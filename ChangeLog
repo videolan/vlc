@@ -1,3 +1,12 @@
+Sun Jun 18 18:54:48 CEST 2000
+0.1.99c :
+
+ * fixed Makefile.in for debug version
+ * catched Delete Window event in Gnome and X11 modes
+ * fixed manpage
+ * GGI output now works
+ * fixed a segfault on exit for the Gnome plugin
+
 Sat Jun 17 03:35:02 CEST 2000
 0.1.99b :
 

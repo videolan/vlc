@@ -210,6 +210,10 @@ void intf_Destroy( intf_thread_t *p_intf )
     /* Unload channels */
     UnloadChannels( p_intf );
 
+    /* XXX: Close plugin - we don't do it because it makes the Gnome
+     * plugin segfaulting */
+    /*TrashPlugin( p_intf->intf_plugin );*/
+
     /* Close plugin */
     TrashPlugin( p_intf->intf_plugin );
 
