@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.11 2002/11/13 20:23:21 fenrir Exp $
+ * $Id: vcd.c,v 1.12 2002/12/06 16:34:04 sam Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -436,8 +436,8 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
  ****************************************************************************/
 static void VCDSeek( input_thread_t * p_input, off_t i_off )
 {
-    thread_vcd_data_t *               p_vcd;
-    int                               i_index;
+    thread_vcd_data_t * p_vcd;
+    unsigned int i_index;
 
     p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
 

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.8 2002/11/28 16:32:29 fenrir Exp $
+ * $Id: mp4.c,v 1.9 2002/12/06 16:34:06 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -99,7 +99,7 @@ static int MP4Init( vlc_object_t * p_this )
     MP4_Box_t       *p_mvhd;
     MP4_Box_t       *p_trak;
 
-    int             i;
+    unsigned int    i;
     /* I need to seek */
     if( !p_input->stream.b_seekable )
     {
@@ -313,7 +313,7 @@ static int MP4Init( vlc_object_t * p_this )
 static int MP4Demux( input_thread_t *p_input )
 {
     demux_sys_t *p_demux = p_input->p_demux_data;
-    int i_track;
+    unsigned int i_track;
 
     /* XXX beurk, beuRK and BEURK, 
        but only way I've found to detect seek from interface */
@@ -401,7 +401,7 @@ static int MP4Demux( input_thread_t *p_input )
 static int   MP4Seek     ( input_thread_t *p_input, mtime_t i_date )
 {
     demux_sys_t *p_demux = p_input->p_demux_data;
-    int i_track;
+    unsigned int i_track;
 
     /* First update update global time */
     p_demux->i_time = i_date * p_demux->i_timescale / 1000000;
@@ -420,19 +420,19 @@ static int   MP4Seek     ( input_thread_t *p_input, mtime_t i_date )
  * MP4End: frees unused data
  *****************************************************************************/
 static void __MP4End ( vlc_object_t * p_this )
-{   
+{
 #define FREE( p ) \
-    if( p ) { free( p ); } 
-    int i_track;
+    if( p ) { free( p ); }
+    unsigned int i_track;
     input_thread_t *  p_input = (input_thread_t *)p_this;
     demux_sys_t *p_demux = p_input->p_demux_data;
-    
+
     msg_Dbg( p_input, "Freeing all memory" );
     MP4_BoxFree( p_input, &p_demux->box_root );
     for( i_track = 0; i_track < p_demux->i_tracks; i_track++ )
     {
-        int i_chunk;
-        for( i_chunk = 0; 
+        unsigned int i_chunk;
+        for( i_chunk = 0;
                 i_chunk < p_demux->track[i_track].i_chunk_count; i_chunk++ )
         {
             if( p_demux->track[i_track].chunk )
@@ -465,7 +465,7 @@ static void __MP4End ( vlc_object_t * p_this )
 static int MP4_TrackSynchro( input_thread_t *p_input, track_data_mp4_t *p_track )
 {
     demux_sys_t *p_demux = p_input->p_demux_data;
-    int i_chunk_last;
+    unsigned int i_chunk_last;
     MP4_Box_t   *p_stss;
 
     if( !p_track->b_ok ||
@@ -508,9 +508,9 @@ static int MP4_TrackSynchro( input_thread_t *p_input, track_data_mp4_t *p_track 
     /* *** Try to find nearest sync points *** */
     if( ( p_stss = MP4_BoxGet( p_track->p_stbl, "stss" ) ) )
     {
-        int i_index;
-        msg_Dbg( p_input, 
-                    "track[Id 0x%x] using Sync Sample Box (stss)", 
+        unsigned int i_index;
+        msg_Dbg( p_input,
+                    "track[Id 0x%x] using Sync Sample Box (stss)",
                     p_track->i_track_ID );
         for( i_index = 0; i_index < p_stss->data.p_stss->i_entry_count; i_index++ )
         {
@@ -574,7 +574,7 @@ static void MP4_ParseTrack( input_thread_t *p_input,
                      track_data_mp4_t *p_demux_track,
                      MP4_Box_t  * p_trak )
 {
-    int i;
+    unsigned int i;
 
     MP4_Box_t *p_tkhd = MP4_BoxGet( p_trak, "tkhd" );
     MP4_Box_t *p_tref = MP4_BoxGet( p_trak, "tref" );
@@ -692,8 +692,8 @@ static int MP4_CreateChunksIndex( input_thread_t *p_input,
     MP4_Box_t *p_co64; /* give offset for each chunk, same for stco and co64 */
     MP4_Box_t *p_stsc;
 
-    int i_chunk;
-    int i_index, i_last;
+    unsigned int i_chunk;
+    unsigned int i_index, i_last;
    
 
     if( ( !(p_co64 = MP4_BoxGet( p_demux_track->p_stbl, "stco" ) )&&
@@ -900,12 +900,12 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
 static void MP4_StartDecoder( input_thread_t *p_input,
                                  track_data_mp4_t *p_demux_track )
 {
-    MP4_Box_t   *p_sample;
-    int         i;
-    int         i_chunk;
+    MP4_Box_t *  p_sample;
+    unsigned int i;
+    unsigned int i_chunk;
 
-    int         i_decoder_specific_info_len;
-    uint8_t     *p_decoder_specific_info;
+    unsigned int i_decoder_specific_info_len;
+    uint8_t *    p_decoder_specific_info;
     
     uint8_t             *p_init;
     BITMAPINFOHEADER    *p_bih;
@@ -1141,7 +1141,7 @@ static int  MP4_ReadSample( input_thread_t *p_input,
                             track_data_mp4_t *p_demux_track,
                             pes_packet_t **pp_pes )
 {
-    int i_size;
+    size_t i_size;
     off_t i_pos;
 
     data_packet_t *p_data;

@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.6 2002/11/20 13:37:36 sam Exp $
+ * $Id: ps.c,v 1.7 2002/12/06 16:34:07 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -195,7 +195,7 @@ static int Activate( vlc_object_t * p_this )
         else
         {
             /* (We have to do it ourselves) */
-            int                 i_es;
+            unsigned int i_es;
 
             /* FIXME: we should do multiple passes in case an audio type
              * is not present */

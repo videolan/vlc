@@ -2,7 +2,7 @@
  * postprocessing_mmxext.c: Post Processing plugin MMXEXT
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: postprocessing_mmxext.c,v 1.3 2002/10/28 06:26:11 fenrir Exp $
+ * $Id: postprocessing_mmxext.c,v 1.4 2002/12/06 16:34:05 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -122,7 +122,7 @@ UNUSED_LONGLONG( mmx_m2_5_m5_2 ) = 0xfffe0005fffb0002ULL;
  ****************************************************************************/
 static inline int pp_deblock_isDC_mode( u8 *p_v )
 {
-    int i_eq_cnt;
+    unsigned int i_eq_cnt;
 
 
     /* algo :

@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.5 2002/11/13 20:23:21 fenrir Exp $
+ * $Id: access.c,v 1.6 2002/12/06 16:34:04 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -16,7 +16,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -104,7 +104,7 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
         return -1;
     }
     p_input->p_access_data = (void *)p_dvd;
-    
+
     p_input->pf_read = DVDRead;
     p_input->pf_seek = DVDSeek;
     p_input->pf_set_area = DVDSetArea;
@@ -116,10 +116,10 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
         free( p_dvd );
         return -1;
     }
-    
-    /* 
+
+    /*
      * set up input
-     */ 
+     */
     p_input->i_mtu = 0;
 
     /* override environment variable DVDCSS_METHOD with config option
@@ -146,9 +146,9 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
 
     /*
      *  get plugin ready
-     */ 
+     */
     p_dvd->dvdhandle = dvdcss_open( psz_device );
-    
+
     /* free allocated string */
     free( psz_device );
 
@@ -210,7 +210,7 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
         /* Titles are Program Chains */
         area[i]->i_id = i;
 
-        /* Absolute start offset and size 
+        /* Absolute start offset and size
          * We can only set that with vts ifo, so we do it during the
          * first call to DVDSetArea */
         area[i]->i_start = 0;
@@ -223,23 +223,23 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
         /* Offset to vts_i_0.ifo */
         area[i]->i_plugin_data = p_dvd->p_ifo->i_start +
                        title_inf.p_attr[i-1].i_start_sector;
-    }   
+    }
 #undef area
-    
+
     p_dvd->i_title = p_dvd->i_title <= title_inf.i_title_nb ?
                      p_dvd->i_title : 1;
 #undef title_inf
 
     p_area = p_input->stream.pp_areas[p_dvd->i_title];
-    
+
     p_area->i_part = p_dvd->i_chapter <= p_area->i_part_nb ?
                      p_dvd->i_chapter : 1;
     p_dvd->i_chapter = 1;
-    
+
     p_dvd->b_new_chapter = 0;
     p_dvd->i_audio_nb = 0;
     p_dvd->i_spu_nb = 0;
-    
+
     /* set title, chapter, audio and subpic */
     if( DVDSetArea( p_input, p_area ) < 0 )
     {
@@ -277,13 +277,13 @@ void E_(DVDClose) ( vlc_object_t *p_this )
  * DVDSetProgram: used to change angle
  *****************************************************************************/
 static int DVDSetProgram( input_thread_t    * p_input,
-                          pgrm_descriptor_t * p_program ) 
+                          pgrm_descriptor_t * p_program )
 {
     if( p_input->stream.p_selected_program != p_program )
     {
         thread_dvd_data_t *  p_dvd;
         int                  i_angle;
-    
+
         p_dvd   = (thread_dvd_data_t*)(p_input->p_access_data);
         i_angle = p_program->i_number;
 
@@ -342,7 +342,7 @@ static void DVDFlushStream( input_thread_t * p_input )
         {
             input_DelES( p_input, p_input->stream.pp_es[0] );
         }
-        
+
         while( p_input->stream.i_pgrm_number )
         {
             input_DelProgram( p_input, p_input->stream.pp_programs[0] );
@@ -367,7 +367,7 @@ static int DVDReadAngle( input_thread_t * p_input )
 
     p_dvd      = (thread_dvd_data_t*)(p_input->p_access_data);
     i_angle_nb = vmg.title_inf.p_attr[p_dvd->i_title-1].i_angle_nb;
-    
+
     input_AddProgram( p_input, 1, sizeof( stream_ps_data_t ) );
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
 
@@ -459,16 +459,16 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* Destroy obsolete ES by reinitializing programs */
         DVDFlushStream( p_input );
-        
+
         /* Angle management: angles are handled through programs */
         p_dvd->i_angle_nb = DVDReadAngle( p_input );
         if( ( p_dvd->i_angle <= 0 ) || p_dvd->i_angle > p_dvd->i_angle_nb )
         {
             p_dvd->i_angle = 1;
         }
-       
+
         DVDSetProgram( p_input,
-                       p_input->stream.pp_programs[p_dvd->i_angle-1] ); 
+                       p_input->stream.pp_programs[p_dvd->i_angle-1] );
 
         msg_Dbg( p_input, "title first %i, last %i, size %i",
                           i_first, i_last, i_last + 1 - p_dvd->i_vts_lb );
@@ -481,7 +481,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         DVDReadVideo( p_input );
         DVDReadAudio( p_input );
         DVDReadSPU  ( p_input );
-   
+
         if( p_input->p_demux )
         {
             DVDLaunchDecoders( p_input );
@@ -495,7 +495,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
     /* Chapter selection */
     p_dvd->i_chapter = DVDSetChapter( p_dvd, p_area->i_part );
-    
+
     p_input->stream.p_selected_area->i_tell = DVDTell;
 
     /* warn interface that something has changed */
@@ -509,7 +509,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
 #define title \
     p_dvd->p_ifo->vts.title_unit.p_title[p_dvd->i_title_id-1].title
-    
+
 /*****************************************************************************
  * DVDRead: reads data packets.
  *****************************************************************************
@@ -596,7 +596,7 @@ static ssize_t DVDRead( input_thread_t * p_input,
 static void DVDSeek( input_thread_t * p_input, off_t i_off )
 {
     thread_dvd_data_t *     p_dvd;
-    
+
     p_dvd = ( thread_dvd_data_t * )(p_input->p_access_data);
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -606,7 +606,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
 
     p_dvd->i_prg_cell = Lb2CellPrg( p_dvd );
     p_dvd->i_map_cell = Lb2CellMap( p_dvd );
-    
+
     if( CellIsInterleaved( p_dvd ) )
     {
         /* if we're inside a multi-angle zone, we have to choose i_sector
@@ -614,7 +614,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
          * can be very wide out of such zones */
         p_dvd->i_vts_lb = CellFirstSector( p_dvd );
     }
-    
+
     p_dvd->i_last_lb  = CellLastSector( p_dvd );
     p_dvd->i_chapter  = CellPrg2Chapter( p_dvd );
 
@@ -694,7 +694,7 @@ static char * DVDParse( input_thread_t * p_input )
         {
             psz_parser++;
         }
-        
+
         if( *psz_parser == '@' )
         {
             /* found end of raw device, and beginning of options */
@@ -766,8 +766,8 @@ static char * DVDParse( input_thread_t * p_input )
             else
             {
                 char * psz_env;
-                
-#ifndef WIN32    
+
+#ifndef WIN32
                 if( !S_ISCHR(stat_info.st_mode) )
                 {
                     msg_Warn( p_input, "raw device %s is"
@@ -791,11 +791,11 @@ static char * DVDParse( input_thread_t * p_input )
             psz_raw = "";
         }
     }
-    
+
     if( !*psz_device )
     {
         free( psz_device );
-        
+
         if( !p_input->psz_access )
         {
             /* no device and no access specified: we probably don't want DVD */
@@ -804,16 +804,16 @@ static char * DVDParse( input_thread_t * p_input )
         psz_device = config_GetPsz( p_input, "dvd" );
     }
 
-#ifndef WIN32    
+#ifndef WIN32
     /* check block device */
     if( stat( psz_device, &stat_info ) == -1 )
     {
         msg_Err( p_input, "cannot stat() device `%s' (%s)",
                           psz_device, strerror(errno));
         free( psz_device );
-        return NULL;                    
+        return NULL;
     }
-    
+
     if( !S_ISBLK(stat_info.st_mode) && !S_ISCHR(stat_info.st_mode) )
     {
         msg_Warn( p_input,
@@ -822,10 +822,10 @@ static char * DVDParse( input_thread_t * p_input )
         return NULL;
     }
 #endif
-    
+
     msg_Dbg( p_input, "dvd=%s raw=%s title=%d chapter=%d angle=%d",
                       psz_device, psz_raw, p_dvd->i_title,
                       p_dvd->i_chapter, p_dvd->i_angle );
 
     return psz_device;
-} 
+}

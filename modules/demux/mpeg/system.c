@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.7 2002/11/20 13:37:36 sam Exp $
+ * $Id: system.c,v 1.8 2002/12/06 16:34:07 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -14,7 +14,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -86,10 +86,10 @@ static int Activate ( vlc_object_t *p_this )
 static inline size_t MoveChunk( byte_t * p_dest, data_packet_t ** pp_data_src,
                                 byte_t ** pp_src, size_t i_buf_len )
 {
-    ptrdiff_t           i_available;
+    size_t i_available;
 
-    if( (i_available = (*pp_data_src)->p_payload_end - *pp_src)
-            >= i_buf_len )
+    i_available = (ptrdiff_t)((*pp_data_src)->p_payload_end - *pp_src);
+    if( i_available >= i_buf_len )
     {
         if( p_dest != NULL )
             memcpy( p_dest, *pp_src, i_buf_len );
@@ -98,7 +98,7 @@ static inline size_t MoveChunk( byte_t * p_dest, data_packet_t ** pp_data_src,
     }
     else
     {
-        size_t          i_init_len = i_buf_len;
+        size_t i_init_len = i_buf_len;
 
         do
         {
@@ -113,9 +113,10 @@ static inline size_t MoveChunk( byte_t * p_dest, data_packet_t ** pp_data_src,
                 return( i_init_len - i_buf_len );
             }
             *pp_src = (*pp_data_src)->p_payload_start;
+
+            i_available = (ptrdiff_t)((*pp_data_src)->p_payload_end - *pp_src);
         }
-        while( (i_available = (*pp_data_src)->p_payload_end - *pp_src)
-                <= i_buf_len );
+        while( i_available <= i_buf_len );
 
         if( i_buf_len )
         {
@@ -176,7 +177,7 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     }
     else
     {
-        int i_pes_header_size, i_payload_size;
+        unsigned int i_pes_header_size, i_payload_size;
 
         if ( p_es->i_pes_real_size &&
              (p_es->i_pes_real_size != p_pes->i_pes_size) )
@@ -214,7 +215,7 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 i_max_len = MoveChunk( p_full_header, &p_data, &p_byte, 12 );
                 if( i_max_len < 2 )
                 {
-                    msg_Warn( p_input, 
+                    msg_Warn( p_input,
                               "PES packet too short to have a MPEG-2 header" );
                     input_DeletePES( p_input->p_method_data,
                                             p_pes );
@@ -479,7 +480,7 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
             }
             p_pes->i_rate = p_input->stream.control.i_rate;
             p_pes->p_first = p_data;
-            
+
             /* If the PES header fits in the first data packet, we can
              * already set p_gather->i_pes_real_size. */
             if( p_data->p_payload_end - p_data->p_payload_start
@@ -489,9 +490,9 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
                                          + p_data->p_payload_start[5] + 6;
             }
             else
-            { 
+            {
                 p_es->i_pes_real_size = 0;
-            } 
+            }
         }
         else
         {
@@ -505,7 +506,7 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
         /* Size of the payload carried in the data packet */
         p_pes->i_pes_size += (p_data->p_payload_end
                                  - p_data->p_payload_start);
-    
+
         /* We can check if the packet is finished */
         if( p_pes->i_pes_size == p_es->i_pes_real_size )
         {
@@ -550,8 +551,8 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                  (stream_ps_data_t *)p_input->stream.p_demux_data;
     byte_t *            p_byte;
     byte_t *            p_end;
-    int                 i;
-    int                 i_new_es_number = 0;
+    unsigned int        i;
+    unsigned int        i_new_es_number = 0;
 
     if( p_data->p_demux_start + 10 > p_data->p_payload_end )
     {
@@ -595,7 +596,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     while( p_byte + 4 <= p_end )
     {
         es_descriptor_t *   p_es = NULL;
-        u8                  i_stream_id = p_byte[1];
+        uint8_t             i_stream_id = p_byte[1];
         /* FIXME: there will be a problem with private streams... (same
          * stream_id) */
 
@@ -700,7 +701,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     {                                                                       \
         return( -1 );                                                       \
     }                                                                       \
-    else if( i_error < SIZE )                                               \
+    else if( (size_t)i_error < SIZE )                                       \
     {                                                                       \
         /* EOF */                                                           \
         return( 0 );                                                        \
@@ -802,15 +803,15 @@ static ssize_t ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
 static es_descriptor_t * ParsePS( input_thread_t * p_input,
                                   data_packet_t * p_data )
 {
-    u32                 i_code;
+    uint32_t            i_code;
     es_descriptor_t *   p_es = NULL;
 
     i_code = p_data->p_demux_start[3];
 
     if( i_code > 0xBC ) /* ES start code */
     {
-        u16                 i_id;
-        int                 i_dummy;
+        uint16_t            i_id;
+        unsigned int        i_dummy;
 
         /* This is a PES packet. Find out if we want it or not. */
         i_id = GetID( p_data );
@@ -1034,11 +1035,11 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
             DecodePSM( p_input, p_data );
             b_trash = 1;
             break;
-    
+
         case 0x1B9: /* PROGRAM_END_CODE */
             b_trash = 1;
             break;
-   
+
         default:
             /* This should not happen */
             b_trash = 1;
@@ -1073,7 +1074,7 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     }
 }
 
- 
+
 /*
  * TS Demultiplexing
  */
@@ -1141,8 +1142,8 @@ static ssize_t ReadTS( input_thread_t * p_input, data_packet_t ** pp_data )
 static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                      psi_callback_t pf_psi_callback )
 {
-    u16                 i_pid;
-    int                 i_dummy;
+    uint16_t            i_pid;
+    unsigned int        i_dummy;
     vlc_bool_t          b_adaptation;         /* Adaptation field is present */
     vlc_bool_t          b_payload;                 /* Packet carries payload */
     vlc_bool_t          b_unit_start;  /* A PSI or a PES start in the packet */
@@ -1163,7 +1164,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
 
     /* Find out the elementary stream. */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    
+
     for( i_dummy = 0; i_dummy < p_input->stream.i_pgrm_number; i_dummy ++ )
     {
         if( (( pgrm_ts_data_t * ) p_input->stream.pp_programs[i_dummy]->
@@ -1173,20 +1174,20 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
             break;
         }
     }
-            
+
     p_es= input_FindES( p_input, i_pid );
-    
+
     if( (p_es != NULL) && (p_es->p_demux_data != NULL) )
     {
         p_es_demux = (es_ts_data_t *)p_es->p_demux_data;
-        
+
         if( p_es_demux->b_psi )
         {
             b_psi = 1;
         }
         else
         {
-            p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data; 
+            p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data;
         }
     }
 
@@ -1199,17 +1200,17 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     }
     else if( p_es->p_decoder_fifo == NULL && !b_psi )
     {
-        b_trash = 1; 
+        b_trash = 1;
     }
 
     vlc_mutex_unlock( &p_input->stream.control.control_lock );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
 
-    /* Don't change the order of the tests : if b_psi then p_pgrm_demux 
+    /* Don't change the order of the tests : if b_psi then p_pgrm_demux
      * may still be null. Who said it was ugly ?
      * I have written worse. --Meuuh */
-    if( ( p_es  ) && 
+    if( ( p_es  ) &&
         ((p_es->p_decoder_fifo != NULL) || b_psi || b_pcr ) )
     {
         p_es->c_packets++;
@@ -1226,7 +1227,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         {
             /* p[4] is adaptation_field_length minus one */
             p_data->p_payload_start += 5 + p[4];
-    
+
             /* The adaptation field can be limited to the
              * adaptation_field_length byte, so that there is nothing to do:
              * skip this possibility */
@@ -1243,7 +1244,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                     p_data->b_discard_payload = 1;
                     p_es->c_invalid_packets++;
                 }
-    
+
                 /* Now we are sure that the byte containing flags is present:
                  * read it */
                 else
@@ -1255,18 +1256,18 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                             "discontinuity_indicator encountered by TS demux "
                             "(position read: %d, saved: %d)",
                             p[5] & 0x80, p_es_demux->i_continuity_counter );
-    
+
                         /* If the PID carries the PCR, there will be a system
                          * time-based discontinuity. We let the PCR decoder
                          * handle that. */
                         p_es->p_pgrm->i_synchro_state = SYNCHRO_REINIT;
-    
+
                         /* There also may be a continuity_counter
                          * discontinuity: resynchronize our counter with
                          * the one of the stream. */
                         p_es_demux->i_continuity_counter = (p[3] & 0x0f) - 1;
                     }
-    
+
                 } /* valid TS adaptation field ? */
             } /* length > 0 */
         } /* has adaptation field */
@@ -1320,7 +1321,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
             } /* not continuous */
         } /* continuity */
     } /* if selected or PCR */
-    
+
     /* Handle PCR */
     if( b_pcr && b_adaptation && (p[5] & 0x10) && p[4]>=7 )
     {
@@ -1332,7 +1333,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                    ( (mtime_t)p[9] << 1 ) |
                    ( (mtime_t)p[10] >> 7 );
         /* Call the pace control. */
-        for( i_dummy = 0; i_dummy < p_input->stream.i_pgrm_number; 
+        for( i_dummy = 0; i_dummy < p_input->stream.i_pgrm_number;
                                 i_dummy ++ )
         {
             if( ( ( pgrm_ts_data_t * ) p_input->stream.pp_programs[i_dummy]->
@@ -1344,7 +1345,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         }
 
     }
-    
+
     /* Trash the packet if it has no payload or if it isn't selected */
     if( b_trash )
     {
@@ -1361,7 +1362,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         else
         {
             /* The payload carries a PES stream */
-            GatherPES( p_input, p_data, p_es, b_unit_start, b_lost ); 
+            GatherPES( p_input, p_data, p_es, b_unit_start, b_lost );
         }
 
     }

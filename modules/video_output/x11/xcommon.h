@@ -2,7 +2,7 @@
  * xcommon.h: Defines common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.h,v 1.3 2002/09/10 12:15:07 sam Exp $
+ * $Id: xcommon.h,v 1.4 2002/12/06 16:34:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,8 +51,8 @@ typedef struct x11_window_t
     Window              base_window;                          /* base window */
     Window              video_window;     /* sub-window for displaying video */
     GC                  gc;              /* graphic context instance handler */
-    int                 i_width;                             /* window width */
-    int                 i_height;                           /* window height */
+    unsigned int        i_width;                             /* window width */
+    unsigned int        i_height;                           /* window height */
     Atom                wm_protocols;
     Atom                wm_delete_window;
 
@@ -92,16 +92,16 @@ struct vout_sys_t
 #else
     Colormap            colormap;               /* colormap used (8bpp only) */
 
-    int                 i_screen_depth;
-    int                 i_bytes_per_pixel;
-    int                 i_bytes_per_line;
+    unsigned int        i_screen_depth;
+    unsigned int        i_bytes_per_pixel;
+    unsigned int        i_bytes_per_line;
 #endif
 
     /* Screen saver properties */
-    int                 i_ss_timeout;                             /* timeout */
-    int                 i_ss_interval;           /* interval between changes */
-    int                 i_ss_blanking;                      /* blanking mode */
-    int                 i_ss_exposure;                      /* exposure mode */
+    unsigned int        i_ss_timeout;                             /* timeout */
+    unsigned int        i_ss_interval;           /* interval between changes */
+    unsigned int        i_ss_blanking;                      /* blanking mode */
+    unsigned int        i_ss_exposure;                      /* exposure mode */
 #ifdef DPMSINFO_IN_DPMS_H
     BOOL                b_ss_dpms;                              /* DPMS mode */
 #endif

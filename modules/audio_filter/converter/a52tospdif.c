@@ -2,7 +2,7 @@
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: a52tospdif.c,v 1.15 2002/11/28 23:24:14 massiot Exp $
+ * $Id: a52tospdif.c,v 1.16 2002/12/06 16:34:04 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -85,15 +85,15 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
      * endian.
      */
 
-    static const u8 p_sync[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x01, 0x00 };
+    static const uint8_t p_sync[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x01, 0x00 };
 #ifndef HAVE_SWAB
-    u16 i;
+    byte_t * p_tmp;
+    uint16_t i;
 #endif
-    u16 i_length = p_in_buf->i_nb_bytes;
-    u8 * pi_length;
+    uint16_t i_length = p_in_buf->i_nb_bytes;
+    uint8_t * pi_length;
     byte_t * p_in = p_in_buf->p_buffer;
     byte_t * p_out = p_out_buf->p_buffer;
-    byte_t * p_tmp;
 
     /* Copy the S/PDIF headers. */
     memcpy( p_out, p_sync, 6 );

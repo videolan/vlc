@@ -2,7 +2,7 @@
  * generic.c: MPEG audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: generic.c,v 1.4 2002/08/28 22:25:38 massiot Exp $
+ * $Id: generic.c,v 1.5 2002/12/06 16:34:05 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -185,7 +185,7 @@ int adec_SyncFrame( adec_thread_t * p_adec, adec_sync_info_t * p_sync_info )
 
 int adec_DecodeFrame( adec_thread_t * p_adec, float * buffer )
 {
-    int i_total_bytes_read;
+    unsigned int i_total_bytes_read;
 
     /* parse audio data */
 

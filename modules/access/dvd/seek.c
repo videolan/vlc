@@ -1,7 +1,7 @@
 /* seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: seek.c,v 1.2 2002/08/08 00:35:10 sam Exp $
+ * $Id: seek.c,v 1.3 2002/12/06 16:34:04 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -82,24 +82,24 @@ int CellPrg2Map( thread_dvd_data_t * p_dvd )
     {
         i_cell++;
     }
-    
+
     if( i_cell >= cell.i_cell_nb )
     {
         return -1;
     }
 
-    return i_cell;    
+    return i_cell;
 }
 
 int CellAngleOffset( thread_dvd_data_t * p_dvd, int i_prg_cell )
 {
     int     i_cell_off;
-    
+
     if( i_prg_cell >= title.i_cell_nb )
     {
         return 0;
     }
-    
+
     /* basic handling of angles */
     switch( ( ( title.p_cell_play[i_prg_cell].i_category & 0xf000 )
                     >> 12 ) )
@@ -126,7 +126,7 @@ int CellFirstSector( thread_dvd_data_t * p_dvd )
     return __MAX( cell.p_cell_map[p_dvd->i_map_cell].i_first_sector,
                   title.p_cell_play[p_dvd->i_prg_cell].i_first_sector );
 }
-    
+
 int CellLastSector( thread_dvd_data_t * p_dvd )
 {
     return __MIN( cell.p_cell_map[p_dvd->i_map_cell].i_last_sector,
@@ -135,8 +135,8 @@ int CellLastSector( thread_dvd_data_t * p_dvd )
 
 int NextCellPrg( thread_dvd_data_t * p_dvd )
 {
-    int     i_cell = p_dvd->i_prg_cell;
-    
+    unsigned int i_cell = p_dvd->i_prg_cell;
+
     if( p_dvd->i_vts_lb > title.p_cell_play[i_cell].i_last_sector )
     {
         i_cell ++;
@@ -147,14 +147,14 @@ int NextCellPrg( thread_dvd_data_t * p_dvd )
             return -1;
         }
     }
-    
+
     return i_cell;
 }
 
 int Lb2CellPrg( thread_dvd_data_t * p_dvd )
 {
-    int     i_cell = 0;
-    
+    unsigned int i_cell = 0;
+
     while( p_dvd->i_vts_lb > title.p_cell_play[i_cell].i_last_sector )
     {
         i_cell ++;
@@ -165,14 +165,14 @@ int Lb2CellPrg( thread_dvd_data_t * p_dvd )
             return -1;
         }
     }
-    
+
     return i_cell;
 }
 
 int Lb2CellMap( thread_dvd_data_t * p_dvd )
 {
     int     i_cell = 0;
-    
+
     while( p_dvd->i_vts_lb > cell.p_cell_map[i_cell].i_last_sector )
     {
         i_cell ++;
@@ -182,7 +182,7 @@ int Lb2CellMap( thread_dvd_data_t * p_dvd )
             return -1;
         }
     }
-    
+
     return i_cell;
 }
 
@@ -211,7 +211,7 @@ int LbMaxOnce( thread_dvd_data_t * p_dvd )
 
         p_dvd->i_vts_lb   = CellFirstSector( p_dvd );
         p_dvd->i_last_lb  = CellLastSector( p_dvd );
-        
+
         p_dvd->i_chapter = NextChapter( p_dvd );
         if( p_dvd->i_chapter < 0 )
         {
@@ -239,14 +239,14 @@ int LbMaxOnce( thread_dvd_data_t * p_dvd )
 
 int CellPrg2Chapter( thread_dvd_data_t * p_dvd )
 {
-    int     i_chapter = 1;
-    int     i_cell    = p_dvd->i_prg_cell;
-    
+    unsigned int i_chapter = 1;
+    unsigned int i_cell    = p_dvd->i_prg_cell;
+
     if( CellIsInterleaved( p_dvd ) )
     {
         i_cell -= (p_dvd->i_angle - 1);
     }
-    
+
     while( title.chapter_map.pi_start_cell[i_chapter] <= i_cell+1 )
     {
         i_chapter ++;
@@ -262,12 +262,12 @@ int CellPrg2Chapter( thread_dvd_data_t * p_dvd )
 int NextChapter( thread_dvd_data_t * p_dvd )
 {
     int i_cell = p_dvd->i_prg_cell;
-    
+
     if( CellIsInterleaved( p_dvd ) )
     {
         i_cell -= (p_dvd->i_angle - 1);
     }
-    
+
     if( title.chapter_map.pi_start_cell[p_dvd->i_chapter] <= i_cell+1 )
     {
         p_dvd->i_chapter++;
@@ -285,13 +285,13 @@ int NextChapter( thread_dvd_data_t * p_dvd )
 
 
 
-int DVDSetChapter( thread_dvd_data_t * p_dvd, int i_chapter )
+int DVDSetChapter( thread_dvd_data_t * p_dvd, unsigned int i_chapter )
 {
     if( i_chapter <= 0 || i_chapter > p_dvd->i_chapter_nb )
     {
         i_chapter = 1;
     }
-    
+
     if( p_dvd->i_chapter != i_chapter )
     {
         /* Find cell index in Program chain for current chapter */
@@ -315,13 +315,13 @@ int DVDSetChapter( thread_dvd_data_t * p_dvd, int i_chapter )
 #endif
             return -1;
         }
-        
+
 #if 0
         intf_WarnMsg( 4, "dvd info: chapter %d prg_cell %d map_cell %d",
                 i_chapter, p_dvd->i_prg_cell, p_dvd->i_map_cell );
 #endif
     }
-    
+
     return i_chapter;
 }
 

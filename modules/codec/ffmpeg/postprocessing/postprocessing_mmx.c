@@ -2,7 +2,7 @@
  * postprocessing_mmx.c: Post Processing library in MMX
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: postprocessing_mmx.c,v 1.1 2002/08/04 22:13:06 fenrir Exp $
+ * $Id: postprocessing_mmx.c,v 1.2 2002/12/06 16:34:05 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -114,7 +114,7 @@ UNUSED_LONGLONG( mmx_m2_5_m5_2 ) = 0xfffe0005fffb0002ULL;
  ****************************************************************************/
 static inline int pp_deblock_isDC_mode( u8 *p_v )
 {
-    int i_eq_cnt;
+    unsigned int i_eq_cnt;
 
     /* algo :
        x = v[i] - v[i+1] without signed saturation 

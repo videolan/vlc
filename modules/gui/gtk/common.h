@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: common.h,v 1.3 2002/09/30 11:05:38 sam Exp $
+ * $Id: common.h,v 1.4 2002/12/06 16:34:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -46,7 +46,7 @@ struct intf_sys_t
     vlc_bool_t          b_slider_free;                      /* slider status */
 
     /* menus handlers */
-    vlc_bool_t          b_program_update;   /* do we need to update programs 
+    vlc_bool_t          b_program_update;   /* do we need to update programs
                                                                         menu */
     vlc_bool_t          b_title_update;  /* do we need to update title menus */
     vlc_bool_t          b_chapter_update;            /* do we need to update
@@ -84,7 +84,7 @@ struct intf_sys_t
     /* The window labels for DVD mode */
     GtkLabel *          p_label_title;
     GtkLabel *          p_label_chapter;
-    gint                i_part;                           /* current chapter */
+    guint               i_part;                           /* current chapter */
 };
 
 /*****************************************************************************

@@ -2,14 +2,14 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.4 2002/11/17 06:46:56 fenrir Exp $
+ * $Id: mp4.h,v 1.5 2002/12/06 16:34:06 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -48,7 +48,7 @@ typedef struct waveformatex_s
     uint32_t i_avgbytespersec;
     uint16_t i_blockalign;
     uint16_t i_bitspersample;
-    uint16_t i_size;          /* This give size of data 
+    uint16_t i_size;          /* This give size of data
                             imediatly following this header. */
 } waveformatex_t;
 
@@ -62,7 +62,7 @@ typedef struct chunk_data_mp4_s
     uint32_t     i_sample_count; /* how many samples in this chunk */
     uint32_t     i_sample_first; /* index of the first sample in this chunk */
 
-    /* now provide way to calculate pts, dts, and offset without to 
+    /* now provide way to calculate pts, dts, and offset without to
         much memory and with fast acces */
 
     /* with this we can calculate dts/pts without waste memory */
@@ -70,9 +70,9 @@ typedef struct chunk_data_mp4_s
     uint32_t     *p_sample_count_dts;
     uint32_t     *p_sample_delta_dts; /* dts delta */
 
-    /* TODO if needed add pts 
+    /* TODO if needed add pts
         but quickly *add* support for edts and seeking */
-    
+
 } chunk_data_mp4_t;
 
 
@@ -91,31 +91,31 @@ typedef struct track_data_mp4_s
     /* display size only ! */
     int         i_width;
     int         i_height;
- 
-    /* more internal data */    
+
+    /* more internal data */
     uint64_t         i_timescale;  /* time scale for this track only */
 
-    /* give the next sample to read, i_chunk is to find quickly where 
+    /* give the next sample to read, i_chunk is to find quickly where
       the sample is located */
     uint32_t         i_sample;       /* next sample to read */
     uint32_t         i_chunk;        /* chunk where next sample is stored */
     /* total count of chunk and sample */
-    uint32_t         i_chunk_count;  
+    uint32_t         i_chunk_count;
     uint32_t         i_sample_count;
-    
+
     chunk_data_mp4_t    *chunk; /* always defined  for each chunk */
-    
-    /* sample size, p_sample_size defined only if i_sample_size == 0 
+
+    /* sample size, p_sample_size defined only if i_sample_size == 0
         else i_sample_size is size for all sample */
     uint32_t         i_sample_size;
-    uint32_t         *p_sample_size; /* XXX perhaps add file offset if take 
+    uint32_t         *p_sample_size; /* XXX perhaps add file offset if take
                                     too much time to do sumations each time*/
-    
+
     es_descriptor_t *p_es; /* vlc es for this track */
 
     MP4_Box_t *p_stbl;  /* will contain all timing information */
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
-    
+
     MP4_Box_t *p_sample; /* actual SampleEntry to make life simpler */
 } track_data_mp4_t;
 
@@ -125,23 +125,21 @@ typedef struct track_data_mp4_s
  *****************************************************************************/
 struct demux_sys_t
 {
+    MP4_Box_t   box_root;      /* container for the whole file */
 
-    MP4_Box_t   box_root;       /* container for the hole file */
+    mtime_t      i_pcr;
 
-    mtime_t     i_pcr;
-    
-    uint64_t    i_time;         /* time position of the presentation in movie timescale */
-    uint64_t    i_timescale;    /* movie time scale */
-    uint64_t    i_duration;     /* movie duration */
-    int         i_tracks;       /* number of track */  
+    uint64_t     i_time;        /* time position of the presentation
+                                 * in movie timescale */
+    uint64_t     i_timescale;   /* movie time scale */
+    uint64_t     i_duration;    /* movie duration */
+    unsigned int i_tracks;      /* number of tracks */
     track_data_mp4_t *track;    /* array of track */
-    
-  
 };
 
 static inline uint64_t MP4_GetTrackPos( track_data_mp4_t *p_track )
 {
-    int      i_sample;
+    unsigned int i_sample;
     uint64_t i_pos;
 
 
@@ -149,13 +147,13 @@ static inline uint64_t MP4_GetTrackPos( track_data_mp4_t *p_track )
 
     if( p_track->i_sample_size )
     {
-        i_pos += ( p_track->i_sample - 
+        i_pos += ( p_track->i_sample -
                         p_track->chunk[p_track->i_chunk].i_sample_first ) *
                                 p_track->i_sample_size;
     }
     else
     {
-        for( i_sample = p_track->chunk[p_track->i_chunk].i_sample_first; 
+        for( i_sample = p_track->chunk[p_track->i_chunk].i_sample_first;
                 i_sample < p_track->i_sample; i_sample++ )
         {
             i_pos += p_track->p_sample_size[i_sample];
@@ -168,10 +166,10 @@ static inline uint64_t MP4_GetTrackPos( track_data_mp4_t *p_track )
 /* Return time in µs of a track */
 static inline mtime_t MP4_GetTrackPTS( track_data_mp4_t *p_track )
 {
-    int      i_sample;
-    int      i_index;
+    unsigned int i_sample;
+    unsigned int i_index;
     uint64_t i_dts;
-    
+
     i_sample = p_track->i_sample - p_track->chunk[p_track->i_chunk].i_sample_first;
     i_dts = p_track->chunk[p_track->i_chunk].i_first_dts;
     i_index = 0;
@@ -179,22 +177,22 @@ static inline mtime_t MP4_GetTrackPTS( track_data_mp4_t *p_track )
     {
         if( i_sample > p_track->chunk[p_track->i_chunk].p_sample_count_dts[i_index] )
         {
-            i_dts += p_track->chunk[p_track->i_chunk].p_sample_count_dts[i_index] * 
+            i_dts += p_track->chunk[p_track->i_chunk].p_sample_count_dts[i_index] *
                         p_track->chunk[p_track->i_chunk].p_sample_delta_dts[i_index];
             i_sample -= p_track->chunk[p_track->i_chunk].p_sample_count_dts[i_index];
             i_index++;
         }
         else
         {
-            i_dts += i_sample * 
+            i_dts += i_sample *
                         p_track->chunk[p_track->i_chunk].p_sample_delta_dts[i_index];
             i_sample = 0;
             break;
         }
     }
-    return( (mtime_t)( 
+    return( (mtime_t)(
                 (mtime_t)1000000 *
-                (mtime_t)i_dts / 
+                (mtime_t)i_dts /
                 (mtime_t)p_track->i_timescale ) );
 }
 

@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.5 2002/11/06 21:48:24 gbazin Exp $
+ * $Id: parse.c,v 1.6 2002/12/06 16:34:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -249,16 +249,16 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
                                   subpicture_t * p_spu )
 {
     /* Our current index in the SPU packet */
-    int i_index = p_spudec->i_rle_size + 4;
+    unsigned int i_index = p_spudec->i_rle_size + 4;
 
     /* The next start-of-control-sequence index and the previous one */
-    int i_next_seq = 0, i_cur_seq = 0;
+    unsigned int i_next_seq = 0, i_cur_seq = 0;
 
     /* Command and date */
     uint8_t i_command = SPU_CMD_END;
     mtime_t date = 0;
 
-    int i, pi_alpha[4];
+    unsigned int i, pi_alpha[4];
 
     /* Initialize the structure */
     p_spu->i_start = p_spu->i_stop = 0;
@@ -272,18 +272,18 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
         {
             /* Get the control sequence date */
             date = GetBits( &p_spudec->bit_stream, 16 );
- 
+
             /* Next offset */
             i_cur_seq = i_index;
             i_next_seq = GetBits( &p_spudec->bit_stream, 16 );
- 
+
             /* Skip what we just read */
             i_index += 4;
         }
- 
+
         i_command = GetBits( &p_spudec->bit_stream, 8 );
         i_index++;
- 
+
         switch( i_command )
         {
         case SPU_CMD_FORCE_DISPLAY: /* 00 (force displaying) */

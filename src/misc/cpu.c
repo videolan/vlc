@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.9 2002/11/11 14:39:12 sam Exp $
+ * $Id: cpu.c,v 1.10 2002/12/06 16:34:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -106,7 +106,7 @@ uint32_t CPUCapabilities( void )
     volatile vlc_bool_t    b_amd;
 
     /* Needed for x86 CPU capabilities detection */
-#   define cpuid( a )                      \
+#   define cpuid( reg )                    \
         asm volatile ( "pushl %%ebx\n\t"   \
                        "cpuid\n\t"         \
                        "movl %%ebx,%1\n\t" \
@@ -115,7 +115,7 @@ uint32_t CPUCapabilities( void )
                        "=r" ( i_ebx ),     \
                        "=c" ( i_ecx ),     \
                        "=d" ( i_edx )      \
-                     : "a"  ( a )          \
+                     : "a"  ( reg )        \
                      : "cc" );
 
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \

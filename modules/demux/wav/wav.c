@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.5 2002/12/03 17:00:16 fenrir Exp $
+ * $Id: wav.c,v 1.6 2002/12/06 16:34:07 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -604,7 +604,8 @@ static int WAVDemux( input_thread_t *p_input )
                           p_input->stream.p_selected_program,
                           p_demux->i_pcr );
 
-    if( TellAbsolute( p_input ) >= p_demux->i_data_pos + p_demux->i_data_size )
+    if( TellAbsolute( p_input )
+         >= (off_t)(p_demux->i_data_pos + p_demux->i_data_size) )
     {
         return( 0 ); // EOF
     }

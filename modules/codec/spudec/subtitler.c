@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -54,7 +54,7 @@ typedef struct subtitler_line_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static uint16_t *PlotSubtitleLine( char *, subtitler_font_t *, int,
+static uint16_t *PlotSubtitleLine( char *, subtitler_font_t *, unsigned int,
                                    uint16_t * );
 static void      DestroySPU      ( subpicture_t * );
 
@@ -67,12 +67,12 @@ static void      DestroySPU      ( subpicture_t * );
  *     1 byte  : font height in rows
  *
  *     then, per character:
- *     1 byte  : character 
+ *     1 byte  : character
  *     1 byte  : character width in pixels
  *
  *         then, per row:
  *         1 byte  : length of row, in entries
- *         
+ *
  *             then, per entry
  *             1 byte : colour
  *             1 byte : number of pixels of that colour
@@ -85,14 +85,14 @@ subtitler_font_t* E_(subtitler_LoadFont)( vout_thread_t * p_vout,
 {
     subtitler_font_t * p_font;
 
-    int                i;
-    int                i_file;
-    int                i_char;
-    int                i_length;
-    int                i_line;
-    int                i_total_length;
+    unsigned int i;
+    unsigned int i_char;
+    unsigned int i_length;
+    unsigned int i_line;
+    unsigned int i_total_length;
 
-    byte_t             pi_buffer[512];                        /* file buffer */
+    int    i_file;
+    byte_t pi_buffer[512];                                    /* file buffer */
 
     msg_Dbg( p_vout, "loading font '%s'", psz_name );
 
@@ -132,7 +132,7 @@ subtitler_font_t* E_(subtitler_LoadFont)( vout_thread_t * p_vout,
     if( read( i_file, pi_buffer, 1 ) != 1 )
     {
         msg_Err( p_vout, "unexpected end of font file '%s'", psz_name );
-        free( p_font ); 
+        free( p_font );
         close( i_file );
         return( NULL );
     }
@@ -210,7 +210,7 @@ subtitler_font_t* E_(subtitler_LoadFont)( vout_thread_t * p_vout,
             i_total_length += i_length;
 
             /* Read line RLE data */
-            if( read( i_file, pi_buffer, i_length*2 ) != i_length*2)
+            if( read( i_file, pi_buffer, i_length*2 ) != (int)i_length*2)
             {
                 msg_Err( p_vout, "unexpected end of font file '%s'", psz_name);
                 E_(subtitler_UnloadFont)( p_vout, p_font );
@@ -237,7 +237,7 @@ subtitler_font_t* E_(subtitler_LoadFont)( vout_thread_t * p_vout,
 
        /* Set total memory size of character */
        p_font->i_memory[ i_char ] = i_total_length;
-        
+
     }
 
     close(i_file);
@@ -248,11 +248,11 @@ subtitler_font_t* E_(subtitler_LoadFont)( vout_thread_t * p_vout,
 /*****************************************************************************
  * subtitler_UnloadFont: unload a run-length encoded font file from memory
  *****************************************************************************/
-void E_(subtitler_UnloadFont)( vout_thread_t * p_vout, 
+void E_(subtitler_UnloadFont)( vout_thread_t * p_vout,
                                subtitler_font_t * p_font )
 {
-    int i_char;
-    int i_line;
+    unsigned int i_char;
+    unsigned int i_line;
 
     msg_Dbg( p_vout, "unloading font" );
 
@@ -292,12 +292,12 @@ void subtitler_PlotSubtitle ( vout_thread_t *p_vout , char *psz_subtitle,
 {
     subpicture_t     * p_spu;
 
-    int                i_x;
-    int                i_width;
-    int                i_lines;
-    int                i_longest_width;
-    int                i_total_length;
-    int                i_char;
+    unsigned int       i_x;
+    unsigned int       i_width;
+    unsigned int       i_lines;
+    unsigned int       i_longest_width;
+    unsigned int       i_total_length;
+    unsigned int       i_char;
 
     uint16_t         * p_data;
 
@@ -328,7 +328,7 @@ void subtitler_PlotSubtitle ( vout_thread_t *p_vout , char *psz_subtitle,
 
         while( *p_char != '\n' && *p_char != 0 )
         {
-            i_width += p_font->i_width[ toascii( *p_char ) ]; 
+            i_width += p_font->i_width[ toascii( *p_char ) ];
 
             if( i_width > p_vout->output.i_width )
             {
@@ -388,7 +388,7 @@ void subtitler_PlotSubtitle ( vout_thread_t *p_vout , char *psz_subtitle,
            no characters are lost */
         if( *p_char != '\n' && *p_char != 0 )
         {
-            p_char--; 
+            p_char--;
         }
 
         p_line_start = p_char;
@@ -411,7 +411,7 @@ void subtitler_PlotSubtitle ( vout_thread_t *p_vout , char *psz_subtitle,
         i_lines++;
         i_width = 0;
         for( i_x = 0; i_x < strlen( p_line->p_text ); i_x++ )
-        { 
+        {
             i_char = toascii(*(( p_line->p_text )+ i_x ));
             i_width += p_font->i_width[ i_char ];
             i_total_length += p_font->i_memory[ i_char ];
@@ -452,7 +452,7 @@ void subtitler_PlotSubtitle ( vout_thread_t *p_vout , char *psz_subtitle,
 
     p_spu->i_start = i_start;
     p_spu->i_stop = i_stop;
- 
+
     p_spu->b_ephemer = i_stop ? VLC_FALSE : VLC_TRUE;
 
     /* FIXME: Do we need these two? */
@@ -492,7 +492,7 @@ void subtitler_PlotSubtitle ( vout_thread_t *p_vout , char *psz_subtitle,
     p_spu->p_sys->b_crop = VLC_FALSE;
 
     p_spu->i_x = (p_vout->output.i_width - i_longest_width) / 2;
-    p_spu->i_y = p_vout->output.i_height - (p_font->i_height * i_lines); 
+    p_spu->i_y = p_vout->output.i_height - (p_font->i_height * i_lines);
     p_spu->i_width = i_longest_width;
     p_spu->i_height = p_font->i_height*i_lines;
 
@@ -518,13 +518,14 @@ void subtitler_PlotSubtitle ( vout_thread_t *p_vout , char *psz_subtitle,
  * PlotSubtitleLine: plot a single line of a subtitle
  *****************************************************************************/
 static uint16_t * PlotSubtitleLine ( char *psz_line, subtitler_font_t *p_font,
-                                     int i_total_width, uint16_t *p_data )
+                                     unsigned int i_total_width,
+                                     uint16_t *p_data )
 {
-    int   i_x;
-    int   i_y;
-    int   i_length;
-    int   i_line_width;
-    int   i_char;
+    unsigned int i_x;
+    unsigned int i_y;
+    unsigned int i_length;
+    unsigned int i_line_width;
+    unsigned int i_char;
 
     uint16_t * p_rle;
 
@@ -552,12 +553,12 @@ static uint16_t * PlotSubtitleLine ( char *psz_line, subtitler_font_t *p_font,
 
                 if(p_rle != NULL )
                 {
-                    memcpy(p_data, p_rle, i_length * sizeof(uint16_t) ); 
+                    memcpy(p_data, p_rle, i_length * sizeof(uint16_t) );
                     p_data+=i_length;
                 }
             }
         }
-    
+
         /* Pad line to fit box */
         if( i_line_width < i_total_width )
         {

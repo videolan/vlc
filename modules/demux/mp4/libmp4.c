@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.9 2002/11/17 06:46:56 fenrir Exp $
+ * $Id: libmp4.c,v 1.10 2002/12/06 16:34:06 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -534,7 +534,7 @@ int MP4_ReadBoxContainerRaw( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
     MP4_Box_t *p_box;
     
     if( MP4_TellStream( p_stream ) + 8 > 
-                        p_container->i_pos + p_container->i_size  )
+                 (off_t)(p_container->i_pos + p_container->i_size) )
     {
         /* there is no box to load */
         return( 0 );
@@ -573,7 +573,7 @@ int MP4_ReadBoxContainerRaw( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
 int MP4_ReadBoxContainer( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
 {
     
-    if( p_container->i_size <= MP4_BOX_HEADERSIZE(p_container ) + 8 )
+    if( p_container->i_size <= (size_t)MP4_BOX_HEADERSIZE(p_container ) + 8 )
     {
         /* container is empty, 8 stand for the first header in this box */
         return( 1 );
@@ -612,7 +612,7 @@ int MP4_ReadBox_ftyp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     
     if( ( p_box->data.p_ftyp->i_compatible_brands_count = i_read / 4 ) )
     {
-        int i;
+        unsigned int i;
         p_box->data.p_ftyp->i_compatible_brands = 
             calloc( p_box->data.p_ftyp->i_compatible_brands_count, sizeof(uint32_t));
 
@@ -637,7 +637,7 @@ void MP4_FreeBox_ftyp( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_mvhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
 #ifdef MP4_VERBOSE
     char s_creation_time[128];
     char s_modification_time[128];
@@ -709,7 +709,7 @@ int MP4_ReadBox_mvhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 int MP4_ReadBox_tkhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
 #ifdef MP4_VERBOSE
     char s_creation_time[128];
     char s_modification_time[128];
@@ -773,7 +773,7 @@ int MP4_ReadBox_tkhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 int MP4_ReadBox_tref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
 
-    if( p_box->i_size < MP4_BOX_HEADERSIZE(p_box ) + 8 )
+    if( p_box->i_size < (size_t)MP4_BOX_HEADERSIZE(p_box ) + 8 )
     {
         /* container is empty, 8 stand for the first header in this box */
         return( 1 );
@@ -797,7 +797,7 @@ int MP4_ReadBox_tref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 int MP4_ReadBox_mdhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
     uint16_t i_language;
 #ifdef MP4_VERBOSE
     char s_creation_time[128];
@@ -879,7 +879,7 @@ void MP4_FreeBox_hdlr( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_vmhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
    
     MP4_READBOX_ENTER( MP4_Box_data_vmhd_t ); 
 
@@ -1014,7 +1014,7 @@ int MP4_ReadBox_dref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 int MP4_ReadBox_stts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
     MP4_READBOX_ENTER( MP4_Box_data_stts_t ); 
 
     MP4_GETVERSIONFLAGS( p_box->data.p_stts );
@@ -1049,7 +1049,7 @@ void MP4_FreeBox_stts( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_ctts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
     MP4_READBOX_ENTER( MP4_Box_data_ctts_t );
     
     MP4_GETVERSIONFLAGS( p_box->data.p_ctts );
@@ -1084,8 +1084,8 @@ void MP4_FreeBox_ctts( input_thread_t *p_input, MP4_Box_t *p_box )
 
 static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, int64_t  *i_read )
 {
-    int i_b;
-    int i_len = 0;
+    unsigned int i_b;
+    unsigned int i_len = 0;
     do
     {
         i_b = **pp_peek;
@@ -1100,9 +1100,9 @@ static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, int64_t  *i_read )
 int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
 #define es_descriptor p_box->data.p_esds->es_descriptor
-    int i_len;
-    int i_flags;
-    int i_type;
+    unsigned int i_len;
+    unsigned int i_flags;
+    unsigned int i_type;
 
     MP4_READBOX_ENTER( MP4_Box_data_esds_t );
 
@@ -1127,7 +1127,7 @@ int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         }
         if( es_descriptor.b_url )
         {
-            int i_len;
+            unsigned int i_len;
         
             MP4_GET1BYTE( i_len );
             es_descriptor.psz_URL = calloc( sizeof(char), i_len + 1 );
@@ -1188,7 +1188,7 @@ void MP4_FreeBox_esds( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;    
+    unsigned int i;    
     
     MP4_READBOX_ENTER( MP4_Box_data_sample_soun_t );
 
@@ -1228,7 +1228,7 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #if 0
 int MP4_ReadBox_sample_mp4a( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;    
+    unsigned int i;    
 
     MP4_READBOX_ENTER( MP4_Box_data_sample_mp4a_t );
     
@@ -1268,7 +1268,7 @@ int MP4_ReadBox_sample_mp4a( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;    
+    unsigned int i;    
 
     MP4_READBOX_ENTER( MP4_Box_data_sample_vide_t );
 
@@ -1340,7 +1340,7 @@ int MP4_ReadBox_stsd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 int MP4_ReadBox_stsz( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
 
     MP4_READBOX_ENTER( MP4_Box_data_stsz_t );
     
@@ -1378,7 +1378,7 @@ void MP4_FreeBox_stsz( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_stsc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
     
     MP4_READBOX_ENTER( MP4_Box_data_stsc_t );
 
@@ -1418,7 +1418,7 @@ void MP4_FreeBox_stsc( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_stco_co64( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
     
     MP4_READBOX_ENTER( MP4_Box_data_co64_t );
 
@@ -1465,7 +1465,7 @@ void MP4_FreeBox_stco_co64( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_stss( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
     
     MP4_READBOX_ENTER( MP4_Box_data_stss_t ); 
 
@@ -1500,7 +1500,7 @@ void MP4_FreeBox_stss( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_stsh( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
     
     MP4_READBOX_ENTER( MP4_Box_data_stsh_t );
 
@@ -1540,7 +1540,7 @@ void MP4_FreeBox_stsh( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_stdp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
    
     MP4_READBOX_ENTER( MP4_Box_data_stdp_t ); 
 
@@ -1571,7 +1571,7 @@ void MP4_FreeBox_stdp( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_padb( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
     
     MP4_READBOX_ENTER( MP4_Box_data_padb_t );
 
@@ -1619,7 +1619,7 @@ void MP4_FreeBox_padb( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_elst( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i;
+    unsigned int i;
     
     MP4_READBOX_ENTER( MP4_Box_data_padb_t );
 
@@ -1678,8 +1678,8 @@ void MP4_FreeBox_elst( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBox_cprt( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i_language;
-    int i;
+    unsigned int i_language;
+    unsigned int i;
     
     MP4_READBOX_ENTER( MP4_Box_data_cprt_t );
 
@@ -2009,7 +2009,7 @@ static struct
 int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
 {
     int i_result;
-    int i_index;
+    unsigned int i_index;
     
     if( !MP4_ReadBoxCommon( p_stream, p_box ) )
     {
@@ -2061,7 +2061,7 @@ int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
  *****************************************************************************/
 int MP4_CountBox( MP4_Box_t *p_box, uint32_t i_type )
 {
-    int i_count;
+    unsigned int i_count;
     MP4_Box_t *p_child;
     
     if( !p_box )
@@ -2167,7 +2167,7 @@ MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, uint32_t i_number )
  *****************************************************************************/
 void MP4_BoxFree( input_thread_t *p_input, MP4_Box_t *p_box )
 {
-    int i_index;
+    unsigned int i_index;
 
     MP4_Box_t *p_child;
     MP4_Box_t *p_next;
@@ -2283,7 +2283,7 @@ int MP4_BoxGetRoot( input_thread_t *p_input, MP4_Box_t *p_root )
 
 
 static void __MP4_BoxDumpStructure( input_thread_t *p_input,
-                                    MP4_Box_t *p_box, int i_level )
+                                    MP4_Box_t *p_box, unsigned int i_level )
 {
     MP4_Box_t *p_child;
 
@@ -2298,7 +2298,7 @@ static void __MP4_BoxDumpStructure( input_thread_t *p_input,
     else
     {
         char str[512];
-        int i;
+        unsigned int i;
         memset( str, (uint8_t)' ', 512 );
         for( i = 0; i < i_level; i++ )
         {
@@ -2338,7 +2338,7 @@ void MP4_BoxDumpStructure( input_thread_t *p_input, MP4_Box_t *p_box )
  *****************************************************************************/
 static void __get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
 {
-    int i_len ;
+    size_t i_len ;
     if( !*ppsz_path[0] )
     {
         *ppsz_token = NULL;
@@ -2391,7 +2391,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
 {
     char    *psz_path;
 #if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN)
-    int     i_size;
+    size_t  i_size;
 #endif
 
     

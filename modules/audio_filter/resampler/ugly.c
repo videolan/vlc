@@ -2,7 +2,7 @@
  * ugly.c : ugly resampler (changes pitch)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ugly.c,v 1.7 2002/11/20 16:43:32 sam Exp $
+ * $Id: ugly.c,v 1.8 2002/12/06 16:34:04 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -82,12 +82,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int32_t* p_in = (int32_t*)p_in_buf->p_buffer;
     int32_t* p_out = (int32_t*)p_out_buf->p_buffer;
 
-    int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
-    int i_in_nb = p_in_buf->i_nb_samples;
-    int i_out_nb = i_in_nb * p_filter->output.i_rate
-                    / p_filter->input.i_rate;
-    int i_sample_bytes = i_nb_channels * sizeof(int32_t);
-    int i_out, i_chan, i_remainder = 0;
+    unsigned int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
+    unsigned int i_in_nb = p_in_buf->i_nb_samples;
+    unsigned int i_out_nb = i_in_nb * p_filter->output.i_rate
+                                    / p_filter->input.i_rate;
+    unsigned int i_sample_bytes = i_nb_channels * sizeof(int32_t);
+    unsigned int i_out, i_chan, i_remainder = 0;
 
     for( i_out = i_out_nb ; i_out-- ; )
     {

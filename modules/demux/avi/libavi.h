@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library 
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.5 2002/12/04 15:47:31 fenrir Exp $
+ * $Id: libavi.h,v 1.6 2002/12/06 16:34:06 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -191,8 +191,8 @@ typedef struct avi_chunk_list_s
 typedef struct avi_chunk_idx1_s
 {
     AVI_CHUNK_COMMON
-    int i_entry_count;
-    int i_entry_max;
+    unsigned int i_entry_count;
+    unsigned int i_entry_max;
     idx1_entry_t *entry;
 
 } avi_chunk_idx1_t;

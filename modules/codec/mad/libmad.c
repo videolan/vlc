@@ -95,8 +95,8 @@ enum mad_flow libmad_input( void *p_data, struct mad_stream *p_stream )
         /* Fill-in the buffer. If an error occurs print a message and leave
          * the decoding loop. If the end of stream is reached we also leave
          * the loop but the return status is left untouched. */
-        if( i_wanted > p_dec->bit_stream.p_data->p_payload_end
-                        - p_dec->bit_stream.p_data->p_payload_start )
+        if( i_wanted > (size_t)(p_dec->bit_stream.p_data->p_payload_end
+                                 - p_dec->bit_stream.p_data->p_payload_start) )
         {
             i_wanted = p_dec->bit_stream.p_data->p_payload_end
                         - p_dec->bit_stream.p_data->p_payload_start;
@@ -146,9 +146,9 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
     aout_buffer_t *     p_buffer;
     mad_fixed_t const * p_left = p_pcm->samples[0];
     mad_fixed_t const * p_right = p_pcm->samples[1];
-    int                 i_samples = p_pcm->length;
+    unsigned int        i_samples = p_pcm->length;
     mad_fixed_t *       p_samples;
-    int                 i_channels = (p_pcm->channels == 2) ?
+    unsigned int        i_channels = (p_pcm->channels == 2) ?
                                      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT :
                                      AOUT_CHAN_CENTER;
 

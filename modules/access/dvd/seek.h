@@ -1,7 +1,7 @@
 /* dvd_seek.h: DVD access plugin.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: seek.h,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: seek.h,v 1.2 2002/12/06 16:34:04 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -33,5 +33,5 @@ int LbMaxOnce        ( thread_dvd_data_t * );
 
 int CellPrg2Chapter  ( thread_dvd_data_t * );
 int NextChapter      ( thread_dvd_data_t * );
-int DVDSetChapter    ( thread_dvd_data_t *, int );
+int DVDSetChapter    ( thread_dvd_data_t *, unsigned int );
 

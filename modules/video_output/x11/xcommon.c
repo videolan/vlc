@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.7 2002/11/14 22:38:48 massiot Exp $
+ * $Id: xcommon.c,v 1.8 2002/12/06 16:34:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -89,7 +89,7 @@ static void DestroyWindow  ( vout_thread_t *, x11_window_t * );
 static int  NewPicture     ( vout_thread_t *, picture_t * );
 static void FreePicture    ( vout_thread_t *, picture_t * );
 
-static IMAGE_TYPE *CreateImage    ( vout_thread_t *, 
+static IMAGE_TYPE *CreateImage    ( vout_thread_t *,
                                     Display *, EXTRA_ARGS, int, int );
 #ifdef HAVE_SYS_SHM_H
 static IMAGE_TYPE *CreateShmImage ( vout_thread_t *,
@@ -183,7 +183,7 @@ int E_(Activate) ( vlc_object_t *p_this )
 
     if( b_chroma )
     {
-        msg_Dbg( p_vout, "forcing chroma 0x%.8x (%4.4s)", 
+        msg_Dbg( p_vout, "forcing chroma 0x%.8x (%4.4s)",
                  i_chroma, (char*)&i_chroma );
     }
     else
@@ -490,15 +490,17 @@ static int ManageVideo( vout_thread_t *p_vout )
     while( XCheckWindowEvent( p_vout->p_sys->p_display,
                               p_vout->p_sys->p_win->base_window,
                               StructureNotifyMask | KeyPressMask |
-                              ButtonPressMask | ButtonReleaseMask | 
+                              ButtonPressMask | ButtonReleaseMask |
                               PointerMotionMask | Button1MotionMask , &xevent )
            == True )
     {
         /* ConfigureNotify event: prepare  */
         if( xevent.type == ConfigureNotify )
         {
-            if( (xevent.xconfigure.width != p_vout->p_sys->p_win->i_width)
-              || (xevent.xconfigure.height != p_vout->p_sys->p_win->i_height) )
+            if( (unsigned int)xevent.xconfigure.width
+                   != p_vout->p_sys->p_win->i_width
+              || (unsigned int)xevent.xconfigure.height
+                    != p_vout->p_sys->p_win->i_height )
             {
                 /* Update dimensions */
                 p_vout->i_changes |= VOUT_SIZE_CHANGE;
@@ -512,7 +514,7 @@ static int ManageVideo( vout_thread_t *p_vout )
             /* We may have keys like F1 trough F12, ESC ... */
             x_key_symbol = XKeycodeToKeysym( p_vout->p_sys->p_display,
                                              xevent.xkey.keycode, 0 );
-            switch( x_key_symbol )
+            switch( (int)x_key_symbol )
             {
             case XK_Escape:
                 if( p_vout->b_fullscreen )
@@ -579,7 +581,7 @@ static int ManageVideo( vout_thread_t *p_vout )
 
             default:
                 /* "Normal Keys"
-                 * The reason why I use this instead of XK_0 is that 
+                 * The reason why I use this instead of XK_0 is that
                  * with XLookupString, we don't have to care about
                  * keymaps. */
 
@@ -681,7 +683,7 @@ static int ManageVideo( vout_thread_t *p_vout )
             p_vout->p_sys->i_time_mouse_last_moved = mdate();
             if( ! p_vout->p_sys->b_mouse_pointer_visible )
             {
-                ToggleCursor( p_vout ); 
+                ToggleCursor( p_vout );
             }
         }
         /* Reparent move -- XXX: why are we getting this ? */
@@ -759,7 +761,7 @@ static int ManageVideo( vout_thread_t *p_vout )
         msg_Dbg( p_vout, "video display resized (%dx%d)",
                          p_vout->p_sys->p_win->i_width,
                          p_vout->p_sys->p_win->i_height );
- 
+
 #ifdef MODULE_NAME_IS_x11
         /* We need to signal the vout thread about the size change because it
          * is doing the rescaling */
@@ -772,7 +774,7 @@ static int ManageVideo( vout_thread_t *p_vout )
 
         XResizeWindow( p_vout->p_sys->p_display,
                        p_vout->p_sys->p_win->video_window, i_width, i_height );
-        
+
         XMoveWindow( p_vout->p_sys->p_display,
                      p_vout->p_sys->p_win->video_window, i_x, i_y );
     }
@@ -899,7 +901,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     {
         /* WM_DELETE_WINDOW is not supported by window manager */
         msg_Warn( p_vout, "missing or bad window manager" );
-    } 
+    }
 
     /* Creation of a graphic context that doesn't generate a GraphicsExpose
      * event when using functions like XCopyArea */
@@ -955,7 +957,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
                   StructureNotifyMask | KeyPressMask |
-                  ButtonPressMask | ButtonReleaseMask | 
+                  ButtonPressMask | ButtonReleaseMask |
                   PointerMotionMask );
 
 #ifdef MODULE_NAME_IS_x11
@@ -1076,7 +1078,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                          p_vout->p_sys->i_xvport, p_vout->output.i_chroma,
 #else
                          p_vout->p_sys->p_visual,
-                         p_vout->p_sys->i_screen_depth, 
+                         p_vout->p_sys->i_screen_depth,
                          p_vout->p_sys->i_bytes_per_pixel,
 #endif
                          p_vout->output.i_width, p_vout->output.i_height );
@@ -1637,8 +1639,8 @@ static int XVideoGetPort( vout_thread_t *p_vout,
 
             /* Look for the first available port supporting this format */
             for( i_port = p_adaptor[i_adaptor].base_id;
-                 ( i_port < p_adaptor[i_adaptor].base_id
-                             + p_adaptor[i_adaptor].num_ports )
+                 ( i_port < (int)(p_adaptor[i_adaptor].base_id
+                                   + p_adaptor[i_adaptor].num_ports) )
                    && ( i_selected_port == -1 );
                  i_port++ )
             {
@@ -1858,12 +1860,13 @@ static int InitDisplay( vout_thread_t *p_vout )
             /* Under XFree4.0, the list contains pixmap formats available
              * through all video depths ; so we have to check against current
              * depth. */
-            if( p_formats->depth == p_vout->p_sys->i_screen_depth )
+            if( p_formats->depth == (int)p_vout->p_sys->i_screen_depth )
             {
                 if( p_formats->bits_per_pixel / 8
-                        > p_vout->p_sys->i_bytes_per_pixel )
+                        > (int)p_vout->p_sys->i_bytes_per_pixel )
                 {
-                    p_vout->p_sys->i_bytes_per_pixel = p_formats->bits_per_pixel / 8;
+                    p_vout->p_sys->i_bytes_per_pixel =
+                                               p_formats->bits_per_pixel / 8;
                 }
             }
         }

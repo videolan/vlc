@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.51 2002/11/11 14:39:12 sam Exp $
+ * $Id: input_dec.c,v 1.52 2002/12/06 16:34:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -229,7 +229,7 @@ void input_FlushPESFifo( decoder_fifo_t *p_fifo )
  *****************************************************************************/
 void input_EscapeDiscontinuity( input_thread_t * p_input )
 {
-    int     i_es, i;
+    unsigned int i_es, i;
 
     for( i_es = 0; i_es < p_input->stream.i_selected_es_number; i_es++ )
     {
@@ -250,7 +250,7 @@ void input_EscapeDiscontinuity( input_thread_t * p_input )
  *****************************************************************************/
 void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
 {
-    int     i_es, i;
+    unsigned int i_es, i;
 
     for( i_es = 0; i_es < p_input->stream.i_selected_es_number; i_es++ )
     {
@@ -296,7 +296,7 @@ static decoder_fifo_t * CreateDecoderFifo( input_thread_t * p_input,
     p_fifo->i_id = p_es->i_id;
     p_fifo->i_fourcc = p_es->i_fourcc;
     p_fifo->p_demux_data = p_es->p_demux_data;
-    
+
     p_fifo->p_stream_ctrl = &p_input->stream.control;
     p_fifo->p_sout = p_input->stream.p_sout;
 

@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.18 2002/11/14 22:38:47 massiot Exp $
+ * $Id: a52.c,v 1.19 2002/12/06 16:34:05 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -86,14 +86,14 @@ vlc_module_end();
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
  *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this ) 
-{   
+static int OpenDecoder( vlc_object_t *p_this )
+{
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
 
     if( p_fifo->i_fourcc != VLC_FOURCC('a','5','2',' ')
          && p_fifo->i_fourcc != VLC_FOURCC('a','5','2','b') )
-    {   
-        return VLC_EGENERIC; 
+    {
+        return VLC_EGENERIC;
     }
 
     p_fifo->pf_run = RunDecoder;
@@ -109,7 +109,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 {
     dec_thread_t * p_dec;
     audio_date_t end_date;
-    
+
     /* Allocate the memory needed to store the thread's structure */
     p_dec = malloc( sizeof(dec_thread_t) );
     if( p_dec == NULL )
@@ -140,14 +140,15 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     /* decoder thread's main loop */
     while ( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
     {
-        int i_frame_size, i_original_channels, i_rate, i_bit_rate;
+        int i_bit_rate;
+        unsigned int i_rate, i_original_channels, i_frame_size;
         mtime_t pts;
         byte_t p_header[7];
         aout_buffer_t * p_buffer;
 
         /* Look for sync word - should be 0x0b77 */
         RealignBits( &p_dec->bit_stream );
-        while ( (ShowBits( &p_dec->bit_stream, 16 ) ) != 0x0b77 && 
+        while ( (ShowBits( &p_dec->bit_stream, 16 ) ) != 0x0b77 &&
                 (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error))
         {
             RemoveBits( &p_dec->bit_stream, 8 );
@@ -245,7 +246,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
     /* End of the spdif decoder thread */
     EndThread( p_dec );
-    
+
     return 0;
 }
 
@@ -270,14 +271,15 @@ static void EndThread( dec_thread_t * p_dec )
  * since we don't want to oblige S/PDIF people to use liba52 just to get
  * their SyncInfo...
  *****************************************************************************/
-int SyncInfo( const byte_t * p_buf, int * pi_channels, int * pi_sample_rate,
-              int * pi_bit_rate)
+static int SyncInfo( const byte_t * p_buf, int * pi_channels,
+                     int * pi_sample_rate, int * pi_bit_rate )
 {
-    static const u8 halfrate[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
+    static const uint8_t halfrate[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3 };
     static const int rate[] = { 32,  40,  48,  56,  64,  80,  96, 112,
                                 128, 160, 192, 224, 256, 320, 384, 448,
-                                512, 576, 640};
-    static const u8 lfeon[8] = {0x10, 0x10, 0x04, 0x04, 0x04, 0x01, 0x04, 0x01};
+                                512, 576, 640 };
+    static const uint8_t lfeon[8] = { 0x10, 0x10, 0x04, 0x04,
+                                      0x04, 0x01, 0x04, 0x01 };
     int frmsizecod;
     int bitrate;
     int half;
@@ -339,7 +341,7 @@ int SyncInfo( const byte_t * p_buf, int * pi_channels, int * pi_sample_rate,
     default:
         return 0;
     }
-   
+
     if ( p_buf[6] & lfeon[acmod] ) *pi_channels |= AOUT_CHAN_LFE;
 
     frmsizecod = p_buf[4] & 63;

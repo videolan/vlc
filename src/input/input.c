@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.217 2002/12/06 10:10:39 sam Exp $
+ * $Id: input.c,v 1.218 2002/12/06 16:34:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -87,7 +87,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
     /* Access */
     p_input->p_access = NULL;
-    
+
     p_input->i_bufsize = 0;
     p_input->i_mtu = 0;
 
@@ -221,7 +221,7 @@ static int RunThread( input_thread_t *p_input )
 
     while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
     {
-        int i, i_count;
+        unsigned int i, i_count;
 
         p_input->c_loops++;
 
@@ -234,8 +234,8 @@ static int RunThread( input_thread_t *p_input )
 
                 /* Reinitialize buffer manager. */
                 input_AccessReinit( p_input );
-                
-                p_input->pf_set_program( p_input, 
+
+                p_input->pf_set_program( p_input,
                                          p_input->stream.p_new_program );
 
                 /* Escape all decoders for the stream discontinuity they
@@ -253,7 +253,7 @@ static int RunThread( input_thread_t *p_input )
             }
             p_input->stream.p_new_program = NULL;
         }
-        
+
         if( p_input->stream.p_new_area )
         {
             if( p_input->stream.b_seekable && p_input->pf_set_area != NULL )
@@ -398,7 +398,7 @@ static int InitThread( input_thread_t * p_input )
         if( psz_parser[0] == '/' && psz_parser[1] == '/' )
         {
             psz_parser += 2 ;
-        } 
+        }
 
         p_input->psz_name = psz_parser ;
 
@@ -549,7 +549,7 @@ static void EndThread( input_thread_t * p_input )
     /* Free info structures */
     msg_Dbg( p_input, "freeing info structures...");
     input_DelInfo( p_input );
-    
+
     input_DumpStream( p_input );
 
     /* Free all ES and destroy all decoder threads */

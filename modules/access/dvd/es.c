@@ -1,7 +1,7 @@
 /* es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: es.c,v 1.3 2002/11/05 18:25:43 gbazin Exp $
+ * $Id: es.c,v 1.4 2002/12/06 16:34:04 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -91,7 +91,7 @@ void DVDReadVideo( input_thread_t * p_input )
     /* ES 0 -> video MPEG2 */
     IfoPrintVideo( p_dvd );
     i_ratio = vts.manager_inf.video_attr.i_ratio;
-    
+
     if( i_ratio )
     {
         ADDES( 0xe0, 0, VLC_FOURCC('m','p','g','v'), VIDEO_ES, 0, sizeof(int) );
@@ -101,7 +101,7 @@ void DVDReadVideo( input_thread_t * p_input )
     {
         ADDES( 0xe0, 0, VLC_FOURCC('m','p','g','v'), VIDEO_ES, 0, 0 );
     }
-        
+
 }
 
 /*****************************************************************************
@@ -109,7 +109,7 @@ void DVDReadVideo( input_thread_t * p_input )
  *****************************************************************************/
 #define audio_status \
     vts.title_unit.p_title[p_dvd->i_title_id-1].title.pi_audio_status[i-1]
-    
+
 void DVDReadAudio( input_thread_t * p_input )
 {
     thread_dvd_data_t * p_dvd;
@@ -120,7 +120,7 @@ void DVDReadAudio( input_thread_t * p_input )
 
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
     p_dvd->i_audio_nb = 0;
-    
+
     /* Audio ES, in the order they appear in .ifo */
     for( i = 1 ; i <= vts.manager_inf.i_audio_nb ; i++ )
     {
@@ -184,7 +184,7 @@ void DVDReadSPU( input_thread_t * p_input )
     es_descriptor_t *   p_es;
     int                 i_id;
     int                 i;
-           
+
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
     p_dvd->i_spu_nb = 0;
 
@@ -226,7 +226,7 @@ void DVDReadSPU( input_thread_t * p_input )
                        sizeof(int) + 16*sizeof(u32) );
                 *(int*)p_es->p_demux_data = 0xBeeF;
                 memcpy( (char*)p_es->p_demux_data + sizeof(int),
-                        palette, 16*sizeof(u32) ); 
+                        palette, 16*sizeof(u32) );
             }
             else
             {
@@ -248,8 +248,8 @@ void DVDReadSPU( input_thread_t * p_input )
 void DVDLaunchDecoders( input_thread_t * p_input )
 {
     thread_dvd_data_t *  p_dvd;
-    int                  i_audio;
-    int                  i_spu;
+    unsigned int         i_audio;
+    unsigned int         i_spu;
 
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
 
@@ -266,7 +266,7 @@ void DVDLaunchDecoders( input_thread_t * p_input )
             config_PutInt( p_input, "audio-channel", 1 );
             i_audio = 1;
         }
-        
+
         if( ( config_GetInt( p_input, "audio-type" )
                == REQUESTED_A52 ) )
         {
@@ -303,7 +303,7 @@ void DVDLaunchDecoders( input_thread_t * p_input )
         }
         if( i_spu > 0 )
         {
-            int i = 0, j = 0;
+            unsigned int i = 0, j = 0;
             for( i = 0; i < p_input->stream.i_es_number; i++ )
             {
                 if ( p_input->stream.pp_es[i]->i_fourcc

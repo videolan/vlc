@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.13 2002/12/02 21:13:25 jlj Exp $
+ * $Id: rc.c,v 1.14 2002/12/06 16:34:06 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -459,7 +459,7 @@ static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
              !strcmp( psz_cmd, "chapter_n" ) ||
              !strcmp( psz_cmd, "chapter_p" ) )
     {
-        int i_chapter = 0;
+        unsigned int i_chapter = 0;
 
         if( !strcmp( psz_cmd, "chapter" ) )
         {
@@ -513,7 +513,7 @@ static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
              !strcmp( psz_cmd, "title_n" ) ||
              !strcmp( psz_cmd, "title_p" ) )
     {
-        int i_title = 0;
+        unsigned int i_title = 0;
 
         if( !strcmp( psz_cmd, "title" ) )
         {

@@ -2,7 +2,7 @@
  * rtp.c: RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rtp.c,v 1.6 2002/11/13 20:23:21 fenrir Exp $
+ * $Id: rtp.c,v 1.7 2002/12/06 16:34:04 sam Exp $
  *
  * Authors: Tristan Leteurtre <tooney@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -236,7 +236,7 @@ static int Open( vlc_object_t *p_this )
         i_server_port = 0;
         psz_server_addr = "";
     }
- 
+
     msg_Dbg( p_input, "opening server=%s:%d local=%s:%d",
              psz_server_addr, i_server_port, psz_bind_addr, i_bind_port );
 
@@ -256,7 +256,7 @@ static int Open( vlc_object_t *p_this )
         return( -1 );
     }
     module_Unneed( p_input, p_network );
-    
+
     p_access_data = malloc( sizeof(input_socket_t) );
     p_input->p_access_data = (access_sys_t *)p_access_data;
 
@@ -272,7 +272,7 @@ static int Open( vlc_object_t *p_this )
     {
         p_input->psz_demux = "ts";
     }
-    
+
     return( 0 );
 }
 
@@ -301,12 +301,12 @@ static void Close( vlc_object_t *p_this )
  * RTPNetworkRead : Read for the network, and parses the RTP header
  *****************************************************************************/
 static ssize_t RTPNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
-	                   size_t i_len	)
+                               size_t i_len )
 {
     int         i_rtp_version;
     int         i_CSRC_count;
     int         i_payload_type;
-    
+
     byte_t *    p_tmp_buffer = alloca( p_input->i_mtu );
 
     /* Get the raw data from the socket.
@@ -314,35 +314,35 @@ static ssize_t RTPNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
     ssize_t i_ret = Read( p_input, p_tmp_buffer, p_input->i_mtu );
 
     if (!i_ret) return 0;
-     
+
     /* Parse the header and make some verifications.
      * See RFC 1889 & RFC 2250. */
-  
+
     i_rtp_version  = ( p_tmp_buffer[0] & 0xC0 ) >> 6;
     i_CSRC_count   = ( p_tmp_buffer[0] & 0x0F );
-    i_payload_type = ( p_tmp_buffer[1] & 0x7F ); 
-  
-    if ( i_rtp_version != 2 ) 
+    i_payload_type = ( p_tmp_buffer[1] & 0x7F );
+
+    if ( i_rtp_version != 2 )
         msg_Dbg( p_input, "RTP version is %u, should be 2", i_rtp_version );
-  
+
     if ( i_payload_type != 33 )
         msg_Dbg( p_input, "RTP payload type is %u, only 33 (Mpeg2-TS) " \
                  "is supported", i_payload_type );
- 
+
     /* Return the packet without the RTP header. */
     i_ret -= ( RTP_HEADER_LEN + 4 * i_CSRC_count );
 
-    if ( i_ret > i_len )
+    if ( (size_t)i_ret > i_len )
     {
         /* This should NOT happen. */
         msg_Warn( p_input, "RTP input trashing %d bytes", i_ret - i_len );
         i_ret = i_len;
     }
 
-    p_input->p_vlc->pf_memcpy( p_buffer, 
+    p_input->p_vlc->pf_memcpy( p_buffer,
                        p_tmp_buffer + RTP_HEADER_LEN + 4 * i_CSRC_count,
                        i_ret );
-    
+
     return i_ret;
 }
 

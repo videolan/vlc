@@ -2,7 +2,7 @@
  * dvd.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd.h,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: dvd.h,v 1.2 2002/12/06 16:34:04 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -36,27 +36,27 @@ typedef struct thread_dvd_data_s
 {
     dvdcss_handle           dvdhandle;                   /* libdvdcss handle */
 
-    int                     i_audio_nb;
-    int                     i_spu_nb;
+    unsigned int            i_audio_nb;
+    unsigned int            i_spu_nb;
 
     /* Navigation information */
-    int                     i_title;
-    int                     i_title_id;
+    unsigned int            i_title;
+    unsigned int            i_title_id;
 
-    int                     i_chapter_nb;
-    int                     i_chapter;
+    unsigned int            i_chapter_nb;
+    unsigned int            i_chapter;
     vlc_bool_t              b_new_chapter;
 
-    int                     i_angle_nb;
-    int                     i_angle;
+    unsigned int            i_angle_nb;
+    unsigned int            i_angle;
 
-    int                     i_map_cell;   /* cell index in adress map */
-    int                     i_prg_cell;   /* cell index in program map */
-    int                     i_angle_cell; /* cell index in the current angle */
+    unsigned int            i_map_cell;   /* cell index in adress map */
+    unsigned int            i_prg_cell;   /* cell index in program map */
+    unsigned int            i_angle_cell; /* cell index in the current angle */
 
-    int                     i_vts_start;  /* offset to beginning of vts */
-    int                     i_vts_lb;     /* sector in vts */
-    int                     i_last_lb;    /* last sector of current cell */
+    unsigned int            i_vts_start;  /* offset to beginning of vts */
+    unsigned int            i_vts_lb;     /* sector in vts */
+    unsigned int            i_last_lb;    /* last sector of current cell */
 
     /* Structure that contains all information of the DVD */
     struct ifo_s *          p_ifo;

@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.6 2002/11/13 20:23:21 fenrir Exp $
+ * $Id: access.c,v 1.7 2002/12/06 16:34:04 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -78,12 +78,12 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     char *                  psz_source;
     dvd_data_t *            p_dvd;
     input_area_t *          p_area;
-    int                     i_title_nr;
-    int                     i_title;
-    int                     i_chapter;
-    int                     i_angle;
-    int                     i;
-    
+    unsigned int            i_title_nr;
+    unsigned int            i_title;
+    unsigned int            i_chapter;
+    unsigned int            i_angle;
+    unsigned int            i;
+
     p_dvd = malloc( sizeof(dvd_data_t) );
     if( p_dvd == NULL )
     {
@@ -99,7 +99,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     p_input->pf_set_program = dvdplay_SetProgram;
 
     /* command line */
-    if( ( psz_source = dvdplay_ParseCL( p_input, 
+    if( ( psz_source = dvdplay_ParseCL( p_input,
                         &i_title, &i_chapter, &i_angle ) ) == NULL )
     {
         free( p_dvd );
@@ -122,7 +122,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     p_dvd->p_intf = NULL;
 
     p_dvd->i_still_time = 0;
-    
+
     /* set up input  */
     p_input->i_mtu = 0;
 
@@ -133,7 +133,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     p_input->stream.b_pace_control = 1;
     /* seek is only allowed when we have size info */
     p_input->stream.b_seekable = 0;
-    
+
     /* Initialize ES structures */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
 
@@ -145,11 +145,11 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
 
     /* Area 0 for menu */
     area[0]->i_plugin_data = 0;
-    
+
     for( i = 1 ; i <= i_title_nr ; i++ )
     {
         input_AddArea( p_input );
-        
+
         /* Titles id */
         area[i]->i_id = i;
 
@@ -173,7 +173,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         return -1;
     }
-    
+
     if( i_angle <= p_input->stream.i_pgrm_number )
     {
         dvdplay_SetProgram( p_input,
@@ -242,7 +242,7 @@ static int dvdplay_SetProgram( input_thread_t *     p_input,
     {
         dvd_data_t *    p_dvd;
         int             i_angle;
-    
+
         p_dvd = (dvd_data_t*)(p_input->p_access_data);
         i_angle = p_program->i_number;
 
@@ -279,17 +279,17 @@ static int dvdplay_SetArea( input_thread_t * p_input, input_area_t * p_area )
     if( p_area != p_input->stream.p_selected_area )
     {
         int i_chapter;
-        
+
         /* prevent intf to try to seek */
         p_input->stream.b_seekable = 0;
-        
+
         /* Store selected chapter */
         i_chapter = p_area->i_part;
 
         dvdNewArea( p_input, p_area );
-        
+
         dvdplay_start( p_dvd->vmg, p_area->i_id );
-        
+
         p_area->i_part = i_chapter;
     } /* i_title >= 0 */
     else
@@ -350,7 +350,7 @@ static int dvdplay_Read( input_thread_t * p_input,
 static void dvdplay_Seek( input_thread_t * p_input, off_t i_off )
 {
     dvd_data_t *     p_dvd;
-    
+
     p_dvd = (dvd_data_t *)p_input->p_access_data;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -377,11 +377,11 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
     input_thread_t *    p_input;
     dvd_data_t *        p_dvd;
     vlc_value_t         val;
-    int                 i;
+    unsigned int        i;
 
     p_input = (input_thread_t*)p_args;
     p_dvd   = (dvd_data_t*)p_input->p_access_data;
-    
+
     switch( event )
     {
     case NEW_DOMAIN:
@@ -395,8 +395,8 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
         /* prevent intf to try to seek  by default */
         p_input->stream.b_seekable = 0;
 
-        if( ( i = dvdplay_title_cur( p_dvd->vmg ) ) != 
-                p_input->stream.p_selected_area->i_id )
+        i = dvdplay_title_cur( p_dvd->vmg );
+        if( i != p_input->stream.p_selected_area->i_id )
         {
             /* the title number has changed: update area */
             msg_Warn( p_input, "new title %d (%d)", i,
@@ -407,7 +407,7 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
 
         /* new pgc in same title: reinit ES */
         dvdNewPGC( p_input );
-        
+
         p_input->stream.b_changed = 1;
 
         break;
@@ -497,9 +497,9 @@ static int dvdNewArea( input_thread_t * p_input, input_area_t * p_area )
     {
         input_AddProgram( p_input, i+1, 0 );
     }
-    
+
     dvdplay_SetProgram( p_input,
-                        p_input->stream.pp_programs[i_angle-1] ); 
+                        p_input->stream.pp_programs[i_angle-1] );
 
 //    dvdNewPGC( p_input );
 
@@ -517,7 +517,7 @@ static int dvdNewPGC( input_thread_t * p_input )
 //    int             i_subp_nr   = -1;
 //    int             i_subp      = -1;
 //    int             i_sec;
-    
+
     p_dvd = (dvd_data_t*)p_input->p_access_data;
 
 //    dvdplay_audio_info( p_dvd->vmg, &i_audio_nr, &i_audio );
@@ -539,7 +539,7 @@ static int dvdNewPGC( input_thread_t * p_input )
     {
         p_input->stream.b_seekable = 0;
     }
-    
+
 #if 0
     i_sec = dvdplay_title_time( p_dvd->vmg );
     msg_Dbg( p_input, "title time: %d:%02d:%02d (%d)",

@@ -1,15 +1,15 @@
 /*****************************************************************************
- * libasf.h : 
+ * libasf.h :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.h,v 1.4 2002/11/14 16:17:47 fenrir Exp $
+ * $Id: libasf.h,v 1.5 2002/12/06 16:34:06 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -53,7 +53,7 @@ static const guid_t asf_object_null_guid =
     { 0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00 }
 };
 
-static const guid_t asf_object_header_guid = 
+static const guid_t asf_object_header_guid =
 {
     0x75B22630,
     0x668E,
@@ -61,7 +61,7 @@ static const guid_t asf_object_header_guid =
     { 0xA6,0xD9, 0x00,0xAA,0x00,0x62,0xCE,0x6C }
 };
 
-static const guid_t asf_object_data_guid = 
+static const guid_t asf_object_data_guid =
 {
     0x75B22636,
     0x668E,
@@ -104,12 +104,12 @@ static const guid_t asf_object_content_description_guid =
     { 0xa6, 0xd9, 0x00, 0xaa, 0x00, 0x62, 0xce, 0x6c }
 };
 
-static const guid_t asf_object_header_extention_guid = 
+static const guid_t asf_object_header_extention_guid =
 {
    0x5FBF03B5,
    0xA92E,
    0x11CF,
-   { 0x8E,0xE3, 0x00,0xC0,0x0C,0x20,0x53,0x65 } 
+   { 0x8E,0xE3, 0x00,0xC0,0x0C,0x20,0x53,0x65 }
 };
 
 static const guid_t asf_object_codec_list_guid =
@@ -167,15 +167,15 @@ typedef struct asf_packet_s
 
     int i_payload_size;
     u8  *p_payload_data;
-    
+
 } asf_packet_t;
 #endif
 
 #define ASF_OBJECT_COMMON           \
     int          i_type;            \
     guid_t       i_object_id;       \
-    u64          i_object_size;     \
-    u64          i_object_pos;      \
+    uint64_t     i_object_size;     \
+    uint64_t     i_object_pos;      \
     union asf_object_u *p_father;  \
     union asf_object_u *p_first;   \
     union asf_object_u *p_last;    \
@@ -195,7 +195,7 @@ typedef struct asf_index_entry_s
 } asf_index_entry_t;
 
 /****************************************************************************
- * High level asf object 
+ * High level asf object
  ****************************************************************************/
 /* This is the first header find in a asf file
  * It's the only object that have subobject */
@@ -205,7 +205,7 @@ typedef struct asf_object_header_s
     uint32_t i_sub_object_count;
     uint8_t  i_reserved1; /* 0x01, but could be safely ignored */
     uint8_t  i_reserved2; /* 0x02, if not must failed to source the contain */
-   
+
 } asf_object_header_t;
 
 typedef struct asf_object_data_s
@@ -214,7 +214,7 @@ typedef struct asf_object_data_s
     guid_t      i_file_id;
     uint64_t    i_total_data_packets;
     uint16_t    i_reserved;
-    
+
 } asf_object_data_t;
 
 
@@ -225,7 +225,7 @@ typedef struct asf_object_index_s
     uint64_t    i_index_entry_time_interval;
     uint32_t    i_max_packet_count;
     uint32_t    i_index_entry_count;
-    
+
     asf_index_entry_t *index_entry;
 
 } asf_object_index_t;
@@ -233,7 +233,7 @@ typedef struct asf_object_index_s
 typedef struct asf_object_root_s
 {
     ASF_OBJECT_COMMON
-    
+
     asf_object_header_t *p_hdr;
     asf_object_data_t   *p_data;
     asf_object_index_t  *p_index;
@@ -249,7 +249,7 @@ typedef struct asf_object_root_s
 typedef struct asf_object_file_properties_s
 {
     ASF_OBJECT_COMMON
-    
+
     guid_t  i_file_id;
     uint64_t     i_file_size;
     uint64_t     i_creation_date;
@@ -261,7 +261,7 @@ typedef struct asf_object_file_properties_s
     uint32_t     i_min_data_packet_size;
     uint32_t     i_max_data_packet_size;
     uint32_t     i_max_bitrate;
-    
+
 } asf_object_file_properties_t;
 
 #define ASF_STREAM_PROPERTIES_ENCRYPTED 0x8000
@@ -320,7 +320,7 @@ typedef struct asf_codec_entry_s
     uint16_t    i_type;
     char        *psz_name;
     char        *psz_description;
-    
+
     uint16_t    i_information_length;
     uint8_t     *p_information;
 } asf_codec_entry_t;
@@ -330,7 +330,7 @@ typedef struct asf_object_codec_list_s
     ASF_OBJECT_COMMON
     guid_t      i_reserved;
     uint32_t    i_codec_entries_count;
-    asf_codec_entry_t *codec; 
+    asf_codec_entry_t *codec;
 
 } asf_object_codec_list_t;
 
@@ -339,7 +339,7 @@ typedef struct asf_object_script_command_s
 {
     ASF_OBJECT_COMMON
 
-    
+
 } asf_object_script_command_t;
 #endif
 typedef struct asf_marker_s
@@ -352,7 +352,7 @@ typedef struct asf_marker_s
     uint32_t     i_marker_description_length;
     uint8_t      *i_marker_description;
     /* u8 padding */
-            
+
 } asf_marker_t;
 
 typedef struct asf_object_marker_s
@@ -383,10 +383,10 @@ typedef union asf_object_u
     asf_object_root_t   root;
     asf_object_file_properties_t    file_properties;
     asf_object_stream_properties_t  stream_properties;
-    asf_object_header_extention_t   header_extention;   
+    asf_object_header_extention_t   header_extention;
     asf_object_codec_list_t         codec_list;
     asf_object_marker_t             marker;
-    
+
 } asf_object_t;
 
 
@@ -397,7 +397,7 @@ int     ASF_SkipBytes( input_thread_t *p_input, int i_count );
 
 void GetGUID( guid_t *p_guid, uint8_t *p_data );
 int  CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 );
-    
+
 int  ASF_ReadObjectCommon( input_thread_t *p_input,
                            asf_object_t *p_obj );
 int  ASF_NextObject( input_thread_t *p_input,

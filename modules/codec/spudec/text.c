@@ -2,7 +2,7 @@
  * text.c: text subtitles parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: text.c,v 1.2 2002/11/15 18:10:26 fenrir Exp $
+ * $Id: text.c,v 1.3 2002/12/06 16:34:05 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -59,10 +59,10 @@ void E_(ParseText)( spudec_thread_t *p_spudec, subtitler_font_t *p_font )
 
     /* Check validity of packet data */
     if( (p_spudec->bit_stream.p_data->p_payload_end
-	  - p_spudec->bit_stream.p_data->p_payload_start) <= 0
-	|| (strlen(p_spudec->bit_stream.p_data->p_payload_start)
-	    > p_spudec->bit_stream.p_data->p_payload_end
-           - p_spudec->bit_stream.p_data->p_payload_start) )
+          - p_spudec->bit_stream.p_data->p_payload_start) <= 0
+        || (strlen(p_spudec->bit_stream.p_data->p_payload_start)
+            > (size_t)(p_spudec->bit_stream.p_data->p_payload_end
+                        - p_spudec->bit_stream.p_data->p_payload_start)) )
     {
         /* Dump the packet */
         NextDataPacket( p_spudec->p_fifo, &p_spudec->bit_stream );

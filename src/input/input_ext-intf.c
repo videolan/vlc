@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.43 2002/11/11 14:39:12 sam Exp $
+ * $Id: input_ext-intf.c,v 1.44 2002/12/06 16:34:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -272,9 +272,9 @@ char * input_OffsetToTime( input_thread_t * p_input, char * psz_buffer,
  *****************************************************************************/
 void input_DumpStream( input_thread_t * p_input )
 {
-    int         i, j;
-    char        psz_time1[OFFSETTOTIME_MAX_SIZE];
-    char        psz_time2[OFFSETTOTIME_MAX_SIZE];
+    char psz_time1[OFFSETTOTIME_MAX_SIZE];
+    char psz_time2[OFFSETTOTIME_MAX_SIZE];
+    unsigned int i, j;
 
 #define S   p_input->stream
     msg_Dbg( p_input, "dumping stream ID 0x%x [OK:%d/D:%d]", S.i_stream_id,

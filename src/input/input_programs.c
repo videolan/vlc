@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.98 2002/11/11 14:39:12 sam Exp $
+ * $Id: input_programs.c,v 1.99 2002/12/06 16:34:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -57,7 +57,7 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     p_input->stream.pp_programs = NULL;
     p_input->stream.p_selected_program = NULL;
     p_input->stream.p_new_program = NULL;
-    
+
     if( i_data_len )
     {
         if ( (p_input->stream.p_demux_data = malloc( i_data_len )) == NULL )
@@ -103,7 +103,7 @@ void input_EndStream( input_thread_t * p_input )
     {
         free( p_input->stream.pp_selected_es );
     }
-    
+
     if( p_input->stream.p_demux_data != NULL )
     {
         free( p_input->stream.p_demux_data );
@@ -113,9 +113,10 @@ void input_EndStream( input_thread_t * p_input )
 /*****************************************************************************
  * input_FindProgram: returns a pointer to a program described by its ID
  *****************************************************************************/
-pgrm_descriptor_t * input_FindProgram( input_thread_t * p_input, u16 i_pgrm_id )
+pgrm_descriptor_t * input_FindProgram( input_thread_t * p_input,
+                                       uint16_t i_pgrm_id )
 {
-    int     i;
+    unsigned int i;
 
     for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
     {
@@ -188,7 +189,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
  *****************************************************************************/
 void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 {
-    int i_pgrm_index;
+    unsigned int i_pgrm_index;
 
     /* Find the program in the programs table */
     for( i_pgrm_index = 0; i_pgrm_index < p_input->stream.i_pgrm_number;
@@ -265,11 +266,11 @@ input_area_t * input_AddArea( input_thread_t * p_input )
  *****************************************************************************/
 int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
 {
-    int i_es_index;
-    int i_required_audio_es;
-    int i_required_spu_es;
-    int i_audio_es = 0;
-    int i_spu_es = 0;
+    unsigned int i_es_index;
+    unsigned int i_required_audio_es;
+    unsigned int i_required_spu_es;
+    unsigned int i_audio_es = 0;
+    unsigned int i_spu_es = 0;
 
     if ( p_input->stream.p_selected_program )
     {
@@ -366,7 +367,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
  *****************************************************************************/
 void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
 {
-    int i_area_index;
+    unsigned int i_area_index;
 
     /* Find the area in the areas table */
     for( i_area_index = 0; i_area_index < p_input->stream.i_area_nb;
@@ -396,9 +397,9 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
 /*****************************************************************************
  * input_FindES: returns a pointer to an ES described by its ID
  *****************************************************************************/
-es_descriptor_t * input_FindES( input_thread_t * p_input, u16 i_es_id )
+es_descriptor_t * input_FindES( input_thread_t * p_input, uint16_t i_es_id )
 {
-    int     i;
+    unsigned int i;
 
     for( i = 0; i < p_input->stream.i_es_number; i++ )
     {
@@ -483,7 +484,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
  *****************************************************************************/
 void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
-    int                     i_index, i_es_index;
+    unsigned int            i_index, i_es_index;
     pgrm_descriptor_t *     p_pgrm;
 
     /* Find the ES in the ES table */
@@ -605,7 +606,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
 
-    int     i_index = 0;
+    unsigned int i_index = 0;
 
     if( p_es == NULL )
     {

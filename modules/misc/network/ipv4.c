@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.8 2002/12/04 06:23:08 titer Exp $
+ * $Id: ipv4.c,v 1.9 2002/12/06 16:34:07 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -98,7 +98,7 @@ static int BuildAddr( struct sockaddr_in * p_socket,
     else
     {
         struct hostent    * p_hostent;
- 
+
         /* Try to convert address directly from in_addr - this will work if
          * psz_address is dotted decimal. */
 #ifdef HAVE_ARPA_INET_H
@@ -201,7 +201,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         msg_Warn( p_this, "cannot configure socket (SO_RCVBUF)" );
 #endif
     }
- 
+
     /* Check if we really got what we have asked for, because Linux, etc.
      * will silently limit the max buffer size to net.core.rmem_max which
      * is typically only 65535 bytes */
@@ -226,15 +226,15 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         msg_Warn( p_this, "socket buffer size is 0x%x instead of 0x%x",
                           i_opt, 0x80000 );
     }
-    
-    
+
+
     /* Build the local socket */
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
     /* Under Win32 and for the multicast, we bind on INADDR_ANY,
      * so let's call BuildAddr with "" instead of psz_bind_addr */
     psz_bind_win32 = psz_bind_addr ;
-    
+
     /* Check if this is a multicast socket */
     if (IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) )
     {
@@ -242,8 +242,8 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
     if ( BuildAddr( &sock, psz_bind_win32, i_bind_port ) == -1 )
 #else
-    if ( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )        
-#endif    
+    if ( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )
+#endif
     {
         msg_Dbg( p_this, "could not build local address" );
 #if defined( WIN32 ) || defined( UNDER_CE )
@@ -253,7 +253,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 #endif
         return( -1 );
     }
- 
+
     /* Bind it */
     if( bind( i_handle, (struct sockaddr *)&sock, sizeof( sock ) ) < 0 )
     {
@@ -289,7 +289,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 #endif
         }
     }
- 
+
 #if !defined( UNDER_CE ) && !defined( SYS_BEOS )
     /* Join the multicast group if the socket is a multicast address */
 #ifndef IN_MULTICAST
@@ -352,7 +352,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 #endif
             return( -1 );
         }
- 
+
         /* Connect the socket */
         if( connect( i_handle, (struct sockaddr *) &sock,
                      sizeof( sock ) ) == (-1) )

@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: preferences.c,v 1.4 2002/08/15 12:11:15 sam Exp $
+ * $Id: preferences.c,v 1.5 2002/12/06 16:34:07 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -609,7 +609,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
  * GtkConfigApply: store the changes to the config inside the modules
  * configuration structure and clear the hash table.
  ****************************************************************************/
-void GtkConfigApply( GtkButton * button, gpointer user_data )
+static void GtkConfigApply( GtkButton * button, gpointer user_data )
 {
     intf_thread_t *p_intf;
     GHashTable *hash_table;
@@ -627,19 +627,19 @@ void GtkConfigApply( GtkButton * button, gpointer user_data )
     gtk_widget_set_sensitive( apply_button, FALSE );
 }
 
-void GtkConfigOk( GtkButton * button, gpointer user_data )
+static void GtkConfigOk( GtkButton * button, gpointer user_data )
 {
     GtkConfigApply( button, user_data );
     gtk_widget_destroy( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
 
-void GtkConfigCancel( GtkButton * button, gpointer user_data )
+static void GtkConfigCancel( GtkButton * button, gpointer user_data )
 {
     gtk_widget_destroy( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
-void GtkConfigSave( GtkButton * button, gpointer user_data )
+static void GtkConfigSave( GtkButton * button, gpointer user_data )
 {
     intf_thread_t *p_intf;
 
@@ -653,8 +653,8 @@ void GtkConfigSave( GtkButton * button, gpointer user_data )
  * GtkModuleHighlighted: display module description when an entry is selected
  *   in the clist, and activate the configure button if necessary.
  ****************************************************************************/
-void GtkModuleHighlighted( GtkCList *module_clist, int row, int column,
-                           GdkEventButton *event, gpointer user_data )
+static void GtkModuleHighlighted( GtkCList *module_clist, int row, int column,
+                                  GdkEventButton *event, gpointer user_data )
 {
     intf_thread_t *p_intf;
     GtkWidget *config_button;
@@ -698,7 +698,7 @@ void GtkModuleHighlighted( GtkCList *module_clist, int row, int column,
 /****************************************************************************
  * GtkModuleConfigure: display module configuration dialog box.
  ****************************************************************************/
-void GtkModuleConfigure( GtkButton *button, gpointer user_data )
+static void GtkModuleConfigure( GtkButton *button, gpointer user_data )
 {
     module_t *p_module;
     intf_thread_t *p_intf;
@@ -716,7 +716,7 @@ void GtkModuleConfigure( GtkButton *button, gpointer user_data )
 /****************************************************************************
  * GtkModuleSelected: select module.
  ****************************************************************************/
-void GtkModuleSelected( GtkButton *button, gpointer user_data )
+static void GtkModuleSelected( GtkButton *button, gpointer user_data )
 {
     module_t *p_module;
     GtkWidget *widget;

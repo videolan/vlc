@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: crop.c,v 1.4 2002/11/28 17:35:00 sam Exp $
+ * $Id: crop.c,v 1.5 2002/12/06 16:34:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -375,7 +375,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
 static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    u8 *p_in = p_pic->p[0].p_pixels;
+    uint8_t *p_in = p_pic->p[0].p_pixels;
     int i_pitch = p_pic->p[0].i_pitch;
     int i_lines = p_pic->p[0].i_lines;
     int i_firstwhite = -1, i_lastwhite = -1, i;
@@ -415,14 +415,17 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
         return;
     }
 
-    if( i_lastwhite - i_firstwhite < p_vout->p_sys->i_height / 2 )
+    if( (unsigned int)(i_lastwhite - i_firstwhite)
+                                           < p_vout->p_sys->i_height / 2 )
     {
         p_vout->p_sys->i_lastchange = 0;
         return;
     }
 
-    if( i_lastwhite - i_firstwhite < p_vout->p_sys->i_height + 16
-         && i_lastwhite - i_firstwhite + 16 > p_vout->p_sys->i_height )
+    if( (unsigned int)(i_lastwhite - i_firstwhite)
+                                          < p_vout->p_sys->i_height + 16
+         && (unsigned int)(i_lastwhite - i_firstwhite + 16)
+                                                > p_vout->p_sys->i_height )
     {
         p_vout->p_sys->i_lastchange = 0;
         return;

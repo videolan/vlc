@@ -2,17 +2,17 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.5 2002/11/12 16:02:51 gbazin Exp $
+ * $Id: gtk_callbacks.c,v 1.6 2002/12/06 16:34:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
  *          Julien BLACHE <jb@technologeek.org>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -128,12 +128,12 @@ gboolean GtkWindowToggle( GtkWidget       *widget,
                           gpointer         user_data )
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
-    
+
     if( GTK_WIDGET_VISIBLE(p_intf->p_sys->p_window) )
     {
         gtk_widget_hide( p_intf->p_sys->p_window);
-    } 
-    else 
+    }
+    else
     {
         gtk_widget_show( p_intf->p_sys->p_window );
     }
@@ -240,7 +240,7 @@ void GtkTitleNext( GtkButton * button, gpointer user_data )
 {
     intf_thread_t * p_intf;
     input_area_t *  p_area;
-    int             i_id;
+    unsigned int    i_id;
 
     p_intf = GtkGetIntf( button );
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
@@ -248,7 +248,7 @@ void GtkTitleNext( GtkButton * button, gpointer user_data )
 
     if( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
     {
-        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];   
+        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
         input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 

@@ -1,15 +1,15 @@
 /*****************************************************************************
- * libasf.c : 
+ * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.7 2002/11/25 15:08:34 fenrir Exp $
+ * $Id: libasf.c,v 1.8 2002/12/06 16:34:06 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -34,7 +34,7 @@
 
 #define FREE( p ) \
     if( p ) {free( p ); p = NULL; }
-   
+
 #define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
 #define GUID_PRINT( guid )  \
     (guid).v1,              \
@@ -86,7 +86,7 @@ int CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
  * Some basic functions to manipulate stream more easily in vlc
  *
  * ASF_TellAbsolute get file position
- * 
+ *
  * ASF_SeekAbsolute seek in the file
  *
  * ASF_ReadData read data from the file in a buffer
@@ -95,9 +95,9 @@ int CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
 off_t ASF_TellAbsolute( input_thread_t *p_input )
 {
     off_t i_pos;
-    
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    
+
     i_pos= p_input->stream.p_selected_area->i_tell;
 //           - ( p_input->p_last_data - p_input->p_current_data  );
 
@@ -105,7 +105,7 @@ off_t ASF_TellAbsolute( input_thread_t *p_input )
 
     return( i_pos );
 }
- 
+
 int ASF_SeekAbsolute( input_thread_t *p_input,
                       off_t i_pos)
 {
@@ -124,8 +124,8 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
     }
 
     if( p_input->stream.b_seekable &&
-        ( p_input->stream.i_method == INPUT_METHOD_FILE || 
-          i_pos < i_filepos || 
+        ( p_input->stream.i_method == INPUT_METHOD_FILE ||
+          i_pos < i_filepos ||
           i_pos - i_filepos > 10000 ) )
     {
         p_input->pf_seek( p_input, i_pos );
@@ -140,7 +140,7 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
             data_packet_t *p_data;
             int i_read;
 
-            i_read = 
+            i_read =
                 input_SplitBuffer(p_input, &p_data, __MIN( i_size, 1024 ) );
             if( i_read <= 0 )
             {
@@ -148,7 +148,7 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
             }
             input_DeletePacket( p_input->p_method_data, p_data );
             i_size -= i_read;
-                    
+
         } while( i_size > 0 );
     }
     return( 1 );
@@ -161,7 +161,7 @@ int ASF_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
 
     int i_read;
 
-                
+
     if( !i_size )
     {
         return( 1 );
@@ -176,23 +176,23 @@ int ASF_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
         }
         memcpy( p_buff, p_data->p_payload_start, i_read );
         input_DeletePacket( p_input->p_method_data, p_data );
-        
+
         p_buff += i_read;
         i_size -= i_read;
-                
+
     } while( i_size );
-    
+
     return( 1 );
 }
 
 int  ASF_SkipBytes( input_thread_t *p_input, int i_count )
 {
-    return( ASF_SeekAbsolute( p_input, 
+    return( ASF_SeekAbsolute( p_input,
                               ASF_TellAbsolute( p_input ) + i_count ) );
 }
 
 /****************************************************************************/
-int  ASF_ReadObjectCommon( input_thread_t *p_input, 
+int  ASF_ReadObjectCommon( input_thread_t *p_input,
                            asf_object_t *p_obj )
 {
     asf_object_common_t *p_common = (asf_object_common_t*)p_obj;
@@ -202,7 +202,7 @@ int  ASF_ReadObjectCommon( input_thread_t *p_input,
     {
         return( 0 );
     }
-    GetGUID( &p_common->i_object_id, p_peek ); 
+    GetGUID( &p_common->i_object_id, p_peek );
     p_common->i_object_size = GetQWLE( p_peek + 16 );
     p_common->i_object_pos = ASF_TellAbsolute( p_input );
     p_common->p_next = NULL;
@@ -212,8 +212,8 @@ int  ASF_ReadObjectCommon( input_thread_t *p_input,
             GUID_PRINT( p_common->i_object_id ),
             p_common->i_object_size );
 #endif
-    
-    return( 1 ); 
+
+    return( 1 );
 }
 
 int ASF_NextObject( input_thread_t *p_input,
@@ -236,14 +236,14 @@ int ASF_NextObject( input_thread_t *p_input,
     if( p_obj->common.p_father && p_obj->common.p_father->common.i_object_size != 0 )
     {
         if( p_obj->common.p_father->common.i_object_pos + p_obj->common.p_father->common.i_object_size <
-                p_obj->common.i_object_pos + p_obj->common.i_object_size + 24 )  
+                p_obj->common.i_object_pos + p_obj->common.i_object_size + 24 )
                                 /* 24 is min size of an object */
         {
             return( 0 );
         }
 
     }
-    return( ASF_SeekAbsolute( p_input, 
+    return( ASF_SeekAbsolute( p_input,
                               p_obj->common.i_object_pos + p_obj->common.i_object_size ) );
 }
 
@@ -272,7 +272,7 @@ int  ASF_ReadObject_Header( input_thread_t *p_input,
     asf_object_t        *p_subobj;
     int                 i_peek;
     uint8_t             *p_peek;
-    
+
     if( ( i_peek = input_Peek( p_input, &p_peek, 30 ) ) < 30 )
     {
        return( 0 );
@@ -297,7 +297,7 @@ int  ASF_ReadObject_Header( input_thread_t *p_input,
 
         if( !( ASF_ReadObject( p_input, p_subobj, (asf_object_t*)p_hdr ) ) )
         {
-            break; 
+            break;
         }
         if( !ASF_NextObject( p_input, p_subobj ) ) /* Go to the next object */
         {
@@ -313,7 +313,7 @@ int  ASF_ReadObject_Data( input_thread_t *p_input,
     asf_object_data_t *p_data = (asf_object_data_t*)p_obj;
     int               i_peek;
     uint8_t           *p_peek;
-    
+
     if( ( i_peek = input_Peek( p_input, &p_peek, 50 ) ) < 50 )
     {
        return( 0 );
@@ -338,7 +338,7 @@ int  ASF_ReadObject_Index( input_thread_t *p_input,
     asf_object_index_t *p_index = (asf_object_index_t*)p_obj;
     int                i_peek;
     uint8_t            *p_peek;
-    
+
     if( ( i_peek = input_Peek( p_input, &p_peek, 56 ) ) < 56 )
     {
        return( 0 );
@@ -374,7 +374,7 @@ int  ASF_ReadObject_file_properties( input_thread_t *p_input,
     asf_object_file_properties_t *p_fp = (asf_object_file_properties_t*)p_obj;
     int      i_peek;
     uint8_t  *p_peek;
-    
+
     if( ( i_peek = input_Peek( p_input, &p_peek,  92) ) < 92 )
     {
        return( 0 );
@@ -390,7 +390,7 @@ int  ASF_ReadObject_file_properties( input_thread_t *p_input,
     p_fp->i_min_data_packet_size = GetDWLE( p_peek + 92 );
     p_fp->i_max_data_packet_size = GetDWLE( p_peek + 96 );
     p_fp->i_max_bitrate = GetDWLE( p_peek + 100 );
-        
+
 #ifdef ASF_DEBUG
     msg_Dbg( p_input,
             "Read \"File Properties Object\" file_id:" GUID_FMT
@@ -419,7 +419,7 @@ int  ASF_ReadObject_header_extention( input_thread_t *p_input,
     asf_object_header_extention_t *p_he = (asf_object_header_extention_t*)p_obj;
     int     i_peek;
     uint8_t *p_peek;
-    
+
     if( ( i_peek = input_Peek( p_input, &p_peek, p_he->i_object_size ) ) <  46)
     {
        return( 0 );
@@ -444,7 +444,7 @@ int  ASF_ReadObject_header_extention( input_thread_t *p_input,
             GUID_PRINT( p_he->i_reserved1 ),
             p_he->i_reserved2,
             p_he->i_header_extention_size );
-#endif 
+#endif
     return( 1 );
 }
 void ASF_FreeObject_header_extention( input_thread_t *p_input,
@@ -458,11 +458,11 @@ void ASF_FreeObject_header_extention( input_thread_t *p_input,
 int  ASF_ReadObject_stream_properties( input_thread_t *p_input,
                                        asf_object_t *p_obj )
 {
-    asf_object_stream_properties_t *p_sp = 
+    asf_object_stream_properties_t *p_sp =
                     (asf_object_stream_properties_t*)p_obj;
     int     i_peek;
     uint8_t *p_peek;
-    
+
     if( ( i_peek = input_Peek( p_input, &p_peek,  p_sp->i_object_size ) ) < 74 )
     {
        return( 0 );
@@ -519,7 +519,7 @@ int  ASF_ReadObject_stream_properties( input_thread_t *p_input,
 void ASF_FreeObject_stream_properties( input_thread_t *p_input,
                                       asf_object_t *p_obj )
 {
-    asf_object_stream_properties_t *p_sp = 
+    asf_object_stream_properties_t *p_sp =
                 (asf_object_stream_properties_t*)p_obj;
 
     FREE( p_sp->p_type_specific_data );
@@ -534,8 +534,8 @@ int  ASF_ReadObject_codec_list( input_thread_t *p_input,
     int     i_peek;
     uint8_t *p_peek, *p_data;
 
-    int i_codec;
-    
+    unsigned int i_codec;
+
     if( ( i_peek = input_Peek( p_input, &p_peek, p_cl->i_object_size ) ) < 44 )
     {
        return( 0 );
@@ -575,7 +575,7 @@ int  ASF_ReadObject_codec_list( input_thread_t *p_input,
             }
             codec.psz_description[i_len] = '\0';
             p_data += 2 * i_len;
-            
+
             /* opaque information */
             codec.i_information_length = GetWLE( p_data ); p_data += 2;
             if( codec.i_information_length > 0 )
@@ -609,10 +609,10 @@ int  ASF_ReadObject_codec_list( input_thread_t *p_input,
                  "Read \"Codec List Object\" codec[%d] %s name:\"%s\" description:\"%s\" information_length:%d",
                  i_codec,
                  ( codec.i_type == ASF_CODEC_TYPE_VIDEO ) ? "video" : ( ( codec.i_type == ASF_CODEC_TYPE_AUDIO ) ? "audio" : "unknown" ),
-                 codec.psz_name, 
-                 codec.psz_description, 
+                 codec.psz_name,
+                 codec.psz_description,
                  codec.i_information_length );
-       
+
 #undef  codec
     }
 #endif
@@ -622,7 +622,7 @@ void ASF_FreeObject_codec_list( input_thread_t *p_input,
                                 asf_object_t *p_obj )
 {
     asf_object_codec_list_t *p_cl = (asf_object_codec_list_t*)p_obj;
-    int i_codec;
+    unsigned int i_codec;
 
     for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
     {
@@ -641,7 +641,7 @@ void ASF_FreeObject_codec_list( input_thread_t *p_input,
 int  ASF_ReadObject_content_description( input_thread_t *p_input,
                                          asf_object_t *p_obj )
 {
-    asf_object_content_description_t *p_cd = 
+    asf_object_content_description_t *p_cd =
                                     (asf_object_content_description_t*)p_obj;
     int     i_peek;
     uint8_t *p_peek, *p_data;
@@ -652,7 +652,7 @@ int  ASF_ReadObject_content_description( input_thread_t *p_input,
     int i_copyright;
     int i_description;
     int i_rating;
-    
+
 #define GETSTRINGW( psz_str, i_size ) \
    psz_str = calloc( i_size/2 + 1, sizeof( char ) ); \
    for( i_len = 0; i_len < i_size/2; i_len++ ) \
@@ -661,7 +661,7 @@ int  ASF_ReadObject_content_description( input_thread_t *p_input,
    } \
    psz_str[i_size/2] = '\0'; \
    p_data += i_size;
-   
+
     if( ( i_peek = input_Peek( p_input, &p_peek, p_cd->i_object_size ) ) < 34 )
     {
        return( 0 );
@@ -690,7 +690,7 @@ int  ASF_ReadObject_content_description( input_thread_t *p_input,
              p_cd->psz_copyright,
              p_cd->psz_description,
              p_cd->psz_rating );
-#endif 
+#endif
     return( 1 );
 }
 
@@ -698,7 +698,7 @@ void ASF_FreeObject_content_description( input_thread_t *p_input,
                                          asf_object_t *p_obj )
 {
     asf_object_content_description_t *p_cd = (asf_object_content_description_t*)p_obj;
-    
+
     FREE( p_cd->psz_title );
     FREE( p_cd->psz_author );
     FREE( p_cd->psz_copyright );
@@ -710,7 +710,7 @@ static struct
 {
     const guid_t  *p_id;
     int     i_type;
-    int     (*ASF_ReadObject_function)( input_thread_t *p_input, 
+    int     (*ASF_ReadObject_function)( input_thread_t *p_input,
                                         asf_object_t *p_obj );
     void    (*ASF_FreeObject_function)( input_thread_t *p_input,
                                         asf_object_t *p_obj );
@@ -749,7 +749,7 @@ int  ASF_ReadObject( input_thread_t *p_input,
     p_obj->common.p_first = NULL;
     p_obj->common.p_next = NULL;
     p_obj->common.p_last = NULL;
-    
+
 
     if( p_obj->common.i_object_size < 24 )
     {
@@ -778,11 +778,11 @@ int  ASF_ReadObject( input_thread_t *p_input,
     else
     {
         /* XXX ASF_ReadObject_function realloc *pp_obj XXX */
-        i_result =  
+        i_result =
             (ASF_Object_Function[i_index].ASF_ReadObject_function)( p_input,
                                                                     p_obj );
     }
-    
+
     /* link this object with father */
     if( p_father )
     {
@@ -805,12 +805,12 @@ void ASF_FreeObject( input_thread_t *p_input,
 {
     int i_index;
     asf_object_t *p_child;
-    
+
     if( !p_obj )
     {
         return;
     }
-    
+
     /* Free all child object */
     p_child = p_obj->common.p_first;
     while( p_child )
@@ -836,14 +836,14 @@ void ASF_FreeObject( input_thread_t *p_input,
     /* Now free this object */
     if( ASF_Object_Function[i_index].ASF_FreeObject_function == NULL )
     {
-        msg_Warn( p_input, 
+        msg_Warn( p_input,
                   "Unknown asf object " GUID_FMT,
                   GUID_PRINT( p_obj->common.i_object_id ) );
     }
     else
     {
 #ifdef ASF_DEBUG
-        msg_Dbg( p_input, 
+        msg_Dbg( p_input,
                   "Free asf object " GUID_FMT,
                   GUID_PRINT( p_obj->common.i_object_id ) );
 #endif
@@ -873,7 +873,7 @@ int ASF_ReadObjectRoot( input_thread_t *p_input,
     p_root->p_hdr = NULL;
     p_root->p_data = NULL;
     p_root->p_index = NULL;
-   
+
     for( ; ; )
     {
         p_obj  = malloc( sizeof( asf_object_t ) );
@@ -914,7 +914,7 @@ void ASF_FreeObjectRoot( input_thread_t *p_input,
                          asf_object_root_t *p_root )
 {
     asf_object_t *p_obj;
-    
+
     p_obj = p_root->p_first;
     while( p_obj )
     {
@@ -930,7 +930,7 @@ void ASF_FreeObjectRoot( input_thread_t *p_input,
     p_root->p_hdr = NULL;
     p_root->p_data = NULL;
     p_root->p_index = NULL;
-    
+
 }
 
 int  __ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid )

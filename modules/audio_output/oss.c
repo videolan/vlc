@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.34 2002/11/21 15:51:57 gbazin Exp $
+ * $Id: oss.c,v 1.35 2002/12/06 16:34:04 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -325,10 +325,10 @@ static int Open( vlc_object_t *p_this )
 
     if ( !AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
     {
-        int i_format = AFMT_S16_NE;
-        int i_frame_size, i_fragments;
-        int i_rate;
-        int i_nb_channels;
+        unsigned int i_format = AFMT_S16_NE;
+        unsigned int i_frame_size, i_fragments;
+        unsigned int i_rate;
+        unsigned int i_nb_channels;
         audio_buf_info audio_buf;
 
         if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )

@@ -1,10 +1,10 @@
 /*****************************************************************************
  * input_ext-intf.h: structures of the input exported to the interface
  * This header provides structures to read the stream descriptors and
- * control the pace of reading. 
+ * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.79 2002/12/06 10:10:40 sam Exp $
+ * $Id: input_ext-intf.h,v 1.80 2002/12/06 16:34:03 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -61,7 +61,7 @@ struct es_descriptor_t
 
     /* PES parser information */
     pes_packet_t *          p_pes;                            /* Current PES */
-    int                     i_pes_real_size;   /* as indicated by the header */
+    unsigned int            i_pes_real_size;   /* as indicated by the header */
 
     /* Decoder information */
     decoder_fifo_t *        p_decoder_fifo;
@@ -75,7 +75,7 @@ struct es_descriptor_t
 #define PROGRAM_ASSOCIATION_TABLE_PID   0x0000
 #define CONDITIONNAL_ACCESS_TABLE_PID   0x0001                   /* not used */
 #define EMPTY_ID                        0xffff    /* empty record in a table */
- 
+
 
 /* ES Categories to be used by interface plugins */
 #define UNKNOWN_ES      0x00
@@ -114,7 +114,7 @@ struct pgrm_descriptor_t
     /* Demultiplexer data */
     pgrm_sys_t *            p_demux_data;
 
-    int                     i_es_number;      /* size of the following array */
+    unsigned int            i_es_number;      /* size of the following array */
     es_descriptor_t **      pp_es;                /* array of pointers to ES */
 };
 
@@ -131,7 +131,7 @@ struct pgrm_descriptor_t
 struct input_area_t
 {
     /* selected area attributes */
-    int                     i_id;        /* identificator for area */
+    unsigned int            i_id;        /* identificator for area */
     off_t                   i_start;     /* start offset of area */
     off_t                   i_size;      /* total size of the area
                                           * (in arbitrary units) */
@@ -143,8 +143,8 @@ struct input_area_t
                                           * (changed by the interface thread */
 
     /* area subdivision */
-    int                     i_part_nb;   /* number of parts (chapter for DVD)*/
-    int                     i_part;      /* currently selected part */
+    unsigned int            i_part_nb;   /* number of parts (chapter for DVD)*/
+    unsigned int            i_part;      /* currently selected part */
 
 
     /* offset to plugin related data */
@@ -168,7 +168,7 @@ struct input_info_t {
      * Value of this item
      */
     char *         psz_value;
-    
+
     /**
      * Pointer to next item in list, or NULL it at end of list
      */
@@ -188,12 +188,12 @@ struct input_info_category_t {
      * The name of this category
      */
     char *                  psz_name;
-    
+
     /**
      * first element of a linked list containing info items
      */
     input_info_t *          p_info;
-    
+
     /**
      * Pointer to next element in this list, or NULL if at end of list
      */
@@ -215,13 +215,13 @@ struct stream_descriptor_t
                                            * or modify stream, pgrm or es    */
 
     /* Input method data */
-    int                     i_method;       /* input method for stream: file,
+    unsigned int            i_method;       /* input method for stream: file,
                                                disc or network */
     vlc_bool_t              b_pace_control;    /* can we read when we want ? */
     vlc_bool_t              b_seekable;               /* can we do lseek() ? */
 
     /* if (b_seekable) : */
-    int                     i_area_nb;
+    unsigned int            i_area_nb;
     input_area_t **         pp_areas;    /* list of areas in stream == offset
                                           * interval with own properties */
     input_area_t *          p_selected_area;
@@ -232,7 +232,7 @@ struct stream_descriptor_t
                                          * units of 50 bytes/s) ; 0 if undef */
 
     /* New status and rate requested by the interface */
-    int                     i_new_status, i_new_rate;
+    unsigned int            i_new_status, i_new_rate;
     int                     b_new_mute;          /* int because it can be -1 */
     vlc_cond_t              stream_wait; /* interface -> input in case of a
                                           * status change request            */
@@ -241,20 +241,20 @@ struct stream_descriptor_t
     stream_sys_t *          p_demux_data;
 
     /* Programs descriptions */
-    int                     i_pgrm_number;    /* size of the following array */
+    unsigned int            i_pgrm_number;    /* size of the following array */
     pgrm_descriptor_t **    pp_programs;        /* array of pointers to pgrm */
-    pgrm_descriptor_t *     p_selected_program;   /* currently 
+    pgrm_descriptor_t *     p_selected_program;   /* currently
                                                  selected program */
     pgrm_descriptor_t *     p_new_program;        /* Newly selected program */
     /* ES descriptions */
-    int                     i_es_number;
+    unsigned int            i_es_number;
     es_descriptor_t **      pp_es;             /* carried elementary streams */
-    int                     i_selected_es_number;
+    unsigned int            i_selected_es_number;
     es_descriptor_t **      pp_selected_es;             /* ES with a decoder */
     es_descriptor_t *       p_newly_selected_es;   /* ES selected from
                                                     * the interface */
     es_descriptor_t *       p_removed_es;   /* ES removed from the interface */
-    
+
     /* Stream control */
     stream_ctrl_t           control;
 
@@ -263,7 +263,7 @@ struct stream_descriptor_t
 
     /* Input info */
     input_info_category_t * p_info;
-    
+
     /* Statistics */
     count_t                 c_packets_read;                  /* packets read */
     count_t                 c_packets_trashed;            /* trashed packets */

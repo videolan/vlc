@@ -2,7 +2,7 @@
  * libavi.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.8 2002/12/04 15:47:31 fenrir Exp $
+ * $Id: libavi.c,v 1.9 2002/12/06 16:34:06 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -378,7 +378,7 @@ static int AVI_ChunkRead_list( input_thread_t *p_input,
 
         if( AVI_ChunkRead( p_input, p_chk, p_container, b_seekable ) ||
            ( AVI_TellAbsolute( p_input ) >=
-                p_chk->common.p_father->common.i_chunk_pos + 
+                (off_t)p_chk->common.p_father->common.i_chunk_pos + 
                     __EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
         {
             break;
@@ -599,7 +599,7 @@ static int AVI_ChunkRead_idx1( input_thread_t *p_input,
                                avi_chunk_t *p_chk,
                                vlc_bool_t b_seekable )
 {
-    int i_count, i_index;
+    unsigned int i_count, i_index;
 
     AVI_READCHUNK_ENTER;
 
@@ -769,9 +769,9 @@ static struct
     { 0,           NULL,               NULL }
 };
 
-static int AVI_ChunkFunctionFind( int i_fourcc )
+static int AVI_ChunkFunctionFind( vlc_fourcc_t i_fourcc )
 {
-    int i_index;
+    unsigned int i_index;
     for( i_index = 0; ; i_index++ )
     {
         if( ( AVI_Chunk_Function[i_index].i_fourcc == i_fourcc )||
@@ -885,7 +885,7 @@ int AVI_ChunkReadRoot( input_thread_t *p_input,
 
         if( AVI_ChunkRead( p_input, p_chk, p_root, b_seekable ) ||
            ( AVI_TellAbsolute( p_input ) >=
-                p_chk->common.p_father->common.i_chunk_pos + 
+                (off_t)p_chk->common.p_father->common.i_chunk_pos + 
                     __EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
         {
             break;

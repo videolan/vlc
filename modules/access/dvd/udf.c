@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: udf.c,v 1.3 2002/08/08 22:28:22 sam Exp $
+ * $Id: udf.c,v 1.4 2002/12/06 16:34:04 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -17,7 +17,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -63,28 +63,28 @@
 typedef struct partition_s
 {
     vlc_bool_t    b_valid;
-    u8            pi_volume_desc[128];
-    u16           i_flags;
-    u16           i_number;
-    u8            pi_contents[32];
-    u32           i_access_type;
-    u32           i_start;
-    u32           i_length;
+    uint8_t       pi_volume_desc[128];
+    uint16_t      i_flags;
+    uint16_t      i_number;
+    uint8_t       pi_contents[32];
+    uint32_t      i_access_type;
+    uint32_t      i_start;
+    uint32_t      i_length;
     dvdcss_handle dvdhandle;
 } partition_t;
 
 typedef struct ad_s
 {
-    u32         i_location;
-    u32         i_length;
-    u8          i_flags;
-    u16         i_partition;
+    uint32_t    i_location;
+    uint32_t    i_length;
+    uint8_t     i_flags;
+    uint16_t    i_partition;
 } ad_t;
 
 /* for direct data access, LSB first */
-#define GETN1(p) ((u8)pi_data[p])
-#define GETN2(p) ((u16)pi_data[p]|((u16)pi_data[(p)+1]<<8))
-#define GETN4(p) ((u32)pi_data[p]|((u32)pi_data[(p)+1]<<8)|((u32)pi_data[(p)+2]<<16)|((u32)pi_data[(p)+3]<<24))
+#define GETN1(p) ((uint8_t)pi_data[p])
+#define GETN2(p) ((uint16_t)pi_data[p]|((uint16_t)pi_data[(p)+1]<<8))
+#define GETN4(p) ((uint32_t)pi_data[p]|((uint32_t)pi_data[(p)+1]<<8)|((uint32_t)pi_data[(p)+2]<<16)|((uint32_t)pi_data[(p)+3]<<24))
 #define GETN(p,n,target) memcpy(target,&pi_data[p],n)
 
 
@@ -94,7 +94,7 @@ typedef struct ad_s
  * Returns number of read bytes on success, 0 on error
  *****************************************************************************/
 static int UDFReadLB( dvdcss_handle dvdhandle, off_t i_lba,
-                      size_t i_block_count, u8 *pi_data )
+                      size_t i_block_count, uint8_t *pi_data )
 {
     if( dvdcss_seek( dvdhandle, i_lba, DVDCSS_NOFLAGS ) < 0 )
     {
@@ -111,7 +111,7 @@ static int UDFReadLB( dvdcss_handle dvdhandle, off_t i_lba,
 /*****************************************************************************
  * UDFDecode: decode unicode encoded udf data
  *****************************************************************************/
-static int UDFDecode( u8 * pi_data, int i_len, char * psz_target )
+static int UDFDecode( uint8_t * pi_data, int i_len, char * psz_target )
 {
     int     p = 1;
     int     i = 0;
@@ -139,7 +139,7 @@ static int UDFDecode( u8 * pi_data, int i_len, char * psz_target )
             psz_target[i++] = pi_data[p++];
         }
     }
-    
+
     psz_target[i]='\0';
 
     return 0;
@@ -150,7 +150,7 @@ static int UDFDecode( u8 * pi_data, int i_len, char * psz_target )
  *
  **/
 
-int UDFEntity (u8 *data, u8 *Flags, char *Identifier)
+int UDFEntity (uint8_t *data, uint8_t *Flags, char *Identifier)
 {
     Flags[0] = data[0];
     strncpy (Identifier, &data[1], 5);
@@ -163,7 +163,7 @@ int UDFEntity (u8 *data, u8 *Flags, char *Identifier)
 /*****************************************************************************
  * UDFDescriptor: gives a tag ID from your data to find out what it refers to
  *****************************************************************************/
-static int UDFDescriptor( u8 * pi_data, u16 * pi_tag_id )
+static int UDFDescriptor( uint8_t * pi_data, uint16_t * pi_tag_id )
 {
     pi_tag_id[0] = GETN2( 0 );
     /* TODO: check CRC 'n stuff */
@@ -175,7 +175,8 @@ static int UDFDescriptor( u8 * pi_data, u16 * pi_tag_id )
 /*****************************************************************************
  * UDFExtendAD: main volume information
  *****************************************************************************/
-static int UDFExtentAD (u8 * pi_data, u32 * pi_length, u32 * pi_location)
+static int UDFExtentAD ( uint8_t * pi_data, uint32_t * pi_length,
+                         uint32_t * pi_location)
 {
     pi_length[0] = GETN4( 0 );
     pi_location[0] = GETN4( 4 );
@@ -187,7 +188,7 @@ static int UDFExtentAD (u8 * pi_data, u32 * pi_length, u32 * pi_location)
 /*****************************************************************************
  * UDFAD: file set information
  *****************************************************************************/
-static int UDFAD( u8 * pi_data, struct ad_s * p_ad, u8 i_type,
+static int UDFAD( uint8_t * pi_data, struct ad_s * p_ad, uint8_t i_type,
                   struct partition_s partition )
 {
     p_ad->i_length = GETN4( 0 );
@@ -220,7 +221,8 @@ static int UDFAD( u8 * pi_data, struct ad_s * p_ad, u8 i_type,
 /*****************************************************************************
  * UDFICB: takes Information Control Block from pi_data
  *****************************************************************************/
-static int UDFICB( u8 * pi_data, u8 * pi_file_type, u16 * pi_flags)
+static int UDFICB( uint8_t * pi_data, uint8_t * pi_file_type,
+                   uint16_t * pi_flags)
 {
     pi_file_type[0] = GETN1( 11 );
     pi_flags[0] = GETN2( 18 );
@@ -232,8 +234,9 @@ static int UDFICB( u8 * pi_data, u8 * pi_file_type, u16 * pi_flags)
 /*****************************************************************************
  * UDFPartition: gets partition descriptor
  *****************************************************************************/
-static int UDFPartition( u8 * pi_data, u16 * pi_flags, u16 * pi_nb,
-                         byte_t * ps_contents, u32 * pi_start, u32 * pi_length )
+static int UDFPartition( uint8_t * pi_data, uint16_t * pi_flags,
+                         uint16_t * pi_nb, byte_t * ps_contents,
+                         uint32_t * pi_start, uint32_t * pi_length )
 {
     pi_flags[0] = GETN2( 20 );
     pi_nb[0] = GETN2( 22 );
@@ -250,11 +253,11 @@ static int UDFPartition( u8 * pi_data, u16 * pi_flags, u16 * pi_nb,
  *****************************************************************************
  * Returns 0 on OK, 1 on error
  *****************************************************************************/
-static int UDFLogVolume(u8 * pi_data, byte_t * p_volume_descriptor )
+static int UDFLogVolume( uint8_t * pi_data, byte_t * p_volume_descriptor )
 {
-    u32 i_lb_size;
-    u32 i_MT_L;
-    u32 i_N_PM;
+    uint32_t i_lb_size;
+    uint32_t i_MT_L;
+    uint32_t i_N_PM;
 
     UDFDecode( &pi_data[84], 128, (char *)p_volume_descriptor );
 
@@ -277,14 +280,14 @@ static int UDFLogVolume(u8 * pi_data, byte_t * p_volume_descriptor )
 /*****************************************************************************
  * UDFFileEntry: fills a ad_t struct with information at pi_data
  *****************************************************************************/
-static int UDFFileEntry( u8 * pi_data, u8 * pi_file_type, struct ad_s * p_ad,
-                         struct partition_s partition )
+static int UDFFileEntry( uint8_t * pi_data, uint8_t * pi_file_type,
+                         struct ad_s * p_ad, struct partition_s partition )
 {
-    u8      i_file_type;
-    u16     i_flags;
-    u32     i_L_EA;
-    u32     i_L_AD;
-    int     p;
+    uint8_t  i_file_type;
+    uint16_t i_flags;
+    uint32_t i_L_EA;
+    uint32_t i_L_AD;
+    unsigned int p;
 
     UDFICB( &pi_data[16], &i_file_type, &i_flags );
 
@@ -335,14 +338,14 @@ static int UDFFileEntry( u8 * pi_data, u8 * pi_file_type, struct ad_s * p_ad,
 /*****************************************************************************
  * UDFFileIdentifier: gives filename and characteristics of pi_data
  *****************************************************************************/
-static int UDFFileIdentifier( u8 * pi_data, u8 * pi_file_characteristics,
+static int UDFFileIdentifier( uint8_t * pi_data, uint8_t * pi_file_info,
                               char * psz_filename, struct ad_s * p_file_icb,
                               struct partition_s partition )
 {
-    u8      i_L_FI;
-    u16     i_L_IU;
-  
-    pi_file_characteristics[0] = GETN1( 18 );
+    uint8_t  i_L_FI;
+    uint16_t i_L_IU;
+
+    pi_file_info[0] = GETN1( 18 );
     i_L_FI = GETN1( 19 );
     UDFAD( &pi_data[20], p_file_icb, UDFADlong, partition );
     i_L_IU = GETN2( 36 );
@@ -368,12 +371,12 @@ static int UDFFileIdentifier( u8 * pi_data, u8 * pi_file_characteristics,
  * File: Location of file the ICB is pointing to
  * return 1 on success, 0 on error;
  *****************************************************************************/
-static int UDFMapICB( struct ad_s icb, u8 * pi_file_type, struct ad_s * p_file,
-                      struct partition_s partition )
+static int UDFMapICB( struct ad_s icb, uint8_t * pi_file_type,
+                      struct ad_s * p_file, struct partition_s partition )
 {
-    u8      pi_lb[DVD_LB_SIZE];
-    u32     i_lba;
-    u16     i_tag_id;
+    uint8_t  pi_lb[DVD_LB_SIZE];
+    uint32_t i_lba;
+    uint16_t i_tag_id;
 
     i_lba = partition.i_start + icb.i_location;
 
@@ -411,13 +414,13 @@ static int UDFMapICB( struct ad_s icb, u8 * pi_file_type, struct ad_s * p_file,
 static int UDFScanDir( struct ad_s dir, char * psz_filename,
                        struct ad_s * p_file_icb, struct partition_s partition )
 {
-    u8      pi_lb[2*DVD_LB_SIZE];
-    u32     i_lba;
-    u16     i_tag_id;
-    u8      i_file_char;
-    char    psz_temp[DVD_LB_SIZE];
-    int     p;
-  
+    uint8_t  pi_lb[2*DVD_LB_SIZE];
+    uint32_t i_lba;
+    uint16_t i_tag_id;
+    uint8_t  i_file_char;
+    char     psz_temp[DVD_LB_SIZE];
+    unsigned int p;
+
     /* Scan dir for ICB of file */
     i_lba = partition.i_start + dir.i_location;
 #if 0
@@ -503,22 +506,22 @@ static int UDFScanDir( struct ad_s dir, char * psz_filename,
  *****************************************************************************/
 static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
 {
-    u8          pi_lb[DVD_LB_SIZE];
-    u8          pi_anchor[DVD_LB_SIZE];
-    u16         i_tag_id;
-    u32         i_lba;
-    u32         i_MVDS_location;
-    u32         i_MVDS_length;
-    u32         i_last_sector;
+    uint8_t     pi_lb[DVD_LB_SIZE];
+    uint8_t     pi_anchor[DVD_LB_SIZE];
+    uint16_t    i_tag_id;
+    uint32_t    i_lba;
+    uint32_t    i_MVDS_location;
+    uint32_t    i_MVDS_length;
+    uint32_t    i_last_sector;
     vlc_bool_t  b_term;
     vlc_bool_t  b_vol_valid;
     int         i;
 
     /* Find Anchor */
     i_last_sector = 0;
- 
+
     /* try #1, prime anchor */
-    i_lba = 256;    
+    i_lba = 256;
     b_term = 0;
 
     /* Search anchor loop */
@@ -534,7 +537,7 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
         }
 
         if( i_tag_id != 2 )
-        {                
+        {
             /* not an anchor? */
             if( b_term )
             {
@@ -546,10 +549,10 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
             {
                 /* we already found the last sector
                  * try #3, alternative backup anchor */
-                i_lba = i_last_sector;    
-            
+                i_lba = i_last_sector;
+
                 /* but that's just about enough, then! */
-                b_term = 1;            
+                b_term = 1;
             }
             else
             {
@@ -557,7 +560,7 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
                 if( i_last_sector )
                 {
                     /* try #2, backup anchor */
-                    i_lba = i_last_sector - 256;                
+                    i_lba = i_last_sector - 256;
                 }
                 else
                 {
@@ -575,7 +578,7 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
 
     /* main volume descriptor */
     UDFExtentAD( &pi_anchor[16], &i_MVDS_length, &i_MVDS_location );
-  
+
     p_partition->b_valid = 0;
     b_vol_valid = 0;
     p_partition->pi_volume_desc[0] = '\0';
@@ -612,7 +615,7 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
             {
                 /* Logical Volume Descriptor */
                 if( UDFLogVolume( pi_lb , p_partition->pi_volume_desc ) )
-                {  
+                {
                 /* TODO: sector size wrong! */
                 }
                 else
@@ -625,7 +628,7 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
                    ( i_MVDS_length - 1 ) / DVD_LB_SIZE )
                  && ( i_tag_id != 8 )
                  && ( ( !p_partition->b_valid ) || ( !b_vol_valid ) ) );
-    
+
         if( ( !p_partition->b_valid ) || ( !b_vol_valid ) )
         {
             /* backup volume descriptor */
@@ -645,20 +648,20 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
  * starting with '/'.
  * returns absolute LB number, or 0 on error
  *****************************************************************************/
-u32 DVDUDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
+uint32_t DVDUDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
 {
     struct partition_s  partition;
     struct ad_s         root_icb;
     struct ad_s         file;
     struct ad_s         icb;
-    u32                 i_lba;
-    u16                 i_tag_id;
-    u8                  pi_lb[DVD_LB_SIZE];
-    u8                  i_file_type;
+    uint32_t            i_lba;
+    uint16_t            i_tag_id;
+    uint8_t             pi_lb[DVD_LB_SIZE];
+    uint8_t             i_file_type;
     char                psz_tokenline[DVD_LB_SIZE] = "";
     char *              psz_token;
     int                 i_partition;
- 
+
     strcat( psz_tokenline, psz_path );
 
     /* Init file descriptor of UDF filesystem (== DVD) */
@@ -673,7 +676,7 @@ u32 DVDUDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
 #endif
         return 0;
     }
-  
+
     /* Find root dir ICB */
     i_lba = partition.i_start;
 
@@ -711,7 +714,7 @@ u32 DVDUDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
 #endif
         return 0;
     }
-  
+
     /* Find root dir */
     if( !UDFMapICB( root_icb, &i_file_type, &file, partition ) )
     {

@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.9 2002/11/20 13:37:36 sam Exp $
+ * $Id: ts.c,v 1.10 2002/12/06 16:34:07 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -192,7 +192,7 @@ static int Activate( vlc_object_t * p_this )
 
 #ifdef MODULE_NAME_IS_ts_dvbpsi
     p_stream_data->p_pat_handle = (dvbpsi_handle *)
-      dvbpsi_AttachPAT( (dvbpsi_pat_callback) &TS_DVBPSI_HandlePAT, p_input ); 
+      dvbpsi_AttachPAT( (dvbpsi_pat_callback) &TS_DVBPSI_HandlePAT, p_input );
 
     if( p_stream_data->p_pat_handle == NULL )
     {
@@ -202,7 +202,7 @@ static int Activate( vlc_object_t * p_this )
         return -1;
     }
 #endif
-    
+
     /* We'll have to catch the PAT in order to continue
      * Then the input will catch the PMT and then the others ES
      * The PAT es is indepedent of any program. */
@@ -215,7 +215,7 @@ static int Activate( vlc_object_t * p_this )
     p_demux_data->p_psi_section->b_is_complete = 1;
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
+
     return 0;
 }
 
@@ -272,11 +272,11 @@ static int Demux( input_thread_t * p_input )
 /*****************************************************************************
  * DemuxPSI : makes up complete PSI data
  *****************************************************************************/
-static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data, 
+static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
         es_descriptor_t * p_es, vlc_bool_t b_unit_start )
 {
     es_ts_data_t  * p_demux_data;
-    
+
     p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
 
 #define p_psi (p_demux_data->p_psi_section)
@@ -299,12 +299,12 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
 
         /* This is the begining of a new section */
 
-        if( ((u8)(p[1]) & 0xc0) != 0x80 ) 
+        if( ((u8)(p[1]) & 0xc0) != 0x80 )
         {
             msg_Warn( p_input, "invalid PSI packet" );
             p_psi->b_trash = 1;
         }
-        else 
+        else
         {
             p_psi->i_section_length = ((p[1] & 0xF) << 8) | p[2];
             p_psi->b_section_complete = 0;
@@ -328,7 +328,7 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
                 {
                     /* New Section of an already started PSI */
                     p_psi->b_section_complete = 0;
-                    
+
                     if( p_psi->i_version_number != (( p[5] >> 1 ) & 0x1f) )
                     {
                         msg_Warn( p_input,
@@ -352,7 +352,7 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
             }
         }
     } /* b_unit_start */
-    
+
     if( !p_psi->b_trash )
     {
         /* read */
@@ -360,13 +360,13 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
             ( p_psi->i_section_length - p_psi->i_read_in_section ) )
         {
             /* The end of the section is in this TS packet */
-            memcpy( p_psi->p_current, p, 
+            memcpy( p_psi->p_current, p,
             (p_psi->i_section_length - p_psi->i_read_in_section) );
-    
+
             p_psi->b_section_complete = 1;
-            p_psi->p_current += 
+            p_psi->p_current +=
                 (p_psi->i_section_length - p_psi->i_read_in_section);
-                        
+
             if( p_psi->i_section_number == p_psi->i_last_section_number )
             {
                 /* This was the last section of PSI */
@@ -394,11 +394,11 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
         }
     }
 
-#undef p_psi    
+#undef p_psi
 #undef p
-   
+
     input_DeletePacket( p_input->p_method_data, p_data );
-    
+
     return ;
 }
 
@@ -412,7 +412,7 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
 
     pgrm_descriptor_t * p_pgrm;
     es_descriptor_t   * p_current_es;
-    byte_t            * p_current_data;           
+    byte_t            * p_current_data;
 
     int                 i_section_length, i_program_id, i_pmt_pid;
     int                 i_loop, i_current_section;
@@ -421,7 +421,7 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
 
     p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
-    
+
 #define p_psi (p_demux_data->p_psi_section)
 
     /* Not so fast, Mike ! If the PAT version has changed, we first check
@@ -437,7 +437,7 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
             i_section_length = ((u32)(p_current_data[1] & 0xF) << 8) |
                                  p_current_data[2];
             i_current_section = (u8)p_current_data[6];
-    
+
             for( i_loop = 0;
                  ( i_loop < (i_section_length - 9) / 4 ) && !b_changed;
                  i_loop++ )
@@ -466,7 +466,7 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
                     }
                 }
             }
-            
+
             p_current_data += 3 + i_section_length;
 
         } while( ( i_current_section < p_psi->i_last_section_number )
@@ -479,13 +479,13 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
 
     if( b_changed )
     {
-        /* PAT has changed. We are going to delete all programs and 
+        /* PAT has changed. We are going to delete all programs and
          * create new ones. We chose not to only change what was needed
          * as a PAT change may mean the stream is radically changing and
          * this is a secure method to avoid crashes */
         es_ts_data_t      * p_es_demux;
         pgrm_ts_data_t    * p_pgrm_demux;
-        
+
         p_current_data = p_psi->buffer;
 
         /* Delete all programs */
@@ -493,13 +493,13 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
         {
             input_DelProgram( p_input, p_input->stream.pp_programs[0] );
         }
-        
+
         do
         {
             i_section_length = ((u32)(p_current_data[1] & 0xF) << 8) |
                                  p_current_data[2];
             i_current_section = (u8)p_current_data[6];
-    
+
             for( i_loop = 0; i_loop < (i_section_length - 9) / 4 ; i_loop++ )
             {
                 i_program_id = ( (u32)*(p_current_data + i_loop * 4 + 8) << 8 )
@@ -507,31 +507,31 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
                 i_pmt_pid = ( ((u32)*(p_current_data + i_loop * 4 + 10) & 0x1F)
                                     << 8 )
                                | *(p_current_data + i_loop * 4 + 11);
-    
+
                 /* If program = 0, we're having info about NIT not PMT */
                 if( i_program_id )
                 {
                     /* Add this program */
-                    p_pgrm = input_AddProgram( p_input, i_program_id, 
+                    p_pgrm = input_AddProgram( p_input, i_program_id,
                                                sizeof( pgrm_ts_data_t ) );
-                   
+
                     /* whatis the PID of the PMT of this program */
                     p_pgrm_demux = (pgrm_ts_data_t *)p_pgrm->p_demux_data;
                     p_pgrm_demux->i_pmt_version = PMT_UNINITIALIZED;
-    
+
                     /* Add the PMT ES to this program */
                     p_current_es = input_AddES( p_input, p_pgrm,(u16)i_pmt_pid,
                                         sizeof( es_ts_data_t) );
                     p_es_demux = (es_ts_data_t *)p_current_es->p_demux_data;
                     p_es_demux->b_psi = 1;
                     p_es_demux->i_psi_type = PSI_IS_PMT;
-                    
-                    p_es_demux->p_psi_section = 
+
+                    p_es_demux->p_psi_section =
                                             malloc( sizeof( psi_section_t ) );
                     p_es_demux->p_psi_section->b_is_complete = 0;
                 }
             }
-            
+
             p_current_data += 3 + i_section_length;
 
         } while( i_current_section < p_psi->i_last_section_number );
@@ -560,18 +560,18 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 
     p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
     p_pgrm_data = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data;
-    
+
 #define p_psi (p_demux_data->p_psi_section)
 
-    if( p_psi->i_version_number != p_pgrm_data->i_pmt_version ) 
+    if( p_psi->i_version_number != p_pgrm_data->i_pmt_version )
     {
-        es_descriptor_t   * p_new_es;  
+        es_descriptor_t   * p_new_es;
         es_ts_data_t      * p_es_demux;
         byte_t            * p_current_data, * p_current_section;
         int                 i_section_length,i_current_section;
         int                 i_prog_info_length, i_loop;
         int                 i_es_info_length, i_pid, i_stream_type;
-        
+
         p_current_section = p_psi->buffer;
         p_current_data = p_psi->buffer;
 
@@ -606,8 +606,8 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 
             /* For the moment we ignore program descriptors */
             p_current_data += 12 + i_prog_info_length;
-    
-            /* The end of the section, before the CRC is at 
+
+            /* The end of the section, before the CRC is at
              * p_current_section + i_section_length -1 */
             while( p_current_data < p_current_section + i_section_length -1 )
             {
@@ -616,12 +616,12 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                            *(p_current_data + 2);
                 i_es_info_length = ( ((u32)*(p_current_data + 3) & 0xF) << 8 ) |
                                       *(p_current_data + 4);
-                
+
                 /* Add this ES to the program */
-                p_new_es = input_AddES( p_input, p_es->p_pgrm, 
+                p_new_es = input_AddES( p_input, p_es->p_pgrm,
                                         (u16)i_pid, sizeof( es_ts_data_t ) );
 
-                /* Tell the interface what kind of stream it is and select 
+                /* Tell the interface what kind of stream it is and select
                  * the required ones */
                 {
                     switch( i_stream_type )
@@ -690,15 +690,15 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                             break;
                     }
                 }
-                
+
                 p_current_data += 5 + i_es_info_length;
             }
 
             /* Go to the beginning of the next section*/
             p_current_data += 3 + i_section_length;
-           
+
             p_current_section++;
-            
+
         } while( i_current_section < p_psi->i_last_section_number );
 
         p_pgrm_data->i_pmt_version = p_psi->i_version_number;
@@ -719,27 +719,27 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
             else
                     p_input->pf_set_program( p_input, p_es->p_pgrm );
         }
-        
+
         /* inform interface that stream has changed */
         p_input->stream.b_changed = 1;
         /*  Remove lock */
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
-    
+
 #undef p_psi
 }
 
 #elif defined MODULE_NAME_IS_ts_dvbpsi
 /*
- * PSI Decoding using libdvbcss 
+ * PSI Decoding using libdvbcss
  */
 
 /*****************************************************************************
  * DemuxPSI : send the PSI to the right libdvbpsi decoder
  *****************************************************************************/
-static void TS_DVBPSI_DemuxPSI( input_thread_t  * p_input, 
-                                data_packet_t   * p_data, 
-                                es_descriptor_t * p_es, 
+static void TS_DVBPSI_DemuxPSI( input_thread_t  * p_input,
+                                data_packet_t   * p_data,
+                                es_descriptor_t * p_es,
                                 vlc_bool_t        b_unit_start )
 {
     es_ts_data_t        * p_es_demux_data;
@@ -752,28 +752,28 @@ static void TS_DVBPSI_DemuxPSI( input_thread_t  * p_input,
     switch( p_es_demux_data->i_psi_type)
     {
         case PSI_IS_PAT:
-            dvbpsi_PushPacket( 
+            dvbpsi_PushPacket(
                     ( dvbpsi_handle ) p_stream_demux_data->p_pat_handle,
                     p_data->p_demux_start );
             break;
         case PSI_IS_PMT:
             p_pgrm_demux_data = ( pgrm_ts_data_t * )p_es->p_pgrm->p_demux_data;
-            dvbpsi_PushPacket( 
+            dvbpsi_PushPacket(
                     ( dvbpsi_handle ) p_pgrm_demux_data->p_pmt_handle,
                     p_data->p_demux_start );
             break;
         default:
             msg_Warn( p_input, "received unknown PSI in DemuxPSI" );
     }
-    
+
     input_DeletePacket( p_input->p_method_data, p_data );
 }
 
 /*****************************************************************************
  * HandlePAT: will treat a PAT returned by dvbpsi
  *****************************************************************************/
-
-void TS_DVBPSI_HandlePAT( input_thread_t * p_input, dvbpsi_pat_t * p_new_pat )
+static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
+                                 dvbpsi_pat_t * p_new_pat )
 {
     dvbpsi_pat_program_t *      p_pgrm;
     pgrm_descriptor_t *         p_new_pgrm;
@@ -783,10 +783,10 @@ void TS_DVBPSI_HandlePAT( input_thread_t * p_input, dvbpsi_pat_t * p_new_pat )
     stream_ts_data_t *          p_stream_data;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    
+
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
-    
-    if ( !p_new_pat->b_current_next || 
+
+    if ( !p_new_pat->b_current_next ||
             p_stream_data->i_pat_version == PAT_UNINITIALIZED  )
     {
         /* Delete all programs */
@@ -794,22 +794,22 @@ void TS_DVBPSI_HandlePAT( input_thread_t * p_input, dvbpsi_pat_t * p_new_pat )
         {
             input_DelProgram( p_input, p_input->stream.pp_programs[0] );
         }
-    
+
         /* treat the new programs list */
         p_pgrm = p_new_pat->p_first_program;
-        
+
         while( p_pgrm )
         {
             /* If program = 0, we're having info about NIT not PMT */
             if( p_pgrm->i_number )
             {
                 /* Add this program */
-                p_new_pgrm = input_AddProgram( p_input, p_pgrm->i_number, 
+                p_new_pgrm = input_AddProgram( p_input, p_pgrm->i_number,
                                             sizeof( pgrm_ts_data_t ) );
 
                 p_pgrm_demux = (pgrm_ts_data_t *)p_new_pgrm->p_demux_data;
                 p_pgrm_demux->i_pmt_version = PMT_UNINITIALIZED;
-        
+
                 /* Add the PMT ES to this program */
                 p_current_es = input_AddES( p_input, p_new_pgrm,
                                             (u16) p_pgrm->i_pid,
@@ -817,7 +817,7 @@ void TS_DVBPSI_HandlePAT( input_thread_t * p_input, dvbpsi_pat_t * p_new_pat )
                 p_es_demux = (es_ts_data_t *)p_current_es->p_demux_data;
                 p_es_demux->b_psi = 1;
                 p_es_demux->i_psi_type = PSI_IS_PMT;
-                        
+
                 p_es_demux->p_psi_section = malloc( sizeof( psi_section_t ) );
                 if ( p_es_demux->p_psi_section == NULL )
                 {
@@ -825,13 +825,13 @@ void TS_DVBPSI_HandlePAT( input_thread_t * p_input, dvbpsi_pat_t * p_new_pat )
                     p_input->b_error = 1;
                     return;
                 }
-            
+
                 p_es_demux->p_psi_section->b_is_complete = 0;
-                
+
                 /* Create a PMT decoder */
                 p_pgrm_demux->p_pmt_handle = (dvbpsi_handle *)
                     dvbpsi_AttachPMT( p_pgrm->i_number,
-                            (dvbpsi_pmt_callback) &TS_DVBPSI_HandlePMT, 
+                            (dvbpsi_pmt_callback) &TS_DVBPSI_HandlePMT,
                             p_input );
 
                 if( p_pgrm_demux->p_pmt_handle == NULL )
@@ -842,9 +842,9 @@ void TS_DVBPSI_HandlePAT( input_thread_t * p_input, dvbpsi_pat_t * p_new_pat )
                 }
 
             }
-            p_pgrm = p_pgrm->p_next; 
+            p_pgrm = p_pgrm->p_next;
         }
-        
+
         p_stream_data->i_pat_version = p_new_pat->i_version;
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -853,16 +853,17 @@ void TS_DVBPSI_HandlePAT( input_thread_t * p_input, dvbpsi_pat_t * p_new_pat )
 /*****************************************************************************
  * HandlePMT: will treat a PMT returned by dvbpsi
  *****************************************************************************/
-void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
+static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
+                                 dvbpsi_pmt_t * p_new_pmt )
 {
     dvbpsi_pmt_es_t *       p_es;
     pgrm_descriptor_t *     p_pgrm;
     es_descriptor_t *       p_new_es;
     pgrm_ts_data_t *        p_pgrm_demux;
     vlc_bool_t b_vls_compat = config_GetInt( p_input, "vls-backwards-compat" );
-   
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    
+
     p_pgrm = input_FindProgram( p_input, p_new_pmt->i_program_number );
 
     if( p_pgrm == NULL )
@@ -874,14 +875,14 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
     p_pgrm_demux = (pgrm_ts_data_t *)p_pgrm->p_demux_data;
     p_pgrm_demux->i_pcr_pid = p_new_pmt->i_pcr_pid;
 
-    if( !p_new_pmt->b_current_next || 
+    if( !p_new_pmt->b_current_next ||
             p_pgrm_demux->i_pmt_version == PMT_UNINITIALIZED )
     {
         p_es = p_new_pmt->p_first_es;
         while( p_es )
         {
             /* Add this ES */
-            p_new_es = input_AddES( p_input, p_pgrm, 
+            p_new_es = input_AddES( p_input, p_pgrm,
                             (u16)p_es->i_pid, sizeof( es_ts_data_t ) );
             if( p_new_es == NULL )
             {
@@ -1004,7 +1005,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
 
             p_es = p_es->p_next;
         }
-        
+
         /* if no program is selected :*/
         if( !p_input->stream.p_selected_program )
         {
@@ -1027,7 +1028,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
         {
             p_input->pf_set_program( p_input, p_pgrm );
         }
-        
+
         p_pgrm_demux->i_pmt_version = p_new_pmt->i_version;
         p_input->stream.b_changed = 1;
     }
