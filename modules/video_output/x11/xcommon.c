@@ -384,7 +384,6 @@ static int InitVideo( vout_thread_t *p_vout )
         case 16:
             p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6'); break;
         case 24:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4'); break;
         case 32:
             p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2'); break;
         default:

@@ -122,9 +122,11 @@ static int Activate( vlc_object_t *p_this )
                     p_vout->chroma.pf_convert = E_(I420_RGB16);
                     break;
 
-#ifndef WIN32 /* Hmmm, is there only X11 using 32bits per pixel for RV24 ? */
+#if 0
+                /* Hmmm, is there only X11 using 32bits per pixel for RV24 ? */
                 case VLC_FOURCC('R','V','2','4'):
 #endif
+
                 case VLC_FOURCC('R','V','3','2'):
 #if defined (MODULE_NAME_IS_i420_rgb_mmx)
                     /* If we don't have support for the bitmasks, bail out */
