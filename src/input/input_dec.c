@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.46 2002/08/29 23:53:22 massiot Exp $
+ * $Id: input_dec.c,v 1.47 2002/09/01 21:20:29 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -74,7 +74,7 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
     }
     else
     {
-        i_priority = VLC_THREAD_PRIORITY_LOW;
+        i_priority = VLC_THREAD_PRIORITY_VIDEO;
     }
 
     /* Spawn the decoder thread */
