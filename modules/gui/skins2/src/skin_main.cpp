@@ -2,7 +2,7 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.4 2004/01/25 17:20:19 kuehne Exp $
+ * $Id: skin_main.cpp,v 1.5 2004/01/25 23:04:06 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -23,17 +23,16 @@
  *****************************************************************************/
 
 #include <stdlib.h>
-#include "generic_window.hpp"
 #include "dialogs.hpp"
 #include "os_factory.hpp"
 #include "os_loop.hpp"
-#include "window_manager.hpp"
 #include "var_manager.hpp"
 #include "vlcproc.hpp"
-#include "theme.hpp"
 #include "theme_loader.hpp"
+#include "theme.hpp"
 #include "../parser/interpreter.hpp"
 #include "../commands/async_queue.hpp"
+#include "../commands/cmd_quit.hpp"
 
 
 //---------------------------------------------------------------------------
@@ -167,7 +166,7 @@ static void Run( intf_thread_t *p_intf )
 {
     // Load a theme
     ThemeLoader *pLoader = new ThemeLoader( p_intf );
-    char *skin_last = config_GetPsz( p_intf, "skin_last2" );
+    char *skin_last = config_GetPsz( p_intf, "skin_last" );
 
     if( skin_last == NULL || !pLoader->load( skin_last ) )
     {
@@ -186,7 +185,18 @@ static void Run( intf_thread_t *p_intf )
         {
             // Last chance: the user can select a new theme file (blocking call)
             Dialogs *pDialogs = Dialogs::instance( p_intf );
-            pDialogs->showChangeSkin();
+            if( pDialogs )
+            {
+                pDialogs->showChangeSkin();
+            }
+            else
+            {
+                // No dialogs provider, just quit...
+                CmdQuit *pCmd = new CmdQuit( p_intf );
+                AsyncQueue *pQueue = AsyncQueue::instance( p_intf );
+                pQueue->push( CmdGenericPtr( pCmd ) );
+                msg_Err( p_intf, "Cannot show the \"open skin\" dialog: exiting...");
+            }
         }
     }
     delete pLoader;
@@ -198,6 +208,8 @@ static void Run( intf_thread_t *p_intf )
 
     // Get the instance of OSLoop
     OSLoop *loop = OSFactory::instance( p_intf )->getOSLoop();
+
+    // Enter the main event loop
     loop->run();
 
     // Delete the theme
@@ -213,10 +225,13 @@ static void Run( intf_thread_t *p_intf )
 //---------------------------------------------------------------------------
 #define DEFAULT_SKIN        N_("Last skin used")
 #define DEFAULT_SKIN_LONG   N_("Select the path to the last skin used.")
+#define SKIN_CONFIG         N_("Config of last used skin")
+#define SKIN_CONFIG_LONG    N_("Config of last used skin.")
 
 vlc_module_begin();
-// XXX
-    add_string( "skin_last2", "", NULL, DEFAULT_SKIN, DEFAULT_SKIN_LONG,
+    add_string( "skin_last", "", NULL, DEFAULT_SKIN, DEFAULT_SKIN_LONG,
+                VLC_TRUE );
+    add_string( "skin_config", "", NULL, SKIN_CONFIG, SKIN_CONFIG_LONG,
                 VLC_TRUE );
     set_description( _("Skinnable Interface") );
     set_capability( "interface", 30 );

@@ -2,7 +2,7 @@
  * theme.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: theme.cpp,v 1.2 2004/01/25 23:04:06 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,6 +27,8 @@
 
 Theme::~Theme()
 {
+    saveConfig();
+
     // Be sure things are destroyed in the right order (XXX check)
     m_layouts.clear();
     m_controls.clear();
@@ -35,6 +37,71 @@ Theme::~Theme()
     m_fonts.clear();
     m_commands.clear();
     m_vars.clear();
+}
+
+
+void Theme::loadConfig()
+{
+    msg_Dbg( getIntf(), "Loading theme configuration");
+
+    // Get config from vlcrc file
+    char *save = config_GetPsz( getIntf(), "skin_config" );
+    if( save == NULL )
+        return;
+
+    // Initialization
+    map<string, GenericWindowPtr>::const_iterator it;
+    int i = 0;
+    int x, y, v, scan;
+
+    // Get config for each window
+    for( it = m_windows.begin(); it != m_windows.end(); it++ )
+    {
+        GenericWindow *pWin = (*it).second.get();
+        // Get config
+        scan = sscanf( &save[i * 13], "(%4d,%4d,%1d)", &x, &y, &v );
+
+        // If config has the correct number of arguments
+        if( scan > 2 )
+        {
+            pWin->move( x, y );
+            if( v ) pWin->show();
+        }
+
+        // Next window
+        i++;
+    }
+}
+
+
+void Theme::saveConfig()
+{
+    msg_Dbg( getIntf(), "Saving theme configuration");
+
+    // Initialize char where config is stored
+    char *save  = new char[400];
+    map<string, GenericWindowPtr>::const_iterator it;
+    int i = 0;
+    int x, y;
+
+    // Save config of every window
+    for( it = m_windows.begin(); it != m_windows.end(); it++ )
+    {
+        GenericWindow *pWin = (*it).second.get();
+        // Print config
+        x = pWin->getLeft();
+        y = pWin->getTop();
+        sprintf( &save[i * 13], "(%4d,%4d,%1d)", x, y,
+            pWin->getVisibleVar().get() );
+        i++;
+    }
+
+    // Save config to file
+    config_PutPsz( getIntf(), "skin_config", save );
+    config_SaveConfigFile( getIntf(), "skins" );
+
+    // Free memory
+    delete[] save;
 }
 
 
@@ -47,7 +114,6 @@ Theme::~Theme()
         return NULL; \
     } \
     return (*it).second.get();
-
 
 GenericBitmap *Theme::getBitmapById( const string &id )
 {
@@ -73,4 +139,6 @@ CtrlGeneric *Theme::getControlById( const string &id )
 {
     FIND_OBJECT( CtrlGenericPtr, m_controls );
 }
+
+
 

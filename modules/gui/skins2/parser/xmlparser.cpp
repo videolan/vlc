@@ -2,7 +2,7 @@
  * xmlparser.cpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: xmlparser.cpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
+ * $Id: xmlparser.cpp,v 1.4 2004/01/25 23:04:01 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -31,6 +31,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName ):
     {
         msg_Err( getIntf(), "Failed to open %s for parsing",
                  rFileName.c_str() );
+        return;
     }
 
     // Activate DTD validation
@@ -55,7 +56,7 @@ bool XMLParser::parse()
 {
     if( !m_pReader )
     {
-        return -1;
+        return false;
     }
 
     m_errors = false;
@@ -69,7 +70,7 @@ bool XMLParser::parse()
         {
             // Error
             case -1:
-                return -1;
+                return false;
                 break;
 
             // Begin element
@@ -79,7 +80,7 @@ bool XMLParser::parse()
                 const xmlChar *eltName = xmlTextReaderConstName( m_pReader );
                 if( !eltName )
                 {
-                    return -1;
+                    return false;
                 }
                 // Read the attributes
                 AttrList_t attributes;
@@ -89,7 +90,7 @@ bool XMLParser::parse()
                     const xmlChar *value = xmlTextReaderConstValue( m_pReader );
                     if( !name || !value )
                     {
-                        return -1;
+                        return false;
                     }
                     attributes[(const char*)name] = (const char*)value;
                 }
@@ -103,7 +104,7 @@ bool XMLParser::parse()
                 const xmlChar *eltName = xmlTextReaderConstName( m_pReader );
                 if( !eltName )
                 {
-                    return -1;
+                    return false;
                 }
                 handleEndElement( (const char*)eltName );
                 break;

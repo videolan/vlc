@@ -2,7 +2,7 @@
  * theme.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: theme.hpp,v 1.2 2004/01/25 23:04:06 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -45,6 +45,9 @@ class Theme: public SkinObject
         Theme( intf_thread_t *pIntf ): SkinObject( pIntf ),
             m_windowManager( getIntf() ) {}
         virtual ~Theme();
+
+        void loadConfig();
+        void saveConfig();
 
         GenericBitmap *getBitmapById( const string &id );
         GenericFont *getFontById( const string &id );
