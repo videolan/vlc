@@ -612,7 +612,7 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
                         * (2 - p_vpar->picture.b_frame_structure)
                         * p_vpar->sequence.i_chroma_mb_height;
     p_vpar->mb.i_c_x %= p_vpar->sequence.i_chroma_width;
-    if( p_mb->b_motion_field = p_vpar->picture.b_motion_field )
+    if( (p_mb->b_motion_field = p_vpar->picture.b_motion_field) )
     {
         p_mb->i_motion_l_y--;
         p_mb->i_motion_c_y--;
@@ -689,7 +689,6 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
         /* Special No-MC macroblock in P pictures (7.6.3.5). */
         memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
         memset( p_mb->pppi_motion_vectors, 0, 8*sizeof(int) );
-        
         p_vpar->mb.i_motion_type = MOTION_FRAME;
         p_mb->ppi_field_select[0][0] = ( p_vpar->picture.i_current_structure == BOTTOM_FIELD );
     }
@@ -709,6 +708,7 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                         [p_vpar->mb.i_motion_type];
     p_vpar->mb.i_mv_format = ppi_mv_format[p_vpar->picture.b_frame_structure]
                                           [p_vpar->mb.i_motion_type];
+    
 
     p_vpar->mb.b_dct_type = 0;
     if( (p_vpar->picture.i_structure == FRAME_STRUCTURE) &&
@@ -870,7 +870,7 @@ if( 0 )
                                     [p_vpar->mb.i_mb_type & MB_INTRA];
     }
     pf_addb = ppf_addb_intra[p_vpar->mb.i_mb_type & MB_INTRA];
-
+            
     /*
      * Effectively decode blocks.
      */
@@ -1178,6 +1178,7 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
     int         i_pos;
     int         i_run;
     int         i_level;
+    int         i_quant_type;
     boolean_t   b_sign;
     int *       ppi_quant[2];
     
@@ -1188,10 +1189,11 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
 
     /* Determine whether it is luminance or not (chrominance) */
     i_type = ( i_cc + 1 ) >> 1;
-
+    i_quant_type = (!i_type) || (p_vpar->sequence.i_chroma_format == CHROMA_420);
+    
     /* Give a pointer to the quantization matrices for intra blocks */
-    ppi_quant[0] = p_vpar->sequence.nonintra_quant.pi_matrix;
-    ppi_quant[1] = p_vpar->sequence.chroma_nonintra_quant.pi_matrix;
+    ppi_quant[1] = p_vpar->sequence.nonintra_quant.pi_matrix;
+    ppi_quant[0] = p_vpar->sequence.chroma_nonintra_quant.pi_matrix;
 
     /* Decoding of the AC coefficients */
     
@@ -1242,7 +1244,7 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
             case DCT_EOB:
                 if( i_nc <= 0 )
                 {
-                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+                    p_mb->pf_idct[i_b] = vdec_IDCT;//vdec_SparseIDCT;
                     p_mb->pi_sparse_pos[i_b] = i_coef;
                 }
                 else
@@ -1265,9 +1267,8 @@ if( i_parse >= 64 )
 }
         
         i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
-        i_level = ( i_level *
-                    p_vpar->slice.i_quantizer_scale *
-                    ppi_quant[i_type][i_pos] ) >> 5;
+        i_level = ( ((i_level << 1) + 1) * p_vpar->slice.i_quantizer_scale 
+                    * ppi_quant[i_quant_type][i_pos] ) >> 5;
         p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
 fprintf( stderr, "Non intra MPEG2 end (%d)\n", i_b );
@@ -1302,11 +1303,11 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
 
     /* Determine whether it is luminance or not (chrominance) */
     i_type = ( i_cc + 1 ) >> 1;
-    i_quant_type = i_type | (p_vpar->sequence.i_chroma_format == CHROMA_420);
+    i_quant_type = (!i_type) | (p_vpar->sequence.i_chroma_format == CHROMA_420);
 
     /* Give a pointer to the quantization matrices for intra blocks */
-    ppi_quant[0] = p_vpar->sequence.intra_quant.pi_matrix;
-    ppi_quant[1] = p_vpar->sequence.chroma_intra_quant.pi_matrix;
+    ppi_quant[1] = p_vpar->sequence.intra_quant.pi_matrix;
+    ppi_quant[0] = p_vpar->sequence.chroma_intra_quant.pi_matrix;
 
 #if 0    
     /* Decoding of the DC intra coefficient */
@@ -1477,7 +1478,7 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
             case DCT_EOB:
                 if( i_nc <= 1 )
                 {
-                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+                    p_mb->pf_idct[i_b] = vdec_IDCT;//vdec_SparseIDCT;
                     p_mb->pi_sparse_pos[i_b] = i_coef;
                 }
                 else
