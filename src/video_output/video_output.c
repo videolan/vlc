@@ -161,9 +161,9 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     p_vout->b_interface           = 0;
     p_vout->b_scale               = 1;
 
-    intf_DbgMsg( "wished configuration: %dx%d, %d/%d bpp (%d Bpl)",
-                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-                 p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line );
+    intf_WarnMsg( 1, "wished configuration: %dx%d, %d/%d bpp (%d Bpl)",
+                  p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
+                  p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line );
 
     /* Initialize idle screen */
     p_vout->last_display_date   = 0;
@@ -199,12 +199,12 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
         free( p_vout );
         return( NULL );
     }
-    intf_DbgMsg( "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
-                 "masks: 0x%x/0x%x/0x%x",
-                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-                 p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
-                 p_vout->i_red_mask, p_vout->i_green_mask,
-                 p_vout->i_blue_mask );
+    intf_WarnMsg( 1, "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
+                  "masks: 0x%x/0x%x/0x%x",
+                  p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
+                  p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
+                  p_vout->i_red_mask, p_vout->i_green_mask,
+                  p_vout->i_blue_mask );
 
     /* Calculate shifts from system-updated masks */
     MaskToShift( &p_vout->i_red_lshift, &p_vout->i_red_rshift,

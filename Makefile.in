@@ -301,7 +301,6 @@ PLUGIN_ESD =	plugins/esd/esd.o \
 		plugins/esd/aout_esd.o
 
 PLUGIN_FB =	plugins/fb/fb.o \
-		plugins/fb/intf_fb.o \
 		plugins/fb/vout_fb.o
 
 PLUGIN_GGI =	plugins/ggi/ggi.o \

@@ -3450,7 +3450,7 @@ fi
 # Check whether --enable-fb or --disable-fb was given.
 if test "${enable_fb+set}" = set; then
   enableval="$enable_fb"
-  if test x$enable_fb = xyes; then PLUGINS=${PLUGINS}"fb "; ALIASES=${ALIASES}"fbvlc "; fi
+  if test x$enable_fb = xyes; then PLUGINS=${PLUGINS}"fb "; fi
 fi
 
 # Check whether --with-ggi or --without-ggi was given.

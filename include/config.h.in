@@ -369,12 +369,7 @@
 #define VOUT_FB_DEV_VAR                 "vlc_fb_dev"
 #define VOUT_FB_DEV_DEFAULT             "/dev/fb0"
 
-/* Some frame buffers aren't able to support double buffering.
- * We don't want to lose one frame out of 2, so we may set the
- * FB_NOYPAN
- */
-// #define FB_NOYPAN
-
+/* The default video output window title */
 #define VOUT_TITLE                      "VideoLAN Client @VLC_VERSION@"
 
 /*****************************************************************************
