@@ -2,7 +2,7 @@
  * Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: ogt_parse.c,v 1.10 2004/01/16 13:32:37 rocky Exp $
+ * $Id: ogt_parse.c,v 1.11 2004/01/21 04:45:47 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -181,7 +181,7 @@ E_(ParsePacket)( decoder_t *p_dec)
     /* Fill the p_spu structure */
     vlc_mutex_init( p_dec, &p_spu->p_sys->lock );
 
-    p_spu->pf_render  = VCDSubRender;
+    p_spu->pf_render  = VCDSubBlend;
     p_spu->pf_destroy = VCDSubDestroySPU;
     p_spu->p_sys->p_data = (uint8_t*)p_spu->p_sys + sizeof( subpicture_sys_t );
 

@@ -2,7 +2,7 @@
  * render.h : Common SVCD and CVD rendering routine(s).
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: render.h,v 1.2 2003/12/28 04:51:52 rocky Exp $
+ * $Id: render.h,v 1.3 2004/01/21 04:45:47 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -24,5 +24,5 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void VCDSubRender  ( vout_thread_t *, picture_t *, const subpicture_t * );
+void VCDSubBlend  ( vout_thread_t *, picture_t *, const subpicture_t * );
 

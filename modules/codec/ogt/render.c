@@ -1,8 +1,8 @@
 /*****************************************************************************
- * render.c : Philips OGT and CVD (VCD Subtitle) renderer
+ * render.c : Philips OGT and CVD (VCD Subtitle) blending routines
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.16 2004/01/20 13:31:15 rocky Exp $
+ * $Id: render.c,v 1.17 2004/01/21 04:45:47 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -44,35 +44,40 @@
 #define MAX_ALPHA  ((1<<ALPHA_BITS) - 1) 
 #define ALPHA_SCALEDOWN (8-ALPHA_BITS)
 
+/* We use a somewhat artifical factor in scaling calculations so
+   that we can use integer arithmetic and still get somewhat precise
+   results. 
+*/
+#define ASCALE 6
+
 /* Horrible hack to get dbg_print to do the right thing */
 #define p_dec p_vout
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void RenderI420( vout_thread_t *, picture_t *, const subpicture_t *,
+static void BlendI420( vout_thread_t *, picture_t *, const subpicture_t *,
                         vlc_bool_t );
-static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
+static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
-static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
+static void BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
-static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
+static void BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
-static void RenderRGB2( vout_thread_t *p_vout, picture_t *p_pic,
+static void BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
 
 /*****************************************************************************
- * RenderSPU: draw an SPU on a picture
+ * BlendSPU: blend a subtitle into a picture
  *****************************************************************************
  
-  This is a fast implementation of the subpicture drawing code. The
-  data has been preprocessed. Each byte has a run-length 1 in the upper
-  nibble and a color in the lower nibble. The interleaving of rows has
-  been done. Most sanity checks are already done so that this
-  routine can be as fast as possible.
+  This blends subtitles (a subpicture) into the underlying
+  picture. Subtitle data has been preprocessed as YUV + transparancy
+  or 4 bytes per pixel with interleaving of rows in the subtitle
+  removed. 
 
  *****************************************************************************/
-void VCDSubRender( vout_thread_t *p_vout, picture_t *p_pic,
+void VCDSubBlend( vout_thread_t *p_vout, picture_t *p_pic,
 		   const subpicture_t *p_spu )
 {
     struct subpicture_sys_t *p_sys = p_spu->p_sys;
@@ -86,23 +91,23 @@ void VCDSubRender( vout_thread_t *p_vout, picture_t *p_pic,
         case VLC_FOURCC('I','4','2','0'):
         case VLC_FOURCC('I','Y','U','V'):
         case VLC_FOURCC('Y','V','1','2'):
-            RenderI420( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            BlendI420( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
             break;
 
         /* RGB 555 - scaled */
         case VLC_FOURCC('R','V','1','6'):
-            RenderRV16( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            BlendRV16( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
 	    break;
 
         /* RV32 target, scaling */
         case VLC_FOURCC('R','V','2','4'):
         case VLC_FOURCC('R','V','3','2'):
-            RenderRV32( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            BlendRV32( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
 	    break;
 
         /* NVidia overlay, no scaling */
         case VLC_FOURCC('Y','U','Y','2'):
-            RenderYUY2( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            BlendYUY2( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
 	    break;
 
         /* Palettized 8 bits per pixel (256 colors). Each
@@ -110,7 +115,7 @@ void VCDSubRender( vout_thread_t *p_vout, picture_t *p_pic,
            Used in ASCII Art. 
         */
         case VLC_FOURCC('R','G','B','2'):
-            RenderRGB2( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            BlendRGB2( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
           
           /*msg_Err( p_vout, "RGB2 not implemented yet" );*/
 	    break;
@@ -133,7 +138,7 @@ void VCDSubRender( vout_thread_t *p_vout, picture_t *p_pic,
   all Cb (=V) samples in a similar fashion.
 */
 
-static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
+static void BlendI420( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
   /* Common variables */
@@ -317,7 +322,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 */
 #define BYTES_PER_PIXEL 4
 
-static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
+static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
   /* Common variables */
@@ -571,7 +576,7 @@ yuv2rgb555(ogt_yuvt_t *p_yuv, uint8_t *p_rgb1, uint8_t *p_rgb2 )
 #define BYTES_PER_PIXEL 2
 
 static void 
-RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
+BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
             const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
@@ -591,8 +596,8 @@ RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
 
     struct subpicture_sys_t *p_sys = p_spu->p_sys;
 
-    i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
-    i_yscale = ( p_vout->output.i_height << 6 ) / p_vout->render.i_height;
+    i_xscale = ( p_vout->output.i_width << ASCALE ) / p_vout->render.i_width;
+    i_yscale = ( p_vout->output.i_height << ASCALE ) / p_vout->render.i_height;
 
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
 	       "spu: %dx%d, scaled: %dx%d, vout render: %dx%d, scale %dx%d", 
@@ -609,8 +614,8 @@ RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
        the picture coordinates subtitle offsets
     */
     p_pixel_base = p_pic->p->p_pixels 
-              + ( (p_spu->i_x * i_xscale) >> 6 ) * BYTES_PER_PIXEL
-              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_pic->p->i_pitch;
+              + ( (p_spu->i_x * i_xscale) >> ASCALE ) * BYTES_PER_PIXEL
+              + ( (p_spu->i_y * i_yscale) >> ASCALE ) * p_pic->p->i_pitch;
 
     i_x_start = p_sys->i_x_start;
     i_y_start = i_yscale * p_sys->i_y_start;
@@ -625,7 +630,7 @@ RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
          i_y_src += p_spu->i_width )
     {
 	uint8_t *p_pixel_base_y;
-        i_ytmp = i_y >> 6;
+        i_ytmp = i_y >> ASCALE;
         i_y += i_yscale;
 	p_pixel_base_y = p_pixel_base + (i_ytmp * p_pic->p->i_pitch);
 	i_x = 0;
@@ -639,7 +644,7 @@ RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
         }
 
         /* Check whether we need to draw one line or more than one */
-        if( i_ytmp + 1 >= ( i_y >> 6 ) )
+        if( i_ytmp + 1 >= ( i_y >> ASCALE ) )
         {
           /* Draw until we reach the end of the line */
           for( ; i_x < p_spu->i_width;  i_x++, p_source++ )
@@ -717,7 +722,7 @@ RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
         }
         else
         {
-            i_ynext = p_pic->p->i_pitch * i_y >> 6;
+            i_ynext = p_pic->p->i_pitch * i_y >> ASCALE;
 
 
             /* Draw until we reach the end of the line */
@@ -806,7 +811,7 @@ RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
 #define BYTES_PER_PIXEL 4
 
 static void 
-RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
+BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
             const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
@@ -826,8 +831,8 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 
     struct subpicture_sys_t *p_sys = p_spu->p_sys;
 
-    i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
-    i_yscale = ( p_vout->output.i_height << 6 ) / p_vout->render.i_height;
+    i_xscale = ( p_vout->output.i_width << ASCALE ) / p_vout->render.i_width;
+    i_yscale = ( p_vout->output.i_height << ASCALE ) / p_vout->render.i_height;
 
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
 	       "spu: %dx%d, scaled: %dx%d, vout render: %dx%d, scale %dx%d", 
@@ -844,8 +849,8 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
        the picture coordinates subtitle offsets
     */
     p_pixel_base = p_pic->p->p_pixels 
-              + ( (p_spu->i_x * i_xscale) >> 6 ) * BYTES_PER_PIXEL
-              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_pic->p->i_pitch;
+              + ( (p_spu->i_x * i_xscale) >> ASCALE ) * BYTES_PER_PIXEL
+              + ( (p_spu->i_y * i_yscale) >> ASCALE ) * p_pic->p->i_pitch;
 
     i_x_start = p_sys->i_x_start;
     i_y_start = i_yscale * p_sys->i_y_start;
@@ -860,7 +865,7 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
          i_y_src += p_spu->i_width )
     {
 	uint8_t *p_pixel_base_y;
-        i_ytmp = i_y >> 6;
+        i_ytmp = i_y >> ASCALE;
         i_y += i_yscale;
 	p_pixel_base_y = p_pixel_base + (i_ytmp * p_pic->p->i_pitch);
 	i_x = 0;
@@ -874,7 +879,7 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
         }
 
         /* Check whether we need to draw one line or more than one */
-        if( i_ytmp + 1 >= ( i_y >> 6 ) )
+        if( i_ytmp + 1 >= ( i_y >> ASCALE ) )
         {
           /* Draw until we reach the end of the line */
           for( ; i_x < p_spu->i_width;  i_x++, p_source++ )
@@ -919,7 +924,8 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 		
 		    /* This is the location that's going to get changed.
 		     */
-		    uint8_t *p_dest = p_pixel_base_y + i_x * BYTES_PER_PIXEL;
+		    uint8_t *p_dest = p_pixel_base_y 
+                      + ((i_x * i_xscale ) >> ASCALE) * BYTES_PER_PIXEL;
                     uint8_t rgb[4];
 
                     yuv2rgb(p_source, rgb);
@@ -939,7 +945,8 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 		       be completely transparent and is not correct, but
 		       that's handled in a special case above anyway. */
 		
-		    uint8_t *p_dest = p_pixel_base_y + i_x * BYTES_PER_PIXEL;
+		    uint8_t *p_dest = p_pixel_base_y 
+                      + ((i_x * i_xscale ) >> ASCALE) * BYTES_PER_PIXEL;
 		    uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
                     uint8_t rgb[3];
 
@@ -953,7 +960,7 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
         }
         else
         {
-            i_ynext = p_pic->p->i_pitch * i_y >> 6;
+            i_ynext = p_pic->p->i_pitch * i_y >> ASCALE;
 
 
             /* Draw until we reach the end of the line */
@@ -993,8 +1000,8 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 
 		    /* This is the location that's going to get changed.
 		     */
-		    uint8_t *p_pixel_base_x = p_pixel_base 
-                                            + i_x * BYTES_PER_PIXEL;
+		    uint8_t *p_pixel_base_x = p_pixel_base
+                      + ((i_x * i_xscale ) >> ASCALE) * BYTES_PER_PIXEL;
                     uint8_t rgb[4];
                     yuv2rgb(p_source, rgb); 
 
@@ -1041,14 +1048,14 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 #define BYTES_PER_PIXEL 1
 
 static void 
-RenderRGB2( vout_thread_t *p_vout, picture_t *p_pic,
+BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
             const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
     uint8_t *p_pixel_base;
-    ogt_yuvt_t *p_src_start = (ogt_yuvt_t *)p_spu->p_sys->p_data;
-    ogt_yuvt_t *p_src_end   = &p_src_start[p_spu->i_height * p_spu->i_width];
-    ogt_yuvt_t *p_source;
+    uint8_t *p_src_start = (uint8_t *)p_spu->p_sys->p_data;
+    uint8_t *p_src_end   = &p_src_start[p_spu->i_height * p_spu->i_width];
+    uint8_t *p_source;
 
     int i_x, i_y;
     int i_y_src;
@@ -1061,8 +1068,8 @@ RenderRGB2( vout_thread_t *p_vout, picture_t *p_pic,
 
     struct subpicture_sys_t *p_sys = p_spu->p_sys;
 
-    i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
-    i_yscale = ( p_vout->output.i_height << 6 ) / p_vout->render.i_height;
+    i_xscale = ( p_vout->output.i_width << ASCALE ) / p_vout->render.i_width;
+    i_yscale = ( p_vout->output.i_height << ASCALE ) / p_vout->render.i_height;
 
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
 	       "spu: %dx%d, scaled: %dx%d, vout render: %dx%d, scale %dx%d", 
@@ -1079,15 +1086,15 @@ RenderRGB2( vout_thread_t *p_vout, picture_t *p_pic,
        the picture coordinates subtitle offsets
     */
     p_pixel_base = p_pic->p->p_pixels 
-              + ( (p_spu->i_x * i_xscale) >> 6 ) * BYTES_PER_PIXEL
-              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_pic->p->i_pitch;
+              + ( (p_spu->i_x * i_xscale) >> ASCALE ) * BYTES_PER_PIXEL
+              + ( (p_spu->i_y * i_yscale) >> ASCALE ) * p_pic->p->i_pitch;
 
     i_x_start = p_sys->i_x_start;
     i_y_start = i_yscale * p_sys->i_y_start;
     i_x_end   = p_sys->i_x_end;
     i_y_end   = i_yscale * p_sys->i_y_end;
 
-    p_source = (ogt_yuvt_t *)p_sys->p_data;
+    p_source = (uint8_t *)p_sys->p_data;
   
     /* Draw until we reach the bottom of the subtitle */
     i_y = 0;
@@ -1095,11 +1102,31 @@ RenderRGB2( vout_thread_t *p_vout, picture_t *p_pic,
          i_y_src += p_spu->i_width )
       {
 	uint8_t *p_pixel_base_y;
-        i_ytmp = i_y >> 6;
+        i_ytmp = i_y >> ASCALE;
         i_y += i_yscale;
 	p_pixel_base_y = p_pixel_base + (i_ytmp * p_pic->p->i_pitch);
 	i_x = 0;
-        
+
+#if 0
+        /* Remove this */        
+        *p_pixel_base_y = 0xff;         /*+++++*/
+        *(p_pixel_base_y+1) = 0x0;
+        *(p_pixel_base_y+2) = 0x0;
+        *(p_pixel_base_y+3) = 0x0;
+        *(p_pixel_base_y+4) = 0x0;
+        *(p_pixel_base_y+5) = 0x0;
+        *(p_pixel_base_y+6) = 0x0;
+        *(p_pixel_base_y+7) = 0x0;
+        *(p_pixel_base_y+8) = 0xFF;
+        *(p_pixel_base_y+9) = 0xFF;
+        *(p_pixel_base_y+10) = 0xFF;
+        *(p_pixel_base_y+11) = 0xFF;
+        *(p_pixel_base_y+12) = 0xFF;
+        *(p_pixel_base_y+13) = 0xFF;
+        *(p_pixel_base_y+14) = 0xFF;
+        *(p_pixel_base_y+15) = 0xFF;
+#endif
+
         if ( b_crop ) {
           if ( i_y > i_y_end ) break;
           if (i_x_start) {
@@ -1108,79 +1135,90 @@ RenderRGB2( vout_thread_t *p_vout, picture_t *p_pic,
           }
         }
         
-        /* Draw until we reach the end of the line */
-        for( ; i_x < p_spu->i_width; i_x ++, p_source++ )
-          {
-            
-#if 0              
-            uint8_t *p=(uint8_t *) p_source;
-            printf("+++ %02x %02x %02x %02x\n", 
-                   p[0], p[1], p[2], p[3]);
-#endif
-            
-            if( b_crop ) {
-              
-              /* FIXME: y cropping should be dealt with outside of this 
-                 loop.*/
-              if ( i_y < i_y_start) continue;
-              
-              if ( i_x > i_x_end )
-                {
-                  p_source += p_spu->i_width - i_x;
-                  break;
-                }
-            }
-            
-            if (p_source >= p_src_end) {
-              msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
-                       i_x, i_y / i_yscale, i_height);
-              return;
-            }
-            
-            switch( p_source->s.t )
-              {
-              case 0x00:
-                /* Completely transparent. Don't change pixel. */
-                break;
-		
-              default:
-              case MAX_ALPHA:
-                {
-                  /* Completely opaque. Completely overwrite underlying
-                     pixel with subtitle pixel. */
-                  
-                  /* This is the location that's going to get changed.
-                   */
-                  uint8_t *p_dest = p_pixel_base_y + i_x;
-                  uint8_t rgb[4];
-                  
-                  yuv2rgb(p_source, rgb);
-                  *p_dest++ = 0xff;
-                  break;
-                }
+        /* Check whether we need to draw one line or more than one */
+        if( i_ytmp + 1 >= ( i_y >> ASCALE ) )
+        {
+
+          /* Draw until we reach the end of the line */
+          for( ; i_x < p_spu->i_width; i_x ++, p_source++ )
+            {
+              if( b_crop ) {
                 
-#ifdef TRANSPARENCY_FINISHED
-              default:
-                {
-                  /* Blend in underlying pixel subtitle pixel. */
-		  
-                  /* To be able to scale correctly for full opaqueness, we
-                     add 1 to the alpha.  This means alpha value 0 won't
-                     be completely transparent and is not correct, but
-                     that's handled in a special case above anyway. */
-                  
-                  uint8_t *p_dest = p_pixel_base_y + i_x * BYTES_PER_PIXEL;
-                  uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
-                  uint8_t rgb[3];
-                  
-                  yuv2rgb(p_source, rgb);
-                  rv32_pack_blend(p_dest, rgb, dest_alpha, ALPHA_SCALEDOWN);
-                  break;
-                }
-#endif /*TRANSPARENCY_FINISHED*/
+                /* FIXME: y cropping should be dealt with outside of this 
+                   loop.*/
+                if ( i_y < i_y_start) continue;
+                
+                if ( i_x > i_x_end )
+                  {
+                    p_source += p_spu->i_width - i_x;
+                    break;
+                  }
               }
-          }
-    }
+              
+              if (p_source >= p_src_end) {
+                msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
+                         i_x, i_y / i_yscale, i_height);
+                return;
+              }
+              
+              if (*p_source == 0) {
+#if 0
+                printf(" "); /*++++*/
+#endif
+              } else {
+                uint8_t *p_dest = p_pixel_base_y + ((i_x*i_xscale) >> 7);
+                *p_dest++ = 0xff;
+#if 0
+                printf("%1d", *p_source); /*++++*/
+#endif
+              }
+              
+            }
+#if 0
+          printf("\n"); /*++++*/
+#endif
+        } else {
+          /* Have to scale over many lines. */
+          int i_yreal = p_pic->p->i_pitch * i_ytmp;
+          int i_ynext = p_pic->p->i_pitch * i_y >> ASCALE;
+
+           /* Draw until we reach the end of the line */
+           for( ; i_x < p_spu->i_width; i_x ++, p_source++ )
+             {
+              if( b_crop ) {
+                
+                /* FIXME: y cropping should be dealt with outside of this 
+                   loop.*/
+                if ( i_y < i_y_start) continue;
+                
+                if ( i_x > i_x_end )
+                  {
+                    p_source += p_spu->i_width - i_x;
+                    break;
+                  }
+              }
+              
+              if (p_source >= p_src_end) {
+                msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
+                         i_x, i_y / i_yscale, i_height);
+                return;
+              }
+              
+              if (*p_source != 0) {
+                printf("_"); /*++++*/
+              } else {
+                printf("%1d", *p_source); /*++++*/
+                for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
+                     i_ytmp += p_pic->p->i_pitch ) {
+                  uint8_t *p_dest = p_pixel_base + i_ytmp 
+                    + i_x * BYTES_PER_PIXEL;
+                  *p_dest++ = 0xff;
+                }
+              }
+            }
+
+        }
+      }
 }
 
 
