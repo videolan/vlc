@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.55 2004/03/03 14:22:47 fenrir Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1798,7 +1798,11 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     {
                         playlist_SortAuthor( p_sys->p_playlist , i_order );
                         msg_Dbg( p_intf, "requested playlist sort by author (%d)" , i_order );
-                    }
+                    } else if( !strcmp( type , "Shuffle" ) )
+                    {
+                        playlist_Sort( p_sys->p_playlist , SORT_RANDOM, ORDER_NORMAL );
+                        msg_Dbg( p_intf, "requested playlist shuffle");
+                    } 
 
                     break;
                 }
