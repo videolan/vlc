@@ -1,7 +1,7 @@
 /*****************************************************************************
  * httpd.c
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004-2005 VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -2478,7 +2478,6 @@ static void httpd_HostThread( httpd_host_t *host )
                 fcntl( fd, F_SETFL, O_NONBLOCK );
 #endif
 
-                /* FIXME: that MUST be non-blocking */
                 if( p_tls != NULL)
                 {
                     switch ( tls_SessionHandshake( p_tls, fd ) )
@@ -2487,6 +2486,7 @@ static void httpd_HostThread( httpd_host_t *host )
                             msg_Err( host, "Rejecting TLS connection" );
                             net_Close( fd );
                             fd = -1;
+                            p_tls = NULL;
                             break;
 
                         case 1: /* missing input - most likely */
