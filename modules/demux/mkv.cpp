@@ -785,11 +785,13 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys   = p_demux->p_sys;
     matroska_stream_t  *p_stream = p_sys->Stream();
-    matroska_segment_t *p_segment = p_stream->Segment();
+    if ( p_stream != NULL )
+    {
+        matroska_segment_t *p_segment = p_stream->Segment();
 
-    /* TODO close everything ? */
-    if ( p_segment )
-        delete p_segment->segment;
+        if ( p_segment )
+            delete p_segment->segment;
+    }
 
     delete p_sys;
 }
@@ -801,6 +803,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     matroska_stream_t  *p_stream = p_sys->Stream();
+    if ( p_stream == NULL ) return VLC_EGENERIC;
     matroska_segment_t *p_segment = p_stream->Segment();
     int64_t     *pi64;
     double      *pf, f;
@@ -1843,7 +1846,20 @@ static int Demux( demux_t *p_demux)
             p_stream->i_current_segment++;
             p_segment = p_stream->Segment();
             if ( !p_segment || !p_segment->Select( 0 ) )
-                return 0;
+            {
+                for (;;)
+                {
+                    p_sys->i_current_stream++;
+                    p_stream = p_sys->Stream();
+                    if ( p_stream )
+                    {
+                        p_segment = p_stream->Segment();
+                        if ( p_segment && p_segment->Select( 0 ) )
+                            break;
+                    }
+                    return 0;
+                }
+            }
 
             continue;
         }
