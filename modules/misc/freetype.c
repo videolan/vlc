@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.15 2003/07/31 17:03:46 sigmunau Exp $
+ * $Id: freetype.c,v 1.16 2003/08/04 23:31:53 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -60,11 +60,12 @@ static void RenderYUY2( vout_thread_t *, picture_t *,
                         const subpicture_t * );
 static int  AddText   ( vout_thread_t *, byte_t *, text_style_t *, int,
                         int, int, mtime_t, mtime_t );
-static int  GetUnicodeCharFromUTF8( byte_t ** );
-static int  CountUtf8Characters( byte_t * );
 static void FreeString( subpicture_t * );
+
+static int  GetUnicodeCharFromUTF8( byte_t ** );
+
 static line_desc_t *NewLine( byte_t * );
-    
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -219,7 +220,8 @@ static int Create( vlc_object_t *p_this )
         FT_HAS_KERNING(p_vout->p_text_renderer_data->p_face);
     var_Get( p_vout, "freetype-fontsize", &val );
 
-    i_error = FT_Set_Pixel_Sizes( p_vout->p_text_renderer_data->p_face, 0, val.i_int );
+    i_error = FT_Set_Pixel_Sizes( p_vout->p_text_renderer_data->p_face, 0,
+                                  val.i_int );
     if( i_error )
     {
         msg_Err( p_vout, "couldn't set font size to %d", val.i_int );
@@ -391,20 +393,21 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_subpic )
 {
     subpicture_sys_t *p_string = p_subpic->p_sys;
-    int i_plane, x, y, pen_x, pen_y;
+    int x, y, pen_x, pen_y;
     unsigned int i;
     line_desc_t *p_line;
 
-    for( p_line = p_subpic->p_sys->p_lines; p_line != NULL; p_line = p_line->p_next )
+    for( p_line = p_subpic->p_sys->p_lines; p_line != NULL;
+         p_line = p_line->p_next )
     {
         uint8_t *p_in;
-        int i_pitch = p_pic->p[ i_plane ].i_pitch;
+        int i_pitch = p_pic->p[0].i_pitch;
         
-        p_in = p_pic->p[ i_plane ].p_pixels;
+        p_in = p_pic->p[0].p_pixels;
         
         if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
         {
-            pen_y = p_pic->p[ i_plane ].i_lines - p_string->i_height -
+            pen_y = p_pic->p[0].i_lines - p_string->i_height -
                 p_string->i_y_margin;
         }
         else
@@ -456,11 +459,17 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous, i_char;
     subpicture_t *p_subpic;
     line_desc_t  *p_line,  *p_next;
-    
+
     FT_BBox line;
     FT_BBox glyph_size;
     FT_Vector result;
     FT_Glyph tmp_glyph;
+
+    /* Sanity check */
+    if ( !psz_string || !*psz_string )
+    {
+        return VLC_EGENERIC;
+    }
 
     result.x = 0;
     result.y = 0;
@@ -468,12 +477,18 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     line.xMax = 0;
     line.yMin = 0;
     line.yMax = 0;
+
+    p_line = 0;
+    p_string = 0;
+    p_subpic = 0;
+
     /* Create and initialize a subpicture */
     p_subpic = vout_CreateSubPicture( p_vout, MEMORY_SUBPICTURE );
     if ( p_subpic == NULL )
     {
         return VLC_EGENERIC;
     }
+    p_subpic->p_sys = 0;
     p_subpic->pf_render = Render;
     p_subpic->pf_destroy = FreeString;
     p_subpic->i_start = i_start;
@@ -491,14 +506,14 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     p_string = malloc( sizeof(subpicture_sys_t) );
     if ( p_string == NULL )
     {
-        vout_DestroySubPicture( p_vout, p_subpic );
-        return VLC_ENOMEM;
+        msg_Err( p_vout, "Out of memory" );
+        goto error;
     }
     p_subpic->p_sys = p_string;
     p_string->i_flags = i_flags;
     p_string->i_x_margin = i_hmargin;
     p_string->i_y_margin = i_vmargin;
-
+    p_string->p_lines = 0;
     p_string->psz_text = strdup( psz_string );
 
     /* Calculate relative glyph positions and a bounding box for the
@@ -507,29 +522,33 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     if( p_line == NULL )
     {
         msg_Err( p_vout, "Out of memory" );
-        return VLC_ENOMEM;
+        goto error;
     }
     p_string->p_lines = p_line;
     i_pen_x = 0;
     i_pen_y = 0;
     i_previous = 0;
     i = 0;
+
+#define face p_vout->p_text_renderer_data->p_face
+#define glyph face->glyph
+
     while( *psz_string )
     {
         i_char = GetUnicodeCharFromUTF8( &psz_string );
-#define face p_vout->p_text_renderer_data->p_face
-#define glyph face->glyph
-        if ( i_char == 13 ) /* ignore CR chars wherever they may be */
+
+        if ( i_char == '\r' ) /* ignore CR chars wherever they may be */
         {
             continue;
         }
+
         if ( i_char == '\n' )
         {
             p_next = NewLine( psz_string );
             if( p_next == NULL )
             {
                 msg_Err( p_vout, "Out of memory" );
-                return VLC_ENOMEM;
+                goto error;
             }
             p_line->p_next = p_next;
             p_line->i_width = line.xMax;
@@ -548,6 +567,7 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
             i = 0;
             continue;
         }
+
         i_glyph_index = FT_Get_Char_Index( face, i_char );
         if ( p_vout->p_text_renderer_data->i_use_kerning && i_glyph_index
             && i_previous )
@@ -564,13 +584,13 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         if ( i_error )
         {
             msg_Err( p_vout, "FT_Load_Glyph returned %d", i_error );
-            return VLC_EGENERIC;
+            goto error;
         }
         i_error = FT_Get_Glyph( glyph, &tmp_glyph );
         if ( i_error )
         {
             msg_Err( p_vout, "FT_Get_Glyph returned %d", i_error );
-            return VLC_EGENERIC;
+            goto error;
         }
         FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );
         i_error = FT_Glyph_To_Bitmap( &tmp_glyph, ft_render_mode_normal,
@@ -601,6 +621,14 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
              p_string->i_y_margin, i_start, i_stop );
     vout_DisplaySubPicture( p_vout, p_subpic );
     return VLC_SUCCESS;
+
+#undef face
+#undef glyph
+
+ error:
+    FreeString( p_subpic );
+    vout_DestroySubPicture( p_vout, p_subpic );
+    return VLC_EGENERIC;
 }
 
 static void FreeString( subpicture_t *p_subpic )
@@ -608,6 +636,9 @@ static void FreeString( subpicture_t *p_subpic )
     unsigned int i;
     subpicture_sys_t *p_string = p_subpic->p_sys;
     line_desc_t *p_line, *p_next;
+
+    if( p_subpic->p_sys == NULL ) return;
+
     for( p_line = p_string->p_lines; p_line != NULL; p_line = p_next )
     {
         p_next = p_line->p_next;
@@ -668,27 +699,10 @@ static int GetUnicodeCharFromUTF8( byte_t **ppsz_utf8_string )
     return i_char;
 }
 
-static int CountUtf8Characters( byte_t *psz_string )
-{
-    int i, i_num;
-    i = 0;
-    i_num = 0;
-    while( psz_string[ i ] != 0 && psz_string[ i ] != 10 )
-    {
-        if( psz_string[ i ] != 13 && psz_string[ i ] <  0x80 )
-        {
-            i_num++;
-        }
-        i++;
-    }
-    printf( "number of characters in line is %d\n", i_num );
-    return i_num;
-}
-
 static line_desc_t *NewLine( byte_t *psz_string )
 {
-    line_desc_t *p_line;
-    p_line = malloc( sizeof(line_desc_t) );
+    int i_count;
+    line_desc_t *p_line = malloc( sizeof(line_desc_t) );
     if( !p_line )
     {
         return NULL;
@@ -696,17 +710,26 @@ static line_desc_t *NewLine( byte_t *psz_string )
     p_line->i_height = 0;
     p_line->i_width = 0;
     p_line->p_next = NULL;
+
+    /* We don't use CountUtf8Characters() here because we are not acutally
+     * sure the string is utf8. Better be safe than sorry. */
+    i_count = strlen( psz_string );
+
     p_line->pp_glyphs = malloc( sizeof(FT_BitmapGlyph)
-                                * ( CountUtf8Characters( psz_string ) + 1 ) );
+                                * ( i_count + 1 ) );
     if( p_line->pp_glyphs == NULL )
     {
+        free( p_line );
         return NULL;
     }
     p_line->p_glyph_pos = malloc( sizeof( FT_Vector )
-                                  * CountUtf8Characters( psz_string ) );
+                                  * i_count + 1 );
     if( p_line->p_glyph_pos == NULL )
     {
+        free( p_line->pp_glyphs );
+        free( p_line );
         return NULL;
     }
+
     return p_line;
 }
