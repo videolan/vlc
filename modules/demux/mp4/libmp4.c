@@ -1141,11 +1141,17 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         }
     }
 
+    if( p_box->i_type == FOURCC_samr || p_box->i_type == FOURCC_sawb )
+    {
+        /* Ignore channelcount for AMR (3gpp AMRSpecificBox) */
+        p_box->data.p_sample_soun->i_channelcount = 1;
+    }
+
     MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"soun\" in stsd channel %d "
-             "sample size %d sampl rate %f",
+             "sample size %d sample rate %f",
              p_box->data.p_sample_soun->i_channelcount,
              p_box->data.p_sample_soun->i_samplesize,
              (float)p_box->data.p_sample_soun->i_sampleratehi +
