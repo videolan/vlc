@@ -46,12 +46,6 @@ static __inline__ void NextStartCode( vpar_thread_t * p_vpar );
 static void SequenceHeader( vpar_thread_t * p_vpar );
 static void GroupHeader( vpar_thread_t * p_vpar );
 static void PictureHeader( vpar_thread_t * p_vpar );
-static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
-                                        int i_coding_type,
-                                        picture_t * p_newref );
-static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
-                                         int i_coding_type,
-                                         picture_t * p_newref );
 static void SliceHeader00( vpar_thread_t * p_vpar,
                            int * pi_mb_address, int i_mb_base,
                            u32 i_vert_code );
@@ -75,8 +69,108 @@ static void PictureDisplayExtension( vpar_thread_t * p_vpar );
 static void PictureSpatialScalableExtension( vpar_thread_t * p_vpar );
 static void PictureTemporalScalableExtension( vpar_thread_t * p_vpar );
 static void CopyrightExtension( vpar_thread_t * p_vpar );
-static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix );
-static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array );
+
+/*
+ * Local inline functions.
+ */
+
+/*****************************************************************************
+ * NextStartCode : Find the next start code
+ *****************************************************************************/
+static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
+{
+    /* Re-align the buffer on an 8-bit boundary */
+    RealignBits( &p_vpar->bit_stream );
+
+    while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
+    {
+        DumpBits( &p_vpar->bit_stream, 8 );
+    }
+}
+
+/*****************************************************************************
+ * ReferenceUpdate : Update the reference pointers when we have a new picture
+ *****************************************************************************/
+static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
+                                        int i_coding_type,
+                                        picture_t * p_newref )
+{
+    if( i_coding_type != B_CODING_TYPE )
+    {
+        if( p_vpar->sequence.p_forward != NULL )
+            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+        p_vpar->sequence.p_forward = p_vpar->sequence.p_backward;
+        p_vpar->sequence.p_backward = p_newref;
+        if( p_newref != NULL )
+            vout_LinkPicture( p_vpar->p_vout, p_newref );
+    }
+}
+
+/*****************************************************************************
+ * ReferenceReplace : Replace the last reference pointer when we destroy
+ * a picture
+ *****************************************************************************/
+static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
+                                         int i_coding_type,
+                                         picture_t * p_newref )
+{
+    if( i_coding_type != B_CODING_TYPE )
+    {
+        if( p_vpar->sequence.p_backward != NULL )
+            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+        p_vpar->sequence.p_backward = p_newref;
+        if( p_newref != NULL )
+            vout_LinkPicture( p_vpar->p_vout, p_newref );
+    }
+}
+
+/*****************************************************************************
+ * LoadMatrix : Load a quantization matrix
+ *****************************************************************************/
+static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix )
+{
+    int i_dummy;
+    
+    if( !p_matrix->b_allocated )
+    {
+        /* Allocate a piece of memory to load the matrix. */
+        p_matrix->pi_matrix = (int *)malloc( 64*sizeof(int) );
+        p_matrix->b_allocated = 1;
+    }
+    
+    for( i_dummy = 0; i_dummy < 64; i_dummy++ )
+    {
+        p_matrix->pi_matrix[pi_scan[SCAN_ZIGZAG][i_dummy]]
+             = GetBits( &p_vpar->bit_stream, 8 );
+    }
+
+#ifdef VDEC_DFT
+    /* Discrete Fourier Transform requires the quantization matrices to
+     * be normalized before using them. */
+    vdec_NormQuantMatrix( p_matrix->pi_matrix );
+#endif
+}
+
+/*****************************************************************************
+ * LinkMatrix : Link a quantization matrix to another
+ *****************************************************************************/
+static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
+{
+    int i_dummy;
+    
+    if( p_matrix->b_allocated )
+    {
+        /* Deallocate the piece of memory. */
+        free( p_matrix->pi_matrix );
+        p_matrix->b_allocated = 0;
+    }
+    
+    p_matrix->pi_matrix = pi_array;
+}
+
+/*
+ * Exported functions.
+ */
 
 /*****************************************************************************
  * vpar_NextSequenceHeader : Find the next sequence header
@@ -131,20 +225,6 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
 /*
  * Following functions are local
  */
-
-/*****************************************************************************
- * NextStartCode : Find the next start code
- *****************************************************************************/
-static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
-{
-    /* Re-align the buffer on an 8-bit boundary */
-    RealignBits( &p_vpar->bit_stream );
-
-    while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
-    {
-        DumpBits( &p_vpar->bit_stream, 8 );
-    }
-}
 
 /*****************************************************************************
  * SequenceHeader : Parse the next sequence header
@@ -579,39 +659,49 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 }
 
 /*****************************************************************************
- * ReferenceUpdate : Update the reference pointers when we have a new picture
+ * SliceHeader : Parse the next slice structure
  *****************************************************************************/
-static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
-                                        int i_coding_type,
-                                        picture_t * p_newref )
+static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
+                                    int * pi_mb_address, int i_mb_base,
+                                    u32 i_vert_code )
 {
-    if( i_coding_type != B_CODING_TYPE )
-    {
-        if( p_vpar->sequence.p_forward != NULL )
-            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
-        p_vpar->sequence.p_forward = p_vpar->sequence.p_backward;
-        p_vpar->sequence.p_backward = p_newref;
-        if( p_newref != NULL )
-            vout_LinkPicture( p_vpar->p_vout, p_newref );
-    }
-}
+    /* DC predictors initialization table */
+    static int              pi_dc_dct_reinit[4] = {128,256,512,1024};
 
-/*****************************************************************************
- * ReferenceReplace : Replace the last reference pointer when we destroy
- * a picture
- *****************************************************************************/
-static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
-                                         int i_coding_type,
-                                         picture_t * p_newref )
-{
-    if( i_coding_type != B_CODING_TYPE )
+    int                     i_mb_address_save = *pi_mb_address;
+
+    /* slice_vertical_position_extension and priority_breakpoint already done */
+    LoadQuantizerScale( p_vpar );
+
+    if( GetBits( &p_vpar->bit_stream, 1 ) )
     {
-        if( p_vpar->sequence.p_backward != NULL )
-            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
-        p_vpar->sequence.p_backward = p_newref;
-        if( p_newref != NULL )
-            vout_LinkPicture( p_vpar->p_vout, p_newref );
+        /* intra_slice, slice_id */
+        DumpBits( &p_vpar->bit_stream, 8 );
+        /* extra_information_slice */
+        while( GetBits( &p_vpar->bit_stream, 1 ) )
+        {
+            DumpBits( &p_vpar->bit_stream, 8 );
+        }
     }
+
+    *pi_mb_address = (i_vert_code - 1)*p_vpar->sequence.i_mb_width;
+
+    /* Reset DC coefficients predictors (ISO/IEC 13818-2 7.2.1). Why
+     * does the reference decoder put 0 instead of the normative values ? */
+    p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
+        = p_vpar->slice.pi_dc_dct_pred[2]
+        = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
+
+    /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
+    memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
+
+    do
+    {
+        vpar_ParseMacroblock( p_vpar, pi_mb_address, i_mb_address_save,
+                              i_mb_base );
+        i_mb_address_save = *pi_mb_address;
+    }
+    while( !ShowBits( &p_vpar->bit_stream, 23 ) );
 }
 
 /*****************************************************************************
@@ -650,52 +740,6 @@ static void SliceHeader11( vpar_thread_t * p_vpar,
     i_vert_code += GetBits( &p_vpar->bit_stream, 3 ) << 7;
     DumpBits( &p_vpar->bit_stream, 7 ); /* priority_breakpoint */
     SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
-}
-
-/*****************************************************************************
- * SliceHeader : Parse the next slice structure
- *****************************************************************************/
-static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
-                                    int * pi_mb_address, int i_mb_base,
-                                    u32 i_vert_code )
-{
-    /* DC predictors initialization table */
-    static int              pi_dc_dct_reinit[4] = {128,256,512,1024};
-
-    int                     i_mb_address_save = *pi_mb_address;
-
-    /* slice_vertical_position_extension and priority_breakpoint already done */
-    LoadQuantizerScale( p_vpar );
-
-    if( GetBits( &p_vpar->bit_stream, 1 ) )
-    {
-        /* intra_slice, slice_id */
-        DumpBits( &p_vpar->bit_stream, 8 );
-        /* extra_information_slice */
-        while( GetBits( &p_vpar->bit_stream, 1 ) )
-        {
-            DumpBits( &p_vpar->bit_stream, 8 );
-        }
-    }
-
-    *pi_mb_address = (i_vert_code - 1)*p_vpar->sequence.i_mb_width;
-
-    /* Reset DC coefficients predictors (ISO/IEC 13818-2 7.2.1). Why
-     * does the reference decoder put 0 instead of the normative values ? */
-    p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
-        = p_vpar->slice.pi_dc_dct_pred[2]
-        = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
-
-    /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
-    bzero( p_vpar->slice.pppi_pmv, 8*sizeof(int) );
-
-    do
-    {
-        vpar_ParseMacroblock( p_vpar, pi_mb_address, i_mb_address_save,
-                              i_mb_base );
-        i_mb_address_save = *pi_mb_address;
-    }
-    while( !ShowBits( &p_vpar->bit_stream, 23 ) );
 }
 
 /*****************************************************************************
@@ -923,49 +967,4 @@ static void CopyrightExtension( vpar_thread_t * p_vpar )
     p_vpar->sequence.i_copyright_nb = ( (u64)i_copyright_nb_1 << 44 ) +
                                       ( (u64)i_copyright_nb_2 << 22 ) +
                                       ( (u64)GetBits( &p_vpar->bit_stream, 22 ) );
-}
-
-
-/*****************************************************************************
- * LoadMatrix : Load a quantization matrix
- *****************************************************************************/
-static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix )
-{
-    int i_dummy;
-    
-    if( !p_matrix->b_allocated )
-    {
-        /* Allocate a piece of memory to load the matrix. */
-        p_matrix->pi_matrix = (int *)malloc( 64*sizeof(int) );
-        p_matrix->b_allocated = 1;
-    }
-    
-    for( i_dummy = 0; i_dummy < 64; i_dummy++ )
-    {
-        p_matrix->pi_matrix[pi_scan[SCAN_ZIGZAG][i_dummy]]
-             = GetBits( &p_vpar->bit_stream, 8 );
-    }
-
-#ifdef VDEC_DFT
-    /* Discrete Fourier Transform requires the quantization matrices to
-     * be normalized before using them. */
-    vdec_NormQuantMatrix( p_matrix->pi_matrix );
-#endif
-}
-
-/*****************************************************************************
- * LinkMatrix : Link a quantization matrix to another
- *****************************************************************************/
-static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
-{
-    int i_dummy;
-    
-    if( p_matrix->b_allocated )
-    {
-        /* Deallocate the piece of memory. */
-        free( p_matrix->pi_matrix );
-        p_matrix->b_allocated = 0;
-    }
-    
-    p_matrix->pi_matrix = pi_array;
 }

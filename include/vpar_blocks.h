@@ -52,6 +52,7 @@ typedef struct macroblock_s
     f_addb_t                pf_addb[12];      /* pointer to the Add function */
     data_t *                p_data[12];              /* pointer to the position
 					              * in the final picture */
+    int                     i_addb_l_stride, i_addb_c_stride;
 } macroblock_t;
 
 /*****************************************************************************

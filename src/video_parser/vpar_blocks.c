@@ -363,8 +363,8 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
     p_mb->i_c_y = p_vpar->mb.i_c_y;
     p_mb->i_chroma_nb_blocks = p_vpar->sequence.i_chroma_nb_blocks;
 
-    p_mb->i_l_stride = p_vpar->picture.i_l_stride;
-    p_mb->i_c_stride = p_vpar->picture.i_c_stride;
+    p_mb->i_addb_l_stride = p_mb->i_l_stride = p_vpar->picture.i_l_stride;
+    p_mb->i_addb_c_stride = p_mb->i_c_stride = p_vpar->picture.i_c_stride;
 
     /* Update macroblock real position. */
     p_vpar->mb.i_l_x += 16;
@@ -446,10 +446,16 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
     {
         if( p_vpar->mb.b_dct_type = GetBits( &p_vpar->bit_stream, 1 ) )
         {
-            p_mb->i_l_stride <<= 1;
-	    p_mb->i_l_stride += 8;
-	    p_mb->i_c_stride <<= 1;
-	    p_mb->i_c_stride += 8;
+            /* The DCT is coded on fields. Jump one line between each
+             * sample. */
+            p_mb->i_addb_l_stride <<= 1;
+	    p_mb->i_addb_l_stride += 8;
+            /* With CHROMA_420, the DCT is necessarily frame-coded. */
+            if( p_vpar->picture.sequence.i_chroma_format != CHROMA_420 )
+            {
+	        p_mb->i_addb_c_stride <<= 1;
+	        p_mb->i_addb_c_stride += 8;
+            }
         }
     }
 }
