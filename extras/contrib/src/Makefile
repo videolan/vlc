@@ -834,19 +834,21 @@ DISTCLEAN_PKG += live.$(LIVEDOTCOM_VERSION).tar.gz
 # goom2k4
 # ***************************************************************************
 
-goom2k4-$(GOOM2k4_VERSION).tar.gz:
+goom$(GOOM2k4_VERSION).tar.gz:
 	$(WGET) $(GOOM2k4_URL)
+	mv goom-$(GOOM2k4_VERSION)-src.tar.gz goom$(GOOM2k4_VERSION).tar.gz
 
-goom: goom2k4-$(GOOM2k4_VERSION).tar.gz
+goom: goom$(GOOM2k4_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/goom.patch
 
 .goom2k4: goom
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -faltivec" && make && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install )
 	touch $@
 
 CLEAN_FILE += .goom2k4
 CLEAN_PKG += goom
-DISTCLEAN_PKG += goom2k4-$(GOOM2k_VESION).tar.gz
+DISTCLEAN_PKG += goom$(GOOM2k_VESION).tar.gz
 
 # ***************************************************************************
 # libcaca
