@@ -1,10 +1,10 @@
 object NetworkDlg: TNetworkDlg
-  Left = 419
-  Top = 281
+  Left = 353
+  Top = 273
   BorderStyle = bsDialog
   Caption = 'Open network'
-  ClientHeight = 209
-  ClientWidth = 386
+  ClientHeight = 222
+  ClientWidth = 482
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -247,172 +247,211 @@ object NetworkDlg: TNetworkDlg
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object RadioGroupProtocol: TRadioGroup
+  object BitBtnOk: TBitBtn
+    Left = 40
+    Top = 184
+    Width = 177
+    Height = 25
+    TabOrder = 0
+    OnClick = BitBtnOkClick
+    Kind = bkOK
+  end
+  object BitBtnCancel: TBitBtn
+    Left = 256
+    Top = 184
+    Width = 177
+    Height = 25
+    TabOrder = 1
+    OnClick = BitBtnCancelClick
+    Kind = bkCancel
+  end
+  object GroupBoxMode: TGroupBox
     Left = 8
     Top = 8
-    Width = 89
-    Height = 97
-    Caption = 'Protocol'
-    ItemIndex = 0
-    Items.Strings = (
-      'TS'
-      'RTP'
-      'HTTP')
-    TabOrder = 0
-  end
-  object GroupBoxServer: TGroupBox
-    Left = 104
-    Top = 8
-    Width = 273
-    Height = 97
-    Caption = 'Server'
-    TabOrder = 1
-    object LabelAddress: TLabel
-      Left = 16
-      Top = 20
-      Width = 38
+    Width = 465
+    Height = 161
+    Caption = 'Network mode'
+    TabOrder = 2
+    object LabelUDPPort: TLabel
+      Left = 148
+      Top = 34
+      Width = 22
       Height = 13
-      Caption = 'Address'
+      Caption = 'Port:'
     end
-    object LabelPort: TLabel
-      Left = 16
-      Top = 46
-      Width = 19
+    object LabelMulticastPort: TLabel
+      Left = 364
+      Top = 66
+      Width = 22
       Height = 13
-      Caption = 'Port'
+      Caption = 'Port:'
+      Enabled = False
     end
-    object CheckBoxBroadcast: TCheckBox
+    object LabelCSPort: TLabel
+      Left = 364
+      Top = 98
+      Width = 22
+      Height = 13
+      Caption = 'Port:'
+      Enabled = False
+    end
+    object LabelMulticastAddress: TLabel
+      Left = 139
+      Top = 66
+      Width = 41
+      Height = 13
+      Caption = 'Address:'
+      Enabled = False
+    end
+    object LabelCSAddress: TLabel
+      Left = 139
+      Top = 98
+      Width = 41
+      Height = 13
+      Caption = 'Address:'
+      Enabled = False
+    end
+    object LabelHTTPURL: TLabel
+      Left = 147
+      Top = 130
+      Width = 25
+      Height = 13
+      Caption = 'URL:'
+      Enabled = False
+    end
+    object RadioButtonUDP: TRadioButton
       Left = 16
-      Top = 72
-      Width = 73
+      Top = 32
+      Width = 97
       Height = 17
-      Caption = 'Broadcast'
+      Caption = 'UDP'
+      Checked = True
       TabOrder = 0
-      OnClick = CheckBoxBroadcastClick
+      TabStop = True
+      OnClick = RadioButtonUDPClick
     end
-    object EditPort: TEdit
-      Left = 96
-      Top = 42
-      Width = 145
-      Height = 21
+    object RadioButtonMulticast: TRadioButton
+      Left = 16
+      Top = 64
+      Width = 97
+      Height = 17
+      Caption = 'UDP Multicast'
       TabOrder = 1
+      OnClick = RadioButtonMulticastClick
+    end
+    object RadioButtonCS: TRadioButton
+      Left = 16
+      Top = 96
+      Width = 97
+      Height = 17
+      Caption = 'Channel Server'
+      TabOrder = 2
+      OnClick = RadioButtonCSClick
+    end
+    object RadioButtonHTTP: TRadioButton
+      Left = 16
+      Top = 128
+      Width = 97
+      Height = 17
+      Caption = 'HTTP'
+      TabOrder = 3
+      OnClick = RadioButtonHTTPClick
+    end
+    object EditUDPPort: TEdit
+      Left = 184
+      Top = 30
+      Width = 41
+      Height = 21
+      TabOrder = 4
       Text = '1234'
     end
-    object ComboBoxAddress: TComboBox
-      Left = 96
-      Top = 16
-      Width = 161
+    object UpDownUDPPort: TUpDown
+      Left = 225
+      Top = 30
+      Width = 16
       Height = 21
-      ItemHeight = 13
-      TabOrder = 2
-      Text = '138.195.131.10'
-      Items.Strings = (
-        '138.195.131.10')
-    end
-    object ComboBoxBroadcast: TComboBox
-      Left = 96
-      Top = 70
-      Width = 161
-      Height = 21
-      Enabled = False
-      ItemHeight = 13
-      TabOrder = 3
-      Text = '138.195.143.255'
-      Items.Strings = (
-        '138.195.143.255')
-    end
-    object UpDownPort: TUpDown
-      Left = 241
-      Top = 42
-      Width = 15
-      Height = 21
-      Associate = EditPort
+      Associate = EditUDPPort
       Min = 0
       Max = 32767
       Position = 1234
-      TabOrder = 4
+      TabOrder = 5
       Thousands = False
       Wrap = False
     end
-  end
-  object GroupBoxChannels: TGroupBox
-    Left = 8
-    Top = 112
-    Width = 369
-    Height = 57
-    Caption = 'Channels'
-    TabOrder = 2
-    object LabelPortCS: TLabel
-      Left = 268
-      Top = 26
-      Width = 19
-      Height = 13
-      Caption = 'Port'
-      Enabled = False
-    end
-    object CheckBoxChannel: TCheckBox
-      Left = 8
-      Top = 24
-      Width = 97
-      Height = 17
-      Caption = 'Channel server'
-      TabOrder = 0
-      OnClick = CheckBoxChannelClick
-    end
-    object ComboBoxChannel: TComboBox
-      Left = 112
-      Top = 22
-      Width = 137
-      Height = 21
-      Enabled = False
-      ItemHeight = 13
-      TabOrder = 1
-      Text = '138.195.156.232'
-      Items.Strings = (
-        '138.195.156.232')
-    end
-    object EditPortCS: TEdit
-      Left = 296
-      Top = 22
+    object EditMulticastPort: TEdit
+      Left = 392
+      Top = 62
       Width = 41
       Height = 21
       Enabled = False
-      TabOrder = 2
-      Text = '6 010'
+      TabOrder = 6
+      Text = '1234'
     end
-    object UpDownPortCS: TUpDown
-      Left = 337
-      Top = 22
-      Width = 15
+    object UpDownMulticastPort: TUpDown
+      Left = 433
+      Top = 62
+      Width = 16
       Height = 21
-      Associate = EditPortCS
+      Associate = EditMulticastPort
+      Enabled = False
+      Min = 0
+      Max = 32767
+      Position = 1234
+      TabOrder = 7
+      Thousands = False
+      Wrap = False
+    end
+    object EditCSPort: TEdit
+      Left = 392
+      Top = 94
+      Width = 41
+      Height = 21
+      Enabled = False
+      TabOrder = 8
+      Text = '6010'
+    end
+    object UpDownCSPort: TUpDown
+      Left = 433
+      Top = 94
+      Width = 16
+      Height = 21
+      Associate = EditCSPort
       Enabled = False
       Min = 0
       Max = 32767
       Position = 6010
-      TabOrder = 3
+      TabOrder = 9
+      Thousands = False
       Wrap = False
     end
-  end
-  object BitBtnOk: TBitBtn
-    Left = 8
-    Top = 176
-    Width = 177
-    Height = 25
-    Caption = 'OK'
-    Default = True
-    ModalResult = 1
-    TabOrder = 3
-    OnClick = BitBtnOkClick
-  end
-  object BitBtnCancel: TBitBtn
-    Left = 200
-    Top = 176
-    Width = 177
-    Height = 25
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 4
-    OnClick = BitBtnCancelClick
+    object ComboBoxMulticastAddress: TComboBox
+      Left = 184
+      Top = 62
+      Width = 161
+      Height = 21
+      Enabled = False
+      ItemHeight = 13
+      TabOrder = 10
+    end
+    object ComboBoxCSAddress: TComboBox
+      Left = 184
+      Top = 94
+      Width = 161
+      Height = 21
+      Enabled = False
+      ItemHeight = 13
+      TabOrder = 11
+      Text = '138.195.156.230'
+      Items.Strings = (
+        '138.195.159.230')
+    end
+    object EditHTTPURL: TEdit
+      Left = 184
+      Top = 126
+      Width = 265
+      Height = 21
+      Enabled = False
+      TabOrder = 12
+    end
   end
 end

@@ -37,30 +37,39 @@
 class TNetworkDlg : public TForm
 {
 __published:	// IDE-managed Components
-    TRadioGroup *RadioGroupProtocol;
-    TGroupBox *GroupBoxServer;
-    TLabel *LabelAddress;
-    TLabel *LabelPort;
-    TCheckBox *CheckBoxBroadcast;
-    TEdit *EditPort;
-    TComboBox *ComboBoxAddress;
-    TComboBox *ComboBoxBroadcast;
-    TUpDown *UpDownPort;
-    TGroupBox *GroupBoxChannels;
-    TLabel *LabelPortCS;
-    TCheckBox *CheckBoxChannel;
-    TComboBox *ComboBoxChannel;
-    TEdit *EditPortCS;
-    TUpDown *UpDownPortCS;
     TBitBtn *BitBtnOk;
     TBitBtn *BitBtnCancel;
+    TGroupBox *GroupBoxMode;
+    TRadioButton *RadioButtonUDP;
+    TRadioButton *RadioButtonMulticast;
+    TRadioButton *RadioButtonCS;
+    TRadioButton *RadioButtonHTTP;
+    TLabel *LabelUDPPort;
+    TEdit *EditUDPPort;
+    TUpDown *UpDownUDPPort;
+    TLabel *LabelMulticastPort;
+    TEdit *EditMulticastPort;
+    TUpDown *UpDownMulticastPort;
+    TLabel *LabelCSPort;
+    TEdit *EditCSPort;
+    TUpDown *UpDownCSPort;
+    TLabel *LabelMulticastAddress;
+    TComboBox *ComboBoxMulticastAddress;
+    TLabel *LabelCSAddress;
+    TComboBox *ComboBoxCSAddress;
+    TEdit *EditHTTPURL;
+    TLabel *LabelHTTPURL;
     void __fastcall FormShow( TObject *Sender );
     void __fastcall FormHide( TObject *Sender );
-    void __fastcall BitBtnCancelClick(TObject *Sender);
-    void __fastcall CheckBoxBroadcastClick( TObject *Sender );
-    void __fastcall CheckBoxChannelClick( TObject *Sender );
-    void __fastcall BitBtnOkClick(TObject *Sender);
+    void __fastcall BitBtnCancelClick( TObject *Sender );
+    void __fastcall BitBtnOkClick( TObject *Sender );
+    void __fastcall RadioButtonUDPClick( TObject *Sender );
+    void __fastcall RadioButtonMulticastClick( TObject *Sender );
+    void __fastcall RadioButtonCSClick( TObject *Sender );
+    void __fastcall RadioButtonHTTPClick( TObject *Sender );
 private:	// User declarations
+    int OldRadioValue;
+    void __fastcall ChangeEnabled( int i_selected );
 public:		// User declarations
     __fastcall TNetworkDlg( TComponent* Owner );
 };

@@ -49,22 +49,25 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
         char *psz_channel_server;
 
         /* server port */
-        UpDownPort->Position = config_GetIntVariable( "server-port" );
+        UpDownUDPPort->Position = config_GetIntVariable( "server-port" );
+        UpDownMulticastPort->Position = config_GetIntVariable( "server-port" );
 
         /* channel server */
         if( config_GetIntVariable( "network-channel" ) )
         {
-            CheckBoxChannel->Checked = true;
+            RadioButtonCS->Checked = true;
         }
 
         psz_channel_server = config_GetPszVariable( "channel-server" );
         if( psz_channel_server )
         {
-            ComboBoxChannel->Text = psz_channel_server;
+            ComboBoxCSAddress->Text = psz_channel_server;
             free( psz_channel_server );
         }
 
-        UpDownPortCS->Position = config_GetIntVariable( "channel-port" );
+        UpDownCSPort->Position = config_GetIntVariable( "channel-port" );
+
+        OldRadioValue = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormShow( TObject *Sender )
@@ -84,37 +87,15 @@ void __fastcall TNetworkDlg::BitBtnCancelClick( TObject *Sender )
     Hide();
 }
 //---------------------------------------------------------------------------
-void __fastcall TNetworkDlg::CheckBoxBroadcastClick( TObject *Sender )
-{
-    ComboBoxBroadcast->Enabled = NOT( ComboBoxBroadcast->Enabled );
-}
-//---------------------------------------------------------------------------
-void __fastcall TNetworkDlg::CheckBoxChannelClick( TObject *Sender )
-{
-    LabelAddress->Enabled = NOT( LabelAddress->Enabled );
-    ComboBoxAddress->Enabled = NOT( ComboBoxAddress->Enabled );
-    LabelPort->Enabled = NOT( LabelPort->Enabled );
-    EditPort->Enabled = NOT( EditPort->Enabled );
-    UpDownPort->Enabled = NOT( UpDownPort->Enabled );
-    CheckBoxBroadcast->Enabled = NOT( CheckBoxBroadcast->Enabled );
-    ComboBoxBroadcast->Enabled = ( NOT( ComboBoxBroadcast->Enabled ) &&
-                                   CheckBoxBroadcast->Checked );
-    ComboBoxChannel->Enabled = NOT( ComboBoxChannel->Enabled );
-    LabelPortCS->Enabled = NOT( LabelPortCS->Enabled );
-    EditPortCS->Enabled = NOT( EditPortCS->Enabled );
-    UpDownPortCS->Enabled = NOT( UpDownPortCS->Enabled );
-}
-//---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
 {
-    AnsiString      Source, Protocol, Server;
-    boolean_t       b_channel;
-    boolean_t       b_broadcast;
+    AnsiString      Source, Address;
+    AnsiString      Channel = ComboBoxCSAddress->Text;
+    unsigned int    i_channel_port = UpDownCSPort->Position;
     unsigned int    i_port;
     int             i_end = p_main->p_playlist->i_size;
 
     Hide();
-    Server = ComboBoxAddress->Text;
 
     /* select added item */
     if( p_input_bank->pp_input[0] != NULL )
@@ -122,74 +103,132 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
         p_input_bank->pp_input[0]->b_eof = 1;
     }
 
-    /* Check which protocol was activated */
-    switch( RadioGroupProtocol->ItemIndex )
+    /* Check which option was chosen */
+    switch( OldRadioValue )
+    {
+        /* UDP */
+        case 0:
+            config_PutIntVariable( "network-channel", FALSE );
+            i_port = UpDownUDPPort->Position;
+
+            /* Build source name */
+            Source = "udp:@:" + IntToStr( i_port );
+
+            intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, Source.c_str() );
+
+            /* update the display */
+            p_intfGlobal->p_sys->p_playlist->UpdateGrid( p_main->p_playlist );
+
+            intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+            break;
+
+        /* UDP Multicast */
+        case 1:
+            config_PutIntVariable( "network-channel", FALSE );
+            Address = ComboBoxMulticastAddress->Text;
+            i_port = UpDownMulticastPort->Position;
+
+            /* Build source name */
+            Source = "udp:@" + Address + ":" + IntToStr( i_port );
+
+            intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, Source.c_str() );
+
+            /* update the display */
+            p_intfGlobal->p_sys->p_playlist->UpdateGrid( p_main->p_playlist );
+
+            intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+            break;
+
+        /* Channel server */
+        case 2:
+            config_PutIntVariable( "network-channel", TRUE );
+            config_PutPszVariable( "channel-server", Channel.c_str() );
+            config_PutIntVariable( "channel-port", i_channel_port );
+
+            if( p_main->p_channel == NULL )
+            {
+                network_ChannelCreate();
+            }
+
+            p_intfGlobal->p_sys->b_playing = 1;
+            break;
+
+        /* HTTP */
+        case 3:
+            config_PutIntVariable( "network-channel", FALSE );
+            Address = EditHTTPURL->Text;
+
+            /* Build source name */
+            Source = "http:" + Address;
+
+            intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, Source.c_str() );
+
+            /* update the display */
+            p_intfGlobal->p_sys->p_playlist->UpdateGrid( p_main->p_playlist );
+
+            intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+            break;
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TNetworkDlg::ChangeEnabled( int i_selected )
+{
+    switch( i_selected )
     {
         case 0:
-            Protocol = "udp";
+            LabelUDPPort->Enabled = NOT( LabelUDPPort->Enabled );
+            EditUDPPort->Enabled = NOT( EditUDPPort->Enabled );
+            UpDownUDPPort->Enabled = NOT( UpDownUDPPort->Enabled );
             break;
         case 1:
-            intf_ErrMsg( "intf error: rtp protocol not yet implemented" );
-            return;
+            LabelMulticastAddress->Enabled =
+                    NOT( LabelMulticastAddress->Enabled );
+            ComboBoxMulticastAddress->Enabled =
+                    NOT( ComboBoxMulticastAddress->Enabled );
+            LabelMulticastPort->Enabled = NOT( LabelMulticastPort->Enabled );
+            EditMulticastPort->Enabled = NOT( EditMulticastPort->Enabled );
+            UpDownMulticastPort->Enabled = NOT( UpDownMulticastPort->Enabled );
+            break;
         case 2:
-            Protocol = "http";
+            LabelCSAddress->Enabled = NOT( LabelCSAddress->Enabled );
+            ComboBoxCSAddress->Enabled = NOT( ComboBoxCSAddress->Enabled );
+            LabelCSPort->Enabled = NOT( LabelCSPort->Enabled );
+            EditCSPort->Enabled = NOT( EditCSPort->Enabled );
+            UpDownCSPort->Enabled = NOT( UpDownCSPort->Enabled );
+            break;
+        case 3:
+            LabelHTTPURL->Enabled = NOT( LabelHTTPURL->Enabled );
+            EditHTTPURL->Enabled = NOT( EditHTTPURL->Enabled );
             break;
     }
-
-    /* Manage channel server */
-    b_channel = CheckBoxChannel->Checked ? TRUE : FALSE;
-    config_PutIntVariable( "network-channel", b_channel );
-    if( b_channel )
-    {
-        AnsiString      Channel = ComboBoxChannel->Text;
-        unsigned int    i_channel_port = UpDownPortCS->Position;
-
-        if( p_main->p_channel == NULL )
-        {
-            network_ChannelCreate();
-        }
-
-        config_PutPszVariable( "channel-server", Channel.c_str() );
-        if( i_channel_port < 65536 )
-        {
-            config_PutIntVariable( "channel-port", i_channel_port );
-        }
-
-        p_intfGlobal->p_sys->b_playing = 1;
-    }
-    else
-    {
-        /* Get the port number and make sure it will not
-         * overflow 5 characters */
-        i_port = UpDownPort->Position;
-        if( i_port > 65535 )
-        {
-            intf_ErrMsg( "intf error: invalid port %i", i_port );
-        }
-
-        /* do we have a broadcast address */
-        b_broadcast = CheckBoxBroadcast->Checked ? TRUE : FALSE;
-        if( b_broadcast )
-        {
-            AnsiString Broadcast = ComboBoxBroadcast->Text;
-
-            /* Build source name */
-            Source = Protocol + "://" + Server + "@:" + IntToStr( i_port )
-                     + "/" + Broadcast;
-        }
-        else
-        {
-            /* Build source name */
-            Source = Protocol + "://" + Server + "@:" + IntToStr( i_port );
-        }
-
-        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, Source.c_str() );
-        
-        /* update the display */
-        p_intfGlobal->p_sys->p_playlist->UpdateGrid( p_main->p_playlist );
-
-        intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
-    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TNetworkDlg::RadioButtonUDPClick( TObject *Sender )
+{
+    ChangeEnabled( OldRadioValue );
+    OldRadioValue = 0;
+    ChangeEnabled( OldRadioValue );
+}
+//---------------------------------------------------------------------------
+void __fastcall TNetworkDlg::RadioButtonMulticastClick( TObject *Sender )
+{
+    ChangeEnabled( OldRadioValue );
+    OldRadioValue = 1;
+    ChangeEnabled( OldRadioValue );
+}
+//---------------------------------------------------------------------------
+void __fastcall TNetworkDlg::RadioButtonCSClick( TObject *Sender )
+{
+    ChangeEnabled( OldRadioValue );
+    OldRadioValue = 2;
+    ChangeEnabled( OldRadioValue );
+}
+//---------------------------------------------------------------------------
+void __fastcall TNetworkDlg::RadioButtonHTTPClick( TObject *Sender )
+{
+    ChangeEnabled( OldRadioValue );
+    OldRadioValue = 3;
+    ChangeEnabled( OldRadioValue );
 }
 //---------------------------------------------------------------------------
 
