@@ -4,6 +4,9 @@
 
 HEAD
 
+  * ./Makefile: fixed the Win32 interface under Win2k/XP.
+  * ./src/misc/modules_plugins.h: implemented a dlerror()-like wrapper
+    for the Win32 API.
   * ./configure.in: fixed a bug in the libdvdread detection.
   * ./configure.in: fixed plugin compilation under Win32.
   * ./vlc.spec: imported MandrakeSoft's enhancements.

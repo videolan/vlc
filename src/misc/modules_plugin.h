@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.18 2002/04/02 23:43:57 gbazin Exp $
+ * $Id: modules_plugin.h,v 1.19 2002/04/11 08:55:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -142,14 +142,35 @@ module_getsymbol( module_handle_t handle, char * psz_function )
  * module_error: wrapper for dlerror()
  *****************************************************************************
  * This function returns the error message of the last module operation. It
- * returns the string "failed" on systems which do not have the dlerror()
- * function.
+ * returns the string "failed" on systems which do not have a dlerror() like
+ * function. psz_buffer can be used to store temporary data, it is guaranteed
+ * to be kept intact until the return value of module_error has been used.
  *****************************************************************************/
 static __inline__ const char *
-module_error( void )
+module_error( char *psz_buffer )
 {
-#if defined(SYS_BEOS) || defined(WIN32)
+#if defined(SYS_BEOS)
     return( "failed" );
+
+#elif defined(WIN32)
+    int i, i_error = GetLastError();
+
+    FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                   NULL, i_error, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+                   (LPTSTR) psz_buffer, 256, NULL);
+
+    /* Go to the end of the string */
+    for( i = 0;
+         psz_buffer[i] && psz_buffer[i] != '\r' && psz_buffer[i] != '\n';
+         i++ ) {};
+
+    if( psz_buffer[i] )
+    {
+        snprintf( psz_buffer + i, 256 - i, " (error %i)", i_error );
+	psz_buffer[ 255 ] = '\0';
+    }
+    
+    return psz_buffer;
 
 #else
     return( dlerror() );

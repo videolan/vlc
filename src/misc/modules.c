@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.57 2002/04/01 21:54:26 gbazin Exp $
+ * $Id: modules.c,v 1.58 2002/04/11 08:55:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -651,9 +651,11 @@ static int AllocatePluginModule( char * psz_filename )
     /* Try to dynamically load the module. */
     if( module_load( psz_filename, &handle ) )
     {
+        char psz_buffer[256];
+
         /* The plugin module couldn't be opened */
         intf_WarnMsg( 1, "module warning: cannot open %s (%s)",
-                         psz_filename, module_error() );
+                         psz_filename, module_error( psz_buffer ) );
         return( -1 );
     }
 
@@ -970,9 +972,12 @@ static int LockModule( module_t * p_module )
     if( module_load( p_module->is.plugin.psz_filename,
                      &p_module->is.plugin.handle ) )
     {
+        char psz_buffer[256];
+
         /* The plugin module couldn't be opened */
         intf_ErrMsg( "module error: cannot open %s (%s)",
-                     p_module->is.plugin.psz_filename, module_error() );
+                     p_module->is.plugin.psz_filename,
+                     module_error( psz_buffer ) );
         return( -1 );
     }
 
@@ -1085,11 +1090,13 @@ static int CallSymbol( module_t * p_module, char * psz_name )
 
     if( pf_symbol == NULL )
     {
+        char psz_buffer[256];
+
         /* We couldn't load the symbol */
         intf_WarnMsg( 1, "module warning: "
                          "cannot find symbol %s in module %s (%s)",
                          psz_name, p_module->is.plugin.psz_filename,
-                         module_error() );
+                         module_error( psz_buffer ) );
         return( -1 );
     }
 

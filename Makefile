@@ -403,7 +403,9 @@ package-win32:
 	cp $(PLUGINS:%=plugins/%.so) tmp/plugins/ 
 	# don't include these two
 	#rm -f tmp/plugins/gtk.so tmp/plugins/sdl.so
-	$(STRIP) $(PLUGINS:%=tmp/plugins/%.so)
+ifneq (,$(PLUGINS))
+	for i in $(PLUGINS) ; do if test $$i != intfwin ; then $(STRIP) tmp/plugins/$$i.so ; fi ; done
+endif
 	mkdir tmp/share
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/share/ ; done
