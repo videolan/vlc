@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.7 2003/04/05 12:43:39 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.8 2003/04/07 17:35:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -74,6 +74,8 @@ typedef struct dec_thread_t
 static int  OpenDecoder  ( vlc_object_t * );
 static int  RunDecoder   ( decoder_fifo_t * );
 static void CloseDecoder ( dec_thread_t * );
+
+static picture_t *GetNewPicture( dec_thread_t *, uint8_t ** );
 
 /*****************************************************************************
  * Module descriptor
@@ -182,7 +184,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             break;
 
         case STATE_SEQUENCE:
+        {
             /* Initialize video output */
+            uint8_t *buf[3];
 
             /* Check whether the input gives a particular aspect ratio */
             if( p_dec->p_fifo->p_demux_data
@@ -223,26 +227,22 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                                           p_dec->p_info->sequence->width,
                                           p_dec->p_info->sequence->height,
                                           i_chroma, i_aspect );
-            break;
+
+            mpeg2_custom_fbuf( p_dec->p_mpeg2dec, 1 );
+
+            /* Set the first 2 reference frames */
+            if( (p_pic = GetNewPicture( p_dec, buf )) == NULL ) break;
+            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
+            if( (p_pic = GetNewPicture( p_dec, buf )) == NULL ) break;
+            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
+        }
+        break;
 
         case STATE_PICTURE:
         {
             uint8_t *buf[3];
 
-            /* Get a new picture */
-            while( !(p_pic = vout_CreatePicture( p_dec->p_vout, 0, 0, 0 ) ) )
-            {
-                if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
-                    break;
-
-                msleep( VOUT_OUTMEM_SLEEP );
-            }
-            if( p_pic == NULL )
-                break;
-
-            buf[0] = p_pic->p[0].p_pixels;
-            buf[1] = p_pic->p[1].p_pixels;
-            buf[2] = p_pic->p[2].p_pixels;
+            if( (p_pic = GetNewPicture( p_dec, buf )) == NULL ) break;
             mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
 
             /* Store the date for the picture */
@@ -361,4 +361,29 @@ static void CloseDecoder( dec_thread_t * p_dec )
 
         free( p_dec );
     }
+}
+
+/*****************************************************************************
+ * GetNewPicture: Get a new picture from the vout and set the buf struct
+ *****************************************************************************/
+static picture_t *GetNewPicture( dec_thread_t *p_dec, uint8_t **pp_buf )
+{
+    picture_t *p_pic;
+
+    /* Get a new picture */
+    while( !(p_pic = vout_CreatePicture( p_dec->p_vout, 0, 0, 0 ) ) )
+    {
+        if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
+            break;
+
+        msleep( VOUT_OUTMEM_SLEEP );
+    }
+    if( p_pic == NULL )
+        return NULL;
+
+    pp_buf[0] = p_pic->p[0].p_pixels;
+    pp_buf[1] = p_pic->p[1].p_pixels;
+    pp_buf[2] = p_pic->p[2].p_pixels;
+
+    return p_pic;
 }

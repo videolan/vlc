@@ -4059,7 +4059,7 @@ msgstr ""
 
 #: modules/gui/wxwindows/interface.cpp:208
 msgid "About this program"
-msgstr "Quitter le programme"
+msgstr "À propos de ce programme"
 
 #: modules/gui/wxwindows/interface.cpp:212
 msgid "&Open File..."
@@ -4071,7 +4071,7 @@ msgstr "Ouvrir un &disque..."
 
 #: modules/gui/wxwindows/interface.cpp:214
 msgid "&Network Stream..."
-msgstr "Flux réseau..."
+msgstr "&Flux réseau..."
 
 #: modules/gui/wxwindows/interface.cpp:216
 msgid "&Satellite Stream..."
@@ -4087,11 +4087,11 @@ msgstr "Quitter"
 
 #: modules/gui/wxwindows/interface.cpp:226
 msgid "&Logs..."
-msgstr "Disque..."
+msgstr "&Messages..."
 
 #: modules/gui/wxwindows/interface.cpp:227
 msgid "&File info..."
-msgstr "&Fichier..."
+msgstr "&Infos fichier..."
 
 #: modules/gui/wxwindows/interface.cpp:231
 msgid "&Audio"
