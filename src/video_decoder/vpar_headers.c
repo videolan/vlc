@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.3 2001/07/18 14:21:00 massiot Exp $
+ * $Id: vpar_headers.c,v 1.4 2001/07/25 15:37:34 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -506,7 +506,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         if( p_vpar->picture.p_picture != NULL )
         {
             vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
+            p_vpar->picture.p_picture = NULL;
         }
+        p_vpar->picture.i_current_structure = 0;
         p_vpar->sequence.b_expect_discontinuity = 0;
     }
 
