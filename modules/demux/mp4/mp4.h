@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.12 2004/01/18 18:31:50 fenrir Exp $
+ * $Id: mp4.h,v 1.13 2004/01/18 22:00:00 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -64,7 +64,12 @@ typedef struct
     int i_height;
 
     /* more internal data */
-    uint64_t         i_timescale;  /* time scale for this track only */
+    uint64_t        i_timescale;    /* time scale for this track only */
+
+    /* elst */
+    int             i_elst;         /* current elst */
+    int64_t         i_elst_time;    /* current elst start time (in movie time scale)*/
+    MP4_Box_t       *p_elst;        /* elst (could be NULL) */
 
     /* give the next sample to read, i_chunk is to find quickly where
       the sample is located */

@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.43 2004/01/09 04:37:43 jlj Exp $
+ * $Id: libmp4.c,v 1.44 2004/01/18 22:00:00 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1559,7 +1559,7 @@ static int MP4_ReadBox_elst( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_elst->i_segment_duration =
         calloc( sizeof( uint64_t ), p_box->data.p_elst->i_entry_count );
     p_box->data.p_elst->i_media_time =
-        calloc( sizeof( uint64_t ), p_box->data.p_elst->i_entry_count );
+        calloc( sizeof( int64_t ),  p_box->data.p_elst->i_entry_count );
     p_box->data.p_elst->i_media_rate_integer =
         calloc( sizeof( uint16_t ), p_box->data.p_elst->i_entry_count );
     p_box->data.p_elst->i_media_rate_fraction=
@@ -1581,6 +1581,7 @@ static int MP4_ReadBox_elst( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
             MP4_GET4BYTES( p_box->data.p_elst->i_segment_duration[i] );
 
             MP4_GET4BYTES( p_box->data.p_elst->i_media_time[i] );
+            p_box->data.p_elst->i_media_time[i] = (int32_t)p_box->data.p_elst->i_media_time[i];
         }
 
         MP4_GET2BYTES( p_box->data.p_elst->i_media_rate_integer[i] );

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.54 2004/01/18 18:31:50 fenrir Exp $
+ * $Id: mp4.c,v 1.55 2004/01/18 22:00:00 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -71,13 +71,14 @@ static int  MP4_TrackSeek   ( input_thread_t *, mp4_track_t *, mtime_t );
 static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
 static int      MP4_TrackSampleSize( mp4_track_t * );
 static int      MP4_TrackNextSample( input_thread_t *, mp4_track_t * );
+static void     MP4_TrackSetELST( input_thread_t *, mp4_track_t *, int64_t );
 
 /* Return time in µs of a track */
-static inline mtime_t MP4_TrackGetPTS( mp4_track_t *p_track )
+static inline int64_t MP4_TrackGetPTS( input_thread_t *p_input, mp4_track_t *p_track )
 {
     unsigned int i_sample;
     unsigned int i_index;
-    uint64_t i_dts;
+    int64_t i_dts;
 
     i_sample = p_track->i_sample - p_track->chunk[p_track->i_chunk].i_sample_first;
     i_dts = p_track->chunk[p_track->i_chunk].i_first_dts;
@@ -98,6 +99,26 @@ static inline mtime_t MP4_TrackGetPTS( mp4_track_t *p_track )
             i_sample = 0;
             break;
         }
+    }
+
+    /* now handle elst */
+    if( p_track->p_elst )
+    {
+        demux_sys_t         *p_sys = p_input->p_demux_data;
+        MP4_Box_data_elst_t *elst = p_track->p_elst->data.p_elst;
+
+        /* convert to offset */
+        if( ( elst->i_media_rate_integer[p_track->i_elst] > 0 ||
+              elst->i_media_rate_fraction[p_track->i_elst] > 0 ) &&
+            elst->i_media_time[p_track->i_elst] > 0 )
+        {
+            i_dts -= elst->i_media_time[p_track->i_elst];
+        }
+
+        /* add i_elst_time */
+        i_dts += p_track->i_elst_time * p_track->i_timescale / p_sys->i_timescale;
+
+        if( i_dts < 0 ) i_dts = 0;
     }
 
     return (int64_t)1000000 * i_dts / p_track->i_timescale;
@@ -467,8 +488,14 @@ static int Demux( input_thread_t *p_input )
             continue;
         }
 
-        while( MP4_TrackGetPTS( tk) < MP4_GetMoviePTS( p_sys ) )
+        while( MP4_TrackGetPTS( p_input, tk ) < MP4_GetMoviePTS( p_sys ) )
         {
+#if 0
+            msg_Dbg( p_input, "tk=%lld mv=%lld",
+                     MP4_TrackGetPTS( p_input, tk ),
+                     MP4_GetMoviePTS( p_sys ) );
+#endif
+
             if( MP4_TrackSampleSize( tk ) > 0 &&
                 ( b_play_audio || tk->fmt.i_cat != AUDIO_ES ) )
             {
@@ -500,7 +527,7 @@ static int Demux( input_thread_t *p_input )
                 p_block->i_dts =
                     input_ClockGetTS( p_input,
                                       p_input->stream.p_selected_program,
-                                      MP4_TrackGetPTS( tk ) * 9/100 );
+                                      MP4_TrackGetPTS( p_input, tk ) * 9/100 );
 
                 p_block->i_pts = tk->fmt.i_cat == VIDEO_ES ? 0 : p_block->i_dts;
 
@@ -699,7 +726,7 @@ static int TrackCreateChunksIndex( input_thread_t *p_input,
     msg_Dbg( p_input,
              "track[Id 0x%x] read %d chunk",
              p_demux_track->i_track_ID,
-            p_demux_track->i_chunk_count );
+             p_demux_track->i_chunk_count );
 
     return( VLC_SUCCESS );
 }
@@ -1074,26 +1101,64 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
     return VLC_SUCCESS;
 }
 
-/* given a time it return sample/chunk */
+/* given a time it return sample/chunk
+ * it also update elst field of the track
+ */
 static int  TrackTimeToSampleChunk( input_thread_t *p_input,
                                     mp4_track_t *p_track,
-                                    uint64_t i_start,
+                                    int64_t i_start,
                                     uint32_t *pi_chunk,
                                     uint32_t *pi_sample )
 {
-    MP4_Box_t    *p_stss;
+    demux_sys_t *p_sys = p_input->p_demux_data;
+    MP4_Box_t   *p_stss;
     uint64_t     i_dts;
     unsigned int i_sample;
     unsigned int i_chunk;
     int          i_index;
 
-    /* convert absolute time to in timescale unit */
-    i_start = i_start * (mtime_t)p_track->i_timescale / (mtime_t)1000000;
-
     /* FIXME see if it's needed to check p_track->i_chunk_count */
     if( !p_track->b_ok || p_track->i_chunk_count == 0 )
     {
         return( VLC_EGENERIC );
+    }
+
+    /* handle elst (find the correct one) */
+    MP4_TrackSetELST( p_input, p_track, i_start );
+    if( p_track->p_elst && p_track->p_elst->data.p_elst->i_entry_count > 0 )
+    {
+        MP4_Box_data_elst_t *elst = p_track->p_elst->data.p_elst;
+        int64_t i_mvt= i_start * p_sys->i_timescale / (int64_t)1000000;
+
+        /* now calculate i_start for this elst */
+        /* offset */
+        i_start -= p_track->i_elst_time * (int64_t)1000000 / p_sys->i_timescale;
+        if( i_start < 0 )
+        {
+            *pi_chunk = 0;
+            *pi_sample= 0;
+
+            return VLC_SUCCESS;
+        }
+        /* to track time scale */
+        i_start  = i_start * p_track->i_timescale / (int64_t)1000000;
+        /* add elst offset */
+        if( ( elst->i_media_rate_integer[p_track->i_elst] > 0 ||
+             elst->i_media_rate_fraction[p_track->i_elst] > 0 ) &&
+            elst->i_media_time[p_track->i_elst] > 0 )
+        {
+            i_start += elst->i_media_time[p_track->i_elst];
+        }
+
+        msg_Dbg( p_input, "elst (%d) gives "I64Fd"ms (movie)-> "I64Fd"ms (track)",
+                 p_track->i_elst,
+                 i_mvt * 1000 / p_sys->i_timescale,
+                 i_start * 1000 / p_track->i_timescale );
+    }
+    else
+    {
+        /* convert absolute time to in timescale unit */
+        i_start = i_start * p_track->i_timescale / (int64_t)1000000;
     }
 
     /* we start from sample 0/chunk 0, hope it won't take too much time */
@@ -1200,9 +1265,10 @@ static int  TrackTimeToSampleChunk( input_thread_t *p_input,
                     p_track->i_track_ID );
     }
 
-    if( pi_chunk  ) *pi_chunk  = i_chunk;
-    if( pi_sample ) *pi_sample = i_sample;
-    return( VLC_SUCCESS );
+    *pi_chunk  = i_chunk;
+    *pi_sample = i_sample;
+
+    return VLC_SUCCESS;
 }
 
 static int  TrackGotoChunkSample( input_thread_t   *p_input,
@@ -1261,6 +1327,8 @@ static void MP4_TrackCreate( input_thread_t *p_input,
                              mp4_track_t *p_track,
                              MP4_Box_t  * p_box_trak )
 {
+    demux_sys_t *p_sys = p_input->p_demux_data;
+
     MP4_Box_t *p_tkhd = MP4_BoxGet( p_box_trak, "tkhd" );
     MP4_Box_t *p_tref = MP4_BoxGet( p_box_trak, "tref" );
     MP4_Box_t *p_elst;
@@ -1297,11 +1365,6 @@ static void MP4_TrackCreate( input_thread_t *p_input,
     p_track->i_track_ID = p_tkhd->data.p_tkhd->i_track_ID;
     p_track->i_width = p_tkhd->data.p_tkhd->i_width / 65536;
     p_track->i_height = p_tkhd->data.p_tkhd->i_height / 65536;
-
-    if( ( p_elst = MP4_BoxGet( p_box_trak, "edts/elst" ) ) )
-    {
-/*        msg_Warn( p_input, "unhandled box: edts --> FIXME" ); */
-    }
 
     if( p_tref )
     {
@@ -1345,6 +1408,28 @@ static void MP4_TrackCreate( input_thread_t *p_input,
         default:
             return;
     }
+
+    p_track->i_elst = 0;
+    p_track->i_elst_time = 0;
+    if( ( p_track->p_elst = p_elst = MP4_BoxGet( p_box_trak, "edts/elst" ) ) )
+    {
+        MP4_Box_data_elst_t *elst = p_elst->data.p_elst;
+        int i;
+
+        msg_Warn( p_input, "elst box found" );
+        for( i = 0; i < elst->i_entry_count; i++ )
+        {
+            msg_Dbg( p_input, "   - [%d] duration="I64Fd"ms media time="I64Fd"ms) rate=%d.%d",
+                     i,
+                     elst->i_segment_duration[i] * 1000 / p_sys->i_timescale,
+                     elst->i_media_time[i] >= 0 ?
+                        elst->i_media_time[i] * 1000 / p_track->i_timescale : -1,
+                     elst->i_media_rate_integer[i],
+                     elst->i_media_rate_fraction[i] );
+        }
+    }
+
+
 /*  TODO
     add support for:
     p_dinf = MP4_BoxGet( p_minf, "dinf" );
@@ -1461,12 +1546,9 @@ static int  MP4_TrackSelect ( input_thread_t    *p_input,
                               mp4_track_t  *p_track,
                               mtime_t           i_start )
 {
-    uint32_t i_chunk;
-    uint32_t i_sample;
-
     if( !p_track->b_ok )
     {
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     if( p_track->b_selected )
@@ -1474,26 +1556,10 @@ static int  MP4_TrackSelect ( input_thread_t    *p_input,
         msg_Warn( p_input,
                   "track[Id 0x%x] already selected",
                   p_track->i_track_ID );
-        return( VLC_SUCCESS );
+        return VLC_SUCCESS;
     }
 
-    if( TrackTimeToSampleChunk( p_input,
-                                p_track, i_start,
-                                &i_chunk, &i_sample ) )
-    {
-        msg_Warn( p_input,
-                  "cannot select track[Id 0x%x]",
-                  p_track->i_track_ID );
-        return( VLC_EGENERIC );
-    }
-
-    p_track->b_selected = VLC_TRUE;
-
-    if( TrackGotoChunkSample( p_input, p_track, i_chunk, i_sample ) )
-    {
-        p_track->b_selected = VLC_FALSE;
-    }
-    return p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC;
+    return MP4_TrackSeek( p_input, p_track, i_start );
 }
 
 static void MP4_TrackUnselect(input_thread_t    *p_input,
@@ -1543,11 +1609,12 @@ static int  MP4_TrackSeek   ( input_thread_t    *p_input,
 
     p_track->b_selected = VLC_TRUE;
 
-    TrackGotoChunkSample( p_input, p_track, i_chunk, i_sample );
-
+    if( TrackGotoChunkSample( p_input, p_track, i_chunk, i_sample ) )
+    {
+        p_track->b_selected = VLC_FALSE;
+    }
     return( p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC );
 }
-
 
 
 /*
@@ -1674,7 +1741,7 @@ static int  MP4_TrackNextSample( input_thread_t     *p_input,
         /* we have reach end of the track so free decoder stuff */
         msg_Warn( p_input, "track[0x%x] will be disabled", p_track->i_track_ID );
         MP4_TrackUnselect( p_input, p_track );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     /* Have we changed chunk ? */
@@ -1689,13 +1756,69 @@ static int  MP4_TrackNextSample( input_thread_t     *p_input,
         {
             msg_Warn( p_input, "track[0x%x] will be disabled (cannot restart decoder)", p_track->i_track_ID );
             MP4_TrackUnselect( p_input, p_track );
-            return( VLC_EGENERIC );
+            return VLC_EGENERIC;
         }
     }
 
-    return( VLC_SUCCESS );
+    /* Have we changed elst */
+    if( p_track->p_elst && p_track->p_elst->data.p_elst->i_entry_count > 0 )
+    {
+        demux_sys_t *p_sys = p_input->p_demux_data;
+        MP4_Box_data_elst_t *elst = p_track->p_elst->data.p_elst;
+        int64_t i_mvt = MP4_TrackGetPTS( p_input, p_track ) * p_sys->i_timescale / (int64_t)1000000;
+
+        if( p_track->i_elst < elst->i_entry_count &&
+            i_mvt >= p_track->i_elst_time + elst->i_segment_duration[p_track->i_elst] )
+        {
+            MP4_TrackSetELST( p_input, p_track, MP4_TrackGetPTS( p_input, p_track ) );
+        }
+    }
+
+    return VLC_SUCCESS;
 }
 
+static void MP4_TrackSetELST( input_thread_t *p_input, mp4_track_t *tk, int64_t i_time )
+{
+    demux_sys_t *p_sys = p_input->p_demux_data;
+    int         i_elst_last = tk->i_elst;
+
+    /* handle elst (find the correct one) */
+    tk->i_elst      = 0;
+    tk->i_elst_time = 0;
+    if( tk->p_elst && tk->p_elst->data.p_elst->i_entry_count > 0 )
+    {
+        MP4_Box_data_elst_t *elst = tk->p_elst->data.p_elst;
+        int64_t i_mvt= i_time * p_sys->i_timescale / (int64_t)1000000;
+
+        for( tk->i_elst = 0; tk->i_elst < elst->i_entry_count; tk->i_elst++ )
+        {
+            mtime_t i_dur = elst->i_segment_duration[tk->i_elst];
+
+            if( tk->i_elst_time <= i_mvt && i_mvt < tk->i_elst_time + i_dur )
+            {
+                break;
+            }
+            tk->i_elst_time += i_dur;
+        }
+
+        if( tk->i_elst >= elst->i_entry_count )
+        {
+            /* msg_Dbg( p_input, "invalid number of entry in elst" ); */
+            tk->i_elst = elst->i_entry_count - 1;
+            tk->i_elst_time -= elst->i_segment_duration[tk->i_elst];
+        }
+
+        if( elst->i_media_time[tk->i_elst] < 0 )
+        {
+            /* track offset */
+            tk->i_elst_time += elst->i_segment_duration[tk->i_elst];
+        }
+    }
+    if( i_elst_last != tk->i_elst )
+    {
+        msg_Warn( p_input, "elst old=%d new=%d", i_elst_last, tk->i_elst );
+    }
+}
 
 static char *LanguageGetName( const char *psz_code )
 {
