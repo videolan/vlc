@@ -56,7 +56,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Microsoft Media Server (MMS) input") );
-    set_capability( "access2", 0 );
+    set_capability( "access2", -1 );
 
     add_integer( "mms-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
@@ -69,6 +69,7 @@ vlc_module_begin();
     add_shortcut( "mmsu" );
     add_shortcut( "mmst" );
     add_shortcut( "mmsh" );
+    add_shortcut( "http" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -106,7 +107,8 @@ static int Open( vlc_object_t *p_this )
         {
             return E_( MMSTUOpen )( p_access );
         }
-        else if( !strncmp( p_access->psz_access, "mmsh", 4 ) )
+        else if( !strncmp( p_access->psz_access, "mmsh", 4 ) ||
+                 !strncmp( p_access->psz_access, "http", 4 ) )
         {
             return E_( MMSHOpen )( p_access );
         }
