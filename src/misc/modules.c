@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.47 2002/01/09 02:01:14 sam Exp $
+ * $Id: modules.c,v 1.48 2002/01/12 21:58:56 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -92,7 +92,9 @@ static int  HideModule   ( module_t * );
 static int  CallSymbol   ( module_t *, char * );
 #endif
 
+#ifdef HAVE_DYNAMIC_PLUGINS
 static module_symbols_t symbols;
+#endif
 
 /*****************************************************************************
  * module_InitBank: create the module bank.
@@ -109,7 +111,9 @@ void module_InitBank( void )
     /*
      * Store the symbols to be exported
      */
+#ifdef HAVE_DYNAMIC_PLUGINS
     STORE_SYMBOLS( &symbols );
+#endif
 
     /*
      * Check all the built-in modules
