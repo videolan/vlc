@@ -5,6 +5,7 @@
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
+include /usr/share/dpatch/dpatch.make
 
 #
 # Compilation options
@@ -54,6 +55,7 @@ CONFIG_FLAGS += \
 	--enable-fribidi \
 	--enable-cdio \
 	--enable-mod \
+	--enable-theora \
 	$(NULL)
 
 # These ones are currently shipped with VLC
@@ -118,8 +120,8 @@ configure-stamp:
 
 	touch configure-stamp
 
-build: configure-stamp build-stamp
-build-stamp:
+build: build-stamp
+build-stamp: patch configure-stamp
 	dh_testdir
 
 	# Build only VLC, with the non-PIC libs
@@ -175,6 +177,7 @@ clean:
 	rm -f config.log confdefs.h
 
 	-$(MAKE) distclean
+	$(MAKE) -f debian/rules unpatch
 
 	dh_clean
 

@@ -1,0 +1,64 @@
+#! /bin/sh -e
+## 20_interfaces.dpatch by  <sam+deb@zoy.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+diff -urNad /home/sam/debian/official/vlc/debian/vlc-0.7.2.final/modules/gui/kde/kde.cpp vlc-0.7.2.final/modules/gui/kde/kde.cpp
+--- /home/sam/debian/official/vlc/debian/vlc-0.7.2.final/modules/gui/kde/kde.cpp	2004-03-05 20:24:00.000000000 +0100
++++ vlc-0.7.2.final/modules/gui/kde/kde.cpp	2004-07-29 17:12:39.000000000 +0200
+@@ -53,7 +53,7 @@
+     /* int i = getenv( "DISPLAY" ) == NULL ? 8 : 85; */
+     set_description( _("KDE interface") );
+     add_file( "kde-uirc", DATA_PATH "/ui.rc", NULL, N_( "path to ui.rc file" ), NULL, VLC_TRUE );
+-    set_capability( "interface", 0 ); /* 0 used to be i, disabled because kvlc not maintained */
++    set_capability( "interface", 1 ); /* 0 used to be i, disabled because kvlc not maintained */
+     set_program( "kvlc" );
+     set_callbacks( open, close );
+ vlc_module_end();
+diff -urNad /home/sam/debian/official/vlc/debian/vlc-0.7.2.final/modules/gui/skins2/src/skin_main.cpp vlc-0.7.2.final/modules/gui/skins2/src/skin_main.cpp
+--- /home/sam/debian/official/vlc/debian/vlc-0.7.2.final/modules/gui/skins2/src/skin_main.cpp	2004-05-21 13:24:58.000000000 +0200
++++ vlc-0.7.2.final/modules/gui/skins2/src/skin_main.cpp	2004-07-29 17:12:39.000000000 +0200
+@@ -258,7 +258,7 @@
+               SKINS2_TRANSPARENCY_LONG, VLC_FALSE );
+ #endif
+     set_description( _("Skinnable Interface") );
+-    set_capability( "interface", 30 );
++    set_capability( "interface", 200 );
+     set_callbacks( Open, Close );
+     set_program( "svlc" );
+ vlc_module_end();
+diff -urNad /home/sam/debian/official/vlc/debian/vlc-0.7.2.final/src/interface/interface.c vlc-0.7.2.final/src/interface/interface.c
+--- /home/sam/debian/official/vlc/debian/vlc-0.7.2.final/src/interface/interface.c	2004-05-17 00:42:55.000000000 +0200
++++ vlc-0.7.2.final/src/interface/interface.c	2004-07-29 17:12:39.000000000 +0200
+@@ -242,9 +242,11 @@
+ {
+     static char *ppsz_interfaces[] =
+     {
++/*
+         "skins", "Skins",
+         "skins2", "Skins 2",
+         "wxwindows", "wxWindows",
++*/
+         NULL, NULL
+     };
+     char **ppsz_parser;

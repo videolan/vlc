@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Sam Hocevar (Debian packages) <sam+deb@zoy.org>
-Build-Depends: debhelper (>= 4.0), gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7-5), libqt3-mt-dev, libqt3-compat-headers, libasound2-dev (>= 0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi3-dev, mozilla-dev, libidl0, libglib2.0-0, kdelibs4-dev, libxosd-dev (>= 2.2.4-1.3), svgalibg1-dev (>= 1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev (>= 2.4.2.4), libdvdplay0-dev (>= 1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>= 1.1.0), libimlib2-dev, libmatroska-dev (>= 0.7.0), libfreetype6-dev, libspeex-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.04.23-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libmodplug-dev, libxml2-dev, libid3tag0-dev, libtheora-dev
+Build-Depends: debhelper (>= 4.0), dpatch, gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7-5), libqt3-mt-dev, libqt3-compat-headers, libasound2-dev (>= 0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi3-dev, mozilla-dev, libidl0, libglib2.0-0, kdelibs4-dev, libxosd-dev (>= 2.2.4-1.3), svgalibg1-dev (>= 1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev (>= 2.4.2.4), libdvdplay0-dev (>= 1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>= 1.1.0), libimlib2-dev, libmatroska-dev (>= 0.7.0), libfreetype6-dev, libspeex-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.04.23-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libmodplug-dev, libxml2-dev, libid3tag0-dev, libtheora-dev
 Build-Conflicts: libavcodec-dev
 Standards-Version: 3.6.1.1
 
@@ -220,7 +220,7 @@ Description: wxWindows frontend for VLC
 Package: vlc-alsa
 Section: oldlibs
 Architecture: any
-Depends: vlc, vlc-plugin-alsa, ${misc:Depends}
+Depends: vlc (= ${Source-Version}), vlc-plugin-alsa, ${misc:Depends}
 Description: ALSA audio output plugin for VLC (dummy legacy package)
  The vlc-alsa package has been renamed to vlc-plugin-alsa. This is a dummy
  package with the sole purpose of ensuring a smooth upgrade from vlc-alsa
@@ -232,7 +232,7 @@ Description: ALSA audio output plugin for VLC (dummy legacy package)
 Package: vlc-esd
 Section: oldlibs
 Architecture: any
-Depends: vlc, vlc-plugin-esd, ${misc:Depends}
+Depends: vlc (= ${Source-Version}), vlc-plugin-esd, ${misc:Depends}
 Description: Esound audio output plugin for VLC (dummy legacy package)
  The vlc-esd package has been renamed to vlc-plugin-esd. This is a dummy
  package with the sole purpose of ensuring a smooth upgrade from vlc-esd
@@ -244,7 +244,7 @@ Description: Esound audio output plugin for VLC (dummy legacy package)
 Package: vlc-ggi
 Section: oldlibs
 Architecture: any
-Depends: vlc, vlc-plugin-ggi, ${misc:Depends}
+Depends: vlc (= ${Source-Version}), vlc-plugin-ggi, ${misc:Depends}
 Description: GGI video output plugin for VLC (dummy legacy package)
  The vlc-ggi package has been renamed to vlc-plugin-ggi. This is a dummy
  package with the sole purpose of ensuring a smooth upgrade from vlc-ggi
@@ -256,7 +256,7 @@ Description: GGI video output plugin for VLC (dummy legacy package)
 Package: vlc-glide
 Section: oldlibs
 Architecture: i386
-Depends: vlc, vlc-plugin-glide, ${misc:Depends}
+Depends: vlc (= ${Source-Version}), vlc-plugin-glide, ${misc:Depends}
 Description: Glide video output plugin for VLC (dummy legacy package)
  The vlc-glide package has been renamed to vlc-plugin-glide. This is a dummy
  package with the sole purpose of ensuring a smooth upgrade from vlc-glide
@@ -268,7 +268,7 @@ Description: Glide video output plugin for VLC (dummy legacy package)
 Package: vlc-gnome
 Section: oldlibs
 Architecture: any
-Depends: vlc, gnome-vlc, ${misc:Depends}
+Depends: vlc (= ${Source-Version}), gnome-vlc, ${misc:Depends}
 Description: GNOME frontend for VLC (dummy legacy package)
  The vlc-gnome package has been renamed to gnome-vlc. This is a dummy
  package with the sole purpose of ensuring a smooth upgrade from vlc-gnome
@@ -280,7 +280,7 @@ Description: GNOME frontend for VLC (dummy legacy package)
 Package: vlc-gtk
 Section: oldlibs
 Architecture: any
-Depends: vlc, gvlc, ${misc:Depends}
+Depends: vlc (= ${Source-Version}), gvlc, ${misc:Depends}
 Description: GTK+ frontend for VLC (dummy legacy package)
  The vlc-gtk package has been renamed to gvlc. This is a dummy package with
  the sole purpose of ensuring a smooth upgrade from vlc-gtk to gvlc.
@@ -291,7 +291,7 @@ Description: GTK+ frontend for VLC (dummy legacy package)
 Package: vlc-qt
 Section: oldlibs
 Architecture: any
-Depends: vlc, qvlc, ${misc:Depends}
+Depends: vlc (= ${Source-Version}), qvlc, ${misc:Depends}
 Description: Qt frontend for VLC (dummy legacy package)
  The vlc-qt package has been renamed to qvlc. This is a dummy package with
  the sole purpose of ensuring a smooth upgrade from vlc-qt to qvlc.
@@ -302,7 +302,7 @@ Description: Qt frontend for VLC (dummy legacy package)
 Package: vlc-sdl
 Section: oldlibs
 Architecture: any
-Depends: vlc, vlc-plugin-sdl, ${misc:Depends}
+Depends: vlc (= ${Source-Version}), vlc-plugin-sdl, ${misc:Depends}
 Description: SDL video and audio output plugin for VLC (dummy legacy package)
  The vlc-sdl package has been renamed to vlc-plugin-sdl. This is a dummy
  package with the sole purpose of ensuring a smooth upgrade from vlc-sdl

@@ -1,3 +1,18 @@
+vlc (0.7.2.final-7) unstable; urgency=low
+
+  * debian/rules:
+    + Switch build system to dpatch.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Thu, 29 Jul 2004 17:03:51 +0200
+
+vlc (0.7.2.final-6) unstable; urgency=low
+
+  * configure.ac: don't use -maltivec -mabi=altivec, because we don't want
+    to trigger AltiVec optimisations in our generic code (Closes: #256578,
+    Closes: #260819).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 23 Jul 2004 17:21:21 +0200
+
 vlc (0.7.2.final-5) unstable; urgency=low
 
   * debian/control:
