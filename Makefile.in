@@ -96,6 +96,7 @@ CCFLAGS += -D_GNU_SOURCE
 CCFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
 
 # Optimizations : don't compile debug versions with them
+ifeq ($(DEBUG),0)
 CCFLAGS += -O6
 CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CCFLAGS += -fomit-frame-pointer
@@ -126,6 +127,9 @@ ifneq (,$(findstring sparc,$(ARCH)))
 CCFLAGS += -mhard-float
 endif
 
+# End of optimizations
+endif
+
 #
 # C compiler flags: dependancies
 #
@@ -143,9 +147,8 @@ LCFLAGS += -Wall
 # Additionnal debugging flags
 #
 
-# Debugging support
-ifeq ($(DEBUG),1)
-CFLAGS += -g
+# Debugging and profiling support
+ifneq ($(DEBUG),0)
 CFLAGS += -pg
 endif
 
