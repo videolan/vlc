@@ -4,7 +4,7 @@
  * Copyright (C) 2000-2004 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -335,6 +335,9 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
                                                   wxWindow *parent )
   : ConfigControl( p_this, p_item, parent )
 {
+    psz_default_value = p_item->psz_value;
+    if( psz_default_value ) psz_default_value = strdup( psz_default_value );
+
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     combo = new wxComboBox( this, -1, wxT(""),
@@ -359,12 +362,16 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
 
 StringListConfigControl::~StringListConfigControl()
 {
+    if( psz_default_value ) free( psz_default_value );
 }
 
 void StringListConfigControl::UpdateCombo( module_config_t *p_item )
 {
+    vlc_bool_t b_found = VLC_FALSE;
+    int i_index;
+
     /* build a list of available options */
-    for( int i_index = 0; i_index < p_item->i_list; i_index++ )
+    for( i_index = 0; i_index < p_item->i_list; i_index++ )
     {
         combo->Append( ( p_item->ppsz_list_text &&
                          p_item->ppsz_list_text[i_index] ) ?
@@ -380,7 +387,17 @@ void StringListConfigControl::UpdateCombo( module_config_t *p_item )
                                p_item->ppsz_list_text[i_index] ) ?
                              wxU(p_item->ppsz_list_text[i_index]) :
                              wxL2U(p_item->ppsz_list[i_index]) );
+            b_found = VLC_TRUE;
         }
+    }
+
+    if( p_item->psz_value && !b_found )
+    {
+        /* Add custom entry to list */
+        combo->Append( wxL2U(p_item->psz_value) );
+        combo->SetClientData( i_index, (void *)psz_default_value );
+        combo->SetSelection( i_index );
+        combo->SetValue( wxL2U(p_item->psz_value) );
     }
 }
 
@@ -494,6 +511,10 @@ wxString FileConfigControl::GetPszValue()
 /*****************************************************************************
  * IntegerConfigControl implementation
  *****************************************************************************/
+BEGIN_EVENT_TABLE(IntegerConfigControl, wxPanel)
+    EVT_COMMAND_SCROLL(-1, IntegerConfigControl::OnUpdate)
+END_EVENT_TABLE()
+
 IntegerConfigControl::IntegerConfigControl( vlc_object_t *p_this,
                                             module_config_t *p_item,
                                             wxWindow *parent )
@@ -621,6 +642,10 @@ int IntegerListConfigControl::GetIntValue()
 /*****************************************************************************
  * RangedIntConfigControl implementation
  *****************************************************************************/
+BEGIN_EVENT_TABLE(RangedIntConfigControl, wxPanel)
+    EVT_COMMAND_SCROLL(-1, RangedIntConfigControl::OnUpdate)
+END_EVENT_TABLE()
+
 RangedIntConfigControl::RangedIntConfigControl( vlc_object_t *p_this,
                                                 module_config_t *p_item,
                                                 wxWindow *parent )
@@ -650,6 +675,10 @@ int RangedIntConfigControl::GetIntValue()
 /*****************************************************************************
  * FloatConfigControl implementation
  *****************************************************************************/
+BEGIN_EVENT_TABLE(FloatConfigControl, wxPanel)
+    EVT_TEXT(-1, FloatConfigControl::OnUpdate)
+END_EVENT_TABLE()
+
 FloatConfigControl::FloatConfigControl( vlc_object_t *p_this,
                                         module_config_t *p_item,
                                         wxWindow *parent )
@@ -684,6 +713,10 @@ float FloatConfigControl::GetFloatValue()
 /*****************************************************************************
  * BoolConfigControl implementation
  *****************************************************************************/
+BEGIN_EVENT_TABLE(BoolConfigControl, wxPanel)
+    EVT_CHECKBOX(-1, BoolConfigControl::OnUpdate)
+END_EVENT_TABLE()
+
 BoolConfigControl::BoolConfigControl( vlc_object_t *p_this,
                                       module_config_t *p_item,
                                       wxWindow *parent )
@@ -704,12 +737,6 @@ BoolConfigControl::~BoolConfigControl()
 
 int BoolConfigControl::GetIntValue()
 {
-    if( checkbox->IsChecked() )
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
+    if( checkbox->IsChecked() ) return 1;
+    else return 0;
 }

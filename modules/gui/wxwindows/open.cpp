@@ -4,7 +4,7 @@
  * Copyright (C) 2000-2004 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -849,7 +849,13 @@ void OpenDialog::UpdateMRL( int i_access_method )
             for( int i=0; i < (int)input_panel->config_array.GetCount(); i++ )
             {
                 ConfigControl *control = input_panel->config_array.Item(i);
-                mrltemp += wxT(" :") + control->GetName() + wxT("=");
+
+                mrltemp += wxT(" :");
+
+                if( control->GetType() == CONFIG_ITEM_BOOL &&
+                    !control->GetIntValue() ) mrltemp += wxT("no-");
+
+                mrltemp += control->GetName();
 
                 switch( control->GetType() )
                 {
@@ -857,16 +863,15 @@ void OpenDialog::UpdateMRL( int i_access_method )
                 case CONFIG_ITEM_FILE:
                 case CONFIG_ITEM_DIRECTORY:
                 case CONFIG_ITEM_MODULE:
-                    mrltemp += wxT("\"") + control->GetPszValue() + wxT("\"");
+                    mrltemp += wxT("=\"") + control->GetPszValue() + wxT("\"");
                     break;
                 case CONFIG_ITEM_INTEGER:
-                case CONFIG_ITEM_BOOL:
                     mrltemp +=
-                        wxString::Format( wxT("%i"), control->GetIntValue() );
+                        wxString::Format( wxT("=%i"), control->GetIntValue() );
                     break;
                 case CONFIG_ITEM_FLOAT:
                     mrltemp +=
-                        wxString::Format( wxT("%f"), control->GetFloatValue());
+                        wxString::Format(wxT("=%f"), control->GetFloatValue());
                     break;
                 }
             }

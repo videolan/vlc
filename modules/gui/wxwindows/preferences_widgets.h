@@ -102,6 +102,7 @@ public:
     virtual wxString GetPszValue();
 private:
     wxComboBox *combo;
+    char *psz_default_value;
     void UpdateCombo( module_config_t *p_item );
 
     void OnAction( wxCommandEvent& );
@@ -117,10 +118,11 @@ public:
     void OnBrowse( wxCommandEvent& );
     virtual wxString GetPszValue();
 private:
-    DECLARE_EVENT_TABLE()
     wxTextCtrl *textctrl;
     wxButton *browse;
     bool directory;
+
+    DECLARE_EVENT_TABLE()
 };
 
 class IntegerConfigControl: public ConfigControl
@@ -131,6 +133,8 @@ public:
     virtual int GetIntValue();
 private:
     wxSpinCtrl *spin;
+
+    DECLARE_EVENT_TABLE()
 };
 
 class IntegerListConfigControl: public ConfigControl
@@ -156,6 +160,8 @@ public:
     virtual int GetIntValue();
 private:
     wxSlider *slider;
+
+    DECLARE_EVENT_TABLE()
 };
 
 class FloatConfigControl: public ConfigControl
@@ -166,6 +172,8 @@ public:
     virtual float GetFloatValue();
 private:
     wxTextCtrl *textctrl;
+
+    DECLARE_EVENT_TABLE()
 };
 
 class BoolConfigControl: public ConfigControl
@@ -176,4 +184,6 @@ public:
     virtual int GetIntValue();
 private:
     wxCheckBox *checkbox;
+
+    DECLARE_EVENT_TABLE()
 };
