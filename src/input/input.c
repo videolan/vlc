@@ -1530,6 +1530,12 @@ static int InputSourceInit( input_thread_t *p_input,
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
 
+    if( !psz_access ||
+        ( strcmp( psz_access, "udp" ) && strcmp( psz_access, "udpstream" ) &&
+          strcmp( psz_access, "udp4" ) && strcmp( psz_access, "udp6" ) &&
+          strcmp( psz_access, "rtp" ) && strcmp( psz_access, "rtp4" ) &&
+          strcmp( psz_access, "rtp6" ) ) ) // FIXME
+
     /* Find optional titles and seekpoints */
     MRLSections( p_input, psz_path, &in->i_title_start, &in->i_title_end,
                  &in->i_seekpoint_start, &in->i_seekpoint_end );

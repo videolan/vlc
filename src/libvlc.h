@@ -727,18 +727,20 @@ static char *ppsz_align_descriptions[] =
 #define SUBTITLE_TRACK_KEY_TEXT N_("Cycle subtitle track")
 #define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks")
 
-#define PLAYLIST_USAGE N_("\nPlaylist items:" \
-    "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
-    "\n  [dvd://][device][@raw_device][@[title][,[chapter][,angle]]]" \
-    "\n                                 DVD device" \
-    "\n  [vcd://][device][@{S|T|E|P}[number]]" \
-    "\n                                 VCD device" \
-    "\n  [cdda://][device][@[T][track-number]]" \
-    "\n                                 Audio CD device" \
-    "\n  udpstream:[[<source address>]@[<bind address>][:<bind port>]]" \
-    "\n                                 UDP stream sent by a streaming server" \
-    "\n  vlc:pause                      pause execution of " \
-    "playlist items" \
+#define PLAYLIST_USAGE N_( \
+    "\nPlaylist item syntax:" \
+    "\n  MRL [:option=value]" \
+    "\nMRL syntax:" \
+    "\n  URL[@[title-start][,chapter-start][-[title-end][,chapter-end]]]" \
+    "\nURL syntax:" \
+    "\n  [file://]filename              plain media file" \
+    "\n  http://ip:port/file            HTTP url" \
+    "\n  [dvd://][device][@raw_device]  DVD device" \
+    "\n  [vcd://][device]               VCD device" \
+    "\n  [cdda://][device]              Audio CD device" \
+    "\n  udp:[[<source address>]@[<bind address>][:<bind port>]]" \
+    "\n                                 UDP stream sent by a streaming server"\
+    "\n  vlc:pause                      pause execution of playlist items" \
     "\n  vlc:quit                       quit VLC" \
     "\n")
 
