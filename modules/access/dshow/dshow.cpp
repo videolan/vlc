@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: dshow.cpp,v 1.25 2004/01/25 17:31:22 gbazin Exp $
+ * $Id: dshow.cpp,v 1.26 2004/01/28 16:46:52 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -414,17 +414,18 @@ static bool ConnectFilters( IFilterGraph *p_graph, IBaseFilter *p_filter,
 {
     IEnumPins *p_enumpins;
     IPin *p_output_pin;
-    ULONG i_fetched;
 
     if( S_OK != p_filter->EnumPins( &p_enumpins ) ) return false;
 
-    while( S_OK == p_enumpins->Next( 1, &p_output_pin, &i_fetched ) )
+    while( S_OK == p_enumpins->Next( 1, &p_output_pin, NULL ) )
     {
         if( S_OK == p_graph->ConnectDirect( p_output_pin, p_input_pin, 0 ) )
         {
+            p_output_pin->Release();
             p_enumpins->Release();
             return true;
         }
+        p_output_pin->Release();
     }
 
     p_enumpins->Release();

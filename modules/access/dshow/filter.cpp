@@ -2,7 +2,7 @@
  * filter.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.cpp,v 1.11 2004/01/26 18:24:17 gbazin Exp $
+ * $Id: filter.cpp,v 1.12 2004/01/28 16:46:52 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -777,18 +777,20 @@ STDMETHODIMP CaptureEnumPins::Next( ULONG cPins, IPin ** ppPins,
     msg_Dbg( p_input, "CaptureEnumPins::Next" );
 #endif
 
-    *pcFetched = 0;
+    unsigned int i_fetched = 0;
 
     if( i_position < 1 && cPins > 0 )
     {
         IPin *pPin = p_filter->CustomGetPin();
         *ppPins = pPin;
         pPin->AddRef();
-        *pcFetched = 1;
+        i_fetched = 1;
         i_position++;
     }
 
-    return *pcFetched == cPins ? NOERROR : S_FALSE;
+    if( pcFetched ) *pcFetched = i_fetched;
+
+    return (i_fetched == cPins) ? S_OK : S_FALSE;
 };
 STDMETHODIMP CaptureEnumPins::Skip( ULONG cPins )
 {
@@ -796,13 +798,14 @@ STDMETHODIMP CaptureEnumPins::Skip( ULONG cPins )
     msg_Dbg( p_input, "CaptureEnumPins::Skip" );
 #endif
 
-    if( cPins > 1 )
+    i_position += cPins;
+
+    if( i_position > 1 )
     {
         return S_FALSE;
     }
 
-    i_position += cPins;
-    return NOERROR;
+    return S_OK;
 };
 STDMETHODIMP CaptureEnumPins::Reset()
 {
