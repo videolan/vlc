@@ -54,14 +54,14 @@ ifeq ($(SYS),DARWIN)
 all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .dts .mod \
+	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .mod \
 	.cddb .cdio .vcdimager
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
-	.dvdread .dvdnav .dvbpsi .dts
+	.dvdread .dvdnav .dvbpsi
 endif
 
 FORCE:
