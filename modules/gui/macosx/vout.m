@@ -3,7 +3,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.57 2003/09/20 19:37:53 hartman Exp $
+ * $Id: vout.m,v 1.58 2003/10/29 02:13:04 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -33,6 +33,8 @@
 #include <string.h>                                            /* strerror() */
 
 #include <QuickTime/QuickTime.h>
+
+#include <vlc_keys.h>
 
 #include "intf.h"
 #include "vout.h"
@@ -357,7 +359,7 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
 {       
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    if ( p_vout->p_sys->isplugin == 0)
+    if ( !p_vout->p_sys->isplugin )
     {
         if( CoDestroyWindow( p_vout ) )
         {
@@ -397,16 +399,18 @@ static int vout_Manage( vout_thread_t *p_vout )
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
 
-    if( (p_vout->i_changes & VOUT_SIZE_CHANGE) || (val1.i_int == 1))
+    if( (p_vout->i_changes & VOUT_SIZE_CHANGE) ||
+            ( p_vout->p_sys->isplugin && val1.i_int == 1) )
     {
-        if (val1.i_int == 1) 
+        if( p_vout->p_sys->isplugin ) 
         {
-        val1.i_int = 0;
-        var_Set( p_vout->p_vlc, "drawableredraw", val1 );
-        SetDSequenceMask( p_vout->p_sys->i_seq , p_vout->p_sys->mask );
-        } else if (p_vout->i_changes & VOUT_SIZE_CHANGE)
+            val1.i_int = 0;
+            var_Set( p_vout->p_vlc, "drawableredraw", val1 );
+            SetDSequenceMask( p_vout->p_sys->i_seq , p_vout->p_sys->mask );
+        }
+        else
         {
-                p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
+            p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
         }
     
         QTScaleMatrix( p_vout );
@@ -980,72 +984,34 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void)keyDown:(NSEvent *)o_event
 {
-    playlist_t * p_playlist;
     unichar key = 0;
     vlc_value_t val;
+    unsigned int i_pressed_modifiers = 0;
 
-    if( [[o_event characters] length] )
+    i_pressed_modifiers = GetCurrentKeyModifiers();
+
+    if( i_pressed_modifiers & NSShiftKeyMask )
+        val.i_int |= KEY_MODIFIER_SHIFT;
+    if( i_pressed_modifiers & NSControlKeyMask )
+        val.i_int |= KEY_MODIFIER_CTRL;
+    if( i_pressed_modifiers & NSAlternateKeyMask )
+        val.i_int |= KEY_MODIFIER_ALT;
+    if( i_pressed_modifiers & NSCommandKeyMask )
+        val.i_int |= KEY_MODIFIER_COMMAND;
+
+    NSLog( @"detected the modifiers: %x", val.i_int );
+
+    key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
+
+    if( key )
     {
-        key = [[o_event characters] characterAtIndex: 0];
+        val.i_int |= CocoaConvertKey( key );
+        var_Set( p_vout->p_vlc, "key-pressed", val );
+        NSLog( @"detected the key: %x", key );
     }
-
-    switch( key )
+    else
     {
-        case 'f': case 'F':
-            [self toggleFullscreen];
-            break;
-
-        case (unichar)0x1b: /* escape */
-            if( [self isFullscreen] )
-            {
-                [self toggleFullscreen];
-            }
-            break;
-
-        case 'q': case 'Q':
-            p_vout->p_vlc->b_die = VLC_TRUE;
-            break;
-
-        case ' ':
-            p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                                    FIND_ANYWHERE );
-            if ( p_playlist != NULL )
-            {
-                playlist_Pause( p_playlist );
-                vlc_object_release( p_playlist);
-            }
-            break;
-
-        case (unichar)0xf700: /* arrow up */
-            val.psz_string = "UP";
-            var_Set( p_vout, "key-pressed", val );
-            break;
-
-        case (unichar)0xf701: /* arrow down */
-            val.psz_string = "DOWN";
-            var_Set( p_vout, "key-pressed", val );
-            break;
-
-        case (unichar)0xf702: /* arrow left */
-            val.psz_string = "LEFT";
-            var_Set( p_vout, "key-pressed", val );
-            break;
-
-        case (unichar)0xf703: /* arrow right */
-            val.psz_string = "RIGHT";
-            var_Set( p_vout, "key-pressed", val );
-            break;
-
-        case (unichar)0xd: /* return */
-        case (unichar)0x3: /* enter */
-            val.psz_string = "ENTER";
-            var_Set( p_vout, "key-pressed", val );
-            break;
-
-
-        default:
-            [super keyDown: o_event];
-            break;
+        [super keyDown: o_event];
     }
 }
 

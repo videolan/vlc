@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.96 2003/09/20 19:37:53 hartman Exp $
+ * $Id: intf.m,v 1.97 2003/10/29 02:13:04 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -29,6 +29,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
+#include <vlc_keys.h>
 
 #include "intf.h"
 #include "vout.h"
@@ -287,6 +288,55 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     p_intf->p_sys->b_playlist_update = VLC_TRUE;
     p_intf->p_sys->b_intf_update = VLC_TRUE;
     return VLC_SUCCESS;
+}
+
+static struct
+{
+    unichar i_nskey;
+    int i_vlckey;
+} nskeys_to_vlckeys[] = 
+{
+    { NSUpArrowFunctionKey, KEY_UP },
+    { NSDownArrowFunctionKey, KEY_DOWN },
+    { NSLeftArrowFunctionKey, KEY_LEFT },
+    { NSRightArrowFunctionKey, KEY_RIGHT },
+    { NSF1FunctionKey, KEY_F1 },
+    { NSF2FunctionKey, KEY_F2 },
+    { NSF3FunctionKey, KEY_F3 },
+    { NSF4FunctionKey, KEY_F4 },
+    { NSF5FunctionKey, KEY_F5 },
+    { NSF6FunctionKey, KEY_F6 },
+    { NSF7FunctionKey, KEY_F7 },
+    { NSF8FunctionKey, KEY_F8 },
+    { NSF9FunctionKey, KEY_F9 },
+    { NSF10FunctionKey, KEY_F10 },
+    { NSF11FunctionKey, KEY_F11 },
+    { NSF12FunctionKey, KEY_F12 },
+    { NSHomeFunctionKey, KEY_HOME },
+    { NSEndFunctionKey, KEY_END },
+    { NSPageUpFunctionKey, KEY_PAGEUP },
+    { NSPageDownFunctionKey, KEY_PAGEDOWN },
+    { NSTabCharacter, KEY_TAB },
+    { NSCarriageReturnCharacter, KEY_ENTER },
+    { NSEnterCharacter, KEY_ENTER },
+    { NSBackspaceCharacter, KEY_BACKSPACE },
+    { (unichar) ' ', KEY_SPACE },
+    { (unichar) 0x1b, KEY_ESC },
+    {0,0}
+};
+
+int CocoaConvertKey( unichar i_key )
+{
+    int i;
+    
+    for( i = 0; nskeys_to_vlckeys[i].i_nskey != 0; i++ )
+    {
+        if( nskeys_to_vlckeys[i].i_nskey == i_key )
+        {
+            return nskeys_to_vlckeys[i].i_vlckey;
+        }
+    }
+    return (int)i_key;
 }
 
 /*****************************************************************************

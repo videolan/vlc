@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.2 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: hotkeys.c,v 1.3 2003/10/29 02:13:04 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -205,7 +205,7 @@ static void Run( intf_thread_t *p_intf )
             audio_volume_t i_newvol;
             char string[9];
             aout_VolumeUp( p_intf, 1, &i_newvol );
-            sprintf( string, "Vol %%%d", i_newvol*100/AOUT_VOLUME_MAX );
+            sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
             Feedback( p_intf, string );
         }
         else if( i_action == ACTIONID_VOL_DOWN )
@@ -213,7 +213,7 @@ static void Run( intf_thread_t *p_intf )
             audio_volume_t i_newvol;
             char string[9];
             aout_VolumeDown( p_intf, 1, &i_newvol );
-            sprintf( string, "Vol %%%d", i_newvol*100/AOUT_VOLUME_MAX );
+            sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
             Feedback( p_intf, string );
         }
         else if( i_action == ACTIONID_FULLSCREEN )
@@ -302,11 +302,13 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_FASTER )
             {
-                input_SetStatus( p_input, INPUT_STATUS_FASTER );
+            	vlc_value_t val; val.b_bool = VLC_TRUE;
+                var_Set( p_input, "rate-faster", val );
             }
             else if( i_action == ACTIONID_FASTER )
             {
-                input_SetStatus( p_input, INPUT_STATUS_SLOWER );
+            	vlc_value_t val; val.b_bool = VLC_TRUE;
+                var_Set( p_input, "rate-slower", val );
             }
         }
 
