@@ -4,6 +4,11 @@
 
 HEAD
 
+  * ./plugins/win32/intfwin.bpr: we now build intfwin.so at the right place.
+  * ./plugins/win32/Makefile: intfwin.so can be built using commandline.
+  * ./configure.in, ./include/threads.h, ./include/common.h: a custom defs.h
+    file isn't needed for the intfwin plugin anymore.
+  * ./INSTALL.win32: updated compilation instructions for the intfwin plugin.
   * ./AUTHORS: added ipkiss.
   * ./plugins/win32/mainframe.cpp: disabled the "hide interface" menu
     item, not yet implemented.

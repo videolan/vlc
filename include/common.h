@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.92 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: common.h,v 1.93 2002/04/05 03:27:27 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -476,7 +476,12 @@ typedef __int64 off_t;
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
+#ifndef PACKAGE
+#define PACKAGE VLC_PACKAGE
+#endif
+#define VERSION VLC_VERSION
+
+#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT ) && !defined( __BORLANDC__ )
 #   include <libintl.h>
 #else
 #   define _(String) (String)

@@ -1227,11 +1227,11 @@ fi
 ALL_LINGUAS="de fr ja no ru nl"
 
 cat >> confdefs.h <<EOF
-#define PACKAGE "vlc"
+#define VLC_PACKAGE "vlc"
 EOF
 
 cat >> confdefs.h <<EOF
-#define VERSION "$VERSION"
+#define VLC_VERSION "$VERSION"
 EOF
 
 # Extract the first word of "ranlib", so it can be a program name with args.
@@ -8222,8 +8222,8 @@ s%@TUNING@%$TUNING%g
 s%@RELEASE@%$RELEASE%g
 s%@MOC@%$MOC%g
 s%@DLL_PATH@%$DLL_PATH%g
-s%@PACKAGE@%$PACKAGE%g
-s%@VERSION@%$VERSION%g
+s%@VLC_PACKAGE@%$VLC_PACKAGE%g
+s%@VLC_VERSION@%$VLC_VERSION%g
 s%@PLDFLAGS@%$PLDFLAGS%g
 s%@LIB_COMMON@%$LIB_COMMON%g
 s%@LIB_VLC@%$LIB_VLC%g

@@ -142,7 +142,7 @@ PLUGINS_TARGETS := a52/a52 \
 		text/rc \
 		vcd/vcd \
 		win32/waveout \
-		win32/win32 \
+		win32/intfwin \
 		x11/x11 \
 		x11/xvideo
 

@@ -3,7 +3,7 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="intfwin.so"/>
+    <PROJECT value="..\intfwin.so"/>
     <OBJFILES value="win32.obj intf_win32.obj mainframe.obj network.obj playlist.obj 
       preferences.obj about.obj disc.obj control.obj menu.obj messages.obj"/>
     <RESFILES value=""/>

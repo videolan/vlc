@@ -128,22 +128,14 @@ Building Win32 interface with bcc32 (Borland's compiler)
 1) Compile vlc as usual.
 include\defs.h should be generated.
 
-2) Edit include\defs.h, and add the following lines if necessary:
-#define WIN32
-#define MODULE_NAME win32
-#define MODULE_NAME_IS win32
-#define PLUGIN
-#define HAVE_DYNAMIC_PLUGINS
-
-3) Still in defs.h, comment the following line to avoid compilation warnings:
-#define PACKAGE "vlc"
-
-4) From the plugin\win32 directory, use Borland C++ command-line tools
+2) From the plugin\win32 directory, use Borland C++ command-line tools
 as follows:
-bpr2mak intfwin.bpr 	// Create a makefile from intfwin.bpr
+bpr2mak intfwin.bpr -s \
+  | sed 's#^LIBPATH = .*#&;$$(RELEASELIBPATH)# ; s#^USERDEFINES = .*#& -DWIN32 -DPLUGIN -DMODULE_NAME_IS_intfwin -DMODULE_NAME=intfwin#' \
+  > intfwin.mak	        // Create a makefile from intfwin.bpr
 make -fintfwin 		// It's Borland's make utility !
 
-5) This should create a intfwin.so
+3) This should create a intfwin.so
 You can remove any other generated file.
 
 
