@@ -2,7 +2,7 @@
  * banks.cpp: Bitmap bank, Event, bank, Font bank and OffSet bank
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: banks.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: banks.cpp,v 1.2 2003/04/14 10:00:38 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -186,6 +186,7 @@ EventBank::~EventBank()
     for( map<string,Event *>::iterator iter = Bank.begin();
          iter != Bank.end(); iter++ )
     {
+        iter->second->DestructParameters( true );
         delete (OSEvent *)iter->second;
     }
 }

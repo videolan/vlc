@@ -2,7 +2,7 @@
  * event.h: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.h,v 1.5 2003/04/12 21:43:27 asmax Exp $
+ * $Id: event.h,v 1.6 2003/04/14 10:00:38 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -40,6 +40,7 @@ using namespace std;
 
 #define MAX_EVENT_SIZE 30
 #define MAX_PARAM_SIZE 20
+#define EVENT_MAX_BUFFER_SIZE 20
 
 #if !defined _WIN32
 #define WM_APP 0x8000
@@ -93,6 +94,7 @@ using namespace std;
 
 // Network events
 #define VLC_NET_ADDUDP      (VLC_MESSAGE + 701)
+#define VLC_NET_ADDCS       (VLC_MESSAGE + 703)
 
 // Window event
 #define WINDOW_MOVE         (VLC_WINDOW + 1)
@@ -163,7 +165,7 @@ class Event
 
         // Destructor
         virtual ~Event();
-        void DestructParameters();
+        void DestructParameters( bool force = false );
 
         // General operations on events
         GenericControl * FindControl( string id );

@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.6 2003/04/13 17:46:23 asmax Exp $
+ * $Id: event.cpp,v 1.7 2003/04/14 10:00:38 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -66,17 +66,22 @@ Event::~Event()
 {
 }
 //---------------------------------------------------------------------------
-void Event::DestructParameters()
+void Event::DestructParameters( bool force )
 {
     switch( Message )
     {
         case CTRL_SYNCHRO:
-            if( Param2 == (int)true )
+            if( Param2 == (int)true || force )
                 delete (Event *)Param1;
             break;
 
         case CTRL_SET_TEXT:
-            delete (char *)Param2;
+            delete[] (char *)Param2;
+            break;
+
+        case VLC_NET_ADDCS:
+            if( Param2 == (int)true || force )
+                delete[] (char *)Param1;
             break;
     }
 
@@ -171,6 +176,8 @@ unsigned int Event::GetMessageType( string Desc )
     // Network events
     else if( Desc == "VLC_NET_ADDUDP" )
         return VLC_NET_ADDUDP;
+    else if( Desc == "VLC_NET_ADDCS" )
+        return VLC_NET_ADDCS;
 
     // Window event
     else if( Desc == "WINDOW_MOVE" )
@@ -236,6 +243,9 @@ void Event::CreateEvent()
     char *para2 = new char[MAX_PARAM_SIZE];
     char *para3 = new char[MAX_PARAM_SIZE];
 
+    // Buffer to create strings
+    char *buf;
+
     // Scan the event
     int scan = sscanf( EventDesc.c_str(),
         "%[^(](%[^,)],%[^,)],%[^,)])", msg, para1, para2, para3 );
@@ -280,6 +290,13 @@ void Event::CreateEvent()
 
         case VLC_NET_ADDUDP:
             Param2 = atoi( para1 );
+            break;
+
+        case VLC_NET_ADDCS:
+            buf = new char[MAX_PARAM_SIZE + 7];
+            sprintf( buf, "%s:%s", para1, para2 );
+            Param1 = (unsigned int)buf;
+            Param2 = (int)false;
             break;
 
         case CTRL_ID_VISIBLE:

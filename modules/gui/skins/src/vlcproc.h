@@ -2,7 +2,7 @@
  * vlcproc.h: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.h,v 1.2 2003/04/11 22:08:07 videolan Exp $
+ * $Id: vlcproc.h,v 1.3 2003/04/14 10:00:39 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -53,6 +53,7 @@ class VlcProc
         void FullScreen();
         void ChangeVolume( unsigned int msg, long param );
         void AddNetworkUDP( int port );
+        void AddNetworkChannelServer( char *server );
 
         void InterfaceRefresh( bool All = false );
         void EnabledEvent( string type, bool state );
