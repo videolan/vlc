@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.23 2003/02/08 19:10:21 massiot Exp $
+ * $Id: controls.m,v 1.24 2003/02/09 01:13:43 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -279,17 +279,11 @@
 {
     intf_thread_t * p_intf = [NSApp getIntf];
 
-    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                        FIND_ANYWHERE );
-    if( p_aout != NULL )
-    {
-        if( p_intf->p_sys->b_mute )
-        {
-            [self mute: nil];
-        }
+    aout_VolumeUp( p_intf, 1, NULL );
 
-        aout_VolumeUp( p_aout, 1, NULL );
-        vlc_object_release( (vlc_object_t *)p_aout );
+    if( p_intf->p_sys->b_mute )
+    {
+        [self mute: nil];
     }
 
     [self updateVolumeSlider];
@@ -299,17 +293,11 @@
 {
     intf_thread_t * p_intf = [NSApp getIntf];
 
-    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                        FIND_ANYWHERE );
-    if( p_aout != NULL )
-    {
-        if( p_intf->p_sys->b_mute )
-        {
-            [self mute: nil];
-        }
+    aout_VolumeDown( p_intf, 1, NULL );
 
-        aout_VolumeDown( p_aout, 1, NULL );
-        vlc_object_release( (vlc_object_t *)p_aout );
+    if( p_intf->p_sys->b_mute )
+    {
+        [self mute: nil];
     }
 
     [self updateVolumeSlider];
@@ -318,19 +306,10 @@
 - (IBAction)mute:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
+    audio_volume_t i_volume;
 
-    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                        FIND_ANYWHERE );
-
-    if ( p_aout != NULL )
-    {
-        audio_volume_t i_volume;
-
-        aout_VolumeMute( p_aout, &i_volume );
-        vlc_object_release( (vlc_object_t *)p_aout );
-
-        p_intf->p_sys->b_mute = ( i_volume == 0 );
-    }
+    aout_VolumeMute( p_intf, &i_volume );
+    p_intf->p_sys->b_mute = ( i_volume == 0 );
 
     [self updateVolumeSlider];
 }
@@ -338,36 +317,19 @@
 - (IBAction)volumeSliderUpdated:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
+    audio_volume_t i_volume = (audio_volume_t)[sender intValue];
 
-    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                        FIND_ANYWHERE );
-    if( p_aout != NULL )
-    {
-        audio_volume_t i_volume;
-
-        i_volume = (audio_volume_t)[sender intValue];
-
-        aout_VolumeSet( p_aout, i_volume * AOUT_VOLUME_STEP );
-        vlc_object_release( (vlc_object_t *)p_aout );
-    }
+    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_STEP );
 }
 
 - (void)updateVolumeSlider
 {
     intf_thread_t * p_intf = [NSApp getIntf];
+    audio_volume_t i_volume;
 
-    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                        FIND_ANYWHERE );
+    aout_VolumeGet( p_intf, &i_volume );
 
-    if ( p_aout != NULL )
-    {
-        audio_volume_t i_volume;
-
-        aout_VolumeGet( p_aout, &i_volume );
-        vlc_object_release( (vlc_object_t *)p_aout );
-
-        [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)]; 
-    }
+    [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)]; 
 }
 
 - (IBAction)halfWindow:(id)sender
@@ -718,37 +680,8 @@
 
         [o_mi setState: i_state];
     }
-    else if( [[o_mi title] isEqualToString: _NS("Volume Up")] ||
-             [[o_mi title] isEqualToString: _NS("Volume Down")] ) 
-    {
-        aout_instance_t * p_aout;
-
-        p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                          FIND_ANYWHERE );
-        if( p_aout != NULL )
-        {
-            vlc_object_release( (vlc_object_t *)p_aout );
-        }
-        else
-        {
-            bEnabled = FALSE;
-        }
-    }
     else if( [[o_mi title] isEqualToString: _NS("Mute")] ) 
     {
-        aout_instance_t * p_aout;
-
-        p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                          FIND_ANYWHERE );
-        if( p_aout != NULL )
-        {
-            vlc_object_release( (vlc_object_t *)p_aout );
-        }
-        else
-        {
-            bEnabled = FALSE;
-        }
-
         [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
     }
     else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] ||

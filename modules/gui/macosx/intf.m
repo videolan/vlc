@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.50 2003/02/08 20:32:44 massiot Exp $
+ * $Id: intf.m,v 1.51 2003/02/09 01:13:43 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -459,6 +459,8 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
         if( !p_input->b_die )
         {
+            audio_volume_t i_volume;
+
             /* New input or stream map change */
             if( p_input->stream.b_changed )
             {
@@ -479,7 +481,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
             if( p_aout != NULL )
             {
                 vlc_value_t val;
-                audio_volume_t i_volume;
 
                 if( var_Get( (vlc_object_t *)p_aout, "intf-change", &val )
                     >= 0 && val.b_bool )
@@ -487,12 +488,10 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                     p_intf->p_sys->b_aout_update = 1;
                     b_need_menus = VLC_TRUE;
                 }
-
-                aout_VolumeGet( p_aout, &i_volume );
                 vlc_object_release( (vlc_object_t *)p_aout );
-
-                p_intf->p_sys->b_mute = ( i_volume == 0 );
             }
+            aout_VolumeGet( p_intf, &i_volume );
+            p_intf->p_sys->b_mute = ( i_volume == 0 );
 
             p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
@@ -834,25 +833,12 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 - (void)manageVolumeSlider
 {
     audio_volume_t i_volume;
-    vlc_bool_t b_audio = VLC_FALSE;
     intf_thread_t * p_intf = [NSApp getIntf];
 
-    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT, 
-                                                        FIND_ANYWHERE );
-    if( p_aout != NULL )
-    {
-        b_audio = VLC_TRUE;
-
-        aout_VolumeGet( p_aout, &i_volume );
-        vlc_object_release( (vlc_object_t *)p_aout );
-    }
-    else
-    {
-        i_volume = (audio_volume_t)config_GetInt( p_intf, "volume" );
-    }
+    aout_VolumeGet( p_intf, &i_volume );
 
     [o_volumeslider setFloatValue: (float)i_volume / AOUT_VOLUME_STEP]; 
-    [o_volumeslider setEnabled: b_audio];
+    [o_volumeslider setEnabled: 1];
 
     p_intf->p_sys->b_mute = ( i_volume == 0 );
 }

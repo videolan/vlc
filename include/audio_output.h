@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.77 2003/02/06 15:14:41 massiot Exp $
+ * $Id: audio_output.h,v 1.78 2003/02/09 01:13:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -175,12 +175,18 @@ VLC_EXPORT( void, aout_DecDeleteBuffer, ( aout_instance_t *, aout_input_t *, aou
 VLC_EXPORT( int, aout_DecPlay, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
 
 /* From intf.c : */
-VLC_EXPORT( int, aout_VolumeGet, ( aout_instance_t *, audio_volume_t * ) );
-VLC_EXPORT( int, aout_VolumeSet, ( aout_instance_t *, audio_volume_t ) );
-VLC_EXPORT( int, aout_VolumeInfos, ( aout_instance_t *, audio_volume_t * ) );
-VLC_EXPORT( int, aout_VolumeUp, ( aout_instance_t *, int, audio_volume_t * ) );
-VLC_EXPORT( int, aout_VolumeDown, ( aout_instance_t *, int, audio_volume_t * ) );
-VLC_EXPORT( int, aout_VolumeMute, ( aout_instance_t *, audio_volume_t * ) );
+#define aout_VolumeGet(a, b) __aout_VolumeGet(VLC_OBJECT(a), b)
+VLC_EXPORT( int, __aout_VolumeGet, ( vlc_object_t *, audio_volume_t * ) );
+#define aout_VolumeSet(a, b) __aout_VolumeSet(VLC_OBJECT(a), b)
+VLC_EXPORT( int, __aout_VolumeSet, ( vlc_object_t *, audio_volume_t ) );
+#define aout_VolumeInfos(a, b) __aout_VolumeInfos(VLC_OBJECT(a), b)
+VLC_EXPORT( int, __aout_VolumeInfos, ( vlc_object_t *, audio_volume_t * ) );
+#define aout_VolumeUp(a, b, c) __aout_VolumeUp(VLC_OBJECT(a), b, c)
+VLC_EXPORT( int, __aout_VolumeUp, ( vlc_object_t *, int, audio_volume_t * ) );
+#define aout_VolumeDown(a, b, c) __aout_VolumeDown(VLC_OBJECT(a), b, c)
+VLC_EXPORT( int, __aout_VolumeDown, ( vlc_object_t *, int, audio_volume_t * ) );
+#define aout_VolumeMute(a, b) __aout_VolumeMute(VLC_OBJECT(a), b)
+VLC_EXPORT( int, __aout_VolumeMute, ( vlc_object_t *, audio_volume_t * ) );
 VLC_EXPORT( int, aout_Restart, ( aout_instance_t * p_aout ) );
 VLC_EXPORT( void, aout_FindAndRestart, ( vlc_object_t * p_this ) );
 VLC_EXPORT( int, aout_ChannelsRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );

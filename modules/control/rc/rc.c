@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.24 2003/02/06 23:59:40 sam Exp $
+ * $Id: rc.c,v 1.25 2003/02/09 01:13:43 massiot Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -681,10 +681,7 @@ static int Intf( vlc_object_t *p_this, char const *psz_cmd,
 static int Volume( vlc_object_t *p_this, char const *psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    aout_instance_t * p_aout;
     int i_error;
-    p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    if ( p_aout == NULL ) return VLC_ENOOBJ;
 
     if ( *newval.psz_string )
     {
@@ -696,13 +693,13 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
                     AOUT_VOLUME_MAX );
             i_error = VLC_EBADVAR;
         }
-        else i_error = aout_VolumeSet( p_aout, i_volume );
+        else i_error = aout_VolumeSet( p_this, i_volume );
     }
     else
     {
         /* Get. */
         audio_volume_t i_volume;
-        if ( aout_VolumeGet( p_aout, &i_volume ) < 0 )
+        if ( aout_VolumeGet( p_this, &i_volume ) < 0 )
         {
             i_error = VLC_EGENERIC;
         }
@@ -712,7 +709,6 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
             i_error = VLC_SUCCESS;
         }
     }
-    vlc_object_release( (vlc_object_t *)p_aout );
 
     return i_error;
 }
@@ -720,7 +716,6 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
 static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    aout_instance_t * p_aout;
     audio_volume_t i_volume;
     int i_nb_steps = atoi(newval.psz_string);
     int i_error = VLC_SUCCESS;
@@ -730,20 +725,16 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
         i_nb_steps = 1;
     }
 
-    p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    if ( p_aout == NULL ) return VLC_ENOOBJ;
-
     if ( !strcmp(psz_cmd, "volup") )
     {
-        if ( aout_VolumeUp( p_aout, i_nb_steps, &i_volume ) < 0 )
+        if ( aout_VolumeUp( p_this, i_nb_steps, &i_volume ) < 0 )
             i_error = VLC_EGENERIC;
     }
     else
     {
-        if ( aout_VolumeDown( p_aout, i_nb_steps, &i_volume ) < 0 )
+        if ( aout_VolumeDown( p_this, i_nb_steps, &i_volume ) < 0 )
             i_error = VLC_EGENERIC;
     }
-    vlc_object_release( (vlc_object_t *)p_aout );
 
     if ( !i_error ) printf( "Volume is %d\n", i_volume );
     return i_error;

@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.15 2003/01/21 10:29:12 massiot Exp $
+ * $Id: intf.c,v 1.16 2003/02/09 01:13:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,71 +59,64 @@
 /*****************************************************************************
  * aout_VolumeGet : get the volume of the output device
  *****************************************************************************/
-int aout_VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
+int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
 {
-    int i_result;
+    int i;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    i = config_GetInt( p_object, "volume" );
+    if ( pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
 
-    if ( p_aout->mixer.b_error )
-    {
-        int i;
-        /* The output module is destroyed. */
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        i = config_GetInt( p_aout, "volume" );
-        if (pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
-        return 0;
-    }
-
-    i_result = p_aout->output.pf_volume_get( p_aout, pi_volume );
-
-    vlc_mutex_unlock( &p_aout->mixer_lock );
-    return i_result;
+    return 0;
 }
 
 /*****************************************************************************
  * aout_VolumeSet : set the volume of the output device
  *****************************************************************************/
-int aout_VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
+int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 {
-    int i_result;
+    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+    int i_result = 0;
+
+    config_PutInt( p_object, "volume", i_volume );
+
+    if ( p_aout == NULL ) return 0;
 
     vlc_mutex_lock( &p_aout->mixer_lock );
-
-    if ( p_aout->mixer.b_error )
+    if ( !p_aout->mixer.b_error )
     {
-        /* The output module is destroyed. */
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        config_PutInt( p_aout, "volume", i_volume );
-        return 0;
+        i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
     }
-
-    i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
-
     vlc_mutex_unlock( &p_aout->mixer_lock );
+
+    vlc_object_release( p_aout );
     return i_result;
 }
 
 /*****************************************************************************
  * aout_VolumeInfos : get the boundary pi_soft
  *****************************************************************************/
-int aout_VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
+int __aout_VolumeInfos( vlc_object_t * p_object, audio_volume_t * pi_soft )
 {
+    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
     int i_result;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    if ( p_aout == NULL ) return 0;
 
+    vlc_mutex_lock( &p_aout->mixer_lock );
     if ( p_aout->mixer.b_error )
     {
         /* The output module is destroyed. */
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        msg_Err( p_aout, "VolumeInfos called without output module" );
-        return -1;
+        i_result = -1;
     }
-
-    i_result = p_aout->output.pf_volume_infos( p_aout, pi_soft );
-
+    else
+    {
+        i_result = p_aout->output.pf_volume_infos( p_aout, pi_soft );
+    }
     vlc_mutex_unlock( &p_aout->mixer_lock );
+
+    vlc_object_release( p_aout );
     return i_result;
 }
 
@@ -133,44 +126,32 @@ int aout_VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
  * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
  * function.
  *****************************************************************************/
-int aout_VolumeUp( aout_instance_t * p_aout, int i_nb_steps,
+int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                    audio_volume_t * pi_volume )
 {
-    int i_result;
-    audio_volume_t i_volume;
+    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+    int i_result = 0, i;
+
+    i = config_GetInt( p_object, "volume" );
+    i += AOUT_VOLUME_STEP * i_nb_steps;
+    if ( i > AOUT_VOLUME_MAX )
+    {
+        i = AOUT_VOLUME_MAX;
+    }
+    config_PutInt( p_object, "volume", i );
+    if ( pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
+
+    if ( p_aout == NULL ) return 0;
 
     vlc_mutex_lock( &p_aout->mixer_lock );
-
-    if ( p_aout->mixer.b_error )
+    if ( !p_aout->mixer.b_error )
     {
-        int i;
-        /* The output module is destroyed. */
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        i = config_GetInt( p_aout, "volume" );
-        i += AOUT_VOLUME_STEP * i_nb_steps;
-        if ( i > AOUT_VOLUME_MAX )
-        {
-            i = AOUT_VOLUME_MAX;
-        }
-        config_PutInt( p_aout, "volume", i );
-        if ( pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
-        return 0;
+        i_result = p_aout->output.pf_volume_set( p_aout, (audio_volume_t)i );
     }
-
-    if ( p_aout->output.pf_volume_get( p_aout, &i_volume ) )
-    {
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        return -1;
-    }
-
-    i_volume += AOUT_VOLUME_STEP * i_nb_steps;
-    if ( i_volume > AOUT_VOLUME_MAX ) i_volume = AOUT_VOLUME_MAX;
-
-    i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
-
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
-    if ( pi_volume != NULL ) *pi_volume = i_volume;
+    vlc_object_release( p_aout );
     return i_result;
 }
 
@@ -180,46 +161,32 @@ int aout_VolumeUp( aout_instance_t * p_aout, int i_nb_steps,
  * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
  * function.
  *****************************************************************************/
-int aout_VolumeDown( aout_instance_t * p_aout, int i_nb_steps,
+int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
                      audio_volume_t * pi_volume )
 {
-    int i_result;
-    audio_volume_t i_volume;
+    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+    int i_result = 0, i;
+
+    i = config_GetInt( p_object, "volume" );
+    i -= AOUT_VOLUME_STEP * i_nb_steps;
+    if ( i < AOUT_VOLUME_MIN )
+    {
+        i = AOUT_VOLUME_MIN;
+    }
+    config_PutInt( p_object, "volume", i );
+    if ( pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
+
+    if ( p_aout == NULL ) return 0;
 
     vlc_mutex_lock( &p_aout->mixer_lock );
-
-    if ( p_aout->mixer.b_error )
+    if ( !p_aout->mixer.b_error )
     {
-        int i;
-        /* The output module is destroyed. */
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        i = config_GetInt( p_aout, "volume" );
-        i -= AOUT_VOLUME_STEP * i_nb_steps;
-        if ( i < 0 )
-        {
-            i = AOUT_VOLUME_MAX;
-        }
-        config_PutInt( p_aout, "volume", i );
-        if ( pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
-        return 0;
+        i_result = p_aout->output.pf_volume_set( p_aout, (audio_volume_t)i );
     }
-
-    if ( p_aout->output.pf_volume_get( p_aout, &i_volume ) )
-    {
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        return -1;
-    }
-
-    if ( i_volume < AOUT_VOLUME_STEP * i_nb_steps )
-        i_volume = 0;
-    else
-        i_volume -= AOUT_VOLUME_STEP * i_nb_steps;
-
-    i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
-
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
-    if ( pi_volume != NULL ) *pi_volume = i_volume;
+    vlc_object_release( p_aout );
     return i_result;
 }
 
@@ -229,43 +196,27 @@ int aout_VolumeDown( aout_instance_t * p_aout, int i_nb_steps,
  * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
  * function (muted => 0).
  *****************************************************************************/
-int aout_VolumeMute( aout_instance_t * p_aout, audio_volume_t * pi_volume )
+int __aout_VolumeMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
 {
     int i_result;
     audio_volume_t i_volume;
 
-    vlc_mutex_lock( &p_aout->mixer_lock );
-
-    if ( p_aout->mixer.b_error )
+    i_volume = (audio_volume_t)config_GetInt( p_object, "volume" );
+    if ( i_volume != 0 )
     {
-        /* The output module is destroyed. */
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        config_PutInt( p_aout, "volume", 0 );
-        if ( pi_volume != NULL ) *pi_volume = 0;
-        return 0;
-    }
-
-    if ( p_aout->output.pf_volume_get( p_aout, &i_volume ) )
-    {
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        return -1;
-    }
-
-    if ( i_volume == 0 )
-    {
-        i_volume = p_aout->output.i_saved_volume;
+        /* Mute */
+        i_result = aout_VolumeSet( p_object, AOUT_VOLUME_MIN );
+        config_PutInt( p_object, "saved-volume", (int)i_volume );
+        if ( pi_volume != NULL ) *pi_volume = AOUT_VOLUME_MIN;
     }
     else
     {
-        p_aout->output.i_saved_volume = i_volume;
-        i_volume = 0;
+        /* Un-mute */
+        i_volume = (audio_volume_t)config_GetInt( p_object, "saved-volume" );
+        i_result = aout_VolumeSet( p_object, i_volume );
+        if ( pi_volume != NULL ) *pi_volume = i_volume;
     }
 
-    i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
-
-    vlc_mutex_unlock( &p_aout->mixer_lock );
-
-    if ( pi_volume != NULL ) *pi_volume = i_volume;
     return i_result;
 }
 
@@ -284,7 +235,7 @@ void aout_VolumeSoftInit( aout_instance_t * p_aout )
     p_aout->output.pf_volume_set = aout_VolumeSoftSet;
 
     i_volume = config_GetInt( p_aout, "volume" );
-    if ( i_volume < 0 )
+    if ( i_volume < AOUT_VOLUME_MIN )
     {
         i_volume = AOUT_VOLUME_DEFAULT;
     }

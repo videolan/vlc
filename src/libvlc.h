@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.41 2003/02/08 19:10:22 massiot Exp $
+ * $Id: libvlc.h,v 1.42 2003/02/09 01:13:43 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -88,6 +88,10 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define VOLUME_LONGTEXT N_( \
     "You can set the default audio output volume here, in a range from 0 to " \
     "1024.")
+
+#define VOLUME_SAVE_TEXT N_("audio output saved volume")
+#define VOLUME_SAVE_LONGTEXT N_( \
+    "This saves the audio output volume when you select mute.")
 
 #define AOUT_RATE_TEXT N_("audio output frequency (Hz)")
 #define AOUT_RATE_LONGTEXT N_( \
@@ -438,7 +442,12 @@ vlc_module_begin();
     add_module_with_short( "aout", 'A', "audio output", NULL, NULL,
                            AOUT_TEXT, AOUT_LONGTEXT );
     add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT );
-    add_integer_with_range( "volume", 256, 0, 1024, NULL, VOLUME_TEXT, VOLUME_LONGTEXT );
+    add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, AOUT_VOLUME_MIN,
+                            AOUT_VOLUME_MAX, NULL, VOLUME_TEXT,
+                            VOLUME_LONGTEXT );
+    add_integer_with_range( "saved-volume", AOUT_VOLUME_DEFAULT,
+                            AOUT_VOLUME_MIN, AOUT_VOLUME_MAX, NULL,
+                            VOLUME_SAVE_TEXT, VOLUME_SAVE_LONGTEXT );
     add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT, AOUT_RATE_LONGTEXT );
     add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT );
     add_bool( "headphone", 0, NULL, HEADPHONE_TEXT, HEADPHONE_LONGTEXT );
