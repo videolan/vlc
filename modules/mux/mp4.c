@@ -1554,8 +1554,7 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
             if( p_stream->fmt.video.i_aspect > 0 )
             {
                 i_width = p_stream->fmt.video.i_aspect *
-                          p_stream->fmt.video.i_height /
-                          VOUT_ASPECT_FACTOR << 16;
+                          (p_stream->fmt.video.i_height << 16) / VOUT_ASPECT_FACTOR;
             }
             // width (presentation)
             bo_add_32be( tkhd, i_width );
