@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.13 2002/11/15 01:17:08 fenrir Exp $
+ * $Id: decoder.c,v 1.14 2002/11/28 16:32:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -33,7 +33,7 @@
 #include <string.h>                                              /* strdup() */
 
 #include <faad.h>
-
+#include "codecs.h"
 #include "decoder.h"
 
 
@@ -141,19 +141,22 @@ static int pi_channels_maps[6] =
 static void faac_GetWaveFormatEx( waveformatex_t *p_wh,
                                           u8 *p_data )
 {
-
-    p_wh->i_formattag     = GetWLE( p_data );
-    p_wh->i_nb_channels   = GetWLE( p_data + 2 );
-    p_wh->i_samplespersec = GetDWLE( p_data + 4 );
-    p_wh->i_avgbytespersec= GetDWLE( p_data + 8 );
-    p_wh->i_blockalign    = GetWLE( p_data + 12 );
-    p_wh->i_bitspersample = GetWLE( p_data + 14 );
-    p_wh->i_size          = GetWLE( p_data + 16 );
+    WAVEFORMATEX *p_wfdata = (WAVEFORMATEX*)p_data;
+    
+    p_wh->i_formattag     = p_wfdata->wFormatTag;
+    p_wh->i_nb_channels   = p_wfdata->nChannels;
+    p_wh->i_samplespersec = p_wfdata->nSamplesPerSec;
+    p_wh->i_avgbytespersec= p_wfdata->nAvgBytesPerSec;
+    p_wh->i_blockalign    = p_wfdata->nBlockAlign;
+    p_wh->i_bitspersample = p_wfdata->wBitsPerSample;
+    p_wh->i_size          = p_wfdata->cbSize;
 
     if( p_wh->i_size )
     {
         p_wh->p_data = malloc( p_wh->i_size );
-        memcpy( p_wh->p_data, p_data + 18, p_wh->i_size );
+        memcpy( p_wh->p_data, 
+                p_data + sizeof(WAVEFORMATEX) , 
+                p_wh->i_size );
     }
 }
 

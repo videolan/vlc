@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.3 2002/11/21 13:53:32 sam Exp $
+ * $Id: wav.c,v 1.4 2002/11/28 16:32:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include <codecs.h>
 #include "wav.h"
 
 /*****************************************************************************
@@ -227,7 +228,9 @@ static int LoadTag_fmt( input_thread_t *p_input,
 {
     u8  *p_peek;
     u32 i_size;
-    
+    WAVEFORMATEX *p_wf;
+            
+
     if( input_Peek( p_input, &p_peek , 8 ) < 8 )
     {
         return( 0 );
@@ -240,26 +243,22 @@ static int LoadTag_fmt( input_thread_t *p_input,
         SkipBytes( p_input, i_size );
         return( 0 );
     }
-    p_demux->p_wf = malloc( i_size );
-    ReadData( p_input,  p_demux->p_wf, __EVEN( i_size ) );
-    p_demux->format.i_format         = GetWLE( p_demux->p_wf );
-    p_demux->format.i_channels       = GetWLE( p_demux->p_wf + 2 );
-    p_demux->format.i_samplepersec   = GetDWLE( p_demux->p_wf + 4 );
-    p_demux->format.i_avgbytespersec = GetDWLE( p_demux->p_wf + 8);
-    p_demux->format.i_blockalign    = GetWLE( p_demux->p_wf + 12 );
-    p_demux->format.i_bitspersample = GetWLE( p_demux->p_wf + 14);
-    if( i_size > 18 )
+    p_wf = p_demux->p_wf = malloc( __MAX( i_size, sizeof( WAVEFORMATEX) ) );
+    ReadData( p_input, (uint8_t*)p_wf, __EVEN( i_size ) );
+
+    p_wf->wFormatTag      = GetWLE( (uint8_t*)&p_demux->p_wf->wFormatTag );
+    p_wf->nChannels       = GetWLE( (uint8_t*)&p_demux->p_wf->nChannels );
+    p_wf->nSamplesPerSec  = GetWLE( (uint8_t*)&p_demux->p_wf->nSamplesPerSec );
+    p_wf->nAvgBytesPerSec = GetWLE( (uint8_t*)&p_demux->p_wf->nAvgBytesPerSec );
+    p_wf->nBlockAlign     = GetWLE( (uint8_t*)&p_demux->p_wf->nBlockAlign );
+    p_wf->wBitsPerSample  = GetWLE( (uint8_t*)&p_demux->p_wf->wBitsPerSample );
+    if( i_size >= sizeof( WAVEFORMATEX) )
     {
-        p_demux->format.i_size = GetWLE( p_demux->p_wf + 16 );
-        p_demux->format.p_data = malloc( p_demux->format.i_size );
-        memcpy( p_demux->format.p_data, 
-                p_demux->p_wf + 18, 
-                p_demux->format.i_size );
+        p_wf->cbSize          = GetWLE( (uint8_t*)&p_demux->p_wf->cbSize );
     }
     else
     {
-        p_demux->format.i_size = 0;
-        p_demux->format.p_data = NULL;
+        p_wf->cbSize = 0;
     }
 
     msg_Dbg( p_input, "loaded \"fmt \" chunk" );
@@ -267,9 +266,9 @@ static int LoadTag_fmt( input_thread_t *p_input,
 }
 
 static int PCM_GetFrame( input_thread_t *p_input,
-                         waveformatex_t *p_wf,
-                         pes_packet_t **pp_pes,
-                         mtime_t *pi_length )
+                         WAVEFORMATEX   *p_wf,
+                         pes_packet_t   **pp_pes,
+                         mtime_t        *pi_length )
 {
     int i_samples;
 
@@ -277,20 +276,20 @@ static int PCM_GetFrame( input_thread_t *p_input,
     int i_modulo;
 
     /* read samples for 50ms of */
-    i_samples = __MAX( p_wf->i_samplepersec / 20, 1 );
+    i_samples = __MAX( p_wf->nSamplesPerSec / 20, 1 );
         
     
     *pi_length = (mtime_t)1000000 * 
                  (mtime_t)i_samples / 
-                 (mtime_t)p_wf->i_samplepersec;
+                 (mtime_t)p_wf->nSamplesPerSec;
 
-    i_bytes = i_samples * p_wf->i_channels * ( p_wf->i_bitspersample + 7 ) / 8;
+    i_bytes = i_samples * p_wf->nChannels * ( p_wf->wBitsPerSample + 7 ) / 8;
     
-    if( p_wf->i_blockalign > 0 )
+    if( p_wf->nBlockAlign > 0 )
     {
-        if( ( i_modulo = i_bytes % p_wf->i_blockalign ) != 0 )
+        if( ( i_modulo = i_bytes % p_wf->nBlockAlign ) != 0 )
         {
-            i_bytes += p_wf->i_blockalign - i_modulo;
+            i_bytes += p_wf->nBlockAlign - i_modulo;
         }
     }
 
@@ -348,7 +347,7 @@ static int WAVInit( vlc_object_t * p_this )
     }
     memset( p_demux, 0, sizeof( demux_sys_t ) );
        
-    /* Load waveformatex_t header */
+    /* Load WAVEFORMATEX header */
     if( !LoadTag_fmt( p_input, p_demux ) )
     {
         msg_Err( p_input, "cannot load \"fmt \" tag" );
@@ -356,19 +355,18 @@ static int WAVInit( vlc_object_t * p_this )
         return( -1 );
     }
     msg_Dbg( p_input, "format:0x%4.4x channels:%d %dHz %dKo/s blockalign:%d bits/samples:%d extra size:%d",
-            p_demux->format.i_format,
-            p_demux->format.i_channels,
-            p_demux->format.i_samplepersec,
-            p_demux->format.i_avgbytespersec/1024,
-            p_demux->format.i_blockalign,
-            p_demux->format.i_bitspersample,
-            p_demux->format.i_size );
-
+            p_demux->p_wf->wFormatTag,
+            p_demux->p_wf->nChannels,
+            p_demux->p_wf->nSamplesPerSec,
+            p_demux->p_wf->nAvgBytesPerSec / 1024,
+            p_demux->p_wf->nBlockAlign,
+            p_demux->p_wf->wBitsPerSample,
+            p_demux->p_wf->cbSize );
+           
     if( !FindTag( p_input, CreateDWLE( 'd', 'a', 't', 'a' ) ) )
     {
         msg_Err( p_input, "cannot find \"data\" tag" );
         FREE( p_demux->p_wf );
-        FREE( p_demux->format.p_data );
         FREE( p_demux );
         return( -1 );
     }
@@ -376,7 +374,6 @@ static int WAVInit( vlc_object_t * p_this )
     {
         msg_Warn( p_input, "WAV plugin discarded (cannot peek)" );
         FREE( p_demux->p_wf );
-        FREE( p_demux->format.p_data );
         FREE( p_demux );
         return( -1 );
     }
@@ -386,7 +383,7 @@ static int WAVInit( vlc_object_t * p_this )
     SkipBytes( p_input, 8 );
 
     /* XXX p_demux->psz_demux shouldn't be NULL ! */
-    switch( p_demux->format.i_format )
+    switch( p_demux->p_wf->wFormatTag )
     {
         case( 0x01 ):
             msg_Dbg( p_input,"found raw pcm audio format" );
@@ -409,11 +406,11 @@ static int WAVInit( vlc_object_t * p_this )
             break;
         default:
             msg_Warn( p_input,"unrecognize audio format(0x%x)", 
-                      p_demux->format.i_format );
+                      p_demux->p_wf->wFormatTag );
             p_demux->i_fourcc = 
                 VLC_FOURCC( 'm', 's', 
-                            (p_demux->format.i_format >> 8)&0xff,
-                            (p_demux->format.i_format )&0xff);
+                            (p_demux->p_wf->wFormatTag >> 8)&0xff,
+                            (p_demux->p_wf->wFormatTag )&0xff);
             p_demux->GetFrame = NULL;
             p_demux->psz_demux = strdup( "" );
             break;
@@ -451,12 +448,9 @@ static int WAVInit( vlc_object_t * p_this )
         p_demux->p_es->i_stream_id = 1;
         p_demux->p_es->i_fourcc = p_demux->i_fourcc;
         p_demux->p_es->i_cat = AUDIO_ES;
-        if( p_demux->i_wf > 0 && p_demux->p_wf )
-        {
-            memcpy( p_demux->p_es->p_demux_data,
-                    p_demux->p_wf,
-                    p_demux->i_wf );
-        }
+        memcpy( p_demux->p_es->p_demux_data,
+                p_demux->p_wf,
+                p_demux->i_wf );
         
         input_SelectES( p_input, p_demux->p_es );
         
@@ -480,10 +474,9 @@ static int WAVInit( vlc_object_t * p_this )
         {
             msg_Err( p_input, 
                      "cannot get external demux for formattag 0x%x",
-                     p_demux->format.i_format );
+                     p_demux->p_wf->wFormatTag );
             FREE( p_demux->psz_demux );
             FREE( p_demux->p_wf );
-            FREE( p_demux->format.p_data );
             FREE( p_demux );
             return( -1 );
         }
@@ -495,7 +488,6 @@ static int WAVInit( vlc_object_t * p_this )
         p_input->p_demux_data = p_demux;
 
     }
-
 
     return( 0 );    
 }
@@ -555,10 +547,10 @@ static int WAVDemux( input_thread_t *p_input )
             SeekAbsolute( p_input, p_demux->i_data_pos );
         }
         else
-        if( p_demux->format.i_blockalign != 0 )
+        if( p_demux->p_wf->nBlockAlign != 0 )
         {
             
-            i_offset = i_offset - i_offset % p_demux->format.i_blockalign;
+            i_offset = i_offset - i_offset % p_demux->p_wf->nBlockAlign;
             SeekAbsolute( p_input, p_demux->i_data_pos + i_offset );
         }
     }
@@ -572,7 +564,7 @@ static int WAVDemux( input_thread_t *p_input )
         return( 0 ); // EOF
     }
 
-    if( !p_demux->GetFrame( p_input, &p_demux->format, &p_pes, &i_length ) )
+    if( !p_demux->GetFrame( p_input, p_demux->p_wf, &p_pes, &i_length ) )
     {
         msg_Warn( p_input, "failed to get one frame" );
         return( 0 );
@@ -607,7 +599,6 @@ static void __WAVEnd ( vlc_object_t * p_this )
     demux_sys_t *p_demux = p_input->p_demux_data;
     
     FREE( p_demux->p_wf );
-    FREE( p_demux->format.p_data );
     FREE( p_demux->psz_demux );
     
     if( p_demux->p_demux )

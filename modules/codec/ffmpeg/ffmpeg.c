@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.19 2002/11/27 14:44:06 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.20 2002/11/28 16:32:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -495,6 +495,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_mjpg:
         case FOURCC_mjpa:
         case FOURCC_jpeg:
+        case FOURCC_JPEG:
         case FOURCC_JFIF:
             i_cat = VIDEO_ES;
             i_codec = CODEC_ID_MJPEG;

@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.7 2002/11/14 22:38:47 massiot Exp $
+ * $Id: araw.c,v 1.8 2002/11/28 16:32:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -31,25 +31,16 @@
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
-
+#include "codecs.h"
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-typedef struct waveformatex_s
-{
-    u16 i_formattag;
-    u16 i_channels;
-    u32 i_samplespersec;
-    u32 i_avgbytespersec;
-    u16 i_blockalign;
-    u16 i_bitspersample;
-    u16 i_size; /* the extra size in bytes */
-    u8  *p_data; /* The extra data */
-} waveformatex_t;
 
 typedef struct adec_thread_s
 {
-    waveformatex_t  format;
+    WAVEFORMATEX    *p_wf;
+    
+    //waveformatex_t  format;
 
     /* The bit stream structure handles the PES stream at the bit level */
 //    bit_stream_t        bit_stream;
@@ -171,7 +162,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 #define GetDWLE( p ) \
     (  *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) + \
         ( *((u8*)(p)+2) << 16 ) + ( *((u8*)(p)+3) << 24 ) )
-    
+
+#if 0
 static void GetWaveFormatEx( waveformatex_t *p_wh,
                              u8 *p_data )
 {
@@ -193,6 +185,7 @@ static void GetWaveFormatEx( waveformatex_t *p_wh,
         }
     }
 }
+#endif
 
 /*****************************************************************************
  * InitThread: initialize data before entering main loop
@@ -201,31 +194,30 @@ static void GetWaveFormatEx( waveformatex_t *p_wh,
 static int InitThread( adec_thread_t * p_adec )
 {
 
-    if( p_adec->p_fifo->p_demux_data )
-    {
-        GetWaveFormatEx( &p_adec->format,
-                         (u8*)p_adec->p_fifo->p_demux_data );
-        /* fixing some values */
-        if( p_adec->format.i_formattag == 1 && !p_adec->format.i_blockalign )
-        {
-            p_adec->format.i_blockalign = p_adec->format.i_channels * 
-                    ( ( p_adec->format.i_bitspersample + 7 ) / 8 );
-        }
-    }
-    else
+    if( !p_adec->p_fifo->p_demux_data )
     {
         msg_Err( p_adec->p_fifo, "unknown raw format" );
         return( -1 );
     }
+    p_adec->p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_demux_data;
+    /* fixing some values */
+    if( p_adec->p_wf->wFormatTag  == WAVE_FORMAT_PCM && 
+        !p_adec->p_wf->nBlockAlign )
+    {
+        p_adec->p_wf->nBlockAlign = 
+            p_adec->p_wf->nChannels * 
+                ( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 );
+    }
 
     msg_Dbg( p_adec->p_fifo,
              "raw format: samplerate:%dHz channels:%d bits/sample:%d blockalign:%d",
-             p_adec->format.i_samplespersec,
-             p_adec->format.i_channels,
-             p_adec->format.i_bitspersample, p_adec->format.i_blockalign );
+             p_adec->p_wf->nSamplesPerSec,
+             p_adec->p_wf->nChannels,
+             p_adec->p_wf->wBitsPerSample, 
+             p_adec->p_wf->nBlockAlign );
 
     /* Initialize the thread properties */
-    switch( ( p_adec->format.i_bitspersample + 7 ) / 8 )
+    switch( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 )
     {
         case( 2 ):
             p_adec->output_format.i_format = VLC_FOURCC('s','1','6','l');
@@ -243,10 +235,10 @@ static int InitThread( adec_thread_t * p_adec )
             msg_Err( p_adec->p_fifo, "bad parameters(bits/sample)" );
             return( -1 );
     }
-    p_adec->output_format.i_rate = p_adec->format.i_samplespersec;
+    p_adec->output_format.i_rate = p_adec->p_wf->nSamplesPerSec;
 
-    if( p_adec->format.i_channels <= 0 || 
-            p_adec->format.i_channels > 5 )
+    if( p_adec->p_wf->nChannels <= 0 || 
+            p_adec->p_wf->nChannels > 5 )
     {
         msg_Err( p_adec->p_fifo, "bad channels count(1-5)" );
         return( -1 );
@@ -254,7 +246,7 @@ static int InitThread( adec_thread_t * p_adec )
 
     p_adec->output_format.i_physical_channels = 
             p_adec->output_format.i_original_channels =
-            pi_channels_maps[p_adec->format.i_channels];
+            pi_channels_maps[p_adec->p_wf->nChannels];
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
 
@@ -328,11 +320,11 @@ static void DecodeThread( adec_thread_t *p_adec )
     }
     i_size = p_pes->i_pes_size;
 
-    if( p_adec->format.i_blockalign > 0 )
+    if( p_adec->p_wf->nBlockAlign > 0 )
     {
-        i_size -= i_size % p_adec->format.i_blockalign;
+        i_size -= i_size % p_adec->p_wf->nBlockAlign;
     }
-    i_size = __MAX( i_size, p_adec->format.i_blockalign );
+    i_size = __MAX( i_size, p_adec->p_wf->nBlockAlign );
 
     if( !i_size || !p_pes )
     {
@@ -340,8 +332,8 @@ static void DecodeThread( adec_thread_t *p_adec )
         return;
     }
     i_samples = i_size / 
-                ( ( p_adec->format.i_bitspersample + 7 ) / 8 ) / 
-                p_adec->format.i_channels;
+                ( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 ) / 
+                p_adec->p_wf->nChannels;
 
 //    msg_Warn( p_adec->p_fifo, "got %d samples (%d bytes)", i_samples, i_size );
     p_adec->pts = p_pes->i_pts;
@@ -389,8 +381,6 @@ static void EndThread (adec_thread_t *p_adec)
     {
         aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
     }
-
-    FREE( p_adec->format.p_data );
 
     msg_Dbg( p_adec->p_fifo, "raw audio decoder closed" );
         

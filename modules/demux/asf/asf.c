@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.8 2002/11/25 15:08:34 fenrir Exp $
+ * $Id: asf.c,v 1.9 2002/11/28 16:32:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -239,11 +239,29 @@ static int Activate( vlc_object_t * p_this )
             }
             if( p_sp->i_type_specific_data_length > 0 )
             {
-                p_stream->p_es->p_demux_data = 
-                    malloc( p_sp->i_type_specific_data_length );
-                memcpy( p_stream->p_es->p_demux_data,
-                        p_sp->p_type_specific_data,
-                        p_sp->i_type_specific_data_length );
+                WAVEFORMATEX    *p_wf;
+                int             i_size;
+                uint8_t         *p_data;
+                
+                i_size = p_sp->i_type_specific_data_length;
+
+                p_wf = malloc( i_size );
+                p_stream->p_es->p_demux_data = (void*)p_wf;
+                p_data = p_sp->p_type_specific_data;
+
+                p_wf->wFormatTag        = GetWLE( p_data );
+                p_wf->nChannels         = GetWLE( p_data + 2 );
+                p_wf->nSamplesPerSec    = GetDWLE( p_data + 4 );
+                p_wf->nAvgBytesPerSec   = GetDWLE( p_data + 8 );
+                p_wf->nBlockAlign       = GetWLE( p_data + 12 );
+                p_wf->wBitsPerSample    = GetWLE( p_data + 14 );
+                p_wf->cbSize            = i_size - sizeof( WAVEFORMATEX );
+                if( i_size > sizeof( WAVEFORMATEX ) )
+                {
+                    memcpy( (uint8_t*)p_stream->p_es->p_demux_data + sizeof( WAVEFORMATEX ),
+                            p_data + sizeof( WAVEFORMATEX ),
+                            i_size - sizeof( WAVEFORMATEX ) );
+                }
             }
             
         }
@@ -257,7 +275,10 @@ static int Activate( vlc_object_t * p_this )
             if( p_sp->p_type_specific_data )
             {
                 p_stream->p_es->i_fourcc =
-                    GetDWLE( p_sp->p_type_specific_data + 27 );
+                    VLC_FOURCC( p_sp->p_type_specific_data + 27,
+                                p_sp->p_type_specific_data + 28,
+                                p_sp->p_type_specific_data + 29,
+                                p_sp->p_type_specific_data + 30 );
             }
             else
             {

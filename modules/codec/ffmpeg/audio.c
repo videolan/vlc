@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.4 2002/11/27 12:41:45 fenrir Exp $
+ * $Id: audio.c,v 1.5 2002/11/28 16:32:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -42,11 +42,11 @@
 #ifdef HAVE_SYS_TIMES_H
 #   include <sys/times.h>
 #endif
+#include "codecs.h"
 
 #include "avcodec.h"                                            /* ffmpeg */
 
-#include "postprocessing/postprocessing.h"
-
+//#include "postprocessing/postprocessing.h"
 #include "ffmpeg.h"
 #include "audio.h"
 
@@ -74,18 +74,22 @@ static int pi_channels_maps[6] =
 static void ffmpeg_GetWaveFormatEx( waveformatex_t *p_wh,
                                     u8 *p_data )
 {
-    p_wh->i_formattag     = GetWLE( p_data );
-    p_wh->i_nb_channels   = GetWLE( p_data + 2 );
-    p_wh->i_samplespersec = GetDWLE( p_data + 4 );
-    p_wh->i_avgbytespersec= GetDWLE( p_data + 8 );
-    p_wh->i_blockalign    = GetWLE( p_data + 12 );
-    p_wh->i_bitspersample = GetWLE( p_data + 14 );
-    p_wh->i_size          = GetWLE( p_data + 16 );
+    WAVEFORMATEX *p_wfdata = (WAVEFORMATEX*)p_data;
+    
+    p_wh->i_formattag     = p_wfdata->wFormatTag;
+    p_wh->i_nb_channels   = p_wfdata->nChannels;
+    p_wh->i_samplespersec = p_wfdata->nSamplesPerSec;
+    p_wh->i_avgbytespersec= p_wfdata->nAvgBytesPerSec;
+    p_wh->i_blockalign    = p_wfdata->nBlockAlign;
+    p_wh->i_bitspersample = p_wfdata->wBitsPerSample;
+    p_wh->i_size          = p_wfdata->cbSize;
 
     if( p_wh->i_size )
     {
         p_wh->p_data = malloc( p_wh->i_size );
-        memcpy( p_wh->p_data, p_data + 18, p_wh->i_size );
+        memcpy( p_wh->p_data, 
+                p_data + sizeof(WAVEFORMATEX) , 
+                p_wh->i_size );
     }
 }
 

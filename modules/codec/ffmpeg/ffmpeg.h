@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.9 2002/11/27 12:41:45 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.10 2002/11/28 16:32:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -131,6 +131,7 @@ int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 #define FOURCC_mjpb VLC_FOURCC( 'm', 'j', 'p', 'b' )
 
 #define FOURCC_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
+#define FOURCC_JPEG VLC_FOURCC( 'J', 'P', 'E', 'G' )
 #define FOURCC_JFIF VLC_FOURCC( 'J', 'F', 'I', 'F' )
 
 /* wmv */

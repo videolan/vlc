@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.7 2002/11/26 17:28:22 fenrir Exp $
+ * $Id: mp4.c,v 1.8 2002/11/28 16:32:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -90,7 +90,6 @@ static int MP4Init( vlc_object_t * p_this )
 {   
     input_thread_t  *p_input = (input_thread_t *)p_this;
     uint8_t         *p_peek;
-    uint32_t        i_type;
     
     demux_sys_t     *p_demux;
     
@@ -123,9 +122,9 @@ static int MP4Init( vlc_object_t * p_this )
         msg_Warn( p_input, "MP4 plugin discarded (cannot peek)" );
         return( -1 );
     }
-    i_type = ( p_peek[4] ) + ( p_peek[5] << 8 ) +
-                ( p_peek[6] << 16 ) + ( p_peek[7] << 24);
-    switch( i_type )
+
+    
+    switch( VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] ) )
     {
         case( FOURCC_ftyp ):
         case( FOURCC_moov ):
@@ -910,6 +909,7 @@ static void MP4_StartDecoder( input_thread_t *p_input,
     
     uint8_t             *p_init;
     BITMAPINFOHEADER    *p_bih;
+    WAVEFORMATEX        *p_wf;
 
     MP4_Box_t   *p_esds;
 
@@ -1090,24 +1090,22 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             break;
 
         case( AUDIO_ES ):
-            p_init = malloc( 18 + i_decoder_specific_info_len);
-            memset( p_init, 0, 18 + i_decoder_specific_info_len);
-            MP4_Set2BytesLE( p_init + 2, /* i_channel */
-                             p_sample->data.p_sample_soun->i_channelcount );
-            MP4_Set4BytesLE( p_init + 4, /* samplepersec */
-                             p_sample->data.p_sample_soun->i_sampleratehi );
-            MP4_Set4BytesLE( p_init + 8, /* avgbytespersec */
-                             p_sample->data.p_sample_soun->i_channelcount *
-                                p_sample->data.p_sample_soun->i_sampleratehi *
-                             (p_sample->data.p_sample_soun->i_samplesize/8) );
-            MP4_Set2BytesLE( p_init + 14, /* bits/sample */
-                             p_sample->data.p_sample_soun->i_samplesize );
+            p_init = malloc( sizeof( WAVEFORMATEX ) + i_decoder_specific_info_len);
+            p_wf = (WAVEFORMATEX*)p_init;
 
-            MP4_Set2BytesLE( p_init + 16, /* i_size, specific info len*/
-                             i_decoder_specific_info_len );
+            p_wf->wFormatTag = 0;
+            p_wf->nChannels = p_sample->data.p_sample_soun->i_channelcount;
+            p_wf->nSamplesPerSec = p_sample->data.p_sample_soun->i_sampleratehi;
+            p_wf->nAvgBytesPerSec = p_sample->data.p_sample_soun->i_channelcount *
+                                    p_sample->data.p_sample_soun->i_sampleratehi *
+                                    p_sample->data.p_sample_soun->i_samplesize / 8;
+            p_wf->nBlockAlign = 0;
+            p_wf->wBitsPerSample = p_sample->data.p_sample_soun->i_samplesize;
+            p_wf->cbSize = i_decoder_specific_info_len;
+
             if( i_decoder_specific_info_len )
             {
-                memcpy( p_init + 18, 
+                memcpy( p_init + sizeof( WAVEFORMATEX ), 
                         p_decoder_specific_info,
                         i_decoder_specific_info_len);
             }
