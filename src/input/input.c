@@ -412,6 +412,9 @@ static void EndThread( input_thread_t * p_input )
         case AC3_AUDIO_ES:
             ac3dec_DestroyThread( (ac3dec_thread_t *)(p_input->pp_selected_es[i_es_loop]->p_dec) );
             break;
+        case 0:
+            /* Special streams for the PSI decoder, PID 0 and 1 */
+            break;
 #ifdef DEBUG
         default:
             intf_DbgMsg("error: unknown decoder type %d\n", p_input->pp_selected_es[i_es_loop]->i_type );

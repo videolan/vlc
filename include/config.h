@@ -281,7 +281,7 @@
 #define VPAR_IDLE_SLEEP                 100000
 
 /* Time to sleep when waiting for a buffer (from vout or the video fifo). */
-#define VPAR_OUTMEM_SLEEP               50000
+#define VPAR_OUTMEM_SLEEP               10000
 
 /* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
  * that raising this level dramatically lengthens the compilation time. */

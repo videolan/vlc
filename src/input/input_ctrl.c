@@ -127,7 +127,6 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                     case MPEG1_VIDEO_ES:
                     case MPEG2_VIDEO_ES:
                         /* Spawn video thread. */
-/* Les 2 pointeurs NULL ne doivent pas etre NULL sinon on segfault !!!! */
 #ifdef OLD_DECODER
                         if( ((vdec_thread_t*)(p_input->p_es[i_es_loop].p_dec) =
                             vdec_CreateThread( p_input )) == NULL )
