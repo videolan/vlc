@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.62 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: input_dec.c,v 1.63 2003/10/06 15:22:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -383,6 +383,8 @@ static int DecoderThread( decoder_t * p_dec )
 	for( i_size = 0, p_data = p_pes->p_first;
 	     p_data != NULL; p_data = p_data->p_next )
 	{
+            if( p_data->p_payload_end == p_data->p_payload_start )
+                continue;
             memcpy( p_block->p_buffer + i_size, p_data->p_payload_start,
 		    p_data->p_payload_end - p_data->p_payload_start );
             i_size += p_data->p_payload_end - p_data->p_payload_start;
@@ -390,6 +392,7 @@ static int DecoderThread( decoder_t * p_dec )
 
         p_block->i_pts = p_pes->i_pts;
         p_block->i_dts = p_pes->i_dts;
+        p_block->b_discontinuity = p_pes->b_discontinuity;
         p_dec->p_fifo->b_error = p_dec->pf_decode( p_dec, p_block );
 
         input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
