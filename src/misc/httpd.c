@@ -1027,7 +1027,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
                 continue;
 
             /* Cannot re-use host if it uses TLS/SSL */
-            if( &httpd->host[i]->p_tls != NULL )
+            if( httpd->host[i]->p_tls != NULL )
                 continue;
 
 #ifdef AF_INET6
