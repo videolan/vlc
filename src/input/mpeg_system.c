@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.50 2001/04/13 01:49:22 henri Exp $
+ * $Id: mpeg_system.c,v 1.51 2001/04/17 14:54:54 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -148,7 +148,9 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     }
 
     /* Get the PES size if defined */
-    p_es->i_pes_real_size = U16_AT(p_header + 4) + 6;
+    p_es->i_pes_real_size = U16_AT(p_header + 4);
+    if( p_es->i_pes_real_size )
+        p_es->i_pes_real_size += 6;
 
     /* First read the 6 header bytes common to all PES packets:
      * use them to test the PES validity */
