@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.3 2002/11/20 15:58:15 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.4 2002/11/23 01:32:40 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -179,6 +179,9 @@ bool Instance::OnInit()
      * of Frame's constructor is NULL) as the frame doesn't have a frame
      * since it is the first window */
     Interface *MainInterface = new Interface( p_intf );
+
+    /* Create the playlist window */
+    p_intf->p_sys->p_playlist_window = new Playlist( p_intf, MainInterface );
 
     /* Show the interface */
     MainInterface->Show(TRUE);

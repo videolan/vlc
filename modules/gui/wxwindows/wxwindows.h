@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.1 2002/11/18 13:02:16 gbazin Exp $
+ * $Id: wxwindows.h,v 1.2 2002/11/23 01:32:40 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -21,6 +21,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include <wx/listctrl.h>
+
+class Playlist;
+
 /*****************************************************************************
  * intf_sys_t: description and status of Gtk+ interface
  *****************************************************************************/
@@ -28,6 +32,9 @@ struct intf_sys_t
 {
     /* the wx parent window */
     wxWindow            *p_wxwindow;
+
+    /* secondary windows */
+    Playlist            *p_playlist_window;
 
     /* special actions */
     vlc_bool_t          b_playing;
@@ -100,13 +107,14 @@ public:
 
 private:
     /* Event handlers (these functions should _not_ be virtual) */
-    void OnExit(wxCommandEvent& event);
-    void OnAbout(wxCommandEvent& event);
-    void OnOpenFile(wxCommandEvent& event);
-    void OnPlayStream(wxCommandEvent& event);
-    void OnStopStream(wxCommandEvent& event);
-    void OnPauseStream(wxCommandEvent& event);
-    void OnSliderUpdate(wxScrollEvent& event);
+    void OnExit( wxCommandEvent& event );
+    void OnAbout( wxCommandEvent& event );
+    void OnPlaylist( wxCommandEvent& event );
+    void OnOpenFile( wxCommandEvent& event );
+    void OnPlayStream( wxCommandEvent& event );
+    void OnStopStream( wxCommandEvent& event );
+    void OnPauseStream( wxCommandEvent& event );
+    void OnSliderUpdate( wxScrollEvent& event );
     void OnPrevStream( wxCommandEvent& event );
     void OnNextStream( wxCommandEvent& event );
 
@@ -114,4 +122,34 @@ private:
 
     Timer *timer;
     intf_thread_t *p_intf;
+};
+
+/* Playlist */
+class Playlist: public wxFrame
+{
+public:
+    /* Constructor */
+    Playlist( intf_thread_t *p_intf, Interface *p_main_interface );
+    virtual ~Playlist();
+    void Rebuild();
+    void Manage();
+
+private:
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnAddUrl( wxCommandEvent& event );
+    void OnAddDirectory( wxCommandEvent& event );
+    void OnClose( wxCommandEvent& event );
+    void OnInvertSelection( wxCommandEvent& event );
+    void OnDeleteSelection( wxCommandEvent& event );
+    void OnSelectAll( wxCommandEvent& event );
+    void OnActivateItem( wxListEvent& event );
+    void OnKeyDown( wxListEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    void DeleteItem( int item );
+    intf_thread_t *p_intf;
+    Interface *p_main_interface;
+    wxListView *listview;
+    wxButton *ok_button;
 };

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.5 2002/11/20 14:24:00 gbazin Exp $
+ * $Id: interface.cpp,v 1.6 2002/11/23 01:32:40 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -74,6 +74,7 @@ enum
     OpenSat_Event,
     EjectDisc_Event,
 
+    Playlist_Event,
     Logs_Event,
 
     Audio_Event,
@@ -97,6 +98,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     /* Menu events */
     EVT_MENU(Exit_Event, Interface::OnExit)
     EVT_MENU(About_Event, Interface::OnAbout)
+    EVT_MENU(Playlist_Event, Interface::OnPlaylist)
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
     /* Toolbar events */
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
@@ -143,8 +145,10 @@ Interface::Interface( intf_thread_t *_p_intf ):
     file_menu->Append( Exit_Event, _("E&xit"), HELP_EXIT );
 
     /* Create our "View" menu */
-#define HELP_LOGS  N_("Show the program logs")
+#define HELP_PLAYLIST   N_("Open the playlist")
+#define HELP_LOGS       N_("Show the program logs")
     wxMenu *view_menu = new wxMenu;
+    view_menu->Append( Playlist_Event, _("&Playlist..."), HELP_PLAYLIST );
     view_menu->Append( Logs_Event, _("&Logs..."), HELP_LOGS );
 
     /* Create our "Settings" menu */
@@ -203,11 +207,18 @@ Interface::Interface( intf_thread_t *_p_intf ):
     toolbar->AddTool( PlayStream_Event, _("Play"), *p_bmp_play, HELP_PLAY );
     toolbar->AddTool( PauseStream_Event, _("Pause"), *p_bmp_pause, HELP_PAUSE);
     toolbar->AddSeparator();
-    toolbar->AddTool( wxID_OPEN, _("Playlist"), *p_bmp_playlist, HELP_PLO );
+    toolbar->AddTool( Playlist_Event, _("Playlist"), *p_bmp_playlist,
+                      HELP_PLO );
     toolbar->AddTool( PrevStream_Event, _("Prev"), *p_bmp_prev, HELP_PLP );
     toolbar->AddTool( NextStream_Event, _("Next"), *p_bmp_next, HELP_PLN );
 
     toolbar->Realize();
+
+    /* Place the toolbar in a sizer, so that the window will stretch
+     * to get its size */
+    wxBoxSizer *toolbar_sizer = new wxBoxSizer( wxVERTICAL );
+    toolbar_sizer->Add( toolbar, 0 );
+    toolbar_sizer->SetSizeHints( this );
 
     /* Create slider */
     wxBoxSizer *slider_sizer = new wxBoxSizer( wxVERTICAL );
@@ -253,14 +264,23 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
     wxString msg;
     msg.Printf( _("This is the about dialog of the VideoLAN Client.\n") );
 
-    wxMessageBox( msg, "About VideoLAN Client",
+    wxMessageBox( msg, _("About VideoLAN Client"),
                   wxOK | wxICON_INFORMATION, this );
+}
+
+void Interface::OnPlaylist( wxCommandEvent& WXUNUSED(event) )
+{
+    /* Show/hide the playlist window */
+    wxFrame *p_playlist_window = p_intf->p_sys->p_playlist_window;
+    if( p_playlist_window )
+    {
+        p_playlist_window->Show( ! p_playlist_window->IsShown() );
+    }
 }
 
 void Interface::OnOpenFile( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, _("Open file"), _(""), _(""),
-                         _("*.*") );
+    wxFileDialog dialog( this, _("Open file"), _(""), _(""), _("*.*") );
 
     if( dialog.ShowModal() == wxID_OK )
     {
@@ -275,6 +295,9 @@ void Interface::OnOpenFile( wxCommandEvent& WXUNUSED(event) )
 
         playlist_Add( p_playlist, (char *)dialog.GetPath().c_str(),
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+
+        /* Rebuild the playlist */
+        p_intf->p_sys->p_playlist_window->Rebuild();
 
         vlc_object_release( p_playlist );
     }
