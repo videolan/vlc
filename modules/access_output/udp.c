@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.12 2003/08/01 19:38:48 fenrir Exp $
+ * $Id: udp.c,v 1.13 2003/08/18 17:30:48 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -95,6 +95,8 @@ typedef struct sout_access_thread_s
     sout_fifo_t *p_fifo;
 
     int         i_handle;
+
+    int64_t     i_caching;
 
 } sout_access_thread_t;
 
@@ -209,6 +211,11 @@ static int Open( vlc_object_t *p_this )
     module_Unneed( p_sys->p_thread, p_network );
 
     p_sys->p_thread->i_handle = socket_desc.i_handle;
+    p_sys->p_thread->i_caching = config_GetInt( p_this, "udp-sout-caching" ) * 1000;
+    if( ( val = sout_cfg_find_value( p_access->p_cfg, "caching" ) ) )
+    {
+        p_sys->p_thread->i_caching = atoll( val ) * 1000;
+    }
     p_sys->i_mtu     = socket_desc.i_mtu;
 
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
@@ -380,11 +387,7 @@ static void ThreadWrite( vlc_object_t *p_this )
 {
     sout_access_thread_t *p_thread = (sout_access_thread_t*)p_this;
     sout_instance_t      *p_sout = p_thread->p_sout;
-    mtime_t              i_pts_delay;
     mtime_t              i_date_last = -1;
-
-    /* Get the i_pts_delay value */
-    i_pts_delay = config_GetInt( p_this, "udp-sout-caching" ) * 1000;
 
     while( ! p_thread->b_die )
     {
@@ -393,7 +396,7 @@ static void ThreadWrite( vlc_object_t *p_this )
 
         p_pk = sout_FifoGet( p_thread->p_fifo );
 
-        i_date = i_pts_delay + p_pk->i_dts;
+        i_date = p_thread->i_caching + p_pk->i_dts;
         if( i_date_last > 0 )
         {
             if( i_date - i_date_last > 2000000 )
