@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1998-2000 Apple Computer, Inc. All rights reserved.
  * Copyright (C) 2001 VideoLAN
- * $Id: DVDioctl.cpp,v 1.4 2001/04/06 09:15:47 sam Exp $
+ * $Id: DVDioctl.cpp,v 1.5 2001/04/17 14:39:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -485,8 +485,8 @@ static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
         case IODVD_REPORT_KEY:
 
             log( LOG_INFO, "DVD ioctl: report key from `%s', "
-                 p_drive->getDeviceTypeName(),
                  "buf %d, class %d, lba %d, agid %d, format %d\n",
+                 p_drive->getDeviceTypeName(),
                  (int)p_data->p_buffer, p_data->i_keyclass, p_data->i_lba,
                  p_data->i_agid, p_data->i_keyformat );
 

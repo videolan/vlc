@@ -203,7 +203,7 @@ show:
 
 
 # ugliest of all, but I have no time to do it -- sam
-snapshot:
+snapshot: Makefile.opts
 	rm -Rf /tmp/vlc-${PROGRAM_VERSION}* /tmp/vlc-${PROGRAM_VERSION}nocss*
 	# copy archive in /tmp
 	find -type d | grep -v CVS | grep -v '\.dep' | while read i ; \
@@ -339,4 +339,5 @@ $(PLUGIN_OBJ): FORCE
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 $(BUILTIN_OBJ): FORCE
 	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:lib/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
+	ranlib $@
 

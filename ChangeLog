@@ -4,7 +4,8 @@
 
 HEAD
 
-  * Nothing yet.
+  * Fixed a compilation issue in the DVDioctl driver.
+  * Added a call to ranlib after a built-in module compilation.
 
 0.2.72
 Mon, 16 Apr 2001 14:33:53 +0200
