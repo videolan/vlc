@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), gettext, fortune-mod, xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt3-dev, libasound2-dev (>=0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs4-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0), libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev, libdvdread2-dev, libslp-dev, libflac-dev (>=1.1.0)
+Build-Depends: debhelper (>=2.2.0), gettext, fortune-mod, xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt3-dev, libasound2-dev (>=0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs4-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev, libdvdread2-dev, libslp-dev, libflac-dev (>=1.1.0)
 Standards-Version: 3.5.6
 
 Package: vlc
@@ -10,7 +10,6 @@ Section: graphics
 Architecture: any
 Depends: ${shlibs:Depends}
 Recommends: vlc-gui
-Depends: vlc-plugin-mad, vlc-plugin-a52
 Suggests: gnome-vlc
 Description: a complete multimedia player
  This is the VideoLAN project's VLC media player. It plays MPEG, MPEG2,
@@ -156,22 +155,11 @@ Depends: qvlc
 Description: legacy package that you should remove
  This package is now called qvlc.
 
-Package: vlc-plugin-mad
-Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Conflicts: vlc-mad (<< 0.5.0)
-Replaces: vlc-mad (<< 0.5.0)
-Provides: mp3-decoder
-Description: MPEG audio codec plugin for VLC
- This plugin adds support for libmad, the MPEG audio decoder library,
- to the VLC media player. It is based on libmad, a 100% fixed-point based
- decoding library. The plugin is autodetected.
-
 Package: vlc-mad
 Architecture: any
-Depends: vlc-plugin-mad
+Depends: vlc
 Description: legacy package that you should remove
- This package is now called vlc-plugin-mad.
+ This package is now included in vlc.
 
 Package: vlc-plugin-arts
 Architecture: any
@@ -221,16 +209,6 @@ Depends: vlc-plugin-aa
 Description: legacy package that you should remove
  This package is now called vlc-plugin-aa.
 
-Package: vlc-plugin-xosd
-Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Conflicts: vlc-xosd (<< 0.5.0)
-Replaces: vlc-xosd (<< 0.5.0)
-Description: X On-Screen Display plugin for VLC
- This is an On-Screen Display plugin for the VLC media player. To
- activate it, use the `--extraintf xosd' flag or select the `xosd'
- extra interface plugin from the preferences menu.
-
 Package: mozilla-plugin-vlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -253,41 +231,13 @@ Description: KDE frontend for VLC
  use the `--intf kde' flag or run the `kvlc' program.
 
 Package: vlc-plugin-svgalib
-Architecture: any
+Architecture: i386
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Description: SVGAlib video output plugin for VLC
  This plugin adds support for SVGAlib to the VLC media player. To
  activate it, use the `--vout svgalib' flag or select the `svgalib' video
  output plugin from the preferences menu. Note that you will need root
  permissions to use SVGAlib.
-
-Package: vlc-plugin-dv
-Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: DV video codec plugin for VLC
- This plugin adds support for the DV video format to the VLC media player.
- The plugin is autodetected.
-
-Package: vlc-plugin-a52
-Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: A-52 (AC-3) audio codec plugin for VLC
- This plugin adds support for the ATSC A-52 (aka. AC-3) audio format to
- the VLC media player. The plugin is autodetected.
-
-Package: vlc-plugin-dvb
-Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: DVB input plugin for VLC
- This plugin adds support for DVB cards to the VLC media player. Note
- that your card needs to be supported by your kernel before VLC can use it.
-
-Package: vlc-plugin-ogg
-Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: Ogg demuxer and Vorbis audio codec plugins for VLC
- These plugins add support for the Ogg bitstream format and the Ogg Vorbis
- compressed audio format to the VLC media player. They are autodetected.
 
 Package: wxvlc
 Architecture: any
