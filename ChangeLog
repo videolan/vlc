@@ -1,3 +1,19 @@
+2003-08-11 Monday 20:48  gbazin
+
+ * modules/stream_out/transcode.c: work around a problem in ffmpeg with mpeg4 encoding.
+
+2003-08-11 Monday 20:19  fenrir
+
+  * copy: removed annoying debug message.
+
+2003-08-11 Monday 20:18  fenrir
+
+  * httpd: added HEAD command support.
+
+2003-08-11 Monday 19:30  gbazin
+
+ * ChangeLog, po/*: preparing for the 0.6.2 release
+
 2003-08-11 Monday 18:52  gbazin
 
  * modules/packetizer/mpegvideo.c: oops, fixed typo.
