@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.102 2003/11/03 22:30:14 fenrir Exp $
+dnl $Id: configure.ac,v 1.103 2003/11/03 23:05:03 fenrir Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1734,14 +1734,6 @@ then
       AX_ADD_BUILTINS([faad])
       AX_ADD_LDFLAGS([faad],[-L${real_faad_tree}/libfaad/.libs -lfaad])
       AX_ADD_CPPFLAGS([faad],[-I${real_faad_tree}/include])
-      CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_faad}"
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_faad}"
-      AC_TRY_COMPILE([#include <faad.h>],
-        [faacDecHandle a; faacDecFrameInfo *b; unsigned char *c;
-         unsigned long d; faacDecDecode(a,b,c,d);],
-        [], [AC_DEFINE(HAVE_OLD_FAAD2, 1, Define if FAAD2 < 1.2)])
-      LDFLAGS="${LDFLAGS_save}"
-      CPPFLAGS="${CPPFLAGS_save}"
     else
       dnl  The given libfaad wasn't built
       AC_MSG_RESULT(no)
@@ -1754,11 +1746,7 @@ then
       [ AC_MSG_ERROR([Cannot find development headers for libfaad...]) ])
     AC_CHECK_LIB(faad, faacDecOpen, [
       AX_ADD_PLUGINS([faad])
-      AX_ADD_LDFLAGS([faad],[-lfaad])
-      AC_TRY_COMPILE([#include <faad.h>],
-        [faacDecHandle a; faacDecFrameInfo *b; unsigned char *c;
-         unsigned long d; faacDecDecode(a,b,c,d);],
-        [], [AC_DEFINE(HAVE_OLD_FAAD2, 1, Define if FAAD2 < 1.2)]) ],
+      AX_ADD_LDFLAGS([faad],[-lfaad]) ],
       [ AC_MSG_ERROR([Cannot find libfaad library...]) ])
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
