@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.15 2003/11/21 09:23:49 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.16 2003/11/25 20:01:08 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -89,7 +89,17 @@ void * E_(__GtkGetIntf)( GtkWidget * widget )
 
 void PlaylistAddItem(GtkWidget *widget, gchar *name)
 {
-    GtkTreeView  *p_tvplaylist = NULL;
+    intf_thread_t *p_intf = GtkGetIntf( widget );
+    playlist_t    *p_playlist;
+    GtkTreeView   *p_tvplaylist = NULL;
+
+    p_playlist = (playlist_t *)
+             vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
+    if( p_playlist ==  NULL)
+    {   /* Bail out when VLC's playlist object is not found. */
+        return;
+    }
 
     /* Add to playlist object. */
     p_tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(widget), "tvPlaylist");
@@ -108,8 +118,25 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name)
                                     0, name,   /* Add path to it !!! */
                                     1, "no info",
                                     -1 );
+
+            msg_Dbg( p_intf, "Adding files to playlist ...");
+            /* Add to VLC's playlist */
+#if 0
+            if (p_intf->p_sys->b_autoplayfile)
+            {
+                playlist_Add( p_playlist, (char*)name, 0, 0,
+                              PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END);
+            }
+            else
+            {
+                playlist_Add( p_playlist, (char*)name, 0, 0,
+                              PLAYLIST_APPEND, PLAYLIST_END );
+            }
+#endif
+            msg_Dbg( p_intf, "done");
         }
     }
+    vlc_object_release(  p_playlist );
 }
 
 void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
@@ -135,39 +162,6 @@ void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 }
-
-#if 0
-void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
-{
-    intf_thread_t *p_intf = GtkGetIntf( widget );
-    playlist_t   *p_playlist;
-
-    p_playlist = (playlist_t *)
-             vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( p_playlist ==  NULL)
-    {
-        return;
-    }
-
-    if( p_playlist )
-    {
-        if (p_intf->p_sys->b_autoplayfile)
-        {
-            playlist_Add( p_playlist, (char*)psz_url, 0, 0,
-                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END);
-        }
-        else
-        {
-            playlist_Add( p_playlist, (char*)psz_url, 0, 0,
-                          PLAYLIST_APPEND, PLAYLIST_END );
-        }
-        vlc_object_release(  p_playlist );
-
-        PlaylistAddItem(GTK_WIDGET(widget), psz_url);
-    }
-}
-#endif
 
 /*****************************************************************
  * Read directory helper function.
@@ -501,57 +495,42 @@ onFileListRow                          (GtkTreeView     *treeview,
         /* This might be a directory selection */
         model = gtk_tree_view_get_model(treeview);
         if (!model)
+        {
             msg_Err(p_intf, "PDA: Filelist model contains a NULL pointer\n" );
-
-        if (path == NULL )
-        {
-#if 0
-            GList* list;
-
-            list = gtk_tree_selection_get_selected_rows(selection,model);
-            if (g_list_length(list) == 1)
-            {
-                filename = (gchar *) g_list_nth_data(list,0);
-                msg_Dbg(p_intf, "PDA: filename = %s", (gchar*) filename );
-                PlaylistAddItem(GTK_WIDGET(treeview), filename);
-            }
-            g_list_foreach (list, gtk_tree_path_free, NULL);
-            g_list_free (list);
-#endif
+            return;
         }
-        else
+        if (!gtk_tree_model_get_iter(model, &iter, path))
         {
-            if (!gtk_tree_model_get_iter(model, &iter, path))
-                msg_Err( p_intf, "PDA: Could not get iter from model" );
+            msg_Err( p_intf, "PDA: Could not get iter from model" );
+            return;
+        }
 
-            gtk_tree_model_get(model, &iter, 0, &filename, -1);
-
-            if (stat((char*)filename, &st)==0)
+        gtk_tree_model_get(model, &iter, 0, &filename, -1);
+        if (stat((char*)filename, &st)==0)
+        {
+            if (S_ISDIR(st.st_mode))
             {
-                if (S_ISDIR(st.st_mode))
-                {
-                    GtkListStore *p_model = NULL;
+                GtkListStore *p_model = NULL;
 
-                    /* Get new directory listing */
-                    p_model = gtk_list_store_new (5,
-                                               G_TYPE_STRING,
-                                               G_TYPE_STRING,
-                                               G_TYPE_UINT64,
-                                               G_TYPE_STRING,
-                                               G_TYPE_STRING);
-                    if (p_model)
-                    {
-                        ReadDirectory(p_intf, p_model, filename);
-
-                        /* Update TreeView with new model */
-                        gtk_tree_view_set_model(treeview, (GtkTreeModel*) p_model);
-                        g_object_unref(p_model);
-                    }
-                }
-                else
+                /* Get new directory listing */
+                p_model = gtk_list_store_new (5,
+                                           G_TYPE_STRING,
+                                           G_TYPE_STRING,
+                                           G_TYPE_UINT64,
+                                           G_TYPE_STRING,
+                                           G_TYPE_STRING);
+                if (p_model)
                 {
-                    gtk_tree_selection_selected_foreach(selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) treeview);
+                    ReadDirectory(p_intf, p_model, filename);
+
+                    /* Update TreeView with new model */
+                    gtk_tree_view_set_model(treeview, (GtkTreeModel*) p_model);
+                    g_object_unref(p_model);
                 }
+            }
+            else
+            {
+                gtk_tree_selection_selected_foreach(selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) treeview);
             }
         }
     }
@@ -570,7 +549,9 @@ onAddFileToPlaylist                    (GtkButton       *button,
     treeview = (GtkTreeView *) lookup_widget( GTK_WIDGET(button), "tvFileList");
     if (treeview)
     {
-        onFileListRow(treeview, NULL, NULL, NULL );
+        GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
+
+        gtk_tree_selection_selected_foreach(selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) treeview);    
     }
 }
 
