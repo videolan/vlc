@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.4 2002/10/01 21:47:25 massiot Exp $
+ * $Id: system.c,v 1.5 2002/10/03 21:45:16 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1291,7 +1291,8 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
             {
                 /* Duplicate packet: mark it as being to be trashed. */
                 msg_Warn( p_input,
-                          "duplicate packet received by TS demux" );
+                          "duplicate packet received by TS demux (%d)",
+                          i_dummy );
                 b_trash = 1;
             }
             else if( p_es_demux->i_continuity_counter == 0xFF )

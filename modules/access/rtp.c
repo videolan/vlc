@@ -2,9 +2,9 @@
  * rtp.c: RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rtp.c,v 1.3 2002/10/03 20:49:31 jpsaman Exp $
+ * $Id: rtp.c,v 1.4 2002/10/03 21:45:16 massiot Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ * Authors: Tristan Leteurtre <tooney@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,14 +40,20 @@
 #   include <io.h>
 #endif
 
+#ifdef HAVE_ALLOCA_H
+#   include <alloca.h>
+#endif
+
 #include "network.h"
 
 #define RTP_HEADER_LEN 12
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Open       ( vlc_object_t * );
-static int  RTPNetworkRead( input_thread_t *, byte_t *, size_t );
+static ssize_t RTPNetworkRead( input_thread_t *, byte_t *, size_t );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -259,25 +265,24 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * RTPNetworkRead : Read for the network, and parses the RTP header
  *****************************************************************************/
-static int RTPNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
+static ssize_t RTPNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
 	                   size_t i_len	)
 {
     int         i_rtp_version;
     int         i_CSRC_count;
     int         i_payload_type;
-    int         i;
     
-    byte_t 	p_tmp_buffer[1500];
-    
-    // Get the Raw data from the socket
-    // We first assume that RTP header size is the classic RTP_HEADER_LEN
-    ssize_t i_ret = input_FDNetworkRead(p_input, p_tmp_buffer,
-		                        i_len + RTP_HEADER_LEN);
-    
+    byte_t *    p_tmp_buffer = alloca( p_input->i_mtu );
+
+    /* Get the raw data from the socket.
+     * We first assume that RTP header size is the classic RTP_HEADER_LEN. */
+    ssize_t i_ret = input_FDNetworkRead( p_input, p_tmp_buffer,
+		                         p_input->i_mtu );
+
     if (!i_ret) return 0;
-	     
-    // Parse the header and make some verifications
-    // See RFC 1889 & RFC 2250
+     
+    /* Parse the header and make some verifications.
+     * See RFC 1889 & RFC 2250. */
   
     i_rtp_version  = ( p_tmp_buffer[0] & 0xC0 ) >> 6;
     i_CSRC_count   = ( p_tmp_buffer[0] & 0x0F );
@@ -287,45 +292,22 @@ static int RTPNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
         msg_Dbg( p_input, "RTP version is %u, should be 2", i_rtp_version );
   
     if ( i_payload_type != 33 )
-        msg_Dbg( p_input, "RTP payload type is %u, only 33 (Mpeg2-TS) \
-is supported", i_payload_type );
+        msg_Dbg( p_input, "RTP payload type is %u, only 33 (Mpeg2-TS) " \
+                 "is supported", i_payload_type );
  
-    // If both bytes are wrong, maybe a synchro error occurred...
-    if (( i_rtp_version != 2 ) && ( i_payload_type != 33 ))
-    {
-         msg_Dbg( p_input, "Too many RTP errors, trying to re-synchronize" );
- 
-        //Trying to re-synchronize
-	for ( i=0 ; (i<i_len) ||
-                    ((( p_tmp_buffer[0] & 0xC0 ) >> 6 == 2 )
-                     && ( p_tmp_buffer[1] & 0x7F ) == 33 ) ; i++);
-
-	if (i!=i_len)
-	{
-	   input_FDNetworkRead(p_input, p_tmp_buffer,i);
-	   return 0;
-	}
-		
-    }
-
-/*    
-    // if i_CSRC_count != 0, the header is in fact longer than RTP_HEADER_LEN
-    // so we have to read some extra bytes 
-    // This case is supposed to be very rare (vls does not handle that),
-    //  so in practical this second input_FDNetworkRead is never done...
-    if (i_CSRC_count)
-    {    i_ret += input_FDNetworkRead(p_input,
-                                      p_tmp_buffer + i_len + RTP_HEADER_LEN,
-                                      4 * i_CSRC_count ); 
-    }
-*/
-    
-    // Return the packet without the RTP header
+    /* Return the packet without the RTP header. */
     i_ret -= ( RTP_HEADER_LEN + 4 * i_CSRC_count );
+
+    if ( i_ret > i_len )
+    {
+        /* This should NOT happen. */
+        msg_Warn( p_input, "RTP input trashing %d bytes", i_ret - i_len );
+        i_ret = i_len;
+    }
 
     p_input->p_vlc->pf_memcpy( p_buffer, 
                        p_tmp_buffer + RTP_HEADER_LEN + 4 * i_CSRC_count,
                        i_ret );
     
-    return (i_ret);
+    return i_ret;
 }
