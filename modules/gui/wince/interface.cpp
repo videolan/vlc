@@ -668,10 +668,14 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
 
     case WM_INITMENUPOPUP:
-        RefreshSettingsMenu( p_intf, menu_settings );
-        RefreshAudioMenu( p_intf, menu_audio );
-        RefreshVideoMenu( p_intf, menu_video );
-        RefreshNavigMenu( p_intf, menu_navigation );
+        if( (HMENU)wp == menu_settings )
+            RefreshSettingsMenu( p_intf, menu_settings );
+        if( (HMENU)wp == menu_audio )
+            RefreshAudioMenu( p_intf, menu_audio );
+        if( (HMENU)wp == menu_video )
+            RefreshVideoMenu( p_intf, menu_video );
+        if( (HMENU)wp == menu_navigation )
+            RefreshNavigMenu( p_intf, menu_navigation );
         /* Fall through */
 
     case WM_ENTERMENULOOP:
