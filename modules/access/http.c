@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.54 2004/01/14 15:40:57 fenrir Exp $
+ * $Id: http.c,v 1.55 2004/01/15 12:55:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -228,7 +228,8 @@ static int  Open ( vlc_object_t *p_this )
         /* Retry with http 1.0 */
         p_sys->i_version = 0;
 
-        if( Connect( p_input, &p_input->stream.b_seekable, &p_input->stream.p_selected_area->i_size, 0 ) )
+        if( p_input->b_die ||
+            Connect( p_input, &p_input->stream.b_seekable, &p_input->stream.p_selected_area->i_size, 0 ) )
         {
             goto error;
         }
