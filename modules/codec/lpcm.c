@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.11 2003/02/11 11:16:04 massiot Exp $
+ * $Id: lpcm.c,v 1.12 2003/03/03 14:19:09 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -202,12 +202,14 @@ static void DecodeFrame( dec_thread_t * p_dec )
         i_rate = 48000;
         break;
     case 1:
+        i_rate = 96000;
+        break;
+    case 2:
+        i_rate = 44100;
+        break;
+    case 3:
         i_rate = 32000;
         break;
-    default:
-        msg_Err( p_dec->p_fifo, "unsupported LPCM rate (0x%x)", i_header );
-        p_dec->p_fifo->b_error = 1;
-        return;
     }
 
     switch ( i_header & 0x7 )

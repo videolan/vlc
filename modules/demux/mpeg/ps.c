@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.7 2002/12/06 16:34:07 sam Exp $
+ * $Id: ps.c,v 1.8 2003/03/03 14:19:09 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -95,7 +95,7 @@ static int Activate( vlc_object_t * p_this )
         if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "ps", 3 ) )
         {
             /* User forced */
-            msg_Err( p_input, "this does not look like an MPEG PS stream, continuing" );
+            msg_Warn( p_input, "this does not look like an MPEG PS stream, continuing" );
         }
         else
         {
