@@ -741,3 +741,4 @@ void __fastcall TMainFrameDlg::CreatePreferences( AnsiString Name )
 }
 //---------------------------------------------------------------------------
 
+

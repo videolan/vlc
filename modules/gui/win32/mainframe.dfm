@@ -2558,6 +2558,7 @@ object MainFrameDlg: TMainFrameDlg
       Enabled = False
       Hint = 'Pause stream'
       ImageIndex = 6
+      ShortCut = 32
       OnExecute = PauseActionExecute
     end
     object StopAction: TAction
@@ -2663,7 +2664,7 @@ object MainFrameDlg: TMainFrameDlg
       Category = 'Menu'
       Caption = 'Messages...'
       Hint = 'Open the messages window'
-      ShortCut = 16461
+      ShortCut = 16460
       OnExecute = MessagesActionExecute
     end
     object AboutAction: TAction
@@ -2722,6 +2723,7 @@ object MainFrameDlg: TMainFrameDlg
       Category = 'Control'
       Caption = '&Mute'
       Hint = 'Toggle mute'
+      ShortCut = 16461
       OnExecute = MuteActionExecute
     end
     object OnTopAction: TAction
