@@ -388,14 +388,14 @@ static void RunThread ( playlist_t *p_playlist )
                                           p_autodelete_item->input.psz_uri, 0);
 
                     vlc_mutex_unlock( &p_playlist->object_lock );
+                    p_playlist->i_status = PLAYLIST_STOPPED;
                     playlist_Delete( p_playlist, p_playlist->i_index );
                     p_playlist->i_status = PLAYLIST_RUNNING;
+                    vlc_mutex_lock( &p_playlist->object_lock );
                 }
-                else
-                {
-                    SkipItem( p_playlist, 1 );
-                    vlc_mutex_unlock( &p_playlist->object_lock );
-                }
+
+                SkipItem( p_playlist, 1 );
+                vlc_mutex_unlock( &p_playlist->object_lock );
                 continue;
             }
             else if( p_playlist->p_input->i_state != INIT_S )
