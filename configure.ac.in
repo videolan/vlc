@@ -1625,9 +1625,9 @@ then
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_xvid}"
     AC_CHECK_HEADERS(xvid.h, ,
       [ AC_MSG_ERROR([Cannot find development headers for libxvidcore...]) ])
-    AC_CHECK_LIB(xvid, xvid_init, [
+    AC_CHECK_LIB(xvidcore, xvid_init, [
       PLUGINS="${PLUGINS} xvid"
-      LDFLAGS_xvid="${LDFLAGS_xvid} -lxvid" ],
+      LDFLAGS_xvid="${LDFLAGS_xvid} -lxvidcore" ],
       [ AC_MSG_ERROR([Cannot find libxvidcore library...]) ])
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
