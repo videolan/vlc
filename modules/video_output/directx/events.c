@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.18 2003/07/18 11:39:39 gbazin Exp $
+ * $Id: events.c,v 1.19 2003/07/25 11:37:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -176,6 +176,7 @@ void DirectXEventThread( event_thread_t *p_event )
                 if( p_playlist != NULL )
                 {
                     vlc_value_t val;
+                    val.b_bool = VLC_TRUE; /* make compiler happy */
                     var_Set( p_playlist, "intf-popupmenu", val );
                     vlc_object_release( p_playlist );
                 }
@@ -666,7 +667,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
                                            FIND_ANYWHERE );
         if( p_playlist == NULL )
         {
-            return;
+            return 0;
         }
 
         playlist_Stop( p_playlist );

@@ -690,7 +690,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_basic_skins"=.\plugin_basic_skins.dsp - Package Owner=<4>
+Project: "plugin_skins"=.\plugin_skins.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
