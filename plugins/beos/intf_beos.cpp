@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.28 2001/05/07 04:42:42 sam Exp $
+ * $Id: intf_beos.cpp,v 1.29 2001/05/10 06:47:31 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -272,15 +272,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         break;
 
     case OPEN_DVD:
-        const char **ppsz_device;
+        const char *psz_device;
         char psz_method[ B_FILE_NAME_LENGTH + 4 ];
-
-        if( p_message->FindString("device", ppsz_device) != B_ERROR )
+        if( p_message->FindString("device", &psz_device) != B_ERROR )
         {
             snprintf( psz_method, B_FILE_NAME_LENGTH + 4,
-                      "dvd:%s", *ppsz_device );
-            psz_method[ B_FILE_NAME_LENGTH + 4 - 1 ] = '\0';
-
+                      "dvd:%s", psz_device );
+            psz_method[ strlen(psz_method) ] = '\0';
             intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_method );
         }
         break;

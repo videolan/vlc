@@ -2,7 +2,7 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.27 2001/05/07 03:14:09 stef Exp $
+ * $Id: gnome_callbacks.c,v 1.28 2001/05/10 06:47:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -182,7 +182,8 @@ on_button_title_prev_clicked           (GtkButton       *button,
     p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
     i_id = p_intf->p_input->stream.p_selected_area->i_id - 1;
 
-    if( i_id >= 0 )
+    /* Disallow area 0 since it is used for video_ts.vob */
+    if( i_id > 0 )
     {
         p_area = p_intf->p_input->stream.pp_areas[i_id];
         p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
@@ -990,14 +991,10 @@ on_popup_navigation_toggle             (GtkCheckMenuItem     *menuitem,
         !p_intf->p_sys->b_title_update &&
         !p_intf->p_sys->b_chapter_update )
     {
-        input_area_t *  p_area;
-        gint            i_title;
-        gint            i_chapter;
+        input_area_t   *p_area = p_intf->p_input->stream.p_selected_area;
 
-        i_title   = (gint)(user_data) / 100;
-        i_chapter = (gint)(user_data) - ( 100 * i_title );
-        p_area = p_intf->p_input->stream.p_selected_area;
-
+        gint i_title   = DATA2TITLE( user_data );
+        gint i_chapter = DATA2CHAPTER( user_data );
 
         if( p_area != p_intf->p_input->stream.pp_areas[i_title] )
         {

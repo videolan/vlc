@@ -2,7 +2,7 @@
  * intf_gnome.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.h,v 1.10 2001/05/06 18:32:30 stef Exp $
+ * $Id: intf_gnome.h,v 1.11 2001/05/10 06:47:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,6 +41,13 @@
 #define GNOME_MENU_LABEL_SIZE 64
 
 /*****************************************************************************
+ * Convert user_data structures to title and chapter information
+ *****************************************************************************/
+#define DATA2TITLE( user_data )    ( (gint)(user_data) >> 16 )
+#define DATA2CHAPTER( user_data )  ( (gint)(user_data) & 0xffff )
+#define POS2DATA( title, chapter ) ( ((title) << 16) | ((chapter) & 0xffff) )
+
+/*****************************************************************************
  * Inline function to retrieve the interface structure
  *****************************************************************************/
 static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
@@ -48,9 +55,6 @@ static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
     return( gtk_object_get_data( GTK_OBJECT( lookup_widget(item, psz_parent) ),
                                  "p_intf" ) );
 }
-
-
-
 
 /*****************************************************************************
  * intf_sys_t: description and status of Gnome interface
@@ -105,3 +109,4 @@ typedef struct intf_sys_s
     void             ( *pf_gdk_callback ) ( void );
 
 } intf_sys_t;
+

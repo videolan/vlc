@@ -2,7 +2,7 @@
  * spu_decoder.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spu_decoder.h,v 1.8 2001/05/07 04:42:42 sam Exp $
+ * $Id: spu_decoder.h,v 1.9 2001/05/10 06:47:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,9 +48,13 @@ typedef struct spudec_thread_s
      * Private properties
      */
     mtime_t             i_pts;                     /* presentation timestamp */
+
+ //   subpicture_t *      p_spu;
     int                 i_spu_size;            /* size of current SPU packet */
+
     int                 i_rle_size;                  /* size of the RLE part */
-    subpicture_t *      p_spu;
+    int                 i_skipped_top;                  /* skipped RLE lines */
+    int                 i_skipped_bottom;
 
 } spudec_thread_t;
 

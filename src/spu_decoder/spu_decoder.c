@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.43 2001/05/08 20:38:25 sam Exp $
+ * $Id: spu_decoder.c,v 1.44 2001/05/10 06:47:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -60,7 +60,7 @@ static void EndThread   ( spudec_thread_t * );
 static int  SyncPacket           ( spudec_thread_t * );
 static void ParsePacket          ( spudec_thread_t * );
 static int  ParseControlSequences( spudec_thread_t *, subpicture_t * );
-static int  ParseRLE             ( u8 *,              subpicture_t * );
+static int  ParseRLE             ( spudec_thread_t *, subpicture_t *, u8 * );
 
 /*****************************************************************************
  * spudec_CreateThread: create a spu decoder thread
@@ -250,7 +250,8 @@ static int SyncPacket( spudec_thread_t *p_spudec )
     p_spudec->i_rle_size = ShowBits( &p_spudec->bit_stream, 16 ) - 4;
 
     /* If the values we got are a bit strange, skip packet */
-    if( p_spudec->i_rle_size >= p_spudec->i_spu_size )
+    if( !p_spudec->i_spu_size
+         || ( p_spudec->i_rle_size >= p_spudec->i_spu_size ) )
     {
         return( 1 );
     }
@@ -324,7 +325,9 @@ static void ParsePacket( spudec_thread_t *p_spudec )
         return;
     }
 
-    if( ParseRLE( p_src, p_spu ) )
+    p_spudec->i_skipped_top = p_spudec->i_skipped_bottom = 0;
+
+    if( ParseRLE( p_spudec, p_spu, p_src ) )
     {
         /* There was a parse error, delete the subpicture */
         free( p_src );
@@ -334,7 +337,18 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 
     intf_WarnMsg( 3, "spudec: valid subtitle, size: %ix%i, position: %i,%i",
                   p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
-                     
+
+    /* Crop if necessary */
+    if( p_spudec->i_skipped_top || p_spudec->i_skipped_bottom )
+    {
+        p_spu->i_y += p_spudec->i_skipped_top;
+        p_spu->i_height -= p_spudec->i_skipped_top
+                            + p_spudec->i_skipped_bottom;
+
+        intf_WarnMsg( 3, "spudec: cropped to: %ix%i, position: %i,%i",
+                      p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
+    }
+
     intf_WarnMsg( 3, "spudec: total size: 0x%x, RLE offsets: 0x%x 0x%x",
                   p_spudec->i_spu_size,
                   p_spu->type.spu.i_offset[0], p_spu->type.spu.i_offset[1] );
@@ -366,6 +380,9 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
     u8  i_command;
     int i_date;
 
+    /* XXX: temporary variables */
+    boolean_t b_force_display = 0;
+
     /* Initialize the structure */
     p_spu->i_start = p_spu->i_stop = 0;
     p_spu->b_ephemer = 0;
@@ -392,9 +409,7 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_FORCE_DISPLAY:
 
                     /* 00 (force displaying) */
-                    intf_ErrMsg( "spudec: \"force display\" command" );
-                    intf_ErrMsg( "spudec: send mail to <sam@zoy.org> if you "
-                                         "want to help debugging this" );
+                    b_force_display = 1;
  
                     break;
  
@@ -527,6 +542,13 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
             break;
     }
 
+    if( b_force_display )
+    {
+        intf_ErrMsg( "spudec: \"force display\" command" );
+        intf_ErrMsg( "spudec: send mail to <sam@zoy.org> if you "
+                     "want to help debugging this" );
+    }
+
     /* Successfully parsed ! */
     return( 0 );
 }
@@ -538,7 +560,8 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
  * convenient structure for later decoding. For more information on the
  * subtitles format, see http://sam.zoy.org/doc/dvd/subtitles/index.html
  *****************************************************************************/
-static int ParseRLE( u8 *p_src, subpicture_t * p_spu )
+static int ParseRLE( spudec_thread_t *p_spudec,
+                     subpicture_t * p_spu, u8 * p_src )
 {
     unsigned int i_code;
 
@@ -552,6 +575,12 @@ static int ParseRLE( u8 *p_src, subpicture_t * p_spu )
     unsigned int  i_id = 0;                   /* Start on the even SPU layer */
     unsigned int  pi_table[ 2 ];
     unsigned int *pi_offset;
+
+    boolean_t b_empty_top = 1,
+              b_empty_bottom = 0;
+
+    /* XXX: temporary variables */
+    boolean_t b_padding_bytes = 0;
 
     pi_table[ 0 ] = p_spu->type.spu.i_offset[ 0 ] << 1;
     pi_table[ 1 ] = p_spu->type.spu.i_offset[ 1 ] << 1;
@@ -604,8 +633,33 @@ static int ParseRLE( u8 *p_src, subpicture_t * p_spu )
                 return( 1 );
             }
 
-            /* We got a valid code, store it */
-            *p_dest++ = i_code;
+            if( i_code == (i_width << 2) )
+            {
+                if( b_empty_top )
+                {
+                    /* This is a blank top line, we skip it */
+                    p_spudec->i_skipped_top++;
+                }
+                else
+                {
+                    /* We can't be sure the current lines will be skipped,
+                     * so we store the code just in case. */
+                    *p_dest++ = i_code;
+
+                    b_empty_bottom = 1;
+                    p_spudec->i_skipped_bottom++;
+                }
+            }
+            else
+            {
+                /* We got a valid code, store it */
+                *p_dest++ = i_code;
+
+                /* Valid code means no blank line */
+                b_empty_top = 0;
+                b_empty_bottom = 0;
+                p_spudec->i_skipped_bottom = 0;
+            }
         }
 
         /* Check that we didn't go too far */
@@ -629,8 +683,16 @@ static int ParseRLE( u8 *p_src, subpicture_t * p_spu )
     /* FIXME: we shouldn't need these padding bytes */
     while( i_y < i_height )
     {
+        b_padding_bytes = 1;
         *p_dest++ = i_width << 2;
         i_y++;
+    }
+
+    if( b_padding_bytes )
+    {
+        intf_ErrMsg( "spudec: padding bytes found in RLE sequence" );
+        intf_ErrMsg( "spudec: send mail to <sam@zoy.org> if you "
+                     "want to help debugging this" );
     }
 
     return( 0 );

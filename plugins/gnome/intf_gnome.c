@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.37 2001/05/07 03:14:09 stef Exp $
+ * $Id: intf_gnome.c,v 1.38 2001/05/10 06:47:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -439,7 +439,7 @@ static gint GnomeRadioMenu( intf_thread_t * p_intf,
             }
 
             snprintf( psz_name, GNOME_MENU_LABEL_SIZE,
-                      "%d - %d", i_item + 1, i_item + 10);
+                      "Chapters %d to %d", i_item + 1, i_item + 10);
             psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
             p_item_group = gtk_menu_item_new_with_label( psz_name );
             gtk_widget_show( p_item_group );
@@ -782,7 +782,7 @@ static gint GnomeTitleMenu( gpointer       p_data,
                 gtk_signal_connect( GTK_OBJECT( p_item ),
                            "toggled",
                            GTK_SIGNAL_FUNC( pf_toggle ),
-                           (gpointer)( ( i_title * 100 ) + ( i_chapter + 1) ) );
+                           (gpointer)POS2DATA( i_title, i_chapter + 1) );
 
                 if( i_chapter_nb > 20 )
                 {
