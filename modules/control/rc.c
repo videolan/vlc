@@ -95,7 +95,6 @@ struct intf_sys_t
     int i_socket_listen;
     int i_socket;
     char *psz_unix_path;
-    vlc_bool_t b_extend;
 
 #ifdef WIN32
     HANDLE hConsoleIn;
@@ -136,8 +135,6 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 #define HOST_TEXT N_("TCP command input")
 #define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
             "You can set the address and port the interface will bind to." )
-#define EXTEND_TEXT N_("Extended help")
-#define EXTEND_LONGTEXT N_("List additional commands.")
 
 #ifdef WIN32
 #define QUIET_TEXT N_("Do not open a DOS command box interface")
@@ -163,7 +160,6 @@ vlc_module_begin();
 #ifdef WIN32
     add_bool( "rc-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
 #endif
-    add_bool( "rc-extend", 0, NULL, EXTEND_TEXT, EXTEND_LONGTEXT, VLC_FALSE );
 
     set_capability( "interface", 20 );
     set_callbacks( Activate, Deactivate );
@@ -328,6 +324,7 @@ static void Run( intf_thread_t *p_intf )
 
     char       p_buffer[ MAX_LINE_LENGTH + 1 ];
     vlc_bool_t b_showpos = config_GetInt( p_intf, "rc-show-pos" );
+    vlc_bool_t b_longhelp = VLC_FALSE;
 
     int        i_size = 0;
     int        i_oldpos = 0;
@@ -337,7 +334,6 @@ static void Run( intf_thread_t *p_intf )
     p_input = NULL;
     p_playlist = NULL;
  
-    p_intf->p_sys->b_extend = config_GetInt( p_intf, "rc-extend" );
     /* Register commands that will be cleaned up upon object destruction */
     var_Create( p_intf, "quit", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "quit", Quit, NULL );
@@ -663,32 +659,13 @@ static void Run( intf_thread_t *p_intf )
                 msg_rc( "%s\n", p_input->input.p_item->psz_name );
             }
         }
-        else switch( psz_cmd[0] )
+        else if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "h", 1 )
+                 || !strncmp( psz_cmd, "H", 1 ) || !strncmp( psz_cmd, "?", 1 ) )
         {
-        case 'f':
-        case 'F':
-            if( p_input )
-            {
-                vout_thread_t *p_vout;
-                p_vout = vlc_object_find( p_input,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
-
-                if( p_vout )
-                {
-                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                    vlc_object_release( p_vout );
-                }
-            }
-            break;
-
-        case 's':
-        case 'S':
-            ;
-            break;
-
-        case '?':
-        case 'h':
-        case 'H':
+            if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "H", 1 ) )
+                 b_longhelp = VLC_TRUE;
+            else b_longhelp = VLC_FALSE;
+            
             msg_rc(_("+----[ Remote control commands ]\n"));
             msg_rc(  "| \n");
             msg_rc(_("| add XYZ  . . . . . . . . . . add XYZ to playlist\n"));
@@ -719,7 +696,7 @@ static void Run( intf_thread_t *p_intf )
             msg_rc(_("| achan [X]. . . . . . . .  set/get audio channels\n"));
             msg_rc(  "| \n");
             
-            if (p_intf->p_sys->b_extend)
+            if (b_longhelp)
             {
                 msg_rc(_("| marq-marquee STRING  . . overlay STRING in video\n"));
                 msg_rc(_("| marq-x X . . . . . . . . . . . .offset from left\n"));
@@ -758,10 +735,33 @@ static void Run( intf_thread_t *p_intf )
                 msg_rc(  "| \n");
             }    
             msg_rc(_("| help . . . . . . . . . . . . . this help message\n"));
+            msg_rc(_("| longhelp . . . . . . . . . a longer help message\n"));
             msg_rc(_("| logout . . . . .  exit (if in socket connection)\n"));
             msg_rc(_("| quit . . . . . . . . . . . . . . . . .  quit vlc\n"));
             msg_rc(  "| \n");
             msg_rc(_("+----[ end of help ]\n"));
+        }
+        else switch( psz_cmd[0] )
+        {
+        case 'f':
+        case 'F':
+            if( p_input )
+            {
+                vout_thread_t *p_vout;
+                p_vout = vlc_object_find( p_input,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
+
+                if( p_vout )
+                {
+                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                    vlc_object_release( p_vout );
+                }
+            }
+            break;
+
+        case 's':
+        case 'S':
+            ;
             break;
 
         case '\0':
