@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.14 2002/07/15 22:20:47 jlj Exp $
+ * $Id: http.c,v 1.15 2002/07/15 23:05:46 jlj Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -449,6 +449,10 @@ static int HTTPOpen( input_thread_t * p_input )
  *****************************************************************************/
 static void HTTPClose( input_thread_t * p_input )
 {
+    _input_socket_t * p_access_data = 
+        (_input_socket_t *)p_input->p_access_data;
+
+    free( p_access_data->psz_name );
     input_FDNetworkClose( p_input );
 }
 
