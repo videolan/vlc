@@ -152,6 +152,9 @@ file depends on the Operating System you are running: </para>
 <listitem><para>Unices (Linux, etc.):
 <filename>$(HOME)/.vlc/vlcrc</filename></para></listitem>
 
+<listitem><para>Mac OS X: <filename>/Library/Preferences/VLC</filename>
+</para></listitem>
+
 <listitem><para>Windows: <filename>Application Data\vlc\vlcrc</filename>
 (Application Data is usually in <filename>C:\Documents and
 Settings\your_name</filename></para></listitem>
