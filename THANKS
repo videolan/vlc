@@ -9,6 +9,7 @@ Michel Lespinasse <walken@zoy.org> - AC3 decoder, MPEG audio and video decoders
 The VideoLAN team would like to thank the following contributors:
 
 André de Barros Martins Ribeiro <andrerib@ajato.com.br> - Brazilian portuguese localization
+Andre Pang <adre.pang at csiro dot au> - Annodex support
 Andres Krapf <dae@via.ecp.fr> - FreeBSD port and tests, KDE interface
 Andy Lindsay <andy_vl@ananam.com> - fixes in the TS demux
 Arkadiusz Lipiec <A.Lipiec@elka.pw.edu.pl> - Polish translation
