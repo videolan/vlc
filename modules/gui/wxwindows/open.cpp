@@ -679,7 +679,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
 
       switch ( i_disc_type_selection )
         {
-        case 0:
+	case 0: /* DVD with menues */
           disc_chapter->Enable();
           disc_chapter_label->Enable();
           mrltemp = wxT("dvd://")
@@ -688,7 +688,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
                                       disc_title->GetValue(),
                                       disc_chapter->GetValue() );
           break;
-        case 1:
+
+	case 1: /* DVD of some sort */
           disc_chapter->Enable();
           disc_chapter_label->Enable();
           mrltemp = wxT("dvdsimple://")
@@ -697,9 +698,16 @@ void OpenDialog::UpdateMRL( int i_access_method )
                                       disc_title->GetValue(),
                                       disc_chapter->GetValue() );
           break;
-        case 2:
-          disc_chapter->Disable();
-          disc_chapter_label->Disable();
+
+	case 2:  /* VCD of some sort */
+	  {
+	    /* The chapter object is used for subtitles */
+
+	    int i_subtitle = disc_chapter->GetValue();
+	    config_PutInt( p_intf, "spu-channel", i_subtitle );
+	    
+	    disc_chapter->Enable();
+	    disc_chapter_label->Enable();
 #ifdef HAVE_VCDX
           if ( disc_title->GetValue() )
             mrltemp = wxT("vcdx://")
@@ -711,15 +719,18 @@ void OpenDialog::UpdateMRL( int i_access_method )
                                   );
           else
             mrltemp = wxT("vcdx://")
-                  + disc_device->GetValue();
+	      + disc_device->GetValue();
 #else
           mrltemp = wxT("vcd://")
-                  + disc_device->GetValue()
-                  + wxString::Format( wxT("@%d"),
-                                      disc_title->GetValue() );
+	    + disc_device->GetValue()
+	    + wxString::Format( wxT("@%d"),
+				disc_title->GetValue() );
 #endif
           break;
-        case 3:
+	  }
+	  
+
+	case 3: /* CD-DA */
           disc_chapter->Disable();
           disc_chapter_label->Disable();
 #ifdef HAVE_CDDAX
@@ -1050,6 +1061,11 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         }
         disc_title->SetRange( i_selection, 255 );
         disc_title->SetValue( i_selection );
+
+	disc_chapter->SetRange( 1, 255 );
+	disc_chapter->SetValue( 1 );
+	disc_chapter_label->SetLabel ( wxU(_("Chapter")) );
+
         break;
 
     case 2:  /* VCD of some sort */
@@ -1079,6 +1095,11 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_title->SetRange( 1, 98 );
 #endif
         disc_title->SetValue( i_selection );
+
+	/* We use the chapter to set subtitle number */
+        disc_chapter_label->SetLabel ( wxU(_("Subtitle")) );
+        disc_chapter->SetRange( -1, 4 );
+        disc_chapter->SetValue( config_GetInt( p_intf, "spu-channel" ) );
         break;
 
     case 3: /* CD-DA */
@@ -1105,9 +1126,6 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
     }
 
     if( psz_device ) free( psz_device );
-
-    disc_chapter->SetRange( 1, 255 );
-    disc_chapter->SetValue( 1 );
 
     UpdateMRL( DISC_ACCESS );
 }
