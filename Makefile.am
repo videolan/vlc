@@ -558,6 +558,7 @@ package-win32-base:
 	cp "$(srcdir)/install-win32" "$(srcdir)/vlc-${VERSION}/nsi"
 # Copy relevant files
 	cp "$(top_builddir)/vlc$(EXEEXT)" "$(srcdir)/vlc-${VERSION}/"
+	cp "$(top_builddir)/vlc$(EXEEXT).manifest" "$(srcdir)/vlc-${VERSION}/"
 	$(STRIP) "$(srcdir)/vlc-${VERSION}/vlc$(EXEEXT)"
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
 	  do cp "$(srcdir)/$$file" "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; \

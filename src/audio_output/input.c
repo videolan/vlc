@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.41 2003/12/17 23:21:15 hartman Exp $
+ * $Id: input.c,v 1.42 2003/12/20 22:57:36 babal Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,15 +39,20 @@
 
 static int VisualizationCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
+static aout_filter_t * allocateUserChannelMixer( aout_instance_t *,
+                                                 audio_sample_format_t *,
+                                                 audio_sample_format_t * );
 
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
 int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 {
-    audio_sample_format_t intermediate_format;
+    audio_sample_format_t user_filter_format;
+    audio_sample_format_t intermediate_format;/* input of resampler */
     vlc_value_t val, text;
     char * psz_filters;
+    aout_filter_t * p_user_channel_mixer;
 
     aout_FormatPrint( p_aout, "input", &p_input->input );
 
@@ -60,11 +65,28 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             sizeof(audio_sample_format_t) );
     intermediate_format.i_rate = p_input->input.i_rate;
 
+    /* Try to use the channel mixer chosen by the user */
+    memcpy ( &user_filter_format, &intermediate_format,
+             sizeof(audio_sample_format_t) );
+    user_filter_format.i_physical_channels = p_input->input.i_physical_channels;
+    user_filter_format.i_original_channels = p_input->input.i_original_channels;
+    user_filter_format.i_bytes_per_frame = user_filter_format.i_bytes_per_frame
+                              * aout_FormatNbChannels( &user_filter_format )
+                              / aout_FormatNbChannels( &intermediate_format );
+    p_user_channel_mixer = allocateUserChannelMixer( p_aout, &user_filter_format,
+                                                   &intermediate_format );
+    /* If it failed, let the main pipeline do channel mixing */
+    if ( ! p_user_channel_mixer )
+    {
+        memcpy ( &user_filter_format, &intermediate_format,
+                 sizeof(audio_sample_format_t) );
+    }
+
     /* Create filters. */
     if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
                                      &p_input->i_nb_filters,
                                      &p_input->input,
-                                     &intermediate_format
+                                     &user_filter_format
                                      ) < 0 )
     {
         msg_Err( p_aout, "couldn't set an input pipeline" );
@@ -112,15 +134,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     {
         char *psz_parser = psz_filters;
         char *psz_next;
-        audio_sample_format_t format_in, format_out;
-
-        memcpy( &format_in, &p_aout->mixer.mixer,
-                sizeof( audio_sample_format_t ) );
-        memcpy( &format_out,&p_aout->mixer.mixer,
-                sizeof( audio_sample_format_t ) );
-
-        format_in.i_rate  = p_input->input.i_rate;
-        format_out.i_rate = p_input->input.i_rate;
 
         while( psz_parser && *psz_parser )
         {
@@ -158,9 +171,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             }
 
             vlc_object_attach( p_filter , p_aout );
-            memcpy( &p_filter->input, &format_in,
+            memcpy( &p_filter->input, &user_filter_format,
                     sizeof(audio_sample_format_t) );
-            memcpy( &p_filter->output, &format_out,
+            memcpy( &p_filter->output, &user_filter_format,
                     sizeof(audio_sample_format_t) );
 
             p_filter->p_module =
@@ -186,6 +199,12 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         }
     }
     if( psz_filters ) free( psz_filters );
+
+    /* Attach the user channel mixer */
+    if ( p_user_channel_mixer )
+    {
+        p_input->pp_filters[p_input->i_nb_filters++] = p_user_channel_mixer;
+    }
 
     /* Prepare hints for the buffer allocator. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
@@ -475,4 +494,49 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
     aout_Restart( p_aout );
 
     return VLC_SUCCESS;
+}
+
+static aout_filter_t * allocateUserChannelMixer( aout_instance_t * p_aout,
+                                     audio_sample_format_t * p_input_format,
+                                     audio_sample_format_t * p_output_format )
+{
+    aout_filter_t * p_channel_mixer;
+
+    /* Retreive user preferred channel mixer */
+    char * psz_name = config_GetPsz( p_aout, "audio-channel-mixer" );
+
+    /* Not specified => let the main pipeline do the mixing */
+    if ( ! psz_name ) return NULL;
+
+    /* Debug information */
+    aout_FormatsPrint( p_aout, "channel mixer", p_input_format,
+                       p_output_format );
+
+    /* Create a VLC object */
+    p_channel_mixer = vlc_object_create( p_aout, sizeof(aout_filter_t) );
+    if( p_channel_mixer == NULL )
+    {
+        msg_Err( p_aout, "cannot add user channel mixer %s", psz_name );
+        return NULL;
+    }
+    vlc_object_attach( p_channel_mixer , p_aout );
+
+    /* Attach the suitable module */
+    memcpy( &p_channel_mixer->input, p_input_format,
+                    sizeof(audio_sample_format_t) );
+    memcpy( &p_channel_mixer->output, p_output_format,
+                    sizeof(audio_sample_format_t) );
+    p_channel_mixer->p_module =
+                    module_Need( p_channel_mixer,"audio filter", psz_name );
+    if( p_channel_mixer->p_module== NULL )
+    {
+        msg_Err( p_aout, "cannot add user channel mixer %s", psz_name );
+        vlc_object_detach( p_channel_mixer );
+        vlc_object_destroy( p_channel_mixer );
+        return NULL;
+    }
+    p_channel_mixer->b_continuity = VLC_FALSE;
+
+    /* Ok */
+    return p_channel_mixer;
 }

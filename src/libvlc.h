@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.124 2003/12/15 14:05:19 hartman Exp $
+ * $Id: libvlc.h,v 1.125 2003/12/20 22:57:36 babal Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -158,14 +158,12 @@ static char *ppsz_language_text[] =
     "This allows you to add audio postprocessing filters, to modify " \
     "the sound.")
 
-#define HEADPHONE_TEXT N_("Headphone virtual spatialization effect")
-#define HEADPHONE_LONGTEXT N_( \
-    "This effect gives you the feeling that you are standing in a room " \
-    "with a complete 5.1 speaker set when using only a headphone, " \
-    "providing a more realistic sound experience. It should also be " \
-    "more comfortable and less tiring when listening to music for " \
-    "long periods of time.\nIt works with any source format from mono " \
-    "to 5.1.")
+#define AUDIO_CHANNEL_MIXER N_("Channel mixer")
+#define AUDIO_CHANNEL_MIXER_LONGTEXT N_( \
+     "This allows you to choose a specific audio channel mixer. For instance " \
+     "the headphone channel mixer will downmix any audio source to a stereo " \
+     "output and give the feeling that you are standing in a room with a " \
+     "complete 5.1 speaker set when using only a headphone.")
 
 #define VOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify options related to " \
@@ -686,13 +684,12 @@ vlc_module_begin();
     add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT, AOUT_RESAMP_LONGTEXT, VLC_TRUE );
 #endif
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
-#if 0
-    add_bool( "headphone-opt", 0, NULL, HEADPHONE_TEXT,
-                        HEADPHONE_LONGTEXT, VLC_FALSE );
-#endif
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
     add_string("audio-filter",0,NULL,AUDIO_FILTER_TEXT,
                     AUDIO_FILTER_LONGTEXT,VLC_FALSE);
+    add_module( "audio-channel-mixer", "audio filter", NULL, NULL,
+		    AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT,
+		    VLC_FALSE );
 
     /* Video options */
     add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , VLC_FALSE );

@@ -60,6 +60,7 @@ Section "Install"
 	SetOutPath $INSTDIR
 
 	File  vlc.exe
+	File  vlc.exe.manifest
 	File  *.txt
 
 	File  /r plugins

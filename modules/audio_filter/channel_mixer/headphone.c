@@ -3,7 +3,7 @@
  *               -> gives the feeling of a real room with a simple headphone
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: headphone.c,v 1.5 2003/05/15 22:27:37 massiot Exp $
+ * $Id: headphone.c,v 1.6 2003/12/20 22:57:36 babal Exp $
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
  *
@@ -45,16 +45,25 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define MODULE_DESCRIPTION N_ ( \
+     "This effect gives you the feeling that you are standing in a room " \
+     "with a complete 5.1 speaker set when using only a headphone, " \
+     "providing a more realistic sound experience. It should also be " \
+     "more comfortable and less tiring when listening to music for " \
+     "long periods of time.\nIt works with any source format from mono " \
+     "to 5.1.")
+
 #define HEADPHONE_DIM_TEXT N_("Characteristic dimension")
 #define HEADPHONE_DIM_LONGTEXT N_( \
      "Headphone virtual spatialization effect parameter: "\
      "distance between front left speaker and listener in meters.")
 
 vlc_module_begin();
-    add_category_hint( N_("headphone"), NULL, VLC_FALSE );
-    add_integer( "headphone-dim", 5, NULL, HEADPHONE_DIM_TEXT,
-                 HEADPHONE_DIM_LONGTEXT, VLC_TRUE );
-    set_description( _("headphone channel mixer with virtual spatialization effect") );
+    add_category_hint( N_("headphone"), MODULE_DESCRIPTION, VLC_FALSE );
+    add_integer( "headphone-dim", 10, NULL, HEADPHONE_DIM_TEXT,
+                 HEADPHONE_DIM_LONGTEXT, VLC_FALSE );
+    set_description( N_("headphone channel mixer with virtual spatialization effect") );
+
     set_capability( "audio filter", 0 );
     set_callbacks( Create, Destroy );
     add_shortcut( "headphone" );
