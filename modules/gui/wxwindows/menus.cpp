@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: menus.cpp,v 1.32 2004/02/26 00:23:04 gbazin Exp $
+ * $Id: menus.cpp,v 1.33 2004/02/26 12:04:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -531,8 +531,6 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
     /* Get the descriptive name of the variable */
     var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text, NULL );
 
-    var_Get( p_object, psz_var, &val );
-
     if( i_type & VLC_VAR_HASCHOICE )
     {
         menu->Append( MenuDummy_Event,
@@ -548,6 +546,7 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
     switch( i_type & VLC_VAR_TYPE )
     {
     case VLC_VAR_VOID:
+        var_Get( p_object, psz_var, &val );
         menuitem = new wxMenuItemExt( menu, ++i_item_id,
                                       wxU(text.psz_string ?
                                         text.psz_string : psz_var),
@@ -557,6 +556,7 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
         break;
 
     case VLC_VAR_BOOL:
+        var_Get( p_object, psz_var, &val );
         val.b_bool = !val.b_bool;
         menuitem = new wxMenuItemExt( menu, ++i_item_id,
                                       wxU(text.psz_string ?
@@ -566,13 +566,8 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
         menu->Append( menuitem );
         Check( i_item_id, val.b_bool ? FALSE : TRUE );
         break;
-
-    default:
-        if( text.psz_string ) free( text.psz_string );
-        return;
     }
 
-    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
     if( text.psz_string ) free( text.psz_string );
 }
 
@@ -601,15 +596,9 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object,
         return NULL;
     }
 
-    if( var_Get( p_object, psz_var, &val ) < 0 )
-    {
-        return NULL;
-    }
-
     if( var_Change( p_object, psz_var, VLC_VAR_GETLIST,
                     &val_list, &text_list ) < 0 )
     {
-        if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
         return NULL;
     }
 
@@ -632,6 +621,8 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object,
           break;
 
         case VLC_VAR_STRING:
+          var_Get( p_object, psz_var, &val );
+
           another_val.psz_string =
               strdup(val_list.p_list->p_values[i].psz_string);
           menuitem =
@@ -646,13 +637,17 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object,
 
           menu->Append( menuitem );
 
-          if( !(i_type & VLC_VAR_ISCOMMAND) &&
+          if( !(i_type & VLC_VAR_ISCOMMAND) && val.psz_string &&
               !strcmp( val.psz_string,
                        val_list.p_list->p_values[i].psz_string ) )
               menu->Check( i_item_id, TRUE );
+
+          if( val.psz_string ) free( val.psz_string );
           break;
 
         case VLC_VAR_INTEGER:
+          var_Get( p_object, psz_var, &val );
+
           menuitem =
               new wxMenuItemExt( menu, ++i_item_id,
                                  text_list.p_list->p_values[i].psz_string ?
@@ -679,7 +674,6 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object,
     }
 
     /* clean up everything */
-    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
     var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list, &text_list );
 
     return menu;

@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.45 2004/02/26 08:24:29 gbazin Exp $
+ * $Id: playlist.cpp,v 1.46 2004/02/26 12:04:14 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -541,11 +541,11 @@ void Playlist::UpdatePlaylist()
     }
 
     /* Update the colour of items */
-    vlc_mutex_lock( &p_playlist->object_lock );
-    if( p_intf->p_sys->i_playing != p_playlist->i_index )
+    int i_playlist_index = p_playlist->i_index;
+    if( p_intf->p_sys->i_playing != i_playlist_index )
     {
         wxListItem listitem;
-        listitem.m_itemId = p_playlist->i_index;
+        listitem.m_itemId = i_playlist_index;
         listitem.SetTextColour( *wxRED );
         listview->SetItem( listitem );
 
@@ -555,9 +555,8 @@ void Playlist::UpdatePlaylist()
             listitem.SetTextColour( *wxBLACK );
             listview->SetItem( listitem );
         }
-        p_intf->p_sys->i_playing = p_playlist->i_index;
+        p_intf->p_sys->i_playing = i_playlist_index;
     }
-    vlc_mutex_unlock( &p_playlist->object_lock );
 
     vlc_object_release( p_playlist );
 }
