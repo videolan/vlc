@@ -37,10 +37,15 @@
 #include <list>
 #include <map>
 
+class Builder;
+class Interpreter;
 
 /// Class storing the data of the current theme
 class Theme: public SkinObject
 {
+    private:
+        friend class Builder;
+        friend class Interpreter;
     public:
         Theme( intf_thread_t *pIntf ): SkinObject( pIntf ),
             m_windowManager( getIntf() ) {}
@@ -57,9 +62,7 @@ class Theme: public SkinObject
 
         WindowManager &getWindowManager() { return m_windowManager; }
 
-        // XXX: It would be nicer to put everything private, and have the
-        // builder and interpreter classes as friends of this one
-//     private:
+    private:
         /// Store the bitmaps by ID
         map<string, GenericBitmapPtr> m_bitmaps;
         /// Store the fonts by ID
@@ -77,7 +80,6 @@ class Theme: public SkinObject
         /// Store the variables
         list<VariablePtr> m_vars;
 
-    private:
         WindowManager m_windowManager;
 };
 

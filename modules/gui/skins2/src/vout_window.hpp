@@ -37,6 +37,19 @@ class VoutWindow: public GenericWindow
                     bool dragDrop, bool playOnDrop, GenericWindow &rParent );
         virtual ~VoutWindow();
 
+        /// These methods are redefined here to make them public
+        //@{
+        /// Show the window
+        virtual void show() { GenericWindow::show(); }
+
+        /// Hide the window
+        virtual void hide() { GenericWindow::hide(); }
+
+        /// Move the window
+        virtual void move( int left, int top )
+            { GenericWindow::move( left, top ); }
+        //@}
+
         /// Resize the window
         virtual void resize( int width, int height );
 

@@ -53,20 +53,25 @@ void Theme::loadConfig()
     // Initialization
     map<string, TopWindowPtr>::const_iterator it;
     int i = 0;
-    int x, y, v, scan;
+    int x, y, visible, scan;
 
     // Get config for each window
     for( it = m_windows.begin(); it != m_windows.end(); it++ )
     {
         TopWindow *pWin = (*it).second.get();
         // Get config
-        scan = sscanf( &save[i * 13], "(%4d,%4d,%1d)", &x, &y, &v );
+        scan = sscanf( &save[i * 13], "(%4d,%4d,%1d)", &x, &y, &visible );
 
         // If config has the correct number of arguments
         if( scan > 2 )
         {
-            pWin->move( x, y );
-            if( v ) pWin->show();
+            m_windowManager.startMove( *pWin );
+            m_windowManager.move( *pWin, x, y );
+            m_windowManager.stopMove();
+            if( visible )
+            {
+                m_windowManager.show( *pWin );
+            }
         }
 
         // Next window

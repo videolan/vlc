@@ -37,11 +37,14 @@ class EvtMouse;
 class EvtKey;
 class EvtRefresh;
 class EvtScroll;
+class WindowManager;
 
 
 /// Generic window class
 class GenericWindow: public SkinObject, public Observer<VarBool>
 {
+    private:
+        friend class WindowManager;
     public:
         GenericWindow( intf_thread_t *pIntf, int xPos, int yPos,
                        bool dragDrop, bool playOnDrop,
@@ -58,29 +61,11 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
 
         virtual void processEvent( EvtRefresh &rEvtRefresh );
 
-        // Show the window
-        virtual void show();
-
-        // Hide the window
-        virtual void hide();
-
-        // Refresh an area of the window
-        virtual void refresh( int left, int top, int width, int height ) {}
-
-        /// Move the window
-        virtual void move( int left, int top );
-
         /// Resize the window
         virtual void resize( int width, int height );
 
-        /// Bring the window on top
-        virtual void raise() const;
-
-        /// Set the opacity of the window (0 = transparent, 255 = opaque)
-        virtual void setOpacity( uint8_t value );
-
-        /// Toggle the window on top
-        virtual void toggleOnTop( bool onTop ) const;
+        /// Refresh an area of the window
+        virtual void refresh( int left, int top, int width, int height ) {}
 
         /// Get the coordinates of the window
         virtual int getLeft() const { return m_left; }
@@ -92,14 +77,36 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         VarBool &getVisibleVar() { return m_varVisible; }
 
     protected:
+        /// Get the OS window
+        OSWindow *getOSWindow() const { return m_pOsWindow; }
+
+        /// These methods do not need to be public since they are accessed
+        /// only by the window manager or by inheritant classes.
+        //@{
+        /// Show the window
+        virtual void show();
+
+        /// Hide the window
+        virtual void hide();
+
+        /// Move the window
+        virtual void move( int left, int top );
+
+        /// Bring the window on top
+        virtual void raise() const;
+
+        /// Set the opacity of the window (0 = transparent, 255 = opaque)
+        virtual void setOpacity( uint8_t value );
+
+        /// Toggle the window on top
+        virtual void toggleOnTop( bool onTop ) const;
+        //@}
+
         /// Actually show the window
         virtual void innerShow();
 
         /// Actually hide the window
         virtual void innerHide();
-
-        /// Get the OS window
-        OSWindow *getOSWindow() const { return m_pOsWindow; }
 
     private:
         /// Window position and size

@@ -104,7 +104,7 @@ Theme *Builder::build()
 #define GET_BMP( pBmp, id ) \
     if( id != "none" ) \
     { \
-        pBmp = m_pTheme->m_bitmaps[id].get(); \
+        pBmp = m_pTheme->getBitmapById(id); \
         if( pBmp == NULL ) \
         { \
             msg_Err( getIntf(), "unknown bitmap id: %s", id.c_str() ); \
@@ -184,7 +184,7 @@ void Builder::addWindow( const BuilderData::Window &rData )
 
 void Builder::addLayout( const BuilderData::Layout &rData )
 {
-    TopWindow *pWin = m_pTheme->m_windows[rData.m_windowId].get();
+    TopWindow *pWin = m_pTheme->getWindowById(rData.m_windowId);
     if( pWin == NULL )
     {
         msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
@@ -210,7 +210,7 @@ void Builder::addLayout( const BuilderData::Layout &rData )
 
 void Builder::addAnchor( const BuilderData::Anchor &rData )
 {
-    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -245,7 +245,7 @@ void Builder::addButton( const BuilderData::Button &rData )
     GenericBitmap *pBmpOver = pBmpUp;
     GET_BMP( pBmpOver, rData.m_overId );
 
-    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -302,7 +302,7 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
     GenericBitmap *pBmpOver2 = pBmpUp2;
     GET_BMP( pBmpOver2, rData.m_over2Id );
 
-    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -361,14 +361,14 @@ void Builder::addImage( const BuilderData::Image &rData )
     GenericBitmap *pBmp = NULL;
     GET_BMP( pBmp, rData.m_bmpId );
 
-    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
-    TopWindow *pWindow = m_pTheme->m_windows[rData.m_windowId].get();
+    TopWindow *pWindow = m_pTheme->getWindowById(rData.m_windowId);
     if( pWindow == NULL )
     {
         msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
@@ -414,7 +414,7 @@ void Builder::addImage( const BuilderData::Image &rData )
 
 void Builder::addText( const BuilderData::Text &rData )
 {
-    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -459,7 +459,7 @@ void Builder::addRadialSlider( const BuilderData::RadialSlider &rData )
     GenericBitmap *pSeq = NULL;
     GET_BMP( pSeq, rData.m_sequence );
 
-    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -511,7 +511,7 @@ void Builder::addSlider( const BuilderData::Slider &rData )
     GenericBitmap *pBmpOver = pBmpUp;
     GET_BMP( pBmpOver, rData.m_overId );
 
-    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -566,7 +566,7 @@ void Builder::addSlider( const BuilderData::Slider &rData )
 
 void Builder::addList( const BuilderData::List &rData )
 {
-    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -613,7 +613,7 @@ void Builder::addList( const BuilderData::List &rData )
 
 void Builder::addVideo( const BuilderData::Video &rData )
 {
-    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -711,7 +711,7 @@ const Position Builder::makePosition( const string &rLeftTop,
 
 GenericFont *Builder::getFont( const string &fontId )
 {
-    GenericFont *pFont = m_pTheme->m_fonts[fontId].get();
+    GenericFont *pFont = m_pTheme->getFontById(fontId);
     if( !pFont && fontId == "defaultfont" )
     {
 #ifdef WIN32_SKINS
