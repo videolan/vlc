@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.10 2003/05/15 01:33:53 gbazin Exp $
+ * $Id: streamout.cpp,v 1.11 2003/05/15 15:59:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -217,7 +217,7 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     SetSizerAndFit( main_sizer );
 
     /* Update all the values */
-    ParseMRL();
+    //ParseMRL();
 }
 
 SoutDialog::~SoutDialog()
@@ -337,7 +337,7 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
                                               wxU(_("Output Methods")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
-                                                          wxHORIZONTAL );
+                                                          wxVERTICAL );
 
     static const wxString access_output_array[] =
     {
@@ -409,15 +409,17 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
 
 
     /* Stuff everything into the main panel */
-    for( i=0; i < ACCESS_OUT_NUM; i++ )
+    for( i=1; i < ACCESS_OUT_NUM; i++ )
     {
         sizer->Add( access_checkboxes[i], 0,
-                    wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+                    wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL  | wxALL, 5 );
         sizer->Add( access_subpanels[i], 1, wxEXPAND | wxALIGN_CENTER_VERTICAL
-                    | wxALIGN_LEFT );
+                    | wxALIGN_LEFT  | wxALL, 5 );
     }
 
-    panel_sizer->Add( sizer, 1, wxEXPAND, 0 );
+    panel_sizer->Add( access_checkboxes[0], 0,
+                      wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL  | wxALL, 5 );
+    panel_sizer->Add( sizer, 1, wxEXPAND | wxTOP, 3 );
 
     panel->SetSizerAndFit( panel_sizer );
 
@@ -457,13 +459,13 @@ wxPanel *SoutDialog::EncapsulationPanel( wxWindow* parent )
             new wxRadioButton( panel, EncapsulationRadio1_Event + i,
                                encapsulation_array[i] );
         panel_sizer->Add( encapsulation_radios[i], 0,
-                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL, 8 );
     }
 
     panel->SetSizerAndFit( panel_sizer );
 
     /* Update encapsulation panel */
-    encapsulation_radios[0]->Enable();
+    encapsulation_radios[TS_ENCAPSULATION]->SetValue(true);
     i_encapsulation_type = TS_ENCAPSULATION;
 
     return panel;

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.26 2003/05/15 01:33:53 gbazin Exp $
+ * $Id: wxwindows.h,v 1.27 2003/05/15 15:59:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -190,6 +190,8 @@ private:
 };
 
 /* Open Dialog */
+class SoutDialog;
+class SubsFileDialog;
 class OpenDialog: public wxDialog
 {
 public:
@@ -250,6 +252,7 @@ private:
 
     /* Controls for the file panel */
     wxComboBox *file_combo;
+    wxFileDialog *file_dialog;
 
     /* Controls for the disc panel */
     wxRadioBox *disc_type;
@@ -268,15 +271,18 @@ private:
     /* Controls for the subtitles file */
     wxButton *subsfile_button;
     wxCheckBox *subsfile_checkbox;
+    SubsFileDialog *subsfile_dialog;
 
     /* Controls for the stream output */
     wxButton *sout_button;
     wxCheckBox *sout_checkbox;
+    SoutDialog *sout_dialog;
 
     /* Controls for the demux dump */
     wxTextCtrl *demuxdump_textctrl;
     wxButton *demuxdump_button;
     wxCheckBox *demuxdump_checkbox;
+    wxFileDialog *demuxdump_dialog;
 };
 
 enum

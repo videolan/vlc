@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.8 2003/05/13 23:41:17 gbazin Exp $
+ * $Id: menus.cpp,v 1.9 2003/05/15 15:59:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -147,6 +147,8 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "navigation";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "program";
+        pi_objects[i++] = p_object->i_object_id;
 
         ppsz_varnames[i] = "video-es";
         pi_objects[i++] = p_object->i_object_id;
@@ -243,8 +245,8 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
 wxMenu *NavigMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
 {
     vlc_object_t *p_object;
-    char *ppsz_varnames[4];
-    int pi_objects[4];
+    char *ppsz_varnames[6];
+    int pi_objects[6];
     int i = 0;
 
     /* Initializations */
@@ -261,6 +263,8 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
         ppsz_varnames[i] = "navigation";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
+        ppsz_varnames[i] = "program";
+        pi_objects[i++] = p_object->i_object_id;
     }
 
     /* Build menu */

@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.21 2003/05/13 22:33:33 gbazin Exp $
+ * $Id: open.cpp,v 1.22 2003/05/15 15:59:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -154,6 +154,10 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     p_intf = _p_intf;
     p_parent = _p_parent;
     SetIcon( *p_intf->p_sys->p_icon );
+    file_dialog = NULL;
+    sout_dialog = NULL;
+    subsfile_dialog = NULL;
+    demuxdump_dialog = NULL;
 
     /* Create a panel to put everything in */
     wxPanel *panel = new wxPanel( this, -1 );
@@ -315,6 +319,11 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
 
 OpenDialog::~OpenDialog()
 {
+    /* Clean up */
+    if( file_dialog ) delete file_dialog;
+    if( sout_dialog ) delete sout_dialog;
+    if( subsfile_dialog ) delete subsfile_dialog;
+    if( demuxdump_dialog ) delete demuxdump_dialog;
 }
 
 /*****************************************************************************
@@ -587,12 +596,13 @@ void OpenDialog::OnFilePanelChange( wxCommandEvent& WXUNUSED(event) )
 
 void OpenDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, wxU(_("Open file")),
-                         wxT(""), wxT(""), wxT("*.*"), wxOPEN );
+    if( file_dialog == NULL )
+        file_dialog = new wxFileDialog( this, wxU(_("Open file")),
+                                        wxT(""), wxT(""), wxT("*.*"), wxOPEN );
 
-    if( dialog.ShowModal() == wxID_OK )
+    if( file_dialog && file_dialog->ShowModal() == wxID_OK )
     {
-        file_combo->SetValue( dialog.GetPath() );      
+        file_combo->SetValue( file_dialog->GetPath() );      
         UpdateMRL( FILE_ACCESS );
     }
 }
@@ -688,16 +698,17 @@ void OpenDialog::OnSubsFileEnable( wxCommandEvent& event )
 void OpenDialog::OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the open dialog */
-    SubsFileDialog dialog( p_intf, p_parent );
+    if( subsfile_dialog == NULL )
+        subsfile_dialog = new SubsFileDialog( p_intf, p_parent );
 
-    if( dialog.ShowModal() == wxID_OK )
+    if( subsfile_dialog && subsfile_dialog->ShowModal() == wxID_OK )
     {
         config_PutPsz( p_intf, "sub-file",
-                       (const char *)dialog.file_combo->GetValue().mb_str() );
+            (const char *)subsfile_dialog->file_combo->GetValue().mb_str() );
         config_PutInt( p_intf, "sub-delay",
-                       dialog.delay_spinctrl->GetValue() );
+                       subsfile_dialog->delay_spinctrl->GetValue() );
         config_PutFloat( p_intf, "sub-fps",
-                         dialog.fps_spinctrl->GetValue() );
+                         subsfile_dialog->fps_spinctrl->GetValue() );
     }
 }
 
@@ -723,11 +734,13 @@ void OpenDialog::OnSoutEnable( wxCommandEvent& event )
 void OpenDialog::OnSoutSettings( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the open dialog */
-    SoutDialog dialog( p_intf, p_parent );
+    if( sout_dialog == NULL )
+        sout_dialog = new SoutDialog( p_intf, p_parent );
 
-    if( dialog.ShowModal() == wxID_OK )
+    if( sout_dialog && sout_dialog->ShowModal() == wxID_OK )
     {
-        config_PutPsz( p_intf, "sout", (const char *)dialog.mrl.mb_str() );
+        config_PutPsz( p_intf, "sout",
+                       (const char *)sout_dialog->mrl.mb_str() );
     }
 }
 
@@ -754,12 +767,13 @@ void OpenDialog::OnDemuxDumpEnable( wxCommandEvent& event )
 
 void OpenDialog::OnDemuxDumpBrowse( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, wxU(_("Save file")),
-                         wxT(""), wxT(""), wxT("*.*"), wxSAVE );
+    if( demuxdump_dialog == NULL )
+        demuxdump_dialog = new wxFileDialog( this, wxU(_("Save file")),
+                               wxT(""), wxT(""), wxT("*.*"), wxSAVE );
 
-    if( dialog.ShowModal() == wxID_OK )
+    if( demuxdump_dialog && demuxdump_dialog->ShowModal() == wxID_OK )
     {
-        demuxdump_textctrl->SetValue( dialog.GetPath() );
+        demuxdump_textctrl->SetValue( demuxdump_dialog->GetPath() );
         wxCommandEvent event = wxCommandEvent( wxEVT_NULL );
         OnDemuxDumpChange( event );
     }
