@@ -1609,7 +1609,7 @@ void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
             {
                 /* TODO check if we need to silently seek to a new location in the stream (switch to another chapter) */
                 if (psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time)
-                    Seek(&demux, sys.i_pts, -1, psz_curr_chapter);
+                    Seek( demux, sys.i_pts, 0, psz_curr_chapter );
                 /* count the last duration time found for each track in a table (-1 not found, -2 silent) */
                 /* only seek after each duration >= end timecode of the current chapter */
             }
