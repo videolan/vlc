@@ -390,11 +390,14 @@ typedef struct vod_media_t vod_media_t;
 typedef struct opengl_t     opengl_t;
 typedef struct opengl_sys_t opengl_sys_t;
 
-/* divers */
-typedef struct vlc_meta_t    vlc_meta_t;
-
+/* VLM */
 typedef struct vlm_t         vlm_t;
 typedef struct vlm_message_t vlm_message_t;
+typedef struct vlm_media_t   vlm_media_t;
+typedef struct vlm_schedule_t vlm_schedule_t;
+
+/* divers */
+typedef struct vlc_meta_t    vlc_meta_t;
 
 
 /*****************************************************************************

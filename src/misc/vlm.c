@@ -49,30 +49,21 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static char          *vlm_Save( vlm_t * );
-static int            vlm_Load( vlm_t *, char *);
 static vlm_message_t *vlm_Show( vlm_t *, vlm_media_t *, vlm_schedule_t *, char * );
 static vlm_message_t *vlm_Help( vlm_t *, char * );
 
-static vlm_media_t *vlm_MediaNew    ( vlm_t *, char *, int );
-static void         vlm_MediaDelete ( vlm_t *, vlm_media_t *, char * );
 static vlm_media_t *vlm_MediaSearch ( vlm_t *, char * );
-static int          vlm_MediaSetup  ( vlm_t *, vlm_media_t *, char *, char * );
-static int          vlm_MediaControl( vlm_t *, vlm_media_t *, char *, char *, char * );
 static vlm_media_instance_t *vlm_MediaInstanceSearch( vlm_t *, vlm_media_t *, char * );
 
 static vlm_message_t *vlm_MessageNew( char *, const char *, ... );
-static vlm_message_t *vlm_MessageAdd( vlm_message_t*, vlm_message_t* );
+static vlm_message_t *vlm_MessageAdd( vlm_message_t *, vlm_message_t * );
 
-static vlm_schedule_t *vlm_ScheduleNew( vlm_t *, char *);
-static void            vlm_ScheduleDelete( vlm_t *, vlm_schedule_t *, char *);
-static int             vlm_ScheduleSetup( vlm_schedule_t *, char *, char *);
-static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *, char *);
+static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *, char * );
 
-static int vlm_MediaVodControl( void *, vod_media_t *, char *, int, va_list );
-
-static int ExecuteCommand( vlm_t *, char *, vlm_message_t **);
-static int Manage( vlc_object_t* );
+static char *Save( vlm_t * );
+static int Load( vlm_t *, char * );
+static int ExecuteCommand( vlm_t *, char *, vlm_message_t ** );
+static int Manage( vlc_object_t * );
 
 /*****************************************************************************
  * vlm_New:
@@ -190,6 +181,70 @@ int vlm_ExecuteCommand( vlm_t *p_vlm, char *psz_command,
     vlc_mutex_unlock( &p_vlm->lock );
 
     return i_result;
+}
+
+/*****************************************************************************
+ * vlm_Save:
+ *****************************************************************************/
+int vlm_Save( vlm_t *p_vlm, char *psz_file )
+{
+    FILE *file;
+    char *psz_save;
+
+    if( !p_vlm || !psz_file ) return 1;
+
+    file = fopen( psz_file, "w" );
+    if( file == NULL ) return 1;
+
+    psz_save = Save( p_vlm );
+    if( psz_save == NULL )
+    {
+        fclose( file );
+        return 1;
+    }
+    fwrite( psz_save, strlen( psz_save ), 1, file );
+    fclose( file );
+    free( psz_save );
+
+    return 0;
+}
+
+/*****************************************************************************
+ * vlm_Load:
+ *****************************************************************************/
+int vlm_Load( vlm_t *p_vlm, char *psz_file )
+{
+    FILE *file;
+    int64_t i_size;
+    char *psz_buffer;
+
+    if( !p_vlm || !psz_file ) return 1;
+
+    file = fopen( psz_file, "r" );
+    if( file == NULL ) return 1;
+
+    if( fseek( file, 0, SEEK_END) != 0 ) return 2;
+
+    i_size = ftell( file );
+    fseek( file, 0, SEEK_SET);
+    psz_buffer = malloc( i_size + 1 );
+    if( !psz_buffer )
+    {
+        fclose( file );
+        return 2;
+    }
+    fread( psz_buffer, 1, i_size, file);
+    psz_buffer[ i_size ] = '\0';
+    if( Load( p_vlm, psz_buffer ) )
+    {
+        free( psz_buffer );
+        return 3;
+    }
+    free( psz_buffer );
+
+    fclose( file );
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -539,27 +594,15 @@ static int ExecuteCommand( vlm_t *p_vlm, char *psz_command,
 
     else if( !strcmp(ppsz_command[0], "save") )
     {
-        FILE *file;
-
         if( i_command != 2 ) goto syntax_error;
 
-        file = fopen( ppsz_command[1], "w" );
-        if( file == NULL )
+        if( vlm_Save( p_vlm, ppsz_command[1] ) )
         {
             p_message = vlm_MessageNew( "save", "Unable to save to file" );
             goto error;
         }
         else
         {
-            char *psz_save = vlm_Save( p_vlm );
-            if( psz_save == NULL )
-            {
-                fclose( file );
-                goto error;
-            }
-            fwrite( psz_save, strlen( psz_save ), 1, file );
-            fclose( file );
-            free( psz_save );
             p_message = vlm_MessageNew( "save", NULL );
             goto success;
         }
@@ -567,52 +610,24 @@ static int ExecuteCommand( vlm_t *p_vlm, char *psz_command,
 
     else if( !strcmp(ppsz_command[0], "load") )
     {
-        FILE *file;
-
         if( i_command != 2 ) goto syntax_error;
 
-        file = fopen( ppsz_command[1], "r" );
-
-        if( file == NULL )
+        switch( vlm_Load( p_vlm, ppsz_command[1] ) )
         {
-            p_message = vlm_MessageNew( "load", "Unable to load from file" );
-            goto error;
-        }
-        else
-        {
-            int64_t i_size;
-            char *psz_buffer;
-
-            if( fseek( file, 0, SEEK_END) == 0 )
-            {
-                i_size = ftell( file );
-                fseek( file, 0, SEEK_SET);
-                psz_buffer = malloc( i_size + 1 );
-                if( !psz_buffer )
-                {
-                    fclose( file );
-                    goto error;
-                }
-                fread( psz_buffer, 1, i_size, file);
-                psz_buffer[ i_size ] = '\0';
-                if( vlm_Load( p_vlm, psz_buffer ) )
-                {
-                    free( psz_buffer );
-                    p_message = vlm_MessageNew( "load", "error while loading "
-                                              "file" );
-                    goto error;
-                }
-                free( psz_buffer );
-            }
-            else
-            {
+            case 0:
+                p_message = vlm_MessageNew( "load", NULL );
+                goto success;
+            case 2:
                 p_message = vlm_MessageNew( "load", "read file error" );
                 goto error;
-            }
-
-            fclose( file );
-            p_message = vlm_MessageNew( "load", NULL );
-            goto success;
+            case 3:
+                p_message =
+                    vlm_MessageNew( "load", "error while loading file" );
+                goto error;
+            default:
+                p_message =
+                    vlm_MessageNew( "load", "Unable to load from file" );
+                goto error;
         }
     }
 
@@ -817,7 +832,7 @@ vlm_MediaInstanceSearch( vlm_t *vlm, vlm_media_t *media, char *psz_name )
     return NULL;
 }
 
-static vlm_media_t *vlm_MediaNew( vlm_t *vlm, char *psz_name, int i_type )
+vlm_media_t *vlm_MediaNew( vlm_t *vlm, char *psz_name, int i_type )
 {
     vlm_media_t *media = malloc( sizeof( vlm_media_t ) );
 
@@ -873,7 +888,7 @@ static vlm_media_t *vlm_MediaNew( vlm_t *vlm, char *psz_name, int i_type )
 }
 
 /* for now, simple delete. After, del with options (last arg) */
-static void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, char *psz_name )
+void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, char *psz_name )
 {
     if( media == NULL ) return;
 
@@ -918,8 +933,8 @@ static void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, char *psz_name )
     free( media );
 }
 
-static int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
-                           char *psz_value )
+int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
+                    char *psz_value )
 {
     if( !psz_cmd) return VLC_EGENERIC;
 
@@ -1063,8 +1078,8 @@ static int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_id,
-                             char *psz_command, char *psz_args )
+int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_id,
+                      char *psz_command, char *psz_args )
 {
     vlm_media_instance_t *p_instance;
     int i;
@@ -1189,7 +1204,7 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_id,
 /*****************************************************************************
  * Schedule handling
  *****************************************************************************/
-static vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm, char *psz_name )
+vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm, char *psz_name )
 {
     vlm_schedule_t *p_sched = malloc( sizeof( vlm_schedule_t ) );
 
@@ -1217,8 +1232,8 @@ static vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm, char *psz_name )
 }
 
 /* for now, simple delete. After, del with options (last arg) */
-static void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_t *sched,
-                                char *psz_name )
+void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_t *sched,
+                         char *psz_name )
 {
     if( sched == NULL ) return;
 
@@ -1246,8 +1261,8 @@ static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *vlm, char *psz_name )
 }
 
 /* Ok, setup schedule command will be able to support only one (argument value) at a time  */
-static int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
-                              char *psz_value )
+int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
+                       char *psz_value )
 {
     if( !strcmp( psz_cmd, "enabled" ) )
     {
@@ -1852,7 +1867,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
 /*****************************************************************************
  * Config handling functions
  *****************************************************************************/
-static int vlm_Load( vlm_t *vlm, char *file )
+static int Load( vlm_t *vlm, char *file )
 {
     char *pf = file;
 
@@ -1890,7 +1905,7 @@ static int vlm_Load( vlm_t *vlm, char *file )
     return 0;
 }
 
-static char *vlm_Save( vlm_t *vlm )
+static char *Save( vlm_t *vlm )
 {
     char *save = NULL;
     char *p;
@@ -2127,8 +2142,8 @@ static char *vlm_Save( vlm_t *vlm )
 /*****************************************************************************
  * Manage:
  *****************************************************************************/
-static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
-                                char *psz_id, int i_query, va_list args )
+int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
+                         char *psz_id, int i_query, va_list args )
 {
     vlm_t *vlm = (vlm_t *)p_private;
     int i, i_ret = VLC_EGENERIC;
@@ -2306,5 +2321,17 @@ vlm_t *__vlm_New( vlc_object_t *a )
 void vlm_Delete( vlm_t *a ){}
 int vlm_ExecuteCommand( vlm_t *a, char *b, vlm_message_t **c ){ return -1; }
 void vlm_MessageDelete( vlm_message_t *a ){}
+vlm_media_t *vlm_MediaNew( vlm_t *a, char *b, int c ){ return NULL }
+void vlm_MediaDelete( vlm_t *a, vlm_media_t *b, char *c ){}
+int vlm_MediaSetup( vlm_t *a, vlm_media_t *b, char *c, char *d ){ return -1; }
+int vlm_MediaControl( vlm_t *a, vlm_media_t *b, char *c, char *d, char *e )
+    { return -1; }
+vlm_schedule_t * vlm_ScheduleNew( vlm_t *a, char *b ){ return NULL; }
+void  vlm_ScheduleDelete( vlm_t *a, vlm_schedule_t *b, char *c ){}
+int vlm_ScheduleSetup( vlm_schedule_t *a, char *b, char *c ){ return -1; }
+int vlm_MediaVodControl( void *a, vod_media_t *b, char *c, int, va_list d )
+    { return -1; }
+int vlm_Save( vlm_t *a, char *b ){ return -1; }
+int vlm_Load( vlm_t *a, char *b ){ return -1; }
 
 #endif /* ENABLE_VLM */
