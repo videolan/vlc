@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.16 2002/09/06 23:15:44 massiot Exp $
+ * $Id: aout_internal.h,v 1.17 2002/09/16 20:46:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -119,6 +119,11 @@ typedef struct aout_mixer_t
     struct aout_mixer_sys_t * p_sys;
     void                 (* pf_do_work)( struct aout_instance_t *,
                                          struct aout_buffer_t * );
+
+    /* Multiplier used to raise or lower the volume of the sound in
+     * software. Beware, this creates sound distortion and should be avoided
+     * as much as possible. This isn't available for non-float32 mixer. */
+    float                   f_multiplier;
 } aout_mixer_t;
 
 /*****************************************************************************
@@ -159,7 +164,14 @@ typedef struct aout_output_t
     struct module_t *       p_module;
     struct aout_sys_t *     p_sys;
     void                 (* pf_play)( aout_instance_t * );
+    int                  (* pf_volume_get )( aout_instance_t *, audio_volume_t * );
+    int                  (* pf_volume_set )( aout_instance_t *, audio_volume_t );
+    int                  (* pf_volume_infos )( aout_instance_t *, audio_volume_t *, audio_volume_t * );
     int                     i_nb_samples;
+
+    /* Current volume for the output - it's just a placeholder, the plug-in
+     * may or may not use it. */
+    audio_volume_t          i_volume;
 } aout_output_t;
 
 /*****************************************************************************
@@ -219,6 +231,8 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
 int aout_MixerNew( aout_instance_t * p_aout );
 void aout_MixerDelete( aout_instance_t * p_aout );
 void aout_MixerRun( aout_instance_t * p_aout );
+int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier );
+int aout_MixerMultiplierGet( aout_instance_t * p_aout, float * pf_multiplier );
 
 int aout_OutputNew( aout_instance_t * p_aout,
                     audio_sample_format_t * p_format );

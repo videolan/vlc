@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance miscellaneous functions
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.101 2002/09/02 23:17:06 massiot Exp $
+ * $Id: audio_output.c,v 1.102 2002/09/16 20:46:38 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,6 +59,7 @@ aout_instance_t * __aout_NewInstance( vlc_object_t * p_parent )
     vlc_mutex_init( p_parent, &p_aout->mixer_lock );
     vlc_mutex_init( p_parent, &p_aout->output_fifo_lock );
     p_aout->i_nb_inputs = 0;
+    p_aout->mixer.f_multiplier = 1.0;
 
     vlc_object_attach( p_aout, p_parent->p_vlc );
 

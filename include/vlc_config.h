@@ -1,8 +1,8 @@
 /*****************************************************************************
- * config.h: limits and configuration
+ * vlc_config.h: limits and configuration
  * Defines all compilation-time configuration constants and size limits
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * Copyright (C) 1999-2002 VideoLAN
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -124,10 +124,10 @@
 #define AOUT_MAX_THREADS                10
 
 /* Volume */
-#define VOLUME_DEFAULT                  256
-#define VOLUME_STEP                     32
-#define VOLUME_MAX                      1024
-#define VOLUME_MIN                      0
+#define AOUT_VOLUME_DEFAULT             256
+#define AOUT_VOLUME_STEP                32
+#define AOUT_VOLUME_MAX                 1024
+#define AOUT_VOLUME_MIN                 0
 
 /* Max number of pre-filters per input, and max number of post-filters */
 #define AOUT_MAX_FILTERS                10

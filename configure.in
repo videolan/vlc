@@ -1394,17 +1394,21 @@ then
   then
     test_LDFLAGS="-L${QTDIR}/lib"
     test_CFLAGS="-I$(QTDIR)/include"
-    PLUGINS="${PLUGINS} video_output/qte/qte"
   else
     test_LDFLAGS="-L${with_qte}/lib"
     test_CFLAGS="-I${with_qte}/include"
-    BUILTINS="${BUILTINS} video_output/qte/qte"
   fi
 
   CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
   AC_CHECK_HEADERS(qt.h, [
     qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
     qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
+    if test "x${with_qte}" = "x"
+    then
+      PLUGINS="${PLUGINS} video_output/qte/qte"
+    else
+      BUILTINS="${BUILTINS} video_output/qte/qte"
+    fi
   ])
   CPPFLAGS="${save_CPPFLAGS}"
 fi

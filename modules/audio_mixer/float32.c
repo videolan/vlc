@@ -2,7 +2,7 @@
  * float32.c : precise float32 audio mixer implementation
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32.c,v 1.1 2002/08/28 22:25:38 massiot Exp $
+ * $Id: float32.c,v 1.2 2002/09/16 20:46:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -60,7 +60,7 @@ static int Create( vlc_object_t *p_this )
         return -1;
     }
 
-    if ( p_aout->i_nb_inputs == 1 )
+    if ( p_aout->i_nb_inputs == 1 && p_aout->mixer.f_multiplier == 1.0 )
     {
         /* Tell the trivial mixer to go for it. */
         return -1;
@@ -75,13 +75,14 @@ static int Create( vlc_object_t *p_this )
  * ScaleWords: prepare input words for averaging
  *****************************************************************************/
 static void ScaleWords( float * p_out, const float * p_in, size_t i_nb_words,
-                        int i_nb_inputs )
+                        int i_nb_inputs, float f_multiplier )
 {
     int i;
+    f_multiplier /= i_nb_inputs;
 
     for ( i = i_nb_words; i--; )
     {
-        *p_out++ = *p_in++ / i_nb_inputs;
+        *p_out++ = *p_in++ * f_multiplier;
     }
 }
 
@@ -89,13 +90,14 @@ static void ScaleWords( float * p_out, const float * p_in, size_t i_nb_words,
  * MeanWords: average input words
  *****************************************************************************/
 static void MeanWords( float * p_out, const float * p_in, size_t i_nb_words,
-                       int i_nb_inputs )
+                       int i_nb_inputs, float f_multiplier )
 {
     int i;
+    f_multiplier /= i_nb_inputs;
 
     for ( i = i_nb_words; i--; )
     {
-        *p_out++ += *p_in++ / i_nb_inputs;
+        *p_out++ += *p_in++ * f_multiplier;
     }
 }
 
@@ -134,12 +136,12 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                     if ( !i_input )
                     {
                         ScaleWords( p_out, p_in, i_available_words,
-                                    i_nb_inputs );
+                                    i_nb_inputs, p_aout->mixer.f_multiplier );
                     }
                     else
                     {
                         MeanWords( p_out, p_in, i_available_words,
-                                   i_nb_inputs );
+                                   i_nb_inputs, p_aout->mixer.f_multiplier );
                     }
                 }
 
@@ -162,11 +164,13 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                 {
                     if ( !i_input )
                     {
-                        ScaleWords( p_out, p_in, i_nb_words, i_nb_inputs );
+                        ScaleWords( p_out, p_in, i_nb_words, i_nb_inputs,
+                                    p_aout->mixer.f_multiplier );
                     }
                     else
                     {
-                        MeanWords( p_out, p_in, i_nb_words, i_nb_inputs );
+                        MeanWords( p_out, p_in, i_nb_words, i_nb_inputs,
+                                   p_aout->mixer.f_multiplier );
                     }
                 }
                 p_input->p_first_byte_to_mix = (void *)(p_in

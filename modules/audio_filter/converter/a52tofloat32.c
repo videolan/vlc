@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52tofloat32.c,v 1.1 2002/09/02 23:17:05 massiot Exp $
+ * $Id: a52tofloat32.c,v 1.2 2002/09/16 20:46:37 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -190,7 +190,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     a52_frame( p_sys->p_liba52, p_in_buf->p_buffer,
                &i_flags, &i_sample_level, 0 );
 
-    if ( i_flags != p_sys->i_flags )
+    if ( (i_flags & A52_CHANNEL_MASK) != (p_sys->i_flags & A52_CHANNEL_MASK) )
     {
         msg_Err( p_filter,
                  "liba52 couldn't do the requested downmix 0x%x->0x%x",

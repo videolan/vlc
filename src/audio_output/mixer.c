@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.11 2002/08/30 22:22:24 massiot Exp $
+ * $Id: mixer.c,v 1.12 2002/09/16 20:46:38 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -289,3 +289,52 @@ void aout_MixerRun( aout_instance_t * p_aout )
 {
     while( MixBuffer( p_aout ) != -1 );
 }
+
+/*****************************************************************************
+ * aout_MixerMultiplierSet: set p_aout->mixer.f_multiplier
+ *****************************************************************************
+ * Please note that we assume that you own the mixer lock when entering this
+ * function. This function returns -1 on error.
+ *****************************************************************************/
+int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
+{
+    float f_old = p_aout->mixer.f_multiplier;
+
+    if ( p_aout->mixer.mixer.i_format != AOUT_FMT_FLOAT32 )
+    {
+        msg_Warn( p_aout, "MixerMultiplierSet called for non-float32 mixer" );
+        return -1;
+    }
+
+    aout_MixerDelete( p_aout );
+
+    p_aout->mixer.f_multiplier = f_multiplier;
+
+    if ( aout_MixerNew( p_aout ) )
+    {
+        p_aout->mixer.f_multiplier = f_old;
+        aout_MixerNew( p_aout );
+        return -1;
+    }
+
+    return 0;
+}
+
+/*****************************************************************************
+ * aout_MixerMultiplierGet: get p_aout->mixer.f_multiplier
+ *****************************************************************************
+ * Please note that we assume that you own the mixer lock when entering this
+ * function. This function returns -1 on error.
+ *****************************************************************************/
+int aout_MixerMultiplierGet( aout_instance_t * p_aout, float * pf_multiplier )
+{
+    if ( p_aout->mixer.mixer.i_format != AOUT_FMT_FLOAT32 )
+    {
+        msg_Warn( p_aout, "MixerMultiplierGet called for non-float32 mixer" );
+        return -1;
+    }
+
+    *pf_multiplier = p_aout->mixer.f_multiplier;
+    return 0;
+}
+

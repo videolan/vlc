@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.62 2002/09/02 23:17:05 massiot Exp $
+ * $Id: audio_output.h,v 1.63 2002/09/16 20:46:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -166,6 +166,11 @@ struct audio_date_t
 };
 
 /*****************************************************************************
+ * audio_volume_t : integer value for the audio volume
+ *****************************************************************************/
+typedef unsigned int audio_volume_t;
+
+/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 /* From audio_output.c : */
@@ -185,4 +190,6 @@ VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, u32 ) );
 #define aout_InputNew(a,b,c) __aout_InputNew(VLC_OBJECT(a),b,c)
 VLC_EXPORT( aout_input_t *, __aout_InputNew, ( vlc_object_t *, aout_instance_t **, audio_sample_format_t * ) );
 VLC_EXPORT( void, aout_InputDelete, ( aout_instance_t *, aout_input_t * ) );
+
+/* From intf.c : */
 

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.14 2002/08/16 12:31:04 sam Exp $
+ * $Id: libvlc.h,v 1.15 2002/09/16 20:46:38 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -358,7 +358,7 @@ vlc_module_begin();
     add_module_with_short( "aout", 'A', "audio output", NULL, NULL,
                            AOUT_TEXT, AOUT_LONGTEXT );
     add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT );
-    add_integer( "volume", VOLUME_DEFAULT, NULL, VOLUME_TEXT, VOLUME_LONGTEXT );
+    add_integer( "volume", -1, NULL, VOLUME_TEXT, VOLUME_LONGTEXT );
     add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT, AOUT_RATE_LONGTEXT );
     add_integer( "aout-channels", -1, NULL,
                  AOUT_CHANNELS_TEXT, AOUT_CHANNELS_LONGTEXT );

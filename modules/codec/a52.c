@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.10 2002/09/06 23:15:44 massiot Exp $
+ * $Id: a52.c,v 1.11 2002/09/16 20:46:38 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -84,7 +84,7 @@ static int  SyncInfo       ( const byte_t *, int *, int *, int * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("A/52 parser") );
-    set_capability( "decoder", 0 );
+    set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, NULL );
     add_shortcut( "pass_through" );
     add_shortcut( "pass" );
