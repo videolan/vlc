@@ -16,7 +16,7 @@ D: directory browsing code in modules.c
 N: Stéphane Borel
 E: stef@via.ecp.fr
 D: MPEG video decoder
-D: DVD input
+D: DVD input, IFO parsing, CSS decryption
 
 N: Arnaud de Bossoreille de Ribou
 E: bozo@via.ecp.fr
@@ -29,6 +29,10 @@ D: BeOS interface
 N: Renaud Dartus
 E: reno@via.ecp.fr
 D: AC3 decoder
+
+N: Nilmoni Deb
+E: ndeb@ece.cmu.edu
+D: Minor configure.in and Makefile.in fixes
 
 N: Colin Delacroix
 E: colin@zoy.org
@@ -55,6 +59,8 @@ D: Bug fixes
 N: Shane Harper
 E: shanegh@optusnet.com.au
 D: SDL plugin fixes and enhancements
+D: XVideo video output
+D: Gnome and Gtk+ interface enhancements
 
 N: Gaël Hendryckx
 E: jimmy@via.ecp.fr

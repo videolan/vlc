@@ -28,10 +28,6 @@ libdir=@libdir@
 CC=@CC@
 SHELL=@SHELL@
 
-LIB_SDL=@LIB_SDL@
-LIB_GLIDE=@LIB_GLIDE@
-LIB_GGI=@LIB_GGI@
-
 #----------------- do not change anything below this line ----------------------
 
 ################################################################################
@@ -73,6 +69,7 @@ endif
 #
 # C headers directories
 #
+INCLUDE += @INCLUDE@
 INCLUDE += -Iinclude -I/usr/local/include
 
 #
@@ -423,7 +420,10 @@ PLUGIN_SDL =	plugins/sdl/sdl.o \
 PLUGIN_TS =	plugins/mpeg/ts.o \
 		plugins/mpeg/input_ts.o
 
-PLUGIN_X11=	plugins/x11/x11.o \
+PLUGIN_XVIDEO =	plugins/x11/xvideo.o \
+		plugins/x11/vout_xvideo.o
+
+PLUGIN_X11 =	plugins/x11/x11.o \
 		plugins/x11/vout_x11.o
 
 PLUGIN_YUV =	plugins/yuv/yuv.o \
@@ -464,6 +464,7 @@ STD_PLUGIN_OBJ = \
 
 NONSTD_PLUGIN_OBJ = \
 		$(PLUGIN_X11) \
+		$(PLUGIN_XVIDEO) \
 		$(PLUGIN_GLIDE) \
 		$(PLUGIN_GTK) \
 		$(PLUGIN_GNOME) \
@@ -607,6 +608,11 @@ $(STD_PLUGIN_OBJ): %.o: .dep/%.d
 $(STD_PLUGIN_OBJ): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
+$(PLUGIN_XVIDEO): %.o: Makefile.dep
+$(PLUGIN_XVIDEO): %.o: .dep/%.d
+$(PLUGIN_XVIDEO): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/X11R6/include -c -o $@ $<
+
 $(PLUGIN_X11): %.o: Makefile.dep
 $(PLUGIN_X11): %.o: .dep/%.d
 $(PLUGIN_X11): %.o: %.c
@@ -693,10 +699,10 @@ lib/fb.so: $(PLUGIN_FB)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 lib/ggi.so: $(PLUGIN_GGI)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GGI)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) @LIB_GGI@
 
 lib/glide.so: $(PLUGIN_GLIDE)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GLIDE)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) @LIB_GLIDE@
 
 lib/gnome.so: $(PLUGIN_GNOME)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
@@ -750,13 +756,20 @@ lib/qt.so: $(PLUGIN_QT)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lqt -L${QTDIR}/lib
 
 lib/sdl.so: $(PLUGIN_SDL)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_SDL)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) @LIB_SDL@
 
 lib/ts.so: $(PLUGIN_TS)
 ifeq ($(SYS),darwin)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework AGL -framework Carbon
 else
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+endif
+
+lib/xvideo.so: $(PLUGIN_XVIDEO)
+ifeq ($(SYS),nto-qnx)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXv -lsocket
+else
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXv
 endif
 
 lib/x11.so: $(PLUGIN_X11)

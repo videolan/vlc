@@ -198,7 +198,8 @@ AC_ARG_WITH(sdl,
       PLUGINS=${PLUGINS}"sdl ";
       if test "x$withval" != "xyes";
       then
-        LIB_SDL="L/usr/X11R6/lib -l"$withval
+        LIB_SDL="-L/usr/X11R6/lib -L"$withval"/lib -l"$withval
+        INCLUDE=${INCLUDE}" -I"$withval"/include"
       else
         AC_CHECK_HEADERS(SDL/SDL.h, , [echo "Cannot find SDL headers !"; exit])
         LIB_SDL="-L/usr/X11R6/lib -lSDL"
@@ -245,6 +246,9 @@ fi
 AC_ARG_ENABLE(x11,
   [  --disable-x11           X11 support (default enabled)])
 if test x$enable_x11 != xno; then PLUGINS=${PLUGINS}"x11 "; fi
+AC_ARG_ENABLE(xvideo,
+  [  --enable-xvideo         XVideo interface support (default disabled)],
+  [if test x$enable_xvideo = xyes; then PLUGINS=${PLUGINS}"xvideo "; fi])
 
 AC_ARG_ENABLE(alsa,
   [  --enable-alsa           Alsa sound drivers support (Only for linux) (default disabled)],
@@ -258,6 +262,7 @@ AC_SUBST(SYS)
 AC_SUBST(ARCH)
 AC_SUBST(PLUGINS)
 AC_SUBST(ALIASES)
+AC_SUBST(INCLUDE)
 AC_SUBST(DEBUG)
 AC_SUBST(STATS)
 AC_SUBST(OPTIMS)

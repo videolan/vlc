@@ -1,10 +1,11 @@
 /*****************************************************************************
- * vout_x11.c: X11 video output display method
+ * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.17 2001/04/01 06:21:44 sam Exp $
+ * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
+ * $Id: vout_xvideo.c,v 1.1 2001/04/01 06:21:44 sam Exp $
  *
- * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ * Authors: Shane Harper <shanegh@optusnet.com.au>
+ *          Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME x11
+#define MODULE_NAME xvideo
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -46,6 +47,8 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/extensions/XShm.h>
+#include <X11/extensions/Xv.h>
+#include <X11/extensions/Xvlib.h>
 
 #include "config.h"
 #include "common.h"
@@ -73,19 +76,22 @@
 typedef struct vout_sys_s
 {
     /* User settings */
+#if 0
+    /* this plugin (currently) requires the SHM Ext... */
     boolean_t           b_shm;               /* shared memory extension flag */
+#endif
 
     /* Internal settings and properties */
     Display *           p_display;                        /* display pointer */
-    Visual *            p_visual;                          /* visual pointer */
     int                 i_screen;                           /* screen number */
     Window              window;                               /* root window */
     GC                  gc;              /* graphic context instance handler */
-    Colormap            colormap;               /* colormap used (8bpp only) */
+    int                 xv_port;
 
     /* Display buffers and shared memory information */
-    XImage *            p_ximage[2];                       /* XImage pointer */
-    XShmSegmentInfo     shm_info[2];       /* shared memory zone information */
+    /* Note: only 1 buffer (I don't know why the X11 plugin had 2.) */
+    XvImage *           p_xvimage;
+    XShmSegmentInfo     shm_info;       /* shared memory zone information */
 
     /* X11 generic properties */
     Atom                wm_protocols;
@@ -108,28 +114,28 @@ typedef struct vout_sys_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Probe     ( probedata_t *p_data );
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
-static void vout_Display   ( struct vout_thread_s * );
-static void vout_SetPalette( struct vout_thread_s *, u16*, u16*, u16*, u16* );
+static int  vout_Probe     ( probedata_t * );
+static int  vout_Create    ( vout_thread_t * );
+static int  vout_Init      ( vout_thread_t * );
+static void vout_End       ( vout_thread_t * );
+static void vout_Destroy   ( vout_thread_t * );
+static int  vout_Manage    ( vout_thread_t * );
+static void vout_Display   ( vout_thread_t * );
+static void vout_SetPalette( vout_thread_t *, u16 *, u16 *, u16 *, u16 * );
 
-static int  X11CreateWindow     ( vout_thread_t *p_vout );
-static int  X11InitDisplay      ( vout_thread_t *p_vout, char *psz_display );
+static int  XVideoCreateWindow       ( vout_thread_t * );
+static int  XVideoCreateShmImage     ( vout_thread_t *, XvImage **,
+                                       XShmSegmentInfo *p_shm_info );
+static void XVideoDestroyShmImage    ( vout_thread_t *, XvImage *,
+                                       XShmSegmentInfo * );
+static void XVideoTogglePointer      ( vout_thread_t * );
+static void XVideoEnableScreenSaver  ( vout_thread_t * );
+static void XVideoDisableScreenSaver ( vout_thread_t * );
 
-static int  X11CreateImage      ( vout_thread_t *p_vout, XImage **pp_ximage );
-static void X11DestroyImage     ( XImage *p_ximage );
-static int  X11CreateShmImage   ( vout_thread_t *p_vout, XImage **pp_ximage,
-                                  XShmSegmentInfo *p_shm_info );
-static void X11DestroyShmImage  ( vout_thread_t *p_vout, XImage *p_ximage,
-                                  XShmSegmentInfo *p_shm_info );
-
-static void X11TogglePointer            ( vout_thread_t *p_vout );
-static void X11EnableScreenSaver        ( vout_thread_t *p_vout );
-static void X11DisableScreenSaver       ( vout_thread_t *p_vout );
+static int  XVideoCheckForXv         ( Display * );
+static void XVideoOutputCoords       ( const picture_t *, const boolean_t,
+                                       const int, const int,
+                                       int *, int *, int *, int * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -150,21 +156,21 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * vout_Probe: probe the video driver and return a score
  *****************************************************************************
- * This function tries to initialize SDL and returns a score to the
- * plugin manager so that it can select the best plugin.
+ * This returns a score to the plugin manager so that it can select the best
+ * plugin.
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_METHOD_VAR, "x11" ) )
+    if( TestMethod( VOUT_METHOD_VAR, "xvideo" ) )
     {
         return( 999 );
     }
 
-    return( 50 );
+    return( 90 );
 }
 
 /*****************************************************************************
- * vout_Create: allocate X11 video thread output method
+ * vout_Create: allocate XVideo video thread output method
  *****************************************************************************
  * This function allocate and initialize a X11 vout method. It uses some of the
  * vout properties to choose the window size, and change them according to the
@@ -194,23 +200,19 @@ static int vout_Create( vout_thread_t *p_vout )
     }
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
-    /* Spawn base window - this window will include the video output window,
-     * but also command buttons, subtitles and other indicators */
-    if( X11CreateWindow( p_vout ) )
+    if( !XVideoCheckForXv( p_vout->p_sys->p_display ) )
     {
-        intf_ErrMsg( "vout error: cannot create X11 window" );
+        intf_ErrMsg( "vout error: no XVideo extension" );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
         return( 1 );
     }
 
-    /* Open and initialize device. This function issues its own error messages.
-     * Since XLib is usually not thread-safe, we can't use the same display
-     * pointer than the interface or another thread. However, the root window
-     * id is still valid. */
-    if( X11InitDisplay( p_vout, psz_display ) )
+    /* Spawn base window - this window will include the video output window,
+     * but also command buttons, subtitles and other indicators */
+    if( XVideoCreateWindow( p_vout ) )
     {
-        intf_ErrMsg( "vout error: cannot initialize X11 display" );
+        intf_ErrMsg( "vout error: cannot create XVideo window" );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
         return( 1 );
@@ -219,13 +221,13 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_mouse = 1;
 
     /* Disable screen saver and return */
-    X11DisableScreenSaver( p_vout );
+    XVideoDisableScreenSaver( p_vout );
 
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Init: initialize X11 video thread output method
+ * vout_Init: initialize XVideo video thread output method
  *****************************************************************************
  * This function create the XImages needed by the output thread. It is called
  * at the beginning of the thread, but also each time the window is resized.
@@ -239,95 +241,59 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->p_sys->b_shm = 0;
 #endif
 
-    /* Create XImages using XShm extension - on failure, fall back to regular
-     * way (and destroy the first image if it was created successfully) */
-    if( p_vout->p_sys->b_shm )
+    /* Create XImages using XShm extension */
+    i_err = XVideoCreateShmImage( p_vout, &p_vout->p_sys->p_xvimage,
+                                  &p_vout->p_sys->shm_info );
+    if( i_err )
     {
-        /* Create first image */
-        i_err = X11CreateShmImage( p_vout, &p_vout->p_sys->p_ximage[0],
-                                   &p_vout->p_sys->shm_info[0] );
-        if( !i_err )                         /* first image has been created */
-        {
-            /* Create second image */
-            if( X11CreateShmImage( p_vout, &p_vout->p_sys->p_ximage[1],
-                                   &p_vout->p_sys->shm_info[1] ) )
-            {                             /* error creating the second image */
-                X11DestroyShmImage( p_vout, p_vout->p_sys->p_ximage[0],
-                                    &p_vout->p_sys->shm_info[0] );
-                i_err = 1;
-            }
-        }
-        if( i_err )                                      /* an error occured */
-        {
-            intf_Msg( "vout: XShm video extension unavailable" );
-            p_vout->p_sys->b_shm = 0;
-        }
+        intf_Msg( "vout: XShm video extension unavailable" );
+        /* p_vout->p_sys->b_shm = 0; */
     }
-
-    /* Create XImages without XShm extension */
-    if( !p_vout->p_sys->b_shm )
-    {
-        if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[0] ) )
-        {
-            intf_ErrMsg( "vout error: cannot create images" );
-            p_vout->p_sys->p_ximage[0] = NULL;
-            p_vout->p_sys->p_ximage[1] = NULL;
-            return( 1 );
-        }
-        if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[1] ) )
-        {
-            intf_ErrMsg( "vout error: cannot create images" );
-            X11DestroyImage( p_vout->p_sys->p_ximage[0] );
-            p_vout->p_sys->p_ximage[0] = NULL;
-            p_vout->p_sys->p_ximage[1] = NULL;
-            return( 1 );
-        }
-    }
+    p_vout->b_need_render = 0; /* = 1 if not using Xv extension. */
 
     /* Set bytes per line and initialize buffers */
-    p_vout->i_bytes_per_line = p_vout->p_sys->p_ximage[0]->bytes_per_line;
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_ximage[ 0 ]->data,
-                     p_vout->p_sys->p_ximage[ 1 ]->data );
+    p_vout->i_bytes_per_line =
+        (p_vout->p_sys->p_xvimage->data_size) /
+        (p_vout->p_sys->p_xvimage->height);
+
+    /* vout_SetBuffers( p_vout, p_vout->p_sys->p_xvimage[0]->data,
+     *                          p_vout->p_sys->p_xvimage[1]->data ); */
+    p_vout->p_buffer[0].i_pic_x =         0;
+    p_vout->p_buffer[0].i_pic_y =         0;
+    p_vout->p_buffer[0].i_pic_width =     0;
+    p_vout->p_buffer[0].i_pic_height =    0;
+
+    /* The first area covers all the screen */
+    p_vout->p_buffer[0].i_areas =           1;
+    p_vout->p_buffer[0].pi_area_begin[0] =  0;
+    p_vout->p_buffer[0].pi_area_end[0] =    p_vout->i_height - 1;
+
+    /* Set addresses */
+    p_vout->p_buffer[0].p_data = p_vout->p_sys->p_xvimage->data;
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_End: terminate X11 video thread output method
+ * vout_End: terminate XVideo video thread output method
  *****************************************************************************
- * Destroy the X11 XImages created by vout_Init. It is called at the end of
+ * Destroy the XVideo xImages created by vout_Init. It is called at the end of
  * the thread, but also each time the window is resized.
  *****************************************************************************/
 static void vout_End( vout_thread_t *p_vout )
 {
-    if( p_vout->p_sys->b_shm )                             /* Shm XImages... */
-    {
-        X11DestroyShmImage( p_vout, p_vout->p_sys->p_ximage[0],
-                            &p_vout->p_sys->shm_info[0] );
-        X11DestroyShmImage( p_vout, p_vout->p_sys->p_ximage[1],
-                            &p_vout->p_sys->shm_info[1] );
-    }
-    else                                          /* ...or regular XImages */
-    {
-        X11DestroyImage( p_vout->p_sys->p_ximage[0] );
-        X11DestroyImage( p_vout->p_sys->p_ximage[1] );
-    }
+    XVideoDestroyShmImage( p_vout, p_vout->p_sys->p_xvimage,
+                           &p_vout->p_sys->shm_info );
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy X11 video thread output method
+ * vout_Destroy: destroy XVideo video thread output method
  *****************************************************************************
  * Terminate an output method created by vout_CreateOutputMethod
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
     /* Enable screen saver */
-    X11EnableScreenSaver( p_vout );
-
-    /* Destroy colormap */
-    if( p_vout->i_screen_depth == 8 )
-    {
-        XFreeColormap( p_vout->p_sys->p_display, p_vout->p_sys->colormap );
-    }
+    XVideoEnableScreenSaver( p_vout );
 
     /* Destroy window */
     XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
@@ -346,6 +312,9 @@ static void vout_Destroy( vout_thread_t *p_vout )
  * This function should be called regularly by video output thread. It manages
  * X11 events and allows window resizing. It returns a non null value on
  * error.
+ *
+ * XXX  Should "factor-out" common code in this and the "same" fn in the x11
+ * XXX  plugin!
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {
@@ -369,16 +338,18 @@ static int vout_Manage( vout_thread_t *p_vout )
                 || (xevent.xconfigure.height != p_vout->p_sys->i_height)) )
         {
             /* Update dimensions */
+#if 0 XXX XXX
             b_resized = 1;
             p_vout->p_sys->i_width = xevent.xconfigure.width;
             p_vout->p_sys->i_height = xevent.xconfigure.height;
+#endif XXX XXX
         }
         /* MapNotify event: change window status and disable screen saver */
         else if( xevent.type == MapNotify)
         {
             if( (p_vout != NULL) && !p_vout->b_active )
             {
-                X11DisableScreenSaver( p_vout );
+                XVideoDisableScreenSaver( p_vout );
                 p_vout->b_active = 1;
             }
         }
@@ -387,7 +358,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         {
             if( (p_vout != NULL) && p_vout->b_active )
             {
-                X11EnableScreenSaver( p_vout );
+                XVideoEnableScreenSaver( p_vout );
                 p_vout->b_active = 0;
             }
         }
@@ -417,7 +388,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                     break;
 
                 case Button2:
-                    X11TogglePointer( p_vout );
+                    XVideoTogglePointer( p_vout );
                     break;
             }
         }
@@ -459,18 +430,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
     }
 
-    /*
-     * Handle vout window resizing
-     */
-    if( b_resized )
-    {
-        /* If interface window has been resized, change vout size */
-        intf_DbgMsg( "resizing output window" );
-        p_vout->i_width =  p_vout->p_sys->i_width;
-        p_vout->i_height = p_vout->p_sys->i_height;
-        p_vout->i_changes |= VOUT_SIZE_CHANGE;
-    }
-    else if( (p_vout->i_width  != p_vout->p_sys->i_width) ||
+    if( (p_vout->i_width  != p_vout->p_sys->i_width) ||
              (p_vout->i_height != p_vout->p_sys->i_height) )
     {
         /* If video output size has changed, change interface window size */
@@ -480,11 +440,8 @@ static int vout_Manage( vout_thread_t *p_vout )
         XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window,
                        p_vout->p_sys->i_width, p_vout->p_sys->i_height );
     }
-    /*
-     * Color/Grayscale or gamma change: in 8bpp, just change the colormap
-     */
-    if( (p_vout->i_changes & VOUT_GRAYSCALE_CHANGE)
-        && (p_vout->i_screen_depth == 8) )
+
+    if( (p_vout->i_changes & VOUT_GRAYSCALE_CHANGE))
     {
         /* FIXME: clear flags ?? */
     }
@@ -494,7 +451,7 @@ static int vout_Manage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_DbgMsg( "vout info: resizing window" );
+        intf_DbgMsg( "vout: resizing window" );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Resize window */
@@ -504,23 +461,20 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Destroy XImages to change their size */
         vout_End( p_vout );
 
-        /* Recreate XImages. If SysInit failed, the thread can't go on. */
+        /* Recreate XImages. If SysInit failed, the thread cannot go on. */
         if( vout_Init( p_vout ) )
         {
             intf_ErrMsg( "vout error: cannot resize display" );
             return( 1 );
        }
 
-        /* Tell the video output thread that it will need to rebuild YUV
-         * tables. This is needed since conversion buffer size may have
-         * changed */
-        p_vout->i_changes |= VOUT_YUV_CHANGE;
         intf_Msg( "vout: video display resized (%dx%d)",
-                  p_vout->i_width, p_vout->i_height);
+                  p_vout->i_width, p_vout->i_height );
     }
 
     return 0;
 }
+
 
 /*****************************************************************************
  * vout_Display: displays previously rendered output
@@ -530,69 +484,96 @@ static int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Display( vout_thread_t *p_vout )
 {
-    if( p_vout->p_sys->b_shm)                                /* XShm is used */
-    {
-        /* Display rendered image using shared memory extension */
-        XShmPutImage(p_vout->p_sys->p_display, p_vout->p_sys->window, p_vout->p_sys->gc,
-                     p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ],
-                     0, 0, 0, 0,
-                     p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->width,
-                     p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->height, True);
+    boolean_t b_draw = 1;
+    const int i_size = p_vout->i_width * p_vout->i_height;
 
-        /* Send the order to the X server */
-        XSync(p_vout->p_sys->p_display, False);
+    switch( p_vout->p_rendered_pic->i_type )
+    {
+    case YUV_422_PICTURE:
+        intf_ErrMsg( "vout error: YUV_422_PICTURE not (yet) supported" );
+        b_draw = 0;
+        break;
+
+    case YUV_444_PICTURE:
+        intf_ErrMsg( "vout error: YUV_444_PICTURE not (yet) supported" );
+        b_draw = 0;
+        break;
+
+    case YUV_420_PICTURE:
+        memcpy( p_vout->p_sys->p_xvimage->data,
+                p_vout->p_rendered_pic->p_y, i_size );
+        memcpy( p_vout->p_sys->p_xvimage->data + ( i_size ),
+                p_vout->p_rendered_pic->p_v, i_size / 4 );
+        memcpy( p_vout->p_sys->p_xvimage->data + ( i_size ) + ( i_size / 4 ),
+                p_vout->p_rendered_pic->p_u, i_size / 4 );
+        break;
     }
-    else                                /* regular X11 capabilities are used */
-    {
-        XPutImage(p_vout->p_sys->p_display, p_vout->p_sys->window, p_vout->p_sys->gc,
-                  p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ],
-                  0, 0, 0, 0,
-                  p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->width,
-                  p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->height);
 
-        /* Send the order to the X server */
-        XSync(p_vout->p_sys->p_display, False);
+    if( b_draw )
+    {
+        int     i_dummy, i_src_width, i_src_height,
+                i_dest_width, i_dest_height, i_dest_x, i_dest_y;
+        Window  window;
+
+        /* Could use p_vout->p_sys->i_width and p_vout->p_sys->i_height
+         *instead of calling XGetGeometry? */
+        XGetGeometry( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                      &window, &i_dummy, &i_dummy,
+                      &i_src_width, &i_src_height, &i_dummy, &i_dummy );
+
+        XVideoOutputCoords( p_vout->p_rendered_pic, p_vout->b_scale,
+                            i_src_width, i_src_height, &i_dest_x, &i_dest_y,
+                            &i_dest_width, &i_dest_height);
+  
+        XvShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->xv_port,
+                       p_vout->p_sys->window, p_vout->p_sys->gc,
+                       p_vout->p_sys->p_xvimage,
+                       0 /*src_x*/, 0 /*src_y*/,
+                       p_vout->p_rendered_pic->i_width,
+                       p_vout->p_rendered_pic->i_height,
+                       i_dest_x, i_dest_y, i_dest_width, i_dest_height,
+                       True );
     }
 }
 
-/*****************************************************************************
- * vout_SetPalette: sets an 8 bpp palette
- *****************************************************************************
- * This function sets the palette given as an argument. It does not return
- * anything, but could later send information on which colors it was unable
- * to set.
- *****************************************************************************/
 static void vout_SetPalette( p_vout_thread_t p_vout,
                              u16 *red, u16 *green, u16 *blue, u16 *transp )
 {
-    int i, j;
-    XColor p_colors[255];
-
-    intf_DbgMsg( "Palette change called" );
-
-    /* allocate palette */
-    for( i = 0, j = 255; i < 255; i++, j-- )
-    {
-        /* kludge: colors are indexed reversely because color 255 seems
-         * to be reserved for black even if we try to set it to white */
-        p_colors[ i ].pixel = j;
-        p_colors[ i ].pad   = 0;
-        p_colors[ i ].flags = DoRed | DoGreen | DoBlue;
-        p_colors[ i ].red   = red[ j ];
-        p_colors[ i ].blue  = blue[ j ];
-        p_colors[ i ].green = green[ j ];
-    }
-
-    XStoreColors( p_vout->p_sys->p_display,
-                  p_vout->p_sys->colormap, p_colors, 256 );
+    return;
 }
 
 /* following functions are local */
 
 /*****************************************************************************
- * X11CreateWindow: open and set-up X11 main window
+ * XVideoCheckForXv: check for the XVideo extension
  *****************************************************************************/
-static int X11CreateWindow( vout_thread_t *p_vout )
+static int XVideoCheckForXv( Display *dpy )
+{
+    unsigned int i;
+
+    switch( XvQueryExtension( dpy, &i, &i, &i, &i, &i ) )
+    {
+        case Success:
+            return( 1 );
+
+        case XvBadExtension:
+            intf_ErrMsg( "vout error: XvBadExtension" );
+            return( 0 );
+
+        case XvBadAlloc:
+            intf_ErrMsg( "vout error: XvBadAlloc" );
+            return( 0 );
+
+        default:
+            intf_ErrMsg( "vout error: XvQueryExtension failed" );
+            return( 0 );
+    }
+}
+
+/*****************************************************************************
+ * XVideoCreateWindow: open and set-up XVideo main window
+ *****************************************************************************/
+static int XVideoCreateWindow( vout_thread_t *p_vout )
 {
     XSizeHints              xsize_hints;
     XSetWindowAttributes    xwindow_attributes;
@@ -642,7 +623,7 @@ static int X11CreateWindow( vout_thread_t *p_vout )
     XSetCommand( p_vout->p_sys->p_display, p_vout->p_sys->window,
                  p_main->ppsz_argv, p_main->i_argc );
     XStoreName( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                VOUT_TITLE " (X11 output)" );
+                VOUT_TITLE " (XVideo output)" );
 
     if( (p_vout->p_sys->wm_protocols == None)        /* use WM_DELETE_WINDOW */
         || (p_vout->p_sys->wm_delete_window == None)
@@ -650,7 +631,7 @@ static int X11CreateWindow( vout_thread_t *p_vout )
                              &p_vout->p_sys->wm_delete_window, 1 ) )
     {
         /* WM_DELETE_WINDOW is not supported by window manager */
-        intf_Msg( "intf error: missing or bad window manager" );
+        intf_Msg( "vout error: missing or bad window manager" );
     }
 
     /* Creation of a graphic context that doesn't generate a GraphicsExpose
@@ -695,284 +676,110 @@ static int X11CreateWindow( vout_thread_t *p_vout )
                   StructureNotifyMask | KeyPressMask |
                   ButtonPressMask | ButtonReleaseMask );
 
-    if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
-    {
-        /* Allocate a new palette */
-        p_vout->p_sys->colormap =
-            XCreateColormap( p_vout->p_sys->p_display,
-                             DefaultRootWindow( p_vout->p_sys->p_display ),
-                             DefaultVisual( p_vout->p_sys->p_display,
-                                            p_vout->p_sys->i_screen ),
-                             AllocAll );
-
-        xwindow_attributes.colormap = p_vout->p_sys->colormap;
-        XChangeWindowAttributes( p_vout->p_sys->p_display,
-                                 p_vout->p_sys->window,
-                                 CWColormap, &xwindow_attributes );
-    }
-
     /* At this stage, the window is open, displayed, and ready to
      * receive data */
     return( 0 );
 }
 
 /*****************************************************************************
- * X11InitDisplay: open and initialize X11 device
- *****************************************************************************
- * Create a window according to video output given size, and set other
- * properties according to the display properties.
- *****************************************************************************/
-static int X11InitDisplay( vout_thread_t *p_vout, char *psz_display )
-{
-    XPixmapFormatValues *       p_formats;                 /* pixmap formats */
-    XVisualInfo *               p_xvisual;           /* visuals informations */
-    XVisualInfo                 xvisual_template;         /* visual template */
-    int                         i_count;                       /* array size */
-
-    /* Initialize structure */
-    p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
-    p_vout->p_sys->b_shm    = ( XShmQueryExtension( p_vout->p_sys->p_display )
-                                 == True );
-    if( !p_vout->p_sys->b_shm )
-    {
-        intf_Msg( "vout: XShm video extension is not available" );
-    }
-
-    /* Get screen depth */
-    p_vout->i_screen_depth = XDefaultDepth( p_vout->p_sys->p_display,
-                                            p_vout->p_sys->i_screen );
-    switch( p_vout->i_screen_depth )
-    {
-    case 8:
-        /*
-         * Screen depth is 8bpp. Use PseudoColor visual with private colormap.
-         */
-        xvisual_template.screen =   p_vout->p_sys->i_screen;
-        xvisual_template.class =    DirectColor;
-        p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display,
-                                    VisualScreenMask | VisualClassMask,
-                                    &xvisual_template, &i_count );
-        if( p_xvisual == NULL )
-        {
-            intf_ErrMsg( "vout error: no PseudoColor visual available" );
-            return( 1 );
-        }
-        p_vout->i_bytes_per_pixel = 1;
-        break;
-    case 15:
-    case 16:
-    case 24:
-    default:
-        /*
-         * Screen depth is higher than 8bpp. TrueColor visual is used.
-         */
-        xvisual_template.screen =   p_vout->p_sys->i_screen;
-        xvisual_template.class =    TrueColor;
-        p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display,
-                                    VisualScreenMask | VisualClassMask,
-                                    &xvisual_template, &i_count );
-        if( p_xvisual == NULL )
-        {
-            intf_ErrMsg( "vout error: no TrueColor visual available" );
-            return( 1 );
-        }
-        p_vout->i_red_mask =        p_xvisual->red_mask;
-        p_vout->i_green_mask =      p_xvisual->green_mask;
-        p_vout->i_blue_mask =       p_xvisual->blue_mask;
-
-        /* There is no difference yet between 3 and 4 Bpp. The only way
-         * to find the actual number of bytes per pixel is to list supported
-         * pixmap formats. */
-        p_formats = XListPixmapFormats( p_vout->p_sys->p_display, &i_count );
-        p_vout->i_bytes_per_pixel = 0;
-
-        for( ; i_count-- ; p_formats++ )
-        {
-            /* Under XFree4.0, the list contains pixmap formats available
-             * through all video depths ; so we have to check against current
-             * depth. */
-            if( p_formats->depth == p_vout->i_screen_depth )
-            {
-                if( p_formats->bits_per_pixel / 8
-                        > p_vout->i_bytes_per_pixel )
-                {
-                    p_vout->i_bytes_per_pixel = p_formats->bits_per_pixel / 8;
-                }
-            }
-        }
-        break;
-    }
-    p_vout->p_sys->p_visual = p_xvisual->visual;
-    XFree( p_xvisual );
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * X11CreateImage: create an XImage
- *****************************************************************************
- * Create a simple XImage used as a buffer.
- *****************************************************************************/
-static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
-{
-    byte_t *    pb_data;                          /* image data storage zone */
-    int         i_quantum;                     /* XImage quantum (see below) */
-
-    /* Allocate memory for image */
-    p_vout->i_bytes_per_line = p_vout->i_width * p_vout->i_bytes_per_pixel;
-    pb_data = (byte_t *) malloc( p_vout->i_bytes_per_line * p_vout->i_height );
-    if( !pb_data )                                                  /* error */
-    {
-        intf_ErrMsg( "vout error: %s", strerror(ENOMEM));
-        return( 1 );
-    }
-
-    /* Optimize the quantum of a scanline regarding its size - the quantum is
-       a diviser of the number of bits between the start of two scanlines. */
-    if( !(( p_vout->i_bytes_per_line ) % 32) )
-    {
-        i_quantum = 32;
-    }
-    else
-    {
-        if( !(( p_vout->i_bytes_per_line ) % 16) )
-        {
-            i_quantum = 16;
-        }
-        else
-        {
-            i_quantum = 8;
-        }
-    }
-
-    /* Create XImage */
-    *pp_ximage = XCreateImage( p_vout->p_sys->p_display,
-                               p_vout->p_sys->p_visual, p_vout->i_screen_depth,
-                               ZPixmap, 0, pb_data,
-                               p_vout->i_width, p_vout->i_height, i_quantum, 0);
-    if(! *pp_ximage )                                               /* error */
-    {
-        intf_ErrMsg( "error: XCreateImage() failed" );
-        free( pb_data );
-        return( 1 );
-    }
-
-    return 0;
-}
-
-/*****************************************************************************
- * X11CreateShmImage: create an XImage using shared memory extension
+ * XVideoCreateShmImage: create an XImage using shared memory extension
  *****************************************************************************
  * Prepare an XImage for DisplayX11ShmImage function.
  * The order of the operations respects the recommandations of the mit-shm
  * document by J.Corbet and K.Packard. Most of the parameters were copied from
  * there.
  *****************************************************************************/
-static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
-                              XShmSegmentInfo *p_shm_info)
+static int XVideoCreateShmImage( vout_thread_t *p_vout, XvImage **pp_xvimage,
+                                 XShmSegmentInfo *p_shm_info)
 {
-    /* Create XImage */
-    *pp_ximage =
-        XShmCreateImage( p_vout->p_sys->p_display, p_vout->p_sys->p_visual,
-                         p_vout->i_screen_depth, ZPixmap, 0,
-                         p_shm_info, p_vout->i_width, p_vout->i_height );
-    if(! *pp_ximage )                                               /* error */
+    int            i_adaptors;
+    XvAdaptorInfo *adaptor_info;
+
+    /* find xv_port... */
+    switch( XvQueryAdaptors( p_vout->p_sys->p_display,
+                             DefaultRootWindow( p_vout->p_sys->p_display ),
+                             &i_adaptors, &adaptor_info ) )
     {
-        intf_ErrMsg( "vout error: XShmCreateImage() failed" );
-        return( 1 );
+        case Success:
+            break;
+
+        case XvBadExtension:
+            intf_ErrMsg( "vout error: XvBadExtension for XvQueryAdaptors" );
+            return( -1 );
+
+        case XvBadAlloc:
+            intf_ErrMsg( "vout error: XvBadAlloc for XvQueryAdaptors" );
+            return( -1 );
+
+        default:
+            intf_ErrMsg( "vout error: XvQueryAdaptors failed" );
+            return( -1 );
     }
 
-    /* Allocate shared memory segment - 0777 set the access permission
-     * rights (like umask), they are not yet supported by X servers */
-    p_shm_info->shmid =
-        shmget( IPC_PRIVATE, (*pp_ximage)->bytes_per_line
-                                 * (*pp_ximage)->height, IPC_CREAT | 0777);
-    if( p_shm_info->shmid < 0)                                      /* error */
+    /* XXX is this right? */
+    p_vout->p_sys->xv_port = adaptor_info[ i_adaptors - 1 ].base_id;
+
+    #define GUID_YUV12_PLANAR 0x32315659
+
+    *pp_xvimage = XvShmCreateImage( p_vout->p_sys->p_display,
+                                    p_vout->p_sys->xv_port,
+                                    GUID_YUV12_PLANAR, 0,
+                                    p_vout->i_width, p_vout->i_height,
+                                    p_shm_info );
+
+    p_shm_info->shmid    = shmget( IPC_PRIVATE, (*pp_xvimage)->data_size,
+                                   IPC_CREAT | 0777 );
+    p_shm_info->shmaddr  = (*pp_xvimage)->data = shmat( p_shm_info->shmid,
+                                                        0, 0 );
+    p_shm_info->readOnly = False;
+
+    shmctl( p_shm_info->shmid, IPC_RMID, 0 ); /* XXX */
+
+    if( !XShmAttach(p_vout->p_sys->p_display, p_shm_info) )
     {
-        intf_ErrMsg( "vout error: cannot allocate shared image data (%s)",
-                    strerror(errno));
-        XDestroyImage( *pp_ximage );
-        return( 1 );
-    }
-
-    /* Attach shared memory segment to process (read/write) */
-    p_shm_info->shmaddr = (*pp_ximage)->data = shmat(p_shm_info->shmid, 0, 0);
-    if(! p_shm_info->shmaddr )
-    {                                                               /* error */
-        intf_ErrMsg( "vout error: cannot attach shared memory (%s)",
-                    strerror(errno));
-        shmctl( p_shm_info->shmid, IPC_RMID, 0 );      /* free shared memory */
-        XDestroyImage( *pp_ximage );
-        return( 1 );
-    }
-
-    /* Mark the shm segment to be removed when there will be no more
-     * attachements, so it is automatic on process exit or after shmdt */
-    shmctl( p_shm_info->shmid, IPC_RMID, 0 );
-
-    /* Attach shared memory segment to X server (read only) */
-    p_shm_info->readOnly = True;
-    if( XShmAttach( p_vout->p_sys->p_display, p_shm_info )
-         == False )                                                 /* error */
-    {
-        intf_ErrMsg( "vout error: cannot attach shared memory to X11 server" );
-        shmdt( p_shm_info->shmaddr );   /* detach shared memory from process
-                                         * and automatic free */
-        XDestroyImage( *pp_ximage );
-        return( 1 );
+        intf_ErrMsg( "vout error: XShmAttach failed" );
+        return( -1 );
     }
 
     /* Send image to X server. This instruction is required, since having
      * built a Shm XImage and not using it causes an error on XCloseDisplay */
     XFlush( p_vout->p_sys->p_display );
+
     return( 0 );
 }
 
 /*****************************************************************************
- * X11DestroyImage: destroy an XImage
- *****************************************************************************
- * Destroy XImage AND associated data. If pointer is NULL, the image won't be
- * destroyed (see vout_ManageOutputMethod())
- *****************************************************************************/
-static void X11DestroyImage( XImage *p_ximage )
-{
-    if( p_ximage != NULL )
-    {
-        XDestroyImage( p_ximage );                     /* no free() required */
-    }
-}
-
-/*****************************************************************************
- * X11DestroyShmImage
+ * XVideoDestroyShmImage
  *****************************************************************************
  * Destroy XImage AND associated data. Detach shared memory segment from
  * server and process, then free it. If pointer is NULL, the image won't be
  * destroyed (see vout_ManageOutputMethod())
  *****************************************************************************/
-static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
-                                XShmSegmentInfo *p_shm_info )
+static void XVideoDestroyShmImage( vout_thread_t *p_vout, XvImage *p_xvimage,
+                                   XShmSegmentInfo *p_shm_info )
 {
     /* If pointer is NULL, do nothing */
-    if( p_ximage == NULL )
+    if( p_xvimage == NULL )
     {
         return;
     }
 
     XShmDetach( p_vout->p_sys->p_display, p_shm_info );/* detach from server */
+#if 0
     XDestroyImage( p_ximage );
+#else
+/*    XvDestroyImage( p_xvimage ); XXX */
+#endif
 
     if( shmdt( p_shm_info->shmaddr ) )  /* detach shared memory from process */
     {                                   /* also automatic freeing...         */
-        intf_ErrMsg( "error: cannot detach shared memory (%s)",
+        intf_ErrMsg( "vout error: cannot detach shared memory (%s)",
                      strerror(errno) );
     }
 }
 
-
-/* WAZAAAAAAAAAAA */
-
 /*****************************************************************************
- * X11EnableScreenSaver: enable screen saver
+ * XVideoEnableScreenSaver: enable screen saver
  *****************************************************************************
  * This function enable the screen saver on a display after it had been
  * disabled by XDisableScreenSaver. Both functions use a counter mechanism to
@@ -980,7 +787,7 @@ static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
  * are made to XDisableScreenSaver, n successive calls to XEnableScreenSaver
  * will be required before the screen saver could effectively be activated.
  *****************************************************************************/
-void X11EnableScreenSaver( vout_thread_t *p_vout )
+void XVideoEnableScreenSaver( vout_thread_t *p_vout )
 {
     intf_DbgMsg( "intf: enabling screen saver" );
     XSetScreenSaver( p_vout->p_sys->p_display, p_vout->p_sys->i_ss_timeout,
@@ -990,11 +797,11 @@ void X11EnableScreenSaver( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * X11DisableScreenSaver: disable screen saver
+ * XVideoDisableScreenSaver: disable screen saver
  *****************************************************************************
  * See XEnableScreenSaver
  *****************************************************************************/
-void X11DisableScreenSaver( vout_thread_t *p_vout )
+void XVideoDisableScreenSaver( vout_thread_t *p_vout )
 {
     /* Save screen saver informations */
     XGetScreenSaver( p_vout->p_sys->p_display, &p_vout->p_sys->i_ss_timeout,
@@ -1003,7 +810,7 @@ void X11DisableScreenSaver( vout_thread_t *p_vout )
                      &p_vout->p_sys->i_ss_exposure );
 
     /* Disable screen saver */
-    intf_DbgMsg( "vout: disabling screen saver" );
+    intf_DbgMsg( "intf: disabling screen saver" );
     XSetScreenSaver( p_vout->p_sys->p_display, 0,
                      p_vout->p_sys->i_ss_interval,
                      p_vout->p_sys->i_ss_blanking,
@@ -1011,13 +818,13 @@ void X11DisableScreenSaver( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * X11TogglePointer: hide or show the mouse pointer
+ * XVideoTogglePointer: hide or show the mouse pointer
  *****************************************************************************
  * This function hides the X pointer if it is visible by putting it at
  * coordinates (32,32) and setting the pointer sprite to a blank one. To
  * show it again, we disable the sprite and restore the original coordinates.
  *****************************************************************************/
-void X11TogglePointer( vout_thread_t *p_vout )
+void XVideoTogglePointer( vout_thread_t *p_vout )
 {
     static Cursor cursor;
     static boolean_t b_cursor = 0;
@@ -1057,5 +864,46 @@ void X11TogglePointer( vout_thread_t *p_vout )
 
         XUndefineCursor( p_vout->p_sys->p_display, p_vout->p_sys->window );
     }
+}
+
+/* This based on some code in SetBufferPicture... At the moment it's only
+ * used by the xvideo plugin, but others may want to use it. */
+static void XVideoOutputCoords( const picture_t *p_pic, const boolean_t scale,
+                                const int win_w, const int win_h,
+                                int *dx, int *dy, int *w, int *h)
+{
+    if( !scale )
+    {
+        *w = p_pic->i_width; *h = p_pic->i_height;
+    }
+    else
+    {
+        *w = win_w;
+        switch( p_pic->i_aspect_ratio )
+        {
+        case AR_3_4_PICTURE:        *h = win_w * 3 / 4;      break;
+        case AR_16_9_PICTURE:       *h = win_w * 9 / 16;     break;
+        case AR_221_1_PICTURE:      *h = win_w * 100 / 221;  break;
+        case AR_SQUARE_PICTURE:
+                default:            *h = win_w; break;
+        }
+
+        if( *h > win_h )
+        {
+            *h = win_h;
+            switch( p_pic->i_aspect_ratio )
+            {
+            case AR_3_4_PICTURE:    *w = win_h * 4 / 3;      break;
+            case AR_16_9_PICTURE:   *w = win_h * 16 / 9;     break;
+            case AR_221_1_PICTURE:  *w = win_h * 221 / 100;  break;
+            case AR_SQUARE_PICTURE:
+                    default:        *w = win_h; break;
+            }
+        }
+    }
+
+    /* Set picture position */
+    *dx = (win_w - *w) / 2;
+    *dy = (win_h - *h) / 2;
 }
 
