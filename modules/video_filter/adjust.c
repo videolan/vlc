@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: adjust.c,v 1.14 2003/10/15 22:49:48 gbazin Exp $
+ * $Id: adjust.c,v 1.15 2004/01/22 15:00:10 sigmunau Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>
  *
@@ -65,6 +65,8 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define SAT_LONGTEXT N_("Set the image saturation, between 0 and 3. Defaults to 1")
 #define LUM_TEXT N_("Set image brightness")
 #define LUM_LONGTEXT N_("Set the image brightness, between 0 and 2. Defaults to 1")
+#define GAMMA_TEXT N_("Set image gamma")
+#define GAMMA_LONGTEXT N_("Set the image gamma, between 0.01 and 10. Defaults to 1")
 
 
 vlc_module_begin();
@@ -73,7 +75,8 @@ vlc_module_begin();
     add_float_with_range( "brightness", 1.0, 0.0, 2.0, NULL, LUM_TEXT, LUM_LONGTEXT, VLC_FALSE );
     add_integer_with_range( "hue", 0, 0, 360, NULL, HUE_TEXT, HUE_LONGTEXT, VLC_FALSE );
     add_float_with_range( "saturation", 1.0, 0.0, 3.0, NULL, SAT_TEXT, SAT_LONGTEXT, VLC_FALSE );
-    set_description( _("contrast/hue/saturation/brightness filter") );
+    add_float_with_range( "gamma", 1.0, 0.01, 10.0, NULL, GAMMA_TEXT, GAMMA_LONGTEXT, VLC_FALSE );
+    set_description( _("contrast/hue/saturation/brightness/gamma filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "adjust" );
     set_callbacks( Create, Destroy );
@@ -204,12 +207,14 @@ static void Destroy( vlc_object_t *p_this )
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int pi_luma[256];
+    int pi_gamma[256];
 
     picture_t *p_outpic;
     uint8_t *p_in, *p_in_v, *p_in_end, *p_line_end;
     uint8_t *p_out, *p_out_v;
 
     double  f_hue;
+    double  f_gamma;
     int32_t i_cont, i_lum;
     int i_sat, i_sin, i_cos, i_x, i_y;
     int i;
@@ -233,15 +238,22 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     i_lum = (config_GetFloat( p_vout, "brightness" ) - 1.0) * 255;
     f_hue = config_GetInt( p_vout, "hue" ) * M_PI / 180;
     i_sat = config_GetFloat( p_vout, "saturation" ) * 256;
+    f_gamma = 1.0 / config_GetFloat( p_vout, "gamma" );
 
     /* Contrast is a fast but kludged function, so I put this gap to be
      * cleaner :) */
     i_lum += 128 - i_cont / 2;
 
+    /* Fill the gamma lookup table */
+    for( i = 0 ; i < 256 ; i++ )
+    {
+      pi_gamma[ i ] = clip( pow(i / 255.0, f_gamma) * 255.0);
+    }
+
     /* Fill the luma lookup table */
     for( i = 0 ; i < 256 ; i++ )
     {
-        pi_luma[ i ] = clip( i_lum + i_cont * i / 256 );
+        pi_luma[ i ] = pi_gamma[clip( i_lum + i_cont * i / 256)];
     }
 
     /*

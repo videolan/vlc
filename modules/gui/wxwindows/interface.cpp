@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.83 2004/01/05 13:00:39 zorglub Exp $
+ * $Id: interface.cpp,v 1.84 2004/01/22 15:00:10 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -145,6 +145,7 @@ enum
     Contrast_Event,
     Brightness_Event,
     Saturation_Event,
+    Gamma_Event,
 
     Ratio_Event,
     Visual_Event,
@@ -200,6 +201,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_COMMAND_SCROLL(Contrast_Event, Interface::OnContrastUpdate)
     EVT_COMMAND_SCROLL(Brightness_Event, Interface::OnBrightnessUpdate)
     EVT_COMMAND_SCROLL(Saturation_Event, Interface::OnSaturationUpdate)
+    EVT_COMMAND_SCROLL(Gamma_Event, Interface::OnGammaUpdate)
 
 END_EVENT_TABLE()
 
@@ -546,11 +548,21 @@ void Interface::CreateOurExtraPanel()
     saturation_sizer->Add(saturation_slider,1,0,0);
     saturation_sizer->Layout();
 
+    wxBoxSizer *gamma_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxStaticText *gamma_text = new wxStaticText( extra_frame, -1,
+                                          wxU(_("Gamma")) );
+    gamma_slider = new wxSlider ( extra_frame, Gamma_Event, 0, 0,
+                           100, wxDefaultPosition, wxDefaultSize );
+    gamma_sizer->Add(gamma_text,1,0,0);
+    gamma_sizer->Add(gamma_slider,1,0,0);
+    gamma_sizer->Layout();
+
     adjust_sizer->Add(adjust_check, 1, wxEXPAND, 0);
     adjust_sizer->Add(hue_sizer, 1, wxEXPAND, 0);
     adjust_sizer->Add(contrast_sizer, 1, wxEXPAND, 0);
     adjust_sizer->Add(brightness_sizer, 1, wxEXPAND, 0);
     adjust_sizer->Add(saturation_sizer, 1, wxEXPAND, 0);
+    adjust_sizer->Add(gamma_sizer, 1, wxEXPAND, 0);
 
     extra_sizer->Add(adjust_sizer,1,wxBOTTOM,5);
 
@@ -637,6 +649,7 @@ void Interface::CreateOurExtraPanel()
         contrast_slider->Enable();
         brightness_slider->Enable();
         hue_slider->Enable();
+        gamma_slider->Enable();
     }
     else
     {
@@ -645,6 +658,7 @@ void Interface::CreateOurExtraPanel()
         contrast_slider->Disable();
         brightness_slider->Disable();
         hue_slider->Disable();
+        gamma_slider->Disable();
     }
     if( psz_filters ) free( psz_filters );
 
@@ -662,6 +676,9 @@ void Interface::CreateOurExtraPanel()
     f_value = config_GetFloat( p_intf, "brightness" );
     if( f_value > 0 && f_value < 2 )
         brightness_slider->SetValue( (int)(100 * f_value) );
+    f_value = config_GetFloat( p_intf, "gamma" );
+    if (f_value > 0 && f_value < 10 )
+        gamma_slider->SetValue( (int)(10 * f_value) );
 
     extra_frame->Hide();
 }
@@ -983,6 +1000,7 @@ void Interface::OnEnableAdjust(wxCommandEvent& event)
         saturation_slider->Enable();
         contrast_slider->Enable();
         hue_slider->Enable();
+        gamma_slider->Enable();
     }
     else
     {
@@ -1025,6 +1043,7 @@ void Interface::OnEnableAdjust(wxCommandEvent& event)
         saturation_slider->Disable();
         contrast_slider->Disable();
         hue_slider->Disable();
+        gamma_slider->Disable();
     }
     if(psz_filters) free(psz_filters);
     if(psz_new) free(psz_new);
@@ -1049,6 +1068,11 @@ void Interface::OnContrastUpdate(wxScrollEvent& event)
 {
    config_PutFloat( p_intf , "contrast" , (float)event.GetPosition()/100 );
 
+}
+
+void Interface::OnGammaUpdate(wxScrollEvent& event)
+{
+    config_PutFloat( p_intf , "gamma" , (float)event.GetPosition()/10 );
 }
 
 void Interface::OnRatio( wxCommandEvent& event )

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.85 2004/01/15 21:49:07 sigmunau Exp $
+ * $Id: wxwindows.h,v 1.86 2004/01/22 15:00:10 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -178,6 +178,7 @@ public:
     wxSlider *contrast_slider;
     wxSlider *saturation_slider;
     wxSlider *hue_slider;
+    wxSlider *gamma_slider;
 
     wxStaticBox *other_box;
     wxComboBox *ratio_combo;
@@ -218,6 +219,7 @@ private:
     void OnContrastUpdate( wxScrollEvent& event );
     void OnBrightnessUpdate( wxScrollEvent& event );
     void OnSaturationUpdate( wxScrollEvent& event );
+    void OnGammaUpdate( wxScrollEvent& event );
 
     void OnRatio( wxCommandEvent& event );
     void OnEnableVisual( wxCommandEvent& event );
