@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.14 2003/08/29 19:49:33 fenrir Exp $
+ * $Id: standard.c,v 1.15 2003/09/13 17:44:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -109,8 +109,10 @@ static int Open( vlc_object_t *p_this )
             { "wma", "asf" },
             { "wmv", "asf" },
             { "trp", "ts" },
+            { "ts",  "ts" },
             { "mpg", "ps" },
             { "mpeg","ps" },
+            { "ps",  "ps" },
             { "mpeg1","mpeg1" },
             { NULL,  NULL }
         };
