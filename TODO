@@ -7,6 +7,53 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
+Task: 0x3e
+Difficulty: Guru
+Urgency: Critical
+Description: Fix backwards moves
+ Sometimes the frames seem to go backwards for a short period of
+ time. This is due to the output methods and is known to happen
+ with the x11 and SDL plugins.
+Status: Todo
+
+Task: 0x3d
+Difficulty: Easy
+Urgency: Normal
+Description: Have more statistics messages displayed
+ The vlc has structures to keep track of the interesting
+ events, but there is no way to print these structures. In stats
+ mode, we should print these structures regularly, or at quit
+ time (whichever is the more convenient).
+Status: Todo
+
+Task: 0x3c
+Difficulty: Easy
+Urgency: Important
+Description: Separate optimizations from debug mode
+ We sometimes want to have the debug mode (which writes an
+ interesting log of debug messages) along with the compiler
+ optimizations (which allow decoding of more than 2 fps).
+Status: Done 18 Nov 2000 (Meuuh)
+
+Task: 0x3b
+Difficulty: Easy
+Urgency: Important
+Description: Write intf_WarnMsg and intf_StatMsg
+ We have intf_ErrMsg to display fatal errors, but warnings are
+ drowned in an ocean of unreadable intf_DbgMsg. Same for
+ statistics messages.
+Status: Todo
+
+Task: 0x3a
+Difficulty: Hard
+Urgency: Important
+Description: Support SDL Overlay
+ The SDL livrary has routines to use the video board to do the YUV
+ conversion, scaling and displaying. Using them will require a
+ partial rewrite of the video_output way of handling rendering
+ and displaying.
+Status: Todo
+
 Task: 0x39
 Difficulty: Medium
 Urgency: Wishlist
@@ -368,7 +415,7 @@ Description: Fix synchro
  is not smart enough on fast machines and does not detect
  when it has enough time for a frame. Perhaps a better
  handling of the dates might help.
-Status: Todo
+Status: Done 13 Nov 2000 (Meuuh)
 
 Task: 0x0b
 Difficulty: Medium
@@ -419,7 +466,7 @@ Urgency: Critical
 Description: Fix VDEC_SMP segfaults
  When compiled to support SMP, the vlc segfaults. The synchro
  code lacks locks, but there might be bugs elsewhere as well.
-Status: Todo
+Status: Done 16 Nov 2000 (Meuuh)
 
 Task: 0x06
 Difficulty: Guru

@@ -12,6 +12,12 @@ ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
 ac_help="$ac_help
+  --enable-debug          Enable debug mode (default is no)"
+ac_help="$ac_help
+  --enable-stats          Enable printing of statistics (default is yes)"
+ac_help="$ac_help
+  --disable-optimizations Disable compiler optimizations (default enabled)"
+ac_help="$ac_help
   --enable-ppro           Enable PentiumPro optimizations (default is no)"
 ac_help="$ac_help
   --enable-mmx            Enable MMX optimizations (default is no)"
@@ -3062,6 +3068,24 @@ if test "${enable_mmx+set}" = set; then
    if test x`echo $ARCH | cut -b3-4` = x86 ; then if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi; fi 
 fi
 
+# Check whether --enable-debug or --disable-debug was given.
+if test "${enable_debug+set}" = set; then
+  enableval="$enable_debug"
+   if test x$enableval = xyes; then DEBUG=1; fi 
+fi
+
+# Check whether --enable-stats or --disable-stats was given.
+if test "${enable_stats+set}" = set; then
+  enableval="$enable_stats"
+fi
+if test x$enable_stats != xno; then STATS=1; fi 
+
+# Check whether --enable-optims or --disable-optims was given.
+if test "${enable_optims+set}" = set; then
+  enableval="$enable_optims"
+fi
+if test x$enable_optims != xno; then OPTIMS=1; fi 
+
 
 SYS=${host_os}
 
@@ -3287,6 +3311,9 @@ s%@SYS@%$SYS%g
 s%@ARCH@%$ARCH%g
 s%@PLUGINS@%$PLUGINS%g
 s%@ALIASES@%$ALIASES%g
+s%@DEBUG@%$DEBUG%g
+s%@STATS@%$STATS%g
+s%@OPTIMS@%$OPTIMS%g
 
 CEOF
 EOF
@@ -3513,6 +3540,9 @@ vlc configuration
 vlc version           : ${VLC_VERSION}
 system                : ${SYS}
 architecture          : ${ARCH}
+debug mode            : ${DEBUG}
+statistics            : ${STATS}
+optimizations         : ${OPTIMS}
 plugins               : ${PLUGINS}
 vlc aliases           : ${ALIASES}
 "

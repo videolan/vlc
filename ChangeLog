@@ -9,14 +9,14 @@
   * Added --broadcast option for network input.
   * Screen is now emptied when framebuffer output exits.
   * Totally new frame dropping algorithm.
-  * Fixed a bug in video_ouput.c which made the stream go backwards
-    sometimes.
   * Fixed a bug in video_ouput.c which trashed more late pictures than
     necessary.
   * Fixed the DEBUG mode in the Makefile.
   * Fixed a bug in mwait() which made us wait too long.
   * The video_decoder can now be split into several threads to take
     advantage of the SMP machines.
+  * Added --enable-debug, --enable-stats, and --disable-optims in the
+    GNU configure stuff.
 
 Mon, 28 Aug 2000 02:34:18 +0200
 0.1.99i :

@@ -10,7 +10,9 @@
 ################################################################################
 
 # Debugging mode on or off (set to 1 to activate)
-DEBUG=0
+DEBUG=@DEBUG@
+STATS=@STATS@
+OPTIMS=@OPTIMS@
 
 SYS=@SYS@
 PLUGINS=@PLUGINS@
@@ -29,7 +31,11 @@ prefix=@prefix@
 PROGRAM_OPTIONS = $(SYS) $(ARCH)
 ifeq ($(DEBUG),1)
 PROGRAM_OPTIONS += DEBUG
-DEFINE += -DDEBUG -g
+DEFINE += -DDEBUG
+endif
+ifeq ($(STATS),1)
+PROGRAM_OPTIONS += DEBUG
+DEFINE += -DSTATS
 endif
 
 # PROGRAM_BUILD is a complete identification of the build
@@ -90,7 +96,7 @@ CFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
 endif
 
 # Optimizations : don't compile debug versions with them
-ifeq ($(DEBUG),0)
+ifeq ($(OPTIMS),1)
 CFLAGS += -O6
 CFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CFLAGS += -fomit-frame-pointer
@@ -98,7 +104,7 @@ CFLAGS += -fomit-frame-pointer
 # Optimizations for x86 familiy
 ifneq (,$(findstring 86,$(ARCH)))
 CFLAGS += -malign-double
-# Eventual Pentium Pro optimizations
+# Optional Pentium Pro optimizations
 ifneq (,$(findstring ppro,$(ARCH)))
 ifneq ($(SYS), BSD)
 CFLAGS += -march=pentiumpro
@@ -126,7 +132,7 @@ endif
 # /debug
 endif
 
-# Eventual MMX optimizations for x86
+# Optional MMX optimizations for x86
 ifneq (,$(findstring mmx,$(ARCH)))
 CFLAGS += -DHAVE_MMX
 endif
@@ -151,12 +157,8 @@ LCFLAGS += -Wall
 #
 
 # Debugging and profiling support
-ifneq ($(DEBUG),0)
-ifeq ($(SYS),beos)
+ifneq ($(OPTIMS),0)
 CFLAGS += -g
-else
-CFLAGS += -pg
-endif
 endif
 
 #################################################################################
