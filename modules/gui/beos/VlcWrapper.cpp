@@ -856,12 +856,7 @@ void VlcWrapper::ToggleTitle(int i_title)
 {
     if( p_input != NULL )
     {
-        input_ChangeArea( p_input,
-                          p_input->stream.pp_areas[i_title] );
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        var_SetInteger( p_input, "title", i_title );
     }
 }
 
@@ -945,12 +940,7 @@ void VlcWrapper::ToggleChapter(int i_chapter)
 {
     if( p_input != NULL )
     {
-        p_input->stream.p_selected_area->i_part = i_chapter;
-        input_ChangeArea( p_input,
-                          p_input->stream.p_selected_area );
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        var_SetInteger( p_input, "chapter", i_chapter );
     }
 }
 
