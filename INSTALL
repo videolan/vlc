@@ -1,9 +1,15 @@
-$Id: INSTALL,v 1.25 2003/03/19 15:44:44 hartman Exp $
+$Id$
 
 INSTALL file for the VLC media player
 
 Mac OS X and BeOS users should read the documentation available at: 
 http://developers.videolan.org/vlc/
+
+Bootstrapping VLC
+=================
+
+If you retrieved VLC from the SVN server and do not have a "configure"
+script, please refer to the HACKING file.
 
 Configuring VLC
 ===============
