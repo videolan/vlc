@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.77 2001/02/11 01:15:12 sam Exp $
+ * $Id: vpar_headers.c,v 1.78 2001/02/13 13:01:15 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -469,6 +469,15 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     int                 i_mb;
 #endif
 
+    /* Recover in case of stream discontinuity. */
+    if( p_vpar->sequence.b_expect_discontinuity )
+    {
+        ReferenceUpdate( p_vpar, I_CODING_TYPE, NULL );
+        ReferenceUpdate( p_vpar, I_CODING_TYPE, NULL );
+        p_vpar->sequence.b_expect_discontinuity = 0;
+    }
+
+    /* Parse the picture header. */
     RemoveBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
     p_vpar->picture.i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
     RemoveBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */

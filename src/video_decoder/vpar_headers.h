@@ -2,7 +2,7 @@
  * vpar_headers.h : video parser : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.h,v 1.5 2001/01/24 19:05:55 massiot Exp $
+ * $Id: vpar_headers.h,v 1.6 2001/02/13 13:01:14 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -84,6 +84,8 @@ typedef struct sequence_s
     picture_t *         p_backward;      /* current backward reference frame */
     mtime_t             next_pts, next_dts;
     int                 i_current_rate;
+    boolean_t           b_expect_discontinuity; /* reset the frame predictors
+                                                 * after the current frame   */
 
     /* Copyright extension */
     boolean_t           b_copyright_flag;     /* Whether the following

@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.75 2001/02/11 01:15:12 sam Exp $
+ * $Id: vpar_blocks.c,v 1.76 2001/02/13 13:01:15 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -2093,6 +2093,7 @@ static __inline__ void vpar_PictureData( vpar_thread_t * p_vpar,
      * number of macroblocks of the picture, mark the missed ones
      * as skipped. */
     if( (i_coding_type == P_CODING_TYPE || i_coding_type == B_CODING_TYPE)
+        && !p_vpar->sequence.b_expect_discontinuity
         && p_vpar->picture.b_error &&
         ( (i_mb_address-i_mb_base) > (p_vpar->sequence.i_mb_size >> 1)
            || (i_structure != FRAME_STRUCTURE

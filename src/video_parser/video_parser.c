@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.73 2001/02/11 01:15:12 sam Exp $
+ * $Id: video_parser.c,v 1.74 2001/02/13 13:01:14 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -240,6 +240,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->sequence.chroma_nonintra_quant.b_allocated = 0;
     p_vpar->sequence.i_matrix_coefficients = 1;
     p_vpar->sequence.next_pts = p_vpar->sequence.next_dts = 0;
+    p_vpar->sequence.b_expect_discontinuity = 0;
 
     /* Initialize copyright information */
     p_vpar->sequence.b_copyright_flag = 0;
@@ -540,18 +541,8 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
         if( DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->b_discontinuity )
         {
             /* Escape the current picture and reset the picture predictors. */
+            p_vpar->sequence.b_expect_discontinuity = 1;
             p_vpar->picture.b_error = 1;
-            if( p_vpar->sequence.p_forward != NULL )
-            {
-                vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
-            }
-            if( p_vpar->sequence.p_backward != NULL )
-            {
-                vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
-                                  vpar_SynchroDate( p_vpar ) );
-                vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
-            }
-            p_vpar->sequence.p_forward = p_vpar->sequence.p_backward = NULL;
         }
     }
 
