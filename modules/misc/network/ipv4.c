@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.12 2003/01/09 23:43:07 massiot Exp $
+ * $Id: ipv4.c,v 1.13 2003/01/23 15:53:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -67,6 +67,13 @@
 
 #include "network.h"
 
+#ifndef INADDR_ANY
+#   define INADDR_ANY  0x00000000
+#endif
+#ifndef INADDR_NONE
+#   define INADDR_NONE 0xFFFFFFFF
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -104,7 +111,8 @@ static int BuildAddr( struct sockaddr_in * p_socket,
 #ifdef HAVE_ARPA_INET_H
         if( !inet_aton( psz_address, &p_socket->sin_addr ) )
 #else
-        if( (p_socket->sin_addr.s_addr = inet_addr( psz_address )) == -1 )
+        p_socket->sin_addr.s_addr = inet_addr( psz_address );
+        if( p_socket->sin_addr.s_addr == INADDR_NONE )
 #endif
         {
             /* We have a fqdn, try to find its address */
@@ -305,7 +313,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         imr.imr_multiaddr.s_addr = inet_addr(psz_bind_addr);
 #endif
         if ( psz_if_addr != NULL && *psz_if_addr
-              && inet_addr(psz_if_addr) != -1 )
+              && inet_addr(psz_if_addr) != INADDR_NONE )
         {
             imr.imr_interface.s_addr = inet_addr(psz_if_addr);
         }
