@@ -344,16 +344,6 @@ static mtime_t snapshot_GetMovietime( vout_thread_t *p_vout )
 
     i_result = val.i_time;
 
-    if( i_result <= 0 )
-    {
-        /* Either we are at the start, or (more probably) the demuxer
-           does not support the DEMUX_GET_TIME call. Try to fallback to
-           another method. */
-        stream_position_t pos;
-
-        input_Tell( p_input, &pos );
-        i_result = pos.i_mux_rate * 50 * pos.i_tell;
-    }
     return( i_result / 1000 );
 }
 
