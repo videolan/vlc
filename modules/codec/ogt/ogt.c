@@ -244,7 +244,7 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 	       p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4],
 	       p_block->i_buffer);
 
-#if 1
+#if 0
     if( config_GetInt( p_dec, "spu-channel" ) != p_buffer[1] )
       return NULL;
 #else
@@ -259,8 +259,15 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 
         if( var_Get( p_input, "spu-channel", &val ) ) return NULL;
 	
-	if( val.i_int == -1 || val.i_int != p_buffer[1] )
+        dbg_print( (DECODE_DBG_PACKET), 
+                   "val.i_int %x p_buffer[i] %x", val.i_int, p_buffer[1]);
+
+        /* The dummy ES that the menu selection uses has an 0x70 at
+           the head which we need to strip off. */
+	if( val.i_int == -1 || (val.i_int & 0x03) != p_buffer[1] ) {
+          dbg_print( DECODE_DBG_PACKET, "subtitle not for us.\n");
 	  return NULL;
+        }
     }
 #endif
 

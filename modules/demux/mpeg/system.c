@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: system.c,v 1.31 2004/02/20 17:16:50 massiot Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -566,7 +566,14 @@ static uint16_t GetID( input_thread_t *p_input, data_packet_t * p_data )
         /* FIXME : this is not valid if the header is split in multiple
          * packets */
         /* stream_private_id */
-        i_id |= p_data->p_demux_start[ 9 + p_data->p_demux_start[8] ] << 8;
+
+	if ( p_data->p_demux_start[ 9 + p_data->p_demux_start[8] ] == 0x70 ) {
+	  /* SVCD/OGT ES: 0x70 = private stream. We pick out the subtitle
+	     number this way though. */
+	  i_id = 0x7000 | p_data->p_demux_start[10 + p_data->p_demux_start[8]];
+	} else {
+	  i_id |= p_data->p_demux_start[ 9 + p_data->p_demux_start[8] ] << 8;
+	}
 
         /* FIXME: See note about cur_scr_time above. */
         p_mpeg_demux->cur_scr_time = -1;
@@ -883,6 +890,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
             if( p_es == NULL && !p_demux->b_has_PSM )
             {
                 int i_fourcc, i_cat;
+		char *psz_desc = NULL;
 
                 /* Set stream type and auto-spawn. */
                 if( (i_id & 0xF0) == 0xE0 )
@@ -970,20 +978,32 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                     i_fourcc = VLC_FOURCC('l','p','c','b');
                     i_cat = AUDIO_ES;
                 }
-                else if( (i_id & 0xFFFF) == 0x70BD )
+
+                else if( (i_id & 0xFF00) == 0x7000 )
                 {
                     /* SVCD OGT subtitles in stream 0x070 */
                     i_fourcc = VLC_FOURCC('o','g','t', ' ');
                     i_cat = SPU_ES;
                     b_auto_spawn = VLC_TRUE;
+		    psz_desc = malloc( strlen( _("SVCD Subtitle %i") ) + 2 );
+		    if( psz_desc )
+		      sprintf( psz_desc, _("SVCD Subtitle %i"), 
+			       i_id & 0x03 );
                 }
-                else if( ((i_id >> 8) & 0xFF) <= 0x03 &&
+
+#define CVD_SUBTITLE_NUM(id) ((i_id >> 8) & 0xFF)
+
+                else if( CVD_SUBTITLE_NUM(i_id) <= 0x03 &&
                          (i_id & 0x00FF) == 0x00BD )
                 {
                     /* CVD subtitles (0x00->0x03) */
                     i_fourcc = VLC_FOURCC('c','v','d', ' ');
                     i_cat = SPU_ES;
                     b_auto_spawn = VLC_TRUE;
+		    psz_desc = malloc( strlen( _("CVD Subtitle %i") ) + 2 );
+		    if( psz_desc )
+		      sprintf( psz_desc, _("CVD Subtitle %i"), 
+			       CVD_SUBTITLE_NUM(i_id) );
                 }
                 else
                 {
@@ -992,7 +1012,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                 }
 
                 p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
-                                    i_id, i_cat, NULL, 0 );
+                                    i_id, i_cat, psz_desc, 0 );
 
                 p_es->i_stream_id = p_data->p_demux_start[3];
                 p_es->i_fourcc = i_fourcc;
