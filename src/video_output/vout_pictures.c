@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.2 2001/12/13 12:47:17 sam Exp $
+ * $Id: vout_pictures.c,v 1.3 2001/12/13 20:47:46 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -134,9 +134,20 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout )
      * Look for an empty place. XXX: we start at 1 because the first
      * directbuffer is reserved for memcpy()ed pictures.
      */
-    for( i_picture = 0; i_picture < I_RENDERPICTURES; i_picture++ )
+    for( i_picture = 0;
+         i_picture < I_RENDERPICTURES && p_free_picture == NULL;
+         i_picture++ )
     {
         p_picture = PP_RENDERPICTURE[ i_picture ];
+
+        /* If the picture we found is a memory buffer, and we might have
+         * enough room later for a direct buffer, skip it. If no other
+         * pictures are found, the video decoder will try again later. */
+        if( p_vout->b_direct && ( p_vout->output.i_pictures > 3 )
+             && ( p_picture->i_type != DIRECT_PICTURE ) )
+        {
+            break;
+        }
 
         switch( p_picture->i_status )
         {
@@ -151,11 +162,8 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout )
                 return( p_picture );
 
             case FREE_PICTURE:
-                if( p_free_picture == NULL )
-                {
-                    /* Picture is empty and ready for allocation */
-                    p_free_picture = p_picture;
-                }
+                /* Picture is empty and ready for allocation */
+                p_free_picture = p_picture;
                 break;
 
             default:
@@ -174,7 +182,6 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout )
         {
             /* Copy picture information, set some default values */
             p_free_picture->i_status = RESERVED_PICTURE;
-            p_free_picture->i_type = MEMORY_PICTURE;
             p_free_picture->i_matrix_coefficients = 1;
             p_free_picture->i_refcount = 0;
             p_vout->i_heap_size++;
@@ -483,6 +490,8 @@ static void NewPicture( vout_thread_t *p_vout, picture_t *p_picture )
             p_picture->i_planes = 0;
             return;
     }
+
+    p_picture->i_type = MEMORY_PICTURE;
 
     /* Allocate memory */
     switch( p_vout->render.i_chroma )

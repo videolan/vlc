@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.31 2001/12/03 13:58:59 massiot Exp $
+ * $Id: threads.h,v 1.32 2001/12/13 20:47:46 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -939,7 +939,8 @@ static __inline__ void _vlc_thread_join( char * psz_file, int i_line,
     i_ret = pthread_join( thread, NULL );
 
 #elif defined( HAVE_CTHREADS_H )
-    i_ret = cthread_join( thread );
+    cthread_join( thread );
+    i_ret = 1;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     int32 exit_value;
