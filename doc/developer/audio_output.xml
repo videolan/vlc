@@ -14,16 +14,149 @@ The audio output's main purpose is to take sound samples from one or several dec
 (insert here a schematic of the data flow in aout3)
     </para>
 
+    <sect2> <title> Terminology </title>
+
+      <itemizedlist>
+        <listitem> <para> <emphasis> Sample </emphasis> : A sample is an elementary piece of audio information, containing the value for all channels. For instance, a stream at 44100 Hz features 44100 samples per second, no matter how many channels are coded, nor the coding type of the coefficients. </para> </listitem>
+
+        <listitem> <para> <emphasis> Frame </emphasis> : A set of samples of arbitrary size. Codecs usually have a fixed frame size (for instance an A/52 frame contains 1536 samples). Frames do not have much importance in the audio output, since it can manage buffers of arbitrary sizes. However, for undecoded formats, the developer must indicate the number of bytes required to carry a frame of n samples, since it depends on the compression ratio of the stream. </para> </listitem>
+
+        <listitem> <para> <emphasis> Coefficient </emphasis> : A sample contains one coefficient per channel. For instance a stereo stream features 2 coefficients per sample. Many audio items (such as the float32 audio mixer) deal directly with the coefficients. Of course, an undecoded sample format doesn't have the notion of "coefficient", since a sample cannot be materialized independantly in the stream. </para> </listitem>
+
+        <listitem> <para> <emphasis> Resampling </emphasis> : Changing the number of samples per second of an audio stream. </para> </listitem>
+
+        <listitem> <para> <emphasis> Downmixing/upmixing </emphasis> : Changing the configuration of the channels (see below). </para> </listitem>
+      </itemizedlist>
+
+    </sect2>
+
+    <sect2> <title> Audio sample formats </title>
+
+      <para>
+The whole audio output can viewed as a pipeline transforming one audio format to another in successive steps. Consequently, it is essential to understand what an audio sample format is.
+      </para>
+
+      <para> The audio_sample_format_t structure is defined in include/audio_output.h. It contains the following members : </para>
+
+      <itemizedlist>
+        <listitem> <para> <emphasis> i_format </emphasis> : Define the format of the coefficients. For instance AOUT_FMT_FLOAT32, AOUT_FMT_S16_NE. Undecoded sample formats include AOUT_FMT_A52, AOUT_FMT_DTS, AOUT_FMT_SPDIF. An audio filter allowing to go from one format to another is called, by definition, a "converter". Some converters play the role of a decoder (for instance a52tofloat32.c), but are in fact "audio filters". </para> </listitem>
+
+        <listitem> <para> <emphasis> i_rate </emphasis> : Define the number of samples per second the audio output will have to deal with. Common values are 22050, 24000, 44100, 48000. i_rate is in Hz. </para> </listitem>
+
+        <listitem> <para> <emphasis> i_channels </emphasis> : Define the channel configuration, for instance AOUT_CHAN_MONO, AOUT_CHAN_STEREO, AOUT_CHAN_3F1R. Beware : the numeric value doesn't represent the number of coefficients per sample, see aout_FormatNbChannels() for that. The coefficients for each channel are always stored interleaved, because it is much easier for the mixer to deal with interleaved coefficients. Consequently, decoders which output planar data must implement an interleaving function. </para> </listitem>
+      </itemizedlist>
+
+      <note> <para>
+For 16-bit integer format types, we make a distinction between big-endian and little-endian storage types. However, floats are also stored in either big endian or little endian formats, and we didn't make a difference. The reason is, samples are hardly stored in float32 format in a file, and transferred from one machine to another ; so we assume float32 always use the native endianness.
+      </para> <para>
+Yet, samples are quite often stored as big-endian signed 16-bit integers, such as in DVD's LPCM format. So the LPCM decoder allocates an AOUT_FMT_S16_BE input stream, and on little-endian machines, an AOUT_FMT_S16_BE-&gt;AOUT_FMT_S16_NE is automatically invoked by the input pipeline.
+      </para> <para>
+In most cases though, AOUT_FMT_S16_NE and AOUT_FMT_U16_NE should be used.
+      </para> </note>
+
+      <para>
+The aout core provides macros to compare two audio sample formats. AOUT_FMTS_IDENTICAL() tests if i_format, i_rate and i_channels are identical. AOUT_FMTS_SIMILAR tests if i_rate and i_channels are identical (useful to write a pure converter filter).
+      </para>
+
+      <para>
+The audio_sample_format_t structure then contains two additional parameters, which you are not supposed to write directly, except if you're dealing with undecoded formats. For PCM formats they are automatically filled in by aout_FormatPrepare(), which is called by the core functions when necessary.
+      </para>
+
+      <itemizedlist>
+        <listitem> <para> <emphasis> i_frame_length </emphasis> : Define the number of samples of the "natural" frame. For instance for A/52 it is 1536, since 1536 samples are compressed in an undecoded buffer. For PCM formats, the frame size is 1, because every sample in the buffer can be independantly accessed. </para> </listitem>
+
+        <listitem> <para> <emphasis> i_bytes_per_frame </emphasis> : Define the size (in bytes) of a frame. For A/52 it depends on the bitrate of the input stream (read in the sync info). For instance for stereo float32 samples, i_bytes_per_frame == 8 (i_frame_length == 1). </para> </listitem>
+      </itemizedlist>
+
+      <para>
+These last two fields (which are <emphasis> always </emphasis> meaningful as soon as aout_FormatPrepare() has been called) make it easy to calculate the size of an audio buffer : i_nb_samples * i_bytes_per_frame / i_frame_length.
+      </para>
+
+    </sect2>
+
     <sect2> <title> Typical runcourse </title>
 
       <para>
-The input spawns a new decoder audio decoder, say for instance an A/52 decoder. The A/52 decoder parses the sync info for format information, and creates a new aout "input stream" whith aout_InputNew().
+The input spawns a new audio decoder, say for instance an A/52 decoder. The A/52 decoder parses the sync info for format information (eg. it finds 48 kHz, 5.1, 196 kbi/s), and creates a new aout "input stream" with aout_InputNew(). The sample format is :
+      </para>
+
+      <itemizedlist>
+        <listitem> <para> i_format = AOUT_FMT_A52 </para> </listitem>
+        <listitem> <para> i_rate = 48000 </para> </listitem>
+        <listitem> <para> i_channels = AOUT_CHAN_3F2R | AOUT_CHAN_LFE </para> </listitem>
+        <listitem> <para> i_frame_length = 1536 </para> </listitem>
+        <listitem> <para> i_bytes_per_frame = 24000 </para> </listitem>
+      </itemizedlist>
+
+      <para>
+This input format won't be modified, and will be stored in the aout_input_t structure corresponding to this input stream : p_aout-&gt;pp_inputs[0]-&gt;input. Since it is our first input stream, the aout core will try to configure the output device with this audio sample format (p_aout-&gt;output.output), to avoid unnecessary transformations.
+      </para>
+
+      <para>
+The core will probe for an output module in the usual fashion, and its behavior will depend. Either the output device has the S/PDIF capability, and then it will set p_aout-&gt;output.output.i_format to AOUT_FMT_SPDIF, or it's a PCM-only device. It will thus ask for the native sample format, such as AOUT_FMT_FLOAT32 (for Darwin CoreAudio) or AOUT_FMT_S16_NE (for OSS). The output device may also have constraints on the number of channels or the rate. For instance, the p_aout-&gt;output.output structure may look like :
+      </para>
+
+      <itemizedlist>
+        <listitem> <para> i_format = AOUT_FMT_S16_NE </para> </listitem>
+        <listitem> <para> i_rate = 44100 </para> </listitem>
+        <listitem> <para> i_channels = AOUT_CHAN_STEREO </para> </listitem>
+        <listitem> <para> i_frame_length = 1 </para> </listitem>
+        <listitem> <para> i_bytes_per_frame = 4 </para> </listitem>
+      </itemizedlist>
+
+      <para>
+Once we have an output format, we deduce the mixer format. It is strictly forbidden to change the audio sample format between the mixer and the output (because all transformations happen in the input pipeline), except for i_format. The reason is that we have only developed three mixers (float32 and S/PDIF, plus fixed32 for embedded devices which do not feature an FPU), so all other types must be cast into one of those. Still with our example, the p_aout-&gt;mixer.mixer structure looks like :
+      </para>
+
+      <itemizedlist>
+        <listitem> <para> i_format = AOUT_FMT_FLOAT32 </para> </listitem>
+        <listitem> <para> i_rate = 44100 </para> </listitem>
+        <listitem> <para> i_channels = AOUT_CHAN_STEREO </para> </listitem>
+        <listitem> <para> i_frame_length = 1 </para> </listitem>
+        <listitem> <para> i_bytes_per_frame = 8 </para> </listitem>
+      </itemizedlist>
+
+      <para>
+The aout core will thus allocate an audio filter to convert AOUT_FMT_FLOAT32 to AOUT_FMT_S16_NE. This is the only audio filter in the output pipeline. It will also allocate a float32 mixer. Since only one input stream is present, the trivial mixer will be used (only copies samples from the first input stream). Otherwise it would have used a more precise float32 mixer.
+      </para>
+
+      <para>
+The last step of the initialization is to build an input pipeline. When several properties have to be changed, the aout core searches first for an audio filter capable of changing :
+      </para>
+
+      <orderedlist>
+        <listitem> <para> All parameters ; </para> </listitem>
+        <listitem> <para> i_format and i_channels ; </para> </listitem>
+        <listitem> <para> i_format ; </para> </listitem>
+      </orderedlist>
+
+      <para>
+If the whole transformation cannot be done by only one audio filter, it will allocate a second and maybe a third filter to deal with the rest. To follow up on our example, we will allocate two filters : a52tofloat32 (which will deal with the conversion and the downmixing), and a resampler. Quite often, for undecoded formats, the converter will also deal with the downmixing, for efficiency reasons.
+      </para>
+
+      <para>
+When this initialization is over, the "decoder" plug-in can run its main loop. Typically the decoder requests a buffer of length i_nb_samples, and copies the undecoded samples there (using GetChunk()). The buffer then goes along the input pipeline, which will do the decoding (to AOUT_FMT_FLOAT32), and downmixing and resampling. Additional resampling will occur if complex latency issues in the output layer impose us to go temporarily faster or slower to achieve perfect lipsync (this is decided on a per-buffer basis). At the end of the input pipeline, the buffer is placed in a FIFO, and the decoder thread runs the audio mixer.
+      </para>
+
+      <para>
+The audio mixer then calculates whether it has enough samples to build a new output buffer. If it does, it mixes the input streams, and passes the buffer to the output layer.
+      </para>
+
+      <orderedlist>
+        <listitem> <para> AOUT_FMT_FLOAT32 : the general case for plain PCM samples. </para> </listitem>
+        <listitem> <para> AOUT_FMT_FIXED32 : machines without FPU cannot work on floats, so it is recommended to use fixed-point arithmetic instead. </para> </listitem>
+        <listitem> <para> AOUT_FMT_A52 : the raw undecoded samples will be passed to the output layer for decoding by an external S/PDIF dedicated hardware. </para> </listitem>
+      </orderedlist>
+
+      <para>
+Currently, the audio mixer will impose one of these three formats. Technically, nothing prevents you from providing for instance an AOUT_FMT_S16_NE mixer, but for simplicity it has been decided to keep only two PCM formats, and formats for undecoded samples.
       </para>
 
     </sect2>
 
   </sect1>
   
+  <!--
   <sect1> <title> API for the decoders </title>
   
   </sect1>
@@ -39,70 +172,6 @@ The input spawns a new decoder audio decoder, say for instance an A/52 decoder. 
   <sect1> <title> Writing an audio mixer </title>
   
   </sect1>
-
-  <sect1> <title> Data exchanges between a decoder and the audio output
-  </title>
-
-    <para>
-The audio output basically takes audio samples from one or several
-FIFOs, mixes and resamples them, and plays them through the audio
-chip. Data exchanges are simple and described in <filename>
-src/audio_output/audio_output.c.</filename> A decoder needs to open
-a channel FIFO with <function> aout_CreateFifo </function>, and
-then write the data to the buffer. The buffer is in <parameter>
-p_aout_fifo-&gt;buffer + p_aout_fifo-&gt;l_end_frame </parameter>
-* <constant> ADEC_FRAME_SIZE</constant>.
-    </para>
-
-  </sect1>
-
-  <sect1> <title> How to write an audio output plugin </title>
-
-    <para>
-[This API is subject to change in the very near future.] Have a look at
-<filename> plugins/dsp/aout_dsp.c</filename>. You need to write six
-functions :
-    </para>
-
-    <itemizedlist>
-
-      <listitem> <para> <type> int </type> <function> aout_Probe </function>
-      <parameter> ( probedata_t *p_data ) </parameter> :
-      Returns a score between 0 and 999 to tell whether the plugin
-      can be used. <parameter> p_data </parameter> is currently
-      unused.
-      </para> </listitem>
-
-      <listitem> <para> <type> int </type> <function> aout_Open </function>
-      <parameter> ( aout_thread_t *p_aout ) </parameter> :
-      Opens the audio device.
-      </para> </listitem>
-
-      <listitem> <para> <type> int </type> <function> aout_SetFormat
-      </function> <parameter> ( aout_thread_t *p_aout ) </parameter> :
-      Sets the output format, the number of channels, and the output
-      rate.
-      </para> </listitem>
-
-      <listitem> <para> <type> long </type> <function> aout_GetBufInfo
-      </function> <parameter> ( aout_thread_t *p_aout,
-      long l_buffer_limit ) </parameter> :
-      Gets the status of the audio buffer.
-      </para> </listitem>
-
-      <listitem> <para> <function> aout_Play </function> <parameter>
-      ( aout_thread_t *p_aout, byte_t *buffer, int i_size )
-      </parameter> :
-      Writes the audio output buffer to the audio device.
-      </para> </listitem>
-
-      <listitem> <para> <function> aout_Close </function> <parameter>
-      ( aout_thread_t *p_aout ) </parameter> :
-      Closes the audio device.
-      </para> </listitem>
-
-    </itemizedlist>
-
-  </sect1>
+  -->
 
 </chapter>
