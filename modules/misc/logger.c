@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -80,7 +80,7 @@ struct intf_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Open    ( vlc_object_t * );                  
+static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
 
@@ -100,7 +100,8 @@ static char *mode_list_text[] = { N_("Text"), "HTML" };
 vlc_module_begin();
     set_category( CAT_ADVANCED );
     set_subcategory( SUBCAT_ADVANCED_MISC );
-    set_description( _("File logging interface") );
+    set_shortname( N_( "Logging" ) );
+    set_description( _("File logging") );
 
     add_file( "logfile", NULL, NULL, N_("Log filename"), N_("Specify the log filename."), VLC_FALSE );
     add_string( "logmode", "text", NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT,

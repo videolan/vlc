@@ -1,4 +1,4 @@
-List of vlc plugins (221)
+List of vlc plugins (264)
 $Id$
 
  * a52: A/52 basic parser/packetizer
@@ -31,6 +31,8 @@ $Id$
 
  * access_output_udp: UDP Network access_output module
 
+ * access_smb: SMB shares access module
+
  * access_tcp: TCP Network access module
 
  * access_udp: UDP Network access module 
@@ -56,6 +58,8 @@ $Id$
  * asf: ASF demuxer
  
  * au: AU file demuxer
+
+ * audio_format: helper module for audio transcoding
 
  * avi: AVI File stream demuxer
 
@@ -87,11 +91,13 @@ $Id$
  
  * cvdsub: CVD subtitles decoder
 
+ * daap: iTunes shares services discovery
+
  * deinterlace: naive deinterlacing filter.
 
  * demuxdump: Pseudo-demuxer that dumps the stream
-
- * demuxstream: MPEG TS demuxer which also sends the stream to the network
+ 
+ * dirac: BBC Dirac codec
 
  * directory : input module to read files in a directory
 
@@ -137,6 +143,8 @@ $Id$
 
  * ffmpeg: Video decoder using the ffmpeg library
 
+ * ffmpegaltivec: Video decoder using the ffmpeg library (Altivec version)
+
  * fixed32tofloat32: Audio converter from fixed 32 bits to float 32 bits
 
  * fixed32tos16: Fixed 32 bits to Signed 16 bits integer audio converter
@@ -161,6 +169,8 @@ $Id$
 
  * galaktos: a visualization module that outputs OpenGL
 
+ * gapi: PocketPC Video output
+
  * gestures: mouse gestures control plugin
 
  * ggi: video output module using the GGI API.
@@ -179,6 +189,8 @@ $Id$
  
  * gnome_main: Gtk+ wrapper for gtk_main
 
+ * gnutls: GNU TLS encryption/decryption module
+
  * goom: visualisation plugin based on goom
 
  * gtk2: interface using the Gtk2 widget set.
@@ -190,6 +202,8 @@ $Id$
  * gtk_main: Gtk+ wrapper for gtk_main
 
  * h264: H264 decoder
+ 
+ * hal: Linux HAL services discovery module
 
  * hd1000a: audio output module for the Roku HD1000 Set-Top-Box
 
@@ -223,6 +237,8 @@ $Id$
  * id3: ID3 tag skipper
  
  * id3tag: ID3 tag parser/skipper using libid3tag
+
+ * image: Image file video output
  
  * invert: inverse video filter.
 
@@ -250,9 +266,13 @@ $Id$
  
  * m3u: PLS, M3U, ASX and B4S playlist parser
 
+ * m4a: MPEG-4 Audio Stream demuxer
+
  * m4v: MPEG-4 Video Stream demuxer
 
  * macosx: Video output, and interface module for Mac OS X.
+
+ * marq: Overlays a marquee on the video
 
  * mash: OpenMash based decoder
 
@@ -275,6 +295,8 @@ $Id$
  * mod: MOD demuxer
 
  * motionblur: Motion blur filter
+
+ * motiondetect: Motion detection filter
 
  * mp4: MP4 file input module
 
@@ -335,14 +357,10 @@ $Id$
  * pda: interface for iPaq using the Gtk2+ widget set.
 
  * playlist: playlist import module
+
+ * png: PNG images decoder
  
  * portaudio: audio output module that uses the portaudio library (www.portaudio.com)
-
- * postprocessing_c: Video Postprocessing module
-
- * postprocessing_mmx: Video Postprocessing module using MMX
- 
- * postprocessing_mmxext: Video Postprocessing module using MMX_EXT 
 
  * ps: input module for MPEG PS decapsulation.
  
@@ -368,6 +386,8 @@ $Id$
 
  * real: partial Real audio/video demuxer
 
+ * rtci: extended RC interface module
+
  * s16tofixed32: Signed 16 bits to fixed 32 bits audio converter
 
  * s16tofloat32: Signed 16 bits to float 32 bits audio converter
@@ -380,11 +400,17 @@ $Id$
 
  * satellite: Satellite cards access module
 
+ * scale: Images rescaler
+
  * screen: a input module that takes screenshots of the primary monitor
 
  * screensaver: screensaver disabling module
 
  * sgimb: SGIMB referrer files parser
+ 
+ * showintf: shows the main interface
+
+ * simple_channel_mixer: channel mixer
 
  * skins2: Skinnable interface, new generation
 
@@ -397,6 +423,8 @@ $Id$
  * speex: a speex audio decoder/packetizer using the libspeex library.
 
  * spudec: RLE DVD subtitles decoder.
+
+ * stream_out_description: helper module for RTSP vod
 
  * stream_out_display: displays a stream output chain 
 
@@ -426,6 +454,8 @@ $Id$
 
  * svgalib: SGVAlib output plugin
 
+ * swscale: Image scaling module
+
  * tarkin: a tarkin video decoder using libtarkin
 
  * telnet: Telnet control interface for VideoLAN Media Manager
@@ -439,6 +469,8 @@ $Id$
  * test4: Stress test module
 
  * theora: a theora video decoder/packetizer/encoder using the libtheora library.
+
+ * time: Overlays the current time
 
  * toolame: a mp1 mp2 audio encoder based on toolame
 
@@ -469,6 +501,10 @@ $Id$
 
  * visual: visualisation system
 
+ * vobsub: VobSUB subtitles demuxer
+
+ * vod_rtsp: RTSP VoD module
+
  * vorbis: a vorbis audio decoder/packetizer using the libvorbis library.
 
  * vout_directx: video output module using the DirectX API.
@@ -481,6 +517,8 @@ $Id$
 
  * waveout: simple audio output module for Windows.
 
+ * wince: Pocket PC interface
+
  * wingdi: WIN 32 / WIN CE GDI video output
 
  * wxwindows: interface module using the cross-platform wxWindows library.
@@ -489,7 +527,11 @@ $Id$
 
  * x264: H264 video decoder using X264
 
+ * xml: LibXML xml parser
+
  * xosd: X On Screen Display interface
+
+ * xtag: XTAG xml parser
 
  * xvid: Decoder for the Xvid codec, using libxvidcore
 

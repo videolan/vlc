@@ -454,7 +454,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         /* Load the blending module */
         if( !p_spu->p_blend && p_region )
         {
-            p_spu->p_blend = vlc_object_create( p_spu, sizeof(filter_t) );
+            p_spu->p_blend = vlc_object_create( p_spu, VLC_OBJECT_FILTER );
             vlc_object_attach( p_spu->p_blend, p_spu );
             p_spu->p_blend->fmt_out.video.i_x_offset =
                 p_spu->p_blend->fmt_out.video.i_y_offset = 0;
@@ -470,7 +470,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         /* Load the text rendering module */
         if( !p_spu->p_text && p_region )
         {
-            p_spu->p_text = vlc_object_create( p_spu, sizeof(filter_t) );
+            p_spu->p_text = vlc_object_create( p_spu, VLC_OBJECT_FILTER );
             vlc_object_attach( p_spu->p_text, p_spu );
 
             p_spu->p_text->fmt_out.video.i_width =
@@ -604,10 +604,12 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     p_region->p_cache = 0;
                 }
             }
+
             if( (i_scale_width != 1000 || i_scale_height != 1000) &&
                 p_spu->p_scale && !p_region->p_cache )
             {
                 picture_t *p_pic;
+
 
                 p_spu->p_scale->fmt_in.video = p_region->fmt;
                 p_spu->p_scale->fmt_out.video = p_region->fmt;
@@ -695,10 +697,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             if( p_spu->b_force_crop )
             {
                 video_format_t *p_fmt = &p_spu->p_blend->fmt_in.video;
-		int i_crop_x = p_spu->i_crop_x * i_scale_width / 1000;
-		int i_crop_y = p_spu->i_crop_y * i_scale_height / 1000;
-		int i_crop_width = p_spu->i_crop_width * i_scale_width / 1000;
-		int i_crop_height = p_spu->i_crop_height * i_scale_height/1000;
+                int i_crop_x = p_spu->i_crop_x * i_scale_width / 1000;
+                int i_crop_y = p_spu->i_crop_y * i_scale_height / 1000;
+                int i_crop_width = p_spu->i_crop_width * i_scale_width / 1000;
+                int i_crop_height = p_spu->i_crop_height * i_scale_height/1000;
 
                 /* Find the intersection */
                 if( i_crop_x + i_crop_width <= i_x_offset ||

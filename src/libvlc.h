@@ -288,7 +288,7 @@ static char *ppsz_align_descriptions[] =
     "When using the PVR input (or a very irregular source), you should " \
     "set this to 10000.")
 
-#define SERVER_PORT_TEXT N_("Server port")
+#define SERVER_PORT_TEXT N_("UDP port")
 #define SERVER_PORT_LONGTEXT N_( \
     "This is the port used for UDP streams. By default, we chose 1234.")
 
@@ -310,25 +310,30 @@ static char *ppsz_align_descriptions[] =
 
 #define INPUT_PROGRAM_TEXT N_("Choose program (SID)")
 #define INPUT_PROGRAM_LONGTEXT N_( \
-    "Choose the program to select by giving its Service ID.")
+    "Choose the program to select by giving its Service ID\n." \
+    "Only use this option if you want to read a multi-program stream " \
+    "(like DVB streams for example )" )
 
 #define INPUT_PROGRAMS_TEXT N_("Choose programs")
 #define INPUT_PROGRAMS_LONGTEXT N_( \
     "Choose the programs to select by giving a comma-separated list of " \
-    "SIDs.")
+    "SIDs\n." \
+    "Only use this option if you want to read a multi-program stream " \
+    "(like DVB streams for example )" )
 
 #define INPUT_CHAN_TEXT N_("Choose audio channel")
 #define INPUT_CHAN_LONGTEXT N_( \
-    "Give the stream number of the audio channel you want to use in a DVD " \
+    "Give the stream number of the audio channel you want to use" \
     "(from 0 to n).")
 
-#define INPUT_SUB_TEXT N_("Choose subtitle track")
+#define INPUT_SUB_TEXT N_("Choose subtitles track")
 #define INPUT_SUB_LONGTEXT N_( \
     "Give the stream number of the subtitle channel you want to use " \
     "(from 0 to n).")
 
 #define INPUT_REPEAT_TEXT N_("Input repetitions")
-#define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be repeated")
+#define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be " \
+                                 "repeated")
 
 #define START_TIME_TEXT N_("Input start time (seconds)")
 #define START_TIME_LONGTEXT N_("Input start time (seconds)")
@@ -337,11 +342,12 @@ static char *ppsz_align_descriptions[] =
 #define STOP_TIME_LONGTEXT N_("Input stop time (seconds)")
 
 #define INPUT_LIST_TEXT N_("Input list")
-#define INPUT_LIST_LONGTEXT N_("Allows you to specify a coma separated list " \
-    "of inputs that will be concatenated to the main MRL when playing.")
+#define INPUT_LIST_LONGTEXT N_("Allows you to specify a comma-separated list " \
+    "of inputs that will be concatenated.")
 
 #define INPUT_SLAVE_TEXT N_("Input slave (experimental)")
-#define INPUT_SLAVE_LONGTEXT N_("Input slave (experimental)")
+#define INPUT_SLAVE_LONGTEXT N_("Allows you to play from several files at " \
+    "the same time. Experimental, not all formats are supported.")
 
 #define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
 #define BOOKMARKS_LONGTEXT N_("You can specify a list of bookmarks for a stream in " \
@@ -963,14 +969,8 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACODEC );
     set_subcategory( SUBCAT_INPUT_SCODEC );
     set_subcategory( SUBCAT_INPUT_ADVANCED );
-    add_integer( "cr-average", 40, NULL, CR_AVERAGE_TEXT,
-                 CR_AVERAGE_LONGTEXT, VLC_FALSE );
-    add_integer( "server-port", 1234, NULL,
-                 SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
-    add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
-    add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT,
-                IFACE_ADDR_LONGTEXT, VLC_TRUE );
 
+    set_section( N_( "Tracks settings" ), NULL );
     add_integer( "program", 0, NULL,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, VLC_TRUE );
     add_string( "programs", "", NULL,
@@ -979,6 +979,8 @@ vlc_module_begin();
                  INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT, VLC_FALSE );
     add_integer( "spu-channel", -1, NULL,
                  INPUT_SUB_TEXT, INPUT_SUB_LONGTEXT, VLC_FALSE );
+
+    set_section( N_( "Playback control" ) , NULL);
     add_integer( "input-repeat", 0, NULL,
                  INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, VLC_TRUE );
     add_integer( "start-time", 0, NULL,
@@ -1002,6 +1004,13 @@ vlc_module_begin();
     add_file( "cd-audio", CDAUDIO_DEVICE, NULL, CDAUDIO_DEV_TEXT,
               CDAUDIO_DEV_LONGTEXT, VLC_FALSE );
 
+    set_section( N_( "Network settings" ), NULL );
+
+    add_integer( "server-port", 1234, NULL,
+                 SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
+    add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
+    add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT,
+                IFACE_ADDR_LONGTEXT, VLC_TRUE );
     add_bool( "ipv6", 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, VLC_FALSE );
         change_short('6');
     add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
@@ -1033,6 +1042,11 @@ vlc_module_begin();
                 META_DATE_LONGTEXT, VLC_TRUE );
     add_string( "meta-url", NULL, NULL, META_URL_TEXT,
                 META_URL_LONGTEXT, VLC_TRUE );
+
+    set_section( N_( "Advanced" ), NULL );
+
+    add_integer( "cr-average", 40, NULL, CR_AVERAGE_TEXT,
+                 CR_AVERAGE_LONGTEXT, VLC_FALSE );
 
     /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , VLC_TRUE );
