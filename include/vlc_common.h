@@ -277,6 +277,7 @@ typedef struct picture_sys_t picture_sys_t;
 typedef struct picture_heap_t picture_heap_t;
 typedef struct subpicture_t subpicture_t;
 typedef struct subpicture_sys_t subpicture_sys_t;
+typedef struct subpicture_region_t subpicture_region_t;
 typedef struct vout_synchro_t vout_synchro_t;
 typedef struct text_renderer_sys_t text_renderer_sys_t;
 typedef struct text_style_t text_style_t;
@@ -313,6 +314,10 @@ typedef struct decoder_sys_t  decoder_sys_t;
 /* Encoders */
 typedef struct encoder_t      encoder_t;
 typedef struct encoder_sys_t  encoder_sys_t;
+
+/* Filters */
+typedef struct filter_t filter_t;
+typedef struct filter_sys_t filter_sys_t;
 
 /* Misc */
 typedef struct data_packet_t data_packet_t;

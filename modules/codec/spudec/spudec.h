@@ -30,16 +30,13 @@ struct decoder_sys_t
     int i_rle_size;
     int i_spu;
 
-    int i_subpic_channel;
-
     block_t *p_block;
 
-    uint8_t buffer[65536 + 20 ]; /* we will never overflow more than 11 bytes if I'm right */
-
-    vout_thread_t *p_vout;
+    /* We will never overflow more than 11 bytes if I'm right */
+    uint8_t buffer[65536 + 20 ];
 };
 
-struct subpicture_sys_t
+typedef struct subpicture_data_t
 {
     mtime_t i_pts;                                 /* presentation timestamp */
 
@@ -51,14 +48,7 @@ struct subpicture_sys_t
     uint8_t    pi_alpha[4];
     uint8_t    pi_yuv[4][3];
 
-    /* Link to our input */
-    vlc_object_t * p_input;
-
-    /* Cropping properties */
-    vlc_mutex_t  lock;
-    vlc_bool_t   b_crop;
-    unsigned int i_x_start, i_y_start, i_x_end, i_y_end;
-};
+} subpicture_data_t;
 
 /*****************************************************************************
  * Amount of bytes we GetChunk() in one go
@@ -80,7 +70,4 @@ struct subpicture_sys_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void E_(ParsePacket)( decoder_t * );
-
-void E_(RenderSPU)  ( vout_thread_t *, picture_t *, const subpicture_t * );
-
+subpicture_t * E_(ParsePacket)( decoder_t * );

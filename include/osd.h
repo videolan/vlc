@@ -53,7 +53,7 @@ struct text_style_t
 };
 static const text_style_t default_text_style = { 22, 0xffffff, VLC_FALSE, VLC_FALSE, VLC_FALSE };
 
-VLC_EXPORT( subpicture_t *, vout_ShowTextRelative, ( vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
+VLC_EXPORT( int, vout_ShowTextRelative, ( vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
 VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
 VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, int, char *, ... ) );
 /**

@@ -90,3 +90,6 @@
 
 /* Planar 4:4:4:4 Y:U:V:A */
 #define FOURCC_YUVA         VLC_FOURCC('Y','U','V','A')
+
+/* Palettized YUV with palette element Y:U:V:A */
+#define FOURCC_YUVP         VLC_FOURCC('Y','U','V','P')

@@ -36,10 +36,8 @@
  */
 struct video_palette_t
 {
-    int i_dummy; /**< to keep the compatibility with ffmpeg's palette */
-
-    uint32_t palette[256]; /**< 4-byte ARGB palette entries, stored in native
-                            * byte order */
+    int i_dummy;        /**< to keep the compatibility with ffmpeg's palette */
+    uint8_t palette[256][4];                   /**< 4-byte RGBA/YUVA palette */
 };
 
 /**
@@ -96,6 +94,7 @@ struct video_format_t
     unsigned int i_frame_rate;                     /**< frame rate numerator */
     unsigned int i_frame_rate_base;              /**< frame rate denominator */
 
+    int i_rmask, i_rgmask, i_bmask;          /**< color masks for RGB chroma */
     video_palette_t *p_palette;              /**< video palette from demuxer */
 };
 

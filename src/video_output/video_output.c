@@ -232,7 +232,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         return NULL;
     }
 
-    /* Initialize pictures and subpictures - translation tables and functions
+    /* Initialize pictures - translation tables and functions
      * will be initialized later in InitThread */
     for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES + 1; i_index++)
     {
@@ -241,12 +241,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         p_vout->p_picture[i_index].i_status = FREE_PICTURE;
         p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
         p_vout->p_picture[i_index].b_slow   = 0;
-    }
-
-    for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
-    {
-        p_vout->p_subpicture[i_index].i_status = FREE_SUBPICTURE;
-        p_vout->p_subpicture[i_index].i_type   = EMPTY_SUBPICTURE;
     }
 
     /* No images in the heap */
@@ -416,13 +410,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         return NULL;
     }
 
-    p_vout->p_text_renderer_module =
-        module_Need( p_vout, "text renderer", NULL, 0 );
-    if( p_vout->p_text_renderer_module == NULL )
-    {
-        msg_Warn( p_vout, "no suitable text renderer module" );
-        p_vout->pf_add_string = NULL;
-    }
+    /* Initialize subpicture unit */
+    vout_InitSPU( p_vout );
 
     /* Create a few object variables for interface interaction */
     var_Create( p_vout, "deinterlace", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
@@ -489,10 +478,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         /* Make sure the thread is destroyed */
         p_vout->b_die = VLC_TRUE;
 
-        if( p_vout->p_text_renderer_module )
-        {
-            module_Unneed( p_vout, p_vout->p_text_renderer_module );
-        }
         vlc_thread_join( p_vout );
 
         vlc_object_detach( p_vout );
@@ -1127,18 +1112,8 @@ static void EndThread( vout_thread_t *p_vout )
         }
     }
 
-    /* Destroy all remaining subpictures */
-    for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
-    {
-        if( p_vout->p_subpicture[i_index].i_status != FREE_SUBPICTURE )
-        {
-            vout_DestroySubPicture( p_vout,
-                                    &p_vout->p_subpicture[i_index] );
-        }
-    }
-
-    if( p_vout->p_text_renderer_module )
-        module_Unneed( p_vout, p_vout->p_text_renderer_module );
+    /* Destroy subpicture unit */
+    vout_DestroySPU( p_vout );
 
     /* Destroy translation tables */
     p_vout->pf_end( p_vout );

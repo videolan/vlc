@@ -1210,7 +1210,8 @@ char *stream_ReadLine( stream_t *s )
     }
 
     /* Remove trailing LF/CR */
-    while( i_line > 0 && ( p_line[i_line-1] == '\r' || p_line[i_line-1] == '\n') ) i_line--;
+    while( i_line > 0 && ( p_line[i_line-1] == '\r' ||
+           p_line[i_line-1] == '\n') ) i_line--;
 
     if( i_read > 0 )
     {
@@ -1218,7 +1219,7 @@ char *stream_ReadLine( stream_t *s )
         return p_line;
     }
 
-    /* We failed to read any data, probably EOF*/
+    /* We failed to read any data, probably EOF */
     if( p_line ) free( p_line );
     return NULL;
 }

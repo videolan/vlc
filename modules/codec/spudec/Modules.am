@@ -1,6 +1,5 @@
 SOURCES_spudec = \
 	spudec.c \
 	parse.c \
-	render.c \
 	spudec.h \
 	$(NULL)

@@ -175,6 +175,8 @@ struct picture_heap_t
 #define U_PITCH      p[U_PLANE].i_pitch
 #define V_PIXELS     p[V_PLANE].p_pixels
 #define V_PITCH      p[V_PLANE].i_pitch
+#define A_PIXELS     p[A_PLANE].p_pixels
+#define A_PITCH      p[A_PLANE].i_pitch
 
 /**
  * \defgroup subpicture Video Subpictures
@@ -183,6 +185,28 @@ struct picture_heap_t
  * \ingroup video_output
  * @{
  */
+
+/**
+ * Video subtitle region
+ *
+ * A subtitle region is defined by a picture (graphic) and its rendering
+ * coordinates.
+ * Subtitles contain a list of regions.
+ */
+struct subpicture_region_t
+{
+    /** \name Region properties */
+    /**@{*/
+    video_format_t  fmt;                          /**< format of the picture */
+    picture_t       picture;             /**< picture comprising this region */
+
+    int             i_x;                             /**< position of region */
+    int             i_y;                             /**< position of region */
+
+    subpicture_region_t *p_next;                /**< next region in the list */
+    /**@}*/
+
+};
 
 /**
  * Video subtitle
@@ -216,6 +240,8 @@ struct subpicture_t
                                       untill the next one appear */
     /**@}*/
 
+    subpicture_region_t *p_region;  /**< region list composing this subtitle */
+
     /** \name Display properties
      * These properties are only indicative and may be
      * changed by the video output thread, or simply ignored depending of the
@@ -225,12 +251,19 @@ struct subpicture_t
     int             i_y;                 /**< offset from alignment position */
     int             i_width;                              /**< picture width */
     int             i_height;                            /**< picture height */
-    /**@}*/
+    int             b_absolute;                    /**< position is absolute */
+    int             i_flags;                             /**< position flags */
+     /**@}*/
 
     /** Pointer to function that renders this subtitle in a picture */
     void ( *pf_render )  ( vout_thread_t *, picture_t *, const subpicture_t * );
     /** Pointer to function that cleans up the private data of this subtitle */
     void ( *pf_destroy ) ( subpicture_t * );
+
+    /** Pointer to functions for region management */
+    subpicture_region_t * ( *pf_create_region ) ( vlc_object_t *,
+                                                  video_format_t * );
+    void ( *pf_destroy_region ) ( vlc_object_t *, subpicture_region_t * );
 
     /** Private data - the subtitle plugin might want to put stuff here to
      * keep track of the subpicture */

@@ -21,7 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 #include <vlc/vout.h>
-#include <osd.h>
+#include "vlc_block.h"
+#include "vlc_filter.h"
+#include "osd.h"
 
 /**
  * \brief Show text on the video for some time
@@ -34,25 +36,44 @@
  * \param i_vmargin vertical margin in pixels
  * \param i_duration Amount of time the text is to be shown.
  */
-subpicture_t *vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
-                              char *psz_string, text_style_t *p_style,
-                              int i_flags, int i_hmargin, int i_vmargin,
-                              mtime_t i_duration )
+int vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
+                           char *psz_string, text_style_t *p_style,
+                           int i_flags, int i_hmargin, int i_vmargin,
+                           mtime_t i_duration )
 {
     subpicture_t *p_subpic = NULL;
     mtime_t i_now = mdate();
 
-    if ( p_vout->pf_add_string )
+    if( p_vout->p_text && p_vout->p_text->p_module &&
+        p_vout->p_text->pf_render_string )
     {
-        p_subpic = p_vout->pf_add_string( p_vout, i_channel, psz_string,
-           p_style, i_flags, i_hmargin, i_vmargin, i_now, i_now + i_duration );
+        block_t *p_block = block_New( p_vout, strlen(psz_string) + 1 );
+        if( p_block )
+        {
+            memcpy( p_block->p_buffer, psz_string, p_block->i_buffer );
+            p_block->i_pts = p_block->i_dts = i_now;
+            p_block->i_length = i_duration;
+
+            p_subpic = p_vout->p_text->pf_render_string( p_vout->p_text,
+                                                         p_block );
+            if( p_subpic )
+            {
+                p_subpic->i_x = i_hmargin;
+                p_subpic->i_y = i_vmargin;
+                p_subpic->i_flags = i_flags;
+                p_subpic->i_channel = i_channel;
+
+                vout_DisplaySubPicture( p_vout, p_subpic );
+                return VLC_SUCCESS;
+            }
+        }
+        return VLC_EGENERIC;
     }
     else
     {
         msg_Warn( p_vout, "No text renderer found" );
+        return VLC_EGENERIC;
     }
-
-    return p_subpic;
 }
 
 /**
@@ -74,11 +95,32 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {
-    if ( p_vout->pf_add_string )
+    subpicture_t *p_subpic = NULL;
+
+    if( p_vout->p_text && p_vout->p_text->p_module &&
+        p_vout->p_text->pf_render_string )
     {
-        p_vout->pf_add_string( p_vout, i_channel, psz_string, p_style, i_flags,
-                               i_hmargin, i_vmargin, i_start, i_stop );
-        return VLC_SUCCESS;
+        block_t *p_block = block_New( p_vout, strlen(psz_string) + 1 );
+        if( p_block )
+        {
+            memcpy( p_block->p_buffer, psz_string, p_block->i_buffer );
+            p_block->i_pts = p_block->i_dts = i_start;
+            p_block->i_length = i_stop - i_start;
+
+            p_subpic = p_vout->p_text->pf_render_string( p_vout->p_text,
+                                                         p_block );
+            if( p_subpic )
+            {
+                p_subpic->i_x = i_hmargin;
+                p_subpic->i_y = i_vmargin;
+                p_subpic->i_flags = i_flags;
+                p_subpic->i_channel = i_channel;
+
+                vout_DisplaySubPicture( p_vout, p_subpic );
+                return VLC_SUCCESS;
+            }
+        }
+        return VLC_EGENERIC;
     }
     else
     {

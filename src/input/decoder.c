@@ -51,6 +51,9 @@ static void vout_del_buffer( decoder_t *, picture_t * );
 static void vout_link_picture( decoder_t *, picture_t * );
 static void vout_unlink_picture( decoder_t *, picture_t * );
 
+static subpicture_t *spu_new_buffer( decoder_t * );
+static void spu_del_buffer( decoder_t *, subpicture_t * );
+
 static es_format_t null_es_format = {0};
 
 struct decoder_owner_sys_t
@@ -63,6 +66,9 @@ struct decoder_owner_sys_t
     aout_input_t    *p_aout_input;
 
     vout_thread_t   *p_vout;
+
+    vout_thread_t   *p_spu_vout;
+    int              i_spu_channel;
 
     sout_instance_t         *p_sout;
     sout_packetizer_input_t *p_sout_input;
@@ -387,10 +393,11 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->p_owner->p_aout = NULL;
     p_dec->p_owner->p_aout_input = NULL;
     p_dec->p_owner->p_vout = NULL;
+    p_dec->p_owner->p_spu_vout = NULL;
+    p_dec->p_owner->i_spu_channel = 0;
     p_dec->p_owner->p_sout = p_input->p_sout;
     p_dec->p_owner->p_sout_input = NULL;
     p_dec->p_owner->p_packetizer = NULL;
-
 
     /* decoder fifo */
     if( ( p_dec->p_owner->p_fifo = block_FifoNew( p_dec ) ) == NULL )
@@ -398,6 +405,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
         msg_Err( p_dec, "out of memory" );
         return NULL;
     }
+
     /* Set buffers allocation callbacks for the decoders */
     p_dec->pf_aout_buffer_new = aout_new_buffer;
     p_dec->pf_aout_buffer_del = aout_del_buffer;
@@ -405,6 +413,8 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->pf_vout_buffer_del = vout_del_buffer;
     p_dec->pf_picture_link    = vout_link_picture;
     p_dec->pf_picture_unlink  = vout_unlink_picture;
+    p_dec->pf_spu_buffer_new  = spu_new_buffer;
+    p_dec->pf_spu_buffer_del  = spu_del_buffer;
 
     vlc_object_attach( p_dec, p_input );
 
@@ -618,7 +628,17 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
     }
     else if( p_dec->fmt_in.i_cat == SPU_ES )
     {
-        p_dec->pf_decode_sub( p_dec, &p_block );
+        vout_thread_t *p_vout;
+        subpicture_t *p_spu;
+        while( (p_spu = p_dec->pf_decode_sub( p_dec, &p_block ) ) )
+        {
+            p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+            if( p_vout )
+            {
+                vout_DisplaySubPicture( p_vout, p_spu );
+                vlc_object_release( p_vout );
+            }
+        }
     }
     else
     {
@@ -675,6 +695,18 @@ static void DeleteDecoder( decoder_t * p_dec )
     {
         sout_InputDelete( p_dec->p_owner->p_sout_input );
         es_format_Clean( &p_dec->p_owner->sout );
+    }
+
+    if( p_dec->fmt_in.i_cat == SPU_ES )
+    {
+        vout_thread_t *p_vout;
+
+        p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+        if( p_vout )
+        {
+            vout_ClearOSDChannel( p_vout, p_dec->p_owner->i_spu_channel );
+            vlc_object_release( p_vout );
+        }
     }
 
     es_format_Clean( &p_dec->fmt_in );
@@ -839,4 +871,33 @@ static void vout_link_picture( decoder_t *p_dec, picture_t *p_pic )
 static void vout_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
 {
     vout_UnlinkPicture( p_dec->p_owner->p_vout, p_pic );
+}
+
+static subpicture_t *spu_new_buffer( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_sys = (decoder_owner_sys_t *)p_dec->p_owner;
+    vout_thread_t *p_vout;
+    subpicture_t *p_spu;
+
+    p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    if( !p_vout ) return NULL;
+
+    if( p_sys->p_spu_vout != p_vout )
+    {
+        p_sys->i_spu_channel =
+            vout_RegisterOSDChannel( p_vout );
+        p_sys->p_spu_vout = p_vout;
+    }
+
+    p_spu = vout_CreateSubPicture( p_vout, p_sys->i_spu_channel,
+                                   MEMORY_SUBPICTURE );
+
+    vlc_object_release( p_vout );
+
+    return p_spu;
+}
+
+static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_spu )
+{
+    vout_DestroySubPicture( p_dec->p_owner->p_vout, p_spu );
 }

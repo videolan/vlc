@@ -23,22 +23,19 @@
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
+#include "vlc_block.h"
+#include "vlc_filter.h"
 
-static subpicture_t * AddText( vout_thread_t *, int, char *, text_style_t *,
-                        int, int, int, mtime_t, mtime_t );
+static subpicture_t *RenderText( filter_t *, block_t * );
 
 int E_(OpenRenderer)( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->pf_add_string = AddText;
+    filter_t *p_filter = (filter_t *)p_this;
+    p_filter->pf_render_string = RenderText;
     return VLC_SUCCESS;
 }
 
-static subpicture_t * AddText( vout_thread_t *p_vout, int i_channel,
-                        char *psz_string, text_style_t *p_style , int i_flags,
-                        int i_x_margin, int i_y_margin, mtime_t i_start,
-                        mtime_t i_stop )
+static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
 {
-    return VLC_SUCCESS;
+    return NULL;
 }
-

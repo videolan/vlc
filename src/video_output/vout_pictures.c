@@ -586,6 +586,9 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
 
     switch( i_chroma )
     {
+        case FOURCC_YUVA:
+            p_format->i_bits_per_pixel = 32;
+            break;
         case FOURCC_I444:
             p_format->i_bits_per_pixel = 24;
             break;
@@ -608,6 +611,10 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
         case FOURCC_Y211:
             p_format->i_bits_per_pixel = 8;
             break;
+        case FOURCC_YUVP:
+            p_format->i_bits_per_pixel = 8;
+            break;
+
         case FOURCC_RV32:
             p_format->i_bits_per_pixel = 32;
             break;
@@ -731,6 +738,30 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 3;
             break;
 
+        case FOURCC_YUVA:
+            p_pic->p[ Y_PLANE ].i_lines = i_height;
+            p_pic->p[ Y_PLANE ].i_pitch = i_width;
+            p_pic->p[ Y_PLANE ].i_visible_pitch = p_pic->p[ Y_PLANE ].i_pitch;
+            p_pic->p[ U_PLANE ].i_lines = i_height;
+            p_pic->p[ U_PLANE ].i_pitch = i_width;
+            p_pic->p[ U_PLANE ].i_visible_pitch = p_pic->p[ U_PLANE ].i_pitch;
+            p_pic->p[ V_PLANE ].i_lines = i_height;
+            p_pic->p[ V_PLANE ].i_pitch = i_width;
+            p_pic->p[ V_PLANE ].i_visible_pitch = p_pic->p[ V_PLANE ].i_pitch;
+            p_pic->p[ A_PLANE ].i_lines = i_height;
+            p_pic->p[ A_PLANE ].i_pitch = i_width;
+            p_pic->p[ A_PLANE ].i_visible_pitch = p_pic->p[ A_PLANE ].i_pitch;
+            p_pic->i_planes = 4;
+            break;
+
+        case FOURCC_YUVP:
+            p_pic->p->i_lines = i_height;
+            p_pic->p->i_pitch = i_width;
+            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_pixel_pitch = 8;
+            p_pic->i_planes = 1;
+            break;
+
         case FOURCC_Y211:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width;
@@ -811,20 +842,6 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->p_heap->i_bmask = 0x0000ff; */
             p_pic->i_planes = 1;
             break;
-        case FOURCC_YUVA:
-            p_pic->p[ Y_PLANE ].i_lines = i_height;
-            p_pic->p[ Y_PLANE ].i_pitch = i_width;
-            p_pic->p[ Y_PLANE ].i_visible_pitch = p_pic->p[ Y_PLANE ].i_pitch;
-            p_pic->p[ U_PLANE ].i_lines = i_height;
-            p_pic->p[ U_PLANE ].i_pitch = i_width;
-            p_pic->p[ U_PLANE ].i_visible_pitch = p_pic->p[ U_PLANE ].i_pitch;
-            p_pic->p[ V_PLANE ].i_lines = i_height;
-            p_pic->p[ V_PLANE ].i_pitch = i_width;
-            p_pic->p[ V_PLANE ].i_visible_pitch = p_pic->p[ V_PLANE ].i_pitch;
-            p_pic->p[ A_PLANE ].i_lines = i_height;
-            p_pic->p[ A_PLANE ].i_pitch = i_width;
-            p_pic->p[ A_PLANE ].i_visible_pitch = p_pic->p[ A_PLANE ].i_pitch;
-            p_pic->i_planes = 4;
 
         default:
             msg_Err( p_this, "unknown chroma type 0x%.8x (%4.4s)",

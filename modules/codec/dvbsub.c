@@ -37,8 +37,10 @@
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-static int  Open ( vlc_object_t *p_this );
-static void Close( vlc_object_t *p_this );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+static subpicture_t *Decode( decoder_t *, block_t ** );
+
 
 vlc_module_begin();
     set_description( _("DVB subtitles decoder") );
@@ -173,33 +175,14 @@ typedef struct
 
 } dvbsub_clut_t;
 
-typedef struct dvbsub_render_s
-{
-    uint16_t               i_x;
-    uint16_t               i_y;
-    dvbsub_image_t         *p_rle_top;
-    dvbsub_image_t         *p_rle_bot;
-
-    struct dvbsub_render_s *p_next;
-
-} dvbsub_render_t;
-
-struct subpicture_sys_t
-{
-    dvbsub_render_t         *p_objects;  /* Linked list of objects to render */
-};
-
 struct decoder_sys_t
 {
-    vout_thread_t   *p_vout;
-
     bs_t            bs;
 
     /* Decoder internal data */
-    int i_id;
-    int i_ancillary_id;
-
-    mtime_t i_pts;
+    int             i_id;
+    int             i_ancillary_id;
+    mtime_t         i_pts;
 
     dvbsub_page_t   *p_page;
     dvbsub_region_t *p_regions;
@@ -207,9 +190,6 @@ struct decoder_sys_t
 
     dvbsub_clut_t   *p_clut[256];
     dvbsub_clut_t   default_clut;
-
-    subpicture_t    *p_spu;
-    int             i_subpic_channel;
 };
 
 
@@ -243,8 +223,6 @@ struct decoder_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void Decode( decoder_t *, block_t ** );
-
 static void decode_segment( decoder_t *, bs_t * );
 static void decode_page_composition( decoder_t *, bs_t * );
 static void decode_region_composition( decoder_t *, bs_t * );
@@ -254,7 +232,8 @@ static void decode_clut( decoder_t *, bs_t * );
 static void free_objects( decoder_t * );
 static void free_all( decoder_t * );
 
-static void render( decoder_t *, vout_thread_t * );
+static subpicture_t *render( decoder_t * );
+
 static void default_clut_init( decoder_t * );
 
 /*****************************************************************************
@@ -283,8 +262,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_page         = NULL;
     p_sys->p_regions      = NULL;
     p_sys->p_objects      = NULL;
-    p_sys->p_vout         = NULL;
-    p_sys->p_spu          = NULL;
     for( i = 0; i < 256; i++ ) p_sys->p_clut[i] = NULL;
 
     es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 'd','v','b','s' ) );
@@ -302,22 +279,6 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*) p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_vout && p_sys->p_vout->p_subpicture != NULL )
-    {
-        subpicture_t *p_subpic;
-        int i_subpic;
-        for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
-        {
-            p_subpic = &p_sys->p_vout->p_subpicture[i_subpic];
-            if( p_subpic != NULL &&
-                ( p_subpic->i_status == RESERVED_SUBPICTURE ||
-                  p_subpic->i_status == READY_SUBPICTURE ) )
-            {
-                vout_DestroySubPicture( p_sys->p_vout, p_subpic );
-            }
-        }
-    }
-
     free_all( p_dec );
     free( p_sys );
 }
@@ -325,16 +286,13 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static void Decode( decoder_t *p_dec, block_t **pp_block )
+static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_block;
-    vout_thread_t *p_last_vout;
+    subpicture_t  *p_spu = NULL;
 
-    if( pp_block == NULL || *pp_block == NULL )
-    {
-        return;
-    }
+    if( pp_block == NULL || *pp_block == NULL ) return NULL;
     p_block = *pp_block;
     *pp_block = NULL;
 
@@ -343,7 +301,7 @@ static void Decode( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Warn( p_dec, "non dated subtitle" );
         block_Release( p_block );
-        return;
+        return NULL;
     }
 
     bs_init( &p_sys->bs, p_block->p_buffer, p_block->i_buffer );
@@ -352,14 +310,14 @@ static void Decode( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Dbg( p_dec, "invalid data identifier" );
         block_Release( p_block );
-        return;
+        return NULL;
     }
 
     if( bs_read( &p_sys->bs, 8 ) != 0x20 && 0 ) /* Subtitle stream id */
     {
         msg_Dbg( p_dec, "invalid subtitle stream id" );
         block_Release( p_block );
-        return;
+        return NULL;
     }
 
     while( bs_show( &p_sys->bs, 8 ) == 0x0f ) /* Sync byte */
@@ -371,29 +329,15 @@ static void Decode( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Warn( p_dec, "end marker not found (corrupted subtitle ?)" );
         block_Release( p_block );
-        return;
+        return NULL;
     }
 
-    p_last_vout = p_sys->p_vout;
-    if( ( p_sys->p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT,
-                                           FIND_ANYWHERE ) ) )
-    {
-        if( p_last_vout != p_sys->p_vout )
-        {
-            p_sys->i_subpic_channel =
-                vout_RegisterOSDChannel( p_sys->p_vout );
-        }
-
-        /* Check if the page is to be displayed */
-        if( p_sys->p_page ) render( p_dec, p_sys->p_vout );
-
-        vlc_object_release( p_sys->p_vout );
-    }
-#ifdef DEBUG_DVBSUB
-    else if( p_sys->p_page ) render( p_dec, NULL );
-#endif
+    /* Check if the page is to be displayed */
+    if( p_sys->p_page ) p_spu = render( p_dec );
 
     block_Release( p_block );
+
+    return p_spu;
 }
 
 /* following functions are local */
@@ -1174,27 +1118,6 @@ static uint16_t dvbsub_pdata8bpp( bs_t *s, uint16_t* p,
     return ( i_processed + 7 ) / 8 ;
 }
 
-static dvbsub_image_t *dup_image( dvbsub_image_t *p_i )
-{
-    dvbsub_image_t *p_image = malloc( sizeof(dvbsub_image_t) );
-    dvbsub_rle_t *p_rle = p_i->p_codes;
-
-    *p_image = *p_i;
-    p_image->p_last = NULL;
-
-    while( p_rle )
-    {
-        dvbsub_rle_t *p_last = p_image->p_last;
-        p_image->p_last = malloc( sizeof(dvbsub_rle_t) );
-        if( !p_last ) p_image->p_codes = p_image->p_last;
-        if( p_last ) p_last->p_next = p_image->p_last;
-        *p_image->p_last = *p_rle;
-        p_rle = p_rle->p_next;
-    }
-
-    return p_image;
-}
-
 static void free_image( dvbsub_image_t *p_i )
 {
     dvbsub_rle_t *p1;
@@ -1208,21 +1131,6 @@ static void free_image( dvbsub_image_t *p_i )
     }
 
     free( p_i );
-}
-
-static void free_spu( subpicture_t *p_spu )
-{
-    dvbsub_render_t *p_obj, *p_obj_next;
-
-    for( p_obj = p_spu->p_sys->p_objects; p_obj != NULL; p_obj = p_obj_next )
-    {
-        p_obj_next = p_obj->p_next;
-        free_image( p_obj->p_rle_top );
-        free_image( p_obj->p_rle_bot );
-        free( p_obj );
-    }
-    free( p_spu->p_sys );
-    p_spu->p_sys = NULL;
 }
 
 static void free_objects( decoder_t *p_dec )
@@ -1271,201 +1179,20 @@ static void free_all( decoder_t *p_dec )
     free_objects( p_dec );
 }
 
-static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
-                        dvbsub_render_t *p_r )
-{
-    /* Common variables */
-    uint8_t  *p_desty;
-    uint16_t i,j;
-    uint16_t i_cnt;
-    uint16_t x, y;
-    dvbsub_rle_t* p_c;
-    dvbsub_image_t* p_im = p_r->p_rle_top;
-    i=0;
-    j=0;
-    p_desty = p_pic->Y_PIXELS;
-    //let's render the 1st frame
-    for(p_c = p_im->p_codes; p_c->p_next != NULL; p_c=p_c->p_next)
-    {
-        //if( p_c->y != 0  && p_c->t < 0x20)
-        if( p_c->y != 0  && p_c->t < 0x20)
-        {
-            x = j+ p_r->i_x;
-            y = 2*i+p_r->i_y;
-            //memset(p_desty+ y*p_pic->Y_PITCH + x, p_c->y, p_c->i_num);
-            // In YUY2 we have to set pixel per pixel
-            for( i_cnt = 0; i_cnt < p_c->i_num; i_cnt+=2 )
-            {
-                memset(p_desty+ y*p_pic->Y_PITCH + 2*x + i_cnt, p_c->y, 1);
-              //memset(p_desty+ y*p_pic->Y_PITCH + 2*x + i_cnt+1, p_c->cr, 1);
-              //memset(p_desty+ y*p_pic->Y_PITCH + 2*x + i_cnt+2, p_c->y, 1);
-              //memset(p_desty+ y*p_pic->Y_PITCH + 2*x + i_cnt+3, p_c->cb, 1);
-            }
-        }
-        j += p_c->i_num;
-        if(j >= p_im->i_cols[i])
-        {
-            i++; j=0;
-        }
-        if( i>= p_im->i_rows) break;
-    }
-    //idem for the second frame
-    p_im = p_r->p_rle_bot; i=0; j=0;
-    for(p_c = p_im->p_codes; p_c->p_next != NULL; p_c=p_c->p_next)
-    {
-        if( p_c->y != 0 && p_c->t < 0x20)
-        {
-            x = j+ p_r->i_x;
-            y = 2*i+1+p_r->i_y;
-            //memset(p_desty+ y*p_pic->Y_PITCH + x, p_c->y, p_c->i_num);
-            // In YUY2 we have to set pixel per pixel
-            for( i_cnt = 0; i_cnt < p_c->i_num; i_cnt+=2 )
-            {
-                memset(p_desty+ y*p_pic->Y_PITCH + 2*x + i_cnt, p_c->y, 1);
-              //memset(p_desty+ y*p_pic->Y_PITCH + 2*x + i_cnt+1, p_c->cr, 1);
-              //memset(p_desty+ y*p_pic->Y_PITCH + 2*x + i_cnt+2, p_c->y, 1);
-              //memset(p_desty+ y*p_pic->Y_PITCH + 2*x + i_cnt+3, p_c->cb, 1);
-           }
-        }
-        j += p_c->i_num;
-        if(j >= p_im->i_cols[i])
-        {
-            i++; j=0;
-        }
-        if( i>= p_im->i_rows) break;
-    }
-}
-
-static void RenderI42x( vout_thread_t *p_vout, picture_t *p_pic,
-                        dvbsub_render_t *p_r )
-{
-    /* Common variables */
-    uint8_t *p_desty = p_pic->Y_PIXELS;
-    uint8_t *p_destu = p_pic->U_PIXELS;
-    uint8_t *p_destv = p_pic->V_PIXELS;
-    dvbsub_image_t* p_im = p_r->p_rle_top;
-    dvbsub_rle_t* p_c;
-    uint16_t i, j, x, y;
-    int i_x_subsampling =
-        p_vout->output.i_chroma == VLC_FOURCC('I','4','2','2') ? 1 : 2;
-
-    /* Let's render the top field */
-    p_im = p_r->p_rle_bot; i = 0; j = 0;
-    for( p_c = p_im->p_codes; p_c->p_next != NULL; p_c = p_c->p_next )
-    {
-        if( p_c->y != 0 && p_c->t != 0xFF )
-        {
-            x = j + p_r->i_x;
-            y = 2 * i + p_r->i_y;
-            memset( p_desty + y * p_pic->Y_PITCH + x, p_c->y, p_c->i_num );
-
-            memset( p_destu + y/2 * p_pic->U_PITCH + x/i_x_subsampling,
-                    p_c->cr, p_c->i_num/i_x_subsampling );
-            memset( p_destv + y/2 * p_pic->V_PITCH + x/i_x_subsampling,
-                    p_c->cb, p_c->i_num/i_x_subsampling );
-        }
-
-        j += p_c->i_num;
-        if( j >= p_im->i_cols[i] )
-        {
-            i++; j=0;
-        }
-
-        if( i >= p_im->i_rows) break;
-    }
-
-    /* Idem for the bottom field */
-    p_im = p_r->p_rle_bot; i = 0; j = 0;
-    for( p_c = p_im->p_codes; p_c->p_next != NULL; p_c = p_c->p_next )
-    {
-      if( p_c->y != 0  && p_c->t != 0xFF )
-        {
-            x = j + p_r->i_x;
-            y = 2*i + 1 + p_r->i_y;
-
-            memset(p_desty+ y*p_pic->Y_PITCH + x, p_c->y, p_c->i_num);
-
-            /* No U or V (decimation) */
-        }
-
-        j += p_c->i_num;
-        if( j >= p_im->i_cols[i] )
-        {
-            i++; j=0;
-        }
-
-        if( i >= p_im->i_rows ) break;
-    }
-}
-
-static void RenderDVBSUB( vout_thread_t *p_vout, picture_t *p_pic,
-                          const subpicture_t *p_spu )
-{
-    dvbsub_render_t* p_render;
-
-    if( p_spu->p_sys == NULL ) return;
-
-    p_render = p_spu->p_sys->p_objects;
-    while( p_render )
-    {
-
-        switch( p_vout->output.i_chroma )
-        {
-        /* I420 target, no scaling */
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('Y','V','1','2'):
-            /* As long as we just use Y info, I422 and YV12 are just equivalent
-             * to I420. Remember to change it the day we'll take into account
-             * U and V info. */
-            RenderI42x( p_vout, p_pic, p_render );
-            break;
-
-        /* RV16 target, scaling */
-        case VLC_FOURCC('R','V','1','6'):
-            msg_Err(p_vout, "unimplemented chroma: RV16");
-            /* RenderRV16( p_vout, p_pic, p_spu ); */
-            break;
-
-        /* RV32 target, scaling */
-        case VLC_FOURCC('R','V','2','4'):
-        case VLC_FOURCC('R','V','3','2'):
-            msg_Err(p_vout, "unimplemented chroma: RV32");
-            /* RenderRV32( p_vout, p_pic, p_spu ); */
-            break;
-
-        /* NVidia overlay, no scaling */
-        case VLC_FOURCC('Y','U','Y','2'):
-            RenderYUY2( p_vout, p_pic, p_render );
-            break;
-
-        default:
-            msg_Err( p_vout, "unknown chroma, can't render SPU" );
-            break;
-        }
-
-        p_render = p_render->p_next;
-    }
-}
-
-static void render( decoder_t *p_dec, vout_thread_t *p_vout )
+static subpicture_t *render( decoder_t *p_dec )
 {
     decoder_sys_t   *p_sys = p_dec->p_sys;
-    dvbsub_render_t *p_render = NULL, *p_current, *p_last = NULL;
     dvbsub_clut_t   *p_clut;
     dvbsub_rle_t    *p_c;
+    subpicture_t    *p_spu;
+    subpicture_region_t **pp_spu_region;
     int i, j = 0, i_timeout = 0;
 
     /* Allocate the subpicture internal data. */
-#ifdef DEBUG_DVBSUB
-    if( !p_vout ) p_sys->p_spu = malloc( sizeof(subpicture_t) );
-    else
-#endif
-    p_sys->p_spu =
-        vout_CreateSubPicture( p_vout, p_sys->i_subpic_channel,
-                               MEMORY_SUBPICTURE );
-    if( p_sys->p_spu == NULL ) return;
+    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    if( !p_spu ) return NULL;
+
+    pp_spu_region = &p_spu->p_region;
 
     /* Loop on region definitions */
 #ifdef DEBUG_DVBSUB
@@ -1475,8 +1202,12 @@ static void render( decoder_t *p_dec, vout_thread_t *p_vout )
 
     for( i = 0; p_sys->p_page && i < p_sys->p_page->i_region_defs; i++ )
     {
-        dvbsub_region_t    *p_region;
-        dvbsub_regiondef_t *p_regiondef;
+        dvbsub_region_t     *p_region;
+        dvbsub_regiondef_t  *p_regiondef;
+        subpicture_region_t *p_spu_region;
+        uint8_t *p_y, *p_u, *p_v, *p_a;
+        video_format_t fmt;
+        int i_pitch;
 
         i_timeout = p_sys->p_page->i_timeout;
 
@@ -1500,11 +1231,37 @@ static void render( decoder_t *p_dec, vout_thread_t *p_vout )
             continue;
         }
 
+        /* Create new SPU region */
+        memset( &fmt, 0, sizeof(video_format_t) );
+        fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
+        fmt.i_aspect = VOUT_ASPECT_FACTOR;
+        fmt.i_width = fmt.i_visible_width = p_region->i_width;
+        fmt.i_height = fmt.i_visible_height = p_region->i_height;
+        fmt.i_x_offset = fmt.i_y_offset = 0;
+        p_spu_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+        if( !p_region )
+        {
+            msg_Err( p_dec, "cannot allocate SPU region" );
+            continue;
+        }
+        p_spu_region->i_x = p_regiondef->i_x;
+        p_spu_region->i_y = p_regiondef->i_y;
+        *pp_spu_region = p_spu_region;
+        pp_spu_region = &p_spu_region->p_next;
+
+        p_y = p_spu_region->picture.Y_PIXELS;
+        p_u = p_spu_region->picture.U_PIXELS;
+        p_v = p_spu_region->picture.V_PIXELS;
+        p_a = p_spu_region->picture.A_PIXELS;
+        i_pitch = p_spu_region->picture.Y_PITCH;
+        memset( p_a, 0, i_pitch * p_region->i_height );
+
         /* Loop on object definitions */
         for( j = 0; j < p_region->i_object_defs; j++ )
         {
             dvbsub_object_t    *p_object;
             dvbsub_objectdef_t *p_objectdef;
+            uint16_t k, l, x, y;
 
             p_objectdef = &p_region->p_object_defs[j];
 
@@ -1526,65 +1283,64 @@ static void render( decoder_t *p_dec, vout_thread_t *p_vout )
                 continue;
             }
 
-            /* Allocate the render structure */
-            p_current = malloc( sizeof(dvbsub_render_t) );
-            p_current->p_next = NULL;
-            p_current->i_x = p_regiondef->i_x + p_objectdef->i_x;
-            p_current->i_y = p_regiondef->i_y + p_objectdef->i_y;
-            p_current->p_rle_top = dup_image( p_object->topfield );
-            p_current->p_rle_bot = dup_image( p_object->bottomfield );
-
-            if( !p_render ) p_render = p_current;
-            if( p_last ) p_last->p_next = p_current;
-            p_last = p_current;
-
+            /* Draw SPU region */
             p_clut = p_sys->p_clut[p_region->i_clut];
             if( !p_clut ) p_clut = &p_sys->default_clut;
 
-            /* Compute the color datas according to the appropriate CLUT */
-            for( p_c = p_current->p_rle_top->p_codes;
-                 p_c->p_next != NULL; p_c = p_c->p_next )
+            for( k = 0, l = 0, p_c = p_object->topfield->p_codes;
+                 p_c->p_next; p_c = p_c->p_next )
             {
+                /* Compute the color data according to the appropriate CLUT */
                 dvbsub_color_t *p_color = (p_c->i_bpp == 2) ? p_clut->c_2b :
                     (p_c->i_bpp == 4) ? p_clut->c_4b : p_clut->c_8b;
 
-                p_c->y = p_color[p_c->i_color_code].Y;
-                p_c->cr = p_color[p_c->i_color_code].Cr;
-                p_c->cb = p_color[p_c->i_color_code].Cb;
-                p_c->t = p_color[p_c->i_color_code].T;
+                x = l + p_objectdef->i_x;
+                y = 2 * k + p_objectdef->i_y;
+                memset( p_y + y * i_pitch + x, p_color[p_c->i_color_code].Y,
+                        p_c->i_num );
+                memset( p_u + y * i_pitch + x, p_color[p_c->i_color_code].Cr,
+                        p_c->i_num );
+                memset( p_v + y * i_pitch + x, p_color[p_c->i_color_code].Cb,
+                        p_c->i_num );
+                memset( p_a + y * i_pitch + x,
+                        255 - p_color[p_c->i_color_code].T, p_c->i_num );
+
+                l += p_c->i_num;
+                if( l >= p_object->topfield->i_cols[k] ) { k++; l = 0; }
+                if( k >= p_object->topfield->i_rows) break;
+
             }
-            for( p_c = p_current->p_rle_bot->p_codes; p_c->p_next != NULL;
-                 p_c = p_c->p_next )
+
+            for( k = 0, l = 0, p_c = p_object->bottomfield->p_codes;
+                 p_c->p_next; p_c = p_c->p_next )
             {
+                /* Compute the color data according to the appropriate CLUT */
                 dvbsub_color_t *p_color = (p_c->i_bpp == 2) ? p_clut->c_2b :
                     (p_c->i_bpp == 4) ? p_clut->c_4b : p_clut->c_8b;
 
-                p_c->y = p_color[p_c->i_color_code].Y;
-                p_c->cr = p_color[p_c->i_color_code].Cr;
-                p_c->cb = p_color[p_c->i_color_code].Cb;
-                p_c->t = p_color[p_c->i_color_code].T;
+                x = l + p_objectdef->i_x;
+                y = 2 * k + 1 + p_objectdef->i_y;
+                memset( p_y + y * i_pitch + x, p_color[p_c->i_color_code].Y,
+                        p_c->i_num );
+                memset( p_u + y * i_pitch + x, p_color[p_c->i_color_code].Cr,
+                        p_c->i_num );
+                memset( p_v + y * i_pitch + x, p_color[p_c->i_color_code].Cb,
+                        p_c->i_num );
+                memset( p_a + y * i_pitch + x,
+                        255 - p_color[p_c->i_color_code].T, p_c->i_num );
+
+                l += p_c->i_num;
+                if( l >= p_object->bottomfield->i_cols[k] ) { k++; l = 0; }
+                if( k >= p_object->bottomfield->i_rows) break;
+
             }
         }
     }
 
     /* Set the pf_render callback */
-    p_sys->p_spu->pf_render = RenderDVBSUB;
-    p_sys->p_spu->p_sys = malloc( sizeof(subpicture_sys_t) );
-    p_sys->p_spu->p_sys->p_objects = p_render;
-    p_sys->p_spu->pf_destroy = free_spu;
-    p_sys->p_spu->i_start = p_sys->i_pts;
-    p_sys->p_spu->i_stop = p_sys->p_spu->i_start + i_timeout * 1000000;
-    p_sys->p_spu->b_ephemer = VLC_TRUE;
+    p_spu->i_start = p_sys->i_pts;
+    p_spu->i_stop = p_spu->i_start + i_timeout * 1000000;
+    p_spu->b_ephemer = VLC_TRUE;
 
-#ifdef DEBUG_DVBSUB
-    if( !p_vout )
-    {
-        free_spu( p_sys->p_spu );
-        free( p_sys->p_spu );
-        p_sys->p_spu = NULL;
-        return;
-    }
-#endif
-
-    vout_DisplaySubPicture( p_vout, p_sys->p_spu );
+    return p_spu;
 }

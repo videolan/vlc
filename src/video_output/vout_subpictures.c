@@ -6,6 +6,7 @@
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +34,156 @@
 
 #include "vlc_video.h"
 #include "video_output.h"
+#include "vlc_filter.h"
+#include "osd.h"
+
+static void UpdateSPU        ( vout_thread_t *, vlc_object_t * );
+static int  CropCallback     ( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
+
+static subpicture_t *spu_new_buffer( filter_t * );
+static void spu_del_buffer( filter_t *, subpicture_t * );
+
+/**
+ * Initialise the subpicture decoder unit
+ *
+ * \param p_vout the vout in which to create the subpicture unit
+ */
+void vout_InitSPU( vout_thread_t *p_vout )
+{
+    vlc_object_t *p_input;
+    int i_index;
+
+    for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
+    {
+        p_vout->p_subpicture[i_index].i_status = FREE_SUBPICTURE;
+        p_vout->p_subpicture[i_index].i_type   = EMPTY_SUBPICTURE;
+    }
+
+    /* Load the text rendering module */
+    p_vout->p_text = vlc_object_create( p_vout, sizeof(filter_t) );
+    p_vout->p_text->pf_spu_buffer_new = spu_new_buffer;
+    p_vout->p_text->pf_spu_buffer_del = spu_del_buffer;
+    p_vout->p_text->p_owner = (filter_owner_sys_t *)p_vout;
+    vlc_object_attach( p_vout->p_text, p_vout );
+    p_vout->p_text->p_module =
+        module_Need( p_vout->p_text, "text renderer", 0, 0 );
+    if( p_vout->p_text->p_module == NULL )
+    {
+        msg_Warn( p_vout, "no suitable text renderer module" );
+        vlc_object_detach( p_vout->p_text );
+        vlc_object_destroy( p_vout->p_text );
+        p_vout->p_text = NULL;
+    }
+
+    p_vout->p_blend = NULL;
+
+    p_vout->i_crop_x = p_vout->i_crop_y =
+        p_vout->i_crop_width = p_vout->i_crop_height = 0;
+    p_vout->b_force_alpha = VLC_FALSE;
+    p_vout->b_force_crop = VLC_FALSE;
+
+    /* Create callback */
+    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( p_input )
+    {
+        UpdateSPU( p_vout, VLC_OBJECT(p_input) );
+        var_AddCallback( p_input, "highlight", CropCallback, p_vout );
+        vlc_object_release( p_input );
+    }
+}
+
+/**
+ * Destroy the subpicture decoder unit
+ *
+ * \param p_vout the vout in which to destroy the subpicture unit
+ */
+void vout_DestroySPU( vout_thread_t *p_vout )
+{
+    vlc_object_t *p_input;
+    int i_index;
+
+    /* Destroy all remaining subpictures */
+    for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
+    {
+        if( p_vout->p_subpicture[i_index].i_status != FREE_SUBPICTURE )
+        {
+            vout_DestroySubPicture( p_vout,
+                                    &p_vout->p_subpicture[i_index] );
+        }
+    }
+
+    if( p_vout->p_text )
+    {
+        if( p_vout->p_text->p_module )
+            module_Unneed( p_vout->p_text, p_vout->p_text->p_module );
+
+        vlc_object_detach( p_vout->p_text );
+        vlc_object_destroy( p_vout->p_text );
+    }
+
+    if( p_vout->p_blend )
+    {
+        if( p_vout->p_blend->p_module )
+            module_Unneed( p_vout->p_blend, p_vout->p_blend->p_module );
+
+        vlc_object_detach( p_vout->p_blend );
+        vlc_object_destroy( p_vout->p_blend );
+    }
+
+    /* Delete callback */
+    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( p_input )
+    {
+        var_DelCallback( p_input, "highlight", CropCallback, p_vout );
+        vlc_object_release( p_input );
+    }
+}
+
+/**
+ * Create a subpicture region
+ *
+ * \param p_this vlc_object_t
+ * \param p_fmt the format that this subpicture region should have
+ */
+subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
+                                         video_format_t *p_fmt )
+{
+    subpicture_region_t *p_region = malloc( sizeof(subpicture_region_t) );
+    memset( p_region, 0, sizeof(subpicture_region_t) );
+    p_region->p_next = 0;
+    p_region->fmt = *p_fmt;
+
+    vout_AllocatePicture( p_this, &p_region->picture, p_fmt->i_chroma,
+                          p_fmt->i_width, p_fmt->i_height, p_fmt->i_aspect );
+
+    if( !p_region->picture.i_planes )
+    {
+        free( p_region );
+        return NULL;
+    }
+
+    if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
+        p_fmt->p_palette = p_region->fmt.p_palette =
+            malloc( sizeof(video_palette_t) );
+    else p_fmt->p_palette = p_region->fmt.p_palette = NULL;
+
+    return p_region;
+}
+
+/**
+ * Destroy a subpicture region
+ *
+ * \param p_this vlc_object_t
+ * \param p_region the subpicture region to destroy
+ */
+void __spu_DestroyRegion( vlc_object_t *p_this, subpicture_region_t *p_region )
+{
+    if( !p_region ) return;
+    if( p_region->picture.p_data_orig ) free( p_region->picture.p_data_orig );
+    if( p_region->fmt.p_palette ) free( p_region->fmt.p_palette );
+    free( p_region );
+}
 
 /**
  * Display a subpicture unit
@@ -134,6 +285,11 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_channel,
     p_subpic->i_y       = 0;
     p_subpic->i_width   = 0;
     p_subpic->i_height  = 0;
+    p_subpic->b_absolute= VLC_TRUE;
+    p_subpic->i_flags   = 0;
+    p_subpic->pf_render = 0;
+    p_subpic->pf_destroy= 0;
+    p_subpic->p_sys     = 0;
 
     /* Remain last subpicture displayed in DEFAULT_CHAN */
     if( i_channel == DEFAULT_CHAN )
@@ -142,6 +298,9 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_channel,
     }
 
     vlc_mutex_unlock( &p_vout->subpicture_lock );
+
+    p_subpic->pf_create_region = __spu_CreateRegion;
+    p_subpic->pf_destroy_region = __spu_DestroyRegion;
 
     return p_subpic;
 }
@@ -174,6 +333,13 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
                          p_subpic, p_subpic->i_status );
     }
 
+    while( p_subpic->p_region )
+    {
+        subpicture_region_t *p_region = p_subpic->p_region;
+        p_subpic->p_region = p_region->p_next;
+        spu_DestroyRegion( p_vout, p_region );
+    }
+
     if( p_subpic->pf_destroy )
     {
         p_subpic->pf_destroy( p_subpic );
@@ -192,13 +358,109 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic,
                              subpicture_t *p_subpic )
 {
+    /* Load the blending module */
+    if( !p_vout->p_blend && p_subpic && p_subpic->p_region )
+    {
+        p_vout->p_blend = vlc_object_create( p_vout, sizeof(filter_t) );
+        vlc_object_attach( p_vout->p_blend, p_vout );
+        p_vout->p_blend->fmt_out.video.i_width =
+            p_vout->p_blend->fmt_out.video.i_visible_width =
+                p_vout->render.i_width;
+        p_vout->p_blend->fmt_out.video.i_height =
+            p_vout->p_blend->fmt_out.video.i_visible_height =
+                p_vout->render.i_height;
+        p_vout->p_blend->fmt_out.video.i_x_offset =
+            p_vout->p_blend->fmt_out.video.i_y_offset = 0;
+        p_vout->p_blend->fmt_out.video.i_aspect =
+            p_vout->render.i_aspect;
+        p_vout->p_blend->fmt_out.video.i_chroma =
+            p_vout->output.i_chroma;
+
+        p_vout->p_blend->fmt_in.video = p_subpic->p_region->fmt;
+
+        p_vout->p_blend->p_module =
+            module_Need( p_vout->p_blend, "video blending", 0, 0 );
+    }
+
     /* Get lock */
     vlc_mutex_lock( &p_vout->subpicture_lock );
 
     /* Check i_status again to make sure spudec hasn't destroyed the subpic */
     while( p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE )
     {
-        p_subpic->pf_render( p_vout, p_pic, p_subpic );
+        subpicture_region_t *p_region = p_subpic->p_region;
+
+        if( p_subpic->pf_render )
+        {
+            p_subpic->pf_render( p_vout, p_pic, p_subpic );
+        }
+        else while( p_region && p_vout->p_blend &&
+                    p_vout->p_blend->pf_video_blend )
+        {
+            int i_x_offset = p_region->i_x + p_subpic->i_x;
+            int i_y_offset = p_region->i_y + p_subpic->i_y;
+
+            if( p_subpic->i_flags & OSD_ALIGN_BOTTOM )
+            {
+                i_y_offset += p_vout->output.i_height - p_region->fmt.i_height;
+            }
+            else if ( !(p_subpic->i_flags & OSD_ALIGN_TOP) )
+            {
+                i_y_offset += p_vout->output.i_height / 2 -
+                    p_region->fmt.i_height / 2;
+            }
+
+            if( p_subpic->i_flags & OSD_ALIGN_RIGHT )
+            {
+                i_x_offset += p_vout->output.i_width - p_region->fmt.i_width;
+            }
+            else if ( !(p_subpic->i_flags & OSD_ALIGN_LEFT) )
+            {
+                i_x_offset += p_vout->output.i_width / 2 -
+                    p_region->fmt.i_width / 2;
+            }
+
+            if( p_subpic->b_absolute )
+            {
+                i_x_offset = p_region->i_x + p_subpic->i_x;
+                i_y_offset = p_region->i_y + p_subpic->i_y;
+            }
+
+            p_vout->p_blend->fmt_in.video = p_region->fmt;
+
+            /* Force cropping if requested */
+            if( p_vout->b_force_crop )
+            {
+                p_vout->p_blend->fmt_in.video.i_x_offset = p_vout->i_crop_x;
+                p_vout->p_blend->fmt_in.video.i_y_offset = p_vout->i_crop_y;
+                p_vout->p_blend->fmt_in.video.i_visible_width =
+                    p_vout->i_crop_width;
+                p_vout->p_blend->fmt_in.video.i_visible_height =
+                    p_vout->i_crop_height;
+                i_x_offset += p_vout->i_crop_x;
+                i_y_offset += p_vout->i_crop_y;
+            }
+
+            /* Force palette if requested */
+            if( p_vout->b_force_alpha && VLC_FOURCC('Y','U','V','P') ==
+                p_vout->p_blend->fmt_in.video.i_chroma )
+            {
+                p_vout->p_blend->fmt_in.video.p_palette->palette[0][3] =
+                    p_vout->pi_alpha[0];
+                p_vout->p_blend->fmt_in.video.p_palette->palette[1][3] =
+                    p_vout->pi_alpha[1];
+                p_vout->p_blend->fmt_in.video.p_palette->palette[2][3] =
+                    p_vout->pi_alpha[2];
+                p_vout->p_blend->fmt_in.video.p_palette->palette[3][3] =
+                    p_vout->pi_alpha[3];
+            }
+
+            p_vout->p_blend->pf_video_blend( p_vout->p_blend,
+                p_pic, p_pic, &p_region->picture, i_x_offset, i_y_offset );
+
+            p_region = p_region->p_next;
+        }
+
         p_subpic = p_subpic->p_next;
     }
 
@@ -325,7 +587,8 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
  *****************************************************************************/
 int vout_RegisterOSDChannel( vout_thread_t *p_vout )
 {
-    msg_Dbg( p_vout, "Registering OSD channel, ID: %i", p_vout->i_channel_count + 1 );
+    msg_Dbg( p_vout, "Registering OSD channel, ID: %i",
+             p_vout->i_channel_count + 1 );
     return ++p_vout->i_channel_count;
 }
 
@@ -361,8 +624,16 @@ void vout_ClearOSDChannel( vout_thread_t *p_vout, int i_channel )
         {
             continue;
         }
+
         if( p_subpic->i_channel == i_channel )
         {
+            while( p_subpic->p_region )
+            {
+                subpicture_region_t *p_region = p_subpic->p_region;
+                p_subpic->p_region = p_region->p_next;
+                spu_DestroyRegion( p_vout, p_region );
+            }
+
             if( p_subpic->pf_destroy )
             {
                 p_subpic->pf_destroy( p_subpic );
@@ -372,4 +643,88 @@ void vout_ClearOSDChannel( vout_thread_t *p_vout, int i_channel )
     }
 
     vlc_mutex_unlock( &p_vout->subpicture_lock );
+}
+
+/*****************************************************************************
+ * UpdateSPU: update subpicture settings
+ *****************************************************************************
+ * This function is called from CropCallback and at initialization time, to
+ * retrieve crop information from the input.
+ *****************************************************************************/
+static void UpdateSPU( vout_thread_t *p_vout, vlc_object_t *p_object )
+{
+    vlc_value_t val;
+
+    p_vout->b_force_alpha = VLC_FALSE;
+    p_vout->b_force_crop = VLC_FALSE;
+
+    if( var_Get( p_object, "highlight", &val ) || !val.b_bool ) return;
+
+    p_vout->b_force_crop = VLC_TRUE;
+    var_Get( p_object, "x-start", &val );
+    p_vout->i_crop_x = val.i_int;
+    var_Get( p_object, "y-start", &val );
+    p_vout->i_crop_y = val.i_int;
+    var_Get( p_object, "x-end", &val );
+    p_vout->i_crop_width = val.i_int - p_vout->i_crop_x;
+    var_Get( p_object, "y-end", &val );
+    p_vout->i_crop_height = val.i_int - p_vout->i_crop_y;
+
+#if 0
+    if( var_Get( p_object, "color", &val ) == VLC_SUCCESS )
+    {
+        int i;
+        for( i = 0; i < 4; i++ )
+        {
+            p_vout->pi_color[i] = ((uint8_t *)val.p_address)[i];
+        }
+    }
+#endif
+
+    if( var_Get( p_object, "contrast", &val ) == VLC_SUCCESS )
+    {
+        int i;
+        for( i = 0; i < 4; i++ )
+        {
+            p_vout->pi_alpha[i] = ((uint8_t *)val.p_address)[i];
+            p_vout->pi_alpha[i] = p_vout->pi_alpha[i] == 0xf ?
+                0xff : p_vout->pi_alpha[i] << 4;
+        }
+        p_vout->b_force_alpha = VLC_TRUE;
+    }
+
+    msg_Dbg( p_vout, "crop: %i,%i,%i,%i, alpha: %i",
+             p_vout->i_crop_x, p_vout->i_crop_y,
+             p_vout->i_crop_width, p_vout->i_crop_height,
+             p_vout->b_force_alpha );
+}
+
+/*****************************************************************************
+ * CropCallback: called when the highlight properties are changed
+ *****************************************************************************
+ * This callback is called from the input thread when we need cropping
+ *****************************************************************************/
+static int CropCallback( vlc_object_t *p_object, char const *psz_var,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    UpdateSPU( (vout_thread_t *)p_data, p_object );
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Buffers allocation callbacks for the filters
+ *****************************************************************************/
+static subpicture_t *spu_new_buffer( filter_t *p_filter )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_filter->p_owner;
+    subpicture_t *p_spu;
+
+    p_spu = vout_CreateSubPicture( p_vout, !DEFAULT_CHAN, MEMORY_SUBPICTURE );
+    return p_spu;
+}
+
+static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_spu )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_filter->p_owner;
+    vout_DestroySubPicture( p_vout, p_spu );
 }

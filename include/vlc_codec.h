@@ -48,7 +48,7 @@ struct decoder_t
 
     picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
     aout_buffer_t *     ( * pf_decode_audio )( decoder_t *, block_t ** );
-    void                ( * pf_decode_sub)   ( decoder_t *, block_t ** );
+    subpicture_t *      ( * pf_decode_sub)   ( decoder_t *, block_t ** );
     block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
 
     /* Some decoders only accept packetized data (ie. not truncated) */
@@ -74,6 +74,9 @@ struct decoder_t
     void            ( * pf_picture_link)    ( decoder_t *, picture_t * );
     void            ( * pf_picture_unlink)  ( decoder_t *, picture_t * );
 
+    /* SPU output callbacks */
+    subpicture_t *  ( * pf_spu_buffer_new) ( decoder_t * );
+    void            ( * pf_spu_buffer_del) ( decoder_t *, subpicture_t * );
 
     /* Private structure for the owner of the decoder */
     decoder_owner_sys_t *p_owner;

@@ -29,7 +29,8 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
-#include <osd.h>
+#include "osd.h"
+#include "vlc_filter.h"
 
 #if defined(HAVE_ICONV)
 #include <iconv.h>
@@ -43,13 +44,12 @@
 struct decoder_sys_t
 {
     int                 i_align;          /* Subtitles alignment on the vout */
-    int                 i_subpic_channel;    /* Subpic channel for subtitles */
-
-    vout_thread_t       *p_vout;                           /* last vout used */
 
 #if defined(HAVE_ICONV)
     iconv_t             iconv_handle;            /* handle to iconv instance */
 #endif
+
+    filter_t *p_render;                              /* text renderer filter */
 };
 
 /*****************************************************************************
@@ -58,10 +58,12 @@ struct decoder_sys_t
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
-static void DecodeBlock   ( decoder_t *, block_t ** );
+static subpicture_t *DecodeBlock   ( decoder_t *, block_t ** );
+static subpicture_t *ParseText     ( decoder_t *, block_t * );
+static void         StripTags      ( char * );
 
-static void ParseText     ( decoder_t *, block_t *, vout_thread_t * );
-static void StripTags     ( char * );
+static subpicture_t *spu_new_buffer( filter_t * );
+static void spu_del_buffer( filter_t *, subpicture_t * );
 
 #define DEFAULT_NAME "System Default"
 
@@ -152,8 +154,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         msg_Dbg( p_dec, "using character encoding: %s",
                  p_dec->fmt_in.subs.psz_encoding );
-        p_sys->iconv_handle = iconv_open( "UTF-8",
-                                          p_dec->fmt_in.subs.psz_encoding );
+        p_sys->iconv_handle =
+            iconv_open( "UTF-8", p_dec->fmt_in.subs.psz_encoding );
     }
     else
     {
@@ -185,8 +187,22 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     msg_Dbg( p_dec, "no iconv support available" );
 #endif
-    
-    p_dec->p_sys->p_vout = NULL;
+
+    /* Load the text rendering module */
+    p_sys->p_render = vlc_object_create( p_dec, sizeof(filter_t) );
+    p_sys->p_render->pf_spu_buffer_new = spu_new_buffer;
+    p_sys->p_render->pf_spu_buffer_del = spu_del_buffer;
+    p_sys->p_render->p_owner = (filter_owner_sys_t *)p_dec;
+    vlc_object_attach( p_sys->p_render, p_dec );
+    p_sys->p_render->p_module =
+        module_Need( p_sys->p_render, "text renderer", 0, 0 );
+    if( p_sys->p_render->p_module == NULL )
+    {
+        msg_Warn( p_dec, "no suitable text renderer module" );
+        vlc_object_detach( p_sys->p_render );
+        vlc_object_destroy( p_sys->p_render );
+        p_sys->p_render = NULL;
+    }
 
     return VLC_SUCCESS;
 }
@@ -196,34 +212,18 @@ static int OpenDecoder( vlc_object_t *p_this )
  ****************************************************************************
  * This function must be fed with complete subtitles units.
  ****************************************************************************/
-static void DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
-    vout_thread_t *p_vout;
+    subpicture_t *p_spu;
 
-    if( !pp_block || *pp_block == NULL )
-    {
-        return;
-    }
+    if( !pp_block || *pp_block == NULL ) return NULL;
 
-    /* Here we are dealing with text subtitles */
-    p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout )
-    {
-        if( p_dec->p_sys->p_vout != p_vout )
-        {
-            p_dec->p_sys->i_subpic_channel = vout_RegisterOSDChannel( p_vout );
-        }                
-        ParseText( p_dec, *pp_block, p_vout );
-        vlc_object_release( p_vout );
-    }
-    else
-    {
-        msg_Warn( p_dec, "couldn't find a video output, trashing subtitle" );
-    }
-    p_dec->p_sys->p_vout = p_vout;
+    p_spu = ParseText( p_dec, *pp_block );
 
     block_Release( *pp_block );
     *pp_block = NULL;
+
+    return p_spu;
 }
 
 /*****************************************************************************
@@ -233,27 +233,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    vout_thread_t *p_vout;
-
-    p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout != NULL && p_vout->p_subpicture != NULL )
-    {
-        subpicture_t *p_subpic;
-        int          i_subpic;
-
-        for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
-        {
-            p_subpic = &p_vout->p_subpicture[i_subpic];
-
-            if( p_subpic != NULL &&
-              ( p_subpic->i_status == RESERVED_SUBPICTURE
-                || p_subpic->i_status == READY_SUBPICTURE ) )
-            {
-                vout_DestroySubPicture( p_vout, p_subpic );
-            }
-        }
-    }
-    if( p_vout ) vlc_object_release( p_vout );
 
 #if defined(HAVE_ICONV)
     if( p_sys->iconv_handle != (iconv_t)-1 )
@@ -262,16 +241,25 @@ static void CloseDecoder( vlc_object_t *p_this )
     }
 #endif
 
+    if( p_sys->p_render )
+    {
+        if( p_sys->p_render->p_module )
+            module_Unneed( p_sys->p_render, p_sys->p_render->p_module );
+
+        vlc_object_detach( p_sys->p_render );
+        vlc_object_destroy( p_sys->p_render );
+    }
+
     free( p_sys );
 }
 
 /*****************************************************************************
  * ParseText: parse an text subtitle packet and send it to the video output
  *****************************************************************************/
-static void ParseText( decoder_t *p_dec, block_t *p_block,
-                       vout_thread_t *p_vout )
+static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    subpicture_t *p_spu = 0;
     char *psz_subtitle;
     int i_align_h, i_align_v;
 
@@ -279,14 +267,14 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
     if( p_block->i_pts == 0 )
     {
         msg_Warn( p_dec, "subtitle without a date" );
-        return;
+        return NULL;
     }
 
     /* Check validity of packet data */
     if( p_block->i_buffer <= 1 ||  p_block->p_buffer[0] == '\0' )
     {
         msg_Warn( p_dec, "empty subtitle" );
-        return;
+        return NULL;
     }
 
     /* Should be resiliant against bad subtitles */
@@ -314,9 +302,11 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
 
         if( inbytes_left )
         {
-            msg_Warn( p_dec, "Failed to convert subtitle encoding, dropping subtitle.\nTry setting a different character-encoding for the subtitle." );
+            msg_Warn( p_dec, "Failed to convert subtitle encoding, "
+                      "dropping subtitle.\nTry setting a different "
+                      "character-encoding for the subtitle." );
             free( psz_subtitle );
-            return;
+            return NULL;
         }
         else
         {
@@ -329,7 +319,8 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
     if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ') )
     {
         /* Decode SSA strings */
-        /* We expect: ReadOrder, Layer, Style, Name, MarginL, MarginR, MarginV, Effect, Text */
+        /* We expect: ReadOrder, Layer, Style, Name, MarginL, MarginR,
+         * MarginV, Effect, Text */
         char *psz_new_subtitle;
         char *psz_buffer_sub;
         int         i_comma;
@@ -352,16 +343,19 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
             i_text = 0;
             while( psz_buffer_sub[0] != '\0' )
             {
-                if( psz_buffer_sub[0] == '\\' && ( psz_buffer_sub[1] =='n' || psz_buffer_sub[1] =='N' ) )
+                if( psz_buffer_sub[0] == '\\' && ( psz_buffer_sub[1] == 'n' ||
+                    psz_buffer_sub[1] == 'N' ) )
                 {
                     psz_new_subtitle[i_text] = '\n';
                     i_text++;
                     psz_buffer_sub += 2;
                 }
-                else if( psz_buffer_sub[0] == '{' && psz_buffer_sub[1] == '\\' )
+                else if( psz_buffer_sub[0] == '{' &&
+                         psz_buffer_sub[1] == '\\' )
                 {
                     /* SSA control code */
-                    while( psz_buffer_sub[0] != '\0' && psz_buffer_sub[0] != '}' )
+                    while( psz_buffer_sub[0] != '\0' &&
+                           psz_buffer_sub[0] != '}' )
                     {
                         psz_buffer_sub++;
                     }
@@ -380,13 +374,33 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
             break;
         }
     }
+
     StripTags( psz_subtitle );
-    vout_ShowTextAbsolute( p_vout, p_sys->i_subpic_channel, psz_subtitle, NULL,
-        OSD_ALIGN_BOTTOM | p_sys->i_align, i_align_h,
-        i_align_v, p_block->i_pts,
-        p_block->i_length ? p_block->i_pts + p_block->i_length : 0 );
+
+    if( p_sys->p_render && p_sys->p_render->p_module &&
+        p_sys->p_render->pf_render_string )
+    {
+        block_t *p_new_block = block_New( p_dec, strlen(psz_subtitle) + 1 );
+        if( p_new_block )
+        {
+            memcpy( p_new_block->p_buffer, psz_subtitle,
+                    p_new_block->i_buffer );
+            p_new_block->i_pts = p_new_block->i_dts = p_block->i_pts;
+            p_new_block->i_length = p_block->i_length;
+            p_spu = p_sys->p_render->pf_render_string( p_sys->p_render,
+                                                       p_new_block );
+        }
+    }
+
+    if( p_spu )
+    {
+        p_spu->i_flags = OSD_ALIGN_BOTTOM | p_sys->i_align;
+        p_spu->i_x = i_align_h;
+        p_spu->i_y = i_align_v;
+    }
 
     free( psz_subtitle );
+    return p_spu;
 }
 
 static void StripTags( char *psz_text )
@@ -430,4 +444,19 @@ static void StripTags( char *psz_text )
         i++;
     }
     psz_text[ i - i_left_moves ] = '\0';
+}
+
+/*****************************************************************************
+ * Buffers allocation callbacks for the filters
+ *****************************************************************************/
+static subpicture_t *spu_new_buffer( filter_t *p_filter )
+{
+    decoder_t *p_dec = (decoder_t *)p_filter->p_owner;
+    return p_dec->pf_spu_buffer_new( p_dec );
+}
+
+static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_spu )
+{
+    decoder_t *p_dec = (decoder_t *)p_filter->p_owner;
+    p_dec->pf_spu_buffer_del( p_dec, p_spu );
 }

@@ -98,6 +98,7 @@ HEADERS_include = \
 	include/vlc_error.h \
 	include/vlc_es.h \
 	include/vlc_es_out.h \
+	include/vlc_filter.h \
 	include/vlc_help.h \
 	include/vlc_httpd.h \
 	include/vlc_input.h \
