@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.28 2003/11/04 15:52:52 garf Exp $
+ * $Id: http.c,v 1.29 2003/11/06 01:49:18 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -37,6 +37,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
+#include <vlc/aout.h>
 #include <vlc/vout.h> /* for fullscreen */
 
 #include "httpd.h"
@@ -1326,6 +1327,8 @@ enum macroType
         MVLC_EMPTY,
         MVLC_SEEK,
         MVLC_KEEP,
+        MVLC_SORT,
+        MVLC_VOLUME,
         MVLC_FULLSCREEN,
 
         MVLC_CLOSE,
@@ -1361,11 +1364,13 @@ StrToMacroTypeTab [] =
         { "seek",           MVLC_SEEK },
         { "keep",           MVLC_KEEP },
         { "fullscreen",     MVLC_FULLSCREEN },
+        { "volume",         MVLC_VOLUME },
 
         /* playlist management */
         { "add",            MVLC_ADD },
         { "delete",         MVLC_DEL },
         { "empty",          MVLC_EMPTY },
+        { "sort",           MVLC_SORT },
 
         /* admin control */
         { "close",          MVLC_CLOSE },
@@ -1487,6 +1492,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
                 case MVLC_FULLSCREEN:
+                {
                     if( p_sys->p_input )
                     {
                         vout_thread_t *p_vout;
@@ -1497,24 +1503,74 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                         {
                             p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
                             vlc_object_release( p_vout );
+                            msg_Dbg( p_intf, "requested fullscreen toggle" );
                         }
                     }
+                }
                 break;
                 case MVLC_SEEK:
                 {
                     vlc_value_t val;
-                    char percent[3];
+                    char percent[4];
 
                     if( p_sys->p_input )
                     {
-                        uri_extract_value( p_request, "percent", percent, 3 );
+                        uri_extract_value( p_request, "percent", percent, 4 );
                         val.f_float = ((float)atoi( percent )) / 100.0;
                         var_Set( p_sys->p_input, "position", val );
                         msg_Dbg( p_intf, "requested seek percent: %i", atoi( percent ) );
                     }
                     break;
                 }
+                case MVLC_VOLUME:
+                {
+                    char vol[8];
+                    audio_volume_t i_volume;
+                    int i_value;
 
+                    if( p_sys->p_input )
+                    {
+                        uri_extract_value( p_request, "value", vol, 8 );
+                        aout_VolumeGet( p_intf, &i_volume );
+                        uri_decode_url_encoded( vol );
+
+                        if( vol[0] == '+' )
+                        {
+                            i_value = atoi( vol + 1 );
+                            if( (i_volume + i_value) > AOUT_VOLUME_MAX )
+                            {
+                                aout_VolumeSet( p_intf , AOUT_VOLUME_MAX );
+                                msg_Dbg( p_intf, "requested volume set: max" );
+                            } else
+                            {
+                                aout_VolumeSet( p_intf , (i_volume + i_value) );
+                                msg_Dbg( p_intf, "requested volume set: +%i", (i_volume + i_value) );
+                            }
+                        } else
+                        if( vol[0] == '-' )
+                        {
+                            i_value = atoi( vol + 1 );
+                            if( (i_volume - i_value) < AOUT_VOLUME_MIN )
+                            {
+                                aout_VolumeSet( p_intf , AOUT_VOLUME_MIN );
+                                msg_Dbg( p_intf, "requested volume set: min" );
+                            } else
+                            {
+                                aout_VolumeSet( p_intf , (i_volume - i_value) );
+                                msg_Dbg( p_intf, "requested volume set: -%i", (i_volume - i_value) );
+                            } 
+                        } else
+                        {
+                            i_value = atoi( vol );
+                            if( ( i_value <= AOUT_VOLUME_MAX ) && ( i_value >= AOUT_VOLUME_MIN ) )
+                            {
+                                aout_VolumeSet( p_intf , atoi( vol ) );
+                                msg_Dbg( p_intf, "requested volume set: %i", atoi( vol ) );
+                            }
+                        }
+                    }
+                    break;
+                }
               
 
                 /* playlist management */
@@ -1628,6 +1684,34 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                         playlist_Delete( p_sys->p_playlist, 0 );
                     }
                     msg_Dbg( p_intf, "requested playlist empty" );
+                    break;
+                }
+                case MVLC_SORT:
+                {
+                    char type[12];
+                    char order[2];
+                    int i_order;
+
+                    uri_extract_value( p_request, "type", type, 12 );
+                    uri_extract_value( p_request, "order", order, 2 );
+
+                    if( order[0] == '0' ) i_order = SORT_NORMAL;
+                    else i_order = SORT_REVERSE;
+
+                    if( !strcmp( type , "title" ) )
+                    {
+                        playlist_SortTitle( p_sys->p_playlist , i_order );
+                        msg_Dbg( p_intf, "requested playlist sort by title (%d)" , i_order );
+                    } else if( !strcmp( type , "group" ) )
+                    {
+                        playlist_SortGroup( p_sys->p_playlist , i_order );
+                        msg_Dbg( p_intf, "requested playlist sort by group (%d)" , i_order );
+                    } else if( !strcmp( type , "author" ) )
+                    {
+                        playlist_SortAuthor( p_sys->p_playlist , i_order );
+                        msg_Dbg( p_intf, "requested playlist sort by author (%d)" , i_order );
+                    }
+
                     break;
                 }
 
@@ -2036,9 +2120,11 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         uint8_t *p_buffer;
         uint8_t *dst;
         vlc_value_t val;
-        char position[3]; /* percentage */
+        char position[4]; /* percentage */
         char time[12]; /* in seconds */
         char length[12]; /* in seconds */
+        audio_volume_t i_volume;
+        char volume[5];
  
 #define p_sys p_args->p_intf->p_sys
         if( p_sys->p_input )
@@ -2057,6 +2143,9 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         }
 #undef p_sys
 
+        aout_VolumeGet( p_args->p_intf , &i_volume );
+        sprintf( volume , "%d" , (int)i_volume );
+
         p_args->vars = mvar_New( "variables", "" );
         mvar_AppendNewVar( p_args->vars, "url_param", i_request > 0 ? "1" : "0" );
         mvar_AppendNewVar( p_args->vars, "url_value", p_request );
@@ -2065,6 +2154,7 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         mvar_AppendNewVar( p_args->vars, "stream_position", position );
         mvar_AppendNewVar( p_args->vars, "stream_time", time );
         mvar_AppendNewVar( p_args->vars, "stream_length", length );
+        mvar_AppendNewVar( p_args->vars, "volume", volume );
 
         SSInit( &p_args->stack );
 

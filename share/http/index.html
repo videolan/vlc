@@ -10,7 +10,7 @@
         <meta http-equiv="refresh" content="0;URL=/" />
     <vlc id="end" />
 
-    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep" />
+    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep,volume,sort" />
     <vlc id="set" param1="sout" param2="string" />
  </head>
  <body>
@@ -18,9 +18,9 @@
      <a href="http://www.videolan.org">VLC Media Player <vlc id="value" param1="version" /></a> (http interface)</h2>
     <div class="sectitle">Control VLC</div>
     <div class="section">   
-     <form method="get" action="">
-      <table class="add">
-       <tr>
+     <table class="add">
+      <tr>
+       <form method="get" action="">
         <td><input type="submit" name="control" value="stop" /></td>
         <td><input type="submit" name="control" value="pause" /></td>
         <td><input type="submit" name="control" value="previous" /></td>
@@ -28,16 +28,17 @@
         <td><input type="submit" name="control" value="fullscreen" /></td>
         <td><a href="info.html">Informations</a></td>
         <td><a href="admin/">Administration</a></td>
-       </tr>
-      </table>
-     </form>
-     <form>
-      <table>
-       <tr>
-        <td>Seek (in percentage): <input type="text" name="percent" size="3">%<input type="submit" name="control" value="seek"></td>
-       </tr>
-      </table>
-     </form>
+       </form>
+       <form>
+        <td colspan="0" align="right">Current Volume: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"><input type="hidden" name="control" value="volume"><input type="submit" name="Set" value="Set"></td>
+       </form>
+      </tr>
+      <tr>
+       <form>
+        <td colspan="5">Seek (in percentage): <input type="text" name="percent" size="3">%<input type="submit" name="control" value="seek"></td>
+       </form>
+      </tr>
+     </table>
     </div>
     <div class="sectitle">Add</div>
     <div class="section">
@@ -78,9 +79,24 @@
      <td><input type="submit" name="control" value="delete" /></td>
      <td><input type="submit" name="control" value="keep" /></td>
     </form>
+    <tr>
+     <td>
+      <form>
+       <input type="submit" name="control" value="sort" /> by
+       <select name="type">
+        <option value="title">title
+        <option value="group">group
+        <option value="author">author
+       </select> with
+       <select name="order">
+        <option value="0">normal order
+        <option value="1">reverse order
+       </select>
+      </form>
+     </td>
+    </tr>
     </div>
     <hr/>
     <p> <vlc id="value" param1="copyright" /> </p>
 </body>
 </html>
-
