@@ -533,6 +533,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
             result.x = __MAX( result.x, line.xMax );
             result.y += face->size->metrics.height >> 6;
             i_pen_x = 0;
+            i_previous = 0;
             line.xMin = 0;
             line.xMax = 0;
             line.yMin = 0;
@@ -576,7 +577,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
         p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
 
         /* Do rest */
-        line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax - glyph_size.xMin;
+        line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax - glyph_size.xMin + ((FT_BitmapGlyph)tmp_glyph)->left;
         line.yMax = __MAX( line.yMax, glyph_size.yMax );
         line.yMin = __MIN( line.yMin, glyph_size.yMin );
 
