@@ -46,9 +46,12 @@ KInterface::KInterface( intf_thread_t *p_intf, QWidget *parent,
 
     fSlider = new KVLCSlider( QSlider::Horizontal, this );
     fSlider->setMaxValue(10000);
-    connect( fSlider, SIGNAL( userChanged( int ) ), this, SLOT( slotSliderMoved( int ) ) );
-    connect( fSlider, SIGNAL( valueChanged( int ) ), this, SLOT( slotSliderChanged( int ) ) );
-    connect( fSlider, SIGNAL( sliderMoved( int ) ), this, SLOT( slotSliderChanged( int ) ) );
+    connect( fSlider, SIGNAL( userChanged( int ) ), this,
+             SLOT( slotSliderMoved( int ) ) );
+    connect( fSlider, SIGNAL( valueChanged( int ) ), this,
+             SLOT( slotSliderChanged( int ) ) );
+    connect( fSlider, SIGNAL( sliderMoved( int ) ), this,
+             SLOT( slotSliderChanged( int ) ) );
     setCentralWidget(fSlider);
 
     fTimer = new QTimer( this );
@@ -83,33 +86,60 @@ KInterface::~KInterface()
 
 void KInterface::initActions()
 {
-    languages = new KActionMenu( _( "Languages" ), actionCollection(), "language" );
+    languages = new KActionMenu( _( "Languages" ), actionCollection(),
+                                 "language" );
     languages->setEnabled( false );
     languageCollection = new KActionCollection( this );
     subtitleCollection = new KActionCollection( this );
-    subtitles = new KActionMenu( _( "Subtitles" ), actionCollection(), "subtitles" );
+    subtitles = new KActionMenu( _( "Subtitles" ), actionCollection(),
+                                 "subtitles" );
     subtitles->setEnabled( false );
-    fileOpen = KStdAction::open(this, SLOT(slotFileOpen()), actionCollection());
-    fileOpenRecent = KStdAction::openRecent(this, SLOT(slotFileOpenRecent(const KURL&)), actionCollection());
-    preferences = KStdAction::preferences(this, SLOT(slotShowPreferences()), actionCollection());
-    fileQuit = KStdAction::quit(this, SLOT(slotFileQuit()), actionCollection());
-    viewToolBar = KStdAction::showToolbar(this, SLOT(slotViewToolBar()), actionCollection());
-    viewStatusBar = KStdAction::showStatusbar(this, SLOT(slotViewStatusBar()), actionCollection());
+    fileOpen =
+        KStdAction::open(this, SLOT(slotFileOpen()), actionCollection());
+    fileOpenRecent =
+        KStdAction::openRecent(this, SLOT(slotFileOpenRecent(const KURL&)),
+                               actionCollection());
+    preferences = KStdAction::preferences(this, SLOT(slotShowPreferences()),
+                                          actionCollection());
+    fileQuit = KStdAction::quit(this, SLOT(slotFileQuit()),
+                                actionCollection());
+    viewToolBar = KStdAction::showToolbar(this, SLOT(slotViewToolBar()),
+                                          actionCollection());
+    viewStatusBar = KStdAction::showStatusbar(this, SLOT(slotViewStatusBar()),
+                                              actionCollection());
 
-    diskOpen = new KAction( i18n( "Open &Disk" ), 0, 0, this, SLOT( slotOpenDisk() ), actionCollection(), "open_disk" );
-    streamOpen = new KAction( i18n( "Open &Stream" ), 0, 0, this, SLOT( slotOpenStream() ), actionCollection(), "open_stream" );
-    backward = new KAction( i18n( "&Backward" ), 0, 0, this, SLOT( slotBackward() ), actionCollection(), "backward" );
-    stop = new KAction( i18n( "&Stop" ), 0, 0, this, SLOT( slotStop() ), actionCollection(), "stop" );
-    play = new KAction( i18n( "&Play" ), 0, 0, this, SLOT( slotPlay() ), actionCollection(), "play" );
-    pause = new KAction( i18n( "P&ause" ), 0, 0, this, SLOT( slotPause() ), actionCollection(), "pause" );
-    slow = new KAction( i18n( "&Slow" ), 0, 0, this, SLOT( slotSlow() ), actionCollection(), "slow" );
-    fast = new KAction( i18n( "Fas&t" ), 0, 0, this, SLOT( slotFast() ), actionCollection(), "fast" );
-    prev = new KAction( i18n( "Prev" ), 0, 0, this, SLOT( slotPrev() ), actionCollection(), "prev" );
-    next = new KAction( i18n( "Next" ), 0, 0, this, SLOT( slotNext() ), actionCollection(), "next" );
-    messages = new KAction( _( "Messages..." ), 0, 0, this, SLOT( slotShowMessages() ), actionCollection(), "view_messages");
+    diskOpen = new KAction( i18n( "Open &Disk" ), 0, 0, this,
+                            SLOT( slotOpenDisk() ), actionCollection(),
+                            "open_disk" );
+    streamOpen = new KAction( i18n( "Open &Stream" ), 0, 0, this,
+                              SLOT( slotOpenStream() ), actionCollection(),
+                              "open_stream" );
+    backward = new KAction( i18n( "&Backward" ), 0, 0, this,
+                            SLOT( slotBackward() ), actionCollection(),
+                            "backward" );
+    stop = new KAction( i18n( "&Stop" ), 0, 0, this,
+                        SLOT( slotStop() ), actionCollection(), "stop" );
+    play = new KAction( i18n( "&Play" ), 0, 0, this,
+                        SLOT( slotPlay() ), actionCollection(), "play" );
+    pause = new KAction( i18n( "P&ause" ), 0, 0, this,
+                         SLOT( slotPause() ), actionCollection(), "pause" );
+    slow = new KAction( i18n( "&Slow" ), 0, 0, this,
+                        SLOT( slotSlow() ), actionCollection(), "slow" );
+    fast = new KAction( i18n( "Fas&t" ), 0, 0, this,
+                        SLOT( slotFast() ), actionCollection(), "fast" );
+    prev = new KAction( i18n( "Prev" ), 0, 0, this,
+                        SLOT( slotPrev() ), actionCollection(), "prev" );
+    next = new KAction( i18n( "Next" ), 0, 0, this,
+                        SLOT( slotNext() ), actionCollection(), "next" );
+    messages = new KAction( _( "Messages..." ), 0, 0, this,
+                            SLOT( slotShowMessages() ), actionCollection(),
+                            "view_messages");
     
-    info = new KAction( _( "Stream info..." ), 0, 0, this, SLOT( slotShowInfo() ), actionCollection(), "view_stream_info");
+    info = new KAction( _( "Stream info..." ), 0, 0, this,
+                        SLOT( slotShowInfo() ), actionCollection(),
+                        "view_stream_info");
 
+    info->setEnabled( false );
     program = new KActionMenu( _( "Program" ), actionCollection(), "program" );
     program->setEnabled( false );
     title = new KActionMenu( _( "Title" ), actionCollection(), "title" );
@@ -265,6 +295,9 @@ void KInterface::slotManage()
     {
         vlc_object_release( p_intf->p_sys->p_input );
         p_intf->p_sys->p_input = NULL;
+        languages->setEnabled( false );
+        subtitles->setEnabled( false );
+        info->setEnabled( false );
     }
 
     /* If the "display popup" flag has changed */
@@ -297,7 +330,8 @@ void KInterface::slotManage()
 #define p_area p_input->stream.p_selected_area
             if( p_area->i_size ) {
                 vlc_mutex_unlock( &p_input->stream.stream_lock );
-                fSlider->setValue( ( 10000 * p_area->i_tell ) / p_area->i_size );
+                fSlider->setValue( ( 10000 * p_area->i_tell )
+                                   / p_area->i_size );
                 vlc_mutex_lock( &p_input->stream.stream_lock );
 
             }
@@ -353,9 +387,13 @@ void KInterface::slotUpdateLanguages()
     p_audio_es = NULL;
     p_spu_es = NULL;
 
-    for( int i = 0 ; i < p_intf->p_sys->p_input->stream.i_selected_es_number ; i++ )
+    for( int i = 0 ;
+         i < p_intf->p_sys->p_input->stream.i_selected_es_number ;
+         i++
+        )
     {
-        if( p_intf->p_sys->p_input->stream.pp_selected_es[i]->i_cat == AUDIO_ES )
+        if( p_intf->p_sys->p_input->stream.pp_selected_es[i]->i_cat
+            == AUDIO_ES )
         {
             p_audio_es = p_intf->p_sys->p_input->stream.pp_selected_es[i];
         }
