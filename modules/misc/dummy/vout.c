@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout.c,v 1.7 2004/03/03 12:21:36 fenrir Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -103,10 +103,11 @@ static int Init( vout_thread_t *p_vout )
     }
     else
     {
-        p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
-        p_vout->output.i_rmask  = 0xf800;
-        p_vout->output.i_gmask  = 0x07e0;
-        p_vout->output.i_bmask  = 0x001f;
+        /* Use same chroma as input */
+        p_vout->output.i_chroma = p_vout->render.i_chroma;
+        p_vout->output.i_rmask  = p_vout->render.i_rmask;
+        p_vout->output.i_gmask  = p_vout->render.i_gmask;
+        p_vout->output.i_bmask  = p_vout->render.i_bmask;
         p_vout->output.i_width  = p_vout->render.i_width;
         p_vout->output.i_height = p_vout->render.i_height;
         p_vout->output.i_aspect = p_vout->render.i_aspect;
