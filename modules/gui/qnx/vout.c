@@ -129,7 +129,7 @@ static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
  * actual properties of the display.
  *****************************************************************************/
 int E_(OpenVideo) ( vlc_object_t *p_this )
-{   
+{
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     /* init connection to photon */
@@ -277,7 +277,7 @@ static void QNXEnd( vout_thread_t *p_vout )
  * Terminate an output method created by QNXCreate
  *****************************************************************************/
 void E_(CloseVideo) ( vlc_object_t *p_this )
-{   
+{
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     /* destroy the window */
@@ -539,16 +539,6 @@ static int QNXInitDisplay( vout_thread_t * p_vout )
     {
         msg_Err( p_vout, "unable to get info for video mode" );
         return( 1 );
-    }
-
-    /* switch to normal mode if no overlay support */
-//    printf("minfo.mode_capabilities1: 0x%x\n", minfo.mode_capabilities1);
-
-    if( p_vout->p_sys->i_mode == MODE_VIDEO_OVERLAY &&
-        !( minfo.mode_capabilities1 & PgVM_MODE_CAP1_VIDEO_OVERLAY ) )
-    {
-        msg_Err( p_vout, "no overlay support detected" );
-        p_vout->p_sys->i_mode = MODE_NORMAL_MEM;
     }
 
     if( p_vout->p_sys->i_mode == MODE_VIDEO_OVERLAY )
