@@ -235,6 +235,9 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
     p_demux->pf_demux   = NULL;
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
+    p_demux->info.i_update = 0;
+    p_demux->info.i_title  = 0;
+    p_demux->info.i_seekpoint = 0;
 
     psz_module = p_demux->psz_demux;
     if( *psz_module == '\0' && strrchr( p_demux->psz_path, '.' ) )
