@@ -1,10 +1,10 @@
 /*****************************************************************************
- * alsa.c : alsa plugin for vlc
+ * rc.cpp : stdin/stdout plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: alsa.c,v 1.9 2001/04/27 16:08:26 sam Exp $
+ * Copyright (C) 2001 VideoLAN
+ * $Id: rc.cpp,v 0.1 2001/04/27 shurdeek
  *
- * Authors: Henri Fallon <henri@videolan.org>
+ * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME alsa
+#define MODULE_NAME rc
 #include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
@@ -43,13 +42,14 @@
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_COMMENT( "Yeah, alsa rocks !" )
-MODULE_CONFIG_END     
+ADD_WINDOW( "Configuration for rc module" )
+    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
+MODULE_CONFIG_END
 
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list );
+void _M( intf_getfunctions )( function_list_t * p_function_list );
 
 /*****************************************************************************
  * InitModule: get the module structure and configuration.
@@ -62,13 +62,14 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
 MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "Alsa audio module";
+    p_module->psz_longname = "rc interface module";
     p_module->psz_version = VERSION;
-    p_module->i_capabilities =  MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_AOUT;
+
+    p_module->i_capabilities = MODULE_CAPABILITY_NULL
+                                | MODULE_CAPABILITY_INTF;
+
     return( 0 );
 }
-    
 
 /*****************************************************************************
  * ActivateModule: set the module to an usable state.
@@ -80,19 +81,19 @@ MODULE_INIT
  *****************************************************************************/
 MODULE_ACTIVATE
 {
-    p_module->p_functions = malloc( sizeof( module_functions_t ) );
+    p_module->p_functions =
+                ( module_functions_t * )malloc( sizeof( module_functions_t ) );
     if( p_module->p_functions == NULL )
     {
         return( -1 );
     }
 
-    _M( aout_getfunctions )( &p_module->p_functions->aout );
-    
+    _M( intf_getfunctions )( &p_module->p_functions->intf );
+
     p_module->p_config = p_config;
-    
+
     return( 0 );
 }
-
 
 /*****************************************************************************
  * DeactivateModule: make sure the module can be unloaded.

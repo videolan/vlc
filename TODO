@@ -128,7 +128,7 @@ Urgency: Critical
 Description: Multi-angle multi-language support
  Some DVDs have several languages encoded in the same video stream, we
  need to properly parse them.
-Status: Todo
+Status: Done 22 Apr 2001 (stef)
 
 Task: 0x4f
 Difficulty: Hard
@@ -145,7 +145,7 @@ Urgency: Important
 Description: Write stream zones support
  For random access we need to know where stream descriptors are valid
  and reside (essentially DVD plugin). -> Meuuh
-Status: Todo
+Status: Done (stef)
 
 Task: 0x4d
 Difficulty: Hard
@@ -185,7 +185,7 @@ Urgency: Important
 Description: Write a new buffer allocator
  Avoid malloc()s by reusing the recently released packets. More
  information -> Meuuh
-Status: Todo
+Status: Done 16 Apr 2001 (asmax)
 
 Task: 0x48
 Difficulty: Hard

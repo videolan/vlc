@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.25 2001/04/17 20:43:41 marcari Exp $
+ * $Id: netutils.c,v 1.26 2001/04/27 16:08:26 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -45,7 +45,7 @@
 #include <sys/ioctl.h>                                            /* ioctl() */
 #endif
 
-#if defined (HAVE_NET_IF_H)
+#ifdef HAVE_NET_IF_H
 #include <net/if.h>                            /* interface (arch-dependent) */
 #endif
 
@@ -180,12 +180,12 @@ int network_ChannelCreate( void )
 {
 /* Even when BSD are supported, BeOS is not likely to be supported, so 
  * I prefer to put it apart */    
-#ifdef SYS_BEOS
+#if defined( SYS_BEOS )
     intf_ErrMsg( "error: channel changing is not yet supported under BeOS" );
     return( 1 );
-#else
+
+#elif defined( SYS_LINUX )
 /* FIXME : channels handling only work for linux */
-#ifdef SYS_LINUX
     /* Allocate structure */
     p_main->p_channel = malloc( sizeof( input_channel_t ) );
     if( p_main->p_channel == NULL )
@@ -200,11 +200,12 @@ int network_ChannelCreate( void )
 
     intf_Msg("Channels initialized\n");
     return( 0 );
+
 #else
     intf_ErrMsg( "error : channel changing only works with linux yest" );
     return( 1 );
-#endif /* SYS_LINUX */   
-#endif /* SYS_BEOS */
+
+#endif
 }
 
 /*****************************************************************************
@@ -221,11 +222,11 @@ int network_ChannelCreate( void )
 int network_ChannelJoin( int i_channel_id )
 {
 /* I still prefer to put BeOS a bit apart */   
-#ifdef SYS_BEOS
+#if defined( SYS_BEOS )
     intf_ErrMsg( "Channels are not yet supported under BeOS" );
     return( -1 );
-#else
-#ifdef SYS_LINUX    
+
+#elif defined( SYS_LINUX )
     int                 i_socket_cl;
     int                 i_fromlen;
     struct ifreq        s_interface;
@@ -392,9 +393,11 @@ int network_ChannelJoin( int i_channel_id )
     close( i_socket_cl );
 
     return( 0 );
-#else /* SYS_LINUX */
-    intf_ErrMsg( "Channel only work under linux yet" );
-#endif /* SYS_LINUX */    
 
-#endif /* SYS_BEOS */
+#else
+    intf_ErrMsg( "Channels only work under linux yet" );
+    return( -1 );
+
+#endif
 }
+

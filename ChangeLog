@@ -4,6 +4,10 @@
 
 HEAD
 
+  * Fixed the continuous 'seeking position' bug in network mode.
+  * Support for `ts://foo:42' style input source.
+  * rc interface plugin for vlc control through /dev/stdin courtesy
+    of Peter Surda <shurdeek@panorama.sth.ac.at>.
   * Misc XVideo fixes (aspect ratio, mouse pointer, blue areas).
   * AC3 decoder enhancements.
   * Fixed an alignment issue in the bitstream callback.

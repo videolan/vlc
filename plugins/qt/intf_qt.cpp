@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.4 2001/04/16 07:40:11 sam Exp $
+ * $Id: intf_qt.cpp,v 1.5 2001/04/27 16:08:26 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -465,7 +465,7 @@ void IntfWindow::About( void )
 void IntfWindow::Manage( void )
 {
     /* Manage the slider */
-    if( p_intf->p_input != NULL )
+    if( p_intf->p_input != NULL && p_intf->p_input->stream.b_seekable )
     {
         int i_value = p_slider->value();
 

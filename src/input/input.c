@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.99 2001/04/22 00:08:26 stef Exp $
+ * $Id: input.c,v 1.100 2001/04/27 16:08:26 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -508,7 +508,7 @@ void input_FileOpen( input_thread_t * p_input )
     p_input->stream.p_selected_area->i_tell = 0;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    intf_Msg( "input: opening %s", p_input->p_source );
+    intf_Msg( "input: opening file `%s'", p_input->p_source );
     if( (p_input->i_handle = open( psz_name,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
@@ -524,7 +524,7 @@ void input_FileOpen( input_thread_t * p_input )
  *****************************************************************************/
 void input_FileClose( input_thread_t * p_input )
 {
-    intf_Msg( "input: closing %s", p_input->p_source );
+    intf_Msg( "input: closing file `%s'", p_input->p_source );
     close( p_input->i_handle );
 
     return;
@@ -537,18 +537,68 @@ void input_FileClose( input_thread_t * p_input )
  *****************************************************************************/
 void input_NetworkOpen( input_thread_t * p_input )
 {
- 
-    int                 i_option_value, i_port;
-    struct sockaddr_in  s_socket;
+    char *psz_server = NULL;
+    int   i_port = 0;
+
+    int                 i_opt;
+    struct sockaddr_in  sock;
     boolean_t           b_broadcast;
     
-    /* FIXME : we don't handle channels for the moment */
-    
     /* Get the remote server */
-    if( p_input->p_source == NULL )
+    if( p_input->p_source != NULL )
     {
-        p_input->p_source = main_GetPszVariable( INPUT_SERVER_VAR, 
-                                                 INPUT_SERVER_DEFAULT );
+        psz_server = p_input->p_source;
+
+        /* Skip the protocol name */
+        while( *psz_server && *psz_server != ':' )
+        {
+            psz_server++;
+        }
+
+        /* Skip the "://" part */
+        while( *psz_server && (*psz_server == ':' || *psz_server == '/') )
+        {
+            psz_server++;
+        }
+
+        /* Found a server name */
+        if( *psz_server )
+        {
+            char *psz_port = psz_server;
+
+            /* Skip the hostname part */
+            while( *psz_port && *psz_port != ':' )
+            {
+                psz_port++;
+            }
+
+            /* Found a port name */
+            if( *psz_port )
+            {
+                /* Replace ':' with '\0' */
+                *psz_port = '\0';
+                psz_port++;
+
+                i_port = atoi( psz_port );
+            }
+        }
+        else
+        {
+            psz_server = NULL;
+        }
+    }
+
+    /* Check that we got a valid server */
+    if( psz_server == NULL )
+    {
+        psz_server = main_GetPszVariable( INPUT_SERVER_VAR, 
+                                          INPUT_SERVER_DEFAULT );
+    }
+
+    /* Check that we got a valid port */
+    if( i_port == 0 )
+    {
+        i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
     }
     
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
@@ -556,17 +606,17 @@ void input_NetworkOpen( input_thread_t * p_input )
     p_input->i_handle = socket( AF_INET, SOCK_DGRAM, 0 );
     if( p_input->i_handle == -1 )
     {
-        intf_ErrMsg("NetworkOpen : can't create socket : %s", strerror(errno));
+        intf_ErrMsg("input error: can't create socket : %s", strerror(errno));
         p_input->b_error = 1;
         return;
     }
 
     /* We may want to reuse an already used socket */
-    i_option_value = 1;
+    i_opt = 1;
     if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_REUSEADDR,
-                    &i_option_value,sizeof( i_option_value ) ) == -1 )
+                    &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_ErrMsg("NetworkOpen : can't configure socket (SO_REUSEADDR: %s)",
+        intf_ErrMsg("input error: can't configure socket (SO_REUSEADDR: %s)",
                     strerror(errno));
         close( p_input->i_handle );
         p_input->b_error = 1;
@@ -575,11 +625,11 @@ void input_NetworkOpen( input_thread_t * p_input )
 
     /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
      * packet loss caused by scheduling problems */
-    i_option_value = 524288;
-    if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF, &i_option_value,
-                    sizeof( i_option_value ) ) == -1 )
+    i_opt = 0x80000;
+    if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF,
+                    &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_ErrMsg("NetworkOpen : can't configure socket (SO_RCVBUF: %s)", 
+        intf_ErrMsg("input error: can't configure socket (SO_RCVBUF: %s)", 
                     strerror(errno));
         close( p_input->i_handle );
         p_input->b_error = 1;
@@ -588,13 +638,11 @@ void input_NetworkOpen( input_thread_t * p_input )
 
     /* Get details about what we are supposed to do */
     b_broadcast = (boolean_t)main_GetIntVariable( INPUT_BROADCAST_VAR, 0 );
-    i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
 
-    /* TODO : here deal with channel stufs */
+    /* TODO : here deal with channel stuff */
     
     /* Build the local socket */
-    if ( network_BuildLocalAddr( &s_socket, i_port, b_broadcast ) 
-         == -1 )
+    if ( network_BuildLocalAddr( &sock, i_port, b_broadcast ) == -1 )
     {
         close( p_input->i_handle );
         p_input->b_error = 1;
@@ -602,18 +650,17 @@ void input_NetworkOpen( input_thread_t * p_input )
     }
     
     /* Bind it */
-    if( bind( p_input->i_handle, (struct sockaddr *)&s_socket, 
-              sizeof( s_socket ) ) < 0 )
+    if( bind( p_input->i_handle, (struct sockaddr *)&sock, 
+              sizeof( sock ) ) < 0 )
     {
-        intf_ErrMsg("NetworkOpen: can't bind socket (%s)", strerror(errno));
+        intf_ErrMsg("input error: can't bind socket (%s)", strerror(errno));
         close( p_input->i_handle );
         p_input->b_error = 1;
         return;
     }
 
     /* Build socket for remote connection */
-    if ( network_BuildRemoteAddr( &s_socket, p_input->p_source ) 
-         == -1 )
+    if ( network_BuildRemoteAddr( &sock, psz_server ) == -1 )
     {
         close( p_input->i_handle );
         p_input->b_error = 1;
@@ -621,10 +668,10 @@ void input_NetworkOpen( input_thread_t * p_input )
     }
 
     /* And connect it ... should we really connect ? */
-    if( connect( p_input->i_handle, (struct sockaddr *) &s_socket,
-                 sizeof( s_socket ) ) == (-1) )
+    if( connect( p_input->i_handle, (struct sockaddr *) &sock,
+                 sizeof( sock ) ) == (-1) )
     {
-        intf_ErrMsg("NetworkOpen: can't connect socket" );
+        intf_ErrMsg("input error: can't connect socket" );
         close( p_input->i_handle );
         p_input->b_error = 1;
         return;
@@ -633,6 +680,7 @@ void input_NetworkOpen( input_thread_t * p_input )
     /* We can't pace control, but FIXME : bug in meuuh's code to sync PCR
      * with the server. */
     p_input->stream.b_pace_control = 1;
+    p_input->stream.b_seekable = 0;
     
     return;
 }

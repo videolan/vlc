@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.13 2001/04/13 01:49:22 henri Exp $
+ * $Id: intf_gtk.c,v 1.14 2001/04/27 16:08:26 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -409,7 +409,7 @@ static gint GtkManage( gpointer p_data )
     }
 
     /* Manage the slider */
-    if( p_intf->p_input != NULL )
+    if( p_intf->p_input != NULL && p_intf->p_input->stream.b_seekable )
     {
         float newvalue = p_intf->p_sys->p_adj->value;
 

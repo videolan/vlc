@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.14 2001/04/13 05:36:12 stef Exp $
+ * $Id: input_ts.c,v 1.15 2001/04/27 16:08:26 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -66,10 +66,11 @@
  * Local prototypes
  *****************************************************************************/
 static int  TSProbe     ( probedata_t * );
+static void TSInit      ( struct input_thread_s * );
+static void TSFakeOpen  ( struct input_thread_s * );
+static void TSEnd       ( struct input_thread_s * );
 static int  TSRead      ( struct input_thread_s *,
                           data_packet_t * p_packets[INPUT_READ_ONCE] );
-static void TSInit      ( struct input_thread_s * );
-static void TSEnd       ( struct input_thread_s * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -80,13 +81,8 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = TSProbe;
     input.pf_init             = TSInit;
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
-    input.pf_open             = input_NetworkOpen;
-    input.pf_close            = input_NetworkClose;
-#else
-    input.pf_open             = input_FileOpen;
-    input.pf_close            = input_FileClose;
-#endif
+    input.pf_open             = TSFakeOpen;
+    input.pf_close            = NULL;              /* Will be set by pf_open */
     input.pf_end              = TSEnd;
     input.pf_set_area         = NULL;
     input.pf_read             = TSRead;
@@ -113,6 +109,12 @@ static int TSProbe( probedata_t * p_data )
 
     if( TestMethod( INPUT_METHOD_VAR, "ts" ) )
     {
+        return( 999 );
+    }
+
+    if( ( strlen(psz_name) > 3 ) && !strncasecmp( psz_name, "ts:", 3 ) )
+    {
+        /* If the user specified "ts:" then it's probably a network stream */
         return( 999 );
     }
 
@@ -189,6 +191,30 @@ static void TSInit( input_thread_t * p_input )
 }
 
 /*****************************************************************************
+ * TSFakeOpen: open the stream and set pf_close
+ *****************************************************************************/
+void TSFakeOpen( input_thread_t * p_input )
+{
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
+    char *psz_name = p_input->p_source;
+
+    if( ( strlen(psz_name) > 3 ) && !strncasecmp( psz_name, "ts:", 3 ) )
+    {
+        /* If the user specified "ts:" he wants a network stream */
+        p_input->pf_open = input_NetworkOpen;
+        p_input->pf_close = input_NetworkClose;
+    }
+    else
+#endif
+    {
+        p_input->pf_open = input_FileOpen;
+        p_input->pf_close = input_FileClose;
+    }
+
+    p_input->pf_open( p_input );
+}
+
+/*****************************************************************************
  * TSEnd: frees unused data
  *****************************************************************************/
 static void TSEnd( input_thread_t * p_input )
@@ -231,7 +257,7 @@ static int TSRead( input_thread_t * p_input,
     s_wait.tv_usec = 0;
     
     /* Reset pointer table */
-    memset( pp_packets, 0, INPUT_READ_ONCE*sizeof(data_packet_t *) );
+    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
     
     /* Get iovecs */
     p_iovec = input_NetlistGetiovec( p_input->p_method_data );
@@ -247,7 +273,7 @@ static int TSRead( input_thread_t * p_input,
     
     if( i_data == -1 )
     {
-        intf_ErrMsg( "TS input : Error in select : %s", strerror(errno) );
+        intf_ErrMsg( "input error: TS select error (%s)", strerror(errno) );
         return( -1 );
     }
     
@@ -257,7 +283,7 @@ static int TSRead( input_thread_t * p_input,
         
         if( i_read == -1 )
         {
-            intf_ErrMsg( "TS input : Could not readv" );
+            intf_ErrMsg( "input error: TS readv error" );
             return( -1 );
         }
     
@@ -268,7 +294,9 @@ static int TSRead( input_thread_t * p_input,
         for( i_loop=0; i_loop * TS_PACKET_SIZE < i_read; i_loop++ )
         {
             if( pp_packets[i_loop]->p_buffer[0] != 0x47 )
-                intf_ErrMsg( "TS input : Bad TS Packet (starcode != 0x47)." );
+                intf_ErrMsg( "input error: bad TS packet (starts with "
+                             "0x%.2x, should be 0x47)",
+                             pp_packets[i_loop]->p_buffer[0] );
         }
     }
     return 0;

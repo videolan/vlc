@@ -39,6 +39,10 @@ N: Nilmoni Deb
 E: ndeb@ece.cmu.edu
 D: Minor configure.in and Makefile.in fixes
 
+N: Cyril Deguet
+E: asmax@via.ecp.fr
+D: PS input packet allocator
+
 N: Colin Delacroix
 E: colin@zoy.org
 C: colin
@@ -162,4 +166,8 @@ E: benny@via.ecp.fr
 C: benny
 D: MPEG system input
 D: network input
+
+N: Peter Surda
+E: shurdeek@panorama.sth.ac.at
+D: rc plugin for vlc control through /dev/stdin
 

@@ -144,6 +144,14 @@ if test x$enable_null != xno; then
   BUILTINS="${BUILTINS} null"; fi
 
 dnl
+dnl  rc plugin
+dnl
+AC_ARG_ENABLE(rc,
+  [  --disable-rc            rc module (default enabled)])
+if test x$enable_rc != xno; then
+  BUILTINS="${BUILTINS} rc"; fi
+
+dnl
 dnl  PentiumPro acceleration
 dnl
 AC_ARG_ENABLE(ppro,
