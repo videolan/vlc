@@ -37,7 +37,6 @@ struct stream_sys_t
 
 static int  AStreamReadMem( stream_t *, void *p_read, int i_read );
 static int  AStreamPeekMem( stream_t *, uint8_t **pp_peek, int i_read );
-static int  AStreamSeekMem( stream_t *s, int64_t i_pos );
 static int  AStreamControl( stream_t *, int i_query, va_list );
 
 /****************************************************************************
@@ -110,6 +109,8 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_SET_POSITION:
             i_64 = (int64_t)va_arg( args, int64_t );
+            i_64 = __MAX( i_64, 0 );
+            i_64 = __MIN( i_64, s->p_sys->i_size ); 
             p_sys->i_pos = i_64;
 
         case STREAM_GET_MTU:
@@ -143,12 +144,4 @@ static int  AStreamPeekMem( stream_t *s, uint8_t **pp_peek, int i_read )
     int i_res = __MIN( i_read, p_sys->i_size - p_sys->i_pos );
     *pp_peek = p_sys->p_buffer + p_sys->i_pos;
     return i_res;
-}
-
-static int  AStreamSeekMem( stream_t *s, int64_t i_pos )
-{
-    int64_t i_new_pos;
-    i_new_pos = __MAX( i_pos, 0 );
-    i_new_pos = __MIN( i_new_pos, s->p_sys->i_size ); 
-    s->p_sys->i_pos = i_new_pos;
 }
