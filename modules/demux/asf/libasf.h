@@ -2,7 +2,7 @@
  * libasf.h : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.h,v 1.3 2002/11/05 10:07:56 gbazin Exp $
+ * $Id: libasf.h,v 1.4 2002/11/14 16:17:47 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -27,10 +27,10 @@
  *****************************************************************************/
 typedef struct guid_s
 {
-    u32 v1; /* le */
-    u16 v2; /* le */
-    u16 v3; /* le */
-    u8  v4[8];
+    uint32_t v1; /* le */
+    uint16_t v2; /* le */
+    uint16_t v3; /* le */
+    uint8_t  v4[8];
 } guid_t;
 
 #define ASF_OBJECT_TYPE_NULL      0x0000
@@ -189,8 +189,8 @@ typedef struct asf_object_common_s
 
 typedef struct asf_index_entry_s
 {
-    u32 i_packet_number;
-    u16 i_packet_count;
+    uint32_t i_packet_number;
+    uint16_t i_packet_count;
 
 } asf_index_entry_t;
 
@@ -202,18 +202,18 @@ typedef struct asf_index_entry_s
 typedef struct asf_object_header_s
 {
     ASF_OBJECT_COMMON
-    u32 i_sub_object_count;
-    u8  i_reserved1; /* 0x01, but could be safely ignored */
-    u8  i_reserved2; /* 0x02, if not must failed to source the contain */
+    uint32_t i_sub_object_count;
+    uint8_t  i_reserved1; /* 0x01, but could be safely ignored */
+    uint8_t  i_reserved2; /* 0x02, if not must failed to source the contain */
    
 } asf_object_header_t;
 
 typedef struct asf_object_data_s
 {
     ASF_OBJECT_COMMON
-    guid_t  i_file_id;
-    u64     i_total_data_packets;
-    u16     i_reserved;
+    guid_t      i_file_id;
+    uint64_t    i_total_data_packets;
+    uint16_t    i_reserved;
     
 } asf_object_data_t;
 
@@ -221,10 +221,10 @@ typedef struct asf_object_data_s
 typedef struct asf_object_index_s
 {
     ASF_OBJECT_COMMON
-    guid_t  i_file_id;
-    u64     i_index_entry_time_interval;
-    u32     i_max_packet_count;
-    u32     i_index_entry_count;
+    guid_t      i_file_id;
+    uint64_t    i_index_entry_time_interval;
+    uint32_t    i_max_packet_count;
+    uint32_t    i_index_entry_count;
     
     asf_index_entry_t *index_entry;
 
@@ -251,16 +251,16 @@ typedef struct asf_object_file_properties_s
     ASF_OBJECT_COMMON
     
     guid_t  i_file_id;
-    u64     i_file_size;
-    u64     i_creation_date;
-    u64     i_data_packets_count;
-    u64     i_play_duration;
-    u64     i_send_duration;
-    u64     i_preroll;
-    u32     i_flags;
-    u32     i_min_data_packet_size;
-    u32     i_max_data_packet_size;
-    u32     i_max_bitrate;
+    uint64_t     i_file_size;
+    uint64_t     i_creation_date;
+    uint64_t     i_data_packets_count;
+    uint64_t     i_play_duration;
+    uint64_t     i_send_duration;
+    uint64_t     i_preroll;
+    uint32_t     i_flags;
+    uint32_t     i_min_data_packet_size;
+    uint32_t     i_max_data_packet_size;
+    uint32_t     i_max_bitrate;
     
 } asf_object_file_properties_t;
 
@@ -271,25 +271,25 @@ typedef struct asf_object_stream_properties_s
 
     guid_t  i_stream_type;
     guid_t  i_error_correction_type;
-    u64     i_time_offset;
-    u32     i_type_specific_data_length;
-    u32     i_error_correction_data_length;
-    u16     i_flags;
+    uint64_t     i_time_offset;
+    uint32_t     i_type_specific_data_length;
+    uint32_t     i_error_correction_data_length;
+    uint16_t     i_flags;
         /* extrated from flags */
-        u8      i_stream_number;
-    u32     i_reserved;
-    u8      *p_type_specific_data;
-    u8      *p_error_correction_data;
+        uint8_t i_stream_number;
+    uint32_t    i_reserved;
+    uint8_t     *p_type_specific_data;
+    uint8_t     *p_error_correction_data;
 } asf_object_stream_properties_t;
 
 typedef struct asf_object_header_extention_s
 {
     ASF_OBJECT_COMMON
 
-    guid_t  i_reserved1;
-    u16     i_reserved2;
-    u32     i_header_extention_size;
-    u8      *p_header_extention_data;
+    guid_t      i_reserved1;
+    uint16_t    i_reserved2;
+    uint32_t    i_header_extention_size;
+    uint8_t     *p_header_extention_data;
 
 } asf_object_header_extention_t;
 
@@ -307,8 +307,8 @@ typedef struct asf_objec_content_description_s
 
 typedef struct string16_s
 {
-    u16 i_length;
-    u16 *i_char;
+    uint16_t i_length;
+    uint16_t *i_char;
 } string16_t;
 
 #define ASF_CODEC_TYPE_VIDEO    0x0001
@@ -317,19 +317,19 @@ typedef struct string16_s
 
 typedef struct asf_codec_entry_s
 {
-    u16         i_type;
+    uint16_t    i_type;
     char        *psz_name;
     char        *psz_description;
     
-    u16         i_information_length;
-    u8          *p_information;
+    uint16_t    i_information_length;
+    uint8_t     *p_information;
 } asf_codec_entry_t;
 
 typedef struct asf_object_codec_list_s
 {
     ASF_OBJECT_COMMON
-    guid_t  i_reserved;
-    u32     i_codec_entries_count;
+    guid_t      i_reserved;
+    uint32_t    i_codec_entries_count;
     asf_codec_entry_t *codec; 
 
 } asf_object_codec_list_t;
@@ -344,13 +344,13 @@ typedef struct asf_object_script_command_s
 #endif
 typedef struct asf_marker_s
 {
-    u64     i_offset;
-    u64     i_presentation_time;
-    u16     i_entry_length;
-    u32     i_send_time;
-    u32     i_flags;
-    u32     i_marker_description_length;
-    u8      *i_marker_description;
+    uint64_t     i_offset;
+    uint64_t     i_presentation_time;
+    uint16_t     i_entry_length;
+    uint32_t     i_send_time;
+    uint32_t     i_flags;
+    uint32_t     i_marker_description_length;
+    uint8_t      *i_marker_description;
     /* u8 padding */
             
 } asf_marker_t;
@@ -358,9 +358,9 @@ typedef struct asf_marker_s
 typedef struct asf_object_marker_s
 {
     ASF_OBJECT_COMMON
-    guid_t  i_reserved1;
-    u32     i_count;
-    u16     i_reserved2;
+    guid_t      i_reserved1;
+    uint32_t    i_count;
+    uint16_t    i_reserved2;
     string16_t name;
     asf_marker_t *marker;
 
@@ -392,10 +392,10 @@ typedef union asf_object_u
 
 off_t   ASF_TellAbsolute( input_thread_t *p_input );
 int     ASF_SeekAbsolute( input_thread_t *p_input, off_t i_pos);
-int     ASF_ReadData( input_thread_t *p_input, u8 *p_buff, int i_size );
+int     ASF_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size );
 int     ASF_SkipBytes( input_thread_t *p_input, int i_count );
 
-void GetGUID( guid_t *p_guid, u8 *p_data );
+void GetGUID( guid_t *p_guid, uint8_t *p_data );
 int  CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 );
     
 int  ASF_ReadObjectCommon( input_thread_t *p_input,

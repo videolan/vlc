@@ -2,7 +2,7 @@
  * libasf.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.5 2002/11/10 16:31:20 fenrir Exp $
+ * $Id: libasf.c,v 1.6 2002/11/14 16:17:47 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -44,23 +44,24 @@
     (guid).v4[4],(guid).v4[5],(guid).v4[6],(guid).v4[7]
 
 /* Some functions to manipulate memory */
-static u16 GetWLE( u8 *p_buff )
+static uint16_t GetWLE( uint8_t *p_buff )
 {
     return( (p_buff[0]) + ( p_buff[1] <<8 ) );
 }
 
-static u32 GetDWLE( u8 *p_buff )
+static uint32_t GetDWLE( uint8_t *p_buff )
 {
     return( p_buff[0] + ( p_buff[1] <<8 ) +
             ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
 }
 
-static u64 GetQWLE( u8 *p_buff )
+static uint64_t GetQWLE( uint8_t *p_buff )
 {
-    return( ( (u64)GetDWLE( p_buff ) )|( (u64)GetDWLE( p_buff + 4 ) << 32) );
+    return( ( (uint64_t)GetDWLE( p_buff ) )|
+            ( (uint64_t)GetDWLE( p_buff + 4 ) << 32) );
 }
 
-void GetGUID( guid_t *p_guid, u8 *p_data )
+void GetGUID( guid_t *p_guid, uint8_t *p_data )
 {
     p_guid->v1 = GetDWLE( p_data );
     p_guid->v2 = GetWLE( p_data + 4);
@@ -116,7 +117,7 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
         return( 1 );
     }
 
-    if( p_input->stream.b_seekable && 
+    if( p_input->stream.b_seekable &&
         p_input->stream.i_method != INPUT_METHOD_NETWORK )
     {
         p_input->pf_seek( p_input, i_pos );
@@ -125,7 +126,7 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
     }
     else if( i_pos > i_filepos )
     {
-        u64 i_size = i_pos - i_filepos;
+        uint64_t i_size = i_pos - i_filepos;
         do
         {
             data_packet_t *p_data;
@@ -152,7 +153,7 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
 }
 
 /* return 1 if success, 0 if fail */
-int ASF_ReadData( input_thread_t *p_input, u8 *p_buff, int i_size )
+int ASF_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
 {
     data_packet_t *p_data;
 
@@ -193,7 +194,7 @@ int  ASF_ReadObjectCommon( input_thread_t *p_input,
                            asf_object_t *p_obj )
 {
     asf_object_common_t *p_common = (asf_object_common_t*)p_obj;
-    u8  *p_peek;
+    uint8_t             *p_peek;
 
     if( input_Peek( p_input, &p_peek, 24 ) < 24 )
     {
@@ -266,9 +267,9 @@ int  ASF_ReadObject_Header( input_thread_t *p_input,
                             asf_object_t *p_obj )
 {
     asf_object_header_t *p_hdr = (asf_object_header_t*)p_obj;
-    asf_object_t *p_subobj;
-    int i_peek;
-    u8  *p_peek;
+    asf_object_t        *p_subobj;
+    int                 i_peek;
+    uint8_t             *p_peek;
     
     if( ( i_peek = input_Peek( p_input, &p_peek, 30 ) ) < 30 )
     {
@@ -308,8 +309,8 @@ int  ASF_ReadObject_Data( input_thread_t *p_input,
                           asf_object_t *p_obj )
 {
     asf_object_data_t *p_data = (asf_object_data_t*)p_obj;
-    int i_peek;
-    u8  *p_peek;
+    int               i_peek;
+    uint8_t           *p_peek;
     
     if( ( i_peek = input_Peek( p_input, &p_peek, 50 ) ) < 50 )
     {
@@ -333,8 +334,8 @@ int  ASF_ReadObject_Index( input_thread_t *p_input,
                            asf_object_t *p_obj )
 {
     asf_object_index_t *p_index = (asf_object_index_t*)p_obj;
-    int i_peek;
-    u8  *p_peek;
+    int                i_peek;
+    uint8_t            *p_peek;
     
     if( ( i_peek = input_Peek( p_input, &p_peek, 56 ) ) < 56 )
     {
@@ -369,8 +370,8 @@ int  ASF_ReadObject_file_properties( input_thread_t *p_input,
                                      asf_object_t *p_obj )
 {
     asf_object_file_properties_t *p_fp = (asf_object_file_properties_t*)p_obj;
-    int i_peek;
-    u8  *p_peek;
+    int      i_peek;
+    uint8_t  *p_peek;
     
     if( ( i_peek = input_Peek( p_input, &p_peek,  92) ) < 92 )
     {
@@ -414,8 +415,8 @@ int  ASF_ReadObject_header_extention( input_thread_t *p_input,
                                       asf_object_t *p_obj )
 {
     asf_object_header_extention_t *p_he = (asf_object_header_extention_t*)p_obj;
-    int i_peek;
-    u8  *p_peek;
+    int     i_peek;
+    uint8_t *p_peek;
     
     if( ( i_peek = input_Peek( p_input, &p_peek, p_he->i_object_size ) ) <  46)
     {
@@ -457,8 +458,8 @@ int  ASF_ReadObject_stream_properties( input_thread_t *p_input,
 {
     asf_object_stream_properties_t *p_sp = 
                     (asf_object_stream_properties_t*)p_obj;
-    int i_peek;
-    u8  *p_peek;
+    int     i_peek;
+    uint8_t *p_peek;
     
     if( ( i_peek = input_Peek( p_input, &p_peek,  p_sp->i_object_size ) ) < 74 )
     {
@@ -528,8 +529,8 @@ int  ASF_ReadObject_codec_list( input_thread_t *p_input,
                                 asf_object_t *p_obj )
 {
     asf_object_codec_list_t *p_cl = (asf_object_codec_list_t*)p_obj;
-    int i_peek;
-    u8  *p_peek, *p_data;
+    int     i_peek;
+    uint8_t *p_peek, *p_data;
 
     int i_codec;
     
@@ -638,9 +639,10 @@ void ASF_FreeObject_codec_list( input_thread_t *p_input,
 int  ASF_ReadObject_content_description( input_thread_t *p_input,
                                          asf_object_t *p_obj )
 {
-    asf_object_content_description_t *p_cd = (asf_object_content_description_t*)p_obj;
-    int i_peek;
-    u8  *p_peek, *p_data;
+    asf_object_content_description_t *p_cd = 
+                                    (asf_object_content_description_t*)p_obj;
+    int     i_peek;
+    uint8_t *p_peek, *p_data;
 
     int i_len;
     int i_title;

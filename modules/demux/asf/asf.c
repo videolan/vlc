@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.4 2002/11/10 16:31:20 fenrir Exp $
+ * $Id: asf.c,v 1.5 2002/11/14 16:17:47 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -51,11 +51,11 @@ vlc_module_begin();
     add_shortcut( "asf" );
 vlc_module_end();
 
-static u16 GetWLE( u8 *p_buff )
+static uint16_t GetWLE( uint8_t *p_buff )
 {
     return( (p_buff[0]) + ( p_buff[1] <<8 ) );
 }
-static u32 GetDWLE( u8 *p_buff )
+static uint32_t GetDWLE( uint8_t *p_buff )
 {   
     return( p_buff[0] + ( p_buff[1] <<8 ) +
             ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
@@ -66,12 +66,12 @@ static u32 GetDWLE( u8 *p_buff )
  *****************************************************************************/
 static int Activate( vlc_object_t * p_this )
 {   
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    u8  *p_peek;
-    guid_t guid;
+    input_thread_t  *p_input = (input_thread_t *)p_this;
+    uint8_t         *p_peek;
+    guid_t          guid;
     
-    demux_sys_t *p_demux;
-    int i_stream;
+    demux_sys_t     *p_demux;
+    int             i_stream;
     
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
@@ -103,6 +103,7 @@ static int Activate( vlc_object_t * p_this )
         return( -1 );
     }
     memset( p_demux, 0, sizeof( demux_sys_t ) );
+    p_demux->i_first_pts = -1;
 
     /* Now load all object ( except raw data ) */
     if( !ASF_ReadObjectRoot( p_input, &p_demux->root, p_input->stream.b_seekable ) )
@@ -284,7 +285,10 @@ static int Activate( vlc_object_t * p_this )
         p_stream->p_es->i_cat = p_stream->i_cat;
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        input_SelectES( p_input, p_stream->p_es );
+        if( p_stream->p_es->i_fourcc != VLC_FOURCC( 'u','n','d','f' ) )
+        {
+            input_SelectES( p_input, p_stream->p_es );
+        }
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     
@@ -331,7 +335,7 @@ static int Demux( input_thread_t *p_input )
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
         off_t i_offset;
-        
+        msleep( DEFAULT_PTS_DELAY );
         i_offset = ASF_TellAbsolute( p_input ) - p_demux->i_data_begin;
         
         if( i_offset  < 0 )
@@ -352,37 +356,29 @@ static int Demux( input_thread_t *p_input )
             }
 #undef p_stream
         }
-
     }
-    /* first wait for the good time to read a packet */
 
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
-                          p_demux->i_pcr );
-
-    /* update pcr XXX in mpeg scale so in 90000 unit/s */
-    p_demux->i_pcr = p_demux->i_time * 9 / 100;
 
     for( i = 0; i < 10; i++ ) // parse 10 packets
     {
-        int i_data_packet_min = p_demux->p_fp->i_min_data_packet_size;
-        u8  *p_peek;
-        int i_skip;
+        int     i_data_packet_min = p_demux->p_fp->i_min_data_packet_size;
+        uint8_t *p_peek;
+        int     i_skip;
         
-        int i_packet_size_left;
-        int i_packet_flags;
-        int i_packet_property;
+        int     i_packet_size_left;
+        int     i_packet_flags;
+        int     i_packet_property;
 
-        int b_packet_multiple_payload;
-        int i_packet_length;
-        int i_packet_sequence;
-        int i_packet_padding_length;
+        int     b_packet_multiple_payload;
+        int     i_packet_length;
+        int     i_packet_sequence;
+        int     i_packet_padding_length;
         
-        u32 i_packet_send_time;
-        u16 i_packet_duration;
-        int i_payload;
-        int i_payload_count;
-        int i_payload_length_type;
+        uint32_t    i_packet_send_time;
+        uint16_t    i_packet_duration;
+        int         i_payload;
+        int         i_payload_count;
+        int         i_payload_length_type;
 
         
         if( input_Peek( p_input, &p_peek, i_data_packet_min ) < i_data_packet_min )
@@ -482,7 +478,7 @@ static int Demux( input_thread_t *p_input )
             else if( i_replicated_data_length == 1 )
             {
 
-                msg_Warn( p_input, "found compressed payload" );
+                msg_Dbg( p_input, "found compressed payload" );
 
                 i_pts = (mtime_t)i_tmp * 1000;
                 i_pts_delta = (mtime_t)p_peek[i_skip] * 1000; i_skip++;
@@ -498,15 +494,14 @@ static int Demux( input_thread_t *p_input )
             }
 
             i_pts = __MAX( i_pts - p_demux->p_fp->i_preroll * 1000, 0 );
-
             if( b_packet_multiple_payload )
             {
                 GETVALUE2b( i_payload_length_type, i_payload_data_length, 0 );
             }
             else
             {
-                msg_Warn( p_input, "single payload" );
-                i_payload_data_length = i_packet_length - i_packet_padding_length - i_skip;
+                i_payload_data_length = i_packet_length - 
+                                            i_packet_padding_length - i_skip;
             }
             
 #if 0
@@ -523,7 +518,8 @@ static int Demux( input_thread_t *p_input )
 
             if( !( p_stream = p_demux->stream[i_stream_number] ) )
             {
-                msg_Warn( p_input, "undeclared stream[Id 0x%x]", i_stream_number );
+                msg_Warn( p_input, 
+                          "undeclared stream[Id 0x%x]", i_stream_number );
                 i_skip += i_payload_data_length;
                 continue;   // over payload
             }
@@ -565,14 +561,21 @@ static int Demux( input_thread_t *p_input )
 
                 if( !p_stream->p_pes )  // add a new PES
                 {
-                    p_stream->i_time = ( (mtime_t)i_pts + i_payload * (mtime_t)i_pts_delta );
-                    
+                    p_stream->i_time = 
+                        ( (mtime_t)i_pts + i_payload * (mtime_t)i_pts_delta );
+
+                    if( p_demux->i_first_pts == -1 )
+                    {
+                        p_demux->i_first_pts = p_stream->i_time;
+                    }
+                    p_stream->i_time -= p_demux->i_first_pts;
+
                     p_stream->p_pes = input_NewPES( p_input->p_method_data );
                     p_stream->p_pes->i_dts = 
                         p_stream->p_pes->i_pts = 
                             input_ClockGetTS( p_input, 
                                               p_input->stream.p_selected_program,
-                                              p_stream->i_time * 9 / 100 );
+                                              ( p_stream->i_time+DEFAULT_PTS_DELAY) * 9 /100 );
 
                     p_stream->p_pes->p_next = NULL;
                     p_stream->p_pes->i_nb_data = 0;
@@ -635,17 +638,36 @@ loop_error_recovery:
         ASF_SkipBytes( p_input, i_data_packet_min );
 
     }   // loop over packet
-    p_demux->i_time = 0;
+    p_demux->i_time = -1;
     for( i = 0; i < 128 ; i++ )
     {
 #define p_stream p_demux->stream[i]
         if( p_stream && p_stream->p_es && p_stream->p_es->p_decoder_fifo )
         {
-            p_demux->i_time = __MAX( p_demux->i_time, p_stream->i_time );
+            if( p_demux->i_time < 0 )
+            {
+                p_demux->i_time = p_stream->i_time;
+            }
+            else
+            {
+                p_demux->i_time = __MIN( p_demux->i_time, p_stream->i_time );
+            }
         }
 #undef p_stream
     }
-    
+
+    if( p_demux->i_time >= 0 )
+    {
+        /* update pcr XXX in mpeg scale so in 90000 unit/s */
+        p_demux->i_pcr =( __MAX( p_demux->i_time /*- DEFAULT_PTS_DELAY*/, 0 ) ) * 9 / 100;
+        
+        /* first wait for the good time to read next packets */
+        input_ClockManageRef( p_input,
+                              p_input->stream.p_selected_program,
+                              p_demux->i_pcr );
+    }
+
+   
     return( 1 );
 }
 
