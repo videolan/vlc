@@ -4,6 +4,7 @@
  * Copyright (C) 2002 VideoLAN
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
+ *          Boris Dores <babal@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,13 +34,41 @@
 #include <ExtCtrls.hpp>
 #include "CSPIN.h"
 //---------------------------------------------------------------------------
-class TGroupBoxPref : public TGroupBox
+/* A TCheckListBox that automatically disposes any TObject
+   associated with the string items */
+class TCleanCheckListBox : public TCheckListBox
 {
 public:
-    __fastcall TGroupBoxPref( TComponent* Owner, module_config_t *p_config_arg );
+    __fastcall TCleanCheckListBox(Classes::TComponent* AOwner)
+        : TCheckListBox( AOwner ) { };
+    virtual __fastcall ~TCleanCheckListBox();
+};
+//---------------------------------------------------------------------------
+/* A THintWindow with a limited width */
+class TNarrowHintWindow : public THintWindow
+{
+public:
+   virtual void __fastcall ActivateHint(const Windows::TRect &Rect,
+       const System::AnsiString AHint);
+};
+//---------------------------------------------------------------------------
+/* Just a wrapper to embed an AnsiString into a TObject */
+class TObjectString : public TObject
+{
+private:
+    AnsiString FString;
+public:
+    __fastcall TObjectString(char * String);
+    AnsiString __fastcall String();
+};
+//---------------------------------------------------------------------------
+class TPanelPref : public TPanel
+{
+public:
+    __fastcall TPanelPref( TComponent* Owner, module_config_t *p_config_arg );
     module_config_t *p_config;
     virtual void __fastcall UpdateChanges();
-    TCheckListBox * __fastcall CreateCheckListBox( TWinControl *Parent,
+    TCleanCheckListBox * __fastcall CreateCleanCheckListBox( TWinControl *Parent,
             int Left, int Width, int Top, int Height );
     TButton * __fastcall CreateButton( TWinControl *Parent,
             int Left, int Width, int Top, int Height, AnsiString Caption );
@@ -55,14 +84,13 @@ public:
             long Min, long Max, long Value );
 };
 //---------------------------------------------------------------------------
-class TGroupBoxPlugin : public TGroupBoxPref
+class TPanelPlugin : public TPanelPref
 {
 public:
-    __fastcall TGroupBoxPlugin( TComponent* Owner, module_config_t *p_config );
-    TCheckListBox *CheckListBox;
+    __fastcall TPanelPlugin( TComponent* Owner, module_config_t *p_config );
+    TCleanCheckListBox *CleanCheckListBox;
     TButton *ButtonConfig;
-    TLabel *LabelDesc;
-    TLabel *LabelHint;
+    TLabel *Label;
     module_t *ModuleSelected;
     void __fastcall UpdateChanges();
     void __fastcall CheckListBoxClick( TObject *Sender );
@@ -70,29 +98,28 @@ public:
     void __fastcall ButtonConfigClick( TObject *Sender );
 };
 //---------------------------------------------------------------------------
-class TGroupBoxString : public TGroupBoxPref
+class TPanelString : public TPanelPref
 {
 public:
-    __fastcall TGroupBoxString( TComponent* Owner, module_config_t *p_config );
-    TLabel *LabelDesc;
+    __fastcall TPanelString( TComponent* Owner, module_config_t *p_config );
+    TLabel *Label;
     TEdit *Edit;
     void __fastcall UpdateChanges();
 };
 //---------------------------------------------------------------------------
-class TGroupBoxInteger : public TGroupBoxPref
+class TPanelInteger : public TPanelPref
 {
 public:
-    __fastcall TGroupBoxInteger( TComponent* Owner, module_config_t *p_config );
-    TLabel *LabelDesc;
+    __fastcall TPanelInteger( TComponent* Owner, module_config_t *p_config );
+    TLabel *Label;
     TCSpinEdit *SpinEdit;
     void __fastcall UpdateChanges();
 };
 //---------------------------------------------------------------------------
-class TGroupBoxBool : public TGroupBoxPref
+class TPanelBool : public TPanelPref
 {
 public:
-    __fastcall TGroupBoxBool( TComponent* Owner, module_config_t *p_config );
-    TLabel *LabelDesc;
+    __fastcall TPanelBool( TComponent* Owner, module_config_t *p_config );
     TCheckBox *CheckBox;
     void __fastcall UpdateChanges();
 };

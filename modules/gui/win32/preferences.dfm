@@ -1,8 +1,9 @@
 object PreferencesDlg: TPreferencesDlg
-  Left = 309
-  Top = 124
-  Width = 522
-  Height = 582
+  Left = 310
+  Top = 125
+  Width = 458
+  Height = 594
+  Anchors = [akTop, akRight]
   Caption = 'Preferences'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -249,44 +250,50 @@ object PreferencesDlg: TPreferencesDlg
   object PageControlPref: TPageControl
     Left = 8
     Top = 8
-    Width = 497
-    Height = 497
-    TabOrder = 1
+    Width = 433
+    Height = 511
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    TabOrder = 0
   end
   object ButtonApply: TButton
-    Left = 146
-    Top = 520
-    Width = 105
+    Left = 266
+    Top = 530
+    Width = 82
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'Apply'
-    TabOrder = 0
+    TabOrder = 3
     OnClick = ButtonApplyClick
   end
   object ButtonSave: TButton
-    Left = 265
-    Top = 520
-    Width = 105
+    Left = 359
+    Top = 530
+    Width = 82
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'Save'
-    TabOrder = 2
+    TabOrder = 4
     OnClick = ButtonSaveClick
   end
   object ButtonOK: TButton
-    Left = 26
-    Top = 520
-    Width = 105
+    Left = 81
+    Top = 530
+    Width = 82
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
-    TabOrder = 3
+    Default = True
+    TabOrder = 1
     OnClick = ButtonOkClick
   end
   object ButtonCancel: TButton
-    Left = 386
-    Top = 520
-    Width = 105
+    Left = 174
+    Top = 530
+    Width = 82
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'Cancel'
-    TabOrder = 4
+    TabOrder = 2
     OnClick = ButtonCancelClick
   end
 end

@@ -4,6 +4,7 @@
  * Copyright (C) 2002 VideoLAN
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
+ *          Boris Dores <babal@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,30 +40,73 @@
 
 extern intf_thread_t *p_intfGlobal;
 
+/****************************************************************************
+ * A THintWindow with a limited width
+ ****************************************************************************/
+void __fastcall TNarrowHintWindow::ActivateHint(const Windows::TRect &Rect,
+    const System::AnsiString AHint)
+{
+    TRect NarrowRect = CalcHintRect ( 300 , AHint , NULL );
+    NarrowRect.Left = Rect.Left;
+    NarrowRect.Top = Rect.Top;
+    NarrowRect.Right += Rect.Left;
+    NarrowRect.Bottom += Rect.Top;
+    THintWindow::ActivateHint ( NarrowRect , AHint );
+}
+
+
+/****************************************************************************
+ * Just a wrapper to embed an AnsiString into a TObject
+ ****************************************************************************/
+__fastcall TObjectString::TObjectString(char * String)
+{
+    FString = AnsiString(String);
+}
+//---------------------------------------------------------------------------
+AnsiString __fastcall TObjectString::String()
+{
+    return FString;
+}
+
+
+/****************************************************************************
+ * A TCheckListBox that automatically disposes any TObject
+ * associated with the string items
+ ****************************************************************************/
+__fastcall TCleanCheckListBox::~TCleanCheckListBox()
+{
+    for ( int i = 0 ; i < Items->Count ; i++ )
+    {
+        if ( Items->Objects[i] != NULL ) delete Items->Objects[i];
+    }
+}
+
 
 /****************************************************************************
  * Functions to help components creation
  ****************************************************************************/
-__fastcall TGroupBoxPref::TGroupBoxPref( TComponent* Owner,
-            module_config_t *p_config_arg ) : TGroupBox( Owner )
+__fastcall TPanelPref::TPanelPref( TComponent* Owner,
+            module_config_t *p_config_arg ) : TPanel( Owner )
 {
     p_config = p_config_arg;
-    Caption = p_config->psz_text;
+    BevelInner = bvNone;
+    BevelOuter = bvNone;
+    BorderStyle = bsNone;
 }
 //---------------------------------------------------------------------------
-TCheckListBox * __fastcall TGroupBoxPref::CreateCheckListBox(
+TCleanCheckListBox * __fastcall TPanelPref::CreateCleanCheckListBox(
     TWinControl *Parent, int Left, int Width, int Top, int Height )
 {
-    TCheckListBox *CheckListBox = new TCheckListBox( Parent );
-    CheckListBox->Parent = Parent;
-    CheckListBox->Left = Left;
-    CheckListBox->Width = Width;
-    CheckListBox->Top = Top;
-    CheckListBox->Height = Height;
-    return CheckListBox;
+    TCleanCheckListBox *CleanCheckListBox = new TCleanCheckListBox( Parent );
+    CleanCheckListBox->Parent = Parent;
+    CleanCheckListBox->Left = Left;
+    CleanCheckListBox->Width = Width;
+    CleanCheckListBox->Top = Top;
+    CleanCheckListBox->Height = Height;
+    return CleanCheckListBox;
 }
 //---------------------------------------------------------------------------
-TButton * __fastcall TGroupBoxPref::CreateButton( TWinControl *Parent,
+TButton * __fastcall TPanelPref::CreateButton( TWinControl *Parent,
             int Left, int Width, int Top, int Height, AnsiString Caption )
 {
     TButton *Button = new TButton( Parent );
@@ -75,7 +119,7 @@ TButton * __fastcall TGroupBoxPref::CreateButton( TWinControl *Parent,
     return Button;
 }
 //---------------------------------------------------------------------------
-TCheckBox * __fastcall TGroupBoxPref::CreateCheckBox( TWinControl *Parent,
+TCheckBox * __fastcall TPanelPref::CreateCheckBox( TWinControl *Parent,
             int Left, int Width, int Top, int Height, AnsiString Caption )
 {
     TCheckBox *CheckBox = new TCheckBox( Parent );
@@ -88,7 +132,7 @@ TCheckBox * __fastcall TGroupBoxPref::CreateCheckBox( TWinControl *Parent,
     return CheckBox;
 }
 //---------------------------------------------------------------------------
-TLabel * __fastcall TGroupBoxPref::CreateLabel( TWinControl *Parent,
+TLabel * __fastcall TPanelPref::CreateLabel( TWinControl *Parent,
             int Left, int Width, int Top, int Height, AnsiString Caption,
             bool WordWrap )
 {
@@ -103,7 +147,7 @@ TLabel * __fastcall TGroupBoxPref::CreateLabel( TWinControl *Parent,
     return Label;
 }
 //---------------------------------------------------------------------------
-TEdit * __fastcall TGroupBoxPref::CreateEdit( TWinControl *Parent,
+TEdit * __fastcall TPanelPref::CreateEdit( TWinControl *Parent,
             int Left, int Width, int Top, int Height, AnsiString Text )
 {
     TEdit *Edit = new TEdit( Parent );
@@ -116,7 +160,7 @@ TEdit * __fastcall TGroupBoxPref::CreateEdit( TWinControl *Parent,
     return Edit;
 }
 //---------------------------------------------------------------------------
-TCSpinEdit * __fastcall TGroupBoxPref::CreateSpinEdit( TWinControl *Parent,
+TCSpinEdit * __fastcall TPanelPref::CreateSpinEdit( TWinControl *Parent,
             int Left, int Width, int Top, int Height,
             long Min, long Max, long Value )
 {
@@ -132,48 +176,87 @@ TCSpinEdit * __fastcall TGroupBoxPref::CreateSpinEdit( TWinControl *Parent,
     return SpinEdit;
 }
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxPref::UpdateChanges()
+void __fastcall TPanelPref::UpdateChanges()
 {
 }
 
+#define LIBWIN32_PREFSIZE_VPAD                4
+#define LIBWIN32_PREFSIZE_HPAD                4
+#define LIBWIN32_PREFSIZE_LEFT                16
+#define LIBWIN32_PREFSIZE_EDIT_LEFT           (LIBWIN32_PREFSIZE_LEFT+32)
+#define LIBWIN32_PREFSIZE_WIDTH               375
+#define LIBWIN32_PREFSIZE_EDIT_WIDTH          (LIBWIN32_PREFSIZE_WIDTH-32)
+#define LIBWIN32_PREFSIZE_BUTTON_WIDTH        150
+#define LIBWIN32_PREFSIZE_SPINEDIT_WIDTH      100
+#define LIBWIN32_PREFSIZE_RIGHT               (LIBWIN32_PREFSIZE_LEFT+LIBWIN32_PREFSIZE_WIDTH)
+#define LIBWIN32_PREFSIZE_BUTTON_HEIGHT       25
+#define LIBWIN32_PREFSIZE_LABEL_HEIGHT        26
+#define LIBWIN32_PREFSIZE_CHECKLISTBOX_HEIGHT 120
+#define LIBWIN32_PREFSIZE_EDIT_HEIGHT         21
+#define LIBWIN32_PREFSIZE_CHECKBOX_HEIGHT     17
+#define LIBWIN32_PREFSIZE_SPINEDIT_HEIGHT     21
 
 /****************************************************************************
- * GroupBox for module management
+ * Panel for module management
  ****************************************************************************/
-__fastcall TGroupBoxPlugin::TGroupBoxPlugin( TComponent* Owner,
-            module_config_t *p_config ) : TGroupBoxPref( Owner, p_config )
+__fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
+            module_config_t *p_config ) : TPanelPref( Owner, p_config )
 {
-    /* init checklistbox */
-    CheckListBox = CreateCheckListBox( this, 16, 164, 24, 160 );
-    CheckListBox->OnClick = CheckListBoxClick;
-    CheckListBox->OnClickCheck = CheckListBoxClickCheck;
-
-    /* init description label */
-    LabelDesc = CreateLabel( this, 230, 225, 50, 52,
-                             p_config->psz_longtext, true );
-
-    /* init hint label */
-    LabelHint = CreateLabel( this, 230, 225, 135, 13, "", false );
-
     /* init configure button */
-    ButtonConfig = CreateButton( this, 16, 70, 192, 25, "Configure" );
+    ButtonConfig = CreateButton( this,
+            LIBWIN32_PREFSIZE_RIGHT - LIBWIN32_PREFSIZE_BUTTON_WIDTH,
+            LIBWIN32_PREFSIZE_BUTTON_WIDTH,
+            LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_BUTTON_HEIGHT,
+            "Configure..." );
     ButtonConfig->Enabled = false;
     ButtonConfig->OnClick = ButtonConfigClick;
 
-    Height = 233;
+    /* init label */
+    AnsiString Text = AnsiString(p_config->psz_text) + ":";
+    Label = CreateLabel( this,
+            LIBWIN32_PREFSIZE_LEFT,
+            LIBWIN32_PREFSIZE_RIGHT - LIBWIN32_PREFSIZE_BUTTON_WIDTH
+             - LIBWIN32_PREFSIZE_HPAD,
+            LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_LABEL_HEIGHT,
+            Text.c_str(), true );
+
+    /* vertical alignement */
+    if ( ButtonConfig->Height > Label->Height )
+        Label->Top += ( ButtonConfig->Height - Label->Height ) / 2;
+    else
+        ButtonConfig->Top += ( Label->Height - ButtonConfig->Height ) / 2;
+
+    /* init checklistbox */
+    CleanCheckListBox = CreateCleanCheckListBox( this,
+            LIBWIN32_PREFSIZE_EDIT_LEFT,
+            LIBWIN32_PREFSIZE_EDIT_WIDTH,
+            max ( Label->Top + Label->Height , ButtonConfig->Top
+             + ButtonConfig->Height ) + LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_CHECKLISTBOX_HEIGHT );
+    CleanCheckListBox->OnClick = CheckListBoxClick;
+    CleanCheckListBox->OnClickCheck = CheckListBoxClickCheck;
+    CleanCheckListBox->Hint = p_config->psz_longtext;
+    CleanCheckListBox->ShowHint = true;
+
+    /* panel height */
+    Height = CleanCheckListBox->Top + CleanCheckListBox->Height
+            + LIBWIN32_PREFSIZE_VPAD;
 };
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxPlugin::CheckListBoxClick( TObject *Sender )
+void __fastcall TPanelPlugin::CheckListBoxClick( TObject *Sender )
 {
     module_t **pp_parser;
     vlc_list_t *p_list;
 
     /* check that the click is valid (we are on an item, and the click
      * started on an item */
-    if( CheckListBox->ItemIndex == -1 )
+    if( CleanCheckListBox->ItemIndex == -1 )
         return;
 
-    AnsiString Name = CheckListBox->Items->Strings[CheckListBox->ItemIndex];
+    AnsiString Name = ((TObjectString*)CleanCheckListBox->Items->
+        Objects[CleanCheckListBox->ItemIndex])->String().c_str();
     if( Name == "" )
         return;
 
@@ -187,8 +270,6 @@ void __fastcall TGroupBoxPlugin::CheckListBoxClick( TObject *Sender )
         if( strcmp( (*pp_parser)->psz_object_name, Name.c_str() ) == 0 )
         {
             ModuleSelected = (*pp_parser);
-            LabelHint->Caption = (*pp_parser)->psz_longname ?
-                                 (*pp_parser)->psz_longname : "";
             ButtonConfig->Enabled =
                 (*pp_parser)->i_config_items ? true : false;
 
@@ -197,37 +278,38 @@ void __fastcall TGroupBoxPlugin::CheckListBoxClick( TObject *Sender )
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxPlugin::CheckListBoxClickCheck( TObject *Sender )
+void __fastcall TPanelPlugin::CheckListBoxClickCheck( TObject *Sender )
 {
     /* one item maximum must be checked */
-    if( CheckListBox->Checked[CheckListBox->ItemIndex] )
+    if( CleanCheckListBox->Checked[CleanCheckListBox->ItemIndex] )
     {
-        for( int item = 0; item < CheckListBox->Items->Count; item++ )
+        for( int item = 0; item < CleanCheckListBox->Items->Count; item++ )
         {
-            if( item != CheckListBox->ItemIndex )
+            if( item != CleanCheckListBox->ItemIndex )
             {
-                CheckListBox->Checked[item] = false;
+                CleanCheckListBox->Checked[item] = false;
             }
         }
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxPlugin::ButtonConfigClick( TObject *Sender )
+void __fastcall TPanelPlugin::ButtonConfigClick( TObject *Sender )
 {
     p_intfGlobal->p_sys->p_window->
                         CreatePreferences( ModuleSelected->psz_object_name );
 }
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxPlugin::UpdateChanges()
+void __fastcall TPanelPlugin::UpdateChanges()
 {
     AnsiString Name = "";
 
     /* find the selected plugin (if any) */
-    for( int item = 0; item < CheckListBox->Items->Count; item++ )
+    for( int item = 0; item < CleanCheckListBox->Items->Count; item++ )
     {
-        if( CheckListBox->Checked[item] )
+        if( CleanCheckListBox->Checked[item] )
         {
-            Name = CheckListBox->Items->Strings[item];
+            Name = ((TObjectString*)CleanCheckListBox->Items->Objects[item])
+                   ->String().c_str();
             break;
         }
     }
@@ -240,28 +322,38 @@ void __fastcall TGroupBoxPlugin::UpdateChanges()
 
 
 /****************************************************************************
- * GroupBox for string management
+ * Panel for string management
  ****************************************************************************/
-__fastcall TGroupBoxString::TGroupBoxString( TComponent* Owner,
-            module_config_t *p_config ) : TGroupBoxPref( Owner, p_config )
+__fastcall TPanelString::TPanelString( TComponent* Owner,
+            module_config_t *p_config ) : TPanelPref( Owner, p_config )
 {
     /* init description label */
-    LabelDesc = CreateLabel( this, 230, 225, 24, 26,
-                             p_config->psz_longtext, true );
+    AnsiString Text = AnsiString ( p_config->psz_text ) + ":";
+    Label = CreateLabel( this,
+            LIBWIN32_PREFSIZE_LEFT,
+            LIBWIN32_PREFSIZE_WIDTH,
+            LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_LABEL_HEIGHT,
+            Text.c_str(), true );
 
     /* init edit */
-    Edit = CreateEdit( this, 16, 164, 24, 21, "" );
+    Edit = CreateEdit( this,
+            LIBWIN32_PREFSIZE_EDIT_LEFT,
+            LIBWIN32_PREFSIZE_EDIT_WIDTH,
+            LIBWIN32_PREFSIZE_VPAD + Label->Height + LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_EDIT_HEIGHT, "" );
     vlc_mutex_lock( p_config->p_lock );
     Edit->Text = p_config->psz_value ? p_config->psz_value : "";
     vlc_mutex_unlock( p_config->p_lock );
+    Edit->Hint = p_config->psz_longtext;
+    Edit->ShowHint = true;
 
-    /* vertical alignment */
-    Height = LabelDesc->Height + 24;
-    LabelDesc->Top = Top + ( Height - LabelDesc->Height ) / 2 + 4;
-    Edit->Top = Top + ( Height - Edit->Height ) / 2 + 4;
+    /* panel height */
+    Height = LIBWIN32_PREFSIZE_VPAD + Label->Height + LIBWIN32_PREFSIZE_VPAD
+            + Edit->Height + LIBWIN32_PREFSIZE_VPAD;
 };
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxString::UpdateChanges()
+void __fastcall TPanelString::UpdateChanges()
 {
     /* XXX: Necessary, since c_str() returns only a temporary pointer... */
     free( p_config->psz_value );
@@ -271,26 +363,44 @@ void __fastcall TGroupBoxString::UpdateChanges()
 
 
 /****************************************************************************
- * GroupBox for integer management
+ * Panel for integer management
  ****************************************************************************/
-__fastcall TGroupBoxInteger::TGroupBoxInteger( TComponent* Owner,
-            module_config_t *p_config ) : TGroupBoxPref( Owner, p_config )
+__fastcall TPanelInteger::TPanelInteger( TComponent* Owner,
+            module_config_t *p_config ) : TPanelPref( Owner, p_config )
 {
     /* init description label */
-    LabelDesc = CreateLabel( this, 230, 225, 19, 26,
-                             p_config->psz_longtext, true );
+    AnsiString Text = AnsiString ( p_config->psz_text ) + ":";
+    Label = CreateLabel( this,
+            LIBWIN32_PREFSIZE_LEFT,
+            LIBWIN32_PREFSIZE_WIDTH - LIBWIN32_PREFSIZE_SPINEDIT_WIDTH
+             - LIBWIN32_PREFSIZE_HPAD,
+            LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_LABEL_HEIGHT, Text.c_str(), true );
 
     /* init spinedit */
-    SpinEdit = CreateSpinEdit( this, 16, 164, 24, 21,
-                               -1, 100000, p_config->i_value );
+    SpinEdit = CreateSpinEdit( this,
+            LIBWIN32_PREFSIZE_RIGHT - LIBWIN32_PREFSIZE_SPINEDIT_WIDTH,
+            LIBWIN32_PREFSIZE_SPINEDIT_WIDTH,
+            LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_SPINEDIT_HEIGHT,
+            -1, 100000, p_config->i_value );
+    SpinEdit->Hint = p_config->psz_longtext;
+    SpinEdit->ShowHint = true;
 
-    /* vertical alignment */
-    Height = LabelDesc->Height + 24;
-    LabelDesc->Top = Top + ( Height - LabelDesc->Height ) / 2 + 4;
-    SpinEdit->Top = Top + ( Height - SpinEdit->Height ) / 2 + 4;
+    /* vertical alignement and panel height */
+    if ( SpinEdit->Height > Label->Height )
+    {
+        Label->Top += ( SpinEdit->Height - Label->Height ) / 2;
+        Height = SpinEdit->Top + SpinEdit->Height + LIBWIN32_PREFSIZE_VPAD;
+    }
+    else
+    {
+        SpinEdit->Top += ( Label->Height - SpinEdit->Height ) / 2;
+        Height = Label->Top + Label->Height + LIBWIN32_PREFSIZE_VPAD;
+    }
 };
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxInteger::UpdateChanges()
+void __fastcall TPanelInteger::UpdateChanges()
 {
     /* Warning: we're casting from long to int */
     p_config->i_value = (int)SpinEdit->Value;
@@ -298,26 +408,26 @@ void __fastcall TGroupBoxInteger::UpdateChanges()
 
 
 /****************************************************************************
- * GroupBox for boolean management
+ * Panel for boolean management
  ****************************************************************************/
-__fastcall TGroupBoxBool::TGroupBoxBool( TComponent* Owner,
-            module_config_t *p_config ) : TGroupBoxPref( Owner, p_config )
+__fastcall TPanelBool::TPanelBool( TComponent* Owner,
+            module_config_t *p_config ) : TPanelPref( Owner, p_config )
 {
-    /* init description label */
-    LabelDesc = CreateLabel( this, 230, 225, 19, 26,
-                             p_config->psz_longtext, true );
-
     /* init checkbox */
-    CheckBox = CreateCheckBox( this, 16, 184, 28, 17, p_config->psz_text );
+    CheckBox = CreateCheckBox( this,
+            LIBWIN32_PREFSIZE_LEFT,
+            LIBWIN32_PREFSIZE_WIDTH,
+            LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_CHECKBOX_HEIGHT, p_config->psz_text );
     CheckBox->Checked = p_config->i_value;
+    CheckBox->Hint = p_config->psz_longtext;
+    CheckBox->ShowHint = true;
 
-    /* vertical alignment */
-    Height = LabelDesc->Height + 24;
-    LabelDesc->Top = Top + ( Height - LabelDesc->Height ) / 2 + 4;
-    CheckBox->Top = Top + ( Height - CheckBox->Height ) / 2 + 4;
+    /* panel height */
+    Height = LIBWIN32_PREFSIZE_VPAD + CheckBox->Height + LIBWIN32_PREFSIZE_VPAD;
 };
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxBool::UpdateChanges()
+void __fastcall TPanelBool::UpdateChanges()
 {
     p_config->i_value = CheckBox->Checked ? 1 : 0;
 }
@@ -330,6 +440,11 @@ __fastcall TPreferencesDlg::TPreferencesDlg( TComponent* Owner )
         : TForm( Owner )
 {
     Icon = p_intfGlobal->p_sys->p_window->Icon;
+    Application->HintHidePause = 0x1000000;
+    HintWindowClass = __classid ( TNarrowHintWindow );
+    /* prevent the form from being resized horizontally */
+    Constraints->MinWidth = Width;
+    Constraints->MaxWidth = Width;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPreferencesDlg::FormClose( TObject *Sender,
@@ -363,10 +478,10 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     TTabSheet          *TabSheet;
     TScrollBox         *ScrollBox;
     TPanel             *Panel;
-    TGroupBoxPlugin    *GroupBoxPlugin;
-    TGroupBoxString    *GroupBoxString;
-    TGroupBoxInteger   *GroupBoxInteger;
-    TGroupBoxBool      *GroupBoxBool;
+    TPanelPlugin       *PanelPlugin;
+    TPanelString       *PanelString;
+    TPanelInteger      *PanelInteger;
+    TPanelBool         *PanelBool;
 
     /* Look for the selected module */
     p_list = vlc_list_find( p_intfGlobal, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -413,16 +528,16 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             ScrollBox->HorzScrollBar->Tracking = true;
             ScrollBox->VertScrollBar->Tracking = true;
 
+            /* add a panel as top margin */
+            ADD_PANEL;
+
             break;
 
         case CONFIG_ITEM_MODULE:
 
-            /* add new groupbox for the config option */
-            GroupBoxPlugin = new TGroupBoxPlugin( this, p_item );
-            GroupBoxPlugin->Parent = ScrollBox;
-
-            /* add panel as separator */
-            ADD_PANEL;
+            /* add new panel for the config option */
+            PanelPlugin = new TPanelPlugin( this, p_item );
+            PanelPlugin->Parent = ScrollBox;
 
             /* Look for valid modules */
             pp_parser = (module_t **)p_list->pp_objects;
@@ -431,15 +546,25 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             {
                 if( !strcmp( (*pp_parser)->psz_capability, p_item->psz_type ) )
                 {
-                    int item = GroupBoxPlugin->CheckListBox->Items->Add(
-                        (*pp_parser)->psz_object_name );
+                    AnsiString ModuleDesc;
+                    if ( (*pp_parser)->psz_longname != NULL ) {
+                        ModuleDesc = AnsiString((*pp_parser)->psz_longname) +
+                            " (" + AnsiString((*pp_parser)->psz_object_name) +
+                            ")";
+                    }
+                    else
+                        ModuleDesc = AnsiString((*pp_parser)->psz_object_name);
+
+                    int item = PanelPlugin->CleanCheckListBox->Items->AddObject(
+                        ModuleDesc.c_str(),
+                        new TObjectString((*pp_parser)->psz_object_name) );
 
                     /* check the box if it's the default module */
                     AnsiString Name = p_item->psz_value ?
                         p_item->psz_value : "";
                     if( !strcmp( (*pp_parser)->psz_object_name, Name.c_str()) )
                     {
-                        GroupBoxPlugin->CheckListBox->Checked[item] = true;
+                        PanelPlugin->CleanCheckListBox->Checked[item] = true;
                     }
                 }
             }
@@ -450,34 +575,25 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
         case CONFIG_ITEM_STRING:
 
-            /* add new groupbox for the config option */
-            GroupBoxString = new TGroupBoxString( this, p_item );
-            GroupBoxString->Parent = ScrollBox;
-
-            /* add panel as separator */
-            ADD_PANEL;
+            /* add new panel for the config option */
+            PanelString = new TPanelString( this, p_item );
+            PanelString->Parent = ScrollBox;
 
             break;
 
         case CONFIG_ITEM_INTEGER:
 
-            /* add new groupbox for the config option */
-            GroupBoxInteger = new TGroupBoxInteger( this, p_item );
-            GroupBoxInteger->Parent = ScrollBox;
-
-            /* add panel as separator */
-            ADD_PANEL;
+            /* add new panel for the config option */
+            PanelInteger = new TPanelInteger( this, p_item );
+            PanelInteger->Parent = ScrollBox;
 
             break;
 
         case CONFIG_ITEM_BOOL:
 
-            /* add new groupbox for the config option */
-            GroupBoxBool = new TGroupBoxBool( this, p_item );
-            GroupBoxBool->Parent = ScrollBox;
-
-            /* add panel as separator */
-            ADD_PANEL;
+            /* add new panel for the config option */
+            PanelBool = new TPanelBool( this, p_item );
+            PanelBool->Parent = ScrollBox;
 
             break;
         }
@@ -486,11 +602,14 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     }
     while( p_item->i_type != CONFIG_HINT_END );
 
-    /* Reorder groupboxes inside the tabsheets */
+    /* Reorder panels inside the tabsheets */
     for( i_pages = 0; i_pages < PageControlPref->PageCount; i_pages++ )
     {
         /* get scrollbox from the tabsheet */
         ScrollBox = (TScrollBox *)PageControlPref->Pages[i_pages]->Controls[0];
+
+        /* add a panel as bottom margin */
+        ADD_PANEL;
 
         for( i_ctrl = ScrollBox->ControlCount - 1; i_ctrl >= 0 ; i_ctrl-- )
         {
@@ -516,7 +635,7 @@ void __fastcall TPreferencesDlg::ButtonOkClick( TObject *Sender )
 void __fastcall TPreferencesDlg::ButtonApplyClick( TObject *Sender )
 {
     TScrollBox *ScrollBox;
-    TGroupBoxPref *GroupBox;
+    TPanelPref *Panel;
     int i, j;
 
     for( i = 0; i < PageControlPref->PageCount; i++ )
@@ -527,11 +646,11 @@ void __fastcall TPreferencesDlg::ButtonApplyClick( TObject *Sender )
         for( j = 0; j < ScrollBox->ControlCount ; j++ )
         {
             /* skip the panels */
-            if( ScrollBox->Controls[j]->InheritsFrom( __classid( TGroupBoxPref ) ) )
+            if( ScrollBox->Controls[j]->InheritsFrom( __classid( TPanelPref ) ) )
             {
-                GroupBox = (TGroupBoxPref *)ScrollBox->Controls[j];
-                GroupBox->UpdateChanges();
-                SaveValue( GroupBox->p_config );
+                Panel = (TPanelPref *)ScrollBox->Controls[j];
+                Panel->UpdateChanges();
+                SaveValue( Panel->p_config );
             }
         }
     }
