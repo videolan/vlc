@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: access.c,v 1.1 2003/10/04 18:55:13 gbazin Exp $
+ * $Id: access.c,v 1.2 2003/11/07 10:31:38 rocky Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Rocky Bernstein <rocky@panix.com> 
@@ -886,8 +886,16 @@ VCDLIDs( input_thread_t * p_input )
       
       vcdinfo_visit_lot (p_vcd->vcd, false);
       
+#if FIXED
+    /* 
+       We need to change libvcdinfo to be more robust when there are 
+       problems reading the extended PSD. Given that area-highlighting and 
+       selection features in the extended PSD haven't been implemented,
+       it's best then to not try to read this at all.
+     */
       if (vcdinfo_get_psd_x_size(p_vcd->vcd))
         vcdinfo_visit_lot (p_vcd->vcd, true);
+#endif 
     }
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_MRL), 
