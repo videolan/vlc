@@ -504,7 +504,7 @@ WindowSettings::~WindowSettings( )
     wxString sCfg;
     int i;
 
-    sCfg = wxString::Format( "(%d,0,0,%d,%d)", ID_SCREEN,
+    sCfg = wxString::Format( wxT("(%d,0,0,%d,%d)"), ID_SCREEN,
                              wxSystemSettings::GetMetric( wxSYS_SCREEN_X ),
                              wxSystemSettings::GetMetric( wxSYS_SCREEN_Y ) );
     for( i = 0; i < ID_MAX; i++ )
@@ -512,12 +512,12 @@ WindowSettings::~WindowSettings( )
         if( !b_valid[i] || !b_shown[i] )
             continue;
 
-        sCfg += wxString::Format( "(%d,%d,%d,%d,%d)",
+        sCfg += wxString::Format( wxT("(%d,%d,%d,%d,%d)"),
                                   i, position[i].x, position[i].y,
                                      size[i].x, size[i].y );
     }
 
-    config_PutPsz( p_intf, "wxwin-config-last", sCfg.c_str() );
+    config_PutPsz( p_intf, "wxwin-config-last", sCfg.mb_str() );
     config_SaveConfigFile( p_intf, "wxwindows" );
 }
 void WindowSettings::SetScreen( int i_screen_w, int i_screen_h )
