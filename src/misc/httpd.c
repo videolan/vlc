@@ -931,7 +931,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
         vlc_value_t val;
         char psz_port[6];
         struct addrinfo hints;
-        int res;
+        int check;
 
         memset( &hints, 0, sizeof( hints ) );
 
@@ -955,12 +955,12 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
         snprintf( psz_port, sizeof( psz_port ), "%d", i_port );
         psz_port[sizeof( psz_port ) - 1] = '\0';
         
-        res = getaddrinfo( psz_host, psz_port, &hints, &res );
-        if( res != 0 )
+        check = getaddrinfo( psz_host, psz_port, &hints, &res );
+        if( check != 0 )
         {
 #ifdef HAVE_GAI_STRERROR
             msg_Err( p_this, "cannot resolve %s:%d : %s", psz_host, i_port,
-                     gai_strerror( res ) );
+                     gai_strerror( check ) );
 #else
             msg_Err( p_this, "cannot resolve %s:%d", psz_host, i_port );
 #endif
