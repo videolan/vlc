@@ -171,7 +171,8 @@ static int CheckInit( filter_t *p_filter )
           p_filter->fmt_in.video.i_width * p_filter->fmt_in.video.i_height >
           p_filter->fmt_out.video.i_width * p_filter->fmt_out.video.i_height;
 
-        if( p_sys->i_src_ffmpeg_chroma != PIX_FMT_YUV420P &&
+        if( p_sys->b_resize &&
+            p_sys->i_src_ffmpeg_chroma != PIX_FMT_YUV420P &&
             p_sys->i_src_ffmpeg_chroma != PIX_FMT_YUVJ420P &&
             p_sys->i_dst_ffmpeg_chroma != PIX_FMT_YUV420P &&
             p_sys->i_dst_ffmpeg_chroma != PIX_FMT_YUVJ420P )
