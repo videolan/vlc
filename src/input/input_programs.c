@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.38 2001/03/02 13:49:37 massiot Exp $
+ * $Id: input_programs.c,v 1.39 2001/03/02 15:51:22 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -86,6 +86,11 @@ void input_EndStream( input_thread_t * p_input )
     while( p_input->stream.i_es_number )
     {
         input_DelES( p_input, p_input->stream.pp_es[0] );
+    }
+
+    if( p_input->stream.p_demux_data != NULL )
+    {
+        free( p_input->stream.p_demux_data );
     }
 }
 
