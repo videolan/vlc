@@ -95,7 +95,7 @@ int read_toc ( thread_vcd_data_t * p_vcd )
     p_vcd->nb_tracks = tochdr.cdth_trk1;
     /* nb_tracks + 1 because we put the lead_out tracks for computing last
      track's size */
-    p_vcd->tracks_sector = malloc( (p_vcd->nb_tracks + 1) 
+    p_vcd->tracks_sector = malloc( ( p_vcd->nb_tracks + 1 ) 
                                             * sizeof( int ) );
     if ( p_vcd->tracks_sector == NULL ) 
     {
@@ -105,18 +105,18 @@ int read_toc ( thread_vcd_data_t * p_vcd )
 
     /* then for each track we read its TOC entry */
 
-    for(i=tochdr.cdth_trk0 ;i<=tochdr.cdth_trk1;i++)
+    for( i=tochdr.cdth_trk0 ; i <= tochdr.cdth_trk1 ; i++ )
     {
-        tocent.cdte_track = i ;
-        tocent.cdte_format = CDROM_LBA ;
-        if (ioctl(fd, CDROMREADTOCENTRY, &tocent) == -1)
+        tocent.cdte_track = i;
+        tocent.cdte_format = CDROM_LBA;
+        if (ioctl( fd, CDROMREADTOCENTRY, &tocent) == -1 )
         {
-          intf_ErrMsg("problem occured when reading CD's TOCENTRY\n") ;
-          free (p_vcd->tracks_sector) ;
-          return -1 ;
+          intf_ErrMsg( "problem occured when reading CD's TOCENTRY\n" );
+          free ( p_vcd->tracks_sector );
+          return -1;
         }
     
-        p_vcd->tracks_sector[i] = tocent.cdte_addr.lba ;
+        p_vcd->tracks_sector[i-1] = tocent.cdte_addr.lba ;
 
     }
   
@@ -132,7 +132,7 @@ int read_toc ( thread_vcd_data_t * p_vcd )
         return -1 ;
     }
 
-    p_vcd->tracks_sector[p_vcd->nb_tracks + 1] = tocent.cdte_addr.lba ;
+    p_vcd->tracks_sector[p_vcd->nb_tracks] = tocent.cdte_addr.lba ;
   
     return 1 ;
 

@@ -70,7 +70,7 @@
 #include "modules.h"
 #include "modules_export.h"
 
-#include "../mpeg/input_ps.h"
+#include "../mpeg_system/input_ps.h"
 #include "input_vcd.h"
 #include "linux_cdrom_tools.h"
 
@@ -319,8 +319,8 @@ static void VCDInit( input_thread_t * p_input )
         area[i]->i_id = i;
 
         /* Absolute start offset and size */
-        area[i]->i_start = p_vcd->tracks_sector[i+1];
-        area[i]->i_size = p_vcd->tracks_sector[i+2] - p_vcd->tracks_sector[i+1];
+        area[i]->i_start = p_vcd->tracks_sector[i];
+        area[i]->i_size = p_vcd->tracks_sector[i+1] - p_vcd->tracks_sector[i];
 
         /* Number of chapters */
         area[i]->i_part_nb = 0;   // will be the entry points
@@ -330,7 +330,7 @@ static void VCDInit( input_thread_t * p_input )
         area[i]->i_angle_nb = 1; // no angle support in VCDs
         area[i]->i_angle = 1;
 
-        area[i]->i_plugin_data = p_vcd->tracks_sector[i+1];
+        area[i]->i_plugin_data = p_vcd->tracks_sector[i];
     }   
 #undef area
 
@@ -338,7 +338,7 @@ static void VCDInit( input_thread_t * p_input )
     i_title = main_GetIntVariable( INPUT_TITLE_VAR, 1 );
     if( i_title <= 0)
     {
-        i_title = 2;
+        i_title = 1;
     }
     
     // p_vcd->current_track = i_title-1 ;
@@ -434,14 +434,14 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
     {
         /* Reset the Chapter position of the old title */
         p_input->stream.p_selected_area->i_part = 0;
+        p_input->stream.p_selected_area->i_tell = 0;
         
         /* Change the default area */
-        p_input->stream.p_selected_area =
-                    p_input->stream.pp_areas[p_area->i_id];
+        p_input->stream.p_selected_area = p_area;
 
         /* Change the current track */
         /* The first track is not a valid one  */
-        p_vcd->current_track = p_area->i_id + 1 ;
+        p_vcd->current_track = p_area->i_id ;
         p_vcd->current_sector = p_vcd->tracks_sector[p_vcd->current_track] ;
     }
     /* warn interface that something has changed */
@@ -616,9 +616,6 @@ static int VCDRead( input_thread_t * p_input,
     }
 
 
-
-
-
     
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -635,8 +632,8 @@ static int VCDRead( input_thread_t * p_input,
     }*/
 
     
-    b_eof = p_vcd->b_end_of_track && 
-            ( ( p_vcd->current_track + 1 ) >= p_vcd->nb_tracks );
+    b_eof = p_vcd->b_end_of_track; 
+        /*FIXME&& ( ( p_vcd->current_track ) >= p_vcd->nb_tracks - 1);*/
 
     if( b_eof )
     {
@@ -647,9 +644,9 @@ static int VCDRead( input_thread_t * p_input,
     if( p_vcd->b_end_of_track )
     {
         intf_WarnMsg( 4, "vcd info: new title" );
-        p_vcd->current_track++;
         p_vcd->b_end_of_track = 0;
-        VCDSetArea( p_input, p_input->stream.pp_areas[p_vcd->current_track] );
+        VCDSetArea( p_input, p_input->stream.pp_areas[
+                     p_input->stream.p_selected_area->i_id + 1] );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         return 0;
     }
