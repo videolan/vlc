@@ -55,7 +55,7 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
-	.png .gpgerror .gcrypt .gnutls
+	.png .gpgerror .gcrypt .gnutls .daap
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
@@ -1060,6 +1060,26 @@ CLEAN_FILE += .gnutls
 CLEAN_PKG += gnutls
 DISCLEAN_PKG += gnutls-$(GNUTLS_VERSION).tar.bz2
 
+# ***************************************************************************
+# libopendaap
+# ***************************************************************************
+
+libopendaap-$(DAAP_VERSION).tar.bz2:
+	$(WGET) $(DAAP_URL)
+
+libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+	patch -p 0 < Patches/daap.patch
+
+.daap: libopendaap
+	(cd $<; ./configure --prefix=$(PREFIX) && make install )
+	touch $@
+
+CLEAN_FILE += .daap
+CLEAN_PKG += libopendaap
+DISCLEAN_PKG += libopendaap-$(DAAP_VERSION).tar.bz2
+
+# ***************************************************************************
 # ***************************************************************************
 # Some cleansing
 # ***************************************************************************

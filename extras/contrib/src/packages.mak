@@ -117,4 +117,6 @@ GCRYPT_VERSION=1.2.0
 GCRYPT_URL=$(VIDEOLAN)/testing/contrib/libgcrypt-$(GCRYPT_VERSION).tar.gz
 GNUTLS_VERSION=1.1.22
 GNUTLS_URL=$(VIDEOLAN)/testing/contrib/gnutls-$(GNUTLS_VERSION).tar.bz2
+DAAP_VERSION=0.3.0
+DAAP_URL=http://crazney.net/programs/itunes/files/libopendaap-$(DAAP_VERSION).tar.bz2
 
