@@ -991,7 +991,6 @@ int VLC_AddTarget( int i_object, char const *psz_target,
  *****************************************************************************/
 int VLC_Play( int i_object )
 {
-    int i_err;
     playlist_t * p_playlist;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
@@ -1009,11 +1008,11 @@ int VLC_Play( int i_object )
         return VLC_ENOOBJ;
     }
 
-    i_err = playlist_Play( p_playlist );
+    playlist_Play( p_playlist );
     vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
-    return i_err;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1021,7 +1020,6 @@ int VLC_Play( int i_object )
  *****************************************************************************/
 int VLC_Pause( int i_object )
 {
-    int i_err;
     playlist_t * p_playlist;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
@@ -1039,11 +1037,11 @@ int VLC_Pause( int i_object )
         return VLC_ENOOBJ;
     }
 
-    i_err = playlist_Pause( p_playlist );
+    playlist_Pause( p_playlist );
     vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
-    return i_err;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1051,7 +1049,6 @@ int VLC_Pause( int i_object )
  *****************************************************************************/
 int VLC_Stop( int i_object )
 {
-    int i_err;
     playlist_t * p_playlist;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
@@ -1069,11 +1066,11 @@ int VLC_Stop( int i_object )
         return VLC_ENOOBJ;
     }
 
-    i_err = playlist_Stop( p_playlist );
+    playlist_Stop( p_playlist );
     vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
-    return i_err;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
