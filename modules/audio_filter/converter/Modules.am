@@ -11,3 +11,4 @@ SOURCES_s16tofloat32swab = modules/audio_filter/converter/s16tofloat32swab.c
 SOURCES_s8tofloat32 = modules/audio_filter/converter/s8tofloat32.c
 SOURCES_u8tofixed32 = modules/audio_filter/converter/u8tofixed32.c
 SOURCES_u8tofloat32 = modules/audio_filter/converter/u8tofloat32.c
+SOURCES_mpgatofixed32 = modules/audio_filter/converter/mpgatofixed32.c

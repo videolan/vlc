@@ -25,6 +25,7 @@ modules/audio_filter/converter/float32tou16.c
 modules/audio_filter/converter/float32tou8.c
 modules/audio_filter/converter/s16tofloat32.c
 modules/audio_filter/converter/a52tofloat32.c
+modules/audio_filter/converter/mpgatofixed32.c
 modules/audio_filter/converter/s16tofloat32swab.c
 modules/audio_filter/resampler/trivial.c
 modules/audio_filter/resampler/ugly.c
@@ -55,8 +56,7 @@ modules/codec/faad/decoder.c
 modules/codec/ffmpeg/ffmpeg.c
 modules/codec/ffmpeg/postprocessing/postprocessing.c
 modules/codec/lpcm.c
-modules/codec/mad/decoder.c
-modules/codec/mpeg_audio/decoder.c
+modules/codec/mpeg_audio.c
 modules/codec/mpeg_video/idct/idct.c
 modules/codec/mpeg_video/idct/idctaltivec.c
 modules/codec/mpeg_video/idct/idctclassic.c

@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.20 2002/12/28 02:02:18 massiot Exp $
+ * $Id: a52.c,v 1.21 2003/01/15 10:58:47 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -41,7 +41,7 @@
 #endif
 
 /*****************************************************************************
- * dec_thread_t : A52 pass-through thread descriptor
+ * dec_thread_t : decoder thread descriptor
  *****************************************************************************/
 typedef struct dec_thread_t
 {
@@ -254,7 +254,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 }
 
 /*****************************************************************************
- * EndThread : spdif thread destruction
+ * EndThread : thread destruction
  *****************************************************************************/
 static void EndThread( dec_thread_t * p_dec )
 {
@@ -268,7 +268,7 @@ static void EndThread( dec_thread_t * p_dec )
 }
 
 /*****************************************************************************
- * SyncInfo: parse A52 sync info
+ * SyncInfo: parse A/52 sync info
  *****************************************************************************
  * This code is borrowed from liba52 by Aaron Holtzman & Michel Lespinasse,
  * since we don't want to oblige S/PDIF people to use liba52 just to get

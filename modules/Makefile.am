@@ -22,8 +22,6 @@ EXTRA_DIST = \
 	codec/faad/Modules.am \
 	codec/ffmpeg/Modules.am \
 	codec/ffmpeg/postprocessing/Modules.am \
-	codec/mad/Modules.am \
-	codec/mpeg_audio/Modules.am \
 	codec/mpeg_video/Modules.am \
 	codec/mpeg_video/idct/Modules.am \
 	codec/mpeg_video/motion/Modules.am \

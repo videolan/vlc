@@ -1375,8 +1375,8 @@ then
     [    --with-mad=PATH       path to libmad],[],[])
   if test "x${with_mad}" != "xno" -a "x${with_mad}" != "x"
   then
-    CPPFLAGS_mad="${CPPFLAGS_mad} -I${with_mad}/include"
-    LDFLAGS_mad="${LDFLAGS_mad} -L${with_mad}/lib"
+    CPPFLAGS_mad="${CPPFLAGS_mpgatofixed32} -I${with_mad}/include"
+    LDFLAGS_mad="${LDFLAGS_mpgatofixed32} -L${with_mad}/lib"
   fi
 
   AC_ARG_WITH(mad-tree,
@@ -1395,12 +1395,12 @@ then
     if test -f ${real_mad_tree}/libmad/mad.h
     then
       AC_MSG_RESULT(yes)
-      CPPFLAGS_mad="${CPPFLAGS_mad} -I${real_mad_tree}/libmad"
-      LDFLAGS_mad="${LDFLAGS_mad} -L${real_mad_tree}/libmad/.libs"
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_mad}"
+      CPPFLAGS_mad="${CPPFLAGS_mpgatofixed32} -I${real_mad_tree}/libmad"
+      LDFLAGS_mad="${LDFLAGS_mpgatofixed32} -L${real_mad_tree}/libmad/.libs"
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_mpgatofixed32}"
       AC_CHECK_LIB(mad, mad_bit_init, [
-        BUILTINS="${BUILTINS} mad"
-        LDFLAGS_mad="${LDFLAGS_mad} -lmad"
+        BUILTINS="${BUILTINS} mpgatofixed32"
+        LDFLAGS_mpgatofixed32="${LDFLAGS_mpgatofixed32} -lmad"
         ],[ AC_MSG_ERROR([the specified tree hasn't been compiled ])
       ],[])
       LDFLAGS="${LDFLAGS_save}"
@@ -1409,13 +1409,13 @@ then
       AC_MSG_ERROR([the specified tree doesn't have mad.h])
     fi
   else
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mad}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_mad}"
+    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mpgatofixed32}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_mpgatofixed32}"
     AC_CHECK_HEADERS(mad.h, ,
       [ AC_MSG_ERROR([Cannot find development headers for libmad...]) ])
     AC_CHECK_LIB(mad, mad_bit_init, [
-      PLUGINS="${PLUGINS} mad"
-      LDFLAGS_mad="${LDFLAGS_mad} -lmad" ],
+      PLUGINS="${PLUGINS} mpgatofixed32"
+      LDFLAGS_mpgatofixed32="${LDFLAGS_mpgatofixed32} -lmad" ],
       [ AC_MSG_ERROR([Cannot find libmad library...]) ])
     CPPFLAGS="${CPPFLAGS_save}"
     LDFLAGS="${LDFLAGS_save}"

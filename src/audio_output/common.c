@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.12 2002/12/25 02:23:37 massiot Exp $
+ * $Id: common.c,v 1.13 2003/01/15 10:58:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -138,6 +138,8 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
     case VLC_FOURCC('s','p','d','i'):
     case VLC_FOURCC('a','5','2',' '):
     case VLC_FOURCC('d','t','s',' '):
+    case VLC_FOURCC('m','p','g','a'):
+    case VLC_FOURCC('m','p','g','3'):
     default:
         /* For these formats the caller has to indicate the parameters
          * by hand. */
@@ -234,9 +236,10 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
 void aout_FormatPrint( aout_instance_t * p_aout, const char * psz_text,
                        const audio_sample_format_t * p_format )
 {
-    msg_Dbg( p_aout, "%s format='%4.4s' rate=%d channels=%s", psz_text,
+    msg_Dbg( p_aout, "%s '%4.4s' %d Hz %s frame=%d samples/%d bytes", psz_text,
              (char *)&p_format->i_format, p_format->i_rate,
-             aout_FormatPrintChannels( p_format ) );
+             aout_FormatPrintChannels( p_format ),
+             p_format->i_frame_length, p_format->i_bytes_per_frame );
 }
 
 /*****************************************************************************
@@ -246,7 +249,7 @@ void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text,
                         const audio_sample_format_t * p_format1,
                         const audio_sample_format_t * p_format2 )
 {
-    msg_Dbg( p_aout, "%s format='%4.4s'->'%4.4s' rate=%d->%d channels=%s->%s",
+    msg_Dbg( p_aout, "%s '%4.4s'->'%4.4s' %d Hz->%d Hz %s->%s",
              psz_text,
              (char *)&p_format1->i_format, (char *)&p_format2->i_format,
              p_format1->i_rate, p_format2->i_rate,
