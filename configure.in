@@ -765,9 +765,12 @@ AC_ARG_ENABLE(satellite,
     fi])
 
 dnl
-dnl  ipv6 plugin
+dnl  ipv6 plugin - not for QNX yet
 dnl
-AC_CHECK_FUNC(inet_pton,[PLUGINS="${PLUGINS} ipv6"])
+if test x$SYS != xnto
+then
+  AC_CHECK_FUNC(inet_pton,[PLUGINS="${PLUGINS} ipv6"])
+fi
 
 dnl
 dnl  AVI demux plugin

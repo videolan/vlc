@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.11 2002/04/23 14:16:20 sam Exp $
+ * $Id: ipv4.c,v 1.12 2002/05/04 15:49:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -46,7 +46,7 @@
 #   ifndef IN_MULTICAST
 #       define IN_MULTICAST(a) IN_CLASSD(a)
 #   endif
-#elif !defined( SYS_NTO )
+#else
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
 #   include <netinet/in.h>
