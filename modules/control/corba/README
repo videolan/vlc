@@ -1,0 +1,64 @@
+$Id: README,v 1.1 2003/07/07 16:59:00 sam Exp $
+* Module (server) side
+** Dependencies
+
+To compile the CORBA plugin, you need the orbit2 developpement files
+(for Debian, install the package liborbi2-dev)
+
+** How to run it ?
+
+You run the CORBA module  with the following command line :
+
+vlc --intf corba
+
+The CORBA module is initialized and saves its IOR into the file
+/tmp/vlc-ior.ref
+
+
+* Client side
+
+A sample client application is provided, using python-orbit
+
+**  Dependencies
+
+The python client uses the pyorbit library developped by James
+Henstridge <james at daa dot com dot au> (source:
+http://ftp.gnome.org/pub/GNOME/sources/pyorbit/1.99/pyorbit-1.99.3.tar.gz).
+
+To interoperate with gtk, the original pyorbit-1.99.3 needs a patch to
+implement the bindings to OR_work_pending and ORB_perform_work (see
+pyorbit-1.99.3.patch)
+
+The gtk simpleplayer example uses the python-glade module by James
+Henstridge.
+
+** Typelib information
+
+To simply access the server, you do not need any reference to the IDL
+(CORBA2.0 provides introspection facilities). However, if you want to
+use the structures defined in the IDL (Position, Origin, ...), you
+need to use the IDL information, and compile a dynamic lib
+(MediaControl.so) from the IDL.
+
+To build the library, you can use the Makefile :
+
+make corba-generate-typelib
+
+which will generate MediaControl.so
+
+* Interesting pointers 
+
+- GLib reference manual
+http://developer.gnome.org/doc/API/glib/
+
+- IDL quickref :
+http://www.cs.rpi.edu/~musser/dsc/idl/idl-overview.html
+
+- Python-Bonobo
+http://www.pycage.de/howto_bonobo.html
+
+* How to add the module to the original sources (vlc-0.5.x) :
+- copy the directory modules/control/corba
+- add configuration lines relative to corba in configure.ac.in
+- add a reference to  control/corba/Modules.am in
+  modules/Makefile.am

@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.40 2003/06/27 13:38:54 sam Exp $
+ * $Id: playlist.c,v 1.41 2003/07/07 16:59:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -412,6 +412,7 @@ void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
         p_playlist->i_status = PLAYLIST_RUNNING;
         if( p_playlist->p_input )
         {
+            PlayItem( p_playlist );
             input_SetStatus( p_playlist->p_input, INPUT_STATUS_PLAY );
         }
         break;

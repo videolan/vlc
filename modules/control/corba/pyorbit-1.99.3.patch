@@ -1,0 +1,48 @@
+--- pyorbit-1.99.3/src/pycorba-orb.c    2002-11-16 07:51:41.000000000 +0100
++++ pyorbit-1.99.3-modif/src/pycorba-orb.c      2003-01-22 14:43:30.000000000 +0100
+@@ -154,6 +154,36 @@
+     return Py_None;
+ }
+ 
++static PyObject *
++pycorba_orb_work_pending(PyCORBA_ORB *self)
++{
++    CORBA_boolean ret;
++    CORBA_Environment ev;
++    PyObject *py_ret;
++
++    CORBA_exception_init(&ev);
++    ret = CORBA_ORB_work_pending (self->orb, &ev);
++
++    if (pyorbit_check_ex(&ev))
++        return NULL;
++    py_ret = ret ? Py_True : Py_False;
++    Py_INCREF(py_ret);
++    return py_ret;
++}
++
++static PyObject *
++pycorba_orb_perform_work (PyCORBA_ORB *self)
++{
++    CORBA_Environment ev;
++
++    CORBA_exception_init(&ev);
++    CORBA_ORB_perform_work (self->orb, &ev);
++    if (pyorbit_check_ex(&ev))
++       return NULL;
++    Py_INCREF(Py_None);
++    return Py_None;
++}
++
+ static PyMethodDef pycorba_orb_methods[] = {
+     { "object_to_string", (PyCFunction)pycorba_orb_object_to_string, METH_VARARGS },
+     { "string_to_object", (PyCFunction)pycorba_orb_string_to_object, METH_VARARGS },
+@@ -161,6 +191,8 @@
+     { "resolve_initial_references", (PyCFunction)pycorba_orb_resolve_initial_references, METH_VARARGS },
+     { "run", (PyCFunction)pycorba_orb_run, METH_NOARGS },
+     { "shutdown", (PyCFunction)pycorba_orb_shutdown, METH_VARARGS },
++    { "work_pending", (PyCFunction)pycorba_orb_work_pending, METH_VARARGS },
++    { "perform_work", (PyCFunction)pycorba_orb_perform_work, METH_VARARGS },
+     { NULL, NULL, 0 }
+ };
+ 

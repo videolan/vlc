@@ -1,0 +1,25 @@
+## corba module declaration
+
+SOURCES_corba = corba.c
+
+nodist_SOURCES_corba = \
+	mediacontrol-common.c \
+	mediacontrol-skels.c \
+	mediacontrol.h \
+	$(NULL)
+
+ORBITIDL = orbit-idl-2
+
+mediacontrol-common.c mediacontrol-skels.c mediacontrol-stubs.c mediacontrol.h:
+	$(ORBITIDL) --skeleton-impl mediacontrol.idl
+
+mediacontrol-imodule.c:
+	$(ORBITIDL) --imodule mediacontrol.idl
+
+mediacontrol.so: mediacontrol-imodule.c
+	gcc -fPIC -o mediacontrol-imodule.o -c mediacontrol-imodule.c `pkg-config --cflags ORBit-2.0`
+	gcc -shared -o $@ mediacontrol-imodule.o `pkg-config --libs ORBit-2.0`
+
+clean:
+	rm -f mediacontrol-stubs.c mediacontrol-imodule.c mediacontrol-skelimpl.c
+

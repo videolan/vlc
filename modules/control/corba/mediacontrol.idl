@@ -1,0 +1,55 @@
+/* Cf
+   http://www.cs.rpi.edu/~musser/dsc/idl/idl-overview.html
+   pour une intro à la syntaxe */
+
+module VLC {
+   enum PositionOrigin {
+   	AbsolutePosition, RelativePosition, ModuloPosition
+   };
+   
+   enum PositionKey {
+   	ByteCount, SampleCount, MediaTime
+   };
+   
+   struct Position {
+   	PositionOrigin origin;
+   	PositionKey key;
+   	long value;
+   };
+   
+   exception PositionKeyNotSupported { PositionKey key;};
+   exception InvalidPosition { PositionKey key;};
+
+  typedef sequence<string> PlaylistSeq; 
+
+   // MediaControl interface is similar to
+   // ControlledStream interface in MSS.
+   // It can be inherited by flow endpoints or
+   // FlowConnection interfaces.
+  interface MediaControl
+  {
+    
+    exception PositionKeyNotSupported { PositionKey key;};
+    
+    Position get_media_position(
+				in PositionOrigin an_origin,
+				in PositionKey a_key)
+      raises (PositionKeyNotSupported);
+    
+    void set_media_position(in Position a_position)
+      raises (PositionKeyNotSupported, InvalidPosition);
+     
+    void start(in Position a_position)
+      raises(InvalidPosition);
+    void pause(in Position a_position)
+      raises(InvalidPosition);
+    void resume(in Position a_position)
+      raises(InvalidPosition);
+    void stop(in Position a_position)
+      raises(InvalidPosition);
+    void exit (); // Exits the player (not in the original spec)
+    void add_to_playlist (in string a_file);
+    // Returns the list of files in playlist
+    PlaylistSeq get_playlist ();
+  };
+};
