@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.36 2003/12/14 21:03:27 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.37 2004/01/15 00:05:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -28,6 +28,10 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
+
+#ifdef HAVE_LOCALE_H
+#   include <locale.h>
+#endif
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
