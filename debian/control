@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), xlib6g-dev, libgnome-dev, libggi2-dev, libglide-dev [i386], libesd0-dev, libsdl1.1-dev, libasound1-dev, libqt-dev
+Build-Depends: debhelper (>=2.2.0), xlib6g-dev, libgnome-dev, libggi2-dev, libglide-dev [i386], libesd0-dev, libsdl1.1-dev, libqt-dev
 Standards-Version: 3.0.1
 
 Package: vlc
@@ -42,15 +42,6 @@ Description: Esound plugin for the VideoLAN Client
  VideoLAN is a free MPEG, MPEG2 and DVD software solution.
  .
  This plugin adds support for the Enlightened Sound Daemon to
- the VideoLAN Client.
-
-Package: vlc-alsa
-Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: ALSA plugin for the VideoLAN Client
- VideoLAN is a free MPEG, MPEG2 and DVD software solution.
- .
- This plugin adds support for the Advanced Linux Sound Architecture to
  the VideoLAN Client.
 
 Package: vlc-sdl
