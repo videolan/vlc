@@ -2,7 +2,7 @@
  * dts.c : raw DTS stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dts.c,v 1.4 2004/02/04 08:11:49 gbazin Exp $
+ * $Id: dts.c,v 1.5 2004/02/05 22:56:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -38,6 +38,8 @@ static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
 static int  Demux ( input_thread_t * );
 
+static int Control( input_thread_t *, int, va_list );
+
 struct demux_sys_t
 {
     vlc_bool_t  b_start;
@@ -45,6 +47,8 @@ struct demux_sys_t
 
     /* Packetizer */
     decoder_t *p_packetizer;
+
+    int i_mux_rate;
 };
 
 /*****************************************************************************
@@ -103,7 +107,7 @@ static int Open( vlc_object_t * p_this )
     int            i_peek = 0;
 
     p_input->pf_demux = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
+    p_input->pf_demux_control = Control;
     p_input->pf_rewind = NULL;
 
     /* Check if we are dealing with a WAV file */
@@ -163,6 +167,7 @@ static int Open( vlc_object_t * p_this )
 
     p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->b_start = VLC_TRUE;
+    p_sys->i_mux_rate = 0;
 
     /*
      * Load the DTS packetizer
@@ -251,6 +256,12 @@ static int Demux( input_thread_t * p_input )
         {
             block_t *p_next = p_block_out->p_next;
 
+            /* We assume a constant bitrate */
+            if( p_block_out->i_length )
+            p_sys->i_mux_rate =
+                p_block_out->i_buffer * I64C(1000000) / p_block_out->i_length;
+            p_input->stream.i_mux_rate = p_sys->i_mux_rate / 50;
+
             input_ClockManageRef( p_input,
                                   p_input->stream.p_selected_program,
                                   p_block_out->i_pts * 9 / 100 );
@@ -267,4 +278,41 @@ static int Demux( input_thread_t * p_input )
     }
 
     return 1;
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( input_thread_t *p_input, int i_query, va_list args )
+{
+    demux_sys_t *p_sys  = (demux_sys_t *)p_input->p_demux_data;
+    int64_t *pi64;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->i_mux_rate > 0 )
+            {
+                *pi64 = I64C(1000000) * stream_Tell( p_input->s ) /
+                        p_sys->i_mux_rate;
+                return VLC_SUCCESS;
+            }
+            *pi64 = 0;
+            return VLC_EGENERIC;
+
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->i_mux_rate > 0 )
+            {
+                *pi64 = I64C(1000000) * stream_Size( p_input->s ) /
+                        p_sys->i_mux_rate;
+                return VLC_SUCCESS;
+            }
+            *pi64 = 0;
+            return VLC_EGENERIC;
+
+        default:
+            return demux_vaControlDefault( p_input, i_query, args );
+    }
 }

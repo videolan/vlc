@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: directx.c,v 1.34 2004/01/26 16:45:02 zorglub Exp $
+ * $Id: directx.c,v 1.35 2004/02/05 22:56:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -138,6 +138,7 @@ vlc_module_begin();
     add_string( "directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                 VLC_TRUE );
         change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback );
+        change_action_add( FindDevicesCallback, N_("Refresh list") );
 
     set_description( _("DirectX video output") );
     set_capability( "video output", 100 );

@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: wav.c,v 1.11 2003/11/21 00:38:01 gbazin Exp $
+ * $Id: wav.c,v 1.12 2004/02/05 22:56:11 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -34,9 +34,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-
-static int  Open    ( vlc_object_t * );
-static void Close  ( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("WAV demuxer") );
@@ -47,8 +46,7 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-
-static int  Demux       ( input_thread_t * );
+static int Demux( input_thread_t * );
 
 struct demux_sys_t
 {
@@ -62,7 +60,6 @@ struct demux_sys_t
     unsigned int    i_frame_size;
     mtime_t         i_frame_length;
 };
-
 
 /*****************************************************************************
  * Declaration of local function
@@ -133,7 +130,8 @@ static int Open( vlc_object_t * p_this )
     }
 
     es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
-    wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_sys->fmt.i_codec, &psz_name );
+    wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_sys->fmt.i_codec,
+                      &psz_name );
     p_sys->fmt.audio.i_channels = GetWLE ( &p_wf->nChannels );
     p_sys->fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
     p_sys->fmt.audio.i_blockalign = GetWLE ( &p_wf->nBlockAlign );
@@ -147,41 +145,44 @@ static int Open( vlc_object_t * p_this )
         memcpy( p_sys->fmt.p_extra, &p_wf[1], p_sys->fmt.i_extra );
     }
 
-    msg_Dbg( p_input, "format:0x%4.4x channels:%d %dHz %dKo/s blockalign:%d bits/samples:%d extra size:%d",
-            GetWLE( &p_wf->wFormatTag ),
-            p_sys->fmt.audio.i_channels,
-            p_sys->fmt.audio.i_rate,
-            p_sys->fmt.i_bitrate / 8 / 1024,
-            p_sys->fmt.audio.i_blockalign,
-            p_sys->fmt.audio.i_bitspersample,
-            p_sys->fmt.i_extra );
+    msg_Dbg( p_input, "format:0x%4.4x channels:%d %dHz %dKo/s "
+             "blockalign:%d bits/samples:%d extra size:%d",
+             GetWLE( &p_wf->wFormatTag ), p_sys->fmt.audio.i_channels,
+             p_sys->fmt.audio.i_rate, p_sys->fmt.i_bitrate / 8 / 1024,
+             p_sys->fmt.audio.i_blockalign, p_sys->fmt.audio.i_bitspersample,
+             p_sys->fmt.i_extra );
+
     free( p_wf );
 
     switch( p_sys->fmt.i_codec )
     {
-        case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
-        case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
-        case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
-            FrameInfo_PCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
-            break;
-        case VLC_FOURCC( 'm', 's', 0x00, 0x02 ):
-            FrameInfo_MS_ADPCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
-            break;
-        case VLC_FOURCC( 'm', 's', 0x00, 0x11 ):
-            FrameInfo_IMA_ADPCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
-            break;
-        case VLC_FOURCC( 'm', 's', 0x00, 0x61 ):
-        case VLC_FOURCC( 'm', 's', 0x00, 0x62 ):
-            /* FIXME not sure at all FIXME */
-            FrameInfo_MS_ADPCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
-            break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
-        case VLC_FOURCC( 'a', '5', '2', ' ' ):
-            /* FIXME set end of area FIXME */
-            goto relay;
-        default:
-            msg_Err( p_input, "unsupported codec (%4.4s)", (char*)&p_sys->fmt.i_codec );
-            goto error;
+    case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
+    case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
+    case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
+        FrameInfo_PCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
+        break;
+    case VLC_FOURCC( 'm', 's', 0x00, 0x02 ):
+        FrameInfo_MS_ADPCM( p_input, &p_sys->i_frame_size,
+                            &p_sys->i_frame_length );
+        break;
+    case VLC_FOURCC( 'm', 's', 0x00, 0x11 ):
+        FrameInfo_IMA_ADPCM( p_input, &p_sys->i_frame_size,
+                             &p_sys->i_frame_length );
+        break;
+    case VLC_FOURCC( 'm', 's', 0x00, 0x61 ):
+    case VLC_FOURCC( 'm', 's', 0x00, 0x62 ):
+        /* FIXME not sure at all FIXME */
+        FrameInfo_MS_ADPCM( p_input, &p_sys->i_frame_size,
+                            &p_sys->i_frame_length );
+        break;
+    case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+    case VLC_FOURCC( 'a', '5', '2', ' ' ):
+        /* FIXME set end of area FIXME */
+        goto relay;
+    default:
+        msg_Err( p_input, "unsupported codec (%4.4s)",
+                 (char*)&p_sys->fmt.i_codec );
+        goto error;
     }
 
     msg_Dbg( p_input, "found %s audio format", psz_name );
@@ -196,7 +197,7 @@ static int Open( vlc_object_t * p_this )
 
     stream_Read( p_input->s, NULL, 8 );   /* cannot fail */
 
-    /*  create one program */
+    /* Create one program */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
     {
@@ -204,11 +205,16 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "cannot init stream" );
         goto error;
     }
+
     p_input->stream.i_mux_rate = 0;
-    if( p_sys->i_data_size > 0 )
+    if( p_sys->fmt.i_bitrate )
+    {
+        p_input->stream.i_mux_rate = p_sys->fmt.i_bitrate / 50 / 8;
+    }
+    else if( p_sys->i_data_size > 0 )
     {
         p_input->stream.i_mux_rate = (mtime_t)p_sys->i_frame_size *
-                                     (mtime_t)1000000 / 50 / p_sys->i_frame_length;
+            (mtime_t)1000000 / 50 / p_sys->i_frame_length;
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -228,25 +234,28 @@ relay:
  *****************************************************************************/
 static int Demux( input_thread_t *p_input )
 {
-    demux_sys_t  *p_sys = p_input->p_demux_data;
-    int64_t      i_pos;
-    block_t      *p_block;
+    demux_sys_t *p_sys = p_input->p_demux_data;
+    int64_t     i_pos;
+    block_t     *p_block;
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
         i_pos = stream_Tell( p_input->s );
-        if( p_sys->fmt.audio.i_blockalign != 0 )
+        if( p_sys->fmt.audio.i_blockalign != 0 &&
+            i_pos % p_sys->fmt.audio.i_blockalign )
         {
-            i_pos += p_sys->fmt.audio.i_blockalign - i_pos % p_sys->fmt.audio.i_blockalign;
-            if( stream_Seek( p_input->s, i_pos ) )
+            i_pos = p_sys->fmt.audio.i_blockalign -
+                i_pos % p_sys->fmt.audio.i_blockalign;
+
+            /* Skip some data to realign the stream */
+            if( stream_Read( p_input->s, NULL, i_pos ) != i_pos )
             {
                 msg_Err( p_input, "stream_Sekk failed (cannot resync)" );
             }
         }
     }
 
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
+    input_ClockManageRef( p_input, p_input->stream.p_selected_program,
                           p_sys->i_time * 9 / 100 );
 
     i_pos = stream_Tell( p_input->s );
@@ -265,14 +274,14 @@ static int Demux( input_thread_t *p_input )
     }
     p_block->i_dts =
     p_block->i_pts = input_ClockGetTS( p_input,
-                                     p_input->stream.p_selected_program,
-                                     p_sys->i_time * 9 / 100 );
+                                       p_input->stream.p_selected_program,
+                                       p_sys->i_time * 9 / 100 );
 
     es_out_Send( p_input->p_es_out, p_sys->p_es, p_block );
 
     p_sys->i_time += p_sys->i_frame_length;
 
-    return( 1 );
+    return 1;
 }
 
 /*****************************************************************************
@@ -286,14 +295,13 @@ static void Close ( vlc_object_t * p_this )
     free( p_sys );
 }
 
-
 /*****************************************************************************
  * Local functions
  *****************************************************************************/
 static int ChunkFind( input_thread_t *p_input,
                       char *fcc, unsigned int *pi_size )
 {
-    uint8_t     *p_peek;
+    uint8_t *p_peek;
 
     for( ;; )
     {
@@ -345,7 +353,8 @@ static void FrameInfo_PCM( input_thread_t *p_input,
                  (mtime_t)i_samples /
                  (mtime_t)p_sys->fmt.audio.i_rate;
 
-    i_bytes = i_samples * p_sys->fmt.audio.i_channels * ( (p_sys->fmt.audio.i_bitspersample + 7) / 8 );
+    i_bytes = i_samples * p_sys->fmt.audio.i_channels *
+        ( (p_sys->fmt.audio.i_bitspersample + 7) / 8 );
 
     if( p_sys->fmt.audio.i_blockalign > 0 )
     {
@@ -354,42 +363,40 @@ static void FrameInfo_PCM( input_thread_t *p_input,
             i_bytes += p_sys->fmt.audio.i_blockalign - i_modulo;
         }
     }
+
     *pi_size = i_bytes;
 }
 
 static void FrameInfo_MS_ADPCM( input_thread_t *p_input,
-                              unsigned int   *pi_size,
-                              mtime_t        *pi_length )
+                                unsigned int   *pi_size,
+                                mtime_t        *pi_length )
 {
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_input->p_demux_data;
 
     int i_samples;
 
     i_samples = 2 + 2 * ( p_sys->fmt.audio.i_blockalign -
-                                7 * p_sys->fmt.audio.i_channels ) / p_sys->fmt.audio.i_channels;
+        7 * p_sys->fmt.audio.i_channels ) / p_sys->fmt.audio.i_channels;
 
-    *pi_length = (mtime_t)1000000 *
-                 (mtime_t)i_samples /
+    *pi_length = (mtime_t)1000000 * (mtime_t)i_samples /
                  (mtime_t)p_sys->fmt.audio.i_rate;
 
     *pi_size = p_sys->fmt.audio.i_blockalign;
 }
 
 static void FrameInfo_IMA_ADPCM( input_thread_t *p_input,
-                               unsigned int   *pi_size,
-                               mtime_t        *pi_length )
+                                 unsigned int   *pi_size,
+                                 mtime_t        *pi_length )
 {
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_input->p_demux_data;
 
     int i_samples;
 
     i_samples = 2 * ( p_sys->fmt.audio.i_blockalign -
-                        4 * p_sys->fmt.audio.i_channels ) / p_sys->fmt.audio.i_channels;
+        4 * p_sys->fmt.audio.i_channels ) / p_sys->fmt.audio.i_channels;
 
-    *pi_length = (mtime_t)1000000 *
-                 (mtime_t)i_samples /
+    *pi_length = (mtime_t)1000000 * (mtime_t)i_samples /
                  (mtime_t)p_sys->fmt.audio.i_rate;
 
     *pi_size = p_sys->fmt.audio.i_blockalign;
 }
-

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.169 2004/02/03 12:49:53 sigmunau Exp $
+dnl $Id: configure.ac,v 1.170 2004/02/05 22:56:12 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -377,7 +377,7 @@ AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 if test "${SYS}" != "mingw32"; then
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(m,cos,[
-  AX_ADD_LDFLAGS([adjust distort a52tofloat32],[-lm])
+  AX_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
   AX_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad vlc],[-lm])
@@ -1993,7 +1993,7 @@ AC_CHECK_HEADERS(libtar.h, [
 
 
 dnl
-dnl  a52 AC3 decoder plugin
+dnl A52/AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
   [  --enable-a52            A/52 support with liba52 (default enabled)])
@@ -2059,6 +2059,62 @@ then
     ])
     CPPFLAGS="${CPPFLAGS_save}"
     LDFLAGS="${LDFLAGS_save}"
+  fi
+fi
+
+dnl
+dnl DTS Coherent Acoustics decoder plugin
+dnl
+AC_ARG_ENABLE(dts,
+  [  --enable-dts            DTS Coherent Acoustics support with libdts (default enabled)])
+if test "${enable_dts}" != "no"; then
+  AC_ARG_WITH(dts-tree,
+    [    --with-dts-tree=PATH  dtsdec tree for static linking ],[],[])
+  if test "${with_dts_tree}" != "no" -a -n "${with_dts_tree}"
+  then
+    real_dts_tree="`cd ${with_dts_tree} 2>/dev/null && pwd`"
+    if test -z "${real_dts_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${with_dts_tree} directory doesn't exist])
+    fi
+    dnl  Use a custom dtsdec
+    AC_MSG_CHECKING(for dts.h in ${real_dts_tree}/include)
+    if test -f ${real_dts_tree}/include/dts.h
+    then
+      AC_MSG_RESULT(yes)
+      AX_ADD_CPPFLAGS([dtstofloat32],[-I${real_dts_tree}])
+      AX_ADD_LDFLAGS([dtstofloat32],[-L${real_dts_tree}/libdts/.libs])
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_dtstofloat32}"
+      AC_CHECK_LIB(dts, dts_free, [
+        AX_ADD_BUILTINS([dtstofloat32])
+        AX_ADD_CPPFLAGS([dtstofloat32],[-DUSE_DTSDEC_TREE])
+        AX_ADD_LDFLAGS([dtstofloat32],[-ldts])
+        ],[
+        if test -f ${real_dts_tree}/libdts/.libs/libdts.a
+        then
+          AC_MSG_ERROR([make sure you have at least dtsdec-0.1.0])
+        else
+          AC_MSG_ERROR([the specified tree hasn't been compiled])
+        fi
+      ])
+      LDFLAGS="${LDFLAGS_save}"
+    else
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([the specified tree doesn't have dts.h])
+    fi
+  else
+    AC_CHECK_HEADERS(dtsdec/dts.h, [
+      AC_CHECK_LIB(dts, dts_free, [
+        AX_ADD_PLUGINS([dtstofloat32])
+        AX_ADD_LDFLAGS([dtstofloat32],[-ldts])
+      ],[
+        if test "${enable_dts}" = "yes"; then
+          AC_MSG_ERROR([Could not find libdts on your system: you may get it from http://www.videolan.org/dtsdec.])
+        fi
+      ])
+    ])
   fi
 fi
 
