@@ -42,6 +42,7 @@ vlc_module_begin();
     add_shortcut( "access2" );
     add_shortcut( "http" );
     add_shortcut( "ftp" );
+    add_shortcut( "tcp" );
 
     /* Hack */
     //add_shortcut( "file" );
