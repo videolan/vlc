@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.4 2002/10/17 16:56:52 sam Exp $
+ * $Id: events.c,v 1.5 2002/10/17 17:30:10 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -144,7 +144,7 @@ void DirectXEventThread( event_thread_t *p_event )
             break;
 
         case WM_LBUTTONUP:
-            var.b_bool = VLC_TRUE;
+            val.b_bool = VLC_TRUE;
             var_Set( p_event->p_vout, "mouse-clicked", val );
             break;
 
