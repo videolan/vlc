@@ -196,10 +196,16 @@ vcdplayer_play_return( access_t * p_access );
    input: p_vcd->i_lsn, p_vcd->play_item
    changed: p_vcd->origin_lsn, p_vcd->end_lsn
 */
-void vcdplayer_set_origin(access_t * p_access);
+void vcdplayer_set_origin(access_t *p_access, lsn_t i_lsn, track_t i_track,
+                          const vcdinfo_itemid_t *p_itemid);
+
+void vcdplayer_play(access_t *p_access, vcdinfo_itemid_t itemid);
 
 vcdplayer_read_status_t vcdplayer_pbc_nav     ( access_t * p_access );
 vcdplayer_read_status_t vcdplayer_non_pbc_nav ( access_t * p_access );
+
+vcdplayer_read_status_t vcdplayer_read (access_t * p_access_t, 
+                                        uint8_t *p_buf);
 
 #endif /* _VCDPLAYER_H_ */
 /* 
