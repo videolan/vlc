@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.41 2002/11/25 03:12:42 ipkiss Exp $
+ * $Id: vlc_common.h,v 1.42 2002/11/28 23:24:14 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -115,6 +115,10 @@ typedef uint8_t             yuv_data_t;
 
 /* Audio volume */
 typedef uint16_t            audio_volume_t;
+
+#ifndef HAVE_SOCKLEN_T
+typedef int                 socklen_t;
+#endif
 
 /*****************************************************************************
  * Old types definitions

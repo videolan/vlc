@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.71 2002/11/14 22:38:46 massiot Exp $
+ * $Id: audio_output.h,v 1.72 2002/11/28 23:24:14 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -36,13 +36,16 @@ struct audio_sample_format_t
     /* Describes from which original channels, before downmixing, the
      * buffer is derived. */
     u32                 i_original_channels;
-    /* Optional - for A52, SPDIF and DTS types */
+    /* Optional - for A/52, SPDIF and DTS types : */
+    /* Bytes used by one compressed frame, depends on bitrate. */
     unsigned int        i_bytes_per_frame;
+    /* Number of sampleframes contained in one compressed frame. */
     unsigned int        i_frame_length;
     /* Please note that it may be completely arbitrary - buffers are not
      * obliged to contain a integral number of so-called "frames". It's
      * just here for the division :
-     * i_nb_samples * i_bytes_per_frame / i_frame_length */
+     * buffer_size = i_nb_samples * i_bytes_per_frame / i_frame_length
+     */
 };
 
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \

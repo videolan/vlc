@@ -283,7 +283,21 @@ if ${have_nanosleep}; then
   AC_DEFINE(HAVE_NANOSLEEP, 1,
             Define if nanosleep is available.)
 fi
-# HP/UX port
+
+dnl Check for socklen_t
+AC_CACHE_CHECK([for socklen_t], ac_cv_type_socklen_t,
+  [AC_TRY_COMPILE(
+     [#include <sys/types.h>
+      #include <sys/socket.h>],
+     [socklen_t len = 42; return len;],
+     ac_cv_type_socklen_t=yes,
+     ac_cv_type_socklen_t=no)])
+if test x$ac_cv_type_socklen_t != xno; then
+  AC_DEFINE(HAVE_SOCKLEN_T, 1,
+            Define if <sys/socket.h> defines socklen_t.)
+fi
+
+dnl HP/UX port
 AC_CHECK_LIB(rt,sem_init, [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"])
 
 AC_CHECK_FUNC(inet_aton,,[

@@ -3,7 +3,6 @@
 //  
 //
 //  Created by Heiko Panther on Tue Sep 10 2002.
-//  Copyright (c) 2002 __MyCompanyName__. All rights reserved.
 //
 
 #import "asystm.h"

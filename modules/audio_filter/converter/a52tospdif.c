@@ -2,7 +2,7 @@
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: a52tospdif.c,v 1.14 2002/11/20 13:37:35 sam Exp $
+ * $Id: a52tospdif.c,v 1.15 2002/11/28 23:24:14 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -78,42 +78,39 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-#ifdef WORDS_BIGENDIAN
-    static const u8 p_sync[6] = { 0xF8, 0x72, 0x4E, 0x1F, 0x00, 0x01 };
-#else
+    /* It is not entirely clear which endianness the AC3 stream should have.
+     * I have been told endianness does not matter, AC3 can be both endian.
+     * But then, I could not get it to work on Mac OS X and a JVC RX-6000R
+     * decoder without using little endian. So right now, I convert to little
+     * endian.
+     */
+
     static const u8 p_sync[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x01, 0x00 };
-#   ifndef HAVE_SWAB
+#ifndef HAVE_SWAB
     u16 i;
-#   endif
 #endif
     u16 i_length = p_in_buf->i_nb_bytes;
-    u16 * pi_length;
+    u8 * pi_length;
     byte_t * p_in = p_in_buf->p_buffer;
     byte_t * p_out = p_out_buf->p_buffer;
+    byte_t * p_tmp;
 
     /* Copy the S/PDIF headers. */
     memcpy( p_out, p_sync, 6 );
-    pi_length = (u16 *)(p_out + 6);
-    *pi_length = i_length * 8;
+    pi_length = (p_out + 6);
+    *pi_length = (i_length * 8) & 0xff;
+    *(pi_length + 1) = (i_length * 8) >> 8;
 
-    /* FIXME : if i_length is odd, the following code sucks. What should
-     * we do ? --Meuuh */
-
-#ifndef WORDS_BIGENDIAN
-#   ifdef HAVE_SWAB
+#ifdef HAVE_SWAB
     swab( p_in, p_out + 8, i_length );
-#   else
-    p_out += 8;
+#else
+    p_tmp = p_out + 8;
     for ( i = i_length / 2 ; i-- ; )
     {
-        p_out[0] = p_in[1];
-        p_out[1] = p_in[0];
-        p_out += 2; p_in += 2;
+        p_tmp[0] = p_in[1];
+        p_tmp[1] = p_in[0];
+        p_tmp += 2; p_in += 2;
     }
-#   endif
-
-#else
-    p_filter->p_vlc->pf_memcpy( p_out + 8, p_in, i_length );
 #endif
 
     p_filter->p_vlc->pf_memset( p_out + 8 + i_length, 0,
