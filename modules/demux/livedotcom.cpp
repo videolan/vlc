@@ -939,9 +939,9 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
 #endif
     if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') )
     {
-        i_size += 4;        
+        i_size += 4;
     }
-    
+
     if( i_size > 65536 )
     {
         msg_Warn( p_demux, "buffer overflow" );
@@ -950,15 +950,15 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     p_block = block_New( p_demux, i_size );
     if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') )
     {
-        H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->rtpSource;
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1081468800
+        H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->rtpSource;
         uint32_t header = h261Source->lastSpecialHeader();
 #else
         uint32_t header = 0;
         msg_Warn( p_demux, "need livemedia library >= \"2004.04.09\"" );
 #endif
         memcpy( p_block->p_buffer, &header, 4 );
-        memcpy( p_block->p_buffer + 4, tk->buffer, i_size );        
+        memcpy( p_block->p_buffer + 4, tk->buffer, i_size );
     }
     else
     {
@@ -966,7 +966,7 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     }
     if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') &&
         tk->rtpSource->curPacketMarkerBit() )
-    {        
+    {
         p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
     }
     //p_block->i_rate = p_input->stream.control.i_rate;
