@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.37 2002/12/07 23:50:30 massiot Exp $
+ * $Id: oss.c,v 1.38 2002/12/10 18:22:01 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -251,7 +251,7 @@ static int Open( vlc_object_t *p_this )
 
     p_aout->output.pf_play = Play;
 
-    if ( var_Type( p_aout, "audio-device" ) < 0 )
+    if ( var_Type( p_aout, "audio-device" ) == 0 )
     {
         Probe( p_aout );
     }

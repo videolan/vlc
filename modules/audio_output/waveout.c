@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.12 2002/11/20 16:43:33 sam Exp $
+ * $Id: waveout.c,v 1.13 2002/12/10 18:22:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -130,7 +130,7 @@ static int Open( vlc_object_t *p_this )
     if ( OpenWaveOut( p_aout, WAVE_FORMAT_IEEE_FLOAT, i_nb_channels,
                       p_aout->output.output.i_rate ) )
     {
-        msg_Err( p_aout, "Audio device doesn't allow WAVE_FORMAT_IEEE_FLOAT" );
+        msg_Warn( p_aout, "Audio device can't use WAVE_FORMAT_IEEE_FLOAT" );
 
         p_aout->output.output.i_format = VLC_FOURCC('s','1','6','l');
         if ( OpenWaveOut( p_aout, WAVE_FORMAT_PCM, i_nb_channels,
@@ -257,12 +257,12 @@ static int OpenWaveOut( aout_instance_t *p_aout, int i_format,
                           CALLBACK_FUNCTION );
     if( result == WAVERR_BADFORMAT )
     {
-        msg_Err( p_aout, "waveOutOpen failed WAVERR_BADFORMAT" );
-        return( 1 );
+        msg_Warn( p_aout, "waveOutOpen failed WAVERR_BADFORMAT" );
+        return 1;
     }
     if( result != MMSYSERR_NOERROR )
     {
-        msg_Err( p_aout, "waveOutOpen failed" );
+        msg_Warn( p_aout, "waveOutOpen failed" );
         return 1;
     }
 

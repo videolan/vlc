@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.10 2002/12/07 23:50:30 massiot Exp $
+ * $Id: intf.c,v 1.11 2002/12/10 18:22:01 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -419,11 +419,11 @@ void aout_FindAndRestart( vlc_object_t * p_this )
 
     if ( p_aout == NULL ) return;
 
-    if ( var_Type( p_aout, "audio-device" ) >= 0 )
+    if ( var_Type( p_aout, "audio-device" ) != 0 )
     {
         var_Destroy( p_aout, "audio-device" );
     }
-    if ( var_Type( p_aout, "audio-channels" ) >= 0 )
+    if ( var_Type( p_aout, "audio-channels" ) != 0 )
     {
         var_Destroy( p_aout, "audio-channels" );
     }
