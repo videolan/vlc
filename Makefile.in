@@ -140,7 +140,11 @@ LCFLAGS += -Wall
 
 # Debugging and profiling support
 ifneq ($(DEBUG),0)
+ifeq ($(SYS),beos)
+CFLAGS += -g
+else
 CFLAGS += -pg
+endif
 endif
 
 #################################################################################
@@ -414,7 +418,7 @@ $(ASM_OBJ): %.o: %.S
 #$(PLUGIN_OBJ): %.so: .dep/%.d
 
 lib/beos.so: $(PLUGIN_BEOS)
-	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) $(CCFLAGS) $(CFLAGS) $(LCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 $(PLUGIN_BEOS): %.o: %.cpp
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
@@ -468,12 +472,20 @@ $(PLUGIN_GGI): %.o: %.c
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 lib/yuv.so: $(PLUGIN_YUV)
+ifeq ($(SYS),beos)
+	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+else
 	ld -shared -o $@ $^
+endif
 $(PLUGIN_YUV): %.o: %.c
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
+ifeq ($(SYS),beos)
+	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+else
 	ld -shared -o $@ $^
+endif
 $(PLUGIN_YUVMMX): %.o: %.c
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 

@@ -63,6 +63,7 @@ plugin_info_t * GetConfig( void )
     p_info->aout_GetPlugin = aout_GetPlugin;
     p_info->vout_GetPlugin = vout_GetPlugin;
     p_info->intf_GetPlugin = intf_GetPlugin;
+    p_info->yuv_GetPlugin = NULL;
 
     return( p_info );
 }
