@@ -508,7 +508,6 @@ public:
 
     bool Preload( );
     bool PreloadFamily( const matroska_segment_t & segment );
-    size_t PreloadLinked( const demux_sys_t & of_sys, std::vector<matroska_segment_t*> & segments );
     void ParseInfo( EbmlElement *info );
     void ParseChapters( EbmlElement *chapters );
     void ParseSeekHead( EbmlElement *seekhead );
@@ -525,15 +524,48 @@ public:
     static bool CompareSegmentUIDs( const matroska_segment_t * item_a, const matroska_segment_t * item_b );
 };
 
+// class holding hard-linked segment together in the playback order
+class virtual_segment_t
+{
+public:
+    virtual_segment_t()
+        :i_current_segment(0)
+    {}
+
+    std::vector<matroska_segment_t*> linked_segments;
+    size_t                           i_current_segment;
+
+    void Sort();
+    size_t AddSegment( matroska_segment_t *p_segment );
+    void PreloadLinked( );
+    float Duration( ) const;
+    void LoadCues( );
+
+    matroska_segment_t * Segment() const
+    {
+        if ( linked_segments.size() == 0 || i_current_segment >= linked_segments.size() )
+            return NULL;
+        return linked_segments[i_current_segment];
+    }
+
+    bool SelectNext()
+    {
+        if ( i_current_segment < linked_segments.size()-1 )
+        {
+            i_current_segment++;
+            return true;
+        }
+        return false;
+    }
+};
+
 class matroska_stream_t
 {
 public:
     matroska_stream_t( demux_sys_t & demuxer )
         :p_in(NULL)
         ,p_es(NULL)
-        ,i_current_segment(-1)
         ,sys(demuxer)
-        ,f_duration(-1.0)
     {}
 
     ~matroska_stream_t()
@@ -546,25 +578,10 @@ public:
     EbmlStream         *p_es;
 
     std::vector<matroska_segment_t*> segments;
-    size_t                           i_current_segment;
 
     demux_sys_t                      & sys;
-    
-    /* duration of the stream */
-    float                   f_duration;
-
-    inline matroska_segment_t *Segment()
-    {
-        if ( i_current_segment >= 0 && size_t(i_current_segment) < segments.size() )
-            return segments[i_current_segment];
-        return NULL;
-    }
-    
-    matroska_segment_t *FindSegment( const EbmlBinary & uid ) const;
 
     void PreloadFamily( const matroska_segment_t & segment );
-    size_t PreloadLinked( const demux_sys_t & of_sys );
-    void PreparePlayback( );
 };
 
 class demux_sys_t
@@ -577,7 +594,8 @@ public:
         ,i_chapter_time(0)
         ,meta(NULL)
         ,title(NULL)
-        ,i_current_stream(-1)
+        ,p_current_segment(NULL)
+        ,f_duration(-1.0)
     {}
 
     ~demux_sys_t()
@@ -600,19 +618,15 @@ public:
     input_title_t           *title;
 
     std::vector<matroska_stream_t*>  streams;
-    int                              i_current_stream;
     std::vector<matroska_segment_t*> opened_segments;
+    virtual_segment_t                *p_current_segment;
 
-    inline matroska_stream_t *Stream()
-    {
-        if ( i_current_stream >= 0 && size_t(i_current_stream) < streams.size() )
-            return streams[i_current_stream];
-        return NULL;
-    }
+    /* duration of the stream */
+    float                   f_duration;
 
     matroska_segment_t *FindSegment( const EbmlBinary & uid ) const;
     void PreloadFamily( );
-    void PreloadLinked( );
+    void PreloadLinked( matroska_segment_t *p_segment );
     void PreparePlayback( );
     matroska_stream_t *AnalyseAllSegmentsFound( EbmlStream *p_estream );
 };
@@ -669,7 +683,6 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
     p_sys->streams.push_back( p_stream );
-    p_sys->i_current_stream = 0;
 
     p_stream->p_in = p_io_callback;
     p_stream->p_es = p_io_stream;
@@ -678,9 +691,8 @@ static int Open( vlc_object_t * p_this )
     {
         p_stream->segments[i]->Preload();
     }
-    p_stream->i_current_segment = 0;
 
-    p_segment = p_stream->Segment();
+    p_segment = p_stream->segments[0];
     if( p_segment->cluster == NULL )
     {
         msg_Err( p_demux, "cannot find any cluster, damaged file ?" );
@@ -755,7 +767,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_sys->PreloadFamily( );
-    p_sys->PreloadLinked( );
+    p_sys->PreloadLinked( p_segment );
     p_sys->PreparePlayback( );
 
     if( !p_segment->b_cues || p_segment->i_index <= 0 )
@@ -800,9 +812,7 @@ static void Close( vlc_object_t *p_this )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_stream_t  *p_stream = p_sys->Stream();
-    if ( p_stream == NULL ) return VLC_EGENERIC;
-    matroska_segment_t *p_segment = p_stream->Segment();
+    matroska_segment_t *p_segment = p_sys->p_current_segment->Segment();
     int64_t     *pi64;
     double      *pf, f;
     int         i_skp;
@@ -818,17 +828,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_stream->f_duration > 0.0 )
+            if( p_sys->f_duration > 0.0 )
             {
-                *pi64 = (int64_t)(p_stream->f_duration * 1000);
+                *pi64 = (int64_t)(p_sys->f_duration * 1000);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
 
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
-            if ( p_stream->f_duration > 0.0 )
-                *pf = (double)p_sys->i_pts / (1000.0 * p_stream->f_duration);
+            if ( p_sys->f_duration > 0.0 )
+                *pf = (double)p_sys->i_pts / (1000.0 * p_sys->f_duration);
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
@@ -1045,8 +1055,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
                          mtime_t i_duration )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_stream_t  *p_stream = p_sys->Stream();
-    matroska_segment_t *p_segment = p_stream->Segment();
+    matroska_segment_t *p_segment = p_sys->p_current_segment->Segment();
 
     size_t          i_track;
     unsigned int    i;
@@ -1559,8 +1568,7 @@ void matroska_segment_t::UnSelect( )
 static void UpdateCurrentToChapter( demux_t & demux )
 {
     demux_sys_t & sys = *demux.p_sys;
-    matroska_stream_t  *p_stream = sys.Stream();
-    matroska_segment_t *p_segment = p_stream->Segment();
+    matroska_segment_t *p_segment = sys.p_current_segment->Segment();
     const chapter_item_t *psz_curr_chapter;
 
     /* update current chapter/seekpoint */
@@ -1597,8 +1605,7 @@ static void UpdateCurrentToChapter( demux_t & demux )
 static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter)
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_stream_t  *p_stream = p_sys->Stream();
-    matroska_segment_t *p_segment = p_stream->Segment();
+    matroska_segment_t *p_segment = p_sys->p_current_segment->Segment();
     mtime_t            i_time_offset = 0;
 
     KaxBlock    *block;
@@ -1623,15 +1630,15 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
     }
 
     delete p_segment->ep;
-    p_segment->ep = new EbmlParser( p_stream->p_es, p_segment->segment );
+    p_segment->ep = new EbmlParser( &p_segment->es, p_segment->segment );
     p_segment->cluster = NULL;
 
     /* seek without index or without date */
     if( f_percent >= 0 && (config_GetInt( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_date < 0 ))
     {
-        if (p_stream->f_duration >= 0)
+        if (p_sys->f_duration >= 0)
         {
-            i_date = int64_t( f_percent * p_stream->f_duration * 1000.0 );
+            i_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
         }
         else
         {
@@ -1718,7 +1725,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
                 (int)( 100 * p_segment->index[i_index].i_position /
                     stream_Size( p_demux->s ) ) );
 
-    p_stream->p_in->setFilePointer( p_segment->index[i_index].i_position,
+    p_segment->es.I_O().setFilePointer( p_segment->index[i_index].i_position,
                                 seek_beginning );
 
     p_sys->i_start_pts = i_date;
@@ -1792,8 +1799,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
 static int Demux( demux_t *p_demux)
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_stream_t  *p_stream = p_sys->Stream();
-    matroska_segment_t *p_segment = p_stream->Segment();
+    matroska_segment_t *p_segment = p_sys->p_current_segment->Segment();
     if ( p_segment == NULL ) return 0;
     int                i_block_count = 0;
 
@@ -1810,17 +1816,19 @@ static int Demux( demux_t *p_demux)
         if ( p_segment->editions.size() && p_segment->editions[p_segment->i_current_edition].b_ordered && p_segment->psz_current_chapter == NULL )
         {
             /* nothing left to read in this ordered edition */
-            if ( p_stream->i_current_segment == p_stream->segments.size() - 1)
+            if ( !p_sys->p_current_segment->SelectNext() )
                 return 0;
             p_segment->UnSelect( );
             
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
-            /* switch to the next segment (TODO update the duration) */
-            p_stream->i_current_segment++;
-            p_segment = p_stream->Segment();
-            if ( !p_segment || !p_segment->Select( 0 ) )
+            /* switch to the next segment */
+            p_segment = p_sys->p_current_segment->Segment();
+            if ( !p_segment->Select( 0 ) )
+            {
+                msg_Err( p_demux, "Failed to select new segment" );
                 return 0;
+            }
             continue;
         }
 
@@ -1843,11 +1851,15 @@ static int Demux( demux_t *p_demux)
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* switch to the next segment */
-            p_stream->i_current_segment++;
-            p_segment = p_stream->Segment();
-            if ( !p_segment || !p_segment->Select( 0 ) )
+            if ( !p_sys->p_current_segment->SelectNext() )
                 // no more segments in this stream
                 return 0;
+            p_segment = p_sys->p_current_segment->Segment();
+            if ( !p_segment->Select( 0 ) )
+            {
+                msg_Err( p_demux, "Failed to select new segment" );
+                return 0;
+            }
 
             continue;
         }
@@ -3364,6 +3376,7 @@ const chapter_item_t *chapter_edition_t::FindTimecode( mtime_t i_user_timecode )
 
 void demux_sys_t::PreloadFamily( )
 {
+/* family handling disabled  for the moment
     matroska_stream_t *p_stream = Stream();
     if ( p_stream )
     {
@@ -3376,6 +3389,7 @@ void demux_sys_t::PreloadFamily( )
             }
         }
     }
+*/
 }
 
 void matroska_stream_t::PreloadFamily( const matroska_segment_t & of_segment )
@@ -3404,83 +3418,34 @@ bool matroska_segment_t::PreloadFamily( const matroska_segment_t & of_segment )
 }
 
 // preload all the linked segments for all preloaded segments
-void demux_sys_t::PreloadLinked( )
+void demux_sys_t::PreloadLinked( matroska_segment_t *p_segment )
 {
-    size_t i_prealoaded;
+    size_t i_preloaded, i;
+
+    delete p_current_segment;
+    p_current_segment = new virtual_segment_t();
+
+    // fill our current virtual segment with the used segment from the current stream
+    p_current_segment->linked_segments.push_back( p_segment );
+
+    // fill our current virtual segment with all hard linked segments
     do {
-        i_prealoaded = 0;
-        for (size_t i=0; i<streams.size(); i++)
+        i_preloaded = 0;
+        for ( i=0; i< opened_segments.size(); i++ )
         {
-            i_prealoaded += streams[i]->PreloadLinked( *this );
+            i_preloaded += p_current_segment->AddSegment( opened_segments[i] );
         }
-    } while ( i_prealoaded ); // worst case: will stop when all segments are preloaded
-}
+    } while ( i_preloaded ); // worst case: will stop when all segments are found as linked
 
-size_t matroska_stream_t::PreloadLinked( const demux_sys_t & of_sys )
-{
-    size_t i_result = 0;
-    for (size_t i=0; i<segments.size(); i++)
-    {
-        i_result += segments[i]->PreloadLinked( of_sys, segments );
-    }
+    p_current_segment->Sort( );
 
-    return i_result;
-}
-
-size_t matroska_segment_t::PreloadLinked( const demux_sys_t & of_sys, std::vector<matroska_segment_t*> & segments )
-{
-    size_t i_result = 0;
-    if ( prev_segment_uid.GetBuffer() )
-    {
-        matroska_segment_t *p_segment = of_sys.FindSegment( prev_segment_uid );
-        if ( p_segment )
-        {
-            if ( p_segment->Preload( ) )
-            {
-                segments.push_back( p_segment );
-                i_result++;
-            }
-        }
-    }
-    if ( next_segment_uid.GetBuffer() )
-    {
-        matroska_segment_t *p_segment = of_sys.FindSegment( next_segment_uid );
-        if ( p_segment )
-        {
-            if ( p_segment->Preload( ) )
-            {
-                segments.push_back( p_segment );
-                i_result++;
-            }
-        }
-    }
-    return i_result;
+    p_current_segment->PreloadLinked( );
 }
 
 void demux_sys_t::PreparePlayback( )
 {
-    matroska_stream_t *p_stream = Stream();
-    if ( p_stream )
-    {
-        p_stream->PreparePlayback( );
-    }
-}
-
-void matroska_stream_t::PreparePlayback( )
-{
-    size_t i;
-
-    // update duration
-    f_duration = 0.0;
-    for (i=0; i<segments.size(); i++)
-    {
-        f_duration += segments[i]->f_duration;
-
-        segments[i]->LoadCues( );
-    }
-
-    // sort segment order
-    std::sort( segments.begin(), segments.end(), matroska_segment_t::CompareSegmentUIDs );
+    f_duration = p_current_segment->Duration();
+    p_current_segment->LoadCues();
 }
 
 bool matroska_segment_t::CompareSegmentUIDs( const matroska_segment_t * p_item_a, const matroska_segment_t * p_item_b )
@@ -3561,20 +3526,75 @@ bool matroska_segment_t::Preload( )
 
 matroska_segment_t *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
 {
-    matroska_segment_t *p_segment = NULL;
-    for (size_t i=0; i<streams.size() && p_segment == NULL; i++)
+    for (size_t i=0; i<opened_segments.size(); i++)
     {
-        p_segment = streams[i]->FindSegment( uid );
-    }
-    return p_segment;
-}
-
-matroska_segment_t *matroska_stream_t::FindSegment( const EbmlBinary & uid ) const
-{
-    for (size_t i=0; i<segments.size(); i++)
-    {
-        if ( segments[i]->segment_uid == uid )
-            return segments[i];
+        if ( opened_segments[i]->segment_uid == uid )
+            return opened_segments[i];
     }
     return NULL;
+}
+
+void virtual_segment_t::Sort()
+{
+    // keep the current segment index
+    matroska_segment_t *p_segment = linked_segments[i_current_segment];
+
+    std::sort( linked_segments.begin(), linked_segments.end(), matroska_segment_t::CompareSegmentUIDs );
+
+    for ( i_current_segment=0; i_current_segment<linked_segments.size(); i_current_segment++)
+        if ( linked_segments[i_current_segment] == p_segment )
+            break;
+}
+
+size_t virtual_segment_t::AddSegment( matroska_segment_t *p_segment )
+{
+    size_t i;
+    // check if it's not already in here
+    for ( i=0; i<linked_segments.size(); i++ )
+    {
+        if ( p_segment->segment_uid == linked_segments[i]->segment_uid )
+            return 0;
+    }
+
+    // find possible mates
+    for ( i=0; i<linked_segments.size(); i++ )
+    {
+        if ( p_segment->segment_uid == linked_segments[i]->prev_segment_uid )
+        {
+            linked_segments.push_back( p_segment );
+            return 1;
+        }
+        if ( p_segment->segment_uid == linked_segments[i]->next_segment_uid )
+        {
+            linked_segments.push_back( p_segment );
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void virtual_segment_t::PreloadLinked( )
+{
+    for ( size_t i=0; i<linked_segments.size(); i++ )
+    {
+        linked_segments[i]->Preload( );
+    }
+}
+
+float virtual_segment_t::Duration() const
+{
+    float f_duration = 0.0;
+    for ( size_t i=0; i<linked_segments.size(); i++ )
+    {
+        f_duration += linked_segments[i]->f_duration;
+    }
+    return f_duration;
+}
+
+void virtual_segment_t::LoadCues( )
+{
+    for ( size_t i=0; i<linked_segments.size(); i++ )
+    {
+        linked_segments[i]->LoadCues();
+    }
 }
