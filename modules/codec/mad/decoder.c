@@ -190,7 +190,7 @@ static void EndThread (mad_adec_thread_t * p_dec)
     /* If the audio output fifo was created, we destroy it */
     if (p_dec->p_aout_input != NULL)
     {
-        aout_InputDelete( p_dec->p_aout, p_dec->p_aout_input );
+        aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
     }
 
     /* mad_decoder_finish releases the memory allocated inside the struct */

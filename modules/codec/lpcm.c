@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.2 2002/09/26 22:40:20 massiot Exp $
+ * $Id: lpcm.c,v 1.3 2002/09/28 13:05:16 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -131,6 +131,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     p_dec->output_format.i_rate = 48000;
     
     aout_DateInit( &p_dec->end_date, 48000 );
+    p_dec->p_aout = NULL;
     p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
                                        &p_dec->p_aout,
                                        &p_dec->output_format );

@@ -2,7 +2,7 @@
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.7 2002/09/20 23:27:03 massiot Exp $
+ * $Id: trivial.c,v 1.8 2002/09/28 13:05:16 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -71,13 +71,21 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
-    aout_input_t * p_input = p_aout->pp_inputs[0];
+    int i = 0;
+    aout_input_t * p_input = p_aout->pp_inputs[i];
     int i_nb_bytes = p_buffer->i_nb_samples * sizeof(s32)
                       * p_aout->mixer.mixer.i_channels;
-    byte_t * p_in = p_input->p_first_byte_to_mix;
-    byte_t * p_out = p_buffer->p_buffer;
+    byte_t * p_in;
+    byte_t * p_out;
 
-    if ( p_input->b_error ) return;
+    while ( p_input->b_error )
+    {
+        p_input = p_aout->pp_inputs[++i];
+        /* This can't crash because if no input has b_error == 0, the
+         * audio mixer cannot run and we can't be here. */
+    }
+    p_in = p_input->p_first_byte_to_mix;
+    p_out = p_buffer->p_buffer;
 
     for ( ; ; )
     {
@@ -113,6 +121,26 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
             p_input->p_first_byte_to_mix = p_in + i_nb_bytes;
             break;
         }
+    }
+
+    /* Empty other FIFOs to avoid a memory leak. */
+    for ( i++; i < p_aout->i_nb_inputs; i++ )
+    {
+        aout_fifo_t * p_fifo;
+        aout_buffer_t * p_deleted;
+
+        p_input = p_aout->pp_inputs[i];
+        if ( p_input->b_error ) continue;
+        p_fifo = &p_input->fifo;
+        p_deleted = p_fifo->p_first;
+        while ( p_deleted != NULL )
+        {
+            aout_buffer_t * p_next = p_deleted->p_next;
+            aout_BufferFree( p_deleted );
+            p_deleted = p_next;
+        }
+        p_fifo->p_first = NULL;
+        p_fifo->pp_last = &p_fifo->p_first;
     }
 }
 

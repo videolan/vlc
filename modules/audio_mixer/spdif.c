@@ -2,7 +2,7 @@
  * spdif.c : dummy mixer for S/PDIF output (1 input only)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: spdif.c,v 1.6 2002/09/20 23:27:03 massiot Exp $
+ * $Id: spdif.c,v 1.7 2002/09/28 13:05:16 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -73,8 +73,32 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
-    aout_input_t * p_input = p_aout->pp_inputs[0];
-    if ( p_input->b_error ) return;
+    int i = 0;
+    aout_input_t * p_input = p_aout->pp_inputs[i];
+    while ( p_input->b_error )
+    {
+        p_input = p_aout->pp_inputs[++i];
+    }
     aout_FifoPop( p_aout, &p_input->fifo );
+
+    /* Empty other FIFOs to avoid a memory leak. */
+    for ( i++; i < p_aout->i_nb_inputs; i++ )
+    {
+        aout_fifo_t * p_fifo;
+        aout_buffer_t * p_deleted;
+
+        p_input = p_aout->pp_inputs[i];
+        if ( p_input->b_error ) continue;
+        p_fifo = &p_input->fifo;
+        p_deleted = p_fifo->p_first;  
+        while ( p_deleted != NULL )
+        {
+            aout_buffer_t * p_next = p_deleted->p_next;
+            aout_BufferFree( p_deleted );
+            p_deleted = p_next;
+        }
+        p_fifo->p_first = NULL;
+        p_fifo->pp_last = &p_fifo->p_first;
+    }
 }
 

@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.16 2002/09/26 22:40:25 massiot Exp $
+ * $Id: mixer.c,v 1.17 2002/09/28 13:05:16 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -74,7 +74,7 @@ int aout_MixerDelete( aout_instance_t * p_aout )
  *****************************************************************************/
 static int MixBuffer( aout_instance_t * p_aout )
 {
-    int             i, i_nb_real_inputs = 0;
+    int             i, i_first_input = 0;
     aout_buffer_t * p_output_buffer;
     mtime_t start_date, end_date;
     audio_date_t exact_start_date;
@@ -168,8 +168,11 @@ static int MixBuffer( aout_instance_t * p_aout )
         mtime_t prev_date;
         vlc_bool_t b_drop_buffers;
 
-        if ( p_input->b_error ) continue;
-        i_nb_real_inputs++;
+        if ( p_input->b_error )
+        {
+            if ( i_first_input == i ) i_first_input++;
+            continue;
+        }
 
         p_buffer = p_fifo->p_first;
         if ( p_buffer == NULL )
@@ -268,7 +271,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         if ( p_buffer == NULL ) break;
     }
 
-    if ( i < p_aout->i_nb_inputs || !i_nb_real_inputs )
+    if ( i < p_aout->i_nb_inputs || i_first_input == p_aout->i_nb_inputs )
     {
         /* Interrupted before the end... We can't run. */
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
@@ -281,7 +284,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                         / p_aout->output.output.i_rate,
                       /* This is a bit kludgy, but is actually only used
                        * for the S/PDIF dummy mixer : */
-                      p_aout->pp_inputs[0]->fifo.p_first,
+                      p_aout->pp_inputs[i_first_input]->fifo.p_first,
                       p_output_buffer );
     if ( p_output_buffer == NULL )
     {
