@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.30 2003/07/24 16:07:10 gbazin Exp $
+ * $Id: open.cpp,v 1.31 2003/07/24 17:31:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -49,10 +49,6 @@
 #include <wx/tokenzr.h>
 
 #include <vlc/intf.h>
-
-#if defined MODULE_NAME_IS_skins
-#   include "../skins/src/skin_common.h"
-#endif
 
 #include "wxwindows.h"
 
@@ -663,7 +659,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
         /* Count the input options */
         while( i + i_options + 1 < (int)mrl.GetCount() &&
-               mrl[i + i_options + 1].mb_str()[0] == ':' )
+               ((const char *)mrl[i + i_options + 1].mb_str())[0] == ':' )
         {
             i_options++;
         }
