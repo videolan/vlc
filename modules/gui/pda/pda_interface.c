@@ -176,6 +176,8 @@ create_pda (void)
   GtkWidget *ClearPlaylist;
   GtkWidget *playlist;
   GtkWidget *vbox2;
+  GtkWidget *scrolledwindowPreference;
+  GtkWidget *tvPreferences;
   GtkWidget *hbox2;
   GtkWidget *PreferenceSave;
   GtkWidget *PreferenceApply;
@@ -187,8 +189,8 @@ create_pda (void)
   GtkWidget *aboutImage;
   GtkWidget *labelDescription;
   GtkWidget *labelAuthors;
-  GtkWidget *labelProgramName;
   GtkWidget *labelCopyright;
+  GtkWidget *labelProgramName;
   GtkWidget *about;
   GtkTooltips *tooltips;
 
@@ -303,7 +305,7 @@ create_pda (void)
   timeSlider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (3, 0, 100, 1, 6.25, 0)));
   gtk_widget_set_name (timeSlider, "timeSlider");
   gtk_widget_show (timeSlider);
-  gtk_box_pack_start (GTK_BOX (vbox), timeSlider, FALSE, FALSE, 4);
+  gtk_box_pack_start (GTK_BOX (vbox), timeSlider, FALSE, TRUE, 4);
   gtk_scale_set_draw_value (GTK_SCALE (timeSlider), FALSE);
   gtk_scale_set_value_pos (GTK_SCALE (timeSlider), GTK_POS_RIGHT);
   gtk_scale_set_digits (GTK_SCALE (timeSlider), 3);
@@ -426,7 +428,7 @@ create_pda (void)
   gtk_label_set_justify (GTK_LABEL (labelNetworkAddress), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelNetworkAddress), 0, 0.5);
 
-  entryNetworkPort_adj = gtk_adjustment_new (1233, 0, 65535, 1, 10, 10);
+  entryNetworkPort_adj = gtk_adjustment_new (1234, 0, 65535, 1, 10, 10);
   entryNetworkPort = gtk_spin_button_new (GTK_ADJUSTMENT (entryNetworkPort_adj), 1, 0);
   gtk_widget_set_name (entryNetworkPort, "entryNetworkPort");
   gtk_widget_show (entryNetworkPort);
@@ -464,7 +466,6 @@ create_pda (void)
   entryNetworkType = GTK_COMBO (comboNetworkType)->entry;
   gtk_widget_set_name (entryNetworkType, "entryNetworkType");
   gtk_widget_show (entryNetworkType);
-  gtk_entry_set_text (GTK_ENTRY (entryNetworkType), _("unicast"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryNetworkType), TRUE);
 
   labelNetworkType = gtk_label_new (_("Network: "));
@@ -498,7 +499,6 @@ create_pda (void)
   entryNetworkProtocolType = GTK_COMBO (comboNetworkProtocolType)->entry;
   gtk_widget_set_name (entryNetworkProtocolType, "entryNetworkProtocolType");
   gtk_widget_show (entryNetworkProtocolType);
-  gtk_entry_set_text (GTK_ENTRY (entryNetworkProtocolType), _("udp"));
 
   labelNetworkProtocol = gtk_label_new (_("Protocol:"));
   gtk_widget_set_name (labelNetworkProtocol, "labelNetworkProtocol");
@@ -672,7 +672,6 @@ create_pda (void)
   entryV4LVideoDevice = GTK_COMBO (comboV4lVideoDevice)->entry;
   gtk_widget_set_name (entryV4LVideoDevice, "entryV4LVideoDevice");
   gtk_widget_show (entryV4LVideoDevice);
-  gtk_entry_set_text (GTK_ENTRY (entryV4LVideoDevice), _("/dev/video"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryV4LVideoDevice), TRUE);
 
   comboV4lAudioDevice = gtk_combo_new ();
@@ -693,7 +692,6 @@ create_pda (void)
   entryV4LAudioDevice = GTK_COMBO (comboV4lAudioDevice)->entry;
   gtk_widget_set_name (entryV4LAudioDevice, "entryV4LAudioDevice");
   gtk_widget_show (entryV4LAudioDevice);
-  gtk_entry_set_text (GTK_ENTRY (entryV4LAudioDevice), _("/dev/dsp"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryV4LAudioDevice), TRUE);
 
   entryV4LChannel_adj = gtk_adjustment_new (0, 0, 100, 1, 10, 10);
@@ -723,7 +721,6 @@ create_pda (void)
   entryV4LNorm = GTK_COMBO (comboV4LNorm)->entry;
   gtk_widget_set_name (entryV4LNorm, "entryV4LNorm");
   gtk_widget_show (entryV4LNorm);
-  gtk_entry_set_text (GTK_ENTRY (entryV4LNorm), _("pal"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryV4LNorm), TRUE);
 
   comboV4LSize = gtk_combo_new ();
@@ -747,7 +744,6 @@ create_pda (void)
   entryV4LSize = GTK_COMBO (comboV4LSize)->entry;
   gtk_widget_set_name (entryV4LSize, "entryV4LSize");
   gtk_widget_show (entryV4LSize);
-  gtk_entry_set_text (GTK_ENTRY (entryV4LSize), _("240x192"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryV4LSize), TRUE);
 
   entryV4LFrequency_adj = gtk_adjustment_new (8692, 0, 65535, 1, 10, 10);
@@ -797,7 +793,6 @@ create_pda (void)
   entryV4LSoundDirection = GTK_COMBO (comboV4LSoundDirection)->entry;
   gtk_widget_set_name (entryV4LSoundDirection, "entryV4LSoundDirection");
   gtk_widget_show (entryV4LSoundDirection);
-  gtk_entry_set_text (GTK_ENTRY (entryV4LSoundDirection), _("mono"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryV4LSoundDirection), TRUE);
 
   entryV4LTuner_adj = gtk_adjustment_new (0, -1, 100, 1, 10, 10);
@@ -896,7 +891,6 @@ create_pda (void)
   entryVideoCodec = GTK_COMBO (comboVideoCodec)->entry;
   gtk_widget_set_name (entryVideoCodec, "entryVideoCodec");
   gtk_widget_show (entryVideoCodec);
-  gtk_entry_set_text (GTK_ENTRY (entryVideoCodec), _("huffyuv"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryVideoCodec), TRUE);
 
   labelVideoBitrate = gtk_label_new (_("Video Bitrate:"));
@@ -1006,7 +1000,6 @@ create_pda (void)
   entryStdURL = GTK_COMBO (comboStdURL)->entry;
   gtk_widget_set_name (entryStdURL, "entryStdURL");
   gtk_widget_show (entryStdURL);
-  gtk_entry_set_text (GTK_ENTRY (entryStdURL), _("127.0.0.1"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryStdURL), TRUE);
 
   comboStdMuxer = gtk_combo_new ();
@@ -1024,7 +1017,6 @@ create_pda (void)
   entryStdMuxer = GTK_COMBO (comboStdMuxer)->entry;
   gtk_widget_set_name (entryStdMuxer, "entryStdMuxer");
   gtk_widget_show (entryStdMuxer);
-  gtk_entry_set_text (GTK_ENTRY (entryStdMuxer), _("udp"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryStdMuxer), TRUE);
 
   comboStdAccess = gtk_combo_new ();
@@ -1043,7 +1035,6 @@ create_pda (void)
   entryStdAccess = GTK_COMBO (comboStdAccess)->entry;
   gtk_widget_set_name (entryStdAccess, "entryStdAccess");
   gtk_widget_show (entryStdAccess);
-  gtk_entry_set_text (GTK_ENTRY (entryStdAccess), _("ts"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryStdAccess), TRUE);
 
   entryAudioBitrate_adj = gtk_adjustment_new (256, 0, 65535, 1, 10, 10);
@@ -1074,7 +1065,6 @@ create_pda (void)
   entryAudioCodec = GTK_COMBO (comboAudioCodec)->entry;
   gtk_widget_set_name (entryAudioCodec, "entryAudioCodec");
   gtk_widget_show (entryAudioCodec);
-  gtk_entry_set_text (GTK_ENTRY (entryAudioCodec), _("alaw"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryAudioCodec), TRUE);
 
   checkVideoDeinterlace = gtk_check_button_new_with_mnemonic (_("enable"));
@@ -1185,6 +1175,17 @@ create_pda (void)
   gtk_widget_show (vbox2);
   gtk_container_add (GTK_CONTAINER (notebook), vbox2);
 
+  scrolledwindowPreference = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_set_name (scrolledwindowPreference, "scrolledwindowPreference");
+  gtk_widget_show (scrolledwindowPreference);
+  gtk_box_pack_start (GTK_BOX (vbox2), scrolledwindowPreference, TRUE, TRUE, 0);
+
+  tvPreferences = gtk_tree_view_new ();
+  gtk_widget_set_name (tvPreferences, "tvPreferences");
+  gtk_widget_show (tvPreferences);
+  gtk_container_add (GTK_CONTAINER (scrolledwindowPreference), tvPreferences);
+  gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (tvPreferences), FALSE);
+
   hbox2 = gtk_hbox_new (TRUE, 0);
   gtk_widget_set_name (hbox2, "hbox2");
   gtk_widget_show (hbox2);
@@ -1249,18 +1250,18 @@ create_pda (void)
   gtk_label_set_justify (GTK_LABEL (labelAuthors), GTK_JUSTIFY_LEFT);
   gtk_label_set_line_wrap (GTK_LABEL (labelAuthors), TRUE);
 
+  labelCopyright = gtk_label_new (_("(C) 1996-2003 the VideoLAN team"));
+  gtk_widget_set_name (labelCopyright, "labelCopyright");
+  gtk_widget_show (labelCopyright);
+  gtk_fixed_put (GTK_FIXED (fixed2), labelCopyright, 16, 48);
+  gtk_widget_set_size_request (labelCopyright, 208, 16);
+
   labelProgramName = gtk_label_new (_("VLC media player"));
   gtk_widget_set_name (labelProgramName, "labelProgramName");
   gtk_widget_show (labelProgramName);
   gtk_fixed_put (GTK_FIXED (fixed2), labelProgramName, 48, 16);
   gtk_widget_set_size_request (labelProgramName, 152, 16);
   gtk_label_set_line_wrap (GTK_LABEL (labelProgramName), TRUE);
-
-  labelCopyright = gtk_label_new (_("(C) 1996-2003 the VideoLAN team"));
-  gtk_widget_set_name (labelCopyright, "labelCopyright");
-  gtk_widget_show (labelCopyright);
-  gtk_fixed_put (GTK_FIXED (fixed2), labelCopyright, 16, 48);
-  gtk_widget_set_size_request (labelCopyright, 208, 16);
 
   about = gtk_label_new (_("About"));
   gtk_widget_set_name (about, "about");
@@ -1297,14 +1298,8 @@ create_pda (void)
   g_signal_connect ((gpointer) tvFileList, "row_activated",
                     G_CALLBACK (onFileListRow),
                     NULL);
-  g_signal_connect ((gpointer) tvFileList, "select_cursor_row",
-                    G_CALLBACK (onFileListRowSelected),
-                    NULL);
   g_signal_connect ((gpointer) AddFileToPlaylist, "pressed",
                     G_CALLBACK (onAddFileToPlaylist),
-                    NULL);
-  g_signal_connect ((gpointer) comboMRL, "add",
-                    G_CALLBACK (onNetworkMRLAdd),
                     NULL);
   g_signal_connect ((gpointer) entryNetworkPort, "changed",
                     G_CALLBACK (NetworkBuildMRL),
@@ -1479,6 +1474,8 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, ClearPlaylist, "ClearPlaylist");
   GLADE_HOOKUP_OBJECT (pda, playlist, "playlist");
   GLADE_HOOKUP_OBJECT (pda, vbox2, "vbox2");
+  GLADE_HOOKUP_OBJECT (pda, scrolledwindowPreference, "scrolledwindowPreference");
+  GLADE_HOOKUP_OBJECT (pda, tvPreferences, "tvPreferences");
   GLADE_HOOKUP_OBJECT (pda, hbox2, "hbox2");
   GLADE_HOOKUP_OBJECT (pda, PreferenceSave, "PreferenceSave");
   GLADE_HOOKUP_OBJECT (pda, PreferenceApply, "PreferenceApply");
@@ -1490,8 +1487,8 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, aboutImage, "aboutImage");
   GLADE_HOOKUP_OBJECT (pda, labelDescription, "labelDescription");
   GLADE_HOOKUP_OBJECT (pda, labelAuthors, "labelAuthors");
-  GLADE_HOOKUP_OBJECT (pda, labelProgramName, "labelProgramName");
   GLADE_HOOKUP_OBJECT (pda, labelCopyright, "labelCopyright");
+  GLADE_HOOKUP_OBJECT (pda, labelProgramName, "labelProgramName");
   GLADE_HOOKUP_OBJECT (pda, about, "about");
   GLADE_HOOKUP_OBJECT_NO_REF (pda, tooltips, "tooltips");
 

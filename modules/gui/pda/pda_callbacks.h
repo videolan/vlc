@@ -2,7 +2,7 @@
  * callbacks.h : pda plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: pda_callbacks.h,v 1.8 2003/11/09 21:29:52 jpsaman Exp $
+ * $Id: pda_callbacks.h,v 1.9 2003/11/18 20:36:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -26,7 +26,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-void ReadDirectory( GtkListStore *p_list, char *psz_dir );
+void ReadDirectory( intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir );
 #if 0
 void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
 #endif
@@ -76,15 +76,6 @@ void
 onFileListRow                          (GtkTreeView     *treeview,
                                         GtkTreePath     *path,
                                         GtkTreeViewColumn *column,
-                                        gpointer         user_data);
-
-void
-onFileListColumns                      (GtkTreeView     *treeview,
-                                        gpointer         user_data);
-
-gboolean
-onFileListRowSelected                  (GtkTreeView     *treeview,
-                                        gboolean         start_editing,
                                         gpointer         user_data);
 
 void
@@ -143,11 +134,6 @@ void
 onPreferenceCancel                     (GtkButton       *button,
                                         gpointer         user_data);
 
-
-void
-onNetworkMRLAdd                        (GtkContainer    *container,
-                                        GtkWidget       *widget,
-                                        gpointer         user_data);
 
 void
 NetworkBuildMRL                        (GtkEditable     *editable,

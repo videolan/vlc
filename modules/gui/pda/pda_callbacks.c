@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.13 2003/11/09 21:29:52 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.14 2003/11/18 20:36:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -35,6 +35,8 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <pwd.h>
+#include <grp.h>
 
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
@@ -49,7 +51,7 @@
 
 #define VLC_MAX_MRL     256
 
-static char* get_file_stat(const char *path, uid_t *uid, gid_t *gid, off_t *size);
+static char *get_file_stat(const char *path, off_t *size);
 
 /*****************************************************************************
  * Useful function to retrieve p_intf
@@ -85,7 +87,7 @@ void * E_(__GtkGetIntf)( GtkWidget * widget )
     return p_data;
 }
 
-void PlaylistAddItem( GtkWidget *widget, gchar *name)
+void PlaylistAddItem(GtkWidget *widget, gchar *name)
 {
     GtkTreeView  *p_tvplaylist = NULL;
 
@@ -139,7 +141,6 @@ void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
     playlist_t   *p_playlist;
-    GtkTreeView  *p_tvplaylist;
 
     p_playlist = (playlist_t *)
              vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -163,13 +164,7 @@ void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
         }
         vlc_object_release(  p_playlist );
 
-        p_tvplaylist = (GtkTreeView*) lookup_widget( GTK_WIDGET(widget), "tvPlaylist" );
-        if (p_tvplaylist)
-        {
-            GtkListStore *p_liststore;
-            p_liststore = (GtkListStore *) gtk_tree_view_get_model(p_tvplaylist);
-            PlaylistRebuildListStore(p_liststore, p_playlist);
-        }
+        PlaylistAddItem(GTK_WIDGET(widget), psz_url);
     }
 }
 #endif
@@ -177,18 +172,18 @@ void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 /*****************************************************************
  * Read directory helper function.
  ****************************************************************/
-void ReadDirectory(GtkListStore *p_list, char *psz_dir )
+void ReadDirectory(intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
 {
     GtkTreeIter iter;
     struct dirent **namelist;
     int n=-1, status=-1;
 
-    g_print("changing to dir %s\n", psz_dir);
+    msg_Dbg(p_intf, "Changing to dir %s", psz_dir);
     if (psz_dir)
     {
        status = chdir(psz_dir);
        if (status<0)
-          g_print( "permision denied\n" );
+          msg_Dbg(p_intf, "permision denied" );
     }
     n = scandir(".", &namelist, 0, alphasort);
 
@@ -197,17 +192,14 @@ void ReadDirectory(GtkListStore *p_list, char *psz_dir )
     else
     {
         int i;
-        uint32_t uid;
-        uint32_t gid;
         off_t  size;
-        gchar *ppsz_text[5];
+        gchar *ppsz_text[4];
 
         /* XXX : kludge temporaire pour yopy */
-        ppsz_text[0]="..";
-        ppsz_text[1] = get_file_stat("..", &uid, &gid, &size);
-        ppsz_text[2] = "";
-        ppsz_text[3] = "";
-        ppsz_text[4] = "";
+        ppsz_text[0] = "..";
+        ppsz_text[1] = get_file_stat("..", &size);
+        ppsz_text[2] = "?";
+        ppsz_text[3] = "?";        
 
         /* Add a new row to the model */
         gtk_list_store_append (p_list, &iter);
@@ -215,8 +207,8 @@ void ReadDirectory(GtkListStore *p_list, char *psz_dir )
                             0, ppsz_text[0],
                             1, ppsz_text[1],
                             2, size,
-                            3, ppsz_text[3],
-                            4, ppsz_text[4],
+                            3, ppsz_text[2],
+                            4, ppsz_text[3],
                             -1);
 
         if (ppsz_text[1]) free(ppsz_text[1]);
@@ -228,20 +220,19 @@ void ReadDirectory(GtkListStore *p_list, char *psz_dir )
             {
                 /* This is a list of strings. */
                 ppsz_text[0] = namelist[i]->d_name;
-                ppsz_text[1] = get_file_stat(namelist[i]->d_name, &uid, &gid, &size);
-                ppsz_text[2] = "";
-                ppsz_text[3] = "";
-                ppsz_text[4] = "";
-#if 0
-                g_print( "(%d) file: %s permission: %s user: %ull group: %ull size: %ull\n", i, ppsz_text[0], ppsz_text[1], uid, gid, size );
+                ppsz_text[1] = get_file_stat(namelist[i]->d_name, &size);
+                ppsz_text[2] = "?";
+                ppsz_text[3] = "?";
+#if 1
+                msg_Dbg(p_intf, "(%d) file: %s permission: %s user: %s group: %s size: %ull", i, ppsz_text[0], ppsz_text[1], ppsz_text[2], ppsz_text[3], (unsigned long long) size );
 #endif
                 gtk_list_store_append (p_list, &iter);
                 gtk_list_store_set (p_list, &iter,
                                     0, ppsz_text[0],
                                     1, ppsz_text[1],
                                     2, size,
-                                    3, ppsz_text[3],
-                                    4, ppsz_text[4],
+                                    3, ppsz_text[2],
+                                    4, ppsz_text[3],
                                     -1);
 
                 if (ppsz_text[1]) free(ppsz_text[1]);
@@ -251,19 +242,18 @@ void ReadDirectory(GtkListStore *p_list, char *psz_dir )
     }
 }
 
-static char* get_file_stat(const char *path, uid_t *uid, gid_t *gid, off_t *size)
+static char *get_file_stat(const char *path, off_t *size)
 {
-    struct stat st;
-    char *perm;
+    struct passwd *pw  = NULL;
+    struct group  *grp = NULL;
+    struct stat    st;
+    char  *perm;
+    int    ret = -1;
 
     perm = (char *) malloc(sizeof(char)*10);
     strncpy( perm, "----------", sizeof("----------"));
     if (lstat(path, &st)==0)
     {
-        /* user, group, filesize */
-        *uid = st.st_uid;
-        *gid = st.st_gid;
-        *size = st.st_size;
         /* determine permission modes */
         if (S_ISLNK(st.st_mode))
             perm[0]= 'l';
@@ -325,6 +315,24 @@ static char* get_file_stat(const char *path, uid_t *uid, gid_t *gid, off_t *size
         }
         else if (st.st_mode &S_ISVTX)
             perm[9]= 'T';
+
+#if 0
+        *permission = perm;
+
+        /* user, group, filesize */
+        pw  = getpwuid(st.st_uid);
+        grp = getgrgid(st.st_gid);
+        if (NULL == pw)
+            return -1;
+        *uid = (char*) malloc( sizeof(char) * strlen(pw->pw_name) );
+        strcpy(path[2],pw->pw_name);
+        if (NULL == grp)
+            return -1;
+        *gid = (char*) malloc( sizeof(char) * strlen(grp->gr_name) );
+        strcpy(path[3], grp->gr_name);
+#endif
+        *size = st.st_size;
+        ret = 0;
     }
     return perm;
 }
@@ -481,7 +489,6 @@ void addSelectedToPlaylist(GtkTreeModel *model,
 
     gtk_tree_model_get(model, iter, 0, &filename, -1);
 
-    /* Add to playlist object. */
     PlaylistAddItem(GTK_WIDGET(userdata), filename);
 }
 
@@ -491,11 +498,12 @@ onFileListRow                          (GtkTreeView     *treeview,
                                         GtkTreeViewColumn *column,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET(treeview) );
     GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
 
     if (gtk_tree_selection_count_selected_rows(selection) == 1)
     {
-        struct stat st;
+        struct stat   st;
         GtkTreeModel *model;
         GtkTreeIter   iter;
         gchar        *filename;
@@ -503,37 +511,57 @@ onFileListRow                          (GtkTreeView     *treeview,
         /* This might be a directory selection */
         model = gtk_tree_view_get_model(treeview);
         if (!model)
-            g_print( "Error: model is a null pointer\n" );
-        if (!gtk_tree_model_get_iter(model, &iter, path))
-            g_print( "Error: could not get iter from model\n" );
+            msg_Err(p_intf, "PDA: Filelist model contains a NULL pointer\n" );
 
-        gtk_tree_model_get(model, &iter, 0, &filename, -1);
-
-        if (stat((char*)filename, &st)==0)
+        if (path == NULL )
         {
-            if (S_ISDIR(st.st_mode))
+#if 0
+            GList* list;
+
+            list = gtk_tree_selection_get_selected_rows(selection,model);
+            if (g_list_length(list) == 1)
             {
-                GtkListStore *p_model = NULL;
-
-                /* Get new directory listing */
-                p_model = gtk_list_store_new (5,
-                                           G_TYPE_STRING,
-                                           G_TYPE_STRING,
-                                           G_TYPE_UINT64,
-                                           G_TYPE_STRING,
-                                           G_TYPE_STRING);
-                if (p_model)
-                {               
-                    ReadDirectory(p_model, filename);
-
-                    /* Update TreeView with new model */
-                    gtk_tree_view_set_model(treeview, (GtkTreeModel*) p_model);
-                    g_object_unref(p_model);
-                }
+                filename = (gchar *) g_list_nth_data(list,0);
+                msg_Dbg(p_intf, "PDA: filename = %s", (gchar*) filename );
+                PlaylistAddItem(GTK_WIDGET(treeview), filename);
             }
-            else
+            g_list_foreach (list, gtk_tree_path_free, NULL);
+            g_list_free (list);
+#endif
+        }
+        else
+        {
+            if (!gtk_tree_model_get_iter(model, &iter, path))
+                msg_Err( p_intf, "PDA: Could not get iter from model" );
+
+            gtk_tree_model_get(model, &iter, 0, &filename, -1);
+
+            if (stat((char*)filename, &st)==0)
             {
-                gtk_tree_selection_selected_foreach(selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) treeview);
+                if (S_ISDIR(st.st_mode))
+                {
+                    GtkListStore *p_model = NULL;
+
+                    /* Get new directory listing */
+                    p_model = gtk_list_store_new (5,
+                                               G_TYPE_STRING,
+                                               G_TYPE_STRING,
+                                               G_TYPE_UINT64,
+                                               G_TYPE_STRING,
+                                               G_TYPE_STRING);
+                    if (p_model)
+                    {
+                        ReadDirectory(p_intf, p_model, filename);
+
+                        /* Update TreeView with new model */
+                        gtk_tree_view_set_model(treeview, (GtkTreeModel*) p_model);
+                        g_object_unref(p_model);
+                    }
+                }
+                else
+                {
+                    gtk_tree_selection_selected_foreach(selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) treeview);
+                }
             }
         }
     }
@@ -542,25 +570,6 @@ onFileListRow                          (GtkTreeView     *treeview,
         gtk_tree_selection_selected_foreach(selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) treeview);
     }
 }
-
-
-void
-onFileListColumns                      (GtkTreeView     *treeview,
-                                        gpointer         user_data)
-{
-    g_print("onFileListColumn\n");
-}
-
-
-gboolean
-onFileListRowSelected                  (GtkTreeView     *treeview,
-                                        gboolean         start_editing,
-                                        gpointer         user_data)
-{
-    g_print("onFileListRowSelected\n");
-    return FALSE;
-}
-
 
 void
 onAddFileToPlaylist                    (GtkButton       *button,
@@ -630,7 +639,7 @@ onAddNetworkPlaylist                   (GtkButton       *button,
     {
         mrl_name = gtk_entry_get_text(p_mrl);
 
-        PlaylistAddItem(GTK_WIDGET(button), (gchar *)p_mrl);
+        PlaylistAddItem(GTK_WIDGET(button), (gchar *)mrl_name);
     }
 }
 
@@ -639,6 +648,8 @@ void
 onAddCameraToPlaylist                  (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( button );
+
     GtkSpinButton *entryV4LChannel = NULL;
     GtkSpinButton *entryV4LFrequency = NULL;
     GtkSpinButton *entryV4LSampleRate = NULL;
@@ -721,9 +732,10 @@ onAddCameraToPlaylist                  (GtkButton       *button,
     /* end MJPEG only */
 
     if (pos >= VLC_MAX_MRL)
+    {
         v4l_mrl[VLC_MAX_MRL-1]='\0';
-
-    g_print( "%s\n", v4l_mrl );
+        msg_Err(p_intf, "Media Resource Locator is truncated to: %s", v4l_mrl);
+    }
 
     PlaylistAddItem(GTK_WIDGET(button), (gchar*) &v4l_mrl);
 }
@@ -734,7 +746,6 @@ PlaylistEvent                          (GtkWidget       *widget,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
-    g_print("onPlaylistEvent\n");
     return FALSE;
 }
 
@@ -743,7 +754,6 @@ void
 onPlaylistColumnsChanged               (GtkTreeView     *treeview,
                                         gpointer         user_data)
 {
-    g_print("onPlaylistColumnsChanged\n");
 }
 
 
@@ -752,8 +762,7 @@ onPlaylistRowSelected                  (GtkTreeView     *treeview,
                                         gboolean         start_editing,
                                         gpointer         user_data)
 {
-  g_print("onPlaylistRowSelected\n");
-  return FALSE;
+    return FALSE;
 }
 
 
@@ -763,7 +772,6 @@ onPlaylistRow                          (GtkTreeView     *treeview,
                                         GtkTreeViewColumn *column,
                                         gpointer         user_data)
 {
-    g_print("onPlaylistRow\n");
 }
 
 
@@ -787,7 +795,9 @@ void
 onClearPlaylist                        (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( button );
 
+    msg_Dbg(p_intf, "Clear playlist" );
 }
 
 
@@ -795,7 +805,9 @@ void
 onPreferenceSave                       (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( button );
 
+    msg_Dbg(p_intf, "Preferences Save" );
 }
 
 
@@ -803,7 +815,9 @@ void
 onPreferenceApply                      (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( button );
 
+    msg_Dbg(p_intf, "Preferences Apply" );
 }
 
 
@@ -811,23 +825,18 @@ void
 onPreferenceCancel                     (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( button );
 
+    msg_Dbg(p_intf, "Preferences Cancel" );
 }
 
-
-
-void
-onNetworkMRLAdd                        (GtkContainer    *container,
-                                        GtkWidget       *widget,
-                                        gpointer         user_data)
-{
-
-}
 
 void
 onAddTranscodeToPlaylist               (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( button );
+
     GtkEntry       *entryVideoCodec = NULL;
     GtkSpinButton  *entryVideoBitrate = NULL;
     GtkSpinButton  *entryVideoBitrateTolerance = NULL;
@@ -907,11 +916,11 @@ onAddTranscodeToPlaylist               (GtkButton       *button,
 
     pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, " --ttl=%d", (int)i_std_ttl);
 
-
     if (pos >= VLC_MAX_MRL)
-        _mrl[VLC_MAX_MRL-1]='\0';
-
-    g_print( "%s\n", mrl );
+    {
+        mrl[VLC_MAX_MRL-1]='\0';
+        msg_Err(p_intf, "Media Resource Locator is truncated to: %s", mrl );
+    }
 
     PlaylistAddItem(GTK_WIDGET(button), (gchar*) &mrl);
 }

@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.8 2003/11/07 13:01:51 jpsaman Exp $
+ * $Id: pda.c,v 1.9 2003/11/18 20:36:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -148,6 +148,7 @@ static void Run( intf_thread_t *p_intf )
     GtkCellRenderer   *renderer = NULL;
     GtkTreeViewColumn *column   = NULL;
     GtkListStore      *filelist = NULL;
+    GtkListStore      *playlist = NULL;
 
 #ifndef NEED_GTK2_MAIN
     gtk_set_locale ();
@@ -252,7 +253,7 @@ static void Run( intf_thread_t *p_intf )
                 G_TYPE_UINT64, /* File size */
                 G_TYPE_STRING, /* Owner */
                 G_TYPE_STRING);/* Group */
-    ReadDirectory(filelist, ".");
+    ReadDirectory(p_intf, filelist, ".");
     msg_Dbg(p_intf, "Showing GtkTreeView FileList" );
     gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvfile), GTK_TREE_MODEL(filelist));
     g_object_unref(filelist);     /* Model will be released by GtkTreeView */
@@ -267,8 +268,7 @@ static void Run( intf_thread_t *p_intf )
     /* BEGIN OF PLAYLIST GTK_TREE_VIEW */
     msg_Dbg(p_intf, "Getting GtkTreeView PlayList" );
     p_intf->p_sys->p_tvplaylist = NULL;
-    p_intf->p_sys->p_tvplaylist = (GtkTreeView *) lookup_widget( p_intf->p_sys->p_window,
-                                                             "tvPlaylist");   
+    p_intf->p_sys->p_tvplaylist = (GtkTreeView *) lookup_widget( p_intf->p_sys->p_window, "tvPlaylist");   
     if (NULL == p_intf->p_sys->p_tvplaylist)
        msg_Err(p_intf, "Error obtaining pointer to Play List");
 
@@ -287,13 +287,13 @@ static void Run( intf_thread_t *p_intf )
 
     /* update the playlist */
     msg_Dbg(p_intf, "Populating GtkTreeView Playlist" );
-    p_intf->p_sys->p_playlist = gtk_list_store_new (2,
-                               G_TYPE_STRING, /* Filename */
-                               G_TYPE_STRING);/* Time */
-    PlaylistRebuildListStore( p_intf->p_sys->p_playlist, vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ));
+    playlist = gtk_list_store_new (2,
+                G_TYPE_STRING, /* Filename */
+                G_TYPE_STRING);/* Time */
+    PlaylistRebuildListStore( playlist, vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ));
     msg_Dbg(p_intf, "Showing GtkTreeView Playlist" );
-    gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvplaylist), GTK_TREE_MODEL(p_intf->p_sys->p_playlist));
-    g_object_unref(p_intf->p_sys->p_playlist);
+    gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvplaylist), GTK_TREE_MODEL(playlist));
+    g_object_unref(playlist);
     gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(p_intf->p_sys->p_tvplaylist)),GTK_SELECTION_MULTIPLE);
 
     /* Column properties */
@@ -301,10 +301,6 @@ static void Run( intf_thread_t *p_intf )
     gtk_tree_view_columns_autosize(p_intf->p_sys->p_tvplaylist);
     gtk_tree_view_set_headers_clickable(p_intf->p_sys->p_tvplaylist, TRUE);
     /* END OF PLAYLIST GTK_TREE_VIEW */
-
-    /* Save MRL entry object */
-    p_intf->p_sys->p_mrlentry = GTK_ENTRY( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "mrl_entry" ) );
 
     /* Store p_intf to keep an eye on it */
     msg_Dbg( p_intf, "trying to store p_intf pointer ... " );

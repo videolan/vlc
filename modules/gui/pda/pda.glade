@@ -157,7 +157,7 @@
 	<packing>
 	  <property name="padding">4</property>
 	  <property name="expand">False</property>
-	  <property name="fill">False</property>
+	  <property name="fill">True</property>
 	</packing>
       </child>
 
@@ -209,7 +209,6 @@
 			      <property name="reorderable">False</property>
 			      <property name="enable_search">True</property>
 			      <signal name="row_activated" handler="onFileListRow" last_modification_time="Fri, 26 Sep 2003 13:30:40 GMT"/>
-			      <signal name="select_cursor_row" handler="onFileListRowSelected" last_modification_time="Fri, 26 Sep 2003 13:31:20 GMT"/>
 			    </widget>
 			  </child>
 			</widget>
@@ -331,7 +330,6 @@
 		      <property name="case_sensitive">False</property>
 		      <property name="enable_arrow_keys">True</property>
 		      <property name="enable_arrows_always">False</property>
-		      <signal name="add" handler="onNetworkMRLAdd" last_modification_time="Fri, 07 Nov 2003 14:35:58 GMT"/>
 
 		      <child internal-child="entry">
 			<widget class="GtkEntry" id="entryMRL">
@@ -505,7 +503,7 @@
 		      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 		      <property name="snap_to_ticks">False</property>
 		      <property name="wrap">False</property>
-		      <property name="adjustment">1233 0 65535 1 10 10</property>
+		      <property name="adjustment">1234 0 65535 1 10 10</property>
 		      <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:34:10 GMT"/>
 		    </widget>
 		    <packing>
@@ -573,7 +571,7 @@
 			  <property name="editable">True</property>
 			  <property name="visibility">True</property>
 			  <property name="max_length">0</property>
-			  <property name="text" translatable="yes">unicast</property>
+			  <property name="text" translatable="yes"></property>
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">True</property>
@@ -653,7 +651,7 @@
 			  <property name="editable">True</property>
 			  <property name="visibility">True</property>
 			  <property name="max_length">0</property>
-			  <property name="text" translatable="yes">udp</property>
+			  <property name="text" translatable="yes"></property>
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
@@ -1167,7 +1165,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">/dev/video</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -1231,7 +1229,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">/dev/dsp</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -1325,7 +1323,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">pal</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -1397,7 +1395,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">240x192</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -1561,7 +1559,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">mono</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -1808,7 +1806,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">huffyuv</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -2181,7 +2179,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">127.0.0.1</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -2252,7 +2250,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">udp</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -2299,7 +2297,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">ts</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -2376,7 +2374,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">alaw</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -2743,7 +2741,30 @@
 	      <property name="spacing">0</property>
 
 	      <child>
-		<placeholder/>
+		<widget class="GtkScrolledWindow" id="scrolledwindowPreference">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="hscrollbar_policy">GTK_POLICY_ALWAYS</property>
+		  <property name="vscrollbar_policy">GTK_POLICY_ALWAYS</property>
+		  <property name="shadow_type">GTK_SHADOW_NONE</property>
+		  <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
+
+		  <child>
+		    <widget class="GtkTreeView" id="tvPreferences">
+		      <property name="visible">True</property>
+		      <property name="can_focus">True</property>
+		      <property name="headers_visible">False</property>
+		      <property name="rules_hint">False</property>
+		      <property name="reorderable">False</property>
+		      <property name="enable_search">True</property>
+		    </widget>
+		  </child>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">True</property>
+		  <property name="fill">True</property>
+		</packing>
 	      </child>
 
 	      <child>
@@ -2917,28 +2938,6 @@
 		      </child>
 
 		      <child>
-			<widget class="GtkLabel" id="labelProgramName">
-			  <property name="width_request">152</property>
-			  <property name="height_request">16</property>
-			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">VLC media player</property>
-			  <property name="use_underline">False</property>
-			  <property name="use_markup">False</property>
-			  <property name="justify">GTK_JUSTIFY_CENTER</property>
-			  <property name="wrap">True</property>
-			  <property name="selectable">False</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-			<packing>
-			  <property name="x">48</property>
-			  <property name="y">16</property>
-			</packing>
-		      </child>
-
-		      <child>
 			<widget class="GtkLabel" id="labelCopyright">
 			  <property name="width_request">208</property>
 			  <property name="height_request">16</property>
@@ -2957,6 +2956,28 @@
 			<packing>
 			  <property name="x">16</property>
 			  <property name="y">48</property>
+			</packing>
+		      </child>
+
+		      <child>
+			<widget class="GtkLabel" id="labelProgramName">
+			  <property name="width_request">152</property>
+			  <property name="height_request">16</property>
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">VLC media player</property>
+			  <property name="use_underline">False</property>
+			  <property name="use_markup">False</property>
+			  <property name="justify">GTK_JUSTIFY_CENTER</property>
+			  <property name="wrap">True</property>
+			  <property name="selectable">False</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+			<packing>
+			  <property name="x">48</property>
+			  <property name="y">16</property>
 			</packing>
 		      </child>
 		    </widget>
