@@ -2,7 +2,7 @@
  * aac.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: aac.c,v 1.9 2004/01/25 20:05:28 hartman Exp $
+ * $Id: aac.c,v 1.10 2004/03/03 11:40:19 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -37,7 +37,7 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("AAC demuxer" ) );
-    set_capability( "demux", 10 );
+    set_capability( "demux2", 100 );
     set_callbacks( Open, Close );
     add_shortcut( "aac" );
 vlc_module_end();
@@ -50,8 +50,6 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux       ( input_thread_t * );
-
 struct demux_sys_t
 {
     mtime_t         i_time;
@@ -59,9 +57,12 @@ struct demux_sys_t
     es_out_id_t     *p_es;
 };
 
+static int Demux  ( demux_t * );
+static int Control( demux_t *, int, va_list );
+
 static int i_aac_samplerate[16] =
 {
-    96000, 88200, 64000, 48000, 44100, 32000, 
+    96000, 88200, 64000, 48000, 44100, 32000,
     24000, 22050, 16000, 12000, 11025, 8000,
     7350,  0,     0,     0
 };
@@ -70,6 +71,7 @@ static int i_aac_samplerate[16] =
 #define AAC_SAMPLE_RATE( p ) i_aac_samplerate[((p)[2]>>2)&0x0f]
 #define AAC_CHANNELS( p )    ( (((p)[2]&0x01)<<2) | (((p)[3]>>6)&0x03) )
 #define AAC_FRAME_SIZE( p )  ( (((p)[3]&0x03) << 11)|( (p)[4] << 3 )|( (((p)[5]) >>5)&0x7 ) )
+
 /* FIXME it's plain wrong */
 #define AAC_FRAME_SAMPLES( p )  1024
 
@@ -86,33 +88,29 @@ static inline int HeaderCheck( uint8_t *p )
     return VLC_TRUE;
 }
 
-
 /*****************************************************************************
  * Open: initializes AAC demux structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys;
-    int            b_forced = VLC_FALSE;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
+    int         b_forced = VLC_FALSE;
 
-    uint8_t        *p_peek;
+    uint8_t     *p_peek;
+    module_t    *p_id3;
+    es_format_t fmt;
 
-    module_t       *p_id3;
-
-    es_format_t    fmt;
-
-
-    if( p_input->psz_demux && !strncmp( p_input->psz_demux, "aac", 3 ) )
+    if( !strncmp( p_demux->psz_demux, "aac", 3 ) )
     {
         b_forced = VLC_TRUE;
     }
 
-    if( p_input->psz_name )
+    if( p_demux->psz_path )
     {
-        int  i_len = strlen( p_input->psz_name );
+        int  i_len = strlen( p_demux->psz_path );
 
-        if( i_len > 4 && !strcasecmp( &p_input->psz_name[i_len - 4], ".aac" ) )
+        if( i_len > 4 && !strcasecmp( &p_demux->psz_path[i_len - 4], ".aac" ) )
         {
             b_forced = VLC_TRUE;
         }
@@ -123,33 +121,31 @@ static int Open( vlc_object_t * p_this )
         /* I haven't find any sure working aac detection so only forced or
          * extention check
          */
-        msg_Warn( p_input, "AAC module discarded" );
+        msg_Warn( p_demux, "AAC module discarded" );
         return VLC_EGENERIC;
     }
 
     /* skip possible id3 header */
-    p_id3 = module_Need( p_input, "id3", NULL );
-    if ( p_id3 )
+    if( ( p_id3 = module_Need( p_demux, "id3", NULL ) ) )
     {
-        module_Unneed( p_input, p_id3 );
+        module_Unneed( p_demux, p_id3 );
     }
 
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
 
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_time = 0;
 
     /* peek the begining (10 is for adts header) */
-    if( stream_Peek( p_input->s, &p_peek, 10 ) < 10 )
+    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
     {
-        msg_Err( p_input, "cannot peek" );
+        msg_Err( p_demux, "cannot peek" );
         goto error;
     }
-
     if( !strncmp( p_peek, "ADIF", 4 ) )
     {
-        msg_Err( p_input, "ADIF file. Not yet supported. (Please report)" );
+        msg_Err( p_demux, "ADIF file. Not yet supported. (Please report)" );
         goto error;
     }
 
@@ -157,27 +153,16 @@ static int Open( vlc_object_t * p_this )
     if( HeaderCheck( p_peek ) )
     {
         fmt.audio.i_channels = AAC_CHANNELS( p_peek );
-        fmt.audio.i_rate = AAC_SAMPLE_RATE( p_peek );
+        fmt.audio.i_rate     = AAC_SAMPLE_RATE( p_peek );
 
-        msg_Dbg( p_input,
+        msg_Dbg( p_demux,
                  "adts header: id=%d channels=%d sample_rate=%d",
                  AAC_ID( p_peek ),
                  AAC_CHANNELS( p_peek ),
                  AAC_SAMPLE_RATE( p_peek ) );
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        goto error;
-    }
-    p_input->stream.i_mux_rate = 0 / 50;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
-
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     return VLC_SUCCESS;
 
 error:
@@ -191,17 +176,17 @@ error:
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux( input_thread_t * p_input )
+static int Demux( demux_t *p_demux )
 {
-    demux_sys_t  *p_sys = p_input->p_demux_data;
-    block_t *p_block;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    block_t     *p_block;
 
-    uint8_t      h[8];
-    uint8_t      *p_peek;
+    uint8_t     h[8];
+    uint8_t     *p_peek;
 
-    if( stream_Peek( p_input->s, &p_peek, 8 ) < 8 )
+    if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
     {
-        msg_Warn( p_input, "cannot peek" );
+        msg_Warn( p_demux, "cannot peek" );
         return 0;
     }
 
@@ -212,10 +197,10 @@ static int Demux( input_thread_t * p_input )
         int         i_skip = 0;
         int         i_peek;
 
-        i_peek = stream_Peek( p_input->s, &p_peek, 8096 );
+        i_peek = stream_Peek( p_demux->s, &p_peek, 8096 );
         if( i_peek < 8 )
         {
-            msg_Warn( p_input, "cannot peek" );
+            msg_Warn( p_demux, "cannot peek" );
             return 0;
         }
 
@@ -232,29 +217,27 @@ static int Demux( input_thread_t * p_input )
             i_skip++;
         }
 
-        msg_Warn( p_input, "garbage=%d bytes", i_skip );
-        stream_Read( p_input->s, NULL, i_skip );
+        msg_Warn( p_demux, "garbage=%d bytes", i_skip );
+        stream_Read( p_demux->s, NULL, i_skip );
         return 1;
     }
 
     memcpy( h, p_peek, 8 );    /* can't use p_peek after stream_*  */
 
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
-                          p_sys->i_time * 9 / 100 );
 
-    if( ( p_block = stream_Block( p_input->s, AAC_FRAME_SIZE( h ) ) ) == NULL )
+
+    /* set PCR */
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
+
+    if( ( p_block = stream_Block( p_demux->s, AAC_FRAME_SIZE( h ) ) ) == NULL )
     {
-        msg_Warn( p_input, "cannot read data" );
+        msg_Warn( p_demux, "cannot read data" );
         return 0;
     }
 
-    p_block->i_dts =
-    p_block->i_pts = input_ClockGetTS( p_input,
-                                     p_input->stream.p_selected_program,
-                                     p_sys->i_time * 9 / 100 );
+    p_block->i_dts = p_block->i_pts = p_sys->i_time;
 
-    es_out_Send( p_input->p_es_out, p_sys->p_es, p_block );
+    es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
     p_sys->i_time += (mtime_t)1000000 *
                      (mtime_t)AAC_FRAME_SAMPLES( h ) /
@@ -267,9 +250,21 @@ static int Demux( input_thread_t * p_input )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t*)p_this;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     free( p_sys );
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    /* demux_sys_t *p_sys  = p_demux->p_sys; */
+    /* FIXME calculate the bitrate */
+    return demux2_vaControlHelper( p_demux->s,
+                                   0, -1,
+                                   8*0, 1, i_query, args );
 }
 

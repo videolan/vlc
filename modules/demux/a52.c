@@ -2,7 +2,7 @@
  * a52.c : raw A/52 stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.6 2004/02/25 17:48:52 fenrir Exp $
+ * $Id: a52.c,v 1.7 2004/03/03 11:40:19 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -32,18 +32,24 @@
 #   include <unistd.h>
 #endif
 
-#define PCM_FRAME_SIZE (1536 * 4)
-#define A52_PACKET_SIZE (4 * PCM_FRAME_SIZE)
-#define A52_MAX_HEADER_SIZE 10
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open  ( vlc_object_t * );
+static void Close ( vlc_object_t * );
+
+vlc_module_begin();
+    set_description( _("Raw A/52 demuxer") );
+    set_capability( "demux2", 145 );
+    set_callbacks( Open, Close );
+    add_shortcut( "a52" );
+vlc_module_end();
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Open  ( vlc_object_t * );
-static void Close ( vlc_object_t * );
-static int  Demux ( input_thread_t * );
-
-static int Control( input_thread_t *, int, va_list );
+static int Demux  ( demux_t * );
+static int Control( demux_t *, int, va_list );
 
 struct demux_sys_t
 {
@@ -57,63 +63,33 @@ struct demux_sys_t
     vlc_bool_t b_big_endian;
 };
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-vlc_module_begin();
-    set_description( _("Raw A/52 demuxer") );
-    set_capability( "demux", 145 );
-    set_callbacks( Open, Close );
-    add_shortcut( "a52" );
-vlc_module_end();
+static int CheckSync( uint8_t *p_peek, vlc_bool_t *p_big_endian );
 
-/*****************************************************************************
- * CheckSync: Check if buffer starts with an A52 sync code
- *****************************************************************************/
-static int CheckSync( uint8_t *p_peek, vlc_bool_t *p_big_endian )
-{
-    /* Little endian version of the bitstream */
-    if( p_peek[0] == 0x77 && p_peek[1] == 0x0b &&
-        p_peek[4] < 0x60 /* bsid < 12 */ )
-    {
-        *p_big_endian = VLC_FALSE;
-        return VLC_SUCCESS;
-    }
-    /* Big endian version of the bitstream */
-    else if( p_peek[0] == 0x0b && p_peek[1] == 0x77 &&
-             p_peek[5] < 0x60 /* bsid < 12 */ )
-    {
-        *p_big_endian = VLC_TRUE;
-        return VLC_SUCCESS;
-    }
+#define PCM_FRAME_SIZE (1536 * 4)
+#define A52_PACKET_SIZE (4 * PCM_FRAME_SIZE)
+#define A52_MAX_HEADER_SIZE 10
 
-    return VLC_EGENERIC;
-}
 
 /*****************************************************************************
  * Open: initializes ES structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys;
-    byte_t *       p_peek;
-    int            i_peek = 0;
-    vlc_bool_t     b_big_endian;
-
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = Control;
-    p_input->pf_rewind = NULL;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
+    byte_t      *p_peek;
+    int         i_peek = 0;
+    vlc_bool_t  b_big_endian;
 
     /* Check if we are dealing with a WAV file */
-    if( input_Peek( p_input, &p_peek, 12 ) == 12 &&
+    if( stream_Peek( p_demux->s, &p_peek, 12 ) == 12 &&
         !strncmp( p_peek, "RIFF", 4 ) && !strncmp( &p_peek[8], "WAVE", 4 ) )
     {
         int i_size;
 
         /* Skip the wave header */
         i_peek = 12 + 8;
-        while( input_Peek( p_input, &p_peek, i_peek ) == i_peek &&
+        while( stream_Peek( p_demux->s, &p_peek, i_peek ) == i_peek &&
                strncmp( p_peek + i_peek - 8, "data", 4 ) )
         {
             i_peek += GetDWLE( p_peek + i_peek - 4 ) + 8;
@@ -123,7 +99,7 @@ static int Open( vlc_object_t * p_this )
 
         /* Some A52 wav files don't begin with a sync code so we do a more
          * extensive search */
-        i_size = input_Peek( p_input, &p_peek, i_peek + A52_PACKET_SIZE * 2);
+        i_size = stream_Peek( p_demux->s, &p_peek, i_peek + A52_PACKET_SIZE * 2);
         i_size -= (PCM_FRAME_SIZE + A52_MAX_HEADER_SIZE);
 
         while( i_peek < i_size )
@@ -147,29 +123,30 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Have a peep at the show. */
-    if( input_Peek( p_input, &p_peek, i_peek + A52_MAX_HEADER_SIZE * 2 ) <
+    if( stream_Peek( p_demux->s, &p_peek, i_peek + A52_MAX_HEADER_SIZE * 2 ) <
         i_peek + A52_MAX_HEADER_SIZE * 2 )
     {
         /* Stream too short */
-        msg_Warn( p_input, "cannot peek()" );
+        msg_Warn( p_demux, "cannot peek()" );
         return VLC_EGENERIC;
     }
 
     if( CheckSync( p_peek + i_peek, &b_big_endian ) != VLC_SUCCESS )
     {
-        if( p_input->psz_demux && !strncmp( p_input->psz_demux, "a52", 3 ) )
-        {
-            /* User forced */
-            msg_Err( p_input, "this doesn't look like a A52 audio stream, "
-                     "continuing anyway" );
-        }
-        else
+        if( strncmp( p_demux->psz_demux, "a52", 3 ) )
         {
             return VLC_EGENERIC;
         }
+
+        /* User forced */
+        msg_Err( p_demux, "this doesn't look like a A52 audio stream, "
+                 "continuing anyway" );
     }
 
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    /* Fill p_demux fields */
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->b_start = VLC_TRUE;
     p_sys->i_mux_rate = 0;
     p_sys->b_big_endian = b_big_endian;
@@ -177,7 +154,7 @@ static int Open( vlc_object_t * p_this )
     /*
      * Load the A52 packetizer
      */
-    p_sys->p_packetizer = vlc_object_create( p_input, VLC_OBJECT_DECODER );
+    p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_DECODER );
     p_sys->p_packetizer->pf_decode_audio = 0;
     p_sys->p_packetizer->pf_decode_video = 0;
     p_sys->p_packetizer->pf_decode_sub = 0;
@@ -191,23 +168,12 @@ static int Open( vlc_object_t * p_this )
         module_Need( p_sys->p_packetizer, "packetizer", NULL );
     if( !p_sys->p_packetizer->p_module )
     {
-        msg_Err( p_input, "cannot find A52 packetizer" );
+        msg_Err( p_demux, "cannot find A52 packetizer" );
         return VLC_EGENERIC;
     }
 
     /* Create one program */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1 )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        return VLC_EGENERIC;
-    }
-    p_input->stream.i_mux_rate = 0;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    p_sys->p_es =
-        es_out_Add( p_input->p_es_out, &p_sys->p_packetizer->fmt_in );
+    p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_in );
 
     return VLC_SUCCESS;
 }
@@ -217,8 +183,8 @@ static int Open( vlc_object_t * p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t*)p_this;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_t        *p_demux = (demux_t*)p_this;
+    demux_sys_t    *p_sys = p_demux->p_sys;
 
     /* Unneed module */
     module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
@@ -234,16 +200,16 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux( input_thread_t * p_input )
+static int Demux( demux_t *p_demux )
 {
-    demux_sys_t  *p_sys = p_input->p_demux_data;
-    block_t *p_block_in, *p_block_out;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    block_t     *p_block_in, *p_block_out;
 
      /* Align stream */
-    int64_t i_pos = stream_Tell( p_input->s );
-    if( i_pos % 2 ) stream_Read( p_input->s, NULL, 1 );
+    int64_t i_pos = stream_Tell( p_demux->s );
+    if( i_pos % 2 ) stream_Read( p_demux->s, NULL, 1 );
 
-    if( !( p_block_in = stream_Block( p_input->s, A52_PACKET_SIZE ) ) )
+    if( !( p_block_in = stream_Block( p_demux->s, A52_PACKET_SIZE ) ) )
     {
         return 0;
     }
@@ -285,19 +251,15 @@ static int Demux( input_thread_t * p_input )
 
             /* We assume a constant bitrate */
             if( p_block_out->i_length )
-            p_sys->i_mux_rate =
-                p_block_out->i_buffer * I64C(1000000) / p_block_out->i_length;
-            p_input->stream.i_mux_rate = p_sys->i_mux_rate / 50;
+            {
+                p_sys->i_mux_rate =
+                    p_block_out->i_buffer * I64C(1000000)/p_block_out->i_length;
+            }
 
-            input_ClockManageRef( p_input,
-                                  p_input->stream.p_selected_program,
-                                  p_block_out->i_pts * 9 / 100 );
+            /* set PCR */
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
 
-            p_block_out->i_dts = p_block_out->i_pts =
-                input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                                  p_block_out->i_pts * 9 / 100 );
-
-            es_out_Send( p_input->p_es_out, p_sys->p_es, p_block_out );
+            es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
             p_block_out = p_next;
         }
@@ -309,36 +271,35 @@ static int Demux( input_thread_t * p_input )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( input_thread_t *p_input, int i_query, va_list args )
+static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys  = (demux_sys_t *)p_input->p_demux_data;
-    int64_t *pi64;
-
-    switch( i_query )
-    {
-        case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_mux_rate > 0 )
-            {
-                *pi64 = I64C(1000000) * stream_Tell( p_input->s ) /
-                        p_sys->i_mux_rate;
-                return VLC_SUCCESS;
-            }
-            *pi64 = 0;
-            return VLC_EGENERIC;
-
-        case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_mux_rate > 0 )
-            {
-                *pi64 = I64C(1000000) * stream_Size( p_input->s ) /
-                        p_sys->i_mux_rate;
-                return VLC_SUCCESS;
-            }
-            *pi64 = 0;
-            return VLC_EGENERIC;
-
-        default:
-            return demux_vaControlDefault( p_input, i_query, args );
-    }
+    demux_sys_t *p_sys  = p_demux->p_sys;
+    return demux2_vaControlHelper( p_demux->s,
+                                   0, -1,
+                                   8*p_sys->i_mux_rate, 1, i_query, args );
 }
+
+/*****************************************************************************
+ * CheckSync: Check if buffer starts with an A52 sync code
+ *****************************************************************************/
+static int CheckSync( uint8_t *p_peek, vlc_bool_t *p_big_endian )
+{
+    /* Little endian version of the bitstream */
+    if( p_peek[0] == 0x77 && p_peek[1] == 0x0b &&
+        p_peek[4] < 0x60 /* bsid < 12 */ )
+    {
+        *p_big_endian = VLC_FALSE;
+        return VLC_SUCCESS;
+    }
+    /* Big endian version of the bitstream */
+    else if( p_peek[0] == 0x0b && p_peek[1] == 0x77 &&
+             p_peek[5] < 0x60 /* bsid < 12 */ )
+    {
+        *p_big_endian = VLC_TRUE;
+        return VLC_SUCCESS;
+    }
+
+    return VLC_EGENERIC;
+}
+
+

@@ -2,7 +2,7 @@
  * dts.c : raw DTS stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dts.c,v 1.10 2004/02/25 17:48:52 fenrir Exp $
+ * $Id: dts.c,v 1.11 2004/03/03 11:40:19 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -28,18 +28,24 @@
 #include <vlc/input.h>
 #include <vlc_codec.h>
 
-#define DTS_PACKET_SIZE 16384
-#define DTS_PROBE_SIZE (DTS_PACKET_SIZE * 4)
-#define DTS_MAX_HEADER_SIZE 11
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open  ( vlc_object_t * );
+static void Close ( vlc_object_t * );
+
+vlc_module_begin();
+    set_description( _("Raw DTS demuxer") );
+    set_capability( "demux2", 155 );
+    set_callbacks( Open, Close );
+    add_shortcut( "dts" );
+vlc_module_end();
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Open  ( vlc_object_t * );
-static void Close ( vlc_object_t * );
-static int  Demux ( input_thread_t * );
-
-static int Control( input_thread_t *, int, va_list );
+static int Demux  ( demux_t * );
+static int Control( demux_t *, int, va_list );
 
 struct demux_sys_t
 {
@@ -52,15 +58,208 @@ struct demux_sys_t
     int i_mux_rate;
 };
 
+static int CheckSync( uint8_t *p_peek );
+
+#define DTS_PACKET_SIZE 16384
+#define DTS_PROBE_SIZE (DTS_PACKET_SIZE * 4)
+#define DTS_MAX_HEADER_SIZE 11
+
 /*****************************************************************************
- * Module descriptor
+ * Open: initializes ES structures
  *****************************************************************************/
-vlc_module_begin();
-    set_description( _("Raw DTS demuxer") );
-    set_capability( "demux", 155 );
-    set_callbacks( Open, Close );
-    add_shortcut( "dts" );
-vlc_module_end();
+static int Open( vlc_object_t * p_this )
+{
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
+    byte_t *     p_peek;
+    int          i_peek = 0;
+
+    /* Check if we are dealing with a WAV file */
+    if( stream_Peek( p_demux->s, &p_peek, 20 ) == 20 &&
+        !strncmp( p_peek, "RIFF", 4 ) && !strncmp( &p_peek[8], "WAVE", 4 ) )
+    {
+        int i_size;
+
+        /* Find the wave format header */
+        i_peek = 20;
+        while( strncmp( p_peek + i_peek - 8, "fmt ", 4 ) )
+        {
+            i_size = GetDWLE( p_peek + i_peek - 4 );
+            if( i_size + i_peek > DTS_PROBE_SIZE ) return VLC_EGENERIC;
+            i_peek += i_size + 8;
+
+            if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+                return VLC_EGENERIC;
+        }
+
+        /* Sanity check the wave format header */
+        i_size = GetDWLE( p_peek + i_peek - 4 );
+        if( i_size + i_peek > DTS_PROBE_SIZE ) return VLC_EGENERIC;
+        i_peek += i_size + 8;
+        if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+            return VLC_EGENERIC;
+        if( GetWLE( p_peek + i_peek - i_size - 8 /* wFormatTag */ ) !=
+            1 /* WAVE_FORMAT_PCM */ )
+            return VLC_EGENERIC;
+        if( GetWLE( p_peek + i_peek - i_size - 6 /* nChannels */ ) != 2 )
+            return VLC_EGENERIC;
+        if( GetDWLE( p_peek + i_peek - i_size - 4 /* nSamplesPerSec */ ) !=
+            44100 )
+            return VLC_EGENERIC;
+
+        /* Skip the wave header */
+        while( strncmp( p_peek + i_peek - 8, "data", 4 ) )
+        {
+            i_size = GetDWLE( p_peek + i_peek - 4 );
+            if( i_size + i_peek > DTS_PROBE_SIZE ) return VLC_EGENERIC;
+            i_peek += i_size + 8;
+
+            if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+                return VLC_EGENERIC;
+        }
+
+        /* Some DTS wav files don't begin with a sync code so we do a more
+         * extensive search */
+        i_size = stream_Peek( p_demux->s, &p_peek, DTS_PROBE_SIZE );
+        i_size -= DTS_MAX_HEADER_SIZE;
+
+        while( i_peek < i_size )
+        {
+            if( CheckSync( p_peek + i_peek ) != VLC_SUCCESS )
+                /* The data is stored in 16 bits words */
+                i_peek += 2;
+            else
+                break;
+        }
+    }
+
+    /* Have a peep at the show. */
+    if( stream_Peek( p_demux->s, &p_peek, i_peek + DTS_MAX_HEADER_SIZE * 2 ) <
+        i_peek + DTS_MAX_HEADER_SIZE * 2 )
+    {
+        /* Stream too short */
+        msg_Warn( p_demux, "cannot peek()" );
+        return VLC_EGENERIC;
+    }
+
+    if( CheckSync( p_peek + i_peek ) != VLC_SUCCESS )
+    {
+        if( strncmp( p_demux->psz_demux, "dts", 3 ) )
+        {
+            return VLC_EGENERIC;
+        }
+        /* User forced */
+        msg_Err( p_demux, "this doesn't look like a DTS audio stream, "
+                 "continuing anyway" );
+    }
+
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->b_start = VLC_TRUE;
+    p_sys->i_mux_rate = 0;
+
+    /*
+     * Load the DTS packetizer
+     */
+    p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_DECODER );
+    p_sys->p_packetizer->pf_decode_audio = 0;
+    p_sys->p_packetizer->pf_decode_video = 0;
+    p_sys->p_packetizer->pf_decode_sub = 0;
+    p_sys->p_packetizer->pf_packetize = 0;
+
+    /* Initialization of decoder structure */
+    es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES,
+                    VLC_FOURCC( 'd', 't', 's', ' ' ) );
+
+    p_sys->p_packetizer->p_module =
+        module_Need( p_sys->p_packetizer, "packetizer", NULL );
+    if( !p_sys->p_packetizer->p_module )
+    {
+        msg_Err( p_demux, "cannot find DTS packetizer" );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_in );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close: frees unused data
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    /* Unneed module */
+    module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
+
+    /* Delete the decoder */
+    vlc_object_destroy( p_sys->p_packetizer );
+
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * Demux: reads and demuxes data packets
+ *****************************************************************************
+ * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
+ *****************************************************************************/
+static int Demux( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    block_t *p_block_in, *p_block_out;
+
+    if( !( p_block_in = stream_Block( p_demux->s, DTS_PACKET_SIZE ) ) )
+    {
+        return 0;
+    }
+
+    if( p_sys->b_start )
+        p_block_in->i_pts = p_block_in->i_dts = 1;
+    else
+        p_block_in->i_pts = p_block_in->i_dts = 0;
+
+    while( (p_block_out = p_sys->p_packetizer->pf_packetize(
+                p_sys->p_packetizer, &p_block_in )) )
+    {
+        p_sys->b_start = VLC_FALSE;
+
+        while( p_block_out )
+        {
+            block_t *p_next = p_block_out->p_next;
+
+            /* We assume a constant bitrate */
+            if( p_block_out->i_length )
+            {
+                p_sys->i_mux_rate =
+                    p_block_out->i_buffer * I64C(1000000) / p_block_out->i_length;
+            }
+
+            /* set PCR */
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
+
+            es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
+
+            p_block_out = p_next;
+        }
+    }
+
+    return 1;
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    demux_sys_t *p_sys  = p_demux->p_sys;
+    return demux2_vaControlHelper( p_demux->s,
+                                   0, -1,
+                                   8*p_sys->i_mux_rate, 1, i_query, args );
+}
 
 /*****************************************************************************
  * CheckSync: Check if buffer starts with a DTS sync code
@@ -97,246 +296,3 @@ static int CheckSync( uint8_t *p_peek )
     return VLC_EGENERIC;
 }
 
-/*****************************************************************************
- * Open: initializes ES structures
- *****************************************************************************/
-static int Open( vlc_object_t * p_this )
-{
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys;
-    byte_t *       p_peek;
-    int            i_peek = 0;
-
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = Control;
-    p_input->pf_rewind = NULL;
-
-    /* Check if we are dealing with a WAV file */
-    if( input_Peek( p_input, &p_peek, 20 ) == 20 &&
-        !strncmp( p_peek, "RIFF", 4 ) && !strncmp( &p_peek[8], "WAVE", 4 ) )
-    {
-        int i_size;
-
-        /* Find the wave format header */
-        i_peek = 20;
-        while( strncmp( p_peek + i_peek - 8, "fmt ", 4 ) )
-        {
-            i_size = GetDWLE( p_peek + i_peek - 4 );
-            if( i_size + i_peek > DTS_PROBE_SIZE ) return VLC_EGENERIC;
-            i_peek += i_size + 8;
-
-            if( input_Peek( p_input, &p_peek, i_peek ) != i_peek )
-                return VLC_EGENERIC;
-        }
-
-        /* Sanity check the wave format header */
-        i_size = GetDWLE( p_peek + i_peek - 4 );
-        if( i_size + i_peek > DTS_PROBE_SIZE ) return VLC_EGENERIC;
-        i_peek += i_size + 8;
-        if( input_Peek( p_input, &p_peek, i_peek ) != i_peek )
-            return VLC_EGENERIC;
-        if( GetWLE( p_peek + i_peek - i_size - 8 /* wFormatTag */ ) !=
-            1 /* WAVE_FORMAT_PCM */ )
-            return VLC_EGENERIC;
-        if( GetWLE( p_peek + i_peek - i_size - 6 /* nChannels */ ) != 2 )
-            return VLC_EGENERIC;
-        if( GetDWLE( p_peek + i_peek - i_size - 4 /* nSamplesPerSec */ ) !=
-            44100 )
-            return VLC_EGENERIC;
-
-        /* Skip the wave header */
-        while( strncmp( p_peek + i_peek - 8, "data", 4 ) )
-        {
-            i_size = GetDWLE( p_peek + i_peek - 4 );
-            if( i_size + i_peek > DTS_PROBE_SIZE ) return VLC_EGENERIC;
-            i_peek += i_size + 8;
-
-            if( input_Peek( p_input, &p_peek, i_peek ) != i_peek )
-                return VLC_EGENERIC;
-        }
-
-        /* Some DTS wav files don't begin with a sync code so we do a more
-         * extensive search */
-        i_size = input_Peek( p_input, &p_peek, DTS_PROBE_SIZE );
-        i_size -= DTS_MAX_HEADER_SIZE;
-
-        while( i_peek < i_size )
-        {
-            if( CheckSync( p_peek + i_peek ) != VLC_SUCCESS )
-                /* The data is stored in 16 bits words */
-                i_peek += 2;
-            else
-                break;
-        }
-    }
-
-    /* Have a peep at the show. */
-    if( input_Peek( p_input, &p_peek, i_peek + DTS_MAX_HEADER_SIZE * 2 ) <
-        i_peek + DTS_MAX_HEADER_SIZE * 2 )
-    {
-        /* Stream too short */
-        msg_Warn( p_input, "cannot peek()" );
-        return VLC_EGENERIC;
-    }
-
-    if( CheckSync( p_peek + i_peek ) != VLC_SUCCESS )
-    {
-        if( p_input->psz_demux && !strncmp( p_input->psz_demux, "dts", 3 ) )
-        {
-            /* User forced */
-            msg_Err( p_input, "this doesn't look like a DTS audio stream, "
-                     "continuing anyway" );
-        }
-        else
-        {
-            return VLC_EGENERIC;
-        }
-    }
-
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->b_start = VLC_TRUE;
-    p_sys->i_mux_rate = 0;
-
-    /*
-     * Load the DTS packetizer
-     */
-    p_sys->p_packetizer = vlc_object_create( p_input, VLC_OBJECT_DECODER );
-    p_sys->p_packetizer->pf_decode_audio = 0;
-    p_sys->p_packetizer->pf_decode_video = 0;
-    p_sys->p_packetizer->pf_decode_sub = 0;
-    p_sys->p_packetizer->pf_packetize = 0;
-
-    /* Initialization of decoder structure */
-    es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES,
-                    VLC_FOURCC( 'd', 't', 's', ' ' ) );
-
-    p_sys->p_packetizer->p_module =
-        module_Need( p_sys->p_packetizer, "packetizer", NULL );
-    if( !p_sys->p_packetizer->p_module )
-    {
-        msg_Err( p_input, "cannot find DTS packetizer" );
-        return VLC_EGENERIC;
-    }
-
-    /* Create one program */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1 )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        return VLC_EGENERIC;
-    }
-    p_input->stream.i_mux_rate = 0;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    p_sys->p_es =
-        es_out_Add( p_input->p_es_out, &p_sys->p_packetizer->fmt_in );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close: frees unused data
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    input_thread_t *p_input = (input_thread_t*)p_this;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
-
-    /* Unneed module */
-    module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
-
-    /* Delete the decoder */
-    vlc_object_destroy( p_sys->p_packetizer );
-
-    free( p_sys );
-}
-
-/*****************************************************************************
- * Demux: reads and demuxes data packets
- *****************************************************************************
- * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
- *****************************************************************************/
-static int Demux( input_thread_t * p_input )
-{
-    demux_sys_t  *p_sys = p_input->p_demux_data;
-    block_t *p_block_in, *p_block_out;
-
-    if( !( p_block_in = stream_Block( p_input->s, DTS_PACKET_SIZE ) ) )
-    {
-        return 0;
-    }
-
-    if( p_sys->b_start )
-        p_block_in->i_pts = p_block_in->i_dts = 1;
-    else
-        p_block_in->i_pts = p_block_in->i_dts = 0;
-
-    while( (p_block_out = p_sys->p_packetizer->pf_packetize(
-                p_sys->p_packetizer, &p_block_in )) )
-    {
-        p_sys->b_start = VLC_FALSE;
-
-        while( p_block_out )
-        {
-            block_t *p_next = p_block_out->p_next;
-
-            /* We assume a constant bitrate */
-            if( p_block_out->i_length )
-            p_sys->i_mux_rate =
-                p_block_out->i_buffer * I64C(1000000) / p_block_out->i_length;
-            p_input->stream.i_mux_rate = p_sys->i_mux_rate / 50;
-
-            input_ClockManageRef( p_input,
-                                  p_input->stream.p_selected_program,
-                                  p_block_out->i_pts * 9 / 100 );
-
-            p_block_out->i_dts = p_block_out->i_pts =
-                input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                                  p_block_out->i_pts * 9 / 100 );
-
-            es_out_Send( p_input->p_es_out, p_sys->p_es, p_block_out );
-
-            p_block_out = p_next;
-        }
-    }
-
-    return 1;
-}
-
-/*****************************************************************************
- * Control:
- *****************************************************************************/
-static int Control( input_thread_t *p_input, int i_query, va_list args )
-{
-    demux_sys_t *p_sys  = (demux_sys_t *)p_input->p_demux_data;
-    int64_t *pi64;
-
-    switch( i_query )
-    {
-        case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_mux_rate > 0 )
-            {
-                *pi64 = I64C(1000000) * stream_Tell( p_input->s ) /
-                        p_sys->i_mux_rate;
-                return VLC_SUCCESS;
-            }
-            *pi64 = 0;
-            return VLC_EGENERIC;
-
-        case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_mux_rate > 0 )
-            {
-                *pi64 = I64C(1000000) * stream_Size( p_input->s ) /
-                        p_sys->i_mux_rate;
-                return VLC_SUCCESS;
-            }
-            *pi64 = 0;
-            return VLC_EGENERIC;
-
-        default:
-            return demux_vaControlDefault( p_input, i_query, args );
-    }
-}
