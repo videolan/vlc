@@ -793,7 +793,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
     {
     case FILE_ACCESS:
         mrltemp = file_combo->GetValue();
-        caching_name = "file-caching";
+        caching_name = wxT("file-caching");
         break;
 
     case DISC_ACCESS:
@@ -806,12 +806,12 @@ void OpenDialog::UpdateMRL( int i_access_method )
             if( i_disc_type_selection == 0 )
             {
                 mrltemp = wxT("dvd://") + disc_device->GetValue();
-                caching_name = "dvdnav-caching";
+                caching_name = wxT("dvdnav-caching");
             }
             else
             {
                 mrltemp = wxT("dvdsimple://") + disc_device->GetValue();
-                caching_name = "dvdread-caching";
+                caching_name = wxT("dvdread-caching");
             }
 
             if( i_disc_title > 0 )
@@ -844,7 +844,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
                 mrltemp += wxString::Format( wxT("  :spu-channel=%d"),
                                              i_disc_sub );
 
-            caching_name = "vcd-caching";
+            caching_name = wxT("vcd-caching");
             break;
 
         case 3: /* CD-DA */
@@ -852,7 +852,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
             if( i_disc_title > 0 )
                 mrltemp += wxString::Format( wxT("@%d"), i_disc_title );
 
-            caching_name = "cdda-caching";
+            caching_name = wxT("cdda-caching");
             break;
 
         default:
@@ -877,7 +877,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
                 mrltemp += wxString::Format( wxT("@:%d"), i_net_ports[0] );
             }
 
-            caching_name = "udp-caching";
+            caching_name = wxT("udp-caching");
             break;
 
         case 1:
@@ -898,7 +898,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
                 mrltemp += wxString::Format( wxT(":%d"), i_net_ports[1] );
             }
 
-            caching_name = "udp-caching";
+            caching_name = wxT("udp-caching");
             break;
 
         case 2:
@@ -909,7 +909,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
             }
             mrltemp += net_addrs[2]->GetLineText(0);
 
-            caching_name = "http-caching";
+            caching_name = wxT("http-caching");
             break;
 
         case 3:
@@ -920,7 +920,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
             }
             mrltemp += net_addrs[3]->GetLineText(0);
 
-            caching_name = "rtsp-caching";
+            caching_name = wxT("rtsp-caching");
             break;
         }
         break;
@@ -980,8 +980,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
     {
         if( caching_value->IsEnabled() )
         {
-            mrltemp += wxString::Format( wxT("  :%s=%d"), caching_name.mb_str(),
-                                         i_caching );
+            mrltemp += wxT("  :") + caching_name +
+                wxString::Format( wxT("=%d"), i_caching );
         }
         else
         {
