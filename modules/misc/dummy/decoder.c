@@ -2,7 +2,7 @@
  * decoder.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: decoder.c,v 1.9 2003/12/08 18:42:07 gbazin Exp $
+ * $Id: decoder.c,v 1.10 2004/01/25 22:16:26 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,6 +40,10 @@
 #endif
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
+#endif
+
+#ifdef HAVE_LIMITS_H
+#   include <limits.h> /* PATH_MAX */
 #endif
 
 #include <stdio.h> /* sprintf() */
