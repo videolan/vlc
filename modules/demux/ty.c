@@ -170,7 +170,8 @@ static int TyOpen(vlc_object_t *p_this)
         /* doesn't look like a TY file... */
         char *psz_ext = strrchr(p_demux->psz_path, '.');
         /* if they specified tydemux, or if the file ends in .ty we try anyway */
-        if (strcmp(p_demux->psz_demux, "tydemux") && strcasecmp(psz_ext, ".ty"))
+        if (psz_ext && strcmp(p_demux->psz_demux, "tydemux") &&
+            strcasecmp(psz_ext, ".ty"))
             return VLC_EGENERIC;
         msg_Warn(p_demux, "this does not look like a TY file, continuing anyway...");
     }
