@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.6 2002/10/14 16:46:55 sam Exp $
+ * $Id: gtk.c,v 1.7 2002/11/12 11:45:27 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -77,6 +77,7 @@ vlc_module_begin();
     set_description( _("Gtk+ interface module") );
     set_capability( "interface", i );
     set_callbacks( Open, Close );
+    add_shortcut( "gtk" );
     set_program( "gvlc" );
 vlc_module_end();
 
