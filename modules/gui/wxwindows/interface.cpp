@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.48 2003/07/18 11:39:39 gbazin Exp $
+ * $Id: interface.cpp,v 1.49 2003/07/19 16:33:55 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -539,6 +539,13 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )
 void Interface::OnContextMenu2(wxContextMenuEvent& event)
 {
+    /* Only show the context menu for the main interface */
+    if( GetId() != event.GetId() )
+    {
+        event.Skip();
+        return;
+    }
+
     if( p_intf->p_sys->pf_show_dialog )
         p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU, 0 );
 }
