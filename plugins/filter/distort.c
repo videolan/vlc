@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.11 2002/05/19 12:57:32 gbazin Exp $
+ * $Id: distort.c,v 1.12 2002/05/27 19:35:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,6 +49,9 @@ static void vout_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_STRING  ( "distort_mode", "wave", NULL, N_("distort mode"),
+              N_("one of \"wave\" and \"ripple\"") )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -130,8 +133,8 @@ static int vout_Create( vout_thread_t *p_vout )
         intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
-
-    /* Look what method was requested */
+    p_vout->p_sys->i_mode = 0;
+    /* Look what method was requested from command line*/
     if( !(psz_method = psz_method_tmp
           = config_GetPszVariable( "filter" )) )
     {
@@ -139,7 +142,6 @@ static int vout_Create( vout_thread_t *p_vout )
                      "filter" );
         return( 1 );
     }
-
     while( *psz_method && *psz_method != ':' )
     {
         psz_method++;
@@ -153,18 +155,43 @@ static int vout_Create( vout_thread_t *p_vout )
     {
         p_vout->p_sys->i_mode = DISTORT_MODE_RIPPLE;
     }
-    else
-    {
-        intf_ErrMsg( "filter error: no valid distort mode provided, "
-                     "using distort:wave" );
-        p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
-    }
-
     free( psz_method_tmp );
-
+    if( !p_vout->p_sys->i_mode )
+    {
+        /* No method given in commandline. Look what method was
+         requested in configuration system */
+        if( !(psz_method = psz_method_tmp
+              = config_GetPszVariable( "distort_mode" )) )
+        {
+            intf_ErrMsg( "vout error: configuration variable %s empty "
+                         "using wave",
+                         "distort_mode" );
+            p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
+        }
+        else {
+        
+            if( !strcmp( psz_method, "wave" ) )
+            {
+                p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
+            }
+            else if( !strcmp( psz_method, "ripple" ) )
+            {
+                p_vout->p_sys->i_mode = DISTORT_MODE_RIPPLE;
+            }
+            
+            else
+            {
+                intf_ErrMsg( "filter error: no valid distort mode provided, "
+                             "using distort:wave" );
+                p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
+            }
+        }
+    }
+    free( psz_method_tmp );
+    
     return( 0 );
 }
-
+    
 /*****************************************************************************
  * vout_Init: initialize Distort video thread output method
  *****************************************************************************/

@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: transform.c,v 1.10 2002/05/19 12:57:32 gbazin Exp $
+ * $Id: transform.c,v 1.11 2002/05/27 19:35:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,6 +50,9 @@ static void vout_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_STRING("transform_type", "90", NULL, N_("Transform type"),
+           N_("One of '90', '180', '270', 'hflip' and 'vflip'"))
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -126,51 +129,51 @@ static int vout_Create( vout_thread_t *p_vout )
 
     /* Look what method was requested */
     if( !(psz_method = psz_method_tmp
-          = config_GetPszVariable( "filter" )) )
+          = config_GetPszVariable( "transform_type" )) )
     {
         intf_ErrMsg( "vout error: configuration variable %s empty",
-                     "filter" );
-        return( 1 );
-    }
-
-    while( *psz_method && *psz_method != ':' )
-    {
-        psz_method++;
-    }
-
-    if( !strcmp( psz_method, ":hflip" ) )
-    {
-        p_vout->p_sys->i_mode = TRANSFORM_MODE_HFLIP;
-        p_vout->p_sys->b_rotation = 0;
-    }
-    else if( !strcmp( psz_method, ":vflip" ) )
-    {
-        p_vout->p_sys->i_mode = TRANSFORM_MODE_VFLIP;
-        p_vout->p_sys->b_rotation = 0;
-    }
-    else if( !strcmp( psz_method, ":90" ) )
-    {
+                     "transform_type" );
+        intf_ErrMsg( "filter error: no valid transform mode provided, "
+                     "using '90'" );
         p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
-        p_vout->p_sys->b_rotation = 1;
-    }
-    else if( !strcmp( psz_method, ":180" ) )
-    {
-        p_vout->p_sys->i_mode = TRANSFORM_MODE_180;
-        p_vout->p_sys->b_rotation = 0;
-    }
-    else if( !strcmp( psz_method, ":270" ) )
-    {
-        p_vout->p_sys->i_mode = TRANSFORM_MODE_270;
         p_vout->p_sys->b_rotation = 1;
     }
     else
     {
-        intf_ErrMsg( "filter error: no valid transform mode provided, "
-                     "using transform:90" );
-        p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
-        p_vout->p_sys->b_rotation = 1;
+        if( !strcmp( psz_method, "hflip" ) )
+        {
+            p_vout->p_sys->i_mode = TRANSFORM_MODE_HFLIP;
+            p_vout->p_sys->b_rotation = 0;
+        }
+        else if( !strcmp( psz_method, "vflip" ) )
+        {
+            p_vout->p_sys->i_mode = TRANSFORM_MODE_VFLIP;
+            p_vout->p_sys->b_rotation = 0;
+        }
+        else if( !strcmp( psz_method, "90" ) )
+        {
+            p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
+            p_vout->p_sys->b_rotation = 1;
+        }
+        else if( !strcmp( psz_method, "180" ) )
+        {
+            p_vout->p_sys->i_mode = TRANSFORM_MODE_180;
+            p_vout->p_sys->b_rotation = 0;
+        }
+        else if( !strcmp( psz_method, "270" ) )
+        {
+            p_vout->p_sys->i_mode = TRANSFORM_MODE_270;
+            p_vout->p_sys->b_rotation = 1;
+        }
+        else
+        {
+            intf_ErrMsg( "filter error: no valid transform mode provided, "
+                         "using '90'" );
+            p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
+            p_vout->p_sys->b_rotation = 1;
+        }
     }
-
+    
     free( psz_method_tmp );
 
     return( 0 );

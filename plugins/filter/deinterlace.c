@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.10 2002/05/19 12:57:32 gbazin Exp $
+ * $Id: deinterlace.c,v 1.11 2002/05/27 19:35:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,6 +49,9 @@ static void *memblend( void *, const void *, const void *, size_t );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_STRING  ( "deinterlace_mode", "bob", NULL, N_("Deinterlace mode"),
+              N_("one of 'bob' and 'blend'") )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -113,7 +116,7 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
-    char *psz_method, *psz_method_tmp;
+    char *psz_method;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -124,24 +127,18 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Look what method was requested */
-    if( !(psz_method = psz_method_tmp
-          = config_GetPszVariable( "filter" )) )
+    if( !(psz_method = config_GetPszVariable( "filter" )) )
     {
         intf_ErrMsg( "vout error: configuration variable %s empty",
                      "filter" );
         return( 1 );
     }
 
-    while( *psz_method && *psz_method != ':' )
-    {
-        psz_method++;
-    }
-
-    if( !strcmp( psz_method, ":bob" ) )
+    if( !strcmp( psz_method, "bob" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
     }
-    else if( !strcmp( psz_method, ":blend" ) )
+    else if( !strcmp( psz_method, "blend" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_MODE_BLEND;
     }
@@ -152,7 +149,7 @@ static int vout_Create( vout_thread_t *p_vout )
         p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
     }
 
-    free( psz_method_tmp );
+    free( psz_method );
 
     return( 0 );
 }

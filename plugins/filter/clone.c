@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: clone.c,v 1.2 2002/05/19 12:57:32 gbazin Exp $
+ * $Id: clone.c,v 1.3 2002/05/27 19:35:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,6 +44,9 @@ static void vout_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_INTEGER ( "clone_count", 2, NULL, N_("Number of clones"),
+              N_("Select the number of videowindows in which to clone the video") )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -109,7 +112,6 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
-    char *psz_method, *psz_method_orig;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -120,27 +122,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Look what method was requested */
-    if( !(psz_method = psz_method_orig = config_GetPszVariable( "filter" )) )
-    {
-        intf_ErrMsg( "vout error: configuration variable %s empty", "filter" );
-        return( 1 );
-    }
-
-    while( *psz_method && *psz_method != ':' )
-    {
-        psz_method++;
-    }
-
-    if( *psz_method )
-    {
-        p_vout->p_sys->i_clones = atoi( psz_method + 1 );
-    }
-    else
-    {
-        intf_ErrMsg( "vout error: "
-                     "no valid clone count provided, using clone:2" );
-        p_vout->p_sys->i_clones = 2;
-    }
+    p_vout->p_sys->i_clones = config_GetIntVariable( "clone_count" );
 
     p_vout->p_sys->i_clones = __MAX( 1, __MIN( 99, p_vout->p_sys->i_clones ) );
 
@@ -152,12 +134,9 @@ static int vout_Create( vout_thread_t *p_vout )
     if( p_vout->p_sys->pp_vout == NULL )
     {
         intf_ErrMsg( "vout error: out of memory" );
-        free( psz_method_orig );
         free( p_vout->p_sys );
         return( 1 );
     }
-
-    free( psz_method_orig );
 
     return( 0 );
 }
