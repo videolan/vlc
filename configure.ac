@@ -3500,6 +3500,18 @@ then
   fi
 fi
 
+dnl
+dnl Simple test for skins2 dependency
+dnl
+if test "${enable_skins2}" != "no"
+then
+  if test "${WX_CONFIG}" = "no"
+  then
+    AC_MSG_ERROR([The skins2 module depends on the wxWindows development package. Without it you won't be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the wxWindows development package or alternatively you can also configure with: --disable-wxwindows --disable-skins2.])
+  fi
+fi
+
+
 dnl dnl
 dnl dnl  Qt module
 dnl dnl
