@@ -39,11 +39,11 @@ static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-x264-"
 static char *enc_analyse_list[] = {
-    "all", "slowest", "slow", "normal", "fast", "fastest", "none"
+    "all", "normal", "fast", "none"
 };
 
 static char *enc_analyse_list_text[] = {
-    N_("all"), N_("slowest"), N_("slow"), N_("normal"), N_("fast"), N_("fastest"), N_("none")
+    N_("all"), N_("normal"), N_("fast"), N_("none")
 };
 
 vlc_module_begin();
@@ -73,7 +73,6 @@ struct encoder_sys_t
 {
     x264_t          *h;
     x264_param_t    param;
-    x264_picture_t  *pic;
 
     int             i_buffer;
     uint8_t         *p_buffer;
@@ -104,7 +103,7 @@ static int  Open ( vlc_object_t *p_this )
     sout_ParseCfg( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
 
     p_enc->fmt_out.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
-    p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+    p_enc->fmt_in.i_codec = VLC_FOURCC('R','V','2','4');
 
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
@@ -156,66 +155,28 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.cpu &= ~(X264_CPU_SSE|X264_CPU_SSE2);
     }
 
-    p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4  |
-                                 X264_ANALYSE_P16x16 |
-                                 X264_ANALYSE_P16x8 | X264_ANALYSE_P8x16 |
-                                 X264_ANALYSE_P8x8 | X264_ANALYSE_SMART_PSUB;
-
     var_Get( p_enc, SOUT_CFG_PREFIX "analyse", &val );
     if( !strcmp( val.psz_string, "none" ) )
     {
         p_sys->param.analyse.inter = 0;
     }
-    else if( !strcmp( val.psz_string, "fastest" ) )
-    {
-        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_P16x16;
-    }
     else if( !strcmp( val.psz_string, "fast" ) )
     {
-        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
-                                     X264_ANALYSE_P16x16 |
-                                     X264_ANALYSE_P16x8 | X264_ANALYSE_P8x16 |
-                                     X264_ANALYSE_SMART_PSUB;
+        p_sys->param.analyse.inter = X264_ANALYSE_I4x4;
     }
     else if( !strcmp( val.psz_string, "normal" ) )
     {
-        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
-                                     X264_ANALYSE_P16x16 |
-                                     X264_ANALYSE_P16x8 | X264_ANALYSE_P8x16 |
-                                     X264_ANALYSE_P8x8 |
-                                     X264_ANALYSE_SMART_PSUB;
-    }
-    else if( !strcmp( val.psz_string, "slow" ) )
-    {
-        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
-                                     X264_ANALYSE_P16x16 | X264_ANALYSE_P16x8 |
-                                     X264_ANALYSE_P8x16 | X264_ANALYSE_P8x8 |
-                                     X264_ANALYSE_P8x4 | X264_ANALYSE_P4x8 |
-                                     X264_ANALYSE_SMART_PSUB;
-    }
-    else if( !strcmp( val.psz_string, "slowest" ) )
-    {
-        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
-                                     X264_ANALYSE_P16x16 | X264_ANALYSE_P16x8 |
-                                     X264_ANALYSE_P8x16 | X264_ANALYSE_P8x8 |
-                                     X264_ANALYSE_P8x4 | X264_ANALYSE_P4x8 |
-                                     X264_ANALYSE_P4x4 |
-                                     X264_ANALYSE_SMART_PSUB;
+        p_sys->param.analyse.inter = X264_ANALYSE_I4x4  | X264_ANALYSE_PSUB16x16;
     }
     else if( !strcmp( val.psz_string, "all" ) )
     {
-        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
-                                     X264_ANALYSE_P16x16 | X264_ANALYSE_P16x8 |
-                                     X264_ANALYSE_P8x16 | X264_ANALYSE_P8x8 |
-                                     X264_ANALYSE_P8x4 | X264_ANALYSE_P4x8 |
-                                     X264_ANALYSE_P4x4;
+        p_sys->param.analyse.inter = X264_ANALYSE_I4x4  |
+                                     X264_ANALYSE_PSUB16x16 | X264_ANALYSE_PSUB8x8;
     }
-
     /* Open the encoder */
     p_sys->h = x264_encoder_open( &p_sys->param );
 
     /* alloc mem */
-    p_sys->pic      = x264_picture_new( p_sys->h );
     p_sys->i_buffer = 4 * p_enc->fmt_in.video.i_width * p_enc->fmt_in.video.i_height + 1000;
     p_sys->p_buffer = malloc( p_sys->i_buffer );
 
@@ -249,29 +210,24 @@ static int  Open ( vlc_object_t *p_this )
 static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
+    x264_picture_t  pic;
     int        i_nal;
     x264_nal_t *nal;
     block_t *p_block;
     int i_out;
     int i;
 
-    /* copy the picture */
-    for( i = 0; i < 3; i++ )
+    /* init pic */
+    memset( &pic, 0, sizeof( x264_picture_t ) );
+    pic.img.i_csp = X264_CSP_RGB;
+    pic.img.i_plane = p_pict->i_planes;
+    for( i = 0; i < p_pict->i_planes; i++ )
     {
-        uint8_t *src = p_pict->p[i].p_pixels;
-        uint8_t *dst = p_sys->pic->plane[i];
-        int j;
-
-        for( j = 0;j < p_pict->p[i].i_lines; j++ )
-        {
-            memcpy( dst, src, __MIN( p_sys->pic->i_stride[i], p_pict->p[i].i_pitch ) );
-
-            src += p_pict->p[i].i_pitch;
-            dst += p_sys->pic->i_stride[i];
-        }
+        pic.img.plane[i] = p_pict->p[i].p_pixels;
+        pic.img.i_stride[i] = p_pict->p[i].i_pitch;
     }
 
-    x264_encoder_encode( p_sys->h, &nal, &i_nal, p_sys->pic );
+    x264_encoder_encode( p_sys->h, &nal, &i_nal, &pic );
     for( i = 0, i_out = 0; i < i_nal; i++ )
     {
         int i_size = p_sys->i_buffer - i_out;
@@ -285,8 +241,12 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     p_block->i_pts = p_pict->date;
     memcpy( p_block->p_buffer, p_sys->p_buffer, i_out );
 
-    /* TODO */
-    /* p_block->i_flags |= BLOCK_FLAG_TYPE_I; */
+    if( pic.i_type == X264_TYPE_IDR || pic.i_type == X264_TYPE_I )
+        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+    else if( pic.i_type == X264_TYPE_P )
+        p_block->i_flags |= BLOCK_FLAG_TYPE_P;
+    else if( pic.i_type == X264_TYPE_B )
+        p_block->i_flags |= BLOCK_FLAG_TYPE_B;
 
     return p_block;
 }
@@ -300,7 +260,6 @@ static void Close( vlc_object_t *p_this )
     encoder_sys_t *p_sys = p_enc->p_sys;
 
 
-    x264_picture_delete( p_sys->pic );
     x264_encoder_close( p_sys->h );
     free( p_sys->p_buffer );
     free( p_sys );
