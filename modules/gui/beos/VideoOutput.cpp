@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.12 2003/02/09 17:10:52 stippi Exp $
+ * $Id: VideoOutput.cpp,v 1.13 2003/03/12 23:15:03 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -666,7 +666,7 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
                                     &key, B_FOLLOW_ALL,
 		                            B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
 		       view->SetViewColor(key);
-               SetTitle(VOUT_TITLE " (Overlay)");
+               SetTitle("VLC " PACKAGE_VERSION " (Overlay)");
                break;
             }
             else
@@ -683,7 +683,7 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
 	{
         // fallback to RGB
         colspace_index = DEFAULT_COL;	// B_RGB32
-        SetTitle( VOUT_TITLE " (Bitmap)" );
+        SetTitle( "VLC " PACKAGE_VERSION " (Bitmap)" );
         bitmap[0] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );
         bitmap[1] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );
         bitmap[2] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );

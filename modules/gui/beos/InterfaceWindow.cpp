@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.30 2003/02/10 15:23:46 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.31 2003/03/12 23:15:03 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -216,7 +216,6 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
 
     // set the title bar
     SetName( "interface" );
-    SetTitle( VOUT_TITLE );
 
     // the media control view
     p_mediaControl = new MediaControlView( BRect( 0.0, 0.0, 250.0, 50.0 ),
@@ -359,8 +358,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
     {
         case B_ABOUT_REQUESTED:
         {
-            BAlert* alert = new BAlert( VOUT_TITLE,
-                                        "BeOS " VOUT_TITLE "\n\n<www.videolan.org>", "Ok");
+            BAlert* alert = new BAlert( "VLC " PACKAGE_VERSION,
+                                        "VLC " PACKAGE_VERSION " for BeOS\n\n"
+                                        "<www.videolan.org>", "OK");
             alert->Go();
             break;
         }

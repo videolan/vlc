@@ -157,7 +157,7 @@ case "x${target_os}" in
     AC_CHECK_LIB( bind, inet_ntoa,
         [ LDFLAGS_access_mms="${LDFLAGS_access_mms} -lbind"
           LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind"
-          LDFALGS_httpd="${LDFLAGS_httpd} -lbind"],
+          LDFLAGS_httpd="${LDFLAGS_httpd} -lbind"],
         [])
     ;;
   x*)

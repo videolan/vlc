@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.29 2003/01/19 03:16:24 sam Exp $
+ * $Id: beos_specific.cpp,v 1.30 2003/03/12 23:15:03 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -150,9 +150,9 @@ VlcApplication::~VlcApplication( )
 void VlcApplication::AboutRequested( )
 {
     BAlert *alert;
-    alert = new BAlert( VOUT_TITLE,
-                        "BeOS " VOUT_TITLE "\n\n<www.videolan.org>",
-                        "Ok" );
+    alert = new BAlert( "VLC " PACKAGE_VERSION,
+                        "VLC " PACKAGE_VERSION " for BeOS\n\n"
+                                        "<www.videolan.org>", "OK");
     alert->Go( NULL );
 }
 
