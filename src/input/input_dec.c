@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.34 2002/05/14 21:23:44 massiot Exp $
+ * $Id: input_dec.c,v 1.35 2002/05/15 15:46:34 asmax Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -224,17 +224,29 @@ static decoder_config_t * CreateDecoderConfig( input_thread_t * p_input,
 
     /* Select a new ES */
     p_input->stream.i_selected_es_number++;
-    p_input->stream.pp_selected_es = realloc(
-                                       p_input->stream.pp_selected_es,
-                                       p_input->stream.i_selected_es_number
-                                        * sizeof(es_descriptor_t *) );
-    if( p_input->stream.pp_selected_es == NULL )
+    if( p_input->stream.i_selected_es_number > 0 )
     {
-        intf_ErrMsg( "Unable to realloc memory" );
+        p_input->stream.pp_selected_es = realloc(
+                                          p_input->stream.pp_selected_es,
+                                          p_input->stream.i_selected_es_number
+                                           * sizeof(es_descriptor_t *) );
+        if( p_input->stream.pp_selected_es == NULL )
+        {
+            intf_ErrMsg( "Unable to realloc memory" );
+            free( p_config->p_decoder_fifo );
+            free( p_config );
+            return NULL;
+        }
+    }
+    else
+    { 
+        intf_ErrMsg( "realloc(0) (p_input->stream.i_selected_es_number "
+                     "corrupted?)" );
         free( p_config->p_decoder_fifo );
         free( p_config );
         return NULL;
     }
+    
     p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number - 1]
             = p_es;
 

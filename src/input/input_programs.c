@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.85 2002/05/13 21:55:30 fenrir Exp $
+ * $Id: input_programs.c,v 1.86 2002/05/15 15:46:34 asmax Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -142,15 +142,22 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
 
     /* Add an entry to the list of program associated with the stream */
     p_input->stream.i_pgrm_number++;
-    p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
-                                           p_input->stream.i_pgrm_number
-                                            * sizeof(pgrm_descriptor_t *) );
-    if( p_input->stream.pp_programs == NULL )
+    if( p_input->stream.i_pgrm_number > 0 )
     {
-        intf_ErrMsg( "Unable to realloc memory in input_AddProgram" );
+        p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
+                                               p_input->stream.i_pgrm_number
+                                               * sizeof(pgrm_descriptor_t *) );
+        if( p_input->stream.pp_programs == NULL )
+        {
+            intf_ErrMsg( "Unable to realloc memory in input_AddProgram" );
+            return( NULL );
+        }
+    }
+    else {
+        intf_ErrMsg( "realloc(0) (p_input->stream.i_pgrm_number corrupted ?)");
         return( NULL );
     }
-    
+        
     /* Allocate the structure to store this description */
     p_input->stream.pp_programs[i_pgrm_index] =
                                         malloc( sizeof(pgrm_descriptor_t) );
@@ -229,14 +236,21 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 
     p_input->stream.pp_programs[i_pgrm_index] =
         p_input->stream.pp_programs[p_input->stream.i_pgrm_number];
-    p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
-                                           p_input->stream.i_pgrm_number
-                                            * sizeof(pgrm_descriptor_t *) );
-
-    if( p_input->stream.i_pgrm_number && p_input->stream.pp_programs == NULL)
+    if( p_input->stream.i_pgrm_number > 0 ) 
     {
-        intf_ErrMsg( "input error: unable to realloc program list"
-                     " in input_DelProgram" );
+        p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
+                                               p_input->stream.i_pgrm_number
+                                               * sizeof(pgrm_descriptor_t *) );
+        if( p_input->stream.pp_programs == NULL )
+        {
+            intf_ErrMsg( "input error: unable to realloc program list"
+                         " in input_DelProgram" );
+        }
+
+    }
+    else
+    {
+        free( p_input->stream.pp_programs );
     }
 
     /* Free the description of this program */
@@ -255,12 +269,20 @@ input_area_t * input_AddArea( input_thread_t * p_input )
 
     /* Add an entry to the list of program associated with the stream */
     p_input->stream.i_area_nb++;
-    p_input->stream.pp_areas = realloc( p_input->stream.pp_areas,
-                                        p_input->stream.i_area_nb
-                                            * sizeof(input_area_t *) );
-    if( p_input->stream.pp_areas == NULL )
+    if( p_input->stream.i_area_nb > 0 )
     {
-        intf_ErrMsg( "Unable to realloc memory in input_AddArea" );
+        p_input->stream.pp_areas = realloc( p_input->stream.pp_areas,
+                                            p_input->stream.i_area_nb
+                                            * sizeof(input_area_t *) );
+        if( p_input->stream.pp_areas == NULL )
+        {
+            intf_ErrMsg( "Unable to realloc memory in input_AddArea" );
+            return( NULL );
+        }
+    }
+    else
+    {
+        intf_ErrMsg( "realloc(0) (p_input->stream.i_area_nb corrupted ?)");
         return( NULL );
     }
     
@@ -408,14 +430,21 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
 
     p_input->stream.pp_areas[i_area_index] =
         p_input->stream.pp_areas[p_input->stream.i_area_nb];
-    p_input->stream.pp_areas = realloc( p_input->stream.pp_areas,
-                                           p_input->stream.i_area_nb
+    if( p_input->stream.i_area_nb > 0 )
+    {
+        p_input->stream.pp_areas = realloc( p_input->stream.pp_areas,
+                                            p_input->stream.i_area_nb
                                             * sizeof(input_area_t *) );
 
-    if( p_input->stream.i_area_nb && p_input->stream.pp_areas == NULL)
+        if( p_input->stream.pp_areas == NULL )
+        {
+            intf_ErrMsg( "input error: unable to realloc area list"
+                         " in input_DelArea" );
+        }
+    }
+    else
     {
-        intf_ErrMsg( "input error: unable to realloc area list"
-                     " in input_DelArea" );
+        free( p_input->stream.pp_areas );
     }
 
     /* Free the description of this area */
@@ -461,12 +490,20 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         return( NULL);
     }
     p_input->stream.i_es_number++;
-    p_input->stream.pp_es = realloc( p_input->stream.pp_es,
-                                     p_input->stream.i_es_number
-                                      * sizeof(es_descriptor_t *) );
-    if( p_input->stream.pp_es == NULL )
+    if( p_input->stream.i_es_number > 0 )
     {
-        intf_ErrMsg( "Unable to realloc memory in input_AddES" );
+        p_input->stream.pp_es = realloc( p_input->stream.pp_es,
+                                         p_input->stream.i_es_number
+                                          * sizeof(es_descriptor_t *) );
+        if( p_input->stream.pp_es == NULL )
+        {
+            intf_ErrMsg( "Unable to realloc memory in input_AddES" );
+            return( NULL );
+        }
+    }
+    else
+    {
+        intf_ErrMsg( "realloc(0) (p_input->stream.pp_es_number corrupted ?)");
         return( NULL );
     }
     p_input->stream.pp_es[p_input->stream.i_es_number - 1] = p_es;
@@ -499,12 +536,20 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     if( p_pgrm )
     {
         p_pgrm->i_es_number++;
-        p_pgrm->pp_es = realloc( p_pgrm->pp_es,
-                                 p_pgrm->i_es_number
-                                  * sizeof(es_descriptor_t *) );
-        if( p_pgrm->pp_es == NULL )
+        if( p_pgrm->i_es_number > 0 )
         {
-            intf_ErrMsg( "Unable to realloc memory in input_AddES" );
+            p_pgrm->pp_es = realloc( p_pgrm->pp_es,
+                                     p_pgrm->i_es_number
+                                      * sizeof(es_descriptor_t *) );
+            if( p_pgrm->pp_es == NULL )
+            {
+                intf_ErrMsg( "Unable to realloc memory in input_AddES" );
+                return( NULL );
+            }
+        }
+        else
+        {
+            intf_ErrMsg( "realloc(0) (p_pgrm->i_es_number corrupted ?)");
             return( NULL );
         }
         p_pgrm->pp_es[p_pgrm->i_es_number - 1] = p_es;
@@ -545,12 +590,20 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
             {
                 p_pgrm->i_es_number--;
                 p_pgrm->pp_es[i_index] = p_pgrm->pp_es[p_pgrm->i_es_number];
-                p_pgrm->pp_es = realloc( p_pgrm->pp_es,
-                                         p_pgrm->i_es_number
-                                          * sizeof(es_descriptor_t *));
-                if( p_pgrm->i_es_number && p_pgrm->pp_es == NULL )
+                if( p_pgrm->i_es_number > 0 )
                 {
-                    intf_ErrMsg( "Unable to realloc memory in input_DelES" );
+                    p_pgrm->pp_es = realloc( p_pgrm->pp_es,
+                                             p_pgrm->i_es_number
+                                              * sizeof(es_descriptor_t *));
+                    if( p_pgrm->pp_es == NULL )
+                    {
+                        intf_ErrMsg( "Unable to realloc memory in "
+                                     "input_DelES" );
+                    }
+                }
+                else
+                {
+                    free( p_pgrm->pp_es );
                 }
                 break;
             }
@@ -576,12 +629,19 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     p_input->stream.i_es_number--;
     p_input->stream.pp_es[i_es_index] =
                     p_input->stream.pp_es[p_input->stream.i_es_number];
-    p_input->stream.pp_es = realloc( p_input->stream.pp_es,
-                                     p_input->stream.i_es_number
-                                      * sizeof(es_descriptor_t *));
-    if( p_input->stream.i_es_number && p_input->stream.pp_es == NULL )
+    if( p_input->stream.i_es_number > 0 )
     {
-        intf_ErrMsg( "Unable to realloc memory in input_DelES" );
+        p_input->stream.pp_es = realloc( p_input->stream.pp_es,
+                                         p_input->stream.i_es_number
+                                          * sizeof(es_descriptor_t *));
+        if( p_input->stream.pp_es == NULL )
+        {
+            intf_ErrMsg( "Unable to realloc memory in input_DelES" );
+        }
+    }
+    else
+    {
+        free( p_input->stream.pp_es );
     }
     
 }
@@ -696,15 +756,22 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
         p_input->stream.pp_selected_es[i_index] = 
           p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number];
 
-        p_input->stream.pp_selected_es = realloc(
+        if( p_input->stream.i_selected_es_number > 0 )
+        {
+            p_input->stream.pp_selected_es = realloc(
                                            p_input->stream.pp_selected_es,
                                            p_input->stream.i_selected_es_number
-                                            * sizeof(es_descriptor_t *) );
-
-        if( p_input->stream.pp_selected_es == NULL )
+                                           * sizeof(es_descriptor_t *) );
+            if( p_input->stream.pp_selected_es == NULL )
+            {
+                intf_ErrMsg( "Unable to realloc memory in input_UnselectES" );
+                return( -1 );
+            }
+        }
+        else
         {
-            intf_WarnMsg( 4, "input: no more selected ES in input_UnselectES" );
-            return( 1 );
+            free( p_input->stream.pp_selected_es );   
+            intf_WarnMsg( 4, "input: no more selected ES in input_UnselectES" );            return( 1 );
         }
     }
 
