@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.31 2003/08/01 18:49:51 fenrir Exp $
+ * $Id: ts.c,v 1.32 2003/08/04 12:40:22 jpsaman Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -141,6 +141,8 @@ static int Activate( vlc_object_t * p_this )
     if( p_input->i_mtu == 0 )
     {
         /* Improve speed. */
+        msg_Err( p_input, "using default mtu (%d) with bufsize (%d)\n",
+                 p_input->i_mtu, INPUT_DEFAULT_BUFSIZE );
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
 
