@@ -545,10 +545,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_region_t *p_region;
     video_format_t fmt;
 
-    if( p_sys->i_last_date && p_sys->i_last_date + 5000000 > date )
-    {
-        return 0;
-    }
+    if( p_sys->i_last_date && p_sys->i_last_date + 5000000 > date ) return 0;
 
     /* Allocate the subpicture internal data. */
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
@@ -576,7 +573,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_y = p_sys->posy;
     p_spu->p_region = p_region;
 
-    p_spu->i_start = date;
+    p_spu->i_start = p_sys->i_last_date = date;
     p_spu->i_stop = 0;
     p_spu->b_ephemer = VLC_TRUE;
 
