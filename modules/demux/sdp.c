@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.6 2003/09/08 07:36:34 fenrir Exp $
+ * $Id: sdp.c,v 1.7 2003/09/08 07:38:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -50,7 +50,7 @@ vlc_module_begin();
 
     add_submodule();
         set_description( _("RTSP/RTP describe") );
-        add_shortcut( "rtp" );
+        add_shortcut( "rtp_sdp" );
         add_shortcut( "rtsp" );
         set_capability( "access", 0 );
         set_callbacks( DescribeOpen, DescribeClose );
@@ -105,7 +105,7 @@ static int  DescribeOpen( vlc_object_t *p_this )
 
     if( p_input->psz_access == NULL ||
         ( strcmp( p_input->psz_access, "rtsp" ) &&
-          strcmp( p_input->psz_access, "rtp" ) ) )
+          strcmp( p_input->psz_access, "rtp_sdp" ) ) )
     {
         msg_Dbg( p_input, "invalid access name" );
         return VLC_EGENERIC;
@@ -115,7 +115,14 @@ static int  DescribeOpen( vlc_object_t *p_this )
      * something like rtsp/<demuxer>:// */
     psz_uri = malloc( strlen( p_input->psz_access ) +
                       strlen( p_input->psz_name ) + 4 );
-    sprintf( psz_uri, "%s://%s", p_input->psz_access, p_input->psz_name );
+    if( !strcmp( p_input->psz_access, "rtp_sdp" ) )
+    {
+        sprintf( psz_uri, "rtp://%s", p_input->psz_name );
+    }
+    else
+    {
+        sprintf( psz_uri, "%s://%s", p_input->psz_access, p_input->psz_name );
+    }
 
     msg_Dbg( p_input, "describing %s", psz_uri );
 
