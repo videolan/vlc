@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mtime.c,v 1.23 2001/06/14 20:21:04 sam Exp $
+ * $Id: mtime.c,v 1.24 2001/06/28 22:12:04 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -56,38 +56,6 @@
 #include "common.h"
 #include "mtime.h"
 
-#if defined( WIN32 )
-/*****************************************************************************
- * usleep: microsecond sleep for win32
- *****************************************************************************
- * This function uses performance counter if available, and Sleep() if not.
- *****************************************************************************/
-static __inline__ void usleep( unsigned int i_useconds )
-{
-    s64 i_cur, i_freq;
-    s64 i_now, i_then;
-
-    if( i_useconds < 1000
-         && QueryPerformanceFrequency( (LARGE_INTEGER *) &i_freq ) )
-    {
-        QueryPerformanceCounter( (LARGE_INTEGER *) &i_cur );
-
-        i_now = ( i_cur * 1000 * 1000 / i_freq );
-        i_then = i_now + i_useconds;
-
-        while( i_now < i_then )
-        {
-            QueryPerformanceCounter( (LARGE_INTEGER *) &i_cur );
-            i_now = i_cur * 1000 * 1000 / i_freq;
-        }
-    }
-    else
-    {
-        Sleep( (int) ((i_useconds + 500) / 1000) );
-    }
-}
-#endif
-
 /*****************************************************************************
  * mstrtime: return a date in a readable format
  *****************************************************************************
@@ -127,7 +95,7 @@ mtime_t mdate( void )
     {
         /* Microsecond resolution */
         QueryPerformanceCounter( (LARGE_INTEGER *)&usec_time );
-	return ( usec_time * 1000000 ) / freq;
+        return ( usec_time * 1000000 ) / freq;
     }
     else
     {
@@ -175,8 +143,7 @@ void mwait( mtime_t date )
     {
         return;
     }
-
-    usleep( delay );
+    msleep( delay );
 
 #else
 
@@ -235,8 +202,11 @@ void msleep( mtime_t delay )
     tv_delay.tv_usec = delay % 1000000;
     pth_select( 0, NULL, NULL, NULL, &tv_delay );
 
-#elif defined( HAVE_USLEEP ) || defined( WIN32 )
+#elif defined( HAVE_USLEEP )
     usleep( delay );
+
+#elif defined( WIN32 )
+    Sleep( (int) (delay / 1000) );
 
 #else
     struct timeval tv_delay;

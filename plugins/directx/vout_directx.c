@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.4 2001/06/14 01:49:44 sam Exp $
+ * $Id: vout_directx.c,v 1.5 2001/06/28 22:12:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -24,27 +24,33 @@
 #define MODULE_NAME directx
 #include "modules_inner.h"
 
-/* This is a list of what needs to be fixed:
+/* To be fixed:
  *
  * When the option: "Display full screen when dragging window" is enabled in
  * Windows display properties, the overlay surface coordinates won't be updated
- * (but it won't crash anymore ;-) I know where the problem is in the code, but * I just don't know yet of a nice way to fix it.
- *
- * When you move part of the video window outside the physical display, the
- * overlay surface coordinates are not updated anymore. This comes from the
- * directdraw UpdateOverlay function which doesn't like negative coordinates.
- *
- * For now, this plugin only works when YUV overlay is supported (which it
- * should be nowadays on most of the video cards under Windows)...
- *
- * The overlay doesn't use double-buffering.
+ * (but it won't crash anymore ;-) I know where the problem is in the code, but * I just don't know yet of a nice way to fix this.
+ * 
+ * Double buffering
  *
  * Port this plugin to Video Output IV
  */
 
 /*****************************************************************************
- * Preamble
+ * Preamble:
  *
+ * This plugin will use YUV overlay if supported, using overlay will result in
+ * the best video quality (hardware interpolation when rescaling the picture)
+ * and the fastest display as it requires less processing.
+ *
+ * If YUV overlay is not supported the plugin will use an RGB offscreen video
+ * surface that will be blitted onto the primary surface (display) to
+ * effectively display the picture. this fallback method enables us to display
+ * video in window mode.
+ * Another fallback method (which isn't implemented yet) would be to use the
+ * primary surface as the video buffer. This would allow for better
+ * performance but this is restricted to fullscreen video. In short,
+ * implementing this is not considered high priority.
+ * 
  *****************************************************************************/
 #include "defs.h"
 
@@ -466,7 +472,9 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_SCALE_CHANGE )
     {
         intf_WarnMsg( 3, "vout: vout_Manage Scale Change" );
-        DirectXUpdateOverlay( p_vout );
+        if( DirectXUpdateOverlay( p_vout ) )
+            /* failed so try again next time */
+            PostMessage( p_vout->p_sys->hwnd, WM_CHAR, (WPARAM)'S', 0);
         p_vout->i_changes &= ~VOUT_SCALE_CHANGE;
     }
 
@@ -476,7 +484,9 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
         intf_WarnMsg( 3, "vout: vout_Manage Size Change" );
-        DirectXUpdateOverlay( p_vout );
+        if( DirectXUpdateOverlay( p_vout ) )
+            /* failed so try again next time */
+            PostMessage( p_vout->p_sys->hwnd, WM_APP, 0, 0);
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
 
@@ -497,12 +507,13 @@ static int vout_Manage( vout_thread_t *p_vout )
 
         /* Repaint the window background (needed by the overlay surface) */
         if( !p_vout->b_need_render )
-	{
+        {
             InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
             p_vout->p_sys->b_display_enabled = 1;
-            DirectXUpdateOverlay( p_vout );
-	}
-
+            if( DirectXUpdateOverlay( p_vout ) )
+                /* failed so try again next time */
+                PostMessage( p_vout->p_sys->hwnd, WM_CHAR, (WPARAM)'S', 0);
+        }
         p_vout->i_changes &= ~VOUT_YUV_CHANGE;
     }
 
@@ -599,9 +610,6 @@ static void vout_Display( vout_thread_t *p_vout )
         return;
     }
 
-    /* The first time this function is called it enables the display */
-    p_vout->p_sys->b_display_enabled = 1;
-
     /* if the size of the decoded pictures has changed then we close the
      * video surface (which doesn't have the right size anymore). */
     i_image_width = ( p_vout->p_rendered_pic ) ?
@@ -684,9 +692,6 @@ static void vout_Display( vout_thread_t *p_vout )
                 intf_WarnMsg( 3, "vout: cannot open a new video surface !!" );
                 return;
             }
-            /* Display the Overlay */
-            p_vout->p_sys->b_display_enabled = 1;
-            DirectXUpdateOverlay( p_vout );
         }
 
         /* Lock the overlay surface */
@@ -760,7 +765,17 @@ static void vout_Display( vout_thread_t *p_vout )
         dxresult = IDirectDrawSurface3_Unlock(p_vout->p_sys->p_surface,
                                               ddsd.lpSurface );
 
+        /* If display not enabled yet then enable */
+        if( !p_vout->p_sys->b_display_enabled )
+        {
+            p_vout->p_sys->b_display_enabled = 1;
+            DirectXUpdateOverlay( p_vout );
+        }
+
     }
+
+    /* The first time this function is called it enables the display */
+    p_vout->p_sys->b_display_enabled = 1;
 
 }
 
@@ -784,6 +799,10 @@ long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 {
     switch( message )
     {
+
+    case WM_APP:
+        intf_WarnMsg( 3, "vout: WinProc WM_APP" );
+        break;
 
 #if 0
     case WM_ACTIVATE:
@@ -836,7 +855,7 @@ long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     case WM_WINDOWPOSCHANGED:
         intf_WarnMsg( 3, "vout: WinProc WM_WINDOWPOSCHANGED" );
-        PostMessage( NULL, WM_APP, 0, 0);
+        PostMessage( hwnd, WM_APP, 0, 0);
         break;
 
 #if 0
@@ -870,11 +889,11 @@ long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
  *****************************************************************************/
 static int DirectXCreateWindow( vout_thread_t *p_vout )
 {
-    HINSTANCE hInstance;
-    WNDCLASS  wc;                                 /* window class components */
-    RECT      rect_window;
-    COLORREF  colorkey; 
-    HDC       hdc;
+    HINSTANCE  hInstance;
+    WNDCLASSEX wc;                                /* window class components */
+    RECT       rect_window;
+    COLORREF   colorkey; 
+    HDC        hdc;
 
     intf_WarnMsg( 3, "vout: WinDX WinDXCreateWindow" );
 
@@ -907,19 +926,22 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     p_vout->p_sys->i_colorkey = (int)colorkey;
 
     /* fill in the window class structure */
+    wc.cbSize        = sizeof(WNDCLASSEX);
     wc.style         = 0;                               /* no special styles */
     wc.lpfnWndProc   = (WNDPROC)DirectXEventProc;           /* event handler */
     wc.cbClsExtra    = 0;                             /* no extra class data */
     wc.cbWndExtra    = 0;                            /* no extra window data */
     wc.hInstance     = hInstance;                                /* instance */
-    wc.hIcon         = LoadIcon(NULL, IDI_WINLOGO);   /* load a default icon */
+    wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION); /* load the vlc icon */
     wc.hCursor       = LoadCursor(NULL, IDC_ARROW); /* load a default cursor */
     wc.hbrBackground = p_vout->p_sys->hbrush;            /* background color */
     wc.lpszMenuName  = NULL;                                      /* no menu */
     wc.lpszClassName = "VLC DirectX";                 /* use a special class */
+    wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION); /* load the vlc icon */
 
     /* register the window class */
-    if (!RegisterClass(&wc)) {
+    if (!RegisterClassEx(&wc))
+    {
         intf_WarnMsg( 3, "vout: DirectXCreateWindow register window FAILED" );
         return (1);
     }
@@ -1171,7 +1193,9 @@ static int DirectXCreateSurface( vout_thread_t *p_vout )
         intf_WarnMsg( 3, "vout: Dx Caps: overlay=%i colorkey=%i stretch=%i",
                          bHasOverlay, bHasColorKey, bCanStretch );
 
+#if 0
         if( !bHasOverlay ) p_vout->b_need_render = 1;
+#endif
     }
 #endif
 
@@ -1201,9 +1225,10 @@ static int DirectXCreateSurface( vout_thread_t *p_vout )
                        DDSD_HEIGHT |
                        DDSD_WIDTH |
                        DDSD_PIXELFORMAT;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY | DDSCAPS_VIDEOMEMORY;
+        ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY;
         ddsd.dwHeight =  p_vout->p_sys->i_image_height;
         ddsd.dwWidth =  p_vout->p_sys->i_image_width;
+        ddsd.dwBackBufferCount = 1;                       /* One back buffer */
 
         dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
                                                &ddsd, &p_surface, NULL );
@@ -1427,11 +1452,16 @@ static int DirectXUpdateOverlay( vout_thread_t *p_vout )
         return( 0 );
     }
 
+    if( !p_vout->p_rendered_pic )
+    {
+        intf_WarnMsg( 3, "vout: DirectXUpdateOverlay p_rendered_pic=NULL !" );
+        return( 1 );
+    }
+
     if( !p_vout->p_sys->b_display_enabled )
     {
         return( 0 );
     }
-
 
     /* Now get the coordinates of the window. We don't actually want the
      * window coordinates but these of the usable surface inside the window.
