@@ -2,7 +2,7 @@
  * win32_graphics.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.cpp,v 1.4 2004/01/28 15:51:16 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -241,6 +241,7 @@ void Win32Graphics::fillRect( int left, int top, int width, int height,
     HRGN newMask = CreateRectRgn( left, top, left + width, top + height );
     CombineRgn( m_mask, m_mask, newMask, RGN_OR );
     SelectClipRgn( m_hDC, m_mask );
+    DeleteObject( newMask );
 
     // Create a brush with the color
     int red = (color & 0xff0000) >> 16;
@@ -255,6 +256,7 @@ void Win32Graphics::fillRect( int left, int top, int width, int height,
     r.right = left + width;
     r.bottom = top + height;
     FillRect( m_hDC, &r, hBrush );
+    DeleteObject( hBrush );
 }
 
 
@@ -262,14 +264,21 @@ void Win32Graphics::drawRect( int left, int top, int width, int height,
                               uint32_t color )
 {
     // Update the mask with the rectangle
-    HRGN l1 = CreateRectRgn( left, top, left + width, top );
-    HRGN l2 = CreateRectRgn( left + width, top, left + width, top + height );
-    HRGN l3 = CreateRectRgn( left + width, top + height, left, top + height );
-    HRGN l4 = CreateRectRgn( left, top + height, left, top );
+    HRGN l1 = CreateRectRgn( left, top, left + width, top + 1 );
+    HRGN l2 = CreateRectRgn( left + width - 1, top,
+                             left + width, top + height );
+    HRGN l3 = CreateRectRgn( left, top + height - 1,
+                             left + width, top + height );
+    HRGN l4 = CreateRectRgn( left, top, left + 1, top + height );
     CombineRgn( m_mask, m_mask, l1, RGN_OR );
     CombineRgn( m_mask, m_mask, l2, RGN_OR );
     CombineRgn( m_mask, m_mask, l3, RGN_OR );
     CombineRgn( m_mask, m_mask, l4, RGN_OR );
+    DeleteObject( l1 );
+    DeleteObject( l2 );
+    DeleteObject( l3 );
+    DeleteObject( l4 );
+
     SelectClipRgn( m_hDC, m_mask );
 
     // Create a pen with the color
@@ -329,8 +338,7 @@ bool Win32Graphics::hit( int x, int y ) const
 void Win32Graphics::addSegmentInRegion( HRGN &rMask, int start,
                                         int end, int line )
 {
-    HRGN buffer;
-    buffer = CreateRectRgn( start, line, end, line + 1 );
+    HRGN buffer = CreateRectRgn( start, line, end, line + 1 );
     CombineRgn( rMask, buffer, rMask, RGN_OR );
     DeleteObject( buffer );
 }
