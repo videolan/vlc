@@ -26,10 +26,13 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
+
+#ifdef HAVE_UNISTD_H
+#    include <unistd.h>
+#endif
 
 #include "announce.h"
 #include "network.h"
