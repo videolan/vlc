@@ -34,6 +34,7 @@
 #include "vlc_filter.h"
 #include "filter_common.h"
 #include "vlc_image.h"
+#include "osd.h"
 
 #ifdef LoadImage
 #   undef LoadImage
@@ -95,7 +96,7 @@ vlc_module_begin();
 
     add_file( "logo-file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
     add_integer( "logo-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( "logo-y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+    add_integer( "logo-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
     add_integer_with_range( "logo-transparency", 255, 0, 255, NULL,
         TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
     add_integer( "logo-position", 6, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
@@ -195,7 +196,7 @@ static int Create( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-
+    
     p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
     p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
 
@@ -522,13 +523,6 @@ static int CreateFilter( vlc_object_t *p_this )
     var_AddCallback( p_input->p_libvlc, "logo-transparency", LogoCallback, p_sys );
     vlc_object_release( p_input );
 
-    p_sys->b_absolute = VLC_TRUE;
-    if( p_sys->posx < 0 || p_sys->posy < 0 )
-    {
-        p_sys->b_absolute = VLC_FALSE;
-        p_sys->posx = 0; p_sys->posy = 0;
-    }
-
     p_sys->p_pic = LoadImage( p_this, p_sys->psz_filename );
     if( !p_sys->p_pic )
     {
@@ -637,11 +631,23 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
 
     vout_CopyPicture( p_filter, &p_region->picture, p_sys->p_pic );
-    p_region->i_x = 0;
-    p_region->i_y = 0;
-    p_spu->i_x = p_sys->posx;
-    p_spu->i_y = p_sys->posy;
-    p_spu->i_flags = p_sys->pos;
+
+    /*  where to locate the logo: */
+    if( p_sys->posx < 0 || p_sys->posy < 0 )
+    {   /* set to one of the 9 relative locations */
+        p_spu->i_flags = p_sys->pos;
+        p_spu->i_x = 0;
+        p_spu->i_y = 0;
+        p_spu->b_absolute = VLC_FALSE;
+    }
+    else
+    {   /*  set to an absolute xy, referenced to upper left corner */
+	    p_spu->i_flags = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
+        p_spu->i_x = p_sys->posx;
+        p_spu->i_y = p_sys->posy;
+        p_spu->b_absolute = VLC_TRUE;
+    }
+
     p_spu->p_region = p_region;
     p_spu->i_alpha = p_sys->i_trans;
 

@@ -418,6 +418,17 @@ static void Run( intf_thread_t *p_intf )
     var_Create( p_intf, "time-size", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "time-size", Other, NULL );
     
+    /* logo on the fly items */
+    var_Create( p_intf, "logo-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "logo-x", Other, NULL );
+    var_Create( p_intf, "logo-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "logo-y", Other, NULL );
+    var_Create( p_intf, "logo-position", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "logo-position", Other, NULL );
+    var_Create( p_intf, "logo-transparency", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "logo-transparency", Other, NULL );
+    
+    
     var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "pause", Input, NULL );
     var_Create( p_intf, "seek", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
@@ -709,21 +720,26 @@ static void Run( intf_thread_t *p_intf )
             if (p_intf->p_sys->b_extend)
             {
                 msg_rc(_("| marq-marquee STRING  . . overlay STRING in video\n"));
-                msg_rc(_("| marq-x X . . . . .  offset of marquee, from left\n"));
-                msg_rc(_("| marq-y Y . . . . . . offset of marquee, from top\n"));
+                msg_rc(_("| marq-x X . . . . . . . . . . . .offset from left\n"));
+                msg_rc(_("| marq-y Y . . . . . . . . . . . . offset from top\n"));
                 msg_rc(_("| marq-position #. . .  .relative position control\n"));
-                msg_rc(_("| marq-color # . . . .  font color of marquee, RGB\n"));
-                msg_rc(_("| marq-opacity # . . . . . . . .opacity of marquee\n"));
-                msg_rc(_("| marq-timeout T. . . .  timeout of marquee, in ms\n"));
-                msg_rc(_("| marq-size # . . . font size of marquee, in pixels\n"));
+                msg_rc(_("| marq-color # . . . . . . . . . . font color, RGB\n"));
+                msg_rc(_("| marq-opacity # . . . . . . . . . . . . . opacity\n"));
+                msg_rc(_("| marq-timeout T. . . . . . . . . . timeout, in ms\n"));
+                msg_rc(_("| marq-size # . . . . . . . . font size, in pixels\n"));
                 msg_rc(  "| \n");
                 msg_rc(_("| time-format STRING . . . overlay STRING in video\n"));
-                msg_rc(_("| time-x X . . . . .offset of timestamp, from left\n"));
-                msg_rc(_("| time-y Y . . . . . offset of timestamp, from top\n"));
-                msg_rc(_("| time-position #. . .  .relative position control\n"));
-                msg_rc(_("| time-color # . . .  font color of timestamp, RGB\n"));
-                msg_rc(_("| time-opacity # . . . . . . .opacity of timestamp\n"));
-                msg_rc(_("| time-size # . .font size of timestamp, in pixels\n"));
+                msg_rc(_("| time-x X . . . . . . . . . . . .offset from left\n"));
+                msg_rc(_("| time-y Y . . . . . . . . . . . . offset from top\n"));
+                msg_rc(_("| time-position #. . . . . . . . relative position\n"));
+                msg_rc(_("| time-color # . . . . . . . . . . font color, RGB\n"));
+                msg_rc(_("| time-opacity # . . . . . . . . . . . . . opacity\n"));
+                msg_rc(_("| time-size # . . . . . . . . font size, in pixels\n"));
+                msg_rc(  "| \n");
+                msg_rc(_("| logo-x X . . . . . . . . . . . .offset from left\n"));
+                msg_rc(_("| logo-y Y . . . . . . . . . . . . offset from top\n"));
+                msg_rc(_("| logo-position #. . . . . . . . relative position\n"));
+                msg_rc(_("| logo-transparency #. . . . . . . . .transparency\n"));
                 msg_rc(  "| \n");
             }    
             msg_rc(_("| help . . . . . . . . . . . . . this help message\n"));
@@ -1214,6 +1230,38 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "time-size", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "logo-x" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "logo-x", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "logo-y" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "logo-y", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "logo-position" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "logo-position", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "logo-transparency" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = strtol( newval.psz_string, NULL, 0 );
+            var_Set( p_inp->p_libvlc, "logo-transparency", val );
         }
     }
 
