@@ -1,8 +1,8 @@
 # This is borrowed and adapted from Mandrake's Cooker
 %define name 	libdvdcss
-%define version	0.0.3
+%define version	1.0.0
 %define release	1
-%define major  	0
+%define major  	1
 %define lib_name %{name}%{major}
 
 Summary:	A library for accessing DVDs like block device, deciphering CSS encryption if needed.
