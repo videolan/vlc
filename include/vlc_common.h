@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.54 2003/02/16 14:10:44 fenrir Exp $
+ * $Id: vlc_common.h,v 1.55 2003/02/28 04:31:24 ipkiss Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -657,7 +657,11 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #elif defined( ENABLE_NLS ) && defined( HAVE_INCLUDED_GETTEXT )
 #   include "libintl.h"
 #   undef _
+#if defined( __BORLANDC__ )
+#define _(String) vlc_dgettext (PACKAGE_TARNAME, String)
+#else
 #   define _(String) vlc_dgettext (PACKAGE, String)
+#endif
 #   define N_(String) ((char*)(String))
 #elif defined( ENABLE_NLS ) && defined( HAVE_GETTEXT )
 #   include <libintl.h>
