@@ -1,8 +1,8 @@
 /*****************************************************************************
- * mpeg_audio.c : mpeg_audio Stream input module for vlc
+ * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.3 2002/08/08 00:35:11 sam Exp $
+ * $Id: audio.c,v 1.4 2002/08/13 20:28:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -38,16 +38,17 @@
 static int  Activate ( vlc_object_t * );
 static int  Demux ( input_thread_t * );
 
-/* TODO: support MPEG-2.5, not difficult */
+/* TODO: support MPEG-2.5, not difficult, but I need somes samples... */
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("ISO 13818-3 MPEG I/II audio stream demux" ) );
-    set_capability( "demux", 100 );
+    set_description( _("MPEG I/II audio stream demux" ) );
+    set_capability( "demux", 50 );
     set_callbacks( Activate, NULL );
     add_shortcut( "mpegaudio" );
+    add_shortcut( "mp3" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -59,16 +60,14 @@ vlc_module_end();
 /* it's you to choose */
 #define MPEGAUDIO_MAXTESTPOS    0
 
-#define MPEGAUDIO_MAXFRAMESIZE  1500 /* no exactly */
-
-typedef struct mpegaudio_format_s
+typedef struct mpeg_header_s
 {
     u32 i_header;
     int i_version;
     int i_layer;
     int i_crc;
     int i_bitrate;
-    int i_samplingfreq;
+    int i_samplerate;
     int i_padding;
     int i_extension;
     int i_mode;
@@ -77,14 +76,14 @@ typedef struct mpegaudio_format_s
     int i_original;
     int i_emphasis;
 
-} mpegaudio_format_t;
+} mpeg_header_t;
 
 /* Xing Header if present */
 #define FRAMES_FLAG     0x0001  /* these flags is for i_flags */
 #define BYTES_FLAG      0x0002  /* because all is optionnal */
 #define TOC_FLAG        0x0004
 #define VBR_SCALE_FLAG  0x0008
-typedef struct mpegaudio_xing_header_s
+typedef struct xing_header_s
 {
     int i_flags;      /* from Xing header data */
     int i_frames;     /* total bit stream frames from Xing header data */
@@ -92,37 +91,46 @@ typedef struct mpegaudio_xing_header_s
     int i_vbr_scale;  /* encoded vbr scale from Xing header data */
     u8  i_toc[100];   /* for seek */
     int i_avgbitrate; /* calculated, XXX: bits/sec not Kb */
-} mpegaudio_xing_header_t;
+} xing_header_t;
 
 struct demux_sys_t
 {
     mtime_t i_pts;
 
-    int     i_framecount;
-   
-    es_descriptor_t         *p_es;
-    mpegaudio_format_t      mpeg;
-    mpegaudio_xing_header_t xingheader;
+    es_descriptor_t *p_es;
+    mpeg_header_t   mpeg;
+    xing_header_t   xingheader;
+
+    /* extracted information */
+    int i_samplerate;
+    int i_samplelength;
+    int i_framelength;
 };
 
 
 static int mpegaudio_bitrate[2][3][16] =
 {
-    {
-        { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 }, /* v1 l1 */
-        { 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0 }, /* v1 l2 */
-        { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0 }  /* v1 l3 */
-    },
+  {
+    /* v1 l1 */
+    { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0},
+    /* v1 l2 */
+    { 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0},
+    /* v1 l3 */
+    { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0} 
+  },
     
-    {
-        { 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256, 0 }, /* v2 l1 */
-        { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0 }, /* v2 l2 */
-        { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0 }  /* v2 l3 */
-    }
+  {
+     /* v2 l1 */
+    { 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256, 0},
+    /* v2 l2 */
+    { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0},
+    /* v2 l3 */
+    { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0} 
+  }
 
 };
 
-static int mpegaudio_samplingfreq[2][4] = /* version 1 then 2 */
+static int mpegaudio_samplerate[2][4] = /* version 1 then 2 */
 {
     { 44100, 48000, 32000, 0 },
     { 22050, 24000, 16000, 0 }
@@ -133,39 +141,88 @@ static char* mpegaudio_mode[4] =
     "stereo", "joint stereo", "dual channel", "mono"
 };
 
-static inline u32 __GetDWBE( byte_t *p_buff )
+static inline u32 GetDWBE( u8 *p_buff )
 {
-    return( ( (*(p_buff)) << 24 ) + ( (*(p_buff+1)) << 16 ) +
-                    ( (*(p_buff+2)) << 8 ) +  ( (*(p_buff+3)) ) );
+    return( ( p_buff[0] << 24 )|( p_buff[1] << 16 )|
+            ( p_buff[2] <<  8 )|( p_buff[3] ) );
 }
 
-static int __CheckPS( input_thread_t *p_input )
+/*****************************************************************************
+ * Function to manipulate stream easily
+ *****************************************************************************
+ *
+ * SkipBytes : skip bytes, not yet optimised, read bytes to be skipped :P
+ *
+ * ReadPes : read data and make a PES
+ * 
+ *****************************************************************************/
+static int SkipBytes( input_thread_t *p_input, int i_size )
 {
-    byte_t *p_buff;
-    int i_size = input_Peek( p_input, &p_buff, 8196 );
+    data_packet_t *p_data;
+    int i_read;
 
     while( i_size > 0 )
     {
-        if( !(*p_buff) && !(*(p_buff + 1)) 
-                && (*(p_buff + 2) == 1 ) && (*(p_buff + 3) >= 0xB9 ) )
+        i_read = input_SplitBuffer(p_input, &p_data, __MIN( i_size, 1024 ) );
+        if( i_read <= 0 )
         {
-            return( 1 );  /* it could be ps so ...*/
+            return( 0 );
         }
-        p_buff++;
-        i_size--;
+        input_DeletePacket( p_input->p_method_data, p_data );
+        i_size -= i_read;
     }
-    return( 0 );
+    return( 1 );
 }
 
-/*
-#define __GetDWBE( p_buff ) \
-    ( ( (*(p_buff)) << 24 ) + ( (*(p_buff+1)) << 16 ) + \
-      ( (*(p_buff+2)) << 8 ) +  ( (*(p_buff+3)) ) )
-*/
+static int ReadPES( input_thread_t *p_input, 
+                    pes_packet_t **pp_pes, 
+                    int i_size )
+{
+    pes_packet_t *p_pes;
+
+    *pp_pes = NULL;
+        
+    if( !(p_pes = input_NewPES( p_input->p_method_data )) )
+    {
+        msg_Err( p_input, "cannot allocate new PES" );
+        return( 0 );
+    }
+
+    while( i_size > 0 )
+    {
+        data_packet_t   *p_data;
+        int i_read;
+
+        if( (i_read = input_SplitBuffer( p_input, 
+                                         &p_data, 
+                                         __MIN( i_size, 1024 ) ) ) <= 0 )
+        {
+            input_DeletePES( p_input->p_method_data, p_pes );
+            return( 0 );
+        }
+        if( !p_pes->p_first )
+        {
+            p_pes->p_first = p_data;
+            p_pes->i_nb_data = 1;
+            p_pes->i_pes_size = i_read;
+        }
+        else
+        {
+            p_pes->p_last->p_next  = p_data;
+            p_pes->i_nb_data++;
+            p_pes->i_pes_size += i_read;
+        }
+        p_pes->p_last  = p_data;
+        i_size -= i_read;
+    }
+    *pp_pes = p_pes;
+    return( 1 );
+}
+
 /*****************************************************************************
- * MPEGAudio_CheckHeader : Test the validity of the header 
+ * CheckHeader : Test the validity of the header 
  *****************************************************************************/
-static int MPEGAudio_CheckHeader( u32 i_header )
+static int CheckHeader( u32 i_header )
 {
     if( ((( i_header >> 20 )&0x0FFF) != 0x0FFF )  /* header sync */
         || (((i_header >> 17)&0x03) == 0 )  /* valid layer ?*/
@@ -180,50 +237,9 @@ static int MPEGAudio_CheckHeader( u32 i_header )
 }
 
 /*****************************************************************************
- * MPEGAudio_ParseHeader : Parse a header ;)
+ * DecodedFrameSize : give the length of the decoded pcm data
  *****************************************************************************/
-static void MPEGAudio_ParseHeader( u32 i_header, mpegaudio_format_t *p_mpeg )
-{
-    p_mpeg->i_header = i_header;
-    p_mpeg->i_version =  1 - ( ( i_header >> 19 ) & 0x01 );
-    p_mpeg->i_layer =  3 - ( ( i_header >> 17 ) & 0x03 );
-    p_mpeg->i_crc = 1 - (( i_header >> 16 ) & 0x01);
-    p_mpeg->i_bitrate = mpegaudio_bitrate[p_mpeg->i_version][p_mpeg->i_layer][(i_header>>12)&0x0F];
-    p_mpeg->i_samplingfreq = mpegaudio_samplingfreq[p_mpeg->i_version][(i_header>>10)&0x03];
-    p_mpeg->i_padding = (( i_header >> 9 ) & 0x01);
-    p_mpeg->i_extension = ( i_header >> 7 ) & 0x01;
-    p_mpeg->i_mode = ( i_header >> 6 ) & 0x03;
-    p_mpeg->i_modeext = ( i_header >> 4 ) & 0x03;
-    p_mpeg->i_copyright = ( i_header >> 3 ) & 0x01;
-    p_mpeg->i_original = ( i_header >> 2 ) & 0x01;
-    p_mpeg->i_emphasis = ( i_header ) & 0x03;
-}
-
-/*****************************************************************************
- * MPEGAudio_FrameSize : give the size of a frame in the mpeg stream
- *****************************************************************************/
-static int MPEGAudio_FrameSize( mpegaudio_format_t *p_mpeg )
-{
-    /* XXX if crc do i need to add 2 bytes or not? */
-    switch( p_mpeg->i_layer )
-    {
-        case( 0 ):
-            return( ( ( ( !p_mpeg->i_version ? 12000 : 6000 ) * 
-                         p_mpeg->i_bitrate ) / 
-                         p_mpeg->i_samplingfreq + p_mpeg->i_padding ) * 4);
-        case( 1 ):
-        case( 2 ):
-            return( ( ( !p_mpeg->i_version ? 144000 : 72000 ) * 
-                         p_mpeg->i_bitrate ) /  
-                         p_mpeg->i_samplingfreq + p_mpeg->i_padding );
-    }
-    return( 1024 ); /* must never happen, 1k to advance in stream*/
-}
-
-/*****************************************************************************
- * MPEGAudio_DecodedFrameSize : give the length of the decoded pcm data
- *****************************************************************************/
-static int MPEGAudio_DecodedFrameSize( mpegaudio_format_t *p_mpeg )
+static int DecodedFrameSize( mpeg_header_t *p_mpeg )
 {
     switch( p_mpeg->i_layer )
     {
@@ -238,11 +254,201 @@ static int MPEGAudio_DecodedFrameSize( mpegaudio_format_t *p_mpeg )
     return( 0 );
 }
 
-static int MPEGAudio_SkipID3Tag( input_thread_t *p_input )
+/****************************************************************************
+ * GetHeader : find an mpeg header and load it 
+ ****************************************************************************/
+static int GetHeader( input_thread_t  *p_input,
+                      mpeg_header_t   *p_mpeg,
+                      int             i_max_pos,
+                      int             *pi_skip )
+{
+    u32 i_header;
+    u8  *p_peek;
+    int i_size;
+
+    *pi_skip = 0;
+    i_size = input_Peek( p_input, &p_peek, i_max_pos + 4 );
+
+    for( ; ; )
+    {
+        if( i_size < 4 )
+        {
+            return( 0 );
+        }
+        if( !CheckHeader( GetDWBE( p_peek ) ) )
+        {
+            p_peek++;
+            i_size--;
+            *pi_skip += 1;
+            continue;
+        }
+        /* we found an header, load it */
+        break;
+    }
+    i_header = GetDWBE( p_peek );
+    p_mpeg->i_header = i_header;
+    p_mpeg->i_version =  1 - ( ( i_header >> 19 ) & 0x01 );
+    p_mpeg->i_layer =  3 - ( ( i_header >> 17 ) & 0x03 );
+    p_mpeg->i_crc = 1 - (( i_header >> 16 ) & 0x01);
+    p_mpeg->i_bitrate = 
+        mpegaudio_bitrate[p_mpeg->i_version][p_mpeg->i_layer][(i_header>>12)&0x0F];
+    p_mpeg->i_samplerate = mpegaudio_samplerate[p_mpeg->i_version][(i_header>>10)&0x03];
+    p_mpeg->i_padding = (( i_header >> 9 ) & 0x01);
+    p_mpeg->i_extension = ( i_header >> 7 ) & 0x01;
+    p_mpeg->i_mode = ( i_header >> 6 ) & 0x03;
+    p_mpeg->i_modeext = ( i_header >> 4 ) & 0x03;
+    p_mpeg->i_copyright = ( i_header >> 3 ) & 0x01;
+    p_mpeg->i_original = ( i_header >> 2 ) & 0x01;
+    p_mpeg->i_emphasis = ( i_header ) & 0x03;
+
+    return( 1 );
+}
+
+/*****************************************************************************
+ * ExtractXingHeader : extract a Xing header if exist
+ *****************************************************************************
+ * It also calcul avgbitrate, using Xing header if present or assume that
+ * the bitrate of the first frame is the same for the all file
+ *****************************************************************************/
+static void ExtractXingHeader( input_thread_t *p_input,
+                               xing_header_t *p_xh )
+{
+    int i_skip;
+    int i_size;
+    u8  *p_peek;
+    mpeg_header_t mpeg;
+    
+    p_xh->i_flags = 0;  /* nothing present */
+    if( !( GetHeader( p_input,
+                      &mpeg,
+                      8192,
+                      &i_skip ) ) )
+    {
+        msg_Err( p_input, "ExtractXingHeader failed, shouldn't ..." );
+        return;
+    }
+
+    p_xh->i_avgbitrate = mpeg.i_bitrate * 1000; /* default */
+
+    /* 1024 is enougth */
+    if( ( i_size = input_Peek( p_input, &p_peek, 1024 + i_skip ) ) < 8 )
+    {
+        return;
+    }
+    p_peek += i_skip;
+    i_size -= i_skip;
+
+    /* calculate pos of xing header */
+    if( !mpeg.i_version )
+    {
+        p_peek += mpeg.i_mode != 3 ? 36 : 21;
+        i_size -= mpeg.i_mode != 3 ? 36 : 21;
+    }
+    else
+    {
+        p_peek += mpeg.i_mode != 3 ? 21 : 13;
+        i_size -= mpeg.i_mode != 3 ? 21 : 13;
+    }
+    if( i_size < 8 )
+    {
+        return;
+    }
+    if( ( p_peek[0] != 'X' )||( p_peek[1] != 'i' )||
+        ( p_peek[2] != 'n' )||( p_peek[3] != 'g' ) )
+    {
+        return;
+    }
+    else
+    {
+        msg_Dbg( p_input, "Xing header is present" );
+        p_peek += 4;
+        i_size -= 4;
+    }
+    if( i_size < 4 )
+    {
+        return;
+    }
+    else
+    {
+        p_xh->i_flags = GetDWBE( p_peek ); 
+        p_peek += 4;
+        i_size -= 4;
+    }
+
+    if( ( p_xh->i_flags&FRAMES_FLAG )&&( i_size >= 4 ) )
+    {
+        p_xh->i_frames = GetDWBE( p_peek );
+        p_peek += 4;
+        i_size -= 4;
+    }
+    if( ( p_xh->i_flags&BYTES_FLAG ) &&( i_size >= 4 ) )
+
+    {
+        p_xh->i_bytes = GetDWBE( p_peek );
+        p_peek += 4;
+        i_size -= 4;
+    }
+    if( ( p_xh->i_flags&TOC_FLAG ) &&( i_size >= 100 ) )
+
+    {
+        memcpy( p_xh->i_toc, p_peek, 100 );
+        p_peek += 100;
+        i_size -= 100;
+    }
+    if( ( p_xh->i_flags&VBR_SCALE_FLAG ) &&( i_size >= 4 ) )
+
+    {
+        p_xh->i_vbr_scale = GetDWBE( p_peek );
+        p_peek += 4;
+        i_size -= 4;
+    }
+
+    if( ( p_xh->i_flags&FRAMES_FLAG )&&( p_xh->i_flags&BYTES_FLAG ) )
+    {
+        p_xh->i_avgbitrate = 
+              ((u64)p_xh->i_bytes * (u64)8 * (u64)mpeg.i_samplerate) / 
+               ((u64)p_xh->i_frames * (u64)DecodedFrameSize( &mpeg ) );
+    }
+}
+
+/****************************************************************************
+ * ExtractConfiguration : extract usefull informations from mpeg_header_t
+ ****************************************************************************/
+static void ExtractConfiguration( demux_sys_t *p_demux )
+{
+    p_demux->i_samplerate   = p_demux->mpeg.i_samplerate;
+    
+    p_demux->i_samplelength = DecodedFrameSize( &p_demux->mpeg );    
+
+    /* XXX if crc do i need to add 2 bytes or not? */
+    switch( p_demux->mpeg.i_layer )
+    {
+        case( 0 ):
+            p_demux->i_framelength = 
+                ( ( ( !p_demux->mpeg.i_version ? 12000 : 6000 ) *
+                           p_demux->mpeg.i_bitrate ) / 
+                       p_demux->mpeg.i_samplerate + p_demux->mpeg.i_padding ) * 4;
+        case( 1 ):
+        case( 2 ):
+            p_demux->i_framelength = 
+                  ( ( !p_demux->mpeg.i_version ? 144000 : 72000 ) *
+                           p_demux->mpeg.i_bitrate ) / 
+                       p_demux->mpeg.i_samplerate + p_demux->mpeg.i_padding;
+    }
+}
+
+/****************************************************************************
+ * SkipID3Tag : check if an ID3 header is present and skip it
+ ****************************************************************************
+ *
+ * Author : Sigmund Augdal 
+ * 
+ ****************************************************************************/
+static int SkipID3Tag( input_thread_t *p_input )
 {
     int count;
-    byte_t *p_peek;
-    byte_t version, revision;
+    u8  *p_peek;
+    u8  version, revision;
     int b_footer;
     int i_size;
 
@@ -253,13 +459,6 @@ static int MPEGAudio_SkipID3Tag( input_thread_t *p_input )
         msg_Err( p_input, "cannot peek()" );
         return( -1 );
     }
-/*
-    msg_Info( p_input, "Three first bytes are: %d %d %d",
-              p_peek[0],
-              p_peek[1],
-              p_peek[2]  
-              );
-*/
     if ( !( (p_peek[0] == 0x49) && (p_peek[1] == 0x44) && (p_peek[2] == 0x33)))
     {
         return( 0 );
@@ -290,130 +489,29 @@ static int MPEGAudio_SkipID3Tag( input_thread_t *p_input )
     return (0);
 }
 
-/*****************************************************************************
- * MPEGAudio_FindFrame : Find a header that could be valid. 
- *****************************************************************************
- * The idea is to search for 2 consecutive headers that seem valid 
- * Perhaps we can search 2 header with same version or samplefreq(...) to be
- * more secure but this seems to be enougth
- *****************************************************************************/
-static int MPEGAudio_FindFrame( input_thread_t *p_input, 
-                                 int *pi_pos, 
-                                 mpegaudio_format_t *p_mpeg,
-                                 int i_posmax )
+/****************************************************************************
+ * CheckPS : check if this stream could be some ps, 
+ *           yes it's ugly ...  but another idea ?
+ *
+ ****************************************************************************/
+static int CheckPS( input_thread_t *p_input )
 {
-    byte_t *p_buff;
-    u32 i_header;
-    int i_framesize;
+    u8  *p_peek;
+    int i_size = input_Peek( p_input, &p_peek, 8196 );
 
-    int i_pos = 0;
-    int i_size = input_Peek( p_input, &p_buff, i_posmax+MPEGAUDIO_MAXFRAMESIZE);
-
-    while( i_pos <= __MIN( i_posmax, i_size - 4) )
+    while( i_size > 4 )
     {
-        i_header = __GetDWBE( p_buff );
-        if( MPEGAudio_CheckHeader( i_header ) )
+        if( ( p_peek[0] == 0 ) && ( p_peek[1] == 0 )&&
+            ( p_peek[2] == 1 ) && ( p_peek[3] >= 0xb9 ) )
         {
-            MPEGAudio_ParseHeader( i_header, p_mpeg );
-            i_framesize = MPEGAudio_FrameSize( p_mpeg );
-            if(  i_pos + i_framesize + 4 > i_size )
-            {
-                *pi_pos = i_pos;
-                return( 1 );
-            }
-            else
-            {
-                if( MPEGAudio_CheckHeader( __GetDWBE( p_buff + i_framesize ) ) )
-                {
-                    *pi_pos = i_pos;
-                    return( 2 );
-                }
-            }
+            return( 1 );  /* it could be ps so ...*/
         }
-        p_buff++;
-        i_pos++;
+        p_peek++;
+        i_size--;
     }
 
-    *pi_pos = 0;
     return( 0 );
 }
-
-/*****************************************************************************
- * MPEGAudio_ExtractXingHeader : extract a Xing header if exist
- *****************************************************************************
- * It also calcul avgbitrate, using Xing header if present or assume that
- * the bitrate of the first frame is the same for the all file
- *****************************************************************************/
-static void MPEGAudio_ExtractXingHeader( input_thread_t *p_input,
-                                    mpegaudio_xing_header_t *p_xh )
-{
-    int i_pos;
-    int i_size;
-    mpegaudio_format_t mpeg;
-    byte_t  *p_buff;
-    
-    p_xh->i_flags = 0;  /* nothing present */
-    if( !(MPEGAudio_FindFrame( p_input, &i_pos, &mpeg, 2024 )) )
-    {
-        return; /* failed , can't */
-    }
-    p_xh->i_avgbitrate = mpeg.i_bitrate * 1000; /* default */
-
-    /* 1024 is enougth */
-    if( ( i_size = input_Peek( p_input, &p_buff, 1024 + i_pos ) ) < 8 )
-    {
-        return;
-    }
-    p_buff += i_pos;
-
-    /* calculate pos of xing header */
-    if( !mpeg.i_version )
-    {
-        p_buff += mpeg.i_mode != 3 ? 36 : 21;
-    }
-    else
-    {
-        p_buff += mpeg.i_mode != 3 ? 21 : 13;
-    }
-    
-    if( (*p_buff != 'X' )||(*(p_buff+1) != 'i' )
-        ||(*(p_buff+2) != 'n' )||(*(p_buff+3) != 'g' ) )
-    {
-        return;
-    }
-    p_buff += 4;
-
-    p_xh->i_flags = __GetDWBE( p_buff ); 
-    p_buff += 4;
-
-    if( p_xh->i_flags&FRAMES_FLAG ) 
-    {
-        p_xh->i_frames = __GetDWBE( p_buff );
-        p_buff += 4;
-    }
-    if( p_xh->i_flags&BYTES_FLAG ) 
-    {
-        p_xh->i_bytes = __GetDWBE( p_buff );
-        p_buff += 4;
-    }
-    if( p_xh->i_flags&TOC_FLAG ) 
-    {
-        p_input->p_vlc->pf_memcpy( p_xh->i_toc, p_buff, 100 );
-        p_buff += 100;
-    }
-    if( p_xh->i_flags&VBR_SCALE_FLAG ) 
-    {
-        p_xh->i_vbr_scale = __GetDWBE( p_buff );
-        p_buff += 4;
-    }
-    if( ( p_xh->i_flags&FRAMES_FLAG )&&( p_xh->i_flags&BYTES_FLAG ) )
-    {
-        p_xh->i_avgbitrate = 
-              ((u64)p_xh->i_bytes * (u64)8 * (u64)mpeg.i_samplingfreq) / 
-               ((u64)p_xh->i_frames * (u64)MPEGAudio_DecodedFrameSize( &mpeg));
-    }
-}
-                                    
 
 /*****************************************************************************
  * Activate: initializes MPEGaudio structures
@@ -421,25 +519,26 @@ static void MPEGAudio_ExtractXingHeader( input_thread_t *p_input,
 static int Activate( vlc_object_t * p_this )
 {
     input_thread_t * p_input = (input_thread_t *)p_this;
-    demux_sys_t * p_mpegaudio;
-    mpegaudio_format_t mpeg;
-    es_descriptor_t * p_es;
-    int i_pos;
-    int b_forced;
+    demux_sys_t * p_demux;
     input_info_category_t * p_category;
+
+    int i_found;
+    int b_forced;
+    int i_skip;
 
     /* Set the demux function */
     p_input->pf_demux = Demux;
 
-    /* XXX: i don't know what it's supposed to do, copied from ESInit */
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
     {
-    /* Improve speed. */
+        /* Improve speed. */
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
+
     if( ( *p_input->psz_demux )
-        &&( !strncmp( p_input->psz_demux, "mpegaudio", 10 ) ) )
+        &&( ( !strncmp( p_input->psz_demux, "mpegaudio", 10 ) )||
+            ( !strncmp( p_input->psz_demux, "mp3", 3 ) ) ) )
     {
         b_forced = 1;
     }
@@ -448,28 +547,49 @@ static int Activate( vlc_object_t * p_this )
         b_forced = 0;
     }
 
-    if ( MPEGAudio_SkipID3Tag( p_input ) )
-    {
-        return -1;
-    }
-    
-    /* check if it can be a ps stream */
-    if( __CheckPS(  p_input ) && !b_forced )
+    if ( SkipID3Tag( p_input ) )
     {
         return( -1 );
     }
 
-    /* must be sure that is mpeg audio stream */
-    if( MPEGAudio_FindFrame( p_input, 
-                             &i_pos, 
-                             &mpeg, 
-                             (b_forced ? 2 * MPEGAUDIO_MAXFRAMESIZE : 
-                                             MPEGAUDIO_MAXTESTPOS) ) 
-                    < (b_forced ? 1 : 2)  )
+    /* create p_demux and init it */
+    if( !( p_demux = p_input->p_demux_data = malloc( sizeof(demux_sys_t) ) ) )
     {
-        msg_Warn( p_input, "MPEGAudio module discarded (no frame found)" );
+        msg_Err( p_input, "out of memory" );
         return( -1 );
     }
+    memset( p_demux, 0, sizeof(demux_sys_t) );
+   
+    /* check if it could be a ps stream */
+    if( !b_forced && CheckPS(  p_input ))
+    {
+        return( -1 );
+    }
+
+
+    /* must be sure that is mpeg audio stream unless forced */
+    if( !( i_found = GetHeader( p_input,
+                                &p_demux->mpeg,
+                                b_forced ? 4000 : MPEGAUDIO_MAXTESTPOS,
+                                &i_skip ) ) )
+    {
+        if( b_forced )
+        {
+            msg_Warn( p_input, 
+                      "this does not look like an MPEG audio stream, "
+                      "but continuing anyway" );
+        }
+        else
+        {
+            msg_Warn( p_input, "MPEGAudio module discarded (no frame found)" );
+            return( -1 );
+        }
+    }
+    else
+    {
+        ExtractConfiguration( p_demux );
+    }
+
     
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
@@ -486,79 +606,85 @@ static int Activate( vlc_object_t * p_this )
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     
     /* create our ES */ 
-    p_es = input_AddES( p_input, 
-                        p_input->stream.p_selected_program, 
-                        1, /* id */
-                        0 );
-    if( !p_es )
+    p_demux->p_es = input_AddES( p_input, 
+                                 p_input->stream.p_selected_program,
+                                 1, /* id */
+                                 0 );
+    if( !p_demux->p_es )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "out of memory" );
         return( -1 );
     }
-    p_es->i_stream_id = 1;
-    p_es->i_fourcc = !mpeg.i_layer ? VLC_FOURCC('m','p','g','a') /* layer 1 */
-                                   : VLC_FOURCC('m','p','g','a'); /* layer 2 */
-    p_es->i_cat = AUDIO_ES;
-    input_SelectES( p_input, p_es );
+    p_demux->p_es->i_stream_id = 1;
+    p_demux->p_es->i_fourcc = VLC_FOURCC('m','p','g','a');
+    p_demux->p_es->i_cat = AUDIO_ES;
+
+    input_SelectES( p_input, p_demux->p_es );
 
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    /* create p_mpegaudio and init it */
-    p_mpegaudio = p_input->p_demux_data = malloc( sizeof(demux_sys_t) );
 
-    if( !p_mpegaudio )
+    if( i_found )
     {
-        msg_Err( p_input, "out of memory" );
-        return( -1 );
-    }
-
-    /*input_ClockInit(  p_input->stream.p_selected_program ); 
-      done by AddProgram */
-    p_mpegaudio->p_es = p_es;
-    p_mpegaudio->mpeg = mpeg;
-    p_mpegaudio->i_framecount = 0;
-    p_mpegaudio->i_pts = 0;  
-
-    /* parse Xing Header if present */
-    MPEGAudio_ExtractXingHeader( p_input, &p_mpegaudio->xingheader );
+        /* parse Xing Header if present */
+        ExtractXingHeader( p_input, &p_demux->xingheader );
     
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_mux_rate = p_mpegaudio->xingheader.i_avgbitrate / 50 / 8;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_input->stream.i_mux_rate = p_demux->xingheader.i_avgbitrate / 50 / 8;
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
-    /* if i don't do that, it don't work correctly but why ??? */
-    if( p_input->stream.b_seekable )
-    {
-        p_input->pf_seek( p_input, 0 );
-        input_AccessReinit( p_input );
-    }
-    /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
 
-    /* all is ok :)) */
-    msg_Dbg( p_input, "audio MPEG-%d layer %d %s %dHz %dKb/s %s",
-                mpeg.i_version + 1,
-                mpeg.i_layer + 1,
-                mpegaudio_mode[mpeg.i_mode],
-                mpeg.i_samplingfreq,
-                p_mpegaudio->xingheader.i_avgbitrate / 1000,
-                p_mpegaudio->xingheader.i_flags ?
+        /* all is ok :)) */
+        msg_Dbg( p_input, "audio MPEG-%d layer %d %s %dHz %dKb/s %s",
+                p_demux->mpeg.i_version + 1,
+                p_demux->mpeg.i_layer + 1,
+                mpegaudio_mode[p_demux->mpeg.i_mode],
+                p_demux->mpeg.i_samplerate,
+                p_demux->xingheader.i_avgbitrate / 1000,
+                p_demux->xingheader.i_flags ?
                         "VBR (Xing)" : "" 
                     );
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_category = input_InfoCategory( p_input, "mpeg" );
-    input_AddInfo( p_category, "input type", "audio MPEG-%d",
-                   mpeg.i_version +1 );
-    input_AddInfo( p_category, "layer", "%d", mpeg.i_layer + 1 );
-    input_AddInfo( p_category, "mode", mpegaudio_mode[mpeg.i_mode] );
-    input_AddInfo( p_category, "sample rate", "%dHz", mpeg.i_samplingfreq );
-    input_AddInfo( p_category, "average bitrate", "%dKb/s",
-                   p_mpegaudio->xingheader.i_avgbitrate / 1000 );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_category = input_InfoCategory( p_input, "mpeg" );
+        input_AddInfo( p_category, "input type", "audio MPEG-%d",
+                       p_demux->mpeg.i_version +1 );
+        input_AddInfo( p_category, "layer", "%d", p_demux->mpeg.i_layer + 1 );
+        input_AddInfo( p_category, "mode", 
+                       mpegaudio_mode[p_demux->mpeg.i_mode] );
+        input_AddInfo( p_category, "sample rate", "%dHz",
+                       p_demux->mpeg.i_samplerate );
+        input_AddInfo( p_category, "average bitrate", "%dKb/s",
+                       p_demux->xingheader.i_avgbitrate / 1000 );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+    }
+    else
+    {
+        msg_Dbg( p_input, 
+                 "assuming audio MPEG, but not frame header yet found" );
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_category = input_InfoCategory( p_input, "mpeg" );
+        input_AddInfo( p_category, "input type", "audio MPEG-?" );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    }
+#if 0
+    /* seems now to be ok */
+
+    /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
+    /* if i don't do that, it don't work correctly but why ??? */
+
+    /* XXX Sigmund : if you want to seek use this :) 
+       but it work only with file .... ( http doesn't like seeking */
+    if( p_input->stream.b_seekable )
+    {
+        p_input->pf_seek( p_input, 0 ); // 0 -> seek at position 0
+        input_AccessReinit( p_input );
+    }
+#endif
+
     return( 0 );
 }
 
@@ -569,78 +695,56 @@ static int Activate( vlc_object_t * p_this )
  *****************************************************************************/
 static int Demux( input_thread_t * p_input )
 {
-    int i_pos;
-    int i_toread;
-    pes_packet_t    *p_pes;
-    mpegaudio_format_t mpeg;
-    demux_sys_t *p_mpegaudio = p_input->p_demux_data;
-
-    /*  look for a frame */
-    if( !MPEGAudio_FindFrame( p_input, &i_pos, &mpeg, 4096 ) )
-    {
-        msg_Warn( p_input, "cannot find next frame" );
-        return( 0 );
-    }
+    demux_sys_t  *p_demux = p_input->p_demux_data;
+    pes_packet_t *p_pes;
+    int          i_skip;
     
-    /* if stream has changed */
-    if( ( mpeg.i_version != p_mpegaudio->mpeg.i_version )
-        ||( mpeg.i_layer != p_mpegaudio->mpeg.i_layer )
-        ||( mpeg.i_samplingfreq != p_mpegaudio->mpeg.i_samplingfreq ) )
+    if( !GetHeader( p_input, 
+                    &p_demux->mpeg,
+                    8192,
+                    &i_skip ) )
     {
-        msg_Dbg( p_input, "stream has changed" );
-        p_mpegaudio->i_framecount = 0;
-        p_mpegaudio->i_pts = 0;
-    }
-
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
-                          p_mpegaudio->i_pts );
-
-    /* in fact i_pos may be garbage but ... i don't want to skip it 
-        it's borring ;) */
-
-    i_toread = MPEGAudio_FrameSize( &mpeg ) + i_pos;
-    /* create one pes */
-    if( !(p_pes = input_NewPES( p_input->p_method_data )) )
-    {
-        msg_Err( p_input, "cannot allocate new PES" );
-        return( -1 );
-    }
-
-    while( i_toread > 0 )
-    {
-        data_packet_t   *p_data;
-        int i_read;
-
-        if( (i_read = input_SplitBuffer( p_input, &p_data, i_toread ) ) <= 0 )
+        if( i_skip > 0)
         {
-            break;
-        }
-        if( !p_pes->p_first )
-        {
-            p_pes->p_first = p_data;
-            p_pes->i_nb_data = 1;
-            p_pes->i_pes_size = i_read;
+            msg_Dbg( p_input,
+                     "skipping %d bytes (garbage ?)",
+                     i_skip );
+            SkipBytes( p_input, i_skip );
+            return( 1 );
         }
         else
         {
-            p_pes->p_last->p_next  = p_data;
-            p_pes->i_nb_data++;
-            p_pes->i_pes_size += i_read;
+            msg_Dbg( p_input,
+                     "cannot find next frame (EOF ?)" );
+            return( 0 );
         }
-        p_pes->p_last  = p_data;
-        i_toread -= i_read;
     }
-    p_mpegaudio->i_pts = (mtime_t)90000 * 
-                               (mtime_t)p_mpegaudio->i_framecount * 
-                               (mtime_t)MPEGAudio_DecodedFrameSize( &mpeg ) /
-                               (mtime_t)mpeg.i_samplingfreq;
-    p_pes->i_dts = 0;
-    p_pes->i_pts = input_ClockGetTS( p_input,
-                                     p_input->stream.p_selected_program,
-                                     p_mpegaudio->i_pts );
 
-    if( !p_mpegaudio->p_es->p_decoder_fifo )
+    ExtractConfiguration( p_demux );
+     
+    input_ClockManageRef( p_input,
+                          p_input->stream.p_selected_program,
+                          p_demux->i_pts );
+   
+    /*
+     * For layer 1 and 2 i_skip is garbage but for layer 3 it is not.
+     * Since mad accept without to much trouble garbage I don't skip
+     * it ( in case I misdetect garbage ... )
+     *
+     */
+    if( !ReadPES( p_input, &p_pes, p_demux->i_framelength + i_skip) )
+    {
+        msg_Err( p_input,
+                "cannot read data" );
+        return( -1 );
+    }
+    
+    p_pes->i_dts =
+        p_pes->i_pts = input_ClockGetTS( p_input,
+                                         p_input->stream.p_selected_program,
+                                         p_demux->i_pts );
+
+    if( !p_demux->p_es->p_decoder_fifo )
     {
         msg_Err( p_input, "no audio decoder" );
         input_DeletePES( p_input->p_method_data, p_pes );
@@ -648,13 +752,13 @@ static int Demux( input_thread_t * p_input )
     }
     else
     {
-        input_DecodePES( p_mpegaudio->p_es->p_decoder_fifo, p_pes );
+        input_DecodePES( p_demux->p_es->p_decoder_fifo, p_pes );
     }
-
-    p_mpegaudio->i_framecount++;
-    p_mpegaudio->mpeg = mpeg; 
-
+    p_demux->i_pts += (mtime_t)90000 * 
+                      (mtime_t)p_demux->i_samplelength /
+                      (mtime_t)p_demux->i_samplerate;
     return( 1 );
+   
 }
 
 
