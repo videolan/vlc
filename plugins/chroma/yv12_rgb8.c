@@ -2,7 +2,7 @@
  * yv12_rgb8.c : YUV to paletted RGB8 conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: yv12_rgb8.c,v 1.1 2001/12/16 16:18:36 sam Exp $
+ * $Id: yv12_rgb8.c,v 1.2 2001/12/19 18:14:23 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME yv12_rgb8.c
+#define MODULE_NAME chroma_yv12_rgb8
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -34,8 +34,8 @@
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

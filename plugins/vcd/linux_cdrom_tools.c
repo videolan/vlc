@@ -71,9 +71,11 @@
 #include "modules.h"
 #include "modules_export.h"
 
-
 #include "input_vcd.h"
 #include "linux_cdrom_tools.h"
+
+static void lba2msf( struct cdrom_msf0 *p_msf, int lba );
+
 /*****************************************************************************
 * read_toc : Reads the Table of Content of a CD-ROM and fills p_vcd with     *
 *            the read information                                            *
@@ -146,7 +148,7 @@ int VCD_sector_read ( struct thread_vcd_data_s * p_vcd, byte_t * p_buffer )
     byte_t                        p_read_block[VCD_SECTOR_SIZE] ;
     struct cdrom_msf0             msf_cursor ;
     
-    msf_cursor = lba2msf( p_vcd->current_sector ) ;
+    lba2msf( &msf_cursor, p_vcd->current_sector ) ;
    
 #ifdef DEBUG
     intf_DbgMsg("Playing frame %d:%d-%d\n", msf_cursor.minute, 
@@ -184,16 +186,14 @@ int VCD_sector_read ( struct thread_vcd_data_s * p_vcd, byte_t * p_buffer )
  *           address.
  *****************************************************************************/
 
-struct cdrom_msf0 lba2msf( int lba)
+static void lba2msf( struct cdrom_msf0 *p_msf, int lba )
 {
-    struct cdrom_msf0                      msf_result ;
-
-    /* we add 2*CD_FRAMES since the 2 first seconds are not played*/
+    /* we add 2*CD_FRAMES since the 2 first seconds are not played */
     
-    msf_result.minute = (lba+2*CD_FRAMES) / ( CD_FRAMES * CD_SECS ) ;
-    msf_result.second = ( (lba+2*CD_FRAMES) % ( CD_FRAMES * CD_SECS ) ) 
+    p_msf->minute = (lba+2*CD_FRAMES) / ( CD_FRAMES * CD_SECS ) ;
+    p_msf->second = ( (lba+2*CD_FRAMES) % ( CD_FRAMES * CD_SECS ) ) 
         / CD_FRAMES ;
-    msf_result.frame = ( (lba+2*CD_FRAMES) % ( CD_FRAMES * CD_SECS ) ) 
+    p_msf->frame = ( (lba+2*CD_FRAMES) % ( CD_FRAMES * CD_SECS ) ) 
         % CD_FRAMES ;
-    return msf_result ;
 }
+

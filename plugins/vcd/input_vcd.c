@@ -224,7 +224,6 @@ static void VCDInit( input_thread_t * p_input )
     int                  i;
     input_area_t *       p_area;
     es_descriptor_t *    p_es;
-    packet_cache_t *     p_packet_cache;
     
     p_vcd = malloc( sizeof(thread_vcd_data_t) );
         
@@ -422,7 +421,6 @@ static int VCDRead( input_thread_t * p_input,
     int                     i_packet_size;
     int                     i_index;
     int                     i_packet;   
-    boolean_t               b_eof;
     byte_t *                p_buffer;
     boolean_t                  b_no_packet;
     /* boolean_t               b_eoc; No chapters yet */
@@ -533,7 +531,8 @@ static int VCDRead( input_thread_t * p_input,
 #endif
             if ( i_index + i_packet_size > BUFFER_SIZE )
             {
-                intf_ErrMsg( "Too long packet");
+                intf_ErrMsg( "input error: packet too long (%i)",
+                             i_index + i_packet_size );
                 continue;
             }
             
@@ -587,28 +586,29 @@ static int VCDRead( input_thread_t * p_input,
         p_input->stream.p_selected_area->i_part = p_vcd->i_chapter;
     }*/
 
-    
-    b_eof = p_vcd->b_end_of_track; 
-        /*FIXME&& ( ( p_vcd->current_track ) >= p_vcd->nb_tracks - 1);*/
-
-    if( b_eof )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        return 1;
-    }
-
     if( p_vcd->b_end_of_track )
     {
+        input_area_t *p_area;
+
+        /* EOF ? */
+        if( p_vcd->current_track >= p_vcd->nb_tracks - 1 )
+        {
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            return 1;
+        }
+
         intf_WarnMsg( 4, "vcd info: new title" );
+
         p_vcd->b_end_of_track = 0;
-        VCDSetArea( p_input, p_input->stream.pp_areas[
-                     p_input->stream.p_selected_area->i_id + 1] );
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        return 0;
+
+        p_area = p_input->stream.pp_areas[
+                                 p_input->stream.p_selected_area->i_id + 1 ];
+
+        p_area->i_part = 1;
+        VCDSetArea( p_input, p_area );
     }
     
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
 
     return 0;
 }

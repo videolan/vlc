@@ -2,7 +2,7 @@
  * vout_common.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_common.c,v 1.5 2001/12/19 03:50:22 sam Exp $
+ * $Id: vout_common.c,v 1.6 2001/12/19 18:14:23 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -470,13 +470,13 @@ int _M( XCommonCreateWindow ) ( vout_thread_t *p_vout )
                 * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
         }
 
-        if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 200 )
+        if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 300 )
         {
             p_vout->p_sys->i_width <<= 1;
             p_vout->p_sys->i_height <<= 1;
         }
         else if( p_vout->p_sys->i_width <= 400
-                  && p_vout->p_sys->i_height <= 300 )
+                  && p_vout->p_sys->i_height <= 400 )
         {
             p_vout->p_sys->i_width += p_vout->p_sys->i_width >> 1;
             p_vout->p_sys->i_height += p_vout->p_sys->i_height >> 1;

@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.107 2001/12/19 10:00:00 massiot Exp $
+ * $Id: input_dvd.c,v 1.108 2001/12/19 18:14:23 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -302,9 +302,8 @@ static void DVDInit( input_thread_t * p_input )
         i_chapter = 1;
     }
 
-    p_input->stream.pp_areas[i_title]->i_part = i_chapter;
-
     p_area = p_input->stream.pp_areas[i_title];
+    p_area->i_part = i_chapter;
 
     /* set title, chapter, audio and subpic */
     DVDSetArea( p_input, p_area );
@@ -849,8 +848,6 @@ static int DVDRead( input_thread_t * p_input,
     int                     i_pos;
     int                     i_read_blocks;
     int                     i_sector;
-    boolean_t               b_eof;
-    boolean_t               b_eot;
     boolean_t               b_eoc;
     data_packet_t *         p_data;
 
@@ -1002,18 +999,17 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
         p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
     }
 
-    b_eot = !( p_input->stream.p_selected_area->i_tell
-                  < p_input->stream.p_selected_area->i_size );
-    b_eof = b_eot && ( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb );
-
-    if( b_eof )
+    if( p_input->stream.p_selected_area->i_tell
+            >= p_input->stream.p_selected_area->i_size )
     {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        return 1;
-    }
+        if( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb )
+        {
+            /* EOF */
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            return 1;
+        }
 
-    if( b_eot )
-    {
+        /* EOT */
         intf_WarnMsg( 4, "dvd info: new title" );
         p_dvd->i_title++;
         DVDSetArea( p_input, p_input->stream.pp_areas[p_dvd->i_title] );

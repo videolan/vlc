@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.71 2001/12/19 03:50:22 sam Exp $
+ * $Id: vout_sdl.c,v 1.72 2001/12/19 18:14:23 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -46,6 +46,7 @@
 #include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
+#include "netutils.h"
 #include "tests.h"
 
 #include "video.h"
@@ -196,12 +197,12 @@ static int vout_Create( vout_thread_t *p_vout )
             * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
     }
 
-    if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 200 )
+    if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 300 )
     {
         p_vout->p_sys->i_width <<= 1;
         p_vout->p_sys->i_height <<= 1;
     }
-    else if( p_vout->p_sys->i_width <= 400 && p_vout->p_sys->i_height <= 300 )
+    else if( p_vout->p_sys->i_width <= 400 && p_vout->p_sys->i_height <= 400 )
     {
         p_vout->p_sys->i_width += p_vout->p_sys->i_width >> 1;
         p_vout->p_sys->i_height += p_vout->p_sys->i_height >> 1;

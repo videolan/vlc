@@ -39,4 +39,4 @@
 
 int read_toc ( struct thread_vcd_data_s *);
 int VCD_sector_read ( struct thread_vcd_data_s *, byte_t *) ;
-struct cdrom_msf0 lba2msf ( int ) ;
+

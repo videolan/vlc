@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.41 2001/12/17 19:42:16 massiot Exp $
+ * $Id: vout_xvideo.c,v 1.42 2001/12/19 18:14:23 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -382,7 +382,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                    p_pic->p_sys->p_xvimage, 0 /*src_x*/, 0 /*src_y*/,
                    p_vout->output.i_width, p_vout->output.i_height,
                    0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height,
-                   True );
+                   False /* Don't put True here or you'll waste your CPU */ );
 
     XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
                    i_width, i_height );
