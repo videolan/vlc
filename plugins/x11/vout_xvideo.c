@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.40 2001/12/17 03:38:21 sam Exp $
+ * $Id: vout_xvideo.c,v 1.41 2001/12/17 19:42:16 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -389,6 +389,9 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
     XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
                  i_x, i_y );
+
+    /* Force synchronization */
+    XSync( p_vout->p_sys->p_display, False );
 }
 
 /* following functions are local */
