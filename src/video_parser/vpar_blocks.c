@@ -144,6 +144,7 @@ static lookup_t     pl_coded_pattern[512] =
      */
 
     /* Table B-12, dct_dc_size_luminance, codes 00XXX ... 11110 */
+
 static lookup_t     pl_dct_dc_lum_init_table_1[32] =
     { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
       {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
@@ -151,7 +152,20 @@ static lookup_t     pl_dct_dc_lum_init_table_1[32] =
       {4, 3}, {4, 3}, {4, 3}, {4, 3}, {5, 4}, {5, 4}, {6, 5}, {MB_ERROR, 0}
     };
 
+static lookup_t     ppl_dct_dc_init_table_1[2][32] =
+{    { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
+      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
+      {0, 3}, {0, 3}, {0, 3}, {0, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3},
+      {4, 3}, {4, 3}, {4, 3}, {4, 3}, {5, 4}, {5, 4}, {6, 5}, {MB_ERROR, 0}},
+{ {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2},
+      {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
+      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
+      {3, 3}, {3, 3}, {3, 3}, {3, 3}, {4, 4}, {4, 4}, {5, 5}, {MB_ERROR, 0}
+    }
+    };
+
     /* Table B-12, dct_dc_size_luminance, codes 111110xxx ... 111111111 */
+
 static lookup_t     pl_dct_dc_lum_init_table_2[32] =
     { {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6},
       {8, 7}, {8, 7}, {8, 7}, {8, 7}, {9, 8}, {9, 8}, {10,9}, {11,9},
@@ -161,13 +175,28 @@ static lookup_t     pl_dct_dc_lum_init_table_2[32] =
       {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}
     };
 
+static lookup_t     ppl_dct_dc_init_table_2[2][32] =
+{    { {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6},
+      {8, 7}, {8, 7}, {8, 7}, {8, 7}, {9, 8}, {9, 8}, {10,9}, {11,9},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}},
+    { {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
+      {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
+      {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7},
+      {8, 8}, {8, 8}, {8, 8}, {8, 8}, {9, 9}, {9, 9}, {10,10}, {11,10}
+    }
+    };
+
     /* Table B-13, dct_dc_size_chrominance, codes 00xxx ... 11110 */
 static lookup_t     pl_dct_dc_chrom_init_table_1[32] =
-    { {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2},
+ { {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2},
       {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
       {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
       {3, 3}, {3, 3}, {3, 3}, {3, 3}, {4, 4}, {4, 4}, {5, 5}, {MB_ERROR, 0}
     };
+    
 
    /* Table B-13, dct_dc_size_chrominance, codes 111110xxxx ... 1111111111 */
 static lookup_t     pl_dct_dc_chrom_init_table_2[32] =
@@ -176,7 +205,7 @@ static lookup_t     pl_dct_dc_chrom_init_table_2[32] =
       {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7},
       {8, 8}, {8, 8}, {8, 8}, {8, 8}, {9, 9}, {9, 9}, {10,10}, {11,10}
     };
-
+ 
 
     /* Tables for ac DCT coefficients. There are cut in many parts to save space */
     /* Table B-14, DCT coefficients table zero,
@@ -364,6 +393,15 @@ static dct_lookup_t pl_DCT_tab6[16] =
         {13,2,16}, {12,2,16}, {11,2,16}, {31,1,16},
         {30,1,16}, {29,1,16}, {28,1,16}, {27,1,16}
     };
+
+    /* Pointers on tables of dct coefficients */
+static dct_lookup_t * ppl_dct_tab1[2] = { pl_DCT_tab_ac, pl_DCT_tab0a };
+
+static dct_lookup_t * ppl_dct_tab2[2] = { pl_DCT_tab_dc, pl_DCT_tab_ac };
+
+
+    /* Lookup Table for the chromatic component */
+static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
 
 
 /*
@@ -585,13 +623,108 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
                                             macroblock_t * p_mb, int i_b,
                                             int i_chroma_format )
 {
+    int         i_parse;
+    int         i_nc;
+    int         i_cc;
+    int         i_coef;
+    int         i_code;
+    int         i_length;
+    int         i_pos;
+    int         i_run;
+    int         i_level;
+    boolean_t   b_dc;
+    boolean_t   b_sign;
+    boolean_t   b_chroma;
 
+    /* Give the chromatic component (0, 1, 2) */
+    i_cc = pi_cc_index[i_b];
+
+    /* Determine whether it is luminance or not (chrominance) */
+    b_chroma = ( i_cc + 1 ) >> 1;
+
+    /* There should be no D picture in non-intra blocks */
     if( p_vpar->picture.i_coding_type == D_CODING_TYPE )
+        intf_ErrMsg("vpar error : D-picture in non intra block\n");
+    
+    /* Decoding of the AC coefficients */
+
+    i_nc = 0;
+    i_coef = 0;
+    b_sign = 0;
+
+    for( i_parse = 0; !p_vpar->b_die; i_parse++ )
     {
-        /* Remove end_of_macroblock (always 1, prevents startcode emulation)
-         * ISO/IEC 11172-2 section 2.4.2.7 and 2.4.3.6 */
-        RemoveBits( &p_vpar->bit_stream, 1 );
+        i_code = ShowBits( &p_vpar->bit_stream, 16 );
+        if( i_code >= 16384 )
+        {
+            b_dc = !((i_parse + 62)/63);
+            i_run =     ppl_dct_tab2[b_dc][(i_code>>12)-4].i_run;
+            i_level =   ppl_dct_tab2[b_dc][(i_code>>12)-4].i_level;
+            i_length =  ppl_dct_tab2[b_dc][(i_code>>12)-4].i_length;
+        }
+        else
+        {
+            i_run =     p_vpar->ppl_dct_coef[0][i_code].i_run;
+            i_length =  p_vpar->ppl_dct_coef[0][i_code].i_length;
+            i_level =   p_vpar->ppl_dct_coef[0][i_code].i_level;
+        }
+
+        RemoveBits( &p_vpar->bit_stream, i_length );
+
+        switch( i_run )
+        {
+            case DCT_ESCAPE:
+                i_run = GetBits( &p_vpar->bit_stream, 6 );
+                i_level = GetBits( &p_vpar->bit_stream, 8 );
+                if (i_level == 0)
+                    i_level = GetBits( &p_vpar->bit_stream, 8 );
+                else if (i_level == 128)
+                    i_level = GetBits( &p_vpar->bit_stream, 8 ) - 256;
+                else if (i_level > 128)
+                    i_level -= 256;
+
+                if (i_level<0)
+                    i_level = -i_level;
+                
+                break;
+            case DCT_EOB:
+#ifdef HAVE_MMX
+                /* The MMX IDCT has a precision problem with non-intra
+                 * blocks. */
+                p_mb->ppi_blocks[i_b][0] += 4;
+#endif
+                if( i_nc <= 1 )
+                {
+                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+                    p_mb->pi_sparse_pos[i_b] = i_coef;
+                }
+                else
+                {
+                    p_mb->pf_idct[i_b] = vdec_IDCT;
+                }
+                return;
+
+                break;
+            default:
+                b_sign = GetBits( &p_vpar->bit_stream, 1 );
+        }
+        i_coef = i_parse;
+        i_parse += i_run;
+        i_nc ++;
+
+        if( i_parse >= 64 )
+        {
+            break;
+        }
+
+        i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
+        i_level = ( ((i_level << 1) + 1) * p_vpar->mb.i_quantizer_scale
+                    * p_vpar->sequence.nonintra_quant.pi_matrix[i_pos] ) >> 4;
+        p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
+
+    intf_ErrMsg("vpar error: DCT coeff (non-intra) is out of bounds\n");
+    p_vpar->picture.b_error = 1;
 }
 
 /*****************************************************************************
@@ -601,13 +734,144 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb, int i_b ,
                                          int i_chroma_format )
 {
+    int             i_parse;
+    int             i_nc;
+    int             i_cc;
+    int             i_coef;
+    int             i_code;
+    int             i_length;
+    int             i_pos;
+    int             i_dct_dc_size;
+    int             i_dct_dc_diff;
+    int             i_run;
+    int             i_level;
+    boolean_t       b_sign;
+    boolean_t       b_chroma;
+    
+    /* Give the chromatic component (0, 1, 2) */
+    i_cc = pi_cc_index[i_b];
+
+    /* Determine whether it is luminance or not (chrominance) */
+    b_chroma = ( i_cc + 1 ) >> 1;
+
+    /* decode length */
+    i_code = ShowBits(&p_vpar->bit_stream, 5);
+
+    if (i_code<31)
+    {
+        i_dct_dc_size = ppl_dct_dc_init_table_1[b_chroma][i_code].i_value;
+        i_length = ppl_dct_dc_init_table_1[b_chroma][i_code].i_length;
+        RemoveBits( &p_vpar->bit_stream, i_length);
+    }
+    else
+    {
+        i_code = ShowBits(&p_vpar->bit_stream, (9+b_chroma)) - (0x1f0 * (b_chroma + 1));
+        i_dct_dc_size = ppl_dct_dc_init_table_2[b_chroma][i_code].i_value;
+        i_length = ppl_dct_dc_init_table_2[b_chroma][i_code].i_length;
+        RemoveBits( &p_vpar->bit_stream, i_length);
+    }
+ 
+    if (i_dct_dc_size == 0)
+        i_dct_dc_diff = 0;
+    else
+    {
+        i_dct_dc_diff = GetBits( &p_vpar->bit_stream, i_dct_dc_size);
+        if ((i_dct_dc_diff & (1<<(i_dct_dc_size-1))) == 0)
+            i_dct_dc_diff -= (1<<i_dct_dc_size) - 1;
+    }
+
+    /* Read the actual code with the good length */
+    p_vpar->mb.pi_dc_dct_pred[i_cc] += i_dct_dc_diff;
+
+    p_mb->ppi_blocks[i_b][0] = p_vpar->mb.pi_dc_dct_pred[i_cc];
+
+    i_nc = ( p_vpar->mb.pi_dc_dct_pred[i_cc] != 0 );
+
 
     if( p_vpar->picture.i_coding_type == D_CODING_TYPE )
     {
         /* Remove end_of_macroblock (always 1, prevents startcode emulation)
          * ISO/IEC 11172-2 section 2.4.2.7 and 2.4.3.6 */
         RemoveBits( &p_vpar->bit_stream, 1 );
+        /* D pictures do not have AC coefficients */
+        return;
     }
+
+    
+    /* Decoding of the AC coefficients */
+    i_coef = 0;
+    i_nc = 0;
+    b_sign = 0;
+
+    for( i_parse = 1; !p_vpar->b_die/*i_parse < 64*/; i_parse++ )
+    {
+        i_code = ShowBits( &p_vpar->bit_stream, 16 );
+        /* We use 2 main tables for the coefficients */
+        if( i_code >= 16384 )
+        {
+            i_run =     ppl_dct_tab1[0][(i_code>>12)-4].i_run;
+            i_level =   ppl_dct_tab1[0][(i_code>>12)-4].i_level;
+            i_length =  ppl_dct_tab1[0][(i_code>>12)-4].i_length;
+        }
+        else
+        {
+            i_run =     p_vpar->ppl_dct_coef[0][i_code].i_run;
+            i_length =  p_vpar->ppl_dct_coef[0][i_code].i_length;
+            i_level =   p_vpar->ppl_dct_coef[0][i_code].i_level;
+        }
+
+        RemoveBits( &p_vpar->bit_stream, i_length );
+
+        switch( i_run )
+        {
+            case DCT_ESCAPE:
+                i_run = GetBits( &p_vpar->bit_stream, 6 );
+                i_level = GetBits( &p_vpar->bit_stream, 8 );
+                if (i_level == 0)
+                    i_level = GetBits( &p_vpar->bit_stream, 8 );
+                else if (i_level == 128)
+                    i_level = GetBits( &p_vpar->bit_stream, 8 ) - 256;
+                else if (i_level > 128)
+                    i_level -= 256;
+                break;
+            case DCT_EOB:
+                if( i_nc <= 1 )
+                {
+                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+                    p_mb->pi_sparse_pos[i_b] = i_coef;
+                }
+                else
+                {
+                    p_mb->pf_idct[i_b] = vdec_IDCT;
+                }
+                return;
+
+                break;
+            default:
+                b_sign = GetBits( &p_vpar->bit_stream, 1 );
+        }
+        
+        /* Prepare the next block */
+        i_coef = i_parse;
+        i_parse += i_run;
+        i_nc ++;
+
+        if( i_parse >= 64 )
+        {
+            /* We have an error in the stream */
+            break;
+        }
+
+        /* Determine the position of the block in the frame */
+        i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
+        i_level = ( i_level *
+                    p_vpar->mb.i_quantizer_scale *
+                    p_vpar->sequence.intra_quant.pi_matrix[i_pos] ) >> 3;
+        p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
+    }
+
+    intf_ErrMsg("vpar error: DCT coeff (intra) is out of bounds\n");
+    p_vpar->picture.b_error = 1;
 }
 
 /*****************************************************************************
@@ -621,25 +885,24 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
     int         i_nc;
     int         i_cc;
     int         i_coef;
-    int         i_type;
     int         i_code;
     int         i_length;
     int         i_pos;
     int         i_run;
     int         i_level;
+    boolean_t   b_dc;
     boolean_t   b_sign;
+    boolean_t   b_chroma;
     int *       pi_quant;
 
-    /* Lookup Table for the chromatic component */
-    static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
-
+    /* Give the chromatic component (0, 1, 2) */
     i_cc = pi_cc_index[i_b];
 
     /* Determine whether it is luminance or not (chrominance) */
-    i_type = ( i_cc + 1 ) >> 1;
+    b_chroma = ( i_cc + 1 ) >> 1;
 
     /* Give a pointer to the quantization matrices for intra blocks */
-    if( (i_chroma_format == CHROMA_420) || (!i_type) )
+    if( (i_chroma_format == CHROMA_420) || (!b_chroma) )
     {
         pi_quant = p_vpar->sequence.nonintra_quant.pi_matrix;
     }
@@ -657,24 +920,10 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         if( i_code >= 16384 )
         {
-            if( i_parse == 0 )
-            {
-                i_run =     pl_DCT_tab_dc[(i_code>>12)-4].i_run;
-                i_level =   pl_DCT_tab_dc[(i_code>>12)-4].i_level;
-                i_length =  pl_DCT_tab_dc[(i_code>>12)-4].i_length;
-            }
-            else
-            {
-                i_run =     pl_DCT_tab_ac[(i_code>>12)-4].i_run;
-                i_level =   pl_DCT_tab_ac[(i_code>>12)-4].i_level;
-                i_length =  pl_DCT_tab_ac[(i_code>>12)-4].i_length;
-             }
-        }
-        else if( i_code >= 1024 )
-        {
-            i_run =     pl_DCT_tab0[(i_code>>8)-4].i_run;
-            i_length =  pl_DCT_tab0[(i_code>>8)-4].i_length;
-            i_level =   pl_DCT_tab0[(i_code>>8)-4].i_level;
+            b_dc = !((i_parse + 62)/63);
+            i_run =     ppl_dct_tab2[b_dc][(i_code>>12)-4].i_run;
+            i_level =   ppl_dct_tab2[b_dc][(i_code>>12)-4].i_level;
+            i_length =  ppl_dct_tab2[b_dc][(i_code>>12)-4].i_length;
         }
         else
         {
@@ -741,31 +990,30 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb, int i_b,
                                          int i_chroma_format )
 {
-    int         i_parse;
-    int         i_nc;
-    int         i_cc;
-    int         i_coef;
-    int         i_type;
-    int         i_code;
-    int         i_length;
-    int         i_pos;
-    int         i_dct_dc_size;
-    int         i_dct_dc_diff;
-    int         i_run;
-    int         i_level;
-    boolean_t   b_vlc_intra;
-    boolean_t   b_sign;
-    int *       pi_quant;
-
-    /* Lookup Table for the chromatic component */
-    static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
+    int             i_parse;
+    int             i_nc;
+    int             i_cc;
+    int             i_coef;
+    int             i_code;
+    int             i_length;
+    int             i_pos;
+    int             i_dct_dc_size;
+    int             i_dct_dc_diff;
+    int             i_run;
+    int             i_level;
+    boolean_t       b_vlc_intra;
+    boolean_t       b_sign;
+    boolean_t       b_chroma;
+    int *           pi_quant;
+    
+    /* Give the chromatic component (0, 1, 2) */
     i_cc = pi_cc_index[i_b];
 
     /* Determine whether it is luminance or not (chrominance) */
-    i_type = ( i_cc + 1 ) >> 1;
+    b_chroma = ( i_cc + 1 ) >> 1;
 
     /* Give a pointer to the quantization matrices for intra blocks */
-    if( (i_chroma_format == CHROMA_420) || (!i_type) )
+    if( (i_chroma_format == CHROMA_420) || (!b_chroma) )
     {
         pi_quant = p_vpar->sequence.intra_quant.pi_matrix;
     }
@@ -774,72 +1022,31 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
         pi_quant = p_vpar->sequence.chroma_intra_quant.pi_matrix;
     }
 
-#if 0
-    /* Decoding of the DC intra coefficient */
-    /* The nb of bits to parse depends on i_type */
-    i_code = ShowBits( &p_vpar->bit_stream, 9 + i_type );
+    /* decode length */
+    i_code = ShowBits(&p_vpar->bit_stream, 5);
 
-    /* To reduce memory occupation, there are two lookup tables
-     * See InitDCT above */
-    i_code5 = i_code >> (4+i_type);
-
-    /* Shall we lookup in the first or in the second table ? */
-    i_select = ( i_code5 == 31 );
-    /* Offset value for looking in the second table */
-    i_offset = 0x1f0 + ( i_type * 0x1f0 );
-    i_pos = ( i_code5 * ( ! i_select ) ) + ( ( i_code - i_offset ) * i_select );
-    i_dct_dc_size = p_vpar->pppl_dct_dc_size[i_type][i_select][i_pos].i_value;
-#endif
-
-    if( !i_type/*i_b < 4*/ )
+    if (i_code<31)
     {
-        /* decode length */
-        i_code = ShowBits(&p_vpar->bit_stream, 5);
-        if (i_code<31)
-        {
-            i_dct_dc_size = pl_dct_dc_lum_init_table_1[i_code].i_value;
-            i_length = pl_dct_dc_lum_init_table_1[i_code].i_length;
-            RemoveBits( &p_vpar->bit_stream, i_length);
-        }
-        else
-        {
-            i_code = ShowBits(&p_vpar->bit_stream, 9) - 0x1f0;
-            i_dct_dc_size = pl_dct_dc_lum_init_table_2[i_code].i_value;
-            i_length = pl_dct_dc_lum_init_table_2[i_code].i_length;
-            RemoveBits( &p_vpar->bit_stream, i_length);
-        }
+        i_dct_dc_size = ppl_dct_dc_init_table_1[b_chroma][i_code].i_value;
+        i_length = ppl_dct_dc_init_table_1[b_chroma][i_code].i_length;
+        RemoveBits( &p_vpar->bit_stream, i_length);
     }
     else
     {
-        /* decode length */
-        i_code = ShowBits(&p_vpar->bit_stream, 5);
-
-        if (i_code<31)
-        {
-            i_dct_dc_size = pl_dct_dc_chrom_init_table_1[i_code].i_value;
-            i_length = pl_dct_dc_chrom_init_table_1[i_code].i_length;
-            RemoveBits(&p_vpar->bit_stream, i_length);
-        }
-        else
-        {
-            i_code = ShowBits(&p_vpar->bit_stream, 10) - 0x3e0;
-            i_dct_dc_size = pl_dct_dc_chrom_init_table_2[i_code].i_value;
-            i_length = pl_dct_dc_chrom_init_table_2[i_code].i_length;
-            RemoveBits( &p_vpar->bit_stream, i_length);
-        }
+        i_code = ShowBits(&p_vpar->bit_stream, (9+b_chroma)) - (0x1f0 * (b_chroma + 1));
+        i_dct_dc_size = ppl_dct_dc_init_table_2[b_chroma][i_code].i_value;
+        i_length = ppl_dct_dc_init_table_2[b_chroma][i_code].i_length;
+        RemoveBits( &p_vpar->bit_stream, i_length);
     }
-    if (i_dct_dc_size==0)
+ 
+    if (i_dct_dc_size == 0)
         i_dct_dc_diff = 0;
     else
     {
         i_dct_dc_diff = GetBits( &p_vpar->bit_stream, i_dct_dc_size);
-        if ((i_dct_dc_diff & (1<<(i_dct_dc_size-1)))==0)
-            i_dct_dc_diff-= (1<<i_dct_dc_size) - 1;
+        if ((i_dct_dc_diff & (1<<(i_dct_dc_size-1))) == 0)
+            i_dct_dc_diff -= (1<<i_dct_dc_size) - 1;
     }
-
-    /* Dump the variable length code */
-    //RemoveBits( &p_vpar->bit_stream,
-    //          p_vpar->pppl_dct_dc_size[i_type][i_select][i_pos].i_length );
 
     /* Read the actual code with the good length */
     p_vpar->mb.pi_dc_dct_pred[i_cc] += i_dct_dc_diff;
@@ -849,6 +1056,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
 
     i_nc = ( p_vpar->mb.pi_dc_dct_pred[i_cc] != 0 );
 
+    
     /* Decoding of the AC coefficients */
 
     i_coef = 0;
@@ -856,21 +1064,12 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
     for( i_parse = 1; !p_vpar->b_die/*i_parse < 64*/; i_parse++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
+        /* We use 2 main tables for the coefficients */
         if( i_code >= 16384 )
         {
-            if( b_vlc_intra )
-            {
-                i_run =     pl_DCT_tab0a[(i_code>>8)-4].i_run;
-                i_level =   pl_DCT_tab0a[(i_code>>8)-4].i_level;
-                i_length =  pl_DCT_tab0a[(i_code>>8)-4].i_length;
-//fprintf( stderr, "**********> %d, %d, %d *******\n", i_run, i_level, (i_code>>8)-4 );
-            }
-            else
-            {
-                i_run =     pl_DCT_tab_ac[(i_code>>12)-4].i_run;
-                i_level =   pl_DCT_tab_ac[(i_code>>12)-4].i_level;
-                i_length =  pl_DCT_tab_ac[(i_code>>12)-4].i_length;
-             }
+            i_run =     ppl_dct_tab1[b_vlc_intra][(i_code>>(12-(4*b_vlc_intra)))-4].i_run;
+            i_level =   ppl_dct_tab1[b_vlc_intra][(i_code>>(12-(4*b_vlc_intra)))-4].i_level;
+            i_length =  ppl_dct_tab1[b_vlc_intra][(i_code>>(12-(4*b_vlc_intra)))-4].i_length;
         }
         else
         {
@@ -879,54 +1078,6 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
             i_level =   p_vpar->ppl_dct_coef[b_vlc_intra][i_code].i_level;
         }
 
-#if 0
-        {
-            int code = i_code;
-            int intra_vlc_format = b_vlc_intra;
-            dct_lookup_t tab;
-
-    if (code>=16384 && !intra_vlc_format)
-      tab = pl_DCT_tab_ac[(code>>12)-4];
-    else if (code>=1024)
-    {
-      if (intra_vlc_format)
-        tab = pl_DCT_tab0a[(code>>8)-4];
-      else
-        tab = pl_DCT_tab0[(code>>8)-4];
-    }
-    else if (code>=512)
-    {
-      if (intra_vlc_format)
-        tab = pl_DCT_tab1a[(code>>6)-8];
-      else
-        tab = pl_DCT_tab1[(code>>6)-8];
-    }
-    else if (code>=256)
-      tab = pl_DCT_tab2[(code>>4)-16];
-    else if (code>=128)
-      tab = pl_DCT_tab3[(code>>3)-16];
-    else if (code>=64)
-      tab = pl_DCT_tab4[(code>>2)-16];
-    else if (code>=32)
-      tab = pl_DCT_tab5[(code>>1)-16];
-    else if (code>=16)
-      tab = pl_DCT_tab6[code-16];
-    else
-    {
-       fprintf( stderr, "invalid Huffman code in Decode_MPEG2_Intra_Block()\n");
-    }
-
-    if( (i_run != tab.i_run) || (i_length != tab.i_length) || (i_level != tab.i_level) )
-    {
-        fprintf( stderr, "ET M....... !!!\n" );
-        exit(0);
-    }
-        }
-#endif
-
-
-
-
         RemoveBits( &p_vpar->bit_stream, i_length );
 
         switch( i_run )
@@ -934,9 +1085,6 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
             case DCT_ESCAPE:
                 i_run = GetBits( &p_vpar->bit_stream, 6 );
                 i_level = GetBits( &p_vpar->bit_stream, 12 );
-                /*p_mb->ppi_blocks[i_b][i_parse] = ( b_sign = ( i_level > 2047 ) )
-                                                          ? ( -4096 + i_level )
-                                                          : i_level;*/
                 i_level = (b_sign = ( i_level > 2047 )) ? 4096 - i_level
                                                         : i_level;
                 break;
@@ -956,16 +1104,19 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
             default:
                 b_sign = GetBits( &p_vpar->bit_stream, 1 );
         }
-
+        
+        /* Prepare the next block */
         i_coef = i_parse;
         i_parse += i_run;
         i_nc ++;
 
         if( i_parse >= 64 )
         {
+            /* We have an error in the stream */
             break;
         }
 
+        /* Determine the position of the block in the frame */
         i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
         i_level = ( i_level *
                     p_vpar->mb.i_quantizer_scale *
