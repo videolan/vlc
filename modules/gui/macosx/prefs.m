@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.5 2002/12/30 23:45:21 massiot Exp $
+ * $Id: prefs.m,v 1.6 2003/01/05 16:23:57 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -246,7 +246,7 @@
         [o_view addSubview: [o_text_field autorelease]]; \
     }
 
-#define INPUT_FIELD( ctype, cname, label, w, msg, param ) \
+#define INPUT_FIELD( ctype, cname, label, w, msg, param, tip ) \
     { \
         s_rc.size.height = 25; \
         s_rc.size.width = w; \
@@ -256,6 +256,7 @@
         [o_text_field setAlignment: NSRightTextAlignment]; \
         CONTROL_CONFIG( o_text_field, o_module_name, ctype, cname ); \
         [o_text_field msg: param]; \
+        [o_text_field setToolTip: [NSApp localizedString: tip]]; \
         [o_view addSubview: [o_text_field autorelease]]; \
         [[NSNotificationCenter defaultCenter] addObserver: self \
             selector: @selector(configChanged:) \
@@ -266,12 +267,12 @@
         s_rc.origin.x = X_ORIGIN; \
     }
 
-#define INPUT_FIELD_INTEGER( name, label, w, param ) \
-    INPUT_FIELD( CONFIG_ITEM_INTEGER, name, label, w, setIntValue, param )
-#define INPUT_FIELD_FLOAT( name, label, w, param ) \
-    INPUT_FIELD( CONFIG_ITEM_FLOAT, name, label, w, setFloatValue, param )
-#define INPUT_FIELD_STRING( name, label, w, param ) \
-    INPUT_FIELD( CONFIG_ITEM_STRING, name, label, w, setStringValue, param )
+#define INPUT_FIELD_INTEGER( name, label, w, param, tip ) \
+    INPUT_FIELD( CONFIG_ITEM_INTEGER, name, label, w, setIntValue, param, tip )
+#define INPUT_FIELD_FLOAT( name, label, w, param, tip ) \
+    INPUT_FIELD( CONFIG_ITEM_FLOAT, name, label, w, setFloatValue, param, tip )
+#define INPUT_FIELD_STRING( name, label, w, param, tip ) \
+    INPUT_FIELD( CONFIG_ITEM_STRING, name, label, w, setStringValue, param, tip )
 
     if( p_item ) do
     {
@@ -357,6 +358,7 @@
             [o_modules setTag: i_module_tag++];
             [o_modules setTarget: self];
             [o_modules setAction: @selector(moduleSelected:)];
+            [o_modules setToolTip: [NSApp localizedString: p_item->psz_longtext]];
             [o_cview addSubview: [o_modules autorelease]]; 
 
             MODULE_BUTTON( o_btn_configure, _NS("Configure"), 
@@ -426,7 +428,8 @@
                                   p_item->psz_value : "";
 
                 INPUT_FIELD_STRING( p_item->psz_name, p_item->psz_text, 150,
-                                    [NSString stringWithCString: psz_value] );
+                                    [NSString stringWithCString: psz_value],
+                                    p_item->psz_longtext );
             }
             else
             {
@@ -442,6 +445,8 @@
                 o_combo_box = [[VLCComboBox alloc] initWithFrame: s_rc];
                 CONTROL_CONFIG( o_combo_box, o_module_name, 
                                 CONFIG_ITEM_STRING, p_item->psz_name );
+                [o_combo_box setToolTip:
+                    [NSApp localizedString: p_item->psz_longtext]];
                 [o_view addSubview: [o_combo_box autorelease]];
                 [[NSNotificationCenter defaultCenter] addObserver: self
                     selector: @selector(configChanged:)
@@ -470,14 +475,14 @@
         case CONFIG_ITEM_INTEGER:
         {
             INPUT_FIELD_INTEGER( p_item->psz_name, p_item->psz_text, 70, 
-                                 p_item->i_value );
+                                 p_item->i_value, p_item->psz_longtext );
         }
         break;
 
         case CONFIG_ITEM_FLOAT:
         {
             INPUT_FIELD_FLOAT( p_item->psz_name, p_item->psz_text, 70,
-                               p_item->f_value );
+                               p_item->f_value, p_item->psz_longtext );
         }
         break;
 
@@ -495,7 +500,9 @@
             [o_btn_bool setButtonType: NSSwitchButton];
             [o_btn_bool setIntValue: p_item->i_value];
             [o_btn_bool setTitle: 
-                  [NSApp localizedString: p_item->psz_text]];
+                [NSApp localizedString: p_item->psz_text]];
+            [o_btn_bool setToolTip:
+                [NSApp localizedString: p_item->psz_longtext]];
             [o_btn_bool setTarget: self];
             [o_btn_bool setAction: @selector(configChanged:)];
             CONTROL_CONFIG( o_btn_bool, o_module_name, 

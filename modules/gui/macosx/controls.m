@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.5 2003/01/04 04:11:08 jlj Exp $
+ * $Id: controls.m,v 1.6 2003/01/05 16:23:57 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -127,6 +127,7 @@
 
     playlist_Stop( p_playlist );
     vlc_object_release( p_playlist );
+    p_intf->p_sys->b_stopping = 1;
 }
 
 - (IBAction)faster:(id)sender

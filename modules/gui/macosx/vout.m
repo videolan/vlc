@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.10 2003/01/05 01:55:07 massiot Exp $
+ * $Id: vout.m,v 1.11 2003/01/05 16:23:57 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -547,6 +547,7 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
             EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
         p_vout->p_sys->p_fullscreen_state = NULL;
     }
+    config_PutInt( p_vout, "fullscreen", p_vout->b_fullscreen );
 
     if( CoCreateWindow( p_vout ) )
     {
@@ -874,6 +875,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     playlist_Stop( p_playlist );
     vlc_object_release( p_playlist );
+    p_intf->p_sys->b_stopping = 1;
 
     /* The window will be closed by the intf later. */
     return NO;
