@@ -17,7 +17,7 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "CompanyName", "VideoLAN"
-      VALUE "FileVersion", "VERSION"
+      VALUE "FileVersion", "0.6.1"
       VALUE "FileDescription", "VLC media player"
       VALUE "LegalCopyright", "(c) 1996-2003 VideoLAN"
     END

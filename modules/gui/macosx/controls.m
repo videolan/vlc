@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.46 2003/07/27 14:10:02 massiot Exp $
+ * $Id: controls.m,v 1.47 2003/07/29 21:14:10 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -150,21 +150,20 @@
     }
 
     vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
+    val.b_bool = VLC_TRUE;
 
 #define p_area p_playlist->p_input->stream.p_selected_area
     if( p_area->i_part > 0 && p_area->i_part_nb > 1)
     {
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        var_Get( p_playlist->p_input, "prev-chapter", &val );
         var_Set( p_playlist->p_input, "prev-chapter", val );
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else if( p_area->i_id > 1 )
     {
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        var_Get( p_playlist->p_input, "prev-title", &val );
         var_Set( p_playlist->p_input, "prev-title", val );
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else
     {
@@ -199,21 +198,20 @@
     }
 
     vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
+    val.b_bool = VLC_TRUE;
 
 #define p_area p_playlist->p_input->stream.p_selected_area
-    if( p_area->i_part < p_area->i_part_nb && p_area->i_part_nb > 1 )
+    if( p_area->i_part < p_area->i_part_nb - 1 && p_area->i_part_nb > 1 )
     {
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        var_Get( p_playlist->p_input, "next-chapter", &val );
         var_Set( p_playlist->p_input, "next-chapter", val );
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else if( p_area->i_id < p_playlist->p_input->stream.i_area_nb && p_playlist->p_input->stream.i_area_nb > 1 )
     {
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        var_Get( p_playlist->p_input, "next-title", &val );
         var_Set( p_playlist->p_input, "next-title", val );
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else
     {

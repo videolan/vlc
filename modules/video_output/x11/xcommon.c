@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.25 2003/07/29 09:32:14 sam Exp $
+ * $Id: xcommon.c,v 1.26 2003/07/29 21:14:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -583,10 +583,10 @@ static int ManageVideo( vout_thread_t *p_vout )
                 input_Seek( p_vout, 0, INPUT_SEEK_BYTES | INPUT_SEEK_END );
                 break;
             case XK_Page_Up:
-                input_Seek( p_vout, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                input_Seek( p_vout, 10, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
             case XK_Page_Down:
-                input_Seek( p_vout, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                input_Seek( p_vout, -10, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
             case XK_space:
                 input_SetStatus( p_vout, INPUT_STATUS_PAUSE );
