@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.20 2003/01/22 01:13:22 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.21 2003/01/25 01:03:44 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -70,7 +70,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     p_wrapper = p_intf->p_sys->p_wrapper;
     p_intf->p_sys->b_dvdold = false;
     
-    fPlaylistIsEmpty = ( p_wrapper->PlaylistSize() < 0 );
+    fPlaylistIsEmpty = !( p_wrapper->PlaylistSize() > 0 );
     
     fPlaylistWindow = new PlayListWindow( BRect( 100.0, 100.0, 400.0, 350.0 ),
 	  									  "Playlist",
@@ -96,7 +96,6 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	p_mediaControl = new MediaControlView( BRect( 0.0, 0.0, 250.0, 50.0 ),
 	                                       p_intf );
 	p_mediaControl->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
-	p_mediaControl->SetEnabled( !fPlaylistIsEmpty );
 
 	float width, height;
 	p_mediaControl->GetPreferredSize( &width, &height );
@@ -181,10 +180,41 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
         new BMenuItem( "Preferences", new BMessage( OPEN_PREFERENCES ) ) );
 	fMenuBar->AddItem( fSettingsMenu );							
 
-	// prepare fow showing
+	/* Prepare fow showing */
 	_SetMenusEnabled( false );
 	p_mediaControl->SetEnabled( false );
-
+	
+    /* Restore interface settings */
+    int i_width = config_GetInt( p_intf, "beos-intf-width" ),
+        i_height = config_GetInt( p_intf, "beos-intf-height" ),
+        i_xpos = config_GetInt( p_intf, "beos-intf-xpos" ),
+        i_ypos = config_GetInt( p_intf, "beos-intf-ypos" );
+    if( i_width && i_height && i_xpos && i_ypos )
+    {
+        /* main window size and position */
+        ResizeTo( i_width, i_height );
+        MoveTo( i_xpos, i_ypos );
+    }
+    i_width = config_GetInt( p_intf, "beos-playlist-width" ),
+    i_height = config_GetInt( p_intf, "beos-playlist-height" ),
+    i_xpos = config_GetInt( p_intf, "beos-playlist-xpos" ),
+    i_ypos = config_GetInt( p_intf, "beos-playlist-ypos" );
+    if( i_width && i_height && i_xpos && i_ypos )
+    {
+        /* playlist window size and position */
+        fPlaylistWindow->ResizeTo( i_width, i_height );
+        fPlaylistWindow->MoveTo( i_xpos, i_ypos );
+    }
+    if( config_GetInt( p_intf, "beos-playlist-show" ) )
+    {
+        /* playlist showing */
+        if( fPlaylistWindow->Lock() )
+        {
+            fPlaylistWindow->Show();
+            fPlaylistWindow->Unlock();
+        }
+    }
+	
 	Show();
 }
 
@@ -552,7 +582,25 @@ bool InterfaceWindow::QuitRequested()
 {
 	p_wrapper->PlaylistStop();
 	p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
-	
+
+    /* Save interface settings */
+    BRect frame = Frame();
+    config_PutInt( p_intf, "beos-intf-width", (int)frame.Width() );
+    config_PutInt( p_intf, "beos-intf-height", (int)frame.Height() );
+    config_PutInt( p_intf, "beos-intf-xpos", (int)frame.left );
+    config_PutInt( p_intf, "beos-intf-ypos", (int)frame.top );
+    if( fPlaylistWindow->Lock() )
+    {
+        frame = fPlaylistWindow->Frame();
+        config_PutInt( p_intf, "beos-playlist-width", (int)frame.Width() );
+        config_PutInt( p_intf, "beos-playlist-height", (int)frame.Height() );
+        config_PutInt( p_intf, "beos-playlist-xpos", (int)frame.left );
+        config_PutInt( p_intf, "beos-playlist-ypos", (int)frame.top );
+        config_PutInt( p_intf, "beos-playlist-show", !fPlaylistWindow->IsHidden() );
+        fPlaylistWindow->Unlock();
+    }
+    config_SaveConfigFile( p_intf, "beos" );
+    
 	p_intf->b_die = 1;
 
 	return( true );
@@ -571,7 +619,7 @@ void InterfaceWindow::updateInterface()
 		}
 		else if ( Lock() )
 		{
-//			p_mediaControl->SetEnabled( true );
+			p_mediaControl->SetEnabled( true );
 			bool hasTitles = p_wrapper->HasTitles();
 			bool hasChapters = p_wrapper->HasChapters();
 			p_mediaControl->SetStatus( p_wrapper->InputStatus(), 
@@ -606,14 +654,18 @@ void InterfaceWindow::updateInterface()
     else
     {
     	_SetMenusEnabled( false );
-//		p_mediaControl->SetEnabled( false );
+    	if( !( p_wrapper->PlaylistSize() > 0 ) )
+		   p_mediaControl->SetEnabled( false );
+		else
+		    p_mediaControl->SetProgress( 0 );
     }
 
     /* always force the user-specified volume */
     /* FIXME : I'm quite sure there is a cleaner way to do this */
-    if( p_wrapper->GetVolume() != p_mediaControl->GetVolume() )
+    int i_volume = p_mediaControl->GetVolume();
+    if( p_wrapper->GetVolume() != i_volume )
     {
-        p_wrapper->SetVolume( p_mediaControl->GetVolume() );
+        p_wrapper->SetVolume( i_volume );
     }
 
 	fLastUpdateTime = system_time();

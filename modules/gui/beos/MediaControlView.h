@@ -2,7 +2,7 @@
  * MediaControlView.h: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.h,v 1.4 2003/01/12 02:08:39 titer Exp $
+ * $Id: MediaControlView.h,v 1.5 2003/01/25 01:03:44 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -86,6 +86,7 @@ class MediaControlView : public BBox
 			int					fCurrentStatus;
 			float				fBottomControlHeight;
 			BRect				fOldBounds;
+			bool                fIsEnabled;
 			
 			intf_thread_t *     p_intf;
 };

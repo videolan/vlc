@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.12 2003/01/24 06:31:56 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.13 2003/01/25 01:03:44 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -78,7 +78,8 @@ MediaControlView::MediaControlView(BRect frame, intf_thread_t *p_interface)
       fScrubSem(B_ERROR),
       fCurrentRate(DEFAULT_RATE),
       fCurrentStatus(UNDEF_S),
-      fBottomControlHeight(0.0)
+      fBottomControlHeight(0.0),
+      fIsEnabled( true )
 {
     p_intf = p_interface;
 
@@ -325,7 +326,14 @@ MediaControlView::SetStatus(int status, int rate)
 void
 MediaControlView::SetEnabled(bool enabled)
 {
-	if ( LockLooper() )
+    if( ( enabled && fIsEnabled ) ||
+        ( !enabled && !fIsEnabled ) )
+    {
+        /* do not redraw if it is not necessary */
+        return;
+    }
+    
+	if( LockLooper() )
 	{
 		fSkipBack->SetEnabled( enabled );
 		fPlayPause->SetEnabled( enabled );
@@ -337,6 +345,7 @@ MediaControlView::SetEnabled(bool enabled)
 		fRewind->SetEnabled( enabled );
 		fForward->SetEnabled( enabled );
 		UnlockLooper();
+		fIsEnabled = enabled;
 	}
 }
 
@@ -764,7 +773,9 @@ SeekSlider::ResizeToPreferred()
 void
 SeekSlider::SetPosition(float position)
 {
+    LockLooper();
 	SetValue(fMinValue + (int32)floorf((fMaxValue - fMinValue) * position + 0.5));
+	UnlockLooper();
 }
 
 /*****************************************************************************
