@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.24 2003/04/27 13:03:28 fenrir Exp $
+ * $Id: video.c,v 1.25 2003/05/07 00:28:38 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -232,7 +232,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 
     /* FIXME search real LIBAVCODEC_BUILD */
 #if LIBAVCODEC_BUILD >= 4662
-    if( p_vdec->p_codec->capabilities & CODEC_CAP_TRUNCATED )
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-truncated" ) && ( p_vdec->p_codec->capabilities & CODEC_CAP_TRUNCATED ) )
     {
         p_vdec->p_context->flags |= CODEC_FLAG_TRUNCATED;
     }
