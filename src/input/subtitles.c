@@ -234,7 +234,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     char *f_dir, *f_fname, *f_fname_noext, *f_fname_trim, *tmp;
     /* variables to be used for derivatives FILE *f */
     char *tmp_fname_noext, *tmp_fname_trim, *tmp_fname_ext, *tmpresult;
-
     vlc_value_t fuzzy;
     int len, i, j, i_sub_count;
     subfn *result; /* unsorted results */
@@ -244,6 +243,11 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     FILE *f;
     DIR *d;
     struct dirent *de;
+
+    if( !strncmp( psz_fname, "file://", 7 ) )
+    {
+        psz_fname += 7;
+    }
 
     i_sub_count = 0;
     len = strlen( psz_fname ) > 256 ? strlen( psz_fname ) : 256;
