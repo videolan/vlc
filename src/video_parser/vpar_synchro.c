@@ -440,7 +440,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
                         int i_structure )
 {
-    if (DECODER_FIFO_START(p_vpar->fifo)->b_has_pts)
+    if (DECODER_FIFO_START(p_vpar->fifo)->b_has_pts && i_coding_type == I_CODING_TYPE)
     {
         p_vpar->synchro.kludge_nbframes = 0;
         p_vpar->synchro.kludge_date = DECODER_FIFO_START(p_vpar->fifo)->i_pts;
@@ -453,7 +453,7 @@ void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
 void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
                             int i_structure )
 {
-    if (DECODER_FIFO_START(p_vpar->fifo)->b_has_pts)
+    if (DECODER_FIFO_START(p_vpar->fifo)->b_has_pts && i_coding_type == I_CODING_TYPE)
     {
         p_vpar->synchro.kludge_nbframes = 0;
         p_vpar->synchro.kludge_date = DECODER_FIFO_START(p_vpar->fifo)->i_pts;
