@@ -1256,6 +1256,10 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
         }
     }
 
+    /* ISO/IEC 13818-1 2.7.5: if no pts and no dts, then dts == pts */
+    if( i_pts >= 0 && i_dts < 0 )
+        i_dts = i_pts;
+
     if( p_pes )
     {
         block_t *p_block;
