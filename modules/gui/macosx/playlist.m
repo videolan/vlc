@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.45 2003/11/19 19:00:16 bigben Exp $
+ * $Id: playlist.m,v 1.46 2003/11/20 02:39:09 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -145,25 +145,6 @@
     [o_loop_ckb setTitle: _NS("Repeat Playlist")];
     [o_repeat_ckb setTitle: _NS("Repeat Item")];
     [o_search_button setTitle: _NS("Search")];
-
-
-    /*vlc_value_t val;
-    intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist != NULL )
-    {
-        var_Get( p_playlist, "random", &val );
-        [o_random_ckb setState: val.b_bool];
-
-        var_Get( p_playlist, "loop", &val );
-        [o_loop_ckb setState: val.b_bool];
-
-        var_Get( p_playlist, "repeat", &val );
-        [o_repeat_ckb setState: val.b_bool];
-
-        vlc_object_release( p_playlist );
-    }*/
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv 
@@ -426,11 +407,7 @@
 
 - (void)playlistUpdated
 {
-
     vlc_value_t val;
-
-    [o_table_view reloadData];
-
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -447,6 +424,7 @@
 
         vlc_object_release( p_playlist );
     }
+    [o_table_view reloadData];
 }
 
 - (void)updateRowSelection
