@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.7 2003/03/11 20:01:23 fenrir Exp $
+ * $Id: sub.c,v 1.8 2003/03/15 18:44:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -47,15 +47,11 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate );
 static int  sub_seek ( subtitle_demux_t *p_sub, mtime_t i_date );
 static void sub_close( subtitle_demux_t *p_sub );
 
-static int  sub_MicroDvdRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
-static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
-static int  sub_SSA1Read( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
-static int  sub_SSA2_4Read( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
-static int  sub_Vplayer( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
-
 static void sub_fix( subtitle_demux_t *p_sub );
 
-static char *ppsz_sub_type[] = { "microdvd", "subrip", "ssa1", "ssa2-4", "vplayer", NULL };
+static char *ppsz_sub_type[] = { "microdvd", "subrip", "ssa1", "ssa2-4", "vplayer", "sami", NULL };
+
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -64,7 +60,7 @@ static char *ppsz_sub_type[] = { "microdvd", "subrip", "ssa1", "ssa2-4", "vplaye
     "Override frames per second. " \
     "It will work only with MicroDVD"
 #define SUB_TYPE_LONGTEXT \
-    "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\", \"vplayer\" " \
+    "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\", \"vplayer\" \"sami\"" \
     "(nothing for autodetection, it should always work)"
 
 vlc_module_begin();
@@ -101,6 +97,122 @@ static int Open ( vlc_object_t *p_this )
 }
 #define MAX_TRY     256
 #define MAX_LINE    2048
+
+#define FREE( p ) if( p ) { free( p); (p) = NULL; }
+
+typedef struct
+{
+    int     i_line_count;
+    int     i_line;
+    char    **line;
+} text_t;
+
+static int  text_load( text_t *txt, char *psz_name )
+{
+    FILE *f;
+    int   i_line_max;
+
+    /* init txt */
+    i_line_max          = 100;
+    txt->i_line_count   = 0;
+    txt->i_line         = 0;
+    txt->line           = calloc( i_line_max, sizeof( char * ) );
+
+    /* open file */
+    if( !( f = fopen( psz_name, "rb" ) ) )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* load the complete file */
+    for( ;; )
+    {
+        char buffer[8096];
+        char *p;
+
+        if( fgets( buffer, 8096, f ) <= 0)
+        {
+            break;
+        }
+        while( ( p = strchr( buffer, '\r' ) ) )
+        {
+            *p = '\0';
+        }
+        while( ( p = strchr( buffer, '\n' ) ) )
+        {
+            *p = '\0';
+        }
+
+        txt->line[txt->i_line_count++] = strdup( buffer );
+
+        if( txt->i_line_count >= i_line_max )
+        {
+            i_line_max += 100;
+            txt->line = realloc( txt->line, i_line_max * sizeof( char*) );
+        }
+    }
+
+    fclose( f );
+
+    if( txt->i_line_count <= 0 )
+    {
+        FREE( txt->line );
+        return( VLC_EGENERIC );
+    }
+
+    return( VLC_SUCCESS );
+}
+static void text_unload( text_t *txt )
+{
+    int i;
+
+    for( i = 0; i < txt->i_line_count; i++ )
+    {
+        FREE( txt->line[i] );
+    }
+    FREE( txt->line );
+    txt->i_line       = 0;
+    txt->i_line_count = 0;
+}
+
+static char *text_get_line( text_t *txt )
+{
+    if( txt->i_line >= txt->i_line_count )
+    {
+        return( NULL );
+    }
+
+    return( txt->line[txt->i_line++] );
+}
+static void text_rewind( text_t *txt )
+{
+    txt->i_line = 0;
+}
+
+static int  sub_MicroDvdRead( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+static int  sub_SubRipRead  ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+static int  sub_SSA1Read    ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+static int  sub_SSA2_4Read  ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+static int  sub_Vplayer     ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+static int  sub_Sami        ( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+
+static struct
+{
+    char *psz_type_name;
+    int  i_type;
+    char *psz_name;
+    int  (*pf_read_subtitle)    ( text_t *, subtitle_t*, mtime_t );
+} sub_read_subtitle_function [] =
+{
+    { "microdvd",   SUB_TYPE_MICRODVD,  "MicroDVD", sub_MicroDvdRead },
+    { "subrip",     SUB_TYPE_SUBRIP,    "SubRIP",   sub_SubRipRead },
+    { "ssa1",       SUB_TYPE_SSA1,      "SSA-1",    sub_SSA1Read },
+    { "ssa2-4",     SUB_TYPE_SSA2_4,    "SSA-2/3/4",sub_SSA2_4Read },
+    { "vplayer",    SUB_TYPE_VPLAYER,   "VPlayer",  sub_Vplayer },
+    { "sami",       SUB_TYPE_SAMI,      "SAMI",     sub_Sami },
+    { NULL,         SUB_TYPE_UNKNOWN,   "Unknow",   NULL }
+};
+
 /*****************************************************************************
  * sub_open: Open a subtitle file and add subtitle ES
  *****************************************************************************/
@@ -109,13 +221,13 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                        char     *psz_name,
                        mtime_t i_microsecperframe )
 {
-    FILE *p_file;
+    text_t  txt;
+
+    int     i;
     char    *psz_file_type;
-    char    buffer[MAX_LINE + 1];
-    int     i_try;
     int     i_sub_type;
     int     i_max;
-    int (*pf_read_subtitle)( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe ) = NULL;
+    int (*pf_read_subtitle)( text_t *, subtitle_t *, mtime_t ) = NULL;
 
     p_sub->i_sub_type = SUB_TYPE_UNKNOWN;
     p_sub->p_es = NULL;
@@ -136,6 +248,17 @@ static int  sub_open ( subtitle_demux_t *p_sub,
         psz_name = strdup( psz_name );
     }
 
+    /* *** load the file *** */
+    if( text_load( &txt, psz_name ) )
+    {
+        msg_Err( p_sub, "cannot open `%s' subtitle file", psz_name );
+        free( psz_name );
+        return VLC_EGENERIC;
+    }
+    msg_Dbg( p_sub, "opened `%s'", psz_name );
+    free( psz_name );
+
+
     if(  config_GetFloat( p_sub, "sub-fps" ) >= 1.0 )
     {
         i_microsecperframe = (mtime_t)( (float)1000000 /
@@ -146,71 +269,60 @@ static int  sub_open ( subtitle_demux_t *p_sub,
         i_microsecperframe = 40000; /* default: 25fps */
     }
 
-    /* *** Open the file *** */
-    if( !( p_file = fopen( psz_name, "rb" ) ) )
-    {
-        msg_Err( p_sub, "cannot open `%s' subtitle file", psz_name );
-        free( psz_name );
-        return VLC_EGENERIC;
-    }
-    else
-    {
-        msg_Dbg( p_sub, "opened `%s'", psz_name );
-        free( psz_name );
-    }
-
     psz_file_type = config_GetPsz( p_sub, "sub-type" );
     if( psz_file_type && *psz_file_type)
     {
-        if( !strcmp( psz_file_type, "microdvd" ) )
+        int i;
+
+        for( i = 0; ; i++ )
         {
-            i_sub_type = SUB_TYPE_MICRODVD;
-        }
-        else if( !strcmp( psz_file_type, "subrip" ) )
-        {
-            i_sub_type = SUB_TYPE_SUBRIP;
-        }
-        else if( !strcmp( psz_file_type, "ssa1" ) )
-        {
-            i_sub_type = SUB_TYPE_SSA1;
-        }
-        else if( !strcmp( psz_file_type, "ssa2-4" ) )
-        {
-            i_sub_type = SUB_TYPE_SSA2_4;
-        }
-        else if( !strcmp( psz_file_type, "vplayer" ) )
-        {
-            i_sub_type = SUB_TYPE_VPLAYER;
-        }
-        else
-        {
-            i_sub_type = SUB_TYPE_UNKNOWN;
+            if( sub_read_subtitle_function[i].psz_type_name == NULL )
+            {
+                i_sub_type = SUB_TYPE_UNKNOWN;
+                break;
+            }
+            if( !strcmp( sub_read_subtitle_function[i].psz_type_name,
+                         psz_file_type ) )
+            {
+                i_sub_type = sub_read_subtitle_function[i].i_type;
+                break;
+            }
         }
     }
     else
     {
         i_sub_type = SUB_TYPE_UNKNOWN;
     }
+    FREE( psz_file_type );
 
     /* *** Now try to autodetect subtitle format *** */
     if( i_sub_type == SUB_TYPE_UNKNOWN )
     {
+        int     i_try;
+        char    *s;
+
         msg_Dbg( p_input, "trying to autodetect file format" );
         for( i_try = 0; i_try < MAX_TRY; i_try++ )
         {
             int i_dummy;
-            if( fgets( buffer, MAX_LINE, p_file ) <= 0 )
+
+            if( ( s = text_get_line( &txt ) ) == NULL )
             {
                 break;
             }
 
-            if( sscanf( buffer, "{%d}{%d}", &i_dummy, &i_dummy ) == 2 ||
-                sscanf( buffer, "{%d}{}", &i_dummy ) == 1)
+            if( strstr( s, "<SAMI>" ) )
+            {
+                i_sub_type = SUB_TYPE_SAMI;
+                break;
+            }
+            else if( sscanf( s, "{%d}{%d}", &i_dummy, &i_dummy ) == 2 ||
+                     sscanf( s, "{%d}{}", &i_dummy ) == 1)
             {
                 i_sub_type = SUB_TYPE_MICRODVD;
                 break;
             }
-            else if( sscanf( buffer,
+            else if( sscanf( s,
                              "%d:%d:%d,%d --> %d:%d:%d,%d",
                              &i_dummy,&i_dummy,&i_dummy,&i_dummy,
                              &i_dummy,&i_dummy,&i_dummy,&i_dummy ) == 8 )
@@ -218,7 +330,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                 i_sub_type = SUB_TYPE_SUBRIP;
                 break;
             }
-            else if( sscanf( buffer,
+            else if( sscanf( s,
                              "!: This is a Sub Station Alpha v%d.x script.",
                              &i_dummy ) == 1)
             {
@@ -232,56 +344,43 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                 }
                 break;
             }
-            else if( !strcmp( buffer,
+            else if( !strcmp( s,
                               "Dialogue: Marked" ) )
             {
                 i_sub_type = SUB_TYPE_SSA2_4; // could be wrong
                 break;
             }
-            else if( sscanf( buffer, "%d:%d:%d:", &i_dummy, &i_dummy, &i_dummy ) == 3 ||
-                     sscanf( buffer, "%d:%d:%d ", &i_dummy, &i_dummy, &i_dummy ) == 3 )
+            else if( sscanf( s, "%d:%d:%d:", &i_dummy, &i_dummy, &i_dummy ) == 3 ||
+                     sscanf( s, "%d:%d:%d ", &i_dummy, &i_dummy, &i_dummy ) == 3 )
             {
                 i_sub_type = SUB_TYPE_VPLAYER;
                 break;
             }
         }
+
+        text_rewind( &txt );
     }
 
     /* *** Load this file in memory *** */
-    switch( i_sub_type )
+    for( i = 0; ; i++ )
     {
-        case SUB_TYPE_MICRODVD:
-            msg_Dbg( p_input, "detected MicroDVD format" );
-            pf_read_subtitle = sub_MicroDvdRead;
-            break;
-        case SUB_TYPE_SUBRIP:
-            msg_Dbg( p_input, "detected SubRIP format" );
-            pf_read_subtitle = sub_SubRipRead;
-            break;
-        case SUB_TYPE_SSA1:
-            msg_Dbg( p_input, "detected SSAv1 Script format" );
-            pf_read_subtitle = sub_SSA1Read;
-            break;
-        case SUB_TYPE_SSA2_4:
-            msg_Dbg( p_input, "detected SSAv2-4 Script format" );
-            pf_read_subtitle = sub_SSA2_4Read;
-            break;
-        case SUB_TYPE_VPLAYER:
-            msg_Dbg( p_input, "detected vplayer format" );
-            pf_read_subtitle = sub_Vplayer;
-            break;
-        default:
-            msg_Err( p_sub, "unknown subtitile file" );
-            fclose( p_file );
+        if( sub_read_subtitle_function[i].i_type == SUB_TYPE_UNKNOWN )
+        {
+            msg_Dbg( p_input, "unknown subtitile file" );
+            text_unload( &txt );
             return VLC_EGENERIC;
+        }
+
+        if( sub_read_subtitle_function[i].i_type == i_sub_type )
+        {
+            msg_Dbg( p_input,
+                    "detected %s format",
+                    sub_read_subtitle_function[i].psz_name );
+            pf_read_subtitle = sub_read_subtitle_function[i].pf_read_subtitle;
+            break;
+        }
     }
 
-    if( fseek( p_file, 0L, SEEK_SET ) < 0 )
-    {
-        msg_Err( p_input, "cannot read file from begining" );
-        fclose( p_file );
-        return VLC_EGENERIC;
-    }
     for( i_max = 0;; )
     {
         if( p_sub->i_subtitles >= i_max )
@@ -297,7 +396,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                 p_sub->subtitle = malloc( sizeof( subtitle_t ) * i_max );
             }
         }
-        if( pf_read_subtitle( p_file,
+        if( pf_read_subtitle( &txt,
                               p_sub->subtitle + p_sub->i_subtitles,
                               i_microsecperframe ) < 0 )
         {
@@ -308,7 +407,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     msg_Dbg( p_sub, "loaded %d subtitles", p_sub->i_subtitles );
 
     /* *** Close the file *** */
-    fclose( p_file );
+    text_unload( &txt );
 
     /* *** fix subtitle (order and time) *** */
     p_sub->i_subtitle = 0;  // will be modified by sub_fix
@@ -512,7 +611,7 @@ static void  sub_fix( subtitle_demux_t *p_sub )
 /*****************************************************************************
  * Specific Subtitle function
  *****************************************************************************/
-static int  sub_MicroDvdRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe)
+static int  sub_MicroDvdRead( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe)
 {
     /*
      * each line:
@@ -520,7 +619,8 @@ static int  sub_MicroDvdRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_mi
      * where n1 and n2 are the video frame number...
      *
      */
-    char buffer[MAX_LINE + 1];
+    char *s;
+
     char buffer_text[MAX_LINE + 1];
     uint32_t    i_start;
     uint32_t    i_stop;
@@ -528,17 +628,16 @@ static int  sub_MicroDvdRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_mi
 
     for( ;; )
     {
-        if( fgets( buffer, MAX_LINE, p_file ) <= 0)
+        if( ( s = text_get_line( txt ) ) == NULL )
         {
-            return( -1 );
+            return( VLC_EGENERIC );
         }
         i_start = 0;
         i_stop  = 0;
 
-        buffer[MAX_LINE] = '\0';
         memset( buffer_text, '\0', MAX_LINE );
-        if( sscanf( buffer, "{%d}{}%[^\r\n]", &i_start, buffer_text ) == 2 ||
-            sscanf( buffer, "{%d}{%d}%[^\r\n]", &i_start, &i_stop, buffer_text ) == 3)
+        if( sscanf( s, "{%d}{}%[^\r\n]", &i_start, buffer_text ) == 2 ||
+            sscanf( s, "{%d}{%d}%[^\r\n]", &i_start, &i_stop, buffer_text ) == 3)
         {
             break;
         }
@@ -557,7 +656,7 @@ static int  sub_MicroDvdRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_mi
     return( 0 );
 }
 
-static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
+static int  sub_SubRipRead( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
 {
     /*
      * n
@@ -568,7 +667,7 @@ static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_micr
      * [empty line]
      *
      */
-    char buffer[MAX_LINE + 1];
+    char *s;
     char buffer_text[ 10 * MAX_LINE];
     int  i_buffer_text;
     mtime_t     i_start;
@@ -577,11 +676,11 @@ static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_micr
     for( ;; )
     {
         int h1, m1, s1, d1, h2, m2, s2, d2;
-        if( fgets( buffer, MAX_LINE, p_file ) <= 0)
+        if( ( s = text_get_line( txt ) ) == NULL )
         {
-            return( -1 );
+            return( VLC_EGENERIC );
         }
-        if( sscanf( buffer,
+        if( sscanf( s,
                     "%d:%d:%d,%d --> %d:%d:%d,%d",
                     &h1, &m1, &s1, &d1,
                     &h2, &m2, &s2, &d2 ) == 8 )
@@ -600,13 +699,13 @@ static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_micr
             for( i_buffer_text = 0;; )
             {
                 int i_len;
-                if( fgets( buffer, MAX_LINE, p_file ) <= 0 )
+                if( ( s = text_get_line( txt ) ) == NULL )
                 {
-                    return( -1 );
+                    return( VLC_EGENERIC );
                 }
-                buffer[MAX_LINE] = '\0'; // just in case
-                i_len = strlen( buffer );
-                if( buffer[0] == '\r' || buffer[0] == '\n' || i_len <= 1 )
+
+                i_len = strlen( s );
+                if( i_len <= 1 )
                 {
                     // empty line -> end of this subtitle
                     buffer_text[__MAX( i_buffer_text - 1, 0 )] = '\0';
@@ -620,7 +719,7 @@ static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_micr
                     if( i_buffer_text + i_len + 1 < 10 * MAX_LINE )
                     {
                         memcpy( buffer_text + i_buffer_text,
-                                buffer,
+                                s,
                                 i_len );
                         i_buffer_text += i_len;
 
@@ -634,10 +733,10 @@ static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_micr
 }
 
 
-static int  sub_SSARead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe, int i_comma_count )
+static int  sub_SSARead( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe, int i_comma_count )
 {
-    char buffer[MAX_LINE + 1];
     char buffer_text[ 10 * MAX_LINE];
+    char *s;
     char *p_buffer_text;
     mtime_t     i_start;
     mtime_t     i_stop;
@@ -648,11 +747,12 @@ static int  sub_SSARead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microse
     {
         int h1, m1, s1, c1, h2, m2, s2, c2;
         int i_dummy;
-        if( fgets( buffer, MAX_LINE, p_file ) <= 0 )
+
+        if( ( s = text_get_line( txt ) ) == NULL )
         {
-            return( -1 );
+            return( VLC_EGENERIC );
         }
-        if( sscanf( buffer,
+        if( sscanf( s,
                     "Dialogue: Marked=%d,%d:%d:%d.%d,%d:%d:%d.%d,%[^\r\n]",
                     &i_dummy,
                     &h1, &m1, &s1, &c1,
@@ -712,16 +812,16 @@ static int  sub_SSARead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microse
     }
 }
 
-static int  sub_SSA1Read( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
+static int  sub_SSA1Read( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
 {
-    return( sub_SSARead( p_file, p_subtitle, i_microsecperframe, 8 ) );
+    return( sub_SSARead( txt, p_subtitle, i_microsecperframe, 8 ) );
 }
-static int  sub_SSA2_4Read( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
+static int  sub_SSA2_4Read( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
 {
-    return( sub_SSARead( p_file, p_subtitle, i_microsecperframe, 9 ) );
+    return( sub_SSARead( txt, p_subtitle, i_microsecperframe, 9 ) );
 }
 
-static int  sub_Vplayer( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microsecperframe)
+static int  sub_Vplayer( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe)
 {
     /*
      * each line:
@@ -731,7 +831,7 @@ static int  sub_Vplayer( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microse
      * where n1 and n2 are the video frame number...
      *
      */
-    char buffer[MAX_LINE + 1];
+    char *p;
     char buffer_text[MAX_LINE + 1];
     mtime_t    i_start;
     unsigned int i;
@@ -741,15 +841,15 @@ static int  sub_Vplayer( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microse
         int h, m, s;
         char c;
 
-        if( fgets( buffer, MAX_LINE, p_file ) <= 0)
+        if( ( p = text_get_line( txt ) ) == NULL )
         {
-            return( -1 );
+            return( VLC_EGENERIC );
         }
+
         i_start = 0;
 
-        buffer[MAX_LINE] = '\0';
         memset( buffer_text, '\0', MAX_LINE );
-        if( sscanf( buffer, "%d:%d:%d%[ :]%[^\r\n]", &h, &m, &s, &c, buffer_text ) == 5 )
+        if( sscanf( p, "%d:%d:%d%[ :]%[^\r\n]", &h, &m, &s, &c, buffer_text ) == 5 )
         {
             i_start = ( (mtime_t)h * 3600*1000 +
                         (mtime_t)m * 60*1000 +
@@ -771,4 +871,43 @@ static int  sub_Vplayer( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_microse
     p_subtitle->i_stop  = 0;
     p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
     return( 0 );
+}
+
+static int  sub_Sami( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
+{
+#if 0
+    char buffer[MAX_LINE + 1];
+    char buffer_text[MAX_LINE + 1];
+    char *p;
+
+    /* first find "Start=" */
+    /* the <P ... > */
+    /* then all text and remove <...> until new "Start="*/
+    for( ;; )
+    {
+        int i_state;
+        if( ( s = text_get_line( txt ) ) == NULL )
+        {
+            return( VLC_EGENERIC );
+        }
+
+        if( fgets( buffer, MAX_LINE, p_file ) <= 0)
+        {
+            return( -1 );
+        }
+        i_start = 0;
+
+        buffer[MAX_LINE] = '\0';
+        memset( buffer_text, '\0', MAX_LINE );
+
+        for( ;; )
+        {
+            if( p = strstr( buffer, "Start=" ) )
+            {
+
+
+            }
+    }
+#endif
+    return( VLC_EGENERIC );
 }

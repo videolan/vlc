@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.17 2003/02/18 22:33:54 gbazin Exp $
+ * $Id: video.c,v 1.18 2003/03/15 18:44:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -217,6 +217,15 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     }
 #endif
 
+    /* CODEC_FLAG_TRUNCATED */
+
+    /* FIXME search real LIBAVCODEC_BUILD */
+#if LIBAVCODEC_BUILD >= 4662
+    if( p_vdec->p_codec->capabilities & CODEC_CAP_TRUNCATED )
+    {
+        p_vdec->p_context->flags |= CODEC_FLAG_TRUNCATED;
+    }
+#endif
     /* ***** Open the codec ***** */
     if( avcodec_open(p_vdec->p_context, p_vdec->p_codec) < 0 )
     {
@@ -585,10 +594,17 @@ usenextdata:
 
         if( p_vdec->p_context->frame_rate > 0 )
         {
+#if LIBAVCODEC_BUILD >= 4662
+           i_pts += (uint64_t)1000000 *
+                    ( p_vdec->i_frame_count - 1) /
+                    DEFAULT_FRAME_RATE_BASE /
+                    p_vdec->p_context->frame_rate;
+#else
            i_pts += (uint64_t)1000000 *
                     ( p_vdec->i_frame_count - 1) /
                     FRAME_RATE_BASE /
                     p_vdec->p_context->frame_rate;
+#endif
         }
     }
     else

@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sub.h,v 1.3 2003/03/11 20:01:23 fenrir Exp $
+ * $Id: sub.h,v 1.4 2003/03/15 18:44:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -26,6 +26,7 @@
 #define SUB_TYPE_SSA1       0x02
 #define SUB_TYPE_SSA2_4     0x03
 #define SUB_TYPE_VPLAYER    0x04
+#define SUB_TYPE_SAMI       0x05
 #define SUB_TYPE_UNKNOWN    0xffff
 
 typedef struct subtitle_s
