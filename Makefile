@@ -14,17 +14,16 @@
 #SHELL=/bin/sh
 
 # Video output settings
-VIDEO=X11
-#VIDEO=DUMMY
-#VIDEO=FB
-#VIDEO=GGI
+VIDEO_X11=YES
+VIDEO_FB=YES
+#VIDEO_GGI=YES
 
 # Highly experimental
-#VIDEO=3DFX
+#VIDEO_GLIDE=YES
 
 # Not yet supported
-#VIDEO=BEOS
-#VIDEO=DGA
+#VIDEO_BEOS=YES
+#VIDEO_DGA=YES
 
 # Target architecture
 ARCH=X86
@@ -56,8 +55,49 @@ DEBUG=1
 # Program version - may only be changed by the project leader
 PROGRAM_VERSION = 1.0-dev
 
+# VIDEO_OPTIONS describes all used video options
+VIDEO_OPTIONS = dummy
+intf_method = interface/intf_dummy.o
+vout_method = video_output/vout_dummy.o
+ifeq ($(VIDEO_GLIDE), YES)
+VIDEO_OPTIONS += glide
+DEFINE += -DVIDEO_GLIDE
+intf_method += interface/intf_glide.o
+vout_method += video_output/vout_glide.o
+endif
+ifeq ($(VIDEO_X11), YES)
+VIDEO_OPTIONS += x11
+DEFINE += -DVIDEO_X11
+intf_method += interface/intf_x11.o
+vout_method += video_output/vout_x11.o
+endif
+ifeq ($(VIDEO_GGI), YES)
+VIDEO_OPTIONS += ggi
+DEFINE += -DVIDEO_GGI
+intf_method += interface/intf_ggi.o
+vout_method += video_output/vout_ggi.o
+endif
+ifeq ($(VIDEO_FB), YES)
+VIDEO_OPTIONS += fb
+DEFINE += -DVIDEO_FB
+intf_method += interface/intf_fb.o
+vout_method += video_output/vout_fb.o
+endif
+ifeq ($(VIDEO_BEOS), YES)
+VIDEO_OPTIONS += beos
+DEFINE += -DVIDEO_BEOS
+intf_method += interface/intf_beos.o
+vout_method += video_output/vout_beos.o
+endif
+ifeq ($(VIDEO_DGA), YES)
+VIDEO_OPTIONS += dga
+DEFINE += -DVIDEO_DGA
+intf_method += interface/intf_dga.o
+vout_method += video_output/vout_dga.o
+endif
+
 # PROGRAM_OPTIONS is an identification string of the compilation options
-PROGRAM_OPTIONS = $(VIDEO) $(ARCH) $(SYS)
+PROGRAM_OPTIONS = $(ARCH) $(SYS)
 ifeq ($(DEBUG),1)
 PROGRAM_OPTIONS += DEBUG
 endif
@@ -66,10 +106,10 @@ endif
 PROGRAM_BUILD = `date -R` $(USER)@`hostname`
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
-# including VIDEO_xx and ARCH_xx. It will be passed to C compiler.
-DEFINE += -DVIDEO_$(VIDEO) 
+# including ARCH_xx and SYS_xx. It will be passed to C compiler.
 DEFINE += -DARCH_$(ARCH)
 DEFINE += -DSYS_$(SYS)
+DEFINE += -DVIDEO_OPTIONS="\"$(VIDEO_OPTIONS)\""
 DEFINE += -DPROGRAM_VERSION="\"$(PROGRAM_VERSION)\""
 DEFINE += -DPROGRAM_OPTIONS="\"$(PROGRAM_OPTIONS)\""
 DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
@@ -81,7 +121,7 @@ endif
 video = $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
 
 ################################################################################
-# Tunning and other variables - do not change anything except if you know
+# Tuning and other variables - do not change anything except if you know
 # exactly what you are doing
 ################################################################################
 
@@ -90,11 +130,11 @@ video = $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
 #
 INCLUDE += -Iinclude
 
-ifeq ($(VIDEO),X11)
+ifeq ($(VIDEO_X11),YES)
 INCLUDE += -I/usr/X11R6/include
 endif
 
-ifeq ($(VIDEO),3DFX)
+ifeq ($(VIDEO_GLIDE),YES)
 INCLUDE += -I/usr/include/glide
 endif
 
@@ -104,15 +144,15 @@ endif
 LIB += -lpthread
 LIN += -lm
 
-ifeq ($(VIDEO),X11)
+ifeq ($(VIDEO_X11),YES)
 LIB += -L/usr/X11R6/lib
 LIB += -lX11
 LIB += -lXext 
 endif
-ifeq ($(VIDEO),GGI)
+ifeq ($(VIDEO_GGI),YES)
 LIB += -lggi
 endif
-ifeq ($(VIDEO),3DFX)
+ifeq ($(VIDEO_GLIDE),YES)
 LIB += -lglide2x
 endif
 
@@ -194,7 +234,7 @@ interface_obj =  		interface/main.o \
 						interface/intf_ctrl.o \
 						interface/control.o \
 						interface/intf_console.o \
-						interface/intf_$(video).o
+						$(intf_method)
 
 input_obj =         		input/input_vlan.o \
 						input/input_file.o \
@@ -209,9 +249,9 @@ audio_output_obj = 		audio_output/audio_output.o \
 						audio_output/audio_dsp.o
 
 video_output_obj = 		video_output/video_output.o \
-						video_output/video_$(video).o \
 						video_output/video_text.o \
-						video_output/video_yuv.o
+						video_output/video_yuv.o \
+						$(vout_method)
 
 ac3_decoder_obj =		ac3_decoder/ac3_decoder.o \
 						ac3_decoder/ac3_parse.o \

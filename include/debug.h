@@ -18,9 +18,10 @@
  * in release program.
  *****************************************************************************/
 #ifdef DEBUG
-#define ASSERT(p_Mem)								\
-if (!(p_Mem))									\
-    intf_ErrMsg("Void pointer error: %s line %d (variable %s at address %p)\n",	\
+#define ASSERT(p_Mem)                                                         \
+if (!(p_Mem))                                                                 \
+    intf_ErrMsg("Void pointer error: "                                        \
+                "%s line %d (variable %s at address %p)\n",                   \
                  __FILE__, __LINE__, #p_Mem, &p_Mem);
 
 #else
@@ -37,7 +38,7 @@ if (!(p_Mem))									\
  * program is compiled with the debug option.
  *****************************************************************************/
 #ifdef DEBUG
-#define RZERO(r_Var)								\
+#define RZERO(r_Var)                                                          \
 bzero(&(r_Var), sizeof((r_Var)));
 
 #else
@@ -53,7 +54,7 @@ bzero(&(r_Var), sizeof((r_Var)));
  * It has the same purpose than RZERO, but for pointers.
  *****************************************************************************/
 #ifdef DEBUG
-#define PZERO(p_Mem)								\
+#define PZERO(p_Mem)                                                          \
 bzero((p_Mem), sizeof(*(p_Mem)));
 
 #else
@@ -69,7 +70,7 @@ bzero((p_Mem), sizeof(*(p_Mem)));
  * It has the same purpose than RZERO or PZERO, but for array
  *****************************************************************************/
 #ifdef DEBUG
-#define AZERO(p_Array, i_Size)	       						\
+#define AZERO(p_Array, i_Size)                                                \
 bzero((p_Array), (i_Size)*sizeof(*(p_Array)));
 
 #else

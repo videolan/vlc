@@ -87,7 +87,7 @@ typedef struct intf_msg_s
  *****************************************************************************/
 
 static void QueueMsg        ( intf_msg_t *p_msg, int i_type,
-			      char *psz_format, va_list ap );
+                              char *psz_format, va_list ap );
 static void PrintMsg        ( intf_msg_item_t *p_msg );
 #ifdef DEBUG
 static void QueueDbgMsg     ( intf_msg_t *p_msg, char *psz_file,
@@ -100,7 +100,7 @@ static void FlushLockedMsg  ( intf_msg_t *p_msg );
 
 
 /*****************************************************************************
- * intf_MsgCreate: initialize messages interface                            (ok ?)
+ * intf_MsgCreate: initialize messages interface                         (ok ?)
  *****************************************************************************
  * This functions has to be called before any call to other intf_*Msg functions.
  * It set up the locks and the message queue if it is used.
@@ -113,7 +113,7 @@ p_intf_msg_t intf_MsgCreate( void )
     p_msg = malloc( sizeof( intf_msg_t ) );
     if( p_msg == NULL )
     {
-	errno = ENOMEM;
+        errno = ENOMEM;
     }
     else
     {
@@ -124,10 +124,10 @@ p_intf_msg_t intf_MsgCreate( void )
 #endif
 
 #ifdef DEBUG_LOG
-	/* Log file initialization - on failure, file pointer will be null,
-	 * and no log will be issued, but this is not considered as an
-	 * error */
-	p_msg->i_log_file = open( DEBUG_LOG,
+        /* Log file initialization - on failure, file pointer will be null,
+         * and no log will be issued, but this is not considered as an
+         * error */
+        p_msg->i_log_file = open( DEBUG_LOG,
                                   O_CREAT | O_TRUNC | O_SYNC | O_WRONLY,
                                   0666 );
 #endif
@@ -150,7 +150,7 @@ void intf_MsgDestroy( void )
     /* Close log file if any */
     if( p_main->p_msg->i_log_file >= 0 )
     {
-	close( p_main->p_msg->i_log_file );
+        close( p_main->p_msg->i_log_file );
     }
 #endif
 
@@ -365,7 +365,7 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
  *****************************************************************************/
 #ifdef DEBUG
 static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
-			int i_line, char *psz_format, va_list ap)
+                        int i_line, char *psz_format, va_list ap)
 {
     char *                  psz_str;             /* formatted message string */
     intf_msg_item_t *       p_msg_item;                /* pointer to message */
@@ -384,7 +384,7 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
         fprintf(stderr, "warning: can't store following message (%s): ",
                 strerror(errno) );
         fprintf(stderr, INTF_MSG_DBG_FORMAT, psz_file, psz_function, i_line );
-	vfprintf(stderr, psz_format, ap );
+        vfprintf(stderr, psz_format, ap );
         exit( errno );
     }
 
@@ -509,7 +509,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     /* Append all messages to log file */
     if( p_main->p_msg->i_log_file >= 0 )
     {
-	write( p_main->p_msg->i_log_file, psz_msg, strlen( psz_msg ) );
+        write( p_main->p_msg->i_log_file, psz_msg, strlen( psz_msg ) );
     }
 #endif
 

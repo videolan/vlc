@@ -274,7 +274,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
     {                                                                         \
         /* Horizontal scaling, but we can't use a buffer due to dither */     \
         p_offset = p_offset_start;                                            \
-	b_jump_uv = 0;                                                        \
+        b_jump_uv = 0;                                                        \
         for( i_x = i_pic_width / 16; i_x--; )                                 \
         {                                                                     \
             CONVERT_4YUV_PIXELS_SCALE( CHROMA )                               \
@@ -291,7 +291,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
             CONVERT_4YUV_PIXELS( CHROMA )                                     \
             CONVERT_4YUV_PIXELS( CHROMA )                                     \
             CONVERT_4YUV_PIXELS( CHROMA )                                     \
-	}                                                                     \
+        }                                                                     \
     }                                                                         \
     /* Increment of picture pointer to end of line is still needed */         \
     p_pic += i_pic_line_width;                                                \
@@ -693,7 +693,7 @@ static void SetYUV( vout_thread_t *p_vout )
                             i++;
                             continue;
                         }
-    														
+
                         /* heavy. yeah. */
                         for( u2 = 0; u2 <= 256; u2 += 32 )
                         for( v2 = 0; v2 <= 256; v2 += 32 )
@@ -1729,8 +1729,8 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
 #if 0
 //??
 static void yuvToRgb24 (unsigned char * Y,
-			unsigned char * U, unsigned char * V,
-			char * dest, int table[1935], int width)
+                        unsigned char * U, unsigned char * V,
+                        char * dest, int table[1935], int width)
 {
     int i;
     int u;
@@ -1743,145 +1743,145 @@ static void yuvToRgb24 (unsigned char * Y,
 
     i = width >> 3;
     while (i--) {
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
+        u = *(U++);
+        v = *(V++);
+        uvRed = (V_RED_COEF*v) >> SHIFT;
+        uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
+        uvBlue = (U_BLUE_COEF*u) >> SHIFT;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
 
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
+        u = *(U++);
+        v = *(V++);
+        uvRed = (V_RED_COEF*v) >> SHIFT;
+        uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
+        uvBlue = (U_BLUE_COEF*u) >> SHIFT;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
 
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
+        u = *(U++);
+        v = *(V++);
+        uvRed = (V_RED_COEF*v) >> SHIFT;
+        uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
+        uvBlue = (U_BLUE_COEF*u) >> SHIFT;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
 
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
+        u = *(U++);
+        v = *(V++);
+        uvRed = (V_RED_COEF*v) >> SHIFT;
+        uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
+        uvBlue = (U_BLUE_COEF*u) >> SHIFT;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
     }
 
     i = (width & 7) >> 1;
     while (i--) {
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
+        u = *(U++);
+        v = *(V++);
+        uvRed = (V_RED_COEF*v) >> SHIFT;
+        uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
+        uvBlue = (U_BLUE_COEF*u) >> SHIFT;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
     }
 
     if (width & 1) {
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
+        u = *(U++);
+        v = *(V++);
+        uvRed = (V_RED_COEF*v) >> SHIFT;
+        uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
+        uvBlue = (U_BLUE_COEF*u) >> SHIFT;
 
-	tableY = table + *(Y++);
-	tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			uvGreen] |
-		 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-	*(dest++) = tmp24;
-	*(dest++) = tmp24 >> 8;
-	*(dest++) = tmp24 >> 16;
+        tableY = table + *(Y++);
+        tmp24 = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
+                 tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
+                        uvGreen] |
+                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
+        *(dest++) = tmp24;
+        *(dest++) = tmp24 >> 8;
+        *(dest++) = tmp24 >> 16;
     }
 }
 #endif

@@ -86,15 +86,15 @@ struct vdec_thread_s;
  * shows that the values given below are the most effective.
  */
 
-#define CONST_BITS 8       /* Jimmy chose this constant :) */
+#define CONST_BITS 8                         /* Jimmy chose this constant :) */
 
 #ifdef EIGHT_BIT_SAMPLES
 #define PASS1_BITS  2
 #else
-#define PASS1_BITS  1		/* lose a little precision to avoid overflow */
+#define PASS1_BITS  1           /* lose a little precision to avoid overflow */
 #endif
 
-#define ONE	((s32) 1)
+#define ONE     ((s32) 1)
 
 #define CONST_SCALE (ONE << CONST_BITS)
 
@@ -104,10 +104,10 @@ struct vdec_thread_s;
  * the correct integer constant values and insert them by hand.
  */
 
-#define FIX(x)	((s32) ((x) * CONST_SCALE + 0.5))
+#define FIX(x)  ((s32) ((x) * CONST_SCALE + 0.5))
 
 /* When adding two opposite-signed fixes, the 0.5 cancels */
-#define FIX2(x)	((s32) ((x) * CONST_SCALE))
+#define FIX2(x) ((s32) ((x) * CONST_SCALE))
 
 /* Descale and correctly round an s32 value that's scaled by N bits.
  * We assume RIGHT_SHIFT rounds towards minus infinity, so adding
@@ -128,15 +128,15 @@ struct vdec_thread_s;
  */
 
 #ifdef EIGHT_BIT_SAMPLES
-#ifdef SHORTxSHORT_32		/* may work if 'int' is 32 bits */
+#ifdef SHORTxSHORT_32                        /* may work if 'int' is 32 bits */
 #define MULTIPLY(var,const)  (((INT16) (var)) * ((INT16) (const)))
 #endif
-#ifdef SHORTxLCONST_32		/* known to work with Microsoft C 6.0 */
+#ifdef SHORTxLCONST_32                 /* known to work with Microsoft C 6.0 */
 #define MULTIPLY(var,const)  (((INT16) (var)) * ((s32) (const)))
 #endif
 #endif
 
-#ifndef MULTIPLY		/* default definition */
+#ifndef MULTIPLY                                       /* default definition */
 #define MULTIPLY(var,const)  ((var) * (const))
 #endif
 

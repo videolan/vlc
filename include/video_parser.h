@@ -115,7 +115,7 @@ typedef struct vpar_thread_s
     /* Structure to store the tables B14 & B15 (ISO/CEI 13818-2 B.4) */
      dct_lookup_t           ppl_dct_coef[2][16384];
 
-	
+
 
 #ifdef STATS
     /* Statistics */

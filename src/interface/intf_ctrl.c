@@ -435,7 +435,7 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
       switch( p_argv[i_arg].i_index )
       {
       case 0:
-	  // ?? useless
+          // ?? useless
           i_input = p_argv[i_arg].i_num;
           break;
       case 1:
@@ -448,7 +448,7 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
     /* Find to which input this command is destinated */
     intf_IntfMsg( "Adding PID %d to input %d\n", i_pid, i_input );
 //????    input_AddPgrmElem( p_main->p_intf->p_x11->p_input,
-//????		       i_pid );
+//????                       i_pid );
     return( INTF_NO_ERROR );
 }
 

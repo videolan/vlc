@@ -140,7 +140,7 @@ static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
         /* Unlink referenced pictures */
         if( p_mb->p_forward != NULL )
         {
-	        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forward );
+            vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forward );
         }
         if( p_mb->p_backward != NULL )
         {

@@ -65,8 +65,8 @@ static void     SetPalette        ( p_vout_thread_t p_vout, u16 *red,
  * If pi_status is NULL, then the function will block until the thread is ready.
  * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
-vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_window,
-                                                  int i_width, int i_height, int *pi_status )
+vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
+                          int i_width, int i_height, int *pi_status, int i_method )
 {
     vout_thread_t * p_vout;                             /* thread descriptor */
     int             i_status;                               /* thread status */
@@ -79,6 +79,83 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
         return( NULL );
+    }
+
+    /* Sets method-specific functions */
+    switch( i_method )
+    {
+        case VOUT_DUMMY_METHOD:
+            p_vout->p_sys_create =    vout_DummySysCreate;
+            p_vout->p_sys_init =      vout_DummySysInit;
+            p_vout->p_sys_end =       vout_DummySysEnd;
+            p_vout->p_sys_destroy =   vout_DummySysDestroy;
+            p_vout->p_sys_manage =    vout_DummySysManage;
+            p_vout->p_sys_display =   vout_DummySysDisplay;
+            break;
+#ifdef VIDEO_X11
+        case VOUT_X11_METHOD:
+            p_vout->p_sys_create =    vout_X11SysCreate;
+            p_vout->p_sys_init =      vout_X11SysInit;
+            p_vout->p_sys_end =       vout_X11SysEnd;
+            p_vout->p_sys_destroy =   vout_X11SysDestroy;
+            p_vout->p_sys_manage =    vout_X11SysManage;
+            p_vout->p_sys_display =   vout_X11SysDisplay;
+            break;
+#endif
+#ifdef VIDEO_FB
+        case VOUT_FB_METHOD:
+            p_vout->p_sys_create =    vout_FBSysCreate;
+            p_vout->p_sys_init =      vout_FBSysInit;
+            p_vout->p_sys_end =       vout_FBSysEnd;
+            p_vout->p_sys_destroy =   vout_FBSysDestroy;
+            p_vout->p_sys_manage =    vout_FBSysManage;
+            p_vout->p_sys_display =   vout_FBSysDisplay;
+            break;
+#endif
+#ifdef VIDEO_GLIDE
+        case VOUT_GLIDE_METHOD:
+            p_vout->p_sys_create =    vout_GlideSysCreate;
+            p_vout->p_sys_init =      vout_GlideSysInit;
+            p_vout->p_sys_end =       vout_GlideSysEnd;
+            p_vout->p_sys_destroy =   vout_GlideSysDestroy;
+            p_vout->p_sys_manage =    vout_GlideSysManage;
+            p_vout->p_sys_display =   vout_GlideSysDisplay;
+            break;
+#endif
+#ifdef VIDEO_DGA
+        case VOUT_DGA_METHOD:
+            p_vout->p_sys_create =    vout_DGASysCreate;
+            p_vout->p_sys_init =      vout_DGASysInit;
+            p_vout->p_sys_end =       vout_DGASysEnd;
+            p_vout->p_sys_destroy =   vout_DGASysDestroy;
+            p_vout->p_sys_manage =    vout_DGASysManage;
+            p_vout->p_sys_display =   vout_DGASysDisplay;
+            break;
+#endif
+#ifdef VIDEO_GGI
+        case VOUT_GGI_METHOD:
+            p_vout->p_sys_create =    vout_GGISysCreate;
+            p_vout->p_sys_init =      vout_GGISysInit;
+            p_vout->p_sys_end =       vout_GGISysEnd;
+            p_vout->p_sys_destroy =   vout_GGISysDestroy;
+            p_vout->p_sys_manage =    vout_GGISysManage;
+            p_vout->p_sys_display =   vout_GGISysDisplay;
+            break;
+#endif
+#ifdef VIDEO_BEOS
+        case VOUT_BEOS_METHOD:
+            p_vout->p_sys_create =    vout_BeSysCreate;
+            p_vout->p_sys_init =      vout_BeSysInit;
+            p_vout->p_sys_end =       vout_BeSysEnd;
+            p_vout->p_sys_destroy =   vout_BeSysDestroy;
+            p_vout->p_sys_manage =    vout_BeSysManage;
+            p_vout->p_sys_display =   vout_BeSysDisplay;
+            break;
+#endif
+        default:
+            intf_ErrMsg( "error: video output method not available\n" );
+            free( p_vout );
+            return( NULL );
     }
 
     /* Initialize thread properties - thread id and locks will be initialized
@@ -136,7 +213,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
 
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
-    if( vout_SysCreate( p_vout, psz_display, i_root_window ) )
+    if( p_vout->p_sys_create( p_vout, psz_display, i_root_window ) )
     {
       free( p_vout );
       return( NULL );
@@ -157,12 +234,12 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     p_vout->i_gray_pixel  = RGB2PIXEL( p_vout, 128, 128, 128 );
     p_vout->i_blue_pixel  = RGB2PIXEL( p_vout, 0, 0, 50 );
 
-    /* Load fonts - fonts must be initialized after the systme method since
-     * they may be dependant of screen depth and other thread properties */
+    /* Load fonts - fonts must be initialized after the system method since
+     * they may be dependant on screen depth and other thread properties */
     p_vout->p_default_font      = vout_LoadFont( VOUT_DEFAULT_FONT );
     if( p_vout->p_default_font == NULL )
     {
-        vout_SysDestroy( p_vout );
+        p_vout->p_sys_destroy( p_vout );
         free( p_vout );
         return( NULL );
     }
@@ -170,7 +247,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     if( p_vout->p_large_font == NULL )
     {
         vout_UnloadFont( p_vout->p_default_font );
-        vout_SysDestroy( p_vout );
+        p_vout->p_sys_destroy( p_vout );
         free( p_vout );
         return( NULL );
     }
@@ -185,7 +262,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
         vout_UnloadFont( p_vout->p_default_font );
         vout_UnloadFont( p_vout->p_large_font );
-	vout_SysDestroy( p_vout );
+        p_vout->p_sys_destroy( p_vout );
         free( p_vout );
         return( NULL );
     }
@@ -298,34 +375,34 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
      */
     for( i_subpic = 0; i_subpic < VOUT_MAX_PICTURES; i_subpic++ )
     {
-	if( p_vout->p_subpicture[i_subpic].i_status == DESTROYED_SUBPICTURE )
-	{
-	    /* Subpicture is marked for destruction, but is still allocated */
-	    if( (p_vout->p_subpicture[i_subpic].i_type  == i_type)   &&
-		(p_vout->p_subpicture[i_subpic].i_size  >= i_size) )
-	    {
-		/* Memory size do match or is smaller : memory will not be reallocated,
+        if( p_vout->p_subpicture[i_subpic].i_status == DESTROYED_SUBPICTURE )
+        {
+            /* Subpicture is marked for destruction, but is still allocated */
+            if( (p_vout->p_subpicture[i_subpic].i_type  == i_type)   &&
+                (p_vout->p_subpicture[i_subpic].i_size  >= i_size) )
+            {
+                /* Memory size do match or is smaller : memory will not be reallocated,
                  * and function can end immediately - this is the best possible case,
                  * since no memory allocation needs to be done */
-		p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
+                p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
 #ifdef DEBUG_VIDEO
                 intf_DbgMsg("subpicture %p (in destroyed subpicture slot)\n",
                             &p_vout->p_subpicture[i_subpic] );
 #endif
-		vlc_mutex_unlock( &p_vout->subpicture_lock );
-		return( &p_vout->p_subpicture[i_subpic] );
-	    }
-	    else if( p_destroyed_subpic == NULL )
-	    {
-		/* Memory size do not match, but subpicture index will be kept in
-		 * case no other place are left */
-		p_destroyed_subpic = &p_vout->p_subpicture[i_subpic];
-	    }	
-	}
+                vlc_mutex_unlock( &p_vout->subpicture_lock );
+                return( &p_vout->p_subpicture[i_subpic] );
+            }
+            else if( p_destroyed_subpic == NULL )
+            {
+                /* Memory size do not match, but subpicture index will be kept in
+                 * case no other place are left */
+                p_destroyed_subpic = &p_vout->p_subpicture[i_subpic];
+            }
+        }
         else if( (p_free_subpic == NULL) &&
                  (p_vout->p_subpicture[i_subpic].i_status == FREE_SUBPICTURE ))
         {
-	    /* Subpicture is empty and ready for allocation */
+            /* Subpicture is empty and ready for allocation */
             p_free_subpic = &p_vout->p_subpicture[i_subpic];
         }
     }
@@ -333,8 +410,8 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     /* If no free subpicture is available, use a destroyed subpicture */
     if( (p_free_subpic == NULL) && (p_destroyed_subpic != NULL ) )
     {
-	/* No free subpicture or matching destroyed subpicture has been found, but
-	 * a destroyed subpicture is still avalaible */
+        /* No free subpicture or matching destroyed subpicture has been found, but
+         * a destroyed subpicture is still avalaible */
         free( p_destroyed_subpic->p_data );
         p_free_subpic = p_destroyed_subpic;
     }
@@ -494,7 +571,7 @@ void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
  * since several pictures can be created by several producers threads.
  *****************************************************************************/
 picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
-			       int i_width, int i_height )
+                               int i_width, int i_height )
 {
     int         i_picture;                                  /* picture index */
     int         i_chroma_width = 0;                          /* chroma width */
@@ -509,37 +586,37 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
      */
     for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
     {
-	if( p_vout->p_picture[i_picture].i_status == DESTROYED_PICTURE )
-	{
-	    /* Picture is marked for destruction, but is still allocated - note
+        if( p_vout->p_picture[i_picture].i_status == DESTROYED_PICTURE )
+        {
+            /* Picture is marked for destruction, but is still allocated - note
              * that if width and type are the same for two pictures, chroma_width
              * should also be the same */
-	    if( (p_vout->p_picture[i_picture].i_type           == i_type)   &&
-		(p_vout->p_picture[i_picture].i_height         == i_height) &&
-		(p_vout->p_picture[i_picture].i_width          == i_width) )
-	    {
-		/* Memory size do match : memory will not be reallocated, and function
+            if( (p_vout->p_picture[i_picture].i_type           == i_type)   &&
+                (p_vout->p_picture[i_picture].i_height         == i_height) &&
+                (p_vout->p_picture[i_picture].i_width          == i_width) )
+            {
+                /* Memory size do match : memory will not be reallocated, and function
                  * can end immediately - this is the best possible case, since no
                  * memory allocation needs to be done */
-		p_vout->p_picture[i_picture].i_status = RESERVED_PICTURE;
+                p_vout->p_picture[i_picture].i_status = RESERVED_PICTURE;
 #ifdef DEBUG_VIDEO
                 intf_DbgMsg("picture %p (in destroyed picture slot)\n",
                             &p_vout->p_picture[i_picture] );
 #endif
-		vlc_mutex_unlock( &p_vout->picture_lock );
-		return( &p_vout->p_picture[i_picture] );
-	    }
-	    else if( p_destroyed_picture == NULL )
-	    {
-		/* Memory size do not match, but picture index will be kept in
-		 * case no other place are left */
-		p_destroyed_picture = &p_vout->p_picture[i_picture];
-	    }	
-	}
+                vlc_mutex_unlock( &p_vout->picture_lock );
+                return( &p_vout->p_picture[i_picture] );
+            }
+            else if( p_destroyed_picture == NULL )
+            {
+                /* Memory size do not match, but picture index will be kept in
+                 * case no other place are left */
+                p_destroyed_picture = &p_vout->p_picture[i_picture];
+            }
+        }
         else if( (p_free_picture == NULL) &&
                  (p_vout->p_picture[i_picture].i_status == FREE_PICTURE ))
         {
-	    /* Picture is empty and ready for allocation */
+            /* Picture is empty and ready for allocation */
             p_free_picture = &p_vout->p_picture[i_picture];
         }
     }
@@ -547,8 +624,8 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
     /* If no free picture is available, use a destroyed picture */
     if( (p_free_picture == NULL) && (p_destroyed_picture != NULL ) )
     {
-	/* No free picture or matching destroyed picture has been found, but
-	 * a destroyed picture is still avalaible */
+        /* No free picture or matching destroyed picture has been found, but
+         * a destroyed picture is still avalaible */
         free( p_destroyed_picture->p_data );
         p_free_picture = p_destroyed_picture;
     }
@@ -694,7 +771,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( (p_pic->i_refcount == 0) && (p_pic->i_status == DISPLAYED_PICTURE) )
     {
-	p_pic->i_status = DESTROYED_PICTURE;
+        p_pic->i_status = DESTROYED_PICTURE;
     }
 
 #ifdef DEBUG_VIDEO
@@ -783,7 +860,7 @@ static int BinaryLog(u32 i)
     }
     if (i != ((u32)1 << i_log))
     {
-	intf_ErrMsg("internal error: binary log overflow\n");
+        intf_ErrMsg("internal error: binary log overflow\n");
     }
 
     return( i_log );
@@ -825,7 +902,7 @@ static int InitThread( vout_thread_t *p_vout )
     *p_vout->pi_status = THREAD_START;
 
    /* Initialize output method - this function issues its own error messages */
-    if( vout_SysInit( p_vout ) )
+    if( p_vout->p_sys_init( p_vout ) )
     {
         return( 1 );
     }
@@ -884,45 +961,45 @@ static void RunThread( vout_thread_t *p_vout)
         current_date =  mdate();
 
         /*
-	 * Find the picture to display - this operation does not need lock,
+         * Find the picture to display - this operation does not need lock,
          * since only READY_PICTUREs are handled
          */
         for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
-	{
-	    if( (p_vout->p_picture[i_index].i_status == READY_PICTURE) &&
-		( (p_pic == NULL) ||
-		  (p_vout->p_picture[i_index].date < display_date) ) )
-	    {
+        {
+            if( (p_vout->p_picture[i_index].i_status == READY_PICTURE) &&
+            ( (p_pic == NULL) ||
+              (p_vout->p_picture[i_index].date < display_date) ) )
+            {
                 p_pic = &p_vout->p_picture[i_index];
                 display_date = p_pic->date;
-	    }
-	}
+            }
+        }
 
         if( p_pic )
         {
 #ifdef STATS
             /* Computes FPS rate */
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
-#endif	
-	    if( display_date < current_date )
-	    {
-		/* Picture is late: it will be destroyed and the thread will sleep and
+#endif
+            if( display_date < current_date )
+            {
+                /* Picture is late: it will be destroyed and the thread will sleep and
                  * go to next picture */
                 vlc_mutex_lock( &p_vout->picture_lock );
                 p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
-		intf_DbgMsg( "warning: late picture %p skipped refcount=%d\n", p_pic, p_pic->i_refcount );
+            intf_DbgMsg( "warning: late picture %p skipped refcount=%d\n", p_pic, p_pic->i_refcount );
                 vlc_mutex_unlock( &p_vout->picture_lock );
                 p_pic =         NULL;
                 display_date =  0;
-	    }
-	    else if( display_date > current_date + VOUT_DISPLAY_DELAY )
-	    {
-		/* A picture is ready to be rendered, but its rendering date is
-		 * far from the current one so the thread will perform an empty loop
-		 * as if no picture were found. The picture state is unchanged */
+            }
+            else if( display_date > current_date + VOUT_DISPLAY_DELAY )
+            {
+                /* A picture is ready to be rendered, but its rendering date is
+                 * far from the current one so the thread will perform an empty loop
+                 * as if no picture were found. The picture state is unchanged */
                 p_pic =         NULL;
                 display_date =  0;
-	    }
+            }
         }
 
         /*
@@ -1063,20 +1140,20 @@ static void RunThread( vout_thread_t *p_vout)
 #endif
         if( b_display && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) )
         {
-            vout_SysDisplay( p_vout );
+            p_vout->p_sys_display( p_vout );
             p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
         }
 
         /*
          * Check events and manage thread
-	 */
-        if( vout_SysManage( p_vout ) | Manage( p_vout ) )
-	{
-	    /* A fatal error occured, and the thread must terminate immediately,
-	     * without displaying anything - setting b_error to 1 cause the
-	     * immediate end of the main while() loop. */
-	    p_vout->b_error = 1;
-	}
+         */
+        if( p_vout->p_sys_manage( p_vout ) | Manage( p_vout ) )
+        {
+            /* A fatal error occured, and the thread must terminate immediately,
+             * without displaying anything - setting b_error to 1 cause the
+             * immediate end of the main while() loop. */
+            p_vout->b_error = 1;
+        }
     }
 
     /*
@@ -1128,8 +1205,8 @@ static void EndThread( vout_thread_t *p_vout )
     /* Destroy all remaining pictures and subpictures */
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
     {
-	if( p_vout->p_picture[i_index].i_status != FREE_PICTURE )
-	{
+        if( p_vout->p_picture[i_index].i_status != FREE_PICTURE )
+        {
             free( p_vout->p_picture[i_index].p_data );
         }
         if( p_vout->p_subpicture[i_index].i_status != FREE_SUBPICTURE )
@@ -1140,7 +1217,7 @@ static void EndThread( vout_thread_t *p_vout )
 
     /* Destroy translation tables */
     vout_EndYUV( p_vout );
-    vout_SysEnd( p_vout );
+    p_vout->p_sys_end( p_vout );
 }
 
 /*****************************************************************************
@@ -1160,7 +1237,7 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     /* Destroy thread structures allocated by Create and InitThread */
     vout_UnloadFont( p_vout->p_default_font );
     vout_UnloadFont( p_vout->p_large_font );
-    vout_SysDestroy( p_vout );
+    p_vout->p_sys_destroy( p_vout );
     free( p_vout );
     *pi_status = i_status;
 }
@@ -1823,8 +1900,8 @@ static int Manage( vout_thread_t *p_vout )
     /* Detect unauthorized changes */
     if( p_vout->i_changes )
     {
-        /* Some changes were not acknowledged by vout_SysManage or this function,
-         * it means they should not be authorized */
+        /* Some changes were not acknowledged by p_vout->p_sys_manage or this
+         * function, it means they should not be authorized */
         intf_ErrMsg( "error: unauthorized changes in the video output thread\n" );
         return( 1 );
     }

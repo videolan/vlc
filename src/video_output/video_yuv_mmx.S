@@ -500,7 +500,7 @@ do_next_8x2_block:
   addl       $16,%edi                /* ih take 16 bytes (8 pixels-16 bit) */
   addl       $4,%ebx                 /* ? to take 4 pixels together
                                         instead of 2 */
-#endif					
+#endif
   jl         do_next_8x2_block
 
   addl       CCOSkipDistance(%esp),%edi /* go to begin of next line */

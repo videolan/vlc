@@ -47,7 +47,7 @@ typedef void *(*vlc_thread_func_t)(void *p_data);
  *****************************************************************************/
 
 static __inline__ int  vlc_thread_create( vlc_thread_t *p_thread, char *psz_name,
-					  vlc_thread_func_t func, void *p_data );
+                                          vlc_thread_func_t func, void *p_data );
 static __inline__ void vlc_thread_exit  ( void );
 static __inline__ void vlc_thread_join  ( vlc_thread_t thread );
 
@@ -66,8 +66,8 @@ static __inline__ int  vlc_cond_wait    ( vlc_cond_t *p_condvar, vlc_mutex_t *p_
  * vlc_thread_create: create a thread
  *****************************************************************************/
 static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
-					 char *psz_name, vlc_thread_func_t func,
-					 void *p_data)
+                                         char *psz_name, vlc_thread_func_t func,
+                                         void *p_data)
 {
     return pthread_create( p_thread, NULL, func, p_data );
 }

@@ -107,7 +107,7 @@ static int  TestMMX                 ( void );
  *      -openning of audio output device and some global modules
  *      -execution of interface, which exit on error or on user request
  *      -closing of audio output device and some global modules
- * On error, the spawned threads are cancelled, and the openned devices closed.
+ * On error, the spawned threads are cancelled, and the open devices closed.
  *****************************************************************************/
 int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
@@ -121,7 +121,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     if( !TestMMX() )
     {
         fprintf( stderr, "Sorry, this program needs an MMX processor. Please run the non-MMX version.\n" );
-	return(0);
+        return( 1 );
     }
 #endif
     p_main->p_msg = intf_MsgCreate();
@@ -131,7 +131,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
                 strerror(errno));
         return(errno);
     }
-    if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )/* parse command line */
+    if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
     {
         intf_MsgDestroy();
         return(errno);
@@ -154,12 +154,12 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     if( main_data.b_audio )
     {
         main_data.p_aout = aout_CreateThread( NULL );
-	if( main_data.p_aout == NULL )
-	{
-	    /* On error during audio initialization, switch of audio */
+        if( main_data.p_aout == NULL )
+        {
+            /* On error during audio initialization, switch of audio */
             intf_Msg("Audio initialization failed : audio is desactivated\n");
             main_data.b_audio = 0;
-	}
+        }
     }
 
     /*
@@ -168,9 +168,9 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     main_data.p_intf = intf_Create();
     if( main_data.p_intf != NULL )
     {
-	InitSignalHandler();               /* prepare signals for interception */
- 	intf_Run( main_data.p_intf );
-	intf_Destroy( main_data.p_intf );
+        InitSignalHandler();               /* prepare signals for interception */
+        intf_Run( main_data.p_intf );
+        intf_Destroy( main_data.p_intf );
     }
 
     /*
@@ -216,7 +216,7 @@ int main_GetIntVariable( char *psz_name, int i_default )
         {
             return( i_value );
         }
-    }	
+    }
     return( i_default );
 }
 
@@ -335,7 +335,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
         /* Audio options */
         case OPT_NOAUDIO:                                       /* --noaudio */
-	    p_main->b_audio = 0;
+            p_main->b_audio = 0;
             break;
         case OPT_STEREO:                                         /* --stereo */
             main_PutIntVariable( AOUT_STEREO_VAR, 1 );
@@ -375,7 +375,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_PORT:                                             /* --port */
             main_PutPszVariable( INPUT_PORT_VAR, optarg );
             break;
-	
+
         /* Internal error: unknown option */
         case '?':
         default:
@@ -388,7 +388,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /* Parse command line parameters - no check is made for these options */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
-	putenv( ppsz_argv[ i_opt ] );
+        putenv( ppsz_argv[ i_opt ] );
     }
     return( 0 );
 }
@@ -419,34 +419,36 @@ static void Usage( void )
 
     /* Interface parameters */
     intf_Msg("Interface parameters:\n" \
-	     "  " INTF_INIT_SCRIPT_VAR "=<filename>             \tinitialization script\n" \
+             "  " INTF_INIT_SCRIPT_VAR "=<filename>             \tinitialization script\n" \
              "  " INTF_CHANNELS_VAR "=<filename>            \tchannels list\n"\
-	     );
+             );
 
     /* Audio parameters */
     intf_Msg("Audio parameters:\n" \
              "  " AOUT_DSP_VAR "=<filename>              \tdsp device path\n" \
              "  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output\n" \
              "  " AOUT_RATE_VAR "=<rate>             \toutput rate\n" \
-	     );
+             );
 
     /* Video parameters */
     intf_Msg("Video parameters:\n" \
+             "  " VOUT_METHOD_VAR "=<method name>        \tmethod used\n" \
+             "    ( available: " VIDEO_OPTIONS " )\n" \
              "  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used\n" \
              "  " VOUT_WIDTH_VAR "=<width>               \tdisplay width\n" \
              "  " VOUT_HEIGHT_VAR "=<height>             \tdislay height\n" \
              "  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path\n" \
              "  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output\n" \
-	     );
+             );
 
     /* Input parameters */
     intf_Msg("Input parameters:\n" \
              "  " INPUT_SERVER_VAR "=<hostname>          \tvideo server\n" \
              "  " INPUT_PORT_VAR "=<port>            \tvideo server port\n" \
-	     "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n" \
+             "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n" \
              "  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server\n" \
              "  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port\n"\
-	     );
+             );
 }
 
 /*****************************************************************************
@@ -513,7 +515,7 @@ static void SignalHandler( int i_signal )
  *****************************************************************************/
 static int TestMMX( void )
 {
-    int reg, dummy;
+    int i_reg, i_dummy = 0;
 
     /* test for a 386 cpu */
     asm volatile ( "pushfl
@@ -526,9 +528,9 @@ static int TestMMX( void )
                     popl %%eax
                     xorl %%ecx, %%eax
                     andl $0x40000, %%eax"
-                 : "=a" ( reg ) );
+                 : "=a" ( i_reg ) );
     
-    if( !reg )
+    if( !i_reg )
         return( 0 );
 
     /* test for a 486 cpu */
@@ -542,33 +544,35 @@ static int TestMMX( void )
                     pushl %%ecx 
                     popfl
                     andl $0x200000, %%eax"
-                 : "=a" ( reg ) );
+                 : "=a" ( i_reg ) );
     
-    if( !reg )
+    if( !i_reg )
         return( 0 );
 
     /* the cpu supports the CPUID instruction - get its level */
     asm volatile ( "cpuid"
-                 : "=a" ( reg ),
-                   "=b" ( dummy ),
-                   "=c" ( dummy ),
-                   "=d" ( dummy )
-                 : "a"  ( 0 ) ); /* level 0 */
+                 : "=a" ( i_reg ),
+                   "=b" ( i_dummy ),
+                   "=c" ( i_dummy ),
+                   "=d" ( i_dummy )
+                 : "a"  ( 0 ),       /* level 0 */
+                   "b"  ( i_dummy ) ); /* buggy compiler shouldn't complain */
 
     /* this shouldn't happen on a normal cpu */
-    if( !reg )
+    if( !i_reg )
         return( 0 );
 
     /* test for the MMX flag */
     asm volatile ( "cpuid
                     andl $0x00800000, %%edx" /* X86_FEATURE_MMX */
-                 : "=a" ( dummy ),
-                   "=b" ( dummy ),
-                   "=c" ( dummy ),
-                   "=d" ( reg )
-                 : "a"  ( 1 ) ); /* level 1 */
+                 : "=a" ( i_dummy ),
+                   "=b" ( i_dummy ),
+                   "=c" ( i_dummy ),
+                   "=d" ( i_reg )
+                 : "a"  ( 1 ),       /* level 1 */
+                   "b"  ( i_dummy ) ); /* buggy compiler shouldn't complain */
 
-    if( !reg )
+    if( !i_reg )
         return( 0 );
 
     return( 1 );

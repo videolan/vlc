@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 /* Program version and copyright message */
-#define COPYRIGHT_MESSAGE	        "VideoLAN Client v" PROGRAM_VERSION " - (c)1999-2000 VideoLAN"
+#define COPYRIGHT_MESSAGE               "VideoLAN Client v" PROGRAM_VERSION " - (c)1999-2000 VideoLAN"
 #define VERSION_MESSAGE                 "VideoLAN Client - (c)1999-2000 VideoLAN\n" \
                                         "version " PROGRAM_VERSION " ( " PROGRAM_BUILD " )\n" \
                                         "compilation options: " PROGRAM_OPTIONS
@@ -97,7 +97,7 @@
  *****************************************************************************/
 
 /* Environment variable used to store startup script name and default value */
-#define INTF_INIT_SCRIPT_VAR	        "vlc_init"
+#define INTF_INIT_SCRIPT_VAR            "vlc_init"
 #define INTF_INIT_SCRIPT_DEFAULT        "vlc.init"
 
 /* Environment variable used to store channels file and default value */
@@ -226,6 +226,9 @@
  * Default settings for video output threads
  */
 
+/* Environment variable containing the display method */
+#define VOUT_METHOD_VAR                 "vlc_vout_method"
+					
 /* Environment variable used in place of DISPLAY if available */
 #define VOUT_DISPLAY_VAR                "vlc_display"
 

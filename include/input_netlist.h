@@ -39,7 +39,7 @@ static __inline__ void input_NetlistFreePES( input_thread_t *p_input,
     p_ts_packet = p_pes_packet->p_first_ts;
     for( i_dummy = 0; i_dummy < p_pes_packet->i_ts_packets; i_dummy++ )
     {
-	ASSERT(p_ts_packet);
+        ASSERT(p_ts_packet);
 
 #ifdef INPUT_LIFO_TS_NETLIST
         p_input->netlist.i_ts_index--;

@@ -61,7 +61,7 @@ typedef struct vout_yuv_s
  * vout_buffer_t: rendering buffer
  *****************************************************************************
  * This structure store informations about a buffer. Buffers are not completely
- * cleared between displays, and modified areas needs to be stored.
+ * cleared between displays, and modified areas need to be stored.
  *****************************************************************************/
 typedef struct vout_buffer_s
 {
@@ -82,11 +82,18 @@ typedef struct vout_buffer_s
  * vout_thread_t: video output thread descriptor
  *****************************************************************************
  * Any independant video output device, such as an X11 window or a GGI device,
- * is represented by a video output thread, and described using following
+ * is represented by a video output thread, and described using the following
  * structure.
  *****************************************************************************/
-typedef void (vout_set_palette_t)( p_vout_thread_t p_vout,
-                                   u16 *red, u16 *green, u16 *blue, u16 *transp );
+typedef int  (vout_sys_create_t)    ( p_vout_thread_t p_vout,
+                                      char *psz_display, int i_root_window );
+typedef int  (vout_sys_init_t)      ( p_vout_thread_t p_vout );
+typedef void (vout_sys_end_t)       ( p_vout_thread_t p_vout );
+typedef void (vout_sys_destroy_t)   ( p_vout_thread_t p_vout );
+typedef int  (vout_sys_manage_t)    ( p_vout_thread_t p_vout );
+typedef void (vout_sys_display_t)   ( p_vout_thread_t p_vout );
+typedef void (vout_set_palette_t)   ( p_vout_thread_t p_vout, u16 *red,
+                                      u16 *green, u16 *blue, u16 *transp );
 
 typedef struct vout_thread_s
 {
@@ -100,6 +107,7 @@ typedef struct vout_thread_s
     vlc_mutex_t         change_lock;                   /* thread change lock */
     int *               pi_status;                  /* temporary status flag */
     p_vout_sys_t        p_sys;                       /* system output method */
+    int                 i_method;                          /* display method */
 
     /* Current display properties */
     u16                 i_changes;             /* changes made to the thread */
@@ -127,12 +135,20 @@ typedef struct vout_thread_s
     u32                 i_gray_pixel;                                /* gray */
     u32                 i_blue_pixel;                                /* blue */
 
+    /* method-dependant functions */
+    vout_sys_create_t *     p_sys_create;          /* allocate output method */
+    vout_sys_init_t *       p_sys_init;          /* initialize output method */
+    vout_sys_end_t *        p_sys_end;            /* terminate output method */
+    vout_sys_destroy_t *    p_sys_destroy;          /* destroy output method */
+    vout_sys_manage_t *     p_sys_manage;                   /* handle events */
+    vout_sys_display_t *    p_sys_display;         /* display rendered image */
+    vout_set_palette_t *    p_set_palette;              /* sets 8bpp palette */
+
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;           /* color or grayscale display */
     boolean_t           b_info;            /* print additionnal informations */
     boolean_t           b_interface;                     /* render interface */
     boolean_t           b_scale;                    /* allow picture scaling */
-    vout_set_palette_t *p_set_palette;                  /* sets 8bpp palette */
 
     /* Idle screens management */
     mtime_t             last_display_date;     /* last non idle display date */
@@ -158,7 +174,44 @@ typedef struct vout_thread_s
     /* Bitmap fonts */
     p_vout_font_t       p_default_font;                      /* default font */
     p_vout_font_t       p_large_font;                          /* large font */
+
 } vout_thread_t;
+
+/* Output methods */
+#define VOUT_DUMMY_METHOD       0x0000                 /* dummy video output */
+#define VOUT_X11_METHOD         0x0001                                /* X11 */
+#define VOUT_GGI_METHOD         0x0002         /* General Graphics Interface */
+#define VOUT_FB_METHOD          0x0003                  /* Linux framebuffer */
+#define VOUT_GLIDE_METHOD       0x0004                        /* Voodoo 3dfx */
+#define VOUT_DGA_METHOD         0x0005                  /* X11 DGA extension */
+#define VOUT_BEOS_METHOD        0x0006                     /* BeOS rendering */
+
+/* Get the fallback method */
+#ifdef VIDEO_X11
+#define VOUT_DEFAULT_METHOD "x11"
+#else
+#ifdef VIDEO_FB
+#define VOUT_DEFAULT_METHOD "fb"
+#else
+#ifdef VIDEO_GGI
+#define VOUT_DEFAULT_METHOD "ggi"
+#else
+#ifdef VIDEO_GLIDE
+#define VOUT_DEFAULT_METHOD "glide"
+#else
+#ifdef VIDEO_DGA
+#define VOUT_DEFAULT_METHOD "dga"
+#else
+#ifdef VIDEO_BEOS
+#define VOUT_DEFAULT_METHOD "beos"
+#else
+#define VOUT_DEFAULT_METHOD "dummy"
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
 
 /* Flags for changes - these flags are set in the i_changes field when another
  * thread changed a variable */
@@ -187,7 +240,7 @@ typedef struct vout_thread_s
  * Prototypes
  *****************************************************************************/
 vout_thread_t * vout_CreateThread       ( char *psz_display, int i_root_window,
-                                          int i_width, int i_height, int *pi_status );
+                                          int i_width, int i_height, int *pi_status, int i_method );
 void            vout_DestroyThread      ( vout_thread_t *p_vout, int *pi_status );
 picture_t *     vout_CreatePicture      ( vout_thread_t *p_vout, int i_type,
                                           int i_width, int i_height );

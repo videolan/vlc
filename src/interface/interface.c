@@ -68,13 +68,78 @@ static int      ParseChannel    ( intf_channel_t *p_channel, char *psz_str );
 intf_thread_t* intf_Create( void )
 {
     intf_thread_t *p_intf;
+    char * psz_method;
 
     /* Allocate structure */
     p_intf = malloc( sizeof( intf_thread_t ) );
     if( !p_intf )
     {
         intf_ErrMsg("error: %s\n", strerror( ENOMEM ) );
-	return( NULL );
+        return( NULL );
+    }
+
+    /* initialize method-dependent functions */
+    psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
+
+    if( !strcmp(psz_method, "dummy") )
+    {
+        p_intf->p_sys_create =    intf_DummySysCreate;
+        p_intf->p_sys_manage =    intf_DummySysManage;
+        p_intf->p_sys_destroy =   intf_DummySysDestroy;
+    }
+#ifdef VIDEO_X11
+    else if( !strcmp(psz_method, "x11") )
+    {
+        p_intf->p_sys_create =    intf_X11SysCreate;
+        p_intf->p_sys_manage =    intf_X11SysManage;
+        p_intf->p_sys_destroy =   intf_X11SysDestroy;
+    }
+#endif
+#ifdef VIDEO_FB
+    else if( !strcmp(psz_method, "fb") )
+    {
+        p_intf->p_sys_create =    intf_FBSysCreate;
+        p_intf->p_sys_manage =    intf_FBSysManage;
+        p_intf->p_sys_destroy =   intf_FBSysDestroy;
+    }
+#endif
+#ifdef VIDEO_GGI
+    else if( !strcmp(psz_method, "ggi") )
+    {
+        p_intf->p_sys_create =    intf_GGISysCreate;
+        p_intf->p_sys_manage =    intf_GGISysManage;
+        p_intf->p_sys_destroy =   intf_GGISysDestroy;
+    }
+#endif
+#ifdef VIDEO_DGA
+    else if( !strcmp(psz_method, "dga") )
+    {
+        p_intf->p_sys_create =    intf_DGASysCreate;
+        p_intf->p_sys_manage =    intf_DGASysManage;
+        p_intf->p_sys_destroy =   intf_DGASysDestroy;
+    }
+#endif
+#ifdef VIDEO_GLIDE
+    else if( !strcmp(psz_method, "glide") )
+    {
+        p_intf->p_sys_create =    intf_GlideSysCreate;
+        p_intf->p_sys_manage =    intf_GlideSysManage;
+        p_intf->p_sys_destroy =   intf_GlideSysDestroy;
+    }
+#endif
+#ifdef VIDEO_BEOS
+    else if( !strcmp(psz_method, "beos") )
+    {
+        p_intf->p_sys_create =    intf_BeSysCreate;
+        p_intf->p_sys_manage =    intf_BeSysManage;
+        p_intf->p_sys_destroy =   intf_BeSysDestroy;
+    }
+#endif
+    else
+    {
+        intf_ErrMsg( "error: video output method not available\n" );
+        free( p_intf );
+        return( NULL );
     }
 
     /* Initialize structure */
@@ -92,15 +157,15 @@ intf_thread_t* intf_Create( void )
     if( p_intf->p_console == NULL )
     {
         intf_ErrMsg("error: can't create control console\n");
-	free( p_intf );
+        free( p_intf );
         return( NULL );
     }
-    if( intf_SysCreate( p_intf ) )
+    if( p_intf->p_sys_create( p_intf ) )
     {
-	intf_ErrMsg("error: can't create interface\n");
-	intf_ConsoleDestroy( p_intf->p_console );
-	free( p_intf );
-	return( NULL );
+        intf_ErrMsg("error: can't create interface\n");
+        intf_ConsoleDestroy( p_intf->p_console );
+        free( p_intf );
+        return( NULL );
     }
 
     intf_Msg("Interface initialized\n");
@@ -118,7 +183,7 @@ void intf_Run( intf_thread_t *p_intf )
      * the script could be executed but failed */
     if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
     {
-	intf_ErrMsg("warning: error(s) during startup script\n");
+        intf_ErrMsg("warning: error(s) during startup script\n");
     }
 
     /* Main loop */
@@ -128,7 +193,7 @@ void intf_Run( intf_thread_t *p_intf )
         intf_FlushMsg();
 
         /* Manage specific interface */
-        intf_SysManage( p_intf );
+        p_intf->p_sys_manage( p_intf );
 
         /* Check attached threads status */
         if( (p_intf->p_vout != NULL) && p_intf->p_vout->b_error )
@@ -157,7 +222,7 @@ void intf_Run( intf_thread_t *p_intf )
 void intf_Destroy( intf_thread_t *p_intf )
 {
     /* Destroy interfaces */
-    intf_SysDestroy( p_intf );
+    p_intf->p_sys_destroy( p_intf );
     intf_ConsoleDestroy( p_intf->p_console );
 
     /* Unload channels */
@@ -249,7 +314,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
     case 'M':                                                 /* toggle mute */
     case 'm':
         // ??
-        break;	
+        break;
     case 'g':                                                     /* gamma - */
         if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )
         {
