@@ -2,7 +2,7 @@
 # idctaltivec.S : Altivec IDCT code
 #*****************************************************************************
 # Copyright (C) 1999, 2001 VideoLAN
-# $Id: idctaltivec.S,v 1.1 2001/09/05 16:07:49 massiot Exp $
+# $Id: idctaltivecasm.S,v 1.1 2001/09/05 16:20:23 massiot Exp $
 # 
 # Author: Paul Mackerras <paulus@linuxcare.com>
 # 
