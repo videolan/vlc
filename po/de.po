@@ -147,7 +147,7 @@ msgstr ""
 
 #: src/libvlc.h:68
 msgid "plugin search path"
-msgstr ""
+msgstr "Plugin-Such-Pfad"
 
 #: src/libvlc.h:70
 msgid ""
@@ -473,7 +473,9 @@ msgstr "Netzwerk Schnittstelle"
 msgid ""
 "If you have several interfaces on your Linux machine and use the VLAN "
 "solution, you may indicate here which interface to use."
-msgstr ""
+msgstr "Wenn Sie mehrere Benutzeroberflächen auf Ihrem Linux-Rechner "
+"haben und die VLAN-Lösung (VLAN solution) benutzen, können Sie hier "
+"angeben, welche Benutzeroberfläche benutzt werden soll."
 
 #: src/libvlc.h:217
 msgid "network interface address"
@@ -949,7 +951,7 @@ msgstr "Hauptprogramm"
 
 #: src/libvlc.h:561
 msgid "print help"
-msgstr "Hilfetext anzeigen"
+msgstr "Hilfetexte anzeigen"
 
 #: src/libvlc.h:563
 msgid "print detailed help"
@@ -2048,7 +2050,7 @@ msgstr "Lautstärke verringern"
 #: modules/gui/gtk/gtk_interface.c:471 modules/gui/gtk/gtk_interface.c:1308
 #: modules/gui/macosx/intf.m:306 modules/gui/macosx/controls.m:686
 msgid "Mute"
-msgstr ""
+msgstr "Stumm"
 
 #: modules/gui/gtk/gnome_interface.c:148 modules/gui/gtk/gnome_interface.c:972
 #: modules/gui/gtk/gtk_interface.c:486 modules/gui/gtk/gtk_interface.c:1323
@@ -2304,7 +2306,7 @@ msgstr "Stream öffnen"
 #: modules/gui/gtk/gnome_interface.c:1524 modules/gui/gtk/gtk_interface.c:1839
 #: modules/gui/macosx/open.m:166
 msgid "Media Resource Locator (MRL)"
-msgstr ""
+msgstr "Medien-Finder (MRL)"
 
 #: modules/gui/gtk/gnome_interface.c:1546 modules/gui/gtk/gtk_interface.c:1861
 msgid "Open Target:"
@@ -2315,7 +2317,7 @@ msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
 msgstr ""
-"Sonst können Sie ein MRL mit einer dieser vordefinierten Ziele erzeugen:"
+"Sonst können Sie ein Medien-Finder (MRL) mit einer dieser vordefinierten Ziele erzeugen:"
 
 #: modules/gui/gtk/gnome_interface.c:1610
 #: modules/gui/gtk/gnome_interface.c:2105 modules/gui/gtk/gtk_interface.c:1925
@@ -2813,7 +2815,7 @@ msgstr "Nachrichten:"
 
 #: modules/gui/macosx/intf.m:245
 msgid "VLC - Controller"
-msgstr "VLC - Kontrollen"
+msgstr "VLC - Einstellungen"
 
 #: modules/gui/macosx/intf.m:250 modules/gui/macosx/intf.m:294
 #: modules/gui/macosx/controls.m:644
@@ -2865,11 +2867,11 @@ msgstr "VLC beenden"
 
 #: modules/gui/macosx/intf.m:275
 msgid "Open..."
-msgstr "öffnen..."
+msgstr "Öffnen..."
 
 #: modules/gui/macosx/intf.m:276 modules/gui/win32/strings.cpp:90
 msgid "Open File..."
-msgstr "Datei _öffnen..."
+msgstr "Datei öffnen..."
 
 #: modules/gui/macosx/intf.m:277 modules/gui/win32/strings.cpp:91
 msgid "Open Disc..."
@@ -2877,11 +2879,11 @@ msgstr "Volume öffnen..."
 
 #: modules/gui/macosx/intf.m:278
 msgid "Open Network..."
-msgstr "Netzwerk öffnen"
+msgstr "Netzwerk öffnen..."
 
 #: modules/gui/macosx/intf.m:279
 msgid "Open Recent"
-msgstr "Letzte Dateien öffnen"
+msgstr "Benutzte Dokumente"
 
 #. Recent Items Menu
 #: modules/gui/macosx/intf.m:280 modules/gui/macosx/intf.m:1419
@@ -2914,7 +2916,7 @@ msgstr "Alles auswählen"
 
 #: modules/gui/macosx/intf.m:289 modules/gui/win32/strings.cpp:77
 msgid "Controls"
-msgstr "Kontrollen"
+msgstr "Einstellungen"
 
 #: modules/gui/macosx/intf.m:296 modules/gui/macosx/controls.m:663
 msgid "Loop"
@@ -2950,7 +2952,7 @@ msgstr "Alle nach vorne bringen"
 
 #: modules/gui/macosx/intf.m:324
 msgid "Help"
-msgstr "_Hilfe"
+msgstr "Hilfe"
 
 #: modules/gui/macosx/intf.m:325
 msgid "ReadMe..."
@@ -2966,7 +2968,7 @@ msgstr "VideoLAN Website"
 
 #: modules/gui/macosx/intf.m:328
 msgid "License"
-msgstr "Lizenz"
+msgstr "Lizenzvertrag"
 
 #. error panel
 #: modules/gui/macosx/intf.m:335
@@ -3063,7 +3065,7 @@ msgstr "QNX RTOS Modul"
 
 #: modules/gui/qt/qt.cpp:47
 msgid "Qt interface module"
-msgstr "Qt Oberflächen-Modul"
+msgstr "QT Oberflächen-Modul"
 
 #. ****************************************************************************
 #. * Module descriptor
