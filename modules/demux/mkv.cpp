@@ -569,6 +569,10 @@ static int Open( vlc_object_t * p_this )
             {
                 tk.fmt.i_codec = VLC_FOURCC( 'D', 'I', 'V', '3' );
             }
+            else if( !strcmp( tk.psz_codec, "V_MPEG4/ISO/AVC" ) )
+            {
+                tk.fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
+            }
             else
             {
                 tk.fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
