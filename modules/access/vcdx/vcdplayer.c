@@ -48,16 +48,14 @@
 #endif
 
 /*!
-  Return true if playback control (PBC) is on
+  Return VLC_TRUE if playback control (PBC) is on
 */
-bool
-vcdplayer_pbc_is_on(const thread_vcd_data_t *p_vcd) 
+vlc_bool_t vcdplayer_pbc_is_on( const thread_vcd_data_t *p_vcd ) 
 {
   return VCDINFO_INVALID_ENTRY != p_vcd->cur_lid; 
 }
 
-static void
-vcdplayer_update_entry( input_thread_t * p_input, uint16_t ofs, 
+static void vcdplayer_update_entry( input_thread_t * p_input, uint16_t ofs, 
                         uint16_t *entry, const char *label)
 {
   thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
@@ -79,10 +77,9 @@ vcdplayer_update_entry( input_thread_t * p_input, uint16_t ofs,
    The navigations rules here may be sort of made up, but the intent 
    is to do something that's probably right or helpful.
 
-   return true if the caller should return.
+   return VLC_TRUE if the caller should return.
 */
-vcdplayer_read_status_t
-vcdplayer_non_pbc_nav ( input_thread_t * p_input )
+vcdplayer_read_status_t vcdplayer_non_pbc_nav ( input_thread_t * p_input )
 {
   thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
 
@@ -260,8 +257,7 @@ vcdplayer_pbc_nav ( input_thread_t * p_input )
   confused with a user's list of favorite things to play or the 
   "next" field of a LID which moves us to a different LID.
  */
-bool
-vcdplayer_inc_play_item( input_thread_t *p_input )
+vlc_bool_t vcdplayer_inc_play_item( input_thread_t *p_input )
 {
   thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
 
@@ -269,24 +265,24 @@ vcdplayer_inc_play_item( input_thread_t *p_input )
 
   dbg_print(INPUT_DBG_CALL, "called pli: %d", p_vcd->pdi);
 
-  if ( NULL == p_vcd || NULL == p_vcd->pxd.pld  ) return false;
+  if ( NULL == p_vcd || NULL == p_vcd->pxd.pld  ) return VLC_FALSE;
 
   noi = vcdinf_pld_get_noi(p_vcd->pxd.pld);
   
-  if ( noi <= 0 ) return false;
+  if ( noi <= 0 ) return VLC_FALSE;
   
   /* Handle delays like autowait or wait here? */
 
   p_vcd->pdi++;
 
-  if ( p_vcd->pdi < 0 || p_vcd->pdi >= noi ) return false;
+  if ( p_vcd->pdi < 0 || p_vcd->pdi >= noi ) return VLC_FALSE;
 
   else {
     uint16_t trans_itemid_num=vcdinf_pld_get_play_item(p_vcd->pxd.pld, 
                                                        p_vcd->pdi);
     vcdinfo_itemid_t trans_itemid;
 
-    if (VCDINFO_INVALID_ITEMID == trans_itemid_num) return false;
+    if (VCDINFO_INVALID_ITEMID == trans_itemid_num) return VLC_FALSE;
     
     vcdinfo_classify_itemid(trans_itemid_num, &trans_itemid);
     dbg_print(INPUT_DBG_PBC, "  play-item[%d]: %s",
@@ -298,10 +294,9 @@ vcdplayer_inc_play_item( input_thread_t *p_input )
 /*!
   Play item assocated with the "default" selection.
 
-  Return false if there was some problem.
+  Return VLC_FALSE if there was some problem.
 */
-bool
-vcdplayer_play_default( input_thread_t * p_input )
+vlc_bool_t vcdplayer_play_default( input_thread_t * p_input )
 {
   thread_vcd_data_t *p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
 
@@ -339,7 +334,7 @@ vcdplayer_play_default( input_thread_t * p_input )
     switch (p_vcd->pxd.descriptor_type) {
     case PSD_TYPE_SELECTION_LIST:
     case PSD_TYPE_EXT_SELECTION_LIST:
-      if (p_vcd->pxd.psd == NULL) return false;
+      if (p_vcd->pxd.psd == NULL) return VLC_FALSE;
       vcdplayer_update_entry( p_input, 
 			      vcdinfo_get_default_offset(p_vcd->vcd, 
 							 p_vcd->cur_lid), 
@@ -350,7 +345,7 @@ vcdplayer_play_default( input_thread_t * p_input )
     case PSD_TYPE_END_LIST:
     case PSD_TYPE_COMMAND_LIST:
       LOG_WARN( "There is no PBC 'default' selection here" );
-      return false;
+      return VLC_FALSE;
     }
 #endif /* LIBVCD_VERSION (< 0.7.21) */
     
@@ -372,17 +367,16 @@ vcdplayer_play_default( input_thread_t * p_input )
 /*!
   Play item assocated with the "next" selection.
 
-  Return false if there was some problem.
+  Return VLC_FALSE if there was some problem.
 */
-bool
-vcdplayer_play_next( input_thread_t * p_input )
+vlc_bool_t vcdplayer_play_next( input_thread_t * p_input )
 {
   thread_vcd_data_t *p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
 
   vcdinfo_obj_t     *obj;
   vcdinfo_itemid_t   itemid;
 
-  if (!p_vcd) return false;
+  if (!p_vcd) return VLC_FALSE;
 
   dbg_print( (INPUT_DBG_CALL|INPUT_DBG_PBC), 
 	     "current: %d" , p_vcd->play_item.num);
@@ -398,7 +392,7 @@ vcdplayer_play_next( input_thread_t * p_input )
     switch (p_vcd->pxd.descriptor_type) {
     case PSD_TYPE_SELECTION_LIST:
     case PSD_TYPE_EXT_SELECTION_LIST:
-      if (p_vcd->pxd.psd == NULL) return false;
+      if (p_vcd->pxd.psd == NULL) return VLC_FALSE;
       vcdplayer_update_entry( p_input, 
 			      vcdinf_psd_get_next_offset(p_vcd->pxd.psd), 
 			      &itemid.num, "next");
@@ -406,7 +400,7 @@ vcdplayer_play_next( input_thread_t * p_input )
       break;
 
     case PSD_TYPE_PLAY_LIST: 
-      if (p_vcd->pxd.pld == NULL) return false;
+      if (p_vcd->pxd.pld == NULL) return VLC_FALSE;
       vcdplayer_update_entry( p_input, 
 			      vcdinf_pld_get_next_offset(p_vcd->pxd.pld), 
 			      &itemid.num, "next");
@@ -416,7 +410,7 @@ vcdplayer_play_next( input_thread_t * p_input )
     case PSD_TYPE_END_LIST:
     case PSD_TYPE_COMMAND_LIST:
       LOG_WARN( "There is no PBC 'next' selection here" );
-      return false;
+      return VLC_FALSE;
     }
   } else {
 
@@ -446,7 +440,7 @@ vcdplayer_play_next( input_thread_t * p_input )
 	itemid.num = p_vcd->play_item.num+1;
       } else {
 	LOG_WARN( "At the end - non-PBC 'next' not possible here" );
-	return false;
+	return VLC_FALSE;
       }
       
       break;
@@ -455,10 +449,10 @@ vcdplayer_play_next( input_thread_t * p_input )
       {
 	/* Should have handled above. */
 	LOG_WARN( "Internal inconsistency - should not have gotten here." );
-	return false;
+	return VLC_FALSE;
       }
     default: 
-      return false;
+      return VLC_FALSE;
     }
   }
 
@@ -470,10 +464,9 @@ vcdplayer_play_next( input_thread_t * p_input )
 /*!
   Play item assocated with the "prev" selection.
 
-  Return false if there was some problem.
+  Return VLC_FALSE if there was some problem.
 */
-bool
-vcdplayer_play_prev( input_thread_t * p_input )
+vlc_bool_t vcdplayer_play_prev( input_thread_t * p_input )
 {
   thread_vcd_data_t *p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
 
@@ -492,7 +485,7 @@ vcdplayer_play_prev( input_thread_t * p_input )
     switch (p_vcd->pxd.descriptor_type) {
     case PSD_TYPE_SELECTION_LIST:
     case PSD_TYPE_EXT_SELECTION_LIST:
-      if (p_vcd->pxd.psd == NULL) return false;
+      if (p_vcd->pxd.psd == NULL) return VLC_FALSE;
       vcdplayer_update_entry( p_input, 
 			      vcdinf_psd_get_prev_offset(p_vcd->pxd.psd), 
 			      &itemid.num, "prev");
@@ -500,7 +493,7 @@ vcdplayer_play_prev( input_thread_t * p_input )
       break;
 
     case PSD_TYPE_PLAY_LIST: 
-      if (p_vcd->pxd.pld == NULL) return false;
+      if (p_vcd->pxd.pld == NULL) return VLC_FALSE;
       vcdplayer_update_entry( p_input, 
 			      vcdinf_pld_get_prev_offset(p_vcd->pxd.pld), 
 			      &itemid.num, "prev");
@@ -510,7 +503,7 @@ vcdplayer_play_prev( input_thread_t * p_input )
     case PSD_TYPE_END_LIST:
     case PSD_TYPE_COMMAND_LIST:
       LOG_WARN( "There is no PBC 'prev' selection here" );
-      return false;
+      return VLC_FALSE;
     }
   } else {
 
@@ -523,7 +516,7 @@ vcdplayer_play_prev( input_thread_t * p_input )
       itemid.num = p_vcd->play_item.num-1;
     } else {
       LOG_WARN( "At the beginning - non-PBC 'prev' not possible here" );
-      return false;
+      return VLC_FALSE;
     }
       
   }
@@ -536,10 +529,9 @@ vcdplayer_play_prev( input_thread_t * p_input )
 /*!
   Play item assocated with the "return" selection.
 
-  Return false if there was some problem.
+  Return VLC_FALSE if there was some problem.
 */
-bool
-vcdplayer_play_return( input_thread_t * p_input )
+vlc_bool_t vcdplayer_play_return( input_thread_t * p_input )
 {
   thread_vcd_data_t *p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
 
@@ -558,7 +550,7 @@ vcdplayer_play_return( input_thread_t * p_input )
     switch (p_vcd->pxd.descriptor_type) {
     case PSD_TYPE_SELECTION_LIST:
     case PSD_TYPE_EXT_SELECTION_LIST:
-      if (p_vcd->pxd.psd == NULL) return false;
+      if (p_vcd->pxd.psd == NULL) return VLC_FALSE;
       vcdplayer_update_entry( p_input, 
 			      vcdinf_psd_get_return_offset(p_vcd->pxd.psd), 
 			      &itemid.num, "return");
@@ -566,7 +558,7 @@ vcdplayer_play_return( input_thread_t * p_input )
       break;
 
     case PSD_TYPE_PLAY_LIST: 
-      if (p_vcd->pxd.pld == NULL) return false;
+      if (p_vcd->pxd.pld == NULL) return VLC_FALSE;
       vcdplayer_update_entry( p_input, 
 			      vcdinf_pld_get_return_offset(p_vcd->pxd.pld), 
 			      &itemid.num, "return");
@@ -576,7 +568,7 @@ vcdplayer_play_return( input_thread_t * p_input )
     case PSD_TYPE_END_LIST:
     case PSD_TYPE_COMMAND_LIST:
       LOG_WARN( "There is no PBC 'return' selection here" );
-      return false;
+      return VLC_FALSE;
     }
   } else {
 

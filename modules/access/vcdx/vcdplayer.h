@@ -65,8 +65,8 @@ typedef enum {
 typedef struct thread_vcd_data_s
 {
   vcdinfo_obj_t *vcd;                   /* CD device descriptor */
-  bool           in_still;              /*  true if in still */
-  bool           b_svd;                 /*  true if we have SVD info */
+  vlc_bool_t   in_still;              /*  true if in still */
+  vlc_bool_t   b_svd;                 /*  true if we have SVD info */
   unsigned int num_tracks;              /* Nb of tracks (titles) */
   unsigned int num_segments;            /* Nb of segments */
   unsigned int num_entries;             /* Nb of entries */
@@ -99,7 +99,7 @@ typedef struct thread_vcd_data_s
   lsn_t *      p_sectors;               /* Track sectors */
   lsn_t *      p_entries;               /* Entry points */
   lsn_t *      p_segments;              /* Segments */
-  bool         b_valid_ep;              /* Valid entry points flag */
+  vlc_bool_t   b_valid_ep;              /* Valid entry points flag */
   vlc_bool_t   b_end_of_track;          /* If the end of track was reached */
   int          i_debug;                 /* Debugging mask */
 
@@ -117,40 +117,40 @@ typedef struct thread_vcd_data_s
   confused with a user's list of favorite things to play or the 
   "next" field of a LID which moves us to a different LID.
  */
-bool vcdplayer_inc_play_item( input_thread_t *p_input );
+vlc_bool_t vcdplayer_inc_play_item( input_thread_t *p_input );
 
 /*!
   Return true if playback control (PBC) is on
 */
-bool vcdplayer_pbc_is_on(const thread_vcd_data_t *p_this);
+vlc_bool_t vcdplayer_pbc_is_on(const thread_vcd_data_t *p_this);
 
 /*!
   Play item assocated with the "default" selection.
 
   Return false if there was some problem.
 */
-bool vcdplayer_play_default( input_thread_t * p_input );
+vlc_bool_t vcdplayer_play_default( input_thread_t * p_input );
 
 /*!
   Play item assocated with the "next" selection.
 
   Return false if there was some problem.
 */
-bool vcdplayer_play_next( input_thread_t * p_input );
+vlc_bool_t vcdplayer_play_next( input_thread_t * p_input );
 
 /*!
   Play item assocated with the "prev" selection.
 
   Return false if there was some problem.
 */
-bool vcdplayer_play_prev( input_thread_t * p_input );
+vlc_bool_t vcdplayer_play_prev( input_thread_t * p_input );
 
 /*!
   Play item assocated with the "return" selection.
 
   Return false if there was some problem.
 */
-bool
+vlc_bool_t
 vcdplayer_play_return( input_thread_t * p_input );
 
 vcdplayer_read_status_t vcdplayer_pbc_nav ( input_thread_t * p_input );
