@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.9 2002/12/30 17:28:31 gbazin Exp $
+ * $Id: lpcm.c,v 1.10 2003/01/02 20:48:28 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -259,8 +259,6 @@ static void DecodeFrame( dec_thread_t * p_dec )
         p_dec->output_format.i_original_channels = i_original_channels;
         p_dec->output_format.i_physical_channels
                    = i_original_channels & AOUT_CHAN_PHYSMASK;
-        p_dec->output_format.i_bytes_per_frame = i_nb_channels * 2;
-        p_dec->output_format.i_frame_length = 1;
         aout_DateInit( &p_dec->end_date, i_rate );
         p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
                                            &p_dec->p_aout,

@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.3 2002/12/30 17:28:31 gbazin Exp $
+ * $Id: adpcm.c,v 1.4 2003/01/02 20:48:28 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -305,9 +305,6 @@ static int InitThread( adec_thread_t * p_adec )
     p_adec->output_format.i_physical_channels = 
         p_adec->output_format.i_original_channels =
             pi_channels_maps[p_adec->p_wf->nChannels];
-    p_adec->output_format.i_bytes_per_frame =
-        p_adec->p_wf->nChannels * 2;
-    p_adec->output_format.i_frame_length = 1;
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
 

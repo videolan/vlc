@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.10 2002/12/30 17:28:31 gbazin Exp $
+ * $Id: vorbis.c,v 1.11 2003/01/02 20:48:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -224,9 +224,6 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         p_dec->output_format.i_original_channels =
             pi_channels_maps[p_dec->vi.channels];
     p_dec->output_format.i_rate = p_dec->vi.rate;
-    p_dec->output_format.i_bytes_per_frame =
-        p_dec->vi.channels * sizeof(float);
-    p_dec->output_format.i_frame_length = 1;
 
     aout_DateInit( &p_dec->end_date, p_dec->vi.rate );
     p_dec->p_aout = NULL;

@@ -180,9 +180,6 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
         p_dec->output_format.i_rate = p_pcm->samplerate;
         p_dec->output_format.i_physical_channels = i_channels;
         p_dec->output_format.i_original_channels = i_channels;
-        p_dec->output_format.i_bytes_per_frame =
-            p_pcm->channels * sizeof(mad_fixed_t);
-        p_dec->output_format.i_frame_length = 1;
         aout_DateInit( &p_dec->end_date, p_pcm->samplerate );
         p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
                                            &p_dec->p_aout,

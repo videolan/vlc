@@ -2,7 +2,7 @@
  * decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: decoder.c,v 1.10 2002/12/30 17:28:31 gbazin Exp $
+ * $Id: decoder.c,v 1.11 2003/01/02 20:48:28 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -192,9 +192,6 @@ static void DecodeThread( adec_thread_t * p_dec )
                ( sync_info.b_stereo ? AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT :
                  AOUT_CHAN_CENTER );
             p_dec->output_format.i_rate     = sync_info.sample_rate;
-            p_dec->output_format.i_bytes_per_frame =
-               ( sync_info.b_stereo ? 2 : 1 ) * sizeof(float);
-            p_dec->output_format.i_frame_length = 1;
             aout_DateInit( &p_dec->end_date, sync_info.sample_rate );
             p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
                                                &p_dec->p_aout,

@@ -2,7 +2,7 @@
  * dec.c : audio output API towards decoders
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dec.c,v 1.5 2002/12/28 02:02:18 massiot Exp $
+ * $Id: dec.c,v 1.6 2003/01/02 20:48:28 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -69,7 +69,7 @@ static aout_input_t * DecNew( aout_instance_t * p_aout,
 
     p_input->b_changed = 0;
     p_input->b_error = 1;
-    aout_FormatPrepare( &p_format );
+    aout_FormatPrepare( p_format );
     memcpy( &p_input->input, p_format,
             sizeof(audio_sample_format_t) );
 
