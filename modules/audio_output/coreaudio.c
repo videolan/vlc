@@ -603,12 +603,12 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
     p_buffer = aout_OutputNextBuffer( p_aout, current_date, B_SPDI );
 #undef B_SPDI
 
+#define BUFFER outOutputData->mBuffers[ p_sys->i_stream_index ]
     if( p_buffer != NULL )
     {
         /* move data into output data buffer */
-        p_aout->p_vlc->pf_memcpy( outOutputData->mBuffers[ p_sys->i_stream_index ].mData, 
-                                  p_buffer->p_buffer, p_sys->i_bufframe_size *
-                                  p_sys->stream_format.mBytesPerFrame );
+        p_aout->p_vlc->pf_memcpy( BUFFER.mData,
+                                  p_buffer->p_buffer, p_buffer->i_nb_bytes );
 
         aout_BufferFree( p_buffer );
     }
@@ -618,7 +618,7 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
         {
             UInt32 i, i_size = p_sys->i_bufframe_size * 
                                p_sys->stream_format.mChannelsPerFrame;
-            float * p = (float *)outOutputData->mBuffers[ p_sys->i_stream_index ].mData;
+            float * p = (float *)BUFFER.mData;
 
             for( i = 0; i < i_size; i++ )
             {
@@ -627,11 +627,10 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
         }
         else
         {
-            memset( outOutputData->mBuffers[ p_sys->i_stream_index ].mData, 
-                    0, p_sys->i_bufframe_size * 
-                    p_sys->stream_format.mBytesPerFrame );
+            p_aout->p_vlc->pf_memset( BUFFER.mData, 0, BUFFER.mDataByteSize );
         }
     }
+#undef BUFFER
 
     return( noErr );     
 }
