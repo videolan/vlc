@@ -510,7 +510,53 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
  *****************************************************************************/
 void vdec_Motion422( macroblock_t * p_mb, motion_arg_t * p_motion )
 {
-    fprintf(stderr, "La chrominance va chier dans la colle.\n");
+    /* Luminance */
+    MotionComponent( p_motion->p_source->p_y
+                       + (p_mb->i_l_x + (p_motion->i_mv_x >> 1))
+                       + (p_mb->i_motion_l_y + p_motion->i_offset
+                          + (p_motion->i_mv_y >> 1)
+                          + p_motion->b_source_field)
+                         * p_mb->p_picture->i_width,
+                     p_mb->p_picture->p_y
+                       + (p_mb->i_l_x)
+                       + (p_mb->i_motion_l_y + p_motion->b_dest_field)
+                         * p_mb->p_picture->i_width,
+                     16, p_motion->i_height, p_mb->i_l_stride,
+                     (p_motion->b_average << 2)
+                       | ((p_motion->i_mv_y & 1) << 1)
+                       | (p_motion->i_mv_x & 1) );
+
+    /* Chrominance Cr */
+    MotionComponent( p_motion->p_source->p_u
+                       + (p_mb->i_c_x + ((p_motion->i_mv_x/2) >> 1))
+                       + ((p_mb->i_motion_c_y + p_motion->i_offset
+                          + ((p_motion->i_mv_y) >> 1))
+                          + p_motion->b_source_field)
+                         * p_mb->p_picture->i_chroma_width,
+                     p_mb->p_picture->p_u
+                       + (p_mb->i_c_x)
+                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
+                         * p_mb->p_picture->i_chroma_width,
+                     8, p_motion->i_height, p_mb->i_c_stride,
+                     (p_motion->b_average << 2)
+                       | ((p_motion->i_mv_y & 1) << 1)
+                       | ((p_motion->i_mv_x/2) & 1) );
+
+    /* Chrominance Cb */
+    MotionComponent( p_motion->p_source->p_v
+                       + (p_mb->i_c_x + ((p_motion->i_mv_x/2) >> 1))
+                       + ((p_mb->i_motion_c_y + p_motion->i_offset
+                          + ((p_motion->i_mv_y) >> 1))
+                          + p_motion->b_source_field)
+                         * p_mb->p_picture->i_chroma_width,
+                     p_mb->p_picture->p_v
+                       + (p_mb->i_c_x)
+                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
+                         * p_mb->p_picture->i_chroma_width,
+                     8, p_motion->i_height, p_mb->i_c_stride,
+                     (p_motion->b_average << 2)
+                       | ((p_motion->i_mv_y & 1) << 1)
+                       | ((p_motion->i_mv_x/2) & 1) );
 }
 
 /*****************************************************************************
@@ -518,5 +564,51 @@ void vdec_Motion422( macroblock_t * p_mb, motion_arg_t * p_motion )
  *****************************************************************************/
 void vdec_Motion444( macroblock_t * p_mb, motion_arg_t * p_motion )
 {
-    fprintf(stderr, "La chrominance va chier dans le pastis.\n");
+    /* Luminance */
+    MotionComponent( p_motion->p_source->p_y
+                       + (p_mb->i_l_x + (p_motion->i_mv_x >> 1))
+                       + (p_mb->i_motion_l_y + p_motion->i_offset
+                          + (p_motion->i_mv_y >> 1)
+                          + p_motion->b_source_field)
+                         * p_mb->p_picture->i_width,
+                     p_mb->p_picture->p_y
+                       + (p_mb->i_l_x)
+                       + (p_mb->i_motion_l_y + p_motion->b_dest_field)
+                         * p_mb->p_picture->i_width,
+                     16, p_motion->i_height, p_mb->i_l_stride,
+                     (p_motion->b_average << 2)
+                       | ((p_motion->i_mv_y & 1) << 1)
+                       | (p_motion->i_mv_x & 1) );
+
+    /* Chrominance Cr */
+    MotionComponent( p_motion->p_source->p_u
+                       + (p_mb->i_c_x + (p_motion->i_mv_x >> 1))
+                       + ((p_mb->i_motion_c_y + p_motion->i_offset
+                          + (p_motion->i_mv_y >> 1))
+                          + p_motion->b_source_field)
+                         * p_mb->p_picture->i_chroma_width,
+                     p_mb->p_picture->p_u
+                       + (p_mb->i_c_x)
+                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
+                         * p_mb->p_picture->i_chroma_width,
+                     16, p_motion->i_height, p_mb->i_c_stride,
+                     (p_motion->b_average << 2)
+                       | ((p_motion->i_mv_y & 1) << 1)
+                       | (p_motion->i_mv_x & 1) );
+
+    /* Chrominance Cb */
+    MotionComponent( p_motion->p_source->p_v
+                       + (p_mb->i_c_x + (p_motion->i_mv_x >> 1))
+                       + ((p_mb->i_motion_c_y + p_motion->i_offset
+                          + (p_motion->i_mv_y >> 1))
+                          + p_motion->b_source_field)
+                         * p_mb->p_picture->i_chroma_width,
+                     p_mb->p_picture->p_v
+                       + (p_mb->i_c_x)
+                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
+                         * p_mb->p_picture->i_chroma_width,
+                     16, p_motion->i_height, p_mb->i_c_stride,
+                     (p_motion->b_average << 2)
+                       | ((p_motion->i_mv_y & 1) << 1)
+                       | (p_motion->i_mv_x & 1) );
 }
