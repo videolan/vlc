@@ -427,7 +427,7 @@ static void ErrorThread( vpar_thread_t *p_vpar )
 /*****************************************************************************
  * EndThread: thread destruction
  *****************************************************************************
- * This function is called when the thread ends after a sucessfull
+ * This function is called when the thread ends after a sucessful
  * initialization.
  *****************************************************************************/
 static void EndThread( vpar_thread_t *p_vpar )

@@ -316,7 +316,7 @@ static void ErrorThread (adec_thread_t *p_adec)
 /*****************************************************************************
  * EndThread : audio decoder thread destruction
  *****************************************************************************
- * This function is called when the thread ends after a sucessfull
+ * This function is called when the thread ends after a sucessful
  * initialization.
  *****************************************************************************/
 static void EndThread (adec_thread_t *p_adec)

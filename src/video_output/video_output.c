@@ -1214,7 +1214,7 @@ static void ErrorThread( vout_thread_t *p_vout )
 /*****************************************************************************
  * EndThread: thread destruction
  *****************************************************************************
- * This function is called when the thread ends after a sucessfull
+ * This function is called when the thread ends after a sucessful
  * initialization. It frees all ressources allocated by InitThread.
  *****************************************************************************/
 static void EndThread( vout_thread_t *p_vout )

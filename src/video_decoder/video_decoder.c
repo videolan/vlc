@@ -210,7 +210,7 @@ static void ErrorThread( vdec_thread_t *p_vdec )
 /*****************************************************************************
  * EndThread: thread destruction
  *****************************************************************************
- * This function is called when the thread ends after a sucessfull
+ * This function is called when the thread ends after a sucessful
  * initialization.
  *****************************************************************************/
 static void EndThread( vdec_thread_t *p_vdec )

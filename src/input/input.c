@@ -942,7 +942,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                 {
                   /* The payload of the PES packet is shorter than the 14 bytes
                      we would read. This means that high packet lost occured
-                     so the PES won't be usefull for any decoder. Moreover,
+                     so the PES won't be useful for any decoder. Moreover,
                      this should never happen so we can trash the packet and
                      exit roughly without regrets */
                   intf_DbgMsg("PES packet too short: trashed\n");

@@ -57,7 +57,7 @@ void    _intf_DbgMsgImm     ( char *psz_file, char *psz_function, int i_line,
  * intf_FlushMsg macro and function
  *****************************************************************************
  * intf_FlushMsg is a function which flushs message queue and print all messages
- * remaining. It is only usefull if INTF_MSG_QUEUE is defined. In this case, it
+ * remaining. It is only useful if INTF_MSG_QUEUE is defined. In this case, it
  * is really a function. In the other case, it is a macro doing nothing.
  *****************************************************************************/
 #ifdef INTF_MSG_QUEUE

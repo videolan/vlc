@@ -250,7 +250,7 @@ static void ErrorThread( spudec_thread_t *p_spudec )
 /*****************************************************************************
  * EndThread: thread destruction
  *****************************************************************************
- * This function is called when the thread ends after a sucessfull
+ * This function is called when the thread ends after a sucessful
  * initialization.
  *****************************************************************************/
 static void EndThread( spudec_thread_t *p_spudec )

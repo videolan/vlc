@@ -147,7 +147,7 @@ typedef struct es_descriptor_t
 #ifdef STATS
     /* Stats */
     count_t                 c_bytes;                     /* total bytes read */
-    count_t                 c_payload_bytes;/* total of payload usefull bytes */
+    count_t                 c_payload_bytes;/* total of payload useful bytes */
     count_t                 c_packets;                 /* total packets read */
     count_t                 c_invalid_packets;       /* invalid packets read */
     /* XXX?? ... other stats */
