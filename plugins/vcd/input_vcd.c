@@ -291,7 +291,6 @@ static void VCDClose( struct input_thread_s *p_input )
 {
     thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
 
-    input_BuffersEnd( p_input->p_method_data );
     close( p_vcd->i_handle );
     free( p_vcd );
 }
