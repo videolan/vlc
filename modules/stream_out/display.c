@@ -2,7 +2,7 @@
  * display.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.10 2003/11/30 22:47:55 gbazin Exp $
+ * $Id: display.c,v 1.11 2003/12/10 23:51:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -195,7 +195,8 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         sout_buffer_t *p_next;
         block_t *p_block;
 
-        if( p_buffer->i_size > 0 &&
+        vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
+        if( id->p_es->p_dec && p_buffer->i_size > 0 &&
             (p_block = block_New( p_stream, p_buffer->i_size )) )
         {
             p_block->i_dts = p_buffer->i_dts <= 0 ? 0 :
@@ -208,6 +209,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
             input_DecodeBlock( id->p_es->p_dec, p_block );
         }
+        vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
 
         /* *** go to next buffer *** */
         p_next = p_buffer->p_next;
