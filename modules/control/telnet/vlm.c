@@ -2,7 +2,7 @@
  * .c: VLM interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vlm.c,v 1.1 2004/03/05 14:03:20 garf Exp $
+ * $Id$
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *          Laurent Aimar <fenrir@videolan.org>
@@ -1167,10 +1167,14 @@ static char *vlm_Show( vlm_t *vlm, vlm_media_t *media, vlm_schedule_t *schedule,
 
         if( schedule->i_date != 0 )
         {
-            char   psz_date[500];
             time_t i_time = schedule->i_date / (int64_t)1000000;
 
+#ifdef HAVE_CTIME_R
+            char psz_date[500];
             ctime_r( &i_time, psz_date );
+#else
+            char *psz_date = ctime( &i_time );
+#endif
             show = realloc( show, strlen( show ) + strlen( psz_date ) + 1 );
             strcat( show , psz_date );
         }
@@ -1353,11 +1357,16 @@ static char *vlm_Show( vlm_t *vlm, vlm_media_t *media, vlm_schedule_t *schedule,
                 if( i_next_date > i_time )
                 {
                     time_t i_date = (time_t) (i_next_date / 1000000) ;
-                    char   psz_date[500];
 
+#ifdef HAVE_CTIME_R
+                    char psz_date[500];
                     ctime_r( &i_date, psz_date );
+#else
+                    char *psz_date = ctime( &i_date );
+#endif
 
-                    show = realloc( show, strlen( show ) + strlen( psz_date ) + 14 + 1 );
+                    show = realloc( show, strlen( show ) + strlen( psz_date ) +
+                                    14 + 1 );
                     strcat( show , " next launch: " );
                     strcat( show , psz_date );
                 }
@@ -1644,31 +1653,28 @@ static char *vlm_Save( vlm_t *vlm )
     {
         vlm_schedule_t *schedule = vlm->schedule[i];
         struct tm date;
-        time_t i_time;
+        time_t i_time = (time_t) ( schedule->i_date / 1000000 );
+
+#ifdef HAVE_LOCALTIME_R
+        localtime_r( &i_time, &date);
+#else
+        struct tm *p_date = localtime( &i_time );
+        date = *p_date;
+#endif
 
         p += sprintf( p, "new %s schedule ", schedule->psz_name);
 
-        i_time = (time_t) ( schedule->i_date / 1000000 );
-
-        localtime_r( &i_time, &date);
-
         if( schedule->b_enabled == VLC_TRUE )
         {
-            p += sprintf( p, "date %d/%d/%d-%d:%d:%d enabled\n", date.tm_year + 1900,
-                                                                 date.tm_mon + 1,
-                                                                 date.tm_mday,
-                                                                 date.tm_hour,
-                                                                 date.tm_min,
-                                                                 date.tm_sec);
+            p += sprintf( p, "date %d/%d/%d-%d:%d:%d enabled\n",
+                          date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,
+                          date.tm_hour, date.tm_min, date.tm_sec );
         }
         else
         {
-            p += sprintf( p, "date %d/%d/%d-%d:%d:%d disabled\n", date.tm_year + 1900,
-                                                                 date.tm_mon + 1,
-                                                                 date.tm_mday,
-                                                                 date.tm_hour,
-                                                                 date.tm_min,
-                                                                 date.tm_sec);
+            p += sprintf( p, "date %d/%d/%d-%d:%d:%d disabled\n",
+                          date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,
+                          date.tm_hour, date.tm_min, date.tm_sec);
         }
 
 
