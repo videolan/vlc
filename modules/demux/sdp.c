@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.1 2003/08/03 15:25:33 fenrir Exp $
+ * $Id: sdp.c,v 1.2 2003/08/03 16:22:48 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,6 +40,10 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_description( _("SDP demuxer + UDP/RTP/RTSP") );
     set_capability( "demux", 100 );
+    add_category_hint( "Stream", NULL, VLC_FALSE );
+        add_integer( "sdp-session", 0, NULL,
+                     "Session", "Session", VLC_TRUE );
+
     set_callbacks( Open, Close );
     add_shortcut( "sdp" );
 vlc_module_end();
@@ -52,11 +56,21 @@ static int  Demux ( input_thread_t * );
 
 typedef struct
 {
+    char *psz_name;
+    char *psz_value;
+
+} sdp_attribute_t;
+
+typedef struct
+{
     char    *psz_media;
     char    *psz_description;
     char    *psz_connection;
     char    *psz_bandwith;
     char    *psz_key;
+
+    int             i_attribute;
+    sdp_attribute_t *attribute;
 
 } sdp_media_t;
 
@@ -72,6 +86,9 @@ typedef struct
     char    *psz_bandwith;
     char    *psz_key;
     char    *psz_timezone;
+
+    int             i_attribute;
+    sdp_attribute_t *attribute;
 
     int         i_media;
     sdp_media_t *media;
@@ -89,6 +106,7 @@ struct demux_sys_t
 {
     stream_t *s;
 
+    int      i_session;
     sdp_t    *p_sdp;
 };
 
@@ -108,6 +126,8 @@ static int Open( vlc_object_t * p_this )
     int            i_sdp;
     int            i_sdp_max;
     char           *psz_sdp;
+
+    vlc_value_t    val;
 
     /* See if it looks like a SDP
        v, o, s fields are mandatory and in this order */
@@ -169,6 +189,18 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
     sdp_Dump( p_input, p_sys->p_sdp );
+
+    /* Get the selected session */
+    var_Create( p_input, "sdp-session", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "sdp-session", &val );
+    p_sys->i_session = val.i_int;
+    if( p_sys->i_session >= p_sys->p_sdp->i_session )
+    {
+        p_sys->i_session = 0;
+    }
+
+    /* Now create a handler for each media */
+
 
     return VLC_SUCCESS;
 
@@ -297,6 +329,9 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
                 p_session->psz_timezone   = NULL;
                 p_session->i_media        = -1;
                 p_session->media          = NULL;
+                p_session->i_attribute    = 0;
+                p_session->attribute      = 0;
+
                 break;
             case 'm':
                 fprintf( stderr, "New media added\n" );
@@ -309,6 +344,8 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
                 p_media->psz_connection = NULL;
                 p_media->psz_bandwith   = NULL;
                 p_media->psz_key        = NULL;
+                p_media->i_attribute    = 0;
+                p_media->attribute      = 0;
                 break;
             case 'o':
                 p_session->psz_origin = strdup( psz );
@@ -368,6 +405,42 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
             case 'z':
                 p_session->psz_timezone   = strdup( psz );
                 break;
+            case 'a':
+            {
+                char *p = strchr( psz, ':' );
+                char *name = NULL;
+                char *value= NULL;
+
+                if( p )
+                {
+                    *p++ = '\0';
+                    value= strdup( p);
+                }
+                name = strdup( psz );
+
+                if( p_session->i_media != -1 )
+                {
+                    p_media->attribute
+                        = realloc( p_media->attribute,
+                                   ( p_media->i_attribute + 1 ) *
+                                        sizeof( sdp_attribute_t ) );
+                    p_media->attribute[p_media->i_attribute].psz_name = name;
+                    p_media->attribute[p_media->i_attribute].psz_value = value;
+                    p_media->i_attribute++;
+                }
+                else
+                {
+                    p_session->psz_key = strdup( psz );
+                    p_session->attribute
+                        = realloc( p_session->attribute,
+                                   ( p_session->i_attribute + 1 ) *
+                                        sizeof( sdp_attribute_t ) );
+                    p_session->attribute[p_session->i_attribute].psz_name = name;
+                    p_session->attribute[p_session->i_attribute].psz_value = value;
+                    p_session->i_attribute++;
+                }
+                break;
+            }
 
             default:
                 fprintf( stderr, "unhandled com=%c\n", com );
@@ -390,7 +463,7 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
 static void   sdp_Release( sdp_t *p_sdp )
 {
 #define FREE( p ) if( p ) { free( p ) ; (p) = NULL; }
-    int i, j;
+    int i, j, i_attr;
     for( i = 0; i < p_sdp->i_session; i++ )
     {
         FREE( p_sdp->session[i].psz_origin );
@@ -403,6 +476,12 @@ static void   sdp_Release( sdp_t *p_sdp )
         FREE( p_sdp->session[i].psz_bandwith );
         FREE( p_sdp->session[i].psz_key );
         FREE( p_sdp->session[i].psz_timezone );
+        for( i_attr = 0; i_attr < p_sdp->session[i].i_attribute; i_attr++ )
+        {
+            FREE( p_sdp->session[i].attribute[i].psz_name );
+            FREE( p_sdp->session[i].attribute[i].psz_value );
+        }
+        FREE( p_sdp->session[i].attribute );
 
         for( j = 0; j < p_sdp->session[i].i_media; j++ )
         {
@@ -411,6 +490,12 @@ static void   sdp_Release( sdp_t *p_sdp )
             FREE( p_sdp->session[i].media[j].psz_connection );
             FREE( p_sdp->session[i].media[j].psz_bandwith );
             FREE( p_sdp->session[i].media[j].psz_key );
+            for( i_attr = 0; i_attr < p_sdp->session[i].i_attribute; i_attr++ )
+            {
+                FREE( p_sdp->session[i].media[j].attribute[i_attr].psz_name );
+                FREE( p_sdp->session[i].media[j].attribute[i_attr].psz_value );
+            }
+            FREE( p_sdp->session[i].media[j].attribute );
         }
         FREE( p_sdp->session[i].media);
     }
@@ -421,7 +506,7 @@ static void   sdp_Release( sdp_t *p_sdp )
 
 static void  sdp_Dump   ( input_thread_t *p_input, sdp_t *p_sdp )
 {
-    int i, j;
+    int i, j, i_attr;
 #define PRINTS( var, fmt ) \
     if( var ) { msg_Dbg( p_input, "    - " fmt " : %s", var ); }
 #define PRINTM( var, fmt ) \
@@ -440,6 +525,14 @@ static void  sdp_Dump   ( input_thread_t *p_input, sdp_t *p_sdp )
         PRINTS( p_sdp->session[i].psz_bandwith, "Bandwith" );
         PRINTS( p_sdp->session[i].psz_key, "Key" );
         PRINTS( p_sdp->session[i].psz_timezone, "TimeZone" );
+        for( i_attr = 0; i_attr < p_sdp->session[i].i_attribute; i_attr++ )
+        {
+            msg_Dbg( p_input, "    - attribute[%d] name:'%s' value:'%s'",
+                    i_attr,
+                    p_sdp->session[i].attribute[i_attr].psz_name,
+                    p_sdp->session[i].attribute[i_attr].psz_value );
+        }
+
         for( j = 0; j < p_sdp->session[i].i_media; j++ )
         {
             msg_Dbg( p_input, "    - media[%d]", j );
@@ -448,6 +541,14 @@ static void  sdp_Dump   ( input_thread_t *p_input, sdp_t *p_sdp )
             PRINTM( p_sdp->session[i].media[j].psz_connection, "Connection" );
             PRINTM( p_sdp->session[i].media[j].psz_bandwith, "Bandwith" );
             PRINTM( p_sdp->session[i].media[j].psz_key, "Key" );
+
+            for( i_attr = 0; i_attr < p_sdp->session[i].media[j].i_attribute; i_attr++ )
+            {
+                msg_Dbg( p_input, "        - attribute[%d] name:'%s' value:'%s'",
+                        i_attr,
+                        p_sdp->session[i].media[j].attribute[i_attr].psz_name,
+                        p_sdp->session[i].media[j].attribute[i_attr].psz_value );
+            }
         }
     }
 #undef PRINTS
