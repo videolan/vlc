@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.91 2003/10/01 22:44:58 hartman Exp $
+ * $Id: libvlc.h,v 1.92 2003/10/02 13:31:00 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -686,11 +686,9 @@ vlc_module_begin();
 
     /* Playlist options */
     add_category_hint( N_("Playlist"), PLAYLIST_CAT_LONGTEXT , VLC_FALSE );
-    add_bool_with_short( "random", 'Z', 0, NULL, RANDOM_TEXT, 
-                                RANDOM_LONGTEXT, VLC_FALSE );
     add_bool_with_short( "random", 'Z', 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
-    add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
-    add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
+    add_bool_with_short( "loop", 'L', 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
+    add_bool_with_short( "repeat", 'R', 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
 
     /* Misc options */
     add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, VLC_TRUE );

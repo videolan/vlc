@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.1 2003/10/01 22:19:57 gbazin Exp $
+ * $Id: subsdec.c,v 1.2 2003/10/02 13:31:00 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -173,6 +173,8 @@ static int InitDecoder( decoder_t *p_dec )
     }
 
     if( val.psz_string ) free( val.psz_string );
+#else
+    msg_Dbg( p_dec, "No iconv support available" );
 #endif
 
     return VLC_SUCCESS;
