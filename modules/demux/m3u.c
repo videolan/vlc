@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.13 2003/02/27 13:19:43 gbazin Exp $
+ * $Id: m3u.c,v 1.14 2003/03/06 00:10:33 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -165,12 +165,11 @@ static void Deactivate( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Demux: reads and demuxes data packets
- *****************************************************************************
- * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
+ * ProcessLine: read a "line" from the file and add any entries found
+ * to the playlist. Return number of items added ( 0 or 1 )
  *****************************************************************************/
-static void ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
-        , playlist_t *p_playlist , char psz_line[MAX_LINE] )
+static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
+        , playlist_t *p_playlist , char psz_line[MAX_LINE], int i_position )
 {
     char          *psz_bol, *psz_name;
 
@@ -186,7 +185,7 @@ static void ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
         /* Check for comment line */
         if( *psz_bol == '#' )
             /*line is comment or extended info, ignored for now */
-            return;
+            return 0;
     }
     else if ( p_m3u->i_type == TYPE_ASX )
     {
@@ -199,13 +198,13 @@ static void ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
                strncasecmp( psz_bol, "ref", sizeof("ref") - 1 ) )
             psz_bol++;
 
-        if( !*psz_bol ) return;
+        if( !*psz_bol ) return 0;
 
         while( *psz_bol &&
                strncasecmp( psz_bol, "href", sizeof("href") - 1 ) )
             psz_bol++;
 
-        if( !*psz_bol ) return;
+        if( !*psz_bol ) return 0;
 
         while( *psz_bol &&
                strncasecmp( psz_bol, "mms://",
@@ -216,11 +215,11 @@ static void ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
                             sizeof("file://") - 1 ) )
             psz_bol++;
 
-        if( !*psz_bol ) return;
+        if( !*psz_bol ) return 0;
 
         psz_eol = strchr( psz_bol, '"');
         if( !psz_eol )
-          return;
+          return 0;
 
         *psz_eol = '\0';
     }
@@ -235,31 +234,31 @@ static void ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
                strncasecmp( psz_bol, "param", sizeof("param") - 1 ) )
             psz_bol++;
 
-        if( !*psz_bol ) return;
+        if( !*psz_bol ) return 0;
 
         while( *psz_bol &&
                strncasecmp( psz_bol, "filename", sizeof("filename") - 1 ) )
             psz_bol++;
 
-        if( !*psz_bol ) return;
+        if( !*psz_bol ) return 0;
 
         while( *psz_bol &&
                strncasecmp( psz_bol, "http://",
                             sizeof("http://") - 1 ) )
             psz_bol++;
 
-        if( !*psz_bol ) return;
+        if( !*psz_bol ) return 0;
 
         psz_eol = strchr( psz_bol, '"');
         if( !psz_eol )
-          return;
+          return 0;
 
         *psz_eol = '\0';
 
     }
 
     /* empty line */
-    if ( !*psz_bol ) return;
+    if ( !*psz_bol ) return 0;
 
     /*
      * From now on, we know we've got a meaningful line
@@ -335,17 +334,24 @@ static void ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
     }
 
     playlist_Add( p_playlist, psz_name,
-                  PLAYLIST_APPEND, PLAYLIST_END );
+                  PLAYLIST_INSERT, i_position );
 
     free( psz_name );
+    return 1;
 }
 
+/*****************************************************************************
+ * Demux: reads and demuxes data packets
+ *****************************************************************************
+ * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
+ *****************************************************************************/
 static int Demux ( input_thread_t *p_input )
 {
     data_packet_t *p_data;
     char          *p_buf, psz_line[MAX_LINE], eol_tok;
     int           i_size, i_bufpos, i_linepos = 0;
     playlist_t    *p_playlist;
+    int           i_position;
     vlc_bool_t    b_discard = VLC_FALSE;
 
     demux_sys_t   *p_m3u = (demux_sys_t *)p_input->p_demux_data;
@@ -359,6 +365,7 @@ static int Demux ( input_thread_t *p_input )
     }
 
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
+    i_position = p_playlist->i_index + 1;
 
     /* Depending on wether we are dealing with an m3u/asf file, the end of
      * line token will be different */
@@ -405,7 +412,8 @@ static int Demux ( input_thread_t *p_input )
 
             psz_line[i_linepos] = '\0';
             i_linepos = 0;
-            ProcessLine ( p_input, p_m3u , p_playlist , psz_line );
+            i_position += ProcessLine ( p_input, p_m3u , p_playlist ,
+                                        psz_line, i_position );
         }
 
         input_DeletePacket( p_input->p_method_data, p_data );
@@ -415,7 +423,8 @@ static int Demux ( input_thread_t *p_input )
     {
         psz_line[i_linepos] = '\0';
         i_linepos = 0;
-        ProcessLine ( p_input, p_m3u , p_playlist , psz_line );
+        i_position += ProcessLine ( p_input, p_m3u , p_playlist , psz_line,
+                                    i_position );
     }
 
     vlc_object_release( p_playlist );
