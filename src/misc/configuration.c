@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.51 2003/02/20 01:52:47 sigmunau Exp $
+ * $Id: configuration.c,v 1.52 2003/03/30 13:23:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -117,7 +117,7 @@ float __config_GetFloat( vlc_object_t *p_this, const char *psz_name )
  *****************************************************************************
  * This function is used to get the value of variables which are internally
  * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_FILE,
- * and CONFIG_ITEM_MODULE).
+ * CONFIG_ITEM_DIRECTORY, and CONFIG_ITEM_MODULE).
  *
  * Important note: remember to free() the returned char* because it's a
  *   duplicate of the actual value. It isn't safe to return a pointer to the
@@ -138,6 +138,7 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
     }
     if( (p_config->i_type!=CONFIG_ITEM_STRING) &&
         (p_config->i_type!=CONFIG_ITEM_FILE) &&
+        (p_config->i_type!=CONFIG_ITEM_DIRECTORY) &&
         (p_config->i_type!=CONFIG_ITEM_MODULE) )
     {
         msg_Err( p_this, "option %s does not refer to a string", psz_name );
@@ -157,7 +158,7 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
  *****************************************************************************
  * This function is used to set the value of variables which are internally
  * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_FILE,
- * and CONFIG_ITEM_MODULE).
+ * CONFIG_ITEM_DIRECTORY, and CONFIG_ITEM_MODULE).
  *****************************************************************************/
 void __config_PutPsz( vlc_object_t *p_this,
                       const char *psz_name, const char *psz_value )
@@ -174,6 +175,7 @@ void __config_PutPsz( vlc_object_t *p_this,
     }
     if( (p_config->i_type!=CONFIG_ITEM_STRING) &&
         (p_config->i_type!=CONFIG_ITEM_FILE) &&
+        (p_config->i_type!=CONFIG_ITEM_DIRECTORY) &&
         (p_config->i_type!=CONFIG_ITEM_MODULE) )
     {
         msg_Err( p_this, "option %s does not refer to a string", psz_name );
@@ -1155,6 +1157,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             {
             case CONFIG_ITEM_STRING:
             case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_DIRECTORY:
             case CONFIG_ITEM_MODULE:
                 config_PutPsz( p_this, psz_name, optarg );
                 break;
@@ -1179,6 +1182,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             {
             case CONFIG_ITEM_STRING:
             case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_DIRECTORY:
             case CONFIG_ITEM_MODULE:
                 config_PutPsz( p_this, pp_shortopts[i_cmd]->psz_name, optarg );
                 break;

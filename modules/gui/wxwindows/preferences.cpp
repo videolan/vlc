@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.4 2003/03/30 11:43:38 gbazin Exp $
+ * $Id: preferences.cpp,v 1.5 2003/03/30 13:23:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -127,8 +127,6 @@ public:
     void ApplyChanges();
 
 private:
-    void OnFileBrowse( wxCommandEvent& WXUNUSED(event) );
-    void OnDirectoryBrowse( wxCommandEvent& WXUNUSED(event) );
     void OnAdvanced( wxCommandEvent& WXUNUSED(event) );
     DECLARE_EVENT_TABLE()
 
@@ -201,18 +199,9 @@ BEGIN_EVENT_TABLE(PrefsTreeCtrl, wxTreeCtrl)
     EVT_TREE_SEL_CHANGED(PrefsTree_Ctrl, PrefsTreeCtrl::OnSelectTreeItem)
 END_EVENT_TABLE()
 
-enum
-{
-    FileBrowse_Event = wxID_HIGHEST,
-    DirectoryBrowse_Event,
-
-};
-
 BEGIN_EVENT_TABLE(PrefsPanel, wxPanel)
     /* Button events */
     EVT_BUTTON(Advanced_Event, PrefsPanel::OnAdvanced)
-    EVT_BUTTON(FileBrowse_Event, PrefsPanel::OnFileBrowse)
-    EVT_BUTTON(DirectoryBrowse_Event, PrefsPanel::OnDirectoryBrowse)
 
 END_EVENT_TABLE()
 
@@ -380,7 +369,11 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     {
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
-        /* Find the capabiltiy child item */
+        /* Exclude the main module */
+        if( !strcmp( p_module->psz_object_name, "main" ) )
+            continue;
+
+        /* Find the capability child item */
         long cookie; size_t i_child_index;
         wxTreeItemId capability_item = GetFirstChild( plugins_item, cookie);
         for( i_child_index = 0;
@@ -458,9 +451,9 @@ void PrefsTreeCtrl::ApplyChanges()
     }
 
     /* Apply changes to the plugins */
-    item = GetFirstChild( plugins_item, cookie);
+    item = GetFirstChild( plugins_item, cookie );
     for( size_t i_child_index = 0;
-         i_child_index < GetChildrenCount( plugins_item, TRUE );
+         i_child_index < GetChildrenCount( plugins_item, FALSE );
          i_child_index++ )
     {
         wxTreeItemId item2 = GetFirstChild( item, cookie2 );
@@ -726,7 +719,6 @@ void PrefsPanel::ApplyChanges()
     {
         ConfigData *config_data = config_array.Item(i);
 
-        msg_Err( p_intf, "ApplyChanges %s", config_data->option_name.c_str() );
         switch( config_data->i_config_type )
         {
         case CONFIG_ITEM_MODULE:
@@ -742,7 +734,7 @@ void PrefsPanel::ApplyChanges()
             break;
         case CONFIG_ITEM_BOOL:
             config_PutInt( p_intf, config_data->option_name.c_str(),
-                           config_data->control.checkbox->GetValue() );
+                           config_data->control.checkbox->IsChecked() );
             break;
         case CONFIG_ITEM_INTEGER:
             config_PutInt( p_intf, config_data->option_name.c_str(),
@@ -772,32 +764,6 @@ void PrefsPanel::OnAdvanced( wxCommandEvent& WXUNUSED(event) )
 
     config_sizer->Layout();
     config_window->FitInside();
-}
-
-void PrefsPanel::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
-{
-    wxFileDialog dialog( this, _("Open file"), "", "", "*.*",
-                         wxOPEN );
-
-    if( dialog.ShowModal() == wxID_OK )
-    {
-#if 0
-        file_combo->SetValue( dialog.GetPath() );      
-#endif
-    }
-}
-
-void PrefsPanel::OnDirectoryBrowse( wxCommandEvent& WXUNUSED(event) )
-{
-    wxFileDialog dialog( this, _("Open file"), "", "", "*.*",
-                         wxOPEN );
-
-    if( dialog.ShowModal() == wxID_OK )
-    {
-#if 0
-        file_combo->SetValue( dialog.GetPath() );      
-#endif
-    }
 }
 
 /*****************************************************************************
