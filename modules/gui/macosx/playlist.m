@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.9 2003/02/10 21:54:03 hartman Exp $
+ * $Id: playlist.m,v 1.10 2003/02/13 01:14:55 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -243,6 +243,9 @@
 
     vlc_object_release( p_playlist );
 
+    /* this is actually duplicity, because the intf.m manage also updates the view
+     * when the playlist changes. we do this on purpose, because else there is a 
+     * delay of .5 sec or so when we delete an item */
     [self playlistUpdated];
 }
 
@@ -290,8 +293,6 @@
     }
 
     vlc_object_release( p_playlist );
-
-    [self playlistUpdated];
 }
 
 - (void)playlistUpdated
