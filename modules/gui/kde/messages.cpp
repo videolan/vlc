@@ -28,6 +28,7 @@ KMessagesWindow::KMessagesWindow( intf_thread_t * p_intf,  msg_subscription_t *p
     resize(300,400);
     new QLabel( _("Messages:"), category_table );
     text = new QTextView( category_table );
+    text->setPaper( QBrush( black ) );
 //    clearWFlags(WStyle_DialogBorder|WStyle_NoBorder);
 //    setWFlags(WStyle_NormalBorder|WStyle_Customize);
 //    connect(this, SIGNAL(okClicked()), this, SLOT(accept()));
@@ -51,17 +52,19 @@ void KMessagesWindow::update()
         static const char * ppsz_type[4] = { ": ", " error: ", " warning: ",
                                              " debug: " };
         static const char * ppsz_color[4] = {
-            "<font color=#FFFFFF>",
-            "<font color=#FF0000>",
-            "<font color=#CCCC00>",
-            "<font>"
+            "<font color=white>",
+            "<font color=red>",
+            "<font color=yellow>",
+            "<font color=gray>"
         };
         for( i_start = p_msg->i_start;
              i_start != i_stop;
              i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
-            text->append( QString(p_msg->p_msg[i_start].psz_module) +
+            text->append( QString("<font color=white>") +
+                          p_msg->p_msg[i_start].psz_module +
                           ppsz_type[p_msg->p_msg[i_start].i_type] +
+                          "</font>" +
                           ppsz_color[p_msg->p_msg[i_start].i_type] +
                           p_msg->p_msg[i_start].psz_msg + "</font>" );
             
