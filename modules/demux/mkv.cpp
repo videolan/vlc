@@ -528,12 +528,15 @@ public:
 class virtual_segment_t
 {
 public:
-    virtual_segment_t()
+    virtual_segment_t( matroska_segment_t *p_segment )
         :i_current_segment(0)
-    {}
+    {
+        linked_segments.push_back( p_segment );
 
-    std::vector<matroska_segment_t*> linked_segments;
-    size_t                           i_current_segment;
+        AppendUID( p_segment->segment_uid );
+        AppendUID( p_segment->prev_segment_uid );
+        AppendUID( p_segment->next_segment_uid );
+    }
 
     void Sort();
     size_t AddSegment( matroska_segment_t *p_segment );
@@ -557,6 +560,13 @@ public:
         }
         return false;
     }
+
+protected:
+    std::vector<matroska_segment_t*> linked_segments;
+    std::vector<const KaxSegmentUID> linked_uids;
+    size_t                           i_current_segment;
+
+    void                             AppendUID( const EbmlBinary & UID );
 };
 
 class matroska_stream_t
@@ -3423,10 +3433,7 @@ void demux_sys_t::PreloadLinked( matroska_segment_t *p_segment )
     size_t i_preloaded, i;
 
     delete p_current_segment;
-    p_current_segment = new virtual_segment_t();
-
-    // fill our current virtual segment with the used segment from the current stream
-    p_current_segment->linked_segments.push_back( p_segment );
+    p_current_segment = new virtual_segment_t( p_segment );
 
     // fill our current virtual segment with all hard linked segments
     do {
@@ -3456,6 +3463,9 @@ bool matroska_segment_t::CompareSegmentUIDs( const matroska_segment_t * p_item_a
 
     p_itema = (EbmlBinary *)(&p_item_a->next_segment_uid);
     if ( *p_itema == p_item_b->segment_uid )
+        return true;
+
+    if ( *p_itema == p_item_b->prev_segment_uid )
         return true;
 
     return false;
@@ -3557,16 +3567,17 @@ size_t virtual_segment_t::AddSegment( matroska_segment_t *p_segment )
     }
 
     // find possible mates
-    for ( i=0; i<linked_segments.size(); i++ )
+    for ( i=0; i<linked_uids.size(); i++ )
     {
-        if ( p_segment->segment_uid == linked_segments[i]->prev_segment_uid )
+        if (   p_segment->segment_uid == linked_uids[i] 
+            || p_segment->prev_segment_uid == linked_uids[i] 
+            || p_segment->next_segment_uid == linked_uids[i] )
         {
             linked_segments.push_back( p_segment );
-            return 1;
-        }
-        if ( p_segment->segment_uid == linked_segments[i]->next_segment_uid )
-        {
-            linked_segments.push_back( p_segment );
+
+            AppendUID( p_segment->prev_segment_uid );
+            AppendUID( p_segment->next_segment_uid );
+
             return 1;
         }
     }
@@ -3597,4 +3608,17 @@ void virtual_segment_t::LoadCues( )
     {
         linked_segments[i]->LoadCues();
     }
+}
+
+void virtual_segment_t::AppendUID( const EbmlBinary & UID )
+{
+    if ( UID.GetBuffer() == NULL )
+        return;
+
+    for (size_t i=0; i<linked_uids.size(); i++)
+    {
+        if ( UID == linked_uids[i] )
+            return;
+    }
+    linked_uids.push_back( *(KaxSegmentUID*)(&UID) );
 }
