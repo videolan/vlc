@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.69 2001/01/15 18:02:49 massiot Exp $
+ * $Id: vpar_headers.c,v 1.70 2001/01/15 19:54:34 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -565,7 +565,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.b_q_scale_type = 0;
         p_vpar->picture.b_intra_vlc_format = 0;
         p_vpar->picture.b_alternate_scan = 0; /* zigzag */
-        p_vpar->picture.b_repeat_first_field = 1;
+        p_vpar->picture.b_repeat_first_field = 1; /* FIXME! this contradicts
+                                                   * ISO/IEC */
         p_vpar->picture.b_progressive = 1;
     }
 

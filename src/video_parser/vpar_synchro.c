@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.73 2001/01/15 18:02:49 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.74 2001/01/15 19:54:34 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -150,7 +150,8 @@ void vpar_SynchroInit( vpar_thread_t * p_vpar )
     memset( p_vpar->synchro.pi_meaningful, 0, 4 * sizeof(unsigned int) );
     p_vpar->synchro.b_dropped_last = 0;
     p_vpar->synchro.current_pts = mdate() + DEFAULT_PTS_DELAY;
-    p_vpar->synchro.backward_pts = p_vpar->synchro.next_period = 0;
+    p_vpar->synchro.backward_pts = p_vpar->synchro.current_period =
+        p_vpar->synchro.backward_period = 0;
 #ifdef STATS
     p_vpar->synchro.i_trashed_pic = p_vpar->synchro.i_not_chosen_pic = 
         p_vpar->synchro.i_pic = 0;
@@ -228,7 +229,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 #endif
 
         now = mdate();
-        period = 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
+        period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate;
 
         vlc_mutex_lock( &p_vpar->p_vout->change_lock );
         tau_yuv = p_vpar->p_vout->render_time;
@@ -420,7 +421,7 @@ mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                              int i_repeat_field )
 {
-    mtime_t         period = 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
+    mtime_t         period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate;
 
     switch( i_coding_type )
     {
@@ -468,16 +469,16 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
         break;
     }
 
-    p_vpar->synchro.current_pts += p_vpar->synchro.next_period;
-
-    /* A video frame can be displayed 1, 2 or 3 times, according to
-     * repeat_first_field, top_field_first, progressive_sequence and
-     * progressive_frame. */
-    p_vpar->synchro.next_period = i_repeat_field * (period >> 1);
+    p_vpar->synchro.current_pts += p_vpar->synchro.current_period;
 
 #define PTS_THRESHOLD   (period >> 2)
     if( i_coding_type == B_CODING_TYPE )
     {
+        /* A video frame can be displayed 1, 2 or 3 times, according to
+         * repeat_first_field, top_field_first, progressive_sequence and
+         * progressive_frame. */
+        p_vpar->synchro.current_period = i_repeat_field * (period >> 1);
+
         if( p_vpar->sequence.next_pts )
         {
             if( p_vpar->sequence.next_pts - p_vpar->synchro.current_pts
@@ -496,6 +497,9 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
     }
     else
     {
+        p_vpar->synchro.current_period = p_vpar->synchro.backward_period;
+        p_vpar->synchro.backward_period = i_repeat_field * (period >> 1);
+
         if( p_vpar->synchro.backward_pts )
         {
             if( p_vpar->sequence.next_dts && 
@@ -506,10 +510,9 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
             {
                 intf_WarnMsg( 2,
                         "vpar synchro warning: backward_pts != dts (%lld)",
-                        p_vpar->synchro.backward_pts
-                            - p_vpar->sequence.next_dts );
+                        p_vpar->sequence.next_dts
+                            - p_vpar->synchro.backward_pts );
             }
-
             if( p_vpar->synchro.backward_pts - p_vpar->synchro.current_pts
                     > PTS_THRESHOLD
                  || p_vpar->synchro.current_pts - p_vpar->synchro.backward_pts
