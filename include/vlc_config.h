@@ -112,8 +112,8 @@
 #   define DVD_DEVICE "/dev/dvd"
 #   define VCD_DEVICE "/dev/cdrom"
 #else
-#   define DVD_DEVICE "D"
-#   define VCD_DEVICE "D"
+#   define DVD_DEVICE "D:"
+#   define VCD_DEVICE "D:"
 #endif
 
 /*****************************************************************************

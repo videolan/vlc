@@ -14,8 +14,8 @@ To store a debug log of the current vlc session, you can use
 disable the GUI. You will end-up with a vlc.log file in your current directory.
 
 If you want to play a DVD, run vlc and click on the Disc option in the
-interface. You then have to type your drive letter in the 'Device name'
-box (eg. 'D' if this is the letter for your dvdrom drive).
+interface. You then have to type your drive letter followed by a colon in
+the 'Device name' box (eg. 'D:' if this is the letter for your dvdrom drive).
 
 Building VideoLAN Client from the source code
 =============================================

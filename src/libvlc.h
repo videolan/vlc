@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.20 2002/10/15 12:30:00 sam Exp $
+ * $Id: libvlc.h,v 1.21 2002/11/07 19:31:08 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -215,8 +215,14 @@
     "DVD (from 1 to n).")
 
 #define DVD_DEV_TEXT N_("DVD device")
+#ifdef WIN32
+#define DVD_DEV_LONGTEXT N_( \
+    "This is the default DVD drive (or file) to use. Don't forget the colon " \
+    "after the drive letter (eg D:)")
+#else
 #define DVD_DEV_LONGTEXT N_( \
     "This is the default DVD device to use.")
+#endif
 
 #define VCD_DEV_TEXT N_("VCD device")
 #define VCD_DEV_LONGTEXT N_( \
