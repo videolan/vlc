@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.37 2003/05/07 14:49:19 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.38 2003/05/17 15:20:46 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -204,10 +204,10 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
                      screen_rect.right - 150,
                      screen_rect.top + 250 );
     fPlaylistWindow = new PlayListWindow( window_rect, _("Playlist"), this, p_intf );
-    window_rect.Set( screen_rect.right - 500,
+    window_rect.Set( screen_rect.right - 550,
                      screen_rect.top + 300,
                      screen_rect.right - 150,
-                     screen_rect.top + 600 );
+                     screen_rect.top + 500 );
     fMessagesWindow = new MessagesWindow( p_intf, window_rect, _("Messages") );
 
     // the media control view

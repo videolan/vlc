@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.8 2003/05/07 17:27:30 titer Exp $
+ * $Id: MessagesWindow.cpp,v 1.9 2003/05/17 15:20:46 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -46,7 +46,7 @@ MessagesWindow::MessagesWindow( intf_thread_t * p_intf,
 {
 	this->p_intf = p_intf;
 
-    SetSizeLimits( 200, 2000, 200, 2000 );
+    SetSizeLimits( 400, 2000, 200, 2000 );
 	
 	BRect rect, textRect;
 
@@ -57,7 +57,6 @@ MessagesWindow::MessagesWindow( intf_thread_t * p_intf,
 	fMessagesView = new BTextView( rect, "messages", textRect,
 	                               B_FOLLOW_ALL, B_WILL_DRAW );
 	fMessagesView->MakeEditable( false );
-	fMessagesView->MakeSelectable( false );
 	fMessagesView->SetStylable( true );
 	fScrollView = new BScrollView( "scrollview", fMessagesView, B_WILL_DRAW,
 	                               B_FOLLOW_ALL, false, true );
@@ -87,8 +86,9 @@ MessagesWindow::~MessagesWindow()
 /*****************************************************************************
  * MessagesWindow::FrameResized
  *****************************************************************************/
-void MessagesWindow::FrameResized( float, float )
+void MessagesWindow::FrameResized( float width, float height )
 {
+    BWindow::FrameResized( width, height );
     BRect rect = fMessagesView->Bounds();
     rect.InsetBy( 5, 5 );
     fMessagesView->SetTextRect( rect );
@@ -177,7 +177,9 @@ static int UpdateMessages( intf_thread_t * p_intf )
     	            BString string;
     	            string << p_sub->p_msg[i_start].psz_module << " " << psz_module_type << " : " <<
     	                p_sub->p_msg[i_start].psz_msg << "\n";
-    	            messagesView->Insert( string.String() );
+    	            messagesView->Insert( messagesView->TextLength(),
+    	                                  string.String(),
+    	                                  strlen( string.String() ) );
     	            messagesView->SetFontAndColor( oldLength,
     	                                           messagesView->TextLength(),
     	                                           NULL, 0, &color );
