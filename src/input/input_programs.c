@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.107 2003/05/05 22:48:23 gbazin Exp $
+ * $Id: input_programs.c,v 1.108 2003/05/10 11:08:07 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,7 +56,7 @@ static int ESCallback( vlc_object_t *, char const *,
  *****************************************************************************/
 int input_InitStream( input_thread_t * p_input, size_t i_data_len )
 {
-    vlc_value_t val, text;
+    vlc_value_t text;
 
     p_input->stream.i_stream_id = 0;
 
@@ -107,11 +107,6 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     var_Create( p_input, "spu-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Subtitle track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
-
-    val.i_int = -1; text.psz_string = _("Disable");
-    var_Change( p_input, "video-es", VLC_VAR_ADDCHOICE, &val, &text );
-    var_Change( p_input, "audio-es", VLC_VAR_ADDCHOICE, &val, &text );
-    var_Change( p_input, "spu-es", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_input, "program", ProgramCallback, NULL );
     var_AddCallback( p_input, "title", TitleCallback, NULL );
@@ -339,20 +334,20 @@ input_area_t * input_AddArea( input_thread_t * p_input,
         vlc_value_t val2;
 
         sprintf( val.psz_string, "title %2i", i_area_id );
-	var_Destroy( p_input, val.psz_string );
-	var_Create( p_input, val.psz_string, VLC_VAR_INTEGER |
-		    VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
-	var_AddCallback( p_input, val.psz_string, NavigationCallback,
-			 (void *)(int)i_area_id );
+        var_Destroy( p_input, val.psz_string );
+        var_Create( p_input, val.psz_string, VLC_VAR_INTEGER |
+                    VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
+        var_AddCallback( p_input, val.psz_string, NavigationCallback,
+                         (void *)(int)i_area_id );
 
-	var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val, NULL );
+        var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val, NULL );
 
-	for( i = 1; i <= i_part_nb; i++ )
-	{
-	    val2.i_int = i;
-	    var_Change( p_input, val.psz_string,
+        for( i = 1; i <= i_part_nb; i++ )
+        {
+            val2.i_int = i;
+            var_Change( p_input, val.psz_string,
                         VLC_VAR_ADDCHOICE, &val2, NULL );
-	}
+        }
     }
 
     return p_area;
@@ -491,8 +486,8 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
     if( val.psz_string )
     {
         sprintf( val.psz_string, "title %i", p_area->i_id );
-	var_Change( p_input, "navigation", VLC_VAR_DELCHOICE, &val, NULL );
-	var_Destroy( p_input, val.psz_string );
+        var_Change( p_input, "navigation", VLC_VAR_DELCHOICE, &val, NULL );
+        var_Destroy( p_input, val.psz_string );
     }
 
     /* Remove this area from the stream's list of areas */
@@ -553,7 +548,6 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
 
     /* Init its values */
     p_es->i_id = i_es_id;
-    p_es->psz_desc = psz_desc ? strdup( psz_desc ) : NULL;
     p_es->p_pes = NULL;
     p_es->p_decoder_fifo = NULL;
     p_es->i_cat = i_category;
@@ -608,8 +602,32 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
 
     if( psz_var )
     {
+        /* Get the number of ES already added */
+        var_Change( p_input, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
+        if( val.i_int == 0 )
+        {
+            vlc_value_t val2;
+
+            /* First one, we need to add the "Disable" choice */
+            val2.i_int = -1; text.psz_string = _("Disable");
+            var_Change( p_input, psz_var, VLC_VAR_ADDCHOICE, &val2, &text );
+            val.i_int++;
+        }
+
+        /* Take care of the ES description */
+        if( psz_desc )
+        {
+            p_es->psz_desc = strdup( psz_desc );
+        }
+        else
+        {
+            p_es->psz_desc = malloc( strlen( _("Track %i") ) + 20 );
+            if( p_es->psz_desc )
+                sprintf( p_es->psz_desc, _("Track %i"), val.i_int );
+        }
+
         val.i_int = p_es->i_id;
-        text.psz_string = (char *)psz_desc;
+        text.psz_string = p_es->psz_desc;
         var_Change( p_input, psz_var, VLC_VAR_ADDCHOICE, &val, &text );
     }
 
@@ -623,7 +641,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     unsigned int            i_index, i_es_index;
     pgrm_descriptor_t *     p_pgrm;
-    char *                  psz_var;
+    char *                  psz_var = NULL;
     vlc_value_t             val;
 
     /* Find the ES in the ES table */
@@ -646,17 +664,28 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     {
     case AUDIO_ES:
         psz_var = "audio-es";
-	break;
+        break;
     case SPU_ES:
         psz_var = "spu-es";
-	break;
+        break;
     case VIDEO_ES:
-    default:
         psz_var = "video-es";
-	break;
+        break;
     }
-    val.i_int = p_es->i_id;
-    var_Change( p_input, psz_var, VLC_VAR_DELCHOICE, &val, NULL );
+
+    if( psz_var )
+    {
+        val.i_int = p_es->i_id;
+        var_Change( p_input, psz_var, VLC_VAR_DELCHOICE, &val, NULL );
+
+        /* Remove the "Disable" entry if needed */
+        var_Change( p_input, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
+        if( val.i_int == 1 )
+        {
+            val.i_int = -1;
+            var_Change( p_input, psz_var, VLC_VAR_DELCHOICE, &val, NULL );
+        }
+    }
 
     /* Kill associated decoder, if any. */
     if( p_es->p_decoder_fifo != NULL )
@@ -727,6 +756,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
 int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     vlc_value_t val;
+    char *psz_var = NULL;
 
     if( p_es == NULL )
     {
@@ -769,8 +799,24 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     }
 
     /* Update the es variable without triggering a callback */
-    val.i_int = p_es->i_id;
-    var_Change( p_input, "audio-es", VLC_VAR_SETVALUE, &val, NULL );
+    switch( p_es->i_cat )
+    {
+    case AUDIO_ES:
+        psz_var = "audio-es";
+        break;
+    case SPU_ES:
+        psz_var = "spu-es";
+        break;
+    case VIDEO_ES:
+        psz_var = "video-es";
+        break;
+    }
+
+    if( psz_var )
+    {
+        val.i_int = p_es->i_id;
+        var_Change( p_input, psz_var, VLC_VAR_SETVALUE, &val, NULL );
+    }
 
     return 0;
 }
@@ -780,8 +826,9 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
  *****************************************************************************/
 int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
-
     unsigned int i_index = 0;
+    vlc_value_t val;
+    char *psz_var = NULL;
 
     if( p_es == NULL )
     {
@@ -797,6 +844,27 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
         return( -1 );
     }
 
+    /* Update the es variable without triggering a callback */
+    switch( p_es->i_cat )
+    {
+    case AUDIO_ES:
+        psz_var = "audio-es";
+        break;
+    case SPU_ES:
+        psz_var = "spu-es";
+        break;
+    case VIDEO_ES:
+        psz_var = "video-es";
+        break;
+    }
+
+    if( psz_var )
+    {
+        val.i_int = -1;
+        var_Change( p_input, psz_var, VLC_VAR_SETVALUE, &val, NULL );
+    }
+
+    /* Actually unselect the ES */
     input_EndDecoder( p_input, p_es );
     p_es->p_pes = NULL;
 
