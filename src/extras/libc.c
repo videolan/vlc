@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.14 2004/01/09 18:32:04 gbazin Exp $
+ * $Id: libc.c,v 1.15 2004/01/09 19:21:58 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -180,9 +180,13 @@ int vlc_vasprintf(char **strp, const char *fmt, va_list ap)
 int vlc_asprintf( char **strp, const char *fmt, ... )
 {
     va_list args;
+    int i_ret;
+
     va_start( args, fmt );
-    vasprintf( strp, fmt, args );
+    i_ret = vasprintf( strp, fmt, args );
     va_end( args );
+
+    return i_ret;
 }
 #endif
 
