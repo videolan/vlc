@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.90 2002/08/21 09:26:53 xav Exp $
+ * $Id: modules.c,v 1.91 2002/08/21 11:07:42 xav Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -538,7 +538,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 #endif
 
     /* If the user provided a plugin path, we add it to the list */
-    path[ sizeof(path)/sizeof(char*) - 1 ] = config_GetPsz( p_this,
+    path[ sizeof(path)/sizeof(char*) - 2 ] = config_GetPsz( p_this,
                                                             "plugin-path" );
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
