@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.89 2001/03/07 00:18:46 henri Exp $
+ * $Id: input.c,v 1.90 2001/03/07 01:36:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,12 +38,14 @@
 
 /* Network functions */
 
+#ifndef SYS_BEOS
 #include <netdb.h>                                             /* hostent ... */
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#endif
 
 #ifdef STATS
 #   include <sys/times.h>
@@ -435,7 +437,7 @@ void input_FileOpen( input_thread_t * p_input )
             psz_name += 4;
             i_stat = stat( psz_name, &stat_info );
         }
-	else if( ( i_size > 5 )
+        else if( ( i_size > 5 )
                  && !strncasecmp( psz_name, "file:", 5 ) )
         {
             /* get rid of the 'file:' stuff and try again */
@@ -443,7 +445,7 @@ void input_FileOpen( input_thread_t * p_input )
             i_stat = stat( psz_name, &stat_info );
         }
 
-    	if( i_stat == (-1) )
+        if( i_stat == (-1) )
         {
             intf_ErrMsg( "input error: cannot stat() file `%s' (%s)",
                          psz_name, strerror(errno));
@@ -505,6 +507,7 @@ void input_FileClose( input_thread_t * p_input )
     return;
 }
 
+#ifndef SYS_BEOS
 /*****************************************************************************
  * input_BuildLocalAddr : fill a sockaddr_in structure for local binding
  *****************************************************************************/
@@ -714,3 +717,4 @@ void input_NetworkClose( input_thread_t * p_input )
     close( p_input->i_handle );
     /* FIXME: deal with channels */
 }
+#endif
