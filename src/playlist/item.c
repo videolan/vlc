@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: item.c,v 1.7 2003/12/05 01:52:11 rocky Exp $
+ * $Id: item.c,v 1.8 2003/12/05 02:12:53 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,7 +51,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_target,
  * \param p_playlist the playlist to add into
  * \param psz_uri the mrl to add to the playlist
  * \param psz_name a text giving a name or description of this item
- * \param i_duration a hint about the duration of this item, in milliseconds, 
+ * \param i_duration a hint about the duration of this item, in microseconds, 
  *        or -1 if unknown.
  * \param ppsz_options array of options
  * \param i_options number of items in ppsz_options
