@@ -2,7 +2,7 @@
  * input_es.h: thread structure of the ES plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.h,v 1.1 2001/12/09 17:01:36 sam Exp $
+ * $Id: input_es.h,v 1.2 2001/12/12 17:41:15 massiot Exp $
  *
  * Authors: 
  *
@@ -21,7 +21,5 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define NB_DATA 8192
-#define NB_PES  4096
 #define ES_PACKET_SIZE 2048
 #define MAX_PACKETS_IN_FIFO 14

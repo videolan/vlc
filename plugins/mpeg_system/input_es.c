@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.3 2001/12/10 15:52:31 massiot Exp $
+ * $Id: input_es.c,v 1.4 2001/12/12 17:41:15 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -88,6 +88,19 @@ static void ESInitBitstream( struct bit_stream_s *, struct decoder_fifo_s *,
                                                         boolean_t ),
                         void * );
 
+/*****************************************************************************
+ * Declare a buffer manager
+ *****************************************************************************/
+#define FLAGS           BUFFERS_UNIQUE_SIZE
+#define NB_LIFO         1
+DECLARE_BUFFERS_EMBEDDED( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_INIT( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 150 );
+DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150, 150 );
+DECLARE_BUFFERS_TOIO( FLAGS, ES_PACKET_SIZE );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -106,10 +119,10 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_set_program      = ESSetProgram;
     input.pf_read             = ESRead;
     input.pf_demux            = ESDemux;
-    input.pf_new_packet       = input_NetlistNewPacket;
-    input.pf_new_pes          = input_NetlistNewPES;
-    input.pf_delete_packet    = input_NetlistDeletePacket;
-    input.pf_delete_pes       = input_NetlistDeletePES;
+    input.pf_new_packet       = input_NewPacket;
+    input.pf_new_pes          = input_NewPES;
+    input.pf_delete_packet    = input_DeletePacket;
+    input.pf_delete_pes       = input_DeletePES;
     input.pf_rewind           = NULL;
     input.pf_seek             = ESSeek;
 #undef input
@@ -143,11 +156,9 @@ static void ESInit( input_thread_t * p_input )
 
     p_input->p_method_data = NULL;
 
-    /* Initialize netlist */
-    if( input_NetlistInit( p_input, NB_DATA, NB_DATA, NB_PES, ES_PACKET_SIZE,
-                           INPUT_READ_ONCE ) )
+    if( (p_input->p_method_data = input_BuffersInit()) == NULL )
     {
-        intf_ErrMsg( "ES input : Could not initialize netlist" );
+        p_input->b_error = 1;
         return;
     }
 
@@ -170,6 +181,7 @@ static void ESInit( input_thread_t * p_input )
  *****************************************************************************/
 static void ESEnd( input_thread_t * p_input )
 {
+    input_BuffersEnd( p_input->p_method_data );
 }
 
 /*****************************************************************************
@@ -181,13 +193,15 @@ static void ESEnd( input_thread_t * p_input )
 static int ESRead( input_thread_t * p_input,
                    data_packet_t * pp_packets[INPUT_READ_ONCE] )
 {
-    int             i_read;
-    struct iovec  * p_iovec;
+    int             i_read, i_loop;
+    struct iovec    p_iovec[INPUT_READ_ONCE];
+    data_packet_t * p_data;
 
     /* Get iovecs */
-    p_iovec = input_NetlistGetiovec( p_input->p_method_data );
+    p_data = input_BuffersToIO( p_input->p_method_data, p_iovec,
+                                INPUT_READ_ONCE );
 
-    if ( p_iovec == NULL )
+    if ( p_data == NULL )
     {
         return( -1 ); /* empty netlist */
     }
@@ -201,14 +215,25 @@ static int ESRead( input_thread_t * p_input,
         return( -1 );
     }
 
+    for( i_loop=0; i_loop * ES_PACKET_SIZE < i_read; i_loop++ )
+    {
+        pp_packets[i_loop] = p_data;
+        p_data = p_data->p_next;
+        pp_packets[i_loop]->p_next = NULL;
+    }
+    for( ; i_loop < INPUT_READ_ONCE ; i_loop++ )
+    {
+        data_packet_t * p_next = p_data->p_next;
+        input_DeletePacket( p_input->p_method_data, p_data );
+        p_data = p_next;
+        pp_packets[i_loop] = NULL;
+    }
+
     /* EOF */
     if( i_read == 0 && p_input->stream.b_seekable )
     {
         return( 1 );
     }
-
-    input_NetlistMviovec( p_input->p_method_data,
-             (int)(i_read/ES_PACKET_SIZE), pp_packets );
 
     p_input->stream.p_selected_area->i_tell += i_read;
 
@@ -251,7 +276,8 @@ static void ESDemux( input_thread_t * p_input, data_packet_t * p_data )
     }
 
     p_pes->i_rate = p_input->stream.control.i_rate;
-    p_pes->p_first = p_data;
+    p_pes->p_first = p_pes->p_last = p_data;
+    p_pes->i_nb_data = 1;
 
     if( (p_input->stream.pp_programs[0]->i_synchro_state == SYNCHRO_REINIT)
          | (input_ClockManageControl( p_input, p_input->stream.pp_programs[0],

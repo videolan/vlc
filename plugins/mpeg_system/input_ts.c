@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.3 2001/12/12 13:48:09 massiot Exp $
+ * $Id: input_ts.c,v 1.4 2001/12/12 17:41:15 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -293,7 +293,7 @@ static int TSRead( input_thread_t * p_input,
         p_data = input_BuffersToIO( p_input->p_method_data, p_iovec,
                                     INPUT_READ_ONCE );
 
-        if ( p_iovec == NULL )
+        if ( p_data == NULL )
         {
             return( -1 );
         }
