@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.6 2003/12/01 01:08:42 rocky Exp $
+ * $Id: access.c,v 1.7 2003/12/01 03:34:30 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -419,7 +419,7 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
 	    dbg_print( (INPUT_DBG_LSN|INPUT_DBG_CALL), 
 		       "end of track, cur: %u", p_cdda->i_sector );
 
-            if ( p_cdda->i_track >= p_cdda->i_nb_tracks - 1 )
+            /*???? if ( p_cdda->i_track >= p_cdda->i_nb_tracks - 1 )*/
                 return 0; /* EOF */
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -584,13 +584,12 @@ static void InformationCreate( input_thread_t *p_input  )
 
   if (!use_cddb)
   {
-    lba_t i_sec = cdio_get_track_lba(p_cdda->p_cddev->cdio, 
-				       CDIO_CDROM_LEADOUT_TRACK) ;
+    track_t i_track = p_cdda->i_nb_tracks;
+    mtime_t i_duration = 
+      (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
+      / CDIO_CD_FRAMES_PER_SEC;
 
-    i_sec /= CDIO_CD_FRAMES_PER_SEC;
-
-    if ( i_sec > 1000 )
-      input_AddInfo( p_cat, _("Duration"), "%s", secs2TimeStr( i_sec ) );
+    input_AddInfo( p_cat, _("Duration"), "%s", secs2TimeStr( i_duration ) );
   }
 }
 
@@ -727,18 +726,19 @@ GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
    begin with %, with information from the current CD. 
    The expanded string is returned. Here is a list of escape sequences:
 
-   %a : The album artist
-   %A : The album information 
-   %C : Category
-   %I : CDDB disk ID
-   %G : Genre
+   %a : The album artist **
+   %A : The album information **
+   %C : Category **
+   %I : CDDB disk ID **
+   %G : Genre **
    %M : The current MRL
    %m : The CD-DA Media Catalog Number (MCN)
-   %p : The artist/performer/composer in the track
-   %T : The track number
+   %n : The number of tracks on the CD
+   %p : The artist/performer/composer in the track **
+   %T : The track number **
    %s : Number of seconds in this track
-   %t : The name
-   %Y : The year 19xx or 20xx
+   %t : The name **
+   %Y : The year 19xx or 20xx **
    %% : a %
 */
 static char *
@@ -811,26 +811,31 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
 	  add_format_str_info(t->artist);
       } else goto not_special;
       break;
-    case 's':
-      if (p_cdda->i_cddb_enabled) {
-	cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, 
-					    i_track-1);
-	if (t != NULL && t->length > 1000 ) {
-	  add_format_str_info(secs2TimeStr(t->length));
-	}
-      } else goto not_special;
-      break;
-
 #endif
 
     case 'M':
       add_format_str_info(mrl);
       break;
+
 #if FINISHED
     case 'm':
       add_format_str_info(p_cdda->mcn);
       break;
 #endif
+
+    case 'n':
+      add_format_num_info(p_cdda->i_nb_tracks, "%d");
+      break;
+
+    case 's':
+      if (p_cdda->i_cddb_enabled) {
+	mtime_t i_duration = 
+	  (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
+	  / CDIO_CD_FRAMES_PER_SEC;
+	add_format_str_info(secs2TimeStr(i_duration));
+      } else goto not_special;
+      break;
+
     case 'T':
       add_format_num_info(i_track, "%d");
       break;
@@ -855,7 +860,7 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
 {
   mtime_t i_duration = 
     (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
-    * 1000 / CDIO_CD_FRAMES_PER_SEC;
+    / CDIO_CD_FRAMES_PER_SEC;
   char *p_title;
   
   snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u", 

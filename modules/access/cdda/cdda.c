@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.5 2003/12/01 01:08:42 rocky Exp $
+ * $Id: cdda.c,v 1.6 2003/12/01 03:34:30 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -76,22 +76,24 @@ int  E_(DebugCallback)       ( vlc_object_t *p_this, const char *psz_name,
 #define TITLE_FMT_LONGTEXT N_( \
 "Format used in the GUI Playlist Title. Similar to the Unix date \n" \
 "Format specifiers that start with a percent sign. Specifiers are: \n" \
-"   %a : The artist\n" \
-"   %A : The album information \n" \
-"   %C : Category\n" \
+"   %a : The artist **\n" \
+"   %A : The album information **\n" \
+"   %C : Category **\n" \
 "   %I : CDDB disk ID\n" \
-"   %G : Genre\n" \
+"   %G : Genre **\n" \
 "   %M : The current MRL\n" \
 "   %m : The CD-DA Media Catalog Number (MCN)\n" \
-"   %p : The artist/performer/composer in the track \n" \
+"   %n : The number of tracks on the CD\n" \
+"   %p : The artist/performer/composer in the track **\n" \
 "   %T : The track number\n" \
 "   %s : Number of seconds in this track \n" \
-"   %t : The name\n" \
-"   %Y : The year 19xx or 20xx\n" \
-"   %% : a %\n")
+"   %t : The title **\n" \
+"   %Y : The year 19xx or 20xx\n **\n" \
+"   %% : a % \n" \
+"\n\n ** Only available if CDDB is enabled")
 
 #ifdef HAVE_LIBCDDB
-#define DEFAULT_TITLE_FORMAT "Track %T. %t - %p %s",
+#define DEFAULT_TITLE_FORMAT "Track %T. %t - %p",
 #else 
 #define DEFAULT_TITLE_FORMAT "%T %M",
 #endif
