@@ -289,7 +289,7 @@ STDMETHODIMP CapturePin::QueryInterface(REFIID riid, void **ppv)
 
 STDMETHODIMP_(ULONG) CapturePin::AddRef()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CapturePin::AddRef (ref: %i)", i_ref );
 #endif
 
@@ -297,7 +297,7 @@ STDMETHODIMP_(ULONG) CapturePin::AddRef()
 };
 STDMETHODIMP_(ULONG) CapturePin::Release()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CapturePin::Release (ref: %i)", i_ref );
 #endif
 
@@ -619,7 +619,7 @@ STDMETHODIMP CaptureFilter::QueryInterface( REFIID riid, void **ppv )
 };
 STDMETHODIMP_(ULONG) CaptureFilter::AddRef()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureFilter::AddRef (ref: %i)", i_ref );
 #endif
 
@@ -627,7 +627,7 @@ STDMETHODIMP_(ULONG) CaptureFilter::AddRef()
 };
 STDMETHODIMP_(ULONG) CaptureFilter::Release()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureFilter::Release (ref: %i)", i_ref );
 #endif
 
@@ -810,7 +810,7 @@ STDMETHODIMP CaptureEnumPins::QueryInterface( REFIID riid, void **ppv )
 };
 STDMETHODIMP_(ULONG) CaptureEnumPins::AddRef()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumPins::AddRef (ref: %i)", i_ref );
 #endif
 
@@ -818,7 +818,7 @@ STDMETHODIMP_(ULONG) CaptureEnumPins::AddRef()
 };
 STDMETHODIMP_(ULONG) CaptureEnumPins::Release()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumPins::Release (ref: %i)", i_ref );
 #endif
 
@@ -939,7 +939,7 @@ STDMETHODIMP CaptureEnumMediaTypes::QueryInterface( REFIID riid, void **ppv )
 };
 STDMETHODIMP_(ULONG) CaptureEnumMediaTypes::AddRef()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumMediaTypes::AddRef (ref: %i)", i_ref );
 #endif
 
@@ -947,7 +947,7 @@ STDMETHODIMP_(ULONG) CaptureEnumMediaTypes::AddRef()
 };
 STDMETHODIMP_(ULONG) CaptureEnumMediaTypes::Release()
 {
-#ifdef DEBUG_DSHOW
+#ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Release (ref: %i)", i_ref );
 #endif
 
