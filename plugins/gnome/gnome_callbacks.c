@@ -2,7 +2,7 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.21 2001/04/08 07:24:47 stef Exp $
+ * $Id: gnome_callbacks.c,v 1.22 2001/04/08 07:45:03 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -334,6 +334,8 @@ on_menubar_audio_toggle                (GtkCheckMenuItem     *menuitem,
 {
     intf_thread_t *         p_intf;
     es_descriptor_t *       p_es;
+
+    p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
     if( !p_intf->p_sys->b_menus_update )
     {
