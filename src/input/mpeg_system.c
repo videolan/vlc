@@ -68,6 +68,18 @@ void input_DecodePES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( p_es->p_decoder_fifo != NULL )
     {
         vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
+
+        if( p_input->stream.b_pace_control )
+        {
+            /* FIXME : normally we shouldn't need this... */
+            while( DECODER_FIFO_ISFULL( *p_es->p_decoder_fifo ) )
+            {
+                vlc_mutex_unlock( &p_es->p_decoder_fifo->data_lock );
+                msleep( 20000 );
+                vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
+            }
+        }
+
         if( !DECODER_FIFO_ISFULL( *p_es->p_decoder_fifo ) )
         {
             //intf_DbgMsg("Putting %p into fifo %p/%d\n",
@@ -190,21 +202,123 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             break;
 
         default:
-            /* The PES header contains at least 3 more bytes. */
-            p_pes->b_data_alignment = p_header[6] & 0x04;
-            p_pes->b_has_pts = p_header[7] & 0x80;
-            i_pes_header_size = p_header[8] + 9;
+            if( (p_header[6] & 0xC0) == 0x80 )
+            {
+                /* MPEG-2 : the PES header contains at least 3 more bytes. */
+                p_pes->b_data_alignment = p_header[6] & 0x04;
+                p_pes->b_has_pts = p_header[7] & 0x80;
+                i_pes_header_size = p_header[8] + 9;
 
-            /* Now parse the optional header extensions (in the limit of
-             * the 14 bytes). */
+                /* Now parse the optional header extensions (in the limit of
+                 * the 14 bytes). */
+                if( p_pes->b_has_pts )
+                {
+                    p_pes->i_pts =
+                      ( ((mtime_t)(p_header[9] & 0x0E) << 29) |
+                        (((mtime_t)U16_AT(p_header + 10) << 14) - (1 << 14)) |
+                        ((mtime_t)U16_AT(p_header + 12) >> 1) ) * 300;
+                    p_pes->i_pts /= 27;
+                }
+            }
+            else
+            {
+                /* Probably MPEG-1 */
+                byte_t *        p_byte;
+                data_packet_t * p_data;
+
+                i_pes_header_size = 6;
+                p_data = p_pes->p_first;
+                p_byte = p_data->p_buffer + 6;
+                while( *p_byte == 0xFF && i_pes_header_size < 22 )
+                {
+                    i_pes_header_size++;
+                    p_byte++;
+                    if( p_byte >= p_data->p_payload_end )
+                    {
+                        p_data = p_data->p_next;
+                        if( p_data == NULL )
+                        {
+                            intf_ErrMsg( "MPEG-1 packet too short for header" );
+                            p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+                            p_pes = NULL;
+                            return;
+                        }
+                        p_byte = p_data->p_payload_start;
+                    }
+                }
+                if( i_pes_header_size == 22 )
+                {
+                    intf_ErrMsg( "Too much MPEG-1 stuffing" );
+                    p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+                    p_pes = NULL;
+                    return;
+                }
+
+                if( (*p_byte & 0xC0) == 0x40 )
+                {
+                    /* Don't ask why... --Meuuh */
+                    p_byte += 2;
+                    i_pes_header_size += 2;
+                    if( p_byte >= p_data->p_payload_end )
+                    {
+                        int i_plus = p_byte - p_data->p_payload_end;
+                        p_data = p_data->p_next;
+                        if( p_data == NULL )
+                        {
+                            intf_ErrMsg( "MPEG-1 packet too short for header" );
+                            p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+                            p_pes = NULL;
+                            return;
+                        }
+                        p_byte = p_data->p_payload_start + i_plus;
+                    }
+                }
+
+                i_pes_header_size++;
+                p_pes->b_has_pts = *p_byte & 0x20;
+
+                if( *p_byte & 0x10 )
+                {
+                    /* DTS */
+                    i_pes_header_size += 5;
+                }
+                if( *p_byte & 0x20 )
+                {
+                    /* PTS */
+                    byte_t      p_pts[5];
+                    int         i;
+
+                    i_pes_header_size += 4;
+                    p_pts[0] = *p_byte;
+                    for( i = 1; i < 5; i++ )
+                    {
+                        p_byte++;
+                        if( p_byte >= p_data->p_payload_end )
+                        {
+                            p_data = p_data->p_next;
+                            if( p_data == NULL )
+                            {
+                                intf_ErrMsg( "MPEG-1 packet too short for header" );
+                                p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+                                p_pes = NULL;
+                                return;
+                            }
+                            p_byte = p_data->p_payload_start;
+                        }
+
+                        p_pts[i] = *p_byte;
+                    }
+                    p_pes->i_pts =
+                      ( ((mtime_t)(p_pts[0] & 0x0E) << 29) |
+                        (((mtime_t)U16_AT(p_pts + 1) << 14) - (1 << 14)) |
+                        ((mtime_t)U16_AT(p_pts + 3) >> 1) ) * 300;
+                    p_pes->i_pts /= 27;
+                }
+            }
+
+            /* PTS management */
             if( p_pes->b_has_pts )
             {
-                p_pes->i_pts =
-                  ( ((mtime_t)(p_header[9] & 0x0E) << 29) |
-                    (((mtime_t)U16_AT(p_header + 10) << 14) - (1 << 14)) |
-                    ((mtime_t)U16_AT(p_header + 12) >> 1) ) * 300;
-                p_pes->i_pts /= 27;
-
                 switch( p_es->p_pgrm->i_synchro_state )
                 {
                 case SYNCHRO_NOT_STARTED:
@@ -609,6 +723,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
             {
                 /* Convert the SCR in microseconds. */
                 mtime_t         scr_time;
+
+                /* FIXME : this calculus is broken with MPEG-1 ! */
                 scr_time = (( ((mtime_t)(p_data->p_buffer[4] & 0x38) << 27) |
                               ((mtime_t)(p_data->p_buffer[4] & 0x3) << 26) |
                               ((mtime_t)(p_data->p_buffer[5]) << 20) |
@@ -779,7 +895,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
             b_trash = 1;
 #endif
         }
-        else
+
+        if( p_es != NULL )
         {
 #ifdef STATS
             p_es->c_packets++;

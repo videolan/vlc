@@ -183,7 +183,22 @@ static void PSRead( input_thread_t * p_input,
     }
     else
     {
-        i_packet_size = 8;
+        if( (p_header[4] & 0xC0) == 0x40 )
+        {
+            /* MPEG-2 */
+            i_packet_size = 8;
+        }
+        else if( (p_header[4] & 0xF0) == 0x20 )
+        {
+            /* MPEG-1 */
+            i_packet_size = 6;
+        }
+        else
+        {
+            intf_ErrMsg( "Unable to determine stream type" );
+            p_input->b_error = 1;
+            return;
+        }
     }
 
     if( (p_data = NewPacket( p_input, i_packet_size + 6 )) == NULL )
@@ -217,13 +232,24 @@ static void PSRead( input_thread_t * p_input,
 
     if( U32_AT(p_header) == 0x1BA )
     {
-        /* stuffing_bytes */
-        byte_t      p_garbage[8];
-        /* FIXME: catch EINTR ! */
-        if( (p_data->p_buffer[13] & 0x3) != 0 )
+        if( i_packet_size == 8 )
         {
-            fread( p_garbage, p_garbage[0] & 0x3, 1,
-                   p_method->stream );
+            /* MPEG-2 stuffing bytes */
+            byte_t      p_garbage[8];
+            if( (p_data->p_buffer[13] & 0x7) != 0 )
+            {
+                /* FIXME: catch EINTR ! */
+                fread( p_garbage, p_garbage[0] & 0x7, 1,
+                       p_method->stream );
+            }
+        }
+        else
+        {
+            /* FIXME: kludge to avoid SCR to block everything (SCR
+             * calculus appears to be wrong). */
+            p_data->p_buffer[4] = p_data->p_buffer[5] =
+                p_data->p_buffer[6] = p_data->p_buffer[7] =
+                p_data->p_buffer[8] = 0;
         }
     }
 

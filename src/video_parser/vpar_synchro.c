@@ -239,7 +239,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         {
         case I_CODING_TYPE:
             /* Stream structure changes */
-            if( S.i_n_p )
+            if( S.i_eta_p )
                 S.i_n_p = S.i_eta_p;
 
             if( S.backward_pts )
@@ -271,7 +271,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 
         case P_CODING_TYPE:
             /* Stream structure changes */
-            if( S.i_n_b )
+            if( S.i_eta_b )
                 S.i_n_b = S.i_eta_b;
             if( S.i_eta_p + 1 > S.i_n_p )
                 S.i_n_p++;
