@@ -46,6 +46,9 @@ typedef struct
     /* only for broadcast */
     vlc_bool_t b_loop;
 
+    /* only for vod */
+    vod_media_t *vod_media;
+
     /* "playlist" index */
     int     i_index;
 
@@ -101,16 +104,11 @@ struct vlm_t
 
     vlc_mutex_t lock;
 
-#if 0
-    int         i_vod;
-    vlm_media_t **vod;
-
-    int         i_broadcast;
-    vlm_media_t **broadcast;
-#endif
-
     int            i_media;
     vlm_media_t    **media;
+
+    int            i_vod;
+    vod_t          *vod;
 
     int            i_schedule;
     vlm_schedule_t **schedule;
@@ -118,11 +116,9 @@ struct vlm_t
 
 
 #define vlm_New( a ) __vlm_New( VLC_OBJECT(a) )
-
 VLC_EXPORT( vlm_t *, __vlm_New, ( vlc_object_t * ) );
-VLC_EXPORT( void,    vlm_Delete, ( vlm_t * ) );
-
-VLC_EXPORT( int,     vlm_ExecuteCommand, ( vlm_t *, char *, vlm_message_t **) );
-VLC_EXPORT( void,    vlm_MessageDelete, ( vlm_message_t* ) );
+VLC_EXPORT( void, vlm_Delete, ( vlm_t * ) );
+VLC_EXPORT( int, vlm_ExecuteCommand, ( vlm_t *, char *, vlm_message_t ** ) );
+VLC_EXPORT( void, vlm_MessageDelete, ( vlm_message_t* ) );
 
 #endif

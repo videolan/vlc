@@ -118,7 +118,7 @@ struct vod_sys_t
     vod_media_t **media;
 };
 
-static vod_media_t *MediaNew( vod_t *, void *needsomethingthere );
+static vod_media_t *MediaNew( vod_t *, char *, input_item_t * );
 static void         MediaDel( vod_t *, vod_media_t * );
 static int          MediaAddES( vod_t *, vod_media_t *, es_format_t * );
 static void         MediaDelES( vod_t *, vod_media_t *, es_format_t * );
@@ -209,14 +209,14 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Media handling
  *****************************************************************************/
-static vod_media_t *MediaNew( vod_t *p_vod, void *needsomethinghere )
+static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
+                              input_item_t *p_item )
 {
     vod_sys_t *p_sys = p_vod->p_sys;
     vod_media_t *p_media = malloc( sizeof(vod_media_t) );
     memset( p_media, 0, sizeof(vod_media_t) );
 
-    asprintf( &p_media->psz_rtsp_path, "%s%i", p_sys->psz_path,
-              p_sys->i_media );
+    asprintf( &p_media->psz_rtsp_path, "%s%s", p_sys->psz_path, psz_name );
 
     p_media->p_rtsp_url =
         httpd_UrlNewUnique( p_sys->p_rtsp_host, p_media->psz_rtsp_path, 0, 0 );
@@ -226,6 +226,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, void *needsomethinghere )
         msg_Err( p_vod, "cannot create http url" );
         free( p_media->psz_rtsp_path );
         free( p_media );
+        return 0;
     }
 
     msg_Dbg( p_vod, "created rtsp url: %s", p_media->psz_rtsp_path );

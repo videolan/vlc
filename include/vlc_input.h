@@ -27,7 +27,7 @@
 #define _VLC__INPUT_H 1
 
 /*****************************************************************************
- * input_item_t: Describes an input and is used to spawn input_thread_t objects.
+ * input_item_t: Describes an input and is used to spawn input_thread_t objects
  *****************************************************************************/
 struct info_t
 {
@@ -55,6 +55,9 @@ struct input_item_t
 
     int        i_categories;         /**< Number of info categories */
     info_category_t **pp_categories; /**< Pointer to the first info category */
+
+    int         i_es;                /**< Number of es format descriptions */
+    es_format_t **es;                /**< Pointer to an array of es formats */
 
     vlc_mutex_t lock;                /**< Item cannot be changed without this lock */
 };

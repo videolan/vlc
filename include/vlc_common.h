@@ -357,6 +357,7 @@ typedef struct httpd_stream_t httpd_stream_t;
 /* vod server */
 typedef struct vod_t     vod_t;
 typedef struct vod_sys_t vod_sys_t;
+typedef struct vod_media_t vod_media_t;
 
 /* opengl */
 typedef struct opengl_t     opengl_t;

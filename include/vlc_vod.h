@@ -24,8 +24,6 @@
 #ifndef _VLC_VOD_H
 #define _VLC_VOD_H 1
 
-typedef struct vod_media_t vod_media_t;
-
 struct vod_t
 {
     VLC_COMMON_MEMBERS
@@ -34,7 +32,7 @@ struct vod_t
     module_t  *p_module;
     vod_sys_t *p_sys;
 
-    vod_media_t * (*pf_media_new)   ( vod_t *, void * );
+    vod_media_t * (*pf_media_new)   ( vod_t *, char *, input_item_t * );
     void          (*pf_media_del)   ( vod_t *, vod_media_t * );
     int           (*pf_media_add_es)( vod_t *, vod_media_t *, es_format_t * );
     void          (*pf_media_del_es)( vod_t *, vod_media_t *, es_format_t * );
