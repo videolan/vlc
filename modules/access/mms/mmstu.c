@@ -1211,8 +1211,8 @@ static int  mms_ParsePacket( access_t *p_access,
     if( i_packet_length > i_data || i_packet_length <= 8)
     {
         msg_Dbg( p_access,
-                 "truncated packet (missing %d bytes)",
-                 i_packet_length - i_data  );
+                 "truncated packet (Declared %d bytes, Actual %d bytes)",
+                 i_packet_length, i_data  );
         *pi_used = 0;
         return -1;
     }
