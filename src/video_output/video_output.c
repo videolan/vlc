@@ -472,6 +472,20 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     {
         msg_Err( p_vout, "out of memory" );
         module_Unneed( p_vout, p_vout->p_module );
+        vlc_object_detach( p_vout );
+        vlc_object_destroy( p_vout );
+        return NULL;
+    }
+
+    if( p_vout->b_error )
+    {
+        msg_Err( p_vout, "video output creation failed" );
+
+        /* Make sure the thread is destroyed */
+        p_vout->b_die = VLC_TRUE;
+        vlc_thread_join( p_vout );
+
+        vlc_object_detach( p_vout );
         vlc_object_destroy( p_vout );
         return NULL;
     }
