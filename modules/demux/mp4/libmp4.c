@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.37 2003/12/02 13:31:23 gbazin Exp $
+ * $Id: libmp4.c,v 1.38 2003/12/15 22:55:01 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -102,7 +102,7 @@
     free( p_buff ); \
     if( i_read < 0 ) \
     { \
-        msg_Warn( p_stream->p_input, "Not enougth data" ); \
+        msg_Warn( p_stream->p_input, "Not enough data" ); \
     } \
     return( i_code )
 
@@ -1090,7 +1090,7 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     if( i_read < 28 )
     {
         i_read -= 30;
-        MP4_READBOX_EXIT( 0 );
+        MP4_READBOX_EXIT( 1 );
     }
 
     for( i = 0; i < 6 ; i++ )

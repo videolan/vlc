@@ -2,7 +2,7 @@
  * mpeg4audio.c: parse and packetize an MPEG 4 audio stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.12 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: mpeg4audio.c,v 1.13 2003/12/15 22:55:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -212,6 +212,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
+    *pp_block = NULL; /* Don't reuse this block */
 
     if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
     {
@@ -230,7 +231,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
     p_block->i_length = aout_DateIncrement( &p_sys->end_date,
         p_dec->fmt_out.audio.i_frame_length ) - p_block->i_pts;
 
-    return *pp_block;
+    return p_block;
 }
 
 /****************************************************************************
