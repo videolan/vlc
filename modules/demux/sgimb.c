@@ -345,8 +345,8 @@ static int Demux ( demux_t *p_demux )
     if( !p_sys->psz_mcast_ip )
     {
         char *psz_option;
-	asprintf( &psz_option, "rtsp-caching=10000" )
-	playlist_ItemAddOption( p_item, psz_option )
+	asprintf( &psz_option, "rtsp-caching=10000" );
+	playlist_ItemAddOption( p_item, psz_option );
 	free( psz_option );
     }
     if( !p_sys->psz_mcast_ip && p_sys->b_rtsp_kasenna )
