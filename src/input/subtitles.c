@@ -131,6 +131,7 @@ typedef struct _subfn
 {
     int priority;
     char *psz_fname;
+    char *psz_ext;
 } subfn;
 
 static int compare_sub_priority( const void *a, const void *b )
@@ -239,7 +240,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     /* variables to be used for derivatives FILE *f */
     char *tmp_fname_noext, *tmp_fname_trim, *tmp_fname_ext, *tmpresult;
     vlc_value_t fuzzy;
-    int len, i, j, i_sub_count;
+    int len, i, j, i_sub_count, i_result2;
     subfn *result; /* unsorted results */
     char **result2; /* sorted results */
     char **tmp_subdirs, **subdirs; /* list of subdirectories to look in */
@@ -367,6 +368,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                             fclose( f );
                             result[i_sub_count].priority = i_prio;
                             result[i_sub_count].psz_fname = strdup(tmpresult);
+                            result[i_sub_count].psz_ext = strdup(tmp_fname_ext);
                             i_sub_count++;
                         }
                     }
@@ -395,12 +397,33 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
     result2 = (char**)malloc( sizeof(char*) * ( i_sub_count + 1 ) );
     memset( result2, 0, sizeof(char*) * ( i_sub_count + 1 ) );
+    i_result2 = 0;
 
     for( i = 0; i < i_sub_count; i++ )
     {
-        result2[i] = result[i].psz_fname;
+        if( result[i].psz_ext && !strcasecmp( result[i].psz_ext, "sub" ) )
+        {
+            int j;
+            for( j = 0; j < i_sub_count; j++ )
+            {
+                if( result[j].psz_fname && result[i].psz_fname &&
+                    !strncasecmp( result[i].psz_fname, result[j].psz_fname, sizeof( result[i].psz_fname) - 4 ) )
+                    break;
+                
+            }
+            if( j >= i_sub_count )
+            {
+                result2[i_result2] = result[i].psz_fname;
+                i_result2++;
+            }
+        }
+        else
+        {
+            result2[i_result2] = result[i].psz_fname;
+            i_result2++;
+        }
     }
-    result2[i_sub_count] = NULL;
+    result2[i_result2+1] = NULL;
     free( result );
     return result2;
 }
