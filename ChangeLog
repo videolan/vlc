@@ -4,6 +4,11 @@
 
 HEAD
 
+  * Added support in ./configure for the cprof profiler.
+  * Activated -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 on all platforms, fixes
+    issues under Solaris and QNX.
+  * Additional checks for SSE-specific (non-MMXEXT) instructions, as
+    reported in lucky.openbsd.misc.
   * GNU/Hurd configuration and compilation fixes.
   * Fixed a crash in subtitle rendering.
   * Activated old crappy subtitle rendering in overlay mode (ugly but

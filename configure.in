@@ -202,16 +202,28 @@ dnl
 dnl  Accelerated modules
 dnl
 MMX_MODULES="yuvmmx idctmmx motionmmx"
-MMXEXT_MODULES="idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
+MMXEXT_MODULES="idctmmxext motionmmxext"
+THREEDNOW_MODULES="imdct3dn downmix3dn"
+SSE_MODULES="imdctsse downmixsse"
 
 AC_MSG_CHECKING([if \$CC groks MMX inline assembly])
 AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
-AC_MSG_CHECKING([if \$CC groks MMX EXT or SSE inline assembly])
+AC_MSG_CHECKING([if \$CC groks MMX EXT inline assembly])
 AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
   ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
+  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING([if \$CC groks 3D Now! inline assembly])
+AC_TRY_COMPILE([void quux(){void *p;asm("pfadd %%mm1,%%mm2"::"r"(p));}],,
+  ACCEL_MODULES="${ACCEL_MODULES} ${THREEDNOW_MODULES}"
+  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING([if \$CC groks SSE inline assembly])
+AC_TRY_COMPILE([void quux(){void *p;asm("xorps %%xmm1,%%xmm2"::"r"(p));}],,
+  ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl
@@ -371,10 +383,20 @@ AC_ARG_ENABLE(trace,
 dnl
 dnl  Trace mode
 dnl
-PROFILING=0
-AC_ARG_ENABLE(profiling,
-[  --enable-profiling      Enable gprof profiling (default disabled)],
-[ if test x$enableval = xyes; then PROFILING=1; fi ])
+GPROF=0
+AC_ARG_ENABLE(gprof,
+[  --enable-gprof          Enable gprof profiling (default disabled)],
+[ if test x$enableval = xyes; then GPROF=1; fi ])
+
+CPROF=0
+AC_ARG_ENABLE(cprof,
+[  --enable-cprof          Enable cprof profiling (default disabled)],
+[ if test x$enableval = xyes;
+  then
+    LIB="${LIB} -lcprof"
+    CPROF=1
+  fi
+])
 
 dnl
 dnl  Enable/disable optimizations
@@ -864,7 +886,8 @@ AC_SUBST(DEBUG)
 AC_SUBST(STATS)
 AC_SUBST(ASM)
 AC_SUBST(TRACE)
-AC_SUBST(PROFILING)
+AC_SUBST(CPROF)
+AC_SUBST(GPROF)
 AC_SUBST(OPTIMS)
 AC_SUBST(NEED_GETOPT)
 AC_SUBST(MOC)
@@ -929,7 +952,7 @@ vlc version           : ${VLC_VERSION}
 debug mode            : ${DEBUG}
 statistics            : ${STATS}
 trace mode            : ${TRACE}
-profiling             : ${PROFILING}
+cprof/gprof support   : ${CPROF}/${GPROF}
 need builtin getopt   : ${NEED_GETOPT}
 built-in modules      :${BUILTINS}
 plugin modules        :${PLUGINS}

@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.23 2001/08/14 04:52:39 sam Exp $
+ * $Id: threads.h,v 1.24 2001/08/19 23:35:13 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 
-#ifdef PROFILING
+#ifdef GPROF
 #   include <sys/time.h>
 #endif
 
@@ -176,7 +176,7 @@ static __inline__ int  vlc_cond_timedwait( vlc_cond_t *, vlc_mutex_t *,
                                            mtime_t );
 #endif
 
-#ifdef PROFILING
+#ifdef GPROF
 /* Wrapper function for profiling */
 static void *      vlc_thread_wrapper ( void *p_wrapper );
 
@@ -210,7 +210,7 @@ int setitimer(int kind, const struct itimerval* itnew,
 
 #endif /* WIN32 */
 
-#endif /* PROFILING */
+#endif /* GPROF */
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
@@ -707,7 +707,7 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
 {
     int i_ret;
 
-#ifdef PROFILING
+#ifdef GPROF
     wrapper_t wrapper;
 
     /* Initialize the wrapper structure */
@@ -759,7 +759,7 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
 
 #endif
 
-#ifdef PROFILING
+#ifdef GPROF
     if( i_ret == 0 )
     {
         vlc_cond_wait( &wrapper.wait, &wrapper.lock );
@@ -826,7 +826,7 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
 #endif
 }
 
-#ifdef PROFILING
+#ifdef GPROF
 static void *vlc_thread_wrapper( void *p_wrapper )
 {
     /* Put user data in thread-local variables */

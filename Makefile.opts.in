@@ -37,7 +37,8 @@ ARCH = @ARCH@
 DEBUG = @DEBUG@
 STATS = @STATS@
 TRACE = @TRACE@
-PROFILING = @PROFILING@
+CPROF = @CPROF@
+GPROF = @GPROF@
 OPTIMS = @OPTIMS@
 
 # 
@@ -122,9 +123,13 @@ ifeq ($(TRACE),1)
 PROGRAM_OPTIONS += TRACE
 DEFINE += -DTRACE
 endif
-ifeq ($(PROFILING),1)
-PROGRAM_OPTIONS += PROFILING
-DEFINE += -DPROFILING
+ifeq ($(CPROF),1)
+PROGRAM_OPTIONS += CPROF
+DEFINE += -DCPROF
+endif
+ifeq ($(GPROF),1)
+PROGRAM_OPTIONS += GPROF
+DEFINE += -DGPROF
 endif
 ifeq ($(STATS),1)
 PROGRAM_OPTIONS += STATS
@@ -150,10 +155,8 @@ LIBDVDCSS_VERSION=@LIBDVDCSS_VERSION@
 DEFINE_CONSTANTS := -DSYS_$(shell echo $(SYS) | sed -e 's/-.*//' | tr '[a-z].' '[A-Z]_')
 DEFINE += $(DEFINE_CONSTANTS)
 
-# On Linux activate 64-bit off_t (by default under BSD)
-ifneq (,$(findstring linux,$(SYS)))
+# On Linux and Solaris, activate 64-bit off_t (by default under BSD)
 DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98
-endif
 
 ###############################################################################
 # Tuning and other variables - do not change anything except if you know
@@ -215,8 +218,10 @@ ifeq ($(OPTIMS),1)
 CFLAGS += -O3
 CFLAGS += -ffast-math -funroll-loops
 ifneq ($(DEBUG),1)
-ifneq ($(PROFILING),1)
+ifneq ($(GPROF),1)
+ifneq ($(CPROF),1)
 CFLAGS += -fomit-frame-pointer
+endif
 endif
 endif
 
@@ -285,7 +290,12 @@ ifeq ($(DEBUG),1)
 CFLAGS += -g
 endif
 
-ifeq ($(PROFILING),1)
+ifeq ($(CPROF),1)
+CFLAGS += -finstrument-functions
+endif
+
+ifeq ($(GPROF),1)
 CFLAGS += -pg
 endif
+
 
