@@ -212,7 +212,7 @@ on_menubar_chapter_activate            (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 gboolean
-on_clist1_event                        (GtkWidget       *widget,
+on_playlist_clist_event                        (GtkWidget       *widget,
                                         GdkEvent        *event,
                                         gpointer         user_data);
 
@@ -242,7 +242,7 @@ on_intf_playlist_drag_data_received    (GtkWidget       *widget,
                                         gpointer         user_data);
 
 gboolean
-on_clist1_event                        (GtkWidget       *widget,
+on_playlist_clist_event                        (GtkWidget       *widget,
                                         GdkEvent        *event,
                                         gpointer         user_data);
 

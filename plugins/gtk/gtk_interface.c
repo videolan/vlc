@@ -1179,7 +1179,7 @@ create_intf_playlist (void)
   GtkWidget *selection;
   GtkWidget *selection1;
   GtkWidget *scrolledwindow1;
-  GtkWidget *clist1;
+  GtkWidget *playlist_clist;
   GtkWidget *label22;
   GtkWidget *label23;
 
@@ -1271,30 +1271,30 @@ create_intf_playlist (void)
   gtk_box_pack_start (GTK_BOX (vbox6), scrolledwindow1, TRUE, TRUE, 0);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
-  clist1 = gtk_clist_new (2);
-  gtk_widget_ref (clist1);
-  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "clist1", clist1,
+  playlist_clist = gtk_clist_new (2);
+  gtk_widget_ref (playlist_clist);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_clist", playlist_clist,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (clist1);
-  gtk_container_add (GTK_CONTAINER (scrolledwindow1), clist1);
-  gtk_clist_set_column_width (GTK_CLIST (clist1), 0, 257);
-  gtk_clist_set_column_width (GTK_CLIST (clist1), 1, 80);
-  gtk_clist_set_selection_mode (GTK_CLIST (clist1), GTK_SELECTION_EXTENDED);
-  gtk_clist_column_titles_hide (GTK_CLIST (clist1));
+  gtk_widget_show (playlist_clist);
+  gtk_container_add (GTK_CONTAINER (scrolledwindow1), playlist_clist);
+  gtk_clist_set_column_width (GTK_CLIST (playlist_clist), 0, 257);
+  gtk_clist_set_column_width (GTK_CLIST (playlist_clist), 1, 80);
+  gtk_clist_set_selection_mode (GTK_CLIST (playlist_clist), GTK_SELECTION_EXTENDED);
+  gtk_clist_column_titles_hide (GTK_CLIST (playlist_clist));
 
   label22 = gtk_label_new (_("File"));
   gtk_widget_ref (label22);
   gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label22", label22,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label22);
-  gtk_clist_set_column_widget (GTK_CLIST (clist1), 0, label22);
+  gtk_clist_set_column_widget (GTK_CLIST (playlist_clist), 0, label22);
 
   label23 = gtk_label_new (_("Duration"));
   gtk_widget_ref (label23);
   gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label23", label23,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label23);
-  gtk_clist_set_column_widget (GTK_CLIST (clist1), 1, label23);
+  gtk_clist_set_column_widget (GTK_CLIST (playlist_clist), 1, label23);
 
   gtk_signal_connect (GTK_OBJECT (intf_playlist), "delete_event",
                       GTK_SIGNAL_FUNC (on_intf_playlist_destroy_event),
@@ -1308,10 +1308,10 @@ create_intf_playlist (void)
   gtk_signal_connect (GTK_OBJECT (selection), "activate",
                       GTK_SIGNAL_FUNC (on_delete_clicked),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (clist1), "event",
-                      GTK_SIGNAL_FUNC (on_clist1_event),
+  gtk_signal_connect (GTK_OBJECT (playlist_clist), "event",
+                      GTK_SIGNAL_FUNC (on_playlist_clist_event),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (clist1), "drag_data_received",
+  gtk_signal_connect (GTK_OBJECT (playlist_clist), "drag_data_received",
                       GTK_SIGNAL_FUNC (on_intf_playlist_drag_data_received),
                       NULL);
 

@@ -477,7 +477,8 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
                                         gpointer         user_data)
 {
     intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_window" );
-    on_generic_drop_data_received( p_intf, data, info, 0);
+    int end = p_main->p_playlist->i_size;
+    on_generic_drop_data_received( p_intf, data, info, PLAYLIST_END);
 
      if( p_intf->p_input != NULL )
      {
@@ -485,7 +486,7 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
         p_intf->p_input->b_eof = 1;
      }
      
-    intf_PlstJumpto( p_main->p_playlist, -1 );
+    intf_PlstJumpto( p_main->p_playlist, end-1 );
 
 }
 
@@ -739,14 +740,8 @@ on_intf_window_destroy                 (GtkWidget       *widget,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget),  "intf_window" );
-    /* is there an output thread ? */
-    if(p_main->b_video == 1)
-    {
-        gtk_widget_hide(widget);
-    } else {
-        p_intf->b_die = 1;
-    }
-  return TRUE;
+    p_intf->b_die = 1;
+    return TRUE;
 }
 
 

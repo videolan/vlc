@@ -1386,12 +1386,12 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 
       <widget>
 	<class>GtkCList</class>
-	<name>clist1</name>
+	<name>playlist_clist</name>
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>event</name>
-	  <handler>on_clist1_event</handler>
-	  <last_modification_time>Thu, 08 Mar 2001 10:14:05 GMT</last_modification_time>
+	  <handler>on_playlist_clist_event</handler>
+	  <last_modification_time>Thu, 08 Mar 2001 22:18:03 GMT</last_modification_time>
 	</signal>
 	<signal>
 	  <name>drag_data_received</name>

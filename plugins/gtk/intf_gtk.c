@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.7 2001/03/08 15:48:14 octplane Exp $
+ * $Id: intf_gtk.c,v 1.8 2001/03/08 21:47:02 octplane Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -215,7 +215,7 @@ static void intf_Run( intf_thread_t *p_intf )
                        1, GDK_ACTION_COPY );
 
     /* Accept file drops on the playlist window */
-    temp = lookup_widget(p_intf->p_sys->p_playlist, "clist1"); 
+    temp = lookup_widget(p_intf->p_sys->p_playlist, "playlist_clist"); 
     
     
     gtk_drag_dest_set( GTK_WIDGET( temp ),

@@ -99,7 +99,7 @@ on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
     {
         p_playlist = p_main->p_playlist;
         
-        list = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist, "clist1" )) ;
+        list = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist, "playlist_clist" )) ;
         rebuildCList( list, p_playlist );
         
        
@@ -128,7 +128,7 @@ on_toolbar_playlist_clicked            (GtkButton       *button,
     } else {        
         GtkCList * clist;
         gtk_widget_show( p_intf->p_sys->p_playlist );
-        clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"clist1" ));
+        clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist" ));
         gdk_window_raise( p_intf->p_sys->p_playlist->window );
         rebuildCList( clist , p_main->p_playlist );
     }
@@ -211,15 +211,19 @@ on_invertselection_clicked (GtkMenuItem *item, gpointer user_data)
     
     /* lock the struct */
     vlc_mutex_lock( &p_intf->p_sys->change_lock );
-    clist = GTK_CLIST( lookup_widget(p_intf->p_sys->p_playlist,"clist1") );
+    clist = GTK_CLIST( lookup_widget(p_intf->p_sys->p_playlist,"playlist_clist") );
+    
+    /* have to copy the selection to an int *
+       I wasn't able to copy the g_list to another g_list
+       glib only does pointer copies, not real copies :( */
+    
     selected = malloc(sizeof(int)* g_list_length(clist->selection));
-
     sel_l = g_list_length(clist->selection);
-     
     for(dummy=0; dummy < sel_l; dummy++)
     {
         selected[dummy] = (int)g_list_nth_data(clist->selection,dummy);
     }
+    
     gtk_clist_freeze( clist );
     gtk_clist_select_all( clist );
     for(dummy=0; dummy < sel_l; dummy++)
@@ -236,6 +240,9 @@ void
 on_crop_activate                       (GtkMenuItem     *menuitem,
                                        gpointer         user_data)
 {
+    /* Ok, this is a really small thing, but, hey, it works and
+       might be useful, who knows ? */
+    
     on_invertselection_clicked (menuitem, user_data);
     on_delete_clicked(menuitem, user_data);
 }
@@ -256,7 +263,7 @@ on_delete_clicked                      (GtkMenuItem       *item,
     
     /* lock the struct */
     vlc_mutex_lock( &p_intf->p_sys->change_lock );
-    clist = GTK_CLIST( lookup_widget(p_intf->p_sys->p_playlist,"clist1") );
+    clist = GTK_CLIST( lookup_widget(p_intf->p_sys->p_playlist,"playlist_clist") );
     
     /* I use UNDOCUMENTED features to retrieve the selection... */
     selection = clist->selection; 
@@ -299,7 +306,7 @@ on_intf_playlist_drag_data_received    (GtkWidget       *widget,
     GtkCList *  clist;
     gint row, col;
 
-    clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"clist1" ));
+    clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist" ));
     
     if( gtk_clist_get_selection_info( clist, 
                 x, 
@@ -309,7 +316,7 @@ on_intf_playlist_drag_data_received    (GtkWidget       *widget,
     {
         on_generic_drop_data_received( p_intf, data, info, row);
     } else {
-        on_generic_drop_data_received( p_intf, data, info, 0);
+        on_generic_drop_data_received( p_intf, data, info, PLAYLIST_END);
     }
 }
     
@@ -398,7 +405,7 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
         intf_WarnMsg(1, "List has %d elements",g_list_length(files)); 
         intf_AppendList( p_playlist, position, files );
         /* get the CList  and rebuild it. */
-        clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"clist1" )); 
+        clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist" )); 
         rebuildCList( clist , p_playlist );
         
         /* unlock the interface */
@@ -486,20 +493,23 @@ intf_readFiles(gchar * fsname )
     return NULL;
 }
 
-/* add items in a playlist */
+/* add items in a playlist 
+  when i_pos==-1 add to the end of the list... 
+ */
 int intf_AppendList( playlist_t * p_playlist, int i_pos, GList * list )
 {
     guint length, dummy;
     length = g_list_length( list );
     for(dummy=0; dummy<length; dummy++)
     {
-        intf_WarnMsg(1,"Adding: %s@%d",g_list_nth_data(list, dummy), i_pos + dummy);
-        intf_PlstAdd( p_playlist, i_pos + dummy, g_list_nth_data(list, dummy));
+        intf_PlstAdd( p_playlist, 
+                i_pos==PLAYLIST_END?PLAYLIST_END:(i_pos + dummy), 
+                g_list_nth_data(list, dummy));
     }
     return 0;
 }
 gboolean
-on_clist1_event                        (GtkWidget       *widget,
+on_playlist_clist_event                        (GtkWidget       *widget,
         GdkEvent        *event,
         gpointer         user_data)
 {
@@ -510,7 +520,7 @@ on_clist1_event                        (GtkWidget       *widget,
         GtkCList *  clist;
         gint row, col;
 
-        clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"clist1" )); 
+        clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist" )); 
         if( gtk_clist_get_selection_info( clist, 
                     (event->button).x, 
                     (event->button).y, 
@@ -553,7 +563,7 @@ void GtkPlayListManage( gpointer p_data )
         color.blue = 0;
 
         gtk_clist_set_background (
-        GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist, "clist1" ) ),
+        GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist, "playlist_clist" ) ),
         p_playlist->i_index,
         &color);
         if( p_intf->p_sys->i_playing != -1 )
@@ -562,7 +572,7 @@ void GtkPlayListManage( gpointer p_data )
             color.green = 65535;
             color.blue = 65535;
             gtk_clist_set_background (
-            GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist, "clist1" ) ),
+            GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist, "playlist_clist" ) ),
             p_intf->p_sys->i_playing,
             &color);
         }
