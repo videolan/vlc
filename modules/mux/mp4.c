@@ -2,7 +2,7 @@
  * mp4.c
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.1 2003/04/18 22:43:08 fenrir Exp $
+ * $Id: mp4.c,v 1.2 2003/04/19 00:12:50 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -740,6 +740,23 @@ static void Close( vlc_object_t * p_this )
 
     box_fix( moov );
     box_send( p_mux, moov );
+
+    /* *** release memory *** */
+    for( i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++ )
+    {
+        mp4_stream_t *p_stream;
+
+        p_stream = p_sys->pp_streams[i_trak];
+
+        if( p_stream->p_fmt->p_extra_data )
+        {
+            free( p_stream->p_fmt->p_extra_data );
+        }
+        free( p_stream->p_fmt );
+        free( p_stream->entry );
+        free( p_stream );
+    }
+    free( p_sys );
 }
 
 static int Capability( sout_mux_t *p_mux, int i_query, void *p_args, void *p_answer )
@@ -759,7 +776,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     mp4_stream_t    *p_stream;
 
-    switch( p_input-p_fmt->i_fourcc )
+    switch( p_input->p_fmt->i_fourcc )
     {
         case VLC_FOURCC( 'm', 'p', '4', 'a' ):
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
@@ -769,7 +786,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         default:
             msg_Err( p_mux,
                      "unsupported codec %4.4s in mp4",
-                     (char*)&p_input-p_fmt->i_fourcc );
+                     (char*)&p_input->p_fmt->i_fourcc );
             return VLC_EGENERIC;
     }
 
