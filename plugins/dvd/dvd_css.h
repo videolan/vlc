@@ -2,7 +2,7 @@
  * dvd_css.h: Structures for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.h,v 1.3 2001/02/15 21:03:27 stef Exp $
+ * $Id: dvd_css.h,v 1.4 2001/02/20 02:53:13 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  *  - css-auth by Derek Fawcus <derek@spider.com>
  *  - DVD CSS ioctls example program by Andrew T. Veliath <andrewtv@usa.net>
  *  - DeCSSPlus by Ethan Hawke
- *  - The Divide and conquer attack by Frank A. Stevenson<frank@funcom.com>
+ *  - The Divide and conquer attack by Frank A. Stevenson <frank@funcom.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,24 +28,21 @@
  *****************************************************************************/
 #define KEY_SIZE 5
 
-typedef u8 DVD_key_t[KEY_SIZE];
+typedef u8 dvd_key_t[KEY_SIZE];
 
 typedef struct disc_s
 {
     u8              pi_challenge[2*KEY_SIZE];
-    u8              pi_key1[KEY_SIZE];
-    u8              pi_key2[KEY_SIZE];
-    u8              pi_key_check[KEY_SIZE];
+    dvd_key_t       pi_key1;
+    dvd_key_t       pi_key2;
+    dvd_key_t       pi_key_check;
     u8              i_varient;
 } disc_t;
 
 typedef struct title_key_s
 {
-    off_t           i;          /* This signification of this parameter
-                                   depends on the function it is called from :
-                                    *from DVDInit    -> i == position
-                                    *from CSSGetKeys -> i ==  nb occurence */
-    DVD_key_t       key;
+    int             i_occ;
+    dvd_key_t       pi_key;
 } title_key_t;
 
 typedef struct css_s
@@ -55,6 +52,7 @@ typedef struct css_s
     int             i_agid;
     disc_t          disc;
     u8              pi_disc_key[2048];
-    int             i_title_nb;
-    title_key_t*    p_title_key;
+    int             i_title;
+    off_t           i_title_pos;
+    dvd_key_t       pi_title_key;
 } css_t;

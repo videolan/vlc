@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.14 2001/02/19 03:12:26 stef Exp $
+ * $Id: input_dvd.c,v 1.15 2001/02/20 02:53:13 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -241,6 +241,7 @@ static int  DVDRead     ( struct input_thread_s *, data_packet_t ** );
 static void DVDInit     ( struct input_thread_s * );
 static void DVDEnd      ( struct input_thread_s * );
 static void DVDSeek     ( struct input_thread_s *, off_t );
+static int  DVDSetArea  ( struct input_thread_s *, int, int, int, int );
 static int  DVDRewind   ( struct input_thread_s * );
 
 /*****************************************************************************
@@ -256,6 +257,7 @@ void input_getfunctions( function_list_t * p_function_list )
     input.pf_close            = input_FileClose;
     input.pf_end              = DVDEnd;
     input.pf_read             = DVDRead;
+    input.pf_set_area         = DVDSetArea;
     input.pf_demux            = input_DemuxPS;
     input.pf_new_packet       = input_NetlistNewPacket;
     input.pf_new_pes          = input_NetlistNewPES;
@@ -338,17 +340,18 @@ static int DVDCheckCSS( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * DVDSetRegion: initialize input data for title x, chapter y.
+ * DVDSetArea: initialize input data for title x, chapter y.
  * It should be called for each user navigation request, and to change
  * audio or sub-picture streams.
  * ---
  * Take care that i_title and i_chapter start from 0.
  *****************************************************************************/
-static int DVDSetRegionParameters( input_thread_t * p_input,
-                                   int i_title, int i_chapter,
-                                   int i_audio, int i_spu )
+static int DVDSetArea( input_thread_t * p_input,
+                       int i_title, int i_chapter,
+                       int i_audio, int i_spu )
 {
     thread_dvd_data_t *  p_method;
+    es_descriptor_t *    p_es;
     off_t                i_start;
     off_t                i_size;
     pgc_t *              p_pgc;
@@ -356,14 +359,31 @@ static int DVDSetRegionParameters( input_thread_t * p_input,
     int                  i_end_cell;
     int                  i_index;
     int                  i_cell;
+    int                  i_nb;
+    int                  i_id;
+    int                  i;
     
-
     p_method = (thread_dvd_data_t*)p_input->p_plugin_data;
 
-    /* Set selected title start and size */
-    p_input->stream.i_title = i_title;
+    /* Ifo structures reading */
+    p_method->ifo.i_title = i_title;
+    IfoReadVTS( &(p_method->ifo) );
+    intf_WarnMsg( 2, "Ifo: VTS initialized" );
 
-    p_pgc = &p_method->ifo.p_vts[i_title].pgci_ti.p_srp[0].pgc;
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+    if( p_method->b_encrypted )
+    {
+        p_method->css.i_title = i_title;
+        p_method->css.i_title_pos =
+                p_method->ifo.vts.i_pos +
+                p_method->ifo.vts.mat.i_tt_vobs_ssector * DVD_LB_SIZE;
+        CSSGetKey( &(p_method->css) );
+        intf_WarnMsg( 2, "CSS: VTS key initialized" );
+    }
+#endif
+
+    /* Set selected title start and size */
+    p_pgc = &p_method->ifo.vts.pgci_ti.p_srp[0].pgc;
 
     /* Find cell index in Program chain */
     i_index = p_pgc->prg_map.pi_entry_cell[i_chapter] - 1;
@@ -371,38 +391,96 @@ static int DVDSetRegionParameters( input_thread_t * p_input,
     /* Search for cell_index in cell adress_table */
     i_cell = 0;
     while( p_pgc->p_cell_pos_inf[i_index].i_vob_id >
-           p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_cell].i_vob_id )
+           p_method->ifo.vts.c_adt.p_cell_inf[i_cell].i_vob_id )
     {
         i_cell++;
     }
     while( p_pgc->p_cell_pos_inf[i_index].i_cell_id >
-           p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_cell].i_cell_id )
+           p_method->ifo.vts.c_adt.p_cell_inf[i_cell].i_cell_id )
     {
         i_cell++;
     }
     i_start_cell = i_cell;
     i_end_cell = i_start_cell + p_pgc->i_cell_nb - 1;
 
-    intf_WarnMsg( 2, "DVD: Start cell: %d End Cell: %d",
+    intf_WarnMsg( 3, "DVD: Start cell: %d End Cell: %d",
                                             i_start_cell, i_end_cell );
 
     p_method->i_start_cell = i_start_cell;
     p_method->i_end_cell = i_end_cell;
 
     /* start is : beginning of vts + offset to vobs + offset to vob x */
-    i_start = p_method->ifo.p_vts[i_title].i_pos + DVD_LB_SIZE *
-            ( p_method->ifo.p_vts[i_title].mat.i_tt_vobs_ssector +
-              p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_start_cell].i_ssector );
-    p_method->i_start_byte = i_start;
-                                                    
+    i_start = p_method->ifo.vts.i_pos + DVD_LB_SIZE *
+            ( p_method->ifo.vts.mat.i_tt_vobs_ssector +
+              p_method->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_ssector );
+
     i_start = lseek( p_input->i_handle, i_start, SEEK_SET );
-    intf_WarnMsg( 3, "DVD: VOBstart at: %lld", i_start );
+    intf_WarnMsg( 2, "DVD: VOBstart at: %lld", i_start );
 
     i_size = (off_t)
-        ( p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_end_cell].i_esector -
-          p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_start_cell].i_ssector + 1 )
+        ( p_method->ifo.vts.c_adt.p_cell_inf[i_end_cell].i_esector -
+          p_method->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_ssector + 1 )
         *DVD_LB_SIZE;
-    intf_WarnMsg( 3, "DVD: stream size: %lld", i_size );
+    intf_WarnMsg( 2, "DVD: stream size: %lld", i_size );
+
+#if 0
+    p_es = NULL;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    /* ES 0 -> video MPEG2 */
+    intf_WarnMsg( 1, "DVD: Video MPEG2 stream" );
+    p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xe0, 0 );
+    p_es->i_stream_id = 0xe0;
+    p_es->i_type = MPEG2_VIDEO_ES;
+    input_SelectES( p_input, p_es );
+
+    /* Audio ES, in the order they appear in .ifo */
+    i_nb = p_method->ifo.vts.mat.i_audio_nb;
+    intf_WarnMsg( 1, "DVD: Audio streams %d", i_nb );
+    for( i = 0 ; i < i_nb ; i++ )
+    {
+        i_id = ( ( 0x80 + i ) << 8 ) | 0xbd;
+        p_es = input_AddES( p_input,
+                           p_input->stream.pp_programs[0], i_id, 0 );
+        p_es->i_stream_id = 0xbd;
+        p_es->i_type = AC3_AUDIO_ES;
+        p_es->b_audio = 1;
+//        p_es->psz_desc = p_method->ifo.vts.mat.pi_audio_attr[i];
+        if( i == 0 )
+        {
+            input_SelectES( p_input, p_es );
+        }
+    }
+
+    /* Sub Picture ES */
+    i_nb = p_method->ifo.vts.mat.i_subpic_nb;
+    intf_WarnMsg( 1, "DVD: Subpic streams %d", i_nb );
+    for( i = 0 ; i < i_nb ; i++ )
+    {
+        i_id = ( ( 0x20 + i ) << 8 ) | 0xbd;
+        p_es = input_AddES( p_input,
+                           p_input->stream.pp_programs[0], i_id, 0 );
+        p_es->i_stream_id = 0xbd;
+        p_es->i_type = DVD_SPU_ES;
+//        p_es->psz_desc = p_method->ifo.vts.mat.pi_subpic_attr[i];
+        if( i == 0 )
+        {
+            input_SelectES( p_input, p_es );
+        }
+
+    }
+
+    /* area definition */
+    p_input->stream.pp_areas[0]->i_start = i_start;
+    p_input->stream.pp_areas[0]->i_size = i_size;
+
+    /* No PSM to read in DVD mode */
+    p_input->stream.pp_programs[0]->b_is_ok = 1;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+#else
 
     if( p_input->stream.b_seekable )
     {
@@ -443,7 +521,7 @@ static int DVDSetRegionParameters( input_thread_t * p_input,
             }
 
             /* File too big. */
-            if( p_input->stream.i_tell > INPUT_PREPARSE_LENGTH )
+            if( p_input->stream.pp_areas[0]->i_tell > INPUT_PREPARSE_LENGTH )
             {
                 break;
             }
@@ -453,7 +531,7 @@ static int DVDSetRegionParameters( input_thread_t * p_input,
 
         /* i_tell is an indicator from the beginning of the stream,
          * not of the DVD */
-        p_input->stream.i_tell = 0;
+        p_input->stream.pp_areas[0]->i_tell = 0;
 
         if( p_demux_data->b_has_PSM )
         {
@@ -528,7 +606,7 @@ static int DVDSetRegionParameters( input_thread_t * p_input,
 #endif
 
         /* FIXME : ugly kludge */
-        p_input->stream.i_size = i_size;
+        p_input->stream.pp_areas[0]->i_size = i_size;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -539,11 +617,11 @@ static int DVDSetRegionParameters( input_thread_t * p_input,
         p_input->stream.pp_programs[0]->b_is_ok = 0;
 
         /* FIXME : ugly kludge */
-        p_input->stream.i_size = i_size;
+        p_input->stream.pp_areas[0]->i_size = i_size;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
-  
+#endif  
 
     return 0;
 }
@@ -554,6 +632,7 @@ static int DVDSetRegionParameters( input_thread_t * p_input,
 static void DVDInit( input_thread_t * p_input )
 {
     thread_dvd_data_t *  p_method;
+    int                  i;
 
     if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
     {
@@ -575,9 +654,11 @@ static void DVDInit( input_thread_t * p_input )
     /* Reading structures initialisation */
     input_NetlistInit( p_input, 4096, 4096, DVD_LB_SIZE,
                        p_method->i_read_once ); 
+    intf_WarnMsg( 2, "DVD: Netlist initialized" );
 
     /* Ifo initialisation */
     p_method->ifo = IfoInit( p_input->i_handle );
+    intf_WarnMsg( 2, "Ifo: VMG initialized" );
 
     /* CSS initialisation */
     if( p_method->b_encrypted )
@@ -591,44 +672,7 @@ static void DVDInit( input_thread_t * p_input )
             intf_ErrMsg( "CSS fatal error" );
             return;
         }
-#else
-        intf_ErrMsg( "Unscrambling not supported" );
-        p_input->b_error = 1;
-        return;
-#endif
-    }
-
-    /* Ifo structures reading */
-    IfoRead( &(p_method->ifo) );
-    intf_WarnMsg( 3, "Ifo: Initialized" );
-
-    /* CSS title keys decryption */
-    if( p_method->b_encrypted )
-    {
-
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-        int   i;
-
-        p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
-
-        if( (p_method->css.p_title_key =
-            malloc( p_method->css.i_title_nb *sizeof(title_key_t) ) ) == NULL )
-        {
-            intf_ErrMsg( "Out of memory" );
-            p_input->b_error = 1;
-            return;
-        }
-
-        for( i=0 ; i<p_method->css.i_title_nb ; i++ )
-        {
-            p_method->css.p_title_key[i].i =
-                p_method->ifo.p_vts[i].i_pos +
-                p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector * DVD_LB_SIZE;
-        }
-
-        CSSGetKeys( &(p_method->css) );
-
-        intf_WarnMsg( 3, "CSS: initialized" );
+        intf_WarnMsg( 2, "CSS: initialized" );
 #else
         intf_ErrMsg( "Unscrambling not supported" );
         p_input->b_error = 1;
@@ -640,16 +684,43 @@ static void DVDInit( input_thread_t * p_input )
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 
-    /* Set stream data */
+    /* Set stream and area data */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
+
+    /* FIXME: We consider here that one title is one title set
+     * it is not true !!! */
+
+#define area p_input->stream.pp_areas
+    /* We start from 1 here since area 0 is reserved for video_ts.vob */
+    for( i = 1 ; i < p_method->ifo.vmg.mat.i_tts_nb ; i++ )
+    {
+        input_AddArea( p_input );
+
+        /* Should not be so simple eventually :
+         * are title Program Chains, or still something else ? */
+        area[i]->i_id = i;
+
+        /* Absolute start offset and size 
+         * We can only set that with vts ifo, so we do it during the
+         * first call to DVDSetArea */
+        area[i]->i_start = 0;
+        area[i]->i_size = 0;
+
+        /* Number of chapter */
+        area[i]->i_part_nb = 0;
+        area[i]->i_part = 1;
+        /* Offset to vts_i_0.ifo */
+        area[i]->i_plugin_data = p_method->ifo.i_off +
+            ( p_method->ifo.vmg.ptt_srpt.p_tts[i-1].i_ssector * DVD_LB_SIZE );
+    }   
+#undef area
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* By default, set all parameters to 0 */
-    /* FIXME: wrong kludge to get title nb */
-    DVDSetRegionParameters( p_input, 
-                            p_method->ifo.vmg.ptt_srpt.p_tts[0].i_tts_nb - 1,
-                            0, 0, 0 );
+    /* FIXME: wrong kludge to get first title number */
+    DVDSetArea( p_input, p_method->ifo.vmg.ptt_srpt.p_tts[0].i_tts_nb - 1,
+                0, 0, 0 );
 
     return;
 }
@@ -705,9 +776,8 @@ static int DVDRead( input_thread_t * p_input,
     {
         for( i=0 ; i<p_method->i_read_once ; i++ )
         {
-            CSSDescrambleSector(
-                        p_method->css.p_title_key[p_input->stream.i_title].key, 
-                        p_vec[i].iov_base );
+            CSSDescrambleSector( p_method->css.pi_title_key, 
+                                 p_vec[i].iov_base );
             ((u8*)(p_vec[i].iov_base))[0x14] &= 0x8F;
         }
     }
@@ -772,7 +842,7 @@ static int DVDRead( input_thread_t * p_input,
     pp_packets[i_packet] = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_tell += p_method->i_read_once *DVD_LB_SIZE;
+    p_input->stream.pp_areas[0]->i_tell += p_method->i_read_once *DVD_LB_SIZE;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( 0 );
@@ -800,14 +870,14 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_method = ( thread_dvd_data_t * )p_input->p_plugin_data;
 
     /* We have to take care of offset of beginning of title */
-    i_pos = i_off + p_method->i_start_byte;
+    i_pos = i_off + p_input->stream.pp_areas[0]->i_start;
 
     /* With DVD, we have to be on a sector boundary */
     i_pos = i_pos & (~0x7ff);
 
     i_pos = lseek( p_input->i_handle, i_pos, SEEK_SET );
 
-    p_input->stream.i_tell = i_pos - p_method->i_start_byte;
+    p_input->stream.pp_areas[0]->i_tell = i_pos - p_input->stream.pp_areas[0]->i_start;
 
     return;
 }

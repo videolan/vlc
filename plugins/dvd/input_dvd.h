@@ -53,6 +53,7 @@ typedef struct thread_dvd_data_s
  * Prototypes in dvd_ifo.c
  *****************************************************************************/
 struct ifo_s    IfoInit( int );
+int             IfoReadVTS( struct ifo_s * );
 void            IfoRead( struct ifo_s * );
 void            IfoEnd( ifo_t * );
 
@@ -62,7 +63,7 @@ void            IfoEnd( ifo_t * );
 #if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
 int             CSSTest     ( int );
 struct css_s    CSSInit     ( int );
-int             CSSGetKeys  ( struct css_s * );
+int             CSSGetKey   ( struct css_s * );
 int             CSSDescrambleSector( u8 * , u8 * );
 
 #endif

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.31 2001/02/08 17:44:12 massiot Exp $
+ * $Id: input_programs.c,v 1.32 2001/02/20 02:53:13 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -227,6 +227,91 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 }
 
 /*****************************************************************************
+ * input_AddArea: add and init an area descriptor
+ *****************************************************************************
+ * This area descriptor will be referenced in the given stream descriptor
+ *****************************************************************************/
+input_area_t * input_AddArea( input_thread_t * p_input )
+{
+    /* Where to add the pgrm */
+    int i_area_index = p_input->stream.i_area_nb;
+
+    intf_DbgMsg("Adding description for area %d", i_area_index );
+
+    /* Add an entry to the list of program associated with the stream */
+    p_input->stream.i_area_nb++;
+    p_input->stream.pp_areas = realloc( p_input->stream.pp_areas,
+                                        p_input->stream.i_area_nb
+                                            * sizeof(input_area_t *) );
+    if( p_input->stream.pp_areas == NULL )
+    {
+        intf_ErrMsg( "Unable to realloc memory in input_AddArea" );
+        return( NULL );
+    }
+    
+    /* Allocate the structure to store this description */
+    p_input->stream.pp_areas[i_area_index] =
+                                        malloc( sizeof(input_area_t) );
+    if( p_input->stream.pp_areas[i_area_index] == NULL )
+    {
+        intf_ErrMsg( "Unable to allocate memory in input_AddArea" );
+        return( NULL );
+    }
+    
+    /* Init this entry */
+    p_input->stream.pp_areas[i_area_index]->i_id = 0;
+    p_input->stream.pp_areas[i_area_index]->i_start = 0;
+    p_input->stream.pp_areas[i_area_index]->i_size = 0;
+    p_input->stream.pp_areas[i_area_index]->i_tell = 0;
+    p_input->stream.pp_areas[i_area_index]->i_seek = 0;
+    p_input->stream.pp_areas[i_area_index]->i_part_nb = 0;
+    p_input->stream.pp_areas[i_area_index]->i_part= 0;
+
+    return p_input->stream.pp_areas[i_area_index];
+}
+
+/*****************************************************************************
+ * input_DelArea: destroy a area descriptor
+ *****************************************************************************
+ * All ES descriptions referenced in the descriptor will be deleted.
+ *****************************************************************************/
+void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
+{
+    int i_area_index;
+
+    ASSERT( p_area );
+
+    intf_DbgMsg("Deleting description for area %d", p_area->i_number);
+
+    /* Find the area in the areas table */
+    for( i_area_index = 0; i_area_index < p_input->stream.i_area_nb;
+         i_area_index++ )
+    {
+        if( p_input->stream.pp_areas[i_area_index] == p_area )
+            break;
+    }
+
+    /* Remove this area from the stream's list of areas */
+    p_input->stream.i_area_nb--;
+
+    p_input->stream.pp_areas[i_area_index] =
+        p_input->stream.pp_areas[p_input->stream.i_area_nb];
+    p_input->stream.pp_areas = realloc( p_input->stream.pp_areas,
+                                           p_input->stream.i_area_nb
+                                            * sizeof(input_area_t *) );
+
+    if( p_input->stream.i_area_nb && p_input->stream.pp_areas == NULL)
+    {
+        intf_ErrMsg( "input error: unable to realloc area list"
+                     " in input_Delarea" );
+    }
+
+    /* Free the description of this area */
+    free( p_area );
+}
+
+
+/*****************************************************************************
  * input_FindES: returns a pointer to an ES described by its ID
  *****************************************************************************/
 es_descriptor_t * input_FindES( input_thread_t * p_input, u16 i_es_id )
@@ -399,7 +484,7 @@ void input_DumpStream( input_thread_t * p_input )
     intf_Msg( "input info: Dumping stream ID 0x%x", S.i_stream_id );
     if( S.b_seekable )
         intf_Msg( "input info: seekable stream, position: %lld/%lld",
-                  S.i_tell, S.i_size );
+                  S.pp_areas[0].i_tell, S.pp_areas[0].i_size );
     else
         intf_Msg( "input info: %s", S.b_pace_control ? "pace controlled" :
                   "pace un-controlled" );

@@ -438,7 +438,8 @@ on_hscale_button_release_event         (GtkWidget       *widget,
 
     if( p_intf->p_input != NULL )
     {
-        i_seek = (p_adj->value * p_intf->p_input->stream.i_size) / 100;
+        i_seek = (p_adj->value *
+                  p_intf->p_input->stream.pp_areas[0]->i_size) / 100;
         input_Seek( p_intf->p_input, i_seek );
     }
     p_intf->p_sys->b_scale_isfree = 1;

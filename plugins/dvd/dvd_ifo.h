@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.6 2001/02/15 21:03:27 stef Exp $
+ * $Id: dvd_ifo.h,v 1.7 2001/02/20 02:53:13 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -491,9 +491,11 @@ typedef struct ifo_s
     off_t           i_pos;
     /* Error Management */
     boolean_t       b_error;
+    /* Current title set number */
+    int             i_title;
     /* Structure described in video_ts */
     vmg_t           vmg;
-    /* Table of vts ifos */
-    vts_t *         p_vts;
+    /* Vts ifo for current title set */
+    vts_t           vts;
 } ifo_t;
 

@@ -81,6 +81,9 @@ typedef struct function_list_s
             void ( * pf_close )( struct input_thread_s * );
             void ( * pf_end )  ( struct input_thread_s * );
 
+            int  ( * pf_set_area ) ( struct input_thread_s *,
+                                     int, int, int, int );
+
             int  ( * pf_read ) ( struct input_thread_s *,
                                  struct data_packet_s *
                                         pp_packets[] );

@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.22 2001/02/19 19:08:59 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.23 2001/02/20 02:53:13 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -50,6 +50,9 @@ typedef struct es_descriptor_s
     boolean_t               b_audio;      /* is the stream an audio stream that
                                            * will need to be discarded with
                                            * fast forward and slow motion ?  */
+    char                    psz_desc[20]; /* description of ES: audio language
+                                           * for instance ; NULL if not
+                                           *  available */
 
     /* Demultiplexer information */
     void *                  p_demux_data;
@@ -132,6 +135,33 @@ typedef struct pgrm_descriptor_s
 #define SYNCHRO_REINIT      2
 
 /*****************************************************************************
+ * input_area_t
+ *****************************************************************************
+ * Attributes for current area (title for DVD)
+ *****************************************************************************/
+typedef struct input_area_s
+{
+    /* selected area attributes */
+    int                     i_id;        /* identificator for area */
+    off_t                   i_start;     /* start offset of area */
+    off_t                   i_size;      /* total size of the area
+                                          * (in arbitrary units) */
+
+    /* navigation parameters */
+    off_t                   i_tell;      /* actual location in the area
+                                          * (in arbitrary units) */
+    off_t                   i_seek;      /* next requested location
+                                          * (changed by the interface thread */
+
+    /* area subdivision */
+    int                     i_part_nb;   /* number of parts (chapter for DVD)*/
+    int                     i_part;      /* currently selected part */
+
+    /* offset to plugin related data */
+    off_t                   i_plugin_data;
+} input_area_t;
+
+/*****************************************************************************
  * stream_descriptor_t
  *****************************************************************************
  * Describes a stream and list its associated programs. Build upon
@@ -146,25 +176,13 @@ typedef struct stream_descriptor_s
     /* Input method data */
     boolean_t               b_pace_control;    /* can we read when we want ? */
     boolean_t               b_seekable;               /* can we do lseek() ? */
+
     /* if (b_seekable) : */
-    off_t                   i_size;                  /* total size of the file
-                                                      * (in arbitrary units) */
-    off_t                   i_tell;             /* actual location in the file
-                                                 * (in arbitrary units) */
-    off_t                   i_seek;         /* next requested location (changed
-                                             * by the interface thread */
+    int                     i_area_nb;
+    input_area_t **         pp_areas;      /* list of areas in stream == offset
+                                            * interval with own properties */
     u32                     i_mux_rate; /* the rate we read the stream (in
                                          * units of 50 bytes/s) ; 0 if undef */
-
-    /* For DVD streams: */
-    int                     i_title_nb;
-    int *                   pi_chapter;  /* Number of chapter for each title */
-    char **                 ppsz_audio;  /* Audio language names */
-    char **                 ppsz_spu;    /* Sub-pictures names */
-    int                     i_title;     /* selected title */
-    int                     i_chapter;   /* selected chapter */
-    int                     i_audio;     /* selected audio stream */
-    int                     i_spu;       /* selected spu */
 
     /* New status and rate requested by the interface */
     int                     i_new_status, i_new_rate;

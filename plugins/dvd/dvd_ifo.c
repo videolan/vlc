@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.10 2001/02/19 03:12:26 stef Exp $
+ * $Id: dvd_ifo.c,v 1.11 2001/02/20 02:53:13 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -41,7 +41,11 @@
 #include "dvd_udf.h"
 #include "input_dvd.h"
 
-void CommandRead( ifo_command_t );
+/*
+ * Local prototypes
+ */
+static vmg_t ReadVMG    ( ifo_t* );
+void         CommandRead( ifo_command_t );
 
 /*
  * IFO Management.
@@ -64,6 +68,10 @@ ifo_t IfoInit( int i_fd )
     ifo.i_off = (off_t)(i_lba) * DVD_LB_SIZE;
     ifo.i_pos = lseek( ifo.i_fd, ifo.i_off, SEEK_SET );
 
+    /* Video Manager Initialization */
+    intf_WarnMsg( 2, "ifo: initializing VMG" );
+    ifo.vmg = ReadVMG( &ifo );
+
     return ifo;
 }
 
@@ -72,6 +80,7 @@ ifo_t IfoInit( int i_fd )
  *****************************************************************************/
 void IfoEnd( ifo_t* p_ifo )
 {
+#if 0
     int     i,j;
 
     /* Free structures from video title sets */
@@ -121,7 +130,7 @@ void IfoEnd( ifo_t* p_ifo )
     free( p_ifo->vmg.pgc.com_tab.p_cell_com );
     free( p_ifo->vmg.pgc.com_tab.p_post_com );
     free( p_ifo->vmg.pgc.com_tab.p_pre_com );
-
+#endif
     return;
 }
 
@@ -215,11 +224,12 @@ static pgc_t ReadPGC( ifo_t* p_ifo )
     int     i;
     off_t   i_start = p_ifo->i_pos;
 
-//fprintf( stderr, "PGC\n" );
+fprintf( stderr, "PGC\n" );
 
     FLUSH(2);
     GETC( &pgc.i_prg_nb );
     GETC( &pgc.i_cell_nb );
+fprintf( stderr, "PGC: Prg: %d Cell: %d\n", pgc.i_prg_nb, pgc.i_cell_nb );
     GETL( &pgc.i_play_time );
     GETL( &pgc.i_prohibited_user_op );
     for( i=0 ; i<8 ; i++ )
@@ -233,6 +243,7 @@ static pgc_t ReadPGC( ifo_t* p_ifo )
     GETS( &pgc.i_next_pgc_nb );
     GETS( &pgc.i_prev_pgc_nb );
     GETS( &pgc.i_goup_pgc_nb );
+fprintf( stderr, "PGC: Prev: %d Next: %d Up: %d\n",pgc.i_prev_pgc_nb ,pgc.i_next_pgc_nb, pgc.i_goup_pgc_nb );
     GETC( &pgc.i_still_time );
     GETC( &pgc.i_play_mode );
     for( i=0 ; i<16 ; i++ )
@@ -371,7 +382,7 @@ static pgci_inf_t ReadUnit( ifo_t* p_ifo )
     int             i;
     off_t           i_start = p_ifo->i_pos;
 
-//fprintf( stderr, "Unit\n" );
+fprintf( stderr, "Unit\n" );
 
     GETS( &inf.i_srp_nb );
     FLUSH( 2 );
@@ -395,6 +406,7 @@ static pgci_inf_t ReadUnit( ifo_t* p_ifo )
         p_ifo->i_pos = lseek( p_ifo->i_fd,
                          i_start + inf.p_srp[i].i_pgci_sbyte,
                          SEEK_SET );
+fprintf( stderr, "Unit: PGC %d\n", i );
         inf.p_srp[i].pgc = ReadPGC( p_ifo );
     }
 
@@ -410,7 +422,7 @@ static pgci_ut_t ReadUnitTable( ifo_t* p_ifo )
     int             i;
     off_t           i_start = p_ifo->i_pos;
 
-//fprintf( stderr, "Unit Table\n" );
+fprintf( stderr, "Unit Table\n" );
 
     GETS( &pgci.i_lu_nb );
     FLUSH( 2 );
@@ -577,9 +589,10 @@ static vmg_ptt_srpt_t ReadVMGTitlePointer( ifo_t* p_ifo )
     int             i;
 //    off_t           i_start = p_ifo->i_pos;
 
-//fprintf( stderr, "PTR\n" );
+fprintf( stderr, "PTR\n" );
 
     GETS( &ptr.i_ttu_nb );
+fprintf( stderr, "PTR: TTU nb %d\n", ptr.i_ttu_nb );
     FLUSH( 2 );
     GETL( &ptr.i_ebyte );
     /* Parsing of tts */
@@ -599,7 +612,7 @@ static vmg_ptt_srpt_t ReadVMGTitlePointer( ifo_t* p_ifo )
         GETC( &ptr.p_tts[i].i_tts_nb );
         GETC( &ptr.p_tts[i].i_vts_ttn );
         GETL( &ptr.p_tts[i].i_ssector );
-//fprintf( stderr, "PTR: %d %d %d\n",ptr.p_tts[i].i_tts_nb,ptr.p_tts[i].i_vts_ttn, ptr.p_tts[i].i_ssector );
+fprintf( stderr, "PTR: %d %d %d\n", ptr.p_tts[i].i_ptt_nb, ptr.p_tts[i].i_tts_nb,ptr.p_tts[i].i_vts_ttn );
     }
 
     return ptr;
@@ -673,9 +686,10 @@ static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
     int             i, j;
     off_t           i_start = p_ifo->i_pos;
 
-//fprintf( stderr, "VTS ATTR\n" );
+fprintf( stderr, "VTS ATTR\n" );
 
     GETS( &atrt.i_vts_nb );
+fprintf( stderr, "VTS ATTR Nb: %d\n", atrt.i_vts_nb );
     FLUSH( 2 );
     GETL( &atrt.i_ebyte );
     atrt.pi_vts_atrt_sbyte = malloc( atrt.i_vts_nb *sizeof(u32) );
@@ -880,9 +894,10 @@ static vts_ptt_srpt_t ReadVTSTitlePointer( ifo_t* p_ifo )
     int             i;
     off_t           i_start = p_ifo->i_pos;
 
-//fprintf( stderr, "PTR\n" );
+fprintf( stderr, "VTS PTR\n" );
 
     GETS( &ptr.i_ttu_nb );
+fprintf( stderr, "VTS PTR nb: %d\n", ptr.i_ttu_nb );
     FLUSH( 2 );
     GETL( &ptr.i_ebyte );
     ptr.pi_ttu_sbyte = malloc( ptr.i_ttu_nb *sizeof(u32) );
@@ -910,6 +925,7 @@ static vts_ptt_srpt_t ReadVTSTitlePointer( ifo_t* p_ifo )
                         ptr.pi_ttu_sbyte[i], SEEK_SET );
         GETS( &ptr.p_ttu[i].i_pgc_nb );
         GETS( &ptr.p_ttu[i].i_prg_nb );
+fprintf( stderr, "VTS %d PTR Pgc: %d Prg: %d\n", i,ptr.p_ttu[i].i_pgc_nb, ptr.p_ttu[i].i_prg_nb );
     }
 
     return ptr;
@@ -971,11 +987,21 @@ static vts_tmap_ti_t ReadVTSTimeMap( ifo_t* p_ifo )
     
 
 /*****************************************************************************
- * ReadVTS : Parse vts*.ifo files to fill the Video Title Set structure.
+ * IfoReadVTS : Parse vts*.ifo files to fill the Video Title Set structure.
  *****************************************************************************/
-static vts_t ReadVTS( ifo_t* p_ifo )
+int IfoReadVTS( ifo_t* p_ifo )
 {
     vts_t       vts;
+    off_t       i_off;
+    int         i_title;
+
+    intf_WarnMsg( 2, "ifo: initializing VTS %d", p_ifo->i_title );
+
+    i_title = p_ifo->i_title;
+    i_off = (off_t)( p_ifo->vmg.ptt_srpt.p_tts[i_title].i_ssector ) *DVD_LB_SIZE
+                   + p_ifo->i_off;
+
+    p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
 
     vts.i_pos = p_ifo->i_pos;
 
@@ -1037,13 +1063,15 @@ static vts_t ReadVTS( ifo_t* p_ifo )
         vts.vobu_admap = ReadMap( p_ifo );
     }
 
-    return vts;
+    p_ifo->vts = vts;
+
+    return 0;
 }
 
 /*
  * DVD Information Management
  */
-
+#if 0
 /*****************************************************************************
  * IfoRead : Function that fills structure and calls specified functions
  * to do it.
@@ -1052,10 +1080,6 @@ void IfoRead( ifo_t* p_ifo )
 {
     int     i;
     off_t   i_off;
-
-    /* Video Manager Initialization */
-    intf_WarnMsg( 2, "ifo: initializing VMG" );
-    p_ifo->vmg = ReadVMG( p_ifo );
 
     /* Video Title Sets initialization */
     p_ifo->p_vts = malloc( p_ifo->vmg.mat.i_tts_nb *sizeof(vts_t) );
@@ -1085,7 +1109,7 @@ void IfoRead( ifo_t* p_ifo )
 
     return; 
 }
-
+#endif
 /*
  * IFO virtual machine : a set of commands that give the
  * interactive behaviour of the dvd
