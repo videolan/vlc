@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.58 2002/08/14 00:23:59 massiot Exp $
+ * $Id: audio_output.h,v 1.59 2002/08/14 00:43:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -131,7 +131,4 @@ VLC_EXPORT( int, aout_FormatToByterate, ( audio_sample_format_t * p_format ) );
 #define aout_InputNew(a,b,c) __aout_InputNew(VLC_OBJECT(a),b,c)
 VLC_EXPORT( aout_input_t *, __aout_InputNew, ( vlc_object_t *, aout_instance_t **, audio_sample_format_t * ) );
 VLC_EXPORT( void, aout_InputDelete, ( aout_instance_t *, aout_input_t * ) );
-
-/* From output.c : */
-VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t ) );
 

@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.5 2002/08/14 00:23:59 massiot Exp $
+ * $Id: output.c,v 1.6 2002/08/14 00:43:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -168,8 +168,8 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
  * do it by itself. S/PDIF outputs should always set b_can_sleek = 1.
  *****************************************************************************/
 aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
-                                       mtime_t start_date /*,
-                                       vlc_bool_t b_can_sleek */ )
+                                       mtime_t start_date ,
+                                       vlc_bool_t b_can_sleek )
 {
     aout_buffer_t * p_buffer;
 

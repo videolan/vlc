@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.4 2002/08/14 00:23:59 massiot Exp $
+ * $Id: esd.c,v 1.5 2002/08/14 00:43:52 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -201,7 +201,7 @@ static int ESDThread( aout_instance_t * p_aout )
 
         /* Get the presentation date of the next write() operation. It
          * is equal to the current date + buffered samples + esd latency */
-        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency );
+        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency, 0 );
 
         if ( p_buffer != NULL )
         {

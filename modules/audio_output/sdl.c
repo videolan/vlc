@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.1 2002/08/13 11:59:36 sam Exp $
+ * $Id: sdl.c,v 1.2 2002/08/14 00:43:52 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -155,7 +155,7 @@ static void SDLCallback( void * _p_aout, byte_t * p_stream, int i_len )
 {
     aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
     /* FIXME : take into account SDL latency instead of mdate() */
-    aout_buffer_t * p_buffer = aout_OutputNextBuffer( p_aout, mdate() );
+    aout_buffer_t * p_buffer = aout_OutputNextBuffer( p_aout, mdate(), 0 );
 
     if ( i_len != FRAME_SIZE * sizeof(s16)
                     * p_aout->output.output.i_channels )

@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.9 2002/08/14 00:23:59 massiot Exp $
+ * $Id: oss.c,v 1.10 2002/08/14 00:43:52 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -293,7 +293,6 @@ static int OSSThread( aout_instance_t * p_aout )
     while ( !p_aout->b_die )
     {
         aout_buffer_t * p_buffer;
-        mtime_t next_date = 0;
         int i_tmp, i_size;
         byte_t * p_bytes;
 
@@ -305,6 +304,7 @@ static int OSSThread( aout_instance_t * p_aout )
 
         if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
         {
+            mtime_t next_date = 0;
             /* Get the presentation date of the next write() operation. It
              * is equal to the current date + duration of buffered samples.
              * Order is important here, since GetBufInfo is believed to take
@@ -312,9 +312,13 @@ static int OSSThread( aout_instance_t * p_aout )
             next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
                       / aout_FormatToByterate( &p_aout->output.output );
             next_date += mdate();
-        }
 
-        p_buffer = aout_OutputNextBuffer( p_aout, next_date );
+            p_buffer = aout_OutputNextBuffer( p_aout, next_date, 0 );
+        }
+        else
+        {
+            p_buffer = aout_OutputNextBuffer( p_aout, 0, 1 );
+        }
 
         if ( p_buffer != NULL )
         {

@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.2 2002/08/10 18:17:06 gbazin Exp $
+ * $Id: waveout.c,v 1.3 2002/08/14 00:43:52 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -311,7 +311,7 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
         aout_BufferFree( (aout_buffer_t *)p_waveheader->dwUser );
 
     /* FIXME : take into account WaveOut latency instead of mdate() */
-    p_buffer = aout_OutputNextBuffer( p_aout, mdate() );
+    p_buffer = aout_OutputNextBuffer( p_aout, mdate(), 0 );
 
     PlayWaveOut( p_aout, h_waveout, p_waveheader, p_buffer );
 }

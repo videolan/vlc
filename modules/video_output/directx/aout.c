@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout.c,v 1.3 2002/08/12 09:34:15 sam Exp $
+ * $Id: aout.c,v 1.4 2002/08/14 00:43:52 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -560,7 +560,7 @@ static void DirectSoundThread( notification_thread_t *p_notif )
         }
 
         /* FIXME : take into account DirectSound latency instead of mdate() */
-        p_buffer = aout_OutputNextBuffer( p_aout, mdate() );
+        p_buffer = aout_OutputNextBuffer( p_aout, mdate(), 0 );
 
         /* Now do the actual memcpy into the circular buffer */
         if ( l_bytes1 != p_notif->i_buffer_size )

@@ -179,6 +179,7 @@ static const char * module_error( char *psz_buffer )
  * STORE_SYMBOLS: store known symbols into p_symbols for plugin access.
  *****************************************************************************/
 #define STORE_SYMBOLS( p_symbols ) \
+    (p_symbols)->aout_OutputNextBuffer_inner = aout_OutputNextBuffer; \
     (p_symbols)->__aout_NewInstance_inner = __aout_NewInstance; \
     (p_symbols)->aout_DeleteInstance_inner = aout_DeleteInstance; \
     (p_symbols)->aout_BufferNew_inner = aout_BufferNew; \
@@ -187,7 +188,6 @@ static const char * module_error( char *psz_buffer )
     (p_symbols)->aout_FormatToByterate_inner = aout_FormatToByterate; \
     (p_symbols)->__aout_InputNew_inner = __aout_InputNew; \
     (p_symbols)->aout_InputDelete_inner = aout_InputDelete; \
-    (p_symbols)->aout_OutputNextBuffer_inner = aout_OutputNextBuffer; \
     (p_symbols)->__config_GetInt_inner = __config_GetInt; \
     (p_symbols)->__config_PutInt_inner = __config_PutInt; \
     (p_symbols)->__config_GetFloat_inner = __config_GetFloat; \

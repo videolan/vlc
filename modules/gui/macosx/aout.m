@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.3 2002/08/12 22:48:18 massiot Exp $
+ * $Id: aout.m,v 1.4 2002/08/14 00:43:52 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -241,7 +241,7 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
     current_date = p_sys->clock_diff
                  + AudioConvertHostTimeToNanos(host_time.mHostTime) / 1000;
 
-    p_buffer = aout_OutputNextBuffer( p_aout, current_date );
+    p_buffer = aout_OutputNextBuffer( p_aout, current_date, 0 );
 
     /* move data into output data buffer */
     if ( p_buffer != NULL )
