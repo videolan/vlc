@@ -712,14 +712,12 @@ difficulty to understand how VLC skins work.</para>
   <listitem><para>
     <emphasis>vlc.fullscreen()</emphasis>: Toggle the fullscreen mode.
   </para></listitem>
-<!--  TODO: Enable it for 0.7.3
   <listitem><para>
-    <emphasis>vlc.onTop()</emphasis>: Toggle the "Always on top" status.
+    <emphasis>vlc.onTop()</emphasis>: Toggle the "Always on top" status (since VLC 0.8.0).
   </para></listitem>
   <listitem><para>
-    <emphasis>vlc.minimize()</emphasis>: Minimize VLC.
+    <emphasis>vlc.minimize()</emphasis>: Minimize VLC (since VLC 0.8.0)
   </para></listitem>
--->
   <listitem><para>
     <emphasis>vlc.quit()</emphasis>: Quit VLC.
   </para></listitem>
@@ -747,20 +745,18 @@ difficulty to understand how VLC skins work.</para>
   <listitem><para>
     <emphasis>playlist.setLoop(false)</emphasis>: Do not loop at playlist end.
   </para></listitem>
-<!--  TODO: Enable it for 0.7.3
   <listitem><para>
-    <emphasis>playlist.setRepeat(true)</emphasis>: Repeat the current playlist item.
+    <emphasis>playlist.setRepeat(true)</emphasis>: Repeat the current playlist item (since VLC 0.8.0).
   </para></listitem>
   <listitem><para>
-    <emphasis>playlist.setRepeat(false)</emphasis>: Stop repeating the current playlist item.
+    <emphasis>playlist.setRepeat(false)</emphasis>: Stop repeating the current playlist item (since VLC 0.8.0).
   </para></listitem>
   <listitem><para>
-    <emphasis>playlist.load()</emphasis>: Load an external playlist file.
+    <emphasis>playlist.load()</emphasis>: Load an external playlist file (since VLC 0.8.0).
   </para></listitem>
   <listitem><para>
-    <emphasis>playlist.save()</emphasis>: Save the current playlist.
+    <emphasis>playlist.save()</emphasis>: Save the current playlist (since VLC 0.8.0).
   </para></listitem>
--->
   <listitem><para>
     <emphasis>WindowID.show()</emphasis>: Show the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID'.
   </para></listitem>
@@ -831,22 +827,18 @@ difficulty to understand how VLC skins work.</para>
   <listitem><para>
     <emphasis>vlc.isMute</emphasis>: True when the sound is mute (in VLC, not on your OS), false otherwise.
   </para></listitem>
-<!--  TODO: Enable it for 0.7.3
   <listitem><para>
-    <emphasis>vlc.isOnTop</emphasis>: True when the windows have the "Always on top" status.
+    <emphasis>vlc.isOnTop</emphasis>: True when the windows have the "Always on top" status (since VLC 0.8.0).
   </para></listitem>
--->
   <listitem><para>
     <emphasis>playlist.isRandom</emphasis>: True when the playlist items are played in a random order, false otherwise.
   </para></listitem>
   <listitem><para>
     <emphasis>playlist.isLoop</emphasis>: True when the playlist is looping, false otherwise.
   </para></listitem>
-<!--  TODO: Enable it for 0.7.3
   <listitem><para>
-    <emphasis>playlist.isRepeat</emphasis>: True when the current playlist item is being repeated, false otherwise.
+    <emphasis>playlist.isRepeat</emphasis>: True when the current playlist item is being repeated, false otherwise (since VLC 0.8.0).
   </para></listitem>
--->
   <listitem><para>
     <emphasis>window_name.isVisible</emphasis>: True when the window whose <link linkend="windowid">id</link> is "window_name" is visible, false otherwise.
   </para></listitem>
