@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.44 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: libvlc.h,v 1.45 2003/02/20 16:07:38 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -107,6 +107,11 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define DESYNC_LONGTEXT N_( \
     "This option allows you to delay the audio output. This can be handy if " \
     "you notice a lag between the video and the audio.")
+
+#define SPDIF_TEXT N_("use the S/PDIF audio output when available")
+#define SPDIF_LONGTEXT N_( \
+    "This option allows you to use the S/PDIF audio output by default when " \
+    "your hardware supports it as well as the audio stream being played.")
 
 #define HEADPHONE_TEXT N_("headphone virtual spatialization effect")
 #define HEADPHONE_LONGTEXT N_( \
@@ -461,6 +466,7 @@ vlc_module_begin();
                             VOLUME_SAVE_TEXT, VOLUME_SAVE_LONGTEXT, VLC_TRUE );
     add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT, AOUT_RATE_LONGTEXT, VLC_TRUE );
     add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
+    add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     add_bool( "headphone", 0, NULL, HEADPHONE_TEXT, HEADPHONE_LONGTEXT, VLC_FALSE );
     add_integer( "headphone-dim", 5, NULL, HEADPHONE_DIM_TEXT,
                  HEADPHONE_DIM_LONGTEXT, VLC_TRUE );

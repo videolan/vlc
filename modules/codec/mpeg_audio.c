@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.12 2003/02/18 18:49:11 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.13 2003/02/20 16:07:38 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -164,7 +164,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             /* Look inside the sync buffer. */
             for ( i = 1; i < MAD_BUFFER_GUARD - 1; i++ )
             {
-                if ( (p_sync[i] == 0xff) && ((p_sync[i + 1] & 0xe0) != 0xe0) )
+                if ( (p_sync[i] == 0xff) && ((p_sync[i + 1] & 0xe0) == 0xe0) )
                     break;
             }
             if ( i < MAD_BUFFER_GUARD - 1 )

@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.27 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: rc.c,v 1.28 2003/02/20 16:07:38 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -250,7 +250,33 @@ static void Run( intf_thread_t *p_intf )
 
                 p_buffer[ i_size ] =
                     input_record.Event.KeyEvent.uChar.AsciiChar;
-#endif
+
+                /* Echo out the command */
+                putc( p_buffer[ i_size ], stdout );
+
+                /* Handle special keys */
+                if( p_buffer[ i_size ] == '\r' || p_buffer[ i_size ] == '\n' )
+                {
+                    putc( '\n', stdout );
+                    break;
+                }
+                switch( p_buffer[ i_size ] )
+                {
+                case '\b':
+                    if( i_size )
+                    {
+                        i_size -= 2;
+                        putc( ' ', stdout );
+                        putc( '\b', stdout );
+                    }
+                    break;
+                case '\r':
+                    i_size --;
+                    break;
+                }
+
+                i_size++;
+#else
 
                 if( p_buffer[ i_size ] == '\r' || p_buffer[ i_size ] == '\n' )
                 {
@@ -258,6 +284,7 @@ static void Run( intf_thread_t *p_intf )
                 }
 
                 i_size++;
+#endif
             }
 
             if( i_size == MAX_LINE_LENGTH

@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.23 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: alsa.c,v 1.24 2003/02/20 16:07:38 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -87,17 +87,10 @@ static void ALSAFill     ( aout_instance_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define SPDIF_TEXT N_("Try to use S/PDIF output")
-#define SPDIF_LONGTEXT N_( \
-    "Sometimes we attempt to use the S/PDIF output, even if nothing is " \
-    "connected to it. Un-checking this option disables this behaviour, " \
-    "and permanently selects analog PCM output." )
-
 vlc_module_begin();
     add_category_hint( N_("ALSA"), NULL, VLC_FALSE );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
                 N_("ALSA device name"), NULL, VLC_FALSE );
-    add_bool( "spdif", 1, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     set_description( _("ALSA audio module") );
     set_capability( "audio output", 50 );
     set_callbacks( Open, Close );
@@ -114,20 +107,6 @@ static void Probe( aout_instance_t * p_aout,
     vlc_value_t val;
 
     var_Create ( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
-
-    /* Test for S/PDIF device if needed */
-    if ( psz_iec_device )
-    {
-        /* Opening the device should be enough */
-        if ( config_GetInt( p_aout, "spdif" )
-              && !snd_pcm_open( &p_sys->p_snd_pcm, psz_iec_device,
-                                SND_PCM_STREAM_PLAYBACK, 0 ) )
-        {
-            val.psz_string = N_("A/52 over S/PDIF");
-            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
-            snd_pcm_close( p_sys->p_snd_pcm );
-        }
-    }
 
     /* Now test linear PCM capabilities */
     if ( !snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
@@ -203,6 +182,21 @@ static void Probe( aout_instance_t * p_aout,
 
         /* Close the previously opened device */
         snd_pcm_close( p_sys->p_snd_pcm );
+    }
+
+    /* Test for S/PDIF device if needed */
+    if ( psz_iec_device )
+    {
+        /* Opening the device should be enough */
+        if ( !snd_pcm_open( &p_sys->p_snd_pcm, psz_iec_device,
+                                SND_PCM_STREAM_PLAYBACK, 0 ) )
+        {
+            val.psz_string = N_("A/52 over S/PDIF");
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+            snd_pcm_close( p_sys->p_snd_pcm );
+            if( config_GetInt( p_aout, "spdif" ) )
+                var_Set( p_aout, "audio-device", val );
+        }
     }
 
     /* Add final settings to the variable */

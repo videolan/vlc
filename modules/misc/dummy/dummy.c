@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.3 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: dummy.c,v 1.4 2003/02/20 16:07:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,12 +40,25 @@
     "format instead of trying to improve performances by using the most " \
     "efficient one.")
 
+#ifdef WIN32
+#define QUIET_TEXT N_("don't open a dos command box interface")
+#define QUIET_LONGTEXT N_( \
+    "By default the dummy interface plugin will start a dos command box. " \
+    "Enabling the quiet mode will not bring this command box but can also " \
+    "be pretty annoying when you want to stop vlc and no video window is " \
+    "opened." )
+#endif
+
 vlc_module_begin();
     set_description( _("dummy functions module") );
     add_shortcut( "vlc" );
     add_submodule();
         set_capability( "interface", 0 );
         set_callbacks( E_(OpenIntf), NULL );
+#ifdef WIN32
+        add_category_hint( N_("Interface"), NULL, VLC_FALSE );
+        add_bool( "dummy-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
+#endif
     add_submodule();
         set_capability( "access", 0 );
         set_callbacks( E_(OpenAccess), NULL );

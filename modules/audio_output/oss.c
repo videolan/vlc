@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.52 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: oss.c,v 1.53 2003/02/20 16:07:38 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -105,18 +105,11 @@ static mtime_t BufferDuration( aout_instance_t * p_aout );
     "are completely filled (the sound gets heavily hashed). If you have one " \
     "of these drivers, then you need to enable this option." )
 
-#define SPDIF_TEXT N_("try to use S/PDIF output")
-#define SPDIF_LONGTEXT N_( \
-    "Sometimes we attempt to use the S/PDIF output, even if nothing is " \
-    "connected to it. Un-checking this option disables this behaviour, " \
-    "and permanently selects analog PCM output." )
-
 vlc_module_begin();
     add_category_hint( N_("OSS"), NULL, VLC_FALSE );
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
               N_("OSS dsp device"), NULL, VLC_FALSE );
     add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, VLC_TRUE );
-    add_bool( "spdif", 1, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     set_description( _("Linux OSS /dev/dsp module") );
     set_capability( "audio output", 100 );
     add_shortcut( "oss" );
@@ -134,40 +127,24 @@ static void Probe( aout_instance_t * p_aout )
 
     var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
 
-    if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
-    {
-        msg_Err( p_aout, "cannot reset OSS audio device" );
-        var_Destroy( p_aout, "audio-device" );
-        return;
-    }
-
-    if ( config_GetInt( p_aout, "spdif" )
-          && AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
-    {
-        i_format = AFMT_AC3;
-
-        if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) >= 0
-             && i_format == AFMT_AC3 )
-        {
-            val.psz_string = N_("A/52 over S/PDIF");
-            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
-        }
-    }
-
-    /* Go to PCM mode. */
-    i_format = AFMT_S16_NE;
-    if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 ||
-        ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
-    {
-        return;
-    }
-
+    /* Test for multi-channel. */
 #ifdef SNDCTL_DSP_GETCHANNELMASK
     if ( aout_FormatNbChannels( &p_aout->output.output ) > 2 )
     {
         /* Check that the device supports this. */
 
         int i_chanmask;
+
+        /* Reset all. */
+        i_format = AFMT_S16_NE;
+        if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 ||
+            ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
+        {
+            msg_Err( p_aout, "cannot reset OSS audio device" );
+            var_Destroy( p_aout, "audio-device" );
+            return;
+        }
+
         if ( ioctl( p_sys->i_fd, SNDCTL_DSP_GETCHANNELMASK,
                     &i_chanmask ) == 0 )
         {
@@ -199,6 +176,16 @@ static void Probe( aout_instance_t * p_aout )
         }
     }
 #endif
+
+    /* Reset all. */
+    i_format = AFMT_S16_NE;
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 ||
+        ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
+    {
+        msg_Err( p_aout, "cannot reset OSS audio device" );
+        var_Destroy( p_aout, "audio-device" );
+        return;
+    }
 
     /* Test for stereo. */
     i_nb_channels = 2;
@@ -232,6 +219,27 @@ static void Probe( aout_instance_t * p_aout )
         }
     }
 
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
+    {
+        msg_Err( p_aout, "cannot reset OSS audio device" );
+        var_Destroy( p_aout, "audio-device" );
+        return;
+    }
+
+    /* Test for spdif. */
+    if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
+    {
+        i_format = AFMT_AC3;
+
+        if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) >= 0
+             && i_format == AFMT_AC3 )
+        {
+            val.psz_string = N_("A/52 over S/PDIF");
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+            if( config_GetInt( p_aout, "spdif" ) )
+                var_Set( p_aout, "audio-device", val );
+        }
+    }
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
                      NULL );

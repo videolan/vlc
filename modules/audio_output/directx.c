@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.13 2003/02/19 22:08:39 gbazin Exp $
+ * $Id: directx.c,v 1.14 2003/02/20 16:07:38 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -194,7 +194,7 @@ static void InterleaveS16     ( int16_t *, int16_t *, int *, int );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("DirectX audio module") );
-    set_capability( "audio output", 50 );
+    set_capability( "audio output", 100 );
     add_shortcut( "directx" );
     set_callbacks( OpenAudio, CloseAudio );
 vlc_module_end();
@@ -365,22 +365,6 @@ static void Probe( aout_instance_t * p_aout )
 
     var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
 
-    /* Test for SPDIF support */
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
-    {
-        if( CreateDSBuffer( p_aout, VLC_FOURCC('s','p','d','i'),
-                            p_aout->output.output.i_physical_channels,
-                            aout_FormatNbChannels( &p_aout->output.output ),
-                            p_aout->output.output.i_rate,
-                            AOUT_SPDIF_SIZE, VLC_TRUE )
-            == VLC_SUCCESS )
-        {
-            msg_Dbg( p_aout, "device supports A/52 over S/PDIF" );
-            val.psz_string = N_("A/52 over S/PDIF");
-            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
-        }
-    }
-
     /* Test for 5.1 support */
     i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                           AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
@@ -460,6 +444,24 @@ static void Probe( aout_instance_t * p_aout )
         break;
     }
     var_Set( p_aout, "audio-device", val );
+
+    /* Test for SPDIF support */
+    if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
+    {
+        if( CreateDSBuffer( p_aout, VLC_FOURCC('s','p','d','i'),
+                            p_aout->output.output.i_physical_channels,
+                            aout_FormatNbChannels( &p_aout->output.output ),
+                            p_aout->output.output.i_rate,
+                            AOUT_SPDIF_SIZE, VLC_TRUE )
+            == VLC_SUCCESS )
+        {
+            msg_Dbg( p_aout, "device supports A/52 over S/PDIF" );
+            val.psz_string = N_("A/52 over S/PDIF");
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+            if( config_GetInt( p_aout, "spdif" ) )
+                var_Set( p_aout, "audio-device", val );
+        }
+    }
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
 

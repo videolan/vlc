@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: interface.c,v 1.2 2002/10/03 17:01:58 gbazin Exp $
+ * $Id: interface.c,v 1.3 2003/02/20 16:07:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,7 +42,13 @@ int  E_(OpenIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
-    CONSOLE_INTRO_MSG;
+#ifdef WIN32
+    vlc_bool_t b_quiet;
+    b_quiet = config_GetInt( p_intf, "dummy-quiet" );
+    if( !b_quiet )
+        CONSOLE_INTRO_MSG;
+#endif
+
     msg_Info( p_intf, _("Using the dummy interface plugin...") );
 
     p_intf->pf_run = Run;
