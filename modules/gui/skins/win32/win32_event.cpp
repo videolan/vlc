@@ -2,7 +2,7 @@
  * win32_event.cpp: Win32 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.cpp,v 1.5 2003/04/21 21:51:16 asmax Exp $
+ * $Id: win32_event.cpp,v 1.6 2003/10/28 07:17:45 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -72,7 +72,10 @@ bool Win32Event::SendEvent()
     if( Message != VLC_NOTHING )
     {
         PostMessage( hWnd, Message, Param1, Param2 );
-        PostSynchroMessage();
+        if( hWnd )
+        {
+            PostSynchroMessage();
+        }
         return true;
     }
 
