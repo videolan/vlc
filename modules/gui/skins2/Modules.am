@@ -154,8 +154,6 @@ SOURCES_skins2 = \
 	\
 	vars/playlist.cpp \
 	vars/playlist.hpp \
-	vars/stream.cpp \
-	vars/stream.hpp \
 	vars/time.cpp \
 	vars/time.hpp \
 	vars/volume.cpp \

@@ -27,32 +27,41 @@
 #include "../src/var_manager.hpp"
 #include "../vars/time.hpp"
 #include "../vars/volume.hpp"
-#include "../vars/stream.hpp"
 
 
 const string VarText::m_type = "text";
 
 
-VarText::VarText( intf_thread_t *pIntf ): Variable( pIntf ),
-    m_text( pIntf, "" ), m_lastText( pIntf, "" )
+VarText::VarText( intf_thread_t *pIntf, bool substVars ): Variable( pIntf ),
+    m_text( pIntf, "" ), m_lastText( pIntf, "" ), m_substVars( substVars )
 {
 }
 
 
 VarText::~VarText()
 {
-    // Remove the observers
-    VlcProc *pVlcProc = VlcProc::instance( getIntf() );
-    pVlcProc->getTimeVar().delObserver( this );
-    pVlcProc->getVolumeVar().delObserver( this );
-    pVlcProc->getStreamVar().delObserver( this );
-    VarManager *pVarManager = VarManager::instance( getIntf() );
-    pVarManager->getHelpText().delObserver( this );
+    if( m_substVars )
+    {
+        // Remove the observers
+        VlcProc *pVlcProc = VlcProc::instance( getIntf() );
+        pVlcProc->getTimeVar().delObserver( this );
+        pVlcProc->getVolumeVar().delObserver( this );
+        pVlcProc->getStreamURIVar().delObserver( this );
+        pVlcProc->getStreamNameVar().delObserver( this );
+        VarManager *pVarManager = VarManager::instance( getIntf() );
+        pVarManager->getHelpText().delObserver( this );
+    }
 }
 
 
 const UString VarText::get() const
 {
+    if( !m_substVars )
+    {
+        // Do not substitute "$X" variables
+        return m_text;
+    }
+
     uint32_t pos;
     VlcProc *pVlcProc = VlcProc::instance( getIntf() );
 
@@ -67,8 +76,7 @@ const UString VarText::get() const
     if( (pos = temp.find( "$H" )) != UString::npos )
     {
         VarManager *pVarManager = VarManager::instance( getIntf() );
-        // We use .getRaw() to avoid replacing the $H recursively!
-        temp.replace( pos, 2, pVarManager->getHelpText().getRaw() );
+        temp.replace( pos, 2, pVarManager->getHelpText().get() );
     }
     while( (pos = temp.find( "$T" )) != UString::npos )
     {
@@ -92,13 +100,11 @@ const UString VarText::get() const
     }
     while( (pos = temp.find( "$N" )) != UString::npos )
     {
-        temp.replace( pos, 2,
-                      pVlcProc->getStreamVar().getAsStringName().c_str() );
+        temp.replace( pos, 2, pVlcProc->getStreamNameVar().get() );
     }
     while( (pos = temp.find( "$F" )) != UString::npos )
     {
-        temp.replace( pos, 2,
-                      pVlcProc->getStreamVar().getAsStringFullName().c_str() );
+        temp.replace( pos, 2, pVlcProc->getStreamURIVar().get() );
     }
 
     return temp;
@@ -113,44 +119,48 @@ void VarText::set( const UString &rText )
         return;
     }
 
-    // Stop observing other variables
-    VlcProc *pVlcProc = VlcProc::instance( getIntf() );
-    pVlcProc->getTimeVar().delObserver( this );
-    pVlcProc->getVolumeVar().delObserver( this );
-    pVlcProc->getStreamVar().delObserver( this );
-    VarManager *pVarManager = VarManager::instance( getIntf() );
-    pVarManager->getHelpText().delObserver( this );
-
     m_text = rText;
 
-    // Observe needed variables
-    if( m_text.find( "$H" ) != UString::npos )
+    if( m_substVars )
     {
-        pVarManager->getHelpText().addObserver( this );
-    }
-    if( m_text.find( "$T" ) != UString::npos )
-    {
-        pVlcProc->getTimeVar().addObserver( this );
-    }
-    if( m_text.find( "$L" ) != UString::npos )
-    {
-        pVlcProc->getTimeVar().addObserver( this );
-    }
-    if( m_text.find( "$D" ) != UString::npos )
-    {
-        pVlcProc->getTimeVar().addObserver( this );
-    }
-    if( m_text.find( "$V" ) != UString::npos )
-    {
-        pVlcProc->getVolumeVar().addObserver( this );
-    }
-    if( m_text.find( "$N" ) != UString::npos )
-    {
-        pVlcProc->getStreamVar().addObserver( this );
-    }
-    if( m_text.find( "$F" ) != UString::npos )
-    {
-        pVlcProc->getStreamVar().addObserver( this );
+        // Stop observing other variables
+        VlcProc *pVlcProc = VlcProc::instance( getIntf() );
+        pVlcProc->getTimeVar().delObserver( this );
+        pVlcProc->getVolumeVar().delObserver( this );
+        pVlcProc->getStreamNameVar().delObserver( this );
+        pVlcProc->getStreamURIVar().delObserver( this );
+        VarManager *pVarManager = VarManager::instance( getIntf() );
+        pVarManager->getHelpText().delObserver( this );
+
+        // Observe needed variables
+        if( m_text.find( "$H" ) != UString::npos )
+        {
+            pVarManager->getHelpText().addObserver( this );
+        }
+        if( m_text.find( "$T" ) != UString::npos )
+        {
+            pVlcProc->getTimeVar().addObserver( this );
+        }
+        if( m_text.find( "$L" ) != UString::npos )
+        {
+            pVlcProc->getTimeVar().addObserver( this );
+        }
+        if( m_text.find( "$D" ) != UString::npos )
+        {
+            pVlcProc->getTimeVar().addObserver( this );
+        }
+        if( m_text.find( "$V" ) != UString::npos )
+        {
+            pVlcProc->getVolumeVar().addObserver( this );
+        }
+        if( m_text.find( "$N" ) != UString::npos )
+        {
+            pVlcProc->getStreamNameVar().addObserver( this );
+        }
+        if( m_text.find( "$F" ) != UString::npos )
+        {
+            pVlcProc->getStreamURIVar().addObserver( this );
+        }
     }
 
     notify();

@@ -2,7 +2,7 @@
  * var_text.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_text.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -36,7 +36,8 @@ class VarText: public Variable, public Subject<VarText>,
                public Observer<VarPercent>, public Observer< VarText >
 {
     public:
-        VarText( intf_thread_t *pIntf );
+        // Set substVars to true to replace "$X" variables in the text
+        VarText( intf_thread_t *pIntf, bool substVars = true );
         virtual ~VarText();
 
         /// Get the variable type
@@ -57,9 +58,8 @@ class VarText: public Variable, public Subject<VarText>,
         UString m_text;
         /// Actual text after having replaced the variables
         UString m_lastText;
-
-        /// Get the raw text without replacing the $something's
-        const UString &getRaw() const { return m_text; }
+        /// Flag to activate or not "$X" variables substitution
+        bool m_substVars;
 };
 
 #endif

@@ -23,7 +23,7 @@
 
 #include "cmd_vars.hpp"
 #include "../src/vlcproc.hpp"
-#include "../vars/stream.hpp"
+#include "../utils/var_text.hpp"
 #include "../vars/playlist.hpp"
 
 
@@ -35,9 +35,9 @@ void CmdNotifyPlaylist::execute()
 }
 
 
-void CmdSetStream::execute()
+void CmdSetText::execute()
 {
-    // Change the stream variable
-    m_rStream.set( m_name, m_updateVLC );
+    // Change the text variable
+    m_rText.set( m_value );
 }
 

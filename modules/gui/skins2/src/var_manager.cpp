@@ -26,7 +26,7 @@
 
 
 VarManager::VarManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
-    m_tooltipText( pIntf ), m_helpText( pIntf )
+    m_tooltipText( pIntf ), m_helpText( pIntf, false )
 {
 }
 

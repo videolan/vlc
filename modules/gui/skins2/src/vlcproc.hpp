@@ -28,7 +28,7 @@
 #include "../vars/playlist.hpp"
 #include "../vars/time.hpp"
 #include "../vars/volume.hpp"
-#include "../vars/stream.hpp"
+#include "../utils/var_text.hpp"
 
 class OSTimer;
 class VarBool;
@@ -54,8 +54,13 @@ class VlcProc: public SkinObject
         /// Getter for the volume variable
         Volume &getVolumeVar() { return *((Volume*)(m_cVarVolume.get())); }
 
-        /// Getter for the stream variable
-        Stream &getStreamVar() { return *((Stream*)(m_cVarStream.get())); }
+        /// Getter for the stream name variable
+        VarText &getStreamNameVar()
+           { return *((VarText*)(m_cVarStreamName.get())); }
+
+        /// Getter for the stream URI variable
+        VarText &getStreamURIVar()
+            { return *((VarText*)(m_cVarStreamURI.get())); }
 
         /// Set the vout window handle
         void setVoutWindow( void *pVoutWindow );
@@ -77,8 +82,9 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarTime;
         /// Variable for audio volume
         VariablePtr m_cVarVolume;
-        /// Variable for current stream properties (only name, currently)
-        VariablePtr m_cVarStream;
+        /// Variable for current stream properties
+        VariablePtr m_cVarStreamName;
+        VariablePtr m_cVarStreamURI;
         /// Variable for the "mute" state
         VariablePtr m_cVarMute;
         /// Variables related to the input
@@ -97,6 +103,9 @@ class VlcProc: public SkinObject
         /// callback mechanism (yet?) to automatically update a variable when
         /// the internal status changes
         void manage();
+
+        /// Update the stream name variable
+        void updateStreamName( playlist_t *p_playlist );
 
         /// This function directly calls manage(), because it's boring to
         /// always write "pThis->"

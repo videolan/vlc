@@ -27,34 +27,32 @@
 #include "cmd_generic.hpp"
 #include "../utils/ustring.hpp"
 
-class Stream;
+class VarText;
 
 /// Command to notify the playlist of a change
 DEFINE_COMMAND( NotifyPlaylist, "notify playlist" )
 
 
-/// Command to set a stream variable
-class CmdSetStream: public CmdGeneric
+/// Command to set a text variable
+class CmdSetText: public CmdGeneric
 {
     public:
-        CmdSetStream( intf_thread_t *pIntf, Stream &rStream,
-                      const UString &rName, bool updateVLC ):
-            CmdGeneric( pIntf ), m_rStream( rStream ), m_name( rName ),
-            m_updateVLC( updateVLC ) {}
-        virtual ~CmdSetStream() {}
+        CmdSetText( intf_thread_t *pIntf, VarText &rText,
+                    const UString &rValue ):
+            CmdGeneric( pIntf ), m_rText( rText ), m_value( rValue ) {}
+        virtual ~CmdSetText() {}
 
         /// This method does the real job of the command
         virtual void execute();
 
         /// Return the type of the command
-        virtual string getType() const { return "set stream"; }
+        virtual string getType() const { return "set text"; }
 
     private:
-        /// Stream variable to set
-        Stream &m_rStream;
+        /// Text variable to set
+        VarText &m_rText;
         /// Value to set
-        const UString m_name;
-        bool m_updateVLC;
+        const UString m_value;
 };
 
 
