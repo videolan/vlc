@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.8 2003/02/01 21:24:06 titer Exp $
+$Id: NEWS,v 1.9 2003/02/01 21:39:21 ipkiss Exp $
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
@@ -73,8 +73,12 @@ Mac OS X port:
   * new playlist and messages windows
 
 Win32 port:
-  * waveout modules supports multi-channel audio output
+  * waveout module supports multi-channel audio output
   * support for VCDs
+  * new dialog box to select avi subtitles
+  * some new shortcuts (in particular to play/pause or stay on top)
+  * new menu entry to spawn another interface
+  * rc interface is repaired
 
 BeOS port:
   * new settings window for adjusting post-processing, brightness,
