@@ -456,7 +456,8 @@ static void vout_Display( vout_thread_t *p_vout )
 {
 //    intf_ErrMsg( "vout_Display()" );
 
-    if ( p_vout->p_sys->playback_status != PAUSED &&  p_vout->p_sys->playback_status != STOPPED )
+//we should not be called if we set the status to paused or stopped via the interface
+//    if ( p_vout->p_sys->playback_status != PAUSED &&  p_vout->p_sys->playback_status != STOPPED )
         BlitToWindow ( p_vout, p_vout->i_buffer_index );
 }
 

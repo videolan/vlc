@@ -69,7 +69,4 @@ typedef struct vout_sys_s
     Ptr				theBase;
     int				theRow;
     int				theDepth;
-
-    int playback_status;		// remember playback state
-    int vol_val;	// remember the current volume
 } vout_sys_t;

@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.16 2001/05/07 04:42:42 sam Exp $
+ * $Id: vout_xvideo.c,v 1.17 2001/05/25 13:20:09 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -41,6 +41,10 @@
 #include <machine/param.h>
 #include <sys/types.h>                                     /* typedef ushort */
 #include <sys/ipc.h>
+#endif
+
+#ifndef WIN32
+#include <netinet/in.h>                               /* BSD: struct in_addr */
 #endif
 
 #include <sys/shm.h>                                   /* shmget(), shmctl() */

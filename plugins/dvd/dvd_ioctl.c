@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.12 2001/05/25 04:23:37 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.13 2001/05/25 13:20:09 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -252,7 +252,7 @@ int ioctl_ReportAgid( int i_fd, int *pi_agid )
 
     i_ret = ioctl( i_fd, IODVD_REPORT_KEY, &dvdioctl );
 
-    *pi_asf = p_buffer[ 7 ] >> 6;
+    *pi_agid = p_buffer[ 7 ] >> 6;
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */

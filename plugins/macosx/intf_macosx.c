@@ -159,6 +159,8 @@ typedef struct intf_sys_s
     EventLoopTimerRef manageTimer;
     Rect aboutRect;
     WindowRef	p_aboutWindow;
+    int playback_status; //moved from vout ; prolly didn't belong
+				//there for a good reason ; more like Beos
 } intf_sys_t;
 
 /*****************************************************************************
@@ -179,6 +181,7 @@ OSErr MyOpenDocument(const FSSpecPtr defaultLocationfssPtr);
 
 void playorpause ( intf_thread_t *p_intf );
 void stop ( intf_thread_t *p_intf );
+void silence ( intf_thread_t *p_intf );
 
 
 #ifndef CarbonEvents
@@ -527,48 +530,64 @@ void DoEvent( intf_thread_t *p_intf , EventRecord *event)
 //the code for playorpause and stop taken almost directly from the BeOS code
 void playorpause ( intf_thread_t *p_intf )
 {
-// pause the playback
+    int i_index;
+
+    // pause the playback
     if (p_intf->p_input != NULL )
     {
-            // mute the volume if currently playing
-            if (p_main->p_vout->p_sys->playback_status == PLAYING)
+        // mute the volume if currently playing
+        if (p_intf->p_sys->playback_status == PLAYING)
+        {
+            vlc_mutex_lock( &p_aout_bank->lock );
+            for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
             {
-                    if (p_main->p_aout != NULL)
-                    {
-                            p_main->p_aout->i_vol = 0;
-                    }
-                    p_main->p_vout->p_sys->playback_status = PAUSED;
-                SetMenuItemText( GetMenuHandle(kMenuControls), kControlsPlayORPause, "\pPlay");
+                p_aout_bank->pp_aout[i_index]->i_savedvolume =
+                                    p_aout_bank->pp_aout[i_index]->i_volume;
+                p_aout_bank->pp_aout[i_index]->i_volume = 0;
             }
-            else
-            // restore the volume
+            vlc_mutex_unlock( &p_aout_bank->lock );
+            p_intf->p_sys->playback_status = PAUSED;
+            SetMenuItemText( GetMenuHandle(kMenuControls), kControlsPlayORPause, "\pPlay");
+        }
+        else
+        // restore the volume
+        {
+            vlc_mutex_lock( &p_aout_bank->lock );
+            for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
             {
-                    if (p_main->p_aout != NULL)
-                    {
-                            p_main->p_aout->i_vol = p_main->p_vout->p_sys->vol_val;
-                    }
-                    p_main->p_vout->p_sys->playback_status = PLAYING;
-                SetMenuItemText( GetMenuHandle(kMenuControls), kControlsPlayORPause, "\pPause");
+                p_aout_bank->pp_aout[i_index]->i_volume =
+                                p_aout_bank->pp_aout[i_index]->i_savedvolume;
+                p_aout_bank->pp_aout[i_index]->i_savedvolume = 0;
             }
-            //snooze(400000);
-            input_SetStatus(p_intf->p_input, INPUT_STATUS_PAUSE);
+            vlc_mutex_unlock( &p_aout_bank->lock );
+            p_intf->p_sys->playback_status = PLAYING;
+            SetMenuItemText( GetMenuHandle(kMenuControls), kControlsPlayORPause, "\pPause");
+        }
+        //snooze(400000);
+        input_SetStatus(p_intf->p_input, INPUT_STATUS_PAUSE);
     }
 }
 
 void stop ( intf_thread_t *p_intf )
 {
+    int i_index;
+
     // this currently stops playback not nicely
-    if (p_intf->p_input != NULL )
+    if( p_intf->p_input != NULL )
     {
-            // silence the sound, otherwise very horrible
-            if (p_main->p_aout != NULL)
-            {
-                    p_main->p_aout->i_vol = 0;
-            }
-            //snooze(400000);
-            input_SetStatus(p_intf->p_input, INPUT_STATUS_END);
+        // silence the sound, otherwise very horrible
+        vlc_mutex_lock( &p_aout_bank->lock );
+        for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
+        {
+            p_aout_bank->pp_aout[i_index]->i_savedvolume = p_aout_bank->pp_aout[i_index]->i_volume;
+            p_aout_bank->pp_aout[i_index]->i_volume = 0;
+        }
+        vlc_mutex_unlock( &p_aout_bank->lock );
+
+        //snooze( 400000 );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_END );
     }
-    p_main->p_vout->p_sys->playback_status = STOPPED;
+    p_intf->p_sys->playback_status = STOPPED;
 }
 
 
@@ -576,7 +595,8 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
 {
     short	menuID;		/* the resource ID of the selected menu */
     short	menuItem;	/* the item number of the selected menu */
-	
+    int i_index;
+    vout_thread_t *p_vout;
 
     menuID = HiWord(menuResult);    /* use macros to get item & menu number */
     menuItem = LoWord(menuResult);
@@ -607,8 +627,15 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
             switch (menuItem) 
             {
                 case kFileNew:
-                    ShowWindow( p_main->p_vout->p_sys->p_window );
-                    SelectWindow( p_main->p_vout->p_sys->p_window );
+                    vlc_mutex_lock( &p_vout_bank->lock );
+                    /* XXX: only test the first video output */
+                    if( p_vout_bank->i_count )
+                    {
+                        p_vout = p_vout_bank->pp_vout[0];
+                        ShowWindow( p_vout->p_sys->p_window );
+                        SelectWindow( p_vout->p_sys->p_window );
+                    }
+                    vlc_mutex_unlock( &p_vout_bank->lock );
                     DisableMenuItem( GetMenuHandle(kMenuFile), kFileNew);
                     EnableMenuItem( GetMenuHandle(kMenuFile), kFileClose);
                     //hmm, can't say to play() right now because I don't know if a file is in playlist yet.
@@ -623,7 +650,18 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
 
                 case kFileClose:
                     HideWindow( FrontWindow() );
-                    if ( ! IsWindowVisible( p_main->p_vout->p_sys->p_window ) && ! IsWindowVisible( p_intf->p_sys->p_aboutWindow ) )
+
+                    vlc_mutex_lock( &p_vout_bank->lock );
+                    /* XXX: only test the first video output */
+                    if( p_vout_bank->i_count )
+                    {
+                        p_vout = p_vout_bank->pp_vout[0];
+                        printf("ok\n");
+                    }
+                        else printf("NO\n");
+                    vlc_mutex_unlock( &p_vout_bank->lock );
+
+                    if ( ! IsWindowVisible( p_vout->p_sys->p_window ) && ! IsWindowVisible( p_intf->p_sys->p_aboutWindow ) )
                     {
                         //calling this even if no file open shouldn't be bad... not sure of opposite situation above
                         stop( p_intf );
@@ -657,12 +695,16 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
 		// cycle the fast playback modes
                     if (p_intf->p_input != NULL )
                     {
-                            if (p_main->p_aout != NULL)
-                            {
-                                    p_main->p_aout->i_vol = 0;
-                            }
-                            //snooze(400000);
-                            input_SetStatus(p_intf->p_input, INPUT_STATUS_FASTER);
+                        vlc_mutex_lock( &p_aout_bank->lock );
+                        for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
+                        {
+                            p_aout_bank->pp_aout[i_index]->i_savedvolume =
+                                                p_aout_bank->pp_aout[i_index]->i_volume;
+                            p_aout_bank->pp_aout[i_index]->i_volume = 0;
+                        }
+                        vlc_mutex_unlock( &p_aout_bank->lock );
+                        //snooze(400000);
+                        input_SetStatus(p_intf->p_input, INPUT_STATUS_FASTER);
                     }
                     break;
 
@@ -670,12 +712,16 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
 		// cycle the slow playback modes
                     if (p_intf->p_input != NULL )
                     {
-                            if (p_main->p_aout != NULL)
-                            {
-                                    p_main->p_aout->i_vol = 0;
-                            }
-                            //snooze(400000);
-                            input_SetStatus(p_intf->p_input, INPUT_STATUS_SLOWER);
+                        vlc_mutex_lock( &p_aout_bank->lock );
+                        for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
+                        {
+                            p_aout_bank->pp_aout[i_index]->i_savedvolume =
+                                                p_aout_bank->pp_aout[i_index]->i_volume;
+                            p_aout_bank->pp_aout[i_index]->i_volume = 0;
+                        }
+                        vlc_mutex_unlock( &p_aout_bank->lock );
+                        //snooze(400000);
+                        input_SetStatus(p_intf->p_input, INPUT_STATUS_FASTER);
                     }
                     break;
                 
@@ -704,37 +750,46 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
 
                 case kControlsVolumeUp:
 		// adjust the volume
-                    if (p_main->p_aout != NULL) 
+                    vlc_mutex_lock( &p_aout_bank->lock );
+                    for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
                     {
-                        p_main->p_aout->i_vol++;
+//                            ++p_aout_bank->pp_aout[i_index]->i_volume;
+                            p_aout_bank->pp_aout[i_index]->i_savedvolume = ++p_aout_bank->pp_aout[i_index]->i_volume;
                     }
+                    vlc_mutex_unlock( &p_aout_bank->lock );
                     break;
 
                 case kControlsVolumeDown:
 		// adjust the volume
-                    if (p_main->p_aout != NULL) 
+                    vlc_mutex_lock( &p_aout_bank->lock );
+                    for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
                     {
-                        p_main->p_aout->i_vol--;
+//                            --p_aout_bank->pp_aout[i_index]->i_volume;
+                            p_aout_bank->pp_aout[i_index]->i_savedvolume = --p_aout_bank->pp_aout[i_index]->i_volume;
                     }
+                    vlc_mutex_unlock( &p_aout_bank->lock );
                     break;
 
                 case kControlsVolumeMute:
                 // mute
-                    if (p_main->p_aout != NULL) 
+                    vlc_mutex_lock( &p_aout_bank->lock );
+                    for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
+                    {
+                        if( p_aout_bank->pp_aout[i_index]->i_savedvolume )
                         {
-                                    if (p_main->p_aout->i_vol == 0)
-                                    {
-                                            //p_vol->SetEnabled(true);
-                                            p_main->p_aout->i_vol = p_main->p_vout->p_sys->vol_val;
-                                    }	
-                                    else
-                                    {
-                                            //p_vol->SetEnabled(false);
-                                            p_main->p_vout->p_sys->vol_val = p_main->p_aout->i_vol;
-                                            p_main->p_aout->i_vol = 0;
-                                    }
-                            }
-                            break;
+                            p_aout_bank->pp_aout[i_index]->i_volume =
+                                            p_aout_bank->pp_aout[i_index]->i_savedvolume;
+                            p_aout_bank->pp_aout[i_index]->i_savedvolume = 0;
+                        }
+                        else
+                        {
+                            p_aout_bank->pp_aout[i_index]->i_savedvolume =
+                                                p_aout_bank->pp_aout[i_index]->i_volume;
+                            p_aout_bank->pp_aout[i_index]->i_volume = 0;
+                        }
+                    }
+                    vlc_mutex_unlock( &p_aout_bank->lock );
+                    break;
 
                 case kControlsEject:
                     //Fixme

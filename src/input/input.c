@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.108 2001/05/19 00:39:30 stef Exp $
+ * $Id: input.c,v 1.109 2001/05/25 13:20:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -72,8 +72,6 @@
 #include "interface.h"
 
 #include "main.h"
-
- /* #include <netutils.h> */
 
 
 /*****************************************************************************
