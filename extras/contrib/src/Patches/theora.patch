@@ -13,12 +13,12 @@ diff -ru libtheora.old/Makefile.am libtheora/Makefile.am
 diff -ru libtheora.old/Makefile.in libtheora/Makefile.in
 --- libtheora.old/Makefile.in	Mon Jun  9 23:26:11 2003
 +++ libtheora/Makefile.in	Wed Nov 12 00:06:37 2003
-@@ -86,7 +86,7 @@
- 
- AUTOMAKE_OPTIONS = foreign dist-zip
- 
+@@ -206,7 +206,7 @@
+ target_os = @target_os@
+ target_vendor = @target_vendor@
+ AUTOMAKE_OPTIONS = foreign 1.6 dist-zip dist-bzip2
 -SUBDIRS = lib include doc examples debian
 +SUBDIRS = lib include
- 
- EXTRA_DIST = COPYING autogen.sh 
- ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+ EXTRA_DIST = COPYING autogen.sh win32 libtheora.spec libtheora.spec.in \
+ 	theora-uninstalled.pc.in
+
