@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.155 2001/11/13 16:00:54 sam Exp $
+ * $Id: input.c,v 1.156 2001/11/15 18:50:49 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -865,11 +865,8 @@ static void NetworkOpen( input_thread_t * p_input )
     if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF,
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_ErrMsg( "input error: can't configure socket (SO_RCVBUF: %s)", 
-                     strerror(errno));
-        close( p_input->i_handle );
-        p_input->b_error = 1;
-        return;
+        intf_WarnMsg( 1, "input error: can't configure socket (SO_RCVBUF: %s)", 
+                         strerror(errno));
     }
 
     /* Check if we really got what we have asked for, because Linux, etc.
@@ -880,17 +877,13 @@ static void NetworkOpen( input_thread_t * p_input )
     if( getsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF,
                     (void*) &i_opt, &i_opt_size ) == -1 )
     {
-        intf_ErrMsg( "input error: can't configure socket (SO_RCVBUF: %s)", 
-                     strerror(errno));
-        close( p_input->i_handle );
-        p_input->b_error = 1;
-        return;
+        intf_WarnMsg( 1, "input error: can't query socket (SO_RCVBUF: %s)", 
+                         strerror(errno));
     }
-    
-    if( i_opt < 0x80000 )
+    else if( i_opt < 0x80000 )
     {
-        intf_WarnMsg( 1, "input warning: socket receive buffer size just 0x%x"
-                         " instead of 0x%x bytes.", i_opt, 0x80000 );
+        intf_WarnMsg( 1, "input warning: socket buffer size is 0x%x"
+                         " instead of 0x%x", i_opt, 0x80000 );
     }
 
     /* Build the local socket */
