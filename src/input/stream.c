@@ -1179,17 +1179,6 @@ char *stream_ReadLine( stream_t *s )
             i_line += (i_data - 1);
             i_read += i_data;
 
-            /* Remove trailing LF/CR */
-            while( stream_Peek( s, &p_data, 1 ) == 1 &&
-                   i_read < STREAM_LINE_MAX )
-            {
-                if( p_data[0] != '\n' && p_data[0] != '\r' ) break;
-
-                i_data = stream_Read( s, NULL, 1 );
-                if( i_data <= 0 ) break; /* Hmmm */
-                i_read += i_data;
-            }
-
             /* We have our line */
             break;
         }
@@ -1202,15 +1191,16 @@ char *stream_ReadLine( stream_t *s )
         i_read += i_data;
     }
 
-    /* Remove trailing CR */
-    while( i_line > 0 && p_line[i_line-1] == '\r' ) i_line--;
+    /* Remove trailing LF/CR */
+    while( i_line > 0 && ( p_line[i_line-1] == '\r' || p_line[i_line-1] == '\n') ) i_line--;
 
-    if( i_line > 0 )
+    if( i_read > 0 )
     {
         p_line[i_line] = '\0';
         return p_line;
     }
 
+    /* We failed to read any data, probably EOF*/
     if( p_line ) free( p_line );
     return NULL;
 }
