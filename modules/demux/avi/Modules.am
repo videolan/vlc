@@ -1,6 +1,5 @@
 SOURCES_avi = \
 	avi.c \
-	avi.h \
 	libavi.c \
 	libavi.h \
 	$(NULL)
