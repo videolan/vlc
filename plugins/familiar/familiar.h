@@ -2,7 +2,7 @@
  * familiar.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: familiar.h,v 1.6.2.1 2002/09/30 20:37:13 jpsaman Exp $
+ * $Id: familiar.h,v 1.6.2.2 2002/10/02 19:58:45 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -33,11 +33,8 @@ typedef struct intf_sys_s
     GtkNotebook *       p_notebook;
     GtkProgressBar *    p_progess;
     GtkCList    *       p_clist;
-
+//    GHashTable *        config_hash_table;
     boolean_t           b_autoplayfile;
-
-    /* The input thread */
-    input_thread_t *    p_input;
 
     /* XXX: Ugly kludge, see gtk.c */
     void             ( *pf_callback[MAX_ATEXIT] ) ( void );

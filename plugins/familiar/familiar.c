@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.8.2.3 2002/10/01 19:13:14 jpsaman Exp $
+ * $Id: familiar.c,v 1.8.2.4 2002/10/02 19:58:45 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -142,8 +142,6 @@ static int Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_autoplayfile = 1;
     p_intf->p_sys->pf_callback[0] = NULL;
 
-    /* Initialize Gtk+ thread */
-    p_intf->p_sys->p_input = NULL;
     p_intf->pf_run = Run;
 
     return (0);
@@ -154,11 +152,6 @@ static int Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void Close( intf_thread_t *p_intf )
 {   
-    if( p_intf->p_sys->p_input )
-    {
-//        vlc_object_release( p_intf->p_sys->p_input );
-    }
-
     /* Destroy structure */
     free( p_intf->p_sys );
 }
@@ -202,6 +195,12 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_notebook = GTK_NOTEBOOK( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
 //    gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+
+
+    /* Create our config hash table and associate it with the dialog box */
+//    config_hash_table = g_hash_table_new( NULL, NULL );
+//    gtk_object_set_data( GTK_OBJECT(config_dialog),
+//                         "config_hash_table", config_hash_table );
 
     p_intf->p_sys->p_progess = GTK_PROGRESS_BAR( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "progress" ) );
