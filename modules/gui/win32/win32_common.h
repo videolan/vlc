@@ -81,7 +81,7 @@ struct intf_sys_t
     /* The window labels for DVD mode */
     TLabel            * p_label_title;
     TLabel            * p_label_chapter;
-    int                 i_part;                           /* current chapter */
+    unsigned int        i_part;                           /* current chapter */
 
     /* The input thread */
     input_thread_t    * p_input;

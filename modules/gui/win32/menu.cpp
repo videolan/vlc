@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.4 2003/01/13 17:11:14 ipkiss Exp $
+ * $Id: menu.cpp,v 1.5 2003/01/16 09:02:46 sam Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -313,7 +313,7 @@ void __fastcall TMenusGen::SetupMenus()
     p_audio_es = NULL;
     p_spu_es = NULL;
 
-    for( int i = 0; i < p_input->stream.i_selected_es_number; i++ )
+    for( unsigned int i = 0; i < p_input->stream.i_selected_es_number; i++ )
     {
         if( p_input->stream.pp_selected_es[i]->i_cat == AUDIO_ES )
         {
@@ -618,7 +618,8 @@ void __fastcall TMenusGen::ProgramMenu( TMenuItem *Root,
     Root->Enabled = false;
 
     /* create a set of program buttons and append them to the container */
-    for( int i = 0; i < p_intf->p_sys->p_input->stream.i_pgrm_number; i++ )
+    for( unsigned int i = 0; i < p_intf->p_sys->p_input->stream.i_pgrm_number;
+         i++ )
     {
         AnsiString Name;
         Name.sprintf( "id %d",
@@ -771,7 +772,8 @@ void __fastcall TMenusGen::LanguageMenu( TMenuItem *Root, es_descriptor_t *p_es,
 
 #define ES p_intf->p_sys->p_input->stream.pp_es[i]
     /* create a set of language buttons and append them to the Root */
-    for( int i = 0; i < p_intf->p_sys->p_input->stream.i_es_number; i++ )
+    for( unsigned int i = 0; i < p_intf->p_sys->p_input->stream.i_es_number;
+         i++ )
     {
         if( ( ES->i_cat == i_cat ) &&
             ( !ES->p_pgrm ||
@@ -828,8 +830,8 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
     TMenuItem     * ChapterGroup;
     TMenuItem     * ChapterItem;
     AnsiString      Name;
-    int             i_title_nb;
-    int             i_chapter_nb;
+    unsigned int    i_title_nb;
+    unsigned int    i_chapter_nb;
 
 
     /* remove previous menu */
@@ -839,7 +841,7 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
     i_title_nb = p_intf->p_sys->p_input->stream.i_area_nb;
 
     /* loop on titles */
-    for( int i_title = 1; i_title < i_title_nb; i_title++ )
+    for( unsigned int i_title = 1; i_title < i_title_nb; i_title++ )
     {
         /* we group titles in packets of ten for small screens */
         if( ( i_title % 10 == 1 ) && ( i_title_nb > 20 ) )
@@ -868,7 +870,8 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
                 p_intf->p_sys->p_input->stream.pp_areas[i_title]->i_part_nb;
 
             /* loop on chapters */
-            for( int i_chapter = 0; i_chapter < i_chapter_nb; i_chapter++ )
+            for( unsigned int i_chapter = 0; i_chapter < i_chapter_nb;
+                 i_chapter++ )
             {
                 /* we group chapters in packets of ten for small screens */
                 if( ( i_chapter % 10 == 0 ) && ( i_chapter_nb > 20 ) )
@@ -894,7 +897,7 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
 
                 /* FIXME: temporary hack to save i_title and i_chapter with
                  * ChapterItem, since we will need them in the callback */
-                 ChapterItem->Tag = Pos2Data( i_title, i_chapter + 1 );
+                ChapterItem->Tag = Pos2Data( i_title, i_chapter + 1 );
 
 #define p_area p_intf->p_sys->p_input->stream.pp_areas[i_title]
                 /* check the currently selected chapter */

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.47 2002/12/30 17:36:01 gbazin Exp $
+ * $Id: vlc_common.h,v 1.48 2003/01/16 09:02:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -37,6 +37,7 @@
 #   undef HAVE_VARIADIC_MACROS
 #   undef HAVE_STDINT_H
 #   undef HAVE_INTTYPES_H
+#   undef off_t
 #endif
 
 #include "vlc_config.h"

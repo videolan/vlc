@@ -446,7 +446,7 @@ void __fastcall TMainFrameDlg::PrevTitleActionExecute( TObject *Sender )
 void __fastcall TMainFrameDlg::NextTitleActionExecute( TObject *Sender )
 {
     input_area_t  * p_area;
-    int             i_id;
+    unsigned int    i_id;
 
     i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id + 1;
 

@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.11 2002/12/18 11:47:35 sam Exp $
+ * $Id: vlc_threads_funcs.h,v 1.12 2003/01/16 09:02:46 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -80,7 +80,7 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
 
 #elif defined( UNDER_CE )
     EnterCriticalSection( &p_mutex->csection );
-    return 0;
+    i_result = 0;
 
 #elif defined( WIN32 )
     if( p_mutex->mutex )
@@ -91,7 +91,7 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
     {
         EnterCriticalSection( &p_mutex->csection );
     }
-    return 0;
+    i_result = 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_result = pthread_mutex_lock( &p_mutex->mutex );
@@ -103,7 +103,7 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
 
 #elif defined( HAVE_CTHREADS_H )
     mutex_lock( p_mutex->mutex );
-    return 0;
+    i_result = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_mutex == NULL )
@@ -151,7 +151,7 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
 
 #elif defined( UNDER_CE )
     LeaveCriticalSection( &p_mutex->csection );
-    return 0;
+    i_result = 0;
 
 #elif defined( WIN32 )
     if( p_mutex->mutex )
@@ -162,7 +162,7 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
     {
         LeaveCriticalSection( &p_mutex->csection );
     }
-    return 0;
+    i_result = 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_result = pthread_mutex_unlock( &p_mutex->mutex );
@@ -174,7 +174,7 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
 
 #elif defined( HAVE_CTHREADS_H )
     mutex_unlock( p_mutex );
-    return 0;
+    i_result = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_mutex == NULL )
@@ -236,7 +236,7 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
 
 #elif defined( UNDER_CE )
     PulseEvent( p_condvar->event );
-    return 0;
+    i_result = 0;
 
 #elif defined( WIN32 )
     /* Release one waiting thread if one is available. */
@@ -277,7 +277,7 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
             WaitForSingleObject( p_condvar->event, INFINITE );
         }
     }
-    return 0;
+    i_result = 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_result = pthread_cond_signal( &p_condvar->cond );
@@ -293,7 +293,7 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
     {
         cond_signal( (condition_t)p_condvar );
     }
-    return 0;
+    i_result = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_condvar == NULL )
@@ -377,7 +377,7 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
     {
         PulseEvent( p_condvar->event );
     }
-    return 0;
+    i_result = 0;
 
 #elif defined( WIN32 )
     int i;
@@ -423,7 +423,7 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
             WaitForSingleObject( p_condvar->event, INFINITE );
         }
     }
-    return 0;
+    i_result = 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_result = pthread_cond_broadcast( &p_condvar->cond );
@@ -439,7 +439,7 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
     {
         cond_signal( (condition_t)p_condvar );
     }
-    return 0;
+    i_result = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_condvar == NULL )
@@ -520,7 +520,7 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
 
-    return 0;
+    i_result = 0;
 
 #elif defined( WIN32 )
     if( !p_condvar->semaphore )
@@ -596,7 +596,7 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
 
-    return 0;
+    i_result = 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 
@@ -635,7 +635,7 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
 
 #elif defined( HAVE_CTHREADS_H )
     condition_wait( (condition_t)p_condvar, (mutex_t)p_mutex );
-    return 0;
+    i_result = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_condvar == NULL )
@@ -660,7 +660,7 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
     p_condvar->thread = -1;
 
     vlc_mutex_lock( p_mutex );
-    return 0;
+    i_result = 0;
 
 #endif
 
