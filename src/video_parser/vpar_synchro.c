@@ -48,7 +48,7 @@
 /*****************************************************************************
  * vpar_SynchroUpdateTab : Update a mean table in the synchro structure
  *****************************************************************************/
-double vpar_SynchroUpdateTab( video_synchro_tab_t * tab, int count )
+float vpar_SynchroUpdateTab( video_synchro_tab_t * tab, int count )
 {
 	
     tab->mean = ( tab->mean + 3 * count ) / 4;
@@ -63,9 +63,9 @@ double vpar_SynchroUpdateTab( video_synchro_tab_t * tab, int count )
 void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                                    int i_coding_type )
 {
-    double candidate_deviation;
-    double optimal_deviation;
-    double predict;
+    float candidate_deviation;
+    float optimal_deviation;
+    float predict;
 
     switch(i_coding_type)
     {
@@ -167,19 +167,19 @@ void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
 /*****************************************************************************
  * vpar_SynchroDecode : Update timers when we decide to decode a picture
  *****************************************************************************/
-mtime_t vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
+void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
                             int i_structure )
 {
     vpar_SynchroUpdateStructures (p_vpar, i_coding_type);
 
-    return mdate() + 700000;
 }
 
 /*****************************************************************************
  * vpar_SynchroEnd : Called when the image is totally decoded
  *****************************************************************************/
-void vpar_SynchroEnd( vpar_thread_t * p_vpar )
+mtime_t vpar_SynchroEnd( vpar_thread_t * p_vpar )
 {
-
+    
+    return mdate() + 700000;
 }
 

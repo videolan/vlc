@@ -677,9 +677,10 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         }
 
         /* Initialize values. */
-        P_picture->date = vpar_SynchroDecode( p_vpar,
-                                              p_vpar->picture.i_coding_type,
-                                              i_structure );
+        vpar_SynchroDecode( p_vpar, p_vpar->picture.i_coding_type, i_structure );
+	/* kludge to be removed once vpar_SynchroEnd is called properly */
+        P_picture->date = mdate() + 700000;
+
         P_picture->i_aspect_ratio = p_vpar->sequence.i_aspect_ratio;
         P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
         p_vpar->picture.i_l_stride = ( p_vpar->sequence.i_width
