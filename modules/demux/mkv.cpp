@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.46 2003/11/28 17:30:31 hartman Exp $
+ * $Id: mkv.cpp,v 1.47 2003/11/28 22:23:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1103,7 +1103,7 @@ static int Open( vlc_object_t * p_this )
                  !strncmp( tk.psz_codec, "A_AAC/MPEG4/", strlen( "A_AAC/MPEG4/" ) ) )
         {
             int i_profile, i_srate;
-            static int i_sample_rates[] =
+            static unsigned int i_sample_rates[] =
             {
                     96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
                         16000, 12000, 11025, 8000,  7350,  0,     0,     0
@@ -1507,11 +1507,6 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
             else
             {
                 p_block->i_dts = 0;
-            }
-
-            if( p_block->i_buffer > 0 )
-            {
-                p_block->p_buffer[p_block->i_buffer] = '\0';
             }
         }
         es_out_Send( p_input->p_es_out, tk.p_es, p_block );
