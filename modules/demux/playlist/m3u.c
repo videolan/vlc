@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
+ *          Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,12 +106,13 @@ static int Demux( demux_t *p_demux )
 {
     playlist_t *p_playlist;
     char       *psz_line;
-    int        i_position;
 
     char *psz_name = NULL;
     mtime_t i_duration = -1;
     char **ppsz_options = NULL;
-    int i_options = 0;
+    int i_options = 0, i;
+
+    playlist_item_t *p_item;
 
     vlc_bool_t b_cleanup = VLC_FALSE;
 
@@ -123,10 +124,8 @@ static int Demux( demux_t *p_demux )
         return -1;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
-    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
-    i_position = p_playlist->i_index + 1;
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    playlist_ItemToNode( p_playlist, p_playlist->status.p_item );
+    p_playlist->status.p_item->input.i_type = ITEM_TYPE_PLAYLIST;
 
     psz_line = stream_ReadLine( p_demux->s );
     while( psz_line )
@@ -142,7 +141,7 @@ static int Demux( demux_t *p_demux )
             /* Parse extra info */
 
             /* Skip leading tabs and spaces */
-            while( *psz_parse == ' ' || *psz_parse == '\t' || 
+            while( *psz_parse == ' ' || *psz_parse == '\t' ||
                    *psz_parse == '\n' || *psz_parse == '\r' ||
                    *psz_parse == '#' ) psz_parse++;
 
@@ -189,11 +188,26 @@ static int Demux( demux_t *p_demux )
             b_cleanup = VLC_TRUE;
             if( !psz_mrl ) goto error;
 
-            playlist_AddExt( p_playlist, psz_mrl, psz_name,
-                             PLAYLIST_INSERT, i_position, i_duration,
-                             (const char **)ppsz_options, i_options );
+            p_item = playlist_ItemNew( p_playlist, psz_mrl, psz_name );
+            for( i = 0; i< i_options; i++ )
+            {
+                playlist_ItemAddOption( p_item, ppsz_options[i] );
+            }
+            p_item->input.i_duration = i_duration;
 
-            i_position++;
+            playlist_NodeAddItem( p_playlist, p_item,
+                           p_playlist->status.p_item->pp_parents[0]->i_view,
+                           p_playlist->status.p_item, PLAYLIST_APPEND,
+                           PLAYLIST_END );
+
+            /* We need to declare the parents of the node as the
+             *                  * same of the parent's ones */
+            for( i= 1 ; i< p_playlist->status.p_item->i_parents; i ++ )
+            {
+                    playlist_ItemAddParent( p_item,
+                              p_playlist->status.p_item->pp_parents[i]->i_view,
+                              p_playlist->status.p_item );
+            }
             free( psz_mrl );
         }
 
@@ -217,6 +231,10 @@ static int Demux( demux_t *p_demux )
             b_cleanup = VLC_FALSE;
         }
     }
+
+    /* Go back and play the playlist */
+    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_playlist->status.i_view,
+                      p_playlist->status.p_item, NULL );
 
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;

@@ -188,7 +188,7 @@ static int Demux( demux_t *p_demux )
                               PLAYLIST_INSERT, i_position );
                 if( i_duration != -1 )
                 {
-                    playlist_SetDuration( p_playlist, i_position, i_duration );
+                    //playlist_SetDuration( p_playlist, i_position, i_duration );
                 }
                 i_position++;
                 free( psz_mrl );
@@ -236,7 +236,7 @@ static int Demux( demux_t *p_demux )
                       PLAYLIST_INSERT, i_position );
         if( i_duration != -1 )
         {
-                    playlist_SetDuration( p_playlist, i_position, i_duration );
+            //playlist_SetDuration( p_playlist, i_position, i_duration );
         }
         i_position++;
         free( psz_mrl );
