@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.2 2001/09/12 01:31:37 tcastley Exp $
+ * $Id: MediaControlView.cpp,v 1.3 2001/10/21 06:05:30 tcastley Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *
@@ -173,7 +173,6 @@ void MediaControlView::SetStatus(int status, int rate)
     }
     if ( rate < DEFAULT_RATE )
     {
-       intf_Msg("Fastler Rate: %d", rate);
     }
 }
 

@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.3 2001/09/12 01:30:07 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.4 2001/10/21 06:05:30 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -442,7 +442,6 @@ void InterfaceWindow::updateInterface()
         {
             uint64 seekTo = (p_mediaControl->GetSeekTo() *
                         p_intf->p_input->stream.p_selected_area->i_size) / 100;
-            intf_Msg("Move to: %u", seekTo);
             input_Seek( p_intf->p_input, seekTo);
         }
         else if( Lock() )
