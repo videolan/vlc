@@ -4,6 +4,8 @@
 
 HEAD
 
+  * Additional Makefile cleaning for built-in modules.
+  * Fixed Makefile for Solaris target.
   * All Debian packages are now lintian-clean.
   * Fixed XVideo plugin linking.
   * Updated TODO list.

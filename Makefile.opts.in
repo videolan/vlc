@@ -89,7 +89,7 @@ PROGRAM_VERSION=@VLC_VERSION@
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.
-DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr '[a-z].' '[A-Z]_')
+DEFINE += -DSYS_$(shell echo $(SYS) | sed -e 's/-.*//' | tr '[a-z].' '[A-Z]_')
 
 # On Linux activate 64-bit off_t (by default under BSD)
 ifneq (,$(findstring linux,$(SYS)))
@@ -115,7 +115,7 @@ LIB += @LIB@ -L/usr/local/lib
 #
 # Libraries needed by built-in modules
 #
-LIB += $(shell for i in ${BUILTINS} ; do echo $$i | tr '[a-z]' '[A-Z]' | sed 's/.*/$$LIB_&/' ; done)
+LIB += $(shell for i in ${BUILTINS} ; do echo $$i | tr '[a-z]' '[A-Z]' | sed -e 's/.*/$$LIB_&/' ; done)
 
 #
 # C compiler flags: mainstream compilation

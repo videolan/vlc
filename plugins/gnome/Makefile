@@ -3,49 +3,35 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
-include ../../Makefile.modules
+-include ../../Makefile.modules
 
-###############################################################################
-# Objects and files
-###############################################################################
+#
+# Objects
+#
+
 PLUGIN_GNOME = gnome.o intf_gnome.o gnome_callbacks.o gnome_interface.o gnome_support.o
-BUILTIN_GNOME = $(PLUGIN_GNOME:%.o=%-BUILTIN.o)
+BUILTIN_GNOME = $(PLUGIN_GNOME:%.o=BUILTIN_%.o)
 
 ALL_OBJ = $(PLUGIN_GNOME) $(BUILTIN_GNOME)
-
-objects := $(PLUGIN_GNOME) $(BUILTIN_GNOME)
-cdependancies := $(objects:%.o=.dep/%.d)
-
-export
 
 #
 # Virtual targets
 #
-all:
 
-clean:
-	rm -f $(ALL_OBJ)
-	rm -f *.o *.moc *.bak *.builtin
-	rm -rf .dep
-
-FORCE:
-
-$(cdependancies): %.d: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
-
-$(ALL_OBJ): %.o: ../../Makefile.dep Makefile
+include ../../Makefile.common
 
 $(PLUGIN_GNOME): %.o: .dep/%.d
 $(PLUGIN_GNOME): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) `gnome-config --cflags gtk gnomeui` -c -o $@ $<
 
-$(BUILTIN_GNOME): %-BUILTIN.o: .dep/%.d
-$(BUILTIN_GNOME): %-BUILTIN.o: %.c
+$(BUILTIN_GNOME): BUILTIN_%.o: .dep/%.d
+$(BUILTIN_GNOME): BUILTIN_%.o: %.c
 	$(CC) $(CFLAGS) -DBUILTIN `gnome-config --cflags gtk gnomeui` -c -o $@ $<
 
 #
 # Real targets
 #
+
 ../../lib/gnome.so: $(PLUGIN_GNOME)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GNOME)
 

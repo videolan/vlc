@@ -1,0 +1,50 @@
+###############################################################################
+# vlc (VideoLAN Client) common module Makefile
+# (c)2001 VideoLAN
+###############################################################################
+# This file should be included by all module Makefiles
+###############################################################################
+
+C_DEP := $(ALL_OBJ:%.o=.dep/%.d)
+
+CPP_DEP := $(ALL_OBJ:%.o=.dep/%.dpp)
+
+export
+
+#
+# Virtual targets
+#
+all:
+
+clean:
+	rm -f $(ALL_OBJ)
+	rm -f *.o *.moc *.bak *.builtin
+	rm -rf .dep
+
+FORCE:
+
+$(ALL_OBJ): %.o: ../../Makefile.modules ../../Makefile.dep Makefile
+
+$(C_DEP): %.d: FORCE
+	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
+
+$(CPP_DEP): %.dpp: FORCE
+	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
+
+$(PLUGIN_C): %.o: .dep/%.d
+$(PLUGIN_C): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
+
+$(BUILTIN_C): BUILTIN_%.o: .dep/%.d
+$(BUILTIN_C): BUILTIN_%.o: %.c
+	$(CC) $(CFLAGS) -DBUILTIN -c -o $@ $<
+
+$(PLUGIN_CPP): %.o: .dep/%.dpp
+$(PLUGIN_CPP): %.o: %.cpp
+	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
+
+$(BUILTIN_CPP): BUILTIN_%.o: .dep/%.dpp
+$(BUILTIN_CPP): BUILTIN_%.o: %.cpp
+	$(CC) $(CFLAGS) -DBUILTIN -c -o $@ $<
+
+

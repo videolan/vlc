@@ -3,54 +3,32 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
-include ../../Makefile.modules
+-include ../../Makefile.modules
 
-###############################################################################
-# Objects and files
-###############################################################################
+#
+# Objects
+#
+
 PLUGIN_X11 = x11.o vout_x11.o
 PLUGIN_XVIDEO = xvideo.o vout_xvideo.o
-BUILTIN_X11 = $(PLUGIN_X11:%.o=%-BUILTIN.o)
-BUILTIN_XVIDEO = $(PLUGIN_XVIDEO:%.o=%-BUILTIN.o)
+BUILTIN_X11 = $(PLUGIN_X11:%.o=BUILTIN_%.o)
+BUILTIN_XVIDEO = $(PLUGIN_XVIDEO:%.o=BUILTIN_%.o)
 
-STD_PLUGIN_OBJ = $(PLUGIN_X11) $(PLUGIN_XVIDEO)
-STD_BUILTIN_OBJ = $(BUILTIN_X11) $(BUILTIN_XVIDEO)
+PLUGIN_C = $(PLUGIN_X11) $(PLUGIN_XVIDEO)
+BUILTIN_C = $(BUILTIN_X11) $(BUILTIN_XVIDEO)
 
-ALL_OBJ = $(STD_PLUGIN_OBJ) $(STD_BUILTIN_OBJ)
-
-objects := $(ALL_OBJ)
-cdependancies := $(objects:%.o=.dep/%.d)
-
-export
+ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
 
 #
 # Virtual targets
 #
-all:
 
-clean:
-	rm -f $(ALL_OBJ)
-	rm -f *.o *.moc *.bak *.builtin
-	rm -rf .dep
-
-FORCE:
-
-$(cdependancies): %.d: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
-
-$(ALL_OBJ): %.o: ../../Makefile.dep Makefile
-
-$(STD_PLUGIN_OBJ): %.o: .dep/%.d
-$(STD_PLUGIN_OBJ): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
-
-$(STD_BUILTIN_OBJ): %-BUILTIN.o: .dep/%.d
-$(STD_BUILTIN_OBJ): %-BUILTIN.o: %.c
-	$(CC) $(CFLAGS) -DBUILTIN -c -o $@ $<
+include ../../Makefile.common
 
 #
 # Real targets
 #
+
 ../../lib/x11.so: $(PLUGIN_X11)
 ifeq ($(SYS),nto-qnx)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_X11) -lsocket

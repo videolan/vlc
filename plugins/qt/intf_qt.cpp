@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.3 2001/04/15 10:54:46 sam Exp $
+ * $Id: intf_qt.cpp,v 1.4 2001/04/16 07:40:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -141,7 +141,7 @@ private:
 };
 
 #ifdef BUILTIN
-#   include "intf_qt-BUILTIN.moc"
+#   include "BUILTIN_intf_qt.moc"
 #else
 #   include "intf_qt.moc"
 #endif

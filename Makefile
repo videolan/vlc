@@ -2,7 +2,7 @@
 # vlc (VideoLAN Client) main Makefile - (c)1998 VideoLAN
 ###############################################################################
 
-include Makefile.opts
+-include Makefile.opts
 
 ###############################################################################
 # Objects and files
@@ -29,12 +29,6 @@ PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin dsp/dsp dummy/dummy \
 		motion/motion motion/motionmmx motion/motionmmxext \
 		mpeg/ps mpeg/ts null/null qt/qt sdl/sdl \
 		text/text x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
-
-#
-# Translate plugin names
-#
-PLUGINS_OBJ := $(shell for i in : $(PLUGINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed 's@.*/\('$$i'\) .*@lib/\1.so@ ; s@^ .*@@' ; done)
-BUILTINS_OBJ := $(shell for i in : $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed 's@.*/\('$$i'\) .*@lib/\1.a@ ; s@^ .*@@' ; done)
 
 #
 # C Objects
@@ -144,10 +138,14 @@ H_OBJ =		include/modules_builtin.h
 #
 # Other lists of files
 #
-objects := $(C_OBJ)
-cdependancies := $(objects:%.o=.dep/%.d)
-cppobjects := $(CPP_OBJ)
-cppdependancies := $(cppobjects:%.o=.dep/%.dpp)
+C_DEP := $(C_OBJ:%.o=.dep/%.d)
+CPP_DEP := $(CPP_OBJ:%.o=.dep/%.dpp)
+
+#
+# Translate plugin names
+#
+PLUGIN_OBJ := $(shell for i in : $(PLUGINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@lib/\1.so@' -e 's@^ .*@@' ; done)
+BUILTIN_OBJ := $(shell for i in : $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@lib/\1.a@' -e 's@^ .*@@' ; done)
 
 # All symbols must be exported
 export
@@ -160,15 +158,6 @@ export
 # Virtual targets
 #
 all: vlc ${ALIASES} plugins vlc.app
-
-Makefile.opts:
-	@echo
-	@echo "Sorry, you need to run ./configure before using this makefile."
-	@echo "To make clean or make distclean, use this:"
-	@echo
-	@echo "    touch Makefile.opts Makefile.modules && make distclean"
-	@echo
-	@exit 1
 
 clean:
 	for d in $(PLUGINS_DIR) ; do ( cd plugins/$${d} && $(MAKE) clean ) ; done
@@ -208,8 +197,8 @@ show:
 	@echo CPP_OBJ: $(CPP_OBJ)
 	@echo objects: $(objects)
 	@echo cppobjects: $(cppobjects)
-	@echo PLUGINS_OBJ: $(PLUGINS_OBJ)
-	@echo BUILTINS_OBJ: $(BUILTINS_OBJ)
+	@echo PLUGIN_OBJ: $(PLUGIN_OBJ)
+	@echo BUILTIN_OBJ: $(BUILTIN_OBJ)
 
 
 # ugliest of all, but I have no time to do it -- sam
@@ -221,10 +210,12 @@ snapshot:
 	done
 	find debian -mindepth 1 -maxdepth 1 -type d | \
 		while read i ; do rm -Rf /tmp/vlc-${PROGRAM_VERSION}/$$i ; done
-	# .c .h .in .cpp
-	find include src plugins -type f -name '*.[chi]*' | while read i ; \
-		do cp $$i /tmp/vlc-${PROGRAM_VERSION}/$$i ; \
-	done
+	# .c .h .in .cpp .glade
+	find include src plugins -type f -name '*.[chig]*' | while read i ; \
+		do cp $$i /tmp/vlc-${PROGRAM_VERSION}/$$i ; done
+	# Makefiles
+	find . plugins -type f -name Makefile | while read i ; \
+		do cp $$i /tmp/vlc-${PROGRAM_VERSION}/$$i ; done
 	# extra files
 	cp -a extras/* /tmp/vlc-${PROGRAM_VERSION}/extras
 	cp -a doc/* /tmp/vlc-${PROGRAM_VERSION}/doc
@@ -235,7 +226,7 @@ snapshot:
 		done
 	# copy misc files
 	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL README TODO todo.pl \
-		Makefile Makefile.opts.in Makefile.dep Makefile.modules \
+		Makefile.opts.in Makefile.dep Makefile.modules.in \
 		configure configure.in install-sh config.sub config.guess \
 			/tmp/vlc-${PROGRAM_VERSION}/
 	for file in control control-css vlc-gtk.menu vlc.copyright vlc.docs \
@@ -243,7 +234,7 @@ snapshot:
 		vlc.menu ; do \
 			cp debian/$$file /tmp/vlc-${PROGRAM_VERSION}/debian/ ; \
 		done
-	for file in default8x16.psf default8x9.psf vlc_beos.rsrc ; do \
+	for file in default8x16.psf default8x9.psf vlc_beos.rsrc vlc.icns ; do \
 		cp share/$$file /tmp/vlc-${PROGRAM_VERSION}/share/ ; done
 	for icon in vlc gvlc qvlc gnome-vlc kvlc ; do \
 		cp share/$$icon.xpm share/$$icon.png \
@@ -287,13 +278,13 @@ gnome-vlc gvlc kvlc qvlc: vlc
 #
 # Generic rules (see below)
 #
-$(cdependancies): %.d: FORCE
+$(C_DEP): %.d: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
-$(cppdependancies): %.dpp: FORCE
+$(CPP_DEP): %.dpp: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
-$(H_OBJ): Makefile.opts Makefile
+$(H_OBJ): Makefile.opts Makefile.dep Makefile
 	rm -f $@ && cp $@.in $@
 	for i in $(BUILTINS) ; do \
 	echo "int module_"$$i"_InitModule (module_t *);" >> $@ ; \
@@ -307,7 +298,7 @@ $(H_OBJ): Makefile.opts Makefile
 	done
 	echo "};" >> $@ ;
 
-$(C_OBJ): %.o: Makefile.dep
+$(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
 ifneq (,$(findstring darwin,$(SYS)))
@@ -317,7 +308,7 @@ else
 	$(CC) $(CFLAGS) -c -o $@ $<
 endif
 
-$(CPP_OBJ): %.o: Makefile.dep
+$(CPP_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(CPP_OBJ): %.o: .dep/%.dpp
 $(CPP_OBJ): %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -325,8 +316,8 @@ $(CPP_OBJ): %.o: %.cpp
 #
 # Main application target
 #
-vlc: $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTINS_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTINS_OBJ) $(LCFLAGS)
+vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ)
+	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(LCFLAGS)
 ifeq ($(SYS),beos)
 	rm -f ./lib/_APP_
 	ln -s ../vlc ./lib/_APP_
@@ -337,14 +328,14 @@ endif
 #
 # Plugins target
 #
-plugins: $(PLUGINS_OBJ)
-$(PLUGINS_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed 's@.* \([^/]*/\)'$(@:lib/%.so=%)' .*@plugins/\1@ ; s@^ .*@@') && $(MAKE) $(@:%=../../%)
+plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
+$(PLUGIN_OBJ): FORCE
+	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:lib/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
 
 #
 # Built-in modules target
 #
-builtins: $(BUILTINS_OBJ)
-$(BUILTINS_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed 's@.* \([^/]*/\)'$(@:lib/%.a=%)' .*@plugins/\1@ ; s@^ .*@@') && $(MAKE) $(@:%=../../%)
+builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
+$(BUILTIN_OBJ): FORCE
+	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:lib/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
 

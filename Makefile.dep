@@ -45,7 +45,7 @@ default:
 
 -include $(MAKECMDGOALS)
 
-$(cdependancies): .dep/%.d: %.c
+$(C_DEP): .dep/%.d: %.c
 	@test -d .dep/$(dir $*) || mkdir -p .dep/$(dir $*)
 	#@echo "generating dependancies for $*.c"
 	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) 2>/dev/null $< \
@@ -53,7 +53,7 @@ $(cdependancies): .dep/%.d: %.c
 	.dep\/$(subst /,\/,$*).d : /g'\'' > $@; \
 	[ -s $@ ] || rm -f $@'
 
-$(cppdependancies): .dep/%.dpp: %.cpp
+$(CPP_DEP): .dep/%.dpp: %.cpp
 	@test -d .dep/$(dir $*) || mkdir -p .dep/$(dir $*)
 	#@echo "generating dependancies for $*.c"
 	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) 2>/dev/null $< \

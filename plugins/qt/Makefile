@@ -3,37 +3,22 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
-include ../../Makefile.modules
+-include ../../Makefile.modules
 
-###############################################################################
-# Objects and files
-###############################################################################
+#
+# Objects
+#
+
 PLUGIN_QT = qt.o intf_qt.o
-BUILTIN_QT = $(PLUGIN_QT:%.o=%-BUILTIN.o)
+BUILTIN_QT = $(PLUGIN_QT:%.o=BUILTIN_%.o)
 
 ALL_OBJ = $(PLUGIN_QT) $(BUILTIN_QT)
-
-cppobjects := $(ALL_OBJ)
-cppdependancies := $(cppobjects:%.o=.dep/%.dpp)
-
-export
 
 #
 # Virtual targets
 #
-all:
 
-clean:
-	rm -f $(ALL_OBJ)
-	rm -f *.o *.moc *.bak *.builtin
-	rm -rf .dep
-
-FORCE:
-
-$(cppdependancies): %.dpp: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
-
-$(ALL_OBJ): %.o: ../../Makefile.dep Makefile
+include ../../Makefile.common
 
 $(PLUGIN_QT): %.o: .dep/%.dpp
 $(PLUGIN_QT): %.o: %.moc
@@ -41,15 +26,16 @@ $(PLUGIN_QT): %.o: %.moc
 $(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
 	moc -i $< -o $@
 
-$(BUILTIN_QT): %-BUILTIN.o: .dep/%.dpp
+$(BUILTIN_QT): BUILTIN_%.o: .dep/%.dpp
 $(BUILTIN_QT): %.o: %.moc
-	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:%-BUILTIN.moc=%.cpp)
-$(BUILTIN_QT:%.o=%.moc): %-BUILTIN.moc: %.cpp
+	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:BUILTIN_%.moc=%.cpp)
+$(BUILTIN_QT:%.o=%.moc): BUILTIN_%.moc: %.cpp
 	moc -i $< -o $@
 
 #
 # Real targets
 #
+
 ../../lib/qt.so: $(PLUGIN_QT)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_QT)
 

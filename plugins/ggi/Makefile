@@ -3,54 +3,30 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
-include ../../Makefile.modules
+-include ../../Makefile.modules
 
-###############################################################################
-# Objects and files
-###############################################################################
-PLUGIN_GGI = ggi.o vout_ggi.o
-BUILTIN_GGI = $(PLUGIN_GGI:%.o=%-BUILTIN.o)
+#
+# Objects
+#
 
-STD_PLUGIN_OBJ = $(PLUGIN_GGI)
-STD_BUILTIN_OBJ = $(BUILTIN_GGI)
-ALL_OBJ = $(STD_PLUGIN_OBJ) $(STD_BUILTIN_OBJ)
+PLUGIN_C = ggi.o vout_ggi.o
+BUILTIN_C = $(PLUGIN_C:%.o=BUILTIN_%.o)
 
-objects := $(STD_PLUGIN_OBJ) $(STD_BUILTIN_OBJ)
-cdependancies := $(objects:%.o=.dep/%.d)
-
-export
+ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
 
 #
 # Virtual targets
 #
-all:
 
-clean:
-	rm -f $(ALL_OBJ)
-	rm -f *.o *.moc *.bak *.builtin
-	rm -rf .dep
-
-FORCE:
-
-$(cdependancies): %.d: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
-
-$(ALL_OBJ): %.o: ../../Makefile.dep Makefile
-
-$(STD_PLUGIN_OBJ): %.o: .dep/%.d
-$(STD_PLUGIN_OBJ): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
-
-$(STD_BUILTIN_OBJ): %-BUILTIN.o: .dep/%.d
-$(STD_BUILTIN_OBJ): %-BUILTIN.o: %.c
-	$(CC) $(CFLAGS) -DBUILTIN -c -o $@ $<
+include ../../Makefile.common
 
 #
 # Real targets
 #
-../../lib/ggi.so: $(PLUGIN_GGI)
+
+../../lib/ggi.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GGI)
 
-../../lib/ggi.a: $(BUILTIN_GGI)
+../../lib/ggi.a: $(BUILTIN_C)
 	ar r $@ $^
 

@@ -1,8 +1,8 @@
 INSTALL file for vlc, the VideoLAN Client
 
 
-Building VideoLAN
-=================
+Configuring VideoLAN
+====================
 
 A typical way to configure vlc is:
 
@@ -10,21 +10,28 @@ A typical way to configure vlc is:
 
 See `./configure --help' for more information.
 
-Then, run `make' to build vlc.
-
 Here is a shortcut to copy-paste for a complete build:
 
-   make distclean 2>/dev/null ; ./configure --prefix=/usr --enable-gnome \
+   make distclean && ./configure --prefix=/usr --enable-gnome \
       --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
-      --enable-alsa --enable-mga --enable-gtk --enable-qt --enable-xvideo \
-   && make
+      --enable-alsa --enable-mga --enable-gtk --enable-qt --enable-xvideo
 
 If you intend to debug stuff, you may want to disable optimizations:
 
-   make distclean 2>/dev/null ; ./configure --prefix=/usr --enable-gnome \
+   make distclean && ./configure --prefix=/usr --enable-gnome \
       --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
       --enable-alsa --enable-mga --enable-gtk --enable-qt --enable-xvideo \
-      --disable-optimizatons && make
+      --disable-optimizatons
+
+
+Building VideoLAN
+=================
+
+Have a look at the generated Makefile.opts file, you may want to choose
+which modules will be compiled as plugins, and which ones will remain in
+the core application. The configure script tries to guess for you.
+
+Once configured, run `make' to build vlc.
 
 
 Installing and running VideoLAN

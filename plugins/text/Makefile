@@ -3,52 +3,30 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
-include ../../Makefile.modules
+-include ../../Makefile.modules
 
-###############################################################################
-# Objects and files
-###############################################################################
-PLUGIN_NCURSES = ncurses.o vout_ncurses.o
-BUILTIN_NCURSES = $(PLUGIN_NCURSES:%.o=%-BUILTIN.o)
+#
+# Objects
+#
 
-ALL_OBJ = $(PLUGIN_NCURSES) $(BUILTIN_NCURSES)
+PLUGIN_C = ncurses.o vout_ncurses.o
+BUILTIN_C = $(PLUGIN_C:%.o=BUILTIN_%.o)
 
-objects := $(ALL_OBJ)
-cdependancies := $(objects:%.o=.dep/%.d)
-
-export
+ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
 
 #
 # Virtual targets
 #
-all:
 
-clean:
-	rm -f $(ALL_OBJ)
-	rm -f *.o *.moc *.bak *.builtin
-	rm -rf .dep
-
-FORCE:
-
-$(cdependancies): %.d: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
-
-$(ALL_OBJ): %.o: ../../Makefile.dep Makefile
-
-$(PLUGIN_NCURSES): %.o: .dep/%.d
-$(PLUGIN_NCURSES): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
-
-$(BUILTIN_NCURSES): %-BUILTIN.o: .dep/%.d
-$(BUILTIN_NCURSES): %-BUILTIN.o: %.c
-	$(CC) $(CFLAGS) -DBUILTIN -c -o $@ $<
+include ../../Makefile.common
 
 #
 # Real targets
 #
-../../lib/ncurses.so: $(PLUGIN_NCURSES)
+
+../../lib/ncurses.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_NCURSES)
 
-../../lib/ncurses.a: $(BUILTIN_NCURSES)
+../../lib/ncurses.a: $(BUILTIN_C)
 	ar r $@ $^
 

@@ -3,67 +3,49 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
-include ../../Makefile.modules
+-include ../../Makefile.modules
 
-###############################################################################
-# Objects and files
-###############################################################################
+#
+# Objects
+#
+
 PLUGIN_MOTION = motion.o vdec_motion_inner.o
 PLUGIN_MOTIONMMX = motionmmx.o vdec_motion_inner_mmx.o
 PLUGIN_MOTIONMMXEXT = motionmmxext.o vdec_motion_inner_mmxext.o
 PLUGIN_MOTIONCOMMON = vdec_motion_common.o
 
-BUILTIN_MOTION = $(PLUGIN_MOTION:%.o=%-BUILTIN-MOTION.o) \
-		$(PLUGIN_MOTIONCOMMON:%.o=%-BUILTIN-MOTION.o)
-BUILTIN_MOTIONMMX = $(PLUGIN_MOTIONMMX:%.o=%-BUILTIN-MOTIONMMX.o) \
-		$(PLUGIN_MOTIONCOMMON:%.o=%-BUILTIN-MOTIONMMX.o)
-BUILTIN_MOTIONMMXEXT = $(PLUGIN_MOTIONMMXEXT:%.o=%-BUILTIN-MOTIONMMXEXT.o) \
-		$(PLUGIN_MOTIONCOMMON:%.o=%-BUILTIN-MOTIONMMXEXT.o)
+BUILTIN_MOTION = $(PLUGIN_MOTION:%.o=BUILTIN_MOTION_%.o) \
+		$(PLUGIN_MOTIONCOMMON:%.o=BUILTIN_MOTION_%.o)
+BUILTIN_MOTIONMMX = $(PLUGIN_MOTIONMMX:%.o=BUILTIN_MOTIONMMX_%.o) \
+		$(PLUGIN_MOTIONCOMMON:%.o=BUILTIN_MOTIONMMX_%.o)
+BUILTIN_MOTIONMMXEXT = $(PLUGIN_MOTIONMMXEXT:%.o=BUILTIN_MOTIONMMXEXT_%.o) \
+		$(PLUGIN_MOTIONCOMMON:%.o=BUILTIN_MOTIONMMXEXT_%.o)
 
-STD_PLUGIN_OBJ = $(PLUGIN_MOTION) $(PLUGIN_MOTIONMMX) $(PLUGIN_MOTIONMMXEXT) $(PLUGIN_MOTIONCOMMON)
-ALL_OBJ = $(STD_PLUGIN_OBJ) $(BUILTIN_MOTION) $(BUILTIN_MOTIONMMX) $(BUILTIN_MOTIONMMXEXT)
-
-objects := $(ALL_OBJ)
-cdependancies := $(objects:%.o=.dep/%.d)
-
-export
+PLUGIN_C = $(PLUGIN_MOTION) $(PLUGIN_MOTIONMMX) $(PLUGIN_MOTIONMMXEXT) $(PLUGIN_MOTIONCOMMON)
+ALL_OBJ = $(PLUGIN_C) $(BUILTIN_MOTION) $(BUILTIN_MOTIONMMX) $(BUILTIN_MOTIONMMXEXT)
 
 #
 # Virtual targets
 #
-all:
 
-clean:
-	rm -f $(ALL_OBJ)
-	rm -f *.o *.moc *.bak *.builtin
-	rm -rf .dep
+include ../../Makefile.common
 
-FORCE:
-
-$(cdependancies): %.d: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
-
-$(ALL_OBJ): %.o: ../../Makefile.dep Makefile
-
-$(STD_PLUGIN_OBJ): %.o: .dep/%.d
-$(STD_PLUGIN_OBJ): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
-
-$(BUILTIN_MOTION): %-BUILTIN-MOTION.o: .dep/%.d
-$(BUILTIN_MOTION): %-BUILTIN-MOTION.o: %.c
+$(BUILTIN_MOTION): BUILTIN_MOTION_%.o: .dep/%.d
+$(BUILTIN_MOTION): BUILTIN_MOTION_%.o: %.c
 	$(CC) $(CFLAGS) -DBUILTIN -DMODULE_NAME=motion -c -o $@ $<
 
-$(BUILTIN_MOTIONMMX): %-BUILTIN-MOTIONMMX.o: .dep/%.d
-$(BUILTIN_MOTIONMMX): %-BUILTIN-MOTIONMMX.o: %.c
+$(BUILTIN_MOTIONMMX): BUILTIN_MOTIONMMX_%.o: .dep/%.d
+$(BUILTIN_MOTIONMMX): BUILTIN_MOTIONMMX_%.o: %.c
 	$(CC) $(CFLAGS) -DBUILTIN -DMODULE_NAME=motionmmx -c -o $@ $<
 
-$(BUILTIN_MOTIONMMXEXT): %-BUILTIN-MOTIONMMXEXT.o: .dep/%.d
-$(BUILTIN_MOTIONMMXEXT): %-BUILTIN-MOTIONMMXEXT.o: %.c
+$(BUILTIN_MOTIONMMXEXT): BUILTIN_MOTIONMMXEXT_%.o: .dep/%.d
+$(BUILTIN_MOTIONMMXEXT): BUILTIN_MOTIONMMXEXT_%.o: %.c
 	$(CC) $(CFLAGS) -DBUILTIN -DMODULE_NAME=motionmmxext -c -o $@ $<
 
 #
 # Real targets
 #
+
 ../../lib/motion.so: $(PLUGIN_MOTION) $(PLUGIN_MOTIONCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
