@@ -71,6 +71,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_VAR( m_cPlaylist, Playlist, "playlist" )
     pVarManager->registerVar( getPlaylistVar().getPositionVarPtr(),
                               "playlist.slider" );
+    REGISTER_VAR( m_cVarRandom, VarBoolImpl, "playlist.isRandom" )
     REGISTER_VAR( m_cVarTime, Time, "time" )
     REGISTER_VAR( m_cVarVolume, Volume, "volume" )
     REGISTER_VAR( m_cVarStream, Stream, "stream" )
@@ -123,6 +124,7 @@ void VlcProc::manage()
     VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
     VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
     VarBoolImpl *pVarSeekable = (VarBoolImpl*)m_cVarSeekable.get();
+    VarBoolImpl *pVarRandom = (VarBoolImpl*)m_cVarRandom.get();
 
     // Refresh sound volume
     audio_volume_t volume;
@@ -177,6 +179,11 @@ void VlcProc::manage()
         pVarSeekable->set( false );
         pTime->set( 0, false );
     }
+
+    // Refresh the random variable
+    vlc_value_t val;
+    var_Get( getIntf()->p_sys->p_playlist, "random", &val );
+    pVarRandom->set( val.b_bool );
 }
 
 

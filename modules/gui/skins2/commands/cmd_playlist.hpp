@@ -2,7 +2,7 @@
  * cmd_playlist.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_playlist.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -57,6 +57,26 @@ DEFINE_COMMAND( PlaylistNext, "playlist next" )
 
 /// Command to jump to the previous item
 DEFINE_COMMAND( PlaylistPrevious, "playlist previous" )
+
+
+/// Command to set the random state
+class CmdPlaylistRandom: public CmdGeneric
+{
+    public:
+        CmdPlaylistRandom( intf_thread_t *pIntf, bool value ):
+            CmdGeneric( pIntf ), m_value( value ) {}
+        virtual ~CmdPlaylistRandom() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "playlist random"; }
+
+    private:
+        /// Random state
+        bool m_value;
+};
 
 
 #endif

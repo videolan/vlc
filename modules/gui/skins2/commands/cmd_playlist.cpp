@@ -2,7 +2,7 @@
  * cmd_playlist.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_playlist.cpp,v 1.2 2004/01/10 03:36:03 hartman Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #include "cmd_playlist.hpp"
+#include "../src/vlcproc.hpp"
+#include "../utils/var_bool.hpp"
 
 
 void CmdPlaylistDel::execute()
@@ -61,3 +63,16 @@ void CmdPlaylistPrevious::execute()
         playlist_Prev( pPlaylist );
     }
 }
+
+
+void CmdPlaylistRandom::execute()
+{
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    if( pPlaylist != NULL )
+    {
+        vlc_value_t val;
+        val.b_bool = m_value;
+        var_Set( pPlaylist , "random", val);
+    }
+}
+
