@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.42 2003/11/16 22:54:12 gbazin Exp $
+ * $Id: asf.c,v 1.43 2003/11/20 22:10:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -193,7 +193,6 @@ static int Open( vlc_object_t * p_this )
 
             if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) )
             {
-                fmt.i_extra_type = ES_EXTRA_TYPE_WAVEFORMATEX;
                 fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
                                      p_sp->i_type_specific_data_length - sizeof( WAVEFORMATEX ) );
                 fmt.p_extra = malloc( fmt.i_extra );
@@ -220,7 +219,6 @@ static int Open( vlc_object_t * p_this )
 
             if( p_sp->i_type_specific_data_length > 11 + sizeof( BITMAPINFOHEADER ) )
             {
-                fmt.i_extra_type = ES_EXTRA_TYPE_BITMAPINFOHEADER;
                 fmt.i_extra = __MIN( GetDWLE( p_data ),
                                      p_sp->i_type_specific_data_length - 11 - sizeof( BITMAPINFOHEADER ) );
                 fmt.p_extra = malloc( fmt.i_extra );

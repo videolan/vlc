@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.256 2003/11/16 22:54:11 gbazin Exp $
+ * $Id: input.c,v 1.257 2003/11/20 22:10:56 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -1079,10 +1079,6 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             p_wf->cbSize            = fmt->i_extra;
             if( fmt->i_extra > 0 )
             {
-                if( fmt->i_extra_type != ES_EXTRA_TYPE_WAVEFORMATEX )
-                {
-                    msg_Warn( p_input, "extra type != WAVEFORMATEX for audio");
-                }
                 memcpy( &p_wf[1], fmt->p_extra, fmt->i_extra );
             }
             id->p_es->p_waveformatex = p_wf;
@@ -1107,11 +1103,6 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 
             if( fmt->i_extra > 0 )
             {
-                if( fmt->i_extra_type != ES_EXTRA_TYPE_BITMAPINFOHEADER )
-                {
-                    msg_Warn( p_input,
-                              "extra type != BITMAPINFOHEADER for video" );
-                }
                 memcpy( &p_bih[1], fmt->p_extra, fmt->i_extra );
             }
             id->p_es->p_bitmapinfoheader = p_bih;
@@ -1123,11 +1114,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             memset( p_sub, 0, sizeof( subtitle_data_t ) );
             if( fmt->i_extra > 0 )
             {
-                if( fmt->i_extra_type == ES_EXTRA_TYPE_SUBHEADER )
-                {
-                    p_sub->psz_header = malloc( fmt->i_extra  );
-                    memcpy( p_sub->psz_header, fmt->p_extra , fmt->i_extra );
-                }
+                p_sub->psz_header = malloc( fmt->i_extra  );
+                memcpy( p_sub->psz_header, fmt->p_extra , fmt->i_extra );
             }
             /* FIXME beuuuuuurk */
             id->p_es->p_demux_data = p_sub;

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_video.h,v 1.6 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: vlc_video.h,v 1.7 2003/11/20 22:10:55 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -25,26 +25,7 @@
 #ifndef _VLC_VIDEO_H
 #define _VLC_VIDEO_H 1
 
-/**
- * Description of a video frame
- */
-struct video_format_t
-{
-    vlc_fourcc_t i_chroma;                               /**< picture chroma */
-    unsigned int i_aspect;                                 /**< aspect ratio */
-
-    unsigned int i_width;                                 /**< picture width */
-    unsigned int i_height;                               /**< picture height */
-    unsigned int i_x_offset;               /**< start offset of visible area */
-    unsigned int i_y_offset;               /**< start offset of visible area */
-    unsigned int i_visible_width;                 /**< width of visible area */
-    unsigned int i_visible_height;               /**< height of visible area */
-
-    unsigned int i_bits_per_pixel;             /**< number of bits per pixel */
-
-    unsigned int i_frame_rate;                     /**< frame rate numerator */
-    unsigned int i_frame_rate_base;              /**< frame rate denominator */
-};
+#include "vlc_es.h"
 
 /**
  * Description of a planar graphic field

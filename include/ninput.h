@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.16 2003/11/19 00:14:39 fenrir Exp $
+ * $Id: ninput.h,v 1.17 2003/11/20 22:10:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -24,69 +24,7 @@
 #ifndef _NINPUT_H
 #define _NINPUT_H 1
 
-#include "audio_output.h"
-#include "vlc_video.h"
-
-enum es_extra_type_e
-{
-    ES_EXTRA_TYPE_UNKNOWN,
-    ES_EXTRA_TYPE_WAVEFORMATEX,
-    ES_EXTRA_TYPE_BITMAPINFOHEADER,
-    ES_EXTRA_TYPE_SUBHEADER
-};
-
-typedef struct subs_format_t
-{
-    char *psz_encoding;
-
-} subs_format_t;
-
-typedef struct
-{
-    int             i_cat;
-    vlc_fourcc_t    i_codec;
-
-    int             i_group;    /* -1 : standalone
-                                   >= 0 then a "group" (program) is created
-                                        for each value */
-    int             i_priority; /*  -2 : mean not selectable by the users
-                                    -1 : mean not selected by default even
-                                        when no other stream
-                                    >=0: priority */
-    char            *psz_language;
-    char            *psz_description;
-
-    audio_format_t audio;
-    video_format_t video;
-    subs_format_t  subs;
-
-    int     i_bitrate;
-
-    int     i_extra_type;
-    int     i_extra;
-    void    *p_extra;
-
-} es_format_t;
-
-static inline void es_format_Init( es_format_t *fmt,
-                                   int i_cat, vlc_fourcc_t i_codec )
-{
-    fmt->i_cat                  = i_cat;
-    fmt->i_codec                = i_codec;
-    fmt->i_group                = 0;
-    fmt->i_priority             = 0;
-    fmt->psz_language           = NULL;
-    fmt->psz_description        = NULL;
-
-    memset( &fmt->audio, 0, sizeof(audio_format_t) );
-    memset( &fmt->video, 0, sizeof(video_format_t) );
-    memset( &fmt->subs, 0, sizeof(subs_format_t) );
-
-    fmt->i_bitrate              = 0;
-    fmt->i_extra_type           = ES_EXTRA_TYPE_UNKNOWN;
-    fmt->i_extra                = 0;
-    fmt->p_extra                = NULL;
-}
+#include "vlc_es.h"
 
 enum es_out_query_e
 {

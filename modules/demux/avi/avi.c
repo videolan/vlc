@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.70 2003/11/16 22:54:12 gbazin Exp $
+ * $Id: avi.c,v 1.71 2003/11/20 22:10:56 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -281,7 +281,6 @@ static int Open( vlc_object_t * p_this )
                 if( ( fmt.i_extra = __MIN( p_auds->p_wf->cbSize,
                                            p_auds->i_chunk_size - sizeof(WAVEFORMATEX) ) ) > 0 )
                 {
-                    fmt.i_extra_type = ES_EXTRA_TYPE_WAVEFORMATEX;
                     fmt.p_extra = malloc( fmt.i_extra );
                     memcpy( fmt.p_extra, &p_auds->p_wf[1], fmt.i_extra );
                 }
@@ -302,7 +301,6 @@ static int Open( vlc_object_t * p_this )
                 if( ( fmt.i_extra = __MIN( p_vids->p_bih->biSize - sizeof( BITMAPINFOHEADER ),
                                            p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER) ) ) > 0 )
                 {
-                    fmt.i_extra_type = ES_EXTRA_TYPE_BITMAPINFOHEADER;
                     fmt.p_extra = malloc( fmt.i_extra );
                     memcpy( fmt.p_extra, &p_vids->p_bih[1], fmt.i_extra );
                 }

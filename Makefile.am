@@ -89,14 +89,15 @@ HEADERS_include = \
 	include/stream_output.h \
 	include/variables.h \
 	include/video_output.h \
-	include/vlc_block.h \
 	include/vlc_bits.h \
+	include/vlc_block.h \
 	include/vlc_block_helper.h \
 	include/vlc_codec.h \
 	include/vlc_common.h \
 	include/vlc_config.h \
 	include/vlc_cpu.h \
 	include/vlc_error.h \
+	include/vlc_es.h \
 	include/vlc_help.h \
 	include/vlc_interface.h \
 	include/vlc_keys.h \

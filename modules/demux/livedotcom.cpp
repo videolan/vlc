@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.7 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: livedotcom.cpp,v 1.8 2003/11/20 22:10:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -494,7 +494,6 @@ static int  DemuxOpen ( vlc_object_t *p_this )
 
                 if( ( p_extra = parseStreamMuxConfigStr( sub->fmtp_config(), i_extra ) ) )
                 {
-                    tk->fmt.i_extra_type = ES_EXTRA_TYPE_WAVEFORMATEX;
                     tk->fmt.i_extra = i_extra;
                     tk->fmt.p_extra = malloc( sizeof( i_extra ) );
                     memcpy( tk->fmt.p_extra, p_extra, i_extra );
@@ -510,7 +509,6 @@ static int  DemuxOpen ( vlc_object_t *p_this )
 
                 if( ( p_extra = parseGeneralConfigStr( sub->fmtp_config(), i_extra ) ) )
                 {
-                    tk->fmt.i_extra_type = ES_EXTRA_TYPE_WAVEFORMATEX;
                     tk->fmt.i_extra = i_extra;
                     tk->fmt.p_extra = malloc( i_extra );
                     memcpy( tk->fmt.p_extra, p_extra, i_extra );
@@ -547,7 +545,6 @@ static int  DemuxOpen ( vlc_object_t *p_this )
 
                 if( ( p_extra = parseGeneralConfigStr( sub->fmtp_config(), i_extra ) ) )
                 {
-                    tk->fmt.i_extra_type = ES_EXTRA_TYPE_BITMAPINFOHEADER;
                     tk->fmt.i_extra = i_extra;
                     tk->fmt.p_extra = malloc( i_extra );
                     memcpy( tk->fmt.p_extra, p_extra, i_extra );
@@ -838,7 +835,6 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
         tk->fmt.video.i_height = (sdAtom[30] << 8) | sdAtom[31];
 
         tk->fmt.i_extra        = qtState.sdAtomSize - 16;
-        tk->fmt.i_extra_type   = ES_EXTRA_TYPE_BITMAPINFOHEADER;
         tk->fmt.p_extra        = malloc( tk->fmt.i_extra );
         memcpy( tk->fmt.p_extra, &sdAtom[12], tk->fmt.i_extra );
 

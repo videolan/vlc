@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.85 2003/11/16 22:54:11 gbazin Exp $
+ * $Id: audio_output.h,v 1.86 2003/11/20 22:10:55 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -23,42 +23,7 @@
 #ifndef _VLC_AUDIO_OUTPUT_H
 #define _VLC_AUDIO_OUTPUT_H 1
 
-/*****************************************************************************
- * audio_sample_format_t
- *****************************************************************************
- * This structure defines a format for audio samples.
- *****************************************************************************/
-struct audio_format_t
-{
-    vlc_fourcc_t        i_format;
-
-    unsigned int        i_rate;
-
-    /* Describes the channels configuration of the samples (ie. number of
-     * channels which are available in the buffer, and positions). */
-    uint32_t            i_physical_channels;
-
-    /* Describes from which original channels, before downmixing, the
-     * buffer is derived. */
-    uint32_t            i_original_channels;
-
-    /* Optional - for A/52, SPDIF and DTS types : */
-    /* Bytes used by one compressed frame, depends on bitrate. */
-    unsigned int        i_bytes_per_frame;
-
-    /* Number of sampleframes contained in one compressed frame. */
-    unsigned int        i_frame_length;
-    /* Please note that it may be completely arbitrary - buffers are not
-     * obliged to contain a integral number of so-called "frames". It's
-     * just here for the division :
-     * buffer_size = i_nb_samples * i_bytes_per_frame / i_frame_length
-     */
-
-    /* FIXME ? (used by the codecs) */
-    int i_channels;
-    int i_blockalign;
-    int i_bitspersample;
-};
+#include "vlc_es.h"
 
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \
     ((p_first)->i_format == (p_second)->i_format)                           \

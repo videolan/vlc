@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.41 2003/11/16 22:54:12 gbazin Exp $
+ * $Id: mkv.cpp,v 1.42 2003/11/20 22:10:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1029,7 +1029,6 @@ static int Open( vlc_object_t * p_this )
                 tk.fmt.video.i_height= GetDWLE( &p_bih->biHeight );
                 tk.fmt.i_codec       = GetFOURCC( &p_bih->biCompression );
 
-                tk.fmt.i_extra_type  = ES_EXTRA_TYPE_BITMAPINFOHEADER;
                 tk.fmt.i_extra       = GetDWLE( &p_bih->biSize ) - sizeof( BITMAPINFOHEADER );
                 if( tk.fmt.i_extra > 0 )
                 {

@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.36 2003/11/13 13:31:12 fenrir Exp $
+ * $Id: sub.c,v 1.37 2003/11/20 22:10:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -485,7 +485,6 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     }
     if( p_sub->psz_header != NULL )
     {
-        fmt.i_extra_type = ES_EXTRA_TYPE_SUBHEADER;
         fmt.i_extra = strlen( p_sub->psz_header ) + 1;
         fmt.p_extra = strdup( p_sub->psz_header );
     }
