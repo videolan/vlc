@@ -1399,6 +1399,11 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 	  <handler>on_intf_playlist_drag_data_received</handler>
 	  <last_modification_time>Thu, 08 Mar 2001 12:00:13 GMT</last_modification_time>
 	</signal>
+	<signal>
+	  <name>drag_motion</name>
+	  <handler>on_playlist_clist_drag_motion</handler>
+	  <last_modification_time>Fri, 09 Mar 2001 18:32:47 GMT</last_modification_time>
+	</signal>
 	<columns>2</columns>
 	<column_widths>257,80</column_widths>
 	<selection_mode>GTK_SELECTION_EXTENDED</selection_mode>

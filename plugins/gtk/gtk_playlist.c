@@ -52,10 +52,10 @@
 #include "intf_msg.h"
 #include "intf_urldecode.h"
 
-#include "gtk_sys.h"
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
 #include "gtk_support.h"
+#include "gtk_sys.h"
 
 #include "main.h"
 
@@ -68,15 +68,6 @@ int intf_AppendList( playlist_t * p_playlist, int i_pos, GList * list );
 void GtkPlayListManage( gpointer p_data );
 void on_generic_drop_data_received( intf_thread_t * p_intf,
                 GtkSelectionData *data, guint info, int position);
-
-
-static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
-{
-    return( gtk_object_get_data( GTK_OBJECT( lookup_widget(item, psz_parent) ),
-                                 "p_intf" ) );
-}
-
-
 
 void
 on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
@@ -314,7 +305,7 @@ on_intf_playlist_drag_data_received    (GtkWidget       *widget,
                 &row, 
                 &col )== 1)
     {
-        on_generic_drop_data_received( p_intf, data, info, row -1 /*TRICK ! */);
+        on_generic_drop_data_received( p_intf, data, info, row );
     } else {
         on_generic_drop_data_received( p_intf, data, info, PLAYLIST_END);
     }

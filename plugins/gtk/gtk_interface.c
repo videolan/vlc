@@ -1316,6 +1316,9 @@ create_intf_playlist (void)
   gtk_signal_connect (GTK_OBJECT (playlist_clist), "drag_data_received",
                       GTK_SIGNAL_FUNC (on_intf_playlist_drag_data_received),
                       NULL);
+  gtk_signal_connect (GTK_OBJECT (playlist_clist), "drag_motion",
+                      GTK_SIGNAL_FUNC (on_playlist_clist_drag_motion),
+                      NULL);
 
   return intf_playlist;
 }

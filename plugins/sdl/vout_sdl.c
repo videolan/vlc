@@ -217,8 +217,10 @@ static int vout_Init( vout_thread_t *p_vout )
     /* This hack is hugly, but hey, you are, too. */
 
     SDL_Overlay *   p_overlay;
-
-    p_overlay = SDL_CreateYUVOverlay( VOUT_WIDTH_DEFAULT, VOUT_HEIGHT_DEFAULT,
+    
+    p_overlay = SDL_CreateYUVOverlay( 
+           main_GetIntVariable( VOUT_WIDTH_VAR,VOUT_WIDTH_DEFAULT ),
+           main_GetIntVariable( VOUT_HEIGHT_VAR,VOUT_HEIGHT_DEFAULT ),
                                       SDL_YV12_OVERLAY, 
                                       p_vout->p_sys->p_display );
     intf_Msg( "vout: YUV acceleration %s",
@@ -470,7 +472,6 @@ static void vout_Display( vout_thread_t *p_vout )
         }
         else
         {
-        
             /*
              * p_vout->p_rendered_pic->p_y/u/v contains the YUV buffers to
              * render 

@@ -276,3 +276,11 @@ on_crop_activate                       (GtkMenuItem     *menuitem,
 void
 on_invertselection_clicked             (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
+
+gboolean
+on_playlist_clist_drag_motion          (GtkWidget       *widget,
+                                        GdkDragContext  *drag_context,
+                                        gint             x,
+                                        gint             y,
+                                        guint            time,
+                                        gpointer         user_data);

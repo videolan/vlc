@@ -2,7 +2,7 @@
  * gtk_sys.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_sys.h,v 1.4 2001/03/08 13:32:55 octplane Exp $
+ * $Id: gtk_sys.h,v 1.5 2001/03/09 19:38:47 octplane Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,6 +26,18 @@
  *****************************************************************************/
 #define DROP_ACCEPT_TEXT_URI_LIST  0
 #define DROP_ACCEPT_TEXT_PLAIN     1
+
+/*****************************************************************************
+ * useful inline function
+ ****************************************************************************/
+static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
+{
+    return( gtk_object_get_data( GTK_OBJECT( lookup_widget(item, psz_parent) ),
+                                                     "p_intf" ) );
+}
+
+
+
 
 /*****************************************************************************
  * intf_sys_t: description and status of Gtk+ interface

@@ -47,10 +47,10 @@
 #include "intf_plst.h"
 #include "intf_msg.h"
 
-#include "gtk_sys.h"
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
 #include "gtk_support.h"
+#include "gtk_sys.h"
 
 #include "main.h"
 
@@ -61,15 +61,6 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
                         GtkSelectionData *data, guint info, int position);
 
 
-
-/*****************************************************************************
- * Inline function to retrieve the interface structure
- *****************************************************************************/
-static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
-{
-    return( gtk_object_get_data( GTK_OBJECT( lookup_widget(item, psz_parent) ),
-                                 "p_intf" ) );
-}
 
 /*****************************************************************************
  * Callbacks
@@ -757,5 +748,59 @@ on_main_window_toggle                  (GtkMenuItem     *menuitem,
     } else {
         gtk_widget_show( p_intf->p_sys->p_window );
     }
+}
+
+
+gboolean
+on_playlist_clist_drag_motion          (GtkWidget       *widget,
+                                        GdkDragContext  *drag_context,
+                                        gint             x,
+                                        gint             y,
+                                        guint            time,
+                                        gpointer         user_data)
+{
+    GtkCList * clist;
+    gint row,col;
+    int dummy;
+    gchar * text[2];
+    GdkColor color;
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget),  "intf_playlist" );
+   
+    
+    clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist"
+             ));
+
+    if(!GTK_WIDGET_TOPLEVEL(widget))
+    {
+        gdk_window_raise( p_intf->p_sys->p_playlist->window );
+    }
+
+    color.red = 0xffff;
+    color.green = 0xffff;
+    color.blue = 0xffff;
+
+    gtk_clist_freeze( clist );
+    
+    for(dummy=0; dummy<clist->rows; dummy++)
+    {
+       gtk_clist_set_background ( clist, dummy , &color);
+    }
+    color.red = 0xffff;
+    color.green = 0;
+    color.blue = 0;
+    gtk_clist_set_background ( clist, p_main->p_playlist->i_index , &color);
+        
+    if( gtk_clist_get_selection_info( clist,x,y ,&row,&col )== 1)
+    {
+        color.red = 0;
+        color.green = 0x9000;
+        color.blue = 0xf000;
+        gtk_clist_set_background ( clist, row-1  , &color);
+        gtk_clist_set_background ( clist, row  , &color);
+    }
+
+    gtk_clist_thaw( clist );
+    
+    return TRUE;
 }
 
