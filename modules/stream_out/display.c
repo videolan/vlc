@@ -2,7 +2,7 @@
  * display.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.5 2003/06/09 07:16:42 gbazin Exp $
+ * $Id: display.c,v 1.6 2003/11/18 16:46:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -142,7 +142,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
     id->p_es = input_AddES( p_sys->p_input,
                             NULL,           /* no program */
                             12,             /* es_id */
-       /* p_fmt->i_cat; */  UNKNOWN_ES,     /* es category */
+                            p_fmt->i_cat, /* UNKNOWN_ES,*/    /* es category */
                             NULL,           /* description */
                             0 );            /* no extra data */
 
