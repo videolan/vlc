@@ -447,6 +447,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
     }
     if( p_sys->i_box_type == BOX_BROWSE )
     {
+        vlc_bool_t b_ret = VLC_TRUE;
         /* Browser navigation */
         switch( i_key )
         {
@@ -498,9 +499,11 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 }
                 break;
             default:
-                return 1;
+                b_ret = VLC_FALSE;
                 break;
-
+        }
+        if( b_ret )
+        {
             if( p_sys->i_box_bidx >= p_sys->i_dir_entries ) p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
             if( p_sys->i_box_bidx < 0 ) p_sys->i_box_bidx = 0;
             return 1;
