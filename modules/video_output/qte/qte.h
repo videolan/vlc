@@ -2,7 +2,7 @@
  * qte.h : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.h,v 1.3 2002/09/23 21:44:23 jpsaman Exp $
+ * $Id: qte.h,v 1.4 2003/01/19 22:16:13 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -55,6 +55,10 @@ struct vout_sys_t
 
     QApplication*       pcQApplication;
     QWidget*            pcVoutWidget;
+
+#ifdef NEED_QTE_MAIN
+    module_t *          p_qte_main;
+#endif
 
     event_thread_t *    p_event;
 };

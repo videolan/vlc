@@ -436,6 +436,9 @@ dnl Build the gtk_main plugins?
 NEED_GTK_MAIN=no
 NEED_GNOME_MAIN=no
 
+dnl build the qte plugin ?
+NEED_QTE_MAIN=no
+
 dnl Check for DPMS
 if test "x${SYS}" != "xmingw32"
 then
@@ -1922,6 +1925,7 @@ then
     CPPFLAGS_qte="${CPPFLAGS_qte} -I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
   fi
   PLUGINS="${PLUGINS} qte"
+  NEED_QTE_MAIN=yes
   CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_qte}"
   AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
     AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
@@ -2413,6 +2417,7 @@ AC_ARG_ENABLE(opie,
      CPPFLAGS="${CPPFLAGS_save}"
 
      PLUGINS="${PLUGINS} opie"
+     NEED_QTE_MAIN=yes
      LDFLAGS_opie="${LDFLAGS_opie} -lqpe ${LDFLAGS_qte}"
      CPPFLAGS_opie="${CPPFLAGS_opie} ${CPPFLAGS_qte}"
      if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
@@ -2708,6 +2713,19 @@ then
     CFLAGS_gnome_main="${CFLAGS_gnome_main} ${CFLAGS_gtk} ${CFLAGS_familiar} ${CFLAGS_gnome}"
     LDFLAGS_gnome_main="${LDFLAGS_gnome_main} ${LDFLAGS_gtk} ${LDFLAGS_familiar} ${LDFLAGS_gnome}"
 fi
+
+dnl
+dnl  qte_main plugin
+dnl
+if test "x${NEED_QTE_MAIN}" != "xno"
+then
+    PLUGINS="${PLUGINS} qte_main"
+    CPPFLAGS_qte="${CPPFLAGS_qte} -DNEED_QTE_MAIN"
+	CPPFLAGS_opie="${CPPFLAGS_opie} -DNEED_QTE_MAIN"
+    CPPFLAGS_qte_main="${CFLAGS_qte_main} ${CPPFLAGS_qte}"
+    LDFLAGS_qte_main="${LDFLAGS_qte_main} ${LDFLAGS_qte}"
+fi
+
 
 dnl
 dnl  Plugin and builtin checks

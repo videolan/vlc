@@ -54,7 +54,7 @@ config:
 		--host=arm-linux \
 		--target=arm-linux \
 		$(shell echo $(CONFIG_FLAGS)) \
-		LDFLAGS=/usr/local/arm/2.95.3/arm-linux/lib
+		LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib"
 
 build:
 # This is ugly -- I know

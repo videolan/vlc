@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.8 2002/12/24 19:25:54 jpsaman Exp $
+ * $Id: qte.cpp,v 1.9 2003/01/19 22:16:13 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -64,9 +64,9 @@ extern "C"
 #include <qpainter.h>
 
 #ifdef Q_WS_QWS
-# define USE_DIRECT_PAINTER
-# include <qdirectpainter_qws.h>
-# include <qgfxraster_qws.h>
+#   define USE_DIRECT_PAINTER
+#   include <qdirectpainter_qws.h>
+#   include <qgfxraster_qws.h>
 #endif
 
 extern "C"
@@ -129,6 +129,7 @@ vlc_module_begin();
 //    add_integer( "qte-drawable", -1, NULL, NULL, NULL); //DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
     set_description( _("QT Embedded module") );
     set_capability( "video output", 30 );
+//    add_shortcut( "qte" );
     set_callbacks( Open, Close);
 vlc_module_end();
 
@@ -164,6 +165,15 @@ static int Open( vlc_object_t *p_this )
     p_vout->pf_render  = NULL; //Render;
     p_vout->pf_display = Display;
 
+#ifdef NEED_QTE_MAIN
+    p_vout->p_sys->p_qte_main = module_Need( p_this, "qte_main", "qte" );
+    if( p_vout->p_sys->p_qte_main == NULL )
+    {
+        free( p_vout->p_sys );
+        return VLC_ENOMOD;
+    }
+#endif
+
     CreateQtWindow(p_vout);
     return( 0 );
 }
@@ -189,6 +199,10 @@ static void Close ( vlc_object_t *p_this )
         vlc_thread_join( p_vout->p_sys->p_event );
         vlc_object_destroy( p_vout->p_sys->p_event );
     }
+
+#ifdef NEED_QTE_MAIN
+    module_Unneed( p_vout, p_vout->p_sys->p_qte_main );
+#endif
 
     if( p_vout->p_sys )
     {
@@ -528,14 +542,14 @@ static void DestroyQtWindow( vout_thread_t *p_vout )
     // quit qt application loop
     if(p_vout->p_sys->pcQApplication)
     {
+#ifndef NEED_QTE_MAIN
         if(p_vout->p_sys->bOwnsQApp)
         {
             p_vout->p_sys->pcQApplication->quit();
         }
         else
-        {
+#endif
             p_vout->p_sys->bRunning = FALSE;
-        }
 
         while(p_vout->p_sys->pcVoutWidget)
         {
@@ -566,6 +580,7 @@ static void RunQtThread(event_thread_t *p_event)
     else
     {
         p_event->p_vout->p_sys->pcQApplication = qApp;
+        p_event->p_vout->p_sys->bOwnsQApp = FALSE;
         msg_Dbg( p_event->p_vout, "RunQtThread applicaton attached" );
     }
 
@@ -584,6 +599,7 @@ static void RunQtThread(event_thread_t *p_event)
         if(p_event->p_vout->p_sys->bOwnsQApp)
         {
             // run the main loop of qtapplication until someone says: 'quit'
+            msg_Dbg( p_event->p_vout, "+qte::RunQtThread starting application" );
             p_event->p_vout->p_sys->pcQApplication->exec();
         }
         else
@@ -603,6 +619,7 @@ static void RunQtThread(event_thread_t *p_event)
 
     if(p_event->p_vout->p_sys->bOwnsQApp)
     {
+        msg_Dbg( p_event->p_vout, "+qte::RunQtThread deleting application" );
         delete p_event->p_vout->p_sys->pcQApplication;
         p_event->p_vout->p_sys->pcQApplication = NULL;
     }

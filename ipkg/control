@@ -2,7 +2,7 @@ Package: vlc
 Section: graphics
 Priority: optional
 Version: 0.5.0
-Release: 1
+Release: test3
 Architecture: arm
 Conflicts: task-opie, gpe-vlc, gpe
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>

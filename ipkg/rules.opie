@@ -19,7 +19,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--enable-qte \
 	--disable-x11 \
 	--enable-fb \
-	--disable-sdl \
+	--enable-sdl \
 	--disable-alsa \
 	--disable-xvideo \
 	--disable-dvd \

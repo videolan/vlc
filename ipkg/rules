@@ -10,8 +10,6 @@ export AR=arm-linux-ar
 export RANLIB=arm-linux-ranlib
 export STRIP=arm-linux-strip
 
-#export CONFIG_FLAGS="--enable-release --prefix=/usr --disable-gtk --enable-fb --enable-sdl --disable-xvideo --disable-plugins --with-tuning=strongarm1100 --x-includes=/skiff/local/arm-linux/include --x-libraries=/skiff/local/arm-linux/lib/X11 --with-sdl-config-path=/skiff/local/bin --with-mad=/skiff/local/arm-linux"
-
 export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-plugins \
 	--disable-gtk \
@@ -23,6 +21,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--enable-sdl \
 	--enable-oss \
 	--disable-alsa \
+	--enable-x11 \
 	--disable-xvideo \
 	--disable-dvd \
 	--disable-dvdread \
