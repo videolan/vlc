@@ -1601,16 +1601,6 @@ then
   CPPFLAGS_encoder_ffmpeg="${CPPFLAGS_ffmpeg}"
   dnl XXX: we don't link with -lavcodec blah blah blah
   #LDFLAGS_encoder_ffmpeg="${LDFLAGS_ffmpeg}"
-
-  dnl Add postprocessing modules
-  PLUGINS="${PLUGINS} postprocessing_c"
-  if test "x${ac_cv_mmx_inline}" != "xno"; then
-    PLUGINS="${PLUGINS} postprocessing_mmx"
-  fi
-
-  if test "x${ac_cv_mmxext_inline}" != "xno"; then
-    PLUGINS="${PLUGINS} postprocessing_mmxext"
-  fi
 fi
 
 dnl

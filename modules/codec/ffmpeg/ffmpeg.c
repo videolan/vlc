@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.43 2003/06/15 22:32:06 hartman Exp $
+ * $Id: ffmpeg.c,v 1.44 2003/06/16 20:23:41 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -58,8 +58,6 @@
 #   else
 #       include <libpostproc/postprocess.h>
 #   endif
-#else
-#   include "postprocessing/postprocessing.h"
 #endif
 
 #include "video.h" // video ffmpeg specific
@@ -155,32 +153,6 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 "                       1. <= 2. <= 3.          larger -> stronger filtering\n" \
 "fq     forceQuant      <quantizer>             Force quantizer\n"
 
-#define FFMPEG_PP_TEXT N_( "Ffmpeg postprocessing module" )
-
-#define PP_AQ_TEXT N_("Auto-level Post processing quality")
-#define PP_AQ_LONGTEXT N_( \
-    "Post processing quality is selected upon time left " \
-    "but no more than requested quality\n" \
-    "Not yet implemented !")
-
-#define FFMPEG_YV_TEXT N_("Force vertical luminance deblocking")
-#define FFMPEG_YV_LONGTEXT N_("Force vertical luminance deblocking (override other settings)")
-
-#define FFMPEG_YH_TEXT N_("Force horizontal luminance deblocking")
-#define FFMPEG_YH_LONGTEXT N_("Force horizontal luminance deblocking (override other settings)")
-
-#define FFMPEG_CV_TEXT N_("Force vertical chrominance deblocking")
-#define FFMPEG_CV_LONGTEXT N_("Force vertical chrominance deblocking (override other settings)")
-
-#define FFMPEG_CH_TEXT N_("Force horizontal chrominance deblocking")
-#define FFMPEG_CH_LONGTEXT N_("Force horizontal chrominance deblocking (override other settings)")
-
-#define FFMPEG_Y_DR_TEXT N_("Force luminance deringing")
-#define FFMPEG_Y_DR_LONGTEXT N_("Force luminance deringing (override other settings)")
-
-#define FFMPEG_C_DR_TEXT N_("Force chrominance deringing")
-#define FFMPEG_C_DR_LONGTEXT N_("Force chrominance deringing (override other settings)")
-
 vlc_module_begin();
     add_category_hint( N_("ffmpeg"), NULL, VLC_FALSE );
     set_capability( "decoder", 70 );
@@ -198,15 +170,6 @@ vlc_module_begin();
     add_integer( "ffmpeg-pp-q", 0, NULL, PP_Q_TEXT, PP_Q_LONGTEXT, VLC_FALSE );
 #ifdef LIBAVCODEC_PP
     add_string( "ffmpeg-pp-name", "default", NULL, LIBAVCODEC_PP_TEXT, LIBAVCODEC_PP_LONGTEXT, VLC_TRUE );
-#else
-    add_module( "ffmpeg-pp", "postprocessing",NULL, NULL, FFMPEG_PP_TEXT, NULL, VLC_FALSE );
-    add_bool( "ffmpeg-pp-auto", 0, NULL, PP_AQ_TEXT, PP_AQ_LONGTEXT, VLC_FALSE );
-    add_bool( "ffmpeg-db-yv", 0, NULL, FFMPEG_YV_TEXT, FFMPEG_YV_LONGTEXT, VLC_TRUE );
-    add_bool( "ffmpeg-db-yh", 0, NULL, FFMPEG_YH_TEXT, FFMPEG_YH_LONGTEXT, VLC_TRUE );
-    add_bool( "ffmpeg-db-cv", 0, NULL, FFMPEG_CV_TEXT, FFMPEG_CV_LONGTEXT, VLC_TRUE );
-    add_bool( "ffmpeg-db-ch", 0, NULL, FFMPEG_CH_TEXT, FFMPEG_CH_LONGTEXT, VLC_TRUE );
-    add_bool( "ffmpeg-dr-y", 0, NULL, FFMPEG_Y_DR_TEXT, FFMPEG_Y_DR_LONGTEXT, VLC_TRUE );
-    add_bool( "ffmpeg-dr-c", 0, NULL, FFMPEG_C_DR_TEXT, FFMPEG_C_DR_LONGTEXT, VLC_TRUE );
 #endif
 
     /* chroma conversion submodule */
