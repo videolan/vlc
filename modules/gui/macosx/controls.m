@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.51 2003/11/02 06:33:49 hartman Exp $
+ * $Id: controls.m,v 1.52 2003/11/06 18:55:22 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -412,6 +412,7 @@
                     if( ![o_window isZoomed] )
                         [o_window performZoom:self];
                 }
+                break;
             }
         }
         vlc_object_release( (vlc_object_t *)p_vout );
