@@ -297,7 +297,7 @@ AC_CHECK_FUNCS(send,,[
 )])
 
 AC_CHECK_FUNCS(gethostbyname,,[
-  AC_CHECK_LIB(nsl,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lnsl" LDFLAGS_httpd="${LDFLAGS_httpd} -lnsl",[
+  AC_CHECK_LIB(nsl,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lnsl" LDFLAGS_httpd="${LDFLAGS_httpd} -lnsl" LDFLAGS_vlc="${LDFLAGS_vlc} -lnsl",[
     AC_CHECK_LIB(bind,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind" LDFLAGS_httpd="${LDFLAGS_httpd} -lbind")])
 ])
 
