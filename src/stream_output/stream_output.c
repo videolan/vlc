@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.6 2002/12/14 21:32:42 fenrir Exp $
+ * $Id: stream_output.c,v 1.7 2003/01/08 10:38:32 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -273,7 +273,8 @@ sout_input_t *__sout_InputNew( vlc_object_t *p_this,
     p_sout->pp_inputs[p_sout->i_nb_inputs] = p_input;
     p_sout->i_nb_inputs++;
 
-    if( p_sout->pf_mux_addstream( p_sout, p_input ) < 0 )
+    if( p_input->input_format.i_fourcc != VLC_FOURCC( 'n', 'u', 'l', 'l' ) &&
+        p_sout->pf_mux_addstream( p_sout, p_input ) < 0 )
     {
         /* vlc_mutex_unlock( &p_sout->lock ); */
         msg_Err( p_sout, "cannot add this stream" );
@@ -310,7 +311,8 @@ int sout_InputDelete( sout_input_t *p_input )
 
     msg_Dbg( p_sout, "removing an input" );
 
-    if( p_sout->pf_mux_delstream( p_sout, p_input ) < 0 )
+    if( p_input->input_format.i_fourcc != VLC_FOURCC( 'n', 'u', 'l', 'l' ) &&
+        p_sout->pf_mux_delstream( p_sout, p_input ) < 0 )
     {
         msg_Err( p_sout, "cannot del this stream" );
         /* FIXME FIXME */
@@ -328,8 +330,6 @@ int sout_InputDelete( sout_input_t *p_input )
         free( p_sout->pp_inputs );
     }
     p_sout->i_nb_inputs--;
-
-    /* FIXME --> send message to mux to declare this stream removing */
 
     sout_FifoDestroy( p_sout, p_input->p_fifo );
     vlc_mutex_destroy( &p_input->lock );
@@ -349,11 +349,21 @@ int sout_InputSendBuffer( sout_input_t *p_input, sout_buffer_t *p_buffer )
 {
 /*    msg_Dbg( p_input->p_sout,
              "send buffer, size:%d", p_buffer->i_size ); */
-    sout_FifoPut( p_input->p_fifo, p_buffer );
 
-    vlc_mutex_lock( &p_input->p_sout->lock );
-    p_input->p_sout->pf_mux( p_input->p_sout );
-    vlc_mutex_unlock( &p_input->p_sout->lock );
+    if( p_input->input_format.i_fourcc != VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
+    {
+        sout_FifoPut( p_input->p_fifo, p_buffer );
+
+        vlc_mutex_lock( &p_input->p_sout->lock );
+        p_input->p_sout->pf_mux( p_input->p_sout );
+        vlc_mutex_unlock( &p_input->p_sout->lock );
+
+    }
+    else
+    {
+        sout_BufferDelete( p_input->p_sout, p_buffer );
+    }
+
     return( 0 );
 }
 
@@ -538,3 +548,22 @@ sout_buffer_t *sout_BufferDuplicate( sout_instance_t *p_sout,
     return( p_dup );
 }
 
+void sout_BufferChain( sout_buffer_t **pp_chain,
+                       sout_buffer_t *p_buffer )
+{
+    if( *pp_chain == NULL )
+    {
+        *pp_chain = p_buffer;
+    }
+    else
+    {
+        sout_buffer_t *p = *pp_chain;
+
+        while( p->p_next )
+        {
+            p = p->p_next;
+        }
+
+        p->p_next = p_buffer;
+    }
+}
