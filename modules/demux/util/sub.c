@@ -2,7 +2,7 @@
  * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sub.c,v 1.46 2004/01/27 11:57:05 gbazin Exp $
+ * $Id: sub.c,v 1.47 2004/01/27 12:22:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -1127,58 +1127,45 @@ static int DemuxVobSub( subtitle_demux_t *p_demux, uint8_t *pkt, int i_pkt )
     {
         int i_size = ps_pkt_size( p, &pkt[i_pkt] - p );
         block_t *p_pkt;
+        int        i_id;
+        int        i_spu;
+
         if( i_size <= 0 )
         {
             break;
+        }
+        if( p[0] != 0 || p[1] != 0 || p[2] != 0x01 )
+        {
+            msg_Warn( p_demux, "invalid PES" );
+            break;
+        }
+
+        if( p[3] != 0xbd )
+        {
+            msg_Dbg( p_demux, "we don't need these ps packets (id=0x1%2.2x)", p[3] );
+            p += i_size;
+            continue;
         }
 
         /* Create a block */
         p_pkt = block_New( p_demux, i_size );
         memcpy( p_pkt->p_buffer, p, i_size);
-
-        /* Parse it and send it */
-        switch( 0x100 | p[3] )
-        {
-        case 0x1b9:
-        case 0x1bb:
-        case 0x1bc:
-            msg_Dbg( p_demux, "we don't need these ps packets" );
-            block_Release( p_pkt );
-            break;
-
-        case 0x1ba:
-        {
-            msg_Dbg( p_demux, "pack: we don't need the info" );
-            block_Release( p_pkt );
-            break;
-        }
-        default:
-        {
-            int i_id = ps_pkt_id( p_pkt );
-            msg_Dbg( p_demux, "do we have a spu pes ? that would be so cool" );
-            if( i_id >= 0xc0 )
-            {
-                ps_track_t *tk = &p_demux->tk[PS_ID_TO_TK(i_id)];
-
-                if( p_demux->p_es &&
-                    !ps_pkt_parse_pes( p_pkt, tk->i_skip ) )
-                {
-                    msg_Dbg( p_demux, "do we pass it along?" );
-                    es_out_Send( p_demux->p_input->p_es_out, p_demux->p_es, p_pkt );
-                }
-                else
-                {
-                    block_Release( p_pkt );
-                }
-            }
-            else
-            {
-                block_Release( p_pkt );
-            }
-            break;
-        }
-        }
         p += i_size;
+
+        i_id = ps_pkt_id( p_pkt );
+        if( (i_id&0xffe0) != 0xbd20 ||
+            ps_pkt_parse_pes( p_pkt, 1 ) )
+        {
+            block_Release( p_pkt );
+            continue;
+        }
+        i_spu = i_id&0x1f;
+        msg_Dbg( p_demux, "SPU track %d size %d", i_spu, i_size );
+
+        if( p_demux->p_es )
+        {
+            es_out_Send( p_demux->p_input->p_es_out, p_demux->p_es, p_pkt );
+        }
     }
 
     return VLC_SUCCESS;
