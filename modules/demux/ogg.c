@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.38 2003/10/01 17:44:25 gbazin Exp $
+ * $Id: ogg.c,v 1.39 2003/10/19 16:53:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -677,7 +677,6 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                              "The theora stream won't be decoded." );
                     free( p_stream );
                     p_ogg->i_streams--;
-                    continue;
 #endif /* HAVE_OGGPACKB */
                 }
                 /* Check for Tarkin header */
@@ -732,7 +731,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             /* Mem allocation error, just ignore the stream */
                             free( p_stream );
                             p_ogg->i_streams--;
-                            continue;
+                            break;
                         }
                         p_stream->p_bih->biSize = sizeof(BITMAPINFOHEADER);
                         p_stream->p_bih->biCompression= p_stream->i_fourcc =
@@ -799,7 +798,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             /* Mem allocation error, just ignore the stream */
                             free( p_stream );
                             p_ogg->i_streams--;
-                            continue;
+                            break;
                         }
 
                         p_stream->p_wf->wFormatTag =
@@ -908,7 +907,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             /* Mem allocation error, just ignore the stream */
                             free( p_stream );
                             p_ogg->i_streams--;
-                            continue;
+                            break;
                         }
                         p_stream->p_bih->biSize = sizeof(BITMAPINFOHEADER);
                         p_stream->p_bih->biCompression=
@@ -975,7 +974,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             /* Mem allocation error, just ignore the stream */
                             free( p_stream );
                             p_ogg->i_streams--;
-                            continue;
+                            break;
                         }
 
                         memcpy( p_buffer, st->subtype, 4 );
