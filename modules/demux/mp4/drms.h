@@ -2,7 +2,7 @@
  * drms.h : DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.h,v 1.2 2004/01/09 04:37:43 jlj Exp $
+ * $Id$
  *
  * Author: Jon Lech Johansen <jon-vl@nanocrew.net>
  *

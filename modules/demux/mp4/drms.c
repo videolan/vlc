@@ -42,6 +42,9 @@
 #endif
 
 #ifdef WIN32
+#   if !defined( UNDER_CE )
+#       include <direct.h>
+#   endif
 #   include <tchar.h>
 #   include <shlobj.h>
 #   include <windows.h>

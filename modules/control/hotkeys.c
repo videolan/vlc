@@ -313,8 +313,8 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( i_action == ACTIONID_FULLSCREEN && p_vout )
         {
-            var_Get( p_vout, "fullscreen", &val );
-            var_Set( p_vout, "fullscreen", (vlc_value_t)!val.b_bool );
+            var_Get( p_vout, "fullscreen", &val ); val.b_bool = !val.b_bool;
+            var_Set( p_vout, "fullscreen", val );
         }
         else if( i_action == ACTIONID_PLAY )
         {

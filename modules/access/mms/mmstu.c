@@ -26,14 +26,17 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <sys/time.h>
+#include <vlc/vlc.h>
+
+#ifdef HAVE_SYS_TIME_H
+#   include <sys/time.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H

@@ -145,7 +145,7 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
     int i_sec;
 
     /* date begin at 1 jan 1904 */
-    i_date += ((1904U * 365) + 17) * 24 * 60 * 60;
+    i_date += ((I64C(1904) * 365) + 17) * 24 * 60 * 60;
 
     i_day = i_date / ( 60*60*24);
     i_hour = ( i_date /( 60*60 ) ) % 60;
@@ -1891,14 +1891,13 @@ static void MP4_FreeBox_cmvd( MP4_Box_t *p_box )
 
 static int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    MP4_Stream_t *p_stream_memory;
-
     MP4_Box_t *p_dcom;
     MP4_Box_t *p_cmvd;
 #ifdef HAVE_ZLIB_H
+    MP4_Stream_t *p_stream_memory;
     z_stream  z_data;
-#endif
     uint8_t *p_data;
+#endif
 
     int i_result;
 

@@ -1158,7 +1158,7 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 
     while( !p_intf->b_die && *pi_size < MAX_LINE_LENGTH &&
            (i_read = net_ReadNonBlock( p_intf, p_intf->p_sys->i_socket == -1 ?
-                       STDIN_FILENO : p_intf->p_sys->i_socket,
+                       0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket,
                        p_buffer + *pi_size, 1, INTF_IDLE_SLEEP ) ) > 0 )
     {
         if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
