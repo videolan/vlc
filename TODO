@@ -33,6 +33,18 @@ Status: Todo
 
 Task
 Difficulty: Medium
+Platform: Any
+Urgency: Critical
+Description: fix subtitle regressions
+Multi-line subtitles are not aligned correctly.<br />
+Text subtitles don't work with 32bpp rgb.<br />
+Investigate behaviour of subpictures when pausing.<br />
+Negative delaying broken<br />
+Status: Todo
+
+
+Task
+Difficulty: Medium
 Platform: any
 Urgency: Important
 Description: Update matroska demux
@@ -40,21 +52,23 @@ Description: Update matroska demux
 Status: Todo
 
 Task
-Difficulty: Easy
-Platform: any
+Difficulty: Easy to Difficult
+Platform: Any
 Urgency: Important
-Description: proper DVD controls
-Most importantly a proper button that will take you straight to the DVD menu. But also, next/prev chapter should be integrated with next/prev playlistitem.
-Status: Assigned to yoann (done)
+Description: Write some developer documentation
+Perhaps a skeletal driver in each of the categories, what they need to
+do, the design decisions, possibilities, or options that drivers in
+a category might implement. If there is a canonical module for each 
+category or modules that show the range of options that might be mentioned 
+too.
 
 Task
 Difficulty: Easy
-Platform: Linux, Win32, Mac OS X
+Platform: Mac OS X
 Urgency: Normal
 Description: Streaming wizard
- Finish the streaming wizard (85% finished)<br />
-The mac version is at 0%
-Status: Assigned to zorglub
+ Make a Streaming wizard for OS X
+Status: Todo
 
 Task
 Difficulty: Easy
@@ -76,9 +90,10 @@ Task
 Difficulty: Guru
 Urgency: Normal
 Platform: any
-Description: External audio file playing
- Allow several access from an input thread to allow for multi-input<br />
-(90% done) Add GUI elements
+Description: Multi-input
+* Core support done<br />
+* Many demuxers don't support it<br />
+* Need GUI elements
 Status: Assigned to fenrir
 
 Task
@@ -108,7 +123,7 @@ Platform: any
 Description: Playlist II
  A hierarchized playlist structure, eventually using a media library.
 Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc. <a href="http://sierra.via.ecp.fr/~zorglub/vlc/playlist.txt">Thoughts and ideas (not up-to-date)</a><br />
-50% done.<br />
+70% done.<br />
 Todo:<br />
 - Core support<br />
    - *   "Name finder"<br />
@@ -121,8 +136,9 @@ Todo:<br />
    - **  ASX and B4S parsers (see below)<br />
    - *   Rewrite SLP announce discovery<br />
    - *   Live directory representation<br /> 
-- *** Implement in MacOS X and Skins 2 interfaces<br />
+- *** Implement in Skins 2 interfaces<br />
 - wx implementation :<br />
+   - *** Fix deadlocks<br />
    - **  Support item move/copy<br />
    - *   Explorer view<br />
    - *   Playlist preferences panel<br />
@@ -136,15 +152,6 @@ Platform: any
 Description: Improve bookmarks
  - Put them in the input_item structure to have them persistent
  - Add an input option to play the whole file but starting at a given bookmark
-Status: Todo
-
-Task
-Difficulty: Easy
-Urgency: Normal
-Platform: Win32, Linux
-Description: DVD controls panel
-  A small panel that would popup (below the slider, for example) when playing
-  a DVD with controls such as "up, down, right, left, next chapter, prev chapter, back to menu, ..."
 Status: Todo
 
 Task
@@ -178,16 +185,6 @@ Platform: Mac OS X
 Description: LPCM
 The LPCM decoder outputs really small samples which aren't accepted properly by the macosx coreaudio resampler, causing VLC to not output any sound with many DVD's. A test sample that shows this effect on the mac is the Madonna clip.
 Status: Todo
-
-Task
-Difficulty: Hard
-Urgency: Normal
-Platform: Any
-Description: Rework of the preferences
- * New information in preferences for a rework of how preferences are sorted in interfaces
- * New widget types
- See http://www.via.ecp.fr/via/ml/vlc-devel/200409/msg00409.html
-Status: Assigned to zorglub
 
 Task
 Difficulty: Hard
@@ -239,6 +236,8 @@ Description: equalizer fixes
    - Once audio equalizer is disabled, it doesn't enable the first
      try when you select from main menu. It only works a 2nd change
      (enable flag not properly set?).
+ To have this work correctly, the best solution is to remove knowledge of
+ presets from the filter and give it to ... core ?
 Status: Todo
 
 Task
@@ -266,7 +265,8 @@ Urgency: Normal
 Platform: any
 Description: Stream text subtitles
  Find a a way to stream text subtitles, in TS and in RTP.<br />
- Needs testing and validating
+ Needs testing and validating<br />
+ Currently broken.
 Status: 65% (fenrir)
 
 Task
@@ -306,10 +306,10 @@ Difficulty: Hard
 Platform: WinCE
 Urgency: Wishlist
 Description: WinCE port finalizing
-The WinCE port is already quite functional but we still miss a GAPI video output (GDI works but is slow) and an interface.
+The WinCE port is already quite functional but we still miss a GAPI video output (GDI works but is slow).
 Some code already exists for that (http://sourceforge.net/projects/vlcpocketpc/) and would need to be imported into the VLC source tree.
 Downloads should be added to the main vlc download page. We need an icon for this. 
-Status: Assigned to MixerAnderson
+Status: Assigned to MixerAnderson and gibalou
 
 Task
 Difficulty: Medium
@@ -317,7 +317,8 @@ Urgency: Wishlist
 Platform: any
 Description: Full blown OSD system 
  In the line of freevo etc.
-Status: Assigned to thedj, jpsaman and yoann
+ (Checkout the correct svn branch)
+Status: 75% done. Assigned to thedj, jpsaman and yoann
 
 Task
 Difficulty: Easy
@@ -391,21 +392,22 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: More/Better Picture filters
-There are several picture filters (blend, scale), but we can use more (screenshot, crop, move..) We probably need on the fly picture filter insertion as well.
+There are several picture filters (blend, scale), but we can use more (screenshot, crop, move..) We probably need on the fly picture filter insertion as well. (and also not-on-the-fly)
 Status: Todo
 
 Task
 Difficulty: Guru
-Urgency: Wishlist
+Urgency: Normal
 Platform: any
 Description: Vout redesign
 - vout needs distinct splitting into vout_core, vout_window, pic_filter, vout_filter<br />
-- needs 'assistence' vout windows (clone filters, goom) etc.<br />
+- needs 'assistance' vout windows (clone filters, goom) etc.<br />
 - 4:3, 16:9, freeform Aspect Ratio<br />
 - cropping and padding (do at OS level, but provide a core call to set it up and configure).<br />
 - OSD at window resolution instead of video res (secondary vout channel)<br />
 - a OSD needs to be bound to a vout stream (no subs on goom vout)<br />
-- Use OS native calls where appropriate, with 'C' fallbacks. (OpenGL, Quartz, DirectX already has many of the funtionalities we seek and sometimes they are a lot faster too).
+- Use OS native calls where appropriate, with 'C' fallbacks. (OpenGL, Quartz, DirectX already has many of the funtionalities we seek and sometimes they are a lot faster too).<br />
+- better hotkeys integration
 Status: Todo
 
 Task
@@ -447,6 +449,9 @@ Implement a system to: <br />
  - Ask the user a question (Are you sure? or Try to Fix index of avi? or Overwrite File?)<br />
  - Inform the user, without disturbing him. (Buffering stream). This might require a displaytime or something. Because how do we know how long this information should be displayed? Also think of buffering 0-100%<br /> 
  - present a user/passwd dialog when we get an authentication failure on a stream.<br />
+Implementation ideas: <br />
+ - via variables and callbacks. How to give answers back ?<br />
+ - via p_intf->pf_* functions.<br />
 Status: Todo
 
 Task
@@ -455,7 +460,7 @@ Urgency: Wishlist
 Platform: any
 Description: Full H323 Videoconferencing
 VLC isn't really suited for this yet, because it introduces quite large latencies. This should be fixed before the H323 can ever come close to working in VLC.
-We also will need SIP support.
+We also will need SIP support. A first implementation using a custom protocol is being made. 
 Status: Todo
 
 Task
@@ -489,15 +494,6 @@ Description: export paramaters of an input
 Status: Todo
 
 Task
-Difficulty: Easy
-Urgency: Wishlist
-Platform: any
-Description: SSL http
-SSL encrypted HTTP communication. To support protected VoD.<br />
-The question is how to neatly integrate it into our API. Support for all our http handling plugins means complicating the API. Perhaps we should store the SSL context in the p_sys of the vlc_object that is calling it? Tad dangerous, but would keep stuff simple.
-Status: Done
-
-Task
 Difficulty: Hard
 Urgency: Wishlist
 Platform: any
@@ -520,8 +516,9 @@ Urgency: Wishlist
 Platform: any
 Description: rendezvous announces
 Apple released the rendezvous code under a Open Source license now. perhaps it can be used. (It's OpenTalk now btw).<br />
+Note: the licence is probably not DFSG compatible. Alternative mDNS implementations exist<br />
 DMAP protocol announce for videos.
-Status: Todo
+Status: Partly done (DAAP only)
 
 Task
 Difficulty: Easy
@@ -561,7 +558,9 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: Make vlm more user friendly (setup etc)
-vlm is kinda a pain to setup if you are not entirely experienced with A/V and streaming or VLC for that matter. It can be heavily improved by updating the vlm http interface. Using seperate fields for the need paramters of a schedule/source.
+vlm is kinda a pain to setup if you are not entirely experienced with A/V and streaming or VLC for that matter.<br />
+It can be heavily improved by updating the vlm http interface. Using seperate fields for the need paramters of a schedule/source.<br />
+Also, GUI implementation.
 Status: Todo
 
 Task
@@ -675,25 +674,6 @@ Video Files( .avi, .mkv, .mov, .mpg, .m2v, etc)<br />
 Subtitle Files( .idx, .sub, .utf, .srt)<br />
 Status: Todo
 
-Task
-Difficulty: Medium
-Platform: Any
-Urgency: Important
-Description: fix subtitle regressions
-Multi-line subtitles are not aligned correctly. Text subtitles don't work
-with 32bpp rgb. Investigate behaviour of subpictures when pausing.
-Status: Todo
-
-Task
-Difficulty: Easy to Difficult
-Platform: Any
-Urgency: Important
-Description: Write some developer documentation
-Perhaps a skeletal driver in each of the categories, what they need to
-do, the design decisions, possibilities, or options that drivers in
-a category might implement. If there is a canonical module for each 
-category or modules that show the range of options that might be mentioned 
-too.
 
 # Do not remove me
 Task
