@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.16 2002/12/11 17:27:29 bozo Exp $
+ * $Id: alsa.c,v 1.17 2002/12/23 17:22:46 bozo Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -53,7 +53,7 @@ struct aout_sys_t
 {
     snd_pcm_t         * p_snd_pcm;
     int                 i_period_time;
-mtime_t grut;
+
 #ifdef DEBUG
     snd_output_t      * p_snd_stderr;
 #endif
@@ -522,8 +522,9 @@ static void Close( vlc_object_t *p_this )
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     int i_snd_rc;
 
-    p_aout->b_die = 1;
+    p_aout->b_die = VLC_TRUE;
     vlc_thread_join( p_aout );
+    p_aout->b_die = VLC_FALSE;
 
     i_snd_rc = snd_pcm_close( p_sys->p_snd_pcm );
 
@@ -557,7 +558,7 @@ static int ALSAThread( aout_instance_t * p_aout )
         /* Why do we need to sleep ? --Meuuh */
         /* Maybe because I don't want to eat all the cpu by looping
            all the time. --Bozo */
-        msleep( p_sys->i_period_time >> 2 );
+        msleep( p_sys->i_period_time >> 1 );
     }
 
     return 0;
@@ -574,6 +575,7 @@ static void ALSAFill( aout_instance_t * p_aout )
     snd_pcm_status_t * p_status;
     snd_timestamp_t ts_next;
     int i_snd_rc;
+    mtime_t next_date;
 
     snd_pcm_status_alloca( &p_status );
 
@@ -629,39 +631,32 @@ static void ALSAFill( aout_instance_t * p_aout )
         /* Here the device should be either in the RUNNING state either in
            the PREPARE state. p_status is valid. */
 
-        if( 1 )
-        {
-            mtime_t next_date;
-            snd_pcm_status_get_tstamp( p_status, &ts_next );
-            next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
-            next_date += (mtime_t)snd_pcm_status_get_delay(p_status)
-                         * 1000000 / p_aout->output.output.i_rate;
+        snd_pcm_status_get_tstamp( p_status, &ts_next );
+        next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
+        next_date += (mtime_t)snd_pcm_status_get_delay(p_status)
+                     * 1000000 / p_aout->output.output.i_rate;
 
-            p_buffer = aout_OutputNextBuffer( p_aout, next_date,
+        p_buffer = aout_OutputNextBuffer( p_aout, next_date,
                         (p_aout->output.output.i_format ==
-                            VLC_FOURCC('s','p','d','i')) );
+                         VLC_FOURCC('s','p','d','i')) );
 
-            /* Audio output buffer shortage -> stop the fill process and
-               wait in ALSAThread */
-            if( p_buffer == NULL )
-                return;
-
-            i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
-                                       p_buffer->i_nb_samples );
-
-            if( i_snd_rc < 0 )
-            {
-                msg_Err( p_aout, "write failed (%s)",
-                                 snd_strerror( i_snd_rc ) );
-            }
-
-            aout_BufferFree( p_buffer );
-        }
-        else
-        {
-            /* Don't eat all the CPU. We will try to write later. */
+        /* Audio output buffer shortage -> stop the fill process and
+           wait in ALSAThread */
+        if( p_buffer == NULL )
             return;
+
+        i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
+                                   p_buffer->i_nb_samples );
+
+        if( i_snd_rc < 0 )
+        {
+            msg_Err( p_aout, "write failed (%s)",
+                             snd_strerror( i_snd_rc ) );
         }
+
+        aout_BufferFree( p_buffer );
+
+        msleep( p_sys->i_period_time >> 2 );
     }
 }
 
