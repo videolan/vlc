@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.14 2003/11/30 21:21:20 jpsaman Exp $
+ * $Id: pda.c,v 1.15 2003/12/03 20:47:06 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -560,6 +560,7 @@ void E_(GtkDisplayDate)( GtkAdjustment *p_adj )
 
     p_intf = gtk_object_get_data( GTK_OBJECT( p_adj ), "p_intf" );
 
+#ifdef WIN32
     if( p_intf->p_sys->p_input )
     {
 #define p_area p_intf->p_sys->p_input->stream.p_selected_area
@@ -570,6 +571,7 @@ void E_(GtkDisplayDate)( GtkAdjustment *p_adj )
                                    ( p_area->i_size * p_adj->value ) / 100 ) );
 #undef p_area
      }
+#endif
 }
 
 /*****************************************************************************
