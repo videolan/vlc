@@ -451,3 +451,12 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<bbpig> tiens au fait y a des mauvais signal handlers dans le vlc ;P
+<Ipkiss> je crois qu'il n'y a pas de bons ou de mauvais signal handlers
+<bbpig> Ipkiss: ah ?
+<Ipkiss> si je devais résumer le vlc aujourd'hui...
+<tooney> c'est un effort commun de gens qui aiment, qui dansent l'opensource
+<tooney> qui chantent l'opensource
+
+  -- #c00lz
+%
