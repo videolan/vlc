@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.26 2003/03/16 01:37:44 fenrir Exp $
+ * $Id: mms.c,v 1.27 2003/03/16 01:49:28 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1528,8 +1528,14 @@ static int  NetFillBuffer( input_thread_t *p_input )
                  i_tcp_read );
     }
 #endif
-    p_access->i_buffer_tcp += i_tcp_read;
-    p_access->i_buffer_udp += i_udp_read;
+    if( i_tcp_read > 0 )
+    {
+        p_access->i_buffer_tcp += i_tcp_read;
+    }
+    if( i_udp_read > 0 )
+    {
+        p_access->i_buffer_udp += i_udp_read;
+    }
 
     return( i_tcp_read + i_udp_read);
 #endif
@@ -1622,7 +1628,6 @@ static int  mms_ParsePacket( input_thread_t *p_input,
     uint8_t  *p_packet;
 
 
-//    *pi_used = i_data; /* default */
     *pi_used = i_data; /* default */
     if( i_data <= 8 )
     {
@@ -1729,7 +1734,6 @@ static int mms_ReceivePacket( input_thread_t *p_input )
             msg_Warn( p_input, "cannot fill buffer" );
             continue;
         }
-        /* TODO udp */
 
         i_packet_tcp_type = -1;
         i_packet_udp_type = -1;
@@ -1755,7 +1759,7 @@ static int mms_ReceivePacket( input_thread_t *p_input )
                                      p_access->i_buffer_tcp,
                                      &i_used );
             }
-            if( i_used < MMS_BUFFER_SIZE )
+            if( i_used > 0 && i_used < MMS_BUFFER_SIZE )
             {
                 memmove( p_access->buffer_tcp,
                          p_access->buffer_tcp + i_used,
@@ -1766,36 +1770,20 @@ static int mms_ReceivePacket( input_thread_t *p_input )
         else if( p_access->i_buffer_udp > 0 )
         {
             int i_used;
-#if 0
-            if( GetDWLE( p_access->buffer_tcp + 4 ) == 0xb00bface )
-            {
-                i_packet_tcp_type =
-                    mms_ParseCommand( p_input,
-                                      p_access->buffer_tcp,
-                                      p_access->i_buffer_tcp,
-                                      &i_used );
 
-            }
-            else
-#endif
-            {
-                i_packet_tcp_type =
-                    mms_ParsePacket( p_input,
-                                     p_access->buffer_udp,
-                                     p_access->i_buffer_udp,
-                                     &i_used );
-            }
-            if( i_used < MMS_BUFFER_SIZE )
+            i_packet_udp_type =
+                mms_ParsePacket( p_input,
+                                 p_access->buffer_udp,
+                                 p_access->i_buffer_udp,
+                                 &i_used );
+
+            if( i_used > 0 && i_used < MMS_BUFFER_SIZE )
             {
                 memmove( p_access->buffer_udp,
                          p_access->buffer_udp + i_used,
                          MMS_BUFFER_SIZE - i_used );
             }
             p_access->i_buffer_udp -= i_used;
-        }
-        else
-        {
-            i_packet_udp_type = -1;
         }
 
         if( i_packet_tcp_type == MMS_PACKET_CMD &&
