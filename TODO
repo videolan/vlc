@@ -45,7 +45,7 @@ Platform: any
 Urgency: Important
 Description: proper DVD controls
 Most importantly a proper button that will take you straight to the DVD menu. But also, next/prev chapter should be integrated with next/prev playlistitem.
-Status: Todo
+Status: Assigned to yoann (done)
 
 Task
 Difficulty: Easy
