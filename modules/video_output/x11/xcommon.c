@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.16 2003/05/25 11:31:54 gbazin Exp $
+ * $Id: xcommon.c,v 1.17 2003/05/25 19:24:53 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -64,6 +64,10 @@
 #ifdef MODULE_NAME_IS_xvideo
 #   include <X11/extensions/Xv.h>
 #   include <X11/extensions/Xvlib.h>
+#endif
+
+#ifdef HAVE_XINERAMA
+#   include <X11/extensions/Xinerama.h>
 #endif
 
 #include "xcommon.h"
@@ -1334,6 +1338,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     XEvent xevent;
     mwmhints_t mwmhints;
     XSetWindowAttributes attributes;
+    int i_d1, i_d2;
 
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
@@ -1401,9 +1406,54 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         p_vout->p_sys->p_win->i_height =
             DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
 
+        p_vout->p_sys->p_win->i_x = 0;
+        p_vout->p_sys->p_win->i_y = 0;
+
+#ifdef HAVE_XINERAMA
+        if( XineramaQueryExtension( p_vout->p_sys->p_display, &i_d1, &i_d2 ) &&
+            XineramaIsActive( p_vout->p_sys->p_display ) )
+        {
+            XineramaScreenInfo *screens;   /* infos for xinerama */
+            int i_num_screens;
+
+            msg_Dbg( p_vout, "Using XFree Xinerama extension");
+
+#define SCREEN p_vout->p_sys->p_win->i_screen
+
+            /* Get Informations about Xinerama (num of screens) */
+            screens = XineramaQueryScreens( p_vout->p_sys->p_display,
+                                            &i_num_screens );
+
+            if( !SCREEN )
+                SCREEN = config_GetInt( p_vout,
+                                        MODULE_STRING "-xineramascreen" );
+
+            /* just check that user has entered a good value */
+            if( SCREEN >= i_num_screens || SCREEN < 0 )
+            {
+                msg_Dbg( p_vout, "requested screen number invalid" );
+                SCREEN = 0;
+            }
+
+            /* Get the X/Y upper left corner coordinate of the above screen */
+            p_vout->p_sys->p_win->i_x = screens[SCREEN].x_org;
+            p_vout->p_sys->p_win->i_y = screens[SCREEN].y_org;
+
+            /* Set the Height/width to the screen resolution */
+            p_vout->p_sys->p_win->i_width = screens[SCREEN].width;
+            p_vout->p_sys->p_win->i_height = screens[SCREEN].height;
+
+            XFree(screens);
+
+#undef SCREEN
+
+        }
+#endif
+
         XMoveResizeWindow( p_vout->p_sys->p_display,
                            p_vout->p_sys->p_win->base_window,
-                           0, 0,
+                           p_vout->p_sys->p_win->i_x,
+                           p_vout->p_sys->p_win->i_y,
                            p_vout->p_sys->p_win->i_width,
                            p_vout->p_sys->p_win->i_height );
     }

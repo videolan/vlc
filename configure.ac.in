@@ -514,25 +514,6 @@ NEED_GNOME2_MAIN=no
 dnl build the qte plugin ?
 NEED_QTE_MAIN=no
 
-dnl Check for DPMS
-if test "x${SYS}" != "xmingw32"
-then
-  CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
-  AC_CHECK_HEADERS(X11/extensions/dpms.h, [
-    AC_MSG_CHECKING(for DPMSInfo in X11/extensions/dpms.h)
-    AC_EGREP_HEADER(DPMSInfo,X11/extensions/dpms.h,[
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(DPMSINFO_IN_DPMS_H, 1,
-                Define if <X11/extensions/dpms.h> defines DPMSInfo.)
-    ],[
-      AC_MSG_RESULT(no)
-    ])
-  ],,[
-    #include <X11/Xlib.h>
-  ])
-  CPPFLAGS="${CPPFLAGS_save}"
-fi
-
 dnl Check for ntohl, etc.
 AC_CACHE_CHECK([for ntohl in sys/param.h],
     [ac_cv_c_ntohl_sys_param_h],
@@ -1962,6 +1943,25 @@ dnl
 
 AC_ARG_WITH(,[Video plugins:])
 
+dnl Check for DPMS
+if test "x${SYS}" != "xmingw32"
+then
+  CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
+  AC_CHECK_HEADERS(X11/extensions/dpms.h, [
+    AC_MSG_CHECKING(for DPMSInfo in X11/extensions/dpms.h)
+    AC_EGREP_HEADER(DPMSInfo,X11/extensions/dpms.h,[
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(DPMSINFO_IN_DPMS_H, 1,
+                Define if <X11/extensions/dpms.h> defines DPMSInfo.)
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+  ],,[
+    #include <X11/Xlib.h>
+  ])
+  CPPFLAGS="${CPPFLAGS_save}"
+fi
+
 dnl
 dnl  X11 module
 dnl  (enabled by default except on win32)
@@ -1975,6 +1975,11 @@ if test "x${enable_x11}" != "xno" &&
     PLUGINS="${PLUGINS} x11"
     LDFLAGS_x11="${LDFLAGS_x11} -L${x_libraries} -lX11 -lXext"
     CPPFLAGS_x11="${CPPFLAGS_x11} -I${x_includes}"
+    AC_CHECK_HEADERS(X11/extensions/Xinerama.h, [
+      AC_CHECK_LIB(Xinerama, XineramaQueryExtension,
+        AC_DEFINE(HAVE_XINERAMA,1,[Define this if you have libXinerama installed])
+        LDFLAGS_x11="${LDFLAGS_x11} -lXinerama")
+    ])
   ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
@@ -2004,6 +2009,11 @@ if test "x${enable_xvideo}" != "xno" &&
         :
       )
     )
+    AC_CHECK_HEADERS(X11/extensions/Xinerama.h, [
+      AC_CHECK_LIB(Xinerama, XineramaQueryExtension,
+        AC_DEFINE(HAVE_XINERAMA,1,[Define this if you have libXinerama installed])
+        LDFLAGS_xvideo="${LDFLAGS_xvideo} -lXinerama")
+    ])
     CFLAGS="${CFLAGS_save}"
   ]
   CPPFLAGS="${CPPFLAGS_save}")

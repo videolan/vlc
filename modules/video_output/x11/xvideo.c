@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.7 2003/05/15 22:27:38 massiot Exp $
+ * $Id: xvideo.c,v 1.8 2003/05/25 19:24:53 gbazin Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -69,6 +69,11 @@ extern void E_(Deactivate) ( vlc_object_t * );
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between VLC and the X server.")
 
+#define SCREEN_TEXT N_("choose the screen to be used for fullscreen mode.")
+#define SCREEN_LONGTEXT N_( \
+    "Choose the screen you want to use in fullscreen mode. For instance " \
+    "set it to 0 for first screen, 1 for the second.")
+
 vlc_module_begin();
     add_category_hint( N_("XVideo"), NULL, VLC_TRUE );
     add_string( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
@@ -78,6 +83,10 @@ vlc_module_begin();
 #ifdef HAVE_SYS_SHM_H
     add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, VLC_TRUE );
 #endif
+#ifdef HAVE_XINERAMA
+    add_integer ( "xvideo-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, VLC_TRUE );
+#endif
+
     set_description( _("XVideo extension video output") );
     set_capability( "video output", 150 );
     set_callbacks( E_(Activate), E_(Deactivate) );
