@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.5 2002/08/20 12:32:01 sam Exp $
+ * $Id: familiar.c,v 1.6 2002/08/20 18:08:51 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -40,61 +40,12 @@
 #include "familiar.h"
 
 /*****************************************************************************
- * Local variables (mutex-protected).
- *****************************************************************************/
-static void ** pp_global_data = NULL;
-
-/*****************************************************************************
- * g_atexit: kludge to avoid the Gtk+ thread to segfault at exit
- *****************************************************************************
- * gtk_init() makes several calls to g_atexit() which calls atexit() to
- * register tidying callbacks to be called at program exit. Since the Gtk+
- * plugin is likely to be unloaded at program exit, we have to export this
- * symbol to intercept the g_atexit() calls. Talk about crude hack.
- *****************************************************************************/
-void g_atexit( GVoidFunc func )
-{
-    intf_thread_t *p_intf;
-
-    int i_dummy;
-
-    if( pp_global_data == NULL )
-    {
-        atexit( func );
-        return;
-    }
-
-    p_intf = (intf_thread_t *)*pp_global_data;
-    if( p_intf == NULL )
-    {
-        return;
-    }
-
-    for( i_dummy = 0;
-         i_dummy < MAX_ATEXIT && p_intf->p_sys->pf_callback[i_dummy] != NULL;
-         i_dummy++ )
-    {
-        ;
-    }
-
-    if( i_dummy >= MAX_ATEXIT - 1 )
-    {
-        msg_Err( p_intf, "too many atexit() callbacks to register" );
-        return;
-    }
-
-    p_intf->p_sys->pf_callback[i_dummy]     = func;
-    p_intf->p_sys->pf_callback[i_dummy + 1] = NULL;
-}
-
-/*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );             
 
 static void Run          ( intf_thread_t * );                  
-static gint Manage       ( gpointer );
 
 /*****************************************************************************
  * Module descriptor
@@ -117,7 +68,14 @@ static int Open( vlc_object_t *p_this )
     if( p_intf->p_sys == NULL )
     {
         msg_Err( p_intf, "out of memory" );
-        return( 1 );
+        return VLC_ENOMEM;
+    }
+
+    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gtk" );
+    if( p_intf->p_sys->p_gtk_main == NULL )
+    {
+        free( p_intf->p_sys );
+        return VLC_EMODULE;
     }
 
     /* Initialize Gtk+ thread */
@@ -127,7 +85,7 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -142,8 +100,10 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_intf->p_sys->p_input );
     }
 
+    module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
+
     /* Destroy structure */
-    if (p_intf->p_sys) free( p_intf->p_sys );
+    free( p_intf->p_sys );
 }
 
 /*****************************************************************************
@@ -151,27 +111,10 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************
  * this part of the interface is in a separate thread so that we can call
  * gtk_main() from within it without annoying the rest of the program.
- * XXX: the approach may look kludgy, and probably is, but I could not find
- * a better way to dynamically load a Gtk+ interface at runtime.
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    /* gtk_init needs to know the command line. We don't care, so we
-     * give it an empty one */
-    char  *p_args[] = { "" };
-    char **pp_args  = p_args;
-    int    i_args   = 1;
-    int    i_dummy;
-
-    /* Initialize Gtk+ */
-    gtk_set_locale ();
-
-    /* gtk_init will register stuff with g_atexit, so we need to take
-     * the global lock if we want to be able to intercept the calls */
-    vlc_mutex_lock( p_intf->p_vlc->p_global_lock );
-    *p_intf->p_vlc->pp_global_data = p_intf;
-    gtk_init( &i_args, &pp_args );
-    vlc_mutex_unlock( p_intf->p_vlc->p_global_lock );
+    gdk_threads_enter();
 
     /* Create some useful widgets that will certainly be used */
 // FIXME: magic path
@@ -203,30 +146,17 @@ static void Run( intf_thread_t *p_intf )
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
 
-    /* Add a check for termination */
-    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, Manage, p_intf );
-
-    /* Enter Gtk mode */
-    gtk_main();
-
-    /* Remove the timeout */
-    gtk_timeout_remove( i_dummy );
-}
-
-/*****************************************************************************
- * Manage: check for termination
- *****************************************************************************
- * In this function, called approx. 10 times a second, we check whether the
- * main program asked us to die by setting b_die to VLC_TRUE.
- *****************************************************************************/
-static gint Manage( gpointer p_data )
-{
-    if( ((intf_thread_t *)p_data)->b_die )
+    /* Sleep to avoid using all CPU - since some interfaces need to
+     * access keyboard events, a 100ms delay is a good compromise */
+    while( !p_intf->b_die )
     {
-        gtk_main_quit();
-        return FALSE;
+        gdk_threads_leave();
+        msleep( INTF_IDLE_SLEEP );
+        gdk_threads_enter();
     }
 
-    return TRUE;
+    gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
+
+    gdk_threads_leave();
 }
 

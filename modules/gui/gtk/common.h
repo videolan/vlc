@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: common.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: common.h,v 1.2 2002/08/20 18:08:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,6 +35,9 @@
  *****************************************************************************/
 struct intf_sys_t
 {
+    /* the gtk_main module */
+    module_t *          p_gtk_main;
+
     /* special actions */
     vlc_bool_t          b_playing;
     vlc_bool_t          b_popup_changed;                   /* display menu ? */
@@ -82,9 +85,6 @@ struct intf_sys_t
     GtkLabel *          p_label_title;
     GtkLabel *          p_label_chapter;
     gint                i_part;                           /* current chapter */
-
-    /* XXX: Ugly kludge, see gtk.c */
-    void             ( *pf_callback[MAX_ATEXIT] ) ( void );
 };
 
 /*****************************************************************************

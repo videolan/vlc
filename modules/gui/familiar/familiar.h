@@ -2,7 +2,7 @@
  * familiar.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: familiar.h,v 1.4 2002/08/18 20:36:04 jpsaman Exp $
+ * $Id: familiar.h,v 1.5 2002/08/20 18:08:51 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -28,6 +28,9 @@
  *****************************************************************************/
 struct intf_sys_t
 {
+    /* The gtk_main module */
+    module_t *          p_gtk_main;
+
     /* windows and widgets */
     GtkWidget *         p_window;                             /* main window */
     GtkNotebook *       p_notebook;
@@ -39,9 +42,6 @@ struct intf_sys_t
     vlc_bool_t          b_autoplayfile;
     /* The input thread */
     input_thread_t *    p_input;
-
-    /* XXX: Ugly kludge, see gtk.c */
-    void             ( *pf_callback[MAX_ATEXIT] ) ( void );
 };
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * null.c : NULL module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: null.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: null.c,v 1.1 2002/08/20 18:08:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.28 2002/08/19 11:13:45 sam Exp $
+ * $Id: libvlc.c,v 1.29 2002/08/20 18:08:51 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -39,14 +39,6 @@
 #include <stdlib.h>                                                /* free() */
 
 #include <vlc/vlc.h>
-
-#ifdef HAVE_GETOPT_LONG
-#   ifdef HAVE_GETOPT_H
-#       include <getopt.h>                                       /* getopt() */
-#   endif
-#else
-#   include "GNUgetopt/getopt.h"
-#endif
 
 #ifndef WIN32
 #   include <netinet/in.h>                            /* BSD: struct in_addr */
@@ -89,8 +81,7 @@ static vlc_mutex_t global_lock;
 void *             p_global_data;
 
 /* A list of all the currently allocated vlc objects */
-static int volatile i_vlc = 0;
-static int volatile i_unique = 0;
+static int      volatile i_vlc = 0;
 static vlc_t ** volatile pp_vlc = NULL;
 
 /*****************************************************************************
@@ -152,6 +143,7 @@ vlc_error_t vlc_create( void )
 
 vlc_t * vlc_create_r( void )
 {
+    static int i_instance = 0;
     vlc_t * p_vlc = NULL;
 
     /* Allocate the main structure */
@@ -181,8 +173,8 @@ vlc_t * vlc_create_r( void )
     pp_vlc = realloc( pp_vlc, (i_vlc+1) * sizeof( vlc_t * ) );
     pp_vlc[ i_vlc ] = p_vlc;
     i_vlc++;
-    p_vlc->i_unique = i_unique;
-    i_unique++;
+    p_vlc->i_instance = i_instance;
+    i_instance++;
     vlc_mutex_unlock( p_vlc->p_global_lock );
 
     /* Update the handle status */
@@ -207,10 +199,11 @@ vlc_error_t vlc_init( int i_argc, char *ppsz_argv[] )
 
 vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 {
-    char p_capabilities[200];
-    char *p_tmp;
-    module_t        *p_help_module;
-    playlist_t      *p_playlist;
+    char         p_capabilities[200];
+    char *       p_tmp;
+    vlc_bool_t   b_exit;
+    module_t    *p_help_module;
+    playlist_t  *p_playlist;
 
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_CREATED )
@@ -304,37 +297,36 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         return VLC_EGENERIC;
     }
 
+    b_exit = VLC_FALSE;
+
     /* Check for short help option */
     if( config_GetInt( p_vlc, "help" ) )
     {
-        fprintf( stderr, _("Usage: %s [options] [parameters] [file]...\n"),
+        fprintf( stderr, _("Usage: %s [options] [parameters] [files]...\n\n"),
                          p_vlc->psz_object_name );
-
-        Usage( p_vlc, "help" );
         Usage( p_vlc, "main" );
-        vlc_object_detach( p_help_module );
-        config_Free( p_help_module );
-        vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
-        return VLC_EEXIT;
+        Usage( p_vlc, "help" );
+        b_exit = VLC_TRUE;
     }
-
     /* Check for version option */
-    if( config_GetInt( p_vlc, "version" ) )
+    else if( config_GetInt( p_vlc, "version" ) )
     {
         Version();
-        vlc_object_detach( p_help_module );
-        config_Free( p_help_module );
-        vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
-        return VLC_EEXIT;
+        b_exit = VLC_TRUE;
     }
 
     /* Hack: remove the help module here */
     vlc_object_detach( p_help_module );
     /* End hack */
+
+    if( b_exit )
+    {
+        config_Free( p_help_module );
+        vlc_object_destroy( p_help_module );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
+        return VLC_EEXIT;
+    }
 
     /*
      * Load the builtins and plugins into the module_bank.
@@ -356,36 +348,19 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     {
         Usage( p_vlc, p_tmp );
         free( p_tmp );
-        vlc_object_detach( p_help_module );
-        config_Free( p_help_module );
-        vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
-        return VLC_EGENERIC;
+        b_exit = VLC_TRUE;
     }
-
     /* Check for long help option */
-    if( config_GetInt( p_vlc, "longhelp" ) )
+    else if( config_GetInt( p_vlc, "longhelp" ) )
     {
         Usage( p_vlc, NULL );
-        vlc_object_detach( p_help_module );
-        config_Free( p_help_module );
-        vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
-        return VLC_EEXIT;
+        b_exit = VLC_TRUE;
     }
-
     /* Check for module list option */
-    if( config_GetInt( p_vlc, "list" ) )
+    else if( config_GetInt( p_vlc, "list" ) )
     {
         ListModules( p_vlc );
-        vlc_object_detach( p_help_module );
-        config_Free( p_help_module );
-        vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
-        return VLC_EEXIT;
+        b_exit = VLC_TRUE;
     }
 
     /* Hack: remove the help module here */
@@ -393,6 +368,13 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     config_Free( p_help_module );
     vlc_object_destroy( p_help_module );
     /* End hack */
+
+    if( b_exit )
+    {
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
+        return VLC_EEXIT;
+    }
 
     /*
      * Override default configuration with config file settings
@@ -615,145 +597,10 @@ vlc_error_t vlc_add_intf_r( vlc_t *p_vlc, const char *psz_module,
 }
 
 /*****************************************************************************
- * vlc_stop: stop playing.
+ * vlc_destroy: stop playing and destroy everything.
  *****************************************************************************
- * This function requests the interface threads to finish, waits for their
+ * This function requests the running threads to finish, waits for their
  * termination, and destroys their structure.
- *****************************************************************************/
-vlc_error_t vlc_stop( void )
-{
-    return vlc_stop_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
-}
-
-vlc_error_t vlc_stop_r( vlc_t *p_vlc )
-{
-    intf_thread_t *p_intf;
-    playlist_t    *p_playlist;
-    vout_thread_t *p_vout;
-    aout_instance_t *p_aout;
-
-    /* Check that the handle is valid */
-    if( !p_vlc || p_vlc->i_status != VLC_STATUS_RUNNING )
-    {
-        fprintf( stderr, "error: invalid status (!RUNNING)\n" );
-        return VLC_ESTATUS;
-    }
-
-    /*
-     * Ask the interfaces to stop and destroy them
-     */
-    msg_Dbg( p_vlc, "removing all interfaces" );
-    while( (p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_CHILD )) )
-    {
-        intf_StopThread( p_intf );
-        vlc_object_detach( p_intf );
-        vlc_object_release( p_intf );
-        intf_Destroy( p_intf );
-    }
-
-    /*
-     * Free playlists
-     */
-    msg_Dbg( p_vlc, "removing all playlists" );
-    while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
-                                          FIND_CHILD )) )
-    {
-        vlc_object_detach( p_playlist );
-        vlc_object_release( p_playlist );
-        playlist_Destroy( p_playlist );
-    }
-
-    /*
-     * Free video outputs
-     */
-    msg_Dbg( p_vlc, "removing all video outputs" );
-    while( (p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
-    {
-        vlc_object_detach( p_vout );
-        vlc_object_release( p_vout );
-        vout_DestroyThread( p_vout );
-    }
-
-    /*
-     * Free audio outputs
-     */
-    msg_Dbg( p_vlc, "removing all audio outputs" );
-    while( (p_aout = vlc_object_find( p_vlc, VLC_OBJECT_AOUT, FIND_CHILD )) )
-    {
-        vlc_object_detach( (vlc_object_t *)p_aout );
-        vlc_object_release( (vlc_object_t *)p_aout );
-        aout_DeleteInstance( p_aout );
-    }
-
-    /* Update the handle status */
-    p_vlc->i_status = VLC_STATUS_STOPPED;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * vlc_end: uninitialize everything.
- *****************************************************************************
- * This function uninitializes every vlc component that was activated in
- * vlc_init: audio and video outputs, playlist, module bank and message queue.
- *****************************************************************************/
-vlc_error_t vlc_end( void )
-{
-    return vlc_end_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
-}
-
-vlc_error_t vlc_end_r( vlc_t *p_vlc )
-{
-    /* Check that the handle is valid */
-    if( !p_vlc || p_vlc->i_status != VLC_STATUS_STOPPED )
-    {
-        fprintf( stderr, "error: invalid status (!STOPPED)\n" );
-        return VLC_ESTATUS;
-    }
-
-    /*
-     * Go back into channel 0 which is the network
-     */
-    if( config_GetInt( p_vlc, "network-channel" ) && p_vlc->p_channel )
-    {
-        network_ChannelJoin( p_vlc, COMMON_CHANNEL );
-    }
-
-    /*
-     * Free allocated memory
-     */
-    if( p_vlc->p_memcpy_module != NULL )
-    {
-        module_Unneed( p_vlc, p_vlc->p_memcpy_module );
-    }
-
-    free( p_vlc->psz_homedir );
-
-    /*
-     * Free module bank
-     */
-    module_EndBank( p_vlc );
-
-    /*
-     * System specific cleaning code
-     */
-    system_End( p_vlc );
-
-    /*
-     * Terminate messages interface and program
-     */
-    msg_Destroy( p_vlc );
-
-    /* Update the handle status */
-    p_vlc->i_status = VLC_STATUS_CREATED;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * vlc_destroy: free allocated resources.
- *****************************************************************************
- * This function frees the previously allocated vlc_t structure.
  *****************************************************************************/
 vlc_error_t vlc_destroy( void )
 {
@@ -762,13 +609,114 @@ vlc_error_t vlc_destroy( void )
 
 vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
 {
-    int i_index;
+    int               i_index;
+    intf_thread_t *   p_intf;
+    playlist_t    *   p_playlist;
+    vout_thread_t *   p_vout;
+    aout_instance_t * p_aout;
 
     /* Check that the handle is valid */
-    if( !p_vlc || p_vlc->i_status != VLC_STATUS_CREATED )
+    if( !p_vlc || (p_vlc->i_status != VLC_STATUS_RUNNING
+                    && p_vlc->i_status != VLC_STATUS_STOPPED
+                    && p_vlc->i_status != VLC_STATUS_CREATED) )
     {
-        fprintf( stderr, "error: invalid status (!CREATED)\n" );
+        fprintf( stderr, "error: invalid status "
+                         "(!RUNNING&&!STOPPED&&!CREATED)\n" );
         return VLC_ESTATUS;
+    }
+
+    if( p_vlc->i_status == VLC_STATUS_RUNNING )
+    {
+        /*
+         * Ask the interfaces to stop and destroy them
+         */
+        msg_Dbg( p_vlc, "removing all interfaces" );
+        while( (p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF,
+                                                 FIND_CHILD )) )
+        {
+            intf_StopThread( p_intf );
+            vlc_object_detach( p_intf );
+            vlc_object_release( p_intf );
+            intf_Destroy( p_intf );
+        }
+
+        /*
+         * Free playlists
+         */
+        msg_Dbg( p_vlc, "removing all playlists" );
+        while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
+                                              FIND_CHILD )) )
+        {
+            vlc_object_detach( p_playlist );
+            vlc_object_release( p_playlist );
+            playlist_Destroy( p_playlist );
+        }
+
+        /*
+         * Free video outputs
+         */
+        msg_Dbg( p_vlc, "removing all video outputs" );
+        while( (p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT,
+                                                 FIND_CHILD )) )
+        {
+            vlc_object_detach( p_vout );
+            vlc_object_release( p_vout );
+            vout_DestroyThread( p_vout );
+        }
+
+        /*
+         * Free audio outputs
+         */
+        msg_Dbg( p_vlc, "removing all audio outputs" );
+        while( (p_aout = vlc_object_find( p_vlc, VLC_OBJECT_AOUT,
+                                                 FIND_CHILD )) )
+        {
+            vlc_object_detach( (vlc_object_t *)p_aout );
+            vlc_object_release( (vlc_object_t *)p_aout );
+            aout_DeleteInstance( p_aout );
+        }
+
+        /* Update the handle status */
+        p_vlc->i_status = VLC_STATUS_STOPPED;
+    }
+
+    if( p_vlc->i_status == VLC_STATUS_STOPPED )
+    {
+        /*
+         * Go back into channel 0 which is the network
+         */
+        if( config_GetInt( p_vlc, "network-channel" ) && p_vlc->p_channel )
+        {
+            network_ChannelJoin( p_vlc, COMMON_CHANNEL );
+        }
+    
+        /*
+         * Free allocated memory
+         */
+        if( p_vlc->p_memcpy_module != NULL )
+        {
+            module_Unneed( p_vlc, p_vlc->p_memcpy_module );
+        }
+    
+        free( p_vlc->psz_homedir );
+    
+        /*
+         * Free module bank
+         */
+        module_EndBank( p_vlc );
+    
+        /*
+         * System specific cleaning code
+         */
+        system_End( p_vlc );
+    
+        /*
+         * Terminate messages interface and program
+         */
+        msg_Destroy( p_vlc );
+
+        /* Update the handle status */
+        p_vlc->i_status = VLC_STATUS_CREATED;
     }
 
     /* Update the handle status, just in case */
@@ -913,6 +861,108 @@ vlc_error_t vlc_add_target_r( vlc_t *p_vlc, const char *psz_target,
     return err;
 }
 
+/*****************************************************************************
+ * vlc_set: set a vlc variable
+ *****************************************************************************
+ *
+ *****************************************************************************/
+vlc_error_t vlc_set( const char *psz_var, const char *psz_val )
+{
+    return vlc_set_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL, psz_var, psz_val );
+}
+
+vlc_error_t vlc_set_r( vlc_t *p_vlc, const char *psz_var, const char *psz_val )
+{
+    module_config_t *p_config;
+
+    if( !p_vlc )
+    {
+        fprintf( stderr, "error: invalid status\n" );
+        return VLC_ESTATUS;
+    }
+
+    p_config = config_FindConfig( VLC_OBJECT(p_vlc), psz_var );
+
+    if( !p_config )
+    {
+        msg_Err( p_vlc, "option %s does not exist", psz_var );
+        return VLC_EGENERIC;
+    }
+
+    vlc_mutex_lock( p_config->p_lock );
+
+    switch( p_config->i_type )
+    {
+    case CONFIG_ITEM_BOOL:
+        if( psz_val && *psz_val )
+        {
+            if( !strcmp( psz_val, "off" ) || !strcmp( psz_val, "no" ) )
+            {
+                p_config->i_value = VLC_FALSE;
+            }
+            else
+            {
+                p_config->i_value = atoi( psz_val );
+            }
+        }
+        else
+        {
+            p_config->i_value = VLC_TRUE;
+        }
+        break;
+    case CONFIG_ITEM_INTEGER:
+        if( psz_val && *psz_val )
+        {
+            p_config->i_value = atoi( psz_val );
+        }
+        else
+        {
+            p_config->i_value = 0;
+        }
+        break;
+    case CONFIG_ITEM_FLOAT:
+        if( psz_val && *psz_val )
+        {
+            p_config->f_value = (float)atof( psz_val );
+        }
+        else
+        {
+            p_config->f_value = 0.0;
+        }
+        break;
+    case CONFIG_ITEM_STRING:
+    case CONFIG_ITEM_FILE:
+    case CONFIG_ITEM_MODULE:
+    default:
+        if( p_config->psz_value )
+        {
+            free( p_config->psz_value );
+        }
+
+        if( psz_val )
+        {
+            p_config->psz_value = strdup( psz_val );
+        }
+        else
+        {
+            p_config->psz_value = NULL;
+        }
+        break;
+    }
+
+    if( p_config->pf_callback )
+    {
+        vlc_mutex_unlock( p_config->p_lock );
+        p_config->pf_callback( VLC_OBJECT(p_vlc) );
+    }
+    else
+    {
+        vlc_mutex_unlock( p_config->p_lock );
+    }
+
+    return VLC_SUCCESS;
+}
+
 /* following functions are local */
 
 /*****************************************************************************
@@ -977,8 +1027,7 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
          *pp_parser ;
          pp_parser++ )
     {
-        vlc_bool_t b_help_module =
-                       !strcmp( "help", (*pp_parser)->psz_object_name );
+        vlc_bool_t b_help_module;
 
         if( psz_module_name && strcmp( psz_module_name,
                                        (*pp_parser)->psz_object_name ) )
@@ -992,10 +1041,9 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
             continue;
         }
 
-        /* Print module name */
-        fprintf( stderr, _("%s module options:\n\n"),
-                         (*pp_parser)->psz_object_name );
+        b_help_module = !strcmp( "help", (*pp_parser)->psz_object_name );
 
+        /* Print module options */
         for( p_item = (*pp_parser)->p_config;
              p_item->i_type != CONFIG_HINT_END;
              p_item++ )
@@ -1049,7 +1097,7 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                 break;
             }
 
-            /* Add short option */
+            /* Add short option if any */
             if( p_item->i_short )
             {
                 psz_format[2] = '-';
@@ -1071,6 +1119,10 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                 if( p_item->i_type == CONFIG_ITEM_BOOL
                      && !b_help_module )
                 {
+                    /* If option is of type --foo-bar, we print its counterpart
+                     * as --no-foo-bar, but if it is of type --foobar (without
+                     * dashes in the name) we print it as --nofoobar. Both
+                     * values are of course valid, only the display changes. */
                     vlc_bool_t b_dash = VLC_FALSE;
                     psz_prefix = p_item->psz_name;
                     while( *psz_prefix )
@@ -1124,9 +1176,6 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                 }
             }
         }
-
-        fprintf( stderr, "\n" );
-
     }
 
     /* Release the module list */
@@ -1157,7 +1206,7 @@ static void ListModules( vlc_t *p_this )
 #endif
 
     /* Usage */
-    fprintf( stderr, _("Usage: %s [options] [parameters] [file]...\n\n"),
+    fprintf( stderr, _("Usage: %s [options] [parameters] [files]...\n\n"),
                      p_this->p_vlc->psz_object_name );
 
     fprintf( stderr, _("[module]              [description]\n") );

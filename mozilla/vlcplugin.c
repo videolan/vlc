@@ -2,7 +2,7 @@
  * vlcplugin.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.c,v 1.4 2002/08/08 22:28:23 sam Exp $
+ * $Id: vlcplugin.c,v 1.5 2002/08/20 18:08:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -137,10 +137,13 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         return NPERR_GENERIC_ERROR;
     }
 
+    vlc_set_r( This->p_vlc, "vout", "xvideo,x11,dummy" );
+    vlc_set_r( This->p_vlc, "intf", "dummy" );
+    vlc_set_r( This->p_vlc, "audio", 0 );
+
     i_ret = vlc_run_r( This->p_vlc );
     if( i_ret )
     {
-        vlc_end_r( This->p_vlc );
         vlc_destroy_r( This->p_vlc );
         This->p_vlc = NULL;
         return NPERR_GENERIC_ERROR;
@@ -159,7 +162,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         }
         else
         {
-            /*__config_PutPsz( This->psz_target, argn[i], argv[i] );*/
+            /*vlc_set_r( This->psz_target, argn[i], argv[i] );*/
         }
     }
 
@@ -179,8 +182,6 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
     if( This->p_vlc != NULL )
     {
-        vlc_stop_r( This->p_vlc );
-        vlc_end_r( This->p_vlc );
         vlc_destroy_r( This->p_vlc );
         This->p_vlc = NULL;
     }
@@ -211,8 +212,8 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 
     This = (PluginInstance*) instance->pdata;
 
-    __config_PutInt( This->p_vlc, "x11-drawable", window->window );
-    __config_PutInt( This->p_vlc, "xvideo-drawable", window->window );
+    vlc_set_r( This->p_vlc, "x11-drawable", window->window );
+    vlc_set_r( This->p_vlc, "xvideo-drawable", window->window );
     /*
      * PLUGIN DEVELOPERS:
      *	Before setting window to point to the

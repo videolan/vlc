@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.9 2002/08/19 11:13:44 sam Exp $
+ * $Id: vlc.h,v 1.10 2002/08/20 18:08:51 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,10 +41,12 @@ typedef int        vlc_status_t;
  * Error values
  *****************************************************************************/
 #define VLC_SUCCESS         -0                                   /* No error */
-#define VLC_EGENERIC        -1                              /* Generic error */
-#define VLC_ENOMEM          -2                          /* Not enough memory */
+#define VLC_ENOMEM          -1                          /* Not enough memory */
+#define VLC_EMODULE         -2                           /* Module not found */
 #define VLC_ESTATUS         -3                             /* Invalid status */
+#define VLC_ETHREAD         -4                     /* Could not spawn thread */
 #define VLC_EEXIT         -255                             /* Program exited */
+#define VLC_EGENERIC      -666                              /* Generic error */
 
 /*****************************************************************************
  * Booleans
@@ -115,10 +117,9 @@ vlc_error_t     vlc_create       ( void );
 vlc_error_t     vlc_init         ( int, char *[] );
 vlc_error_t     vlc_run          ( void );
 vlc_error_t     vlc_die          ( void );
-vlc_error_t     vlc_stop         ( void );
-vlc_error_t     vlc_end          ( void );
 vlc_error_t     vlc_destroy      ( void );
 
+vlc_error_t     vlc_set          ( const char *, const char * );
 vlc_error_t     vlc_add_intf     ( const char *, vlc_bool_t );
 vlc_error_t     vlc_add_target   ( const char *, int, int );
 
@@ -131,10 +132,9 @@ vlc_t *         vlc_create_r     ( void );
 vlc_error_t     vlc_init_r       ( vlc_t *, int, char *[] );
 vlc_error_t     vlc_run_r        ( vlc_t * );
 vlc_error_t     vlc_die_r        ( vlc_t * );
-vlc_error_t     vlc_stop_r       ( vlc_t * );
-vlc_error_t     vlc_end_r        ( vlc_t * );
 vlc_error_t     vlc_destroy_r    ( vlc_t * );
 
+vlc_error_t     vlc_set_r        ( vlc_t *, const char *, const char * );
 vlc_error_t     vlc_add_intf_r   ( vlc_t *, const char *, vlc_bool_t );
 vlc_error_t     vlc_add_target_r ( vlc_t *, const char *, int, int );
 

@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: gnome.c,v 1.2 2002/08/20 18:08:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -47,12 +47,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 static void Run          ( intf_thread_t * );
-static gint Manage       ( gpointer );
-
-/*****************************************************************************
- * Local variables (mutex-protected).
- *****************************************************************************/
-static void ** pp_global_data = NULL;
+static void Manage       ( intf_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -74,9 +69,7 @@ vlc_module_begin();
 #else
     int i = getenv( "DISPLAY" ) == NULL ? 15 : 100;
 #endif
-    pp_global_data = p_module->p_vlc->pp_global_data;
-    
-    add_category_hint( N_("Miscellaneous"), NULL );
+    add_category_hint( N_("GNOME"), NULL );
     add_bool( "gnome-tooltips", 1, GtkHideTooltips,
               TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT );
     add_bool( "gnome-toolbartext", 1, GtkHideToolbarText, TOOLBAR_TEXT,
@@ -91,49 +84,6 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * g_atexit: kludge to avoid the Gnome thread to segfault at exit
- *****************************************************************************
- * gtk_init() makes several calls to g_atexit() which calls atexit() to
- * register tidying callbacks to be called at program exit. Since the Gnome
- * plugin is likely to be unloaded at program exit, we have to export this
- * symbol to intercept the g_atexit() calls. Talk about crude hack.
- *****************************************************************************/
-void g_atexit( GVoidFunc func )
-{
-    intf_thread_t *p_intf;
-
-    int i_dummy;
-
-    if( pp_global_data == NULL )
-    {
-        atexit( func );
-        return;
-    }
-
-    p_intf = (intf_thread_t *)*pp_global_data;
-    if( p_intf == NULL )
-    {
-        return;
-    }
-
-    for( i_dummy = 0;
-         i_dummy < MAX_ATEXIT && p_intf->p_sys->pf_callback[i_dummy] != NULL;
-         i_dummy++ )
-    {
-        ;
-    }
-
-    if( i_dummy >= MAX_ATEXIT - 1 )
-    {
-        msg_Err( p_intf, "too many atexit() callbacks to register" );
-        return;
-    }
-
-    p_intf->p_sys->pf_callback[i_dummy]     = func;
-    p_intf->p_sys->pf_callback[i_dummy + 1] = NULL;
-}
-
-/*****************************************************************************
  * Open: initialize and create window
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
@@ -145,7 +95,14 @@ static int Open( vlc_object_t *p_this )
     if( p_intf->p_sys == NULL )
     {
         msg_Err( p_intf, "out of memory" );
-        return( 1 );
+        return VLC_ENOMEM;
+    }
+
+    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gnome" );
+    if( p_intf->p_sys->p_gtk_main == NULL )
+    {
+        free( p_intf->p_sys );
+        return VLC_EMODULE;
     }
 
     p_intf->pf_run = Run;
@@ -162,11 +119,9 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->i_playing = -1;
     p_intf->p_sys->b_slider_free = 1;
 
-    p_intf->p_sys->pf_callback[0] = NULL;
-
     p_intf->p_sys->i_part = 0;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -183,6 +138,8 @@ static void Close( vlc_object_t *p_this )
 
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
+    module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
+
     /* Destroy structure */
     free( p_intf->p_sys );
 }
@@ -197,12 +154,6 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    /* gnome_init needs to know the command line. We don't care, so we
-     * give it an empty one */
-    char *p_args[] = { "" };
-    int   i_args   = 1;
-    int   i_dummy;
-
     /* The data types we are allowed to receive */
     static GtkTargetEntry target_table[] =
     {
@@ -211,20 +162,14 @@ static void Run( intf_thread_t *p_intf )
         { "text/plain",    0, DROP_ACCEPT_TEXT_PLAIN }
     };
 
-    /* Initialize Gnome */
-
-    /* gnome_init will register stuff with g_atexit, so we need to take
-     * the global lock if we want to be able to intercept the calls */
-    vlc_mutex_lock( p_intf->p_vlc->p_global_lock );
-    *p_intf->p_vlc->pp_global_data = p_intf;
-    gnome_init( p_intf->p_vlc->psz_object_name, VERSION, i_args, p_args );
-    vlc_mutex_unlock( p_intf->p_vlc->p_global_lock );
+    gdk_threads_enter();
 
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window( );
     p_intf->p_sys->p_popup = create_intf_popup( );
     p_intf->p_sys->p_playwin = create_intf_playlist();
     p_intf->p_sys->p_messages = create_intf_messages();
+    p_intf->p_sys->p_tooltips = gtk_tooltips_new();
 
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -267,8 +212,6 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->f_adj_oldvalue = 0;
     #undef P_SLIDER
 
-    p_intf->p_sys->p_tooltips = gtk_tooltips_new();
-
     /* We don't create these ones yet because we perhaps won't need them */
     p_intf->p_sys->p_about = NULL;
     p_intf->p_sys->p_modules = NULL;
@@ -308,26 +251,25 @@ static void Run( intf_thread_t *p_intf )
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
 
-    /* Sleep to avoid using all CPU - since some interfaces needs to access
-     * keyboard events, a 100ms delay is a good compromise */
-    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, Manage, p_intf );
+    while( !p_intf->b_die )
+    {
+        Manage( p_intf );
 
-    /* Enter gnome mode */
-    gtk_main();
-
-    /* Remove the timeout */
-    gtk_timeout_remove( i_dummy );
+        /* Sleep to avoid using all CPU - since some interfaces need to
+         * access keyboard events, a 100ms delay is a good compromise */
+        gdk_threads_leave();
+        msleep( INTF_IDLE_SLEEP );
+        gdk_threads_enter();
+    }
 
     /* Destroy the Tooltips structure */
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_tooltips) );
+    gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_messages) );
+    gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_playwin) );
+    gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_popup) );
+    gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
 
-    /* Get rid of stored callbacks so we can unload the plugin */
-    for( i_dummy = 0;
-         i_dummy < MAX_ATEXIT && p_intf->p_sys->pf_callback[i_dummy] != NULL;
-         i_dummy++ )
-    {
-        p_intf->p_sys->pf_callback[i_dummy]();
-    }
+    gdk_threads_leave();
 }
 
 /* following functions are local */
@@ -338,9 +280,8 @@ static void Run( intf_thread_t *p_intf )
  * In this function, called approx. 10 times a second, we check what the
  * main program wanted to tell us.
  *****************************************************************************/
-static gint Manage( gpointer p_data )
+static void Manage( intf_thread_t *p_intf )
 {
-#define p_intf ((intf_thread_t *)p_data)
     int i_start, i_stop;
 
     vlc_mutex_lock( &p_intf->change_lock );
@@ -492,21 +433,8 @@ static gint Manage( gpointer p_data )
         p_intf->p_sys->b_playing = 0;
     }
 
-    if( p_intf->b_die )
-    {
-        vlc_mutex_unlock( &p_intf->change_lock );
-
-        /* Prepare to die, young Skywalker */
-        gtk_main_quit();
-
-        /* Just in case */
-        return( FALSE );
-    }
-
     vlc_mutex_unlock( &p_intf->change_lock );
 
-    return( TRUE );
-
-#undef p_intf
+    return;
 }
 

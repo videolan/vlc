@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.3 2002/08/14 08:17:24 sam Exp $
+ * $Id: rc.c,v 1.4 2002/08/20 18:08:51 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -30,6 +30,7 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>
 #include <ctype.h>
+#include <signal.h>
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
@@ -59,7 +60,12 @@ static void Run          ( intf_thread_t *p_intf );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define POS_TEXT N_("show stream position")
+#define POS_LONGTEXT N_("Show the current position in seconds within the stream from time to time.")
+
 vlc_module_begin();
+    add_category_hint( N_("Remote control"), NULL );
+    add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT );
     set_description( _("remote control interface module") );
     set_capability( "interface", 20 );
     set_callbacks( Activate, NULL );
@@ -107,9 +113,11 @@ static int Activate( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     input_thread_t * p_input;
+    playlist_t *     p_playlist;
 
     char       p_buffer[ MAX_LINE_LENGTH + 1 ];
     vlc_bool_t b_complete = 0;
+    vlc_bool_t b_showpos = config_GetInt( p_intf, "rc-show-pos" );
     input_info_category_t * p_category;
     input_info_t * p_info;
 
@@ -120,12 +128,9 @@ static void Run( intf_thread_t *p_intf )
     struct timeval tv;                                   /* how long to wait */
 
     double     f_ratio = 1;
-    char       psz_dashes[81];
 
-    memset(psz_dashes, '-', 80);
-    psz_dashes[80] = '\0';
-    
     p_input = NULL;
+    p_playlist = NULL;
 
     while( !p_intf->b_die )
     {
@@ -163,8 +168,21 @@ static void Run( intf_thread_t *p_intf )
         /* Manage the input part */
         if( p_input == NULL )
         {
-            p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                               FIND_ANYWHERE );
+            if( p_playlist )
+            {
+                p_input = vlc_object_find( p_playlist, VLC_OBJECT_INPUT,
+                                                       FIND_CHILD );
+            }
+            else
+            {
+                p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                   FIND_ANYWHERE );
+                if( p_input )
+                {
+                    p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                                           FIND_PARENT );
+                }
+            }
         }
         else if( p_input->b_dead )
         {
@@ -172,7 +190,7 @@ static void Run( intf_thread_t *p_intf )
             p_input = NULL;
         }
 
-        if( p_input )
+        if( p_input && b_showpos )
         {
             /* Get position */
             vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -197,40 +215,114 @@ static void Run( intf_thread_t *p_intf )
         if( b_complete == 1 )
         {
             char *p_cmd = p_buffer;
+            //char *p_tmp;
 
-            switch( p_cmd[0] )
+            if( !strcmp( p_cmd, "quit" ) )
+            {
+                p_intf->p_vlc->b_die = VLC_TRUE;
+            }
+            else if( !strcmp( p_cmd, "segfault" ) )
+            {
+                raise( SIGSEGV );
+            }
+            else if( !strcmp( p_cmd, "prev" ) )
+            {
+                if( p_playlist ) playlist_Prev( p_playlist );
+            }
+            else if( !strcmp( p_cmd, "next" ) )
+            {
+                if( p_playlist ) playlist_Next( p_playlist );
+            }
+            else if( !strcmp( p_cmd, "play" ) )
+            {
+                if( p_playlist ) playlist_Play( p_playlist );
+            }
+            else if( !strcmp( p_cmd, "stop" ) )
+            {
+                if( p_playlist ) playlist_Stop( p_playlist );
+            }
+            else if( !strcmp( p_cmd, "pause" ) )
+            {
+                if( p_input ) input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+            }
+            else if( !strcmp( p_cmd, "tree" ) )
+            {
+                vlc_dumpstructure( p_intf->p_vlc );
+            }
+            else if( !strcmp( p_cmd, "list" ) )
+            {
+                vlc_liststructure( p_intf->p_vlc );
+            }
+            else if( !strncmp( p_cmd, "set ", 4 ) )
+            {
+#if 0
+//                vlc_set_r( p_intf->p_vlc, p_cmd + 4, strstr( p_cmd + 4, " " ) );
+                p_tmp = strstr( p_cmd + 4, " " );
+                p_tmp[0] = '\0';
+                config_PutPsz( p_intf->p_vlc, p_cmd + 4, p_tmp + 1 );
+                config_PutInt( p_intf->p_vlc, p_cmd + 4, atoi(p_tmp + 1) );
+#endif
+            }
+            else if( !strncmp( p_cmd, "intf ", 5 ) )
+            {
+                intf_thread_t *p_newintf;
+                char *psz_oldmodule = config_GetPsz( p_intf->p_vlc, "intf" );
+
+                config_PutPsz( p_intf->p_vlc, "intf", p_cmd + 5 );
+                p_newintf = intf_Create( p_intf->p_vlc );
+                config_PutPsz( p_intf->p_vlc, "intf", psz_oldmodule );
+
+                if( psz_oldmodule )
+                {
+                    free( psz_oldmodule );
+                }
+
+                if( p_newintf )
+                {
+                    p_newintf->b_block = VLC_FALSE;
+                    if( intf_RunThread( p_newintf ) )
+                    {
+                        vlc_object_detach( p_newintf );
+                        intf_Destroy( p_newintf );
+                    }
+                }
+            }
+            else if( !strcmp( p_cmd, "info" ) )
+            {
+                if ( p_input )
+                {
+                    vlc_mutex_lock( &p_input->stream.stream_lock );
+                    p_category = p_input->stream.p_info;
+                    while ( p_category )
+                    {
+                        printf( "+----[ %s ]\n", p_category->psz_name );
+                        printf( "| \n" );
+                        p_info = p_category->p_info;
+                        while ( p_info )
+                        {
+                            printf( "| %s: %s\n", p_info->psz_name,
+                                    p_info->psz_value );
+                            p_info = p_info->p_next;
+                        }
+                        p_category = p_category->p_next;
+                        printf( "| \n" );
+                    }
+                    printf( "+----[ end of stream info ]\n" );
+                    vlc_mutex_unlock( &p_input->stream.stream_lock );
+                }
+                else
+                {
+                    printf( "no input\n" );
+                }
+            }
+            else switch( p_cmd[0] )
             {
             case 'a':
             case 'A':
-                if( p_cmd[1] == ' ' )
+                if( p_cmd[1] == ' ' && p_playlist )
                 {
-                    playlist_t *p_playlist;
-                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                          FIND_ANYWHERE );
-                    if( p_playlist )
-                    {
-                        playlist_Add( p_playlist, p_cmd + 2,
-                                PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-                        vlc_object_release( p_playlist );
-                    }
-                }
-                break;
-
-            case 'l':
-            case 'L':
-                vlc_liststructure( p_intf->p_vlc );
-                break;
-
-            case 'd':
-            case 'D':
-                vlc_dumpstructure( p_intf->p_vlc );
-                break;
-
-            case 'p':
-            case 'P':
-                if( p_input )
-                {
-                    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+                    playlist_Add( p_playlist, p_cmd + 2,
+                                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
                 }
                 break;
 
@@ -255,11 +347,6 @@ static void Run( intf_thread_t *p_intf )
                 ;
                 break;
 
-            case 'q':
-            case 'Q':
-                p_intf->p_vlc->b_die = VLC_TRUE;
-                break;
-
             case 'r':
             case 'R':
                 if( p_input )
@@ -282,50 +369,29 @@ static void Run( intf_thread_t *p_intf )
             case '?':
             case 'h':
             case 'H':
-                printf( "help for remote control commands\n" );
-                printf( "h . . . . . . . . . . . . . . . . . . . . . help\n" );
-                printf( "a XYZ . . . . . . . . . . append XYZ to playlist\n" );
-                printf( "p . . . . . . . . . . . . . . . . . toggle pause\n" );
-                printf( "f . . . . . . . . . . . . . . toggle  fullscreen\n" );
-                printf( "r X . . . seek in seconds,  for instance `r 3.5'\n" );
-                printf( "q . . . . . . . . . . . . . . . . . . . . . quit\n" );
-                printf( "end of help\n" );
-                break;
-            case 'i':
-            case 'I':
-                if ( p_input ) {
-                    printf( "Dumping stream info\n" );
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
-                    p_category = p_input->stream.p_info;
-                    while ( p_category )
-                    {
-                        psz_dashes[72 - strlen(p_category->psz_name) ] = '\0';
-                        printf( "+--| %s |%s+\n", p_category->psz_name, psz_dashes);
-                        psz_dashes[72 - strlen(p_category->psz_name) ] = '-';
-                        p_info = p_category->p_info;
-                        while ( p_info )
-                        {
-                            printf( "| %s: %s\n", p_info->psz_name,
-                                    p_info->psz_value );
-                            p_info = p_info->p_next;
-                        }
-                        printf("|\n");
-                        p_category = p_category->p_next;
-                    }
-                    psz_dashes[78] = '\0';
-                    printf( "+%s+\n", psz_dashes );
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
-                }
-                else
-                {
-                    printf( "no input" );
-                }
+                printf("+----[ remote control commands ]\n");
+                printf("| \n");
+                printf("| a XYZ  . . . . . . . . . . . add XYZ to playlist\n");
+                printf("| play . . . . . . . . . . . . . . . . play stream\n");
+                printf("| stop . . . . . . . . . . . . . . . . stop stream\n");
+                printf("| next . . . . . . . . . . . .  next playlist item\n");
+                printf("| prev . . . . . . . . . .  previous playlist item\n");
+                printf("| \n");
+                printf("| r X  . . . seek in seconds, for instance `r 3.5'\n");
+                printf("| pause  . . . . . . . . . . . . . .  toggle pause\n");
+                printf("| f  . . . . . . . . . . . . . . toggle fullscreen\n");
+                printf("| info . . .  information about the current stream\n");
+                printf("| \n");
+                printf("| help . . . . . . . . . . . . . this help message\n");
+                printf("| quit . . . . . . . . . . . . . . . . .  quit vlc\n");
+                printf("| \n");
+                printf("+----[ end of help ]\n");
                 break;
             case '\0':
                 /* Ignore empty lines */
                 break;
             default:
-                printf( "unknown command `%s'\n", p_cmd );
+                printf( "unknown command `%s', type `help' for help\n", p_cmd );
                 break;
             }
         }
@@ -337,6 +403,12 @@ static void Run( intf_thread_t *p_intf )
     {
         vlc_object_release( p_input );
         p_input = NULL;
+
+        if( p_playlist )
+        {
+            vlc_object_release( p_playlist );
+            p_playlist = NULL;
+        }
     }
 }
 
