@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.32 2002/06/01 12:32:01 sam Exp $
+ * $Id: input_ext-dec.c,v 1.33 2002/07/24 15:21:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -98,6 +98,9 @@ void DecoderError( decoder_fifo_t * p_fifo )
         input_DeletePES( p_fifo->p_packets_mgt, p_fifo->p_first );
         p_fifo->p_first = NULL;
         p_fifo->pp_last = &p_fifo->p_first;
+
+        /* If the input is waiting for us, tell him to stop */
+        vlc_cond_signal( &p_fifo->data_wait );
 
         /* Waiting for the input thread to put new PES packets in the fifo */
         vlc_cond_wait (&p_fifo->data_wait, &p_fifo->data_lock);

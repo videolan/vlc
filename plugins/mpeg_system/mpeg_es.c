@@ -2,7 +2,7 @@
  * mpeg_es.c : Elementary Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_es.c,v 1.10 2002/07/23 00:39:17 sam Exp $
+ * $Id: mpeg_es.c,v 1.11 2002/07/24 15:21:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -172,12 +172,17 @@ static int ESDemux( input_thread_t * p_input )
         p_input->stream.p_selected_program->pp_es[0]->p_decoder_fifo;
     pes_packet_t *  p_pes;
     data_packet_t * p_data;
-   
+
+    if( p_fifo == NULL )
+    {
+        return -1;
+    }
+
     i_read = input_SplitBuffer( p_input, &p_data, ES_PACKET_SIZE );
 
     if ( i_read <= 0 )
     {
-        return( i_read );
+        return i_read;
     }
 
     p_pes = input_NewPES( p_input->p_method_data );
@@ -186,7 +191,7 @@ static int ESDemux( input_thread_t * p_input )
     {
         msg_Err( p_input, "out of memory" );
         input_DeletePacket( p_input->p_method_data, p_data );
-        return( -1 );
+        return -1;
     }
 
     p_pes->i_rate = p_input->stream.control.i_rate;
@@ -194,6 +199,10 @@ static int ESDemux( input_thread_t * p_input )
     p_pes->i_nb_data = 1;
 
     vlc_mutex_lock( &p_fifo->data_lock );
+
+    /* If the decoder is waiting for us, wake him up */
+    vlc_cond_signal( &p_fifo->data_wait );
+
     if( p_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
     {
         /* Wait for the decoder. */
@@ -213,6 +222,6 @@ static int ESDemux( input_thread_t * p_input )
 
     input_DecodePES( p_fifo, p_pes );
 
-    return( 1 );
+    return 1;
 }
 
