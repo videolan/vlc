@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.3 2003/03/19 18:14:48 karibu Exp $
+ * $Id: window.cpp,v 1.4 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -226,6 +226,14 @@ bool Window::ProcessEvent( Event *evt )
 
         case WINDOW_HIDE:
             Hide();
+            return true;
+
+        case WINDOW_LEAVE:
+            MouseMove( -1, -1, 0 );
+            return true;
+
+        case WINDOW_REFRESH:
+            RefreshAll();
             return true;
 
         default:

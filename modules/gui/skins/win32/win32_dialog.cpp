@@ -2,7 +2,7 @@
  * win32_dialog.cpp: Win32 implementation of some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_dialog.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: win32_dialog.cpp,v 1.2 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -26,6 +26,7 @@
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
+extern intf_thread_t *g_pIntf;
 
 //--- WIN32 -----------------------------------------------------------------
 #define _WIN32_IE 0x0400    // Yes, i think it's a fucking kludge !
@@ -39,6 +40,8 @@
 #include "dialog.h"
 #include "os_dialog.h"
 #include "skin_common.h"
+#include "window.h"
+#include "os_window.h"
 #include "theme.h"
 #include "os_theme.h"
 #include "event.h"
@@ -48,8 +51,8 @@
 //---------------------------------------------------------------------------
 // Open file dialog box
 //---------------------------------------------------------------------------
-Win32OpenFileDialog::Win32OpenFileDialog( string title, bool multiselect ) :
-    OpenFileDialog( title, multiselect )
+Win32OpenFileDialog::Win32OpenFileDialog( intf_thread_t *_p_intf, string title,
+    bool multiselect ) : OpenFileDialog( _p_intf, title, multiselect )
 {
 }
 //---------------------------------------------------------------------------
@@ -103,9 +106,33 @@ bool Win32OpenFileDialog::Open()
     OpenFile.lpstrTitle  = Title.c_str();
     OpenFile.lpstrFilter = Filter;
 
+    // Remove mouse tracking event to avoid non process due to modal open box
+    if( p_intf != NULL && p_intf->p_sys->p_theme != NULL )
+    {
+        TRACKMOUSEEVENT TrackEvent;
+        TrackEvent.cbSize      = sizeof( TRACKMOUSEEVENT );
+        TrackEvent.dwFlags     = TME_LEAVE|TME_CANCEL;
+        TrackEvent.dwHoverTime = 1;
+
+        list<Window *>::const_iterator win;
+        for( win = g_pIntf->p_sys->p_theme->WindowList.begin();
+            win != g_pIntf->p_sys->p_theme->WindowList.end(); win++ )
+        {
+            TrackEvent.hwndTrack   = ( (Win32Window *)(*win) )->GetHandle();
+            TrackMouseEvent( &TrackEvent );
+        }
+    }
+
     // Show dialog box
     if( !GetOpenFileName( &OpenFile ) )
+    {
+        OSAPI_PostMessage( NULL, WINDOW_LEAVE, 0, 0 );
         return false;
+    }
+
+    // Tell windows that mouse cursor has left window because it has been
+    // unactivated
+    OSAPI_PostMessage( NULL, WINDOW_LEAVE, 0, 0 );
 
     // Find files in string result
     char * File = OpenFile.lpstrFile;

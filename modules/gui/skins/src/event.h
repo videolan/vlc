@@ -2,7 +2,7 @@
  * event.h: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: event.h,v 1.2 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -94,6 +94,8 @@ using namespace std;
 #define WINDOW_SHOW         (VLC_WINDOW + 4)
 #define WINDOW_HIDE         (VLC_WINDOW + 5)
 #define WINDOW_FADE         (VLC_WINDOW + 6)
+#define WINDOW_LEAVE        (VLC_WINDOW + 7)
+#define WINDOW_REFRESH      (VLC_WINDOW + 8)
 
 // Control event
 #define CTRL_ENABLED        (VLC_CONTROL + 1)

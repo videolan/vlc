@@ -2,7 +2,7 @@
  * win32_window.cpp: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.2 2003/03/19 02:09:56 videolan Exp $
+ * $Id: win32_window.cpp,v 1.3 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -197,7 +197,7 @@ bool Win32Window::ProcessOSEvent( Event *evt )
             return true;
 
         case WM_MOUSELEAVE:
-            MouseMove( -1, -1, 0 );
+            OSAPI_PostMessage( this, WINDOW_LEAVE, 0, 0 );
             return true;
 
         default:

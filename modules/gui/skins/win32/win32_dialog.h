@@ -2,7 +2,7 @@
  * win32_dialog.h: Win32 implementation of some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_dialog.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: win32_dialog.h,v 1.2 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -42,7 +42,8 @@ class Win32OpenFileDialog : OpenFileDialog
 
     public:
         // Constructors
-        Win32OpenFileDialog( string title, bool multiselect );
+        Win32OpenFileDialog( intf_thread_t *_p_intf, string title,
+                             bool multiselect );
 
         // Destructors
         virtual ~Win32OpenFileDialog();

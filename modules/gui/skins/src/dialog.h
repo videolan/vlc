@@ -2,7 +2,7 @@
  * dialog.h: Classes for some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialog.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: dialog.h,v 1.2 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -47,9 +47,12 @@ class OpenFileDialog
         string Title;
         bool   MultiSelect;
 
+        intf_thread_t *p_intf;
+
     public:
         // Constructors
-        OpenFileDialog( string title, bool multiselect );
+        OpenFileDialog( intf_thread_t *_p_intf, string title,
+                        bool multiselect );
 
         // Destructors
         virtual ~OpenFileDialog();

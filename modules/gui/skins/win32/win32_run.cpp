@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.2 2003/03/19 17:14:50 karibu Exp $
+ * $Id: win32_run.cpp,v 1.3 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -83,6 +83,7 @@ void OSRun( intf_thread_t *p_intf )
     // Compute windows message list
     while( GetMessage( &msg, NULL, 0, 0 ) )
     {
+
         // Translate keys
         TranslateMessage( &msg );
 

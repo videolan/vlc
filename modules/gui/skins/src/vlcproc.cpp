@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.2 2003/03/19 18:14:48 karibu Exp $
+ * $Id: vlcproc.cpp,v 1.3 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -313,7 +313,7 @@ void VlcProc::LoadSkin()
     {
         // Initialize file structure
         OpenFileDialog *OpenFile;
-        OpenFile = (OpenFileDialog *)new OSOpenFileDialog(
+        OpenFile = (OpenFileDialog *)new OSOpenFileDialog( p_intf,
             _("Change skin - Open new file"), false );
         OpenFile->AddFilter( _("Skin files"), "*.vlt" );
         OpenFile->AddFilter( _("Skin files"), "*.xml" );
@@ -379,13 +379,13 @@ void VlcProc::OpenFile( bool play )
     OpenFileDialog *OpenFile;
     if( play )
     {
-        OpenFile = (OpenFileDialog *)new OSOpenFileDialog( _("Open file"),
-                                                           false );
+        OpenFile = (OpenFileDialog *)new OSOpenFileDialog( p_intf,
+            _("Open file"), false );
     }
     else
     {
-        OpenFile = (OpenFileDialog *)new OSOpenFileDialog( _("Add file"),
-                                                           true );
+        OpenFile = (OpenFileDialog *)new OSOpenFileDialog( p_intf,
+            _("Add file"), true );
     }
     OpenFile->AddFilter( _("All files"), "*.*" );
 

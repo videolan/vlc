@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.3 2003/03/19 17:14:50 karibu Exp $
+ * $Id: button.cpp,v 1.4 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -36,8 +36,6 @@
 #include "theme.h"
 #include "window.h"
 #include "skin_common.h"
-
-
 
 //---------------------------------------------------------------------------
 // Control Button
@@ -184,7 +182,9 @@ bool ControlButton::MouseMove( int x, int y, int button )
         }
 
         if( MouseOverActionName != "none" )
+        {
             MouseOverAction->SendEvent();
+        }
 
         CursorIn = true;
         return true;
@@ -199,7 +199,9 @@ bool ControlButton::MouseMove( int x, int y, int button )
         }
 
         if( MouseOutActionName != "none" )
+        {
             MouseOutAction->SendEvent();
+        }
 
         CursorIn = false;
         return true;

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.2 2003/03/19 03:11:14 karibu Exp $
+ * $Id: skin_main.cpp,v 1.3 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -158,8 +158,8 @@ static void Run( intf_thread_t *p_intf )
 
             // Initialize file structure
             OpenFileDialog *OpenFile;
-            OpenFile = (OpenFileDialog *)new OSOpenFileDialog( _("Open skin"),
-                false );
+            OpenFile = (OpenFileDialog *)new OSOpenFileDialog( NULL,
+                _("Open skin"), false );
             OpenFile->AddFilter( _("Skin files"), "*.vlt" );
             OpenFile->AddFilter( _("Skin files"), "*.xml" );
             OpenFile->AddFilter( _("All files"), "*.*" );

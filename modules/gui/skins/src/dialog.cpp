@@ -2,7 +2,7 @@
  * dialog.cpp: Classes for some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialog.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: dialog.cpp,v 1.2 2003/03/20 09:29:07 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -35,8 +35,10 @@
 //---------------------------------------------------------------------------
 // Open file dialog box
 //---------------------------------------------------------------------------
-OpenFileDialog::OpenFileDialog( string title, bool multiselect )
+OpenFileDialog::OpenFileDialog( intf_thread_t *_p_intf, string title,
+    bool multiselect )
 {
+    p_intf       = _p_intf;
     MultiSelect  = multiselect;
     Title        = title;
     Filter       = new char[200];
