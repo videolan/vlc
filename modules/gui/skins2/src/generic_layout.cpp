@@ -121,10 +121,21 @@ const list<LayeredControl> &GenericLayout::getControlList() const
 }
 
 
-void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl )
+void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl,
+                                     int width, int height )
 {
-    // TODO: refresh only the needed area if possible
-    refreshAll();
+    // The size was not specified (or invalid)
+    if( width <= 0 || height <= 0 )
+    {
+        refreshAll();
+        return;
+    }
+
+    const Position *pPos = rCtrl.getPosition();
+    if( pPos )
+    {
+        refreshRect( pPos->getLeft(), pPos->getTop(), width, height );
+    }
 }
 
 
@@ -178,6 +189,12 @@ void GenericLayout::resize( int width, int height )
 
 void GenericLayout::refreshAll()
 {
+    refreshRect( 0, 0, m_width, m_height );
+}
+
+
+void GenericLayout::refreshRect( int x, int y, int width, int height )
+{
     // Draw all the controls of the layout
     list<LayeredControl>::const_iterator iter;
     for( iter = m_controlList.begin(); iter != m_controlList.end(); iter++ )
@@ -194,7 +211,17 @@ void GenericLayout::refreshAll()
     TopWindow *pWindow = getWindow();
     if( pWindow )
     {
-        pWindow->refresh( 0, 0, m_width, m_height );
+        // Check boundaries
+        if( x < 0 )
+            x = 0;
+        if( y < 0)
+            y = 0;
+        if( x + width > m_width )
+            width = m_width - x;
+        if( y + height > m_height )
+            height = m_height - y;
+
+        pWindow->refresh( x, y, width, height );
     }
 }
 

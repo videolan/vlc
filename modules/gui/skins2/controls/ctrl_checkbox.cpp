@@ -177,8 +177,9 @@ void CtrlCheckbox::transUpOverDownOver( SkinObject *pCtrl )
 {
     CtrlCheckbox *pThis = (CtrlCheckbox*)pCtrl;
     pThis->captureMouse();
+    const OSGraphics *pOldImg = pThis->m_pImgCurrent;
     pThis->m_pImgCurrent = pThis->m_pImgDown;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImgCurrent );
 }
 
 
@@ -188,8 +189,9 @@ void CtrlCheckbox::transDownOverUpOver( SkinObject *pCtrl )
     pThis->releaseMouse();
 
     // Invert the state variable
+    const OSGraphics *pOldImg = pThis->m_pImgCurrent;
     pThis->m_pImgCurrent = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImgCurrent );
 
     // Execute the command
     pThis->m_pCommand->execute();
@@ -199,32 +201,36 @@ void CtrlCheckbox::transDownOverUpOver( SkinObject *pCtrl )
 void CtrlCheckbox::transDownOverDown( SkinObject *pCtrl )
 {
     CtrlCheckbox *pThis = (CtrlCheckbox*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImgCurrent;
     pThis->m_pImgCurrent = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::transDownDownOver( SkinObject *pCtrl )
 {
     CtrlCheckbox *pThis = (CtrlCheckbox*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImgCurrent;
     pThis->m_pImgCurrent = pThis->m_pImgDown;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::transUpUpOver( SkinObject *pCtrl )
 {
     CtrlCheckbox *pThis = (CtrlCheckbox*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImgCurrent;
     pThis->m_pImgCurrent = pThis->m_pImgOver;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::transUpOverUp( SkinObject *pCtrl )
 {
     CtrlCheckbox *pThis = (CtrlCheckbox*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImgCurrent;
     pThis->m_pImgCurrent = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImgCurrent );
 }
 
 
@@ -238,16 +244,18 @@ void CtrlCheckbox::transDownUp( SkinObject *pCtrl )
 void CtrlCheckbox::transUpHidden( SkinObject *pCtrl )
 {
     CtrlCheckbox *pThis = (CtrlCheckbox*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImgCurrent;
     pThis->m_pImgCurrent = NULL;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::transHiddenUp( SkinObject *pCtrl )
 {
     CtrlCheckbox *pThis = (CtrlCheckbox*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImgCurrent;
     pThis->m_pImgCurrent = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImgCurrent );
 }
 
 

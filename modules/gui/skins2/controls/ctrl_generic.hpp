@@ -83,8 +83,15 @@ class CtrlGeneric: public SkinObject, public Observer<VarBool>
         CtrlGeneric( intf_thread_t *pIntf, const UString &rHelp,
                      VarBool *pVisible = NULL );
 
-        /// Tell the layout when the image has changed
-        virtual void notifyLayout() const;
+        /// Tell the layout when the image has changed, with the size of the
+        /// rectangle to repaint (use the default values for repainting the
+        /// whole window)
+        virtual void notifyLayout( int witdh = -1, int height = -1 ) const;
+
+        /// Same as notifyLayout(), but takes optional images as parameters.
+        /// The maximum size(s) of the images will be used for repainting.
+        void notifyLayoutMaxSize( const OSGraphics *pImg1 = NULL,
+                                  const OSGraphics *pImg2 = NULL );
 
         /// Ask the layout to capture the mouse
         virtual void captureMouse() const;

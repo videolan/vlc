@@ -69,12 +69,41 @@ void CtrlGeneric::setLayout( GenericLayout *pLayout,
 }
 
 
-void CtrlGeneric::notifyLayout() const
+void CtrlGeneric::notifyLayout( int width, int height ) const
 {
     // Notify the layout
     if( m_pLayout )
     {
-        m_pLayout->onControlUpdate( *this );
+        m_pLayout->onControlUpdate( *this, width, height );
+    }
+}
+
+
+void CtrlGeneric::notifyLayoutMaxSize( const OSGraphics *pImg1,
+                                      const OSGraphics *pImg2 )
+{
+    if( pImg1 == NULL )
+    {
+        if( pImg2 == NULL )
+        {
+            notifyLayout();
+        }
+        else
+        {
+            notifyLayout( pImg2->getWidth(), pImg2->getHeight() );
+        }
+    }
+    else
+    {
+        if( pImg2 == NULL )
+        {
+            notifyLayout( pImg1->getWidth(), pImg1->getHeight() );
+        }
+        else
+        {
+            notifyLayout( max( pImg1->getWidth(), pImg2->getWidth() ),
+                          max( pImg1->getHeight(), pImg2->getHeight() ) );
+        }
     }
 }
 
@@ -128,7 +157,7 @@ bool CtrlGeneric::isVisible() const
 
 void CtrlGeneric::onUpdate( Subject<VarBool> &rVariable )
 {
-    // Is it the visibily variable ?
+    // Is it the visibility variable ?
     if( &rVariable == m_pVisible )
     {
         // Redraw the layout

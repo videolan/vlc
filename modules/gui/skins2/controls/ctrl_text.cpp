@@ -227,7 +227,7 @@ void CtrlText::displayText( const UString &rText )
                 m_pTimer->stop();
             }
         }
-        notifyLayout();
+        notifyLayout( getPosition()->getWidth(), getPosition()->getHeight() );
     }
 }
 
@@ -311,7 +311,8 @@ void CtrlText::transMove( SkinObject *pCtrl )
         pThis->m_xPos = (pEvtMouse->getXPos() - pThis->m_xOffset);
         pThis->adjust( pThis->m_xPos );
 
-        pThis->notifyLayout();
+        pThis->notifyLayout( pThis->getPosition()->getWidth(),
+                             pThis->getPosition()->getHeight() );
     }
 }
 
@@ -323,7 +324,8 @@ void CtrlText::updateText( SkinObject *pCtrl )
     pThis->m_xPos -= MOVING_TEXT_STEP;
     pThis->adjust( pThis->m_xPos );
 
-    pThis->notifyLayout();
+    pThis->notifyLayout( pThis->getPosition()->getWidth(),
+                         pThis->getPosition()->getHeight() );
 }
 
 

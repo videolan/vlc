@@ -105,7 +105,8 @@ class GenericLayout: public SkinObject, public Box
         virtual const list<LayeredControl> &getControlList() const;
 
         /// Called by a control when its image has changed
-        virtual void onControlUpdate( const CtrlGeneric &rCtrl );
+        virtual void onControlUpdate( const CtrlGeneric &rCtrl,
+                                      int width, int height );
 
         /// Get the list of the anchors of this layout
         virtual const list<Anchor*>& getAnchorList() const;
@@ -114,6 +115,9 @@ class GenericLayout: public SkinObject, public Box
         virtual void addAnchor( Anchor *pAnchor );
 
     private:
+        /// Refresh a rectangular portion of the window
+        void GenericLayout::refreshRect( int x, int y, int width, int height );
+
         /// Parent window of the layout
         TopWindow *m_pWindow;
         /// Layout size

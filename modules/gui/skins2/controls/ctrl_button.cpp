@@ -133,8 +133,9 @@ void CtrlButton::transUpOverDownOver( SkinObject *pCtrl )
 {
     CtrlButton *pThis = (CtrlButton*)pCtrl;
     pThis->captureMouse();
+    const OSGraphics *pOldImg = pThis->m_pImg;
     pThis->m_pImg = pThis->m_pImgDown;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImg );
 }
 
 
@@ -142,8 +143,9 @@ void CtrlButton::transDownOverUpOver( SkinObject *pCtrl )
 {
     CtrlButton *pThis = (CtrlButton*)pCtrl;
     pThis->releaseMouse();
+    const OSGraphics *pOldImg = pThis->m_pImg;
     pThis->m_pImg = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImg );
     // Execute the command associated to this button
     pThis->m_rCommand.execute();
 }
@@ -152,32 +154,36 @@ void CtrlButton::transDownOverUpOver( SkinObject *pCtrl )
 void CtrlButton::transDownOverDown( SkinObject *pCtrl )
 {
     CtrlButton *pThis = (CtrlButton*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImg;
     pThis->m_pImg = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImg );
 }
 
 
 void CtrlButton::transDownDownOver( SkinObject *pCtrl )
 {
     CtrlButton *pThis = (CtrlButton*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImg;
     pThis->m_pImg = pThis->m_pImgDown;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImg );
 }
 
 
 void CtrlButton::transUpUpOver( SkinObject *pCtrl )
 {
     CtrlButton *pThis = (CtrlButton*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImg;
     pThis->m_pImg = pThis->m_pImgOver;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImg );
 }
 
 
 void CtrlButton::transUpOverUp( SkinObject *pCtrl )
 {
     CtrlButton *pThis = (CtrlButton*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImg;
     pThis->m_pImg = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImg );
 }
 
 
@@ -191,15 +197,17 @@ void CtrlButton::transDownUp( SkinObject *pCtrl )
 void CtrlButton::transUpHidden( SkinObject *pCtrl )
 {
     CtrlButton *pThis = (CtrlButton*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImg;
     pThis->m_pImg = NULL;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImg );
 }
 
 
 void CtrlButton::transHiddenUp( SkinObject *pCtrl )
 {
     CtrlButton *pThis = (CtrlButton*)pCtrl;
+    const OSGraphics *pOldImg = pThis->m_pImg;
     pThis->m_pImg = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayoutMaxSize( pOldImg, pThis->m_pImg );
 }
 

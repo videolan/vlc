@@ -163,7 +163,7 @@ void CtrlSliderCursor::draw( OSGraphics &rImage, int xDest, int yDest )
 void CtrlSliderCursor::onUpdate( Subject<VarPercent> &rVariable )
 {
     // The position has changed
-    notifyLayout();
+    notifyLayout( m_rCurve.getWidth(), m_rCurve.getHeight() );
 }
 
 
@@ -189,7 +189,8 @@ void CtrlSliderCursor::transOverDown( SkinObject *pCtrl )
 
     pThis->captureMouse();
     pThis->m_pImg = pThis->m_pImgDown;
-    pThis->notifyLayout();
+    pThis->notifyLayout( pThis->m_rCurve.getWidth(),
+                         pThis->m_rCurve.getHeight() );
 }
 
 
@@ -202,7 +203,8 @@ void CtrlSliderCursor::transDownOver( SkinObject *pCtrl )
 
     pThis->releaseMouse();
     pThis->m_pImg = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayout( pThis->m_rCurve.getWidth(),
+                         pThis->m_rCurve.getHeight() );
 }
 
 
@@ -211,7 +213,8 @@ void CtrlSliderCursor::transUpOver( SkinObject *pCtrl )
     CtrlSliderCursor *pThis = (CtrlSliderCursor*)pCtrl;
 
     pThis->m_pImg = pThis->m_pImgOver;
-    pThis->notifyLayout();
+    pThis->notifyLayout( pThis->m_rCurve.getWidth(),
+                         pThis->m_rCurve.getHeight() );
 }
 
 
@@ -220,7 +223,8 @@ void CtrlSliderCursor::transOverUp( SkinObject *pCtrl )
     CtrlSliderCursor *pThis = (CtrlSliderCursor*)pCtrl;
 
     pThis->m_pImg = pThis->m_pImgUp;
-    pThis->notifyLayout();
+    pThis->notifyLayout( pThis->m_rCurve.getWidth(),
+                         pThis->m_rCurve.getHeight() );
 }
 
 
