@@ -22,7 +22,7 @@ AUDIO += dummy
 
 # Video output settings
 VIDEO = x11
-#VIDEO += fb
+VIDEO += fb
 #VIDEO += ggi
 #VIDEO += glide
 # Not yet supported
@@ -50,7 +50,7 @@ MMX=YES
 DECODER=new
 
 # Debugging mode on or off (set to 1 to activate)
-DEBUG=0
+DEBUG=1
 
 #----------------- do not change anything below this line ----------------------
 
@@ -140,7 +140,7 @@ CCFLAGS += -D_GNU_SOURCE
 # Optimizations : don't compile debug versions with them
 CCFLAGS += -O6
 CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
-CCFLAGS += -fomit-frame-pointer
+#CCFLAGS += -fomit-frame-pointer
 
 # Optimizations for x86 familiy
 ifeq ($(ARCH),X86)

@@ -274,14 +274,20 @@ static __inline__ void Motion420(
     /* Temporary variables to avoid recalculating things twice */
     int     i_source_offset, i_dest_offset, i_c_height, i_c_select;
 
+    i_source_offset = (p_mb->i_l_x + (i_mv_x >> 1))
+                       + (p_mb->i_motion_l_y + i_offset
+                         + (i_mv_y >> 1)
+                         + b_source_field)
+                         * p_mb->p_picture->i_width;
+    if( i_source_offset >= p_source->i_width * p_source->i_height )
+    {
+        fprintf( stderr, "vdec error: bad motion vector\n" );
+        return;
+    }
+
     /* Luminance */
     MotionComponent( /* source */
-                     p_source->p_y
-                       + (p_mb->i_l_x + (i_mv_x >> 1))
-                       + (p_mb->i_motion_l_y + i_offset
-                          + (i_mv_y >> 1)
-                          + b_source_field)
-                         * p_mb->p_picture->i_width,
+                     p_source->p_y + i_source_offset,
                      /* destination */
                      p_mb->p_picture->p_y
                        + (p_mb->i_l_x)
@@ -300,6 +306,12 @@ static __inline__ void Motion420(
                            + ((i_mv_y/2) >> 1))
                            + b_source_field)
                           * p_mb->p_picture->i_chroma_width;
+    if( i_source_offset >= (p_source->i_width * p_source->i_height) / 4 )
+    {
+        fprintf( stderr, "vdec error: bad motion vector\n" );
+        return;
+    }
+
     i_dest_offset = (p_mb->i_c_x)
                       + (p_mb->i_motion_c_y + b_dest_field)
                         * p_mb->p_picture->i_chroma_width;
@@ -345,6 +357,7 @@ static __inline__ void Motion422(
                     boolean_t b_average         /* (explicit) averaging of
                                                  * several predictions */ )
 {
+#if 0
     int     i_source_offset, i_dest_offset, i_c_select;
 
     /* Luminance */
@@ -393,6 +406,7 @@ static __inline__ void Motion422(
                        + i_dest_offset,
                      8, i_height, i_c_stride, p_mb->i_c_stride,
                      i_c_select, b_average );
+#endif
 }
 
 /*****************************************************************************
@@ -417,6 +431,7 @@ static __inline__ void Motion444(
                     boolean_t b_average         /* (explicit) averaging of
                                                  * several predictions */ )
 {
+#if 0
     int     i_source_offset, i_dest_offset, i_select;
 
     i_source_offset = (p_mb->i_l_x + (i_mv_x >> 1))
@@ -453,6 +468,7 @@ static __inline__ void Motion444(
                        + i_dest_offset,
                      16, i_height, i_l_stride, p_mb->i_l_stride,
                      i_select, b_average );
+#endif
 }
 
 /*****************************************************************************
@@ -502,12 +518,12 @@ void vdec_MotionFieldField420( macroblock_t * p_mb )
 
 void vdec_MotionFieldField422( macroblock_t * p_mb )
 {
-    FIELDFIELD( Motion422 )
+    //FIELDFIELD( Motion422 )
 }
 
 void vdec_MotionFieldField444( macroblock_t * p_mb )
 {
-    FIELDFIELD( Motion444 )
+    //FIELDFIELD( Motion444 )
 }
 
 /*****************************************************************************
@@ -584,12 +600,12 @@ void vdec_MotionField16x8420( macroblock_t * p_mb )
 
 void vdec_MotionField16x8422( macroblock_t * p_mb )
 {
-    FIELD16X8( Motion422 )
+    //FIELD16X8( Motion422 )
 }
 
 void vdec_MotionField16x8444( macroblock_t * p_mb )
 {
-    FIELD16X8( Motion444 )
+    //FIELD16X8( Motion444 )
 }
 
 /*****************************************************************************
@@ -626,12 +642,12 @@ void vdec_MotionFieldDMV420( macroblock_t * p_mb )
 
 void vdec_MotionFieldDMV422( macroblock_t * p_mb )
 {
-    FIELDDMV( Motion422 )
+    //FIELDDMV( Motion422 )
 }
 
 void vdec_MotionFieldDMV444( macroblock_t * p_mb )
 {
-    FIELDDMV( Motion444 )
+    //FIELDDMV( Motion444 )
 }
 
 /*****************************************************************************
@@ -671,12 +687,12 @@ void vdec_MotionFrameFrame420( macroblock_t * p_mb )
 
 void vdec_MotionFrameFrame422( macroblock_t * p_mb )
 {
-    FRAMEFRAME( Motion422 )
+    //FRAMEFRAME( Motion422 )
 }
 
 void vdec_MotionFrameFrame444( macroblock_t * p_mb )
 {
-    FRAMEFRAME( Motion444 )
+    //FRAMEFRAME( Motion444 )
 }
 
 /*****************************************************************************
@@ -736,12 +752,12 @@ void vdec_MotionFrameField420( macroblock_t * p_mb )
 
 void vdec_MotionFrameField422( macroblock_t * p_mb )
 {
-    FRAMEFIELD( Motion422 )
+    //FRAMEFIELD( Motion422 )
 }
 
 void vdec_MotionFrameField444( macroblock_t * p_mb )
 {
-    FRAMEFIELD( Motion444 )
+    //FRAMEFIELD( Motion444 )
 }
 
 /*****************************************************************************
@@ -784,10 +800,10 @@ void vdec_MotionFrameDMV420( macroblock_t * p_mb )
 
 void vdec_MotionFrameDMV422( macroblock_t * p_mb )
 {
-    FRAMEDMV( Motion422 )
+    //FRAMEDMV( Motion422 )
 }
 
 void vdec_MotionFrameDMV444( macroblock_t * p_mb )
 {
-    FRAMEDMV( Motion444 )
+    //FRAMEDMV( Motion444 )
 }

@@ -443,7 +443,14 @@ void vdec_DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
         /*
          * Motion Compensation (ISO/IEC 13818-2 section 7.6)
          */
-        p_mb->pf_motion( p_mb );
+        if( p_mb->pf_motion == 0 )
+        {
+            fprintf( stderr, "vdec error: pf_motion set to NULL\n" );
+        }
+        else
+        {
+            p_mb->pf_motion( p_mb );
+        }
 
         DECODEBLOCKS( AddBlock )
     }

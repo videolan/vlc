@@ -760,8 +760,16 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     else
     {
         /* Try to find an optimized function. */
-        ppf_picture_data[p_vpar->picture.i_structure]
-                        [p_vpar->picture.i_coding_type]( p_vpar, i_mb_base );
+        if( ppf_picture_data[p_vpar->picture.i_structure][p_vpar->picture.i_coding_type] == NULL )
+        {
+            fprintf( stderr, "vpar error: bad ppf_picture_data function pointer (struct:%d, coding type:%d)\n",
+                     p_vpar->picture.i_structure, p_vpar->picture.i_coding_type );
+        }
+        else
+        {
+            ppf_picture_data[p_vpar->picture.i_structure]
+                            [p_vpar->picture.i_coding_type]( p_vpar, i_mb_base );
+        }
     }
 
     if( p_vpar->b_die || p_vpar->b_error )

@@ -1878,6 +1878,11 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
 
     do
     {
+        if( i_mb_address_save >= p_vpar->sequence.i_mb_size )
+        {
+            p_vpar->picture.b_error = 1;
+            return;            
+        }
         ParseMacroblock( p_vpar, pi_mb_address, i_mb_address_save,
                          i_mb_base, b_mpeg2, i_coding_type,
                          i_chroma_format, i_structure,
