@@ -2,7 +2,7 @@
  * i420_rgb8.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb8.c,v 1.3 2003/08/29 18:58:05 fenrir Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,6 +61,11 @@ void E_(I420_RGB8)( vout_thread_t *p_vout, picture_t *p_src, picture_t *p_dest )
     int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
     int *       p_offset;
 
+    const int i_source_margin = p_src->p[0].i_pitch
+                                 - p_src->p[0].i_visible_pitch;
+    const int i_source_margin_c = p_src->p[1].i_pitch
+                                 - p_src->p[1].i_visible_pitch;
+
     /* The dithering matrices */
     static int dither10[4] = {  0x0,  0x8,  0x2,  0xa };
     static int dither11[4] = {  0xc,  0x4,  0xe,  0x6 };
@@ -88,6 +93,13 @@ void E_(I420_RGB8)( vout_thread_t *p_vout, picture_t *p_src, picture_t *p_dest )
         /* Do horizontal and vertical scaling */
         SCALE_WIDTH_DITHER( 420 );
         SCALE_HEIGHT_DITHER( 420 );
+    }
+
+    p_y += i_source_margin;
+    if( i_y % 2 )
+    {
+        p_u += i_source_margin_c;
+        p_v += i_source_margin_c;
     }
 }
 
