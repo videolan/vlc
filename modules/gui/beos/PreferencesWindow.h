@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.10 2003/05/03 13:37:21 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.11 2003/05/05 13:06:02 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -27,7 +27,7 @@
 #include <Window.h>
 
 #define PREFS_WINDOW_WIDTH   600
-#define PREFS_WINDOW_HEIGHT  300
+#define PREFS_WINDOW_HEIGHT  400
 #define PREFS_ITEM_SELECTED  'pris'
 #define PREFS_OK             'prok'
 #define PREFS_REVERT         'prre'

@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.35 2003/05/03 13:37:21 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.36 2003/05/05 13:06:02 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -966,7 +966,12 @@ InterfaceWindow::_RestoreSettings()
 		if (fSettings->FindRect( "messages frame", &frame ) == B_OK )
 			set_window_pos( fMessagesWindow, frame );
 		if (fSettings->FindRect( "settings frame", &frame ) == B_OK )
+		{
+		    /* FIXME: Preferences horizontal resizing doesn't work
+		       correctly now */
+		    frame.right = frame.left + fPreferencesWindow->Frame().Width();
 			set_window_pos( fPreferencesWindow, frame );
+		}
 		
 		bool showing;
 		if ( fSettings->FindBool( "playlist showing", &showing ) == B_OK )

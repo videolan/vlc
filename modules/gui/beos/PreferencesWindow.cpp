@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.15 2003/05/03 13:37:21 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.16 2003/05/05 13:06:02 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -56,7 +56,7 @@ ConfigView::ConfigView( BRect frame, const char * name,
 PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                                       BRect frame, const char * name )
     : BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-               B_NOT_ZOOMABLE ),
+               B_NOT_ZOOMABLE | B_NOT_H_RESIZABLE ),
       fConfigScroll( NULL ),
       p_intf( p_interface )
 {
@@ -75,8 +75,6 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     fOutline = new BOutlineListView( rect, "preferences tree",
                                      B_SINGLE_SELECTION_LIST,
                                      B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM );
-
-    rect.right += B_V_SCROLL_BAR_WIDTH;
     BScrollView * scrollview = new BScrollView( "scrollview", fOutline,
                                                 B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
                                                 0, false, true );
@@ -87,7 +85,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
 
     /* Create a dummy view so we can correctly place the real config views later */
     rect.bottom -= 40;
-    rect.left = rect.right + 15;
+    rect.left = rect.right + 15 + B_V_SCROLL_BAR_WIDTH;
     rect.right = Bounds().right - 15;
     fDummyView = new BView( rect, "", B_FOLLOW_ALL_SIDES, B_WILL_DRAW );
     fPrefsView->AddChild( fDummyView );
@@ -165,7 +163,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                     sprintf( name, "s%s", p_item->psz_name );
                     textControl = new BTextControl( rect, name, p_item->psz_text,
                                                     "", new BMessage(),
-                                                    B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+                                                    B_FOLLOW_NONE );
                     configView->AddChild( textControl );
                     break;
 
@@ -179,7 +177,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                     sprintf( name, "i%s", p_item->psz_name );
                     textControl = new BTextControl( rect, name, p_item->psz_text,
                                                     "", new BMessage(),
-                                                    B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+                                                    B_FOLLOW_NONE );
                     configView->AddChild( textControl );
                     break;
 
@@ -193,7 +191,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                     sprintf( name, "f%s", p_item->psz_name );
                     textControl = new BTextControl( rect, name, p_item->psz_text,
                                                     "", new BMessage(),
-                                                    B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+                                                    B_FOLLOW_NONE );
                     configView->AddChild( textControl );
                     break;
             
@@ -206,7 +204,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                     memset( name, 0, 128 );
                     sprintf( name, "b%s", p_item->psz_name );
                     checkBox = new BCheckBox( rect, name, p_item->psz_text,
-                                              new BMessage(), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+                                              new BMessage(), B_FOLLOW_NONE );
                     configView->AddChild( checkBox );
                     break;
             }
@@ -307,6 +305,18 @@ void PreferencesWindow::MessageReceived( BMessage * message )
 void PreferencesWindow::FrameResized( float width, float height )
 {
     BWindow::FrameResized( width, height );
+    
+    StringItemWithView * item;
+    ConfigView * view;
+    for( int i = 0; i < fOutline->CountItems(); i++ )
+    {
+        /* Fix ConfigView sizes */
+        item = (StringItemWithView*) fOutline->ItemAt( i );
+        view = item->fConfigView;
+        view->ResizeTo( fDummyView->Bounds().Width() - B_V_SCROLL_BAR_WIDTH,
+                        fDummyView->Bounds().Height() );
+    }
+
     UpdateScrollBar();
 }
 
@@ -352,17 +362,24 @@ void PreferencesWindow::UpdateScrollBar()
        correctly simple BViews */
        
     /* Get the current config view */
+    ConfigView * view;
     if( fOutline->CurrentSelection() < 0 )
         return;
     StringItemWithView * selectedItem =
         (StringItemWithView*) fOutline->ItemAt( fOutline->CurrentSelection() );
+    view = selectedItem->fConfigView;
+    
+    /* Get the available BRect for display */
+    BRect display = fConfigScroll->Bounds();
+    display.right -= B_V_SCROLL_BAR_WIDTH;
     
     /* Fix the scrollbar */
-	BRect visible = fConfigScroll->Bounds() & selectedItem->fConfigView->fRealBounds;
-	BRect total = fConfigScroll->Bounds() | selectedItem->fConfigView->fRealBounds;
-    BScrollBar * scrollBar = fConfigScroll->ScrollBar( B_VERTICAL );
-    long max = (long)( selectedItem->fConfigView->fRealBounds.Height() -
-                       fConfigScroll->Bounds().Height() );
+    BScrollBar * scrollBar;
+    long max;
+	BRect visible = display & view->fRealBounds;
+	BRect total = display | view->fRealBounds;
+    scrollBar = fConfigScroll->ScrollBar( B_VERTICAL );
+    max = (long)( view->fRealBounds.Height() - visible.Height() );
     if( max < 0 ) max = 0;
     scrollBar->SetRange( 0, max );
     scrollBar->SetProportion( visible.Height() / total.Height() );
