@@ -36,10 +36,9 @@ else
 if HAVE_DARWIN
 # We don't define LIBRARIES_mozilla because we'll be using project builder, or not...
 BUNDLE_mozilla = VLC\ Plugin.plugin
-
 vlc_moz_FLAGS = `$(VLC_CONFIG) --libs vlc builtin pic mozilla`
 moz_CFLAGS = `$(MOZILLA_CONFIG) --cflags plugin java nspr/obsolete nspr oji xpcom xpconnect`
-moz_plugin_FLAGS = -I$(srcdir)/../include -c -F/System/Library/Frameworks/CoreFoundation.framework $(moz_CFLAGS) -I/Developer/Headers/FlatCarbon -arch ppc -fno-common -fpascal-strings -O0 -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 -DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 -g -include mozilla-config.h
+moz_plugin_FLAGS = -I. -I$(top_builddir) -I$(srcdir)/../include -c -F/System/Library/Frameworks/CoreFoundation.framework $(moz_CFLAGS) -I/Developer/Headers/FlatCarbon -arch ppc -fno-common -fpascal-strings -O0 -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 -DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 -g -include mozilla-config.h
 pic = pic
 LIBRARIES_libvlc = $(top_builddir)/lib/libvlc_pic.a
 
@@ -95,20 +94,20 @@ npvlc_rc.$(OBJEXT): npvlc_rc.rc
 endif
 if HAVE_DARWIN
 VLC\ Plugin.plugin:
-	rm -rf $(srcdir)/VLC\ Plugin.plugin
-	mkdir -p $(srcdir)/VLC\ Plugin.plugin/Contents/MacOS
-	mkdir -p $(srcdir)/VLC\ Plugin.plugin/Contents/Resources
-	/usr/bin/g++3 $(moz_plugin_FLAGS) $(srcdir)/vlcplugin.cpp -o $(srcdir)/libplugin_a-vlcplugin.o
-	/usr/bin/g++3 $(moz_plugin_FLAGS) $(srcdir)/vlcshell.cpp -o $(srcdir)/libplugin_a-vlcshell.o
-	/usr/bin/g++3 $(moz_plugin_FLAGS) $(srcdir)/vlcpeer.cpp -o $(srcdir)/libplugin_a-vlcpeer.o
-	/usr/bin/g++3 $(moz_plugin_FLAGS) $(srcdir)/support/npmac.cpp -o $(srcdir)/libplugin_a-npmac.o
-	/usr/bin/g++3 $(srcdir)/libplugin_a-vlcplugin.o $(srcdir)/libplugin_a-vlcshell.o $(srcdir)/libplugin_a-vlcpeer.o $(srcdir)/libplugin_a-npmac.o -o $(srcdir)/VLC\ Plugin.plugin/Contents/MacOS/VLC\ Plugin -L/usr/lib -F/System/Library/Frameworks/CoreFoundation.framework -framework CoreFoundation -arch ppc -bundle -read_only_relocs suppress $(LIBRARIES_libvlc) -dylib $(vlc_moz_FLAGS)
-	cp $(top_srcdir)/extras/MacOSX/plugin/Info.plist $(srcdir)/VLC\ Plugin.plugin/Contents/Info.plist
-	cp $(top_srcdir)/extras/MacOSX/plugin/pbdevelopment.plist $(srcdir)/VLC\ Plugin.plugin/Contents/pbdevelopment.plist
-	cp -r $(top_srcdir)/extras/MacOSX/plugin/English.lproj $(srcdir)/VLC\ Plugin.plugin/Contents/Resources/
-	Rez /Developer/Headers/FlatCarbon/Types.r $(srcdir)/vlc.r -o $(srcdir)/VLC\ Plugin.plugin/Contents/Resources/Vlc\ Plugin.rsrc
-	mkdir $(srcdir)/VLC\ Plugin.plugin/Contents/MacOS/modules
-	cp -r $(top_srcdir)/VLC.app/Contents/MacOS/modules/* $(srcdir)/VLC\ Plugin.plugin/Contents/MacOS/modules/
+	rm -rf ./VLC\ Plugin.plugin
+	mkdir -p ./VLC\ Plugin.plugin/Contents/MacOS
+	mkdir -p ./VLC\ Plugin.plugin/Contents/Resources
+	/usr/bin/g++3 $(moz_plugin_FLAGS) $(srcdir)/vlcplugin.cpp -o ./libplugin_a-vlcplugin.o
+	/usr/bin/g++3 $(moz_plugin_FLAGS) $(srcdir)/vlcshell.cpp -o ./libplugin_a-vlcshell.o
+	/usr/bin/g++3 $(moz_plugin_FLAGS) $(srcdir)/vlcpeer.cpp -o ./libplugin_a-vlcpeer.o
+	/usr/bin/g++3 $(moz_plugin_FLAGS) $(srcdir)/support/npmac.cpp -o ./libplugin_a-npmac.o
+	/usr/bin/g++3 ./libplugin_a-vlcplugin.o ./libplugin_a-vlcshell.o ./libplugin_a-vlcpeer.o ./libplugin_a-npmac.o -o ./VLC\ Plugin.plugin/Contents/MacOS/VLC\ Plugin -L/usr/lib -F/System/Library/Frameworks/CoreFoundation.framework -framework CoreFoundation -arch ppc -bundle -read_only_relocs suppress $(LIBRARIES_libvlc) -dylib $(vlc_moz_FLAGS)
+	cp $(top_srcdir)/extras/MacOSX/plugin/Info.plist ./VLC\ Plugin.plugin/Contents/Info.plist
+	cp $(top_srcdir)/extras/MacOSX/plugin/pbdevelopment.plist ./VLC\ Plugin.plugin/Contents/pbdevelopment.plist
+	cp -r $(top_srcdir)/extras/MacOSX/plugin/English.lproj ./VLC\ Plugin.plugin/Contents/Resources/
+	Rez /Developer/Headers/FlatCarbon/Types.r $(srcdir)/vlc.r -o ./VLC\ Plugin.plugin/Contents/Resources/Vlc\ Plugin.rsrc
+	mkdir ./VLC\ Plugin.plugin/Contents/MacOS/modules
+	cp -r $(top_builddir)/VLC.app/Contents/MacOS/modules/* ./VLC\ Plugin.plugin/Contents/MacOS/modules/
 endif
 endif
 
@@ -129,7 +128,7 @@ stamp-pic: FORCE
 	@if test ! -f $@; then printf "" > $@; fi
 
 clean-bundle:
-	rm -rf $(srcdir)/VLC\ Plugin.plugin
+	rm -rf ./VLC\ Plugin.plugin
 
 ###############################################################################
 # Force rule
