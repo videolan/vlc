@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.18 2003/07/04 12:20:32 adn Exp $
+ * $Id: streamout.cpp,v 1.19 2003/07/04 15:20:49 adn Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -675,6 +675,7 @@ void SoutDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     mrl_combo->Append( mrl_combo->GetValue() );
     mrl = mrl_combo->GetValue();
     EndModal( wxID_OK );
+    
 }
 
 void SoutDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
