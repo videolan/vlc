@@ -37,6 +37,8 @@ HEAD
 0.4.1
 Not released yet
 
+  * ./plugins/motion/motionmmx.c: MMX motion optimizations courtesy of
+    Vladimir Chernyshov <greengrass@writeme.com>.
   * ./plugins/dvdread/dvdread.c: disabled the dvdread plugin because it
     currently sucks.
   * ./src/misc/configuration.c, ./src/interface/main.c: we now accept --nofoo
