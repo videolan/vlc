@@ -32,9 +32,8 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-#include <wx/dialog.h>
-
 #include "wxwindows.h"
+#include <wx/dialog.h>
 
 /* Callback prototype */
 static int PlaylistChanged( vlc_object_t *, const char *,
