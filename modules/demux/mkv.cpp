@@ -384,7 +384,7 @@ public:
         :segment(NULL)
         ,es(estream)
         ,i_timescale(MKVD_TIMECODESCALE)
-        ,f_duration(-1.0)
+        ,i_duration(-1)
         ,i_start_time(0)
         ,i_cues_position(-1)
         ,i_chapters_position(-1)
@@ -461,7 +461,7 @@ public:
     uint64_t                i_timescale;
 
     /* duration of the segment */
-    float                   f_duration;
+    mtime_t                 i_duration;
     mtime_t                 i_start_time;
 
     /* all tracks */
@@ -538,7 +538,7 @@ public:
     void Sort();
     size_t AddSegment( matroska_segment_t *p_segment );
     void PreloadLinked( );
-    float Duration( ) const;
+    mtime_t Duration( ) const;
     void LoadCues( );
     void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_t *psz_chapter );
 
@@ -2809,10 +2809,10 @@ void matroska_segment_t::ParseInfo( EbmlElement *info )
         {
             KaxDuration &dur = *(KaxDuration*)l;
 
-            f_duration = float(dur);
+            i_duration = mtime_t( double( dur ) );
 
-            msg_Dbg( &sys.demuxer, "|   |   + Duration=%f",
-                     f_duration );
+            msg_Dbg( &sys.demuxer, "|   |   + Duration="I64Fd,
+                     i_duration );
         }
         else if( MKV_IS_ID( l, KaxMuxingApp ) )
         {
@@ -2882,7 +2882,7 @@ void matroska_segment_t::ParseInfo( EbmlElement *info )
         }
     }
 
-    f_duration *= i_timescale / 1000000.0;
+    i_duration *= i_timescale / 1000000.0;
 }
 
 
@@ -3049,7 +3049,7 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
         /* update the duration of the segment according to the sum of all sub chapters */
         f_dur = stored_editions[i_default_edition].Duration() / I64C(1000);
         if (f_dur > 0.0)
-            f_duration = f_dur;
+            i_duration = f_dur;
     }
 }
 
@@ -3523,18 +3523,18 @@ void virtual_segment_t::PreloadLinked( )
     }
 }
 
-float virtual_segment_t::Duration() const
+mtime_t virtual_segment_t::Duration() const
 {
-    float f_duration;
+    mtime_t i_duration;
     if ( linked_segments.size() == 0 )
-        f_duration = 0.0;
+        i_duration = 0;
     else {
         matroska_segment_t *p_last_segment = linked_segments[linked_segments.size()-1];
 //        p_last_segment->ParseCluster( );
 
-        f_duration = p_last_segment->i_start_time / 1000 + p_last_segment->f_duration;
+        i_duration = p_last_segment->i_start_time / 1000 + p_last_segment->i_duration;
     }
-    return f_duration;
+    return i_duration;
 }
 
 void virtual_segment_t::LoadCues( )
