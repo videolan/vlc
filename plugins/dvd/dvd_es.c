@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.7 2002/04/23 14:16:20 sam Exp $
+ * $Id: dvd_es.c,v 1.8 2002/04/23 20:58:23 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -231,8 +231,10 @@ void DVDReadSPU( input_thread_t * p_input )
             {
                 ADDES( 0xbd, 0x20 + i_id, DVD_SPU_ES, SPU_ES,
                        vts.manager_inf.p_spu_attr[i-1].i_lang_code,
-                       16*sizeof(u32) );
-                memcpy( p_es->p_demux_data, palette, 16*sizeof(u32) ); 
+                       sizeof(int) + 16*sizeof(u32) );
+                *(int*)p_es->p_demux_data = 0xBeeF;
+                memcpy( (void*)p_es->p_demux_data + sizeof(int),
+                        palette, 16*sizeof(u32) ); 
             }
             else
             {

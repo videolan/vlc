@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.15 2002/04/18 12:51:59 sam Exp $
+ * $Id: spu_decoder.c,v 1.16 2002/04/23 20:58:23 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -426,13 +426,15 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_SET_PALETTE:
  
                     /* 03xxxx (palette) */
-                    if( p_spudec->p_config->p_demux_data )
+                    if( p_spudec->p_config->p_demux_data &&
+                         *(int*)p_spudec->p_config->p_demux_data == 0xBeeF )
                     {
                         p_spu->p_sys->b_palette = 1;
                         for( i = 0; i < 4 ; i++ )
                         {
-                            pi_color = (u8*)p_spudec->p_config->p_demux_data
-                                    + 4 * GetBits( &p_spudec->bit_stream, 4 );
+                            pi_color = (void*)p_spudec->p_config->p_demux_data
+                                         + sizeof(int) + 4 * sizeof(u8) *
+                                          GetBits( &p_spudec->bit_stream, 4 );
                             p_spu->p_sys->pi_yuv[3-i][0] = pi_color[2];
                             p_spu->p_sys->pi_yuv[3-i][1] = pi_color[0];
                             p_spu->p_sys->pi_yuv[3-i][2] = pi_color[1];

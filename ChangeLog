@@ -4,6 +4,9 @@
 
 HEAD
 
+  * ./plugins/spudec/spu_decoder.c, ./plugins/dvd/dvd_es.c: temporary fix
+    to avoid retrieving the spu palette from a network stream as if it was
+    a DVD.
   * ./src/interface/main.c: tidied the help output code.
   * ALL: removed underscores from option names and made a few options more
     self-explanatory, for instance --input_channel becomes --audio-channel;
