@@ -4,6 +4,7 @@
 
 HEAD
 
+  * DVD title change no longer restart the input.
   * BeOS crash fix by Wade Majors <guru@startrek.com>.
   * Slight modification in ClockManageRef: after a synchro reinit, we still
     do the mwait and re-init last-cr.

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.53 2001/04/29 14:52:42 stef Exp $
+ * $Id: input_dvd.c,v 1.54 2001/04/29 17:57:50 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -581,7 +581,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* uodate title environnement variable so that we don't
          * loop on the same title forever */
-//        main_PutIntVariable( INPUT_TITLE_VAR, p_dvd->i_title + 1 );
+        main_PutIntVariable( INPUT_TITLE_VAR, p_dvd->i_title + 1 );
 
         /* ifo vts */
         if( IfoTitleSet( p_dvd->p_ifo ) < 0 )
@@ -947,6 +947,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         intf_WarnMsg( 2, "dvd info: angle %d selected", p_area->i_angle );
     }
 
+    /* warn interface that something has changed */
+    p_input->stream.b_changed = 1;
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return 0;
@@ -1139,7 +1142,7 @@ static int DVDRead( input_thread_t * p_input,
 
     p_input->stream.p_selected_area->i_tell += i_read_bytes;
     b_eot = !( p_input->stream.p_selected_area->i_tell < p_dvd->i_size );
-    b_eof = b_eot && ( ( p_dvd->i_title + 1 ) < p_input->stream.i_area_nb );
+    b_eof = b_eot && ( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb );
     p_area = p_input->stream.pp_areas[p_dvd->i_title + 1];
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
