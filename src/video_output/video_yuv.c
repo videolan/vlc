@@ -71,6 +71,8 @@ static int      BinaryLog         ( u32 i );
 static void     MaskToShift       ( int *pi_right, int *pi_left, u32 i_mask );
 static void     SetGammaTable     ( int *pi_table, double f_gamma );
 static void     SetYUV            ( vout_thread_t *p_vout );
+static void     SetOffset         ( int i_width, int i_height, int i_pic_width, int i_pic_height, 
+                                    boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset );
 
 static void     ConvertY4Gray16   ( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                     int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
@@ -110,14 +112,6 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
                                     int i_matrix_coefficients );
 
 /*******************************************************************************
- * CLIP_BYTE macro: boundary detection
- *******************************************************************************
- * Return parameter if between 0 and 255, else return nearest boundary (0 or 
- * 255). This macro is used to build translations tables.
- *******************************************************************************/
-#define CLIP_BYTE( i_val ) ( (i_val < 0) ? 0 : ((i_val > 255) ? 255 : i_val) )
-
-/*******************************************************************************
  * CONVERT_YUV_PIXEL, CONVERT_Y_PIXEL: pixel convertion blocks
  *******************************************************************************
  * These convertion routines are used by YUV convertion functions.
@@ -139,6 +133,106 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
     i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;       \
     i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;                                \
     CONVERT_Y_PIXEL                                                             \
+
+/*******************************************************************************
+ * SCALE_WIDTH: scale a line horizontally
+ *******************************************************************************
+ * This macro scale a line using rendering buffer and offset array.
+ *******************************************************************************/
+#define SCALE_WIDTH                                                             \
+    if( b_horizontal_scaling )                                                  \
+    {                                                                           \
+        /* Horizontal scaling, convertion has been done to buffer.              \
+         * Rewind buffer and offset, then copy and scale line */                \
+        p_buffer = p_buffer_start;                                              \
+        p_offset = p_offset_start;                                              \
+        for( i_x = i_pic_width / 16; i_x--; )                                   \
+        {                                                                       \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                    \
+        }                                                                       \
+        p_pic += i_pic_line_width;                                              \
+    }                                                                           \
+    else                                                                        \
+    {                                                                           \
+        /* No scaling, convertion has been done directly in picture memory.     \
+         * Increment of picture pointer to end of line is still needed */       \
+        p_pic += i_pic_width + i_pic_line_width;                                \
+    }                                                                           \
+
+/*******************************************************************************
+ * SCALE_HEIGHT: handle vertical scaling
+ *******************************************************************************
+ * This macro handle vertical scaling for a picture. CHROMA may be 420, 422 or
+ * 444 for RGB convertion, or 400 for gray convertion.
+ *******************************************************************************/
+#define SCALE_HEIGHT( CHROMA )                                                  \
+    /* If line is odd, rewind 4:2:0 U and V samples */                          \
+    if( ((CHROMA == 420) || (CHROMA == 422)) && !(i_y & 0x1) )                  \
+    {                                                                           \
+        p_u -= i_chroma_width;                                                  \
+        p_v -= i_chroma_width;                                                  \
+    }                                                                           \
+                                                                                \
+    /*                                                                          \
+     * Handle vertical scaling. The current line can be copied or next one      \
+     * can be ignored.                                                          \
+     */                                                                         \
+    switch( i_vertical_scaling )                                                \
+    {                                                                           \
+    case -1:                             /* vertical scaling factor is < 1 */   \
+        while( (i_scale_count -= i_pic_height) >= 0 )                           \
+        {                                                                       \
+            /* Height reduction: skip next source line */                       \
+            p_y += i_width;                                                     \
+            i_y++;                                                              \
+            if( (CHROMA == 420) || (CHROMA == 422) )                            \
+            {                                                                   \
+                if( i_y & 0x1 )                                                 \
+                {                                                               \
+                    p_u += i_chroma_width;                                      \
+                    p_v += i_chroma_width;                                      \
+                }                                                               \
+            }                                                                   \
+            else if( CHROMA == 444 )                                            \
+            {                                                                   \
+                p_u += i_width;                                                 \
+                p_v += i_width;                                                 \
+            }                                                                   \
+        }                                                                       \
+        i_scale_count += i_height;                                              \
+        break;                                                                  \
+    case 1:                              /* vertical scaling factor is > 1 */   \
+        while( (i_scale_count -= i_height) > 0 )                                \
+        {                                                                       \
+            /* Height increment: copy previous picture line */                  \
+            for( i_x = i_pic_width / 16; i_x--; )                               \
+            {                                                                   \
+                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );             \
+                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );             \
+                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );             \
+                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );             \
+            }                                                                   \
+            p_pic +=        i_pic_line_width;                                   \
+            p_pic_start +=  i_pic_line_width;                                   \
+        }                                                                       \
+        i_scale_count += i_pic_height;                                          \
+        break;                                                                  \
+    }                                                                           \
 
 /*******************************************************************************
  * vout_InitYUV: allocate and initialize translations tables
@@ -361,26 +455,48 @@ static void SetYUV( vout_thread_t *p_vout )
         case 15:
         case 16:         
             p_vout->yuv.yuv.p_gray16 =  (u16 *)p_vout->yuv.p_base + GRAY_MARGIN;
-            for( i_index = -GRAY_MARGIN; i_index < 256 + GRAY_MARGIN; i_index++) 
+            for( i_index = 0; i_index < GRAY_MARGIN; i_index++ )
+            {
+                p_vout->yuv.yuv.p_gray16[ -i_index ] = 
+                    ((pi_gamma[ 0 ] >> i_red_right)   << i_red_left)   |
+                    ((pi_gamma[ 0 ] >> i_green_right) << i_green_left) |
+                    ((pi_gamma[ 0 ] >> i_blue_right)  << i_blue_left);
+                p_vout->yuv.yuv.p_gray16[ 256 + i_index ] = 
+                    ((pi_gamma[ 255 ] >> i_red_right)   << i_red_left)   |
+                    ((pi_gamma[ 255 ] >> i_green_right) << i_green_left) |
+                    ((pi_gamma[ 255 ] >> i_blue_right)  << i_blue_left);
+            }            
+            for( i_index = 0; i_index < 256; i_index++) 
             {
                 p_vout->yuv.yuv.p_gray16[ i_index ] = 
-                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_red_right)   << i_red_left)   |
-                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_green_right) << i_green_left) |
-                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_blue_right)  << i_blue_left);
+                    ((pi_gamma[ i_index ] >> i_red_right)   << i_red_left)   |
+                    ((pi_gamma[ i_index ] >> i_green_right) << i_green_left) |
+                    ((pi_gamma[ i_index ] >> i_blue_right)  << i_blue_left);
             }
             break;        
         case 24:
         case 32:        
             p_vout->yuv.yuv.p_gray32 =  (u32 *)p_vout->yuv.p_base + GRAY_MARGIN;
-            for( i_index = -GRAY_MARGIN; i_index < 256 + GRAY_MARGIN; i_index++) 
+            for( i_index = 0; i_index < GRAY_MARGIN; i_index++ )
+            {
+                p_vout->yuv.yuv.p_gray32[ -i_index ] = 
+                    ((pi_gamma[ 0 ] >> i_red_right)   << i_red_left)   |
+                    ((pi_gamma[ 0 ] >> i_green_right) << i_green_left) |
+                    ((pi_gamma[ 0 ] >> i_blue_right)  << i_blue_left);
+                p_vout->yuv.yuv.p_gray32[ 256 + i_index ] = 
+                    ((pi_gamma[ 255 ] >> i_red_right)   << i_red_left)   |
+                    ((pi_gamma[ 255 ] >> i_green_right) << i_green_left) |
+                    ((pi_gamma[ 255 ] >> i_blue_right)  << i_blue_left);
+            }            
+            for( i_index = 0; i_index < 256; i_index++) 
             {
                 p_vout->yuv.yuv.p_gray32[ i_index ] = 
-                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_red_right)   << i_red_left)   |
-                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_green_right) << i_green_left) |
-                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_blue_right)  << i_blue_left);
-            }        
+                    ((pi_gamma[ i_index ] >> i_red_right)   << i_red_left)   |
+                    ((pi_gamma[ i_index ] >> i_green_right) << i_green_left) |
+                    ((pi_gamma[ i_index ] >> i_blue_right)  << i_blue_left);
+            }
             break;        
-        }
+         }
     }
     else
     {
@@ -492,39 +608,24 @@ static void SetYUV( vout_thread_t *p_vout )
 }
 
 /*******************************************************************************
- * ConvertY4Gray16: grayscale YUV 4:x:x to RGB 15 or 16 bpp
+ * SetOffset: build offset array for convertion functions
+ *******************************************************************************
+ * This function will build an offset array used in later convertion functions.
+ * It will also set horizontal and vertical scaling indicators.
  *******************************************************************************/
-static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                             int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
-                             int i_matrix_coefficients )
-{
-    boolean_t   b_horizontal_scaling;               /* horizontal scaling type */
-    int         i_vertical_scaling;                   /* vertical scaling type */
-    int         i_x, i_y;                   /* horizontal and vertical indexes */
-    int         i_scale_count;                         /* scale modulo counter */
-    u16 *       p_gray;                               /* base convertion table */
-    u16 *       p_pic_start;         /* beginning of the current line for copy */
-    u16 *       p_buffer_start;                     /* convertion buffer start */
-    u16 *       p_buffer;                         /* convertion buffer pointer */
-    int *       p_offset_start;                          /* offset array start */
-    int *       p_offset;                              /* offset array pointer */
-    
-    /* 
-     * Initialize some values  - i_pic_line_width will store the line skip 
-     */
-    i_pic_line_width -= i_pic_width;
-    p_gray =            p_vout->yuv.yuv.p_gray16;    
-    p_buffer_start =    p_vout->yuv.p_buffer;        
-    p_offset_start =    p_vout->yuv.p_offset;                    
-    
-    /* 
-     * Set scalings 
-     */
+static void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height, 
+                       boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset )
+{    
+    int i_x;                                      /* x position in destination */
+    int i_scale_count;                                       /* modulo counter */
+
+    /*
+     * Prepare horizontal offset array
+     */      
     if( i_pic_width - i_width > 0 )
     {
         /* Prepare scaling array for horizontal extension */
-        b_horizontal_scaling =  1;   
-        p_offset =              p_offset_start;
+        *pb_h_scaling =  1;   
         i_scale_count =         i_pic_width;
         for( i_x = i_width; i_x--; )
         {
@@ -539,8 +640,7 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
     else if( i_pic_width - i_width < 0 )
     {
         /* Prepare scaling array for horizontal reduction */
-        b_horizontal_scaling =  1;
-        p_offset =              p_offset_start;        
+        *pb_h_scaling =  1;
         i_scale_count =         i_pic_width;
         for( i_x = i_pic_width; i_x--; )
         {
@@ -556,20 +656,54 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
     else
     {
         /* No horizontal scaling: YUV convertion is done directly to picture */          
-        b_horizontal_scaling = 0;        
+        *pb_h_scaling = 0;        
     }
+
+    /*
+     * Set vertical scaling indicator
+     */
     if( i_pic_height - i_height > 0 )
     {
-        i_vertical_scaling = 1;        
+        *pi_v_scaling = 1;        
     }
     else if( i_pic_height - i_height < 0 )
     {
-        i_vertical_scaling = -1;        
+        *pi_v_scaling = -1;        
     }
     else
     {
-        i_vertical_scaling = 0;        
+        *pi_v_scaling = 0;        
     }
+}
+
+/*******************************************************************************
+ * ConvertY4Gray16: grayscale YUV 4:x:x to RGB 15 or 16 bpp
+ *******************************************************************************/
+static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
+                             int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
+                             int i_matrix_coefficients )
+{
+    boolean_t   b_horizontal_scaling;               /* horizontal scaling type */
+    int         i_vertical_scaling;                   /* vertical scaling type */
+    int         i_x, i_y;                   /* horizontal and vertical indexes */
+    int         i_scale_count;                         /* scale modulo counter */
+    int         i_chroma_width;                      /* chroma width, not used */    
+    u16 *       p_gray;                               /* base convertion table */
+    u16 *       p_pic_start;         /* beginning of the current line for copy */
+    u16 *       p_buffer_start;                     /* convertion buffer start */
+    u16 *       p_buffer;                         /* convertion buffer pointer */
+    int *       p_offset_start;                          /* offset array start */
+    int *       p_offset;                              /* offset array pointer */    
+    
+    /* 
+     * Initialize some values  - i_pic_line_width will store the line skip 
+     */
+    i_pic_line_width -= i_pic_width;                                            
+    p_gray =            p_vout->yuv.yuv.p_gray16;    
+    p_buffer_start =    p_vout->yuv.p_buffer;                                   
+    p_offset_start =    p_vout->yuv.p_offset;                                   
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
      * Perform convertion
@@ -604,74 +738,9 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
             *p_buffer++ = p_gray[ *p_y++ ];
         }             
 
-        if( b_horizontal_scaling )
-        {
-            /* Horizontal scaling, convertion has been done to buffer.
-             * Rewind buffer and offset, then copy and scale line */
-            p_buffer = p_buffer_start;
-            p_offset = p_offset_start;            
-            for( i_x = i_pic_width / 16; i_x--; )
-            {
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-            }            
-        }        
-        else
-        {
-            /* No scaling, convertion has been done directly in picture memory.
-             * Increment of picture pointer to end of line is still needed */
-            p_pic += i_pic_width;            
-        }
-
-        /* End of line: skip picture to reach beginning of next line */
-        p_pic += i_pic_line_width;
- 
-        /* 
-         * Handle vertical scaling. The current line can be copied or next one
-         * can be ignored.
-         */
-        switch( i_vertical_scaling )
-        {
-        case -1:                         /* vertical scaling factor is < 1 */
-            while( (i_scale_count -= i_pic_height) >= 0 )
-            {                
-                /* Height reduction: skip next source line */
-                p_y += i_width;
-                i_y++;                
-            }            
-            i_scale_count += i_height;
-            break;            
-        case 1:                          /* vertical scaling factor is > 1 */
-            while( (i_scale_count -= i_height) > 0 )
-            {                
-                /* Height increment: copy previous picture line */
-                for( i_x = i_pic_width / 16; i_x--; )
-                {
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                }
-                p_pic +=        i_pic_line_width;
-                p_pic_start +=  i_pic_line_width;
-            }
-            i_scale_count += i_pic_height; 
-            break;
-        }
+        /* Do horizontal and vertical scaling */
+        SCALE_WIDTH;
+        SCALE_HEIGHT(400);        
     }
 }
 
@@ -692,7 +761,65 @@ static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y
                              int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                              int i_matrix_coefficients )
 {
-    //??
+    boolean_t   b_horizontal_scaling;               /* horizontal scaling type */
+    int         i_vertical_scaling;                   /* vertical scaling type */
+    int         i_x, i_y;                   /* horizontal and vertical indexes */
+    int         i_scale_count;                         /* scale modulo counter */
+    int         i_chroma_width;                      /* chroma width, not used */    
+    u32 *       p_gray;                               /* base convertion table */
+    u32 *       p_pic_start;         /* beginning of the current line for copy */
+    u32 *       p_buffer_start;                     /* convertion buffer start */
+    u32 *       p_buffer;                         /* convertion buffer pointer */
+    int *       p_offset_start;                          /* offset array start */
+    int *       p_offset;                              /* offset array pointer */    
+    
+    /* 
+     * Initialize some values  - i_pic_line_width will store the line skip 
+     */
+    i_pic_line_width -= i_pic_width;                                            
+    p_gray =            p_vout->yuv.yuv.p_gray32;    
+    p_buffer_start =    p_vout->yuv.p_buffer;                                   
+    p_offset_start =    p_vout->yuv.p_offset;                                   
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+
+    /*
+     * Perform convertion
+     */
+    i_scale_count = i_pic_height;
+    for( i_y = 0; i_y < i_height; i_y++ )
+    {
+        /* Mark beginnning of line for possible later line copy, and initialize
+         * buffer */
+        p_pic_start =   p_pic;
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+
+        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+         * pixels wide blocks */
+        for( i_x = i_width / 16; i_x--;  )
+        {
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ];
+        }             
+
+        /* Do horizontal and vertical scaling */
+        SCALE_WIDTH;
+        SCALE_HEIGHT(400);        
+    }
 }
 
 /*******************************************************************************
@@ -736,60 +863,8 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     p_yuv =             p_vout->yuv.yuv.p_rgb16;
     p_buffer_start =    p_vout->yuv.p_buffer;        
     p_offset_start =    p_vout->yuv.p_offset;                    
-   
-    /* 
-     * Set scalings 
-     */
-    if( i_pic_width - i_width > 0 )
-    {
-        /* Prepare scaling array for horizontal extension */
-        b_horizontal_scaling =  1;   
-        p_offset =              p_offset_start;
-        i_scale_count =         i_pic_width;
-        for( i_x = i_width; i_x--; )
-        {
-            while( (i_scale_count -= i_width) > 0 )
-            {
-                *p_offset++ = 0;                
-            }
-            *p_offset++ = 1;            
-            i_scale_count += i_pic_width;            
-        }        
-    }
-    else if( i_pic_width - i_width < 0 )
-    {
-        /* Prepare scaling array for horizontal reduction */
-        b_horizontal_scaling =  1;
-        p_offset =              p_offset_start;        
-        i_scale_count =         i_pic_width;
-        for( i_x = i_pic_width; i_x--; )
-        {
-            *p_offset = 1;            
-            while( (i_scale_count -= i_pic_width) >= 0 )
-            {                
-                *p_offset += 1;                
-            }
-            p_offset++;
-            i_scale_count += i_width;
-        }        
-    }
-    else
-    {
-        /* No horizontal scaling: YUV convertion is done directly to picture */          
-        b_horizontal_scaling =  0;
-    }
-    if( i_pic_height - i_height > 0 )
-    {
-        i_vertical_scaling = 1;        
-    }
-    else if( i_pic_height - i_height < 0 )
-    {
-        i_vertical_scaling = -1;        
-    }
-    else
-    {
-        i_vertical_scaling = 0;        
-    }
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
      * Perform convertion
@@ -816,85 +891,9 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
             CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
         }             
 
-        if( b_horizontal_scaling )
-        {
-            /* Horizontal scaling, convertion has been done to buffer.
-             * Rewind buffer and offset, then copy and scale line */
-            p_buffer = p_buffer_start;
-            p_offset = p_offset_start;            
-            for( i_x = i_pic_width / 16; i_x--; )
-            {
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
-            }            
-        }        
-        else
-        {
-            /* No scaling, convertion has been done directly in picture memory.
-             * Increment of picture pointer to end of line is still needed */
-            p_pic += i_pic_width;            
-        }
-
-        /* If line is odd, rewind U and V samples */
-        if( !(i_y & 0x1) )
-        {
-            p_u -= i_chroma_width;
-            p_v -= i_chroma_width;
-        }
-
-        /* End of line: skip picture to reach beginning of next line */
-        p_pic += i_pic_line_width;
- 
-        /* 
-         * Handle vertical scaling. The current line can be copied or next one
-         * can be ignored.
-         */
-        switch( i_vertical_scaling )
-        {
-        case -1:                         /* vertical scaling factor is < 1 */
-            while( (i_scale_count -= i_pic_height) >= 0 )
-            {                
-                /* Height reduction: skip next source line */
-                p_y += i_width;
-                if( ++i_y & 0x1 )
-                {
-                    p_u += i_chroma_width;
-                    p_v += i_chroma_width;
-                }                
-            }            
-            i_scale_count += i_height;
-            break;            
-        case 1:                          /* vertical scaling factor is > 1 */
-            while( (i_scale_count -= i_height) > 0 )
-            {                
-                /* Height increment: copy previous picture line */
-                for( i_x = i_pic_width / 16; i_x--; )
-                {
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                }
-                p_pic +=        i_pic_line_width;
-                p_pic_start +=  i_pic_line_width;
-            }
-            i_scale_count += i_pic_height; 
-            break;
-        }
+        /* Do horizontal and vertical scaling */
+        SCALE_WIDTH;
+        SCALE_HEIGHT(420);        
     }
 }
 
@@ -905,7 +904,61 @@ static void ConvertYUV422RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
 {
-    //??
+    boolean_t   b_horizontal_scaling;               /* horizontal scaling type */
+    int         i_vertical_scaling;                   /* vertical scaling type */
+    int         i_x, i_y;                   /* horizontal and vertical indexes */
+    int         i_scale_count;                         /* scale modulo counter */
+    int         i_uval, i_vval;                             /* U and V samples */
+    int         i_red, i_green, i_blue;            /* U and V modified samples */
+    int         i_chroma_width;                                /* chroma width */
+    u16 *       p_yuv;                                /* base convertion table */
+    u16 *       p_ybase;                       /* Y dependant convertion table */   
+    u16 *       p_pic_start;         /* beginning of the current line for copy */
+    u16 *       p_buffer_start;                     /* convertion buffer start */
+    u16 *       p_buffer;                         /* convertion buffer pointer */
+    int *       p_offset_start;                          /* offset array start */
+    int *       p_offset;                              /* offset array pointer */
+    
+    /* 
+     * Initialize some values  - i_pic_line_width will store the line skip 
+     */
+    i_pic_line_width -= i_pic_width;
+    i_chroma_width =    i_width / 2;
+    p_yuv =             p_vout->yuv.yuv.p_rgb16;
+    p_buffer_start =    p_vout->yuv.p_buffer;        
+    p_offset_start =    p_vout->yuv.p_offset;                    
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+
+    /*
+     * Perform convertion
+     */
+    i_scale_count = i_pic_height;
+    for( i_y = 0; i_y < i_height; i_y++ )
+    {
+        /* Mark beginnning of line for possible later line copy, and initialize
+         * buffer */
+        p_pic_start =   p_pic;
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+
+        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+         * pixels wide blocks */
+        for( i_x = i_width / 16; i_x--;  )
+        {
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+        }             
+
+        /* Do horizontal and vertical scaling */
+        SCALE_WIDTH;
+        SCALE_HEIGHT(422);        
+    }
 }
 
 /*******************************************************************************
@@ -915,7 +968,60 @@ static void ConvertYUV444RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
 {
-    //??
+    boolean_t   b_horizontal_scaling;               /* horizontal scaling type */
+    int         i_vertical_scaling;                   /* vertical scaling type */
+    int         i_x, i_y;                   /* horizontal and vertical indexes */
+    int         i_scale_count;                         /* scale modulo counter */
+    int         i_uval, i_vval;                             /* U and V samples */
+    int         i_red, i_green, i_blue;            /* U and V modified samples */
+    int         i_chroma_width;                      /* chroma width, not used */
+    u16 *       p_yuv;                                /* base convertion table */
+    u16 *       p_ybase;                       /* Y dependant convertion table */   
+    u16 *       p_pic_start;         /* beginning of the current line for copy */
+    u16 *       p_buffer_start;                     /* convertion buffer start */
+    u16 *       p_buffer;                         /* convertion buffer pointer */
+    int *       p_offset_start;                          /* offset array start */
+    int *       p_offset;                              /* offset array pointer */
+    
+    /* 
+     * Initialize some values  - i_pic_line_width will store the line skip 
+     */
+    i_pic_line_width -= i_pic_width;
+    p_yuv =             p_vout->yuv.yuv.p_rgb16;
+    p_buffer_start =    p_vout->yuv.p_buffer;        
+    p_offset_start =    p_vout->yuv.p_offset;                    
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+
+    /*
+     * Perform convertion
+     */
+    i_scale_count = i_pic_height;
+    for( i_y = 0; i_y < i_height; i_y++ )
+    {
+        /* Mark beginnning of line for possible later line copy, and initialize
+         * buffer */
+        p_pic_start =   p_pic;
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+
+        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+         * pixels wide blocks */
+        for( i_x = i_width / 16; i_x--;  )
+        {
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+        }             
+
+        /* Do horizontal and vertical scaling */
+        SCALE_WIDTH;
+        SCALE_HEIGHT(444);        
+    }
 }
 
 /*******************************************************************************
@@ -955,7 +1061,61 @@ static void ConvertYUV420RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
 {
-    //??
+    boolean_t   b_horizontal_scaling;               /* horizontal scaling type */
+    int         i_vertical_scaling;                   /* vertical scaling type */
+    int         i_x, i_y;                   /* horizontal and vertical indexes */
+    int         i_scale_count;                         /* scale modulo counter */
+    int         i_uval, i_vval;                             /* U and V samples */
+    int         i_red, i_green, i_blue;            /* U and V modified samples */
+    int         i_chroma_width;                                /* chroma width */
+    u32 *       p_yuv;                                /* base convertion table */
+    u32 *       p_ybase;                       /* Y dependant convertion table */   
+    u32 *       p_pic_start;         /* beginning of the current line for copy */
+    u32 *       p_buffer_start;                     /* convertion buffer start */
+    u32 *       p_buffer;                         /* convertion buffer pointer */
+    int *       p_offset_start;                          /* offset array start */
+    int *       p_offset;                              /* offset array pointer */
+    
+    /* 
+     * Initialize some values  - i_pic_line_width will store the line skip 
+     */
+    i_pic_line_width -= i_pic_width;
+    i_chroma_width =    i_width / 2;
+    p_yuv =             p_vout->yuv.yuv.p_rgb32;
+    p_buffer_start =    p_vout->yuv.p_buffer;        
+    p_offset_start =    p_vout->yuv.p_offset;                    
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+
+    /*
+     * Perform convertion
+     */
+    i_scale_count = i_pic_height;
+    for( i_y = 0; i_y < i_height; i_y++ )
+    {
+        /* Mark beginnning of line for possible later line copy, and initialize
+         * buffer */
+        p_pic_start =   p_pic;
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+
+        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+         * pixels wide blocks */
+        for( i_x = i_width / 16; i_x--;  )
+        {
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+        }             
+
+        /* Do horizontal and vertical scaling */
+        SCALE_WIDTH;
+        SCALE_HEIGHT(420);        
+    }
 }
 
 /*******************************************************************************
@@ -965,7 +1125,61 @@ static void ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
 {
-    //??
+    boolean_t   b_horizontal_scaling;               /* horizontal scaling type */
+    int         i_vertical_scaling;                   /* vertical scaling type */
+    int         i_x, i_y;                   /* horizontal and vertical indexes */
+    int         i_scale_count;                         /* scale modulo counter */
+    int         i_uval, i_vval;                             /* U and V samples */
+    int         i_red, i_green, i_blue;            /* U and V modified samples */
+    int         i_chroma_width;                                /* chroma width */
+    u32 *       p_yuv;                                /* base convertion table */
+    u32 *       p_ybase;                       /* Y dependant convertion table */   
+    u32 *       p_pic_start;         /* beginning of the current line for copy */
+    u32 *       p_buffer_start;                     /* convertion buffer start */
+    u32 *       p_buffer;                         /* convertion buffer pointer */
+    int *       p_offset_start;                          /* offset array start */
+    int *       p_offset;                              /* offset array pointer */
+    
+    /* 
+     * Initialize some values  - i_pic_line_width will store the line skip 
+     */
+    i_pic_line_width -= i_pic_width;
+    i_chroma_width =    i_width / 2;
+    p_yuv =             p_vout->yuv.yuv.p_rgb32;
+    p_buffer_start =    p_vout->yuv.p_buffer;        
+    p_offset_start =    p_vout->yuv.p_offset;                    
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+
+    /*
+     * Perform convertion
+     */
+    i_scale_count = i_pic_height;
+    for( i_y = 0; i_y < i_height; i_y++ )
+    {
+        /* Mark beginnning of line for possible later line copy, and initialize
+         * buffer */
+        p_pic_start =   p_pic;
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+
+        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+         * pixels wide blocks */
+        for( i_x = i_width / 16; i_x--;  )
+        {
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+        }             
+
+        /* Do horizontal and vertical scaling */
+        SCALE_WIDTH;
+        SCALE_HEIGHT(422);        
+    }
 }
 
 /*******************************************************************************
@@ -975,7 +1189,60 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
 {
-    //??
+    boolean_t   b_horizontal_scaling;               /* horizontal scaling type */
+    int         i_vertical_scaling;                   /* vertical scaling type */
+    int         i_x, i_y;                   /* horizontal and vertical indexes */
+    int         i_scale_count;                         /* scale modulo counter */
+    int         i_uval, i_vval;                             /* U and V samples */
+    int         i_red, i_green, i_blue;            /* U and V modified samples */
+    int         i_chroma_width;                      /* chroma width, not used */
+    u32 *       p_yuv;                                /* base convertion table */
+    u32 *       p_ybase;                       /* Y dependant convertion table */   
+    u32 *       p_pic_start;         /* beginning of the current line for copy */
+    u32 *       p_buffer_start;                     /* convertion buffer start */
+    u32 *       p_buffer;                         /* convertion buffer pointer */
+    int *       p_offset_start;                          /* offset array start */
+    int *       p_offset;                              /* offset array pointer */
+    
+    /* 
+     * Initialize some values  - i_pic_line_width will store the line skip 
+     */
+    i_pic_line_width -= i_pic_width;
+    p_yuv =             p_vout->yuv.yuv.p_rgb32;
+    p_buffer_start =    p_vout->yuv.p_buffer;        
+    p_offset_start =    p_vout->yuv.p_offset;                    
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+
+    /*
+     * Perform convertion
+     */
+    i_scale_count = i_pic_height;
+    for( i_y = 0; i_y < i_height; i_y++ )
+    {
+        /* Mark beginnning of line for possible later line copy, and initialize
+         * buffer */
+        p_pic_start =   p_pic;
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+
+        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+         * pixels wide blocks */
+        for( i_x = i_width / 16; i_x--;  )
+        {
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_YUV_PIXEL;
+        }             
+
+        /* Do horizontal and vertical scaling */
+        SCALE_WIDTH;
+        SCALE_HEIGHT(444);        
+    }
 }
 
 //-------------------- walken code follow ---------------------------------------
@@ -1160,197 +1427,3 @@ static void yuvToRgb24 (unsigned char * Y,
     }
 }
 
-static void yuvToRgb32 (unsigned char * Y,
-			unsigned char * U, unsigned char * V,
-			int * dest, int table[1935], int width)
-{
-    int i;
-    int u;
-    int v;
-    int uvRed;
-    int uvGreen;
-    int uvBlue;
-    int * tableY;
-
-    i = width >> 4;
-    while (i--) {
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-    }
-
-    i = (width & 15) >> 1;
-    while (i--) {
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-    }
-
-    if (width & 1) {
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-    }
-}
