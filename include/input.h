@@ -203,7 +203,6 @@ typedef struct
  * pcr_descriptor_t
  *******************************************************************************
  * Contains informations used to synchronise the decoder with the server
- * Only input_PcrDecode() is allowed to modify it
  *******************************************************************************/
 
 typedef struct pcr_descriptor_struct
@@ -211,9 +210,11 @@ typedef struct pcr_descriptor_struct
     pthread_mutex_t         lock;                     /* pcr modification lock */
 
     s64                     delta_clock;
+    s64                     delta_decode;
                             /* represents decoder_time - pcr_time in usecondes */
     count_t                 c_average;
                              /* counter used to compute dynamic average values */
+    count_t                 c_pts;
 #ifdef STATS
     /* Stats */
     count_t     c_average_jitter;

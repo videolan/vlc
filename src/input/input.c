@@ -870,12 +870,33 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                    the 14 bytes */
                 if( p_pes->b_has_pts )
                 {
-                   /* The PTS field is split in 3 bit records. We have to add
-                      them, and thereafter we substract the 2 marker_bits */
-                    p_pes->i_pts = ( (p_pes->p_pes_header[9] << 29) +
-                                     (U16_AT(p_pes->p_pes_header + 10) << 14) +
-                                     (U16_AT(p_pes->p_pes_header + 12) >> 1) -
-                                     (1 << 14) - (1 << 29) );
+                    pcr_descriptor_t *p_pcr;
+                    /* The PTS field is split in 3 bit records. We have to add
+                       them, and thereafter we substract the 2 marker_bits */
+
+                    p_pcr = p_input->p_pcr;
+                    pthread_mutex_lock( &p_pcr->lock );
+                    if( p_pcr->delta_clock == 0 )
+                    {
+                        p_pes->i_pts = 0;
+                    }
+                    else
+                    {
+                        p_pes->i_pts = ( ((s64)p_pes->p_pes_header[9] << 29) +
+                                         ((s64)U16_AT(p_pes->p_pes_header + 10) << 14) +
+                                         ((s64)U16_AT(p_pes->p_pes_header + 12) >> 1) -
+                                         (1 << 14) - (1 << 29) );
+                        p_pes->i_pts *= 300;
+                        p_pes->i_pts /= 27;
+                        p_pes->i_pts += p_pcr->delta_clock;
+                        if( p_pcr->c_pts == 0 )
+                        {
+                            p_pcr->delta_decode = mdate() - p_pes->i_pts + 500000;
+                        }
+                        p_pes->i_pts += p_pcr->delta_decode;
+                    }
+                    p_pcr->c_pts += 1;
+                    pthread_mutex_unlock( &p_pcr->lock );
                 }
                 break;
             }
