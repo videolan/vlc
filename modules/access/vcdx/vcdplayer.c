@@ -3,7 +3,7 @@
  *               using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
- * $Id: vcdplayer.c,v 1.5 2003/11/24 03:30:36 rocky Exp $
+ * $Id: vcdplayer.c,v 1.6 2003/12/05 04:24:47 rocky Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +31,11 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc/intf.h>
 
 #include "vcd.h"
 #include "vcdplayer.h"
+#include "intf.h"
 
 #include <string.h>
 
@@ -183,9 +185,13 @@ vcdplayer_pbc_nav ( input_thread_t * p_input )
       if (wait_time != 0) {
         /* FIXME */
         p_vcd->in_still = wait_time - 1;
-        SLEEP_1_SEC_AND_HANDLE_EVENTS ;
+	p_vcd->p_intf->p_sys->m_still_time = (wait_time - 1) * 1000000;
         return READ_STILL_FRAME;
+      } else {
+	p_vcd->p_intf->p_sys->m_still_time = 0;
+	p_vcd->p_intf->p_sys->b_inf_still  = 1;
       }
+
     }
     vcdplayer_update_entry( p_input, 
                             vcdinf_pld_get_next_offset(p_vcd->pxd.pld),
@@ -208,9 +214,16 @@ vcdplayer_pbc_nav ( input_thread_t * p_input )
       
       /* Handle any wait time given */
       if (-5 == p_vcd->in_still) {
-        p_vcd->in_still = wait_time - 1;
-        SLEEP_1_SEC_AND_HANDLE_EVENTS ;
-        return READ_STILL_FRAME;
+	if (wait_time != 0) {
+	  /* FIXME */
+	  p_vcd->in_still = wait_time - 1;
+	  p_vcd->p_intf->p_sys->m_still_time = (wait_time - 1) * 1000000;
+	  return READ_STILL_FRAME;
+	} else {
+	  p_vcd->p_intf->p_sys->m_still_time = 0;
+	  p_vcd->p_intf->p_sys->b_inf_still  = 1;
+	}
+	return READ_STILL_FRAME;
       }
       
       /* Handle any looping given. */

@@ -2,7 +2,7 @@
  * intf.h: send info to intf.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf.h,v 1.1 2003/10/04 18:55:13 gbazin Exp $
+ * $Id: intf.h,v 1.2 2003/12/05 04:24:47 rocky Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -20,6 +20,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*****************************************************************************
+ * intf_sys_t: description and status of interface
+ *****************************************************************************/
+struct intf_sys_t
+{
+    input_thread_t    * p_input;
+    thread_vcd_data_t * p_vcd;
+
+    vlc_bool_t          b_still;
+    vlc_bool_t          b_inf_still;
+    mtime_t             m_still_time;
+
+#if FINISHED
+    vcdplay_ctrl_t      control;
+#else 
+    int                 control;
+#endif
+    vlc_bool_t          b_click, b_move, b_key_pressed;
+};
 
 int vcdIntfStillTime( struct intf_thread_t *, int );
 int vcdIntfResetStillTime( intf_thread_t *p_intf );

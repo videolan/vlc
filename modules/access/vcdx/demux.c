@@ -2,7 +2,7 @@
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.2 2003/11/09 00:52:32 rocky Exp $
+ * $Id: demux.c,v 1.3 2003/12/05 04:24:47 rocky Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -49,6 +49,7 @@
 #endif
 
 #include "vcd.h"
+#include "vcdplayer.h"
 #include "intf.h"
 
 /* how many packets vcdx_Demux will read in each loop */

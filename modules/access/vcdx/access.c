@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.7 2003/12/03 21:55:33 rocky Exp $
+ * $Id: access.c,v 1.8 2003/12/05 04:24:47 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -30,12 +30,12 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#include <vlc_interface.h>
+#include <vlc/intf.h>
 
 #include "../../demux/mpeg/system.h"
 #include "vcd.h"
-#include "intf.h"
 #include "vcdplayer.h"
+#include "intf.h"
 
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
@@ -49,6 +49,8 @@
 /* how many blocks VCDRead will read in each loop */
 #define VCD_BLOCKS_ONCE 20
 #define VCD_DATA_ONCE   (VCD_BLOCKS_ONCE * M2F2_SECTOR_SIZE)
+
+#define VCD_MRL_PREFIX "vcdx://"
 
 /*****************************************************************************
  * Local prototypes
@@ -193,9 +195,9 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             memset(p_buf, 0, M2F2_SECTOR_SIZE);
             p_buf += 2;
             *p_buf = 0x01;
-            dbg_print(INPUT_DBG_STILL, "Handled still event\n");
+            dbg_print(INPUT_DBG_STILL, "Handled still event");
 
-	    /* p_vcd->p_intf->b_end_of_cell = true; */
+	    p_vcd->p_intf->p_sys->b_still = 1;
 	    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
 
 	    vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -205,7 +207,9 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
 	    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+            dbg_print(INPUT_DBG_STILL, "Clock manage");
 	    input_ClockManageControl( p_input, p_pgrm, 0 );
+            dbg_print(INPUT_DBG_STILL, "Clock manage done");
 
             return i_read + M2F2_SECTOR_SIZE;
           }
@@ -945,7 +949,7 @@ VCDUpdateVar( input_thread_t *p_input, int i_num, int i_action,
 
 #define meta_info_add_str(title, str) \
   if ( str ) {								\
-    dbg_print( INPUT_DBG_META, "field: %s: %s\n", title, str);	\
+    dbg_print( INPUT_DBG_META, "field: %s: %s\n", title, str);		\
     input_AddInfo( p_cat, _(title), "%s", str );			\
   }
 
@@ -976,6 +980,92 @@ static void InformationCreate( input_thread_t *p_input  )
   meta_info_add_num( "Tracks",     vcdinfo_get_num_tracks(p_vcd->vcd));
 
 }
+
+#if FINISHED_PLAYLIST
+static void
+VCDCreatePlayListItem(const input_thread_t *p_input, 
+		      thread_vcd_data_t *p_vcd, 
+		      playlist_t *p_playlist, unsigned int i_track, 
+		      char *psz_mrl, int psz_mrl_max, 
+		      const char *psz_source, int playlist_operation, 
+		      unsigned int i_pos)
+{
+  mtime_t i_duration = 
+    (vcdinfo_get_track_size(p_vcd->vcd, i_track) * 8 * 10000000)
+    / (400 * p_input->stream.control.i_rate) ;
+  char *p_title;
+  char *config_varname = MODULE_STRING "-title-format";
+
+  snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u", 
+	   VCD_MRL_PREFIX, psz_source, i_track);
+
+#if 0
+  p_title = VCDFormatStr(p_input, p_vcd, 
+			 config_GetPsz( p_input, config_varname ), 
+			 psz_mrl, i_track);
+#else
+  p_title = psz_mrl;
+#endif
+
+  playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration, 
+		   0, 0, playlist_operation, i_pos );
+}
+
+static int
+VCDFixupPlayList( input_thread_t *p_input, thread_vcd_data_t *p_vcd, 
+		  const char *psz_source )
+{
+  unsigned int i;
+  playlist_t * p_playlist;
+  char       * psz_mrl;
+  unsigned int psz_mrl_max = strlen(VCD_MRL_PREFIX) + strlen(psz_source) + 
+    strlen("@T") + strlen("100") + 1;
+
+  psz_mrl = malloc( psz_mrl_max );
+
+  if( psz_mrl == NULL )
+    {
+      msg_Warn( p_input, "out of memory" );
+      return -1;
+    }
+
+  p_playlist = (playlist_t *) vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+					       FIND_ANYWHERE );
+  if( !p_playlist )
+    {
+      msg_Warn( p_input, "can't find playlist" );
+      free(psz_mrl);
+      return -1;
+    }
+
+  if ( config_GetInt( p_input, MODULE_STRING "-PBC" ) ) {
+    /* May fill out more information when the playlist user interface becomes
+       more mature.
+     */
+    VCDCreatePlayListItem(p_input, p_vcd, p_playlist, p_vcd->cur_track, 
+			  psz_mrl, psz_mrl_max, psz_source, PLAYLIST_REPLACE, 
+			  p_playlist->i_index);
+  } else {
+  
+    playlist_Delete( p_playlist, p_playlist->i_index);
+
+    for( i = 1 ; i < p_vcd->num_tracks ; i++ )
+      {
+	VCDCreatePlayListItem(p_input, p_vcd, p_playlist, i, psz_mrl, 
+			      psz_mrl_max, psz_source, PLAYLIST_APPEND, 
+			      PLAYLIST_END);
+
+      }
+
+    playlist_Command( p_playlist, PLAYLIST_GOTO, 0 );
+
+  }
+    
+  vlc_object_release( p_playlist );
+  free(psz_mrl);
+  return 0;
+}
+#endif
 
 /*****************************************************************************
  * Public routines.
@@ -1061,16 +1151,13 @@ E_(Open) ( vlc_object_t *p_this )
     if( !(p_vcd->vcd = vcd_Open( p_this, psz_source )) )
     {
         msg_Warn( p_input, "could not open %s", psz_source );
-        free( psz_source );
-        free( p_vcd );
-        return VLC_EGENERIC;
+	goto err_exit;
     }
 
     /* Get track information. */
     p_vcd->num_tracks = ioctl_GetTracksMap( VLC_OBJECT(p_input),
                                             vcdinfo_get_cd_image(p_vcd->vcd), 
                                             &p_vcd->p_sectors );
-    free( psz_source );
     if( p_vcd->num_tracks < 0 )
         LOG_ERR ("unable to count tracks" );
     else if( p_vcd->num_tracks <= 1 )
@@ -1078,8 +1165,7 @@ E_(Open) ( vlc_object_t *p_this )
     if( p_vcd->num_tracks <= 1)
     {
         vcdinfo_close( p_vcd->vcd );
-        free( p_vcd );
-        return VLC_EGENERIC;
+	goto err_exit;
     }
 
     /* Set stream and area data */
@@ -1117,8 +1203,7 @@ E_(Open) ( vlc_object_t *p_this )
 
     if ( ! b_play_ok ) {
       vcdinfo_close( p_vcd->vcd );
-      free( p_vcd );
-      return VLC_EGENERIC;
+      goto err_exit;
     }
 
     if( !p_input->psz_demux || !*p_input->psz_demux )
@@ -1136,7 +1221,17 @@ E_(Open) ( vlc_object_t *p_this )
 
     InformationCreate( p_input );
 
+#if FINISHED_PLAYLIST
+    VCDFixupPlayList( p_input, p_vcd, psz_source );
+#endif
+    
+    free( psz_source );
+
     return VLC_SUCCESS;
+ err_exit:
+    free( psz_source );
+    free( p_vcd );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************

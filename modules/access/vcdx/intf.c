@@ -2,7 +2,7 @@
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
  * Copyright (C) 2002,2003 VideoLAN
- * $Id: intf.c,v 1.9 2003/11/26 01:45:03 rocky Exp $
+ * $Id: intf.c,v 1.10 2003/12/05 04:24:47 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
@@ -35,33 +35,12 @@
 
 #include "vcd.h"
 #include "vcdplayer.h"
-
-/*****************************************************************************
- * intf_sys_t: description and status of interface
- *****************************************************************************/
-struct intf_sys_t
-{
-    input_thread_t    * p_input;
-    thread_vcd_data_t * p_vcd;
-
-    vlc_bool_t          b_still;
-    vlc_bool_t          b_inf_still;
-    mtime_t             m_still_time;
-
-#if FINISHED
-    vcdplay_ctrl_t      control;
-#else 
-    int                 control;
-#endif
-    vlc_bool_t          b_click, b_move, b_key_pressed;
-};
+#include "intf.h"
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
 static int  InitThread     ( intf_thread_t *p_intf );
-static int  MouseEvent     ( vlc_object_t *, char const *,
-                             vlc_value_t, vlc_value_t, void * );
 static int  KeyEvent       ( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 
@@ -100,6 +79,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 void E_(CloseIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    var_DelCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -112,6 +92,8 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
 static void RunIntf( intf_thread_t *p_intf )
 {
     vlc_object_t      * p_vout = NULL;
+    mtime_t             mtime = 0;
+    mtime_t             mlast = 0;
     thread_vcd_data_t * p_vcd;
     input_thread_t    * p_input;
     
@@ -135,6 +117,35 @@ static void RunIntf( intf_thread_t *p_intf )
     while( !p_intf->b_die )
     {
       vlc_mutex_lock( &p_intf->change_lock );
+
+        /*
+         * still images
+         */
+        if( p_intf->p_sys->b_still && !p_intf->p_sys->b_inf_still )
+        {
+            if( p_intf->p_sys->m_still_time > 0 )
+            {
+                /* update remaining still time */
+	        dbg_print(INPUT_DBG_STILL, "updating still time");
+                mtime = mdate();
+                if( mlast )
+                {
+                    p_intf->p_sys->m_still_time -= mtime - mlast;
+                }
+
+                mlast = mtime;
+            }
+            else
+            {
+                /* still time elasped */
+	        dbg_print(INPUT_DBG_STILL, "wait time done - setting play");
+                input_SetStatus( p_intf->p_sys->p_input,
+                                 INPUT_STATUS_PLAY );
+                p_intf->p_sys->m_still_time = 0;
+                p_intf->p_sys->b_still = 0;
+                mlast = 0;
+            }
+        }
 
       /*
        * keyboard event
@@ -215,6 +226,18 @@ static void RunIntf( intf_thread_t *p_intf )
 	      }
 	    }
 	    number_addend = 0;
+
+	    /* we can safely interact with the VCD player
+	     * with the stream lock */
+	    if( p_intf->p_sys->b_still )
+	      {
+		dbg_print(INPUT_DBG_STILL, "Playing still after activate");
+		input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+		p_intf->p_sys->b_still = 0;
+		p_intf->p_sys->b_inf_still = 0;
+		p_intf->p_sys->m_still_time = 0;
+	      }
+
 	  } else {
 	    unsigned int digit_entered=0;
 
@@ -259,8 +282,6 @@ static void RunIntf( intf_thread_t *p_intf )
 				    VLC_OBJECT_VOUT, FIND_CHILD );
 	  if( p_vout )
             {
-	      var_AddCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
-	      var_AddCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
 	      var_AddCallback( p_vout, "key-pressed", KeyEvent, p_intf );
             }
         }
@@ -272,8 +293,6 @@ static void RunIntf( intf_thread_t *p_intf )
 
     if( p_vout )
     {
-        var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
-        var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
         var_DelCallback( p_vout, "key-pressed", KeyEvent, p_intf );
         vlc_object_release( p_vout );
     }
@@ -318,30 +337,6 @@ static int InitThread( intf_thread_t * p_intf )
 }
 
 /*****************************************************************************
- * MouseEvent: callback for mouse events
- *****************************************************************************/
-static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)p_data;
-
-    vlc_mutex_lock( &p_intf->change_lock );
-
-    if( psz_var[6] == 'c' ) /* "mouse-clicked" */
-    {
-        p_intf->p_sys->b_click = VLC_TRUE;
-    }
-    else if( psz_var[6] == 'm' ) /* "mouse-moved" */
-    {
-        p_intf->p_sys->b_move = VLC_TRUE;
-    }
-
-    vlc_mutex_unlock( &p_intf->change_lock );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
  * KeyEvent: callback for keyboard events
  *****************************************************************************/
 static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
@@ -358,7 +353,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
 }
 
 /*****************************************************************************
- * dvdIntfStillTime: function provided to demux plugin to request
+ * vcdIntfStillTime: function provided to demux plugin to request
  * still images
  *****************************************************************************/
 int vcdIntfStillTime( intf_thread_t *p_intf, int i_sec )
