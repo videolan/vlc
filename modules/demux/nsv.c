@@ -365,13 +365,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pi64 = 0;
             return VLC_EGENERIC;
 
-        case DEMUX_SET_TIME:
 #endif
         case DEMUX_GET_FPS:
             pf = (double*)va_arg( args, double * );
             *pf = (double)1000000.0 / (double)p_sys->i_pcr_inc;
             return VLC_SUCCESS;
 
+        case DEMUX_SET_TIME:
         default:
             return VLC_EGENERIC;
     }
