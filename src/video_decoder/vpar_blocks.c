@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.10 2001/09/06 13:16:26 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.11 2001/10/01 10:27:17 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -1877,6 +1877,21 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
 
     p_vpar->mb.i_offset = MacroblockAddressIncrement( p_vpar ) << 4;
 
+    while( (int)(p_vpar->mb.i_offset - p_vpar->sequence.i_width) >= 0 )
+    {
+        /* Unusual construct at the start of some slices. Jump one line. */
+        p_vpar->mb.i_offset -= p_vpar->sequence.i_width;
+        p_dest[0] += i_width * 16;
+        p_dest[1] += i_width * 4;
+        p_dest[2] += i_width * 4;
+        p_f_motion->pppi_ref[0][0] += i_width * 16;
+        p_f_motion->pppi_ref[0][1] += i_width * 4;
+        p_f_motion->pppi_ref[0][2] += i_width * 4;
+        p_f_motion->pppi_ref[1][0] += i_width * 16;
+        p_f_motion->pppi_ref[1][1] += i_width * 4;
+        p_f_motion->pppi_ref[1][2] += i_width * 4;
+    }
+
     for( ; ; )
     {
         /* Decode macroblocks. */
@@ -2006,7 +2021,6 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
                     p_f_motion->ppi_pmv[0][0] = p_f_motion->ppi_pmv[0][1] = 0;
                     p_f_motion->ppi_pmv[1][0] = p_f_motion->ppi_pmv[1][1] = 0;
                     MOTION( MotionFieldZero, MB_MOTION_FORWARD );
-
                 }
             }
 
