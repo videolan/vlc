@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.6 2003/01/17 16:18:03 sam Exp $
+ * $Id: deinterlace.c,v 1.7 2003/01/28 12:30:44 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -60,6 +60,15 @@ static void Merge        ( void *, const void *, const void *, size_t );
 static int  SendEvents   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
+static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method );
+static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout );
+
+/*****************************************************************************
+ * Callback prototypes
+ *****************************************************************************/
+static int FilterCallback ( vlc_object_t *, char const *,
+                            vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -93,6 +102,8 @@ struct vout_sys_t
     mtime_t    next_date;
 
     vout_thread_t *p_vout;
+
+    vlc_mutex_t filter_lock;
 };
 
 /*****************************************************************************
@@ -103,7 +114,7 @@ struct vout_sys_t
 static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    char *psz_method;
+    vlc_value_t val;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -122,53 +133,71 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
     p_vout->p_sys->b_double_rate = 0;
     p_vout->p_sys->last_date = 0;
+    vlc_mutex_init( p_vout, &p_vout->p_sys->filter_lock );
 
     /* Look what method was requested */
-    psz_method = config_GetPsz( p_vout, "deinterlace-mode" );
+    val.psz_string = config_GetPsz( p_vout, "deinterlace-mode" );
 
-    if( psz_method == NULL )
+    var_Create( p_vout, "deinterlace-mode", VLC_VAR_STRING );
+
+    if( val.psz_string == NULL )
     {
         msg_Err( p_vout, "configuration variable %s empty",
                          "deinterlace-mode" );
         msg_Err( p_vout, "no deinterlace mode provided, using \"discard\"" );
+
+        val.psz_string = strdup( "discard" );
+    }
+
+    var_Set( p_vout, "deinterlace-mode", val );
+
+    SetFilterMethod( p_vout, val.psz_string );
+
+    free( val.psz_string );
+
+    var_AddCallback( p_vout, "deinterlace-mode", FilterCallback, NULL );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * SetFilterMethod: setup the deinterlace method to use.
+ *****************************************************************************/
+static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
+{
+    if( !strcmp( psz_method, "discard" ) )
+    {
+        p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
+        p_vout->p_sys->b_double_rate = 0;
+    }
+    else if( !strcmp( psz_method, "mean" ) )
+    {
+        p_vout->p_sys->i_mode = DEINTERLACE_MEAN;
+        p_vout->p_sys->b_double_rate = 0;
+    }
+    else if( !strcmp( psz_method, "blend" )
+             || !strcmp( psz_method, "average" )
+             || !strcmp( psz_method, "combine-fields" ) )
+    {
+        p_vout->p_sys->i_mode = DEINTERLACE_BLEND;
+        p_vout->p_sys->b_double_rate = 0;
+    }
+    else if( !strcmp( psz_method, "bob" )
+             || !strcmp( psz_method, "progressive-scan" ) )
+    {
+        p_vout->p_sys->i_mode = DEINTERLACE_BOB;
+        p_vout->p_sys->b_double_rate = 1;
+    }
+    else if( !strcmp( psz_method, "linear" ) )
+    {
+        p_vout->p_sys->i_mode = DEINTERLACE_LINEAR;
+        p_vout->p_sys->b_double_rate = 1;
     }
     else
     {
-        if( !strcmp( psz_method, "discard" ) )
-        {
-            p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
-        }
-        else if( !strcmp( psz_method, "mean" ) )
-        {
-            p_vout->p_sys->i_mode = DEINTERLACE_MEAN;
-        }
-        else if( !strcmp( psz_method, "blend" )
-                  || !strcmp( psz_method, "average" )
-                  || !strcmp( psz_method, "combine-fields" ) )
-        {
-            p_vout->p_sys->i_mode = DEINTERLACE_BLEND;
-        }
-        else if( !strcmp( psz_method, "bob" )
-                  || !strcmp( psz_method, "progressive-scan" ) )
-        {
-            p_vout->p_sys->i_mode = DEINTERLACE_BOB;
-            p_vout->p_sys->b_double_rate = 1;
-        }
-        else if( !strcmp( psz_method, "linear" ) )
-        {
-            p_vout->p_sys->i_mode = DEINTERLACE_LINEAR;
-            p_vout->p_sys->b_double_rate = 1;
-        }
-        else
-        {
-            msg_Err( p_vout, "no valid deinterlace mode provided, "
-                             "using \"discard\"" );
-        }
-
-        free( psz_method );
+        msg_Err( p_vout, "no valid deinterlace mode provided, "
+                 "using \"discard\"" );
     }
-
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -200,7 +229,31 @@ static int Init( vout_thread_t *p_vout )
             break;
     }
 
-    /* Try to open the real video output, with half the height our images */
+    /* Try to open the real video output */
+    p_vout->p_sys->p_vout = SpawnRealVout( p_vout );
+
+    if( p_vout->p_sys->p_vout == NULL )
+    {
+        /* Everything failed */
+        msg_Err( p_vout, "cannot open vout, aborting" );
+
+        return VLC_EGENERIC;
+    }
+
+    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
+
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * SpawnRealVout: spawn the real video output.
+ *****************************************************************************/
+static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
+{
+    vout_thread_t *p_real_vout = NULL;
+
     msg_Dbg( p_vout, "spawning the real video output" );
 
     switch( p_vout->render.i_chroma )
@@ -212,7 +265,7 @@ static int Init( vout_thread_t *p_vout )
         {
         case DEINTERLACE_MEAN:
         case DEINTERLACE_DISCARD:
-            p_vout->p_sys->p_vout =
+            p_real_vout =
                 vout_Create( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height / 2,
                        p_vout->output.i_chroma, p_vout->output.i_aspect );
@@ -221,7 +274,7 @@ static int Init( vout_thread_t *p_vout )
         case DEINTERLACE_BOB:
         case DEINTERLACE_BLEND:
         case DEINTERLACE_LINEAR:
-            p_vout->p_sys->p_vout =
+            p_real_vout =
                 vout_Create( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height,
                        p_vout->output.i_chroma, p_vout->output.i_aspect );
@@ -230,7 +283,7 @@ static int Init( vout_thread_t *p_vout )
         break;
 
     case VLC_FOURCC('I','4','2','2'):
-        p_vout->p_sys->p_vout =
+        p_real_vout =
             vout_Create( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height,
                        VLC_FOURCC('I','4','2','0'), p_vout->output.i_aspect );
@@ -240,19 +293,7 @@ static int Init( vout_thread_t *p_vout )
         break;
     }
 
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout == NULL )
-    {
-        msg_Err( p_vout, "cannot open vout, aborting" );
-
-        return VLC_EGENERIC;
-    }
-
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
-
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    return VLC_SUCCESS;
+    return p_real_vout;
 }
 
 /*****************************************************************************
@@ -281,6 +322,7 @@ static void Destroy( vlc_object_t *p_this )
 
     DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
 
+    vlc_object_detach( p_vout->p_sys->p_vout );
     vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
@@ -297,6 +339,8 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *pp_outpic[2];
 
+    vlc_mutex_lock( &p_vout->p_sys->filter_lock );
+
     /* Get a new picture */
     while( ( pp_outpic[0] = vout_CreatePicture( p_vout->p_sys->p_vout,
                                              0, 0, 0 ) )
@@ -304,10 +348,11 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
     {
         if( p_vout->b_die || p_vout->b_error )
         {
+            vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
             return;
         }
         msleep( VOUT_OUTMEM_SLEEP );
-    }
+     }
 
     vout_DatePicture( p_vout->p_sys->p_vout, pp_outpic[0], p_pic->date );
 
@@ -321,9 +366,10 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
             if( p_vout->b_die || p_vout->b_error )
             {
                 vout_DestroyPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
+                vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
                 return;
             }
-            msleep( VOUT_OUTMEM_SLEEP );
+	    msleep( VOUT_OUTMEM_SLEEP );
         }
 
         /* 20ms is a bit arbitrary, but it's only for the first image we get */
@@ -371,6 +417,8 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
             break;
     }
+
+    vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
 }
 
 /*****************************************************************************
@@ -668,3 +716,82 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * FilterCallback: called when changing the deinterlace method on the fly.
+ *****************************************************************************/
+static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+    int i_old_mode = p_vout->p_sys->i_mode;
+
+    vlc_mutex_lock( &p_vout->p_sys->filter_lock );
+    msg_Err( p_vout, "filter method: %s", newval.psz_string );
+
+    SetFilterMethod( p_vout, newval.psz_string );
+
+    switch( p_vout->render.i_chroma )
+    {
+    case VLC_FOURCC('I','4','2','2'):
+        vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
+        return VLC_SUCCESS;
+        break;
+
+    case VLC_FOURCC('I','4','2','0'):
+    case VLC_FOURCC('I','Y','U','V'):
+    case VLC_FOURCC('Y','V','1','2'):
+        switch( p_vout->p_sys->i_mode )
+        {
+        case DEINTERLACE_MEAN:
+        case DEINTERLACE_DISCARD:
+            if( ( i_old_mode == DEINTERLACE_MEAN )
+                || ( i_old_mode == DEINTERLACE_DISCARD ) )
+            {
+                vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
+                return VLC_SUCCESS;
+            }
+            break;
+
+        case DEINTERLACE_BOB:
+        case DEINTERLACE_BLEND:
+        case DEINTERLACE_LINEAR:
+            if( ( i_old_mode == DEINTERLACE_BOB )
+                || ( i_old_mode == DEINTERLACE_BLEND )
+                || ( i_old_mode == DEINTERLACE_LINEAR ) )
+            {
+                vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
+                return VLC_SUCCESS;
+            }
+            break;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    /* We need to kill the old vout */
+
+    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
+    vlc_object_detach( p_vout->p_sys->p_vout );
+    vout_Destroy( p_vout->p_sys->p_vout );
+
+    /* Try to open a new video output */
+    p_vout->p_sys->p_vout = SpawnRealVout( p_vout );
+
+    if( p_vout->p_sys->p_vout == NULL )
+    {
+        /* Everything failed */
+        msg_Err( p_vout, "cannot open vout, aborting" );
+
+        vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
+        return VLC_EGENERIC;
+    }
+
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
+    vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
+    return VLC_SUCCESS;
+}

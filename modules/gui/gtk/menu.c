@@ -2,7 +2,7 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.6 2003/01/23 15:52:04 sam Exp $
+ * $Id: menu.c,v 1.7 2003/01/28 12:30:44 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -364,8 +364,6 @@ static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
             }
             config_PutPsz( p_intf, "filter", psz_filter );
         }
-
-        config_PutPsz( p_intf, "deinterlace-mode", psz_mode );
     }
 
     if( psz_filter )
@@ -374,7 +372,18 @@ static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
     /* now restart all video stream */
     if( p_intf->p_sys->p_input )
     {
+        vout_thread_t *p_vout;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+
+        /* Warn the vout we are about to change the filter chain */
+        p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                  FIND_ANYWHERE );
+        if( p_vout )
+        {
+            p_vout->b_filter_change = VLC_TRUE;
+            vlc_object_release( p_vout );
+        }
+
 #define ES p_intf->p_sys->p_input->stream.pp_es[i]
         /* create a set of language buttons and append them to the container */
         for( i = 0 ; i < p_intf->p_sys->p_input->stream.i_es_number ; i++ )
@@ -388,6 +397,26 @@ static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
 #undef ES
         }
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+    }
+
+    if( strcmp( psz_mode, "None" ) )
+    {
+        vout_thread_t *p_vout;
+	p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+				  FIND_ANYWHERE );
+	if( p_vout )
+	{
+	    vlc_value_t val;
+
+	    val.psz_string = psz_mode;
+	    if( var_Set( p_vout, "deinterlace-mode", val ) != VLC_SUCCESS )
+                config_PutPsz( p_intf, "deinterlace-mode", psz_mode );
+
+	    vlc_object_release( p_vout );
+	}
+	else
+            config_PutPsz( p_intf, "deinterlace-mode", psz_mode );
+
     }
 }
 
@@ -1175,10 +1204,23 @@ static gint GtkDeinterlaceMenus( gpointer          p_data,
     {
        if( strstr ( psz_filter, "deinterlace" ) )
        {
-            free( psz_deinterlace_option );
-            psz_deinterlace_option = config_GetPsz( p_intf, "deinterlace-mode" );
-            if( !psz_deinterlace_option )
-                psz_deinterlace_option = strdup( "None" );
+            vlc_value_t val;
+            vout_thread_t *p_vout;
+
+            p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                      FIND_ANYWHERE );
+            if( p_vout &&
+                var_Get( p_vout, "deinterlace-mode", &val ) == VLC_SUCCESS )
+            {
+                if( val.psz_string && *val.psz_string )
+                {
+                    free( psz_deinterlace_option );
+                    psz_deinterlace_option = val.psz_string;
+                }
+                else if( val.psz_string ) free( val.psz_string );
+            }
+
+            if( p_vout ) vlc_object_release( p_vout );
        }
     }
     if( psz_filter )

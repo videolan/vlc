@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.207 2003/01/22 10:44:50 fenrir Exp $
+ * $Id: video_output.c,v 1.208 2003/01/28 12:30:44 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -81,7 +81,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
             else
             {
                 vlc_object_detach( p_vout );
-//                vlc_object_release( p_vout );
+                vlc_object_release( p_vout );
                 vout_Destroy( p_vout );
             }
             if( psz_sout ) free( psz_sout );
@@ -108,10 +108,39 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
     /* If we now have a video output, check it has the right properties */
     if( p_vout )
     {
+        char *psz_filter_chain;
+
+        /* We don't directly check for the "filter" variable for obvious
+         * performance reasons. */
+        if( p_vout->b_filter_change )
+        {
+            psz_filter_chain = config_GetPsz( p_this, "filter" );
+
+            if( psz_filter_chain && !*psz_filter_chain )
+            {
+                free( psz_filter_chain );
+                psz_filter_chain = NULL;
+            }
+            if( p_vout->psz_filter_chain && !*p_vout->psz_filter_chain )
+            {
+                free( p_vout->psz_filter_chain );
+                p_vout->psz_filter_chain = NULL;
+            }
+
+            if( ( !psz_filter_chain && !p_vout->psz_filter_chain ) ||
+                ( psz_filter_chain && p_vout->psz_filter_chain &&
+                  !strcmp( psz_filter_chain, p_vout->psz_filter_chain ) ) )
+            {
+                p_vout->b_filter_change = VLC_FALSE;
+            }
+
+        }
+
         if( ( p_vout->render.i_width != i_width ) ||
             ( p_vout->render.i_height != i_height ) ||
             ( p_vout->render.i_chroma != i_chroma ) ||
-            ( p_vout->render.i_aspect != i_aspect ) )
+            ( p_vout->render.i_aspect != i_aspect ) ||
+            p_vout->b_filter_change )
         {
             /* We are not interested in this format, close this vout */
             vlc_object_detach( p_vout );
@@ -126,6 +155,8 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
             vlc_object_attach( p_vout, p_this );
             vlc_object_release( p_vout );
         }
+
+        if( psz_filter_chain ) free( psz_filter_chain );
     }
 
     if( !p_vout )
@@ -218,7 +249,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     }
 
     /* Choose the video output module */
-    if( !p_vout->psz_filter_chain )
+    if( !p_vout->psz_filter_chain || !*p_vout->psz_filter_chain )
     {
         psz_plugin = config_GetPsz( p_parent, "vout" );
     }
@@ -287,6 +318,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     p_vout->b_fullscreen = 0;
     p_vout->render_time  = 10;
     p_vout->c_fps_samples= 0;
+    p_vout->b_filter_change = 0;
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
@@ -307,7 +339,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
 
     p_vout->p_module = module_Need( p_vout,
-                           ( p_vout->psz_filter_chain ) ?
+                           ( p_vout->psz_filter_chain &&
+                               *p_vout->psz_filter_chain ) ?
                            "video filter" : "video output",
                            psz_plugin );
 

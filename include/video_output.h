@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.90 2003/01/28 02:03:32 sam Exp $
+ * $Id: video_output.h,v 1.91 2003/01/28 12:30:44 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -116,6 +116,7 @@ struct vout_thread_t
 
     /* Filter chain */
     char *psz_filter_chain;
+    vlc_bool_t b_filter_change;
 };
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures
