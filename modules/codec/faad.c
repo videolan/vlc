@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -200,6 +200,22 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_block->i_buffer = 0;
     }
 
+    if( p_dec->fmt_out.audio.i_rate == 0 && p_dec->fmt_in.i_extra > 0 )
+    {
+        /* We have a decoder config so init the handle */
+        unsigned long i_rate;
+        unsigned char i_channels;
+
+        if( faacDecInit2( p_sys->hfaad, p_dec->fmt_in.p_extra,
+                          p_dec->fmt_in.i_extra,
+                          &i_rate, &i_channels ) >= 0 )
+        {
+            p_dec->fmt_out.audio.i_rate = i_rate;
+            p_dec->fmt_out.audio.i_channels = i_channels;
+            aout_DateInit( &p_sys->date, i_rate );
+        }
+    }
+
     if( p_dec->fmt_out.audio.i_rate == 0 && p_sys->i_buffer )
     {
         unsigned long i_rate;
@@ -307,6 +323,13 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                         pi_channels_out[j];
                     break;
                 }
+            }
+
+            if( j == MAX_CHANNEL_POSITIONS )
+            {
+                msg_Warn( p_dec, "unknow channel ordering" );
+                block_Release( p_block );
+                return NULL;
             }
         }
         p_dec->fmt_out.audio.i_original_channels =
