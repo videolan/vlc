@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.21 2003/05/25 11:31:54 gbazin Exp $
+ * $Id: directx.c,v 1.22 2003/09/26 16:03:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -344,7 +344,7 @@ static void CloseVideo( vlc_object_t *p_this )
 
     msg_Dbg( p_vout, "CloseVideo" );
 
-    var_Destroy( p_vout, "directs-on-top" );
+    var_Destroy( p_vout, "directx-on-top" );
 
     DirectXCloseDisplay( p_vout );
     DirectXCloseDDraw( p_vout );
@@ -909,6 +909,20 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         return VLC_EGENERIC;
     }
 
+    if( b_overlay )
+    {
+        /* Check the overlay is useable as some graphics cards allow creating
+         * several overlays but only one can be used at one time. */
+        p_vout->p_sys->p_current_surface = *pp_surface_final;
+        if( DirectXUpdateOverlay( p_vout ) != VLC_SUCCESS )
+        {
+            IDirectDrawSurface2_Release( *pp_surface_final );
+            *pp_surface_final = NULL;
+            msg_Err( p_vout, "overlay unuseable (might already be in use)" );
+            return VLC_EGENERIC;
+        }
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -919,7 +933,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
  * Ususally the overlay is moved by the user and thus, by a move or resize
  * event (in Manage).
  *****************************************************************************/
-void DirectXUpdateOverlay( vout_thread_t *p_vout )
+int DirectXUpdateOverlay( vout_thread_t *p_vout )
 {
     DDOVERLAYFX     ddofx;
     DWORD           dwFlags;
@@ -927,7 +941,7 @@ void DirectXUpdateOverlay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_current_surface == NULL ||
         !p_vout->p_sys->b_using_overlay )
-        return;
+        return VLC_EGENERIC;
 
     /* The new window dimensions should already have been computed by the
      * caller of this function */
@@ -952,7 +966,10 @@ void DirectXUpdateOverlay( vout_thread_t *p_vout )
     {
         msg_Warn( p_vout,
                   "DirectXUpdateOverlay cannot move or resize overlay" );
+        return VLC_EGENERIC;
     }
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1309,6 +1326,8 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
                     p_pic->p->i_pixel_pitch = 2;
                     break;
                 case VLC_FOURCC('R','V','2','4'):
+                    p_pic->p->i_pixel_pitch = 3;
+                    break;
                 case VLC_FOURCC('R','V','3','2'):
                     p_pic->p->i_pixel_pitch = 4;
                     break;

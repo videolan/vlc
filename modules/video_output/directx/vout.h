@@ -2,7 +2,7 @@
  * vout.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout.h,v 1.5 2003/05/21 13:27:25 gbazin Exp $
+ * $Id: vout.h,v 1.6 2003/09/26 16:03:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -106,7 +106,7 @@ struct picture_sys_t
 /*****************************************************************************
  * Prototypes from vout.c
  *****************************************************************************/
-void DirectXUpdateOverlay( vout_thread_t *p_vout );
+int DirectXUpdateOverlay( vout_thread_t *p_vout );
 
 /*****************************************************************************
  * Prototypes from events.c
