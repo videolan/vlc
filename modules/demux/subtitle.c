@@ -105,8 +105,8 @@ static void TextUnload( text_t * );
 
 typedef struct
 {
-    mtime_t i_start;
-    mtime_t i_stop;
+    int64_t i_start;
+    int64_t i_stop;
 
     char    *psz_text;
 } subtitle_t;
@@ -121,7 +121,7 @@ struct demux_sys_t
     int64_t     i_next_demux_date;
 
     int64_t     i_microsecperframe;
-    mtime_t     i_original_mspf;
+    int64_t     i_original_mspf;
 
     char        *psz_header;
     int         i_subtitle;
@@ -194,13 +194,13 @@ static int Open ( vlc_object_t *p_this )
     f_fps = var_CreateGetFloat( p_demux, "sub-fps" );
     if( f_fps >= 1.0 )
     {
-        p_sys->i_microsecperframe = (mtime_t)( (float)1000000 / f_fps );
+        p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
     }
 
     f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" );
     if( f_fps >= 1.0 )
     {
-        p_sys->i_original_mspf = (mtime_t)( (float)1000000 / f_fps );
+        p_sys->i_original_mspf = (int64_t)( (float)1000000 / f_fps );
     }
     else
     {
@@ -676,8 +676,8 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
     char *s;
 
     char buffer_text[MAX_LINE + 1];
-    unsigned int    i_start;
-    unsigned int    i_stop;
+    int    i_start;
+    int    i_stop;
     unsigned int i;
 
     p_subtitle->i_start = 0;
@@ -709,8 +709,8 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
         }
     }
 
-    p_subtitle->i_start = (mtime_t)i_start * p_sys->i_microsecperframe;
-    p_subtitle->i_stop  = (mtime_t)i_stop  * p_sys->i_microsecperframe;
+    p_subtitle->i_start = (int64_t)i_start * p_sys->i_microsecperframe;
+    p_subtitle->i_stop  = (int64_t)i_stop  * p_sys->i_microsecperframe;
     p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
     return( 0 );
 }
@@ -732,8 +732,8 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
     char *s;
     char buffer_text[ 10 * MAX_LINE];
     int  i_buffer_text;
-    mtime_t     i_start;
-    mtime_t     i_stop;
+    int64_t     i_start;
+    int64_t     i_stop;
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
@@ -751,15 +751,15 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
                     &h1, &m1, &s1, &d1,
                     &h2, &m2, &s2, &d2 ) == 8 )
         {
-            i_start = ( (mtime_t)h1 * 3600*1000 +
-                        (mtime_t)m1 * 60*1000 +
-                        (mtime_t)s1 * 1000 +
-                        (mtime_t)d1 ) * 1000;
+            i_start = ( (int64_t)h1 * 3600*1000 +
+                        (int64_t)m1 * 60*1000 +
+                        (int64_t)s1 * 1000 +
+                        (int64_t)d1 ) * 1000;
 
-            i_stop  = ( (mtime_t)h2 * 3600*1000 +
-                        (mtime_t)m2 * 60*1000 +
-                        (mtime_t)s2 * 1000 +
-                        (mtime_t)d2 ) * 1000;
+            i_stop  = ( (int64_t)h2 * 3600*1000 +
+                        (int64_t)m2 * 60*1000 +
+                        (int64_t)s2 * 1000 +
+                        (int64_t)d2 ) * 1000;
 
             /* Now read text until an empty line */
             for( i_buffer_text = 0;; )
@@ -782,10 +782,10 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
                     if( p_sys->i_microsecperframe != 0 &&
                         p_sys->i_original_mspf != 0)
                     {
-                        p_subtitle->i_start = (mtime_t)i_start *
+                        p_subtitle->i_start = (int64_t)i_start *
                                               p_sys->i_microsecperframe/
                                               p_sys->i_original_mspf;
-                        p_subtitle->i_stop  = (mtime_t)i_stop  *
+                        p_subtitle->i_stop  = (int64_t)i_stop  *
                                               p_sys->i_microsecperframe /
                                               p_sys->i_original_mspf;
                     }
@@ -825,8 +825,8 @@ static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle )
     char *s;
     char buffer_text[ 10 * MAX_LINE];
     int  i_buffer_text;
-    mtime_t     i_start;
-    mtime_t     i_stop;
+    int64_t     i_start;
+    int64_t     i_stop;
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
@@ -844,15 +844,15 @@ static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle )
                     &h1, &m1, &s1, &d1,
                     &h2, &m2, &s2, &d2 ) == 8 )
         {
-            i_start = ( (mtime_t)h1 * 3600*1000 +
-                        (mtime_t)m1 * 60*1000 +
-                        (mtime_t)s1 * 1000 +
-                        (mtime_t)d1 ) * 1000;
+            i_start = ( (int64_t)h1 * 3600*1000 +
+                        (int64_t)m1 * 60*1000 +
+                        (int64_t)s1 * 1000 +
+                        (int64_t)d1 ) * 1000;
 
-            i_stop  = ( (mtime_t)h2 * 3600*1000 +
-                        (mtime_t)m2 * 60*1000 +
-                        (mtime_t)s2 * 1000 +
-                        (mtime_t)d2 ) * 1000;
+            i_stop  = ( (int64_t)h2 * 3600*1000 +
+                        (int64_t)m2 * 60*1000 +
+                        (int64_t)s2 * 1000 +
+                        (int64_t)d2 ) * 1000;
 
             /* Now read text until an empty line */
             for( i_buffer_text = 0;; )
@@ -912,8 +912,8 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
 
     char buffer_text[ 10 * MAX_LINE];
     char *s;
-    mtime_t     i_start;
-    mtime_t     i_stop;
+    int64_t     i_start;
+    int64_t     i_stop;
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
@@ -937,15 +937,15 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
                     &h2, &m2, &s2, &c2,
                     buffer_text ) == 10 )
         {
-            i_start = ( (mtime_t)h1 * 3600*1000 +
-                        (mtime_t)m1 * 60*1000 +
-                        (mtime_t)s1 * 1000 +
-                        (mtime_t)c1 * 10 ) * 1000;
+            i_start = ( (int64_t)h1 * 3600*1000 +
+                        (int64_t)m1 * 60*1000 +
+                        (int64_t)s1 * 1000 +
+                        (int64_t)c1 * 10 ) * 1000;
 
-            i_stop  = ( (mtime_t)h2 * 3600*1000 +
-                        (mtime_t)m2 * 60*1000 +
-                        (mtime_t)s2 * 1000 +
-                        (mtime_t)c2 * 10 ) * 1000;
+            i_stop  = ( (int64_t)h2 * 3600*1000 +
+                        (int64_t)m2 * 60*1000 +
+                        (int64_t)s2 * 1000 +
+                        (int64_t)c2 * 10 ) * 1000;
 
             /* The dec expects: ReadOrder, Layer, Style, Name, MarginL, MarginR, MarginV, Effect, Text */
             if( p_sys->i_type == SUB_TYPE_SSA1 )
@@ -1004,7 +1004,7 @@ static int  ParseVplayer( demux_t *p_demux, subtitle_t *p_subtitle )
      */
     char *p;
     char buffer_text[MAX_LINE + 1];
-    mtime_t    i_start;
+    int64_t    i_start;
     unsigned int i;
 
     p_subtitle->i_start = 0;
@@ -1026,9 +1026,9 @@ static int  ParseVplayer( demux_t *p_demux, subtitle_t *p_subtitle )
         memset( buffer_text, '\0', MAX_LINE );
         if( sscanf( p, "%d:%d:%d%[ :]%[^\r\n]", &h, &m, &s, &c, buffer_text ) == 5 )
         {
-            i_start = ( (mtime_t)h * 3600*1000 +
-                        (mtime_t)m * 60*1000 +
-                        (mtime_t)s * 1000 ) * 1000;
+            i_start = ( (int64_t)h * 3600*1000 +
+                        (int64_t)m * 60*1000 +
+                        (int64_t)s * 1000 ) * 1000;
             break;
         }
     }
@@ -1085,7 +1085,7 @@ static int  ParseSami( demux_t *p_demux, subtitle_t *p_subtitle )
     text_t      *txt = &p_sys->txt;
 
     char *p;
-    int i_start;
+    int64_t i_start;
 
     int  i_text;
     char buffer_text[10*MAX_LINE + 1];
