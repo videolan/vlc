@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.18 2001/06/14 01:49:44 sam Exp $
+ * $Id: threads.h,v 1.19 2001/06/14 20:21:04 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -24,6 +24,10 @@
  *****************************************************************************/
 
 #include <stdio.h>
+
+#ifdef PROFILING
+#   include <sys/time.h>
+#endif
 
 #if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
 #   include <pth.h>
@@ -143,10 +147,8 @@ typedef void *(*vlc_thread_func_t)(void *p_data);
  * Prototypes
  *****************************************************************************/
 
-static __inline__ int  vlc_thread_create ( vlc_thread_t *, char *,
-                                           vlc_thread_func_t, void * );
-static __inline__ void vlc_thread_exit   ( void );
-static __inline__ void vlc_thread_join   ( vlc_thread_t );
+static __inline__ int  vlc_threads_init  ( void );
+static __inline__ int  vlc_threads_end   ( void );
 
 static __inline__ int  vlc_mutex_init    ( vlc_mutex_t * );
 static __inline__ int  vlc_mutex_lock    ( vlc_mutex_t * );
@@ -158,103 +160,78 @@ static __inline__ int  vlc_cond_signal   ( vlc_cond_t * );
 static __inline__ int  vlc_cond_wait     ( vlc_cond_t *, vlc_mutex_t * );
 static __inline__ int  vlc_cond_destroy  ( vlc_cond_t * );
 
+static __inline__ int  vlc_thread_create ( vlc_thread_t *, char *,
+                                           vlc_thread_func_t, void * );
+static __inline__ void vlc_thread_exit   ( void );
+static __inline__ void vlc_thread_join   ( vlc_thread_t );
+
 #if 0
 static __inline__ int  vlc_cond_timedwait( vlc_cond_t *, vlc_mutex_t *,
                                            mtime_t );
 #endif
 
+#ifdef PROFILING
+/* Wrapper function for profiling */
+static void *      vlc_thread_wrapper ( void *p_wrapper );
+
+typedef struct wrapper_s
+{
+    /* Data lock access */
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+
+    /* Data used to spawn the real thread */
+    vlc_thread_func_t func;
+    void *p_data;
+
+    /* Profiling timer passed to the thread */
+    struct itimerval itimer;
+
+} wrapper_t;
+#endif
+
 /*****************************************************************************
- * vlc_thread_create: create a thread
+ * vlc_threads_init: initialize threads system
  *****************************************************************************/
-static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
-                                         char *psz_name, vlc_thread_func_t func,
-                                         void *p_data )
+static __inline__ int vlc_threads_init( void )
 {
 #if defined( PTH_INIT_IN_PTH_H )
-    *p_thread = pth_spawn( PTH_ATTR_DEFAULT, func, p_data );
-    return ( p_thread == NULL );
+    return pth_init();
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    return pthread_create( p_thread, NULL, func, p_data );
+    return 0;
 
 #elif defined( HAVE_CTHREADS_H )
-    *p_thread = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
     return 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    *p_thread = spawn_thread( (thread_func)func, psz_name,
-                              B_NORMAL_PRIORITY, p_data );
-    return resume_thread( *p_thread );
+    return 0;
 
 #elif defined( WIN32 )
-#if 0
-    DWORD threadID;
-    /* This method is not recommended when using the MSVCRT C library,
-     * so we'll have to use _beginthreadex instead */
-    *p_thread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE) func, 
-                             p_data, 0, &threadID);
-#endif
-    unsigned threadID;
-    /* When using the MSVCRT C library you have to use the _beginthreadex
-     * function instead of CreateThread, otherwise you'll end up with memory
-     * leaks and the signal function not working */
-    *p_thread = (HANDLE)_beginthreadex(NULL, 0, (PTHREAD_START) func, 
-                             p_data, 0, &threadID);
-    
-    return( *p_thread ? 0 : 1 );
+    return 0;
 
 #endif
 }
 
 /*****************************************************************************
- * vlc_thread_exit: terminate a thread
+ * vlc_threads_end: stop threads system
  *****************************************************************************/
-static __inline__ void vlc_thread_exit( void )
+static __inline__ int vlc_threads_end( void )
 {
 #if defined( PTH_INIT_IN_PTH_H )
-    pth_exit( 0 );
+    return pth_kill();
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    pthread_exit( 0 );
+    return 0;
 
 #elif defined( HAVE_CTHREADS_H )
-    int result;
-    cthread_exit( &result );
+    return 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    exit_thread( 0 );
+    return 0;
 
 #elif defined( WIN32 )
-#if 0
-    ExitThread( 0 );
-#endif
-    /* For now we don't close the thread handles (because of race conditions).
-     * Need to be looked at. */
-    _endthreadex(0);
-
-#endif
-}
-
-/*****************************************************************************
- * vlc_thread_join: wait until a thread exits
- *****************************************************************************/
-static __inline__ void vlc_thread_join( vlc_thread_t thread )
-{
-#if defined( PTH_INIT_IN_PTH_H )
-    pth_join( thread, NULL );
-
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    pthread_join( thread, NULL );
-
-#elif defined( HAVE_CTHREADS_H )
-    cthread_join( thread );
-
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    int32 exit_value;
-    wait_for_thread( thread, &exit_value );
-
-#elif defined( WIN32 )
-    WaitForSingleObject( thread, INFINITE);
+    return 0;
 
 #endif
 }
@@ -592,4 +569,152 @@ static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
 
 #endif    
 }
+
+/*****************************************************************************
+ * vlc_thread_create: create a thread
+ *****************************************************************************/
+static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
+                                         char *psz_name, vlc_thread_func_t func,
+                                         void *p_data )
+{
+    int i_ret;
+
+#ifdef PROFILING
+    wrapper_t wrapper;
+
+    /* Initialize the wrapper structure */
+    wrapper.func = func;
+    wrapper.p_data = p_data;
+    getitimer( ITIMER_PROF, &wrapper.itimer );
+    vlc_mutex_init( &wrapper.lock );
+    vlc_cond_init( &wrapper.wait );
+    vlc_mutex_lock( &wrapper.lock );
+
+    /* Alter user-passed data so that we call the wrapper instead
+     * of the real function */
+    p_data = &wrapper;
+    func = vlc_thread_wrapper;
+#endif
+
+#if defined( PTH_INIT_IN_PTH_H )
+    *p_thread = pth_spawn( PTH_ATTR_DEFAULT, func, p_data );
+    i_ret = ( p_thread == NULL );
+
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    i_ret = pthread_create( p_thread, NULL, func, p_data );
+
+#elif defined( HAVE_CTHREADS_H )
+    *p_thread = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
+    i_ret = 0;
+
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    *p_thread = spawn_thread( (thread_func)func, psz_name,
+                              B_NORMAL_PRIORITY, p_data );
+    i_ret = resume_thread( *p_thread );
+
+#elif defined( WIN32 )
+#if 0
+    DWORD threadID;
+    /* This method is not recommended when using the MSVCRT C library,
+     * so we'll have to use _beginthreadex instead */
+    *p_thread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE) func, 
+                             p_data, 0, &threadID);
+#endif
+    unsigned threadID;
+    /* When using the MSVCRT C library you have to use the _beginthreadex
+     * function instead of CreateThread, otherwise you'll end up with memory
+     * leaks and the signal function not working */
+    *p_thread = (HANDLE)_beginthreadex(NULL, 0, (PTHREAD_START) func, 
+                             p_data, 0, &threadID);
+    
+    i_ret = ( *p_thread ? 0 : 1 );
+
+#endif
+
+#ifdef PROFILING
+    if( i_ret == 0 )
+    {
+        vlc_cond_wait( &wrapper.wait, &wrapper.lock );
+    }
+
+    vlc_mutex_unlock( &wrapper.lock );
+    vlc_mutex_destroy( &wrapper.lock );
+    vlc_cond_destroy( &wrapper.wait );
+#endif
+
+    return i_ret;
+}
+
+/*****************************************************************************
+ * vlc_thread_exit: terminate a thread
+ *****************************************************************************/
+static __inline__ void vlc_thread_exit( void )
+{
+#if defined( PTH_INIT_IN_PTH_H )
+    pth_exit( 0 );
+
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    pthread_exit( 0 );
+
+#elif defined( HAVE_CTHREADS_H )
+    int result;
+    cthread_exit( &result );
+
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    exit_thread( 0 );
+
+#elif defined( WIN32 )
+#if 0
+    ExitThread( 0 );
+#endif
+    /* For now we don't close the thread handles (because of race conditions).
+     * Need to be looked at. */
+    _endthreadex(0);
+
+#endif
+}
+
+/*****************************************************************************
+ * vlc_thread_join: wait until a thread exits
+ *****************************************************************************/
+static __inline__ void vlc_thread_join( vlc_thread_t thread )
+{
+#if defined( PTH_INIT_IN_PTH_H )
+    pth_join( thread, NULL );
+
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    pthread_join( thread, NULL );
+
+#elif defined( HAVE_CTHREADS_H )
+    cthread_join( thread );
+
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    int32 exit_value;
+    wait_for_thread( thread, &exit_value );
+
+#elif defined( WIN32 )
+    WaitForSingleObject( thread, INFINITE);
+
+#endif
+}
+
+#ifdef PROFILING
+static void *vlc_thread_wrapper( void *p_wrapper )
+{
+    /* Put user data in thread-local variables */
+    void *            p_data = ((wrapper_t*)p_wrapper)->p_data;
+    vlc_thread_func_t func   = ((wrapper_t*)p_wrapper)->func;
+
+    /* Set the profile timer value */
+    setitimer( ITIMER_PROF, &((wrapper_t*)p_wrapper)->itimer, NULL );
+
+    /* Tell the calling thread that we don't need its data anymore */
+    vlc_mutex_lock( &((wrapper_t*)p_wrapper)->lock );
+    vlc_cond_signal( &((wrapper_t*)p_wrapper)->wait );
+    vlc_mutex_unlock( &((wrapper_t*)p_wrapper)->lock );
+
+    /* Call the real function */
+    return func( p_data );
+}
+#endif
 

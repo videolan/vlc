@@ -4,6 +4,7 @@
 
 HEAD
 
+  * Added gprof profiling support with --enable-profiling.
   * Fully working Windows DVD ioctl support by Jon Lech Johansen.
   * DirectX enhancements by Gildas Bazin, such as software rendering.
   * Merged dvdcss_init and dvdcss_open into dvdcss_open, and dvdcss_close

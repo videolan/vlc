@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mtime.c,v 1.22 2001/06/14 01:49:44 sam Exp $
+ * $Id: mtime.c,v 1.23 2001/06/14 20:21:04 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -229,14 +229,14 @@ void msleep( mtime_t delay )
 #if defined( HAVE_KERNEL_OS_H )
     snooze( delay );
 
-#elif defined( HAVE_USLEEP ) || defined( WIN32 )
-    usleep( delay );
-
 #elif defined( PTH_INIT_IN_PTH_H )
     struct timeval tv_delay;
     tv_delay.tv_sec = delay / 1000000;
     tv_delay.tv_usec = delay % 1000000;
     pth_select( 0, NULL, NULL, NULL, &tv_delay );
+
+#elif defined( HAVE_USLEEP ) || defined( WIN32 )
+    usleep( delay );
 
 #else
     struct timeval tv_delay;

@@ -35,6 +35,7 @@ ARCH = @ARCH@
 DEBUG = @DEBUG@
 STATS = @STATS@
 TRACE = @TRACE@
+PROFILING = @PROFILING@
 OPTIMS = @OPTIMS@
 GETOPT = @GETOPT@
 
@@ -106,6 +107,10 @@ endif
 ifeq ($(TRACE),1)
 PROGRAM_OPTIONS += TRACE
 DEFINE += -DTRACE
+endif
+ifeq ($(PROFILING),1)
+PROGRAM_OPTIONS += PROFILING
+DEFINE += -DPROFILING
 endif
 ifeq ($(STATS),1)
 PROGRAM_OPTIONS += STATS
@@ -196,7 +201,9 @@ ifeq ($(OPTIMS),1)
 CFLAGS += -O3
 CFLAGS += -ffast-math -funroll-loops
 ifneq ($(DEBUG),1)
+ifneq ($(PROFILING),1)
 CFLAGS += -fomit-frame-pointer
+endif
 endif
 
 # Optimizations for x86 familiy
@@ -257,5 +264,9 @@ PLCFLAGS += @PLCFLAGS@
 #
 ifeq ($(DEBUG),1)
 CFLAGS += -g
+endif
+
+ifeq ($(PROFILING),1)
+CFLAGS += -pg
 endif
 

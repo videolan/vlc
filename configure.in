@@ -218,22 +218,6 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
 ])
 
 dnl
-dnl  GNU portable threads
-dnl
-AC_ARG_ENABLE(pth,
-  [  --enable-pth            Enable GNU Pth support (default disabled)],
-  [ if test x$enableval = xyes; then
-    AC_CHECK_LIB(pth,pth_init)
-    AC_EGREP_HEADER(pth_init,pth.h,[
-      AC_DEFINE(PTH_INIT_IN_PTH_H, 1,
-                Define if <pth.h> defines pth_init)
-    THREAD_LIB="-lpth"
-    fi])
-])
-
-LIB="${LIB} ${THREAD_LIB}"
-
-dnl
 dnl  PentiumPro acceleration
 dnl
 AC_ARG_ENABLE(ppro,
@@ -263,14 +247,6 @@ AC_ARG_ENABLE(altivec,
 #[ if test -d /System/Library/Frameworks/vecLib.framework; then ARCH="${ARCH} altivec"; PLUGINS="${PLUGINS} idctaltivec"; fi ])
 
 dnl
-dnl  CSS DVD decryption
-dnl
-AC_ARG_ENABLE(css,
-[  --disable-css           Disable DVD CSS decryption (default enabled)],
-[ if test x$enableval = xyes; then CSS=1; else CSS=0; fi ], [ CSS=1; ])
-if test x${CSS} = x1; then AC_DEFINE(HAVE_CSS, 1, Define if you want DVD CSS decryption.) fi
-
-dnl
 dnl  Debugging mode
 dnl
 AC_ARG_ENABLE(debug,
@@ -292,12 +268,43 @@ AC_ARG_ENABLE(trace,
 [ if test x$enableval = xyes; then TRACE=1; fi ])
 
 dnl
+dnl  Trace mode
+dnl
+AC_ARG_ENABLE(profiling,
+[  --enable-profiling      Enable gprof profiling (default disabled)],
+[ if test x$enableval = xyes; then PROFILING=1; fi ])
+
+dnl
 dnl  Enable/disable optimizations
 dnl
 AC_ARG_ENABLE(optimizations,
 [  --disable-optimizations Disable compiler optimizations (default enabled)],
 [ if test x$enableval = xno; then OPTIMS=0; fi ],
 [ OPTIMS=1 ])
+
+dnl
+dnl  GNU portable threads
+dnl
+AC_ARG_ENABLE(pth,
+  [  --enable-pth            Enable GNU Pth support (default disabled)],
+  [ if test x$enableval = xyes; then
+    AC_CHECK_LIB(pth,pth_init)
+    AC_EGREP_HEADER(pth_init,pth.h,[
+      AC_DEFINE(PTH_INIT_IN_PTH_H, 1,
+                Define if <pth.h> defines pth_init)
+    THREAD_LIB="-lpth"
+    fi])
+])
+
+LIB="${LIB} ${THREAD_LIB}"
+
+dnl
+dnl  CSS DVD decryption
+dnl
+AC_ARG_ENABLE(css,
+[  --disable-css           Disable DVD CSS decryption (default enabled)],
+[ if test x$enableval = xyes; then CSS=1; else CSS=0; fi ], [ CSS=1; ])
+if test x${CSS} = x1; then AC_DEFINE(HAVE_CSS, 1, Define if you want DVD CSS decryption.) fi
 
 dnl
 dnl  DVD module: check for installed libdvdcss or local libdvdcss
@@ -619,6 +626,7 @@ AC_SUBST(DEBUG)
 AC_SUBST(STATS)
 AC_SUBST(ASM)
 AC_SUBST(TRACE)
+AC_SUBST(PROFILING)
 AC_SUBST(OPTIMS)
 AC_SUBST(CSS)
 AC_SUBST(MOC)
@@ -671,6 +679,7 @@ vlc version           : ${VLC_VERSION}
 debug mode            : ${DEBUG}
 statistics            : ${STATS}
 trace mode            : ${TRACE}
+profiling             : ${PROFILING}
 need builtin getopt   : ${GETOPT}
 built-in modules      :${BUILTINS}
 plugin modules        :${PLUGINS}

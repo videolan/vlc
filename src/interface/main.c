@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.103 2001/06/14 01:49:44 sam Exp $
+ * $Id: main.c,v 1.104 2001/06/14 20:21:04 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -252,11 +252,9 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_vout_bank   = &vout_bank;
 
     /*
-     * Initialize threads
+     * Initialize threads system
      */
-#if defined( PTH_INIT_IN_PTH_H )
-    pth_init( );
-#endif
+    vlc_threads_init( );
 
     /*
      * Test if our code is likely to run on this CPU 
@@ -399,9 +397,10 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     intf_Msg( "intf: program terminated" );
     intf_MsgDestroy();
 
-#if defined( PTH_INIT_IN_PTH_H )
-    pth_kill( );
-#endif
+    /*
+     * Stop threads system
+     */
+    vlc_threads_end( );
 
     return 0;
 }
