@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.7 2003/01/31 02:53:52 jlj Exp $
+ * $Id: playlist.m,v 1.8 2003/02/07 01:31:14 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -44,6 +44,7 @@
 - (void)keyDown:(NSEvent *)o_event
 {
     unichar key = 0;
+    int i_row;
     playlist_t * p_playlist;
     intf_thread_t * p_intf = [NSApp getIntf];
 
@@ -54,20 +55,41 @@
 
     p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
-    if( p_playlist != NULL )
+    
+    if ( p_playlist == NULL )
     {
-        vlc_mutex_lock( &p_playlist->object_lock );
+        return;
     }
-
+    
     switch( key )
     {
         case ' ':
+            vlc_mutex_lock( &p_playlist->object_lock );
             if( p_playlist != NULL && p_playlist->p_input != NULL )
             {
                 input_SetStatus( p_playlist->p_input, INPUT_STATUS_PAUSE );
             }
+            vlc_mutex_unlock( &p_playlist->object_lock );
             break;
 
+        case NSDeleteCharacter:
+        case NSDeleteFunctionKey:
+        case NSDeleteCharFunctionKey:
+        case NSBackspaceCharacter:
+            while( ( i_row = [self selectedRow] ) != -1 )
+            {
+                if( p_playlist->i_index == i_row && p_playlist->i_status )
+                {
+                    playlist_Stop( p_playlist );
+                }
+        
+                playlist_Delete( p_playlist, i_row ); 
+        
+                [self deselectRow: i_row];
+            }
+            [self reloadData];
+            break;
+            
         default:
             [super keyDown: o_event];
             break;
@@ -75,7 +97,6 @@
 
     if( p_playlist != NULL )
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
     }
 }
