@@ -4,6 +4,8 @@
 
 HEAD
 
+  * ./plugins/a52/a52.c: added an option to disable the dynamic range
+    compression.
   * ./Makefile.opts.in: removed configuration stuff which does not need to
     rebuild anything to Makefile.config, so that editing it will not cause
     a complete rebuild.

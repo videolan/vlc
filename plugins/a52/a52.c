@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.10 2002/05/18 17:47:46 sam Exp $
+ * $Id: a52.c,v 1.11 2002/05/20 15:03:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -72,7 +72,17 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * Build configuration structure.
  *****************************************************************************/
+#define DYNRNG_TEXT N_("disable A/52 dynamic range compression")
+#define DYNRNG_LONGTEXT N_( \
+    "Dynamic range compression makes the loud sounds softer, and the soft " \
+    "sounds louder, so you can more easily listen to the stream in a noisy " \
+    "environment without disturbing anyone.\nIf you disable the dynamic range"\
+    " compression the playback will be more adapted to a movie theater or a " \
+    "listening room.")
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_BOOL    ( "a52-no-dynrng", NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -198,6 +208,8 @@ static int InitThread( a52_adec_thread_t * p_a52_adec )
         return -1;
     }
 
+    p_a52_adec->b_dynrng = !config_GetIntVariable( "a52-no-dynrng" );
+
     /* Init the BitStream */
     InitBitstream( &p_a52_adec->bit_stream,
                    p_a52_adec->p_fifo,
@@ -271,6 +283,9 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     /* do the actual decoding now */
     a52_frame( p_a52_adec->p_a52_state, p_a52_adec->p_frame_buffer,
                &p_a52_adec->flags, &sample_level, 384 );
+
+    if( !p_a52_adec->b_dynrng )
+        a52_dynrng( p_a52_adec->p_a52_state, NULL, NULL );
 
     for( i = 0; i < 6; i++ )
     {
