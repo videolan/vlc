@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.24 2003/03/15 02:33:23 fenrir Exp $
+ * $Id: mms.c,v 1.25 2003/03/15 03:02:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1574,7 +1574,6 @@ static int  mms_ParseCommand( input_thread_t *p_input,
     {
         msg_Warn( p_input, "truncated command (header incomplete)" );
         p_access->i_command = 0;
-        *pi_used = 0;
         return( -1 );
     }
     i_id =  GetDWLE( p_data + 4 );
@@ -1594,7 +1593,6 @@ static int  mms_ParseCommand( input_thread_t *p_input,
                   "truncated command (missing %d bytes)",
                    i_length - i_data  );
         p_access->i_command = 0;
-        *pi_used = 0;
         return( -1 );
     }
     else if( i_length < p_access->i_cmd )
@@ -1640,7 +1638,6 @@ static int  mms_ParsePacket( input_thread_t *p_input,
     if( i_data <= 8 )
     {
         msg_Warn( p_input, "truncated packet (header incomplete)" );
-        *pi_used = 0;
         return( -1 );
     }
 
@@ -1872,6 +1869,10 @@ static int  mms_ReceiveCommand( input_thread_t *p_input )
             {
                 break;
             }
+        }
+        else
+        {
+            return( -1 );
         }
     }
 
