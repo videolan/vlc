@@ -1,3 +1,4 @@
+
 /*****************************************************************************
  * es_out.c: Es Out handler for input.
  *****************************************************************************
@@ -62,7 +63,7 @@ struct es_out_id_t
     /* Channel in the track type */
     int         i_channel;
     es_format_t fmt;
-    char        *psz_description;
+    char        *psz_language;
     decoder_t   *p_dec;
 };
 
@@ -179,8 +180,8 @@ void input_EsOutDelete( es_out_t *out )
         {
             input_DecoderDelete( p_sys->es[i]->p_dec );
         }
-        if( p_sys->es[i]->psz_description )
-            free( p_sys->es[i]->psz_description );
+        if( p_sys->es[i]->psz_language )
+            free( p_sys->es[i]->psz_language );
         es_format_Clean( &p_sys->es[i]->fmt );
 
         free( p_sys->es[i] );
@@ -301,14 +302,30 @@ static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es,
     }
 
     /* Take care of the ES description */
-    if( es->psz_description && *es->psz_description )
+    if( es->fmt.psz_description && *es->fmt.psz_description )
     {
-        text.psz_string = strdup( es->psz_description );
+        if( es->psz_language && *es->psz_language )
+	{
+	    text.psz_string = malloc( strlen( es->fmt.psz_description) + strlen( es->psz_language ) + 10 );
+	    sprintf( text.psz_string, "%s - [%s]", es->fmt.psz_description, es->psz_language );
+	}
+	else text.psz_string = strdup( es->fmt.psz_description );
     }
     else
     {
-        text.psz_string = malloc( strlen( _("Track %i") ) + 20 );
-        sprintf( text.psz_string, _("Track %i"), val.i_int );
+        if( es->psz_language && *es->psz_language )
+        {
+            char *temp;
+            text.psz_string = malloc( strlen( _("Track %i") )+ strlen( es->psz_language ) + 30 );
+            asprintf( &temp,  _("Track %i"), val.i_int );
+            sprintf( text.psz_string, "%s - [%s]", temp, es->psz_language );
+            free( temp );
+        }
+        else
+        {
+            text.psz_string = malloc( strlen( _("Track %i") ) + 20 );
+            sprintf( text.psz_string, _("Track %i"), val.i_int );
+        }
     }
 
     val.i_int = es->i_id;
@@ -470,7 +487,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         es->i_channel = 0;
         break;
     }
-    es->psz_description = LanguageGetName( fmt->psz_language );
+    es->psz_language = LanguageGetName( fmt->psz_language ); /* remember so we only need to do it once */
     es->p_dec = NULL;
 
     if( es->p_pgrm == p_sys->p_pgrm )
@@ -795,8 +812,8 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
             break;
     }
 
-    if( es->psz_description )
-        free( es->psz_description );
+    if( es->psz_language )
+        free( es->psz_language );
 
     es_format_Clean( &es->fmt );
 
@@ -1115,7 +1132,7 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
                    "%.4s", (char*)&fmt->i_codec );
 
     input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Language"),
-                   "%s", es->psz_description );
+                   "%s", es->psz_language );
 
     /* Add information */
     switch( fmt->i_cat )
