@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.158 2002/03/04 01:53:56 stef Exp $
+ * $Id: main.c,v 1.159 2002/03/04 22:18:25 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -887,7 +887,8 @@ static void Usage( const char *psz_module_name )
         if( !strcmp( "main", p_module->psz_name ) )
             intf_Msg( "\nPlaylist items:"
                 "\n  *.mpg, *.vob                   \tPlain MPEG-1/2 files"
-                "\n  dvd:<device>[@<raw device>]    \tDVD device"
+                "\n  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
+                "\n                                 \tDVD device"
                 "\n  vcd:<device>                   \tVCD device"
                 "\n  udpstream:[<server>[:<server port>]][@[<bind address>]"
                       "[:<bind port>]]"

@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.80 2002/02/27 22:57:10 sam Exp $
+ * $Id: audio_output.c,v 1.81 2002/03/04 22:18:25 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -194,7 +194,6 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
      * AOUT_BUFFER_DURATION is given in microseconds, the output rate is given
      * in Hz, that's why we need to divide by 10^6 microseconds (1 second) */
     p_aout->i_units = (s64)p_aout->i_rate * AOUT_BUFFER_DURATION / 1000000;
-    p_aout->i_msleep = AOUT_BUFFER_DURATION;
 
     /* Make pf_aout_thread point to the right thread function, and compute the
      * byte size of the audio output buffer */

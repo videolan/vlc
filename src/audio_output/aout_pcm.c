@@ -2,7 +2,7 @@
  * aout_pcm.c: PCM audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: aout_pcm.c,v 1.2 2002/02/27 22:57:10 sam Exp $
+ * $Id: aout_pcm.c,v 1.3 2002/03/04 22:18:25 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -147,10 +147,13 @@ void aout_PCMThread( aout_thread_t * p_aout )
             break;
         }
 
-        if ( i_units > i_buffer_limit )
-        {
-            msleep( p_aout->i_msleep );
-        }
+        /* Sleep until there is only AOUT_BUFFER_DURATION/2 worth of audio
+         * left to play in the aout plugin, then we can start refill the
+         * plugin's buffer */
+        if( i_units > (i_buffer_limit/2) )
+            msleep( (i_units - i_buffer_limit/2) * AOUT_BUFFER_DURATION
+                    / i_buffer_limit );
+
     }
 
     vlc_mutex_lock( &p_aout->fifos_lock );

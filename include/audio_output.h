@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.43 2002/02/24 22:06:50 sam Exp $
+ * $Id: audio_output.h,v 1.44 2002/03/04 22:18:25 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -158,7 +158,6 @@ typedef struct aout_thread_s
     /* The size of the audio output buffer is kept in audio units, as this is
      * the only unit that is common with every audio decoder and audio fifo */
     int                 i_units;
-    int                 i_msleep;
 
     /* date is the moment where the first audio unit of the output buffer
      * will be played */

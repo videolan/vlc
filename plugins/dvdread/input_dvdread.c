@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.25 2002/03/04 01:53:56 stef Exp $
+ * $Id: input_dvdread.c,v 1.26 2002/03/04 22:18:25 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -236,18 +236,24 @@ static int DvdReadRewind( input_thread_t * p_input )
  *****************************************************************************/
 static int DvdReadOpen( struct input_thread_s *p_input )
 {
-    char *                  psz_parser = p_input->psz_name;
-    char *                  psz_source = p_input->psz_name;
+    char *                  psz_orig;
+    char *                  psz_parser;
+    char *                  psz_source;
     char *                  psz_next;
     struct stat             stat_info;
     thread_dvd_data_t *     p_dvd;
     dvd_reader_t *          p_dvdread;
     input_area_t *          p_area;
-    boolean_t               b_need_free = 0;
     int                     i_title = 1;
     int                     i_chapter = 1;
     int                     i_angle = 1;
     int                     i;
+
+    psz_orig = psz_parser = psz_source = strdup( p_input->psz_name );
+    if( !psz_orig )
+    {
+        return( -1 );
+    }
 
     while( *psz_parser && *psz_parser != '@' )
     {
@@ -279,7 +285,6 @@ static int DvdReadOpen( struct input_thread_s *p_input )
     if( !*psz_source )
     {
         psz_source = config_GetPszVariable( INPUT_DVD_DEVICE_VAR );
-        b_need_free = 1;
     }
 
     if( stat( psz_source, &stat_info ) == -1 )
@@ -303,10 +308,10 @@ static int DvdReadOpen( struct input_thread_s *p_input )
 
     p_dvdread = DVDOpen( psz_source );
 
-    if( b_need_free )
-    {
-        free( psz_source );
-    }
+    /* free allocated strings */
+    if( psz_source != psz_orig )
+        free( psz_device );
+    free( psz_orig );
 
     if( ! p_dvdread )
     {

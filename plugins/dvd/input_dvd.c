@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.129 2002/03/04 02:50:18 stef Exp $
+ * $Id: input_dvd.c,v 1.130 2002/03/04 22:18:25 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -256,19 +256,26 @@ static int DVDRewind( input_thread_t * p_input )
 static int DVDOpen( struct input_thread_s *p_input )
 {
     struct stat          stat_info;
-    char *               psz_parser = p_input->psz_name;
-    char *               psz_device = p_input->psz_name;
+    char *               psz_orig;
+    char *               psz_parser;
+    char *               psz_device;
     char *               psz_raw;
     char *               psz_next;
     dvdcss_handle        dvdhandle;
     thread_dvd_data_t *  p_dvd;
     input_area_t *       p_area;
-    boolean_t            b_need_free = 0;
     boolean_t            b_options = 0;
     int                  i_title = 1;
     int                  i_chapter = 1;
     int                  i_angle = 1;
     int                  i;
+
+    psz_orig = psz_parser = psz_device = strdup( p_input->psz_name );
+    if( !psz_orig )
+    {
+        return( -1 );
+    }
+
 
     /* Parse input string :
      * [device][@rawdevice][@[title][,[chapter][,angle]]] */
@@ -349,7 +356,6 @@ static int DVDOpen( struct input_thread_s *p_input )
     if( !*psz_device )
     {
         psz_device = config_GetPszVariable( INPUT_DVD_DEVICE_VAR );
-        b_need_free = 1;
     }
 
     if( stat( psz_device, &stat_info ) == -1 )
@@ -412,10 +418,11 @@ static int DVDOpen( struct input_thread_s *p_input )
      */ 
     dvdhandle = dvdcss_open( psz_device );
     
-    if( b_need_free )
-    {
+    /* free allocated strings */
+    if( psz_device != psz_orig )
         free( psz_device );
-    }
+    free( psz_orig );
+
 
     if( dvdhandle == NULL )
     {
