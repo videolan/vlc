@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.9 2002/01/02 14:37:42 sam Exp $
+ * $Id: vpar_headers.c,v 1.10 2002/01/08 23:06:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -1059,17 +1059,6 @@ static void QuantMatrixExtension( vpar_thread_t * p_vpar )
     {
         /* Load intra_quantiser_matrix for chrominance. */
         LoadMatrix( p_vpar, &p_vpar->sequence.chroma_intra_quant );
-    }
-    else
-    {
-        /* Link the chrominance intra matrix to the luminance one. */
-        LinkMatrix( &p_vpar->sequence.chroma_intra_quant,
-                    p_vpar->sequence.intra_quant.pi_matrix );
-    }
-    if( GetBits( &p_vpar->bit_stream, 1 ) )
-    {
-        /* Load non_intra_quantiser_matrix for chrominance. */
-        LoadMatrix( p_vpar, &p_vpar->sequence.chroma_nonintra_quant );
     }
     else
     {
