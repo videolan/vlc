@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.39 2003/11/23 17:46:06 gbazin Exp $
+ * $Id: http.c,v 1.40 2003/11/23 18:16:45 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1754,7 +1754,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                     uri_decode_url_encoded( mrl );
                     p_item = parse_MRL( mrl );
 
-                    if( !p_item || !*p_item )
+                    if( !p_item || !p_item->psz_uri || !*p_item->psz_uri )
                     {
                         msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
                     } else
