@@ -3628,7 +3628,7 @@ if test "${enable_xvideo+set}" = set; then
   enableval="$enable_xvideo"
   if test x$enable_xvideo = xyes; then
      PLUGINS=${PLUGINS}"xvideo "
-     LIB_XVIDEO="-L/usr/X11R6/lib -lX11 -lXext"
+     LIB_XVIDEO="-L/usr/X11R6/lib -lX11 -lXext -lXv"
    fi
 fi
 

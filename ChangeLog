@@ -4,6 +4,8 @@
 
 HEAD
 
+  * All Debian packages are now lintian-clean.
+  * Fixed XVideo plugin linking.
   * Updated TODO list.
   * Built-in modules support almost finished.
   * A few Makefile fixes for BeOS.
