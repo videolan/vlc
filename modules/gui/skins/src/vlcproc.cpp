@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.49 2003/10/19 12:37:03 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.50 2003/10/20 22:27:05 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -373,6 +373,12 @@ void VlcProc::EnabledEvent( string type, bool state )
 {
     OSAPI_PostMessage( NULL, CTRL_ENABLED, (unsigned int)
         p_intf->p_sys->p_theme->EvtBank->Get( type ), (int)state );
+
+    if( !state )
+    {
+        OSAPI_PostMessage( NULL, CTRL_SYNCHRO, (unsigned int)
+            p_intf->p_sys->p_theme->EvtBank->Get( type ), (int)false );
+    }
 }
 //---------------------------------------------------------------------------
 
@@ -464,9 +470,10 @@ void VlcProc::DropFile( unsigned int param )
 //---------------------------------------------------------------------------
 void VlcProc::PauseStream()
 {
-    if( p_intf->p_sys->p_input == NULL )
+    if( p_intf->p_sys->p_playlist == NULL )
         return;
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+
+    playlist_Command( p_intf->p_sys->p_playlist, PLAYLIST_PAUSE, 0 );
 
     // Refresh interface
     InterfaceRefresh();
