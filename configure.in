@@ -659,6 +659,19 @@ AC_ARG_WITH(dvdcss,
       LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldl"
     fi ])
 
+
+
+
+dnl
+dnl  vcd module
+dnl
+AC_ARG_ENABLE(vcd,
+  [  --enable-vcd        VCDs support (default disabled)],
+      [if test x$enable_vcd = xyes; then
+               PLUGINS="${PLUGINS} vcd"
+       fi])
+
+
 dnl
 dnl  dummy plugin
 dnl

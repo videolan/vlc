@@ -625,7 +625,7 @@ create_intf_window (void)
   gtk_box_pack_start (GTK_BOX (window_vbox), dvd_box, TRUE, TRUE, 0);
   gtk_widget_set_usize (dvd_box, 500, 24);
 
-  dvd_label = gtk_label_new (_("DVD"));
+  dvd_label = gtk_label_new (_("Disc"));
   gtk_widget_ref (dvd_label);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "dvd_label", dvd_label,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1455,7 +1455,6 @@ create_intf_disc (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (disc_vcd);
   gtk_box_pack_start (GTK_BOX (vbox5), disc_vcd, FALSE, FALSE, 0);
-  gtk_widget_set_sensitive (disc_vcd, FALSE);
 
   frame3 = gtk_frame_new (_("Starting position"));
   gtk_widget_ref (frame3);

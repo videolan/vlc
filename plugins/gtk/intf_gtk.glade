@@ -639,7 +639,7 @@
       <widget>
 	<class>GtkLabel</class>
 	<name>dvd_label</name>
-	<label>DVD</label>
+	<label>Disc</label>
 	<justify>GTK_JUSTIFY_CENTER</justify>
 	<wrap>False</wrap>
 	<xalign>0.5</xalign>
@@ -1626,7 +1626,6 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 	    <widget>
 	      <class>GtkRadioButton</class>
 	      <name>disc_vcd</name>
-	      <sensitive>False</sensitive>
 	      <can_focus>True</can_focus>
 	      <signal>
 		<name>toggled</name>
