@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.9 2003/02/01 21:39:21 ipkiss Exp $
+$Id: NEWS,v 1.10 2003/02/01 22:03:42 babal Exp $
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
@@ -58,6 +58,7 @@ Miscellaneous:
   * new WxWindows interface
   * all interfaces allow to dynamically change the volume, the audio
     device and the channels configuration
+  * headphone channel mixer with virtual spatialization effect
 
 GNU/Linux, *BSD & misc. UNIX ports:
   * OSS and ALSA audio output modules support A/52 over S/PDIF output
@@ -73,6 +74,7 @@ Mac OS X port:
   * new playlist and messages windows
 
 Win32 port:
+  * preference dialog box redesigned
   * waveout module supports multi-channel audio output
   * support for VCDs
   * new dialog box to select avi subtitles
