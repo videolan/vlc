@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.15.2.2 2002/09/25 23:11:53 massiot Exp $
+ * $Id: lpcm_adec.c,v 1.15.2.3 2002/10/14 16:27:44 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -161,7 +161,7 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
 {
     byte_t * buffer;
 #ifndef WORDS_BIGENDIAN
-    byte_t * p_temp[LPCMDEC_FRAME_SIZE];
+    byte_t p_temp[LPCMDEC_FRAME_SIZE];
 #endif
     int i_loop;
     byte_t byte1, byte2;
@@ -198,7 +198,7 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
     if( p_lpcmdec->p_fifo->b_die ) return;
 
 #   ifdef HAVE_SWAB
-    swab( buffer, p_temp, LPCMDEC_FRAME_SIZE );
+    swab( p_temp, buffer, LPCMDEC_FRAME_SIZE );
 #   else
     for( i_loop = 0; i_loop < LPCMDEC_FRAME_SIZE/2; i_loop++ )
     {
