@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.9 2001/05/31 01:37:08 sam Exp $
+ * $Id: aout_spdif.c,v 1.10 2001/05/31 03:12:49 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -114,10 +114,10 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                         mlast = mplay;
                         /* play spdif frame to the external decoder */
                         p_aout->pf_play( p_aout,
-                                         ((byte_t*) p_aout->fifo[i_fifo].buffer +
-                                            p_aout->fifo[i_fifo].l_start_frame*
-                                            SPDIF_FRAME_SIZE ),
-                                         p_aout->fifo[i_fifo].l_frame_size );
+                                     ( (byte_t *)p_aout->fifo[i_fifo].buffer
+                                         + p_aout->fifo[i_fifo].l_start_frame
+                                            * SPDIF_FRAME_SIZE ),
+                                     p_aout->fifo[i_fifo].l_frame_size );
 
                         p_aout->fifo[i_fifo].l_start_frame = 
                             (p_aout->fifo[i_fifo].l_start_frame + 1 )

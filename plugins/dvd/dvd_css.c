@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.30 2001/05/31 01:37:08 sam Exp $
+ * $Id: dvd_css.c,v 1.31 2001/05/31 03:12:49 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -38,9 +38,9 @@
 #include <stdlib.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#   include <unistd.h>
 #elif defined( _MSC_VER ) && defined( _WIN32 )
-#include <io.h>
+#   include <io.h>
 #endif
 
 #include <string.h>
@@ -50,9 +50,11 @@
 #include "intf_msg.h"
 
 #include "dvd_css.h"
+
 #ifdef HAVE_CSS
-#include "dvd_csstables.h"
+#   include "dvd_csstables.h"
 #endif /* HAVE_CSS */
+
 #include "dvd_ioctl.h"
 
 #include "input_dvd.h"
@@ -333,8 +335,13 @@ int CSSGetKey( int i_fd, css_t * p_css )
     i_pos = p_css->i_title_pos;
 
     do {
+#if !defined( WIN32 )
     i_pos = lseek( i_fd, i_pos, SEEK_SET );
     i_bytes_read = read( i_fd, pi_buf, 0x800 );
+#else
+    i_pos = SetFilePointer( (HANDLE) i_fd, i_pos, 0, FILE_BEGIN );
+    ReadFile( (HANDLE) i_fd, pi_buf, 0x800, &i_bytes_read, NULL );
+#endif
 
     /* PES_scrambling_control */
     if( pi_buf[0x14] & 0x30 )

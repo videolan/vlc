@@ -2,7 +2,7 @@
  * dvd_ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.h,v 1.8 2001/05/25 04:44:49 sam Exp $
+ * $Id: dvd_ioctl.h,v 1.9 2001/05/31 03:12:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -32,7 +32,37 @@ int ioctl_InvalidateAgid    ( int, int * );
 int ioctl_SendChallenge     ( int, int *, u8 * );
 int ioctl_SendKey2          ( int, int *, u8 * );
 
-#ifdef SYS_BEOS
+/*****************************************************************************
+ * Common macro, BeOS specific
+ *****************************************************************************/
+#if defined( SYS_BEOS )
+#define INIT_RDC( TYPE, SIZE ) \
+    raw_device_command rdc; \
+    u8 p_buffer[ (SIZE) ]; \
+    memset( &rdc, 0, sizeof( raw_device_command ) ); \
+    rdc.data = (char *)p_buffer; \
+    rdc.data_length = (SIZE); \
+    BeInitRDC( &rdc, (TYPE) );
+#endif
+
+/*****************************************************************************
+ * Common macro, Darwin specific
+ *****************************************************************************/
+#if defined( SYS_DARWIN1_3 )
+#define INIT_DVDIOCTL( SIZE ) \
+    dvdioctl_data_t dvdioctl; \
+    u8 p_buffer[ (SIZE) ]; \
+    dvdioctl.p_buffer = p_buffer; \
+    dvdioctl.i_size = (SIZE); \
+    dvdioctl.i_keyclass = kCSS_CSS2_CPRM; \
+    memset( p_buffer, 0, (SIZE) );
+#endif
+
+/*****************************************************************************
+ * Various DVD I/O tables
+ *****************************************************************************/
+
+#if defined( SYS_BEOS ) || defined( WIN32 )
 
 /* The generic packet command opcodes for CD/DVD Logical Units,
  * From Table 57 of the SFF8090 Ver. 3 (Mt. Fuji) draft standard. */
@@ -43,6 +73,81 @@ int ioctl_SendKey2          ( int, int *, u8 * );
 /* DVD struct types */
 #define DVD_STRUCT_COPYRIGHT     0x01
 #define DVD_STRUCT_DISCKEY       0x02
+#endif
+
+#if defined( WIN32 )
+
+#define IOCTL_DVD_START_SESSION         CTL_CODE(FILE_DEVICE_DVD, 0x0400, METHOD_BUFFERED, FILE_READ_ACCESS)
+#define IOCTL_DVD_READ_KEY              CTL_CODE(FILE_DEVICE_DVD, 0x0401, METHOD_BUFFERED, FILE_READ_ACCESS)
+#define IOCTL_DVD_SEND_KEY              CTL_CODE(FILE_DEVICE_DVD, 0x0402, METHOD_BUFFERED, FILE_READ_ACCESS)
+#define IOCTL_DVD_END_SESSION           CTL_CODE(FILE_DEVICE_DVD, 0x0403, METHOD_BUFFERED, FILE_READ_ACCESS)
+
+#define IOCTL_SCSI_PASS_THROUGH_DIRECT  CTL_CODE(FILE_DEVICE_CONTROLLER, 0x0405, METHOD_BUFFERED, FILE_READ_ACCESS | FILE_WRITE_ACCESS)
+
+#define DVD_CHALLENGE_KEY_LENGTH    (12 + sizeof(DVD_COPY_PROTECT_KEY))
+#define DVD_BUS_KEY_LENGTH          (8 + sizeof(DVD_COPY_PROTECT_KEY))
+#define DVD_DISK_KEY_LENGTH         (2048 + sizeof(DVD_COPY_PROTECT_KEY))
+#define DVD_ASF_LENGTH              (sizeof(DVD_ASF) + sizeof(DVD_COPY_PROTECT_KEY))
+
+typedef ULONG DVD_SESSION_ID, *PDVD_SESSION_ID;
+
+typedef enum
+{
+    DvdChallengeKey = 0x01,
+    DvdBusKey1,
+    DvdBusKey2,
+    DvdTitleKey,
+    DvdAsf,
+    DvdSetRpcKey = 0x6,
+    DvdGetRpcKey = 0x8,
+    DvdDiskKey = 0x80,
+    DvdInvalidateAGID = 0x3f
+} DVD_KEY_TYPE;
+
+typedef struct _DVD_COPY_PROTECT_KEY
+{
+    ULONG KeyLength;
+    DVD_SESSION_ID SessionId;
+    DVD_KEY_TYPE KeyType;
+    ULONG KeyFlags;
+    union
+    {
+        struct
+        {
+            ULONG FileHandle;
+            ULONG Reserved;   // used for NT alignment
+        };
+        LARGE_INTEGER TitleOffset;
+    } Parameters;
+    UCHAR KeyData[0];
+} DVD_COPY_PROTECT_KEY, *PDVD_COPY_PROTECT_KEY;
+
+typedef struct _DVD_ASF
+{
+    UCHAR Reserved0[3];
+    UCHAR SuccessFlag:1;
+    UCHAR Reserved1:7;
+} DVD_ASF, * PDVD_ASF;
+
+typedef struct _SCSI_PASS_THROUGH_DIRECT
+{
+    USHORT Length;
+    UCHAR ScsiStatus;
+    UCHAR PathId;
+    UCHAR TargetId;
+    UCHAR Lun;
+    UCHAR CdbLength;
+    UCHAR SenseInfoLength;
+    UCHAR DataIn;
+    ULONG DataTransferLength;
+    ULONG TimeOutValue;
+    PVOID DataBuffer;
+    ULONG SenseInfoOffset;
+    UCHAR Cdb[16];
+} SCSI_PASS_THROUGH_DIRECT, *PSCSI_PASS_THROUGH_DIRECT;
+
+#define SCSI_IOCTL_DATA_OUT         0
+#define SCSI_IOCTL_DATA_IN          1
 
 /* Key formats */
 #define DVD_REPORT_AGID          0x00

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.63 2001/05/31 01:37:08 sam Exp $
+ * $Id: input_dvd.c,v 1.64 2001/05/31 03:12:49 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -35,37 +35,38 @@
 #include "defs.h"
 
 #ifdef HAVE_CSS
-#define MODULE_NAME dvd
+#   define MODULE_NAME dvd
 #else /* HAVE_CSS */
-#define MODULE_NAME dvdnocss
+#   define MODULE_NAME dvdnocss
 #endif /* HAVE_CSS */
+
 #include "modules_inner.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#   include <unistd.h>
 #endif
 
 #if !defined( WIN32 )
-#include <netinet/in.h>
+#   include <netinet/in.h>
 #endif
 
 #include <fcntl.h>
 #include <sys/types.h>
-
 #include <string.h>
+#include <errno.h>
+
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
 #endif
-#include <errno.h>
 
-#if !defined( WIN32 )
-#include <sys/uio.h>                                         /* struct iovec */
+#if defined( WIN32 )
+#   include <io.h>
+#   include "iovec.h"
 #else
-#include <io.h>
-#include "iovec.h"
+#   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
 #include "config.h"
@@ -151,6 +152,9 @@ static int DVDProbe( probedata_t *p_data )
     char * psz_name = p_input->p_source;
     int i_handle;
     int i_score = 5;
+#if defined( WIN32 )
+    char buf[7];
+#endif
 
     if( TestMethod( INPUT_METHOD_VAR, "dvd" ) )
     {
@@ -172,12 +176,25 @@ static int DVDProbe( probedata_t *p_data )
         psz_name += 4;
     }
 
+#if !defined( WIN32 )
     i_handle = open( psz_name, 0 );
     if( i_handle == -1 )
     {
         return( 0 );
     }
     close( i_handle );
+#else
+    snprintf( buf, 7, "\\\\.\\%c:", psz_name[0] );
+    (HANDLE) i_handle = CreateFile( i_score < 90 ? psz_name : buf, 
+                        GENERIC_READ | GENERIC_WRITE,
+                        FILE_SHARE_READ | FILE_SHARE_WRITE,
+                        NULL, OPEN_EXISTING, 0, NULL );
+    if( (HANDLE) i_handle == INVALID_HANDLE_VALUE )
+    {
+        return( 0 );
+    }
+    CloseHandle( (HANDLE) i_handle );
+#endif
 
     return( i_score );
 }
@@ -224,7 +241,11 @@ static void DVDInit( input_thread_t * p_input )
 
     p_dvd->b_encrypted = i;
 
+#if !defined( WIN32 )
     lseek( p_input->i_handle, 0, SEEK_SET );
+#else
+    SetFilePointer( (HANDLE) p_input->i_handle, 0, 0, FILE_BEGIN );
+#endif
 
     /* Reading structures initialisation */
     p_input->p_method_data =
@@ -818,6 +839,14 @@ static int DVDRead( input_thread_t * p_input,
         return -1;
     }
 
+    pp_data = (struct data_packet_s **) malloc( p_input->i_read_once *
+                                        sizeof( struct data_packet_s * ) );
+    if( pp_data == NULL )
+    {
+        intf_ErrMsg( "dvd error: out of memory" );
+        return -1;
+    }
+
     p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
     p_netlist = (dvd_netlist_t *)p_input->p_method_data;
 
@@ -897,7 +926,11 @@ static int DVDRead( input_thread_t * p_input,
     p_netlist->i_read_once = i_block_once;
 
     /* Reads from DVD */
+#if !defined( WIN32 )
     i_read_bytes = readv( p_dvd->i_fd, p_vec, i_block_once );
+#else
+    i_read_bytes = ReadFileV( p_dvd->i_fd, p_vec, i_block_once );
+#endif
     i_read_blocks = ( i_read_bytes + 0x7ff ) >> 11;
 
     /* Update netlist indexes */
@@ -922,7 +955,7 @@ static int DVDRead( input_thread_t * p_input,
 
         while( i_pos < p_netlist->i_buffer_size )
         {
-            pi_cur = ((u8*)p_vec[i_iovec].iov_base + i_pos);
+            pi_cur = (u8*)p_vec[i_iovec].iov_base + i_pos;
 
             /*default header */
             if( U32_AT( pi_cur ) != 0x1BA )
@@ -984,6 +1017,8 @@ static int DVDRead( input_thread_t * p_input,
     b_eof = b_eot && ( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    free( pp_data );
 
     free( pp_data );
 
@@ -1115,10 +1150,18 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_dvd->i_chapter = i_chapter;
     p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
 
+#if !defined( WIN32 )
     p_input->stream.p_selected_area->i_tell =
                 lseek( p_dvd->i_fd, p_dvd->i_title_start +
                        (off_t)( p_dvd->i_sector ) *DVD_LB_SIZE, SEEK_SET ) -
                 p_input->stream.p_selected_area->i_start;
+#else
+    p_input->stream.p_selected_area->i_tell =
+                SetFilePointer( (HANDLE) p_dvd->i_fd, p_dvd->i_title_start +
+                        (off_t)( p_dvd->i_sector ) *DVD_LB_SIZE, NULL, FILE_BEGIN) -
+                         p_input->stream.p_selected_area->i_start;
+
+#endif
 /*
     intf_WarnMsg( 3, "Program Cell: %d Cell: %d Chapter: %d",
                      p_dvd->i_prg_cell, p_dvd->i_cell, p_dvd->i_chapter );
@@ -1249,7 +1292,12 @@ static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
                          DVD_LB_SIZE * (off_t)( p_dvd->i_sector );
 
     /* Position the fd pointer on the right address */
+#if !defined( WIN32 )
     p_dvd->i_start = lseek( p_dvd->i_fd, p_dvd->i_start, SEEK_SET );
+#else
+    p_dvd->i_start = SetFilePointer( (HANDLE) p_dvd->i_fd,
+                        p_dvd->i_start, NULL, FILE_BEGIN );
+#endif
 
     p_dvd->i_chapter = i_chapter;
     return 0;

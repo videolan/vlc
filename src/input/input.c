@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.115 2001/05/31 01:37:08 sam Exp $
+ * $Id: input.c,v 1.116 2001/05/31 03:12:49 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,33 +34,27 @@
 #include <fcntl.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#   include <unistd.h>
 #elif defined( _MSC_VER ) && defined( _WIN32 )
-#include <io.h>
+#   include <io.h>
 #endif
 
 #include <string.h>
+#include <errno.h>
+
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
 #endif
-#include <errno.h>
-
-/* WinSock Includes */
 
 #ifdef WIN32
-#include <winsock2.h>
-#endif
-
-
-/* Network functions */
-
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO ) && !defined( WIN32 )
-#include <netdb.h>                                            /* hostent ... */
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+#   include <winsock2.h>
+#elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#   include <netdb.h>                                         /* hostent ... */
+#   include <sys/socket.h>
+#   include <netinet/in.h>
+#   include <arpa/inet.h>
+#   include <sys/types.h>
+#   include <sys/socket.h>
 #endif
 
 #ifdef STATS
@@ -85,7 +79,6 @@
 #include "interface.h"
 
 #include "main.h"
-
 
 /*****************************************************************************
  * Local prototypes
@@ -260,6 +253,7 @@ static void RunThread( input_thread_t *p_input )
     if( pp_packets == NULL )
     {
         intf_ErrMsg( "input error: out of memory" );
+        free( pp_packets );
         p_input->b_error = 1;
     }
 
@@ -504,6 +498,10 @@ static void FileOpen( input_thread_t * p_input )
     struct stat         stat_info;
     int                 i_stat;
 
+#if defined( WIN32 )
+    char buf[7] = { 0 };
+#endif
+
     char *psz_name = p_input->p_source;
 
     /* FIXME: this code ought to be in the plugin so that code can
@@ -518,6 +516,9 @@ static void FileOpen( input_thread_t * p_input )
             /* get rid of the 'dvd:' stuff and try again */
             psz_name += 4;
             i_stat = stat( psz_name, &stat_info );
+#if defined( WIN32 )
+            snprintf( buf, 7, "\\\\.\\%c:", psz_name[0] );
+#endif
         }
         else if( ( i_size > 5 )
                  && !strncasecmp( psz_name, "file:", 5 ) )
@@ -527,7 +528,11 @@ static void FileOpen( input_thread_t * p_input )
             i_stat = stat( psz_name, &stat_info );
         }
 
-        if( i_stat == (-1) )
+        if( i_stat == (-1) 
+#if defined( WIN32 )
+        && !buf[0]      
+#endif
+            )
         {
             intf_ErrMsg( "input error: cannot stat() file `%s' (%s)",
                          psz_name, strerror(errno));
@@ -542,7 +547,11 @@ static void FileOpen( input_thread_t * p_input )
     p_input->stream.b_pace_control = 1;
 
     if( S_ISREG(stat_info.st_mode) || S_ISCHR(stat_info.st_mode)
-         || S_ISBLK(stat_info.st_mode) )
+         || S_ISBLK(stat_info.st_mode)
+#if defined( WIN32 )
+         || ( buf[0] && ( ( stat_info.st_size = 0 ) == 0 ) )
+#endif
+         )
     {
         p_input->stream.b_seekable = 1;
         p_input->stream.p_selected_area->i_size = stat_info.st_size;
@@ -573,8 +582,10 @@ static void FileOpen( input_thread_t * p_input )
     if( (p_input->i_handle = open( psz_name,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
 #else
-    if( (p_input->i_handle = open( psz_name, O_BINARY
-                                   /*O_NONBLOCK | O_LARGEFILE*/ )) == (-1) )
+    if( ( buf[0] && ( (HANDLE) p_input->i_handle = CreateFile( buf, 
+        GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 
+        NULL, OPEN_EXISTING, 0, NULL ) ) == INVALID_HANDLE_VALUE ) ||
+        ( !buf[0] && (p_input->i_handle = open( psz_name, O_BINARY ) ) == (-1) ) )
 #endif
     {
         intf_ErrMsg( "input error: cannot open file (%s)", strerror(errno) );
@@ -590,6 +601,14 @@ static void FileOpen( input_thread_t * p_input )
 static void FileClose( input_thread_t * p_input )
 {
     intf_WarnMsg( 1, "input: closing file `%s'", p_input->p_source );
+#if defined( WIN32 )
+    if( ( strlen( p_input->p_source ) > 4 ) &&
+        !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    {
+        CloseHandle( (HANDLE) p_input->i_handle );
+    }
+    else
+#endif
     close( p_input->i_handle );
 
     return;

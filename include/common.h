@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.33 2001/05/31 01:37:08 sam Exp $
+ * $Id: common.h,v 1.34 2001/05/31 03:12:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -140,7 +140,6 @@ struct es_descriptor_s;
 /*****************************************************************************
  * Macros and inline functions
  *****************************************************************************/
-
 #ifdef NTOHL_IN_SYS_PARAM_H
 #   include <sys/param.h>
 #elif defined(WIN32)
@@ -157,10 +156,10 @@ struct es_descriptor_s;
 
 /* MAX and MIN: self explanatory */
 #ifndef MAX
-#define MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
+#   define MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
 #endif
 #ifndef MIN
-#define MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
+#   define MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
@@ -171,19 +170,19 @@ struct es_descriptor_s;
 /* FIXME: hton64 should be declared as an extern inline function to avoid
  * border effects (see byteorder.h) */
 #if WORDS_BIGENDIAN
-#define hton16      htons
-#define hton32      htonl
-#define hton64(i)   ( i )
-#define ntoh16      ntohs
-#define ntoh32      ntohl
-#define ntoh64(i)   ( i )
+#   define hton16      htons
+#   define hton32      htonl
+#   define hton64(i)   ( i )
+#   define ntoh16      ntohs
+#   define ntoh32      ntohl
+#   define ntoh64(i)   ( i )
 #else
-#define hton16      htons
-#define hton32      htonl
-#define hton64(i)   ( ((u64)(htonl((i) & 0xffffffff)) << 32) | htonl(((i) >> 32) & 0xffffffff ) )
-#define ntoh16      ntohs
-#define ntoh32      ntohl
-#define ntoh64      hton64
+#   define hton16      htons
+#   define hton32      htonl
+#   define hton64(i)   ( ((u64)(htonl((i) & 0xffffffff)) << 32) | htonl(((i) >> 32) & 0xffffffff ) )
+#   define ntoh16      ntohs
+#   define ntoh32      ntohl
+#   define ntoh64      hton64
 #endif
 
 /* Macros with automatic casts */
@@ -194,15 +193,16 @@ struct es_descriptor_s;
 /* win32, cl and icl support */
 #if defined( _MSC_VER )
 typedef long off_t;
-#define __attribute__(x)
-#define __inline__      __inline
-#define strncasecmp     strnicmp
-#define strcasecmp      stricmp
-#define S_ISBLK(m)      (0)
-#define S_ISCHR(m)      (0)
-#define S_ISFIFO(m)     (((m)&_S_IFMT) == _S_IFIFO)
-#define S_ISREG(m)      (((m)&_S_IFMT) == _S_IFREG)
-#define I64C(x)         x
+#   define __attribute__(x)
+#   define __inline__      __inline
+#   define strncasecmp     strnicmp
+#   define strcasecmp      stricmp
+#   define S_ISBLK(m)      (0)
+#   define S_ISCHR(m)      (0)
+#   define S_ISFIFO(m)     (((m)&_S_IFMT) == _S_IFIFO)
+#   define S_ISREG(m)      (((m)&_S_IFMT) == _S_IFREG)
+#   define I64C(x)         x
 #else
-#define I64C(x)         x##LL
+#   define I64C(x)         x##LL
 #endif
+

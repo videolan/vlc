@@ -2,10 +2,11 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.15 2001/05/31 01:37:08 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.16 2001/05/31 03:12:49 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +31,12 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>
 
-#if !defined( WIN32 )
-#include <netinet/in.h>
-#include <sys/ioctl.h>
+#if defined( WIN32 )
+#   include <windows.h>
+#   include <winioctl.h>
+#else
+#   include <netinet/in.h>
+#   include <sys/ioctl.h>
 #endif
 
 #ifdef DVD_STRUCT_IN_SYS_CDIO_H
@@ -65,26 +69,6 @@
  *****************************************************************************/
 #if defined( SYS_BEOS )
 static void BeInitRDC ( raw_device_command *, int );
-#define INIT_RDC( TYPE, SIZE ) \
-    raw_device_command rdc; \
-    u8 p_buffer[ (SIZE) ]; \
-    memset( &rdc, 0, sizeof( raw_device_command ) ); \
-    rdc.data = (char *)p_buffer; \
-    rdc.data_length = (SIZE); \
-    BeInitRDC( &rdc, (TYPE) );
-#endif
-
-/*****************************************************************************
- * Local prototypes, Darwin specific
- *****************************************************************************/
-#if defined( SYS_DARWIN1_3 )
-#define INIT_DVDIOCTL( SIZE ) \
-    dvdioctl_data_t dvdioctl; \
-    u8 p_buffer[ (SIZE) ]; \
-    dvdioctl.p_buffer = p_buffer; \
-    dvdioctl.i_size = (SIZE); \
-    dvdioctl.i_keyclass = kCSS_CSS2_CPRM; \
-    memset( p_buffer, 0, (SIZE) );
 #endif
 
 /*****************************************************************************
@@ -131,6 +115,49 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
     *pi_copyright = 1;
 
     i_ret = 0;
+
+#elif defined( WIN32 )
+    if( GetVersion() < 0x80000000 ) /* NT/Win2000/Whistler */
+    {
+        DWORD tmp;
+        u8 p_buffer[ 8 ];
+        SCSI_PASS_THROUGH_DIRECT sptd;
+
+        memset( &sptd, 0, sizeof( sptd ) );
+        memset( &p_buffer, 0, sizeof( p_buffer ) );
+   
+        /*  When using IOCTL_DVD_READ_STRUCTURE and 
+            DVD_COPYRIGHT_DESCRIPTOR, CopyrightProtectionType
+            is always 6. So we send a raw scsi command instead. */
+
+        sptd.Length             = sizeof( SCSI_PASS_THROUGH_DIRECT );
+        sptd.CdbLength          = 12;
+        sptd.DataIn             = SCSI_IOCTL_DATA_IN;
+        sptd.DataTransferLength = 8;
+        sptd.TimeOutValue       = 2;
+        sptd.DataBuffer         = p_buffer;
+        sptd.Cdb[ 0 ]           = GPCMD_READ_DVD_STRUCTURE;
+        sptd.Cdb[ 6 ]           = i_layer;
+        sptd.Cdb[ 7 ]           = DVD_STRUCT_COPYRIGHT;
+        sptd.Cdb[ 8 ]           = (8 >> 8) & 0xff;
+        sptd.Cdb[ 9 ]           =  8       & 0xff;
+
+        i_ret = DeviceIoControl( (HANDLE) i_fd,
+                             IOCTL_SCSI_PASS_THROUGH_DIRECT,
+                             &sptd, sizeof( SCSI_PASS_THROUGH_DIRECT ),
+                             &sptd, sizeof( SCSI_PASS_THROUGH_DIRECT ),
+                             &tmp, NULL ) ? 0 : -1;
+
+        *pi_copyright = p_buffer[4];
+    }
+    else
+    {
+        /* TODO: add WNASPI support for Win9x */
+        intf_ErrMsg( "css error: DVD ioctls not functional yet" );
+        intf_ErrMsg( "css error: assuming disc is unencrypted" );
+        *pi_copyright = 0;
+        i_ret = 0;
+    }
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
@@ -202,6 +229,35 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
 
     memset( p_key, 0x00, 2048 );
 
+#elif defined( WIN32 )
+    if( GetVersion() < 0x80000000 ) /* NT/Win2000/Whistler */
+    {
+        DWORD tmp;
+        u8 buffer[DVD_DISK_KEY_LENGTH];
+        PDVD_COPY_PROTECT_KEY key = (PDVD_COPY_PROTECT_KEY) &buffer;
+
+        memset( &buffer, 0, sizeof( buffer ) );
+
+        key->KeyLength  = DVD_DISK_KEY_LENGTH;
+        key->SessionId  = *pi_agid;
+        key->KeyType    = DvdDiskKey;
+        key->KeyFlags   = 0;
+
+        i_ret = DeviceIoControl( (HANDLE) i_fd, IOCTL_DVD_READ_KEY, key, 
+                key->KeyLength, key, key->KeyLength, &tmp, NULL ) ? 0 : -1;
+
+        if( i_ret < 0 )
+        {   
+            return i_ret;
+        }
+
+        memcpy( p_key, key->KeyData, 2048 );
+    }
+    else
+    {
+        i_ret = -1;
+    }
+
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
     i_ret = -1;
@@ -257,6 +313,22 @@ int ioctl_ReportAgid( int i_fd, int *pi_agid )
 
     *pi_agid = p_buffer[ 7 ] >> 6;
 
+#elif defined( WIN32 )
+    if( GetVersion() < 0x80000000 ) /* NT/Win2000/Whistler */
+    {
+        ULONG id;
+        DWORD tmp;
+
+        i_ret = DeviceIoControl( (HANDLE) i_fd, IOCTL_DVD_START_SESSION, 
+                        &tmp, 4, &id, sizeof( id ), &tmp, NULL ) ? 0 : -1;
+
+        *pi_agid = id;
+    }
+    else
+    {
+        i_ret = -1;
+    }
+
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
     i_ret = -1;
@@ -311,6 +383,35 @@ int ioctl_ReportChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
     i_ret = ioctl( i_fd, IODVD_REPORT_KEY, &dvdioctl );
 
     memcpy( p_challenge, p_buffer + 4, 12 );
+
+#elif defined( WIN32 )
+    if( GetVersion() < 0x80000000 ) /* NT/Win2000/Whistler */
+    {
+        DWORD tmp;
+        u8 buffer[DVD_CHALLENGE_KEY_LENGTH];
+        PDVD_COPY_PROTECT_KEY key = (PDVD_COPY_PROTECT_KEY) &buffer;
+
+        memset( &buffer, 0, sizeof( buffer ) );
+
+        key->KeyLength  = DVD_CHALLENGE_KEY_LENGTH;
+        key->SessionId  = *pi_agid;
+        key->KeyType    = DvdChallengeKey;
+        key->KeyFlags   = 0;
+
+        i_ret = DeviceIoControl( (HANDLE) i_fd, IOCTL_DVD_READ_KEY, key, 
+                key->KeyLength, key, key->KeyLength, &tmp, NULL ) ? 0 : -1;
+
+        if( i_ret < 0 )
+        {
+            return i_ret;
+        }
+
+        memcpy( p_challenge, key->KeyData, 10 );
+    }
+    else
+    {
+        i_ret = -1;
+    }
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
@@ -369,6 +470,37 @@ int ioctl_ReportASF( int i_fd, int *pi_agid, int *pi_asf )
 
     *pi_asf = p_buffer[ 7 ] & 1;
 
+#elif defined( WIN32 )
+    if( GetVersion() < 0x80000000 ) /* NT/Win2000/Whistler */
+    {
+        DWORD tmp;
+        u8 buffer[DVD_ASF_LENGTH];
+        PDVD_COPY_PROTECT_KEY key = (PDVD_COPY_PROTECT_KEY) &buffer;
+
+        memset( &buffer, 0, sizeof( buffer ) );
+
+        key->KeyLength  = DVD_ASF_LENGTH;
+        key->SessionId  = *pi_agid;
+        key->KeyType    = DvdAsf;
+        key->KeyFlags   = 0;
+
+        ((PDVD_ASF)key->KeyData)->SuccessFlag = *pi_asf;
+
+        i_ret = DeviceIoControl( (HANDLE) i_fd, IOCTL_DVD_READ_KEY, key, 
+                key->KeyLength, key, key->KeyLength, &tmp, NULL ) ? 0 : -1;
+
+        if( i_ret < 0 )
+        {
+            return i_ret;
+        }
+
+        *pi_asf = ((PDVD_ASF)key->KeyData)->SuccessFlag;
+    }
+    else
+    {
+        i_ret = -1;
+    }
+
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
     i_ret = -1;
@@ -423,6 +555,30 @@ int ioctl_ReportKey1( int i_fd, int *pi_agid, u8 *p_key )
 
     memcpy( p_key, p_buffer + 4, 8 );
 
+#elif defined( WIN32 )
+    if( GetVersion() < 0x80000000 ) /* NT/Win2000/Whistler */
+    {
+        DWORD tmp;
+        u8 buffer[DVD_BUS_KEY_LENGTH];
+        PDVD_COPY_PROTECT_KEY key = (PDVD_COPY_PROTECT_KEY) &buffer;
+
+        memset( &buffer, 0, sizeof( buffer ) );
+
+        key->KeyLength  = DVD_BUS_KEY_LENGTH;
+        key->SessionId  = *pi_agid;
+        key->KeyType    = DvdBusKey1;
+        key->KeyFlags   = 0;
+
+        i_ret = DeviceIoControl( (HANDLE) i_fd, IOCTL_DVD_READ_KEY, key, 
+                key->KeyLength, key, key->KeyLength, &tmp, NULL ) ? 0 : -1;
+
+        memcpy( p_key, key->KeyData, 8 );
+    }
+    else
+    {
+        i_ret = -1;
+    }
+
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
     i_ret = -1;
@@ -472,6 +628,19 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
     dvdioctl.i_agid = *pi_agid;
 
     i_ret = ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
+
+#elif defined( WIN32 )
+    if( GetVersion() < 0x80000000 ) /* NT/Win2000/Whistler */
+    {
+        DWORD tmp;
+
+        i_ret = DeviceIoControl( (HANDLE) i_fd, IOCTL_DVD_END_SESSION, 
+                    pi_agid, sizeof( *pi_agid ), NULL, 0, &tmp, NULL ) ? 0 : -1;
+    }
+    else
+    {
+        i_ret = -1;
+    }
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
@@ -527,6 +696,30 @@ int ioctl_SendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 
     return ioctl( i_fd, IODVD_SEND_KEY, &dvdioctl );
 
+#elif defined( WIN32 )
+    if( GetVersion() < 0x80000000 ) /* NT/Win2000/Whistler */
+    {
+        DWORD tmp;
+        u8 buffer[DVD_CHALLENGE_KEY_LENGTH];
+        PDVD_COPY_PROTECT_KEY key = (PDVD_COPY_PROTECT_KEY) &buffer;
+
+        memset( &buffer, 0, sizeof( buffer ) );
+
+        key->KeyLength  = DVD_CHALLENGE_KEY_LENGTH;
+        key->SessionId  = *pi_agid;
+        key->KeyType    = DvdChallengeKey;
+        key->KeyFlags   = 0;
+
+        memcpy( key->KeyData, p_challenge, 10 );
+
+        return DeviceIoControl( (HANDLE) i_fd, IOCTL_DVD_SEND_KEY, key, 
+                key->KeyLength, key, key->KeyLength, &tmp, NULL ) ? 0 : -1;
+    }
+    else
+    {
+        return -1;
+    }
+
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
     return -1;
@@ -568,6 +761,30 @@ int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
     memcpy( p_buffer + 4, p_key, 8 );
 
     return ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+#elif defined( WIN32 )
+    if( GetVersion() < 0x80000000 ) /* NT/Win2000/Whistler */
+    {
+        DWORD tmp;
+        u8 buffer[DVD_BUS_KEY_LENGTH];
+        PDVD_COPY_PROTECT_KEY key = (PDVD_COPY_PROTECT_KEY) &buffer;
+
+        memset( &buffer, 0, sizeof( buffer ) );
+
+        key->KeyLength  = DVD_BUS_KEY_LENGTH;
+        key->SessionId  = *pi_agid;
+        key->KeyType    = DvdBusKey2;
+        key->KeyFlags   = 0;
+
+        memcpy( key->KeyData, p_key, 8 );
+
+        return DeviceIoControl( (HANDLE) i_fd, IOCTL_DVD_SEND_KEY, key, 
+                key->KeyLength, key, key->KeyLength, &tmp, NULL ) ? 0 : -1;
+    }
+    else
+    {
+        return -1;
+    }
 
 #elif defined( SYS_DARWIN1_3 )
     INIT_DVDIOCTL( 12 );

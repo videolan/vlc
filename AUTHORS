@@ -115,6 +115,7 @@ D: Bug fixes
 N: Jon Lech Johansen
 E: jon-vl@nanocrew.net
 D: PS input fixes
+D: Win32 port
 
 N: Michel Kaempf
 E: maxx@via.ecp.fr

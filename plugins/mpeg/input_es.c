@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.4 2001/05/31 01:37:08 sam Exp $
+ * $Id: input_es.c,v 1.5 2001/05/31 03:12:49 sam Exp $
  *
  * Authors: 
  *
@@ -37,9 +37,9 @@
 #include <sys/stat.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#   include <unistd.h>
 #elif defined( _MSC_VER ) && defined( _WIN32 )
-#include <io.h>
+#   include <io.h>
 #endif
 
 #include <fcntl.h>

@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.c,v 1.27 2001/05/31 01:37:08 sam Exp $
+ * $Id: video_text.c,v 1.28 2001/05/31 03:12:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,9 +34,9 @@
 #include <fcntl.h>                                                 /* open() */
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>                                       /* read(), close() */
+#   include <unistd.h>                                    /* read(), close() */
 #elif defined( _MSC_VER ) && defined( _WIN32 )
-#include <io.h>
+#   include <io.h>
 #endif
 
 #ifdef SYS_BEOS
@@ -45,6 +45,10 @@
 
 #ifdef SYS_DARWIN1_3
 #   include "darwin_specific.h"
+#endif
+
+#if defined( WIN32 )
+#   include <io.h>
 #endif
 
 #include "config.h"

@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.28 2001/05/31 01:37:08 sam Exp $
+ * $Id: dvd_ifo.c,v 1.29 2001/05/31 03:12:49 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -36,9 +36,9 @@
 #include <stdlib.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#   include <unistd.h>
 #elif defined( _MSC_VER ) && defined( _WIN32 )
-#include <io.h>
+#   include <io.h>
 #endif
 
 #include <string.h>
@@ -51,9 +51,9 @@
 #include "dvd_udf.h"
 #include "input_dvd.h"
 
-/*
+/*****************************************************************************
  * Local prototypes
- */
+ *****************************************************************************/
 void            CommandRead     ( command_desc_t );
 static int      ReadTitle       ( ifo_t * , title_t *, off_t );
 static int      FreeTitle       ( title_t * );
@@ -72,9 +72,18 @@ static int      FreeTitleSet    ( vts_t * );
  *****************************************************************************/
 static __inline__ u8* FillBuffer( ifo_t* p_ifo, u8* pi_buffer, off_t i_pos )
 {
+#if defined( WIN32 )
+    DWORD tmp;
+#endif
+
     memset( pi_buffer, 0, DVD_LB_SIZE );
+#if !defined( WIN32 )
     p_ifo->i_pos = lseek( p_ifo->i_fd, i_pos, SEEK_SET );
     read( p_ifo->i_fd, pi_buffer, DVD_LB_SIZE );
+#else
+    p_ifo->i_pos = SetFilePointer( (HANDLE) p_ifo->i_fd, i_pos, NULL, FILE_BEGIN );
+    ReadFile( (HANDLE) p_ifo->i_fd, pi_buffer, DVD_LB_SIZE, &tmp, NULL );
+#endif
 
     return pi_buffer;
 }
@@ -1095,9 +1104,15 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
     /* parsing of chapter_map_t: it gives the entry cell for each chapter */
     if( p_title->i_chapter_map_start_byte )
     {
+#if !defined( WIN32 )
         p_ifo->i_pos = lseek( p_ifo->i_fd,
                               i_start + p_title->i_chapter_map_start_byte,
                               SEEK_SET );
+#else
+        p_ifo->i_pos = SetFilePointer( (HANDLE) p_ifo->i_fd, 
+                        i_start + p_title->i_chapter_map_start_byte,
+                        NULL, FILE_BEGIN );
+#endif
         
         p_title->chapter_map.pi_start_cell =
                     malloc( p_title->i_chapter_nb *sizeof(chapter_map_t) );

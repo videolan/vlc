@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mtime.c,v 1.19 2001/05/31 01:37:08 sam Exp $
+ * $Id: mtime.c,v 1.20 2001/05/31 03:12:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -35,24 +35,54 @@
 #include <stdio.h>                                              /* sprintf() */
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>                                              /* select() */
-#endif
-
-#if !defined( _MSC_VER )
-#include <sys/time.h>
+#   include <unistd.h>                                           /* select() */
 #endif
 
 #ifdef HAVE_KERNEL_OS_H
-#include <kernel/OS.h>
+#   include <kernel/OS.h>
 #endif
 
 #if defined( WIN32 )
-#include <windows.h>
+#   include <windows.h>
+#else
+#   include <sys/time.h>
 #endif
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+
+#if defined( WIN32 )
+/*****************************************************************************
+ * usleep: microsecond sleep for win32
+ *****************************************************************************
+ * This function uses performance counter if available, and Sleep() if not.
+ *****************************************************************************/
+static __inline__ void usleep( unsigned int i_useconds )
+{
+    s64 i_cur, i_freq;
+    s64 i_now, i_then;
+
+    if( i_useconds < 1000
+         && QueryPerformanceFrequency( (LARGE_INTEGER *) &i_freq ) )
+    {
+        QueryPerformanceCounter( (LARGE_INTEGER *) &i_cur );
+
+        i_now = ( cur * 1000 * 1000 / i_freq );
+        i_then = i_now + i_useconds;
+
+        while( i_now < i_then )
+        {
+            QueryPerformanceCounter( (LARGE_INTEGER *) &i_cur );
+            now = cur * 1000 * 1000 / i_freq;
+        }
+    }
+    else
+    {
+        Sleep( (int) ((i_useconds + 500) / 1000) );
+    }
+}
+#endif
 
 /*****************************************************************************
  * mstrtime: return a date in a readable format
@@ -87,22 +117,19 @@ mtime_t mdate( void )
     /* We don't get the real date, just the value of a high precision timer.
      * this is because the usual time functions have at best only a milisecond
      * resolution */
-    mtime_t freq,usec_time;
+    mtime_t freq, usec_time;
 
-    if( !QueryPerformanceFrequency((LARGE_INTEGER *)&freq) )
+    if( QueryPerformanceFrequency( (LARGE_INTEGER *)&freq ) )
     {
-        /* Milisecond resolution */
-        FILETIME file_time;
-        GetSystemTimeAsFileTime((FILETIME *)&file_time);
-        usec_time *= 1000;
+        /* Microsecond resolution */
+        QueryPerformanceCounter( (LARGE_INTEGER *)&usec_time );
+	return ( usec_time * 1000000 ) / freq;
     }
     else
     {
-        /* Microsecond resolution */
-        QueryPerformanceCounter((LARGE_INTEGER *)&usec_time);
-        usec_time /= (freq/1000000);
+        /* Milisecond resolution */
+        return 1000 * GetTickCount();
     }
-    return( usec_time );
 
 #else
     struct timeval tv_date;
@@ -144,8 +171,8 @@ void mwait( mtime_t date )
     {
         return;
     }
-    /* Sleep only has milisecond resolution */
-    Sleep( (DWORD)(delay/1000) );
+
+    usleep( delay );
 
 #else
 
@@ -160,7 +187,10 @@ void mwait( mtime_t date )
     gettimeofday( &tv_date, NULL );
 
     /* calculate delay and check if current date is before wished date */
-    delay = date - (mtime_t) tv_date.tv_sec * 1000000 - (mtime_t) tv_date.tv_usec - 10000;
+    delay = date - (mtime_t) tv_date.tv_sec * 1000000
+                 - (mtime_t) tv_date.tv_usec
+                 - 10000;
+
     /* Linux/i386 has a granularity of 10 ms. It's better to be in advance
      * than to be late. */
     if( delay <= 0 )                 /* wished date is now or already passed */
@@ -191,12 +221,7 @@ void msleep( mtime_t delay )
 #if defined( HAVE_KERNEL_OS_H )
     snooze( delay );
 
-#elif defined( WIN32 )
-    Sleep( delay/1000 );             /* Sleep only has milisecond resolution */
-  /* Maybe we could use the multimedia timer to reach the right resolution,  */
-  /* or the old Winsock select() function ?*/
-
-#elif defined( HAVE_USLEEP )
+#elif defined( HAVE_USLEEP ) || defined( WIN32 )
     usleep( delay );
 
 #else

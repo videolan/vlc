@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.26 2001/05/31 01:37:08 sam Exp $
+ * $Id: input_ps.c,v 1.27 2001/05/31 03:12:49 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -32,18 +32,19 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
 #endif
-#include <errno.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#   include <unistd.h>
 #elif defined( _MSC_VER ) && defined( _WIN32 )
-#include <io.h>
+#   include <io.h>
 #endif
 
 #include <fcntl.h>
@@ -154,8 +155,8 @@ static void PSInit( input_thread_t * p_input )
     thread_ps_data_t *  p_method;
     packet_cache_t *    p_packet_cache;
 
-    if( (p_method =
-         (thread_ps_data_t *)malloc( sizeof(thread_ps_data_t) )) == NULL )
+    p_method = (thread_ps_data_t *)malloc( sizeof(thread_ps_data_t) );
+    if( p_method == NULL )
     {
         intf_ErrMsg( "Out of memory" );
         p_input->b_error = 1;
@@ -203,29 +204,31 @@ static void PSInit( input_thread_t * p_input )
     p_packet_cache->pes.l_index = 0;
     
     /* allocates the small buffer cache */
-    p_packet_cache->small.p_stack = malloc( SMALL_CACHE_SIZE * 
+    p_packet_cache->smallbuffer.p_stack = malloc( SMALL_CACHE_SIZE * 
         sizeof(packet_buffer_t) );
-    if ( p_packet_cache->small.p_stack == NULL )
+    if ( p_packet_cache->smallbuffer.p_stack == NULL )
     {
         intf_ErrMsg( "Out of memory" );
         p_input->b_error = 1;
         return;
     }
-    p_packet_cache->small.l_index = 0;
+    p_packet_cache->smallbuffer.l_index = 0;
     
     /* allocates the large buffer cache */
-    p_packet_cache->large.p_stack = malloc( LARGE_CACHE_SIZE * 
+    p_packet_cache->largebuffer.p_stack = malloc( LARGE_CACHE_SIZE * 
         sizeof(packet_buffer_t) );
-    if ( p_packet_cache->large.p_stack == NULL )
+    if ( p_packet_cache->largebuffer.p_stack == NULL )
     {
         intf_ErrMsg( "Out of memory" );
         p_input->b_error = 1;
         return;
     }
-    p_packet_cache->large.l_index = 0;
+    p_packet_cache->largebuffer.l_index = 0;
     
     /* Re-open the socket as a buffered FILE stream */
-    if( (p_method->stream = fdopen( p_input->i_handle, "r" )) == NULL )
+    p_method->stream = fdopen( p_input->i_handle, "r" );
+
+    if( p_method->stream == NULL )
     {
         intf_ErrMsg( "Cannot open file (%s)", strerror(errno) );
         p_input->b_error = 1;
@@ -504,8 +507,8 @@ static int PSRead( input_thread_t * p_input,
         }
 
         /* Fetch a packet of the appropriate size. */
-        if( (p_data = NewPacket( p_input->p_method_data, i_packet_size + 6 )) 
-            == NULL )
+        p_data = NewPacket( p_input->p_method_data, i_packet_size + 6 );
+        if( p_data == NULL )
         {
             intf_ErrMsg( "Out of memory" );
             return( -1 );
@@ -600,7 +603,8 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
     if( p_cache->data.l_index == 0 )
     {
         /* Allocates a new packet */
-        if ( (p_data = malloc( sizeof(data_packet_t) )) == NULL )
+        p_data = malloc( sizeof(data_packet_t) );
+        if( p_data == NULL )
         {
             intf_ErrMsg( "Out of memory" );
             vlc_mutex_unlock( &p_cache->lock );
@@ -627,10 +631,11 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         /* Small buffer */  
    
         /* Checks whether the buffer cache is empty */
-        if( p_cache->small.l_index == 0 )
+        if( p_cache->smallbuffer.l_index == 0 )
         {
             /* Allocates a new packet */
-            if ( (p_data->p_buffer = malloc( l_size )) == NULL )
+            p_data->p_buffer = malloc( l_size );
+            if( p_data->p_buffer == NULL )
             {
                 intf_DbgMsg( "Out of memory" );
                 free( p_data );
@@ -645,8 +650,8 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         else
         {
             /* Takes the packet out from the cache */
-            l_index = -- p_cache->small.l_index;    
-            if( (p_data->p_buffer = p_cache->small.p_stack[l_index].p_data)
+            l_index = -- p_cache->smallbuffer.l_index;    
+            if( (p_data->p_buffer = p_cache->smallbuffer.p_stack[l_index].p_data)
                 == NULL )
             {
                 intf_ErrMsg( "NULL packet in the small buffer cache" );
@@ -655,15 +660,15 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
                 return NULL;
             }
             /* Reallocates the packet if it is too small or too large */
-            if( p_cache->small.p_stack[l_index].l_size < l_size ||
-                p_cache->small.p_stack[l_index].l_size > 2*l_size )
+            if( p_cache->smallbuffer.p_stack[l_index].l_size < l_size ||
+                p_cache->smallbuffer.p_stack[l_index].l_size > 2*l_size )
             {
                 p_data->p_buffer = realloc( p_data->p_buffer, l_size );
                 p_data->l_size = l_size;
             }
             else
             {
-                p_data->l_size = p_cache->small.p_stack[l_index].l_size;
+                p_data->l_size = p_cache->smallbuffer.p_stack[l_index].l_size;
             }
         }
     }
@@ -672,10 +677,11 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         /* Large buffer */  
    
         /* Checks whether the buffer cache is empty */
-        if( p_cache->large.l_index == 0 )
+        if( p_cache->largebuffer.l_index == 0 )
         {
             /* Allocates a new packet */
-            if ( (p_data->p_buffer = malloc( l_size )) == NULL )
+            p_data->p_buffer = malloc( l_size );
+            if ( p_data->p_buffer == NULL )
             {
                 intf_ErrMsg( "Out of memory" );
                 free( p_data );
@@ -690,9 +696,9 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         else
         {
             /* Takes the packet out from the cache */
-            l_index = -- p_cache->large.l_index;    
-            if( (p_data->p_buffer = p_cache->large.p_stack[l_index].p_data)
-                == NULL )
+            l_index = -- p_cache->largebuffer.l_index;    
+            p_data->p_buffer = p_cache->largebuffer.p_stack[l_index].p_data;
+            if( p_data->p_buffer == NULL )
             {
                 intf_ErrMsg( "NULL packet in the small buffer cache" );
                 free( p_data );
@@ -700,15 +706,15 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
                 return NULL;
             }
             /* Reallocates the packet if it is too small or too large */
-            if( p_cache->large.p_stack[l_index].l_size < l_size ||
-                p_cache->large.p_stack[l_index].l_size > 2*l_size )
+            if( p_cache->largebuffer.p_stack[l_index].l_size < l_size ||
+                p_cache->largebuffer.p_stack[l_index].l_size > 2*l_size )
             {
                 p_data->p_buffer = realloc( p_data->p_buffer, l_size );
                 p_data->l_size = l_size;
             }
             else
             {
-                p_data->l_size = p_cache->large.p_stack[l_index].l_size;
+                p_data->l_size = p_cache->largebuffer.p_stack[l_index].l_size;
             }
         }
     }
@@ -750,7 +756,8 @@ static pes_packet_t * NewPES( void * p_packet_cache )
     if( p_cache->pes.l_index == 0 )
     {
         /* Allocates a new packet */
-        if ( (p_pes = malloc( sizeof(pes_packet_t) )) == NULL )
+        p_pes = malloc( sizeof(pes_packet_t) );
+        if( p_pes == NULL )
         {
             intf_DbgMsg( "Out of memory" );
             vlc_mutex_unlock( &p_cache->lock );	
@@ -763,8 +770,8 @@ static pes_packet_t * NewPES( void * p_packet_cache )
     else
     {
         /* Takes the packet out from the cache */
-        if( (p_pes = p_cache->pes.p_stack[ -- p_cache->pes.l_index ]) 
-            == NULL )
+        p_pes = p_cache->pes.p_stack[ -- p_cache->pes.l_index ];
+        if( p_pes == NULL )
         {
             intf_ErrMsg( "NULL packet in the data cache" );
             vlc_mutex_unlock( &p_cache->lock );
@@ -814,12 +821,12 @@ static void DeletePacket( void * p_packet_cache,
         if ( p_data->l_size < MAX_SMALL_SIZE )
         {
             /* Checks whether the small buffer cache is full */
-            if ( p_cache->small.l_index < SMALL_CACHE_SIZE )
+            if ( p_cache->smallbuffer.l_index < SMALL_CACHE_SIZE )
             {
-                p_cache->small.p_stack[ p_cache->small.l_index ].l_size = 
-                    p_data->l_size;
-                p_cache->small.p_stack[ p_cache->small.l_index ++ ].p_data = 
-                    p_data->p_buffer;
+                p_cache->smallbuffer.p_stack[
+                    p_cache->smallbuffer.l_index ].l_size = p_data->l_size;
+                p_cache->smallbuffer.p_stack[
+                    p_cache->smallbuffer.l_index++ ].p_data = p_data->p_buffer;
             }
             else
             {
@@ -833,12 +840,12 @@ static void DeletePacket( void * p_packet_cache,
         else
         {
             /* Checks whether the large buffer cache is full */
-            if ( p_cache->large.l_index < LARGE_CACHE_SIZE )
+            if ( p_cache->largebuffer.l_index < LARGE_CACHE_SIZE )
             {
-                p_cache->large.p_stack[ p_cache->large.l_index ].l_size = 
-                    p_data->l_size;
-                p_cache->large.p_stack[ p_cache->large.l_index ++ ].p_data = 
-                    p_data->p_buffer;
+                p_cache->largebuffer.p_stack[
+                    p_cache->largebuffer.l_index ].l_size = p_data->l_size;
+                p_cache->largebuffer.p_stack[
+                    p_cache->largebuffer.l_index++ ].p_data = p_data->p_buffer;
             }
             else
             {
