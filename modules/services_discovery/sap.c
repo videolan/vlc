@@ -327,8 +327,6 @@ static int OpenDemux( vlc_object_t *p_this )
         }
     }
 
-    free( p_peek );
-
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
 
