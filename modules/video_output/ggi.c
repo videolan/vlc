@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.3 2003/02/02 00:46:58 sam Exp $
+ * $Id: ggi.c,v 1.4 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,8 +59,8 @@ static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
                            " environment variable.")
 
 vlc_module_begin();                                
-    add_category_hint( N_("Miscellaneous"), NULL );
-    add_string( "ggi-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
+    add_category_hint( N_("Miscellaneous"), NULL, VLC_FALSE );
+    add_string( "ggi-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
     set_description( "General Graphics Interface video output" );
     set_capability( "video output", 30 );
     set_callbacks( Create, Destroy );

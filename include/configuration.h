@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.23 2003/01/06 00:37:29 garf Exp $
+ * $Id: configuration.h,v 1.24 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -69,7 +69,7 @@ struct module_config_t
 
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
-
+    vlc_bool_t b_advanced;            /* Flag to indicate an advanced option */
 };
 
 /*****************************************************************************
@@ -119,8 +119,8 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
  *   allow for a more user friendly interface.
  *****************************************************************************/
 
-#define add_category_hint( text, longtext ) \
-    { static module_config_t tmp = { CONFIG_HINT_CATEGORY, NULL, NULL, '\0', text, longtext }; p_config[ i_config ] = tmp; } i_config++
+#define add_category_hint( text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_HINT_CATEGORY, NULL, NULL, '\0', text, longtext }; p_config[ i_config ] = tmp; p_config[i_config].b_advanced = advc; } i_config++
 #define add_subcategory_hint( text, longtext ) \
     { static module_config_t tmp = { CONFIG_HINT_SUBCATEGORY, NULL, NULL, '\0', text, longtext }; p_config[ i_config ] = tmp; } i_config++
 #define end_subcategory_hint \
@@ -128,38 +128,38 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
 #define add_usage_hint( text ) \
     { static module_config_t tmp = { CONFIG_HINT_USAGE, NULL, NULL, '\0', text }; p_config[ i_config ] = tmp; } i_config++
 
-#define add_string( name, psz_value, p_callback, text, longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
+#define add_string( name, psz_value, p_callback, text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value }; tmp.b_advanced = advc; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
 #define add_string_from_list( name, psz_value, ppsz_list, p_callback, text, \
-      longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, 0, 0, 0, 0, NULL, ppsz_list }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_file( name, psz_value, p_callback, text, longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_FILE, NULL, name, '\0', text, longtext, psz_value, 0, 0 }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_module( name, psz_caps, psz_value, p_callback, text, longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_MODULE, psz_caps, name, '\0', text, longtext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_integer( name, i_value, p_callback, text, longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_integer_with_range( name, i_value, i_min, i_max, p_callback, text, longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value, 0, i_min, i_max }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_float( name, f_value, p_callback, text, longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, '\0', text, longtext, NULL, 0, f_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_float_with_range( name, f_value, f_min, f_max, p_callback, text, longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, '\0', text, longtext, NULL, 0, f_value, 0, 0, f_min, f_max }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_bool( name, b_value, p_callback, text, longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_BOOL, NULL, name, '\0', text, longtext, NULL, b_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
+      longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, 0, 0, 0, 0, NULL, ppsz_list }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_file( name, psz_value, p_callback, text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_FILE, NULL, name, '\0', text, longtext, psz_value, 0, 0 }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_module( name, psz_caps, psz_value, p_callback, text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_MODULE, psz_caps, name, '\0', text, longtext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_integer( name, i_value, p_callback, text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_integer_with_range( name, i_value, i_min, i_max, p_callback, text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value, 0, i_min, i_max }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_float( name, f_value, p_callback, text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, '\0', text, longtext, NULL, 0, f_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_float_with_range( name, f_value, f_min, f_max, p_callback, text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, '\0', text, longtext, NULL, 0, f_value, 0, 0, f_min, f_max }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_bool( name, b_value, p_callback, text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_BOOL, NULL, name, '\0', text, longtext, NULL, b_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
 
 /* These should be seldom used. They were added just to provide easy shortcuts
  * for the command line interface */
-#define add_string_with_short( name, ch, psz_value, p_callback, text, ltext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, ch, text, ltext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_file_with_short( name, ch, psz_value, p_callback, text, ltext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_FILE, NULL, name, ch, text, ltext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
+#define add_string_with_short( name, ch, psz_value, p_callback, text, ltext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, ch, text, ltext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_file_with_short( name, ch, psz_value, p_callback, text, ltext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_FILE, NULL, name, ch, text, ltext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
 #define add_module_with_short( name, ch, psz_caps, psz_value, p_callback, \
-    text, ltext) \
-    { static module_config_t tmp = { CONFIG_ITEM_MODULE, psz_caps, name, ch, text, ltext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_integer_with_short( name, ch, i_value, p_callback, text, ltext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, ch, text, ltext, NULL, i_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_float_with_short( name, ch, f_value, p_callback, text, ltext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, ch, text, ltext, NULL, 0, f_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
-#define add_bool_with_short( name, ch, b_value, p_callback, text, ltext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_BOOL, NULL, name, ch, text, ltext, NULL, b_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
+    text, ltext, advc) \
+    { static module_config_t tmp = { CONFIG_ITEM_MODULE, psz_caps, name, ch, text, ltext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_integer_with_short( name, ch, i_value, p_callback, text, ltext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, ch, text, ltext, NULL, i_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_float_with_short( name, ch, f_value, p_callback, text, ltext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, ch, text, ltext, NULL, 0, f_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc;} i_config++
+#define add_bool_with_short( name, ch, b_value, p_callback, text, ltext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_BOOL, NULL, name, ch, text, ltext, NULL, b_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc;} i_config++

@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.7 2003/01/22 16:16:27 lool Exp $
+ * $Id: slp.c,v 1.8 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -76,14 +76,14 @@ static int  Demux ( input_thread_t * );
 
 vlc_module_begin();
     set_description( _("SLP access module") );
-    add_category_hint( N_("slp"), NULL );
-    add_string( "slp-attrids", "", NULL, ATTRIDS_TEXT, ATTRIDS_LONGTEXT );
+    add_category_hint( N_("slp"), NULL, VLC_TRUE );
+    add_string( "slp-attrids", "", NULL, ATTRIDS_TEXT, ATTRIDS_LONGTEXT, VLC_TRUE );
     add_string( "slp-scopelist", "", NULL, SCOPELIST_TEXT,
-                SCOPELIST_LONGTEXT );
+                SCOPELIST_LONGTEXT, VLC_TRUE );
     add_string( "slp-namingauthority", "*", NULL, NAMINGAUTHORITY_TEXT,
-                NAMINGAUTHORITY_LONGTEXT );
-    add_string( "slp-filter", "", NULL, FILTER_TEXT, FILTER_LONGTEXT );
-    add_string( "slp-lang", "", NULL, LANG_TEXT, LANG_LONGTEXT );
+                NAMINGAUTHORITY_LONGTEXT, VLC_TRUE );
+    add_string( "slp-filter", "", NULL, FILTER_TEXT, FILTER_LONGTEXT, VLC_TRUE );
+    add_string( "slp-lang", "", NULL, LANG_TEXT, LANG_LONGTEXT, VLC_TRUE );
     add_submodule();
         set_capability( "access", 0 );
         set_callbacks( Open, Close );

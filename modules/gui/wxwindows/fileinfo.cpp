@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.2 2003/01/28 21:08:29 sam Exp $
+ * $Id: fileinfo.cpp,v 1.3 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -77,7 +77,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     intf_thread_t *p_intf = _p_intf;
     input_thread_t *p_input;
 
-    wxTreeCtrl *tree = new wxTreeCtrl( this, -1 );
+    wxTreeCtrl *tree = new wxTreeCtrl( this, -1, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS|wxTR_HIDE_ROOT );
     p_input = p_intf->p_sys->p_input;
     /* Create the OK button */
     wxButton *ok_button = new wxButton( this, wxID_OK, _("OK") );
@@ -99,7 +99,6 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     vlc_mutex_lock( &p_input->stream.stream_lock );
     wxTreeItemId root = tree->AddRoot( p_input->psz_name );
     tree->Expand( root );
-    tree->EnsureVisible( root );
     input_info_category_t *p_cat = p_input->stream.p_info;
     
     while ( p_cat ) {

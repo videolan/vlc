@@ -2,7 +2,7 @@
  * encoder.c : audio/video encoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: encoder.c,v 1.1 2003/01/22 10:41:57 fenrir Exp $
+ * $Id: encoder.c,v 1.2 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Laurent Aimar
  *
@@ -55,17 +55,17 @@ vlc_module_begin();
     add_submodule();
         set_capability( "video encoder", 100 );
         set_callbacks( E_( OpenEncoderVideo ), E_( CloseEncoderVideo ) );
-        add_category_hint( "video setting", NULL );
-            add_integer( "encoder-ffmpeg-video-bitrate", 1000, NULL, "bitrate (kb/s)", "bitrate (kb/s)" );
-            add_integer( "encoder-ffmpeg-video-max-key-interval", 10, NULL, "max key interval", "maximum   value  of   frames  between   two  keyframes" );
-            add_integer( "encoder-ffmpeg-min-quantizer", 2, NULL, "min quantizer", "range 1-31" );
-            add_integer( "encoder-ffmpeg-max-quantizer", 31, NULL, "max quantizer", "range 1-31" );
+        add_category_hint( "video setting", NULL, VLC_TRUE );
+            add_integer( "encoder-ffmpeg-video-bitrate", 1000, NULL, "bitrate (kb/s)", "bitrate (kb/s)", VLC_TRUE );
+            add_integer( "encoder-ffmpeg-video-max-key-interval", 10, NULL, "max key interval", "maximum   value  of   frames  between   two  keyframes", VLC_TRUE );
+            add_integer( "encoder-ffmpeg-min-quantizer", 2, NULL, "min quantizer", "range 1-31", VLC_TRUE );
+            add_integer( "encoder-ffmpeg-max-quantizer", 31, NULL, "max quantizer", "range 1-31", VLC_TRUE );
 
     add_submodule();
         set_capability( "audio encoder", 50 );
         set_callbacks( E_( OpenEncoderAudio ), E_( CloseEncoderAudio ) );
-        add_category_hint( "audio setting", NULL );
-            add_integer( "encoder-ffmpeg-audio-bitrate", 64, NULL, "bitrate (kb/s)", "bitrate (kb/s)" );
+        add_category_hint( "audio setting", NULL, VLC_TRUE );
+            add_integer( "encoder-ffmpeg-audio-bitrate", 64, NULL, "bitrate (kb/s)", "bitrate (kb/s)", VLC_TRUE );
 
 vlc_module_end();
 

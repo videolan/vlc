@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.4 2003/02/02 00:46:58 sam Exp $
+ * $Id: xvideo.c,v 1.5 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -70,13 +70,13 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "Use shared memory to communicate between VLC and the X server.")
 
 vlc_module_begin();
-    add_category_hint( N_("XVideo"), NULL );
-    add_string( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
-    add_integer( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT );
-    add_bool( "xvideo-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT );
-    add_string( "xvideo-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT );
+    add_category_hint( N_("XVideo"), NULL, VLC_TRUE );
+    add_string( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
+    add_integer( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, VLC_TRUE );
+    add_bool( "xvideo-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, VLC_TRUE );
+    add_string( "xvideo-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_TRUE );
 #ifdef HAVE_SYS_SHM_H
-    add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT );
+    add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, VLC_TRUE );
 #endif
     set_description( _("XVideo extension module") );
     set_capability( "video output", 150 );

@@ -2,7 +2,7 @@
  * a52old.c: A52 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: a52old.c,v 1.8 2002/10/27 16:58:14 gbazin Exp $
+ * $Id: a52old.c,v 1.9 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -56,11 +56,11 @@ static void BitstreamCallback ( bit_stream_t *, vlc_bool_t );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( N_("Miscellaneous"), NULL );
+    add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
     add_module  ( "a52-downmix", "downmix", NULL, NULL,
-                  N_("A52 downmix module"), NULL );
+                  N_("A52 downmix module"), NULL, VLC_TRUE );
     add_module  ( "a52-imdct", "imdct", NULL, NULL,
-                  N_("A52 IMDCT module"), NULL );
+                  N_("A52 IMDCT module"), NULL, VLC_TRUE );
     set_description( _("software A52 decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );

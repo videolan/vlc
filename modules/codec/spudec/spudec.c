@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.15 2003/02/17 05:50:31 sam Exp $
+ * $Id: spudec.c,v 1.16 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -53,14 +53,14 @@ static vout_thread_t *FindVout( spudec_thread_t * );
 #define DEFAULT_FONT "font-eutopiabold36.rle"
 
 vlc_module_begin();
-    add_category_hint( N_("subtitles"), NULL );
+    add_category_hint( N_("subtitles"), NULL, VLC_TRUE );
 #if defined(SYS_DARWIN) || defined(SYS_BEOS) \
      || (defined(WIN32) && !defined(UNDER_CE))
     add_file( "spudec-font", NULL, NULL,
-              FONT_TEXT, FONT_LONGTEXT );
+              FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
 #else
     add_file( "spudec-font", "share/" DEFAULT_FONT, NULL,
-              FONT_TEXT, FONT_LONGTEXT );
+              FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
 #endif
     set_description( _("subtitles decoder module") );
     set_capability( "decoder", 50 );

@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: wall.c,v 1.6 2003/01/17 16:18:03 sam Exp $
+ * $Id: wall.c,v 1.7 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,10 +63,10 @@ static int  SendEvents( vlc_object_t *, char const *,
     "defaults to all")
 
 vlc_module_begin();
-    add_category_hint( N_("Miscellaneous"), NULL );
-    add_integer( "wall-cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT );
-    add_integer( "wall-rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT );
-    add_string( "wall-active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT );
+    add_category_hint( N_("Miscellaneous"), NULL, VLC_FALSE );
+    add_integer( "wall-cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
+    add_integer( "wall-rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
+    add_string( "wall-active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, VLC_FALSE );
     set_description( _("image wall video module") );
     set_capability( "video filter", 0 );
     add_shortcut( "wall" );

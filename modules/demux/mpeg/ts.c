@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.17 2003/02/12 13:42:43 massiot Exp $
+ * $Id: ts.c,v 1.18 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -115,10 +115,10 @@ vlc_module_begin();
     set_capability( "demux", 170 );
     add_shortcut( "ts_dvbpsi" );
 #endif
-    add_category_hint( N_("Miscellaneous"), NULL );
+    add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
     add_bool( "vls-backwards-compat", 0, NULL,
-              VLS_BACKWARDS_COMPAT_TEXT, VLS_BACKWARDS_COMPAT_LONGTEXT );
-    add_bool( "buggy-psi", 0, NULL, BUGGY_PSI_TEXT, BUGGY_PSI_LONGTEXT );
+              VLS_BACKWARDS_COMPAT_TEXT, VLS_BACKWARDS_COMPAT_LONGTEXT, VLC_TRUE );
+    add_bool( "buggy-psi", 0, NULL, BUGGY_PSI_TEXT, BUGGY_PSI_LONGTEXT, VLC_TRUE );
     set_callbacks( Activate, Deactivate );
 vlc_module_end();
 

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.10 2003/02/08 20:32:43 massiot Exp $
+ * $Id: parser.c,v 1.11 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -81,14 +81,14 @@ static void     BitstreamCallback ( bit_stream_t *, vlc_bool_t );
     "you won't get anything.")
 
 vlc_module_begin();
-    add_category_hint( N_("Miscellaneous"), NULL );
+    add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
     add_module  ( "mpeg-idct", "idct", NULL, NULL,
-                  VDEC_IDCT_TEXT, VDEC_IDCT_LONGTEXT );
+                  VDEC_IDCT_TEXT, VDEC_IDCT_LONGTEXT, VLC_TRUE );
     add_module  ( "mpeg-motion", "motion compensation", NULL, NULL,
-                  VDEC_MOTION_TEXT, VDEC_MOTION_LONGTEXT );
-    add_integer ( "vdec-smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT );
+                  VDEC_MOTION_TEXT, VDEC_MOTION_LONGTEXT, VLC_TRUE );
+    add_integer ( "vdec-smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT, VLC_TRUE );
     add_string  ( "vpar-synchro", NULL, NULL, VPAR_SYNCHRO_TEXT,
-                  VPAR_SYNCHRO_LONGTEXT );
+                  VPAR_SYNCHRO_LONGTEXT, VLC_TRUE );
     set_description( _("MPEG I/II video decoder module") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );

@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: preferences.c,v 1.8 2003/01/27 17:41:01 ipkiss Exp $
+ * $Id: preferences.c,v 1.9 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -233,6 +233,10 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
     if( p_item ) do
     {
+        if( p_item->b_advanced && !config_GetInt( p_intf, "advanced" ))
+        {
+            continue;
+        }
         switch( p_item->i_type )
         {
 

@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.7 2003/02/03 01:32:37 sam Exp $
+ * $Id: xosd.c,v 1.8 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -73,13 +73,13 @@ static void Run          ( intf_thread_t * );
 
 vlc_module_begin();
     int i = getenv( "DISPLAY" ) == NULL ? 10 : 90;
-    add_category_hint( N_("XOSD module"), NULL );
-    add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT );
-    add_integer( "xosd-text-offset", 0, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT );
+    add_category_hint( N_("XOSD module"), NULL, VLC_TRUE );
+    add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT, VLC_TRUE );
+    add_integer( "xosd-text-offset", 0, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, VLC_TRUE );
     add_integer( "xosd-shadow-offset", 1, NULL,
-                 SHD_OFS_TEXT, SHD_OFS_LONGTEXT );
+                 SHD_OFS_TEXT, SHD_OFS_LONGTEXT, VLC_TRUE );
     add_string( "xosd-font", "-misc-fixed-medium-r-*-*-*-300-*-*-*-*-*-*",
-                NULL, FONT_TEXT, FONT_LONGTEXT );
+                NULL, FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
     set_description( _("xosd interface module") );
     set_capability( "interface", i );
     set_callbacks( Open, Close );

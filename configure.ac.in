@@ -1336,6 +1336,7 @@ then
     PLUGINS="${PLUGINS} ipv6"],[AC_MSG_RESULT(no)])
 fi
 
+        
 dnl
 dnl  AVI demux plugin
 dnl
@@ -1753,7 +1754,7 @@ then
     LDFLAGS_vorbis="${LDFLAGS_vorbis} -lvorbis -logg"
    ],[])
 fi
-
+         
 dnl
 dnl  Tremor plugin
 dnl

@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.7 2003/02/07 23:36:55 marcari Exp $
+ * $Id: ftp.c,v 1.8 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -94,12 +94,12 @@ static int  ftp_StopStream ( input_thread_t *);
 vlc_module_begin();
     set_description( _("ftp access module") );
     set_capability( "access", 0 );
-    add_category_hint( "stream", NULL );
+    add_category_hint( "stream", NULL, VLC_FALSE );
         add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
-                     CACHING_TEXT, CACHING_LONGTEXT );
-        add_string( "ftp-user", "anonymous", NULL, "ftp user name", "ftp user name" );
-        add_string( "ftp-pwd", "anonymous@dummy.org", NULL, "ftp password", "ftp password, be careful with that option..." );
-        add_string( "ftp-account", "anonymous", NULL, "ftp account", "ftp account" );
+                     CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        add_string( "ftp-user", "anonymous", NULL, "ftp user name", "ftp user name", VLC_FALSE );
+        add_string( "ftp-pwd", "anonymous@dummy.org", NULL, "ftp password", "ftp password, be careful with that option...", VLC_FALSE );
+        add_string( "ftp-account", "anonymous", NULL, "ftp account", "ftp account", VLC_FALSE );
     add_shortcut( "ftp" );
     set_callbacks( Open, Close );
 vlc_module_end();

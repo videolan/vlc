@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.22 2003/02/10 17:43:21 massiot Exp $
+ * $Id: alsa.c,v 1.23 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -94,10 +94,10 @@ static void ALSAFill     ( aout_instance_t * );
     "and permanently selects analog PCM output." )
 
 vlc_module_begin();
-    add_category_hint( N_("ALSA"), NULL );
+    add_category_hint( N_("ALSA"), NULL, VLC_FALSE );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
-                N_("ALSA device name"), NULL );
-    add_bool( "spdif", 1, NULL, SPDIF_TEXT, SPDIF_LONGTEXT );
+                N_("ALSA device name"), NULL, VLC_FALSE );
+    add_bool( "spdif", 1, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     set_description( _("ALSA audio module") );
     set_capability( "audio output", 50 );
     set_callbacks( Open, Close );

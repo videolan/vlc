@@ -2,7 +2,7 @@
  * id3.c: simple id3 tag skipper
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3.c,v 1.2 2002/10/13 14:26:48 sigmunau Exp $
+ * $Id: id3.c,v 1.3 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
@@ -89,7 +89,6 @@ static int SkipID3Tag( vlc_object_t *p_this )
     
     version = p_peek[3];  /* These may become usfull later, */
     revision = p_peek[4]; /* but we ignore them for now */
-
     b_footer = p_peek[5] & 0x10;
     i_size = (p_peek[6] << 21) +
              (p_peek[7] << 14) +
@@ -108,7 +107,8 @@ static int SkipID3Tag( vlc_object_t *p_this )
         return( VLC_EGENERIC );
     }
 
-    msg_Dbg( p_input, "ID3 tag found, skiping %d bytes", i_size );
+    msg_Dbg( p_input, "ID3v2.%d revision %d tag found, skiping %d bytes",
+             version, revision, i_size );
     p_input->p_current_data += i_size; /* seek passed end of ID3 tag */
     return ( VLC_SUCCESS );
 }

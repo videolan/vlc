@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.65 2003/02/19 10:02:57 gbazin Exp $
+ * $Id: libvlc.c,v 1.66 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1122,7 +1122,10 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
             char *psz_suf = "", *psz_prefix = NULL;
             int i;
-
+            if ( p_item->b_advanced && !config_GetInt( p_this, "advanced" ))
+            {
+                continue;
+            }
             switch( p_item->i_type )
             {
             case CONFIG_HINT_CATEGORY:

@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.5 2003/02/09 13:25:42 fenrir Exp $
+ * $Id: sub.c,v 1.6 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -69,18 +69,18 @@ static char *ppsz_sub_type[] = { "microdvd", "subrip", "ssa1", "ssa2-4", NULL };
 vlc_module_begin();
     set_description( _("text subtitle demux") );
     set_capability( "subtitle demux", 12 );
-    add_category_hint( "subtitle", NULL );
+    add_category_hint( "subtitle", NULL, VLC_TRUE );
         add_string( "sub-file", NULL, NULL,
-                    "subtitle file name", "subtitle file name" );
+                    "subtitle file name", "subtitle file name", VLC_TRUE );
         add_float( "sub-fps", 0.0, NULL,
                    "override frames per second",
-                   SUB_FPS_LONGTEXT );
+                   SUB_FPS_LONGTEXT, VLC_TRUE );
         add_integer( "sub-delay", 0, NULL,
                      "delay subtitles (in 1/10s)",
-                     "delay subtitles (in 1/10s)" );
+                     "delay subtitles (in 1/10s)", VLC_TRUE );
         add_string_from_list( "sub-type", NULL, ppsz_sub_type, NULL,
                               "subtitle type",
-                              SUB_TYPE_LONGTEXT );
+                              SUB_TYPE_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, NULL );
 vlc_module_end();
 

@@ -37,7 +37,7 @@ class KInterface : public KMainWindow
     Q_OBJECT
     public:
         KInterface(intf_thread_t *p_intf, QWidget *parent=0,
-                   const char *name=0);
+                   const char *name="VLC");
         ~KInterface();
 
     public slots:

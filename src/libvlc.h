@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.43 2003/02/18 18:33:44 titer Exp $
+ * $Id: libvlc.h,v 1.44 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,6 +59,11 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define COLOR_LONGTEXT N_( \
     "When this option is turned on, the messages sent to the console will " \
     "be colorized. Your terminal needs Linux color support for this to work.")
+
+#define ADVANCED_TEXT N_("show advanced options")
+#define ADVANCED_LONGTEXT N_( \
+    "When this option is turned on, the interfaces will show all the " \
+    "available options, including those that most users should never touch")
 
 #define INTF_PATH_TEXT N_("interface default search path")
 #define INTF_PATH_LONGTEXT N_( \
@@ -430,138 +435,139 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 vlc_module_begin();
     /* Interface options */
-    add_category_hint( N_("Interface"), NULL);
+    add_category_hint( N_("Interface"), NULL, VLC_FALSE );
     add_module_with_short( "intf", 'I', "interface", NULL, NULL,
-                           INTF_TEXT, INTF_LONGTEXT );
-    add_string( "extraintf", NULL, NULL, EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT );
+                           INTF_TEXT, INTF_LONGTEXT, VLC_TRUE );
+    add_string( "extraintf", NULL, NULL, EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, VLC_TRUE );
     add_integer_with_short( "verbose", 'v', -1, NULL,
-                            VERBOSE_TEXT, VERBOSE_LONGTEXT );
-    add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT );
-    add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT );
-    add_string( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT );
+                            VERBOSE_TEXT, VERBOSE_LONGTEXT, VLC_FALSE );
+    add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
+    add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
+    add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT, VLC_FALSE );
+    add_string( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT, VLC_TRUE );
     add_string( "plugin-path", NULL, NULL,
-                PLUGIN_PATH_TEXT, PLUGIN_PATH_LONGTEXT );
+                PLUGIN_PATH_TEXT, PLUGIN_PATH_LONGTEXT, VLC_TRUE );
 
     /* Audio options */
-    add_category_hint( N_("Audio"), NULL);
+    add_category_hint( N_("Audio"), NULL, VLC_FALSE );
     add_module_with_short( "aout", 'A', "audio output", NULL, NULL,
-                           AOUT_TEXT, AOUT_LONGTEXT );
-    add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT );
+                           AOUT_TEXT, AOUT_LONGTEXT, VLC_FALSE );
+    add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, VLC_TRUE );
     add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, NULL, VOLUME_TEXT,
-                            VOLUME_LONGTEXT );
+                            VOLUME_LONGTEXT, VLC_FALSE );
     add_integer_with_range( "saved-volume", AOUT_VOLUME_DEFAULT,
                             AOUT_VOLUME_MIN, AOUT_VOLUME_MAX, NULL,
-                            VOLUME_SAVE_TEXT, VOLUME_SAVE_LONGTEXT );
-    add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT, AOUT_RATE_LONGTEXT );
-    add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT );
-    add_bool( "headphone", 0, NULL, HEADPHONE_TEXT, HEADPHONE_LONGTEXT );
+                            VOLUME_SAVE_TEXT, VOLUME_SAVE_LONGTEXT, VLC_TRUE );
+    add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT, AOUT_RATE_LONGTEXT, VLC_TRUE );
+    add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
+    add_bool( "headphone", 0, NULL, HEADPHONE_TEXT, HEADPHONE_LONGTEXT, VLC_FALSE );
     add_integer( "headphone-dim", 5, NULL, HEADPHONE_DIM_TEXT,
-                 HEADPHONE_DIM_LONGTEXT );
+                 HEADPHONE_DIM_LONGTEXT, VLC_TRUE );
 
     /* Video options */
-    add_category_hint( N_("Video"), NULL );
+    add_category_hint( N_("Video"), NULL, VLC_FALSE );
     add_module_with_short( "vout", 'V', "video output", NULL, NULL,
-                           VOUT_TEXT, VOUT_LONGTEXT );
-    add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT );
-    add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT );
-    add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT );
-    add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT );
-    add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT );
-    add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT );
-    add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT );
-    add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT );
+                           VOUT_TEXT, VOUT_LONGTEXT, VLC_FALSE );
+    add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, VLC_TRUE );
+    add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
+    add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
+    add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );
+    add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT, VLC_TRUE );
+    add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT, VLC_FALSE );
+    add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
+    add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT, VLC_TRUE );
     add_module( "filter", "video filter", NULL, NULL,
-                FILTER_TEXT, FILTER_LONGTEXT );
+                FILTER_TEXT, FILTER_LONGTEXT, VLC_TRUE );
     add_string( "aspect-ratio", "", NULL,
-                ASPECT_RATIO_TEXT, ASPECT_RATIO_TEXT );
+                ASPECT_RATIO_TEXT, ASPECT_RATIO_TEXT, VLC_TRUE );
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
 
     /* Input options */
-    add_category_hint( N_("Input"), NULL );
+    add_category_hint( N_("Input"), NULL, VLC_FALSE );
     add_integer( "server-port", 1234, NULL,
-                 SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT );
+                 SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
     add_bool( "network-channel", 0, NULL,
-              NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT );
+              NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT, VLC_TRUE );
     add_string( "channel-server", "localhost", NULL,
-                CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT );
+                CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT, VLC_TRUE );
     add_integer( "channel-port", 6010, NULL,
-                 CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT );
-    add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT );
+                 CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT, VLC_TRUE );
+    add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
 #ifdef SYS_DARWIN
-    add_string( "iface", "en0", NULL, IFACE_TEXT, IFACE_LONGTEXT );
+    add_string( "iface", "en0", NULL, IFACE_TEXT, IFACE_LONGTEXT, VLC_TRUE );
 #else
-    add_string( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT );
+    add_string( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT, VLC_TRUE );
 #endif
-    add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT );
-    add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT );
+    add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT, VLC_TRUE );
+    add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
 
     add_integer( "program", 0, NULL,
-                 INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT );
+                 INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, VLC_TRUE );
     add_integer( "audio-type", -1, NULL,
-                 INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT );
+                 INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT, VLC_TRUE );
     add_integer( "audio-channel", -1, NULL,
-                 INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT );
+                 INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT, VLC_TRUE );
     add_integer( "spu-channel", -1, NULL,
-                 INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT );
+                 INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT, VLC_TRUE );
 
-    add_string( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT );
-    add_string( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT );
+    add_string( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT, VLC_FALSE );
+    add_string( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT, VLC_FALSE );
 
-    add_bool_with_short( "ipv6", '6', 0, NULL, IPV6_TEXT, IPV6_LONGTEXT );
-    add_bool_with_short( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT );
+    add_bool_with_short( "ipv6", '6', 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, VLC_FALSE );
+    add_bool_with_short( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
 
     /* Decoder options */
-    add_category_hint( N_("Decoders"), NULL );
-    add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT );
+    add_category_hint( N_("Decoders"), NULL, VLC_TRUE );
+    add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT, VLC_TRUE );
 
-    add_category_hint( N_("Encoders"), NULL );
-    add_module( "video-encoder", "video encoder", NULL, NULL, ENCODER_VIDEO_TEXT, ENCODER_VIDEO_LONGTEXT );
-    add_module( "audio-encoder", "audio encoder", NULL, NULL, ENCODER_AUDIO_TEXT, ENCODER_AUDIO_LONGTEXT );
+    add_category_hint( N_("Encoders"), NULL, VLC_TRUE );
+    add_module( "video-encoder", "video encoder", NULL, NULL, ENCODER_VIDEO_TEXT, ENCODER_VIDEO_LONGTEXT, VLC_TRUE );
+    add_module( "audio-encoder", "audio encoder", NULL, NULL, ENCODER_AUDIO_TEXT, ENCODER_AUDIO_LONGTEXT, VLC_TRUE );
 
     /* Stream output options */
-    add_category_hint( N_("Stream output"), NULL );
-    add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT );
-    add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT, SOUT_AUDIO_LONGTEXT );
-    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT, SOUT_VIDEO_LONGTEXT );
-    add_string_from_list( "sout-acodec", "", ppsz_sout_acodec, NULL, SOUT_ACODEC_TEXT, SOUT_ACODEC_LONGTEXT );
-    add_string_from_list( "sout-vcodec", "", ppsz_sout_vcodec, NULL, SOUT_VCODEC_TEXT, SOUT_VCODEC_LONGTEXT );
+    add_category_hint( N_("Stream output"), NULL, VLC_TRUE );
+    add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT, VLC_TRUE );
+    add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT, SOUT_AUDIO_LONGTEXT, VLC_TRUE );
+    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT, SOUT_VIDEO_LONGTEXT, VLC_TRUE );
+    add_string_from_list( "sout-acodec", "", ppsz_sout_acodec, NULL, SOUT_ACODEC_TEXT, SOUT_ACODEC_LONGTEXT, VLC_TRUE );
+    add_string_from_list( "sout-vcodec", "", ppsz_sout_vcodec, NULL, SOUT_VCODEC_TEXT, SOUT_VCODEC_LONGTEXT, VLC_TRUE );
     add_module( "packetizer", "packetizer", NULL, NULL,
-                PACKETIZER_TEXT, PACKETIZER_LONGTEXT );
-    add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT, MUX_LONGTEXT );
+                PACKETIZER_TEXT, PACKETIZER_LONGTEXT, VLC_TRUE );
+    add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT, MUX_LONGTEXT, VLC_TRUE );
     add_module( "access_output", "sout access", NULL, NULL,
-                ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT );
+                ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
 
     /* CPU options */
-    add_category_hint( N_("CPU"), NULL );
+    add_category_hint( N_("CPU"), NULL, VLC_FALSE );
 #if defined( __i386__ )
-    add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT );
-    add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT );
-    add_bool( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT );
-    add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT );
+    add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, VLC_FALSE );
+    add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, VLC_FALSE );
+    add_bool( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT, VLC_FALSE );
+    add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT, VLC_FALSE );
 #endif
 #if defined( __powerpc__ ) || defined( SYS_DARWIN )
-    add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT );
+    add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, VLC_FALSE );
 #endif
 
     /* Playlist options */
-    add_category_hint( N_("Playlist"), NULL );
-    add_bool_with_short( "random", 'Z', 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT );
-    add_bool( "playlist", 0, NULL, LAUNCH_TEXT, LAUNCH_LONGTEXT );
-    add_bool( "enqueue", 0, NULL, ENQUEUE_TEXT, ENQUEUE_LONGTEXT );
-    add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT );
+    add_category_hint( N_("Playlist"), NULL, VLC_FALSE );
+    add_bool_with_short( "random", 'Z', 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
+    add_bool( "playlist", 0, NULL, LAUNCH_TEXT, LAUNCH_LONGTEXT, VLC_FALSE );
+    add_bool( "enqueue", 0, NULL, ENQUEUE_TEXT, ENQUEUE_LONGTEXT, VLC_FALSE );
+    add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
 
     /* Misc options */
-    add_category_hint( N_("Miscellaneous"), NULL );
-    add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT );
-    add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT );
-    add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT );
+    add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
+    add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT, VLC_TRUE );
+    add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT, VLC_TRUE );
+    add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT, VLC_TRUE );
 
 #if defined(WIN32)
-    add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT );
-    add_integer( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT );
+    add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT, VLC_TRUE );
+    add_integer( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT, VLC_TRUE );
 #endif
 
     /* Usage (mainly useful for cmd line stuff) */

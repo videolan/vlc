@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.13 2003/02/12 13:42:43 massiot Exp $
+ * $Id: udp.c,v 1.14 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -79,8 +79,8 @@ static ssize_t RTPChoose( input_thread_t *, byte_t *, size_t );
 
 vlc_module_begin();
     set_description( _("raw UDP access module") );
-    add_category_hint( N_("udp"), NULL );
-    add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT );
+    add_category_hint( N_("udp"), NULL , VLC_TRUE );
+    add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "access", 0 );
     add_shortcut( "udp" );
     add_shortcut( "udpstream" );

@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.7 2003/01/21 18:43:54 lool Exp $
+ * $Id: sap.c,v 1.8 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -128,9 +128,9 @@ struct media_descr_t {
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( N_("SAP"), NULL );
+    add_category_hint( N_("SAP"), NULL, VLC_TRUE );
         add_string( "sap-addr", NULL, NULL,
-                     "SAP multicast address", "SAP multicast address" );
+                     "SAP multicast address", "SAP multicast address", VLC_TRUE );
     set_description( _("SAP interface module") );
     set_capability( "interface", 0 );
     set_callbacks( Activate, NULL);

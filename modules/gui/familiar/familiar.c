@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.28 2003/01/27 17:41:01 ipkiss Exp $
+ * $Id: familiar.c,v 1.29 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -66,8 +66,8 @@ gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( N_("Miscellaneous"), NULL );
-    add_bool( "familiar-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT );
+    add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
+    add_bool( "familiar-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, VLC_TRUE );
     set_description( _("Familiar Linux Gtk+ interface module") );
     set_capability( "interface", 70 );
     set_callbacks( Open, Close );

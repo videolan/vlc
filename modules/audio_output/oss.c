@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.51 2003/02/10 17:43:21 massiot Exp $
+ * $Id: oss.c,v 1.52 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -112,11 +112,11 @@ static mtime_t BufferDuration( aout_instance_t * p_aout );
     "and permanently selects analog PCM output." )
 
 vlc_module_begin();
-    add_category_hint( N_("OSS"), NULL );
+    add_category_hint( N_("OSS"), NULL, VLC_FALSE );
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
-              N_("OSS dsp device"), NULL );
-    add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT );
-    add_bool( "spdif", 1, NULL, SPDIF_TEXT, SPDIF_LONGTEXT );
+              N_("OSS dsp device"), NULL, VLC_FALSE );
+    add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, VLC_TRUE );
+    add_bool( "spdif", 1, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     set_description( _("Linux OSS /dev/dsp module") );
     set_capability( "audio output", 100 );
     add_shortcut( "oss" );

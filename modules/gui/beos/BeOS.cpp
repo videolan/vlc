@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: BeOS.cpp,v 1.6 2003/02/09 17:10:52 stippi Exp $
+ * $Id: BeOS.cpp,v 1.7 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,28 +51,28 @@ vlc_module_begin();
     add_submodule();
         set_capability( "interface", 100 );
         set_callbacks( E_(OpenIntf), E_(CloseIntf) );
-        add_integer( "beos-intf-width", 0, NULL, "", "" );
-        add_integer( "beos-intf-height", 0, NULL, "", "" );
-        add_integer( "beos-intf-xpos", 0, NULL, "", "" );
-        add_integer( "beos-intf-ypos", 0, NULL, "", "" );
-        add_integer( "beos-playlist-width", 0, NULL, "", "" );
-        add_integer( "beos-playlist-height", 0, NULL, "", "" );
-        add_integer( "beos-playlist-xpos", 0, NULL, "", "" );
-        add_integer( "beos-playlist-ypos", 0, NULL, "", "" );
-        add_bool( "beos-playlist-show", 0, NULL, "", "" );
-        add_integer( "beos-messages-width", 0, NULL, "", "" );
-        add_integer( "beos-messages-height", 0, NULL, "", "" );
-        add_integer( "beos-messages-xpos", 0, NULL, "", "" );
-        add_integer( "beos-messages-ypos", 0, NULL, "", "" );
-        add_bool( "beos-messages-show", 0, NULL, "", "" );
-        add_integer( "beos-settings-width", 0, NULL, "", "" );
-        add_integer( "beos-settings-height", 0, NULL, "", "" );
-        add_integer( "beos-settings-xpos", 0, NULL, "", "" );
-        add_integer( "beos-settings-ypos", 0, NULL, "", "" );
-        add_bool( "beos-settings-show", 0, NULL, "", "" );
-        add_integer( "beos-screenshot-format", 0, NULL, "", "" );
-        add_string( "beos-screenshot-path", 0, NULL, "", "" );
-        add_bool( "beos-use-dvd-menus", 0, NULL, "", "" );
+        add_integer( "beos-intf-width", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-intf-height", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-intf-xpos", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-intf-ypos", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-playlist-width", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-playlist-height", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-playlist-xpos", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-playlist-ypos", 0, NULL, "", "", VLC_TRUE );
+        add_bool( "beos-playlist-show", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-messages-width", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-messages-height", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-messages-xpos", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-messages-ypos", 0, NULL, "", "", VLC_TRUE );
+        add_bool( "beos-messages-show", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-settings-width", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-settings-height", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-settings-xpos", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-settings-ypos", 0, NULL, "", "", VLC_TRUE );
+        add_bool( "beos-settings-show", 0, NULL, "", "", VLC_TRUE );
+        add_integer( "beos-screenshot-format", 0, NULL, "", "", VLC_TRUE );
+        add_string( "beos-screenshot-path", 0, NULL, "", "", VLC_TRUE );
+        add_bool( "beos-use-dvd-menus", 0, NULL, "", "", VLC_TRUE );
     add_submodule();                                     
         set_capability( "video output", 100 );
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );

@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.12 2003/02/01 18:54:10 sam Exp $
+ * $Id: directx.c,v 1.13 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -104,10 +104,10 @@ static int  DirectXGetSurfaceDesc ( vout_thread_t *p_vout, picture_t *p_pic );
     "This option doesn't have any effect when using overlays." )
 
 vlc_module_begin();
-    add_category_hint( N_("Video"), NULL );
-    add_bool( "directx-on-top", 0, NULL, ON_TOP_TEXT, ON_TOP_LONGTEXT );
-    add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT );
-    add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT );
+    add_category_hint( N_("Video"), NULL, VLC_FALSE );
+    add_bool( "directx-on-top", 0, NULL, ON_TOP_TEXT, ON_TOP_LONGTEXT, VLC_FALSE );
+    add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT, VLC_TRUE );
+    add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT, VLC_TRUE );
     set_description( _("DirectX video module") );
     set_capability( "video output", 100 );
     add_shortcut( "directx" );

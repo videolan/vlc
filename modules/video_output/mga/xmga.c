@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.2 2003/02/02 00:46:58 sam Exp $
+ * $Id: xmga.c,v 1.3 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -101,9 +101,9 @@ static void ToggleCursor   ( vout_thread_t * );
     "use the value of the DISPLAY environment variable.")
 
 vlc_module_begin();  
-    add_category_hint( N_("Miscellaneous"), NULL );
-    add_string( "xmga-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
-    add_bool( "xmga-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT );
+    add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
+    add_string( "xmga-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
+    add_bool( "xmga-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, VLC_TRUE );
     set_description( _("X11 MGA module") );
     set_capability( "video output", 60 );
     set_callbacks( Create, Destroy );

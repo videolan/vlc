@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.4 2003/02/02 00:46:58 sam Exp $
+ * $Id: x11.c,v 1.5 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,11 +59,11 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "Use shared memory to communicate between VLC and the X server.")
 
 vlc_module_begin();
-    add_category_hint( N_("X11"), NULL );
-    add_string( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
-    add_bool( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT );
+    add_category_hint( N_("X11"), NULL, VLC_TRUE );
+    add_string( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
+    add_bool( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, VLC_TRUE );
 #ifdef HAVE_SYS_SHM_H
-    add_bool( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT );
+    add_bool( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, VLC_TRUE );
 #endif
     set_description( _("X11 module") );
     set_capability( "video output", 50 );

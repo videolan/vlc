@@ -2,7 +2,7 @@
  * dvdread.c : DvdRead input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dvdread.c,v 1.3 2003/01/23 09:58:02 sam Exp $
+ * $Id: dvdread.c,v 1.4 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,7 +42,7 @@ void E_(EndDVD)    ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( "[dvdread:][device][@[title][,[chapter][,angle]]]", NULL );
+    add_category_hint( "[dvdread:][device][@[title][,[chapter][,angle]]]", NULL, VLC_TRUE );
     set_description( _("DVDRead input module") );
     add_submodule();
         set_capability( "access", 110 );

@@ -2,7 +2,7 @@
  * xvid.c: a decoder for libxvidcore, the Xvid video codec
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: xvid.c,v 1.4 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: xvid.c,v 1.5 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,7 +49,7 @@ vlc_module_begin();
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
     add_bool( "xvid-direct-render", 0, NULL, "direct rendering",
-              "Use libxvidcore's direct rendering feature." );
+              "Use libxvidcore's direct rendering feature.", VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************

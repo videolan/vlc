@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.10 2003/02/08 22:20:28 massiot Exp $
+ * $Id: file.c,v 1.11 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -67,8 +67,8 @@ static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
 
 vlc_module_begin();
     set_description( _("Standard filesystem file reading") );
-    add_category_hint( N_("file"), NULL );
-    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT );
+    add_category_hint( N_("file"), NULL, VLC_TRUE );
+    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "access", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.24 2003/02/18 19:42:57 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.25 2003/02/20 01:52:46 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -96,45 +96,45 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
     "64 Qpel chroma"
 
 vlc_module_begin();
-    add_category_hint( N_("ffmpeg"), NULL );
+    add_category_hint( N_("ffmpeg"), NULL, VLC_FALSE );
 #if LIBAVCODEC_BUILD >= 4615
     add_bool( "ffmpeg-dr", 0, NULL,
               "direct rendering", 
-              "direct rendering" );
+              "direct rendering", VLC_TRUE );
 #endif
 #if LIBAVCODEC_BUILD >= 4611
     add_integer ( "ffmpeg-error-resilience", -1, NULL, 
-                  "error resilience", ERROR_RESILIENCE_LONGTEXT );
+                  "error resilience", ERROR_RESILIENCE_LONGTEXT, VLC_TRUE );
     add_integer ( "ffmpeg-workaround-bugs", 1, NULL, 
-                  "workaround bugs", WORKAROUND_BUGS_LONGTEXT );
+                  "workaround bugs", WORKAROUND_BUGS_LONGTEXT, VLC_FALSE );
 #endif
-    add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT );
+    add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT, VLC_FALSE );
     
-    add_category_hint( N_("Post processing"), NULL );
+    add_category_hint( N_("Post processing"), NULL, VLC_FALSE );
     add_module( "ffmpeg-pp", "postprocessing",NULL, NULL,
-                N_( "ffmpeg postprocessing module" ), NULL ); 
+                N_( "ffmpeg postprocessing module" ), NULL, VLC_FALSE ); 
     add_integer( "ffmpeg-pp-q", 0, NULL,
-                 "post processing quality", POSTPROCESSING_Q_LONGTEXT );
+                 "post processing quality", POSTPROCESSING_Q_LONGTEXT, VLC_FALSE );
     add_bool( "ffmpeg-pp-auto", 0, NULL,
-              "auto-level Post processing quality", POSTPROCESSING_AQ_LONGTEXT );
+              "auto-level Post processing quality", POSTPROCESSING_AQ_LONGTEXT, VLC_FALSE );
     add_bool( "ffmpeg-db-yv", 0, NULL, 
               "force vertical luminance deblocking", 
-              "force vertical luminance deblocking (override other settings)" );
+              "force vertical luminance deblocking (override other settings)", VLC_TRUE );
     add_bool( "ffmpeg-db-yh", 0, NULL, 
               "force horizontal luminance deblocking",
-              "force horizontal luminance deblocking (override other settings)" );
+              "force horizontal luminance deblocking (override other settings)", VLC_TRUE );
     add_bool( "ffmpeg-db-cv", 0, NULL, 
               "force vertical chrominance deblocking",
-              "force vertical chrominance deblocking (override other settings)" );
+              "force vertical chrominance deblocking (override other settings)", VLC_TRUE );
     add_bool( "ffmpeg-db-ch", 0, NULL, 
               "force horizontal chrominance deblocking",
-              "force horizontal chrominance deblocking (override other settings) " );
+              "force horizontal chrominance deblocking (override other settings) ", VLC_TRUE );
     add_bool( "ffmpeg-dr-y", 0, NULL,
               "force luminance deringing",
-              "force luminance deringing (override other settings)" );
+              "force luminance deringing (override other settings)", VLC_TRUE );
     add_bool( "ffmpeg-dr-c", 0, NULL,
               "force chrominance deringing",
-              "force chrominance deringing (override other settings)" );
+              "force chrominance deringing (override other settings)", VLC_TRUE );
       
     set_description( _("ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
     set_capability( "decoder", 70 );

@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.18 2003/02/07 23:36:55 marcari Exp $
+ * $Id: mms.c,v 1.19 2003/02/20 01:52:45 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -134,20 +134,20 @@ static void mms_ParseURL( url_t *p_url, char *psz_url );
 vlc_module_begin();
     set_description( _("MMS access module") );
     set_capability( "access", 0 );
-    add_category_hint( "stream", NULL );
+    add_category_hint( "stream", NULL, VLC_TRUE );
         add_integer( "mms-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
-                     CACHING_TEXT, CACHING_LONGTEXT );
+                     CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
 
         add_bool( "mms-all", 0, NULL,
                   "force selection of all streams",
-                  "force selection of all streams" );
+                  "force selection of all streams", VLC_TRUE );
 
         add_string( "mms-stream", NULL, NULL,
                     "streams selection",
-                    "force this stream selection" );
+                    "force this stream selection", VLC_TRUE );
         add_integer( "mms-maxbitrate", 0, NULL,
                      "max bitrate",
-                     "set max bitrate for auto streams selections" );
+                     "set max bitrate for auto streams selections", VLC_FALSE );
     add_shortcut( "mms" );
     add_shortcut( "mmsu" );
     add_shortcut( "mmst" );
