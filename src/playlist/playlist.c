@@ -221,10 +221,10 @@ int playlist_Control( playlist_t * p_playlist, int i_query, ... )
 
 int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
 {
-    vlc_mutex_lock( &p_playlist->object_lock );
-
     playlist_view_t *p_view;
     vlc_value_t val;
+
+    vlc_mutex_lock( &p_playlist->object_lock );
 
 #ifdef PLAYLIST_PROFILE
     p_playlist->request_date = mdate();

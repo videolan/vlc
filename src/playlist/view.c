@@ -90,7 +90,8 @@ playlist_view_t * playlist_ViewCreate( playlist_t *p_playlist, int i_id,
  */
 int playlist_ViewInsert( playlist_t *p_playlist, int i_id, char *psz_name )
 {
-    playlist_view_t *p_view = playlist_ViewCreate( p_playlist, i_id , psz_name);
+    playlist_view_t *p_view =
+        playlist_ViewCreate( p_playlist, i_id , psz_name );
     if( !p_view )
     {
         msg_Err( p_playlist, "Creation failed" );
@@ -99,12 +100,11 @@ int playlist_ViewInsert( playlist_t *p_playlist, int i_id, char *psz_name )
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
-    INSERT_ELEM( p_playlist->pp_views,
-                 p_playlist->i_views,
-                 p_playlist->i_views,
-                 p_view );
+    INSERT_ELEM( p_playlist->pp_views, p_playlist->i_views,
+                 p_playlist->i_views, p_view );
 
     vlc_mutex_unlock( &p_playlist->object_lock );
+    return VLC_SUCCESS;
 }
 
 

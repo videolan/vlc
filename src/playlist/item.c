@@ -246,7 +246,7 @@ int playlist_ItemSetDuration( playlist_item_t *p_item, mtime_t i_duration )
         p_item->input.i_duration = i_duration;
         if( i_duration != -1 )
         {
-            secstotimestr( psz_buffer, i_duration/1000000 );
+            secstotimestr( psz_buffer, (int)(i_duration/1000000) );
         }
         else
         {
@@ -291,5 +291,5 @@ static void GuessType( input_item_t *p_item)
             return;
         }
     }
-    return ITEM_TYPE_UNKNOWN;
+    p_item->i_type = ITEM_TYPE_UNKNOWN;
 }
