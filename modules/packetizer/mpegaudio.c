@@ -2,7 +2,7 @@
  * mpegaudio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegaudio.c,v 1.8 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: mpegaudio.c,v 1.9 2003/09/10 21:56:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -228,7 +228,7 @@ static void PacketizeThread( packetizer_t *p_pack )
         RealignBits( &p_pack->bit_stream );
 
 
-        while( ShowBits( &p_pack->bit_stream, 12 ) != 0x0fff &&
+        while( ShowBits( &p_pack->bit_stream, 11 ) != 0x07ff &&
                !p_pack->p_fifo->b_die && !p_pack->p_fifo->b_error )
         {
             //msg_Warn( p_pack->p_fifo, "trash..." );
@@ -268,6 +268,12 @@ static void PacketizeThread( packetizer_t *p_pack )
             i_channels = ( i_mode == 3 ) ? 1 : 2;
             i_bitrate = mpegaudio_bitrate[i_version][i_layer][i_bitrate_index];
             i_samplerate = mpegaudio_samplerate[i_version][i_samplerate_index];
+
+            if( ( i_sync & 0x01 ) == 0x00 )
+            {
+                /* mpeg 2.5 */
+                i_samplerate /= 2;
+            }
             switch( i_layer )
             {
                 case 0:

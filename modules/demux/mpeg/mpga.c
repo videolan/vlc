@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.3 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: mpga.c,v 1.4 2003/09/10 21:56:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -44,7 +44,6 @@ vlc_module_begin();
 vlc_module_end();
 
 /* TODO:
- * - mpeg 2.5
  * - free bitrate
  */
 
@@ -64,12 +63,12 @@ struct demux_sys_t
 
 static int HeaderCheck( uint32_t h )
 {
-    if( ((( h >> 20 )&0x0FFF) != 0x0FFF )  /* header sync */
-        || (((h >> 17)&0x03) == 0 )  /* valid layer ?*/
+    if( ((( h >> 21 )&0x07FF) != 0x07FF )   /* header sync */
+        || (((h >> 17)&0x03) == 0 )         /* valid layer ?*/
         || (((h >> 12)&0x0F) == 0x0F )
-        || (((h >> 12)&0x0F) == 0x00 ) /* valid bitrate ? */
-        || (((h >> 10) & 0x03) == 0x03 ) /* valide sampling freq ? */
-        || ((h & 0x03) == 0x02 )) /* valid emphasis ? */
+        || (((h >> 12)&0x0F) == 0x00 )      /* valid bitrate ? */
+        || (((h >> 10) & 0x03) == 0x03 )    /* valide sampling freq ? */
+        || ((h & 0x03) == 0x02 ))           /* valid emphasis ? */
     {
         return( VLC_FALSE );
     }
@@ -99,7 +98,8 @@ static int mpga_bitrate[2][3][16] =
 
 #define MPGA_VERSION( h )   ( 1 - (((h)>>19)&0x01) )
 #define MPGA_LAYER( h )     ( 3 - (((h)>>17)&0x03) )
-#define MPGA_SAMPLE_RATE(h) mpga_sample_rate[MPGA_VERSION(h)][((h)>>10)&0x03]
+#define MPGA_SAMPLE_RATE(h) \
+    ( mpga_sample_rate[MPGA_VERSION(h)][((h)>>10)&0x03] / ( ((h>>20)&0x01) ? 1 : 2) )
 #define MPGA_CHANNELS(h)    ( (((h)>>6)&0x03) == 3 ? 1 : 2)
 #define MPGA_BITRATE(h)     mpga_bitrate[MPGA_VERSION(h)][MPGA_LAYER(h)][((h)>>12)&0x0f]
 #define MPGA_PADDING(h)     ( ((h)>>9)&0x01 )
