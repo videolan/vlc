@@ -99,6 +99,7 @@ static int Open( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys  = malloc(
                                     sizeof( services_discovery_sys_t ) );
 
+    vlc_value_t         val;
     playlist_t          *p_playlist;
     playlist_view_t     *p_view;
 
@@ -124,6 +125,11 @@ static int Open( vlc_object_t *p_this )
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
     p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                          _("Devices"), p_view->p_root );
+
+    p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
+    val.b_bool = VLC_TRUE;
+    var_Set( p_playlist, "intf-change", val );
+
     vlc_object_release( p_playlist );
 
     return VLC_SUCCESS;
@@ -134,9 +140,15 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    services_discovery_t *p_sd = ( services_discovery_t* )p_sd;
-    services_discovery_sys_t *p_sys  = malloc(
-                                         sizeof( services_discovery_sys_t ) );
+    services_discovery_t *p_sd = ( services_discovery_t* )p_this;
+    services_discovery_sys_t *p_sys  = p_sd->p_sys;
+    playlist_t *p_playlist =  (playlist_t *) vlc_object_find( p_sd,
+                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist )
+    {
+        playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE, VLC_TRUE );
+        vlc_object_release( p_playlist );
+    }
     free( p_sys );
 }
 

@@ -490,7 +490,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Stop( p_playlist );
             }
-            playlist_NodeDelete( p_playlist, p_item, VLC_TRUE);
+            playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
         }
         else
         {

@@ -874,7 +874,6 @@ private:
     void UpdateNodeChildren( playlist_t *, playlist_item_t*, wxTreeItemId );
     void CreateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
     void UpdateTreeItem( playlist_t *, wxTreeItemId );
-    void SetCurrentItem( wxTreeItemId );
 
     /* Search (internal) */
     int CountItems( wxTreeItemId);

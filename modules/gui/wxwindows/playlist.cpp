@@ -379,8 +379,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     p_saved_item = NULL;
 
-    /* Update the playlist */
-    Rebuild();
 
     /* We want to be noticed of playlist changes */
 
@@ -396,9 +394,10 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     var_AddCallback( p_playlist, "item-append", ItemAppended, this );
     var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
 
+    /* Update the playlist */
+    Rebuild();
+
     vlc_object_release( p_playlist );
-
-
 }
 
 Playlist::~Playlist()
@@ -484,9 +483,6 @@ void Playlist::UpdateNodeChildren( playlist_t *p_playlist,
                            new PlaylistItem( p_node->pp_children[i]) );
 
             UpdateTreeItem( p_playlist, item );
-
-            treectrl->SetItemImage( item,
-                                    p_node->pp_children[i]->input.i_type );
         }
         else
         {
@@ -496,19 +492,11 @@ void Playlist::UpdateNodeChildren( playlist_t *p_playlist,
     }
 }
 
-/* Set current item */
-void Playlist::SetCurrentItem( wxTreeItemId item )
-{
-    if( item.IsOk() )
-    {
-        treectrl->SetItemBold( item, true );
-        treectrl->EnsureVisible( item );
-    }
-}
-
 /* Update an item in the tree */
 void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
 {
+    if( ! item.IsOk() ) return;
+
     playlist_item_t *p_item  =
             ((PlaylistItem *)treectrl->GetItemData( item ))->p_item;
 
@@ -546,7 +534,8 @@ void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
 
     if( p_playlist->status.p_item == p_item )
     {
-        SetCurrentItem( item );
+        treectrl->SetItemBold( item, true );
+        treectrl->EnsureVisible( item );
     }
     else
     {
@@ -676,7 +665,7 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
 
     p_wxcurrent = (PlaylistItem *)treectrl->GetItemData( root );
 
-    if( !p_item )
+    if( !p_item || !p_wxcurrent )
     {
         wxTreeItemId dummy;
         return dummy;
@@ -833,6 +822,15 @@ void Playlist::Rebuild()
     {
         return;
     }
+
+    /* We can remove the callbacks before locking, anyway, we won't
+     * miss anything */
+    var_DelCallback( p_playlist, "item-change", ItemChanged, this );
+    var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
+    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
+    var_DelCallback( p_playlist, "item-append", ItemAppended, this );
+    var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
+
     /* ...and rebuild it */
     vlc_mutex_lock( &p_playlist->object_lock );
 
@@ -847,6 +845,7 @@ void Playlist::Rebuild()
     wxTreeItemId root = treectrl->GetRootItem();
     UpdateNode( p_playlist, p_view->p_root, root );
 
+/*
     wxTreeItemId item;
     if( p_playlist->status.p_item != NULL )
     {
@@ -865,7 +864,7 @@ void Playlist::Rebuild()
     {
         SetCurrentItem( item );
     }
-
+*/
     int i_count = CountItems( treectrl->GetRootItem() );
 
     if( i_count < p_playlist->i_size && !b_changed_view )
@@ -889,6 +888,13 @@ void Playlist::Rebuild()
                                   "%i items in playlist")),
                                   p_playlist->i_size ), 0 );
     }
+
+    /* Put callbacks back online */
+    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
+    var_AddCallback( p_playlist, "playlist-current", PlaylistNext, this );
+    var_AddCallback( p_playlist, "item-change", ItemChanged, this );
+    var_AddCallback( p_playlist, "item-append", ItemAppended, this );
+    var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -959,7 +965,7 @@ void Playlist::DeleteNode( playlist_item_t *p_item )
         return;
     }
 
-    playlist_NodeDelete( p_playlist, p_item, VLC_TRUE );
+    playlist_NodeDelete( p_playlist, p_item, VLC_TRUE , VLC_FALSE );
 
     vlc_object_release( p_playlist );
 }
@@ -1334,8 +1340,10 @@ void Playlist::OnMenuEvent( wxCommandEvent& event )
         }
         else
         {
+            wxMutexGuiLeave();
             playlist_ServicesDiscoveryRemove( p_playlist,
                             pp_sds[event.GetId() - FirstSD_Event] );
+            wxMutexGuiEnter();
         }
     }
     vlc_object_release( p_playlist );

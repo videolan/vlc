@@ -481,7 +481,7 @@ static void Close( vlc_object_t *p_this )
 
     if( p_playlist )
     {
-        playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE );
+        playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE , VLC_TRUE );
         vlc_object_release( p_playlist );
     }
 
