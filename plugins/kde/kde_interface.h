@@ -50,6 +50,8 @@ class KInterface : public KMainWindow
          * If queryClose() returns false because the user canceled the saveModified() dialog, the closing breaks.
          */
         void slotFileQuit();
+        void slotShowPreferences();
+
         /** toggles the toolbar
          */
         void slotViewToolBar();
@@ -128,6 +130,7 @@ class KInterface : public KMainWindow
         KAction             *fast;
         KAction             *prev;
         KAction             *next;
+        KAction             *preferences;
 };
 
 /*****************************************************************************

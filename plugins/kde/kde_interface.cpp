@@ -11,6 +11,7 @@
 #include "kde_net.h"
 #include "kde_menu.h"
 #include "kde_slider.h"
+#include "kde_preferences.h"
 
 #include <iostream.h>
 
@@ -23,6 +24,7 @@
 #include <qcursor.h>
 #include <qdragobject.h>
 #include <qtimer.h>
+#include <kdialog.h>
 
 #define ID_STATUS_MSG       1
 #define ID_DATE             2
@@ -40,6 +42,7 @@ KInterface::KInterface( intf_thread_t *p_intf, QWidget *parent,
     fTitleMenu = new KTitleMenu( p_intf, this );
 
     fSlider = new KVLCSlider( QSlider::Horizontal, this );
+    fSlider->setMaxValue(10000);
     connect( fSlider, SIGNAL( userChanged( int ) ), this, SLOT( slotSliderMoved( int ) ) );
     connect( fSlider, SIGNAL( valueChanged( int ) ), this, SLOT( slotSliderChanged( int ) ) );
     setCentralWidget(fSlider);
@@ -79,6 +82,7 @@ void KInterface::initActions()
     fileOpen = KStdAction::open(this, SLOT(slotFileOpen()), actionCollection());
     fileOpenRecent = KStdAction::openRecent(this, SLOT(slotFileOpenRecent(const KURL&)), actionCollection());
     fileClose = KStdAction::close(this, SLOT(slotFileClose()), actionCollection());
+    preferences = KStdAction::preferences(this, SLOT(slotShowPreferences()), actionCollection());
     fileQuit = KStdAction::quit(this, SLOT(slotFileQuit()), actionCollection());
     viewToolBar = KStdAction::showToolbar(this, SLOT(slotViewToolBar()), actionCollection());
     viewStatusBar = KStdAction::showStatusbar(this, SLOT(slotViewStatusBar()), actionCollection());
@@ -93,7 +97,7 @@ void KInterface::initActions()
     fast = new KAction( i18n( "Fas&t" ), 0, 0, this, SLOT( slotFast() ), actionCollection(), "fast" );
     prev = new KAction( i18n( "Prev" ), 0, 0, this, SLOT( slotPrev() ), actionCollection(), "prev" );
     next = new KAction( i18n( "Next" ), 0, 0, this, SLOT( slotNext() ), actionCollection(), "next" );
-
+    
     fileOpen->setStatusText(i18n("Opens an existing document"));
     fileOpenRecent->setStatusText(i18n("Opens a recently used file"));
     fileClose->setStatusText(i18n("Closes the actual document"));
@@ -201,6 +205,12 @@ void KInterface::slotViewStatusBar()
   slotStatusMsg(i18n("Ready."));
 }
 
+void KInterface::slotShowPreferences()
+{
+    // Do something
+    KPreferences("main", this, "preferences");
+}
+
 void KInterface::slotStatusMsg(const QString &text)
 {
   ///////////////////////////////////////////////////////////////////
@@ -230,12 +240,12 @@ void KInterface::slotManage()
 #endif
 
     /* Manage the slider */
-    if( p_input_bank->pp_input[0] != NULL )
-    {
 #define p_area p_input_bank->pp_input[0]->stream.p_selected_area
-        fSlider->setValue( ( 100 * p_area->i_tell ) / p_area->i_size );
-#undef p_area
+    if( (p_input_bank->pp_input[0] != NULL) && (p_area->i_size != 0 ))
+    {
+	fSlider->setValue( ( 10000. * p_area->i_tell ) / p_area->i_size );
     }
+#undef p_area
 
     /* Manage core vlc functions through the callback */
     p_intf->pf_manage(p_intf);
@@ -253,7 +263,7 @@ void KInterface::slotSliderMoved( int position )
 // XXX is this locking really useful ?
     vlc_mutex_lock( &p_intf->change_lock );
 
-    off_t i_seek = ( position * p_input_bank->pp_input[0]->stream.p_selected_area->i_size ) / 100;
+    off_t i_seek = ( position * p_input_bank->pp_input[0]->stream.p_selected_area->i_size ) / 10000;
     input_Seek( p_input_bank->pp_input[0], i_seek );
 
     vlc_mutex_unlock( &p_intf->change_lock );
@@ -268,7 +278,7 @@ void KInterface::slotSliderChanged( int position )
         vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
 
 #define p_area p_input_bank->pp_input[0]->stream.p_selected_area
-        statusBar()->changeItem( input_OffsetToTime( p_input_bank->pp_input[0], psz_time, ( p_area->i_size * position ) / 100 ), ID_DATE );
+        statusBar()->changeItem( input_OffsetToTime( p_input_bank->pp_input[0], psz_time, ( p_area->i_size * position ) / 10000 ), ID_DATE );
 #undef p_area
 
         vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
