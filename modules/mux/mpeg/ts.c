@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.41 2003/11/27 22:44:50 massiot Exp $
+ * $Id: ts.c,v 1.42 2004/01/25 02:26:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -35,6 +35,7 @@
 #include "codecs.h"
 #include "bits.h"
 #include "pes.h"
+#include "csa.h"
 
 #if defined MODULE_NAME_IS_mux_ts_dvbpsi
 #   ifdef HAVE_DVBPSI_DR_H
@@ -102,6 +103,7 @@ static int     Mux      ( sout_mux_t * );
  * Local prototypes
  *****************************************************************************/
 #define SOUT_BUFFER_FLAGS_PRIVATE_PCR  ( 1 << SOUT_BUFFER_FLAGS_PRIVATE_SHIFT )
+#define SOUT_BUFFER_FLAGS_PRIVATE_CSA  ( 2 << SOUT_BUFFER_FLAGS_PRIVATE_SHIFT )
 typedef struct
 {
     int           i_depth;
@@ -212,6 +214,8 @@ struct sout_mux_sys_t
     int64_t             i_dts_delay;
 
     mtime_t             i_pcr;  /* last PCR emited */
+
+    csa_t               *csa;
 };
 
 
@@ -366,6 +370,36 @@ static int Open( vlc_object_t *p_this )
 
     /* for TS generation */
     p_sys->i_pcr    = 0;
+
+    p_sys->csa      = NULL;
+    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "csa-ck" ) ) )
+    {
+        /* skip 0x */
+        if( val[0] == '0' && ( val[1] == 'x' || val[1] == 'X' ) )
+        {
+            val += 2;
+        }
+        if( strlen( val ) != 16 )
+        {
+            msg_Dbg( p_mux, "invalid csa ck (it must be 16 chars long)" );
+        }
+        else
+        {
+            uint64_t i_ck = strtoll( val, NULL, 16 );
+            uint8_t ck[8];
+            int     i;
+            for( i = 0; i < 8; i++ )
+            {
+                ck[i] = ( i_ck >> ( 56 - 8*i) )&0xff;
+            }
+
+            msg_Dbg( p_mux, "using CSA scrambling with ck=%x:%x:%x:%x:%x:%x:%x:%x",
+                     ck[0], ck[1], ck[2], ck[3], ck[4], ck[5], ck[6], ck[7] );
+
+            p_sys->csa = csa_New();
+            csa_SetCW( p_sys->csa, ck, ck );
+        }
+    }
     return VLC_SUCCESS;
 }
 
@@ -378,6 +412,10 @@ static void Close( vlc_object_t * p_this )
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
 
     msg_Dbg( p_mux, "Close" );
+    if( p_sys->csa )
+    {
+        csa_Delete( p_sys->csa );
+    }
 
     free( p_sys );
 }
@@ -825,6 +863,10 @@ static int Mux( sout_mux_t *p_mux )
 
             /* Build the TS packet */
             p_ts = TSNew( p_mux, p_stream, b_pcr );
+            if( p_sys->csa )
+            {
+                p_ts->i_flags |= SOUT_BUFFER_FLAGS_PRIVATE_CSA;
+            }
             i_packet_pos++;
 
             /* */
@@ -845,6 +887,10 @@ static int Mux( sout_mux_t *p_mux )
             {
                 /* msg_Dbg( p_mux, "pcr=%lld ms", p_ts->i_dts / 1000 ); */
                 TSSetPCR( p_ts, p_ts->i_dts - p_sys->i_dts_delay );
+            }
+            if( p_ts->i_flags&SOUT_BUFFER_FLAGS_PRIVATE_CSA )
+            {
+                csa_Encrypt( p_sys->csa, p_ts->p_buffer, 0 );
             }
 
             /* latency */

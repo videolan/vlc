@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.6 2004/01/22 00:02:18 fenrir Exp $
+ * $Id: ts.c,v 1.7 2004/01/25 02:26:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -31,6 +31,8 @@
 
 #include "iso_lang.h"
 #include "network.h"
+
+#include "../mux/mpeg/csa.h"
 
 /* Include dvbpsi headers */
 #ifdef HAVE_DVBPSI_DR_H
@@ -68,6 +70,7 @@ vlc_module_begin();
         add_bool( "ts-es-id-pid", 0, NULL, "set id of es to pid", "set id of es to pid", VLC_TRUE );
         add_string( "ts-out", NULL, NULL, "fast udp streaming", "send TS to specific ip:port by udp (you must know what you are doing)", VLC_TRUE );
         add_integer( "ts-out-mtu", 1500, NULL, "MTU for out mode", "MTU for out mode", VLC_TRUE );
+        add_string( "ts-csa-ck", NULL, NULL, "CSA ck", "CSA ck", VLC_TRUE );
     set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "ts2" );
@@ -208,6 +211,7 @@ struct demux_sys_t
 
     /* */
     vlc_bool_t  b_es_id_pid;
+    csa_t       *csa;
 
     vlc_bool_t  b_udp_out;
     int         fd; /* udp socket */
@@ -285,6 +289,7 @@ static int Open( vlc_object_t *p_this )
     }
     p_sys->b_udp_out = VLC_FALSE;
     p_sys->i_ts_read = 50;
+    p_sys->csa = NULL;
 
     /* Init PAT handler */
     pat = &p_sys->pid[0];
@@ -405,6 +410,42 @@ static int Open( vlc_object_t *p_this )
         free( val.psz_string );
     }
 
+    var_Create( p_demux, "ts-csa-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "ts-csa-ck", &val );
+    if( val.psz_string && *val.psz_string )
+    {
+        char *psz = val.psz_string;
+        if( psz[0] == '0' && ( psz[1] == 'x' || psz[1] == 'X' ) )
+        {
+            psz += 2;
+        }
+        if( strlen( psz ) != 16 )
+        {
+            msg_Warn( p_demux, "invalid csa ck (it must be 16 chars long)" );
+        }
+        else
+        {
+            uint64_t i_ck = strtoll( psz, NULL, 16 );
+            uint8_t ck[8];
+            int     i;
+            for( i = 0; i < 8; i++ )
+            {
+                ck[i] = ( i_ck >> ( 56 - 8*i) )&0xff;
+            }
+
+            msg_Dbg( p_demux, "using CSA scrambling with ck=%x:%x:%x:%x:%x:%x:%x:%x",
+                     ck[0], ck[1], ck[2], ck[3], ck[4], ck[5], ck[6], ck[7] );
+
+            p_sys->csa = csa_New();
+            csa_SetCW( p_sys->csa, ck, ck );
+        }
+    }
+    if( val.psz_string )
+    {
+        free( val.psz_string );
+    }
+
+
     return VLC_SUCCESS;
 }
 
@@ -460,6 +501,10 @@ static void Close( vlc_object_t *p_this )
     {
         net_Close( p_sys->fd );
         free( p_sys->buffer );
+    }
+    if( p_sys->csa )
+    {
+        csa_Delete( p_sys->csa );
     }
 
     free( p_sys );
@@ -725,7 +770,7 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
 
     if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
-        msg_Err( p_demux, "invalid header [0x%x:%x:%x:%x]", header[0], header[1],header[2],header[3] );
+        msg_Warn( p_demux, "invalid header [0x%x:%x:%x:%x]", header[0], header[1],header[2],header[3] );
         block_ChainRelease( p_pes );
         return;
     }
@@ -885,6 +930,11 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     if( p[1]&0x80 )
     {
         msg_Dbg( p_demux, "transport_error_indicator set (pid=0x%x)", pid->i_pid );
+    }
+
+    if( p_demux->p_sys->csa )
+    {
+        csa_Decrypt( p_demux->p_sys->csa, p_bk->p_buffer );
     }
 
     if( !b_adaptation )
