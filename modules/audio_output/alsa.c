@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.31 2003/07/18 20:06:00 gbazin Exp $
+ * $Id: alsa.c,v 1.32 2003/07/27 16:14:20 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -111,14 +111,20 @@ static void Probe( aout_instance_t * p_aout,
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     vlc_value_t val, text;
+    int i_ret;
 
     var_Create ( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Audio device");
     var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
+    /* We'll open the audio device in non blocking mode so we can just exit
+     * when it is already in use, but for the real stuff we'll still use
+     * the blocking mode */
+
     /* Now test linear PCM capabilities */
-    if ( !snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
-                        SND_PCM_STREAM_PLAYBACK, 0 ) )
+    if ( !(i_ret = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
+                                 SND_PCM_STREAM_PLAYBACK,
+                                 SND_PCM_NONBLOCK ) ) )
     {
         int i_channels;
         snd_pcm_hw_params_t * p_hw;
@@ -196,13 +202,18 @@ static void Probe( aout_instance_t * p_aout,
         /* Close the previously opened device */
         snd_pcm_close( p_sys->p_snd_pcm );
     }
+    else if ( i_ret == -EBUSY )
+    {
+        msg_Warn( p_aout, "audio device: %s is already in use", psz_device );
+    }
 
     /* Test for S/PDIF device if needed */
     if ( psz_iec_device )
     {
         /* Opening the device should be enough */
-        if ( !snd_pcm_open( &p_sys->p_snd_pcm, psz_iec_device,
-                                SND_PCM_STREAM_PLAYBACK, 0 ) )
+        if ( !(i_ret = snd_pcm_open( &p_sys->p_snd_pcm, psz_iec_device,
+                                     SND_PCM_STREAM_PLAYBACK,
+                                     SND_PCM_NONBLOCK ) ) )
         {
             val.i_int = AOUT_VAR_SPDIF;
             text.psz_string = N_("A/52 over S/PDIF");
@@ -212,6 +223,11 @@ static void Probe( aout_instance_t * p_aout,
                 var_Set( p_aout, "audio-device", val );
 
             snd_pcm_close( p_sys->p_snd_pcm );
+        }
+        else if ( i_ret == -EBUSY )
+        {
+            msg_Warn( p_aout, "audio device: %s is already in use",
+                      psz_iec_device );
         }
     }
 
