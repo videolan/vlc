@@ -38,21 +38,21 @@ long long mediacontrol_unit_convert( input_thread_t *p_input,
 {
     if( to == from )
         return value;
-    
+
     /* For all conversions, we need data from p_input */
     if( !p_input )
         return 0;
-    
+
     switch( from )
     {
     case mediacontrol_MediaTime:
         if( to == mediacontrol_ByteCount )
             return value * 50 * p_input->stream.i_mux_rate / 1000;
-      
+
         if( to == mediacontrol_SampleCount )
         {
             double f_fps;
-          
+
             if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
                 return 0;
             else
@@ -61,34 +61,34 @@ long long mediacontrol_unit_convert( input_thread_t *p_input,
         /* Cannot happen */
         /* See http://catb.org/~esr/jargon/html/entry/can't-happen.html */
         break;
-      
+
     case mediacontrol_SampleCount:
     {
         double f_fps;
-      
+
         if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
             return 0;
-      
+
         if( to == mediacontrol_ByteCount )
             return ( long long )( value * 50 * p_input->stream.i_mux_rate / f_fps );
-        
+
         if( to == mediacontrol_MediaTime )
             return( long long )( value * 1000.0 / ( double )f_fps );
-        
+
         /* Cannot happen */
         break;
     }
     case mediacontrol_ByteCount:
         if( p_input->stream.i_mux_rate == 0 )
             return 0;
-      
+
         /* Convert an offset into milliseconds. Taken from input_ext-intf.c.
            The 50 hardcoded constant comes from the definition of i_mux_rate :
            i_mux_rate : the rate we read the stream (in units of 50 bytes/s) ;
            0 if undef */
         if( to == mediacontrol_MediaTime )
             return ( long long )( 1000 * value / 50 / p_input->stream.i_mux_rate );
-      
+
         if( to == mediacontrol_SampleCount )
         {
             double f_fps;
@@ -112,7 +112,7 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
     switch( pos->origin )
     {
     case mediacontrol_AbsolutePosition:
-        return ( 1000 * mediacontrol_unit_convert( p_input, 
+        return ( 1000 * mediacontrol_unit_convert( p_input,
                                                    pos->key, /* from */
                                                    mediacontrol_MediaTime,  /* to */
                                                    pos->value ) );
@@ -121,14 +121,14 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
     {
         long long l_pos;
         vlc_value_t val;
-        
+
         val.i_time = 0;
-	if( p_input )
+        if( p_input )
         {
             var_Get( p_input, "time", &val );
         }
-        
-        l_pos = 1000 * mediacontrol_unit_convert( p_input, 
+
+        l_pos = 1000 * mediacontrol_unit_convert( p_input,
                                                   pos->key,
                                                   mediacontrol_MediaTime,
                                                   pos->value );
@@ -139,23 +139,23 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
     {
         long long l_pos;
         vlc_value_t val;
-        
+
         val.i_time = 0;
-	if( p_input )
+        if( p_input )
         {
             var_Get( p_input, "length", &val );
         }
 
         if( val.i_time > 0)
         {
-            l_pos = ( 1000 * mediacontrol_unit_convert( p_input, 
+            l_pos = ( 1000 * mediacontrol_unit_convert( p_input,
                                                         pos->key,
                                                         mediacontrol_MediaTime,
                                                         pos->value ) );
         }
         else
             l_pos = 0;
-        
+
         return l_pos % val.i_time;
         break;
     }
@@ -167,11 +167,11 @@ mediacontrol_RGBPicture*
 mediacontrol_RGBPicture__alloc( int datasize )
 {
     mediacontrol_RGBPicture* pic;
-    
+
     pic = ( mediacontrol_RGBPicture * )malloc( sizeof( mediacontrol_RGBPicture ) );
     if( ! pic )
         return NULL;
-    
+
     pic->size = datasize;
     pic->data = ( char* )malloc( datasize );
     return pic;
@@ -189,7 +189,7 @@ mediacontrol_PlaylistSeq*
 mediacontrol_PlaylistSeq__alloc( int size )
 {
     mediacontrol_PlaylistSeq* ps;
-  
+
     ps =( mediacontrol_PlaylistSeq* )malloc( sizeof( mediacontrol_PlaylistSeq ) );
     if( ! ps )
         return NULL;
@@ -208,7 +208,7 @@ mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq* ps )
         for( i = 0 ; i < ps->size ; i++ )
             free( ps->data[i] );
     }
-    free( ps->data );    
+    free( ps->data );
     free( ps );
 }
 
@@ -240,7 +240,7 @@ mediacontrol_Instance* mediacontrol_new_from_object( vlc_object_t* p_object,
 {
     mediacontrol_Instance* retval;
     vlc_object_t *p_vlc;
-    
+
     p_vlc = vlc_object_find( p_object, VLC_OBJECT_ROOT, FIND_PARENT );
     if( ! p_vlc )
     {
@@ -275,16 +275,16 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     mediacontrol_Position* retval;
     vlc_value_t val;
     input_thread_t * p_input = self->p_playlist->p_input;
-    
+
     exception = mediacontrol_exception_init( exception );
 
     retval = ( mediacontrol_Position* )malloc( sizeof( mediacontrol_Position ) );
     retval->origin = an_origin;
     retval->key = a_key;
-  
+
     if( ! p_input )
     {
-        /* 
+        /*
            RAISE( mediacontrol_InternalException, "No input thread." );
            return( NULL );
         */
@@ -304,7 +304,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     val.i_time = 0;
     var_Get( p_input, "time", &val );
     /* FIXME: check val.i_time > 0 */
-    
+
     retval->value = mediacontrol_unit_convert( p_input,
                                                mediacontrol_MediaTime,
                                                a_key,
@@ -342,7 +342,7 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
 /* Starts playing a stream */
 void
 mediacontrol_start( mediacontrol_Instance *self,
-                    const mediacontrol_Position * a_position, 
+                    const mediacontrol_Position * a_position,
                     mediacontrol_Exception *exception )
 {
     playlist_t * p_playlist = self->p_playlist;
@@ -365,7 +365,7 @@ mediacontrol_start( mediacontrol_Instance *self,
         val.i_int = mediacontrol_position2microsecond( p_playlist->p_input, a_position ) / 1000000;
         var_Set( p_playlist, "start-time", val );
 
-        playlist_Play( p_playlist );      
+        playlist_Play( p_playlist );
     }
     else
     {
@@ -379,7 +379,7 @@ mediacontrol_start( mediacontrol_Instance *self,
 
 void
 mediacontrol_pause( mediacontrol_Instance *self,
-                    const mediacontrol_Position * a_position, 
+                    const mediacontrol_Position * a_position,
                     mediacontrol_Exception *exception )
 {
     input_thread_t *p_input = self->p_playlist->p_input;;
@@ -394,13 +394,13 @@ mediacontrol_pause( mediacontrol_Instance *self,
     {
         RAISE( mediacontrol_InternalException, "No input" );
     }
-  
+
     return;
 }
 
 void
 mediacontrol_resume( mediacontrol_Instance *self,
-                     const mediacontrol_Position * a_position, 
+                     const mediacontrol_Position * a_position,
                      mediacontrol_Exception *exception )
 {
     input_thread_t *p_input = self->p_playlist->p_input;
@@ -419,7 +419,7 @@ mediacontrol_resume( mediacontrol_Instance *self,
 
 void
 mediacontrol_stop( mediacontrol_Instance *self,
-                   const mediacontrol_Position * a_position, 
+                   const mediacontrol_Position * a_position,
                    mediacontrol_Exception *exception )
 {
     /* FIXME: use the a_position parameter */
@@ -460,7 +460,7 @@ mediacontrol_playlist_clear( mediacontrol_Instance *self,
     }
 
     playlist_Clear( self->p_playlist );
-  
+
     return;
 }
 
@@ -479,18 +479,18 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
         RAISE( mediacontrol_PlaylistException, "No playlist" );
         return NULL;
     }
-  
+
     vlc_mutex_lock( &p_playlist->object_lock );
     i_playlist_size = p_playlist->i_size;
-  
+
     retval = mediacontrol_PlaylistSeq__alloc( i_playlist_size );
-  
+
     for( i_index = 0 ; i_index < i_playlist_size ; i_index++ )
     {
         retval->data[i_index] = strdup( p_playlist->pp_items[i_index]->input.psz_uri );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
-  
+
     return retval;
 }
 
@@ -533,7 +533,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     exception=mediacontrol_exception_init( exception );
 
-    /* 
+    /*
        if( var_Get( self->p_vlc, "snapshot-id", &val ) == VLC_SUCCESS )
        p_vout = vlc_object_get( self->p_vlc, val.i_int );
     */
@@ -553,7 +553,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
         return NULL;
     }
 
-#ifdef HAS_SNAPSHOT   
+#ifdef HAS_SNAPSHOT
     /* We test if the vout is a snapshot module. We cannot test
        pvout_psz_object_name( which is NULL ). But we can check if
        there are snapshot-specific variables */
@@ -564,14 +564,14 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
         return NULL;
     }
     i_datasize = val.i_int;
-   
+
     /* Handle the a_position parameter */
     if( ! ( a_position->origin == mediacontrol_RelativePosition
             && a_position->value == 0 ) )
     {
         /* The position is not the current one. Go to it. */
-        mediacontrol_set_media_position( self, 
-                                         ( mediacontrol_Position* ) a_position, 
+        mediacontrol_set_media_position( self,
+                                         ( mediacontrol_Position* ) a_position,
                                          exception );
         if( exception->code )
         {
@@ -583,22 +583,22 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     /* FIXME: We should not go further until we got past the position
        ( which means that we had the possibility to capture the right
        picture ). */
-   
+
     vlc_mutex_lock( &p_vout->picture_lock );
-   
-    searched_date = mediacontrol_position2microsecond( p_input, 
+
+    searched_date = mediacontrol_position2microsecond( p_input,
                                                        ( mediacontrol_Position * ) a_position );
-    
+
     var_Get( p_vout, "snapshot-cache-size", &val );
     i_cachesize = val.i_int  ;
-   
+
     var_Get( p_vout, "snapshot-list-pointer", &val );
     pointer = ( snapshot_t ** )val.p_address;
-   
+
     if( ! pointer )
     {
         RAISE( mediacontrol_InternalException, "No available snapshot" );
-       
+
         vlc_mutex_unlock( &p_vout->picture_lock );
         vlc_object_release( p_vout );
         return NULL;
@@ -616,7 +616,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
             p_best_snapshot = pointer[i_index];
         }
     }
-   
+
     /* FIXME: add a test for the case that no picture matched the test
        ( we have p_best_snapshot == pointer[0] */
     retval = _mediacontrol_createRGBPicture( p_best_snapshot->i_width,
@@ -700,12 +700,12 @@ mediacontrol_all_snapshots( mediacontrol_Instance *self,
                                                 p_s->date,
                                                 p_s->p_data,
                                                 i_datasize );
-       
+
         retval[i_index] = p_rgb;
     }
 
     retval[i_cachesize] = NULL;
-   
+
     vlc_mutex_unlock( &p_vout->picture_lock );
     vlc_object_release( p_vout );
 
@@ -724,32 +724,32 @@ mediacontrol_display_text( mediacontrol_Instance *self,
     input_thread_t *p_input = NULL;
     vout_thread_t *p_vout = NULL;
 
-    p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD ); 
+    p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
     if( ! p_vout )
     {
         RAISE( mediacontrol_InternalException, "No video output" );
         return;
     }
-  
+
     if( begin->origin == mediacontrol_RelativePosition &&
-        begin->value == 0 && 
+        begin->value == 0 &&
         end->origin == mediacontrol_RelativePosition )
     {
         mtime_t i_duration = 0;
-      
+
         i_duration = 1000 * mediacontrol_unit_convert( self->p_playlist->p_input,
                                                        end->key,
                                                        mediacontrol_MediaTime,
                                                        end->value );
 
-        vout_ShowTextRelative( p_vout, DEFAULT_CHAN, ( char* ) message, NULL, 
-			                   OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20, 
+        vout_ShowTextRelative( p_vout, DEFAULT_CHAN, ( char* ) message, NULL,
+                               OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20,
                                i_duration );
     }
     else
     {
         mtime_t i_debut, i_fin, i_now;
-      
+
         p_input = self->p_playlist->p_input;
         if( ! p_input )
         {
@@ -757,22 +757,22 @@ mediacontrol_display_text( mediacontrol_Instance *self,
             vlc_object_release( p_vout );
             return;
         }
-      
+
         i_now = input_ClockGetTS( p_input, NULL, 0 );
-      
-        i_debut = mediacontrol_position2microsecond( p_input, 
+
+        i_debut = mediacontrol_position2microsecond( p_input,
                                                      ( mediacontrol_Position* ) begin );
         i_debut += i_now;
-      
-        i_fin = mediacontrol_position2microsecond( p_input, 
+
+        i_fin = mediacontrol_position2microsecond( p_input,
                                                    ( mediacontrol_Position * ) end );
         i_fin += i_now;
-      
-        vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN, ( char* ) message, NULL, 
-			                   OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20, 
-			                   i_debut, i_fin );
+
+        vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN, ( char* ) message, NULL,
+                               OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20,
+                               i_debut, i_fin );
     }
-  
+
     vlc_object_release( p_vout );
 }
 
@@ -784,14 +784,14 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
     mediacontrol_StreamInformation *retval;
     input_thread_t *p_input = self->p_playlist->p_input;
     vlc_value_t val;
-  
+
     retval = ( mediacontrol_StreamInformation* )malloc( sizeof( mediacontrol_StreamInformation ) );
     if( ! retval )
     {
         RAISE( mediacontrol_InternalException, "Out of memory" );
         return NULL;
     }
-  
+
     if( ! p_input )
     {
         /* No p_input defined */
@@ -829,7 +829,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
             retval->streamstatus = mediacontrol_UndefinedStatus;
             break;
         }
-      
+
         retval->url = strdup( p_input->psz_source );
 
         /* TIME and LENGTH are in microseconds. We want them in ms */
@@ -839,11 +839,11 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
         var_Get( p_input, "length", &val);
         retval->length = val.i_time / 1000;
 
-        retval->position = mediacontrol_unit_convert( p_input, 
-                                                      mediacontrol_MediaTime, a_key, 
+        retval->position = mediacontrol_unit_convert( p_input,
+                                                      mediacontrol_MediaTime, a_key,
                                                       retval->position );
-        retval->length   = mediacontrol_unit_convert( p_input, 
-                                                      mediacontrol_MediaTime, a_key, 
+        retval->length   = mediacontrol_unit_convert( p_input,
+                                                      mediacontrol_MediaTime, a_key,
                                                       retval->length );
     }
     return retval;
