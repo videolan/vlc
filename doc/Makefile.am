@@ -6,7 +6,7 @@ EXTRA_DIST = \
 	bugreport-howto.txt \
 	fortunes.txt \
 	release-howto.txt \
-	web-streaming.html
+	web-streaming.html \
 	vlc-howto.sgml \
 	arm-crosscompile-howto.sgml \
 	Configure.help \
