@@ -557,9 +557,9 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
             *((int*)va_arg( args, int* )) = 1; /* Title offset */
 
             /* Duplicate title info */
-            dbg_print ( INPUT_DBG_EVENT, 
-			"GET TITLE: i_tracks %d, i_titles %d",
-			p_cdda->i_tracks, p_cdda->i_titles );
+            dbg_print ( INPUT_DBG_EVENT,
+                        "GET TITLE: i_tracks %d, i_titles %d",
+                        p_cdda->i_tracks, p_cdda->i_titles );
             if( p_cdda->i_titles == 0 )
             {
                 *pi_int = 0; ppp_title = NULL;

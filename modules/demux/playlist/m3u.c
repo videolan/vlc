@@ -126,9 +126,7 @@ static int Demux( demux_t *p_demux )
         return -1;
     }
 
-    fprintf(stderr,"playlist item is %p\n", p_playlist->status.p_item );
     b_play = FindItem( p_demux, p_playlist, &p_current );
-    fprintf(stderr,"current is %p\n", p_current );
 
     playlist_ItemToNode( p_playlist, p_current );
     p_current->input.i_type = ITEM_TYPE_PLAYLIST;
