@@ -430,9 +430,9 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
             int i_dummy, i_short = i_shortcuts;
             char *psz_name = psz_shortcuts;
 
-            /* Let's drop modules with a 0 score (unless they are
+            /* Let's drop modules with a <= 0 score (unless they are
              * explicitly requested) */
-            b_trash = !p_module->i_score;
+            b_trash = p_module->i_score <= 0;
 
             while( i_short > 0 )
             {
@@ -476,8 +476,8 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
                 continue;
             }
         }
-        /* If we didn't require a shortcut, trash zero-scored plugins */
-        else if( !p_module->i_score )
+        /* If we didn't require a shortcut, trash <= 0 scored plugins */
+        else if( p_module->i_score <= 0 )
         {
             continue;
         }
