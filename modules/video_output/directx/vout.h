@@ -77,6 +77,7 @@ struct vout_sys_t
     RECT         rect_src_clipped;
     RECT         rect_dest;
     RECT         rect_dest_clipped;
+    RECT         rect_parent;
 
     /* Overlay alignment restrictions */
     int          i_align_src_boundary;
@@ -97,9 +98,10 @@ struct vout_sys_t
     volatile mtime_t    i_lastmoved;
 
     /* Misc */
-    vlc_bool_t          b_on_top_change;
+    vlc_bool_t      b_on_top_change;
 
-    event_thread_t *    p_event;
+    event_thread_t *p_event;
+    vlc_mutex_t    lock;
 };
 
 /*****************************************************************************

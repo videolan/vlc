@@ -160,7 +160,7 @@ vlc_module_end();
 static int OpenVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    vlc_value_t val, text;
+    vlc_value_t val;
     HMODULE huser32;
 
     /* Allocate structure */
@@ -186,7 +186,9 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
     p_vout->p_sys->hparent = NULL;
     p_vout->p_sys->i_changes = 0;
-    SetRectEmpty( &p_vout->p_sys->rect_display  );
+    vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
+    SetRectEmpty( &p_vout->p_sys->rect_display );
+    SetRectEmpty( &p_vout->p_sys->rect_parent );
 
     /* Multimonitor stuff */
     p_vout->p_sys->hmonitor = NULL;
@@ -371,8 +373,7 @@ static int Init( vout_thread_t *p_vout )
     }
 
     /* Change the window title bar text */
-    if( p_vout->p_sys->hparent ) ; /* Do nothing */
-    else PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
+    PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
 
     return VLC_SUCCESS;
 }
@@ -422,6 +423,8 @@ static void CloseVideo( vlc_object_t *p_this )
         vlc_object_destroy( p_vout->p_sys->p_event );
     }
 
+    vlc_mutex_destroy( &p_vout->p_sys->lock );
+
     if( p_vout->p_sys )
     {
         free( p_vout->p_sys );
@@ -441,9 +444,37 @@ static int Manage( vout_thread_t *p_vout )
 
     /* If we do not control our window, we check for geometry changes
      * ourselves because the parent might not send us its events. */
+    vlc_mutex_lock( &p_vout->p_sys->lock );
     if( p_vout->p_sys->hparent )
     {
-        DirectXUpdateRects( p_vout, VLC_FALSE );
+        RECT rect_parent;
+        POINT point;
+
+        vlc_mutex_unlock( &p_vout->p_sys->lock );
+
+        GetClientRect( p_vout->p_sys->hparent, &rect_parent );
+        point.x = point.y = 0;
+        ClientToScreen( p_vout->p_sys->hparent, &point );
+        OffsetRect( &rect_parent, point.x, point.y );
+
+        if( !EqualRect( &rect_parent, &p_vout->p_sys->rect_parent ) )
+        {
+            p_vout->p_sys->rect_parent = rect_parent;
+
+            /* This one is to force the update even if only
+	     * the position has changed */
+            SetWindowPos( p_vout->p_sys->hwnd, 0, 1, 1,
+                          rect_parent.right - rect_parent.left,
+                          rect_parent.bottom - rect_parent.top, 0 );
+
+            SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
+                          rect_parent.right - rect_parent.left,
+                          rect_parent.bottom - rect_parent.top, 0 );
+        }
+    }
+    else
+    {
+        vlc_mutex_unlock( &p_vout->p_sys->lock );
     }
 
     /*
@@ -452,9 +483,6 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->p_sys->i_changes & DX_POSITION_CHANGE )
     {
         p_vout->p_sys->i_changes &= ~DX_POSITION_CHANGE;
-
-        if( p_vout->p_sys->b_using_overlay )
-            DirectXUpdateOverlay( p_vout );
 
         /* Check if we are still on the same monitor */
         if( p_vout->p_sys->MonitorFromWindow &&
@@ -478,6 +506,7 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE
         || p_vout->p_sys->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
+        int i_style = 0;
         vlc_value_t val;
 
         p_vout->b_fullscreen = ! p_vout->b_fullscreen;
@@ -487,21 +516,33 @@ static int Manage( vout_thread_t *p_vout )
         GetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
         if( p_vout->b_fullscreen )
         {
+           if( p_vout->p_sys->hparent )
+               SetParent( p_vout->p_sys->hwnd, GetDesktopWindow() );
+
             /* Maximized window */
             window_placement.showCmd = SW_SHOWMAXIMIZED;
             /* Change window style, no borders and no title bar */
-            SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE, WS_CLIPCHILDREN );
-
+            i_style = WS_CLIPCHILDREN;
         }
         else
         {
+            if( p_vout->p_sys->hparent )
+            {
+                SetParent( p_vout->p_sys->hwnd, p_vout->p_sys->hparent );
+                i_style = WS_CLIPCHILDREN | WS_VISIBLE | WS_CHILD;
+            }
+            else
+            {
+                i_style = WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW |
+                          WS_SIZEBOX | WS_VISIBLE;
+            }
+
             /* Normal window */
             window_placement.showCmd = SW_SHOWNORMAL;
-            /* Change window style, borders and title bar */
-            SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE, WS_CLIPCHILDREN |
-                           WS_OVERLAPPEDWINDOW | WS_SIZEBOX | WS_VISIBLE );
         }
 
+        /* Change window style, borders and title bar */
+        SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE, i_style );
         SetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
 
         /* Update the object variable and trigger callback */
@@ -518,11 +559,23 @@ static int Manage( vout_thread_t *p_vout )
     if( (!p_vout->p_sys->b_cursor_hidden) &&
         ( (mdate() - p_vout->p_sys->i_lastmoved) > 5000000 ) )
     {
-        /* Hide the mouse automatically */
-        if( p_vout->p_sys->hwnd != p_vout->p_sys->hparent )
+        POINT point;
+        RECT rect;
+
+        /* Hide the cursor only if it is inside our window */
+        GetClientRect( p_vout->p_sys->hwnd, &rect );
+        point.x = point.y = 0;
+        ClientToScreen( p_vout->p_sys->hwnd, &point );
+        OffsetRect( &rect, point.x, point.y );
+        GetCursorPos( &point );
+        if( PtInRect( &rect, point ) )
         {
             p_vout->p_sys->b_cursor_hidden = VLC_TRUE;
             PostMessage( p_vout->p_sys->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
+        }
+        else
+        {
+            p_vout->p_sys->i_lastmoved = mdate();
         }
     }
 
@@ -1084,9 +1137,14 @@ int DirectXUpdateOverlay( vout_thread_t *p_vout )
     RECT            rect_src = p_vout->p_sys->rect_src_clipped;
     RECT            rect_dest = p_vout->p_sys->rect_dest_clipped;
 
-    if( p_vout->p_sys->p_current_surface == NULL ||
-        !p_vout->p_sys->b_using_overlay )
+    if( !p_vout->p_sys->b_using_overlay ) return VLC_EGENERIC;
+
+    vlc_mutex_lock( &p_vout->p_sys->lock );
+    if( p_vout->p_sys->p_current_surface == NULL )
+    {
+        vlc_mutex_unlock( &p_vout->p_sys->lock );
         return VLC_EGENERIC;
+    }
 
     /* The new window dimensions should already have been computed by the
      * caller of this function */
@@ -1103,6 +1161,9 @@ int DirectXUpdateOverlay( vout_thread_t *p_vout )
                    p_vout->p_sys->p_current_surface,
                    &rect_src, p_vout->p_sys->p_display, &rect_dest,
                    dwFlags, &ddofx );
+
+    vlc_mutex_unlock( &p_vout->p_sys->lock );
+
     if(dxresult != DD_OK)
     {
         msg_Warn( p_vout, "DirectXUpdateOverlay cannot move/resize overlay" );
@@ -1435,6 +1496,10 @@ static void FreePictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 {
     int i;
 
+    vlc_mutex_lock( &p_vout->p_sys->lock );
+    p_vout->p_sys->p_current_surface = 0;
+    vlc_mutex_unlock( &p_vout->p_sys->lock );
+
     for( i = 0; i < i_num_pics; i++ )
     {
         DirectXCloseSurface( p_vout, p_pic[i].p_sys->p_front_surface );
@@ -1444,8 +1509,6 @@ static void FreePictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             free( p_pic[i].p_sys );
         }
     }
-
-    p_vout->p_sys->p_current_surface = 0;
 }
 
 /*****************************************************************************
