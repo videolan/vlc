@@ -2,7 +2,7 @@
  * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.9 2002/10/10 20:33:12 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.10 2002/10/13 14:27:49 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -428,9 +428,9 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
 		    (strncmp("rtp4://",(const char *) psz_url,7)==0) ||
 		    (strncmp("rtp6://",(const char *) psz_url,7)==0) ||
 		    (strncmp("rtpstream://",(const char *) psz_url,12)==0) ||
+			(strncmp("ftp://",(const char *) psz_url,6)==0) ||
 		    (strncmp("http://",(const char *) psz_url,7)==0) )
 	{
-		intf_ErrMsg( "comboURL change event - open URL" );
         MediaURLOpenChanged(GTK_WIDGET(editable), psz_url);
     }
     else if (lstat((char*)psz_url, &st)==0)
