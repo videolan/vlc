@@ -2,8 +2,11 @@
  * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: audio_decoder.c,v 1.40 2000/12/21 13:25:50 massiot Exp $
  *
- * Authors:
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Michel Lespinasse <walken@via.ecp.fr>
+ *          Samuel Hocevar <sam@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,8 +94,6 @@ vlc_thread_t adec_CreateThread ( adec_config_t * p_config )
     /*
      * Initialize the thread properties
      */
-    p_adec->b_die = 0;
-    p_adec->b_error = 0;
     p_adec->p_config = p_config;
     p_adec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
@@ -138,7 +139,7 @@ static int InitThread (adec_thread_t * p_adec)
     vlc_mutex_lock ( &p_adec->p_fifo->data_lock );
     while ( DECODER_FIFO_ISEMPTY(*p_adec->p_fifo) ) 
     {
-        if (p_adec->b_die) 
+        if (p_adec->p_fifo->b_die) 
         {
             vlc_mutex_unlock ( &p_adec->p_fifo->data_lock );
             return -1;
@@ -185,13 +186,13 @@ static void RunThread (adec_thread_t * p_adec)
     /* Initializing the audio decoder thread */
     if( InitThread (p_adec) )
     {
-        p_adec->b_error = 1;
+        p_adec->p_fifo->b_error = 1;
     }
 
     sync = 0;
 
     /* Audio decoder thread's main loop */
-    while( (!p_adec->b_die) && (!p_adec->b_error) )
+    while( (!p_adec->p_fifo->b_die) && (!p_adec->p_fifo->b_error) )
     {
         s16 * buffer;
         adec_sync_info_t sync_info;
@@ -209,7 +210,7 @@ static void RunThread (adec_thread_t * p_adec)
             /* FIXME: is this really needed ?
             adec_byte_stream_next ( p_byte_stream ); */
 
-            if( p_adec->b_die || p_adec->b_error )
+            if( p_adec->p_fifo->b_die || p_adec->p_fifo->b_error )
             {
                 goto bad_frame;
             }
@@ -257,7 +258,7 @@ static void RunThread (adec_thread_t * p_adec)
     }
 
     /* If b_error is set, the audio decoder thread enters the error loop */
-    if( p_adec->b_error ) 
+    if( p_adec->p_fifo->b_error ) 
     {
         ErrorThread( p_adec );
     }
@@ -280,7 +281,7 @@ static void ErrorThread ( adec_thread_t *p_adec )
     vlc_mutex_lock ( &p_adec->p_fifo->data_lock );
 
     /* Wait until a `die' order is sent */
-    while ( !p_adec->b_die ) 
+    while ( !p_adec->p_fifo->b_die ) 
     {
         /* Trash all received PES packets */
         while ( !DECODER_FIFO_ISEMPTY(*p_adec->p_fifo) ) 

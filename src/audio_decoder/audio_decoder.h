@@ -2,6 +2,7 @@
  * audio_decoder.h : audio decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: audio_decoder.h,v 1.3 2000/12/21 13:25:50 massiot Exp $
  *
  * Authors:
  * Michel Kaempf <maxx@via.ecp.fr>
@@ -30,8 +31,6 @@ typedef struct adec_thread_s
      * Thread properties
      */
     vlc_thread_t        thread_id;                /* id for thread functions */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_error;                             /* `error' flag */
 
     /*
      * Input properties

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.9 2000/12/21 12:38:27 massiot Exp $
+ * $Id: input_programs.c,v 1.10 2000/12/21 13:25:51 massiot Exp $
  *
  * Authors:
  *
@@ -347,7 +347,7 @@ static int InitDecConfig( input_thread_t * p_input, es_descriptor_t * p_es,
     vlc_mutex_init(&p_config->p_decoder_fifo->data_lock);
     vlc_cond_init(&p_config->p_decoder_fifo->data_wait);
     p_config->p_decoder_fifo->i_start = p_config->p_decoder_fifo->i_end = 0;
-    p_config->p_decoder_fifo->b_die = 0;
+    p_config->p_decoder_fifo->b_die = p_config->p_decoder_fifo->b_error = 0;
     p_config->p_decoder_fifo->p_packets_mgt = p_input->p_method_data;
     p_config->p_decoder_fifo->pf_delete_pes =
         p_input->p_plugin->pf_delete_pes;

@@ -28,10 +28,6 @@ typedef struct spudec_thread_s
     /*
      * Thread properties and locks
      */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_run;                                 /* `run' flag */
-    boolean_t           b_active;                           /* `active' flag */
-    boolean_t           b_error;                             /* `error' flag */
     vlc_thread_t        thread_id;                /* id for thread functions */
 
     /*

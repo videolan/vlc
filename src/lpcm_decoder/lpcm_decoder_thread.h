@@ -2,6 +2,7 @@
  * lpcm_decoder_thread.h : lpcm decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: lpcm_decoder_thread.h,v 1.2 2000/12/21 13:25:51 massiot Exp $
  *
  * Authors:
  *
@@ -30,8 +31,6 @@ typedef struct lpcmdec_thread_s
      * Thread properties
      */
     vlc_thread_t        thread_id;                /* id for thread functions */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_error;                             /* `error' flag */
 
     /*
      * Input properties

@@ -2,6 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: ac3_decoder_thread.c,v 1.19 2000/12/21 13:25:50 massiot Exp $
  *
  * Authors:
  *
@@ -88,8 +89,6 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
     /*
      * Initialize the thread properties
      */
-    p_ac3dec->b_die = 0;
-    p_ac3dec->b_error = 0;
     p_ac3dec->p_config = p_config;
     p_ac3dec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
@@ -175,7 +174,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
     /* Initializing the ac3 decoder thread */
     if (InitThread (p_ac3dec)) /* XXX?? */
     {
-        p_ac3dec->b_error = 1;
+        p_ac3dec->p_fifo->b_error = 1;
     }
 
     sync = 0;
@@ -183,7 +182,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
 
     /* ac3 decoder thread's main loop */
     /* FIXME : do we have enough room to store the decoded frames ?? */
-    while ((!p_ac3dec->b_die) && (!p_ac3dec->b_error))
+    while ((!p_ac3dec->p_fifo->b_die) && (!p_ac3dec->p_fifo->b_error))
     {
         s16 * buffer;
         ac3_sync_info_t sync_info;
@@ -201,17 +200,17 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
             {
                 ac3_byte_stream_next (p_byte_stream);
             } while ((!p_ac3dec->sync_ptr) &&
-                    (!p_ac3dec->b_die) &&
-                    (!p_ac3dec->b_error));
+                    (!p_ac3dec->p_fifo->b_die) &&
+                    (!p_ac3dec->p_fifo->b_error));
             /* skip the specified number of bytes */
 
-            if( p_ac3dec->b_die || p_ac3dec->b_error )
+            if( p_ac3dec->p_fifo->b_die || p_ac3dec->p_fifo->b_error )
             {
                 goto bad_frame;
             }
 
             ptr = p_ac3dec->sync_ptr;
-            while (--ptr && (!p_ac3dec->b_die) && (!p_ac3dec->b_error))
+            while (--ptr && (!p_ac3dec->p_fifo->b_die) && (!p_ac3dec->p_fifo->b_error))
             {
                 if (p_byte_stream->p_byte >= p_byte_stream->p_end)
                 {
@@ -220,7 +219,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
                 p_byte_stream->p_byte++;
             }
 
-            if( p_ac3dec->b_die || p_ac3dec->b_error )
+            if( p_ac3dec->p_fifo->b_die || p_ac3dec->p_fifo->b_error )
             {
                 goto bad_frame;
             }
@@ -265,7 +264,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
     }
 
     /* If b_error is set, the ac3 decoder thread enters the error loop */
-    if (p_ac3dec->b_error)
+    if (p_ac3dec->p_fifo->b_error)
     {
         ErrorThread (p_ac3dec);
     }
@@ -284,7 +283,7 @@ static void ErrorThread (ac3dec_thread_t * p_ac3dec)
     vlc_mutex_lock (&p_ac3dec->p_fifo->data_lock);
 
     /* Wait until a `die' order is sent */
-    while (!p_ac3dec->b_die)
+    while (!p_ac3dec->p_fifo->b_die)
     {
         /* Trash all received PES packets */
         while (!DECODER_FIFO_ISEMPTY(*p_ac3dec->p_fifo))

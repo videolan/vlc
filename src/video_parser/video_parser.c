@@ -2,6 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: video_parser.c,v 1.55 2000/12/21 13:25:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -97,8 +98,6 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
     /*
      * Initialize the thread properties
      */
-    p_vpar->b_die = 0;
-    p_vpar->b_error = 0;
     p_vpar->p_fifo = p_config->decoder_config.p_decoder_fifo;
     p_vpar->p_config = p_config;
 
@@ -231,20 +230,18 @@ static void RunThread( vpar_thread_t *p_vpar )
     /*
      * Initialize thread
      */
-    p_vpar->b_error = InitThread( p_vpar );
-
-    p_vpar->b_run = 1;
+    p_vpar->p_fifo->b_error = InitThread( p_vpar );
 
     /*
      * Main loop - it is not executed if an error occured during
      * initialization
      */
-    while( (!p_vpar->p_fifo->b_die) && (!p_vpar->b_error) )
+    while( (!p_vpar->p_fifo->b_die) && (!p_vpar->p_fifo->b_error) )
     {
         /* Find the next sequence header in the stream */
-        p_vpar->b_error = vpar_NextSequenceHeader( p_vpar );
+        p_vpar->p_fifo->b_error = vpar_NextSequenceHeader( p_vpar );
 
-        while( (!p_vpar->p_fifo->b_die) && (!p_vpar->b_error) )
+        while( (!p_vpar->p_fifo->b_die) && (!p_vpar->p_fifo->b_error) )
         {
 #ifdef STATS
             p_vpar->c_loops++;
@@ -261,12 +258,10 @@ static void RunThread( vpar_thread_t *p_vpar )
     /*
      * Error loop
      */
-    if( p_vpar->b_error )
+    if( p_vpar->p_fifo->b_error )
     {
         ErrorThread( p_vpar );
     }
-
-    p_vpar->b_run = 0;
 
     /* End of thread */
     EndThread( p_vpar );

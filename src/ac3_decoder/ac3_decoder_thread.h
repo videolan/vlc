@@ -2,6 +2,7 @@
  * ac3_decoder_thread.h : ac3 decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: ac3_decoder_thread.h,v 1.2 2000/12/21 13:25:50 massiot Exp $
  *
  * Authors:
  * Michel Kaempf <maxx@via.ecp.fr>
@@ -30,8 +31,6 @@ typedef struct ac3dec_thread_s
      * Thread properties
      */
     vlc_thread_t        thread_id;                /* id for thread functions */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_error;                             /* `error' flag */
 
     /*
      * Input properties

@@ -2,6 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: vpar_headers.c,v 1.60 2000/12/21 13:25:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -222,7 +223,7 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_ma
         if( (p_matrix->pi_matrix = (int *)malloc( 64*sizeof(int) )) == NULL )
         {
             intf_ErrMsg( "vpar error: allocation error in LoadMatrix()\n" );
-            p_vpar->b_error = 1;
+            p_vpar->p_fifo->b_error = 1;
             return;
         }
         p_matrix->b_allocated = 1;
@@ -674,7 +675,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
              == NULL )
         {
             intf_DbgMsg("vpar debug: allocation error in vout_CreatePicture, delaying\n");
-            if( p_vpar->p_fifo->b_die || p_vpar->b_error )
+            if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
             {
                 return;
             }
@@ -737,7 +738,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
     vpar_PictureData( p_vpar, i_mb_base );
 
-    if( p_vpar->p_fifo->b_die || p_vpar->b_error )
+    if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
     {
         return;
     }

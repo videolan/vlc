@@ -82,8 +82,8 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
     /*
      * Initialize the thread properties
      */
-    p_spudec->b_die = 0;
-    p_spudec->b_error = 0;
+    p_spudec->p_fifo->b_die = 0;
+    p_spudec->p_fifo->b_error = 0;
     p_spudec->p_config = p_config;
     p_spudec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
@@ -138,15 +138,13 @@ static void RunThread( spudec_thread_t *p_spudec )
     /*
      * Initialize thread and free configuration
      */
-    p_spudec->b_error = InitThread( p_spudec );
-
-    p_spudec->b_run = 1;
+    p_spudec->p_fifo->b_error = InitThread( p_spudec );
 
     /*
      * Main loop - it is not executed if an error occured during
      * initialization
      */
-    while( (!p_spudec->b_die) && (!p_spudec->b_error) )
+    while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
     {
         int i_packet_size;
         int i_rle_size;
@@ -168,7 +166,7 @@ static void RunThread( spudec_thread_t *p_spudec )
             }
             while( i_packet_size == 0xff );
 
-            if( p_spudec->b_die )
+            if( p_spudec->p_fifo->b_die )
                 break;
 
             /* the total size - should equal the sum of the
@@ -316,12 +314,10 @@ static void RunThread( spudec_thread_t *p_spudec )
     /*
      * Error loop
      */
-    if( p_spudec->b_error )
+    if( p_spudec->p_fifo->b_error )
     {
         ErrorThread( p_spudec );
     }
-
-    p_spudec->b_run = 0;
 
     /* End of thread */
     EndThread( p_spudec );
@@ -341,7 +337,7 @@ static void ErrorThread( spudec_thread_t *p_spudec )
     vlc_mutex_lock( &p_spudec->p_fifo->data_lock );
 
     /* Wait until a `die' order is sent */
-    while( !p_spudec->b_die )
+    while( !p_spudec->p_fifo->b_die )
     {
         /* Trash all received PES packets */
         while( !DECODER_FIFO_ISEMPTY(*p_spudec->p_fifo) )

@@ -65,6 +65,7 @@ typedef struct decoder_fifo_s
 
     /* Communication interface between input and decoders */
     boolean_t               b_die;          /* the decoder should return now */
+    boolean_t               b_error;      /* the decoder is in an error loop */
     void *                  p_packets_mgt;   /* packets management services
                                               * data (netlist...)            */
     void                 (* pf_delete_pes)( void *, pes_packet_t * );

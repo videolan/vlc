@@ -2,6 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: lpcm_decoder_thread.c,v 1.5 2000/12/21 13:25:51 massiot Exp $
  *
  * Authors:
  *
@@ -76,8 +77,6 @@ vlc_thread_t lpcmdec_CreateThread (adec_config_t * p_config)
     /*
      * Initialize the thread properties
      */
-    p_lpcmdec->b_die = 0;
-    p_lpcmdec->b_error = 0;
     p_lpcmdec->p_config = p_config;
     p_lpcmdec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
@@ -118,7 +117,7 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
      * beginning of the input stream */
     vlc_mutex_lock (&p_lpcmdec->p_fifo->data_lock);
     while (DECODER_FIFO_ISEMPTY(*p_lpcmdec->p_fifo)) {
-        if (p_lpcmdec->b_die) {
+        if (p_lpcmdec->p_fifo->b_die) {
             vlc_mutex_unlock (&p_lpcmdec->p_fifo->data_lock);
             return -1;
         }
@@ -161,7 +160,7 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
     /* Initializing the lpcm decoder thread */
     if (InitThread (p_lpcmdec)) 
     {
-        p_lpcmdec->b_error = 1;
+        p_lpcmdec->p_fifo->b_error = 1;
     }
 
     sync = 0;
@@ -170,7 +169,7 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
     /* lpcm decoder thread's main loop */
     /* FIXME : do we have enough room to store the decoded frames ?? */
    
-    while ((!p_lpcmdec->b_die) && (!p_lpcmdec->b_error))
+    while ((!p_lpcmdec->p_fifo->b_die) && (!p_lpcmdec->p_fifo->b_error))
     {
 	    s16 * buffer;
 	    lpcm_sync_info_t sync_info;
@@ -210,7 +209,7 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
     }
 
     /* If b_error is set, the lpcm decoder thread enters the error loop */
-    if (p_lpcmdec->b_error)
+    if (p_lpcmdec->p_fifo->b_error)
     {
         ErrorThread (p_lpcmdec);
     }
@@ -229,7 +228,7 @@ static void ErrorThread (lpcmdec_thread_t * p_lpcmdec)
     vlc_mutex_lock (&p_lpcmdec->p_fifo->data_lock);
 
     /* Wait until a `die' order is sent */
-    while (!p_lpcmdec->b_die) {
+    while (!p_lpcmdec->p_fifo->b_die) {
         /* Trash all received PES packets */
         while (!DECODER_FIFO_ISEMPTY(*p_lpcmdec->p_fifo)) {
             p_lpcmdec->p_fifo->pf_delete_pes(p_lpcmdec->p_fifo->p_packets_mgt,
