@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.7 2003/10/29 12:23:50 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.8 2003/10/29 23:31:57 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -135,6 +135,78 @@ vlc_bool_t ConfigControl::IsAdvanced()
 /*****************************************************************************
  * KeyConfigControl implementation
  *****************************************************************************/
+static wxString KeysList[] =
+{
+    wxT("Unset"),
+    wxT("Left"),
+    wxT("Right"),
+    wxT("Up"),
+    wxT("Down"),
+    wxT("Space"),
+    wxT("Enter"),
+    wxT("F1"),
+    wxT("F2"),
+    wxT("F3"),
+    wxT("F4"),
+    wxT("F5"),
+    wxT("F6"),
+    wxT("F7"),
+    wxT("F8"),
+    wxT("F9"),
+    wxT("F10"),
+    wxT("F11"),
+    wxT("F12"),
+    wxT("Home"),
+    wxT("End"),
+    wxT("Menu"),
+    wxT("Esc"),
+    wxT("Page Up"),
+    wxT("Page Down"),
+    wxT("Tab"),
+    wxT("Backspace"),
+    wxT("a"),
+    wxT("b"),
+    wxT("c"),
+    wxT("d"),
+    wxT("e"),
+    wxT("f"),
+    wxT("g"),
+    wxT("h"),
+    wxT("i"),
+    wxT("j"),
+    wxT("k"),
+    wxT("l"),
+    wxT("m"),
+    wxT("n"),
+    wxT("o"),
+    wxT("p"),
+    wxT("q"),
+    wxT("r"),
+    wxT("s"),
+    wxT("t"),
+    wxT("u"),
+    wxT("v"),
+    wxT("w"),
+    wxT("x"),
+    wxT("y"),
+    wxT("z"),
+    wxT("+"),
+    wxT("="),
+    wxT("-"),
+    wxT(","),
+    wxT("."),
+    wxT("<"),
+    wxT(">"),
+    wxT("`"),
+    wxT("/"),
+    wxT(";"),
+    wxT("'"),
+    wxT("\\"),
+    wxT("["),
+    wxT("]"),
+    wxT("*")
+};
+
 KeyConfigControl::KeyConfigControl( module_config_t *p_item, wxWindow *parent )
   : ConfigControl( p_item, parent )
 {
@@ -145,14 +217,14 @@ KeyConfigControl::KeyConfigControl( module_config_t *p_item, wxWindow *parent )
     ctrl->SetValue( p_item->i_value & KEY_MODIFIER_CTRL );
     shift = new wxCheckBox( this, -1, wxU(_("Shift")) );
     shift->SetValue( p_item->i_value & KEY_MODIFIER_SHIFT );
-    combo = new wxComboBox( this, -1, wxU("f"), wxDefaultPosition,
-                            wxDefaultSize, 0, NULL, wxCB_READONLY );
-    for( unsigned int i = 0; i < sizeof(keys)/sizeof(key_descriptor_s); i++ )
+    combo = new wxComboBox( this, -1, wxT(""), wxDefaultPosition,
+                            wxDefaultSize, WXSIZEOF(KeysList), KeysList,
+                            wxCB_READONLY );
+    for( unsigned int i = 0; i < WXSIZEOF(KeysList); i++ )
     {
-        /* HPReg says casting the int to void * is fine */
-        combo->Append( wxU(_(keys[i].psz_key_string)),
-                       (void*)keys[i].i_key_code );
-        if( keys[i].i_key_code == ( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ) )
+        combo->SetClientData( i, (void*)keys[i].i_key_code );
+        if( keys[i].i_key_code ==
+            ( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ) )
         {
             combo->SetSelection( i );
             combo->SetValue( wxU(_(keys[i].psz_key_string)) );
