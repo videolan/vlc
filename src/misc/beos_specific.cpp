@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.cpp,v 1.7 2001/04/12 01:52:45 sam Exp $
+ * $Id: beos_specific.cpp,v 1.8 2001/04/12 08:24:30 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -62,7 +62,7 @@ void system_Create( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     app_info info; 
     
     be_app = NULL;
-    vlc_thread_create( &beos_app_thread, "app thread", (vlc_thread_func_t)beos_AppThread, 0 );
+    vlc_thread_create( &beos_app_thread, "app thread", (vlc_thread_func_t)system_AppThread, 0 );
     while( be_app == NULL )
         msleep( 5000 );
     
