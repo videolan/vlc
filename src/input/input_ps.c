@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.13 2000/12/26 19:14:47 massiot Exp $
+ * $Id: input_ps.c,v 1.14 2000/12/27 09:54:53 sam Exp $
  *
  * Authors: 
  *
@@ -361,7 +361,7 @@ static int PSRead( input_thread_t * p_input,
         memcpy( p_data->p_buffer, p_header, 6 );
 
         /* Read the remaining of the packet. */
-        if( (i_error =
+        if( i_packet_size && (i_error =
                 SafeRead( p_input, p_data->p_buffer + 6, i_packet_size )) )
         {
             return( i_error );
