@@ -2,7 +2,7 @@
  * dts.c: DTS basic parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.1 2003/03/09 20:07:47 jlj Exp $
+ * $Id: dts.c,v 1.2 2003/03/10 08:23:45 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -400,7 +400,16 @@ static int SyncInfo( const byte_t * p_buf, unsigned int * pi_channels,
             break;
 
         default:
-            return( 0 );
+            if( i_audio_mode <= 63 )
+            {
+                /* User defined */
+                *pi_channels = 0; 
+            }
+            else
+            {
+                return( 0 );
+            }
+            break;
     }
 
     if( i_sample_rate >= sizeof( ppi_dts_samplerate ) /
