@@ -8,4 +8,10 @@ EXTRA_DIST = \
 	release-howto.txt \
 	web-streaming.html
 	vlc-howto.sgml \
+	faq/Makefile \
+	faq/faq-alone.sgml \
+	faq/faq.sgml \
+	common/stylesheet-html.dsl \
+	common/stylesheet-print-noicones.dsl \
+	lirc/example.lircrc \
 	$(NULL)
