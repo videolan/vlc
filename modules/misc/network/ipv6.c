@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.15 2004/01/25 17:20:19 kuehne Exp $
+ * $Id: ipv6.c,v 1.16 2004/02/15 22:20:56 gbazin Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -165,9 +165,8 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
 #else
         memset(&hints, 0, sizeof(hints));
         hints.ai_family = AF_INET6;
-        hints.ai_flags = AI_NUMERICHOST;
 
-        if( _getaddrinfo( psz_address, NULL, &hints, &res ) )
+        if( _getaddrinfo( psz_address, NULL, &hints, &res ) != 0 )
         {
             FreeLibrary( wship6_dll );
             free( psz_backup );
@@ -198,7 +197,10 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
                  p_hostent->h_length );
 
 #elif defined(WIN32)
-        if( _getaddrinfo( psz_address, NULL, &hints, &res ) )
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_INET6;
+
+        if( _getaddrinfo( psz_address, NULL, &hints, &res ) != 0 )
         {
             FreeLibrary( wship6_dll );
             free( psz_backup );
