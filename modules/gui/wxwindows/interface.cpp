@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.1 2002/11/18 13:02:16 gbazin Exp $
+ * $Id: interface.cpp,v 1.2 2002/11/18 15:19:26 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -84,12 +84,12 @@ enum
     PlayStream_Event,
     PauseStream_Event,
     PrevStream_Event,
-    NextStream_Event
+    NextStream_Event,
 
     /* it is important for the id corresponding to the "About" command to have
      * this standard value as otherwise it won't be handled properly under Mac
      * (where it is special and put into the "Apple" menu) */
-    About_Event = wxID_ABOUT,
+    About_Event = wxID_ABOUT
 };
 
 BEGIN_EVENT_TABLE(Interface, wxFrame)
