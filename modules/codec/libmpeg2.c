@@ -54,7 +54,6 @@ struct decoder_sys_t
     /*
      * Input properties
      */
-    pes_packet_t     *p_pes;                  /* current PES we are decoding */
     mtime_t          i_pts;
     mtime_t          i_previous_pts;
     mtime_t          i_current_pts;
@@ -123,7 +122,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Initialize the thread properties */
     memset( p_sys, 0, sizeof(decoder_sys_t) );
-    p_sys->p_pes      = NULL;
     p_sys->p_mpeg2dec = NULL;
     p_sys->p_synchro  = NULL;
     p_sys->p_info     = NULL;
