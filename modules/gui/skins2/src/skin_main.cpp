@@ -2,7 +2,7 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.8 2004/02/29 14:05:14 asmax Exp $
+ * $Id: skin_main.cpp,v 1.9 2004/02/29 17:36:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -140,11 +140,6 @@ static void Close( vlc_object_t *p_this )
     VarManager::destroy( p_intf );
     VlcProc::destroy( p_intf );
     OSFactory::destroy( p_intf );
-
-    if( p_intf->p_sys->p_input )
-    {
-        vlc_object_release( p_intf->p_sys->p_input );
-    }
 
     if( p_intf->p_sys->p_playlist )
     {
