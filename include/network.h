@@ -164,9 +164,53 @@ static inline void vlc_UrlClean( vlc_url_t *url )
     url->psz_path     = NULL;
     url->psz_option   = NULL;
 }
+                    
+/*****************************************************************************
+ * vlc_b64_encode:
+ *****************************************************************************
+ *
+ *****************************************************************************/
+static inline char *vlc_b64_encode( unsigned char *src )
+{
+    static const char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+                                                                                
+    char *dst = malloc( strlen( src ) * 4 / 3 + 12 );
+    char *ret = dst;
+    unsigned i_bits = 0;
+    unsigned i_shift = 0;
+                                                                                
+    for( ;; )
+    {
+        if( *src )
+        {
+            i_bits = ( i_bits << 8 )|( *src++ );
+            i_shift += 8;
+        }
+        else if( i_shift > 0 )
+        {
+           i_bits <<= 6 - i_shift;
+           i_shift = 6;
+        }
+        else
+        {
+            *dst++ = '=';
+            break;
+        }
+                                                                                
+        while( i_shift >= 6 )
+        {
+            i_shift -= 6;
+            *dst++ = b64[(i_bits >> i_shift)&0x3f];
+        }
+    }
+                                                                                
+    *dst++ = '\0';
+                                                                                
+    return ret;
+}
 
 #define net_OpenTCP(a, b, c) __net_OpenTCP(VLC_OBJECT(a), b, c)
-VLC_EXPORT( int, __net_OpenTCP, ( vlc_object_t *p_this, char *psz_host, int i_port ) );
+VLC_EXPORT( int, __net_OpenTCP, ( vlc_object_t *p_this, const char *psz_host, int i_port ) );
 
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_ListenTCP, ( vlc_object_t *p_this, char *psz_localaddr, int i_port ) );

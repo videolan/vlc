@@ -130,7 +130,6 @@ static int Control( access_t *, int, va_list );
 /* */
 static void ParseURL( access_sys_t *, char *psz_url );
 static int  Connect( access_t *, int64_t );
-static char *b64_encode( unsigned char *src );
 
 /*****************************************************************************
  * Open:
@@ -685,7 +684,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
         asprintf( &buf, "%s:%s", p_sys->psz_user,
                    p_sys->psz_passwd ? p_sys->psz_passwd : "" );
 
-        b64 = b64_encode( buf );
+        b64 = vlc_b64_encode( buf );
 
         net_Printf( VLC_OBJECT(p_access), p_sys->fd,
                     "Authorization: Basic %s\r\n", b64 );
@@ -818,44 +817,3 @@ error:
     return VLC_EGENERIC;
 }
 
-/*****************************************************************************
- * b64_encode:
- *****************************************************************************/
-static char *b64_encode( unsigned char *src )
-{
-    static const char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-    char *dst = malloc( strlen( src ) * 4 / 3 + 12 );
-    char *ret = dst;
-    unsigned i_bits = 0;
-    unsigned i_shift = 0;
-
-    for( ;; )
-    {
-        if( *src )
-        {
-            i_bits = ( i_bits << 8 )|( *src++ );
-            i_shift += 8;
-        }
-        else if( i_shift > 0 )
-        {
-           i_bits <<= 6 - i_shift;
-           i_shift = 6;
-        }
-        else
-        {
-            *dst++ = '=';
-            break;
-        }
-
-        while( i_shift >= 6 )
-        {
-            i_shift -= 6;
-            *dst++ = b64[(i_bits >> i_shift)&0x3f];
-        }
-    }
-
-    *dst++ = '\0';
-
-    return ret;
-}
