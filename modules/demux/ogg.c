@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.49 2003/12/04 22:37:02 gbazin Exp $
+ * $Id: ogg.c,v 1.50 2003/12/15 23:31:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -324,6 +324,11 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
               }
               p_stream->b_force_backup = 0;
               p_stream->i_packets_backup = 0;
+
+              if( p_oggpacket->granulepos >= 0 )
+                  Ogg_UpdatePCR( p_stream, p_oggpacket );
+
+              p_stream->i_previous_pcr = 0;
               return;
           }
           break;
@@ -1085,7 +1090,8 @@ static void Ogg_EndOfStream( input_thread_t *p_input, demux_sys_t *p_ogg )
 #define p_stream p_ogg->pp_stream[i_stream]
     for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
     {
-        es_out_Del( p_input->p_es_out, p_stream->p_es );
+        if( p_stream->p_es )
+            es_out_Del( p_input->p_es_out, p_stream->p_es );
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.i_mux_rate -= (p_stream->fmt.i_bitrate / ( 8 * 50 ));
