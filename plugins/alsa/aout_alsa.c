@@ -28,10 +28,7 @@
 #include "defs.h"
 
 #include <errno.h>                                                 /* ENOMEM */
-#include <fcntl.h>                                       /* open(), O_WRONLY */
-#include <sys/ioctl.h>                                            /* ioctl() */
 #include <string.h>                                            /* strerror() */
-#include <unistd.h>                                      /* write(), close() */
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
@@ -66,11 +63,11 @@ typedef struct alsa_card_s
 
 typedef struct aout_sys_s
 {
-	snd_pcm_t * p_alsa_handle;
-    alsa_device_t * p_alsa_device;
-    alsa_card_t * p_alsa_card;
+	snd_pcm_t         * p_alsa_handle;
+    alsa_device_t       s_alsa_device;
+    alsa_card_t         s_alsa_card;
     snd_pcm_channel_params_t s_alsa_channel_params;
-    snd_pcm_format_t s_alsa_format;
+    snd_pcm_format_t    s_alsa_format;
 } aout_sys_t;
 
 
@@ -88,22 +85,14 @@ int aout_AlsaOpen( aout_thread_t *p_aout )
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
+        intf_ErrMsg("Alsa Plugin : Could not allocate memory\n");
         intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
         return( 1 );
     }
 
-    p_aout->p_sys->p_alsa_device = malloc( sizeof( alsa_device_t) );
-    p_aout->p_sys->p_alsa_card = malloc( sizeof( alsa_device_t ) );
-    if( ( p_aout->p_sys->p_alsa_device == NULL ) || 
-            ( p_aout->p_sys->p_alsa_card == NULL ) )
-    {
-        intf_ErrMsg ( "error: %s\n", strerror(ENOMEM) );
-        return ( 1 );
-    }
-
     /* Initialize  */
-    p_aout->p_sys->p_alsa_device->i_num = 0;
-    p_aout->p_sys->p_alsa_card->i_num = 0;
+    p_aout->p_sys->s_alsa_device.i_num = 0;
+    p_aout->p_sys->s_alsa_card.i_num = 0;
     /* FIXME : why not other format ? */
     p_aout->i_format = AOUT_FMT_S16_LE;   
     /* FIXME : why always 2 channels ?*/
@@ -112,18 +101,18 @@ int aout_AlsaOpen( aout_thread_t *p_aout )
     
     /* Open device */
     if ( ( i_open_returns = snd_pcm_open( &(p_aout->p_sys->p_alsa_handle),
-                p_aout->p_sys->p_alsa_card->i_num,
-                p_aout->p_sys->p_alsa_device->i_num,
+                p_aout->p_sys->s_alsa_card.i_num,
+                p_aout->p_sys->s_alsa_device.i_num,
                 SND_PCM_OPEN_PLAYBACK ) ) )
     {
-        intf_ErrMsg ( "could not open alsa device; error code : %i\n",
+        intf_ErrMsg ( "Could not open alsa device; exit = %i\n",
                 i_open_returns );
+        intf_ErrMsg ( "This means : %s\n\n",snd_strerror(i_open_returns) );
         return ( 1 );
     }
 
+    intf_DbgMsg("Alsa plugin : Alsa device successfully opened\n");
     return ( 0 );
-
-    intf_ErrMsg("Alsa device open \n\n");
 }
 
 
@@ -156,7 +145,6 @@ int aout_AlsaSetFormat ( aout_thread_t *p_aout )
     else
         p_aout->p_sys->s_alsa_channel_params.format.format = 
             SND_PCM_SFMT_S16_BE;
-
     p_aout->p_sys->s_alsa_channel_params.format.rate = p_aout->l_rate;
     p_aout->p_sys->s_alsa_channel_params.format.voices = p_aout->i_channels ;
     
@@ -167,8 +155,10 @@ int aout_AlsaSetFormat ( aout_thread_t *p_aout )
     /* Buffer information . I have chosen the stream mode here
      * instead of the block mode. I don't know whether i'm wrong 
      * but it seemed more logical */
+    /* TODO : find the best value to put here. Probably depending
+     * on many parameters */
     p_aout->p_sys->s_alsa_channel_params.buf.stream.queue_size = 131072; 
-    /* Fill with silence */
+    
     p_aout->p_sys->s_alsa_channel_params.buf.stream.fill = SND_PCM_FILL_NONE ;
     p_aout->p_sys->s_alsa_channel_params.buf.stream.max_fill = 0 ; 
   
@@ -200,7 +190,7 @@ int aout_AlsaSetFormat ( aout_thread_t *p_aout )
         return ( 1 );
     }
     
-    /* then we may go */
+   /* then we may go */
    i_playback_go_returns =
        snd_pcm_playback_go ( p_aout->p_sys->p_alsa_handle );
     if ( i_playback_go_returns )
@@ -256,6 +246,7 @@ long aout_AlsaGetBufInfo ( aout_thread_t *p_aout, long l_buffer_limit )
     int i_alsa_get_status_returns;
     
     memset (&alsa_channel_status, 0, sizeof(alsa_channel_status));
+   
     i_alsa_get_status_returns = snd_pcm_channel_status ( 
             p_aout->p_sys->p_alsa_handle, &alsa_channel_status );
 
@@ -273,20 +264,20 @@ long aout_AlsaGetBufInfo ( aout_thread_t *p_aout, long l_buffer_limit )
         case SND_PCM_STATUS_NOTREADY : intf_ErrMsg("Status NOT READY \n \n");
                                        break;
         case SND_PCM_STATUS_UNDERRUN : {
-                                       int i_drain_returns;
+                                       int i_prepare_returns;
                                        intf_ErrMsg(
-                                  "Status UNDERRUN ... draining \n \n");
-                                       i_drain_returns = 
+                                  "Status UNDERRUN ... reseting queue \n \n");
+                                       i_prepare_returns = 
                                            snd_pcm_playback_prepare(
                                                p_aout->p_sys->p_alsa_handle );
-                                       if ( i_drain_returns )
+                                       if ( i_prepare_returns )
                                        {
                                            intf_ErrMsg(
                                   "Error : could not flush : %i\n",
-                                  i_drain_returns);
+                                  i_prepare_returns);
                                            intf_ErrMsg(
                                   "This means : %s\n",
-                                  snd_strerror(i_drain_returns));
+                                  snd_strerror(i_prepare_returns));
                                        }
                                        break;
                                        }
@@ -325,4 +316,7 @@ void aout_AlsaClose ( aout_thread_t *p_aout )
         intf_ErrMsg( "Error closing alsa device; exit=%i\n",i_close_returns );
         intf_ErrMsg( "This means : %s\n\n",snd_strerror( i_close_returns ) );
     }
+    free(p_aout->p_sys);
+    
+    intf_DbgMsg( "Alsa plugin : Alsa device closed\n");
 }
