@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.67.2.1 2001/12/18 00:51:19 sam Exp $
+ * $Id: vout_sdl.c,v 1.67.2.2 2001/12/19 01:08:21 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -247,28 +247,35 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
-    /* This hack is hugly, but hey, you are, too. */
-
+    /* This hack is ugly, but hey, you are, too. */
     SDL_Overlay *   p_overlay;
+    char *          psz_title;
     
     p_overlay = SDL_CreateYUVOverlay( 
            main_GetIntVariable( VOUT_WIDTH_VAR,VOUT_WIDTH_DEFAULT ),
            main_GetIntVariable( VOUT_HEIGHT_VAR,VOUT_HEIGHT_DEFAULT ),
-                                      SDL_YV12_OVERLAY, 
-                                      p_vout->p_sys->p_display );
+           SDL_YV12_OVERLAY,
+           p_vout->p_sys->p_display );
 
     if( p_overlay == NULL )
     {
         intf_ErrMsg( "vout error: could not create SDL overlay" );
         p_vout->b_need_render = 1;
-        return( 0 );
+
+        psz_title = VOUT_TITLE " (RGB SDL output)";
+    }
+    else
+    {
+        p_vout->b_need_render = !p_overlay->hw_overlay;
+
+        psz_title = p_overlay->hw_overlay
+                            ? VOUT_TITLE " (hardware SDL output)"
+                            : VOUT_TITLE " (software SDL output)";
+
+        SDL_FreeYUVOverlay( p_overlay );
     }
 
-    intf_WarnMsg( 2, "vout: YUV acceleration %s",
-              p_overlay->hw_overlay ? "activated" : "unavailable !" ); 
-    p_vout->b_need_render = !p_overlay->hw_overlay;
-
-    SDL_FreeYUVOverlay( p_overlay );
+    SDL_WM_SetCaption( psz_title, psz_title );
 
     return( 0 );
 }
@@ -698,8 +705,6 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
     SDL_LockSurface( p_vout->p_sys->p_display );
 
-    SDL_WM_SetCaption( VOUT_TITLE " (SDL output)",
-                       VOUT_TITLE " (SDL output)" );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);                /* ignore keys up */
 
     if( p_vout->b_need_render )
