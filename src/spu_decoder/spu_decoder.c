@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.38 2001/04/28 03:36:25 sam Exp $
+ * $Id: spu_decoder.c,v 1.39 2001/05/01 12:22:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,6 +49,8 @@
 
 #include "spu_decoder.h"
 
+#include "main.h" /* XXX: remove this later */
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -83,10 +85,20 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
      * Initialize the thread properties
      */
     p_spudec->p_config = p_config;
+
     p_spudec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
-    /* Get the video output informations */
-    p_spudec->p_vout = p_config->p_vout;
+    /* XXX: The vout request and fifo opening will eventually be here */
+    if( p_spudec->p_vout == NULL )
+    {
+        if( p_main->p_vout == NULL )
+        {
+            intf_Msg( "vpar: no vout present, spawning one" );
+            p_main->p_vout = vout_CreateThread( NULL );
+        }
+
+        p_spudec->p_vout = p_main->p_vout;
+    }
 
     /* Spawn the spu decoder thread */
     if ( vlc_thread_create(&p_spudec->thread_id, "spu decoder",

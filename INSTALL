@@ -21,7 +21,7 @@ If you intend to debug stuff, you may want to disable optimizations:
    make distclean && ./configure --prefix=/usr --enable-gnome \
       --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
       --enable-mga --enable-gtk --enable-qt --enable-xvideo \
-      --disable-optimizatons
+      --enable-debug
 
 
 Building VideoLAN

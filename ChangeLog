@@ -4,6 +4,7 @@
 
 HEAD
 
+  * Fixed a segfault in the SPU decoder initialization.
   * Mandatory step for video output IV and the audio output quality
     fix: the output threads are now spawned when a decoder needs one,
     so it can decide the audio frequency or the video window size.

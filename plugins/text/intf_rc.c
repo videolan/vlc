@@ -212,8 +212,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
                 case 'f':
                 case 'F':
-                    p_intf->p_input->p_default_vout->i_changes |= 
-                        VOUT_FULLSCREEN_CHANGE;
+                    p_main->p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
                     break;
 
                 case 'm':

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.104 2001/05/01 04:18:18 sam Exp $
+ * $Id: input.c,v 1.105 2001/05/01 12:22:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -142,9 +142,6 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
     p_input->stream.control.b_bw = 0;
-
-    /* Initialize default settings for spawned decoders */
-    p_input->p_default_vout = p_main->p_vout;
 
     /* Create thread and set locks. */
     vlc_mutex_init( &p_input->stream.stream_lock );

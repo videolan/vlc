@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.31 2001/05/01 04:18:17 sam Exp $
+ * $Id: input_ext-dec.h,v 1.32 2001/05/01 12:22:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -515,8 +515,6 @@ struct vout_thread_s;
 
 typedef struct vdec_config_s
 {
-    struct vout_thread_s *  p_vout;
-
     struct picture_s *   (* pf_create_picture)( struct vout_thread_s *,
                                                 int i_type, int i_width,
                                                 int i_height );

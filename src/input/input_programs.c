@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.54 2001/05/01 04:18:18 sam Exp $
+ * $Id: input_programs.c,v 1.55 2001/05/01 12:22:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -171,9 +171,6 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
 
     p_input->stream.pp_programs[i_pgrm_index]->i_synchro_state
                                                 = SYNCHRO_START;
-
-    p_input->stream.pp_programs[i_pgrm_index]->p_vout
-                                            = p_input->p_default_vout;
 
     if( i_data_len )
     {
@@ -554,7 +551,6 @@ static vdec_config_t * GetVdecConfig( input_thread_t * p_input,
         intf_ErrMsg( "Unable to allocate memory in GetVdecConfig" );
         return( NULL );
     }
-    p_config->p_vout = p_input->p_default_vout;
     if( InitDecConfig( p_input, p_es, &p_config->decoder_config ) == -1 )
     {
         free( p_config );

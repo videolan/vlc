@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.35 2001/05/01 04:18:17 sam Exp $
+ * $Id: input_ext-intf.h,v 1.36 2001/05/01 12:22:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -131,9 +131,6 @@ typedef struct pgrm_descriptor_s
 
     /* Demultiplexer data */
     void *                  p_demux_data;
-
-    /* Decoders control */
-    struct vout_thread_s *  p_vout;
 
     int                     i_es_number;      /* size of the following array */
     es_descriptor_t **      pp_es;                /* array of pointers to ES */
@@ -301,9 +298,6 @@ typedef struct input_thread_s
 
     /* General stream description */
     stream_descriptor_t     stream;                            /* PAT tables */
-
-    /* For auto-launch of decoders */
-    struct vout_thread_s *  p_default_vout;
 
 #ifdef STATS
     count_t                 c_loops;
