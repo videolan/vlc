@@ -49,9 +49,6 @@ static int               Send( sout_stream_t *, sout_stream_id_t *, block_t * );
 
 static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, block_t *, block_t ** );
 
-void E_(process_frame)( sout_stream_t *p_stream,
-               sout_stream_id_t *id, block_t *in, block_t **out );
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -68,8 +65,8 @@ struct sout_stream_sys_t
 
     int             i_vbitrate;
     mtime_t         i_shaping_delay;
+    int             b_mpeg4_matrix;
 
-    mtime_t         i_first_frame;
     mtime_t         i_dts, i_pts;
 };
 
@@ -113,7 +110,11 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    p_sys->i_first_frame = 0;
+    p_sys->b_mpeg4_matrix = 0;
+    if( sout_cfg_find( p_stream->p_cfg, "mpeg4-matrix" ) )
+    {
+        p_sys->b_mpeg4_matrix = 1;
+    }
 
     msg_Dbg( p_stream, "codec video %dkb/s max gop="I64Fd"us",
              p_sys->i_vbitrate / 1024, p_sys->i_shaping_delay );
@@ -167,7 +168,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->i_next_gop_size = 0;
         memset( &id->tr, 0, sizeof( transrate_t ) );
         id->tr.bs.i_byte_in = id->tr.bs.i_byte_out = 0;
-        id->tr.fact_x = 1.0;
+        id->tr.mpeg4_matrix = p_sys->b_mpeg4_matrix;
 
         /* open output stream */
         id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
@@ -261,25 +262,19 @@ static int transrate_video_process( sout_stream_t *p_stream,
                                     / (id->i_next_gop_duration / 1000);
             mtime_t i_new_bitrate;
 
-            if ( i_bitrate > p_stream->p_sys->i_vbitrate )
-            {
-                tr->fact_x = (double)i_bitrate / p_stream->p_sys->i_vbitrate;
-            }
-            else
-            {
-                tr->fact_x = 1.0;
-            }
-            id->tr.i_current_gop_size = id->i_next_gop_size;
-            id->tr.i_wanted_gop_size = (p_stream->p_sys->i_vbitrate)
+            id->tr.i_total_input = id->i_next_gop_size;
+            id->tr.i_remaining_input = id->i_next_gop_size;
+            id->tr.i_wanted_output = (p_stream->p_sys->i_vbitrate)
                                     * (id->i_next_gop_duration / 1000) / 8000;
-            id->tr.i_new_gop_size = 0;
+            id->tr.i_current_output = 0;
 
             id->p_current_buffer = id->p_next_gop;
 
             while ( id->p_current_buffer != NULL )
             {
                 block_t * p_next = id->p_current_buffer->p_next;
-                if ( tr->fact_x == 1.0 )
+                if ( !p_stream->p_sys->b_mpeg4_matrix
+                       && id->tr.i_wanted_output >= id->tr.i_total_input )
                 {
                     bs->i_byte_out += id->p_current_buffer->i_buffer;
                     id->p_current_buffer->p_next = NULL;
@@ -287,25 +282,33 @@ static int transrate_video_process( sout_stream_t *p_stream,
                 }
                 else
                 {
-                    E_(process_frame)( p_stream, id, id->p_current_buffer, out );
-                    block_Release( id->p_current_buffer);
+                    if ( process_frame( p_stream, id, id->p_current_buffer,
+                                        out, 0 ) < 0 )
+                    {
+                        id->p_current_buffer->p_next = NULL;
+                        block_ChainAppend( out, id->p_current_buffer );
+                        if ( p_stream->p_sys->b_mpeg4_matrix )
+                            id->tr.i_wanted_output = id->tr.i_total_input;
+                    }
+                    else
+                    {
+                        block_Release( id->p_current_buffer );
+                    }
                 }
                 id->p_current_buffer = p_next;
             }
 
-            if ( tr->fact_x != 1.0 )
+            if ( id->tr.i_wanted_output < id->tr.i_total_input )
             {
-                i_new_bitrate = (mtime_t)tr->i_new_gop_size * 8000
-                                    / (id->i_next_gop_duration / 1001);
+                i_new_bitrate = (mtime_t)tr->i_current_output * 8000
+                                    / (id->i_next_gop_duration / 1000);
                 if (i_new_bitrate > p_stream->p_sys->i_vbitrate + 300000)
-                    msg_Err(p_stream, "%lld -> %lld (%f, r:%f) d=%lld",
-                            i_bitrate, i_new_bitrate, tr->fact_x,
-                            (float)i_bitrate / i_new_bitrate,
+                    msg_Err(p_stream, "%lld -> %lld d=%lld",
+                            i_bitrate, i_new_bitrate,
                             id->i_next_gop_duration);
-                    else
-                        msg_Dbg(p_stream, "%lld -> %lld (%f, r:%f) d=%lld",
-                            i_bitrate, i_new_bitrate, tr->fact_x,
-                            (float)i_bitrate / i_new_bitrate,
+                else
+                    msg_Dbg(p_stream, "%lld -> %lld d=%lld",
+                            i_bitrate, i_new_bitrate,
                             id->i_next_gop_duration);
             }
 

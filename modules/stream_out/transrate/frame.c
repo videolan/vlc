@@ -1,7 +1,7 @@
 /*****************************************************************************
  * frame.c: MPEG2 video transrating module
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003-2004 VideoLAN
  * Copyright (C) 2003 Antoine Missout
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -47,37 +47,6 @@
  * transrater, code from M2VRequantizer http://www.metakine.com/
  ****************************************************************************/
 
-/* This is awful magic --Meuuh */
-//#define REACT_DELAY (1024.0*128.0)
-#define REACT_DELAY (256.0)
-
-#define QUANT_I (1.7)
-
-#define QUANT_P (1.4)
-
-#define QUANT_P_INC (0.1)
-
-#define B_HANDICAP 5
-
-// notes:
-//
-// - intra block:
-//      - the quantiser is increment by one step
-//
-// - non intra block:
-//      - in P_FRAME we keep the original quantiser but drop the last coefficient
-//        if there is more than one
-//      - in B_FRAME we multiply the quantiser by a factor
-//
-// - I_FRAME is recoded when we're 5.0 * REACT_DELAY late
-// - P_FRAME is recoded when we're 2.5 * REACT_DELAY late
-// - B_FRAME are always recoded
-
-// if we're getting *very* late (60 * REACT_DELAY)
-//
-// - intra blocks quantiser is incremented two step
-// - drop a few coefficients but always keep the first one
-
 // useful constants
 enum
 {
@@ -87,273 +56,9 @@ enum
 };
 
 
-// gcc
-#ifdef HAVE_BUILTIN_EXPECT
-#define likely(x) __builtin_expect ((x) != 0, 1)
-#define unlikely(x) __builtin_expect ((x) != 0, 0)
-#else
-#define likely(x) (x)
-#define unlikely(x) (x)
-#endif
-
-#define BITS_IN_BUF (8)
-
-#define LOG(msg) fprintf (stderr, msg)
-#define LOGF(format, args...) fprintf (stderr, format, args)
-
-static inline void bs_write( bs_transrate_t *s, unsigned int val, int n)
-{
-    assert(n < 32);
-    assert(!(val & (0xffffffffU << n)));
-
-    while (unlikely(n >= s->i_bit_out))
-    {
-        s->p_w[0] = (s->i_bit_out_cache << s->i_bit_out ) | (val >> (n - s->i_bit_out));
-        s->p_w++;
-        n -= s->i_bit_out;
-        s->i_bit_out_cache = 0;
-        val &= ~(0xffffffffU << n);
-        s->i_bit_out = BITS_IN_BUF;
-    }
-
-    if (likely(n))
-    {
-        s->i_bit_out_cache = (s->i_bit_out_cache << n) | val;
-        s->i_bit_out -= n;
-    }
-
-    assert(s->i_bit_out > 0);
-    assert(s->i_bit_out <= BITS_IN_BUF);
-}
-
-static inline void bs_refill( bs_transrate_t *s )
-{
-    assert((s->p_r - s->p_c) >= 1);
-    s->i_bit_in_cache |= s->p_c[0] << (24 - s->i_bit_in);
-    s->i_bit_in += 8;
-    s->p_c++;
-}
-
-static inline void bs_flush( bs_transrate_t *s, unsigned int n )
-{
-    assert(s->i_bit_in >= n);
-
-    s->i_bit_in_cache <<= n;
-    s->i_bit_in -= n;
-
-    assert( (!n) || ((n>0) && !(s->i_bit_in_cache & 0x1)) );
-
-    while (unlikely(s->i_bit_in < 24)) bs_refill( s );
-}
-
-static inline unsigned int bs_read( bs_transrate_t *s, unsigned int n)
-{
-    unsigned int Val = ((unsigned int)s->i_bit_in_cache) >> (32 - n);
-    bs_flush( s, n );
-    return Val;
-}
-
-static inline unsigned int bs_copy( bs_transrate_t *s, unsigned int n)
-{
-    unsigned int Val = bs_read( s, n);
-    bs_write(s, Val, n);
-    return Val;
-}
-
-static inline void bs_flush_read( bs_transrate_t *s )
-{
-    int i = s->i_bit_in & 0x7;
-    if( i )
-    {
-        assert(((unsigned int)bs->i_bit_in_cache) >> (32 - i) == 0);
-        s->i_bit_in_cache <<= i;
-        s->i_bit_in -= i;
-    }
-    s->p_c += -1 * (s->i_bit_in >> 3);
-    s->i_bit_in = 0;
-}
-static inline void bs_flush_write( bs_transrate_t *s )
-{
-    if( s->i_bit_out != 8 ) bs_write(s, 0, s->i_bit_out);
-}
-
 /////---- begin ext mpeg code
 
-const uint8_t non_linear_mquant_table[32] =
-{
-    0, 1, 2, 3, 4, 5, 6, 7,
-    8,10,12,14,16,18,20,22,
-    24,28,32,36,40,44,48,52,
-    56,64,72,80,88,96,104,112
-};
-const uint8_t map_non_linear_mquant[113] =
-{
-    0,1,2,3,4,5,6,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15,16,16,
-    16,17,17,17,18,18,18,18,19,19,19,19,20,20,20,20,21,21,21,21,22,22,
-    22,22,23,23,23,23,24,24,24,24,24,24,24,25,25,25,25,25,25,25,26,26,
-    26,26,26,26,26,26,27,27,27,27,27,27,27,27,28,28,28,28,28,28,28,29,
-    29,29,29,29,29,29,29,29,29,30,30,30,30,30,30,30,31,31,31,31,31
-};
-
-static int scale_quant( unsigned int q_scale_type, double quant )
-{
-    int iquant;
-    if (q_scale_type)
-    {
-        iquant = (int) floor(quant+0.5);
-
-        /* clip mquant to legal (linear) range */
-        if (iquant<1) iquant = 1;
-        if (iquant>112) iquant = 112;
-
-        iquant = non_linear_mquant_table[map_non_linear_mquant[iquant]];
-    }
-    else
-    {
-        /* clip mquant to legal (linear) range */
-        iquant = (int)floor(quant+0.5);
-        if (iquant<2) iquant = 2;
-        if (iquant>62) iquant = 62;
-        iquant = (iquant/2)*2; // Must be *even*
-    }
-    return iquant;
-}
-
-static int increment_quant( transrate_t *tr, int quant )
-{
-    if( tr->q_scale_type )
-    {
-        assert(quant >= 1 && quant <= 112 );
-        quant = map_non_linear_mquant[quant] + 1;
-        if( tr->picture_coding_type == P_TYPE )
-            quant += tr->level_p;
-        if( quant > 31) quant = 31;
-        quant = non_linear_mquant_table[quant];
-    }
-    else
-    {
-        assert(!(quant & 1));
-        quant += 2;
-        if( tr->picture_coding_type == P_TYPE )
-            quant += 2 * tr->level_p;
-        if (quant > 62) quant = 62;
-    }
-    return quant;
-}
-
-static inline int intmax( register int x, register int y )
-{
-    return x < y ? y : x;
-}
-static inline int intmin( register int x, register int y )
-{
-    return x < y ? x : y;
-}
-
-static int getNewQuant( transrate_t *tr, int curQuant)
-{
-    bs_transrate_t *bs = &tr->bs;
-
-    double calc_quant, quant_to_use;
-    int mquant = 0;
-
-    switch ( tr->picture_coding_type )
-    {
-        case I_TYPE:
-        case P_TYPE:
-            mquant = increment_quant( tr, curQuant );
-            break;
-
-        case B_TYPE:
-            tr->quant_corr = (((bs->i_byte_in - (bs->p_r - 4 - bs->p_c)) / tr->fact_x) - (bs->i_byte_out + (bs->p_w - bs->p_ow))) / REACT_DELAY + B_HANDICAP;
-            calc_quant = curQuant * tr->current_fact_x;
-            quant_to_use = calc_quant - tr->quant_corr;
-
-            mquant = intmax(scale_quant( tr->q_scale_type, quant_to_use), increment_quant( tr, curQuant) );
-            break;
-
-        default:
-            assert(0);
-            break;
-    }
-
-    /*
-        LOGF("type: %s orig_quant: %3i calc_quant: %7.1f quant_corr: %7.1f using_quant: %3i\n",
-        (picture_coding_type == I_TYPE ? "I_TYPE" : (picture_coding_type == P_TYPE ? "P_TYPE" : "B_TYPE")),
-        (int)curQuant, (float)calc_quant, (float)quant_corr, (int)mquant);
-    */
-
-    assert(mquant >= curQuant);
-
-    return mquant;
-}
-
-static inline int isNotEmpty(RunLevel *blk)
-{
-    return (blk->level);
-}
-
 #include "putvlc.h"
-
-static void putAC( bs_transrate_t *bs, int run, int signed_level, int vlcformat)
-{
-    int level, len;
-    const VLCtable *ptab = NULL;
-
-    level = (signed_level<0) ? -signed_level : signed_level; /* abs(signed_level) */
-
-    assert(!(run<0 || run>63 || level==0 || level>2047));
-
-    len = 0;
-
-    if (run<2 && level<41)
-    {
-        if (vlcformat)  ptab = &dct_code_tab1a[run][level-1];
-        else ptab = &dct_code_tab1[run][level-1];
-        len = ptab->len;
-    }
-    else if (run<32 && level<6)
-    {
-        if (vlcformat) ptab = &dct_code_tab2a[run-2][level-1];
-        else ptab = &dct_code_tab2[run-2][level-1];
-        len = ptab->len;
-    }
-
-    if (len) /* a VLC code exists */
-    {
-        bs_write( bs, ptab->code, len);
-        bs_write( bs, signed_level<0, 1); /* sign */
-    }
-    else
-    {
-        bs_write( bs, 1l, 6); /* Escape */
-        bs_write( bs, run, 6); /* 6 bit code for run */
-        bs_write( bs, ((unsigned int)signed_level) & 0xFFF, 12);
-    }
-}
-
-
-static inline void putACfirst( bs_transrate_t *bs, int run, int val)
-{
-    if (run==0 && (val==1 || val==-1)) bs_write( bs, 2|(val<0),2);
-    else putAC( bs, run,val,0);
-}
-
-static void putnonintrablk( bs_transrate_t *bs, RunLevel *blk)
-{
-    assert(blk->level);
-
-    putACfirst( bs, blk->run, blk->level);
-    blk++;
-
-    while(blk->level)
-    {
-        putAC( bs, blk->run, blk->level, 0);
-        blk++;
-    }
-
-    bs_write( bs, 2,2);
-}
 
 #include "getvlc.h"
 
@@ -372,7 +77,7 @@ static inline int get_macroblock_modes( transrate_t *tr )
     int macroblock_modes;
     const MBtab * tab;
 
-    switch( tr->picture_coding_type)
+    switch( tr->picture_coding_type )
     {
         case I_TYPE:
 
@@ -380,7 +85,7 @@ static inline int get_macroblock_modes( transrate_t *tr )
             bs_flush( bs, tab->len );
             macroblock_modes = tab->modes;
 
-            if ((! ( tr->frame_pred_frame_dct)) && ( tr->picture_structure == FRAME_PICTURE))
+            if ((!(tr->frame_pred_frame_dct)) && (tr->picture_structure == FRAME_PICTURE))
             {
                 macroblock_modes |= UBITS (bs->i_bit_in_cache, 1) * DCT_TYPE_INTERLACED;
                 bs_flush( bs, 1 );
@@ -501,8 +206,11 @@ static inline int get_motion_delta( bs_transrate_t *bs, const int f_code )
         sign = SBITS (bs->i_bit_in_cache, 1);
         bs_copy( bs, 1 );
 
-        if (f_code) delta += UBITS (bs->i_bit_in_cache, f_code);
-        bs_copy( bs, f_code);
+        if (f_code)
+        {
+            delta += UBITS (bs->i_bit_in_cache, f_code);
+            bs_copy( bs, f_code);
+        }
 
         return (delta ^ sign) - sign;
     }
@@ -554,7 +262,7 @@ static inline int get_coded_block_pattern( bs_transrate_t *bs )
     }
 }
 
-static inline int get_luma_dc_dct_diff( bs_transrate_t *bs )
+static inline int get_luma_dc_dct_diff( bs_transrate_t *bs, uint32_t *bits, uint8_t *len )
 {
     const DCtab * tab;
     int size;
@@ -566,16 +274,20 @@ static inline int get_luma_dc_dct_diff( bs_transrate_t *bs )
         size = tab->size;
         if (size)
         {
-            bs_copy( bs, tab->len);
+            *bits = bs_read( bs, tab->len );
+            *len = tab->len;
             //dc_diff = UBITS (bs->i_bit_in_cache, size) - UBITS (SBITS (~bs->i_bit_in_cache, 1), size);
             dc_diff = UBITS (bs->i_bit_in_cache, size);
             if (!(dc_diff >> (size - 1))) dc_diff = (dc_diff + 1) - (1 << size);
-            bs_copy( bs, size);
+            *bits <<= size;
+            *bits |= bs_read( bs, size );
+            *len += size;
             return dc_diff;
         }
         else
         {
-            bs_copy( bs, 3);
+            *bits = bs_read( bs, 3 );
+            *len = 3;
             return 0;
         }
     }
@@ -583,16 +295,19 @@ static inline int get_luma_dc_dct_diff( bs_transrate_t *bs )
     {
         tab = DC_long + (UBITS (bs->i_bit_in_cache, 9) - 0x1e0);
         size = tab->size;
-        bs_copy( bs, tab->len);
+        *bits = bs_read( bs, tab->len );
+        *len = tab->len;
         //dc_diff = UBITS (bs->i_bit_in_cache, size) - UBITS (SBITS (~bs->i_bit_in_cache, 1), size);
         dc_diff = UBITS (bs->i_bit_in_cache, size);
         if (!(dc_diff >> (size - 1))) dc_diff = (dc_diff + 1) - (1 << size);
-        bs_copy( bs, size);
+        *bits <<= size;
+        *bits |= bs_read( bs, size );
+        *len += size;
         return dc_diff;
     }
 }
 
-static inline int get_chroma_dc_dct_diff( bs_transrate_t *bs )
+static inline int get_chroma_dc_dct_diff( bs_transrate_t *bs, uint32_t *bits, uint8_t *len )
 {
     const DCtab * tab;
     int size;
@@ -604,15 +319,20 @@ static inline int get_chroma_dc_dct_diff( bs_transrate_t *bs )
         size = tab->size;
         if (size)
         {
-            bs_copy( bs, tab->len);
+            *bits = bs_read( bs, tab->len );
+            *len = tab->len;
             //dc_diff = UBITS (bs->i_bit_in_cache, size) - UBITS (SBITS (~bs->i_bit_in_cache, 1), size);
             dc_diff = UBITS (bs->i_bit_in_cache, size);
             if (!(dc_diff >> (size - 1))) dc_diff = (dc_diff + 1) - (1 << size);
-            bs_copy( bs, size);
+            *bits <<= size;
+            *bits |= bs_read( bs, size );
+            *len += size;
             return dc_diff;
-        } else
+        }
+        else
         {
-            bs_copy( bs, 2);
+            *bits = bs_read( bs, 2 );
+            *len = 2;
             return 0;
         }
     }
@@ -620,438 +340,16 @@ static inline int get_chroma_dc_dct_diff( bs_transrate_t *bs )
     {
         tab = DC_long + (UBITS (bs->i_bit_in_cache, 10) - 0x3e0);
         size = tab->size;
-        bs_copy( bs, tab->len + 1);
+        *bits = bs_read( bs, tab->len + 1 );
+        *len = tab->len + 1;
         //dc_diff = UBITS (bs->i_bit_in_cache, size) - UBITS (SBITS (~bs->i_bit_in_cache, 1), size);
         dc_diff = UBITS (bs->i_bit_in_cache, size);
         if (!(dc_diff >> (size - 1))) dc_diff = (dc_diff + 1) - (1 << size);
-        bs_copy( bs, size);
+        *bits <<= size;
+        *bits |= bs_read( bs, size );
+        *len += size;
         return dc_diff;
     }
-}
-
-static void get_intra_block_B14( bs_transrate_t *bs, const int i_qscale, const int i_qscale_new )
-{
-    int tst;
-    int i, li;
-    int val;
-    const DCTtab * tab;
-
-    /* Basic sanity check --Meuuh */
-    if( i_qscale == 0 )
-    {
-        return;
-    }
-
-    tst = i_qscale_new/i_qscale + ((i_qscale_new%i_qscale) ? 1 : 0);
-
-    li = i = 0;
-
-    for( ;; )
-    {
-        if (bs->i_bit_in_cache >= 0x28000000)
-        {
-            tab = DCT_B14AC_5 + (UBITS (bs->i_bit_in_cache, 5) - 5);
-
-            i += tab->run;
-            if (i >= 64) break; /* end of block */
-
-    normal_code:
-            bs_flush( bs, tab->len );
-            val = tab->level;
-            if (val >= tst)
-            {
-                val = (val ^ SBITS (bs->i_bit_in_cache, 1)) - SBITS (bs->i_bit_in_cache, 1);
-                putAC( bs, i - li - 1, (val * i_qscale) / i_qscale_new, 0);
-                li = i;
-            }
-
-            bs_flush( bs, 1 );
-            continue;
-        }
-        else if (bs->i_bit_in_cache >= 0x04000000)
-        {
-            tab = DCT_B14_8 + (UBITS (bs->i_bit_in_cache, 8) - 4);
-
-            i += tab->run;
-            if (i < 64) goto normal_code;
-
-            /* escape code */
-            i += (UBITS (bs->i_bit_in_cache, 12) & 0x3F) - 64;
-            if (i >= 64) break; /* illegal, check needed to avoid buffer overflow */
-
-            bs_flush( bs, 12 );
-            val = SBITS (bs->i_bit_in_cache, 12);
-            if (abs(val) >= tst)
-            {
-                putAC( bs, i - li - 1, (val * i_qscale) / i_qscale_new, 0);
-                li = i;
-            }
-
-            bs_flush( bs, 12 );
-
-            continue;
-        }
-        else if (bs->i_bit_in_cache >= 0x02000000)
-        {
-            tab = DCT_B14_10 + (UBITS (bs->i_bit_in_cache, 10) - 8);
-            i += tab->run;
-            if (i < 64 ) goto normal_code;
-        }
-        else if (bs->i_bit_in_cache >= 0x00800000)
-        {
-            tab = DCT_13 + (UBITS (bs->i_bit_in_cache, 13) - 16);
-            i += tab->run;
-            if (i < 64 ) goto normal_code;
-        }
-        else if (bs->i_bit_in_cache >= 0x00200000)
-        {
-            tab = DCT_15 + (UBITS (bs->i_bit_in_cache, 15) - 16);
-            i += tab->run;
-            if (i < 64 ) goto normal_code;
-        }
-        else
-        {
-            tab = DCT_16 + UBITS (bs->i_bit_in_cache, 16);
-            bs_flush( bs, 16 );
-            i += tab->run;
-            if (i < 64 ) goto normal_code;
-        }
-        break;  /* illegal, check needed to avoid buffer overflow */
-    }
-
-    bs_copy( bs, 2);    /* end of block code */
-}
-
-static void get_intra_block_B15( bs_transrate_t *bs,  const int i_qscale, int const i_qscale_new )
-{
-    int tst;
-    int i, li;
-    int val;
-    const DCTtab * tab;
-
-    /* Basic sanity check --Meuuh */
-    if( i_qscale == 0 )
-    {
-        return;
-    }
-
-    tst = i_qscale_new/i_qscale + ((i_qscale_new%i_qscale) ? 1 : 0);
-
-    li = i = 0;
-
-    for( ;; )
-    {
-        if (bs->i_bit_in_cache >= 0x04000000)
-        {
-            tab = DCT_B15_8 + (UBITS (bs->i_bit_in_cache, 8) - 4);
-
-            i += tab->run;
-            if (i < 64)
-            {
-    normal_code:
-                bs_flush( bs, tab->len );
-
-                val = tab->level;
-                if (val >= tst)
-                {
-                    val = (val ^ SBITS (bs->i_bit_in_cache, 1)) - SBITS (bs->i_bit_in_cache, 1);
-                    putAC( bs, i - li - 1, (val * i_qscale) / i_qscale_new, 1);
-                    li = i;
-                }
-
-                bs_flush( bs, 1 );
-                continue;
-            }
-            else
-            {
-                i += (UBITS (bs->i_bit_in_cache, 12) & 0x3F) - 64;
-
-                if (i >= 64) break; /* illegal, check against buffer overflow */
-
-                bs_flush( bs, 12 );
-                val = SBITS (bs->i_bit_in_cache, 12);
-                if (abs(val) >= tst)
-                {
-                    putAC( bs, i - li - 1, (val * i_qscale) / i_qscale_new, 1);
-                    li = i;
-                }
-
-                bs_flush( bs, 12 );
-                continue;
-            }
-        }
-        else if (bs->i_bit_in_cache >= 0x02000000)
-        {
-            tab = DCT_B15_10 + (UBITS (bs->i_bit_in_cache, 10) - 8);
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        else if (bs->i_bit_in_cache >= 0x00800000)
-        {
-            tab = DCT_13 + (UBITS (bs->i_bit_in_cache, 13) - 16);
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        else if (bs->i_bit_in_cache >= 0x00200000)
-        {
-            tab = DCT_15 + (UBITS (bs->i_bit_in_cache, 15) - 16);
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        else
-        {
-            tab = DCT_16 + UBITS (bs->i_bit_in_cache, 16);
-            bs_flush( bs, 16 );
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        break;  /* illegal, check needed to avoid buffer overflow */
-    }
-
-    bs_copy( bs, 4);    /* end of block code */
-}
-
-
-static int get_non_intra_block_drop( transrate_t *tr, RunLevel *blk)
-{
-    bs_transrate_t *bs = &tr->bs;
-
-    int i, li;
-    int val;
-    const DCTtab * tab;
-    RunLevel *sblk = blk + 1;
-
-    li = i = -1;
-
-    if (bs->i_bit_in_cache >= 0x28000000)
-    {
-        tab = DCT_B14DC_5 + (UBITS (bs->i_bit_in_cache, 5) - 5);
-        goto entry_1;
-    }
-    else goto entry_2;
-
-    for( ;; )
-    {
-        if (bs->i_bit_in_cache >= 0x28000000)
-        {
-            tab = DCT_B14AC_5 + (UBITS (bs->i_bit_in_cache, 5) - 5);
-
-    entry_1:
-            i += tab->run;
-            if (i >= 64) break; /* end of block */
-
-    normal_code:
-
-            bs_flush( bs, tab->len );
-            val = tab->level;
-            val = (val ^ SBITS (bs->i_bit_in_cache, 1)) - SBITS (bs->i_bit_in_cache, 1); /* if (bitstream_get (1)) val = -val; */
-
-            blk->level = val;
-            blk->run = i - li - 1;
-            li = i;
-            blk++;
-
-            bs_flush( bs, 1 );
-            continue;
-        }
-
-    entry_2:
-
-        if (bs->i_bit_in_cache >= 0x04000000)
-        {
-            tab = DCT_B14_8 + (UBITS (bs->i_bit_in_cache, 8) - 4);
-
-            i += tab->run;
-            if (i < 64) goto normal_code;
-
-            /* escape code */
-
-            i += (UBITS (bs->i_bit_in_cache, 12) & 0x3F) - 64;
-
-            if (i >= 64) break; /* illegal, check needed to avoid buffer overflow */
-
-            bs_flush( bs, 12 );
-            val = SBITS (bs->i_bit_in_cache, 12);
-
-            blk->level = val;
-            blk->run = i - li - 1;
-            li = i;
-            blk++;
-
-            bs_flush( bs, 12 );
-            continue;
-        }
-        else if (bs->i_bit_in_cache >= 0x02000000)
-        {
-            tab = DCT_B14_10 + (UBITS (bs->i_bit_in_cache, 10) - 8);
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        else if (bs->i_bit_in_cache >= 0x00800000)
-        {
-            tab = DCT_13 + (UBITS (bs->i_bit_in_cache, 13) - 16);
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        else if (bs->i_bit_in_cache >= 0x00200000)
-        {
-            tab = DCT_15 + (UBITS (bs->i_bit_in_cache, 15) - 16);
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        else
-        {
-            tab = DCT_16 + UBITS (bs->i_bit_in_cache, 16);
-            bs_flush( bs, 16 );
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        break;  /* illegal, check needed to avoid buffer overflow */
-    }
-    bs_flush( bs, 2 ); /* dump end of block code */
-
-    // remove last coeff
-    if (blk != sblk)
-    {
-        blk--;
-    }
-
-    // remove more coeffs if very late
-    if (tr->level_p >= 4 && (blk != sblk))
-    {
-        blk--;
-        if (tr->level_p >= 5 && (blk != sblk))
-        {
-            blk--;
-            if (tr->level_p >= 6 && (blk != sblk))
-            {
-                blk--;
-                if (tr->level_p >= 7 && (blk != sblk))
-                    blk--;
-            }
-        }
-    }
-
-    blk->level = 0;
-
-    return i;
-}
-
-static int get_non_intra_block_rq( bs_transrate_t *bs, RunLevel *blk,  const int i_qscale, const int i_qscale_new )
-{
-    int tst;
-    int i, li;
-    int val;
-    const DCTtab * tab;
-
-    /* Basic sanity check --Meuuh */
-    if( i_qscale == 0 )
-    {
-        return 0;
-    }
-
-    tst = i_qscale_new/i_qscale + ((i_qscale_new%i_qscale) ? 1 : 0);
-
-    li = i = -1;
-
-    if (bs->i_bit_in_cache >= 0x28000000)
-    {
-        tab = DCT_B14DC_5 + (UBITS (bs->i_bit_in_cache, 5) - 5);
-        goto entry_1;
-    }
-    else goto entry_2;
-
-    for( ;; )
-    {
-        if (bs->i_bit_in_cache >= 0x28000000)
-        {
-            tab = DCT_B14AC_5 + (UBITS (bs->i_bit_in_cache, 5) - 5);
-
-    entry_1:
-            i += tab->run;
-            if (i >= 64)
-            break;  /* end of block */
-
-    normal_code:
-
-            bs_flush( bs, tab->len );
-            val = tab->level;
-            if (val >= tst)
-            {
-                val = (val ^ SBITS (bs->i_bit_in_cache, 1)) - SBITS (bs->i_bit_in_cache, 1);
-                blk->level = (val * i_qscale) / i_qscale_new;
-                blk->run = i - li - 1;
-                li = i;
-                blk++;
-            }
-
-            //if ( ((val) && (tab->level < tst)) || ((!val) && (tab->level >= tst)) )
-            //  LOGF("level: %i val: %i tst : %i q: %i nq : %i\n", tab->level, val, tst, q, nq);
-
-            bs_flush( bs, 1 );
-            continue;
-        }
-
-    entry_2:
-        if (bs->i_bit_in_cache >= 0x04000000)
-        {
-            tab = DCT_B14_8 + (UBITS (bs->i_bit_in_cache, 8) - 4);
-
-            i += tab->run;
-            if (i < 64) goto normal_code;
-
-            /* escape code */
-
-            i += (UBITS (bs->i_bit_in_cache, 12) & 0x3F) - 64;
-
-            if (i >= 64) break; /* illegal, check needed to avoid buffer overflow */
-
-            bs_flush( bs, 12 );
-            val = SBITS (bs->i_bit_in_cache, 12);
-            if (abs(val) >= tst)
-            {
-                blk->level = (val * i_qscale) / i_qscale_new;
-                blk->run = i - li - 1;
-                li = i;
-                blk++;
-            }
-
-            bs_flush( bs, 12 );
-            continue;
-        }
-        else if (bs->i_bit_in_cache >= 0x02000000)
-        {
-            tab = DCT_B14_10 + (UBITS (bs->i_bit_in_cache, 10) - 8);
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        else if (bs->i_bit_in_cache >= 0x00800000)
-        {
-            tab = DCT_13 + (UBITS (bs->i_bit_in_cache, 13) - 16);
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        else if (bs->i_bit_in_cache >= 0x00200000)
-        {
-            tab = DCT_15 + (UBITS (bs->i_bit_in_cache, 15) - 16);
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        else
-        {
-            tab = DCT_16 + UBITS (bs->i_bit_in_cache, 16);
-            bs_flush( bs, 16 );
-
-            i += tab->run;
-            if (i < 64) goto normal_code;
-        }
-        break;  /* illegal, check needed to avoid buffer overflow */
-    }
-    bs_flush( bs, 2 );    /* dump end of block code */
-
-    blk->level = 0;
-
-    return i;
 }
 
 static void motion_fr_frame( bs_transrate_t *bs, unsigned int f_code[2] )
@@ -1140,7 +438,7 @@ static void putmbdata( transrate_t *tr, int macroblock_modes )
               mbtypetab[tr->picture_coding_type-1][macroblock_modes&0x1F].code,
               mbtypetab[tr->picture_coding_type-1][macroblock_modes&0x1F].len);
 
-    switch ( tr->picture_coding_type)
+    switch ( tr->picture_coding_type )
     {
         case I_TYPE:
             if ((! (tr->frame_pred_frame_dct)) && (tr->picture_structure == FRAME_PICTURE))
@@ -1186,15 +484,37 @@ static void putmbdata( transrate_t *tr, int macroblock_modes )
     }
 }
 
+static const uint8_t map_non_linear_mquant[113] =
+{
+    0,1,2,3,4,5,6,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15,16,16,
+    16,17,17,17,18,18,18,18,19,19,19,19,20,20,20,20,21,21,21,21,22,22,
+    22,22,23,23,23,23,24,24,24,24,24,24,24,25,25,25,25,25,25,25,26,26,
+    26,26,26,26,26,26,27,27,27,27,27,27,27,27,28,28,28,28,28,28,28,29,
+    29,29,29,29,29,29,29,29,29,30,30,30,30,30,30,30,31,31,31,31,31
+};
 static inline void put_quantiser( transrate_t *tr )
 {
     bs_transrate_t *bs = &tr->bs;
 
-    bs_write( bs, tr->q_scale_type ? map_non_linear_mquant[tr->new_quantizer_scale] : tr->new_quantizer_scale >> 1, 5);
+    bs_write( bs, tr->q_scale_type ? map_non_linear_mquant[tr->new_quantizer_scale] : tr->new_quantizer_scale >> 1, 5 );
     tr->last_coded_scale = tr->new_quantizer_scale;
 }
 
-static int slice_init( transrate_t *tr,  int code)
+/* generate variable length code for macroblock_address_increment (6.3.16) */
+static inline void putaddrinc( transrate_t *tr, int addrinc )
+{
+    bs_transrate_t *bs = &tr->bs;
+
+    while ( addrinc >= 33 )
+    {
+        bs_write( bs, 0x08, 11 ); /* macroblock_escape */
+        addrinc -= 33;
+    }
+
+    bs_write( bs, addrinctab[addrinc].code, addrinctab[addrinc].len );
+}
+
+static int slice_init( transrate_t *tr,  int code )
 {
     bs_transrate_t *bs = &tr->bs;
     int offset;
@@ -1203,15 +523,8 @@ static int slice_init( transrate_t *tr,  int code)
     tr->v_offset = (code - 1) * 16;
 
     tr->quantizer_scale = get_quantizer_scale( tr );
-    if ( tr->picture_coding_type == P_TYPE)
-    {
-        tr->new_quantizer_scale = tr->quantizer_scale;
-    }
-    else
-    {
-        tr->new_quantizer_scale = getNewQuant(tr, tr->quantizer_scale);
-    }
-    put_quantiser( tr );
+    if ( tr->new_quantizer_scale < tr->quantizer_scale )
+        tr->new_quantizer_scale = scale_quant( tr, tr->qrate );
 
     /*LOGF("************************\nstart of slice %i in %s picture. ori quant: %i new quant: %i\n", code,
         (picture_coding_type == I_TYPE ? "I_TYPE" : (picture_coding_type == P_TYPE ? "P_TYPE" : "B_TYPE")),
@@ -1241,7 +554,7 @@ static int slice_init( transrate_t *tr,  int code)
         {
             /* macroblock_escape */
             offset += 33;
-            bs_copy( bs, 11);
+            bs_flush(bs, 11);
         }
         else
         {
@@ -1249,7 +562,7 @@ static int slice_init( transrate_t *tr,  int code)
         }
     }
 
-    bs_copy( bs, mba->len + 1);
+    bs_flush(bs, mba->len + 1);
     tr->h_offset = (offset + mba->mba) << 4;
 
     while( tr->h_offset - (int)tr->horizontal_size_value >= 0)
@@ -1262,81 +575,157 @@ static int slice_init( transrate_t *tr,  int code)
     {
         return -1;
     }
-    return 0;
+    return (offset + mba->mba);
 }
 
 static void mpeg2_slice( transrate_t *tr, const int code )
 {
     bs_transrate_t *bs = &tr->bs;
+    int mba_inc;
+    int first_in_slice = 1;
 
-    if( slice_init( tr, code ) )
+    if( (mba_inc = slice_init( tr, code )) < 0 )
     {
         return;
     }
 
     for( ;; )
     {
-        int macroblock_modes;
-        int mba_inc;
         const MBAtab * mba;
+        int macroblock_modes;
+        int mba_local;
+        int i;
+
+        while (unlikely(bs->i_bit_in < 24)) bs_refill( bs );
 
         macroblock_modes = get_macroblock_modes( tr );
-        if (macroblock_modes & MACROBLOCK_QUANT) tr->quantizer_scale = get_quantizer_scale( tr );
+        if (macroblock_modes & MACROBLOCK_QUANT)
+            tr->quantizer_scale = get_quantizer_scale( tr );
+        if (tr->new_quantizer_scale < tr->quantizer_scale)
+            tr->new_quantizer_scale = scale_quant( tr, tr->qrate );
 
         //LOGF("blk %i : ", h_offset >> 4);
 
         if (macroblock_modes & MACROBLOCK_INTRA)
         {
+            RunLevel block[6][65]; // terminated by level = 0, so we need 64+1
+            RunLevel new_block[6][65]; // terminated by level = 0, so we need 64+1
+            uint32_t dc[6];
+            uint8_t  dc_len[6];
+
+            // begin saving data
+            int batb;
+            uint8_t   p_n_ow[32], *p_n_w,
+                    *p_o_ow = bs->p_ow, *p_o_w = bs->p_w;
+            uint32_t  i_n_bit_out, i_n_bit_out_cache,
+                    i_o_bit_out  = bs->i_bit_out, i_o_bit_out_cache = bs->i_bit_out_cache;
+
+            bs->i_bit_out_cache = 0; bs->i_bit_out = BITS_IN_BUF;
+            bs->p_ow = bs->p_w = p_n_ow;
+
             //LOG("intra "); if (macroblock_modes & MACROBLOCK_QUANT) LOGF("got new quant: %i ", quantizer_scale);
-
-            tr->new_quantizer_scale = increment_quant( tr, tr->quantizer_scale);
-            if (tr->last_coded_scale == tr->new_quantizer_scale) macroblock_modes &= 0xFFFFFFEF; // remove MACROBLOCK_QUANT
-            else macroblock_modes |= MACROBLOCK_QUANT; //add MACROBLOCK_QUANT
-            putmbdata( tr, macroblock_modes);
-            if (macroblock_modes & MACROBLOCK_QUANT) put_quantiser( tr );
-
-            //if (macroblock_modes & MACROBLOCK_QUANT) LOGF("put new quant: %i ", new_quantizer_scale);
 
             if (tr->concealment_motion_vectors)
             {
                 if (tr->picture_structure != FRAME_PICTURE)
                 {
-                    bs_copy( bs, 1); /* remove field_select */
+                    bs_copy(bs, 1); /* remove field_select */
                 }
                 /* like motion_frame, but parsing without actual motion compensation */
-                get_motion_delta( bs, tr->f_code[0][0]);
-                get_motion_delta( bs, tr->f_code[0][1]);
+                get_motion_delta(bs, tr->f_code[0][0]);
+                get_motion_delta(bs, tr->f_code[0][1]);
 
-                bs_copy( bs, 1); /* remove marker_bit */
+                bs_copy(bs, 1); /* remove marker_bit */
             }
+
+            assert(bs->p_w - bs->p_ow < 32);
+
+            p_n_w = bs->p_w;
+            i_n_bit_out = bs->i_bit_out;
+            i_n_bit_out_cache = bs->i_bit_out_cache;
+            assert(bs->p_ow == p_n_ow);
+
+            bs->i_bit_out = i_o_bit_out ;
+            bs->i_bit_out_cache = i_o_bit_out_cache;
+            bs->p_ow = p_o_ow;
+            bs->p_w = p_o_w;
+            // end saving data
 
             if( tr->intra_vlc_format )
             {
                 /* Luma */
-                get_luma_dc_dct_diff( bs );     get_intra_block_B15( bs, tr->quantizer_scale, tr->new_quantizer_scale );
-                get_luma_dc_dct_diff( bs );     get_intra_block_B15( bs, tr->quantizer_scale, tr->new_quantizer_scale );
-                get_luma_dc_dct_diff( bs );     get_intra_block_B15( bs, tr->quantizer_scale, tr->new_quantizer_scale );
-                get_luma_dc_dct_diff( bs );     get_intra_block_B15( bs, tr->quantizer_scale, tr->new_quantizer_scale );
+                for ( i = 0; i < 4; i++ )
+                {
+                    get_luma_dc_dct_diff( bs, dc + i, dc_len + i );
+                    get_intra_block_B15( tr, block[i] );
+                    if (tr->b_error) return;
+                }
                 /* Chroma */
-                get_chroma_dc_dct_diff( bs );   get_intra_block_B15( bs, tr->quantizer_scale, tr->new_quantizer_scale );
-                get_chroma_dc_dct_diff( bs );   get_intra_block_B15( bs, tr->quantizer_scale, tr->new_quantizer_scale );
+                for ( ; i < 6; i++ )
+                {
+                    get_chroma_dc_dct_diff( bs, dc + i, dc_len + i );
+                    get_intra_block_B15( tr, block[i] );
+                    if (tr->b_error) return;
+                }
             }
             else
             {
                 /* Luma */
-                get_luma_dc_dct_diff( bs );     get_intra_block_B14( bs, tr->quantizer_scale, tr->new_quantizer_scale );
-                get_luma_dc_dct_diff( bs );     get_intra_block_B14( bs, tr->quantizer_scale, tr->new_quantizer_scale );
-                get_luma_dc_dct_diff( bs );     get_intra_block_B14( bs, tr->quantizer_scale, tr->new_quantizer_scale );
-                get_luma_dc_dct_diff( bs );     get_intra_block_B14( bs, tr->quantizer_scale, tr->new_quantizer_scale );
+                for ( i = 0; i < 4; i++ )
+                {
+                    get_luma_dc_dct_diff( bs, dc + i, dc_len + i );
+                    get_intra_block_B14( tr, block[i] );
+                    if (tr->b_error) return;
+                }
                 /* Chroma */
-                get_chroma_dc_dct_diff( bs );   get_intra_block_B14( bs, tr->quantizer_scale, tr->new_quantizer_scale );
-                get_chroma_dc_dct_diff( bs );   get_intra_block_B14( bs, tr->quantizer_scale, tr->new_quantizer_scale );
+                for ( ; i < 6; i++ )
+                {
+                    get_chroma_dc_dct_diff( bs, dc + i, dc_len + i );
+                    get_intra_block_B14( tr, block[i] );
+                    if (tr->b_error) return;
+                }
             }
+
+            transrate_mb( tr, block, new_block, 0x3f, 1 );
+
+            if (tr->last_coded_scale == tr->new_quantizer_scale)
+                macroblock_modes &= ~MACROBLOCK_QUANT;
+
+            if ( first_in_slice )
+            {
+                put_quantiser( tr );
+                bs_write( bs, 0, 1 );
+                macroblock_modes &= ~MACROBLOCK_QUANT;
+            }
+            putaddrinc( tr, mba_inc );
+            mba_inc = 0;
+            putmbdata( tr, macroblock_modes );
+            if( macroblock_modes & MACROBLOCK_QUANT )
+            {
+                put_quantiser( tr );
+            }
+
+            // put saved motion data...
+            for (batb = 0; batb < (p_n_w - p_n_ow); batb++)
+            {
+                bs_write( bs, p_n_ow[batb], 8 );
+            }
+            bs_write( bs, i_n_bit_out_cache, BITS_IN_BUF - i_n_bit_out );
+            // end saved motion data...
+
+            for ( i = 0; i < 6; i++ )
+            {
+                bs_write( bs, *(dc + i), *(dc_len + i) );
+                putintrablk( bs, new_block[i], tr->intra_vlc_format );
+            }
+    
         }
         else
         {
             RunLevel block[6][65]; // terminated by level = 0, so we need 64+1
+            RunLevel new_block[6][65]; // terminated by level = 0, so we need 64+1
             int new_coded_block_pattern = 0;
+            int cbp = 0;
 
             // begin saving data
             int batb;
@@ -1363,6 +752,70 @@ static void mpeg2_slice( transrate_t *tr, const int code )
                     case MC_DMV: MOTION_CALL (motion_fi_dmv, MACROBLOCK_MOTION_FORWARD); break;
                 }
 
+            //LOG("non intra "); if (macroblock_modes & MACROBLOCK_QUANT) LOGF("got new quant: %i ", quantizer_scale);
+
+            if (macroblock_modes & MACROBLOCK_PATTERN)
+            {
+                int last_in_slice;
+
+                cbp = get_coded_block_pattern( bs );
+
+                for ( i = 0; i < 6; i++ )
+                {
+                    if ( cbp & (1 << (5 - i)) )
+                    {
+                        get_non_intra_block( tr, block[i] );
+                        if (tr->b_error) return;
+                    }
+                }
+                last_in_slice = !UBITS( bs->i_bit_in_cache, 11 );
+
+                new_coded_block_pattern = transrate_mb( tr, block, new_block,
+                                                        cbp, 0 );
+
+                if ( !new_coded_block_pattern &&
+                        !(macroblock_modes
+                            & (MACROBLOCK_MOTION_FORWARD
+                                | MACROBLOCK_MOTION_BACKWARD))
+                        && (first_in_slice || last_in_slice) )
+                {
+                    /* First mb in slice, just code a 0-mv mb.
+                     * This is wrong for last in slice, but it only shows
+                     * a few artefacts. */
+                    macroblock_modes |= MACROBLOCK_MOTION_FORWARD;
+                    if (tr->picture_structure == FRAME_PICTURE)
+                    {
+                        macroblock_modes |= MC_FRAME;
+                        bs_write( bs, 0x3, 2 ); /* motion vectors */
+                    }
+                    else
+                    {
+                        macroblock_modes |= MC_FIELD;
+                        bs_write( bs,
+                             (tr->picture_structure == BOTTOM_FIELD ? 1 : 0),
+                             1); /* motion field select */
+                        bs_write( bs, 0x3, 2 ); /* motion vectors */
+                    }
+                }
+
+                if ( !new_coded_block_pattern )
+                {
+                    macroblock_modes &= ~MACROBLOCK_PATTERN;
+                    macroblock_modes &= ~MACROBLOCK_QUANT;
+                }
+                else
+                {
+                    if ( tr->last_coded_scale == tr->new_quantizer_scale )
+                    {
+                        macroblock_modes &= ~MACROBLOCK_QUANT;
+                    }
+                    else
+                    {
+                        macroblock_modes |= MACROBLOCK_QUANT;
+                    }
+                }
+            }
+
             assert(bs->p_w - bs->p_ow < 32);
 
             p_n_w = bs->p_w;
@@ -1376,116 +829,83 @@ static void mpeg2_slice( transrate_t *tr, const int code )
             bs->p_w = p_o_w;
             // end saving data
 
-            if ( tr->picture_coding_type == P_TYPE) tr->new_quantizer_scale = tr->quantizer_scale;
-            else tr->new_quantizer_scale = getNewQuant( tr, tr->quantizer_scale);
-
-            //LOG("non intra "); if (macroblock_modes & MACROBLOCK_QUANT) LOGF("got new quant: %i ", quantizer_scale);
-
-            if (macroblock_modes & MACROBLOCK_PATTERN)
+            if ( macroblock_modes &
+                    (MACROBLOCK_MOTION_FORWARD | MACROBLOCK_MOTION_BACKWARD
+                      | MACROBLOCK_PATTERN) )
             {
-                const int cbp = get_coded_block_pattern( bs );
-
-                if( tr->picture_coding_type == P_TYPE )
+                if ( first_in_slice )
                 {
-                    if( cbp&0x20 ) get_non_intra_block_drop( tr, block[0] );
-                    if( cbp&0x10 ) get_non_intra_block_drop( tr, block[1] );
-                    if( cbp&0x08 ) get_non_intra_block_drop( tr, block[2] );
-                    if( cbp&0x04 ) get_non_intra_block_drop( tr, block[3] );
-                    if( cbp&0x02 ) get_non_intra_block_drop( tr, block[4] );
-                    if( cbp&0x01 ) get_non_intra_block_drop( tr, block[5] );
-
-                    new_coded_block_pattern = cbp;
+                    put_quantiser( tr );
+                    bs_write( bs, 0, 1 );
+                    macroblock_modes &= ~MACROBLOCK_QUANT;
                 }
-                else
+                putaddrinc( tr, mba_inc );
+                mba_inc = 0;
+                putmbdata( tr, macroblock_modes );
+                if ( macroblock_modes & MACROBLOCK_QUANT )
                 {
-                    if( cbp&0x20 )
+                    put_quantiser( tr );
+                }
+
+                // put saved motion data...
+                for (batb = 0; batb < (p_n_w - p_n_ow); batb++)
+                {
+                    bs_write( bs, p_n_ow[batb], 8 );
+                }
+                bs_write( bs, i_n_bit_out_cache, BITS_IN_BUF - i_n_bit_out);
+                // end saved motion data...
+
+                if (macroblock_modes & MACROBLOCK_PATTERN)
+                {
+                    /* Write CBP */
+                    bs_write( bs, cbptable[new_coded_block_pattern].code,
+                              cbptable[new_coded_block_pattern].len );
+
+                    for ( i = 0; i < 6; i++ )
                     {
-                        get_non_intra_block_rq( bs, block[0], tr->quantizer_scale, tr->new_quantizer_scale );
-                        if( isNotEmpty( block[0] ) ) new_coded_block_pattern |= 0x20;
+                        if ( new_coded_block_pattern & (1 << (5 - i)) )
+                        {
+                            putnonintrablk( bs, new_block[i] );
+                        }
                     }
-                    if( cbp&0x10 )
-                    {
-                        get_non_intra_block_rq( bs, block[1], tr->quantizer_scale, tr->new_quantizer_scale );
-                        if( isNotEmpty( block[1] ) ) new_coded_block_pattern |= 0x10;
-                    }
-                    if( cbp&0x08 )
-                    {
-                        get_non_intra_block_rq( bs, block[2], tr->quantizer_scale, tr->new_quantizer_scale );
-                        if( isNotEmpty( block[2] ) ) new_coded_block_pattern |= 0x08;
-                    }
-                    if( cbp&0x04 )
-                    {
-                        get_non_intra_block_rq( bs, block[3], tr->quantizer_scale, tr->new_quantizer_scale );
-                        if( isNotEmpty( block[3] ) ) new_coded_block_pattern |= 0x04;
-                    }
-                    if( cbp&0x02 )
-                    {
-                        get_non_intra_block_rq( bs, block[4], tr->quantizer_scale, tr->new_quantizer_scale );
-                        if( isNotEmpty( block[4] ) ) new_coded_block_pattern |= 0x02;
-                    }
-                    if( cbp&0x01 )
-                    {
-                        get_non_intra_block_rq( bs, block[5], tr->quantizer_scale, tr->new_quantizer_scale );
-                        if( isNotEmpty( block[5] ) ) new_coded_block_pattern |= 0x01;
-                    }
-                    if( !new_coded_block_pattern) macroblock_modes &= 0xFFFFFFED; // remove MACROBLOCK_PATTERN and MACROBLOCK_QUANT flag
                 }
             }
-
-            if (tr->last_coded_scale == tr->new_quantizer_scale) macroblock_modes &= 0xFFFFFFEF; // remove MACROBLOCK_QUANT
-            else if (macroblock_modes & MACROBLOCK_PATTERN) macroblock_modes |= MACROBLOCK_QUANT; //add MACROBLOCK_QUANT
-            assert( (macroblock_modes & MACROBLOCK_PATTERN) || !(macroblock_modes & MACROBLOCK_QUANT) );
-
-            putmbdata( tr, macroblock_modes);
-            if( macroblock_modes & MACROBLOCK_QUANT )
+            else
             {
-                put_quantiser( tr );
-            }
-
-            // put saved motion data...
-            for (batb = 0; batb < (p_n_w - p_n_ow); batb++)
-            {
-                bs_write( bs, p_n_ow[batb], 8 );
-            }
-            bs_write( bs, i_n_bit_out_cache, BITS_IN_BUF - i_n_bit_out);
-            // end saved motion data...
-
-            if (macroblock_modes & MACROBLOCK_PATTERN)
-            {
-                /* Write CBP */
-                bs_write( bs, cbptable[new_coded_block_pattern].code,cbptable[new_coded_block_pattern].len);
-
-                if (new_coded_block_pattern & 0x20) putnonintrablk( bs, block[0]);
-                if (new_coded_block_pattern & 0x10) putnonintrablk( bs, block[1]);
-                if (new_coded_block_pattern & 0x08) putnonintrablk( bs, block[2]);
-                if (new_coded_block_pattern & 0x04) putnonintrablk( bs, block[3]);
-                if (new_coded_block_pattern & 0x02) putnonintrablk( bs, block[4]);
-                if (new_coded_block_pattern & 0x01) putnonintrablk( bs, block[5]);
+                /* skipped macroblock */
+                mba_inc++;
             }
         }
 
+        if (bs->p_c > bs->p_r || bs->p_w > bs->p_rw)
+        {
+            tr->b_error = 1;
+            return;
+        }
         //LOGF("\n\to: %i c: %i n: %i\n", quantizer_scale, last_coded_scale, new_quantizer_scale);
 
         NEXT_MACROBLOCK;
 
-        mba_inc = 0;
-        for( ;; )
+        first_in_slice = 0;
+        mba_local = 0;
+        for ( ; ; )
         {
-            if (bs->i_bit_in_cache >= 0x10000000)
+            if ( bs->i_bit_in_cache >= 0x10000000 )
             {
                 mba = MBA_5 + (UBITS (bs->i_bit_in_cache, 5) - 2);
                 break;
             }
-            else if (bs->i_bit_in_cache >= 0x03000000)
+            else if ( bs->i_bit_in_cache >= 0x03000000 )
             {
                 mba = MBA_11 + (UBITS (bs->i_bit_in_cache, 11) - 24);
                 break;
             }
-            else if( UBITS (bs->i_bit_in_cache, 11 ) == 8 )
+            else if ( UBITS( bs->i_bit_in_cache, 11 ) == 8 )
             {
                 /* macroblock_escape */
                 mba_inc += 33;
-                bs_copy( bs, 11);
+                mba_local += 33;
+                bs_flush(bs, 11);
             }
             else
             {
@@ -1493,14 +913,121 @@ static void mpeg2_slice( transrate_t *tr, const int code )
                 return;
             }
         }
-        bs_copy( bs, mba->len);
+        bs_flush(bs, mba->len);
         mba_inc += mba->mba;
+        mba_local += mba->mba;
 
-        while( mba_inc-- )
+        while( mba_local-- )
         {
             NEXT_MACROBLOCK;
         }
     }
+}
+
+static const uint8_t mpeg2_scan_norm[64] ATTR_ALIGN(16) = {
+    /* Zig-Zag scan pattern */
+     0,  1,  8, 16,  9,  2,  3, 10, 17, 24, 32, 25, 18, 11,  4,  5,
+    12, 19, 26, 33, 40, 48, 41, 34, 27, 20, 13,  6,  7, 14, 21, 28,
+    35, 42, 49, 56, 57, 50, 43, 36, 29, 22, 15, 23, 30, 37, 44, 51,
+    58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62, 63
+};
+
+static const uint8_t mpeg2_scan_alt[64] ATTR_ALIGN(16) = {
+    /* Alternate scan pattern */
+     0, 8,  16, 24,  1,  9,  2, 10, 17, 25, 32, 40, 48, 56, 57, 49,
+    41, 33, 26, 18,  3, 11,  4, 12, 19, 27, 34, 42, 50, 58, 35, 43,
+    51, 59, 20, 28,  5, 13,  6, 14, 21, 29, 36, 44, 52, 60, 37, 45,
+    53, 61, 22, 30,  7, 15, 23, 31, 38, 46, 54, 62, 39, 47, 55, 63
+};
+
+static const int16_t default_intra_matrix[64] = {
+        8, 16, 19, 22, 26, 27, 29, 34,
+        16, 16, 22, 24, 27, 29, 34, 37,
+        19, 22, 26, 27, 29, 34, 34, 38,
+        22, 22, 26, 27, 29, 34, 37, 40,
+        22, 26, 27, 29, 32, 35, 40, 48,
+        26, 27, 29, 32, 35, 40, 48, 58,
+        26, 27, 29, 34, 38, 46, 56, 69,
+        27, 29, 35, 38, 46, 56, 69, 83
+};
+
+static int mpeg2_header_sequence( transrate_t * tr )
+{
+    bs_transrate_t *bs = &tr->bs;
+    int has_intra = 0, has_non_intra = 0;
+    int i;
+
+    i = (bs->p_c[0] << 16) | (bs->p_c[1] << 8) | bs->p_c[2];
+    tr->horizontal_size_value = i >> 12;
+    tr->vertical_size_value = i & 0xfff;
+    tr->horizontal_size_value = (tr->horizontal_size_value + 15) & ~15;
+    tr->vertical_size_value = (tr->vertical_size_value + 15) & ~15;
+    if ( !tr->horizontal_size_value || !tr->vertical_size_value )
+    {
+        return -1;
+    }
+
+    if ( tr->mpeg4_matrix )
+    {
+        if (bs->p_c[7] & 2)
+        {
+            has_intra = 1;
+            for (i = 0; i < 64; i++)
+                tr->intra_quantizer_matrix[mpeg2_scan_norm[i]] =
+                (bs->p_c[i+7] << 7) | (bs->p_c[i+8] >> 1);
+        }
+        else
+        {
+            for (i = 0; i < 64; i++)
+                tr->intra_quantizer_matrix[mpeg2_scan_norm[i]] =
+                default_intra_matrix[i];
+        }
+
+        if (bs->p_c[7+64] & 1)
+        {
+            has_non_intra = 1;
+            for (i = 0; i < 64; i++)
+                tr->non_intra_quantizer_matrix[mpeg2_scan_norm[i]] =
+                bs->p_c[i+8+64];
+        }
+        else
+        {
+            for (i = 0; i < 64; i++)
+                tr->non_intra_quantizer_matrix[i] = 16;
+        }
+    }
+
+    /* Write quantization matrices */
+    memcpy( bs->p_w, bs->p_c, 8 );
+    bs->p_c += 8;
+
+    if ( tr->mpeg4_matrix )
+    {
+        memset( &bs->p_w[8], 0, 128 );
+        bs->p_w[7] |= 2;
+        bs->p_w[7] &= ~1;
+        for (i = 0; i < 64; i++)
+        {
+            bs->p_w[i+7] |= mpeg4_default_intra_matrix[mpeg2_scan_norm[i]] >> 7;
+            bs->p_w[i+8] |= mpeg4_default_intra_matrix[mpeg2_scan_norm[i]] << 1;
+        }
+
+        bs->p_w[7+64] |= 1;
+        for (i = 0; i < 64; i++)
+        {
+            bs->p_w[i+8+64] |= mpeg4_default_intra_matrix[mpeg2_scan_norm[i]];
+        }
+        bs->p_w += 8 + 128;
+        bs->p_c += (has_intra + has_non_intra) * 64;
+    }
+    else
+    {
+        bs->p_w += 8;
+    }
+
+    tr->scan = mpeg2_scan_norm;
+
+    return 0;
 }
 
 /////---- end ext mpeg code
@@ -1527,16 +1054,7 @@ static int do_next_start_code( transrate_t *tr )
     }
     else if (ID == 0xB3) // seq header
     {
-        tr->horizontal_size_value = (bs->p_c[0] << 4) | (bs->p_c[1] >> 4);
-        tr->vertical_size_value = ((bs->p_c[1] & 0xF) << 8) | bs->p_c[2];
-        if(!tr->horizontal_size_value || !tr->vertical_size_value )
-        {
-            return -1;
-        }
-
-        memcpy(bs->p_w, bs->p_c, 8 );
-        bs->p_c += 8;
-        bs->p_w += 8;
+        mpeg2_header_sequence(tr);
     }
     else if (ID == 0xB5) // extension
     {
@@ -1553,8 +1071,8 @@ static int do_next_start_code( transrate_t *tr )
             tr->concealment_motion_vectors = (bs->p_c[3] >> 5) & 0x1;
             tr->q_scale_type = (bs->p_c[3] >> 4) & 0x1;
             tr->intra_vlc_format = (bs->p_c[3] >> 3) & 0x1;
-            /* tr->alternate_scan = (bs->p_c[3] >> 2) & 0x1; */
-
+            if ( (bs->p_c[3] >> 2) & 0x1 )
+                tr->scan = mpeg2_scan_alt;
 
             memcpy(bs->p_w, bs->p_c, 5);
             bs->p_c += 5;
@@ -1575,15 +1093,7 @@ static int do_next_start_code( transrate_t *tr )
     {
         uint8_t *outTemp = bs->p_w, *inTemp = bs->p_c;
 
-#if 0
-        if( ( tr->picture_coding_type == B_TYPE && tr->quant_corr <  2.5f ) || // don't recompress if we're in advance!
-            ( tr->picture_coding_type == P_TYPE && tr->quant_corr < -2.5f ) ||
-            ( tr->picture_coding_type == I_TYPE && tr->quant_corr < -5.0f ) )
-#else
-        if( ( tr->picture_coding_type == B_TYPE ) ||
-            ( tr->picture_coding_type == P_TYPE && tr->level_p ) ||
-            ( tr->picture_coding_type == I_TYPE && tr->level_i ) )
-#endif
+        if( tr->qrate != 1.0 )
         {
             if( !tr->horizontal_size_value || !tr->vertical_size_value )
             {
@@ -1602,6 +1112,7 @@ static int do_next_start_code( transrate_t *tr )
 
             // begin bit level recoding
             mpeg2_slice(tr, ID);
+            if (tr->b_error) return -1;
 
             bs_flush_read( bs );
             bs_flush_write( bs );
@@ -1619,94 +1130,119 @@ static int do_next_start_code( transrate_t *tr )
 
             if (bs->p_w - outTemp > bs->p_c - inTemp) // yes that might happen, rarely
             {
+
                 /*LOGF("*** slice bigger than before !! (type: %s code: %i in : %i out : %i diff : %i)\n",
                 (picture_coding_type == I_TYPE ? "I_TYPE" : (picture_coding_type == P_TYPE ? "P_TYPE" : "B_TYPE")),
                 ID, bs->p_c - inTemp, bs->p_w - outTemp, (bs->p_w - outTemp) - (bs->p_c - inTemp));*/
 
-                // in this case, we'll just use the original slice !
-                memcpy(outTemp, inTemp, bs->p_c - inTemp);
-                bs->p_w = outTemp + (bs->p_c - inTemp);
+                if ( !tr->mpeg4_matrix )
+                {
+                    // in this case, we'll just use the original slice !
+                    memcpy(outTemp, inTemp, bs->p_c - inTemp);
+                    bs->p_w = outTemp + (bs->p_c - inTemp);
 
-                // adjust bs->i_byte_out
-                bs->i_byte_out -= (bs->p_w - outTemp) - (bs->p_c - inTemp);
+                    // adjust bs->i_byte_out
+                    bs->i_byte_out -= (bs->p_w - outTemp) - (bs->p_c - inTemp);
+                }
+                else
+                {
+                    fprintf(stderr, "bad choice for mpeg4-matrix...\n");
+                }
             }
         }
     }
     return 0;
 }
 
-void E_(process_frame)( sout_stream_t *p_stream,
-                    sout_stream_id_t *id, block_t *in, block_t **out )
+int process_frame( sout_stream_t *p_stream, sout_stream_id_t *id,
+                   block_t *in, block_t **out, int i_handicap )
 {
     transrate_t *tr = &id->tr;
     bs_transrate_t *bs = &tr->bs;
 
     block_t       *p_out;
 
-    double              next_fact_x = 1.0;
+    double        f_drift, f_fact;
+    int           i_drift;
 
-    /* The output buffer can't be bigger than the input buffer. */
-    p_out = block_New( p_stream, in->i_buffer );
+    p_out = block_New( p_stream, in->i_buffer * 3 );
 
     p_out->i_length = in->i_length;
     p_out->i_dts    = in->i_dts;
     p_out->i_pts    = in->i_pts;
     p_out->i_flags  = in->i_flags;
 
-    block_ChainAppend( out, p_out );
-
     bs->p_rw = bs->p_ow = bs->p_w = p_out->p_buffer;
     bs->p_c = bs->p_r = in->p_buffer;
     bs->p_r += in->i_buffer + 4;
-    bs->p_rw += in->i_buffer;
+    bs->p_rw += in->i_buffer * 2;
     *(in->p_buffer + in->i_buffer) = 0;
     *(in->p_buffer + in->i_buffer + 1) = 0;
     *(in->p_buffer + in->i_buffer + 2) = 1;
     *(in->p_buffer + in->i_buffer + 3) = 0;
 
     /* Calculate how late we are */
-    tr->quant_corr = 0.0 + B_HANDICAP;
-    tr->level_i = 0;
-    tr->level_p = 0;
     bs->i_byte_in = in->i_buffer;
     bs->i_byte_out  = 0;
 
-    if (tr->i_current_gop_size - in->i_buffer > 100)
+    i_drift = tr->i_current_output + tr->i_remaining_input
+                - tr->i_wanted_output;
+    f_drift = (double)i_drift / tr->i_wanted_output;
+    f_fact = (double)(tr->i_wanted_output - tr->i_current_output)
+                    / tr->i_remaining_input;
+
+    if ( in->i_flags & BLOCK_FLAG_TYPE_I )
     {
-        if (tr->i_wanted_gop_size == in->i_buffer)
+        /* This is the last picture of the GOP ; only transrate if we're
+         * very late. */
+        if ( 0 && f_drift > 0.085 )
         {
-            next_fact_x = 1.0;
-        }
-        else if ( tr->i_wanted_gop_size < in->i_buffer )
-        {
-            /* We're really late */
-            next_fact_x = 10.0;
+            tr->i_minimum_error = (f_drift - 0.085) * 50.0 * 50.0;
+            tr->i_admissible_error = (f_drift - 0.085) * 50.0 * 75.0;
+            tr->qrate = 1.0 + (f_drift - 0.085) * 50.0;
+            msg_Warn( p_stream, "transrating I %d/%d",
+                      tr->i_minimum_error, tr->i_admissible_error );
         }
         else
         {
-            next_fact_x = ((double)(tr->i_current_gop_size - in->i_buffer)) /
-                          (tr->i_wanted_gop_size - in->i_buffer);
-        }
-
-        if (next_fact_x > QUANT_I)
-        {
-            tr->level_i = 1;
-        }
-        if (next_fact_x > QUANT_P)
-        {
-            tr->level_p = 1 + (next_fact_x - QUANT_P) / (QUANT_P_INC);
+            tr->i_minimum_error = 0;
+            tr->i_admissible_error = 0;
+            tr->qrate = 1.0;
         }
     }
-    if ( tr->i_wanted_gop_size < 0 )
+    else if ( in->i_flags & BLOCK_FLAG_TYPE_P )
     {
-        /* We're really late */
-        tr->current_fact_x = 3.0;
+        if ( f_fact < 0.8 )
+        {
+            tr->i_minimum_error = (0.8 - f_fact) * 3000.0 + i_handicap;
+            tr->i_admissible_error = (0.8 - f_fact) * 3500.0 + i_handicap;
+            tr->qrate = 1.0 + (0.8 - f_fact) * 70.0;
+        }
+        else
+        {
+            tr->i_minimum_error = 0;
+            tr->i_admissible_error = 0;
+            tr->qrate = 1.0;
+        }
     }
     else
     {
-        tr->current_fact_x = ((double)(tr->i_current_gop_size) /
-                              (tr->i_wanted_gop_size));
+        if ( f_fact < 1.2 )
+        {
+            tr->i_minimum_error = (1.2 - f_fact) * 1750.0 + i_handicap;
+            tr->i_admissible_error = (1.2 - f_fact) * 2250.0 + i_handicap;
+            tr->qrate = 1.0 + (1.2 - f_fact) * 45.0;
+        }
+        else
+        {
+            tr->i_minimum_error = 0;
+            tr->i_admissible_error = 0;
+            tr->qrate = 1.0;
+        }
     }
+
+    tr->new_quantizer_scale = 0;
+    tr->b_error = 0;
 
     for ( ; ; )
     {
@@ -1733,7 +1269,7 @@ void E_(process_frame)( sout_stream_t *p_stream,
                 *bs->p_w++ = *bs->p_c++;
             }
 
-            if( bs->p_c >= p_end)
+            if( bs->p_c >= p_end )
             {
                 break;
             }
@@ -1745,31 +1281,72 @@ void E_(process_frame)( sout_stream_t *p_stream,
         }
 
         /* Copy the start code */
-        memcpy(bs->p_w, bs->p_c, 3 );
+        memcpy( bs->p_w, bs->p_c, 3 );
         bs->p_c += 3;
         bs->p_w += 3;
 
-        if (do_next_start_code( tr ) )
+        if ( do_next_start_code( tr ) )
         {
             /* Error */
-            break;
+            msg_Err( p_stream, "error in do_next_start_code()" );
+            block_Release( p_out );
+            tr->i_remaining_input -= in->i_buffer;
+            tr->i_current_output += in->i_buffer;
+            return -1;
         }
-
-        tr->quant_corr = (((bs->i_byte_in - (bs->p_r - 4 - bs->p_c)) / tr->fact_x) - (bs->i_byte_out + (bs->p_w - bs->p_ow))) / REACT_DELAY + B_HANDICAP;
     }
 
     bs->i_byte_out += bs->p_w - bs->p_ow;
     p_out->i_buffer = bs->p_w - bs->p_ow;
-    tr->i_current_gop_size -= in->i_buffer;
-    tr->i_wanted_gop_size -= p_out->i_buffer;
-    tr->i_new_gop_size += bs->i_byte_out;
 
 #if 0
-    msg_Dbg( p_stream, "%d: %d -> %d (r: %f, n:%f, corr:%f)",
-             tr->picture_coding_type, in->i_buffer, p_out->i_size,
-             (float)in->i_buffer / p_out->i_size,
-             next_fact_x, tr->quant_corr);
+    if ( in->i_flags & BLOCK_FLAG_TYPE_P && f_fact < 0.8 )
+    {
+        double f_ratio = (in->i_buffer - p_out->i_buffer) / in->i_buffer;
+        if ( f_ratio < (0.8 - f_fact) * 0.1 && i_handicap < 200 )
+        {
+            block_Release( p_out );
+            return process_frame( p_stream, id, in, out, i_handicap + 50 );
+        }
+    }
+
+    if ( in->i_flags & BLOCK_FLAG_TYPE_B && f_fact < 1.1 )
+    {
+        double f_ratio = (double)(in->i_buffer - p_out->i_buffer)
+                            / in->i_buffer;
+        if ( f_ratio < (1.1 - f_fact) * 0.1 && i_handicap < 400 )
+        {
+#ifdef DEBUG_TRANSRATER
+            msg_Dbg( p_stream, "%d: %d -> %d big (f: %f d: %f)",
+                     tr->picture_coding_type, in->i_buffer, p_out->i_buffer,
+                     f_fact, f_drift);
 #endif
+            block_Release( p_out );
+            return process_frame( p_stream, id, in, out, i_handicap + 100 );
+        }
+    }
+#endif
+
+#if 0
+    {
+        int toto;
+        for ( toto = 0; toto < p_out->i_buffer; toto++ )
+            if (in->p_buffer[toto] != p_out->p_buffer[toto])
+                msg_Dbg(p_stream, "toto %d %x %x", toto, in->p_buffer[toto], p_out->p_buffer[toto]);
+    }
+#endif
+
+    block_ChainAppend( out, p_out );
+    tr->i_remaining_input -= in->i_buffer;
+    tr->i_current_output += p_out->i_buffer;
+
+#ifdef DEBUG_TRANSRATER
+    msg_Dbg( p_stream, "%d: %d -> %d (%d/%d)",
+             tr->picture_coding_type, in->i_buffer, p_out->i_buffer,
+             tr->i_minimum_error, tr->i_admissible_error );
+#endif
+
+    return 0;
 }
 
 

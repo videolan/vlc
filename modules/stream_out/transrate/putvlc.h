@@ -1,4 +1,31 @@
-// put blk
+/* vlc.h, variable length code tables (used by routines in putvlc.c)        */
+
+/* Copyright (C) 1996, MPEG Software Simulation Group. All Rights Reserved. */
+
+/*
+ * Disclaimer of Warranty
+ *
+ * These software programs are available to the user without any license fee or
+ * royalty on an "as is" basis.  The MPEG Software Simulation Group disclaims
+ * any and all warranties, whether express, implied, or statuary, including any
+ * implied warranties or merchantability or of fitness for a particular
+ * purpose.  In no event shall the copyright-holder be liable for any
+ * incidental, punitive, or consequential damages of any kind whatsoever
+ * arising from the use of these programs.
+ *
+ * This disclaimer of warranty extends to the user of these programs and user's
+ * customers, employees, agents, transferees, successors, and assigns.
+ *
+ * The MPEG Software Simulation Group does not represent or warrant that the
+ * programs furnished hereunder are free of infringement of any third-party
+ * patents.
+ *
+ * Commercial implementations of MPEG-1 and MPEG-2 video, including shareware,
+ * are subject to royalty fees to patent holders.  Many of these patents are
+ * general enough such that they are unavoidable regardless of implementation
+ * design.
+ *
+ */
 
 /* type definitions for variable length code table entries */
 
@@ -14,6 +41,28 @@ typedef struct
   unsigned short code; /* right justified */
   char len;
 } sVLCtable;
+
+
+/* data from ISO/IEC 13818-2 DIS, Annex B, variable length code tables */
+
+/* Table B-1, variable length codes for macroblock_address_increment
+ *
+ * indexed by [macroblock_address_increment-1]
+ * 'macroblock_escape' is treated elsewhere
+ */
+
+const static VLCtable addrinctab[33]=
+{
+  {0x01,1},  {0x03,3},  {0x02,3},  {0x03,4},
+  {0x02,4},  {0x03,5},  {0x02,5},  {0x07,7},
+  {0x06,7},  {0x0b,8},  {0x0a,8},  {0x09,8},
+  {0x08,8},  {0x07,8},  {0x06,8},  {0x17,10},
+  {0x16,10}, {0x15,10}, {0x14,10}, {0x13,10},
+  {0x12,10}, {0x23,11}, {0x22,11}, {0x21,11},
+  {0x20,11}, {0x1f,11}, {0x1e,11}, {0x1d,11},
+  {0x1c,11}, {0x1b,11}, {0x1a,11}, {0x19,11},
+  {0x18,11}
+};
 
 
 /* Table B-2, B-3, B-4 variable length codes for macroblock_type
@@ -77,7 +126,6 @@ const static VLCtable cbptable[64]=
   {0x0c,5}, {0x08,8}, {0x04,8}, {0x04,9},
   {0x07,3}, {0x0a,5}, {0x08,5}, {0x0c,6}
 };
-
 
 
 /* Table B-14, DCT coefficients table zero
@@ -226,3 +274,27 @@ const static VLCtable dct_code_tab2a[30][5]=
   {{0x1c,16}, {0x00, 0}, {0x00, 0}, {0x00, 0}, {0x00, 0}},
   {{0x1b,16}, {0x00, 0}, {0x00, 0}, {0x00, 0}, {0x00, 0}}
 };
+
+/* MPEG-4 matrices */
+static const uint8_t mpeg4_default_intra_matrix[64] = {
+  8, 17, 18, 19, 21, 23, 25, 27,
+ 17, 18, 19, 21, 23, 25, 27, 28,
+ 20, 21, 22, 23, 24, 26, 28, 30,
+ 21, 22, 23, 24, 26, 28, 30, 32,
+ 22, 23, 24, 26, 28, 30, 32, 35,
+ 23, 24, 26, 28, 30, 32, 35, 38,
+ 25, 26, 28, 30, 32, 35, 38, 41,
+ 27, 28, 30, 32, 35, 38, 41, 45, 
+};
+
+static const uint8_t mpeg4_default_non_intra_matrix[64] = {
+ 16, 17, 18, 19, 20, 21, 22, 23,
+ 17, 18, 19, 20, 21, 22, 23, 24,
+ 18, 19, 20, 21, 22, 23, 24, 25,
+ 19, 20, 21, 22, 23, 24, 26, 27,
+ 20, 21, 22, 23, 25, 26, 27, 28,
+ 21, 22, 23, 24, 26, 27, 28, 30,
+ 22, 23, 24, 26, 27, 28, 30, 31,
+ 23, 24, 25, 27, 28, 30, 31, 33,
+};
+

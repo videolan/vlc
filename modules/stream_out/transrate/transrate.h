@@ -64,6 +64,9 @@ typedef struct
     // seq header
     unsigned int horizontal_size_value;
     unsigned int vertical_size_value;
+    uint8_t intra_quantizer_matrix [64];
+    uint8_t non_intra_quantizer_matrix [64];
+    int mpeg4_matrix;
 
     // pic header
     unsigned int picture_coding_type;
@@ -76,7 +79,7 @@ typedef struct
     unsigned int concealment_motion_vectors;
     unsigned int q_scale_type;
     unsigned int intra_vlc_format;
-    /* unsigned int alternate_scan; */
+    const uint8_t * scan;
 
     // slice or mb
     // quantizer_scale_code
@@ -84,12 +87,16 @@ typedef struct
     unsigned int new_quantizer_scale;
     unsigned int last_coded_scale;
     int   h_offset, v_offset;
+    vlc_bool_t b_error;
 
     // mb
-    double quant_corr, fact_x, current_fact_x;
-    int level_i, level_p;
+    double qrate;
+    int i_admissible_error, i_minimum_error;
 
-    ssize_t i_current_gop_size, i_wanted_gop_size, i_new_gop_size;
+    /* input buffers */
+    ssize_t i_total_input, i_remaining_input;
+    /* output buffers */
+    ssize_t i_current_output, i_wanted_output;
 } transrate_t;
 
 
@@ -98,8 +105,8 @@ struct sout_stream_id_t
     void            *id;
     vlc_bool_t      b_transrate;
 
-    block_t   *p_current_buffer;
-    block_t   *p_next_gop;
+    block_t         *p_current_buffer;
+    block_t   	    *p_next_gop;
     mtime_t         i_next_gop_duration;
     size_t          i_next_gop_size;
 
@@ -107,3 +114,102 @@ struct sout_stream_id_t
 };
 
 
+#ifdef HAVE_BUILTIN_EXPECT
+#define likely(x) __builtin_expect ((x) != 0, 1)
+#define unlikely(x) __builtin_expect ((x) != 0, 0)
+#else
+#define likely(x) (x)
+#define unlikely(x) (x)
+#endif
+
+#define BITS_IN_BUF (8)
+
+#define LOG(msg) fprintf (stderr, msg)
+#define LOGF(format, args...) fprintf (stderr, format, args)
+
+static inline void bs_write( bs_transrate_t *s, unsigned int val, int n )
+{
+    assert(n < 32);
+    assert(!(val & (0xffffffffU << n)));
+
+    while (unlikely(n >= s->i_bit_out))
+    {
+        s->p_w[0] = (s->i_bit_out_cache << s->i_bit_out ) | (val >> (n - s->i_bit_out));
+        s->p_w++;
+        n -= s->i_bit_out;
+        s->i_bit_out_cache = 0;
+        val &= ~(0xffffffffU << n);
+        s->i_bit_out = BITS_IN_BUF;
+    }
+
+    if (likely(n))
+    {
+        s->i_bit_out_cache = (s->i_bit_out_cache << n) | val;
+        s->i_bit_out -= n;
+    }
+
+    assert(s->i_bit_out > 0);
+    assert(s->i_bit_out <= BITS_IN_BUF);
+}
+
+static inline void bs_refill( bs_transrate_t *s )
+{
+    assert((s->p_r - s->p_c) >= 1);
+    s->i_bit_in_cache |= s->p_c[0] << (24 - s->i_bit_in);
+    s->i_bit_in += 8;
+    s->p_c++;
+}
+
+static inline void bs_flush( bs_transrate_t *s, unsigned int n )
+{
+    assert(s->i_bit_in >= n);
+
+    s->i_bit_in_cache <<= n;
+    s->i_bit_in -= n;
+
+    assert( (!n) || ((n>0) && !(s->i_bit_in_cache & 0x1)) );
+
+    while (unlikely(s->i_bit_in < 24)) bs_refill( s );
+}
+
+static inline unsigned int bs_read( bs_transrate_t *s, unsigned int n )
+{
+    unsigned int Val = ((unsigned int)s->i_bit_in_cache) >> (32 - n);
+    bs_flush( s, n );
+    return Val;
+}
+
+static inline unsigned int bs_copy( bs_transrate_t *s, unsigned int n )
+{
+    unsigned int Val = bs_read( s, n);
+    bs_write(s, Val, n);
+    return Val;
+}
+
+static inline void bs_flush_read( bs_transrate_t *s )
+{
+    int i = s->i_bit_in & 0x7;
+    if( i )
+    {
+        assert(((unsigned int)s->i_bit_in_cache) >> (32 - i) == 0);
+        s->i_bit_in_cache <<= i;
+        s->i_bit_in -= i;
+    }
+    s->p_c += -1 * (s->i_bit_in >> 3);
+    s->i_bit_in = 0;
+}
+static inline void bs_flush_write( bs_transrate_t *s )
+{
+    if( s->i_bit_out != 8 ) bs_write(s, 0, s->i_bit_out);
+}
+
+int scale_quant( transrate_t *tr, double qrate );
+int transrate_mb( transrate_t *tr, RunLevel blk[6][65], RunLevel new_blk[6][65], int i_cbp, int intra );
+void get_intra_block_B14( transrate_t *tr, RunLevel *blk );
+void get_intra_block_B15( transrate_t *tr, RunLevel *blk );
+int get_non_intra_block( transrate_t *tr, RunLevel *blk );
+void putnonintrablk( bs_transrate_t *bs, RunLevel *blk);
+void putintrablk( bs_transrate_t *bs, RunLevel *blk, int vlcformat);
+
+int process_frame( sout_stream_t *p_stream, sout_stream_id_t *id,
+                   block_t *in, block_t **out, int i_handicap );
