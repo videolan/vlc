@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.144 2004/01/05 14:10:58 fenrir Exp $
+dnl $Id: configure.ac,v 1.145 2004/01/05 17:42:36 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -2745,17 +2745,23 @@ if test "${enable_skins2}" != "no"; then
 
     AX_ADD_PLUGINS([skins2])
     ALIASES="${ALIASES} svlc"
-    AX_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -Imodules/gui/skins2])
+    AX_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -Imodules/gui/skins2 -DWIN32_SKINS])
     AX_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    AX_ADD_LDFLAGS([skins2],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
+    AX_ADD_LDFLAGS([skins2],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32 -lmsimg32])
 
   else if test "${enable_skins2}" = "yes"; then
     AX_ADD_PLUGINS([skins2])
     ALIASES="${ALIASES} svlc"
-    AX_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -I${x_includes} -I/usr/include/freetype2 -DX11_SKINS])
+    AX_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -I${x_includes} -DX11_SKINS])
     AX_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    AX_ADD_LDFLAGS([skins2],[-L${x_libraries} -lXext -lX11 -lfreetype -lpng ])
+    AX_ADD_LDFLAGS([skins2],[-L${x_libraries} -lXext -lX11])
   fi fi
+
+  if test "${FREETYPE_CONFIG}" != "no"
+  then
+    AX_ADD_CPPFLAGS([skins2],[`${FREETYPE_CONFIG} --cflags` ${INCICONV}])
+    AX_ADD_LDFLAGS([skins2],[`${FREETYPE_CONFIG} --libs` ${LIBICONV} -lpng])
+  fi
 fi
 
 

@@ -1,4 +1,4 @@
-SOURCES_skins = \
+SOURCES_skins2 = \
 	commands/async_queue.cpp \
 	commands/async_queue.hpp \
 	commands/cmd_add_item.cpp \

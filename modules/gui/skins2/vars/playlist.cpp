@@ -2,7 +2,7 @@
  * playlist.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.2 2004/01/04 22:38:49 gbazin Exp $
+ * $Id: playlist.cpp,v 1.3 2004/01/05 17:42:36 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -157,8 +157,8 @@ UString *Playlist::convertName( const char *pName )
     pBufferIn = pName;
     inbytesLeft = strlen( pName );
     outbytesLeft = 6 * inbytesLeft;
-    ret = iconv( iconvHandle, (char**)&pBufferIn, &inbytesLeft, &pBufferOut,
-                 &outbytesLeft );
+    ret = iconv( iconvHandle, (const char**)&pBufferIn, &inbytesLeft,
+                 &pBufferOut, &outbytesLeft );
     *pBufferOut = '\0';
 
     if( inbytesLeft )
