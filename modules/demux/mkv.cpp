@@ -385,7 +385,7 @@ public:
         ,es(estream)
         ,i_timescale(MKVD_TIMECODESCALE)
         ,f_duration(-1.0)
-		,f_start_time(0.0)
+        ,f_start_time(0.0)
         ,i_cues_position(-1)
         ,i_chapters_position(-1)
         ,i_tags_position(-1)
@@ -463,7 +463,7 @@ public:
 
     /* duration of the segment */
     float                   f_duration;
-	float                   f_start_time;
+    float                   f_start_time;
 
     /* all tracks */
     std::vector<mkv_track_t*> tracks;
@@ -521,6 +521,7 @@ public:
     void LoadCues( );
     void LoadTags( );
     void InformationCreate( );
+    void Seek( mtime_t i_date, mtime_t i_time_offset );
     int BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
     bool Select( mtime_t i_start_time );
     void UnSelect( );
@@ -546,6 +547,7 @@ public:
     void PreloadLinked( );
     float Duration( ) const;
     void LoadCues( );
+    void Seek( mtime_t i_date, mtime_t i_time_offset );
 
     matroska_segment_t * Segment() const
     {
@@ -563,6 +565,8 @@ public:
         }
         return false;
     }
+
+/* TODO handle/merge chapters here */
 
 protected:
     std::vector<matroska_segment_t*> linked_segments;
@@ -782,15 +786,6 @@ static int Open( vlc_object_t * p_this )
     p_sys->PreloadFamily( );
     p_sys->PreloadLinked( p_segment );
     p_sys->PreparePlayback( );
-
-    if( !p_segment->b_cues || p_segment->i_index <= 0 )
-    {
-        msg_Warn( p_demux, "no cues/empty cues found->seek won't be precise" );
-
-        p_segment->IndexAppendCluster( p_segment->cluster );
-
-        p_segment->b_cues = VLC_FALSE;
-    }
 
     /* add information */
     p_segment->InformationCreate( );
@@ -1618,17 +1613,11 @@ static void UpdateCurrentToChapter( demux_t & demux )
 static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter)
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_segment_t *p_segment = p_sys->p_current_segment->Segment();
+    virtual_segment_t  *p_vsegment = p_sys->p_current_segment;
+    matroska_segment_t *p_segment = p_vsegment->Segment();
     mtime_t            i_time_offset = 0;
 
-    KaxBlock    *block;
-    int64_t     i_block_duration;
-    int64_t     i_block_ref1;
-    int64_t     i_block_ref2;
-
-    int         i_index = 0;
-    int         i_track_skipping;
-    size_t      i_track;
+    int         i_index;
 
     msg_Dbg( p_demux, "seek request to "I64Fd" (%f%%)", i_date, f_percent );
     if( i_date < 0 && f_percent < 0 )
@@ -1641,10 +1630,6 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
         msg_Warn( p_demux, "cannot seek so far !" );
         return;
     }
-
-    delete p_segment->ep;
-    p_segment->ep = new EbmlParser( &p_segment->es, p_segment->segment );
-    p_segment->cluster = NULL;
 
     /* seek without index or without date */
     if( f_percent >= 0 && (config_GetInt( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_date < 0 ))
@@ -1720,88 +1705,11 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
         p_demux->info.i_seekpoint = psz_chapter->i_seekpoint_num - 1;
     }
 
-    for( ; i_index < p_segment->i_index; i_index++ )
-    {
-        if( p_segment->index[i_index].i_time + i_time_offset > i_date )
-        {
-            break;
-        }
-    }
+//    p_sys->i_start_pts = i_date;
 
-    if( i_index > 0 )
-    {
-        i_index--;
-    }
+//    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
-    msg_Dbg( p_demux, "seek got "I64Fd" (%d%%)",
-                p_segment->index[i_index].i_time,
-                (int)( 100 * p_segment->index[i_index].i_position /
-                    stream_Size( p_demux->s ) ) );
-
-    p_segment->es.I_O().setFilePointer( p_segment->index[i_index].i_position,
-                                seek_beginning );
-
-    p_sys->i_start_pts = i_date;
-
-    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
-
-    /* now parse until key frame */
-#define tk  p_segment->tracks[i_track]
-    i_track_skipping = 0;
-    for( i_track = 0; i_track < p_segment->tracks.size(); i_track++ )
-    {
-        if( tk->fmt.i_cat == VIDEO_ES )
-        {
-            tk->b_search_keyframe = VLC_TRUE;
-            i_track_skipping++;
-        }
-        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, tk->p_es, i_date );
-    }
-
-
-    while( i_track_skipping > 0 )
-    {
-        if( p_segment->BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
-        {
-            msg_Warn( p_demux, "cannot get block EOF?" );
-
-            return;
-        }
-
-        for( i_track = 0; i_track < p_segment->tracks.size(); i_track++ )
-        {
-            if( tk->i_number == block->TrackNum() )
-            {
-                break;
-            }
-        }
-
-        p_sys->i_pts = p_sys->i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
-
-        if( i_track < p_segment->tracks.size() )
-        {
-            if( p_sys->i_pts >= p_sys->i_start_pts )
-            {
-                BlockDecode( p_demux, block, p_sys->i_pts, 0 );
-                i_track_skipping = 0;
-            }
-            else if( tk->fmt.i_cat == VIDEO_ES )
-            {
-                if( i_block_ref1 == -1 && tk->b_search_keyframe )
-                {
-                    tk->b_search_keyframe = VLC_FALSE;
-                    i_track_skipping--;
-                }
-                if( !tk->b_search_keyframe )
-                {
-                    BlockDecode( p_demux, block, p_sys->i_pts, 0 );
-                }
-            } 
-        }
-
-        delete block;
-    }
-#undef tk
+    p_vsegment->Seek( i_date, i_time_offset );
 }
 
 /*****************************************************************************
@@ -2110,7 +2018,11 @@ void matroska_segment_t::LoadCues( )
 
     /* *** Load the cue if found *** */
     if( i_cues_position < 0 )
-        return;
+    {
+        msg_Warn( &sys.demuxer, "no cues/empty cues found->seek won't be precise" );
+
+//        IndexAppendCluster( cluster );
+    }
 
     vlc_bool_t b_seekable;
 
@@ -3155,7 +3067,7 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
 
 void matroska_segment_t::ParseCluster( )
 {
-	EbmlElement *el;
+    EbmlElement *el;
     EbmlMaster  *m;
     unsigned int i;
     int i_upper_level = 0;
@@ -3173,11 +3085,11 @@ void matroska_segment_t::ParseCluster( )
             KaxClusterTimecode &ctc = *(KaxClusterTimecode*)l;
 
             cluster->InitTimecode( uint64( ctc ), i_timescale );
-			break;
+            break;
         }
     }
 
-	f_start_time = cluster->GlobalTimecode() / 1000000.0;
+    f_start_time = cluster->GlobalTimecode() / 1000000.0;
 }
 
 /*****************************************************************************
@@ -3481,8 +3393,8 @@ void demux_sys_t::PreloadLinked( matroska_segment_t *p_segment )
 
 void demux_sys_t::PreparePlayback( )
 {
-    f_duration = p_current_segment->Duration();
     p_current_segment->LoadCues();
+    f_duration = p_current_segment->Duration();
 }
 
 bool matroska_segment_t::CompareSegmentUIDs( const matroska_segment_t * p_item_a, const matroska_segment_t * p_item_b )
@@ -3535,6 +3447,7 @@ bool matroska_segment_t::Preload( )
             cluster = (KaxCluster*)el;
 
             i_start_pos = cluster->GetElementPosition();
+            ParseCluster( );
 
             ep->Down();
             /* stop parsing the stream */
@@ -3625,14 +3538,14 @@ void virtual_segment_t::PreloadLinked( )
 float virtual_segment_t::Duration() const
 {
     float f_duration;
-	if ( linked_segments.size() == 0 )
-		f_duration = 0.0;
-	else {
-		matroska_segment_t *p_last_segment = linked_segments[linked_segments.size()-1];
-		p_last_segment->ParseCluster( );
+    if ( linked_segments.size() == 0 )
+        f_duration = 0.0;
+    else {
+        matroska_segment_t *p_last_segment = linked_segments[linked_segments.size()-1];
+//        p_last_segment->ParseCluster( );
 
-		f_duration = p_last_segment->f_start_time + p_last_segment->f_duration;
-	}
+        f_duration = p_last_segment->f_start_time + p_last_segment->f_duration;
+    }
     return f_duration;
 }
 
@@ -3655,4 +3568,123 @@ void virtual_segment_t::AppendUID( const EbmlBinary & UID )
             return;
     }
     linked_uids.push_back( *(KaxSegmentUID*)(&UID) );
+}
+
+void matroska_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
+{
+    KaxBlock    *block;
+    int         i_track_skipping;
+    int64_t     i_block_duration;
+    int64_t     i_block_ref1;
+    int64_t     i_block_ref2;
+    size_t      i_track;
+
+    int         i_idx = 0;
+
+    for( ; i_idx < i_index; i_idx++ )
+    {
+        if( index[i_idx].i_time + i_time_offset > i_date )
+        {
+            break;
+        }
+    }
+
+    if( i_idx > 0 )
+    {
+        i_idx--;
+    }
+
+    msg_Dbg( &sys.demuxer, "seek got "I64Fd" (%d%%)",
+                index[i_idx].i_time,
+                (int)( 100 * index[i_idx].i_position / stream_Size( sys.demuxer.s ) ) );
+
+    delete ep;
+    ep = new EbmlParser( &es, segment );
+    cluster = NULL;
+
+    es.I_O().setFilePointer( index[i_idx].i_position, seek_beginning );
+
+    sys.i_start_pts = i_date;
+
+    es_out_Control( sys.demuxer.out, ES_OUT_RESET_PCR );
+
+    /* now parse until key frame */
+#define tk  tracks[i_track]
+    i_track_skipping = 0;
+    for( i_track = 0; i_track < tracks.size(); i_track++ )
+    {
+        if( tk->fmt.i_cat == VIDEO_ES )
+        {
+            tk->b_search_keyframe = VLC_TRUE;
+            i_track_skipping++;
+        }
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tk->p_es, i_date );
+    }
+
+
+    while( i_track_skipping > 0 )
+    {
+        if( BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        {
+            msg_Warn( &sys.demuxer, "cannot get block EOF?" );
+
+            return;
+        }
+
+        for( i_track = 0; i_track < tracks.size(); i_track++ )
+        {
+            if( tk->i_number == block->TrackNum() )
+            {
+                break;
+            }
+        }
+
+        sys.i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
+
+        if( i_track < tracks.size() )
+        {
+            if( sys.i_pts >= sys.i_start_pts )
+            {
+                BlockDecode( &sys.demuxer, block, sys.i_pts, 0 );
+                i_track_skipping = 0;
+            }
+            else if( tk->fmt.i_cat == VIDEO_ES )
+            {
+                if( i_block_ref1 == -1 && tk->b_search_keyframe )
+                {
+                    tk->b_search_keyframe = VLC_FALSE;
+                    i_track_skipping--;
+                }
+                if( !tk->b_search_keyframe )
+                {
+                    BlockDecode( &sys.demuxer, block, sys.i_pts, 0 );
+                }
+            } 
+        }
+
+        delete block;
+    }
+#undef tk
+}
+
+void virtual_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
+{
+    // find the best matching segment
+    for ( size_t i=0; i<linked_segments.size(); i++ )
+    {
+        if ( i_date < linked_segments[i]->f_start_time * 1000.0 )
+            break;
+    }
+
+    if ( i > 0 )
+        i--;
+
+    if ( i_current_segment != i  )
+    {
+        linked_segments[i_current_segment]->UnSelect();
+        linked_segments[i]->Select( i_date );
+        i_current_segment = i;
+    }
+
+    linked_segments[i]->Seek( i_date, i_time_offset );
 }
