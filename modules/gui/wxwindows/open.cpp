@@ -1,8 +1,8 @@
 /*****************************************************************************
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.52 2003/12/13 00:45:00 rocky Exp $
+ * Copyright (C) 2000, 2001, 2003 VideoLAN
+ * $Id: open.cpp,v 1.53 2003/12/13 20:13:07 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1017,11 +1017,11 @@ void OpenDialog::OnDiscDeviceChange( wxCommandEvent& event )
         case 3:
             psz_device = config_GetPsz( p_intf, "cd-audio" );
             break;
-                                                                                                                           
+
         case 2:
             psz_device = config_GetPsz( p_intf, "vcd" );
             break;
-                                                                                                                            
+
         default:
             psz_device = config_GetPsz( p_intf, "dvd" );
             break;
@@ -1039,72 +1039,76 @@ void OpenDialog::OnDiscDeviceChange( wxCommandEvent& event )
 
 void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
 {
-    char *psz_device;
+    char *psz_device = NULL;
+    int  i_selection = 1; /* Default Title/Track selection number*/
 
     switch( disc_type->GetSelection() )
     {
-    case 3:
-        psz_device = config_GetPsz( p_intf, "cd-audio" );
-        if( !b_disc_device_changed )
-        {
-            disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
-	    disc_title_label->SetLabel ( wxT("Track") );
-        }
-        break;
 
-    case 2:
-        psz_device = config_GetPsz( p_intf, "vcd" );
-        if( !b_disc_device_changed )
-        {
-            disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
-	    disc_title_label->SetLabel ( config_GetInt( p_intf, "vcdx-PBC"  )
-					 ? wxT("PBC LID") : wxT("Entry") );
-        }
-        break;
+    case 0: /* DVD with menues */
+      i_selection=0;
+      /* Fall through... */
 
-    default:
+    case 1: /* DVD of some sort */
+      {
         psz_device = config_GetPsz( p_intf, "dvd" );
         if( !b_disc_device_changed )
         {
             disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
 	    disc_title_label->SetLabel ( wxT("Title") );
+	}
+	disc_title->SetRange( i_selection, 255 );
+	disc_title->SetValue( i_selection );
+	break;
+      }
+	
+    case 2:  /* VCD of some sort */
+        psz_device = config_GetPsz( p_intf, "vcd" );
+        if( !b_disc_device_changed )
+        {
+            disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
         }
+
+	/* There are at most 98, tracks in a VCD, 999 Segments, 500 entries
+	   I don't know what the limit is for LIDs, 999 is probably safe
+	   though. 
+
+	   FIXME: it would be better however to get the information for
+	   this particular Media possibly from the General Info area.
+	*/
+#ifdef HAVE_VCDX
+	disc_title_label->SetLabel ( config_GetInt( p_intf, "vcdx-PBC"  )
+				     ? wxT("PBC LID") : wxT("Entry") );
+        disc_title->SetRange( 0, 999 ); 
+        i_selection = 0;
+#else
+	disc_title_label->SetLabel ( wxT("Track") );
+        disc_title->SetRange( 1, 98 ); 
+#endif
+        disc_title->SetValue( i_selection );
+        break;
+
+    case 3: /* CD-DA */
+        psz_device = config_GetPsz( p_intf, "cd-audio" );
+        if( !b_disc_device_changed )
+        {
+            disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
+        }
+	disc_title_label->SetLabel ( wxT("Track") );
+#ifdef HAVE_CDDAX
+        i_selection = 0;
+#endif
+       /* There are at most 99 tracks in a CD-DA */
+        disc_title->SetRange( i_selection, 99 ); 
+        disc_title->SetValue( i_selection );
+        break;
+    default: 
+        msg_Err( p_intf, "invalid Disc type selection (%d)", 
+	       disc_type->GetSelection() );
         break;
     }
 
     if( psz_device ) free( psz_device );
-
-    switch( disc_type->GetSelection() )
-    {
-    case 0:
-        disc_title->SetRange( 0, 255 );
-        disc_title->SetValue( 0 );
-        break;
-    case 2:
-       /* There are at most 100 tracks in a VCD */
-        disc_title->SetRange( 0, 100 ); 
-#ifdef HAVE_VCDX
-        disc_title->SetValue( 0 );
-#else
-        disc_title->SetValue( 1 );
-#endif
-        break;
-    case 3:
-       /* There are at most 100 tracks in a CD */
-#ifdef HAVE_CDDAX
-        disc_title->SetRange( 0, 100 ); 
-        disc_title->SetValue( 0 );
-	break;
-#else
-        disc_title->SetRange( 1, 100 ); 
-        disc_title->SetValue( 1 );
-#endif
-        break;
-    default:
-        disc_title->SetRange( 1, 255 );
-        disc_title->SetValue( 1 );
-        break;
-    }
 
     disc_chapter->SetRange( 1, 255 );
     disc_chapter->SetValue( 1 );
