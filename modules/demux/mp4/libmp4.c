@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.40 2004/01/05 12:37:52 jlj Exp $
+ * $Id: libmp4.c,v 1.41 2004/01/06 01:41:10 jlj Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1215,6 +1215,8 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
         if( i_ret )
         {
+            msg_Dbg( p_stream->p_input, "drms_init( UKEY ) failed" );
+
             drms_free( p_box->data.p_sample_soun->p_drms );
             p_box->data.p_sample_soun->p_drms = NULL;
         }
@@ -1983,6 +1985,8 @@ static int MP4_ReadBox_iviv( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
             if( drms_init( p_drms_box->data.p_sample_soun->p_drms,
                            DRMS_INIT_IVIV, p_peek, sizeof(uint32_t) * 4 ) )
             {
+                msg_Dbg( p_stream->p_input, "drms_init( IVIV ) failed" );
+
                 drms_free( p_drms_box->data.p_sample_soun->p_drms );
                 p_drms_box->data.p_sample_soun->p_drms = NULL;
             }
@@ -2008,6 +2012,8 @@ static int MP4_ReadBox_name( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         if( drms_init( p_drms_box->data.p_sample_soun->p_drms,
                        DRMS_INIT_NAME, p_peek, strlen( p_peek ) ) )
         {
+            msg_Dbg( p_stream->p_input, "drms_init( NAME ) failed" );
+
             drms_free( p_drms_box->data.p_sample_soun->p_drms );
             p_drms_box->data.p_sample_soun->p_drms = NULL;
         }
@@ -2032,6 +2038,8 @@ static int MP4_ReadBox_priv( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         if( drms_init( p_drms_box->data.p_sample_soun->p_drms,
                        DRMS_INIT_PRIV, p_peek, i_read ) )
         {
+            msg_Dbg( p_stream->p_input, "drms_init( PRIV ) failed" );
+
             drms_free( p_drms_box->data.p_sample_soun->p_drms );
             p_drms_box->data.p_sample_soun->p_drms = NULL;
         }

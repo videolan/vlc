@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.48 2004/01/05 13:07:02 zorglub Exp $
+ * $Id: mp4.c,v 1.49 2004/01/06 01:41:10 jlj Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1335,6 +1335,9 @@ static void MP4_TrackCreate( input_thread_t *p_input,
     p_drms = MP4_BoxGet( p_track->p_stsd, "drms" );
     p_track->p_drms = p_drms != NULL ?
         p_drms->data.p_sample_soun->p_drms : NULL;
+
+    msg_Dbg( p_input, "drms%sinitialized",
+             p_track->p_drms == NULL ? " not " : " " );
 
     /* Set language */
     if( strcmp( language, "```" ) && strcmp( language, "und" ) )
