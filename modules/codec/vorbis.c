@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.3 2002/11/02 18:13:22 gbazin Exp $
+ * $Id: vorbis.c,v 1.4 2002/11/03 13:22:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -129,6 +129,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     }
 
     /* Initialize the thread properties */
+    memset( p_dec, 0, sizeof(dec_thread_t) );
     p_dec->p_fifo = p_fifo;
     p_dec->p_pes  = NULL;
 
@@ -206,14 +207,16 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     return 0;
 
  error:
+    DecoderError( p_fifo );
     if( p_dec )
     {
         if( p_dec->p_fifo )
             p_dec->p_fifo->b_error = 1;
-        free( p_dec );
+
+        /* End of the vorbis decoder thread */
+        CloseDecoder( p_dec );
     }
 
-    DecoderError( p_fifo );
     return -1;
 
 }

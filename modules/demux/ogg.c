@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.4 2002/11/02 22:47:16 gbazin Exp $
+ * $Id: ogg.c,v 1.5 2002/11/03 13:22:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -45,7 +45,6 @@ typedef struct logical_stream_s
     ogg_stream_state os;                        /* logical stream of packets */
 
     int              i_serial_no;
-    int              i_pages_read;
     int              i_cat;                            /* AUDIO_ES, VIDEO_ES */
     int              i_activated;
     vlc_fourcc_t     i_fourcc;
@@ -53,6 +52,13 @@ typedef struct logical_stream_s
 
     es_descriptor_t  *p_es;   
     int              b_selected;                           /* newly selected */
+
+    /* the header of some logical streams (eg vorbis) contain essential
+     * data for the decoder. We back them up here in case we need to re-feed
+     * them to the decoder. */
+    int              b_force_backup;
+    int              i_packets_backup;
+    ogg_packet       *p_packets_backup;
 
     /* program clock reference (in units of 90kHz) derived from the previous
      * granulepos */
@@ -143,6 +149,17 @@ static int Ogg_StreamStart( input_thread_t *p_input,
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     p_stream->i_activated = p_stream->p_es->p_decoder_fifo ? 1 : 0;
+
+    /* Feed the backup header to the decoder */
+    if( !p_stream->b_force_backup )
+    {
+        int i;
+        for( i = 0; i < p_stream->i_packets_backup; i++ )
+        {
+            Ogg_DecodePacket( p_input, p_stream,
+                              &p_stream->p_packets_backup[i] );
+        }
+    }
 
     //Ogg_StreamSeek( p_input, p_ogg, i_stream, p_ogg->i_time );
 
@@ -242,6 +259,51 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     data_packet_t *p_data;
     demux_sys_t *p_ogg = p_input->p_demux_data;
 
+    if( p_stream->b_force_backup )
+    {
+        /* Backup the ogg packet (likely an header) */
+        ogg_packet *p_packet_backup;
+        p_stream->i_packets_backup++;
+        p_stream->p_packets_backup =
+            realloc( p_stream->p_packets_backup, p_stream->i_packets_backup *
+                     sizeof(ogg_packet) );
+
+        p_packet_backup =
+            &p_stream->p_packets_backup[p_stream->i_packets_backup - 1];
+
+        p_packet_backup->bytes = p_oggpacket->bytes;
+        p_packet_backup->granulepos = p_oggpacket->granulepos;
+        p_packet_backup->packet = malloc( p_oggpacket->bytes );
+        if( !p_packet_backup->packet ) return;
+        memcpy( p_packet_backup->packet, p_oggpacket->packet,
+                p_oggpacket->bytes );
+
+        switch( p_stream->i_fourcc )
+        {
+        case VLC_FOURCC( 'v','o','r','b' ):
+          if( p_stream->i_packets_backup == 3 ) p_stream->b_force_backup = 0;
+          break;
+
+        default:
+          p_stream->b_force_backup = 0;
+          break;
+        }
+    }
+
+    if( !p_stream->p_es->p_decoder_fifo )
+    {
+        /* This stream isn't currently selected so we don't need to decode it,
+         * but we do need to store its pcr as it might be selected later on. */
+
+        /* Convert the next granule into a pcr */
+        p_stream->i_pcr = ( p_oggpacket->granulepos < 0 ) ?
+            p_stream->i_pcr + ( p_oggpacket->bytes * 90000
+                / p_stream->i_bitrate / 8 ):
+            p_oggpacket->granulepos * 90000 / p_stream->i_rate;
+
+        return;
+    }
+
     if( !( p_pes = input_NewPES( p_input->p_method_data ) ) )
     {
         return;
@@ -265,7 +327,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
 
     /* Convert the next granule into a pcr */
     p_stream->i_pcr = ( p_oggpacket->granulepos < 0 ) ? -1 :
-                           p_oggpacket->granulepos * 90000 / p_stream->i_rate;
+                        p_oggpacket->granulepos * 90000 / p_stream->i_rate;
 
     /* Update the main pcr */
     if( p_stream == p_ogg->p_stream_timeref )
@@ -322,7 +384,6 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 memset( p_stream, 0, sizeof(logical_stream_t) );
 
                 /* Setup the logical stream */
-                p_stream->i_pages_read++;
                 p_stream->i_serial_no = ogg_page_serialno( &oggpage );
                 ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
 
@@ -353,6 +414,11 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     p_stream->i_cat = AUDIO_ES;
                     p_stream->i_fourcc = VLC_FOURCC( 'v','o','r','b' );
 
+                    /* Signal that we want to keep a backup of the vorbis
+                     * stream headers. They will be used when switching between
+                     * audio streams. */
+                    p_stream->b_force_backup = 1;
+
                     /* Cheat and get additionnal info ;) */
                     oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
                     oggpack_adv( &opb, 96 );
@@ -363,7 +429,8 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 else
                 {
                     msg_Dbg( p_input, "found unknown codec" );
-                    p_stream->i_cat = UNKNOWN_ES;
+                    free( p_stream );
+                    p_ogg->i_streams--;
                 }
 
 #undef p_stream
@@ -380,7 +447,6 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 if( ogg_stream_pagein( &p_ogg->pp_stream[i_stream]->os,
                                        &oggpage ) == 0 )
                 {
-                    p_ogg->pp_stream[i_stream]->i_pages_read++;
                     break;
                 }
             }
@@ -538,7 +604,7 @@ static void Deactivate( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t *p_ogg = (demux_sys_t *)p_input->p_demux_data  ; 
-    int i;
+    int i, j;
 
     if( p_ogg )
     {
@@ -548,6 +614,11 @@ static void Deactivate( vlc_object_t *p_this )
         for( i = 0; i < p_ogg->i_streams; i++ )
         {
             ogg_stream_clear( &p_ogg->pp_stream[i]->os );
+            for( j = 0; j < p_ogg->pp_stream[i]->i_packets_backup; j++ )
+            {
+                free( p_ogg->pp_stream[i]->p_packets_backup[j].packet );
+            }
+            free( p_ogg->pp_stream[i]->p_packets_backup );
             free( p_ogg->pp_stream[i] );
         }
         if( p_ogg->pp_stream ) free( p_ogg->pp_stream );
@@ -649,15 +720,12 @@ static int Demux( input_thread_t * p_input )
 
         for( i_stream = 0; i_stream < p_ogg->i_streams; i_stream++ )
         {
-            /* FIXME: we already read the header */
-
             if( ogg_stream_pagein( &p_stream->os, &oggpage ) != 0 )
                 continue;
 
             while( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
             {
-                if( !p_stream->p_es ||
-                    !p_stream->p_es->p_decoder_fifo )
+                if( !p_stream->p_es )
                 {
                     break;
                 }
