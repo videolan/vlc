@@ -147,9 +147,9 @@ VlcProc::~VlcProc()
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-append",
-                     onIntfShow, this );
+                     onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-deleted",
-                     onIntfShow, this );
+                     onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-show",
                      onIntfShow, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-current",
@@ -392,7 +392,6 @@ void VlcProc::updateStreamName( playlist_t *p_playlist )
         VarText &rStreamURI = getStreamURIVar();
         // XXX: we should not need to access p_input->psz_source directly, a
         // getter should be provided by VLC core
-#warning "FIXME!"
         string name = p_playlist->p_input->input.p_item->psz_name;
         // XXX: This should be done in VLC core, not here...
         // Remove path information if any
