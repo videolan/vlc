@@ -2,7 +2,7 @@
  * lirc.c : lirc module for vlc
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: lirc.c,v 1.11 2004/02/15 19:40:41 sigmunau Exp $
+ * $Id$
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -196,13 +196,15 @@ static void Run( intf_thread_t *p_intf )
             {
                 audio_volume_t i_newvol;
                 aout_VolumeUp( p_intf, 1, &i_newvol );
-                vout_OSDMessage( p_intf, _("Vol %%%d"), i_newvol*100/AOUT_VOLUME_MAX );
+                vout_OSDMessage( p_intf, _("Vol %%%d"),
+                                 i_newvol * 100 / AOUT_VOLUME_MAX );
             }
             else if( !strcmp( c, "VOL_DOWN" ) )
             {
                 audio_volume_t i_newvol;
                 aout_VolumeDown( p_intf, 1, &i_newvol );
-                vout_OSDMessage( p_intf, _("Vol %%%d"), i_newvol*100/AOUT_VOLUME_MAX );
+                vout_OSDMessage( p_intf, _("Vol %%%d"),
+                                 i_newvol * 100 / AOUT_VOLUME_MAX );
             }
             else if( !strcmp( c, "MUTE" ) )
             {
@@ -214,7 +216,8 @@ static void Run( intf_thread_t *p_intf )
                 }
                 else
                 {
-                    vout_OSDMessage( p_intf, _("Vol %d%%"), i_newvol*100/AOUT_VOLUME_MAX );
+                    vout_OSDMessage( p_intf, _("Vol %d%%"),
+                                     i_newvol * 100 / AOUT_VOLUME_MAX );
                 }
             }
             if( p_vout )
@@ -283,16 +286,11 @@ static void Run( intf_thread_t *p_intf )
             if( !strcmp( c, "PLAY" ) )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                      FIND_ANYWHERE );
+                                              FIND_ANYWHERE );
                 if( p_playlist )
                 {
-                    vlc_mutex_lock( &p_playlist->object_lock );
-                    if( p_playlist->i_size )
-                    {
-                        vlc_mutex_unlock( &p_playlist->object_lock );
-                        playlist_Play( p_playlist );
-                        vlc_object_release( p_playlist );
-                    }
+                    playlist_Play( p_playlist );
+                    vlc_object_release( p_playlist );
                 }
                 continue;
             }
@@ -334,10 +332,11 @@ static void Run( intf_thread_t *p_intf )
             {
                 if( !strcmp( c, "AUDIO_TRACK" ) )
                 {
-                    vlc_value_t val,list,list2;
+                    vlc_value_t val, list, list2;
                     int i_count, i;
                     var_Get( p_input, "audio-es", &val );
-                    var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES, &list, &list2 );
+                    var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
+                                &list, &list2 );
                     i_count = list.p_list->i_count;
                     for( i = 0; i < i_count; i++ )
                     {
@@ -349,28 +348,34 @@ static void Run( intf_thread_t *p_intf )
                     /* value of audio-es was not in choices list */
                     if( i == i_count )
                     {
-                        msg_Warn( p_input, "invalid current audio track, selecting 0" );
-                        var_Set( p_input, "audio-es", list.p_list->p_values[0] );
+                        msg_Warn( p_input,
+                                  "invalid current audio track, selecting 0" );
+                        var_Set( p_input, "audio-es",
+                                 list.p_list->p_values[0] );
                         i = 0;
                     }
                     else if( i == i_count - 1 )
                     {
-                        var_Set( p_input, "audio-es", list.p_list->p_values[0] );
+                        var_Set( p_input, "audio-es",
+                                 list.p_list->p_values[0] );
                         i = 0;
                     }
                     else
                     {
-                        var_Set( p_input, "audio-es", list.p_list->p_values[i+1] );
-                        i = i + 1;
+                        var_Set( p_input, "audio-es",
+                                 list.p_list->p_values[i+1] );
+                        i++;
                     }
-                    vout_OSDMessage( VLC_OBJECT(p_input), _("Audio track: %s"), list2.p_list->p_values[i].psz_string );
+                    vout_OSDMessage( VLC_OBJECT(p_input), _("Audio track: %s"),
+                                     list2.p_list->p_values[i].psz_string );
                 }
                 else if( !strcmp( c, "SUBTITLE_TRACK" ) )
                 {
-                    vlc_value_t val,list,list2;
+                    vlc_value_t val, list, list2;
                     int i_count, i;
                     var_Get( p_input, "spu-es", &val );
-                    var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES, &list, &list2 );
+                    var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
+                                &list, &list2 );
                     i_count = list.p_list->i_count;
                     for( i = 0; i < i_count; i++ )
                     {

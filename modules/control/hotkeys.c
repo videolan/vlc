@@ -85,26 +85,26 @@ static void SetBookmark ( intf_thread_t *, int );
 vlc_module_begin();
     set_description( _("Hotkeys management interface") );
     add_string( "bookmark1", NULL, NULL,
-                BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+                BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
     add_string( "bookmark2", NULL, NULL,
-                BOOKMARK2_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+                BOOKMARK2_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
     add_string( "bookmark3", NULL, NULL,
-                BOOKMARK3_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+                BOOKMARK3_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
     add_string( "bookmark4", NULL, NULL,
-                BOOKMARK4_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+                BOOKMARK4_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
     add_string( "bookmark5", NULL, NULL,
-                BOOKMARK5_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+                BOOKMARK5_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
     add_string( "bookmark6", NULL, NULL,
-                BOOKMARK6_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+                BOOKMARK6_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
     add_string( "bookmark7", NULL, NULL,
-                BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+                BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
     add_string( "bookmark8", NULL, NULL,
-                BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+                BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
     add_string( "bookmark9", NULL, NULL,
-                BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+                BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
     add_string( "bookmark10", NULL, NULL,
-                BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
-    
+                BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -200,8 +200,7 @@ static void Run( intf_thread_t *p_intf )
         /* Update the vout */
         if( p_vout == NULL )
         {
-            p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                      FIND_ANYWHERE );
+            p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
             p_intf->p_sys->p_vout = p_vout;
         }
         else if( p_vout->b_die )
@@ -251,22 +250,22 @@ static void Run( intf_thread_t *p_intf )
         {
             int i_delay;
             if( input_Control( p_input, INPUT_GET_SUBDELAY, &i_delay ) ==
-                             VLC_SUCCESS )
+                VLC_SUCCESS )
             {
                 i_delay--;
                 input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
-                vout_OSDMessage( p_intf, "Subtitle delay %i ms",i_delay*100);
+                vout_OSDMessage( p_intf, "Subtitle delay %i ms", i_delay*100);
             }
         }
         else if( i_action == ACTIONID_SUBDELAY_UP )
         {
             int i_delay;
             if( input_Control( p_input, INPUT_GET_SUBDELAY, &i_delay ) ==
-                             VLC_SUCCESS )
+                VLC_SUCCESS )
             {
                 i_delay++;
                 input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
-                vout_OSDMessage( p_intf, "Subtitle delay %i ms",i_delay*100);
+                vout_OSDMessage( p_intf, "Subtitle delay %i ms", i_delay*100);
             }
         }
         else if( i_action == ACTIONID_VOL_MUTE )
@@ -280,7 +279,7 @@ static void Run( intf_thread_t *p_intf )
             else
             {
                 vout_OSDMessage( p_intf, "Vol %d%%",
-                                 i_newvol*100/AOUT_VOLUME_MAX );
+                                 i_newvol * 100 / AOUT_VOLUME_MAX );
             }
         }
         else if( i_action == ACTIONID_FULLSCREEN && p_vout )
@@ -317,14 +316,9 @@ static void Run( intf_thread_t *p_intf )
                                               FIND_ANYWHERE );
                 if( p_playlist )
                 {
-                    vlc_mutex_lock( &p_playlist->object_lock );
-                    if( p_playlist->i_size )
-                    {
-                        vlc_mutex_unlock( &p_playlist->object_lock );
-                        vout_OSDMessage( p_intf, _( "Play" ) );
-                        playlist_Play( p_playlist );
-                        vlc_object_release( p_playlist );
-                    }
+                    vout_OSDMessage( p_intf, _( "Play" ) );
+                    playlist_Play( p_playlist );
+                    vlc_object_release( p_playlist );
                 }
             }
         }
@@ -414,15 +408,16 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_POSITION )
             {
-                playlist_t *p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                              FIND_ANYWHERE );
+                playlist_t *p_playlist =
+                    vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                     FIND_ANYWHERE );
                 char psz_duration[MSTRTIME_MAX_SIZE];
                 char psz_time[MSTRTIME_MAX_SIZE];
                 vlc_value_t time;
                 mtime_t i_seconds;
-                                                                                                                            
+
                 var_Get( p_input, "time", &time );
-                                                                                                                            
+
                 if( p_playlist )
                 {
                     mtime_t dur =
@@ -430,14 +425,15 @@ static void Run( intf_thread_t *p_intf )
 
                     i_seconds = time.i_time / 1000000;
                     secstotimestr ( psz_time, i_seconds );
-                                                                                                                            
+
                     if( dur != -1 )
                     {
-                        secstotimestr( psz_duration, dur/1000000 );
-                        vout_OSDMessage( p_playlist, "%s / %s", psz_time, psz_duration );
+                        secstotimestr( psz_duration, dur / 1000000 );
+                        vout_OSDMessage( p_playlist, "%s / %s",
+                                         psz_time, psz_duration );
                     }
                     else if( i_seconds > 0 )
-                    { 
+                    {
                         vout_OSDMessage( p_playlist, psz_time );
                     }
                     vlc_object_release( p_playlist );
@@ -522,23 +518,24 @@ static int ActionKeyCB( vlc_object_t *p_this, char const *psz_var,
 }
 
 static void PlayBookmark( intf_thread_t *p_intf, int i_num )
-{   
+{
     vlc_value_t val;
     int i_position;
     char psz_bookmark_name[11];
-    playlist_t *p_playlist = vlc_object_find( p_intf,
-             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    
+    playlist_t *p_playlist =
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
     sprintf( psz_bookmark_name, "bookmark%i", i_num );
     var_Create( p_intf, psz_bookmark_name, VLC_VAR_STRING|VLC_VAR_DOINHERIT );
     var_Get( p_intf, psz_bookmark_name, &val );
-                                                                                                                    
+
     if( p_playlist )
     {
         char *psz_bookmark = strdup( val.psz_string );
-        for( i_position = 0 ; i_position < p_playlist->i_size ; i_position++)
+        for( i_position = 0; i_position < p_playlist->i_size; i_position++)
         {
-            if( !strcmp( psz_bookmark, p_playlist->pp_items[i_position]->input.psz_uri ) )
+            if( !strcmp( psz_bookmark,
+                         p_playlist->pp_items[i_position]->input.psz_uri ) )
             {
                 playlist_Goto( p_playlist, i_position );
                 break;
@@ -551,16 +548,18 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
 static void SetBookmark( intf_thread_t *p_intf, int i_num )
 {
     vlc_value_t val;
-    playlist_t *p_playlist = vlc_object_find( p_intf,
-            VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist =
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist )
     {
         char psz_bookmark_name[11];
         sprintf( psz_bookmark_name, "bookmark%i", i_num );
-        var_Create( p_intf, psz_bookmark_name, VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+        var_Create( p_intf, psz_bookmark_name,
+                    VLC_VAR_STRING|VLC_VAR_DOINHERIT );
         val.psz_string = strdup( p_playlist->pp_items[p_playlist->i_index]->input.psz_uri );
         var_Set( p_intf, psz_bookmark_name, val );
-        msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num, val.psz_string );
+        msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num,
+                  val.psz_string );
         vlc_object_release( p_playlist );
     }
 }
