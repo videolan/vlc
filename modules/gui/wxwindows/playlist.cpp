@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: playlist.cpp,v 1.28 2003/12/03 13:35:19 rocky Exp $
+ * $Id: playlist.cpp,v 1.29 2003/12/03 21:58:42 sigmunau Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -399,15 +399,15 @@ void Playlist::Rebuild()
             listview->SetItem(listitem);
         }
 	{
-	  char psz_duration[MSTRTIME_MAX_SIZE];
-	  mtime_t dur = p_playlist->pp_items[i]->i_duration;
-	  if ( dur != -1 )
+            char psz_duration[MSTRTIME_MAX_SIZE];
+            mtime_t dur = p_playlist->pp_items[i]->i_duration;
+            if ( dur != -1 )
 	    {
-	      secstotimestr( psz_duration, dur );
+                secstotimestr( psz_duration, dur/1000000 );
 	    }
-	  else
+            else
 	    {
-	      memcpy( psz_duration ,"-:--:--", sizeof("-:--:--"));
+                memcpy( psz_duration ,"-:--:--", sizeof("-:--:--"));
 	    }
             listview->SetItem( i, 3, psz_duration );
 	}

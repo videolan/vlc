@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.17 2003/11/26 10:45:21 zorglub Exp $
+ * $Id: vlc_playlist.h,v 1.18 2003/12/03 21:58:42 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,8 +41,7 @@ struct playlist_item_t
 {
     char *     psz_name;       /**< text describing this item */
     char *     psz_uri;        /**< mrl of this item */
-    mtime_t    i_duration;     /**< A hint about the duration of this
-                                * item, in miliseconds*/
+    mtime_t    i_duration;     /**< A hint about the duration of this item */
     char **    ppsz_options;   /**< options passed with the :foo=bar syntax */
     int        i_options;      /**< number of items in the
                                 * ppsz_options array */

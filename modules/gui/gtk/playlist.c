@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: playlist.c,v 1.6 2003/12/02 01:54:30 rocky Exp $
+ * $Id: playlist.c,v 1.7 2003/12/03 21:58:43 sigmunau Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -698,7 +698,7 @@ void GtkRebuildCList( GtkCList * p_clist, playlist_t * p_playlist )
         mtime_t dur = p_playlist->pp_items[i_dummy]->i_duration;
         if ( dur != -1 )
         {
-	  secstotimestr( psz_duration, dur );
+	  secstotimestr( psz_duration, dur/1000000 );
         }
         else
         {
