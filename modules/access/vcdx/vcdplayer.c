@@ -321,6 +321,7 @@ vcdplayer_play_default( input_thread_t * p_input )
 
   if  (vcdplayer_pbc_is_on(p_vcd)) {
 
+#if defined(LIBVCD_VERSION)
     lid_t lid=vcdinfo_get_multi_default_lid(p_vcd->vcd, p_vcd->cur_lid,
 					    p_vcd->cur_lsn);
 
@@ -331,6 +332,27 @@ vcdplayer_play_default( input_thread_t * p_input )
     } else {
       dbg_print(INPUT_DBG_PBC, "no DEFAULT for LID %d\n", p_vcd->cur_lid);
     }
+
+#else 
+    vcdinfo_lid_get_pxd(p_vcd->vcd, &(p_vcd->pxd), p_vcd->cur_lid);
+    
+    switch (p_vcd->pxd.descriptor_type) {
+    case PSD_TYPE_SELECTION_LIST:
+    case PSD_TYPE_EXT_SELECTION_LIST:
+      if (p_vcd->pxd.psd == NULL) return false;
+      vcdplayer_update_entry( p_input, 
+			      vcdinfo_get_default_offset(p_vcd->vcd, 
+							 p_vcd->cur_lid), 
+			      &itemid.num, "default");
+      break;
+
+    case PSD_TYPE_PLAY_LIST: 
+    case PSD_TYPE_END_LIST:
+    case PSD_TYPE_COMMAND_LIST:
+      LOG_WARN( "There is no PBC 'default' selection here" );
+      return false;
+    }
+#endif /* LIBVCD_VERSION (< 0.7.21) */
     
 
   } else {

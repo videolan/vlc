@@ -1593,7 +1593,7 @@ then
 
   if test "${enable_vcdx}" != "no"
   then
-    PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.21,
+    PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20,
      [enable_vcd="no"
       AC_DEFINE(HAVE_VCDX, [], 
       [Define for the VCD plugin using libcdio/libvcdinfo])
