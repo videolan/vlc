@@ -2,7 +2,7 @@
  * transforms_yuvmmx.h: MMX YUV transformation assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: transforms_yuvmmx.h,v 1.4 2001/04/28 03:36:25 sam Exp $
+ * $Id: transforms_yuvmmx.h,v 1.5 2001/07/01 08:49:09 gbazin Exp $
  *
  * Authors: Olie Lho <ollie@sis.com.tw>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -26,7 +26,7 @@
 
 /* hope these constant values are cache line aligned */
 #define UNUSED_LONGLONG(foo) \
-    static unsigned long long foo __attribute__((unused))
+    static unsigned long long foo __asm__ (#foo) __attribute__((unused))
 UNUSED_LONGLONG(mmx_80w)     = 0x0080008000800080;
 UNUSED_LONGLONG(mmx_10w)     = 0x1010101010101010;
 UNUSED_LONGLONG(mmx_00ffw)   = 0x00ff00ff00ff00ff;

@@ -2,7 +2,7 @@
  * ac3_downmix_3dn.c: accelerated 3D Now! ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_3dn.c,v 1.2 2001/06/03 12:47:21 sam Exp $
+ * $Id: ac3_downmix_3dn.c,v 1.3 2001/07/01 08:49:09 gbazin Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -37,6 +37,7 @@
 
 #include "ac3_downmix.h"
 
+void sqrt2_3dn (void) __asm__ ("sqrt2_3dn");
 void sqrt2_3dn (void)
 {
     __asm__ (".float 0f0.7071068");

@@ -2,7 +2,7 @@
  * ac3_srfft_sse.c: accelerated SSE ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_srfft_sse.c,v 1.2 2001/05/16 14:51:29 reno Exp $
+ * $Id: ac3_srfft_sse.c,v 1.3 2001/07/01 08:49:09 gbazin Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -43,8 +43,8 @@
 #include "ac3_imdct.h"
 #include "ac3_srfft.h"
 
-void hsqrt2_sse (void);
-void C_1_sse (void);
+void hsqrt2_sse (void) __asm__ ("hsqrt2_sse");
+void C_1_sse (void) __asm__ ("C_1_sse");
 static void fft_4_sse (complex_t *x);
 static void fft_8_sse (complex_t *x);
 static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,

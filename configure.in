@@ -155,16 +155,8 @@ PLUGINS="${PLUGINS}"
 dnl
 dnl  Accelerated modules
 dnl
-case x$host_os in
-  xmingw32msvc)
-    MMX_MODULES="idctmmx motionmmx"
-    MMXEXT_MODULES="idctmmxext motionmmxext imdct3dn"
-    ;;
-  *)
-    MMX_MODULES="yuvmmx idctmmx motionmmx"
-    MMXEXT_MODULES="idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
-    ;;
-esac
+MMX_MODULES="yuvmmx idctmmx motionmmx"
+MMXEXT_MODULES="idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
 
 AC_MSG_CHECKING([if \$CC groks MMX inline assembly])
 AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
