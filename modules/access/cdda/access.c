@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.28 2004/02/23 00:10:50 rocky Exp $
+ * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -72,9 +72,11 @@ static int  CDDAFixupPlayList( input_thread_t *p_input,
                               cdda_data_t *p_cdda, const char *psz_source,
                               bool play_single_track);
 
+#if NEED_UPDATE_VAR
 static void CDDAUpdateVar( input_thread_t *p_input, int i_entry, int i_action,
 			   const char *p_varname, char *p_label,
 			   const char *p_debug_label );
+#endif
 
 
 /****************************************************************************
@@ -211,7 +213,8 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
         if( cdio_read_audio_sector( p_cdda->p_cddev->cdio, p_buffer,
                                     p_cdda->i_sector) != 0 )
         {
-            msg_Err( p_input, "could not read sector %d", p_cdda->i_sector );
+            msg_Err( p_input, "could not read sector %lu", 
+		     (long unsigned int) p_cdda->i_sector );
             return -1;
         }
 
@@ -221,7 +224,8 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
             input_area_t *p_area;
 
             dbg_print( (INPUT_DBG_LSN|INPUT_DBG_CALL),
-                       "end of track, cur: %u", p_cdda->i_sector );
+                       "end of track, cur: %lu", 
+		       (long unsigned int) p_cdda->i_sector );
 
             /*???? if ( p_cdda->i_track >= p_cdda->i_nb_tracks - 1 )*/
                 return 0; /* EOF */
@@ -322,11 +326,13 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_SEEK),
-    "sector %ud, offset: %lld, i_tell: %lld",  p_cdda->i_sector, i_off,
+               "sector %lu, offset: %lld, i_tell: %lld",  
+	       (long unsigned int) p_cdda->i_sector, i_off,
                p_input->stream.p_selected_area->i_tell );
 
 }
 
+#if NEED_UPDATE_VAR
 /****************************************************************************
  Update the "varname" variable to i_num without triggering a callback.
 ****************************************************************************/
@@ -344,7 +350,7 @@ CDDAUpdateVar( input_thread_t *p_input, int i_num, int i_action,
   }
   var_Change( p_input, p_varname, i_action, &val, NULL );
 }
-
+#endif
 
 #define meta_info_add_str(title, str)                          \
   if ( str ) {                                                 \
@@ -366,13 +372,13 @@ static void InformationCreate( input_thread_t *p_input  )
   playlist_t *p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
                                             FIND_PARENT );
   input_info_category_t *p_cat;
-  playlist_item_t *p_item;
 
   p_cat = input_InfoCategory( p_input, "General" );
 
 
 #ifdef HAVE_LIBCDDB
   if (p_cdda->i_cddb_enabled) {
+    playlist_item_t *p_item;
 
     meta_info_add_str( "Title", p_cdda->cddb.disc->title );
     meta_info_add_str( "Artist", p_cdda->cddb.disc->artist );

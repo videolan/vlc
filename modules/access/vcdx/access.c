@@ -252,7 +252,7 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
               p_vcd->cur_lsn >= p_vcd->p_entries[i_entry+1] )
             {
               dbg_print( INPUT_DBG_PBC,
-                         "new entry, i_entry %d, sector %lu, es %lu",
+                         "new entry, i_entry %d, sector %lu, es %u",
                          i_entry, (long unsigned int) p_vcd->cur_lsn,
                          p_vcd->p_entries[i_entry] );
               p_vcd->play_item.num =
