@@ -12,6 +12,23 @@
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
+;;;;;;;;;;;;;;;;;;;;;;;;;
+; General configuration ;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Name "${PRODUCT_GROUP} ${PRODUCT_NAME} ${PRODUCT_VERSION}"
+OutFile ..\vlc-${VERSION}-win32.exe
+InstallDir "$PROGRAMFILES\VideoLAN\VLC"
+InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" "Install_Dir"
+SetCompressor lzma
+ShowInstDetails show
+ShowUnInstDetails show
+SetOverwrite ifnewer
+CRCCheck on
+
+InstType "Normal"
+InstType "Full"
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NSIS Modern User Interface configuration ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -37,6 +54,7 @@
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
 !define MUI_FINISHPAGE_RUN "$INSTDIR\vlc.exe"
+!define MUI_FINISHPAGE_NOREBOOTSUPPORT
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -100,22 +118,9 @@ FunctionEnd
   Pop $R0
 !macroend
 
-;;;;;;;;;;;;;;;;;;;;;;;;;
-; General configuration ;
-;;;;;;;;;;;;;;;;;;;;;;;;;
-
-Name "${PRODUCT_GROUP} ${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile ..\vlc-${VERSION}-win32.exe
-InstallDir "$PROGRAMFILES\VideoLAN\VLC"
-InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" "Install_Dir"
-SetCompressor lzma
-ShowInstDetails show
-ShowUnInstDetails show
-SetOverwrite ifnewer
-CRCCheck on
-
-InstType "Normal"
-InstType "Full"
+;;;;;;;;;;;;;;;;;;;;;;
+; Installer sections ;
+;;;;;;;;;;;;;;;;;;;;;;
 
 Section "Media player (required)" SEC01
   SectionIn 1 2 3 RO
