@@ -16,9 +16,9 @@ Replaces: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-
 Conflicts: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
 Provides: mp3-decoder
 Description: multimedia player for all audio and video formats
- This is the VideoLAN project's VLC media player. It plays MPEG, MPEG2,
- MPEG4, DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and
- multimedia streams from various network sources.
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
  .
  VLC can also be used as a streaming server that duplicates the stream it
  reads and multicasts them through the network to other clients, or serves
@@ -34,6 +34,10 @@ Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: development files for VLC
  This package contains headers and a static library required to build plugins
  for VLC, or standalone applications that use VLC features.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: gnome-vlc
 Section: gnome
@@ -46,6 +50,10 @@ Provides: vlc-gui
 Description: GNOME frontend for VLC
  This plugin adds a GNOME interface to the VLC media player. To activate
  it, use the `--intf gnome' flag or run the `gnome-vlc' program.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: gvlc
 Architecture: any
@@ -56,6 +64,10 @@ Provides: vlc-gui
 Description: GTK+ frontend for VLC
  This plugin adds a GTK+ interface to the VLC media player. To activate
  it, use the `--intf gtk' flag or run the `gvlc' program.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: vlc-plugin-esd
 Architecture: any
@@ -66,6 +78,10 @@ Description: Esound audio output plugin for VLC
  This plugin adds support for the Enlightened Sound Daemon to the VLC
  media player. To activate it, use the `--aout esd' flag or select the
  `esd' audio output plugin from the preferences menu.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: vlc-plugin-alsa
 Architecture: any
@@ -76,6 +92,10 @@ Description: ALSA audio output plugin for VLC
  This plugin adds support for the Advanced Linux Sound Architecture to
  the VLC media player. To activate it, use the `--aout alsa' flag or
  select the `alsa' audio output plugin from the preferences menu.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: vlc-plugin-sdl
 Architecture: any
@@ -87,6 +107,10 @@ Description: SDL video and audio output plugin for VLC
  the VLC media player. To activate it, use the `--vout sdl' or
  `--aout sdl' flags or select the `sdl' video or audio output plugin
  from the preferences menu.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: vlc-plugin-ggi
 Architecture: any
@@ -97,6 +121,10 @@ Description: GGI video output plugin for VLC
  This is a GGI plugin for the VLC media player.  To activate it, use
  the `--vout ggi' flag or select the `ggi' video output plugin from the
  preferences menu.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: vlc-plugin-glide
 Architecture: i386
@@ -107,6 +135,10 @@ Description: Glide video output plugin for VLC
  This is a Glide (3dfx) plugin for the VLC media player. To activate
  it, use the `--vout glide' flag or select the `glide' video output
  plugin from the preferences menu.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: qvlc
 Architecture: any
@@ -117,6 +149,10 @@ Provides: vlc-gui
 Description: Qt frontend for VLC
  This plugin adds a Qt interface to the VLC media player. To activate it,
  use the `--intf qt' flag or run the `qvlc' program.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: vlc-plugin-arts
 Architecture: any
@@ -127,6 +163,10 @@ Description: aRts audio output plugin for VLC
  This plugin adds support for the aRts Sound System to the VLC media
  player. To activate it, use the `--aout arts' flag or select the `arts'
  audio output plugin from the preferences menu.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: mozilla-plugin-vlc
 Architecture: any
@@ -137,6 +177,10 @@ Description: multimedia plugin for Mozilla based on VLC
  more formats to your Mozilla browser. The decoding process is done by VLC
  and the output window is embedded in a webpage or directly in the browser
  window. There is also support for fullscreen display and javascript control.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: kvlc
 Section: kde
@@ -149,6 +193,10 @@ Provides: vlc-gui
 Description: KDE frontend for VLC
  This plugin adds a KDE interface to the VLC media player. To activate it,
  use the `--intf kde' flag or run the `kvlc' program.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: vlc-plugin-svgalib
 Architecture: i386
@@ -158,6 +206,10 @@ Description: SVGAlib video output plugin for VLC
  activate it, use the `--vout svgalib' flag or select the `svgalib' video
  output plugin from the preferences menu. Note that you will need root
  permissions to use SVGAlib.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: wxvlc
 Architecture: any
@@ -168,53 +220,102 @@ Description: wxWindows and skins frontends for VLC
  VLC media player. To activate the wxWindow GUI, use the `--intf wxwin'
  flag or run the `wxvlc' program. To activate the skinnable GUI, use the
  `--intf skins' flag.
+ .
+ VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
+ DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
+ streams from various network sources.
 
 Package: vlc-alsa
+Section: oldlibs
 Architecture: any
 Depends: vlc, vlc-plugin-alsa, ${misc:Depends}
-Description: legacy package that you should remove
- This package is now called vlc-plugin-alsa.
+Description: ALSA audio output plugin for VLC (dummy legacy package)
+ The vlc-alsa package has been renamed to vlc-plugin-alsa. This is a dummy
+ package with the sole purpose of ensuring a smooth upgrade from vlc-alsa
+ to vlc-plugin-alsa.
+ .
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-esd
+Section: oldlibs
 Architecture: any
 Depends: vlc, vlc-plugin-esd, ${misc:Depends}
-Description: legacy package that you should remove
- This package is now called vlc-plugin-esd.
+Description: Esound audio output plugin for VLC (dummy legacy package)
+ The vlc-esd package has been renamed to vlc-plugin-esd. This is a dummy
+ package with the sole purpose of ensuring a smooth upgrade from vlc-esd
+ to vlc-plugin-esd.
+ .
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-ggi
+Section: oldlibs
 Architecture: any
 Depends: vlc, vlc-plugin-ggi, ${misc:Depends}
-Description: legacy package that you should remove
- This package is now called vlc-plugin-ggi.
+Description: GGI video output plugin for VLC (dummy legacy package)
+ The vlc-ggi package has been renamed to vlc-plugin-ggi. This is a dummy
+ package with the sole purpose of ensuring a smooth upgrade from vlc-ggi
+ to vlc-plugin-ggi.
+ .
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-glide
+Section: oldlibs
 Architecture: i386
 Depends: vlc, vlc-plugin-glide, ${misc:Depends}
-Description: legacy package that you should remove
- This package is now called vlc-plugin-glide.
+Description: Glide video output plugin for VLC (dummy legacy package)
+ The vlc-glide package has been renamed to vlc-plugin-glide. This is a dummy
+ package with the sole purpose of ensuring a smooth upgrade from vlc-glide
+ to vlc-plugin-glide.
+ .
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-gnome
-Section: gnome
+Section: oldlibs
 Architecture: any
 Depends: vlc, gnome-vlc, ${misc:Depends}
-Description: legacy package that you should remove
- This package is now called gnome-vlc.
+Description: GNOME frontend for VLC (dummy legacy package)
+ The vlc-gnome package has been renamed to gnome-vlc. This is a dummy
+ package with the sole purpose of ensuring a smooth upgrade from vlc-gnome
+ to gnome-vlc.
+ .
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-gtk
+Section: oldlibs
 Architecture: any
 Depends: vlc, gvlc, ${misc:Depends}
-Description: legacy package that you should remove
- This package is now called gvlc.
+Description: GTK+ frontend for VLC (dummy legacy package)
+ The vlc-gtk package has been renamed to gvlc. This is a dummy package with
+ the sole purpose of ensuring a smooth upgrade from vlc-gtk to gvlc.
+ .
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-qt
+Section: oldlibs
 Architecture: any
 Depends: vlc, qvlc, ${misc:Depends}
-Description: legacy package that you should remove
- This package is now called qvlc.
+Description: Qt frontend for VLC (dummy legacy package)
+ The vlc-qt package has been renamed to qvlc. This is a dummy package with
+ the sole purpose of ensuring a smooth upgrade from vlc-qt to qvlc.
+ .
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-sdl
+Section: oldlibs
 Architecture: any
 Depends: vlc, vlc-plugin-sdl, ${misc:Depends}
-Description: legacy package that you should remove
- This package is now called vlc-plugin-sdl.
+Description: SDL video and audio output plugin for VLC (dummy legacy package)
+ The vlc-sdl package has been renamed to vlc-plugin-sdl. This is a dummy
+ package with the sole purpose of ensuring a smooth upgrade from vlc-sdl
+ to vlc-plugin-sdl.
+ .
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
