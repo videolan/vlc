@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.17 2002/07/20 18:53:33 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.18 2002/07/21 15:07:39 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -80,7 +80,7 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
 #define HURRY_UP_LONGTEXT \
     "Allow the decoder to partially decode or skip frame(s) " \
     "when there not enough time.\n It's usefull with low CPU power " \
-    "but it could produce broken pictures (not yet implemented)"
+    "but it could produce broken pictures."
     
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
@@ -90,14 +90,12 @@ ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
   ADD_INTEGER ( "ffmpeg-workaround-bugs", 0, NULL, 
                 "workaround bugs", "0-99, seems to be for msmpeg v3\n"  )
 #endif
-#if LIBAVCODEC_BUILD > 4603
   ADD_BOOL( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT ) 
-#endif
 
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "ffmpeg video decoder(MS-MPEG4,MPEG4,SVQ1,H263,H263.I)" )
+    SET_DESCRIPTION( "ffmpeg video decoder((MS)MPEG4,SVQ1,H263)" )
     ADD_CAPABILITY( DECODER, 70 )
 MODULE_INIT_STOP
 
@@ -768,12 +766,55 @@ static int InitThread( videodec_thread_t *p_vdec )
 static void  DecodeThread( videodec_thread_t *p_vdec )
 {
     int     i_status;
+    int     b_drawpicture;
     int     b_gotpicture;
     AVPicture avpicture;  /* ffmpeg picture */
     picture_t *p_pic; /* videolan picture */
     /* we have to get a frame stored in a pes 
        give it to ffmpeg decoder 
        and send the image to the output */ 
+
+    /* TODO implement it in a better way */
+
+    if( ( config_GetInt(p_vdec->p_fifo, "ffmpeg-hurry-up") )&&
+        ( p_vdec->i_frame_late > 4 ) )
+    {
+#if LIBAVCODEC_BUILD > 4603
+        b_drawpicture = 0;
+        if( p_vdec->i_frame_late < 8 )
+        {
+            p_vdec->p_context->hurry_up = 2;
+        }
+        else
+        {
+            /* too much late picture, won't decode 
+               but break picture until a new I, and for mpeg4 ...*/
+            p_vdec->i_frame_late--; /* needed else it will never be decrease */
+            __PES_NEXT( p_vdec->p_fifo );
+            return;
+        }
+#else
+        if( p_vdec->i_frame_late < 8 )
+        {
+            b_drawpicture = 0; /* not really good but .. */
+        }
+        else
+        {
+            /* too much late picture, won't decode 
+               but break picture until a new I, and for mpeg4 ...*/
+            p_vdec->i_frame_late--; /* needed else it will never be decrease */
+            __PES_NEXT( p_vdec->p_fifo );
+            return;
+        }
+#endif
+    }
+    else
+    {
+        b_drawpicture = 1;
+#if LIBAVCODEC_BUILD > 4603
+        p_vdec->p_context->hurry_up = 0;
+#endif
+    }
 
     __GetFrame( p_vdec );
 
@@ -792,10 +833,22 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
         p_vdec->i_frame_error++;
         return;
     }
-    if( !b_gotpicture || avpicture.linesize[0] == 0 )
+    /* Update frame late count*/
+    /* I don't make statistic on decoding time */
+    if( p_vdec->i_pts <= mdate()) 
+    {
+        p_vdec->i_frame_late++;
+    }
+    else
+    {
+        p_vdec->i_frame_late = 0;
+    }
+
+    if( !b_gotpicture || avpicture.linesize[0] == 0 || !b_drawpicture)
     {
         return;
     }
+    
     /* Check our vout */
     if( !ffmpeg_CheckVout( p_vdec->p_vout,
                            p_vdec->p_context->width,
