@@ -6,7 +6,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_netlist.c,v 1.46 2001/12/02 17:32:19 stef Exp $
+ * $Id: input_netlist.c,v 1.47 2001/12/03 17:34:08 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -289,7 +289,7 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
      (p_netlist->i_iovec_end - p_netlist->i_iovec_start)
         & p_netlist->i_nb_iovec ) < p_netlist->i_read_once )
     {
-        intf_WarnMsg( 12, "input info: waiting for free iovec" );
+        intf_WarnMsg( 4, "input info: waiting for free iovec" );
         msleep( INPUT_IDLE_SLEEP );
 
         while( (
@@ -299,14 +299,14 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
             msleep( INPUT_IDLE_SLEEP );
         }
 
-        intf_WarnMsg( 12, "input info: found free iovec" );
+        intf_WarnMsg( 4, "input info: found free iovec" );
     }
 
     if( (
      (p_netlist->i_data_end - p_netlist->i_data_start)
         & p_netlist->i_nb_data ) < p_netlist->i_read_once )
     {
-        intf_WarnMsg( 12, "input info: waiting for free data packet" );
+        intf_WarnMsg( 4, "input info: waiting for free data packet" );
         msleep( INPUT_IDLE_SLEEP );
 
         while( (
@@ -316,7 +316,7 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
             msleep( INPUT_IDLE_SLEEP );
         }
 
-        intf_WarnMsg( 12, "input info: found free data packet" );
+        intf_WarnMsg( 4, "input info: found free data packet" );
     }
 
     /* readv only takes contiguous buffers 
@@ -373,7 +373,11 @@ void input_NetlistMviovec( void * p_method_data, int i_nb_iovec,
 
         pp_data[i_loop]->pi_refcount = p_netlist->pi_refcount +
                                        p_netlist->i_iovec_start;
-        //(*pp_data[i_loop]->pi_refcount)++;
+        if( (*pp_data[i_loop]->pi_refcount) != 0)
+        {
+            intf_ErrMsg( "netlist error: refcount should be 0 (%d)",
+                  (*pp_data[i_loop]->pi_refcount) );
+        }
         (*pp_data[i_loop]->pi_refcount) = 1;
 
         p_netlist->i_iovec_start ++;
@@ -485,7 +489,11 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     p_packet->b_discard_payload = 0;
 
     p_packet->pi_refcount = p_netlist->pi_refcount + p_netlist->i_iovec_start;
-    //(*p_packet->pi_refcount)++;
+    if( (*p_packet->pi_refcount) != 0)
+    {
+        intf_ErrMsg( "netlist error: refcount should be 0 (%d)",
+                     (*p_packet->pi_refcount) );
+    }
     (*p_packet->pi_refcount) = 1;
 
     p_netlist->i_iovec_start ++;
@@ -568,13 +576,18 @@ void input_NetlistDeletePacket( void * p_method_data, data_packet_t * p_data )
     /* Update reference counter */
     (*p_data->pi_refcount)--;
 
-    if( (*p_data->pi_refcount) <= 0 )
+    if( (*p_data->pi_refcount) == 0 )
     {
         (*p_data->pi_refcount) = 0;
         p_netlist->i_iovec_end++;
         p_netlist->i_iovec_end &= p_netlist->i_nb_iovec;
         p_netlist->p_free_iovec[p_netlist->i_iovec_end].iov_base =
                                                             p_data->p_buffer;
+    }
+    else if( (*p_data->pi_refcount) < 0 )
+    {
+        intf_ErrMsg( "netlist error: refcount can't be negative (%d)",
+                     (*p_data->pi_refcount) );
     }
  
     /* unlock */
@@ -615,13 +628,18 @@ void input_NetlistDeletePES( void * p_method_data, pes_packet_t * p_pes )
         /* Update reference counter */
         (*p_current_packet->pi_refcount)--;
 
-        if( (*p_current_packet->pi_refcount) <= 0 )
+        if( (*p_current_packet->pi_refcount) == 0 )
         {
             (*p_current_packet->pi_refcount) = 0;
             p_netlist->i_iovec_end++;
             p_netlist->i_iovec_end &= p_netlist->i_nb_iovec;
             p_netlist->p_free_iovec[p_netlist->i_iovec_end].iov_base =
                     p_current_packet->p_buffer;
+        }
+        else if( (*p_current_packet->pi_refcount) < 0 )
+        {
+            intf_ErrMsg( "netlist error: refcount can't be negative (%d)",
+                         (*p_current_packet->pi_refcount) );
         }
     
         p_next_packet = p_current_packet->p_next;

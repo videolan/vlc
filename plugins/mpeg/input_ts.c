@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.39 2001/11/28 15:08:05 massiot Exp $
+ * $Id: input_ts.c,v 1.40 2001/12/03 17:34:08 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -225,7 +225,9 @@ static void TSEnd( input_thread_t * p_input )
 
     if( p_pat_es != NULL )
         input_DelES( p_input, p_pat_es );
+
     free(p_input->p_plugin_data);
+    input_NetlistEnd( p_input );
 }
 
 /*****************************************************************************
@@ -300,6 +302,7 @@ static int TSRead( input_thread_t * p_input,
         if( (i_read == -1) && ( (errno == EAGAIN) || (errno = EWOULDBLOCK) ) )
         {
             /* just ignore that error */
+            intf_ErrMsg( "input error: 0 bytes read" );
             i_read = 0;
         }
 #endif
@@ -308,9 +311,15 @@ static int TSRead( input_thread_t * p_input,
             intf_ErrMsg( "input error: TS readv error" );
             return( -1 );
         }
-	
+
+        /* EOF */
+        if( i_read == 0 && p_input->stream.b_seekable )
+        {
+            return( 1 );
+        }
+
         input_NetlistMviovec( p_input->p_method_data,
-                (int)(i_read/TS_PACKET_SIZE) , pp_packets );
+                (int)(((i_read-1)/TS_PACKET_SIZE)+1) , pp_packets );
 
         /* check correct TS header */
         for( i_loop=0; i_loop * TS_PACKET_SIZE < i_read; i_loop++ )
@@ -319,6 +328,10 @@ static int TSRead( input_thread_t * p_input,
                 intf_ErrMsg( "input error: bad TS packet (starts with "
                              "0x%.2x, should be 0x47)",
                              pp_packets[i_loop]->p_buffer[0] );
+        }
+        for( ; i_loop < INPUT_READ_ONCE ; i_loop++ )
+        {
+            pp_packets[i_loop] = NULL;
         }
 
         p_input->stream.p_selected_area->i_tell += i_read;
