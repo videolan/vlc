@@ -480,9 +480,6 @@ package-win32:
 	for i in "" $(srcdir)/tmp/plugins/*$(LIBEXT) ; \
 	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
 
-	mkdir -p "$(srcdir)/tmp/share"
-	cp $(srcdir)/share/*.rle $(srcdir)/tmp/share/ ;
-
 	mkdir $(srcdir)/tmp/locale
 	for i in $(ALL_LINGUAS); do \
 	  mkdir -p "$(srcdir)/tmp/locale/$${i}/LC_MESSAGES" ; \
@@ -497,6 +494,11 @@ package-win32:
 	for i in $(srcdir)/doc/skins/*.txt; do \
 	  cp $$i $(srcdir)/tmp/skins/ || true ; \
 	done
+
+	mkdir -p "$(srcdir)/tmp/http/admin"
+	cp $(srcdir)/share/http/*.html $(srcdir)/tmp/http/ ;
+	cp $(srcdir)/share/http/admin/*.html $(srcdir)/tmp/http/admin/ ;
+	cp $(srcdir)/share/http/admin/.access $(srcdir)/tmp/http/admin/ ;
 
 # Create package 
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} $(srcdir)/tmp/nsi

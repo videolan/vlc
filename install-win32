@@ -62,10 +62,10 @@ Section "Install"
 	File  vlc.exe
 	File  *.txt
 
-	File  /r share
 	File  /r plugins
 	File  /r locale
 	File  /r skins
+	File  /r http
 
         SetShellVarContext all
 
@@ -79,7 +79,7 @@ Section "Install"
 
         WriteRegStr HKLM \
             SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\VideoLAN \
-            "DisplayName" "VideoLAN VLC media player"
+            "DisplayName" "VideoLAN VLC media player ${VERSION}"
         WriteRegStr HKLM \
             SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\VideoLAN \
             "UninstallString" '"$INSTDIR\uninstall.exe"'
