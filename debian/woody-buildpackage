@@ -1,13 +1,11 @@
 #! /bin/sh
+# $Id: woody-buildpackage,v 1.13 2003/04/09 11:43:03 sam Exp $
+# Build VLC on a Debian woody system
 
-# $Id: woody-buildpackage,v 1.12 2003/04/01 16:13:39 sam Exp $
-# Build VLC for a Woody Debian system
+set -x
+set -e
 
-if test ! -d debian
-then
-  echo "No debian/ directory"
-  exit 1
-fi
+test -d debian
 
 # changelog: replace (1.2.3-4) with (1.2.3-0woody.4)
 sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc (\1-0woody.\2)/' \
