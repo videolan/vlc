@@ -3,8 +3,14 @@
 #===================#
 
 0.4.3
-Not released yet.
+Fri, 26 Jul 2002 00:03:13 +0200
 
+  * ./plugins/macosx/vout_macosx.m : fixed _the_ bug with QuickTime 6.
+  * ./plugins/access/http.c: we are now parsing the http return code and
+    failing cleanly if it is >= 400.
+  * ./plugins/mpeg_system/mpeg_es.c, ./src/input/input_ext-dec.c: fixed
+    a deadlock issue with demuxers waiting on p_fifo->data_lock.
+  * ./src/input/input_ext-plugins.c: fixed a memory leak.
   * ./plugins/access/http.c: fixed a bug with HTTP/1.0 servers.
   * ./src/interface/main.c: new --mtu option.
   * ./configure.in: fixed nanosleep detection on some platforms.

@@ -1,7 +1,7 @@
 
 
 %define name 		vlc
-%define vlc_ver 	0.4.2
+%define vlc_ver 	0.4.3
 %define version		%vlc_ver
 
 %define cvs     	0
@@ -411,6 +411,9 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/alsa.so
 
 %changelog
+* Fri Jul 26 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.3-1mdk
+- new upstream release
+
 * Sun Jul 7 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.2-1mdk
 - new upstream release
 
