@@ -1,5 +1,6 @@
-# The format of this file was inspired by the Linux kernel CREDITS file.
+# $Id: AUTHORS
 # 
+# The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors and contributors are listed alphabetically.
 # 
 # The fields are: name (N), email (E), web-address (W), CVS account login (C),

@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
 
 /* Define if using alloca.c.  */
 #undef C_ALLOCA
@@ -58,14 +58,14 @@
 /* Define if you have the atoll function.  */
 #undef HAVE_ATOLL
 
-/* Define if you have the dcgettext function.  */
-#undef HAVE_DCGETTEXT
-
 /* Define if you have the feof_unlocked function.  */
 #undef HAVE_FEOF_UNLOCKED
 
 /* Define if you have the fgets_unlocked function.  */
 #undef HAVE_FGETS_UNLOCKED
+
+/* Define if you have the getc_unlocked function.  */
+#undef HAVE_GETC_UNLOCKED
 
 /* Define if you have the getcwd function.  */
 #undef HAVE_GETCWD
@@ -129,9 +129,6 @@
 
 /* Define if you have the strcasecmp function.  */
 #undef HAVE_STRCASECMP
-
-/* Define if you have the strchr function.  */
-#undef HAVE_STRCHR
 
 /* Define if you have the strdup function.  */
 #undef HAVE_STRDUP
@@ -349,6 +346,30 @@
 /* Package version */
 #undef VLC_VERSION
 
+/* Define if <inttypes.h> exists, doesn't clash with <sys/types.h>,
+   and declares uintmax_t.  */
+#undef HAVE_INTTYPES_H_WITH_UINTMAX
+
+/* Define if <stdint.h> exists, doesn't clash with <sys/types.h>,
+   and declares uintmax_t.  */
+#undef HAVE_STDINT_H_WITH_UINTMAX
+
+/* Define if you have the unsigned long long type. */
+#undef HAVE_UNSIGNED_LONG_LONG
+
+/* Define if integer division by zero raises signal SIGFPE. */
+#undef INTDIV0_RAISES_SIGFPE
+
+/* Define to unsigned long or unsigned long long
+   if <inttypes.h> and <stdint.h> don't define. */
+#undef uintmax_t
+
+/* Define if <inttypes.h> exists and doesn't clash with <sys/types.h>. */
+#undef HAVE_INTTYPES_H
+
+/* Define if <inttypes.h> exists and defines unusable PRI* macros. */
+#undef PRI_MACROS_BROKEN
+
 /* Define if you have the iconv() function. */
 #undef HAVE_ICONV
 
@@ -367,6 +388,9 @@
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
+
+/* Define if the GNU dcgettext() function is already present or preinstalled. */
+#undef HAVE_DCGETTEXT
 
 /* Define if nanosleep is available. */
 #undef HAVE_NANOSLEEP

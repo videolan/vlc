@@ -1,14 +1,13 @@
 # Norwegian locale definition for vlc
 # Copyright (C) 2002 Sigmund Augdal <sigmunau@idi.ntnu.no>.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc-cvs\n"
+"Project-Id-Version: vlc\n"
 "POT-Creation-Date: 2002-07-15 03:18+0200\n"
 "PO-Revision-Date: 2002-28-02 23.35+0100\n"
 "Last-Translator: Sigmund Augdal <sigmunau@idi.ntnu.no>.\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"

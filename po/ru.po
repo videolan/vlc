@@ -2,10 +2,9 @@
 # Copyright (C) 2001 Free Software Foundation, Inc.
 # Valek Filippov <frob@df.ru>, 2001.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-vlc\n"
+"Project-Id-Version: vlc\n"
 "POT-Creation-Date: 2002-07-15 03:18+0200\n"
 "PO-Revision-Date: 2001-02-19 19:58+03:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"

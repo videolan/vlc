@@ -1,3 +1,5 @@
+$Id: README,v 1.11 2002/08/25 23:18:04 sam Exp $
+
 README for vlc, the VideoLAN Client
 ===================================
 
@@ -7,6 +9,7 @@ BUGS               - List of known, unresolved bugs.
 COPYING            - The GPL license.
 ChangeLog          - The vlc ChangeLog.
 FAQ                - Commonly asked questions.
+HACKING            - Hacking vlc.
 INSTALL            - Installation instructions.
 INSTALL.libmad     - Installation instructions for the libmad library.
 INSTALL.win32      - Installation instructions for the Win32 version of vlc.
