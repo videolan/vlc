@@ -227,7 +227,7 @@ static int Open( vlc_object_t *p_this )
     int                 i_test;
 
     /* Initialize structure */
-    p_dvb = malloc( sizeof( thread_dvb_data_t ) );
+    p_dvb = (thread_dvb_data_t *)malloc( sizeof( thread_dvb_data_t ) );
     if( p_dvb == NULL )
     {
         msg_Err( p_input, "out of memory" );
@@ -424,6 +424,9 @@ static void Close( vlc_object_t *p_this )
         E_(DMXUnsetFilter)( p_input, p_dvb->p_demux_handles[0].i_handle );
         p_dvb->p_demux_handles[0].i_type = 0;
     }
+
+    E_(FrontendClose)( p_input );
+    free( p_dvb );
 }
 
 /*****************************************************************************

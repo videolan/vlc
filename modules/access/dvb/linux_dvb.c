@@ -99,7 +99,13 @@ int E_(FrontendOpen)( input_thread_t * p_input )
         frontend[sizeof(frontend) - 1] = '\0';
     }
 
-    p_frontend = malloc(sizeof(frontend_t));
+    p_frontend = (frontend_t *) malloc(sizeof(frontend_t));
+    if( p_frontend == NULL )
+    {
+        msg_Err( p_input, "FrontEndOpen: out of memory" );
+        return -1;
+    }
+
     p_dvb->p_frontend = p_frontend;
 
     msg_Dbg( p_input, "Opening device %s", frontend );
@@ -223,7 +229,7 @@ int E_(FrontendSet)( input_thread_t * p_input )
             return -1;
         }
         break;
-        
+
     /* DVB-C */
     case FE_QAM:
         if ( FrontendSetQAM( p_input ) < 0 )
@@ -363,7 +369,7 @@ static int FrontendInfo( input_thread_t * p_input )
     if (p_frontend->info.caps & FE_CAN_CLEAN_SETUP)
         msg_Dbg(p_input, "  clean setup");
     msg_Dbg(p_input, "End of capability list");
-    
+
     return 0;
 }
 
@@ -630,6 +636,7 @@ static int FrontendSetQPSK( input_thread_t * p_input )
     }
 
     msleep(100000);
+
     /* Empty the event queue */
     for ( ; ; )
     {
@@ -675,6 +682,14 @@ static int FrontendSetQAM( input_thread_t * p_input )
     fep.u.qam.fec_inner = DecodeFEC( p_input, val.i_int );
 
     fep.u.qam.modulation = DecodeModulation( p_input );
+
+    /* Empty the event queue */
+    for ( ; ; )
+    {
+        struct dvb_frontend_event event;
+        if ( ioctl( p_frontend->i_handle, FE_GET_EVENT, &event ) < 0 )
+            break;
+    }
 
     /* Now send it all to the frontend device */
     if ( (i_ret = ioctl( p_frontend->i_handle, FE_SET_FRONTEND, &fep )) < 0 )
@@ -805,6 +820,14 @@ static int FrontendSetOFDM( input_thread_t * p_input )
     fep.u.ofdm.guard_interval = DecodeGuardInterval( p_input );
     fep.u.ofdm.hierarchy_information = DecodeHierarchy( p_input );
 
+    /* Empty the event queue */
+    for ( ; ; )
+    {
+        struct dvb_frontend_event event;
+        if ( ioctl( p_frontend->i_handle, FE_GET_EVENT, &event ) < 0 )
+            break;
+    }
+
     /* Now send it all to the frontend device */
     if ( (ret = ioctl( p_frontend->i_handle, FE_SET_FRONTEND, &fep )) < 0 )
     {
@@ -854,7 +877,7 @@ static int FrontendCheck( input_thread_t * p_input )
             int32_t value;
             msg_Dbg(p_input, "check frontend ... has lock");
             msg_Dbg(p_input, "tuning succeeded");
- 
+
             /* Read some statistics */
             value = 0;
             if ( ioctl( p_frontend->i_handle, FE_READ_BER, &value ) >= 0 )
@@ -869,7 +892,7 @@ static int FrontendCheck( input_thread_t * p_input )
                 msg_Dbg( p_input, "SNR: %d", value );
 
             return 0;
-        }        
+        }
 
         if (status & FE_TIMEDOUT)    /*  no lock within the last ~2 seconds */
         {
@@ -944,19 +967,19 @@ int E_(DMXSetFilter)( input_thread_t * p_input, int i_pid, int * pi_fd,
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_AUDIO0 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_AUDIO0;
             break;
-        case 3: 
+        case 3:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_TELETEXT0 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_TELETEXT0;
             break;
-        case 4: 
+        case 4:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_SUBTITLE0 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_SUBTITLE0;
             break;
-        case 5: 
+        case 5:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_PCR0 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_PCR0;
             break;
-        /* Second device */    
+        /* Second device */
         case 6:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_VIDEO1 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_VIDEO1;
@@ -964,16 +987,16 @@ int E_(DMXSetFilter)( input_thread_t * p_input, int i_pid, int * pi_fd,
         case 7:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_AUDIO1 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_AUDIO1;
-            break;            
-        case 8: 
+            break;
+        case 8:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_TELETEXT1 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_TELETEXT1;
             break;
-        case 9: 
+        case 9:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_SUBTITLE1 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_SUBTITLE1;
             break;
-        case 10: 
+        case 10:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_PCR1 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_PCR1;
             break;
@@ -985,20 +1008,20 @@ int E_(DMXSetFilter)( input_thread_t * p_input, int i_pid, int * pi_fd,
         case 12:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_AUDIO2 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_AUDIO2;
-            break;            
-        case 13: 
+            break;
+        case 13:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_TELETEXT2 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_TELETEXT2;
-            break;        
-        case 14: 
+            break;
+        case 14:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_SUBTITLE2 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_SUBTITLE2;
             break;
-        case 15: 
+        case 15:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_PCR2 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_PCR2;
             break;
-        /* Forth device */    
+        /* Forth device */
         case 16:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_VIDEO3 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_VIDEO3;
@@ -1007,15 +1030,15 @@ int E_(DMXSetFilter)( input_thread_t * p_input, int i_pid, int * pi_fd,
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_AUDIO3 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_AUDIO3;
             break;
-        case 18: 
+        case 18:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_TELETEXT3 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_TELETEXT3;
             break;
-        case 19: 
+        case 19:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_SUBTITLE3 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_SUBTITLE3;
             break;
-        case 20: 
+        case 20:
             msg_Dbg(p_input, "DMXSetFilter: DMX_PES_PCR3 for PID %d", i_pid);
             s_filter_params.pes_type = DMX_PES_PCR3;
             break;
@@ -1043,7 +1066,7 @@ int E_(DMXSetFilter)( input_thread_t * p_input, int i_pid, int * pi_fd,
 int E_(DMXUnsetFilter)( input_thread_t * p_input, int i_fd )
 {
     int i_ret;
-    
+
     if ( (i_ret = ioctl( i_fd, DMX_STOP )) < 0 )
     {
         msg_Err( p_input, "DMX_STOP failed for demux (%d) %s",
