@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.7 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: xvideo.c,v 1.8 2002/03/17 13:53:21 gbazin Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -37,9 +37,24 @@
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
+#define ADAPTOR_TEXT "XVideo adaptor number"
+#define ADAPTOR_LONGTEXT "If you graphics card provides several adaptors, " \
+                         "this option allows you to choose which one will " \
+                         "be used (you shouldn't have to change this)"
+
+#define ALT_FS_TEXT "Alternate fullscreen method"
+#define ALT_FS_LONGTEXT "There are two ways to make a fullscreen window, " \
+                        "unfortunately each one has its drawbacks.\n" \
+                        "1) Let the window manager handle your fullscreen " \
+                        "window (default). But things like taskbars will " \
+                        "likely show on top of the video\n" \
+                        "2) Completly bypass the window manager, but then " \
+                        "nothing will be able to show on top of the video"
+
 MODULE_CONFIG_START
-ADD_CATEGORY_HINT( "Misc Options", NULL )
-ADD_INTEGER ( XVADAPTOR_VAR, -1, NULL, "XVideo adaptor number", NULL )
+ADD_CATEGORY_HINT( "Miscellaneous", NULL )
+ADD_INTEGER ( "xvideo_adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT )
+ADD_BOOL    ( "xvideo_altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.12 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: x11.c,v 1.13 2002/03/17 13:53:21 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -36,7 +36,19 @@
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
+
+#define ALT_FS_TEXT "Alternate fullscreen method"
+#define ALT_FS_LONGTEXT "There are two ways to make a fullscreen window, " \
+                        "unfortunately each one has its drawbacks.\n" \
+                        "1) Let the window manager handle your fullscreen " \
+                        "window (default). But things like taskbars will " \
+                        "likely show on top of the video\n" \
+                        "2) Completly bypass the window manager, but then " \
+                        "nothing will be able to show on top of the video"
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( "Miscellaneous", NULL )
+ADD_BOOL    ( "x11_altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

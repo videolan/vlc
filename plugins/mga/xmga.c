@@ -2,10 +2,11 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.7 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: xmga.c,v 1.8 2002/03/17 13:53:21 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,7 +92,19 @@ static void ToggleCursor   ( vout_thread_t * );
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
+
+#define ALT_FS_TEXT "Alternate fullscreen method"
+#define ALT_FS_LONGTEXT "There are two ways to make a fullscreen window, " \
+                        "unfortunately each one has its drawbacks.\n" \
+                        "1) Let the window manager handle your fullscreen " \
+                        "window (default). But things like taskbars will " \
+                        "likely show on top of the video\n" \
+                        "2) Completly bypass the window manager, but then " \
+                        "nothing will be able to show on top of the video"
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( "Miscellaneous", NULL )
+ADD_BOOL    ( "xmga_altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -146,6 +159,7 @@ typedef struct vout_sys_s
 
     int                 i_width;                     /* width of main window */
     int                 i_height;                   /* height of main window */
+    boolean_t           b_altfullscreen;          /* which fullscreen method */
 
     /* Backup of window position and size before fullscreen switch */
     int                 i_width_backup;
@@ -299,8 +313,11 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    /* Disable screen saver and return */
+    /* Disable screen saver */
     DisableXScreenSaver( p_vout );
+
+    /* Misc init */
+    p_vout->p_sys->b_altfullscreen = 0;
 
     return( 0 );
 }
@@ -920,9 +937,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     mwmhints_t mwmhints;
     int i_xpos, i_ypos, i_width, i_height;
     XEvent xevent;
-#ifdef ALTERNATE_FULLSCREEN
     XSetWindowAttributes attributes;
-#endif
 
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
@@ -932,6 +947,12 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         unsigned int dummy2, dummy3;
 
         intf_WarnMsg( 3, "vout: entering fullscreen mode" );
+
+        /* Only check the fullscreen method when we actually go fullscreen,
+         * because to go back to window mode we need to know in which
+         * fullscreen mode we where */
+        p_vout->p_sys->b_altfullscreen =
+            config_GetIntVariable( "xmga_altfullscreen" );
 
         /* Save current window coordinates so they can be restored when
          * we exit from fullscreen mode. This is the tricky part because
@@ -1002,13 +1023,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         i_height = DisplayHeight( p_vout->p_sys->p_display,
                                   p_vout->p_sys->i_screen );
 
-#if 0
-        /* Being a transient window allows us to really be fullscreen (display
-         * over the taskbar for instance) but then we end-up with the same
-         * result as with the brute force method */
-        XSetTransientForHint( p_vout->p_sys->p_display,
-                              p_vout->p_sys->window, None );
-#endif
     }
     else
     {
@@ -1026,25 +1040,27 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
      * The other way is to use the motif property "_MOTIF_WM_HINTS" which
      * luckily seems to be supported by most window managers.
      */
-#ifndef ALTERNATE_FULLSCREEN
-    mwmhints.flags = MWM_HINTS_DECORATIONS;
-    mwmhints.decorations = !p_vout->b_fullscreen;
+    if( !p_vout->p_sys->b_altfullscreen )
+    {
+        mwmhints.flags = MWM_HINTS_DECORATIONS;
+        mwmhints.decorations = !p_vout->b_fullscreen;
 
-    prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
-                        False );
-    XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                     prop, prop, 32, PropModeReplace,
-                     (unsigned char *)&mwmhints,
-                     PROP_MWM_HINTS_ELEMENTS );
-
-#else
-    /* brute force way to remove decorations */
-    attributes.override_redirect = p_vout->b_fullscreen;
-    XChangeWindowAttributes( p_vout->p_sys->p_display,
-                             p_vout->p_sys->window,
-                             CWOverrideRedirect,
-                             &attributes);
-#endif
+        prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
+                            False );
+        XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                         prop, prop, 32, PropModeReplace,
+                         (unsigned char *)&mwmhints,
+                         PROP_MWM_HINTS_ELEMENTS );
+    }
+    else
+    {
+        /* brute force way to remove decorations */
+        attributes.override_redirect = p_vout->b_fullscreen;
+        XChangeWindowAttributes( p_vout->p_sys->p_display,
+                                 p_vout->p_sys->window,
+                                 CWOverrideRedirect,
+                                 &attributes);
+    }
 
     /* We need to unmap and remap the window if we want the window 
      * manager to take our changes into effect */
@@ -1148,12 +1164,11 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         }
     }
 
-#ifdef ALTERNATE_FULLSCREEN
-    XSetInputFocus(p_vout->p_sys->p_display,
-                   p_vout->p_sys->window,
-                   RevertToParent,
-                   CurrentTime);
-#endif
+    if( p_vout->p_sys->b_altfullscreen )
+        XSetInputFocus(p_vout->p_sys->p_display,
+                       p_vout->p_sys->window,
+                       RevertToParent,
+                       CurrentTime);
 
     /* signal that the size needs to be updated */
     p_vout->p_sys->i_width = i_width;

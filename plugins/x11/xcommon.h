@@ -2,7 +2,7 @@
  * xcommon.h: Common X11 and Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.h,v 1.2 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: xcommon.h,v 1.3 2002/03/17 13:53:21 gbazin Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -23,11 +23,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-/*****************************************************************************
- * Common macros
- *****************************************************************************/
-#define XVADAPTOR_VAR              "xvideo_adaptor"
 
 /*****************************************************************************
  * Common prototypes
