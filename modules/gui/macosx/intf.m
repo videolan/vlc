@@ -59,7 +59,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
     
     p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
-    
+
     /* Put Cocoa into multithread mode as soon as possible.
      * http://developer.apple.com/techpubs/macosx/Cocoa/
      * TasksAndConcepts/ProgrammingTopics/Multithreading/index.html
@@ -71,9 +71,8 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     p_intf->b_play = VLC_TRUE;
     p_intf->pf_run = Run;
     
-    [[VLCApplication sharedApplication] autorelease];
+    [VLCApplication sharedApplication];
     [NSApp setIntf: p_intf];
-
 
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
@@ -211,6 +210,7 @@ static void Run( intf_thread_t *p_intf )
 - (void)terminate:(id)sender
 {
     p_intf->p_vlc->b_die = VLC_TRUE;
+    [super terminate:sender];
 }
 
 
@@ -1261,6 +1261,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         o_msg_lock = nil;
     }
 
+    [NSApp terminate: nil];
     [NSApp stop: nil];
 
     /* write cached user defaults to disk */
