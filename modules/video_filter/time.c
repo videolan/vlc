@@ -116,7 +116,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 }
 
 
-static char *FormatTime(char *tformat, time_t *t )
+static char *FormatTime(char *tformat )
 {
   char buffer[255];
   time_t curtime;
@@ -150,7 +150,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu;
     video_format_t fmt;
-    time_t t;
 
     if( p_sys->last_time == time( NULL ) ) return NULL;
 
@@ -171,9 +170,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
 
-    t = p_sys->last_time = time( NULL );
+    p_sys->last_time = time( NULL );
 
-    p_spu->p_region->psz_text = FormatTime( p_sys->psz_format, &t );
+    p_spu->p_region->psz_text = FormatTime( p_sys->psz_format );
     p_spu->i_start = date;
     p_spu->i_stop  = 0;
     p_spu->b_ephemer = VLC_TRUE;
