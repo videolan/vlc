@@ -3,7 +3,7 @@
 #===================#
 
 0.2.92
-Fri,  7 Dec 2001 20:18:56 +0100
+Mon, 31 Dec 2001 19:50:40 +0100
 
   * Added a missing call to DecoderError() in mpeg_adec.c.
   * Fixed a segfault in the aRts plugin.

@@ -1,11 +1,11 @@
 # This is borrowed and adapted from Mandrake's Cooker
 %define name 	vlc
-%define vlc_ver 0.2.92-dev
+%define vlc_ver 0.2.92
 %define version	%vlc_ver
 
 # libdvdcss
 %define major   0
-%define lib_ver 1.0.1-dev
+%define lib_ver 1.0.1
 %define lib_name libdvdcss%{major}
 
 %define cvs     0
@@ -157,6 +157,9 @@ rm -fr %buildroot
 
 
 %changelog
+* Mon Dec 31 2001 Samuel Hocevar <sam@zoy.org> 0.2.92-1
+- version 0.2.92
+
 * Mon Nov 12 2001 Christophe Massiot <massiot@via.ecp.fr> 0.2.91-1
 - version 0.2.91
 

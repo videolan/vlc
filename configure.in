@@ -7,7 +7,7 @@ AC_CANONICAL_SYSTEM
 HAVE_VLC=0
 if test -r src/interface/main.c; then
   HAVE_VLC=1
-  VLC_VERSION="0.2.92-pre1"
+  VLC_VERSION="0.2.92"
   AC_SUBST(VLC_VERSION)
   VLC_CODENAME=Ourumov
   AC_SUBST(VLC_CODENAME)
@@ -16,7 +16,7 @@ fi
 HAVE_LIBDVDCSS=0
 if test -r extras/libdvdcss/libdvdcss.c; then
   HAVE_LIBDVDCSS=1
-  LIBDVDCSS_VERSION="1.0.1-pre1"
+  LIBDVDCSS_VERSION="1.0.1"
   AC_SUBST(LIBDVDCSS_VERSION)
   if test -r extras/libdvdcss/csskeys.h; then
     AC_DEFINE(HAVE_CSSKEYS,1,css decryption with player keys)
