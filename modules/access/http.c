@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.7 2002/11/08 10:26:52 gbazin Exp $
+ * $Id: http.c,v 1.8 2002/11/10 15:37:39 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,6 +99,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     int                 i_returncode, i, i_size;
     char *              psz_return_alpha;
 
+    char                *psz_protocol;
     /* Find an appropriate network module */
     p_access_data = (_input_socket_t *)p_input->p_access_data;
     p_input->p_private = (void*) &p_access_data->socket_desc;
@@ -166,36 +167,58 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         input_FDNetworkClose( p_input );
         return( -1 );
     }
-
-    if( (i_size >= sizeof("HTTP/1.") + 1 ) &&
-	!strncmp( psz_parser, "HTTP/1.", sizeof("HTTP/1.") - 1 ) )
+    if( ( ( i_size >= sizeof("HTTP/1.") + 1 ) &&
+	    !strncmp( psz_parser, "HTTP/1.", sizeof("HTTP/1.") - 1 ) ) )
     {
-        psz_parser += sizeof("HTTP/1.") + 1;
-        i_returncode = atoi( (char*)psz_parser );
-        msg_Dbg( p_input, "HTTP server replied: %i", i_returncode );
-        psz_parser += 4;
-	i_size -= (sizeof("HTTP/1.") + 5);
-        for ( i = 0; (i < i_size -1) && ((psz_parser[i] != '\r') ||
-	      (psz_parser[i+1] != '\n')); i++ )
+        psz_protocol = "HTTP";
+    }
+    else if( ( i_size >= sizeof( "ICY" ) &&
+             !strncmp( psz_parser, "ICY", strlen( "ICY" ) ) ) )
+    {
+        psz_protocol = "ICY";
+        if( !p_input->psz_demux || !*p_input->psz_demux  )
         {
-            ;
+            msg_Info( p_input, "ICY server --> mp3 demuxer selected" );
+            p_input->psz_demux = "mp3";    // FIXME strdup ?
         }
-	 /* check we actually parsed something */
-        if ( (i == i_size - 1) && (psz_parser[i+1] != '\n') )
-        {
-            msg_Err( p_input, "stream not compliant with HTTP/1.x" );
-            return -1;
-        }
-
-        psz_return_alpha = malloc( i + 1 );
-        memcpy( psz_return_alpha, psz_parser, i );
-        psz_return_alpha[i] = '\0';
     }
     else
     {
         msg_Err( p_input, "invalid http reply" );
         return -1;
     }
+    msg_Dbg( p_input, "detected %s server", psz_protocol );
+
+    if( !strncmp( psz_protocol, "ICY", sizeof( "ICY" ) ) )
+    { // ICY server
+        psz_parser += sizeof( "ICY" );
+        i_size -= sizeof( "ICY" );
+    }
+    else
+    { // HTTP/1.0 or HTTP/1.1
+        psz_parser += sizeof("HTTP/1.") + 1;
+        i_size -= sizeof("HTTP/1.") + 1;
+    }
+
+    i_returncode = atoi( (char*)psz_parser );
+    msg_Dbg( p_input, "%s server replied: %i", psz_protocol, i_returncode );
+    psz_parser += 4;
+    i_size -= 4;
+    for ( i = 0; (i < i_size -1) && ((psz_parser[i] != '\r') ||
+      (psz_parser[i+1] != '\n')); i++ )
+    {
+        ;
+    }
+    /* check we actually parsed something */
+    if ( (i == i_size - 1) && (psz_parser[i+1] != '\n') )
+    {
+        msg_Err( p_input, "stream not compliant with HTTP/1.x" );
+        return -1;
+    }
+
+    psz_return_alpha = malloc( i + 1 );
+    memcpy( psz_return_alpha, psz_parser, i );
+    psz_return_alpha[i] = '\0';
 
     if ( i_returncode >= 400 ) /* something is wrong */
     {
@@ -242,16 +265,24 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         }
         p_input->p_current_data = psz_parser + 2;
     }
+    
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( !strcmp( psz_protocol, "ICY") )
+    {
+        p_input->stream.b_seekable = 0;
+    }
+    else
+    {
+        p_input->stream.b_seekable = 1;
+    }
 
     if( p_input->stream.p_selected_area->i_size )
     {
-        vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.p_selected_area->i_tell = i_tell
             + (p_input->p_last_data - p_input->p_current_data);
-        p_input->stream.b_seekable = 1;
-        p_input->stream.b_changed = 1;
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
+    p_input->stream.b_changed = 1;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( 0 );
 }
