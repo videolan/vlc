@@ -2,7 +2,7 @@
  * vout_common.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_common.c,v 1.6 2001/12/19 18:14:23 sam Exp $
+ * $Id: vout_common.c,v 1.7 2001/12/20 15:43:15 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -83,6 +83,21 @@
 #include "modules.h"
 #include "modules_export.h"
 
+static __inline__ void vout_Seek( off_t i_seek )
+{
+#define area p_main->p_intf->p_input->stream.p_selected_area
+    off_t i_tell = area->i_tell;
+
+    i_tell += i_seek * (off_t)50 * p_main->p_intf->p_input->stream.i_mux_rate;
+
+    i_tell = ( i_tell <= area->i_start ) ? area->i_start
+           : ( i_tell >= area->i_size ) ? area->i_size
+           : i_tell;
+
+    input_Seek( p_main->p_intf->p_input, i_tell );
+#undef area
+}
+
 /*****************************************************************************
  * vout_Manage: handle X11 events
  *****************************************************************************
@@ -90,24 +105,6 @@
  * X11 events and allows window resizing. It returns a non null value on
  * error.
  *****************************************************************************/
-static __inline__ void vout_Seek( int i_seek )
-{
-    int i_tell = p_main->p_intf->p_input->stream.p_selected_area->i_tell;
-
-    i_tell += i_seek * 50 * p_main->p_intf->p_input->stream.i_mux_rate;
-
-    if( i_tell < p_main->p_intf->p_input->stream.p_selected_area->i_start )
-    {
-        i_tell = p_main->p_intf->p_input->stream.p_selected_area->i_start;
-    }
-    else if( i_tell > p_main->p_intf->p_input->stream.p_selected_area->i_size )
-    {
-        i_tell = p_main->p_intf->p_input->stream.p_selected_area->i_size;
-    }
-
-    input_Seek( p_main->p_intf->p_input, i_tell );
-}
-
 int _M( vout_Manage ) ( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
@@ -251,6 +248,14 @@ int _M( vout_Manage ) ( vout_thread_t *p_vout )
                      * moment just pause the stream. */
                     input_SetStatus( p_main->p_intf->p_input,
                                      INPUT_STATUS_PAUSE );
+                    break;
+
+                case Button4:
+                    vout_Seek( 15 );
+                    break;
+
+                case Button5:
+                    vout_Seek( -15 );
                     break;
             }
         }

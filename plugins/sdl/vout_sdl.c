@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.72 2001/12/19 18:14:23 sam Exp $
+ * $Id: vout_sdl.c,v 1.73 2001/12/20 15:43:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -53,6 +53,9 @@
 #include "video_output.h"
 
 #include "interface.h"
+
+#include "stream_control.h"                 /* needed by input_ext-intf.h... */
+#include "input_ext-intf.h"
 
 #include "modules.h"
 #include "modules_export.h"
@@ -315,6 +318,21 @@ static void vout_Destroy( vout_thread_t *p_vout )
     free( p_vout->p_sys );
 }
 
+static __inline__ void vout_Seek( off_t i_seek )
+{
+#define area p_main->p_intf->p_input->stream.p_selected_area
+    off_t i_tell = area->i_tell;
+
+    i_tell += i_seek * (off_t)50 * p_main->p_intf->p_input->stream.i_mux_rate;
+
+    i_tell = ( i_tell <= area->i_start ) ? area->i_start
+           : ( i_tell >= area->i_size ) ? area->i_size
+           : i_tell;
+
+    input_Seek( p_main->p_intf->p_input, i_tell );
+#undef area
+}
+
 /*****************************************************************************
  * vout_Manage: handle Sys events
  *****************************************************************************
@@ -366,7 +384,18 @@ static int vout_Manage( vout_thread_t *p_vout )
             switch( event.button.button )
             {
             case SDL_BUTTON_LEFT:
-                /* Handle clicks */
+                /* In this part we will eventually manage
+                 * clicks for DVD navigation for instance. For the
+                 * moment just pause the stream. */
+                input_SetStatus( p_main->p_intf->p_input, INPUT_STATUS_PAUSE );
+                break;
+
+            case 4:
+                vout_Seek( 15 );
+                break;
+
+            case 5:
+                vout_Seek( -15 );
                 break;
             }
             break;
@@ -411,7 +440,23 @@ static int vout_Manage( vout_thread_t *p_vout )
             case SDLK_MENU:
                 p_main->p_intf->b_menu_change = 1;
                 break;
-                
+
+            case SDLK_LEFT:
+                vout_Seek( -5 );
+                break;
+
+            case SDLK_RIGHT:
+                vout_Seek( 5 );
+                break;
+
+            case SDLK_UP:
+                vout_Seek( 60 );
+                break;
+
+            case SDLK_DOWN:
+                vout_Seek( -60 );
+                break;
+
             case SDLK_F10: network_ChannelJoin( 0 ); break;
             case SDLK_F1:  network_ChannelJoin( 1 ); break;
             case SDLK_F2:  network_ChannelJoin( 2 ); break;
