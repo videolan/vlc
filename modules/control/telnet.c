@@ -57,12 +57,6 @@
 
 #include "vlc_vlm.h"
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-#define SOCKET_CLOSE(a)    closesocket(a)
-#else
-#define SOCKET_CLOSE(a)    close(a)
-#endif
-
 #define READ_MODE_PWD 1
 #define READ_MODE_CMD 2
 #define WRITE_MODE_PWD 3 // when we write the word "Password:"
@@ -210,7 +204,7 @@ static void Run( intf_thread_t *p_intf )
         int             i;
 
         /* if a new client wants to communicate */
-        fd = accept( p_sys->fd, NULL, NULL );
+        fd = net_Accept( p_intf, p_sys->fd, 0 );
         if( fd > 0 )
         {
             telnet_client_t *cl;
@@ -371,7 +365,7 @@ static void Run( intf_thread_t *p_intf )
                     !strncmp( cl->buffer_read, "quit", 4 )  ||
                     !strncmp( cl->buffer_read, "exit", 4 ) )
                 {
-                    close( cl->fd );
+                    net_Close( cl->fd );
                     TAB_REMOVE( p_intf->p_sys->i_clients , p_intf->p_sys->clients , cl );
                     free( cl );
                 }
