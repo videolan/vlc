@@ -102,8 +102,7 @@ Platform: any
 Description: Rewrite the SAP parser
  The SAP parser is very dirty at the moment, and needs a complete rewrite.
  - caching support<br />
-Mostly finished. Closely tied to the new playlist system
-Status: Done
+Status: Assigned to zorglub (80% done)
 
 Task
 Difficulty: Medium

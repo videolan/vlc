@@ -233,13 +233,13 @@ static int  ismult( char * );
 static int Open( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    services_discovery_sys_t    *p_sys  = malloc( sizeof( services_discovery_sys_t ) );
+    services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)
+                                malloc( sizeof( services_discovery_sys_t ) );
 
     playlist_t          *p_playlist;
     playlist_view_t     *p_view;
 
     p_sys->i_timeout = config_GetInt( p_sd,"sap-timeout" );
-
 
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
@@ -249,6 +249,7 @@ static int Open( vlc_object_t *p_this )
 
     /* FIXME */
     p_sys->b_strict = VLC_FALSE;
+    p_sys->b_parse = config_GetInt( p_sd, "sap-parse" );
 
     if( config_GetInt( p_sd, "sap-cache" ) )
     {
@@ -317,6 +318,8 @@ static int OpenDemux( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
+
+    free( p_peek );
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
@@ -436,6 +439,7 @@ static void Run( services_discovery_t *p_sd )
             {
                 msg_Warn( p_sd, "socket read error" );
             }
+            free( p_buffer );
             continue;
         }
 
@@ -853,6 +857,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
                 strncmp( psz_parse, "video",5 ) )
             {
                 msg_Warn( p_obj, "unhandled media type -%s-", psz_parse );
+                FREE( psz_uri );
                 return VLC_EGENERIC;
             }
 
@@ -861,6 +866,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         else
         {
             msg_Warn( p_obj, "unable to parse m field (1)");
+            FREE( psz_uri );
             return VLC_EGENERIC;
         }
 
@@ -883,6 +889,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         else
         {
             msg_Warn( p_obj, "unable to parse m field (2)");
+            FREE( psz_uri );
             return VLC_EGENERIC;
         }
 
@@ -1161,16 +1168,43 @@ static void FreeSDP( sdp_t *p_sdp )
     FREE( p_sdp->psz_connection );
     FREE( p_sdp->psz_media );
     FREE( p_sdp->psz_uri );
-    for( i= 0 ; i< p_sdp->i_attributes; i++ )
+    for( i= p_sdp->i_attributes - 1; i >= 0 ; i-- )
     {
-        FREE( p_sdp->pp_attributes[i] );
+        struct attribute_t *p_attr = p_sdp->pp_attributes[i];
+        FREE( p_sdp->pp_attributes[i]->psz_field );
+        FREE( p_sdp->pp_attributes[i]->psz_value );
+        REMOVE_ELEM( p_sdp->pp_attributes, p_sdp->i_attributes, i);
+        FREE( p_attr );
     }
     free( p_sdp );
 }
 
-static int RemoveAnnounce( services_discovery_t *p_sd, sap_announce_t *p_announce )
+static int RemoveAnnounce( services_discovery_t *p_sd,
+                           sap_announce_t *p_announce )
 {
-    msg_Err( p_sd, "remove not implemented");
+
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_sd,
+                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
+    if( p_announce->p_sdp )
+    {
+        FreeSDP( p_announce->p_sdp );
+    }
+
+    if( !p_playlist )
+    {
+        return VLC_EGENERIC;
+    }
+
+    if( p_announce->p_item )
+    {
+        playlist_Delete( p_playlist, p_announce->p_item->input.i_id );
+    }
+
+    vlc_object_release( p_playlist );
+
+    free( p_announce );
+
     return VLC_SUCCESS;
 }
 
@@ -1179,6 +1213,7 @@ static void CacheLoad( services_discovery_t *p_sd )
 {
     msg_Warn( p_sd, "Cache not implemented") ;
 }
+
 static void CacheSave( services_discovery_t *p_sd )
 {
     msg_Warn( p_sd, "Cache not implemented") ;
