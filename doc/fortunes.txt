@@ -1,3 +1,11 @@
+<Meuuh> do you actually have soundsticks ?
+<xtoph> want to see an image to believe it ?
+<Meuuh> then you can debug the soundsticks support
+%
+<Meuuh> gang_bang12.avi
+<Meuuh> sound is ok but I don't really care
+
+  -- #videolan
 %
 <Meuuh> intf: added `--vout' to playlist
 <Meuuh> intf: added `dummy' to playlist
