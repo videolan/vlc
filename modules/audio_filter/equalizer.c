@@ -573,12 +573,11 @@ static void EqzClean( aout_filter_t *p_filter )
     free( p_sys->f_gamma );
 
     free( p_sys->f_amp );
-
 }
 
 
 static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
-                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
@@ -631,7 +630,7 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
 }
 
 static int PreampCallback( vlc_object_t *p_this, char const *psz_cmd,
-                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
 
@@ -645,32 +644,29 @@ static int PreampCallback( vlc_object_t *p_this, char const *psz_cmd,
 }
 
 static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
-                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
-
     char *psz_bands = newval.psz_string;
 
     /* Same thing for bands */
     if( *psz_bands )
     {
-        char *p = psz_bands;
+        char *p = psz_bands, p_next;
         int i;
+
         for( i = 0; i < p_sys->i_band; i++ )
         {
-            float f;
-
-            /* Read dB -20/20*/
-            f = strtof( p, &p );
+            /* Read dB -20/20 */
+            float f = strtof( p, &p_next );
+            if( !p_next || p_next == p ) break; /* strtof() failed */
 
             p_sys->f_amp[i] = EqzConvertdB( f );
 
-            if( p == NULL )
-                break;
+            if( !*p ) break; /* end of line */
             p++;
-            if( *p == '\0' )
-                break;
         }
     }
+
     return VLC_SUCCESS;
 }
