@@ -2,7 +2,7 @@
  * caca.c: Color ASCII Art video output plugin using libcaca
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: caca.c,v 1.2 2003/11/22 15:53:18 sam Exp $
+ * $Id: caca.c,v 1.3 2003/11/22 16:18:05 sam Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -256,8 +256,8 @@ static int Manage( vout_thread_t *p_vout )
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     caca_clear();
-    caca_blit( 0, 0, caca_get_width() - 1, caca_get_height() - 1,
-               p_vout->p_sys->p_bitmap, p_pic->p->p_pixels );
+    caca_draw_bitmap( 0, 0, caca_get_width() - 1, caca_get_height() - 1,
+                      p_vout->p_sys->p_bitmap, p_pic->p->p_pixels );
 }
 
 /*****************************************************************************
