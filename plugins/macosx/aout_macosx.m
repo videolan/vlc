@@ -1,8 +1,8 @@
 /*****************************************************************************
- * aout_macosx.c : CoreAudio output plugin
+ * aout_macosx.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.m,v 1.6 2002/06/08 14:08:46 sam Exp $
+ * $Id: aout_macosx.m,v 1.7 2002/06/08 18:52:34 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -442,7 +442,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
     p_aout->p_sys->clock_diff = mdate()
          - AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()) / 1000
          + (mtime_t)p_aout->p_sys->ui_buffer_size / 4 * 1000000 / (mtime_t)p_aout->i_rate
-         + p_main->i_desync;
+         + p_aout->p_vlc->i_desync;
 
     p_aout->p_sys->b_format = 1;
 
