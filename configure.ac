@@ -1211,71 +1211,70 @@ if test "${enable_livedotcom}" = "yes"; then
   fi
 fi
 
-dnl 
-dnl dnl
-dnl dnl dvdread module: check for libdvdread
-dnl dnl
-dnl AC_ARG_ENABLE(dvdread,
-dnl [  --enable-dvdread        dvdread input module (default disabled)])
-dnl if test "${enable_dvdread}" != "no"
-dnl then
-dnl   AC_ARG_WITH(dvdread,
-dnl   [    --with-dvdread=PATH    libdvdread headers and libraries])
-dnl   AC_ARG_WITH(dvdread-tree,
-dnl   [    --with-dvdread-tree=PATH libdvdread tree for static linking])
-dnl   if test -z "${with_dvdread}"
-dnl   then
-dnl     if test -z "${with_dvdread_tree}"
-dnl     then
-dnl       AC_CHECK_HEADERS(dvdread/dvd_reader.h,
-dnl         [ AX_ADD_PLUGINS([dvdread])
-dnl           AX_ADD_LDFLAGS([dvdread],[-ldvdread ${LDFLAGS_dvdcss}])
-dnl         ],[
-dnl           if test -n "${enable_dvdread}"
-dnl           then
-dnl             AC_MSG_WARN([Please get libdvdread from http://www.dtek.chalmers.se/groups/dvd/downloads.shtml])
-dnl             AC_MSG_ERROR([cannot find libdvdread headers])
-dnl           fi
-dnl         ])
-dnl     else
-dnl       AC_MSG_CHECKING(for libdvdread.a in ${with_dvdread_tree})
-dnl       real_dvdread_tree="`cd ${with_dvdread_tree} 2>/dev/null && pwd`"
-dnl       if test -z "${real_dvdread_tree}"
-dnl       then
-dnl         dnl  The given directory can't be found
-dnl         AC_MSG_RESULT(no)
-dnl         AC_MSG_ERROR([cannot cd to ${with_dvdread_tree}])
-dnl       fi
-dnl       if test -f "${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
-dnl       then
-dnl         dnl  Use a custom libdvdread
-dnl         AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
-dnl         AX_ADD_BUILTINS([dvdread])
-dnl         AX_ADD_LDFLAGS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread ${LDFLAGS_dvdcss}])
-dnl         AX_ADD_CPPFLAGS([dvdread],[-I${real_dvdread_tree}])
-dnl       else
-dnl         dnl  The given libdvdread wasn't built
-dnl         AC_MSG_RESULT(no)
-dnl         AC_MSG_ERROR([cannot find ${real_dvdread_tree}/dvdread/.libs/libdvdread.a, make sure you compiled libdvdread in ${with_dvdread_tree}])
-dnl       fi
-dnl     fi
-dnl   else
-dnl     AC_MSG_CHECKING(for dvdread headers in ${with_dvdread})
-dnl     if test -f ${with_dvdread}/include/dvdread/dvd_reader.h
-dnl     then
-dnl       dnl  Use ${with_dvdread}/include/dvdread/dvd_reader.h
-dnl       AC_MSG_RESULT(yes)
-dnl       AX_ADD_PLUGINS([dvdread])
-dnl       AX_ADD_LDFLAGS([dvdread],[-L${with_dvdread}/lib -ldvdread ${LDFLAGS_dvdcss}])
-dnl       AX_ADD_CPPFLAGS([dvdread],[-I${with_dvdread}/include])
-dnl     else
-dnl       dnl  No libdvdread could be found, sorry
-dnl       AC_MSG_RESULT(no)
-dnl       AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvd_reader.h])
-dnl     fi
-dnl   fi
-dnl fi
-dnl 
+
+dnl
+dnl dvdread module: check for libdvdread
+dnl
+AC_ARG_ENABLE(dvdread,
+[  --enable-dvdread        dvdread input module (default disabled)])
+if test "${enable_dvdread}" != "no"
+then
+  AC_ARG_WITH(dvdread,
+  [    --with-dvdread=PATH    libdvdread headers and libraries])
+  AC_ARG_WITH(dvdread-tree,
+  [    --with-dvdread-tree=PATH libdvdread tree for static linking])
+  if test -z "${with_dvdread}"
+  then
+    if test -z "${with_dvdread_tree}"
+    then
+      AC_CHECK_HEADERS(dvdread/dvd_reader.h,
+        [ AX_ADD_PLUGINS([dvdread])
+          AX_ADD_LDFLAGS([dvdread],[-ldvdread ${LDFLAGS_dvdcss}])
+        ],[
+          if test -n "${enable_dvdread}"
+          then
+            AC_MSG_WARN([Please get libdvdread from http://www.dtek.chalmers.se/groups/dvd/downloads.shtml])
+            AC_MSG_ERROR([cannot find libdvdread headers])
+          fi
+        ])
+    else
+      AC_MSG_CHECKING(for libdvdread.a in ${with_dvdread_tree})
+      real_dvdread_tree="`cd ${with_dvdread_tree} 2>/dev/null && pwd`"
+      if test -z "${real_dvdread_tree}"
+      then
+        dnl  The given directory can't be found
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot cd to ${with_dvdread_tree}])
+      fi
+      if test -f "${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
+      then
+        dnl  Use a custom libdvdread
+        AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
+        AX_ADD_BUILTINS([dvdread])
+        AX_ADD_LDFLAGS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread ${LDFLAGS_dvdcss}])
+        AX_ADD_CPPFLAGS([dvdread],[-I${real_dvdread_tree}])
+      else
+        dnl  The given libdvdread wasn't built
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot find ${real_dvdread_tree}/dvdread/.libs/libdvdread.a, make sure you compiled libdvdread in ${with_dvdread_tree}])
+      fi
+    fi
+  else
+    AC_MSG_CHECKING(for dvdread headers in ${with_dvdread})
+    if test -f ${with_dvdread}/include/dvdread/dvd_reader.h
+    then
+      dnl  Use ${with_dvdread}/include/dvdread/dvd_reader.h
+      AC_MSG_RESULT(yes)
+      AX_ADD_PLUGINS([dvdread])
+      AX_ADD_LDFLAGS([dvdread],[-L${with_dvdread}/lib -ldvdread ${LDFLAGS_dvdcss}])
+      AX_ADD_CPPFLAGS([dvdread],[-I${with_dvdread}/include])
+    else
+      dnl  No libdvdread could be found, sorry
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvd_reader.h])
+    fi
+  fi
+fi
 
 dnl
 dnl  libdvdnav plugin

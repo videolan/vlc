@@ -1,6 +1,0 @@
-SOURCES_dvdread = \
-	dvdread.c \
-	input.c \
-	input.h \
-	$(NULL)
-
