@@ -144,6 +144,7 @@
                 "o_mi_subtitle" = id; 
                 "o_mi_title" = id; 
                 "o_mi_videotrack" = id; 
+                "o_mi_visual" = id; 
                 "o_mi_vol_down" = id; 
                 "o_mi_vol_up" = id; 
                 "o_mi_website" = id; 
@@ -165,6 +166,7 @@
                 "o_mu_title" = id; 
                 "o_mu_video" = id; 
                 "o_mu_videotrack" = id; 
+                "o_mu_visual" = id; 
                 "o_mu_window" = id; 
                 "o_playlist" = id; 
                 "o_prefs" = id; 

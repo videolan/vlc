@@ -453,7 +453,7 @@ VLC.app: vlc
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
-	cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
+	cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'
 	cp -r $(top_builddir)/tmp/extras/MacOSX/build/vlc.bundle \
 	      $(top_builddir)/VLC.app
 	rm -Rf $(top_builddir)/tmp

@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.97 2003/10/29 02:13:04 hartman Exp $
+ * $Id: intf.m,v 1.98 2003/11/03 15:27:28 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -419,6 +419,8 @@ int CocoaConvertKey( unichar i_key )
     [o_mu_channels setTitle: _NS("Audio channels")];
     [o_mi_device setTitle: _NS("Audio device")];
     [o_mu_device setTitle: _NS("Audio device")];
+    [o_mi_visual setTitle: _NS("Visualizations")];
+    [o_mu_visual setTitle: _NS("Visualizations")];
     
     [o_mu_video setTitle: _NS("Video")];
     [o_mi_half_window setTitle: _NS("Half Size")];
@@ -779,6 +781,9 @@ int CocoaConvertKey( unichar i_key )
             
                 [o_controls setupVarMenuItem: o_mi_device target: (vlc_object_t *)p_aout
                     var: "audio-device" selector: @selector(toggleVar:)];
+                    
+                [o_controls setupVarMenuItem: o_mi_visual target: (vlc_object_t *)p_aout
+                    var: "visual" selector: @selector(toggleVar:)];
                 vlc_object_release( (vlc_object_t *)p_aout );
             }
             
