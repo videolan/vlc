@@ -2,7 +2,7 @@
  * x11_window.h: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.h,v 1.2 2003/05/13 20:36:29 asmax Exp $
+ * $Id: x11_window.h,v 1.3 2003/06/07 00:36:28 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -54,8 +54,15 @@ class X11Window : public SkinWindow
         Window ToolTipWindow;
 //        TOOLINFO ToolTipInfo;
 
+        // Double-click handling
+        int ClickedX;
+        int ClickedY;
+        int ClickedTime;
+        int DblClickDelay;
+
         // Left button down
         bool LButtonDown;
+        // Right button down
         bool RButtonDown;
 
     public:

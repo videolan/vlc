@@ -2,7 +2,7 @@
  * x11_api.cpp: Various x11-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_api.cpp,v 1.7 2003/06/04 18:47:57 asmax Exp $
+ * $Id: x11_api.cpp,v 1.8 2003/06/07 00:36:28 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -105,7 +105,7 @@ int OSAPI_GetTime()
 {
     struct timeval time;
     gettimeofday( &time, NULL );
-    return( time.tv_sec * 1000 + time.tv_usec / 1000 );
+    return( (time.tv_sec&0xffffff) * 1000 + time.tv_usec / 1000 );
 }
 //---------------------------------------------------------------------------
 void OSAPI_GetScreenSize( int &w, int &h )

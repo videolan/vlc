@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.10 2003/06/06 23:34:35 asmax Exp $
+ * $Id: x11_window.cpp,v 1.11 2003/06/07 00:36:28 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -98,7 +98,6 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
                     (LPARAM)(LPTOOLINFO) &ToolTipInfo );
 */
 
-
     if( DragDrop )
     {
         // register the listview as a drop target
@@ -108,6 +107,14 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
 
     // Create Tool Tip window
     ToolTipWindow = XCreateSimpleWindow( display, wnd, 0, 0, 1, 1, 0, 0, 0 );
+
+    // Double-click handling
+    ClickedX = 0;
+    ClickedY = 0;
+    ClickedTime = 0;
+    // TODO: can be retrieved somewhere ?
+    DblClickDelay = 400;
+   
 }
 //---------------------------------------------------------------------------
 X11Window::~X11Window()
@@ -119,10 +126,8 @@ X11Window::~X11Window()
     {
         DestroyWindow( hWnd );
     }*/
-    if( ToolTipWindow != NULL )
-    {
-        XDestroyWindow( display, ToolTipWindow );
-    }/*
+    XDestroyWindow( display, ToolTipWindow );
+    /*
     if( DragDrop )
     {
         // Remove the listview from the list of drop targets
@@ -159,6 +164,8 @@ bool X11Window::ProcessOSEvent( Event *evt )
     unsigned int msg = evt->GetMessage();
     unsigned int p1  = evt->GetParam1();
     int          p2  = evt->GetParam2();
+    int          time;
+    int          posX, posY;
 
     switch( msg )
     {
@@ -194,9 +201,25 @@ bool X11Window::ProcessOSEvent( Event *evt )
             {
                 case 1:
                     // Left button
-                    LButtonDown = true;
-                    MouseDown( (int)( (XButtonEvent *)p2 )->x,
-                               (int)( (XButtonEvent *)p2 )->y, 1 );
+                    time = OSAPI_GetTime();
+                    OSAPI_GetMousePos( posX, posY );
+                    if( time - ClickedTime < DblClickDelay && 
+                        posX == ClickedX && posY == ClickedY )
+                    {
+                        // Double-click
+                        ClickedTime = 0; 
+                        MouseDblClick( (int)( (XButtonEvent *)p2 )->x,
+                                       (int)( (XButtonEvent *)p2 )->y, 1 );
+                    }
+                    else
+                    {
+                        ClickedTime = time;
+                        ClickedX = posX;
+                        ClickedY = posY;
+                        LButtonDown = true;
+                        MouseDown( (int)( (XButtonEvent *)p2 )->x,
+                                   (int)( (XButtonEvent *)p2 )->y, 1 );
+                    }
                     break;
 
                 case 3:
@@ -251,12 +274,7 @@ bool X11Window::ProcessOSEvent( Event *evt )
             OSAPI_PostMessage( this, WINDOW_LEAVE, 0, 0 );
             return true;
 
-/*        case GDK_2BUTTON_PRESS:
-            MouseDblClick( (int)( (GdkEventButton *)p2 )->x,
-                           (int)( (GdkEventButton *)p2 )->y, 1 );
-            return true;
-
-        case GDK_DROP_START:
+/*        case GDK_DROP_START:
             DropObject->HandleDropStart( ( (GdkEventDND *)p2 )->context );
             return true;
 */
