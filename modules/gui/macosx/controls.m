@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.32 2003/04/19 12:33:01 hartman Exp $
+ * $Id: controls.m,v 1.33 2003/04/30 14:04:53 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -748,7 +748,14 @@
         }
         else
         {
-            [o_mi setState: NSOffState];
+            if( [[o_mi title] isEqualToString: @"none"] )
+            {
+                [o_mi setState: NSOnState];
+            }
+            else
+            {
+                [o_mi setState: NSOffState];
+            }
         }
     }
 
