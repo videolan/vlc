@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.39 2003/11/02 06:33:49 hartman Exp $
+ * $Id: input.c,v 1.40 2003/11/02 12:22:45 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -75,7 +75,40 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     }
 
     /* Now add user filters */
-    if( ( psz_filters = config_GetPsz( p_aout , "audio-filter" ) ) )
+    if( var_Type( p_aout, "visual" ) == 0 )
+    {
+        var_Create( p_aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
+        text.psz_string = _("Visualizations");
+        var_Change( p_aout, "visual", VLC_VAR_SETTEXT, &text, NULL );
+        val.psz_string = ""; text.psz_string = _("Disable");
+        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        val.psz_string = "random"; text.psz_string = _("Random");
+        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        val.psz_string = "scope"; text.psz_string = _("Scope");
+        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        val.psz_string = "spectrum"; text.psz_string = _("Spectrum");
+        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        val.psz_string = "goom"; text.psz_string = _("Goom");
+        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        if( var_Get( p_aout, "effect-list", &val ) == VLC_SUCCESS )
+        {
+            var_Set( p_aout, "visual", val );
+            if( val.psz_string ) free( val.psz_string );
+        }
+        var_AddCallback( p_aout, "visual", VisualizationCallback, NULL );
+    }
+
+    if( var_Type( p_aout, "audio-filter" ) == 0 )
+    {
+        var_Create( p_aout, "audio-filter",
+                    VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        text.psz_string = _("Audio filters");
+        var_Change( p_aout, "audio-filter", VLC_VAR_SETTEXT, &text, NULL );
+    }
+
+    var_Get( p_aout, "audio-filter", &val );
+    psz_filters = val.psz_string;
+    if( psz_filters && *psz_filters )
     {
         char *psz_parser = psz_filters;
         char *psz_next;
@@ -151,38 +184,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             /* next filter if any */
             psz_parser = psz_next;
         }
-        free( psz_filters );
     }
-    
-    var_Create( p_aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Visualizations");
-    var_Change( p_aout, "visual", VLC_VAR_SETTEXT, &text, NULL );
-    val.psz_string = ""; text.psz_string = _("Disable");
-    var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "random"; text.psz_string = _("Random");
-    var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "scope"; text.psz_string = _("Scope");
-    var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "spectrum"; text.psz_string = _("Spectrum");
-    var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "goom"; text.psz_string = _("Goom");
-    var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-    if( var_Get( p_aout, "effect-list", &val ) == VLC_SUCCESS )
-    {
-        var_Set( p_aout, "visual", val );
-    }
-    var_AddCallback( p_aout, "visual", VisualizationCallback, NULL );
-
-
-    var_Create( p_aout, "audio-filter", VLC_VAR_STRING );
-    text.psz_string = _("Audio filters");
-    var_Change( p_aout, "audio-filter", VLC_VAR_SETTEXT, &text, NULL );
-    var_Change( p_aout, "audio-filter", VLC_VAR_INHERITVALUE, &val, NULL );
-    if( var_Get( p_aout, "audio-filter", &val ) == VLC_SUCCESS )
-    {
-        var_Set( p_aout, "audio-filter", val );
-    }
-    //var_AddCallback( p_aout, "audio-filter", AudioFilterCallback, NULL );
+    if( psz_filters ) free( psz_filters );
 
     /* Prepare hints for the buffer allocator. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
@@ -213,6 +216,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
                                          p_input->i_nb_filters );
             aout_FifoDestroy( p_aout, &p_input->fifo );
+            var_Destroy( p_aout, "visual" );
             p_input->b_error = 1;
 
             return -1;
@@ -423,29 +427,28 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     return 0;
 }
 
-
 static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    input_thread_t *p_input;
     vlc_value_t val;
-    
     char *psz_mode = newval.psz_string;
     char *psz_filter;
-    unsigned int  i;
 
-    psz_filter = config_GetPsz( p_aout, "audio-filter" );
+    var_Get( p_aout, "audio-filter", &val );
+    psz_filter = val.psz_string;
 
     if( !psz_mode || !*psz_mode )
     {
-        config_PutPsz( p_aout, "audio-filter", "" );
+        val.psz_string = "";
+        var_Set( p_aout, "audio-filter", val );
     }
     else
     {
         if( !psz_filter || !*psz_filter )
         {
-            config_PutPsz( p_aout, "audio-filter", "visual" );
+            val.psz_string = "visual";
+            var_Set( p_aout, "audio-filter", val );
         }
         else
         {
@@ -454,16 +457,22 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
                 psz_filter = realloc( psz_filter, strlen( psz_filter ) + 20 );
                 strcat( psz_filter, ",visual" );
             }
-            config_PutPsz( p_aout, "audio-filter", psz_filter );
+            val.psz_string = psz_filter;
+            var_Set( p_aout, "audio-filter", val );
         }
     }
-    
+
     if( psz_mode && *psz_mode )
     {
-        config_PutPsz( p_aout, "effect-list", psz_mode );
+        vlc_value_t val;
+        val.psz_string = psz_mode;
+        var_Create( p_aout, "effect-list", VLC_VAR_STRING );
+        var_Set( p_aout, "effect-list", val);
     }
 
     if( psz_filter ) free( psz_filter );
+
+    aout_Restart( p_aout );
 
     return VLC_SUCCESS;
 }

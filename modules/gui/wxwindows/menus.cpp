@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.23 2003/10/19 23:38:09 gbazin Exp $
+ * $Id: menus.cpp,v 1.24 2003/11/02 12:22:45 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -122,6 +122,8 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "audio-channels";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "visual";
+        pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
     }
 
@@ -219,7 +221,7 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 {
 #define MAX_AUDIO_ITEMS 10
 
-    vlc_object_t *p_object;
+    vlc_object_t *p_object1, *p_object2;
     char *ppsz_varnames[MAX_AUDIO_ITEMS];
     int pi_objects[MAX_AUDIO_ITEMS];
     int i = 0;
@@ -227,24 +229,30 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
     /* Initializations */
     memset( pi_objects, 0, MAX_AUDIO_ITEMS * sizeof(int) );
 
-    p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_AOUT,
-                                                FIND_ANYWHERE );
-    if( p_object != NULL )
+    p_object1 = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_AOUT,
+                                                 FIND_ANYWHERE );
+    if( p_object1 != NULL )
     {
         ppsz_varnames[i] = "audio-device";
-        pi_objects[i++] = p_object->i_object_id;
+        pi_objects[i++] = p_object1->i_object_id;
         ppsz_varnames[i] = "audio-channels";
-        pi_objects[i++] = p_object->i_object_id;
-        vlc_object_release( p_object );
+        pi_objects[i++] = p_object1->i_object_id;
     }
 
-    p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
-                                                FIND_ANYWHERE );
-    if( p_object != NULL )
+    p_object2 = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
+                                                 FIND_ANYWHERE );
+    if( p_object2 != NULL )
     {
         ppsz_varnames[i] = "audio-es";
-        pi_objects[i++] = p_object->i_object_id;
-        vlc_object_release( p_object );
+        pi_objects[i++] = p_object2->i_object_id;
+        vlc_object_release( p_object2 );
+    }
+
+    if( p_object1 != NULL )
+    {
+        ppsz_varnames[i] = "visual";
+        pi_objects[i++] = p_object1->i_object_id;
+        vlc_object_release( p_object1 );
     }
 
     /* Build menu */
