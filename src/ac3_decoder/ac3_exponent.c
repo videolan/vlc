@@ -2,7 +2,7 @@
  * ac3_exponent.c: ac3 exponent calculations
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_exponent.c,v 1.22 2001/04/06 09:15:47 sam Exp $
+ * $Id: ac3_exponent.c,v 1.23 2001/04/20 12:14:34 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -41,7 +41,6 @@
 
 #include "intf_msg.h"
 
-#include "ac3_bit_stream.h"
 #include "ac3_internal.h"
 
 static const s16 exps_1[128] =

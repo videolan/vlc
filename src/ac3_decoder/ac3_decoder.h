@@ -2,7 +2,7 @@
  * ac3_decoder.h : ac3 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.h,v 1.4 2001/03/21 13:42:34 sam Exp $
+ * $Id: ac3_decoder.h,v 1.5 2001/04/20 12:14:34 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -32,22 +32,12 @@ typedef struct ac3_sync_info_s {
     int bit_rate;       /* nominal bit rate in kbps */
 } ac3_sync_info_t;
 
-typedef struct ac3_byte_stream_s {
-    u8 * p_byte;
-    u8 * p_end;
-    void * info;
-} ac3_byte_stream_t;
 
 /**** ac3 decoder API - functions publically provided by the ac3 decoder ****/
 
 int ac3_init (ac3dec_t * p_ac3dec);
 int ac3_sync_frame (ac3dec_t * p_ac3dec, ac3_sync_info_t * p_sync_info);
 int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer);
-static ac3_byte_stream_t * ac3_byte_stream (ac3dec_t * p_ac3dec);
-
-/**** ac3 decoder API - user functions to be provided to the ac3 decoder ****/
-
-void ac3_byte_stream_next (ac3_byte_stream_t * p_byte_stream);
 
 /**** EVERYTHING AFTER THIS POINT IS PRIVATE ! DO NOT USE DIRECTLY ****/
 
@@ -347,15 +337,6 @@ typedef struct stream_samples_s
     float channel[6][256];
 } stream_samples_t;
 
-typedef struct ac3_bit_stream_s
-{
-    u32 buffer;
-    int i_available;
-    ac3_byte_stream_t byte_stream;
-
-    unsigned int total_bits_read; /* temporary */
-} ac3_bit_stream_t;
-
 typedef struct bit_allocate_s
 {
     s16 psd[256];
@@ -420,8 +401,10 @@ struct ac3dec_s
      */
 
     /* The bit stream structure handles the PES stream at the bit level */
-    ac3_bit_stream_t    bit_stream;
-
+    bit_stream_t        bit_stream;
+    int                 i_available;
+    unsigned int        total_bits_read; /* temporary */
+                
     /*
      * Decoder properties
      */
@@ -436,10 +419,3 @@ struct ac3dec_s
     mantissa_t          mantissa;
     imdct_t             imdct;
 };
-
-/**** ac3 decoder inline functions ****/
-
-static ac3_byte_stream_t * ac3_byte_stream (ac3dec_t * p_ac3dec)
-{
-    return &(p_ac3dec->bit_stream.byte_stream);
-}
