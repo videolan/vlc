@@ -36,10 +36,13 @@ struct image_handler_t
                              video_format_t *, video_format_t * );
     picture_t * (*pf_read_url) ( image_handler_t *, const char *,
                                  video_format_t *, video_format_t * );
-    block_t* (*pf_write) ( image_handler_t *, picture_t *,
-                           video_format_t *, video_format_t * );
+    block_t * (*pf_write) ( image_handler_t *, picture_t *,
+                            video_format_t *, video_format_t * );
     int (*pf_write_url) ( image_handler_t *, picture_t *,
                           video_format_t *, video_format_t *, const char * );
+
+    picture_t * (*pf_convert) ( image_handler_t *, picture_t *,
+                                video_format_t *, video_format_t * );
 
     /* Private properties */
     vlc_object_t *p_parent;
@@ -56,6 +59,7 @@ VLC_EXPORT( void, image_HandlerDelete, ( image_handler_t * ) );
 #define image_ReadUrl( a, b, c, d ) a->pf_read_url( a, b, c, d )
 #define image_Write( a, b, c, d ) a->pf_write( a, b, c, d )
 #define image_WriteUrl( a, b, c, d, e ) a->pf_write_url( a, b, c, d, e )
+#define image_Convert( a, b, c, d ) a->pf_convert( a, b, c, d )
 
 # ifdef __cplusplus
 }

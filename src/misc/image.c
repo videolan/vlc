@@ -44,6 +44,9 @@ static block_t *ImageWrite( image_handler_t *, picture_t *,
 static int ImageWriteUrl( image_handler_t *, picture_t *,
                           video_format_t *, video_format_t *, const char * );
 
+static picture_t *ImageConvert( image_handler_t *, picture_t *,
+                                video_format_t *, video_format_t * );
+
 static decoder_t *CreateDecoder( vlc_object_t *, video_format_t * );
 static void DeleteDecoder( decoder_t * );
 static encoder_t *CreateEncoder( vlc_object_t *, video_format_t *,
@@ -71,6 +74,7 @@ image_handler_t *__image_HandlerCreate( vlc_object_t *p_this )
     p_image->pf_read_url = ImageReadUrl;
     p_image->pf_write = ImageWrite;
     p_image->pf_write_url = ImageWriteUrl;
+    p_image->pf_convert = ImageConvert;
 
     return p_image;
 }
@@ -338,6 +342,70 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
     fclose( file );
 
     return p_block ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+/**
+ * Convert an image to a different format
+ *
+ */
+
+static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
+                                video_format_t *p_fmt_in,
+                                video_format_t *p_fmt_out )
+{
+    void (*pf_release)( picture_t * );
+    picture_t *p_pif;
+
+    if( !p_fmt_out->i_chroma ) p_fmt_out->i_chroma = p_fmt_in->i_chroma;
+    if( !p_fmt_out->i_width ) p_fmt_out->i_width = p_fmt_in->i_width;
+    if( !p_fmt_out->i_height ) p_fmt_out->i_height = p_fmt_in->i_height;
+
+    if( p_image->p_filter )
+    if( p_image->p_filter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
+        p_image->p_filter->fmt_out.video.i_chroma != p_fmt_out->i_chroma )
+    {
+        /* We need to restart a new filter */
+        DeleteFilter( p_image->p_filter );
+        p_image->p_filter = 0;
+    }
+
+    /* Start a filter */
+    if( !p_image->p_filter )
+    {
+        es_format_t fmt_in;
+        es_format_Init( &fmt_in, VIDEO_ES, p_fmt_in->i_chroma );
+        fmt_in.video = *p_fmt_in;
+
+        p_image->p_filter =
+            CreateFilter( p_image->p_parent, &fmt_in, p_fmt_out );
+
+        if( !p_image->p_filter )
+        {
+            return NULL;
+        }
+    }
+    else
+    {
+        /* Filters should handle on-the-fly size changes */
+        p_image->p_filter->fmt_in.video = *p_fmt_in;
+        p_image->p_filter->fmt_out.video = *p_fmt_out;
+    }
+
+    pf_release = p_pic->pf_release;
+    p_pic->pf_release = PicRelease; /* Small hack */
+    p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
+    p_pic->pf_release = pf_release;
+
+    if( p_fmt_in->i_chroma == p_fmt_out->i_chroma &&
+        p_fmt_in->i_width == p_fmt_out->i_width &&
+        p_fmt_in->i_height == p_fmt_out->i_height )
+    {
+        /* Duplicate image */
+        p_pif = p_image->p_filter->pf_vout_buffer_new( p_image->p_filter );
+        if( p_pif ) vout_CopyPicture( p_image->p_parent, p_pif, p_pic );
+    }
+
+    return p_pif;
 }
 
 /**
