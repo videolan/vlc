@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.3 2003/03/20 09:29:07 karibu Exp $
+ * $Id: vlcproc.cpp,v 1.4 2003/04/11 22:08:06 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -152,6 +152,10 @@ bool VlcProc::EventProc( Event *evt )
 
         case VLC_CHANGE_TASKBAR:
             p_intf->p_sys->p_theme->ChangeTaskbar();
+            return true;
+
+        case VLC_NET_ADDUDP:
+            AddNetworkUDP( (int)evt->GetParam2() );
             return true;
 
         default:
@@ -583,3 +587,29 @@ void VlcProc::ChangeVolume( unsigned int msg, long param )
         (int)( volume * SLIDER_RANGE / AOUT_VOLUME_MAX ) );
 }
 //---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+// Network
+//---------------------------------------------------------------------------
+void VlcProc::AddNetworkUDP( int port )
+{
+    config_PutInt( p_intf, "network-channel", FALSE );
+
+    // Build source name
+    char *s_port = new char[5];
+    sprintf( s_port, "%i", port );
+    string source = "udp:@:" + (string)s_port;
+    delete[] s_port;
+
+    playlist_Add( p_intf->p_sys->p_playlist, (char *)source.c_str(),
+        PLAYLIST_APPEND, PLAYLIST_END );
+
+    // Refresh interface !
+    p_intf->p_sys->p_theme->EvtBank->Get( "playlist_refresh" )
+        ->PostSynchroMessage();
+    InterfaceRefresh();
+}
+//---------------------------------------------------------------------------
+
+

@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.4 2003/04/08 02:06:13 gbazin Exp $
+ * $Id: event.cpp,v 1.5 2003/04/11 22:08:06 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -168,6 +168,10 @@ unsigned int Event::GetMessageType( string Desc )
     else if( Desc == "VLC_FULLSCREEN" )
         return VLC_FULLSCREEN;
 
+    // Network events
+    else if( Desc == "VLC_NET_ADDUDP" )
+        return VLC_NET_ADDUDP;
+
     // Window event
     else if( Desc == "WINDOW_MOVE" )
         return WINDOW_MOVE;
@@ -272,6 +276,10 @@ void Event::CreateEvent()
 
         case VLC_LOG_SHOW:
             Param2 = GetBool( para1 );
+            break;
+
+        case VLC_NET_ADDUDP:
+            Param2 = atoi( para1 );
             break;
 
         case CTRL_ID_VISIBLE:

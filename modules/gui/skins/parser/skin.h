@@ -1,5 +1,5 @@
 /* XML processor/application API for skin.dtd (Id: skin.dtd,v 1.3 2003/03/19 17:14:50 karibu Exp).
- * Generated 2003/03/20 10:30:38.
+ * Generated 2003/04/08 20:19:55.
  *
  * This program was generated with the FleXML XML processor generator,
  * (Id: flexml.pl,v 1.24 1999/12/13 16:18:30 krisrose Exp).
