@@ -493,5 +493,23 @@ Description: Gnome-vfs support
 For integration with smb, sftp and other file sharing/mounting methods
 Status: Todo
 
+Task
+Difficulty: Medium
+Platform: any
+Urgency: Critical
+Description: Update matroska demux
+ Support non-default timescale
+ Support default track flag
+ General bugfixes
+ Chapters etc
+Status: Todo
+
+Task
+Difficulty: Hard
+Platform: any
+Urgency: Wishlist
+Description: Matroska muxer
+Status: Todo
+
 # Do not remove me
 Task
