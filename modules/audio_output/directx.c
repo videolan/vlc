@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.16 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: directx.c,v 1.17 2003/04/07 16:02:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -123,15 +123,9 @@ typedef struct {
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
 #endif
 
-#ifndef KSDATAFORMAT_SUBTYPE_IEEE_FLOAT
-DEFINE_GUID( KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
-#endif
-#ifndef KSDATAFORMAT_SUBTYPE_PCM
-DEFINE_GUID( KSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
-#endif
-#ifndef KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF
-DEFINE_GUID( KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
-#endif
+DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
 
 /*****************************************************************************
  * notification_thread_t: DirectX event thread
@@ -657,7 +651,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
         waveformat.Format.wFormatTag = WAVE_FORMAT_DOLBY_AC3_SPDIF;
-        waveformat.SubFormat = KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF;
+        waveformat.SubFormat = _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF;
         break;
 
     case VLC_FOURCC('f','l','3','2'):
@@ -665,7 +659,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
         waveformat.Format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
-        waveformat.SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
+        waveformat.SubFormat = _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
         break;
 
     case VLC_FOURCC('s','1','6','l'):
@@ -673,7 +667,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
         waveformat.Format.wFormatTag = WAVE_FORMAT_PCM;
-        waveformat.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
+        waveformat.SubFormat = _KSDATAFORMAT_SUBTYPE_PCM;
         break;
     }
 
