@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.16 2003/11/23 03:41:58 fenrir Exp $
+ * $Id: quicktime.c,v 1.17 2003/11/23 03:45:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -38,7 +38,6 @@
 #endif
 
 /* for windows do we require Quicktime compents header? */
-#define LOADER 1
 #ifdef LOADER
 #include "w32dll/loader/qtx/qtxsdk/components.h"
 #include "w32dll/loader/wine/windef.h"
