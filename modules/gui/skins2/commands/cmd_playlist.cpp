@@ -88,3 +88,15 @@ void CmdPlaylistLoop::execute()
     }
 }
 
+
+void CmdPlaylistRepeat::execute()
+{
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    if( pPlaylist != NULL )
+    {
+        vlc_value_t val;
+        val.b_bool = m_value;
+        var_Set( pPlaylist , "repeat", val);
+    }
+}
+

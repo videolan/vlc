@@ -78,6 +78,7 @@ class CmdPlaylistRandom: public CmdGeneric
         bool m_value;
 };
 
+
 /// Command to set the loop state
 class CmdPlaylistLoop: public CmdGeneric
 {
@@ -97,6 +98,25 @@ class CmdPlaylistLoop: public CmdGeneric
         bool m_value;
 };
 
+
+/// Command to set the repeat state
+class CmdPlaylistRepeat: public CmdGeneric
+{
+    public:
+        CmdPlaylistRepeat( intf_thread_t *pIntf, bool value ):
+            CmdGeneric( pIntf ), m_value( value ) {}
+        virtual ~CmdPlaylistRepeat() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "playlist repeat"; }
+
+    private:
+        /// Repeat state
+        bool m_value;
+};
 
 
 #endif
