@@ -472,7 +472,7 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint16_t      i_segment_length;
     uint16_t      i_processed_length;
-    dvbsub_clut_t *p_clut;
+    dvbsub_clut_t *p_clut, *p_next;
     int           i_id, i_version;
 
     i_segment_length = bs_read( s, 16 );
@@ -504,7 +504,9 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
     }
 
     /* Initialize to default clut */
+    p_next = p_clut->p_next;
     *p_clut = p_sys->default_clut;
+    p_clut->p_next = p_next;
 
     /* We don't have this version of the CLUT: Parse it */
     p_clut->i_version = i_version;
