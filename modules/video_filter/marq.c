@@ -94,6 +94,7 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
+    vlc_object_t *p_pl;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -104,8 +105,7 @@ static int CreateFilter( vlc_object_t *p_this )
     }
 
     /* hook to the playlist */
-    vlc_object_t *p_pl =
-          vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    p_pl = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( !p_pl )
     {
         return VLC_ENOOBJ;
@@ -138,13 +138,13 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_object_t *p_pl;
 
     if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
     free( p_sys );
 
     /* Delete the marquee variables from playlist */
-    vlc_object_t *p_pl =
-        vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    p_pl = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( !p_pl )
     {
         return;
