@@ -1,5 +1,14 @@
 NULL =
 
+docdir = $(datadir)/doc/@PACKAGE@
+
+doc_DATA = \
+	bugreport-howto.txt \
+	fortunes.txt \
+	web-streaming.html \
+	vlc-howto.sgml \
+	$(NULL)
+
 EXTRA_DIST = \
 	ChangeLog-1999 \
 	ChangeLog-2000 \
