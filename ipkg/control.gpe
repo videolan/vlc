@@ -1,7 +1,7 @@
 Package: gpe-vlc
 Section: graphics
 Priority: optional
-Version: 0.7.0
+Version: 0.7.1
 Release: 1
 Conflicts: opie-vlc, opie-libsdl, opie-base, vlc
 Architecture: arm

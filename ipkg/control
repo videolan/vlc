@@ -1,7 +1,7 @@
 Package: vlc
 Section: graphics
 Priority: optional
-Version: 0.7.0
+Version: 0.7.1
 Release: 1
 Architecture: arm
 Source: http://www.videolan.org/vlc/download-sources.html
