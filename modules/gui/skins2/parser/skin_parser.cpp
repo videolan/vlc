@@ -55,18 +55,18 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
     {
         const BuilderData::Button button( uniqueId( attr["id"] ), atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["lefttop"],
-                attr["rightbottom"], attr["up"], attr["down"], attr["over"],
-                attr["action"], attr["tooltiptext"], attr["help"], m_curLayer,
-                m_curWindowId, m_curLayoutId );
+                attr["rightbottom"], attr["visible"], attr["up"], attr["down"],
+                attr["over"], attr["action"], attr["tooltiptext"], attr["help"],
+                m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_data.m_listButton.push_back( button );
     }
 
-    else if( rName == "CheckBox" )
+    else if( rName == "Checkbox" )
     {
         const BuilderData::Checkbox checkbox( uniqueId( attr["id"] ), atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["lefttop"],
-                attr["rightbottom"], attr["up1"], attr["down1"], attr["over1"],
+                attr["rightbottom"], attr["visible"], attr["up1"], attr["down1"], attr["over1"],
                 attr["up2"], attr["down2"], attr["over2"], attr["state"],
                 attr["action1"], attr["action2"], attr["tooltiptext1"],
                 attr["tooltiptext2"], attr["help"], m_curLayer, m_curWindowId,
@@ -77,7 +77,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Font" )
     {
-        const BuilderData::Font fontData( attr["id"], attr["font"],
+        const BuilderData::Font fontData( attr["id"], attr["file"],
                 atoi( attr["size"] ) );
         m_data.m_listFont.push_back( fontData );
     }
@@ -94,7 +94,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
     {
         const BuilderData::Image imageData( uniqueId( attr["id"] ), atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["lefttop"],
-                attr["rightbottom"], ConvertBoolean( attr["visible"] ),
+                attr["rightbottom"], attr["visible"],
                 attr["image"], attr["action"], attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
         m_curLayer++;
@@ -116,8 +116,9 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
     {
         m_curListId = uniqueId( attr["id"] );
         const BuilderData::List listData( m_curListId, atoi( attr["x"] ) +
-                m_xOffset, atoi( attr["y"] ) + m_yOffset, atoi( attr["width"]),
-                atoi( attr["height"] ), attr["lefttop"], attr["rightbottom"],
+                m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
+                atoi( attr["width"]), atoi( attr["height"] ),
+                attr["lefttop"], attr["rightbottom"],
                 attr["font"], attr["var"], ConvertColor( attr["fgcolor"] ),
                 ConvertColor( attr["playcolor"] ),
                 ConvertColor( attr["bgcolor1"] ),
@@ -130,7 +131,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "RadialSlider" )
     {
-        const BuilderData::RadialSlider radial( uniqueId( attr["id"] ), attr["visible"],
+        const BuilderData::RadialSlider radial( uniqueId( attr["id"] ),
+                attr["visible"],
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 attr["lefttop"], attr["rightbottom"], attr["sequence"],
                 atoi( attr["nbImages"] ), atof( attr["minAngle"] ) * M_PI / 180,
@@ -149,7 +151,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
             // Slider associated to a list
             newValue = "playlist.slider";
         }
-        const BuilderData::Slider slider( uniqueId( attr["id"] ), attr["visible"],
+        const BuilderData::Slider slider( uniqueId( attr["id"] ),
+                attr["visible"],
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 attr["lefttop"], attr["rightbottom"], attr["up"], attr["down"],
                 attr["over"], attr["points"], atoi( attr["thickness"] ),
@@ -161,8 +164,9 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Text" )
     {
-        const BuilderData::Text textData( uniqueId( attr["id"] ), atoi( attr["x"] ) +
-                m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["font"],
+        const BuilderData::Text textData( uniqueId( attr["id"] ),
+                atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
+                attr["visible"], attr["font"],
                 attr["text"], atoi( attr["width"] ),
                 ConvertColor( attr["color"] ), attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
@@ -198,7 +202,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 atoi( attr["width"] ), atoi( attr["height" ]),
                 attr["lefttop"], attr["rightbottom"],
-                ConvertBoolean( attr["visible"] ), attr["help"], m_curLayer,
+                attr["visible"], attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_data.m_listVideo.push_back( videoData );

@@ -62,8 +62,8 @@
   <Bitmap id="stop_onclick" file="stop_onclick.png" alphacolor="#FF0000"/>
   <Bitmap id="volume_radial" file="volume.png" alphacolor="#FF0000"/>
 
-  <Font id="default_font" font="FreeSansBold.ttf" size="15"/>
-  <Font id="playlist_font" font="FreeSansBold.ttf" size="12"/>
+  <Font id="default_font" file="FreeSansBold.ttf" size="15"/>
+  <Font id="playlist_font" file="FreeSansBold.ttf" size="12"/>
 
   <Window x="230" y="250" dragdrop="true">
 
@@ -81,8 +81,8 @@
       <Text font="default_font" width="70" x="287" y="79" text="$T" color="#000000"/>
       <Button x="42" y="42" up="preferences" down="preferences_onclick" over="preferences" action="dialogs.prefs()" tooltiptext="Preferences"/>
       <Button x="17" y="64" up="stop" down="stop_onclick" over="stop" action="vlc.stop()" tooltiptext="Stop"/>
-      <CheckBox x="42" y="87" up1="playlist_button" down1="playlist_button_onclick" up2="playlist_button2" down2="playlist_button_onclick2" state="playlist_window.isVisible" action1="playlist_window.show()" action2="playlist_window.hide()" tooltiptext1="Show Playlist" tooltiptext2="Hide Playlist"/>
-      <CheckBox x="83" y="44" up1="play" up2="pause" down1="play_onclick" down2="pause_onclick" state="vlc.isPlaying" action1="vlc.play()" action2="vlc.pause()" tooltiptext1="Play" tooltiptext2="Pause"/>
+      <Checkbox x="42" y="87" up1="playlist_button" down1="playlist_button_onclick" up2="playlist_button2" down2="playlist_button_onclick2" state="playlist_window.isVisible" action1="playlist_window.show()" action2="playlist_window.hide()" tooltiptext1="Show Playlist" tooltiptext2="Hide Playlist"/>
+      <Checkbox x="83" y="44" up1="play" up2="pause" down1="play_onclick" down2="pause_onclick" state="vlc.isPlaying" action1="vlc.play()" action2="vlc.pause()" tooltiptext1="Play" tooltiptext2="Pause"/>
       <Button x="159" y="37" up="rev" down="rev_click" over="rev" action="vlc.slower()" tooltiptext="Slower"/>
       <Button x="159" y="89" up="fast" down="fast_click" over="fast" action="vlc.faster()" tooltiptext="Faster"/>
       <Button x="196" y="46" up="previous" down="previous_onclick" over="previous" action="playlist.previous()" tooltiptext="Previous Item"/>

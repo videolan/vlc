@@ -70,11 +70,11 @@ m_id( id ), m_fileName( fileName ), m_alphaColor( alphaColor ) {}
     /// Type definition
     struct Font
     {
-        Font( const string & id, const string & fontName, int size ):
-m_id( id ), m_fontName( fontName ), m_size( size ) {}
+        Font( const string & id, const string & fontFile, int size ):
+m_id( id ), m_fontFile( fontFile ), m_size( size ) {}
 
         const string m_id;
-        const string m_fontName;
+        const string m_fontFile;
         int m_size;
     };
     /// List
@@ -133,14 +133,15 @@ m_xPos( xPos ), m_yPos( yPos ), m_range( range ), m_priority( priority ), m_poin
     /// Type definition
     struct Button
     {
-        Button( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & upId, const string & downId, const string & overId, const string & actionId, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_actionId( actionId ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Button( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & upId, const string & downId, const string & overId, const string & actionId, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_actionId( actionId ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
         int m_xPos;
         int m_yPos;
         const string m_leftTop;
         const string m_rightBottom;
+        const string m_visible;
         const string m_upId;
         const string m_downId;
         const string m_overId;
@@ -157,14 +158,15 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Checkbox
     {
-        Checkbox( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & up1Id, const string & down1Id, const string & over1Id, const string & up2Id, const string & down2Id, const string & over2Id, const string & state, const string & action1, const string & action2, const string & tooltip1, const string & tooltip2, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_up1Id( up1Id ), m_down1Id( down1Id ), m_over1Id( over1Id ), m_up2Id( up2Id ), m_down2Id( down2Id ), m_over2Id( over2Id ), m_state( state ), m_action1( action1 ), m_action2( action2 ), m_tooltip1( tooltip1 ), m_tooltip2( tooltip2 ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Checkbox( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & up1Id, const string & down1Id, const string & over1Id, const string & up2Id, const string & down2Id, const string & over2Id, const string & state, const string & action1, const string & action2, const string & tooltip1, const string & tooltip2, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_up1Id( up1Id ), m_down1Id( down1Id ), m_over1Id( over1Id ), m_up2Id( up2Id ), m_down2Id( down2Id ), m_over2Id( over2Id ), m_state( state ), m_action1( action1 ), m_action2( action2 ), m_tooltip1( tooltip1 ), m_tooltip2( tooltip2 ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
         int m_xPos;
         int m_yPos;
         const string m_leftTop;
         const string m_rightBottom;
+        const string m_visible;
         const string m_up1Id;
         const string m_down1Id;
         const string m_over1Id;
@@ -187,7 +189,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Image
     {
-        Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool visible, const string & bmpId, const string & actionId, const string & help, int layer, const string & windowId, const string & layoutId ):
+        Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & bmpId, const string & actionId, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_bmpId( bmpId ), m_actionId( actionId ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
@@ -195,7 +197,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
         int m_yPos;
         const string m_leftTop;
         const string m_rightBottom;
-        bool m_visible;
+        const string m_visible;
         const string m_bmpId;
         const string m_actionId;
         const string m_help;
@@ -209,12 +211,13 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Text
     {
-        Text( const string & id, int xPos, int yPos, const string & fontId, const string & text, int width, uint32_t color, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_fontId( fontId ), m_text( text ), m_width( width ), m_color( color ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Text( const string & id, int xPos, int yPos, const string & visible, const string & fontId, const string & text, int width, uint32_t color, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( fontId ), m_text( text ), m_width( width ), m_color( color ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
         int m_xPos;
         int m_yPos;
+        const string m_visible;
         const string m_fontId;
         const string m_text;
         int m_width;
@@ -283,12 +286,13 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
     /// Type definition
     struct List
     {
-        List( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, uint32_t fgColor, uint32_t playColor, uint32_t bgColor1, uint32_t bgColor2, uint32_t selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_fontId( fontId ), m_var( var ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        List( const string & id, int xPos, int yPos, const string & visible, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, uint32_t fgColor, uint32_t playColor, uint32_t bgColor1, uint32_t bgColor2, uint32_t selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_fontId( fontId ), m_var( var ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
         int m_xPos;
         int m_yPos;
+        const string m_visible;
         int m_width;
         int m_height;
         const string m_leftTop;
@@ -311,7 +315,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height )
     /// Type definition
     struct Video
     {
-        Video( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, bool visible, const string & help, int layer, const string & windowId, const string & layoutId ):
+        Video( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, const string & visible, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
@@ -321,7 +325,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height )
         int m_height;
         const string m_leftTop;
         const string m_rightBottom;
-        bool m_visible;
+        const string m_visible;
         const string m_help;
         int m_layer;
         const string m_windowId;

@@ -139,7 +139,7 @@ void Builder::addBitmap( const BuilderData::Bitmap &rData )
 
 void Builder::addFont( const BuilderData::Font &rData )
 {
-    GenericFont *pFont = new FT2Font( getIntf(), rData.m_fontName,
+    GenericFont *pFont = new FT2Font( getIntf(), rData.m_fontFile,
                                       rData.m_size );
     if( pFont->init() )
     {
@@ -240,9 +240,14 @@ void Builder::addButton( const BuilderData::Button &rData )
         return;
     }
 
+    // Get the visibility variable
+    // XXX check when it is null
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
+
     CtrlButton *pButton = new CtrlButton( getIntf(), *pBmpUp, *pBmpOver,
         *pBmpDown, *pCommand, UString( getIntf(), rData.m_tooltip.c_str() ),
-        UString( getIntf(), rData.m_help.c_str() ), NULL );
+        UString( getIntf(), rData.m_help.c_str() ), pVisible );
 
     // Compute the position of the control
     // XXX (we suppose all the images have the same size...)
@@ -308,12 +313,16 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
         return;
     }
 
+    // Get the visibility variable
+    // XXX check when it is null
+    VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
+
     // Create the control
     CtrlCheckbox *pCheckbox = new CtrlCheckbox( getIntf(), *pBmpUp1,
         *pBmpOver1, *pBmpDown1, *pBmpUp2, *pBmpOver2, *pBmpDown2, *pCommand1,
         *pCommand2, UString( getIntf(), rData.m_tooltip1.c_str() ),
         UString( getIntf(), rData.m_tooltip2.c_str() ), *pVar,
-        UString( getIntf(), rData.m_help.c_str() ), NULL );
+        UString( getIntf(), rData.m_help.c_str() ), pVisible );
 
     // Compute the position of the control
     // XXX (we suppose all the images have the same size...)
@@ -347,9 +356,13 @@ void Builder::addImage( const BuilderData::Image &rData )
         return;
     }
 
+    // Get the visibility variable
+    // XXX check when it is null
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
+
     CtrlImage *pImage = new CtrlImage( getIntf(), *pBmp,
-                                UString( getIntf(), rData.m_help.c_str() ),
-                                NULL);
+        UString( getIntf(), rData.m_help.c_str() ), pVisible );
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
@@ -402,8 +415,13 @@ void Builder::addText( const BuilderData::Text &rData )
     pVar->set( msg );
     m_pTheme->m_vars.push_back( VariablePtr( pVar ) );
 
+    // Get the visibility variable
+    // XXX check when it is null
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
+
     CtrlText *pText = new CtrlText( getIntf(), *pVar, *pFont,
-            UString( getIntf(), rData.m_help.c_str() ), rData.m_color, NULL );
+        UString( getIntf(), rData.m_help.c_str() ), rData.m_color, pVisible );
 
     int height = pFont->getSize();
 
@@ -438,12 +456,16 @@ void Builder::addRadialSlider( const BuilderData::RadialSlider &rData )
         return;
     }
 
+    // Get the visibility variable
+    // XXX check when it is null
+    VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
+
     // Create the control
     CtrlRadialSlider *pRadial =
         new CtrlRadialSlider( getIntf(), *pSeq, rData.m_nbImages, *pVar,
                               rData.m_minAngle, rData.m_maxAngle,
                               UString( getIntf(), rData.m_help.c_str() ),
-                              NULL );
+                              pVisible );
 
     // XXX: resizing is not supported
     // Compute the position of the control
@@ -548,11 +570,15 @@ void Builder::addList( const BuilderData::List &rData )
         return;
     }
 
+    // Get the visibility variable
+    // XXX check when it is null
+    VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
+
     // Create the list control
     CtrlList *pList = new CtrlList( getIntf(), *pVar, *pFont,
        rData.m_fgColor, rData.m_playColor, rData.m_bgColor1,
        rData.m_bgColor2, rData.m_selColor,
-       UString( getIntf(), rData.m_help.c_str() ), NULL );
+       UString( getIntf(), rData.m_help.c_str() ), pVisible );
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
@@ -575,8 +601,13 @@ void Builder::addVideo( const BuilderData::Video &rData )
         return;
     }
 
+    // Get the visibility variable
+    // XXX check when it is null
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
+
     CtrlVideo *pVideo = new CtrlVideo( getIntf(),
-        UString( getIntf(), rData.m_help.c_str() ), NULL);
+        UString( getIntf(), rData.m_help.c_str() ), pVisible );
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,

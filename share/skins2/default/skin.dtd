@@ -22,7 +22,7 @@
 <!ELEMENT Font EMPTY>
     <!ATTLIST Font
         id          CDATA   #REQUIRED
-        font        CDATA   "arial"
+        file        CDATA   #REQUIRED
         size        CDATA   "12"
         color       CDATA   "#000000"
         italic      CDATA   "false"
@@ -61,7 +61,7 @@
         minheight   CDATA   "-1"
         maxheight   CDATA   "-1"
     >
-<!ELEMENT Group (Group|Image|Button|Playlist|Slider|RadialSlider|Text|CheckBox|
+<!ELEMENT Group (Group|Image|Button|Playlist|Slider|RadialSlider|Text|Checkbox|
                  Anchor|Video)+>
     <!ATTLIST Group
         x           CDATA   "0"
@@ -94,6 +94,7 @@
 <!ELEMENT Button EMPTY>
     <!ATTLIST Button
         id          CDATA   "none"
+        visible     CDATA   "true"
         x           CDATA   "0"
         y           CDATA   "0"
         lefttop     CDATA   "lefttop"
@@ -105,9 +106,10 @@
         tooltiptext CDATA   ""
         help        CDATA   ""
     >
-<!ELEMENT CheckBox EMPTY>
-    <!ATTLIST CheckBox
+<!ELEMENT Checkbox EMPTY>
+    <!ATTLIST Checkbox
         id           CDATA   "none"
+        visible      CDATA   "true"
         x            CDATA   "0"
         y            CDATA   "0"
         lefttop      CDATA   "lefttop"
