@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.15 2001/11/15 17:39:13 sam Exp $
+ * $Id: input_dec.c,v 1.16 2001/11/15 18:11:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -130,6 +130,9 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 
     /* Unneed module */
     module_Unneed( p_es->p_module );
+
+    /* Tell the input there is no more decoder */
+    p_es->p_decoder_fifo = NULL;
 }
 
 /*****************************************************************************
@@ -272,6 +275,7 @@ static decoder_config_t * CreateDecoderConfig( input_thread_t * p_input,
 static void DeleteDecoderConfig( decoder_config_t * p_config )
 {
     /* Free all packets still in the decoder fifo. */
+#if 0
     while( !DECODER_FIFO_ISEMPTY( *p_config->p_decoder_fifo ) )
     {
         p_config->p_decoder_fifo->pf_delete_pes(
@@ -279,13 +283,13 @@ static void DeleteDecoderConfig( decoder_config_t * p_config )
                             DECODER_FIFO_START( *p_config->p_decoder_fifo ) );
         DECODER_FIFO_INCSTART( *p_config->p_decoder_fifo );
     }
+#endif
 
     /* Destroy the lock and cond */
     vlc_cond_destroy( &p_config->p_decoder_fifo->data_wait );
     vlc_mutex_destroy( &p_config->p_decoder_fifo->data_lock );
 
     free( p_config->p_decoder_fifo );
-    p_config->p_decoder_fifo = NULL;
 
     free( p_config );
 }

@@ -2,7 +2,7 @@
  * motionmmxext.c : MMX EXT motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmxext.c,v 1.11 2001/09/06 14:02:56 massiot Exp $
+ * $Id: motionmmxext.c,v 1.12 2001/11/15 18:11:50 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -560,30 +560,6 @@ static void MC_put_y8_3dnow (yuv_data_t * dest, yuv_data_t * ref,
                               int stride, int height)
 {
     MC_put2_8 (height, dest, ref, stride, stride, CPU_3DNOW);
-}
-
-static void MC_avg_xy16_3dnow (yuv_data_t * dest, yuv_data_t * ref,
-                                int stride, int height)
-{
-    MC_avg4_16 (height, dest, ref, stride, CPU_3DNOW);
-}
-
-static void MC_avg_xy8_3dnow (yuv_data_t * dest, yuv_data_t * ref,
-                               int stride, int height)
-{
-    MC_avg4_8 (height, dest, ref, stride, CPU_3DNOW);
-}
-
-static void MC_put_xy16_3dnow (yuv_data_t * dest, yuv_data_t * ref,
-                                int stride, int height)
-{
-    MC_put4_16 (height, dest, ref, stride, CPU_3DNOW);
-}
-
-static void MC_put_xy8_3dnow (yuv_data_t * dest, yuv_data_t * ref,
-                               int stride, int height)
-{
-    MC_put4_8 (height, dest, ref, stride, CPU_3DNOW);
 }
 
 /*****************************************************************************
