@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.3 2002/11/02 18:13:22 gbazin Exp $
+ * $Id: ogg.c,v 1.4 2002/11/02 22:47:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -363,9 +363,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 else
                 {
                     msg_Dbg( p_input, "found unknown codec" );
-                    ogg_stream_destroy( &p_stream->os );
-                    free( p_stream );
-                    p_ogg->i_streams--;
+                    p_stream->i_cat = UNKNOWN_ES;
                 }
 
 #undef p_stream
