@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.185 2002/03/04 22:20:09 gbazin Exp $
+ * $Id: input.c,v 1.186 2002/03/05 06:48:33 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Alexis Guillard <alexis.guillard@bt.com>
@@ -440,11 +440,11 @@ static int InitThread( input_thread_t * p_input )
         psz_parser++;
     }
 #ifdef WIN32
-    if ( psz_parser - p_input->psz_source == 1 )
+    if( psz_parser - p_input->psz_source == 1 )
     {
         intf_WarnMsg( 2, "Drive letter %c: specified in source string",
                       p_input->psz_source ) ;
-	psz_parser = NULL;
+	psz_parser = "";
     }
 #endif
 
