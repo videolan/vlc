@@ -316,15 +316,6 @@ static void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {    
-    if( p_vout->i_changes & VOUT_SIZE_CHANGE ) 
-    {
-        QTScaleMatrix( p_vout );
-        SetDSequenceMatrix( p_vout->p_sys->i_seq, 
-                            p_vout->p_sys->p_matrix );
- 
-        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-    }
-
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         if( CoToggleFullscreen( p_vout ) )  
@@ -333,6 +324,15 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
+    }
+
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE ) 
+    {
+        QTScaleMatrix( p_vout );
+        SetDSequenceMatrix( p_vout->p_sys->i_seq, 
+                            p_vout->p_sys->p_matrix );
+ 
+        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
 
     /* hide/show mouse cursor */
