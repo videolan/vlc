@@ -1,3 +1,4 @@
+SOURCES_m4a = m4a.c
 SOURCES_m4v = m4v.c
 SOURCES_mpga = mpga.c
 SOURCES_mpgv = mpgv.c
