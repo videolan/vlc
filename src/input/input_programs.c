@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.117 2003/08/13 01:45:13 gbazin Exp $
+ * $Id: input_programs.c,v 1.118 2003/08/17 20:39:08 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -84,7 +84,7 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     {
         p_input->stream.p_demux_data = NULL;
     }
-    
+
     var_Create( p_input, "intf-change", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE;
     var_Set( p_input, "intf-change", val );
@@ -195,7 +195,7 @@ pgrm_descriptor_t * input_FindProgram( input_thread_t * p_input,
  * This program descriptor will be referenced in the given stream descriptor
  *****************************************************************************/
 pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
-                                      u16 i_pgrm_id, size_t i_data_len )
+                                      uint16_t i_pgrm_id, size_t i_data_len )
 {
     /* Where to add the pgrm */
     pgrm_descriptor_t * p_pgrm = malloc( sizeof(pgrm_descriptor_t) );
@@ -587,7 +587,7 @@ es_descriptor_t * input_FindES( input_thread_t * p_input, uint16_t i_es_id )
  * alone (PSI ?)
  *****************************************************************************/
 es_descriptor_t * input_AddES( input_thread_t * p_input,
-                               pgrm_descriptor_t * p_pgrm, u16 i_es_id,
+                               pgrm_descriptor_t * p_pgrm, uint16_t i_es_id,
                                int i_category, char const *psz_desc,
                                size_t i_data_len )
 {

@@ -2,7 +2,7 @@
  * iso_lang.c: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: iso_lang.c,v 1.8 2002/11/13 20:51:05 sam Exp $
+ * $Id: iso_lang.c,v 1.9 2003/08/17 20:39:08 fenrir Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -51,10 +51,10 @@ static const iso639_lang_t unknown_language =
  * DecodeLanguage: gives the long language name from the two-letter
  *                 ISO-639 code
  *****************************************************************************/
-const char * DecodeLanguage( u16 i_code )
+const char * DecodeLanguage( uint16_t i_code )
 {
     const iso639_lang_t * p_lang;
-    u8 psz_code[3];
+    uint8_t psz_code[3];
 
     psz_code[0] = i_code >> 8;
     psz_code[1] = i_code & 0xff;
@@ -90,7 +90,7 @@ const iso639_lang_t * GetLang_1( const char * psz_code )
 const iso639_lang_t * GetLang_2T( const char * psz_code )
 {
     const iso639_lang_t *p_lang;
-    
+
     for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
         if( !strncmp( p_lang->psz_iso639_2T, psz_code, 3 ) )
             return p_lang;

@@ -2,7 +2,7 @@
  * video_text.h : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.h,v 1.8 2002/06/01 12:32:02 sam Exp $
+ * $Id: video_text.h,v 1.9 2003/08/17 20:39:08 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -41,5 +41,6 @@ void            vout_TextSize   ( vout_font_t *p_font, int i_style,
                                   int *pi_width, int *pi_height );
 void            vout_Print      ( vout_font_t *p_font, byte_t *p_pic,
                                   int i_bytes_per_pixel, int i_bytes_per_line,
-                                  u32, u32, u32, int, const char *, int );
+                                  uint32_t, uint32_t, uint32_t,
+                                  int, const char *, int );
 
