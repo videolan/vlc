@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.14 2003/06/13 00:15:40 titer Exp $
+ * $Id: Interface.cpp,v 1.15 2003/06/22 00:40:18 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -93,7 +93,6 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
         message.AddPointer("window", p_intf->p_sys->p_window);
         be_app->PostMessage(&message);
     }
-    p_intf->p_sys->i_saved_volume = AOUT_VOLUME_DEFAULT;
     p_intf->p_sys->b_loop = 0;
     p_intf->p_sys->b_mute = 0;
     

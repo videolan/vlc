@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.34 2003/06/08 16:04:30 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.35 2003/06/22 00:40:18 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -749,14 +749,14 @@ void VlcWrapper::SetVolume( int value )
 
 void VlcWrapper::VolumeMute()
 {
-   	aout_VolumeGet( p_intf, &p_intf->p_sys->i_saved_volume );
     aout_VolumeMute( p_intf, NULL );
     p_intf->p_sys->b_mute = 1;
 }
 
 void VlcWrapper::VolumeRestore()
 {
-    aout_VolumeSet( p_intf, p_intf->p_sys->i_saved_volume );
+    audio_volume_t dummy;
+    aout_VolumeMute( p_intf, &dummy );
     p_intf->p_sys->b_mute = 0;
 }
 

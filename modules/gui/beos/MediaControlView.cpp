@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.18 2003/05/30 17:30:54 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.19 2003/06/22 00:40:18 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -172,7 +172,7 @@ MediaControlView::MediaControlView(BRect frame, intf_thread_t *p_interface)
 										   kVolumeSliderBitmapHeight - 1.0),
 									 "volume slider", 1, AOUT_VOLUME_MAX,
 									 new BMessage(VOLUME_CHG));
-	fVolumeSlider->SetValue(AOUT_VOLUME_DEFAULT);
+	fVolumeSlider->SetValue( config_GetInt( p_intf, "volume" ) );
 	AddChild( fVolumeSlider );
 	
 	// Position Info View

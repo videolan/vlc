@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.41 2003/05/30 18:43:31 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.42 2003/06/22 00:40:18 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1011,6 +1011,11 @@ InterfaceWindow::_RestoreSettings()
 void
 InterfaceWindow::_StoreSettings()
 {
+    /* Save the volume */
+    config_PutInt( p_intf, "volume", p_mediaControl->GetVolume() );
+    config_SaveConfigFile( p_intf, "main" );
+
+    /* Save the windows positions */
 	if ( fSettings->ReplaceRect( "main frame", Frame() ) != B_OK )
 		fSettings->AddRect( "main frame", Frame() );
 	if ( fPlaylistWindow->Lock() )
