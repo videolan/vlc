@@ -4,7 +4,7 @@ Changes between 0.8.0 and 0.8.1:
 -----------------------------------------------------
 
 Core support:
- * Include TLS/SSL API (on plaforms where libgnutls is available)
+ * Include TLS/SSL API (on plattforms where libgnutls is available)
  * SSL support in the HTTP daemon (HTTP stream output and HTTP interface)
 
 Windows port:
