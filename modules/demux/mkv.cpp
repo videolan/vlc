@@ -3360,7 +3360,7 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
 
 mtime_t chapter_edition_t::Duration() const
 {
-    mtime_t i_result = 0.0;
+    mtime_t i_result = 0;
     
     if ( sub_chapters.size() )
     {
