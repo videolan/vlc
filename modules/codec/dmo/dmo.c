@@ -60,8 +60,9 @@ HMODULE WINAPI LoadLibraryA(LPCSTR);
 #define LoadLibrary LoadLibraryA
 FARPROC WINAPI GetProcAddress(HMODULE,LPCSTR);
 int     WINAPI FreeLibrary(HMODULE);
-typedef long STDCALL (*GETCLASS) ( const GUID*, const GUID*, void** );
 #endif /* LOADER */
+
+typedef long STDCALL (*GETCLASS) ( const GUID*, const GUID*, void** );
 
 static int pi_channels_maps[7] =
 {
@@ -130,7 +131,6 @@ struct decoder_sys_t
 #endif
 };
 
-#ifdef LOADER
 static const GUID guid_wmv9 = { 0x724bb6a4, 0xe526, 0x450f, { 0xaf, 0xfa, 0xab, 0x9b, 0x45, 0x12, 0x91, 0x11 } };
 static const GUID guid_wma9 = { 0x27ca0808, 0x01f5, 0x4e7a, { 0x8b, 0x05, 0x87, 0xf8, 0x07, 0xa2, 0x33, 0xd1 } };
 
@@ -190,8 +190,6 @@ static const codec_dll encoders_table[] =
     /* */
     { 0, NULL, NULL }
 };
-
-#endif /* LOADER */
 
 static void WINAPI DMOFreeMediaType( DMO_MEDIA_TYPE *mt )
 {
@@ -390,29 +388,45 @@ static int DecOpen( vlc_object_t *p_this )
     else
     {
         BITMAPINFOHEADER *p_bih;
+        DMO_MEDIA_TYPE mt;
+        int i_chroma = VLC_FOURCC('Y','U','Y','2'), i_planes = 1, i_bpp = 16;
+        int i = 0;
 
-        p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
+        /* Find out which chroma to use */
+        while( !p_dmo->vt->GetOutputType( p_dmo, 0, i++, &mt ) )
+        {
+            if( mt.subtype.Data1 == VLC_FOURCC('Y','V','1','2') )
+            {
+                i_chroma = mt.subtype.Data1;
+                i_planes = 3; i_bpp = 12;
+            }
+
+            DMOFreeMediaType( &mt );
+        }
+
+        p_dec->fmt_out.i_codec = i_chroma == VLC_FOURCC('Y','V','1','2') ?
+            VLC_FOURCC('I','4','2','0') : i_chroma;
         p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
         p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
-        p_dec->fmt_out.video.i_bits_per_pixel = 12;
+        p_dec->fmt_out.video.i_bits_per_pixel = i_bpp;
         p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
             p_dec->fmt_out.video.i_width / p_dec->fmt_out.video.i_height;
 
-        dmo_output_type.formattype = FORMAT_VideoInfo;
-        dmo_output_type.subtype = MEDIASUBTYPE_YV12;
-
         p_bih = &p_vih->bmiHeader;
-        p_bih->biCompression = VLC_FOURCC('Y','V','1','2');
+        p_bih->biCompression = i_chroma;
         p_bih->biHeight *= -1;
         p_bih->biBitCount = p_dec->fmt_out.video.i_bits_per_pixel;
         p_bih->biSizeImage = p_dec->fmt_in.video.i_width *
             p_dec->fmt_in.video.i_height *
             (p_dec->fmt_in.video.i_bits_per_pixel + 7) / 8;
 
-        //p_bih->biPlanes = 1;
+        p_bih->biPlanes = i_planes;
         p_bih->biSize = sizeof(BITMAPINFOHEADER);
 
         dmo_output_type.majortype = MEDIATYPE_Video;
+        dmo_output_type.formattype = FORMAT_VideoInfo;
+        dmo_output_type.subtype = dmo_output_type.majortype;
+        dmo_output_type.subtype.Data1 = p_bih->biCompression;
         dmo_output_type.bFixedSizeSamples = VLC_TRUE;
         dmo_output_type.bTemporalCompression = 0;
         dmo_output_type.lSampleSize = p_bih->biSizeImage;
@@ -527,14 +541,13 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     IEnumDMO *p_enum_dmo = NULL;
     WCHAR *psz_dmo_name;
     GUID clsid_dmo;
-#else
+#endif
 
     GETCLASS GetClass;
     IClassFactory *cFactory = NULL;
     IUnknown *cObject = NULL;
     codec_dll *codecs_table = b_out ? encoders_table : decoders_table;
     int i_codec;
-#endif
 
     /* Look for a DMO which can handle the requested codec */
     if( p_fmt->i_cat == AUDIO_ES )
@@ -577,20 +590,20 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     else
     {
         i_err = OurDMOEnum( &GUID_NULL, 1 /*DMO_ENUMF_INCLUDE_KEYED*/,
-                             0, NULL, 1, &dmo_partial_type, &p_enum_dmo );
+                            0, NULL, 1, &dmo_partial_type, &p_enum_dmo );
     }
     if( i_err )
     {
-        CoUninitialize();
         FreeLibrary( *p_hmsdmo_dll );
-        return VLC_EGENERIC;
+        /* return VLC_EGENERIC; */
+        /* Try loading the dll directly */
+        goto loader;
     }
 
     /* Pickup the first available codec */
     if( p_enum_dmo->vt->Next( p_enum_dmo, 1, &clsid_dmo,
                               &psz_dmo_name, NULL ) )
     {
-        CoUninitialize();
         FreeLibrary( *p_hmsdmo_dll );
         return VLC_EGENERIC;
     }
@@ -611,12 +624,14 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
                           &IID_IMediaObject, (void **)pp_dmo ) )
     {
         msg_Err( p_this, "can't create DMO" );
-        CoUninitialize();
         FreeLibrary( *p_hmsdmo_dll );
         return VLC_EGENERIC;
     }
 
-#else   /* LOADER */
+    return VLC_SUCCESS;
+#endif   /* LOADER */
+
+ loader:
     for( i_codec = 0; codecs_table[i_codec].i_fourcc != 0; i_codec++ )
     {
         if( codecs_table[i_codec].i_fourcc == p_fmt->i_codec )
@@ -668,7 +683,6 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
         FreeLibrary( *p_hmsdmo_dll );
         return VLC_EGENERIC;
     }
-#endif  /* LOADER */
 
     return VLC_SUCCESS;
 }
