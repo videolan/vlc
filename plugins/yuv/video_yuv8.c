@@ -134,7 +134,6 @@ void ConvertYUV420RGB8( YUV_ARGS_8BPP )
     int dither22[4] = {  0x6, 0x16,  0x2, 0x12 };
     int dither23[4] = { 0x1e,  0xe, 0x1a,  0xa };
 
-    return;
     /*
      * Initialize some values  - i_pic_line_width will store the line skip
      */

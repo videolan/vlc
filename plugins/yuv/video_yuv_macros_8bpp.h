@@ -167,7 +167,7 @@
             p_y -= i_width;                                                   \
             p_u -= i_chroma_width;                                            \
             p_v -= i_chroma_width;                                            \
-            p_pic +=        i_pic_line_width;                                 \
+            p_pic += i_pic_line_width;                                        \
         }                                                                     \
         i_scale_count += i_pic_height;                                        \
         break;                                                                \

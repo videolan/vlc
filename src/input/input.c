@@ -943,7 +943,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                   intf_DbgMsg("PES packet too short: trashed\n");
                   input_NetlistFreePES( p_input, p_pes );
                   p_pes = NULL;
-                  /* Stats XXX?? */
+                  /* XXX: Stats */
                   return;
                 }
 
@@ -1106,7 +1106,7 @@ static __inline__ void input_ParsePES( input_thread_t *p_input,
     {
       /* Trash the packet and set p_pes to NULL to be sure the next PES
          packet will have its b_data_lost flag set */
-      intf_DbgMsg("Corrupted PES packet received: trashed\n");
+      intf_DbgMsg("Corrupted PES packet (size doesn't match) : trashed\n");
       input_NetlistFreePES( p_input, p_pes );
       p_pes = NULL;
       /* Stats XXX?? */
@@ -1133,58 +1133,72 @@ static __inline__ void input_ParsePES( input_thread_t *p_input,
             break;
 
         default:
-            /* The PES header contains at least 3 more bytes: parse them */
-            p_pes->b_data_alignment = p_pes->p_pes_header[6] & 0x04;
-            p_pes->b_has_pts = p_pes->p_pes_header[7] & 0x80;
-            i_pes_header_size = p_pes->p_pes_header[8] + 9;
-
-            /* Now parse the optional header extensions (in the limit of
-               the 14 bytes */
-            if( p_pes->b_has_pts )
+            switch( p_pes->p_pes_header[8] & 0xc0 )
             {
-                pcr_descriptor_t * p_pcr;
+              case 0x80: /* MPEG2: 10xx xxxx */
+              case 0x00: /* FIXME: This shouldn't be allowed !! */
+                /* The PES header contains at least 3 more bytes: parse them */
+                p_pes->b_data_alignment = p_pes->p_pes_header[6] & 0x04;
+                p_pes->b_has_pts = p_pes->p_pes_header[7] & 0x80;
+                i_pes_header_size = p_pes->p_pes_header[8] + 9;
 
-                p_pcr = p_input->p_pcr;
-
-                p_pes->i_pts =
-                    ( ((mtime_t)(p_pes->p_pes_header[9] & 0x0E) << 29) |
-                      (((mtime_t)U16_AT(p_pes->p_pes_header + 10) << 14) - (1 << 14)) |
-                      ((mtime_t)U16_AT(p_pes->p_pes_header + 12) >> 1) ) * 300;
-                p_pes->i_pts /= 27;
-
-                if( p_pcr->i_synchro_state )
+                /* Now parse the optional header extensions (in the limit of
+                   the 14 bytes */
+                if( p_pes->b_has_pts )
                 {
-                    switch( p_pcr->i_synchro_state )
+                    pcr_descriptor_t * p_pcr;
+
+                    p_pcr = p_input->p_pcr;
+
+                    p_pes->i_pts =
+                        ( ((mtime_t)(p_pes->p_pes_header[9] & 0x0E) << 29) |
+                          (((mtime_t)U16_AT(p_pes->p_pes_header + 10) << 14) - (1 << 14)) |
+                          ((mtime_t)U16_AT(p_pes->p_pes_header + 12) >> 1) ) * 300;
+                    p_pes->i_pts /= 27;
+
+                    if( p_pcr->i_synchro_state )
                     {
-                        case SYNCHRO_NOT_STARTED:
-                            p_pes->b_has_pts = 0;
-                            break;
+                        switch( p_pcr->i_synchro_state )
+                        {
+                            case SYNCHRO_NOT_STARTED:
+                                p_pes->b_has_pts = 0;
+                                break;
 
-                        case SYNCHRO_START:
-                            p_pes->i_pts += p_pcr->delta_pcr;
-                            p_pcr->delta_absolute = mdate() - p_pes->i_pts + INPUT_PTS_DELAY;
-                            p_pes->i_pts += p_pcr->delta_absolute;
-                            p_pcr->i_synchro_state = 0;
-                            break;
+                            case SYNCHRO_START:
+                                p_pes->i_pts += p_pcr->delta_pcr;
+                                p_pcr->delta_absolute = mdate() - p_pes->i_pts + INPUT_PTS_DELAY;
+                                p_pes->i_pts += p_pcr->delta_absolute;
+                                p_pcr->i_synchro_state = 0;
+                                break;
 
-                        case SYNCHRO_REINIT: /* We skip a PES */
-                            p_pes->b_has_pts = 0;
-                            p_pcr->i_synchro_state = SYNCHRO_START;
-                            break;
+                            case SYNCHRO_REINIT: /* We skip a PES */
+                                p_pes->b_has_pts = 0;
+                                p_pcr->i_synchro_state = SYNCHRO_START;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        p_pes->i_pts += p_pcr->delta_pcr + p_pcr->delta_absolute;
                     }
                 }
-                else
-                {
-                    p_pes->i_pts += p_pcr->delta_pcr + p_pcr->delta_absolute;
-                }
+                break;
+
+            default: /* MPEG1 or some strange thing */
+                /* since this isn't supported yet, we certainly gonna crash */
+                intf_ErrMsg( "FIXME: unknown PES type %.2x\n",
+                             p_pes->p_pes_header[8] );
+                i_pes_header_size = 6;
+                break;
+
             }
             break;
         }
 
         /* Now we've parsed the header, we just have to indicate in some
-           specific TS packets where the PES payload begins (renumber
-           i_payload_start), so that the decoders can find the beginning
-           of their data right out of the box. */
+         * specific TS packets where the PES payload begins (renumber
+         * i_payload_start), so that the decoders can find the beginning
+         * of their data right out of the box. */
         p_ts = p_pes->p_first_ts;
         i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
         while( i_pes_header_size > i_ts_payload_size )
@@ -1193,8 +1207,8 @@ static __inline__ void input_ParsePES( input_thread_t *p_input,
             i_pes_header_size -= i_ts_payload_size;
             p_ts->i_payload_start = p_ts->i_payload_end;
             /* Go to the next TS packet: here we won't have to test it is
-               not NULL because we trash the PES packets when packet lost
-               occurs */
+             * not NULL because we trash the PES packets when packet lost
+             * occurs */
             p_ts = p_ts->p_next_ts;
             i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
         }
@@ -1203,7 +1217,7 @@ static __inline__ void input_ParsePES( input_thread_t *p_input,
 
 
         /* Now we can eventually put the PES packet in the decoder's
-           PES fifo */
+         * PES fifo */
         switch( p_es_descriptor->i_type )
         {
             case MPEG1_VIDEO_ES:
@@ -1308,9 +1322,9 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
 
 
     /* Try to find the beginning of the payload in the packet to initialise
-       the do-while loop that follows -> Compute the i_data_offset variable:
-       by default, the value is set so that we won't enter in the while loop.
-       It will be set to a correct value if the data are not corrupted */
+     * the do-while loop that follows -> Compute the i_data_offset variable:
+     * by default, the value is set so that we won't enter in the while loop.
+     * It will be set to a correct value if the data are not corrupted */
     i_data_offset = TS_PACKET_SIZE;
 
     /* Has the reassembly of a section already begun in a previous packet ? */
@@ -1328,7 +1342,7 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
         else
         {
             /* The data that complete a previously began section are always at
-               the beginning of the TS payload... */
+             * the beginning of the TS payload... */
             i_data_offset = p_ts_packet->i_payload_start;
             /* ...Unless there is a pointer field, that we have to bypass */
             if( b_unit_start )
@@ -1342,9 +1356,9 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
         if( b_unit_start )
         {
             /* Get the offset at which the data for that section can be found
-               The offset is stored in the pointer_field since we are
-               interested in the first section of the TS packet. Note that
-               the +1 is to bypass the pointer field */
+             * The offset is stored in the pointer_field since we are
+             * interested in the first section of the TS packet. Note that
+             * the +1 is to bypass the pointer field */
             i_data_offset = p_ts_packet->i_payload_start +
                             p_ts_packet->buffer[p_ts_packet->i_payload_start] + 1;
             //intf_DbgMsg( "New section beginning at offset %d in TS packet\n", i_data_offset );
@@ -1401,7 +1415,7 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
                 i_data_length );
 
         /* Interesting data are now after the ones we copied, since no gap is
-           allowed between 2 sections in a TS packets */
+         * allowed between 2 sections in a TS packets */
         i_data_offset += i_data_length;
 
         /* Decode the packet if it is now complete */
@@ -1434,3 +1448,4 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
 
 #undef p_psi
 }
+

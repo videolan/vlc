@@ -65,9 +65,9 @@
 void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                                    int i_coding_type, boolean_t b_kept )
 {
-    mtime_t         i_delay;
+    double          i_can_display;
     mtime_t         i_pts;
-    pes_packet_t *  p_pes = p_vpar->bit_stream.p_decoder_fifo->buffer[ 
+    pes_packet_t *  p_pes = p_vpar->bit_stream.p_decoder_fifo->buffer[
                                p_vpar->bit_stream.p_decoder_fifo->i_start ];
 
     /* try to guess the current DTS and PTS */
@@ -126,58 +126,52 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
             }
 
             /* now we calculated all statistics, it's time to
-             * decide what we have the time to display
-             */
-            i_delay = i_pts - p_vpar->synchro.i_last_kept_I_pts;
+             * decide what we have the time to display */
+            i_can_display = (float)(i_pts - p_vpar->synchro.i_last_kept_I_pts)
+                                / p_vpar->synchro.i_delay;
 
-            p_vpar->synchro.b_all_I
-                = ( p_vpar->synchro.i_delay < i_delay );
+            p_vpar->synchro.b_all_I = 0;
+            p_vpar->synchro.b_all_B = 0;
+            p_vpar->synchro.b_all_P = 0;
+            p_vpar->synchro.displayable_p = 0;
+            p_vpar->synchro.displayable_b = 0;
 
-            p_vpar->synchro.b_all_P
-                    = ( p_vpar->synchro.i_delay
-                    * (1 + p_vpar->synchro.i_P_seen) < i_delay );
-
-            if( !p_vpar->synchro.b_all_P )
+            if( ( p_vpar->synchro.b_all_I = ( i_can_display > 1 ) ) )
             {
-                p_vpar->synchro.displayable_p
-                    //= -1.0 + (float)i_delay / (float)p_vpar->synchro.i_delay;
-                    = (-1.0 + (float)p_vpar->synchro.displayable_p + (float)i_delay / (float)p_vpar->synchro.i_delay) / 2.0;
-                if( p_vpar->synchro.displayable_p < 0 )
-                    p_vpar->synchro.displayable_p = 0;
+                i_can_display -= 1;
 
-                p_vpar->synchro.b_all_B = 0;
-                p_vpar->synchro.displayable_b = 0;
-            }
-            else
-            {
-                p_vpar->synchro.displayable_p = p_vpar->synchro.i_P_seen;
-
-                if( !(p_vpar->synchro.b_all_B
-                        = ( p_vpar->synchro.i_delay
-                        * (1 + p_vpar->synchro.i_B_seen
-                            + p_vpar->synchro.i_P_seen)) < i_delay) )
+                if( !( p_vpar->synchro.b_all_P
+                        = ( i_can_display > p_vpar->synchro.i_P_seen ) ) )
                 {
-                    p_vpar->synchro.displayable_b
-                        //= -2.0 + i_delay / p_vpar->synchro.i_delay - p_vpar->synchro.b_all_P;
-                        = ( -2.0 + (float)p_vpar->synchro.displayable_b + (float)i_delay / (float)p_vpar->synchro.i_delay - (float)p_vpar->synchro.b_all_P) / 2.0;
+                    p_vpar->synchro.displayable_p = i_can_display;
                 }
                 else
                 {
-                    p_vpar->synchro.displayable_b = p_vpar->synchro.i_B_seen;
+                    i_can_display -= p_vpar->synchro.i_P_seen;
+
+                    if( !( p_vpar->synchro.b_all_B
+                            = ( i_can_display > p_vpar->synchro.i_B_seen ) ) )
+                    {
+                        p_vpar->synchro.displayable_b = i_can_display;
+                    }
                 }
             }
 
 #if 1
             if( p_vpar->synchro.b_all_I )
-                intf_ErrMsg( "I: all  " );
+                intf_ErrMsg( "I: 1/1  " );
             if( p_vpar->synchro.b_all_P )
-                intf_ErrMsg( "P: all  " );
+                intf_ErrMsg( "P: %i/%i  ", p_vpar->synchro.i_P_seen,
+                                           p_vpar->synchro.i_P_seen );
             else if( p_vpar->synchro.displayable_p > 0 )
-                intf_ErrMsg( "P: %f  ", p_vpar->synchro.displayable_p );
+                intf_ErrMsg( "P: %.2f/%i  ", p_vpar->synchro.displayable_p,
+                                             p_vpar->synchro.i_P_seen );
             if( p_vpar->synchro.b_all_B )
-                intf_ErrMsg( "B: all" );
+                intf_ErrMsg( "B: %i/%i", p_vpar->synchro.displayable_b,
+                                         p_vpar->synchro.displayable_b );
             else if( p_vpar->synchro.displayable_b > 0 )
-                intf_ErrMsg( "B: %f", p_vpar->synchro.displayable_b );
+                intf_ErrMsg( "B: %.2f/%i", p_vpar->synchro.displayable_b,
+                                           p_vpar->synchro.i_B_seen );
             intf_ErrMsg( "\n" );
 #endif
             p_vpar->synchro.i_P_seen = 0;
@@ -212,6 +206,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 
         case P_CODING_TYPE:
 
+            //return(1);
             if( p_vpar->synchro.b_all_P )
             {
                 //intf_ErrMsg( " p  " );

@@ -238,7 +238,7 @@ static void RunThread (adec_thread_t * p_adec)
             /* have to find a synchro point */
             adec_byte_stream_t * p_byte_stream;
             
-            intf_Msg ( "adec: sync\n" );
+            intf_DbgMsg ( "adec: sync\n" );
             
             p_adec->align = 0;
             p_byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
