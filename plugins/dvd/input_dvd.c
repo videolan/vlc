@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.19 2001/02/22 08:44:45 stef Exp $
+ * $Id: input_dvd.c,v 1.20 2001/02/22 08:59:54 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -793,120 +793,102 @@ static void DVDEnd( input_thread_t * p_input )
 static int DVDRead( input_thread_t * p_input,
                    data_packet_t ** pp_packets )
 {
-    byte_t              p_header[6];
-    data_packet_t *     p_data;
-    size_t              i_packet_size;
-    int                 i_packet, i_error;
-    thread_dvd_data_t * p_method;
+    thread_dvd_data_t *     p_method;
+    netlist_t *             p_netlist;
+    struct iovec *          p_vec;
+    struct data_packet_s *  p_data;
+    u8 *                    pi_cur;
+    int                     i_packet_size;
+    int                     i_packet;
+    int                     i_pos;
+    int                     i;
+    boolean_t               b_first_packet;
 
-    p_method = (thread_dvd_data_t *)p_input->p_plugin_data;
+    p_method = ( thread_dvd_data_t * ) p_input->p_plugin_data;
+    p_netlist = ( netlist_t * ) p_input->p_method_data;
 
-    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
-    for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
+    /* Get an iovec pointer */
+    if( ( p_vec = input_NetlistGetiovec( p_netlist ) ) == NULL )
     {
-        /* Read what we believe to be a packet header. */
-        if( (i_error = SafeRead( p_input, p_header, 6 )) )
+        intf_ErrMsg( "DVD: read error" );
+        return -1;
+    }
+
+    /* Reads from DVD */
+    readv( p_input->i_handle, p_vec, p_method->i_read_once );
+
+    if( p_method->b_encrypted )
+    {
+        for( i=0 ; i<p_method->i_read_once ; i++ )
         {
-            return( i_error );
+            CSSDescrambleSector( p_method->css.pi_title_key, 
+                                 p_vec[i].iov_base );
+            ((u8*)(p_vec[i].iov_base))[0x14] &= 0x8F;
         }
+    }
 
-        if( (U32_AT(p_header) & 0xFFFFFF00) != 0x100L )
+    /* Update netlist indexes */
+    input_NetlistMviovec( p_netlist, p_method->i_read_once, &p_data );
+
+    i_packet = 0;
+    /* Read headers to compute payload length */
+    for( i = 0 ; i < p_method->i_read_once ; i++ )
+    {
+        i_pos = 0;
+        b_first_packet = 1;
+        while( i_pos < p_netlist->i_buffer_size )
         {
-            /* This is not the startcode of a packet. Read the stream
-             * until we find one. */
-            u32         i_startcode = U32_AT(p_header);
-            int         i_nb;
-            byte_t      i_dummy;
-
-            if( i_startcode )
+            pi_cur = (u8*)(p_vec[i].iov_base + i_pos);
+            /*default header */
+            if( U32_AT( pi_cur ) != 0x1BA )
             {
-                /* It is common for MPEG-1 streams to pad with zeros
-                 * (although it is forbidden by the recommendation), so
-                 * don't bother everybody in this case. */
-                intf_WarnMsg( 1, "Garbage at input (%x)", i_startcode );
-            }
-
-            while( (i_startcode & 0xFFFFFF00) != 0x100L )
-            {
-                i_startcode <<= 8;
-                if( (i_nb = SafeRead( p_input, &i_dummy, 1 )) != 0 )
-                {
-                    i_startcode |= i_dummy;
-                }
-                else
-                {
-                    return( 1 );
-                }
-            }
-
-            /* Packet found. */
-            *(u32 *)p_header = U32_AT(&i_startcode);
-            if( (i_error = SafeRead( p_input, p_header + 4, 2 )) )
-            {
-                return( i_error );
-            }
-        }
-
-        if( U32_AT(p_header) != 0x1BA )
-        {
-            /* That's the case for all packets, except pack header. */
-            i_packet_size = U16_AT(&p_header[4]);
-        }
-        else
-        {
-            /* Pack header. */
-            if( (p_header[4] & 0xC0) == 0x40 )
-            {
-                /* MPEG-2 */
-                i_packet_size = 8;
-            }
-            else if( (p_header[4] & 0xF0) == 0x20 )
-            {
-                /* MPEG-1 */
-                i_packet_size = 6;
+                /* That's the case for all packets, except pack header. */
+                i_packet_size = U16_AT( pi_cur + 4 );
             }
             else
             {
-                intf_ErrMsg( "Unable to determine stream type" );
-                return( -1 );
-            }
-        }
-
-        /* Fetch a packet of the appropriate size. */
-        if( (p_data = NewPacket( p_input, i_packet_size + 6 )) == NULL )
-        {
-            intf_ErrMsg( "Out of memory" );
-            return( -1 );
-        }
-
-        /* Copy the header we already read. */
-        memcpy( p_data->p_buffer, p_header, 6 );
-
-        /* Read the remaining of the packet. */
-        if( i_packet_size && (i_error =
-                SafeRead( p_input, p_data->p_buffer + 6, i_packet_size )) )
-        {
-            return( i_error );
-        }
-
-        /* In MPEG-2 pack headers we still have to read stuffing bytes. */
-        if( U32_AT(p_header) == 0x1BA )
-        {
-            if( i_packet_size == 8 && (p_data->p_buffer[13] & 0x7) != 0 )
-            {
-                /* MPEG-2 stuffing bytes */
-                byte_t      p_garbage[8];
-                if( (i_error = SafeRead( p_input, p_garbage,
-                                         p_data->p_buffer[13] & 0x7)) )
+                /* Pack header. */
+                if( ( pi_cur[4] & 0xC0 ) == 0x40 )
                 {
-                    return( i_error );
+                    /* MPEG-2 */
+                    i_packet_size = 8;
+                }
+                else if( ( pi_cur[4] & 0xF0 ) == 0x20 )
+                {
+                    /* MPEG-1 */
+                    i_packet_size = 6;
+                }
+                else
+                {
+                    intf_ErrMsg( "Unable to determine stream type" );
+                    return( -1 );
                 }
             }
-        }
+            if( b_first_packet )
+            {
+                p_data->b_discard_payload = 0;
+                b_first_packet = 0;
+            }
+            else
+            { 
+                p_data = input_NetlistNewPacket( p_netlist ,
+                                                 i_packet_size + 6 );
+                memcpy( p_data->p_buffer,
+                        p_vec[i].iov_base + i_pos , i_packet_size + 6 );
+            }
 
-        /* Give the packet to the other input stages. */
-        pp_packets[i_packet] = p_data;
+            p_data->p_payload_end = p_data->p_payload_start + i_packet_size + 6;
+            pp_packets[i_packet] = p_data;
+            i_packet++;
+            i_pos += i_packet_size + 6;
+        }
     }
+    pp_packets[i_packet] = NULL;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.p_selected_area->i_tell +=
+                                        p_method->i_read_once *DVD_LB_SIZE;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( 0 );
 }
@@ -945,3 +927,6 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
 
     return;
 }
+
+
+
