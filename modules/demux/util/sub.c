@@ -2,7 +2,7 @@
  * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sub.c,v 1.48 2004/01/27 12:46:46 fenrir Exp $
+ * $Id: sub.c,v 1.49 2004/01/27 13:10:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -395,7 +395,6 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
             else if( local_stristr( s, "# VobSub index file" ) )
             {
                 i_sub_type = SUB_TYPE_VOBSUB;
-                ps_track_init( p_sub->tk );
                 break;
             }
         }
