@@ -2,7 +2,7 @@
  * lpcm_adec.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.17 2002/06/01 18:04:49 sam Exp $
+ * $Id: lpcm_adec.c,v 1.18 2002/07/17 21:24:06 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -155,9 +155,9 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
  *****************************************************************************/
 void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
 {
-    byte_t * buffer,p_temp[LPCMDEC_FRAME_SIZE];
-    int i_loop;
-    byte_t byte1, byte2;
+    byte_t *    buffer,p_temp[LPCMDEC_FRAME_SIZE];
+    vlc_bool_t  b_sync;
+    int         i_loop;
 
     CurrentPTS( &p_lpcmdec->bit_stream,
         &p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->i_end_frame],
@@ -172,6 +172,7 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
               (p_lpcmdec->p_aout_fifo->i_end_frame * LPCMDEC_FRAME_SIZE);
 
     RemoveBits32(&p_lpcmdec->bit_stream);
+#if 0
     byte1 = GetBits(&p_lpcmdec->bit_stream, 8) ;
     byte2 = GetBits(&p_lpcmdec->bit_stream, 8) ;
     
@@ -185,9 +186,22 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
         byte1 = byte2;
         byte2 = GetBits(&p_lpcmdec->bit_stream, 8);
     }
+#else
+    b_sync = 0;
+    while( ( !p_lpcmdec->p_fifo->b_die ) &&
+           ( !p_lpcmdec->p_fifo->b_error ) &&
+           ( !b_sync ) )
+    {
+        while( ( !p_lpcmdec->p_fifo->b_die ) &&
+               ( !p_lpcmdec->p_fifo->b_error ) &&
+               ( GetBits( &p_lpcmdec->bit_stream, 8 ) != 0x01 ) );
+        b_sync = ( ShowBits( &p_lpcmdec->bit_stream, 8 ) == 0x80 );
+    }
+    RemoveBits( &p_lpcmdec->bit_stream, 8 );
+#endif
     
     GetChunk( &p_lpcmdec->bit_stream, p_temp, LPCMDEC_FRAME_SIZE);
-    if( p_lpcmdec->p_fifo->b_die ) return;
+    if( p_lpcmdec->p_fifo->b_die || p_lpcmdec->p_fifo->b_error ) return;
 
     for( i_loop = 0; i_loop < LPCMDEC_FRAME_SIZE/2; i_loop++ )
     {
