@@ -1,4 +1,45 @@
-$Id: NEWS,v 1.37 2003/04/08 08:35:59 massiot Exp $
+$Id: NEWS,v 1.38 2003/05/05 13:03:23 hartman Exp $
+
+Changes between 0.5.3 and 0.5.4:
+---------------------------------
+
+Core Support:
+ *
+
+Input access:
+ * fixed a big bug in ftp and http access that prevented many platforms (OSX most prominently) to view ftp and http streams.
+
+Input demux:
+ *
+
+Codecs:
+ *
+
+Interfaces:
+ *
+
+Stream output:
+ *
+
+Miscellaneous:
+ *
+
+UNIX ports:
+ *
+
+Mac OS X port:
+ * When you add several items to the playlist, they are sorted alphabetically.
+ * New about panel
+ * subs are removed more often now.
+ * transparency option for video out.
+ * float on top option for video out.
+ * new output dialog for transcode and display while stream capabilities
+
+Win32 port:
+ *
+
+iPAQ familiar Linux port:
+ *
 
 Changes between 0.5.2 and 0.5.3:
 ---------------------------------
