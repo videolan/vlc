@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.118 2003/11/23 03:58:33 rocky Exp $
+dnl $Id: configure.ac,v 1.119 2003/11/23 18:40:09 fenrir Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -867,7 +867,7 @@ dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc logger gestures memcpy hotkeys])
 AX_ADD_PLUGINS([mpgv mpga m4v mpeg_system ps ts avi asf aac mp4 rawdv])
-AX_ADD_PLUGINS([spudec mpeg_audio lpcm a52 dts cinepak dvbsub])
+AX_ADD_PLUGINS([spudec mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
 AX_ADD_PLUGINS([trivial_resampler ugly_resampler linear_resampler bandlimited_resampler])
@@ -1828,58 +1828,58 @@ then
 fi
 
 
-dnl
-dnl  xvid decoder plugin
-dnl
-AC_ARG_ENABLE(xvid,
-[  --enable-xvid           xvid codec (default disabled)])
-if test "${enable_xvid}" = "yes"
-then
-  AC_ARG_WITH(xvid,
-    [    --with-xvid=PATH      path to xvid installation],[],[])
-  if test "${with_xvid}" != "no" -a -n "${with_xvid}"
-  then
-    AX_ADD_CPPFLAGS([xvid],[-I${with_xvid}/include])
-    AX_ADD_LDFLAGS([xvid],[-L${with_xvid}/lib])
-  fi
-
-  AC_ARG_WITH(xvid-tree,
-  [    --with-xvid-tree=PATH xvid tree for static linking])
-  if test -n "${with_xvid_tree}"
-  then
-    AC_MSG_CHECKING(for libxvidcore.a in ${with_xvid_tree})
-    real_xvid_tree="`cd ${with_xvid_tree} 2>/dev/null && pwd`"
-    if test -z "${real_xvid_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_xvid_tree}])
-    fi
-    if test -f "${real_xvid_tree}/build/generic/libxvidcore.a"
-    then
-      dnl  Use a custom xvid
-      AC_MSG_RESULT(${real_xvid_tree}/build/generic/libxvidcore.a)
-      AX_ADD_BUILTINS([xvid])
-      AX_ADD_LDFLAGS([xvid],[-L${real_xvid_tree}/build/generic -lxvidcore])
-      AX_ADD_CPPFLAGS([xvid],[-I${real_xvid_tree}/src])
-    else
-      dnl  The given libxvidcore wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_xvid_tree}/build/generic/libxvidcore.a, make sure you compiled libxvidcore in ${with_xvid_tree}])
-    fi
-  else
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_xvid}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_xvid}"
-    AC_CHECK_HEADERS(xvid.h, ,
-      [ AC_MSG_ERROR([Cannot find development headers for libxvidcore...]) ])
-    AC_CHECK_LIB(xvidcore, xvid_init, [
-      AX_ADD_PLUGINS([xvid])
-      AX_ADD_LDFLAGS([xvid],[-lxvidcore]) ],
-      [ AC_MSG_ERROR([Cannot find libxvidcore library...]) ])
-    LDFLAGS="${LDFLAGS_save}"
-    CPPFLAGS="${CPPFLAGS_save}"
-  fi
-fi
+dnl dnl
+dnl dnl  xvid decoder plugin
+dnl dnl
+dnl AC_ARG_ENABLE(xvid,
+dnl [  --enable-xvid           xvid codec (default disabled)])
+dnl if test "${enable_xvid}" = "yes"
+dnl then
+dnl   AC_ARG_WITH(xvid,
+dnl     [    --with-xvid=PATH      path to xvid installation],[],[])
+dnl   if test "${with_xvid}" != "no" -a -n "${with_xvid}"
+dnl   then
+dnl     AX_ADD_CPPFLAGS([xvid],[-I${with_xvid}/include])
+dnl     AX_ADD_LDFLAGS([xvid],[-L${with_xvid}/lib])
+dnl   fi
+dnl 
+dnl   AC_ARG_WITH(xvid-tree,
+dnl   [    --with-xvid-tree=PATH xvid tree for static linking])
+dnl   if test -n "${with_xvid_tree}"
+dnl   then
+dnl     AC_MSG_CHECKING(for libxvidcore.a in ${with_xvid_tree})
+dnl     real_xvid_tree="`cd ${with_xvid_tree} 2>/dev/null && pwd`"
+dnl     if test -z "${real_xvid_tree}"
+dnl     then
+dnl       dnl  The given directory can't be found
+dnl       AC_MSG_RESULT(no)
+dnl       AC_MSG_ERROR([cannot cd to ${with_xvid_tree}])
+dnl     fi
+dnl     if test -f "${real_xvid_tree}/build/generic/libxvidcore.a"
+dnl     then
+dnl       dnl  Use a custom xvid
+dnl       AC_MSG_RESULT(${real_xvid_tree}/build/generic/libxvidcore.a)
+dnl       AX_ADD_BUILTINS([xvid])
+dnl       AX_ADD_LDFLAGS([xvid],[-L${real_xvid_tree}/build/generic -lxvidcore])
+dnl       AX_ADD_CPPFLAGS([xvid],[-I${real_xvid_tree}/src])
+dnl     else
+dnl       dnl  The given libxvidcore wasn't built
+dnl       AC_MSG_RESULT(no)
+dnl       AC_MSG_ERROR([cannot find ${real_xvid_tree}/build/generic/libxvidcore.a, make sure you compiled libxvidcore in ${with_xvid_tree}])
+dnl     fi
+dnl   else
+dnl     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_xvid}"
+dnl     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_xvid}"
+dnl     AC_CHECK_HEADERS(xvid.h, ,
+dnl       [ AC_MSG_ERROR([Cannot find development headers for libxvidcore...]) ])
+dnl     AC_CHECK_LIB(xvidcore, xvid_init, [
+dnl       AX_ADD_PLUGINS([xvid])
+dnl       AX_ADD_LDFLAGS([xvid],[-lxvidcore]) ],
+dnl       [ AC_MSG_ERROR([Cannot find libxvidcore library...]) ])
+dnl     LDFLAGS="${LDFLAGS_save}"
+dnl     CPPFLAGS="${CPPFLAGS_save}"
+dnl   fi
+dnl fi
 
 dnl
 dnl  QuickTime plugin
@@ -1986,18 +1986,18 @@ then
   fi
 fi
 
-dnl
-dnl  DV plugin
-dnl
-AC_ARG_ENABLE(dv,
-  [  --enable-dv             DV decoder support (deprecated in favor of ffmpeg) (default disabled)])
-if test "${enable_dv}" = "yes"
-then
-  AC_CHECK_HEADERS(libdv/dv.h, [
-    AX_ADD_PLUGINS([dv])
-    AX_ADD_LDFLAGS([dv],[-ldv])
-   ],[])
-fi
+dnl dnl
+dnl dnl  DV plugin
+dnl dnl
+dnl AC_ARG_ENABLE(dv,
+dnl   [  --enable-dv             DV decoder support (deprecated in favor of ffmpeg) (default disabled)])
+dnl if test "${enable_dv}" = "yes"
+dnl then
+dnl   AC_CHECK_HEADERS(libdv/dv.h, [
+dnl     AX_ADD_PLUGINS([dv])
+dnl     AX_ADD_LDFLAGS([dv],[-ldv])
+dnl    ],[])
+dnl fi
 
 dnl
 dnl  Flac plugin
