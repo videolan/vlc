@@ -113,12 +113,6 @@ movq      %%mm1, (%1)   # Store YUYV                                      \n\
 
 #else
 
-#define C_YUV420_YUYV( )                                                    \
-    *(p_line1)++ = *(p_y1)++; *(p_line2)++ = *(p_y2)++;                     \
-    *(p_line1)++ =            *(p_line2)++ = *(p_u)++;                      \
-    *(p_line1)++ = *(p_y1)++; *(p_line2)++ = *(p_y2)++;                     \
-    *(p_line1)++ =            *(p_line2)++ = *(p_v)++;                      \
-
 #define C_YUV420_YVYU( )                                                    \
     *(p_line1)++ = *(p_y1)++; *(p_line2)++ = *(p_y2)++;                     \
     *(p_line1)++ =            *(p_line2)++ = *(p_v)++;                      \
@@ -140,4 +134,11 @@ movq      %%mm1, (%1)   # Store YUYV                                      \n\
     *(p_line1)++ = *(p_line2)++ = *(p_v) - 0x80; p_v += 2;                  \
 
 #endif
+
+/* Used in both MMX and C modules */
+#define C_YUV420_YUYV( )                                                    \
+    *(p_line1)++ = *(p_y1)++; *(p_line2)++ = *(p_y2)++;                     \
+    *(p_line1)++ =            *(p_line2)++ = *(p_u)++;                      \
+    *(p_line1)++ = *(p_y1)++; *(p_line2)++ = *(p_y2)++;                     \
+    *(p_line1)++ =            *(p_line2)++ = *(p_v)++;                      \
 
