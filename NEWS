@@ -1,7 +1,11 @@
-$Id: NEWS,v 1.65 2003/08/24 17:24:33 gbazin Exp $
+$Id: NEWS,v 1.66 2003/09/20 02:47:41 hartman Exp $
 
-Changes between 0.6.2 and HEAD:
+Changes between 0.6.2 and 0.6.3:
 ---------------------------------
+
+Core support:
+ * Video outputs are recycled if possible. This removes any 'flicker' between two similiar video files.
+ * Fixed the video filters. Video should no longer go black when these are used.
 
 Stream output:
  * MPEG TS muxer follows the ATSC/DVB specs for embedded A52 audio.
@@ -12,9 +16,10 @@ Input demux:
 
 Codecs:
  * Support for AAC + SBR.
+ * MPEG 2.5 support.
 
 Mac OS X port:
- * Mozilla plugin for Mac OS X.
+ * Mozilla plugin for Mac OS X (experimental).
 
 Win32 port:
  * New DirectShow input module (for video acquisition cards, webcams...).
@@ -22,7 +27,11 @@ Win32 port:
  * Support for 3F2R in audio output.
 
 Miscellaneous:
+ * Text subtitles now have a black outline.
  * Text subtitles filename and charset autodetection.
+ * Text subtitles for mpeg files.
+ * Automatic fontsize selection for text subtitles.
+ * Audio visual effects filters (spectrum, scope and random).
  * Audio visual effects filter using goom.
 
 Changes between 0.6.1 and 0.6.2:
