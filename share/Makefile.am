@@ -13,7 +13,9 @@ dist_pkgdata_DATA = \
 	$(NULL)
 
 nobase_dist_pkgdata_DATA = \
-	$(DIST_skins)
+	$(DIST_skins) \
+	$(DIST_http) \
+	$(NULL)
 
 DIST_fonts = \
 	$(NULL)
@@ -122,5 +124,13 @@ DIST_skins = \
 	skins/default/pause4.bmp \
 	skins/default/playlist3.bmp \
 	skins/default/prev3.bmp \
-	skins/default/stop1.bmp
+	skins/default/stop1.bmp \
+	$(NULL)
 
+DIST_http = \
+	http/index.html \
+	http/info.html \
+	http/admin/index.html \
+	http/admin/browse.html \
+	http/admin/.access \
+	$(NULL)

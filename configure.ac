@@ -1,7 +1,7 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.45 2003/07/28 21:41:20 massiot Exp $
+dnl $Id: configure.ac,v 1.46 2003/07/29 17:42:58 gbazin Exp $
 
-AC_INIT(vlc,0.6.1-test1)
+AC_INIT(vlc,0.6.1)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Trevelyan"
@@ -13,7 +13,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.6.1-test1)
+AM_INIT_AUTOMAKE(vlc,0.6.1)
 AM_CONFIG_HEADER(config.h)
 
 dnl
@@ -1403,8 +1403,8 @@ dnl
 dnl  matroska demux plugin
 dnl
 AC_ARG_ENABLE(mkv,
-  [  --enable-mkv            Matroska demux support (default disabled)])
-if test "${enable_mkv}" = "yes"
+  [  --enable-mkv            Matroska demux support (default enabled)])
+if test "${enable_mkv}" != "no"
 then
 AC_LANG_PUSH(C++)
   dnl matroska headers include ebml headers directly... pouah that stinks
