@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.18 2001/04/27 19:29:11 massiot Exp $
+ * $Id: input_ps.c,v 1.19 2001/04/27 23:29:14 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -547,8 +547,10 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
     data_packet_t *    p_data;
     long               l_index;
 
+    p_cache = (packet_cache_t *)p_packet_cache;
+
 #ifdef DEBUG
-    if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
+    if ( p_cache == NULL )
     {
         intf_ErrMsg( "PPacket cache not initialized" );
         return NULL;
@@ -692,8 +694,10 @@ static pes_packet_t * NewPES( void * p_packet_cache )
     packet_cache_t *   p_cache;
     pes_packet_t *     p_pes;
 
+    p_cache = (packet_cache_t *)p_packet_cache;
+
 #ifdef DEBUG
-    if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
+    if ( p_cache == NULL )
     {
         intf_ErrMsg( "Packet cache not initialized" );
         return NULL;
@@ -741,8 +745,10 @@ static void DeletePacket( void * p_packet_cache,
 {
     packet_cache_t *   p_cache;
 
+    p_cache = (packet_cache_t *)p_packet_cache;
+
 #ifdef DEBUG
-    if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
+    if ( p_cache == NULL )
     {
         intf_ErrMsg( "Packet cache not initialized" );
         return;
@@ -817,8 +823,10 @@ static void DeletePES( void * p_packet_cache, pes_packet_t * p_pes )
     data_packet_t *     p_data;
     data_packet_t *     p_next;
 
+    p_cache = (packet_cache_t *)p_packet_cache;
+
 #ifdef DEBUG
-    if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
+    if ( p_cache == NULL )
     {
         intf_ErrMsg( "Packet cache not initialized" );
         return;
