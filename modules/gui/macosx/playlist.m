@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.17 2003/03/17 23:13:06 hartman Exp $
+ * $Id: playlist.m,v 1.18 2003/04/09 14:12:49 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -446,8 +446,8 @@
         
         if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
         {
-            o_values = [o_pasteboard propertyListForType: NSFilenamesPboardType];
-        
+            o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]
+                        sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
             [self appendArray: o_values atPos: i_proposed_row enqueue:YES];
         
             return( YES );

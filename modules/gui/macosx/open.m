@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.27 2003/04/01 22:29:41 massiot Exp $
+ * $Id: open.m,v 1.28 2003/04/09 14:12:49 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -808,7 +808,11 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     {
         intf_thread_t * p_intf = [NSApp getIntf];
         config_PutPsz( p_intf, "sout", NULL );
-        [o_playlist appendArray: [o_open_panel filenames] atPos: -1 enqueue:NO];
+        
+        NSArray *o_values = [[o_open_panel filenames]
+                sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+        
+        [o_playlist appendArray: o_values atPos: -1 enqueue:NO];
     }
 }
 

@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.25 2003/03/31 23:32:44 sigmunau Exp $
+ * $Id: asf.c,v 1.26 2003/04/09 14:12:49 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -264,7 +264,7 @@ static int Activate( vlc_object_t * p_this )
                 p_wf->nChannels         = GetWLE( p_data + 2 );
                 input_AddInfo( p_cat, _("Channels"), "%d", p_wf->nChannels );
                 p_wf->nSamplesPerSec    = GetDWLE( p_data + 4 );
-                input_AddInfo( p_cat, _("Sample rate"), "%d", p_wf->nSamplesPerSec );
+                input_AddInfo( p_cat, _("Sample Rate"), "%d", p_wf->nSamplesPerSec );
                 p_wf->nAvgBytesPerSec   = GetDWLE( p_data + 8 );
                 input_AddInfo( p_cat, _("Avg. byterate"), "%d", p_wf->nAvgBytesPerSec );
                 p_wf->nBlockAlign       = GetWLE( p_data + 12 );
