@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.12 2003/03/29 01:50:12 gbazin Exp $
+ * $Id: wxwindows.h,v 1.13 2003/03/30 02:58:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -311,6 +311,7 @@ private:
 };
 
 /* Preferences Dialog */
+class PrefsTreeCtrl;
 class PrefsDialog: public wxDialog
 {
 public:
@@ -324,11 +325,14 @@ private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
     void OnCancel( wxCommandEvent& event );
+    void OnSave( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
     Interface *p_main_interface;
+
+    PrefsTreeCtrl *prefs_tree;
 };
 
 /* Messages */

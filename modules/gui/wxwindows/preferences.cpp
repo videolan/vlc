@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.2 2003/03/29 01:50:12 gbazin Exp $
+ * $Id: preferences.cpp,v 1.3 2003/03/30 02:58:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -71,6 +71,8 @@ public:
                    PrefsDialog *p_prefs_dialog, wxBoxSizer *_p_sizer );
     virtual ~PrefsTreeCtrl();
 
+    void ApplyChanges();
+
 private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnSelectTreeItem( wxTreeEvent& event );
@@ -81,11 +83,37 @@ private:
     PrefsDialog *p_prefs_dialog;
     wxBoxSizer *p_sizer;
     wxWindow *p_parent;
+
+    wxTreeItemId root_item;
 };
 
-WX_DEFINE_ARRAY(wxEvtHandler *, ArrayOfControls);
+struct ConfigData
+{
+    ConfigData( wxPanel *_panel, int _i_conf_type,
+                vlc_bool_t _b_advanced, char *psz_name )
+    { panel = _panel; b_advanced = _b_advanced;
+      i_config_type = _i_conf_type; option_name = psz_name; }
 
-class PrefsPanel : public wxScrolledWindow
+    vlc_bool_t b_advanced;
+    int i_config_type;
+
+    union control
+    {
+        wxComboBox *combobox;
+        wxRadioButton *radio;
+        wxSpinCtrl *spinctrl;
+        wxCheckBox *checkbox;
+        wxTextCtrl *textctrl;
+
+    } control;
+
+    wxPanel *panel;
+    wxString option_name;
+};
+
+WX_DEFINE_ARRAY(ConfigData *, ArrayOfConfigData);
+
+class PrefsPanel : public wxPanel
 {
 public:
 
@@ -94,13 +122,21 @@ public:
                 module_t *p_module, char * );
     virtual ~PrefsPanel() {}
 
+    void ApplyChanges();
+
 private:
     void OnFileBrowse( wxCommandEvent& WXUNUSED(event) );
     void OnDirectoryBrowse( wxCommandEvent& WXUNUSED(event) );
+    void OnAdvanced( wxCommandEvent& WXUNUSED(event) );
     DECLARE_EVENT_TABLE()
 
     intf_thread_t *p_intf;
-    ArrayOfControls controls_array;
+    vlc_bool_t b_advanced;
+
+    wxBoxSizer *config_sizer;
+    wxScrolledWindow *config_window;
+
+    ArrayOfConfigData config_array;
 };
 
 class ConfigTreeData : public wxTreeItemData
@@ -110,21 +146,23 @@ public:
     ConfigTreeData() { panel == NULL; }
     virtual ~ConfigTreeData() { if( panel ) delete panel; }
 
-    wxWindow *panel;
+    PrefsPanel *panel;
     wxBoxSizer *sizer;
 };
 
-class ConfigData : public wxClientData
+class ConfigEvtHandler : public wxEvtHandler
 {
 public:
-    ConfigData() { b_advanced = VLC_FALSE; }
-    ConfigData( vlc_bool_t _b_advanced ) { b_advanced = _b_advanced; }
-    virtual ~ConfigData() { }
+    ConfigEvtHandler( intf_thread_t *p_intf );
+    virtual ~ConfigEvtHandler();
 
-    vlc_bool_t IsAdvanced() { return b_advanced; }
+    void ConfigEvtHandler::OnCommandEvent( wxCommandEvent& event );
 
 private:
-    vlc_bool_t b_advanced;
+
+    DECLARE_EVENT_TABLE()
+
+    intf_thread_t *p_intf;
 };
 
 /*****************************************************************************
@@ -136,13 +174,15 @@ enum
 {
     Notebook_Event = wxID_HIGHEST,
     MRL_Event,
-
+    Reset_Event,
+    Advanced_Event,
 };
 
 BEGIN_EVENT_TABLE(PrefsDialog, wxDialog)
     /* Button events */
     EVT_BUTTON(wxID_OK, PrefsDialog::OnOk)
     EVT_BUTTON(wxID_CANCEL, PrefsDialog::OnCancel)
+    EVT_BUTTON(wxID_SAVE, PrefsDialog::OnSave)
 
 END_EVENT_TABLE()
 
@@ -163,11 +203,19 @@ enum
 
 };
 
-BEGIN_EVENT_TABLE(PrefsPanel, wxScrolledWindow)
+BEGIN_EVENT_TABLE(PrefsPanel, wxPanel)
     /* Button events */
+    EVT_BUTTON(Advanced_Event, PrefsPanel::OnAdvanced)
     EVT_BUTTON(FileBrowse_Event, PrefsPanel::OnFileBrowse)
     EVT_BUTTON(DirectoryBrowse_Event, PrefsPanel::OnDirectoryBrowse)
 
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(ConfigEvtHandler, wxEvtHandler)
+    EVT_BUTTON(-1, ConfigEvtHandler::OnCommandEvent)
+    EVT_TEXT(-1, ConfigEvtHandler::OnCommandEvent)
+    EVT_RADIOBOX(-1, ConfigEvtHandler::OnCommandEvent)
+    EVT_SPINCTRL(-1, ConfigEvtHandler::OnCommandEvent)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -175,7 +223,7 @@ END_EVENT_TABLE()
  *****************************************************************************/
 PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, Interface *_p_main_interface)
   :  wxDialog( _p_main_interface, -1, _("Preferences"), wxDefaultPosition,
-               wxSize(600,400), wxDEFAULT_FRAME_STYLE )
+               wxSize(650,450), wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -187,7 +235,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, Interface *_p_main_interface)
 
     /* Create the preferences tree control */
     wxBoxSizer *controls_sizer = new wxBoxSizer( wxHORIZONTAL );
-    PrefsTreeCtrl *prefs_tree =
+    prefs_tree =
         new PrefsTreeCtrl( panel, p_intf, this, controls_sizer );
 
     /* Separation */
@@ -197,11 +245,15 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, Interface *_p_main_interface)
     wxButton *ok_button = new wxButton( panel, wxID_OK, _("OK") );
     ok_button->SetDefault();
     wxButton *cancel_button = new wxButton( panel, wxID_CANCEL, _("Cancel") );
+    wxButton *save_button = new wxButton( panel, wxID_SAVE, _("Save") );
+    //wxButton *reset_button = new wxButton( panel, Reset_Event, _("Reset") );
 
     /* Place everything in sizers */
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
     button_sizer->Add( ok_button, 0, wxALL, 5 );
     button_sizer->Add( cancel_button, 0, wxALL, 5 );
+    button_sizer->Add( save_button, 0, wxALL, 5 );
+    //button_sizer->Add( reset_button, 0, wxALL, 5 );
     button_sizer->Layout();
 
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
@@ -231,6 +283,8 @@ PrefsDialog::~PrefsDialog()
  *****************************************************************************/
 void PrefsDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
+    prefs_tree->ApplyChanges();
+
     this->Hide();
 }
 
@@ -239,51 +293,11 @@ void PrefsDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
     this->Hide();
 }
 
-void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
+void PrefsDialog::OnSave( wxCommandEvent& WXUNUSED(event) )
 {
-    ConfigTreeData *config_data;
+    prefs_tree->ApplyChanges();
 
-    config_data = (ConfigTreeData *)GetItemData( event.GetOldItem() );
-    if( config_data && config_data->panel )
-    {
-        config_data->panel->Hide();
-        p_sizer->Remove( config_data->panel );
-    }
-
-    config_data = (ConfigTreeData *)GetItemData( event.GetItem() );
-    if( config_data && config_data->panel )
-    {
-        config_data->panel->Show();
-        config_data->panel->FitInside();
-        p_sizer->Add( config_data->panel, 2, wxEXPAND | wxALL, 0 );
-        p_sizer->Layout();
-    }
-}
-
-void PrefsPanel::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
-{
-    wxFileDialog dialog( this, _("Open file"), "", "", "*.*",
-                         wxOPEN );
-
-    if( dialog.ShowModal() == wxID_OK )
-    {
-#if 0
-        file_combo->SetValue( dialog.GetPath() );      
-#endif
-    }
-}
-
-void PrefsPanel::OnDirectoryBrowse( wxCommandEvent& WXUNUSED(event) )
-{
-    wxFileDialog dialog( this, _("Open file"), "", "", "*.*",
-                         wxOPEN );
-
-    if( dialog.ShowModal() == wxID_OK )
-    {
-#if 0
-        file_combo->SetValue( dialog.GetPath() );      
-#endif
-    }
+    config_SaveConfigFile( p_intf, NULL );
 }
 
 /*****************************************************************************
@@ -308,7 +322,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     p_sizer = _p_sizer;
     p_parent = _p_parent;
 
-    wxTreeItemId root_item = AddRoot( "" );
+    root_item = AddRoot( "" );
 
     /* List the plugins */
     p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -332,10 +346,6 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
         if( p_item ) do
         {
-            if( p_item->b_advanced && !config_GetInt( p_intf, "advanced" ))
-            {
-                continue;
-            }
             switch( p_item->i_type )
             {
             case CONFIG_HINT_CATEGORY:
@@ -355,10 +365,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         SortChildren( root_item );
     }
 
+
     /*
      * Build a tree of all the plugins
      */
-
     wxTreeItemId plugins_item = AppendItem( root_item, _("Plugins") );
 
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
@@ -379,7 +389,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             capability_item = GetNextChild( plugins_item, cookie );
         }
 
-        if( i_child_index == GetChildrenCount( plugins_item, FALSE ) )
+        if( i_child_index == GetChildrenCount( plugins_item, FALSE ) &&
+            p_module->psz_capability && *p_module->psz_capability )
         {
             /* We didn't find it, add it */
             capability_item = AppendItem( plugins_item,
@@ -413,10 +424,52 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     p_sizer->Add( this, 1, wxEXPAND | wxALL, 0 );
     p_sizer->Layout();
 
+    /* Update Tree Ctrl */
+    SelectItem( GetFirstChild( root_item, cookie ) );
 }
 
 PrefsTreeCtrl::~PrefsTreeCtrl()
 {
+}
+
+void PrefsTreeCtrl::ApplyChanges()
+{
+    long cookie; size_t i_child_index;
+    ConfigTreeData *config_data;
+
+    wxTreeItemId item = GetFirstChild( root_item, cookie);
+    for( i_child_index = 0;
+         i_child_index < GetChildrenCount( root_item, TRUE );
+         i_child_index++ )
+    {
+        config_data = (ConfigTreeData *)GetItemData( item );
+        if( config_data )
+        {
+            config_data->panel->ApplyChanges();
+        }
+
+        item = GetNextChild( root_item, cookie );
+    }
+}
+
+void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
+{
+    ConfigTreeData *config_data;
+
+    config_data = (ConfigTreeData *)GetItemData( event.GetOldItem() );
+    if( config_data && config_data->panel )
+    {
+        config_data->panel->Hide();
+        p_sizer->Remove( config_data->panel );
+    }
+
+    config_data = (ConfigTreeData *)GetItemData( event.GetItem() );
+    if( config_data && config_data->panel )
+    {
+        config_data->panel->Show();
+        p_sizer->Add( config_data->panel, 2, wxEXPAND | wxALL, 0 );
+        p_sizer->Layout();
+    }
 }
 
 /*****************************************************************************
@@ -424,7 +477,7 @@ PrefsTreeCtrl::~PrefsTreeCtrl()
  *****************************************************************************/
 PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                         module_t *p_module, char *psz_section )
-  :  wxScrolledWindow( parent, -1, wxDefaultPosition, wxDefaultSize )
+  :  wxPanel( parent, -1, wxDefaultPosition, wxDefaultSize )
 {
     module_config_t *p_item;
     vlc_list_t      *p_list;
@@ -432,20 +485,16 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
     wxStaticText *label;
     wxComboBox *combo;
-    wxRadioButton *radio;
     wxSpinCtrl *spin;
     wxCheckBox *checkbox;
     wxTextCtrl *textctrl;
     wxButton *button;
-    wxStaticLine *static_line;
-    wxBoxSizer *horizontal_sizer;
-    wxSortedArrayString sorted_array;
     wxArrayString array;
 
     /* Initializations */
     p_intf = _p_intf;
+    b_advanced = VLC_TRUE;
     SetAutoLayout( TRUE );
-    SetScrollRate( 5, 5 );
 
     wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
 
@@ -475,35 +524,41 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     box_sizer->Add( label, 1, wxALL, 5 );
     sizer->Add( box_sizer, 0, wxEXPAND | wxALL, 5 );
 
+    /* Now put all the config options into a scrolled window */
+    config_sizer = new wxBoxSizer( wxVERTICAL );
+    config_window = new wxScrolledWindow( this, -1, wxDefaultPosition,
+                                          wxDefaultSize );
+    config_window->SetAutoLayout( TRUE );
+    config_window->SetScrollRate( 5, 5 );
+
     if( p_item ) do
     {
-        if( p_item->b_advanced && !config_GetInt( p_intf, "advanced" ) )
-        {
-            continue;
-        }
-
         /* If a category has been specified, check we finished the job */
         if( psz_section && p_item->i_type == CONFIG_HINT_CATEGORY &&
             strcmp( psz_section, p_item->psz_text ) )
             break;
 
+        /* put each config option in a separate panel so we can hide advanced
+         * options easily */
+        wxPanel *panel = new wxPanel( config_window, -1, wxDefaultPosition,
+                                      wxDefaultSize );
+        wxBoxSizer *panel_sizer = new wxBoxSizer( wxHORIZONTAL );
+        ConfigData *config_data =
+            new ConfigData( panel, p_item->i_type,
+                            p_item->b_advanced, p_item->psz_name );
+
         switch( p_item->i_type )
         {
-        case CONFIG_HINT_CATEGORY:
-#if 0
-            label = new wxStaticText(this, -1, p_item->psz_text);
-            sizer->Add( label, 0, wxALL, 5 );
-#endif
-            break;
-
         case CONFIG_ITEM_MODULE:
-            label = new wxStaticText(this, -1, p_item->psz_text);
-            combo = new wxComboBox( this, -1, p_item->psz_value,
-                                    wxDefaultPosition, wxSize(200,-1),
-                                    0, NULL );
+            label = new wxStaticText(panel, -1, p_item->psz_text);
+            combo = new wxComboBox( panel, -1, p_item->psz_value,
+                                    wxDefaultPosition, wxDefaultSize,
+                                    0, NULL, wxCB_READONLY | wxCB_SORT );
 
             /* build a list of available modules */
             p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+            combo->Append( _("Default"), (void *)NULL );
+            combo->SetSelection( 0 );
             for( int i_index = 0; i_index < p_list->i_count; i_index++ )
             {
                 p_parser = (module_t *)p_list->p_values[i_index].p_object ;
@@ -511,76 +566,251 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 if( !strcmp( p_parser->psz_capability,
                              p_item->psz_type ) )
                 {
-                    combo->Append( p_parser->psz_longname );
+                    combo->Append( p_parser->psz_longname,
+                                   p_parser->psz_object_name );
+                    if( p_item->psz_value &&
+                        !strcmp(p_item->psz_value, p_parser->psz_object_name) )
+                        combo->SetSelection( combo->GetCount() - 1 );
                 }
             }
 
             combo->SetToolTip( p_item->psz_longtext );
-            horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
-            horizontal_sizer->Add( label, 0, wxALL, 5 );
-            horizontal_sizer->Add( combo, 0, wxALL, 5 );
-            sizer->Add( horizontal_sizer, 0, wxALL, 5 );
+            config_data->control.combobox = combo;
+            panel_sizer->Add( label, 0, wxALL, 5 );
+            panel_sizer->Add( combo, 1, wxALL, 5 );
             break;
 
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
-            label = new wxStaticText(this, -1, p_item->psz_text);
-            textctrl = new wxTextCtrl( this, -1, p_item->psz_value,
+            label = new wxStaticText(panel, -1, p_item->psz_text);
+            textctrl = new wxTextCtrl( panel, -1, p_item->psz_value,
                                        wxDefaultPosition, wxDefaultSize,
                                        wxTE_PROCESS_ENTER);
             textctrl->SetToolTip( p_item->psz_longtext );
-            horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
-            horizontal_sizer->Add( label, 0, wxALL, 5 );
-            horizontal_sizer->Add( textctrl, 0, wxALL, 5 );
+            config_data->control.textctrl = textctrl;
+            panel_sizer->Add( label, 0, wxALL, 5 );
+            panel_sizer->Add( textctrl, 1, wxALL, 5 );
             if( p_item->i_type == CONFIG_ITEM_FILE )
             {
-                button = new wxButton( this, -1, _("Browse...") );
-                horizontal_sizer->Add( button, 0, wxALL, 5 );
+                button = new wxButton( panel, -1, _("Browse...") );
+                panel_sizer->Add( button, 0, wxALL, 5 );
             }
-            sizer->Add( horizontal_sizer, 0, wxALL, 5 );
             break;
 
         case CONFIG_ITEM_INTEGER:
-            label = new wxStaticText(this, -1, p_item->psz_text);
-            spin = new wxSpinCtrl( this, -1,
+            label = new wxStaticText(panel, -1, p_item->psz_text);
+            spin = new wxSpinCtrl( panel, -1,
                                    wxString::Format(_("%d"), p_item->i_value),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, p_item->i_value);
             spin->SetToolTip( p_item->psz_longtext );
-            horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
-            horizontal_sizer->Add( label, 0, wxALL, 5 );
-            horizontal_sizer->Add( spin, 0, wxALL, 5 );
-            sizer->Add( horizontal_sizer, 0, wxALL, 5 );
+            config_data->control.spinctrl = spin;
+            panel_sizer->Add( label, 0, wxALL, 5 );
+            panel_sizer->Add( spin, 0, wxALL, 5 );
+
+            spin->SetClientData((void *)config_data);
             break;
 
         case CONFIG_ITEM_FLOAT:
-            label = new wxStaticText(this, -1, p_item->psz_text);
-            spin = new wxSpinCtrl( this, -1,
+            label = new wxStaticText(panel, -1, p_item->psz_text);
+            spin = new wxSpinCtrl( panel, -1,
                                    wxString::Format(_("%d"), p_item->i_value),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, p_item->i_value);
             spin->SetToolTip( p_item->psz_longtext );
-            horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
-            horizontal_sizer->Add( label, 0, wxALL, 5 );
-            horizontal_sizer->Add( spin, 0, wxALL, 5 );
-            sizer->Add( horizontal_sizer, 0, wxALL, 5 );
+            config_data->control.spinctrl = spin;
+            panel_sizer->Add( label, 0, wxALL, 5 );
+            panel_sizer->Add( spin, 0, wxALL, 5 );
             break;
 
         case CONFIG_ITEM_BOOL:
-            checkbox = new wxCheckBox( this, -1, p_item->psz_text );
+            checkbox = new wxCheckBox( panel, -1, p_item->psz_text );
             if( p_item->i_value ) checkbox->SetValue(TRUE);
             checkbox->SetToolTip( p_item->psz_longtext );
-            horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
-            horizontal_sizer->Add( checkbox, 0, wxALL, 5 );
-            sizer->Add( horizontal_sizer, 0, wxALL, 5 );
+            config_data->control.checkbox = checkbox;
+            panel_sizer->Add( checkbox, 0, wxALL, 5 );
+            break;
+
+        default:
+            delete panel; panel = NULL;
+            delete panel_sizer;
+            delete config_data;
             break;
         }
+
+        /* Don't add items that were not recognized */
+        if( panel == NULL ) continue;
+
+        panel_sizer->Layout();
+        panel->SetSizerAndFit( panel_sizer );
+
+        /* Add the config data to our array so we can keep a trace of it */
+        config_array.Add( config_data );
+
+        config_sizer->Add( panel, 0, wxEXPAND | wxALL, 2 );
     }
     while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
+    /* Display a nice message if no configuration options are available */
+    if( !config_array.GetCount() )
+    {
+        config_sizer->Add( new wxStaticText( config_window, -1,
+                           _("No configuration options available") ), 1,
+                           wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER, 2 );
+    }
+
+    config_sizer->Layout();
+    config_window->SetSizer( config_sizer );
+    sizer->Add( config_window, 1, wxEXPAND | wxALL, 5 );
+
+    /* Intercept all menu events in our custom event handler */
+    config_window->PushEventHandler(
+        new ConfigEvtHandler( p_intf ) );
+
+    /* Update panel */
+    wxCommandEvent dummy_event;
+    b_advanced = !config_GetInt( p_intf, "advanced" );
+    OnAdvanced( dummy_event );
+
+    /* Create advanced button */
+    if( config_array.GetCount() )
+    {
+        wxButton *advanced_button = new wxButton( this, Advanced_Event,
+                                                  _("Advanced...") );
+        sizer->Add( advanced_button, 0, wxALL, 5 );
+    }
 
     sizer->Layout();
     SetSizer( sizer );
+}
+
+void PrefsPanel::ApplyChanges()
+{
+    for( size_t i = 0; i < config_array.GetCount(); i++ )
+    {
+        ConfigData *config_data = config_array.Item(i);
+
+        msg_Err( p_intf, "ApplyChanges %s", config_data->option_name.c_str() );
+        switch( config_data->i_config_type )
+        {
+        case CONFIG_ITEM_MODULE:
+            config_PutPsz( p_intf, config_data->option_name.c_str(), (char *)
+                           config_data->control.combobox->GetClientData(
+                           config_data->control.combobox->GetSelection() ) );
+            break;
+        case CONFIG_ITEM_STRING:
+        case CONFIG_ITEM_FILE:
+            config_PutPsz( p_intf, config_data->option_name.c_str(),
+                           config_data->control.textctrl->GetValue() );
+            break;
+        case CONFIG_ITEM_BOOL:
+            config_PutInt( p_intf, config_data->option_name.c_str(),
+                           config_data->control.checkbox->GetValue() );
+            break;
+        case CONFIG_ITEM_INTEGER:
+            config_PutInt( p_intf, config_data->option_name.c_str(),
+                           config_data->control.spinctrl->GetValue() );
+            break;
+        case CONFIG_ITEM_FLOAT:
+            config_PutFloat( p_intf, config_data->option_name.c_str(),
+                             config_data->control.spinctrl->GetValue() );
+            break;
+        }
+    }
+}
+
+void PrefsPanel::OnAdvanced( wxCommandEvent& WXUNUSED(event) )
+{
+    b_advanced = !b_advanced;
+
+    for( size_t i = 0; i < config_array.GetCount(); i++ )
+    {
+        ConfigData *config_data = config_array.Item(i);
+        if( config_data->b_advanced )
+        {
+            config_data->panel->Show( b_advanced );
+            config_sizer->Show( config_data->panel, b_advanced );
+        }
+    }
+
+    config_sizer->Layout();
+    config_window->FitInside();
+}
+
+void PrefsPanel::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
+{
+    wxFileDialog dialog( this, _("Open file"), "", "", "*.*",
+                         wxOPEN );
+
+    if( dialog.ShowModal() == wxID_OK )
+    {
+#if 0
+        file_combo->SetValue( dialog.GetPath() );      
+#endif
+    }
+}
+
+void PrefsPanel::OnDirectoryBrowse( wxCommandEvent& WXUNUSED(event) )
+{
+    wxFileDialog dialog( this, _("Open file"), "", "", "*.*",
+                         wxOPEN );
+
+    if( dialog.ShowModal() == wxID_OK )
+    {
+#if 0
+        file_combo->SetValue( dialog.GetPath() );      
+#endif
+    }
+}
+
+/*****************************************************************************
+ * A small helper class which intercepts all events
+ *****************************************************************************/
+ConfigEvtHandler::ConfigEvtHandler( intf_thread_t *_p_intf )
+{
+    /* Initializations */
+    p_intf = _p_intf;
+}
+
+ConfigEvtHandler::~ConfigEvtHandler()
+{
+}
+
+void ConfigEvtHandler::OnCommandEvent( wxCommandEvent& event )
+{
+    if( !event.GetEventObject() )
+    {
+        event.Skip();
+        return;
+    }
+
+    ConfigData *config_data = (ConfigData *)
+        ((wxEvtHandler *)event.GetEventObject())->GetClientData();
+
+    if( !config_data )
+    {
+        event.Skip();
+        return;
+    }
+
+    msg_Err( p_intf, "%s", config_data->option_name.c_str() );
+
+    switch( config_data->i_config_type )
+    {
+    case CONFIG_ITEM_MODULE:
+        break;
+    case CONFIG_ITEM_STRING:
+    case CONFIG_ITEM_FILE:
+        break;
+    case CONFIG_ITEM_INTEGER:
+        break;
+    case CONFIG_ITEM_FLOAT:
+        break;
+    case CONFIG_ITEM_BOOL:
+        break;
+    }
+
+    event.Skip();
 }
