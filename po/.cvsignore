@@ -4,3 +4,7 @@ Makefile.in.in
 POTFILES
 *.mo
 *.gmo
+*.sed
+*.sin
+*.header
+Rules-quot
