@@ -1,4 +1,4 @@
-# $Id: STATUS,v 1.3 2002/08/10 11:35:30 jpsaman Exp $
+# $Id: STATUS,v 1.4 2002/08/16 14:30:39 bozo Exp $
 #
 #                              VLC STATUS
 #
@@ -63,3 +63,7 @@ Jean-Paul Saman <jpsaman@wxs.nl> :
 Gerald Hansink <gerald.hansink@ordina.nl> :
     - Video Out module for QT Embedded
       ETA : end of 2002
+
+Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr> :
+    - ALSA Audio output module (S/PDIF support)
+      ETA : soon
