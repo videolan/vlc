@@ -304,7 +304,7 @@ object MainFrameDlg: TMainFrameDlg
       Tag = 3
       Left = 64
       Top = 16
-      Width = 49
+      Width = 46
       Height = 13
       Caption = 'No server'
     end
@@ -459,6 +459,9 @@ object MainFrameDlg: TMainFrameDlg
         Tag = 3
         Action = NetworkStreamAction
         Caption = '&Network stream...'
+      end
+      object Streamouput1: TMenuItem
+        Action = StreamOutputAction
       end
       object N8: TMenuItem
         Caption = '-'
@@ -2584,6 +2587,13 @@ object MainFrameDlg: TMainFrameDlg
       Hint = 'Next file'
       ImageIndex = 12
       OnExecute = NextActionExecute
+    end
+    object StreamOutputAction: TAction
+      Tag = 3
+      Category = 'Menu'
+      Caption = '&Stream output...'
+      Hint = 'Open the stream output'
+      OnExecute = StreamOutputActionExecute
     end
     object PlaylistAction: TAction
       Tag = 3

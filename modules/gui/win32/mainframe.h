@@ -184,6 +184,8 @@ __published:	// IDE-managed Components
     TMenuItem *N2;
     TMenuItem *N1;
     TMenuItem *PopupVDevice;
+    TMenuItem *Streamouput1;
+    TAction *StreamOutputAction;
     void __fastcall TimerManageTimer( TObject *Sender );
     void __fastcall TrackBarChange( TObject *Sender );
     void __fastcall FormClose( TObject *Sender, TCloseAction &Action );
@@ -217,6 +219,7 @@ __published:	// IDE-managed Components
     void __fastcall NextTitleActionExecute( TObject *Sender );
     void __fastcall PrevChapterActionExecute( TObject *Sender );
     void __fastcall NextChapterActionExecute( TObject *Sender );
+    void __fastcall StreamOutputActionExecute( TObject *Sender );
 private:	// User declarations
     intf_thread_t *p_intf;
     /* drag and drop handling */

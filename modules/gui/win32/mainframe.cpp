@@ -36,6 +36,7 @@
 #include "preferences.h"
 #include "messages.h"
 #include "playlist.h"
+#include "sout.h"
 #include "misc.h"
 #include "win32_common.h"
 
@@ -147,7 +148,7 @@ void __fastcall TMainFrameDlg::OpenFileActionExecute( TObject *Sender )
     if( OpenDialog1->Execute() )
     {
         /* add the new file to the interface playlist */
-        for ( int i = 0 ; i < OpenDialog1->Files->Count ; i++ )
+        for( int i = 0; i < OpenDialog1->Files->Count; i++ )
             p_intf->p_sys->p_playwin->Add( OpenDialog1->Files->Strings[i],
                     PLAYLIST_APPEND
                     | ( p_intf->p_sys->b_play_when_adding ? PLAYLIST_GO : 0 ),
@@ -695,6 +696,13 @@ void __fastcall TMainFrameDlg::CreatePreferences( AnsiString Name )
 
     /* display the dialog */
     Preferences->Show();
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainFrameDlg::StreamOutputActionExecute( TObject *Sender )
+{
+    TSoutDlg *p_sout = new TSoutDlg( this, p_intf );
+    p_sout->ShowModal();
+    delete p_sout;
 }
 //---------------------------------------------------------------------------
 

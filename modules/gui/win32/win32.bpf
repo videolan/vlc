@@ -10,6 +10,7 @@ USEUNIT("menu.cpp");
 USEFORM("messages.cpp", MessagesDlg);
 USEUNIT("misc.cpp");
 USEUNIT("dragdrop.cpp");
+USEFORM("sout.cpp", SoutDlg);
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 
