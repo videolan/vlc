@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.43 2003/07/27 12:31:50 ipkiss Exp $
+dnl $Id: configure.ac,v 1.44 2003/07/27 21:35:50 jpsaman Exp $
 
 AC_INIT(vlc,0.6.1-test1)
 
@@ -2537,9 +2537,13 @@ then
   AX_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
   AX_ADD_LDFLAGS([gtk2],[${GTK2_LIBS}])
   AX_ADD_CFLAGS([pda],[${GTK2_CFLAGS} ${CFLAGS_pda}])
-  AX_ADD_LDFLAGS([pda],[${GTK2_LDFLAGS} ${LDFLAGS_pda}])
+  AX_ADD_LDFLAGS([pda],[${GTK2_LIBS} ${LDFLAGS_pda}])
   AX_ADD_PLUGINS([pda])
+  if test "${SYS}" != "mingw32"; then
+    NEED_GTK2_MAIN=yes
+  fi
 fi
+
 
 dnl
 dnl  Familiar module uses Gtk+ library

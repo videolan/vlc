@@ -5,6 +5,7 @@
   <name>Pda</name>
   <program_name>pda</program_name>
   <pixmaps_directory>../../../share</pixmaps_directory>
+  <use_widget_names>TRUE</use_widget_names>
   <output_main_file>FALSE</output_main_file>
   <output_build_files>FALSE</output_build_files>
 </glade-project>

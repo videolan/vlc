@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.1 2003/07/23 22:02:56 jpsaman Exp $
+ * $Id: pda.c,v 1.2 2003/07/27 21:35:51 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -92,7 +92,7 @@ static int Open( vlc_object_t *p_this )
 
 #ifdef NEED_GTK_MAIN
     msg_Dbg( p_intf, "Using gui-helper" );
-    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gui-helper", "gtk" );
+    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gui-helper", "gtk2" );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
