@@ -82,6 +82,9 @@ static line_desc_t *NewLine( byte_t * );
 #define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module. " \
     "If set to something different than 0 this option will override the " \
     "relative font size " )
+#define OPACITY_TEXT N_("Opacity, 0..100%")
+#define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of overlay text. " \
+    "0 = totally transparent, 100 = totally opaque. " )
 #define FONTSIZER_TEXT N_("Font size")
 #define FONTSIZER_LONGTEXT N_("The size of the fonts used by the osd module" )
 
@@ -98,6 +101,8 @@ vlc_module_begin();
               VLC_FALSE );
     add_integer( "freetype-fontsize", 0, NULL, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, VLC_TRUE );
+    add_integer( "freetype-opacity", 100, NULL, OPACITY_TEXT,
+                 OPACITY_LONGTEXT, VLC_TRUE );
     add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
@@ -146,6 +151,7 @@ struct filter_sys_t
     FT_Library     p_library;   /* handle to library     */
     FT_Face        p_face;      /* handle to face object */
     vlc_bool_t     i_use_kerning;
+    int            i_opacity;   /* default is opaque */
     uint8_t        pi_gamma[256];
 };
 
@@ -172,6 +178,7 @@ static int Create( vlc_object_t *p_this )
     }
     p_sys->p_face = 0;
     p_sys->p_library = 0;
+    p_sys->i_opacity = 100; /* default to fully opaque */
 
     for( i = 0; i < 256; i++ )
     {
@@ -183,6 +190,8 @@ static int Create( vlc_object_t *p_this )
     var_Create( p_filter, "freetype-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_filter, "freetype-rel-fontsize",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "freetype-opacity",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* Look what method was requested */
@@ -232,6 +241,15 @@ static int Create( vlc_object_t *p_this )
 
     p_sys->i_use_kerning = FT_HAS_KERNING( p_sys->p_face );
 
+    var_Get( p_filter, "freetype-opacity", &val );
+    if( val.i_int )
+    {
+	    if ( ( val.i_int > -1 ) && ( val.i_int < 101 ) )  /* valid range 0 to 100% */
+	    {
+           p_sys->i_opacity = val.i_int;
+        }
+        else msg_Warn(p_filter, "Invalid freetype opacity specified, using 100%");        
+    }
     var_Get( p_filter, "freetype-fontsize", &val );
     if( val.i_int )
     {
@@ -325,6 +343,7 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
     memset( p_a, 0x00, i_pitch * p_spu->p_region->fmt.i_height );
 
 #define pi_gamma p_sys->pi_gamma
+#define opacity  p_sys->i_opacity
 
     for( p_line = p_string->p_lines; p_line != NULL; p_line = p_line->p_next )
     {
@@ -353,16 +372,16 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
 
                     i_offset -= i_pitch;
                     p_a[i_offset + x] = ((uint16_t)p_a[i_offset + x] +
-                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])/2;
+                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/200;
                     i_offset += i_pitch; x--;
                     p_a[i_offset + x] = ((uint16_t)p_a[i_offset + x] +
-                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])/2;
+                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/200;
                     x += 2;
                     p_a[i_offset + x] = ((uint16_t)p_a[i_offset + x] +
-                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])/2;
+                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/200;
                     i_offset += i_pitch; x--;
                     p_a[i_offset + x] = ((uint16_t)p_a[i_offset + x] +
-                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])/2;
+                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/200;
                     i_offset -= i_pitch;
                 }
                 i_offset += i_pitch;
@@ -377,7 +396,7 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
                for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
                {
                    p_y[i_offset + x] =
-                       pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]];
+                       pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]]*opacity/100;
                }
                i_offset += i_pitch;
             }
