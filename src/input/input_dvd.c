@@ -2,7 +2,7 @@
  * input_dvd.c: DVD reading
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.4 2001/01/20 20:59:44 stef Exp $
+ * $Id: input_dvd.c,v 1.5 2001/01/21 09:20:27 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -114,6 +114,7 @@ static void DVDInit( input_thread_t * p_input )
 {
     thread_dvd_data_t *  p_method;
     off64_t              i_start;
+    int                  i;
 
     if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
     {
@@ -140,21 +141,24 @@ static void DVDInit( input_thread_t * p_input )
 fprintf(stderr, " CSS Init start\n" );
         p_method->css = CSSInit( p_input->i_handle );
 fprintf(stderr, " CSS Init end\n" );
-        p_method->css.i_title_nb = 1/*p_method->ifo.vmg.ptt_srpt.i_nb*/;
-#if 0        
-        if( (p_title_key =
-             malloc( p_method->css.i_title_nb *sizeof(title_key_t) )) == NULL )
+        p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
+        if( (p_method->css.p_title_key =
+             malloc( p_method->css.i_title_nb *
+                     sizeof(p_method->css.p_title_key) ) ) == NULL )
         {
             intf_ErrMsg( "Out of memory" );
             p_input->b_error = 1;
             return;
         }
-#endif
-
+        for( i=0 ; i<p_method->css.i_title_nb ; i++ )
+        {
+            p_method->css.p_title_key[i].i =
+                      p_method->ifo.p_vts[i].i_pos +
+                      p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
+        }
 fprintf(stderr, " CSS Get start\n" );
         CSSGetKeys( &(p_method->css) );
 fprintf(stderr, " CSS Get end\n" );
-
     }
 
     i_start = p_method->ifo.p_vts[0].i_pos +
@@ -162,6 +166,7 @@ fprintf(stderr, " CSS Get end\n" );
 
     i_start = lseek64( p_input->i_handle, i_start, SEEK_SET );
     fprintf(stderr, "Begin at : %lld\n", (long long)i_start );
+
 #if 1
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
@@ -308,7 +313,16 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
     int                 i_nb;
 
     p_method = (thread_dvd_data_t *)p_input->p_plugin_data;
-    i_nb = read( p_input->i_handle, p_buffer, i_len );
+//    if( !p_method->b_encrypted )
+//    {
+        i_nb = read( p_input->i_handle, p_buffer, i_len );
+#if 0
+    }
+    else
+    {
+        i_nb = read( p_input->i_handle, p_buffer, 4096 );
+        CSSDescrambleSector( p_method->css.p_title_key.key, p_buffer );
+    }
     switch( i_nb )
     {
         case 0:
@@ -320,14 +334,10 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
         default:
             break;
     }
-#if 0
-    if( p_method->b_encrypted )
-    {
-        CSSDescrambleSector( p_method->css.p_title_key.key, p_buffer );
-    }
 #endif
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_tell += i_nb;
+    p_input->stream.i_tell += i_nb; //lseek64( p_input->i_handle,
+                             //         p_input->stream.i_tell+i_len, SEEK_SET );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     return( 0 );
 }

@@ -21,21 +21,24 @@
  *****************************************************************************/
 #define KEY_SIZE 5
 
-typedef unsigned char DVD40bitKey[KEY_SIZE];
+typedef u8 DVD_key_t[KEY_SIZE];
 
-typedef struct drive_key_s
+typedef struct disc_s
 {
     u8              pi_challenge[2*KEY_SIZE];
     u8              pi_key1[KEY_SIZE];
     u8              pi_key2[KEY_SIZE];
     u8              pi_key_check[KEY_SIZE];
-    u8              i_version;
-} drive_key_t;
+    u8              i_varient;
+} disc_t;
 
 typedef struct title_key_s
 {
-    u32             i_lba;
-    u8              key[KEY_SIZE];
+    u32             i;          /* This signification of this parameter
+                                   depends on the function it is called from :
+                                    *from DVDInit    -> i == i_lba
+                                    *from CSSGetKeys -> i == i_occ */
+    DVD_key_t       key;
 } title_key_t;
 
 typedef struct css_s
@@ -43,7 +46,7 @@ typedef struct css_s
     int             i_fd;
     boolean_t       b_error;
     int             i_agid;
-    drive_key_t     keys;
+    disc_t          disc;
     u8              pi_disc_key[2048];
     int             i_title_nb;
     title_key_t*    p_title_key;
