@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Remi Denis-Courmont <courmisch # via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +55,8 @@ enum adpcm_codec_e
     ADPCM_IMA_WAV,
     ADPCM_MS,
     ADPCM_DK3,
-    ADPCM_DK4
+    ADPCM_DK4,
+    ADPCM_EA
 };
 
 struct decoder_sys_t
@@ -72,6 +74,7 @@ static void DecodeAdpcmImaWav( decoder_t *, int16_t *, uint8_t * );
 static void DecodeAdpcmImaQT ( decoder_t *, int16_t *, uint8_t * );
 static void DecodeAdpcmDk4   ( decoder_t *, int16_t *, uint8_t * );
 static void DecodeAdpcmDk3   ( decoder_t *, int16_t *, uint8_t * );
+static void DecodeAdpcmEA    ( decoder_t *, int16_t *, uint8_t * );
 
 static int pi_channels_maps[6] =
 {
@@ -135,17 +138,10 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('m','s',0x00,0x11): /* IMA ADPCM */
         case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
         case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
+        case VLC_FOURCC('X','A','J', 0): /* EA ADPCM */
             break;
         default:
             return VLC_EGENERIC;
-    }
-
-    /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
     }
 
     if( p_dec->fmt_in.audio.i_channels <= 0 ||
@@ -159,6 +155,14 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         msg_Err( p_dec, "bad samplerate" );
         return VLC_EGENERIC;
+    }
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys = p_sys =
+          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_dec, "out of memory" );
+        return VLC_ENOMEM;
     }
 
     switch( p_dec->fmt_in.i_codec )
@@ -177,6 +181,16 @@ static int OpenDecoder( vlc_object_t *p_this )
             break;
         case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
             p_sys->codec = ADPCM_DK3;
+            break;
+        case VLC_FOURCC('X','A','J', 0): /* EA ADPCM */
+            p_sys->codec = ADPCM_EA;
+            p_dec->fmt_in.p_extra = calloc( 2 * p_dec->fmt_in.audio.i_channels,
+                                            sizeof( int16_t ) );
+            if( p_dec->fmt_in.p_extra == NULL )
+            {
+                free( p_sys );
+                return VLC_ENOMEM;
+            }
             break;
     }
 
@@ -216,6 +230,10 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_dec->fmt_in.audio.i_channels = 2;
         p_sys->i_samplesperblock = ( 4 * ( p_sys->i_block - 16 ) + 2 )/ 3;
         break;
+    case ADPCM_EA:
+        p_sys->i_samplesperblock =
+            2 * (p_sys->i_block - p_dec->fmt_in.audio.i_channels) /
+            p_dec->fmt_in.audio.i_channels;
     }
 
     msg_Dbg( p_dec, "format: samplerate:%dHz channels:%d bits/sample:%d "
@@ -303,6 +321,9 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             DecodeAdpcmDk3( p_dec, (int16_t*)p_out->p_buffer,
                             p_block->p_buffer );
             break;
+        case ADPCM_EA:
+            DecodeAdpcmEA( p_dec, (int16_t*)p_out->p_buffer,
+                           p_block->p_buffer );
         default:
             break;
         }
@@ -324,6 +345,8 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    if( p_sys->codec == ADPCM_EA )
+        free( p_dec->fmt_in.p_extra );
     free( p_sys );
 }
 
@@ -690,6 +713,77 @@ static void DecodeAdpcmDk3( decoder_t *p_dec, int16_t *p_sample,
 
             *p_sample++ = sum.i_predictor + i_diff_value;
             *p_sample++ = sum.i_predictor - i_diff_value;
+        }
+    }
+}
+
+
+/*
+ * EA ADPCM
+ */
+#define MAX_CHAN 5
+static void DecodeAdpcmEA( decoder_t *p_dec, int16_t *p_sample,
+                           uint8_t *p_buffer )
+{
+    static const uint32_t EATable[]=
+    {
+        0x00000000, 0x000000F0, 0x000001CC, 0x00000188,
+        0x00000000, 0x00000000, 0xFFFFFF30, 0xFFFFFF24,
+        0x00000000, 0x00000001, 0x00000003, 0x00000004,
+        0x00000007, 0x00000008, 0x0000000A, 0x0000000B,
+        0x00000000, 0xFFFFFFFF, 0xFFFFFFFD, 0xFFFFFFFC
+    };
+    decoder_sys_t *p_sys  = p_dec->p_sys;
+    uint8_t *p_end;
+    unsigned i_channels, c;
+    int16_t *prev, *cur;
+    int32_t c1[MAX_CHAN], c2[MAX_CHAN];
+    int8_t d[MAX_CHAN];
+
+    i_channels = p_dec->fmt_in.audio.i_channels;
+    p_end = &p_buffer[p_sys->i_block];
+
+    prev = (int16_t *)p_dec->fmt_in.p_extra;
+    cur = prev + i_channels;
+
+    for (c = 0; c < i_channels; c++)
+    {
+        uint8_t input;
+
+        input = p_buffer[c];
+        c1[c] = EATable[input >> 4];
+        c2[c] = EATable[(input >> 4) + 4];
+        d[c] = (input & 0xf) + 8;
+    }
+
+    for( p_buffer += i_channels; p_buffer < p_end ; p_buffer += i_channels)
+    {
+        for (c = 0; c < i_channels; c++)
+        {
+            int32_t spl;
+
+            spl = (p_buffer[c] >> 4) & 0xf;
+            spl = (spl << 0x1c) >> d[c];
+            spl = (spl + cur[c] * c1[c] + prev[c] * c2[c] + 0x80) >> 8;
+            CLAMP( spl, -32768, 32767 );
+            prev[c] = cur[c];
+            cur[c] = spl;
+
+            *(p_sample++) = spl;
+        }
+
+        for (c = 0; c < i_channels; c++)
+        {
+            int32_t spl;
+
+            spl = p_buffer[c] & 0xf;
+            spl = (spl << 0x1c) >> d[c];
+            spl = (spl + cur[c] * c1[c] + prev[c] * c2[c] + 0x80) >> 8;
+            CLAMP( spl, -32768, 32767 );
+            prev[c] = cur[c];
+            cur[c] = spl;
+
+            *(p_sample++) = spl;
         }
     }
 }

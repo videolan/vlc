@@ -21,3 +21,4 @@ SOURCES_sgimb = sgimb.c
 SOURCES_mjpeg = mjpeg.c
 SOURCES_subtitle = subtitle.c
 SOURCES_vobsub = vobsub.c
+SOURCES_xa = xa.c
