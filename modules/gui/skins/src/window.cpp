@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.25 2003/05/31 23:23:59 ipkiss Exp $
+ * $Id: window.cpp,v 1.26 2003/06/08 16:56:48 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -38,6 +38,7 @@
 #include "banks.h"
 #include "theme.h"
 #include "skin_common.h"
+#include "dialogs.h"
 
 #include <stdio.h>
 
@@ -417,6 +418,11 @@ void SkinWindow::MouseUp( int x, int y, int button )
                      ControlList[i]->GetId().c_str() );
             break;
         }
+    }
+
+    if( i < 0  && button == 2 )
+    {
+        p_intf->p_sys->p_dialogs->ShowPopup();
     }
 }
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.33 2003/06/06 23:34:35 asmax Exp $
+ * $Id: skin_main.cpp,v 1.34 2003/06/08 16:56:48 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -248,6 +248,7 @@ static void Run( intf_thread_t *p_intf )
         {
             // Last chance: the user can  select a new theme file
 #ifndef BASIC_SKINS
+            wxMutexGuiEnter();
             wxFileDialog dialog( NULL,
                 wxU(_("Open a skin file")), wxT(""), wxT(""),
                 wxT("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
@@ -260,13 +261,18 @@ static void Run( intf_thread_t *p_intf )
                 {
                     // He, he, what the hell is he doing ?
                     delete Loader;
+                    wxMutexGuiLeave();
                     return;
                 }
+                wxMutexGuiLeave();
             }
             else
 #endif
             {
                 delete Loader;
+#ifndef BASIC_SKINS
+                wxMutexGuiLeave();
+#endif
                 return;
             }
         }

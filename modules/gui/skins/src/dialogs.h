@@ -2,7 +2,7 @@
  * dialogs.h: Dialogs class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.h,v 1.3 2003/06/05 21:22:27 gbazin Exp $
+ * $Id: dialogs.h,v 1.4 2003/06/08 16:56:48 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -76,6 +76,7 @@ class Dialogs
         void ShowMessages();
         void ShowPrefs();
         void ShowFileInfo();
+        void ShowPopup();
 
         vlc_bool_t b_popup_change;
 

@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.3 2003/06/05 21:22:27 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.4 2003/06/08 16:56:48 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -297,6 +297,14 @@ void Dialogs::ShowFileInfo()
     wxTheApp->AddPendingEvent( event );
 }
 
+void Dialogs::ShowPopup()
+{
+    wxCommandEvent event( wxEVT_DIALOG, ShowPopup_Event );
+    event.SetClientData( this );
+
+    wxTheApp->AddPendingEvent( event );
+}
+
 void Dialogs::OnShowOpen( wxCommandEvent& event )
 {
     Dialogs *p_dialogs = (Dialogs *)event.GetClientData();
@@ -417,10 +425,7 @@ int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
     Dialogs *p_dialogs = (Dialogs *)param;
 
 #ifndef BASIC_SKINS
-    wxCommandEvent event( wxEVT_DIALOG, ShowPopup_Event );
-    event.SetClientData( p_dialogs );
-
-    wxTheApp->AddPendingEvent( event );
+    p_dialogs->ShowPopup();
 #endif // BASIC_SKINS
 
     return VLC_SUCCESS;

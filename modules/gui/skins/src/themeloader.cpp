@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.12 2003/06/06 14:50:49 gbazin Exp $
+ * $Id: themeloader.cpp,v 1.13 2003/06/08 16:56:48 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -156,6 +156,8 @@ bool ThemeLoader::Extract( const string FileName )
 
     if( ! Parse( TempPath + DIRECTORY_SEPARATOR + string( DEFAULT_XML_FILE ) ) )
     {
+        msg_Err( p_intf, "%s doesn't contain a " DEFAULT_XML_FILE " file",
+                 FileName.c_str() );
         DeleteTempFiles( TempPath );
         return false;
     }
