@@ -29,8 +29,8 @@
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
 
-#define SEPARATOR "\n--This Random String\n" \
-                  "Content-Type: image/jpeg\n\n"
+#define SEPARATOR "\r\n--This Random String\r\n" \
+                  "Content-Type: image/jpeg\r\n\r\n"
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -114,7 +114,7 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 
        case MUX_GET_MIME:
            ppsz = (char**)va_arg( args, char ** );
-           *ppsz = strdup( "image/jpeg" );
+           *ppsz = strdup( "multipart/x-mixed-replace; boundary=This Random String" );
            return VLC_SUCCESS;
 
         default:
@@ -153,8 +153,8 @@ static int Mux( sout_mux_t *p_mux )
 
     if( p_sys->b_send_headers )
     {
-        block_t *p_header = block_New( p_mux, sizeof(SEPARATOR) - 2);
-        memcpy( p_header->p_buffer, &SEPARATOR[1], sizeof(SEPARATOR) - 2 );
+        block_t *p_header = block_New( p_mux, sizeof(SEPARATOR) - 3);
+        memcpy( p_header->p_buffer, &SEPARATOR[2], sizeof(SEPARATOR) - 3 );
         p_header->i_flags |= BLOCK_FLAG_HEADER;
         sout_AccessOutWrite( p_mux->p_access, p_header );
         p_sys->b_send_headers = VLC_FALSE;
