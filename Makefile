@@ -60,9 +60,9 @@ ifneq (,$(findstring darwin,$(SYS)))
 C_OBJ +=	src/misc/darwin_specific.o
 endif
 
-ifneq (,$(findstring mingw32,$(SYS)))
-RESOURCE_OBJ :=	share/vlc_win32_rc.o
-endif
+#ifneq (,$(findstring mingw32,$(SYS)))
+#RESOURCE_OBJ :=	share/vlc_win32_rc.o
+#endif
 
 #
 # Generated header
