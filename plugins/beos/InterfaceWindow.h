@@ -22,6 +22,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+class SeekSlider;
+class MediaSlider;
+
 class CDMenu : public BMenu
 {
 public:
@@ -44,8 +47,8 @@ public:
     
 	
     intf_thread_t  *p_intf;
-	BSlider * p_vol;
-	BSlider * p_seek;
+	MediaSlider * p_vol;
+	SeekSlider * p_seek;
 	BCheckBox * p_mute;
 	sem_id	fScrubSem;
 	bool	fSeeking;

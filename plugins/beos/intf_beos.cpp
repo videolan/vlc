@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.20 2001/03/15 01:42:19 sam Exp $
+ * $Id: intf_beos.cpp,v 1.21 2001/03/17 19:33:22 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -126,7 +126,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
 	menu_bar->AddItem( m = new BMenu("File") );
 	menu_bar->ResizeToPreferred();
 	m->AddItem( new BMenuItem("Open File...", new BMessage(OPEN_FILE), 'O'));
-	cd_menu = new CDMenu("Open DVD");
+	cd_menu = new CDMenu("Open Disc");
 	//GetCD("/dev/disk", cd_menu);
 	m->AddItem(cd_menu);
 	m->AddSeparatorItem();
@@ -540,7 +540,7 @@ void MediaSlider::DrawThumb(void)
 		v->SetHighColor(black);
 	else
 		v->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
-	r.InsetBy(r.IntegerWidth()/4, r.IntegerHeight()/6);
+	r.InsetBy(r.IntegerWidth()/4, r.IntegerHeight()/(4 * r.IntegerWidth() / r.IntegerHeight()));
 	v->StrokeEllipse(r);
 	if(IsEnabled())
 		v->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));

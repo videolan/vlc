@@ -66,6 +66,7 @@ public:
     bool			teardownwindow;
     bool			is_zoomed;
     bool			fUsingOverlay;
+    BScreen			*screen;
 
 private:
 	display_mode old_mode;

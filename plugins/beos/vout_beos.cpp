@@ -150,13 +150,15 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
     is_zoomed = false;
     p_vout = p_video_output;
 	fDrawThreadID = NULL;
+	bitmap[0] = NULL;
+	bitmap[1] = NULL;
 	
     rect = Frame();
     view = new VLCView(Bounds());
     AddChild(view);
 	bitmap[0] = new BBitmap(Bounds(), B_BITMAP_WILL_OVERLAY|B_BITMAP_RESERVE_OVERLAY_CHANNEL, B_YCbCr422);
 	fUsingOverlay = true;
-	i_screen_depth = 32;
+	i_screen_depth = 16;
 	p_vout->b_YCbr = true;
 	
 	if (bitmap[0]->InitCheck() != B_OK)
@@ -429,14 +431,21 @@ int vout_Init( vout_thread_t *p_vout )
 
     if(p_win->fUsingOverlay)
     	{
-	    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+	    if(p_win->bitmap[0] != NULL)
+	    	{
+		    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
     	                 (byte_t *)p_win->bitmap[0]->Bits());
-    	delete p_win->bitmap[0];
+	    	delete p_win->bitmap[0];
+	    	p_win->bitmap[0] = NULL;
+	    	}
     	}
     else
    		{
-	    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+	    if((p_win->bitmap[0] != NULL) && (p_win->bitmap[1] != NULL))
+	    	{
+	    	vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
    	                 (byte_t *)p_win->bitmap[1]->Bits());
+   	        }
     	}
     return( 0 );
 }
@@ -468,7 +477,38 @@ void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_Manage( vout_thread_t *p_vout )
 {
-   return( 0 );
+VideoWindow * p_win = p_vout->p_sys->p_window;
+rgb_color key;
+float minWidth, minHeight, maxWidth, maxHeight; 
+
+if( (p_vout->i_width  != p_vout->p_sys->i_width) ||
+             (p_vout->i_height != p_vout->p_sys->i_height) )
+    {
+        /* If video output size has changed, change interface window size */
+        intf_DbgMsg( "resizing output window" );
+        if(p_win->fUsingOverlay)
+        	{
+	        p_win->Lock();
+	        p_win->view->ClearViewOverlay();
+	        p_vout->p_sys->i_width =    p_vout->i_width;
+	        p_vout->p_sys->i_height =   p_vout->i_height;;
+			p_win->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight); 
+			p_win->SetSizeLimits((float) p_vout->p_sys->i_width, maxWidth, (float) p_vout->p_sys->i_height, maxHeight);       
+	        p_win->ResizeTo(p_vout->p_sys->i_width, p_vout->p_sys->i_height);
+	        p_win->bitmap[0] = new BBitmap(p_win->Bounds(),
+        					B_BITMAP_WILL_OVERLAY|B_BITMAP_RESERVE_OVERLAY_CHANNEL,
+        					B_YCbCr422);
+			memset(p_win->bitmap[0]->Bits(), 0, p_win->bitmap[0]->BitsLength());
+			p_win->view->SetViewOverlay(p_win->bitmap[0], p_win->bitmap[0]->Bounds(), p_win->Bounds(), &key, B_FOLLOW_ALL,
+					B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
+			p_win->view->SetViewColor(key);
+			p_win->Unlock();
+		    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+	   	                 (byte_t *)p_win->bitmap[0]->Bits());
+	   	    delete p_win->bitmap[0];
+	   	    }
+	    }
+return( 0 );
 }
 
 /*****************************************************************************
