@@ -7,11 +7,11 @@ Notes for anyone wanting to build Debian packages of VLC.
  - To build for a Debian woody system, first build a tarball using
    "make dist-woody".
 
- - Usually VLC will come with a copy of ffmpeg, faad2 and libmpeg2 in the
+ - Usually VLC will come with a copy of ffmpeg and faad2 in the
    extras/ directory, because they are not yet available in Debian.
 
  - If there is no CVS directory in the root, debian/rules will assume a
-   full build is requested and will clean ffmpeg, faad2 and libmpeg2.
+   full build is requested and will clean ffmpeg and faad2.
 
  - VLC does not link with libdvdcss by default, thus it will not depend
    on the libdvdcss packages. However it will use libdvdread that can

@@ -1,3 +1,16 @@
+vlc (0.7.2.final-5) unstable; urgency=low
+
+  * debian/control:
+    + Build-depend on libdvbpsi3-dev, so that we can get rid of the previous
+      versions of this library.
+    + Recommend the videolan-doc package.
+    + Build-conflict on libavcodec-dev, just in case it enters Sid at an
+      unappropriate moment.
+  * debian/README.Debian:
+    + Removed mention of the libmpeg2 tree, which we no longer provide.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 20 Jul 2004 11:25:17 +0200
+
 vlc (0.7.2.final-4) unstable; urgency=low
 
   * debian/rules:
