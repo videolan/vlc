@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.246 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: input.c,v 1.247 2003/10/11 22:40:05 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -112,6 +112,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     var_Create( p_input, "spu-channel", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Create( p_input, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sub-autodetect-fuzzy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -729,7 +730,7 @@ static int InitThread( input_thread_t * p_input )
     var_Get( p_input, "sub-file", &val );
     if( val.psz_string && *val.psz_string )
     {
-        if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe ) ) )
+        if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe, 0 ) ) )
         {
             TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
             subtitle_Select( p_sub );
@@ -740,11 +741,12 @@ static int InitThread( input_thread_t * p_input )
     var_Get( p_input, "sub-autodetect-file", &val );
     if( val.b_bool )
     {
+        int i;
         char **tmp = subtitles_Detect( p_input, "", p_input->psz_source );
         char **tmp2 = tmp;
-        while (*tmp2)
+        for( i = 0; *tmp2 != NULL; i++ )
         {
-            if( ( p_sub = subtitle_New( p_input, strdup(*tmp2++), i_microsecondperframe ) ) )
+            if( ( p_sub = subtitle_New( p_input, strdup(*tmp2++), i_microsecondperframe, i ) ) )
             {
                 TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
             }

@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: sub.h,v 1.7 2003/08/23 19:20:29 hartman Exp $
+ * $Id: sub.h,v 1.8 2003/10/11 22:40:05 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -47,7 +47,8 @@ typedef struct subtitle_demux_s
     int     (*pf_open) ( struct subtitle_demux_s *p_sub, 
                          input_thread_t*p_input, 
                          char *psz_name,
-                         mtime_t i_microsecperframe );
+                         mtime_t i_microsecperframe,
+                         int i_track_id );
     int     (*pf_demux)( struct subtitle_demux_s *p_sub, mtime_t i_maxdate );
     int     (*pf_seek) ( struct subtitle_demux_s *p_sub, mtime_t i_date );
     void    (*pf_close)( struct subtitle_demux_s *p_sub );
@@ -89,7 +90,8 @@ typedef struct subtitle_demux_s
  *****************************************************************************/
 static inline subtitle_demux_t *subtitle_New( input_thread_t *p_input,
                                               char *psz_name,
-                                              mtime_t i_microsecperframe );
+                                              mtime_t i_microsecperframe,
+                                              int i_track_id );
 /*****************************************************************************
  * subtitle_Select: Select the related subtitle ES.
  *****************************************************************************/
@@ -127,7 +129,8 @@ static inline void subtitle_Close( subtitle_demux_t *p_sub );
 static inline 
     subtitle_demux_t *subtitle_New( input_thread_t *p_input,
                                     char *psz_name,
-                                    mtime_t i_microsecperframe )
+                                    mtime_t i_microsecperframe,
+                                    int i_track_id )
 {
     subtitle_demux_t *p_sub;
 
@@ -140,7 +143,8 @@ static inline
         p_sub->pf_open( p_sub,
                         p_input,
                         psz_name,
-                        i_microsecperframe ) >=0 )
+                        i_microsecperframe,
+                        i_track_id ) >=0 )
     {
         msg_Info( p_input, "subtitle started" );
 

@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.27 2003/10/08 21:03:36 gbazin Exp $
+ * $Id: sub.c,v 1.28 2003/10/11 22:40:04 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -43,7 +43,8 @@ static int  Open ( vlc_object_t *p_this );
 static int  sub_open ( subtitle_demux_t *p_sub,
                        input_thread_t  *p_input,
                        char  *psz_name,
-                       mtime_t i_microsecperframe );
+                       mtime_t i_microsecperframe,
+                       int i_track_id );
 static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate );
 static int  sub_seek ( subtitle_demux_t *p_sub, mtime_t i_date );
 static void sub_close( subtitle_demux_t *p_sub );
@@ -231,7 +232,8 @@ static struct
 static int  sub_open ( subtitle_demux_t *p_sub,
                        input_thread_t  *p_input,
                        char     *psz_name,
-                       mtime_t i_microsecperframe )
+                       mtime_t i_microsecperframe,
+                       int i_track_id )
 {
     text_t  txt;
     vlc_value_t val;
@@ -424,11 +426,11 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     /* *** add subtitle ES *** */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_sub->p_es = input_AddES( p_input, p_input->stream.p_selected_program,
-                               0xff,    // FIXME
+                               0xff - i_track_id,    /* FIXME */
                                SPU_ES, NULL, 0 );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    p_sub->p_es->i_stream_id = 0xff;    // FIXME
+    p_sub->p_es->i_stream_id = 0xff - i_track_id;    /* FIXME */
     p_sub->p_es->i_fourcc    = VLC_FOURCC( 's','u','b','t' );
 
     p_sub->i_previously_selected = 0;

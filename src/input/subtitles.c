@@ -2,7 +2,7 @@
  * subtitles.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: subtitles.c,v 1.3 2003/10/02 00:16:05 hartman Exp $
+ * $Id: subtitles.c,v 1.4 2003/10/11 22:40:05 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  * This is adapted code from the GPL'ed MPlayer (http://mplayerhq.hu)
@@ -49,17 +49,6 @@
  */
 #define MAX_SUBTITLE_FILES 128
 
-/**
- * This determines how fuzzy the returned results will be.
- *
- * Currently set to 3, other options are:
- * 0 = nothing
- * 1 = any subtitle file
- * 2 = any sub file containing movie name
- * 3 = sub file matching movie name exactly
- * 4 = sub file matching movie name with additional chars 
- */
-#define SUB_FUZZY 3
 
 /**
  * The possible extentions for subtitle files we support
@@ -173,6 +162,7 @@ char** subtitles_Detect( input_thread_t *p_this, char *psz_path, char *psz_fname
     /* variables to be used for derivatives FILE *f */
     char *tmp_fname_noext, *tmp_fname_trim, *tmp_fname_ext, *tmpresult;
  
+    vlc_value_t fuzzy;
     int len, i, j, i_sub_count;
     subfn *result; /* unsorted results */
     char **result2; /* sorted results */
@@ -217,7 +207,9 @@ char** subtitles_Detect( input_thread_t *p_this, char *psz_path, char *psz_fname
 
     strcpy_strip_ext( f_fname_noext, f_fname );
     strcpy_trim( f_fname_trim, f_fname_noext );
-
+    var_Get( p_this, "sub-autodetect-fuzzy", &fuzzy );
+    
+    
     for( j = 0; j <= 1; j++)
     {
 	d = opendir( j == 0 ? f_dir : psz_path );
@@ -272,8 +264,8 @@ char** subtitles_Detect( input_thread_t *p_this, char *psz_path, char *psz_fname
 			/* doesn't contain the movie name */
 			if( j == 0 ) i_prio = 1;
 		    }
-
-		    if( i_prio >= SUB_FUZZY )
+                    
+		    if( i_prio >= fuzzy.i_int )
                     {
                         sprintf( tmpresult, "%s%s", j == 0 ? f_dir : psz_path, de->d_name );
                         msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", de->d_name, i_prio );

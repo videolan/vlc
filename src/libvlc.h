@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.94 2003/10/08 19:40:42 gbazin Exp $
+ * $Id: libvlc.h,v 1.95 2003/10/11 22:40:05 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -149,7 +149,7 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
 
 #define AUDIO_FILTER_TEXT N_("Audio filters")
 #define AUDIO_FILTER_LONGTEXT N_( \
-    "This allows you to add audio postprocessing filters, to modify" \
+    "This allows you to add audio postprocessing filters, to modify " \
     "the sound.")
 
 #define HEADPHONE_TEXT N_("Headphone virtual spatialization effect")
@@ -290,6 +290,16 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
 #define SUB_AUTO_LONGTEXT \
     "Automatically detect a subtitle file, if no subtitle filename is " \
     "specified."
+
+#define SUB_FUZZY_TEXT N_("Subtitle autodection fuzziness")
+#define SUB_FUZZY_LONGTEXT \
+    "This determines how fuzzy subtitle and movie filenaming matching " \
+    "will be. Options are:\n" \
+    "0 = no subtitles autodetected\n" \
+    "1 = any subtitle file\n" \
+    "2 = any subtitle file containing the movie name\n" \
+    "3 = subtitle file matching the movie name with additional chars\n" \
+    "4 = subtitle file matching the movie name exactly"
 
 #define SUB_FILE_TEXT N_("Use subtitle file")
 #define SUB_FILE_LONGTEXT \
@@ -637,6 +647,8 @@ vlc_module_begin();
                  INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT, VLC_TRUE );
     add_bool( "sub-autodetect-file", VLC_TRUE, NULL,
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, VLC_FALSE );
+    add_integer( "sub-autodetect-fuzzy", 3, NULL,
+                 SUB_FUZZY_TEXT, SUB_FUZZY_LONGTEXT, VLC_TRUE );
     add_file( "sub-file", NULL, NULL,
                  SUB_FILE_TEXT, SUB_FILE_LONGTEXT, VLC_TRUE );
 
