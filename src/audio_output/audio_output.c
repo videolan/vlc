@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -569,6 +569,7 @@ void aout_Thread_S8_Stereo( aout_thread_t * p_aout )
 
 void aout_Thread_U8_Mono( aout_thread_t * p_aout )
 {
+# if 0
     int i_fifo;
     long l_buffer, l_buffer_limit;
     long l_units, l_bytes;
@@ -927,7 +928,7 @@ intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i
         }
     }
     vlc_mutex_unlock( &p_aout->fifos_lock );
-
+#endif
 }
 
 void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
@@ -1178,8 +1179,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
 
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
         {
-            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / 256) + 128 ) * \
-                                                     ((float) p_aout->vol / 100 ) );
+            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / 256) + 128 ) * p_aout->vol / 256 );
             p_aout->s32_buffer[l_buffer] = 0;
         }
         l_bytes = p_aout->p_sys_getbufinfo( p_aout, l_buffer_limit );
@@ -1474,8 +1474,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
 
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
         {
-            ((s16 *)p_aout->buffer)[l_buffer] = (s16)( ( p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS ) * \
-                                                       ((float) p_aout->vol / 100 ) ) ;
+            ((s16 *)p_aout->buffer)[l_buffer] = (s16)( ( p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS ) * p_aout->vol / 256 ) ;
             p_aout->s32_buffer[l_buffer] = 0;
         }
 

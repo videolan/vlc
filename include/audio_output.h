@@ -65,10 +65,10 @@
 #define AOUT_MAX_RATE           48000
 
 
-/* Volume (default 100) */
-#define VOL 100
+/* Volume (default 256) */
+#define VOL     256
 #define VOLSTEP 5
-#define VOLMAX 300
+#define VOLMAX  765
 
 /* Number of audio output frames contained in an audio output fifo.
  * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the
