@@ -20,6 +20,22 @@ We need to adapt the clock synchro to work better with BOTH files and streams.
 Status: Todo
 
 Task
+Difficulty: Easy
+Platform: any
+Urgency: Normal
+Description: cli option for audio-channels
+It's currently not possible to force VLC from stereo to mono mode, or from stereo to reverse stereo or dolby mode. It's one of the few options in VLC that can not yet be forced from Preferences or the commandline.
+Status: Todo
+
+Task
+Difficulty: Easy
+Platform: win32/macosx
+Urgency: Normal
+Description: OS contextual menu support
+Create contextual menus for the OS so you can play or enqueue files from the Finder/Explorer directly into VLC. Much like with for instance Winamp.
+Status: Todo
+
+Task
 Difficulty: Hard
 Urgency: Critical
 Platform: Mac OS X
