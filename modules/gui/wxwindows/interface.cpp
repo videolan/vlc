@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.27 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: interface.cpp,v 1.28 2003/05/13 22:59:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -271,6 +271,10 @@ void Interface::CreateOurMenuBar()
     p_video_menu = new wxMenu;
     b_video_menu = 1;
 
+    /* Create the "Navigation" menu */
+    p_navig_menu = new wxMenu;
+    b_navig_menu = 1;
+
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
     help_menu->Append( About_Event, wxU(_("&About...")), wxU(_(HELP_ABOUT)) );
@@ -282,6 +286,7 @@ void Interface::CreateOurMenuBar()
     menubar->Append( settings_menu, wxU(_("&Settings")) );
     menubar->Append( p_audio_menu, wxU(_("&Audio")) );
     menubar->Append( p_video_menu, wxU(_("&Video")) );
+    menubar->Append( p_navig_menu, wxU(_("&Navigation")) );
     menubar->Append( help_menu, wxU(_("&Help")) );
 
     /* Attach the menu bar to the frame */
@@ -471,6 +476,25 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         }
         else b_video_menu = 1;
     }
+    else if( event.GetEventObject() == p_navig_menu )
+    {
+        if( b_navig_menu )
+        {
+            p_navig_menu = NavigMenu( p_intf, this );
+
+            /* Work-around for buggy wxGTK */
+            wxMenu *menu = GetMenuBar()->GetMenu( 5 );
+            RecursiveDestroy( menu );
+            /* End work-around */
+
+            menu =
+                GetMenuBar()->Replace( 5, p_navig_menu, wxU(_("&Navigation")));
+            if( menu ) delete menu;
+
+            b_navig_menu = 0;
+        }
+        else b_navig_menu = 1;
+    }
 
 #else
     p_audio_menu = AudioMenu( p_intf, this );
@@ -479,6 +503,10 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
 
     p_video_menu = VideoMenu( p_intf, this );
     menu = GetMenuBar()->Replace( 4, p_video_menu, wxU(_("&Video")) );
+    if( menu ) delete menu;
+
+    p_navig_menu = NavigMenu( p_intf, this );
+    menu = GetMenuBar()->Replace( 5, p_navig_menu, wxU(_("&Navigation")) );
     if( menu ) delete menu;
 
 #endif

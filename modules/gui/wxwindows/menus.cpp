@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.6 2003/05/11 13:22:23 gbazin Exp $
+ * $Id: menus.cpp,v 1.7 2003/05/13 22:59:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -79,7 +79,8 @@ enum
     MenuDummy_Event,
     AudioMenu_Events,
     VideoMenu_Events = wxID_HIGHEST + 1100,
-    PopupMenu_Events = wxID_HIGHEST + 1200,
+    NavigMenu_Events = wxID_HIGHEST + 1200,
+    PopupMenu_Events = wxID_HIGHEST + 1300,
 };
 
 BEGIN_EVENT_TABLE(Menu, wxMenu)
@@ -238,6 +239,33 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
     /* Build menu */
     return new Menu( _p_intf, _p_main_interface, i,
                      ppsz_varnames, pi_objects, VideoMenu_Events );
+}
+
+wxMenu *NavigMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
+{
+    vlc_object_t *p_object;
+    char *ppsz_varnames[4];
+    int pi_objects[4];
+    int i = 0;
+
+    /* Initializations */
+    memset( pi_objects, 0, 4 * sizeof(int) );
+
+    p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
+                                                FIND_ANYWHERE );
+    if( p_object != NULL )
+    {
+        ppsz_varnames[i] = "title";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "chapter";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "navigation";
+        pi_objects[i++] = p_object->i_object_id;
+    }
+
+    /* Build menu */
+    return new Menu( _p_intf, _p_main_interface, i,
+                     ppsz_varnames, pi_objects, NavigMenu_Events );
 }
 
 /*****************************************************************************
