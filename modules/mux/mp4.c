@@ -1554,12 +1554,18 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         }
         else if( p_stream->fmt.i_cat == VIDEO_ES )
         {
-            int i_width = p_stream->fmt.video.i_width;
+            int i_width = p_stream->fmt.video.i_width << 16;
             if( p_stream->fmt.video.i_aspect > 0 )
             {
-                i_width = p_stream->fmt.video.i_aspect *
-                          (p_stream->fmt.video.i_height << 16) / VOUT_ASPECT_FACTOR;
+                i_width = (int64_t)p_stream->fmt.video.i_aspect *
+                          ((int64_t)p_stream->fmt.video.i_height << 16) /
+                          VOUT_ASPECT_FACTOR;
             }
+            fprintf( stderr, "%dx%d -> %dx%d a=%d/%d=%f\n",
+                     p_stream->fmt.video.i_width, p_stream->fmt.video.i_height,
+                     i_width, p_stream->fmt.video.i_height,
+                     p_stream->fmt.video.i_aspect, VOUT_ASPECT_FACTOR,
+                     (float)p_stream->fmt.video.i_aspect/(float)VOUT_ASPECT_FACTOR );
             // width (presentation)
             bo_add_32be( tkhd, i_width );
             // height(presentation)
@@ -1567,7 +1573,7 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         }
         else
         {
-            int i_width = 320;
+            int i_width = 320 << 16;
             int i_height = 200;
             int i;
             for( i = 0; i < p_sys->i_nb_streams; i++ )
@@ -1576,15 +1582,15 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
                 if( tk->fmt.i_cat == VIDEO_ES )
                 {
                     if( p_stream->fmt.video.i_aspect )
-                        i_width = p_stream->fmt.video.i_aspect *
-                                  p_stream->fmt.video.i_height / VOUT_ASPECT_FACTOR;
+                        i_width = (int64_t)p_stream->fmt.video.i_aspect *
+                                   ((int64_t)p_stream->fmt.video.i_height<<16) / VOUT_ASPECT_FACTOR;
                     else
-                        i_width = p_stream->fmt.video.i_width;
+                        i_width = p_stream->fmt.video.i_width << 16;
                     i_height = p_stream->fmt.video.i_height;
                     break;
                 }
             }
-            bo_add_32be( tkhd, i_width << 16 );     // width (presentation)
+            bo_add_32be( tkhd, i_width );     // width (presentation)
             bo_add_32be( tkhd, i_height << 16 );    // height(presentation)
         }
 
