@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.12 2003/12/22 02:24:52 sam Exp $
+ * $Id: dummy.c,v 1.13 2004/01/25 17:20:19 kuehne Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -55,7 +55,7 @@
 #endif
 
 vlc_module_begin();
-    set_description( _("dummy interface function") );
+    set_description( _("Dummy interface function") );
     set_capability( "interface", 0 );
     add_shortcut( "vlc" );
     set_callbacks( E_(OpenIntf), NULL );
@@ -64,34 +64,34 @@ vlc_module_begin();
     add_bool( "dummy-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
 #endif
     add_submodule();
-        set_description( _("dummy access function") );
+        set_description( _("Dummy access function") );
         set_capability( "access", 0 );
         set_callbacks( E_(OpenAccess), NULL );
     add_submodule();
-        set_description( _("dummy demux function") );
+        set_description( _("Dummy demux function") );
         set_capability( "demux", 0 );
         set_callbacks( E_(OpenDemux), E_(CloseDemux) );
     add_submodule();
-        set_description( _("dummy decoder function") );
+        set_description( _("Dummy decoder function") );
         set_capability( "decoder", 0 );
         set_callbacks( E_(OpenDecoder), E_(CloseDecoder) );
         add_bool( "dummy-save-es", 0, NULL, SAVE_TEXT, SAVE_LONGTEXT, VLC_FALSE );
     add_submodule();
-        set_description( _("dummy encoder function") );
+        set_description( _("Dummy encoder function") );
         set_capability( "encoder", 0 );
         set_callbacks( E_(OpenEncoder), E_(CloseEncoder) );
     add_submodule();
-        set_description( _("dummy audio output function") );
+        set_description( _("Dummy audio output function") );
         set_capability( "audio output", 1 );
         set_callbacks( E_(OpenAudio), NULL );
     add_submodule();
-        set_description( _("dummy video output function") );
+        set_description( _("Dummy video output function") );
         set_capability( "video output", 1 );
         set_callbacks( E_(OpenVideo), NULL );
         add_category_hint( N_("Video"), NULL, VLC_FALSE );
         add_string( "dummy-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_FALSE );
     add_submodule();
-        set_description( _("dummy font renderer function") );
+        set_description( _("Dummy font renderer function") );
         set_capability( "text renderer", 1 );
         set_callbacks( E_(OpenRenderer), NULL );
 vlc_module_end();

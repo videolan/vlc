@@ -2,7 +2,7 @@
  * i420_ymga.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_ymga.c,v 1.2 2003/08/29 18:58:05 fenrir Exp $
+ * $Id: i420_ymga.c,v 1.3 2004/01/25 17:20:18 kuehne Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,7 +45,7 @@ static void I420_YMGA  ( vout_thread_t *, picture_t *, picture_t * );
  *****************************************************************************/
 vlc_module_begin();
 #if defined (MODULE_NAME_IS_i420_ymga)
-    set_description( _("conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_description( _("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 80 );
 #elif defined (MODULE_NAME_IS_i420_ymga_mmx)
     set_description( _("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );

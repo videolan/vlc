@@ -2,7 +2,7 @@
  * builder.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.cpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
+ * $Id: builder.cpp,v 1.4 2004/01/25 17:20:18 kuehne Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -103,7 +103,7 @@ Theme *Builder::build()
         pBmp = m_pTheme->m_bitmaps[id].get(); \
         if( pBmp == NULL ) \
         { \
-            msg_Err( getIntf(), "Unknown Bitmap id: %s", id.c_str() ); \
+            msg_Err( getIntf(), "unknown bitmap id: %s", id.c_str() ); \
             return; \
         } \
     }
@@ -152,7 +152,7 @@ void Builder::addLayout( const BuilderData::Layout &rData )
     GenericWindow *pWin = m_pTheme->m_windows[rData.m_windowId].get();
     if( pWin == NULL )
     {
-        msg_Err( getIntf(), "Unknown Window id: %s", rData.m_windowId.c_str() );
+        msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
         return;
     }
 
@@ -178,7 +178,7 @@ void Builder::addAnchor( const BuilderData::Anchor &rData )
     GenericWindow *pWin = m_pTheme->m_windows[rData.m_windowId].get();
     if( pWin == NULL )
     {
-        msg_Err( getIntf(), "Unknown Window id: %s", rData.m_windowId.c_str() );
+        msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
         return;
     }
 
@@ -203,7 +203,7 @@ void Builder::addButton( const BuilderData::Button &rData )
     GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
     if( pLayout == NULL )
     {
-        msg_Err( getIntf(), "Unknown Layout id: %s", rData.m_layoutId.c_str() );
+        msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
@@ -255,7 +255,7 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
     GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
     if( pLayout == NULL )
     {
-        msg_Err( getIntf(), "Unknown Layout id: %s", rData.m_layoutId.c_str() );
+        msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
@@ -310,14 +310,14 @@ void Builder::addImage( const BuilderData::Image &rData )
     GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
     if( pLayout == NULL )
     {
-        msg_Err( getIntf(), "Unknown Layout id: %s", rData.m_layoutId.c_str() );
+        msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
     GenericWindow *pWindow = m_pTheme->m_windows[rData.m_windowId].get();
     if( pWindow == NULL )
     {
-        msg_Err( getIntf(), "Unknown Window id: %s", rData.m_windowId.c_str() );
+        msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
         return;
     }
 
@@ -357,7 +357,7 @@ void Builder::addText( const BuilderData::Text &rData )
     GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
     if( pLayout == NULL )
     {
-        msg_Err( getIntf(), "Unknown Layout id: %s", rData.m_layoutId.c_str() );
+        msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
@@ -397,7 +397,7 @@ void Builder::addRadialSlider( const BuilderData::RadialSlider &rData )
     GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
     if( pLayout == NULL )
     {
-        msg_Err( getIntf(), "Unknown Layout id: %s", rData.m_layoutId.c_str() );
+        msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
@@ -444,7 +444,7 @@ void Builder::addSlider( const BuilderData::Slider &rData )
     GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
     if( pLayout == NULL )
     {
-        msg_Err( getIntf(), "Unknown Layout id: %s", rData.m_layoutId.c_str() );
+        msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
@@ -500,7 +500,7 @@ void Builder::addList( const BuilderData::List &rData )
     GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
     if( pLayout == NULL )
     {
-        msg_Err( getIntf(), "Unknown Layout id: %s", rData.m_layoutId.c_str() );
+        msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 

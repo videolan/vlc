@@ -2,7 +2,7 @@
  * dialogs.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: dialogs.cpp,v 1.2 2004/01/25 17:20:19 kuehne Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -169,9 +169,9 @@ void Dialogs::showChangeSkin()
 
         p_arg->b_blocking = false;
 
-        p_arg->psz_title = strdup( _("Open a skin file") );
+        p_arg->psz_title = strdup( _("Open a skin file.") );
         p_arg->psz_extensions =
-            strdup( "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|" );
+            strdup( _("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|") );
 
         p_arg->p_arg = getIntf();
         p_arg->pf_callback = showChangeSkinCB;

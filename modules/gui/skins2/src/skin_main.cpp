@@ -2,7 +2,7 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.3 2004/01/25 13:59:33 asmax Exp $
+ * $Id: skin_main.cpp,v 1.4 2004/01/25 17:20:19 kuehne Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -212,7 +212,7 @@ static void Run( intf_thread_t *p_intf )
 // Module descriptor
 //---------------------------------------------------------------------------
 #define DEFAULT_SKIN        N_("Last skin used")
-#define DEFAULT_SKIN_LONG   N_("Select the path to the last skin used")
+#define DEFAULT_SKIN_LONG   N_("Select the path to the last skin used.")
 
 vlc_module_begin();
 // XXX

@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.14 2003/07/31 23:44:49 fenrir Exp $
+ * $Id: ipv6.c,v 1.15 2004/01/25 17:20:19 kuehne Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -188,7 +188,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
         /* We have a fqdn, try to find its address */
         if ( (p_hostent = gethostbyname2( psz_address, AF_INET6 )) == NULL )
         {
-            msg_Warn( p_this, "ipv6 error: unknown host %s", psz_address );
+            msg_Warn( p_this, "IPv6 error: unknown host %s", psz_address );
             free( psz_backup );
             return( -1 );
         }
@@ -210,7 +210,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
         _freeaddrinfo( res );
 
 #else
-        msg_Warn( p_this, "ipv6 error: IPv6 address %s is invalid",
+        msg_Warn( p_this, "IPv6 error: IPv6 address %s is invalid",
                  psz_address );
         free( psz_backup );
         return( -1 );
@@ -291,7 +291,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
     else if( i_opt < 0x80000 )
     {
-        msg_Warn( p_this, "socket buffer size is 0x%x instead of 0x%x",
+        msg_Warn( p_this, "Socket buffer size is 0x%x instead of 0x%x",
                           i_opt, 0x80000 );
     }
 
@@ -334,7 +334,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST,
                         (void*) &i_opt, sizeof( i_opt ) ) == -1 )
         {
-            msg_Warn( p_this, "ipv6 warning: cannot configure socket "
+            msg_Warn( p_this, "IPv6 warning: cannot configure socket "
                               "(SO_BROADCAST: %s)", strerror(errno) );
         }
     }

@@ -2,7 +2,7 @@
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.13 2003/10/25 00:49:13 sam Exp $
+ * $Id: trivial.c,v 1.14 2004/01/25 17:20:18 kuehne Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -42,7 +42,7 @@ static void DoWork    ( aout_instance_t *, aout_buffer_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("trivial audio mixer") );
+    set_description( _("Trivial audio mixer") );
     set_capability( "audio mixer", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();

@@ -2,7 +2,7 @@
  * spdif.c : dummy mixer for S/PDIF output (1 input only)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: spdif.c,v 1.9 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: spdif.c,v 1.10 2004/01/25 17:20:18 kuehne Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -42,7 +42,7 @@ static void DoWork    ( aout_instance_t *, aout_buffer_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("dummy spdif audio mixer") );
+    set_description( _("Dummy spdif audio mixer") );
     set_capability( "audio mixer", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();

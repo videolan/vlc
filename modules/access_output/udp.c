@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.17 2004/01/23 17:56:14 gbazin Exp $
+ * $Id: udp.c,v 1.18 2004/01/25 17:20:18 kuehne Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -70,10 +70,10 @@ static sout_buffer_t *NewUDPPacket( sout_access_out_t *, mtime_t );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for udp streams. This " \
-    "value should be set in miliseconds units." )
+    "value should be set in milliseconds." )
 
 vlc_module_begin();
     set_description( _("UDP stream ouput") );
@@ -142,7 +142,7 @@ static int Open( vlc_object_t *p_this )
     if( p_access->psz_access != NULL &&
         !strcmp( p_access->psz_access, "rtp" ) )
     {
-        msg_Warn( p_access, "becarefull that rtp ouput work only with ts "
+        msg_Warn( p_access, "be carefull that rtp ouput work only with ts "
                   "payload(not an error)" );
         p_sys->b_rtpts = 1;
     }
@@ -358,7 +358,7 @@ static int WriteRaw( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
-    msg_Err( p_access, "udp sout access cannot seek" );
+    msg_Err( p_access, "UDP sout access cannot seek" );
     return( -1 );
 }
 
