@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.26 2003/10/25 00:49:13 sam Exp $
+ * $Id: v4l.c,v 1.27 2003/10/25 20:19:19 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -119,6 +119,9 @@ struct access_sys_t
     int i_width;
     int i_height;
 
+    float f_fps;            /* <= 0.0 mean to grab at full rate */
+    mtime_t i_video_pts;    /* only used when f_fps > 0 */
+
     vlc_bool_t b_mjpeg;
     int i_decimation;
     int i_quality;
@@ -224,6 +227,9 @@ static int AccessOpen( vlc_object_t *p_this )
     p_sys->i_frequency      = -1;
     p_sys->i_width          = 0;
     p_sys->i_height         = 0;
+
+    p_sys->f_fps            = -1.0;
+    p_sys->i_video_pts      = -1;
 
     p_sys->b_mjpeg     = VLC_FALSE;
     p_sys->i_decimation = 1;
@@ -412,6 +418,11 @@ static int AccessOpen( vlc_object_t *p_this )
                 p_sys->i_quality =
                     strtol( psz_parser + strlen( "quality=" ),
                             &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "fps=", strlen( "fps=" ) ) )
+            {
+                p_sys->f_fps = strtof( psz_parser + strlen( "fps=" ),
+                                       &psz_parser );
             }
             else
             {
@@ -1159,7 +1170,21 @@ static int GrabVideo( input_thread_t * p_input,
                       mtime_t  *pi_pts )
 {
     access_sys_t *p_sys   = p_input->p_access_data;
-    uint8_t *p_frame;
+    uint8_t      *p_frame;
+
+
+    if( p_sys->f_fps >= 0.1 && p_sys->i_video_pts > 0 )
+    {
+        mtime_t i_dur = (mtime_t)((double)1000000 / (double)p_sys->f_fps);
+
+        /* have we wait enought ? */
+        if( p_sys->i_video_pts + i_dur > mdate() )
+        {
+            /* no, msleep needed to consume all the cpu, 10ms seem a good value (100fps)*/
+            msleep( 10000 );
+            return VLC_EGENERIC;
+        }
+    }
 
     if( p_sys->b_mjpeg )
         p_frame = GrabMJPEG( p_input );
@@ -1167,13 +1192,15 @@ static int GrabVideo( input_thread_t * p_input,
         p_frame = GrabCapture( p_input );
 
     if( !p_frame )
-        return -1;
+        return VLC_EGENERIC;
 
+    p_sys->i_video_pts   = mdate();
     p_sys->p_video_frame = p_frame;
 
     *pp_data = p_sys->p_video_frame;
     *pi_data = p_sys->i_video_frame_size;
-    *pi_pts  = mdate();
+    *pi_pts  = p_sys->i_video_pts;
+
     return VLC_SUCCESS;
 }
 
