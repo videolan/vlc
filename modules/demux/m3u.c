@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse pls, m3u, asx et b4s playlists
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: m3u.c,v 1.26 2004/01/25 20:05:28 hartman Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -155,10 +155,12 @@ static int Activate( vlc_object_t * p_this )
             {
                 i_type2 = TYPE_ASX;
             }
+#if 0
             else if ( !strncasecmp( p_peek, "<?xml", sizeof("<?xml") -1 ) )
             {
                 i_type2 = TYPE_B4S;
             }
+#endif
         }
     }
     if ( i_type == TYPE_UNKNOWN && i_type2 == TYPE_UNKNOWN)

@@ -591,7 +591,8 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
         char *psz_desc;
         char *psz_filter;
         char *psz_module;
-    } formats[] = {{ _("M3U file"), "*.m3u", "export-m3u" },
+    } formats[] = {{ _("Native VLC playlist"), "*.vlp", "export-native" },
+                   { _("M3U file"), "*.m3u", "export-m3u" },
                    { _("PLS file"), "*.pls", "export-pls" }};
     wxString filter = wxT("");
 

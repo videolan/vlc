@@ -2,7 +2,7 @@
  * playlist.h:  Playlist import module common functions
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: playlist.h,v 1.1 2004/01/11 17:46:58 sigmunau Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -26,6 +26,9 @@ char *FindPrefix( demux_t * );
 
 int Import_Old ( vlc_object_t * );
 int Import_M3U ( vlc_object_t * );
+int Import_Native ( vlc_object_t * );
+int Close_Native ( vlc_object_t * );
+
 void Close_M3U ( vlc_object_t * );
 int Import_PLS ( vlc_object_t * );
 void Close_PLS ( vlc_object_t * );

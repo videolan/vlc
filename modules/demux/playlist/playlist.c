@@ -2,7 +2,7 @@
  * playlist.c :  Playlist import module
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: playlist.c,v 1.5 2004/02/13 23:54:42 gbazin Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -40,6 +40,12 @@ vlc_module_begin();
     set_capability( "demux2" , 10 );
     set_callbacks( Import_Old , NULL );
 
+    add_submodule();
+        set_description( _("Native playlist import") );
+    add_shortcut( "playlist" );
+        add_shortcut( "native-open" );
+        set_capability( "demux2" , 10 );
+        set_callbacks( Import_Native , Close_Native );
     add_submodule();
         set_description( _("M3U playlist import") );
         add_shortcut( "m3u-open" );
