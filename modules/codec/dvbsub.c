@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
  * Copyright (C) 2003 VideoLAN
- * $Id: dvbsub.c,v 1.7 2004/01/25 18:20:12 bigben Exp $
+ * $Id: dvbsub.c,v 1.8 2004/01/25 19:10:09 bigben Exp $
  *
  * Authors: Damien LUCAS <damien.lucas@anevia.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -615,7 +615,7 @@ static void dvbsub_decode_page_composition( dvbsub_all_t *p_dvbsub, bs_t *s )
     /* /Special workaround */
 
     p_dvbsub->p_page->regions =
-         0      trox_malloc(p_dvbsub->p_page->i_regions_number*sizeof(dvbsub_region_t));
+               trox_malloc(p_dvbsub->p_page->i_regions_number*sizeof(dvbsub_region_t));
     for( i = 0; i < p_dvbsub->p_page->i_regions_number; i++ )
     {
         p_dvbsub->p_page->regions[i].i_id = bs_read( s, 8 );
