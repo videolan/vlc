@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: cpu.c,v 1.14 2004/02/01 23:02:02 sigmunau Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -187,7 +187,7 @@ uint32_t CPUCapabilities( void )
     }
     if( i_edx & 0x04000000 )
     {
-#   ifdef CAN_COMPILE_SSE
+#   if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
         /* We test if OS supports the SSE instructions */
         psz_capability = "SSE2";
         i_illegal = 0;
