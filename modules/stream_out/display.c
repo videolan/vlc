@@ -2,7 +2,7 @@
  * display.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.2 2003/04/14 02:26:49 fenrir Exp $
+ * $Id: display.c,v 1.3 2003/04/29 22:44:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -153,7 +153,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
         return NULL;
     }
     id->p_es->i_stream_id   = 1;
-    id->p_es->i_cat         = UNKNOWN_ES; //p_fmt->i_cat;
+    id->p_es->i_cat         = UNKNOWN_ES; /* p_fmt->i_cat; */
     id->p_es->i_fourcc      = p_fmt->i_fourcc;
     id->p_es->b_force_decoder = VLC_TRUE;
     switch( p_fmt->i_cat )

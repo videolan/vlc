@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.4 2003/04/20 11:57:13 gbazin Exp $
+ * $Id: transcode.c,v 1.5 2003/04/29 22:44:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -70,12 +70,12 @@ struct sout_stream_sys_t
 {
     sout_stream_t   *p_out;
 
-    vlc_fourcc_t    i_acodec;   // codec audio (0 if not transcode)
+    vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
     int             i_sample_rate;
     int             i_channels;
     int             i_abitrate;
 
-    vlc_fourcc_t    i_vcodec;   //   "   video  " "   "      "
+    vlc_fourcc_t    i_vcodec;   /*    "   video  " "   "      " */
     int             i_vbitrate;
     int             i_width;
     int             i_height;
@@ -226,8 +226,8 @@ static void Close( vlc_object_t * p_this )
 struct sout_stream_id_t
 {
     vlc_fourcc_t  b_transcode;
-    sout_format_t f_src;        // only if transcoding
-    sout_format_t f_dst;        //  "   "      "
+    sout_format_t f_src;        /* only if transcoding */
+    sout_format_t f_dst;        /*  "   "      " */
 
     /* id of the out stream */
     void *id;
@@ -257,9 +257,9 @@ struct sout_stream_id_t
     uint8_t         *p_buffer_out;
 
     AVFrame         *p_ff_pic;
-    AVFrame         *p_ff_pic_tmp0; // to do deinterlace
-    AVFrame         *p_ff_pic_tmp1; // to do pix conversion
-    AVFrame         *p_ff_pic_tmp2; // to do resample
+    AVFrame         *p_ff_pic_tmp0; /* to do deinterlace */
+    AVFrame         *p_ff_pic_tmp1; /* to do pix conversion */
+    AVFrame         *p_ff_pic_tmp2; /* to do resample */
 
     ImgReSampleContext *p_vresample;
 };
@@ -316,8 +316,8 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
         /* create dst format */
         id->f_dst.i_cat         = VIDEO_ES;
         id->f_dst.i_fourcc      = p_sys->i_vcodec;
-        id->f_dst.i_width       = p_sys->i_width ; //> 0 ? p_sys->i_width : id->f_src.i_width;
-        id->f_dst.i_height      = p_sys->i_height; // > 0 ? p_sys->i_height: id->f_src.i_height;
+        id->f_dst.i_width       = p_sys->i_width ; /* > 0 ? p_sys->i_width : id->f_src.i_width; */
+        id->f_dst.i_height      = p_sys->i_height; /* > 0 ? p_sys->i_height: id->f_src.i_height; */
         id->f_dst.i_bitrate     = p_sys->i_vbitrate > 0 ? p_sys->i_vbitrate : 800*1000;
         id->f_dst.i_extra_data  = 0;
         id->f_dst.p_extra_data  = NULL;
@@ -566,7 +566,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
                                        (int16_t*)&id->p_buffer[id->i_buffer_pos], &i_buffer_size,
                                        id->p_buffer_in, id->i_buffer_in_pos );
 
-        //msg_Warn( p_stream, "avcodec_decode_audio: %d used", i_used );
+        /* msg_Warn( p_stream, "avcodec_decode_audio: %d used", i_used ); */
         id->i_buffer_pos += i_buffer_size;
 
         if( i_used < 0 )
@@ -601,7 +601,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             break;
         }
 
-        //msg_Warn( p_stream, "avcodec_encode_audio: frame size%d", i_frame_size);
+        /* msg_Warn( p_stream, "avcodec_encode_audio: frame size%d", i_frame_size); */
         i_out_size = avcodec_encode_audio( id->ff_enc_c,
                                            id->p_buffer_out, id->i_buffer_out,
                                            (int16_t*)id->p_buffer );
@@ -626,7 +626,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
         /* update dts */
         id->i_dts += p_out->i_length;
 
-       //msg_Warn( p_stream, "frame dts=%lld len %lld out=%d", p_out->i_dts, p_out->i_length, i_out_size );
+       /* msg_Warn( p_stream, "frame dts=%lld len %lld out=%d", p_out->i_dts, p_out->i_length, i_out_size ); */
         sout_BufferChain( out, p_out );
     }
 
@@ -659,7 +659,7 @@ static int transcode_video_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
     id->ff_dec_c = avcodec_alloc_context();
     id->ff_dec_c->width         = id->f_src.i_width;
     id->ff_dec_c->height        = id->f_src.i_height;
-    //id->ff_dec_c->bit_rate      = id->f_src.i_bitrate;
+    /* id->ff_dec_c->bit_rate      = id->f_src.i_bitrate; */
     id->ff_dec_c->extradata_size= id->f_src.i_extra_data;
     id->ff_dec_c->extradata     = id->f_src.p_extra_data;
     id->ff_dec_c->workaround_bugs = FF_BUG_AUTODETECT;
@@ -706,7 +706,7 @@ static int transcode_video_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
     id->ff_enc_c->height         = id->f_dst.i_height;
     id->ff_enc_c->bit_rate       = id->f_dst.i_bitrate;
 #if LIBAVCODEC_BUILD >= 4662
-    id->ff_enc_c->frame_rate     = 25 ; // FIXME as it break mpeg
+    id->ff_enc_c->frame_rate     = 25 ; /* FIXME as it break mpeg */
     id->ff_enc_c->frame_rate_base= 1;
 #else
     id->ff_enc_c->frame_rate     = 25 * FRAME_RATE_BASE;

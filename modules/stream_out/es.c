@@ -2,7 +2,7 @@
  * es.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: es.c,v 1.1 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: es.c,v 1.2 2003/04/29 22:44:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -80,7 +80,7 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t   *p_sys;
 
-    //p_sout->i_preheader = __MAX( p_sout->i_preheader, p_mux->i_preheader );
+    /* p_sout->i_preheader = __MAX( p_sout->i_preheader, p_mux->i_preheader ); */
 
     p_sys                   = malloc( sizeof( sout_stream_sys_t ) );
 
