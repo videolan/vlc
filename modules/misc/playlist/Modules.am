@@ -1,4 +1,4 @@
-SOURCES_export = export.c
-SOURCES_m3u = m3u.c
-SOURCES_native = native.c
-SOURCES_old = old.c
+SOURCES_export = export.c \
+   		 native.c \
+		 m3u.c    \
+		 old.c
