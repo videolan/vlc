@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.27 2004/02/22 21:32:42 gbazin Exp $
+ * $Id: access.c,v 1.28 2004/02/23 00:10:50 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -511,7 +511,6 @@ GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
       cdio_get_track_lba(cdio, CDIO_CDROM_LEADOUT_TRACK)
       / CDIO_CD_FRAMES_PER_SEC;
 
-
     if (!cddb_disc_calc_discid(p_cdda->cddb.disc)) {
       msg_Err( p_input, "CDDB disc calc failed" );
       goto cddb_destroy;
@@ -1001,7 +1000,7 @@ E_(Open)( vlc_object_t *p_this )
     {
         msg_Warn( p_input, "could not open %s", psz_source );
         free( psz_source );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_cdda = malloc( sizeof(cdda_data_t) );
@@ -1009,7 +1008,7 @@ E_(Open)( vlc_object_t *p_this )
     {
         msg_Err( p_input, "out of memory" );
         free( psz_source );
-        return -1;
+        return VLC_ENOMEM;
     }
 
     p_cdda->p_cddev        = p_cddev;
@@ -1033,7 +1032,7 @@ E_(Open)( vlc_object_t *p_this )
         ioctl_Close( p_cdda->p_cddev );
         free( p_cdda );
         free( psz_source );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     if( i_track > p_cdda->i_nb_tracks || i_track < 1 )
@@ -1091,7 +1090,7 @@ E_(Open)( vlc_object_t *p_this )
     p_cdda->waveheader.MainChunkID = VLC_FOURCC('R', 'I', 'F', 'F');
     p_cdda->waveheader.Length = 0;                     /* we just don't know */
     p_cdda->waveheader.ChunkTypeID = VLC_FOURCC('W', 'A', 'V', 'E');
-    p_cdda->waveheader.SubChunkID = VLC_FOURCC('f', 'm', 't', ' ');
+    p_cdda->waveheader.SubChunkID  = VLC_FOURCC('f', 'm', 't', ' ');
     SetDWLE( &p_cdda->waveheader.SubChunkLength, 16);
     SetWLE( &p_cdda->waveheader.Modus, 2);
     SetDWLE( &p_cdda->waveheader.SampleFreq, 44100);
@@ -1103,7 +1102,7 @@ E_(Open)( vlc_object_t *p_this )
     p_cdda->waveheader.DataLength = 0;                 /* we just don't know */
     p_cdda->i_header_pos = 0;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
