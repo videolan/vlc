@@ -29,6 +29,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
@@ -37,9 +38,6 @@
 #endif
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
-#endif
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
 #endif
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
@@ -95,7 +93,7 @@ static int  Seek( access_t *, int64_t );
 static int  Read( access_t *, uint8_t *, int );
 static int  Control( access_t *, int, va_list );
 
-static int     _OpenFile( access_t *, char * );
+static int  _OpenFile( access_t *, char * );
 
 typedef struct
 {
@@ -116,6 +114,9 @@ struct access_sys_t
     /* Current file */
     int  i_index;
     int  fd;
+#ifdef UNDER_CE
+    HANDLE fd_handle;
+#endif
 
     /* */
     vlc_bool_t b_seekable;
@@ -265,6 +266,7 @@ static int Open( vlc_object_t *p_this )
             if( psz_name )
             {
                 msg_Dbg( p_access, "adding file `%s'", psz_name );
+                i_size = 0;
 
 #ifdef HAVE_SYS_STAT_H
                 if( !stat( psz_name, &stat_info ) )
@@ -275,7 +277,6 @@ static int Open( vlc_object_t *p_this )
                 else
                 {
                     msg_Dbg( p_access, "cannot stat() file `%s'", psz_name );
-                    i_size = 0;
                 }
 #endif
                 p_file = malloc( sizeof(file_entry_t) );
@@ -323,13 +324,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     access_sys_t *p_sys = p_access->p_sys;
     int i_ret;
 
-#ifdef UNDER_CE
-    if( !ReadFile( (HANDLE)p_sys->fd, p_buffer, i_len, (LPDWORD)&i_ret, NULL ) )
-    {
-        i_ret = -1;
-    }
-#else
-#ifndef WIN32
+#if !defined(WIN32) && !defined(UNDER_CE)
     if( !p_sys->b_pace_control )
     {
         if( !p_sys->b_kfir )
@@ -377,7 +372,13 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         }
     }
     else
-#   endif
+#endif /* WIN32 || UNDER_CE */
+#ifdef UNDER_CE
+    if( !ReadFile( p_sys->fd_handle, p_buffer, i_len, (LPDWORD)&i_ret, 0 ) )
+    {
+        i_ret = -1;
+    }
+#else
     {
         /* b_pace_control || WIN32 */
         i_ret = read( p_sys->fd, p_buffer, i_len );
@@ -396,7 +397,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 
     p_sys->i_nb_reads++;
 #ifdef HAVE_SYS_STAT_H
-    if( p_access->info.i_size != 0 && (p_sys->i_nb_reads % INPUT_FSTAT_NB_READS) == 0 )
+    if( p_access->info.i_size != 0 &&
+        (p_sys->i_nb_reads % INPUT_FSTAT_NB_READS) == 0 )
     {
         struct stat stat_info;
         int i_file = p_sys->i_index;
@@ -502,7 +504,6 @@ static int Seek( access_t *p_access, int64_t i_pos )
     return VLC_SUCCESS;
 }
 
-
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -569,17 +570,18 @@ static int _OpenFile( access_t * p_access, char * psz_name )
     wchar_t psz_filename[MAX_PATH];
     MultiByteToWideChar( CP_ACP, 0, psz_name, -1, psz_filename, MAX_PATH );
 
-    p_sys->fd =
-       (int)CreateFile( psz_filename, GENERIC_READ, FILE_SHARE_READ,
-                        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+    p_sys->fd_handle =
+       CreateFile( psz_filename, GENERIC_READ, FILE_SHARE_READ,
+                   NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+    p_sys->fd = (int)p_sys->fd_handle;
 
-    if ( (HANDLE)p_sys->fd == INVALID_HANDLE_VALUE )
+    if ( p_sys->fd_handle == INVALID_HANDLE_VALUE )
     {
         msg_Err( p_access, "cannot open file %s", psz_name );
         return VLC_EGENERIC;
     }
     p_access->info.i_size =
-        GetFileSize( (HANDLE)p_access_data->i_handle, NULL );
+        GetFileSize( p_sys->fd_handle, NULL );
     p_access->info.i_update |= INPUT_UPDATE_SIZE;
 #else
 
