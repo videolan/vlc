@@ -2,7 +2,7 @@
  * fixed32float32.c : converter from fixed32 to float32 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: fixed32tofloat32.c,v 1.6 2002/08/21 22:41:59 massiot Exp $
+ * $Id: fixed32tofloat32.c,v 1.7 2002/08/22 17:14:52 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -87,31 +87,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     for ( i = p_in_buf->i_nb_samples * p_filter->input.i_channels ; i-- ; )
     {
-        /* convert vlc_fixed_t into s32 */
-#if 0
-        s32 temp;
-        if ( *p_in >= 8 ) temp = 32767;
-        else if ( *p_in < -8 ) temp = -32768;
-        else temp = *p_in * (s32) 4096; // (32768/8);
-#endif
-
-        /* convert s32 into float */
-#if 0
-        if (temp >= 32768)
-            *p_out = (float) 1.0;
-        else if (temp <= -32768)
-            *p_out = (float) -1.0;
-        else *p_out = (float) (temp/32768.0);
-#endif
-
-        /* combined conversion */
-        /* This has absolutely no chance of working. *p_in is s32, gcc
-         * doesn't know anything of vlc_fixed_t... --Meuuh */
-        if ( *p_in >= 8 ) *p_out = (float) 1.0;
-        else if ( *p_in < -8 ) *p_out = (float) -1.0;
-        else *p_out =(float) (*p_in/8.0);
-
-        p_in++; p_out++;
+        *p_out++ = (float)*p_in++ / -(float)FIXED32_MIN;
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;

@@ -29,7 +29,7 @@ typedef struct mad_adec_thread_s
     /*
      * Decoder properties
      */
-    struct mad_decoder *libmad_decoder;
+    struct mad_decoder  libmad_decoder;
     mad_timer_t         libmad_timer;  
     byte_t              buffer[MAD_BUFFER_MDLEN];
    
@@ -37,6 +37,9 @@ typedef struct mad_adec_thread_s
      * Thread properties
      */
     vlc_thread_t        thread_id;                /* id for thread functions */
+
+    /* The bit stream structure handles the PES stream at the bit level */
+    bit_stream_t        bit_stream;
 
     /*
      * Input properties
@@ -50,16 +53,11 @@ typedef struct mad_adec_thread_s
     /*
      * Output properties
      */
-//old way    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
-
-    /*
-     * Output properties
-     */
     aout_instance_t *   p_aout; /* opaque */
     aout_input_t *      p_aout_input; /* opaque */
     audio_sample_format_t output_format;
+    audio_date_t        end_date;
 
-    mtime_t             last_date;
     enum mad_scaling	audio_scaling;
 
 } mad_adec_thread_t;
