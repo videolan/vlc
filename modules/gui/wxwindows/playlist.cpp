@@ -1362,13 +1362,13 @@ wxMenu * Playlist::ViewMenu()
 
     /* FIXME : have a list of "should have" views */
     p_view_menu->Append( FirstView_Event + VIEW_CATEGORY,
-                           wxU(_("By category") ) );
-    p_view_menu->Append( FirstView_Event + VIEW_SIMPLE,
+                           wxU(_("Normal") ) );
+/*    p_view_menu->Append( FirstView_Event + VIEW_SIMPLE,
                            wxU(_("Manually added") ) );
     p_view_menu->Append( FirstView_Event + VIEW_ALL,
-                           wxU(_("All items, unsorted") ) );
+                           wxU(_("All items, unsorted") ) ); */
     p_view_menu->Append( FirstView_Event + VIEW_S_AUTHOR,
-                           wxU(_("Sorted by author") ) );
+                           wxU(_("Sorted by artist") ) );
 
     vlc_object_release( p_playlist);
 
