@@ -75,6 +75,9 @@
 
 #include "ebml/StdIOCallback.h"
 
+extern "C" {
+   #include "mp4/libmp4.h"
+}
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
 #endif
@@ -567,6 +570,24 @@ static int Open( vlc_object_t * p_this )
             {
                 tk.fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
             }
+        }
+        else if( !strcmp( tk.psz_codec, "V_QUICKTIME" ) )
+        {
+            MP4_Box_t *p_box = (MP4_Box_t*)malloc( sizeof( MP4_Box_t ) );
+            MP4_Stream_t *p_mp4_stream = MP4_MemoryStream( p_demux->s,
+                                                           tk.i_extra_data,
+                                                           tk.p_extra_data );
+            MP4_ReadBoxCommon( p_mp4_stream, p_box );
+            MP4_ReadBox_sample_vide( p_mp4_stream, p_box );
+            tk.fmt.i_codec = p_box->i_type;
+            tk.fmt.video.i_width = p_box->data.p_sample_vide->i_width;
+            tk.fmt.video.i_height = p_box->data.p_sample_vide->i_height;
+            tk.fmt.i_extra = p_box->data.p_sample_vide->i_qt_image_description;
+            tk.fmt.p_extra = malloc( tk.fmt.i_extra );
+            memcpy( tk.fmt.p_extra, p_box->data.p_sample_vide->p_qt_image_description, tk.fmt.i_extra );
+            MP4_FreeBox_sample_vide( p_box );
+            free( p_box );
+            free( p_mp4_stream );
         }
         else if( !strcmp( tk.psz_codec, "A_MS/ACM" ) )
         {

@@ -324,7 +324,7 @@ int MP4_SeekStream( MP4_Stream_t *p_stream, off_t i_pos)
  *
  * RETURN : 0 if it fail, 1 otherwise
  *****************************************************************************/
-static int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     int      i_read;
     uint8_t  *p_peek;
@@ -1325,7 +1325,7 @@ static void MP4_FreeBox_sample_soun( MP4_Box_t *p_box )
 }
 
 
-static int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1390,7 +1390,7 @@ static int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 
-static void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
+void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_sample_vide->p_qt_image_description );
 }
