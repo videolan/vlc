@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.9 2002/10/27 17:23:17 titer Exp $
+ * $Id: decoder.c,v 1.10 2002/10/27 18:06:33 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -148,73 +148,38 @@ static void faac_GetWaveFormatEx( waveformatex_t *p_wh,
     }
 }
 
-static inline void __GetFrame( adec_thread_t *p_adec )
-{
-    pes_packet_t  *p_pes;
-    data_packet_t *p_data;
-    byte_t        *p_buffer;
+static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
+{   
+    int i_copy; 
+    int i_count;
 
-    input_ExtractPES( p_adec->p_fifo, &p_pes );
-    if( !p_pes )
-    {
-        p_adec->p_framedata = NULL;
-        return;
-    }
+    data_packet_t   *p_data;
 
-    if( p_pes->i_pts )
-    {
-        p_adec->pts = p_pes->i_pts;
-    }
-
-    while( ( !p_pes->i_nb_data )||( !p_pes->i_pes_size ) )
-    {
-        input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
-        input_ExtractPES( p_adec->p_fifo, &p_pes );
-        if( !p_pes )
-        {
-            p_adec->p_framedata = NULL;
-            return;
-        }
-    }
-    p_adec->i_framesize = p_pes->i_pes_size;
-    if( p_pes->i_nb_data == 1 )
-    {
-        p_adec->p_framedata = p_pes->p_first->p_payload_start;
-        return;    
-    }
-    /* get a buffer and gather all data packet */
-    if( p_adec->i_buffer_size < p_pes->i_pes_size )
-    {
-        p_adec->i_buffer_size = 3 * p_pes->i_pes_size / 2;
-        if( p_adec->p_buffer )
-        {
-            p_adec->p_buffer = realloc( p_adec->p_buffer,
-                                        p_adec->i_buffer_size );
-        }
-        else
-        {
-            p_adec->p_buffer = malloc( p_adec->i_buffer_size );
-        }
-    }
-    
-    p_buffer = p_adec->p_framedata = p_adec->p_buffer;
+    i_count = 0;
     p_data = p_pes->p_first;
-    do
+    while( p_data != NULL && i_count < i_max )
     {
-        p_adec->p_fifo->p_vlc->pf_memcpy( p_buffer, p_data->p_payload_start, 
-                     p_data->p_payload_end - p_data->p_payload_start );
-        p_buffer += p_data->p_payload_end - p_data->p_payload_start;
+
+        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, 
+                        i_max - i_count );
+
+        if( i_copy > 0 )
+        {
+            memcpy( p_buf,
+                    p_data->p_payload_start,
+                    i_copy );
+        }
+
         p_data = p_data->p_next;
-    } while( p_data );
+        i_count += i_copy;
+        p_buf   += i_copy;
+    }
 
-    input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
+    if( i_count < i_max )
+    {
+        memset( p_buf, 0, i_max - i_count );
+    }
 }
-
-static inline void __NextFrame( adec_thread_t *p_adec )
-{
-    input_ExtractPES( p_adec->p_fifo, NULL );
-}
-
 
 /*****************************************************************************
  * InitThread: initialize data before entering main loop
@@ -238,6 +203,10 @@ static int InitThread( adec_thread_t * p_adec )
                               (u8*)p_adec->p_fifo->p_demux_data );
     }
 
+    p_adec->p_buffer = NULL;
+    p_adec->i_buffer = 0;
+
+
     if( !( p_adec->p_handle = faacDecOpen() ) )
     {
         msg_Err( p_adec->p_fifo,
@@ -248,16 +217,43 @@ static int InitThread( adec_thread_t * p_adec )
     
     if( !p_adec->format.p_data )
     {
+        int i_frame_size;
+        pes_packet_t *p_pes;
 
         msg_Warn( p_adec->p_fifo,
                  "DecoderSpecificInfo missing, trying with first frame" );
-        __GetFrame( p_adec );
+        // gather first frame
+        do
+        {
+            input_ExtractPES( p_adec->p_fifo, &p_pes );
+            if( !p_pes )
+            {
+                return( -1 );
+            }
+            i_frame_size = p_pes->i_pes_size;
+
+            if( i_frame_size > 0 )
+            {
+                if( p_adec->i_buffer < i_frame_size + 16 )
+                {
+                    FREE( p_adec->p_buffer );
+                    p_adec->p_buffer = malloc( i_frame_size + 16 );
+                    p_adec->i_buffer = i_frame_size + 16;
+                }
+                
+                GetPESData( p_adec->p_buffer, p_adec->i_buffer, p_pes );
+            }
+            else
+            {
+                input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
+            }
+        } while( i_frame_size <= 0 );
+
 
         i_status = faacDecInit( p_adec->p_handle,
-                                p_adec->p_framedata,
+                                p_adec->p_buffer,
                                 &i_rate,
                                 &i_channels );
-//        __NextFrame( p_adec );
     }
     else
     {
@@ -293,18 +289,9 @@ static int InitThread( adec_thread_t * p_adec )
     p_adec->output_format.i_channels = i_channels;
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
-  
-#if 0
-    if( !p_adec->format.p_data )
-    {
-        /* Init the BitStream */
-        InitBitstream( &p_adec->bit_stream, p_adec->p_fifo,
-                       NULL, NULL );
-        p_adec->p_framedata = malloc( AAC_MAXCHANNELS * FAAD_MIN_STREAMSIZE );
-        p_adec->i_framesize = 0;
-    }
-#endif
 
+    p_adec->pts = 0;
+  
     return( 0 );
 }
 
@@ -321,58 +308,42 @@ static void DecodeThread( adec_thread_t *p_adec )
 
     void             *p_faad_buffer;
     faacDecFrameInfo faad_frame;
+    int  i_frame_size;
+    pes_packet_t *p_pes;
 
     /* **** Get a new frames from streams **** */
-    __GetFrame( p_adec );
+    do
+    {
+        input_ExtractPES( p_adec->p_fifo, &p_pes );
+        if( !p_pes )
+        {
+            p_adec->p_fifo->b_error = 1;
+            return;
+        }
+        if( p_pes->i_pts != 0 )
+        {
+            p_adec->pts = p_pes->i_pts;
+        }
+        i_frame_size = p_pes->i_pes_size;
+
+        if( i_frame_size > 0 )
+        {
+            if( p_adec->i_buffer < i_frame_size + 16 )
+            {
+                FREE( p_adec->p_buffer );
+                p_adec->p_buffer = malloc( i_frame_size + 16 );
+                p_adec->i_buffer = i_frame_size + 16;
+            }
+            
+            GetPESData( p_adec->p_buffer, p_adec->i_buffer, p_pes );
+        }
+        input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
+    } while( i_frame_size <= 0 );
     
     /* **** decode this frame **** */
     p_faad_buffer = faacDecDecode( p_adec->p_handle,
                                    &faad_frame,
-                                   p_adec->p_framedata );
-    /* **** switch to the next frame **** */
-    __NextFrame( p_adec );
-
-#if 0
-    /* 
-     * XXX don't work ! XXX 
-     *
-     * first even without format.p_data stream can be frame based
-     * and it make libfaad segfault
-     *
-     */
-    if( p_adec->format.p_data )
-    {
-        __GetFrame( p_adec );
-        /* Now decode data */
-        p_faad_buffer = faacDecDecode( p_adec->p_handle,
-                                       &faad_frame,
-                                       p_adec->p_framedata );
-        __NextFrame( p_adec );
-
-    }
-    else
-    {
-        int i_count;
-        /* fill buffer */
-        i_count = __MAX( 1, p_adec->output_format.i_channels ) * FAAD_MIN_STREAMSIZE -
-                        p_adec->i_framesize;
-        
-        GetChunk( &p_adec->bit_stream,
-                  p_adec->p_framedata + p_adec->i_framesize,
-                  i_count );
-        p_adec->i_framesize += i_count;
-        p_faad_buffer = faacDecDecode( p_adec->p_handle,
-                                       &faad_frame,
-                                       p_adec->p_framedata );
-        /* update data buffer pos */
-        i_count = __MIN( p_adec->i_framesize,
-                         __MAX( 1, faad_frame.bytesconsumed ) );
-        memcpy( p_adec->p_framedata,
-                p_adec->p_framedata + i_count,
-                p_adec->i_framesize - i_count );
-        p_adec->i_framesize -= i_count;
-    }
-#endif
+                                   p_adec->p_buffer );
 
     /* **** some sanity checks to see if we have samples to out **** */
     if( faad_frame.error > 0 )

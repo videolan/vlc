@@ -3,7 +3,7 @@
  *
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: decoder.h,v 1.3 2002/10/20 17:44:17 fenrir Exp $
+ * $Id: decoder.h,v 1.4 2002/10/27 18:06:33 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -55,10 +55,9 @@ typedef struct adec_thread_s
      */
     decoder_fifo_t *p_fifo;
     
-    u8             *p_framedata;
-    int            i_framesize;
-    u8             *p_buffer;
-    int            i_buffer_size;
+    u8              *p_buffer;
+    int             i_buffer;
+    
     /*
      * Output properties
      */
