@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.67 2003/08/23 22:49:50 fenrir Exp $
+dnl $Id: configure.ac,v 1.68 2003/08/24 11:17:39 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1209,6 +1209,22 @@ then
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${with_dvdplay}/include/dvdplay/dvdplay.h])
     fi
+  fi
+fi
+
+dnl
+dnl  Windows DirectShow access module
+dnl
+AC_ARG_ENABLE(dshow,
+  [  --enable-dshow       Win32 DirectShow support (default enabled on Win32)])
+if test "${enable_dshow}" != "no"
+then
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
+  then
+      AC_CHECK_HEADERS(dshow.h,
+      [ AX_ADD_PLUGINS([dshow])
+        AX_ADD_CXXFLAGS([dshow],[])
+        AX_ADD_LDFLAGS([dshow],[-lole32 -loleaut32]) ])
   fi
 fi
 
@@ -3261,6 +3277,7 @@ AC_OUTPUT([
   src/Makefile
 
   modules/access/Makefile
+  modules/access/dshow/Makefile
   modules/access/dvb/Makefile
   modules/access/dvd/Makefile
   modules/access/dvdplay/Makefile
