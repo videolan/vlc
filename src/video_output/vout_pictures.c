@@ -300,6 +300,8 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
     fmt.i_chroma = p_vout->output.i_chroma;
     fmt.i_width = p_vout->output.i_width;
     fmt.i_height = p_vout->output.i_height;
+    fmt.i_sar_num = p_vout->output.i_aspect * fmt.i_height / fmt.i_width;
+    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
     i_scale_width = p_vout->output.i_width * 1000 / p_vout->render.i_width;
     i_scale_height = p_vout->output.i_height * 1000 / p_vout->render.i_height;
 

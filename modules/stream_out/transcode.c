@@ -1608,6 +1608,11 @@ static int transcode_video_process( sout_stream_t *p_stream,
             else
                 p_fmt = &id->p_decoder->fmt_out.video;
 
+            /* FIXME (shouldn't have to be done here) */
+            p_fmt->i_sar_num = p_fmt->i_aspect *
+                p_fmt->i_height / p_fmt->i_width;
+            p_fmt->i_sar_den = VOUT_ASPECT_FACTOR;
+
             spu_RenderSubpictures( p_sys->p_spu, p_fmt, p_pic, p_pic, p_subpic,
                                    i_scale_width, i_scale_height );
         }

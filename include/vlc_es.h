@@ -99,6 +99,9 @@ struct video_format_t
 
     unsigned int i_bits_per_pixel;             /**< number of bits per pixel */
 
+    unsigned int i_sar_num;                   /**< sample/pixel aspect ratio */
+    unsigned int i_sar_den;
+
     unsigned int i_frame_rate;                     /**< frame rate numerator */
     unsigned int i_frame_rate_base;              /**< frame rate denominator */
 

@@ -496,6 +496,15 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_subpic->i_original_picture_height;
         }
 
+        /* Take care of the aspect ratio */
+        if( p_region && p_region->fmt.i_sar_num * p_fmt->i_sar_den !=
+            p_region->fmt.i_sar_den * p_fmt->i_sar_num )
+        {
+            i_scale_width = i_scale_width *
+                (int64_t)p_region->fmt.i_sar_num * p_fmt->i_sar_den /
+                p_region->fmt.i_sar_den / p_fmt->i_sar_num;
+        }
+
         /* Load the scaling module */
         if( !p_spu->p_scale && (i_scale_width != 1000 ||
             i_scale_height != 1000) )
