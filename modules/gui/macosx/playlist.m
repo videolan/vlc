@@ -25,12 +25,10 @@
 
 /* TODO
  * connect delegates, actions and outlets in IB
- * implement play by double click
  * implement delete by backspace
  * implement playlist item rightclick menu
  * implement sorting
- * reconnect menu items etc
- * add 'icons' for different types of nodes?
+ * add 'icons' for different types of nodes? (http://www.cocoadev.com/index.pl?IconAndTextInTableCell)
  * create a new 'playlist toggle' that hides the playlist and in effect give you the old controller
  * create a new search field build with pictures from the 'regular' search field, so it can be emulated on 10.2
  * create toggle buttons for the shuffle, repeat one, repeat all functions.
@@ -76,7 +74,7 @@
 
     playlist_t * p_playlist;
     intf_thread_t * p_intf = VLCIntf;
-
+msg_Dbg( p_intf, "KEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
     if( [[o_event characters] length] )
     {
         key = [[o_event characters] characterAtIndex: 0];
@@ -103,15 +101,14 @@
                 o_number = [o_to_delete lastObject];
                 i_row = [o_number intValue];
 
-                if( p_playlist->i_index == i_row && p_playlist->status.i_status )
+                if( p_playlist->status.p_item == [[self itemAtRow: i_row] pointerValue] && p_playlist->status.i_status )
                 {
                     playlist_Stop( p_playlist );
                 }
                 [o_to_delete removeObject: o_number];
                 [self deselectRow: i_row];
-                playlist_Delete( p_playlist, i_row );
+                playlist_ItemDelete( [[self itemAtRow: i_row] pointerValue] );
             }
-            [self reloadData];
             break;
 
         default:
@@ -149,7 +146,7 @@
     [o_outline_view setDelegate: self];
     [o_outline_view setDataSource: self];
 
-    //[o_outline_view setDoubleAction: @selector(playItem:)];
+    [o_outline_view setDoubleAction: @selector(playItem:)];
 
     [o_outline_view registerForDraggedTypes: 
         [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
@@ -212,6 +209,24 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_outline_view reloadData];
 }
 
+- (IBAction)playItem:(id)sender
+{
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    if( p_playlist != NULL )
+    {
+        playlist_item_t *p_item;
+        playlist_view_t *p_view;
+        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+        p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
+        
+        if( p_item )
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VIEW_SIMPLE, p_view ? p_view->p_root : NULL, p_item );
+        vlc_object_release( p_playlist );
+    }
+}
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
 {

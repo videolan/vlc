@@ -51,6 +51,7 @@
 - (void)initStrings;
 
 - (void)playlistUpdated;
+- (void)playItem:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 @end

@@ -673,6 +673,15 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
 
+    switch( key )
+    {
+        case NSDeleteCharacter:
+        case NSDeleteFunctionKey:
+        case NSDeleteCharFunctionKey:
+        case NSBackspaceCharacter:
+            return YES;
+    }
+
     val.i_int |= CocoaKeyToVLC( key );
 
     for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
