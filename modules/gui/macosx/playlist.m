@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.41 2003/11/17 14:11:05 bigben Exp $
+ * $Id: playlist.m,v 1.42 2003/11/17 19:05:03 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -152,22 +152,16 @@
                                                        FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
-    int i_state;
+        var_Get( p_playlist, "random", &val );
+        [o_random_ckb setState: val.b_bool];
 
-    var_Get( p_playlist, "random", &val );
-    i_state = val.b_bool ? NSOnState : NSOffState;
-    [o_random_ckb setState: i_state];
+        var_Get( p_playlist, "loop", &val );
+        [o_loop_ckb setState: val.b_bool];
 
-    var_Get( p_playlist, "loop", &val );
-    i_state = val.b_bool ? NSOnState : NSOffState;
-    [o_loop_ckb setState: i_state];
+        var_Get( p_playlist, "repeat", &val );
+        [o_repeat_ckb setState: val.b_bool];
 
-    var_Get( p_playlist, "repeat", &val );
-    i_state = val.b_bool ? NSOnState : NSOffState;
-    [o_repeat_ckb setState: i_state];
-
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
+        vlc_object_release( p_playlist );
     }
 
 
@@ -291,13 +285,19 @@
 
 - (IBAction)searchItem:(id)sender
 {
-    int i_start;
-    int i_current;
-    id o_current_name;
+    int i_start, i_current;
+    NSString *o_current_name;
+    NSString *o_current_author;
 
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
+    
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
     if ( [o_table_view selectedRow] == [o_table_view numberOfRows]-1 )
     {
          i_start = -1;
@@ -309,29 +309,22 @@
 
     for ( i_current = i_start + 1 ; i_current < [o_table_view numberOfRows] ; i_current++ )
     {
+        vlc_mutex_lock( &p_playlist->object_lock );
+        o_current_name = [NSString stringWithUTF8String: 
+            p_playlist->pp_items[i_current]->psz_name];
+        o_current_author = [NSString stringWithUTF8String: 
+            p_playlist->pp_items[i_current]->psz_author];
+        vlc_mutex_unlock( &p_playlist->object_lock );
 
-        if( p_playlist == NULL )
-        {
-            o_current_name = nil;
-        }
-
-
-        else 
-        {
-            vlc_mutex_lock( &p_playlist->object_lock );
-            o_current_name = [[NSString stringWithUTF8String: 
-                p_playlist->pp_items[i_current]->psz_name] lastPathComponent]; 
-            vlc_mutex_unlock( &p_playlist->object_lock );
-        }
-
-        if( [o_current_name rangeOfString:[o_search_keyword stringValue] options:NSCaseInsensitiveSearch ].length )
+        if( [o_current_name rangeOfString:[o_search_keyword stringValue] options:NSCaseInsensitiveSearch ].length ||
+             [o_current_author rangeOfString:[o_search_keyword stringValue] options:NSCaseInsensitiveSearch ].length )
         {
              [o_table_view selectRow: i_current byExtendingSelection: NO];
              [o_table_view scrollRowToVisible: i_current];
              break;
         }
-    [o_table_view selectRow: i_current byExtendingSelection: NO];
-    [o_table_view scrollRowToVisible: i_current];
+        [o_table_view selectRow: i_start byExtendingSelection: NO];
+        [o_table_view scrollRowToVisible: i_start];
     }
     vlc_object_release( p_playlist );
 }
