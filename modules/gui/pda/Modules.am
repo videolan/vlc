@@ -1,16 +1,12 @@
 SOURCES_pda = \
 	pda.c \
 	pda.h \
-	interface.c \
-	interface.h \
-	support.c \
-	support.h \
-	callbacks.c \
-	callbacks.h \
-	network.c \
-	network.h \
-	playlist.c \
-	playlist.h \
+	pda_interface.c \
+	pda_interface.h \
+	pda_support.c \
+	pda_support.h \
+	pda_callbacks.c \
+	pda_callbacks.h \
 	$(NULL)
 
 EXTRA_DIST += pda.glade \

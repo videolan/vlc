@@ -2,7 +2,7 @@
  * pda.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: pda.h,v 1.1 2003/07/23 22:02:56 jpsaman Exp $
+ * $Id: pda.h,v 1.2 2003/10/01 20:58:45 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -29,16 +29,16 @@
 struct intf_sys_t
 {
     /* The gtk_main module */
-    module_t *          p_gtk_main;
+    module_t           *p_gtk_main;
 
     /* windows and widgets */
-    GtkWidget   *       p_window;                             /* main window */
-    GtkEntry    *       p_mrlentry;
-    GtkNotebook *       p_notebook;
-    GtkNotebook *       p_mediabook;
-    GtkHScale   *       p_slider;
-    GtkCList    *       p_clist;
-    GtkCList    *       p_clistplaylist;
+    GtkWidget          *p_window;                             /* main window */
+    GtkEntry           *p_mrlentry;
+    GtkNotebook        *p_notebook;
+    GtkNotebook        *p_mediabook;
+    GtkHScale          *p_slider;
+    GtkTreeView        *p_tvfile;
+    GtkTreeView        *p_tvplaylist;
 
     /* slider */
     GtkLabel *          p_slider_label;

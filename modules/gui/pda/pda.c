@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.2 2003/07/27 21:35:51 jpsaman Exp $
+ * $Id: pda.c,v 1.3 2003/10/01 20:58:45 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -39,9 +39,9 @@
 #include <gpe/init.h>
 #endif
 
-#include "callbacks.h"
-#include "interface.h"
-#include "support.h"
+#include "pda_callbacks.h"
+#include "pda_interface.h"
+#include "pda_support.h"
 #include "pda.h"
 
 /*****************************************************************************
@@ -68,7 +68,7 @@ gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
  *****************************************************************************/
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
-    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, VLC_TRUE );
+//    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, VLC_TRUE );
     set_description( _("PDA Linux Gtk2+ interface") );
     set_capability( "interface", 70 );
     set_callbacks( Open, Close );
@@ -90,7 +90,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-#ifdef NEED_GTK_MAIN
+#ifdef NEED_GTK2_MAIN
     msg_Dbg( p_intf, "Using gui-helper" );
     p_intf->p_sys->p_gtk_main = module_Need( p_this, "gui-helper", "gtk2" );
     if( p_intf->p_sys->p_gtk_main == NULL )
@@ -124,7 +124,7 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_intf->p_sys->p_input );
     }
 
-#ifdef NEED_GTK_MAIN
+#ifdef NEED_GTK2_MAIN
     msg_Dbg( p_intf, "Releasing gui-helper" );
     module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
 #endif
@@ -141,7 +141,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-#ifndef NEED_GTK_MAIN
+#ifndef NEED_GTK2_MAIN
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
     char  *p_args[] = { "", NULL };
@@ -149,6 +149,8 @@ static void Run( intf_thread_t *p_intf )
     int    i_args   = 1;
     int    i_dummy;
 #endif
+    GtkListStore *filelist = NULL;
+    GtkListStore *playlist = NULL;
 
 #ifdef HAVE_GPE_INIT_H
     /* Initialize GPE interface */
@@ -157,7 +159,7 @@ static void Run( intf_thread_t *p_intf )
         exit (1);
 #else
     gtk_set_locale ();
-#   ifndef NEED_GTK_MAIN
+#   ifndef NEED_GTK2_MAIN
     msg_Dbg( p_intf, "Starting pda GTK2+ interface" );
     gtk_init( &i_args, &pp_args );
 #   else
@@ -183,8 +185,13 @@ static void Run( intf_thread_t *p_intf )
     {
         msg_Err( p_intf, "unable to create pda interface" );
     }
-    gtk_widget_set_usize(p_intf->p_sys->p_window, 
-                        gdk_screen_width() , gdk_screen_height() - 30 );
+
+#if 0
+    msg_Dbg( p_intf, "setting main window size ... " );
+    gtk_widget_set_usize(p_intf->p_sys->p_window,
+                         gdk_screen_width() , gdk_screen_height() - 30 );
+    msg_Dbg( p_intf, "setting main window size ... done" );
+#endif
 
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -201,7 +208,9 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_slider_label = GTK_LABEL( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "slider_label" ) );
 
+#if 0
     /* Connect the date display to the slider */
+    msg_Dbg( p_intf, "setting slider adjustment ... " );
 #define P_SLIDER GTK_RANGE( gtk_object_get_data( \
                          GTK_OBJECT( p_intf->p_sys->p_window ), "slider" ) )
     p_intf->p_sys->p_adj = gtk_range_get_adjustment( P_SLIDER );
@@ -211,36 +220,62 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->f_adj_oldvalue = 0;
     p_intf->p_sys->i_adj_oldvalue = 0;
 #undef P_SLIDER
+    msg_Dbg( p_intf, "setting slider adjustment ... done" );
+#endif
 
-    p_intf->p_sys->p_clist = GTK_CLIST( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "clistmedia" ) );
-    gtk_clist_set_column_visibility (GTK_CLIST (p_intf->p_sys->p_clist), 2, FALSE);
-    gtk_clist_set_column_visibility (GTK_CLIST (p_intf->p_sys->p_clist), 3, FALSE);
-    gtk_clist_set_column_visibility (GTK_CLIST (p_intf->p_sys->p_clist), 4, FALSE);
-    gtk_clist_column_titles_show (GTK_CLIST (p_intf->p_sys->p_clist));
+    msg_Dbg(p_intf, "Getting GtkTreeView FileList" );
+    p_intf->p_sys->p_tvfile = NULL;
+    p_intf->p_sys->p_tvfile = (GtkTreeView *) lookup_widget( p_intf->p_sys->p_window,
+                                                             "tvFileList");
+    if (NULL == p_intf->p_sys->p_tvfile)
+       msg_Err(p_intf, "Error obtaining pointer to File List");
 
     /* the playlist object */
-    p_intf->p_sys->p_clistplaylist = GTK_CLIST( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "clistplaylist" ) );
-    
+    msg_Dbg(p_intf, "Getting GtkTreeView PlayList" );
+    p_intf->p_sys->p_tvplaylist = NULL;
+    p_intf->p_sys->p_tvplaylist = (GtkTreeView *) lookup_widget( p_intf->p_sys->p_window,
+                                                             "tvPlaylist");   
+    if (NULL == p_intf->p_sys->p_tvplaylist)
+       msg_Err(p_intf, "Error obtaining pointer to Play List");
+
     p_intf->p_sys->p_mrlentry = GTK_ENTRY( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "mrl_entry" ) );
 
+#if 0
     /* Store p_intf to keep an eye on it */
+    msg_Dbg( p_intf, "trying to store p_intf pointer ... " );
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
                          "p_intf", p_intf );
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_adj),
                          "p_intf", p_intf );
+    msg_Dbg( p_intf, "trying to store p_intf pointer ... done" );
+#endif
     
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
-    ReadDirectory(p_intf->p_sys->p_clist, ".");
+
+    /* Get new directory listing */
+    msg_Dbg(p_intf, "Populating GtkTreeView FileList" );
+    filelist = gtk_list_store_new (5,
+                               G_TYPE_STRING, /* Filename */
+                               G_TYPE_STRING, /* permissions */
+                               G_TYPE_STRING, /* File size */
+                               G_TYPE_STRING, /* Owner */
+                               G_TYPE_STRING);/* Group */
+    ReadDirectory(p_intf, filelist, ".");
+    msg_Dbg(p_intf, "Showing GtkTreeView FileList" );
+    gtk_tree_view_set_model(p_intf->p_sys->p_tvfile, (GtkTreeModel*) filelist);
 
     /* update the playlist */
-    PDARebuildCList( p_intf->p_sys->p_clistplaylist, 
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ));
-    
-#ifdef NEED_GTK_MAIN
+    msg_Dbg(p_intf, "Populating GtkTreeView Playlist" );
+    playlist = gtk_list_store_new (2,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING);
+    PlaylistRebuildListStore( playlist, vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ));
+    msg_Dbg(p_intf, "Showing GtkTreeView Playlist" );
+    gtk_tree_view_set_model(p_intf->p_sys->p_tvplaylist, (GtkTreeModel*) playlist);
+
+#ifdef NEED_GTK2_MAIN
     msg_Dbg( p_intf, "Manage GTK keyboard events using threads" );
     while( !p_intf->b_die )
     {
@@ -271,7 +306,7 @@ static void Run( intf_thread_t *p_intf )
 #endif
 
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
-#ifdef NEED_GTK_MAIN
+#ifdef NEED_GTK2_MAIN
     gdk_threads_leave();
 #endif
 }
@@ -323,6 +358,7 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
  *****************************************************************************/
 static int Manage( intf_thread_t *p_intf )
 {
+    GtkListStore *p_liststore;
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* Update the input */
@@ -357,8 +393,13 @@ static int Manage( intf_thread_t *p_intf )
                         p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
                 if (p_playlist != NULL)
                 {
-                    PDARebuildCList( p_intf->p_sys->p_clistplaylist, 
-                                          p_playlist );
+                    msg_Dbg(p_intf, "Manage: Populating GtkTreeView Playlist" );
+                    p_liststore = gtk_list_store_new (2,
+                                               G_TYPE_STRING,
+                                               G_TYPE_STRING);
+                    PlaylistRebuildListStore(p_liststore, p_playlist);
+                    msg_Dbg(p_intf, "Manage: Updating GtkTreeView Playlist" );
+                    gtk_tree_view_set_model(p_intf->p_sys->p_tvplaylist, (GtkTreeModel*) p_liststore);
                 }
             }
 
@@ -444,7 +485,7 @@ static int Manage( intf_thread_t *p_intf )
         p_intf->p_sys->b_playing = 0;
     }
 
-#ifndef NEED_GTK_MAIN
+#ifndef NEED_GTK2_MAIN
     if( p_intf->b_die )
     {
         vlc_mutex_unlock( &p_intf->change_lock );
@@ -530,9 +571,9 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
     }
 
     /* set control items */
-    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_rewind"), b_control );
-    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_pause"), b_control );
-    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_forward"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "tbRewind"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "tbPause"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "tbForward"), b_control );
 
 #undef GETWIDGET
     return TRUE;
