@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.2 2002/03/02 03:53:55 xav Exp $
+ * $Id: input_ext-plugins.c,v 1.3 2002/03/26 23:08:40 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,7 +25,11 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <sys/time.h>
+
+#ifdef HAVE_SYS_TIME_H
+#    include <sys/time.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>

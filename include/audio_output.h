@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.44 2002/03/04 22:18:25 gbazin Exp $
+ * $Id: audio_output.h,v 1.45 2002/03/26 23:08:40 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -86,7 +86,7 @@ typedef struct aout_fifo_s
     vlc_mutex_t         data_lock;
     vlc_cond_t          data_wait;
 
-    void *              buffer;
+    u8 *                buffer;
     mtime_t *           date;
 
     /* The start frame is the first frame in the buffer that contains decoded

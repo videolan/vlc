@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.10 2002/02/15 13:32:53 sam Exp $
+ * $Id: rc.c,v 1.11 2002/03/26 23:08:40 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -24,17 +24,23 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <videolan/vlc.h>
+
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>
 #include <ctype.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <sys/types.h>
 
-#include <videolan/vlc.h>
+#ifdef HAVE_UNISTD_H
+#    include <unistd.h>
+#endif
+
+#ifdef HAVE_SYS_TIME_H
+#    include <sys/time.h>
+#endif
+#include <sys/types.h>
 
 #if defined( WIN32 )
 #include <winsock2.h>                                            /* select() */

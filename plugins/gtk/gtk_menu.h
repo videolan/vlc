@@ -2,7 +2,7 @@
  * gtk_menu.h: prototypes for menu functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_menu.h,v 1.5 2001/11/11 18:15:42 sam Exp $
+ * $Id: gtk_menu.h,v 1.6 2002/03/26 23:08:40 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -36,6 +36,6 @@ gint GtkSetupMenus( struct intf_thread_s * );
  *****************************************************************************/
 #define DATA2TITLE( user_data )    ( (gint)((long)(user_data)) >> 16 )
 #define DATA2CHAPTER( user_data )  ( (gint)((long)(user_data)) & 0xffff )
-#define POS2DATA( title, chapter ) ( NULL + ( ((title) << 16) \
-                                            | ((chapter) & 0xffff)) )
+#define POS2DATA( title, chapter ) ( 0 + ( ((title) << 16) \
+                                         | ((chapter) & 0xffff)) )
 

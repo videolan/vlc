@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.13 2002/02/24 22:06:50 sam Exp $
+ * $Id: aout_ext-dec.c,v 1.14 2002/03/26 23:08:40 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -139,7 +139,7 @@ aout_fifo_t * aout_CreateFifo( int i_format, int i_channels, int i_rate,
                 return( NULL );
             }
 
-            p_fifo->buffer = (void *)p_fifo->date + sizeof(mtime_t)
+            p_fifo->buffer = (u8 *)p_fifo->date + sizeof(mtime_t)
                                                      * ( AOUT_FIFO_SIZE + 1 );
 
             /* Set the fifo's buffer as empty (the first frame that is to be

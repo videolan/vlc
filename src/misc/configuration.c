@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.10 2002/03/26 22:30:09 gbazin Exp $
+ * $Id: configuration.c,v 1.11 2002/03/26 23:08:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -21,12 +21,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include <videolan/vlc.h>
+
 #include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <string.h>                                              /* strdup() */
-#include <unistd.h>                                              /* getuid() */
 
-#include <videolan/vlc.h>
+#ifdef HAVE_UNISTD_H
+#    include <unistd.h>                                          /* getuid() */
+#endif
 
 #ifdef HAVE_GETOPT_LONG
 #   ifdef HAVE_GETOPT_H

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.170 2002/03/25 20:37:00 lool Exp $
+ * $Id: main.c,v 1.171 2002/03/26 23:08:40 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -66,8 +66,6 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                  /* getenv(), strtol(),  */
 #include <string.h>                                            /* strerror() */
-#include <fcntl.h>                                       /* open(), O_WRONLY */
-#include <sys/stat.h>                                             /* S_IREAD */
 
 #include "netutils.h"                                 /* network_ChannelJoin */
 

@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.19 2002/03/16 23:03:19 sam Exp $
+ * $Id: vout_dummy.c,v 1.20 2002/03/26 23:08:40 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,6 +46,9 @@
 typedef struct vout_sys_s
 {
     /* Nothing needed here. Maybe stats ? */
+
+    /* Prevent malloc(0) */
+    int i_dummy;
 
 } vout_sys_t;
 

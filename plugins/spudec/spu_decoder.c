@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.13 2002/03/15 18:20:27 sam Exp $
+ * $Id: spu_decoder.c,v 1.14 2002/03/26 23:08:40 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -277,7 +277,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 
     /* Fill the p_spu structure */
     p_spu->pf_render = RenderSPU;
-    p_spu->p_sys->p_data = (void*)p_spu->p_sys
+    p_spu->p_sys->p_data = (u8*)p_spu->p_sys
                             + sizeof( struct subpicture_sys_s );
     p_spu->p_sys->b_palette = 0;
 
