@@ -1,7 +1,7 @@
 /*****************************************************************************
  * asf.c: MMS access plug-in
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
+ * Copyright (C) 2001-2004 VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -59,8 +59,8 @@ void E_( GenerateGuid )( guid_t *p_guid )
     }
 }
 
-void E_( asf_HeaderParse )  ( asf_header_t *hdr,
-                              uint8_t *p_header, int i_header )
+void E_( asf_HeaderParse )( asf_header_t *hdr,
+                            uint8_t *p_header, int i_header )
 {
     var_buffer_t buffer;
     guid_t      guid;
@@ -117,7 +117,6 @@ void E_( asf_HeaderParse )  ( asf_header_t *hdr,
         {
             int     i_stream_id;
             guid_t  stream_type;
-            //msg_Dbg( p_input, "found stream_properties" );
 
             var_buffer_getguid( &buffer, &stream_type );
             var_buffer_getmemory( &buffer, NULL, 32 );
@@ -129,18 +128,15 @@ void E_( asf_HeaderParse )  ( asf_header_t *hdr,
             if( CmpGuid( &stream_type, &asf_object_stream_type_video ) )
             {
                 //fprintf( stderr, "\nvideo stream[%d] found\n", i_stream_id );
-                //msg_Dbg( p_input, "video stream[%d] found", i_stream_id );
                 hdr->stream[i_stream_id].i_cat = ASF_STREAM_VIDEO;
             }
             else if( CmpGuid( &stream_type, &asf_object_stream_type_audio ) )
             {
                 //fprintf( stderr, "\naudio stream[%d] found\n", i_stream_id );
-                //msg_Dbg( p_input, "audio stream[%d] found", i_stream_id );
                 hdr->stream[i_stream_id].i_cat = ASF_STREAM_AUDIO;
             }
             else
             {
-//                msg_Dbg( p_input, "unknown stream[%d] found", i_stream_id );
                 hdr->stream[i_stream_id].i_cat = ASF_STREAM_UNKNOWN;
             }
         }
@@ -169,9 +165,7 @@ void E_( asf_HeaderParse )  ( asf_header_t *hdr,
         }
 
         if( var_buffer_readempty( &buffer ) )
-        {
             return;
-        }
     }
 }
 
@@ -209,40 +203,6 @@ void E_( asf_StreamSelect ) ( asf_header_t *hdr,
             hdr->stream[i].i_selected = 0; /* by default, not selected */
         }
     }
-
-#if 0
-    psz_stream = config_GetPsz( p_input, "mms-stream" );
-
-    if( psz_stream && *psz_stream )
-    {
-        char *psz_tmp = psz_stream;
-        while( *psz_tmp )
-        {
-            if( *psz_tmp == ',' )
-            {
-                psz_tmp++;
-            }
-            else
-            {
-                int i_stream;
-                i_stream = atoi( psz_tmp );
-                while( *psz_tmp != '\0' && *psz_tmp != ',' )
-                {
-                    psz_tmp++;
-                }
-
-                if( i_stream > 0 && i_stream < 128 &&
-                    stream[i_stream].i_cat != MMS_STREAM_UNKNOWN )
-                {
-                    stream[i_stream].i_selected = 1;
-                }
-            }
-        }
-        FREE( psz_stream );
-        return;
-    }
-    FREE( psz_stream );
-#endif
 
     /* big test:
      * select a stream if
@@ -319,19 +279,5 @@ void E_( asf_StreamSelect ) ( asf_header_t *hdr,
         }
 
     }
-#if 0
-    if( i_bitrate_max > 0 )
-    {
-        msg_Dbg( p_input,
-                 "requested bitrate:%d real bitrate:%d",
-                 i_bitrate_max, i_bitrate_total );
-    }
-    else
-    {
-        msg_Dbg( p_input,
-                 "total bitrate:%d",
-                 i_bitrate_total );
-    }
-#endif
 }
 

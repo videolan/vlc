@@ -59,6 +59,11 @@ vlc_module_begin();
 
     add_shortcut( "cdda" );
     add_shortcut( "cddasimple" );
+
+    add_shortcut( "mms" );
+    add_shortcut( "mmsh" );
+    add_shortcut( "mmst" );
+    add_shortcut( "mmsu" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -191,7 +196,7 @@ static int Access2Open( vlc_object_t * p_this )
     access2_Control( p_access, ACCESS_CAN_CONTROL_PACE, &b_bool );
     p_input->stream.b_pace_control = b_bool;
    /* End of init */
-    access2_Control( p_access, ACCESS_CAN_SEEK, &b_bool );
+    access2_Control( p_access, ACCESS_CAN_FASTSEEK, &b_bool );
     if( b_bool )
         p_input->stream.i_method = INPUT_METHOD_FILE;   /* FIXME */
     else

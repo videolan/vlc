@@ -1,8 +1,8 @@
 /*****************************************************************************
  * buffer.c: MMS access plug-in
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: buffer.c,v 1.3 2002/12/06 13:05:22 sam Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -34,7 +34,6 @@
 /*****************************************************************************
  * Buffer management functions
  *****************************************************************************/
-
 int var_buffer_initwrite( var_buffer_t *p_buf, int i_default_size )
 {
     p_buf->i_size =  ( i_default_size > 0 ) ? i_default_size : 2048;
