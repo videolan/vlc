@@ -2,10 +2,11 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.22 2004/01/15 14:57:00 gbazin Exp $
+ * $Id: ipv4.c,v 1.23 2004/01/31 18:02:32 alexis Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
+ *          Alexis de Lattre <alexis@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -281,7 +282,91 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         }
     }
 
-#if !defined( UNDER_CE ) && !defined( SYS_BEOS )
+#if defined( WIN32 )
+/* Only Win32 has the support for IP_ADD_SOURCE_MEMBERSHIP
+   with the headers that are included */
+
+    /* Join the multicast group if the socket is a multicast address */
+    if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
+    {
+        /* Determine interface to be used for multicast */
+        char * psz_if_addr = config_GetPsz( p_this, "iface-addr" );
+
+        /* If we have a source address, we use IP_ADD_SOURCE_MEMBERSHIP
+           so that IGMPv3 aware OSes running on IGMPv3 aware networks
+           will do an IGMPv3 query on the network */
+        if( *psz_server_addr )
+        {
+            struct ip_mreq_source imr;
+
+            imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
+            imr.imr_sourceaddr.s_addr = inet_addr(psz_server_addr);
+
+            if( psz_if_addr != NULL && *psz_if_addr
+                && inet_addr(psz_if_addr) != INADDR_NONE )
+            {
+                imr.imr_interface.s_addr = inet_addr(psz_if_addr);
+            }
+            else
+            {
+                imr.imr_interface.s_addr = INADDR_ANY;
+            }
+            if( psz_if_addr != NULL ) free( psz_if_addr );
+
+            msg_Dbg( p_this, "IP_ADD_SOURCE_MEMBERSHIP multicast request" );
+            /* Join Multicast group with source filter */
+            if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
+                         (char*)&imr, sizeof(struct ip_mreq_source) ) == -1 )
+            {
+#ifdef HAVE_ERRNO_H
+                msg_Err( p_this, "failed to join IP multicast group (%s)",
+                                  strerror(errno) );
+#else
+                msg_Err( p_this, "failed to join IP multicast group" );
+#endif
+                close( i_handle );
+                return( -1 );
+            }
+         }
+         /* If there is no source address, we use IP_ADD_MEMBERSHIP */
+         else
+         {
+             struct ip_mreq imr;
+
+             imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
+             if( psz_if_addr != NULL && *psz_if_addr
+                && inet_addr(psz_if_addr) != INADDR_NONE )
+            {
+                imr.imr_interface.s_addr = inet_addr(psz_if_addr);
+            }
+            else
+            {
+                imr.imr_interface.s_addr = INADDR_ANY;
+            }
+            if( psz_if_addr != NULL ) free( psz_if_addr );
+
+            msg_Dbg( p_this, "IP_ADD_MEMBERSHIP multicast request" );
+            /* Join Multicast group without source filter */
+            if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                            (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
+            {
+#ifdef HAVE_ERRNO_H
+                msg_Err( p_this, "failed to join IP multicast group (%s)",
+                                  strerror(errno) );
+#else
+                msg_Err( p_this, "failed to join IP multicast group" );
+#endif
+                close( i_handle );
+                return( -1 );
+            }
+         }
+    }
+#endif
+
+#if !defined( UNDER_CE ) && !defined( SYS_BEOS ) && !defined( WIN32 )
+/* This code is for the OSes that have multicast support but
+   don't have IP_ADD_SOURCE_MEMBERSHIP with the headers included */
+
     /* Join the multicast group if the socket is a multicast address */
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
@@ -301,6 +386,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         }
         if( psz_if_addr != NULL ) free( psz_if_addr );
 
+        msg_Dbg( p_this, "IP_ADD_MEMBERSHIP multicast request" );
         /* Join Multicast group */
         if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
@@ -315,7 +401,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             return( -1 );
         }
     }
-#endif /* UNDER_CE, SYS_BEOS */
+#endif
 
     if( *psz_server_addr )
     {
@@ -363,7 +449,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                 return( -1 );
             }
         }
-#endif /* UNDER_CE, SYS_BEOS */
+#endif
     }
 
     p_socket->i_handle = i_handle;

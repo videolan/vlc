@@ -1,10 +1,11 @@
-$Id: NEWS,v 1.80 2004/01/23 11:54:48 rocky Exp $
+$Id: NEWS,v 1.81 2004/01/31 18:02:31 alexis Exp $
 Changes between 0.7.0 and 0.7.1:
 ---------------------------------
 
 Core support:
  * Fixed a nasty bug that causes preferences not to be saved some times.
- * SVCD (Philips OGT) and CVD subtitles 
+ * SVCD (Philips OGT) and CVD subtitles
+ * IGMPv3 support for VLC under Windows XP
 
 Playlist:
  * Internal improvments

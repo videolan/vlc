@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP input module
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: udp.c,v 1.28 2004/01/25 17:31:22 gbazin Exp $
+ * $Id: udp.c,v 1.29 2004/01/31 18:02:32 alexis Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -191,19 +191,6 @@ static int Open( vlc_object_t *p_this )
     if( ( i_bind_port   = strtol( psz_bind_port,   NULL, 10 ) ) == 0 )
     {
         i_bind_port = config_GetInt( p_this, "server-port" );
-    }
-
-    if( *psz_server_addr || i_server_port )
-    {
-        msg_Err( p_input, "this UDP syntax is deprecated; the server argument will be");
-        msg_Err( p_input, "ignored (%s:%d). If you wanted to enter a multicast address",
-                          psz_server_addr, i_server_port);
-        msg_Err( p_input, "or local port, type : %s:@%s:%d",
-                          *p_input->psz_access ? p_input->psz_access : "udp",
-                          psz_server_addr, i_server_port );
-
-        i_server_port = 0;
-        psz_server_addr = "";
     }
 
     msg_Dbg( p_input, "opening server=%s:%d local=%s:%d",
