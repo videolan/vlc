@@ -3,7 +3,7 @@
  * using MAD (MPEG Audio Decoder)
  *****************************************************************************
  * Copyright (C) 2001 by Jean-Paul Saman
- * $Id: mpgatofixed32.c,v 1.9 2004/01/25 18:53:06 gbazin Exp $
+ * $Id: mpgatofixed32.c,v 1.10 2004/02/25 23:28:04 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -111,7 +111,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     struct aout_filter_sys_t * p_sys = p_filter->p_sys;
 
-
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t) * 
                                aout_FormatNbChannels( &p_filter->input );
@@ -138,6 +137,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
         return;
     }
+
     mad_synth_frame( &p_sys->mad_synth, &p_sys->mad_frame );
 
     if ( p_filter->output.i_format == VLC_FOURCC('f','i','3','2') )
@@ -177,21 +177,22 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         unsigned int i_samples = p_pcm->length;
         mad_fixed_t const * p_left = p_pcm->samples[0];
         mad_fixed_t const * p_right = p_pcm->samples[1];
-
-        switch ( p_pcm->channels )
+        float f_temp = (float)FIXED32_ONE;
+        
+	switch ( p_pcm->channels )
         {
         case 2:
             while ( i_samples-- )
             {
-                *p_samples++ = (float)*p_left++ / (float)FIXED32_ONE;
-                *p_samples++ = (float)*p_right++ / (float)FIXED32_ONE;
+                *p_samples++ = (float)*p_left++ / f_temp;
+                *p_samples++ = (float)*p_right++ / f_temp;
             }
             break;
 
         case 1:
             while ( i_samples-- )
             {
-                *p_samples++ = (float)*p_left++ / (float)FIXED32_ONE;
+                *p_samples++ = (float)*p_left++ / f_temp;
             }
             break;
 
