@@ -127,10 +127,73 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>ogm</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>OGM FIle</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>asf</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>ASF File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>wmv</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>WMV File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>sub</string>
+				<string>srt</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Subtitle File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>mp3</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MP3</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>dv</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>DV file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
