@@ -252,7 +252,7 @@ static int ExecuteCommand(vlm_t *vlm, char *command, vlm_message_t **p_message)
     while( *cmd != '\0' )
     {
 
-        if( *cmd == ' ' )
+        if( *cmd == ' ' || *cmd == '\t' )
         {
             cmd++;
         }
@@ -260,6 +260,13 @@ static int ExecuteCommand(vlm_t *vlm, char *command, vlm_message_t **p_message)
         {
             char *p_temp;
             int   i_temp;
+
+            /* support for comments */
+            if( i_command == 0 && *cmd == '#')
+            {
+                message = vlm_MessageNew( "", NULL );
+                goto success;
+            }
 
             p_temp = FindEndCommand( cmd );
 
@@ -273,6 +280,7 @@ static int ExecuteCommand(vlm_t *vlm, char *command, vlm_message_t **p_message)
             p_command[ i_command ][ i_temp ] = '\0';
 
             i_command++;
+
             cmd = p_temp;
         }
     }
