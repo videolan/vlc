@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_window.cpp,v 1.2 2003/05/13 20:36:29 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -58,7 +58,11 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
 {
     // Set handles
     Wnd           = wnd;
-//    gc = gdk_gc_new( gwnd );
+
+    display = p_intf->p_sys->display;
+    int screen = DefaultScreen( display );
+
+    Gc = DefaultGC( display, screen );
 
     Name        = name;
 
@@ -155,15 +159,15 @@ bool X11Window::ProcessOSEvent( Event *evt )
     unsigned int msg = evt->GetMessage();
     unsigned int p1  = evt->GetParam1();
     int          p2  = evt->GetParam2();
-/*
+    
     switch( msg )
     {
-        case GDK_EXPOSE:
+        case Expose:
             RefreshFromImage( 0, 0, Width, Height );
             return true;
  
-        case GDK_MOTION_NOTIFY:
-            if( LButtonDown )
+        case MotionNotify:
+ /*           if( LButtonDown )
                 MouseMove( (int)( (GdkEventButton *)p2 )->x,
                            (int)( (GdkEventButton *)p2 )->y, 1 );
             else if( RButtonDown )
@@ -172,13 +176,13 @@ bool X11Window::ProcessOSEvent( Event *evt )
             else
                 MouseMove( (int)( (GdkEventButton *)p2 )->x,
                            (int)( (GdkEventButton *)p2 )->y, 0 );
-            gdk_window_get_pointer( gWnd, 0, 0, 0 );
+            gdk_window_get_pointer( gWnd, 0, 0, 0 );*/
             return true;
 
 
-        case GDK_BUTTON_PRESS:
+        case ButtonPress:
             // Raise all the windows
-            for( list<SkinWindow *>::const_iterator win = 
+/*            for( list<SkinWindow *>::const_iterator win = 
                     p_intf->p_sys->p_theme->WindowList.begin();
                     win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
@@ -203,11 +207,11 @@ bool X11Window::ProcessOSEvent( Event *evt )
 
                 default:
                     break;
-            }
+            }*/
             return true;
 
-        case GDK_BUTTON_RELEASE:
-            switch( ( (GdkEventButton *)p2 )->button )
+        case ButtonRelease:
+/*            switch( ( (GdkEventButton *)p2 )->button )
             {
                 case 1:
                     // Left button
@@ -225,14 +229,14 @@ bool X11Window::ProcessOSEvent( Event *evt )
 
                 default:
                     break;
-            }
+            }*/
             return true;
 
-        case GDK_LEAVE_NOTIFY:
+        case LeaveNotify:
             OSAPI_PostMessage( this, WINDOW_LEAVE, 0, 0 );
             return true;
 
-        case GDK_2BUTTON_PRESS:
+/*        case GDK_2BUTTON_PRESS:
             MouseDblClick( (int)( (GdkEventButton *)p2 )->x,
                            (int)( (GdkEventButton *)p2 )->y, 1 );
             return true;
@@ -256,10 +260,10 @@ bool X11Window::ProcessOSEvent( Event *evt )
                     break;
             }
             return true;
-
+*/
         default:
             return false;
-    }*/
+    }
 }
 //---------------------------------------------------------------------------
 void X11Window::SetTransparency( int Value )
@@ -283,11 +287,12 @@ void X11Window::RefreshFromImage( int x, int y, int w, int h )
     ReleaseDC( hWnd, DC );
 
 */ 
-/*    GdkDrawable *drawable = (( X11Graphics* )Image )->GetImage();
-    GdkImage *image = gdk_drawable_get_image( drawable, 0, 0, Width, Height );
+    Drawable drawable = (( X11Graphics* )Image )->GetImage();
     
-    gdk_draw_drawable( gWnd, gc, drawable, x, y, x, y, w, h );
-
+    fprintf(stderr, "prout\n");
+    XCopyArea( display, drawable, Wnd, Gc, x, y, w, h, x, y );
+    XSync( display, 0);
+/*
     // Mask for transparency
     GdkRegion *region = gdk_region_new();
     for( int line = 0; line < Height; line++ )

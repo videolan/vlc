@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.2 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: x11_run.cpp,v 1.3 2003/05/13 20:36:29 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -49,12 +49,6 @@
 // include the icon graphic
 #include "share/vlc32x32.xpm"
 
-//---------------------------------------------------------------------------
-class CallBackObjects
-{
-    public:
-        VlcProc *Proc;
-};
 
 //---------------------------------------------------------------------------
 // Specific method
@@ -70,14 +64,13 @@ class Instance: public wxApp
 {
 public:
     Instance();
-    Instance( intf_thread_t *_p_intf, CallBackObjects *callback );
+    Instance( intf_thread_t *_p_intf );
 
     bool OnInit();
     OpenDialog *open;
 
 private:
     intf_thread_t *p_intf;
-    CallBackObjects *callbackobj;
 };
 
 
@@ -211,11 +204,10 @@ Instance::Instance( )
 {
 }
 
-Instance::Instance( intf_thread_t *_p_intf, CallBackObjects *callback )
+Instance::Instance( intf_thread_t *_p_intf )
 {
     // Initialization
     p_intf = _p_intf;
-    callbackobj = callback;
 }
 
 IMPLEMENT_APP_NO_MAIN(Instance)
@@ -241,18 +233,121 @@ bool Instance::OnInit()
 
 
 //---------------------------------------------------------------------------
-// GTK2 interface
+// X11 event processing
+//---------------------------------------------------------------------------
+void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
+{
+    // Variables
+    list<SkinWindow *>::const_iterator win;
+    unsigned int msg;
+    Event *evt;
+
+    Window wnd = ((XAnyEvent *)event)->window;
+    
+    fprintf(stderr,"event %d %x\n", event->type, wnd);
+
+    // Create event to dispatch in windows
+    // Skin event
+    if( event->type == ClientMessage )
+    {
+/*        msg = ( (GdkEventClient *)event )->data.l[0];
+        evt = (Event *)new OSEvent( p_intf, 
+            ((GdkEventAny *)event)->window,
+            msg,
+            ( (GdkEventClient *)event )->data.l[1],
+            ( (GdkEventClient *)event )->data.l[2] );*/
+    }
+    // System event
+    else
+    {
+        msg = event->type;
+        evt = (Event *)new OSEvent( p_intf,
+            ((XAnyEvent *)event)->window, msg, 0, (long)event );
+    }
+
+    // Process keyboard shortcuts
+    if( msg == KeyPress )
+    {
+/*        int KeyModifier = 0;
+        // If key is ALT
+        if( ((GdkEventKey *)event)->state & GDK_MOD1_MASK )
+        {
+            KeyModifier = 1;
+        }
+        // If key is CTRL
+        else if( ((GdkEventKey *)event)->state & GDK_CONTROL_MASK )
+        {
+            KeyModifier = 2;
+        }
+        int key = ((GdkEventKey *)event)->keyval;
+        // Translate into lower case
+        if( key >= 'a' && key <= 'z' )
+        {
+            key -= ('a' - 'A');
+        }
+        if( KeyModifier > 0 )
+            p_intf->p_sys->p_theme->EvtBank->TestShortcut( key , KeyModifier );*/
+    }
+
+    // Send event
+    else if( IsVLCEvent( msg ) )
+    {
+        if( !proc->EventProc( evt ) )
+        {
+//            wxExit();
+            return;      // Exit VLC !
+        }
+    }
+    else if( wnd == NULL )
+    {
+        for( win = p_intf->p_sys->p_theme->WindowList.begin();
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+        {
+            (*win)->ProcessEvent( evt );
+        }
+    }
+    else
+    {
+        // Find window matching with gwnd
+        for( win = p_intf->p_sys->p_theme->WindowList.begin();
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+        {
+            // If it is the correct window
+            if( wnd == ( (X11Window *)(*win) )->GetHandle() )
+            {
+                // Send event and check if processed
+                if( (*win)->ProcessEvent( evt ) )
+                {
+                    delete (OSEvent *)evt;
+                    return;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    evt->DestructParameters();
+    delete (OSEvent *)evt;
+
+// Check if vlc is closing
+    proc->IsClosing();
+
+}
+
+
+//---------------------------------------------------------------------------
+// X11 interface
 //---------------------------------------------------------------------------
 void OSRun( intf_thread_t *p_intf )
 {
     static char  *p_args[] = { "" };
 
-    // Create VLC event object processing
-    CallBackObjects *callbackobj = new CallBackObjects();
-    callbackobj->Proc = new VlcProc( p_intf );
-
+    VlcProc *proc = new VlcProc( p_intf );
+    
 /*    wxTheApp = new Instance( p_intf, callbackobj );
-
     wxEntry( 1, p_args );*/
 
     Display *display = ((OSTheme *)p_intf->p_sys->p_theme)->GetDisplay();
@@ -262,10 +357,10 @@ void OSRun( intf_thread_t *p_intf )
     {
         XEvent *event;
         XNextEvent( display, event );
-        fprintf(stderr,"event %d\n", event->type);
+        
+        ProcessEvent( p_intf, proc, event );
     }
     
-    delete callbackobj;
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )

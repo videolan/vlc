@@ -2,7 +2,7 @@
  * x11_window.h: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.h,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_window.h,v 1.2 2003/05/13 20:36:29 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -39,7 +39,8 @@ class X11Window : public SkinWindow
     private:
         // General parameters
         Window Wnd;
-//        GdkGC *gc;
+        Display *display;
+        GC Gc;
         int CursorX;
         int CursorY;
         int WindowX;
@@ -80,7 +81,7 @@ class X11Window : public SkinWindow
         virtual void Move( int left, int top );
         virtual void Size( int width, int height );
 
-        // Specific gtk2 methods
+        // Specific X11 methods
         Window GetHandle() { return Wnd; };
 
         // Tooltip texts
