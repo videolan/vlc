@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.17 2003/03/11 18:57:50 fenrir Exp $
+ * $Id: libmp4.c,v 1.18 2003/03/13 16:09:20 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -2112,7 +2112,13 @@ static struct
     { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_3IV1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_3iv1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_3IV2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_3iv2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_3IVD,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_3ivd,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_3VID,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_3vid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mjpa,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mjpb,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mjqt,  NULL,                       NULL }, /* found in mjpa/b */

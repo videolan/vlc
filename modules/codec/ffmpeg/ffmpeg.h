@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.13 2003/03/11 06:58:06 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.14 2003/03/13 16:09:20 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -108,9 +108,21 @@ int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 /* AngelPotion stuff */
 #define FOURCC_AP41         VLC_FOURCC('A','P','4','1')
 
-/* ?? */
+/* 3ivx doctered divx files */
+#define FOURCC_3IVD         VLC_FOURCC('3','I','V','D')
+#define FOURCC_3ivd         VLC_FOURCC('3','i','v','d')
+
+/* 3ivx delta 3.5 Unsupported */ 
 #define FOURCC_3IV1         VLC_FOURCC('3','I','V','1')
+#define FOURCC_3iv1         VLC_FOURCC('3','i','v','1')
+
+/* 3ivx delta 4 */
 #define FOURCC_3IV2         VLC_FOURCC('3','I','V','2')
+#define FOURCC_3iv2         VLC_FOURCC('3','i','v','2')
+
+/* who knows? */
+#define FOURCC_3VID         VLC_FOURCC('3','V','I','D')
+#define FOURCC_3vid         VLC_FOURCC('3','v','i','d')
 
 /* H263 and H263i */        
 #define FOURCC_H263         VLC_FOURCC('H','2','6','3')

@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.39 2003/03/03 23:48:41 massiot Exp $
+ * $Id: avi.c,v 1.40 2003/03/13 16:09:20 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -262,6 +262,11 @@ vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t i_codec )
                 case FOURCC_div6:
                 case FOURCC_AP41:
                 case FOURCC_3IV1:
+                case FOURCC_3iv1:
+                case FOURCC_3IVD:
+                case FOURCC_3ivd:
+                case FOURCC_3VID:
+                case FOURCC_3vid:
                     return FOURCC_DIV3;
                 case FOURCC_DIVX:
                 case FOURCC_divx:
@@ -275,6 +280,8 @@ vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t i_codec )
                 case FOURCC_DX50:
                 case FOURCC_mp4v:
                 case FOURCC_4:
+                case FOURCC_3IV2:
+                case FOURCC_3iv2:
                     return FOURCC_mp4v;
             }
         default:

@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.67 2003/03/06 12:05:05 hartman Exp $
+ * $Id: intf.m,v 1.68 2003/03/13 16:09:21 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -813,7 +813,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
             [o_msg_lock lock];
 
-            if( [o_msg_arr count] + 2 > 200 )
+            if( [o_msg_arr count] + 2 > 400 )
             {
                 unsigned rid[] = { 0, 1 };
                 [o_msg_arr removeObjectsFromIndices: (unsigned *)&rid

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.26 2003/03/11 05:52:37 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.27 2003/03/13 16:09:20 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -432,7 +432,10 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_DIV6:
         case FOURCC_div6:
         case FOURCC_AP41:
-        case FOURCC_3IV1:
+        case FOURCC_3VID:
+	case FOURCC_3vid:
+        case FOURCC_3IVD:
+        case FOURCC_3ivd:
             i_cat = VIDEO_ES;
 #if LIBAVCODEC_BUILD >= 4608
             i_codec = CODEC_ID_MSMPEG4V3;
@@ -462,7 +465,13 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_DX50:
         case FOURCC_mp4v:
         case FOURCC_4:
+	/* 3iv1 is unsupported by ffmpeg
+           putting it here gives extreme distorted images
+	case FOURCC_3IV1:
+	case FOURCC_3iv1:
+        */
         case FOURCC_3IV2:
+        case FOURCC_3iv2:
             i_cat = VIDEO_ES;
             i_codec = CODEC_ID_MPEG4;
             psz_name = "MPEG-4";

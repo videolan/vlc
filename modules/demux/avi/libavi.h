@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library 
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.7 2003/01/25 16:58:34 fenrir Exp $
+ * $Id: libavi.h,v 1.8 2003/03/13 16:09:20 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -139,8 +139,16 @@
     /* AngelPotion stuff */
 #define FOURCC_AP41         VLC_FOURCC('A','P','4','1')
 
-    /* ?? */
+    /* 3IVX */
 #define FOURCC_3IV1         VLC_FOURCC('3','I','V','1')
+#define FOURCC_3iv1         VLC_FOURCC('2','i','v','1')
+#define FOURCC_3IV2         VLC_FOURCC('3','I','V','2')
+#define FOURCC_3iv2         VLC_FOURCC('3','i','v','2')
+#define FOURCC_3IVD         VLC_FOURCC('3','I','V','D')
+#define FOURCC_3ivd         VLC_FOURCC('3','i','v','d')
+#define FOURCC_3VID         VLC_FOURCC('3','V','I','D')
+#define FOURCC_3vid         VLC_FOURCC('3','v','i','d')
+
     /* H263 and H263i */
 #define FOURCC_H263         VLC_FOURCC('H','2','6','3')
 #define FOURCC_h263         VLC_FOURCC('h','2','6','3')
