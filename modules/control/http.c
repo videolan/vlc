@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.15 2003/07/14 16:10:20 gbazin Exp $
+ * $Id: http.c,v 1.16 2003/07/21 23:53:55 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -25,6 +25,14 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+/*
+ * TODO:
+ *
+ * - clean up ?
+ * - doc ! (mouarf ;)
+ *
+ */
+
 #include <stdlib.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
@@ -1236,6 +1244,8 @@ enum macroType
         MVLC_NEXT,
         MVLC_PREVIOUS,
         MVLC_ADD,
+        MVLC_DEL,
+        MVLC_EMPTY,
 
         MVLC_CLOSE,
         MVLC_SHUTDOWN,
@@ -1266,8 +1276,12 @@ StrToMacroTypeTab [] =
         { "stop",           MVLC_STOP },
         { "pause",          MVLC_PAUSE },
         { "next",           MVLC_NEXT },
-        { "prevous",        MVLC_PREVIOUS },
+        { "previous",       MVLC_PREVIOUS },
+
+        /* playlist management */
         { "add",            MVLC_ADD },
+        { "del",            MVLC_DEL },
+        { "empty",          MVLC_EMPTY },
 
         /* admin control */
         { "close",          MVLC_CLOSE },
@@ -1378,6 +1392,8 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                                       p_sys->p_playlist->i_index - 1 );
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
+
+                /* playlist management */
                 case MVLC_ADD:
                 {
                     char mrl[512];
@@ -1388,6 +1404,28 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                     msg_Dbg( p_intf, "requested playlist add: %s", mrl );
                     break;
                 }
+                case MVLC_DEL:
+                {
+                    int i_item;
+                    char item[512];
+
+                    uri_extract_value( p_request, "item", item, 512 );
+                    i_item = atoi( item );
+
+                    playlist_Delete( p_sys->p_playlist, i_item );
+                    msg_Dbg( p_intf, "requested playlist del: %d", i_item );
+                    break;
+                }
+                case MVLC_EMPTY:
+                {
+                    while( p_sys->p_playlist->i_size > 0 )
+                    {
+                        playlist_Delete( p_sys->p_playlist, 0 );
+                    }
+                    msg_Dbg( p_intf, "requested playlist empty" );
+                    break;
+                }
+
                 /* admin function */
                 case MVLC_CLOSE:
                 {
