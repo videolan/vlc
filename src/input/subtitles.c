@@ -145,7 +145,11 @@ static int compare_sub_priority( const void *a, const void *b )
         return 1;
     }
 
+#ifndef UNDER_CE
     return strcoll(((subfn*)a)->psz_fname, ((subfn*)b)->psz_fname);
+#else
+    return strcmp(((subfn*)a)->psz_fname, ((subfn*)b)->psz_fname);
+#endif
 }
 
 /**
