@@ -2,7 +2,7 @@
  * i420_yuy2.h : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.h,v 1.2 2002/04/23 13:47:30 sam Exp $
+ * $Id: i420_yuy2.h,v 1.3 2002/04/30 20:19:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,20 +28,11 @@
 UNUSED_LONGLONG(woo_00ffw) = 0x00ff00ff00ff00ff;
 UNUSED_LONGLONG(woo_80w)   = 0x0000000080808080;
 
-#define MMX_CALL(foo)                                               \
-    __asm__ __volatile__(                                           \
-        MMX_LOAD                                                    \
-        ".align 8 \n\t"                                             \
-        foo                                                         \
-        MMX_INC                                                     \
-        ".align 8 \n\t"                                             \
-        foo                                                         \
-        MMX_INC                                                     \
-        MMX_SAVE                                                    \
-        : "=c" (p_line1), "=d" (p_line2), "=D" (p_y1), "=S" (p_y2)  \
-        :  "c" (p_line1),  "d" (p_line2),  "D" (p_y1),  "S" (p_y2), \
-          "m" (p_u), "m" (p_v)                                      \
-        : "eax" );
+#ifdef SYS_BEOS
+#   define MMX_CONSTRAINTS "memory"
+#else
+#   define MMX_CONSTRAINTS "eax"
+#endif
 
 #define MMX_LOAD "                                                        \n\
 pushl     %%ebx                                                           \n\
@@ -63,6 +54,21 @@ addl         $4, %3                                                       \n\
 addl         $2, %%eax                                                    \n\
 addl         $2, %%ebx                                                    \n\
 "
+
+#define MMX_CALL(MMX_INSTRUCTION)                                   \
+    __asm__ __volatile__(                                           \
+        MMX_LOAD                                                    \
+        ".align 8 \n\t"                                             \
+        MMX_INSTRUCTIONS                                            \
+        MMX_INC                                                     \
+        ".align 8 \n\t"                                             \
+        MMX_INSTRUCTIONS                                            \
+        MMX_INC                                                     \
+        MMX_SAVE                                                    \
+        : "=c" (p_line1), "=d" (p_line2), "=D" (p_y1), "=S" (p_y2)  \
+        :  "c" (p_line1),  "d" (p_line2),  "D" (p_y1),  "S" (p_y2), \
+          "m" (p_u), "m" (p_v)                                      \
+        : MMX_CONSTRAINTS );
 
 #define MMX_YUV420_YUYV "                                                 \n\
 movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
