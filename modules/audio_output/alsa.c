@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.6 2002/08/19 23:07:30 sam Exp $
+ * $Id: alsa.c,v 1.7 2002/08/24 10:19:42 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -473,7 +473,7 @@ static void ALSAFill( aout_instance_t * p_aout )
             snd_pcm_status_get_tstamp( p_status, &ts_next );
             next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
 
-            p_buffer = aout_OutputNextBuffer( p_aout, next_date,
+            p_buffer = aout_OutputNextBuffer( p_aout, next_date, 0,
                                               p_sys->b_can_sleek );
 
             /* Audio output buffer shortage -> stop the fill process and

@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.8 2002/08/19 23:07:30 sam Exp $
+ * $Id: esd.c,v 1.9 2002/08/24 10:19:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -149,12 +149,10 @@ static int SetFormat( aout_instance_t *p_aout )
         (mtime_t)( esd_get_latency( esd_open_sound(NULL) ) + ESD_BUF_SIZE/2
                     * p_aout->output.output.i_bytes_per_frame
                     * p_aout->output.output.i_rate
-                    / p_aout->output.output.i_frame_length
                     / ESD_DEFAULT_RATE )
       * (mtime_t)1000000
       / p_aout->output.output.i_bytes_per_frame
-      / p_aout->output.output.i_rate
-      * p_aout->output.output.i_frame_length;
+      / p_aout->output.output.i_rate;
 
     p_sys->b_initialized = VLC_TRUE;
 
@@ -204,7 +202,8 @@ static int ESDThread( aout_instance_t * p_aout )
 
         /* Get the presentation date of the next write() operation. It
          * is equal to the current date + buffered samples + esd latency */
-        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency, 0 );
+        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency,
+                                                  0, VLC_FALSE );
 
         if ( p_buffer != NULL )
         {

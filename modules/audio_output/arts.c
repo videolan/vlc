@@ -205,7 +205,8 @@ static int aRtsThread( aout_instance_t * p_aout )
 
         /* Get the presentation date of the next write() operation. It
          * is equal to the current date + latency */
-        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency, 0 );
+        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency,
+                                                  0, VLC_FALSE );
 
         if ( p_buffer != NULL )
         {

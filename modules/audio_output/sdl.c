@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.4 2002/08/21 22:41:59 massiot Exp $
+ * $Id: sdl.c,v 1.5 2002/08/24 10:19:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -149,8 +149,16 @@ static void Close ( vlc_object_t *p_this )
 static void SDLCallback( void * _p_aout, byte_t * p_stream, int i_len )
 {
     aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
+//static mtime_t old = 0;
+//static mtime_t diff = 0;
+//mtime_t foo = mdate();
+    aout_buffer_t * p_buffer;
+//if(old) diff = (9 * diff + (foo-old))/10;
     /* FIXME : take into account SDL latency instead of mdate() */
-    aout_buffer_t * p_buffer = aout_OutputNextBuffer( p_aout, mdate(), 1 );
+    p_buffer = aout_OutputNextBuffer( p_aout, mdate(), 0, VLC_TRUE );
+    //p_buffer = aout_OutputNextBuffer( p_aout, foo - diff, 0, VLC_TRUE );
+//fprintf(stderr, "foo - old : %lli, diff : %lli\n", foo-old, diff);
+//old=foo;
 
     if ( i_len != FRAME_SIZE * sizeof(s16)
                     * p_aout->output.output.i_channels )
@@ -160,11 +168,14 @@ static void SDLCallback( void * _p_aout, byte_t * p_stream, int i_len )
 
     if ( p_buffer != NULL )
     {
+//fprintf(stderr, "got buffer %lli\n", p_buffer->end_date - p_buffer->start_date);
+
         p_aout->p_vlc->pf_memcpy( p_stream, p_buffer->p_buffer, i_len );
         aout_BufferFree( p_buffer );
     }
     else
     {
+//fprintf(stderr, "NO BUFFER !\n");
         p_aout->p_vlc->pf_memset( p_stream, 0, i_len );
     }
 }

@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.14 2002/08/24 01:14:29 sigmunau Exp $
+ * $Id: oss.c,v 1.15 2002/08/24 10:19:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,7 +65,7 @@ struct aout_sys_t
     volatile vlc_bool_t   b_initialized;
 };
 
-#define FRAME_SIZE 2048
+#define FRAME_SIZE 1024
 #define A52_FRAME_NB 1536
 
 /*****************************************************************************
@@ -86,6 +86,7 @@ vlc_module_begin();
     add_file( "dspdev", "/dev/dsp", NULL, N_("OSS dsp device"), NULL );
     set_description( _("Linux OSS /dev/dsp module") );
     set_capability( "audio output", 100 );
+    add_shortcut( "dsp" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -258,7 +259,9 @@ static void Close( vlc_object_t * p_this )
     p_aout->b_die = 1;
     vlc_thread_join( p_aout );
 
+    ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL );
     close( p_sys->i_fd );
+
     free( p_sys );
 }
 
@@ -305,22 +308,20 @@ static int OSSThread( aout_instance_t * p_aout )
 
         if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
         {
-            mtime_t next_date = 0;
-            /* Get the presentation date of the next write() operation. It
-             * is equal to the current date + duration of buffered samples.
-             * Order is important here, since GetBufInfo is believed to take
-             * more time than mdate(). */
-            next_date = (mtime_t)GetBufInfo( p_aout ) * 100000
-                      / p_aout->output.output.i_bytes_per_frame
-                      / p_aout->output.output.i_rate
-                      * p_aout->output.output.i_frame_length;
-            next_date += mdate();
+            mtime_t buffered = (mtime_t)GetBufInfo( p_aout ) * 1000000
+                                / p_aout->output.output.i_bytes_per_frame
+                                / p_aout->output.output.i_rate
+                                * p_aout->output.output.i_frame_length;
 
-            p_buffer = aout_OutputNextBuffer( p_aout, next_date, VLC_FALSE );
+            /* Next buffer will be played at mdate()+buffered, and we tell
+             * the audio output that it can wait for a new packet for
+             * buffered/2 microseconds. */
+            p_buffer = aout_OutputNextBuffer( p_aout, mdate() + buffered,
+                                              buffered / 2, VLC_FALSE );
         }
         else
         {
-            p_buffer = aout_OutputNextBuffer( p_aout, 0, VLC_TRUE );
+            p_buffer = aout_OutputNextBuffer( p_aout, 0, 0, VLC_TRUE );
         }
 
         if ( p_buffer != NULL )

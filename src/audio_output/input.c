@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.7 2002/08/21 22:41:59 massiot Exp $
+ * $Id: input.c,v 1.8 2002/08/24 10:19:43 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -229,7 +229,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         /* The decoder is _very_ late. This can only happen if the user
          * pauses the stream (or if the decoder is buggy, which cannot
          * happen :). */
-        msg_Warn( p_aout, "Computed PTS is out of range (%lld), clearing out",
+        msg_Warn( p_aout, "computed PTS is out of range (%lld), clearing out",
                   start_date );
         vlc_mutex_lock( &p_aout->mixer_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
@@ -237,7 +237,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = 0;
     } 
 
-    if ( p_buffer->start_date < mdate() - AOUT_MIN_PREPARE_TIME )
+    if ( p_buffer->start_date < mdate() + AOUT_MIN_PREPARE_TIME )
     {
         /* The decoder gives us f*cked up PTS. It's its business, but we
          * can't present it anyway, so drop the buffer. */

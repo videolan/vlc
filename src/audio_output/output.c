@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.9 2002/08/21 22:41:59 massiot Exp $
+ * $Id: output.c,v 1.10 2002/08/24 10:19:43 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -163,18 +163,31 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
  * compensate it by itself. S/PDIF outputs should always set b_can_sleek = 1.
  *****************************************************************************/
 aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
-                                       mtime_t start_date ,
+                                       mtime_t start_date,
+                                       mtime_t timeout,
                                        vlc_bool_t b_can_sleek )
 {
     aout_buffer_t * p_buffer;
+    mtime_t         now = mdate();
 
     vlc_mutex_lock( &p_aout->mixer_lock );
-    p_buffer = p_aout->output.fifo.p_first;
 
+    timeout += now;
+
+    while( p_aout->output.fifo.p_first == NULL && timeout > now )
+    {
+        vlc_mutex_unlock( &p_aout->mixer_lock );
+        msleep( AOUT_PTS_TOLERANCE / 2 );
+        vlc_mutex_lock( &p_aout->mixer_lock );
+        now = mdate();
+    }
+
+    p_buffer = p_aout->output.fifo.p_first;
     while ( p_buffer != NULL && p_buffer->start_date < start_date )
     {
-        msg_Dbg( p_aout, "audio output is too slow (%lld)",
-                 start_date - p_buffer->start_date );
+        msg_Dbg( p_aout, "audio output is too slow (%lld), trashing %lldms",
+                 start_date - p_buffer->start_date,
+                 p_buffer->end_date - p_buffer->start_date );
         p_buffer = p_buffer->p_next;
     }
 
@@ -185,7 +198,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */
         aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
         vlc_mutex_unlock( &p_aout->mixer_lock );
-        msg_Dbg( p_aout, "audio output is starving" );
+        msg_Dbg( p_aout, "audio output is starving, waited too long" );
         return NULL;
     }
 
