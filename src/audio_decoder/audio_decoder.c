@@ -809,18 +809,17 @@ static void RunThread( adec_thread_t * p_adec )
     }
 
     /* Initializing date_increment */
+    s64_denominator = (s64)p_adec->p_aout_fifo->l_rate;
     switch ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT )
     {
         /* Layer 2 */
         case 2:
             s64_numerator = 1152 * 1000000;
-            s64_denominator = (s64)p_adec->p_aout->dsp.l_rate;
             break;
 
         /* Layer 1 */
         case 3:
             s64_numerator = 384 * 1000000;
-            s64_denominator = (s64)p_adec->p_aout->dsp.l_rate;
             break;
     }
     date_increment.l_remainder = -(long)s64_denominator;
@@ -895,7 +894,8 @@ static void RunThread( adec_thread_t * p_adec )
                     {
                         pthread_mutex_lock( &p_adec->p_aout_fifo->data_lock );
                         /* Frame 1 */
-                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = date;
+                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = date; /* DECODER_FIFO_START(p_adec->fifo)->i_pts; */
+                        /* DECODER_FIFO_START(p_adec->fifo)->i_pts = LAST_MDATE; */
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         /* Frame 2 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
@@ -913,9 +913,6 @@ static void RunThread( adec_thread_t * p_adec )
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         pthread_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
-/*
-                        date += 24000;
-*/
                         UPDATE_INCREMENT( date_increment, date )
                     }
                 }

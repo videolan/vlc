@@ -89,7 +89,7 @@ FFILTER = grep -v "intf_.*Msg.*\.\.\."
 # Debugging settings: electric fence, debuging symbols and profiling support. 
 # Note that electric fence and accurate profiling are quite uncompatible.
 CCFLAGS += -g
-#CCFLAGS += -pg
+CCFLAGS += -pg
 #LIB += -ldmalloc
 #LIB += -lefence
 
@@ -213,5 +213,5 @@ $(OBJ): %.o: %.c
 # Two makefiles are used: the main one (this one) has regular generic rules,
 # except for .o files, for which it calls the object Makefile. Dependancies
 # are not included in this file.
-# The object Makefile known how to make a .o from a .c, and includes dependancies
-# for the target, but only those required.
+# The object Makefile known how to make a .o from a .c, and includes
+# dependancies for the target, but only those required.

@@ -50,7 +50,7 @@
 /* Maximum number of audio fifos. The value of AOUT_MAX_FIFOS should be a power
  * of two, in order to optimize the '/AOUT_MAX_FIFOS' and '*AOUT_MAX_FIFOS'
  * operations with '>>' and '<<' (gcc changes this at compilation-time) */
-#define AOUT_MAX_FIFOS          4
+#define AOUT_MAX_FIFOS          2
 
 /* Duration (in microseconds) of an audio output buffer should be :
  * - short, in order to be able to play a new song very quickly (especially a

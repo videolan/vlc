@@ -201,14 +201,14 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     intf_Run( &program_data.intf_thread );
     intf_DbgMsg("intf debug: interface terminated\n");
 
-    /* 
+    /*
      * Close audio device
      */
-    if( program_data.cfg.b_audio )                 
+    if( program_data.cfg.b_audio )
     {
         aout_CancelThread( &program_data.aout_thread );
         aout_Close( &program_data.aout_thread );
-    }    
+    }
 
     /*
      * Free shared resources and libraries
