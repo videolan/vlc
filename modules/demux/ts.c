@@ -549,7 +549,11 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
+#ifndef UNDER_CE
             uint64_t i_ck = strtoull( psz, NULL, 16 );
+#else
+            uint64_t i_ck = strtoll( psz, NULL, 16 );
+#endif
             uint8_t ck[8];
             int     i;
             for( i = 0; i < 8; i++ )
