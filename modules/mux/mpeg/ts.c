@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.20 2003/05/31 21:49:12 fenrir Exp $
+ * $Id: ts.c,v 1.21 2003/06/01 00:26:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -838,7 +838,7 @@ static int GetPAT( sout_mux_t *p_mux,
     dvbpsi_InitPAT( &pat,
                     0x01,    // i_ts_id
                     p_sys->i_pat_version_number,
-                    0);      // b_current_next
+                    1 );      // b_current_next
     /* add all program (only one) */
     dvbpsi_PATAddProgram( &pat,
                           1,                    // i_number
