@@ -74,6 +74,9 @@ vlc_module_end();
  *  - ...
  */
 
+/* Shall we use libdvdnav's read ahead cache? */
+#define DVD_READ_CACHE 1
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -345,7 +348,8 @@ static int DemuxOpen( vlc_object_t *p_this )
     free( psz_name );
 
     /* Configure dvdnav */
-    if( dvdnav_set_readahead_flag( p_sys->dvdnav, 1 ) != DVDNAV_STATUS_OK )
+    if( dvdnav_set_readahead_flag( p_sys->dvdnav, DVD_READ_CACHE ) !=
+          DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "cannot set read-a-head flag" );
     }
@@ -364,6 +368,7 @@ static int DemuxOpen( vlc_object_t *p_this )
                   dvdnav_err_to_string( p_sys->dvdnav ) );
     }
 
+#if 0 // FIXME: Doesn't work with libdvdnav CVS!
     /* Find out number of titles/chapters */
     dvdnav_get_number_of_titles( p_sys->dvdnav, &i_titles );
     for( i = 1; i <= i_titles; i++ )
@@ -371,6 +376,7 @@ static int DemuxOpen( vlc_object_t *p_this )
         i_chapters = 0;
         dvdnav_get_number_of_parts( p_sys->dvdnav, i, &i_chapters );
     }
+#endif
 
     if( dvdnav_title_play( p_sys->dvdnav, i_title ) !=
           DVDNAV_STATUS_OK )
@@ -433,6 +439,7 @@ static void DemuxClose( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
+    int i;
 
     if( !p_sys->b_simple )
     {
@@ -451,6 +458,16 @@ static void DemuxClose( vlc_object_t *p_this )
         var_Destroy( p_sys->p_input, "contrast" );
 
         vlc_object_release( p_sys->p_input );
+    }
+
+    for( i = 0; i < PS_TK_COUNT; i++ )
+    {
+        ps_track_t *tk = &p_sys->tk[i];
+        if( tk->b_seen )
+        {
+            es_format_Clean( &tk->fmt );
+            if( tk->es ) es_out_Del( p_demux->out, tk->es );
+        }
     }
 
     dvdnav_close( p_sys->dvdnav );
@@ -513,7 +530,8 @@ static int DemuxDemux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    uint8_t packet[DVD_VIDEO_LB_LEN];
+    uint8_t buffer[DVD_VIDEO_LB_LEN];
+    uint8_t *packet = buffer;
     int i_event;
     int i_len;
 
@@ -531,8 +549,12 @@ static int DemuxDemux( demux_t *p_demux )
         p_sys->b_es_out_ok = VLC_TRUE;
     }
 
-    if( dvdnav_get_next_block( p_sys->dvdnav, packet, &i_event, &i_len ) ==
-          DVDNAV_STATUS_ERR )
+#if DVD_READ_CACHE
+    if( dvdnav_get_next_cache_block( p_sys->dvdnav, &packet, &i_event, &i_len )
+#else
+    if( dvdnav_get_next_block( p_sys->dvdnav, packet, &i_event, &i_len )
+#endif
+          == DVDNAV_STATUS_ERR )
     {
         msg_Warn( p_demux, "cannot get next block (%s)",
                   dvdnav_err_to_string( p_sys->dvdnav ) );
@@ -624,9 +646,10 @@ static int DemuxDemux( demux_t *p_demux )
         for( i = 0; i < PS_TK_COUNT; i++ )
         {
             ps_track_t *tk = &p_sys->tk[i];
-            if( tk->b_seen && tk->es )
+            if( tk->b_seen )
             {
-                es_out_Del( p_demux->out, tk->es );
+                es_format_Clean( &tk->fmt );
+                if( tk->es ) es_out_Del( p_demux->out, tk->es );
             }
             tk->b_seen = VLC_FALSE;
         }
@@ -713,6 +736,10 @@ static int DemuxDemux( demux_t *p_demux )
         msg_Warn( p_demux, "Unknown event (0x%x)", i_event );
         break;
     }
+
+#if DVD_READ_CACHE
+    dvdnav_free_cache_block( p_sys->dvdnav, packet );
+#endif
 
     return 1;
 }
