@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.5 2002/12/13 01:50:32 gbazin Exp $
+ * $Id: wxwindows.h,v 1.6 2002/12/15 18:37:39 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,9 +22,11 @@
  *****************************************************************************/
 
 #include <wx/listctrl.h>
+#include <wx/textctrl.h>
 #include <wx/dnd.h>
 
 class Playlist;
+class Messages;
 
 #define SLIDER_MAX_POS 10000
 
@@ -38,6 +40,7 @@ struct intf_sys_t
 
     /* secondary windows */
     Playlist            *p_playlist_window;
+    Messages            *p_messages_window;
 
     /* special actions */
     vlc_bool_t          b_playing;
@@ -47,7 +50,7 @@ struct intf_sys_t
     vlc_bool_t          b_slider_free;                      /* slider status */
 
     /* menus handlers */
-    vlc_bool_t          b_program_update;   /* do we need to update programs 
+    vlc_bool_t          b_program_update;   /* do we need to update programs
                                                                         menu */
     vlc_bool_t          b_title_update;  /* do we need to update title menus */
     vlc_bool_t          b_chapter_update;            /* do we need to update
@@ -121,7 +124,9 @@ private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnExit( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
+    void OnMessages( wxCommandEvent& event );
     void OnPlaylist( wxCommandEvent& event );
+    void OnLogs( wxCommandEvent& event );
     void OnOpenFile( wxCommandEvent& event );
     void OnPlayStream( wxCommandEvent& event );
     void OnStopStream( wxCommandEvent& event );
@@ -136,6 +141,31 @@ private:
     intf_thread_t *p_intf;
 };
 
+/* Messages */
+class Messages: public wxFrame
+{
+public:
+    /* Constructor */
+    Messages( intf_thread_t *p_intf, Interface *_p_main_interface );
+    virtual ~Messages();
+    void UpdateLog();
+
+private:
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnClose( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    Interface *p_main_interface;
+    wxButton *ok_button;
+    wxTextCtrl *textctrl;
+    wxTextAttr *info_attr;
+    wxTextAttr *err_attr;
+    wxTextAttr *warn_attr;
+    wxTextAttr *dbg_attr;
+};
+
 /* Playlist */
 class Playlist: public wxFrame
 {
@@ -147,6 +177,8 @@ public:
     void Manage();
 
 private:
+    void DeleteItem( int item );
+
     /* Event handlers (these functions should _not_ be virtual) */
     void OnAddUrl( wxCommandEvent& event );
     void OnAddDirectory( wxCommandEvent& event );
@@ -159,7 +191,6 @@ private:
 
     DECLARE_EVENT_TABLE();
 
-    void DeleteItem( int item );
     intf_thread_t *p_intf;
     Interface *p_main_interface;
     wxListView *listview;

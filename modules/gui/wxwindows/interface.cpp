@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.10 2002/12/08 19:56:04 gbazin Exp $
+ * $Id: interface.cpp,v 1.11 2002/12/15 18:37:39 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -109,6 +109,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(Exit_Event, Interface::OnExit)
     EVT_MENU(About_Event, Interface::OnAbout)
     EVT_MENU(Playlist_Event, Interface::OnPlaylist)
+    EVT_MENU(Logs_Event, Interface::OnLogs)
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
     /* Toolbar events */
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
@@ -147,7 +148,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     /* Creation of the slider sub-window */
     CreateOurSlider();
 
-    /* Creation of the status bar 
+    /* Creation of the status bar
      * Helptext for menu items and toolbar tools will automatically get
      * displayed here. */
     int i_status_width[2] = {-2,-3};
@@ -344,6 +345,16 @@ void Interface::OnPlaylist( wxCommandEvent& WXUNUSED(event) )
     if( p_playlist_window )
     {
         p_playlist_window->Show( ! p_playlist_window->IsShown() );
+    }
+}
+
+void Interface::OnLogs( wxCommandEvent& WXUNUSED(event) )
+{
+    /* Show/hide the log window */
+    wxFrame *p_messages_window = p_intf->p_sys->p_messages_window;
+    if( p_messages_window )
+    {
+        p_messages_window->Show( ! p_messages_window->IsShown() );
     }
 }
 

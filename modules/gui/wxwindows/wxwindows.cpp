@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.8 2002/12/13 01:50:32 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.9 2002/12/15 18:37:39 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -198,10 +198,13 @@ bool Instance::OnInit()
     /* Create the playlist window */
     p_intf->p_sys->p_playlist_window = new Playlist( p_intf, MainInterface );
 
-    /* Show the interface */
-    MainInterface->Show(TRUE);
+    /* Create the log window */
+    p_intf->p_sys->p_messages_window = new Messages( p_intf, MainInterface );
 
-    SetTopWindow(MainInterface);
+    /* Show the interface */
+    MainInterface->Show( TRUE );
+
+    SetTopWindow( MainInterface );
 
     /* Start timer */
     new Timer( p_intf, MainInterface );

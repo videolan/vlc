@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.6 2002/12/13 01:50:32 gbazin Exp $
+ * $Id: timer.cpp,v 1.7 2002/12/15 18:37:39 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -109,14 +109,7 @@ void Timer::Notify()
     }
 
     /* Update the log window */
-    vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
-    i_stop = *p_intf->p_sys->p_sub->pi_stop;
-    vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
-
-    if( p_intf->p_sys->p_sub->i_start != i_stop )
-    {
-        /* Append all messages to log window */
-    }
+    p_intf->p_sys->p_messages_window->UpdateLog();
 
     /* Update the playlist */
     p_intf->p_sys->p_playlist_window->Manage();
