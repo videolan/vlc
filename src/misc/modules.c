@@ -1457,44 +1457,31 @@ static char * GetWindowsError( void )
  *****************************************************************************/
 static void CacheLoad( vlc_object_t *p_this )
 {
-    char *psz_filename, *psz_homedir, *psz_cachefile;
+    char *psz_filename, *psz_homedir;
     FILE *file;
     int i, j, i_size, i_read;
     char p_cachestring[sizeof(PLUGINSCACHE_FILE COPYRIGHT_MESSAGE)];
     int *pi_cache;
     module_cache_t **pp_cache = 0;
 
-    psz_cachefile = 0; // FIXME
-    if( !psz_cachefile || !psz_cachefile )
+    psz_homedir = p_this->p_vlc->psz_homedir;
+    if( !psz_homedir )
     {
-        psz_homedir = p_this->p_vlc->psz_homedir;
-        if( !psz_homedir )
-        {
-            msg_Err( p_this, "psz_homedir is null" );
-            return;
-        }
-        psz_filename =
-            (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_FILE) +
-                            strlen(psz_homedir) );
-
-        if( psz_filename )
-            sprintf( psz_filename, "%s/" CONFIG_DIR "/" PLUGINSCACHE_FILE,
-                     psz_homedir );
-
-        if( !psz_filename )
-        {
-            msg_Err( p_this, "out of memory" );
-            return;
-        }
+        msg_Err( p_this, "psz_homedir is null" );
+        return;
     }
-    else
+    psz_filename =
+        (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_FILE) +
+                        strlen(psz_homedir) );
+
+    if( psz_filename )
+        sprintf( psz_filename, "%s/" CONFIG_DIR "/" PLUGINSCACHE_FILE,
+                 psz_homedir );
+
+    if( !psz_filename )
     {
-        psz_filename = strdup( psz_cachefile );
-        if( !psz_filename )
-        {
-            msg_Err( p_this, "out of memory" );
-            return;
-        }
+        msg_Err( p_this, "out of memory" );
+        return;
     }
 
     if( p_this->p_libvlc->p_module_bank->b_cache_delete )
@@ -1533,6 +1520,7 @@ static void CacheLoad( vlc_object_t *p_this )
     for( i = 0; i < *pi_cache; i++ )
     {
         int32_t i_size;
+        int i_submodules;
 
 #define LOAD_IMMEDIATE(a) \
         fread( &a, sizeof(char), sizeof(a), file )
@@ -1577,7 +1565,6 @@ static void CacheLoad( vlc_object_t *p_this )
 
         LOAD_STRING( pp_cache[i]->p_module->psz_filename );
 
-        int i_submodules;
         LOAD_IMMEDIATE( i_submodules );
 
         while( i_submodules-- )
@@ -1707,46 +1694,33 @@ void CacheLoadConfig( module_t *p_module, FILE *file )
  *****************************************************************************/
 static void CacheSave( vlc_object_t *p_this )
 {
-    char *psz_filename, *psz_homedir, *psz_cachefile;
+    char *psz_filename, *psz_homedir;
     FILE *file;
     int i, j, i_cache;
     module_cache_t **pp_cache;
 
-    psz_cachefile = 0; // FIXME
-    if( !psz_cachefile || !psz_cachefile )
+    psz_homedir = p_this->p_vlc->psz_homedir;
+    if( !psz_homedir )
     {
-        psz_homedir = p_this->p_vlc->psz_homedir;
-        if( !psz_homedir )
-        {
-            msg_Err( p_this, "psz_homedir is null" );
-            return;
-        }
-        psz_filename =
-            (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_FILE) +
-                            strlen(psz_homedir) );
-
-        if( psz_filename )
-            sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
-
-        if( !psz_filename )
-        {
-            msg_Err( p_this, "out of memory" );
-            return;
-        }
-
-        config_CreateDir( p_this, psz_filename );
-
-        strcat( psz_filename, "/" PLUGINSCACHE_FILE );
+        msg_Err( p_this, "psz_homedir is null" );
+        return;
     }
-    else
+    psz_filename =
+       (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_FILE) +
+                       strlen(psz_homedir) );
+
+    if( psz_filename )
+        sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
+
+    if( !psz_filename )
     {
-        psz_filename = strdup( psz_cachefile );
-        if( !psz_filename )
-        {
-            msg_Err( p_this, "out of memory" );
-            return;
-        }
+        msg_Err( p_this, "out of memory" );
+        return;
     }
+
+    config_CreateDir( p_this, psz_filename );
+
+    strcat( psz_filename, "/" PLUGINSCACHE_FILE );
 
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
 
@@ -1771,6 +1745,7 @@ static void CacheSave( vlc_object_t *p_this )
     for( i = 0; i < i_cache; i++ )
     {
         int32_t i_size;
+        int32_t i_submodule;
 
 #define SAVE_IMMEDIATE(a) \
         fwrite( &a, sizeof(char), sizeof(a), file )
@@ -1809,8 +1784,8 @@ static void CacheSave( vlc_object_t *p_this )
 
         SAVE_STRING( pp_cache[i]->p_module->psz_filename );
 
-        int i_submodule;
-        SAVE_IMMEDIATE( pp_cache[i]->p_module->i_children );
+        i_submodule = pp_cache[i]->p_module->i_children;
+        SAVE_IMMEDIATE( i_submodule );
         for( i_submodule = 0; i_submodule < pp_cache[i]->p_module->i_children;
              i_submodule++ )
         {
