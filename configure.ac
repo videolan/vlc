@@ -949,7 +949,7 @@ VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts ci
 VLC_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 VLC_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32 audio_format])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler linear_resampler bandlimited_resampler])
-VLC_ADD_PLUGINS([trivial_channel_mixer headphone_channel_mixer])
+VLC_ADD_PLUGINS([trivial_channel_mixer simple_channel_mixer headphone_channel_mixer])
 VLC_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 VLC_ADD_PLUGINS([aout_file equalizer])
 VLC_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])

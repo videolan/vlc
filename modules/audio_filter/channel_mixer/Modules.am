@@ -1,2 +1,3 @@
 SOURCES_trivial_channel_mixer = trivial.c
+SOURCES_simple_channel_mixer = simple.c
 SOURCES_headphone_channel_mixer = headphone.c
