@@ -2,7 +2,7 @@
  * gtk2_event.cpp: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_event.cpp,v 1.4 2003/04/13 19:09:59 asmax Exp $
+ * $Id: gtk2_event.cpp,v 1.5 2003/04/15 17:55:49 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -31,6 +31,7 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
+#include "os_api.h"
 #include "event.h"
 #include "os_event.h"
 #include "window.h"
@@ -67,15 +68,25 @@ GTK2Event::~GTK2Event()
 //---------------------------------------------------------------------------
 bool GTK2Event::SendEvent()
 {
-/*    if( Message != VLC_NOTHING )
+    fprintf( stderr, "++++++++++++++++ %i\n", Message );
+    if( Message != VLC_NOTHING )
     {
-        PostMessage( hWnd, Message, Param1, Param2 );
-        PostSynchroMessage();
-        return true;
+        // Find window matching with gwnd
+        list<Window *>::const_iterator win;
+        for( win = p_intf->p_sys->p_theme->WindowList.begin();
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+        {
+            // If it is the correct window
+            if( gWnd == ( (GTK2Window *)(*win) )->GetHandle() )
+            {
+                OSAPI_PostMessage( *win, Message, Param1, Param2 );
+                PostSynchroMessage();
+            }
+        }
     }
-*/
-    return true;
 
+    OSAPI_PostMessage( NULL, Message, Param1, Param2 );
+    return true;
 }
 //---------------------------------------------------------------------------
 bool GTK2Event::IsEqual( Event *evt )

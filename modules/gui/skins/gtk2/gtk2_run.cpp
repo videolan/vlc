@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.5 2003/04/15 01:19:11 ipkiss Exp $
+ * $Id: gtk2_run.cpp,v 1.6 2003/04/15 17:55:49 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -68,10 +68,14 @@ int  SkinManage( intf_thread_t *p_intf );
 //---------------------------------------------------------------------------
 void GTK2Proc( GdkEvent *event, gpointer data )
 {
-    GdkWindow *gwnd = ((GdkEventAny *)event)->window;
-
     // Get pointer to thread info
     intf_thread_t *p_intf = (intf_thread_t *)data;
+    VlcProc *Proc = new VlcProc( p_intf );
+
+    list<Window *>::const_iterator win;
+    GdkWindow *gwnd = ((GdkEventAny *)event)->window;
+
+    fprintf( stderr, "------ %li\n", (long int)gwnd );
 
     // If doesn't exist, treat windows message normally
 //    if( p_intf == NULL )
@@ -81,27 +85,44 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     Event *evt = (Event *)new OSEvent( p_intf, ((GdkEventAny *)event)->window,
                                        event->type, 0, (long)event );
 
-    // Find window matching with gwnd
-    list<Window *>::const_iterator win;
-    for( win = p_intf->p_sys->p_theme->WindowList.begin();
-         win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+    if( IsVLCEvent( event->type ) )
     {
-        // If it is the correct window
-        if( gwnd == ( (GTK2Window *)(*win) )->GetHandle() )
+        if( !Proc->EventProc( evt ) )
+            return;      // Exit VLC !
+    }
+    else if( gwnd == NULL )
+    {
+        for( win = p_intf->p_sys->p_theme->WindowList.begin();
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
         {
-            // Send event and check if processed
-            if( (*win)->ProcessEvent( evt ) )
+            (*win)->ProcessEvent( evt );
+        }
+    }
+    else
+    {
+        // Find window matching with gwnd
+        for( win = p_intf->p_sys->p_theme->WindowList.begin();
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+        {
+            // If it is the correct window
+            if( gwnd == ( (GTK2Window *)(*win) )->GetHandle() )
             {
-                delete (OSEvent *)evt;
-                return;
-            }
-            else
-            {
-                break;
+                // Send event and check if processed
+                if( (*win)->ProcessEvent( evt ) )
+                {
+                    delete (OSEvent *)evt;
+                    return;
+                }
+                else
+                {
+                    break;
+                }
             }
         }
     }
+
     delete (OSEvent *)evt;
+    delete Proc;
 
 #if 0
     // If Window is parent window

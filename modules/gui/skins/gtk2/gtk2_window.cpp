@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.13 2003/04/15 16:49:45 karibu Exp $
+ * $Id: gtk2_window.cpp,v 1.14 2003/04/15 17:55:49 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -170,7 +170,6 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
 
 
         case GDK_MOTION_NOTIFY:
-            fpprintf( stderr, "Mouse move (%i)", (int)evt );
             if( LButtonDown )
                 MouseMove( (int)( (GdkEventButton *)p2 )->x,
                            (int)( (GdkEventButton *)p2 )->y, 1 );

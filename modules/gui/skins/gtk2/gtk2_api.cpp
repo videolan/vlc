@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.5 2003/04/14 21:38:31 asmax Exp $
+ * $Id: gtk2_api.cpp,v 1.6 2003/04/15 17:55:49 ipkiss Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -34,6 +34,7 @@
 #include "os_api.h"
 #include "event.h"         // for MAX_PARAM_SIZE
 
+#include <stdio.h>
 
 //---------------------------------------------------------------------------
 // Event API
@@ -51,11 +52,24 @@ void OSAPI_SendMessage( Window *win, unsigned int message, unsigned int param1,
 void OSAPI_PostMessage( Window *win, unsigned int message, unsigned int param1,
                         long param2 )
 {
-/*    if( win == NULL )
-        PostMessage( NULL, message, param1, param2 );
+    GdkEventClient *event = new GdkEventClient;
+    event->type = GDK_CLIENT_EVENT;
+    if( win == NULL )
+        event->window = NULL;
     else
-        PostMessage( ( (Win32Window *)win )->GetHandle(), message, param1,
-                     param2 );*/
+        event->window = ((GTK2Window *)win)->GetHandle();
+    event->send_event = 0;
+    event->message_type = NULL;
+    event->data_format = 32;
+    event->data.l[0] = message;
+    event->data.l[1] = param1;
+    event->data.l[2] = param2;
+
+    fprintf( stderr, "======= message %i\n", message );
+
+    gdk_event_put( (GdkEvent *)event );
+
+    delete event;
 }
 //---------------------------------------------------------------------------
 
