@@ -1383,6 +1383,8 @@ static void UpdateFromAccess( input_thread_t *p_input )
 
         input_ControlVarTitle( p_input, p_access->info.i_title );
 
+        stream_AccessUpdate( p_input->input.p_stream );
+
         p_access->info.i_update &= ~INPUT_UPDATE_TITLE;
     }
     if( p_access->info.i_update & INPUT_UPDATE_SEEKPOINT )

@@ -103,6 +103,7 @@ void input_ConfigVarInit ( input_thread_t * );
 stream_t *stream_AccessNew( access_t *p_access );
 void stream_AccessDelete( stream_t *s );
 void stream_AccessReset( stream_t *s );
+void stream_AccessUpdate( stream_t *s );
 
 /* decoder.c FIXME make it public ?*/
 void       input_DecoderDiscontinuity( decoder_t * p_dec );

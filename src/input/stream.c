@@ -340,6 +340,15 @@ void stream_AccessReset( stream_t *s )
 }
 
 /****************************************************************************
+ * stream_AccessUpdate:
+ ****************************************************************************/
+void stream_AccessUpdate( stream_t *s )
+{
+    stream_sys_t *p_sys = s->p_sys;
+    p_sys->i_pos = p_sys->p_access->info.i_pos;
+}
+
+/****************************************************************************
  * AStreamControl:
  ****************************************************************************/
 static int AStreamControl( stream_t *s, int i_query, va_list args )
