@@ -316,10 +316,21 @@ typedef struct
 class chapter_item_t
 {
 public:
+	chapter_item_t()
+	:i_start_time(0)
+	,i_end_time(-1)
+	,i_user_start_time(-1)
+	,i_user_end_time(-1)
+	,i_current_sub_chapter(-1)
+	,i_seekpoint_num(-1)
+	{}
+	
+	int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
+	
     int64_t                     i_start_time, i_end_time;
-    int64_t                     i_absolute_start_time; /* the time in the stream when an edition is ordered */
+    int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
     std::vector<chapter_item_t> sub_chapters;
-    int                            i_current_sub_chapter;
+    int                         i_current_sub_chapter;
     int                         i_seekpoint_num;
 };
 
@@ -330,6 +341,8 @@ public:
     :i_uid(-1)
     ,b_ordered(false)
     {}
+	
+	void RefreshChapters();
     
     std::vector<chapter_item_t> chapters;
     int64_t                     i_uid;
@@ -1601,7 +1614,6 @@ static int Demux( demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     mtime_t        i_start_pts;
     int            i_block_count = 0;
-    int            i_chapter;
 
     KaxBlock *block;
     int64_t i_block_duration;
@@ -2847,15 +2859,15 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
                 }
                 else if( MKV_IS_ID( l, KaxEditionUID ) )
                 {
-                    edition.i_uid = uint64(*static_cast<KaxEditionUID *>(l));
+                    edition.i_uid = uint64(*static_cast<KaxEditionUID *>( l ));
                 }
                 else if( MKV_IS_ID( l, KaxEditionFlagOrdered ) )
                 {
-                    edition.b_ordered = uint8(*static_cast<KaxEditionFlagOrdered *>(l)) != 0;
+                    edition.b_ordered = uint8(*static_cast<KaxEditionFlagOrdered *>( l )) != 0;
                 }
                 else if( MKV_IS_ID( l, KaxEditionFlagDefault ) )
                 {
-                    if (uint8(*static_cast<KaxEditionFlagDefault *>(l)) != 0)
+                    if (uint8(*static_cast<KaxEditionFlagDefault *>( l )) != 0)
                         p_sys->i_current_edition = p_sys->editions.size();
                 }
                 else
@@ -2871,6 +2883,11 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
         }
     }
 
+    for( i = 0; i < p_sys->editions.size(); i++ )
+    {
+		p_sys->editions[i].RefreshChapters();
+	}
+	
     p_sys->i_current_edition = i_default_edition;
     
     if ( p_sys->editions[i_default_edition].b_ordered )
@@ -3006,3 +3023,46 @@ static char * UTF8ToStr( const UTFstring &u )
     return dst;
 }
 
+void chapter_edition_t::RefreshChapters()
+{
+	int64_t i_prev_user_time = 0;
+	std::vector<chapter_item_t>::iterator index = chapters.begin();
+	while ( index != chapters.end() )
+	{
+		i_prev_user_time = (*index).RefreshChapters( b_ordered, i_prev_user_time );
+		index++;
+	}
+}
+
+int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_time )
+{
+	int64_t i_user_time = i_prev_user_time;
+	
+	// first the sub-chapters, and then ourself
+	std::vector<chapter_item_t>::iterator index = sub_chapters.begin();
+	while ( index != sub_chapters.end() )
+	{
+		i_user_time = (*index).RefreshChapters( b_ordered, i_user_time );
+		index++;
+	}
+
+	if ( b_ordered )
+	{
+		i_user_start_time = i_prev_user_time;
+		if ( i_end_time != -1 && i_user_time == i_prev_user_time )
+		{
+			i_user_end_time = i_user_start_time - i_start_time + i_end_time;
+		}
+		else
+		{
+			i_user_end_time = i_user_start_time;
+		}
+	}
+	else
+	{
+		i_user_start_time = i_start_time;
+		i_user_end_time = i_end_time;
+	}
+	
+	return i_user_end_time;
+}
