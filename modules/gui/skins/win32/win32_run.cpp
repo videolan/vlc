@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.21 2003/10/15 12:24:14 gbazin Exp $
+ * $Id: win32_run.cpp,v 1.22 2003/10/23 16:00:48 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -48,19 +48,6 @@
 // Specific method
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg );
-int  SkinManage( intf_thread_t *p_intf );
-
-//---------------------------------------------------------------------------
-// Refresh Timer Callback
-//---------------------------------------------------------------------------
-void CALLBACK RefreshTimer( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)GetWindowLongPtr( hwnd,
-        GWLP_USERDATA );
-    SkinManage( p_intf );
-}
-//---------------------------------------------------------------------------
-
 
 //---------------------------------------------------------------------------
 // Win32 interface
@@ -72,10 +59,6 @@ void OSRun( intf_thread_t *p_intf )
     list<SkinWindow *>::const_iterator win;
     Event *ProcessEvent;
     int KeyModifier = 0;
-
-     // Create refresh timer
-    SetTimer( ((OSTheme *)p_intf->p_sys->p_theme)->GetParentWindow(), 42, 200,
-              (TIMERPROC)RefreshTimer );
 
     // Compute windows message list
     while( GetMessage( &msg, NULL, 0, 0 ) )

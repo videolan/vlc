@@ -2,7 +2,7 @@
  * win32_theme.cpp: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.cpp,v 1.10 2003/10/22 19:12:56 ipkiss Exp $
+ * $Id: win32_theme.cpp,v 1.11 2003/10/23 16:00:48 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -49,9 +49,17 @@
 
 
 //---------------------------------------------------------------------------
-void SkinManage( intf_thread_t *p_intf );
+int SkinManage( intf_thread_t *p_intf );
 
-
+//---------------------------------------------------------------------------
+// Refresh Timer Callback
+//---------------------------------------------------------------------------
+void CALLBACK RefreshTimer( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)GetWindowLongPtr( hwnd,
+        GWLP_USERDATA );
+    SkinManage( p_intf );
+}
 
 //---------------------------------------------------------------------------
 // Win32 interface
@@ -259,6 +267,8 @@ void Win32Theme::OnLoadTheme()
     // The create menu
     CreateSystemMenu();
 
+    // Create refresh timer
+    SetTimer( ParentWindow, 42, 200, (TIMERPROC)RefreshTimer );
 }
 //---------------------------------------------------------------------------
 void Win32Theme::AddSystemMenu( string name, Event *event )
