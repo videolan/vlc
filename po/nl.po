@@ -63,7 +63,6 @@ msgid "[module]              [description]\n"
 msgstr "[module]              [beschrijving]\n"
 
 #: src/libvlc.c:1323
-#, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -287,7 +286,6 @@ msgid "enable video"
 msgstr "zet video aan"
 
 #: src/libvlc.h:128
-#, fuzzy
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
@@ -363,7 +361,6 @@ msgstr ""
 "scherm grootte afspelen."
 
 #: src/libvlc.h:160
-#, fuzzy
 msgid "overlay video output"
 msgstr "overlay video uitvoer"
 
@@ -698,7 +695,6 @@ msgstr ""
 "output modules."
 
 #: src/libvlc.h:323
-#, fuzzy
 msgid "enable CPU MMX support"
 msgstr "schakel de CPU's MMX support in"
 
@@ -779,7 +775,6 @@ msgid "If you want VLC to start playing on startup, then enable this option."
 msgstr "Na het starten zal VLC meteen de speelijst gaan afspelen."
 
 #: src/libvlc.h:357
-#, fuzzy
 msgid "enqueue items in playlist"
 msgstr "standaard in de speellijst plaatsen"
 
@@ -994,7 +989,7 @@ msgstr "boolean"
 
 #: src/audio_output/output.c:72 src/audio_output/output.c:139
 msgid "Reverse stereo"
-msgstr ""
+msgstr "Omgekeerd stereo"
 
 #: modules/audio_output/alsa.c:182 modules/audio_output/alsa.c:333
 #: modules/audio_output/oss.c:208 modules/audio_output/oss.c:317
@@ -1009,12 +1004,12 @@ msgstr "Stereo"
 #: src/audio_output/output.c:113 src/audio_output/output.c:135
 #: src/audio_output/output.c:145
 msgid "Left"
-msgstr ""
+msgstr "Linker"
 
 #: src/audio_output/output.c:86 src/audio_output/output.c:107
 #: src/audio_output/output.c:137
 msgid "Right"
-msgstr ""
+msgstr "Rechter"
 
 #: src/audio_output/output.c:90 src/audio_output/output.c:128
 msgid "Dolby Surround"
@@ -1115,7 +1110,6 @@ msgid "specify an HTTP proxy"
 msgstr "specificeer een HTTP proxy"
 
 #: modules/access/http.c:80
-#, fuzzy
 msgid ""
 "Specify an HTTP proxy to use. It must be in the form http://myproxy.mydomain:"
 "myport. If none is specified, the HTTP_PROXY environment variable will be "
@@ -1400,7 +1394,6 @@ msgstr "bestands audio output module"
 #. * Module descriptor
 #. ****************************************************************************
 #: modules/audio_output/oss.c:102
-#, fuzzy
 msgid "try to work around buggy OSS drivers"
 msgstr "Workaround voor foutieve OSS drivers"
 
@@ -1415,7 +1408,6 @@ msgstr ""
 "een driver hebt, dan moet deze optie aan staan."
 
 #: modules/audio_output/oss.c:108
-#, fuzzy
 msgid "try to use S/PDIF output"
 msgstr "Probeer S/PDIF te gebruiken voor uitvoer"
 
@@ -1484,9 +1476,8 @@ msgid "AAC decoder module (libfaad2)"
 msgstr "AAC decoder module (libfaad2)"
 
 #: modules/codec/ffmpeg/ffmpeg.c:99
-#, fuzzy
 msgid "ffmpeg"
-msgstr "Ffmpeg"
+msgstr "ffmpeg"
 
 #: modules/codec/ffmpeg/ffmpeg.c:113
 msgid "Post processing"
@@ -1621,7 +1612,6 @@ msgstr "MPEG I/II video decoder module"
 #. * Module descriptor.
 #. ****************************************************************************
 #: modules/codec/spudec/spudec.c:48
-#, fuzzy
 msgid "font used by the text subtitler"
 msgstr "Lettertype voor de ondertiteling"
 
@@ -1712,13 +1702,15 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:103
 msgid "buggy PSI"
-msgstr ""
+msgstr "PSI met fouten"
 
 #: modules/demux/mpeg/ts.c:105
 msgid ""
 "If you have a stream whose PSI packets do not feature incremented continuity "
 "counters, select this option."
 msgstr ""
+"Selecteer deze optie als je een stream hebt waarvan de PSI "
+"pakketjes geen continuiteits tellers heeft."
 
 #: modules/demux/mpeg/ts.c:110
 msgid "ISO 13818-1 MPEG Transport Stream input"
@@ -1752,7 +1744,6 @@ msgid "automatically play a file when selected in the file selection list"
 msgstr "speel automatisch een geselecteerd bestand af"
 
 #: modules/gui/familiar/familiar.c:71
-#, fuzzy
 msgid "Familiar Linux Gtk+ interface module"
 msgstr "Familiar Linux Gtk+ interface module"
 
@@ -2079,7 +2070,6 @@ msgstr "Open het berichten venster"
 
 #: modules/gui/gtk/gnome_interface.c:118 modules/gui/gtk/gnome_interface.c:942
 #: modules/gui/gtk/gtk_interface.c:438 modules/gui/gtk/gtk_interface.c:1276
-#, fuzzy
 msgid "_Language"
 msgstr "Taal"
 
@@ -2139,7 +2129,7 @@ msgstr "Volledig Scherm"
 #: modules/gui/gtk/gtk_interface.c:1390 modules/gui/macosx/controls.m:766
 #: modules/gui/macosx/intf.m:345
 msgid "Deinterlace"
-msgstr "Deinterface"
+msgstr "Deinterlace"
 
 #: modules/gui/gtk/gnome_interface.c:190
 #: modules/gui/gtk/gnome_interface.c:1014 modules/gui/gtk/gtk_interface.c:565
@@ -2253,7 +2243,6 @@ msgstr "Vorige"
 
 #: modules/gui/gtk/gnome_interface.c:661 modules/gui/gtk/gtk_interface.c:764
 #: modules/gui/win32/strings.cpp:113
-#, fuzzy
 msgid "Previous file"
 msgstr "Vorig Bestand"
 
@@ -2510,13 +2499,12 @@ msgid "Subtitle"
 msgstr "Ondertiteling"
 
 #: modules/gui/gtk/gnome_interface.c:2112 modules/gui/gtk/gtk_interface.c:2429
-#, fuzzy
 msgid "delay"
-msgstr "Start"
+msgstr "vertraging"
 
 #: modules/gui/gtk/gnome_interface.c:2127 modules/gui/gtk/gtk_interface.c:2445
 msgid "fps"
-msgstr ""
+msgstr "fps"
 
 #: modules/gui/gtk/gnome_interface.c:2156 modules/gui/gtk/gtk_interface.c:2476
 msgid "Settings..."
@@ -2636,7 +2624,7 @@ msgstr "Pad:"
 #: modules/gui/win32/strings.cpp:166 modules/gui/win32/strings.cpp:167
 #: modules/gui/win32/strings.cpp:224
 msgid "Address:"
-msgstr "Adres"
+msgstr "Adres:"
 
 #: modules/gui/gtk/gnome_interface.c:3072 modules/gui/gtk/gtk_interface.c:3317
 #: modules/gui/macosx/open.m:221 modules/gui/win32/strings.cpp:232
@@ -2765,7 +2753,7 @@ msgstr "Selecteer bestand met ondertitels"
 
 #: modules/gui/gtk/gtk_interface.c:2443 modules/gui/win32/strings.cpp:244
 msgid "Set the delay (in seconds)"
-msgstr "Stel vertraging in (seconden)"
+msgstr "Stel vertraging in (in seconden)"
 
 #: modules/gui/gtk/gtk_interface.c:2459 modules/gui/win32/strings.cpp:246
 msgid "Set the number of Frames Per Second"
@@ -2856,9 +2844,8 @@ msgid "Off"
 msgstr "Uit"
 
 #: modules/gui/kde/kde.cpp:55
-#, fuzzy
 msgid "path to ui.rc file"
-msgstr "Pad naar ui.rc bestand"
+msgstr "pad naar ui.rc bestand"
 
 #: modules/gui/kde/kde.cpp:56
 msgid "KDE interface module"
@@ -2901,13 +2888,12 @@ msgstr "Sluit"
 
 #: modules/gui/macosx/intf.m:291
 msgid "Open CrashLog"
-msgstr ""
+msgstr "Open CrashLog"
 
 #. main menu
 #: modules/gui/macosx/intf.m:294
-#, fuzzy
 msgid "About VLC media player"
-msgstr "Over VLC Media Speler"
+msgstr "Over VLC media speler"
 
 #: modules/gui/macosx/intf.m:295 modules/gui/win32/strings.cpp:126
 msgid "Preferences..."
@@ -2919,15 +2905,15 @@ msgstr "Verberg VLC"
 
 #: modules/gui/macosx/intf.m:297
 msgid "Hide Others"
-msgstr "Verberg Anderen"
+msgstr "Verberg anderen"
 
 #: modules/gui/macosx/intf.m:298
 msgid "Show All"
-msgstr "Toon Alle Vensters"
+msgstr "Toon alles"
 
 #: modules/gui/macosx/intf.m:299
 msgid "Quit VLC"
-msgstr "Sluit VLC af"
+msgstr "Stop VLC"
 
 #: modules/gui/macosx/intf.m:302
 msgid "Open..."
@@ -2935,15 +2921,15 @@ msgstr "Open..."
 
 #: modules/gui/macosx/intf.m:303 modules/gui/win32/strings.cpp:90
 msgid "Open File..."
-msgstr "Open Bestand..."
+msgstr "Open bestand..."
 
 #: modules/gui/macosx/intf.m:304 modules/gui/win32/strings.cpp:91
 msgid "Open Disc..."
-msgstr "Open Disk..."
+msgstr "Open disk..."
 
 #: modules/gui/macosx/intf.m:305
 msgid "Open Network..."
-msgstr "Open Netwerk..."
+msgstr "Open netwerk..."
 
 #: modules/gui/macosx/intf.m:306
 msgid "Open Recent"
@@ -2952,7 +2938,7 @@ msgstr "Open laatste"
 #. Recent Items Menu
 #: modules/gui/macosx/intf.m:307 modules/gui/macosx/intf.m:1457
 msgid "Clear Menu"
-msgstr "Maak menu leeg"
+msgstr "Wis menu"
 
 #: modules/gui/macosx/intf.m:309
 msgid "Edit"
@@ -2976,7 +2962,7 @@ msgstr "Verwijder"
 
 #: modules/gui/macosx/intf.m:314 modules/gui/macosx/playlist.m:124
 msgid "Select All"
-msgstr "Alles Selecteren"
+msgstr "Alles selecteren"
 
 #: modules/gui/macosx/intf.m:316 modules/gui/win32/strings.cpp:77
 msgid "Controls"
@@ -2987,35 +2973,32 @@ msgid "Loop"
 msgstr "Herhaal"
 
 #: modules/gui/macosx/controls.m:728 modules/gui/macosx/intf.m:324
-#, fuzzy
 msgid "Step Forward"
-msgstr "Sneller"
+msgstr "Stap vooruit"
 
 #: modules/gui/macosx/controls.m:729 modules/gui/macosx/intf.m:325
-#, fuzzy
 msgid "Step Backward"
-msgstr "Ga Terug"
+msgstr "Stap terug"
 
 #: modules/gui/macosx/intf.m:329 modules/gui/win32/strings.cpp:86
 msgid "Language"
 msgstr "Taal"
 
 #: modules/gui/macosx/controls.m:747 modules/gui/macosx/intf.m:340
-#, fuzzy
 msgid "Half Size"
-msgstr "Grootte"
+msgstr "Halve grootte"
 
 #: modules/gui/macosx/controls.m:748 modules/gui/macosx/intf.m:341
 msgid "Normal Size"
-msgstr ""
+msgstr "Normale grootte"
 
 #: modules/gui/macosx/controls.m:749 modules/gui/macosx/intf.m:342
 msgid "Double Size"
-msgstr ""
+msgstr "Dubbele grootte"
 
 #: modules/gui/macosx/controls.m:746 modules/gui/macosx/intf.m:343
 msgid "Fullscreen"
-msgstr "Volledig Scherm"
+msgstr "Volledig scherm"
 
 #: modules/gui/macosx/intf.m:347
 msgid "Window"
@@ -3023,11 +3006,11 @@ msgstr "Venster"
 
 #: modules/gui/macosx/intf.m:348
 msgid "Minimize Window"
-msgstr "Verklein Venster"
+msgstr "Verklein venster"
 
 #: modules/gui/macosx/intf.m:349
 msgid "Close Window"
-msgstr "Sluit Venster"
+msgstr "Sluit venster"
 
 #: modules/gui/macosx/intf.m:350
 msgid "Controller"
@@ -3035,7 +3018,7 @@ msgstr "Bedieningspaneel"
 
 #: modules/gui/macosx/intf.m:354
 msgid "Bring All to Front"
-msgstr "Breng Allen naar de Voorgrond"
+msgstr "Alles op voorgrond"
 
 #: modules/gui/macosx/intf.m:356
 msgid "Help"
@@ -3043,7 +3026,7 @@ msgstr "Help"
 
 #: modules/gui/macosx/intf.m:357
 msgid "ReadMe..."
-msgstr "Lees Mij..."
+msgstr "Lees mij..."
 
 #: modules/gui/macosx/intf.m:358
 #, fuzzy
@@ -3064,7 +3047,6 @@ msgid "Error"
 msgstr "Fout"
 
 #: modules/gui/macosx/intf.m:370
-#, fuzzy
 msgid ""
 "An error has occurred which probably prevented the execution of your request:"
 msgstr ""
@@ -3072,7 +3054,6 @@ msgstr ""
 "handelen :"
 
 #: modules/gui/macosx/intf.m:371
-#, fuzzy
 msgid "If you believe that it is a bug, please follow the instructions at:"
 msgstr ""
 "Mocht u van mening zijn dat het een software fout betreft, volg dan de "
@@ -3080,11 +3061,11 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:372
 msgid "Open Messages Window"
-msgstr "Open het Berichten Venster"
+msgstr "Open het berichten venster"
 
 #: modules/gui/macosx/intf.m:373
 msgid "Dismiss"
-msgstr ""
+msgstr "Dismiss"
 
 #: modules/gui/macosx/intf.m:1188
 msgid "Load from file.."
@@ -3096,33 +3077,32 @@ msgid "Language 0x%x"
 msgstr "Taal 0x%x"
 
 #: modules/gui/macosx/intf.m:1420
-#, fuzzy
 msgid "No CrashLog found"
-msgstr "Geen %@s gevonden"
+msgstr "Geen CrashLog gevonden"
 
 #: modules/gui/macosx/intf.m:1420
 msgid ""
 "Either you are running Mac OS X pre 10.2 or you haven't experienced any "
 "heavy crashes yet."
 msgstr ""
+"Of u draait een versie van MacOSX van voor 10.2 of u heeft nog "
+"geen crashes gehad."
 
 #: modules/gui/macosx/open.m:165
 msgid "Open Source"
 msgstr "Open Bron"
 
 #: modules/gui/macosx/open.m:167
-#, fuzzy
 msgid "Only enqueue in playlist, do not play"
-msgstr "Enkel in speellijst plaatsen. Speel niet af."
+msgstr "Enkel in speellijst plaatsen, speel niet af."
 
 #: modules/gui/macosx/open.m:177
 msgid "Treat as a pipe rather than as a file"
 msgstr "Beschouw bestand als een pipe"
 
 #: modules/gui/macosx/open.m:180
-#, fuzzy
 msgid "Load subtitles file:"
-msgstr "Gebruik ondertiteling"
+msgstr "Gebruik ondertiteling in bestand:"
 
 #: modules/gui/macosx/open.m:186
 msgid "Use DVD menus (EXPERIMENTAL)"
@@ -3150,7 +3130,6 @@ msgid "Save File"
 msgstr "Bewaar Bestand"
 
 #: modules/gui/macosx/controls.m:579
-#, fuzzy
 msgid "Open subtitle file"
 msgstr "Open bestand met ondertitels"
 
@@ -3223,7 +3202,7 @@ msgstr "&Hoofdstuk:"
 
 #: modules/gui/win32/strings.cpp:28
 msgid "F:\\"
-msgstr ""
+msgstr "F:\\"
 
 #: modules/gui/win32/strings.cpp:35
 msgid "ToolBar"
@@ -3403,7 +3382,6 @@ msgid "&Fullscreen"
 msgstr "&Volledig Scherm"
 
 #: modules/gui/win32/strings.cpp:130
-#, fuzzy
 msgid "About..."
 msgstr "Over..."
 
@@ -3445,7 +3423,7 @@ msgstr "Breng het venster naar boven"
 
 #: modules/gui/win32/strings.cpp:155
 msgid "&Copy text"
-msgstr ""
+msgstr "&Kopieer tekst"
 
 #.
 #. * from modules/gui/win32/network.dfm:
@@ -3497,15 +3475,15 @@ msgstr "&Selectie"
 
 #: modules/gui/win32/strings.cpp:192
 msgid "&Invert selection"
-msgstr "&Inverteer Selectie"
+msgstr "&Inverteer selectie"
 
 #: modules/gui/win32/strings.cpp:193
 msgid "&Crop selection"
-msgstr "&Crop Selectie"
+msgstr "&Crop selectie"
 
 #: modules/gui/win32/strings.cpp:194
 msgid "&Delete selection"
-msgstr "&Verwijder Selectie"
+msgstr "&Verwijder selectie"
 
 #: modules/gui/win32/strings.cpp:195
 msgid "Delete &all"
@@ -3513,16 +3491,15 @@ msgstr "Verwijder allen"
 
 #: modules/gui/win32/strings.cpp:197
 msgid "Invert selection"
-msgstr "Inverteer Selectie"
+msgstr "Inverteer selectie"
 
 #: modules/gui/win32/strings.cpp:199
 msgid "Crop selection"
-msgstr "Crop Selectie"
+msgstr "Crop selectie"
 
 #: modules/gui/win32/strings.cpp:201
-#, fuzzy
 msgid "Delete selection"
-msgstr "Verwijder Selectie"
+msgstr "Verwijder selectie"
 
 #: modules/gui/win32/strings.cpp:203
 msgid "Delete all items"
@@ -3682,7 +3659,6 @@ msgstr "MMX conversies van "
 #. * Module descriptor
 #. ****************************************************************************
 #: modules/video_filter/clone.c:53
-#, fuzzy
 msgid "number of clones"
 msgstr "Aantal klonen"
 
@@ -3757,7 +3733,6 @@ msgstr "inverteer video module"
 #. * Module descriptor
 #. ****************************************************************************
 #: modules/video_filter/motionblur.c:54
-#, fuzzy
 msgid "blur factor"
 msgstr "Wazigheids faktor"
 
