@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: libvlc.c,v 1.109 2004/01/06 12:02:05 zorglub Exp $
+ * $Id: libvlc.c,v 1.110 2004/01/09 20:36:21 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -99,6 +99,8 @@ static void ShowConsole   ( void );
 #endif
 static int  ConsoleWidth  ( void );
 
+static int  VerboseCallback( vlc_object_t *, char const *,
+                             vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vlc_current_object: return the current object.
@@ -497,18 +499,17 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /*
      * Message queue options
      */
+
+    var_Create( p_vlc, "verbose", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     if( config_GetInt( p_vlc, "quiet" ) )
     {
-        libvlc.i_verbose = -1;
+        vlc_value_t val;
+        val.i_int = -1;
+        var_Set( p_vlc, "verbose", val );
     }
-    else
-    {
-        int i_tmp = config_GetInt( p_vlc, "verbose" );
-        if( i_tmp >= 0 )
-        {
-            libvlc.i_verbose = __MIN( i_tmp, 2 );
-        }
-    }
+    var_AddCallback( p_vlc, "verbose", VerboseCallback, NULL );
+    var_Change( p_vlc, "verbose", VLC_VAR_TRIGGER_CALLBACKS, NULL, NULL );
+    
     libvlc.b_color = libvlc.b_color && config_GetInt( p_vlc, "color" );
 
     /*
@@ -1629,4 +1630,16 @@ static int ConsoleWidth( void )
 #endif
 
     return i_width;
+}
+
+static int VerboseCallback( vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param)
+{
+    vlc_t *p_vlc = (vlc_t *)p_this;
+
+    if( new_val.i_int >= -1 )
+    {
+        p_vlc->p_libvlc->i_verbose = __MIN( new_val.i_int, 2 );
+    }
+    return VLC_SUCCESS;
 }

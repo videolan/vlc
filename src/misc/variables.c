@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: variables.c,v 1.35 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: variables.c,v 1.36 2004/01/09 20:36:21 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -611,6 +611,41 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                 {
                     *p_val = p_var->val;
                     p_var->pf_dup( p_val );
+                }
+            }
+            break;
+        case VLC_VAR_TRIGGER_CALLBACKS:
+            {
+                /* Deal with callbacks. Tell we're in a callback, release the lock,
+                 * call stored functions, retake the lock. */
+                if( p_var->i_entries )
+                {
+                    int i_var;
+                    int i_entries = p_var->i_entries;
+                    callback_entry_t *p_entries = p_var->p_entries;
+
+                    p_var->b_incallback = VLC_TRUE;
+                    vlc_mutex_unlock( &p_this->var_lock );
+
+                    /* The real calls */
+                    for( ; i_entries-- ; )
+                    {
+                        p_entries[i_entries].pf_callback( p_this, psz_name, p_var->val, p_var->val,
+                                                          p_entries[i_entries].p_data );
+                    }
+
+                    vlc_mutex_lock( &p_this->var_lock );
+
+                    i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+                    if( i_var < 0 )
+                    {
+                        msg_Err( p_this, "variable %s has disappeared", psz_name );
+                        vlc_mutex_unlock( &p_this->var_lock );
+                        return VLC_ENOVAR;
+                    }
+
+                    p_var = &p_this->p_vars[i_var];
+                    p_var->b_incallback = VLC_FALSE;
                 }
             }
             break;

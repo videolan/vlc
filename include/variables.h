@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.19 2003/12/02 12:57:35 gbazin Exp $
+ * $Id: variables.h,v 1.20 2004/01/09 20:36:21 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -137,36 +137,37 @@ struct variable_t
  * \param p_val The new minimum value
  * \param p_val2 Unused
  */
-#define VLC_VAR_SETMIN        0x0010
+#define VLC_VAR_SETMIN              0x0010
 /**
  * Set the maximum value of this variable
  * \param p_val The new maximum value
  * \param p_val2 Unused
  */
-#define VLC_VAR_SETMAX        0x0011
-#define VLC_VAR_SETSTEP       0x0012
+#define VLC_VAR_SETMAX              0x0011
+#define VLC_VAR_SETSTEP             0x0012
 
 /**
  * Set the value of this variable without triggering any callbacks
  * \param p_val The new value
  * \param p_val2 Unused
  */
-#define VLC_VAR_SETVALUE      0x0013
+#define VLC_VAR_SETVALUE            0x0013
 
-#define VLC_VAR_SETTEXT       0x0014
-#define VLC_VAR_GETTEXT       0x0015
+#define VLC_VAR_SETTEXT             0x0014
+#define VLC_VAR_GETTEXT             0x0015
 
-#define VLC_VAR_ADDCHOICE     0x0020
-#define VLC_VAR_DELCHOICE     0x0021
-#define VLC_VAR_CLEARCHOICES  0x0022
-#define VLC_VAR_SETDEFAULT    0x0023
-#define VLC_VAR_GETCHOICES    0x0024
-#define VLC_VAR_FREECHOICES   0x0025
-#define VLC_VAR_GETLIST       0x0026
-#define VLC_VAR_FREELIST      0x0027
-#define VLC_VAR_CHOICESCOUNT  0x0028
+#define VLC_VAR_ADDCHOICE           0x0020
+#define VLC_VAR_DELCHOICE           0x0021
+#define VLC_VAR_CLEARCHOICES        0x0022
+#define VLC_VAR_SETDEFAULT          0x0023
+#define VLC_VAR_GETCHOICES          0x0024
+#define VLC_VAR_FREECHOICES         0x0025
+#define VLC_VAR_GETLIST             0x0026
+#define VLC_VAR_FREELIST            0x0027
+#define VLC_VAR_CHOICESCOUNT        0x0028
 
-#define VLC_VAR_INHERITVALUE  0x0030
+#define VLC_VAR_INHERITVALUE        0x0030
+#define VLC_VAR_TRIGGER_CALLBACKS   0x0035
 /**@}*/
 
 /*****************************************************************************
