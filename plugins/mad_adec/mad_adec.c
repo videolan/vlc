@@ -229,36 +229,6 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
 
 
 /*****************************************************************************
- * mad_adec_ErrorThread : mad decoder's RunThread() error loop
- *****************************************************************************/
-static void mad_adec_ErrorThread (mad_adec_thread_t * p_mad_adec)
-{
-    /* We take the lock, because we are going to read/write the start/end
-     * indexes of the decoder fifo */
-    vlc_mutex_lock (&p_mad_adec->p_fifo->data_lock);
-
-    /* Wait until a `die' order is sent */
-    while (!p_mad_adec->p_fifo->b_die)
-    {
-        /* Trash all received PES packets */
-        while (!DECODER_FIFO_ISEMPTY(*p_mad_adec->p_fifo))
-        {
-            p_mad_adec->p_fifo->pf_delete_pes(
-                    p_mad_adec->p_fifo->p_packets_mgt,
-                    DECODER_FIFO_START(*p_mad_adec->p_fifo));
-            DECODER_FIFO_INCSTART (*p_mad_adec->p_fifo);
-        }
-
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait (&p_mad_adec->p_fifo->data_wait,
-                       &p_mad_adec->p_fifo->data_lock);
-    }
-
-    /* We can release the lock before leaving */
-    vlc_mutex_unlock (&p_mad_adec->p_fifo->data_lock);
-}
-
-/*****************************************************************************
  * mad_adec_EndThread : libmad decoder thread destruction
  *****************************************************************************/
 static void mad_adec_EndThread (mad_adec_thread_t * p_mad_adec)
