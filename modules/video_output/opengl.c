@@ -110,7 +110,7 @@ static char *ppsz_effects_text[] = {
 vlc_module_begin();
     set_description( _("OpenGL video output") );
 #ifdef SYS_DARWIN
-    set_capability( "video output", 0 );
+    set_capability( "video output", 200 );
 #else
     set_capability( "video output", 20 );
 #endif
