@@ -479,6 +479,9 @@ static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
     if( p_sys->block.p_current == NULL )
         return 0;
 
+    if( p_read == NULL )
+        return AStreamSeekBlock( s, p_sys->i_pos + i_read ) ? 0 : i_read;
+
     while( i_data < i_read )
     {
         int i_current =
@@ -794,6 +797,9 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
     int      i_data = 0;
 
     if( tk->i_start >= tk->i_end ) return 0; /* EOF */
+
+    if( p_read == NULL )
+        return AStreamSeekStream( s, p_sys->i_pos + i_read ) ? 0 : i_read;
 
 #if 0
     msg_Dbg( s, "AStreamReadStream: %d pos="I64Fd" tk=%d start="I64Fd
