@@ -1928,6 +1928,8 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux )
     off_t        i_offset;
     unsigned int i;
 
+    vlc_bool_t b_keyset[100];
+
     p_riff = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, 0);
     p_idx1 = AVI_ChunkFind( p_riff, AVIFOURCC_idx1, 0);
     p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0);
@@ -1951,6 +1953,10 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux )
         }
     }
 
+    /* Reset b_keyset */
+    for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
+        b_keyset[i_stream] = VLC_FALSE;
+
     for( i_index = 0; i_index < p_idx1->i_entry_count; i_index++ )
     {
         unsigned int i_cat;
@@ -1968,6 +1974,21 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux )
             index.i_pos     = p_idx1->entry[i_index].i_pos + i_offset;
             index.i_length  = p_idx1->entry[i_index].i_length;
             AVI_IndexAddEntry( p_sys, i_stream, &index );
+
+            if( index.i_flags&AVIIF_KEYFRAME )
+                b_keyset[i_stream] = VLC_TRUE;
+        }
+    }
+
+    for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
+    {
+        if( !b_keyset[i_stream] )
+        {
+            avi_track_t *tk = p_sys->track[i_stream];
+
+            msg_Dbg( p_demux, "no key frame set for track %d", i_stream );
+            for( i_index = 0; i_index < tk->i_idxnb; i_index++ )
+                tk->p_index[i_index].i_flags |= AVIIF_KEYFRAME;
         }
     }
     return VLC_SUCCESS;
