@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.24 2003/01/04 13:30:02 jpsaman Exp $
+ * $Id: familiar.c,v 1.25 2003/01/04 13:50:16 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -325,8 +325,8 @@ static int Manage( intf_thread_t *p_intf )
 
             /* Manage the slider */
             if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
-			{	
-                /* Manage the slider for CPU_CAPABILITY_FPU hardware */				
+            {
+                /* Manage the slider for CPU_CAPABILITY_FPU hardware */	
                 if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
                 {
                     float newvalue = p_intf->p_sys->p_adj->value;
@@ -359,10 +359,10 @@ static int Manage( intf_thread_t *p_intf )
                     }
 #undef p_area
                 }
-			}
-			else
-			{
-                /* Manage the slider without CPU_CAPABILITY_FPU hardware */				
+            }
+            else
+            {
+                /* Manage the slider without CPU_CAPABILITY_FPU hardware */
                 if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
                 {
                     off_t newvalue = p_intf->p_sys->p_adj->value;
@@ -474,10 +474,10 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
         /* initialize and show slider for seekable streams */
         if( p_intf->p_sys->p_input->stream.b_seekable )
         {
-			if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+            if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
                 p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue = 0;
             else
-				p_intf->p_sys->p_adj->value = p_intf->p_sys->i_adj_oldvalue = 0;
+                p_intf->p_sys->p_adj->value = p_intf->p_sys->i_adj_oldvalue = 0;
             gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
                                      "value_changed" );
             gtk_widget_show( GTK_WIDGET( p_slider ) );
