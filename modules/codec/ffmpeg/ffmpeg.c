@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.56 2003/10/27 17:50:54 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.57 2003/10/29 19:35:43 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -150,7 +150,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if( !avcodec_find_decoder( i_codec_id ) )
     {
-        msg_Err( p_dec, "codec not found (%s)", psz_namecodec );
+        msg_Dbg( p_dec, "codec not found (%s)", psz_namecodec );
         return VLC_EGENERIC;
     }
 
@@ -617,7 +617,7 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         break;
     case VLC_FOURCC('m','p','3',' '):
         i_cat    = AUDIO_ES;
-        i_codec  = CODEC_ID_MP3;
+        i_codec  = CODEC_ID_MP3LAME;
         psz_name = "MPEG Audio layer 1/2/3";
         break;
 
