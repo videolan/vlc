@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.36 2003/07/01 19:17:32 sam Exp $
+##  $Id: toolbox,v 1.37 2003/07/02 20:01:51 gbazin Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -525,7 +525,7 @@ if test "${action}" = "distclean"
 then
   set -x
   # a naive sanity check to make sure we are in a VLC tree
-  test -f vlc.spec -a -f debian/rules || exit 1
+  test -f vlc.spec.mdk -a -f debian/rules || exit 1
   # let's rock!
   find . -type f '(' -name '*.[oa]' -o -name '*.so' -o -name '*.sl' -o -name '*.dylib' -o -name '*.dll' -o -name .dirstamp -o -name Makefile.in -o -name 'stamp-h*' -o -name '*~' -o -name '*.bak' -o -name '*.moc.cpp' ')' -exec rm -f '{}' ';'
   (cd autotools && find . -name '[a-z]*' -exec rm -f '{}' ';')
