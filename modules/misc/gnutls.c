@@ -574,6 +574,7 @@ gnutls_ServerDelete( tls_server_t *p_server )
     p_sys = (tls_server_sys_t *)p_server->p_sys;
 
     gnutls_certificate_free_credentials( p_sys->x509_cred );
+    gnutls_dh_params_deinit( p_sys->dh_params );
     vlc_mutex_destroy( &p_sys->cache_lock );
 
     vlc_object_detach( p_server );
@@ -870,5 +871,5 @@ Close( vlc_object_t *p_this )
         msg_Dbg( p_this, "GNUTLS deinitialized" );
     }
 
-    vlc_mutex_unlock( lock.p_address);
+    vlc_mutex_unlock( lock.p_address );
 }
