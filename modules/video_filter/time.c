@@ -32,6 +32,7 @@
 
 #include "vlc_filter.h"
 #include "vlc_block.h"
+#include "osd.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -45,8 +46,17 @@ static subpicture_t *Filter( filter_t *, mtime_t );
  *****************************************************************************/
 struct filter_sys_t
 {
+    int i_xoff, i_yoff;  /* offsets for the display string in the video window */
+    char *psz_head;  /* text to put before the day/time */
 };
 
+#define MSG_TEXT N_("Timestamp Prefix")
+#define MSG_LONGTEXT N_("Text (name) to display before the date and time")
+#define POSX_TEXT N_("X coordinate of the timestamp")
+#define POSX_LONGTEXT N_("Positive offset, from the left" )
+#define POSY_TEXT N_("Y coordinate of the timestamp")
+#define POSY_LONGTEXT N_("Positive offset, down from the top" )
+#define TRANS_TEXT N_("Transparency of the timestamp")
 
 /*****************************************************************************
  * Module descriptor
@@ -54,6 +64,9 @@ struct filter_sys_t
 vlc_module_begin();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
+    add_string( "text-message", NULL, NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
+    add_integer( "timestamp-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
+    add_integer( "timestamp-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
     set_description( _("Time display sub filter") );
     add_shortcut( "time" );
 vlc_module_end();
@@ -65,6 +78,7 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
+    vlc_value_t val;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -74,6 +88,15 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+    var_Create( p_this, "timestamp-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_filter, "timestamp-x", &val );
+    p_sys->i_xoff = val.i_int;
+    var_Create( p_this, "timestamp-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_filter, "timestamp-y", &val );
+    p_sys->i_yoff = val.i_int;
+    p_sys->psz_head = strdup(var_CreateGetString( p_this, "text-message" ));
+
+    
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
 
@@ -111,14 +134,19 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_t *p_spu;
     video_format_t fmt;
     time_t t;
+    char *psz_time, *psz_string;
+    filter_sys_t *p_sys;
+
+    p_sys = p_filter->p_sys;
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
     
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
     fmt.i_aspect = 0;
-    fmt.i_width = fmt.i_height = 0;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_width = fmt.i_height = 0;     
+    fmt.i_x_offset = 0;
+    fmt.i_y_offset = 0;
     
     p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
     if( !p_spu->p_region )
@@ -127,13 +155,20 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
     t = time(NULL);
-    p_spu->p_region->psz_text = myCtime(&t);
+    
+ 
+    psz_time = myCtime( &t );
+    asprintf( &psz_string, "%s%s", p_sys->psz_head, psz_time );
+    
+    free( psz_time );
+    p_spu->p_region->psz_text = psz_string;
     p_spu->i_start = date;
     p_spu->i_stop  = date + 1000000;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
-    p_spu->i_x = 10;
-    p_spu->i_y = 10;
-    p_spu->i_flags = 0;
+    p_spu->i_x = p_sys->i_xoff;
+    p_spu->i_y = p_sys->i_yoff;
+           
+    p_spu->i_flags = OSD_ALIGN_LEFT|OSD_ALIGN_TOP ;
     return p_spu;
 }
