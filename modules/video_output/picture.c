@@ -86,7 +86,7 @@ static int Open ( vlc_object_t *p_this )
     }
 
     if( var_Get( p_libvlc, "p_picture_vout", &val ) != VLC_SUCCESS ){
-        msg_Err( p_vout, "p_picture_vout not found" );
+        msg_Dbg( p_vout, "p_picture_vout not found" );
         p_picture_vout = malloc( sizeof( struct picture_vout_t ) );
         if( p_vout->p_sys == NULL )
         {
@@ -104,7 +104,7 @@ static int Open ( vlc_object_t *p_this )
         p_picture_vout->p_pic = NULL;
     } else {
         p_picture_vout = val.p_address;
-        msg_Err( p_vout, "p_picture_vout found" );
+        msg_Dbg( p_vout, "p_picture_vout found" );
         vlc_mutex_lock( &p_picture_vout->lock );
     }
 

@@ -374,6 +374,31 @@ static void Run( intf_thread_t *p_intf )
     var_Create( p_intf, "marq-timeout", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-timeout", Other, NULL );
 
+    var_Create( p_intf, "mosaic-alpha", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-alpha", Other, NULL );
+    var_Create( p_intf, "mosaic-height", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-height", Other, NULL );
+    var_Create( p_intf, "mosaic-width", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-width", Other, NULL );
+    var_Create( p_intf, "mosaic-xoffset", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-xoffset", Other, NULL );
+    var_Create( p_intf, "mosaic-yoffset", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-yoffset", Other, NULL );
+    var_Create( p_intf, "mosaic-vborder", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-vborder", Other, NULL );
+    var_Create( p_intf, "mosaic-hborder", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-hborder", Other, NULL );
+    var_Create( p_intf, "mosaic-position",
+                     VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-position", Other, NULL );
+    var_Create( p_intf, "mosaic-rows", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-rows", Other, NULL );
+    var_Create( p_intf, "mosaic-cols", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-cols", Other, NULL );
+    var_Create( p_intf, "mosaic-keep-aspect-ratio",
+                     VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-keep-aspect-ratio", Other, NULL );
+
     /* time on the fly items */
     var_Create( p_intf, "time-format", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "time-format", Other, NULL );
@@ -387,7 +412,6 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "time-color", Other, NULL );
     var_Create( p_intf, "time-opacity", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "time-opacity", Other, NULL );
-    
     
     var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "pause", Input, NULL );
@@ -1026,6 +1050,94 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp, "marq-timeout", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-alpha" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-alpha", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-height" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-height", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-width" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-width", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-xoffset" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-xoffset", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-yoffset" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-yoffset", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-vborder" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-vborder", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-hborder" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-hborder", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-position" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-position", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-rows" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-rows", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-cols" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-cols", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-keep-aspect-ratio" ) )
+    {
+        if( strlen( newval.psz_string) > 0)
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-keep-aspect-ratio", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-format" ) )
