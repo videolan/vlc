@@ -427,7 +427,12 @@ dnl
 dnl  default modules
 dnl
 BUILTINS="${BUILTINS} idct idctclassic motion imdct downmix chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga mpeg_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_ps mpeg_ts mpeg_audio file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone filter_crop fx_scope"
+PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_ps mpeg_ts mpeg_audio file memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone filter_crop fx_scope"
+
+dnl
+dnl  Network modules
+dnl
+NETWORK_MODULES="udp http ipv4"
 
 dnl
 dnl  Accelerated modules
@@ -437,6 +442,11 @@ MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 SSE_MODULES="imdctsse downmixsse"
 ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
+
+if test x$SYS != xbeos
+then
+    PLUGINS="${PLUGINS} ${NETWORK_MODULES}"
+fi
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
@@ -948,7 +958,11 @@ then
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
       BUILTINS="${BUILTINS} ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a -lm"
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a"
+      if test x$SYS != xbeos
+      then
+        ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lm"
+      fi
       ffmpeg_CFLAGS="${ffmpeg_CFLAGS} -I${real_ffmpeg_tree}/libavcodec"
     else
       dnl  The given libavcodec wasn't built
@@ -959,10 +973,18 @@ then
     save_CFLAGS=$CFLAGS
     save_LDFLAGS=$LDFLAGS
     CFLAGS="$CFLAGS $ffmpeg_CFLAGS"
-    LDFLAGS="$LDFLAGS $ffmpeg_LDFLAGS -lm"
+    LDFLAGS="$LDFLAGS $ffmpeg_LDFLAGS"
+    if test x$SYS != xbeos
+    then
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lm"
+    fi
     AC_CHECK_LIB(avcodec, avcodec_init, [
       BUILTINS="${BUILTINS} ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec -lm" ],
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec"
+      if test x$SYS != xbeos
+      then
+        ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lm"
+      fi ],
       [ AC_MSG_ERROR([Cannot find libavcodec library...]) ])
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
