@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,9 +52,10 @@ __published:	// IDE-managed Components
     void __fastcall ButtonCancelClick( TObject *Sender );
     void __fastcall ButtonOkClick( TObject *Sender);
     void __fastcall RadioGroupTypeClick( TObject *Sender );
-    void __fastcall CheckBoxMenusClick(TObject *Sender);
+    void __fastcall CheckBoxMenusClick( TObject *Sender );
 private:	// User declarations
     intf_thread_t *p_intf;
+    void __fastcall DisableTitles( Boolean disable );
 public:		// User declarations
     __fastcall TDiscDlg( TComponent* Owner, intf_thread_t *_p_intf );
 };

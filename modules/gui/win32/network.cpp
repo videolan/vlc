@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -143,8 +143,11 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             config_PutInt( p_intf, "network-channel", FALSE );
             Address = EditHTTPURL->Text;
 
-            /* Build source name with a basic test */
-            if( Address.SubString( 1, 4 ) == "http" )
+            /* Build source name with a basic test;
+             * http is the default protocol */
+            if( Address.SubString( 1, 7 ) == "http://" ||
+                Address.SubString( 1, 6 ) == "ftp://"  ||
+                Address.SubString( 1, 6 ) == "mms://" )
             {
                 Source = Address;
             }

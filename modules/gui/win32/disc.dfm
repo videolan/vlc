@@ -1,6 +1,6 @@
 object DiscDlg: TDiscDlg
-  Left = 502
-  Top = 336
+  Left = 390
+  Top = 320
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Open disc'

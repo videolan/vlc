@@ -1,10 +1,10 @@
 object NetworkDlg: TNetworkDlg
-  Left = 369
-  Top = 301
+  Left = 329
+  Top = 253
   BorderStyle = bsDialog
   Caption = 'Open network'
   ClientHeight = 206
-  ClientWidth = 482
+  ClientWidth = 497
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -249,7 +249,7 @@ object NetworkDlg: TNetworkDlg
   TextHeight = 13
   object BitBtnOk: TBitBtn
     Tag = 3
-    Left = 40
+    Left = 52
     Top = 168
     Width = 177
     Height = 25
@@ -259,7 +259,7 @@ object NetworkDlg: TNetworkDlg
   end
   object BitBtnCancel: TBitBtn
     Tag = 3
-    Left = 256
+    Left = 268
     Top = 168
     Width = 177
     Height = 25
@@ -271,13 +271,13 @@ object NetworkDlg: TNetworkDlg
     Tag = 3
     Left = 8
     Top = 8
-    Width = 465
+    Width = 481
     Height = 145
     Caption = 'Network mode'
     TabOrder = 2
     object LabelUDPPort: TLabel
       Tag = 3
-      Left = 148
+      Left = 172
       Top = 26
       Width = 22
       Height = 13
@@ -285,7 +285,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelMulticastPort: TLabel
       Tag = 3
-      Left = 364
+      Left = 388
       Top = 54
       Width = 22
       Height = 13
@@ -294,7 +294,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelCSPort: TLabel
       Tag = 3
-      Left = 364
+      Left = 388
       Top = 82
       Width = 22
       Height = 13
@@ -303,7 +303,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelMulticastAddress: TLabel
       Tag = 3
-      Left = 139
+      Left = 163
       Top = 54
       Width = 41
       Height = 13
@@ -312,7 +312,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelCSAddress: TLabel
       Tag = 3
-      Left = 139
+      Left = 163
       Top = 82
       Width = 41
       Height = 13
@@ -321,7 +321,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelHTTPURL: TLabel
       Tag = 3
-      Left = 147
+      Left = 171
       Top = 110
       Width = 25
       Height = 13
@@ -332,9 +332,9 @@ object NetworkDlg: TNetworkDlg
       Tag = 3
       Left = 16
       Top = 24
-      Width = 97
+      Width = 113
       Height = 17
-      Caption = 'UDP'
+      Caption = 'UDP/RTP'
       Checked = True
       TabOrder = 0
       TabStop = True
@@ -344,9 +344,9 @@ object NetworkDlg: TNetworkDlg
       Tag = 3
       Left = 16
       Top = 52
-      Width = 97
+      Width = 113
       Height = 17
-      Caption = 'UDP Multicast'
+      Caption = 'UDP/RTP Multicast'
       TabOrder = 1
       OnEnter = RadioButtonMulticastEnter
     end
@@ -354,7 +354,7 @@ object NetworkDlg: TNetworkDlg
       Tag = 3
       Left = 16
       Top = 80
-      Width = 97
+      Width = 113
       Height = 17
       Caption = 'Channel Server'
       TabOrder = 2
@@ -364,15 +364,15 @@ object NetworkDlg: TNetworkDlg
       Tag = 3
       Left = 16
       Top = 108
-      Width = 97
+      Width = 113
       Height = 17
-      Caption = 'HTTP'
+      Caption = 'HTTP/FTP/MMS'
       TabOrder = 3
       OnEnter = RadioButtonHTTPEnter
     end
     object ComboBoxMulticastAddress: TComboBox
       Tag = 5
-      Left = 184
+      Left = 208
       Top = 50
       Width = 161
       Height = 21
@@ -382,7 +382,7 @@ object NetworkDlg: TNetworkDlg
     end
     object ComboBoxCSAddress: TComboBox
       Tag = 5
-      Left = 184
+      Left = 208
       Top = 78
       Width = 161
       Height = 21
@@ -395,7 +395,7 @@ object NetworkDlg: TNetworkDlg
     end
     object EditHTTPURL: TEdit
       Tag = 5
-      Left = 184
+      Left = 208
       Top = 106
       Width = 265
       Height = 21
@@ -403,7 +403,7 @@ object NetworkDlg: TNetworkDlg
       TabOrder = 9
     end
     object SpinEditUDPPort: TCSpinEdit
-      Left = 184
+      Left = 208
       Top = 21
       Width = 57
       Height = 22
@@ -414,7 +414,7 @@ object NetworkDlg: TNetworkDlg
       Value = 1234
     end
     object SpinEditMulticastPort: TCSpinEdit
-      Left = 392
+      Left = 416
       Top = 49
       Width = 57
       Height = 22
@@ -426,7 +426,7 @@ object NetworkDlg: TNetworkDlg
       Value = 1234
     end
     object SpinEditCSPort: TCSpinEdit
-      Left = 392
+      Left = 416
       Top = 77
       Width = 57
       Height = 22

@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -79,13 +79,13 @@ void __fastcall TDiscDlg::ButtonOkClick( TObject *Sender )
     Chapter.sprintf( "%d", SpinEditChapter->Value );
 
     /* Build source name and add it to playlist */
-    if ( CheckBoxMenus->Checked )
+    if ( CheckBoxMenus->Checked && RadioGroupType->ItemIndex == 0 )
     {
-        Source = Method + ":" + Device;
+        Source = "dvdplay://" + Device;
     }
     else
     {
-        Source = Method + ":" + Device + "@" + Title + "," + Chapter;
+        Source = Method + "://" + Device + "@" + Title + "," + Chapter;
     }
 
     p_intf->p_sys->p_playwin->Add( Source, PLAYLIST_APPEND
@@ -102,13 +102,14 @@ void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )
     {
         psz_device = config_GetPsz( p_intf, "dvd" );
         CheckBoxMenus->Enabled = true;
-        CheckBoxMenus->Checked = true;
+        DisableTitles( CheckBoxMenus->Checked );
     }
     else
     {
         psz_device = config_GetPsz( p_intf, "vcd" );
-        CheckBoxMenus->Checked = false;
         CheckBoxMenus->Enabled = false;
+        /* We don't support menus for vcds, so we use titles and chapters */
+        DisableTitles( false );
     }
 
     if( psz_device )
@@ -118,10 +119,14 @@ void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )
     }
 }
 //---------------------------------------------------------------------------
-
-void __fastcall TDiscDlg::CheckBoxMenusClick(TObject *Sender)
+void __fastcall TDiscDlg::CheckBoxMenusClick( TObject *Sender )
 {
-    if ( CheckBoxMenus->Checked )
+    DisableTitles( CheckBoxMenus->Checked );
+}
+//---------------------------------------------------------------------------
+void __fastcall TDiscDlg::DisableTitles( Boolean disable )
+{
+    if( disable )
     {
         LabelTitle->Enabled = false;
         LabelChapter->Enabled = false;
