@@ -2,7 +2,7 @@
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.10 2004/01/29 11:50:21 rocky Exp $
+ * $Id: common.c,v 1.11 2004/01/30 13:17:12 rocky Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from:
@@ -488,25 +488,6 @@ void VCDSubDumpImage( uint8_t *p_image, uint32_t i_height, uint32_t i_width )
   }
   printf("\n-------------------------------------\n");
 }
-
-/***************************************************
-   Color conversion from
-    http://www.inforamp.net/~poynton/notes/colour_and_gamma/ColorFAQ.html#RTFToC30
-    http://people.ee.ethz.ch/~buc/brechbuehler/mirror/color/ColorFAQ.html
- 
-    Thanks to Billy Biggs <vektor@dumbterm.net> for the pointer and
-    the following conversion.
- 
-    R' = [ 1.1644         0    1.5960 ]   ([ Y' ]   [  16 ])
-    G' = [ 1.1644   -0.3918   -0.8130 ] * ([ Cb ] - [ 128 ])
-    B' = [ 1.1644    2.0172         0 ]   ([ Cr ]   [ 128 ])
-
-  See also vlc/modules/video_chroma/i420_rgb.h and
-  vlc/modules/video_chroma/i420_rgb_c.h for a way to do this in a way
-  more optimized for integer arithmetic. Would be nice to merge the
-  two routines.
- 
-***************************************************/
 
 #ifdef HAVE_LIBPNG
 

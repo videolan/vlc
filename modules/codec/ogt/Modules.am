@@ -5,6 +5,7 @@ SOURCES_svcdsub = \
 	ogt.c \
 	ogt.h \
 	ogt_parse.c \
+	pixmap.c \
 	pixmap.h \
 	render.c \
 	render.h \
