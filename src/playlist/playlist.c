@@ -251,7 +251,14 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
                                                    playlist_item_t *);
         p_playlist->request.i_view = p_playlist->status.i_view;
         p_view = playlist_ViewFind( p_playlist, p_playlist->status.i_view );
-        p_playlist->request.p_node = p_view->p_root;
+        if( p_view )
+        {
+            p_playlist->request.p_node = p_view->p_root;
+        }
+        else
+        {
+            p_playlist->request.p_node = NULL;
+        }
         break;
 
     case PLAYLIST_VIEWPLAY:
