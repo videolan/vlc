@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.49 2004/02/29 14:05:45 zorglub Exp $
+ * $Id$
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -594,6 +594,23 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
     } formats[] = {{ _("M3U file"), "*.m3u", "export-m3u" },
                    { _("PLS file"), "*.pls", "export-pls" }};
     wxString filter = wxT("");
+
+    playlist_t * p_playlist =
+                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
+
+    if( ! p_playlist )
+    {
+        return;
+    }
+    if( p_playlist->i_size == 0 )
+    {
+        wxMessageBox( wxU(_("Playlist is empty") ), wxU(_("Can't save")),
+                      wxICON_WARNING | wxOK, this );
+        vlc_object_release( p_playlist );
+        return;
+    }
+
     for( unsigned int i = 0; i < sizeof(formats)/sizeof(formats[0]); i++)
     {
         filter.Append( wxU(formats[i].psz_desc) );
@@ -606,23 +623,15 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
 
     if( dialog.ShowModal() == wxID_OK )
     {
-
-        playlist_t * p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-
-        if( p_playlist )
+        if( dialog.GetFilename().mb_str() )
         {
-            if( dialog.GetFilename().mb_str() )
-            {
-                playlist_Export( p_playlist, dialog.GetFilename().mb_str(),
-                                 formats[dialog.GetFilterIndex()].psz_module );
-            }
+            playlist_Export( p_playlist, dialog.GetFilename().mb_str(),
+                             formats[dialog.GetFilterIndex()].psz_module );
         }
-
-        vlc_object_release( p_playlist );
-
     }
+
+    vlc_object_release( p_playlist );
+
 }
 
 void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
