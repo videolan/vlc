@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.38 2003/12/10 11:04:25 courmisch Exp $
+ * $Id: streamout.cpp,v 1.39 2003/12/14 21:03:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -68,6 +68,7 @@ enum
     EncapsulationRadio7_Event, EncapsulationRadio8_Event,
 
     VideoTranscEnable_Event, VideoTranscCodec_Event, VideoTranscBitrate_Event,
+    VideoTranscScale_Event,
     AudioTranscEnable_Event, AudioTranscCodec_Event, AudioTranscBitrate_Event,
     AudioTranscChans_Event,
 
@@ -128,6 +129,8 @@ BEGIN_EVENT_TABLE(SoutDialog, wxDialog)
     EVT_TEXT(VideoTranscBitrate_Event, SoutDialog::OnTranscodingChange)
     EVT_COMBOBOX(AudioTranscBitrate_Event, SoutDialog::OnTranscodingChange)
     EVT_TEXT(AudioTranscBitrate_Event, SoutDialog::OnTranscodingChange)
+    EVT_COMBOBOX(VideoTranscScale_Event, SoutDialog::OnTranscodingChange)
+    EVT_TEXT(VideoTranscScale_Event, SoutDialog::OnTranscodingChange)
     EVT_COMBOBOX(AudioTranscChans_Event, SoutDialog::OnTranscodingChange)
     EVT_TEXT(AudioTranscChans_Event, SoutDialog::OnTranscodingChange)
 
@@ -252,6 +255,7 @@ void SoutDialog::UpdateMRL()
         {
             transcode += wxT("vcodec=") + video_codec_combo->GetValue();
             transcode += wxT(",vb=") + video_bitrate_combo->GetValue();
+            transcode += wxT(",scale=") + video_scale_combo->GetValue();
             if( audio_transc_checkbox->IsChecked() ) transcode += wxT(",");
         }
         if( audio_transc_checkbox->IsChecked() )
@@ -638,8 +642,19 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("32"),
         wxT("16")
     };
+    static const wxString vscales_array[] =
+    {
+        wxT("0.25"),
+        wxT("0.5"),
+        wxT("0.75"),
+        wxT("1"),
+        wxT("1.25"),
+        wxT("1.5"),
+        wxT("1.75"),
+        wxT("2")
+    };
 
-    wxFlexGridSizer *video_sizer = new wxFlexGridSizer( 4, 1, 20 );
+    wxFlexGridSizer *video_sizer = new wxFlexGridSizer( 6, 1, 20 );
     video_transc_checkbox =
         new wxCheckBox( panel, VideoTranscEnable_Event, wxU(_("Video codec")));
     video_codec_combo =
@@ -653,6 +668,12 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         new wxComboBox( panel, VideoTranscBitrate_Event, wxT("1024"),
                         wxPoint(20,25), wxDefaultSize,
                         WXSIZEOF(vbitrates_array), vbitrates_array );
+    wxStaticText *scale_label =
+        new wxStaticText( panel, -1, wxU(_("Scale")));
+    video_scale_combo =
+        new wxComboBox( panel, VideoTranscScale_Event, wxT("1"),
+                        wxPoint(20,25), wxDefaultSize,
+                        WXSIZEOF(vscales_array), vscales_array );
     video_sizer->Add( video_transc_checkbox, 0,
                       wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     video_sizer->Add( video_codec_combo, 1,
@@ -660,6 +681,10 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     video_sizer->Add( bitrate_label, 0,
                       wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     video_sizer->Add( video_bitrate_combo, 1,
+                      wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+    video_sizer->Add( scale_label, 0,
+                      wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+    video_sizer->Add( video_scale_combo, 1,
                       wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
 
     /* Create audio transcoding checkox */

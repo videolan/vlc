@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.35 2003/10/15 12:24:14 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.36 2003/12/14 21:03:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -258,6 +258,10 @@ bool Instance::OnInit()
      * Usefull for things we don't have any control over, like wxWindows
      * provided facilities (eg. open file dialog) */
     locale.Init( wxLANGUAGE_DEFAULT );
+
+    /* FIXME: The stream output mrl parsing uses ',' already so we want to
+     * keep the default '.' for floating point numbers. */
+    setlocale( LC_NUMERIC, "C" );
 
     /* Make an instance of your derived frame. Passing NULL (the default value
      * of Frame's constructor is NULL) as the frame doesn't have a parent

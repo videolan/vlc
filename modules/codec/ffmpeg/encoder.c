@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.19 2003/12/07 12:11:13 gbazin Exp $
+ * $Id: encoder.c,v 1.20 2003/12/14 21:03:27 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -175,6 +175,14 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
+        if( !p_enc->fmt_in.video.i_width || !p_enc->fmt_in.video.i_height )
+        {
+            msg_Warn( p_enc, "invalid size %ix%i", p_enc->fmt_in.video.i_width,
+                      p_enc->fmt_in.video.i_height );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+
         p_context->width = p_enc->fmt_in.video.i_width;
         p_context->height = p_enc->fmt_in.video.i_height;
 
@@ -256,6 +264,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             if( avcodec_open( p_context, p_codec ) )
             {
                 msg_Err( p_enc, "cannot open encoder" );
+                free( p_sys );
                 return VLC_EGENERIC;
             }
             msg_Warn( p_enc, "stereo mode selected (codec limitation)" );
@@ -263,6 +272,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         else
         {
             msg_Err( p_enc, "cannot open encoder" );
+            free( p_sys );
             return VLC_EGENERIC;
         }
     }

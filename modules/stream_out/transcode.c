@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.63 2003/12/08 13:02:40 gbazin Exp $
+ * $Id: transcode.c,v 1.64 2003/12/14 21:03:27 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1052,6 +1052,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
 #endif
 
 #if LIBAVCODEC_BUILD >= 4687
+        if( id->ff_dec_c->height )
         id->p_encoder->fmt_in.video.i_aspect = VOUT_ASPECT_FACTOR *
             ( av_q2d(id->ff_dec_c->sample_aspect_ratio) *
               id->ff_dec_c->width / id->ff_dec_c->height );
@@ -1222,7 +1223,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             int i_height = id->ff_dec_c->height - p_sys->i_crop_top -
                            p_sys->i_crop_bottom;
 
-            if( id->f_dst.video.i_width <= 0 && id->f_dst.video.i_height <= 0 )
+            if( id->f_dst.video.i_width <= 0 && id->f_dst.video.i_height <= 0
+                && p_sys->f_scale )
             {
                 /* Apply the scaling */
                 id->f_dst.video.i_width = i_width * p_sys->f_scale;
