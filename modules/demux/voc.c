@@ -57,11 +57,7 @@ struct demux_sys_t
     es_format_t     fmt;
     es_out_id_t     *p_es;
 
-#if 0
-    int64_t         i_data_offset;
-    unsigned int    i_data_size;
-#endif
-
+    int64_t         i_block_offset;
     int32_t         i_block_size;
 
     date_t          pts;
@@ -215,6 +211,8 @@ static int Open( vlc_object_t * p_this )
             msg_Dbg( p_demux, "Unsupported block type %u", (unsigned)*p_buf);
             return VLC_EGENERIC;
     }
+    p_sys->i_block_offset = stream_Tell( p_demux->s );
+
     p_sys->fmt.i_extra = 0;
     p_sys->fmt.p_extra = NULL;
 
@@ -247,18 +245,16 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_block;
-#if 0
     int64_t     i_offset;
 
     i_offset = stream_Tell( p_demux->s );
 
-    if( p_sys->i_data_size > 0 &&
-        i_offset >= p_sys->i_data_offset + p_sys->i_data_size )
+    if( i_offset >= p_sys->i_block_offset + p_sys->i_block_size )
     {
         /* EOF */
         return 0;
     }
-#endif
+
     p_block = stream_Block( p_demux->s, p_sys->fmt.audio.i_bytes_per_frame );
     if( p_block == NULL )
     {
@@ -293,10 +289,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
 
-    if( i_query == DEMUX_SET_POSITION )
-        return VLC_EGENERIC; /* not implemented yet */
-
-    return demux2_vaControlHelper( p_demux->s, 0, -1, p_sys->fmt.i_bitrate,
+    return demux2_vaControlHelper( p_demux->s, p_sys->i_block_offset,
+                                   p_sys->i_block_offset + p_sys->i_block_size,
+                                   p_sys->fmt.i_bitrate,
                                    p_sys->fmt.audio.i_blockalign,
                                    i_query, args );
 }
