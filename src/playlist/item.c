@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: item.c,v 1.4 2003/11/25 00:56:35 fenrir Exp $
+ * $Id: item.c,v 1.5 2003/11/27 21:24:57 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -75,7 +75,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
 
     p_item->psz_name   = strdup( psz_name );
     p_item->psz_uri    = strdup( psz_uri );
-    p_item->psz_author = strdup( "Arg" );
+    p_item->psz_author = strdup( "" );
     p_item->i_duration = i_duration;
     p_item->i_type = 0;
     p_item->i_status = 0;
