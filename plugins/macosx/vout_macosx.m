@@ -349,6 +349,10 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     {
         intf_ErrMsg( "DecompressSequenceFrameS failed: %d", err );
     }
+    else
+    {
+        QDFlushPortBuffer( p_vout->p_sys->p_qdport, nil );
+    }
 }
 
 /*****************************************************************************
