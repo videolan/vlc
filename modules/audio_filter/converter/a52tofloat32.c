@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52tofloat32.c,v 1.7 2002/11/18 23:00:41 massiot Exp $
+ * $Id: a52tofloat32.c,v 1.8 2002/11/21 23:06:08 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -215,13 +215,44 @@ static int Create( vlc_object_t * _p_filter )
  *****************************************************************************/
 static void Interleave( float * p_out, const float * p_in, int i_nb_channels )
 {
+    /* We do not only have to interleave, but also reorder the channels
+     * Channel reordering according to number of output channels of libA52
+     * The reordering needs to be different for different channel configurations
+     * (3F2R, 1F2R etc), so this is only temporary.
+     * The WG-4 order is appropriate for stereo, quadrophonia, and 5.1 surround.
+     *
+     * 6 channel mode
+     * channel	liba52 order	WG-4 order
+     * 0	LFE		// L
+     * 1	L		// R
+     * 2	C		// LS
+     * 3	R		// RS
+     * 4	LS		// C
+     * 5	RS		// LFE
+     *
+     * The liba52 moves channels to the front if there are unused spaces, so
+     * there is no gap between channels. The translation table says which
+     * channel of the new stream [use the new channel # as index] is taken
+     * from which original channel [use the number from the array to address
+     * the original channel].
+     */
+    
+    static const int translation[7][6] =
+    {{ 0, 0, 0, 0, 0, 0 },	/* 0 channels (rarely used) */
+    { 0, 0, 0, 0, 0, 0 },	/* 1 ch */
+    { 0, 1, 0, 0, 0, 0 },	/* 2 */
+    { 1, 2, 0, 0, 0, 0 },	/* 3 */
+    { 1, 3, 2, 0, 0, 0 },	/* 4 */
+    { 1, 3, 4, 2, 0, 0 },	/* 5 */
+    { 1, 3, 4, 5, 2, 0 }};	/* 6 */
+	
     int i, j;
-
     for ( j = 0; j < i_nb_channels; j++ )
     {
         for ( i = 0; i < 256; i++ )
         {
-            p_out[i * i_nb_channels + j] = p_in[j * 256 + i];
+            p_out[i * i_nb_channels + translation[i_nb_channels][j]]
+                    = p_in[j * 256 + i];
         }
     }
 }
