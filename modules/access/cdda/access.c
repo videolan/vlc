@@ -119,7 +119,7 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
     break;
   default:
     msg_Warn( p_cdda_input, message,
-            _("The above message had unknown cdio log level"),
+            "The above message had unknown cdio log level",
             level);
   }
   return;
@@ -175,7 +175,7 @@ uninit_log_handler (cdio_log_level_t level, const char message[])
   default:
     fprintf(stderr, "UNKNOWN ERROR: %s\n%s %d\n",
             message,
-            _("The above message had unknown cdio log level"),
+            "The above message had unknown cdio log level",
             level);
   }
 
@@ -239,15 +239,15 @@ CDDAReadBlocks( access_t * p_access )
     p_block = block_New( p_access, i_blocks * CDIO_CD_FRAMESIZE_RAW );
     if( !p_block)
     {
-      msg_Err( p_access, _("Cannot get a new block of size: %i"),
+      msg_Err( p_access, "Cannot get a new block of size: %i",
 	       i_blocks * CDIO_CD_FRAMESIZE_RAW );
       return NULL;
     }
 
     if( cdio_read_audio_sectors( p_cdda->p_cdio, p_block->p_buffer,
-				 p_cdda->i_lsn, i_blocks) != 0 )
+                                 p_cdda->i_lsn, i_blocks) != 0 )
         {
-	  msg_Err( p_access, _("could not read sector %lu"), 
+	  msg_Err( p_access, "could not read sector %lu",
 		   (long unsigned int) p_cdda->i_lsn );
 	  block_Release( p_block );
 
@@ -307,7 +307,7 @@ GetCDDBInfo( access_t *p_access, cdda_data_t *p_cdda )
     cddb_log_set_handler (uninit_log_handler);
 
     if (!conn) {
-      msg_Warn( p_access, _("Unable to initialize libcddb") );
+      msg_Warn( p_access, "Unable to initialize libcddb" );
       goto cddb_destroy;
     }
 
@@ -344,7 +344,7 @@ GetCDDBInfo( access_t *p_access, cdda_data_t *p_cdda )
 
     p_cdda->cddb.disc = cddb_disc_new();
     if (!p_cdda->cddb.disc) {
-      msg_Err( p_access, _("Unable to create CDDB disc structure.") );
+      msg_Err( p_access, "Unable to create CDDB disc structure." );
       goto cddb_end;
     }
 
@@ -361,14 +361,14 @@ GetCDDBInfo( access_t *p_access, cdda_data_t *p_cdda )
       / CDIO_CD_FRAMES_PER_SEC;
 
     if (!cddb_disc_calc_discid(p_cdda->cddb.disc)) {
-      msg_Err( p_access, _("CDDB disc ID calculation failed") );
+      msg_Err( p_access, "CDDB disc ID calculation failed" );
       goto cddb_destroy;
     }
 
     i_matches = cddb_query(conn, p_cdda->cddb.disc);
     if (i_matches > 0) {
       if (i_matches > 1)
-        msg_Warn( p_access, _("Found %d matches in CDDB. Using first one."),
+        msg_Warn( p_access, "Found %d matches in CDDB. Using first one.",
                   i_matches);
       cddb_read(conn, p_cdda->cddb.disc);
 
@@ -376,7 +376,7 @@ GetCDDBInfo( access_t *p_access, cdda_data_t *p_cdda )
         cddb_disc_print(p_cdda->cddb.disc);
 
     } else {
-      msg_Warn( p_access, _("CDDB error: %s"), cddb_error_str(errno));
+      msg_Warn( p_access, "CDDB error: %s", cddb_error_str(errno));
     }
 
   cddb_destroy:
@@ -869,7 +869,7 @@ E_(CDDAOpen)( vlc_object_t *p_this )
 
         if (NULL == cd_drives || NULL == cd_drives[0] ) {
 	  msg_Err( p_access, 
-		   _("libcdio couldn't find something with a CD-DA in it") );
+		   "libcdio couldn't find something with a CD-DA in it" );
           if (cd_drives) cdio_free_device_list(cd_drives);
 	  return VLC_EGENERIC;
 	}
@@ -1041,9 +1041,9 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 	    vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
 	    if ( p_cdda->p_meta ) {
 	      *pp_meta = vlc_meta_Duplicate( p_cdda->p_meta );
-	      dbg_print( INPUT_DBG_META, "%s", _("Meta copied") );
+	      dbg_print( INPUT_DBG_META, "%s", "Meta copied" );
 	    } else 
-	      msg_Warn( p_access, _("Tried to copy NULL meta info") );
+	      msg_Warn( p_access, "tried to copy NULL meta info" );
 	    
 	    return VLC_SUCCESS;
 	  }
@@ -1118,7 +1118,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_PRIVATE_ID_STATE:
             return VLC_EGENERIC;
         default:
-	  msg_Warn( p_access, _("unimplemented query in control") );
+	  msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
 
     }
@@ -1156,7 +1156,7 @@ GetCDInfo( access_t *p_access, cdda_data_t *p_cdda )
     default:
       /* These are not possible for CD-DA */
       msg_Err( p_access, 
-	       _("Disc seems not to be CD-DA. libcdio reports it is %s"),
+	       "Disc seems not to be CD-DA. libcdio reports it is %s",
 	       discmode2str[discmode]
 	       );
       return VLC_EGENERIC;

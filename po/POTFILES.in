@@ -51,11 +51,13 @@ include/vlc_messages.h
 include/vlc_meta.h
 include/vlc_objects.h
 include/vlc_playlist.h
+include/vlc_spu.h
 include/vlc_stream.h
 include/vlc_threads.h
 include/vlc_threads_funcs.h
 include/vlc_video.h
 include/vlc_vlm.h
+include/vlc_vod.h
 include/vout_synchro.h
 include/win32_specific.h
 src/audio_output/common.c
@@ -128,9 +130,14 @@ src/vlc.c
 # modules
 modules/access/cdda.c
 modules/access/cdda/access.c
+modules/access/cdda/access.h
+modules/access/cdda/callback.c
+modules/access/cdda/callback.h
 modules/access/cdda/cdda.c
 modules/access/cdda/cdda.h
 modules/access/directory.c
+modules/access/dshow/common.h
+modules/access/dshow/crossbar.cpp
 modules/access/dshow/dshow.cpp
 modules/access/dshow/filter.cpp
 modules/access/dshow/filter.h
@@ -342,6 +349,7 @@ modules/demux/mp4/libmp4.c
 modules/demux/mp4/libmp4.h
 modules/demux/mp4/mp4.c
 modules/demux/mpeg/h264.c
+modules/demux/mpeg/m4a.c
 modules/demux/mpeg/m4v.c
 modules/demux/mpeg/mpga.c
 modules/demux/mpeg/mpgv.c
@@ -363,6 +371,7 @@ modules/demux/ts.c
 modules/demux/util/id3.c
 modules/demux/util/id3genres.h
 modules/demux/util/id3tag.c
+modules/demux/vobsub.c
 modules/demux/wav.c
 modules/gui/beos/AudioOutput.cpp
 modules/gui/beos/BeOS.cpp
@@ -711,6 +720,7 @@ modules/misc/playlist/export.c
 modules/misc/playlist/m3u.c
 modules/misc/playlist/old.c
 modules/misc/qte_main.cpp
+modules/misc/rtsp.c
 modules/misc/sap.c
 modules/misc/screensaver.c
 modules/misc/svg.c
@@ -739,6 +749,7 @@ modules/packetizer/mpeg4video.c
 modules/packetizer/mpegvideo.c
 modules/stream_out/announce.c
 modules/stream_out/announce.h
+modules/stream_out/description.c
 modules/stream_out/display.c
 modules/stream_out/dummy.c
 modules/stream_out/duplicate.c
@@ -773,7 +784,24 @@ modules/video_filter/distort.c
 modules/video_filter/filter_common.h
 modules/video_filter/invert.c
 modules/video_filter/logo.c
+modules/video_filter/marq.c
 modules/video_filter/motionblur.c
+modules/video_filter/scale.c
+modules/video_filter/swscale/common.h
+modules/video_filter/swscale/filter.c
+modules/video_filter/swscale/rgb2rgb.c
+modules/video_filter/swscale/rgb2rgb.h
+modules/video_filter/swscale/rgb2rgb_template.c
+modules/video_filter/swscale/swscale.c
+modules/video_filter/swscale/swscale.h
+modules/video_filter/swscale/swscale_altivec_template.c
+modules/video_filter/swscale/swscale_internal.h
+modules/video_filter/swscale/swscale_template.c
+modules/video_filter/swscale/yuv2rgb.c
+modules/video_filter/swscale/yuv2rgb_altivec.c
+modules/video_filter/swscale/yuv2rgb_mlib.c
+modules/video_filter/swscale/yuv2rgb_template.c
+modules/video_filter/time.c
 modules/video_filter/transform.c
 modules/video_filter/wall.c
 modules/video_output/aa.c

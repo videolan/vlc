@@ -55,8 +55,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 
 #define HEADPHONE_DIM_TEXT N_("Characteristic dimension")
 #define HEADPHONE_DIM_LONGTEXT N_( \
-     "Headphone virtual spatialization effect parameter: "\
-     "distance between front left speaker and listener in meters.")
+     "Distance between front left speaker and listener in meters.")
 
 vlc_module_begin();
     set_description( N_("headphone channel mixer with virtual spatialization effect") );
