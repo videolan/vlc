@@ -106,7 +106,13 @@ void mwait( mtime_t date )
     snooze( delay );
 #else
 
+#ifdef HAVE_USLEEP
+    struct timeval tv_date;
+
+#else
     struct timeval tv_date, tv_delay;
+
+#endif
     mtime_t        delay;          /* delay in msec, signed to detect errors */
 
     /* see mdate() about gettimeofday() possible errors */

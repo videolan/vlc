@@ -41,6 +41,9 @@
  *****************************************************************************/
 
 /* Program version and copyright message */
+#define VERSION_MESSAGE     "vlc @VLC_VERSION@ @VLC_CODENAME@" \
+                            /* " (" PROGRAM_BUILD ") (" PROGRAM_OPTIONS ")\n" */ \
+                            "Copyright 1996-2000 VideoLAN\n"
 #define COPYRIGHT_MESSAGE   "VideoLAN Client - version @VLC_VERSION@" \
                             " @VLC_CODENAME@ - (c)1996-2000 VideoLAN"
 

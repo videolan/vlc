@@ -33,11 +33,11 @@
 
 #include <netinet/in.h>                               /* BSD: struct in_addr */
 #include <sys/socket.h>                              /* BSD: struct sockaddr */
-#ifdef (HAVE_ARPA_INET_H)
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>                           /* inet_ntoa(), inet_aton() */
 #endif
 
-#if defined (HAVE_SYS_IOCTL_H) && defined(HAVE_NET_IF_H)
+#if defined (HAVE_SYS_IOCTL_H) && defined (HAVE_NET_IF_H)
 #include <sys/ioctl.h>                                            /* ioctl() */
 #include <net/if.h>                            /* interface (arch-dependent) */
 #endif
@@ -227,7 +227,7 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
  *****************************************************************************/
 int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 {
-#if defined (HAVE_SYS_IOCTL_H) && defined(HAVE_NET_IF_H)
+#if defined (HAVE_SYS_IOCTL_H) && defined (HAVE_NET_IF_H)
     struct ifreq* a_ifr_ifconf = NULL;
     struct ifreq* p_ifr_current_if;
     struct ifconf ifc_netconf;
@@ -237,7 +237,7 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 #endif
     int i_rc = 0;
 
-#if defined (HAVE_SYS_IOCTL_H) && defined(HAVE_NET_IF_H)
+#if defined (HAVE_SYS_IOCTL_H) && defined (HAVE_NET_IF_H)
     ASSERT(p_net_descr);
 
     /* Start by assuming we have few than 3 interfaces (i_if_number will

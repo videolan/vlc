@@ -110,9 +110,12 @@ intf_thread_t* intf_Create( void )
     }
 
     /* Get plugins */
-    p_intf->p_sys_create =  GetPluginFunction( p_intf->intf_plugin, "intf_SysCreate" );
-    p_intf->p_sys_manage =  GetPluginFunction( p_intf->intf_plugin, "intf_SysManage" );
-    p_intf->p_sys_destroy = GetPluginFunction( p_intf->intf_plugin, "intf_SysDestroy" );
+    p_intf->p_sys_create
+            = GetPluginFunction( p_intf->intf_plugin, "intf_SysCreate" );
+    p_intf->p_sys_manage
+            = GetPluginFunction( p_intf->intf_plugin, "intf_SysManage" );
+    p_intf->p_sys_destroy
+            = GetPluginFunction( p_intf->intf_plugin, "intf_SysDestroy" );
 
     /* Initialize structure */
     p_intf->b_die =     0;

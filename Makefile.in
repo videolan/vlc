@@ -11,7 +11,7 @@
 ################################################################################
 
 # Audio output settings
-AOUT = dsp
+AOUT += dsp
 #AOUT += esd
 # Not yet supported
 #AOUT += alsa
@@ -19,23 +19,25 @@ AOUT = dsp
 AOUT += dummy
 
 # Video output settings
-VOUT = x11
+VOUT += x11
 #VOUT += fb
 #VOUT += ggi
 #VOUT += glide
 # Not yet supported
-#VOUT = beos
+VOUT += gnome
+#VOUT += beos
 #VOUT += dga
 # Fallback method that should always work
 VOUT += dummy
 
 # Interface settings
-INTF = x11
+INTF += x11
 #INTF += fb
 #INTF += ggi
 #INTF += glide
 # Not yet supported
-#INTF = beos
+INTF += gnome
+#INTF += beos
 #INTF += dga
 # Fallback method that should always work
 INTF += dummy
@@ -88,8 +90,6 @@ PROGRAM_BUILD = `date` $(USER)
 DEFINE += -DARCH_$(shell echo $(ARCH) | cut -f1 -d' ')
 DEFINE += -DSYS_$(SYS)
 DEFINE += -DPLUGIN_PATH="\"$(PREFIX)/lib/videolan/vlc\""
-DEFINE += -DPROGRAM_VERSION="\"0.1.99\""
-DEFINE += -DPROGRAM_CODENAME="\"Onatopp\""
 #DEFINE += -DPROGRAM_OPTIONS="\"$(shell echo $(PROGRAM_OPTIONS) | tr 'A-Z' 'a-z')\""
 #DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
 ifeq ($(DEBUG),1)
@@ -405,6 +405,14 @@ else
 endif
 
 plugins/intf/intf_x11.so plugins/vout/vout_x11.so: %.so: %.c
+		@echo "compiling $*.so from $*.c"
+		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
+
+plugins/intf/intf_gnome.so: %.so: %.c
+		@echo "compiling $*.so from $*.c"
+		@$(CC) $(CCFLAGS) $(CFLAGS) $(LCFLAGS) `gnome-config --libs --cflags gnomeui` -shared -o $@ $< plugins/intf/intf_gnome_callbacks.c plugins/intf/intf_gnome_interface.c plugins/intf/intf_gnome_support.c
+
+plugins/vout/vout_gnome.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
 
