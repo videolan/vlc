@@ -52,8 +52,6 @@ Difficulty: Medium
 Platform: Any
 Urgency: Critical
 Description: fix subtitle regressions
-Multi-line subtitles are not aligned correctly.<br />
-Text subtitles don't work with 32bpp rgb.<br />
 Investigate behaviour of subpictures when pausing.<br />
 Status: Todo
 
