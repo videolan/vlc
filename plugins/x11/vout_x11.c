@@ -412,13 +412,18 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
          * formats. */
         p_xpixmap_format = XListPixmapFormats( p_vout->p_sys->p_display, &i_count );
 
-	/* FIXME: under XFree4.0, we can get some strange values. Check this */
+	
+        /* Under XFree4.0, the list contains pixmap formats available through 
+         * all video depths ; so we have to check against current depth. */
         p_vout->i_bytes_per_pixel = 0;
-        for( ; i_count--; p_xpixmap_format++ )
+        for( ; i_count-- ; p_xpixmap_format++ )
         {
-            if( p_xpixmap_format->bits_per_pixel / 8 > p_vout->i_bytes_per_pixel )
+            if( p_xpixmap_format->depth == p_vout->i_screen_depth )
             {
-                p_vout->i_bytes_per_pixel = p_xpixmap_format->bits_per_pixel / 8;
+                if( p_xpixmap_format->bits_per_pixel / 8 > p_vout->i_bytes_per_pixel )
+                {
+                    p_vout->i_bytes_per_pixel = p_xpixmap_format->bits_per_pixel / 8;
+                }
             }
         }
         break;
