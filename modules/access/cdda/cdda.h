@@ -1,6 +1,5 @@
 /*****************************************************************************
- * cdda.h : CD-DA input module header for vlc
- *          using libcdio, libvcd and libvcdinfo
+ * cdda.h : CD-DA input module header for vlc using libcdio.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
  * $Id$
@@ -22,8 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include <vlc/input.h>
 #include <cdio/cdio.h>
+#include <cdio/cdtext.h>
 #include "vlc_meta.h"
+#include "codecs.h"
 
 #ifdef HAVE_LIBCDDB
 #include <cddb/cddb.h>
@@ -56,39 +58,40 @@
  *****************************************************************************/
 typedef struct cdda_data_s
 {
-    CdIo       *p_cdio;                   /* libcdio CD device */
-    int         i_tracks;                 /* # of tracks (titles) */
-    int         i_first_track;            /* # of first track */
+  CdIo          *p_cdio;                   /* libcdio CD device */
+  track_t        i_tracks;                 /* # of tracks (titles) */
+  track_t        i_first_track;            /* # of first track */
+  
+  /* Current position */
+  track_t        i_track;                  /* Current track */
+  lsn_t          i_lsn;                    /* Current Logical Sector Number */
+  lsn_t *        p_lsns;                   /* Track LSNs */
+  
+  int            i_blocks_per_read;        /* # blocks to get in a read */
+  int            i_debug;                  /* Debugging mask */
 
-    /* Current position */
-    int         i_track;                  /* Current track */
-    lsn_t       i_lsn;                    /* Current Logical Sector Number */
-    lsn_t *     p_lsns;                   /* Track LSNs */
-
-    int         i_debug;                  /* Debugging mask */
-    char *      psz_mcn;                  /* Media Catalog Number            */
-    vlc_meta_t  *p_meta;
-
-    input_title_t *p_title[CDIO_CD_MAX_TRACKS]; 
-
-
+  /* Information about CD */
+  vlc_meta_t    *p_meta;
+  char *         psz_mcn;                  /* Media Catalog Number */
+  cdtext_t      *cdtext;                   /* CD-Text info */
+  input_title_t *p_title[CDIO_CD_MAX_TRACKS]; 
+  
+  
 #ifdef HAVE_LIBCDDB
-    int         i_cddb_enabled;
+  int            i_cddb_enabled;
   struct  {
-    bool             have_info;      /* True if we have any info */
-    cddb_disc_t     *disc;           /* libcdio uses this to get disc info */
-    int              disc_length;    /* Length in frames of cd. Used in
-                                        CDDB lookups */
+    vlc_bool_t   have_info;           /* True if we have any info */
+    cddb_disc_t *disc;                /* libcdio uses this to get disc
+					 info */
+    int          disc_length;         /* Length in frames of cd. Used
+					 in CDDB lookups */
   } cddb;
 #endif
 
-    WAVEHEADER  waveheader;               /* Wave header for the output data */
-    vlc_bool_t  b_header;
+    WAVEHEADER   waveheader;           /* Wave header for the output data */
+    vlc_bool_t   b_header;
 
 } cdda_data_t;
 
-/*****************************************************************************
- * CDDAPlay: Arrange things so we play the specified track.
- * VLC_TRUE is returned if there was no error.
- *****************************************************************************/
-vlc_bool_t  CDDAPlay         ( input_thread_t *, int );
+/* FIXME: This variable is a hack. Would be nice to eliminate. */
+extern access_t *p_cdda_input;

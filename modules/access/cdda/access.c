@@ -26,20 +26,29 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
+#include "callback.h"      /* FIXME - reorganize callback.h, cdda.h better */
+#include "cdda.h"          /* private structures. Also #includes vlc things */
+#include <vlc_playlist.h>  /* Has to come *after* cdda.h */
+#include "vlc_keys.h"
 
-#include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc_playlist.h>
-
-#include <sys/types.h>
 #include <cdio/cdio.h>
 #include <cdio/logging.h>
 #include <cdio/cd_types.h>
 
-#include "codecs.h"
-#include "vlc_keys.h"
+#include <stdio.h>
+
+/* #ifdef variables below are defined via config.h via #include vlc above. */
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -49,28 +58,18 @@
 #   include <errno.h>
 #endif
 
-#include <string.h>
-
-#include "cdda.h"
-
 #define CDDA_MRL_PREFIX "cddax://"
-
-/* how many blocks Open will read in each loop. Note libcdio and
-   SCSI MMC devices can read at most 25 blocks.
-*/
-#define CDDA_BLOCKS_ONCE 20
-#define CDDA_DATA_ONCE   (CDDA_BLOCKS_ONCE * CDIO_CD_FRAMESIZE_RAW)
 
 /* Frequency of sample in bits per second. */
 #define CDDA_FREQUENCY_SAMPLE 44100
 
 /* FIXME: This variable is a hack. Would be nice to eliminate. */
-static access_t *p_cdda_input = NULL;
+access_t *p_cdda_input = NULL;
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t *CDDABlock( access_t * p_access );
+static block_t *CDDAReadBlocks( access_t * p_access );
 static int      CDDASeek( access_t * p_access, int64_t i_pos );
 static int      CDDAControl( access_t *p_access, int i_query, 
 			     va_list args );
@@ -180,17 +179,17 @@ uninit_log_handler (cdio_log_level_t level, const char message[])
 }
 
 /*****************************************************************************
- * CDDARead: reads CDDA_BLOCKS_ONCE from the CD-DA and returns an
- * allocated pointer to the data. NULL is returned if no data read. It
- * is also possible if we haven't read a RIFF header in which case one 
- * that we creaded during Open/Initialization is returned.
+ * CDDAReadBlocks: reads a group of blocks from the CD-DA and returns
+ * an allocated pointer to the data. NULL is returned if no data
+ * read. It is also possible if we haven't read a RIFF header in which
+ * case one that we creaded during Open/Initialization is returned.
  *****************************************************************************/
 static block_t *
-CDDABlock( access_t * p_access )
+CDDAReadBlocks( access_t * p_access )
 {
     block_t     *p_block;
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
-    int          i_blocks = CDDA_BLOCKS_ONCE;
+    int          i_blocks = p_cdda->i_blocks_per_read;
 
     dbg_print((INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_LSN), "called %d", 
 	      p_cdda->i_lsn);
@@ -224,7 +223,7 @@ CDDABlock( access_t * p_access )
 	p_cdda->i_track++;
     }
 
-    /* Don't read after the end of a title */
+    /* Possibly adjust i_blocks so we don't read past the end of a track. */
     if( p_cdda->i_lsn + i_blocks >=
         p_cdda->p_lsns[p_access->info.i_title + 1] )
     {
@@ -236,27 +235,27 @@ CDDABlock( access_t * p_access )
     p_block = block_New( p_access, i_blocks * CDIO_CD_FRAMESIZE_RAW );
     if( !p_block)
     {
-        msg_Err( p_access, "cannot get a new block of size: %i",
-                 i_blocks * CDIO_CD_FRAMESIZE_RAW );
-        return NULL;
+      msg_Err( p_access, _("Cannot get a new block of size: %i"),
+	       i_blocks * CDIO_CD_FRAMESIZE_RAW );
+      return NULL;
     }
 
     if( cdio_read_audio_sectors( p_cdda->p_cdio, p_block->p_buffer,
 				 p_cdda->i_lsn, i_blocks) != 0 )
         {
-            msg_Err( p_access, "could not read sector %lu", 
-		     (long unsigned int) p_cdda->i_lsn );
-            block_Release( p_block );
+	  msg_Err( p_access, _("could not read sector %lu"), 
+		   (long unsigned int) p_cdda->i_lsn );
+	  block_Release( p_block );
 
-	    /* If we had problems above, assume the problem is with
-	       the first sector of the read and set to skip it.  In
-	       the future libcdio may have cdparanoia support.
-	     */
-	    p_cdda->i_lsn++;
-	    p_access->info.i_pos += CDIO_CD_FRAMESIZE_RAW;
-	    return NULL;
+	  /* If we had problems above, assume the problem is with
+	     the first sector of the read and set to skip it.  In
+	     the future libcdio may have cdparanoia support.
+	  */
+	  p_cdda->i_lsn++;
+	  p_access->info.i_pos += CDIO_CD_FRAMESIZE_RAW;
+	  return NULL;
         }
-
+    
     p_cdda->i_lsn     += i_blocks;
     p_access->info.i_pos += p_block->i_buffer;
 
@@ -273,7 +272,7 @@ CDDASeek( access_t * p_access, int64_t i_pos )
     cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
 
     p_cdda->i_lsn = p_cdda->p_lsns[p_access->info.i_title]
-                       + i_pos / CDIO_CD_FRAMESIZE_RAW;
+                  + (i_pos / CDIO_CD_FRAMESIZE_RAW);
     p_access->info.i_pos = i_pos;
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_SEEK),
@@ -804,44 +803,6 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 /****************************************************************************
  * Public functions
  ****************************************************************************/
-int
-E_(CDDADebugCB)   ( vlc_object_t *p_this, const char *psz_name,
-		    vlc_value_t oldval, vlc_value_t val, void *p_data )
-{
-  cdda_data_t *p_cdda;
-
-  if (NULL == p_cdda_input) return VLC_EGENERIC;
-
-  p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
-
-  if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old debug (x%0x) %d, new debug (x%0x) %d",
-             p_cdda->i_debug, p_cdda->i_debug, val.i_int, val.i_int);
-  }
-  p_cdda->i_debug = val.i_int;
-  return VLC_SUCCESS;
-}
-
-int
-E_(CDDBEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
-                      vlc_value_t oldval, vlc_value_t val, void *p_data )
-{
-  cdda_data_t *p_cdda;
-
-  if (NULL == p_cdda_input) return VLC_EGENERIC;
-
-  p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
-
-#ifdef HAVE_LIBCDDB
-  if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old CDDB Enabled (x%0x) %d, new (x%0x) %d",
-             p_cdda->i_cddb_enabled, p_cdda->i_cddb_enabled,
-             val.i_int, val.i_int);
-  }
-  p_cdda->i_cddb_enabled = val.i_int;
-#endif
-  return VLC_SUCCESS;
-}
 
 /*****************************************************************************
  * Open: open cdda device or image file and initialize structures 
@@ -885,8 +846,10 @@ E_(CDDAOpen)( vlc_object_t *p_this )
 	  i_track = i_track ? i_track : 1;
 	  b_single_track = true;
 	}
-    } else {
+    } 
 
+    if (!psz_source || !*psz_source)
+      {
         /* No device/track given. Continue only when this plugin was 
 	   selected */
         if( !p_this->b_force ) return VLC_EGENERIC;
@@ -938,13 +901,30 @@ E_(CDDAOpen)( vlc_object_t *p_this )
     p_cdda->b_header = VLC_FALSE;
     p_cdda->p_cdio   = p_cdio;
     p_cdda->i_track  = i_track;
-    p_cdda->i_debug  = config_GetInt( p_this, MODULE_STRING "-debug" );
+    p_cdda->i_debug  = config_GetInt(p_this, MODULE_STRING "-debug");
+    p_cdda->i_blocks_per_read
+                     = config_GetInt(p_this, MODULE_STRING "-blocks-per-read");
+
+    if (0 == p_cdda->i_blocks_per_read)
+      p_cdda->i_blocks_per_read = DEFAULT_BLOCKS_PER_READ;
+    
+    if ( p_cdda->i_blocks_per_read < MIN_BLOCKS_PER_READ 
+	 || p_cdda->i_blocks_per_read > MAX_BLOCKS_PER_READ ) {
+      msg_Warn( p_cdda_input, 
+		"Number of blocks (%d) has to be between %d and %d. "
+		"Using %d.", 
+		p_cdda->i_blocks_per_read, 
+		MIN_BLOCKS_PER_READ, MAX_BLOCKS_PER_READ,
+		DEFAULT_BLOCKS_PER_READ );
+      p_cdda->i_blocks_per_read = DEFAULT_BLOCKS_PER_READ;
+    }
+
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "%s", psz_source );
 
     /* Set up p_access */
     p_access->pf_read    = NULL;
-    p_access->pf_block   = CDDABlock;
+    p_access->pf_block   = CDDAReadBlocks;
     p_access->pf_control = CDDAControl;
     p_access->pf_seek    = CDDASeek;
 
@@ -1076,7 +1056,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_MTU:
             pi_int = (int*)va_arg( args, int * );
-            *pi_int = CDDA_DATA_ONCE;
+            *pi_int = p_cdda-> i_blocks_per_read * CDIO_CD_FRAMESIZE_RAW;
             break;
 
         case ACCESS_GET_PTS_DELAY:
@@ -1148,6 +1128,8 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
  0-origin, same as p_access->info.  Add first_track to get what track
  number this is on the CD. Note: libcdio uses the real track number.
 
+ On input we assume p_cdda->p_cdio and p_cdda->i_track have been set.
+
  We return the VLC-type status, e.g. VLC_SUCCESS, VLC_ENOMEM, etc.
  *****************************************************************************/
 static int
@@ -1182,7 +1164,6 @@ GetCDInfo( access_t *p_access, cdda_data_t *p_cdda )
         return VLC_ENOMEM;
       }
 
-    
 
     /* Fill the p_lsns structure with the track/sector matches.
        Note cdio_get_track_lsn when given num_tracks + 1 will return
@@ -1193,6 +1174,9 @@ GetCDInfo( access_t *p_access, cdda_data_t *p_cdda )
         (p_cdda->p_lsns)[ i ] = 
 	  cdio_get_track_lsn(p_cdda->p_cdio, p_cdda->i_first_track+i);
       }
-    
+
+    /* Set reading start LSN. */
+    p_cdda->i_lsn = p_cdda->p_lsns[p_cdda->i_track - p_cdda->i_first_track];
+
     return VLC_SUCCESS;
 }

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
- * Copyright (C) 2000,2003 VideoLAN
+ * Copyright (C) 2000, 2003, 2004 VideoLAN
  * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
@@ -27,21 +27,8 @@
  * Preamble
  *****************************************************************************/
 
-#include <vlc/vlc.h>
-
-/*****************************************************************************
- * prototypes
- *****************************************************************************/
-int  E_(CDDAOpen)     ( vlc_object_t * );
-void E_(CDDAClose)    ( vlc_object_t * );
-
-int  E_(CDDADebugCB)  ( vlc_object_t *p_this, const char *psz_name,
-                        vlc_value_t oldval, vlc_value_t val,
-                        void *p_data );
-
-int  E_(CDDBEnabledCB)( vlc_object_t *p_this, const char *psz_name,
-                        vlc_value_t oldval, vlc_value_t val,
-                        void *p_data );
+#include "callback.h"
+#include "access.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -66,6 +53,12 @@ int  E_(CDDBEnabledCB)( vlc_object_t *p_this, const char *psz_name,
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for CDDA streams. This " \
     "value should be set in millisecond units." )
+
+#define BLOCKS_PER_READ_LONGTEXT N_( \
+    "Allows you to specify how many CD blocks to get on a single CD read. " \
+    "Generally on newer/faster CD's, this increases throughput at the " \
+    "expense of a little more memory usage and initial delay. SCSI-MMC " \
+    "limitations generally don't allow for more than 25 blocks per access.")
 
 #define CDDB_TITLE_FMT_LONGTEXT N_( \
 "Format used in the GUI Playlist Title. Similar to the Unix date \n" \
@@ -103,7 +96,7 @@ int  E_(CDDBEnabledCB)( vlc_object_t *p_this, const char *psz_name,
 vlc_module_begin();
     add_usage_hint( N_("cddax://[device-or-file][@[T]track]") );
     set_description( _("Compact Disc Digital Audio (CD-DA) input") );
-    set_capability( "access2", 10 /* slightly higher than cdda */ );
+    set_capability( "access2", 10 /* compare with priority of cdda */ );
     set_callbacks( E_(CDDAOpen), E_(CDDAClose) );
     add_shortcut( "cddax" );
     add_shortcut( "cd" );
@@ -114,9 +107,14 @@ vlc_module_begin();
                   DEBUG_LONGTEXT, VLC_TRUE );
 
     add_integer( MODULE_STRING "-caching",
-                 DEFAULT_PTS_DELAY / 1000, NULL,
+                 DEFAULT_PTS_DELAY / MILLISECONDS_PER_SEC, NULL,
                  N_("Caching value in microseconds"),
                  CACHING_LONGTEXT, VLC_TRUE );
+
+    add_integer( MODULE_STRING "-blocks-per-read",
+                 DEFAULT_BLOCKS_PER_READ, E_(CDDABlocksPerReadCB),
+                 N_("Number of blocks per CD read"),
+                 BLOCKS_PER_READ_LONGTEXT, VLC_TRUE );
 
     add_string( MODULE_STRING "-author-format",
                 "%A - %a %C %I", NULL,
@@ -143,7 +141,7 @@ vlc_module_begin();
     add_string( MODULE_STRING "-cddb-server", "freedb.freedb.org", NULL,
                 N_("CDDB server"),
                 N_( "Contact this CDDB server look up CD-DA information"),
-                 VLC_TRUE );
+		VLC_TRUE );
 
     add_integer( MODULE_STRING "-cddb-port", 8880, NULL,
                  N_("CDDB server port"),
@@ -153,7 +151,7 @@ vlc_module_begin();
     add_string( MODULE_STRING "-cddb-email", "me@home", NULL,
                 N_("email address reported to CDDB server"),
                 N_("email address reported to CDDB server"),
-                 VLC_TRUE );
+		VLC_TRUE );
 
     add_bool( MODULE_STRING "-cddb-enable-cache", 1, NULL,
               N_("Cache CDDB lookups?"),
@@ -175,7 +173,7 @@ vlc_module_begin();
     add_string( MODULE_STRING "-cddb-cachedir", "~/.cddbslave", NULL,
                 N_("Directory to cache CDDB requests"),
                 N_("Directory to cache CDDB requests"),
-                 VLC_TRUE );
+		VLC_TRUE );
 
 #endif
 

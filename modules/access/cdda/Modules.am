@@ -1,5 +1,8 @@
 SOURCES_cddax = \
 	access.c \
+	access.h \
+	callback.c \
+	callback.h \
 	cdda.c \
 	cdda.h \
 	$(NULL)
