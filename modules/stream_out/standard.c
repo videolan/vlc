@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.10 2003/08/13 19:38:28 gbazin Exp $
+ * $Id: standard.c,v 1.11 2003/08/13 21:15:42 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -92,6 +92,7 @@ static int Open( vlc_object_t *p_this )
     if(psz_ipv == NULL) psz_ipv = "4";
     if(psz_v6_scope == NULL) psz_v6_scope = DEFAULT_IPV6_SCOPE;
     p_sys->p_sap = NULL;
+    p_sys->p_slp = NULL;
 
     msg_Dbg( p_this, "creating `%s/%s://%s'",
              psz_access, psz_mux, psz_url );
@@ -138,7 +139,6 @@ static int Open( vlc_object_t *p_this )
     if( p_slp_cfg && ( strstr( psz_access, "udp" ) ||
                        strstr( psz_access ,  "rtp" ) ) )
     {
-        p_sys->p_slp = NULL ;
         msg_Info( p_this, "SLP Enabled");
         if( sout_SLPReg( p_sout, psz_url, 
             p_slp_cfg->psz_value ? p_slp_cfg->psz_value : psz_url) )
