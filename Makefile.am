@@ -117,6 +117,9 @@ CFLAGS_nodebug = @CFLAGS_OPTIM_NODEBUG@
 endif
 endif
 endif
+else
+# !OPTIM
+CFLAGS_optim = @CFLAGS_NOOPTIM@
 endif
 
 CPPFLAGS_default += $(CPPFLAGS_release) \
