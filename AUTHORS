@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.97 2003/08/20 19:36:28 babal Exp $
+# $Id: AUTHORS,v 1.98 2003/11/23 16:02:56 zorglub Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -9,6 +9,7 @@
 N: Laurent Aimar
 E: fenrir@via.ecp.fr
 C: fenrir
+D: input and decoders core improvements
 D: avi, asf/wmv/wma, mp4/mov, mp3, aac, wav demultiplexers
 D: MPEG-4, Div & OpenDivX and various decoders (ffmpeg)
 D: AAC decoder (libfaad2)
@@ -43,6 +44,8 @@ D: lirc plugin
 D: norwegian translation
 D: aalib plugin
 D: KDE plug-in
+D: Subtitles and freetype
+D: Hotkeys
 S: Norway
 
 N: Pierre Baillet
@@ -56,6 +59,7 @@ E: gbazin@netcourrier.com
 C: gbazin
 D: Win32 port, win32 VCD/CDDA input and win32 ipv6 code
 D: DirectX audio/video output, win32 WaveOut audio output
+D: DirectShow input plugin, decoders API 
 D: a52 (liba52), vorbis (libvorbis) and theora (libtheora) decoders
 D: mpeg1/2 video decoder (libmpeg2), bandlimited resampling
 D: Ogg and Raw DV demultiplexers
@@ -172,7 +176,9 @@ N: Samuel Hocevar
 E: sam@zoy.org
 C: sam
 D: playlist and modules system
-D: Gnome and Gtk+ interfaces, Glide and fb video outputs, Esound audio output
+D: Gnome and Gtk+ interfaces
+D: Glide, fb, and caca video outputs
+D: Esound audio output
 D: DVD subtitles decoder
 D: Video output
 D: Mozilla plug-in
@@ -205,7 +211,8 @@ S: France
 N: Simon Latapie
 E: garf@via.ecp.fr
 C: garf
-D: contrast/HSB video filter
+D: contrast/HSB, and logo  video filters
+D: HTTP interface
 S: France
 
 N: Pascal Levesque

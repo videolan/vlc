@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.75 2003/11/23 14:28:15 gbazin Exp $
+$Id: NEWS,v 1.76 2003/11/23 16:02:56 zorglub Exp $
 
 Changes between 0.6.2 and 0.7.0:
 ---------------------------------
@@ -97,6 +97,9 @@ Linux port:
  * Improved Video4Linux input. Also added support for an audio only input.
  * Support for real-time priority when running with root privileges.
  * Allow on the fly switching of the main interface.
+
+iPaq port: 
+ * Brand new Gtk 2 interface
 
 Miscellaneous:
  * Audio visual effects filters (spectrum, scope and random).
