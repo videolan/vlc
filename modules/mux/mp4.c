@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.11 2004/01/24 11:56:16 gbazin Exp $
+ * $Id: mp4.c,v 1.12 2004/01/25 13:29:04 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin at videolan dot org>
@@ -773,21 +773,8 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         bo_add_32be( mvhd, 0 );             // pre-defined
     }
 
-    /* Find the 1st track id */
-    for( i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++ )
-    {
-        mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
-
-        if( p_stream->p_fmt->i_cat == AUDIO_ES ||
-            p_stream->p_fmt->i_cat == VIDEO_ES )
-        {
-            /* Found it */
-            bo_add_32be( mvhd, p_stream->i_track_id ); // next-track-id
-            break;
-        }
-    }
-    if( i_trak == p_sys->i_nb_streams ) /* Just for sanity reasons */
-        bo_add_32be( mvhd, 0xffffffff );
+    /* Next available track id */
+    bo_add_32be( mvhd, p_sys->i_nb_streams + 1 ); // next-track-id
 
     box_fix( mvhd );
     box_gather( moov, mvhd );
