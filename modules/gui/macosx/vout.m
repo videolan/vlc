@@ -349,7 +349,7 @@
 
     vlc_mutex_lock( &p_playlist->object_lock );
     o_title = [NSMutableString stringWithUTF8String: 
-        p_playlist->p_input.psz_uri]; 
+        p_playlist->status.p_item->input.psz_uri]; 
     vlc_mutex_unlock( &p_playlist->object_lock );
     vlc_object_release( p_playlist );
 

@@ -38,9 +38,19 @@
 {
     IBOutlet id o_btn_playlist;
     IBOutlet id o_outline_view;
+    IBOutlet id o_tc_name;
+    IBOutlet id o_tc_author;
+    IBOutlet id o_tc_duration;
+    IBOutlet id o_status_field;
+    IBOutlet id o_search_field;
+    
+    NSImage *o_descendingSortingImage;
+    NSImage *o_ascendingSortingImage;
 }
 
 - (void)initStrings;
+
+- (void)playlistUpdated;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 @end

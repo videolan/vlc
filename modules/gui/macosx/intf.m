@@ -836,7 +836,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if ( p_intf->p_sys->b_playlist_update )
     {
-       [o_playlist playlistUpdated];
+        [o_playlist playlistUpdated];
         p_intf->p_sys->b_playlist_update = VLC_FALSE;
     }
 
@@ -867,16 +867,14 @@ static VLCMain *_o_sharedMainInstance = nil;
             {
                 return;
             }
-
-            vlc_mutex_lock( &p_playlist->object_lock );
+#if 0
             o_temp = [NSString stringWithUTF8String:
                 p_playlist->p_input.psz_name];
             if( o_temp == NULL )
                 o_temp = [NSString stringWithCString:
                     p_playlist->p_input.psz_name];
-            vlc_mutex_unlock( &p_playlist->object_lock );
             [o_scrollfield setStringValue: o_temp ];
-
+#endif
 
             p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                     FIND_ANYWHERE );
@@ -894,7 +892,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                 }
                 vlc_object_release( (vlc_object_t *)p_vout );
             }
-            [o_playlist updateRowSelection];
+            //[o_playlist updateRowSelection];
             vlc_object_release( p_playlist );
             p_intf->p_sys->b_current_title_update = FALSE;
         }

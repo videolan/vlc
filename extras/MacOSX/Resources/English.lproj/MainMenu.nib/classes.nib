@@ -402,10 +402,17 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {}; 
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
-            OUTLETS = {}; 
+            OUTLETS = {
+                "o_btn_playlist" = id; 
+                "o_outline_view" = id; 
+                "o_search_field" = id; 
+                "o_status_field" = id; 
+                "o_tc_author" = id; 
+                "o_tc_duration" = id; 
+                "o_tc_name" = id; 
+            }; 
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 

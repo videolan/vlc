@@ -138,7 +138,7 @@
     self = [super init];
     if ( self !=nil )
     {
-        i_moveRow = -1;
+        //i_moveRow = -1;
     }
     return self;
 }
@@ -158,18 +158,18 @@
 /* We need to check whether _defaultTableHeaderSortImage exists, since it 
 belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
-    if( [[NSTableView class] respondsToSelector:@selector(_defaultTableHeaderSortImage)] )
+    if( [[NSOutlineView class] respondsToSelector:@selector(_defaultTableHeaderSortImage)] )
     {
-        o_ascendingSortingImage = [[NSTableView class] _defaultTableHeaderSortImage];
+        o_ascendingSortingImage = [[NSOutlineView class] _defaultTableHeaderSortImage];
     }
     else
     {
         o_ascendingSortingImage = nil;
     }
 
-    if( [[NSTableView class] respondsToSelector:@selector(_defaultTableHeaderReverseSortImage)] )
+    if( [[NSOutlineView class] respondsToSelector:@selector(_defaultTableHeaderReverseSortImage)] )
     {
-        o_descendingSortingImage = [[NSTableView class] _defaultTableHeaderReverseSortImage];
+        o_descendingSortingImage = [[NSOutlineView class] _defaultTableHeaderReverseSortImage];
     }
     else
     {
@@ -177,13 +177,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
 
     [self initStrings];
-    [self playlistUpdated];
+    //[self playlistUpdated];
 }
 
 - (void)initStrings
 {
 #if 0
-    [o_window setTitle: _NS("Playlist")];
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
@@ -192,19 +191,26 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_enableGroup setTitle: _NS("Enable all group items")];
     [o_mi_disableGroup setTitle: _NS("Disable all group items")];
     [o_mi_info setTitle: _NS("Properties")];
-
+#endif
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
+#if 0
     [o_random_ckb setTitle: _NS("Random")];
     [o_search_button setTitle: _NS("Search")];
+#endif
     [o_btn_playlist setToolTip: _NS("Playlist")];
+#if 0    
     [[o_loop_popup itemAtIndex:0] setTitle: _NS("Standard Play")];
     [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
     [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
 #endif
 }
 
+- (void)playlistUpdated
+{
+    [o_outline_view reloadData];
+}
 
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
@@ -315,7 +321,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         /* root object */
         playlist_view_t *p_view;
-        p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
+        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
         if( p_view && p_view->p_root )
             i_return = p_view->p_root->i_children;
     }
@@ -327,23 +333,24 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
     vlc_object_release( p_playlist );
     if( i_return == -1 ) i_return = 0;
+    msg_Dbg( p_playlist, "I have %d children", i_return );
     return i_return;
 }
 
 /* return the child at index for the Obj-C pointer item */ /* DONE */
 - (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
 {
-    playlist_item *p_return = NULL;
+    playlist_item_t *p_return = NULL;
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
-        return 0;
+        return nil;
 
     if( item == nil )
     {
         /* root object */
         playlist_view_t *p_view;
-        p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
+        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
         if( p_view && index < p_view->p_root->i_children )
             p_return = p_view->p_root->pp_children[index];
     }
@@ -357,7 +364,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
 
     vlc_object_release( p_playlist );
-    return [NSValue valueWithPointer: p_return];
+    msg_Dbg( p_playlist, "childitem with index %d", index );
+    return [[NSValue valueWithPointer: p_return] retain];
 }
 
 /* is the item expandable */
@@ -367,13 +375,13 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
-        return 0;
+        return NO;
 
     if( item == nil )
     {
         /* root object */
         playlist_view_t *p_view;
-        p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
+        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
         if( p_view && p_view->p_root )
             i_return = p_view->p_root->i_children;
     }
@@ -385,24 +393,24 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
     vlc_object_release( p_playlist );
 
-    if( i_return == -1 )
+    if( i_return == -1 || i_return == 0 )
         return NO;
     else
         return YES;
 }
 
 /* retrieve the string values for the cells */
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)o_tc byItem:(id)item
 {
     id o_value = nil;
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
-    playlist_item_t * p_item = [item pointerValue];
+    playlist_item_t *p_item = (playlist_item_t *)[item pointerValue];
 
     if( p_playlist == NULL || p_item == NULL )
     {
-        return( nil );
+        return( @"error" );
     }
 
     if( [[o_tc identifier] isEqualToString:@"1"] )
@@ -416,7 +424,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     else if( [[o_tc identifier] isEqualToString:@"2"] )
     {
         char *psz_temp;
-        psz_temp = playlist_GetInfo( p_item ,_("Meta-information"),_("Artist") );
+        psz_temp = playlist_ItemGetInfo( p_item ,_("Meta-information"),_("Artist") );
 
         if( psz_temp == NULL )
             o_value = @"";
