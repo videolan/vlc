@@ -412,6 +412,8 @@ static void FollowAnchor ( intf_thread_t *p_intf )
         playlist_t *p_playlist;
         playlist_item_t *p_current_item;
         char *psz_uri_to_load;
+        mtime_t i_seconds;
+        vlc_value_t time;
 
         p_playlist = (playlist_t *) vlc_object_find( p_intf, 
                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -435,8 +437,6 @@ static void FollowAnchor ( intf_thread_t *p_intf )
         msg_Dbg( p_intf, "URL to load is \"%s\"", psz_uri_to_load );
 #endif
 
-        mtime_t i_seconds;
-        vlc_value_t time;
         if( var_Get( p_intf->p_sys->p_input, "time", &time ) )
         {
             msg_Dbg( p_intf, "couldn't get time from current clip" );
@@ -579,6 +579,7 @@ void GoBack( intf_thread_t *p_intf )
     history_item_t *p_new_history_item = NULL;
     playlist_t *p_playlist = NULL;
     char *psz_timed_url = NULL;
+    playlist_item_t *p_current_item;
 
 #ifdef CMML_INTF_DEBUG
     msg_Dbg( p_intf, "Going back in navigation history" );
@@ -618,7 +619,6 @@ void GoBack( intf_thread_t *p_intf )
         return;
     }
 
-    playlist_item_t *p_current_item;
     p_current_item = p_playlist->pp_items[p_playlist->i_index];
 
     /* Save the currently-playing media in a new history item */
@@ -657,6 +657,7 @@ void GoForward( intf_thread_t *p_intf )
     history_item_t *p_history_item = NULL;
     history_item_t *p_new_history_item = NULL;
     playlist_t *p_playlist = NULL;
+    playlist_item_t *p_current_item;
 
 #ifdef CMML_INTF_DEBUG
     msg_Dbg( p_intf, "Going forward in navigation history" );
@@ -706,7 +707,6 @@ void GoForward( intf_thread_t *p_intf )
         vlc_object_release( p_playlist );
         return;
     }
-    playlist_item_t *p_current_item;
     p_current_item = p_playlist->pp_items[p_playlist->i_index];
     p_new_history_item->psz_uri = GetTimedURLFromPlaylistItem( p_intf, 
             p_current_item );
