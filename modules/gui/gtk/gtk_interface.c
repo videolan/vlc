@@ -1859,7 +1859,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label20), 0, 0.5);
 
-  disc_chapter_adj = gtk_adjustment_new (1, 1, 65536, 1, 10, 10);
+  disc_chapter_adj = gtk_adjustment_new (0, 0, 65536, 1, 10, 10);
   disc_chapter = gtk_spin_button_new (GTK_ADJUSTMENT (disc_chapter_adj), 1, 0);
   gtk_widget_ref (disc_chapter);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_chapter", disc_chapter,
@@ -1921,7 +1921,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  disc_title_adj = gtk_adjustment_new (1, 1, 65536, 1, 10, 10);
+  disc_title_adj = gtk_adjustment_new (0, 0, 65536, 1, 10, 10);
   disc_title = gtk_spin_button_new (GTK_ADJUSTMENT (disc_title_adj), 1, 0);
   gtk_widget_ref (disc_title);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_title", disc_title,

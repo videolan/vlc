@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.11 2003/01/26 14:49:09 fenrir Exp $
+ * $Id: open.c,v 1.12 2003/01/29 17:28:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -177,6 +177,7 @@ void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
 static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
 {
     GString * p_target = g_string_new( "" );
+    int i_title, i_chapter;
 
     if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button), 
                                           "disc_dvd" ) )->active )
@@ -199,13 +200,25 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
     g_string_append( p_target,
                      gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                      GTK_WIDGET(button), "disc_name" ) ) ) );
-    g_string_sprintfa( p_target, "@%i,%i",
-                       gtk_spin_button_get_value_as_int(
-                              GTK_SPIN_BUTTON( lookup_widget(
-                                  GTK_WIDGET(button), "disc_title" ) ) ),
-                       gtk_spin_button_get_value_as_int(
-                              GTK_SPIN_BUTTON( lookup_widget(
-                                  GTK_WIDGET(button), "disc_chapter" ) ) ) );
+
+    i_title = gtk_spin_button_get_value_as_int(
+                  GTK_SPIN_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                                  "disc_title" ) ) );
+    i_chapter = gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                                    "disc_chapter" ) ) );
+    if( i_title )
+    {
+        if( i_chapter )
+            g_string_sprintfa( p_target, "@%i,%i", i_title, i_chapter );
+        else
+            g_string_sprintfa( p_target, "@%i", i_title );
+    }
+    else
+    {
+        if( i_chapter )
+            g_string_sprintfa( p_target, "@,%i", i_chapter );
+    }
 
     gtk_entry_set_text( GTK_ENTRY( lookup_widget(
                                    GTK_WIDGET(button), "entry_open" ) ),

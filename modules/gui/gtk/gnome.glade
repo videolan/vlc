@@ -1854,8 +1854,8 @@ http://www.videolan.org/
 	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
 	    <snap>False</snap>
 	    <wrap>False</wrap>
-	    <value>1</value>
-	    <lower>1</lower>
+	    <value>0</value>
+	    <lower>0</lower>
 	    <upper>65536</upper>
 	    <step>1</step>
 	    <page>10</page>
@@ -2023,8 +2023,8 @@ http://www.videolan.org/
 	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
 	    <snap>False</snap>
 	    <wrap>False</wrap>
-	    <value>1</value>
-	    <lower>1</lower>
+	    <value>0</value>
+	    <lower>0</lower>
 	    <upper>65536</upper>
 	    <step>1</step>
 	    <page>10</page>
