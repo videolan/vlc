@@ -2,7 +2,7 @@
  * x11_timer.h: helper class to implement timers
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_timer.h,v 1.2 2003/06/07 12:19:23 asmax Exp $
+ * $Id: x11_timer.h,v 1.3 2003/06/08 11:33:14 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -46,14 +46,20 @@ class X11Timer
         mtime_t _interval;       
         callback_t _callback;
         void *_data;
+        vlc_mutex_t _lock;
+        mtime_t _nextDate;
 
     public:
         X11Timer( intf_thread_t *p_intf, mtime_t interval, callback_t func, 
                   void *data );
         ~X11Timer();
 
-        mtime_t getNextDate( mtime_t current );
+        void SetDate( mtime_t date );
+        mtime_t GetNextDate();
         bool Execute();
+        
+        inline void Lock() { vlc_mutex_lock( &_lock ); }
+        inline void Unlock() { vlc_mutex_unlock( &_lock ); }
 };
 //---------------------------------------------------------------------------
 class X11TimerManager
@@ -63,19 +69,23 @@ class X11TimerManager
         intf_thread_t *_p_intf;
         timer_thread_t *_p_timer;
         list<X11Timer*> _timers;
+        vlc_mutex_t _lock;
         
         X11TimerManager( intf_thread_t *p_intf );
         ~X11TimerManager();
 
         static void *Thread( void *p_timer );
+        void WaitNextTimer();
 
     public:
         static X11TimerManager *Instance( intf_thread_t *p_intf );
         void Destroy();
 
-        void addTimer( X11Timer *timer ) { _timers.push_back( timer ); }
-        void removeTimer( X11Timer *timer ) { _timers.remove( timer ); }
+        void addTimer( X11Timer *timer );
+        void removeTimer( X11Timer *timer );
 
+        inline void Lock() { vlc_mutex_lock( &_lock ); }
+        inline void Unlock() { vlc_mutex_unlock( &_lock ); }
 };
 //---------------------------------------------------------------------------
 #endif

@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.18 2003/06/08 00:32:07 asmax Exp $
+ * $Id: x11_run.cpp,v 1.19 2003/06/08 11:33:14 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -168,7 +168,7 @@ void OSRun( intf_thread_t *p_intf )
 
 
     // Timer for SkinManage
-    X11Timer *refreshTimer = new X11Timer( p_intf, 100, RefreshCallback,
+    X11Timer *refreshTimer = new X11Timer( p_intf, 100000, RefreshCallback,
                                            (void*)p_intf );
     X11TimerManager *timerManager = X11TimerManager::Instance( p_intf );
     timerManager->addTimer( refreshTimer );

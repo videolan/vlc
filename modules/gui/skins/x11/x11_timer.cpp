@@ -2,7 +2,7 @@
  * x11_timer.cpp: helper class to implement timers
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_timer.cpp,v 1.2 2003/06/07 12:19:23 asmax Exp $
+ * $Id: x11_timer.cpp,v 1.3 2003/06/08 11:33:14 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -41,22 +41,32 @@ X11Timer::X11Timer( intf_thread_t *p_intf, mtime_t interval, callback_t func,
     _interval = interval;
     _callback = func;
     _data = data;
+    _nextDate = 0;
+    vlc_mutex_init( p_intf, &_lock );
 }
 
 
 X11Timer::~X11Timer()
 {
+    vlc_mutex_destroy( &_lock );
 }
 
 
-mtime_t X11Timer::getNextDate( mtime_t current )
+void X11Timer::SetDate( mtime_t date )
 {
-    return (current / _interval + 1) * _interval;
+    _nextDate = date + _interval;
+}
+
+
+mtime_t X11Timer::GetNextDate()
+{
+    return _nextDate;
 }
 
 
 bool X11Timer::Execute()
 {
+    _nextDate += _interval;
     return (*_callback)( _data );
 }
 
@@ -70,6 +80,8 @@ X11TimerManager::X11TimerManager( intf_thread_t *p_intf )
 {
     _p_intf = p_intf;
     
+    vlc_mutex_init( p_intf, &_lock );
+    
     // Create the timer thread
     _p_timer = (timer_thread_t*)vlc_object_create( _p_intf,
                                                    sizeof( timer_thread_t ) );
@@ -81,6 +93,8 @@ X11TimerManager::~X11TimerManager()
 {
     _p_timer->die = 1;
     vlc_thread_join( _p_timer );
+
+    vlc_mutex_destroy( &_lock );
 }
 
 
@@ -115,19 +129,67 @@ void *X11TimerManager::Thread( void *p_timer )
 
     while( !((timer_thread_t*)p_timer)->die )
     {
-        list<X11Timer*>::iterator timer;
-        // FIXME temporary
-        for( timer = _instance->_timers.begin(); 
-             timer != _instance->_timers.end(); timer++ )
-        {
-            bool ret = (*timer)->Execute();
-            if( !ret ) 
-            {   _instance->_timers.remove( *timer );
-                break;
-            }
-        }
-        msleep( 100000 );
+        _instance->WaitNextTimer();
     }
 }
+
+
+void X11TimerManager::WaitNextTimer()
+{
+    mtime_t curDate = mdate();
+    mtime_t nextDate = LAST_MDATE;
+
+    X11Timer *nextTimer = NULL;
+ 
+    Lock();       
+    // Find the next timer to execute
+    list<X11Timer*>::iterator timer;
+    for( timer = _timers.begin(); timer != _timers.end(); timer++ )
+    {
+        mtime_t timerDate = (*timer)->GetNextDate();
+        if( timerDate < nextDate )
+        {
+            nextTimer = *timer;
+            nextDate = timerDate;
+        }
+    }
+    Unlock();
+    
+    if( nextTimer == NULL )
+    {
+        // FIXME: should wait on a cond instead
+        msleep( 10000 );
+    }
+    else
+    {
+        if( nextDate > curDate )
+        {
+            mwait( nextDate );
+        }
+        bool ret = nextTimer->Execute();
+        if( !ret ) 
+        {   
+            _timers.remove( nextTimer );
+        }
+    }
+}
+
+
+void X11TimerManager::addTimer( X11Timer *timer )
+{ 
+   timer->SetDate( mdate() );
+    _timers.push_back( timer ); 
+}
+
+
+void X11TimerManager::removeTimer( X11Timer *timer ) 
+{
+    Lock();
+    timer->Lock();
+    _timers.remove( timer ); 
+    Unlock();
+    timer->Unlock();
+}
+
 
 #endif

@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.13 2003/06/08 00:32:07 asmax Exp $
+ * $Id: x11_window.cpp,v 1.14 2003/06/08 11:33:14 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -116,7 +116,7 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     XUNLOCK;
 
     ToolTip.display = display;
-    X11Timer *timer = new X11Timer( p_intf, 100, ToolTipCallback, &ToolTip );
+    X11Timer *timer = new X11Timer( p_intf, 500000, ToolTipCallback, &ToolTip );
     ToolTip.p_intf = p_intf;
     ToolTip.timer = timer;
 
