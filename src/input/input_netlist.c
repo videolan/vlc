@@ -2,6 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * $Id: input_netlist.c,v 1.20 2000/12/21 13:07:45 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -119,6 +120,8 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
         p_netlist->pp_free_data[i_loop]->p_buffer = 
             p_netlist->p_buffers + i_loop * i_buffer_size;
         
+        //peut-être pas nécessaire ici vu qu'on le fera à chaque fois
+        //dans NewPacket et Getiovec
         p_netlist->pp_free_data[i_loop]->p_payload_start = 
             p_netlist->pp_free_data[i_loop]->p_buffer;
 
@@ -148,9 +151,12 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     p_netlist->i_data_start = 0;
     p_netlist->i_data_end = i_nb_data - 1;
 
+    //INPUT_READ_ONCE en trop
     p_netlist->i_pes_start = 0;
     p_netlist->i_pes_end = i_nb_pes + INPUT_READ_ONCE - 1;
 
+    //inutiles, en fait toujours strictement == à i_data_start (les deux
+    //pointent vers le même buffer donc il faut garder une synchronisation)
     p_netlist->i_iovec_start = 0;
     p_netlist->i_iovec_end = i_nb_data - 1;
     
@@ -172,6 +178,8 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
     p_netlist = ( netlist_t * ) p_method_data;
     
     /* check */
+    //vérifier que -truc % bidule fait bien ce qu'il faut (me souviens plus
+    //de la définition de % sur -N)
     if ( 
      (p_netlist->i_iovec_end - p_netlist->i_iovec_start)%p_netlist->i_nb_data 
      < INPUT_READ_ONCE )
@@ -186,10 +194,16 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
                 p_netlist->p_free_iovec, 
                 INPUT_READ_ONCE-(p_netlist->i_nb_data-p_netlist->i_iovec_start)
               );
+    //manque un sizeof() dans le memcpy
 
+    //pas tout de suite (->dans Mviovec), parce que readv ne va pas
+    //_nécessairement_ prendre tous les iovec disponibles (cf. man readv)
     p_netlist->i_iovec_start += INPUT_READ_ONCE;
     p_netlist->i_iovec_start %= p_netlist->i_nb_data;
-    
+
+    //il faudrait aussi initialiser les data_packet_t correspondants,
+    //comme dans NewPacket
+
     return &p_netlist->p_free_iovec[p_netlist->i_iovec_start];
 }
 
@@ -203,6 +217,9 @@ void input_NetlistMviovec( void * p_method_data, size_t i_nb_iovec )
     /* cast */
     p_netlist = (netlist_t *) p_method_data;
     
+    //remplacer i_iovec_start par i_data_start, en fait c'est la même
+    //chose.
+    //il manque un lock
     p_netlist->i_iovec_start += i_nb_iovec;
     p_netlist->i_iovec_start %= p_netlist->i_nb_data;
 }
@@ -241,7 +258,8 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     p_return = (p_netlist->pp_free_data[p_netlist->i_data_start]);
     p_netlist->i_data_start++;
     p_netlist->i_data_start %= p_netlist->i_nb_data;
-    
+
+    //on vire aussi, forcément
     p_netlist->i_iovec_start++; 
     p_netlist->i_iovec_start %= p_netlist->i_nb_data;
 
@@ -256,7 +274,9 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     /* initialize data */
     p_return->p_next = NULL;
     p_return->b_discard_payload = 0;
-    
+    //p_payload_start = ..., p_payload_end = ... (risque d'être modifié
+    //à tout moment par l'input et les décodeurs, donc on ne peut rien
+    //supposer...)
     return ( p_return );
 }
 
@@ -384,6 +404,7 @@ void input_NetlistEnd( input_thread_t * p_input)
     free (p_netlist->pp_free_pes);
     free (p_netlist->p_pes);
     free (p_netlist->p_data);
+    //et p_buffers il pue ?
 
     /* free the netlist */
     free (p_netlist);
