@@ -4,10 +4,9 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.191 2002/03/18 21:04:01 xav Exp $
+ * $Id: input.c,v 1.192 2002/04/04 22:51:01 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
- *          Alexis Guillard <alexis.guillard@bt.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -324,6 +323,7 @@ static int RunThread( input_thread_t *p_input )
         {
             if( p_input->stream.b_seekable && p_input->pf_set_area != NULL )
             {
+                input_AccessReinit( p_input );
 
                 p_input->pf_set_area( p_input, p_input->stream.p_new_area );
 
@@ -338,8 +338,6 @@ static int RunThread( input_thread_t *p_input )
                     /* Reinitialize synchro. */
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
                 }
-
-                input_AccessReinit( p_input );
             }
             p_input->stream.p_new_area = NULL;
         }
@@ -348,7 +346,12 @@ static int RunThread( input_thread_t *p_input )
         {
             if( p_input->stream.b_seekable && p_input->pf_seek != NULL )
             {
-                off_t i_new_pos = p_input->stream.p_selected_area->i_seek;
+                off_t i_new_pos;
+
+                /* Reinitialize buffer manager. */
+                input_AccessReinit( p_input );
+
+                i_new_pos = p_input->stream.p_selected_area->i_seek;
                 vlc_mutex_unlock( &p_input->stream.stream_lock );
                 p_input->pf_seek( p_input, i_new_pos );
                 vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -364,9 +367,6 @@ static int RunThread( input_thread_t *p_input )
                     /* Reinitialize synchro. */
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
                 }
-
-                /* Reinitialize buffer manager. */
-                input_AccessReinit( p_input );
             }
             p_input->stream.p_selected_area->i_seek = NO_SEEK;
         }

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.87 2002/03/20 17:44:15 sam Exp $
+ * $Id: mpeg_system.c,v 1.88 2002/04/04 22:51:01 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -662,20 +662,20 @@ ssize_t input_ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
     /* Read what we believe to be a packet header. */
     PEEK( 4 );
 
-    if( *p_peek || *(p_peek + 1) || *(p_peek + 2) != 1 )
+    if( p_peek[0] || p_peek[1] || p_peek[2] != 1 || p_peek[3] < 0xB9 )
     {
-        if( *p_peek || *(p_peek + 1) || *(p_peek + 2) )
+        if( p_peek[0] || p_peek[1] || p_peek[2] )
         {
             /* It is common for MPEG-1 streams to pad with zeros
              * (although it is forbidden by the recommendation), so
              * don't bother everybody in this case. */
             intf_WarnMsg( 3, "input warning: garbage (0x%.2x%.2x%.2x%.2x)",
-                 *p_peek, *(p_peek + 1), *(p_peek + 2), *(p_peek + 3) );
+                 p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
         }
 
         /* This is not the startcode of a packet. Read the stream
          * until we find one. */
-        while( *p_peek || *(p_peek + 1) || *(p_peek + 2) != 1 )
+        while( p_peek[0] || p_peek[1] || p_peek[2] != 1 || p_peek[3] < 0xB9 )
         {
             p_input->p_current_data++;
             PEEK( 4 );

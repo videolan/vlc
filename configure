@@ -5291,7 +5291,7 @@ THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 if test x$SYS != xmingw32; then
   SSE_MODULES="imdctsse downmixsse"
 fi
-ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
+ALTIVEC_MODULES="idctaltivec motionaltivec"
 
 echo $ac_n "checking if \$CC groks MMX inline assembly""... $ac_c" 1>&6
 echo "configure:5298: checking if \$CC groks MMX inline assembly" >&5

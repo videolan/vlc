@@ -380,7 +380,7 @@ THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 if test x$SYS != xmingw32; then
   SSE_MODULES="imdctsse downmixsse"
 fi
-ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
+ALTIVEC_MODULES="idctaltivec motionaltivec"
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
