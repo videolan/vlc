@@ -397,7 +397,7 @@ static dct_lookup_t pl_DCT_tab6[16] =
     /* Pointers on tables of dct coefficients */
 static dct_lookup_t * ppl_dct_tab1[2] = { pl_DCT_tab_ac, pl_DCT_tab0a };
 
-static dct_lookup_t * ppl_dct_tab2[2] = { pl_DCT_tab_dc, pl_DCT_tab_ac };
+static dct_lookup_t * ppl_dct_tab2[2] = { pl_DCT_tab_ac, pl_DCT_tab_dc };
 
 
     /* Lookup Table for the chromatic component */
@@ -920,7 +920,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         if( i_code >= 16384 )
         {
-            b_dc = !((i_parse + 62)/63);
+            b_dc = (i_parse == 0);
             i_run =     ppl_dct_tab2[b_dc][(i_code>>12)-4].i_run;
             i_level =   ppl_dct_tab2[b_dc][(i_code>>12)-4].i_level;
             i_length =  ppl_dct_tab2[b_dc][(i_code>>12)-4].i_length;
