@@ -843,6 +843,14 @@ static struct
       AUDIO_ES, "G.726 ADPCM Audio" },
 #endif
 
+#if LIBAVCODEC_BUILD >= 4683
+    /* AMR */
+    { VLC_FOURCC('s','a','m','r'), CODEC_ID_AMR_NB,
+      AUDIO_ES, "AMR narrow band" },
+    { VLC_FOURCC('s','a','w','b'), CODEC_ID_AMR_WB,
+      AUDIO_ES, "AMR wide band" },
+#endif
+
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
       AUDIO_ES, "PCM S8" },
