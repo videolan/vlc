@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.13 2002/08/20 22:11:49 stef Exp $
+ * $Id: oss.c,v 1.14 2002/08/24 01:14:29 sigmunau Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -310,7 +310,7 @@ static int OSSThread( aout_instance_t * p_aout )
              * is equal to the current date + duration of buffered samples.
              * Order is important here, since GetBufInfo is believed to take
              * more time than mdate(). */
-            next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
+            next_date = (mtime_t)GetBufInfo( p_aout ) * 100000
                       / p_aout->output.output.i_bytes_per_frame
                       / p_aout->output.output.i_rate
                       * p_aout->output.output.i_frame_length;
