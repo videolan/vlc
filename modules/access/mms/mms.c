@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.16 2002/12/31 01:54:35 massiot Exp $
+ * $Id: mms.c,v 1.17 2003/01/27 16:28:42 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -304,6 +304,8 @@ static void Close( vlc_object_t *p_this )
 
     /* free memory */
     FREE( p_access->url.psz_private );
+
+    FREE( p_input->p_access_data );
 }
 
 /*****************************************************************************

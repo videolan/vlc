@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.33 2003/01/26 12:34:47 fenrir Exp $
+ * $Id: avi.c,v 1.34 2003/01/27 16:28:42 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1744,7 +1744,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
         mtime_t i_date;
         int i_percent;
         /* first wait for empty buffer, arbitrary time FIXME */
-        msleep( DEFAULT_PTS_DELAY );
+        //msleep( DEFAULT_PTS_DELAY );
 
         i_date = (mtime_t)1000000 *
                  (mtime_t)p_avi->i_length *
