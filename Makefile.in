@@ -366,10 +366,12 @@ snapshot:
 		find . -type d -name CVS | xargs rm -rf ; \
 		find . -type f -name '.*.swp' | xargs rm -f ; \
 		cd .. ; \
-		tar czvf ${SNAPSHOTDIR}.tar.gz ${SNAPSHOTDIR} )
+		tar czvf ${SNAPSHOTDIR}.tar.gz ${SNAPSHOTDIR} ; \
+		tar cIvf ${SNAPSHOTDIR}.tar.bz2 ${SNAPSHOTDIR} )
 	rm -rf /tmp/${SNAPSHOTDIR}
 	mv /tmp/${SNAPSHOTDIR}.tar.gz ..
-	@echo "Sources are in ../${SNAPSHOTDIR}.tar.gz"
+	mv /tmp/${SNAPSHOTDIR}.tar.bz2 ..
+	@echo "Sources are in ../${SNAPSHOTDIR}.tar.[gz,bz2]"
 
 FORCE:
 
