@@ -74,10 +74,15 @@ typedef struct tls_server_sys_t
 } tls_server_sys_t;
 
 
-/* client-side session private data */
+typedef struct tls_session_sys_t
+{
+    gnutls_session  session;
+} tls_session_sys_t;
+
+
 typedef struct tls_client_sys_t
 {
-    gnutls_session session;
+    struct tls_session_sys_t       session;
     gnutls_certificate_credentials x509_cred;
 } tls_client_sys_t;
 
@@ -91,9 +96,12 @@ static int
 gnutls_Send( void *p_session, const void *buf, int i_length )
 {
     int val;
+    tls_session_sys_t *p_sys;
 
-    val = gnutls_record_send( *(gnutls_session *)(((tls_session_t *)p_session)
-                                ->p_sys), buf, i_length );
+    p_sys = (tls_session_sys_t *)(((tls_session_t *)p_session)->p_sys);
+
+    val = gnutls_record_send( p_sys->session, buf, i_length );
+    /* TODO: handle fatal error */
     return val < 0 ? -1 : val;
 }
 
@@ -107,9 +115,12 @@ static int
 gnutls_Recv( void *p_session, void *buf, int i_length )
 {
     int val;
+    tls_session_sys_t *p_sys;
 
-    val = gnutls_record_recv( *(gnutls_session *)(((tls_session_t *)p_session)
-                                ->p_sys), buf, i_length );
+    p_sys = (tls_session_sys_t *)(((tls_session_t *)p_session)->p_sys);
+
+    val = gnutls_record_recv( p_sys->session, buf, i_length );
+    /* TODO: handle fatal error */
     return val < 0 ? -1 : val;
 }
 
@@ -117,29 +128,37 @@ gnutls_Recv( void *p_session, void *buf, int i_length )
 /*****************************************************************************
  * tls_SessionHandshake:
  *****************************************************************************
- * Establishes TLS session with a peer through socket <fd>
+ * Establishes TLS session with a peer through socket <fd>.
  * Returns NULL on error (do NOT call tls_SessionClose in case of error or
  * re-use the session structure).
  *****************************************************************************/
 static tls_session_t *
 gnutls_SessionHandshake( tls_session_t *p_session, int fd )
 {
+    tls_session_sys_t *p_sys;
     int val;
-    gnutls_session *p_sys;
 
-    p_sys = (gnutls_session *)(p_session->p_sys);
+    p_sys = (tls_session_sys_t *)(p_session->p_sys);
 
-    gnutls_transport_set_ptr( *p_sys, (gnutls_transport_ptr)fd);
-    val = gnutls_handshake( *p_sys );
+    gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)fd);
+
+    msg_Dbg( p_session->p_tls, "shaking hand..." );
+    do
+        /* TODO: handle fatal error */
+        val = gnutls_handshake( p_sys->session );
+    while( ( val == GNUTLS_E_AGAIN ) || ( val == GNUTLS_E_INTERRUPTED ) );
+
     if( val < 0 )
     {
-        gnutls_deinit( *p_sys );
+        gnutls_deinit( p_sys->session );
         msg_Err( p_session->p_tls, "TLS handshake failed : %s",
                  gnutls_strerror( val ) );
         free( p_sys );
         free( p_session );
         return NULL;
     }
+    msg_Dbg( p_session->p_tls, "shaked hand." );
+
     return p_session;
 }
 
@@ -152,17 +171,17 @@ gnutls_SessionHandshake( tls_session_t *p_session, int fd )
 static void
 gnutls_SessionClose( tls_session_t *p_session )
 {
-    gnutls_session *p_sys;
+    tls_session_sys_t *p_sys;
 
-    p_sys = (gnutls_session *)(p_session->p_sys);
+    p_sys = (tls_session_sys_t *)(p_session->p_sys);
 
     /* On the client-side, credentials are re-allocated per session */
     if( p_session->p_server == NULL )
         gnutls_certificate_free_credentials( ((tls_client_sys_t *)p_sys)
                                                 ->x509_cred );
 
-    gnutls_bye( *p_sys, GNUTLS_SHUT_WR );
-    gnutls_deinit( *p_sys );
+    gnutls_bye( p_sys->session, GNUTLS_SHUT_WR );
+    gnutls_deinit( p_sys->session );
     free( p_sys );
     free( p_session );
 }
@@ -213,7 +232,7 @@ gnutls_ClientCreate( tls_t *p_tls, const char *psz_ca_path )
         }
     }
 
-    i_val = gnutls_init( &p_sys->session, GNUTLS_CLIENT );
+    i_val = gnutls_init( &p_sys->session.session, GNUTLS_CLIENT );
     if( i_val != 0 )
     {
         msg_Err( p_tls, "Cannot initialize TLS session : %s",
@@ -223,35 +242,37 @@ gnutls_ClientCreate( tls_t *p_tls, const char *psz_ca_path )
         return NULL;
     }
 
-    i_val = gnutls_set_default_priority( p_sys->session );
+    i_val = gnutls_set_default_priority( p_sys->session.session );
     if( i_val < 0 )
     {
         msg_Err( p_tls, "Cannot set ciphers priorities : %s",
                  gnutls_strerror( i_val ) );
-        gnutls_deinit( p_sys->session );
+        gnutls_deinit( p_sys->session.session );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
         free( p_sys );
         return NULL;
     }
 
-    i_val = gnutls_certificate_type_set_priority( p_sys->session, cert_type_priority );
+    i_val = gnutls_certificate_type_set_priority( p_sys->session.session,
+                                                  cert_type_priority );
     if( i_val < 0 )
     {
         msg_Err( p_tls, "Cannot set certificate type priorities : %s",
                  gnutls_strerror( i_val ) );
-        gnutls_deinit( p_sys->session );
+        gnutls_deinit( p_sys->session.session );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
         free( p_sys );
         return NULL;
     }
 
-    i_val = gnutls_credentials_set( p_sys->session, GNUTLS_CRD_CERTIFICATE,
+    i_val = gnutls_credentials_set( p_sys->session.session,
+                                    GNUTLS_CRD_CERTIFICATE,
                                     p_sys->x509_cred );
     if( i_val < 0 )
     {
         msg_Err( p_tls, "Cannot set TLS session credentials : %s",
                  gnutls_strerror( i_val ) );
-        gnutls_deinit( p_sys->session );
+        gnutls_deinit( p_sys->session.session );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
         free( p_sys );
         return NULL;
@@ -260,7 +281,7 @@ gnutls_ClientCreate( tls_t *p_tls, const char *psz_ca_path )
     p_session = malloc( sizeof (struct tls_session_t) );
     if( p_session == NULL )
     {
-        gnutls_deinit( p_sys->session );
+        gnutls_deinit( p_sys->session.session );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
         free( p_sys );
         return NULL;
@@ -288,41 +309,41 @@ static tls_session_t *
 gnutls_ServerSessionPrepare( tls_server_t *p_server )
 {
     tls_session_t *p_session;
-    gnutls_session *p_sys;
-    int val;
+    tls_session_sys_t *p_sys;
+    int i_val;
     vlc_value_t bits;
 
-    p_sys = (gnutls_session *)malloc( sizeof(gnutls_session) );
+    p_sys = (tls_session_sys_t *)malloc( sizeof(struct tls_session_sys_t) );
     if( p_sys == NULL )
         return NULL;
 
-    val = gnutls_init( p_sys, GNUTLS_SERVER );
-    if( val != 0 )
+    i_val = gnutls_init( &p_sys->session, GNUTLS_SERVER );
+    if( i_val != 0 )
     {
         msg_Err( p_server->p_tls, "Cannot initialize TLS session : %s",
-                 gnutls_strerror( val ) );
+                 gnutls_strerror( i_val ) );
         free( p_sys );
         return NULL;
     }
    
-    val = gnutls_set_default_priority( *p_sys );
-    if( val < 0 )
+    i_val = gnutls_set_default_priority( p_sys->session );
+    if( i_val < 0 )
     {
         msg_Err( p_server->p_tls, "Cannot set ciphers priorities : %s",
-                 gnutls_strerror( val ) );
-        gnutls_deinit( *p_sys );
+                 gnutls_strerror( i_val ) );
+        gnutls_deinit( p_sys->session );
         free( p_sys );
         return NULL;
     }
 
-    val = gnutls_credentials_set( *p_sys, GNUTLS_CRD_CERTIFICATE,
-                                  ((tls_server_sys_t *)(p_server->p_sys))
-                                  ->x509_cred );
-    if( val < 0 )
+    i_val = gnutls_credentials_set( p_sys->session, GNUTLS_CRD_CERTIFICATE,
+                                    ((tls_server_sys_t *)(p_server->p_sys))
+                                    ->x509_cred );
+    if( i_val < 0 )
     {
         msg_Err( p_server->p_tls, "Cannot set TLS session credentials : %s",
-                 gnutls_strerror( val ) );
-        gnutls_deinit( *p_sys );
+                 gnutls_strerror( i_val ) );
+        gnutls_deinit( p_sys->session );
         free( p_sys );
         return NULL;
     }
@@ -338,12 +359,12 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
         var_Get( p_server->p_tls, "dh-bits", &bits );
     }
 
-    gnutls_dh_set_prime_bits( *p_sys, bits.i_int );
+    gnutls_dh_set_prime_bits( p_sys->session, bits.i_int );
 
     p_session = malloc( sizeof (struct tls_session_t) );
     if( p_session == NULL )
     {
-        gnutls_deinit( *p_sys );
+        gnutls_deinit( p_sys->session );
         free( p_sys );
         return NULL;
     }
