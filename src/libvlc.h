@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.48 2003/03/10 00:04:14 massiot Exp $
+ * $Id: libvlc.h,v 1.49 2003/03/17 12:14:26 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -488,7 +488,7 @@ vlc_module_begin();
     add_module( "filter", "video filter", NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_TRUE );
     add_string( "aspect-ratio", "", NULL,
-                ASPECT_RATIO_TEXT, ASPECT_RATIO_TEXT, VLC_TRUE );
+                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
