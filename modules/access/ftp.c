@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.8 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: ftp.c,v 1.9 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -41,8 +41,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
-#   include <io.h>
 #endif
 
 #ifdef WIN32

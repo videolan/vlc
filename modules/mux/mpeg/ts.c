@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.13 2003/02/26 12:38:17 fenrir Exp $
+ * $Id: ts.c,v 1.14 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -39,8 +39,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
 #endif
 
 #include "codecs.h"

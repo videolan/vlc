@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.5 2003/03/02 17:12:21 fenrir Exp $
+ * $Id: httpd.c,v 1.6 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -26,7 +26,6 @@
  *****************************************************************************/
 #include <stdlib.h>
 
-#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -37,10 +36,12 @@
 #include <vlc/vlc.h>
 #include "httpd.h"
 
+#ifdef HAVE_SYS_TIME_H
+#    include <sys/time.h>
+#endif
+
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
 #endif
 
 #if defined( UNDER_CE )

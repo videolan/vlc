@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.14 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: udp.c,v 1.15 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -26,7 +26,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -42,8 +41,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
-#   include <io.h>
 #endif
 
 #ifdef WIN32

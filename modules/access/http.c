@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.24 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: http.c,v 1.25 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,7 +26,6 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
@@ -43,8 +42,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
 #endif
 
 #if defined( UNDER_CE )

@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.11 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: file.c,v 1.12 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,7 +44,7 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
+#elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
 

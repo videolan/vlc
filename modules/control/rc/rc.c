@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.28 2003/02/20 16:07:38 gbazin Exp $
+ * $Id: rc.c,v 1.29 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -140,14 +140,14 @@ static void Run( intf_thread_t *p_intf )
 
     double     f_ratio = 1.0;
 
-    p_input = NULL;
-    p_playlist = NULL;
-
 #ifdef WIN32
     HANDLE hConsoleIn;
     INPUT_RECORD input_record;
     DWORD i_dummy2;
 #endif
+
+    p_input = NULL;
+    p_playlist = NULL;
 
     /* Register commands that will be cleaned up upon object destruction */
     var_Create( p_intf, "quit", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );

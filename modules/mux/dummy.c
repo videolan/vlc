@@ -2,7 +2,7 @@
  * dummy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: dummy.c,v 1.5 2003/02/24 14:14:43 fenrir Exp $
+ * $Id: dummy.c,v 1.6 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -38,8 +38,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
 #endif
 
 #include "codecs.h"

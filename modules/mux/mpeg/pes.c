@@ -2,7 +2,7 @@
  * pes.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.4 2003/01/17 15:26:24 fenrir Exp $
+ * $Id: pes.c,v 1.5 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -38,8 +38,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
 #endif
 
 #include "codecs.h"

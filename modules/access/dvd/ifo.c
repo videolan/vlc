@@ -2,7 +2,7 @@
  * ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ifo.c,v 1.4 2003/01/16 23:00:47 massiot Exp $
+ * $Id: ifo.c,v 1.5 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -37,8 +37,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
-#   include <io.h>
 #endif
 
 #include <string.h>

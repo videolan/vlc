@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.14 2003/02/20 16:07:38 gbazin Exp $
+ * $Id: directx.c,v 1.15 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -88,6 +88,25 @@ DEFINE_GUID(IID_IDirectSoundNotify, 0xb0210783, 0x89cd, 0x11d0, 0xaf, 0x8, 0x0, 
 #   define SPEAKER_TOP_BACK_CENTER        0x10000
 #   define SPEAKER_TOP_BACK_RIGHT         0x20000
 #   define SPEAKER_RESERVED               0x80000000
+#endif
+
+#ifndef DSSPEAKER_HEADPHONE
+#   define DSSPEAKER_HEADPHONE         0x00000001
+#endif
+#ifndef DSSPEAKER_MONO
+#   define DSSPEAKER_MONO              0x00000002
+#endif
+#ifndef DSSPEAKER_QUAD
+#   define DSSPEAKER_QUAD              0x00000003
+#endif
+#ifndef DSSPEAKER_STEREO
+#   define DSSPEAKER_STEREO            0x00000004
+#endif
+#ifndef DSSPEAKER_SURROUND
+#   define DSSPEAKER_SURROUND          0x00000005
+#endif
+#ifndef DSSPEAKER_5POINT1
+#   define DSSPEAKER_5POINT1           0x00000006
 #endif
 
 #ifndef _WAVEFORMATEXTENSIBLE_

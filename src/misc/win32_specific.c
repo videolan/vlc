@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.21 2003/02/17 05:50:31 sam Exp $
+ * $Id: win32_specific.c,v 1.22 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -38,7 +38,6 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
 #if !defined( UNDER_CE )
     WSADATA Data;
-    int i_err;
 
     /* Get our full path */
     if( ppsz_argv[0] )
@@ -63,16 +62,45 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
         p_this->p_libvlc->psz_vlcpath = strdup( "" );
     }
 
-    /* WinSock Library Init. */
-    i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
-
-    if( i_err )
-    {
-        fprintf( stderr, "error: can't initiate WinSocks, error %i\n", i_err );
-    }
-
     /* Set the default file-translation mode */
     _fmode = _O_BINARY;
+
+    /* WinSock Library Init. */
+    if( !WSAStartup( MAKEWORD( 2, 0 ), &Data ) )
+    {
+        /* Confirm that the WinSock DLL supports 2.0.*/
+        if( LOBYTE( Data.wVersion ) != 2 || HIBYTE( Data.wVersion ) != 0 )
+        {
+            /* We could not find a suitable WinSock DLL. */
+            WSACleanup( );
+        }
+        else
+        {
+            /* Everything went ok. */
+            return;
+        }
+    }
+
+    /* Let's try with WinSock 1.1 */
+    if( !WSAStartup( MAKEWORD( 1, 1 ), &Data ) )
+    {
+        /* Confirm that the WinSock DLL supports 1.1.*/
+        if( LOBYTE( Data.wVersion ) != 1 || HIBYTE( Data.wVersion ) != 1 )
+        {
+            /* We could not find a suitable WinSock DLL. */
+            WSACleanup( );
+        }
+        else
+        {
+            /* Everything went ok. */
+            return;
+        }
+    }
+
+    fprintf( stderr, "error: can't initialize WinSocks\n" );
+
+    return; 
+
 #endif
 }
 

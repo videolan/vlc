@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.79 2003/01/27 21:44:39 ipkiss Exp $
+ * $Id: netutils.c,v 1.80 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -41,7 +41,7 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                      /* gethostname() */
-#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
+#elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
 

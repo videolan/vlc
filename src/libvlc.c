@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.68 2003/02/27 08:19:02 massiot Exp $
+ * $Id: libvlc.c,v 1.69 2003/03/03 14:21:08 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -48,7 +48,7 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
+#elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
 

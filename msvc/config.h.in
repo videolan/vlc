@@ -30,7 +30,7 @@
 /* #undef C_ALLOCA */
 
 /* Define if <X11/extensions/dpms.h> defines DPMSInfo. */
-#define DPMSINFO_IN_DPMS_H 1
+/* #undef DPMSINFO_IN_DPMS_H */
 
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
@@ -40,7 +40,7 @@
 /* #undef HAVE_A52DEC_A52_H */
 
 /* Define to 1 if you have `alloca', as a function or macro. */
-/* #define HAVE_ALLOCA 1 */
+#define HAVE_ALLOCA 1
 
 /* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
    */
@@ -254,7 +254,7 @@
 /* #undef HAVE_POSIX_MEMALIGN */
 
 /* Define to 1 if you have the <pthread.h> header file. */
-#define HAVE_PTHREAD_H 1
+/* #undef HAVE_PTHREAD_H */
 
 /* Define to 1 if you have the `putenv' function. */
 #define HAVE_PUTENV 1
@@ -395,7 +395,7 @@
 /* #undef HAVE_XVID_H */
 
 /* Define to 1 if you have the <zlib.h> header file. */
-#define HAVE_ZLIB_H 1
+/* #undefine HAVE_ZLIB_H */
 
 /* Define to 1 if you have the `__argz_count' function. */
 /* #undef HAVE___ARGZ_COUNT */

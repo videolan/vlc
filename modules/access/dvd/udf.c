@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: udf.c,v 1.4 2002/12/06 16:34:04 sam Exp $
+ * $Id: udf.c,v 1.5 2003/03/03 14:21:08 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -39,8 +39,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
-#   include <io.h>
 #endif
 
 #ifdef STRNCASECMP_IN_STRINGS_H
