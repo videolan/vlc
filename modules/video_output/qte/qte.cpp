@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.10 2003/02/02 00:46:58 sam Exp $
+ * $Id: qte.cpp,v 1.11 2003/02/12 23:09:23 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -105,8 +105,8 @@ static int  Manage    ( vout_thread_t * );
 static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 
-static int  CreateQtWindow ( vout_thread_t * );
-static void DestroyQtWindow( vout_thread_t * );
+static int  OpenDisplay ( vout_thread_t * );
+static void CloseDisplay( vout_thread_t * );
 
 static int  NewPicture     ( vout_thread_t *, picture_t * );
 static void FreePicture    ( vout_thread_t *, picture_t * );
@@ -174,7 +174,7 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 
-    CreateQtWindow(p_vout);
+    OpenDisplay(p_vout);
     return( 0 );
 }
 
@@ -194,7 +194,7 @@ static void Close ( vlc_object_t *p_this )
 
         /* Kill RunQtThread */
         p_vout->p_sys->p_event->b_die = VLC_TRUE;
-        DestroyQtWindow(p_vout);
+        CloseDisplay(p_vout);
 
         vlc_thread_join( p_vout->p_sys->p_event );
         vlc_object_destroy( p_vout->p_sys->p_event );
@@ -289,14 +289,16 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                        &x, &y, &w, &h );
 
+#if 0
     msg_Err(p_vout, "+qte::Display( p_vout, i_width=%d, i_height=%d, x=%u, y=%u, w=%u, h=%u",
 					p_vout->p_sys->i_width, p_vout->p_sys->i_height, x, y, w, h );
+#endif
 
-    if(p_vout->p_sys->pcVoutWidget)
+    if(p_vout->p_sys->p_VideoWidget)
     {
 // shameless borrowed from opie mediaplayer....
 #ifndef USE_DIRECT_PAINTER
-        QPainter p(p_vout->p_sys->pcVoutWidget);
+        QPainter p(p_vout->p_sys->p_VideoWidget);
 
         /* rotate frame */
         int dd      = QPixmap::defaultDepth();
@@ -333,21 +335,18 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         p.drawImage( x, y, rotatedFrame, 0, 0, rw, rh );
 #else
-        QDirectPainter p(p_vout->p_sys->pcVoutWidget);
-
+        QDirectPainter p(p_vout->p_sys->p_VideoWidget);
         // just copy the image to the frame buffer...
         memcpy(p.frameBuffer(), (p_pic->p_sys->pQImage->jumpTable())[0], h * p.lineStep());
 #endif
     }
-    msg_Err(p_vout, "-qte::Display" );
-
 }
 
 /*****************************************************************************
- * Manage: handle X11 events
+ * Manage: handle Qte events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
- * X11 events and allows window resizing. It returns a non null value on
+ * Qte events and allows window resizing. It returns a non null value on
  * error.
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
@@ -383,7 +382,9 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int dd = QPixmap::defaultDepth();
 
-    msg_Dbg(p_vout, "+NewPicture::dd = %d",dd );
+#if 0
+    msg_Dbg(p_vout, "Default Depth = %d",dd );
+#endif
 
     p_pic->p_sys = (picture_sys_t*) malloc( sizeof( picture_sys_t ) );
 
@@ -392,73 +393,46 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         return -1;
     }
 
-    switch(p_vout->output.i_chroma)
+    /* Create the display */
+    p_pic->p_sys->pQImage = new QImage(p_vout->output.i_width,
+                                       p_vout->output.i_height,
+                                       dd );
+
+    if(p_pic->p_sys->pQImage == NULL)
     {
-    case VLC_FOURCC('R','V','1','6'):
-        if(dd == 16)
-        {
-            p_pic->p_sys->pQImage = new QImage(p_vout->output.i_width,
-                                               p_vout->output.i_height,
-                                               dd );
-
-            if(p_pic->p_sys->pQImage == NULL)
-            {
-                return -1;
-            }
-
-            p_pic->p->p_pixels = (p_pic->p_sys->pQImage->jumpTable())[0];
-
-            p_pic->p->i_pitch = p_pic->p_sys->pQImage->bytesPerLine();
-
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pixel_pitch   = 2;
-            p_pic->p->i_visible_pitch = 0;
-//            p_pic->p->i_pixel_bytes = 2;
-//            p_pic->p->b_margin      = 0;
-            p_pic->i_planes         = 1;
-        }
-        else
-        {
-            return -1;
-        }
-        break;
-    case VLC_FOURCC('R','V','3','2'):
-        if(dd == 32)
-        {
-            p_pic->p_sys->pQImage = new QImage(p_vout->output.i_width,
-                                               p_vout->output.i_height,
-                                               dd );
-
-            if(p_pic->p_sys->pQImage == NULL)
-            {
-                return -1;
-            }
-
-            p_pic->p->p_pixels = (p_pic->p_sys->pQImage->jumpTable())[0];
-
-            p_pic->p->i_pitch = p_pic->p_sys->pQImage->bytesPerLine();
-
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pixel_pitch   = 4;
-            p_pic->p->i_visible_pitch = 0;
-//            p_pic->p->i_pixel_bytes = 4;
-//            p_pic->p->b_margin      = 0;
-            p_pic->i_planes         = 1;
-        }
-        else
-        {
-            return -1;
-        }
-        break;
-    default:
         return -1;
-        break;
     }
 
+    switch( dd )
+    {
+        case 8:
+            p_pic->p->i_pixel_pitch = 1;
+            break;
+        case 15:
+        case 16:
+            p_pic->p->i_pixel_pitch = 2;
+            break;
+        case 24:
+        case 32:
+            p_pic->p->i_pixel_pitch = 4;
+            break;
+        default:
+            return( -1 );
+    }
+
+    p_pic->p->p_pixels = (p_pic->p_sys->pQImage->jumpTable())[0];
+    p_pic->p->i_pitch = p_pic->p_sys->pQImage->bytesPerLine();
+    p_pic->p->i_lines = p_vout->output.i_height;
+    p_pic->p->i_visible_pitch =
+            p_pic->p->i_pixel_pitch * p_vout->output.i_width;
+
+    p_pic->i_planes = 1;
+
+#if 0
     msg_Dbg(p_vout, "-NewPicture: %d %d %d",p_vout->output.i_width,
                                  p_vout->output.i_height,
                                  p_vout->output.i_chroma );
-
+#endif
     return 0;
 }
 
@@ -478,20 +452,26 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void ToggleFullScreen ( vout_thread_t *p_vout )
 {
+	if ( p_vout->b_fullscreen )
+       p_vout->p_sys->p_VideoWidget->showFullScreen();
+    else
+      p_vout->p_sys->p_VideoWidget->showNormal();
+
+    p_vout->b_fullscreen = !p_vout->b_fullscreen;
 }
 
-
 /*****************************************************************************
- * CreateQtWindow: create qte applicaton / window
+ * OpenDisplay: create qte applicaton / window
  *****************************************************************************
  * Create a window according to video output given size, and set other
  * properties according to the display properties.
  *****************************************************************************/
-static int CreateQtWindow( vout_thread_t *p_vout )
+static int OpenDisplay( vout_thread_t *p_vout )
 {
+    msg_Dbg( p_vout, "Creating Qt Window" );
+
     /* for displaying the vout in a qt window we need the QtApplication */
-    p_vout->p_sys->pcVoutWidget = NULL;
-    msg_Dbg( p_vout, "creating RunQtThread" );
+    p_vout->p_sys->p_VideoWidget = NULL;
 
     p_vout->p_sys->p_event = (event_thread_t*) vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
@@ -499,6 +479,7 @@ static int CreateQtWindow( vout_thread_t *p_vout )
     /* Initializations */
     p_vout->p_sys->i_width  = 320;
     p_vout->p_sys->i_height = 240;
+    p_vout->b_fullscreen = VLC_TRUE;
 
     /* create thread to exec the qpe application */
     if ( vlc_thread_create( p_vout->p_sys->p_event, "QT Embedded Thread",
@@ -521,11 +502,10 @@ static int CreateQtWindow( vout_thread_t *p_vout )
     msg_Dbg( p_vout, "RunQtThread running" );
 
     // just wait until the crew is complete...
-    while(p_vout->p_sys->pcVoutWidget == NULL)
+    while(p_vout->p_sys->p_VideoWidget == NULL)
     {
         msleep(1);
     }
-
     return VLC_SUCCESS;
 
  error:
@@ -535,27 +515,25 @@ static int CreateQtWindow( vout_thread_t *p_vout )
 
 
 /*****************************************************************************
- * DestroyQtWindow: destroy the window
+ * CloseDisplay: destroy the window
  *****************************************************************************/
-static void DestroyQtWindow( vout_thread_t *p_vout )
+static void CloseDisplay( vout_thread_t *p_vout )
 {
     // quit qt application loop
-    if(p_vout->p_sys->pcQApplication)
+    msg_Dbg( p_vout, "Destroying Qt Window" );
+#ifdef NEED_QTE_MAIN
+    if(p_vout->p_sys->p_QApplication)
     {
-#ifndef NEED_QTE_MAIN
-        if(p_vout->p_sys->bOwnsQApp)
-        {
-            p_vout->p_sys->pcQApplication->quit();
-        }
-        else
-#endif
-            p_vout->p_sys->bRunning = FALSE;
-
-        while(p_vout->p_sys->pcVoutWidget)
+        p_vout->p_sys->bRunning = FALSE;
+        while(p_vout->p_sys->p_VideoWidget)
         {
             msleep(1);
         }
     }
+#else
+    if (p_vout->p_sys->p_QApplication)
+       p_vout->p_sys->p_QApplication->quit();
+#endif
 }
 
 /*****************************************************************************
@@ -563,67 +541,70 @@ static void DestroyQtWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static void RunQtThread(event_thread_t *p_event)
 {
-    int     argc    = 0;
+    msg_Dbg( p_event->p_vout, "RunQtThread Starting" );
 
-    msg_Dbg( p_event->p_vout, "+qte::RunQtThread" );
-
-    if(qApp == NULL)
+#ifdef NEED_QTE_MAIN
+    if (qApp)
     {
+        p_event->p_vout->p_sys->p_QApplication = qApp;
+        p_event->p_vout->p_sys->bOwnsQApp = FALSE;
+        p_event->p_vout->p_sys->p_VideoWidget = qApp->mainWidget();
+        msg_Dbg( p_event->p_vout, "RunQtThread applicaton attached" );
+    }
+#else
+    if (qApp==NULL)
+    {
+        int argc = 0;
         QApplication* pApp = new QApplication(argc, NULL);
         if(pApp)
         {
-            p_event->p_vout->p_sys->pcQApplication = pApp;
+            p_event->p_vout->p_sys->p_QApplication = pApp;
             p_event->p_vout->p_sys->bOwnsQApp = TRUE;
         }
-        msg_Dbg( p_event->p_vout, "RunQtThread application created" );
+        QWidget* pWidget = new QWidget();
+        if (pWidget)
+		{
+            p_event->p_vout->p_sys->p_VideoWidget = pWidget;
+        }
     }
-    else
-    {
-        p_event->p_vout->p_sys->pcQApplication = qApp;
-        p_event->p_vout->p_sys->bOwnsQApp = FALSE;
-        msg_Dbg( p_event->p_vout, "RunQtThread applicaton attached" );
-    }
-
+#endif
     /* signal the creation of the window */
     vlc_thread_ready( p_event );
-    msg_Dbg( p_event->p_vout, "+qte::RunQtThread ready" );
+    msg_Dbg( p_event->p_vout, "RunQtThread ready" );
 
-    if (p_event->p_vout->p_sys->pcQApplication)
+    if (p_event->p_vout->p_sys->p_QApplication)
     {
-        QWidget vo(0, "qte");
-        vo.showFullScreen();
-        vo.show();
-        p_event->p_vout->p_sys->pcVoutWidget = &vo;
+        p_event->p_vout->p_sys->p_VideoWidget->showFullScreen();
+        p_event->p_vout->p_sys->p_VideoWidget->show();
         p_event->p_vout->p_sys->bRunning = TRUE;
 
-        if(p_event->p_vout->p_sys->bOwnsQApp)
-        {
-            // run the main loop of qtapplication until someone says: 'quit'
-            msg_Dbg( p_event->p_vout, "+qte::RunQtThread starting application" );
-            p_event->p_vout->p_sys->pcQApplication->exec();
-        }
-        else
-        {
-            while(!p_event->b_die && p_event->p_vout->p_sys->bRunning)
-			{
-        	   /* Check if we are asked to exit */
-               if( p_event->b_die )
-                   break;
+#ifdef NEED_QTE_MAIN
+        while(!p_event->b_die && p_event->p_vout->p_sys->bRunning)
+		{
+    	   /* Check if we are asked to exit */
+           if( p_event->b_die )
+               break;
 
-				msleep(100);
-			}
-        }
+			msleep(100);
+		}
+#else
+        // run the main loop of qtapplication until someone says: 'quit'
+        p_event->p_vout->p_sys->pcQApplication->exec();
+#endif
     }
 
-    p_event->p_vout->p_sys->pcVoutWidget = NULL;
-
-    if(p_event->p_vout->p_sys->bOwnsQApp)
+#ifndef NEED_QTE_MAIN
+    if(p_event->p_vout->p_sys->p_QApplication)
     {
-        msg_Dbg( p_event->p_vout, "+qte::RunQtThread deleting application" );
-        delete p_event->p_vout->p_sys->pcQApplication;
-        p_event->p_vout->p_sys->pcQApplication = NULL;
+        delete p_event->p_vout->p_sys->p_VideoWidget;
+        p_event->p_vout->p_sys->p_VideoWidget = NULL;
+        delete p_event->p_vout->p_sys->p_QApplication;
+        p_event->p_vout->p_sys->p_QApplication = NULL;
     }
+#else
+    p_event->p_vout->p_sys->p_VideoWidget = NULL;
+#endif
 
-    msg_Dbg( p_event->p_vout, "-qte::RunQtThread terminating" );
+    msg_Dbg( p_event->p_vout, "RunQtThread terminating" );
 }
 
