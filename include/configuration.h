@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.6 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: configuration.h,v 1.7 2002/04/21 18:32:12 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -47,16 +47,17 @@
 
 typedef struct module_config_s
 {
-    int         i_type;                                /* Configuration type */
+    int          i_type;                               /* Configuration type */
     char        *psz_name;                                    /* Option name */
+    char         i_short;                      /* Optional short option name */
     char        *psz_text;      /* Short comment on the configuration option */
     char        *psz_longtext;   /* Long comment on the configuration option */
     char        *psz_value;                                  /* Option value */
-    int         i_value;                                     /* Option value */
-    float       f_value;                                     /* Option value */
+    int          i_value;                                    /* Option value */
+    float        f_value;                                    /* Option value */
     void        *p_callback;     /* Function to call when commiting a change */
     vlc_mutex_t *p_lock;            /* lock to use when modifying the config */
-    boolean_t   b_dirty;           /* Dirty flag to indicate a config change */
+    boolean_t    b_dirty;          /* Dirty flag to indicate a config change */
 
 } module_config_t;
 
@@ -109,32 +110,53 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
     static module_config_t p_config[] = {
 
 #define MODULE_CONFIG_STOP \
-    { MODULE_CONFIG_HINT_END, NULL, NULL, NULL, NULL, 0, 0, NULL, 0 } };
+    { MODULE_CONFIG_HINT_END, NULL, '\0', NULL, NULL, NULL, 0, 0, NULL, 0 } };
 
 #define ADD_CATEGORY_HINT( text, longtext ) \
-    { MODULE_CONFIG_HINT_CATEGORY, NULL, text, longtext, NULL, 0, 0, NULL, \
-      NULL, 0 },
+    { MODULE_CONFIG_HINT_CATEGORY, NULL, '\0', text, longtext, NULL, 0, 0, \
+      NULL, NULL, 0 },
 #define ADD_SUBCATEGORY_HINT( text, longtext ) \
-    { MODULE_CONFIG_HINT_SUBCATEGORY, NULL, text, longtext, NULL, 0, 0, NULL, \
-      NULL, 0 },
+    { MODULE_CONFIG_HINT_SUBCATEGORY, NULL, '\0', text, longtext, NULL, 0, 0, \
+      NULL, NULL, 0 },
 #define END_SUBCATEGORY_HINT \
-    { MODULE_CONFIG_HINT_SUBCATEGORY_END, NULL, NULL, NULL, NULL, 0, 0, NULL, \
-      NULL, 0 },
+    { MODULE_CONFIG_HINT_SUBCATEGORY_END, NULL, '\0', NULL, NULL, NULL, 0, 0, \
+      NULL, NULL, 0 },
 #define ADD_STRING( name, value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_STRING, name, text, longtext, value, 0, 0, \
+    { MODULE_CONFIG_ITEM_STRING, name, '\0', text, longtext, value, 0, 0, \
       p_callback, NULL, 0 },
 #define ADD_FILE( name, psz_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_FILE, name, text, longtext, psz_value, 0, 0, \
+    { MODULE_CONFIG_ITEM_FILE, name, '\0', text, longtext, psz_value, 0, 0, \
       p_callback, NULL, 0 },
 #define ADD_PLUGIN( name, i_capability, psz_value, p_callback, text, longtext)\
-    { MODULE_CONFIG_ITEM_PLUGIN, name, text, longtext, psz_value, \
+    { MODULE_CONFIG_ITEM_PLUGIN, name, '\0', text, longtext, psz_value, \
       i_capability, 0, p_callback, NULL, 0 },
 #define ADD_INTEGER( name, i_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_INTEGER, name, text, longtext, NULL, i_value, 0, \
-      p_callback, NULL, 0 },
+    { MODULE_CONFIG_ITEM_INTEGER, name, '\0', text, longtext, NULL, i_value, \
+      0, p_callback, NULL, 0 },
 #define ADD_FLOAT( name, f_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_FLOAT, name, text, longtext, NULL, 0, f_value, \
+    { MODULE_CONFIG_ITEM_FLOAT, name, '\0', text, longtext, NULL, 0, f_value, \
       p_callback, NULL, 0 },
 #define ADD_BOOL( name, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_BOOL, name, text, longtext, NULL, 0, 0, p_callback, \
-      NULL, 0 },
+    { MODULE_CONFIG_ITEM_BOOL, name, '\0', text, longtext, NULL, 0, 0, \
+      p_callback, NULL, 0 },
+#define ADD_STRING_WITH_SHORT( name, ch, value, p_callback, text, longtext ) \
+    { MODULE_CONFIG_ITEM_STRING, name, ch, text, longtext, value, 0, 0, \
+      p_callback, NULL, 0 },
+#define ADD_FILE_WITH_SHORT( name, ch, psz_value, p_callback, text, longtext ) \
+    { MODULE_CONFIG_ITEM_FILE, name, ch, text, longtext, psz_value, 0, 0, \
+      p_callback, NULL, 0 },
+#define ADD_PLUGIN_WITH_SHORT( name, ch, i_capability, psz_value, p_callback, \
+  text, longtext) \
+    { MODULE_CONFIG_ITEM_PLUGIN, name, ch, text, longtext, psz_value, \
+      i_capability, 0, p_callback, NULL, 0 },
+#define ADD_INTEGER_WITH_SHORT( name, ch, i_value, p_callback, text, \
+  longtext ) \
+    { MODULE_CONFIG_ITEM_INTEGER, name, ch, text, longtext, NULL, i_value, 0, \
+      p_callback, NULL, 0 },
+#define ADD_FLOAT_WITH_SHORT( name, f_value, p_callback, text, longtext ) \
+    { MODULE_CONFIG_ITEM_FLOAT, name, ch, text, longtext, NULL, 0, f_value, \
+      p_callback, NULL, 0 },
+#define ADD_BOOL_WITH_SHORT( name, ch, p_callback, text, longtext ) \
+    { MODULE_CONFIG_ITEM_BOOL, name, ch, text, longtext, NULL, 0, 0, \
+      p_callback, NULL, 0 },
+

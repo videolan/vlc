@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.16 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: configuration.c,v 1.17 2002/04/21 18:32:12 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -304,6 +304,7 @@ module_config_t *config_Duplicate( module_config_t *p_orig )
     for( i = 0; i < i_lines ; i++ )
     {
         p_config[i].i_type = p_orig[i].i_type;
+        p_config[i].i_short = p_orig[i].i_short;
         p_config[i].i_value = p_orig[i].i_value;
         p_config[i].f_value = p_orig[i].f_value;
         p_config[i].b_dirty = p_orig[i].b_dirty;
@@ -725,13 +726,14 @@ int config_SaveConfigFile( const char *psz_module_name )
 int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
                         boolean_t b_ignore_errors )
 {
-    int i_cmd, i_index, i_longopts_size;
+    int i_cmd, i_index, i_opts, i_shortopts;
     module_t *p_module;
     module_config_t *p_item;
     struct option *p_longopts;
 
     /* Short options */
-    const char *psz_shortopts = "hHvlp:";
+    module_config_t *pp_shortopts[256];
+    char *psz_shortopts;
 
     /* Set default configuration and copy arguments */
     p_main->i_argc    = *pi_argc;
@@ -759,26 +761,40 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
     }
 #endif
 
-
     /*
-     * Generate the longopts structure used by getopt_long
+     * Generate the longopts and shortopts structure used by getopt_long
      */
-    i_longopts_size = 0;
+
+    i_opts = 0;
     for( p_module = p_module_bank->first;
          p_module != NULL ;
          p_module = p_module->next )
     {
         /* count the number of exported configuration options (to allocate
          * longopts). */
-        i_longopts_size += p_module->i_config_items;
+        i_opts += p_module->i_config_items;
     }
 
-    p_longopts = (struct option *)malloc( sizeof(struct option)
-                                          * (i_longopts_size + 1) );
+    p_longopts = malloc( sizeof(struct option) * (i_opts + 1) );
     if( p_longopts == NULL )
     {
         intf_ErrMsg( "config error: couldn't allocate p_longopts" );
         return( -1 );
+    }
+
+    psz_shortopts = malloc( sizeof( char ) * (2 * i_opts + 1) );
+    if( psz_shortopts == NULL )
+    {
+        intf_ErrMsg( "config error: couldn't allocate psz_shortopts" );
+        free( p_longopts );
+        return( -1 );
+    }
+
+    psz_shortopts[0] = 'v';
+    i_shortopts = 1;
+    for( i_index = 0; i_index < 256; i_index++ )
+    {
+        pp_shortopts[i_index] = NULL;
     }
 
     /* Fill the longopts structure */
@@ -800,12 +816,24 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
                                                no_argument : required_argument;
             p_longopts[i_index].flag = 0;
             p_longopts[i_index].val = 0;
+            if( p_item->i_short )
+            {
+                pp_shortopts[(int)p_item->i_short] = p_item;
+                psz_shortopts[i_shortopts] = p_item->i_short;
+                i_shortopts++;
+                if( p_item->i_type != MODULE_CONFIG_ITEM_BOOL )
+                {
+                    psz_shortopts[i_shortopts] = ':';
+                    i_shortopts++;
+                }
+            }
             i_index++;
         }
     }
-    /* Close the longopts structure */
-    memset( &p_longopts[i_index], 0, sizeof(struct option) );
 
+    /* Close the longopts and shortopts structures */
+    memset( &p_longopts[i_index], 0, sizeof(struct option) );
+    psz_shortopts[i_shortopts] = '\0';
 
     /*
      * Parse the command line options
@@ -815,11 +843,9 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
     while( ( i_cmd = getopt_long( *pi_argc, ppsz_argv, psz_shortopts,
                                   p_longopts, &i_index ) ) != EOF )
     {
-
+        /* A long option has been recognized */
         if( i_cmd == 0 )
         {
-            /* A long option has been recognized */
-
             module_config_t *p_conf;
 
             /* Store the configuration option */
@@ -847,43 +873,47 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
             continue;
         }
 
-        /* short options handled here for now */
-        switch( i_cmd )
+        /* A short option has been recognized */
+        if( pp_shortopts[i_cmd] != NULL )
         {
-
-        /* General/common options */
-        case 'h':                                              /* -h, --help */
-            config_PutIntVariable( "help", 1 );
-            break;
-        case 'H':                                          /* -H, --longhelp */
-            config_PutIntVariable( "longhelp", 1 );
-            break;
-        case 'l':                                              /* -l, --list */
-            config_PutIntVariable( "list", 1 );
-            break;
-        case 'p':                                            /* -p, --plugin */
-            config_PutPszVariable( "plugin", optarg );
-            break;
-        case 'v':                                           /* -v, --verbose */
-            p_main->i_warning_level++;
-            break;
-
-        /* Internal error: unknown option */
-        case '?':
-        default:
-
-            if( !b_ignore_errors )
+            switch( pp_shortopts[i_cmd]->i_type )
             {
-                intf_ErrMsg( "config error: unknown option `%s'",
-                             ppsz_argv[optind-1] );
-                intf_Msg( "Try `%s --help' for more information.\n",
-                          p_main->psz_arg0 );
-
-                free( p_longopts );
-                return( -1 );
+            case MODULE_CONFIG_ITEM_STRING:
+            case MODULE_CONFIG_ITEM_FILE:
+            case MODULE_CONFIG_ITEM_PLUGIN:
+                config_PutPszVariable( pp_shortopts[i_cmd]->psz_name, optarg );
+                break;
+            case MODULE_CONFIG_ITEM_INTEGER:
+                config_PutIntVariable( pp_shortopts[i_cmd]->psz_name,
+                                       atoi(optarg));
+                break;
+            case MODULE_CONFIG_ITEM_BOOL:
+                config_PutIntVariable( pp_shortopts[i_cmd]->psz_name, 1 );
+                break;
             }
+
+            continue;
         }
 
+        /* Either it's a -v or it's an unknown short option */
+        if( i_cmd == 'v' )
+        {
+            p_main->i_warning_level++;
+            continue;
+        }
+
+        /* Internal error: unknown option */
+        if( !b_ignore_errors )
+        {
+            intf_ErrMsg( "config error: unknown option `%s'",
+                         ppsz_argv[optind-1] );
+            intf_Msg( "Try `%s --help' for more information.\n",
+                      p_main->psz_arg0 );
+
+            free( p_longopts );
+            free( psz_shortopts );
+            return( -1 );
+        }
     }
 
     if( p_main->i_warning_level < 0 )
@@ -892,6 +922,7 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
     }
 
     free( p_longopts );
+    free( psz_shortopts );
     return( 0 );
 }
 

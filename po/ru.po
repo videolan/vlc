@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-vlc\n"
-"POT-Creation-Date: 2002-04-21 12:23+0200\n"
+"POT-Creation-Date: 2002-04-21 20:27+0200\n"
 "PO-Revision-Date: 2001-02-19 19:58+03:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -177,187 +177,195 @@ msgid ""
 msgstr ""
 
 #: src/interface/main.c:186
-msgid "grayscale video output"
+msgid "zoom video"
 msgstr ""
 
 #: src/interface/main.c:188
+msgid "You can zoom the video by the specified factor."
+msgstr ""
+
+#: src/interface/main.c:190
+msgid "grayscale video output"
+msgstr ""
+
+#: src/interface/main.c:192
 msgid ""
 "Using this option, vlc will not decode the color information from the video "
 "(this can also allow you to save some processing power)."
 msgstr ""
 
-#: src/interface/main.c:191
+#: src/interface/main.c:195
 msgid "fullscreen video output"
 msgstr ""
 
-#: src/interface/main.c:193
+#: src/interface/main.c:197
 msgid ""
 "If this option is enabled, vlc will always start a video in fullscreen mode."
 msgstr ""
 
-#: src/interface/main.c:196
+#: src/interface/main.c:200
 msgid "disable hardware acceleration for the video output"
 msgstr ""
 
-#: src/interface/main.c:198
+#: src/interface/main.c:202
 msgid ""
 "By default vlc will try to take advantage of the overlay capabilities of you "
 "graphics card."
 msgstr ""
 
-#: src/interface/main.c:201
+#: src/interface/main.c:205
 msgid "force SPU position"
 msgstr ""
 
-#: src/interface/main.c:204
+#: src/interface/main.c:208
 msgid "video filter module"
 msgstr ""
 
-#: src/interface/main.c:207
+#: src/interface/main.c:211
 msgid "server port"
 msgstr ""
 
-#: src/interface/main.c:210
+#: src/interface/main.c:214
 msgid "enable network channel mode"
 msgstr ""
 
-#: src/interface/main.c:213
+#: src/interface/main.c:217
 msgid "channel server address"
 msgstr ""
 
-#: src/interface/main.c:216
+#: src/interface/main.c:220
 msgid "channel server port"
 msgstr ""
 
-#: src/interface/main.c:219
+#: src/interface/main.c:223
 msgid "network interface"
 msgstr ""
 
-#: src/interface/main.c:222
+#: src/interface/main.c:226
 msgid "choose program (SID)"
 msgstr ""
 
-#: src/interface/main.c:224
+#: src/interface/main.c:228
 msgid "Choose the program to select by giving its Service ID."
 msgstr ""
 
-#: src/interface/main.c:226
+#: src/interface/main.c:230
 msgid "choose audio"
 msgstr ""
 
-#: src/interface/main.c:229
+#: src/interface/main.c:233
 msgid "choose channel"
 msgstr ""
 
-#: src/interface/main.c:232
+#: src/interface/main.c:236
 msgid "choose subtitles"
 msgstr ""
 
-#: src/interface/main.c:235
+#: src/interface/main.c:239
 msgid "DVD device"
 msgstr ""
 
-#: src/interface/main.c:238
+#: src/interface/main.c:242
 msgid "VCD device"
 msgstr ""
 
-#: src/interface/main.c:241
+#: src/interface/main.c:245
 msgid "satellite transponder frequency"
 msgstr ""
 
-#: src/interface/main.c:244
+#: src/interface/main.c:248
 msgid "satellite transponder polarization"
 msgstr ""
 
-#: src/interface/main.c:247
+#: src/interface/main.c:251
 msgid "satellite transponder FEC"
 msgstr ""
 
-#: src/interface/main.c:250
+#: src/interface/main.c:254
 msgid "satellite transponder symbol rate"
 msgstr ""
 
-#: src/interface/main.c:253
+#: src/interface/main.c:257
 msgid "use diseqc with antenna"
 msgstr ""
 
-#: src/interface/main.c:256
+#: src/interface/main.c:260
 msgid "antenna lnb_lof1 (kHz)"
 msgstr ""
 
-#: src/interface/main.c:259
+#: src/interface/main.c:263
 msgid "antenna lnb_lof2 (kHz)"
 msgstr ""
 
-#: src/interface/main.c:262
+#: src/interface/main.c:266
 msgid "antenna lnb_slof (kHz)"
 msgstr ""
 
-#: src/interface/main.c:265
+#: src/interface/main.c:269
 msgid "force IPv6"
 msgstr ""
 
-#: src/interface/main.c:268
+#: src/interface/main.c:272
 msgid "force IPv4"
 msgstr ""
 
-#: src/interface/main.c:271
+#: src/interface/main.c:275
 msgid "choose MPEG audio decoder"
 msgstr ""
 
-#: src/interface/main.c:274
+#: src/interface/main.c:278
 msgid "choose AC3 audio decoder"
 msgstr ""
 
-#: src/interface/main.c:277
+#: src/interface/main.c:281
 msgid "use additional processors"
 msgstr ""
 
-#: src/interface/main.c:280
+#: src/interface/main.c:284
 msgid "force synchro algorithm {I|I+|IP|IP+|IPB}"
 msgstr ""
 
-#: src/interface/main.c:283
+#: src/interface/main.c:287
 msgid "disable CPU's MMX support"
 msgstr ""
 
-#: src/interface/main.c:286
+#: src/interface/main.c:290
 msgid "disable CPU's 3D Now! support"
 msgstr ""
 
-#: src/interface/main.c:289
+#: src/interface/main.c:293
 msgid "disable CPU's MMX EXT support"
 msgstr ""
 
-#: src/interface/main.c:292
+#: src/interface/main.c:296
 msgid "disable CPU's SSE support"
 msgstr ""
 
-#: src/interface/main.c:295
+#: src/interface/main.c:299
 msgid "disable CPU's AltiVec support"
 msgstr ""
 
-#: src/interface/main.c:298
+#: src/interface/main.c:302
 msgid "launch playlist on startup"
 msgstr ""
 
-#: src/interface/main.c:301
+#: src/interface/main.c:305
 msgid "enqueue playlist as default"
 msgstr ""
 
-#: src/interface/main.c:304
+#: src/interface/main.c:308
 msgid "loop playlist on end"
 msgstr ""
 
-#: src/interface/main.c:307
+#: src/interface/main.c:311
 msgid "memory copy module"
 msgstr ""
 
-#: src/interface/main.c:310
+#: src/interface/main.c:314
 msgid "fast pthread on NT/2K/XP (developpers only)"
 msgstr ""
 
-#: src/interface/main.c:312
+#: src/interface/main.c:316
 msgid ""
 "On Windows NT/2K/XP we use a slow but correct pthread implementation, you "
 "can also use this faster implementation but you might experience problems "
@@ -365,39 +373,39 @@ msgid ""
 msgstr ""
 
 #. Interface options
-#: src/interface/main.c:334
+#: src/interface/main.c:338
 msgid "Interface"
 msgstr ""
 
 #. Audio options
-#: src/interface/main.c:341
+#: src/interface/main.c:345
 msgid "Audio"
 msgstr ""
 
 #. Video options
-#: src/interface/main.c:352
+#: src/interface/main.c:356
 msgid "Video"
 msgstr ""
 
 #. Input options
-#: src/interface/main.c:364
+#: src/interface/main.c:369
 msgid "Input"
 msgstr ""
 
 #. Decoder options
-#: src/interface/main.c:398
+#: src/interface/main.c:403
 msgid "Decoders"
 msgstr ""
 
 #. CPU options
-#: src/interface/main.c:405
+#: src/interface/main.c:410
 msgid "CPU"
 msgstr ""
 
 #. Playlist options
 #: plugins/gtk/gnome_interface.c:506 plugins/gtk/gnome_interface.c:1806
 #: plugins/gtk/gnome_interface.c:1830 plugins/gtk/gtk_interface.c:611
-#: plugins/gtk/gtk_interface.c:2084 src/interface/main.c:413
+#: plugins/gtk/gtk_interface.c:2084 src/interface/main.c:418
 msgid "Playlist"
 msgstr "Список для воспроизведения"
 
@@ -405,82 +413,86 @@ msgstr "Список для воспроизведения"
 #: plugins/ac3_adec/ac3_adec.c:77 plugins/dsp/dsp.c:42 plugins/fb/fb.c:72
 #: plugins/ggi/ggi.c:68 plugins/gtk/gnome.c:73 plugins/gtk/gtk.c:74
 #: plugins/mga/xmga.c:111 plugins/mpeg_vdec/video_parser.c:80
-#: plugins/x11/x11.c:55 plugins/x11/xvideo.c:60 src/interface/main.c:419
+#: plugins/x11/x11.c:55 plugins/x11/xvideo.c:60 src/interface/main.c:424
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/interface/main.c:429
+#: src/interface/main.c:434
 msgid "main program"
 msgstr ""
 
-#: src/interface/main.c:442
-msgid "print help (or use -h)"
-msgstr ""
-
-#: src/interface/main.c:444
-msgid "print detailed help (or use -H)"
-msgstr ""
-
-#: src/interface/main.c:446
-msgid "print a list of available plugins (or use -l)"
-msgstr ""
-
 #: src/interface/main.c:448
-msgid "print help on plugin (or use -p)"
+msgid "print help"
 msgstr ""
 
 #: src/interface/main.c:450
+msgid "print detailed help"
+msgstr ""
+
+#: src/interface/main.c:452
+msgid "print a list of available plugins"
+msgstr ""
+
+#: src/interface/main.c:454
+msgid "print help on plugin <string>"
+msgstr ""
+
+#: src/interface/main.c:457
 msgid "print version information"
 msgstr ""
 
 #. Usage
-#: src/interface/main.c:614 src/interface/main.c:1038
+#: src/interface/main.c:622 src/interface/main.c:1071
 #, c-format
 msgid "Usage: %s [options] [parameters] [file]...\n"
 msgstr ""
 
 #. print module name
-#: src/interface/main.c:939
+#: src/interface/main.c:948
 #, c-format
 msgid "%s module options:\n"
 msgstr ""
 
-#: src/interface/main.c:959 src/interface/main.c:963
+#: src/interface/main.c:981 src/interface/main.c:985
 msgid " <string>"
 msgstr ""
 
-#: src/interface/main.c:970 src/interface/main.c:974
+#: src/interface/main.c:992 src/interface/main.c:996
 msgid " <integer>"
 msgstr ""
 
-#: src/interface/main.c:995
+#: src/interface/main.c:1003 src/interface/main.c:1007
+msgid " <float>"
+msgstr ""
+
+#: src/interface/main.c:1028
 msgid ""
 "\n"
 "Playlist items:\n"
-"  *.mpg, *.vob                   \tplain MPEG-1/2 files\n"
+"  *.mpg, *.vob                   plain MPEG-1/2 files\n"
 "  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]\n"
-"                                 \tDVD device\n"
+"                                 DVD device\n"
 "  [vcd:][device][@[title][,[chapter]]\n"
-"                                 \tVCD device\n"
+"                                 VCD device\n"
 "  udpstream:[@[<bind address>][:<bind port>]]\n"
-"                                 \tUDP stream sent by VLS\n"
-"  vlc:loop                       \tloop execution of the playlist\n"
-"  vlc:pause                      \tpause execution of playlist items\n"
-"  vlc:quit                       \tquit VLC"
+"                                 UDP stream sent by VLS\n"
+"  vlc:loop                       loop execution of the playlist\n"
+"  vlc:pause                      pause execution of playlist items\n"
+"  vlc:quit                       quit VLC"
 msgstr ""
 
-#: src/interface/main.c:1015 src/interface/main.c:1064
-#: src/interface/main.c:1088
+#: src/interface/main.c:1048 src/interface/main.c:1097
+#: src/interface/main.c:1121
 msgid ""
 "\n"
 "Press the RETURN key to continue..."
 msgstr ""
 
-#: src/interface/main.c:1041
+#: src/interface/main.c:1074
 msgid "[plugin]              [description]"
 msgstr ""
 
-#: src/interface/main.c:1082
+#: src/interface/main.c:1115
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -488,15 +500,20 @@ msgid ""
 "Written by the VideoLAN team at Ecole Centrale, Paris."
 msgstr ""
 
-#: src/misc/configuration.c:612
+#: src/misc/configuration.c:680
 msgid "<boolean>"
 msgstr ""
 
-#: src/misc/configuration.c:613
+#: src/misc/configuration.c:680
 msgid "<integer>"
 msgstr ""
 
-#: src/misc/configuration.c:620
+#: src/misc/configuration.c:687
+#, c-format
+msgid "# %s <float>\n"
+msgstr ""
+
+#: src/misc/configuration.c:694
 #, c-format
 msgid "# %s <string>\n"
 msgstr ""
@@ -1074,7 +1091,7 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:1387 plugins/gtk/gtk_interface.c:1610
 #: plugins/gtk/gtk_interface.c:1900 plugins/gtk/gtk_interface.c:2025
 #: plugins/gtk/gtk_interface.c:2256 plugins/gtk/gtk_interface.c:2362
-#: plugins/gtk/gtk_interface.c:2568 plugins/gtk/gtk_preferences.c:501
+#: plugins/gtk/gtk_interface.c:2568 plugins/gtk/gtk_preferences.c:522
 msgid "OK"
 msgstr ""
 
@@ -1126,7 +1143,7 @@ msgstr ""
 
 #: plugins/gtk/gtk_interface.c:1617 plugins/gtk/gtk_interface.c:1907
 #: plugins/gtk/gtk_interface.c:2032 plugins/gtk/gtk_interface.c:2263
-#: plugins/gtk/gtk_interface.c:2575 plugins/gtk/gtk_preferences.c:513
+#: plugins/gtk/gtk_interface.c:2575 plugins/gtk/gtk_preferences.c:534
 msgid "Cancel"
 msgstr ""
 
@@ -1410,7 +1427,7 @@ msgstr ""
 msgid "Invert"
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:1755 plugins/gtk/gtk_preferences.c:358
+#: plugins/gtk/gnome_interface.c:1755 plugins/gtk/gtk_preferences.c:360
 msgid "Select"
 msgstr ""
 
@@ -1436,28 +1453,28 @@ msgstr ""
 msgid "6/7"
 msgstr ""
 
-#: plugins/gtk/gtk_preferences.c:304
+#: plugins/gtk/gtk_preferences.c:306
 msgid "Name"
 msgstr ""
 
-#: plugins/gtk/gtk_preferences.c:304
+#: plugins/gtk/gtk_preferences.c:306
 msgid "Description"
 msgstr ""
 
-#: plugins/gtk/gtk_preferences.c:347
+#: plugins/gtk/gtk_preferences.c:349
 msgid "Configure"
 msgstr ""
 
 #. add new label
-#: plugins/gtk/gtk_preferences.c:370
+#: plugins/gtk/gtk_preferences.c:372
 msgid "Selected:"
 msgstr ""
 
-#: plugins/gtk/gtk_preferences.c:492 plugins/gtk/gtk_preferences.c:509
+#: plugins/gtk/gtk_preferences.c:513 plugins/gtk/gtk_preferences.c:530
 msgid "Save"
 msgstr ""
 
-#: plugins/gtk/gtk_preferences.c:505
+#: plugins/gtk/gtk_preferences.c:526
 msgid "Apply"
 msgstr ""
 

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.182 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: main.c,v 1.183 2002/04/21 18:32:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -335,15 +335,15 @@
 MODULE_CONFIG_START
 
 /* Interface options */
-ADD_CATEGORY_HINT( N_("Interface"), NULL )
-ADD_PLUGIN  ( "intf", MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
+ADD_CATEGORY_HINT( N_("Interface"), NULL)
+ADD_PLUGIN_WITH_SHORT  ( "intf", 'I', MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
 ADD_INTEGER ( "warning", 0, NULL, WARNING_TEXT, WARNING_LONGTEXT )
 ADD_BOOL    ( "stats", NULL, STATS_TEXT, STATS_LONGTEXT )
 ADD_STRING  ( "search_path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT )
 
 /* Audio options */
 ADD_CATEGORY_HINT( N_("Audio"), NULL)
-ADD_PLUGIN  ( "aout", MODULE_CAPABILITY_AOUT, NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT )
+ADD_PLUGIN_WITH_SHORT  ( "aout", 'A', MODULE_CAPABILITY_AOUT, NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT )
 ADD_BOOL    ( "noaudio", NULL, NOAUDIO_TEXT, NOAUDIO_LONGTEXT )
 ADD_BOOL    ( "mono", NULL, MONO_TEXT, MONO_LONGTEXT )
 ADD_INTEGER ( "volume", VOLUME_DEFAULT, NULL, VOLUME_TEXT, VOLUME_LONGTEXT )
@@ -354,7 +354,7 @@ ADD_INTEGER ( "aout_format", 0, NULL, FORMAT_TEXT,
 
 /* Video options */
 ADD_CATEGORY_HINT( N_("Video"), NULL )
-ADD_PLUGIN  ( "vout", MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
+ADD_PLUGIN_WITH_SHORT  ( "vout", 'V', MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
 ADD_BOOL    ( "novideo", NULL, NOVIDEO_TEXT, NOVIDEO_LONGTEXT )
 ADD_INTEGER ( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
 ADD_INTEGER ( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT )
@@ -396,8 +396,8 @@ ADD_INTEGER ( "sat_lnb_slof", 11700, NULL, SAT_LNB_SLOF_TEXT,
             SAT_LNB_SLOF_LONGTEXT )
 #endif
 
-ADD_BOOL    ( "ipv6", NULL, IPV6_TEXT, IPV6_LONGTEXT )
-ADD_BOOL    ( "ipv4", NULL, IPV4_TEXT, IPV4_LONGTEXT )
+ADD_BOOL_WITH_SHORT    ( "ipv6", '6', NULL, IPV6_TEXT, IPV6_LONGTEXT )
+ADD_BOOL_WITH_SHORT    ( "ipv4", '4', NULL, IPV4_TEXT, IPV4_LONGTEXT )
 
 /* Decoder options */
 ADD_CATEGORY_HINT( N_("Decoders"), NULL )
@@ -443,18 +443,21 @@ MODULE_DEACTIVATE_STOP
 
 /* Hack for help options */
 static module_t help_module;
-static module_config_t p_help_config[] = {
-    { MODULE_CONFIG_ITEM_BOOL, "help", N_("print help (or use -h)"),
+static module_config_t p_help_config[] =
+{
+    { MODULE_CONFIG_ITEM_BOOL, "help", 'h', N_("print help"),
       NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "longhelp", N_("print detailed help (or use -H)"),
+    { MODULE_CONFIG_ITEM_BOOL, "longhelp", 'H', N_("print detailed help"),
       NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "list", N_("print a list of available plugins "
-      "(or use -l)"), NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_STRING, "plugin", N_("print help on plugin "
-      "(or use -p)"), NULL, NULL, 0, 0, NULL, &help_module.config_lock, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "version", N_("print version information"),
-      NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_HINT_END, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, 0 } };
+    { MODULE_CONFIG_ITEM_BOOL, "list", 'l', N_("print a list of available "
+      "plugins"), NULL, NULL, 0, 0, NULL, NULL, 0 },
+    { MODULE_CONFIG_ITEM_STRING, "plugin", 'p', N_("print help on plugin "
+      "<string>"), NULL, NULL, 0, 0, NULL, &help_module.config_lock, 0 },
+    { MODULE_CONFIG_ITEM_BOOL, "version", '\0',
+      N_("print version information"), NULL, NULL, 0, 0, NULL, NULL, 0 },
+    { MODULE_CONFIG_HINT_END, NULL, '\0', NULL, NULL, NULL, 0, 0,
+      NULL, NULL, 0 }
+};
 
 /*****************************************************************************
  * End configuration.
@@ -921,8 +924,10 @@ static void Usage( const char *psz_module_name )
     module_t *p_module;
     module_config_t *p_item;
     char psz_spaces[30];
+    char psz_format[sizeof("      --%s%s%s %s")];
 
-    memset( psz_spaces, 32, 30 );
+    memset( psz_spaces, ' ', 30 );
+    memcpy( psz_format, "      --%s%s%s %s", sizeof(psz_format) );
 
 #ifdef WIN32
     ShowConsole();
@@ -933,7 +938,6 @@ static void Usage( const char *psz_module_name )
          p_module != NULL ;
          p_module = p_module->next )
     {
-
         if( psz_module_name && strcmp( psz_module_name, p_module->psz_name ) )
             continue;
 
@@ -948,6 +952,19 @@ static void Usage( const char *psz_module_name )
              p_item++ )
         {
             int i;
+
+            if( p_item->i_short )
+            {
+                psz_format[2] = '-';
+                psz_format[3] = p_item->i_short;
+                psz_format[4] = ',';
+            }
+            else
+            {
+                psz_format[2] = ' ';
+                psz_format[3] = ' ';
+                psz_format[4] = ' ';
+            }
 
             switch( p_item->i_type )
             {
@@ -964,9 +981,9 @@ static void Usage( const char *psz_module_name )
                     - strlen(_(" <string>")) - 1;
                 if( i < 0 ) i = 0; psz_spaces[i] = 0;
 
-                intf_Msg( "  --%s%s%s %s", p_item->psz_name,
+                intf_Msg( psz_format, p_item->psz_name,
                           _(" <string>"), psz_spaces, p_item->psz_text );
-                psz_spaces[i] = 32;
+                psz_spaces[i] = ' ';
                 break;
             case MODULE_CONFIG_ITEM_INTEGER:
                 /* Nasty hack, but right now I'm too tired to think about
@@ -975,9 +992,9 @@ static void Usage( const char *psz_module_name )
                     - strlen(_(" <integer>")) - 1;
                 if( i < 0 ) i = 0; psz_spaces[i] = 0;
 
-                intf_Msg( "  --%s%s%s %s", p_item->psz_name,
+                intf_Msg( psz_format, p_item->psz_name,
                           _(" <integer>"), psz_spaces, p_item->psz_text );
-                psz_spaces[i] = 32;
+                psz_spaces[i] = ' ';
                 break;
             case MODULE_CONFIG_ITEM_FLOAT:
                 /* Nasty hack, but right now I'm too tired to think about
@@ -986,9 +1003,9 @@ static void Usage( const char *psz_module_name )
                     - strlen(_(" <float>")) - 1;
                 if( i < 0 ) i = 0; psz_spaces[i] = 0;
 
-                intf_Msg( "  --%s%s%s %s", p_item->psz_name,
+                intf_Msg( psz_format, p_item->psz_name,
                           _(" <float>"), psz_spaces, p_item->psz_text );
-                psz_spaces[i] = 32;
+                psz_spaces[i] = ' ';
                 break;
             case MODULE_CONFIG_ITEM_BOOL:
                 /* Nasty hack, but right now I'm too tired to think about
@@ -996,9 +1013,9 @@ static void Usage( const char *psz_module_name )
                 i = 25 - strlen( p_item->psz_name ) - 1;
                 if( i < 0 ) i = 0; psz_spaces[i] = 0;
 
-                intf_Msg( "  --%s%s %s",
-                          p_item->psz_name, psz_spaces, p_item->psz_text );
-                psz_spaces[i] = 32;
+                intf_Msg( psz_format,
+                          p_item->psz_name, "", psz_spaces, p_item->psz_text );
+                psz_spaces[i] = ' ';
                 break;
             }
         }
@@ -1009,18 +1026,18 @@ static void Usage( const char *psz_module_name )
         if( !strcmp( "main", p_module->psz_name ) )
         {
             intf_Msg( _("\nPlaylist items:"
-                "\n  *.mpg, *.vob                   \tplain MPEG-1/2 files"
+                "\n  *.mpg, *.vob                   plain MPEG-1/2 files"
                 "\n  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
-                "\n                                 \tDVD device"
+                "\n                                 DVD device"
                 "\n  [vcd:][device][@[title][,[chapter]]"
-                "\n                                 \tVCD device"
+                "\n                                 VCD device"
                 "\n  udpstream:[@[<bind address>][:<bind port>]]"
-                "\n                                 \tUDP stream sent by VLS"
-                "\n  vlc:loop                       \tloop execution of the "
+                "\n                                 UDP stream sent by VLS"
+                "\n  vlc:loop                       loop execution of the "
                       "playlist"
-                "\n  vlc:pause                      \tpause execution of "
+                "\n  vlc:pause                      pause execution of "
                       "playlist items"
-                "\n  vlc:quit                       \tquit VLC") );
+                "\n  vlc:quit                       quit VLC") );
         }
 
         intf_Msg( "" );
@@ -1318,7 +1335,7 @@ static u32 CPUCapabilities( void )
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
 
 #   ifdef CAN_COMPILE_SSE
-        /* We test if OS support the SSE instructions */
+        /* We test if OS supports the SSE instructions */
         psz_capability = "SSE";
         i_illegal = 0;
         if( setjmp( env ) == 0 )
@@ -1418,7 +1435,7 @@ static u32 CPUCapabilities( void )
 /*****************************************************************************
  * ShowConsole: On Win32, create an output console for debug messages
  *****************************************************************************
- * This function is usefull only on Win32.
+ * This function is useful only on Win32.
  *****************************************************************************/
 #ifdef WIN32 /*  */
 static void ShowConsole( void )
