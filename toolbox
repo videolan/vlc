@@ -218,6 +218,18 @@ SOURCE="..\\`echo ${file} | sed -e 's%/%\\\\%g'`"${M}
 !ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE x86em) Debug"${M}
 # PROP Output_Dir "X86EMDbg\\${subdir}"${M}
 # PROP Intermediate_Dir "X86EMDbg\\${subdir}"${M}
+!ELSEIF  "\$(CFG)" == "libvlc - Win32 (WCE emulator) Debug"${M}
+# PROP Output_Dir "emulatorDbg\\${subdir}"${M}
+# PROP Intermediate_Dir "emulatorDbg\\${subdir}"${M}
+!ELSEIF  "\$(CFG)" == "libvlc - Win32 (WCE emulator) Release"${M}
+# PROP Output_Dir "emulatorRel\\${subdir}"${M}
+# PROP Intermediate_Dir "emulatorRel\\${subdir}"${M}
+!ELSEIF  "\$(CFG)" == "libvlc - Win32 (WCE x86) Debug"${M}
+# PROP Output_Dir "X86Dbg\\${subdir}"${M}
+# PROP Intermediate_Dir "X86Dbg\\${subdir}"${M}
+!ELSEIF  "\$(CFG)" == "libvlc - Win32 (WCE x86) Release"${M}
+# PROP Output_Dir "X86Rel\\${subdir}"${M}
+# PROP Intermediate_Dir "X86Rel\\${subdir}"${M}
 !ENDIF${M}
 # End Source File${M}
 EOF
