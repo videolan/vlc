@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.3 2003/03/19 15:44:44 hartman Exp $
+$Id: THANKS,v 1.4 2003/03/24 13:52:12 sam Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -27,6 +27,7 @@ Espen Skoglund <esk@ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE@cadmus.com> - directory browsing code
 Felix Kühne <fk@aenneburghardt.de> - german translation
 Fumio Nakayama <endymion@ca2.so-net.ne.jp> - Japanese translation
+Haakon Meland Eriksen - Norwegian translation
 Hans-Peter Jansen <hpj@urpla.net> - patch for module options handling
 Jean-Philippe Grimaldi <jeanphi@via.ecp.fr> - bug fixes
 Jeffrey Baker <jwbaker@acm.org> - port of the ALSA plugin to the ALSA 1.0 API

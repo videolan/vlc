@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-27 00:36+0100\n"
+"POT-Creation-Date: 2003-03-04 18:18+0100\n"
 "PO-Revision-Date: 2003-01-31 16:35+0100\n"
 "Last-Translator: Vella Bruno\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -109,7 +109,8 @@ msgid ""
 "This options sets the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
 msgstr ""
-"Questa opzione imposta il livello di dettaglio dei messaggi (0=solo errori e messaggi standard, 1=avvertimenti, 2=debug)."
+"Questa opzione imposta il livello di dettaglio dei messaggi (0=solo errori e "
+"messaggi standard, 1=avvertimenti, 2=debug)."
 
 #: src/libvlc.h:54
 msgid "be quiet"
@@ -140,7 +141,10 @@ msgstr "mostra opzioni avanzate"
 msgid ""
 "When this option is turned on, the interfaces will show all the available "
 "options, including those that most users should never touch"
-msgstr "Quando questa opzione e' attiva, le interfacce mostreranno tutte le opzioni disponibili, incluse quelle che la maggior parte degli utenti non dovrebbero mai toccare"
+msgstr ""
+"Quando questa opzione e' attiva, le interfacce mostreranno tutte le opzioni "
+"disponibili, incluse quelle che la maggior parte degli utenti non dovrebbero "
+"mai toccare"
 
 #: src/libvlc.h:68
 msgid "interface default search path"
@@ -250,7 +254,8 @@ msgid ""
 "This option allows you to use the S/PDIF audio output by default when your "
 "hardware supports it as well as the audio stream being played."
 msgstr ""
-"Questa opzione ti permette di utilizzare l'uscita audio S/PDIF se il tuo hardware la supporta mentre viene riprodotta la sorgente audio."
+"Questa opzione ti permette di utilizzare l'uscita audio S/PDIF se il tuo "
+"hardware la supporta mentre viene riprodotta la sorgente audio."
 
 #: src/libvlc.h:116
 msgid "headphone virtual spatialization effect"
@@ -316,7 +321,9 @@ msgstr "indentificatore display"
 msgid ""
 "This is the local display port that will be used for X11 drawing. For "
 "instance :0.1."
-msgstr "Questa e' la porta dello schermo locale che verra' usata per la grafica X11. Per esempio :0.1."
+msgstr ""
+"Questa e' la porta dello schermo locale che verra' usata per la grafica X11. "
+"Per esempio :0.1."
 
 #: src/libvlc.h:146
 msgid "video width"
@@ -3268,7 +3275,9 @@ msgstr "numero massimo di linee nella finestra resoconto"
 #: modules/gui/win32/win32.cpp:304
 msgid ""
 "You can set the maximum number of lines that the log window will display."
-msgstr "Puoi impostare il numero massimo di linee che la finestra resoconto mostrera'."
+msgstr ""
+"Puoi impostare il numero massimo di linee che la finestra resoconto "
+"mostrera'."
 
 #: modules/gui/win32/win32.cpp:305
 msgid " Enter -1 if you want to keep all messages."
