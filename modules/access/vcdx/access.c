@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.20 2004/02/22 09:35:48 rocky Exp $
+ * $Id: access.c,v 1.21 2004/02/22 10:30:41 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -1593,6 +1593,7 @@ E_(Close) ( vlc_object_t *p_this )
 
     free( p_vcd->p_entries );
     free( p_vcd->p_segments );
+    free( p_vcd->p_sectors );
 
     /* For reasons that are a mystery to me we don't have to deal with
        stopping, and destroying the p_vcd->p_intf thread. And if we do
