@@ -178,7 +178,7 @@ LCFLAGS += -Wall
 
 # Eventual MMX optimizations for x86
 ifeq ($(ARCH),X86)
-ifeq ($(MMX), YES) # MMX is YES or AUTO
+ifeq ($(MMX), YES)
 CFLAGS += -DHAVE_MMX
 endif
 endif
