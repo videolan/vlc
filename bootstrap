@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.67 2003/07/08 13:09:30 sam Exp $
+##  $Id: bootstrap,v 1.68 2003/07/08 13:40:57 sam Exp $
 ##
 ##  Authors: Sam Hocevar <sam@zoy.org>
 
@@ -160,10 +160,10 @@ else
 endif
 
 if UNTRUE
-L${mod}-p = lib${mod}_plugin.a
-D${mod}-p = lib${mod}_plugin\$(LIBEXT)
-L${mod}-b = lib${mod}.a
-L${mod}-pic = lib${mod}_pic.a
+L${mod}p = lib${mod}_plugin.a
+D${mod}p = lib${mod}_plugin\$(LIBEXT)
+L${mod}b = lib${mod}.a
+L${mod}pic = lib${mod}_pic.a
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> modules/${dir}/Makefile.am << EOF
 B${mod} = \$(nodist_SOURCES_${mod})
@@ -211,11 +211,11 @@ lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
 lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
 lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
 
-libvlc_LIBRARIES += \$(L${mod}-b) \$(L${mod}-pic)
-lib${mod}_DATA = \$(D${mod}-p)
+libvlc_LIBRARIES += \$(L${mod}b) \$(L${mod}pic)
+lib${mod}_DATA = \$(D${mod}p)
 
 lib${mod}dir = \$(libdir)/vlc/${topdir}
-${PRIVATE}noinst_LIBRARIES += \$(L${mod}-p)
+${PRIVATE}noinst_LIBRARIES += \$(L${mod}p)
 ${PRIVATE}lib${mod}_plugin\$(LIBEXT): \$(lib${mod}_plugin_a_OBJECTS)
 ${PRIVATE}	@case \`\$(VLC_CONFIG) --linkage ${mod}\` in \\
 ${PRIVATE}	  c++) echo \$(CXXLINK) \$(lib${mod}_plugin_a_OBJECTS) \\\`\$(VLC_CONFIG) --libs plugin ${mod}\\\` ; \$(CXXLINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
