@@ -957,6 +957,7 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         mvnprintw( y++, 0, COLS, "Source: <no current item>" );
         DrawEmptyLine( p_sys->w, y++, 0, COLS );
         DrawEmptyLine( p_sys->w, y++, 0, COLS );
+        DrawEmptyLine( p_sys->w, y++, 0, COLS );
     }
 
     DrawBox( p_sys->w, y, 0, 3, COLS, "" );
@@ -1192,27 +1193,27 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
     }
     if( p_sys->i_box_type == BOX_SEARCH )
     {
-        DrawEmptyLine( p_sys->w, 6, 1, COLS-2 );
+        DrawEmptyLine( p_sys->w, 7, 1, COLS-2 );
         if( p_sys->psz_search_chain )
         {
             if( strlen( p_sys->psz_search_chain ) == 0 &&
                 p_sys->psz_old_search != NULL )
             {
                 /* Searching next entry */
-                mvnprintw( 6, 1, COLS-2, "Find: %s", p_sys->psz_old_search );
+                mvnprintw( 7, 1, COLS-2, "Find: %s", p_sys->psz_old_search );
             }
             else
             {
-                mvnprintw( 6, 1, COLS-2, "Find: %s", p_sys->psz_search_chain );
+                mvnprintw( 7, 1, COLS-2, "Find: %s", p_sys->psz_search_chain );
             }
         }
     }
     if( p_sys->i_box_type == BOX_OPEN )
     {
-        DrawEmptyLine( p_sys->w, 6, 1, COLS-2 );
         if( p_sys->psz_open_chain )
         {
-            mvnprintw( 6, 1, COLS-2, "Open: %s", p_sys->psz_open_chain );
+            DrawEmptyLine( p_sys->w, 7, 1, COLS-2 );
+            mvnprintw( 7, 1, COLS-2, "Open: %s", p_sys->psz_open_chain );
         }
     }
 
