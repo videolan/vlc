@@ -712,14 +712,14 @@ then
     test_CFLAGS="-I${with_dvbpsi}/include"
   fi
   CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
-  AC_CHECK_HEADER([dvbpsi/dvbpsi.h],[
+  AC_CHECK_HEADER([dvbpsi/dr.h],[
     PLUGINS="${PLUGINS} mpeg_ts_dvbpsi"
     mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} ${test_LDFLAGS} -ldvbpsi"
     mpeg_ts_dvbpsi_CFLAGS="${mpeg_ts_dvbpsi_CFLAGS} ${test_CFLAGS}"
     ],[
     if test "x$enable_dvbpsi" != x
     then
-      AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org])
+      AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1])
     fi
   ])
   CPPFLAGS="$save_CPPFLAGS"

@@ -6039,16 +6039,16 @@ fi
     test_CFLAGS="-I${with_dvbpsi}/include"
   fi
   CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
-  ac_safe=`echo "dvbpsi/dvbpsi.h" | sed 'y%./+-%__p_%'`
-echo $ac_n "checking for dvbpsi/dvbpsi.h""... $ac_c" 1>&6
-echo "configure:6045: checking for dvbpsi/dvbpsi.h" >&5
+  ac_safe=`echo "dvbpsi/dr.h" | sed 'y%./+-%__p_%'`
+echo $ac_n "checking for dvbpsi/dr.h""... $ac_c" 1>&6
+echo "configure:6045: checking for dvbpsi/dr.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
 #line 6050 "configure"
 #include "confdefs.h"
-#include <dvbpsi/dvbpsi.h>
+#include <dvbpsi/dr.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
 { (eval echo configure:6055: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
@@ -6077,7 +6077,7 @@ else
 
     if test "x$enable_dvbpsi" != x
     then
-      { echo "configure: error: Could not find libdvbpsi on your system: you may get it from www.videolan.org" 1>&2; exit 1; }
+      { echo "configure: error: Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1" 1>&2; exit 1; }
     fi
   
 fi
