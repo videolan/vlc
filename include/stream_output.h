@@ -245,6 +245,8 @@ struct session_descriptor_t
     int i_ttl;
     int i_payload;   /* SAP Payload type */
 
+    char *psz_group;
+
     sap_session_t *p_sap; /* If we have a sap session, remember it */
     char *psz_sdp;
 };
