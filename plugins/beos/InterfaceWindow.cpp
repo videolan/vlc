@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.16.2.4 2002/09/29 12:04:27 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.16.2.5 2002/10/09 15:29:51 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -76,7 +76,8 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	  fFilePanel( NULL ),
 	  fPlaylistWindow( new PlayListWindow( BRect( 20.0, 20.0, 170.0, 320.0 ),
 	  									   "Playlist", (playlist_t*)p_main->p_playlist, this ) ),
-	  fLastUpdateTime( system_time() ),
+	  fLastInterfaceUpdate( system_time() ),
+	  fLastSoundUpdate( fLastInterfaceUpdate ),
 	  fSettings( new BMessage( 'sett' ) )
 {
 	// set the title bar
@@ -494,6 +495,8 @@ bool InterfaceWindow::QuitRequested()
  *****************************************************************************/
 void InterfaceWindow::updateInterface()
 {
+	fLastInterfaceUpdate = system_time();
+
 	input_thread_s* input = p_input_bank->pp_input[0];
 	if ( input )
 	{
@@ -511,6 +514,9 @@ void InterfaceWindow::updateInterface()
 									   input->stream.control.i_rate );
 			p_mediaControl->SetProgress( input->stream.p_selected_area->i_tell,
 										 input->stream.p_selected_area->i_size );
+
+//printf( "current time: '%s'\n", Intf_VLCWrapper::getTimeAsString() );
+
 			_SetMenusEnabled( true, hasChapters, hasTitles );
 
 			_UpdateSpeedMenu( input->stream.control.i_rate );
@@ -524,11 +530,23 @@ void InterfaceWindow::updateInterface()
 			if ( Intf_VLCWrapper::has_audio() )
 			{
 				p_mediaControl->SetAudioEnabled( true );
-				p_mediaControl->SetMuted( Intf_VLCWrapper::is_muted() );
+				if ( Intf_VLCWrapper::is_muted() )
+					p_mediaControl->SetMuted( true );
+				else
+				{
+					p_mediaControl->SetMuted( false );
+					// take care to update vlc's volume
+					// (it might have changed without us knowing)
+					if ( fLastInterfaceUpdate - fLastSoundUpdate > 1000000 )
+					{
+						Intf_VLCWrapper::set_volume( p_mediaControl->GetVolume() );
+						fLastSoundUpdate = fLastInterfaceUpdate;
+					}
+				}
 			} else
 				p_mediaControl->SetAudioEnabled( false );
 
-			if ( input != fInputThread )
+			if ( input != fInputThread ) // unreliable!!!
 			{
 				fInputThread = input;
 				_InputStreamChanged();
@@ -557,8 +575,6 @@ void InterfaceWindow::updateInterface()
 	}
 	if ( input != fInputThread )
 		fInputThread = input;
-
-	fLastUpdateTime = system_time();
 }
 
 /*****************************************************************************
@@ -567,7 +583,7 @@ void InterfaceWindow::updateInterface()
 bool
 InterfaceWindow::IsStopped() const
 {
-	return (system_time() - fLastUpdateTime > INTERFACE_UPDATE_TIMEOUT);
+	return (system_time() - fLastInterfaceUpdate > INTERFACE_UPDATE_TIMEOUT);
 }
 
 /*****************************************************************************
@@ -1117,17 +1133,17 @@ void ChapterMenu::AttachedToWindow()
 		// lock stream access
 		vlc_mutex_lock( &input->stream.stream_lock );
 		// populate menu according to current stream
-		int32 numChapters = input->stream.p_selected_area->i_part_nb;
+		int32 numChapters = input->stream.p_selected_area->i_part_nb - 1;
 		if ( numChapters > 1 )
 		{
 			for ( int32 i = 0; i < numChapters; i++ )
 			{
 				BMessage* message = new BMessage( TOGGLE_CHAPTER );
-				message->AddInt32( "index", i );
+				message->AddInt32( "index", i + 1 );
 				BString helper( "" );
 				helper << i + 1;
 				BMenuItem* item = new BMenuItem( helper.String(), message );
-				item->SetMarked( input->stream.p_selected_area->i_part == i );
+				item->SetMarked( input->stream.p_selected_area->i_part - 1 == i );
 				AddItem( item );
 			}
 		}

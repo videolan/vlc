@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.cpp,v 1.1.2.3 2002/09/29 12:04:27 titer Exp $
+ * $Id: intf_vlc_wrapper.cpp,v 1.1.2.4 2002/10/09 15:29:51 stippi Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -232,7 +232,7 @@ void Intf_VLCWrapper::getNavCapabilities( bool* canSkipPrev,
 			// first, look for chapters
 			if ( hasChapters )
 			{
-				*canSkipPrev = input->stream.p_selected_area->i_part > 0;
+				*canSkipPrev = input->stream.p_selected_area->i_part > 1;
 				*canSkipNext = input->stream.p_selected_area->i_part <
 									 input->stream.p_selected_area->i_part_nb - 1;
 			}
@@ -279,7 +279,7 @@ void Intf_VLCWrapper::navigatePrev()
 			// skip to the previous chapter
 			currentChapter--;
 
-			if ( currentChapter >= 0 )
+			if ( currentChapter >= 1 )
 			{
 				toggleChapter( currentChapter );
 				hasSkiped = true;
@@ -579,20 +579,19 @@ void Intf_VLCWrapper::eject(){}
 
     /* playback info */
 
-BString*  Intf_VLCWrapper::getTimeAsString()
+const char*
+Intf_VLCWrapper::getTimeAsString()
 {
-    static char psz_currenttime[ OFFSETTOTIME_MAX_SIZE ];
+	static char psz_currenttime[ OFFSETTOTIME_MAX_SIZE ];
         
-    if( p_input_bank->pp_input[0] == NULL )
-    {
-        return (new BString("00:00:00"));
-    }     
-   
-    input_OffsetToTime( p_input_bank->pp_input[0], 
-                        psz_currenttime, 
-                        p_input_bank->pp_input[0]->stream.p_selected_area->i_tell );        
+	if( p_input_bank->pp_input[0] == NULL )
+		return ("-:--:--");
 
-    return(new BString(psz_currenttime));
+	input_OffsetToTime( p_input_bank->pp_input[0],
+						psz_currenttime,
+						p_input_bank->pp_input[0]->stream.p_selected_area->i_tell );
+
+	return(psz_currenttime);
 }
 
 float  Intf_VLCWrapper::getTimeAsFloat()
@@ -638,6 +637,67 @@ BList  *Intf_VLCWrapper::playlistAsArray()
         
     return( p_list );
 }
+
+// getPlaylistInfo
+void
+Intf_VLCWrapper::getPlaylistInfo( int32& currentIndex, int32& maxIndex )
+{
+	currentIndex = -1;
+	maxIndex = -1;
+	if ( playlist_t* list = (playlist_t*)p_main->p_playlist )
+	{
+	    vlc_mutex_lock( &list->change_lock );
+
+		maxIndex = list->i_size;
+		if ( maxIndex > 0 )
+			currentIndex = list->i_index + 1;
+		else
+			maxIndex = -1;
+
+	    vlc_mutex_unlock( &list->change_lock );
+	}
+}
+
+// getTitleInfo
+void  
+Intf_VLCWrapper::getTitleInfo( int32& currentIndex, int32& maxIndex )
+{
+	currentIndex = -1;
+	maxIndex = -1;
+	if ( input_thread_s* input = p_input_bank->pp_input[0] )
+	{
+		vlc_mutex_lock( &input->stream.stream_lock );
+
+		maxIndex = input->stream.i_area_nb - 1;
+		if ( maxIndex > 0)
+			currentIndex = input->stream.p_selected_area->i_id;
+		else
+			maxIndex = -1;
+
+		vlc_mutex_unlock( &input->stream.stream_lock );
+	}
+}
+
+// getChapterInfo
+void
+Intf_VLCWrapper::getChapterInfo( int32& currentIndex, int32& maxIndex )
+{
+	currentIndex = -1;
+	maxIndex = -1;
+	if ( input_thread_s* input = p_input_bank->pp_input[0] )
+	{
+		vlc_mutex_lock( &input->stream.stream_lock );
+
+		maxIndex = input->stream.p_selected_area->i_part_nb - 1;
+		if ( maxIndex > 0)
+			currentIndex = input->stream.p_selected_area->i_part;
+		else
+			maxIndex = -1;
+
+		vlc_mutex_unlock( &input->stream.stream_lock );
+	}
+}
+
 
     /* open file/disc/network */
 void Intf_VLCWrapper::openFiles( BList* o_files, bool replace )

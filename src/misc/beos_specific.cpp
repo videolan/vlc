@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.18.2.2 2002/09/29 12:04:28 titer Exp $
+ * $Id: beos_specific.cpp,v 1.18.2.3 2002/10/09 15:29:52 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -109,11 +109,11 @@ void system_Configure( void )
  *****************************************************************************/
 void system_End( void )
 {
-    free( psz_program_path );
+	free( psz_program_path );
 
-    /* Tell the BApplication to die */
-    be_app->PostMessage( B_QUIT_REQUESTED );
-    vlc_thread_join( app_thread );
+	/* Tell the BApplication to die */
+	be_app->PostMessage( B_QUIT_REQUESTED );
+	vlc_thread_join( app_thread );
 }
 
 /*****************************************************************************
@@ -131,9 +131,9 @@ char * system_GetProgramPath( void )
  *****************************************************************************/
 static void system_AppThread( void * args )
 {
-    new VlcApplication("application/x-vnd.Ink-vlc");
-    be_app->Run();
-    delete be_app;
+	new VlcApplication( "application/x-vnd.Ink-vlc" );
+	be_app->Run();
+	delete be_app;
 }
 
 } /* extern "C" */

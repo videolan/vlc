@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.24.2.5 2002/09/29 12:04:28 titer Exp $
+ * $Id: spu_decoder.c,v 1.24.2.6 2002/10/09 15:29:51 stippi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -1145,11 +1145,9 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
     /* NVidia overlay, no scaling */
     case FOURCC_YUY2:
 
-    p_dest = p_pic->p->p_pixels +
-        + ( p_spu->i_y + p_spu->i_height ) * p_pic->p->i_pitch 
-                                                // * bytes per line
-        + ( p_spu->i_x + p_spu->i_width ) * 2;  // * bytes per pixel
-    
+    p_dest = p_pic->p->p_pixels
+              + ( p_spu->i_y + p_spu->i_height ) * p_pic->p->i_pitch  // * bytes per line
+              + ( p_spu->i_x + p_spu->i_width ) * 2;  // * bytes per pixel
     /* Draw until we reach the bottom of the subtitle */
     for( i_y = p_spu->i_height * p_pic->p->i_pitch / 2;
          i_y ;

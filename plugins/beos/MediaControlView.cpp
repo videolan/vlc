@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.7.2.3 2002/09/29 12:04:27 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.7.2.4 2002/10/09 15:29:51 stippi Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -23,10 +23,12 @@
  *****************************************************************************/
 
 /* System headers */
-#include <InterfaceKit.h>
-#include <AppKit.h>
+#include <stdio.h>
 #include <string.h>
 
+#include <InterfaceKit.h>
+#include <AppKit.h>
+#include <String.h>
 /* VLC headers */
 extern "C"
 {
@@ -40,6 +42,8 @@ extern "C"
 }
 
 /* BeOS interface headers */
+#include "intf_vlc_wrapper.h"
+
 #include "Bitmaps.h"
 #include "DrawingTidbits.h"
 #include "InterfaceWindow.h"
@@ -176,6 +180,11 @@ MediaControlView::MediaControlView(BRect frame)
 									 new BMessage(VOLUME_CHG));
 	fVolumeSlider->SetValue(VOLUME_DEFAULT);
 	AddChild( fVolumeSlider );
+
+	// Position Info View
+	fPositionInfo = new PositionInfoView(BRect(0.0, 0.0, 10.0, 10.0), "led");
+	fPositionInfo->ResizeToPreferred();
+	AddChild( fPositionInfo );
 }
 
 // destructor
@@ -198,7 +207,7 @@ MediaControlView::AttachedToWindow()
 	if (BMenuBar* menuBar = Window()->KeyMenuBar())
 		r.bottom += menuBar->Bounds().Height();
 
-	Window()->SetSizeLimits(r.Width(), r.Width() * 2.0, r.Height(), r.Height() * 2.0);
+	Window()->SetSizeLimits(r.Width(), r.Width() * 1.8, r.Height(), r.Height() * 1.3);
 	if (!Window()->Bounds().Contains(r))
 		Window()->ResizeTo(r.Width(), r.Height());
 	else
@@ -375,9 +384,7 @@ void
 MediaControlView::_LayoutControls(BRect frame) const
 {
 	// seek slider
-	BRect r(frame);
-	r.bottom = r.top + r.Height() / 2.0 - MIN_SPACE / 2.0;
-	_LayoutControl(fSeekSlider, r, true);
+	BRect r( frame );
 	// calculate absolutly minimal width
 	float minWidth = fSkipBack->Bounds().Width();
 //	minWidth += fRewind->Bounds().Width();
@@ -387,11 +394,42 @@ MediaControlView::_LayoutControls(BRect frame) const
 	minWidth += fSkipForward->Bounds().Width();
 	minWidth += fMute->Bounds().Width();
 	minWidth += VOLUME_MIN_WIDTH;
+	// layout time slider and info view
+	float width, height;
+	fPositionInfo->GetBigPreferredSize( &width, &height );
+	float ratio = width / height;
+	width = r.Height() * ratio;
+	if (frame.Width() - minWidth - MIN_SPACE >= width
+		&& frame.Height() >= height)
+	{
+		r.right = r.left + width;
+		fPositionInfo->SetMode(PositionInfoView::MODE_BIG);
+		_LayoutControl(fPositionInfo, r, true, true);
+		frame.left = r.right + MIN_SPACE;
+		r.left = frame.left;
+		r.right = frame.right;
+//		r.bottom = r.top + r.Height() / 2.0 - MIN_SPACE / 2.0;
+		r.bottom = r.top + fSeekSlider->Bounds().Height();
+		_LayoutControl(fSeekSlider, r, true);
+	}
+	else
+	{
+		fPositionInfo->GetPreferredSize( &width, &height );
+		fPositionInfo->SetMode(PositionInfoView::MODE_SMALL);
+		fPositionInfo->ResizeTo(width, height);
+		r.bottom = r.top + r.Height() / 2.0 - MIN_SPACE / 2.0;
+		r.right = r.left + fPositionInfo->Bounds().Width();
+		_LayoutControl(fPositionInfo, r, true );
+		r.left = r.right + MIN_SPACE;
+		r.right = frame.right;
+		_LayoutControl(fSeekSlider, r, true);
+	}
 	float currentWidth = frame.Width();
 	float space = (currentWidth - minWidth) / 6.0;//8.0;
 	// apply weighting
 	space = MIN_SPACE + (space - MIN_SPACE) / VOLUME_SLIDER_LAYOUT_WEIGHT;
 	// layout controls with "space" inbetween
+	r.left = frame.left;
 	r.top = r.bottom + MIN_SPACE + 1.0;
 	r.bottom = frame.bottom;
 	// skip back
@@ -451,15 +489,20 @@ MediaControlView::_MinFrame() const
 
 // _LayoutControl
 void
-MediaControlView::_LayoutControl(BView* view, BRect frame, bool resize) const
+MediaControlView::_LayoutControl(BView* view, BRect frame,
+								 bool resizeWidth, bool resizeHeight) const
 {
-	// center vertically
-	frame.top = (frame.top + frame.bottom) / 2.0 - view->Bounds().Height() / 2.0;
-	if (!resize)
+	if (!resizeHeight)
+		// center vertically
+		frame.top = (frame.top + frame.bottom) / 2.0 - view->Bounds().Height() / 2.0;
+	if (!resizeWidth)
+		// center horizontally
 		frame.left = (frame.left + frame.right) / 2.0 - view->Bounds().Width() / 2.0;
 	view->MoveTo(frame.LeftTop());
-	if (resize)
-		view->ResizeTo(frame.Width(), view->Bounds().Height());
+	float width = resizeWidth ? frame.Width() : view->Bounds().Width();
+	float height = resizeHeight ? frame.Height() : view->Bounds().Height();
+	if (resizeWidth || resizeHeight)
+		view->ResizeTo(width, height);
 }
 
 
@@ -1105,6 +1148,308 @@ VolumeSlider::_ValueFor(float xPos) const
 }
 
 
+/*****************************************************************************
+ * PositionInfoView::PositionInfoView
+ *****************************************************************************/
+PositionInfoView::PositionInfoView( BRect frame, const char* name )
+	: BView( frame, name, B_FOLLOW_NONE,
+			 B_WILL_DRAW | B_PULSE_NEEDED | B_FULL_UPDATE_ON_RESIZE ),
+	  fMode( MODE_SMALL ),
+	  fCurrentFileIndex( -1 ),
+	  fCurrentFileSize( -1 ),
+	  fCurrentTitleIndex( -1 ),
+	  fCurrentTitleSize( -1 ),
+	  fCurrentChapterIndex( -1 ),
+	  fCurrentChapterSize( -1 ),
+	  fSeconds( -1 ),
+	  fTimeString( "-:--:--" ),
+	  fLastPulseUpdate( system_time() ),
+	  fStackedWidthCache( 0.0 ),
+	  fStackedHeightCache( 0.0 )
+{
+	SetViewColor( B_TRANSPARENT_32_BIT );
+	SetLowColor( kBlack );
+	SetHighColor( 0, 255, 0, 255 );
+	SetFontSize( 11.0 );
+}
 
+/*****************************************************************************
+ * PositionInfoView::~PositionInfoView
+ *****************************************************************************/
+PositionInfoView::~PositionInfoView()
+{
+}
 
+/*****************************************************************************
+ * PositionInfoView::Draw
+ *****************************************************************************/
+void
+PositionInfoView::Draw( BRect updateRect )
+{
+	rgb_color background = ui_color( B_PANEL_BACKGROUND_COLOR );
+	rgb_color shadow = tint_color( background, B_DARKEN_1_TINT );
+	rgb_color darkShadow = tint_color( background, B_DARKEN_4_TINT );
+	rgb_color light = tint_color( background, B_LIGHTEN_MAX_TINT );
+	rgb_color softLight = tint_color( background, B_LIGHTEN_1_TINT );
+	// frame
+	BRect r( Bounds() );
+	BeginLineArray( 8 );
+		AddLine( BPoint( r.left, r.bottom ),
+				 BPoint( r.left, r.top ), shadow );
+		AddLine( BPoint( r.left + 1.0, r.top ),
+				 BPoint( r.right, r.top ), shadow );
+		AddLine( BPoint( r.right, r.top + 1.0 ),
+				 BPoint( r.right, r.bottom ), softLight );
+		AddLine( BPoint( r.right - 1.0, r.bottom ),
+				 BPoint( r.left + 1.0, r.bottom ), softLight );
+		r.InsetBy( 1.0, 1.0 );
+		AddLine( BPoint( r.left, r.bottom ),
+				 BPoint( r.left, r.top ), darkShadow );
+		AddLine( BPoint( r.left + 1.0, r.top ),
+				 BPoint( r.right, r.top ), darkShadow );
+		AddLine( BPoint( r.right, r.top + 1.0 ),
+				 BPoint( r.right, r.bottom ), light );
+		AddLine( BPoint( r.right - 1.0, r.bottom ),
+				 BPoint( r.left + 1.0, r.bottom ), light );
+	EndLineArray();
+	// background
+	r.InsetBy( 1.0, 1.0 );
+	FillRect( r, B_SOLID_LOW );
+	// contents
+	font_height fh;
+	GetFontHeight( &fh );
+	switch ( fMode )
+	{
+		case MODE_SMALL:
+		{
+			float width = StringWidth( fTimeString.String() );
+			DrawString( fTimeString.String(),
+						BPoint( r.left + r.Width() / 2.0 - width / 2.0,
+								r.top + r.Height() / 2.0 + fh.ascent / 2.0 - 1.0 ) );
+			break;
+		}
+		case MODE_BIG:
+		{
+			BFont font;
+			GetFont( &font );
+			BFont smallFont = font;
+			BFont bigFont = font;
+			BFont tinyFont = font;
+			smallFont.SetSize( r.Height() / 5.0 );
+			bigFont.SetSize( r.Height() / 3.0 );
+			tinyFont.SetSize( r.Height() / 7.0 );
+			float timeHeight = r.Height() / 2.5;
+			float height = ( r.Height() - timeHeight ) / 3.0;
+			SetFont( &tinyFont );
+			SetHighColor( 0, 180, 0, 255 );
+			DrawString( "File", BPoint( r.left + 3.0, r.top + height ) );
+			DrawString( "Title", BPoint( r.left + 3.0, r.top + 2.0 * height ) );
+			DrawString( "Chapter", BPoint( r.left + 3.0, r.top + 3.0 * height ) );
+			SetFont( &smallFont );
+			BString helper;
+			SetHighColor( 0, 255, 0, 255 );
+			// file
+			_MakeString( helper, fCurrentFileIndex, fCurrentFileSize );
+			float width = StringWidth( helper.String() );
+			DrawString( helper.String(), BPoint( r.right - 3.0 - width, r.top + height ) );
+			// title
+			_MakeString( helper, fCurrentTitleIndex, fCurrentTitleSize );
+			width = StringWidth( helper.String() );
+			DrawString( helper.String(), BPoint( r.right - 3.0 - width, r.top + 2.0 * height ) );
+			// chapter
+			_MakeString( helper, fCurrentChapterIndex, fCurrentChapterSize );
+			width = StringWidth( helper.String() );
+			DrawString( helper.String(), BPoint( r.right - 3.0 - width, r.top + 3.0 * height ) );
+			// time
+			SetFont( &bigFont );
+			width = StringWidth( fTimeString.String() );
+			DrawString( fTimeString.String(),
+						BPoint( r.left + r.Width() / 2.0 - width / 2.0,
+								r.bottom - 3.0 ) );
+			break;
+		}
+	}
+}
+
+/*****************************************************************************
+ * PositionInfoView::ResizeToPreferred
+ *****************************************************************************/
+void
+PositionInfoView::ResizeToPreferred()
+{
+	float width, height;
+	GetPreferredSize( &width, &height );
+	ResizeTo( width, height );
+}
+
+/*****************************************************************************
+ * PositionInfoView::GetPreferredSize
+ *****************************************************************************/
+void
+PositionInfoView::GetPreferredSize( float* width, float* height )
+{
+	if ( width && height )
+	{
+		*width = 5.0 + ceilf( StringWidth( "0:00:00" ) ) + 5.0;
+		font_height fh;
+		GetFontHeight( &fh );
+		*height = 3.0 + ceilf( fh.ascent ) + 3.0;
+		fStackedWidthCache = *width * 1.2;
+		fStackedHeightCache = *height * 2.7;
+	}
+}
+
+/*****************************************************************************
+ * PositionInfoView::Pulse
+ *****************************************************************************/
+void
+PositionInfoView::Pulse()
+{
+	// allow for Pulse frequency to be higher, MediaControlView needs it
+	bigtime_t now = system_time();
+	if ( now - fLastPulseUpdate > 900000 )
+	{
+		int32 index, size;
+		Intf_VLCWrapper::getPlaylistInfo( index, size );
+		SetFile( index, size );
+		Intf_VLCWrapper::getTitleInfo( index, size );
+		SetTitle( index, size );
+		Intf_VLCWrapper::getChapterInfo( index, size );
+		SetChapter( index, size );
+		SetTime( Intf_VLCWrapper::getTimeAsString() );
+		fLastPulseUpdate = now;
+	}
+}
+
+/*****************************************************************************
+ * PositionInfoView::GetBigPreferredSize
+ *****************************************************************************/
+void
+PositionInfoView::GetBigPreferredSize( float* width, float* height )
+{
+	if ( width && height )
+	{
+		*width = fStackedWidthCache;
+		*height = fStackedHeightCache;
+	}
+}
+
+/*****************************************************************************
+ * PositionInfoView::SetMode
+ *****************************************************************************/
+void
+PositionInfoView::SetMode( uint32 mode )
+{
+	if ( fMode != mode )
+	{
+		fMode = mode;
+		_InvalidateContents();
+	}
+}
+
+/*****************************************************************************
+ * PositionInfoView::SetFile
+ *****************************************************************************/
+void
+PositionInfoView::SetFile( int32 index, int32 size )
+{
+	if ( fCurrentFileIndex != index || fCurrentFileSize != size )
+	{
+		fCurrentFileIndex = index;
+		fCurrentFileSize = size;
+		_InvalidateContents();
+	}
+}
+
+/*****************************************************************************
+ * PositionInfoView::SetTitle
+ *****************************************************************************/
+void
+PositionInfoView::SetTitle( int32 index, int32 size )
+{
+	if ( fCurrentTitleIndex != index || fCurrentFileSize != size )
+	{
+		fCurrentTitleIndex = index;
+		fCurrentTitleSize = size;
+		_InvalidateContents();
+	}
+}
+
+/*****************************************************************************
+ * PositionInfoView::SetChapter
+ *****************************************************************************/
+void
+PositionInfoView::SetChapter( int32 index, int32 size )
+{
+	if ( fCurrentChapterIndex != index || fCurrentFileSize != size )
+	{
+		fCurrentChapterIndex = index;
+		fCurrentChapterSize = size;
+		_InvalidateContents();
+	}
+}
+
+/*****************************************************************************
+ * PositionInfoView::SetTime
+ *****************************************************************************/
+void
+PositionInfoView::SetTime( int32 seconds )
+{
+	if ( fSeconds != seconds )
+	{
+		if ( seconds >= 0 )
+		{
+			int32 minutes = seconds / 60;
+			int32 hours = minutes / 60;
+			seconds -= minutes * 60 - hours * 60 * 60;
+			minutes -= hours * 60;
+			fTimeString.SetTo( "" );
+			fTimeString << hours << ":" << minutes << ":" << seconds;
+		}
+		else
+			fTimeString.SetTo( "-:--:--" );
+
+		fSeconds = seconds;
+		_InvalidateContents();
+	}
+}
+
+/*****************************************************************************
+ * PositionInfoView::SetTime
+ *****************************************************************************/
+void
+PositionInfoView::SetTime( const char* string )
+{
+	fTimeString.SetTo( string );
+	_InvalidateContents();
+}
+
+/*****************************************************************************
+ * PositionInfoView::_InvalidateContents
+ *****************************************************************************/
+void
+PositionInfoView::_InvalidateContents( uint32 which )
+{
+	BRect r( Bounds() );
+	r.InsetBy( 2.0, 2.0 );
+	Invalidate( r );
+}
+
+/*****************************************************************************
+ * PositionInfoView::_InvalidateContents
+ *****************************************************************************/
+void
+PositionInfoView::_MakeString( BString& into, int32 index, int32 maxIndex ) const
+{
+	into = "";
+	if ( index >= 0)
+		into << index;
+	else
+		into << "-";
+	into << "/";
+	if ( maxIndex >= 0)
+		into << maxIndex;
+	else
+		into << "-";
+}
 
