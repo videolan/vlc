@@ -34,6 +34,9 @@
 #include "../events/evt_mouse.hpp"
 #include "../events/evt_scroll.hpp"
 #include "vlc_keys.h"
+#ifdef sun
+#   include "solaris_specific.h" // for lrint
+#endif
 
 #define SCROLL_STEP 0.05
 #define LINE_INTERVAL 1  // Number of pixels inserted between 2 lines

@@ -22,7 +22,7 @@ Bill Eldridge <bill@rfa.org> - documentation
 Brieuc Jeunhomme <bbp@via.ecp.fr> - bug fixes
 Bruno Vella <allevb@tin.it> - Italian localization
 Carlo Calabrò <murray@via.ecp.fr> - Italian localization
-Carsten Gottbehüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fix
+Carsten Gottbehüt <gottbehuet at active-elements dot de> - v4l hotplug fix
 Christof Baumgaertner - dbox web intf
 Christopher Johnson <cjohnson@mint.net> - Qt fix in vlc.spec
 Colin Simmonds <colin_simmonds@Mac.lover.org> - compile fix for Mac OS X
@@ -55,6 +55,7 @@ Mark Gritter <mgritter@kealia.com> - fix for netlist packet leak in demuxPSI
 Markus Kern <markus-kern at gmx dot net> - video output window fixes (win32)
 Markus Kuespert <ltlBeBoy@beosmail.com> - BeOS CSS support
 Mathias Kretschmer <mathias@research.att.com> - IP Multicast support
+Mats Rojestal <mats.rojestal at bredband dot net> - compilation fixes for Solaris 9
 Matthieu Lochegnies <lochegm1@cti.ecp.fr> - MPEG audio emphasis fix
 Max Rudberg <max_08 at mac.com> - Mac OS X controller art (v0.7.0)
 Michael Mondragon <mammon@lokmail.net> - ncurses compilation fix

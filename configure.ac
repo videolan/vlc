@@ -1882,7 +1882,7 @@ then
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
     fi
-    if ! grep -q "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
+    if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
       dnl  The given libavcodec wasn't built with --enable-pp
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])

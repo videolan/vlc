@@ -2,7 +2,7 @@
  * bezier.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bezier.cpp,v 1.5 2004/03/03 22:57:15 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -24,6 +24,9 @@
 
 #include "bezier.hpp"
 #include <math.h>
+#ifdef sun
+#   include "solaris_specific.h" // for lrintf
+#endif
 
 
 Bezier::Bezier( intf_thread_t *p_intf, const vector<float> &rAbscissas,
