@@ -16,15 +16,15 @@ SHELL=/bin/sh
 # Audio output settings
 AUDIO = dsp
 # Not yet supported
-AUDIO += esd
+#AUDIO += esd
 # Fallback method that should always work
 AUDIO += dummy
 
 # Video output settings
 VIDEO = x11
-VIDEO += fb
+#VIDEO += fb
 #VIDEO += ggi
-VIDEO += glide
+#VIDEO += glide
 # Not yet supported
 #VIDEO += beos
 #VIDEO += dga
