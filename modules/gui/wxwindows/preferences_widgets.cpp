@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.23 2004/01/29 17:04:01 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -187,6 +187,8 @@ static wxString KeysList[] =
     wxT("Page Down"),
     wxT("Tab"),
     wxT("Backspace"),
+    wxT("Mouse Wheel Up"),
+    wxT("Mouse Wheel Down"),
     wxT("a"),
     wxT("b"),
     wxT("c"),

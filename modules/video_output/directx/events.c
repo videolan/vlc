@@ -237,6 +237,34 @@ void DirectXEventThread( event_thread_t *p_event )
             }
             break;
 
+        case WM_MOUSEWHEEL:
+            if( GET_WHEEL_DELTA_WPARAM( msg.wParam ) > 0 )
+            {
+                val.i_int = KEY_MOUSEWHEELUP;
+            }
+            else
+            {
+                val.i_int = KEY_MOUSEWHEELDOWN;
+            }
+            if( val.i_int )
+            {
+                if( GetKeyState(VK_CONTROL) & 0x8000 )
+                {
+                    val.i_int |= KEY_MODIFIER_CTRL;
+                }
+                if( GetKeyState(VK_SHIFT) & 0x8000 )
+                {
+                    val.i_int |= KEY_MODIFIER_SHIFT;
+                }
+                if( GetKeyState(VK_MENU) & 0x8000 )
+                {
+                    val.i_int |= KEY_MODIFIER_ALT;
+                }
+
+                var_Set( p_event->p_vlc, "key-pressed", val );
+            }
+            break;
+
         case WM_VLC_CHANGE_TEXT:
             if( p_event->p_vout->p_sys->b_using_overlay )
                 SetWindowText( p_event->p_vout->p_sys->hwnd,

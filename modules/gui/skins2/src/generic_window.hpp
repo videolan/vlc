@@ -140,6 +140,8 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         list<Anchor*> m_anchorList;
         /// Variable for the visibility of the window
         VarBoolImpl m_varVisible;
+        /// Current key modifier (also used for mouse)
+        int m_currModifier;
 
         /// Method called when the observed variable is modified
         virtual void onUpdate( Subject<VarBool> &rVariable );

@@ -53,7 +53,8 @@ GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
     SkinObject( pIntf ), m_rWindowManager( rWindowManager ),
     m_left( left ), m_top( top ), m_width( 0 ), m_height( 0 ),
     m_pActiveLayout( NULL ), m_pLastHitControl( NULL ),
-    m_pCapturingControl( NULL ), m_pFocusControl( NULL ), m_varVisible( pIntf )
+    m_pCapturingControl( NULL ), m_pFocusControl( NULL ), m_varVisible( pIntf ),
+    m_currModifier( 0 )
 {
     // Register as a moving window
     m_rWindowManager.registerWindow( *this );
@@ -192,10 +193,11 @@ void GenericWindow::processEvent( EvtKey &rEvtKey )
     if( m_pFocusControl )
     {
         m_pFocusControl->handleEvent( rEvtKey );
+        return;
     }
 
     // Only do the action when the key is down
-    else if( rEvtKey.getAsString().find( "key:down") != string::npos )
+    if( rEvtKey.getAsString().find( "key:down") != string::npos )
     {
         //XXX not to be hardcoded !
         // Ctrl-S = Change skin
@@ -239,6 +241,9 @@ void GenericWindow::processEvent( EvtKey &rEvtKey )
 
         var_Set( getIntf()->p_vlc, "key-pressed", val );
     }
+
+    // Always store the modifier, which can be needed for scroll events
+    m_currModifier = rEvtKey.getMod();
 }
 
 
@@ -258,7 +263,6 @@ void GenericWindow::processEvent( EvtScroll &rEvtScroll )
     // Get the control hit by the mouse
     CtrlGeneric *pNewHitControl = findHitControl( rEvtScroll.getXPos(),
                                                   rEvtScroll.getYPos());
-
     setLastHit( pNewHitControl );
 
     // Send a mouse event to the hit control, or to the control
@@ -272,6 +276,23 @@ void GenericWindow::processEvent( EvtScroll &rEvtScroll )
     if( pActiveControl )
     {
         pActiveControl->handleEvent( rEvtScroll );
+    }
+    else
+    {
+        // Treat the scroll event as a hotkey
+        vlc_value_t val;
+        if( rEvtScroll.getDirection() == EvtScroll::kUp )
+        {
+            val.i_int = KEY_MOUSEWHEELUP;
+        }
+        else
+        {
+            val.i_int = KEY_MOUSEWHEELDOWN;
+        }
+        // Add the modifiers
+        val.i_int |= m_currModifier;
+
+        var_Set( getIntf()->p_vlc, "key-pressed", val );
     }
 }
 

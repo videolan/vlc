@@ -2,7 +2,7 @@
  * hotkeys.h: keycode defines
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_keys.h,v 1.13 2004/01/25 18:17:08 zorglub Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -55,6 +55,8 @@
 #define KEY_PAGEDOWN         0x00180000
 #define KEY_TAB              0x00190000
 #define KEY_BACKSPACE        0x001A0000
+#define KEY_MOUSEWHEELUP     0x001B0000
+#define KEY_MOUSEWHEELDOWN   0x001C0000
 
 #define KEY_ASCII            0x0000007F
 #define KEY_UNSET            0
@@ -105,6 +107,8 @@ static const struct key_descriptor_s vlc_keys[] =
     { "Page Down", KEY_PAGEDOWN },
     { "Tab", KEY_TAB },
     { "Backspace", KEY_BACKSPACE },
+    { "Mouse Wheel Up", KEY_MOUSEWHEELUP },
+    { "Mouse Wheel Down", KEY_MOUSEWHEELDOWN },
     { "a", 'a' },
     { "b", 'b' },
     { "c", 'c' },
