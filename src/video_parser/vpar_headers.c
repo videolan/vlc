@@ -3,8 +3,6 @@
  * (c)1999 VideoLAN
  *****************************************************************************/
 
-/* ?? passer en terminate/destroy avec les signaux supplémentaires */
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -30,15 +28,41 @@
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
+#include "vpar_blocks.h"
 #include "video_parser.h"
 
-#include "undec_picture.h"
+#include "macroblock.h"
 #include "video_fifo.h"
 #include "video_decoder.h"
 
 /*
  * Local prototypes
  */
+static __inline__ void NextStartCode( vpar_thread_t * p_vpar );
+static void GroupHeader( vpar_thread_t * p_vpar )
+static void PictureHeader( vpar_thread_t * p_vpar )
+static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
+                                        int i_coding_type,
+                                        picture_t * p_newref )
+static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
+                                         int i_coding_type,
+                                         picture_t * p_newref )
+static void SliceHeader00( vpar_thread_t * p_vpar,
+                           int * pi_mb_address, int i_mb_base,
+                           elem_t * p_y, p_u, p_v, u32 i_vert_code )
+static void SliceHeader01( vpar_thread_t * p_vpar,
+                           int * pi_mb_address, int i_mb_base,
+                           elem_t * p_y, p_u, p_v, u32 i_vert_code )
+static void SliceHeader10( vpar_thread_t * p_vpar,
+                           int * pi_mb_address, int i_mb_base,
+                           elem_t * p_y, p_u, p_v, u32 i_vert_code )
+static void SliceHeader11( vpar_thread_t * p_vpar,
+                           int * pi_mb_address, int i_mb_base,
+                           elem_t * p_y, p_u, p_v, u32 i_vert_code )
+static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
+                                    int * pi_mb_address, int i_mb_base,
+                                    elem_t * p_y, p_u, p_v, u32 i_vert_code )
+static void ExtensionAndUserData( vpar_thread_t * p_vpar )
 
 /*****************************************************************************
  * vpar_NextSequenceHeader : Find the next sequence header
@@ -98,7 +122,7 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
 {
-    /* Re-align the buffer to an 8-bit boundary */
+    /* Re-align the buffer on an 8-bit boundary */
     DumpBits( &p_vpar->bit_stream, p_vpar->bit_stream.fifo.i_available & 7 );
 
     while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
@@ -110,37 +134,31 @@ static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * SequenceHeader : Parse the next sequence header
  *****************************************************************************/
-#define RESERVED    -1 
-static double d_frame_rate_table[16] =
-{
-  0.0,
-  ((23.0*1000.0)/1001.0),
-  24.0,
-  25.0,
-  ((30.0*1000.0)/1001.0),
-  30.0,
-  50.0,
-  ((60.0*1000.0)/1001.0),
-  60.0,
- 
-  RESERVED,
-  RESERVED,
-  RESERVED,
-  RESERVED,
-  RESERVED,
-  RESERVED,
-  RESERVED
-};
-
 static void SequenceHeader( vpar_thread_t * p_vpar )
 {
+#define RESERVED    -1 
+    static double d_frame_rate_table[16] =
+    {
+        0.0,
+        ((23.0*1000.0)/1001.0),
+        24.0,
+        25.0,
+        ((30.0*1000.0)/1001.0),
+        30.0,
+        50.0,
+        ((60.0*1000.0)/1001.0),
+        60.0,
+        RESERVED, RESERVED, RESERVED, RESERVED, RESERVED, RESERVED, RESERVED
+    };
+#undef RESERVED
+
     int i_height_save, i_width_save;
     
     i_height_save = p_vpar->sequence.i_height;
     i_width_save = p_vpar->sequence.i_width;
 
-    p_vpar->sequence.i_height = ntohl( GetBits( p_vpar->bit_stream, 12 ) );
-    p_vpar->sequence.i_width = ntohl( GetBits( p_vpar->bit_stream, 12 ) );
+    p_vpar->sequence.i_height = GetBits( p_vpar->bit_stream, 12 );
+    p_vpar->sequence.i_width = GetBits( p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_ratio = GetBits( p_vpar->bit_stream, 4 );
     p_vpar->sequence.d_frame_rate =
             d_frame_rate_table( GetBits( p_vpar->bit_stream, 4 ) );
@@ -182,9 +200,14 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     /*
      * Sequence Extension
      */
-    if( ShowBits( p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
+    NextStartCode( p_vpar );
+    if( ShowBits( &p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
     {
         int             i_dummy;
+        static int      pi_chroma_nb_blocks[4] = {0, 1, 2, 4};
+        static (void *) ppf_chroma_pattern[4]( vpar_thread_t * ) =
+                            {NULL, vpar_CodedPattern420,
+                             vpar_CodedPattern422, vpar_CodedPattern444};
     
         /* Parse sequence_extension */
         DumpBits32( &p_vpar->bit_stream );
@@ -192,6 +215,12 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         DumpBits( &p_vpar->bit_stream, 12 );
         p_vpar->sequence.b_progressive = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->sequence.i_chroma_format = GetBits( &p_vpar->bit_stream, 2 );
+        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width
+                    >> (3-p_vpar->sequence.i_chroma_format);
+        p_vpar->sequence.i_chroma_nb_blocks = pi_chroma_nb_blocks
+                                    [p_vpar->sequence.i_chroma_format];
+        p_vpar->sequence.pf_decode_pattern = ppf_chroma_pattern
+                                    [p_vpar->sequence.i_chroma_format];
         p_vpar->sequence.i_width |= GetBits( &p_vpar->bit_stream, 2 ) << 12;
         p_vpar->sequence.i_height |= GetBits( &p_vpar->bit_stream, 2 ) << 12;
         /* bit_rate_extension, marker_bit, vbv_buffer_size_extension, low_delay */
@@ -202,180 +231,64 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         p_vpar->sequence.d_frame_rate *= (i_dummy + 1)
                                   / (GetBits( &p_vpar->bit_stream, 5 ) + 1);
 
-        /* Extension and User data */
-        ExtensionAndUserData( p_vpar );
+        p_vpar->sequence.pf_decode_mv = vpar_MPEG2MotionVector;
     }
     else
     {
         /* It's an MPEG-1 stream. Put adequate parameters. */
         p_vpar->sequence.b_progressive = 1;
-        p_vpar->i_chroma_format = CHROMA_420;
+        p_vpar->sequence.i_chroma_format = CHROMA_420;
+        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i->width >> 2;
+        p_vpar->sequence.i_chroma_nb_blocks = 2;
+        p_vpar->sequence.pf_decode_pattern = vpar_CodedPattern420;
+
+        p_vpar->sequence.pf_decode_mv = vpar_MPEG1MotionVector;
     }
 
     p_vpar->sequence.i_mb_width = (p_vpar->sequence.i_width + 15) / 16;
     p_vpar->sequence.i_mb_height = (p_vpar->sequence.b_progressive) ?
                                    (p_vpar->sequence.i_height + 15) / 16 :
                                    2 * (p_vpar->sequence.i_height + 31) / 32;
+    p_vpar->sequence.i_mb_size = p_vpar->sequence.i_mb_width
+                                        * p_vpar->sequence.i_mb_height;
     p_vpar->sequence.i_width = (p_vpar->sequence.i_mb_width * 16);
     p_vpar->sequence.i_height = (p_vpar->sequence.i_mb_height * 16);
+    p_vpar->sequence.i_size = p_vpar->sequence.i_width
+                                        * p_vpar->sequence.i_height;
+
+    /* Slice Header functions */
+    if( p_vpar->sequence.i_height <= 2800 )
+    {
+        if( p_vpar->sequence.i_scalable_mode != SC_DP )
+        {
+            p_vpar->sequence.pf_slice_header = SliceHeader00;
+        }
+        else
+        {
+            p_vpar->sequence.pf_slice_header = SliceHeader01;
+        }
+    }
+    else
+    {
+        if( p_vpar->sequence.i_scalable_mode != SC_DP )
+        {
+            p_vpar->sequence.pf_slice_header = SliceHeader10;
+        }
+        else
+        {
+            p_vpar->sequence.pf_slice_header = SliceHeader11;
+        }
+    }
 
     if(    p_vpar->sequence.i_width != i_width_save
         || p_vpar->sequence.i_height != i_height_save
         || p_vpar->sequence.p_frame_lum_lookup == NULL )
     {
-        int                 i_x, i_y;
-        pel_lookup_table *  p_fr, p_fl;
-        int                 i_fr, i_fl;
-        static int          pi_chroma_size[4] = {0, 2, 1, 0}
-#define Sequence p_vpar->sequence
 
-        /* The size of the pictures has changed. Probably a new sequence.
-         * We must recalculate the lookup matrices. */
-
-        /* First unlink the previous lookup matrices so that they can
-         * be freed in the future. */
-        if( Sequence.p_frame_lum_lookup != NULL )
-        {
-            UNLINK_LOOKUP( Sequence.p_frame_lum_lookup );
-            UNLINK_LOOKUP( Sequence.p_field_lum_lookup );
-            UNLINK_LOOKUP( Sequence.p_frame_chroma_lookup );
-            UNLINK_LOOKUP( Sequence.p_field_chroma_lookup );
-        }
-
-        /* Allocate the new lookup tables. */
-        Sequence.p_frame_lum_lookup
-            = (pel_lookup_table_t *)malloc( sizeof( pel_lookup_table_t ) *
-                        Sequence.i_width * Sequence.i_height );
-        Sequence.p_field_lum_lookup
-            = (pel_lookup_table_t *)malloc( sizeof( pel_lookup_table_t ) *
-                        Sequence.i_width * Sequence.i_height );
-        Sequence.p_frame_chroma_lookup
-            = (pel_lookup_table_t *)malloc( sizeof( pel_lookup_table_t ) *
-                        Sequence.i_width * Sequence.i_height
-                         >> pi_chroma_size[Sequence.i_chroma_format] );
-        Sequence.p_field_chroma_lookup
-            = (pel_lookup_table_t *)malloc( sizeof( pel_lookup_table_t ) *
-                        Sequence.i_width * Sequence.i_height
-                         >> pi_chroma_size[Sequence.i_chroma_format] );
-
-        if( !Sequence.p_frame_lum_lookup || !Sequence.p_field_lum_lookup
-            || !Sequence.p_frame_chroma_lookup
-            || !Sequence.p_field_chroma_lookup )
-        {
-            intf_DbgMsg("vpar error: not enough memory for lookup tables");
-            p_vpar->b_error = 1;
-            return;
-        }
-
-        /* Fill in the luminance lookup tables */
-        p_fr = &Sequence.p_frame_lum_lookup->pi_pel;
-        p_fl = &Sequence.p_field_lum_lookup->pi_pel;
-        i_fr = i_fl = 0;
-
-        for( i_y = 0; i_y < Sequence.i_height; i_y++ )
-        {
-            int i_mb_y, i_b_y, i_pos_y;
-            i_mb_y = i_y >> 4;
-            i_b_y = (i_y & 15) >> 3;
-            i_pos_y = (i_y & 7);
-
-            for( i_x = 0; i_x < Sequence.i_width; i_x++ )
-            {
-                int i_mb_x, i_b_x, i_pos_x;
-                i_mb_x = i_x >> 4;
-                i_b_x = (i_x & 15) >> 3;
-                i_pos_x = (i_x & 7);
-
-                p_fl[i_fr + i_x] = p_fr[i_fr + i_x]
-                                 = (i_mb_y*Sequence.i_mb_width + i_mb_y)*256
-                                        + ((i_b_y << 1) + i_b_x)*64
-                                        + i_pos_y*8 + i_pos_x;
-            }
-            i_fr += Sequence.i_width;
-            i_fl += Sequence.i_width << 1;
-            if( i_fl == Sequence.i_width*Sequence.i_height )
-            {
-                i_fl = Sequence.i_width;
-            }
-        }
-        
-        /* Fill in the chrominance lookup tables */
-        p_fr = &Sequence.p_frame_chroma_lookup->pi_pel;
-        p_fl = &Sequence.p_field_chroma_lookup->pi_pel;
-        i_fr = i_fl = 0;
-
-        switch( p_vpar->i_chroma_format )
-        {
-        case CHROMA_444:
-            /* That's the same as luminance */
-            memcopy( &Sequence.p_frame_croma_lookup->pi_pel,
-                     &Sequence.p_frame_lum_lookup->pi_pel,
-                     sizeof(PEL_P)*Sequence.i_height*Sequence.i_width );
-            memcopy( &Sequence.p_field_croma_lookup->pi_pel,
-                     &Sequence.p_field_lum_lookup->pi_pel,
-                     sizeof(PEL_P)*Sequence.i_height*Sequence.i_width );
-
-        case CHROMA_422:
-            for( i_y = 0; i_y < Sequence.i_height; i_y++ )
-            {
-                int i_mb_y, i_b_y, i_pos_y;
-                i_mb_y = i_y >> 4;
-                i_b_y = (i_y & 15) >> 3;
-                i_pos_y = (i_y & 7);
-    
-                for( i_x = 0; i_x < (Sequence.i_width >> 1); i_x++ )
-                {
-                    int i_mb_x, i_pos_x;
-                    i_mb_x = i_x >> 3;
-                    i_pos_x = (i_x & 7);
-    
-                    p_fl[i_fr + i_x] = p_fr[i_fr + i_x]
-                                     = (i_mb_y*Sequence.i_mb_width + i_mb_y)*128
-                                            + i_b_y*64
-                                            + i_pos_y*8 + i_pos_x;
-                }
-                i_fr += Sequence.i_width >> 1;
-                i_fl += Sequence.i_width;
-                if( i_fl == (Sequence.i_width*Sequence.i_height >> 1) )
-                {
-                    i_fl = (Sequence.i_width >> 1);
-                }
-            }
-
-        case CHROMA_420:
-            for( i_y = 0; i_y < (Sequence.i_height >> 1); i_y++ )
-            {
-                int i_mb_y, i_pos_y;
-                i_mb_y = i_y >> 3;
-                i_pos_y = (i_y & 7);
-    
-                for( i_x = 0; i_x < (Sequence.i_width >> 1); i_x++ )
-                {
-                    int i_mb_x, i_pos_x;
-                    i_mb_x = i_x >> 3;
-                    i_pos_x = (i_x & 7);
-    
-                    p_fl[i_fr + i_x] = p_fr[i_fr + i_x]
-                                     = (i_mb_y*Sequence.i_mb_width + i_mb_y)*64
-                                            + i_pos_y*8 + i_pos_x;
-                }
-                i_fr += Sequence.i_width >> 1;
-                i_fl += Sequence.i_width;
-                if( i_fl == (Sequence.i_width*Sequence.i_height >> 2) )
-                {
-                    i_fl = Sequence.i_width >> 1;
-                }
-            }
-        } /* switch */
-        
-        /* Link the new lookup tables so that they don't get freed all
-         * the time. */
-        LINK_LOOKUP( Sequence.p_frame_lum_lookup );
-        LINK_LOOKUP( Sequence.p_field_lum_lookup );
-        LINK_LOOKUP( Sequence.p_frame_chroma_lookup );
-        LINK_LOOKUP( Sequence.p_field_chroma_lookup );
-#undef Sequence
     }
+
+    /* Extension and User data */
+    ExtensionAndUserData( p_vpar );
 }
 
 /*****************************************************************************
@@ -393,57 +306,233 @@ static void GroupHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void PictureHeader( vpar_thread_t * p_vpar )
 {
-    int                 i_coding_type;
-    mtime_t             i_pts;
-    undec_picture_t *   p_undec_p;
+    static (int *)      ppf_macroblock_type[4] = {vpar_IMBType, vpar_PMBType,
+                                                  vpar_BMBType, vpar_DMBType};
+
+    int                 i_structure;
+    int                 i_mb_address, i_mb_base, i_mb;
+    elem_t *            p_y, p_u, p_v;
+    boolean_t           b_parsable;
+    u32                 i_dummy;
     
     DumpBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
-    i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
+    p_vpar->picture.i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
+    p_vpar->picture.pf_macroblock_type = ppf_macroblock_type
+                                         [p_vpar->picture.i_coding_type];
     
-    if( ((i_coding_type == P_CODING_TYPE) &&
-         (p_vpar->sequence.p_forward == NULL)) ||
-        ((i_coding_type == B_CODING_TYPE) &&
-         (p_vpar->sequence.p_forward == NULL ||
-          p_vpar->sequence.p_backward == NULL)) )
+    DumpBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
+    
+    p_vpar->picture.b_full_pel_forward_vector = GetBits( &p_vpar->bit_stream, 1 );
+    p_vpar->picture.i_forward_f_code = GetBits( &p_vpar->bit_stream, 3 );
+    p_vpar->picture.b_full_pel_backward_vector = GetBits( &p_vpar->bit_stream, 1 );
+    p_vpar->picture.i_backward_f_code = GetBits( &p_vpar->bit_stream, 3 );
+
+    /* extra_information_picture */
+    while( GetBits( &p_vpar->bit_stream, 1 ) )
     {
-        /* The picture cannot be decoded because we lack one of the
-         * reference frames */
+        DumpBits( &p_vpar->bit_stream, 8 );
+    }
+
+    /* 
+     * Picture Coding Extension
+     */
+    NextStartCode( p_vpar );
+    if( ShowBits( &p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
+    {
+        /* Parse picture_coding_extension */
+        DumpBits32( &p_vpar->bit_stream );
+        /* extension_start_code_identifier */
+        DumpBits( &p_vpar->bit_stream, 4 );
         
-        /* Update the reference pointers */
+        p_vpar->picture.ppi_f_code[0][0] = GetBits( &p_vpar->bit_stream, 4 );
+        p_vpar->picture.ppi_f_code[0][1] = GetBits( &p_vpar->bit_stream, 4 );
+        p_vpar->picture.ppi_f_code[1][0] = GetBits( &p_vpar->bit_stream, 4 );
+        p_vpar->picture.ppi_f_code[1][1] = GetBits( &p_vpar->bit_stream, 4 );
+        p_vpar->picture.i_intra_dc_precision = GetBits( &p_vpar->bit_stream, 2 );
+        i_structure = GetBits( &p_vpar->bit_stream, 2 );
+        p_vpar->picture.b_top_field_first = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.b_frame_pred_frame_dct
+             = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.b_concealment_mv = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.b_q_scale_type = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.b_intra_vlc_format = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.b_alternate_scan = GetBits( &p_vpar->bit_stream, 1 );
+        /* repeat_first_field (ISO/IEC 13818-2 6.3.10 is cryptic and
+         * apparently the reference decoder doesn't use it, so trash it),
+         * chroma_420_type (obsolete) */
+        DumpBits( &p_vpar->bit_stream, 2 );
+        p_vpar->picture.b_progressive_frame = GetBits( &p_vpar->bit_stream, 1 );
+        
+        /* composite_display_flag */
+        if( GetBits( &p_vpar->bit_stream, 1 ) )
+        {
+            /* v_axis, field_sequence, sub_carrier, burst_amplitude,
+             * sub_carrier_phase */
+            DumpBits( &p_vpar->bit_stream, 20 );
+        }
+    }
+    else
+    {
+        /* MPEG-1 compatibility flags */
+        p_vpar->i_intra_dc_precision = 0; /* 8 bits */
+        i_structure = FRAME_STRUCTURE;
+        p_vpar->b_frame_pred_frame_dct = TRUE;
+        p_vpar->picture.b_concealment_mv = 0;
+        p_vpar->picture.b_q_scale_type = 0;
+        p_vpar->picture.b_intra_vlc_format = 0;
+        p_vpar->picture.b_alternate_scan = 0; /* zigzag */
+        b_repeat_first_field = FALSE;
+        p_vpar->picture.b_progressive_frame = TRUE;
+    }
+
+    if( p_vpar->picture.i_current_structure &&
+        (i_structure == FRAME_STRUCTURE ||
+         i_structure == p_vpar->picture.i_current_structure) )
+    {
+        /* We don't have the second field of the buffered frame. */
+        if( p_pvar->picture.p_picture != NULL )
+        {
+            ReferenceReplace( p_vpar,
+                      p_vpar->picture.p_second_field_buffer->i_coding_type,
+                      NULL );
+
+            for( i_mb = 0; i_mb < p_vpar->sequence.i_mb_size >> 1; i_mb++ )
+            {
+                vpar_DestroyMacroblock( &p_vpar->vfifo,
+                                        p_vpar->picture.pp_mb[i_mb] );
+            }
+            vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
+        }
+        
+        p_pvar->picture.i_current_structure = 0;
+
+        intf_DbgMsg("vpar debug: odd number of field picture.");
+    }
+
+    if( p_vpar->picture.i_current_structure )
+    {
+        /* Second field of a frame. We will decode it if, and only if we
+         * have decoded the first frame. */
+        b_parsable = (p_vpar->picture.p_second_field_buffer != NULL);
+    }
+    else
+    {
+        /* Do we have the reference pictures ? */
+        b_parsable = !((i_coding_type == P_CODING_TYPE) &&
+                       (p_vpar->sequence.p_forward == NULL)) ||
+                      ((i_coding_type == B_CODING_TYPE) &&
+                       (p_vpar->sequence.p_forward == NULL ||
+                        p_vpar->sequence.p_backward == NULL));
+
+        /* Does synchro say we have enough time to decode it ? */
+        b_parsable &&= vpar_SynchroChoose( p_vpar, i_coding_type, i_structure );
+    }
+
+    if( !b_parsable )
+    {
+        /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, i_coding_type, NULL );
         
-        /* Warn Synchro we have trashed a picture */
-        vpar_SynchroTrash( p_vpar, i_coding_type );
+        /* Warn Synchro we have trashed a picture. */
+        vpar_SynchroTrash( p_vpar, i_coding_type, i_structure );
+
+        /* Update context. */
+        if( i_structure != FRAME_STRUCTURE )
+            p_vpar->picture.i_current_structure = i_structure;
+        p_vpar->picture.p_picture = NULL;
 
         return;
     }
 
-    if( !(i_pts = vpar_SynchroChoose( p_vpar, i_coding_type )) )
+    /* OK, now we are sure we will decode the picture. */
+#define P_picture p_vpar->picture.p_picture
+    p_vpar->picture.b_error = FALSE;
+
+    if( !p_vpar->picture.i_current_structure )
     {
-        /* Synchro has decided not to decode the picture */
+        /* This is a new frame. Get a structure from the video_output. */
+        P_picture = vout_CreatePicture( p_vpar->p_vout,
+                                        SPLITTED_YUV_PICTURE,
+                                        p_vpar->sequence.i_width,
+                                        p_vpar->sequence.i_height,
+                                        p_vpar->sequence.i_chroma_format );
+
+        /* Initialize values. */
+        P_picture->date = vpar_SynchroDecode( p_vpar, i_coding_type,
+                                              i_structure );
+        bzero( p_vpar->picture.pp_mb, MAX_MB*sizeof( macroblock_t * ) );
+        p_vpar->picture.i_lum_incr = - 8 + ( p_vpar->sequence.i_width
+                    << ( i_structure != FRAME_STRUCTURE ) );
+        p_vpar->picture.i_chroma_incr = -8 + ( p_vpar->sequence.i_width
+                    << (( i_structure != FRAME_STRUCTURE ) +
+                        ( 3 - p_vpar->sequence.i_chroma_format )) );
+
+        /* Update the reference pointers. */
+        ReferenceUpdate( p_vpar, i_coding_type, p_undec_p );
+    }
+    p_vpar->picture.i_current_structure |= i_structure;
+    p_vpar->picture.i_structure = i_structure;
+    p_vpar->picture.b_frame_structure = (i_structure == FRAME_STRUCTURE);
+
+    /* Initialize picture data for decoding. */
+    if( i_structure == BOTTOM_FIELD )
+    {
+        i_mb_base = p_vpar->sequence.i_mb_size >> 1;
+    }
+    else
+    {
+        i_mb_base = 0;
+    }
+    i_mb_address = 0;
+
+    /* Extension and User data. */
+    ExtensionAndUserData( p_vpar );
+
+    /* Picture data (ISO/IEC 13818-2 6.2.3.7). */
+    NextStartCode( p_vpar );
+    while( i_mb_address+i_mb_base < p_vpar->sequence.i_mb_size
+           && !p_vpar->picture.b_error)
+    {
+        if( ((i_dummy = ShowBits( &p_vpar->bit_stream, 32 ))
+                 < SLICE_START_CODE_MIN) ||
+            (i_dummy > SLICE_START_CODE_MAX) )
+        {
+            intf_DbgMsg("vpar debug: premature end of picture");
+            p_vpar->picture.b_error = TRUE;
+            break;
+        }
+        DumpBits32( &p_vpar->bit_stream );
         
-        /* Update the reference pointers */
-        ReferenceUpdate( p_vpar, i_coding_type, NULL );
-        
-        return;
+        /* Decode slice data. */
+        SliceHeader( p_vpar, &i_mb_address, i_mb_base, i_dummy & 255 );
     }
 
-    /* OK, now we are sure we will decode the picture. Get a structure. */
-    p_undec_p = vpar_NewPicture( &p_vpar->vfifo );
-    
-    /* Request a buffer from the video_output. */
-    p_undec_p->p_picture = vout_CreatePicture( p_vpar->p_vout,
-                                               SPLITTED_YUV_PICTURE,
-                                               p_vpar->sequence.i_width,
-                                               p_vpar->sequence.i_height,
-                                               p_vpar->sequence.i_chroma_format );
+    if( p_vpar->picture.b_error )
+    {
+        /* Trash picture. */
+        for( i_mb = 0; p_vpar->picture.pp_mb[i_mb]; i_mb++ )
+        {
+            vpar_DestroyMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
+        }
 
-    /* Initialize values */
-    p_undec_p->i_coding_type = i_conding_type;
-    p_undec_p->b_mpeg2 = p_vpar->sequence.b_mpeg2;
-    p_undec_p->i_mb_height = p_vpar->sequence.i_mb_height;
-    p_undec_p->i_mb_width = p_vpar->sequence.i_mb_width;
-    p_undec_p->i_pts = i_pts;
+        ReferenceReplace( p_vpar, p_vpar->picture.i_coding_type, NULL );
+        vout_DestroyPicture( p_vpar->p_vout, P_picture );
+
+        /* Prepare context for the next picture. */
+        P_picture = NULL:
+    }
+    else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
+    {
+        /* Frame completely parsed. */
+        for( i_mb = 0; i_mb < p_vpar->sequence.i_mb_size; i_mb++ )
+        {
+            vpar_DecodeMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
+        }
+
+        /* Prepare context for the next picture. */
+        P_picture = NULL;
+    }
+#undef P_picture
 }
 
 /*****************************************************************************
@@ -455,11 +544,115 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
 {
     if( i_coding_type != B_CODING_TYPE )
     {
-        /* The P picture would have become the new p_backward reference. */
-        vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+        if( p_vpar->sequence.p_forward != NULL )
+            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
         p_vpar->sequence.p_forward = p_vpar->sequence.p_backward;
         p_vpar->sequence.p_backward = p_newref;
+        if( p_newref != NULL )
+            vout_LinkPicture( p_vpar->p_vout, p_newref );
     }
+}
+
+/*****************************************************************************
+ * ReferenceReplace : Replace the last reference pointer when we destroy
+ * a picture
+ *****************************************************************************/
+static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
+                                         int i_coding_type,
+                                         picture_t * p_newref )
+{
+    if( i_coding_type != B_CODING_TYPE )
+    {
+        if( p_vpar->sequence.p_backward != NULL )
+            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+        p_vpar->sequence.p_backward = p_newref;
+        if( p_newref != NULL )
+            vout_LinkPicture( p_vpar->p_vout, p_newref );
+    }
+}
+
+/*****************************************************************************
+ * SliceHeaderXY : Parse the next slice structure
+ *****************************************************************************
+ * X = i_height > 2800 ?
+ * Y = scalable_mode == SC_DP ?
+ *****************************************************************************/
+static void SliceHeader00( vpar_thread_t * p_vpar,
+                           int * pi_mb_address, int i_mb_base,
+                           u32 i_vert_code )
+{
+    SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
+}
+
+static void SliceHeader01( vpar_thread_t * p_vpar,
+                           int * pi_mb_address, int i_mb_base,
+                           u32 i_vert_code )
+{
+    DumpBits( &p_vpar->bit_stream, 7 ); /* priority_breakpoint */
+    SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
+}
+
+static void SliceHeader10( vpar_thread_t * p_vpar,
+                           int * pi_mb_address, int i_mb_base,
+                           u32 i_vert_code )
+{
+    i_vert_code += GetBits( &p_vpar->bit_stream, 3 ) << 7;
+    SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
+}
+
+static void SliceHeader11( vpar_thread_t * p_vpar,
+                           int * pi_mb_address, int i_mb_base,
+                           u32 i_vert_code )
+{
+    i_vert_code += GetBits( &p_vpar->bit_stream, 3 ) << 7;
+    DumpBits( &p_vpar->bit_stream, 7 ); /* priority_breakpoint */
+    SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
+}
+
+/*****************************************************************************
+ * SliceHeader : Parse the next slice structure
+ *****************************************************************************/
+static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
+                                    int * pi_mb_address, int i_mb_base,
+                                    u32 i_vert_code )
+{
+    /* DC predictors initialization table */
+    static int              pi_dc_dct_reinit[4] = {128,256,512,1024};
+
+    int                     i_mb_address_save = *pi_mb_address;
+
+    /* slice_vertical_position_extension and priority_breakpoint already done */
+    LoadQuantizerScale( p_vpar );
+
+    if( GetBits( &p_vpar->bit_stream, 1 ) )
+    {
+        /* intra_slice, slice_id */
+        DumpBits( &p_vpar->bit_stream, 8 );
+        /* extra_information_slice */
+        while( GetBits( &p_vpar->bit_stream, 1 ) )
+        {
+            DumpBits( &p_vpar->bit_stream, 8 );
+        }
+    }
+
+    *pi_mb_address = (i_vert_code - 1)*p_vpar->sequence.i_mb_width;
+
+    /* Reset DC coefficients predictors (ISO/IEC 13818-2 7.2.1). Why
+     * does the reference decoder put 0 instead of the normative values ? */
+    p_vpar->slice.pi_dct_pred[0] = p_vpar->slice.pi_dct_pred[1]
+        = p_vpar->slice.pi_dct_pred[2]
+        = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
+
+    /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
+    bzero( p_vpar->slice.pppi_pmv, 8*sizeof(int) );
+
+    do
+    {
+        vpar_ParseMacroblock( p_vpar, pi_mb_address, i_mb_address_save,
+                              i_mb_base );
+        i_mb_address_save = *pi_mb_address;
+    }
+    while( !ShowBits( &p_vpar->bit_stream, 23 ) );
 }
 
 /*****************************************************************************
@@ -563,4 +756,3 @@ static void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
     
     p_matrix->pi_matrix = pi_array;
 }
-

@@ -30,7 +30,7 @@
 #include "video_output.h"
 #include "video_parser.h"
 
-#include "undec_picture.h"
+#include "macroblock.h"
 #include "video_fifo.h"
 #include "video_decoder.h"
 
@@ -39,7 +39,7 @@
  *****************************************************************************/
 void vpar_InitFIFO( vpar_thread_t * p_vpar )
 {
-    int i_dummy;
+    int                 i_dummy;
     
     /* Initialize mutex and cond */
     vlc_mutex_init( p_vpar->vfifo.lock );
@@ -54,17 +54,16 @@ void vpar_InitFIFO( vpar_thread_t * p_vpar )
     i_index = VFIFO_SIZE; /* all structures are available */
     for( i_dummy = 0; i_dummy < VFIFO_SIZE + 1; i_dummy++ )
     {
-        p_vpar->vfifo.pp_undec_free[i_dummy] = p_vpar->vfifo.p_undec_p + i;
-        p_vpar->vfifo.p_undec_p[i].p_mb_info = NULL;
+        p_vpar->vfifo.pp_mb_free[i_dummy] = p_vpar->vfifo.p_macroblocks + i;
     }
 }
 
 /*****************************************************************************
- * vpar_GetPicture : return a picture to be decoded
+ * vpar_GetMacroblock : return a macroblock to be decoded
  *****************************************************************************/
-undec_picture_t * vpar_GetPicture( video_fifo_t * p_fifo )
+macroblock_t * vpar_GetMacroblock( video_fifo_t * p_fifo )
 {
-    undec_picture_t *   p_undec_p;
+    macroblock_t *      p_mb;
 
     vlc_mutex_lock( &p_fifo->lock );
     while( VIDEO_FIFO_ISEMPTY( *p_fifo ) )
@@ -77,20 +76,20 @@ undec_picture_t * vpar_GetPicture( video_fifo_t * p_fifo )
         }
     }
     
-    p_undec_p = VIDEO_FIFO_START( *p_fifo );
+    p_mb = VIDEO_FIFO_START( *p_fifo );
     VIDEO_FIFO_INCSTART( *p_fifo );
     
     vlc_mutex_unlock( &p_fifo->lock );
     
-    return( p_undec_p );
+    return( p_mb );
 }
 
 /*****************************************************************************
- * vpar_NewPicture : return a buffer for the parser
+ * vpar_NewMacroblock : return a buffer for the parser
  *****************************************************************************/
-undec_picture_t * vpar_NewPicture( video_fifo_t * p_fifo )
+macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
 {
-    undec_picture_t *   p_undec_p;
+    macroblock_t *      p_mb;
 
 #define P_buffer p_fifo->p_vpar.vbuffer
     vlc_mutex_lock( &P_buffer->lock );
@@ -100,128 +99,100 @@ undec_picture_t * vpar_NewPicture( video_fifo_t * p_fifo )
         return NULL;
     }
 
-    p_undec_p = P_buffer->pp_undec_free[ P_buffer->i_index-- ];
+    p_mb = P_buffer->pp_undec_free[ P_buffer->i_index-- ];
 #undef P_buffer
 
     vlc_mutex_unlock( &P_buffer->lock );
-    return( p_undec_p );
+    return( p_mb );
 }
 
 /*****************************************************************************
- * vpar_DecodePicture : put a picture in the video fifo, if it is decodable
+ * vpar_DecodeMacroblock : put a macroblock in the video fifo
  *****************************************************************************/
-void vpar_DecodePicture( video_fifo_t * p_fifo, undec_picture_t * p_undec_p )
+void vpar_DecodeMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
 {
-    boolean_t           b_decodable;
-    
-    switch( p_undec_p )
-    {
-    case B_CODING_TYPE:
-        b_decodable = ((p_undec_p->p_backward_p != NULL) &&
-                       (p_undec_p->p_forward_p != NULL));
-        break;
-    case P_CODING_TYPE:
-        b_decodable = (p_undec_p->p_backward_p != NULL);
-        break;
-    case I_CODING_TYPE:
-    case D_CODING_TYPE:
-        b_decodable = TRUE;
-        break;
-    default:
-        /* That should not happen */
-    }
-
-    if( b_decodable )
-    {
-        /* Place picture in the video FIFO */
-        vlc_mutex_lock( &p_fifo->lock );
+    /* Place picture in the video FIFO */
+    vlc_mutex_lock( &p_fifo->lock );
         
-        /* By construction, the video FIFO cannot be full */
-        VIDEO_FIFO_END( *p_fifo ) = p_undec_p;
-        VIDEO_FIFO_INCEND( *p_fifo );
+    /* By construction, the video FIFO cannot be full */
+    VIDEO_FIFO_END( *p_fifo ) = p_mb;
+    VIDEO_FIFO_INCEND( *p_fifo );
         
-        vlc_mutex_unlock( &p_fifo->lock );
-    }
+    vlc_mutex_unlock( &p_fifo->lock );
 }
 
 /*****************************************************************************
- * vpar_ReleasePicture : put a picture in the video_output fifo, and update
- *                  links and buffers
+ * vpar_ReleaseMacroblock : release a macroblock and put the picture in the
+ *                          video output heap, if it is finished
  *****************************************************************************/
-void vpar_ReleasePicture( video_fifo_t * p_fifo, undec_picture_t * p_undec_p )
+void vpar_ReleaseMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
 {
-    int         i_ref;
-    
-    /* Tell referencing pictures so that they can be decoded */
-    for( i_ref = 0; p_undec_p->pp_referencing_undec[i_ref].p_undec != NULL
-                    && i_ref < MAX_REFERENCING_UNDEC; i_ref++ )
-    {
-        *p_undec_p->pp_referencing_undec[i_ref].pp_frame = p_undec_p->p_picture;
-        vout_LinkPicture( p_fifo->p_vpar.p_vout, p_picture );
-        
-        /* Try to put the referencing picture in the video FIFO */
-        vpar_DecodePicture( p_fifo, p_undec_p->pp_referencing_undec[i_ref].p_undec );
-    }
-
     /* Unlink referenced pictures */
-    if( p_undec_p->p_forward_ref != NULL )
+    if( p_mb->p_forw_top != NULL )
     {
-        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_undec_p->p_forward_ref );
-        if( p_undec_p->p_backward_ref != NULL )
-        {
-            vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_undec_p->p_backward_ref );
-        }
+        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_mb->p_forw_top );
     }
-    
-    /* Mark the picture to be displayed */
-    vout_DisplayPicture( p_fifo->p_vpar.p_vout, p_undec_p->p_picture );
+    if( p_mb->p_backw_top != NULL )
+    {
+        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_mb->p_backw_top );
+    }
+    if( p_mb->p_forw_bot != NULL )
+    {
+        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_mb->p_forw_bot );
+    }
+    if( p_mb->p_backw_bot != NULL )
+    {
+        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_mb->p_backw_bot );
+    }
 
-    /* Release the undec_picture_t structure */
+    /* Unlink picture buffer */
+    vlc_mutex_lock( &p_mb->p_picture->lock_deccount );
+    p_mb->p_picture->i_deccount--;
+    if( p_mb->p_picture->i_deccount == 0 )
+    {
+        /* Mark the picture to be displayed */
+        vout_DisplayPicture( p_fifo->p_vpar.p_vout, p_mb->p_picture );
+
+        /* Warn Synchro for its records. */
+        vpar_SynchroEnd( p_fifo->p_vpar );
+    }
+    vlc_mutex_unlock( & p_mb->p_picture->lock_deccount );
+
+    /* Release the macroblock_t structure */
 #define P_buffer p_fifo->p_vpar.vbuffer
     vlc_mutex_lock( &P_buffer->lock );
-
-    P_buffer->pp_undec_free[ ++P_buffer->i_index ] = p_undec_p;
-    
+    P_buffer->pp_mb_free[ ++P_buffer->i_index ] = p_mb;
     vlc_mutex_unlock( &P_buffer->lock );
 #undef P_buffer
-    }
 }
 
 /*****************************************************************************
- * vpar_DestroyPicture : destroy a picture in case of error
+ * vpar_DestroyMacroblock : destroy a macroblock in case of error
  *****************************************************************************/
-void vpar_DestroyPicture( video_fifo_t * p_fifo, undec_picture_t * p_undec_p )
+void vpar_DestroyMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
 {
-    int         i_ref;
-    
-    /* Destroy referencing pictures */
-    for( i_ref = 0; p_undec_p->pp_referencing_undec[i_ref].p_undec != NULL
-                    && i_ref < MAX_REFERENCING_UNDEC; i_ref++ )
+    /* Unlink referenced pictures */
+    if( p_mb->p_forw_top != NULL )
     {
-        /* Try to put the referencing picture in the video FIFO */
-        vpar_DestroyPicture( p_fifo, p_undec_p->pp_referencing_undec[i_ref].p_undec );
+        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_mb->p_forw_top );
+    }
+    if( p_mb->p_backw_top != NULL )
+    {
+        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_mb->p_backw_top );
+    }
+    if( p_mb->p_forw_bot != NULL )
+    {
+        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_mb->p_forw_bot );
+    }
+    if( p_mb->p_backw_bot != NULL )
+    {
+        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_mb->p_backw_bot );
     }
 
-    /* Unlink referenced pictures */
-    if( p_undec_p->p_forward_ref != NULL )
-    {
-        vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_undec_p->p_forward_ref );
-        if( p_undec_p->p_backward_ref != NULL )
-        {
-            vout_UnlinkPicture( p_fifo->p_vpar.p_vout, p_undec_p->p_backward_ref );
-        }
-    }
-    
-    /* Release the picture buffer */
-    vout_DestroyPicture( p_fifo->p_vpar.p_vout, p_undec_p->p_picture );
-    
-    /* Release the undec_picture_t structure */
+    /* Release the macroblock_t structure */
 #define P_buffer p_fifo->p_vpar.vbuffer
     vlc_mutex_lock( &P_buffer->lock );
-
-    P_buffer->pp_undec_free[ ++P_buffer->i_index ] = p_undec_p;
-    
+    P_buffer->pp_mb_free[ ++P_buffer->i_index ] = p_mb;
     vlc_mutex_unlock( &P_buffer->lock );
 #undef P_buffer
-    }
 }

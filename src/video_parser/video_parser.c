@@ -146,6 +146,7 @@ static int CheckConfiguration( video_cfg_t *p_cfg )
  *******************************************************************************/
 static int InitThread( vpar_thread_t *p_vpar )
 {
+    int     i_dummy;
 
     intf_DbgMsg("vpar debug: initializing video parser thread %p\n", p_vpar);
 
@@ -181,6 +182,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->sequence.nonintra_quant.b_allocated = FALSE;
     p_vpar->sequence.chroma_intra_quant.b_allocated = FALSE;
     p_vpar->sequence.chroma_nonintra_quant.b_allocated = FALSE;
+    p_vpar->sequence.i_frame_number = 0;
 
     /* Initialize other properties */
 #ifdef STATS
@@ -201,16 +203,19 @@ static int InitThread( vpar_thread_t *p_vpar )
     
     bzero( p_vpar->p_vdec, MAX_VDEC*sizeof(vdec_thread_t *) );
     
-    /* Spawn a video_decoder thread */
-    /* ??? add the possibility to launch multiple vdec threads */
-    if( (p_vpar->p_vdec[0] = vdec_CreateThread( p_vpar )) == NULL )
+    /* Spawn video_decoder threads */
+    /* ??? modify the number of vdecs at runtime ? */
+    for( i_dummy = 0; i_dummy < NB_VDEC; i_dummy++ )
     {
-        return( 1 );
+        if( (p_vpar->p_vdec[i_dummy] = vdec_CreateThread( p_vpar )) == NULL )
+        {
+            return( 1 );
+        }
     }
 
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);
-    return( 0 );    
+    return( 0 );
 }
 
 /*******************************************************************************
@@ -289,15 +294,16 @@ static void ErrorThread( vpar_thread_t *p_vpar )
         vlc_mutex_lock( &p_vpar->fifo.data_lock );
 
         /* ?? trash all trashable PES packets */
-        while( !PARSER_FIFO_ISEMPTY(p_vpar->fifo) )
+        while( !DECODER_FIFO_ISEMPTY(p_vpar->fifo) )
         {
-            input_NetlistFreePES( p_vpar->bit_stream.p_input, PARSER_FIFO_START(p_vpar->fifo) );
-            PARSER_FIFO_INCSTART( p_vpar->fifo );
+            input_NetlistFreePES( p_vpar->bit_stream.p_input,
+                                  DECODER_FIFO_START(p_vpar->fifo) );
+            DECODER_FIFO_INCSTART( p_vpar->fifo );
         }
 
         vlc_mutex_unlock( &p_vpar->fifo.data_lock );
         /* Sleep a while */
-        msleep( VPAR_IDLE_SLEEP );                
+        msleep( VPAR_IDLE_SLEEP );
     }
 }
 
@@ -323,7 +329,7 @@ static void EndThread( vpar_thread_t *p_vpar )
     /* ?? */
 
     /* Destroy vdec threads */
-    for( i_dummy = 0; i_dummy < MAX_VDEC; i_dummy++ )
+    for( i_dummy = 0; i_dummy < NB_VDEC; i_dummy++ )
     {
         if( p_vpar->p_vdec[i_dummy] != NULL )
             vdec_DestroyThread( p_vpar->p_vdec[i_dummy] );

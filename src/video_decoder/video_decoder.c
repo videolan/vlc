@@ -43,8 +43,8 @@ static int      InitThread          ( vdec_thread_t *p_vdec );
 static void     RunThread           ( vdec_thread_t *p_vdec );
 static void     ErrorThread         ( vdec_thread_t *p_vdec );
 static void     EndThread           ( vdec_thread_t *p_vdec );
-static void     DecodePicture       ( vdec_thread_t *p_vdec,
-                                      undec_picture_t * p_undec_p );
+static void     DecodeMacroblock    ( vdec_thread_t *p_vdec,
+                                      macroblock_t * p_mb );
 
 /*******************************************************************************
  * vdec_CreateThread: create a video decoder thread
@@ -165,11 +165,11 @@ static void RunThread( vdec_thread_t *p_vdec )
      */
     while( (!p_vdec->b_die) && (!p_vdec->b_error) )
     {
-        undec_picture_t *       p_undec_p;
+        macroblock_t *          p_mb;
         
-        if( (p_undec_p = GetPicture( p_vdec->p_vpar->p_fifo )) != NULL )
+        if( (p_mb = GetMacroblock( &p_vdec->p_vpar.vfifo )) != NULL )
         {
-            DecodePicture( p_vdec, p_undec_p );
+            DecodeMacroblock( p_vdec, p_mb );
         }
     } 
 
@@ -220,92 +220,101 @@ static void EndThread( vdec_thread_t *p_vdec )
 }
 
 /*******************************************************************************
- * DecodePicture : decode a picture
+ * DecodeMacroblock : decode a macroblock of a picture
  *******************************************************************************/
-static void DecodePicture( vdec_thread_t *p_vdec, undec_picture_t * p_undec_p )
+static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
 {
-    static int              pi_chroma_nb_blocks[4] = {0, 1, 2, 4};
-    static int              pi_chroma_nb_coeffs[4] = {0, 64, 128, 256};
-    static f_motion_mb_t    ppf_chroma_motion[4] = { NULL,
-                                                     &vdec_MotionMacroBlock420,
-                                                     &vdec_MotionMacroBlock422,
-                                                     &vdec_MotionMacroBlock444 };
-    static f_motion_t       pppf_motion_forward[4][2] = {
-                                {NULL, NULL} /* I picture */
-                                {&vdec_MotionForward, &vdec_MotionForward} /* P */
-                                {NULL, &vdec_MotionForward} /* B */
-                                {NULL, NULL} /* D */ };
-    static f_motion_t       pppf_motion_backward[4][2] = {
-                                {NULL, NULL} /* I picture */
-                                {NULL, NULL} /* P */
-                                {NULL, &vdec_MotionBackward} /* B */
-                                {NULL, NULL} /* D */ };
-    static f_motion_t       ppf_motion[4] = { NULL,
-                                              &vdec_MotionTopFirst,
-                                              &vdec_MotionBottomFirst,
-                                              &vdec_MotionFrame };
+    int             i_b;
 
-    int             i_mb, i_b, i_totb;
-    coeff_t *       p_y, p_u, p_v;
-    f_motion_mb_t   pf_chroma_motion;
-    f_motion_t      pf_motion_forward, pf_motion_backward;
-    int             i_chroma_nb_blocks, i_chroma_nb_coeffs;
-    
-    p_y = (coeff_t *)p_undec_p->p_picture->p_y;
-    p_u = (coeff_t *)p_undec_p->p_picture->p_u;
-    p_v = (coeff_t *)p_undec_p->p_picture->p_v;
+    /*
+     * Motion Compensation (ISO/IEC 13818-2 section 7.6)
+     */
+    (*p_mb->pf_motion)( p_mb );
 
-#define I_chroma_format     p_undec_p->p_picture->i_chroma_format
-    pf_chroma_motion = ppf_chroma_motion[I_chroma_format];
-    pf_motion_forward
-    pf_motion = ppf_motion[p_undec_p->i_structure];
-
-    i_chroma_nb_blocks = pi_chroma_nb_blocks[I_chroma_format];
-    i_chroma_nb_coeffs = pi_chroma_nb_coeffs[I_chroma_format];
-#undef I_chroma_format
-
-    for( i_mb = 0; i_mb < p_undec_p->i_mb_height*p_undec_p->i_mb_width; i_mb++ )
+    /* luminance */
+    for( i_b = 0; i_b < 4; i_b++ )
     {
-#define P_mb_info           p_undec_p->p_mb_info[i_ref]
-
         /*
          * Inverse DCT (ISO/IEC 13818-2 section Annex A)
          */
-        
-        /* Luminance : always 4 blocks */
-        for( i_b = 0; i_b < 4; i_b++ )
-        {
-            (*P_mb_info.p_idct_function[i_b])( p_y + i_b*64 );
-        }
-        i_totb = 4;
-        
-        /* Chrominance Cr */
-        for( i_b = 0; i_b < i_chroma_nb_blocks; i_b++ )
-        {
-            (*P_mb_info.p_idct_function[i_totb + i_b])( p_u + i_b*64 );
-        }
-        i_totb += i_chroma_nb_blocks;
-        
-        /* Chrominance Cb */
-        for( i_b = 0; i_b < i_chroma_nb_blocks; i_b++ )
-        {
-            (*P_mb_info.p_idct_function[i_totb + i_b])( p_v + i_b*64 );
-        }
+        (*p_mb->pf_idct[i_b])( p_mb, p_mb->ppi_blocks[i_b], p_mb->pi_sparse_pos[i_b] );
 
         /*
-         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
+         * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
          */
-        (*pf_motion)( p_vdec, p_undec_p, i_mb, pf_chroma_motion );
+        (*p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
+                               p_mb->p_data[i_b], p_mb->i_lum_incr );
+    }
 
-        p_y += 256;
-        p_u += i_chroma_nb_coeffs;
-        p_v += i_chroma_nb_coeffs;
-#undef P_mb_info
+    /* chrominance */
+    for( i_b = 4; i_b < 4 + 2*p_mb->i_chroma_nb_blocks; i_b++ )
+    {
+        /*
+         * Inverse DCT (ISO/IEC 13818-2 section Annex A)
+         */
+        (*p_mb->pf_idct[i_b])( p_mb, p_mb->ppi_blocks[i_b], p_mb->pi_sparse_pos[i_b] );
+
+        /*
+         * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
+         */
+        (*p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
+                               p_mb->p_data[i_b], p_mb->i_chroma_incr );
     }
 
     /*
-     * Decoding is finished, mark the picture ready for displaying and free
-     * unneeded memory
+     * Decoding is finished, release the macroblock and free
+     * unneeded memory.
      */
-    vpar_ReleasePicture( p_vdec->p_vpar->p_fifo, p_undec_p );
+    vpar_ReleaseMacroblock( &p_vdec->p_vpar.vfifo, p_mb );
+}
+
+/*******************************************************************************
+ * vdec_AddBlock : add a block
+ *******************************************************************************/
+void vdec_AddBlock( elem_t * p_block, data_t * p_data, int i_incr )
+{
+    int i_x, i_y;
+    
+    for( i_y = 0; i_y < 8; i_y++ )
+    {
+        for( i_x = 0; i_x < 8; i_x++ )
+        {
+            /* ??? Need clip to be MPEG-2 compliant */
+            *p_data++ += *p_block++;
+        }
+        p_data += i_incr;
+    }
+}
+
+/*******************************************************************************
+ * vdec_CopyBlock : copy a block
+ *******************************************************************************/
+void vdec_CopyBlock( elem_t * p_block, data_t * p_data, int i_incr )
+{
+    int i_x, i_y;
+    
+    for( i_y = 0; i_y < 8; i_y++ )
+    {
+#ifndef VDEC_DFT
+        /* elem_t and data_t are the same */
+        memcopy( p_data, p_block, 8*sizeof(data_t) );
+        p_data += i_incr+8;
+        p_block += 8;
+#else
+        for( i_x = 0; i_x < 8; i_x++ )
+        {
+            /* ??? Need clip to be MPEG-2 compliant */
+            /* ??? Why does the reference decoder add 128 ??? */
+            *p_data++ = *p_block++;
+        }
+        p_data += i_incr;
+#endif
+    }
+}
+
+/*******************************************************************************
+ * vdec_DummyBlock : dummy function that does nothing
+ *******************************************************************************/
+void vdec_DummyBlock( elem_t * p_block, data_t * p_data, int i_incr )
+{
 }
