@@ -387,8 +387,8 @@ dist:
 	for file in control changelog rules ; do \
 		cp debian/$$file tmp/vlc/debian/ ; done
 	# Copy ipkg control files
-	for file in control rules patch ; do \
-		cp ipkg/$$file tmp/vlc/ipkg/ ; done
+	for file in ipkg/* ; do \
+		cp $$file tmp/vlc/ipkg/ ; done
 	# Copy fonts and icons
 	for file in share/*vlc* share/*psf; do \
 		cp $$file tmp/vlc/share ; done
