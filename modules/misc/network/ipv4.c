@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.17 2003/03/24 17:15:30 gbazin Exp $
+ * $Id: ipv4.c,v 1.18 2003/04/21 16:22:43 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -51,9 +51,7 @@
 #elif defined( WIN32 )
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
+#   define close closesocket
 #else
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
@@ -70,6 +68,9 @@
 #endif
 #ifndef INADDR_NONE
 #   define INADDR_NONE 0xFFFFFFFF
+#endif
+#ifndef IN_MULTICAST
+#   define IN_MULTICAST(a) IN_CLASSD(a)
 #endif
 
 /*****************************************************************************
@@ -146,9 +147,6 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     int i_bind_port = p_socket->i_bind_port;
     char * psz_server_addr = p_socket->psz_server_addr;
     int i_server_port = p_socket->i_server_port;
-#if defined( WIN32 ) && !defined( UNDER_CE )
-    char * psz_bind_win32;        /* WIN32 multicast kludge */
-#endif
 
     int i_handle, i_opt;
     socklen_t i_opt_size;
@@ -177,11 +175,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 #else
         msg_Err( p_this, "cannot configure socket (SO_REUSEADDR)" );
 #endif
-#if defined( WIN32 ) || defined( UNDER_CE )
-        closesocket( i_handle );
-#else
         close( i_handle );
-#endif
         return( -1 );
     }
 
@@ -232,26 +226,16 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     /* Build the local socket */
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
-    /* Under Win32 and for the multicast, we bind on INADDR_ANY,
+    /* Under Win32 and for multicasting, we bind to INADDR_ANY,
      * so let's call BuildAddr with "" instead of psz_bind_addr */
-    psz_bind_win32 = psz_bind_addr ;
-
-    /* Check if this is a multicast socket */
-    if (IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) )
-    {
-        psz_bind_win32 = "";
-    }
-    if ( BuildAddr( &sock, psz_bind_win32, i_bind_port ) == -1 )
+    if( BuildAddr( &sock, IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) ?
+                   "" : psz_bind_addr, i_bind_port ) == -1 )
 #else
-    if ( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )
+    if( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )
 #endif
     {
         msg_Dbg( p_this, "could not build local address" );
-#if defined( WIN32 ) || defined( UNDER_CE )
-        closesocket( i_handle );
-#else
         close( i_handle );
-#endif
         return( -1 );
     }
 
@@ -263,13 +247,22 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 #else
         msg_Err( p_this, "cannot bind socket" );
 #endif
-#if defined( WIN32 ) || defined( UNDER_CE )
-        closesocket( i_handle );
-#else
         close( i_handle );
-#endif
         return( -1 );
     }
+
+#if defined( WIN32 ) && !defined( UNDER_CE )
+    /* Restore the sock struct so we can spare a few #ifdef WIN32 later on */
+    if( IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) )
+    {
+        if ( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )
+        {
+            msg_Dbg( p_this, "could not build local address" );
+            close( i_handle );
+            return( -1 );
+        }
+    }
+#endif
 
     /* Allow broadcast reception if we bound on INADDR_ANY */
     if( !*psz_bind_addr )
@@ -293,25 +286,15 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 
 #if !defined( UNDER_CE ) && !defined( SYS_BEOS )
     /* Join the multicast group if the socket is a multicast address */
-#ifndef IN_MULTICAST
-#   define IN_MULTICAST(a)         IN_CLASSD(a)
-#endif
-
-#ifndef WIN32
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
         struct ip_mreq imr;
+
+        /* Determine interface to be used for multicast */
         char * psz_if_addr = config_GetPsz( p_this, "iface-addr" );
         imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
-#else
-    if( IN_MULTICAST( ntohl(inet_addr(psz_bind_addr) ) ) )
-    {
-        struct ip_mreq imr;
-        char * psz_if_addr = config_GetPsz( p_this, "iface-addr" );
-        imr.imr_multiaddr.s_addr = inet_addr(psz_bind_addr);
-#endif
-        if ( psz_if_addr != NULL && *psz_if_addr
-              && inet_addr(psz_if_addr) != INADDR_NONE )
+        if( psz_if_addr != NULL && *psz_if_addr
+            && inet_addr(psz_if_addr) != INADDR_NONE )
         {
             imr.imr_interface.s_addr = inet_addr(psz_if_addr);
         }
@@ -319,8 +302,9 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         {
             imr.imr_interface.s_addr = INADDR_ANY;
         }
-        if ( psz_if_addr != NULL ) free( psz_if_addr );
+        if( psz_if_addr != NULL ) free( psz_if_addr );
 
+        /* Join Multicast group */
         if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
         {
@@ -330,11 +314,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 #else
             msg_Warn( p_this, "failed to join IP multicast group" );
 #endif
-#if defined( WIN32 ) || defined( UNDER_CE )
-            closesocket( i_handle );
-#else
             close( i_handle );
-#endif
             return( -1 );
         }
     }
@@ -346,11 +326,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
         {
             msg_Err( p_this, "cannot build remote address" );
-#if defined( WIN32 ) || defined( UNDER_CE )
-            closesocket( i_handle );
-#else
             close( i_handle );
-#endif
             return( -1 );
         }
 
@@ -363,40 +339,26 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 #else
             msg_Err( p_this, "cannot connect socket" );
 #endif
-#if defined( WIN32 ) || defined( UNDER_CE )
-            closesocket( i_handle );
-#else
             close( i_handle );
-#endif
             return( -1 );
         }
 
 #if !defined( UNDER_CE ) && !defined( SYS_BEOS )
-#ifndef WIN32
-        if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
-#else
         if( IN_MULTICAST( ntohl(inet_addr(psz_server_addr) ) ) )
-#endif
         {
             /* set the time-to-live */
             int ttl = config_GetInt( p_this, "ttl" );
-            if( ttl < 1 )
-                ttl = 1;
+            if( ttl < 1 ) ttl = 1;
 
             if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_TTL,
                             (void *) &ttl, sizeof( ttl ) ) < 0 )
             {
 #ifdef HAVE_ERRNO_H
-                msg_Warn( p_this, "failed to set ttl (%s)",
-                          strerror(errno) );
+                msg_Warn( p_this, "failed to set ttl (%s)", strerror(errno) );
 #else
                 msg_Warn( p_this, "failed to set ttl" );
 #endif
-#if defined( WIN32 ) || defined( UNDER_CE )
-                closesocket( i_handle );
-#else
                 close( i_handle );
-#endif
                 return( -1 );
             }
         }
@@ -445,11 +407,7 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
     if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
     {
         msg_Dbg( p_this, "could not build local address" );
-#if defined( WIN32 ) || defined( UNDER_CE )
-        closesocket( i_handle );
-#else
         close( i_handle );
-#endif
         return( -1 );
     }
 
@@ -462,11 +420,7 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
 #else
         msg_Err( p_this, "cannot connect socket" );
 #endif
-#if defined( WIN32 ) || defined( UNDER_CE )
-        closesocket( i_handle );
-#else
         close( i_handle );
-#endif
         return( -1 );
     }
 

@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.8 2003/02/07 23:36:55 marcari Exp $
+ * $Id: ipv6.c,v 1.9 2003/04/21 16:22:43 gbazin Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -65,6 +65,7 @@ static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #ifndef IPV6_JOIN_GROUP
 #   define IPV6_JOIN_GROUP 20
 #endif
+#   define close closesocket
 #endif
 
 /*****************************************************************************
