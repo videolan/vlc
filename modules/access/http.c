@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.44 2003/09/10 13:39:29 zorglub Exp $
+ * $Id: http.c,v 1.45 2003/09/10 15:50:25 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -731,8 +731,7 @@ static int Open( vlc_object_t *p_this )
         p_access_data->socket_desc.i_ttl           = 0;
 
         snprintf( p_access_data->psz_buffer, MAX_QUERY_SIZE,
-                  "GET http://%s:%d/%s HTTP/1.0\r\n"  \
-                  "Icy-Metadata:0\r\n",
+                  "GET http://%s:%d/%s HTTP/1.0\r\n",
                   psz_server_addr, i_server_port, psz_path );
     }
     else
@@ -744,8 +743,7 @@ static int Open( vlc_object_t *p_this )
         p_access_data->socket_desc.i_ttl           = 0;
 
         snprintf( p_access_data->psz_buffer, MAX_QUERY_SIZE,
-                  "GET /%s HTTP/1.1\r\nHost: %s\r\n" \
-                  "Icy-Metadata:0\r\n",
+                  "GET /%s HTTP/1.1\r\nHost: %s\r\n",
                   psz_path, psz_server_addr );
     }
     p_access_data->psz_buffer[MAX_QUERY_SIZE - 1] = '\0';
