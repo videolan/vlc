@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.5 2002/11/03 13:22:44 gbazin Exp $
+ * $Id: ogg.c,v 1.6 2002/11/03 23:00:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -34,6 +34,8 @@
 
 #include <ogg/ogg.h>
 
+#include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
+
 #define OGG_BLOCK_SIZE 4096
 #define PAGES_READ_ONCE 1
 
@@ -63,11 +65,15 @@ typedef struct logical_stream_s
     /* program clock reference (in units of 90kHz) derived from the previous
      * granulepos */
     mtime_t i_pcr;
+    long    l_previous_granulepos;
 
     /* info from logical streams */
-    int i_rate;
+    double i_rate;
     int i_bitrate;
     int b_reinit;
+
+    BITMAPINFOHEADER *p_bih;
+    WAVEFORMATEX *p_wf;
 
 } logical_stream_t;
 
@@ -92,6 +98,50 @@ struct demux_sys_t
     mtime_t i_length;
     int     b_seekable;
 };
+
+/* OggDS headers for the new header format (used in ogm files) */
+typedef struct stream_header_video
+{
+    ogg_int32_t width;
+    ogg_int32_t height;
+} stream_header_video;
+        
+typedef struct stream_header_audio
+{
+    ogg_int16_t channels;
+    ogg_int16_t blockalign;
+    ogg_int32_t avgbytespersec;
+} stream_header_audio;
+
+typedef struct stream_header
+{
+    char        streamtype[8];
+    char        subtype[4];
+
+    ogg_int32_t size;                               /* size of the structure */
+
+    ogg_int64_t time_unit;                              /* in reference time */
+    ogg_int64_t samples_per_unit;
+    ogg_int32_t default_len;                                /* in media time */
+
+    ogg_int32_t buffersize;
+    ogg_int16_t bits_per_sample;
+
+    union
+    {
+        /* Video specific */
+        stream_header_video video;
+        /* Audio specific */
+        stream_header_audio audio;
+    } sh;
+} stream_header;
+
+/* Some defines from OggDS */
+#define PACKET_TYPE_HEADER   0x01
+#define PACKET_TYPE_BITS     0x07
+#define PACKET_LEN_BITS01    0xc0
+#define PACKET_LEN_BITS2     0x02
+#define PACKET_IS_SYNCPOINT  0x08
 
 /*****************************************************************************
  * Local prototypes
@@ -258,6 +308,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     pes_packet_t  *p_pes;
     data_packet_t *p_data;
     demux_sys_t *p_ogg = p_input->p_demux_data;
+    int i_header_len = 0;
 
     if( p_stream->b_force_backup )
     {
@@ -315,19 +366,24 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         return;
     }
 
-    p_pes->p_first = p_pes->p_last = p_data;
-    p_pes->i_nb_data = 1;
-    p_pes->i_pes_size = p_oggpacket->bytes;
-    p_pes->i_dts = p_oggpacket->granulepos;
-
     /* Convert the pcr into a pts */
     p_pes->i_pts = ( p_stream->i_pcr < 0 ) ? 0 :
         input_ClockGetTS( p_input, p_input->stream.p_selected_program,
                           p_stream->i_pcr );
 
     /* Convert the next granule into a pcr */
-    p_stream->i_pcr = ( p_oggpacket->granulepos < 0 ) ? -1 :
-                        p_oggpacket->granulepos * 90000 / p_stream->i_rate;
+    if( p_oggpacket->granulepos < 0 )
+    {
+        /* FIXME: ffmpeg doesn't like null pts */
+        if( p_stream->i_cat == VIDEO_ES )
+            p_stream->i_pcr += (90000 / p_stream->i_rate);
+        else
+            p_stream->i_pcr = -1;
+    }
+    else
+    {
+        p_stream->i_pcr = p_oggpacket->granulepos * 90000 / p_stream->i_rate;
+    }
 
     /* Update the main pcr */
     if( p_stream == p_ogg->p_stream_timeref )
@@ -343,7 +399,26 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         }
     }
 
-    memcpy( p_data->p_payload_start, p_oggpacket->packet, p_oggpacket->bytes );
+    p_pes->i_nb_data = 1;
+    p_pes->i_dts = p_oggpacket->granulepos;
+    p_pes->p_first = p_pes->p_last = p_data;
+    p_pes->i_pes_size = p_oggpacket->bytes;
+
+    if( p_stream->i_fourcc != VLC_FOURCC( 'v','o','r','b' ) )
+    {
+        /* Remove the header from the packet */
+        i_header_len = (*p_oggpacket->packet & PACKET_LEN_BITS01) >> 6;
+        i_header_len |= (*p_oggpacket->packet & PACKET_LEN_BITS2) << 1;
+        i_header_len++;
+
+        p_pes->i_pes_size -= i_header_len;
+    }
+
+    memcpy( p_data->p_payload_start,
+            p_oggpacket->packet + i_header_len,
+            p_oggpacket->bytes - i_header_len );
+
+    p_data->p_payload_end = p_data->p_payload_start + p_pes->i_pes_size;
 
     input_DecodePES( p_stream->p_es->p_decoder_fifo, p_pes );
 }
@@ -426,9 +501,129 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     oggpack_adv( &opb, 32 );
                     p_stream->i_bitrate = oggpack_read( &opb, 32 );
                 }
+                else if( (*oggpacket.packet & PACKET_TYPE_BITS )
+                         == PACKET_TYPE_HEADER && 
+                         oggpacket.bytes >= (int)sizeof(stream_header)+1 )
+                {
+                    stream_header *st = (stream_header *)(oggpacket.packet+1);
+
+                    /* Check for video header (new format) */
+                    if( !strncmp( st->streamtype, "video", 5 ) )
+                    {
+                        p_stream->i_cat = VIDEO_ES;
+
+                        /* We need to get rid of the header packet */
+                        ogg_stream_packetout( &p_stream->os, &oggpacket );
+
+                        p_stream->p_bih = (BITMAPINFOHEADER*)
+                            calloc( 1, sizeof(BITMAPINFOHEADER) );
+                        p_stream->p_bih->biSize = sizeof(BITMAPINFOHEADER);
+                        p_stream->p_bih->biCompression=
+                            p_stream->i_fourcc = VLC_FOURCC( st->subtype[0],
+                                                             st->subtype[1],
+                                                             st->subtype[2],
+                                                             st->subtype[3] );
+                        msg_Dbg( p_input, "found video header of type: %.4s",
+                                 (char *)&p_stream->i_fourcc );
+
+                        p_stream->i_rate = 10000000.0 / st->time_unit;
+
+                        p_stream->p_bih->biBitCount = st->bits_per_sample;
+                        p_stream->p_bih->biWidth = st->sh.video.width;
+                        p_stream->p_bih->biHeight = st->sh.video.height;
+                        p_stream->p_bih->biPlanes= 1 ;
+                        p_stream->p_bih->biSizeImage =
+                            (p_stream->p_bih->biBitCount >> 3) *
+                            p_stream->p_bih->biWidth *
+                            p_stream->p_bih->biHeight;
+
+                        msg_Dbg( p_input,
+                             "fps: %f, width:%i; height:%i, bitcount:%i",
+                            p_stream->i_rate, p_stream->p_bih->biWidth,
+                            p_stream->p_bih->biHeight,
+                            p_stream->p_bih->biBitCount);
+                    }
+                    /* Check for audio header (new format) */
+                    else if( !strncmp( st->streamtype, "audio", 5 ) )
+                    {
+                        char p_buffer[5];
+                        int i_extra_size = st->size - sizeof(stream_header);
+
+                        p_stream->i_cat = AUDIO_ES;
+
+                        /* We need to get rid of the header packet */
+                        ogg_stream_packetout( &p_stream->os, &oggpacket );
+
+                        memcpy( p_buffer, st->subtype, 4 );
+                        p_buffer[4] = '\0';
+                        p_stream->p_wf = (WAVEFORMATEX *)
+                            calloc( 1, sizeof(WAVEFORMATEX) + i_extra_size );
+
+                        p_stream->p_wf->wFormatTag = strtol(p_buffer,NULL,16);
+                        p_stream->p_wf->nChannels = st->sh.audio.channels;
+                        p_stream->i_rate = p_stream->p_wf->nSamplesPerSec =
+                            st->samples_per_unit;
+                        p_stream->i_bitrate = p_stream->p_wf->nAvgBytesPerSec =
+                            st->sh.audio.avgbytespersec;
+                        p_stream->i_bitrate *= 8;
+                        p_stream->p_wf->nBlockAlign = st->sh.audio.blockalign;
+                        p_stream->p_wf->wBitsPerSample = st->bits_per_sample;
+                        p_stream->p_wf->cbSize = i_extra_size;
+                        if( i_extra_size )
+                            memcpy( p_stream->p_wf + sizeof(WAVEFORMATEX),
+                                    &st[1] , i_extra_size );
+
+                        switch( p_stream->p_wf->wFormatTag )
+                        {
+                        case WAVE_FORMAT_PCM:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'a', 'r', 'a', 'w' );
+                            break;
+                        case WAVE_FORMAT_MPEG:
+                        case WAVE_FORMAT_MPEGLAYER3:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'm', 'p', 'g', 'a' );
+                            break;
+                        case WAVE_FORMAT_A52:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'a', '5', '2', ' ' );
+                            break;
+                        case WAVE_FORMAT_WMA1:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'w', 'm', 'a', '1' );
+                            break;
+                        case WAVE_FORMAT_WMA2:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'w', 'm', 'a', '2' );
+                            break;
+                        default:
+                            p_stream->i_fourcc = VLC_FOURCC( 'm', 's',
+                                ( p_stream->p_wf->wFormatTag >> 8 ) & 0xff,
+                                p_stream->p_wf->wFormatTag & 0xff );
+                        }
+
+                        msg_Dbg( p_input, "found audio header of type: %.4s",
+                                 (char *)&p_stream->i_fourcc );
+                        msg_Dbg( p_input, "audio:0x%4.4x channels:%d %dHz "
+                                 "%dbits/sample %dkb/s",
+                                 p_stream->p_wf->wFormatTag,
+                                 p_stream->p_wf->nChannels,
+                                 p_stream->p_wf->nSamplesPerSec,
+                                 p_stream->p_wf->wBitsPerSample,
+                                 p_stream->p_wf->nAvgBytesPerSec * 8 / 1024 );
+                    }
+                    else
+                    {
+                        msg_Dbg( p_input, "stream %d has a header marker "
+                            "but is of an unknown type", p_ogg->i_streams-1 );
+                        free( p_stream );
+                        p_ogg->i_streams--;
+                    }
+                }
                 else
                 {
-                    msg_Dbg( p_input, "found unknown codec" );
+                    msg_Dbg( p_input, "stream %d is of unknown type",
+                             p_ogg->i_streams-1 );
                     free( p_stream );
                     p_ogg->i_streams--;
                 }
@@ -538,6 +733,8 @@ static int Activate( vlc_object_t * p_this )
         p_stream->p_es->i_stream_id = i_stream;
         p_stream->p_es->i_fourcc = p_stream->i_fourcc;
         p_stream->p_es->i_cat = p_stream->i_cat;
+        p_stream->p_es->p_demux_data = p_stream->p_bih ?
+            (void *)p_stream->p_bih : (void *)p_stream->p_wf;
 #undef p_stream
     }
 
@@ -618,7 +815,14 @@ static void Deactivate( vlc_object_t *p_this )
             {
                 free( p_ogg->pp_stream[i]->p_packets_backup[j].packet );
             }
-            free( p_ogg->pp_stream[i]->p_packets_backup );
+            if( p_ogg->pp_stream[i]->p_packets_backup)
+                free( p_ogg->pp_stream[i]->p_packets_backup );
+#if 0 /* hmmm, it's already freed in input_DelES() */
+            if( p_ogg->pp_stream[i]->p_bih )
+                free( p_ogg->pp_stream[i]->p_bih );
+            if( p_ogg->pp_stream[i]->p_wf )
+                free( p_ogg->pp_stream[i]->p_wf );
+#endif
             free( p_ogg->pp_stream[i] );
         }
         if( p_ogg->pp_stream ) free( p_ogg->pp_stream );
