@@ -2,7 +2,7 @@
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cdda.c,v 1.8 2003/11/24 12:44:24 fenrir Exp $
+ * $Id: cdda.c,v 1.9 2003/11/29 16:29:24 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -250,7 +250,7 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer,
                      size_t i_len )
 {
     access_sys_t *p_sys = p_input->p_access_data;
-    int          i_blocks = i_len / CDDA_DATA_SIZE;;
+    int          i_blocks = i_len / CDDA_DATA_SIZE;
     int          i_read = 0;
     int          i_index;
 
