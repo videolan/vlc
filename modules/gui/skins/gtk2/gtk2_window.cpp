@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.20 2003/04/18 16:04:17 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.21 2003/04/19 11:16:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -102,17 +102,14 @@ GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
 
     SendMessage( ToolTipWindow, TTM_ADDTOOL, 0,
                     (LPARAM)(LPTOOLINFO) &ToolTipInfo );
-
-    // Drag & drop
+*/
     if( DragDrop )
     {
-        // Initialize the OLE library
-        OleInitialize( NULL );
-        DropTarget = (LPDROPTARGET) new GTK2DropObject();
         // register the listview as a drop target
-        RegisterDragDrop( hWnd, DropTarget );
+        GTK2DropObject *DropDrop = new GTK2DropObject( p_intf );
+        gdk_window_register_dnd( gwnd );
     }
-*/
+
     // Create Tool Tip window
 /*    GdkWindowAttr attr;
     attr.event_mask = GDK_ALL_EVENTS_MASK;
@@ -240,6 +237,10 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
                            (int)( (GdkEventButton *)p2 )->y, 1 );
             return true;
 
+        case GDK_DROP_START:
+            DropObject->HandleDropStart( ( (GdkEventDND *)p2 )->context );
+            return true;
+            
         default:
             return false;
     }

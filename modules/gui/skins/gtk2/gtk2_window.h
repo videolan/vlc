@@ -2,7 +2,7 @@
  * gtk2_window.h: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.h,v 1.5 2003/04/15 20:33:58 karibu Exp $
+ * $Id: gtk2_window.h,v 1.6 2003/04/19 11:16:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -46,12 +46,12 @@ class GTK2Window : public Window
         int WindowY;
         string Name;
 
+        // Drag&Drop
+        GTK2DropObject *DropObject;
+
         // Tooltip texts
         GdkWindow *ToolTipWindow;
 //        TOOLINFO ToolTipInfo;
-
-        // Drag & drop
-//        LPDROPTARGET DropTarget;
 
         // Left button down
         bool LButtonDown;

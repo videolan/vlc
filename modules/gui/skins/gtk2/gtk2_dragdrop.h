@@ -2,7 +2,7 @@
  * gtk2_dragdrop.h: GTK2 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_dragdrop.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_dragdrop.h,v 1.2 2003/04/19 11:16:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -27,36 +27,21 @@
 #define VLC_SKIN_GTK2_DRAGDROP
 
 //--- GTK2 -----------------------------------------------------------------
-//#include <shellapi.h>
-//#include <ole2.h>
+#include <gdk/gdk.h>
+
+#include <stdio.h>
 
 //---------------------------------------------------------------------------
-/*
-class GTK2DropObject : public IDropTarget
+class GTK2DropObject
 {
+
+    intf_thread_t *p_intf;
+
     public:
-       GTK2DropObject();
+       GTK2DropObject( intf_thread_t *_p_intf );
        virtual ~GTK2DropObject();
 
-    protected:
-        // IUnknown methods
-        STDMETHOD(QueryInterface)( REFIID riid, void FAR* FAR* ppvObj );
-        STDMETHOD_(ULONG, AddRef)();
-        STDMETHOD_(ULONG, Release)();
-
-        // IDropTarget methods
-        STDMETHOD(DragEnter)( LPDATAOBJECT pDataObj, DWORD grfKeyState,
-                              POINTL pt, DWORD *pdwEffect );
-        STDMETHOD(DragOver)( DWORD grfKeyState, POINTL pt, DWORD *pdwEffect );
-        STDMETHOD(DragLeave)();
-        STDMETHOD(Drop)( LPDATAOBJECT pDataObj, DWORD grfKeyState,
-                         POINTL pt, DWORD *pdwEffect );
-
-    private:
-        unsigned long References;
-
-        // Helper function
-        void HandleDrop( HDROP HDrop );
-};*/
+       void HandleDropStart( GdkDragContext *context );
+};
 //---------------------------------------------------------------------------
 #endif

@@ -2,7 +2,7 @@
  * gtk2_dragdrop.cpp: GTK2 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_dragdrop.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: gtk2_dragdrop.cpp,v 1.4 2003/04/19 11:16:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -25,27 +25,69 @@
 #if !defined WIN32
 
 //--- GTK2 -----------------------------------------------------------------
-//#include <windows.h>
+#include <gdk/gdk.h>
+
+//--- VLC -------------------------------------------------------------------
+#include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "../src/event.h"
+#include "../os_api.h"
 #include "gtk2_dragdrop.h"
 
 
-/*
 //---------------------------------------------------------------------------
-GTK2DropObject::GTK2DropObject() : IDropTarget()
+GTK2DropObject::GTK2DropObject( intf_thread_t *_p_intf )
 {
-    References = 1;
+    p_intf = _p_intf;
 }
 //---------------------------------------------------------------------------
 GTK2DropObject::~GTK2DropObject()
 {
 }
 //---------------------------------------------------------------------------
-void GTK2DropObject::HandleDrop( HDROP HDrop )
+void GTK2DropObject::HandleDropStart( GdkDragContext *context )
 {
-    // Get number of files that are dropped into vlc
+    GdkAtom atom = gdk_drag_get_selection( context );
+    
+    guchar *buffer;
+    GdkAtom prop_type;
+    gint prop_format;
+    
+    // Get the owner of the selection
+    GdkWindow *owner = gdk_selection_owner_get( atom ); 
+
+    // Find the possible targets for the selection
+    string target = "";
+    gdk_selection_convert( owner, atom, gdk_atom_intern("TARGETS", FALSE), 
+                           OSAPI_GetTime() );
+    int len = gdk_selection_property_get( owner, &buffer, &prop_type, 
+                                          &prop_format );
+    for( int i = 0; i < len / sizeof(GdkAtom); i++ )
+    {
+        GdkAtom atom = ( (GdkAtom*)buffer )[i];
+        string name = gdk_atom_name( atom );
+        if( name == "text/plain" || name == "STRING" )
+        {
+            target = name;
+            break;
+        }
+    }
+
+    if( target == "" )
+    {
+        msg_Warn( p_intf, "Drag&Drop: target not found\n" );
+    }
+    else
+    {
+        gdk_selection_convert( owner, atom, gdk_atom_intern(target.c_str(), 
+                               FALSE), OSAPI_GetTime() );
+        len = gdk_selection_property_get( owner, &buffer, &prop_type, 
+                                          &prop_format);
+        OSAPI_PostMessage( NULL, VLC_DROP, (unsigned int)buffer, 0 );
+    }
+
+/*    // Get number of files that are dropped into vlc
     int NbFiles = DragQueryFile( (HDROP)HDrop, 0xFFFFFFFF, NULL, 0 );
 
     // For each dropped files
@@ -62,107 +104,9 @@ void GTK2DropObject::HandleDrop( HDROP HDrop )
     }
 
     DragFinish( (HDROP)HDrop );
-
-}
-//---------------------------------------------------------------------------
-STDMETHODIMP GTK2DropObject::QueryInterface( REFIID iid, void FAR* FAR* ppv )
-{
-    // Tell other objects about our capabilities
-    if( iid == IID_IUnknown || iid == IID_IDropTarget )
-    {
-        *ppv = this;
-        AddRef();
-        return S_OK;
-    }
-    *ppv = NULL;
-    return ResultFromScode( E_NOINTERFACE );
-}
-//---------------------------------------------------------------------------
-STDMETHODIMP_(ULONG) GTK2DropObject::AddRef()
-{
-    return ++References;
-}
-//---------------------------------------------------------------------------
-STDMETHODIMP_(ULONG) GTK2DropObject::Release()
-{
-    if( --References == 0 )
-    {
-        delete this;
-        return 0;
-    }
-    return References;
-}
-//---------------------------------------------------------------------------
-STDMETHODIMP GTK2DropObject::DragEnter( LPDATAOBJECT pDataObj,
-    DWORD grfKeyState, POINTL pt, DWORD *pdwEffect )
-{
-    FORMATETC fmtetc;
-
-    fmtetc.cfFormat = CF_HDROP;
-    fmtetc.ptd      = NULL;
-    fmtetc.dwAspect = DVASPECT_CONTENT;
-    fmtetc.lindex   = -1;
-    fmtetc.tymed    = TYMED_HGLOBAL;
-
-    // Check that the drag source provides CF_HDROP,
-    // which is the only format we accept
-    if( pDataObj->QueryGetData( &fmtetc ) == S_OK )
-        *pdwEffect = DROPEFFECT_COPY;
-    else
-        *pdwEffect = DROPEFFECT_NONE;
-
-    return S_OK;
-}
-//---------------------------------------------------------------------------
-STDMETHODIMP GTK2DropObject::DragOver( DWORD grfKeyState, POINTL pt,
-   DWORD *pdwEffect )
-{
-    // For visual feedback
-    // TODO
-    return S_OK;
-}
-//---------------------------------------------------------------------------
-STDMETHODIMP GTK2DropObject::DragLeave()
-{
-    // Remove visual feedback
-    // TODO
-    return S_OK;
-}
-//---------------------------------------------------------------------------
-STDMETHODIMP GTK2DropObject::Drop( LPDATAOBJECT pDataObj, DWORD grfKeyState,
-   POINTL pt, DWORD *pdwEffect )
-{
-    // User has dropped on us -- get the CF_HDROP data from drag source
-    FORMATETC fmtetc;
-    fmtetc.cfFormat = CF_HDROP;
-    fmtetc.ptd      = NULL;
-    fmtetc.dwAspect = DVASPECT_CONTENT;
-    fmtetc.lindex   = -1;
-    fmtetc.tymed    = TYMED_HGLOBAL;
-
-    STGMEDIUM medium;
-    HRESULT hr = pDataObj->GetData( &fmtetc, &medium );
-
-    if( !FAILED(hr) )
-    {
-        // Grab a pointer to the data
-        HGLOBAL HFiles = medium.hGlobal;
-        HDROP HDrop = (HDROP)GlobalLock( HFiles );
-
-        // Notify the Form of the drop
-        HandleDrop( HDrop );
-
-        // Release the pointer to the memory
-        GlobalUnlock( HFiles );
-//        ReleaseStgMedium( &medium );
-    }
-    else
-    {
-        *pdwEffect = DROPEFFECT_NONE;
-        return hr;
-    }
-    return S_OK;
-}
+    
 */
+    gdk_drop_finish( context, TRUE,OSAPI_GetTime() );
+}
 
 #endif
