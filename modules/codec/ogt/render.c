@@ -4,7 +4,7 @@
  *            by DVD subtitles.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.28 2004/02/01 05:15:22 rocky Exp $
+ * $Id: render.c,v 1.29 2004/02/02 12:53:20 fenrir Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from: 
@@ -379,7 +379,7 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
   uint8_t *p_pixel_base;
 
   /* This is the where the subtitle pixels come from */
-  ogt_yuvt_t *p_source = (ogt_yuvt_t *) p_spu->p_sys->p_data;;
+  ogt_yuvt_t *p_source = (ogt_yuvt_t *) p_spu->p_sys->p_data;
 
   ogt_yuvt_t *p_source_end = (ogt_yuvt_t *)p_spu->p_sys->p_data + 
     (p_spu->i_width * p_spu->i_height);
