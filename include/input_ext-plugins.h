@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.37 2002/11/11 14:39:11 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.38 2002/11/12 13:57:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -155,15 +155,4 @@ struct input_socket_t
     /* Unbuffered file descriptor */
     int i_handle;
 };
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-VLC_EXPORT( void, __input_FDClose, ( vlc_object_t * ) );
-#define input_FDClose(a) __input_FDClose(VLC_OBJECT(a))
-VLC_EXPORT( void, __input_FDNetworkClose, ( vlc_object_t * ) );
-#define input_FDNetworkClose(a) __input_FDNetworkClose(VLC_OBJECT(a))
-VLC_EXPORT( ssize_t, input_FDRead, ( input_thread_t *, byte_t *, size_t ) );
-VLC_EXPORT( ssize_t, input_FDNetworkRead, ( input_thread_t *, byte_t *, size_t ) );
-VLC_EXPORT( void, input_FDSeek, ( input_thread_t *, off_t ) );
 

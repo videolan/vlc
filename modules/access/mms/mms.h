@@ -2,7 +2,7 @@
  * mms.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.h,v 1.1 2002/11/12 00:54:40 fenrir Exp $
+ * $Id: mms.h,v 1.2 2002/11/12 13:57:13 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -64,9 +64,6 @@ typedef struct mms_stream_s
     
 typedef struct access_s
 {
-    /* XXX must be the first field because of __input_FD* XXX */
-    input_socket_t      _socket;
-    
     int                 i_proto;        // MMS_PROTO_TCP, MMS_PROTO_UDP
     input_socket_t      socket_server;  // TCP socket for communication with server
     input_socket_t      socket_data;    // Optional UDP socket for data(media/header packet) 

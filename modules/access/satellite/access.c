@@ -326,13 +326,15 @@ void E_(Close) ( vlc_object_t *p_this )
     close( p_satellite->i_handle );
 }
 
-
 /*****************************************************************************
  * SatelliteRead: reads data from the satellite card
  *****************************************************************************/
 static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
-                size_t i_len )
+                              size_t i_len )
 {
+    input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
+    ssize_t i_ret;
+ 
     int i;
 
     /* if not set, set filters to the PMTs */
@@ -348,11 +350,19 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
         }
     }
 
-    return input_FDRead( p_input, p_buffer, i_len );
+    i_ret = read( p_access_data->i_handle, p_buffer, i_len );
+ 
+    if( i_ret < 0 )
+    {
+#   ifdef HAVE_ERRNO_H
+        msg_Err( p_input, "read failed (%s)", strerror(errno) );
+#   else
+        msg_Err( p_input, "read failed" );
+#   endif
+    }
+ 
+    return i_ret;
 }
-
-
-
 
 /*****************************************************************************
  * SatelliteSetArea : Does nothing
@@ -423,7 +433,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
 
     p_input->stream.p_selected_program = p_new_prg;
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -431,5 +441,6 @@ int SatelliteSetProgram( input_thread_t    * p_input,
  *****************************************************************************/
 static void SatelliteSeek( input_thread_t * p_input, off_t i_off )
 {
-    return;
+    ;
 }
+

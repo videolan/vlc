@@ -479,7 +479,7 @@ DATA_win32_rc = $(noinst_share_vlc_win32_rc_DATA)
 noinst_share_vlc_win32_rc_DATA = share/vlc_win32_rc.$(OBJEXT)
 noinst_share_vlc_win32_rcdir = $(libdir)
 share/vlc_win32_rc.$(OBJEXT): share/vlc_win32_rc.rc
-	$(WINDRES) -i $< -o $@
+	$(WINDRES) --include-dir share -i $< -o $@
 endif
 
 ###############################################################################
@@ -558,7 +558,7 @@ DATA_npvlc_rc = $(noinst_mozilla_npvlc_rc_DATA)
 noinst_mozilla_npvlc_rc_DATA = mozilla/npvlc_rc.$(OBJEXT)
 noinst_mozilla_npvlc_rcdir = $(libdir)
 mozilla/npvlc_rc.$(OBJEXT): mozilla/npvlc_rc.rc
-	$(WINDRES) -i $< -o $@
+	$(WINDRES) --include-dir mozilla -i $< -o $@
 endif
 endif
 

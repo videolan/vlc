@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.1 2002/11/12 00:54:40 fenrir Exp $
+ * $Id: mms.c,v 1.2 2002/11/12 13:57:12 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -75,6 +75,8 @@ static void Close       ( vlc_object_t * );
 
 static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
                           size_t i_len );
+static ssize_t NetRead  ( input_thread_t * p_input, input_socket_t * p_socket,
+                          byte_t * p_buffer, size_t i_len );
 static void Seek        ( input_thread_t *, off_t );
 static int  SetProgram  ( input_thread_t *, pgrm_descriptor_t * );  
 
@@ -102,16 +104,10 @@ static void mms_ParseURL( url_t *p_url, char *psz_url );
  * XXX DON'T FREE MY MEMORY !!! XXX
  * non mais :P
  */
-#define INPUT_FDNETWORKCLOSE( p_input ) \
-    { \
-        void *__p_access = p_input->p_access_data; \
-        input_socket_t *__p_socket = malloc( sizeof( input_socket_t ) ); \
-        memcpy( __p_socket, __p_access, sizeof( input_socket_t ) ); \
-        p_input->p_access_data = (void*)__p_socket; \
-        input_FDNetworkClose( p_input ); \
-        p_input->p_access_data = __p_access; \
-    }
-        
+
+/* 
+ * Ok, ok, j'le ferai plus...
+ */
 
 
 /*****************************************************************************
@@ -394,6 +390,59 @@ static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
     return( i_data );
 }
 
+/*****************************************************************************
+ * NetRead: read on a file descriptor, checking b_die periodically
+ *****************************************************************************/
+static ssize_t NetRead( input_thread_t * p_input, input_socket_t * p_socket,
+                        byte_t * p_buffer, size_t i_len )
+{
+#ifdef UNDER_CE
+    return -1;
+
+#else
+    struct timeval  timeout;
+    fd_set          fds;
+    int             i_ret;
+
+    /* Initialize file descriptor set */
+    FD_ZERO( &fds );
+    FD_SET( p_socket->i_handle, &fds );
+
+    /* We'll wait 0.5 second if nothing happens */
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 500000;
+
+    /* Find if some data is available */
+    i_ret = select( p_socket->i_handle + 1, &fds,
+                    NULL, NULL, &timeout );
+
+    if( i_ret == -1 && errno != EINTR )
+    {
+        msg_Err( p_input, "network select error (%s)", strerror(errno) );
+    }
+    else if( i_ret > 0 )
+    {
+        ssize_t i_recv = recv( p_socket->i_handle, p_buffer, i_len, 0 );
+
+        if( i_recv > 0 )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            p_input->stream.p_selected_area->i_tell += i_recv;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+
+        if( i_recv < 0 )
+        {
+            msg_Err( p_input, "recv failed (%s)", strerror(errno) );
+        }
+
+        return i_recv;
+    }
+
+    return 0;
+
+#endif
+}
 
 static void asf_HeaderParse( mms_stream_t stream[128],
                              uint8_t *p_header, int i_header )
@@ -534,12 +583,15 @@ static int MMSOpen( input_thread_t  *p_input,
         msg_Err( p_input,
                  "MMS/UDP not yet implemented" );
         // close socket
-        p_access->_socket = p_access->socket_server;
-        INPUT_FDNETWORKCLOSE( p_input );
+#if defined( UNDER_CE )
+        CloseHandle( (HANDLE)p_access->socket_server.i_handle );
+#elif defined( WIN32 )
+        closesocket( p_access->socket_server.i_handle );
+#else
+        close( p_access->socket_server.i_handle );
+#endif
         return( -1 );
     }
-    /* *** Default socket is the one for server communication *** */
-    p_access->_socket = p_access->socket_server;
 
     /* *** Init context for mms prototcol *** */
     GenerateGuid( &p_access->guid );    // used to identify client by server
@@ -916,13 +968,23 @@ static int MMSClose  ( input_thread_t  *p_input )
                      0x00000001,
                      NULL, 0 );
     /* *** close sockets *** */
-    p_access->_socket = p_access->socket_server;
-    INPUT_FDNETWORKCLOSE( p_input );
+#if defined( UNDER_CE )
+    CloseHandle( (HANDLE)p_access->socket_server.i_handle );
+#elif defined( WIN32 )
+    closesocket( p_access->socket_server.i_handle );
+#else
+    close( p_access->socket_server.i_handle );
+#endif
 
     if( p_access->i_proto == MMS_PROTO_UDP )
     {
-        p_access->_socket = p_access->socket_data;
-        INPUT_FDNETWORKCLOSE( p_input );
+#if defined( UNDER_CE )
+        CloseHandle( (HANDLE)p_access->socket_data.i_handle );
+#elif defined( WIN32 )
+        closesocket( p_access->socket_data.i_handle );
+#else
+        close( p_access->socket_data.i_handle );
+#endif
     }
     
     FREE( p_access->p_media );
@@ -995,11 +1057,13 @@ static int mms_ReadData( input_thread_t *p_input,
                          uint8_t  *p_data,
                          int i_data )
 {
+    access_t *p_access = (access_t*)p_input->p_access_data;
+
     int i_read;
 
     while( i_data > 0 )
     {
-        i_read = input_FDNetworkRead( p_input, p_data, i_data );
+        i_read = NetRead( p_input, &p_access->socket_server, p_data, i_data );
         if( i_read < 0 )
         {
             msg_Err( p_input, "failed to read data" );
@@ -1053,7 +1117,7 @@ static int mms_CommandSend( input_thread_t *p_input,
     }
 
     /* send it */
-    if( send( p_access->_socket.i_handle, 
+    if( send( p_access->socket_server.i_handle, 
               buffer.p_data, 
               buffer.i_data,
               0 ) == -1 )
@@ -1081,8 +1145,8 @@ static int  mms_ReceiveCommand( input_thread_t *p_input )
         // see for UDP mode
 
         /* *** Read complete command *** */
-        p_access->i_cmd = 
-            input_FDNetworkRead( p_input, p_access->p_cmd, BUF_SIZE );
+        p_access->i_cmd = NetRead( p_input, &p_access->socket_server,
+                                   p_access->p_cmd, BUF_SIZE );
         if( p_access->i_cmd < 12 )
         {
             msg_Warn( p_input, "failed to receive command" );
@@ -1188,7 +1252,8 @@ static int mms_ReceivePacket( input_thread_t *p_input )
     {
         for( ;; )
         {
-            if( ( i_read = input_FDNetworkRead( p_input, preheader, 8 ) ) < 8 )
+            i_read = NetRead( p_input, &p_access->socket_server, preheader, 8 );
+            if( i_read < 8 )
             {
                 msg_Warn( p_input, "cannot read preheader" );
                 return( -1 );

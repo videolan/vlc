@@ -122,6 +122,7 @@ case "x${target_os}" in
     esac
 
     if test "x$SYS" = "xmingw32"; then
+        # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"
         CPPFLAGS="${CPPFLAGS_save}"
         LDFLAGS_vlc="${LDFLAGS_vlc} -lws2_32 -lnetapi32 -mwindows"
@@ -129,6 +130,8 @@ case "x${target_os}" in
         LDFLAGS_ipv6="${LDFLAGS_ipv6} -lws2_32"
         LDFLAGS_access_http="${LDFLAGS_http} -lws2_32"
         LDFLAGS_access_mms="${LDFLAGS_mms} -lws2_32"
+        LDFLAGS_access_rtp="${LDFLAGS_rtp} -lws2_32"
+        LDFLAGS_access_udp="${LDFLAGS_udp} -lws2_32"
         LDFLAGS_rc="${LDFLAGS_rc} -lws2_32"
     fi
     ;;
@@ -238,6 +241,9 @@ AC_CHECK_FUNC(connect,,[
 AC_CHECK_FUNC(send,,[
   AC_CHECK_LIB(socket,send,
     LDFLAGS_http="${LDFLAGS_http} -lsocket"
+    LDFLAGS_mms="${LDFLAGS_mms} -lsocket"
+    LDFLAGS_rtp="${LDFLAGS_rtp} -lsocket"
+    LDFLAGS_udp="${LDFLAGS_udp} -lsocket"
 )])
 
 AC_CHECK_FUNC(gethostbyname,,[

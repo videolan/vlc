@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.8 2002/11/10 15:37:39 fenrir Exp $
+ * $Id: http.c,v 1.9 2002/11/12 13:57:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -60,6 +60,7 @@ static void Close      ( vlc_object_t * );
 
 static int  SetProgram ( input_thread_t *, pgrm_descriptor_t * );  
 static void Seek       ( input_thread_t *, off_t );
+static ssize_t Read    ( input_thread_t *, byte_t *, size_t );
 
 /*****************************************************************************
  * Module descriptor
@@ -98,15 +99,15 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     byte_t *            psz_parser;
     int                 i_returncode, i, i_size;
     char *              psz_return_alpha;
-
     char                *psz_protocol;
+
     /* Find an appropriate network module */
     p_access_data = (_input_socket_t *)p_input->p_access_data;
     p_input->p_private = (void*) &p_access_data->socket_desc;
     p_network = module_Need( p_input, "network", p_access_data->psz_network );
     if( p_network == NULL )
     {
-        return( -1 );
+        return VLC_ENOMOD;
     }
     module_Unneed( p_input, p_network );
 
@@ -137,8 +138,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
                strlen( psz_buffer ), 0 ) == (-1) )
     {
         msg_Err( p_input, "cannot send request (%s)", strerror(errno) );
-        input_FDNetworkClose( p_input );
-        return( -1 );
+        Close( VLC_OBJECT(p_input) );
+        return VLC_EGENERIC;
     }
 
     /* Prepare the input thread for reading. */ 
@@ -146,14 +147,14 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 
     /* FIXME: we shouldn't have to do that ! It's UGLY but mandatory because
      * input_FillBuffer assumes p_input->pf_read exists */
-    p_input->pf_read = input_FDNetworkRead;
+    p_input->pf_read = Read;
 
     while( !input_FillBuffer( p_input ) )
     {
         if( p_input->b_die || p_input->b_error )
         {
-            input_FDNetworkClose( p_input );
-            return( -1 );
+            Close( VLC_OBJECT(p_input) );
+            return VLC_EGENERIC;
         }
     }
 
@@ -164,11 +165,11 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     if( (i_size = input_Peek( p_input, &psz_parser, MAX_LINE )) <= 0 )
     {
         msg_Err( p_input, "not enough data" );
-        input_FDNetworkClose( p_input );
-        return( -1 );
+        Close( VLC_OBJECT(p_input) );
+        return VLC_EGENERIC;
     }
     if( ( ( i_size >= sizeof("HTTP/1.") + 1 ) &&
-	    !strncmp( psz_parser, "HTTP/1.", sizeof("HTTP/1.") - 1 ) ) )
+            !strncmp( psz_parser, "HTTP/1.", strlen("HTTP/1.") ) ) )
     {
         psz_protocol = "HTTP";
     }
@@ -185,7 +186,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     else
     {
         msg_Err( p_input, "invalid http reply" );
-        return -1;
+        return VLC_EGENERIC;
     }
     msg_Dbg( p_input, "detected %s server", psz_protocol );
 
@@ -213,7 +214,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     if ( (i == i_size - 1) && (psz_parser[i+1] != '\n') )
     {
         msg_Err( p_input, "stream not compliant with HTTP/1.x" );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     psz_return_alpha = malloc( i + 1 );
@@ -222,9 +223,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 
     if ( i_returncode >= 400 ) /* something is wrong */
     {
-        msg_Err( p_input, "%i %s", i_returncode,
-                 psz_return_alpha );
-        return -1;
+        msg_Err( p_input, "%i %s", i_returncode, psz_return_alpha );
+        return VLC_EGENERIC;
     }
     
     for( ; ; ) 
@@ -232,8 +232,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         if( input_Peek( p_input, &psz_parser, MAX_LINE ) <= 0 )
         {
             msg_Err( p_input, "not enough data" );
-            input_FDNetworkClose( p_input );
-            return( -1 );
+            Close( VLC_OBJECT(p_input) );
+            return VLC_EGENERIC;
         }
 
         if( psz_parser[0] == '\r' && psz_parser[1] == '\n' )
@@ -284,7 +284,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     p_input->stream.b_changed = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -479,7 +479,7 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_input, "opening server=%s port=%d path=%s",
                       psz_server_addr, i_server_port, psz_path );
 
-    p_input->pf_read = input_FDNetworkRead;
+    p_input->pf_read = Read;
     p_input->pf_set_program = SetProgram;
     p_input->pf_set_area = NULL;
     p_input->pf_seek = Seek;
@@ -495,17 +495,25 @@ static int Open( vlc_object_t *p_this )
  
     if( HTTPConnect( p_input, 0 ) )
     {
-        char * psz_pos = strstr(p_access_data->psz_buffer, "HTTP/1.1");
+        /* Request failed, try again with HTTP/1.0 */
+        char * psz_pos = strstr( p_access_data->psz_buffer, "HTTP/1.1" );
+
+        if( !psz_pos )
+        {
+            return VLC_EGENERIC;
+        }
+
         p_input->stream.b_seekable = 0;
         psz_pos[7] = '0';
         if( HTTPConnect( p_input, 0 ) )
         {
             free( p_input->p_access_data );
             free( psz_name );
-            return( -1 );
+            return VLC_EGENERIC;
         }
     }
-    return 0;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -514,11 +522,23 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     input_thread_t *  p_input = (input_thread_t *)p_this;
+    int i_handle = ((network_socket_t *)p_input->p_access_data)->i_handle;
     _input_socket_t * p_access_data = 
         (_input_socket_t *)p_input->p_access_data;
 
     free( p_access_data->psz_name );
-    input_FDNetworkClose( p_input );
+
+    msg_Info( p_input, "closing HTTP target `%s'", p_input->psz_source );
+
+#ifdef UNDER_CE
+    CloseHandle( (HANDLE)i_handle );
+#elif defined( WIN32 )
+    closesocket( i_handle );
+#else
+    close( i_handle );
+#endif
+
+    free( p_access_data );
 }
 
 /*****************************************************************************
@@ -536,8 +556,68 @@ static int SetProgram( input_thread_t * p_input,
 static void Seek( input_thread_t * p_input, off_t i_pos )
 {
     _input_socket_t *p_access_data = (_input_socket_t*)p_input->p_access_data;
+#ifdef UNDER_CE
+    CloseHandle( (HANDLE)p_access_data->_socket.i_handle );
+#elif defined( WIN32 )
+    closesocket( p_access_data->_socket.i_handle );
+#else
     close( p_access_data->_socket.i_handle );
+#endif
     msg_Dbg( p_input, "seeking to position "I64Fd, i_pos );
     HTTPConnect( p_input, i_pos );
+}
+
+/*****************************************************************************
+ * Read: read on a file descriptor, checking b_die periodically
+ *****************************************************************************/
+static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
+{
+#ifdef UNDER_CE
+    return -1;
+
+#else
+    input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
+    struct timeval  timeout;
+    fd_set          fds;
+    int             i_ret;
+
+    /* Initialize file descriptor set */
+    FD_ZERO( &fds );
+    FD_SET( p_access_data->i_handle, &fds );
+
+    /* We'll wait 0.5 second if nothing happens */
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 500000;
+
+    /* Find if some data is available */
+    i_ret = select( p_access_data->i_handle + 1, &fds,
+                    NULL, NULL, &timeout );
+
+    if( i_ret == -1 && errno != EINTR )
+    {
+        msg_Err( p_input, "network select error (%s)", strerror(errno) );
+    }
+    else if( i_ret > 0 )
+    {
+        ssize_t i_recv = recv( p_access_data->i_handle, p_buffer, i_len, 0 );
+
+        if( i_recv > 0 )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            p_input->stream.p_selected_area->i_tell += i_recv;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+
+        if( i_recv < 0 )
+        {
+            msg_Err( p_input, "recv failed (%s)", strerror(errno) );
+        }
+
+        return i_recv;
+    }
+
+    return 0;
+
+#endif
 }
 

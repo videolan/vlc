@@ -2,7 +2,7 @@
  * rtp.c: RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rtp.c,v 1.4 2002/10/03 21:45:16 massiot Exp $
+ * $Id: rtp.c,v 1.5 2002/11/12 13:57:12 sam Exp $
  *
  * Authors: Tristan Leteurtre <tooney@via.ecp.fr>
  *
@@ -40,6 +40,16 @@
 #   include <io.h>
 #endif
 
+#ifdef WIN32
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   ifndef IN_MULTICAST
+#       define IN_MULTICAST(a) IN_CLASSD(a)
+#   endif
+#else
+#   include <sys/socket.h>
+#endif
+
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h>
 #endif
@@ -52,7 +62,9 @@
  * Local prototypes
  *****************************************************************************/
 static int  Open       ( vlc_object_t * );
+static void Close      ( vlc_object_t * );
 static ssize_t RTPNetworkRead( input_thread_t *, byte_t *, size_t );
+static ssize_t Read    ( input_thread_t *, byte_t *, size_t );
 
 /*****************************************************************************
  * Module descriptor
@@ -64,7 +76,7 @@ vlc_module_begin();
     add_shortcut( "rtpstream" );
     add_shortcut( "rtp4" );
     add_shortcut( "rtp6" );
-    set_callbacks( Open, __input_FDNetworkClose );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
@@ -263,6 +275,27 @@ static int Open( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
+ * Close: free unused data structures
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    input_thread_t *  p_input = (input_thread_t *)p_this;
+    input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
+
+    msg_Info( p_input, "closing RTP target `%s'", p_input->psz_source );
+
+#ifdef UNDER_CE
+    CloseHandle( (HANDLE)p_access_data->i_handle );
+#elif defined( WIN32 )
+    closesocket( p_access_data->i_handle );
+#else
+    close( p_access_data->i_handle );
+#endif
+
+    free( p_access_data );
+}
+
+/*****************************************************************************
  * RTPNetworkRead : Read for the network, and parses the RTP header
  *****************************************************************************/
 static ssize_t RTPNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
@@ -276,8 +309,7 @@ static ssize_t RTPNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
 
     /* Get the raw data from the socket.
      * We first assume that RTP header size is the classic RTP_HEADER_LEN. */
-    ssize_t i_ret = input_FDNetworkRead( p_input, p_tmp_buffer,
-		                         p_input->i_mtu );
+    ssize_t i_ret = Read( p_input, p_tmp_buffer, p_input->i_mtu );
 
     if (!i_ret) return 0;
      
@@ -311,3 +343,58 @@ static ssize_t RTPNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
     
     return i_ret;
 }
+
+/*****************************************************************************
+ * Read: read on a file descriptor, checking b_die periodically
+ *****************************************************************************/
+static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
+{
+#ifdef UNDER_CE
+    return -1;
+
+#else
+    input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
+    struct timeval  timeout;
+    fd_set          fds;
+    int             i_ret;
+
+    /* Initialize file descriptor set */
+    FD_ZERO( &fds );
+    FD_SET( p_access_data->i_handle, &fds );
+
+    /* We'll wait 0.5 second if nothing happens */
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 500000;
+
+    /* Find if some data is available */
+    i_ret = select( p_access_data->i_handle + 1, &fds,
+                    NULL, NULL, &timeout );
+
+    if( i_ret == -1 && errno != EINTR )
+    {
+        msg_Err( p_input, "network select error (%s)", strerror(errno) );
+    }
+    else if( i_ret > 0 )
+    {
+        ssize_t i_recv = recv( p_access_data->i_handle, p_buffer, i_len, 0 );
+
+        if( i_recv > 0 )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            p_input->stream.p_selected_area->i_tell += i_recv;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+
+        if( i_recv < 0 )
+        {
+            msg_Err( p_input, "recv failed (%s)", strerror(errno) );
+        }
+
+        return i_recv;
+    }
+
+    return 0;
+
+#endif
+}
+

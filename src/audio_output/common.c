@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.6 2002/11/01 15:06:23 gbazin Exp $
+ * $Id: common.c,v 1.7 2002/11/12 13:57:13 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -320,8 +320,7 @@ mtime_t aout_FifoNextStart( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
  *****************************************************************************/
 mtime_t aout_FifoFirstDate( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
-    return p_fifo->p_first ?
-        aout_DateGet( &p_fifo->p_first->start_date ) : 0;
+    return p_fifo->p_first ?  p_fifo->p_first->start_date : 0;
 }
 
 /*****************************************************************************
