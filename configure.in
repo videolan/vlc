@@ -44,6 +44,44 @@ dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
 dnl
+dnl  Check the operating system
+dnl
+case x"${target_os}" in
+  x)
+    SYS=unknown
+    ;;
+  xlinux*)
+    SYS=linux
+    ;;
+  xbsdi*)
+    SYS=bsdi
+    ;;
+  xdarwin*)
+    SYS=darwin
+    ;;
+  x*mingw32*)
+    SYS=mingw32
+    AC_CHECK_TOOL(WINDRES, windres, :)
+    LIB_MPEG_TS="${LIB_MPEG_TS} -lws2_32"
+    LIB_RC="${LIB_RC} -lws2_32"
+    ;;
+  x*nto*)
+    SYS=nto
+    LIB_X11="${LIB_X11} -lsocket"
+    LIB_XVIDEO="${LIB_XVIDEO} -lsocket"
+    ;;
+  xbeos)
+    SYS=beos
+    LIB="${LIB} -lbe"
+    LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
+    PLDFLAGS="${PLDFLAGS} -nostart"
+    ;;
+  x*)
+    SYS=${target_os}
+    ;;
+esac
+
+dnl
 dnl  Endianness check, AC_C_BIGENDIAN doesn't work if we are cross-compiling
 dnl
 dnl  We give the user the opportunity to specify
@@ -452,6 +490,9 @@ if test x"$ac_cv_sse_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
 fi
 
+# don't try to grok altivec with native mingw32 it doesn't work right now
+# we should be able to remove this test with future versions of mingw32
+if test x$SYS != xmingw32; then
 AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
     [ac_cv_altivec_inline],
     [AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
@@ -507,44 +548,7 @@ if test x"$ac_cv_ld_altivec" != x"no"; then
   LIB_MOTIONALTIVEC="${LIB_MOTIONALTIVEC} -framework vecLib"
   LIB="${LIB} -framework vecLib"
 fi
-
-dnl
-dnl  Check the operating system
-dnl
-case x"${target_os}" in
-  x)
-    SYS=unknown
-    ;;
-  xlinux*)
-    SYS=linux
-    ;;
-  xbsdi*)
-    SYS=bsdi
-    ;;
-  xdarwin*)
-    SYS=darwin
-    ;;
-  x*mingw32*)
-    SYS=mingw32
-    AC_CHECK_TOOL(WINDRES, windres, :)
-    LIB_MPEG_TS="${LIB_MPEG_TS} -lws2_32"
-    LIB_RC="${LIB_RC} -lws2_32"
-    ;;
-  x*nto*)
-    SYS=nto
-    LIB_X11="${LIB_X11} -lsocket"
-    LIB_XVIDEO="${LIB_XVIDEO} -lsocket"
-    ;;
-  xbeos)
-    SYS=beos
-    LIB="${LIB} -lbe"
-    LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
-    PLDFLAGS="${PLDFLAGS} -nostart"
-    ;;
-  x*)
-    SYS=${target_os}
-    ;;
-esac
+fi # end if mingw32
 
 dnl
 dnl  DVD and VCD devices
@@ -1192,15 +1196,15 @@ then
         LIB_DIRECTX="${LIB_DIRECTX} -lgdi32" ])
     else
       AC_MSG_CHECKING(for directX headers in ${withval})
-      if test -f ${withval}/include/ddraw.h
+      if test -f ${withval}/ddraw.h
       then
         PLUGINS="${PLUGINS} directx"
         LIB_DIRECTX="${LIB_DIRECTX} -L${withval}/lib -lgdi32"
-        INCLUDE="${INCLUDE} -I${withval}/include"
+        INCLUDE="${INCLUDE} -I${withval}"
         AC_MSG_RESULT(yes)
       else
         AC_MSG_RESULT(no)
-        AC_MSG_ERROR([Cannot find ${withval}/include/directx.h!])
+        AC_MSG_ERROR([Cannot find ${withval}/ddraw.h!])
       fi
     fi
   fi
