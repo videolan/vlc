@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: open.cpp,v 1.68 2004/02/08 18:17:22 gbazin Exp $
+ * $Id: open.cpp,v 1.69 2004/02/14 12:36:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1038,23 +1038,28 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
       /* Fall through... */
 
     case 1: /* DVD of some sort */
-      {
         psz_device = config_GetPsz( p_intf, "dvd" );
         if( !b_disc_device_changed )
         {
-            disc_device->SetValue( psz_device ? wxL2U(psz_device) : wxT("") );
+            if( psz_device )
+                disc_device->SetValue( wxL2U(psz_device) );
+            else
+                disc_device->SetValue( wxT("") );
+
             disc_title_label->SetLabel ( wxU(_("Title")) );
         }
         disc_title->SetRange( i_selection, 255 );
         disc_title->SetValue( i_selection );
         break;
-      }
 
     case 2:  /* VCD of some sort */
         psz_device = config_GetPsz( p_intf, "vcd" );
         if( !b_disc_device_changed )
         {
-            disc_device->SetValue( psz_device ? wxL2U(psz_device) : wxT("") );
+            if( psz_device )
+                disc_device->SetValue( wxL2U(psz_device) );
+            else
+                disc_device->SetValue( wxT("") );
         }
 
         /* There are at most 98, tracks in a VCD, 999 Segments, 500 entries
@@ -1063,7 +1068,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
 
            FIXME: it would be better however to get the information for
            this particular Media possibly from the General Info area.
-        */
+         */
 #ifdef HAVE_VCDX
         disc_title_label->SetLabel ( config_GetInt( p_intf, "vcdx-PBC"  )
                                      ? wxT("Playback LID") : wxT("Entry") );
@@ -1080,7 +1085,10 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         psz_device = config_GetPsz( p_intf, "cd-audio" );
         if( !b_disc_device_changed )
         {
-            disc_device->SetValue( psz_device ? wxL2U(psz_device) : wxT("") );
+            if( psz_device )
+                disc_device->SetValue( wxL2U(psz_device) );
+            else
+                disc_device->SetValue( wxT("") );
         }
         disc_title_label->SetLabel ( wxU(_("Track")) );
 #ifdef HAVE_CDDAX
@@ -1092,7 +1100,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         break;
     default:
         msg_Err( p_intf, "invalid Disc type selection (%d)",
-               disc_type->GetSelection() );
+                 disc_type->GetSelection() );
         break;
     }
 
