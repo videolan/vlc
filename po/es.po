@@ -7,14 +7,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-08-11 21:05+0200\n"
+"POT-Creation-Date: 2003-09-18 19:23+0200\n"
 "PO-Revision-Date: 2003-09-10 13:32+0100\n"
 "Last-Translator: Vicente Jimenez Aguilar <vice@v1ce.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
+"Report-Msgid-Bugs-To: \n"
 
 #: include/vlc_interface.h:105
 msgid ""
@@ -23,8 +23,21 @@ msgid ""
 "the directory where you installed VLC and run \"vlc -I wxwin\"\n"
 msgstr ""
 "\n"
-"Atención: si ha perdido el acceso al entorno gráfico, abra una consola de comandos, "
-"acceda al directorio donde se instaló VLC, y ejecute \"vlc -I wxwin\"\n"
+"Atención: si ha perdido el acceso al entorno gráfico, abra una consola de "
+"comandos, acceda al directorio donde se instaló VLC, y ejecute \"vlc -I wxwin"
+"\"\n"
+
+#: include/vlc_interface.h:133
+msgid ""
+"VLC is an open-source and cross-platform multimedia player for various audio "
+"and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, ...) as well as "
+"DVDs, VCDs, CD audio, and various streaming protocols.\n"
+"\n"
+"VLC is also a streaming server with transcoding capabilities (UDP unicast "
+"and multicast, HTTP, ...) mainly designed for high-bandwidth networks.\n"
+"\n"
+"For more information, have a look at the web site."
+msgstr ""
 
 #: src/audio_output/output.c:104 src/audio_output/output.c:131
 #: modules/gui/macosx/intf.m:384 modules/gui/macosx/intf.m:385
@@ -33,7 +46,7 @@ msgid "Audio channels"
 msgstr "Canales de audio"
 
 #: src/audio_output/output.c:107 src/audio_output/output.c:142
-#: modules/audio_output/alsa.c:179 modules/audio_output/directx.c:423
+#: modules/audio_output/alsa.c:177 modules/audio_output/directx.c:447
 #: modules/audio_output/oss.c:202 modules/audio_output/sdl.c:181
 #: modules/audio_output/sdl.c:198 modules/audio_output/waveout.c:386
 msgid "Stereo"
@@ -110,11 +123,11 @@ msgstr "%s: la opción `-W %s' es ambigua\n"
 msgid "%s: option `-W %s' doesn't allow an argument\n"
 msgstr "%s: la opción `-W %s' no admite argumentos\n"
 
-#: src/input/input.c:174
+#: src/input/input.c:237
 msgid "General"
 msgstr ""
 
-#: src/input/input.c:175
+#: src/input/input.c:238
 msgid "Playlist Item"
 msgstr "Lista de reproducción"
 
@@ -124,22 +137,24 @@ msgstr "Lista de reproducción"
 msgid "Program"
 msgstr "Programa"
 
-#: src/input/input_programs.c:98 modules/demux/asf/libasf.c:696
-#: modules/demux/mkv.cpp:2394 modules/gui/beos/MediaControlView.cpp:1258
+#: src/input/input_programs.c:98 modules/access/dvdplay/access.c:207
+#: modules/demux/asf/asf.c:371 modules/demux/mkv.cpp:2327
+#: modules/gui/beos/MediaControlView.cpp:1256
 #: modules/gui/gtk/gnome_interface.c:1650 modules/gui/gtk/gtk_interface.c:1956
-#: modules/gui/gtk/menu.c:1402 modules/gui/gtk/menu.c:1423
+#: modules/gui/gtk/menu.c:1403 modules/gui/gtk/menu.c:1424
 #: modules/gui/kde/interface.cpp:144 modules/gui/macosx/intf.m:373
 #: modules/gui/macosx/intf.m:374 modules/gui/macosx/open.m:150
-#: modules/gui/wxwindows/open.cpp:406
+#: modules/gui/wxwindows/open.cpp:436
 msgid "Title"
 msgstr "Título"
 
-#: src/input/input_programs.c:102 modules/gui/beos/MediaControlView.cpp:1259
+#: src/input/input_programs.c:102 modules/access/dvdplay/access.c:209
+#: modules/gui/beos/MediaControlView.cpp:1257
 #: modules/gui/gtk/gnome_interface.c:1640 modules/gui/gtk/gtk_interface.c:1946
 #: modules/gui/gtk/menu.c:1020 modules/gui/gtk/menu.c:1433
 #: modules/gui/kde/interface.cpp:146 modules/gui/macosx/intf.m:375
 #: modules/gui/macosx/intf.m:376 modules/gui/macosx/open.m:151
-#: modules/gui/wxwindows/open.cpp:412
+#: modules/gui/wxwindows/open.cpp:442
 msgid "Chapter"
 msgstr "Capítulo"
 
@@ -188,7 +203,7 @@ msgstr "Capítulo siguiente"
 msgid "Previous Chapter"
 msgstr "Capítulo anterior"
 
-#: src/input/input_programs.c:673 src/video_output/video_output.c:421
+#: src/input/input_programs.c:673 src/video_output/video_output.c:425
 msgid "Disable"
 msgstr "Desactivar"
 
@@ -200,9 +215,9 @@ msgstr "Pista %i"
 #: src/libvlc.c:262 src/libvlc.c:349
 msgid "C"
 msgstr "Es"
-# ¿Esto que es?
 
-#: src/libvlc.c:305 src/libvlc.c:1368
+# ¿Esto que es?
+#: src/libvlc.c:305 src/libvlc.c:1381
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
@@ -211,27 +226,27 @@ msgstr ""
 "Uso: %s [opciones] [ficheros]...\n"
 "\n"
 
-#: src/libvlc.c:1200 src/misc/configuration.c:1040
+#: src/libvlc.c:1213 src/misc/configuration.c:1062
 msgid "string"
 msgstr "cadena"
 
-#: src/libvlc.c:1217 src/misc/configuration.c:1021
+#: src/libvlc.c:1230 src/misc/configuration.c:1034
 msgid "integer"
 msgstr "entero"
 
-#: src/libvlc.c:1220 src/misc/configuration.c:1030
+#: src/libvlc.c:1233 src/misc/configuration.c:1052
 msgid "float"
 msgstr "coma flotante"
 
-#: src/libvlc.c:1226
+#: src/libvlc.c:1239
 msgid " (default enabled)"
 msgstr " (activado por defecto)"
 
-#: src/libvlc.c:1227
+#: src/libvlc.c:1240
 msgid " (default disabled)"
 msgstr " (desactivado por defecto)"
 
-#: src/libvlc.c:1343 src/libvlc.c:1398 src/libvlc.c:1422
+#: src/libvlc.c:1356 src/libvlc.c:1411 src/libvlc.c:1435
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -239,28 +254,29 @@ msgstr ""
 "\n"
 "Presione la tecla ENTER para continuar...\n"
 
-#: src/libvlc.c:1371
+#: src/libvlc.c:1384
 msgid "[module]              [description]\n"
 msgstr "[módulo]              [descripción]\n"
 
-#: src/libvlc.c:1416
+#: src/libvlc.c:1429
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team at Ecole Centrale, Paris.\n"
 msgstr ""
-"Este programa se suministra SIN NINGUNA GARANTÍA, hasta lo permitido por ley.\n"
+"Este programa se suministra SIN NINGUNA GARANTÍA, hasta lo permitido por "
+"ley.\n"
 "Usted puede redistribuirlo bajo los términos de la GNU General Public "
 "License;\n"
 "ver el fichero COPYING para mas detalles.\n"
 "Escrito por el equipo VideoLAN en la Ecole Centrale, París.\n"
 
-#: src/libvlc.h:42
+#: src/libvlc.h:38
 msgid "Interface module"
 msgstr "Módulo de interfaz"
 
-#: src/libvlc.h:44
+#: src/libvlc.h:40
 msgid ""
 "This option allows you to select the interface used by VLC. The default "
 "behavior is to automatically select the best module available."
@@ -268,72 +284,72 @@ msgstr ""
 "Esta opción permite escoger la interfaz utilizada por VLC. El comportamiento "
 "por defecto es escoger automaticamente el mejor módulo disponible."
 
-#: src/libvlc.h:48
+#: src/libvlc.h:44 modules/control/ntservice.c:48
 msgid "Extra interface modules"
 msgstr "Módulos de interfaz adicionales"
 
-#: src/libvlc.h:50
+#: src/libvlc.h:46
 msgid ""
 "This option allows you to select additional interfaces used by VLC. They "
 "will be launched in the background in addition to the default interface. Use "
 "a comma separated list of interface modules. (common values are: logger,"
 "gestures,sap,rc,http,screensaver)"
 msgstr ""
-"Esta opción permite escoger las interfaces adicionales a utilizar. "
-"Serán lanzadas en segundo plano junto al interfaz por defecto. "
-"Use una lista de módulos separados por comas. (valores habituales: "
-"logger,gestures,sap,rc,http,screensaver)"
+"Esta opción permite escoger las interfaces adicionales a utilizar. Serán "
+"lanzadas en segundo plano junto al interfaz por defecto. Use una lista de "
+"módulos separados por comas. (valores habituales: logger,gestures,sap,rc,"
+"http,screensaver)"
 
-#: src/libvlc.h:55
+#: src/libvlc.h:51
 msgid "Verbosity (0,1,2)"
 msgstr "Nivel de detalle de mensajes (0,1,2)"
 
-#: src/libvlc.h:57
+#: src/libvlc.h:53
 msgid ""
 "This options sets the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
 msgstr ""
-"Esta opción define la importancia de los mensajes mostrados "
-"(0=solo errores y mensajes estándares, 1=avisos, 2=depuración)."
+"Esta opción define la importancia de los mensajes mostrados (0=solo errores "
+"y mensajes estándares, 1=avisos, 2=depuración)."
 
-#: src/libvlc.h:60
+#: src/libvlc.h:56
 msgid "Be quiet"
 msgstr "Menos mensajes"
 
-#: src/libvlc.h:62
+#: src/libvlc.h:58
 msgid "This options turns off all warning and information messages."
-msgstr ""
-"Esta opción desactiva todos los mensajes de aviso y de información"
+msgstr "Esta opción desactiva todos los mensajes de aviso y de información"
 
-#: src/libvlc.h:64 modules/gui/beos/InterfaceWindow.cpp:255
+#: src/libvlc.h:60 modules/gui/beos/InterfaceWindow.cpp:255
 msgid "Language"
 msgstr "Idioma"
 
-#: src/libvlc.h:65
+#: src/libvlc.h:61
 msgid ""
 "This option allows you to set the language of the interface. The system "
 "language is auto-detected if \"auto\" is specified here."
 msgstr ""
-"Esta opción permite elegir el idioma de la interfaz. Si se especifica \"auto\", "
-"el idioma del sistema será detectado automaticamente."
+"Esta opción permite elegir el idioma de la interfaz. Si se especifica \"auto"
+"\", el idioma del sistema será detectado automaticamente."
 
-#: src/libvlc.h:69
+#: src/libvlc.h:65
 msgid "Color messages"
 msgstr "Mensajes en color"
 
-#: src/libvlc.h:71
+#: src/libvlc.h:67
 msgid ""
 "When this option is turned on, the messages sent to the console will be "
 "colorized. Your terminal needs Linux color support for this to work."
 msgstr ""
-"Cuando esta opción se activa, los mensajes enviados a la consola son en color. "
-"Debe disponer de un terminal que reconozca los colores Linux para que funcione."
+"Cuando esta opción se activa, los mensajes enviados a la consola son en "
+"color. Debe disponer de un terminal que reconozca los colores Linux para que "
+"funcione."
 
-#: src/libvlc.h:74
+#: src/libvlc.h:70
 msgid "Show advanced options"
 msgstr "Mostrar opciones avanzadas"
 
-#: src/libvlc.h:76
+#: src/libvlc.h:72
 msgid ""
 "When this option is turned on, the preferences and/or interfaces  will show "
 "all the available options, including those that most users should never touch"
@@ -342,11 +358,11 @@ msgstr ""
 "todas las opciones disponibles, incluso aquellas que la mayoría de usuarios "
 "no tocan nunca."
 
-#: src/libvlc.h:80
+#: src/libvlc.h:76
 msgid "Interface default search path"
 msgstr "Directorio de búsqueda por defecto de la interfaz"
 
-#: src/libvlc.h:82
+#: src/libvlc.h:78
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
@@ -354,11 +370,11 @@ msgstr ""
 "Esta opción permite elegir el directorio por defecto donde la interfaz busca "
 "para abrir un fichero."
 
-#: src/libvlc.h:85
+#: src/libvlc.h:81
 msgid "Plugin search path"
 msgstr "Directorio de búsqueda de módulos integrados"
 
-#: src/libvlc.h:87
+#: src/libvlc.h:83
 msgid ""
 "This option allows you to specify an additional path for VLC to look for its "
 "plugins."
@@ -366,11 +382,11 @@ msgstr ""
 "Esta opción permite especificar un directorio adicional donde VLC busca sus "
 "módulos integrados."
 
-#: src/libvlc.h:90
+#: src/libvlc.h:86
 msgid "Audio output module"
 msgstr "Módulo de salida de audio"
 
-#: src/libvlc.h:92
+#: src/libvlc.h:88
 msgid ""
 "This option allows you to select the audio output method used by VLC. The "
 "default behavior is to automatically select the best method available."
@@ -379,51 +395,52 @@ msgstr ""
 "El comportamiento por defecto es de escoger automaticamente el mejor módulo "
 "disponible."
 
-#: src/libvlc.h:96
+#: src/libvlc.h:92
 msgid "Enable audio"
 msgstr "Activar audio"
 
-#: src/libvlc.h:98
+#: src/libvlc.h:94
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "will not take place, and it will save some processing power."
 msgstr ""
-"Esta opción permite desactivar completamente la salida de audio. En este caso "
-"la decodificación del audio no se efectuaría, y ahorraría algún tiempo de proceso."
+"Esta opción permite desactivar completamente la salida de audio. En este "
+"caso la decodificación del audio no se efectuaría, y ahorraría algún tiempo "
+"de proceso."
 
-#: src/libvlc.h:101
+#: src/libvlc.h:97
 msgid "Force mono audio"
 msgstr "Forzar salida de audio monofónica"
 
-#: src/libvlc.h:102
+#: src/libvlc.h:98
 msgid "This will force a mono audio output"
 msgstr "Esta opción fuerza una salida de audio en mono"
 
-#: src/libvlc.h:104
+#: src/libvlc.h:100
 msgid "Audio output volume"
 msgstr "Volumen de la salida de audio"
 
-#: src/libvlc.h:106
+#: src/libvlc.h:102
 msgid ""
 "You can set the default audio output volume here, in a range from 0 to 1024."
 msgstr ""
 "Se puede establecer un volumen por defecto para la salida de audio, en un "
 "rango entre 0 y 1024."
 
-#: src/libvlc.h:109
+#: src/libvlc.h:105
 msgid "Audio output saved volume"
 msgstr "Volumen grabado de la salida de audio"
 
-#: src/libvlc.h:111
+#: src/libvlc.h:107
 msgid "This saves the audio output volume when you select mute."
 msgstr ""
 "El volumen actual es salvado en esta variable cuando se selecciona \"mute\"."
 
-#: src/libvlc.h:113
+#: src/libvlc.h:109
 msgid "Audio output frequency (Hz)"
 msgstr "Frecuencia de la salida de audio (Hz)"
 
-#: src/libvlc.h:115
+#: src/libvlc.h:111
 msgid ""
 "You can force the audio output frequency here. Common values are -1 "
 "(default), 48000, 44100, 32000, 22050, 16000, 11025, 8000."
@@ -431,11 +448,11 @@ msgstr ""
 "Se puede forzar la frecuencia de la salida de audio. Los valores habituales "
 "son -1 (predefinido), 48000, 44100, 32000, 22050, 16000, 11025, 8000."
 
-#: src/libvlc.h:119
+#: src/libvlc.h:115
 msgid "High quality audio resampling"
 msgstr "Conversión de muestreo de alta calidad"
 
-#: src/libvlc.h:121
+#: src/libvlc.h:117
 msgid ""
 "High quality audio resampling can be processor intensive so you can disable "
 "it and a cheaper resampling algorithm will be used instead."
@@ -444,11 +461,11 @@ msgstr ""
 "procesador, por lo que es posible desactivar esta opción y así emplear un "
 "algoritmo más liviano."
 
-#: src/libvlc.h:125
+#: src/libvlc.h:121
 msgid "Compensate desynchronization of audio (in ms)"
 msgstr "Compensar la desincronización del audio (en ms)"
 
-#: src/libvlc.h:127
+#: src/libvlc.h:123
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
 "notice a lag between the video and the audio."
@@ -456,38 +473,48 @@ msgstr ""
 "Esta opción permite retrasar la salida de audio. Esto puede ser útil si "
 "notamos un retraso entre el sonido y la imagen."
 
-#: src/libvlc.h:130
+#: src/libvlc.h:126
 #, fuzzy
 msgid "Choose prefered audio output channels mode"
 msgstr "Modo de canales de audio de salida preferido"
 
-#: src/libvlc.h:132
+#: src/libvlc.h:128
 msgid ""
 "This option allows you to set the audio output channels mode that will be "
 "used by default when possible (ie. if your hardware supports it as well as "
 "the audio stream being played)"
 msgstr ""
-"Esta opción permite establecer el modo de canales de audio de salida usado "
-"a priori siempre que sea posible (por ejemplo, si lo permite el hardware asi "
+"Esta opción permite establecer el modo de canales de audio de salida usado a "
+"priori siempre que sea posible (por ejemplo, si lo permite el hardware asi "
 "como el stream de audio reproducido)."
 
-#: src/libvlc.h:136
+#: src/libvlc.h:132
 msgid "Use the S/PDIF audio output when available"
 msgstr "Usar la salida de audio S/P-DIF cuando esté disponible"
 
-#: src/libvlc.h:138
+#: src/libvlc.h:134
 msgid ""
 "This option allows you to use the S/PDIF audio output by default when your "
 "hardware supports it as well as the audio stream being played."
 msgstr ""
-"Esta opción permite usar a priori la salida digital S/P-DIF cuando esta "
-"esté disponible y sea compatible con el flujo de audio reproducido."
+"Esta opción permite usar a priori la salida digital S/P-DIF cuando esta esté "
+"disponible y sea compatible con el flujo de audio reproducido."
 
-#: src/libvlc.h:141
+#: src/libvlc.h:137
+#, fuzzy
+msgid "Audio filters"
+msgstr "Audio"
+
+#: src/libvlc.h:139
+msgid ""
+"This allows you to add audio postprocessing filters, to modifythe sound."
+msgstr ""
+
+#: src/libvlc.h:142
 msgid "Headphone virtual spatialization effect"
 msgstr "Efecto de espacialización virtual para auriculares"
 
-#: src/libvlc.h:143
+#: src/libvlc.h:144
 msgid ""
 "This effect gives you the feeling that you are standing in a room with a "
 "complete 5.1 speaker set when using only a headphone, providing a more "
@@ -495,17 +522,17 @@ msgid ""
 "tiring when listening to music for long periods of time.\n"
 "It works with any source format from mono to 5.1."
 msgstr ""
-"Este efecto da la impresión de estar en una sala con un conjunto completo "
-"de altavoces 5.1 utilizando unos simples auriculares, y recreando así un "
-"ambiente sonoro mas realista. Escuchar música durante mucho tiempo, "
-"debería de resultar más confortable y menos cansado.\n"
-"Funciona con cualquier formato de audio, desde mono hasta un fuente 5.1." 
+"Este efecto da la impresión de estar en una sala con un conjunto completo de "
+"altavoces 5.1 utilizando unos simples auriculares, y recreando así un "
+"ambiente sonoro mas realista. Escuchar música durante mucho tiempo, debería "
+"de resultar más confortable y menos cansado.\n"
+"Funciona con cualquier formato de audio, desde mono hasta un fuente 5.1."
 
-#: src/libvlc.h:150
+#: src/libvlc.h:152
 msgid "Video output module"
 msgstr "Módulo de salida de vídeo"
 
-#: src/libvlc.h:152
+#: src/libvlc.h:154
 msgid ""
 "This option allows you to select the video output method used by VLC. The "
 "default behavior is to automatically select the best method available."
@@ -513,23 +540,25 @@ msgstr ""
 "Esta opción permite escoger el módulo de salida de vídeo utilizado por VLC. "
 "Por defecto, escoge automáticamente el mejor módulo disponible."
 
-#: src/libvlc.h:156
+#: src/libvlc.h:158
 msgid "Enable video"
 msgstr "Activar vídeo"
 
-#: src/libvlc.h:158
+#: src/libvlc.h:160
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage will not take place, which will save some processing power."
 msgstr ""
-"Esta opción permite desactivar completamente la salida de vídeo. En este caso "
-"la decodificación del vídeo no se efectuaría, y ahorraría algún tiempo de proceso."
+"Esta opción permite desactivar completamente la salida de vídeo. En este "
+"caso la decodificación del vídeo no se efectuaría, y ahorraría algún tiempo "
+"de proceso."
 
-#: src/libvlc.h:161
+#: src/libvlc.h:163 modules/visualization/visual/visual.c:48
+#: modules/visualization/visual/visual.c:52
 msgid "Video width"
 msgstr "Ancho de la imagen"
 
-#: src/libvlc.h:163
+#: src/libvlc.h:165
 msgid ""
 "You can enforce the video width here. By default (-1) VLC will adapt to the "
 "video characteristics."
@@ -537,54 +566,66 @@ msgstr ""
 "Aqui se puede forzar el ancho de la imagen. Por defecto VLC (-1) se adaptará "
 "a las características del vídeo."
 
-#: src/libvlc.h:166
+#: src/libvlc.h:168
 msgid "Video height"
 msgstr "Altura de la imagen"
 
-#: src/libvlc.h:168
+#: src/libvlc.h:170
 msgid ""
 "You can enforce the video height here. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"Aqui se puede forzar la altura de la imagen. Por defecto VLC (-1) se adaptará "
-"a las características del vídeo."
+"Aqui se puede forzar la altura de la imagen. Por defecto VLC (-1) se "
+"adaptará a las características del vídeo."
 
-#: src/libvlc.h:171
+#: src/libvlc.h:173
+#, fuzzy
+msgid "Video alignment"
+msgstr "Altura de la imagen"
+
+#: src/libvlc.h:175
+msgid ""
+"You can enforce the video alignement in its window. By default (0) it will "
+"be centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use "
+"combinations of these values)."
+msgstr ""
+
+#: src/libvlc.h:179
 msgid "Zoom video"
 msgstr "Zoom de la imagen"
 
-#: src/libvlc.h:173
+#: src/libvlc.h:181
 msgid "You can zoom the video by the specified factor."
 msgstr "Se puede aumentar la imagen el factor especificado."
 
-#: src/libvlc.h:175
+#: src/libvlc.h:183
 msgid "Grayscale video output"
 msgstr "Salida de vídeo en niveles de gris"
 
-#: src/libvlc.h:177
+#: src/libvlc.h:185
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
 msgstr ""
-"Cuando se activa, VLC no decodifica la información de color contenida en "
-"el vídeo (esto permite ahorrar algo de potencia de procesador)." 
+"Cuando se activa, VLC no decodifica la información de color contenida en el "
+"vídeo (esto permite ahorrar algo de potencia de procesador)."
 
-#: src/libvlc.h:180
+#: src/libvlc.h:188
 msgid "Fullscreen video output"
 msgstr "Salida de vídeo a pantalla completa"
 
-#: src/libvlc.h:182
+#: src/libvlc.h:190
 msgid ""
 "If this option is enabled, VLC will always start a video in fullscreen mode."
 msgstr ""
-"Si esta opción se activa, VLC empezará siempre la reproducción del vídeo "
-"en modo pantalla completa."
+"Si esta opción se activa, VLC empezará siempre la reproducción del vídeo en "
+"modo pantalla completa."
 
-#: src/libvlc.h:185
+#: src/libvlc.h:193
 msgid "Overlay video output"
 msgstr "Salida de vídeo superpuesto"
 
-#: src/libvlc.h:187
+#: src/libvlc.h:195
 msgid ""
 "If enabled, VLC will try to take advantage of the overlay capabilities of "
 "your graphics card."
@@ -592,11 +633,11 @@ msgstr ""
 "Si se activa, VLC intentará emplear las capacidades de superposición de la "
 "tarjeta gráfica."
 
-#: src/libvlc.h:190
+#: src/libvlc.h:198
 msgid "Force SPU position"
 msgstr "Forzar posición de subtítulos"
 
-#: src/libvlc.h:192
+#: src/libvlc.h:200
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
@@ -604,24 +645,24 @@ msgstr ""
 "Puede usar esta opción para situar los subtítulos bajo la película, en vez "
 "de sobre ella. Pruebe diferentes posiciones."
 
-#: src/libvlc.h:195
+#: src/libvlc.h:203
 msgid "Video filter module"
 msgstr "Módulo de filtro de vídeo"
 
-#: src/libvlc.h:197
+#: src/libvlc.h:205
 msgid ""
 "This will allow you to add a post-processing filter to enhance the picture "
 "quality, for instance deinterlacing, or to clone or distort the video window."
 msgstr ""
-"Esta opción permite añadir filtros de post producción para mejorar la calidad "
-"de la imagen obtenida, por ejemplo desentrelazar, duplicadar o deformar la "
-"ventana de vídeo." 
+"Esta opción permite añadir filtros de post producción para mejorar la "
+"calidad de la imagen obtenida, por ejemplo desentrelazar, duplicadar o "
+"deformar la ventana de vídeo."
 
-#: src/libvlc.h:201
+#: src/libvlc.h:209
 msgid "Source aspect ratio"
 msgstr "Formato de pantalla de la fuente"
 
-#: src/libvlc.h:203
+#: src/libvlc.h:211
 msgid ""
 "This will force the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
@@ -629,17 +670,17 @@ msgid ""
 "y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
-"Esta opción fuerza el formato de la pantalla de la fuente. POr ejemplo, algún "
-"DVD pretenden ser 16:9 cuando en realidad son 4:3. También sirve para dar un "
-"indicio cuando el formato no dispone de dicha información. Los formatos "
-"aceptados son de la forma x:y (4:3, 16:9, etc), o un valor decimal (1.25, "
-"1.3333, etc.)."
+"Esta opción fuerza el formato de la pantalla de la fuente. POr ejemplo, "
+"algún DVD pretenden ser 16:9 cuando en realidad son 4:3. También sirve para "
+"dar un indicio cuando el formato no dispone de dicha información. Los "
+"formatos aceptados son de la forma x:y (4:3, 16:9, etc), o un valor decimal "
+"(1.25, 1.3333, etc.)."
 
-#: src/libvlc.h:211
+#: src/libvlc.h:219
 msgid "Destination aspect ratio"
 msgstr "Formato de pantalla de salida"
 
-#: src/libvlc.h:213
+#: src/libvlc.h:221
 msgid ""
 "This will force the destination pixel size. By default VLC assumes your "
 "pixels are square, unless your hardware has a way to tell it otherwise. This "
@@ -654,20 +695,20 @@ msgstr ""
 "(1, 1.25, 1.3333, etc.) que indican la proporción del tamaño del punto de "
 "imagen."
 
-#: src/libvlc.h:220
+#: src/libvlc.h:228
 msgid "Server port"
 msgstr "Puerto del servidor"
 
-#: src/libvlc.h:222
+#: src/libvlc.h:230
 msgid "This is the port used for UDP streams. By default, we chose 1234."
 msgstr ""
 "Puerto usado para el flujo de datos UDP. Por defecto, hemos escojido el 1234."
 
-#: src/libvlc.h:224
+#: src/libvlc.h:232
 msgid "MTU of the network interface"
 msgstr "MTU de la interfaz de red"
 
-#: src/libvlc.h:226
+#: src/libvlc.h:234
 msgid ""
 "This is the typical size of UDP packets that we expect. On Ethernet it is "
 "usually 1500."
@@ -675,11 +716,11 @@ msgstr ""
 "Este es el tamaño máximo de los paquetes UDP que esperamos recibir. Sobre "
 "ethernet, este valor suele ser de 1500 bytes."
 
-#: src/libvlc.h:229
+#: src/libvlc.h:237
 msgid "Network interface address"
 msgstr "Dirección de la interfaz de red"
 
-#: src/libvlc.h:231
+#: src/libvlc.h:239
 msgid ""
 "If you have several interfaces on your machine and use the multicast "
 "solution, you will probably have to indicate the IP address of your "
@@ -690,11 +731,11 @@ msgstr ""
 "indicar aquí la dirección IP de la interfaz que se desea emplar para "
 "multidifusión."
 
-#: src/libvlc.h:235
+#: src/libvlc.h:243
 msgid "Time to live"
 msgstr "Tiempo de vida (TTL)"
 
-#: src/libvlc.h:237
+#: src/libvlc.h:245
 msgid ""
 "Indicate here the Time To Live of the multicast packets sent by the stream "
 "output."
@@ -702,30 +743,30 @@ msgstr ""
 "Aqui se indica el tiempo de vida (TTL) de los paquetes de multidifusión "
 "enviados por el flujo de datos de salida."
 
-#: src/libvlc.h:240
+#: src/libvlc.h:248
 msgid "Choose program (SID)"
 msgstr "Elegir programa (SID)"
 
-#: src/libvlc.h:242
+#: src/libvlc.h:250
 msgid "Choose the program to select by giving its Service ID."
 msgstr "Elección del programma facilitando su identificador de servicio (SID)."
 
-#: src/libvlc.h:244
+#: src/libvlc.h:252
 msgid "Choose audio"
 msgstr "Elegir tipo de audio"
 
-#: src/libvlc.h:246
+#: src/libvlc.h:254
 msgid ""
 "Give the default type of audio you want to use in a DVD. (Developers only)"
 msgstr ""
 "Escoger el tipo de audio que se desea escuchar de un DVD por defecto. (Solo "
 "para desarolladores)"
 
-#: src/libvlc.h:249
+#: src/libvlc.h:257
 msgid "Choose channel"
 msgstr "Elegir canal de audio"
 
-#: src/libvlc.h:251
+#: src/libvlc.h:259
 msgid ""
 "Give the stream number of the audio channel you want to use in a DVD (from 1 "
 "to n)."
@@ -733,11 +774,11 @@ msgstr ""
 "Indicar el número del canal de audio dentro del flujo de datos que se desea "
 "reproducir por defecto de un DVD (de 1 a n)."
 
-#: src/libvlc.h:254
+#: src/libvlc.h:262
 msgid "Choose subtitles"
 msgstr "Elegir subtítulos"
 
-#: src/libvlc.h:256
+#: src/libvlc.h:264
 msgid ""
 "Give the stream number of the subtitle channel you want to use in a DVD "
 "(from 1 to n)."
@@ -745,11 +786,11 @@ msgstr ""
 "Indicar el número del canal de subtítulos dentro del flujo de datos que se "
 "prefiere leer por defecto de un DVD (de 1 a n)."
 
-#: src/libvlc.h:259
+#: src/libvlc.h:267
 msgid "DVD device"
 msgstr "Dispositivo DVD"
 
-#: src/libvlc.h:262
+#: src/libvlc.h:270
 msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (eg D:)"
@@ -757,23 +798,23 @@ msgstr ""
 "Dispositivo (o fichero) DVD a usar por defecto. No olvidar los dos puntos "
 "detrás de la letra de unidad (ej. D:)."
 
-#: src/libvlc.h:266
+#: src/libvlc.h:274
 msgid "This is the default DVD device to use."
 msgstr "Este es el dispositivo DVD a usar por defecto."
 
-#: src/libvlc.h:269
+#: src/libvlc.h:277
 msgid "VCD device"
 msgstr "Dispositivo VCD"
 
-#: src/libvlc.h:271
+#: src/libvlc.h:279
 msgid "This is the default VCD device to use."
 msgstr "Este es el dispositivo VCD a usar por defecto."
 
-#: src/libvlc.h:273
+#: src/libvlc.h:281
 msgid "Force IPv6"
 msgstr "Forzar IPv6"
 
-#: src/libvlc.h:275
+#: src/libvlc.h:283
 msgid ""
 "If you check this box, IPv6 will be used by default for all UDP and HTTP "
 "connections."
@@ -781,11 +822,11 @@ msgstr ""
 "Si se activa esta casilla, se empleará el protocolo IPv6 por defecto para "
 "todas las conexiones UDP y HTTP."
 
-#: src/libvlc.h:278
+#: src/libvlc.h:286
 msgid "Force IPv4"
 msgstr "Forzar IPv4"
 
-#: src/libvlc.h:280
+#: src/libvlc.h:288
 msgid ""
 "If you check this box, IPv4 will be used by default for all UDP and HTTP "
 "connections."
@@ -793,11 +834,11 @@ msgstr ""
 "Si se activa esta casilla, se empleará el protocolo IPv4 por defecto para "
 "todas las conexiones UDP y HTTP."
 
-#: src/libvlc.h:283
+#: src/libvlc.h:291
 msgid "Choose preferred codec list"
 msgstr "Lista de códecs preferidos"
 
-#: src/libvlc.h:285
+#: src/libvlc.h:293
 msgid ""
 "This allows you to select the order in which VLC will choose its codecs. For "
 "instance, 'a52old,a52,any' will try the old a52 codec before the new one. "
@@ -805,48 +846,48 @@ msgid ""
 "codecs, so you should always specify 'any' at the end of the list to make "
 "sure there is a fallback for the types you didn't specify."
 msgstr ""
-"Esta lista permite escoger el orden en el cual VLC eligirá los codecs a usar. "
-"Por ejemplo, con 'a52old,a52,any' intentará el viejo códec a52 antes que el "
-"nuevo. Preste atención al hecho que VLC no diferencia entre códecs de audio "
-"y vídeo, así que siembre debería especificar 'any' al final de la lista "
-"para cerciorarse que siempre exista una respuesta para los tipos de códecs "
-"no especificados."
+"Esta lista permite escoger el orden en el cual VLC eligirá los codecs a "
+"usar. Por ejemplo, con 'a52old,a52,any' intentará el viejo códec a52 antes "
+"que el nuevo. Preste atención al hecho que VLC no diferencia entre códecs de "
+"audio y vídeo, así que siembre debería especificar 'any' al final de la "
+"lista para cerciorarse que siempre exista una respuesta para los tipos de "
+"códecs no especificados."
 
-#: src/libvlc.h:292
+#: src/libvlc.h:300
 msgid "Choose preferred video encoder list"
 msgstr "Lista de codificadores de vídeo preferidos"
 
-#: src/libvlc.h:294 src/libvlc.h:298
+#: src/libvlc.h:302 src/libvlc.h:306
 msgid ""
 "This allows you to select the order in which VLC will choose its codecs. "
 msgstr ""
 "Esta opción permite especificar el orden en el cual VLC elegirá sus códecs."
 
-#: src/libvlc.h:296
+#: src/libvlc.h:304
 msgid "Choose preferred audio encoder list"
 msgstr "Lista de codificadores de audio preferidos"
 
-#: src/libvlc.h:301
+#: src/libvlc.h:309
 msgid "Choose a stream output"
 msgstr "Elegir un flujo de salida"
 
-#: src/libvlc.h:303
+#: src/libvlc.h:311
 msgid "Empty if no stream output."
 msgstr "Vacío si no hay flujo de salida."
 
-#: src/libvlc.h:305
+#: src/libvlc.h:313
 msgid "Display while streaming"
 msgstr "Monitorizar difusión"
 
-#: src/libvlc.h:307
+#: src/libvlc.h:315
 msgid "This allows you to play the stream while streaming it."
 msgstr "Reproduce el flujo de vídeo mientras se difunde."
 
-#: src/libvlc.h:309
+#: src/libvlc.h:317
 msgid "Enable video stream output"
 msgstr "Activar difusión de vídeo"
 
-#: src/libvlc.h:311 src/libvlc.h:324
+#: src/libvlc.h:319 src/libvlc.h:324
 msgid ""
 "This allows you to choose if the video stream should be redirected to the "
 "stream output facility when this last one is enabled."
@@ -854,77 +895,54 @@ msgstr ""
 "Esto permite redirigir el vídeo al flujo de salida siempre que se disponga "
 "de él."
 
-#: src/libvlc.h:314
-msgid "Video encoding codec"
-msgstr "Codificador de vídeo"
-
-#: src/libvlc.h:316
-msgid "This allows you to force video encoding"
-msgstr "Esto permite forzar la codificación del vídeo."
-
-#: src/libvlc.h:318
-msgid "Video bitrate encoding (kB/s)"
-msgstr "Tasa de bits de codificación de vídeo (KB/s)"
-
-#: src/libvlc.h:320
-msgid "This allows you to specify video bitrate in kB/s."
-msgstr "Permite especificar la tasa de bits de codificación de vídeo en KB/s."
-
 #: src/libvlc.h:322
 msgid "Enable audio stream output"
 msgstr "Activar difusión de audio"
 
 #: src/libvlc.h:327
-msgid "Audio encoding codec"
-msgstr "Codificador de audio"
+msgid "Keep sout open"
+msgstr ""
 
 #: src/libvlc.h:329
-msgid "This allows you to force audio encoding"
-msgstr "Esto permite forzar la codificación del audio."
-
-#: src/libvlc.h:331
-msgid "Audio bitrate encoding (kB/s)"
-msgstr "Tasa de bits de codificación de audio (KB/s)"
+msgid ""
+"This allows you to keep an unique sout instance across multiple playlist "
+"item (automatically insert gather stream_out if not specified)"
+msgstr ""
 
 #: src/libvlc.h:333
-msgid "This allows you to specify audio bitrate in kB/s."
-msgstr "Permite especificar la tasa de bits de codificación de audio en KB/s."
-
-#: src/libvlc.h:335
 msgid "Choose preferred packetizer list"
 msgstr "Lista de empaquetadores preferidos"
 
-#: src/libvlc.h:337
+#: src/libvlc.h:335
 msgid ""
 "This allows you to select the order in which VLC will choose its packetizers."
 msgstr ""
 "Esta opción permite escoger el orden en el cual VLC eligirá sus "
 "empaquetadores."
 
-#: src/libvlc.h:340
+#: src/libvlc.h:338
 msgid "Mux module"
 msgstr "Módulo de multiplexado"
 
-#: src/libvlc.h:342
+#: src/libvlc.h:340
 msgid "This is a legacy entry to let you configure mux modules"
-msgstr ""
-"Esta entrada solo sirve para configurar los módulos de multiplexado."
+msgstr "Esta entrada solo sirve para configurar los módulos de multiplexado."
 
-#: src/libvlc.h:344
+#: src/libvlc.h:342
 msgid "Access output module"
 msgstr "Módulo de acceso a la salida"
 
-#: src/libvlc.h:346
+#: src/libvlc.h:344
 msgid "This is a legacy entry to let you configure access output modules"
 msgstr ""
 "Esta entrada solo sirve para configurar los módulos de acceso al flujo de "
 "salida."
 
-#: src/libvlc.h:349
+#: src/libvlc.h:347
 msgid "Enable CPU MMX support"
 msgstr "Activar soporte MMX del procesador"
 
-#: src/libvlc.h:351
+#: src/libvlc.h:349
 msgid ""
 "If your processor supports the MMX instructions set, VLC can take advantage "
 "of them."
@@ -932,11 +950,11 @@ msgstr ""
 "Si el procesador reconoce el juego de instrucciones MMX, VLC puede "
 "beneficiarse de ello."
 
-#: src/libvlc.h:354
+#: src/libvlc.h:352
 msgid "Enable CPU 3D Now! support"
 msgstr "Activar soporte 3D Now! del procesador"
 
-#: src/libvlc.h:356
+#: src/libvlc.h:354
 msgid ""
 "If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
@@ -944,11 +962,11 @@ msgstr ""
 "Si el procesador reconoce el juego de instrucciones 3D Now!, VLC puede "
 "beneficiarse de ello."
 
-#: src/libvlc.h:359
+#: src/libvlc.h:357
 msgid "Enable CPU MMX EXT support"
 msgstr "Activar soporte MMX EXT del procesador"
 
-#: src/libvlc.h:361
+#: src/libvlc.h:359
 msgid ""
 "If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
@@ -956,11 +974,11 @@ msgstr ""
 "Si el procesador reconoce el juego de instrucciones MMX EXT, VLC puede "
 "beneficiarse de ello."
 
-#: src/libvlc.h:364
+#: src/libvlc.h:362
 msgid "Enable CPU SSE support"
 msgstr "Activar soporte SSE del procesador"
 
-#: src/libvlc.h:366
+#: src/libvlc.h:364
 msgid ""
 "If your processor supports the SSE instructions set, VLC can take advantage "
 "of them."
@@ -968,11 +986,11 @@ msgstr ""
 "Si el procesador reconoce el juego de instrucciones SSE, VLC puede "
 "beneficiarse de ello."
 
-#: src/libvlc.h:369
+#: src/libvlc.h:367
 msgid "Enable CPU AltiVec support"
 msgstr "Activar soporte AltiVec del procesador"
 
-#: src/libvlc.h:371
+#: src/libvlc.h:369
 msgid ""
 "If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
@@ -980,11 +998,11 @@ msgstr ""
 "Si el procesador reconoce el juego de instrucciones AltiVec, VLC puede "
 "beneficiarse de ello."
 
-#: src/libvlc.h:374
+#: src/libvlc.h:372
 msgid "Play files randomly forever"
 msgstr "Reproducir los ficheros al azar"
 
-#: src/libvlc.h:376
+#: src/libvlc.h:374
 msgid ""
 "When selected, VLC will randomly play files in the playlist until "
 "interrupted."
@@ -992,23 +1010,23 @@ msgstr ""
 "Cuando se activa, VLC reproducira los ficheros de su lista hasta ser "
 "interrumpido."
 
-#: src/libvlc.h:379
+#: src/libvlc.h:377
 msgid "Enqueue items in playlist"
 msgstr "Encolar ficheros en la lista de reproducción"
 
-#: src/libvlc.h:381
+#: src/libvlc.h:379
 msgid ""
 "If you want VLC to add items to the playlist as you open them, then enable "
 "this option."
 msgstr ""
 "Si se desea que VLC añada los ficheros que se abran a su lista de "
-"reproducción, entonces active esta opción." 
+"reproducción, entonces active esta opción."
 
-#: src/libvlc.h:384
+#: src/libvlc.h:382
 msgid "Loop playlist on end"
 msgstr "Reproducir la lista completa en bucle"
 
-#: src/libvlc.h:386
+#: src/libvlc.h:384
 msgid ""
 "If you want VLC to keep playing the playlist indefinitely then enable this "
 "option."
@@ -1016,11 +1034,11 @@ msgstr ""
 "Si se desea que VLC siga reproduciendo su lista indefinidamente, entoces "
 "active esta opción."
 
-#: src/libvlc.h:389
+#: src/libvlc.h:387
 msgid "Memory copy module"
 msgstr "Módulo de copia de memoria"
 
-#: src/libvlc.h:391
+#: src/libvlc.h:389
 msgid ""
 "You can select which memory copy module you want to use. By default VLC will "
 "select the fastest one supported by your hardware."
@@ -1028,29 +1046,29 @@ msgstr ""
 "Puede elegir el módulo de copiado de memoria a emplear. Por defecto, VLC "
 "eligirá el módulo mas rápido que soporte su hardware."
 
-#: src/libvlc.h:394
+#: src/libvlc.h:392
 msgid "Access module"
 msgstr "Módulo de acceso"
 
-#: src/libvlc.h:396
+#: src/libvlc.h:394
 msgid "This is a legacy entry to let you configure access modules"
 msgstr ""
 "Entrada que solo permite configurar los módulos de acceso al flujo de datos."
 
-#: src/libvlc.h:398
+#: src/libvlc.h:396
 msgid "Demux module"
 msgstr "Módulo de desmultiplexado"
 
-#: src/libvlc.h:400
+#: src/libvlc.h:398
 msgid "This is a legacy entry to let you configure demux modules"
 msgstr ""
 "Esta entrada solo sirve para configurar los módulos de desmultiplexado."
 
-#: src/libvlc.h:402
+#: src/libvlc.h:400
 msgid "Increase the priority of the process"
 msgstr "Aumentar la prioridad del proceso"
 
-#: src/libvlc.h:404
+#: src/libvlc.h:402
 msgid ""
 "Increasing the priority of the process will very likely improve your playing "
 "experience as it allows VLC not to be disturbed by other applications that "
@@ -1066,11 +1084,11 @@ msgstr ""
 "programación) VLC puede consumir todo el tiempo del procesador y volver todo "
 "el sistema inestable, hasta el punto de requerir un reinicio de máquina."
 
-#: src/libvlc.h:411
+#: src/libvlc.h:409
 msgid "Fast mutex on NT/2K/XP (developers only)"
 msgstr "Mutex rápido en NT/2K/XP (solo desarolladores)"
 
-#: src/libvlc.h:413
+#: src/libvlc.h:411
 msgid ""
 "On Windows NT/2K/XP we use a slow mutex implementation but which allows us "
 "to correctely implement condition variables. You can also use the faster "
@@ -1080,15 +1098,13 @@ msgstr ""
 "permite implementar variables de condición correctamente. Puede también "
 "probar la implementación más rápida de Win9x pero puede tener problemas con "
 "ella."
- 
-#: src/libvlc.h:418
+
+#: src/libvlc.h:416
 msgid "Condition variables implementation for Win9x (developers only)"
 msgstr ""
-"Implementación de las variables de condición para Win9x (solo "
-"desarolladores)"
+"Implementación de las variables de condición para Win9x (solo desarolladores)"
 
-
-#: src/libvlc.h:421
+#: src/libvlc.h:419
 msgid ""
 "On Windows 9x/Me we use a fast but not correct condition variables "
 "implementation (more precisely there is a possibility for a race condition "
@@ -1102,7 +1118,173 @@ msgstr ""
 "pero más robustas. Actualmente se puede elegir entre la implementación 0 "
 "(por defecto y la más rápida), 1 y 2."
 
-#: src/libvlc.h:429
+#: src/libvlc.h:427 src/video_output/video_output.c:412
+#: modules/gui/beos/VideoOutput.cpp:1151 modules/gui/macosx/applescript.m:122
+#: modules/gui/macosx/controls.m:348 modules/gui/macosx/controls.m:690
+#: modules/gui/macosx/intf.m:394
+msgid "Fullscreen"
+msgstr ""
+
+#: src/libvlc.h:428
+msgid "Select the hotkey to use to swap fullscreen state"
+msgstr ""
+
+#: src/libvlc.h:429 modules/control/lirc/lirc.c:297
+#: modules/control/lirc/lirc.c:323 modules/gui/gtk/gnome_interface.c:602
+#: modules/gui/gtk/gnome_interface.c:1020 modules/gui/gtk/gtk_interface.c:709
+#: modules/gui/gtk/gtk_interface.c:1119 modules/gui/macosx/intf.m:921
+#: modules/gui/macosx/intf.m:922 modules/gui/macosx/intf.m:923
+#: modules/gui/pda/interface.c:179 modules/gui/wxwindows/interface.cpp:872
+msgid "Pause"
+msgstr ""
+
+#: src/libvlc.h:430
+msgid "Select the hotkey to use to swap paused state"
+msgstr ""
+
+#: src/libvlc.h:431
+msgid "Pause only"
+msgstr ""
+
+#: src/libvlc.h:432
+msgid "Select the hotkey to use to pause"
+msgstr ""
+
+#: src/libvlc.h:433
+msgid "Play only"
+msgstr ""
+
+#: src/libvlc.h:434
+msgid "Select the hotkey to use to play"
+msgstr ""
+
+#: src/libvlc.h:435 modules/gui/macosx/controls.m:625
+#: modules/gui/macosx/intf.m:326 modules/gui/macosx/intf.m:364
+#: modules/gui/wxwindows/interface.cpp:382
+msgid "Faster"
+msgstr ""
+
+#: src/libvlc.h:436
+msgid "Select the hotkey to use for fast forward playback"
+msgstr ""
+
+#: src/libvlc.h:437 modules/gui/macosx/controls.m:626
+#: modules/gui/macosx/intf.m:323 modules/gui/macosx/intf.m:365
+#: modules/gui/wxwindows/interface.cpp:380
+msgid "Slower"
+msgstr ""
+
+#: src/libvlc.h:438
+msgid "Select the hotkey to use for slow motion playback"
+msgstr ""
+
+#: src/libvlc.h:439 modules/gui/gtk/gnome_interface.c:667
+#: modules/gui/gtk/gnome_interface.c:1056 modules/gui/gtk/gtk_interface.c:769
+#: modules/gui/gtk/gtk_interface.c:852 modules/gui/gtk/gtk_interface.c:896
+#: modules/gui/gtk/gtk_interface.c:1166 modules/gui/macosx/controls.m:647
+#: modules/gui/macosx/intf.m:327 modules/gui/macosx/intf.m:367
+#: modules/gui/macosx/intf.m:425 modules/gui/wxwindows/interface.cpp:378
+msgid "Next"
+msgstr ""
+
+#: src/libvlc.h:440
+msgid "Select the hotkey to use to skip to the next item in the playlist"
+msgstr ""
+
+#: src/libvlc.h:441 modules/gui/macosx/controls.m:646
+#: modules/gui/macosx/intf.m:322 modules/gui/macosx/intf.m:366
+#: modules/gui/macosx/intf.m:426
+msgid "Previous"
+msgstr ""
+
+#: src/libvlc.h:442
+msgid "Select the hotkey to use to skip to the previous item in the playlist"
+msgstr ""
+
+#: src/libvlc.h:443 modules/gui/gtk/gnome_interface.c:566
+#: modules/gui/gtk/gnome_interface.c:1027 modules/gui/gtk/gtk_interface.c:676
+#: modules/gui/gtk/gtk_interface.c:1127 modules/gui/macosx/controls.m:639
+#: modules/gui/macosx/intf.m:325 modules/gui/macosx/intf.m:363
+#: modules/gui/macosx/intf.m:424 modules/gui/pda/interface.c:205
+#: modules/gui/wxwindows/interface.cpp:369
+msgid "Stop"
+msgstr ""
+
+#: src/libvlc.h:444
+msgid "Select the hotkey to stop the playback"
+msgstr ""
+
+#: src/libvlc.h:445 modules/control/lirc/lirc.c:193
+#: modules/gui/beos/InterfaceWindow.cpp:253
+msgid "Quit"
+msgstr ""
+
+#: src/libvlc.h:446
+msgid "Select the hotkey to quit the application"
+msgstr ""
+
+#: src/libvlc.h:447
+#, fuzzy
+msgid "Navigate up"
+msgstr "Navegación"
+
+#: src/libvlc.h:448
+msgid "Select the key to move the selector up in dvd menus"
+msgstr ""
+
+#: src/libvlc.h:449
+#, fuzzy
+msgid "Navigate down"
+msgstr "Navegación"
+
+#: src/libvlc.h:450
+msgid "Select the key to move the selector down in dvd menus"
+msgstr ""
+
+#: src/libvlc.h:451
+#, fuzzy
+msgid "Navigate left"
+msgstr "Navegación"
+
+#: src/libvlc.h:452
+msgid "Select the key to move the selector left in dvd menus"
+msgstr ""
+
+#: src/libvlc.h:453
+#, fuzzy
+msgid "Navigate right"
+msgstr "Navegación"
+
+#: src/libvlc.h:454
+msgid "Select the key to move the selector right in dvd menus"
+msgstr ""
+
+#: src/libvlc.h:455
+msgid "Activate"
+msgstr ""
+
+#: src/libvlc.h:456
+msgid "Select the key to activate selected item in dvd menus"
+msgstr ""
+
+#: src/libvlc.h:457
+msgid "Volume up"
+msgstr ""
+
+#: src/libvlc.h:458
+msgid "Select the key to turn up audio volume"
+msgstr ""
+
+#: src/libvlc.h:459
+msgid "Volume down"
+msgstr ""
+
+#: src/libvlc.h:460
+msgid "Select the key to turn down audio volume"
+msgstr ""
+
+#: src/libvlc.h:462
+#, fuzzy
 msgid ""
 "\n"
 "Playlist items:\n"
@@ -1112,7 +1294,7 @@ msgid ""
 "  [vcd:][device][@[title][,[chapter]]\n"
 "                                 VCD device\n"
 "  udpstream:[@[<bind address>][:<bind port>]]\n"
-"                                 UDP stream sent by VLS\n"
+"                                 UDP stream sent by a streaming server\n"
 "  vlc:pause                      pause execution of playlist items\n"
 "  vlc:quit                       quit VLC\n"
 msgstr ""
@@ -1129,109 +1311,107 @@ msgstr ""
 "  vlc:quit                       termina la ejecución de VLC\n"
 
 # ------------------------- WORK IN PROGRESS ---------------------------------
-
-#: src/libvlc.h:459 modules/misc/dummy/dummy.c:58
+#: src/libvlc.h:492 modules/misc/dummy/dummy.c:58
 msgid "Interface"
 msgstr ""
 
-#: src/libvlc.h:474 modules/audio_output/coreaudio.c:227
-#: modules/audio_output/file.c:108 modules/demux/asf/asf.c:228
-#: modules/demux/mkv.cpp:2449 modules/demux/ogg.c:558 modules/demux/ogg.c:830
-#: modules/demux/ogg.c:1003 modules/gui/beos/InterfaceWindow.cpp:259
+#: src/libvlc.h:507 modules/access/dvdplay/access.c:213
+#: modules/audio_output/coreaudio.c:227 modules/audio_output/file.c:108
+#: modules/demux/asf/asf.c:398 modules/demux/mkv.cpp:2378
+#: modules/demux/ogg.c:542 modules/demux/ogg.c:814 modules/demux/ogg.c:987
+#: modules/gui/beos/InterfaceWindow.cpp:259
 #: modules/gui/gtk/gnome_interface.c:1092 modules/gui/gtk/gtk_interface.c:1219
-#: modules/gui/macosx/intf.m:378 modules/gui/macosx/output.m:156
+#: modules/gui/macosx/intf.m:378 modules/gui/macosx/output.m:154
 msgid "Audio"
 msgstr ""
 
-#: src/libvlc.h:493 modules/demux/asf/asf.c:298 modules/demux/avi/avi.c:1217
-#: modules/demux/mkv.cpp:2465 modules/demux/ogg.c:630 modules/demux/ogg.c:670
-#: modules/demux/ogg.c:735 modules/demux/ogg.c:910
+#: src/libvlc.h:528 modules/demux/asf/asf.c:398 modules/demux/avi/avi.c:363
+#: modules/demux/mkv.cpp:2394 modules/demux/ogg.c:614 modules/demux/ogg.c:654
+#: modules/demux/ogg.c:719 modules/demux/ogg.c:894
 #: modules/gui/gtk/gnome_interface.c:1099 modules/gui/gtk/gtk_interface.c:1296
 #: modules/gui/macosx/intf.m:389 modules/gui/macosx/macosx.m:68
-#: modules/gui/macosx/output.m:150 modules/misc/dummy/dummy.c:81
+#: modules/gui/macosx/output.m:148 modules/misc/dummy/dummy.c:81
 #: modules/video_output/directx/directx.c:112
 msgid "Video"
 msgstr ""
 
-#: src/libvlc.h:515 modules/access/dvb/qpsk.c:101
+#: src/libvlc.h:551 modules/access/dvb/qpsk.c:101
 #: modules/access/satellite/satellite.c:66
 msgid "Input"
 msgstr ""
 
-#: src/libvlc.h:537
+#: src/libvlc.h:573
 msgid "Decoders"
 msgstr ""
 
-#: src/libvlc.h:541
-msgid "Encoders"
-msgstr ""
-
-#: src/libvlc.h:547 modules/gui/gtk/gnome_interface.c:2042
+#: src/libvlc.h:578 modules/gui/gtk/gnome_interface.c:2042
 #: modules/gui/gtk/gtk_interface.c:2361 modules/gui/gtk/gtk_interface.c:3034
-#: modules/gui/wxwindows/open.cpp:194 modules/gui/wxwindows/streamout.cpp:171
+#: modules/gui/wxwindows/open.cpp:212 modules/gui/wxwindows/streamout.cpp:141
 msgid "Stream output"
 msgstr ""
 
-#: src/libvlc.h:567
+#: src/libvlc.h:595
 msgid "CPU"
 msgstr ""
 
-#: src/libvlc.h:579 modules/gui/beos/InterfaceWindow.cpp:206
+#: src/libvlc.h:607 modules/gui/beos/InterfaceWindow.cpp:206
 #: modules/gui/gtk/gnome_interface.c:643
 #: modules/gui/gtk/gnome_interface.c:2384
 #: modules/gui/gtk/gnome_interface.c:2409 modules/gui/gtk/gtk_interface.c:747
 #: modules/gui/gtk/gtk_interface.c:2697 modules/gui/macosx/intf.m:321
 #: modules/gui/macosx/intf.m:409 modules/gui/pda/interface.c:612
-#: modules/gui/wxwindows/interface.cpp:378
-#: modules/gui/wxwindows/playlist.cpp:104
+#: modules/gui/wxwindows/interface.cpp:374
+#: modules/gui/wxwindows/playlist.cpp:106
 msgid "Playlist"
 msgstr ""
 
-#: src/libvlc.h:585 modules/audio_filter/converter/a52tofloat32.c:85
+#: src/libvlc.h:613 modules/audio_filter/converter/a52tofloat32.c:85
 #: modules/audio_filter/converter/mpgatofixed32.c:60
 #: modules/codec/a52old/a52old.c:59 modules/codec/mpeg_video/parser.c:84
-#: modules/demux/mpeg/ts.c:118 modules/gui/pda/pda.c:70
+#: modules/demux/mpeg/ts.c:112 modules/gui/pda/pda.c:70
 #: modules/misc/logger/logger.c:89 modules/video_filter/motionblur.c:58
 #: modules/video_filter/transform.c:63 modules/video_filter/wall.c:66
-#: modules/video_output/ggi.c:62 modules/video_output/mga/xmga.c:102
+#: modules/video_output/ggi.c:62
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/libvlc.h:599
+#: src/libvlc.h:625
+msgid "Hot keys"
+msgstr ""
+
+#: src/libvlc.h:647
 msgid "main program"
 msgstr ""
 
-#: src/libvlc.h:605
+#: src/libvlc.h:653
 msgid "print help"
 msgstr ""
 
-#: src/libvlc.h:607
+#: src/libvlc.h:655
 msgid "print detailed help"
 msgstr ""
 
-#: src/libvlc.h:610
+#: src/libvlc.h:658
 msgid "print a list of available modules"
 msgstr ""
 
-#: src/libvlc.h:612
+#: src/libvlc.h:660
 msgid "print help on module"
 msgstr ""
 
-#: src/libvlc.h:615
+#: src/libvlc.h:663
 msgid "print version information"
 msgstr ""
 
-#: src/misc/configuration.c:1021
+#: src/misc/configuration.c:1034
 msgid "boolean"
 msgstr ""
 
-#: src/video_output/video_output.c:408 modules/gui/beos/VideoOutput.cpp:1151
-#: modules/gui/macosx/applescript.m:122 modules/gui/macosx/controls.m:348
-#: modules/gui/macosx/controls.m:690 modules/gui/macosx/intf.m:394
-msgid "Fullscreen"
+#: src/misc/configuration.c:1042
+msgid "key"
 msgstr ""
 
-#: src/video_output/video_output.c:419 modules/gui/gtk/gnome_interface.c:183
+#: src/video_output/video_output.c:423 modules/gui/gtk/gnome_interface.c:183
 #: modules/gui/gtk/gnome_interface.c:966 modules/gui/gtk/gtk_interface.c:553
 #: modules/gui/gtk/gtk_interface.c:1349 modules/gui/macosx/intf.m:402
 #: modules/gui/macosx/intf.m:403
@@ -1239,29 +1419,29 @@ msgstr ""
 msgid "Deinterlace"
 msgstr ""
 
-#: src/video_output/video_output.c:423
+#: src/video_output/video_output.c:427
 msgid "Discard"
 msgstr ""
 
-#: src/video_output/video_output.c:425
+#: src/video_output/video_output.c:429
 msgid "Blend"
 msgstr ""
 
-#: src/video_output/video_output.c:427
+#: src/video_output/video_output.c:431
 msgid "Mean"
 msgstr ""
 
-#: src/video_output/video_output.c:429
+#: src/video_output/video_output.c:433
 msgid "Bob"
 msgstr ""
 
-#: src/video_output/video_output.c:431
+#: src/video_output/video_output.c:435
 msgid "Linear"
 msgstr ""
 
-#: modules/access/cdda.c:86 modules/access/file.c:72 modules/access/ftp.c:86
-#: modules/access/http.c:80 modules/access/mms/mms.c:57
-#: modules/access/v4l/v4l.c:66
+#: modules/access/cdda.c:86 modules/access/dshow/dshow.cpp:58
+#: modules/access/file.c:72 modules/access/ftp.c:85 modules/access/http.c:79
+#: modules/access/mms/mms.c:57 modules/access/v4l/v4l.c:65
 msgid "Caching value in ms"
 msgstr ""
 
@@ -1283,6 +1463,24 @@ msgstr ""
 msgid "Standard filesystem directory input"
 msgstr ""
 
+#: modules/access/dshow/dshow.cpp:60
+msgid ""
+"Allows you to modify the default caching value for directshow streams. This "
+"value should be set in miliseconds units."
+msgstr ""
+
+#: modules/access/dshow/dshow.cpp:64
+msgid "DirectShow input"
+msgstr ""
+
+#: modules/access/dshow/dshow.cpp:65
+msgid "dshow"
+msgstr ""
+
+#: modules/access/dshow/dshow.cpp:73
+msgid "DirectShow demuxer"
+msgstr ""
+
 #: modules/access/dvb/qpsk.c:44
 msgid "adapter card to tune"
 msgstr ""
@@ -1296,7 +1494,7 @@ msgid "device nummer to use on adapter"
 msgstr ""
 
 #: modules/access/dvb/qpsk.c:50
-msgid "satellite default transponder frequency"
+msgid "satellite default transponder frequency in Hz"
 msgstr ""
 
 #: modules/access/dvb/qpsk.c:53
@@ -1312,7 +1510,7 @@ msgid "FEC=Forward Error Correction mode"
 msgstr ""
 
 #: modules/access/dvb/qpsk.c:59
-msgid "satellite default transponder symbol rate"
+msgid "satellite default transponder symbol rate in Hz"
 msgstr ""
 
 #: modules/access/dvb/qpsk.c:62
@@ -1320,15 +1518,15 @@ msgid "use diseqc with antenna"
 msgstr ""
 
 #: modules/access/dvb/qpsk.c:65
-msgid "antenna lnb_lof1 (kHz)"
+msgid "antenna lnb_lof1 (Hz)"
 msgstr ""
 
 #: modules/access/dvb/qpsk.c:68
-msgid "antenna lnb_lof2 (kHz)"
+msgid "antenna lnb_lof2 (Hz)"
 msgstr ""
 
 #: modules/access/dvb/qpsk.c:71
-msgid "antenna lnb_slof (kHz)"
+msgid "antenna lnb_slof (Hz)"
 msgstr ""
 
 #: modules/access/dvb/qpsk.c:74
@@ -1375,7 +1573,7 @@ msgstr ""
 msgid "terrestrial hierarchy mode"
 msgstr ""
 
-#: modules/access/dvb/qpsk.c:123
+#: modules/access/dvb/qpsk.c:120
 msgid "DVB input module with v4l2 support"
 msgstr ""
 
@@ -1415,6 +1613,27 @@ msgstr ""
 msgid "DVD input (uses libdvdcss)"
 msgstr ""
 
+#: modules/access/dvdplay/access.c:202
+msgid "DVD menus"
+msgstr ""
+
+#: modules/access/dvdplay/access.c:205
+msgid "Root"
+msgstr ""
+
+#: modules/access/dvdplay/access.c:211 modules/demux/mkv.cpp:2410
+#: modules/gui/gtk/gnome_interface.c:1963 modules/gui/gtk/gtk_interface.c:2278
+msgid "Subtitle"
+msgstr ""
+
+#: modules/access/dvdplay/access.c:215
+msgid "Angle"
+msgstr ""
+
+#: modules/access/dvdplay/access.c:217
+msgid "Resume"
+msgstr ""
+
 #: modules/access/dvdplay/dvd.c:51
 msgid "[dvdplay:][device][@[title][,[chapter][,angle]]]"
 msgstr ""
@@ -1441,38 +1660,38 @@ msgstr ""
 msgid "file"
 msgstr ""
 
-#: modules/access/ftp.c:88
+#: modules/access/ftp.c:87
 msgid ""
 "Allows you to modify the default caching value for ftp streams. This value "
 "should be set in miliseconds units."
 msgstr ""
 
-#: modules/access/ftp.c:92
+#: modules/access/ftp.c:91
 msgid "FTP input"
 msgstr ""
 
-#: modules/access/http.c:74
+#: modules/access/http.c:73
 msgid "Specify an HTTP proxy"
 msgstr ""
 
-#: modules/access/http.c:76
+#: modules/access/http.c:75
 msgid ""
 "Specify an HTTP proxy to use. It must be in the form http://myproxy.mydomain:"
 "myport. If none is specified, the HTTP_PROXY environment variable will be "
 "tried."
 msgstr ""
 
-#: modules/access/http.c:82
+#: modules/access/http.c:81
 msgid ""
 "Allows you to modify the default caching value for http streams. This value "
 "should be set in miliseconds units."
 msgstr ""
 
-#: modules/access/http.c:86
+#: modules/access/http.c:85
 msgid "http"
 msgstr ""
 
-#: modules/access/http.c:91
+#: modules/access/http.c:90
 msgid "HTTP input"
 msgstr ""
 
@@ -1486,12 +1705,8 @@ msgstr ""
 msgid "Microsoft Media Server (MMS) input"
 msgstr ""
 
-#: modules/access/pvr/pvr.c:75
+#: modules/access/pvr/pvr.c:77
 msgid "Hauppauge PVR cards input"
-msgstr ""
-
-#: modules/access/rtsp.c:68
-msgid "RTSP SDP request"
 msgstr ""
 
 #: modules/access/satellite/satellite.c:41
@@ -1556,21 +1771,21 @@ msgstr ""
 msgid "udp"
 msgstr ""
 
-#: modules/access/v4l/v4l.c:68
+#: modules/access/v4l/v4l.c:67
 msgid ""
 "Allows you to modify the default caching value for v4l streams. This value "
 "should be set in miliseconds units."
 msgstr ""
 
-#: modules/access/v4l/v4l.c:72
+#: modules/access/v4l/v4l.c:71
 msgid "Video4Linux input"
 msgstr ""
 
-#: modules/access/v4l/v4l.c:73
+#: modules/access/v4l/v4l.c:72
 msgid "v4l"
 msgstr ""
 
-#: modules/access/v4l/v4l.c:81
+#: modules/access/v4l/v4l.c:80
 msgid "Video4Linux demuxer"
 msgstr ""
 
@@ -1741,30 +1956,30 @@ msgid "ALSA audio output"
 msgstr ""
 
 #: modules/audio_output/alsa.c:117 modules/audio_output/coreaudio.c:218
-#: modules/audio_output/coreaudio.c:1473 modules/audio_output/directx.c:377
+#: modules/audio_output/coreaudio.c:1473 modules/audio_output/directx.c:383
 #: modules/audio_output/oss.c:129 modules/audio_output/sdl.c:176
 #: modules/audio_output/sdl.c:194 modules/audio_output/waveout.c:337
 #: modules/gui/macosx/intf.m:386 modules/gui/macosx/intf.m:387
 msgid "Audio device"
 msgstr ""
 
-#: modules/audio_output/alsa.c:171 modules/audio_output/directx.c:435
+#: modules/audio_output/alsa.c:171 modules/audio_output/directx.c:460
 #: modules/audio_output/oss.c:222 modules/audio_output/sdl.c:182
 #: modules/audio_output/sdl.c:201 modules/audio_output/waveout.c:399
 msgid "Mono"
 msgstr ""
 
-#: modules/audio_output/alsa.c:184 modules/audio_output/directx.c:409
+#: modules/audio_output/alsa.c:184 modules/audio_output/directx.c:433
 #: modules/audio_output/oss.c:178 modules/audio_output/waveout.c:371
 msgid "2 Front 2 Rear"
 msgstr ""
 
-#: modules/audio_output/alsa.c:190 modules/audio_output/directx.c:391
+#: modules/audio_output/alsa.c:190 modules/audio_output/directx.c:397
 #: modules/audio_output/oss.c:167 modules/audio_output/waveout.c:352
 msgid "5.1"
 msgstr ""
 
-#: modules/audio_output/alsa.c:217 modules/audio_output/directx.c:478
+#: modules/audio_output/alsa.c:217 modules/audio_output/directx.c:503
 #: modules/audio_output/oss.c:246 modules/audio_output/waveout.c:415
 msgid "A/52 over S/PDIF"
 msgstr ""
@@ -1786,6 +2001,10 @@ msgstr ""
 
 #: modules/audio_output/directx.c:209
 msgid "DirectX audio output"
+msgstr ""
+
+#: modules/audio_output/directx.c:415
+msgid "3 Front 2 Rear"
 msgstr ""
 
 #: modules/audio_output/esd.c:66
@@ -1853,8 +2072,12 @@ msgstr ""
 msgid "Win32 waveOut extension output"
 msgstr ""
 
-#: modules/codec/a52.c:81
+#: modules/codec/a52.c:120
 msgid "A/52 parser"
+msgstr ""
+
+#: modules/codec/a52.c:125
+msgid "A/52 audio packetizer"
 msgstr ""
 
 #: modules/codec/a52old/a52old.c:61 modules/codec/a52old/downmix/downmix.c:58
@@ -1897,8 +2120,12 @@ msgstr ""
 msgid "Cinepak video decoder"
 msgstr ""
 
-#: modules/codec/dts.c:80
+#: modules/codec/dts.c:122
 msgid "DTS parser"
+msgstr ""
+
+#: modules/codec/dts.c:127
+msgid "DTS audio packetizer"
 msgstr ""
 
 #: modules/codec/dv.c:48
@@ -2007,7 +2234,7 @@ msgstr ""
 msgid "flac audio decoder"
 msgstr ""
 
-#: modules/codec/libmpeg2.c:94
+#: modules/codec/libmpeg2.c:95
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr ""
 
@@ -2122,27 +2349,32 @@ msgstr ""
 msgid "DVD subtitles decoder"
 msgstr ""
 
-#: modules/codec/subsdec/subsdec.c:68
+#: modules/codec/subsdec/subsdec.c:51 modules/codec/subsdec/subsdec.c:86
+#: modules/codec/subsdec/subsdec.c:157
+msgid "System Default"
+msgstr ""
+
+#: modules/codec/subsdec/subsdec.c:73
 msgid "Subtitles text encoding"
 msgstr ""
 
-#: modules/codec/subsdec/subsdec.c:69
+#: modules/codec/subsdec/subsdec.c:74
 msgid "Change the encoding used in text subtitles"
 msgstr ""
 
-#: modules/codec/subsdec/subsdec.c:70
+#: modules/codec/subsdec/subsdec.c:75
 msgid "Subtitles justification"
 msgstr ""
 
-#: modules/codec/subsdec/subsdec.c:71
+#: modules/codec/subsdec/subsdec.c:76
 msgid "Change the justification of substitles (0=center, 1=left, 2=right)"
 msgstr ""
 
-#: modules/codec/subsdec/subsdec.c:74
+#: modules/codec/subsdec/subsdec.c:79
 msgid "file subtitles decoder"
 msgstr ""
 
-#: modules/codec/subsdec/subsdec.c:77 modules/gui/beos/InterfaceWindow.cpp:256
+#: modules/codec/subsdec/subsdec.c:82 modules/gui/beos/InterfaceWindow.cpp:256
 #: modules/gui/kde/interface.cpp:93
 msgid "Subtitles"
 msgstr ""
@@ -2151,15 +2383,27 @@ msgstr ""
 msgid "Tarkin decoder module"
 msgstr ""
 
-#: modules/codec/theora.c:85
+#: modules/codec/theora.c:100
 msgid "Theora video decoder"
 msgstr ""
 
-#: modules/codec/vorbis.c:112
+#: modules/codec/theora.c:106
+msgid "Theora video packetizer"
+msgstr ""
+
+#: modules/codec/theora.c:435
+msgid "Theora Comment"
+msgstr ""
+
+#: modules/codec/vorbis.c:128
 msgid "Vorbis audio decoder"
 msgstr ""
 
-#: modules/codec/vorbis.c:189
+#: modules/codec/vorbis.c:137
+msgid "Vorbis audio packetizer"
+msgstr ""
+
+#: modules/codec/vorbis.c:498
 msgid "Vorbis Comment"
 msgstr ""
 
@@ -2281,29 +2525,63 @@ msgstr ""
 msgid "infrared remote control interface"
 msgstr ""
 
-#: modules/control/lirc/lirc.c:193 modules/gui/beos/InterfaceWindow.cpp:253
-msgid "Quit"
-msgstr ""
-
-#: modules/control/lirc/lirc.c:297 modules/control/lirc/lirc.c:323
-#: modules/gui/gtk/gnome_interface.c:602
-#: modules/gui/gtk/gnome_interface.c:1020 modules/gui/gtk/gtk_interface.c:709
-#: modules/gui/gtk/gtk_interface.c:1119 modules/gui/macosx/intf.m:921
-#: modules/gui/macosx/intf.m:922 modules/gui/macosx/intf.m:923
-#: modules/gui/pda/interface.c:179 modules/gui/wxwindows/interface.cpp:833
-msgid "Pause"
-msgstr ""
-
 #: modules/control/lirc/lirc.c:310 modules/gui/gtk/gnome_interface.c:590
 #: modules/gui/gtk/gnome_interface.c:1013 modules/gui/gtk/gtk_interface.c:698
 #: modules/gui/macosx/intf.m:324 modules/gui/macosx/intf.m:362
 #: modules/gui/macosx/intf.m:423 modules/gui/macosx/intf.m:928
 #: modules/gui/macosx/intf.m:929 modules/gui/macosx/intf.m:930
 #: modules/gui/macosx/playlist.m:194 modules/gui/pda/interface.c:192
-#: modules/gui/wxwindows/interface.cpp:375
-#: modules/gui/wxwindows/interface.cpp:839
+#: modules/gui/wxwindows/interface.cpp:371
+#: modules/gui/wxwindows/interface.cpp:878
 msgid "Play"
 msgstr ""
+
+#: modules/control/ntservice.c:39
+msgid "Install NT/2K/XP service"
+msgstr ""
+
+#: modules/control/ntservice.c:41
+msgid "If enabled the interface will install the service and exit."
+msgstr ""
+
+#: modules/control/ntservice.c:42
+msgid "Uninstall NT/2K/XP service"
+msgstr ""
+
+#: modules/control/ntservice.c:44
+msgid "If enabled the interface will uninstall the service and exit."
+msgstr ""
+
+#: modules/control/ntservice.c:45
+msgid "Display name of the service"
+msgstr ""
+
+#: modules/control/ntservice.c:47
+#, fuzzy
+msgid "This allows you to change the display name of the service."
+msgstr "Reproduce el flujo de vídeo mientras se difunde."
+
+#: modules/control/ntservice.c:50
+#, fuzzy
+msgid ""
+"This option allows you to select additional interfaces spawned by the "
+"service. It should be specified at install time so the service is properly "
+"configured. Use a comma separated list of interface modules. (common values "
+"are: logger,sap,rc,http)"
+msgstr ""
+"Esta opción permite escoger las interfaces adicionales a utilizar. Serán "
+"lanzadas en segundo plano junto al interfaz por defecto. Use una lista de "
+"módulos separados por comas. (valores habituales: logger,gestures,sap,rc,"
+"http,screensaver)"
+
+#: modules/control/ntservice.c:56
+msgid "Windows NT/2K/XP service interface"
+msgstr ""
+
+#: modules/control/ntservice.c:57
+#, fuzzy
+msgid "NT service"
+msgstr "Dispositivo VCD"
 
 #: modules/control/rc/rc.c:77
 msgid "Show stream position"
@@ -2330,191 +2608,192 @@ msgstr ""
 msgid "remote control interface"
 msgstr ""
 
-#: modules/demux/a52sys.c:41
+#: modules/demux/a52sys.c:39
 msgid "A52 demuxer"
 msgstr ""
 
-#: modules/demux/a52sys.c:161
+#: modules/demux/a52sys.c:153
 msgid "A52"
 msgstr ""
 
-#: modules/demux/a52sys.c:163 modules/demux/aac.c:175
-#: modules/demux/mpeg/m4v.c:150 modules/demux/mpeg/mpga.c:331
+#: modules/demux/a52sys.c:155 modules/demux/aac.c:167
+#: modules/demux/mpeg/m4v.c:150 modules/demux/mpeg/mpga.c:321
 msgid "Input Type"
 msgstr ""
 
-#: modules/demux/a52sys.c:164 modules/demux/aac.c:177
-#: modules/demux/asf/asf.c:275 modules/demux/avi/avi.c:1178
-#: modules/demux/mkv.cpp:2453 modules/demux/ogg.c:562 modules/demux/ogg.c:838
-#: modules/demux/ogg.c:1011 modules/gui/gtk/gnome_interface.c:148
+#: modules/demux/a52sys.c:156 modules/demux/aac.c:169
+#: modules/demux/asf/asf.c:412 modules/demux/avi/avi.c:324
+#: modules/demux/mkv.cpp:2382 modules/demux/ogg.c:546 modules/demux/ogg.c:822
+#: modules/demux/ogg.c:995 modules/gui/gtk/gnome_interface.c:148
 #: modules/gui/gtk/gnome_interface.c:931 modules/gui/gtk/gtk_interface.c:481
-#: modules/gui/gtk/gtk_interface.c:1282 modules/gui/macosx/output.m:162
-#: modules/gui/wxwindows/streamout.cpp:668
+#: modules/gui/gtk/gtk_interface.c:1282 modules/gui/macosx/output.m:160
+#: modules/gui/wxwindows/streamout.cpp:672
 msgid "Channels"
 msgstr ""
 
-#: modules/demux/a52sys.c:165 modules/demux/aac.c:179
-#: modules/demux/asf/asf.c:277 modules/demux/avi/avi.c:1180
-#: modules/demux/mkv.cpp:2457 modules/demux/mpeg/mpga.c:337
-#: modules/demux/ogg.c:560 modules/demux/ogg.c:672 modules/demux/ogg.c:833
-#: modules/demux/ogg.c:1006
+#: modules/demux/a52sys.c:157 modules/demux/aac.c:171
+#: modules/demux/asf/asf.c:413 modules/demux/avi/avi.c:326
+#: modules/demux/mkv.cpp:2386 modules/demux/mpeg/mpga.c:327
+#: modules/demux/ogg.c:544 modules/demux/ogg.c:656 modules/demux/ogg.c:817
+#: modules/demux/ogg.c:990
 msgid "Sample Rate"
 msgstr ""
 
-#: modules/demux/aac.c:41
+#: modules/demux/aac.c:39
 msgid "AAC demuxer"
 msgstr ""
 
-#: modules/demux/aac.c:173
+#: modules/demux/aac.c:165
 msgid "Aac"
 msgstr ""
 
-#: modules/demux/asf/asf.c:48
-msgid "ASF v1.0 demuxer (file only)"
+#: modules/demux/asf/asf.c:42
+msgid "ASF v1.0 demuxer"
 msgstr ""
 
-#: modules/demux/asf/asf.c:165 modules/demux/mkv.cpp:2416
+#: modules/demux/asf/asf.c:360
+#, fuzzy
+msgid "Length"
+msgstr "Izquierdo"
+
+#: modules/demux/asf/asf.c:365 modules/demux/mkv.cpp:2345
 msgid "Number of streams"
 msgstr ""
 
-#: modules/demux/asf/asf.c:228 modules/demux/asf/asf.c:298
-#: modules/demux/avi/avi.c:1172 modules/demux/avi/avi.c:1217
-#: modules/demux/avi/avi.c:1250 modules/demux/mkv.cpp:2449
-#: modules/demux/mkv.cpp:2465 modules/demux/mkv.cpp:2481
-#: modules/demux/ogg.c:558 modules/demux/ogg.c:630 modules/demux/ogg.c:670
-#: modules/demux/ogg.c:735 modules/demux/ogg.c:830 modules/demux/ogg.c:910
-#: modules/demux/ogg.c:1003 modules/gui/macosx/output.m:139
-#: modules/gui/pda/interface.c:372
-msgid "Type"
-msgstr ""
-
-#: modules/demux/asf/asf.c:260 modules/demux/asf/asf.c:314
-#: modules/demux/avi/avi.c:1174 modules/demux/avi/avi.c:1218
-#: modules/demux/mkv.cpp:2450 modules/demux/mkv.cpp:2466
-#: modules/demux/mkv.cpp:2482 modules/demux/ogg.c:559 modules/demux/ogg.c:631
-#: modules/demux/ogg.c:671 modules/demux/ogg.c:736 modules/demux/ogg.c:831
-#: modules/demux/ogg.c:911 modules/demux/ogg.c:1004
-msgid "Codec"
-msgstr ""
-
-#: modules/demux/asf/asf.c:279
-msgid "Avg. byterate"
-msgstr ""
-
-#: modules/demux/asf/asf.c:282 modules/demux/avi/avi.c:1185
-#: modules/demux/mkv.cpp:2461
-msgid "Bits Per Sample"
-msgstr ""
-
-#: modules/demux/asf/asf.c:328
-msgid "Size"
-msgstr ""
-
-#: modules/demux/asf/asf.c:331 modules/demux/avi/avi.c:1222
-#: modules/demux/mkv.cpp:2469
-msgid "Resolution"
-msgstr ""
-
-#: modules/demux/asf/asf.c:333
-msgid "Planes"
-msgstr ""
-
-#: modules/demux/asf/asf.c:335 modules/demux/avi/avi.c:1228
-msgid "Bits Per Pixel"
-msgstr ""
-
-#: modules/demux/asf/asf.c:338
-msgid "Image Size"
-msgstr ""
-
-#: modules/demux/asf/asf.c:340
-msgid "X pixels per meter"
-msgstr ""
-
-#: modules/demux/asf/asf.c:342
-msgid "Y pixels per meter"
-msgstr ""
-
-#: modules/demux/asf/libasf.c:614
-msgid "Codec name"
-msgstr ""
-
-#: modules/demux/asf/libasf.c:615
-msgid "Codec description"
-msgstr ""
-
-#: modules/demux/asf/libasf.c:695
-msgid "Asf"
-msgstr ""
-
-#: modules/demux/asf/libasf.c:697
+#: modules/demux/asf/asf.c:373
 msgid "Author"
 msgstr ""
 
-#: modules/demux/asf/libasf.c:698
+#: modules/demux/asf/asf.c:375
 msgid "Copyright"
 msgstr ""
 
-#: modules/demux/asf/libasf.c:699 modules/gui/gtk/preferences.c:325
+#: modules/demux/asf/asf.c:377 modules/gui/gtk/preferences.c:325
 #: modules/gui/kde/pluginsbox.cpp:46
 msgid "Description"
 msgstr ""
 
-#: modules/demux/asf/libasf.c:700
+#: modules/demux/asf/asf.c:379
 msgid "Rating"
 msgstr ""
 
-#: modules/demux/au.c:42
-msgid "AU demuxer"
-msgstr ""
+#: modules/demux/asf/asf.c:388
+#, fuzzy
+msgid "Stream "
+msgstr "Estéreo"
 
-#: modules/demux/avi/avi.c:60
-msgid "avi-demuxer"
-msgstr ""
-
-#: modules/demux/avi/avi.c:62 modules/demux/avi/avi.c:63
-msgid "force interleaved method"
-msgstr ""
-
-#: modules/demux/avi/avi.c:65 modules/demux/avi/avi.c:66
-msgid "force index creation"
-msgstr ""
-
-#: modules/demux/avi/avi.c:68
-msgid "AVI demuxer"
-msgstr ""
-
-#: modules/demux/avi/avi.c:1101
-msgid "Avi"
-msgstr ""
-
-#: modules/demux/avi/avi.c:1102
-msgid "Number of Streams"
-msgstr ""
-
-#: modules/demux/avi/avi.c:1103
-msgid "Flags"
-msgstr ""
-
-#: modules/demux/avi/avi.c:1170
+#: modules/demux/asf/asf.c:394 modules/demux/avi/avi.c:316
 #, c-format
 msgid "Stream %d"
 msgstr ""
 
-#: modules/demux/avi/avi.c:1176 modules/demux/avi/avi.c:1220
+#: modules/demux/asf/asf.c:397 modules/demux/avi/avi.c:318
+#: modules/demux/avi/avi.c:363 modules/demux/avi/avi.c:388
+#: modules/demux/mkv.cpp:2378 modules/demux/mkv.cpp:2394
+#: modules/demux/mkv.cpp:2410 modules/demux/ogg.c:542 modules/demux/ogg.c:614
+#: modules/demux/ogg.c:654 modules/demux/ogg.c:719 modules/demux/ogg.c:814
+#: modules/demux/ogg.c:894 modules/demux/ogg.c:987
+#: modules/gui/macosx/output.m:141 modules/gui/pda/interface.c:372
+msgid "Type"
+msgstr ""
+
+#: modules/demux/asf/asf.c:399 modules/demux/avi/avi.c:320
+#: modules/demux/avi/avi.c:364 modules/demux/mkv.cpp:2379
+#: modules/demux/mkv.cpp:2395 modules/demux/mkv.cpp:2411
+#: modules/demux/ogg.c:543 modules/demux/ogg.c:615 modules/demux/ogg.c:655
+#: modules/demux/ogg.c:720 modules/demux/ogg.c:815 modules/demux/ogg.c:895
+#: modules/demux/ogg.c:988
+msgid "Codec"
+msgstr ""
+
+#: modules/demux/asf/asf.c:403
+msgid "Codec name"
+msgstr ""
+
+#: modules/demux/asf/asf.c:405
+msgid "Codec description"
+msgstr ""
+
+#: modules/demux/asf/asf.c:414
+msgid "Avg. byterate"
+msgstr ""
+
+#: modules/demux/asf/asf.c:415 modules/demux/avi/avi.c:331
+#: modules/demux/mkv.cpp:2390
+msgid "Bits Per Sample"
+msgstr ""
+
+#: modules/demux/asf/asf.c:421 modules/demux/avi/avi.c:368
+#: modules/demux/mkv.cpp:2398
+msgid "Resolution"
+msgstr ""
+
+#: modules/demux/asf/asf.c:423
+msgid "Planes"
+msgstr ""
+
+#: modules/demux/asf/asf.c:424 modules/demux/avi/avi.c:374
+msgid "Bits Per Pixel"
+msgstr ""
+
+#: modules/demux/asf/asf.c:425
+msgid "Image Size"
+msgstr ""
+
+#: modules/demux/asf/asf.c:426
+msgid "X pixels per meter"
+msgstr ""
+
+#: modules/demux/asf/asf.c:428
+msgid "Y pixels per meter"
+msgstr ""
+
+#: modules/demux/au.c:41
+msgid "AU demuxer"
+msgstr ""
+
+#: modules/demux/avi/avi.c:42
+msgid "avi-demuxer"
+msgstr ""
+
+#: modules/demux/avi/avi.c:44 modules/demux/avi/avi.c:45
+msgid "force interleaved method"
+msgstr ""
+
+#: modules/demux/avi/avi.c:47 modules/demux/avi/avi.c:48
+msgid "force index creation"
+msgstr ""
+
+#: modules/demux/avi/avi.c:50
+msgid "AVI demuxer"
+msgstr ""
+
+#: modules/demux/avi/avi.c:245
+msgid "Avi"
+msgstr ""
+
+#: modules/demux/avi/avi.c:246
+msgid "Number of Streams"
+msgstr ""
+
+#: modules/demux/avi/avi.c:247
+msgid "Flags"
+msgstr ""
+
+#: modules/demux/avi/avi.c:322 modules/demux/avi/avi.c:366
 msgid "FOURCC"
 msgstr ""
 
-#: modules/demux/avi/avi.c:1187
+#: modules/demux/avi/avi.c:333
 msgid "Audio Bitrate"
 msgstr ""
 
-#: modules/demux/avi/avi.c:1225 modules/demux/ogg.c:632
-#: modules/demux/ogg.c:738 modules/demux/ogg.c:913
+#: modules/demux/avi/avi.c:371 modules/demux/ogg.c:616 modules/demux/ogg.c:722
+#: modules/demux/ogg.c:897
 msgid "Frame Rate"
 msgstr ""
 
-#: modules/demux/avi/avi.c:1250
+#: modules/demux/avi/avi.c:388
 msgid "Unknown"
 msgstr ""
 
@@ -2550,71 +2829,66 @@ msgstr ""
 msgid "mka/mkv stream demuxer"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2393 modules/gui/gtk/gnome_interface.c:2436
-#: modules/gui/gtk/gtk_interface.c:2857 modules/gui/wxwindows/playlist.cpp:150
+#: modules/demux/mkv.cpp:2322 modules/gui/gtk/gnome_interface.c:2436
+#: modules/gui/gtk/gtk_interface.c:2857 modules/gui/wxwindows/playlist.cpp:154
 msgid "Duration"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2402
+#: modules/demux/mkv.cpp:2331
 msgid "Date UTC"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2406
+#: modules/demux/mkv.cpp:2335
 msgid "Segment Filename"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2410
+#: modules/demux/mkv.cpp:2339
 msgid "Muxing Application"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2414
+#: modules/demux/mkv.cpp:2343
 msgid "Writing Application"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2427 modules/gui/beos/PlayListWindow.cpp:144
+#: modules/demux/mkv.cpp:2356 modules/gui/beos/PlayListWindow.cpp:144
 #: modules/gui/gtk/preferences.c:325 modules/gui/kde/pluginsbox.cpp:45
 #: modules/gui/pda/interface.c:364
 msgid "Name"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2431
+#: modules/demux/mkv.cpp:2360
 msgid "Codec Name"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2435
+#: modules/demux/mkv.cpp:2364
 msgid "Codec Setting"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2439
+#: modules/demux/mkv.cpp:2368
 msgid "Codec Info"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2443
+#: modules/demux/mkv.cpp:2372
 msgid "Codec Download"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2473
+#: modules/demux/mkv.cpp:2402
 msgid "Display Resolution"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2477
+#: modules/demux/mkv.cpp:2406
 msgid "Frame Per Second"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2481 modules/gui/gtk/gnome_interface.c:1963
-#: modules/gui/gtk/gtk_interface.c:2278
-msgid "Subtitle"
-msgstr ""
-
-#: modules/demux/mp4/mp4.c:59
+#: modules/demux/mp4/mp4.c:42
 msgid "MP4 demuxer"
 msgstr ""
 
-#: modules/demux/mpeg/es.c:49
+#: modules/demux/mpeg/es.c:48
 msgid "ISO 13818-1 MPEG Elementary Stream input"
 msgstr ""
 
-#: modules/demux/mpeg/m4v.c:43
+#: modules/demux/mpeg/m4v.c:42
 msgid "MPEG-4 video elementary stream demuxer"
 msgstr ""
 
@@ -2626,106 +2900,110 @@ msgstr ""
 msgid "Video MPEG-4 (raw ES)"
 msgstr ""
 
-#: modules/demux/mpeg/mpga.c:41
+#: modules/demux/mpeg/mpga.c:39
 msgid "MPEG-I/II Audio demuxer"
 msgstr ""
 
-#: modules/demux/mpeg/mpga.c:330
+#: modules/demux/mpeg/mpga.c:320
 msgid "MPEG"
 msgstr ""
 
-#: modules/demux/mpeg/mpga.c:333
+#: modules/demux/mpeg/mpga.c:323
 msgid "Layer"
 msgstr ""
 
-#: modules/demux/mpeg/mpga.c:335
+#: modules/demux/mpeg/mpga.c:325
 msgid "Mode"
 msgstr ""
 
-#: modules/demux/mpeg/mpga.c:339
+#: modules/demux/mpeg/mpga.c:329
 msgid "Average Bitrate"
 msgstr ""
 
-#: modules/demux/mpeg/ps.c:60
+#: modules/demux/mpeg/ps.c:59
 msgid "ISO 13818-1 MPEG Program Stream input"
 msgstr ""
 
-#: modules/demux/mpeg/system.c:56
+#: modules/demux/mpeg/system.c:55
 msgid "generic ISO 13818-1 MPEG demultiplexing"
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:97
+#: modules/demux/mpeg/ts.c:91
 msgid "Compatibility with pre-0.4 VLS"
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:99
+#: modules/demux/mpeg/ts.c:93
 msgid ""
 "The protocol for transmitting A/52 audio streams changed between VLC 0.3.x "
 "and 0.4. By default VLC assumes you have the latest VLS. In case you're "
 "using an old version, select this option."
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:103
+#: modules/demux/mpeg/ts.c:97
 msgid "Buggy PSI"
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:105
+#: modules/demux/mpeg/ts.c:99
 msgid ""
 "If you have a stream whose PSI packets do not feature incremented continuity "
 "counters, select this option."
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:110
+#: modules/demux/mpeg/ts.c:104
 msgid "ISO 13818-1 MPEG Transport Stream input"
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:114
+#: modules/demux/mpeg/ts.c:108
 msgid "ISO 13818-1 MPEG Transport Stream input (libdvbpsi)"
 msgstr ""
 
-#: modules/demux/ogg.c:188
+#: modules/demux/ogg.c:172
 msgid "ogg stream demuxer"
 msgstr ""
 
-#: modules/demux/ogg.c:559
+#: modules/demux/ogg.c:543
 msgid "Vorbis"
 msgstr ""
 
-#: modules/demux/ogg.c:564 modules/demux/ogg.c:634 modules/demux/ogg.c:674
-#: modules/demux/ogg.c:835 modules/demux/ogg.c:1008
+#: modules/demux/ogg.c:548 modules/demux/ogg.c:618 modules/demux/ogg.c:658
+#: modules/demux/ogg.c:819 modules/demux/ogg.c:992
 msgid "Bit Rate"
 msgstr ""
 
-#: modules/demux/ogg.c:631
+#: modules/demux/ogg.c:615
 msgid "Theora"
 msgstr ""
 
-#: modules/demux/ogg.c:671
+#: modules/demux/ogg.c:655
 msgid "tarkin"
 msgstr ""
 
-#: modules/demux/ogg.c:740 modules/demux/ogg.c:915
+#: modules/demux/ogg.c:724 modules/demux/ogg.c:899
 msgid "Bit Count"
 msgstr ""
 
-#: modules/demux/ogg.c:742 modules/demux/ogg.c:917
+#: modules/demux/ogg.c:726 modules/demux/ogg.c:901
 msgid "Width"
 msgstr ""
 
-#: modules/demux/ogg.c:744 modules/demux/ogg.c:919
+#: modules/demux/ogg.c:728 modules/demux/ogg.c:903
 msgid "Height"
 msgstr ""
 
-#: modules/demux/ogg.c:840 modules/demux/ogg.c:1013
+#: modules/demux/ogg.c:824 modules/demux/ogg.c:997
 msgid "Bits per Sample"
 msgstr ""
 
-#: modules/demux/rawdv.c:115
+#: modules/demux/rawdv.c:109
 msgid "raw dv demuxer"
 msgstr ""
 
-#: modules/demux/sdp.c:64
-msgid "SDP demuxer + UDP/RTP/RTSP"
+#: modules/demux/sdp.c:46
+msgid "SDP demuxer/reader"
+msgstr ""
+
+#: modules/demux/sdp.c:56
+msgid "RTSP/RTP describe"
 msgstr ""
 
 #: modules/demux/util/id3.c:44
@@ -3056,24 +3334,12 @@ msgstr ""
 msgid "id3 tag parser using libid3tag"
 msgstr ""
 
-#: modules/demux/util/sub.c:67
+#: modules/demux/util/sub.c:72
 msgid "Text subtitles demux"
 msgstr ""
 
-#: modules/demux/wav.c:43
+#: modules/demux/wav.c:42
 msgid "WAV demuxer"
-msgstr ""
-
-#: modules/encoder/ffmpeg/encoder.c:51
-msgid "ffmpeg video encoder"
-msgstr ""
-
-#: modules/encoder/ffmpeg/encoder.c:62
-msgid "ffmpeg audio encoder"
-msgstr ""
-
-#: modules/encoder/xvid.c:58
-msgid "XviD video encoder (MPEG-4)"
 msgstr ""
 
 #: modules/gui/beos/BeOS.cpp:55
@@ -3095,7 +3361,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:201
 #: modules/gui/beos/InterfaceWindow.cpp:308 modules/gui/macosx/intf.m:328
 #: modules/gui/macosx/prefs.m:77 modules/gui/pda/interface.c:151
-#: modules/gui/pda/interface.c:152 modules/gui/wxwindows/preferences.cpp:233
+#: modules/gui/pda/interface.c:152 modules/gui/wxwindows/preferences.cpp:216
 msgid "Preferences"
 msgstr ""
 
@@ -3104,12 +3370,12 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2692 modules/gui/gtk/gtk_interface.c:2947
 #: modules/gui/kde/info.cpp:9 modules/gui/kde/messages.cpp:8
 #: modules/gui/macosx/intf.m:334 modules/gui/macosx/intf.m:411
-#: modules/gui/wxwindows/messages.cpp:83
+#: modules/gui/wxwindows/messages.cpp:65
 msgid "Messages"
 msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:238
-#: modules/gui/beos/MediaControlView.cpp:1257
+#: modules/gui/beos/MediaControlView.cpp:1255
 #: modules/gui/beos/PlayListWindow.cpp:82
 #: modules/gui/gtk/gnome_interface.c:503
 #: modules/gui/gtk/gnome_interface.c:1569
@@ -3117,19 +3383,19 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2847 modules/gui/gtk/gtk_interface.c:618
 #: modules/gui/gtk/gtk_interface.c:1884 modules/gui/gtk/gtk_interface.c:2733
 #: modules/gui/gtk/gtk_interface.c:2850 modules/gui/gtk/gtk_interface.c:3102
-#: modules/gui/macosx/open.m:142 modules/gui/macosx/open.m:263
-#: modules/gui/macosx/output.m:130 modules/gui/macosx/output.m:208
-#: modules/gui/macosx/output.m:300 modules/gui/pda/interface.c:380
-#: modules/gui/wxwindows/interface.cpp:362 modules/gui/wxwindows/open.cpp:253
-#: modules/gui/wxwindows/streamout.cpp:385
+#: modules/gui/macosx/open.m:142 modules/gui/macosx/open.m:261
+#: modules/gui/macosx/output.m:132 modules/gui/macosx/output.m:206
+#: modules/gui/macosx/output.m:303 modules/gui/pda/interface.c:380
+#: modules/gui/wxwindows/interface.cpp:358 modules/gui/wxwindows/open.cpp:271
+#: modules/gui/wxwindows/streamout.cpp:381
 msgid "File"
 msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:240
 #: modules/gui/beos/PlayListWindow.cpp:84
 #: modules/gui/gtk/gnome_interface.c:2179
-#: modules/gui/gtk2/gnome2_interface.c:113 modules/gui/macosx/open.m:331
-#: modules/gui/macosx/open.m:630 modules/gui/macosx/open.m:676
+#: modules/gui/gtk2/gnome2_interface.c:113 modules/gui/macosx/open.m:329
+#: modules/gui/macosx/open.m:628 modules/gui/macosx/open.m:674
 msgid "Open File"
 msgstr ""
 
@@ -3189,11 +3455,11 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2638 modules/gui/gtk/gtk_interface.c:2869
 #: modules/gui/gtk/gtk_interface.c:2976 modules/gui/gtk/gtk_interface.c:3250
 #: modules/gui/gtk/preferences.c:606 modules/gui/macosx/open.m:139
-#: modules/gui/macosx/open.m:180 modules/gui/macosx/output.m:126
-#: modules/gui/wxwindows/open.cpp:244
-#: modules/gui/wxwindows/preferences.cpp:253
-#: modules/gui/wxwindows/streamout.cpp:217
-#: modules/gui/wxwindows/subtitles.cpp:190
+#: modules/gui/macosx/open.m:180 modules/gui/macosx/output.m:128
+#: modules/gui/wxwindows/open.cpp:262
+#: modules/gui/wxwindows/preferences.cpp:236
+#: modules/gui/wxwindows/streamout.cpp:187
+#: modules/gui/wxwindows/subtitles.cpp:176 modules/gui/wxwindows/v4l.cpp:149
 msgid "OK"
 msgstr ""
 
@@ -3210,9 +3476,8 @@ msgid "Drop files to play"
 msgstr ""
 
 #: modules/gui/beos/PlayListWindow.cpp:93
-#: modules/gui/wxwindows/fileinfo.cpp:96
-#: modules/gui/wxwindows/messages.cpp:106
-#: modules/gui/wxwindows/playlist.cpp:156
+#: modules/gui/wxwindows/fileinfo.cpp:80 modules/gui/wxwindows/messages.cpp:90
+#: modules/gui/wxwindows/playlist.cpp:160
 msgid "Close"
 msgstr ""
 
@@ -3276,8 +3541,8 @@ msgstr ""
 
 #: modules/gui/beos/PreferencesWindow.cpp:224
 #: modules/gui/gtk/preferences.c:597 modules/gui/gtk/preferences.c:614
-#: modules/gui/macosx/output.m:365 modules/gui/macosx/prefs.m:78
-#: modules/gui/wxwindows/preferences.cpp:257
+#: modules/gui/macosx/output.m:370 modules/gui/macosx/prefs.m:78
+#: modules/gui/wxwindows/preferences.cpp:240
 msgid "Save"
 msgstr ""
 
@@ -3367,7 +3632,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:504
 #: modules/gui/gtk/gnome_interface.c:986 modules/gui/gtk/gtk_interface.c:173
 #: modules/gui/gtk/gtk_interface.c:619 modules/gui/gtk/gtk_interface.c:1399
-#: modules/gui/wxwindows/interface.cpp:255
+#: modules/gui/wxwindows/interface.cpp:251
 msgid "Open a file"
 msgstr ""
 
@@ -3505,7 +3770,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:190 modules/gui/gtk/gnome_interface.c:973
 #: modules/gui/gtk/gtk_interface.c:560 modules/gui/gtk/gtk_interface.c:1356
-#: modules/gui/macosx/output.m:129 modules/gui/macosx/vout.m:199
+#: modules/gui/macosx/output.m:131 modules/gui/macosx/vout.m:225
 msgid "Screen"
 msgstr ""
 
@@ -3528,18 +3793,18 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2267 modules/gui/gtk/gtk_interface.c:629
 #: modules/gui/gtk/gtk_interface.c:816 modules/gui/gtk/gtk_interface.c:2005
 #: modules/gui/gtk/gtk_interface.c:2726 modules/gui/macosx/open.m:143
-#: modules/gui/macosx/open.m:267 modules/gui/wxwindows/interface.cpp:364
-#: modules/gui/wxwindows/open.cpp:255
+#: modules/gui/macosx/open.m:265 modules/gui/wxwindows/interface.cpp:360
+#: modules/gui/wxwindows/open.cpp:273
 msgid "Disc"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:527 modules/gui/gtk/gtk_interface.c:640
-#: modules/gui/wxwindows/interface.cpp:366
+#: modules/gui/wxwindows/interface.cpp:362
 msgid "Net"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:539 modules/gui/gtk/gtk_interface.c:651
-#: modules/gui/wxwindows/interface.cpp:369
+#: modules/gui/wxwindows/interface.cpp:365
 msgid "Sat"
 msgstr ""
 
@@ -3555,15 +3820,6 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:554 modules/gui/gtk/gtk_interface.c:665
 msgid "Go Backward"
-msgstr ""
-
-#: modules/gui/gtk/gnome_interface.c:566
-#: modules/gui/gtk/gnome_interface.c:1027 modules/gui/gtk/gtk_interface.c:676
-#: modules/gui/gtk/gtk_interface.c:1127 modules/gui/macosx/controls.m:639
-#: modules/gui/macosx/intf.m:325 modules/gui/macosx/intf.m:363
-#: modules/gui/macosx/intf.m:424 modules/gui/pda/interface.c:205
-#: modules/gui/wxwindows/interface.cpp:373
-msgid "Stop"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:567 modules/gui/gtk/gtk_interface.c:677
@@ -3610,21 +3866,12 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1063 modules/gui/gtk/gtk_interface.c:758
 #: modules/gui/gtk/gtk_interface.c:844 modules/gui/gtk/gtk_interface.c:888
 #: modules/gui/gtk/gtk_interface.c:1173
-#: modules/gui/wxwindows/interface.cpp:380
+#: modules/gui/wxwindows/interface.cpp:376
 msgid "Prev"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:656 modules/gui/gtk/gtk_interface.c:759
 msgid "Previous file"
-msgstr ""
-
-#: modules/gui/gtk/gnome_interface.c:667
-#: modules/gui/gtk/gnome_interface.c:1056 modules/gui/gtk/gtk_interface.c:769
-#: modules/gui/gtk/gtk_interface.c:852 modules/gui/gtk/gtk_interface.c:896
-#: modules/gui/gtk/gtk_interface.c:1166 modules/gui/macosx/controls.m:647
-#: modules/gui/macosx/intf.m:327 modules/gui/macosx/intf.m:367
-#: modules/gui/macosx/intf.m:425 modules/gui/wxwindows/interface.cpp:382
-msgid "Next"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:668 modules/gui/gtk/gtk_interface.c:770
@@ -3704,17 +3951,17 @@ msgid "Open Stream"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1476 modules/gui/gtk/gtk_interface.c:1791
-#: modules/gui/macosx/open.m:136 modules/gui/wxwindows/open.cpp:169
+#: modules/gui/macosx/open.m:136 modules/gui/wxwindows/open.cpp:187
 msgid "Media Resource Locator (MRL)"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1498 modules/gui/gtk/gtk_interface.c:1813
-#: modules/gui/wxwindows/open.cpp:173
+#: modules/gui/wxwindows/open.cpp:191
 msgid "Open Target:"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1518 modules/gui/gtk/gtk_interface.c:1833
-#: modules/gui/wxwindows/open.cpp:188
+#: modules/gui/wxwindows/open.cpp:206
 msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
@@ -3724,33 +3971,33 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1998 modules/gui/gtk/gtk_interface.c:1877
 #: modules/gui/gtk/gtk_interface.c:2315 modules/gui/macosx/open.m:146
 #: modules/gui/macosx/open.m:152 modules/gui/macosx/open.m:174
-#: modules/gui/macosx/output.m:132 modules/gui/macosx/prefs.m:464
-#: modules/gui/wxwindows/open.cpp:223 modules/gui/wxwindows/open.cpp:341
-#: modules/gui/wxwindows/preferences.cpp:832
-#: modules/gui/wxwindows/streamout.cpp:412
-#: modules/gui/wxwindows/subtitles.cpp:109
+#: modules/gui/macosx/output.m:134 modules/gui/macosx/prefs.m:464
+#: modules/gui/wxwindows/open.cpp:241 modules/gui/wxwindows/open.cpp:371
+#: modules/gui/wxwindows/preferences.cpp:815
+#: modules/gui/wxwindows/streamout.cpp:410
+#: modules/gui/wxwindows/subtitles.cpp:93
 msgid "Browse..."
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1586 modules/gui/gtk/gtk_interface.c:1901
-#: modules/gui/wxwindows/open.cpp:392
+#: modules/gui/wxwindows/open.cpp:422
 msgid "Disc type"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1605 modules/gui/gtk/gtk_interface.c:1920
-#: modules/gui/macosx/open.m:156 modules/gui/macosx/open.m:487
-#: modules/gui/wxwindows/open.cpp:386
+#: modules/gui/macosx/open.m:156 modules/gui/macosx/open.m:485
+#: modules/gui/wxwindows/open.cpp:416
 msgid "DVD"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1613 modules/gui/gtk/gtk_interface.c:1928
-#: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:381
-#: modules/gui/macosx/open.m:471 modules/gui/wxwindows/open.cpp:387
+#: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:379
+#: modules/gui/macosx/open.m:469 modules/gui/wxwindows/open.cpp:417
 msgid "VCD"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1621 modules/gui/gtk/gtk_interface.c:1936
-#: modules/gui/macosx/open.m:149 modules/gui/wxwindows/open.cpp:398
+#: modules/gui/macosx/open.m:149 modules/gui/wxwindows/open.cpp:428
 msgid "Device name"
 msgstr ""
 
@@ -3760,20 +4007,20 @@ msgid "Use DVD menus"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1707 modules/gui/gtk/gtk_interface.c:2022
-#: modules/gui/macosx/open.m:165 modules/gui/macosx/open.m:546
-#: modules/gui/macosx/open.m:584 modules/gui/wxwindows/open.cpp:433
+#: modules/gui/macosx/open.m:165 modules/gui/macosx/open.m:544
+#: modules/gui/macosx/open.m:582 modules/gui/wxwindows/open.cpp:463
 msgid "UDP/RTP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1717 modules/gui/gtk/gtk_interface.c:2032
-#: modules/gui/macosx/open.m:166 modules/gui/macosx/open.m:547
-#: modules/gui/macosx/open.m:596 modules/gui/wxwindows/open.cpp:434
+#: modules/gui/macosx/open.m:166 modules/gui/macosx/open.m:545
+#: modules/gui/macosx/open.m:594 modules/gui/wxwindows/open.cpp:464
 msgid "UDP/RTP Multicast"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1727 modules/gui/gtk/gtk_interface.c:2042
-#: modules/gui/macosx/open.m:167 modules/gui/macosx/open.m:548
-#: modules/gui/macosx/open.m:609 modules/gui/wxwindows/open.cpp:435
+#: modules/gui/macosx/open.m:167 modules/gui/macosx/open.m:546
+#: modules/gui/macosx/open.m:607 modules/gui/wxwindows/open.cpp:465
 msgid "HTTP/FTP/MMS"
 msgstr ""
 
@@ -3782,29 +4029,29 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2912 modules/gui/gtk/gtk_interface.c:2052
 #: modules/gui/gtk/gtk_interface.c:2101 modules/gui/gtk/gtk_interface.c:3225
 #: modules/gui/macosx/open.m:160 modules/gui/macosx/open.m:162
-#: modules/gui/macosx/output.m:134 modules/gui/pda/interface.c:425
-#: modules/gui/wxwindows/open.cpp:454 modules/gui/wxwindows/open.cpp:477
-#: modules/gui/wxwindows/streamout.cpp:436
+#: modules/gui/macosx/output.m:136 modules/gui/pda/interface.c:425
+#: modules/gui/wxwindows/open.cpp:484 modules/gui/wxwindows/open.cpp:507
+#: modules/gui/wxwindows/streamout.cpp:434
 msgid "Port"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1747 modules/gui/gtk/gtk_interface.c:2062
-#: modules/gui/macosx/open.m:161 modules/gui/macosx/output.m:133
-#: modules/gui/pda/interface.c:414 modules/gui/wxwindows/open.cpp:469
-#: modules/gui/wxwindows/streamout.cpp:425
+#: modules/gui/macosx/open.m:161 modules/gui/macosx/output.m:135
+#: modules/gui/pda/interface.c:414 modules/gui/wxwindows/open.cpp:499
+#: modules/gui/wxwindows/streamout.cpp:423
 msgid "Address"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1759 modules/gui/gtk/gtk_interface.c:2074
-#: modules/gui/macosx/open.m:163 modules/gui/wxwindows/open.cpp:492
+#: modules/gui/macosx/open.m:163 modules/gui/wxwindows/open.cpp:522
 msgid "URL"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1830
 #: modules/gui/gtk/gnome_interface.c:2281 modules/gui/gtk/gtk_interface.c:2145
 #: modules/gui/gtk/gtk_interface.c:2740 modules/gui/macosx/open.m:144
-#: modules/gui/macosx/open.m:271 modules/gui/pda/interface.c:518
-#: modules/gui/wxwindows/open.cpp:257
+#: modules/gui/macosx/open.m:269 modules/gui/pda/interface.c:518
+#: modules/gui/wxwindows/open.cpp:275
 msgid "Network"
 msgstr ""
 
@@ -3813,6 +4060,7 @@ msgid "Symbol Rate"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1857 modules/gui/gtk/gtk_interface.c:2172
+#: modules/gui/wxwindows/v4l.cpp:304
 msgid "Frequency"
 msgstr ""
 
@@ -3833,7 +4081,7 @@ msgid "Horizontal"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1956 modules/gui/gtk/gtk_interface.c:2271
-#: modules/gui/wxwindows/open.cpp:260
+#: modules/gui/wxwindows/open.cpp:278
 msgid "Satellite"
 msgstr ""
 
@@ -3848,8 +4096,8 @@ msgid "fps"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2049 modules/gui/gtk/gtk_interface.c:2369
-#: modules/gui/macosx/open.m:173 modules/gui/macosx/output.m:125
-#: modules/gui/wxwindows/open.cpp:199 modules/gui/wxwindows/open.cpp:354
+#: modules/gui/macosx/open.m:173 modules/gui/macosx/output.m:127
+#: modules/gui/wxwindows/open.cpp:217 modules/gui/wxwindows/open.cpp:384
 msgid "Settings..."
 msgstr ""
 
@@ -3861,7 +4109,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2288
 #: modules/gui/gtk/gnome_interface.c:2429 modules/gui/gtk/gtk_interface.c:2747
-#: modules/gui/wxwindows/playlist.cpp:149
+#: modules/gui/wxwindows/playlist.cpp:153
 msgid "Url"
 msgstr ""
 
@@ -3925,14 +4173,14 @@ msgid "Destination Target: "
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2857 modules/gui/gtk/gtk_interface.c:3112
-#: modules/gui/macosx/output.m:137 modules/gui/macosx/output.m:247
-#: modules/gui/macosx/output.m:313 modules/gui/wxwindows/streamout.cpp:387
+#: modules/gui/macosx/output.m:139 modules/gui/macosx/output.m:247
+#: modules/gui/macosx/output.m:316 modules/gui/wxwindows/streamout.cpp:384
 msgid "UDP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2867 modules/gui/gtk/gtk_interface.c:3122
-#: modules/gui/macosx/output.m:138 modules/gui/macosx/output.m:260
-#: modules/gui/macosx/output.m:323 modules/gui/wxwindows/streamout.cpp:388
+#: modules/gui/macosx/output.m:140 modules/gui/macosx/output.m:261
+#: modules/gui/macosx/output.m:326 modules/gui/wxwindows/streamout.cpp:385
 msgid "RTP"
 msgstr ""
 
@@ -3953,8 +4201,7 @@ msgid "PS"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2972 modules/gui/gtk/gtk_interface.c:3217
-#: modules/gui/macosx/output.m:145 modules/gui/macosx/output.m:293
-#: modules/gui/macosx/output.m:352
+#: modules/gui/macosx/output.m:295 modules/gui/macosx/output.m:355
 msgid "AVI"
 msgstr ""
 
@@ -4048,7 +4295,7 @@ msgstr ""
 msgid "the VideoLAN team <videolan@videolan.org>"
 msgstr ""
 
-#: modules/gui/gtk/gtk_interface.c:1777 modules/gui/wxwindows/open.cpp:150
+#: modules/gui/gtk/gtk_interface.c:1777 modules/gui/wxwindows/open.cpp:165
 msgid "Open Target"
 msgstr ""
 
@@ -4080,10 +4327,10 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2876 modules/gui/gtk/gtk_interface.c:3257
 #: modules/gui/gtk/preferences.c:618 modules/gui/macosx/open.m:140
 #: modules/gui/macosx/prefs.m:79 modules/gui/macosx/prefs.m:170
-#: modules/gui/wxwindows/open.cpp:247
-#: modules/gui/wxwindows/preferences.cpp:256
-#: modules/gui/wxwindows/streamout.cpp:220
-#: modules/gui/wxwindows/subtitles.cpp:193
+#: modules/gui/wxwindows/open.cpp:265
+#: modules/gui/wxwindows/preferences.cpp:239
+#: modules/gui/wxwindows/streamout.cpp:190
+#: modules/gui/wxwindows/subtitles.cpp:179 modules/gui/wxwindows/v4l.cpp:152
 msgid "Cancel"
 msgstr ""
 
@@ -4159,7 +4406,7 @@ msgstr ""
 msgid "button3"
 msgstr ""
 
-#: modules/gui/gtk2/gnome2_interface.c:123 modules/gui/macosx/output.m:364
+#: modules/gui/gtk2/gnome2_interface.c:123 modules/gui/macosx/output.m:369
 msgid "Save File"
 msgstr ""
 
@@ -4208,7 +4455,7 @@ msgid "Messages:"
 msgstr ""
 
 #: modules/gui/kde/preferences.cpp:96
-#: modules/gui/wxwindows/preferences.cpp:398
+#: modules/gui/wxwindows/preferences.cpp:381
 msgid "Plugins"
 msgstr ""
 
@@ -4241,22 +4488,8 @@ msgstr ""
 msgid "Fit To Screen"
 msgstr ""
 
-#: modules/gui/macosx/controls.m:625 modules/gui/macosx/intf.m:326
-#: modules/gui/macosx/intf.m:364 modules/gui/wxwindows/interface.cpp:386
-msgid "Faster"
-msgstr ""
-
-#: modules/gui/macosx/controls.m:626 modules/gui/macosx/intf.m:323
-#: modules/gui/macosx/intf.m:365 modules/gui/wxwindows/interface.cpp:384
-msgid "Slower"
-msgstr ""
-
-#: modules/gui/macosx/controls.m:646 modules/gui/macosx/intf.m:322
-#: modules/gui/macosx/intf.m:366 modules/gui/macosx/intf.m:426
-msgid "Previous"
-msgstr ""
-
 #: modules/gui/macosx/controls.m:665 modules/gui/macosx/intf.m:368
+#: modules/gui/wxwindows/playlist.cpp:171
 msgid "Loop"
 msgstr ""
 
@@ -4277,9 +4510,8 @@ msgstr ""
 msgid "VLC - Controller"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:329 modules/gui/wxwindows/control.cpp:160
-#: modules/gui/wxwindows/control.cpp:370
-#: modules/gui/wxwindows/interface.cpp:904 modules/gui/wxwindows/timer.cpp:131
+#: modules/gui/macosx/intf.m:329 modules/gui/wxwindows/interface.cpp:943
+#: modules/gui/wxwindows/timer.cpp:119
 msgid "Volume"
 msgstr ""
 
@@ -4351,7 +4583,7 @@ msgstr ""
 msgid "Paste"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:358 modules/gui/wxwindows/messages.cpp:111
+#: modules/gui/macosx/intf.m:358 modules/gui/wxwindows/messages.cpp:95
 msgid "Clear"
 msgstr ""
 
@@ -4360,7 +4592,7 @@ msgid "Controls"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:398 modules/gui/macosx/intf.m:399
-#: modules/gui/macosx/macosx.m:47 modules/gui/macosx/vout.m:188
+#: modules/gui/macosx/macosx.m:47 modules/gui/macosx/vout.m:214
 msgid "Video device"
 msgstr ""
 
@@ -4475,12 +4707,12 @@ msgstr ""
 msgid "Treat as a pipe rather than as a file"
 msgstr ""
 
-#: modules/gui/macosx/open.m:155 modules/gui/macosx/open.m:370
+#: modules/gui/macosx/open.m:155 modules/gui/macosx/open.m:368
 msgid "VIDEO_TS folder"
 msgstr ""
 
-#: modules/gui/macosx/open.m:158 modules/gui/macosx/open.m:388
-#: modules/gui/macosx/open.m:479
+#: modules/gui/macosx/open.m:158 modules/gui/macosx/open.m:386
+#: modules/gui/macosx/open.m:477
 msgid "Audio CD"
 msgstr ""
 
@@ -4492,89 +4724,86 @@ msgstr ""
 msgid "Override"
 msgstr ""
 
-#: modules/gui/macosx/open.m:332 modules/gui/macosx/open.m:526
-#: modules/gui/macosx/open.m:631 modules/gui/macosx/open.m:677
+#: modules/gui/macosx/open.m:330 modules/gui/macosx/open.m:524
+#: modules/gui/macosx/open.m:629 modules/gui/macosx/open.m:675
 msgid "Open"
 msgstr ""
 
-#: modules/gui/macosx/open.m:422 modules/gui/macosx/open.m:474
-#: modules/gui/macosx/open.m:482 modules/gui/macosx/open.m:490
+#: modules/gui/macosx/open.m:420 modules/gui/macosx/open.m:472
+#: modules/gui/macosx/open.m:480 modules/gui/macosx/open.m:488
 msgid "No %@s found"
 msgstr ""
 
-#: modules/gui/macosx/open.m:525
+#: modules/gui/macosx/open.m:523
 msgid "Open VIDEO_TS Directory"
 msgstr ""
 
-#: modules/gui/macosx/output.m:124
+#: modules/gui/macosx/output.m:126
 msgid "Advanced output:"
 msgstr ""
 
-#: modules/gui/macosx/output.m:128
+#: modules/gui/macosx/output.m:130
 msgid "Output Options"
 msgstr ""
 
-#: modules/gui/macosx/output.m:131 modules/gui/macosx/output.m:225
-#: modules/gui/macosx/output.m:306
+#: modules/gui/macosx/output.m:133 modules/gui/macosx/output.m:224
+#: modules/gui/macosx/output.m:309
 msgid "Stream"
 msgstr ""
 
-#: modules/gui/macosx/output.m:135
+#: modules/gui/macosx/output.m:137
 msgid "TTL"
 msgstr ""
 
-#: modules/gui/macosx/output.m:136 modules/gui/macosx/output.m:236
-#: modules/gui/macosx/output.m:311 modules/gui/pda/interface.c:480
-#: modules/gui/wxwindows/streamout.cpp:386
+#: modules/gui/macosx/output.m:138 modules/gui/macosx/output.m:235
+#: modules/gui/macosx/output.m:314 modules/gui/pda/interface.c:480
+#: modules/gui/wxwindows/streamout.cpp:382
 msgid "HTTP"
 msgstr ""
 
-#: modules/gui/macosx/output.m:141 modules/gui/wxwindows/streamout.cpp:531
+#: modules/gui/macosx/output.m:143 modules/gui/wxwindows/streamout.cpp:531
 msgid "Encapsulation Method"
 msgstr ""
 
-#: modules/gui/macosx/output.m:142
-msgid "MPEG TS"
-msgstr ""
-
-#: modules/gui/macosx/output.m:143 modules/gui/macosx/output.m:295
-#: modules/gui/macosx/output.m:348
-msgid "MPEG PS"
-msgstr ""
-
-#: modules/gui/macosx/output.m:144 modules/gui/macosx/output.m:297
-#: modules/gui/macosx/output.m:350
-msgid "MPEG1"
-msgstr ""
-
-#: modules/gui/macosx/output.m:146 modules/gui/macosx/output.m:294
-#: modules/gui/macosx/output.m:354
-msgid "Ogg"
-msgstr ""
-
-#: modules/gui/macosx/output.m:149
+#: modules/gui/macosx/output.m:147
 msgid "Transcode options"
 msgstr ""
 
-#: modules/gui/macosx/output.m:153 modules/gui/macosx/output.m:159
-#: modules/gui/wxwindows/streamout.cpp:610
-#: modules/gui/wxwindows/streamout.cpp:662
+#: modules/gui/macosx/output.m:151 modules/gui/macosx/output.m:157
+#: modules/gui/wxwindows/streamout.cpp:614
+#: modules/gui/wxwindows/streamout.cpp:666
 msgid "Bitrate (kb/s)"
 msgstr ""
 
-#: modules/gui/macosx/output.m:166 modules/gui/wxwindows/streamout.cpp:484
+#: modules/gui/macosx/output.m:164 modules/gui/wxwindows/streamout.cpp:481
 msgid "Miscellaneous Options"
 msgstr ""
 
-#: modules/gui/macosx/output.m:167
+#: modules/gui/macosx/output.m:165
 msgid "Announce streams via SAP Channel:"
 msgstr ""
 
-#: modules/gui/macosx/output.m:296 modules/gui/macosx/output.m:356
-msgid "mp4"
+#: modules/gui/macosx/output.m:296 modules/gui/macosx/output.m:357
+msgid "Ogg"
 msgstr ""
 
-#: modules/gui/macosx/prefs.m:80 modules/gui/wxwindows/preferences.cpp:259
+#: modules/gui/macosx/output.m:297 modules/gui/macosx/output.m:351
+msgid "MPEG PS"
+msgstr ""
+
+#: modules/gui/macosx/output.m:298 modules/gui/macosx/output.m:359
+msgid "MPEG4"
+msgstr ""
+
+#: modules/gui/macosx/output.m:299 modules/gui/macosx/output.m:353
+msgid "MPEG1"
+msgstr ""
+
+#: modules/gui/macosx/output.m:300 modules/gui/macosx/output.m:361
+msgid "Quicktime"
+msgstr ""
+
+#: modules/gui/macosx/prefs.m:80 modules/gui/wxwindows/preferences.cpp:242
 msgid "Reset All"
 msgstr ""
 
@@ -4590,7 +4819,7 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: modules/gui/macosx/prefs.m:172 modules/gui/wxwindows/preferences.cpp:316
+#: modules/gui/macosx/prefs.m:172 modules/gui/wxwindows/preferences.cpp:299
 msgid ""
 "Beware this will reset your VLC Media Player config file.\n"
 "Are you sure you want to continue?"
@@ -4600,7 +4829,7 @@ msgstr ""
 msgid "Select file or directory"
 msgstr ""
 
-#: modules/gui/macosx/prefs.m:408 modules/gui/wxwindows/preferences.cpp:767
+#: modules/gui/macosx/prefs.m:408 modules/gui/wxwindows/preferences.cpp:750
 msgid "Default"
 msgstr ""
 
@@ -4608,10 +4837,10 @@ msgstr ""
 msgid "ncurses interface"
 msgstr ""
 
-#: modules/gui/pda/interface.c:126 modules/gui/wxwindows/dialogs.cpp:268
-#: modules/gui/wxwindows/open.cpp:709
-#: modules/gui/wxwindows/preferences.cpp:1029
-#: modules/gui/wxwindows/subtitles.cpp:234
+#: modules/gui/pda/interface.c:126 modules/gui/wxwindows/dialogs.cpp:256
+#: modules/gui/wxwindows/open.cpp:821
+#: modules/gui/wxwindows/preferences.cpp:1034
+#: modules/gui/wxwindows/subtitles.cpp:220
 msgid "Open file"
 msgstr ""
 
@@ -4733,7 +4962,7 @@ msgstr ""
 msgid "Qt interface"
 msgstr ""
 
-#: modules/gui/skins/src/dialogs.cpp:136
+#: modules/gui/skins/src/dialogs.cpp:143
 msgid "Open a skin file"
 msgstr ""
 
@@ -4761,402 +4990,509 @@ msgstr ""
 msgid "Skinnable Interface"
 msgstr ""
 
-#: modules/gui/wxwindows/fileinfo.cpp:77
+#: modules/gui/wxwindows/fileinfo.cpp:61
 msgid "FileInfo"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:256
+#: modules/gui/wxwindows/interface.cpp:252
 msgid "Open a DVD or (S)VCD"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:257
+#: modules/gui/wxwindows/interface.cpp:253
 msgid "Open a network stream"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:258
+#: modules/gui/wxwindows/interface.cpp:254
 msgid "Open a satellite stream"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:259
+#: modules/gui/wxwindows/interface.cpp:255
 msgid "Eject the DVD/CD"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:260
+#: modules/gui/wxwindows/interface.cpp:256
 msgid "Exit this program"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:262
+#: modules/gui/wxwindows/interface.cpp:258
 msgid "Open the playlist"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:263
+#: modules/gui/wxwindows/interface.cpp:259
 msgid "Show the program logs"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:264
+#: modules/gui/wxwindows/interface.cpp:260
 msgid "Show information about the file being played"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:266
+#: modules/gui/wxwindows/interface.cpp:262
 msgid "Go to the preferences menu"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:268
+#: modules/gui/wxwindows/interface.cpp:264
 msgid "About this program"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:272 modules/gui/wxwindows/menus.cpp:108
+#: modules/gui/wxwindows/interface.cpp:268 modules/gui/wxwindows/menus.cpp:92
 msgid "Simple &Open ..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:274 modules/gui/wxwindows/menus.cpp:109
+#: modules/gui/wxwindows/interface.cpp:270 modules/gui/wxwindows/menus.cpp:93
 msgid "Open &File..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:276 modules/gui/wxwindows/menus.cpp:110
+#: modules/gui/wxwindows/interface.cpp:272 modules/gui/wxwindows/menus.cpp:94
 msgid "Open &Disc..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:278 modules/gui/wxwindows/menus.cpp:111
+#: modules/gui/wxwindows/interface.cpp:274 modules/gui/wxwindows/menus.cpp:95
 msgid "Open &Network Stream..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:281
+#: modules/gui/wxwindows/interface.cpp:277
 msgid "Open &Satellite Stream..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:286
+#: modules/gui/wxwindows/interface.cpp:282
 msgid "&Eject Disc"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:290
+#: modules/gui/wxwindows/interface.cpp:286
 msgid "E&xit"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:294
+#: modules/gui/wxwindows/interface.cpp:290
 msgid "&Playlist..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:296
+#: modules/gui/wxwindows/interface.cpp:292
 msgid "&Messages..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:297
+#: modules/gui/wxwindows/interface.cpp:293
 msgid "&File info..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:302
+#: modules/gui/wxwindows/interface.cpp:298
 msgid "&Preferences..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:319
+#: modules/gui/wxwindows/interface.cpp:315
 msgid "&About..."
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:323
+#: modules/gui/wxwindows/interface.cpp:319
 msgid "&File"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:324
+#: modules/gui/wxwindows/interface.cpp:320
 msgid "&View"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:325
+#: modules/gui/wxwindows/interface.cpp:321
 msgid "&Settings"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:326
-#: modules/gui/wxwindows/interface.cpp:482
-#: modules/gui/wxwindows/interface.cpp:530
+#: modules/gui/wxwindows/interface.cpp:322
+#: modules/gui/wxwindows/interface.cpp:515
+#: modules/gui/wxwindows/interface.cpp:563
 msgid "&Audio"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:327
-#: modules/gui/wxwindows/interface.cpp:501
+#: modules/gui/wxwindows/interface.cpp:323
 #: modules/gui/wxwindows/interface.cpp:534
+#: modules/gui/wxwindows/interface.cpp:567
 msgid "&Video"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:328
-#: modules/gui/wxwindows/interface.cpp:520
-#: modules/gui/wxwindows/interface.cpp:538
+#: modules/gui/wxwindows/interface.cpp:324
+#: modules/gui/wxwindows/interface.cpp:553
+#: modules/gui/wxwindows/interface.cpp:571
 msgid "&Navigation"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:329
+#: modules/gui/wxwindows/interface.cpp:325
 msgid "&Help"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:345
+#: modules/gui/wxwindows/interface.cpp:341
 msgid "Stop current playlist item"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:346
+#: modules/gui/wxwindows/interface.cpp:342
 msgid "Play current playlist item"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:347
+#: modules/gui/wxwindows/interface.cpp:343
 msgid "Pause current playlist item"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:348
-#: modules/gui/wxwindows/playlist.cpp:353
+#: modules/gui/wxwindows/interface.cpp:344
+#: modules/gui/wxwindows/playlist.cpp:397
 msgid "Open playlist"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:349
+#: modules/gui/wxwindows/interface.cpp:345
 msgid "Previous playlist item"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:350
+#: modules/gui/wxwindows/interface.cpp:346
 msgid "Next playlist item"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:351
+#: modules/gui/wxwindows/interface.cpp:347
 msgid "Play slower"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:352
+#: modules/gui/wxwindows/interface.cpp:348
 msgid "Play faster"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:574
+#: modules/gui/wxwindows/interface.cpp:607
 msgid ""
 " (wxWindows interface)\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:575
+#: modules/gui/wxwindows/interface.cpp:608
 msgid ""
 "(C) 1996-2003 - the VideoLAN Team\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:576
+#: modules/gui/wxwindows/interface.cpp:610
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwindows/interface.cpp:578
-msgid ""
-"This is the VideoLAN Client, a DVD, MPEG and DivX player.\n"
-"It can play MPEG and MPEG2 files from a file or from a network source."
-msgstr ""
-
-#: modules/gui/wxwindows/interface.cpp:582
+#: modules/gui/wxwindows/interface.cpp:613
 #, c-format
 msgid "About %s"
 msgstr ""
 
-#: modules/gui/wxwindows/menus.cpp:127
+#: modules/gui/wxwindows/menus.cpp:111
 msgid "Audio menu"
 msgstr ""
 
-#: modules/gui/wxwindows/menus.cpp:143
+#: modules/gui/wxwindows/menus.cpp:127
 msgid "Video menu"
 msgstr ""
 
-#: modules/gui/wxwindows/menus.cpp:161
+#: modules/gui/wxwindows/menus.cpp:145
 msgid "Input menu"
 msgstr ""
 
-#: modules/gui/wxwindows/menus.cpp:197
-msgid "Close Menu"
-msgstr ""
-
-#: modules/gui/wxwindows/menus.cpp:358
+#: modules/gui/wxwindows/menus.cpp:344
 msgid "Empty"
 msgstr ""
 
-#: modules/gui/wxwindows/messages.cpp:116
+#: modules/gui/wxwindows/messages.cpp:100
 msgid "Save As..."
 msgstr ""
 
-#: modules/gui/wxwindows/messages.cpp:121
-msgid "Verbose"
-msgstr ""
-
-#: modules/gui/wxwindows/messages.cpp:222
+#: modules/gui/wxwindows/messages.cpp:204
 msgid "Save Messages As a file..."
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:177
+#: modules/gui/wxwindows/open.cpp:195
 msgid ""
 "You can use this field directly by typing the full MRL you want to open.\n"
 "Alternatively, the field will be filled automatically when you use the "
 "controls below."
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:195
+#: modules/gui/wxwindows/open.cpp:213
 msgid "Use VLC as a stream server"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:216
+#: modules/gui/wxwindows/open.cpp:234
 msgid "Capture input stream"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:218
+#: modules/gui/wxwindows/open.cpp:236
 msgid "Capture the stream you are playing to a file"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:348 modules/gui/wxwindows/subtitles.cpp:100
+#: modules/gui/wxwindows/open.cpp:281
+msgid "Video For Linux"
+msgstr ""
+
+#: modules/gui/wxwindows/open.cpp:378 modules/gui/wxwindows/subtitles.cpp:84
 msgid "Subtitles file"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:349
+#: modules/gui/wxwindows/open.cpp:379
 msgid "Load an additional subtitles file. Currently only works with AVI files."
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:385
+#: modules/gui/wxwindows/open.cpp:415
 msgid "DVD (menus support)"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:388
+#: modules/gui/wxwindows/open.cpp:418
 msgid "CD Audio"
 msgstr ""
 
-#: modules/gui/wxwindows/open.cpp:903 modules/gui/wxwindows/streamout.cpp:784
+#: modules/gui/wxwindows/open.cpp:557
+msgid "WebCam"
+msgstr ""
+
+#: modules/gui/wxwindows/open.cpp:558
+msgid "TV Card"
+msgstr ""
+
+#: modules/gui/wxwindows/open.cpp:559
+msgid "PVR"
+msgstr ""
+
+#: modules/gui/wxwindows/open.cpp:560
+msgid "Kfir"
+msgstr ""
+
+#: modules/gui/wxwindows/open.cpp:564
+msgid "Video Device Type"
+msgstr ""
+
+#: modules/gui/wxwindows/open.cpp:574
+#, fuzzy
+msgid "Video Device"
+msgstr "Altura de la imagen"
+
+#: modules/gui/wxwindows/open.cpp:582 modules/gui/wxwindows/v4l.cpp:353
+#, fuzzy
+msgid "Channel"
+msgstr "Elegir canal de audio"
+
+#: modules/gui/wxwindows/open.cpp:591
+msgid "Advanced Settings..."
+msgstr ""
+
+#: modules/gui/wxwindows/open.cpp:1063 modules/gui/wxwindows/streamout.cpp:800
 msgid "Save file"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:116
+#: modules/gui/wxwindows/playlist.cpp:118
 msgid "&Simple Add..."
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:117
+#: modules/gui/wxwindows/playlist.cpp:119
 msgid "&Add MRL..."
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:118
-msgid "&Open Playlist..."
-msgstr ""
-
-#: modules/gui/wxwindows/playlist.cpp:119
-msgid "&Save Playlist..."
+#: modules/gui/wxwindows/playlist.cpp:120
+msgid "&Sort"
 msgstr ""
 
 #: modules/gui/wxwindows/playlist.cpp:121
-msgid "&Close"
+#, fuzzy
+msgid "&Reverse Sort"
+msgstr "Puerto del servidor"
+
+#: modules/gui/wxwindows/playlist.cpp:122
+msgid "&Open Playlist..."
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:123
+msgid "&Save Playlist..."
 msgstr ""
 
 #: modules/gui/wxwindows/playlist.cpp:125
+msgid "&Close"
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:129
 msgid "&Invert"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:126
+#: modules/gui/wxwindows/playlist.cpp:130
 msgid "&Delete"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:127
+#: modules/gui/wxwindows/playlist.cpp:131
 msgid "&Select All"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:131
+#: modules/gui/wxwindows/playlist.cpp:135
 msgid "&Manage"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:132
+#: modules/gui/wxwindows/playlist.cpp:136
 msgid "&Selection"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:228
+#: modules/gui/wxwindows/playlist.cpp:165
+msgid "Random"
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:183
+msgid "Search"
+msgstr ""
+
+#: modules/gui/wxwindows/playlist.cpp:272
 msgid "no info"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:332
+#: modules/gui/wxwindows/playlist.cpp:376
 msgid "Save playlist"
 msgstr ""
 
-#: modules/gui/wxwindows/preferences.cpp:318
+#: modules/gui/wxwindows/preferences.cpp:301
 msgid "Reset config file"
 msgstr ""
 
-#: modules/gui/wxwindows/preferences.cpp:901
+#: modules/gui/wxwindows/preferences.cpp:840
+msgid "Alt"
+msgstr ""
+
+#: modules/gui/wxwindows/preferences.cpp:842
+msgid "Ctrl"
+msgstr ""
+
+#: modules/gui/wxwindows/preferences.cpp:844
+msgid "Shift"
+msgstr ""
+
+#: modules/gui/wxwindows/preferences.cpp:906
 msgid "No configuration options available"
 msgstr ""
 
-#: modules/gui/wxwindows/preferences.cpp:922
+#: modules/gui/wxwindows/preferences.cpp:927
 msgid "Advanced options"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:186
+#: modules/gui/wxwindows/streamout.cpp:156
 msgid "Stream output MRL"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:190
+#: modules/gui/wxwindows/streamout.cpp:160 modules/gui/wxwindows/v4l.cpp:125
 msgid "Destination Target:"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:193
+#: modules/gui/wxwindows/streamout.cpp:163 modules/gui/wxwindows/v4l.cpp:128
 msgid ""
 "You can use this field directly by typing the full MRL you want to open.\n"
 "Alternatively, the field will be filled automatically when you use the "
 "controls below"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:378
+#: modules/gui/wxwindows/streamout.cpp:373
 msgid "Output Methods"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:384
+#: modules/gui/wxwindows/streamout.cpp:380
 msgid "Play locally"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:408
+#: modules/gui/wxwindows/streamout.cpp:383
+msgid "MMSH"
+msgstr ""
+
+#: modules/gui/wxwindows/streamout.cpp:406
 msgid "Filename"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:496
+#: modules/gui/wxwindows/streamout.cpp:490
 msgid "SAP Announce"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:498
-msgid "Channel Name "
+#: modules/gui/wxwindows/streamout.cpp:492
+msgid "SLP Announce"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:570
+#: modules/gui/wxwindows/streamout.cpp:495
+msgid "Channel Name"
+msgstr ""
+
+#: modules/gui/wxwindows/streamout.cpp:573
 msgid "Transcoding options"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:603
+#: modules/gui/wxwindows/streamout.cpp:607
 msgid "Video codec"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:650
+#: modules/gui/wxwindows/streamout.cpp:654
 msgid "Audio codec"
 msgstr ""
 
-#: modules/gui/wxwindows/subtitles.cpp:83
+#: modules/gui/wxwindows/subtitles.cpp:67
 msgid "Open Subtitles File"
 msgstr ""
 
-#: modules/gui/wxwindows/subtitles.cpp:123
+#: modules/gui/wxwindows/subtitles.cpp:107
 msgid "Subtitles encoding"
 msgstr ""
 
-#: modules/gui/wxwindows/subtitles.cpp:155
+#: modules/gui/wxwindows/subtitles.cpp:139
 msgid "Subtitles options"
 msgstr ""
 
-#: modules/gui/wxwindows/subtitles.cpp:159
+#: modules/gui/wxwindows/subtitles.cpp:143
 msgid "Delay subtitles (in 1/10s)"
 msgstr ""
 
-#: modules/gui/wxwindows/subtitles.cpp:170
+#: modules/gui/wxwindows/subtitles.cpp:155
 msgid "Frames per second"
 msgstr ""
 
-#: modules/gui/wxwindows/subtitles.cpp:178
+#: modules/gui/wxwindows/subtitles.cpp:164
 msgid "Override frames per second. It will only work with MicroDVD subtitles."
 msgstr ""
 
-#: modules/gui/wxwindows/wxwindows.cpp:96
+#: modules/gui/wxwindows/v4l.cpp:106
+#, fuzzy
+msgid "Video Device Advanced Options"
+msgstr "Mostrar opciones avanzadas"
+
+#: modules/gui/wxwindows/v4l.cpp:121
+msgid "Video Device MRL"
+msgstr ""
+
+#: modules/gui/wxwindows/v4l.cpp:247
+msgid "Common Options"
+msgstr ""
+
+#: modules/gui/wxwindows/v4l.cpp:269
+msgid "Size"
+msgstr ""
+
+#: modules/gui/wxwindows/v4l.cpp:290
+msgid "Norm"
+msgstr ""
+
+#: modules/gui/wxwindows/v4l.cpp:306
+msgid "The frequency in KHz"
+msgstr ""
+
+#: modules/gui/wxwindows/v4l.cpp:335
+msgid "Audio Options"
+msgstr ""
+
+#: modules/gui/wxwindows/v4l.cpp:348
+#, fuzzy
+msgid "Audio Device"
+msgstr "Codificador de audio"
+
+#: modules/gui/wxwindows/v4l.cpp:384
+msgid "Bitrate Options"
+msgstr ""
+
+#: modules/gui/wxwindows/v4l.cpp:396
+msgid "Bitrate"
+msgstr ""
+
+#: modules/gui/wxwindows/v4l.cpp:406
+msgid "Maximum Bitrate"
+msgstr ""
+
+#: modules/gui/wxwindows/wxwindows.cpp:84
 msgid "wxWindows interface module"
 msgstr ""
 
-#: modules/gui/wxwindows/wxwindows.cpp:105
+#: modules/gui/wxwindows/wxwindows.cpp:93
 msgid "wxWindows dialogs provider"
 msgstr ""
 
@@ -5213,27 +5549,27 @@ msgstr ""
 msgid "Using the dummy interface plugin..."
 msgstr ""
 
-#: modules/misc/freetype.c:72 modules/visualization/xosd/xosd.c:71
+#: modules/misc/freetype.c:74 modules/visualization/xosd/xosd.c:71
 msgid "Font"
 msgstr ""
 
-#: modules/misc/freetype.c:73
+#: modules/misc/freetype.c:75
 msgid "Filename of Font"
 msgstr ""
 
-#: modules/misc/freetype.c:74
+#: modules/misc/freetype.c:76
 msgid "Font size"
 msgstr ""
 
-#: modules/misc/freetype.c:75
+#: modules/misc/freetype.c:77
 msgid "The size of the fonts used by the osd module"
 msgstr ""
 
-#: modules/misc/freetype.c:78
+#: modules/misc/freetype.c:82
 msgid "Fonts"
 msgstr ""
 
-#: modules/misc/freetype.c:81
+#: modules/misc/freetype.c:86
 msgid "freetype2 font renderer"
 msgstr ""
 
@@ -5241,7 +5577,7 @@ msgstr ""
 msgid "Gtk+ GUI helper"
 msgstr ""
 
-#: modules/misc/httpd.c:94
+#: modules/misc/httpd.c:97
 msgid "HTTP 1.0 daemon"
 msgstr ""
 
@@ -5312,39 +5648,39 @@ msgstr ""
 msgid "Qt Embedded GUI helper"
 msgstr ""
 
-#: modules/misc/sap.c:144 modules/misc/sap.c:145
+#: modules/misc/sap.c:155 modules/misc/sap.c:156
 msgid "SAP multicast address"
 msgstr ""
 
-#: modules/misc/sap.c:146
+#: modules/misc/sap.c:157
 msgid "No IPv4-SAP listening"
 msgstr ""
 
-#: modules/misc/sap.c:147
+#: modules/misc/sap.c:158
 msgid "Set this if you do not want SAP to listen for IPv4 announces"
 msgstr ""
 
-#: modules/misc/sap.c:148
+#: modules/misc/sap.c:159
 msgid "IPv6-SAP listening"
 msgstr ""
 
-#: modules/misc/sap.c:149
+#: modules/misc/sap.c:160
 msgid "Set this if you want SAP to listen for IPv6 announces"
 msgstr ""
 
-#: modules/misc/sap.c:150
+#: modules/misc/sap.c:161
 msgid "IPv6 SAP scope"
 msgstr ""
 
-#: modules/misc/sap.c:151
+#: modules/misc/sap.c:162
 msgid "Sets the scope for IPv6 announces (default is 8)"
 msgstr ""
 
-#: modules/misc/sap.c:154
+#: modules/misc/sap.c:165
 msgid "SAP"
 msgstr ""
 
-#: modules/misc/sap.c:167
+#: modules/misc/sap.c:178
 msgid "SAP interface"
 msgstr ""
 
@@ -5360,12 +5696,16 @@ msgstr ""
 msgid "Miscellaneous stress tests"
 msgstr ""
 
-#: modules/mux/avi.c:94
+#: modules/mux/asf.c:42
+msgid "Asf muxer"
+msgstr ""
+
+#: modules/mux/avi.c:44
 msgid "Avi muxer"
 msgstr ""
 
-#: modules/mux/dummy.c:60
-msgid "Dummy muxer"
+#: modules/mux/dummy.c:43
+msgid "Dummy/Raw muxer"
 msgstr ""
 
 #: modules/mux/mp4.c:56
@@ -5376,20 +5716,16 @@ msgstr ""
 msgid "PS muxer"
 msgstr ""
 
-#: modules/mux/mpeg/ts.c:78
+#: modules/mux/mpeg/ts.c:80
 msgid "TS muxer"
 msgstr ""
 
-#: modules/mux/mpeg/ts.c:83
+#: modules/mux/mpeg/ts.c:85
 msgid "TS muxer (libdvbpsi)"
 msgstr ""
 
 #: modules/mux/ogg.c:55
 msgid "Ogg/ogm muxer"
-msgstr ""
-
-#: modules/packetizer/a52.c:71
-msgid "A/52 audio packetizer"
 msgstr ""
 
 #: modules/packetizer/copy.c:43
@@ -5404,16 +5740,12 @@ msgstr ""
 msgid "MPEG4 Video packetizer"
 msgstr ""
 
-#: modules/packetizer/mpegaudio.c:70
+#: modules/packetizer/mpegaudio.c:41
 msgid "MPEG-I/II audio packetizer"
 msgstr ""
 
 #: modules/packetizer/mpegvideo.c:88
 msgid "MPEG-I/II video packetizer"
-msgstr ""
-
-#: modules/packetizer/vorbis.c:89
-msgid "Vorbis audio packetizer"
 msgstr ""
 
 #: modules/stream_out/display.c:50
@@ -5430,6 +5762,10 @@ msgstr ""
 
 #: modules/stream_out/es.c:49
 msgid "ES stream"
+msgstr ""
+
+#: modules/stream_out/gather.c:40
+msgid "Gather stream"
 msgstr ""
 
 #: modules/stream_out/standard.c:51
@@ -5720,10 +6056,6 @@ msgstr ""
 msgid "DirectX video output"
 msgstr ""
 
-#: modules/video_output/encoder.c:53
-msgid "Encoder wrapper"
-msgstr ""
-
 #: modules/video_output/fb.c:68
 msgid "Frame Buffer"
 msgstr ""
@@ -5736,8 +6068,8 @@ msgstr ""
 msgid "Linux console framebuffer video output"
 msgstr ""
 
-#: modules/video_output/ggi.c:56 modules/video_output/mga/xmga.c:96
-#: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
+#: modules/video_output/ggi.c:56 modules/video_output/x11/x11.c:52
+#: modules/video_output/x11/xvideo.c:58
 msgid "X11 display name"
 msgstr ""
 
@@ -5753,33 +6085,6 @@ msgstr ""
 
 #: modules/video_output/mga/mga.c:59
 msgid "Matrox Graphic Array video output"
-msgstr ""
-
-#: modules/video_output/mga/xmga.c:87 modules/video_output/x11/x11.c:43
-#: modules/video_output/x11/xvideo.c:49
-msgid "Alternate fullscreen method"
-msgstr ""
-
-#: modules/video_output/mga/xmga.c:89 modules/video_output/x11/x11.c:45
-#: modules/video_output/x11/xvideo.c:51
-msgid ""
-"There are two ways to make a fullscreen window, unfortunately each one has "
-"its drawbacks.\n"
-"1) Let the window manager handle your fullscreen window (default). But "
-"things like taskbars will likely show on top of the video.\n"
-"2) Completly bypass the window manager, but then nothing will be able to "
-"show on top of the video."
-msgstr ""
-
-#: modules/video_output/mga/xmga.c:98 modules/video_output/x11/x11.c:54
-#: modules/video_output/x11/xvideo.c:60
-msgid ""
-"Specify the X11 hardware display you want to use. By default VLC will use "
-"the value of the DISPLAY environment variable."
-msgstr ""
-
-#: modules/video_output/mga/xmga.c:105
-msgid "X11 MGA video output"
 msgstr ""
 
 #: modules/video_output/qte/qte.cpp:79
@@ -5806,6 +6111,26 @@ msgstr ""
 
 #: modules/video_output/wingdi.c:82
 msgid "Windows GDI video output"
+msgstr ""
+
+#: modules/video_output/x11/x11.c:43 modules/video_output/x11/xvideo.c:49
+msgid "Alternate fullscreen method"
+msgstr ""
+
+#: modules/video_output/x11/x11.c:45 modules/video_output/x11/xvideo.c:51
+msgid ""
+"There are two ways to make a fullscreen window, unfortunately each one has "
+"its drawbacks.\n"
+"1) Let the window manager handle your fullscreen window (default). But "
+"things like taskbars will likely show on top of the video.\n"
+"2) Completly bypass the window manager, but then nothing will be able to "
+"show on top of the video."
+msgstr ""
+
+#: modules/video_output/x11/x11.c:54 modules/video_output/x11/xvideo.c:60
+msgid ""
+"Specify the X11 hardware display you want to use. By default VLC will use "
+"the value of the DISPLAY environment variable."
 msgstr ""
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
@@ -5862,8 +6187,76 @@ msgstr ""
 msgid "XVideo extension video output"
 msgstr ""
 
-#: modules/visualization/scope/scope.c:67
+#: modules/visualization/goom.c:50
+msgid "goom effect"
+msgstr ""
+
+#: modules/visualization/scope/scope.c:65
 msgid "scope effect"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:43
+msgid "Effects list"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:45
+msgid ""
+"A list of visual effect, separated by commas.\n"
+"Current effects include: dummy, random, scope, spectrum"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:50
+#: modules/visualization/visual/visual.c:54
+msgid "The width of the effects video window, in pixels."
+msgstr ""
+
+#: modules/visualization/visual/visual.c:56
+msgid "Number of bands"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:58
+msgid "Number of bands used by spectrum analizer, should be 20 or 80"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:60
+msgid "Band separator"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:62
+msgid "Number of blank pixels between bands"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:64
+msgid "Amplification"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:66
+msgid "This is a coefficient that modifies the height of the bands"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:68
+#, fuzzy
+msgid "Enable peaks"
+msgstr "Activar vídeo"
+
+#: modules/visualization/visual/visual.c:70
+msgid "Defines whether to draw peaks"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:72
+msgid "Number of stars"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:74
+msgid "Defines the number of stars to draw with random effect"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:77
+msgid "visualizer"
+msgstr ""
+
+#: modules/visualization/visual/visual.c:78
+msgid "visualizer filter"
 msgstr ""
 
 #: modules/visualization/xosd/xosd.c:61
@@ -5901,3 +6294,26 @@ msgstr ""
 #: modules/visualization/xosd/xosd.c:82
 msgid "xosd interface"
 msgstr ""
+
+#~ msgid "Video encoding codec"
+#~ msgstr "Codificador de vídeo"
+
+#~ msgid "This allows you to force video encoding"
+#~ msgstr "Esto permite forzar la codificación del vídeo."
+
+#~ msgid "Video bitrate encoding (kB/s)"
+#~ msgstr "Tasa de bits de codificación de vídeo (KB/s)"
+
+#~ msgid "This allows you to specify video bitrate in kB/s."
+#~ msgstr ""
+#~ "Permite especificar la tasa de bits de codificación de vídeo en KB/s."
+
+#~ msgid "This allows you to force audio encoding"
+#~ msgstr "Esto permite forzar la codificación del audio."
+
+#~ msgid "Audio bitrate encoding (kB/s)"
+#~ msgstr "Tasa de bits de codificación de audio (KB/s)"
+
+#~ msgid "This allows you to specify audio bitrate in kB/s."
+#~ msgstr ""
+#~ "Permite especificar la tasa de bits de codificación de audio en KB/s."

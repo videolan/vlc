@@ -4,6 +4,7 @@
 include/aout_internal.h
 include/audio_output.h
 include/beos_specific.h
+include/charset.h
 include/codecs.h
 include/configuration.h
 include/darwin_specific.h
@@ -33,6 +34,7 @@ include/vlc/intf.h
 include/vlc/sout.h
 include/vlc/vlc.h
 include/vlc/vout.h
+include/vlc_block.h
 include/vlc_common.h
 include/vlc_config.h
 include/vlc_cpu.h
@@ -75,6 +77,8 @@ src/interface/intf_eject.c
 src/libvlc.c
 src/libvlc.h
 src/misc/beos_specific.cpp
+src/misc/block.c
+src/misc/charset.c
 src/misc/configuration.c
 src/misc/cpu.c
 src/misc/darwin_specific.m
@@ -102,6 +106,9 @@ src/vlc.c
 # modules
 modules/access/cdda.c
 modules/access/directory.c
+modules/access/dshow/dshow.cpp
+modules/access/dshow/filter.cpp
+modules/access/dshow/filter.h
 modules/access/dvb/access.c
 modules/access/dvb/dvb.c
 modules/access/dvb/dvb.h
@@ -319,7 +326,6 @@ modules/control/rc/rc.c
 modules/demux/a52sys.c
 modules/demux/aac.c
 modules/demux/asf/asf.c
-modules/demux/asf/asf.h
 modules/demux/asf/libasf.c
 modules/demux/asf/libasf.h
 modules/demux/au.c
@@ -351,10 +357,6 @@ modules/demux/util/id3tag.c
 modules/demux/util/sub.c
 modules/demux/util/sub.h
 modules/demux/wav.c
-modules/encoder/ffmpeg/audio.c
-modules/encoder/ffmpeg/encoder.c
-modules/encoder/ffmpeg/video.c
-modules/encoder/xvid.c
 modules/gui/beos/AudioOutput.cpp
 modules/gui/beos/BeOS.cpp
 modules/gui/beos/Bitmaps.h
@@ -579,7 +581,6 @@ modules/gui/skins/x11/x11_timer.cpp
 modules/gui/skins/x11/x11_timer.h
 modules/gui/skins/x11/x11_window.cpp
 modules/gui/skins/x11/x11_window.h
-modules/gui/wxwindows/control.cpp
 modules/gui/wxwindows/dialogs.cpp
 modules/gui/wxwindows/fileinfo.cpp
 modules/gui/wxwindows/interface.cpp
@@ -591,6 +592,7 @@ modules/gui/wxwindows/preferences.cpp
 modules/gui/wxwindows/streamout.cpp
 modules/gui/wxwindows/subtitles.cpp
 modules/gui/wxwindows/timer.cpp
+modules/gui/wxwindows/v4l.cpp
 modules/gui/wxwindows/wxwindows.cpp
 modules/gui/wxwindows/wxwindows.h
 modules/misc/dummy/aout.c
@@ -617,6 +619,7 @@ modules/misc/testsuite/test1.c
 modules/misc/testsuite/test2.cpp
 modules/misc/testsuite/test3.m
 modules/misc/testsuite/test4.c
+modules/mux/asf.c
 modules/mux/avi.c
 modules/mux/dummy.c
 modules/mux/mp4.c
@@ -626,19 +629,18 @@ modules/mux/mpeg/pes.h
 modules/mux/mpeg/ps.c
 modules/mux/mpeg/ts.c
 modules/mux/ogg.c
-modules/packetizer/a52.c
 modules/packetizer/copy.c
 modules/packetizer/mpeg4audio.c
 modules/packetizer/mpeg4video.c
 modules/packetizer/mpegaudio.c
 modules/packetizer/mpegvideo.c
-modules/packetizer/vorbis.c
 modules/stream_out/announce.c
 modules/stream_out/announce.h
 modules/stream_out/display.c
 modules/stream_out/dummy.c
 modules/stream_out/duplicate.c
 modules/stream_out/es.c
+modules/stream_out/gather.c
 modules/stream_out/standard.c
 modules/stream_out/transcode.c
 modules/video_chroma/i420_rgb.c
@@ -667,12 +669,10 @@ modules/video_output/aa.c
 modules/video_output/directx/directx.c
 modules/video_output/directx/events.c
 modules/video_output/directx/vout.h
-modules/video_output/encoder.c
 modules/video_output/fb.c
 modules/video_output/ggi.c
 modules/video_output/glide.c
 modules/video_output/mga/mga.c
-modules/video_output/mga/xmga.c
 modules/video_output/qte/qte.cpp
 modules/video_output/qte/qte.h
 modules/video_output/sdl.c
@@ -682,5 +682,11 @@ modules/video_output/x11/x11.c
 modules/video_output/x11/xcommon.c
 modules/video_output/x11/xcommon.h
 modules/video_output/x11/xvideo.c
+modules/visualization/goom.c
 modules/visualization/scope/scope.c
+modules/visualization/visual/effects.c
+modules/visualization/visual/fft.c
+modules/visualization/visual/fft.h
+modules/visualization/visual/visual.c
+modules/visualization/visual/visual.h
 modules/visualization/xosd/xosd.c
