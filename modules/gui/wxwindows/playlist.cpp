@@ -1,8 +1,8 @@
 /*****************************************************************************
- * interface.cpp : wxWindows plugin for vlc
+ * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $$
+ * $Id: playlist.cpp,v 1.4 2002/11/23 18:42:59 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *-
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -120,12 +120,17 @@ Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     /* Attach the menu bar to the frame */
     SetMenuBar( menubar );
 
+    /* Create a panel to put everything in */
+    wxPanel *playlist_panel = new wxPanel( this, -1 );
+    playlist_panel->SetAutoLayout( TRUE );
+
     /* Create the listview */
     /* FIXME: the given size is arbitrary, and prevents us from resizing
      * the window to smaller dimensions. But the sizers don't seem to adjust
      * themselves to the size of a listview, and with a wxDefaultSize the
      * playlist window is ridiculously small */
-    listview = new wxListView( this, ListView_Event, wxDefaultPosition,
+    listview = new wxListView( playlist_panel, ListView_Event,
+                               wxDefaultPosition,
                                wxSize( 350, 300 ), wxLC_REPORT );
     listview->InsertColumn( 0, _("Url") );
     listview->InsertColumn( 1, _("Duration") );
@@ -133,16 +138,21 @@ Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     listview->SetColumnWidth( 1, 100 );
 
     /* Create the OK button */
-    ok_button = new wxButton( this, wxID_OK, _("OK") );
+    ok_button = new wxButton( playlist_panel, wxID_OK, _("OK") );
     ok_button->SetDefault();
 
     /* Place everything in sizers */
     wxBoxSizer *ok_button_sizer = new wxBoxSizer( wxHORIZONTAL );
     ok_button_sizer->Add( ok_button, 0, wxALL, 5 );
+    ok_button_sizer->Layout();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
-    main_sizer->Add( listview, 1, wxEXPAND | wxALL, 5 );
-    main_sizer->Add( ok_button_sizer, 0, wxALIGN_CENTRE );
-
+    wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
+    panel_sizer->Add( listview, 1, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( ok_button_sizer, 0, wxALIGN_CENTRE );
+    panel_sizer->Layout();
+    playlist_panel->SetSizerAndFit( panel_sizer );
+    main_sizer->Add( playlist_panel, 1, wxGROW, 0 );
+    main_sizer->Layout();
     SetSizerAndFit( main_sizer );
 
     /* Associate drop targets with the playlist */

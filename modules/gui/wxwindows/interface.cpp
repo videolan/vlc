@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.8 2002/11/23 16:17:12 gbazin Exp $
+ * $Id: interface.cpp,v 1.9 2002/11/23 18:42:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -156,10 +156,13 @@ Interface::Interface( intf_thread_t *_p_intf ):
 
     SetTitle( COPYRIGHT_MESSAGE );
 
+    /* Make sure we've got the right background colour */
+    SetBackgroundColour( slider_frame->GetBackgroundColour() );
+
     /* Layout everything */
     SetAutoLayout( TRUE );
     frame_sizer->Layout();
-    frame_sizer->SetSizeHints(this);
+    frame_sizer->Fit(this);
 
     /* Associate drop targets with the main interface */
     SetDropTarget( new DragAndDrop( p_intf ) );
@@ -289,7 +292,7 @@ void Interface::CreateOurToolBar()
 void Interface::CreateOurSlider()
 {
     /* Create a new frame containing the slider */
-    slider_frame = new wxPanel( this, -1, wxDefaultPosition, wxSize(-1,50) );
+    slider_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
     slider_frame->SetAutoLayout( TRUE );
     slider_frame->Hide();
 
@@ -300,12 +303,14 @@ void Interface::CreateOurSlider()
     wxStaticBoxSizer *slider_sizer =
         new wxStaticBoxSizer( slider_box, wxHORIZONTAL );
     slider_frame->SetSizer( slider_sizer );
+    slider_sizer->SetMinSize( -1, 50 );
 
     /* Create slider */
     slider = new wxSlider( slider_frame, SliderScroll_Event, 0, 0,
                            SLIDER_MAX_POS, wxDefaultPosition, wxDefaultSize );
     slider_sizer->Add( slider, 1, wxGROW | wxALL, 5 );
     slider_sizer->Layout();
+    slider_sizer->SetSizeHints(slider_frame);
 }
 
 /*****************************************************************************
