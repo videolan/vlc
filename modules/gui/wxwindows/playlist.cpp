@@ -942,12 +942,37 @@ void Playlist::OnInvertSelection( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnDeleteSelection( wxCommandEvent& WXUNUSED(event) )
 {
+    long *pd_del = NULL;
+    int i_del = 0;
+    int i;
+
     /* Delete from the end to the beginning, to avoid a shift of indices */
     for( long item = listview->GetItemCount() - 1; item >= 0; item-- )
     {
+        /* TODO : use vector */
         if( listview->IsSelected( item ) )
         {
-            DeleteItem( item );
+            if( i_del> 0 )
+            {
+                pd_del = (long *)realloc( pd_del, sizeof( void **) *
+                                                         (i_del + 1 ) );
+            }
+            else
+            {
+                pd_del = (long *)malloc( sizeof( void ** ) );
+            }
+            pd_del[i_del] = item;
+            i_del ++;
+        }
+    }
+    for( long item = listview->GetItemCount() - 1; item >= 0; item-- )
+    {
+        for( i = 0 ; i < i_del; i++ )
+        {
+            if( item == pd_del[i] )
+            {
+                DeleteItem( item );
+            }
         }
     }
 
