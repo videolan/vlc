@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.67 2003/12/15 19:25:56 bigben Exp $
+ * $Id: vout.m,v 1.68 2003/12/22 17:08:22 bigben Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -435,14 +435,9 @@ static int CoSendRequest( vout_thread_t *p_vout, SEL sel )
 
     p_intf = [NSApp getIntf];
 
-    val.b_bool = p_vout->b_fullscreen;
-    var_Create(p_intf,"fullscreen",VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-    var_Set(p_intf,"fullscreen",val);
-
     val.b_bool = VLC_TRUE;
     var_Create(p_intf,"intf-change",VLC_VAR_BOOL);
     var_Set(p_intf, "intf-change",val);
-
 
     return( i_ret );
 }
@@ -820,6 +815,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void)toggleFullscreen
 {
+    config_PutInt(p_vout, "fullscreen", !p_vout->b_fullscreen);
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 }
 
