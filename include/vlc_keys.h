@@ -228,3 +228,6 @@ static inline int StringToKey( char *psz_key )
 /* end of contiguous zone */
 #define ACTIONID_SUBDELAY_UP           46
 #define ACTIONID_SUBDELAY_DOWN         47
+#define ACTIONID_HISTORY_BACK          48
+#define ACTIONID_HISTORY_FORWARD       49
+

@@ -704,6 +704,11 @@ static char *ppsz_align_descriptions[] =
 #define SET_BOOKMARK10_KEY_TEXT N_("Set playlist bookmark 10")
 #define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark.")
 
+#define HISTORY_BACK_TEXT N_("Go back in browsing history")
+#define HISTORY_BACK_LONGTEXT N_("Select the key to go back (to the previous media item) in the browsing history.")
+#define HISTORY_FORWARD_TEXT N_("Go forward in browsing history")
+#define HISTORY_FORWARD_LONGTEXT N_("Select the key to go forward (to the next media item) in the browsing history.")
+
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
     "\n  [dvd://][device][@raw_device][@[title][,[chapter][,angle]]]" \
@@ -1012,6 +1017,8 @@ vlc_module_begin();
     add_key( "key-play-bookmark8", KEY_F8, NULL, PLAY_BOOKMARK8_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-play-bookmark9", KEY_UNSET, NULL, PLAY_BOOKMARK9_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-play-bookmark10", KEY_UNSET, NULL, PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-history-back", KEY_MODIFIER_COMMAND|'[', NULL, HISTORY_BACK_TEXT, HISTORY_BACK_LONGTEXT, VLC_TRUE );
+    add_key( "key-history-forward", KEY_MODIFIER_COMMAND|']', NULL, HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
 #else
     add_key( "key-fullscreen", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
@@ -1062,6 +1069,8 @@ vlc_module_begin();
     add_key( "key-play-bookmark8", KEY_F8, NULL, PLAY_BOOKMARK8_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-play-bookmark9", KEY_F9, NULL, PLAY_BOOKMARK9_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-play-bookmark10", KEY_F10, NULL, PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-history-back", KEY_MODIFIER_CTRL|'[', NULL, HISTORY_BACK_TEXT, HISTORY_BACK_LONGTEXT, VLC_TRUE );
+    add_key( "key-history-forward", KEY_MODIFIER_CTRL|']', NULL, HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
 #endif
 
     /* Usage (mainly useful for cmd line stuff) */
@@ -1148,5 +1157,7 @@ static struct hotkey p_hotkeys[] =
     { "key-play-bookmark8", ACTIONID_PLAY_BOOKMARK8, 0},
     { "key-play-bookmark9", ACTIONID_PLAY_BOOKMARK9, 0},
     { "key-play-bookmark10", ACTIONID_PLAY_BOOKMARK10, 0},
+    { "key-history-back", ACTIONID_HISTORY_BACK, 0},
+    { "key-history-forward", ACTIONID_HISTORY_FORWARD, 0},
     { NULL, 0, 0 }
 };
