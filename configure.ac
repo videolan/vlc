@@ -1486,46 +1486,46 @@ then
   VLC_ADD_PLUGINS([pvr])
 fi
 
-dnl dnl
-dnl dnl  VCDX and CDDAX modules
-dnl dnl
-dnl AC_ARG_ENABLE(libcdio,
-dnl   [  --enable-libcdio        CDDA support via libcdio (default enabled)])
-dnl 
-dnl AC_ARG_ENABLE(libcddb,
-dnl   [  --enable-libcddb        CDDB support for CDDAX (default enabled)])
-dnl 
+dnl
+dnl  VCDX and CDDAX modules
+dnl
+AC_ARG_ENABLE(libcdio,
+  [  --enable-libcdio        CDDA support via libcdio (default enabled)])
+ 
+AC_ARG_ENABLE(libcddb,
+  [  --enable-libcddb        CDDB support for CDDAX (default enabled)])
+ 
 dnl AC_ARG_ENABLE(vcdx,
 dnl   [  --enable-vcdx           VCD support with Navigation (default enabled)])
-dnl 
-dnl AC_ARG_ENABLE(cdda,           
-dnl   [  --enable-cdda           CDDA plugin support (default enabled)])
-dnl 
-dnl AC_ARG_ENABLE(cddax,
-dnl   [  --enable-cddax          CDDAX plugin support (default enabled)])
-dnl 
-dnl if test "${enable_cddax}" != "no"
-dnl then
-dnl   PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
-dnl    [enable_cddax="no"
-dnl     AC_DEFINE(HAVE_CDDAX, [], [Define for the CD-DA plugin using libcdio])
-dnl     VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
-dnl     VLC_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
-dnl     VLC_ADD_PLUGINS([cddax])], 
-dnl    [AC_MSG_WARN(libcdio library not found)
-dnl    HAVE_CDDAX=no])
-dnl 
-dnl   if test "$enable_libcddb" != "no"; then
-dnl     PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.4, [
-dnl       HAVE_LIBCDDB=yes 
-dnl       AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
-dnl       VLC_ADD_LDFLAGS([cddax],[$LIBCDDB_LIBS])
-dnl       VLC_ADD_CFLAGS([cddax],[$LIBCDDB_CFLAGS])
-dnl       ],
-dnl       [AC_MSG_WARN(new enough libcddb not found. CDDB access disabled) 
-dnl       HAVE_LIBCDDB=no])
-dnl   fi
-dnl 
+ 
+AC_ARG_ENABLE(cdda,           
+  [  --enable-cdda           CDDA plugin support (default enabled)])
+ 
+AC_ARG_ENABLE(cddax,
+  [  --enable-cddax          CDDAX plugin support (default enabled)])
+ 
+if test "${enable_cddax}" != "no"
+then
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.70,
+   [enable_cddax="no"
+    AC_DEFINE(HAVE_CDDAX, [], [Define for the CD-DA plugin using libcdio])
+    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
+    VLC_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
+    VLC_ADD_PLUGINS([cddax])], 
+    [AC_MSG_WARN(libcdio library not found)
+    HAVE_CDDAX=no])
+
+  if test "$enable_libcddb" != "no"; then
+    PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.4, [
+      HAVE_LIBCDDB=yes 
+      AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
+      VLC_ADD_LDFLAGS([cddax],[$LIBCDDB_LIBS])
+      VLC_ADD_CFLAGS([cddax],[$LIBCDDB_CFLAGS])
+      ],
+      [AC_MSG_WARN(new enough libcddb not found. CDDB access disabled) 
+      HAVE_LIBCDDB=no])
+  fi
+ 
 dnl   if test "${enable_vcdx}" != "no"
 dnl   then
 dnl     PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20,
@@ -1538,7 +1538,7 @@ dnl       VLC_ADD_PLUGINS([vcdx])],
 dnl      [AC_MSG_WARN(vcdinfo library not found)
 dnl      HAVE_VCDX=no])
 dnl   fi
-dnl fi
+fi
 
 dnl
 dnl  VCD module

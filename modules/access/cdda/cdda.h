@@ -3,7 +3,7 @@
  *          using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cdda.h,v 1.6 2004/02/14 17:25:39 gbazin Exp $
+ * $Id$
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *
@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "../vcdx/cdrom.h"
+#include "vlc_meta.h"
 
 #ifdef HAVE_LIBCDDB
 #include <cddb/cddb.h>
@@ -45,7 +46,7 @@
 #if INPUT_DEBUG
 #define dbg_print(mask, s, args...) \
    if (p_cdda->i_debug & mask) \
-     msg_Dbg(p_input, "%s: "s, __func__ , ##args)
+     msg_Dbg(p_access, "%s: "s, __func__ , ##args)
 #else
 #define dbg_print(mask, s, args...)
 #endif
@@ -55,15 +56,20 @@
  *****************************************************************************/
 typedef struct cdda_data_s
 {
-    cddev_t     *p_cddev;                           /* CD device descriptor */
-    int         i_nb_tracks;                        /* Nb of tracks (titles) */
-    int         i_track;                                    /* Current track */
-    lsn_t       i_sector;                                  /* Current Sector */
-    lsn_t *     p_sectors;                                  /* Track sectors */
-    vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
+    cddev_t     *p_cddev;                 /* CD device descriptor */
+    int         i_tracks;                 /* # of tracks (titles) */
+
+    /* Current position */
+    int         i_track;                  /* Current track */
+    lsn_t       i_sector;                 /* Current Sector */
+    lsn_t *     p_sectors;                /* Track sectors */
+
     int         i_debug;                  /* Debugging mask */
-    char *      mcn;                      /* Media Catalog Number            */
-    intf_thread_t *p_intf;
+    char *      psz_mcn;                  /* Media Catalog Number            */
+    vlc_meta_t  *p_meta;
+
+    input_title_t *p_title[CDIO_CD_MAX_TRACKS]; 
+
 
 #ifdef HAVE_LIBCDDB
     int         i_cddb_enabled;
@@ -76,7 +82,7 @@ typedef struct cdda_data_s
 #endif
 
     WAVEHEADER  waveheader;               /* Wave header for the output data */
-    int         i_header_pos;
+    vlc_bool_t  b_header;
 
 } cdda_data_t;
 

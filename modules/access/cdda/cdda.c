@@ -32,13 +32,10 @@
 /*****************************************************************************
  * prototypes
  *****************************************************************************/
-int  E_(Open)         ( vlc_object_t * );
-void E_(Close)        ( vlc_object_t * );
+int  E_(CDDAOpen)     ( vlc_object_t * );
+void E_(CDDAClose)    ( vlc_object_t * );
 
-int  E_(OpenIntf)     ( vlc_object_t * );
-void E_(CloseIntf)    ( vlc_object_t * );
-
-int  E_(DebugCB)      ( vlc_object_t *p_this, const char *psz_name,
+int  E_(CDDADebugCB)  ( vlc_object_t *p_this, const char *psz_name,
                         vlc_value_t oldval, vlc_value_t val,
                         void *p_data );
 
@@ -104,15 +101,15 @@ int  E_(CDDBEnabledCB)( vlc_object_t *p_this, const char *psz_name,
  *****************************************************************************/
 
 vlc_module_begin();
-    add_usage_hint( N_("cddax://[device-or-file][@[T]num]") );
+    add_usage_hint( N_("cddax://[device-or-file][@[T]track]") );
     set_description( _("Compact Disc Digital Audio (CD-DA) input") );
-    set_capability( "access", 75 /* slightly higher than cdda */ );
-    set_callbacks( E_(Open), E_(Close) );
-    add_shortcut( "cdda" );
+    set_capability( "access2", 10 /* slightly higher than cdda */ );
+    set_callbacks( E_(CDDAOpen), E_(CDDAClose) );
     add_shortcut( "cddax" );
+    add_shortcut( "cd" );
 
     /* Configuration options */
-    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCB),
+    add_integer ( MODULE_STRING "-debug", 0, E_(CDDADebugCB),
                   N_("If nonzero, this gives additional debug information."),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
