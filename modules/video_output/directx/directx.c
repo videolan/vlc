@@ -1926,5 +1926,8 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 
     FreeLibrary( hddraw_dll );
 
+    /* Signal change to the interface */
+    p_item->b_dirty = VLC_TRUE;
+
     return VLC_SUCCESS;
 }
