@@ -242,6 +242,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     vpar_InitCodedPattern( p_vpar );
     vpar_InitDCTTables( p_vpar );
 
+
     /*
      * Initialize the synchro properties
      */
@@ -260,8 +261,12 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->synchro.modulo = 0;
     /* mean decoding time - at least 200 ms for a slow machine */
     p_vpar->synchro.i_mean_decode_time = 200000;
-    /* suppose we have no delay */
-    p_vpar->synchro.i_delay = 0;
+    /* assume we can display all Is and 2 Ps */
+    p_vpar->synchro.can_display_i = 1;
+    p_vpar->synchro.can_display_p = 0;
+    p_vpar->synchro.displayable_p = 2;
+    p_vpar->synchro.can_display_b = 0;
+    p_vpar->synchro.displayable_b = 0;
     /* assume there were about 3 P and 6 B images between I's */
     p_vpar->synchro.current_p_count = 1;
     p_vpar->synchro.nondropped_p_count = 1;
@@ -273,7 +278,6 @@ static int InitThread( vpar_thread_t *p_vpar )
     {
         p_vpar->synchro.tab_p[i_dummy].mean = 3;
         p_vpar->synchro.tab_p[i_dummy].deviation = .5;
-
         p_vpar->synchro.tab_b[i_dummy].mean = 6;
         p_vpar->synchro.tab_b[i_dummy].deviation = .5;
     }

@@ -43,15 +43,12 @@ typedef struct video_synchro_s
 
     /* mean decoding time */
     mtime_t i_mean_decode_time;
-    /* tells whether we accumulated delay */
-    mtime_t i_delay;
     /* dates */
-    mtime_t i_last_display_pts;
-    mtime_t i_last_decode_pts;
-    mtime_t i_last_i_pts;
+    mtime_t i_last_display_pts;            /* pts of the last displayed image */
+    mtime_t i_last_decode_pts;               /* pts of the last decoded image */
+    mtime_t i_last_i_pts;                          /* pts of the last I image */
+    mtime_t i_last_nondropped_i_pts;       /* pts of last non-dropped I image */
     unsigned int i_images_since_pts;
-    /* last pts of non-dropped I image */
-    mtime_t i_last_nondropped_i_pts;
     
     /* il manquait un compteur */
     unsigned int modulo;
@@ -64,6 +61,13 @@ typedef struct video_synchro_s
     unsigned int current_b_count;
     unsigned int nondropped_b_count;
     double b_count_predict;
+
+    /* can we display pictures ? */
+    unsigned int    can_display_i;
+    unsigned int    can_display_p;
+    double          displayable_p;
+    unsigned int    can_display_b;
+    double          displayable_b;
 
     /* 1 for linear count, 2 for binary count, 3 for ternary count */
     video_synchro_tab_t tab_p[6];

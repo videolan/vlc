@@ -66,6 +66,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
     float optimal_deviation;
     float predict;
     mtime_t i_current_pts;
+    mtime_t i_delay;
     mtime_t i_displaydate;
     decoder_fifo_t * decoder_fifo = p_vpar->bit_stream.p_decoder_fifo;
 
@@ -93,10 +94,11 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                        + 1000000.0 / (p_vpar->synchro.theorical_fps);
         //fprintf (stderr, "  ");
     }
-    //else fprintf (stderr, "R ");
-    //if (dropped) fprintf (stderr, "  "); else fprintf (stderr, "* ");
-    //fprintf (stderr, "%i ", i_coding_type);
-    //fprintf (stderr, "pts %lli delta %lli\n", i_displaydate, i_displaydate - p_vpar->synchro.i_last_display_pts);
+    
+    /* else fprintf (stderr, "R ");
+    if (dropped) fprintf (stderr, "  "); else fprintf (stderr, "* ");
+    fprintf (stderr, "%i ", i_coding_type);
+    fprintf (stderr, "pts %lli delta %lli\n", i_displaydate, i_displaydate - p_vpar->synchro.i_last_display_pts); */
 
     p_vpar->synchro.i_images_since_pts--;
     p_vpar->synchro.i_last_display_pts = i_displaydate;
@@ -136,9 +138,6 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                     p_vpar->synchro.actual_fps = (p_vpar->synchro.actual_fps + 1000000.0 * (1 + p_vpar->synchro.nondropped_b_count + p_vpar->synchro.nondropped_p_count) / (i_current_pts - p_vpar->synchro.i_last_nondropped_i_pts)) / 2;
                 }
     
-                p_vpar->synchro.i_last_nondropped_i_pts = i_current_pts;
-                p_vpar->synchro.nondropped_p_count = 0;
-                p_vpar->synchro.nondropped_b_count = 0;
             }
 
 
@@ -205,7 +204,61 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 	    p_vpar->synchro.b_count_predict = predict;
             p_vpar->synchro.current_b_count = 0;
 	    
+            /* now we calculated all statistics, it's time to
+             * decide what we have the time to display
+             */
+            i_delay = i_current_pts - p_vpar->synchro.i_last_nondropped_i_pts;
+
+	    p_vpar->synchro.can_display_i
+                = ( p_vpar->synchro.i_mean_decode_time < i_delay );
+
+            p_vpar->synchro.can_display_p
+                    = ( p_vpar->synchro.i_mean_decode_time
+                    * (1 + p_vpar->synchro.p_count_predict) < i_delay );
+
+            if( !p_vpar->synchro.can_display_p )
+            {
+                p_vpar->synchro.displayable_p
+                    = -1 + i_delay / p_vpar->synchro.i_mean_decode_time;
+                if( p_vpar->synchro.displayable_p < 0 )
+                    p_vpar->synchro.displayable_p = 0;
+            }
+	    else
+                p_vpar->synchro.displayable_p = 0;
+
+	    if( p_vpar->synchro.can_display_p
+                && !(p_vpar->synchro.can_display_b 
+                    = ( p_vpar->synchro.i_mean_decode_time
+                    * (1 + p_vpar->synchro.b_count_predict
+                        + p_vpar->synchro.p_count_predict)) < i_delay) )
+	    {
+                p_vpar->synchro.displayable_b
+                    = -2.0 + i_delay / p_vpar->synchro.i_mean_decode_time
+                        - p_vpar->synchro.can_display_p;
+            }
+            else
+                p_vpar->synchro.displayable_b = 0;
+
+#if 0
+            fprintf( stderr,
+                "I %i  P %i (%f)  B %i (%f)\n",
+                p_vpar->synchro.can_display_i,
+                p_vpar->synchro.can_display_p,
+                p_vpar->synchro.displayable_p,
+                p_vpar->synchro.can_display_b,
+                p_vpar->synchro.displayable_b );
+#endif
+
+            /* update some values */
+            if( !dropped )
+            {
+                p_vpar->synchro.i_last_nondropped_i_pts = i_current_pts;
+                p_vpar->synchro.nondropped_p_count = 0;
+                p_vpar->synchro.nondropped_b_count = 0;
+            }
+
             break;
+
     }
 
     p_vpar->synchro.modulo++;
@@ -218,41 +271,50 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
-    mtime_t i_delay;
-    int keep;
+    mtime_t i_delay = p_vpar->synchro.i_last_decode_pts - mdate();
 
-    i_delay = p_vpar->synchro.i_last_decode_pts - mdate();
-
-    //fprintf( stderr, "delay is %lli - ", i_delay);
-    
-#if 1
-    /*if ( i_coding_type == B_CODING_TYPE )
-        return (0);*/
-
-    //return( i_coding_type == I_CODING_TYPE || i_coding_type == P_CODING_TYPE );
-    if( i_delay > 120000 )
-    {	    
-        keep = 1;
-    }
-    else if( i_delay > 100000 )
+    switch( i_coding_type )
     {
-        keep = ( i_coding_type == I_CODING_TYPE
-                    || i_coding_type == P_CODING_TYPE );
-    }
-    else if( i_delay > 50000 )
-    {	    
-        keep = ( i_coding_type == I_CODING_TYPE );
-    }
-    else
-    {	    
-        keep = 0;
-    }
-#endif
+        case I_CODING_TYPE:
 
-    //if (!keep) fprintf( stderr, "trashing a type %i with delay %lli\n", i_coding_type, i_delay);
-//    else fprintf( stderr, "chooser :               ok - displaying a %i \n", i_coding_type);
+            return( p_vpar->synchro.can_display_i );
 
-    return (keep);
+        case P_CODING_TYPE:
+
+            if( p_vpar->synchro.can_display_p )
+                return( 1 );
+
+            if( p_vpar->synchro.displayable_p * i_delay
+                < p_vpar->synchro.i_mean_decode_time )
+            {
+                //fprintf( stderr, "trashed a P\n");
+                return( 0 );
+            }
+
+            p_vpar->synchro.displayable_p--;
+            return( 1 );
+   
+        case B_CODING_TYPE:
+
+            if( p_vpar->synchro.can_display_b )
+                return( 1 );
+
+            /* modulo & 0x3 is here to add some randomness */
+            if( i_delay < (1 + (p_vpar->synchro.modulo & 0x3))
+                * p_vpar->synchro.i_mean_decode_time )
+            {
+                //fprintf( stderr, "trashed a B\n");
+                return( 0 );
+            }
+ 
+            if( p_vpar->synchro.displayable_b <= 0 )
+                return( 0 );
+
+            p_vpar->synchro.displayable_b--;
+            return( 1 );
+    }
+
+    return( 0 );
 
 }
 
@@ -296,7 +358,9 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar )
     p_vpar->synchro.i_mean_decode_time =
         ( 7 * p_vpar->synchro.i_mean_decode_time + i_decode_time ) / 8;
 
-    //fprintf (stderr, "decoding time is %lli\n", p_vpar->synchro.i_mean_decode_time);
+    /* fprintf (stderr,
+        "decoding time was %lli\n",
+        p_vpar->synchro.i_mean_decode_time); */
 
     p_vpar->synchro.i_fifo_start = (p_vpar->synchro.i_fifo_start + 1) & 0xf;
 
@@ -308,12 +372,23 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar )
 mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 {
     mtime_t i_displaydate = p_vpar->synchro.i_last_display_pts;
-    static mtime_t i_delta = 0;
     
-    //fprintf(stderr, "displaying type %i with delay %lli and delta %lli\n", p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_image_type, i_displaydate - mdate(), i_displaydate - i_delta);
-    //fprintf (stderr, "theorical fps: %f - actual fps: %f \n", p_vpar->synchro.theorical_fps, p_vpar->synchro.actual_fps);
+#if 0
+    static mtime_t i_delta = 0;
+
+    fprintf( stderr,
+        "displaying type %i with delay %lli and delta %lli\n",
+        p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_image_type,
+        i_displaydate - mdate(),
+        i_displaydate - i_delta );
+
+    fprintf (stderr,
+        "theorical fps: %f - actual fps: %f \n",
+        p_vpar->synchro.theorical_fps, p_vpar->synchro.actual_fps );
 
     i_delta = i_displaydate;
+#endif
+
     return i_displaydate;
 }
 
