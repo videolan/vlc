@@ -223,9 +223,14 @@ static int Open( vlc_object_t *p_this )
         {
             psz_mux = strdup("ts");
         }
-        else
+        else if( psz_mux_byext )
         {
             psz_mux = strdup(psz_mux_byext);
+        }
+        else
+        {
+            msg_Err( p_stream, "no mux specified or found by extention" );
+            return VLC_EGENERIC;
         }
     }
     else if( psz_mux && !psz_access )
