@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.50 2004/01/25 16:17:03 anil Exp $
+ * $Id: http.c,v 1.51 2004/01/29 17:51:07 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -125,7 +125,7 @@ static void uri_decode_url_encoded( char *psz );
 
 static char *Find_end_MRL( char *psz );
 
-static playlist_item_t * parse_MRL( char *psz );
+static playlist_item_t * parse_MRL( intf_thread_t * , char *psz );
 
 /*****************************************************************************
  *
@@ -1764,7 +1764,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
 
                     uri_extract_value( p_request, "mrl", mrl, 512 );
                     uri_decode_url_encoded( mrl );
-                    p_item = parse_MRL( mrl );
+                    p_item = parse_MRL( p_intf, mrl );
 
                     if( !p_item || !p_item->psz_uri || !*p_item->psz_uri )
                     {
@@ -2870,7 +2870,7 @@ static char *Find_end_MRL( char *psz )
  * create an item with all informations in it, and return the item.
  * return NULL if there is an error.
  **********************************************************************/
-playlist_item_t * parse_MRL( char *psz )
+playlist_item_t * parse_MRL( intf_thread_t *p_intf, char *psz )
 {
     char **ppsz_options = NULL;
     char *mrl;
@@ -2967,17 +2967,10 @@ playlist_item_t * parse_MRL( char *psz )
     else
     {
         /* now create an item */
-        p_item = malloc( sizeof( playlist_item_t ) );
-        memset( p_item, 0, sizeof( playlist_item_t ) );
-        p_item->psz_name   = mrl;
-        p_item->psz_uri    = strdup( mrl );
-        p_item->i_duration = -1;
-        p_item->b_enabled = VLC_TRUE;
-        p_item->i_group = PLAYLIST_TYPE_MANUAL;
-
+        p_item = playlist_ItemNew( p_intf, mrl, mrl);
         for( i = 0 ; i< i_options ; i++ )
         {
-            playlist_AddItemOption( p_item, ppsz_options[i] );
+            playlist_ItemAddOption( p_item, ppsz_options[i] );
         }
     }
 

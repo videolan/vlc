@@ -2,7 +2,7 @@
  * iteminfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: iteminfo.cpp,v 1.7 2004/01/25 03:29:01 hartman Exp $
+ * $Id: iteminfo.cpp,v 1.8 2004/01/29 17:51:08 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -178,7 +178,7 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
 
     author_text =
                    new wxTextCtrl( info_panel, Uri_Event,
-                                   wxU( playlist_GetItemInfo( p_item,
+                                   wxU( playlist_ItemGetInfo( p_item,
                                           _("General"), _("Author") ) ),
                                    wxDefaultPosition, wxSize( 300, -1 ),
                                    wxTE_PROCESS_ENTER);
@@ -305,9 +305,10 @@ void ItemInfoDialog::UpdateInfo()
  *****************************************************************************/
 void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
+    vlc_mutex_lock( &p_item->lock );
     p_item->psz_name = strdup( name_text->GetLineText(0).mb_str() );
     p_item->psz_uri = strdup( uri_text->GetLineText(0).mb_str() );
-    playlist_AddItemInfo( p_item,"General","Author",
+    playlist_ItemAddInfo( p_item,"General","Author",
                             author_text->GetLineText(0).mb_str() );
     vlc_bool_t b_old_enabled = p_item->b_enabled;
 
@@ -335,6 +336,7 @@ void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     }
 
     p_item->b_enabled = enabled_checkbox->IsChecked() ? VLC_TRUE : VLC_FALSE ;
+    vlc_mutex_unlock( &p_item->lock );
     EndModal( wxID_OK );
 }
 

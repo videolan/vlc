@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: vlc_playlist.h,v 1.26 2004/01/25 18:17:08 zorglub Exp $
+ * $Id: vlc_playlist.h,v 1.27 2004/01/29 17:51:07 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -75,10 +75,11 @@ struct playlist_item_t
     char *     psz_uri;        /**< mrl of this item */
     mtime_t    i_duration;     /**< A hint about the duration of this
                                 * item, in milliseconds*/
-    int i_categories;          /**< Number of info categories */
-    item_info_category_t **pp_categories;
-                               /**< Pointer to the first info category */
-    int        i_status;       /**< unused yet */
+    int        i_categories;   /**< Number of info categories */
+    item_info_category_t **
+               pp_categories;  /**< Pointer to the first info category */
+    int        i_options;      /**< Number of options */
+    char **    ppsz_options;   /**< Array of options */
     int        i_nb_played;    /**< How many times was this item played ? */
     vlc_bool_t b_autodeletion; /**< Indicates whther this item is to
                                 * be deleted after playback. True mean
@@ -86,8 +87,9 @@ struct playlist_item_t
                                 * after playback, false otherwise */
     vlc_bool_t b_enabled;      /**< Indicates whether this item is to be
                                 * played or skipped */
-    int        i_group;         /**< Which group does this item belongs to ? */
+    int        i_group;        /**< Which group does this item belongs to ? */
     int        i_id;           /**< Unique id to track this item */
+    vlc_mutex_t lock;          /**< Item cannot be changed without this lock */
 };
 
 /**
@@ -165,11 +167,18 @@ void           playlist_Destroy  ( playlist_t * );
 VLC_EXPORT( void, playlist_Command, ( playlist_t *, playlist_command_t, int ) );
 
 
-/* Item functions */
+/* Item management functions */
+#define playlist_AddItem(p,pi,i1,i2) playlist_ItemAdd(p,pi,i1,i2)
+#define playlist_ItemNew( a , b, c ) __playlist_ItemNew(VLC_OBJECT(a) , b , c )
+VLC_EXPORT( playlist_item_t* , __playlist_ItemNew, ( vlc_object_t *,const char *,const char * ) );
+VLC_EXPORT( void, playlist_ItemDelete, ( playlist_item_t * ) );
+VLC_EXPORT( int,  playlist_ItemAdd, ( playlist_t *, playlist_item_t *, int, int ) );
+
+/* Simple add/remove funcctions */
 VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int ) );
-VLC_EXPORT( int,  playlist_AddWDuration, ( playlist_t *, const char *, const char *, int, int, mtime_t ) );
-/* For internal use. Do not use this one anymore */
-VLC_EXPORT( int,  playlist_AddItem, ( playlist_t *, playlist_item_t *, int, int ) );
+VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, const char **,int ) );
+
+
 VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_Disable, ( playlist_t *, int ) );
@@ -178,13 +187,18 @@ VLC_EXPORT( int,  playlist_DisableGroup, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_EnableGroup, ( playlist_t *, int ) );
 
 /* Basic item informations accessors */
-VLC_EXPORT( int, playlist_SetGroup, (playlist_t *, int, int ) );
-VLC_EXPORT( int, playlist_SetName, (playlist_t *, int, char * ) );
-VLC_EXPORT( int, playlist_SetDuration, (playlist_t *, int, mtime_t ) );
+VLC_EXPORT( int, playlist_ItemSetGroup, (playlist_item_t *, int ) );
+VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *,  char * ) );
+VLC_EXPORT( int, playlist_ItemSetDuration, (playlist_item_t *, mtime_t ) );
+
+VLC_EXPORT( int, playlist_SetGroup, (playlist_t * , int , int ) );
+VLC_EXPORT( int, playlist_SetName, (playlist_t *, int ,  char * ) );
+VLC_EXPORT( int, playlist_SetDuration, (playlist_t *, int , mtime_t ) );
 
 /* Item search functions */
 VLC_EXPORT( int, playlist_GetPositionById, (playlist_t *, int) );
-VLC_EXPORT( playlist_item_t *, playlist_GetItemById, (playlist_t *, int) );
+VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int) );
+VLC_EXPORT( playlist_item_t *, playlist_ItemGetByPos, (playlist_t *, int) );
 
 
 /* Group management functions */
@@ -195,20 +209,20 @@ VLC_EXPORT( int, playlist_GroupToId, (playlist_t *, char * ) );
 
 /* Info functions */
 VLC_EXPORT( char * , playlist_GetInfo, ( playlist_t * , int, const char *, const char *) );
-VLC_EXPORT( char * , playlist_GetItemInfo, ( playlist_item_t * , const char *, const char *) );
+VLC_EXPORT( char * , playlist_ItemGetInfo, ( playlist_item_t * , const char *, const char *) );
 
 VLC_EXPORT( item_info_category_t*, playlist_GetCategory, ( playlist_t *, int, const char *) );
-VLC_EXPORT( item_info_category_t*, playlist_GetItemCategory, ( playlist_item_t *, const char *) );
+VLC_EXPORT( item_info_category_t*, playlist_ItemGetCategory, ( playlist_item_t *, const char *) );
 
 VLC_EXPORT( item_info_category_t*, playlist_CreateCategory, ( playlist_t *, int, const char *) );
-VLC_EXPORT( item_info_category_t*, playlist_CreateItemCategory, ( playlist_item_t *, const char *) );
+VLC_EXPORT( item_info_category_t*, playlist_ItemCreateCategory, ( playlist_item_t *, const char *) );
 
 VLC_EXPORT( int, playlist_AddInfo, (playlist_t *, int, const char * , const char *, const char *, ...) );
-VLC_EXPORT( int, playlist_AddItemInfo, (playlist_item_t *, const char * , const char *, const char *, ...) );
+VLC_EXPORT( int, playlist_ItemAddInfo, (playlist_item_t *, const char * , const char *, const char *, ...) );
 
 /* Option functions */
-VLC_EXPORT( int, playlist_AddOption, (playlist_t *, int, const char *, ...) );
-VLC_EXPORT( int, playlist_AddItemOption, (playlist_item_t *, const char *, ...) );
+VLC_EXPORT( int, playlist_AddOption, (playlist_t *, int, const char *) );
+VLC_EXPORT( int, playlist_ItemAddOption, (playlist_item_t *, const char *) );
 
 /* Playlist sorting */
 #define playlist_SortID(p, i) playlist_Sort( p, SORT_ID, i)

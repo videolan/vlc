@@ -2,7 +2,7 @@
  * loadsave.c : Playlist loading / saving functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: loadsave.c,v 1.9 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: loadsave.c,v 1.10 2004/01/29 17:51:08 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -64,7 +64,7 @@ int playlist_Import( playlist_t * p_playlist, const char *psz_filename )
     i_id = playlist_Add( p_playlist, psz_uri, psz_uri,
                   PLAYLIST_INSERT | PLAYLIST_GO , PLAYLIST_END);
 
-    p_item = playlist_GetItemById( p_playlist, i_id );
+    p_item = playlist_ItemGetById( p_playlist, i_id );
     p_item->b_autodeletion = VLC_TRUE;
 
     vlc_mutex_unlock( &p_playlist->object_lock );

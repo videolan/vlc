@@ -2,7 +2,7 @@
  * stream.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: streamwizard.cpp,v 1.5 2004/01/25 03:29:01 hartman Exp $
+ * $Id: streamwizard.cpp,v 1.6 2004/01/29 17:51:08 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -204,11 +204,9 @@ void StreamDialog::OnStart( wxCommandEvent& event )
 
     for( int i = 0; i < (int)p_open_dialog->mrl.GetCount(); i++ )
     {
-        int i_id = playlist_Add( p_playlist,
+        playlist_item_t *p_item = playlist_ItemNew( p_intf,
                       (const char *)p_open_dialog->mrl[i].mb_str(),
-                      (const char *)p_open_dialog->mrl[i].mb_str(),
-                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
-        int i_pos = playlist_GetPositionById( p_playlist, i_id );
+                      (const char *)p_open_dialog->mrl[i].mb_str() );
         int i_options = 0;
 
         /* Count the input options */
@@ -222,7 +220,7 @@ void StreamDialog::OnStart( wxCommandEvent& event )
         /* Insert options */
         for( int j = 0; j < i_options; j++ )
         {
-            playlist_AddOption( p_playlist, i_pos,
+            playlist_ItemAddOption( p_item ,
                                 p_open_dialog->mrl[i + j  + 1].mb_str() );
         }
 
@@ -231,18 +229,21 @@ void StreamDialog::OnStart( wxCommandEvent& event )
         {
             for( int j = 0; j < (int)sout_mrl.GetCount(); j++ )
             {
-                playlist_AddOption( p_playlist, i_pos ,
-                                    sout_mrl[j].mb_str() );
+                playlist_ItemAddOption( p_item , sout_mrl[j].mb_str() );
             }
         }
+
+         playlist_AddItem( p_playlist, p_item,
+                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
+
         msg_Dbg(p_intf,"playings %s",
                  (const char *)p_open_dialog->mrl[i].mb_str());
 
         i += i_options;
-   }
- vlc_object_release( p_playlist );
+    }
+    vlc_object_release( p_playlist );
 
-  Hide();
+    Hide();
 }
 
 

@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item.c,v 1.12 2004/01/17 14:08:37 sigmunau Exp $
+ * $Id: item.c,v 1.13 2004/01/29 17:51:08 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,6 +30,10 @@
 #include <vlc/input.h>
 
 #include "vlc_playlist.h"
+
+
+
+
 
 /**
  * Add a playlist item into a playlist

@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.17 2004/01/25 04:53:16 rocky Exp $
+ * $Id: access.c,v 1.18 2004/01/29 17:51:07 zorglub Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -1003,37 +1003,53 @@ VCDUpdateVar( input_thread_t *p_input, int i_num, int i_action,
 
 
 static inline void
-MetaInfoAddStr(input_thread_t *p_input, input_info_category_t *p_cat, 
-		  playlist_t *p_playlist, char *title, 
-		  const char *str)
+MetaInfoAddStr(input_thread_t *p_input, input_info_category_t *p_cat,
+               playlist_t *p_playlist, char *title,
+               const char *str)
 {
   thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
-  if ( str ) {                                                                
+  playlist_item_t *p_item;
+  if ( str ) {
     dbg_print( INPUT_DBG_META, "field: %s: %s\n", title, str);
-    input_AddInfo( p_cat, title, "%s", str );              
-    playlist_AddInfo( p_playlist, -1, p_cat->psz_name, title,
-                      "%s",str );                                             
+    input_AddInfo( p_cat, title, "%s", str );
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    p_item = playlist_ItemGetByPos( p_playlist, -1 );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    vlc_mutex_lock( &p_item->lock );
+    playlist_ItemAddInfo( p_item, p_cat->psz_name, title,
+                          "%s",str );
+    vlc_mutex_unlock( &p_item->lock );
   }
 }
 
 
 static inline void
-MetaInfoAddNum(input_thread_t *p_input, input_info_category_t *p_cat, 
-	       playlist_t *p_playlist, char *title, int num)
+MetaInfoAddNum(input_thread_t *p_input, input_info_category_t *p_cat,
+               playlist_t *p_playlist, char *title, int num)
 {
   thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
+  playlist_item_t *p_item;
+
+  vlc_mutex_lock( &p_playlist->object_lock );
+  p_item = playlist_ItemGetByPos( p_playlist, -1 );
+  vlc_mutex_unlock( &p_playlist->object_lock );
+
   dbg_print( INPUT_DBG_META, "field %s: %d\n", title, num);
   input_AddInfo( p_cat, title, "%d", num );
-  playlist_AddInfo( p_playlist, -1, p_cat->psz_name, title,
-                    "%d",num );
+
+  vlc_mutex_lock( &p_item->lock );
+  playlist_ItemAddInfo( p_item ,  p_cat->psz_name, title, "%d",num );
+  vlc_mutex_unlock( &p_item->lock );
 }
-  
+
 #define addstr(title, str) \
   MetaInfoAddStr( p_input, p_cat, p_playlist, title, str );
 
 #define addnum(title, num) \
   MetaInfoAddNum( p_input, p_cat, p_playlist, title, num );
-  
+
 static void InformationCreate( input_thread_t *p_input  )
 {
   thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;

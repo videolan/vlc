@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: open.cpp,v 1.66 2004/01/26 22:10:20 gbazin Exp $
+ * $Id: open.cpp,v 1.67 2004/01/29 17:51:08 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -890,11 +890,10 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     for( int i = 0; i < (int)mrl.GetCount(); i++ )
     {
         int i_options = 0;
-
-        int i_id = playlist_Add( p_playlist, (const char *)mrl[i].mb_str(),
-                      (const char *)mrl[i].mb_str(),
-                      PLAYLIST_APPEND, PLAYLIST_END );
-        playlist_item_t *p_item = playlist_GetItemById( p_playlist , i_id );
+        playlist_item_t *p_item =
+                  playlist_ItemNew( p_intf,
+                                    (const char*)mrl[i].mb_str(),
+                                    (const char *)mrl[i].mb_str() );
 
         /* Count the input options */
         while( i + i_options + 1 < (int)mrl.GetCount() &&
@@ -906,7 +905,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         /* Insert options */
         for( int j = 0; j < i_options; j++ )
         {
-            playlist_AddItemOption( p_item, mrl[i + j  + 1].mb_str() );
+            playlist_ItemAddOption( p_item, mrl[i + j  + 1].mb_str() );
         }
 
         /* Get the options from the subtitles dialog */
@@ -914,7 +913,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         {
             for( int j = 0; j < (int)subsfile_mrl.GetCount(); j++ )
             {
-                playlist_AddItemOption( p_item, subsfile_mrl[j].mb_str() );
+                playlist_ItemAddOption( p_item, subsfile_mrl[j].mb_str() );
             }
         }
 
@@ -923,9 +922,12 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         {
             for( int j = 0; j < (int)sout_mrl.GetCount(); j++ )
             {
-                playlist_AddItemOption( p_item, sout_mrl[j].mb_str() );
+                playlist_ItemAddOption( p_item, sout_mrl[j].mb_str() );
             }
         }
+
+       int i_id = playlist_AddItem( p_playlist, p_item,
+                      PLAYLIST_APPEND, PLAYLIST_END );
 
         if( !i && i_open_arg )
         {

@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.51 2004/01/25 18:53:07 gbazin Exp $
+ * $Id: sap.c,v 1.52 2004/01/29 17:51:08 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -647,6 +647,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
     vlc_bool_t b_http = VLC_FALSE;
     char *psz_http_path = NULL;
     playlist_t *p_playlist = NULL;
+    playlist_item_t *p_item;
 
     psz_uri_default = NULL;
     if( p_sd->i_media > 1 )
@@ -670,8 +671,8 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                       PLAYLIST_CHECK_INSERT, PLAYLIST_END );
         if( i_id != -1 )
         {
-            i_pos = playlist_GetPositionById( p_playlist, i_id );
-            playlist_SetGroup( p_playlist, i_pos, p_intf->p_sys->i_group );
+            playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
+            playlist_ItemSetGroup( p_item, p_intf->p_sys->i_group );
         }
 
         /* Remember it */
@@ -838,7 +839,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                             p_sd->psz_sessionname,
                             psz_item_uri );
 
-                    p_item = playlist_GetItemById( p_playlist,
+                    p_item = playlist_ItemGetById( p_playlist,
                                     p_intf->p_sys->pp_announces[i]->i_id );
 
                     /* Change the name in the item */
@@ -864,8 +865,13 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         i_id = playlist_Add ( p_playlist, psz_item_uri ,
                                p_sd->psz_sessionname,
                                PLAYLIST_CHECK_INSERT, PLAYLIST_END );
-        i_pos = playlist_GetPositionById( p_playlist, i_id );
-        playlist_SetGroup( p_playlist, i_pos, i_group );
+        p_item = playlist_ItemGetById( p_playlist, i_id );
+        if( p_item )
+        {
+            vlc_mutex_lock( &p_item->lock );
+            playlist_ItemSetGroup( p_item, i_group );
+            vlc_mutex_unlock( &p_item->lock );
+        }
 
         /* Then remember it */
         p_announce = (struct sap_announce_t *)malloc(

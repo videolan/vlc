@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.25 2004/01/25 14:15:21 kuehne Exp $
+ * $Id: pda_callbacks.c,v 1.26 2004/01/29 17:51:07 zorglub Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -133,16 +133,10 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
             else
 #endif
             {
-                i_id = playlist_Add( p_playlist, (const char*)name,
-                                (const char*)name,
-                              PLAYLIST_APPEND, PLAYLIST_END );
-
-                i_pos = playlist_GetPositionById( p_playlist, i_id );
-
-                for( i = 0 ; i< i_size ; i++ )
-                {
-                    playlist_AddOption( p_playlist, i_pos , ppsz_options[i] );
-                }
+                i_id = playlist_AddExt( p_playlist, (const char*)name,
+                              (const char*)name,
+                              PLAYLIST_APPEND, PLAYLIST_END,
+                              ppsz_options, i_pos );
             }
 
             /* Cleanup memory */

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.283 2004/01/26 23:37:05 hartman Exp $
+ * $Id: input.c,v 1.284 2004/01/29 17:51:08 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -787,7 +787,7 @@ static int InitThread( input_thread_t * p_input )
         if( p_playlist )
         {
             playlist_SetDuration( p_playlist, -1 , i_length );
-            val.b_bool = VLC_TRUE;
+            val.b_bool = p_playlist->i_index;
             var_Set( p_playlist, "item-change", val );
             vlc_object_release( p_playlist );
         }
@@ -808,7 +808,7 @@ static int InitThread( input_thread_t * p_input )
     var_Get( p_input, "sub-file", &val );
     if( val.psz_string && *val.psz_string )
     {
-	msg_Dbg( p_input, "force subtitle: %s", val.psz_string );
+        msg_Dbg( p_input, "force subtitle: %s", val.psz_string );
         subtitle_demux_t *p_sub;
         if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string),
                                     i_microsecondperframe ) ) )

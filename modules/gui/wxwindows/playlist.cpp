@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.39 2004/01/25 03:29:01 hartman Exp $
+ * $Id: playlist.cpp,v 1.40 2004/01/29 17:51:08 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -405,24 +405,29 @@ void Playlist::UpdateItem( int i )
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                        FIND_ANYWHERE );
+
     if( p_playlist == NULL )
     {
         return;
     }
-    if( i < 0 || i >= p_playlist->i_size || !p_playlist->pp_items[i] )
+
+    playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist, i );
+
+    if( !p_item )
     {
         vlc_object_release(p_playlist);
         return;
     }
-    listview->SetItem( i, 0, wxL2U(p_playlist->pp_items[i]->psz_name) );
-    listview->SetItem( i, 1, wxU( playlist_GetInfo( p_playlist, i,
+
+    listview->SetItem( i, 0, wxL2U(p_item->psz_name) );
+    listview->SetItem( i, 1, wxU( playlist_ItemGetInfo( p_item,
                                        _("General") , _("Author") ) ) );
     char *psz_group = playlist_FindGroup(p_playlist,
-                                         p_playlist->pp_items[i]->i_group);
+                                         p_item->i_group);
     listview->SetItem( i, 2,
              wxL2U( psz_group ? psz_group : _("Normal") ) );
 
-    if( p_playlist->pp_items[i]->b_enabled == VLC_FALSE )
+    if( p_item->b_enabled == VLC_FALSE )
     {
         wxListItem listitem;
         listitem.m_itemId = i;
@@ -431,7 +436,7 @@ void Playlist::UpdateItem( int i )
     }
 
     char psz_duration[MSTRTIME_MAX_SIZE];
-    mtime_t dur = p_playlist->pp_items[i]->i_duration;
+    mtime_t dur = p_item->i_duration;
     if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
     else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
     listview->SetItem( i, 3, wxU(psz_duration) );
@@ -611,9 +616,9 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
                                  formats[dialog.GetFilterIndex()].psz_module );
             }
         }
-        
+
         vlc_object_release( p_playlist );
-        
+
     }
 }
 
@@ -900,6 +905,7 @@ void Playlist::OnEnableSelection( wxCommandEvent& WXUNUSED(event) )
     {
         if( listview->IsSelected( item ) )
         {
+            /*XXX*/
             playlist_Enable( p_playlist, item );
             UpdateItem( item );
         }
@@ -921,6 +927,7 @@ void Playlist::OnDisableSelection( wxCommandEvent& WXUNUSED(event) )
     {
         if( listview->IsSelected( item ) )
         {
+            /*XXX*/
             playlist_Disable( p_playlist, item );
             UpdateItem( item );
         }
@@ -1021,10 +1028,14 @@ void Playlist::ShowInfos( int i_item )
     }
     if( iteminfo_dialog == NULL )
     {
-        if( i_item >= 0 && i_item < p_playlist->i_size )
+        vlc_mutex_lock( &p_playlist->object_lock);
+        playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist, i_item );
+        vlc_mutex_unlock( &p_playlist->object_lock );
+
+        if( p_item )
         {
             iteminfo_dialog = new ItemInfoDialog(
-                              p_intf, p_playlist->pp_items[i_item], this );
+                              p_intf, p_item , this );
             if( iteminfo_dialog->ShowModal()  == wxID_OK )
                 UpdateItem( i_item );
             delete iteminfo_dialog;
@@ -1060,6 +1071,7 @@ void Playlist::OnEnDis( wxCommandEvent& event )
        switch( event.GetId() )
        {
            case EnableGroup_Event:
+               /*XXX*/
                playlist_EnableGroup( p_playlist ,
                                   p_playlist->pp_items[i_item]->i_group );
                break;
@@ -1168,6 +1180,7 @@ int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
                  vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
+    fprintf(stderr,"Update item: %i\n",new_val.i_int);
     p_playlist_dialog->UpdateItem( new_val.i_int );
     return 0;
 }

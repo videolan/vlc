@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: speex.c,v 1.10 2004/01/25 18:20:12 bigben Exp $
+ * $Id: speex.c,v 1.11 2004/01/29 17:51:07 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -471,8 +471,19 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     p_mode = speex_mode_list[p_sys->p_header->mode];
     input_AddInfo( p_cat, _("Mode"), "%s%s",
-                   p_mode->modeName, p_sys->p_header->vbr ? " VBR" : "" );
-    playlist_AddInfo( p_playlist, -1, _("Speex comment") , _("Mode"), "%s%s",
+                  p_mode->modeName, p_sys->p_header->vbr ? " VBR" : "" );
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    p_item = playlist_ItemGetByPos( p_playlist, -1 );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    if( !p_item)
+    {
+        msg_Err(p_dec, "unable to find item" );
+        return;
+    }
+    vlc_mutex_lock( &p_item->lock );
+
+    playlist_ItemAddInfo( p_item, _("Speex comment") , _("Mode"),"%s%s",
                     p_mode->modeName, p_sys->p_header->vbr ? " VBR" : "" );
 
     if( p_oggpacket->bytes < 8 )
@@ -489,7 +500,9 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
     }
 
     input_AddInfo( p_cat, p_buf, "" );
-    playlist_AddInfo( p_playlist, -1, _("Speex comment") , p_buf , "" );
+    playlist_ItemAddInfo( p_item , _("Speex comment") , p_buf , "" );
+
+    vlc_mutex_unlock( &p_item->lock );
 
     if( p_playlist ) vlc_object_release( p_playlist );
 

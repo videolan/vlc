@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.78 2004/01/26 23:30:18 fenrir Exp $
+ * $Id: playlist.c,v 1.79 2004/01/29 17:51:08 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -567,8 +567,6 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
 static void PlayItem( playlist_t *p_playlist )
 {
     playlist_item_t *p_item;
-    char            **ppsz_options;
-    int             i_options;
     int             i, j;
     vlc_value_t val;
     if( p_playlist->i_index == -1 )
@@ -587,37 +585,12 @@ static void PlayItem( playlist_t *p_playlist )
     msg_Dbg( p_playlist, "creating new input thread" );
     p_item = p_playlist->pp_items[p_playlist->i_index];
 
-    i_options    = 0;
-    ppsz_options = NULL;
-
-    /* Beurk, who the hell have done that ???????, why moving options
-     * to playlist in a such *bad* way ? --fenrir_is_asking ...*/
-    /* Parse input options */
-    for( i = 0 ; i < p_item->i_categories ; i++ )
-    {
-        if( !strcmp( p_item->pp_categories[i]->psz_name, _("Options") ) )
-        {
-            msg_Dbg( p_playlist, "Parsing %i options for item", p_item->pp_categories[i]->i_infos );
-            for( j = 0; j< p_item->pp_categories[i]->i_infos ; j++ )
-            {
-                msg_Dbg( p_playlist, "Option : %s",
-                         p_item->pp_categories[i]->pp_infos[j]->psz_value );
-                TAB_APPEND( i_options, ppsz_options,
-                            p_item->pp_categories[i]->pp_infos[j]->psz_value );
-            }
-            break;
-        }
-    }
+    p_item->i_nb_played++;
 
     p_playlist->p_input = input_CreateThread( p_playlist, p_item->psz_uri,
-                                              ppsz_options, i_options );
-
-    if( ppsz_options )
-    {
-        free( ppsz_options );
-    }
+                                              p_item->ppsz_options,
+                                              p_item->i_options );
 
     val.i_int = p_playlist->i_index;
     var_Set( p_playlist, "playlist-current", val);
 }
-

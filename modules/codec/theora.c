@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.23 2004/01/25 18:20:12 bigben Exp $
+ * $Id: theora.c,v 1.24 2004/01/29 17:51:07 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -340,6 +340,7 @@ static void ParseTheoraComments( decoder_t *p_dec )
         input_InfoCategory( p_input, _("Theora comment") );
     playlist_t *p_playlist = vlc_object_find( p_dec, VLC_OBJECT_PLAYLIST,
                                               FIND_ANYWHERE );
+    playlist_item_t *p_item;
     int i = 0;
     char *psz_name, *psz_value, *psz_comment;
     while ( i < p_dec->p_sys->tc.comments )
@@ -357,8 +358,18 @@ static void ParseTheoraComments( decoder_t *p_dec )
             *psz_value = '\0';
             psz_value++;
             input_AddInfo( p_cat, psz_name, psz_value );
-            playlist_AddInfo( p_playlist, -1, _("Theora comment") ,
-                              psz_name, psz_value );
+            vlc_mutex_lock( &p_playlist->object_lock );
+            p_item = playlist_ItemGetByPos( p_playlist, -1 );
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            if( !p_item)
+            {
+                msg_Err(p_dec, "unable to find item" );
+                return;
+            }
+            vlc_mutex_lock( &p_item->lock );
+            playlist_ItemAddInfo( p_item, _("Theora comment") ,
+                                  psz_name, psz_value );
+            vlc_mutex_unlock( &p_item->lock );
         }
         free( psz_comment );
         i++;
