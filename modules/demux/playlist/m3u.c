@@ -2,7 +2,7 @@
  * m3u.c : M3U playlist format import
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: m3u.c,v 1.3 2004/01/25 20:05:29 hartman Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -36,6 +36,8 @@
 struct demux_sys_t
 {
     char *psz_prefix;
+    char **ppsz_options;
+    int i_options;
 };
 
 /*****************************************************************************
@@ -74,7 +76,6 @@ int Import_M3U( vlc_object_t *p_this )
     {
         msg_Warn(p_demux, "m3u import module discarded");
         return VLC_EGENERIC;
-        
     }
     msg_Dbg( p_demux, "found valid M3U playlist file");
 
@@ -87,6 +88,9 @@ int Import_M3U( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
+
+    p_demux->p_sys->ppsz_options = NULL;
+    p_demux->p_sys->i_options = 0 ;
 
     return VLC_SUCCESS;
 }
@@ -108,13 +112,15 @@ void Close_M3U( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     mtime_t        i_duration = -1;
-    char          *psz_name = NULL;    
+    char          *psz_name = NULL;
     char          *psz_line;
     char          *psz_parse;
     char          *psz_duration;
     char          *psz_mrl;
     playlist_t    *p_playlist;
     int            i_position;
+    char          *psz_option = NULL;
+    int            i;
 
     p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
                                                  FIND_PARENT );
@@ -133,34 +139,61 @@ static int Demux( demux_t *p_demux )
             /* parse extra info */
             psz_parse = psz_line;
             while( *psz_parse &&
-                   strncasecmp( psz_parse, "EXTINF:", sizeof("EXTINF:") - 1 ) )
+                  strncasecmp( psz_parse, "EXTINF:", sizeof("EXTINF:") - 1 ) &&
+                  strncasecmp( psz_parse, "EXTVLCOPT:",sizeof("EXTVLCOPT:") -1))
                psz_parse++;
             if( *psz_parse )
             {
-                psz_parse += sizeof("EXTINF:") - 1;
-                while( *psz_parse == '\t' || *psz_parse == ' ' )
-                    psz_parse++;
-                psz_duration = psz_parse;
-                psz_parse = strchr( psz_parse, ',' );
-                if ( psz_parse )
+                if( !strncasecmp( psz_parse, "EXTINF:", sizeof("EXTINF:") - 1 ) )
                 {
-                    *psz_parse = '\0';
-                    psz_parse++;
-                    psz_name = strdup( psz_parse );
-                    i_duration = atoi( psz_duration );
-                    if( i_duration != -1 )
+                    psz_parse += sizeof("EXTINF:") - 1;
+                    while( *psz_parse == '\t' || *psz_parse == ' ' )
+                        psz_parse++;
+                    psz_duration = psz_parse;
+                    psz_parse = strchr( psz_parse, ',' );
+                    if ( psz_parse )
                     {
                         i_duration *= 1000000;
+                        *psz_parse = '\0';
+                        psz_parse++;
+                        psz_name = strdup( psz_parse );
+                        i_duration = atoi( psz_duration );
+                        if( i_duration != -1 )
+                        {
+                            i_duration *= 1000000;
+                        }
                     }
+                }
+                else
+                {
+                    /* Option line */
+                    psz_parse = strchr( psz_parse, ':' );
+                    if( !psz_parse ) return 0;
+                    psz_parse++;
+
+                    psz_option = strdup( psz_parse );
+                    INSERT_ELEM( p_demux->p_sys->ppsz_options,
+                                 p_demux->p_sys->i_options,
+                                 p_demux->p_sys->i_options,
+                                 psz_option );
                 }
             }
         }
         else
         {
             psz_mrl = ProcessMRL( psz_line, p_demux->p_sys->psz_prefix );
-            playlist_Add( p_playlist, psz_mrl, psz_name,
-                          PLAYLIST_INSERT, i_position );
-            playlist_SetDuration( p_playlist, i_position, i_duration );
+            playlist_AddExt( p_playlist, psz_mrl, psz_name,
+                          PLAYLIST_INSERT, i_position, i_duration,
+                          p_demux->p_sys->ppsz_options,
+                          p_demux->p_sys->i_options );
+            for( i = 0 ; i < p_demux->p_sys->i_options ; i++)
+            {
+                char *psz_option = p_demux->p_sys->ppsz_options[i];
+                REMOVE_ELEM( p_demux->p_sys->ppsz_options,
+                            p_demux->p_sys->i_options,
+                            i );
+                if( psz_option ) free( psz_option );
+            }
             free( psz_mrl );
             i_position++;
             i_duration = -1;
