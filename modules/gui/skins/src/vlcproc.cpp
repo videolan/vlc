@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.33 2003/06/09 12:33:16 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.34 2003/06/10 11:43:40 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -102,10 +102,8 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_OPEN:
-#ifndef BASIC_SKINS
             p_intf->p_sys->p_dialogs->ShowOpen( true );
             InterfaceRefresh();
-#endif
             return true;
 
         case VLC_LOAD_SKIN:
@@ -137,31 +135,23 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_PLAYLIST_ADD_FILE:
-#ifndef BASIC_SKINS
             p_intf->p_sys->p_dialogs->ShowOpen( false );
             InterfaceRefresh();
-#endif
             return true;
 
         case VLC_LOG_SHOW:
-#ifndef BASIC_SKINS
             p_intf->p_sys->p_dialogs->ShowMessages();
-#endif
             return true;
 
         case VLC_LOG_CLEAR:
             return true;
 
         case VLC_PREFS_SHOW:
-#ifndef BASIC_SKINS
             p_intf->p_sys->p_dialogs->ShowPrefs();
-#endif
             return true;
 
         case VLC_INFO_SHOW:
-#ifndef BASIC_SKINS
             p_intf->p_sys->p_dialogs->ShowFileInfo();
-#endif
             return true;
 
         case VLC_INTF_REFRESH:
@@ -340,9 +330,7 @@ void VlcProc::LoadSkin()
 {
     if( p_intf->p_sys->p_new_theme_file == NULL )
     {
-#ifndef BASIC_SKINS
         p_intf->p_sys->p_dialogs->ShowOpenSkin();
-#endif
     }
     else
     {
@@ -437,10 +425,8 @@ void VlcProc::PlayStream()
 
     if( !p_intf->p_sys->p_playlist->i_size )
     {
-#ifndef BASIC_SKINS
         p_intf->p_sys->p_dialogs->ShowOpen( true );
         InterfaceRefresh();
-#endif
         return;
     }
 

@@ -2,7 +2,7 @@
  * dialogs.h: Dialogs class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.h,v 1.4 2003/06/08 16:56:48 gbazin Exp $
+ * $Id: dialogs.h,v 1.5 2003/06/10 11:43:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *

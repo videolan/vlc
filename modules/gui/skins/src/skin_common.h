@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.18 2003/06/09 19:08:33 asmax Exp $
+ * $Id: skin_common.h,v 1.19 2003/06/10 11:43:40 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -72,12 +72,12 @@ struct intf_sys_t
     int i_index;        // Set which file is being played
     int i_size;         // Size of playlist;
 
-#ifndef BASIC_SKINS
     // Interface dialogs
     Dialogs *p_dialogs;
 
     // Popup menu
     vlc_bool_t b_popup_change;
+#ifndef BASIC_SKINS
     wxMenu     *p_popup_menu;
 #endif
 

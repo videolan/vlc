@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.5 2003/06/09 12:33:16 asmax Exp $
+ * $Id: dialogs.cpp,v 1.6 2003/06/10 11:43:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -54,6 +54,7 @@ void Dialogs::ShowOpenSkin(){}
 void Dialogs::ShowMessages(){}
 void Dialogs::ShowPrefs(){}
 void Dialogs::ShowFileInfo(){}
+void Dialogs::ShowPopup(){}
 
 #else // BASIC_SKINS
 

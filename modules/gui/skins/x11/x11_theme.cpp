@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.11 2003/06/09 12:33:17 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.12 2003/06/10 11:43:41 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -61,7 +61,7 @@ X11Theme::X11Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
 X11Theme::~X11Theme()
 {
     XLOCK;
-    XDestroyWindow( display, p_intf->p_sys->mainWin );
+    //XDestroyWindow( display, p_intf->p_sys->mainWin );
     XUNLOCK;
 }
 //---------------------------------------------------------------------------

@@ -822,6 +822,16 @@ PLUGINS="${PLUGINS} access_file access_udp access_http ipv4 access_mms"
 PLUGINS="${PLUGINS} access_ftp access_directory sap httpd http"
 
 dnl
+dnl  Switch to enable a version of VLC where most modules will be builtin
+dnl
+AC_ARG_ENABLE(mostly-builtin,
+[  --enable-mostly-builtin most modules will be built-in (default disabled)])
+if test "x${enable_mostly_builtin}" = "xyes"; then
+  BUILTINS="${BUILTINS} ${PLUGINS}"
+  PLUGINS=""
+fi
+
+dnl
 dnl Some plugins aren't useful on some platforms
 dnl
 if test "x${SYS}" != "xmingw32"; then
@@ -1169,7 +1179,7 @@ dnl
 dnl dvdplay module: check for libdvdplay
 dnl
 AC_ARG_ENABLE(dvdplay,
-[  --enable-dvdplay        dvdplay input module (default disabled)])
+[  --enable-dvdplay        dvdplay input module (default enabled)])
 if test "x${enable_dvdplay}" != "xno"
 then
   AC_ARG_WITH(dvdplay,
