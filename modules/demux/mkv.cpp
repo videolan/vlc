@@ -388,6 +388,7 @@ public:
         ,psz_current_chapter(NULL)
         ,p_sys(p_demuxer)
         ,ep(NULL)
+		,b_preloaded(false)
     {}
 
     ~matroska_segment_t()
@@ -476,6 +477,7 @@ public:
     
     demux_sys_t                      *p_sys;
     EbmlParser                       *ep;
+	bool                             b_preloaded;
 
     inline chapter_edition_t *Edition()
     {
@@ -483,6 +485,8 @@ public:
             return &editions[i_current_edition];
         return NULL;
     }
+
+	bool Preload( demux_t *p_demux );
 };
 
 class matroska_stream_t
@@ -519,6 +523,8 @@ public:
     }
     
     matroska_segment_t *FindSegment( KaxSegmentUID & i_uid ) const;
+
+	void PreloadFamily( demux_t *p_demux );
 };
 
 class demux_sys_t
@@ -559,8 +565,8 @@ public:
     }
 
     matroska_segment_t *FindSegment( KaxSegmentUID & i_uid ) const;
-    void PreloadFamily();
-    void PreloadLinked();
+    void PreloadFamily( demux_t *p_demux );
+    void PreloadLinked( demux_t *p_demux );
 };
 
 static int  Demux  ( demux_t * );
@@ -597,7 +603,7 @@ static int Open( vlc_object_t * p_this )
     size_t             i;
     size_t             i_track;
 
-    EbmlElement *el = NULL, *el1 = NULL;
+    EbmlElement *el = NULL;
 
     /* peek the begining */
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
@@ -671,52 +677,7 @@ static int Open( vlc_object_t * p_this )
 
     p_segment->ep = new EbmlParser( p_stream->es, el );
 
-    while( ( el1 = p_segment->ep->Get() ) != NULL )
-    {
-        if( MKV_IS_ID( el1, KaxInfo ) )
-        {
-            ParseInfo( p_demux, el1 );
-        }
-        else if( MKV_IS_ID( el1, KaxTracks ) )
-        {
-            ParseTracks( p_demux, el1 );
-        }
-        else if( MKV_IS_ID( el1, KaxSeekHead ) )
-        {
-            ParseSeekHead( p_demux, el1 );
-        }
-        else if( MKV_IS_ID( el1, KaxCues ) )
-        {
-            msg_Dbg( p_demux, "|   + Cues" );
-        }
-        else if( MKV_IS_ID( el1, KaxCluster ) )
-        {
-            msg_Dbg( p_demux, "|   + Cluster" );
-
-            p_segment->cluster = (KaxCluster*)el1;
-
-            p_segment->ep->Down();
-            /* stop parsing the stream */
-            break;
-        }
-        else if( MKV_IS_ID( el1, KaxAttachments ) )
-        {
-            msg_Dbg( p_demux, "|   + Attachments FIXME TODO (but probably never supported)" );
-        }
-        else if( MKV_IS_ID( el1, KaxChapters ) )
-        {
-            msg_Dbg( p_demux, "|   + Chapters" );
-            ParseChapters( p_demux, el1 );
-        }
-        else if( MKV_IS_ID( el1, KaxTag ) )
-        {
-            msg_Dbg( p_demux, "|   + Tags FIXME TODO" );
-        }
-        else
-        {
-            msg_Dbg( p_demux, "|   + Unknown (%s)", typeid(*el1).name() );
-        }
-    }
+	p_segment->Preload( p_demux );
 
     /* get the files from the same dir from the same family (based on p_demux->psz_path) */
     /* _todo_ handle multi-segment files */
@@ -882,8 +843,8 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    p_sys->PreloadFamily( );
-    p_sys->PreloadLinked( );
+    p_sys->PreloadFamily( p_demux );
+    p_sys->PreloadLinked( p_demux );
 
     /* *** Load the cue if found *** */
     if( p_segment->i_cues_position >= 0 )
@@ -3320,10 +3281,69 @@ const chapter_item_t *chapter_edition_t::FindTimecode( mtime_t i_user_timecode )
     return psz_result;
 }
 
-void demux_sys_t::PreloadFamily()
+void demux_sys_t::PreloadFamily( demux_t *p_demux )
 {
 }
 
-void demux_sys_t::PreloadLinked()
+void demux_sys_t::PreloadLinked( demux_t *p_demux )
 {
+}
+
+bool matroska_segment_t::Preload( demux_t *p_demux )
+{
+	if ( b_preloaded )
+		return false;
+
+    EbmlElement *el = NULL;
+
+    while( ( el = ep->Get() ) != NULL )
+    {
+        if( MKV_IS_ID( el, KaxInfo ) )
+        {
+            ParseInfo( p_demux, el );
+        }
+        else if( MKV_IS_ID( el, KaxTracks ) )
+        {
+            ParseTracks( p_demux, el );
+        }
+        else if( MKV_IS_ID( el, KaxSeekHead ) )
+        {
+            ParseSeekHead( p_demux, el );
+        }
+        else if( MKV_IS_ID( el, KaxCues ) )
+        {
+            msg_Dbg( p_demux, "|   + Cues" );
+        }
+        else if( MKV_IS_ID( el, KaxCluster ) )
+        {
+            msg_Dbg( p_demux, "|   + Cluster" );
+
+            cluster = (KaxCluster*)el;
+
+            ep->Down();
+            /* stop parsing the stream */
+            break;
+        }
+        else if( MKV_IS_ID( el, KaxAttachments ) )
+        {
+            msg_Dbg( p_demux, "|   + Attachments FIXME TODO (but probably never supported)" );
+        }
+        else if( MKV_IS_ID( el, KaxChapters ) )
+        {
+            msg_Dbg( p_demux, "|   + Chapters" );
+            ParseChapters( p_demux, el );
+        }
+        else if( MKV_IS_ID( el, KaxTag ) )
+        {
+            msg_Dbg( p_demux, "|   + Tags FIXME TODO" );
+        }
+        else
+        {
+            msg_Dbg( p_demux, "|   + Unknown (%s)", typeid(*el).name() );
+        }
+    }
+
+	b_preloaded = true;
+
+	return true;
 }
