@@ -88,12 +88,12 @@ typedef struct tls_client_sys_t
  * Sends data through a TLS session.
  *****************************************************************************/
 static int
-gnutls_Send( tls_session_t *p_session, const char *buf, int i_length )
+gnutls_Send( void *p_session, const void *buf, int i_length )
 {
     int val;
 
-    val = gnutls_record_send( *(gnutls_session *)(p_session->p_sys),
-                              buf, i_length );
+    val = gnutls_record_send( *(gnutls_session *)(((tls_session_t *)p_session)
+                                ->p_sys), buf, i_length );
     return val < 0 ? -1 : val;
 }
 
@@ -104,12 +104,12 @@ gnutls_Send( tls_session_t *p_session, const char *buf, int i_length )
  * Receives data through a TLS session.
  *****************************************************************************/
 static int
-gnutls_Recv( tls_session_t *p_session, char *buf, int i_length )
+gnutls_Recv( void *p_session, void *buf, int i_length )
 {
     int val;
 
-    val = gnutls_record_recv( *(gnutls_session *)(p_session->p_sys),
-                              buf, i_length );
+    val = gnutls_record_recv( *(gnutls_session *)(((tls_session_t *)p_session)
+                                ->p_sys), buf, i_length );
     return val < 0 ? -1 : val;
 }
 
@@ -269,10 +269,11 @@ gnutls_ClientCreate( tls_t *p_tls, const char *psz_ca_path )
     p_session->p_tls = p_tls;
     p_session->p_server = NULL;
     p_session->p_sys = p_sys;
+    p_session->sock.p_sys = p_session;
+    p_session->sock.pf_send = gnutls_Send;
+    p_session->sock.pf_recv = gnutls_Recv;
     p_session->pf_handshake = gnutls_SessionHandshake;
     p_session->pf_close = gnutls_SessionClose;
-    p_session->pf_send = gnutls_Send;
-    p_session->pf_recv = gnutls_Recv;
 
     return p_session;
 }
@@ -350,10 +351,11 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     p_session->p_tls = p_server->p_tls;
     p_session->p_server = p_server;
     p_session->p_sys = p_sys;
+    p_session->sock.p_sys = p_session;
+    p_session->sock.pf_send = gnutls_Send;
+    p_session->sock.pf_recv = gnutls_Recv;
     p_session->pf_handshake = gnutls_SessionHandshake;
     p_session->pf_close = gnutls_SessionClose;
-    p_session->pf_send = gnutls_Send;
-    p_session->pf_recv = gnutls_Recv;
 
     return p_session;
 }

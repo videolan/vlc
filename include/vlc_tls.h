@@ -24,6 +24,8 @@
 #ifndef _VLC_TLS_H
 # define _VLC_TLS_H
 
+# include "network.h"
+
 struct tls_t
 {
     VLC_COMMON_MEMBERS
@@ -56,10 +58,9 @@ struct tls_session_t
 
     void *p_sys;
 
+    struct virtual_socket_t sock;
     tls_session_t * (*pf_handshake) ( tls_session_t *, int );
     void (*pf_close) ( tls_session_t * );
-    int (*pf_send) ( tls_session_t *, const char *, int );
-    int (*pf_recv) ( tls_session_t *, char *, int );
 };
 
 
@@ -105,8 +106,9 @@ VLC_EXPORT( void, tls_ClientDelete, ( tls_session_t * ) );
 # define tls_SessionClose( a ) (((tls_session_t *)a)->pf_close (a))
 # define __tls_ClientDelete( a ) tls_SessionClose( a )
 
-# define tls_Send( a, b, c ) (((tls_session_t *)a)->pf_send (a, b, c ))
+/* NOTE: It is assumed that a->sock.p_sys = a */
+# define tls_Send( a, b, c ) (((tls_session_t *)a)->sock.pf_send (a, b, c ))
 
-# define tls_Recv( a, b, c ) (((tls_session_t *)a)->pf_recv (a, b, c ))
+# define tls_Recv( a, b, c ) (((tls_session_t *)a)->sock.pf_recv (a, b, c ))
 
 #endif
