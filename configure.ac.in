@@ -2507,11 +2507,30 @@ AC_ARG_ENABLE(slp,
   [  --enable-slp            SLP service discovery support (default enabled)])
 if test "x${enable_slp}" != "xno"
 then
-  AC_CHECK_HEADER(slp.h, have_slp="true", have_slp="false")
-  if test "x${have_slp}" = "xtrue"
+  AC_ARG_WITH(slp,
+  [    --with-slp=PATH       libslp headers and libraries])
+  if test "x${with_slp}" = x
   then
-    PLUGINS="${PLUGINS} slp"
-    LDFLAGS_slp="${LDFLAGS_slp} -lslp"
+    AC_CHECK_HEADER(slp.h, have_slp="true", have_slp="false")
+    if test "x${have_slp}" = "xtrue"
+    then
+      PLUGINS="${PLUGINS} slp"
+      LDFLAGS_slp="${LDFLAGS_slp} -lslp"
+    fi
+  else
+    AC_MSG_CHECKING(for slp headers in ${with_slp})
+    if test -f ${with_slp}/slp.h
+    then
+      dnl  Use ${with_slp}/libslp/slp.h
+      AC_MSG_RESULT(yes)
+      PLUGINS="${PLUGINS} slp"
+      LDFLAGS_slp="${LDFLAGS_slp} -L${with_slp} -lslp"
+      CPPFLAGS_slp="${CPPFLAGS_slp} -I${with_slp}"
+    else
+      dnl  No libslp could be found, sorry
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${with_slp}/slp.h])
+    fi
   fi
 fi
 
