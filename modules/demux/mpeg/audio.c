@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.9 2002/10/23 21:54:33 gbazin Exp $
+ * $Id: audio.c,v 1.10 2003/01/20 13:06:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -689,7 +689,7 @@ static int Demux( input_thread_t * p_input )
      */
     if( !ReadPES( p_input, &p_pes, p_demux->i_framelength + i_skip) )
     {
-        msg_Err( p_input,
+        msg_Warn( p_input,
                 "cannot read data" );
         return( -1 );
     }

@@ -2,7 +2,7 @@
  * m4v.c : MPEG-4 video Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: m4v.c,v 1.1 2003/01/12 06:39:45 fenrir Exp $
+ * $Id: m4v.c,v 1.2 2003/01/20 13:06:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -220,7 +220,7 @@ static int Demux( input_thread_t * p_input )
         if( ( i_peek = input_Peek( p_input, &p_peek, 512 ) ) < 5 )
         {
             /* Stream shorter than 4 bytes... */
-            msg_Err( p_input, "cannot peek()" );
+            msg_Warn( p_input, "cannot peek()" );
             return( 0 );
         }
 
@@ -234,7 +234,7 @@ static int Demux( input_thread_t * p_input )
                                           &p_data,
                                           i_size ) ) < 0 )
         {
-            msg_Err( p_input, "error while reading data" );
+            msg_Warn( p_input, "error while reading data" );
             break;
         }
         PESAddDataPacket( p_pes, p_data );
@@ -246,7 +246,7 @@ static int Demux( input_thread_t * p_input )
         if( ( i_peek = input_Peek( p_input, &p_peek, 512 ) ) < 5 )
         {
             /* Stream shorter than 4 bytes... */
-            msg_Err( p_input, "cannot peek()" );
+            msg_Warn( p_input, "cannot peek()" );
             return( 0 );
         }
 
@@ -266,7 +266,7 @@ static int Demux( input_thread_t * p_input )
                                           &p_data,
                                           i_size ) ) < 0 )
         {
-            msg_Err( p_input, "error while reading data" );
+            msg_Warn( p_input, "error while reading data" );
             break;
         }
         PESAddDataPacket( p_pes, p_data );
