@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.29 2002/04/25 21:52:42 sam Exp $
+ * $Id: ac3_adec.c,v 1.30 2002/05/15 19:36:04 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -119,8 +119,10 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
      * Thread properties 
      */
     p_ac3thread->p_fifo = p_ac3thread->p_config->p_decoder_fifo;
+
     p_ac3thread->ac3_decoder =
         vlc_memalign( &p_ac3thread->ac3_decoder_orig, 16, sizeof(ac3dec_t) );
+    memset( p_ac3thread->ac3_decoder, 0, sizeof( ac3dec_t ) );
 
     /*
      * Choose the best downmix module
@@ -213,6 +215,7 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
                                   16, 32 * sizeof(complex_t) );
     IMDCT->w_64   = vlc_memalign( &IMDCT->w_64_orig,
                                   16, 64 * sizeof(complex_t) );
+#undef IMDCT
 
     _M( ac3_init )( p_ac3thread->ac3_decoder );
 
@@ -314,37 +317,14 @@ static int decoder_Run ( decoder_config_t * p_config )
         }
 
         /* Creating the audio output fifo if not created yet */
-        if (p_ac3thread->p_aout_fifo == NULL ) {
+        if (p_ac3thread->p_aout_fifo == NULL )
+        {
             p_ac3thread->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM, 2,
                            sync_info.sample_rate, AC3DEC_FRAME_SIZE, NULL  );
             if ( p_ac3thread->p_aout_fifo == NULL )
             {
-                free( IMDCT->w_1_orig );
-                free( IMDCT->w_64_orig );
-                free( IMDCT->w_32_orig );
-                free( IMDCT->w_16_orig );
-                free( IMDCT->w_8_orig );
-                free( IMDCT->w_4_orig );
-                free( IMDCT->w_2_orig );
-                free( IMDCT->xcos_sin_sse_orig );
-                free( IMDCT->xsin2_orig );
-                free( IMDCT->xcos2_orig );
-                free( IMDCT->xsin1_orig );
-                free( IMDCT->xcos1_orig );
-                free( IMDCT->delay1_orig );
-                free( IMDCT->delay_orig );
-                free( IMDCT->buf_orig );
-        #undef IMDCT
-
-                free( p_ac3thread->ac3_decoder->samples_orig );
-        
-                module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
-                module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
-        
-                free( p_ac3thread->ac3_decoder->imdct_orig );
-                free( p_ac3thread->ac3_decoder_orig );
-        
-                return( -1 );
+                p_ac3thread->p_fifo->b_error = 1;
+                break;
             }
         }
 
