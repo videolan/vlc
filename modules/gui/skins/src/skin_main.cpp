@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.6 2003/04/12 21:43:27 asmax Exp $
+ * $Id: skin_main.cpp,v 1.7 2003/04/13 17:46:23 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -145,6 +145,17 @@ static void Close ( vlc_object_t *p_this )
 //---------------------------------------------------------------------------
 static void Run( intf_thread_t *p_intf )
 {
+
+#if !defined WIN32
+/* FIXME: should be elsewhere ? */
+    // Initialize GDK
+    int    i_args   = 1;
+    char  *p_args[] = { "", NULL };
+    char **pp_args  = p_args;
+
+    gdk_init( &i_args, &pp_args );
+#endif
+
     int a = OSAPI_GetTime();
 
     // Load a theme
@@ -163,8 +174,8 @@ static void Run( intf_thread_t *p_intf )
                              DIRECTORY_SEPARATOR + "default" +
                              DIRECTORY_SEPARATOR + "theme.xml";
 #else
-/* FIXME: find VLC directory */
-        string default_dir = (string)"." +
+// FIXME: find VLC directory 
+        string default_dir = (string)"/home/cyril/videolan/vlc/share" +
                              DIRECTORY_SEPARATOR + "skins" +
                              DIRECTORY_SEPARATOR + "default" +
                              DIRECTORY_SEPARATOR + "theme.xml";

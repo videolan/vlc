@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.3 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -24,7 +24,8 @@
 
 
 //--- GTK2 ------------------------------------------------------------------
-//#include <windows.h>
+#include <glib.h>
+#include <gdk/gdk.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -171,6 +172,11 @@ void OSRun( intf_thread_t *p_intf )
         Proc->IsClosing();
     }
     #endif
+    
+    // Main event loop
+    GMainLoop *loop = g_main_loop_new( NULL, TRUE );
+    g_main_loop_run( loop );
+
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )

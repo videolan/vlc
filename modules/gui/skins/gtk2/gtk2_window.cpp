@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.3 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -30,7 +30,7 @@
 #include <vlc/intf.h>
 
 //--- GTK2 ------------------------------------------------------------------
-//#include <windows.h>
+#include <gdk/gdk.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "os_api.h"
@@ -68,8 +68,8 @@ GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
               dragdrop )
 {
     // Set handles
-/*    hWnd           = hwnd;
-
+    gWnd           = gwnd;
+/*
     // Set position parameters
     CursorPos    = new POINT;
     WindowPos    = new POINT;
@@ -103,6 +103,16 @@ GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
         RegisterDragDrop( hWnd, DropTarget );
     }
 */
+    // Create Tool Tip window
+/*    GdkWindowAttr attr;
+    attr.event_mask = GDK_ALL_EVENTS_MASK;
+    attr.width = 100;
+    attr.height = 100;
+    attr.window_type = GDK_WINDOW_CHILD;
+    attr.wclass = GDK_INPUT_OUTPUT;
+    gint mask = 0;
+    ToolTipWindow = gdk_window_new( gwnd, &attr, mask);*/
+
 }
 //---------------------------------------------------------------------------
 GTK2Window::~GTK2Window()
@@ -133,11 +143,11 @@ void GTK2Window::OSShow( bool show )
 {
 /*    if( show )
     {
-        ShowWindow( hWnd, SW_SHOW );
+        gdk_window_show( gWnd );
     }
     else
     {
-        ShowWindow( hWnd, SW_HIDE );
+        gdk_window_hide( gWnd );
     }*/
 }
 //---------------------------------------------------------------------------

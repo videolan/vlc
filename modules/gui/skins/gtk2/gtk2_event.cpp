@@ -2,7 +2,7 @@
  * gtk2_event.cpp: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_event.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
+ * $Id: gtk2_event.cpp,v 1.3 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -24,7 +24,7 @@
 
 
 //--- GTK2 -----------------------------------------------------------------
-//#include <windows.h>
+#include <gdk/gdk.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -45,19 +45,19 @@
 GTK2Event::GTK2Event( intf_thread_t *p_intf, string Desc, string shortcut )
     : Event( p_intf, Desc, shortcut )
 {
-/*    hWnd = NULL;*/
+    gWnd = NULL;
 }
 //---------------------------------------------------------------------------
 GTK2Event::GTK2Event( intf_thread_t *p_intf, GdkWindow *gwnd, unsigned int msg,
     unsigned int par1, long par2 ) : Event( p_intf, msg, par1, par2 )
 {
-/*    hWnd = hwnd;*/
+    gWnd = gwnd;
 }
 //---------------------------------------------------------------------------
 GTK2Event::GTK2Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
     unsigned int par1, long par2 ) : Event( p_intf, msg, par1, par2 )
 {
-/*    hWnd = ( (GTK2Window *)win )->GetHandle();*/
+    gWnd = ( (GTK2Window *)win )->GetHandle();
 }
 //---------------------------------------------------------------------------
 GTK2Event::~GTK2Event()
@@ -72,9 +72,9 @@ bool GTK2Event::SendEvent()
         PostSynchroMessage();
         return true;
     }
-
-    return true;
 */
+    return true;
+
 }
 //---------------------------------------------------------------------------
 bool GTK2Event::IsEqual( Event *evt )
@@ -86,34 +86,35 @@ bool GTK2Event::IsEqual( Event *evt )
 //---------------------------------------------------------------------------
 void GTK2Event::CreateOSEvent( string para1, string para2, string para3 )
 {
-/*
     // Find Parameters
     switch( Message )
     {
         case WINDOW_MOVE:
-            hWnd = GetWindowFromName( para1 );
+            gWnd = GetWindowFromName( para1 );
             break;
 
         case WINDOW_CLOSE:
-            hWnd = GetWindowFromName( para1 );
+            gWnd = GetWindowFromName( para1 );
             break;
 
         case WINDOW_OPEN:
-            hWnd = GetWindowFromName( para1 );
+            gWnd = GetWindowFromName( para1 );
             break;
 
     }
-*/
 }
 //---------------------------------------------------------------------------
 GdkWindow *GTK2Event::GetWindowFromName( string name )
 {
-/*    GTK2Window *win = (GTK2Window *)
+    GTK2Window *win = (GTK2Window *)
         p_intf->p_sys->p_theme->GetWindow( name );
-    if( win == NULL )
+    if( win == NULL ) 
+    {
         return NULL;
-    else
-        return win->GetHandle();*/
+    }
+    else {
+        return win->GetHandle();
+    }
 }
 //---------------------------------------------------------------------------
 

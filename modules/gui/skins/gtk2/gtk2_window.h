@@ -2,7 +2,7 @@
  * gtk2_window.h: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_window.h,v 1.2 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -39,15 +39,15 @@ class GTK2Window : public Window
     private:
         // General parameters
         GdkWindow *gWnd;
-/*        LPPOINT CursorPos;
-        LPPOINT WindowPos;
+//        LPPOINT CursorPos;
+//        LPPOINT WindowPos;
 
         // Tooltip texts
-        HWND ToolTipWindow;
-        TOOLINFO ToolTipInfo;
+        GdkWindow *ToolTipWindow;
+//        TOOLINFO ToolTipInfo;
 
         // Drag & drop
-        LPDROPTARGET DropTarget;*/
+//        LPDROPTARGET DropTarget;
 
     public:
         // Cosntructors

@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.5 2003/03/21 00:17:00 karibu Exp $
+ * $Id: theme.cpp,v 1.6 2003/04/13 17:46:23 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -195,13 +195,15 @@ void Theme::StartTheme( bool log, int magnet )
 void Theme::InitTheme()
 {
     // Initialize the events
-    EvtBank->Init();
+/* FIXME */
+fprintf(stderr, "FIXME in theme.cpp !\n");
+//    EvtBank->Init();
 
     // Initialize the controls
     InitControls();
 
     // Initialize the windows
-    InitWindows();
+//    InitWindows();
 }
 //---------------------------------------------------------------------------
 void Theme::InitWindows()

@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.5 2003/04/12 21:43:27 asmax Exp $
+ * $Id: window.cpp,v 1.6 2003/04/13 17:46:23 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -282,7 +282,7 @@ void Window::RefreshImage( int x, int y, int w, int h )
 #ifdef WIN32
     Image->CopyFrom( x, y, w, h, Buffer, 0, 0, SRC_COPY );
 #else
-  fprintf(stderr, "WARNING: FIXME in window.cpp !!!!");
+  fprintf(stderr, "%X WARNING: FIXME in window.cpp !!!!", Buffer);
 #endif
 
     // Free memory

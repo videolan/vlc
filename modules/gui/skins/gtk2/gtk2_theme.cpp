@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.2 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -24,7 +24,7 @@
 
 
 //--- GTK2 -----------------------------------------------------------------
-#include <gtk/gtk.h>
+#include <gdk/gdk.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -160,10 +160,10 @@ GTK2Theme::GTK2Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
             return;
         }
     }
-
+*/
     //Initialize value
     ParentWindow = NULL;
-*/
+
 }
 
 //---------------------------------------------------------------------------
@@ -258,6 +258,19 @@ void GTK2Theme::OnLoadTheme()
     // The create menu
     CreateSystemMenu();
 */
+    // Set the parent window attributes
+    GdkWindowAttr attr;
+    attr.title = "VLC Media Player";
+    attr.event_mask = GDK_ALL_EVENTS_MASK;
+    attr.width = 100;
+    attr.height = 100;
+    attr.window_type = GDK_WINDOW_TOPLEVEL;
+    attr.wclass = GDK_INPUT_OUTPUT;
+    
+    gint mask = GDK_WA_TITLE;
+    
+    // Create the parent window
+    ParentWindow = gdk_window_new( NULL, &attr, mask);
 }
 //---------------------------------------------------------------------------
 void GTK2Theme::AddSystemMenu( string name, Event *event )
@@ -297,6 +310,31 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
 
     WindowList.push_back( (Window *)new OSWindow( p_intf, hwnd, x, y, visible,
         fadetime, alpha, movealpha, dragdrop ) ) ;*/
+        
+    GdkWindowAttr attr;
+    attr.event_mask = GDK_ALL_EVENTS_MASK;
+    attr.width = 100;
+    attr.height = 100;
+    //attr.window_type = GDK_WINDOW_CHILD;
+    attr.window_type = GDK_WINDOW_TOPLEVEL;
+    attr.wclass = GDK_INPUT_OUTPUT;
+    
+    gint mask =0;
+    
+    // Create the parent window
+ //   GdkWindow *gwnd = gdk_window_new( ParentWindow, &attr, mask);
+    GdkWindow *gwnd = gdk_window_new( NULL, &attr, mask);
+    if( !gwnd )
+    {
+        msg_Err( p_intf, "CreateWindow failed" );
+        return;
+    }
+    
+    WindowList.push_back( (Window *)new OSWindow( p_intf, gwnd, x, y, visible,
+        fadetime, alpha, movealpha, dragdrop ) ) ;
+  
+    gdk_window_show( ParentWindow );
+
 }
 //---------------------------------------------------------------------------
 /*HWND GTK2Theme::GetLogHandle()

@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
+ * $Id: gtk2_font.cpp,v 1.3 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -24,7 +24,7 @@
 
 
 //--- GTK2 -----------------------------------------------------------------
-//#include <windows.h>
+#include <gdk/gdk.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -44,13 +44,19 @@ GTK2Font::GTK2Font( intf_thread_t *_p_intf, string fontname, int size,
     int color, int weight, bool italic, bool underline )
     : Font( _p_intf, fontname, size, color, weight, italic, underline )
 {
+/* FIXME */
+/*    GFont = gdk_font_load( "-adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1" );
+    if( GFont == NULL )
+    {
+        msg_Err( _p_intf, "Could not load font %s", fontname.c_str());
+    }*/
 }
 //---------------------------------------------------------------------------
 GTK2Font::~GTK2Font()
 {
 }
 //---------------------------------------------------------------------------
-/*void GTK2Font::AssignGTK2Font( HDC DC )
+/*void GTK2Font::AssignGTK2Font( GdkDrawable *DC )
 {
     // Create font
     HGDIOBJ fontObj = CreateFont(
@@ -75,11 +81,13 @@ GTK2Font::~GTK2Font()
 
     // Free memory
     DeleteObject( fontObj );
+//    GdkGC *gc = gdk_gc_new( DC );
+//    gdk_gc_set_font( GFont, gc );
 }*/
 //---------------------------------------------------------------------------
 void GTK2Font::AssignFont( Graphics *dest )
-{/*
-    HDC DC = ( (GTK2Graphics *)dest )->GetImageHandle();
+{
+/*    GdkDrawable *DC = ( (GTK2Graphics *)dest )->GetImageHandle();
     AssignGTK2Font( DC );*/
 }
 //---------------------------------------------------------------------------
@@ -99,6 +107,11 @@ void GTK2Font::GetSize( string text, int &w, int &h )
 
     // Release screen device context
     ReleaseDC( GetDesktopWindow(), DeskDC );*/
+    /*FIXME*/
+/*    w = gdk_text_width( GFont, text.c_str(), text.length() );
+    h = gdk_text_height( GFont, text.c_str(), text.length() );*/
+    w = 0;
+    h = 0;
 }
 //---------------------------------------------------------------------------
 void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
@@ -135,13 +148,13 @@ void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
 void GTK2Font::Print( Graphics *dest, string text, int x, int y, int w,
                        int h, int align )
 {
-/*    GenericPrint( dest, text, x, y, w, h, align, Color );*/
+    GenericPrint( dest, text, x, y, w, h, align, Color );
 }
 //---------------------------------------------------------------------------
 void GTK2Font::PrintColor( Graphics *dest, string text, int x, int y, int w,
                             int h, int align, int color )
 {
-/*    GenericPrint( dest, text, x, y, w, h, align, color );*/
+    GenericPrint( dest, text, x, y, w, h, align, color );
 }
 //---------------------------------------------------------------------------
 

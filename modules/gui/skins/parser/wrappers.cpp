@@ -2,7 +2,7 @@
  * wrappers.cpp: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.cpp,v 1.5 2003/04/12 21:43:27 asmax Exp $
+ * $Id: wrappers.cpp,v 1.6 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -120,6 +120,7 @@ void AddAnchor( char *x, char *y, char *len, char *priority )
     Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
+    
     vlcWin->AnchorList.push_back( new Anchor( g_pIntf, atoi( x ) + XOff,
                                   atoi( y ) + YOff, atoi( len ),
                                   atoi( priority ), vlcWin ) );

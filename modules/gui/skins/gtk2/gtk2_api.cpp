@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
+ * $Id: gtk2_api.cpp,v 1.3 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -24,7 +24,7 @@
 
 
 //--- GTK2 ------------------------------------------------------------------
-#include <gtk/gtk.h>
+#include <gdk/gdk.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "window.h"
@@ -109,12 +109,14 @@ void OSAPI_GetMousePos( int &x, int &y )
 //---------------------------------------------------------------------------
 string OSAPI_GetWindowTitle( Window *win )
 {
-/*    char *buffer = new char[MAX_PARAM_SIZE];
-    GetWindowText( ((Win32Window *)win)->GetHandle(), buffer, MAX_PARAM_SIZE );
-    string Title = buffer;
-    delete buffer;
+//    char *buffer = new char[MAX_PARAM_SIZE];
+//    GetWindowText( ((GTK2Window *)win)->GetHandle(), buffer, MAX_PARAM_SIZE );
+//    string Title = buffer;
+/* FIXME */
+string Title = "";
+//    delete buffer;
 
-    return Title;*/
+    return Title;
 }
 //---------------------------------------------------------------------------
 bool OSAPI_RmDir( string path )

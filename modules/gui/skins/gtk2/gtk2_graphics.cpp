@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.2 2003/04/12 22:50:42 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.3 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -24,7 +24,7 @@
 
 
 //--- GTK2 -----------------------------------------------------------------
-//#include <windows.h>
+#include <gdk/gdk.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "graphics.h"
@@ -52,6 +52,9 @@ GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
     }
     SelectObject( Image, HImage );
     DeleteObject( HImage );*/
+    
+/*    Image = ( GdkDrawable* )( (GTK2Window *)from )->GetHandle();
+    Gc = gdk_gc_new( Image );*/
 }
 //---------------------------------------------------------------------------
 GTK2Graphics::~GTK2Graphics()
@@ -76,15 +79,7 @@ void GTK2Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
 //---------------------------------------------------------------------------
 void GTK2Graphics::DrawRect( int x, int y, int w, int h, int color )
 {
-/*    LPRECT r = new RECT;
-    HBRUSH  Brush = CreateSolidBrush( color );
-    r->left   = x;
-    r->top    = y;
-    r->right  = x + w;
-    r->bottom = y + h;
-    FillRect( Image, r, Brush );
-    DeleteObject( Brush );
-    delete r;*/
+//    gdk_draw_rectangle( Image, Gc, TRUE, x, y, w, h);
 }
 //---------------------------------------------------------------------------
 void GTK2Graphics::SetClipRegion( Region *rgn )

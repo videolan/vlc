@@ -2,7 +2,7 @@
  * gtk2_graphics.h: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_graphics.h,v 1.2 2003/04/13 17:46:22 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -27,6 +27,9 @@
 #ifndef VLC_SKIN_GTK2_GRAPHICS
 #define VLC_SKIN_GTK2_GRAPHICS
 
+//--- GTK2 ------------------------------------------------------------------
+#include <gdk/gdk.h>
+
 //---------------------------------------------------------------------------
 class Region;
 class Window;
@@ -37,7 +40,8 @@ class GTK2Graphics : public Graphics
     private:
         int Width;
         int Height;
-  //      HDC Image;
+        GdkDrawable *Image;
+        GdkGC *Gc;
     public:
         // Constructor
         GTK2Graphics( int w, int h, Window *from = NULL );
@@ -54,13 +58,13 @@ class GTK2Graphics : public Graphics
         virtual void SetClipRegion( Region *rgn );
 
         // Specific GTK2 methods
-//        HDC GetImageHandle()    { return Image; };
+        GdkDrawable *GetImageHandle()    { return Image; };
 };
 //---------------------------------------------------------------------------
 class GTK2Region : public Region
 {
     private:
-//        HRGN Rgn;
+        GdkRegion *Rgn;
     public:
         // Constructor
         GTK2Region();
@@ -76,7 +80,7 @@ class GTK2Region : public Region
         virtual bool Hit( int x, int y );
 
         // Specific GTK2 methods
-//        HRGN GetHandle() { return Rgn; };
+        GdkRegion *GetHandle() { return Rgn; };
 };
 //---------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.5 2003/04/11 22:08:06 videolan Exp $
+ * $Id: event.cpp,v 1.6 2003/04/13 17:46:23 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -229,7 +229,7 @@ unsigned int Event::GetMessageType( string Desc )
 //---------------------------------------------------------------------------
 void Event::CreateEvent()
 {
-    // Initiatization
+    // Initialization
     int x, y;
     char *msg   = new char[MAX_EVENT_SIZE];
     char *para1 = new char[MAX_PARAM_SIZE];

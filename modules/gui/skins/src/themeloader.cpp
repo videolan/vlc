@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.4 2003/04/12 21:43:27 asmax Exp $
+ * $Id: themeloader.cpp,v 1.5 2003/04/13 17:46:23 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -46,6 +46,9 @@
 #include "os_theme.h"
 #include "themeloader.h"
 #include "skin_common.h"
+
+#include "anchor.h"
+#include "window.h"
 
 #define DEFAULT_XML_FILE "theme.xml"
 
@@ -204,6 +207,7 @@ bool ThemeLoader::Parse( const string XmlFile )
 
     // Start the parser
     int lex = yylex();
+    
     fclose( yyin );
     if( lex )
     {
