@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.28 2001/03/07 10:31:10 stef Exp $
+ * $Id: input_ext-intf.h,v 1.29 2001/04/01 07:31:38 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -353,3 +353,6 @@ void input_Seek     ( struct input_thread_s *, off_t );
 void input_DumpStream( struct input_thread_s * );
 char * input_OffsetToTime( struct input_thread_s *, char * psz_buffer, off_t );
 int  input_ChangeES ( struct input_thread_s *, struct es_descriptor_s *, int );
+int  input_ToggleES ( struct input_thread_s *,
+                      struct es_descriptor_s *,
+                      boolean_t );

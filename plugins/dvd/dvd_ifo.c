@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.15 2001/03/06 10:21:59 massiot Exp $
+ * $Id: dvd_ifo.c,v 1.16 2001/04/01 07:31:38 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -49,95 +49,18 @@
 /*
  * Local prototypes
  */
-static vmg_t ReadVMG    ( ifo_t* );
-void         CommandRead( ifo_command_t );
-
-/*
- * IFO Management.
- */
-
-/*****************************************************************************
- * IfoInit : Creates an ifo structure and prepares for parsing directly
- * on DVD device.
- *****************************************************************************/
-ifo_t IfoInit( int i_fd )
-{
-    ifo_t       ifo;
-    u32         i_lba;
-    
-    /* If we are here the dvd device has already been opened */
-    ifo.i_fd = i_fd;
-
-    i_lba = UDFFindFile( i_fd, "/VIDEO_TS/VIDEO_TS.IFO");
-
-    ifo.i_off = (off_t)(i_lba) * DVD_LB_SIZE;
-    ifo.i_pos = lseek( ifo.i_fd, ifo.i_off, SEEK_SET );
-
-    /* Video Manager Initialization */
-    intf_WarnMsg( 2, "ifo: initializing VMG" );
-    ifo.vmg = ReadVMG( &ifo );
-
-    return ifo;
-}
-
-/*****************************************************************************
- * IfoEnd : Frees all the memory allocated to ifo structures
- *****************************************************************************/
-void IfoEnd( ifo_t* p_ifo )
-{
-#if 0
-    int     i,j;
-
-    /* Free structures from video title sets */
-    for( j=0 ; j<p_ifo->vmg.mat.i_tts_nb ; j++ )
-    {
-        free( p_ifo->p_vts[j].vobu_admap.pi_vobu_ssector );
-        free( p_ifo->p_vts[j].c_adt.p_cell_inf );
-        free( p_ifo->p_vts[j].m_vobu_admap.pi_vobu_ssector );
-        free( p_ifo->p_vts[j].m_c_adt.p_cell_inf );
-        for( i=0 ; i<p_ifo->p_vts[j].tmap_ti.i_nb ; i++ )
-        {
-            free( p_ifo->p_vts[j].tmap_ti.p_tmap[i].pi_sector );
-        }
-        free( p_ifo->p_vts[j].tmap_ti.pi_sbyte );
-        free( p_ifo->p_vts[j].tmap_ti.p_tmap );
-        free( p_ifo->p_vts[j].pgci_ti.p_srp );
-        for( i=0 ; i<p_ifo->p_vts[j].pgci_ut.i_lu_nb ; i++ )
-        {
-            free( p_ifo->p_vts[j].pgci_ut.p_pgci_inf[i].p_srp );
-        }
-        free( p_ifo->p_vts[j].pgci_ut.p_pgci_inf );
-        free( p_ifo->p_vts[j].pgci_ut.p_lu );
-    }
-
-    free( p_ifo->p_vts );
-
-    /* Free structures from video manager */
-    free( p_ifo->vmg.vobu_admap.pi_vobu_ssector );
-    free( p_ifo->vmg.c_adt.p_cell_inf );
-    for( i=0 ; i<p_ifo->vmg.pgci_ut.i_lu_nb ; i++ )
-    {
-        free( p_ifo->vmg.pgci_ut.p_pgci_inf[i].p_srp );
-    }
-    free( p_ifo->vmg.pgci_ut.p_pgci_inf );
-    free( p_ifo->vmg.pgci_ut.p_lu );
-    for( i=1 ; i<=8 ; i++ )
-    {
-        free( p_ifo->vmg.ptl_mait.p_ptl_mask->ppi_ptl_mask[i] );
-    }
-    free( p_ifo->vmg.ptl_mait.p_ptl_desc );
-    free( p_ifo->vmg.ptl_mait.p_ptl_mask );
-    free( p_ifo->vmg.vts_atrt.pi_vts_atrt_sbyte );
-    free( p_ifo->vmg.vts_atrt.p_vts_atrt );
-    free( p_ifo->vmg.pgc.p_cell_pos_inf );
-    free( p_ifo->vmg.pgc.p_cell_play_inf );
-    free( p_ifo->vmg.pgc.prg_map.pi_entry_cell );
-    free( p_ifo->vmg.pgc.com_tab.p_cell_com );
-    free( p_ifo->vmg.pgc.com_tab.p_post_com );
-    free( p_ifo->vmg.pgc.com_tab.p_pre_com );
-#endif
-    return;
-}
+void            CommandRead     ( command_desc_t );
+static int      ReadTitle       ( ifo_t * , title_t * );
+static int      FreeTitle       ( title_t * );
+static int      ReadUnitInf     ( ifo_t * , unit_inf_t * );
+static int      FreeUnitInf     ( unit_inf_t * );
+static int      ReadTitleUnit   ( ifo_t * , title_unit_t * );
+static int      FreeTitleUnit   ( title_unit_t * );
+static int      ReadVobuMap     ( ifo_t * , vobu_map_t * );
+static int      FreeVobuMap     ( vobu_map_t * );
+static int      ReadCellInf     ( ifo_t * , cell_inf_t * );
+static int      FreeCellInf     ( cell_inf_t * );
+static int      FreeTitleSet    ( vts_t * );
 
 /*
  * Macros to process ifo files
@@ -198,12 +121,772 @@ void IfoEnd( ifo_t* p_ifo )
                               p_ifo->i_pos + (i_len), SEEK_SET );           \
     }
 
+
+
+/*
+ * IFO Management.
+ */
+
+/*****************************************************************************
+ * IfoInit : Creates an ifo structure and prepares for parsing directly
+ *           on DVD device. Then reads information from the management table.
+ *****************************************************************************/
+int IfoInit( ifo_t ** pp_ifo, int i_fd )
+{
+    ifo_t *             p_ifo;
+    u64                 i_temp;
+    u32                 i_lba;
+    int                 i, j, k;
+    off_t               i_start;
+
+    
+    p_ifo = malloc( sizeof(ifo_t) );
+    if( p_ifo == NULL )
+    {
+        intf_ErrMsg( "ifo error: unable to allocate memory. aborting" );
+        return -1;
+    }
+
+    *pp_ifo = p_ifo;
+
+    /* if we are here the dvd device has already been opened */
+    p_ifo->i_fd = i_fd;
+
+    /* find the start sector of video information on the dvd */
+    i_lba = UDFFindFile( i_fd, "/VIDEO_TS/VIDEO_TS.IFO");
+
+    p_ifo->i_off = (off_t)(i_lba) * DVD_LB_SIZE;
+    p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off, SEEK_SET );
+
+    /*
+     * read the video manager information table
+     */
+#define manager_inf     p_ifo->vmg.manager_inf
+//fprintf( stderr, "VMGI\n" );
+
+    GET( manager_inf.psz_id , 12 );
+    manager_inf.psz_id[12] = '\0';
+    GETL( &manager_inf.i_vmg_end_sector );
+    FLUSH( 12 );
+    GETL( &manager_inf.i_vmg_inf_end_sector );
+    FLUSH( 1 );
+    GETC( &manager_inf.i_spec_ver );
+    GETL( &manager_inf.i_cat );
+    GETS( &manager_inf.i_volume_nb );
+    GETS( &manager_inf.i_volume );
+    GETC( &manager_inf.i_disc_side );
+    FLUSH( 19 );
+    GETS( &manager_inf.i_title_set_nb );
+    GET( manager_inf.ps_provider_id, 32 );
+    GETLL( &manager_inf.i_pos_code );
+    FLUSH( 24 );
+    GETL( &manager_inf.i_vmg_inf_end_byte );
+    GETL( &manager_inf.i_first_play_title_start_byte );
+    FLUSH( 56 );
+    GETL( &manager_inf.i_vob_start_sector );
+    GETL( &manager_inf.i_title_inf_start_sector );
+    GETL( &manager_inf.i_title_unit_start_sector );
+    GETL( &manager_inf.i_parental_inf_start_sector );
+    GETL( &manager_inf.i_vts_inf_start_sector );
+    GETL( &manager_inf.i_text_data_start_sector );
+    GETL( &manager_inf.i_cell_inf_start_sector );
+    GETL( &manager_inf.i_vobu_map_start_sector );
+    FLUSH( 32 );
+//    GETS( &manager_inf.video_atrt );
+    FLUSH(2);
+    FLUSH( 1 );
+    GETC( &manager_inf.i_audio_nb );
+//fprintf( stderr, "vmgi audio nb : %d\n", manager_inf.i_audio_nb );
+    for( i=0 ; i < 8 ; i++ )
+    {
+        GETLL( &i_temp );
+    }
+    FLUSH( 17 );
+    GETC( &manager_inf.i_spu_nb );
+//fprintf( stderr, "vmgi subpic nb : %d\n", manager_inf.i_subpic_nb );
+    for( i=0 ; i < manager_inf.i_spu_nb ; i++ )
+    {
+        GET( &i_temp, 6 );
+        /* FIXME : take care of endianness */
+    }
+
+    /*
+     * read first play title.
+     */
+    p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+                          manager_inf.i_first_play_title_start_byte,
+                          SEEK_SET );
+    if( ReadTitle( p_ifo, &p_ifo->vmg.title ) < 0)
+    {
+        return -1;
+    }
+
+    /*
+     * fills the title information structure.
+     */
+#define title_inf       p_ifo->vmg.title_inf
+    if( manager_inf.i_title_inf_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+                              manager_inf.i_title_inf_start_sector *DVD_LB_SIZE,
+                              SEEK_SET );
+//fprintf( stderr, "title inf\n" );
+    
+        GETS( &title_inf.i_title_nb );
+//fprintf( stderr, "title_inf: TTU nb %d\n", title_inf.i_title_nb );
+        FLUSH( 2 );
+        GETL( &title_inf.i_end_byte );
+    
+        /* parsing of title attributes */
+        title_inf.p_attr = malloc( title_inf.i_title_nb *sizeof(title_attr_t) );
+        if( title_inf.p_attr == NULL )
+        {
+            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+            return -1;
+        }
+    
+        for( i = 0 ; i < title_inf.i_title_nb ; i++ )
+        {
+            GETC( &title_inf.p_attr[i].i_play_type );
+            GETC( &title_inf.p_attr[i].i_angle_nb );
+            GETS( &title_inf.p_attr[i].i_chapter_nb );
+            GETS( &title_inf.p_attr[i].i_parental_id );
+            GETC( &title_inf.p_attr[i].i_title_set_num );
+            GETC( &title_inf.p_attr[i].i_title_num );
+            GETL( &title_inf.p_attr[i].i_start_sector );
+//fprintf( stderr, "title_inf: %d %d %d\n", ptr.p_tts[i].i_ptt_nb, ptr.p_tts[i].i_tts_nb,ptr.p_tts[i].i_vts_ttn );
+        }
+    }
+    else
+    {
+        title_inf.p_attr = NULL;
+    }
+#undef title_inf
+
+    /*
+     * fills the title unit structure.
+     */
+    if( manager_inf.i_title_unit_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+                        manager_inf.i_title_unit_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        if( ReadTitleUnit( p_ifo, &p_ifo->vmg.title_unit ) < 0 )
+        {
+            return -1;
+        }
+    }
+
+    /*
+     * fills the structure about parental information.
+     */
+#define parental        p_ifo->vmg.parental_inf
+    if( manager_inf.i_parental_inf_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+                        manager_inf.i_parental_inf_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        i_start = p_ifo->i_pos;
+
+//fprintf( stderr, "PTL\n" );
+    
+        GETS( &parental.i_country_nb );
+        GETS( &parental.i_vts_nb );
+        GETL( &parental.i_end_byte );
+        
+        parental.p_parental_desc = malloc( parental.i_country_nb *
+                                           sizeof(parental_desc_t) );
+        if( parental.p_parental_desc == NULL )
+        {
+            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+            return -1;
+        }
+
+        for( i = 0 ; i < parental.i_country_nb ; i++ )
+        {
+            GET( parental.p_parental_desc[i].ps_country_code, 2 );
+            FLUSH( 2 );
+            GETS( &parental.p_parental_desc[i].i_parental_mask_start_byte );
+            FLUSH( 2 );
+        }
+
+        parental.p_parental_mask = malloc( parental.i_country_nb *
+                                           sizeof(parental_mask_t) );
+        if( parental.p_parental_mask == NULL )
+        {
+            intf_ErrMsg( "ifo erro: out of memory in IfoInit" );
+            return -1;
+        }
+
+        for( i = 0 ; i < parental.i_country_nb ; i++ )
+        {
+            p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
+                       parental.p_parental_desc[i].i_parental_mask_start_byte,
+                       SEEK_SET );
+            for( j = 0 ; j < 8 ; j++ )
+            {
+                parental.p_parental_mask[i].ppi_mask[j] =
+                            malloc( ( parental.i_vts_nb + 1 ) *sizeof(u16) );
+                if( parental.p_parental_mask[i].ppi_mask[j] == NULL )
+                {
+                    intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+                    return -1;
+                }        
+                for( k = 0 ; k < parental.i_vts_nb + 1 ; k++ )
+                {
+                    GETS( &parental.p_parental_mask[i].ppi_mask[j][k] );
+                }
+            }
+        }
+    }
+#undef parental
+
+    /*
+     * information and attributes about for each vts.
+     */
+#define vts_inf     p_ifo->vmg.vts_inf
+    if( manager_inf.i_vts_inf_start_sector )
+    {
+        u64             i_temp;
+
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+                        manager_inf.i_vts_inf_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        i_start = p_ifo->i_pos;
+    
+//fprintf( stderr, "VTS ATTR\n" );
+    
+        GETS( &vts_inf.i_vts_nb );
+//fprintf( stderr, "VTS ATTR Nb: %d\n", vts_inf.i_vts_nb );
+        FLUSH( 2 );
+        GETL( &vts_inf.i_end_byte );
+        vts_inf.pi_vts_attr_start_byte =
+                            malloc( vts_inf.i_vts_nb *sizeof(u32) );
+        if( vts_inf.pi_vts_attr_start_byte == NULL )
+        {
+            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+            return -1;
+        }
+
+        for( i = 0 ; i < vts_inf.i_vts_nb ; i++ )
+        {
+            GETL( &vts_inf.pi_vts_attr_start_byte[i] );
+        }
+
+        vts_inf.p_vts_attr = malloc( vts_inf.i_vts_nb *sizeof(vts_attr_t) );
+        if( vts_inf.p_vts_attr == NULL )
+        {
+            intf_ErrMsg( "ifo erro: out of memory in IfoInit" );
+            return -1;
+        }
+
+        for( i = 0 ; i < vts_inf.i_vts_nb ; i++ )
+        {
+            p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
+                                    vts_inf.pi_vts_attr_start_byte[i],
+                                    SEEK_SET );
+            GETL( &vts_inf.p_vts_attr[i].i_end_byte );
+            GETL( &vts_inf.p_vts_attr[i].i_cat_app_type );
+    //        GETS( &vts_inf.p_vts_attr[i].vts_menu_video_attr );
+            FLUSH(2);
+            FLUSH( 1 );
+            GETC( &vts_inf.p_vts_attr[i].i_vts_menu_audio_nb );
+//fprintf( stderr, "m audio nb : %d\n", vts_inf.p_vts_vts_inf[i].i_vtsm_audio_nb );
+            for( j = 0 ; j < 8 ; j++ )
+            {
+                GETLL( &i_temp );
+            }
+            FLUSH( 17 );
+            GETC( &vts_inf.p_vts_attr[i].i_vts_menu_spu_nb );
+//fprintf( stderr, "m subp nb : %d\n", vts_inf.p_vts_vts_inf[i].i_vtsm_subpic_nb );
+            for( j = 0 ; j < 28 ; j++ )
+            {
+                GET( &i_temp, 6 );
+                /* FIXME : Fix endianness issue here */
+            }
+            FLUSH( 2 );
+    //        GETS( &vts_inf.p_vts_attr[i].vtstt_video_vts_inf );
+            FLUSH(2);
+            FLUSH( 1 );
+            GETL( &vts_inf.p_vts_attr[i].i_vts_title_audio_nb );
+//fprintf( stderr, "tt audio nb : %d\n", vts_inf.p_vts_vts_inf[i].i_vtstt_audio_nb );
+            for( j = 0 ; j < 8 ; j++ )
+            {
+                GETLL( &i_temp );
+            }
+            FLUSH( 17 );
+            GETC( &vts_inf.p_vts_attr[i].i_vts_title_spu_nb );
+//fprintf( stderr, "tt subp nb : %d\n", vts_inf.p_vts_vts_inf[i].i_vtstt_subpic_nb );
+            for( j=0 ; j<28/*vts_inf.p_vts_vts_inf[i].i_vtstt_subpic_nb*/ ; j++ )
+            {
+                GET( &i_temp, 6 );
+                /* FIXME : Fix endianness issue here */
+            }
+        }
+    }
+#undef vts_inf
+
+    /*
+     * global cell map.
+     */
+    if( manager_inf.i_cell_inf_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+                        manager_inf.i_cell_inf_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        if( ReadCellInf( p_ifo, &p_ifo->vmg.cell_inf ) < 0 )
+        {
+            return -1;
+        }
+    }
+
+    /*
+     * global vob unit map.
+     */
+    if( manager_inf.i_vobu_map_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+                        manager_inf.i_vobu_map_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        if( ReadVobuMap( p_ifo, &p_ifo->vmg.vobu_map ) < 0 )
+        {
+            return -1;
+        }
+    }
+#undef manager_inf
+
+    p_ifo->vts.b_initialized = 0;
+
+    intf_WarnMsg( 1, "ifo info: vmg initialized" );
+
+    return 0;
+}
+
+/*****************************************************************************
+ * IfoTitleSet: Parse vts*.ifo files to fill the Video Title Set structure.
+ *****************************************************************************/
+int IfoTitleSet( ifo_t * p_ifo )
+{
+    off_t       i_off;
+    off_t       i_start;
+    u64         i_temp;
+    int         i, j;
+
+    if( p_ifo->vts.b_initialized )
+    {
+        FreeTitleSet( &p_ifo->vts );
+    }
+
+    i_off =
+    (off_t)( p_ifo->vmg.title_inf.p_attr[p_ifo->i_title-1].i_start_sector )
+                   * DVD_LB_SIZE
+                   + p_ifo->i_off;
+
+    p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
+
+    p_ifo->vts.i_pos = p_ifo->i_pos;
+
+#define manager_inf p_ifo->vts.manager_inf
+    /*
+     * reads manager information
+     */
+//fprintf( stderr, "VTSI\n" );
+
+    GET( manager_inf.psz_id , 12 );
+    manager_inf.psz_id[12] = '\0';
+    GETL( &manager_inf.i_end_sector );
+    FLUSH( 12 );
+    GETL( &manager_inf.i_inf_end_sector );
+    FLUSH( 1 );
+    GETC( &manager_inf.i_spec_ver );
+    GETL( &manager_inf.i_cat );
+    FLUSH( 90 );
+    GETL( &manager_inf.i_inf_end_byte );
+    FLUSH( 60 );
+    GETL( &manager_inf.i_menu_vob_start_sector );
+    GETL( &manager_inf.i_title_vob_start_sector );
+    GETL( &manager_inf.i_title_inf_start_sector );
+    GETL( &manager_inf.i_title_unit_start_sector );
+    GETL( &manager_inf.i_menu_unit_start_sector );
+    GETL( &manager_inf.i_time_inf_start_sector );
+    GETL( &manager_inf.i_menu_cell_inf_start_sector );
+    GETL( &manager_inf.i_menu_vobu_map_start_sector );
+    GETL( &manager_inf.i_cell_inf_start_sector );
+    GETL( &manager_inf.i_vobu_map_start_sector );
+    FLUSH( 24 );
+//    GETS( &manager_inf.m_video_atrt );
+FLUSH(2);
+    FLUSH( 1 );
+    GETC( &manager_inf.i_menu_audio_nb );
+    for( i=0 ; i<8 ; i++ )
+    {
+        GETLL( &i_temp );
+    }
+    FLUSH( 17 );
+    GETC( &manager_inf.i_menu_spu_nb );
+    for( i=0 ; i<28 ; i++ )
+    {
+        GET( &i_temp, 6 );
+        /* FIXME : take care of endianness */
+    }
+    FLUSH( 2 );
+//    GETS( &manager_inf.video_atrt );
+FLUSH(2);
+    FLUSH( 1 );
+    GETC( &manager_inf.i_audio_nb );
+//fprintf( stderr, "vtsi audio nb : %d\n", manager_inf.i_audio_nb );
+    for( i=0 ; i<8 ; i++ )
+    {
+        GETLL( &i_temp );
+//fprintf( stderr, "Audio %d: %llx\n", i, i_temp );
+        i_temp >>= 32;
+        manager_inf.p_audio_attr[i].i_lang_code = i_temp & 0xffff;
+        i_temp >>= 16;
+        manager_inf.p_audio_attr[i].i_num_channels = i_temp & 0x7;
+        i_temp >>= 4;
+        manager_inf.p_audio_attr[i].i_sample_freq = i_temp & 0x3;
+        i_temp >>= 2;
+        manager_inf.p_audio_attr[i].i_quantization = i_temp & 0x3;
+        i_temp >>= 2;
+        manager_inf.p_audio_attr[i].i_appl_mode = i_temp & 0x3;
+        i_temp >>= 2;
+        manager_inf.p_audio_attr[i].i_type = i_temp & 0x3;
+        i_temp >>= 2;
+        manager_inf.p_audio_attr[i].i_multichannel_extension = i_temp & 0x1;
+        i_temp >>= 1;
+        manager_inf.p_audio_attr[i].i_coding_mode = i_temp & 0x7;
+    }
+    FLUSH( 17 );
+    GETC( &manager_inf.i_spu_nb );
+//fprintf( stderr, "vtsi subpic nb : %d\n", manager_inf.i_subpic_nb );
+    for( i=0 ; i<manager_inf.i_spu_nb ; i++ )
+    {
+        GET( &i_temp, 6 );
+        i_temp = hton64( i_temp ) >> 16;
+//fprintf( stderr, "Subpic %d: %llx\n", i, i_temp );
+        manager_inf.p_spu_attr[i].i_caption = i_temp & 0xff;
+        i_temp >>= 16;
+        manager_inf.p_spu_attr[i].i_lang_code = i_temp & 0xffff;
+        i_temp >>= 16;
+        manager_inf.p_spu_attr[i].i_prefix = i_temp & 0xffff;
+    }
+
+    /*
+     * reads title information: set of pointers to title
+     */
+#define title_inf p_ifo->vts.title_inf
+    if( manager_inf.i_title_inf_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->vts.i_pos +
+                        manager_inf.i_title_inf_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+
+        i_start = p_ifo->i_pos;
+    
+//fprintf( stderr, "VTS PTR\n" );
+   
+        GETS( &title_inf.i_title_nb );
+//fprintf( stderr, "VTS title_inf nb: %d\n", title_inf.i_title_nb );
+        FLUSH( 2 );
+        GETL( &title_inf.i_end_byte );
+
+        title_inf.pi_start_byte = malloc( title_inf.i_title_nb *sizeof(u32) );
+        if( title_inf.pi_start_byte == NULL )
+        {
+            intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+            return -1;
+        }
+
+        for( i = 0 ; i < title_inf.i_title_nb ; i++ )
+        {
+            GETL( &title_inf.pi_start_byte[i] );
+        }
+
+        /* Parsing of tts */
+        title_inf.p_title_start = malloc( title_inf.i_title_nb
+                                         *sizeof(title_start_t) );
+        if( title_inf.p_title_start == NULL )
+        {
+            intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+            return -1;
+        }
+
+        for( i = 0 ; i < title_inf.i_title_nb ; i++ )
+        {
+            p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
+                            title_inf.pi_start_byte[i], SEEK_SET );
+
+            GETS( &title_inf.p_title_start[i].i_program_chain_num );
+            GETS( &title_inf.p_title_start[i].i_program_num );
+//fprintf( stderr, "VTS %d title_inf Pgc: %d Prg: %d\n", i,title_inf.p_title_start[i].i_program_chain_num, title_inf.p_title_start[i].i_program_num );
+        }
+    }
+#undef title_inf
+
+    /*
+     * menu unit information
+     */
+    if( manager_inf.i_menu_unit_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->vts.i_pos +
+                        manager_inf.i_menu_unit_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        if( ReadTitleUnit( p_ifo, &p_ifo->vts.menu_unit ) < 0 )
+        {
+            return -1;
+        }
+    }
+
+    /*
+     * title unit information
+     */
+    if( manager_inf.i_title_unit_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->vts.i_pos +
+                        manager_inf.i_title_unit_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        if( ReadUnitInf( p_ifo, &p_ifo->vts.title_unit ) < 0 )
+        {
+            return -1;
+        }
+    }
+
+    /*
+     * time map inforamtion
+     */
+#define time_inf p_ifo->vts.time_inf
+    if( manager_inf.i_time_inf_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->vts.i_pos +
+                        manager_inf.i_time_inf_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+
+//fprintf( stderr, "TMAP\n" );
+
+        GETS( &time_inf.i_nb );
+        FLUSH( 2 );
+        GETL( &time_inf.i_end_byte );
+
+        time_inf.pi_start_byte = malloc( time_inf.i_nb *sizeof(u32) );
+        if( time_inf.pi_start_byte == NULL )
+        {
+            intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+            return -1;
+        }
+
+        for( i = 0 ; i < time_inf.i_nb ; i++ )
+        {    
+            GETL( &time_inf.pi_start_byte[i] );
+        }
+
+        time_inf.p_time_map = malloc( time_inf.i_nb *sizeof(time_map_t) );
+        if( time_inf.p_time_map == NULL )
+        {
+            intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+            return -1;
+        }
+
+        for( i = 0 ; i < time_inf.i_nb ; i++ )
+        {    
+            GETC( &time_inf.p_time_map[i].i_time_unit );
+            FLUSH( 1 );
+            GETS( &time_inf.p_time_map[i].i_entry_nb );
+
+            time_inf.p_time_map[i].pi_sector =
+                     malloc( time_inf.p_time_map[i].i_entry_nb *sizeof(u32) );
+            if( time_inf.p_time_map[i].pi_sector == NULL )
+            {
+                intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+                return -1;
+            }
+
+            for( j = 0 ; j < time_inf.p_time_map[i].i_entry_nb ; j++ )
+            {
+                GETL( &time_inf.p_time_map[i].pi_sector[j] );
+            }
+        }
+    }
+#undef time_inf
+
+    if( manager_inf.i_menu_cell_inf_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->vts.i_pos +
+                        manager_inf.i_menu_cell_inf_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        if( ReadCellInf( p_ifo, &p_ifo->vts.menu_cell_inf ) < 0 )
+        {
+            return -1;
+        }
+    }
+
+    if( manager_inf.i_menu_vobu_map_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->vts.i_pos +
+                        manager_inf.i_menu_vobu_map_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        if( ReadVobuMap( p_ifo, &p_ifo->vts.menu_vobu_map ) < 0 )
+        {
+            return -1;
+        }
+    }
+
+    if( manager_inf.i_cell_inf_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->vts.i_pos +
+                        manager_inf.i_cell_inf_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        if( ReadCellInf( p_ifo, &p_ifo->vts.cell_inf ) )
+        {
+            return -1;
+        }
+    }
+
+    if( manager_inf.i_vobu_map_start_sector )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->vts.i_pos +
+                        manager_inf.i_vobu_map_start_sector *DVD_LB_SIZE,
+                        SEEK_SET );
+        if( ReadVobuMap( p_ifo, &p_ifo->vts.vobu_map ) )
+        {
+            return -1;
+        }
+    }
+
+    intf_WarnMsg( 2, "ifo info: VTS %d initialized",
+         p_ifo->vmg.title_inf.p_attr[p_ifo->i_title-1].i_title_set_num );
+
+#undef manager_inf
+
+    p_ifo->vts.b_initialized = 1;
+
+    return 0;
+}
+
+/*****************************************************************************
+ * FreeTitleSet : free all structures allocated by IfoTitleSet
+ *****************************************************************************/
+static int FreeTitleSet( vts_t * p_vts )
+{
+    int     i;
+
+    if( p_vts->manager_inf.i_vobu_map_start_sector )
+    {
+        FreeVobuMap( &p_vts->vobu_map );
+    }
+
+    if( p_vts->manager_inf.i_cell_inf_start_sector )
+    {
+        FreeCellInf( &p_vts->cell_inf );
+    }
+
+    if( p_vts->manager_inf.i_menu_vobu_map_start_sector )
+    {
+        FreeVobuMap( &p_vts->menu_vobu_map );
+    }
+
+    if( p_vts->manager_inf.i_menu_cell_inf_start_sector )
+    {
+        FreeCellInf( &p_vts->menu_cell_inf );
+    }
+
+    if( p_vts->manager_inf.i_time_inf_start_sector )
+    {
+        for( i = 0 ; i < p_vts->time_inf.i_nb ; i++ )
+        {
+            free( p_vts->time_inf.p_time_map[i].pi_sector );
+        }
+
+        free( p_vts->time_inf.p_time_map );
+        free( p_vts->time_inf.pi_start_byte );
+    }
+
+    if( p_vts->manager_inf.i_title_unit_start_sector )
+    {
+        FreeUnitInf( &p_vts->title_unit );
+    }
+
+    if( p_vts->manager_inf.i_menu_unit_start_sector )
+    {
+        FreeTitleUnit( &p_vts->menu_unit );
+    }
+
+    if( p_vts->manager_inf.i_title_inf_start_sector )
+    {
+        free( p_vts->title_inf.pi_start_byte );
+        free( p_vts->title_inf.p_title_start );
+    }
+
+    p_vts->b_initialized = 0;
+    
+    return 0;
+}
+
+/*****************************************************************************
+ * IfoEnd : Frees all the memory allocated to ifo structures
+ *****************************************************************************/
+void IfoEnd( ifo_t * p_ifo )
+{
+    int     i, j;
+
+    FreeTitleSet( &p_ifo->vts );
+
+    if( p_ifo->vmg.manager_inf.i_vobu_map_start_sector )
+    {
+        FreeVobuMap( &p_ifo->vmg.vobu_map );
+    }
+
+    if( p_ifo->vmg.manager_inf.i_cell_inf_start_sector )
+    {
+        FreeCellInf( &p_ifo->vmg.cell_inf );
+    }
+
+    if( p_ifo->vmg.manager_inf.i_vts_inf_start_sector )
+    {
+        free( p_ifo->vmg.vts_inf.p_vts_attr );
+        free( p_ifo->vmg.vts_inf.pi_vts_attr_start_byte );
+    }
+
+    /* free parental information structures */
+    if( p_ifo->vmg.manager_inf.i_parental_inf_start_sector )
+    {
+        for( i = 0 ; i < p_ifo->vmg.parental_inf.i_country_nb ; i++ )
+        {
+            for( j = 0 ; j < 8 ; j++ )
+            {
+                free( p_ifo->vmg.parental_inf.p_parental_mask[i].ppi_mask[j] );
+            }
+        }
+
+        free( p_ifo->vmg.parental_inf.p_parental_mask );
+        free( p_ifo->vmg.parental_inf.p_parental_desc );
+    }
+
+    if( p_ifo->vmg.manager_inf.i_title_unit_start_sector )
+    {
+        FreeTitleUnit( &p_ifo->vmg.title_unit );
+    }
+
+    if( p_ifo->vmg.manager_inf.i_title_inf_start_sector )
+    {
+        free( p_ifo->vmg.title_inf.p_attr );
+    }
+
+    FreeTitle( &p_ifo->vmg.title );
+
+    free( p_ifo );
+
+    return;
+}
 /*
  * Function common to Video Manager and Video Title set Processing
  */
 
 /*****************************************************************************
- * ReadPGC : Fills the Program Chain structure.
+ * ReadTitle : Fills the title structure.
+ *****************************************************************************
+ * Titles are logical stream units that correspond to a whole inside the dvd.
+ * Several title can point to the same part of the physical DVD, and give
+ * map to different anglesfor instance.
  *****************************************************************************/
 #define GETCOMMAND( p_com )                                                 \
     {                                                                       \
@@ -223,935 +906,467 @@ void IfoEnd( ifo_t* p_ifo )
         p_ifo->i_pos += 8;                                                  \
     }
 
-static pgc_t ReadPGC( ifo_t* p_ifo )
+static int ReadTitle( ifo_t * p_ifo, title_t * p_title )
 {
-    pgc_t   pgc;
-    int     i;
-    off_t   i_start = p_ifo->i_pos;
+    off_t     i_start;
+    int       i;
+
+    i_start = p_ifo->i_pos;
 
 //fprintf( stderr, "PGC\n" );
 
     FLUSH(2);
-    GETC( &pgc.i_prg_nb );
-    GETC( &pgc.i_cell_nb );
-//fprintf( stderr, "PGC: Prg: %d Cell: %d\n", pgc.i_prg_nb, pgc.i_cell_nb );
-    GETL( &pgc.i_play_time );
-    GETL( &pgc.i_prohibited_user_op );
+    GETC( &p_title->i_chapter_nb );
+    GETC( &p_title->i_cell_nb );
+//fprintf( stderr, "title: Prg: %d Cell: %d\n", pgc.i_prg_nb, pgc.i_cell_nb );
+    GETL( &p_title->i_play_time );
+    GETL( &p_title->i_prohibited_user_op );
     for( i=0 ; i<8 ; i++ )
     {
-        GETS( &pgc.pi_audio_status[i] );
+        GETS( &p_title->pi_audio_status[i] );
     }
     for( i=0 ; i<32 ; i++ )
     {
-        GETL( &pgc.pi_subpic_status[i] );
+        GETL( &p_title->pi_subpic_status[i] );
     }
-    GETS( &pgc.i_next_pgc_nb );
-    GETS( &pgc.i_prev_pgc_nb );
-    GETS( &pgc.i_goup_pgc_nb );
-//fprintf( stderr, "PGC: Prev: %d Next: %d Up: %d\n",pgc.i_prev_pgc_nb ,pgc.i_next_pgc_nb, pgc.i_goup_pgc_nb );
-    GETC( &pgc.i_still_time );
-    GETC( &pgc.i_play_mode );
+    GETS( &p_title->i_next_title_num );
+    GETS( &p_title->i_prev_title_num );
+    GETS( &p_title->i_go_up_title_num );
+//fprintf( stderr, "title: Prev: %d Next: %d Up: %d\n",pgc.i_prev_pgc_nb ,pgc.i_next_pgc_nb, pgc.i_goup_pgc_nb );
+    GETC( &p_title->i_still_time );
+    GETC( &p_title->i_play_mode );
     for( i=0 ; i<16 ; i++ )
     {
-        GETL( &pgc.pi_yuv_color[i] );
+        GETL( &p_title->pi_yuv_color[i] );
         /* FIXME : We have to erase the extra bit */
     }
-    GETS( &pgc.i_com_tab_sbyte );
-    GETS( &pgc.i_prg_map_sbyte );
-    GETS( &pgc.i_cell_play_inf_sbyte );
-    GETS( &pgc.i_cell_pos_inf_sbyte );
+    GETS( &p_title->i_command_start_byte );
+    GETS( &p_title->i_chapter_map_start_byte );
+    GETS( &p_title->i_cell_play_start_byte );
+    GETS( &p_title->i_cell_pos_start_byte );
 
-    /* Parsing of pgc_com_tab_t */
-    if( pgc.i_com_tab_sbyte )
+    /* parsing of command_t */
+    if( p_title->i_command_start_byte )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
-                            + pgc.i_com_tab_sbyte, SEEK_SET );
-        GETS( &pgc.com_tab.i_pre_com_nb );
-        GETS( &pgc.com_tab.i_post_com_nb );
-        GETS( &pgc.com_tab.i_cell_com_nb );
+        p_ifo->i_pos = lseek( p_ifo->i_fd,
+                              i_start + p_title->i_command_start_byte,
+                              SEEK_SET );
+
+        /* header */
+        GETS( &p_title->command.i_pre_command_nb );
+        GETS( &p_title->command.i_post_command_nb );
+        GETS( &p_title->command.i_cell_command_nb );
         FLUSH( 2 );
-        if( pgc.com_tab.i_pre_com_nb )
+
+        /* pre-title commands */
+        if( p_title->command.i_pre_command_nb )
         {
-            pgc.com_tab.p_pre_com =
-                      malloc(pgc.com_tab.i_pre_com_nb *sizeof(ifo_command_t));
-            if( pgc.com_tab.p_pre_com == NULL )
+            p_title->command.p_pre_command =
+                           malloc( p_title->command.i_pre_command_nb
+                                   *sizeof(command_desc_t) );
+
+            if( p_title->command.p_pre_command == NULL )
             {
-                intf_ErrMsg( "Out of memory" );
-                p_ifo->b_error = 1;
-                return pgc;
+                intf_ErrMsg( "ifo error: out of memory in ReadTitle" );
+                return -1;
             }
-            for( i=0 ; i<pgc.com_tab.i_pre_com_nb ; i++ )
+
+            for( i = 0 ; i < p_title->command.i_pre_command_nb ; i++ )
             {
-                GETCOMMAND( &pgc.com_tab.p_pre_com[i] );
+                GETCOMMAND( &p_title->command.p_pre_command[i] );
             }
         }
-        if( pgc.com_tab.i_post_com_nb )
+        else
         {
-            pgc.com_tab.p_post_com =
-                      malloc(pgc.com_tab.i_post_com_nb *sizeof(ifo_command_t));
-            if( pgc.com_tab.p_post_com == NULL )
+            p_title->command.p_pre_command = NULL;
+        }
+
+        /* post-title commands */
+        if( p_title->command.i_post_command_nb )
+        {
+            p_title->command.p_post_command =
+                        malloc( p_title->command.i_post_command_nb
+                                *sizeof(command_desc_t) );
+
+            if( p_title->command.p_post_command == NULL )
             {
-                intf_ErrMsg( "Out of memory" );
-                p_ifo->b_error = 1;
-                return pgc;
+                intf_ErrMsg( "ifo error: out of memory in ReadTitle" );
+                return -1;
             }
-            for( i=0 ; i<pgc.com_tab.i_post_com_nb ; i++ )
+
+            for( i=0 ; i<p_title->command.i_post_command_nb ; i++ )
             {
-                GETCOMMAND( &pgc.com_tab.p_post_com[i] );
+                GETCOMMAND( &p_title->command.p_post_command[i] );
             }
         }
-        if( pgc.com_tab.i_cell_com_nb )
+        else
         {
-            pgc.com_tab.p_cell_com =
-                      malloc(pgc.com_tab.i_cell_com_nb *sizeof(ifo_command_t));
-            if( pgc.com_tab.p_cell_com == NULL )
+            p_title->command.p_post_command = NULL;
+        }
+
+        /* cell commands */
+        if( p_title->command.i_cell_command_nb )
+        {
+            p_title->command.p_cell_command =
+                        malloc( p_title->command.i_cell_command_nb
+                                *sizeof(command_desc_t) );
+
+            if( p_title->command.p_cell_command == NULL )
             {
-                intf_ErrMsg( "Out of memory" );
-                p_ifo->b_error = 1;
-                return pgc;
+                intf_ErrMsg( "ifo error: out of memory in ReadTitle" );
+                return -1;
             }
-            for( i=0 ; i<pgc.com_tab.i_cell_com_nb ; i++ )
+
+            for( i=0 ; i<p_title->command.i_cell_command_nb ; i++ )
             {
-                GETCOMMAND( &pgc.com_tab.p_cell_com[i] );
+                GETCOMMAND( &p_title->command.p_cell_command[i] );
             }
+        }
+        else
+        {
+            p_title->command.p_cell_command = NULL;
         }
     }
-    /* Parsing of pgc_prg_map_t */
-    if( pgc.i_prg_map_sbyte )
+
+    /* parsing of chapter_map_t: it gives the entry cell for each chapter */
+    if( p_title->i_chapter_map_start_byte )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
-                            + pgc.i_prg_map_sbyte, SEEK_SET );
-        pgc.prg_map.pi_entry_cell = malloc( pgc.i_prg_nb *sizeof(u8) );
-        if( pgc.prg_map.pi_entry_cell == NULL )
+        p_ifo->i_pos = lseek( p_ifo->i_fd,
+                              i_start + p_title->i_chapter_map_start_byte,
+                              SEEK_SET );
+        
+        p_title->chapter_map.pi_start_cell =
+                    malloc( p_title->i_chapter_nb *sizeof(chapter_map_t) );
+        
+        if( p_title->chapter_map.pi_start_cell == NULL )
         {
-            intf_ErrMsg( "Out of memory" );
-            p_ifo->b_error = 1;
-            return pgc;
+            intf_ErrMsg( "ifo error: out of memory in Read Title" );
+            return -1;
         }
-        GET( pgc.prg_map.pi_entry_cell, pgc.i_prg_nb );
-        /* FIXME : check endianness here */
+
+        GET( p_title->chapter_map.pi_start_cell, p_title->i_chapter_nb );
     }
-    /* Parsing of cell_play_inf_t */
-    if( pgc.i_cell_play_inf_sbyte )
+    else
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
-                            + pgc.i_cell_play_inf_sbyte, SEEK_SET );
-        pgc.p_cell_play_inf = malloc( pgc.i_cell_nb *sizeof(cell_play_inf_t) );
-        if( pgc.p_cell_play_inf == NULL )
+        p_title->chapter_map.pi_start_cell = NULL; 
+    }
+
+    /* parsing of cell_play_t */
+    if( p_title->i_cell_play_start_byte )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd,
+                              i_start + p_title->i_cell_play_start_byte,
+                              SEEK_SET );
+
+        p_title->p_cell_play = malloc( p_title->i_cell_nb
+                                       *sizeof(cell_play_t) );
+    
+        if( p_title->p_cell_play == NULL )
         {
-            intf_ErrMsg( "Out of memory" );
-            p_ifo->b_error = 1;
-            return pgc;
+            intf_ErrMsg( "ifo error: out of memory in ReadTitle" );
+            return -1;
         }
-        for( i=0 ; i<pgc.i_cell_nb ; i++ )
+
+        for( i = 0 ; i < p_title->i_cell_nb ; i++ )
         {
-            GETS( &pgc.p_cell_play_inf[i].i_cat );
-            GETC( &pgc.p_cell_play_inf[i].i_still_time );
-            GETC( &pgc.p_cell_play_inf[i].i_com_nb );
-            GETL( &pgc.p_cell_play_inf[i].i_play_time );
-            GETL( &pgc.p_cell_play_inf[i].i_entry_sector );
-            GETL( &pgc.p_cell_play_inf[i].i_first_ilvu_vobu_esector );
-            GETL( &pgc.p_cell_play_inf[i].i_lvobu_ssector );
-            GETL( &pgc.p_cell_play_inf[i].i_lsector );
+            GETS( &p_title->p_cell_play[i].i_category );
+            GETC( &p_title->p_cell_play[i].i_still_time );
+            GETC( &p_title->p_cell_play[i].i_command_nb );
+            GETL( &p_title->p_cell_play[i].i_play_time );
+            GETL( &p_title->p_cell_play[i].i_start_sector );
+            GETL( &p_title->p_cell_play[i].i_first_ilvu_vobu_esector );
+            GETL( &p_title->p_cell_play[i].i_last_vobu_start_sector );
+            GETL( &p_title->p_cell_play[i].i_end_sector );
         }
     }
-    /* Parsing of cell_pos_inf_map */
-    if( pgc.i_cell_pos_inf_sbyte )
+
+    /* Parsing of cell_pos_t */
+    if( p_title->i_cell_pos_start_byte )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
-                            + pgc.i_cell_pos_inf_sbyte, SEEK_SET );
-        pgc.p_cell_pos_inf = malloc( pgc.i_cell_nb *sizeof(cell_pos_inf_t) );
-        if( pgc.p_cell_pos_inf == NULL )
+        p_ifo->i_pos = lseek( p_ifo->i_fd,
+                              i_start + p_title->i_cell_pos_start_byte,
+                              SEEK_SET );
+
+        p_title->p_cell_pos = malloc( p_title->i_cell_nb
+                                      *sizeof(cell_pos_t) );
+
+        if( p_title->p_cell_pos == NULL )
         {
-            intf_ErrMsg( "Out of memory" );
-            p_ifo->b_error = 1;
-            return pgc;
+            intf_ErrMsg( "ifo error: out of memory" );
+            return -1;
         }
-        for( i=0 ; i<pgc.i_cell_nb ; i++ )
+
+        for( i = 0 ; i < p_title->i_cell_nb ; i++ )
         {
-            GETS( &pgc.p_cell_pos_inf[i].i_vob_id );
+            GETS( &p_title->p_cell_pos[i].i_vob_id );
             FLUSH( 1 );
-            GETC( &pgc.p_cell_pos_inf[i].i_cell_id );
+            GETC( &p_title->p_cell_pos[i].i_cell_id );
         }
     } 
 
-    return pgc;
+    return 0;
 }
 
 /*****************************************************************************
- * ReadUnit : Fills Menu Language Unit Table/ PGC Info Table
+ * FreeTitle: frees alla structure allocated by a call to ReadTitle
  *****************************************************************************/
-static pgci_inf_t ReadUnit( ifo_t* p_ifo )
+static int FreeTitle( title_t * p_title )
 {
-    pgci_inf_t      inf;
-    int             i;
-    off_t           i_start = p_ifo->i_pos;
+    if( p_title->i_command_start_byte )
+    {
+        if( p_title->command.i_pre_command_nb )
+        {
+            free( p_title->command.p_pre_command );
+        }
 
+        if( p_title->command.i_post_command_nb )
+        {
+            free( p_title->command.p_post_command );
+        }
+
+        if( p_title->command.i_cell_command_nb )
+        {
+            free( p_title->command.p_cell_command );
+        }
+
+        if( p_title->i_chapter_map_start_byte )
+        {
+            free( p_title->chapter_map.pi_start_cell );
+        }
+
+        if( p_title->i_cell_play_start_byte )
+        {
+            free( p_title->p_cell_play );
+        }
+
+        if( p_title->i_cell_pos_start_byte )
+        {
+            free( p_title->p_cell_pos );
+        }
+    }
+
+    return 0;
+}
+
+/*****************************************************************************
+ * ReadUnitInf : Fills Menu Language Unit Table/ PGC Info Table
+ *****************************************************************************/
+static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf )
+{
+    off_t           i_start;
+    int             i;
+
+    i_start = p_ifo->i_pos;
 //fprintf( stderr, "Unit\n" );
 
-    GETS( &inf.i_srp_nb );
+    GETS( &p_unit_inf->i_title_nb );
     FLUSH( 2 );
-    GETL( &inf.i_lu_ebyte );
-    inf.p_srp = malloc( inf.i_srp_nb *sizeof(pgci_srp_t) );
-    if( inf.p_srp == NULL )
+    GETL( &p_unit_inf->i_end_byte );
+
+    p_unit_inf->p_title =
+            malloc( p_unit_inf->i_title_nb *sizeof(unit_title_t) );
+    if( p_unit_inf->p_title == NULL )
     {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return inf;
-    }
-    for( i=0 ; i<inf.i_srp_nb ; i++ )
-    {
-        GETC( &inf.p_srp[i].i_pgc_cat_mask );
-        GETC( &inf.p_srp[i].i_pgc_cat );
-        GETS( &inf.p_srp[i].i_par_mask );
-        GETL( &inf.p_srp[i].i_pgci_sbyte );
-    }
-    for( i=0 ; i<inf.i_srp_nb ; i++ )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd,
-                         i_start + inf.p_srp[i].i_pgci_sbyte,
-                         SEEK_SET );
-//fprintf( stderr, "Unit: PGC %d\n", i );
-        inf.p_srp[i].pgc = ReadPGC( p_ifo );
+        intf_ErrMsg( "ifo error: out of memory in ReadUnit" );
+        return -1;
     }
 
-    return inf;
+    for( i = 0 ; i < p_unit_inf->i_title_nb ; i++ )
+    {
+        GETC( &p_unit_inf->p_title[i].i_category_mask );
+        GETC( &p_unit_inf->p_title[i].i_category );
+        GETS( &p_unit_inf->p_title[i].i_parental_mask );
+        GETL( &p_unit_inf->p_title[i].i_title_start_byte );
+    }
+
+    for( i = 0 ; i < p_unit_inf->i_title_nb ; i++ )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
+                              p_unit_inf->p_title[i].i_title_start_byte,
+                              SEEK_SET );
+//fprintf( stderr, "Unit: PGC %d\n", i );
+        ReadTitle( p_ifo, &p_unit_inf->p_title[i].title );
+    }
+
+    return 0;
 }
 
 /*****************************************************************************
- * ReadUnitTable : Fills the PGCI Unit structure.
- *****************************************************************************/
-static pgci_ut_t ReadUnitTable( ifo_t* p_ifo )
+ * FreeUnitInf : frees a structure allocated by ReadUnit
+ *****************************************************************************/ 
+static int FreeUnitInf( unit_inf_t * p_unit_inf )
 {
-    pgci_ut_t       pgci;
+    if( p_unit_inf->p_title != NULL )
+    {
+        free( p_unit_inf->p_title );
+    }
+
+    return 0;
+}
+
+
+/*****************************************************************************
+ * ReadTitleUnit: Fills the Title Unit structure.
+ *****************************************************************************/
+static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit )
+{
     int             i;
     off_t           i_start = p_ifo->i_pos;
 
 //fprintf( stderr, "Unit Table\n" );
 
-    GETS( &pgci.i_lu_nb );
+    GETS( &p_title_unit->i_unit_nb );
     FLUSH( 2 );
-    GETL( &pgci.i_ebyte );
-    pgci.p_lu = malloc( pgci.i_lu_nb *sizeof(pgci_lu_t) );
-    if( pgci.p_lu == NULL )
+    GETL( &p_title_unit->i_end_byte );
+
+    p_title_unit->p_unit = malloc( p_title_unit->i_unit_nb *sizeof(unit_t) );
+    if( p_title_unit->p_unit == NULL )
     {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return pgci;
-    }
-    for( i=0 ; i<pgci.i_lu_nb ; i++ )
-    {
-        GET( pgci.p_lu[i].ps_lang_code, 2 );
-        FLUSH( 1 );
-        GETC( &pgci.p_lu[i].i_existence_mask );
-        GETL( &pgci.p_lu[i].i_lu_sbyte );
-    }
-    pgci.p_pgci_inf = malloc( pgci.i_lu_nb *sizeof(pgci_inf_t) );
-    if( pgci.p_pgci_inf == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return pgci;
-    }
-    for( i=0 ; i<pgci.i_lu_nb ; i++ )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
-                                pgci.p_lu[i].i_lu_sbyte,
-                                SEEK_SET );
-        pgci.p_pgci_inf[i] = ReadUnit( p_ifo );
+        intf_ErrMsg( "ifo error: out of memory in ReadTitleUnit" );
+        return -1;
     }
 
-    return pgci;
+    for( i = 0 ; i < p_title_unit->i_unit_nb ; i++ )
+    {
+        GET( p_title_unit->p_unit[i].ps_lang_code, 2 );
+        FLUSH( 1 );
+        GETC( &p_title_unit->p_unit[i].i_existence_mask );
+        GETL( &p_title_unit->p_unit[i].i_unit_inf_start_byte );
+    }
+
+    p_title_unit->p_unit_inf =
+                malloc( p_title_unit->i_unit_nb *sizeof(unit_inf_t) );
+    if( p_title_unit->p_unit_inf == NULL )
+    {
+        intf_ErrMsg( "ifo error: out of memory in ReadTitleUnit" );
+        return -1;
+    }
+
+    for( i = 0 ; i < p_title_unit->i_unit_nb ; i++ )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
+                              p_title_unit->p_unit[i].i_unit_inf_start_byte,
+                              SEEK_SET );
+        ReadUnitInf( p_ifo, &p_title_unit->p_unit_inf[i] );
+    }
+
+    return 0;
+}
+
+/*****************************************************************************
+ * FreeTitleUnit: frees a structure allocateed by ReadTitleUnit
+ *****************************************************************************/
+static int FreeTitleUnit( title_unit_t * p_title_unit )
+{
+    int     i;
+
+    if( p_title_unit->p_unit_inf != NULL )
+    {
+        for( i = 0 ; i < p_title_unit->i_unit_nb ; i++ )
+        {
+            FreeUnitInf( &p_title_unit->p_unit_inf[i] );
+        }
+
+        free( p_title_unit->p_unit_inf );
+    }
+
+    return 0;
 }
 
 /*****************************************************************************
  * ReadCellInf : Fills the Cell Information structure.
  *****************************************************************************/
-static c_adt_t ReadCellInf( ifo_t* p_ifo )
+static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf )
 {
-    c_adt_t         c_adt;
-    off_t           i_start = p_ifo->i_pos;
+    off_t           i_start;
     int             i;
 
+    i_start = p_ifo->i_pos;
 //fprintf( stderr, "CELL ADD\n" );
 
-    GETS( &c_adt.i_vob_nb );
+    GETS( &p_cell_inf->i_vob_nb );
     FLUSH( 2 );
-    GETL( &c_adt.i_ebyte );
-    c_adt.i_cell_nb =
-        ( i_start + c_adt.i_ebyte + 1 - p_ifo->i_pos ) / sizeof(cell_inf_t);
-    c_adt.p_cell_inf = malloc( c_adt.i_cell_nb *sizeof(cell_inf_t) );
-    if( c_adt.p_cell_inf == NULL )
+    GETL( &p_cell_inf->i_end_byte );
+
+    p_cell_inf->i_cell_nb =
+        ( i_start + p_cell_inf->i_end_byte + 1 - p_ifo->i_pos )
+        / sizeof(cell_map_t);
+
+    p_cell_inf->p_cell_map =
+                malloc( p_cell_inf->i_cell_nb *sizeof(cell_map_t) );
+    if( p_cell_inf->p_cell_map == NULL )
     {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return c_adt;
+        intf_ErrMsg( "ifo error: out of memory in ReadCellInf" );
+        return -1;
     }
-    for( i = 0 ; i < c_adt.i_cell_nb ; i++ )
+
+    for( i = 0 ; i < p_cell_inf->i_cell_nb ; i++ )
     {
-        GETS( &c_adt.p_cell_inf[i].i_vob_id );
-        GETC( &c_adt.p_cell_inf[i].i_cell_id );
+        GETS( &p_cell_inf->p_cell_map[i].i_vob_id );
+        GETC( &p_cell_inf->p_cell_map[i].i_cell_id );
         FLUSH( 1 );
-        GETL( &c_adt.p_cell_inf[i].i_ssector );
-        GETL( &c_adt.p_cell_inf[i].i_esector );
+        GETL( &p_cell_inf->p_cell_map[i].i_start_sector );
+        GETL( &p_cell_inf->p_cell_map[i].i_end_sector );
     }
     
-    return c_adt;
+    return 0;
 }
 
 /*****************************************************************************
- * ReadMap : Fills the VOBU Map structure.
+ * FreeCellInf : frees structures allocated by ReadCellInf
  *****************************************************************************/
-static vobu_admap_t ReadMap( ifo_t* p_ifo )
+static int FreeCellInf( cell_inf_t * p_cell_inf )
 {
-    vobu_admap_t        map;
+    free( p_cell_inf->p_cell_map );
+
+    return 0;
+}
+
+/*****************************************************************************
+ * ReadVobuMap : Fills the VOBU Map structure.
+ *****************************************************************************/
+static int ReadVobuMap( ifo_t * p_ifo, vobu_map_t * p_vobu_map )
+{
+    off_t               i_start;
     int                 i, i_max;
-    off_t               i_start = p_ifo->i_pos;
     
+    i_start = p_ifo->i_pos;
 //fprintf( stderr, "VOBU ADMAP\n" );
 
-    GETL( &map.i_ebyte );
-    i_max = ( i_start + map.i_ebyte + 1 - p_ifo->i_pos ) / sizeof(u32);
-    map.pi_vobu_ssector = malloc( i_max *sizeof(u32) );
-    for( i=0 ; i<i_max ; i++ )
+    GETL( &p_vobu_map->i_end_byte );
+    i_max = ( i_start + p_vobu_map->i_end_byte + 1 - p_ifo->i_pos )
+            / sizeof(u32);
+
+    p_vobu_map->pi_vobu_start_sector = malloc( i_max *sizeof(u32) );
+    if( p_vobu_map->pi_vobu_start_sector == NULL )
     {
-        GETL( &map.pi_vobu_ssector[i] );
+        intf_ErrMsg( "ifo error: out of memory in ReadVobuMap" );
+        return -1;
     }
 
-    return map;
-}
- 
-/*
- * Video Manager Information Processing.
- * This is what is contained in video_ts.ifo.
- */
-
-/*****************************************************************************
- * ReadVMGInfMat : Fills the Management Information structure.
- *****************************************************************************/
-static vmgi_mat_t ReadVMGInfMat( ifo_t* p_ifo )
-{
-    vmgi_mat_t  mat;
-    u64         i_temp;
-    int         i;
-//    off_t     i_start = p_ifo->i_pos;
-
-//fprintf( stderr, "VMGI\n" );
-
-    GET( mat.psz_id , 12 );
-    mat.psz_id[12] = '\0';
-    GETL( &mat.i_lsector );
-    FLUSH( 12 );
-    GETL( &mat.i_i_lsector );
-    FLUSH( 1 );
-    GETC( &mat.i_spec_ver );
-    GETL( &mat.i_cat );
-    GETS( &mat.i_vol_nb );
-    GETS( &mat.i_vol );
-    GETC( &mat.i_disc_side );
-    FLUSH( 19 );
-    GETS( &mat.i_tts_nb );
-    GET( mat.ps_provider_id, 32 );
-    GETLL( &mat.i_pos_code );
-    FLUSH( 24 );
-    GETL( &mat.i_i_mat_ebyte );
-    GETL( &mat.i_fp_pgc_sbyte );
-    FLUSH( 56 );
-    GETL( &mat.i_vobs_ssector );
-    GETL( &mat.i_ptt_srpt_ssector );
-    GETL( &mat.i_pgci_ut_ssector );
-    GETL( &mat.i_ptl_mait_ssector );
-    GETL( &mat.i_vts_atrt_ssector );
-    GETL( &mat.i_txtdt_mg_ssector );
-    GETL( &mat.i_c_adt_ssector );
-    GETL( &mat.i_vobu_admap_ssector );
-    FLUSH( 32 );
-//    GETS( &mat.video_atrt );
-FLUSH(2);
-    FLUSH( 1 );
-    GETC( &mat.i_audio_nb );
-//fprintf( stderr, "vmgi audio nb : %d\n", mat.i_audio_nb );
-    for( i=0 ; i < 8 ; i++ )
+    for( i = 0 ; i < i_max ; i++ )
     {
-        GETLL( &i_temp );
-    }
-    FLUSH( 17 );
-    GETC( &mat.i_subpic_nb );
-//fprintf( stderr, "vmgi subpic nb : %d\n", mat.i_subpic_nb );
-    for( i=0 ; i < mat.i_subpic_nb ; i++ )
-    {
-        GET( &i_temp, 6 );
-        /* FIXME : take care of endianness */
+        GETL( &p_vobu_map->pi_vobu_start_sector[i] );
     }
 
-    return mat;
+    return 0;
 }
 
 /*****************************************************************************
- * ReadVMGTitlePointer : Fills the Part Of Title Search Pointer structure.
+ * FreeVobuMap: frees structures allocated by ReadVobuMap
  *****************************************************************************/
-static vmg_ptt_srpt_t ReadVMGTitlePointer( ifo_t* p_ifo )
+static int FreeVobuMap( vobu_map_t * p_vobu_map )
 {
-    vmg_ptt_srpt_t  ptr;
-    int             i;
-//    off_t           i_start = p_ifo->i_pos;
-
-//fprintf( stderr, "PTR\n" );
-
-    GETS( &ptr.i_ttu_nb );
-//fprintf( stderr, "PTR: TTU nb %d\n", ptr.i_ttu_nb );
-    FLUSH( 2 );
-    GETL( &ptr.i_ebyte );
-    /* Parsing of tts */
-    ptr.p_tts = malloc( ptr.i_ttu_nb *sizeof(tts_t) );
-    if( ptr.p_tts == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return ptr;
-    }
-    for( i=0 ; i<ptr.i_ttu_nb ; i++ )
-    {
-        GETC( &ptr.p_tts[i].i_play_type );
-        GETC( &ptr.p_tts[i].i_angle_nb );
-        GETS( &ptr.p_tts[i].i_ptt_nb );
-        GETS( &ptr.p_tts[i].i_parental_id );
-        GETC( &ptr.p_tts[i].i_tts_nb );
-        GETC( &ptr.p_tts[i].i_vts_ttn );
-        GETL( &ptr.p_tts[i].i_ssector );
-//fprintf( stderr, "PTR: %d %d %d\n", ptr.p_tts[i].i_ptt_nb, ptr.p_tts[i].i_tts_nb,ptr.p_tts[i].i_vts_ttn );
-    }
-
-    return ptr;
-}
-
-/*****************************************************************************
- * ReadParentalInf : Fills the Parental Management structure.
- *****************************************************************************/
-static vmg_ptl_mait_t ReadParentalInf( ifo_t* p_ifo )
-{
-    vmg_ptl_mait_t  par;
-    int             i, j, k;
-    off_t           i_start = p_ifo->i_pos;
-
-//fprintf( stderr, "PTL\n" );
-
-    GETS( &par.i_country_nb );
-    GETS( &par.i_vts_nb );
-    GETL( &par.i_ebyte );
-    par.p_ptl_desc = malloc( par.i_country_nb *sizeof(vmg_ptl_mai_desc_t) );
-    if( par.p_ptl_desc == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return par;
-    }
-    for( i=0 ; i<par.i_country_nb ; i++ )
-    {
-        GET( par.p_ptl_desc[i].ps_country_code, 2 );
-        FLUSH( 2 );
-        GETS( &par.p_ptl_desc[i].i_ptl_mai_sbyte );
-        FLUSH( 2 );
-    }
-    par.p_ptl_mask = malloc( par.i_country_nb *sizeof(vmg_ptl_mask_t) );
-    if( par.p_ptl_mask == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return par;
-    }
-    for( i=0 ; i<par.i_country_nb ; i++ )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
-                         par.p_ptl_desc[i].i_ptl_mai_sbyte, SEEK_SET );
-        for( j=1 ; j<=8 ; j++ )
-        {
-            par.p_ptl_mask[i].ppi_ptl_mask[j] =
-                                    malloc( par.i_vts_nb *sizeof(u16) );
-            if( par.p_ptl_mask[i].ppi_ptl_mask[j] == NULL )
-            {
-                intf_ErrMsg( "Out of memory" );
-                p_ifo->b_error = 1;
-                return par;
-            }        
-            for( k=0 ; k<par.i_vts_nb ; k++ )
-            {
-                GETS( &par.p_ptl_mask[i].ppi_ptl_mask[j][k] );
-            }
-        }
-    }
-
-    return par;
-}
-
-/*****************************************************************************
- * ReadVTSAttr : Fills the structure about VTS attributes.
- *****************************************************************************/
-static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
-{
-    vmg_vts_atrt_t  atrt;
-    int             i, j;
-    u64             i_temp;
-    off_t           i_start = p_ifo->i_pos;
-
-//fprintf( stderr, "VTS ATTR\n" );
-
-    GETS( &atrt.i_vts_nb );
-//fprintf( stderr, "VTS ATTR Nb: %d\n", atrt.i_vts_nb );
-    FLUSH( 2 );
-    GETL( &atrt.i_ebyte );
-    atrt.pi_vts_atrt_sbyte = malloc( atrt.i_vts_nb *sizeof(u32) );
-    if( atrt.pi_vts_atrt_sbyte == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return atrt;
-    }
-    for( i=0 ; i<atrt.i_vts_nb ; i++ )
-    {
-        GETL( &atrt.pi_vts_atrt_sbyte[i] );
-    }
-    atrt.p_vts_atrt = malloc( atrt.i_vts_nb *sizeof(vts_atrt_t) );
-    if( atrt.p_vts_atrt == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return atrt;
-    }
-    for( i=0 ; i<atrt.i_vts_nb ; i++ )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
-                                atrt.pi_vts_atrt_sbyte[i],
-                                SEEK_SET );
-        GETL( &atrt.p_vts_atrt[i].i_ebyte );
-        GETL( &atrt.p_vts_atrt[i].i_cat_app_type );
-//        GETS( &atrt.p_vts_atrt[i].vtsm_video_atrt );
-FLUSH(2);
-        FLUSH( 1 );
-        GETC( &atrt.p_vts_atrt[i].i_vtsm_audio_nb );
-//fprintf( stderr, "m audio nb : %d\n", atrt.p_vts_atrt[i].i_vtsm_audio_nb );
-        for( j=0 ; j<8 ; j++ )
-        {
-            GETLL( &i_temp );
-        }
-        FLUSH( 17 );
-        GETC( &atrt.p_vts_atrt[i].i_vtsm_subpic_nb );
-//fprintf( stderr, "m subp nb : %d\n", atrt.p_vts_atrt[i].i_vtsm_subpic_nb );
-        for( j=0 ; j<28 ; j++ )
-        {
-            GET( &i_temp, 6 );
-            /* FIXME : Fix endianness issue here */
-        }
-        FLUSH( 2 );
-//        GETS( &atrt.p_vts_atrt[i].vtstt_video_atrt );
-FLUSH(2);
-        FLUSH( 1 );
-        GETL( &atrt.p_vts_atrt[i].i_vtstt_audio_nb );
-//fprintf( stderr, "tt audio nb : %d\n", atrt.p_vts_atrt[i].i_vtstt_audio_nb );
-        for( j=0 ; j<8 ; j++ )
-        {
-            GETLL( &i_temp );
-        }
-        FLUSH( 17 );
-        GETC( &atrt.p_vts_atrt[i].i_vtstt_subpic_nb );
-//fprintf( stderr, "tt subp nb : %d\n", atrt.p_vts_atrt[i].i_vtstt_subpic_nb );
-        for( j=0 ; j<28/*atrt.p_vts_atrt[i].i_vtstt_subpic_nb*/ ; j++ )
-        {
-            GET( &i_temp, 6 );
-            /* FIXME : Fix endianness issue here */
-        }
-    }
-
-    return atrt;
-}
-                           
-/*****************************************************************************
- * ReadVMG : Parse video_ts.ifo file to fill the Video Manager structure.
- *****************************************************************************/
-static vmg_t ReadVMG( ifo_t* p_ifo )
-{
-    vmg_t       vmg;
-
-    p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off, SEEK_SET);
-    vmg.mat = ReadVMGInfMat( p_ifo );
-    p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off + 
-                              vmg.mat.i_fp_pgc_sbyte, SEEK_SET );
-    vmg.pgc = ReadPGC( p_ifo );
-    if( vmg.mat.i_ptt_srpt_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
-                        vmg.mat.i_ptt_srpt_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vmg.ptt_srpt = ReadVMGTitlePointer( p_ifo );
-    }
-    if( vmg.mat.i_pgci_ut_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
-                        vmg.mat.i_pgci_ut_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vmg.pgci_ut = ReadUnitTable( p_ifo );
-    }
-    if( vmg.mat.i_ptl_mait_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
-                        vmg.mat.i_ptl_mait_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vmg.ptl_mait = ReadParentalInf( p_ifo );
-    }
-    if( vmg.mat.i_vts_atrt_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
-                        vmg.mat.i_vts_atrt_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vmg.vts_atrt = ReadVTSAttr( p_ifo );
-    }
-    if( vmg.mat.i_c_adt_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
-                        vmg.mat.i_c_adt_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vmg.c_adt = ReadCellInf( p_ifo );
-    }
-    if( vmg.mat.i_vobu_admap_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
-                        vmg.mat.i_vobu_admap_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vmg.vobu_admap = ReadMap( p_ifo );
-    }
-    return vmg;
-}
-
-/*
- * Video Title Set Information Processing.
- * This is what is contained in vts_*.ifo.
- */
-
-/*****************************************************************************
- * ReadVTSInfMat : Fills the Title Set Information structure.
- *****************************************************************************/
-static vtsi_mat_t ReadVTSInfMat( ifo_t* p_ifo )
-{
-    vtsi_mat_t  mat;
-    int         i;
-    u64         i_temp;
-//    off_t       i_start = p_ifo->i_pos;
-
-//fprintf( stderr, "VTSI\n" );
-
-    GET( mat.psz_id , 12 );
-    mat.psz_id[12] = '\0';
-    GETL( &mat.i_lsector );
-    FLUSH( 12 );
-    GETL( &mat.i_i_lsector );
-    FLUSH( 1 );
-    GETC( &mat.i_spec_ver );
-    GETL( &mat.i_cat );
-    FLUSH( 90 );
-    GETL( &mat.i_mat_ebyte );
-    FLUSH( 60 );
-    GETL( &mat.i_m_vobs_ssector );
-    GETL( &mat.i_tt_vobs_ssector );
-    GETL( &mat.i_ptt_srpt_ssector );
-    GETL( &mat.i_pgcit_ssector );
-    GETL( &mat.i_m_pgci_ut_ssector );
-    GETL( &mat.i_tmap_ti_ssector );
-    GETL( &mat.i_m_c_adt_ssector );
-    GETL( &mat.i_m_vobu_admap_ssector );
-    GETL( &mat.i_c_adt_ssector );
-    GETL( &mat.i_vobu_admap_ssector );
-    FLUSH( 24 );
-//    GETS( &mat.m_video_atrt );
-FLUSH(2);
-    FLUSH( 1 );
-    GETC( &mat.i_m_audio_nb );
-    for( i=0 ; i<8 ; i++ )
-    {
-        GETLL( &i_temp );
-    }
-    FLUSH( 17 );
-    GETC( &mat.i_m_subpic_nb );
-    for( i=0 ; i<28 ; i++ )
-    {
-        GET( &i_temp, 6 );
-        /* FIXME : take care of endianness */
-    }
-    FLUSH( 2 );
-//    GETS( &mat.video_atrt );
-FLUSH(2);
-    FLUSH( 1 );
-    GETC( &mat.i_audio_nb );
-//fprintf( stderr, "vtsi audio nb : %d\n", mat.i_audio_nb );
-    for( i=0 ; i<8 ; i++ )
-    {
-        GETLL( &i_temp );
-//fprintf( stderr, "Audio %d: %llx\n", i, i_temp );
-        i_temp >>= 32;
-        mat.p_audio_atrt[i].i_lang_code = i_temp & 0xffff;
-        i_temp >>= 16;
-        mat.p_audio_atrt[i].i_num_channels = i_temp & 0x7;
-        i_temp >>= 4;
-        mat.p_audio_atrt[i].i_sample_freq = i_temp & 0x3;
-        i_temp >>= 2;
-        mat.p_audio_atrt[i].i_quantization = i_temp & 0x3;
-        i_temp >>= 2;
-        mat.p_audio_atrt[i].i_appl_mode = i_temp & 0x3;
-        i_temp >>= 2;
-        mat.p_audio_atrt[i].i_type = i_temp & 0x3;
-        i_temp >>= 2;
-        mat.p_audio_atrt[i].i_multichannel_extension = i_temp & 0x1;
-        i_temp >>= 1;
-        mat.p_audio_atrt[i].i_coding_mode = i_temp & 0x7;
-    }
-    FLUSH( 17 );
-    GETC( &mat.i_subpic_nb );
-//fprintf( stderr, "vtsi subpic nb : %d\n", mat.i_subpic_nb );
-    for( i=0 ; i<mat.i_subpic_nb ; i++ )
-    {
-        GET( &i_temp, 6 );
-        i_temp = hton64( i_temp ) >> 16;
-//fprintf( stderr, "Subpic %d: %llx\n", i, i_temp );
-        mat.p_subpic_atrt[i].i_caption = i_temp & 0xff;
-        i_temp >>= 16;
-        mat.p_subpic_atrt[i].i_lang_code = i_temp & 0xffff;
-        i_temp >>= 16;
-        mat.p_subpic_atrt[i].i_prefix = i_temp & 0xffff;
-    }
-
-    return mat;
-}
-
-/*****************************************************************************
- * ReadVTSTitlePointer : Fills the Part Of Title Search Pointer structure.
- *****************************************************************************/
-static vts_ptt_srpt_t ReadVTSTitlePointer( ifo_t* p_ifo )
-{
-    vts_ptt_srpt_t  ptr;
-    int             i;
-    off_t           i_start = p_ifo->i_pos;
-
-//fprintf( stderr, "VTS PTR\n" );
-
-    GETS( &ptr.i_ttu_nb );
-//fprintf( stderr, "VTS PTR nb: %d\n", ptr.i_ttu_nb );
-    FLUSH( 2 );
-    GETL( &ptr.i_ebyte );
-    ptr.pi_ttu_sbyte = malloc( ptr.i_ttu_nb *sizeof(u32) );
-    if( ptr.pi_ttu_sbyte == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return ptr;
-    }
-    for( i=0 ; i<ptr.i_ttu_nb ; i++ )
-    {
-        GETL( &ptr.pi_ttu_sbyte[i] );
-    }
-    /* Parsing of tts */
-    ptr.p_ttu = malloc( ptr.i_ttu_nb *sizeof(ttu_t) );
-    if( ptr.p_ttu == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return ptr;
-    }
-    for( i=0 ; i<ptr.i_ttu_nb ; i++ )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
-                        ptr.pi_ttu_sbyte[i], SEEK_SET );
-        GETS( &ptr.p_ttu[i].i_pgc_nb );
-        GETS( &ptr.p_ttu[i].i_prg_nb );
-//fprintf( stderr, "VTS %d PTR Pgc: %d Prg: %d\n", i,ptr.p_ttu[i].i_pgc_nb, ptr.p_ttu[i].i_prg_nb );
-    }
-
-    return ptr;
-}
-
-/*****************************************************************************
- * ReadVTSTimeMap : Fills the time map table
- *****************************************************************************/
-static vts_tmap_ti_t ReadVTSTimeMap( ifo_t* p_ifo )
-{
-    vts_tmap_ti_t   tmap;
-    int             i,j;
-//    off_t           i_start = p_ifo->i_pos;
-
-//fprintf( stderr, "TMAP\n" );
-
-    GETS( &tmap.i_nb );
-    FLUSH( 2 );
-    GETL( &tmap.i_ebyte );
-    tmap.pi_sbyte = malloc( tmap.i_nb *sizeof(u32) );
-    if( tmap.pi_sbyte == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return tmap;
-    }
-    for( i=0 ; i<tmap.i_nb ; i++ )
-    {    
-        GETL( &tmap.pi_sbyte[i] );
-    }
-    tmap.p_tmap = malloc( tmap.i_nb *sizeof(tmap_t) );
-    if( tmap.p_tmap == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return tmap;
-    }
-    for( i=0 ; i<tmap.i_nb ; i++ )
-    {    
-        GETC( &tmap.p_tmap[i].i_time_unit );
-        FLUSH( 1 );
-        GETS( &tmap.p_tmap[i].i_entry_nb );
-        tmap.p_tmap[i].pi_sector =
-                    malloc( tmap.p_tmap[i].i_entry_nb *sizeof(u32) );
-        if( tmap.p_tmap[i].pi_sector == NULL )
-        {
-            intf_ErrMsg( "Out of memory" );
-            p_ifo->b_error = 1;
-            return tmap;
-        }
-        for( j=0 ; j<tmap.p_tmap[i].i_entry_nb ; j++ )
-        {
-            GETL( &tmap.p_tmap[i].pi_sector[j] );
-        }
-    }
-
-    return tmap;
-}
-    
-
-/*****************************************************************************
- * IfoReadVTS : Parse vts*.ifo files to fill the Video Title Set structure.
- *****************************************************************************/
-int IfoReadVTS( ifo_t* p_ifo )
-{
-    vts_t       vts;
-    off_t       i_off;
-    int         i_title;
-
-    intf_WarnMsg( 2, "ifo: initializing VTS %d", p_ifo->i_title );
-
-    i_title = p_ifo->i_title;
-    i_off = (off_t)( p_ifo->vmg.ptt_srpt.p_tts[i_title-1].i_ssector )
-                   * DVD_LB_SIZE
-                   + p_ifo->i_off;
-
-    p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
-
-    vts.i_pos = p_ifo->i_pos;
-
-    vts.mat = ReadVTSInfMat( p_ifo );
-    if( vts.mat.i_ptt_srpt_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
-                        vts.mat.i_ptt_srpt_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vts.ptt_srpt = ReadVTSTitlePointer( p_ifo );
-    }
-    if( vts.mat.i_m_pgci_ut_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
-                        vts.mat.i_m_pgci_ut_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vts.pgci_ut = ReadUnitTable( p_ifo );
-    }
-    if( vts.mat.i_pgcit_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
-                        vts.mat.i_pgcit_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vts.pgci_ti = ReadUnit( p_ifo );
-    }
-    if( vts.mat.i_tmap_ti_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
-                        vts.mat.i_tmap_ti_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vts.tmap_ti = ReadVTSTimeMap( p_ifo );
-    }
-    if( vts.mat.i_m_c_adt_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
-                        vts.mat.i_m_c_adt_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vts.m_c_adt = ReadCellInf( p_ifo );
-    }
-    if( vts.mat.i_m_vobu_admap_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
-                        vts.mat.i_m_vobu_admap_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vts.m_vobu_admap = ReadMap( p_ifo );
-    }
-    if( vts.mat.i_c_adt_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
-                        vts.mat.i_c_adt_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vts.c_adt = ReadCellInf( p_ifo );
-    }
-    if( vts.mat.i_vobu_admap_ssector )
-    {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
-                        vts.mat.i_vobu_admap_ssector *DVD_LB_SIZE,
-                        SEEK_SET );
-        vts.vobu_admap = ReadMap( p_ifo );
-    }
-
-    p_ifo->vts = vts;
+    free( p_vobu_map->pi_vobu_start_sector );
 
     return 0;
 }
 
 /*
- * DVD Information Management
- */
-#if 0
-/*****************************************************************************
- * IfoRead : Function that fills structure and calls specified functions
- * to do it.
- *****************************************************************************/
-void IfoRead( ifo_t* p_ifo )
-{
-    int     i;
-    off_t   i_off;
-
-    /* Video Title Sets initialization */
-    p_ifo->p_vts = malloc( p_ifo->vmg.mat.i_tts_nb *sizeof(vts_t) );
-    if( p_ifo->p_vts == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_ifo->b_error = 1;
-        return;
-    }
-
-    for( i=0 ; i<p_ifo->vmg.mat.i_tts_nb ; i++ )
-    {
-
-        intf_WarnMsg( 2, "ifo: initializing VTS %d", i+1 );
-
-        i_off = (off_t)( p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector ) *DVD_LB_SIZE
-                       + p_ifo->i_off;
-
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
-
-        /* FIXME : I really don't know why udf find file
-         * does not give the exact beginning of file */
-
-        p_ifo->p_vts[i] = ReadVTS( p_ifo );
-
-    }
-
-    return; 
-}
-#endif
-/*
  * IFO virtual machine : a set of commands that give the
  * interactive behaviour of the dvd
  */
-#if 1
+#if 0
 
 #define OP_VAL_16(i) (ntoh16( com.data.pi_16[i]))
 #define OP_VAL_8(i) ((com.data.pi_8[i]))

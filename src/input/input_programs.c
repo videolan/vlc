@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.41 2001/03/15 01:42:20 sam Exp $
+ * $Id: input_programs.c,v 1.42 2001/04/01 07:31:38 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -269,7 +269,7 @@ input_area_t * input_AddArea( input_thread_t * p_input )
     p_input->stream.pp_areas[i_area_index]->i_size = 0;
     p_input->stream.pp_areas[i_area_index]->i_tell = 0;
     p_input->stream.pp_areas[i_area_index]->i_seek = NO_SEEK;
-    p_input->stream.pp_areas[i_area_index]->i_part_nb = 0;
+    p_input->stream.pp_areas[i_area_index]->i_part_nb = 1;
     p_input->stream.pp_areas[i_area_index]->i_part= 0;
 
     return p_input->stream.pp_areas[i_area_index];
@@ -368,6 +368,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
 
     /* Init its values */
     p_es->i_id = i_es_id;
+    p_es->psz_desc[0] = '\0';
     p_es->p_pes = NULL;
     p_es->p_decoder_fifo = NULL;
     p_es->b_audio = 0;
@@ -591,6 +592,12 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     decoder_capabilities_t  decoder;
     void *                  p_config;
 
+    if( p_es == NULL )
+    {
+        intf_ErrMsg( "Nothing to do in input_SelectES" );
+        return -1;
+    }
+
 #ifdef DEBUG_INPUT
     intf_DbgMsg( "Selecting ES 0x%x", p_es->i_id );
 #endif
@@ -683,6 +690,12 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     int     i_index = 0;
 
+    if( p_es == NULL )
+    {
+        intf_ErrMsg( "Nothing to do in input_UnselectES" );
+        return -1;
+    }
+
 #ifdef DEBUG_INPUT
     intf_DbgMsg( "Unselecting ES 0x%x", p_es->i_id );
 #endif
@@ -693,12 +706,10 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
         return( -1 );
     }
 
-    /* Release lock, not to block the input thread. */
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
     input_EndDecoder( p_input, p_es );
-    vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    if( p_es->p_decoder_fifo == NULL )
+    if( ( p_es->p_decoder_fifo == NULL ) &&
+        ( p_input->stream.i_selected_es_number > 0 ) )
     {
         p_input->stream.i_selected_es_number--;
 
@@ -715,11 +726,14 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
                                            p_input->stream.pp_selected_es,
                                            p_input->stream.i_selected_es_number
                                             * sizeof(es_descriptor_t *) );
+
         if( p_input->stream.pp_selected_es == NULL )
         {
-            intf_ErrMsg( "Unable to realloc memory in input_UnSelectES" );
-            return(-1);
+            intf_ErrMsg( "No more selected ES in input_UnselectES" );
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            return( 1 );
         }
     }
+
     return( 0 );
 }

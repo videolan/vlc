@@ -7,7 +7,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.3 2001/03/22 01:23:03 stef Exp $
+ * $Id: dvd_netlist.c,v 1.4 2001/04/01 07:31:38 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -357,7 +357,7 @@ struct data_packet_s * DVDNewPacket( void * p_method_data,
 {
     dvd_netlist_t *         p_netlist;
     struct data_packet_s *  p_packet;
-
+//intf_ErrMsg( "netlist: New packet" );
     /* cast */
     p_netlist = (dvd_netlist_t *)p_method_data;
     
@@ -382,14 +382,18 @@ struct data_packet_s * DVDNewPacket( void * p_method_data,
     p_packet = p_netlist->pp_free_data[p_netlist->i_data_start];
         
     p_packet->p_buffer =
-               p_netlist->p_free_iovec[p_netlist->i_iovec_start].iov_base;
+              p_netlist->p_free_iovec[p_netlist->i_iovec_start].iov_base;
         
     p_packet->p_payload_start = p_packet->p_buffer;
         
     p_packet->p_payload_end =
-               p_packet->p_buffer + i_buffer_size;
+              p_packet->p_buffer + i_buffer_size;
+
+    p_packet->p_next = NULL;
+    p_packet->b_discard_payload = 0;
 
     p_packet->pi_refcount = p_netlist->pi_refcount + p_netlist->i_iovec_start;
+    (*p_packet->pi_refcount)++;
 
     p_netlist->i_iovec_start ++;
     p_netlist->i_iovec_start &= p_netlist->i_nb_iovec;
@@ -411,6 +415,7 @@ struct pes_packet_s * DVDNewPES( void * p_method_data )
     dvd_netlist_t *     p_netlist;
     pes_packet_t *      p_return;
     
+//intf_ErrMsg( "netlist: New pes" );
     /* cast */ 
     p_netlist = (dvd_netlist_t *)p_method_data;
     
@@ -433,9 +438,10 @@ struct pes_packet_s * DVDNewPES( void * p_method_data )
     vlc_mutex_unlock (&p_netlist->lock);
     
     /* initialize PES */
-    p_return->b_data_alignment = 
-        p_return->b_discontinuity = 
-        p_return->i_pts = p_return->i_dts = 0;
+    p_return->b_data_alignment = 0;
+    p_return->b_discontinuity = 0; 
+    p_return->i_pts = 0;
+    p_return->i_dts = 0;
     p_return->i_pes_size = 0;
     p_return->p_first = NULL;
 
@@ -461,6 +467,9 @@ void DVDDeletePacket( void * p_method_data, data_packet_t * p_data )
     p_netlist->i_data_end &= p_netlist->i_nb_data;
     
     p_netlist->pp_free_data[p_netlist->i_data_end] = p_data;
+
+    p_data->p_next = NULL;
+    p_data->b_discard_payload = 0;
 
     /* Update reference counter */
     (*p_data->pi_refcount)--;
@@ -510,7 +519,7 @@ void DVDDeletePES( void * p_method_data, pes_packet_t * p_pes )
         /* Update reference counter */
         (*p_current_packet->pi_refcount)--;
 
-        if( (*p_current_packet->pi_refcount) == 0 )
+        if( (*p_current_packet->pi_refcount) <= 0 )
         {
             p_netlist->i_iovec_end++;
             p_netlist->i_iovec_end &= p_netlist->i_nb_iovec;
@@ -520,6 +529,7 @@ void DVDDeletePES( void * p_method_data, pes_packet_t * p_pes )
     
         p_next_packet = p_current_packet->p_next;
         p_current_packet->p_next = NULL;
+        p_current_packet->b_discard_payload = 0;
         p_current_packet = p_next_packet;
     }
  

@@ -2,9 +2,10 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.18 2001/03/21 13:42:34 sam Exp $
+ * $Id: gnome_callbacks.c,v 1.19 2001/04/01 07:31:38 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Stéphane Borel <stef@via.ecp.fr>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -244,7 +245,10 @@ on_menubar_audio_toggle                (GtkCheckMenuItem     *menuitem,
 
     p_es = (es_descriptor_t*)user_data;
 
-    input_ChangeES( p_intf->p_input, p_es, 1 );
+    if( p_intf->p_sys->b_menus_ready )
+    {
+        input_ToggleES( p_intf->p_input, p_es, menuitem->active );
+    }
 }
 
 
@@ -257,7 +261,10 @@ on_menubar_subtitle_toggle             (GtkCheckMenuItem     *menuitem,
 
     p_es = (es_descriptor_t*)user_data;
 
-    input_ChangeES( p_intf->p_input, p_es, 2 );
+    if( p_intf->p_sys->b_menus_ready )
+    {
+        input_ToggleES( p_intf->p_input, p_es, menuitem->active );
+    }
 }
 
 
@@ -267,9 +274,13 @@ on_menubar_title_toggle                (GtkCheckMenuItem     *menuitem,
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
-    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)user_data );
-    p_intf->p_sys->b_menus_update = 1;
-    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    if( menuitem->active && p_intf->p_sys->b_menus_ready )
+    {
+        p_intf->p_input->pf_set_area( p_intf->p_input,
+                                     (input_area_t*)user_data );
+        p_intf->p_sys->b_menus_update = 1;
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    }
 }
 
 
@@ -281,9 +292,12 @@ on_menubar_chapter_toggle              (GtkCheckMenuItem     *menuitem,
     input_area_t *  p_area    = p_intf->p_input->stream.p_selected_area;
     gint            i_chapter = (gint)user_data;
 
-    p_area->i_part = i_chapter;
+    if( menuitem->active && p_intf->p_sys->b_menus_ready )
+    {
+        p_area->i_part = i_chapter;
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+    }
 
-    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
     input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 }
 
@@ -558,7 +572,10 @@ on_popup_audio_toggle                  (GtkCheckMenuItem     *menuitem,
 
     p_es = (es_descriptor_t*)user_data;
 
-    input_ChangeES( p_intf->p_input, p_es, 1 );
+    if( p_intf->p_sys->b_menus_ready )
+    {
+        input_ToggleES( p_intf->p_input, p_es, menuitem->active );
+    }
 }
 
 
@@ -571,7 +588,10 @@ on_popup_subtitle_toggle            (GtkCheckMenuItem     *menuitem,
 
     p_es = (es_descriptor_t*)user_data;
 
-    input_ChangeES( p_intf->p_input, p_es, 2 );
+    if( p_intf->p_sys->b_menus_ready )
+    {
+        input_ToggleES( p_intf->p_input, p_es, menuitem->active );
+    }
 }
 
 
@@ -579,14 +599,15 @@ void
 on_popup_navigation_toggle             (GtkCheckMenuItem     *menuitem,
                                         gpointer             user_data)
 {
-    if( menuitem->active )
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+
+    if( menuitem->active && p_intf->p_sys->b_menus_ready )
     {
-        intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
         input_area_t *  p_area;
         gint            i_title;
         gint            i_chapter;
 
-        i_title   = (gint)(user_data) / 100 ;
+        i_title   = (gint)(user_data) / 100;
         i_chapter = (gint)(user_data) - ( 100 * i_title );
 
         if( i_title != p_intf->p_input->stream.p_selected_area->i_id )
@@ -598,7 +619,7 @@ on_popup_navigation_toggle             (GtkCheckMenuItem     *menuitem,
         p_area->i_part = i_chapter;
 
         p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
-                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
     }
 }
 

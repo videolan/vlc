@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-intf.c,v 1.17 2001/03/21 13:42:34 sam Exp $
+ * $Id: input_ext-intf.c,v 1.18 2001/04/01 07:31:38 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -289,6 +289,36 @@ int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
 
             input_UnselectES( p_input,
                               p_input->stream.pp_selected_es[i_index] );
+        }
+    }
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return 0;
+}
+
+/*****************************************************************************
+ * input_ToggleES: answers to a user request with calls to (Un)SelectES
+ *****************************************************************************
+ * Useful since the interface plugins know p_es.
+ * It only works for audio & spu ( to be sure nothing nasty is being done ).
+ * b_select is a boolean to know if we have to select or unselect ES
+ *****************************************************************************/
+int input_ToggleES( input_thread_t * p_input, es_descriptor_t * p_es,
+                    boolean_t b_select )
+{
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    if( p_es != NULL && ( p_es->b_audio || p_es->b_spu ) )
+    {
+        if( b_select )
+        {
+            input_SelectES( p_input, p_es );
+        }
+        else
+        {
+            input_UnselectES( p_input, p_es );
         }
     }
 
