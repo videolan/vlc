@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.7 2001/08/22 17:21:46 massiot Exp $
+ * $Id: vpar_headers.c,v 1.8 2001/09/06 13:16:26 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -458,11 +458,8 @@ static void GroupHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void PictureHeader( vpar_thread_t * p_vpar )
 {
-    int                 i_structure;
-    boolean_t           b_parsable;
-#ifdef VDEC_SMP
-    int                 i_mb;
-#endif
+    int                 i_structure, i_previous_coding_type;
+    boolean_t           b_parsable = 0;
 
     /* Recover in case of stream discontinuity. */
     if( p_vpar->sequence.b_expect_discontinuity )
@@ -480,6 +477,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
     /* Parse the picture header. */
     RemoveBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
+    i_previous_coding_type = p_vpar->picture.i_coding_type;
     p_vpar->picture.i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
     RemoveBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
 
@@ -565,40 +563,30 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     p_vpar->pc_pictures[p_vpar->picture.i_coding_type]++;
 #endif
 
-    if( p_vpar->picture.i_current_structure &&
-        (i_structure == FRAME_STRUCTURE ||
-         i_structure == p_vpar->picture.i_current_structure) )
-    {
-        /* We don't have the second field of the buffered frame. */
-        if( p_vpar->picture.p_picture != NULL )
-        {
-            ReferenceReplace( p_vpar,
-                      p_vpar->picture.i_coding_type,
-                      NULL );
-            vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
-            p_vpar->picture.p_picture = NULL;
-        }
-
-        p_vpar->picture.i_current_structure = 0;
-
-        intf_WarnMsg( 2, "Odd number of field pictures." );
-    }
-
-    /* Do we have the reference pictures ? */
-    b_parsable = !(((p_vpar->picture.i_coding_type == P_CODING_TYPE ||
-                     p_vpar->picture.b_concealment_mv) &&
-                    (p_vpar->sequence.p_backward == NULL)) ||
-                     /* p_backward will become p_forward later */
-                   ((p_vpar->picture.i_coding_type == B_CODING_TYPE) &&
-                    (p_vpar->sequence.p_forward == NULL ||
-                     p_vpar->sequence.p_backward == NULL)));
-
     if( p_vpar->picture.i_current_structure )
     {
-        /* Second field of a frame. We will decode it if, and only if we
-         * have decoded the first field. */
-        if( b_parsable )
+        if ( (i_structure == FRAME_STRUCTURE ||
+              i_structure == p_vpar->picture.i_current_structure) )
         {
+            /* We don't have the second field of the buffered frame. */
+            if( p_vpar->picture.p_picture != NULL )
+            {
+                ReferenceReplace( p_vpar,
+                                  p_vpar->picture.i_coding_type,
+                                  NULL );
+                vout_DestroyPicture( p_vpar->p_vout,
+                                     p_vpar->picture.p_picture );
+                p_vpar->picture.p_picture = NULL;
+            }
+
+            p_vpar->picture.i_current_structure = 0;
+
+            intf_WarnMsg( 2, "Odd number of field pictures." );
+        }
+        else
+        {
+            /* Second field of a frame. We will decode it if, and only if we
+             * have decoded the first field. */
             if( p_vpar->picture.p_picture == NULL )
             {
                 if( (p_vpar->picture.i_coding_type == I_CODING_TYPE
@@ -615,11 +603,46 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                     b_parsable = 0;
                 }
             }
+            else
+            {
+                /* We suppose we have the reference pictures, since we already
+                 * decoded the first field and the second field will not need
+                 * any extra reference picture. There is a special case of
+                 * P field being the second field of an I field, but ISO/IEC
+                 * 13818-2 section 7.6.3.5 specifies that this P field will
+                 * not need any reference picture besides the I field. So far
+                 * so good. */
+                b_parsable = 1;
+
+                if( p_vpar->picture.i_coding_type == P_CODING_TYPE &&
+                    i_previous_coding_type == I_CODING_TYPE &&
+                    p_vpar->sequence.p_forward == NULL )
+                {
+                    /* This is the special case of section 7.6.3.5. Create
+                     * a fake reference picture (which will not be used)
+                     * but will prevent us from segfaulting in the slice
+                     * parsing. */
+                    static picture_t    fake_picture;
+                    fake_picture.p_data = NULL; /* We will use it later */
+                    p_vpar->sequence.p_forward = &fake_picture;
+                }
+            }
         }
     }
-    else
+
+    if( !p_vpar->picture.i_current_structure )
     {
+        /* First field of a frame, or new frame picture. */
         int     i_repeat_field;
+
+        /* Do we have the reference pictures ? */
+        b_parsable = !(((p_vpar->picture.i_coding_type == P_CODING_TYPE ||
+                         p_vpar->picture.b_concealment_mv) &&
+                        (p_vpar->sequence.p_backward == NULL)) ||
+                         /* p_backward will become p_forward later */
+                       ((p_vpar->picture.i_coding_type == B_CODING_TYPE) &&
+                        (p_vpar->sequence.p_forward == NULL ||
+                         p_vpar->sequence.p_backward == NULL)));
 
         /* Compute the number of times the frame will be emitted by the
          * decoder (number of half-periods). */
@@ -795,6 +818,14 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
     {
         return;
+    }
+
+    if( p_vpar->sequence.p_forward != NULL &&
+        p_vpar->sequence.p_forward->p_data == NULL )
+    {
+        /* This can only happen with the fake picture created for section
+         * 7.6.3.5. Clean up our mess. */
+        p_vpar->sequence.p_forward = NULL;
     }
 
     if( p_vpar->picture.b_error )

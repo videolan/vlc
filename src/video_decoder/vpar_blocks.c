@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.9 2001/09/05 16:07:50 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.10 2001/09/06 13:16:26 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -1812,8 +1812,7 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
             pp_forward_ref[!p_vpar->picture.b_current_field] =
                 p_vpar->picture.p_picture;
         }
-        if( ( i_coding_type != I_CODING_TYPE || 
-              p_vpar->picture.b_concealment_mv ) && pp_forward_ref[1] != NULL )
+        if( i_coding_type != I_CODING_TYPE || p_vpar->picture.b_concealment_mv )
         {
             p_f_motion->pppi_ref[1][0] =
                     pp_forward_ref[1]->p_y + i_offset * 4 + i_width;
