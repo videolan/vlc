@@ -1,5 +1,5 @@
 %define name 		vlc
-%define vlc_ver 	0.4.5
+%define vlc_ver 	0.4.6
 %define version		%vlc_ver
 
 %define cvs     	0
@@ -408,6 +408,9 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/alsa.so
 
 %changelog
+* Mon Oct 28 2002 Alexis de Lattre <alexis@videolan.org> 0.4.6
+- new upstream release
+
 * Mon Oct 14 2002 Alexis de Lattre <alexis@videolan.org> 0.4.5
 - new upstream release
 

@@ -3,10 +3,13 @@
 #===================#
 
 0.4.6
-Not released yet.
+Mon, 28 Oct 2002 23:53:56 +0100
 
   * plugins/network/ipv4.c: fixed a crash with multicast addresses when no
     interface address is given.
+  * plugins/directx/vout_directx.c: fixed a nasty segfault on initialization.
+  * plugins/dsp/aout_dsp.c: Added O_NONBLOCK flag to the open command,
+    so that if /dev/dsp is used, vlc tries with other plugins (like esd).
 
 0.4.5
 Fri, 11 Oct 2002 15:37:41 +0200
