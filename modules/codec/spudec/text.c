@@ -2,7 +2,7 @@
  * text.c: text subtitles parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: text.c,v 1.4 2003/01/30 16:36:04 gbazin Exp $
+ * $Id: text.c,v 1.5 2003/05/11 14:33:32 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -20,6 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/* define USE_FREETYPE here to disable the old style subtitles */
 
 /*****************************************************************************
  * Preamble
@@ -42,9 +44,9 @@
  *****************************************************************************/
 void E_(ParseText)( spudec_thread_t *p_spudec, subtitler_font_t *p_font )
 {
+#if !defined(USE_FREETYPE)
     char         * psz_subtitle;
     mtime_t        i_pts, i_dts;
-
     /* We cannot display a subpicture with no date */
     i_pts = p_spudec->bit_stream.p_pes->i_pts;
     i_dts = p_spudec->bit_stream.p_pes->i_dts;
@@ -82,4 +84,7 @@ void E_(ParseText)( spudec_thread_t *p_spudec, subtitler_font_t *p_font )
      * p_spudec->bit_stream->p_data is valid since we check later on
      * for b_die and b_error */
     NextDataPacket( p_spudec->p_fifo, &p_spudec->bit_stream );
+#else
+    msleep(10);
+#endif
 }
