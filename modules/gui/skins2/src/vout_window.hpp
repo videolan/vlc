@@ -56,6 +56,8 @@ class VoutWindow: public GenericWindow
         /// Refresh an area of the window
         virtual void refresh( int left, int top, int width, int height );
 
+        virtual string getType() const { return "Vout"; }
+
     private:
         /// Image when there is no video
         OSGraphics *m_pImage;
