@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.67 2003/11/05 00:39:17 gbazin Exp $
+ * $Id: configuration.c,v 1.68 2003/11/05 17:57:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -95,6 +95,9 @@ int __config_GetType( vlc_object_t *p_this, const char *psz_name )
         break;
 
     case CONFIG_ITEM_MODULE:
+        i_type = VLC_VAR_MODULE;
+        break;
+
     case CONFIG_ITEM_STRING:
         i_type = VLC_VAR_STRING;
         break;

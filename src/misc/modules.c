@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.137 2003/10/07 09:32:48 gbazin Exp $
+ * $Id: modules.c,v 1.138 2003/11/05 17:57:29 gbazin Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -288,7 +288,10 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     /* Deal with variables */
     if( psz_name && psz_name[0] == '$' )
     {
-        psz_var = config_GetPsz( p_this, psz_name + 1 );
+        vlc_value_t val;
+        var_Create( p_this, psz_name + 1, VLC_VAR_MODULE | VLC_VAR_DOINHERIT );
+        var_Get( p_this, psz_name + 1, &val );
+        psz_var = val.psz_string;
         psz_name = psz_var;
     }
 

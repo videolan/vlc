@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.33 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: variables.c,v 1.34 2003/11/05 17:57:29 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -1156,6 +1156,7 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
         case VLC_VAR_FILE:
         case VLC_VAR_DIRECTORY:
         case VLC_VAR_STRING:
+        case VLC_VAR_MODULE:
             p_val->psz_string = config_GetPsz( p_this, psz_name );
             if( !p_val->psz_string ) p_val->psz_string = strdup("");
             break;

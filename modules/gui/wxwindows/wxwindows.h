@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.66 2003/10/29 17:32:54 zorglub Exp $
+ * $Id: wxwindows.h,v 1.67 2003/11/05 17:57:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -351,11 +351,6 @@ private:
     void OnSoutEnable( wxCommandEvent& event );
     void OnSoutSettings( wxCommandEvent& WXUNUSED(event) );
 
-    /* Event handlers for the demux dump */
-    void OnDemuxDumpEnable( wxCommandEvent& event );
-    void OnDemuxDumpBrowse( wxCommandEvent& event );
-    void OnDemuxDumpChange( wxCommandEvent& event );
-
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
@@ -406,12 +401,6 @@ private:
     wxCheckBox *sout_checkbox;
     SoutDialog *sout_dialog;
     wxArrayString sout_mrl;
-
-    /* Controls for the demux dump */
-    wxTextCtrl *demuxdump_textctrl;
-    wxButton *demuxdump_button;
-    wxCheckBox *demuxdump_checkbox;
-    wxFileDialog *demuxdump_dialog;
 };
 
 enum
@@ -549,6 +538,7 @@ private:
     /* Event handlers for the file access output */
     void OnFileChange( wxCommandEvent& event );
     void OnFileBrowse( wxCommandEvent& event );
+    void OnFileDump( wxCommandEvent& event );
 
     /* Event handlers for the net access output */
     void OnNetChange( wxCommandEvent& event );
@@ -575,26 +565,31 @@ private:
     wxComboBox *mrl_combo;
 
     /* Controls for the access outputs */
+    wxPanel *access_panel;
     wxPanel *access_subpanels[ACCESS_OUT_NUM];
     wxCheckBox *access_checkboxes[ACCESS_OUT_NUM];
 
     int i_access_type;
 
     wxComboBox *file_combo;
+    wxCheckBox *dump_checkbox;
     wxSpinCtrl *net_ports[ACCESS_OUT_NUM];
     wxTextCtrl *net_addrs[ACCESS_OUT_NUM];
 
     /* Controls for the SAP announces */
+    wxPanel *misc_panel;
     wxPanel *misc_subpanels[MISC_SOUT_NUM];
     wxCheckBox *sap_checkbox;
     wxCheckBox *slp_checkbox;
     wxTextCtrl *announce_addr;
 
     /* Controls for the encapsulation */
+    wxPanel *encapsulation_panel;
     wxRadioButton *encapsulation_radios[ENCAPS_NUM];
     int i_encapsulation_type;
 
     /* Controls for transcoding */
+    wxPanel *transcoding_panel;
     wxCheckBox *video_transc_checkbox;
     wxComboBox *video_codec_combo;
     wxComboBox *audio_codec_combo;

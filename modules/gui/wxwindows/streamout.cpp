@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.33 2003/10/27 22:13:36 gbazin Exp $
+ * $Id: streamout.cpp,v 1.34 2003/11/05 17:57:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -55,6 +55,7 @@ enum
 
     FileBrowse_Event,
     FileName_Event,
+    FileDump_Event,
 
     AccessType1_Event, AccessType2_Event, AccessType3_Event,
     AccessType4_Event, AccessType5_Event, AccessType6_Event,
@@ -87,6 +88,7 @@ BEGIN_EVENT_TABLE(SoutDialog, wxDialog)
     EVT_CHECKBOX(AccessType6_Event, SoutDialog::OnAccessTypeChange)
     EVT_TEXT(FileName_Event, SoutDialog::OnFileChange)
     EVT_BUTTON(FileBrowse_Event, SoutDialog::OnFileBrowse)
+    EVT_CHECKBOX(FileDump_Event, SoutDialog::OnFileDump)
 
     EVT_TEXT(NetPort1_Event, SoutDialog::OnNetChange)
     EVT_TEXT(NetAddr1_Event, SoutDialog::OnNetChange)
@@ -136,6 +138,33 @@ BEGIN_EVENT_TABLE(SoutDialog, wxDialog)
 
 END_EVENT_TABLE()
 
+#if 0
+/*****************************************************************************
+ * Demux dump event methods.
+ *****************************************************************************/
+void OpenDialog::OnDemuxDumpEnable( wxCommandEvent& event )
+{
+    demuxdump_textctrl->Enable( event.GetInt() != 0 );
+    demuxdump_button->Enable( event.GetInt() != 0 );
+
+    if( event.GetInt() )
+    {
+        sout_checkbox->SetValue( 0 );
+        subsfile_checkbox->SetValue( 0 );
+        wxCommandEvent event = wxCommandEvent( wxEVT_NULL );
+        event.SetInt( 0 );
+        OnSoutEnable( event );
+        OnSubsFileEnable( event );
+    }
+
+    UpdateMRL( i_current_access_method );
+}
+
+void OpenDialog::OnDemuxDumpChange( wxCommandEvent& WXUNUSED(event) )
+{
+}
+#endif
+
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
@@ -171,16 +200,16 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     mrl_sizer_sizer->Add( mrl_sizer, 1, wxEXPAND | wxALL, 5 );
 
     /* Create the output encapsulation panel */
-    wxPanel *encapsulation_panel = EncapsulationPanel( panel );
+    encapsulation_panel = EncapsulationPanel( panel );
 
     /* Create the access output panel */
-    wxPanel *access_panel = AccessPanel( panel );
+    access_panel = AccessPanel( panel );
 
     /* Create the transcoding panel */
-    wxPanel *transcoding_panel = TranscodingPanel( panel );
+    transcoding_panel = TranscodingPanel( panel );
 
     /* Create the Misc panel */
-    wxPanel *misc_panel = MiscPanel( panel );
+    misc_panel = MiscPanel( panel );
 
     /* Separation */
     wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );
@@ -227,6 +256,19 @@ wxArrayString SoutDialog::GetOptions()
  *****************************************************************************/
 void SoutDialog::UpdateMRL()
 {
+    /* Check the demux dump option */
+    if( dump_checkbox->IsChecked() )
+    {
+        wxString dumpfile;
+
+        if( file_combo->GetValue().size() )
+            dumpfile = wxT(" :demuxdump-file=\"") +
+                       file_combo->GetValue() + wxT("\"");
+        mrl_combo->SetValue( wxT(":demux=demuxdump") + dumpfile );
+
+        return;
+    }
+
     /* Let's start with the transcode options */
     wxString transcode;
     if( video_transc_checkbox->IsChecked() ||
@@ -404,7 +446,7 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
     access_subpanels[0]->Hide();
 
     /* File row */
-    subpanel_sizer = new wxFlexGridSizer( 3, 1, 20 );
+    subpanel_sizer = new wxFlexGridSizer( 3, 2, 20 );
     label = new wxStaticText( access_subpanels[1], -1, wxU(_("Filename")) );
     file_combo = new wxComboBox( access_subpanels[1], FileName_Event, wxT(""),
                                  wxPoint(20,25), wxSize(200, -1), 0, NULL );
@@ -415,6 +457,14 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
                          wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( browse_button, 0,
                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+    subpanel_sizer->Add( new wxPanel(access_subpanels[1], -1), 0,
+                         wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+    subpanel_sizer->Add( new wxPanel(access_subpanels[1], -1), 0,
+                         wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+    dump_checkbox = new wxCheckBox( access_subpanels[1], FileDump_Event,
+                                    wxU(_("Dump raw input")) );
+    subpanel_sizer->Add( dump_checkbox, 0,
+                         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxTOP, 5 );
 
     access_subpanels[1]->SetSizerAndFit( subpanel_sizer );
 
@@ -815,6 +865,24 @@ void SoutDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
         file_combo->SetValue( dialog.GetPath() );
         UpdateMRL();
     }
+}
+
+void SoutDialog::OnFileDump( wxCommandEvent& event )
+{
+    misc_panel->Enable( !event.GetInt() );
+    encapsulation_panel->Enable( !event.GetInt() );
+    transcoding_panel->Enable( !event.GetInt() );
+
+    for( int i = 0; i < ACCESS_OUT_NUM; i++ )
+    {
+        if( i != FILE_ACCESS_OUT )
+        {
+            access_subpanels[i]->Enable( !event.GetInt() );
+            access_checkboxes[i]->Enable( !event.GetInt() );
+        }
+    }
+
+    UpdateMRL();
 }
 
 /*****************************************************************************

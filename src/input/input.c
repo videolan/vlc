@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.251 2003/11/04 02:23:11 fenrir Exp $
+ * $Id: input.c,v 1.252 2003/11/05 17:57:29 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -706,8 +706,10 @@ static int InitThread( input_thread_t * p_input )
     }
 
     /* Find and open appropriate demux module */
-    p_input->p_demux = module_Need( p_input, "demux",
-                                    p_input->psz_demux );
+    p_input->p_demux =
+        module_Need( p_input, "demux",
+                     (p_input->psz_demux && *p_input->psz_demux) ?
+                     p_input->psz_demux : "$demux" );
 
     if( p_input->p_demux == NULL )
     {
@@ -944,6 +946,7 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
         break;
 
     case VLC_VAR_STRING:
+    case VLC_VAR_MODULE:
     case VLC_VAR_FILE:
     case VLC_VAR_DIRECTORY:
         val.psz_string = psz_value;

@@ -2,7 +2,7 @@
  * demuxdump.c : Pseudo demux module for vlc (dump raw stream)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demuxdump.c,v 1.10 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: demuxdump.c,v 1.11 2003/11/05 17:57:29 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -79,7 +79,7 @@ static int Activate( vlc_object_t * p_this )
 {
     input_thread_t      *p_input = (input_thread_t *)p_this;
     demux_sys_t         *p_demux;
-
+    vlc_value_t         val;
     char                *psz_name;
 
     /* Set the demux function */
@@ -93,7 +93,9 @@ static int Activate( vlc_object_t * p_this )
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
     
-    psz_name = config_GetPsz( p_input, "demuxdump-file" );
+    var_Create( p_input, "demuxdump-file", VLC_VAR_FILE|VLC_VAR_DOINHERIT );
+    var_Get( p_input, "demuxdump-file", &val );
+    psz_name = val.psz_string;
     if( !psz_name || !*psz_name )
     {
         msg_Warn( p_input, "no dump file name given" );
