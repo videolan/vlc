@@ -91,8 +91,12 @@ static void __fastcall LangChange( TMenuItem *RootCurrent, TMenuItem *Item,
     es_descriptor_t       * p_es;
     es_descriptor_t       * p_es_old;
     int                     i_index;
+    int                     i_es;
 
     /* find the selected ES */
+    i_es = Item->Tag;
+
+    /* find selected menu item */
     i_index = Item2Index( RootCurrent, Item ) - 1;
     if( i_index < 0 )
     {
@@ -102,7 +106,7 @@ static void __fastcall LangChange( TMenuItem *RootCurrent, TMenuItem *Item,
     else
     {
         vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
-        p_es = p_input_bank->pp_input[0]->stream.pp_es[i_index];
+        p_es = p_input_bank->pp_input[0]->stream.pp_es[i_es];
         vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
     }
 
@@ -475,6 +479,7 @@ static void __fastcall LanguageMenu( TMenuItem * Root, es_descriptor_t * p_es,
     Item->Hint = Name;
     Item->Caption = Name;
     Item->OnClick = MenuItemClick;
+    Item->Tag = -1;
     Root->Add( Item );
 
     /* separator item */
@@ -507,6 +512,7 @@ static void __fastcall LanguageMenu( TMenuItem * Root, es_descriptor_t * p_es,
             Item->RadioItem = true;
             Item->Hint = Name;
             Item->Caption = Name;
+            Item->Tag = i;
 
             if( p_es == p_input_bank->pp_input[0]->stream.pp_es[i] )
             {
