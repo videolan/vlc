@@ -583,7 +583,7 @@ static int ReadICYMeta( access_t *p_access )
 
     psz_meta[buffer[0]*16 + 1] = '\0'; /* Just in case */
 
-    msg_Warn( p_access, "icy-meta=%s", psz_meta );
+    msg_Dbg( p_access, "icy-meta=%s", psz_meta );
 
     /* Now parse the meta */
     /* Look for StreamTitle= */
@@ -614,7 +614,7 @@ static int ReadICYMeta( access_t *p_access )
 
     free( psz_meta );
 
-    msg_Warn( p_access, "New Title=%s", p_sys->psz_icy_title );
+    msg_Dbg( p_access, "New Title=%s", p_sys->psz_icy_title );
 
     return VLC_SUCCESS;
 }
