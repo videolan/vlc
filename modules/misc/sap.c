@@ -498,6 +498,8 @@ static int Demux( demux_t *p_demux )
    p_playlist = (playlist_t *)vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
 
+   p_playlist->status.p_item->i_flags |= PLAYLIST_DEL_FLAG;
+
    playlist_Add( p_playlist, p_sdp->psz_uri, p_sdp->psz_sessionname,
                  PLAYLIST_APPEND, PLAYLIST_END );
 

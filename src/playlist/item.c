@@ -190,6 +190,21 @@ void playlist_ItemAddParent( playlist_item_t *p_item, int i_view,
    }
 }
 
+/**
+ * Copy all parents from parent to child
+ */
+void playlist_CopyParents( playlist_item_t *p_parent,
+                           playlist_item_t *p_child )
+{
+    int i=0;
+    for( i= 0 ; i< p_parent->i_parents; i ++ )
+    {
+        playlist_ItemAddParent( p_child,
+                                p_parent->pp_parents[i]->i_view,
+                                p_parent );
+    }
+}
+
 
 /**********************************************************************
  * playlist_item_t structure accessors

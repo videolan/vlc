@@ -119,7 +119,6 @@ Todo:<br />
    - *** Improve random mode and fix loop<br />
    - *   "Name finder"<br />
    - *   "Protocol rollover" node<br />
-   - *** Fix autodeletion<br />
    - *** Item moving/copying facilities<br />
    - *** Live directory representation<br /> 
 - Helper modules<br />
@@ -630,7 +629,6 @@ Sound Files( .mp3, .ogg, .wav, .m4a, .m4p)<br />
 Video Files( .avi, .mkv, .mov, .mpg, .m2v, etc)<br />
 Subtitle Files( .idx, .sub, .utf, .srt)<br />
 Status: Todo
-
 
 
 # Do not remove me

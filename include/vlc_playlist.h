@@ -216,6 +216,7 @@ VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
 VLC_EXPORT( playlist_item_t* , __playlist_ItemNew, ( vlc_object_t *,const char *,const char * ) );
 VLC_EXPORT( void, playlist_ItemDelete, ( playlist_item_t * ) );
 VLC_EXPORT( void, playlist_ItemAddParent, ( playlist_item_t *, int,playlist_item_t *) );
+VLC_EXPORT( void, playlist_CopyParents, ( playlist_item_t *,playlist_item_t *) );
 /* Item informations accessors */
 VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *,  char * ) );
 VLC_EXPORT( int, playlist_ItemSetDuration, (playlist_item_t *, mtime_t ) );

@@ -321,7 +321,6 @@ static int ReadDir( playlist_t *p_playlist,
     DIR *                       p_current_dir;
     struct dirent *             p_dir_content;
     playlist_item_t *p_node;
-    int i;
 
    /* Change the item to a node */
    if( p_parent->i_children == -1)
@@ -381,15 +380,10 @@ static int ReadDir( playlist_t *p_playlist,
                                        p_parent->pp_parents[0]->i_view,
                                        psz_uri, p_parent );
 
+                    playlist_CopyParents(  p_parent, p_node );
+
                     p_node->input.i_type = ITEM_TYPE_DIRECTORY;
-                    /* We need to declare the parents of the node as the
-                     * same of the parent's ones */
-                    for( i= 1 ; i< p_parent->i_parents; i ++ )
-                    {
-                        playlist_ItemAddParent( p_node,
-                                                p_parent->pp_parents[i]->i_view,
-                                                p_parent );
-                    }
+
                     if( ReadDir( p_playlist, psz_uri , MODE_EXPAND,
                                  pi_position, p_node ) != VLC_SUCCESS )
                     {
@@ -401,20 +395,12 @@ static int ReadDir( playlist_t *p_playlist,
             {
                 playlist_item_t *p_item = playlist_ItemNew( p_playlist,
                                 psz_uri, p_dir_content->d_name );
-                fprintf(stderr,"STARTTTTt\n");
                 playlist_NodeAddItem( p_playlist,p_item,
                                       p_parent->pp_parents[0]->i_view,
                                       p_parent,
                                       PLAYLIST_APPEND, PLAYLIST_END );
-                fprintf(stderr,"DONE\n");
-                /* We need to declare the parents of the node as the
-                 * same of the parent's ones */
-                for( i= 1 ; i< p_parent->i_parents; i ++ )
-                {
-                    playlist_ItemAddParent( p_item,
-                                            p_parent->pp_parents[i]->i_view,
-                                            p_parent );
-                }
+
+                playlist_CopyParents( p_parent, p_item );
             }
         }
         free( psz_uri );
