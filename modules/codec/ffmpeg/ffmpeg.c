@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.62 2003/11/28 16:09:07 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.63 2003/11/28 23:40:09 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -29,6 +29,7 @@
 #include <vlc/decoder.h>
 
 /* ffmpeg header */
+#define HAVE_MMX
 #ifdef HAVE_FFMPEG_AVCODEC_H
 #   include <ffmpeg/avcodec.h>
 #else
@@ -144,28 +145,24 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_context = avcodec_alloc_context();
 
     /* Set CPU capabilities */
-#ifdef HAVE_MMX
     p_context->dsp_mask = 0;
-    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
+    if( !(p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_MMX) )
     {
-        p_context->dsp_mask &= FF_MM_MMX;
+        p_context->dsp_mask |= FF_MM_MMX;
     }
-    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT )
+    if( !(p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT) )
     {
-        p_context->dsp_mask &= FF_MM_MMXEXT;
+        p_context->dsp_mask |= FF_MM_MMXEXT;
     }
-    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW )
+    if( !(p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW) )
     {
-        p_context->dsp_mask &= FF_MM_3DNOW;
+        p_context->dsp_mask |= FF_MM_3DNOW;
     }
-    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE )
+    if( !(p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_SSE) )
     {
-        p_context->dsp_mask &= FF_MM_SSE;
-        p_context->dsp_mask &= FF_MM_SSE2; /* FIXME */
+        p_context->dsp_mask |= FF_MM_SSE;
+        p_context->dsp_mask |= FF_MM_SSE2;
     }
-    /* Hack to make sure everything can be disabled **/
-    p_context->dsp_mask &= (FF_MM_FORCE >> 1);
-#endif
 
     switch( i_cat )
     {

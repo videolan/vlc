@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.11 2003/11/28 10:36:58 massiot Exp $
+ * $Id: encoder.c,v 1.12 2003/11/28 23:40:09 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -31,6 +31,7 @@
 #include <vlc/decoder.h>
 
 /* ffmpeg header */
+#define HAVE_MMX
 #ifdef HAVE_FFMPEG_AVCODEC_H
 #   include <ffmpeg/avcodec.h>
 #else
@@ -140,28 +141,24 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_sys->p_context = p_context = avcodec_alloc_context();
 
     /* Set CPU capabilities */
-#ifdef HAVE_MMX
     p_context->dsp_mask = 0;
-    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
+    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMX) )
     {
-        p_context->dsp_mask &= FF_MM_MMX;
+        p_context->dsp_mask |= FF_MM_MMX;
     }
-    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT )
+    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT) )
     {
-        p_context->dsp_mask &= FF_MM_MMXEXT;
+        p_context->dsp_mask |= FF_MM_MMXEXT;
     }
-    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW )
+    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW) )
     {
-        p_context->dsp_mask &= FF_MM_3DNOW;
+        p_context->dsp_mask |= FF_MM_3DNOW;
     }
-    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE )
+    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE) )
     {
-        p_context->dsp_mask &= FF_MM_SSE;
-        p_context->dsp_mask &= FF_MM_SSE2; /* FIXME */
+        p_context->dsp_mask |= FF_MM_SSE;
+        p_context->dsp_mask |= FF_MM_SSE2;
     }
-    /* Hack to make sure everything can be disabled **/
-    p_context->dsp_mask &= (FF_MM_FORCE >> 1);
-#endif
 
     /* Make sure we get extradata filled by the encoder */
     p_context->extradata_size = 0;
@@ -297,7 +294,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     encoder_sys_t *p_sys = p_enc->p_sys;
     AVFrame frame;
     int i_out, i_plane;
-    vlc_bool_t b_hurry_up;
+    vlc_bool_t b_hurry_up = 0;
 
     for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
     {
