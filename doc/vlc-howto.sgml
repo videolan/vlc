@@ -2,7 +2,7 @@
 <linuxdoc><article>
 <titlepag>
  <title>VLC HOWTO</title>
- <author>by the Videolan Team<tt><htmlurl url="mailto:videolan@videlan.org" name="videolan@videlan.org"></tt></author>
+ <author>by the Videolan Team<tt><htmlurl url="mailto:videolan@videolan.org" name="videolan@videolan.org"></tt></author>
  <date>v0.0.9, 16 april 2002</date>
 
  <abstract>
@@ -50,8 +50,8 @@
   <p>
    The English version is maintained by Henri Fallon,
    Johan Bilien, and the VideoLAN team. It can be found at:
-   <htmlurl url="http://www.videolan.org/doc.html"
-   name="http://www.videolan.org/doc.html">.
+   <htmlurl url="http://www.videolan.org/doc/index.html"
+   name="http://www.videolan.org/doc/index.html">.
   </p>
  </sect1>
 
@@ -1141,9 +1141,9 @@
   </p>
   <p>
    There is a FAQ page on our website :
-   <htmlurl url="http://www.videolan.org/doc.html" name="http://www.videolan.org/doc.html">.
+   <htmlurl url="http://www.videolan.org/doc/index.html" name="http://www.videolan.org/doc/index.html">.
    If you think one question should be in the FAQ, please contact
-   <htmlurl url="mailto:videolan@videlan.org" name="videolan@videlan.org">
+   <htmlurl url="mailto:videolan@videolan.org" name="videolan@videolan.org">
   </p>
   <p>
    Finally, there's a users mailing list (English speaking). To subscribe, send a mail to 
