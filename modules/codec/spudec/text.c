@@ -2,7 +2,7 @@
  * text.c: text subtitles parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: text.c,v 1.3 2002/12/06 16:34:05 sam Exp $
+ * $Id: text.c,v 1.4 2003/01/30 16:36:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -55,7 +55,6 @@ void E_(ParseText)( spudec_thread_t *p_spudec, subtitler_font_t *p_font )
         msg_Warn( p_spudec->p_fifo, "subtitle without a date" );
         return;
     }
-    else
 
     /* Check validity of packet data */
     if( (p_spudec->bit_stream.p_data->p_payload_end

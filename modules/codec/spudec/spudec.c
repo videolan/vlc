@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.13 2003/01/28 22:03:21 sam Exp $
+ * $Id: spudec.c,v 1.14 2003/01/30 16:36:04 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,6 +40,7 @@ static int  OpenDecoder   ( vlc_object_t * );
 static int  RunDecoder    ( decoder_fifo_t * );
 static int  InitThread    ( spudec_thread_t * );
 static void EndThread     ( spudec_thread_t * );
+static vout_thread_t *FindVout( spudec_thread_t * );
 
 /*****************************************************************************
  * Module descriptor.
@@ -93,8 +94,9 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int RunDecoder( decoder_fifo_t * p_fifo )
 {
     spudec_thread_t *     p_spudec;
-    subtitler_font_t *    p_font;
+    subtitler_font_t *    p_font = NULL;
     char *                psz_font;
+    vout_thread_t *       p_vout_backup = NULL;
 
     /* Allocate the memory needed to store the thread's structure */
     p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) );
@@ -137,28 +139,54 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         if( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
         {
             msg_Err( p_fifo, "no default font selected" );
-            p_font = NULL;
-            p_spudec->p_fifo->b_error;
+            p_spudec->p_fifo->b_error = VLC_TRUE;
         }
-        else
 #endif
-        {
-            p_font = E_(subtitler_LoadFont)( p_spudec->p_vout, psz_font );
-            if ( p_font == NULL )
-            {
-                msg_Err( p_fifo, "unable to load font: %s", psz_font );
-                p_spudec->p_fifo->b_error;
-            }
-        }
-        if( psz_font ) free( psz_font );
 
         while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
         {
-            E_(ParseText)( p_spudec, p_font );
+            /* Find/Wait for a video output */
+            p_spudec->p_vout = FindVout( p_spudec );
+
+            if( p_spudec->p_vout )
+            {
+                if( p_spudec->p_vout != p_vout_backup )
+                {
+                    /* The vout has changed, we need to reload the fonts */
+                    p_vout_backup = p_spudec->p_vout;
+
+                    p_font = E_(subtitler_LoadFont)( p_spudec->p_vout,
+                                                     psz_font );
+                    if( p_font == NULL )
+                    {
+                        msg_Err( p_fifo, "unable to load font: %s", psz_font );
+                        p_spudec->p_fifo->b_error = VLC_TRUE;
+
+                        vlc_object_release( p_spudec->p_vout );
+                        break;
+                    }
+                }
+
+                E_(ParseText)( p_spudec, p_font );
+
+                vlc_object_release( p_spudec->p_vout );
+            }
         }
 
-        if( p_font ) E_(subtitler_UnloadFont)( p_spudec->p_vout, p_font );
+        if( psz_font ) free( psz_font );
 
+        if( p_font )
+        {
+            /* Find/Wait for a video output */
+            p_spudec->p_vout = FindVout( p_spudec );
+
+            if( p_spudec->p_vout )
+            {
+                E_(subtitler_UnloadFont)( p_spudec->p_vout, p_font );
+
+                vlc_object_release( p_spudec->p_vout );
+            }
+        }
     }
     else
     {
@@ -171,7 +199,13 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
                 continue;
             }
 
-            E_(ParsePacket)( p_spudec );
+            /* Find/Wait for a video output */
+            p_spudec->p_vout = FindVout( p_spudec );
+            if( p_spudec->p_vout )
+            {
+                E_(ParsePacket)( p_spudec );
+                vlc_object_release( p_spudec->p_vout );
+            }
         }
     }
 
@@ -203,22 +237,47 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
  *****************************************************************************/
 static int InitThread( spudec_thread_t *p_spudec )
 {
+    int i_ret;
+
+    /* Call InitBitstream anyway so p_spudec->bit_stream is in a known
+     * state before calling CloseBitstream */
+    i_ret = InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo,
+                           NULL, NULL );
+
+    /* Check for a video output */
+    p_spudec->p_vout = FindVout( p_spudec );
+
+    if( !p_spudec->p_vout )
+    {
+        return -1;
+    }
+
+    /* It was just a check */
+    vlc_object_release( p_spudec->p_vout );
+    p_spudec->p_vout = NULL;
+
+    return i_ret;
+}
+
+/*****************************************************************************
+ * FindVout: Find a vout or wait for one to be created.
+ *****************************************************************************/
+static vout_thread_t *FindVout( spudec_thread_t *p_spudec )
+{
+    vout_thread_t *p_vout = NULL;
+
     /* Find an available video output */
     do
     {
         if( p_spudec->p_fifo->b_die || p_spudec->p_fifo->b_error )
         {
-            /* Call InitBitstream anyway so p_spudec->bit_stream is in a known
-             * state before calling CloseBitstream */
-            InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo,
-                           NULL, NULL );
-            return -1;
+            break;
         }
 
-        p_spudec->p_vout = vlc_object_find( p_spudec->p_fifo, VLC_OBJECT_VOUT,
-                                                              FIND_ANYWHERE );
+        p_vout = vlc_object_find( p_spudec->p_fifo, VLC_OBJECT_VOUT,
+                                  FIND_ANYWHERE );
 
-        if( p_spudec->p_vout )
+        if( p_vout )
         {
             break;
         }
@@ -227,8 +286,7 @@ static int InitThread( spudec_thread_t *p_spudec )
     }
     while( 1 );
 
-    return InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo,
-                          NULL, NULL );
+    return p_vout;
 }
 
 /*****************************************************************************
@@ -256,8 +314,6 @@ static void EndThread( spudec_thread_t *p_spudec )
                 vout_DestroySubPicture( p_spudec->p_vout, p_subpic );
             }
         }
-
-        vlc_object_release( p_spudec->p_vout );
     }
 
     CloseBitstream( &p_spudec->bit_stream );
