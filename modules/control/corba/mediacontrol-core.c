@@ -123,7 +123,10 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
         vlc_value_t val;
         
         val.i_time = 0;
-        var_Get( p_input, "time", &val );
+	if( p_input )
+        {
+            var_Get( p_input, "time", &val );
+        }
         
         l_pos = 1000 * mediacontrol_unit_convert( p_input, 
                                                   pos->key,
@@ -138,7 +141,10 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
         vlc_value_t val;
         
         val.i_time = 0;
-        var_Get( p_input, "length", &val );
+	if( p_input )
+        {
+            var_Get( p_input, "length", &val );
+        }
 
         if( val.i_time > 0)
         {
@@ -736,7 +742,7 @@ mediacontrol_display_text( mediacontrol_Instance *self,
                                                        mediacontrol_MediaTime,
                                                        end->value );
 
-        vout_ShowTextRelative( p_vout, ( char* ) message, NULL, 
+        vout_ShowTextRelative( p_vout, SUBT1_CHAN, ( char* ) message, NULL, 
                                OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20, 
                                i_duration );
     }
@@ -762,7 +768,7 @@ mediacontrol_display_text( mediacontrol_Instance *self,
                                                    ( mediacontrol_Position * ) end );
         i_fin += i_now;
       
-        vout_ShowTextAbsolute( p_vout,( char* )message, NULL, 
+        vout_ShowTextAbsolute( p_vout, SUBT1_CHAN, ( char* )message, NULL, 
                                OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 20, 20, 
                                i_debut, i_fin );
     }
