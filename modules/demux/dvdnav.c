@@ -2,7 +2,7 @@
  * dvdnav.c: DVD module using the dvdnav library.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: dvdnav.c,v 1.2 2004/01/18 13:39:32 gbazin Exp $
+ * $Id: dvdnav.c,v 1.3 2004/01/18 16:02:40 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -75,7 +75,8 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static ssize_t  AccessRead ( input_thread_t *, byte_t *, size_t ); /* dummy */
+static ssize_t AccessRead( input_thread_t *, byte_t *, size_t ); /* dummy */
+static char *ParseCL( vlc_object_t *, char *, vlc_bool_t, int *, int *, int *);
 
 typedef struct
 {
@@ -120,10 +121,8 @@ struct demux_sys_t
     vlc_bool_t  b_es_out_ok;
 };
 
-
 static int DemuxControl( demux_t *, int, va_list );
 static int DemuxDemux  ( demux_t * );
-
 static int DemuxBlock  ( demux_t *, uint8_t *pkt, int i_pkt );
 
 enum
@@ -147,24 +146,37 @@ static int AccessOpen( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     dvdnav_t       *dvdnav;
+    int            i_title, i_chapter, i_angle;
+    char           *psz_name;
     vlc_value_t    val;
+    vlc_bool_t     b_force;
 
     /* We try only if we are forced */
-    if( p_input->psz_demux &&
-        *p_input->psz_demux &&
+    if( p_input->psz_demux && *p_input->psz_demux &&
         strcmp( p_input->psz_demux, "dvdnav" ) )
     {
         msg_Warn( p_input, "dvdnav access discarded (demuxer forced)" );
         return VLC_EGENERIC;
     }
 
+    b_force = (p_input->psz_access && !strcmp(p_input->psz_access, "dvdnav")) ?
+        VLC_TRUE : VLC_FALSE;
+
+    psz_name = ParseCL( VLC_OBJECT(p_input), p_input->psz_name, b_force,
+                        &i_title, &i_chapter, &i_angle );
+    if( !psz_name )
+    {
+        return VLC_EGENERIC;
+    }
+
     /* Test dvdnav */
-    if( dvdnav_open( &dvdnav, p_input->psz_name ) != DVDNAV_STATUS_OK )
+    if( dvdnav_open( &dvdnav, psz_name ) != DVDNAV_STATUS_OK )
     {
         msg_Warn( p_input, "cannot open dvdnav" );
         return VLC_EGENERIC;
     }
     dvdnav_close( dvdnav );
+    free( psz_name );
 
     /* Fill p_input fields */
     p_input->pf_read = AccessRead;
@@ -210,6 +222,67 @@ static ssize_t AccessRead( input_thread_t *p_input, byte_t *p_buffer,
 }
 
 /*****************************************************************************
+ * ParseCL: parse command line
+ *****************************************************************************/
+static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
+                      int *i_title, int *i_chapter, int *i_angle )
+{
+    char *psz_parser, *psz_source, *psz_next;
+
+    psz_source = strdup( psz_name );
+    if( psz_source == NULL ) return NULL;
+
+    *i_title = 0;
+    *i_chapter = 1;
+    *i_angle = 1;
+
+    /* Start with the end, because you could have :
+     * dvdnav:/Volumes/my@toto/VIDEO_TS@1,1
+     * (yes, this is kludgy). */
+    for( psz_parser = psz_source + strlen(psz_source) - 1;
+         psz_parser >= psz_source && *psz_parser != '@';
+         psz_parser-- );
+
+    if( psz_parser >= psz_source && *psz_parser == '@' )
+    {
+        /* Found options */
+        *psz_parser = '\0';
+        ++psz_parser;
+
+        *i_title = (int)strtol( psz_parser, &psz_next, 10 );
+        if( *psz_next )
+        {
+            psz_parser = psz_next + 1;
+            *i_chapter = (int)strtol( psz_parser, &psz_next, 10 );
+            if( *psz_next )
+            {
+                *i_angle = (int)strtol( psz_next + 1, NULL, 10 );
+            }
+        }
+    }
+
+    *i_title   = *i_title >= 0 ? *i_title : 0;
+    *i_chapter = *i_chapter    ? *i_chapter : 1;
+    *i_angle   = *i_angle      ? *i_angle : 1;
+
+    if( !*psz_source )
+    {
+        free( psz_source );
+        if( !b_force )
+        {
+            return NULL;
+        }
+        psz_source = config_GetPsz( p_this, "dvd" );
+        if( !psz_source ) return NULL;
+    }
+
+    msg_Dbg( p_this, "dvdroot=%s title=%d chapter=%d angle=%d",
+             psz_source, *i_title, *i_chapter, *i_angle );
+    
+    return psz_source;
+}
+
+/*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
 static int DemuxOpen( vlc_object_t *p_this )
@@ -217,11 +290,20 @@ static int DemuxOpen( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     vlc_value_t val, text;
+    int         i_title, i_titles, i_chapter, i_chapters, i_angle, i;
+    char        *psz_name;
 
     if( strcmp( p_demux->psz_access, "dvdnav" ) ||
         strcmp( p_demux->psz_demux,  "dvdnav" ) )
     {
         msg_Warn( p_demux, "dvdnav module discarded" );
+        return VLC_EGENERIC;
+    }
+
+    psz_name = ParseCL( VLC_OBJECT(p_demux), p_demux->psz_path, VLC_TRUE,
+                        &i_title, &i_chapter, &i_angle );
+    if( !psz_name )
+    {
         return VLC_EGENERIC;
     }
 
@@ -238,11 +320,12 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->b_es_out_ok = VLC_FALSE;
 
     /* Open dvdnav */
-    if( dvdnav_open( &p_sys->dvdnav, p_demux->psz_path ) != DVDNAV_STATUS_OK )
+    if( dvdnav_open( &p_sys->dvdnav, psz_name ) != DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "cannot open dvdnav" );
         return VLC_EGENERIC;
     }
+    free( psz_name );
 
     /* Configure dvdnav */
     if( dvdnav_set_readahead_flag( p_sys->dvdnav, 1 ) != DVDNAV_STATUS_OK )
@@ -265,6 +348,20 @@ static int DemuxOpen( vlc_object_t *p_this )
     {
         msg_Warn( p_demux, "something failed while setting en language (%s)",
                   dvdnav_err_to_string( p_sys->dvdnav ) );
+    }
+
+    /* Find out number of titles/chapters */
+    dvdnav_get_number_of_titles( p_sys->dvdnav, &i_titles );
+    for( i = 1; i <= i_titles; i++ )
+    {
+        i_chapters = 0;
+        dvdnav_get_number_of_parts( p_sys->dvdnav, i, &i_chapters );
+    }
+
+    if( dvdnav_title_play( p_sys->dvdnav, i_title ) !=
+          DVDNAV_STATUS_OK )
+    {
+        msg_Warn( p_demux, "cannot set title/chapter" );
     }
 
     /* Get p_input and create variable */
@@ -334,7 +431,6 @@ static void DemuxClose( vlc_object_t *p_this )
     var_Destroy( p_sys->p_input, "y-end" );
     var_Destroy( p_sys->p_input, "color" );
     var_Destroy( p_sys->p_input, "contrast" );
-
 
     vlc_object_release( p_sys->p_input );
 

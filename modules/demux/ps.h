@@ -2,7 +2,7 @@
  * ps.h: Program Stream demuxer helper
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ps.h,v 1.2 2004/01/17 23:51:50 fenrir Exp $
+ * $Id: ps.h,v 1.3 2004/01/18 16:02:40 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -53,31 +53,31 @@ static inline int ps_track_fill( ps_track_t *tk, int i_id )
     {
         if( ( i_id&0xf8 ) == 0x88 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC( 'd', 't', 's', ' ' ) );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('d','t','s',' ') );
             tk->i_skip = 1;
         }
         else if( ( i_id&0xf0 ) == 0x80 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', ' ' ) );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('a','5','2',' ') );
             tk->i_skip = 4;
         }
         else if( ( i_id&0xe0 ) == 0x20 )
         {
-            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC( 's', 'p', 'u', ' ' ) );
+            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('s','p','u',' ') );
             tk->i_skip = 1;
         }
         else if( ( i_id&0xf0 ) == 0xa0 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC( 'l', 'p', 'c', 'm' ) );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('l','p','c','m') );
             tk->i_skip = 1;
         }
         else if( ( i_id&0xff ) == 0x70 )
         {
-            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC( 'o', 'g', 't', ' ' ) );
+            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('o','g','t',' ') );
         }
         else if( ( i_id&0xfc ) == 0x00 )
         {
-            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC( 'c', 'v', 'd', ' ' ) );
+            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('c','v','d',' ') );
         }
         else
         {
@@ -89,11 +89,11 @@ static inline int ps_track_fill( ps_track_t *tk, int i_id )
     {
         if( ( i_id&0xf0 ) == 0xe0 )
         {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('m','p','g','v') );
         }
         else if( ( i_id&0xe0 ) == 0xc0 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','g','a') );
         }
         else
         {
@@ -145,7 +145,8 @@ static inline int ps_pkt_size( uint8_t *p, int i_peek )
 }
 
 /* parse a PACK PES */
-static inline int ps_pkt_parse_pack( block_t *p_pkt, int64_t *pi_scr, int *pi_mux_rate )
+static inline int ps_pkt_parse_pack( block_t *p_pkt, int64_t *pi_scr,
+                                     int *pi_mux_rate )
 {
     uint8_t *p = p_pkt->p_buffer;
     if( p_pkt->i_buffer >= 14 && (p[4] >> 6) == 0x01 )
@@ -178,7 +179,8 @@ static inline int ps_pkt_parse_pack( block_t *p_pkt, int64_t *pi_scr, int *pi_mu
 }
 
 /* Parse a SYSTEM PES */
-static inline int ps_pkt_parse_system( block_t *p_pkt, ps_track_t tk[PS_TK_COUNT] )
+static inline int ps_pkt_parse_system( block_t *p_pkt,
+                                       ps_track_t tk[PS_TK_COUNT] )
 {
     uint8_t *p = &p_pkt->p_buffer[6 + 3 + 1 + 1 + 1];
 
