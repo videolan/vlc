@@ -97,6 +97,7 @@ HEADERS_include = \
 	include/vlc_cpu.h \
 	include/vlc_error.h \
 	include/vlc_interface.h \
+	include/vlc_keys.h \
 	include/vlc_messages.h \
 	include/vlc_objects.h \
 	include/vlc_playlist.h \
