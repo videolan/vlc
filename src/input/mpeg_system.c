@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.93 2002/05/14 16:45:33 jobi Exp $
+ * $Id: mpeg_system.c,v 1.94 2002/05/14 20:27:25 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -672,6 +672,7 @@ ssize_t input_ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
         {
             p_input->p_current_data++;
             PEEK( 4 );
+            if( p_input->b_die ) return( -1 );
         }
         /* Packet found. */
     }
