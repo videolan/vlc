@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.77 2004/02/20 19:03:59 massiot Exp $
+ * $Id: transcode.c,v 1.78 2004/02/20 19:21:25 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1207,7 +1207,10 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream,
 {
     if ( p_stream->p_sys->i_threads >= 1 )
     {
+       vlc_mutex_lock( &p_stream->p_sys->lock_out );
        p_stream->p_sys->b_die = 1;
+       vlc_cond_signal( &p_stream->p_sys->cond );
+       vlc_mutex_unlock( &p_stream->p_sys->lock_out );
        vlc_thread_join( p_stream->p_sys );
        vlc_mutex_destroy( &p_stream->p_sys->lock_out );
        vlc_cond_destroy( &p_stream->p_sys->cond );
