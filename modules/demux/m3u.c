@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.3 2002/11/13 12:58:19 gbazin Exp $
+ * $Id: m3u.c,v 1.4 2002/11/18 13:08:35 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -134,7 +134,7 @@ static void Deactivate( vlc_object_t *p_this )
 static int Demux ( input_thread_t *p_input )
 {
     data_packet_t *p_data;
-    char          *p_buf, psz_line[MAX_LINE], *psz_bol, eol_tok;
+    char          *p_buf, psz_line[MAX_LINE], *psz_bol, *psz_name, eol_tok;
     int           i_size, i_bufpos, i_linepos = 0;
     playlist_t    *p_playlist;
     vlc_bool_t    b_discard = VLC_FALSE;
@@ -237,8 +237,37 @@ static int Demux ( input_thread_t *p_input )
             /*
              * From now on, we know we've got a meaningful line
              */
-            playlist_Add( p_playlist, psz_bol,
+
+	    /* Check if the line has an absolute or relative path */
+	    psz_name = psz_bol;
+            while( *psz_name && strncmp( psz_bol, "://", sizeof("://") - 1 ) )
+	    {
+	        psz_name++;
+	    }
+
+	    if( !*psz_name )
+	    {
+ 	        /* the line doesn't specify a protocol name.
+		 * If this line doesn't begin with a '/' then assume the path
+		 * is relative to the path of the m3u file. */
+	        char *psz_path = strdup( p_input->psz_name );
+
+		psz_name = strrchr( psz_path, '/' );
+		if( psz_name ) *psz_name = '\0';
+		else *psz_path = '\0';
+		psz_name = malloc( strlen(psz_path) + strlen(psz_bol) + 2 );
+	        sprintf( psz_name, "%s/%s", psz_path, psz_bol );
+		free( psz_path );
+	    }
+	    else
+	    {
+	        psz_name = strdup( psz_bol );
+	    }
+
+            playlist_Add( p_playlist, psz_name,
                           PLAYLIST_APPEND, PLAYLIST_END );
+
+	    free( psz_name );
 
             continue;
         }
