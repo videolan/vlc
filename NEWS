@@ -26,7 +26,8 @@ Input:
  * New "file-cat" option to play truncated movies.
  * Better handling of meta info (title, author, description, etc...).
  * New options to pass meta info to the input.
- * Fixes and improvements to DVB-S/C/T
+ * It is now possible to stream programs from a DVB-S/C/T stream
+   (satellite, cable, or digital terestrial television)
 
 Demux:
  * Annodex (http://www.annodex.net) support.
