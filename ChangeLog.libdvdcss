@@ -1,0 +1,52 @@
+#=========================#
+# ChangeLog for libdvdcss #
+#=========================#
+
+HEAD
+
+  * Added BSD/OS libdvd by Steven M. Schultz <sms@TO.GD-ES.COM> in
+    extras/BSDI_dvdioctl after he suggested us to do so. License is GPL.
+  * ./configure now checks for an installed libdvd under BSD/OS and
+    falls back to ours if not found.
+  * Fixed harmless typos in yesterday's Solaris libdvd patches.
+  * Bumped libdvdcss version number up to 0.0.3.
+  * Solaris DVD decryption support by Håkan Hjort <d95hjort@dtek.chalmers.se>.
+  * BSD/OS 4.3beta1 fixes by Steven M. Schultz <sms@TO.GD-ES.COM>.
+  * libdvdcss* packages are now a bit more policy-compliant.
+  * Fixed a Win32 bug in libdvdcss. This bug was appearing on title change.
+
+0.0.2
+Wed, 22 Aug 2001 15:18:01 +0200
+
+  * Fix in libdvdcss in the key caching code.
+  * Changed libdvdcss API to force binary incompatibility. Yeah, this is
+    evil, but if we don't do it now we'll have to do it when more people
+    are using it.
+  * Fixed minor libdvdcss stuff such as the soname and compilation flags.
+  * dvdcss_readv() optimisations for Win32.
+  * Fixed _win32_dvdcss_aread() to work around the WinASPI32 64kb transfer
+    size restriction.
+  * libdvdcss segfault fixes.
+  * Fixed 2 Win32 bugs in libdvdcss (in _win32_dvdcss_readv), one of them
+    should have prevented the Win9x dvd input from working.
+  * Moved the "if(Win2k)" out of the loop in _win32_dvdcss_readv.
+  * libdvdcss enhancements by Billy Biggs <vektor@dumbterm.net>. This breaks
+    vlc's DVD input (looks like decoders are expecting data too early and
+    DVD input can't cope with it due to decryption). Needs to be investigated.
+  * Removed unnecessary translations in the win32 code from block offsets to
+    byte offsets. This was overflowing some variables.
+  * Reduced the complexity of the Win9x ASPI functions because we only need
+    to handle DVD drive access.
+  * Win32 code now handles seeking in areas above 2.1 Go on DVDs.
+  * Additional MacOS X DVD ioctl work by Eugenio Jarosiewicz
+    <ej0@cise.ufl.edu>.
+
+0.0.1
+Tue, 19 Jun 2001 08:53:16 +0200
+
+  * First libdvdcss version (0.0.1).
+  * Fully working Windows DVD ioctl support by Jon Lech Johansen.
+  * Merged dvdcss_init and dvdcss_open into dvdcss_open, and dvdcss_close
+    and dvdcss_end into dvdcss_close. libdvdcss API now has 7 functions.
+  * Exported the CSS part of the dvd plugin into a library.
+

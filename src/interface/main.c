@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.111 2001/08/07 02:48:25 sam Exp $
+ * $Id: main.c,v 1.112 2001/08/22 14:23:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -115,7 +115,8 @@
 #define OPT_COLOR               164
 #define OPT_FULLSCREEN          165
 #define OPT_OVERLAY             166
-#define OPT_SMP                 167
+#define OPT_XVADAPTOR           167
+#define OPT_SMP                 168
 
 #define OPT_CHANNELS            170
 #define OPT_SERVER              171
@@ -186,6 +187,7 @@ static const struct option longopts[] =
     {   "yuv",              1,          0,      OPT_YUV },
     {   "fullscreen",       0,          0,      OPT_FULLSCREEN },
     {   "overlay",          0,          0,      OPT_OVERLAY },
+    {   "xvadaptor",        1,          0,      OPT_XVADAPTOR },
     {   "smp",              1,          0,      OPT_SMP },
 
     /* DVD options */
@@ -690,6 +692,9 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_OVERLAY:                                       /* --overlay */
             main_PutIntVariable( VOUT_OVERLAY_VAR, 1 );
             break;
+        case OPT_XVADAPTOR:                                   /* --xvadaptor */
+            main_PutIntVariable( VOUT_XVADAPTOR_VAR, atoi(optarg) );
+            break;
         case OPT_MOTION:                                         /* --motion */
             main_PutPszVariable( MOTION_METHOD_VAR, optarg );
             break;
@@ -840,6 +845,7 @@ static void Usage( int i_fashion )
           "\n  -g, --grayscale                \tgrayscale output"
           "\n      --fullscreen               \tfullscreen output"
           "\n      --overlay                  \taccelerated display"
+          "\n      --xvadaptor <adaptor>      \tXVideo adaptor"
           "\n      --color                    \tcolor output"
           "\n      --motion <module>          \tmotion compensation method"
           "\n      --idct <module>            \tIDCT method"
@@ -894,6 +900,7 @@ static void Usage( int i_fashion )
         "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output"
         "\n  " VOUT_FULLSCREEN_VAR "={1|0}            \tfullscreen"
         "\n  " VOUT_OVERLAY_VAR "={1|0}               \toverlay"
+        "\n  " VOUT_XVADAPTOR_VAR "=<adaptor>         \tXVideo adaptor"
         "\n  " MOTION_METHOD_VAR "=<method name>      \tmotion compensation method"
         "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
         "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"

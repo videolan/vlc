@@ -4,6 +4,13 @@
 
 HEAD
 
+  * Nothing yet.
+
+0.2.83
+Wed, 22 Aug 2001 15:18:01 +0200
+
+  * Split ChangeLog into ChangeLog and ChangeLog.libdvdcss.
+  * Added --xvadaptor flag to select the XVideo adaptor to use.
   * Added support in ./configure for the cprof profiler.
   * Activated -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 on all platforms, fixes
     issues under Solaris and QNX.
@@ -15,18 +22,11 @@ HEAD
     probably better than having no subtitles at all).
   * Added proper Conflicts: rules in debian/control.
   * configure.in fixes for BSD/OS.
-  * Added BSD/OS libdvd by Steven M. Schultz <sms@TO.GD-ES.COM> in
-    extras/BSDI_dvdioctl after he suggested us to do so. License is GPL.
-  * ./configure now checks for an installed libdvd under BSD/OS and
-    falls back to ours if not found.
-  * Fixed harmless typos in yesterday's Solaris libdvd patches.
-  * Bumped libdvdcss version number up to 0.0.3.
   * Added vlc:loop playlist command to go back at the beginning.
     Usage: vlc file1.mpeg file2.mpeg ... fileN.mpeg vlc:loop
   * Fixed a bug in the gtk interface which caused vlc to go amok after
     having met a zero-sized area.
   * 'snapshot*' rules do not depend on 'clean', and don't use /tmp anymore.
-  * Solaris DVD decryption support by Håkan Hjort <d95hjort@dtek.chalmers.se>.
 
 0.2.82
 Tue,  7 Aug 2001 12:39:16 +0200
@@ -36,9 +36,7 @@ Tue,  7 Aug 2001 12:39:16 +0200
   * Added -lmsvcrt40 to the win32 flags for proper execution under Wine.
   * Fixed broken soname setting under Solaris (and OS X, sort of).
   * Made the illegal instruction report more explicit.
-  * BSD/OS 4.3beta1 fixes by Steven M. Schultz <sms@TO.GD-ES.COM>.
   * Fixed the sdl video output plugin that was broken 2 days ago.
-  * libdvdcss* packages are now a bit more policy-compliant.
   * Tidied the snapshot-* Makefile rules.
   * Tidied the modules Makefiles.
   * Removed useless stuff in the debian/ directory.
@@ -64,7 +62,6 @@ Tue,  7 Aug 2001 12:39:16 +0200
   * The video decoder thread is now also reniced to a lower priority on
     Win32 (like in the Linux version). This slightly increases the
     responsiveness of vlc.
-  * Fixed a Win32 bug in libdvdcss. This bug was appearing on title change.
   * Modified input_dvd so you can now go directly to the selected chapter
     when you change the title.
   * Implemented the Probe function in the Xvideo plugin. Xvideo is now the
@@ -85,15 +82,10 @@ Tue,  7 Aug 2001 12:39:16 +0200
 0.2.81
 Sat, 28 Jul 2001 04:13:57 +0200
 
-  * Fix in libdvdcss in the key caching code.
   * Removed useless variables in configure.in which caused all subsequent
     compilation tests to fail.
   * Additional fixes to the sdl-config detection.
   * Added a make uninstall rule.
-  * Changed libdvdcss API to force binary incompatibility. Yeah, this is
-    evil, but if we don't do it now we'll have to do it when more people
-    are using it.
-  * Fixed minor libdvdcss stuff such as the soname and compilation flags.
   * New --with-dvdcss flag.
   * Fixed a bug in aout spdif with dolby stereo (use of obsolete PTS).
   * Format asm functions for gcc, fixed the segfaults with imdct_sse.
@@ -105,9 +97,6 @@ Sat, 28 Jul 2001 04:13:57 +0200
   * Fixed a stupid bug in buffer management with field pictures.
   * Fixed a reinit bug after a discontinuity - such as seek().
   * The spdif audio output won't kill itself anymore at the beginning.
-  * dvdcss_readv() optimisations for Win32.
-  * Fixed _win32_dvdcss_aread() to work around the WinASPI32 64kb transfer
-    size restriction.
   * New and theoretically better Win32 pthread implementation.
   * dvd_ifo.c now takes into account error messages from UDFFindFile.
   * Fixed the "quit" event handling in directx/vout_events.c.
@@ -115,7 +104,6 @@ Sat, 28 Jul 2001 04:13:57 +0200
   * ncurses compilation fix by Michael Mondragon <mammon@lokmail.net>.
   * Fix for large inline functions and gcc 3.0.
   * Fixed the gnome plugin so that it does not include gtk headers.
-  * libdvdcss segfault fixes.
   * Tuned constants, since it seems to make people happy.
   * Fixed the "paused movie won't restart" bug.
   * Removed the outdated generic decoder.
@@ -130,9 +118,6 @@ Sat, 28 Jul 2001 04:13:57 +0200
   * Reactivated SDL parachute in non-debug mode (memory leak otherwise).
   * Fixed GetChunk for chunks < 4 bytes.
   * The Win98 DVD input is finally working.
-  * Fixed 2 Win32 bugs in libdvdcss (in _win32_dvdcss_readv), one of them
-    should have prevented the Win9x dvd input from working.
-  * Moved the "if(Win2k)" out of the loop in _win32_dvdcss_readv.
   * Put a readv() function in input_iovec.h, the input_es plugin now compiles
     (Win32).
   * Modified input_ts to use readv() in input_iovec.h (Win32).
@@ -144,9 +129,6 @@ Sat, 28 Jul 2001 04:13:57 +0200
     been done because this function can block the thread. Thanks to this
     change, you can now move your window without any video and audio
     interruption.
-  * libdvdcss enhancements by Billy Biggs <vektor@dumbterm.net>. This breaks
-    vlc's DVD input (looks like decoders are expecting data too early and
-    DVD input can't cope with it due to decryption). Needs to be investigated.
   * Plugins are now compiled in plugins/* and libraries in lib/*.
   * The KDE UI compiles again but does not work yet.
   * ALSA plugin message corrections.
@@ -159,11 +141,6 @@ Sat, 28 Jul 2001 04:13:57 +0200
   * Fixed alignement in imdct asm functions.
   * 16 byte alignement for data (needed for SSE).
   * Optimization in SSE downmix.
-  * Removed unnecessary translations in the win32 code from block offsets to
-    byte offsets. This was overflowing some variables.
-  * Reduced the complexity of the Win9x ASPI functions because we only need
-    to handle DVD drive access.
-  * Win32 code now handles seeking in areas above 2.1 Go on DVDs.
   * Probably fixed the "X eats more and more CPU" bug. Please test.
   * mingw32 cross-compilation issue fixed.
   * Small optimization in vpar_blocks.c, sparing a few memset() calls.
@@ -187,22 +164,16 @@ Sat, 28 Jul 2001 04:13:57 +0200
   * Added INSTALL-win32.txt for specific details to the Win32 port.
   * Compile fix for newer versions of MacOS X by Colin Simmonds
     <colin_simmonds@Mac.lover.org>.
-  * Additional MacOS X DVD ioctl work by Eugenio Jarosiewicz
-    <ej0@cise.ufl.edu>.
   * Win32 network support by Boris Dorès <babal@via.ecp.fr>.
   * Fixed an alignment issue in the ifo parser. The Matrix problem should
     be solved.
   * Minor cosmetic fixes and warning removals here and there.
   * FreeBSD (and probably QNX) shared memory handling fix.
-  * First libdvdcss version (0.0.1).
   * Unrolled two loops in dvd_netlist.c to prevent message flooding.
   * DVD input stuttering fix by Jon Lech Johansen.
   * Removed a lock that caused late frames in DVDRead.
   * Added gprof profiling support with --enable-profiling.
-  * Fully working Windows DVD ioctl support by Jon Lech Johansen.
   * DirectX enhancements by Gildas Bazin, such as software rendering.
-  * Merged dvdcss_init and dvdcss_open into dvdcss_open, and dvdcss_close
-    and dvdcss_end into dvdcss_close. libdvdcss API now has 7 functions.
   * Another failed attempt at profiling vlc under Linux: ported the
     threads API to GNU Pth. Activate with --enable-pth. It doesn't seem to
     spawn new threads for me, maybe someone will have better luck.
@@ -210,7 +181,8 @@ Sat, 28 Jul 2001 04:13:57 +0200
   * Automatic build of libdvdcss if not found.
   * The DVD netlist no longer stops when the fifo is empty ; it just waits
     until there are free vectors again.
-  * Exported the CSS part of the dvd plugin into a library.
+  * Exported the CSS part of the dvd plugin into a library. See
+    ChangeLog.libdvdcss for a separate changelog.
   * Slight modification in input_dvd since Getiovec wasn't at the right place.
   * Send escape packet when changing title, not to be stuck in some decoder.
   * The position in the title is now reset when we change title to

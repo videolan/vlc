@@ -1,3 +1,10 @@
+vlc (0.2.83-1) unstable; urgency=low
+
+  * New upstream release.
+  * Activated subtitles in overlay mode (Closes: #97471).
+
+ -- Samuel Hocevar <sam@zoy.org>  Wed, 22 Aug 2001 15:18:01 +0200
+
 vlc (0.2.82-1) unstable; urgency=low
 
   * New upstream release.

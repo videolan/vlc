@@ -152,7 +152,7 @@ Difficulty: Hard
 Urgency: Normal
 Description: Write subtitles and stream information in YUV coordinates
  ... so that they can be displayed even in "overlay" mode.
-Status: Todo
+Status: Done (sam)
 
 Task: 0x4c
 Difficulty: Medium

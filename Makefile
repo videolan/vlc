@@ -226,7 +226,7 @@ snapshot-common:
 		-type d -name CVS -o -name '.*' -o -name '*.[o]' | \
 			while read i ; do rm -Rf $$i ; done
 	# Copy misc files
-	cp vlc.spec AUTHORS COPYING TODO todo.pl ChangeLog README* INSTALL* \
+	cp vlc.spec AUTHORS COPYING TODO todo.pl ChangeLog* README* INSTALL* \
 		Makefile Makefile.opts.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh config.sub config.guess \
 			tmp/vlc/
@@ -286,6 +286,7 @@ libdvdcss-snapshot: snapshot-common
 	rm -f tmp/vlc/vlc.spec tmp/vlc/INSTALL-win32.txt
 	mv tmp/vlc/INSTALL.libdvdcss tmp/vlc/INSTALL
 	mv tmp/vlc/README.libdvdcss tmp/vlc/README
+	mv tmp/vlc/ChangeLog.libdvdcss tmp/vlc/ChangeLog
 	# Fix Makefile
 	rm -f tmp/vlc/Makefile
 	sed -e 's#^install:#install-unused:#' \

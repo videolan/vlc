@@ -412,16 +412,15 @@
 /* Better be in advance when awakening than late... */
 #define VOUT_MWAIT_TOLERANCE            ((int)(0.020*CLOCK_FREQ))
 
-/*
- * Framebuffer settings
- */
+/* The default video output window title */
+#define VOUT_TITLE                      "VideoLAN Client @VLC_VERSION@"
 
 /* Environment variable for framebuffer device, and default value */
 #define VOUT_FB_DEV_VAR                 "vlc_fb_dev"
 #define VOUT_FB_DEV_DEFAULT             "/dev/fb0"
 
-/* The default video output window title */
-#define VOUT_TITLE                      "VideoLAN Client @VLC_VERSION@"
+/* Environment variable for XVideo adaptor, and default value */
+#define VOUT_XVADAPTOR_VAR              "vlc_xv_adaptor"
 
 /*****************************************************************************
  * Video parser configuration

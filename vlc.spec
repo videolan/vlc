@@ -1,10 +1,10 @@
 Name: vlc
-Version: 0.2.82
+Version: 0.2.83
 Release: 1
 License: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
-Source0: http://www.videolan.org/packages/0.2.82/vlc-0.2.82.tar.gz
+Source0: http://www.videolan.org/packages/0.2.83/vlc-0.2.83.tar.gz
 Prefix: /usr
 Packager: Samuel Hocevar <sam@zoy.org>
 
@@ -13,6 +13,9 @@ Summary: VideoLAN Client.
 Summary(fr): Client VideoLAN.
 
 %changelog
+* Wed Aug 22 2001 Samuel Hocevar <sam@zoy.org>
+New upstream release (0.2.83)
+
 * Tue Aug 7 2001 Samuel Hocevar <sam@zoy.org>
 New upstream release (0.2.82)
 

@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.25 2001/08/05 15:32:46 gbazin Exp $
+ * $Id: vout_xvideo.c,v 1.26 2001/08/22 14:23:57 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -1169,14 +1169,19 @@ static void XVideoOutputCoords( const picture_t *p_pic, const boolean_t scale,
 }
 
 
+/*****************************************************************************
+ * XVideoGetPort: get YUV12 port
+ *****************************************************************************
+ * 
+ *****************************************************************************/
 static int XVideoGetPort( Display *dpy )
 {
-    int            i, i_adaptors;
-    int            xv_port = -1;
-    XvAdaptorInfo *adaptor_info;
+    XvAdaptorInfo *p_adaptor;
+    int i_adaptor, i_num_adaptors, i_requested_adaptor;
+    int i_selected_port;
 
     switch( XvQueryAdaptors( dpy, DefaultRootWindow( dpy ),
-                             &i_adaptors, &adaptor_info ) )
+                             &i_num_adaptors, &p_adaptor ) )
     {
         case Success:
             break;
@@ -1194,52 +1199,137 @@ static int XVideoGetPort( Display *dpy )
             return( -1 );
     }
 
-    for( i=0; i < i_adaptors && xv_port == -1; ++i )
+    i_selected_port = -1;
+    i_requested_adaptor = main_GetIntVariable( VOUT_XVADAPTOR_VAR, -1 );
+
+    /* No special xv port has been requested so try all of them */
+    for( i_adaptor = 0; i_adaptor < i_num_adaptors; ++i_adaptor )
     {
-        if( ( adaptor_info[ i ].type & XvInputMask ) &&
-            ( adaptor_info[ i ].type & XvImageMask ) )
+        int i_port;
+
+        /* If we requested an adaptor and it's not this one, we aren't
+         * interested */
+        if( i_requested_adaptor != -1 && i_adaptor != i_requested_adaptor )
+	{
+            continue;
+	}
+
+	/* If the adaptor doesn't have the required properties, skip it */
+        if( !( p_adaptor[ i_adaptor ].type & XvInputMask ) ||
+            !( p_adaptor[ i_adaptor ].type & XvImageMask ) )
         {
-            /* check that port supports YUV12 planar format... */
-            int port = adaptor_info[ i ].base_id;
-            int i_num_formats, i;
-            XvImageFormatValues *imageFormats;
+            continue;
+	}
 
-            imageFormats = XvListImageFormats( dpy, port, &i_num_formats );
+        for( i_port = p_adaptor[i_adaptor].base_id;
+             i_port < p_adaptor[i_adaptor].base_id
+                       + p_adaptor[i_adaptor].num_ports;
+             i_port++ )
+        {
+            XvImageFormatValues *p_formats;
+            int i_format, i_num_formats;
 
-            for( i=0; i < i_num_formats && xv_port == -1; ++i )
+            /* If we already found a port, we aren't interested */
+            if( i_selected_port != -1 )
             {
-                if( imageFormats[ i ].id == GUID_YUV12_PLANAR )
+                continue;
+            }
+
+            /* Check that port supports YUV12 planar format... */
+            p_formats = XvListImageFormats( dpy, i_port, &i_num_formats );
+
+            for( i_format = 0; i_format < i_num_formats; i_format++ )
+            {
+                XvEncodingInfo  *p_enc;
+                int             i_enc, i_num_encodings;
+                XvAttribute     *p_attr;
+                int             i_attr, i_num_attributes;
+
+                if( p_formats[ i_format ].id != GUID_YUV12_PLANAR )
                 {
-                    xv_port = port;
+                    continue;
+                }
+
+                /* Found a matching port, print a description of this port */
+                i_selected_port = i_port;
+
+                intf_WarnMsg( 3, "vout: XVideoGetPort found adaptor %i port %i",
+                                 i_adaptor, i_port);
+                intf_WarnMsg( 3, "  image format 0x%x (%4.4s) %s supported",
+                                 p_formats[ i_format ].id,
+                                 (char *)&p_formats[ i_format ].id,
+                                 ( p_formats[ i_format ].format
+                                    == XvPacked ) ? "packed" : "planar" );
+
+                intf_WarnMsg( 4, " encoding list:" );
+
+                if( XvQueryEncodings( dpy, i_port, &i_num_encodings, &p_enc )
+                     != Success )
+                {
+                    intf_WarnMsg( 4, "  XvQueryEncodings failed" );
+                    continue;
+                }
+
+                for( i_enc = 0; i_enc < i_num_encodings; i_enc++ )
+                {
+                    intf_WarnMsg( 4, "  id=%ld, name=%s, size=%ldx%ld,"
+                                     " numerator=%d, denominator=%d",
+                                  p_enc[i_enc].encoding_id, p_enc[i_enc].name,
+                                  p_enc[i_enc].width, p_enc[i_enc].height,
+                                  p_enc[i_enc].rate.numerator,
+                                  p_enc[i_enc].rate.denominator );
+                }
+
+                if( p_enc != NULL )
+                {
+                    XvFreeEncodingInfo( p_enc );
+                }
+
+                intf_WarnMsg( 4, " attribute list:" );
+                p_attr = XvQueryPortAttributes( dpy, i_port,
+                                                &i_num_attributes );
+                for( i_attr = 0; i_attr < i_num_attributes; i_attr++ )
+                {
+                    intf_WarnMsg( 4,
+                          "  name=%s, flags=[%s%s ], min=%i, max=%i",
+                          p_attr[i_attr].name,
+                          (p_attr[i_attr].flags & XvGettable) ? " get" : "",
+                          (p_attr[i_attr].flags & XvSettable) ? " set" : "",
+                          p_attr[i_attr].min_value, p_attr[i_attr].max_value );
+                }
+
+                if( p_attr != NULL )
+                {
+                    XFree( p_attr );
                 }
             }
 
-            if( xv_port == -1 )
+            if( p_formats != NULL )
             {
-                intf_WarnMsg( 3, "vout: XVideo image input port %d "
-                        "does not support the YUV12 planar format which is "
-                        "currently required by the xvideo output plugin",
-                        port );
-            }
-
-            if( imageFormats )
-            {
-                XFree( imageFormats );
+                XFree( p_formats );
             }
         }
     }
 
-    if( i_adaptors > 0 )
+    if( i_num_adaptors > 0 )
     {
-        XvFreeAdaptorInfo(adaptor_info);
+        XvFreeAdaptorInfo( p_adaptor );
     }
 
-    if( xv_port == -1 )
+    if( i_selected_port == -1 )
     {
-        intf_WarnMsg( 3, "vout: no suitable Xvideo image input port" );
+        if( i_requested_adaptor == -1 )
+        {
+            intf_WarnMsg( 3, "vout: no XVideo port found supporting YUV12" );
+        }
+        else
+        {
+            intf_WarnMsg( 3, "vout: XVideo adaptor %i does not support YUV12",
+                             i_requested_adaptor );
+        }
     }
 
-    return( xv_port );
+    return( i_selected_port );
 }
 
 
@@ -1321,3 +1411,4 @@ static void XVideoSetAttribute( vout_thread_t *p_vout,
         XFree( p_attrib );
 }
 #endif
+

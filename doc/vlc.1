@@ -88,6 +88,9 @@ Full screen output.
 .B \-\-overlay
 Overlay (hardware accelerated output), if available.
 .TP
+.B \-\-xvadaptor <port>
+Select XVideo adaptor, if XVideo output is used.
+.TP
 .B \-\-color
 Color output.
 .TP
@@ -168,6 +171,7 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_grayscale={1|0}           grayscale or color
  vlc_fullscreen={1|0}          full screen
  vlc_overlay={1|0}             overlay
+ vlc_xvport=<port>             XVideo port
  vlc_motion=<method name>      motion compensation method
  vlc_idct=<method name>        IDCT method
  vlc_yuv=<method name>         YUV method

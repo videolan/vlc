@@ -8,7 +8,7 @@ Standards-Version: 3.0.1
 Package: vlc
 Architecture: any
 Depends: ${shlibs:Depends}, vlc-gui
-Suggests: vlc-sdl, vlc-gnome
+Suggests: vlc-gnome
 Description: a free MPEG and DVD player
  VideoLAN is a free MPEG, MPEG2 and DVD software solution.
  .
