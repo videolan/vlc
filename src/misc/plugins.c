@@ -88,22 +88,21 @@ void bank_Init( plugin_bank_t * p_bank )
 
     /* Arch plugins */
     SEEK_PLUGIN( "beos" );
-    
-    /* High level Video */
-    SEEK_PLUGIN( "gnome" );
-    SEEK_PLUGIN( "ggi" );
-    SEEK_PLUGIN( "sdl" );
-    
+
     /* Low level Video */
     SEEK_PLUGIN( "x11" );
     SEEK_PLUGIN( "fb" );
     SEEK_PLUGIN( "glide" );
     SEEK_PLUGIN( "mga" );
-    
+     
+    /* High level Video */
+    SEEK_PLUGIN( "gnome" );
+    SEEK_PLUGIN( "ggi" );
+    SEEK_PLUGIN( "sdl" );
+   
     /* Video calculus */
     SEEK_PLUGIN( "yuvmmx" );
     SEEK_PLUGIN( "yuv" );
-    SEEK_PLUGIN( "yuvsdl" );
 
     /* Audio pluins */
     SEEK_PLUGIN( "dsp" );
