@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.12 2002/05/14 21:57:31 bozo Exp $
+ * $Id: mpeg_ts.c,v 1.13 2002/05/21 01:27:26 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -857,7 +857,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                                                 dvbpsi_DecodeISO639Dr( p_dr );
                     if( p_decoded->i_code_count > 0 )
                     {
-                        iso639_lang_t * p_iso;
+                        const iso639_lang_t * p_iso;
                         p_iso = GetLang_2T(p_decoded->i_iso_639_code);
                         if(p_iso)
                         {
