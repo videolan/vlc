@@ -2,7 +2,7 @@
  * dvdread.c : DvdRead input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dvdread.c,v 1.12 2002/03/04 01:53:56 stef Exp $
+ * $Id: dvdread.c,v 1.13 2002/03/06 16:39:37 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,7 +44,7 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( "DVDRead input module" )
-    ADD_CAPABILITY( DEMUX, 210 )
+    ADD_CAPABILITY( DEMUX, 0 )
     ADD_CAPABILITY( ACCESS, 110 )
     ADD_SHORTCUT( "dvdread" )
 MODULE_INIT_STOP
