@@ -109,6 +109,11 @@
 #define SCODEC_LONGTEXT N_( \
     "Allows you to specify the destination subtitles codec used for the " \
     "streaming output." )
+#define SFILTER_TEXT N_("Subpictures filter")
+#define SFILTER_LONGTEXT N_( \
+    "Allows you to specify subpictures filters used during the video " \
+    "transcoding. The subpictures produced by the filters will be overlayed " \
+    "directly onto the video." )
 
 #define THREADS_TEXT N_("Number of threads")
 #define THREADS_LONGTEXT N_( \
@@ -173,6 +178,8 @@ vlc_module_begin();
                 SCODEC_LONGTEXT, VLC_FALSE );
     add_bool( SOUT_CFG_PREFIX "soverlay", 0, NULL, SCODEC_TEXT,
                SCODEC_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "sfilter", NULL, NULL, SFILTER_TEXT,
+                SFILTER_LONGTEXT, VLC_FALSE );
 
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
                  THREADS_LONGTEXT, VLC_TRUE );
@@ -185,7 +192,7 @@ static const char *ppsz_sout_options[] = {
     "venc", "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
     "scale", "fps", "width", "height", "deinterlace", "threads",
     "aenc", "acodec", "ab", "samplerate", "channels",
-    "senc", "scodec", "soverlay",
+    "senc", "scodec", "soverlay", "sfilter",
     "audio-sync", NULL
 };
 
@@ -423,9 +430,12 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Subpictures transcoding parameters */
-    var_Get( p_stream, SOUT_CFG_PREFIX "senc", &val );
+    p_sys->p_spu = 0;
     p_sys->psz_senc = NULL;
     p_sys->p_spu_cfg = NULL;
+    p_sys->i_scodec = 0;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "senc", &val );
     if( val.psz_string && *val.psz_string )
     {
         char *psz_next;
@@ -436,7 +446,6 @@ static int Open( vlc_object_t *p_this )
     if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "scodec", &val );
-    p_sys->i_scodec = 0;
     if( val.psz_string && *val.psz_string )
     {
         char fcc[4] = "    ";
@@ -452,7 +461,16 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX "soverlay", &val );
     p_sys->b_soverlay = val.b_bool;
-    p_sys->p_spu = 0;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "sfilter", &val );
+    if( val.psz_string && *val.psz_string )
+    {
+        p_sys->p_spu = spu_Create( p_stream );
+        var_Create( p_sys->p_spu, "sub-filter", VLC_VAR_STRING );
+        var_Set( p_sys->p_spu, "sub-filter", val );
+        spu_Init( p_sys->p_spu );
+    }
+    if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "audio-sync", &val );
     p_sys->b_audio_sync = val.b_bool;
