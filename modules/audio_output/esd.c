@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.15 2002/11/15 17:17:29 gbazin Exp $
+ * $Id: esd.c,v 1.16 2003/01/28 03:46:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -57,6 +57,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static void Play         ( aout_instance_t * );
 static int  ESDThread    ( aout_instance_t * );
+static void ESDLoop      ( aout_instance_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -120,7 +121,7 @@ static int Open( vlc_object_t *p_this )
                               p_aout->output.output.i_rate, NULL, "vlc" );
     if( p_sys->i_fd < 0 )
     {
-        msg_Err( p_aout, "cannot open esound socket (format 0x%08x at %ld Hz)",
+        msg_Err( p_aout, "cannot open esound socket (format 0x%08x at %d Hz)",
                          p_sys->esd_format, p_aout->output.output.i_rate );
         free( p_sys );
         return -1;
@@ -179,47 +180,58 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int ESDThread( aout_instance_t * p_aout )
 {
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-
     while ( !p_aout->b_die )
     {
-        aout_buffer_t * p_buffer;
-        int i_tmp, i_size;
-        byte_t * p_bytes;
-
-        /* Get the presentation date of the next write() operation. It
-         * is equal to the current date + buffered samples + esd latency */
-        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency,
-                                                  VLC_FALSE );
-
-        if ( p_buffer != NULL )
-        {
-            p_bytes = p_buffer->p_buffer;
-            i_size = p_buffer->i_nb_bytes;
-        }
-        else
-        {
-            i_size = ESD_BUF_SIZE * 2
-                      / p_aout->output.output.i_frame_length
-                      * p_aout->output.output.i_bytes_per_frame;
-            p_bytes = alloca( i_size );
-            memset( p_bytes, 0, i_size );
-        }
-
-        i_tmp = write( p_sys->i_fd, p_bytes, i_size );
-
-        if( i_tmp < 0 )
-        {
-            msg_Err( p_aout, "write failed (%s)", strerror(errno) );
-        }
-
-        if ( p_buffer != NULL )
-        {
-            aout_BufferFree( p_buffer );
-        }
+        ESDLoop( p_aout );
     }
 
     return 0;
+}
+
+/*****************************************************************************
+ * ESDLoop: ESDThread's inner loop
+ *****************************************************************************
+ * This is a separate function because it makes use of alloca() which makes
+ * use of the caller's stack frame, which means we need to return after each
+ * iteration.
+ *****************************************************************************/
+static void ESDLoop( aout_instance_t * p_aout )
+{
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    aout_buffer_t * p_buffer;
+    int i_tmp, i_size;
+    byte_t * p_bytes = NULL;
+
+    /* Get the presentation date of the next write() operation. It
+     * is equal to the current date + buffered samples + esd latency */
+    p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency,
+                                              VLC_FALSE );
+
+    if ( p_buffer != NULL )
+    {
+        p_bytes = p_buffer->p_buffer;
+        i_size = p_buffer->i_nb_bytes;
+    }
+    else
+    {
+        i_size = ESD_BUF_SIZE * 2
+                  / p_aout->output.output.i_frame_length
+                  * p_aout->output.output.i_bytes_per_frame;
+        p_bytes = alloca( i_size );
+        memset( p_bytes, 0, i_size );
+    }
+
+    i_tmp = write( p_sys->i_fd, p_bytes, i_size );
+
+    if( i_tmp < 0 )
+    {
+        msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+    }
+
+    if ( p_buffer != NULL )
+    {
+        aout_BufferFree( p_buffer );
+    }
 }
 
 #if 0
