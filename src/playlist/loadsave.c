@@ -2,7 +2,7 @@
  * loadsave.c : Playlist loading / saving functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: loadsave.c,v 1.5 2004/01/12 21:22:23 hartman Exp $
+ * $Id: loadsave.c,v 1.6 2004/01/22 19:35:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,6 +27,10 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/sout.h>
+
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>
+#endif
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -89,7 +93,6 @@ int playlist_Import( playlist_t * p_playlist, const char *psz_filename )
 int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
                      const char *psz_type)
 {
-    extern int errno;
     module_t *p_module;
     playlist_export_t *p_export;
 
@@ -105,9 +108,13 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     p_export->p_file = fopen( psz_filename, "wt" );
     if( !p_export->p_file )
     {
-        msg_Err( p_playlist , "Could not create playlist file %s (%s)"
-                , psz_filename, strerror(errno) );
-        return -1;
+        msg_Err( p_playlist , "Could not create playlist file %s"
+#ifdef HAVE_ERRNO_H
+                 " (%s)", psz_filename, strerror(errno) );
+#else
+                 , psz_filename );
+#endif
+        return VLC_EGENERIC;
     }
 
     p_playlist->p_private = (void *)p_export;
