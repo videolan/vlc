@@ -987,12 +987,6 @@ int vpar_CodedPattern444( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void vpar_DecodeMPEG1Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 {
-    /* À pomper dans Berkeley. Pour toutes ces fonctions, il faut mettre
-       p_mb->pf_idct[i_b] à :
-        - vdec_IDCT ou
-        - vdec_SparseIDCT si la matrice n'a qu'un coefficient non nul.
-       Dans le deuxième cas, p_mb->pi_sparse_pos[i_b] contient le numéro
-       de ce coefficient. */
 
     if( p_vpar->picture.i_coding_type == D_CODING_TYPE )
     {
@@ -1007,7 +1001,6 @@ static void vpar_DecodeMPEG1Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
  *****************************************************************************/
 static void vpar_DecodeMPEG1Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 {
-    /* À pomper dans Berkeley. */
 
     if( p_vpar->picture.i_coding_type == D_CODING_TYPE )
     {
@@ -1022,7 +1015,85 @@ static void vpar_DecodeMPEG1Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
  *****************************************************************************/
 static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 {
-    /* À pomper dans Berkeley. Bien sûr les matrices seront différentes... */
+    int         i_dummy;
+    int         i_code;
+    int         i_nc;
+    int         i_coef;
+    int         i_type;
+    int         i_select;
+    int         i_offset;
+    int         i_run;
+    int         i_level;
+    int         i_2b;
+    int         i_4b;
+    boolean_t   b_sign;
+    /* Lookup table for the offset in the tables for ac coef decoding */
+    static lookup_t pl_offset_table[8] = { { 12, 4 }, { 8, 4 }, { 6, 8 },
+                                           { 4, 16 }, { 3, 16 }, { 2, 16 },
+                                           { 1, 16 }, { 0, 16 } };
+    /* There is no special decodding for DC coefficient in non intra blocs
+     * except that we won't use exactly the same table B.14 note 3 & 4 */
+    /* Decoding of the coefficients */
+
+#ifndef VDEC_DCT
+    i_nc = 1;
+#else
+    i_nc = 0;
+#endif
+
+    for( i_dummy = 0; i_dummy < 64; i_dummy++ )
+    {
+        i_code = ShowBits( &p_vpar->bit_stream, 16 );
+        i_2b = ! ( i_code >> 14 );
+        i_4b = ! ( ( i_code & 0x3C00 ) >> 10 );
+        /* Will contain the number of table to use in ppl_dct_coef */
+        i_select = i_2b + i_4b + ( i_code & 0x0200 ) + ( i_code & 0x0100 ) + 
+                                 ( i_code & 0x0080 ) + ( i_code & 0x0040 ) +
+                                 ( i_code & 0x0020 ) + ( i_code & 0x0010 );
+        /* Shall we use the first table or the next tables */
+        i_type = ( i_select & 1 ) & ( i_dummy & 0 );
+        i_select -= i_type;
+        i_offset = ( i_code >> pl_offset_table[i_select].i_value ) - 
+                               pl_offset_table[i_select].i_length;
+        i_run = ( * ( p_vpar->ppl_dct_coef[i_select]
+                    + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_run;
+        DumpBits( &p_vpar->bit_stream, 
+                  ( * ( p_vpar->ppl_dct_coef[i_select]
+                    + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_length );
+        switch( i_run )
+        {
+            case DCT_ESCAPE:
+                i_run = GetBits( &p_vpar->bit_stream, 6 );
+                i_level = GetBits( &p_vpar->bit_stream, 12 );
+                p_mb->ppi_blocks[i_b][i_dummy] = ( b_sign = ( i_level > 2047 ) ) 
+                                                          ? ( -4096 + i_level )
+                                                          : i_level;
+                i_coef = i_dummy;
+                i_dummy += i_run;
+                i_nc ++;
+                break;
+            case DCT_EOB:
+                i_dummy = 64;
+                break;
+            default:
+                i_level = ( * ( p_vpar->ppl_dct_coef[i_select]
+                              + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_level;
+                b_sign = Getbits( &p_vpar->bit_stream, 1 );
+                p_mb->ppi_blocks[i_b][i_dummy] = b_sign ? -i_level : i_level;
+                i_coef = i_dummy;
+                i_dummy += i_run;
+                i_nc ++;
+        }
+    }
+    if( i_nc == 1 )
+    {
+        p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+        p_mb->pi_sparse_pos[i_b] = i_coef;
+    }
+    else
+    {
+        p_mb->pf_idct[i_b] = vdec_IDCT;
+    }
 }
 
 /*****************************************************************************
@@ -1053,7 +1124,6 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
     static lookup_t pl_offset_table[8] = { { 12, 4 }, { 8, 4 }, { 6, 8 },
                                            { 4, 16 }, { 3, 16 }, { 2, 16 },
                                            { 1, 16 }, { 0, 16 } };
-    
     i_cc = pi_cc_index[i_b];
     /* Determine whether it is luminance or not (chrominance) */
     i_type = ( i_cc + 1 ) >> 1;
