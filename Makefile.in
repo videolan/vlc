@@ -82,7 +82,7 @@ LIB += -lpthread -ldl
 endif
 
 ifneq (,$(findstring solaris,$(SYS)))
-LIB += -ldl -lsocket -lnsl -lposix4 -lpthread -lresolv
+LIB += -ldl -lsocket -lnsl -lpthread
 endif
 
 ifeq ($(SYS),beos)
