@@ -2143,6 +2143,11 @@ AC_ARG_ENABLE(alsa,
      AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_alsa="true", have_alsa="false"),have_alsa="false")
      if test "x${have_alsa}" = "xtrue"
      then
+       AC_TRY_COMPILE([#define ALSA_PCM_NEW_HW_PARAMS_API
+                       #define ALSA_PCM_NEW_SW_PARAMS_API
+                       #include <alsa/asoundlib.h>],
+          [void foo() { snd_pcm_hw_params_get_period_time(0,0,0); }],
+           AC_DEFINE(HAVE_ALSA_NEW_API, 1, Define if ALSA is at least rc4))
        PLUGINS="${PLUGINS} alsa"
        LDFLAGS_alsa="${LDFLAGS_alsa} -lasound -lm -ldl"
      else

@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.20 2003/01/17 23:59:18 sam Exp $
+ * $Id: alsa.c,v 1.21 2003/02/03 00:39:42 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -432,8 +432,13 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set rate. */
+#ifdef HAVE_ALSA_NEW_API
     if ( ( i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
                                 &p_aout->output.output.i_rate, NULL ) ) < 0 )
+#else
+    if ( ( i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
+                                p_aout->output.output.i_rate, NULL ) ) < 0 )
+#endif
     {
         msg_Err( p_aout, "unable to set sample rate (%s)",
                          snd_strerror( i_snd_rc ) );
@@ -441,8 +446,13 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set buffer size. */
+#ifdef HAVE_ALSA_NEW_API
     if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
                                     p_hw, &i_buffer_size ) ) < 0 )
+#else
+    if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
+                                    p_hw, i_buffer_size ) ) < 0 )
+#endif
     {
         msg_Err( p_aout, "unable to set buffer size (%s)",
                          snd_strerror( i_snd_rc ) );
@@ -450,8 +460,13 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set period size. */
+#ifdef HAVE_ALSA_NEW_API
     if ( ( i_snd_rc = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm,
                                     p_hw, &i_period_size, NULL ) ) < 0 )
+#else
+    if ( ( i_snd_rc = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm,
+                                    p_hw, i_period_size, NULL ) ) < 0 )
+#endif
     {
         msg_Err( p_aout, "unable to set period size (%s)",
                          snd_strerror( i_snd_rc ) );
@@ -467,8 +482,13 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
+#ifdef HAVE_ALSA_NEW_API
     if( ( i_snd_rc = snd_pcm_hw_params_get_period_time( p_hw,
                                     &p_sys->i_period_time, NULL ) ) < 0 )
+#else
+    if( ( p_sys->i_period_time =
+                  snd_pcm_hw_params_get_period_time( p_hw, NULL ) ) < 0 )
+#endif
     {
         msg_Err( p_aout, "unable to get period time (%s)",
                          snd_strerror( i_snd_rc ) );
