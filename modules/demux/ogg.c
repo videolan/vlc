@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.15 2002/12/18 14:17:10 sam Exp $
+ * $Id: ogg.c,v 1.16 2002/12/19 23:23:24 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -443,7 +443,8 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
 
     if( p_stream->i_fourcc != VLC_FOURCC( 'v','o','r','b' ) &&
         p_stream->i_fourcc != VLC_FOURCC( 't','a','r','k' ) &&
-        p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
+        p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) &&
+        p_stream->i_fourcc != VLC_FOURCC( 'o','f','l','c') )
     {
         /* Remove the header from the packet */
         i_header_len = (*p_oggpacket->packet & PACKET_LEN_BITS01) >> 6;
@@ -524,8 +525,33 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 /* FIXME: check return value */
                 ogg_stream_packetpeek( &p_stream->os, &oggpacket );
 
+                msg_Dbg( p_input, "found string: %s", strndup( &oggpacket.packet[0], 6 ) );
+                msg_Dbg( p_input, "oggpacket.bytes is %d", oggpacket.bytes );
+                if( oggpacket.bytes >= 4 &&
+                    ! strncmp( &oggpacket.packet[0], "fLaC", 4 ) )
+                {
+                    oggpack_buffer opb;
+
+                    msg_Dbg( p_input, "found flac header" );
+                    p_stream->i_cat = AUDIO_ES;
+                    p_stream->i_fourcc = VLC_FOURCC( 'o','f','l','c' );
+#if 0
+                    /* Signal that we want to keep a backup of the vorbis
+                     * stream headers. They will be used when switching between
+                     * audio streams. */
+                    p_stream->b_force_backup = 1;
+
+                    /* Cheat and get additionnal info ;) */
+                    oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
+                    oggpack_adv( &opb, 96 );
+                    p_stream->f_rate = oggpack_read( &opb, 32 );
+                    oggpack_adv( &opb, 32 );
+                    p_stream->i_bitrate = oggpack_read( &opb, 32 );
+#endif
+                }
+
                 /* Check for Vorbis header */
-                if( oggpacket.bytes >= 7 &&
+                else if( oggpacket.bytes >= 7 &&
                     ! strncmp( &oggpacket.packet[1], "vorbis", 6 ) )
                 {
                     oggpack_buffer opb;
@@ -545,6 +571,18 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     p_stream->f_rate = oggpack_read( &opb, 32 );
                     oggpack_adv( &opb, 32 );
                     p_stream->i_bitrate = oggpack_read( &opb, 32 );
+                    {
+                        char title[sizeof("Stream") + 10];
+                        input_info_category_t *p_cat;
+                        sprintf( title, "Stream %d", p_ogg->i_streams );
+                        p_cat = input_InfoCategory( p_input, title );
+                        input_AddInfo( p_cat, "Type", "Audio" );
+                        input_AddInfo( p_cat, "Codec", "vorbis" );
+                        input_AddInfo( p_cat, "Sample Rate", "%f",
+                                       p_stream->f_rate );
+                        input_AddInfo( p_cat, "Bit Rate", "%d",
+                                       p_stream->i_bitrate );
+                    }
                 }
                 /* Check for Theora header */
                 else if( oggpacket.bytes >= 7 &&
@@ -592,6 +630,18 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     msg_Dbg( p_input,
                              "found theora header, bitrate: %i, rate: %f",
                              p_stream->i_bitrate, p_stream->f_rate );
+                    {
+                        char title[sizeof("Stream") + 10];
+                        input_info_category_t *p_cat;
+                        sprintf( title, "Stream %d", p_ogg->i_streams );
+                        p_cat = input_InfoCategory( p_input, title );
+                        input_AddInfo( p_cat, "Type", "Video" );
+                        input_AddInfo( p_cat, "Codec", "theora" );
+                        input_AddInfo( p_cat, "Frame Rate", "%f",
+                                       p_stream->f_rate );
+                        input_AddInfo( p_cat, "Bit Rate", "%d",
+                                       p_stream->i_bitrate );
+                    }
 #else /* HAVE_OGGPACKB */
                     msg_Dbg( p_input, "the ogg demuxer has been compiled "
                              "without support for the oggpackB extension."
@@ -620,6 +670,19 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     msg_Dbg( p_input,
                              "found tarkin header, bitrate: %i, rate: %f",
                              p_stream->i_bitrate, p_stream->f_rate );
+                                        {
+                        char title[sizeof("Stream") + 10];
+                        input_info_category_t *p_cat;
+                        sprintf( title, "Stream %d", p_ogg->i_streams );
+                        p_cat = input_InfoCategory( p_input, title );
+                        input_AddInfo( p_cat, "Type", "Video" );
+                        input_AddInfo( p_cat, "Codec", "tarkin" );
+                        input_AddInfo( p_cat, "Sample Rate", "%f",
+                                       p_stream->f_rate );
+                        input_AddInfo( p_cat, "Bit Rate", "%d",
+                                       p_stream->i_bitrate );
+                    }
+
                 }
                 else if( oggpacket.bytes >= 142 &&
                          !strncmp( &oggpacket.packet[1],
@@ -672,7 +735,23 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             p_stream->f_rate, p_stream->p_bih->biWidth,
                             p_stream->p_bih->biHeight,
                             p_stream->p_bih->biBitCount);
-
+                        {
+                            char title[sizeof("Stream") + 10];
+                            input_info_category_t *p_cat;
+                            sprintf( title, "Stream %d", p_ogg->i_streams );
+                            p_cat = input_InfoCategory( p_input, title );
+                            input_AddInfo( p_cat, "Type", "Video" );
+                            input_AddInfo( p_cat, "Codec", "%.4s",
+                                           (char *)&p_stream->i_fourcc );
+                            input_AddInfo( p_cat, "Frame Rate", "%f",
+                                           p_stream->f_rate );
+                            input_AddInfo( p_cat, "Bit Count", "%d",
+                                           p_stream->p_bih->biBitCount );
+                            input_AddInfo( p_cat, "Width", "%d",
+                                           p_stream->p_bih->biWidth );
+                            input_AddInfo( p_cat, "Height", "%d",
+                                           p_stream->p_bih->biHeight );
+                        }
                         p_stream->i_bitrate = 0;
                     }
                     /* Check for audio header (old format) */
@@ -751,6 +830,25 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                                  p_stream->p_wf->nSamplesPerSec,
                                  p_stream->p_wf->wBitsPerSample,
                                  p_stream->p_wf->nAvgBytesPerSec * 8 / 1024 );
+                        {
+                            char title[sizeof("Stream") + 10];
+                            input_info_category_t *p_cat;
+                            sprintf( title, "Stream %d", p_ogg->i_streams );
+                            p_cat = input_InfoCategory( p_input, title );
+                            input_AddInfo( p_cat, "Type", "Audio" );
+                            input_AddInfo( p_cat, "Codec", "%.4s", 
+                                           (char *)&p_stream->i_fourcc );
+                            input_AddInfo( p_cat, "Sample Rate", "%d",
+                                           p_stream->p_wf->nSamplesPerSec );
+                            input_AddInfo( p_cat, "Bit Rate", "%d",
+                                           p_stream->p_wf->nAvgBytesPerSec * 8
+                                              / 1024 );
+                            input_AddInfo( p_cat, "Channels", "%d",
+                                           p_stream->p_wf->nChannels );
+                            input_AddInfo( p_cat, "Bits per Sample", "%d",
+                                           p_stream->p_wf->wBitsPerSample );
+                        }
+
                     }
                     else
                     {
@@ -812,6 +910,23 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             p_stream->p_bih->biHeight,
                             p_stream->p_bih->biBitCount);
 
+                        {
+                            char title[sizeof("Stream") + 10];
+                            input_info_category_t *p_cat;
+                            sprintf( title, "Stream %d", p_ogg->i_streams );
+                            p_cat = input_InfoCategory( p_input, title );
+                            input_AddInfo( p_cat, "Type", "Video" );
+                            input_AddInfo( p_cat, "Codec", "%.4s",
+                                           (char *)&p_stream->i_fourcc );
+                            input_AddInfo( p_cat, "Frame Rate", "%f",
+                                           p_stream->f_rate );
+                            input_AddInfo( p_cat, "Bit Count", "%d",
+                                           p_stream->p_bih->biBitCount );
+                            input_AddInfo( p_cat, "Width", "%d",
+                                           p_stream->p_bih->biWidth );
+                            input_AddInfo( p_cat, "Height", "%d",
+                                           p_stream->p_bih->biHeight );
+                        }
                         p_stream->i_bitrate = 0;
                     }
                     /* Check for audio header (new format) */
@@ -888,6 +1003,24 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                                  p_stream->p_wf->nSamplesPerSec,
                                  p_stream->p_wf->wBitsPerSample,
                                  p_stream->p_wf->nAvgBytesPerSec * 8 / 1024 );
+                        {
+                            char title[sizeof("Stream") + 10];
+                            input_info_category_t *p_cat;
+                            sprintf( title, "Stream %d", p_ogg->i_streams );
+                            p_cat = input_InfoCategory( p_input, title );
+                            input_AddInfo( p_cat, "Type", "Audio" );
+                            input_AddInfo( p_cat, "Codec", "%.4s", 
+                                           (char *)&p_stream->i_fourcc );
+                            input_AddInfo( p_cat, "Sample Rate", "%d",
+                                           p_stream->p_wf->nSamplesPerSec );
+                            input_AddInfo( p_cat, "Bit Rate", "%d",
+                                           p_stream->p_wf->nAvgBytesPerSec * 8
+                                              / 1024 );
+                            input_AddInfo( p_cat, "Channels", "%d",
+                                           p_stream->p_wf->nChannels );
+                            input_AddInfo( p_cat, "Bits per Sample", "%d",
+                                           p_stream->p_wf->wBitsPerSample );
+                        }
                     }
                     /* Check for text (subtitles) header */
                     else if( !strncmp(st->streamtype, "text", 4) )

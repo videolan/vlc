@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.8 2002/11/28 21:00:48 gbazin Exp $
+ * $Id: vorbis.c,v 1.9 2002/12/19 23:23:25 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -182,7 +182,26 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         msg_Err( p_dec->p_fifo, "2nd Vorbis header is corrupted" );
         goto error;
     }
-
+    /* parse the vorbis comment */
+    {
+        input_thread_t *p_input = p_fifo->p_parent;
+        input_info_category_t *p_cat = input_InfoCategory( p_input,
+                                                           "Vorbis Comment" );
+        int i = 0;
+        char *psz_name, *psz_value, *psz_comment;
+        while ( i < p_dec->vc.comments )
+        {
+            psz_comment = strdup( p_dec->vc.user_comments[i] );
+            psz_name = psz_comment;
+            psz_value = strchr( psz_comment, '=' );
+            *psz_value = '\0';
+            psz_value++;
+            input_AddInfo( p_cat, psz_name, psz_value );
+            free( psz_comment );
+            i++;
+        }
+    }
+    
     if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
         goto error;
 
