@@ -2,7 +2,7 @@
  * i420_yuy2.h : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.h,v 1.3 2002/04/30 20:19:31 sam Exp $
+ * $Id: i420_yuy2.h,v 1.4 2002/04/30 20:21:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -55,7 +55,7 @@ addl         $2, %%eax                                                    \n\
 addl         $2, %%ebx                                                    \n\
 "
 
-#define MMX_CALL(MMX_INSTRUCTION)                                   \
+#define MMX_CALL(MMX_INSTRUCTIONS)                                  \
     __asm__ __volatile__(                                           \
         MMX_LOAD                                                    \
         ".align 8 \n\t"                                             \
