@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: httpd.c,v 1.1 2004/03/03 13:23:47 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -449,6 +449,12 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
         }
         file->pf_fill( file->p_sys, file, psz_args, &answer->p_body, &answer->i_body );
     }
+    /* We respect client request */
+    if( strcmp( httpd_MsgGet( &cl->query, "Connection" ), "" ) )
+    {
+        httpd_MsgAdd( answer, "Connection", httpd_MsgGet( &cl->query, "Connection" ) );
+    }
+
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
 
     return VLC_SUCCESS;
@@ -1219,7 +1225,7 @@ static void httpd_ClientInit( httpd_client_t *cl )
 {
     cl->i_state = HTTPD_CLIENT_RECEIVING;
     cl->i_activity_date = mdate();
-    cl->i_activity_timeout = 1500000000LL;
+    cl->i_activity_timeout = 10000000LL;
     cl->i_buffer_size = 10000;
     cl->i_buffer = 0;
     cl->p_buffer = malloc( cl->i_buffer_size );
@@ -1943,8 +1949,8 @@ static void httpd_HostThread( httpd_host_t *host )
                 {
                     cl->url = NULL;
                     if( ( cl->query.i_proto == HTTPD_PROTO_HTTP &&
-                          ( !strcasecmp( httpd_MsgGet( &cl->query, "Connection" ), "Keep-Alive" )||
-                          ( cl->answer.i_version == 1 && strcasecmp( httpd_MsgGet( &cl->query, "Connection" ), "Close" ) ) ) ) ||
+                          ( ( cl->answer.i_version == 0 && !strcasecmp( httpd_MsgGet( &cl->answer, "Connection" ), "Keep-Alive" ) ) ||
+                            ( cl->answer.i_version == 1 &&  strcasecmp( httpd_MsgGet( &cl->answer, "Connection" ), "Close" ) ) ) ) ||
                         ( cl->query.i_proto == HTTPD_PROTO_RTSP &&
                           strcasecmp( httpd_MsgGet( &cl->query, "Connection" ), "Close" ) &&
                           strcasecmp( httpd_MsgGet( &cl->answer, "Connection" ), "Close" ) ) )
