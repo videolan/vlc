@@ -4,6 +4,12 @@
 
 HEAD
 
+  * Nothing yet.
+
+0.4.0
+Mon, 20 May 2002 22:53:48 +0200
+
+  * ./plugins/network/ipv6.c: experimental support for Windows IPv6
   * ./plugins/a52/a52.c: added an option to disable the dynamic range
     compression.
   * ./Makefile.opts.in: removed configuration stuff which does not need to

@@ -409,7 +409,7 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/alsa.so
 
 %changelog
-* Sat May 18 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.0-1mdk
+* Mon May 20 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.0-1mdk
 - version 0.4.0 with MPEG4 (DivX) support thx ffmpeg.
   thus s/MPEG, MPEG2 and DVD/multimedia/g
 - sync %%description with debian ones.
