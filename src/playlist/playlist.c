@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.77 2004/01/26 23:07:16 fenrir Exp $
+ * $Id: playlist.c,v 1.78 2004/01/26 23:30:18 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -601,9 +601,9 @@ static void PlayItem( playlist_t *p_playlist )
             for( j = 0; j< p_item->pp_categories[i]->i_infos ; j++ )
             {
                 msg_Dbg( p_playlist, "Option : %s",
-                         p_item->pp_categories[i]->pp_infos[j]->psz_name);
+                         p_item->pp_categories[i]->pp_infos[j]->psz_value );
                 TAB_APPEND( i_options, ppsz_options,
-                            p_item->pp_categories[i]->pp_infos[j]->psz_name );
+                            p_item->pp_categories[i]->pp_infos[j]->psz_value );
             }
             break;
         }
