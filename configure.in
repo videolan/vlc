@@ -78,21 +78,20 @@ CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
 CFLAGS="${CFLAGS} -I/usr/local/include"
 
 dnl Check for pthreads - borrowed from XMMS
-AC_CHECK_FUNC(pthread_attr_init,,[
-  THREAD_LIB=error
-  if test "x${THREAD_LIB}" = xerror; then
-    AC_CHECK_LIB(pthread,pthread_attr_init,THREAD_LIB="-lpthread")
-  fi
-  if test "x${THREAD_LIB}" = xerror; then
-    AC_CHECK_LIB(pthreads,pthread_attr_init,THREAD_LIB="-lpthreads")
-  fi
-  if test "x${THREAD_LIB}" = xerror; then
-    AC_CHECK_LIB(c_r,pthread_attr_init,THREAD_LIB="-lc_r")
-  fi
-  if test "x${THREAD_LIB}" = xerror; then
-    THREAD_LIB=""
-  fi
-])
+THREAD_LIB=error
+if test "x${THREAD_LIB}" = xerror; then
+  AC_CHECK_LIB(pthread,pthread_attr_init,THREAD_LIB="-lpthread")
+fi
+if test "x${THREAD_LIB}" = xerror; then
+  AC_CHECK_LIB(pthreads,pthread_attr_init,THREAD_LIB="-lpthreads")
+fi
+if test "x${THREAD_LIB}" = xerror; then
+  AC_CHECK_LIB(c_r,pthread_attr_init,THREAD_LIB="-lc_r")
+fi
+if test "x${THREAD_LIB}" = xerror; then
+  AC_CHECK_FUNC(pthread_attr_init)
+  THREAD_LIB=""
+fi
 
 dnl Check for cthreads under GNU/Hurd for instance
 AC_CHECK_LIB(threads,cthread_fork,THREAD_LIB="-lthreads")
