@@ -2,7 +2,7 @@
  * demux.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.3 2002/10/23 21:54:33 gbazin Exp $
+ * $Id: demux.c,v 1.4 2003/01/20 13:03:03 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -621,7 +621,7 @@ static int Demux( input_thread_t * p_input )
    
     if( !ReadPES( p_input, &p_pes, p_aac->i_aac_frame_length ) )
     {
-        msg_Err( p_input,
+        msg_Warn( p_input,
                  "cannot read data" );
         return( -1 );
     }
