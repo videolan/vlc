@@ -899,12 +899,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     vlc_bool_t              b_configure_notify = VLC_FALSE;
     vlc_bool_t              b_map_notify = VLC_FALSE;
 
-    vlc_value_t             val;
-
     /* Prepare window manager hints and properties */
-    xsize_hints.base_width          = p_win->i_width;
-    xsize_hints.base_height         = p_win->i_height;
-    xsize_hints.flags               = PSize;
     p_win->wm_protocols =
              XInternAtom( p_vout->p_sys->p_display, "WM_PROTOCOLS", True );
     p_win->wm_delete_window =
@@ -916,9 +911,33 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                                                      p_vout->p_sys->i_screen);
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
 
-    /* Check whether someone provided us with a window ID */
-    var_Get( p_vout->p_vlc, "drawable", &val );
-    p_win->owner_window = p_vout->b_fullscreen ? 0 : val.i_int;
+    if( !p_vout->b_fullscreen )
+    {
+        p_win->owner_window =
+            (Window)vout_RequestWindow( p_vout, &p_win->i_x, &p_win->i_y,
+                                        &p_win->i_width, &p_win->i_height );
+
+        xsize_hints.base_width  = xsize_hints.width = p_win->i_width;
+        xsize_hints.base_height = xsize_hints.height = p_win->i_height;
+        xsize_hints.flags       = PSize;
+
+        if( p_win->i_x >=0 || p_win->i_y >= 0 )
+        {
+            xsize_hints.x = p_win->i_x;
+            xsize_hints.y = p_win->i_y;
+            xsize_hints.flags |= PPosition;
+        }
+    }
+    else
+    {
+        /* Fullscreen window size and position */
+        p_win->owner_window = 0;
+        p_win->i_x = p_win->i_y = 0;
+        p_win->i_width =
+            DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
+        p_win->i_height =
+            DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
+    }
 
     if( !p_win->owner_window )
     {
@@ -929,7 +948,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
         p_win->base_window =
             XCreateWindow( p_vout->p_sys->p_display,
                            DefaultRootWindow( p_vout->p_sys->p_display ),
-                           0, 0,
+                           p_win->i_x, p_win->i_y,
                            p_win->i_width, p_win->i_height,
                            0,
                            0, InputOutput, 0,
@@ -1105,6 +1124,9 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     XUnmapWindow( p_vout->p_sys->p_display, p_win->base_window );
     XDestroyWindow( p_vout->p_sys->p_display, p_win->base_window );
+
+    if( p_win->owner_window )
+        vout_ReleaseWindow( p_vout, (void *)p_win->owner_window );
 }
 
 /*****************************************************************************
@@ -1300,12 +1322,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
 
         p_vout->p_sys->p_win = &p_vout->p_sys->fullscreen_window;
 
-        /* fullscreen window size and position */
-        p_vout->p_sys->p_win->i_width =
-            DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
-        p_vout->p_sys->p_win->i_height =
-            DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
-
         CreateWindow( p_vout, p_vout->p_sys->p_win );
 
         /* To my knowledge there are two ways to create a borderless window.
@@ -1368,15 +1384,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                          p_vout->p_sys->p_win->base_window,
                          DefaultRootWindow( p_vout->p_sys->p_display ),
                          0, 0 );
-
-        /* fullscreen window size and position */
-        p_vout->p_sys->p_win->i_width =
-            DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
-        p_vout->p_sys->p_win->i_height =
-            DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
-
-        p_vout->p_sys->p_win->i_x = 0;
-        p_vout->p_sys->p_win->i_y = 0;
 
 #ifdef HAVE_XINERAMA
         if( XineramaQueryExtension( p_vout->p_sys->p_display, &i_d1, &i_d2 ) &&
