@@ -306,7 +306,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     /* Initialize some data */
     p_sys->i_streams = 0;
-    p_sys->pp_streams = (dshow_stream_t **)malloc( 1 );
+    p_sys->pp_streams = 0;
     p_sys->i_width = i_width;
     p_sys->i_height = i_height;
     p_sys->i_chroma = i_chroma;
@@ -338,10 +338,25 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                 p_stream->i_fourcc == VLC_FOURCC('m','p','2','v') )
             {
                 b_audio = VLC_FALSE;
+
+                if( b_access_demux )
+                {
+                    /* Let the access (only) take care of that */
+                  return VLC_EGENERIC;
+                }
             }
         }
 
-        if( p_stream->mt.majortype == MEDIATYPE_Stream ) b_audio = VLC_FALSE;
+        if( p_stream->mt.majortype == MEDIATYPE_Stream )
+        {
+            b_audio = VLC_FALSE;
+
+            if( b_access_demux )
+            {
+                /* Let the access (only) take care of that */
+                return VLC_EGENERIC;
+            }
+        }
     }
 
     if( b_audio && OpenDevice( p_this, p_sys, adevname, 1 ) != VLC_SUCCESS )
@@ -493,7 +508,7 @@ static int AccessOpen( vlc_object_t *p_this )
     p_access->p_sys = p_sys = (access_sys_t *)malloc( sizeof( access_sys_t ) );
     memset( p_sys, 0, sizeof( access_sys_t ) );
 
-    if( CommonOpen( p_this, p_sys, VLC_TRUE ) != VLC_SUCCESS )
+    if( CommonOpen( p_this, p_sys, VLC_FALSE ) != VLC_SUCCESS )
     {
         CommonClose( p_this, p_sys );
         return VLC_EGENERIC;
@@ -549,11 +564,8 @@ static void CommonClose( vlc_object_t *p_this, access_sys_t *p_sys )
     CoUninitialize();
 
     /* Remove filters from graph */
-    for( int i = 0; i < p_sys->i_streams; i++ )
-    {
-        delete p_sys->pp_streams[i];
-    }
-    free( p_sys->pp_streams );
+    for( int i = 0; i < p_sys->i_streams; i++ ) delete p_sys->pp_streams[i];
+    if( p_sys->i_streams ) free( p_sys->pp_streams );
 
     vlc_mutex_destroy( &p_sys->lock );
     vlc_cond_destroy( &p_sys->wait );
@@ -764,7 +776,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
      * won't add a prefered media type as this doesn't seem to work well
      * -- to investigate. */
     vlc_bool_t b_stream_type = VLC_FALSE;
-    for( int i = 0; i < media_count; i++ )
+    for( size_t i = 0; i < media_count; i++ )
     {
         if( media_types[i].majortype == MEDIATYPE_Stream )
         {
