@@ -369,7 +369,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             }
             closedir( d );
         }
-        free( *subdirs++ );
+        if( j >= 0 ) free( *subdirs++ );
     }
 
     if( tmp_subdirs ) free( tmp_subdirs );
