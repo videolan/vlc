@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# $Id: woody-buildpackage,v 1.1 2003/02/02 17:18:47 sam Exp $
+# $Id: woody-buildpackage,v 1.2 2003/02/02 18:57:01 sam Exp $
 # Build VLC for a Woody Debian system
 
 if test ! -d debian
@@ -11,7 +11,7 @@ fi
 
 # replace (1.2.3-4) with (1.2.3-0woody.4)
 sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc (\1-0woody.\2)/' \
-    < debian/changelog >| debian/changelog.woody
+    < debian/changelog > debian/changelog.woody
 
 # replace liba52-*-dev with a52dec-dev (>=0.7.3)
 #         libdv*-dev with libdv-dev
@@ -20,14 +20,17 @@ sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
     -e 's/libdv[0-9]*-dev/libdv-dev/' \
     -e 's/, libwx[^,]*//' \
     -e '/Package: wxvlc/,/^ *$/d' \
-    < debian/control >| debian/control.woody
+    < debian/control > debian/control.woody
 
-# remove wxwindows stuff
+# remove wxwindows stuff, change changelog path
 sed -e '/# Package: wxvlc/,/^ *$/d' \
     -e '/--enable-wxwindows/d' \
-    < debian/rules >| debian/rules.woody
+    -e ', debian/changelog , debian/changelog.woody ,' \
+    -e '/dh_gencontrol[^#]*/& -- -ldebian/changelog.woody/' \
+    < debian/rules > debian/rules.woody
 chmod a+x debian/rules.woody
 
+# Environment variables - taken from dpkg-buildpackage
 curd="`pwd`"
 dirn="`basename \"$curd\"`"
 package="`dpkg-parsechangelog -ldebian/changelog.woody | sed -n 's/^Source: //p'`"
@@ -40,10 +43,11 @@ pv="${package}_${sversion}"
 pva="${package}_${sversion}_${arch}"
 chg=../"$pva.changes"
 
-dpkg-checkbuilddeps -B debian/control.woody
+# Do the real work
+#dpkg-checkbuilddeps -B debian/control.woody || exit 1
 fakeroot debian/rules.woody clean
-cd ..; dpkg-source -b "$dirn"; cd "$dirn"
+cd ..; dpkg-source -l"$dirn"/debian/changelog.woody -b "$dirn"; cd "$dirn"
 debian/rules.woody build
-fakeroot debian/rules binary
-dpkg-genchanges -ldebian/changelog.woody -c debian/control.woody >"$chg"
+fakeroot debian/rules.woody binary
+dpkg-genchanges -ldebian/changelog.woody -cdebian/control.woody >"$chg"
 
