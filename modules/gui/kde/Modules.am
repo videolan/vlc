@@ -8,7 +8,9 @@ SOURCES_kde = \
 	modules/gui/kde/preferences.cpp \
 	modules/gui/kde/pluginsbox.cpp \
 	modules/gui/kde/QConfigItem.cpp \
-	modules/gui/kde/messages.cpp
+	modules/gui/kde/messages.cpp \
+	modules/gui/kde/info.cpp \
+	modules/gui/kde/languagemenu.cpp
 
 nodist_SOURCES_kde = \
 	modules/gui/kde/interface.moc.cpp \
@@ -19,7 +21,9 @@ nodist_SOURCES_kde = \
 	modules/gui/kde/preferences.moc.cpp \
 	modules/gui/kde/pluginsbox.moc.cpp \
 	modules/gui/kde/QConfigItem.moc.cpp \
-	modules/gui/kde/messages.moc.cpp
+	modules/gui/kde/messages.moc.cpp \
+	modules/gui/kde/info.moc.cpp \
+	modules/gui/kde/languagemenu.moc.cpp
 
 noinst_HEADERS += \
 	modules/gui/kde/common.h \
@@ -31,7 +35,9 @@ noinst_HEADERS += \
 	modules/gui/kde/pluginsbox.h \
 	modules/gui/kde/preferences.h \
 	modules/gui/kde/slider.h \
-	modules/gui/kde/messages.h
+	modules/gui/kde/messages.h \
+	modules/gui/kde/info.h \
+	modules/gui/kde/languagemenu.h
 
 modules/gui/kde/interface.moc.cpp: modules/gui/kde/interface.h
 	$(MOC) $< -o $@
@@ -51,5 +57,11 @@ modules/gui/kde/QConfigItem.moc.cpp: modules/gui/kde/QConfigItem.h
 	$(MOC) $< -o $@
 modules/gui/kde/messages.moc.cpp: modules/gui/kde/messages.h
 	$(MOC) $< -o $@
+modules/gui/kde/info.moc.cpp: modules/gui/kde/info.h
+	$(MOC) $< -o $@
+modules/gui/kde/languagemenu.moc.cpp: modules/gui/kde/languagemenu.h
+	$(MOC) $< -o $@
 
-EXTRA_DIST += modules/gui/kde/ui.rc
+kdedatadir = $(datadir)\vlc
+
+dist_kdedata_DATA = modules/gui/kde/ui.rc

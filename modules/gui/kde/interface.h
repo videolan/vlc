@@ -11,6 +11,7 @@
 
 #include "common.h"
 
+#include <kaction.h>
 #include <kmainwindow.h>
 #include <kapplication.h>
 #include <kurl.h>
@@ -44,9 +45,6 @@ class KInterface : public KMainWindow
         void slotFileOpen();
         /** opens a file from the recent files menu */
         void slotFileOpenRecent(const KURL& url);
-        /** asks for saving if the file is modified, then closes the
-         * actual file and window*/
-        void slotFileClose();
         /** closes all open windows by calling close() on each
          * memberList item until the list is empty, then quits the
          * application.  If queryClose() returns false because the
@@ -68,6 +66,8 @@ class KInterface : public KMainWindow
          */
         void slotStatusMsg( const QString &text );
         void slotShowMessages();
+        void slotShowInfo();
+        void slotSetLanguage( bool, es_descriptor_t * );
 
     protected:
         /** initializes the KActions of the application */
@@ -84,11 +84,13 @@ class KInterface : public KMainWindow
         void slotManage();
 
         /** this slot is called when we drag the position seek bar */
-        void slotSliderMoved( int position );
+        void slotSliderMoved( int );
 
         /** called every time the slider changes values */
         void slotSliderChanged( int position );
 
+        void slotUpdateLanguages();
+        
         void slotOpenDisk();
         void slotOpenStream();
 
@@ -102,6 +104,7 @@ class KInterface : public KMainWindow
         void slotNext();
 
   private:
+        void languageMenus( KActionMenu *, es_descriptor_t *, int );
 
         intf_thread_t    *p_intf;
         KMessagesWindow *p_messagesWindow;
@@ -125,7 +128,6 @@ class KInterface : public KMainWindow
         KAction             *diskOpen;
         KAction             *streamOpen;
         KRecentFilesAction  *fileOpenRecent;
-        KAction             *fileClose;
         KAction             *fileQuit;
         KToggleAction       *viewToolBar;
         KToggleAction       *viewStatusBar;
@@ -139,6 +141,14 @@ class KInterface : public KMainWindow
         KAction             *next;
         KAction             *messages;
         KAction             *preferences;
+        KAction             *info;
+        KActionMenu         *languages;
+        KActionMenu         *subtitles;
+        KActionCollection   *languageCollection;
+        KActionCollection   *subtitleCollection;
+        KActionMenu         *program;
+        KActionMenu         *title;
+        KActionMenu         *chapter;
 };
 
 /*****************************************************************************
@@ -149,6 +159,7 @@ struct intf_sys_t
     KApplication *p_app;
     KInterface   *p_window;
     KAboutData   *p_about;
+    int b_playing;
 
     input_thread_t *p_input;
     msg_subscription_t *p_msg;

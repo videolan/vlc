@@ -15,18 +15,24 @@
 </ActionProperties>
 
 <MenuBar>
-  <Menu name="file" noMerge="1">
+  <Menu name="file">
     <text>&amp;File</text>
-    <Action name="file_open"/>
-    <Action name="file_open_recent"/>
     <Action name="open_disk"/>
     <Action name="open_stream"/>
-    <Separator lineSeparator="true"/>
-    <Action name="file_quit"/>
   </Menu>
-  <Menu name="view" noMerge="1">
+  <Menu name="view">
     <text>&amp;View</text>
+    <Action name="program"/>
+    <Action name="title"/>
+    <Action name="chapter"/>
+    <Separator lineSeparator="true"/>
     <Action name="view_messages"/>
+    <Action name="view_stream_info"/>
+  </Menu>
+  <Menu name="settings">
+    <text>&amp;Settings</text>
+    <Action name="language"/>
+    <Action name="subtitles"/>
   </Menu>
 </MenuBar>
 

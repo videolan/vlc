@@ -7,11 +7,13 @@
  ***************************************************************************/
 
 #include "disc.h"
+#include "info.h"
 #include "interface.h"
 #include "net.h"
 #include "menu.h"
 #include "slider.h"
 #include "preferences.h"
+#include "languagemenu.h"
 
 #include <iostream.h>
 
@@ -38,7 +40,6 @@ KInterface::KInterface( intf_thread_t *p_intf, QWidget *parent,
 
     this->p_intf = p_intf;
     p_messagesWindow = new KMessagesWindow( p_intf, p_intf->p_sys->p_msg );
-    p_messagesWindow->show();
     fDiskDialog = new KDiskDialog( this );
     fNetDialog = new KNetDialog( this );
     fTitleMenu = new KTitleMenu( p_intf, this );
@@ -47,14 +48,14 @@ KInterface::KInterface( intf_thread_t *p_intf, QWidget *parent,
     fSlider->setMaxValue(10000);
     connect( fSlider, SIGNAL( userChanged( int ) ), this, SLOT( slotSliderMoved( int ) ) );
     connect( fSlider, SIGNAL( valueChanged( int ) ), this, SLOT( slotSliderChanged( int ) ) );
+    connect( fSlider, SIGNAL( sliderMoved( int ) ), this, SLOT( slotSliderChanged( int ) ) );
     setCentralWidget(fSlider);
 
     fTimer = new QTimer( this );
     connect( fTimer, SIGNAL( timeout() ), this, SLOT( slotManage() ) );
-    fTimer->start( 100 );
 
     resize( 400, 30 );
-
+    msg_Dbg(p_intf, KStdAction::stdName(KStdAction::Preferences));
     ///////////////////////////////////////////////////////////////////
     // call inits to invoke all other construction parts
     // XXX could we move this up ?
@@ -70,8 +71,9 @@ KInterface::KInterface( intf_thread_t *p_intf, QWidget *parent,
     pause->plug( fTitleMenu );
     slow->plug( fTitleMenu );
     fast->plug( fTitleMenu );
-    fileClose->plug( fTitleMenu );
     fileQuit->plug( fTitleMenu );
+    fTimer->start( 0, FALSE );
+
 }
 
 KInterface::~KInterface()
@@ -81,9 +83,14 @@ KInterface::~KInterface()
 
 void KInterface::initActions()
 {
+    languages = new KActionMenu( _( "Languages" ), actionCollection(), "language" );
+    languages->setEnabled( false );
+    languageCollection = new KActionCollection( this );
+    subtitleCollection = new KActionCollection( this );
+    subtitles = new KActionMenu( _( "Subtitles" ), actionCollection(), "subtitles" );
+    subtitles->setEnabled( false );
     fileOpen = KStdAction::open(this, SLOT(slotFileOpen()), actionCollection());
     fileOpenRecent = KStdAction::openRecent(this, SLOT(slotFileOpenRecent(const KURL&)), actionCollection());
-    fileClose = KStdAction::close(this, SLOT(slotFileClose()), actionCollection());
     preferences = KStdAction::preferences(this, SLOT(slotShowPreferences()), actionCollection());
     fileQuit = KStdAction::quit(this, SLOT(slotFileQuit()), actionCollection());
     viewToolBar = KStdAction::showToolbar(this, SLOT(slotViewToolBar()), actionCollection());
@@ -101,9 +108,16 @@ void KInterface::initActions()
     next = new KAction( i18n( "Next" ), 0, 0, this, SLOT( slotNext() ), actionCollection(), "next" );
     messages = new KAction( _( "Messages..." ), 0, 0, this, SLOT( slotShowMessages() ), actionCollection(), "view_messages");
     
+    info = new KAction( _( "Stream info..." ), 0, 0, this, SLOT( slotShowInfo() ), actionCollection(), "view_stream_info");
+
+    program = new KActionMenu( _( "Program" ), actionCollection(), "program" );
+    program->setEnabled( false );
+    title = new KActionMenu( _( "Title" ), actionCollection(), "title" );
+    title->setEnabled( false );
+    chapter = new KActionMenu( _( "Chapter" ), actionCollection(), "chapter" );
+    chapter->setEnabled( false );
     fileOpen->setStatusText(i18n("Opens an existing document"));
     fileOpenRecent->setStatusText(i18n("Opens a recently used file"));
-    fileClose->setStatusText(i18n("Closes the actual document"));
     fileQuit->setStatusText(i18n("Quits the application"));
     viewToolBar->setStatusText(i18n("Enables/disables the toolbar"));
     viewStatusBar->setStatusText(i18n("Enables/disables the statusbar"));
@@ -119,8 +133,8 @@ void KInterface::initActions()
     prev->setStatusText( i18n( "Prev" ) );
     next->setStatusText( i18n( "Next" ) );
     // use the absolute path to your ktestui.rc file for testing purpose in createGUI();
-
-    createGUI( DATA_PATH "/ui.rc" );
+    char *uifile = config_GetPsz( p_intf, "kdeuirc" );
+    createGUI( uifile );
 //    createGUI( "./modules/gui/kde/ui.rc" );
 }
 
@@ -140,6 +154,14 @@ void KInterface::initStatusBar()
 void KInterface::slotShowMessages()
 {
     p_messagesWindow->show();
+}
+
+void KInterface::slotShowInfo()
+{
+    if ( p_intf->p_sys->p_input )
+    {
+        new KInfoWindow(p_intf, p_intf->p_sys->p_input);
+    }
 }
 
 void KInterface::slotFileOpen()
@@ -169,15 +191,6 @@ void KInterface::slotFileOpen()
 void KInterface::slotFileOpenRecent(const KURL& url)
 {
   slotStatusMsg(i18n("Opening file..."));
-  slotStatusMsg(i18n("Ready."));
-}
-
-void KInterface::slotFileClose()
-{
-  slotStatusMsg(i18n("Closing file..."));
-    
-  close();
-
   slotStatusMsg(i18n("Ready."));
 }
 
@@ -239,7 +252,7 @@ void KInterface::slotStatusMsg(const QString &text)
 void KInterface::slotManage()
 {
     p_messagesWindow->update();
-    p_intf->p_sys->p_app->processEvents();
+//    p_intf->p_sys->p_app->processEvents();
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* Update the input */
@@ -261,22 +274,51 @@ void KInterface::slotManage()
         p_intf->b_menu_change = 0;
     }
 
-    /* Update language/chapter menus after user request */
-#if 0
-    if( p_intf->p_sys->p_input != NULL && p_intf->p_sys->p_window != NULL &&
-        p_intf->p_sys->b_menus_update )
+    if( p_intf->p_sys->p_input )
     {
-//        GnomeSetupMenu( p_intf );
-    }
-#endif
+        input_thread_t *p_input = p_intf->p_sys->p_input;
+                
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        if( !p_input->b_die )
+        {
+            /* New input or stream map change */
+            if( p_input->stream.b_changed )
+            {
+                //            E_(GtkModeManage)( p_intf );
+                //GtkSetupMenus( p_intf );
+                slotUpdateLanguages();
 
-    /* Manage the slider */
-#define p_area p_intf->p_sys->p_input->stream.p_selected_area
-    if( p_intf->p_sys->p_input && p_area->i_size )
-    {
-	fSlider->setValue( ( 10000. * p_area->i_tell ) / p_area->i_size );
-    }
+                p_intf->p_sys->b_playing = 1;
+                p_input->stream.b_changed = 0;
+            }
+
+            /* Manage the slider. fSlider->setValue triggers
+             * slotSliderChanged which needs to grab the stream lock*/
+#define p_area p_input->stream.p_selected_area
+            if( p_area->i_size ) {
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
+                fSlider->setValue( ( 10000 * p_area->i_tell ) / p_area->i_size );
+                vlc_mutex_lock( &p_input->stream.stream_lock );
+
+            }
 #undef p_area
+            
+            //         if( p_intf->p_sys->i_part !=
+            //    p_input->stream.p_selected_area->i_part )
+            //{
+                //      p_intf->p_sys->b_chapter_update = 1;
+                //GtkSetupMenus( p_intf );
+            //}
+        }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    }
+    
+    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
+    {
+        //E_(GtkModeManage)( p_intf );
+        p_intf->p_sys->b_playing = 0;
+    }
 
     if( p_intf->b_die )
     {
@@ -284,6 +326,7 @@ void KInterface::slotManage()
     }
 
     vlc_mutex_unlock( &p_intf->change_lock );
+    msleep( 100 );
 
 }
 
@@ -299,6 +342,114 @@ void KInterface::slotSliderMoved( int position )
 
         vlc_mutex_unlock( &p_intf->change_lock );
     }
+}
+
+void KInterface::slotUpdateLanguages()
+{
+
+    es_descriptor_t *   p_spu_es;
+    es_descriptor_t *   p_audio_es;
+    /* look for selected ES */
+    p_audio_es = NULL;
+    p_spu_es = NULL;
+
+    for( int i = 0 ; i < p_intf->p_sys->p_input->stream.i_selected_es_number ; i++ )
+    {
+        if( p_intf->p_sys->p_input->stream.pp_selected_es[i]->i_cat == AUDIO_ES )
+        {
+            p_audio_es = p_intf->p_sys->p_input->stream.pp_selected_es[i];
+        }
+
+        if( p_intf->p_sys->p_input->stream.pp_selected_es[i]->i_cat == SPU_ES )
+        {
+            p_spu_es = p_intf->p_sys->p_input->stream.pp_selected_es[i];
+        }
+    }
+    languages->setEnabled( false );
+    subtitles->setEnabled( false );
+    languageCollection->clear();
+    subtitleCollection->clear();
+    languages->popupMenu()->clear();
+    subtitles->popupMenu()->clear();
+    /* audio menus */
+    /* find audio root menu */
+    languageMenus( languages, p_audio_es, AUDIO_ES );
+
+    /* sub picture menus */
+    /* find spu root menu */
+    languageMenus( subtitles, p_spu_es, SPU_ES );
+
+}
+
+
+/*
+ * called with stream lock
+ */
+void KInterface::languageMenus(KActionMenu *root, es_descriptor_t *p_es,
+                          int i_cat)
+{
+    int i_item = 0;
+    if ( i_cat != AUDIO_ES )
+    {
+        KLanguageMenuAction *p_item =
+            new KLanguageMenuAction( p_intf, _( "Off" ), 0, this );
+        subtitleCollection->insert( p_item );
+        root->insert( p_item );
+        root->insert( new KActionSeparator( this ) );
+        p_item->setExclusiveGroup( QString().sprintf( "%d", i_cat ) );
+        p_item->setChecked( p_es == 0 );
+    }
+    
+#define ES p_intf->p_sys->p_input->stream.pp_es[i]
+    /* create a set of language buttons and append them to the container */
+    for( int i = 0 ; i < p_intf->p_sys->p_input->stream.i_es_number ; i++ )
+    {
+        if( ( ES->i_cat == i_cat ) &&
+            ( !ES->p_pgrm ||
+              ES->p_pgrm ==
+                 p_intf->p_sys->p_input->stream.p_selected_program ) )
+        {
+            i_item++;
+            QString name = p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc;
+            if( name.isEmpty() )
+            {
+                name.sprintf( "Language %d", i_item );
+            }
+            KLanguageMenuAction *p_item;
+            if ( i_cat == AUDIO_ES )
+            {
+                p_item = new KLanguageMenuAction( p_intf, name, ES,
+                                                  this );
+                languageCollection->insert(p_item);
+            }
+            else
+            {
+                p_item = new KLanguageMenuAction( p_intf, name, ES,
+                                                  this );
+                subtitleCollection->insert(p_item);
+            }
+            p_item->setExclusiveGroup( QString().sprintf( "%d", i_cat ) );
+            root->insert( p_item );
+            
+            if( p_es == p_intf->p_sys->p_input->stream.pp_es[i] )
+            {
+                /* don't lose p_item when we append into menu */
+                //p_item_active = p_item;
+                p_item->setChecked( true );
+            }
+            connect( p_item, SIGNAL( toggled( bool, es_descriptor_t * ) ),
+                     this, SLOT( slotSetLanguage( bool, es_descriptor_t * ) ));
+
+        }
+    }
+
+    root->setEnabled( true );
+}
+
+
+void KInterface::slotSetLanguage( bool on, es_descriptor_t *p_es )
+{
+    input_ToggleES( p_intf->p_sys->p_input, p_es, on );
 }
 
 void KInterface::slotSliderChanged( int position )
