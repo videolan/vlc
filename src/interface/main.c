@@ -26,9 +26,13 @@
 #include "common.h"
 #include "mtime.h"
 #include "netutils.h"
+#include "debug.h"
+
+#include "intf_msg.h"
 
 #include "input.h"
 #include "input_vlan.h"
+#include "input_netlist.h"
 #include "decoder_fifo.h"
 
 #include "audio_output.h"
@@ -40,7 +44,6 @@
 
 #include "xconsole.h"
 #include "interface.h"
-#include "intf_msg.h"
 
 #include "pgm_data.h"
 

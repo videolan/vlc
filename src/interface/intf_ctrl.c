@@ -41,11 +41,15 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "debug.h"
+
+#include "intf_msg.h"
 
 #include "input.h"
 #include "input_ctrl.h"
 #include "input_vlan.h"
 #include "input_psi.h"
+#include "input_netlist.h"
 #include "decoder_fifo.h"
 
 #include "audio_output.h"
@@ -58,7 +62,6 @@
 
 #include "xconsole.h"
 #include "interface.h"
-#include "intf_msg.h"
 #include "intf_cmd.h"
 #include "control.h"
 #include "intf_ctrl.h"

@@ -27,55 +27,6 @@
  */
 
 /******************************************************************************
- * bit_fifo_t : bit fifo descriptor
- ******************************************************************************
- * This type describes a bit fifo used to store bits while working with the
- * input stream at the bit level.
- ******************************************************************************/
-typedef struct bit_fifo_s
-{
-    /* This unsigned integer allows us to work at the bit level. This buffer
-     * can contain 32 bits, and the used space can be found on the MSb's side
-     * and the available space on the LSb's side. */
-    u32                 buffer;
-
-    /* Number of bits available in the bit buffer */
-    int                 i_available;
-
-} bit_fifo_t;
-
-/******************************************************************************
- * bit_stream_t : bit stream descriptor
- ******************************************************************************
- * This type, based on a PES stream, includes all the structures needed to
- * handle the input stream like a bit stream.
- ******************************************************************************/
-typedef struct bit_stream_s
-{
-    /*
-     * Input structures
-     */
-    /* The input thread feeds the stream with fresh PES packets */
-    input_thread_t *    p_input;
-    /* The decoder fifo contains the data of the PES stream */
-    decoder_fifo_t *    p_decoder_fifo;
-
-    /*
-     * Byte structures
-     */
-    /* Current TS packet (in the current PES packet of the PES stream) */
-    ts_packet_t *       p_ts;
-    /* Index of the next byte that is to be read (in the current TS packet) */
-    unsigned int        i_byte;
-
-    /*
-     * Bit structures
-     */
-    bit_fifo_t          fifo;
-
-} bit_stream_t;
-
-/******************************************************************************
  * adec_bank_t
  ******************************************************************************/
 typedef struct adec_bank_s
