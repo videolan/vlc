@@ -89,7 +89,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
     i_displaydate = decoder_fifo->buffer[decoder_fifo->i_start]->b_has_pts ?
                     decoder_fifo->buffer[decoder_fifo->i_start]->i_pts :
                     0;
-    if( !i_displaydate /* || i_coding_type != I_CODING_TYPE */ )
+    if( !i_displaydate || i_coding_type != I_CODING_TYPE )
     {
         if (!p_vpar->synchro.i_images_since_pts )
             p_vpar->synchro.i_images_since_pts = 10;
@@ -99,6 +99,8 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
         //fprintf (stderr, "  ");
     }
     
+    decoder_fifo->buffer[decoder_fifo->i_start]->b_has_pts = 0;
+
     /* else fprintf (stderr, "R ");
     if (dropped) fprintf (stderr, "  "); else fprintf (stderr, "* ");
     fprintf (stderr, "%i ", i_coding_type);
