@@ -424,7 +424,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             i_result2++;
         }
     }
-    result2[i_result2+1] = NULL;
     free( result );
     return result2;
 }
