@@ -368,8 +368,8 @@ PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o \
 PLUGIN_IDCTMMXEXT =	plugins/idct/idctmmxext.o \
 			plugins/idct/idct_common.o
 
-PLUGIN_IDCTALTIVEC =	plugins/idct/idctaltivec.o \
-			plugins/idct/idct_common.o
+PLUGIN_IDCTALTIVEC =	plugins/idct/idctaltivec.o
+#FIXME : we should have plugins/idct/idct_common.o here
 
 PLUGIN_MACOSX =	plugins/macosx/macosx.o \
 		plugins/macosx/intf_macosx.o \
@@ -455,7 +455,7 @@ NONSTD_PLUGIN_OBJ = \
 		$(PLUGIN_GLIDE) \
 		$(PLUGIN_GTK) \
 		$(PLUGIN_GNOME) \
-		$(PLUGIN_IDCT_ALTIVEC)
+		$(PLUGIN_IDCTALTIVEC)
 
 NONSTD_CPP_PLUGIN_OBJ = \
 		$(PLUGIN_BEOS) \
@@ -618,7 +618,7 @@ $(PLUGIN_GLIDE): %.o: %.c
 $(PLUGIN_QT): %.o: Makefile.dep
 $(PLUGIN_QT): %.o: .dep/%.dpp
 $(PLUGIN_QT): %.o: %.moc
-	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/qt -c -o $@ $(<:%.moc=%.cpp)
+	$(CC) $(CFLAGS) $(PCFLAGS) -I${QTDIR}/include -c -o $@ $(<:%.moc=%.cpp)
 $(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
 	moc -i $< -o $@
 
@@ -632,9 +632,9 @@ $(PLUGIN_BEOS): %.o: .dep/%.dpp
 $(PLUGIN_BEOS): %.o: %.cpp
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
-plugins/idct/idctaltivec.o: %.o: Makefile.dep
-plugins/idct/idctaltivec.o: %.o: .dep/%.d
-plugins/idct/idctaltivec.o: %.o: %.c
+$(PLUGIN_IDCTALTIVEC): %.o: Makefile.dep
+$(PLUGIN_IDCTALTIVEC): %.o: .dep/%.d
+$(PLUGIN_IDCTALTIVEC): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $< -faltivec
 
 #
@@ -678,7 +678,7 @@ lib/dsp.so: $(PLUGIN_DSP)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/qt.so: $(PLUGIN_QT)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lqt
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lqt -L${QTDIR}/lib
 
 lib/kde.so: $(PLUGIN_KDE)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -lkdeui -lkdecore -lqt -ldl
@@ -804,7 +804,7 @@ lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/idctaltivec.so: $(PLUGIN_IDCTALTIVEC)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -framework VecLib
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ plugins/idct/idct_common.o -framework VecLib
 endif
 
 ################################################################################
