@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.21 2003/01/17 19:22:21 sam Exp $
+ * $Id: rc.c,v 1.22 2003/01/23 09:53:55 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -102,7 +102,7 @@ static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
 
-#ifdef HAVE_ISATTY
+#if defined(HAVE_ISATTY) && !defined(WIN32)
     /* Check that stdin is a TTY */
     if( !config_GetInt( p_intf, "fake-tty" ) && !isatty( 0 ) )
     {
@@ -194,26 +194,44 @@ static void Run( intf_thread_t *p_intf )
     var_Create( p_intf, "achan", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "achan", AudioConfig, NULL );
 
+#ifdef WIN32
+    /* Get the file descriptor of the console input */
+    i_dummy = _open( "CONIN$", 0 );
+    if( i_dummy == -1 )
+    {
+        msg_Err( p_intf, "Couldn't open CONIN$" ); 
+    }
+#endif
+
     while( !p_intf->b_die )
     {
+        vlc_bool_t     b_complete = VLC_FALSE;
+
+#ifndef WIN32
+        /* On Win32, select() only works on socket descriptors */
+
         fd_set         fds;
         struct timeval tv;
-        vlc_bool_t     b_complete = VLC_FALSE;
 
         /* Check stdin */
         tv.tv_sec = 0;
         tv.tv_usec = 50000;
         FD_ZERO( &fds );
-        FD_SET( STDIN_FILENO, &fds );
+        FD_SET( descr_stdin, &fds );
 
-        i_dummy = select( 32, &fds, NULL, NULL, &tv );
+        i_dummy = select( STDIN_FILENO + 1, &fds, NULL, NULL, &tv );
         if( i_dummy > 0 )
+#endif
         {
             int i_size = 0;
 
             while( !p_intf->b_die
                     && i_size < MAX_LINE_LENGTH
+#ifdef WIN32
+                    && read( i_dummy, p_buffer + i_size, 1 ) > 0
+#else
                     && read( STDIN_FILENO, p_buffer + i_size, 1 ) > 0
+#endif
                     && p_buffer[ i_size ] != '\r'
                     && p_buffer[ i_size ] != '\n' )
             {
