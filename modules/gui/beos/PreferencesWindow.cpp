@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.16 2003/05/05 13:06:02 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.17 2003/05/07 16:47:10 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -30,6 +30,28 @@
 #include <vlc/intf.h>
 
 #include "PreferencesWindow.h"
+
+/* We use this function to order the items of the BOutlineView */
+int compare_func( const BListItem * _first, const BListItem * _second )
+{
+    StringItemWithView * first = (StringItemWithView*) _first;
+    StringItemWithView * second = (StringItemWithView*) _second;
+    
+    /* the beos module first */
+    if( !strcmp( first->Text(), "beos" ) )
+        return -1;
+    if( !strcmp( second->Text(), "beos" ) )
+        return 1;
+
+    /* the main module in second */
+    if( !strcmp( first->Text(), "main" ) )
+        return -1;
+    if( !strcmp( second->Text(), "main" ) )
+        return 1;
+
+    /* alphabetic order */
+    return( strcmp( first->Text(), second->Text() ) );
+}
 
 /*****************************************************************************
  * StringItemWithView::StringItemWithView
@@ -89,15 +111,20 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     rect.right = Bounds().right - 15;
     fDummyView = new BView( rect, "", B_FOLLOW_ALL_SIDES, B_WILL_DRAW );
     fPrefsView->AddChild( fDummyView );
+
+    /* Add a category for modules configuration */
+    StringItemWithView * modulesItem;
+    modulesItem = new StringItemWithView( _("Modules") );
+    modulesItem->fConfigView = NULL;
+    fOutline->AddItem( modulesItem );
    
     /* Fill the tree */
     /* TODO:
         - manage CONFIG_HINT_SUBCATEGORY
         - use a pop-up for CONFIG_HINT_MODULE
         - use BSliders for integer_with_range and float_with_range
-        - add a tab for BeOS specific configution (screenshot path, etc)
         - add the needed LockLooper()s
-        - fix window resizing
+        - fix horizontal window resizing
         - make this intuitive ! */
     vlc_list_t * p_list;
     p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -220,13 +247,21 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
         StringItemWithView * stringItem;
         stringItem = new StringItemWithView( p_module->psz_object_name );
         stringItem->fConfigView = configView;
-        fOutline->AddItem( stringItem );
+        if( !strcmp( p_module->psz_object_name, "beos" )
+            || !strcmp( p_module->psz_object_name, "main" ) )
+            fOutline->AddItem( stringItem );
+        else
+            fOutline->AddUnder( stringItem, modulesItem );
     }
     
     vlc_list_release( p_list );
     
     /* Set the correct values */
     ApplyChanges( false );
+    
+    /* Sort items, collapse the Modules one */
+    fOutline->FullListSortItems( compare_func );
+    fOutline->Collapse( modulesItem );
     
     /* Select the first item */
     fOutline->Select( 0 );
@@ -306,16 +341,12 @@ void PreferencesWindow::FrameResized( float width, float height )
 {
     BWindow::FrameResized( width, height );
     
-    StringItemWithView * item;
+    /* Get the current ConfigView */
     ConfigView * view;
-    for( int i = 0; i < fOutline->CountItems(); i++ )
-    {
-        /* Fix ConfigView sizes */
-        item = (StringItemWithView*) fOutline->ItemAt( i );
-        view = item->fConfigView;
-        view->ResizeTo( fDummyView->Bounds().Width() - B_V_SCROLL_BAR_WIDTH,
-                        fDummyView->Bounds().Height() );
-    }
+    view = (ConfigView*) fConfigScroll->ChildAt( 0 );
+
+    view->ResizeTo( fDummyView->Bounds().Width() - B_V_SCROLL_BAR_WIDTH,
+                    fDummyView->Bounds().Height() );
 
     UpdateScrollBar();
 }
@@ -325,11 +356,15 @@ void PreferencesWindow::FrameResized( float width, float height )
  *****************************************************************************/
 void PreferencesWindow::Update()
 {
-    /* Get the selected item */
+    /* Get the selected item, if any */
     if( fOutline->CurrentSelection() < 0 )
         return;
     StringItemWithView * selectedItem =
         (StringItemWithView*) fOutline->ItemAt( fOutline->CurrentSelection() );
+    
+    if( !selectedItem->fConfigView )
+        /* This must be the "Modules" item */
+        return;
 
     if( fConfigScroll )
     {
@@ -344,6 +379,10 @@ void PreferencesWindow::Update()
         fDummyView->RemoveChild( fConfigScroll );
         delete fConfigScroll;
     }
+    
+    selectedItem->fConfigView->ResizeTo( fDummyView->Bounds().Width() -
+                                             B_V_SCROLL_BAR_WIDTH,
+                                         fDummyView->Bounds().Height() );
     
     /* Create a BScrollView with the new ConfigView in it */
     fConfigScroll = new BScrollView( "", selectedItem->fConfigView, B_FOLLOW_ALL_SIDES,
@@ -363,11 +402,7 @@ void PreferencesWindow::UpdateScrollBar()
        
     /* Get the current config view */
     ConfigView * view;
-    if( fOutline->CurrentSelection() < 0 )
-        return;
-    StringItemWithView * selectedItem =
-        (StringItemWithView*) fOutline->ItemAt( fOutline->CurrentSelection() );
-    view = selectedItem->fConfigView;
+    view = (ConfigView*) fConfigScroll->ChildAt( 0 );
     
     /* Get the available BRect for display */
     BRect display = fConfigScroll->Bounds();
@@ -400,6 +435,10 @@ void PreferencesWindow::ApplyChanges( bool doIt )
     {
         item = (StringItemWithView*) fOutline->ItemAt( i );
         view = item->fConfigView;
+        
+        if( !view )
+            /* This must be the "Modules" item */
+            continue;
         
         for( int j = 0; j < view->CountChildren(); j++ )
         {
