@@ -351,9 +351,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
                    VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
         av_reduce( &p_context->sample_aspect_ratio.num,
                    &p_context->sample_aspect_ratio.den,
-                   i_aspect_num *
-                   (int64_t)p_context->height / p_context->width,
-                   i_aspect_den, 1 << 30 /* something big */ );
+                   i_aspect_num * (int64_t)p_context->height,
+                   i_aspect_den * p_context->width, 1 << 30 );
 #else
         p_context->aspect_ratio = ((float)p_enc->fmt_in.video.i_aspect) /
             VOUT_ASPECT_FACTOR;
