@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.4 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: a52.c,v 1.5 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -213,7 +213,7 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     int i;
 
     if( ( p_a52_adec->p_aout_fifo != NULL ) &&
-        ( p_a52_adec->p_aout_fifo->l_rate != p_a52_adec->sample_rate ) )
+        ( p_a52_adec->p_aout_fifo->i_rate != p_a52_adec->sample_rate ) )
     {
         /* Make sure the output thread leaves the NextFrame() function */
         vlc_mutex_lock (&(p_a52_adec->p_aout_fifo->data_lock));
@@ -227,9 +227,9 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     /* Creating the audio output fifo if not created yet */
     if (p_a52_adec->p_aout_fifo == NULL )
     {
-        p_a52_adec->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 
+        p_a52_adec->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM, 
                                     p_a52_adec->i_channels,
-                                    p_a52_adec->sample_rate, 0,
+                                    p_a52_adec->sample_rate,
                                     AC3DEC_FRAME_SIZE * p_a52_adec->i_channels,
                                     NULL );
 
@@ -242,20 +242,20 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     /* Set the Presentation Time Stamp */
     CurrentPTS( &p_a52_adec->bit_stream,
                 &p_a52_adec->p_aout_fifo->date[
-                    p_a52_adec->p_aout_fifo->l_end_frame],
+                    p_a52_adec->p_aout_fifo->i_end_frame],
                 NULL );
 
     if( !p_a52_adec->p_aout_fifo->date[
-            p_a52_adec->p_aout_fifo->l_end_frame] )
+            p_a52_adec->p_aout_fifo->i_end_frame] )
     {
         p_a52_adec->p_aout_fifo->date[
-            p_a52_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
+            p_a52_adec->p_aout_fifo->i_end_frame] = LAST_MDATE;
     }
 
 
 
     p_buffer = ((byte_t *)p_a52_adec->p_aout_fifo->buffer) +
-        ( p_a52_adec->p_aout_fifo->l_end_frame * AC3DEC_FRAME_SIZE *
+        ( p_a52_adec->p_aout_fifo->i_end_frame * AC3DEC_FRAME_SIZE *
           p_a52_adec->i_channels * sizeof(s16) );
 
     /* FIXME */
@@ -280,8 +280,8 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
 
 
     vlc_mutex_lock( &p_a52_adec->p_aout_fifo->data_lock );
-    p_a52_adec->p_aout_fifo->l_end_frame = 
-      (p_a52_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+    p_a52_adec->p_aout_fifo->i_end_frame = 
+      (p_a52_adec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
     vlc_cond_signal (&p_a52_adec->p_aout_fifo->data_wait);
     vlc_mutex_unlock (&p_a52_adec->p_aout_fifo->data_lock);
 

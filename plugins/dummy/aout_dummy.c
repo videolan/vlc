@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.19 2002/02/15 13:32:53 sam Exp $
+ * $Id: aout_dummy.c,v 1.20 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,7 +48,7 @@ typedef struct aout_sys_s
  *****************************************************************************/
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
 static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
@@ -85,9 +85,9 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_GetBufInfo: returns available bytes in buffer
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
-    return( sizeof(s16) * l_buffer_limit + 1 ); /* value big enough to sleep */
+    return( sizeof(s16) * i_buffer_limit + 1 ); /* value big enough to sleep */
 }
 
 /*****************************************************************************

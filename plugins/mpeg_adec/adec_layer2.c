@@ -2,7 +2,7 @@
  * adec_layer2.c: MPEG Layer II audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: adec_layer2.c,v 1.5 2001/12/30 07:09:55 sam Exp $
+ * $Id: adec_layer2.c,v 1.6 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -372,8 +372,6 @@ int adec_layer2_mono( adec_thread_t * p_adec, s16 * buffer )
     {
         for (gr1 = 0; gr1 < 4; gr1++)
         {
-            s16 * XXX_buf;
-
             for (sb = 0; sb < sblimit; sb++)
             {
                 int code;
@@ -437,14 +435,12 @@ int adec_layer2_mono( adec_thread_t * p_adec, s16 * buffer )
 
             for (s = 0; s < 3; s++)
             {
-                DCT32 (sample[s], &p_adec->bank_0);
-                XXX_buf = buffer;
-                PCM (&p_adec->bank_0, &XXX_buf, 2);
+                DCT32( &p_adec->bank_0, sample[s] );
+                PCM( &p_adec->bank_0, buffer, 2 );
 
                 /* FIXME: one shouldn't have to do it twice ! */
-                DCT32 (sample[s], &p_adec->bank_1);
-                XXX_buf = buffer+1;
-                PCM (&p_adec->bank_1, &XXX_buf, 2);
+                DCT32( &p_adec->bank_1, sample[s] );
+                PCM( &p_adec->bank_1, buffer + 1, 2 );
 
                 buffer += 64;
             }
@@ -798,8 +794,6 @@ int adec_layer2_stereo( adec_thread_t * p_adec, s16 * buffer )
     {
         for (gr1 = 0; gr1 < 4; gr1++)
         {
-            s16 * XXX_buf;
-
             for (sb = 0; sb < bound; sb++)
             {
                 int code;
@@ -983,13 +977,11 @@ int adec_layer2_stereo( adec_thread_t * p_adec, s16 * buffer )
 
             for (s = 0; s < 3; s++)
             {
-                DCT32 (sample_0[s], &p_adec->bank_0);
-                XXX_buf = buffer;
-                PCM (&p_adec->bank_0, &XXX_buf, 2);
+                DCT32( &p_adec->bank_0, sample_0[s] );
+                PCM( &p_adec->bank_0, buffer, 2 );
 
-                DCT32 (sample_1[s], &p_adec->bank_1);
-                XXX_buf = buffer+1;
-                PCM (&p_adec->bank_1, &XXX_buf, 2);
+                DCT32( &p_adec->bank_1, sample_1[s] );
+                PCM( &p_adec->bank_1, buffer + 1, 2 );
 
                 buffer += 64;
             }

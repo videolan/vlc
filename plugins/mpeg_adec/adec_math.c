@@ -2,7 +2,7 @@
  * adec_math.c: Inverse Discrete Cosine Transform and Pulse Code Modulation
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: adec_math.c,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * $Id: adec_math.c,v 1.2 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -34,7 +34,7 @@
  * See fastdct.ps, and fast.tar.gz for a (Fortran :) implementation.
  *****************************************************************************/
 
-void DCT32(float *x, adec_bank_t *b)
+void DCT32( adec_bank_t *b, float *x )
 {
     /* cosine coefficients */
     static const float c2  =  .70710678118655;
@@ -311,7 +311,7 @@ void DCT32(float *x, adec_bank_t *b)
  * Compute 32 PCM samples with a convolution product
  *****************************************************************************/
 
-void PCM(adec_bank_t *b, s16 **pcm, int jump)
+void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
 {
     /* scale factor */
 #define F -32768
@@ -480,18 +480,18 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 if ((tmp += *f++ * *v) > 32767)
                 {
                     /* ceiling saturation */
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
                     /* floor saturation */
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -517,17 +517,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -553,17 +553,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -589,17 +589,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -625,17 +625,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -661,17 +661,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -697,17 +697,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -733,17 +733,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                     **pcm = (s16)tmp;
+                     *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -769,17 +769,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -805,17 +805,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 } 
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -841,17 +841,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {    
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -877,17 +877,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -913,17 +913,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -949,17 +949,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -985,17 +985,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 v += 15;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 15;
             }
             break;
@@ -1020,17 +1020,17 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 if ((tmp += *f++ * *v) > 32767)
                 {
-                    **pcm = 0x7FFF;
+                    *p_pcm = 0x7FFF;
                 }
                 else if (tmp < -32768)
                 {
-                    **pcm = 0x8000;
+                    *p_pcm = 0x8000;
                 }
                 else
                 {
-                    **pcm = (s16)tmp;
+                    *p_pcm = (s16)tmp;
                 }
-                *pcm += jump;
+                p_pcm += jump;
                 v += 31;
             }
             break;

@@ -155,7 +155,7 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
  *
  *   intf_ErrMsg( "mad_adec: libmad_header samplerate %d", p_libmad_header->samplerate);
  *
- *   p_mad_adec->p_aout_fifo->l_rate = p_libmad_header->samplerate;
+ *   p_mad_adec->p_aout_fifo->i_rate = p_libmad_header->samplerate;
  *   mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
  *
  *   return MAD_FLOW_CONTINUE;
@@ -300,12 +300,11 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     if (p_mad_adec->p_aout_fifo==NULL)
     {
     	p_mad_adec->p_aout_fifo = aout_CreateFifo(
-		AOUT_ADEC_STEREO_FIFO,  	/* fifo type */
-		p_libmad_pcm->channels,         /* nr. of channels */
-		p_libmad_pcm->samplerate,       /* frame rate in Hz ?*/
-		0,                     		/* units */
-                ADEC_FRAME_SIZE,     		/* frame size */
-		NULL  );               		/* buffer */
+                AOUT_FIFO_PCM,              /* fifo type */
+                p_libmad_pcm->channels,     /* nr. of channels */
+                p_libmad_pcm->samplerate,   /* frame rate in Hz ?*/
+                ADEC_FRAME_SIZE,            /* frame size */
+                NULL  );                    /* buffer */
 
     	if ( p_mad_adec->p_aout_fifo == NULL )
     	{
@@ -315,27 +314,27 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
         intf_ErrMsg("mad_adec debug: in libmad_output aout fifo created");
     }
 
-    if (p_mad_adec->p_aout_fifo->l_rate != p_libmad_pcm->samplerate)
+    if (p_mad_adec->p_aout_fifo->i_rate != p_libmad_pcm->samplerate)
     {
 	intf_ErrMsg( "mad_adec: libmad_output samplerate is changing from [%d] Hz to [%d] Hz, sample size [%d], error_code [%0x]",
-                   p_mad_adec->p_aout_fifo->l_rate, p_libmad_pcm->samplerate,
+                   p_mad_adec->p_aout_fifo->i_rate, p_libmad_pcm->samplerate,
      		     p_libmad_pcm->length, p_mad_adec->libmad_decoder->sync->stream.error);
-	p_mad_adec->p_aout_fifo->l_rate = p_libmad_pcm->samplerate;
+	p_mad_adec->p_aout_fifo->i_rate = p_libmad_pcm->samplerate;
     }
 
     if( p_mad_adec->i_current_pts )
     {
-        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->l_end_frame]
+        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->i_end_frame]
                 = p_mad_adec->i_current_pts;
     }
     else
     {
-        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->l_end_frame]
+        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->i_end_frame]
                 = LAST_MDATE;
     }
     mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
 
-    buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->l_end_frame * MAD_OUTPUT_SIZE);
+    buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->i_end_frame * MAD_OUTPUT_SIZE);
 
     while (nsamples--)
     {
@@ -384,7 +383,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     }
 
     vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
-    p_mad_adec->p_aout_fifo->l_end_frame = (p_mad_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+    p_mad_adec->p_aout_fifo->i_end_frame = (p_mad_adec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
     vlc_cond_signal (&p_mad_adec->p_aout_fifo->data_wait);
     vlc_mutex_unlock (&p_mad_adec->p_aout_fifo->data_lock);
 

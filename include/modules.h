@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.42 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: modules.h,v 1.43 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -212,7 +212,7 @@ typedef struct function_list_s
         {
             int  ( * pf_open )       ( struct aout_thread_s * );
             int  ( * pf_setformat )  ( struct aout_thread_s * );
-            long ( * pf_getbufinfo ) ( struct aout_thread_s *, long );
+            int  ( * pf_getbufinfo ) ( struct aout_thread_s *, int );
             void ( * pf_play )       ( struct aout_thread_s *, byte_t *, int );
             void ( * pf_close )      ( struct aout_thread_s * );
         } aout;

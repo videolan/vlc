@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.20 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: mpeg_adec.c,v 1.21 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -157,7 +157,7 @@ static int decoder_Run ( decoder_config_t * p_config )
  *****************************************************************************/
 static void DecodeThread( adec_thread_t * p_adec )
 {
-    s16 * buffer;
+    s16 *p_buffer;
     adec_sync_info_t sync_info;
 
     if( ! adec_SyncFrame (p_adec, &sync_info) )
@@ -168,31 +168,26 @@ static void DecodeThread( adec_thread_t * p_adec )
         /* Create the output fifo if it doesn't exist yet */
         if( p_adec->p_aout_fifo == NULL )
         {
-            int fifo_type;
-            int channels;
+            int i_channels;
             
             if( p_main->b_stereo )
             {
                 intf_WarnMsg( 4, "adec info: setting stereo output" );
-                fifo_type = AOUT_ADEC_STEREO_FIFO;
-                channels = 2;
+                i_channels = 2;
             }
             else if( sync_info.b_stereo )
             {
-                fifo_type = AOUT_ADEC_STEREO_FIFO;
-                channels = 2;
+                i_channels = 2;
             }
             else
             {
-                fifo_type = AOUT_ADEC_MONO_FIFO;
-                channels = 1;
+                i_channels = 1;
             }
-            p_adec->p_aout_fifo = aout_CreateFifo( fifo_type, channels,
-                    sync_info.sample_rate, 0, ADEC_FRAME_SIZE, NULL );
+            p_adec->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM, i_channels,
+                    sync_info.sample_rate, ADEC_FRAME_SIZE, NULL );
             if( p_adec->p_aout_fifo == NULL)
             {
-                intf_ErrMsg( "adec error: failed to create Audio Output "
-                        "Fifo." );
+                intf_ErrMsg( "adec error: failed to create aout fifo" );
                 p_adec->p_fifo->b_error = 1;
                 return;
             }
@@ -200,19 +195,19 @@ static void DecodeThread( adec_thread_t * p_adec )
 
         p_adec->i_sync = 1;
 
-        buffer = ((s16 *)p_adec->p_aout_fifo->buffer)
-                    + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
+        p_buffer = ((s16 *)p_adec->p_aout_fifo->buffer)
+                    + (p_adec->p_aout_fifo->i_end_frame * ADEC_FRAME_SIZE);
 
         CurrentPTS( &p_adec->bit_stream,
-            &p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame],
+            &p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->i_end_frame],
             NULL );
-        if( !p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] )
+        if( !p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->i_end_frame] )
         {
-            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
+            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->i_end_frame] =
                 LAST_MDATE;
         }
 
-        if( adec_DecodeFrame (p_adec, buffer) )
+        if( adec_DecodeFrame (p_adec, p_buffer) )
         {
             /* Ouch, failed decoding... We'll have to resync */
             p_adec->i_sync = 0;
@@ -220,8 +215,8 @@ static void DecodeThread( adec_thread_t * p_adec )
         else
         {
             vlc_mutex_lock (&p_adec->p_aout_fifo->data_lock);
-            p_adec->p_aout_fifo->l_end_frame =
-                (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+            p_adec->p_aout_fifo->i_end_frame =
+                (p_adec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
             vlc_cond_signal (&p_adec->p_aout_fifo->data_wait);
             vlc_mutex_unlock (&p_adec->p_aout_fifo->data_lock);
         }

@@ -53,7 +53,7 @@ typedef struct aout_sys_s
  *****************************************************************************/
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
 static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
@@ -96,7 +96,7 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     p_aout->p_sys->stream =
-        arts_play_stream( p_aout->l_rate, 16, p_aout->i_channels, "vlc" );
+        arts_play_stream( p_aout->i_rate, 16, p_aout->i_channels, "vlc" );
 
     return( 0 );
 }
@@ -118,10 +118,10 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_GetBufInfo: buffer status query
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     /* arbitrary value that should be changed */
-    return( l_buffer_limit );
+    return( i_buffer_limit );
 }
 
 /*****************************************************************************

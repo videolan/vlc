@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.21 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: ac3_adec.c,v 1.22 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -279,7 +279,7 @@ static int decoder_Run ( decoder_config_t * p_config )
         }
 
         if( ( p_ac3thread->p_aout_fifo != NULL ) &&
-            ( p_ac3thread->p_aout_fifo->l_rate != sync_info.sample_rate ) )
+            ( p_ac3thread->p_aout_fifo->i_rate != sync_info.sample_rate ) )
         {
             /* Make sure the output thread leaves the NextFrame() function */
             vlc_mutex_lock (&(p_ac3thread->p_aout_fifo->data_lock));
@@ -292,8 +292,8 @@ static int decoder_Run ( decoder_config_t * p_config )
 
         /* Creating the audio output fifo if not created yet */
         if (p_ac3thread->p_aout_fifo == NULL ) {
-            p_ac3thread->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 
-                    2, sync_info.sample_rate, 0, AC3DEC_FRAME_SIZE, NULL  );
+            p_ac3thread->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM, 2,
+                           sync_info.sample_rate, AC3DEC_FRAME_SIZE, NULL  );
             if ( p_ac3thread->p_aout_fifo == NULL )
             {
                 free( IMDCT->w_1 );
@@ -326,17 +326,17 @@ static int decoder_Run ( decoder_config_t * p_config )
         }
 
         CurrentPTS( &p_ac3thread->ac3_decoder->bit_stream,
-            &p_ac3thread->p_aout_fifo->date[p_ac3thread->p_aout_fifo->l_end_frame],
+            &p_ac3thread->p_aout_fifo->date[p_ac3thread->p_aout_fifo->i_end_frame],
             NULL );
-        if( !p_ac3thread->p_aout_fifo->date[p_ac3thread->p_aout_fifo->l_end_frame] )
+        if( !p_ac3thread->p_aout_fifo->date[p_ac3thread->p_aout_fifo->i_end_frame] )
         {
             p_ac3thread->p_aout_fifo->date[
-                p_ac3thread->p_aout_fifo->l_end_frame] =
+                p_ac3thread->p_aout_fifo->i_end_frame] =
                 LAST_MDATE;
         }
     
         buffer = ((s16 *)p_ac3thread->p_aout_fifo->buffer) + 
-            (p_ac3thread->p_aout_fifo->l_end_frame * AC3DEC_FRAME_SIZE);
+            (p_ac3thread->p_aout_fifo->i_end_frame * AC3DEC_FRAME_SIZE);
 
         if (ac3_decode_frame (p_ac3thread->ac3_decoder, buffer))
         {
@@ -345,8 +345,8 @@ static int decoder_Run ( decoder_config_t * p_config )
         }
         
         vlc_mutex_lock (&p_ac3thread->p_aout_fifo->data_lock);
-        p_ac3thread->p_aout_fifo->l_end_frame = 
-            (p_ac3thread->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+        p_ac3thread->p_aout_fifo->i_end_frame = 
+            (p_ac3thread->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
         vlc_cond_signal (&p_ac3thread->p_aout_fifo->data_wait);
         vlc_mutex_unlock (&p_ac3thread->p_aout_fifo->data_lock);
 

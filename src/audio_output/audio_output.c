@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.77 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: audio_output.c,v 1.78 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -40,12 +40,14 @@
 #endif
 
 #include "audio_output.h"
-#include "aout_common.h"
+
+#include "aout_pcm.h"
+#include "aout_spdif.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int aout_SpawnThread( aout_thread_t * p_aout );
+static int  aout_SpawnThread ( aout_thread_t * p_aout );
 
 /*****************************************************************************
  * aout_InitBank: initialize the audio output bank.
@@ -78,7 +80,7 @@ void aout_EndBank ( void )
 /*****************************************************************************
  * aout_CreateThread: initialize audio thread
  *****************************************************************************/
-aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
+aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
 {
     aout_thread_t * p_aout;                             /* thread descriptor */
 #if 0
@@ -93,12 +95,9 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
     }
 
     p_aout->i_latency = 0;
-    p_aout->l_rate = config_GetIntVariable( AOUT_RATE_VAR );
+    p_aout->i_rate = config_GetIntVariable( AOUT_RATE_VAR );
     p_aout->i_channels = config_GetIntVariable( AOUT_MONO_VAR ) ? 1 : 2;
 
-    intf_WarnMsg( 3, "aout info: thread created, channels %d, rate %d",
-                  p_aout->i_channels, p_aout->l_rate );
-    
     /* Maybe we should pass this setting in argument */
     p_aout->i_format = AOUT_FORMAT_DEFAULT;
 
@@ -110,15 +109,12 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
         p_aout->i_format = AOUT_FMT_AC3;
     }
     
-    if( p_aout->l_rate == 0 )
+    if( p_aout->i_rate == 0 )
     {
         intf_ErrMsg( "aout error: null sample rate" );
         free( p_aout );
         return( NULL );
     }
-
-    /* FIXME: only works for i_channels == 1 or 2 ?? */
-    p_aout->b_stereo = ( p_aout->i_channels == 2 ) ? 1 : 0;
 
     /* Choose the best module */
     p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT,
@@ -169,31 +165,14 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
     return( p_aout );
 }
 
-
-/*****************************************************************************
- * Declare the different aout thread functions
- *****************************************************************************/
-DECLARE_AOUT_THREAD( S16, s16, ( p_aout->s32_buffer[l_buffer] / 
-        AOUT_MAX_FIFOS ) )
-
-DECLARE_AOUT_THREAD( U16, u16, (( p_aout->s32_buffer[l_buffer] / 
-        AOUT_MAX_FIFOS) + 128) )
-        
-DECLARE_AOUT_THREAD( U8, u8, (( p_aout->s32_buffer[l_buffer] / 
-        AOUT_MAX_FIFOS / 256) + 128 ) )
-
-DECLARE_AOUT_THREAD( S8, s8, ( p_aout->s32_buffer[l_buffer] / 
-        AOUT_MAX_FIFOS / 256) )
-        
-
 /*****************************************************************************
  * aout_SpawnThread
  *****************************************************************************/
 static int aout_SpawnThread( aout_thread_t * p_aout )
 {
-    int     i_fifo;
-    long    l_bytes;
+    int     i_index, i_bytes;
     void (* pf_aout_thread)( aout_thread_t * ) = NULL;
+    char   *psz_format;
 
     /* We want the audio output thread to live */
     p_aout->b_die = 0;
@@ -201,121 +180,74 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
 
     /* Initialize the fifos lock */
     vlc_mutex_init( &p_aout->fifos_lock );
+
     /* Initialize audio fifos : set all fifos as empty and initialize locks */
-    for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
+    for ( i_index = 0; i_index < AOUT_MAX_FIFOS; i_index++ )
     {
-        p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO;
-        vlc_mutex_init( &p_aout->fifo[i_fifo].data_lock );
-        vlc_cond_init( &p_aout->fifo[i_fifo].data_wait );
+        p_aout->fifo[i_index].i_format = AOUT_FIFO_NONE;
+        vlc_mutex_init( &p_aout->fifo[i_index].data_lock );
+        vlc_cond_init( &p_aout->fifo[i_index].data_wait );
     }
 
     /* Compute the size (in audio units) of the audio output buffer. Although
      * AOUT_BUFFER_DURATION is given in microseconds, the output rate is given
      * in Hz, that's why we need to divide by 10^6 microseconds (1 second) */
-    p_aout->l_units = (long)( ((s64)p_aout->l_rate * AOUT_BUFFER_DURATION) / 1000000 );
-    p_aout->l_msleep = (long)( ((s64)p_aout->l_units * 1000000) / (s64)p_aout->l_rate );
+    p_aout->i_units = ((s64)p_aout->i_rate * AOUT_BUFFER_DURATION) / 1000000;
+    p_aout->i_msleep = AOUT_BUFFER_DURATION / 4;
 
     /* Make pf_aout_thread point to the right thread function, and compute the
      * byte size of the audio output buffer */
-    switch ( p_aout->i_channels )
+    switch ( p_aout->i_format )
     {
-    /* Audio output is mono */
-    case 1:
-        switch ( p_aout->i_format )
-        {
         case AOUT_FMT_U8:
-            intf_WarnMsg( 2, "aout info: unsigned 8 bits mono thread" );
-            l_bytes = 1 * sizeof(u8) * p_aout->l_units;
-            pf_aout_thread = aout_U8Thread;
+            pf_aout_thread = aout_PCMThread;
+            psz_format = "unsigned 8 bits";
+            i_bytes = p_aout->i_units * p_aout->i_channels;
             break;
 
         case AOUT_FMT_S8:
-            intf_WarnMsg( 2, "aout info: signed 8 bits mono thread" );
-            l_bytes = 1 * sizeof(s8) * p_aout->l_units;
-            pf_aout_thread = aout_S8Thread;
+            pf_aout_thread = aout_PCMThread;
+            psz_format = "signed 8 bits";
+            i_bytes = p_aout->i_units * p_aout->i_channels;
             break;
 
         case AOUT_FMT_U16_LE:
         case AOUT_FMT_U16_BE:
-            intf_WarnMsg( 2, "aout info: unsigned 16 bits mono thread" );
-            l_bytes = 1 * sizeof(u16) * p_aout->l_units;
-            pf_aout_thread = aout_U16Thread;
+            pf_aout_thread = aout_PCMThread;
+            psz_format = "unsigned 16 bits";
+            i_bytes = 2 * p_aout->i_units * p_aout->i_channels;
             break;
 
         case AOUT_FMT_S16_LE:
         case AOUT_FMT_S16_BE:
-            intf_WarnMsg( 2, "aout info: signed 16 bits mono thread" );
-            l_bytes = 1 * sizeof(s16) * p_aout->l_units;
-            pf_aout_thread = aout_S16Thread;
-            break;
-
-        default:
-            intf_ErrMsg( "aout error: unknown audio output format (%i)",
-                         p_aout->i_format );
-            return( -1 );
-        }
-        break;
-
-    /* Audio output is stereo */
-    case 2:
-        switch ( p_aout->i_format )
-        {
-        case AOUT_FMT_U8:
-            intf_WarnMsg( 2, "aout info: unsigned 8 bits stereo thread" );
-            l_bytes = 2 * sizeof(u8) * p_aout->l_units;
-            pf_aout_thread = aout_U8Thread;
-            break;
-
-        case AOUT_FMT_S8:
-            intf_WarnMsg( 2, "aout info: signed 8 bits stereo thread" );
-            l_bytes = 2 * sizeof(s8) * p_aout->l_units;
-            pf_aout_thread = aout_S8Thread;
-            break;
-
-        case AOUT_FMT_U16_LE:
-        case AOUT_FMT_U16_BE:
-            intf_WarnMsg( 2, "aout info: unsigned 16 bits stereo thread" );
-            l_bytes = 2 * sizeof(u16) * p_aout->l_units;
-            pf_aout_thread = aout_U16Thread;
-            break;
-
-        case AOUT_FMT_S16_LE:
-        case AOUT_FMT_S16_BE:
-            intf_WarnMsg( 2, "aout info: signed 16 bits stereo thread" );
-            l_bytes = 2 * sizeof(s16) * p_aout->l_units;
-            pf_aout_thread = aout_S16Thread;
+            pf_aout_thread = aout_PCMThread;
+            psz_format = "signed 16 bits";
+            i_bytes = 2 * p_aout->i_units * p_aout->i_channels;
             break;
 
         case AOUT_FMT_AC3:
-            intf_WarnMsg( 2, "aout info: ac3 pass-through thread" );
-            l_bytes = SPDIF_FRAME_SIZE;
             pf_aout_thread = aout_SpdifThread;
+            psz_format = "ac3 pass-through";
+            i_bytes = SPDIF_FRAME_SIZE;
             break;
 
         default:
             intf_ErrMsg( "aout error: unknown audio output format %i",
                          p_aout->i_format );
             return( -1 );
-        }
-        break;
-
-    default:
-        intf_ErrMsg( "aout error: unknown number of audio channels (%i)",
-                     p_aout->i_channels );
-        return( -1 );
     }
 
     /* Allocate the memory needed by the audio output buffers, and set to zero
      * the s32 buffer's memory */
-    p_aout->buffer = malloc( l_bytes );
+    p_aout->buffer = malloc( i_bytes );
     if ( p_aout->buffer == NULL )
     {
         intf_ErrMsg( "aout error: cannot create output buffer" );
         return( -1 );
     }
 
-    p_aout->s32_buffer = (s32 *)calloc( p_aout->l_units,
-                                        sizeof(s32) << ( p_aout->b_stereo ) );
+    p_aout->s32_buffer = (s32 *)calloc( p_aout->i_units,
+                                        sizeof(s32) * p_aout->i_channels );
     if ( p_aout->s32_buffer == NULL )
     {
         intf_ErrMsg( "aout error: cannot create the s32 output buffer" );
@@ -336,7 +268,8 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
         return( -1 );
     }
 
-    intf_WarnMsg( 2, "aout info: audio output thread %i spawned", getpid() );
+    intf_WarnMsg( 2, "aout info: %s thread spawned, %i channels, rate %i",
+                     psz_format, p_aout->i_channels, p_aout->i_rate );
     return( 0 );
 }
 
@@ -345,7 +278,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
  *****************************************************************************/
 void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
 {
-    int i_fifo;
+    int i_index;
     
     /* FIXME: pi_status is not handled correctly: check vout how to do!?? */
 
@@ -358,10 +291,10 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     free( p_aout->s32_buffer );
 
     /* Destroy the condition and mutex locks */
-    for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
+    for ( i_index = 0; i_index < AOUT_MAX_FIFOS; i_index++ )
     {
-        vlc_mutex_destroy( &p_aout->fifo[i_fifo].data_lock );
-        vlc_cond_destroy( &p_aout->fifo[i_fifo].data_wait );
+        vlc_mutex_destroy( &p_aout->fifo[i_index].data_lock );
+        vlc_cond_destroy( &p_aout->fifo[i_index].data_wait );
     }
     vlc_mutex_destroy( &p_aout->fifos_lock );
     

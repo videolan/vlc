@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.26 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: aout_sdl.c,v 1.27 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -63,7 +63,7 @@ typedef struct aout_sys_s
  *****************************************************************************/
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
 static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
@@ -92,7 +92,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
 static int aout_Open( aout_thread_t *p_aout )
 {
     SDL_AudioSpec desired;
-    int i_channels = p_aout->b_stereo ? 2 : 1;
 
     if( SDL_WasInit( SDL_INIT_AUDIO ) != 0 )
     {
@@ -130,12 +129,12 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->audio_buf = malloc( OVERFLOWLIMIT );
 
     /* Initialize some variables */
-    desired.freq =     p_aout->l_rate;
 
     /* TODO: write conversion beetween AOUT_FORMAT_DEFAULT
      * AND AUDIO* from SDL. */
+    desired.freq       = p_aout->i_rate;
     desired.format     = AUDIO_S16LSB;                     /* stereo 16 bits */
-    desired.channels   = i_channels;
+    desired.channels   = p_aout->i_channels;
     desired.callback   = aout_SDLCallback;
     desired.userdata   = p_aout->p_sys;
     desired.samples    = 1024;
@@ -171,12 +170,11 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 {
     /* TODO: finish and clean this */
     SDL_AudioSpec desired;
-    int i_stereo = p_aout->b_stereo ? 2 : 1;
 
     /*i_format = p_aout->i_format;*/
-    desired.freq       = p_aout->l_rate;             /* Set the output rate */
+    desired.freq       = p_aout->i_rate;             /* Set the output rate */
     desired.format     = AUDIO_S16LSB;                    /* stereo 16 bits */
-    desired.channels   = i_stereo;
+    desired.channels   = p_aout->i_channels;
     desired.callback   = aout_SDLCallback;
     desired.userdata   = p_aout->p_sys;
     desired.samples    = 2048;
@@ -201,16 +199,16 @@ static int aout_SetFormat( aout_thread_t *p_aout )
  * aout_GetBufInfo: buffer status query
  *****************************************************************************
  * returns the number of bytes in the audio buffer compared to the size of
- * l_buffer_limit...
+ * i_buffer_limit...
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
-    if(l_buffer_limit > p_aout->p_sys->i_audio_end)
+    if(i_buffer_limit > p_aout->p_sys->i_audio_end)
     {
         /* returning 0 here juste gives awful sound in the speakers :/ */
-        return( l_buffer_limit );
+        return( i_buffer_limit );
     }
-    return( p_aout->p_sys->i_audio_end - l_buffer_limit);
+    return( p_aout->p_sys->i_audio_end - i_buffer_limit);
 }
 
 /*****************************************************************************

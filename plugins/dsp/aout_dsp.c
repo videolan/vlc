@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.22 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: aout_dsp.c,v 1.23 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -75,7 +75,7 @@ typedef struct aout_sys_s
  *****************************************************************************/
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
 static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
@@ -142,8 +142,8 @@ static int aout_Open( aout_thread_t *p_aout )
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
     int i_format;
-    long l_rate;
-    boolean_t b_stereo = p_aout->b_stereo;
+    int i_rate;
+    boolean_t b_stereo;
 
     /* Reset the DSP device */
     if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
@@ -170,6 +170,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     }
 
     /* Set the number of channels */
+    b_stereo = ( p_aout->i_channels >= 2 );
+
     if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_STEREO, &b_stereo ) < 0 )
     {
         intf_ErrMsg( "aout error: can't set number of audio channels (%i)",
@@ -177,28 +179,27 @@ static int aout_SetFormat( aout_thread_t *p_aout )
         return( -1 );
     }
 
-    if( b_stereo != p_aout->b_stereo )
+    if( (1 + b_stereo) != p_aout->i_channels )
     {
-        intf_WarnMsg( 2, "aout warning: number of audio channels not supported"
-                      " (%i)", p_aout->i_channels );
-        p_aout->b_stereo = b_stereo;
+        intf_WarnMsg( 2, "aout warning: %i audio channels not supported",
+                      p_aout->i_channels );
         p_aout->i_channels = 1 + b_stereo;
     }
 
     /* Set the output rate */
-    l_rate = p_aout->l_rate;
+    i_rate = p_aout->i_rate;
     if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_SPEED, &l_rate ) < 0 )
     {
-        intf_ErrMsg( "aout error: can't set audio output rate (%li)",
-                     p_aout->l_rate );
+        intf_ErrMsg( "aout error: can't set audio output rate (%i)",
+                     p_aout->i_rate );
         return( -1 );
     }
 
-    if( l_rate != p_aout->l_rate )
+    if( i_rate != p_aout->i_rate )
     {
         intf_WarnMsg( 1, "aout warning: audio output rate not supported (%li)",
-                      p_aout->l_rate );
-        p_aout->l_rate = l_rate;
+                      p_aout->i_rate );
+        p_aout->i_rate = i_rate;
     }
 
     return( 0 );
@@ -208,14 +209,13 @@ static int aout_SetFormat( aout_thread_t *p_aout )
  * aout_GetBufInfo: buffer status query
  *****************************************************************************
  * This function fills in the audio_buf_info structure :
- * - int fragments : number of available fragments (partially usend ones not
- *   counted)
+ * - returns : number of available fragments (not partially used ones)
  * - int fragstotal : total number of fragments allocated
  * - int fragsize : size of a fragment in bytes
  * - int bytes : available space in bytes (includes partially used fragments)
  * Note! 'bytes' could be more than fragments*fragsize
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_GETOSPACE,
            &p_aout->p_sys->audio_buf );

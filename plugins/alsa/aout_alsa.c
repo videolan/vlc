@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_alsa.c,v 1.27 2002/02/19 00:50:19 sam Exp $
+ * $Id: aout_alsa.c,v 1.28 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -162,7 +162,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     }
 
     i_rv = snd_pcm_hw_params_set_rate_near( p_aout->p_sys->p_alsa_handle, p_hw,
-                                            p_aout->l_rate, 0 );
+                                            p_aout->i_rate, 0 );
     if( i_rv < 0 )
     {
         intf_ErrMsg( "aout error: unable to set sample rate" );
@@ -253,7 +253,7 @@ static void aout_HandleXrun(aout_thread_t *p_aout)
  * of data to play, it switches to the "underrun" status. It has to
  * be flushed and re-prepared
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static long aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     snd_pcm_status_t *p_status;
     int i_alsa_get_status_returns;

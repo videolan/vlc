@@ -2,7 +2,7 @@
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_beos.cpp,v 1.22 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: aout_beos.cpp,v 1.23 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -55,8 +55,8 @@ typedef struct aout_sys_s
     BPushGameSound * p_sound;
     gs_audio_format * p_format;
     void * p_buffer;
-    long i_buffer_size;
-    long i_buffer_pos;
+    int i_buffer_size;
+    int i_buffer_pos;
 
 } aout_sys_t;
 
@@ -68,7 +68,7 @@ extern "C"
  *****************************************************************************/
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
 static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
@@ -155,10 +155,10 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_GetBufInfo: buffer status query
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     /* Each value is 4 bytes long (stereo signed 16 bits) */
-    long i_hard_pos = 4 * p_aout->p_sys->p_sound->CurrentPosition();
+    int i_hard_pos = 4 * p_aout->p_sys->p_sound->CurrentPosition();
 
     i_hard_pos = p_aout->p_sys->i_buffer_pos - i_hard_pos;
     if( i_hard_pos < 0 )
@@ -176,7 +176,7 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
  *****************************************************************************/
 static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
-    long i_newbuf_pos;
+    int i_newbuf_pos;
 
     if( (i_newbuf_pos = p_aout->p_sys->i_buffer_pos + i_size)
               > p_aout->p_sys->i_buffer_size )

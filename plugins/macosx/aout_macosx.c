@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.13 2002/02/19 00:50:19 sam Exp $
+ * $Id: aout_macosx.c,v 1.14 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -78,7 +78,7 @@ typedef struct aout_sys_s
  *****************************************************************************/
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
 static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
@@ -178,7 +178,7 @@ static int aout_Open( aout_thread_t *p_aout )
      * not be forced to compute the same value twice
      */
     p_aout->p_sys->ui_deviceBufferSize = 
-      2 * 2 * sizeof(s16) * ((s64)p_aout->l_rate * AOUT_BUFFER_DURATION) / 1000000; 
+      2 * 2 * sizeof(s16) * ((s64)p_aout->i_rate * AOUT_BUFFER_DURATION) / 1000000; 
  
     /* Allocate memory for audio */
     p_aout->p_sys->p_Data = NewPtrClear( p_aout->p_sys->ui_deviceBufferSize );
@@ -280,7 +280,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
             // format.mFormatFlags |= kLinearPCMFormatFlagIsFloat;
             // format.mFormatFlags |= kLinearPCMFormatFlagIsSignedInteger;
 
-            format.mSampleRate       = p_aout->l_rate;
+            format.mSampleRate       = p_aout->i_rate;
             format.mChannelsPerFrame = p_aout->i_channels;
 
             err = AudioDeviceSetProperty( p_aout->p_sys->device, 0, 0, false, 
@@ -312,7 +312,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_GetBufInfo: returns available bytes in buffer
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     return( 0 ); // Send data as soon as possible
 

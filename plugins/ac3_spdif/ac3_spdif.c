@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.15 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: ac3_spdif.c,v 1.16 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -157,19 +157,19 @@ static int decoder_Run( decoder_config_t * p_config )
         /* if we're late here the output won't have to play the frame */
         if( i_current_pts > mdate() )
         {
-            p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->l_end_frame] =
+            p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->i_end_frame] =
                 i_current_pts;
     
             /* Write in the first free packet of aout fifo */
             p_spdif->p_iec = ((u8*)(p_spdif->p_aout_fifo->buffer) + 
-                (p_spdif->p_aout_fifo->l_end_frame * SPDIF_FRAME_SIZE ));
+                (p_spdif->p_aout_fifo->i_end_frame * SPDIF_FRAME_SIZE ));
     
             /* Build burst to be sent to hardware decoder */
             ac3_iec958_build_burst( p_spdif );
     
             vlc_mutex_lock (&p_spdif->p_aout_fifo->data_lock);
-            p_spdif->p_aout_fifo->l_end_frame = 
-                    (p_spdif->p_aout_fifo->l_end_frame + 1 ) & AOUT_FIFO_SIZE;
+            p_spdif->p_aout_fifo->i_end_frame = 
+                    (p_spdif->p_aout_fifo->i_end_frame + 1 ) & AOUT_FIFO_SIZE;
             vlc_mutex_unlock (&p_spdif->p_aout_fifo->data_lock);
         }
 
@@ -265,9 +265,9 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     }
     
     /* Creating the audio output fifo */
-    p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_SPDIF_FIFO, 1,
+    p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_SPDIF, 1,
                                             p_spdif->ac3_info.i_sample_rate,
-                                            0, SPDIF_FRAME_SIZE, NULL );
+                                            SPDIF_FRAME_SIZE, NULL );
 
     if( p_spdif->p_aout_fifo == NULL )
     {

@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.12 2002/02/19 00:50:19 sam Exp $
+ * $Id: lpcm_adec.c,v 1.13 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -145,8 +145,8 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
                    NULL, NULL);
 
     /* Creating the audio output fifo */
-    p_lpcmdec->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 2, 48000,
-                                            0, LPCMDEC_FRAME_SIZE/2, NULL  );
+    p_lpcmdec->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM, 2, 48000,
+                                              LPCMDEC_FRAME_SIZE/2, NULL  );
     if ( p_lpcmdec->p_aout_fifo == NULL )
     {
         return( -1 );
@@ -164,16 +164,16 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
     byte_t byte1, byte2;
 
     CurrentPTS( &p_lpcmdec->bit_stream,
-        &p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame],
+        &p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->i_end_frame],
         NULL );
-    if( !p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] )
+    if( !p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->i_end_frame] )
     {
-        p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] =
+        p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->i_end_frame] =
             LAST_MDATE;
     }
 
     buffer = ((byte_t *)p_lpcmdec->p_aout_fifo->buffer) + 
-              (p_lpcmdec->p_aout_fifo->l_end_frame * LPCMDEC_FRAME_SIZE);
+              (p_lpcmdec->p_aout_fifo->i_end_frame * LPCMDEC_FRAME_SIZE);
 
     RemoveBits32(&p_lpcmdec->bit_stream);
     byte1 = GetBits(&p_lpcmdec->bit_stream, 8) ;
@@ -199,8 +199,8 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
     }
     
     vlc_mutex_lock (&p_lpcmdec->p_aout_fifo->data_lock);
-    p_lpcmdec->p_aout_fifo->l_end_frame = 
-        (p_lpcmdec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+    p_lpcmdec->p_aout_fifo->i_end_frame = 
+        (p_lpcmdec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
     vlc_cond_signal (&p_lpcmdec->p_aout_fifo->data_wait);
     vlc_mutex_unlock (&p_lpcmdec->p_aout_fifo->data_lock);
 }

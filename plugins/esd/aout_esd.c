@@ -2,7 +2,7 @@
  * aout_esd.c : Esound functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_esd.c,v 1.20 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: aout_esd.c,v 1.21 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,7 +61,7 @@ typedef struct aout_sys_s
  *****************************************************************************/
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
 static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
@@ -98,8 +98,8 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Initialize some variables */
-    p_aout->l_rate = esd_audio_rate; /* We use actual esd rate value, not
-				      * initial value */
+    p_aout->i_rate = esd_audio_rate; /* We use actual esd rate value, not
+                                      * initial value */
 
     i_bits = ESD_BITS16;
     i_mode = ESD_STREAM;
@@ -119,11 +119,11 @@ static int aout_Open( aout_thread_t *p_aout )
      * and try to open /dev/dsp if there's no EsounD */
     if ( (p_aout->p_sys->i_fd
             = esd_play_stream_fallback(p_aout->p_sys->esd_format,
-                p_aout->l_rate, NULL, "vlc")) < 0 )
+                p_aout->i_rate, NULL, "vlc")) < 0 )
     {
         intf_ErrMsg( "aout error: can't open esound socket"
                      " (format 0x%08x at %ld Hz)",
-                     p_aout->p_sys->esd_format, p_aout->l_rate );
+                     p_aout->p_sys->esd_format, p_aout->i_rate );
         return( -1 );
     }
 
@@ -148,10 +148,10 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_GetBufInfo: buffer status query
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     /* arbitrary value that should be changed */
-    return( l_buffer_limit );
+    return( i_buffer_limit );
 }
 
 /*****************************************************************************
@@ -167,22 +167,22 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     {
         if (p_aout->p_sys->esd_format & ESD_BITS16)
         {
-            i_amount = (44100 * (ESD_BUF_SIZE + 64)) / p_aout->l_rate;
+            i_amount = (44100 * (ESD_BUF_SIZE + 64)) / p_aout->i_rate;
         }
         else
         {
-            i_amount = (44100 * (ESD_BUF_SIZE + 128)) / p_aout->l_rate;
+            i_amount = (44100 * (ESD_BUF_SIZE + 128)) / p_aout->i_rate;
         }
     }
     else
     {
         if (p_aout->p_sys->esd_format & ESD_BITS16)
         {
-            i_amount = (2 * 44100 * (ESD_BUF_SIZE + 128)) / p_aout->l_rate;
+            i_amount = (2 * 44100 * (ESD_BUF_SIZE + 128)) / p_aout->i_rate;
         }
         else
         {
-            i_amount = (2 * 44100 * (ESD_BUF_SIZE + 256)) / p_aout->l_rate;
+            i_amount = (2 * 44100 * (ESD_BUF_SIZE + 256)) / p_aout->i_rate;
         }
     }
 

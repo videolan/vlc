@@ -47,7 +47,7 @@ typedef struct aout_sys_s
  *****************************************************************************/
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
 static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
@@ -144,7 +144,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     pp.buf.block.frags_min   = 1;
     
     pp.format.interleave     = 1;
-    pp.format.rate           = p_aout->l_rate;
+    pp.format.rate           = p_aout->i_rate;
     pp.format.voices         = p_aout->i_channels;
 
     switch( p_aout->i_format )
@@ -161,7 +161,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     }
 
     pp.buf.block.frag_size =
-        (((s64)p_aout->l_rate * AOUT_BUFFER_DURATION) / 1000000) *
+        (((s64)p_aout->i_rate * AOUT_BUFFER_DURATION) / 1000000) *
         p_aout->i_channels * i_bytes_per_sample;
 
     /* set parameters */
@@ -193,7 +193,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
  * of data to play, it switches to the "underrun" status. It has to
  * be flushed and re-prepared
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     int i_ret;
     snd_pcm_channel_status_t status;

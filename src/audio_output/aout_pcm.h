@@ -1,10 +1,11 @@
 /*****************************************************************************
- * adec_math.h : PCM and DCT
+ * aout_pcm.h: PCM audio output functions
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: adec_math.h,v 1.2 2002/02/24 22:06:50 sam Exp $
+ * Copyright (C) 1999-2002 VideoLAN
+ * $Id: aout_pcm.h,v 1.1 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Cyril Deguet <asmax@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +22,5 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-void     DCT32 ( adec_bank_t *, float * );
-void     PCM   ( adec_bank_t *, s16 *, int );
+void aout_PCMThread( aout_thread_t * p_aout );
 

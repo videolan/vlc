@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.77 2002/02/24 21:36:20 jobi Exp $
+ * $Id: common.h,v 1.78 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -542,8 +542,7 @@ typedef struct module_symbols_s
                                            struct pgrm_descriptor_s *,
                                            mtime_t );
 
-    struct aout_fifo_s * ( * aout_CreateFifo ) 
-                                       ( int, int, long, long, long, void * );
+    struct aout_fifo_s * ( * aout_CreateFifo ) ( int, int, int, int, void * );
     void ( * aout_DestroyFifo )     ( struct aout_fifo_s * );
 
     struct vout_thread_s * (* vout_CreateThread) ( int *, int, int, u32, int );

@@ -2,7 +2,7 @@
  * adec_layer1.c: MPEG Layer I audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: adec_layer1.c,v 1.5 2001/12/30 07:09:55 sam Exp $
+ * $Id: adec_layer1.c,v 1.6 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -155,8 +155,6 @@ int adec_layer1_mono( adec_thread_t * p_adec, s16 * buffer )
 
     for ( s = 0 ; s < 12; s++)
     {
-        s16 * XXX_buf;
-
         for (i_sb = 0; i_sb < 32; i_sb++)
         {
             if (!allocation[i_sb])
@@ -174,9 +172,8 @@ int adec_layer1_mono( adec_thread_t * p_adec, s16 * buffer )
             }
         }
 
-        DCT32 (sample, &p_adec->bank_0);
-        XXX_buf = buffer;
-        PCM (&p_adec->bank_0, &XXX_buf, 1);
+        DCT32( &p_adec->bank_0, sample );
+        PCM (&p_adec->bank_0, buffer, 1);
         buffer += 32;
     }
 
@@ -291,8 +288,6 @@ int adec_layer1_stereo( adec_thread_t * p_adec, s16 * buffer )
 
     for (s = 0; s < 12; s++)
     {
-        s16 * XXX_buf;
-
         for (i_sb = 0; i_sb < bound; i_sb++)
         {
             if (!allocation_0[i_sb])
@@ -343,12 +338,10 @@ int adec_layer1_stereo( adec_thread_t * p_adec, s16 * buffer )
             }
         }
 
-        DCT32 (sample_0, &p_adec->bank_0);
-        XXX_buf = buffer;
-        PCM (&p_adec->bank_0, &XXX_buf, 2);
-        DCT32 (sample_1, &p_adec->bank_1);
-        XXX_buf = buffer+1;
-        PCM (&p_adec->bank_1, &XXX_buf, 2);
+        DCT32( &p_adec->bank_0, sample_0 );
+        PCM (&p_adec->bank_0, buffer, 2);
+        DCT32( &p_adec->bank_1, sample_1 );
+        PCM (&p_adec->bank_1, buffer + 1, 2);
         buffer += 64;
     }
 

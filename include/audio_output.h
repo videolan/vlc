@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.42 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: audio_output.h,v 1.43 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -54,20 +54,18 @@ typedef struct aout_increment_s
 {
     /* The remainder is used to keep track of the fractional part of the
      * index. */
-    long                l_remainder;
+    int i_r;
 
     /*
      * The increment structure is initialized with the result of an euclidean
      * division :
      *
-     *  l_euclidean_numerator                           l_euclidean_remainder
-     * ----------------------- = l_euclidean_integer + -----------------------
-     * l_euclidean_denominator                         l_euclidean_denominator
+     *  i_x           i_b
+     * ----- = i_a + -----
+     *  i_y           i_c
      *
      */
-    long                l_euclidean_integer;
-    long                l_euclidean_remainder;
-    long                l_euclidean_denominator;
+    int i_a, i_b, i_c;
 
 } aout_increment_t;
 
@@ -76,53 +74,61 @@ typedef struct aout_increment_s
  *****************************************************************************/
 typedef struct aout_fifo_s
 {
-    /* See the fifo types below */
-    int                 i_type;
+    /* See the fifo formats below */
+    int                 i_format;
+    int                 i_channels;
+    int                 i_rate;
+    int                 i_frame_size;
+
     boolean_t           b_die;
     int                 i_fifo;      /* Just to keep track of the fifo index */
-
-    int                 i_channels;
-    boolean_t           b_stereo;
-    long                l_rate;
 
     vlc_mutex_t         data_lock;
     vlc_cond_t          data_wait;
 
-    long                l_frame_size;
     void *              buffer;
     mtime_t *           date;
+
     /* The start frame is the first frame in the buffer that contains decoded
      * audio data. It it also the first frame in the current timestamped frame
      * area, ie the first dated frame in the decoded part of the buffer. :-p */
-    long                l_start_frame;
+    int                 i_start_frame;
     boolean_t           b_start_frame;
     /* The next frame is the end frame of the current timestamped frame area,
      * ie the first dated frame after the start frame. */
-    long                l_next_frame;
+    int                 i_next_frame;
     boolean_t           b_next_frame;
     /* The end frame is the first frame, after the start frame, that doesn't
      * contain decoded audio data. That's why the end frame is the first frame
      * where the audio decoder can store its decoded audio frames. */
-    long                l_end_frame;
+    int                 i_end_frame;
 
-    long                l_unit;
+    /* Current index in p_aout->buffer */
+    int                 i_unit;
+    /* Max index in p_aout->buffer */
+    int                 i_unit_limit;
+    /* Structure used to calculate i_unit with a Bresenham algorithm */
     aout_increment_t    unit_increment;
+
     /* The following variable is used to store the number of remaining audio
      * units in the current timestamped frame area. */
-    long                l_units;
+    int                 i_units;
 
 } aout_fifo_t;
 
 #define AOUT_FIFO_ISEMPTY( fifo ) \
-  ( (fifo).l_end_frame == (fifo).l_start_frame )
+  ( (fifo).i_end_frame == (fifo).i_start_frame )
 
 #define AOUT_FIFO_ISFULL( fifo ) \
-  ( ((((fifo).l_end_frame + 1) - (fifo).l_start_frame) & AOUT_FIFO_SIZE) == 0 )
+  ( ((((fifo).i_end_frame + 1) - (fifo).i_start_frame) & AOUT_FIFO_SIZE) == 0 )
 
-#define AOUT_EMPTY_FIFO         0
-#define AOUT_ADEC_MONO_FIFO     1
-#define AOUT_ADEC_STEREO_FIFO   2
-#define AOUT_ADEC_SPDIF_FIFO    3
+#define AOUT_FIFO_INC( i_index ) \
+  ( ((i_index) + 1) & AOUT_FIFO_SIZE )
+
+/* List of known fifo formats */
+#define AOUT_FIFO_NONE    0
+#define AOUT_FIFO_PCM     1
+#define AOUT_FIFO_SPDIF   2
 
 /*****************************************************************************
  * aout_thread_t : audio output thread descriptor
@@ -140,7 +146,7 @@ typedef struct aout_thread_s
     struct module_s *   p_module;
     int              ( *pf_open )       ( p_aout_thread_t );
     int              ( *pf_setformat )  ( p_aout_thread_t );
-    long             ( *pf_getbufinfo ) ( p_aout_thread_t, long );
+    int              ( *pf_getbufinfo ) ( p_aout_thread_t, int );
     void             ( *pf_play )       ( p_aout_thread_t, byte_t *, int );
     void             ( *pf_close )      ( p_aout_thread_t );
 
@@ -151,8 +157,8 @@ typedef struct aout_thread_s
 
     /* The size of the audio output buffer is kept in audio units, as this is
      * the only unit that is common with every audio decoder and audio fifo */
-    long                l_units;
-    long                l_msleep;
+    int                 i_units;
+    int                 i_msleep;
 
     /* date is the moment where the first audio unit of the output buffer
      * will be played */
@@ -161,15 +167,14 @@ typedef struct aout_thread_s
     /* The current volume */
     int                 i_volume;
     int                 i_savedvolume;
-    /* Format of the audio output samples */
+
+    /* Format of the audio output samples, number of channels, and
+     * rate and gain (in Hz) of the audio output sound */
     int                 i_format;
-    /* Number of channels */
     int                 i_channels;
-    /* Mono or Stereo sound */
-    boolean_t           b_stereo;
-    /* Rate and gain of the audio output sound (in Hz) */
-    long                l_rate;
-    long                l_gain;
+    int                 i_rate;
+
+    /* Latency of the audio output plugin, in bytes */
     int                 i_latency;
 
     /* there might be some useful private structure, such as audio_buf_info
@@ -207,11 +212,10 @@ typedef struct aout_thread_s
 void            aout_InitBank           ( void );
 void            aout_EndBank            ( void );
 
-aout_thread_t * aout_CreateThread       ( int *pi_status, int i_channels, 
-    long l_rate );
+aout_thread_t * aout_CreateThread       ( int *, int, int );
 void            aout_DestroyThread      ( aout_thread_t *, int * );
 
-aout_fifo_t *   aout_CreateFifo         ( int, int, long, long, long, void * );
+aout_fifo_t *   aout_CreateFifo         ( int, int, int, int, void * );
 void            aout_DestroyFifo        ( aout_fifo_t *p_fifo );
 void            aout_FreeFifo           ( aout_fifo_t *p_fifo );
 #else

@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.3 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: waveout.c,v 1.4 2002/02/24 22:06:50 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -88,7 +88,7 @@ typedef struct aout_sys_s
  *****************************************************************************/
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
 static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
@@ -153,7 +153,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     /* Check if the format has changed */
 
     if( (p_aout->p_sys->waveformat.nChannels != p_aout->i_channels) ||
-        (p_aout->p_sys->waveformat.nSamplesPerSec != p_aout->l_rate) )
+        (p_aout->p_sys->waveformat.nSamplesPerSec != p_aout->i_rate) )
     {
         if( waveOutClose( p_aout->p_sys->h_waveout ) == MMSYSERR_NOERROR )
         {
@@ -172,7 +172,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
  * returns the number of bytes in the audio buffer that have not yet been
  * sent to the sound device.
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     MMTIME mmtime;
 
@@ -181,7 +181,7 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
         != MMSYSERR_NOERROR || (mmtime.wType != TIME_BYTES) )
     {
         intf_WarnMsg( 3, "aout: aout_GetBufInfo waveOutGetPosition failed");
-        return l_buffer_limit;
+        return i_buffer_limit;
     }
 
 
@@ -281,7 +281,7 @@ static int OpenWaveOutDevice( aout_thread_t *p_aout )
     /* Set sound format */
     p_aout->p_sys->waveformat.wFormatTag       = WAVE_FORMAT_PCM;
     p_aout->p_sys->waveformat.nChannels        = p_aout->i_channels;
-    p_aout->p_sys->waveformat.nSamplesPerSec   = p_aout->l_rate;
+    p_aout->p_sys->waveformat.nSamplesPerSec   = p_aout->i_rate;
     p_aout->p_sys->waveformat.wBitsPerSample   = 16;
     p_aout->p_sys->waveformat.nBlockAlign      =
         p_aout->p_sys->waveformat.wBitsPerSample / 8 * p_aout->i_channels;
