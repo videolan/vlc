@@ -7,7 +7,7 @@
 	objects = {
 		014CEA410018CDE011CA2923 = {
 			isa = PBXBundleReference;
-			path = vlc.bundle;
+			path = "VLC Media Player.bundle";
 			refType = 3;
 		};
 		014CEA420018CDE011CA2923 = {
@@ -44,6 +44,7 @@
 				014CEA420018CDE011CA2923,
 				014CEA430018CDE011CA2923,
 			);
+			hasScannedForEncodings = 1;
 			isa = PBXProject;
 			mainGroup = 089C166AFE841209C02AAC07;
 			projectDirPath = "";
@@ -93,7 +94,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = vlc;
+				PRODUCT_NAME = "VLC Media Player";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 				WRAPPER_EXTENSION = bundle;
@@ -195,12 +196,14 @@
 	<string>org.videolan.vlc</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>VLC Media Player</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>CFBundleVersion</key>
-	<string>0.5.0</string>
+	<string>0.5.0-test2</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -208,7 +211,6 @@
 </dict>
 </plist>
 ";
-			shouldUseHeadermap = 1;
 		};
 		089C1674FE841209C02AAC07 = {
 			buildActionMask = 2147483647;
@@ -361,6 +363,7 @@
 			refType = 4;
 		};
 		F69B0CA702E24F6401A80112 = {
+			fileEncoding = 5;
 			isa = PBXFileReference;
 			name = English;
 			path = Resources/English.lproj/InfoPlist.strings;

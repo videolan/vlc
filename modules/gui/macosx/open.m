@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.7 2003/01/06 02:45:09 massiot Exp $
+ * $Id: open.m,v 1.8 2003/01/06 22:07:47 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -167,7 +167,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         free(psz_sout);
     }
 
-    [o_panel setTitle: _NS("Open Target")];
+    [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
 
     [o_btn_ok setTitle: _NS("OK")];

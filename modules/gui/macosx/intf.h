@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.11 2003/01/05 16:23:57 massiot Exp $
+ * $Id: intf.h,v 1.12 2003/01/06 22:07:47 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -111,6 +111,13 @@ struct intf_sys_t
     IBOutlet id o_msgs_panel;   /* messages panel */
     IBOutlet id o_msgs_btn_ok;  /* messages btn   */
 
+    IBOutlet id o_error;        /* error panel    */
+    IBOutlet id o_err_msg;      /* NSTextView     */
+    IBOutlet id o_err_lbl;
+    IBOutlet id o_err_bug_lbl;
+    IBOutlet id o_err_btn_msgs; /* Open Messages  */
+    IBOutlet id o_err_btn_dismiss;
+
     /* main menu */
 
     IBOutlet id o_mi_about;
@@ -195,6 +202,8 @@ struct intf_sys_t
 
 - (IBAction)timesliderUpdate:(id)sender;
 - (void)displayTime;
+
+- (IBAction)closeError:(id)sender;
 
 @end
 

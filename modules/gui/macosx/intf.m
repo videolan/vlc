@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.19 2003/01/05 16:23:57 massiot Exp $
+ * $Id: intf.m,v 1.20 2003/01/06 22:07:47 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -199,12 +199,12 @@ static void Run( intf_thread_t *p_intf )
     [o_msgs_btn_ok setTitle: _NS("Close")];
 
     /* main menu */
-    [o_mi_about setTitle: _NS("About vlc")];
+    [o_mi_about setTitle: _NS("About VLC Media Player")];
     [o_mi_prefs setTitle: _NS("Preferences")];
-    [o_mi_hide setTitle: _NS("Hide vlc")];
+    [o_mi_hide setTitle: _NS("Hide VLC")];
     [o_mi_hide_others setTitle: _NS("Hide Others")];
     [o_mi_show_all setTitle: _NS("Show All")];
-    [o_mi_quit setTitle: _NS("Quit vlc")];
+    [o_mi_quit setTitle: _NS("Quit VLC")];
 
     [o_mu_file setTitle: _NS("File")];
     [o_mi_open_generic setTitle: _NS("Open...")];
@@ -258,6 +258,13 @@ static void Run( intf_thread_t *p_intf )
     [o_dmi_pause setTitle: _NS("Pause")];
     [o_dmi_stop setTitle: _NS("Stop")];
 
+    /* error panel */
+    [o_error setTitle: _NS("Error")];
+    [o_err_lbl setStringValue: _NS("An error has occurred which probably prevented the execution of your request :")];
+    [o_err_bug_lbl setStringValue: _NS("If you believe that it is a bug, please follow the instructions at :")];
+    [o_err_btn_msgs setTitle: _NS("Open Messages Window")];
+    [o_err_btn_dismiss setTitle: _NS("Dismiss")];
+
     [self manageMode];
 }
 
@@ -309,7 +316,7 @@ static void Run( intf_thread_t *p_intf )
             p_intf->p_sys->p_input = NULL;
         }
 
-        if( p_intf->p_sys->p_input != NULL )
+        if( p_intf->p_sys->p_input != NULL && !p_intf->p_sys->p_input->b_die )
         {
             vlc_bool_t b_need_menus = 0;
             input_thread_t * p_input = p_intf->p_sys->p_input;
@@ -323,24 +330,21 @@ static void Run( intf_thread_t *p_intf )
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
 
-            if( !p_input->b_die )
+            [self displayTime];
+
+            /* New input or stream map change */
+            if( p_input->stream.b_changed )
             {
-                [self displayTime];
+                [self manageMode];
+                b_need_menus = 1;
+                p_intf->p_sys->b_playing = 1;
+            }
 
-                /* New input or stream map change */
-                if( p_input->stream.b_changed )
-                {
-                    [self manageMode];
-                    b_need_menus = 1;
-                    p_intf->p_sys->b_playing = 1;
-                }
-
-                if( p_intf->p_sys->i_part !=
-                    p_input->stream.p_selected_area->i_part )
-                {
-                    p_intf->p_sys->b_chapter_update = 1;
-                    b_need_menus = 1;
-                }
+            if( p_intf->p_sys->i_part !=
+                p_input->stream.p_selected_area->i_part )
+            {
+                p_intf->p_sys->b_chapter_update = 1;
+                b_need_menus = 1;
             }
 
             if ( p_aout != NULL )
@@ -442,6 +446,23 @@ static void Run( intf_thread_t *p_intf )
                 [o_messages insertText: o_msg_color];
 
                 [o_messages insertText: @"\n"];
+
+                if ( i_type == 1 )
+                {
+                    /* Error panel */
+                    NSString *o_my_msg =
+                        [NSString stringWithFormat: @"%s: %s\n",
+                         p_intf->p_sys->p_sub->p_msg[i_start].psz_module,
+                         p_intf->p_sys->p_sub->p_msg[i_start].psz_msg];
+
+                    [o_err_msg setEditable: YES];
+                    [o_err_msg setSelectedRange:
+                                NSMakeRange( [[o_err_msg string] length], 0 )];
+                    [o_err_msg insertText: o_my_msg];
+
+                    [o_error makeKeyAndOrderFront: self];
+                    [o_err_msg setEditable: NO];
+                }
             }
 
             [o_messages setEditable: NO];
@@ -1056,6 +1077,17 @@ static void Run( intf_thread_t *p_intf )
         }
     }
 #undef p_area
+}
+
+- (IBAction)closeError:(id)sender
+{
+    /* Error panel */
+    [o_err_msg setEditable: YES];
+    [o_err_msg setSelectedRange:
+                NSMakeRange( 0, [[o_err_msg string] length] )];
+    [o_err_msg insertText: @""];
+    [o_err_msg setEditable: NO];
+    [o_error performClose: self];
 }
 
 @end

@@ -32,6 +32,7 @@
         {
             ACTIONS = {
                 clearRecentItems = id; 
+                closeError = id; 
                 openRecentItem = id; 
                 timesliderUpdate = id; 
                 viewPreferences = id; 
@@ -52,12 +53,19 @@
                 "o_dmi_pause" = id; 
                 "o_dmi_play" = id; 
                 "o_dmi_stop" = id; 
+                "o_err_btn_dismiss" = id; 
+                "o_err_btn_msgs" = id; 
+                "o_err_bug_lbl" = id; 
+                "o_err_lbl" = id; 
+                "o_err_msg" = id; 
+                "o_error" = id; 
                 "o_messages" = id; 
                 "o_mi_about" = id; 
                 "o_mi_bring_atf" = id; 
                 "o_mi_channels" = id; 
                 "o_mi_chapter" = id; 
                 "o_mi_clear" = id; 
+                "o_mi_close_window" = id; 
                 "o_mi_copy" = id; 
                 "o_mi_cut" = id; 
                 "o_mi_deinterlace" = id; 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2002-12-31 00:38+0100\n"
+"POT-Creation-Date: 2003-01-06 22:35+0100\n"
 "PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Jean-Paul Saman <jpsaman@wxs.nl>\n"
 "Language-Team: Nederlands <nl@li.org>\n"
@@ -26,15 +26,15 @@ msgid ""
 "\n"
 msgstr "Gebruik: %s [opties] [parameters] [file] ...\n"
 
-#: src/libvlc.c:1113 src/misc/configuration.c:880
+#: src/libvlc.c:1113 src/misc/configuration.c:916
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:1131 src/misc/configuration.c:865
+#: src/libvlc.c:1131 src/misc/configuration.c:901
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:1134 src/misc/configuration.c:872
+#: src/libvlc.c:1134 src/misc/configuration.c:908
 msgid "float"
 msgstr ""
 
@@ -854,7 +854,7 @@ msgid "Decoders"
 msgstr ""
 
 #. Stream output options
-#: src/libvlc.h:503
+#: src/libvlc.h:503 modules/gui/macosx/open.m:210
 msgid "Stream output"
 msgstr ""
 
@@ -867,15 +867,15 @@ msgstr ""
 #: src/libvlc.h:526 modules/gui/gtk/gnome_interface.c:512
 #: modules/gui/gtk/gnome_interface.c:2083
 #: modules/gui/gtk/gnome_interface.c:2108 modules/gui/gtk/gtk_interface.c:627
-#: modules/gui/gtk/gtk_interface.c:2364 modules/gui/macosx/intf.m:213
-#: modules/gui/macosx/playlist.m:69
+#: modules/gui/gtk/gtk_interface.c:2364 modules/gui/macosx/intf.m:187
+#: modules/gui/macosx/intf.m:225
 msgid "Playlist"
 msgstr "Speellijst"
 
 #. Misc options
 #: src/libvlc.h:533 modules/audio_filter/converter/a52tofloat32.c:84
 #: modules/codec/a52old/a52old.c:59 modules/codec/mpeg_video/parser.c:84
-#: modules/gui/familiar/familiar.c:67 modules/gui/win32/win32.cpp:259
+#: modules/gui/familiar/familiar.c:69 modules/gui/win32/win32.cpp:259
 #: modules/misc/logger/logger.c:85 modules/video_filter/clone.c:55
 #: modules/video_filter/crop.c:58
 #: modules/video_filter/deinterlace/deinterlace.c:69
@@ -911,7 +911,7 @@ msgstr "print help over module <string>"
 msgid "print version information"
 msgstr "print versie informatie"
 
-#: src/misc/configuration.c:865
+#: src/misc/configuration.c:901
 msgid "boolean"
 msgstr ""
 
@@ -1586,193 +1586,209 @@ msgstr ""
 #. ****************************************************************************
 #. * Module descriptor
 #. ****************************************************************************
-#: modules/gui/familiar/familiar.c:59
+#: modules/gui/familiar/familiar.c:61
 msgid "autoplay selected file"
 msgstr ""
 
-#: modules/gui/familiar/familiar.c:60
+#: modules/gui/familiar/familiar.c:62
 msgid "automatically play a file when selected in the file selection list"
 msgstr ""
 
-#: modules/gui/familiar/familiar.c:69
+#: modules/gui/familiar/familiar.c:71
 #, fuzzy
 msgid "Familiar Linux Gtk+ interface module"
 msgstr "interface module"
 
-#: modules/gui/familiar/interface.c:69
+#: modules/gui/familiar/interface.c:70
 msgid "vlc (familiar)"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:93 modules/gui/macosx/open.m:559
-#: modules/gui/macosx/open.m:578 modules/gui/macosx/open.m:595
+#: modules/gui/familiar/interface.c:94 modules/gui/macosx/open.m:366
+#: modules/gui/macosx/open.m:533 modules/gui/macosx/open.m:794
 #, fuzzy
 msgid "Open"
 msgstr "Open een bestand"
 
-#: modules/gui/familiar/interface.c:94
+#: modules/gui/familiar/interface.c:95
 #, fuzzy
 msgid "Open file"
 msgstr "Open een bestand"
 
-#: modules/gui/familiar/interface.c:106 modules/gui/familiar/interface.c:107
-#: modules/gui/macosx/intf.m:191 modules/gui/macosx/prefs.m:196
+#: modules/gui/familiar/interface.c:107 modules/gui/familiar/interface.c:108
+#: modules/gui/macosx/intf.m:195 modules/gui/macosx/intf.m:203
+#: modules/gui/macosx/prefs.m:196
 #, fuzzy
 msgid "Preferences"
 msgstr "_Voorkeuren..."
 
-#: modules/gui/familiar/interface.c:121
+#: modules/gui/familiar/interface.c:122
 msgid "Rewind"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:122
+#: modules/gui/familiar/interface.c:123
 msgid "Rewind stream"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:134 modules/gui/gtk/gnome_interface.c:471
+#: modules/gui/familiar/interface.c:135 modules/gui/gtk/gnome_interface.c:471
 #: modules/gui/gtk/gnome_interface.c:845 modules/gui/gtk/gtk_interface.c:589
-#: modules/gui/gtk/gtk_interface.c:1008 modules/gui/macosx/intf.m:218
-#: modules/gui/macosx/intf.m:244 modules/gui/macosx/controls.m:440
+#: modules/gui/gtk/gtk_interface.c:1008 modules/gui/macosx/intf.m:191
+#: modules/gui/macosx/intf.m:230 modules/gui/macosx/intf.m:258
+#: modules/gui/macosx/controls.m:409
 msgid "Pause"
 msgstr "Pauze"
 
-#: modules/gui/familiar/interface.c:135
+#: modules/gui/familiar/interface.c:136
 #, fuzzy
 msgid "Pause stream"
 msgstr "Pauzeer Stream"
 
 #. dock menu
-#: modules/gui/familiar/interface.c:147 modules/gui/gtk/gnome_interface.c:459
+#: modules/gui/familiar/interface.c:148 modules/gui/gtk/gnome_interface.c:459
 #: modules/gui/gtk/gnome_interface.c:838 modules/gui/gtk/gtk_interface.c:578
-#: modules/gui/macosx/intf.m:217 modules/gui/macosx/intf.m:243
+#: modules/gui/macosx/intf.m:190 modules/gui/macosx/intf.m:229
+#: modules/gui/macosx/intf.m:257 modules/gui/macosx/playlist.m:67
 msgid "Play"
 msgstr "Start"
 
-#: modules/gui/familiar/interface.c:148
+#: modules/gui/familiar/interface.c:149
 #, fuzzy
 msgid "Play stream"
 msgstr "Start Stream"
 
-#: modules/gui/familiar/interface.c:160 modules/gui/gtk/gnome_interface.c:435
+#: modules/gui/familiar/interface.c:161 modules/gui/gtk/gnome_interface.c:435
 #: modules/gui/gtk/gnome_interface.c:852 modules/gui/gtk/gtk_interface.c:556
-#: modules/gui/gtk/gtk_interface.c:1016 modules/gui/macosx/intf.m:219
-#: modules/gui/macosx/intf.m:245 modules/gui/macosx/controls.m:457
+#: modules/gui/gtk/gtk_interface.c:1016 modules/gui/macosx/intf.m:192
+#: modules/gui/macosx/intf.m:231 modules/gui/macosx/intf.m:259
+#: modules/gui/macosx/controls.m:426
 msgid "Stop"
 msgstr "Stop"
 
-#: modules/gui/familiar/interface.c:161
+#: modules/gui/familiar/interface.c:162
 #, fuzzy
 msgid "Stop stream"
 msgstr "Stop Stream"
 
-#: modules/gui/familiar/interface.c:173
+#: modules/gui/familiar/interface.c:174
 msgid "Forward"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:174
+#: modules/gui/familiar/interface.c:175
 msgid "Forward stream"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:188 modules/gui/familiar/interface.c:189
-#: modules/gui/familiar/interface.c:448 modules/gui/gtk/gtk_interface.c:1341
+#: modules/gui/familiar/interface.c:189 modules/gui/familiar/interface.c:190
+#: modules/gui/familiar/interface.c:463 modules/gui/gtk/gtk_interface.c:1341
 msgid "About"
 msgstr "Informatie"
 
-#: modules/gui/familiar/interface.c:222
+#: modules/gui/familiar/interface.c:198
+msgid "0:00:00"
+msgstr ""
+
+#: modules/gui/familiar/interface.c:235
 msgid "URL:"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:241 modules/gui/familiar/interface.c:255
-#, fuzzy
-msgid "file://"
-msgstr "Titel:"
-
-#: modules/gui/familiar/interface.c:242
-msgid "ftp://"
-msgstr ""
-
-#: modules/gui/familiar/interface.c:243
-msgid "http://"
-msgstr ""
-
-#: modules/gui/familiar/interface.c:244
-msgid "udp://:1234"
-msgstr ""
-
-#: modules/gui/familiar/interface.c:245
-msgid "udpstream://@:1234"
-msgstr ""
-
-#: modules/gui/familiar/interface.c:281 modules/gui/gtk/preferences.c:317
+#: modules/gui/familiar/interface.c:269 modules/gui/gtk/preferences.c:321
 #: modules/gui/kde/pluginsbox.cpp:45
 msgid "Name"
 msgstr "Naam"
 
-#: modules/gui/familiar/interface.c:289
+#: modules/gui/familiar/interface.c:277
 msgid "Type"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:297
+#: modules/gui/familiar/interface.c:285
 msgid "Size"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:305
+#: modules/gui/familiar/interface.c:293
 #, fuzzy
 msgid "User"
 msgstr "Snel"
 
-#: modules/gui/familiar/interface.c:313
+#: modules/gui/familiar/interface.c:301
 #, fuzzy
 msgid "Group"
 msgstr "Verklein"
 
+#: modules/gui/familiar/interface.c:318 modules/gui/familiar/interface.c:334
+#, fuzzy
+msgid "file://"
+msgstr "Titel:"
+
+#: modules/gui/familiar/interface.c:319
+msgid "ftp://"
+msgstr ""
+
+#: modules/gui/familiar/interface.c:320
+msgid "http://"
+msgstr ""
+
 #: modules/gui/familiar/interface.c:321
+msgid "udp://:1234"
+msgstr ""
+
+#: modules/gui/familiar/interface.c:322
+msgid "udp6://:1234"
+msgstr ""
+
+#: modules/gui/familiar/interface.c:323
+msgid "rtp://:1234"
+msgstr ""
+
+#: modules/gui/familiar/interface.c:324
+msgid "rtp6://:1234"
+msgstr ""
+
+#: modules/gui/familiar/interface.c:336
 msgid "Media"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:337 modules/gui/gtk/preferences.c:548
-#: modules/gui/gtk/preferences.c:565
+#: modules/gui/familiar/interface.c:352 modules/gui/gtk/preferences.c:592
+#: modules/gui/gtk/preferences.c:609 modules/gui/macosx/open.m:707
 msgid "Save"
 msgstr "Bewaar"
 
-#: modules/gui/familiar/interface.c:347 modules/gui/gtk/preferences.c:561
-#: modules/gui/macosx/prefs.m:551
+#: modules/gui/familiar/interface.c:362 modules/gui/gtk/preferences.c:605
+#: modules/gui/macosx/prefs.m:558
 msgid "Apply"
 msgstr "Voer uit"
 
-#: modules/gui/familiar/interface.c:357 modules/gui/gtk/gtk_interface.c:2084
+#: modules/gui/familiar/interface.c:372 modules/gui/gtk/gtk_interface.c:2084
 #: modules/gui/gtk/gtk_interface.c:2312 modules/gui/gtk/gtk_interface.c:2543
-#: modules/gui/gtk/preferences.c:569 modules/gui/macosx/prefs.m:547
-#: modules/gui/macosx/open.m:144
+#: modules/gui/gtk/preferences.c:613 modules/gui/macosx/prefs.m:554
+#: modules/gui/macosx/open.m:174
 msgid "Cancel"
 msgstr "Annuleer"
 
-#: modules/gui/familiar/interface.c:367
+#: modules/gui/familiar/interface.c:382
 msgid "Automatically play file."
 msgstr ""
 
-#: modules/gui/familiar/interface.c:378
+#: modules/gui/familiar/interface.c:393
 #, fuzzy
 msgid "Preference"
 msgstr "_Voorkeuren..."
 
-#: modules/gui/familiar/interface.c:404
+#: modules/gui/familiar/interface.c:419
 msgid ""
 "VideoLAN Client\n"
 " for familiar Linux"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:415
+#: modules/gui/familiar/interface.c:430
 msgid "(c) 2002, the VideoLAN Team"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:425
+#: modules/gui/familiar/interface.c:440
 #, fuzzy
 msgid "Authors: The VideoLAN Team, http://www.videolan.org"
 msgstr ""
 "Het VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/"
 
-#: modules/gui/familiar/interface.c:436
+#: modules/gui/familiar/interface.c:451
 msgid ""
 "The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input "
 "from local or network sources."
@@ -1962,8 +1978,10 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1327
 #: modules/gui/gtk/gnome_interface.c:1973 modules/gui/gtk/gtk_interface.c:498
 #: modules/gui/gtk/gtk_interface.c:1615 modules/gui/gtk/gtk_interface.c:2400
-#: modules/gui/gtk/gtk_interface.c:2517 modules/gui/macosx/intf.m:197
-#: modules/gui/macosx/open.m:146 modules/gui/macosx/open.m:250
+#: modules/gui/gtk/gtk_interface.c:2517 modules/gui/macosx/intf.m:209
+#: modules/gui/macosx/open.m:176 modules/gui/macosx/open.m:212
+#: modules/gui/macosx/open.m:316 modules/gui/macosx/open.m:727
+#: modules/gui/macosx/open.m:759
 msgid "File"
 msgstr "Bestand"
 
@@ -1971,8 +1989,8 @@ msgstr "Bestand"
 #: modules/gui/gtk/gnome_interface.c:1438
 #: modules/gui/gtk/gnome_interface.c:1966 modules/gui/gtk/gtk_interface.c:509
 #: modules/gui/gtk/gtk_interface.c:696 modules/gui/gtk/gtk_interface.c:1726
-#: modules/gui/gtk/gtk_interface.c:2393 modules/gui/macosx/open.m:147
-#: modules/gui/macosx/open.m:254
+#: modules/gui/gtk/gtk_interface.c:2393 modules/gui/macosx/open.m:177
+#: modules/gui/macosx/open.m:320
 msgid "Disc"
 msgstr "Disk"
 
@@ -2038,7 +2056,6 @@ msgstr "Open Speellijst"
 #: modules/gui/gtk/gnome_interface.c:524 modules/gui/gtk/gnome_interface.c:903
 #: modules/gui/gtk/gtk_interface.c:638 modules/gui/gtk/gtk_interface.c:724
 #: modules/gui/gtk/gtk_interface.c:768 modules/gui/gtk/gtk_interface.c:1092
-#: modules/gui/macosx/intf.m:222 modules/gui/macosx/controls.m:461
 msgid "Prev"
 msgstr "Vorige"
 
@@ -2049,7 +2066,8 @@ msgstr "Vorig Bestand"
 #: modules/gui/gtk/gnome_interface.c:536 modules/gui/gtk/gnome_interface.c:896
 #: modules/gui/gtk/gtk_interface.c:649 modules/gui/gtk/gtk_interface.c:732
 #: modules/gui/gtk/gtk_interface.c:776 modules/gui/gtk/gtk_interface.c:1085
-#: modules/gui/macosx/intf.m:223 modules/gui/macosx/controls.m:462
+#: modules/gui/macosx/intf.m:194 modules/gui/macosx/intf.m:235
+#: modules/gui/macosx/controls.m:431
 msgid "Next"
 msgstr "Volgende"
 
@@ -2108,7 +2126,7 @@ msgid "Got directly so specified point"
 msgstr "Ga! rechtstreeks naar gespecificeerd punt"
 
 #: modules/gui/gtk/gnome_interface.c:917 modules/gui/gtk/gtk_interface.c:1110
-#: modules/gui/kde/interface.cpp:143 modules/gui/macosx/intf.m:232
+#: modules/gui/kde/interface.cpp:143 modules/gui/macosx/intf.m:245
 msgid "Program"
 msgstr "Programma"
 
@@ -2147,7 +2165,7 @@ msgid "Open Stream"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1234 modules/gui/gtk/gtk_interface.c:1522
-#: modules/gui/macosx/open.m:141
+#: modules/gui/macosx/open.m:171
 msgid "Media Resource Locator (MRL)"
 msgstr ""
 
@@ -2163,21 +2181,22 @@ msgid ""
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1320 modules/gui/gtk/gtk_interface.c:1608
-#: modules/gui/macosx/open.m:150 modules/gui/macosx/open.m:156
+#: modules/gui/macosx/open.m:180 modules/gui/macosx/open.m:186
+#: modules/gui/macosx/open.m:216
 msgid "Browse..."
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1344 modules/gui/gtk/gtk_interface.c:1632
 #: modules/gui/gtk/menu.c:905 modules/gui/gtk/menu.c:926
-#: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:233
-#: modules/gui/macosx/open.m:154
+#: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:246
+#: modules/gui/macosx/open.m:184
 msgid "Title"
 msgstr "Titel"
 
 #: modules/gui/gtk/gnome_interface.c:1354 modules/gui/gtk/gtk_interface.c:1642
 #: modules/gui/gtk/menu.c:800 modules/gui/gtk/menu.c:935
-#: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:234
-#: modules/gui/macosx/open.m:155
+#: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:247
+#: modules/gui/macosx/open.m:185
 msgid "Chapter"
 msgstr "Hoofdstuk"
 
@@ -2186,24 +2205,24 @@ msgid "Disc type"
 msgstr "Disk type"
 
 #: modules/gui/gtk/gnome_interface.c:1393 modules/gui/gtk/gtk_interface.c:1681
-#: modules/gui/macosx/open.m:158 modules/gui/macosx/open.m:325
-#: modules/gui/macosx/open.m:334 modules/gui/macosx/open.m:412
-#: modules/gui/macosx/open.m:423
+#: modules/gui/macosx/open.m:190 modules/gui/macosx/open.m:494
 msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/gtk/gnome_interface.c:1401 modules/gui/gtk/gtk_interface.c:1689
-#: modules/gui/macosx/open.m:160 modules/gui/macosx/open.m:319
-#: modules/gui/macosx/open.m:404
+#: modules/gui/macosx/open.m:191 modules/gui/macosx/open.m:403
+#: modules/gui/macosx/open.m:486
 msgid "VCD"
 msgstr "VCD"
 
 #: modules/gui/gtk/gnome_interface.c:1409 modules/gui/gtk/gtk_interface.c:1697
-#: modules/gui/macosx/open.m:153
+#: modules/gui/macosx/open.m:183
 msgid "Device name"
 msgstr "Apparaat naam"
 
 #: modules/gui/gtk/gnome_interface.c:1455 modules/gui/gtk/gtk_interface.c:1743
+#: modules/gui/macosx/open.m:213 modules/gui/macosx/open.m:728
+#: modules/gui/macosx/open.m:764
 msgid "UDP"
 msgstr ""
 
@@ -2224,27 +2243,27 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1570
 #: modules/gui/gtk/gnome_interface.c:1581 modules/gui/gtk/gtk_interface.c:1783
 #: modules/gui/gtk/gtk_interface.c:1858 modules/gui/gtk/gtk_interface.c:1869
-#: modules/gui/macosx/open.m:163 modules/gui/macosx/open.m:165
-#: modules/gui/macosx/open.m:167
+#: modules/gui/macosx/open.m:193 modules/gui/macosx/open.m:195
+#: modules/gui/macosx/open.m:197 modules/gui/macosx/open.m:218
 msgid "Port"
 msgstr "Poort"
 
 #: modules/gui/gtk/gnome_interface.c:1505
 #: modules/gui/gtk/gnome_interface.c:1517 modules/gui/gtk/gtk_interface.c:1793
-#: modules/gui/gtk/gtk_interface.c:1805 modules/gui/macosx/open.m:164
-#: modules/gui/macosx/open.m:166
+#: modules/gui/gtk/gtk_interface.c:1805 modules/gui/macosx/open.m:194
+#: modules/gui/macosx/open.m:196 modules/gui/macosx/open.m:217
 msgid "Address"
 msgstr "Adres"
 
 #: modules/gui/gtk/gnome_interface.c:1527 modules/gui/gtk/gtk_interface.c:1815
-#: modules/gui/macosx/open.m:168
+#: modules/gui/macosx/open.m:198
 msgid "URL"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1637
 #: modules/gui/gtk/gnome_interface.c:1980 modules/gui/gtk/gtk_interface.c:1925
-#: modules/gui/gtk/gtk_interface.c:2407 modules/gui/macosx/open.m:148
-#: modules/gui/macosx/open.m:258
+#: modules/gui/gtk/gtk_interface.c:2407 modules/gui/macosx/open.m:178
+#: modules/gui/macosx/open.m:324
 msgid "Network"
 msgstr "Netwerk"
 
@@ -2277,8 +2296,8 @@ msgstr "Horizontaal"
 msgid "Satellite"
 msgstr "Open Sateliet kaart"
 
-#: modules/gui/gtk/gnome_interface.c:1878 modules/gui/macosx/open.m:558
-#: modules/gui/macosx/open.m:594
+#: modules/gui/gtk/gnome_interface.c:1878 modules/gui/macosx/open.m:365
+#: modules/gui/macosx/open.m:793
 msgid "Open File"
 msgstr "Open een bestand"
 
@@ -2314,8 +2333,8 @@ msgstr "Verklein"
 msgid "Invert"
 msgstr "Inverteer"
 
-#: modules/gui/gtk/gnome_interface.c:2032 modules/gui/gtk/preferences.c:374
-#: modules/gui/kde/pluginsbox.cpp:50 modules/gui/macosx/prefs.m:379
+#: modules/gui/gtk/gnome_interface.c:2032 modules/gui/gtk/preferences.c:378
+#: modules/gui/kde/pluginsbox.cpp:50 modules/gui/macosx/prefs.m:381
 msgid "Select"
 msgstr "Selecteer"
 
@@ -2324,6 +2343,7 @@ msgid "Add"
 msgstr "Voeg toe"
 
 #: modules/gui/gtk/gnome_interface.c:2051 modules/gui/gtk/gtk_interface.c:2421
+#: modules/gui/macosx/playlist.m:68
 msgid "Delete"
 msgstr "Verwijder"
 
@@ -2351,9 +2371,10 @@ msgstr ""
 msgid "h:"
 msgstr ""
 
+#. messages panel
 #: modules/gui/gtk/gnome_interface.c:2391 modules/gui/gtk/gtk_interface.c:2614
-#: modules/gui/kde/messages.cpp:8 modules/gui/macosx/intf.m:187
-#: modules/gui/macosx/intf.m:214
+#: modules/gui/kde/messages.cpp:8 modules/gui/macosx/intf.m:198
+#: modules/gui/macosx/intf.m:226
 msgid "Messages"
 msgstr "Boodschappen"
 
@@ -2453,13 +2474,13 @@ msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:1405 modules/gui/gtk/gtk_interface.c:2077
 #: modules/gui/gtk/gtk_interface.c:2305 modules/gui/gtk/gtk_interface.c:2536
-#: modules/gui/gtk/gtk_interface.c:2643 modules/gui/gtk/preferences.c:557
-#: modules/gui/macosx/prefs.m:543 modules/gui/macosx/prefs.m:758
-#: modules/gui/macosx/open.m:143
+#: modules/gui/gtk/gtk_interface.c:2643 modules/gui/gtk/preferences.c:601
+#: modules/gui/macosx/prefs.m:550 modules/gui/macosx/prefs.m:765
+#: modules/gui/macosx/open.m:173
 msgid "OK"
 msgstr ""
 
-#: modules/gui/gtk/gtk_interface.c:1509 modules/gui/macosx/open.m:140
+#: modules/gui/gtk/gtk_interface.c:1509
 #, fuzzy
 msgid "Open Target"
 msgstr "Open een bestand"
@@ -2493,9 +2514,9 @@ msgid "_Select"
 msgstr "_Selecteer"
 
 #. special case for "off" item
-#: modules/gui/gtk/menu.c:518 modules/gui/macosx/prefs.m:382
-#: modules/gui/macosx/prefs.m:411 modules/gui/macosx/prefs.m:634
-#: modules/gui/macosx/prefs.m:663
+#: modules/gui/gtk/menu.c:518 modules/gui/macosx/prefs.m:384
+#: modules/gui/macosx/prefs.m:413 modules/gui/macosx/prefs.m:641
+#: modules/gui/macosx/prefs.m:670
 msgid "None"
 msgstr "Geen"
 
@@ -2509,17 +2530,17 @@ msgstr "Titel: %d (%d)"
 msgid "Chapter %d"
 msgstr "Hoofdstuk %d"
 
-#: modules/gui/gtk/preferences.c:317 modules/gui/kde/pluginsbox.cpp:46
+#: modules/gui/gtk/preferences.c:321 modules/gui/kde/pluginsbox.cpp:46
 msgid "Description"
 msgstr "Beschrijving"
 
-#: modules/gui/gtk/preferences.c:363 modules/gui/kde/pluginsbox.cpp:48
-#: modules/gui/macosx/prefs.m:362
+#: modules/gui/gtk/preferences.c:367 modules/gui/kde/pluginsbox.cpp:48
+#: modules/gui/macosx/prefs.m:364
 msgid "Configure"
 msgstr "Configureer"
 
 #. add new label
-#: modules/gui/gtk/preferences.c:386 modules/gui/kde/pluginsbox.cpp:53
+#: modules/gui/gtk/preferences.c:390 modules/gui/kde/pluginsbox.cpp:53
 msgid "Selected:"
 msgstr "Geselecteerd:"
 
@@ -2527,7 +2548,7 @@ msgstr "Geselecteerd:"
 msgid "Languages"
 msgstr ""
 
-#: modules/gui/kde/interface.cpp:94 modules/gui/macosx/intf.m:236
+#: modules/gui/kde/interface.cpp:94 modules/gui/macosx/intf.m:249
 #, fuzzy
 msgid "Subtitles"
 msgstr "_Ondertitels"
@@ -2553,207 +2574,270 @@ msgstr ""
 msgid "Messages:"
 msgstr "Boodschappen"
 
-#: modules/gui/macosx/intf.m:188 modules/gui/macosx/playlist.m:70
+#: modules/gui/macosx/intf.m:188 modules/gui/macosx/intf.m:234
+#: modules/gui/macosx/controls.m:430
+#, fuzzy
+msgid "Previous"
+msgstr "Vorig Bestand"
+
+#: modules/gui/macosx/intf.m:189 modules/gui/macosx/intf.m:233
+#: modules/gui/macosx/controls.m:411
+#, fuzzy
+msgid "Slower"
+msgstr "Langzaam"
+
+#: modules/gui/macosx/intf.m:193 modules/gui/macosx/intf.m:232
+#: modules/gui/macosx/controls.m:410
+#, fuzzy
+msgid "Faster"
+msgstr "Snel"
+
+#: modules/gui/macosx/intf.m:199
 msgid "Close"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:190
-#, fuzzy
-msgid "About vlc"
-msgstr "Informatie"
-
-#: modules/gui/macosx/intf.m:192
-msgid "Hide vlc"
+#. main menu
+#: modules/gui/macosx/intf.m:202
+msgid "About VLC Media Player"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:193
+#: modules/gui/macosx/intf.m:204
+msgid "Hide VLC"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:205
 #, fuzzy
 msgid "Hide Others"
 msgstr "_Verstop interface"
 
-#: modules/gui/macosx/intf.m:194
+#: modules/gui/macosx/intf.m:206
 msgid "Show All"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:195
+#: modules/gui/macosx/intf.m:207
 #, fuzzy
-msgid "Quit vlc"
+msgid "Quit VLC"
 msgstr "Informatie"
 
-#: modules/gui/macosx/intf.m:198
-#, fuzzy
-msgid "Open File..."
-msgstr "_Open Bestand..."
-
-#: modules/gui/macosx/intf.m:199
+#: modules/gui/macosx/intf.m:210
 #, fuzzy
 msgid "Open..."
 msgstr "Open een bestand"
 
-#: modules/gui/macosx/intf.m:200
+#: modules/gui/macosx/intf.m:211
+#, fuzzy
+msgid "Open File..."
+msgstr "_Open Bestand..."
+
+#: modules/gui/macosx/intf.m:212
 #, fuzzy
 msgid "Open Disc..."
 msgstr "Open _Disk..."
 
-#: modules/gui/macosx/intf.m:201
+#: modules/gui/macosx/intf.m:213
 #, fuzzy
 msgid "Open Network..."
 msgstr "Open Netwerk"
 
-#: modules/gui/macosx/intf.m:202
+#: modules/gui/macosx/intf.m:214
 #, fuzzy
 msgid "Open Recent"
 msgstr "Open een bestand"
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:203 modules/gui/macosx/intf.m:939
+#: modules/gui/macosx/intf.m:215 modules/gui/macosx/intf.m:1103
 msgid "Clear Menu"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:205
+#: modules/gui/macosx/intf.m:217
 #, fuzzy
 msgid "Edit"
 msgstr "Af_sluiten"
 
-#: modules/gui/macosx/intf.m:206
+#: modules/gui/macosx/intf.m:218
 msgid "Cut"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:207
+#: modules/gui/macosx/intf.m:219
 #, fuzzy
 msgid "Copy"
 msgstr "Verklein"
 
-#: modules/gui/macosx/intf.m:208
+#: modules/gui/macosx/intf.m:220
 #, fuzzy
 msgid "Paste"
 msgstr "Pauze"
 
-#: modules/gui/macosx/intf.m:209
+#: modules/gui/macosx/intf.m:221
 msgid "Clear"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:210
+#: modules/gui/macosx/intf.m:222 modules/gui/macosx/playlist.m:69
 #, fuzzy
 msgid "Select All"
 msgstr "Selecteer Bestand"
 
-#: modules/gui/macosx/intf.m:212
+#: modules/gui/macosx/intf.m:224
 #, fuzzy
 msgid "View"
 msgstr "_Toon"
 
-#: modules/gui/macosx/intf.m:216
+#: modules/gui/macosx/intf.m:228
 msgid "Controls"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:220 modules/gui/macosx/controls.m:441
-#, fuzzy
-msgid "Faster"
-msgstr "Snel"
-
-#: modules/gui/macosx/intf.m:221 modules/gui/macosx/controls.m:442
-#, fuzzy
-msgid "Slower"
-msgstr "Langzaam"
-
-#: modules/gui/macosx/intf.m:224
+#: modules/gui/macosx/intf.m:236
 msgid "Loop"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:225
-msgid "Louder"
+#: modules/gui/macosx/intf.m:237 modules/gui/macosx/controls.m:448
+msgid "Volume Up"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:226
-#, fuzzy
-msgid "Softer"
-msgstr "Langzaam"
+#: modules/gui/macosx/intf.m:238 modules/gui/macosx/controls.m:449
+msgid "Volume Down"
+msgstr ""
 
-#: modules/gui/macosx/intf.m:227 modules/gui/macosx/controls.m:484
+#: modules/gui/macosx/intf.m:239 modules/gui/macosx/controls.m:450
 msgid "Mute"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:228
+#: modules/gui/macosx/intf.m:240
 msgid "Channels"
 msgstr "Kanalen"
 
-#: modules/gui/macosx/intf.m:229 modules/gui/macosx/controls.m:516
+#: modules/gui/macosx/intf.m:241
+#, fuzzy
+msgid "Device"
+msgstr "DVD apparaat"
+
+#: modules/gui/macosx/intf.m:242 modules/gui/macosx/controls.m:464
 #, fuzzy
 msgid "Fullscreen"
 msgstr "_Volledig Scherm"
 
-#: modules/gui/macosx/intf.m:230
+#: modules/gui/macosx/intf.m:243
 #, fuzzy
 msgid "Screen"
 msgstr "_Volledig Scherm"
 
-#: modules/gui/macosx/intf.m:231 modules/gui/macosx/controls.m:531
+#: modules/gui/macosx/intf.m:244 modules/gui/macosx/controls.m:479
 #, fuzzy
 msgid "Deinterlace"
 msgstr "interface module"
 
-#: modules/gui/macosx/intf.m:235
+#: modules/gui/macosx/intf.m:248
 msgid "Language"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:238
+#: modules/gui/macosx/intf.m:251
 msgid "Window"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:239
-msgid "Minimize"
+#: modules/gui/macosx/intf.m:252
+msgid "Minimize Window"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:240
+#: modules/gui/macosx/intf.m:253
+#, fuzzy
+msgid "Close Window"
+msgstr "Open het boodschappen scherm"
+
+#: modules/gui/macosx/intf.m:254
 msgid "Bring All to Front"
 msgstr ""
 
-#: modules/gui/macosx/open.m:151
+#. error panel
+#: modules/gui/macosx/intf.m:262
+msgid "Error"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:263
+msgid ""
+"An error has occurred which probably prevented the execution of your "
+"request :"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:264
+msgid "If you believe that it is a bug, please follow the instructions at :"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:265
+#, fuzzy
+msgid "Open Messages Window"
+msgstr "Open het boodschappen scherm"
+
+#: modules/gui/macosx/intf.m:266
+msgid "Dismiss"
+msgstr ""
+
+#: modules/gui/macosx/open.m:170
+#, fuzzy
+msgid "Open Source"
+msgstr "Open een bestand"
+
+#: modules/gui/macosx/open.m:181
 msgid "Treat as a pipe rather than as a file"
 msgstr ""
 
-#: modules/gui/macosx/open.m:159 modules/gui/macosx/open.m:420
-msgid "DVD with menus"
+#: modules/gui/macosx/open.m:187
+msgid "Use DVD menus"
 msgstr ""
 
-#: modules/gui/macosx/open.m:161 modules/gui/macosx/open.m:308
+#: modules/gui/macosx/open.m:189 modules/gui/macosx/open.m:392
 msgid "VIDEO_TS folder"
 msgstr ""
 
-#: modules/gui/macosx/open.m:170 modules/gui/macosx/open.m:495
+#: modules/gui/macosx/open.m:200 modules/gui/macosx/open.m:554
+#: modules/gui/macosx/open.m:604
 msgid "UDP/RTP"
 msgstr ""
 
-#: modules/gui/macosx/open.m:171 modules/gui/macosx/open.m:507
+#: modules/gui/macosx/open.m:201 modules/gui/macosx/open.m:555
+#: modules/gui/macosx/open.m:616
 msgid "UDP/RTP Multicast"
 msgstr ""
 
-#: modules/gui/macosx/open.m:172 modules/gui/macosx/open.m:492
-#: modules/gui/macosx/open.m:520
+#: modules/gui/macosx/open.m:202 modules/gui/macosx/open.m:556
+#: modules/gui/macosx/open.m:601 modules/gui/macosx/open.m:629
 msgid "Channel server"
 msgstr "Kanaal server"
 
-#: modules/gui/macosx/open.m:173 modules/gui/macosx/open.m:539
+#: modules/gui/macosx/open.m:203 modules/gui/macosx/open.m:557
+#: modules/gui/macosx/open.m:648
 msgid "HTTP/FTP/MMS"
 msgstr ""
 
-#: modules/gui/macosx/open.m:358 modules/gui/macosx/open.m:407
-#: modules/gui/macosx/open.m:415 modules/gui/macosx/open.m:423
+#: modules/gui/macosx/open.m:211
+msgid "Stream output MRL"
+msgstr ""
+
+#: modules/gui/macosx/open.m:214 modules/gui/macosx/open.m:729
+msgid "RTP"
+msgstr ""
+
+#: modules/gui/macosx/open.m:220 modules/gui/macosx/open.m:698
+#: modules/gui/macosx/open.m:756
+msgid "PS"
+msgstr ""
+
+#: modules/gui/macosx/open.m:221
+msgid "TS"
+msgstr ""
+
+#: modules/gui/macosx/open.m:437 modules/gui/macosx/open.m:489
+#: modules/gui/macosx/open.m:497
 msgid "No %@s found"
 msgstr ""
 
-#: modules/gui/macosx/open.m:577
+#: modules/gui/macosx/open.m:532
 msgid "Open VIDEO_TS Directory"
 msgstr ""
 
-#: modules/gui/macosx/controls.m:479
-msgid "Volume Up"
-msgstr ""
-
-#: modules/gui/macosx/controls.m:480
-msgid "Volume Down"
-msgstr ""
+#: modules/gui/macosx/open.m:706
+#, fuzzy
+msgid "Save File"
+msgstr "Selecteer Bestand"
 
 #: modules/gui/ncurses/ncurses.c:66
 #, fuzzy
@@ -3307,6 +3391,14 @@ msgstr "help module"
 #, fuzzy
 msgid "xosd interface module"
 msgstr "interface module"
+
+#, fuzzy
+#~ msgid "About vlc"
+#~ msgstr "Informatie"
+
+#, fuzzy
+#~ msgid "Softer"
+#~ msgstr "Langzaam"
 
 #, fuzzy
 #~ msgid "RTP access module"

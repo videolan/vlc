@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.30 2002/12/18 14:17:11 sam Exp $
+ * $Id: threads.c,v 1.31 2003/01/06 22:07:47 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -607,13 +607,15 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 
     if ( i_priority )
     {
+        int i_error;
         struct sched_param param;
         memset( &param, 0, sizeof(struct sched_param) );
         param.sched_priority = i_priority;
-        if ( pthread_setschedparam( p_this->thread_id, SCHED_RR, &param ) )
+        if ( (i_error = pthread_setschedparam( p_this->thread_id,
+                                               SCHED_RR, &param )) )
         {
-            msg_Warn( p_this, "couldn't go to real-time priority (%s:%d)",
-                      psz_file, i_line );
+            msg_Warn( p_this, "couldn't go to real-time priority (%s:%d): %s",
+                      psz_file, i_line, strerror(errno) );
             i_priority = 0;
         }
     }
