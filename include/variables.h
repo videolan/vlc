@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.15 2003/07/23 22:01:25 gbazin Exp $
+ * $Id: variables.h,v 1.16 2003/09/07 22:45:16 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -158,4 +158,39 @@ VLC_EXPORT( int, __var_DelCallback, ( vlc_object_t *, const char *, vlc_callback
 
 #define var_AddCallback(a,b,c,d) __var_AddCallback( VLC_OBJECT(a), b, c, d )
 #define var_DelCallback(a,b,c,d) __var_DelCallback( VLC_OBJECT(a), b, c, d )
+
+/*****************************************************************************
+ * helpers functions
+ *****************************************************************************
+ *
+ *****************************************************************************/
+static inline int __var_SetInteger( vlc_object_t *p_obj, const char *psz_name, int i )
+{
+    vlc_value_t val;
+    val.i_int = i;
+    return __var_Set( p_obj, psz_name, val );
+}
+static inline int __var_SetTime( vlc_object_t *p_obj, const char *psz_name, signed long long i )
+{
+    vlc_value_t val;
+    val.i_time = i;
+    return __var_Set( p_obj, psz_name, val );
+}
+static inline int __var_SetFloat( vlc_object_t *p_obj, const char *psz_name, float f )
+{
+    vlc_value_t val;
+    val.f_float = f;
+    return __var_Set( p_obj, psz_name, val );
+}
+static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t val;
+    val.b_bool = VLC_TRUE;
+    return __var_Set( p_obj, psz_name, val );
+}
+
+#define var_SetInteger(a,b,c)   __var_SetInteger( VLC_OBJECT(a),b,c)
+#define var_SetTime(a,b,c)      __var_SetTime( VLC_OBJECT(a),b,c)
+#define var_SetFloat(a,b,c)     __var_SetFloat( VLC_OBJECT(a),b,c)
+#define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
 

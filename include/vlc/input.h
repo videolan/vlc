@@ -2,7 +2,7 @@
  * input.h: input modules header for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.h,v 1.2 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: input.h,v 1.3 2003/09/07 22:45:16 fenrir Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ extern "C" {
 #include "input_ext-intf.h" /* input_thread_s */
 #include "input_ext-dec.h" /* data_packet_s */
 #include "input_ext-plugins.h"
+#include "ninput.h"
 
 # ifdef __cplusplus
 }

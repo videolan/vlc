@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.7 2003/08/23 14:15:27 fenrir Exp $
+ * $Id: ninput.h,v 1.8 2003/09/07 22:45:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -86,11 +86,10 @@ static int inline stream_Seek( stream_t *s, int64_t i_pos )
  * XXX: don't look at it yet.
  * @{
  */
-#define DEMUX_POSITION_MAX  10000
 enum demux_query_e
 {
-    DEMUX_GET_POSITION,         /* arg1= int64_t *      res=    */
-    DEMUX_SET_POSITION,         /* arg1= int64_t        res=can fail    */
+    DEMUX_GET_POSITION,         /* arg1= double *       res=    */
+    DEMUX_SET_POSITION,         /* arg1= double         res=can fail    */
 
     DEMUX_GET_TIME,             /* arg1= int64_t *      res=    */
     DEMUX_SET_TIME,             /* arg1= int64_t        res=can fail    */
@@ -103,6 +102,8 @@ enum demux_query_e
 /* Demux */
 VLC_EXPORT( int,            demux_vaControl,        ( input_thread_t *, int i_query, va_list  ) );
 VLC_EXPORT( int,            demux_Control,          ( input_thread_t *, int i_query, ...  ) );
+
+VLC_EXPORT( int,            demux_vaControlDefault, ( input_thread_t *, int i_query, va_list  ) );
 
 /**
  * @}

@@ -4,7 +4,7 @@
  * of the reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: stream_control.h,v 1.10 2002/07/31 20:56:50 sam Exp $
+ * $Id: stream_control.h,v 1.11 2003/09/07 22:45:16 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,14 +46,17 @@ struct stream_ctrl_t
 };
 
 /* Possible status : */
-#define UNDEF_S             0
-#define PLAYING_S           1
-#define PAUSE_S             2
-#define FORWARD_S           3
-#define BACKWARD_S          4
-#define REWIND_S            5                /* Not supported for the moment */
-#define NOT_STARTED_S       10
-#define START_S             11
+enum stream_status_e
+{
+    UNDEF_S         = 0,
+    PLAYING_S       = 1,
+    PAUSE_S         = 2,
+    FORWARD_S       = 3,
+    BACKWARD_S      = 4,
+
+    INIT_S          = 10,
+    END_S           = 11
+};
 
 #define DEFAULT_RATE        1000
 #define MINIMAL_RATE        31              /* Up to 32/1 */
