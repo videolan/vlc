@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.30 2002/12/14 22:33:21 fenrir Exp $
+ * $Id: libvlc.h,v 1.31 2002/12/18 17:52:23 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -283,13 +283,26 @@
 #define SOUT_TEXT N_("choose a stream output")
 #define SOUT_LONGTEXT N_( \
     "Empty if no stream output.")
+
+#define SOUT_VIDEO_TEXT N_("enable video stream output")
+#define SOUT_VIDEO_LONGTEXT N_( \
+    "This allows you to choose if the video stream should be redirected to " \
+    "the stream output facility when this last one is enabled.")
+
+#define SOUT_AUDIO_TEXT N_("enable audio stream output")
+#define SOUT_AUDIO_LONGTEXT N_( \
+    "This allows you to choose if the video stream should be redirected to " \
+    "the stream output facility when this last one is enabled.")
+
 #define PACKETIZER_TEXT N_("choose prefered packetizer list")
 #define PACKETIZER_LONGTEXT N_( \
     "This allows you to select the order in which vlc will choose its " \
     "packetizers."  )
+
 #define MUX_TEXT N_("mux module")
 #define MUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure mux modules")
+
 #define ACCESS_OUTPUT_TEXT N_("access output module")
 #define ACCESS_OUTPUT_LONGTEXT N_( \
     "This is a legacy entry to let you configure access output modules")
@@ -486,12 +499,16 @@ vlc_module_begin();
     add_category_hint( N_("Decoders"), NULL );
     add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT );
 
-    /* Stream output */
+    /* Stream output options */
     add_category_hint( N_("Stream output"), NULL );
-    add_module( "packetizer", "packetizer", NULL, NULL, PACKETIZER_TEXT, PACKETIZER_LONGTEXT );
+    add_module( "packetizer", "packetizer", NULL, NULL,
+                PACKETIZER_TEXT, PACKETIZER_LONGTEXT );
     add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT, MUX_LONGTEXT );
-    add_module( "access_output", "sout access", NULL, NULL, ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT );
+    add_module( "access_output", "sout access", NULL, NULL,
+                ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT );
     add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT );
+    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT, SOUT_VIDEO_LONGTEXT );
+    add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT, SOUT_AUDIO_LONGTEXT );
 
     /* CPU options */
     add_category_hint( N_("CPU"), NULL );

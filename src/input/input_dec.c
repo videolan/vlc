@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.53 2002/12/14 21:32:42 fenrir Exp $
+ * $Id: input_dec.c,v 1.54 2002/12/18 17:52:23 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -63,8 +63,24 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
     psz_sout = config_GetPsz( p_input, "sout" );
     if( psz_sout != NULL && *psz_sout != 0 )
     {
-        p_fifo->p_module = module_Need( p_fifo, "packetizer", "$packetizer" );
+        vlc_bool_t b_sout = VLC_TRUE;
+
+        if( p_es->i_cat == AUDIO_ES )
+        {
+            b_sout = config_GetInt( p_input, "sout-audio" );
+        }
+        else if( p_es->i_cat == VIDEO_ES )
+        {
+            b_sout = config_GetInt( p_input, "sout-video" );
+        }
+
+        if( b_sout )
+        {
+            p_fifo->p_module =
+                module_Need( p_fifo, "packetizer", "$packetizer" );
+        }
     }
+
     /* default Get a suitable decoder module */
     if( p_fifo->p_module == NULL )
     {
