@@ -17,6 +17,7 @@ endif
 # All possible plugin directories, needed for make clean
 #
 PLUGINS_DIR :=	a52 \
+		a52_system \
 		aa \
 		ac3_adec \
 		ac3_spdif \
@@ -67,6 +68,7 @@ PLUGINS_DIR :=	a52 \
 
 PLUGINS_TARGETS := a52/a52 \
 		aa/aa \
+		a52_system/a52_system \
 		ac3_adec/ac3_adec \
 		ac3_spdif/ac3_spdif \
 		access/file \

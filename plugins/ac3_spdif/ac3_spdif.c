@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.28 2002/06/01 18:04:48 sam Exp $
+ * $Id: ac3_spdif.c,v 1.29 2002/06/02 23:43:38 bozo Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -199,7 +199,10 @@ static int decoder_Run( decoder_fifo_t * p_fifo )
         {
             i_current_pts += i_frame_time;
         }
-        
+
+        // wait a little to avoid an input flood from the a52 input
+        mwait( i_current_pts - 500000 );
+
         vlc_mutex_lock (&p_spdif->p_aout_fifo->data_lock);
         
         p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->i_end_frame] =
