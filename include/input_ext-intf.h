@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.91 2003/05/31 12:24:39 titer Exp $
+ * $Id: input_ext-intf.h,v 1.92 2003/07/27 14:10:02 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -112,7 +112,7 @@ struct pgrm_descriptor_t
     mtime_t                 cr_ref, sysdate_ref;
     mtime_t                 last_cr; /* reference to detect unexpected stream
                                       * discontinuities                      */
-    mtime_t                 last_syscr;
+    mtime_t                 last_pts;
     count_t                 c_average_count;
                            /* counter used to compute dynamic average values */
     int                     i_synchro_state;

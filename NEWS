@@ -1,7 +1,12 @@
-$Id: NEWS,v 1.57 2003/07/19 15:25:47 sigmunau Exp $
+$Id: NEWS,v 1.58 2003/07/27 14:10:02 massiot Exp $
 
 Changes between 0.6.0 and 0.6.1:
 ---------------------------------
+
+Core support:
+ * There should be less bogus resampling, particularly on DVDs.
+ * VLC will now wait for the medium to wake up before starting its clock
+   after a pause.
 
 Stream output:
  * Added vorbis audio support in Ogg streaming.

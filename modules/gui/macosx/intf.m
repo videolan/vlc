@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.91 2003/06/30 01:51:10 hartman Exp $
+ * $Id: intf.m,v 1.92 2003/07/27 14:10:02 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -733,7 +733,10 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
                 /* release the lock to be able to seek */
                 vlc_mutex_unlock( &p_input->stream.stream_lock );
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                playlist_Play( p_playlist );
                 input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+                vlc_mutex_lock( &p_playlist->object_lock );
                 vlc_mutex_lock( &p_input->stream.stream_lock );
 
                 /* update the old value */

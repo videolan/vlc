@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.37 2003/05/22 16:01:02 gbazin Exp $
+ * $Id: input_clock.c,v 1.38 2003/07/27 14:10:02 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -61,6 +61,9 @@
  * in all the FIFOs, but it may be not enough.
  */
 
+static void ClockNewRef( pgrm_descriptor_t * p_pgrm,
+                         mtime_t i_clock, mtime_t i_sysdate );
+
 /*****************************************************************************
  * Constants
  *****************************************************************************/
@@ -73,6 +76,10 @@
 
 /* Maximum gap allowed between two CRs. */
 #define CR_MAX_GAP 1000000
+
+/* Latency introduced on DVDs with CR == 0 on chapter change - this is from
+ * my dice --Meuuh */
+#define CR_MEAN_PTS_GAP 300000
 
 /*****************************************************************************
  * ClockToSysdate: converts a movie clock to system date
@@ -90,6 +97,12 @@ static mtime_t ClockToSysdate( input_thread_t * p_input,
         i_sysdate /= 27;
         i_sysdate /= 1000;
         i_sysdate += (mtime_t)p_pgrm->sysdate_ref;
+
+        if ( i_sysdate < mdate() - CR_MAX_GAP )
+        {
+            msg_Warn( p_input, "Bogus clock encountered, resetting" );
+            ClockNewRef( p_pgrm, i_clock, i_sysdate = mdate() );
+        }
     }
 
     return( i_sysdate );
@@ -115,12 +128,7 @@ static void ClockNewRef( pgrm_descriptor_t * p_pgrm,
                          mtime_t i_clock, mtime_t i_sysdate )
 {
     p_pgrm->cr_ref = i_clock;
-    /* this is actually a kludge, but it gives better results when scr
-    * is zero in DVDs: we are 3-4 ms in advance instead of sometimes
-    * 100ms late  */
-    p_pgrm->sysdate_ref = ( p_pgrm->last_syscr && !i_clock )
-                          ? p_pgrm->last_syscr
-                          : i_sysdate ;
+    p_pgrm->sysdate_ref = i_sysdate ;
 }
 
 /*****************************************************************************
@@ -130,7 +138,7 @@ static void ClockNewRef( pgrm_descriptor_t * p_pgrm,
 void input_ClockInit( pgrm_descriptor_t * p_pgrm )
 {
     p_pgrm->last_cr = 0;
-    p_pgrm->last_syscr = 0;
+    p_pgrm->last_pts = 0;
     p_pgrm->cr_ref = 0;
     p_pgrm->sysdate_ref = 0;
     p_pgrm->delta_cr = 0;
@@ -160,8 +168,8 @@ int input_ClockManageControl( input_thread_t * p_input,
 
         vlc_cond_wait( &p_input->stream.stream_wait,
                        &p_input->stream.stream_lock );
-        p_pgrm->last_syscr = 0;
-        ClockNewRef( p_pgrm, i_clock, mdate() );
+        ClockNewRef( p_pgrm, i_clock, p_pgrm->last_pts > mdate() ?
+                                      p_pgrm->last_pts : mdate() );
 
         if( p_input->stream.i_new_status == PAUSE_S )
         {
@@ -229,7 +237,9 @@ void input_ClockManageRef( input_thread_t * p_input,
     if( ( p_pgrm->i_synchro_state != SYNCHRO_OK ) || ( i_clock == 0 ) )
     {
         /* Feed synchro with a new reference point. */
-        ClockNewRef( p_pgrm, i_clock, mdate() );
+        ClockNewRef( p_pgrm, i_clock,
+                     p_pgrm->last_pts + CR_MEAN_PTS_GAP > mdate() ?
+                     p_pgrm->last_pts + CR_MEAN_PTS_GAP : mdate() );
         p_pgrm->i_synchro_state = SYNCHRO_OK;
 
         if( p_input->stream.b_pace_control
@@ -241,7 +251,6 @@ void input_ClockManageRef( input_thread_t * p_input,
         else
         {
             p_pgrm->last_cr = 0;
-            p_pgrm->last_syscr = 0;
             p_pgrm->delta_cr = 0;
             p_pgrm->c_average_count = 0;
         }
@@ -266,15 +275,10 @@ void input_ClockManageRef( input_thread_t * p_input,
         if( p_input->stream.b_pace_control
              && p_input->stream.p_selected_program == p_pgrm )
         {
-            /* We remember the last system date to be able to restart
-             * the synchro we statistically better continuity, after 
-             * a zero scr */
-            p_pgrm->last_syscr = ClockToSysdate( p_input, p_pgrm, i_clock );
-            
             /* Wait a while before delivering the packets to the decoder.
              * In case of multiple programs, we arbitrarily follow the
              * clock of the first program. */
-            mwait( p_pgrm->last_syscr );
+            mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
 
             /* Now take into account interface changes. */
             input_ClockManageControl( p_input, p_pgrm, i_clock );
@@ -318,8 +322,9 @@ mtime_t input_ClockGetTS( input_thread_t * p_input,
 
     if( p_pgrm->i_synchro_state == SYNCHRO_OK )
     {
-        return( ClockToSysdate( p_input, p_pgrm, i_ts + p_pgrm->delta_cr )
-                 + p_input->i_pts_delay );
+        p_pgrm->last_pts = ClockToSysdate( p_input, p_pgrm,
+                                           i_ts + p_pgrm->delta_cr );
+        return( p_pgrm->last_pts + p_input->i_pts_delay );
     }
     else
     {

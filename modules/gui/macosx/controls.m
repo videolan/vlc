@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.45 2003/07/09 01:31:25 hartman Exp $
+ * $Id: controls.m,v 1.46 2003/07/27 14:10:02 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -254,6 +254,7 @@
         return;
     }
 
+    playlist_Play( p_playlist );
     input_Seek( p_playlist->p_input, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
     vlc_object_release( p_playlist );
 }
@@ -269,6 +270,7 @@
         return;
     }
 
+    playlist_Play( p_playlist );
     input_Seek( p_playlist->p_input, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
     vlc_object_release( p_playlist );
 }
