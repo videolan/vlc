@@ -37,15 +37,15 @@ $(BUILTIN_X11): BUILTIN_X11_%.o: %.c
 # XVideo
 $(PLUGIN_XVIDEO): %.o: .dep/%.d
 $(PLUGIN_XVIDEO): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_XVIDEO) -DPLUGIN -DMODULE_NAME=xvideo -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_X11) -DPLUGIN -DMODULE_NAME=xvideo -c -o $@ $<
 
 $(PLUGIN_COMMON:%.o=%_xvideo.o): %_xvideo.o: .dep/%.d
 $(PLUGIN_COMMON:%.o=%_xvideo.o): %_xvideo.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_XVIDEO) -DPLUGIN -DMODULE_NAME=xvideo -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_X11) -DPLUGIN -DMODULE_NAME=xvideo -c -o $@ $<
 
 $(BUILTIN_XVIDEO): BUILTIN_XVIDEO_%.o: .dep/%.d
 $(BUILTIN_XVIDEO): BUILTIN_XVIDEO_%.o: %.c
-	$(CC) $(CFLAGS) $(CFLAGS_XVIDEO) -DBUILTIN -DMODULE_NAME=xvideo -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_X11) -DBUILTIN -DMODULE_NAME=xvideo -c -o $@ $<
 
 #
 # Real targets
