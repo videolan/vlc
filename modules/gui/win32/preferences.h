@@ -87,7 +87,8 @@ public:
 class TPanelPlugin : public TPanelPref
 {
 public:
-    __fastcall TPanelPlugin( TComponent* Owner, module_config_t *p_config );
+    __fastcall TPanelPlugin( TComponent* Owner, module_config_t *p_config,
+        intf_thread_t *_p_intf );
     TCleanCheckListBox *CleanCheckListBox;
     TButton *ButtonConfig;
     TLabel *Label;
@@ -96,6 +97,8 @@ public:
     void __fastcall CheckListBoxClick( TObject *Sender );
     void __fastcall CheckListBoxClickCheck( TObject *Sender );
     void __fastcall ButtonConfigClick( TObject *Sender );
+private:
+    intf_thread_t *p_intf;
 };
 //---------------------------------------------------------------------------
 class TPanelString : public TPanelPref
@@ -138,8 +141,9 @@ __published:	// IDE-managed Components
     void __fastcall ButtonCancelClick( TObject *Sender );
     void __fastcall FormClose( TObject *Sender, TCloseAction &Action );
 private:	// User declarations
+    intf_thread_t *p_intf;
 public:		// User declarations
-    __fastcall TPreferencesDlg( TComponent* Owner );
+    __fastcall TPreferencesDlg( TComponent* Owner, intf_thread_t *_p_intf );
     void __fastcall CreateConfigDialog( char *psz_module_name );
     void __fastcall SaveValue( module_config_t *p_config );
 };

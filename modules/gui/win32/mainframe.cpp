@@ -633,7 +633,7 @@ void __fastcall TMainFrameDlg::CreatePreferences( AnsiString Name )
     else
     {
         /* create the config dialog */
-        Preferences = new TPreferencesDlg( this );
+        Preferences = new TPreferencesDlg( this, p_intf );
         Preferences->CreateConfigDialog( Name.c_str() );
 
         /* save it */

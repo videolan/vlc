@@ -38,8 +38,6 @@
 #pragma link "CSPIN"
 #pragma resource "*.dfm"
 
-extern intf_thread_t *p_intfGlobal;
-
 /****************************************************************************
  * A THintWindow with a limited width
  ****************************************************************************/
@@ -200,8 +198,11 @@ void __fastcall TPanelPref::UpdateChanges()
  * Panel for module management
  ****************************************************************************/
 __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
-            module_config_t *p_config ) : TPanelPref( Owner, p_config )
+    module_config_t *p_config, intf_thread_t *_p_intf )
+    : TPanelPref( Owner, p_config )
 {
+    p_intf = _p_intf;
+
     /* init configure button */
     ButtonConfig = CreateButton( this,
             LIBWIN32_PREFSIZE_RIGHT - LIBWIN32_PREFSIZE_BUTTON_WIDTH,
@@ -261,7 +262,7 @@ void __fastcall TPanelPlugin::CheckListBoxClick( TObject *Sender )
         return;
 
     /* look for module 'Name' */
-    p_list = vlc_list_find( p_intfGlobal, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
     for( pp_parser = (module_t **)p_list->pp_objects ;
          *pp_parser ;
@@ -295,7 +296,7 @@ void __fastcall TPanelPlugin::CheckListBoxClickCheck( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TPanelPlugin::ButtonConfigClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->
+    p_intf->p_sys->p_window->
                         CreatePreferences( ModuleSelected->psz_object_name );
 }
 //---------------------------------------------------------------------------
@@ -436,10 +437,11 @@ void __fastcall TPanelBool::UpdateChanges()
 /****************************************************************************
  * Callbacks for the dialog
  ****************************************************************************/
-__fastcall TPreferencesDlg::TPreferencesDlg( TComponent* Owner )
-        : TForm( Owner )
+__fastcall TPreferencesDlg::TPreferencesDlg( TComponent* Owner,
+    intf_thread_t *_p_intf ) : TForm( Owner )
 {
-    Icon = p_intfGlobal->p_sys->p_window->Icon;
+    p_intf = _p_intf;
+    Icon = p_intf->p_sys->p_window->Icon;
     Application->HintHidePause = 0x1000000;
     HintWindowClass = __classid ( TNarrowHintWindow );
     /* prevent the form from being resized horizontally */
@@ -484,7 +486,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     TPanelBool         *PanelBool;
 
     /* Look for the selected module */
-    p_list = vlc_list_find( p_intfGlobal, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
     for( pp_parser = (module_t **)p_list->pp_objects ;
          *pp_parser ;
@@ -536,7 +538,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case CONFIG_ITEM_MODULE:
 
             /* add new panel for the config option */
-            PanelPlugin = new TPanelPlugin( this, p_item );
+            PanelPlugin = new TPanelPlugin( this, p_item, p_intf );
             PanelPlugin->Parent = ScrollBox;
 
             /* Look for valid modules */
@@ -659,7 +661,7 @@ void __fastcall TPreferencesDlg::ButtonApplyClick( TObject *Sender )
 void __fastcall TPreferencesDlg::ButtonSaveClick( TObject *Sender )
 {
     ButtonApplyClick( Sender );
-    config_SaveConfigFile( p_intfGlobal, NULL );
+    config_SaveConfigFile( p_intf, NULL );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPreferencesDlg::ButtonCancelClick( TObject *Sender )
@@ -674,12 +676,12 @@ void __fastcall TPreferencesDlg::SaveValue( module_config_t *p_config )
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
         case CONFIG_ITEM_MODULE:
-            config_PutPsz( p_intfGlobal, p_config->psz_name,
+            config_PutPsz( p_intf, p_config->psz_name,
                            *p_config->psz_value ? p_config->psz_value : NULL );
             break;
         case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_BOOL:
-            config_PutInt( p_intfGlobal, p_config->psz_name,
+            config_PutInt( p_intf, p_config->psz_name,
                            p_config->i_value );
             break;
     }
