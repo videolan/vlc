@@ -140,6 +140,13 @@ void intf_Destroy( intf_thread_t *p_intf )
 int intf_SelectInput( intf_thread_t * p_intf, int i_index )
 {
     intf_DbgMsg("\n");
+
+    /* If VLANs are not active, return with an error */
+    if( !p_main->b_vlans )
+    {
+        intf_ErrMsg("error: VLANs are not activated\n");
+        return( 1 );        
+    }    
     
     /* Kill existing input, if any */
     if( p_intf->p_input != NULL )

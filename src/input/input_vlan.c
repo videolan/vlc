@@ -134,8 +134,6 @@ static int ZeTrucMucheFunction( int Channel)
 	struct sockaddr_in	sa_client;
         char mess[80];
 
-	return( 0 );
-        
   	/*      
 	 *Looking for informations about the eth0 interface
 	 */
