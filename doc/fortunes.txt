@@ -328,3 +328,17 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<Dnumgis> I just listened through an entire ogg/vorbis file with vlc with no
+          audible problem whatsoever
+<Dnumgis> but I don't get the time of the stream
+<Dnumgis> gibalou: why don't I get the time?
+<sam> because time does not exist
+<sam> as Kant stated, our mind structures our perceptions so that we know a 
+      priori that time is like a mathematical line, rendering time as a form 
+      of conscious experience
+<gibalou> Dnumgis: a few things are left to be implemented, like seeking, 
+          stream length display, etc...
+<sam> or you can listen to gibalou's dull explanation
+
+  -- #videolan
+%

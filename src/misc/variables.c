@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.8 2002/10/17 13:15:31 sam Exp $
+ * $Id: variables.c,v 1.9 2002/10/28 13:25:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,6 +48,8 @@ static int Insert         ( variable_t *, int, const char * );
 static int InsertInner    ( variable_t *, int, u32 );
 static int Lookup         ( variable_t *, int, const char * );
 static int LookupInner    ( variable_t *, int, u32 );
+
+static void CheckValue    ( variable_t *, vlc_value_t * );
 
 /*****************************************************************************
  * var_Create: initialize a vlc variable
@@ -107,6 +109,11 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 
     p_var->i_usage = 1;
 
+    p_var->b_min = VLC_FALSE;
+    p_var->b_max = VLC_FALSE;
+    p_var->b_step = VLC_FALSE;
+    p_var->b_select = VLC_FALSE;
+    p_var->p_choice = NULL;
     p_var->b_incallback = VLC_FALSE;
 
     p_var->i_entries = 0;
@@ -217,6 +224,60 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 }
 
 /*****************************************************************************
+ * var_Change: perform an action on a variable
+ *****************************************************************************
+ * 
+ *****************************************************************************/
+int __var_Change( vlc_object_t *p_this, const char *psz_name,
+                  int i_action, vlc_value_t *p_val )
+{
+    int i_var;
+    variable_t *p_var;
+
+    vlc_mutex_lock( &p_this->var_lock );
+
+    i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+
+    if( i_var < 0 )
+    {
+        vlc_mutex_unlock( &p_this->var_lock );
+        return VLC_ENOVAR;
+    }
+
+    p_var = &p_this->p_vars[i_var];
+
+    switch( i_action )
+    {
+        case VLC_VAR_SETMIN:
+            p_var->b_min = VLC_TRUE;
+            p_var->min = *p_val;
+            CheckValue( p_var, &p_var->val );
+            break;
+        case VLC_VAR_SETMAX:
+            p_var->b_max = VLC_TRUE;
+            p_var->max = *p_val;
+            CheckValue( p_var, &p_var->val );
+            break;
+        case VLC_VAR_SETSTEP:
+            p_var->b_step = VLC_TRUE;
+            p_var->step = *p_val;
+            CheckValue( p_var, &p_var->val );
+            break;
+
+        case VLC_VAR_SETCHOICE:
+            p_var->b_select = VLC_TRUE;
+            break;
+
+        default:
+            break;
+    }
+
+    vlc_mutex_unlock( &p_this->var_lock );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * var_Type: request a variable's type, 0 if not found
  *****************************************************************************
  * 
@@ -276,6 +337,9 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
 
     /* Backup needed stuff */
     oldval = p_var->val;
+
+    /* Check boundaries */
+    CheckValue( p_var, &val );
 
     /* Deal with callbacks. Tell we're in a callback, release the lock,
      * call stored functions, retake the lock. */
@@ -693,5 +757,57 @@ static int LookupInner( variable_t *p_vars, int i_count, u32 i_hash )
     }
 
     return i_middle;
+}
+
+/*****************************************************************************
+ * CheckValue: check that a value is valid
+ *****************************************************************************
+ * This function checks p_val's value against p_var's limitations such as
+ * minimal and maximal value, step, in-list position, and changes p_val if
+ * necessary.
+ *****************************************************************************/
+static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
+{
+    switch( p_var->i_type )
+    {
+        case VLC_VAR_INTEGER:
+            if( p_var->b_step && p_var->step.i_int
+                              && (p_val->i_int % p_var->step.i_int) )
+            {
+                p_val->i_int = (p_val->i_int + (p_var->step.i_int / 2))
+                               / p_var->step.i_int * p_var->step.i_int;
+            }
+            if( p_var->b_min && p_val->i_int < p_var->min.i_int )
+            {
+                p_val->i_int = p_var->min.i_int;
+            }
+            if( p_var->b_max && p_val->i_int > p_var->max.i_int )
+            {
+                p_val->i_int = p_var->max.i_int;
+            }
+            break;
+        case VLC_VAR_FLOAT:
+            if( p_var->b_step && p_var->step.f_float )
+            {
+                float f_round = p_var->step.f_float * (float)(int)( 0.5 +
+                                        p_val->f_float / p_var->step.f_float );
+                if( p_val->f_float != f_round )
+                {
+                    p_val->f_float = f_round;
+                }
+            }
+            if( p_var->b_min && p_val->f_float < p_var->min.f_float )
+            {
+                p_val->f_float = p_var->min.f_float;
+            }
+            if( p_var->b_max && p_val->f_float > p_var->max.f_float )
+            {
+                p_val->f_float = p_var->max.f_float;
+            }
+            break;
+        case VLC_VAR_TIME:
+            /* TODO */
+            break;
+    }
 }
 

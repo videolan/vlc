@@ -465,7 +465,9 @@ $(SOURCES_mozilla): mozilla/vlcintf.h
 
 mozilla_plugin_DATA = $(LIBRARIES_mozilla)
 mozilla_plugindir = $(libdir)/mozilla/plugins
-$(LIBRARIES_mozilla): $(mozilla_libplugin_a_OBJECTS) $(L_builtin_pic)
+$(LIBRARIES_mozilla): $(mozilla_libplugin_a_OBJECTS) \
+                      $(mozilla_libplugin_a_DEPENDENCIES) \
+                      $(L_builtin_pic)
 	$(CXXLINK) -o $@ $(mozilla_libplugin_a_OBJECTS) $(DATA_npvlc_rc) \
 		lib/libvlc_pic.a $(L_builtin_pic) -shared $(LDFLAGS) \
 		$(LDFLAGS_vlc) $(LDFLAGS_mozilla) $(LDFLAGS_builtin_pic)

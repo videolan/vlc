@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.5 2002/10/17 13:15:30 sam Exp $
+ * $Id: variables.h,v 1.6 2002/10/28 13:25:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,6 +40,14 @@ struct variable_t
     /* Creation count: we only destroy the variable if it reaches 0 */
     int          i_usage;
 
+    /* Set to TRUE if the variable has min/max/step values */
+    vlc_bool_t   b_min, b_max, b_step;
+    vlc_value_t  min, max, step;
+
+    /* Set to TRUE if the variable is a choice variable */
+    vlc_bool_t   b_select;
+    vlc_value_t *p_choice;
+
     /* Set to TRUE if the variable is in a callback */
     vlc_bool_t   b_incallback;
 
@@ -63,10 +71,23 @@ struct variable_t
 #define VLC_VAR_MUTEX     0x0800
 
 /*****************************************************************************
+ * Variable actions
+ *****************************************************************************/
+#define VLC_VAR_SETMIN        0x0010
+#define VLC_VAR_SETMAX        0x0011
+#define VLC_VAR_SETSTEP       0x0012
+
+#define VLC_VAR_SETCHOICE     0x0020
+#define VLC_VAR_ADDCHOICE     0x0021
+#define VLC_VAR_DELCHOICE     0x0022
+
+/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 VLC_EXPORT( int, __var_Create, ( vlc_object_t *, const char *, int ) );
 VLC_EXPORT( int, __var_Destroy, ( vlc_object_t *, const char * ) );
+
+VLC_EXPORT( int, __var_Change, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
 
 VLC_EXPORT( int, __var_Type, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( int, __var_Set, ( vlc_object_t *, const char *, vlc_value_t ) );
@@ -74,6 +95,8 @@ VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 
 #define var_Create(a,b,c) __var_Create( VLC_OBJECT(a), b, c )
 #define var_Destroy(a,b) __var_Destroy( VLC_OBJECT(a), b )
+
+#define var_Change(a,b,c,d) __var_Change( VLC_OBJECT(a), b, c, d )
 
 #define var_Type(a,b) __var_Type( VLC_OBJECT(a), b )
 #define var_Set(a,b,c) __var_Set( VLC_OBJECT(a), b, c )
