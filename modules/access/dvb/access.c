@@ -334,7 +334,7 @@ int E_(Open) ( vlc_object_t *p_this )
     }
     else
     {
-        msg_Warn(p_input,"DVV Input syntax has changed, please see documentation for further informations");
+        msg_Warn(p_input,"DVB Input syntax has changed, please see documentation for further informations");
         u_freq = (unsigned int)i_test;
         if( *psz_next )
         {
@@ -408,7 +408,9 @@ int E_(Open) ( vlc_object_t *p_this )
             return -1;
         }
     }
+
     /* Setting frontend parameters for tuning the hardware */      
+    msg_Dbg( p_input, "Trying to tune to channel ...");
     switch( frontend_info.type )
     {
         /* DVB-S: satellite and budget cards (nova) */
@@ -418,6 +420,14 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.qpsk.symbol_rate = u_srate;
             fep.u.qpsk.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
             msg_Dbg( p_input, "satellite (QPSK) frontend found on %s", frontend_info.name );
+
+            if (ioctl_SetQPSKFrontend (p_input, fep, b_polarisation,
+                               u_lnb_lof1, u_lnb_lof2, u_lnb_slof,
+                               u_adapter, u_device )<0)
+            {
+                msg_Err( p_input, "DVB-S frontend returned a failure event" );
+                return -1;
+            }
             break;
             
         /* DVB-C */
@@ -428,6 +438,11 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.qam.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
             fep.u.qam.modulation = dvb_DecodeModulation(p_input, i_modulation); 
             msg_Dbg( p_input, "cable (QAM) frontend found on %s", frontend_info.name );
+            if (ioctl_SetQAMFrontend (p_input, fep, u_adapter, u_device )<0)
+            {
+                msg_Err( p_input, "DVB-C frontend returned a failure event" );
+                return -1;
+            }
             break;
 
         /* DVB-T */
@@ -442,12 +457,17 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.ofdm.guard_interval = dvb_DecodeGuardInterval(p_input, i_guard);
             fep.u.ofdm.hierarchy_information = dvb_DecodeHierarchy(p_input, i_hierarchy);
             msg_Dbg( p_input, "terrestrial (OFDM) frontend found on %s", frontend_info.name );
+            if (ioctl_SetOFDMFrontend (p_input, fep,u_adapter, u_device )<0)
+            {
+                msg_Err( p_input, "DVB-T frontend returned a failure event" );
+                return -1;
+            }
             break;
-
         default:
             msg_Err( p_input, "Could not determine frontend type on %s", frontend_info.name );
             return -1;
     }
+    msg_Dbg( p_input, "Tuning done.");
 
     /* Initialise structure */
     p_satellite = malloc( sizeof( input_socket_t ) );
@@ -479,40 +499,6 @@ int E_(Open) ( vlc_object_t *p_this )
 #   endif
         free( p_satellite );
         return -1;
-    }
-
-    /* Initialize the Satellite Card */
-    switch (ioctl_SetFrontend (p_input, fep, b_polarisation,
-                               u_lnb_lof1, u_lnb_lof2, u_lnb_slof,
-                               u_adapter, u_device ))
-    {
-        case -2:
-            msg_Err( p_input, "frontend returned an unexpected event" );
-            close( p_satellite->i_handle );
-            free( p_satellite );
-            return -1;
-        case -3:
-            msg_Err( p_input, "frontend returned no event" );
-            close( p_satellite->i_handle );
-            free( p_satellite );
-            return -1;
-        case -4:
-            msg_Err( p_input, "frontend: timeout when polling for event" );
-            close( p_satellite->i_handle );
-            free( p_satellite );
-            return -1;
-        case -5:
-            msg_Err( p_input, "an error occured when polling frontend device" );
-            close( p_satellite->i_handle );
-            free( p_satellite );
-            return -1;
-        case -1:
-            msg_Err( p_input, "frontend returned a failure event" );
-            close( p_satellite->i_handle );
-            free( p_satellite );
-            return -1;
-        default:
-            break;
     }
 
     msg_Dbg( p_input, "setting filter on PAT" );

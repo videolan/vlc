@@ -33,8 +33,12 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, int b_polarisation,
+int ioctl_SetQPSKFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, int b_polarisation,
                        unsigned int u_lnb_lof1, unsigned int u_lnb_lof2, unsigned int u_lnb_slof,
+                       unsigned int u_adapter, unsigned int u_device );
+int ioctl_SetOFDMFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep,
+                       unsigned int u_adapter, unsigned int u_device );
+int ioctl_SetQAMFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep,
                        unsigned int u_adapter, unsigned int u_device );
 int ioctl_SetDMXFilter(input_thread_t * p_input, int i_pid, int *pi_fd, int i_type, unsigned int u_adapter, unsigned int u_device );
 int ioctl_UnsetDMXFilter(input_thread_t * p_input, int pi_fd);
@@ -50,3 +54,4 @@ fe_transmit_mode_t dvb_DecodeTransmission(input_thread_t * p_input, int transmis
 fe_guard_interval_t dvb_DecodeGuardInterval(input_thread_t * p_input, int guard);
 fe_hierarchy_t dvb_DecodeHierarchy(input_thread_t * p_input, int hierarchy);
 fe_spectral_inversion_t dvb_DecodeInversion(input_thread_t * p_input, int inversion);
+

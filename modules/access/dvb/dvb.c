@@ -187,6 +187,7 @@ int ioctl_InfoFrontend(input_thread_t * p_input, struct dvb_frontend_info *info,
     return 0;
 }
 
+/* QPSK only */
 int ioctl_DiseqcSendMsg (input_thread_t *p_input, int fd, fe_sec_voltage_t v, struct diseqc_cmd_t **cmd,
                          fe_sec_tone_mode_t t, fe_sec_mini_cmd_t b)
 {
@@ -258,6 +259,7 @@ int ioctl_DiseqcSendMsg (input_thread_t *p_input, int fd, fe_sec_voltage_t v, st
     return err; 
 }
 
+/* QPSK only */
 int ioctl_SetupSwitch (input_thread_t *p_input, int frontend_fd, int switch_pos,
                        int voltage_18, int hiband)
 {
@@ -288,14 +290,13 @@ int ioctl_SetupSwitch (input_thread_t *p_input, int frontend_fd, int switch_pos,
 }
 
 /*****************************************************************************
- * ioctl_SetFrontend : controls the FE device
+ * ioctl_SetQPSKFrontend : controls the FE device
  *****************************************************************************/
-int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, int b_polarisation, 
+int ioctl_SetQPSKFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, int b_polarisation, 
                        unsigned int u_lnb_lof1, unsigned int u_lnb_lof2, unsigned int u_lnb_slof,
                        unsigned int u_adapter, unsigned int u_device  )
 {
     int ret;
-    int i;
     int front;
     int hiband;
     char frontend[] = FRONTEND;
@@ -304,18 +305,18 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
     i_len = sizeof(FRONTEND);
     if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
     {
-        msg_Err(p_input,  "ioctl_SetFrontEnd snprintf() truncated string for FRONTEND" );
+        msg_Err(p_input,  "DVB-S: FrontEnd snprintf() truncated string for FRONTEND" );
         frontend[sizeof(FRONTEND)] = '\0';
     }
     
     /* Open the frontend device */
-    msg_Dbg(p_input, "Opening frontend %s", frontend);
+    msg_Dbg(p_input, "DVB-S: Opening frontend %s", frontend);
     if(( front = open(frontend,O_RDWR)) < 0)
     {
 #   ifdef HAVE_ERRNO_H
-        msg_Err(p_input, "failed to open frontend (%s)", strerror(errno));
+        msg_Err(p_input, "DVB-S: failed to open frontend (%s)", strerror(errno));
 #   else
-        msg_Err(p_input, "failed to open frontend");
+        msg_Err(p_input, "DVB-S: failed to open frontend");
 #   endif
         return -1;
     }
@@ -326,7 +327,7 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
 
     if ((ret=ioctl_SetupSwitch (p_input, front, 0, b_polarisation, hiband))<0)
     {
-        msg_Err(p_input, "ioctl_SetupSwitch failed (%d)", ret);
+        msg_Err(p_input, "DVB-S: Setup frontend switch failed (%d)", ret);
         return -1;
     }
 
@@ -340,40 +341,109 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
     {
         close(front);
 #   ifdef HAVE_ERRNO_H
-        msg_Err(p_input, "ioctl_SetFrontend: ioctl FE_SET_FRONTEND failed (%d) %s", ret, strerror(errno));
+        msg_Err(p_input, "DVB-S: setting frontend failed (%d) %s", ret, strerror(errno));
 #   else
-        msg_Err(p_input, "ioctl_SetFrontend: ioctl FE_SET_FRONTEND failed (%d)", ret);
+        msg_Err(p_input, "DVB-S: setting frontend  failed (%d)", ret);
 #   endif
         return -1;
     }
 
-    for (i=0; i<3; i++)
-    {
-        fe_status_t s;
-        if ((ret=ioctl(front, FE_READ_STATUS, &s))<0)
-        {
-#       ifdef HAVE_ERRNO_H
-            msg_Err(p_input, "ioctl FE_READ_STATUS failed (%d) %s", ret, strerror(errno));
-#       else
-            msg_Err(p_input, "ioctl FE_READ_STATUS failed (%d)", ret);
-#       endif
-        }
+    ret = ioctl_CheckFrontend(p_input, front);
 
-        if (s & FE_HAS_LOCK)
-        {
-            msg_Dbg(p_input, "ioctl_SetFrontend: tuning status == 0x%02x!!! ..."
-                             "tuning succeeded", s);
-            ret = 0;
-            break;
-        }
-        else
-        {
-            msg_Dbg(p_input, "ioctl_SetFrontend: tuning status == 0x%02x!!! ..."
-                             "tuning failed", s);
-            ret = -1;
-        }
-        usleep( 500000 );
+    /* Fixme: Return this instead of closing it.
+       Close front end device */
+    close(front);
+    return ret;
+}
+
+int ioctl_SetOFDMFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, 
+                            unsigned int u_adapter, unsigned int u_device )
+{
+    int ret;
+    int front;
+    char frontend[] = FRONTEND;
+    int i_len;
+
+    i_len = sizeof(FRONTEND);
+    if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
+    {
+        msg_Err(p_input,  "DVB-T FrontEnd snprintf() truncated string for FRONTEND" );
+        frontend[sizeof(FRONTEND)] = '\0';
     }
+
+    /* Open the frontend device */
+    msg_Dbg(p_input, "DVB-T: Opening frontend %s", frontend);
+    if(( front = open(frontend,O_RDWR)) < 0)
+    {
+#   ifdef HAVE_ERRNO_H
+        msg_Err(p_input, "DVB-T: failed to open frontend (%s)", strerror(errno));
+#   else
+        msg_Err(p_input, "DVB-T: failed to open frontend");
+#   endif
+        return -1;
+    }
+
+    /* Now send it all to the frontend device */
+    if ((ret=ioctl(front, FE_SET_FRONTEND, &fep)) < 0)
+    {
+        close(front);
+#   ifdef HAVE_ERRNO_H
+        msg_Err(p_input, "DVB-T: setting frontend failed (%d) %s", ret, strerror(errno));
+#   else
+        msg_Err(p_input, "DVB-T: setting frontend failed (%d)", ret);
+#   endif
+        return -1;
+    }
+
+    ret = ioctl_CheckFrontend(p_input, front);
+
+    /* Fixme: Return this instead of closing it.
+       Close front end device */
+    close(front);
+    return ret;
+}
+
+int ioctl_SetQAMFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, 
+                          unsigned int u_adapter, unsigned int u_device )
+{
+    int ret;
+    int front;
+    char frontend[] = FRONTEND;
+    int i_len;
+
+    i_len = sizeof(FRONTEND);
+    if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
+    {
+        msg_Err(p_input,  "DVB-C: FrontEnd snprintf() truncated string for FRONTEND" );
+        frontend[sizeof(FRONTEND)] = '\0';
+    }
+
+    /* Open the frontend device */
+    msg_Dbg(p_input, "DVB-C: Opening frontend %s", frontend);
+    if(( front = open(frontend,O_RDWR)) < 0)
+    {
+#   ifdef HAVE_ERRNO_H
+        msg_Err(p_input, "DVB-C: failed to open frontend (%s)", strerror(errno));
+#   else
+        msg_Err(p_input, "DVB-C: failed to open frontend");
+#   endif
+        return -1;
+    }
+
+    /* Now send it all to the frontend device */
+    if ((ret=ioctl(front, FE_SET_FRONTEND, &fep)) < 0)
+    {
+        close(front);
+#   ifdef HAVE_ERRNO_H
+        msg_Err(p_input, "DVB-C: setting frontend failed (%d) %s", ret, strerror(errno));
+#   else
+        msg_Err(p_input, "DVB-C: setting frontend failed (%d)", ret);
+#   endif
+        return -1;
+    }
+
+    /* Check Status of frontend */
+    ret = ioctl_CheckFrontend(p_input, front);
 
     /* Fixme: Return this instead of closing it.
        Close front end device */
@@ -386,12 +456,68 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
  ******************************************************************/
 static int ioctl_CheckFrontend(input_thread_t * p_input, int front)
 {
+    int i;
     int ret;
     struct pollfd pfd[1];
     struct dvb_frontend_event event;
     /* poll for frontend event to check if tuning worked */
     pfd[0].fd = front;
     pfd[0].events = POLLIN;
+
+#if 1
+    for (i=0; i<3; i++)
+    {
+        fe_status_t status;
+        if ((ret=ioctl(front, FE_READ_STATUS, &status))<0)
+        {
+#       ifdef HAVE_ERRNO_H
+            msg_Err(p_input, "reading frontend status failed (%d) %s", ret, strerror(errno));
+#       else
+            msg_Err(p_input, "reading frontend status failed (%d)", ret);
+#       endif
+        }
+
+        if (status & FE_HAS_SIGNAL) /* found something above the noise level */
+            msg_Dbg(p_input, "check frontend ... has signal");
+
+        if (status & FE_HAS_CARRIER) /* found a DVB signal  */
+            msg_Dbg(p_input, "check frontend ... has carrier");
+
+        if (status & FE_HAS_VITERBI) /* FEC is stable  */
+            msg_Dbg(p_input, "check frontend ... has stable fec");
+
+        if (status & FE_HAS_SYNC)    /* found sync bytes  */
+            msg_Dbg(p_input, "check frontend ... has sync");
+
+        if (status & FE_HAS_LOCK)    /* everything's working... */
+        {
+            msg_Dbg(p_input, "check frontend ... has lock");
+            msg_Dbg(p_input, "check frontend ... tuning status == 0x%02x!!! ..."
+                             "tuning succeeded", status);
+            return 0;
+        }        
+
+        if (status & FE_TIMEDOUT)    /*  no lock within the last ~2 seconds */
+        {
+             msg_Dbg(p_input, "check frontend ... tuning status == 0x%02x!!! ..."
+                              "tuning failed", status);
+             msg_Err(p_input, "check frontend ... timed out");
+             return -2;
+        }
+
+        if (status & FE_REINIT)
+        {
+            /*  frontend was reinitialized,  */
+            /*  application is recommned to reset */
+            /*  DiSEqC, tone and parameters */
+            msg_Dbg(p_input, "DVB-S: tuning status == 0x%02x!!! ..."
+                             "tuning failed", status);
+            msg_Err(p_input, "check frontend ... resend frontend parameters");
+            return -1;
+        }
+        usleep( 500000 );
+    }
+#else
 
     if (poll(pfd,1,3000))
     {
@@ -400,9 +526,9 @@ static int ioctl_CheckFrontend(input_thread_t * p_input, int front)
             if ( (ret=ioctl(front, FE_GET_EVENT, &event)) < 0)
             {
 #           ifdef HAVE_ERRNO_H
-                msg_Err(p_input, "ioctl_CheckFrontend: ioctl FE_GET_EVENT failed (%d) %s", ret, strerror(errno));
+                msg_Err(p_input, "check frontend ... error occured (%d) %s", ret, strerror(errno));
 #           else
-                msg_Err(p_input, "ioctl_CheckFrontend: ioctl FE_GET_EVENT failed (%d)", ret);
+                msg_Err(p_input, "check frontend ... error occured (%d)", ret);
 #           endif
                 return -5;
             }
@@ -410,48 +536,49 @@ static int ioctl_CheckFrontend(input_thread_t * p_input, int front)
             switch(event.status)
             {
                 case FE_HAS_SIGNAL:  /* found something above the noise level */
-                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_SIGNAL");
+                    msg_Dbg(p_input, "check frontend ... has signal");
                     break;
                 case FE_HAS_CARRIER: /* found a DVB signal  */
-                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_CARRIER");
+                    msg_Dbg(p_input, "check frontend ... has carrier");
                     break;
                 case FE_HAS_VITERBI: /* FEC is stable  */
-                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_VITERBI");
+                    msg_Dbg(p_input, "check frontend ... has stable fec");
                     break;
                 case FE_HAS_SYNC:    /* found sync bytes  */
-                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_SYNC");
+                    msg_Dbg(p_input, "check frontend ... has sync");
                     break;
                 case FE_HAS_LOCK:    /* everything's working... */
-                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_LOCK");
-                    break;
+                    msg_Dbg(p_input, "check frontend ... has lock");
+                    return 0;
                 case FE_TIMEDOUT:    /*  no lock within the last ~2 seconds */
-                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_TIMEDOUT");
+                    msg_Err(p_input, "check frontend ... timed out");
                     return -2;
                 case FE_REINIT:      /*  frontend was reinitialized,  */
                                      /*  application is recommned to reset */
                                      /*  DiSEqC, tone and parameters */
-                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_REINIT");
+                    msg_Err(p_input, "check frontend ... resend frontend parameters");
                     return -1;
             }
         }
         else
         {
             /* should come here */
-            msg_Err(p_input, "ioctl_CheckFrontend: event() failed");
+            msg_Err(p_input, "check frontend ... no event occured");
             return -3;
         }
     }
     else
     {
 #   ifdef HAVE_ERRNO_H
-        msg_Err(p_input, "ioctl_CheckFrontend: poll() failed (%s)", strerror(errno));
+        msg_Err(p_input, "check frontend ... timeout when polling for event (%s)", strerror(errno));
 #   else
-        msg_Err(p_input, "ioctl_CheckFrontend: poll() failed");
+        msg_Err(p_input, "check frontend ... timeout when polling for event ");
 #   endif
         return -4;
     }
+#endif
 
-    return 0;
+    return -1;
 }
 
 /*****************************************************************************
