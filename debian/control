@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt-dev, libasound2-dev (>=0.9.0beta10a), libarts-dev, libmad0-dev, liblircclient-dev, a52dec-dev, aalib1-dev, libdvbpsi1-dev
+Build-Depends: debhelper (>=2.2.0), xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt-dev, libasound2-dev (>=0.9.0beta10a), libarts-dev, libmad0-dev, liblircclient-dev, a52dec-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs-dev
 Standards-Version: 3.5.6
 
 Package: vlc
@@ -20,7 +20,7 @@ Package: vlc-gnome
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Provides: vlc-gui
-Description: Gnome plugin for vlc
+Description: GNOME interface plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds a Gnome interface to vlc, the VideoLAN Client. To
@@ -32,7 +32,7 @@ Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Replaces: vlc-gnome (<= 0.2.63-2)
 Conflicts: vlc-gnome (<= 0.2.63-2)
 Provides: vlc-gui
-Description: Gtk+ plugin for vlc
+Description: Gtk+ interface plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds a Gtk+ interface to vlc, the VideoLAN Client. To
@@ -41,7 +41,7 @@ Description: Gtk+ plugin for vlc
 Package: vlc-esd
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: Esound plugin for vlc
+Description: Esound audio output plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds support for the Enlightened Sound Daemon to vlc, the
@@ -51,7 +51,7 @@ Description: Esound plugin for vlc
 Package: vlc-alsa
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: ALSA plugin for vlc
+Description: ALSA audio output plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds support for the Advanced Linux Sound Architecture to
@@ -61,7 +61,7 @@ Description: ALSA plugin for vlc
 Package: vlc-sdl
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: SDL plugin for vlc
+Description: SDL video and audio output plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds support for the Simple DirectMedia Layer library to
@@ -72,7 +72,7 @@ Description: SDL plugin for vlc
 Package: vlc-ggi
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: GGI plugin for vlc
+Description: GGI video output plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This is a GGI plugin for vlc, the VideoLAN Client.  To activate it, use
@@ -82,7 +82,7 @@ Description: GGI plugin for vlc
 Package: vlc-glide
 Architecture: i386
 Depends: vlc (= ${Source-Version}), libglide2
-Description: Glide plugin for vlc
+Description: Glide video output plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This is a Glide (3dfx) plugin for vlc, the VideoLAN Client. To activate
@@ -93,7 +93,7 @@ Package: vlc-qt
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Provides: vlc-gui
-Description: Qt plugin for vlc
+Description: Qt interface plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds a Qt interface to vlc, the VideoLAN Client. To
@@ -102,7 +102,7 @@ Description: Qt plugin for vlc
 Package: vlc-mad
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: MAD plugin for vlc
+Description: MAD audio codec plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds support for libmad, the MPEG audio decoder library,
@@ -113,7 +113,7 @@ Description: MAD plugin for vlc
 Package: vlc-arts
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: aRts plugin for vlc
+Description: aRts audio output plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds support for the aRts Sound System to vlc, the
@@ -123,7 +123,7 @@ Description: aRts plugin for vlc
 Package: vlc-lirc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: lirc (infrared remote control) plugin for vlc
+Description: lirc (infrared remote control) interface plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin is an infrared lirc interface for vlc, the
@@ -132,9 +132,40 @@ Description: lirc (infrared remote control) plugin for vlc
 Package: vlc-aa
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: ASCII art plugin for vlc
+Description: ASCII art video output plugin for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This is an ASCII art video output plugin for vlc, the VideoLAN
  Client. To activate it, use the `--vout aa' flag or select the `aa'
  vout plugin from the preferences menu.
+
+Package: vlc-xosd
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: X On-Screen Display plugin for vlc
+ VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+ .
+ This is an On-Screen Display plugin for vlc, the VideoLAN Client. To
+ activate it, use the `--intf xosd' flag or select the `xosd' interface
+ plugin from the preferences menu.
+
+Package: mozilla-plugin-vlc
+Architecture: any
+Depends: vlc (= ${Source-Version}), mozilla, ${shlibs:Depends}
+Description: a multimedia plugin for Mozilla, based on vlc
+ VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+ .
+ This plugin adds support for MPEG, MPEG2, DVD and DivX to your Mozilla
+ browser. The decoding process is done by vlc and the output window is
+ embedded in a webpage or directly in the browser window. There is also
+ support for fullscreen display.
+
+Package: vlc-kde
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Provides: vlc-gui
+Description: KDE interface plugin for vlc
+ VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+ .
+ This plugin adds a KDE interface to vlc, the VideoLAN Client. To
+ activate it, use the `--intf kde' flag or run the `kvlc' program.

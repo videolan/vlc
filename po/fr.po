@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-11 11:25+0200\n"
+"POT-Creation-Date: 2002-07-04 15:32+0200\n"
 "PO-Revision-Date: 2001-12-10 13:32+0100\n"
 "Last-Translator: Samuel Hocevar <sam@zoy.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,13 +13,13 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
-#: src/libvlc.c:281
+#: src/libvlc.c:284
 #, c-format
 msgid "Usage: %s [options] [parameters] [file]...\n"
 msgstr "Utilisation: %s [options] [paramètres] [fichier]...\n"
 
 #. Print module name
-#: src/libvlc.c:898
+#: src/libvlc.c:902
 #, c-format
 msgid ""
 "%s module options:\n"
@@ -29,27 +29,27 @@ msgstr ""
 "\n"
 
 #. We could also have "=<" here
-#: src/libvlc.c:919 src/misc/configuration.c:813
+#: src/libvlc.c:923 src/misc/configuration.c:813
 msgid "string"
 msgstr "chaîne"
 
-#: src/libvlc.c:922 src/misc/configuration.c:798
+#: src/libvlc.c:926 src/misc/configuration.c:798
 msgid "integer"
 msgstr "entier"
 
-#: src/libvlc.c:925 src/misc/configuration.c:805
+#: src/libvlc.c:929 src/misc/configuration.c:805
 msgid "float"
 msgstr "flottant"
 
-#: src/libvlc.c:931
+#: src/libvlc.c:935
 msgid " (default enabled)"
 msgstr " (activé par défaut)"
 
-#: src/libvlc.c:932
+#: src/libvlc.c:936
 msgid " (default disabled)"
 msgstr " (désactivé par défaut)"
 
-#: src/libvlc.c:1014 src/libvlc.c:1063 src/libvlc.c:1087 src/libvlc.c:1106
+#: src/libvlc.c:1018 src/libvlc.c:1067 src/libvlc.c:1091 src/libvlc.c:1110
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -58,7 +58,7 @@ msgstr ""
 "Appuyez sur ENTRÉE pour continuer...\n"
 
 #. Usage
-#: src/libvlc.c:1037
+#: src/libvlc.c:1041
 #, c-format
 msgid ""
 "Usage: %s [options] [parameters] [file]...\n"
@@ -67,11 +67,11 @@ msgstr ""
 "Utilisation: %s [options] [paramètres] [fichier]...\n"
 "\n"
 
-#: src/libvlc.c:1040
+#: src/libvlc.c:1044
 msgid "[module]              [description]\n"
 msgstr "[module]              [description]\n"
 
-#: src/libvlc.c:1081
+#: src/libvlc.c:1085
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -145,10 +145,22 @@ msgstr ""
 "utilisera pour ouvrir un fichier."
 
 #: src/libvlc.h:58
+msgid "plugin search path"
+msgstr ""
+
+#: src/libvlc.h:60
+msgid ""
+"This option allows you to specify an additional path for vlc to lookfor its "
+"plugins."
+msgstr ""
+"Cette option permet de choisir un chemin supplémentaire pour les plugins que "
+"vlc va rechercher."
+
+#: src/libvlc.h:63
 msgid "audio output module"
 msgstr "module de sortie audio"
 
-#: src/libvlc.h:60
+#: src/libvlc.h:65
 msgid ""
 "This option allows you to select the audio output method used by vlc. The "
 "default behavior is to automatically select the best method available."
@@ -157,11 +169,11 @@ msgstr ""
 "Le comportement par défaut est de choisir automatiquement le meilleur module "
 "disponible."
 
-#: src/libvlc.h:64
+#: src/libvlc.h:69
 msgid "enable audio"
 msgstr "activer l'audio"
 
-#: src/libvlc.h:66
+#: src/libvlc.h:71
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "stage won't be done, and it will save some processing power."
@@ -169,28 +181,28 @@ msgstr ""
 "Cette option désactive complètement la sortie audio. Le décodage des pistes "
 "audio ne sera pas effectué, afin d'économiser du temps processeur."
 
-#: src/libvlc.h:69
+#: src/libvlc.h:74
 msgid "force mono audio"
 msgstr "forcer la sortie audio mono"
 
-#: src/libvlc.h:70
+#: src/libvlc.h:75
 msgid "This will force a mono audio output"
 msgstr "Cette option force une sortie audio mono"
 
-#: src/libvlc.h:72
+#: src/libvlc.h:77
 msgid "audio output volume"
 msgstr "volume de la sortie audio"
 
-#: src/libvlc.h:74
+#: src/libvlc.h:79
 msgid ""
 "You can set the default audio output volume here, in a range from 0 to 1024."
 msgstr "Vous pouvez spécifier ici le volume de la sortie audio, de 0 à 1024."
 
-#: src/libvlc.h:77
+#: src/libvlc.h:82
 msgid "audio output format"
 msgstr "format de sortie audio"
 
-#: src/libvlc.h:79
+#: src/libvlc.h:84
 msgid ""
 "You can force the audio output format here.\n"
 "0 -> 16 bits signed native endian (default)\n"
@@ -214,11 +226,11 @@ msgstr ""
 "7 -> audio MPEG-2 (non supporté)\n"
 "8 -> AC3 pass-through"
 
-#: src/libvlc.h:90
+#: src/libvlc.h:95
 msgid "audio output frequency (Hz)"
 msgstr "fréquence de la sortie audio (Hz)"
 
-#: src/libvlc.h:92
+#: src/libvlc.h:97
 msgid ""
 "You can force the audio output frequency here. Common values are 48000, "
 "44100, 32000, 22050, 16000, 11025, 8000."
@@ -226,11 +238,11 @@ msgstr ""
 "Vous pouvez forcer la fréquence de sortie audio. Des valeurs courantes sont "
 "48000, 44100, 32000, 22050, 16000, 11025, 8000."
 
-#: src/libvlc.h:95
+#: src/libvlc.h:100
 msgid "compensate desynchronization of audio (in ms)"
 msgstr "compenser la désynchronisation de l'audio (en ms)"
 
-#: src/libvlc.h:97
+#: src/libvlc.h:102
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
 "notice a lag between the video and the audio."
@@ -238,11 +250,11 @@ msgstr ""
 "Cette option permet de retarder la sortie audio. Cela peut être utile si "
 "vous remarquez un décalage entre l'audio et la vidéo."
 
-#: src/libvlc.h:100
+#: src/libvlc.h:105
 msgid "video output module"
 msgstr "module de sortie vidéo"
 
-#: src/libvlc.h:102
+#: src/libvlc.h:107
 msgid ""
 "This option allows you to select the video output method used by vlc. The "
 "default behavior is to automatically select the best method available."
@@ -251,11 +263,11 @@ msgstr ""
 "Le comportement par défaut est de choisir automatiquement le meilleur module "
 "disponible."
 
-#: src/libvlc.h:106
+#: src/libvlc.h:111
 msgid "enable video"
 msgstr "activer la vidéo"
 
-#: src/libvlc.h:108
+#: src/libvlc.h:113
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
@@ -263,21 +275,21 @@ msgstr ""
 "Cette option désactive complètement la sortie vidéo. Le décodage des pistes "
 "vidéo ne sera pas effectué, afin d'économiser du temps processeur."
 
-#: src/libvlc.h:111
+#: src/libvlc.h:116
 msgid "display identifier"
 msgstr "identificateur de display"
 
-#: src/libvlc.h:113
+#: src/libvlc.h:118
 msgid ""
 "This is the local display port that will be used for X11 drawing. For "
 "instance :0.1."
 msgstr ""
 
-#: src/libvlc.h:116
+#: src/libvlc.h:121
 msgid "video width"
 msgstr "largeur de la sortie vidéo"
 
-#: src/libvlc.h:118
+#: src/libvlc.h:123
 msgid ""
 "You can enforce the video width here. By default vlc will adapt to the video "
 "characteristics."
@@ -285,11 +297,11 @@ msgstr ""
 "Vous pouvez forcer la largeur de l'image ici. Par défaut vlc s'adaptera aux "
 "propriétés de la vidéo."
 
-#: src/libvlc.h:121
+#: src/libvlc.h:126
 msgid "video height"
 msgstr "hauteur de la sortie vidéo"
 
-#: src/libvlc.h:123
+#: src/libvlc.h:128
 msgid ""
 "You can enforce the video height here. By default vlc will adapt to the "
 "video characteristics."
@@ -297,19 +309,19 @@ msgstr ""
 "Vous pouvez forcer la hauteur de l'image ici. Par défaut vlc s'adaptera aux "
 "propriétés de la vidéo."
 
-#: src/libvlc.h:126
+#: src/libvlc.h:131
 msgid "zoom video"
 msgstr "agrandir l'image"
 
-#: src/libvlc.h:128
+#: src/libvlc.h:133
 msgid "You can zoom the video by the specified factor."
 msgstr "Vous pouvez agrandir l'image d'un facteur spécifié."
 
-#: src/libvlc.h:130
+#: src/libvlc.h:135
 msgid "grayscale video output"
 msgstr "sortie vidéo en niveaux de gris"
 
-#: src/libvlc.h:132
+#: src/libvlc.h:137
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
@@ -317,22 +329,22 @@ msgstr ""
 "En activant cette option, vlc ne décodera pas l'information de couleur "
 "présente dans la vidéo, ce qui permet d'économiser du temps processeur."
 
-#: src/libvlc.h:135
+#: src/libvlc.h:140
 msgid "fullscreen video output"
 msgstr "sortie vidéo en plein écran"
 
-#: src/libvlc.h:137
+#: src/libvlc.h:142
 msgid ""
 "If this option is enabled, vlc will always start a video in fullscreen mode."
 msgstr ""
 "Lorsque cette option est activée, vlc lancera toujours la vidéo en mode "
 "plein écran."
 
-#: src/libvlc.h:140
+#: src/libvlc.h:145
 msgid "overlay video output"
 msgstr "sortie vidéo en overlay"
 
-#: src/libvlc.h:142
+#: src/libvlc.h:147
 msgid ""
 "If enabled, vlc will try to take advantage of the overlay capabilities of "
 "you graphics card."
@@ -340,145 +352,145 @@ msgstr ""
 "Par défaut vlc tentera d'utiliser les capacités d'overlay de votre carte "
 "vidéo."
 
-#: src/libvlc.h:145
+#: src/libvlc.h:150
 msgid "force SPU position"
 msgstr "forcer la position des sous-titres"
 
-#: src/libvlc.h:147
+#: src/libvlc.h:152
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
 msgstr ""
 
-#: src/libvlc.h:150
+#: src/libvlc.h:155
 msgid "video filter module"
 msgstr "module de filtre vidéo"
 
-#: src/libvlc.h:152
+#: src/libvlc.h:157
 msgid ""
 "This will allow you to add a post-processing filter to enhance the picture "
 "quality, for instance deinterlacing, or to clone or distort the video window."
 msgstr ""
 
-#: src/libvlc.h:156
+#: src/libvlc.h:161
 msgid "server port"
 msgstr "port serveur"
 
-#: src/libvlc.h:158
+#: src/libvlc.h:163
 msgid "This is the port used for UDP streams. By default, we chose 1234."
 msgstr ""
 
-#: src/libvlc.h:160
+#: src/libvlc.h:165
 msgid "enable network channel mode"
 msgstr "activer le mode canal réseau"
 
-#: src/libvlc.h:162
+#: src/libvlc.h:167
 msgid "Activate this option if you want to use the VideoLAN Channel Server."
 msgstr ""
 
-#: src/libvlc.h:164
+#: src/libvlc.h:169
 msgid "channel server address"
 msgstr "adresse du serveur de canaux"
 
-#: src/libvlc.h:166
+#: src/libvlc.h:171
 msgid "Indicate here the address of the VideoLAN Channel Server."
 msgstr ""
 
-#: src/libvlc.h:168
+#: src/libvlc.h:173
 msgid "channel server port"
 msgstr "port du serveur de canaux"
 
-#: src/libvlc.h:170
+#: src/libvlc.h:175
 msgid "Indicate here the port on which the VideoLAN Channel Server runs."
 msgstr ""
 
-#: src/libvlc.h:172
+#: src/libvlc.h:177
 msgid "network interface"
 msgstr "interface réseau"
 
-#: src/libvlc.h:174
+#: src/libvlc.h:179
 msgid ""
 "If you have several interfaces on your Linux machine and use the VLAN "
 "solution, you may indicate here which interface to use."
 msgstr ""
 
-#: src/libvlc.h:177
+#: src/libvlc.h:182
 msgid "choose program (SID)"
 msgstr "choisir le programme (SID)"
 
-#: src/libvlc.h:179
+#: src/libvlc.h:184
 msgid "Choose the program to select by giving its Service ID."
 msgstr "Choisit le programme à sélectionner en fournissant son Service ID."
 
-#: src/libvlc.h:181
+#: src/libvlc.h:186
 msgid "choose audio"
 msgstr "choisir la piste audio"
 
-#: src/libvlc.h:183
+#: src/libvlc.h:188
 msgid "Give the default type of audio you want to use in a DVD."
 msgstr ""
 
-#: src/libvlc.h:185
+#: src/libvlc.h:190
 msgid "choose channel"
 msgstr "choisir le canal réseau"
 
-#: src/libvlc.h:187
+#: src/libvlc.h:192
 msgid ""
 "Give the stream number of the audio channel you want to use in a DVD (from 1 "
 "to n)."
 msgstr ""
 
-#: src/libvlc.h:190
+#: src/libvlc.h:195
 msgid "choose subtitles"
 msgstr "choisir la piste de sous-titres"
 
-#: src/libvlc.h:192
+#: src/libvlc.h:197
 msgid ""
 "Give the stream number of the subtitle channel you want to use in a DVD "
 "(from 1 to n)."
 msgstr ""
 
-#: src/libvlc.h:195
+#: src/libvlc.h:200
 msgid "DVD device"
 msgstr "périphérique DVD"
 
-#: src/libvlc.h:197
+#: src/libvlc.h:202
 msgid "This is the default DVD device to use."
 msgstr ""
 
-#: src/libvlc.h:199
+#: src/libvlc.h:204
 msgid "VCD device"
 msgstr "périphérique VCD"
 
-#: src/libvlc.h:201
+#: src/libvlc.h:206
 msgid "This is the default VCD device to use."
 msgstr ""
 
-#: src/libvlc.h:203
+#: src/libvlc.h:208
 msgid "force IPv6"
 msgstr "forcer l'utilisation d'IPv6"
 
-#: src/libvlc.h:205
+#: src/libvlc.h:210
 msgid ""
 "If you check this box, IPv6 will be used by default for all UDP and HTTP "
 "connections."
 msgstr ""
 
-#: src/libvlc.h:208
+#: src/libvlc.h:213
 msgid "force IPv4"
 msgstr "forcer l'utilisation d'IPv4"
 
-#: src/libvlc.h:210
+#: src/libvlc.h:215
 msgid ""
 "If you check this box, IPv4 will be used by default for all UDP and HTTP "
 "connections."
 msgstr ""
 
-#: src/libvlc.h:213
+#: src/libvlc.h:218
 msgid "choose MPEG audio decoder"
 msgstr "choisir le décodeur MPEG audio"
 
-#: src/libvlc.h:215
+#: src/libvlc.h:220
 msgid ""
 "This allows you to select the MPEG audio decoder you want to use. Common "
 "choices are builtin and mad."
@@ -486,11 +498,11 @@ msgstr ""
 "Cette option permet de choisir le module de décodage MPEG audio utilisé par "
 "vlc. Les choix habituels sont builtin et mad."
 
-#: src/libvlc.h:218
+#: src/libvlc.h:223
 msgid "choose AC3 audio decoder"
 msgstr "choisir le décodeur AC3 audio"
 
-#: src/libvlc.h:220
+#: src/libvlc.h:225
 msgid ""
 "This allows you to select the AC3/A52 audio decoder you want to use. Common "
 "choices are builtin and a52."
@@ -498,115 +510,115 @@ msgstr ""
 "Cette option permet de choisir le module de décodage AC3 audio utilisé par "
 "vlc. Les choix habituels sont builtin et a52."
 
-#: src/libvlc.h:223
+#: src/libvlc.h:228
 msgid "enable CPU MMX support"
 msgstr "activer le support MMX du processeur"
 
-#: src/libvlc.h:225
+#: src/libvlc.h:230
 msgid ""
 "If your processor supports the MMX instructions set, vlc can take advantage "
 "of them."
 msgstr ""
 
-#: src/libvlc.h:228
+#: src/libvlc.h:233
 msgid "enable CPU 3D Now! support"
 msgstr "activer le support 3D Now! du processeur"
 
-#: src/libvlc.h:230
+#: src/libvlc.h:235
 msgid ""
 "If your processor supports the 3D Now! instructions set, vlc can take "
 "advantage of them."
 msgstr ""
 
-#: src/libvlc.h:233
+#: src/libvlc.h:238
 msgid "enable CPU MMX EXT support"
 msgstr "activer le support MMX EXT du processeur"
 
-#: src/libvlc.h:235
+#: src/libvlc.h:240
 msgid ""
 "If your processor supports the MMX EXT instructions set, vlc can take "
 "advantage of them."
 msgstr ""
 
-#: src/libvlc.h:238
+#: src/libvlc.h:243
 msgid "enable CPU SSE support"
 msgstr "activer le support SSE du processeur"
 
-#: src/libvlc.h:240
+#: src/libvlc.h:245
 msgid ""
 "If your processor supports the SSE instructions set, vlc can take can take "
 "advantage of them."
 msgstr ""
 
-#: src/libvlc.h:243
+#: src/libvlc.h:248
 msgid "enable CPU AltiVec support"
 msgstr "activer le support AltiVec du processeur"
 
-#: src/libvlc.h:245
+#: src/libvlc.h:250
 msgid ""
 "If your processor supports the AltiVec instructions set, vlc can take "
 "advantage of them."
 msgstr ""
 
-#: src/libvlc.h:248
+#: src/libvlc.h:253
 msgid "launch playlist on startup"
 msgstr "lancer la playlist au démarrage"
 
-#: src/libvlc.h:250
+#: src/libvlc.h:255
 msgid "If you want vlc to start playing on startup, then enable this option."
 msgstr ""
 
-#: src/libvlc.h:252
+#: src/libvlc.h:257
 msgid "enqueue items in playlist"
 msgstr "ajouter les fichiers en fin de playlist"
 
-#: src/libvlc.h:254
+#: src/libvlc.h:259
 msgid ""
 "If you want vlc to add items to the playlist as you open them, then enable "
 "this option."
 msgstr ""
 
-#: src/libvlc.h:257
+#: src/libvlc.h:262
 msgid "loop playlist on end"
 msgstr "boucler en fin de playlist"
 
-#: src/libvlc.h:259
+#: src/libvlc.h:264
 msgid ""
 "If you want vlc to keep playing the playlist indefinitely then enable this "
 "option."
 msgstr ""
 
-#: src/libvlc.h:262
+#: src/libvlc.h:267
 msgid "memory copy module"
 msgstr "module de copie mémoire"
 
-#: src/libvlc.h:264
+#: src/libvlc.h:269
 msgid ""
 "You can select wich memory copy module you want to use. By default vlc will "
 "select the fastest one supported by your hardware."
 msgstr ""
 
-#: src/libvlc.h:267
+#: src/libvlc.h:272
 msgid "access module"
 msgstr "module d'accès"
 
-#: src/libvlc.h:269
+#: src/libvlc.h:274
 msgid "This is a legacy entry to let you configure access modules"
 msgstr ""
 
-#: src/libvlc.h:271
+#: src/libvlc.h:276
 msgid "demux module"
 msgstr "module de démultiplexage"
 
-#: src/libvlc.h:273
+#: src/libvlc.h:278
 msgid "This is a legacy entry to let you configure demux modules"
 msgstr ""
 
-#: src/libvlc.h:275
+#: src/libvlc.h:280
 msgid "fast pthread on NT/2K/XP (developpers only)"
 msgstr "implémentation pthread rapide pour NT/2K/XP (développeurs uniquement)"
 
-#: src/libvlc.h:277
+#: src/libvlc.h:282
 msgid ""
 "On Windows NT/2K/XP we use a slow but correct pthread implementation, you "
 "can also use this faster implementation but you might experience problems "
@@ -616,7 +628,7 @@ msgstr ""
 "pthread. Vous pouvez utiliser cette implémentation qui est plus rapide mais "
 "avec laquelle vous pouvez rencontrer des problèmes."
 
-#: src/libvlc.h:281
+#: src/libvlc.h:286
 msgid ""
 "\n"
 "Playlist items:\n"
@@ -645,39 +657,39 @@ msgstr ""
 "  vlc:quit                       quitter VLC\n"
 
 #. Interface options
-#: src/libvlc.h:315
+#: src/libvlc.h:320
 msgid "Interface"
 msgstr "Interface"
 
 #. Audio options
-#: src/libvlc.h:323
+#: src/libvlc.h:329
 msgid "Audio"
 msgstr "Audio"
 
 #. Video options
-#: plugins/directx/directx.c:53 plugins/dummy/dummy.c:51 src/libvlc.h:333
+#: plugins/directx/directx.c:53 plugins/dummy/dummy.c:51 src/libvlc.h:339
 msgid "Video"
 msgstr "Vidéo"
 
 #. Input options
-#: plugins/satellite/satellite.c:66 src/libvlc.h:346
+#: plugins/satellite/satellite.c:66 src/libvlc.h:352
 msgid "Input"
 msgstr "Entrée"
 
 #. Decoder options
-#: src/libvlc.h:365
+#: src/libvlc.h:371
 msgid "Decoders"
 msgstr "Décodeurs"
 
 #. CPU options
-#: src/libvlc.h:370
+#: src/libvlc.h:376
 msgid "CPU"
 msgstr "Processeur"
 
 #. Playlist options
 #: plugins/gtk/gnome_interface.c:506 plugins/gtk/gnome_interface.c:1824
 #: plugins/gtk/gnome_interface.c:1848 plugins/gtk/gtk_interface.c:611
-#: plugins/gtk/gtk_interface.c:2105 src/libvlc.h:378
+#: plugins/gtk/gtk_interface.c:2105 src/libvlc.h:384
 msgid "Playlist"
 msgstr "Playlist"
 
@@ -688,36 +700,36 @@ msgstr "Playlist"
 #: plugins/filter/wall.c:57 plugins/ggi/ggi.c:64 plugins/gtk/gnome.c:73
 #: plugins/gtk/gtk.c:71 plugins/mad/mad_adec.c:66 plugins/mga/xmga.c:106
 #: plugins/mpeg_vdec/video_parser.c:96 plugins/text/logger.c:86
-#: plugins/win32/win32.cpp:48 plugins/x11/x11.c:55 plugins/x11/xvideo.c:65
-#: src/libvlc.h:384
+#: plugins/win32/win32.cpp:48 plugins/x11/x11.c:64 plugins/x11/xvideo.c:74
+#: src/libvlc.h:390
 msgid "Miscellaneous"
 msgstr "Divers"
 
-#: src/libvlc.h:399
+#: src/libvlc.h:405
 msgid "main program"
 msgstr "programme principal"
 
-#: src/libvlc.h:411
+#: src/libvlc.h:417
 msgid "print help"
 msgstr "afficher l'aide"
 
-#: src/libvlc.h:412
+#: src/libvlc.h:418
 msgid "print detailed help"
 msgstr "afficher l'aide détaillée"
 
-#: src/libvlc.h:413
+#: src/libvlc.h:419
 msgid "print a list of available modules"
 msgstr "afficher la liste des modules disponibles"
 
-#: src/libvlc.h:414
+#: src/libvlc.h:420
 msgid "print help on module"
 msgstr "afficher l'aide du module"
 
-#: src/libvlc.h:415
+#: src/libvlc.h:421
 msgid "print version information"
 msgstr "afficher le nom et la version du logiciel"
 
-#: src/libvlc.h:416
+#: src/libvlc.h:422
 msgid "print build information"
 msgstr "afficher les informations de compilation du logiciel"
 
@@ -929,9 +941,8 @@ msgstr "module de désentrelacement"
 #. * Build configuration tree.
 #. ****************************************************************************
 #: plugins/filter/distort.c:49
-#, fuzzy
 msgid "Distort mode"
-msgstr "mode de distortion"
+msgstr "Mode de distorsion"
 
 #: plugins/filter/distort.c:50
 msgid "one of \"wave\" and \"ripple\""
@@ -1379,6 +1390,7 @@ msgid "About"
 msgstr "À propos"
 
 #: plugins/gtk/gnome_interface.c:1118 plugins/gtk/gtk_interface.c:1345
+#: plugins/kde/kde.cpp:123
 msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"
 msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - l'équipe VideoLAN"
 
@@ -1395,6 +1407,7 @@ msgstr ""
 "http://www.videolan.org/"
 
 #: plugins/gtk/gnome_interface.c:1120 plugins/gtk/gtk_interface.c:1371
+#: plugins/kde/kde.cpp:120
 msgid ""
 "This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and "
 "MPEG 2 files from a file or from a network source."
@@ -1794,7 +1807,7 @@ msgstr "module d'IMDCT AC3 optimisé SSE"
 msgid "KDE interface module"
 msgstr "module d'interface KDE"
 
-#: plugins/lirc/lirc.c:64
+#: plugins/lirc/lirc.c:66
 msgid "infrared remote control module"
 msgstr "module de contrôle infra-rouge à distance"
 
@@ -2093,7 +2106,26 @@ msgstr ""
 msgid "Win32 interface module"
 msgstr "module d'interface Win32"
 
-#: plugins/x11/x11.c:61
+#: plugins/x11/x11.c:54 plugins/x11/xvideo.c:64
+msgid "X11 drawable"
+msgstr "drawable X11"
+
+#: plugins/x11/x11.c:56 plugins/x11/xvideo.c:66
+msgid ""
+"Specify a X11 drawable to use instead of opening a new window. This option "
+"is DANGEROUS, use with care."
+msgstr ""
+
+#: plugins/x11/x11.c:59 plugins/x11/xvideo.c:69
+msgid "use shared memory"
+msgstr "utilise la mémoire partagée"
+
+#: plugins/x11/x11.c:61 plugins/x11/xvideo.c:71
+msgid "Use shared memory to communicate between vlc and the X server."
+msgstr ""
+"Utiliser la mémoire partagée pour communiquer entre vlc et le serveur X."
+
+#: plugins/x11/x11.c:74
 msgid "X11 module"
 msgstr "module X11"
 
@@ -2123,7 +2155,7 @@ msgid ""
 "to improve performances by using the most efficient one."
 msgstr ""
 
-#: plugins/x11/xvideo.c:73
+#: plugins/x11/xvideo.c:86
 msgid "XVideo extension module"
 msgstr "module d'extension XVideo"
 

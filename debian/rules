@@ -9,7 +9,7 @@
 export DH_COMPAT=3
 
 # Compilation options
-export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi"
+export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde"
 # Remove --without-dvdcss here in non-totalitarian countries
 export DVDCSS_FLAGS="--enable-dvd --without-dvdcss"
 
@@ -55,19 +55,24 @@ install: build
 	# make symlinks for packages and install plugins
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa lirc aa glide" ;; \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa lirc aa xosd kde glide" ;; \
 	*) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa lirc aa" ;; \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa lirc aa xosd kde" ;; \
 	esac ;\
 	for alias in $$ARCH_ALIASES ; do \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
 		mv debian/vlc/usr/lib/vlc/$$alias.so \
 			debian/vlc-$$alias/usr/lib/vlc/ ; done
 
+	# do the same for the mozilla plugin
+	ln -s vlc debian/mozilla-plugin-vlc/usr/share/doc/mozilla-plugin-vlc
+	mv debian/vlc/usr/lib/mozilla debian/mozilla-plugin-vlc/usr/lib
+
+	# move binary aliases
 	mv debian/vlc/usr/bin/gvlc debian/vlc-gtk/usr/bin/
 	mv debian/vlc/usr/bin/gnome-vlc debian/vlc-gnome/usr/bin/
 	mv debian/vlc/usr/bin/qvlc debian/vlc-qt/usr/bin/
-	#mv debian/vlc/usr/bin/kvlc debian/vlc-kde/usr/bin/
+	mv debian/vlc/usr/bin/kvlc debian/vlc-kde/usr/bin/
 
 	mv debian/vlc/$(VIDDIR)/vlc48x48.png debian/vlc/$(PIXDIR)/vlc.png
 	mv debian/vlc/$(VIDDIR)/gvlc32x32.xpm debian/vlc-gtk/$(VIDDIR)/gvlc.xpm
@@ -76,8 +81,8 @@ install: build
 	mv debian/vlc/$(VIDDIR)/gnome-vlc48x48.png debian/vlc-gnome/$(PIXDIR)/gnome-vlc.png
 	mv debian/vlc/$(VIDDIR)/qvlc32x32.xpm debian/vlc-qt/$(VIDDIR)/qvlc.xpm
 	mv debian/vlc/$(VIDDIR)/qvlc48x48.png debian/vlc-qt/$(PIXDIR)/qvlc.png
-	#mv debian/vlc/$(VIDDIR)/kvlc32x32.xpm debian/vlc-kde/$(VIDDIR)/kvlc.xpm
-	#mv debian/vlc/$(VIDDIR)/kvlc48x48.png debian/vlc-kde/$(PIXDIR)/kvlc.png
+	mv debian/vlc/$(VIDDIR)/kvlc32x32.xpm debian/vlc-kde/$(VIDDIR)/kvlc.xpm
+	mv debian/vlc/$(VIDDIR)/kvlc48x48.png debian/vlc-kde/$(PIXDIR)/kvlc.png
 
 	cp debian/vlc.desktop debian/vlc/$(GNOMEDIR)
 	cp debian/gvlc.desktop debian/vlc-gtk/$(GNOMEDIR)
@@ -87,7 +92,7 @@ install: build
 	ln -s vlc.1.gz debian/vlc-gtk/usr/share/man/man1/gvlc.1.gz
 	ln -s vlc.1.gz debian/vlc-gnome/usr/share/man/man1/gnome-vlc.1.gz
 	ln -s vlc.1.gz debian/vlc-qt/usr/share/man/man1/qvlc.1.gz
-	#ln -s vlc.1.gz debian/vlc-kde/usr/share/man/man1/kvlc.1.gz
+	ln -s vlc.1.gz debian/vlc-kde/usr/share/man/man1/kvlc.1.gz
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -109,7 +114,7 @@ binary-arch: build install
 	dh_installman doc/vlc.1
 #	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-aa ChangeLog
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-aa -Nvlc-xosd -Nvlc-kde -Nmozilla-plugin-vlc ChangeLog
 	dh_link
 	dh_strip
 	dh_compress

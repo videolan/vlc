@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.70 2002/07/03 19:40:49 sam Exp $
+ * $Id: modules.c,v 1.71 2002/07/04 18:11:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -279,7 +279,7 @@ module_t * __module_Need( vlc_object_t *p_this, int i_capability,
 
     module_t *p_module;
 
-    int   i_shortcuts = 1;
+    int   i_shortcuts = 0;
     char *psz_shortcuts = NULL;
 
     msg_Dbg( p_this, "looking for %s module",
@@ -288,10 +288,12 @@ module_t * __module_Need( vlc_object_t *p_this, int i_capability,
     /* We take the global lock */
     vlc_mutex_lock( &p_this->p_vlc->module_bank.lock );
 
+    /* Count how many different shortcuts were asked for */
     if( psz_name && *psz_name )
     {
         char *psz_parser;
 
+        i_shortcuts++;
         psz_shortcuts = strdup( psz_name );
 
         for( psz_parser = psz_shortcuts; *psz_parser; psz_parser++ )
@@ -331,7 +333,7 @@ module_t * __module_Need( vlc_object_t *p_this, int i_capability,
         }
 
         /* If we required a shortcut, check this plugin provides it. */
-        if( psz_shortcuts )
+        if( i_shortcuts )
         {
             vlc_bool_t b_trash = VLC_TRUE;
             int i_dummy, i_short = i_shortcuts;
@@ -343,7 +345,8 @@ module_t * __module_Need( vlc_object_t *p_this, int i_capability,
                      b_trash && p_module->pp_shortcuts[i_dummy];
                      i_dummy++ )
                 {
-                    b_trash = strcmp( psz_name, p_module->pp_shortcuts[i_dummy] );
+                    b_trash = strcmp( psz_name,
+                                      p_module->pp_shortcuts[i_dummy] );
                 }
 
                 if( !b_trash )

@@ -249,7 +249,7 @@ export
 #
 # Virtual targets
 #
-all: Makefile.opts vlc ${ALIASES} vlc.app plugins po
+all: Makefile.opts vlc ${ALIASES} vlc.app plugins po mozilla/libvlcplugin.so
 
 Makefile.opts:
 	@echo "**** No configuration found, please run ./configure"
@@ -274,7 +274,7 @@ show:
 #
 # Cleaning rules
 #
-clean: plugins-clean po-clean vlc-clean
+clean: plugins-clean po-clean vlc-clean mozilla-clean
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so* lib/*.a
 	rm -f plugins/*.so plugins/*.a plugins/*.lib plugins/*.tds
@@ -294,6 +294,9 @@ vlc-clean:
 	rm -f vlc gnome-vlc gvlc kvlc qvlc vlc.exe
 	rm -Rf vlc.app
 
+mozilla-clean:
+	-cd mozilla && $(MAKE) clean
+
 distclean: clean
 	-cd po && $(MAKE) maintainer-clean
 	rm -f **/*.o **/*~ *.log
@@ -308,9 +311,9 @@ distclean: clean
 #
 # Install/uninstall rules
 #
-install: vlc-install plugins-install po-install
+install: vlc-install plugins-install po-install mozilla-install
 
-uninstall: vlc-uninstall plugins-uninstall po-uninstall
+uninstall: vlc-uninstall plugins-uninstall po-uninstall mozilla-uninstall
 
 vlc-install:
 	mkdir -p $(DESTDIR)$(bindir)
@@ -340,6 +343,16 @@ endif
 
 plugins-uninstall:
 	rm -f $(DESTDIR)$(libdir)/vlc/*.so
+
+mozilla-install:
+ifeq ($(MOZILLA),1)
+	-cd mozilla && $(MAKE) install
+endif
+
+mozilla-uninstall:
+ifeq ($(MOZILLA),1)
+	-cd mozilla && $(MAKE) uninstall
+endif
 
 po-install:
 	-cd po && $(MAKE) install
@@ -605,6 +618,14 @@ $(PLUGIN_OBJ): $(H_OBJ) FORCE
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 $(BUILTIN_OBJ): $(H_OBJ) FORCE
 	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) -f ../../Makefile.modules $(@:plugins/%=../%)
+
+#
+# Mozilla plugin target
+#
+mozilla/libvlcplugin.so: FORCE
+ifeq ($(MOZILLA),1)
+	@cd mozilla && $(MAKE) builtins_LDFLAGS="$(builtins_LDFLAGS)"
+endif
 
 #
 # gettext target

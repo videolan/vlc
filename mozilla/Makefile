@@ -1,0 +1,38 @@
+###############################################################################
+# vlc (VideoLAN Client) Mozilla plugin Makefile
+# (c)2002 VideoLAN
+###############################################################################
+
+#
+# Source objects
+#
+C_SRC = vlcplugin.c npunix.c
+C_OBJ = $(C_SRC:%.c=%.o)
+
+PLUGIN_OBJ = libvlcplugin.so
+
+#
+# Virtual targets
+#
+all: $(PLUGIN_OBJ)
+
+clean:
+	rm -f *.o *.so
+	rm -Rf .dep
+
+install:
+	mkdir -p $(DESTDIR)$(libdir)/mozilla/plugins
+	$(INSTALL) -m 644 $(PLUGIN_OBJ) $(DESTDIR)$(libdir)/mozilla/plugins
+
+uninstall:
+	rm -f $(DESTDIR)$(libdir)/mozilla/plugins/$(PLUGIN_OBJ)
+
+FORCE:
+
+$(PLUGIN_OBJ): Makefile $(C_OBJ)
+	$(CC) -shared $(LDFLAGS) -L../lib $(mozilla_LDFLAGS) $(C_OBJ) -lvlc $(BUILTIN_OBJ:%=../%) $(builtins_LDFLAGS) -o $@
+	chmod a-x $@
+
+$(C_OBJ): %.o: %.c
+	$(CC) $(CFLAGS) -I../include $(mozilla_CFLAGS) -c $< -o $@
+

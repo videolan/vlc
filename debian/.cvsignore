@@ -1,6 +1,7 @@
 tmp
 vlc
 vlc-*
+mozilla-plugin-vlc
 delete
 files
 *debhelper

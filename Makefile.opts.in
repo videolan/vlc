@@ -14,6 +14,7 @@ HAVE_MAKEFILE_OPTS = 1
 # 
 SYS = @SYS@
 ALIASES =@ALIASES@
+MOZILLA = @MOZILLA@
 INSTALL = @INSTALL@
 ARCH = @ARCH@
 
@@ -53,8 +54,9 @@ includedir = @includedir@
 # CFLAGS for special cases
 #
 vlc_CFLAGS = @vlc_CFLAGS@
-plugins_CFLAGS := @plugins_CFLAGS@
-builtins_CFLAGS := @builtins_CFLAGS@
+plugins_CFLAGS = @plugins_CFLAGS@
+builtins_CFLAGS = @builtins_CFLAGS@
+mozilla_CFLAGS = @mozilla_CFLAGS@
 
 a52_CFLAGS = @a52_CFLAGS@
 arts_CFLAGS = @arts_CFLAGS@
@@ -82,8 +84,9 @@ xvideo_CFLAGS = @xvideo_CFLAGS@
 # Libraries for special cases
 #
 vlc_LDFLAGS = @vlc_LDFLAGS@
-plugins_LDFLAGS += @plugins_LDFLAGS@
-builtins_LDFLAGS += @builtins_LDFLAGS@
+plugins_LDFLAGS = @plugins_LDFLAGS@
+builtins_LDFLAGS = @builtins_LDFLAGS@
+mozilla_LDFLAGS = @mozilla_LDFLAGS@
 
 a52_LDFLAGS = @a52_LDFLAGS@
 aa_LDFLAGS = @aa_LDFLAGS@
