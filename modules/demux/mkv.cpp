@@ -452,7 +452,9 @@ public:
     int64_t                 i_tags_position;
 
     KaxCluster              *cluster;
-    KaxSegmentUID           segment_uid, prev_segment_uid, next_segment_uid;
+    KaxSegmentUID           segment_uid;
+    KaxPrevUID              prev_segment_uid;
+    KaxNextUID              next_segment_uid;
 
     vlc_bool_t              b_cues;
     int                     i_index;
@@ -477,7 +479,7 @@ public:
 
     inline chapter_edition_t *Edition()
     {
-        if ( i_current_edition >= 0 && i_current_edition < editions.size() )
+        if ( i_current_edition >= 0 && size_t(i_current_edition) < editions.size() )
             return &editions[i_current_edition];
         return NULL;
     }
@@ -511,7 +513,7 @@ public:
     
     inline matroska_segment_t *Segment()
     {
-        if ( i_current_segment >= 0 && i_current_segment < segments.size() )
+        if ( i_current_segment >= 0 && size_t(i_current_segment) < segments.size() )
             return segments[i_current_segment];
         return NULL;
     }
@@ -551,12 +553,14 @@ public:
 
     inline matroska_stream_t *Stream()
     {
-        if ( i_current_stream >= 0 && i_current_stream < streams.size() )
+        if ( i_current_stream >= 0 && size_t(i_current_stream) < streams.size() )
             return streams[i_current_stream];
         return NULL;
     }
 
     matroska_segment_t *FindSegment( KaxSegmentUID & i_uid ) const;
+    void PreloadFamily();
+    void PreloadLinked();
 };
 
 static int  Demux  ( demux_t * );
@@ -605,7 +609,7 @@ static int Open( vlc_object_t * p_this )
     /* Set the demux function */
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys = new demux_sys_t;
+    p_demux->p_sys      = p_sys = new demux_sys_t();
 
     p_stream = new matroska_stream_t( p_sys );
     p_segment = new matroska_segment_t( p_sys );
@@ -716,7 +720,7 @@ static int Open( vlc_object_t * p_this )
 
     /* get the files from the same dir from the same family (based on p_demux->psz_path) */
     /* _todo_ handle multi-segment files */
-    if (p_demux->psz_path[0] != '\0' && (!strcmp(p_demux->psz_access, "") || !strcmp(p_demux->psz_access, "")))
+    if (p_demux->psz_path[0] != '\0' && !strcmp(p_demux->psz_access, ""))
     {
         // assume it's a regular file
         // get the directory path
@@ -792,7 +796,6 @@ static int Open( vlc_object_t * p_this )
                             if (EbmlId(*p_l0) == KaxSegment::ClassInfos.GlobalId)
                             {
                                 EbmlParser  *ep;
-                                KaxSegmentUID *p_uid = NULL;
                                 matroska_segment_t *p_segment1 = new matroska_segment_t( p_sys );
 
                                 p_stream1->segments.push_back( p_segment1 );
@@ -815,14 +818,22 @@ static int Open( vlc_object_t * p_this )
 
                                             if( MKV_IS_ID( l, KaxSegmentUID ) )
                                             {
-                                                p_uid = static_cast<KaxSegmentUID*>(l);
+                                                KaxSegmentUID *p_uid = static_cast<KaxSegmentUID*>(l);
                                                 if (p_segment->segment_uid == *p_uid)
                                                     break;
-                                                p_segment1->segment_uid = *p_uid;
+                                                p_segment1->segment_uid = *( new KaxSegmentUID(*p_uid) );
+                                            }
+                                            else if( MKV_IS_ID( l, KaxPrevUID ) )
+                                            {
+                                                p_segment1->prev_segment_uid = *( new KaxPrevUID( *static_cast<KaxPrevUID*>(l) ) );
+                                            }
+                                            else if( MKV_IS_ID( l, KaxNextUID ) )
+                                            {
+                                                p_segment1->next_segment_uid = *( new KaxNextUID( *static_cast<KaxNextUID*>(l) ) );
                                             }
                                             else if( MKV_IS_ID( l, KaxSegmentFamily ) )
                                             {
-                                                KaxSegmentFamily *p_fam = static_cast<KaxSegmentFamily*>(l);
+                                                KaxSegmentFamily *p_fam = new KaxSegmentFamily( *static_cast<KaxSegmentFamily*>(l) );
                                                 std::vector<KaxSegmentFamily>::iterator iter;
                                                 p_segment1->families.push_back( *p_fam );
 /*                                                for( iter = p_segment->families.begin();
@@ -865,12 +876,14 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-
     if( p_segment->cluster == NULL )
     {
         msg_Err( p_demux, "cannot find any cluster, damaged file ?" );
         goto error;
     }
+
+    p_sys->PreloadFamily( );
+    p_sys->PreloadLinked( );
 
     /* *** Load the cue if found *** */
     if( p_segment->i_cues_position >= 0 )
@@ -2790,6 +2803,18 @@ static void ParseInfo( demux_t *p_demux, EbmlElement *info )
 
             msg_Dbg( p_demux, "|   |   + UID=%d", *(uint32*)p_segment->segment_uid.GetBuffer() );
         }
+        else if( MKV_IS_ID( l, KaxPrevUID ) )
+        {
+            p_segment->prev_segment_uid = *(new KaxPrevUID(*static_cast<KaxPrevUID*>(l)));
+
+            msg_Dbg( p_demux, "|   |   + PrevUID=%d", *(uint32*)p_segment->prev_segment_uid.GetBuffer() );
+        }
+        else if( MKV_IS_ID( l, KaxNextUID ) )
+        {
+            p_segment->next_segment_uid = *(new KaxNextUID(*static_cast<KaxNextUID*>(l)));
+
+            msg_Dbg( p_demux, "|   |   + NextUID=%d", *(uint32*)p_segment->next_segment_uid.GetBuffer() );
+        }
         else if( MKV_IS_ID( l, KaxTimecodeScale ) )
         {
             KaxTimecodeScale &tcs = *(KaxTimecodeScale*)l;
@@ -3293,4 +3318,12 @@ const chapter_item_t *chapter_edition_t::FindTimecode( mtime_t i_user_timecode )
     }
 
     return psz_result;
+}
+
+void demux_sys_t::PreloadFamily()
+{
+}
+
+void demux_sys_t::PreloadLinked()
+{
 }
