@@ -29,7 +29,6 @@
 
 /*
  * TODO:
- * - client side stuff,
  * - server-side client cert validation,
  * - client-side server cert validation (?).
  */
@@ -97,7 +96,7 @@ tls_ServerDelete( tls_server_t *p_server )
  * tls_ClientCreate:
  *****************************************************************************
  * Allocates a client's TLS credentials and shakes hands through the network.
- * Returns NULL on error.
+ * Returns NULL on error. This is a blocking network operation.
  *****************************************************************************/
 tls_session_t *
 tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca, int fd )
@@ -114,13 +113,17 @@ tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca, int fd )
         p_session = __tls_ClientCreate( p_tls, psz_ca );
         if( p_session != NULL )
         {
-            if( tls_SessionHandshake( p_session, fd ) )
+            int i_val;
+
+            for( i_val = tls_SessionHandshake( p_session, fd ); i_val > 0;
+                 i_val = tls_SessionContinueHandshake( p_session ) );
+            
+            if( i_val == 0 )
             {
                 msg_Dbg( p_this, "TLS/SSL provider initialized" );
                 return p_session;
             }
-            else
-                msg_Err( p_this, "TLS/SSL session handshake error" );
+            msg_Err( p_this, "TLS/SSL session handshake error" );
         }
         else
             msg_Err( p_this, "TLS/SSL provider error" );

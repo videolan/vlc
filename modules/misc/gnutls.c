@@ -305,6 +305,7 @@ gnutls_ClientCreate( tls_t *p_tls, const char *psz_ca_path )
     p_session->sock.pf_send = gnutls_Send;
     p_session->sock.pf_recv = gnutls_Recv;
     p_session->pf_handshake = gnutls_SessionHandshake;
+    p_session->pf_handshake2 = gnutls_SessionContinueHandshake;
     p_session->pf_close = gnutls_SessionClose;
 
     return p_session;
