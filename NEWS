@@ -40,6 +40,7 @@ Codecs:
  * MPEG-4 text support
  * Vastly improved DVB subtitles decoder (ETS 300 743)
  * Enabled color in DVB subtitles rendering
+ * VobSub supported both externally and in Matroska
 
 Stream Output:
  Encoders:
@@ -58,8 +59,9 @@ Stream Output:
   * Experimental WAV muxer
   * Improved ASF muxer
  Misc:
- * H.263 RTP streaming support
- * SDP generation outputs more compliant SDPs and can create SDP files now
+  * H.263 RTP streaming support
+  * SDP generation outputs more compliant SDPs and can create SDP files now
+  * Improved RTSP and VoD server (experimental)
 
 Audio Output:
  * New audio equalizer filter
@@ -102,6 +104,7 @@ Misc:
  * Kasenna MediaBase streams largely supported
  * Cisco IP/TV streams supported
  * Experimental OpenGL video output for X11 and win32
+ * a Time filter that displays the current time over the video
 
 Changes between 0.7.1 and 0.7.2:
 --------------------------------

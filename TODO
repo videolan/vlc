@@ -20,6 +20,16 @@ An access module that would be able to uncompress compressed files.
 Status: Todo
 
 Task
+Difficulty: Medium
+Platform: any
+Urgency: Wishlist
+Description: DVTS support
+DV over RTP support. See <a href="http://www.sfc.wide.ad.jp/DVTS/">DVTS homepage</a>
+Status: Todo
+
+Task
+Difficulty: Easy
+Task
 Difficulty: Easy
 Platform: any
 Urgency: Urgent
@@ -119,6 +129,15 @@ Description: fix ASX playlist parser
 Basically our asx parser is broken. It doesn't handle relative links. It should also URL encode the hrefs (spaces in the url need to be converted to %20 etc). protocol rollover, authors, title's etc etc aren't handled. See <a href="http://www.meetnewplayers.com/bend/Windows%20Media%20-%20Fun%20with%20asx%20files2.htm">this</a> for asx examples. It is still located in the old demux/m3u.c module instead of modules/demux/playlist/
 Status: Todo
 
+Task
+Difficulty: Medium
+Urgency: Normal
+Platform: any
+Description: fix current muxers.
+Our avi and mov muxer don't produce valid files
+Status: Todo
+
+Task
 Task
 Difficulty: Easy
 Urgency: Wishlist
@@ -292,6 +311,14 @@ Description: Subtitle work
 Status: Todo
 
 Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: Automatic charset recognition
+See if we can use <a href="http://trific.ath.cx/software/enca/">ENCA</a> for automatic charset recognition on subtitle files. Might simplify usage of sub files a lot? Might require complete file to be parsed by ENCA before good result is returned?
+Status: Todo
+
+Task
 Difficulty: Guru
 Urgency: Wishlist
 Platform: Mac OS X
@@ -357,6 +384,7 @@ The mozilla plugin needs to be better controllable (via javascript).
 (80% done) see:
 <a href="http://sierra.via.ecp.fr/~zorglub/vlc/plugin/vlc.html">Javascript controls</a>
 <a href="http://sierra.via.ecp.fr/~zorglub/vlc/xul/">XUL controls</a>
+<a href="http://mplayerplug-in.sourceforge.net/">MPlayer Mozilla plugin</a>
 Status: Assigned to zorglub
 
 Task
@@ -506,7 +534,6 @@ Platform: any
 Urgency: Normal
 Description: Update matroska demux
  Better Seeking
- General bugfixes
 Status: Todo
 
 Task
