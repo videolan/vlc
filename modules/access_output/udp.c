@@ -33,7 +33,6 @@
 #include <fcntl.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 #include <vlc/sout.h>
 
 #ifdef HAVE_UNISTD_H
@@ -52,24 +51,13 @@
 
 #include "network.h"
 
-#define DEFAULT_PORT 1234
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static int     Open   ( vlc_object_t * );
-static void    Close  ( vlc_object_t * );
-
-static int     Write   ( sout_access_out_t *, sout_buffer_t * );
-static int     WriteRaw( sout_access_out_t *, sout_buffer_t * );
-static int     Seek    ( sout_access_out_t *, off_t  );
-
-static void    ThreadWrite( vlc_object_t * );
-
-static sout_buffer_t *NewUDPPacket( sout_access_out_t *, mtime_t );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
 #define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for udp streams. This " \
@@ -85,13 +73,25 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+static int  Write   ( sout_access_out_t *, block_t * );
+static int  WriteRaw( sout_access_out_t *, block_t * );
+static int  Seek    ( sout_access_out_t *, off_t  );
+
+static void ThreadWrite( vlc_object_t * );
+
+static block_t *NewUDPPacket( sout_access_out_t *, mtime_t );
+
+
 typedef struct sout_access_thread_t
 {
     VLC_COMMON_MEMBERS
 
     sout_instance_t *p_sout;
 
-    sout_fifo_t *p_fifo;
+    block_fifo_t *p_fifo;
 
     int         i_handle;
 
@@ -109,11 +109,13 @@ struct sout_access_out_sys_t
 
     unsigned int        i_mtu;
 
-    sout_buffer_t       *p_buffer;
+    block_t             *p_buffer;
 
     sout_access_thread_t *p_thread;
 
 };
+
+#define DEFAULT_PORT 1234
 
 /*****************************************************************************
  * Open: open the file
@@ -191,7 +193,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->p_sout = p_access->p_sout;
     p_sys->p_thread->b_die  = 0;
     p_sys->p_thread->b_error= 0;
-    p_sys->p_thread->p_fifo = sout_FifoCreate( p_access->p_sout );
+    p_sys->p_thread->p_fifo = block_FifoNew( p_access );
 
     socket_desc.i_type = NETWORK_UDP;
     socket_desc.psz_server_addr = psz_dst_addr;
@@ -266,7 +268,7 @@ static int Open( vlc_object_t *p_this )
 
     p_access->pf_seek = Seek;
 
-    msg_Info( p_access, "Open: addr:`%s' port:`%d'", psz_dst_addr, i_dst_port);
+    msg_Dbg( p_access, "udp access output opened(%s:%d)", psz_dst_addr, i_dst_port );
 
     free( psz_dst_addr );
 
@@ -288,21 +290,19 @@ static void Close( vlc_object_t * p_this )
     p_sys->p_thread->b_die = 1;
     for( i = 0; i < 10; i++ )
     {
-        sout_buffer_t *p_dummy;
-
-        p_dummy = sout_BufferNew( p_access->p_sout, p_sys->i_mtu );
+        block_t *p_dummy = block_New( p_access, p_sys->i_mtu );
         p_dummy->i_dts = 0;
         p_dummy->i_pts = 0;
         p_dummy->i_length = 0;
-        sout_FifoPut( p_sys->p_thread->p_fifo, p_dummy );
+        block_FifoPut( p_sys->p_thread->p_fifo, p_dummy );
     }
     vlc_thread_join( p_sys->p_thread );
 
-    sout_FifoDestroy( p_access->p_sout, p_sys->p_thread->p_fifo );
+    block_FifoRelease( p_sys->p_thread->p_fifo );
 
     if( p_sys->p_buffer )
     {
-        sout_BufferDelete( p_access->p_sout, p_sys->p_buffer );
+        block_Release( p_sys->p_buffer );
     }
 
     net_Close( p_sys->p_thread->i_handle );
@@ -310,36 +310,36 @@ static void Close( vlc_object_t * p_this )
     /* update p_sout->i_out_pace_nocontrol */
     p_access->p_sout->i_out_pace_nocontrol--;
 
+    msg_Dbg( p_access, "udp access output closed" );
     free( p_sys );
-    msg_Info( p_access, "Close" );
 }
 
 /*****************************************************************************
  * Write: standard write on a file descriptor.
  *****************************************************************************/
-static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     unsigned int i_write;
 
     while( p_buffer )
     {
-        sout_buffer_t *p_next;
-        if( p_buffer->i_size > p_sys->i_mtu )
+        block_t *p_next;
+        if( p_buffer->i_buffer > p_sys->i_mtu )
         {
             msg_Warn( p_access, "arggggggggggggg packet size > mtu" );
             i_write = p_sys->i_mtu;
         }
         else
         {
-            i_write = p_buffer->i_size;
+            i_write = p_buffer->i_buffer;
         }
 
         /* if we have enough data, enque the buffer */
         if( p_sys->p_buffer &&
-            p_sys->p_buffer->i_size + i_write > p_sys->i_mtu )
+            p_sys->p_buffer->i_buffer + i_write > p_sys->i_mtu )
         {
-            sout_FifoPut( p_sys->p_thread->p_fifo, p_sys->p_buffer );
+            block_FifoPut( p_sys->p_thread->p_fifo, p_sys->p_buffer );
             p_sys->p_buffer = NULL;
         }
 
@@ -348,14 +348,14 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
             p_sys->p_buffer = NewUDPPacket( p_access, p_buffer->i_dts );
         }
 
-        if( p_buffer->i_size > 0 )
+        if( p_buffer->i_buffer > 0 )
         {
-            memcpy( p_sys->p_buffer->p_buffer + p_sys->p_buffer->i_size,
+            memcpy( p_sys->p_buffer->p_buffer + p_sys->p_buffer->i_buffer,
                     p_buffer->p_buffer, i_write );
-            p_sys->p_buffer->i_size += i_write;
+            p_sys->p_buffer->i_buffer += i_write;
         }
         p_next = p_buffer->p_next;
-        sout_BufferDelete( p_access->p_sout, p_buffer );
+        block_Release( p_buffer );
         p_buffer = p_next;
     }
 
@@ -365,11 +365,11 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 /*****************************************************************************
  * WriteRaw: write p_buffer without trying to fill mtu
  *****************************************************************************/
-static int WriteRaw( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+static int WriteRaw( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t   *p_sys = p_access->p_sys;
 
-    sout_FifoPut( p_sys->p_thread->p_fifo, p_buffer );
+    block_FifoPut( p_sys->p_thread->p_fifo, p_buffer );
 
     return( p_sys->p_thread->b_error ? -1 : 0 );
 }
@@ -380,20 +380,20 @@ static int WriteRaw( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
     msg_Err( p_access, "UDP sout access cannot seek" );
-    return( -1 );
+    return -1;
 }
 
 /*****************************************************************************
  * NewUDPPacket: allocate a new UDP packet of size p_sys->i_mtu
  *****************************************************************************/
-static sout_buffer_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
+static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    sout_buffer_t *p_buffer;
+    block_t *p_buffer;
 
-    p_buffer = sout_BufferNew( p_access->p_sout, p_sys->i_mtu );
+    p_buffer = block_New( p_access->p_sout, p_sys->i_mtu );
     p_buffer->i_dts = i_dts;
-    p_buffer->i_size = 0;
+    p_buffer->i_buffer = 0;
 
     if( p_sys->b_rtpts )
     {
@@ -417,7 +417,7 @@ static sout_buffer_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
         p_buffer->p_buffer[10] = ( p_sys->i_ssrc >>  8 )&0xff;
         p_buffer->p_buffer[11] = p_sys->i_ssrc&0xff;
 
-        p_buffer->i_size = 12;
+        p_buffer->i_buffer = 12;
     }
 
     return p_buffer;
@@ -429,17 +429,16 @@ static sout_buffer_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
 static void ThreadWrite( vlc_object_t *p_this )
 {
     sout_access_thread_t *p_thread = (sout_access_thread_t*)p_this;
-    sout_instance_t      *p_sout = p_thread->p_sout;
     mtime_t              i_date_last = -1;
     mtime_t              i_to_send = p_thread->i_group;
     int                  i_dropped_packets = 0;
 
     while( !p_thread->b_die )
     {
-        sout_buffer_t *p_pk;
+        block_t *p_pk;
         mtime_t       i_date, i_sent;
 
-        p_pk = sout_FifoGet( p_thread->p_fifo );
+        p_pk = block_FifoGet( p_thread->p_fifo );
 
         i_date = p_thread->i_caching + p_pk->i_dts;
         if( i_date_last > 0 )
@@ -449,7 +448,7 @@ static void ThreadWrite( vlc_object_t *p_this )
                 if( !i_dropped_packets )
                     msg_Dbg( p_thread, "mmh, hole > 2s -> drop" );
 
-                sout_BufferDelete( p_sout, p_pk );
+                block_Release( p_pk  );
                 i_date_last = i_date;
                 i_dropped_packets++;
                 continue;
@@ -459,7 +458,7 @@ static void ThreadWrite( vlc_object_t *p_this )
                 if( !i_dropped_packets )
                     msg_Dbg( p_thread, "mmh, paquets in the past -> drop" );
 
-                sout_BufferDelete( p_sout, p_pk );
+                block_Release( p_pk  );
                 i_date_last = i_date;
                 i_dropped_packets++;
                 continue;
@@ -474,7 +473,7 @@ static void ThreadWrite( vlc_object_t *p_this )
                 msg_Dbg( p_thread, "late packet to send (" I64Fd ") -> drop",
                          i_sent - i_date );
             }
-            sout_BufferDelete( p_sout, p_pk );
+            block_Release( p_pk  );
             i_date_last = i_date;
             i_dropped_packets++;
             continue;
@@ -486,7 +485,7 @@ static void ThreadWrite( vlc_object_t *p_this )
             mwait( i_date );
             i_to_send = p_thread->i_group;
         }
-        send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_size, 0 );
+        send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_buffer, 0 );
 
         if( i_dropped_packets )
         {
@@ -503,7 +502,7 @@ static void ThreadWrite( vlc_object_t *p_this )
         }
 #endif
 
-        sout_BufferDelete( p_sout, p_pk );
+        block_Release( p_pk  );
         i_date_last = i_date;
     }
 }

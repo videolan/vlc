@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.11 2004/01/23 17:56:14 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -29,11 +29,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
-#include <errno.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 #include <vlc/sout.h>
 
 #ifdef HAVE_UNISTD_H
@@ -54,18 +53,11 @@
 #endif
 
 /*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static int     Open   ( vlc_object_t * );
-static void    Close  ( vlc_object_t * );
-
-static int     Write( sout_access_out_t *, sout_buffer_t * );
-static int     Seek ( sout_access_out_t *, off_t  );
-static int     Read ( sout_access_out_t *, sout_buffer_t * );
-
-/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
 vlc_module_begin();
     set_description( _("File stream ouput") );
     set_capability( "sout access", 50 );
@@ -73,10 +65,17 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
+
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+static int Write( sout_access_out_t *, block_t * );
+static int Seek ( sout_access_out_t *, off_t  );
+static int Read ( sout_access_out_t *, block_t * );
+
 struct sout_access_out_sys_t
 {
     int i_handle;
-
 };
 
 /*****************************************************************************
@@ -125,7 +124,7 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_read  = Read;
     p_access->pf_seek  = Seek;
 
-    msg_Info( p_access, "Open: name:`%s'", p_access->psz_name );
+    msg_Dbg( p_access, "file access output opened (`%s')", p_access->psz_name );
     return VLC_SUCCESS;
 }
 
@@ -145,46 +144,43 @@ static void Close( vlc_object_t * p_this )
     }
     free( p_access->p_sys );
 
-    msg_Info( p_access, "Close" );
+    msg_Dbg( p_access, "file access output closed" );
 }
 
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static int Read( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+static int Read( sout_access_out_t *p_access, block_t *p_buffer )
 {
     if( strcmp( p_access->psz_name, "-" ) )
     {
         return read( p_access->p_sys->i_handle, p_buffer->p_buffer,
-                     p_buffer->i_size );
+                     p_buffer->i_buffer );
     }
-    else
-    {
-        msg_Err( p_access, "cannot seek while using stdout" );
-        return VLC_EGENERIC;
-    }
+
+    msg_Err( p_access, "cannot read while using stdout" );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
  * Write: standard write on a file descriptor.
  *****************************************************************************/
-static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     size_t i_write = 0;
 
-    do
+    while( p_buffer )
     {
-        sout_buffer_t *p_next;
+        block_t *p_next = p_buffer->p_next;;
 
-        i_write += write( p_access->p_sys->i_handle, p_buffer->p_buffer,
-                          p_buffer->i_size );
-        p_next = p_buffer->p_next;
-        sout_BufferDelete( p_access->p_sout, p_buffer );
+        i_write += write( p_access->p_sys->i_handle,
+                          p_buffer->p_buffer, p_buffer->i_buffer );
+        block_Release( p_buffer );
+
         p_buffer = p_next;
+    }
 
-    } while( p_buffer );
-
-    return( i_write );
+    return i_write;
 }
 
 /*****************************************************************************
@@ -192,8 +188,6 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
-    //msg_Dbg( p_access, "Seek: pos:"I64Fd, (int64_t)i_pos );
-
     if( strcmp( p_access->psz_name, "-" ) )
     {
 #if defined( WIN32 ) && !defined( UNDER_CE )

@@ -25,11 +25,8 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <string.h>
-#include <errno.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 #include <vlc/sout.h>
 
 #include "vlc_httpd.h"
@@ -39,17 +36,11 @@
 #define DEFAULT_PORT 8080
 
 /*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static int     Open   ( vlc_object_t * );
-static void    Close  ( vlc_object_t * );
-
-static int     Write( sout_access_out_t *, sout_buffer_t * );
-static int     Seek ( sout_access_out_t *, off_t  );
-
-/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
 vlc_module_begin();
     set_description( _("HTTP stream ouput") );
     set_capability( "sout access", 0 );
@@ -57,6 +48,13 @@ vlc_module_begin();
     add_shortcut( "mmsh" );
     set_callbacks( Open, Close );
 vlc_module_end();
+
+
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+static int Write( sout_access_out_t *, block_t * );
+static int Seek ( sout_access_out_t *, off_t  );
 
 struct sout_access_out_sys_t
 {
@@ -72,56 +70,6 @@ struct sout_access_out_sys_t
     uint8_t             *p_header;
     vlc_bool_t          b_header_complete;
 };
-
-#if 0
-static struct
-{
-    char *psz_ext;
-    char *psz_mime;
-} http_mime[] =
-{
-    { ".avi",   "video/avi" },
-    { ".asf",   "video/x-ms-asf" },
-    { ".m1a",   "audio/mpeg" },
-    { ".m2a",   "audio/mpeg" },
-    { ".m1v",   "video/mpeg" },
-    { ".m2v",   "video/mpeg" },
-    { ".mp2",   "audio/mpeg" },
-    { ".mp3",   "audio/mpeg" },
-    { ".mpa",   "audio/mpeg" },
-    { ".mpg",   "video/mpeg" },
-    { ".mpeg",  "video/mpeg" },
-    { ".mpe",   "video/mpeg" },
-    { ".mov",   "video/quicktime" },
-    { ".moov",  "video/quicktime" },
-    { ".ogg",   "application/ogg" },
-    { ".ogm",   "application/ogg" },
-    { ".wma",   "audio/x-ms-wma" },
-    { ".wmv",   "video/x-ms-wmv" },
-    { ".wav",   "audio/wav" },
-    { NULL,     NULL }
-};
-
-static char *GetMime( char *psz_name )
-{
-    char *psz_ext;
-
-    psz_ext = strrchr( psz_name, '.' );
-    if( psz_ext )
-    {
-        int i;
-
-        for( i = 0; http_mime[i].psz_ext != NULL ; i++ )
-        {
-            if( !strcmp( http_mime[i].psz_ext, psz_ext ) )
-            {
-                return( http_mime[i].psz_mime );
-            }
-        }
-    }
-    return( "application/octet-stream" );
-}
-#endif
 
 /*****************************************************************************
  * Open: open the file
@@ -272,16 +220,16 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Write:
  *****************************************************************************/
-static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     int i_err = 0;
 
     while( p_buffer )
     {
-        sout_buffer_t *p_next;
+        block_t *p_next;
 
-        if( p_buffer->i_flags & SOUT_BUFFER_FLAGS_HEADER )
+        if( p_buffer->i_flags & BLOCK_FLAG_HEADER )
         {
             /* gather header */
             if( p_sys->b_header_complete )
@@ -290,18 +238,18 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
                 p_sys->i_header_size = 0;
                 p_sys->b_header_complete = VLC_FALSE;
             }
-            if( (int)(p_buffer->i_size + p_sys->i_header_size) >
+            if( (int)(p_buffer->i_buffer + p_sys->i_header_size) >
                 p_sys->i_header_allocated )
             {
                 p_sys->i_header_allocated =
-                    p_buffer->i_size + p_sys->i_header_size + 1024;
+                    p_buffer->i_buffer + p_sys->i_header_size + 1024;
                 p_sys->p_header =
                     realloc( p_sys->p_header, p_sys->i_header_allocated );
             }
             memcpy( &p_sys->p_header[p_sys->i_header_size],
                     p_buffer->p_buffer,
-                    p_buffer->i_size );
-            p_sys->i_header_size += p_buffer->i_size;
+                    p_buffer->i_buffer );
+            p_sys->i_header_size += p_buffer->i_buffer;
         }
         else if( !p_sys->b_header_complete )
         {
@@ -313,10 +261,10 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 
         /* send data */
         i_err = httpd_StreamSend( p_sys->p_httpd_stream, p_buffer->p_buffer,
-                                  p_buffer->i_size );
+                                  p_buffer->i_buffer );
 
         p_next = p_buffer->p_next;
-        sout_BufferDelete( p_access->p_sout, p_buffer );
+        block_Release( p_buffer );
         p_buffer = p_next;
 
         if( i_err < 0 )
@@ -327,13 +275,7 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 
     if( i_err < 0 )
     {
-        sout_buffer_t *p_next;
-        while( p_buffer )
-        {
-            p_next = p_buffer->p_next;
-            sout_BufferDelete( p_access->p_sout, p_buffer );
-            p_buffer = p_next;
-        }
+        block_ChainRelease( p_buffer );
     }
 
     return( i_err < 0 ? VLC_EGENERIC : VLC_SUCCESS );
