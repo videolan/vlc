@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.5.2.2 2001/12/31 01:21:45 massiot Exp $
+ * $Id: mpeg_adec.c,v 1.5.2.3 2001/12/31 03:59:59 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -157,6 +157,7 @@ static int decoder_Run ( decoder_config_t * p_config )
     if ( p_adec->p_aout_fifo == NULL )
     {
         intf_ErrMsg("mpeg_adec error: cannot create audio output fifo");
+        DecoderError( p_config->p_decoder_fifo );
         return -1;
     }
 
