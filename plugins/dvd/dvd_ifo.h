@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.13 2001/04/20 05:40:03 stef Exp $
+ * $Id: dvd_ifo.h,v 1.14 2001/04/22 00:08:25 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -459,8 +459,8 @@ typedef struct vts_manager_s
  * we have a pointer to this structure for each tts */
 typedef struct title_start_s
 {
-    u16             i_program_chain_num;                   // 2 bytes; Chapters/PGs
-    u16             i_program_num;                   // 2 bytes
+    u16             i_title_id;         // 2 bytes; Chapters/PGs
+    u16             i_chapter;                   // 2 bytes
 } title_start_t;
 
 /* Main struct for tts

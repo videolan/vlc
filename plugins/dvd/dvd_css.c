@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.25 2001/04/20 05:40:03 stef Exp $
+ * $Id: dvd_css.c,v 1.26 2001/04/22 00:08:25 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -264,6 +264,12 @@ int CSSInit( int i_fd, css_t * p_css )
     }
     memcpy( p_css->disc.pi_key_check, p_buffer, 2048 );
 
+    /* initialize title key to know it empty */
+    for( i = 0 ; i < KEY_SIZE ; i++ )
+    {
+        p_css->pi_title_key[i] = 0;
+    }
+
     /* Test authentication success */
     switch( CSSGetASF( i_fd ) )
     {
@@ -302,32 +308,24 @@ int CSSGetKey( int i_fd, css_t * p_css )
      */
     u8          pi_buf[0x800];
     dvd_key_t   pi_key;
-    title_key_t p_title_key[10];
     off_t       i_pos;
     boolean_t   b_encrypted;
     boolean_t   b_stop_scanning;
-    int         i_title;
     int         i_bytes_read;
     int         i_best_plen;
     int         i_best_p;
-    int         i_registered_keys;
-    int         i_total_keys_found;
-    int         i_highest;
-    int         i,j,k;
+    int         i,j;
 
-    memset( p_title_key, 0, 10 );
-    memset( &pi_key, 0, 10 );
+    for( i = 0 ; i < KEY_SIZE ; i++ )
+    {
+        pi_key[i] = 0;
+    }
+
     b_encrypted = 0;
     b_stop_scanning = 0;
-    i_registered_keys = 0 ;
-    i_total_keys_found = 0 ;
-    i_highest = 0;
 
     /* Position of the title on the disc */
-    i_title = p_css->i_title;
     i_pos = p_css->i_title_pos;
-
-//fprintf( stderr, "CSS %d start pos: %lld\n", i_title, i_pos );
 
     do {
     i_pos = lseek( i_fd, i_pos, SEEK_SET );
@@ -359,39 +357,7 @@ int CSSGetKey( int i_fd, css_t * p_css )
                     &pi_buf[0x80 - ( i_best_plen / i_best_p) *i_best_p],
                     (dvd_key_t*)&pi_buf[0x54],
                     &pi_key );
-            while( i>=0 )
-            {
-                k = 0;
-                for( j=0 ; j<i_registered_keys ; j++ )
-                {
-                    if( memcmp( &(p_title_key[j].pi_key),
-                                &pi_key, sizeof(dvd_key_t) ) == 0 )
-                    {
-                        p_title_key[j].i_occ++;
-                        i_total_keys_found++;
-                        k = 1;
-                    }
-                }
-
-                if( k == 0 )
-                {
-                    memcpy( &(p_title_key[i_registered_keys].pi_key),
-                                            &pi_key, sizeof(dvd_key_t) );
-                    p_title_key[i_registered_keys++].i_occ = 1;
-                    i_total_keys_found++;
-                }
-                i = CSSCracker( i, &pi_buf[0x80],
-                    &pi_buf[0x80 - ( i_best_plen / i_best_p) *i_best_p],
-                    (dvd_key_t*)&pi_buf[0x54], &pi_key);
-            }
-
-            /* Stop search if we find one occurence of the key 
-             * I have never found a DVD for which it is not enough
-             * but we should take care of that */
-            if( i_registered_keys == 1 && p_title_key[0].i_occ >= 1 )
-            {
-                b_stop_scanning = 1;
-            }
+            b_stop_scanning = ( i >= 0 );
         }
     }
 
@@ -400,8 +366,10 @@ int CSSGetKey( int i_fd, css_t * p_css )
 
     if( b_stop_scanning)
     {
-        intf_WarnMsg( 1,
-            "css info: found enough occurencies of the same key." );
+            memcpy( p_css->pi_title_key,
+                    &pi_key, sizeof(dvd_key_t) );
+        intf_WarnMsg( 2, "css info: vts key initialized" );
+        return 0;
     }
 
     if( !b_encrypted )
@@ -410,68 +378,7 @@ int CSSGetKey( int i_fd, css_t * p_css )
         return 0;
     }
 
-    if( b_encrypted && i_registered_keys == 0 )
-    {
-        intf_ErrMsg( "css error: unable to determine keys from file" );
-        return -1;
-    }
-
-    for( i = 0 ; i < i_registered_keys - 1 ; i++ )
-    {
-        for( j = i + 1 ; j < i_registered_keys ; j++ )
-        {
-            if( p_title_key[j].i_occ > p_title_key[i].i_occ )
-            {
-                memcpy( &pi_key, &(p_title_key[j].pi_key), sizeof(dvd_key_t) );
-                k = p_title_key[j].i_occ;
-
-                memcpy( &(p_title_key[j].pi_key),
-                        &(p_title_key[i].pi_key), sizeof(dvd_key_t) );
-                p_title_key[j].i_occ = p_title_key[i].i_occ;
-
-                memcpy( &(p_title_key[i].pi_key),&pi_key, sizeof(dvd_key_t) );
-                p_title_key[i].i_occ = k;
-            }
-        }
-    }
-
-#ifdef STATS
-    intf_WarnMsg( 1, "css info: key(s) & key probability" );
-    intf_WarnMsg( 1, "----------------------------------" );
-#endif
-    for( i=0 ; i<i_registered_keys ; i++ )
-    {
-#ifdef STATS
-        intf_WarnMsg( 1, "%d) %02X %02X %02X %02X %02X - %3.2f%%", i,
-                      p_title_key[i].pi_key[0], p_title_key[i].pi_key[1],
-                      p_title_key[i].pi_key[2], p_title_key[i].pi_key[3],
-                      p_title_key[i].pi_key[4],
-                      p_title_key[i].i_occ * 100.0 / i_total_keys_found );
-#endif
-        if( p_title_key[i_highest].i_occ * 100.0 / i_total_keys_found
-                           <= p_title_key[i].i_occ*100.0 / i_total_keys_found )
-        {
-            i_highest = i;
-        }
-    }
-
-
-    /* The "find the key with the highest probability" code
-     * is untested, as I haven't been able to find a VOB that
-     * produces multiple keys (RT)
-     */
-    intf_WarnMsg( 3, "css info: title %d, key %02X %02X %02X %02X %02X",
-                  i_title, p_title_key[i_highest].pi_key[0],
-                           p_title_key[i_highest].pi_key[1],
-                           p_title_key[i_highest].pi_key[2],
-                           p_title_key[i_highest].pi_key[3],
-                           p_title_key[i_highest].pi_key[4] );
-
-    memcpy( p_css->pi_title_key,
-            p_title_key[i_highest].pi_key, KEY_SIZE );
-
-    intf_WarnMsg( 2, "css info: vts key initialized" );
-    return 0;
+    return -1;
 
 #else /* HAVE_CSS */
     intf_ErrMsg( "css error: css decryption unavailable" );
@@ -520,9 +427,6 @@ int CSSDescrambleSector( dvd_key_t pi_key, u8* pi_sec )
             pi_sec++;
             i_t5 >>= 8;
         }
-
-    pi_sec[0x14] &= 0x8F;
-
     }
 
     return 0;

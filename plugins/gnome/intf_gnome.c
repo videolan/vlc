@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.31 2001/04/20 05:40:03 stef Exp $
+ * $Id: intf_gnome.c,v 1.32 2001/04/22 00:08:26 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -70,6 +70,8 @@ static gint GnomeManage    ( gpointer p_data );
 static gint GnomeLanguageMenus( gpointer, GtkWidget *, es_descriptor_t *, gint,
                               void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
 static gint GnomeChapterMenu  ( gpointer, GtkWidget *,
+                              void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
+static gint GnomeAngleMenu    ( gpointer, GtkWidget *,
                               void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
 static gint GnomeTitleMenu    ( gpointer, GtkWidget *, 
                               void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
@@ -153,17 +155,11 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
-    p_intf->p_sys->b_title_update = 1;
-    p_intf->p_sys->b_chapter_update = 1;
-    p_intf->p_sys->b_audio_update = 1;
-    p_intf->p_sys->b_spu_update = 1;
 
     p_intf->p_sys->b_slider_free = 1;
 
     p_intf->p_sys->b_mode_changed = 1;
     p_intf->p_sys->i_intf_mode = FILE_MODE;
-
-    p_intf->p_sys->i_part = 0;
 
     p_intf->p_sys->pf_gtk_callback = NULL;
     p_intf->p_sys->pf_gdk_callback = NULL;
@@ -316,8 +312,10 @@ static gint GnomeManage( gpointer p_data )
 
     if( p_intf->p_input != NULL )
     {
+        GtkWidget *     p_slider;
         float           newvalue;
 
+//        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
         /* New input or stream map change */
         if( p_intf->p_input->stream.b_changed || p_intf->p_sys->b_mode_changed )
         {
@@ -336,12 +334,34 @@ static gint GnomeManage( gpointer p_data )
                     intf_ErrMsg( "intf error: can't determine input method" );
                     break;
             }
+            p_slider = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                                   p_intf->p_sys->p_window ), "slider" ) );
+
+            if( p_intf->p_input->stream.b_seekable )
+            {
+                gtk_widget_show( GTK_WIDGET( p_slider ) );
+            }
+            else
+            {
+                gtk_widget_hide( GTK_WIDGET( p_slider ) );
+            }
+
+            /* get ready for menu regeneration */
+            p_intf->p_sys->b_title_update = 1;
+            p_intf->p_sys->b_chapter_update = 1;
+            p_intf->p_sys->b_angle_update = 1;
+            p_intf->p_sys->b_audio_update = 1;
+            p_intf->p_sys->b_spu_update = 1;
+            p_intf->p_sys->i_part = 0;
 
             p_intf->p_input->stream.b_changed = 0;
             p_intf->p_sys->b_mode_changed = 0;
             intf_WarnMsg( 2, 
-                          "Interface menus refreshed as stream has changed" );
+                          "intf info: menus refreshed as stream has changed" );
+
         }
+
+//        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
 
         /* Update language/chapter menus after user request */
         GnomeSetupMenu( p_intf );
@@ -521,6 +541,77 @@ static gint GnomeLanguageMenus( gpointer          p_data,
 }
 
 /*****************************************************************************
+ * GnomeAngleMenu: generate angle menu for current title
+ *****************************************************************************/
+static gint GnomeAngleMenu( gpointer p_data, GtkWidget * p_angle,
+                        void(*pf_toggle)( GtkCheckMenuItem *, gpointer ) )
+{
+    intf_thread_t *     p_intf;
+    char                psz_name[10];
+    GtkWidget *         p_angle_menu;
+    GSList *            p_angle_group;
+    GtkWidget *         p_item;
+    GtkWidget *         p_item_active;
+    gint                i_angle;
+
+    /* cast */
+    p_intf = (intf_thread_t*)p_data;
+
+    /* removes previous menu */
+    gtk_menu_item_remove_submenu( GTK_MENU_ITEM( p_angle ) );
+    gtk_widget_set_sensitive( p_angle, FALSE );
+
+    p_angle_menu = gtk_menu_new();;
+    p_angle_group = NULL;
+    p_item = NULL;
+    p_item_active = NULL;
+
+    for( i_angle = 0 ;
+         i_angle < p_intf->p_input->stream.p_selected_area->i_angle_nb ;
+         i_angle++ )
+    {
+        sprintf( psz_name, "Angle %d", i_angle + 1 );
+
+        p_item = gtk_radio_menu_item_new_with_label( p_angle_group,
+                                                     psz_name );
+        p_angle_group =
+            gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
+
+        if( p_intf->p_input->stream.p_selected_area->i_angle ==
+                                                            ( i_angle + 1 ) )
+        {
+            p_item_active = p_item;
+        }
+
+        gtk_widget_show( p_item );
+
+        /* setup signal hanling */
+        gtk_signal_connect( GTK_OBJECT( p_item ),
+                        "toggled",
+                        GTK_SIGNAL_FUNC( pf_toggle ),
+                        (gpointer)(i_angle + 1) );
+
+        gtk_menu_append( GTK_MENU( p_angle_menu ), p_item );
+    }
+
+    gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_angle ), p_angle_menu );
+
+    if( p_item_active != NULL )
+    {
+        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_active ),
+                                        TRUE );
+    }
+
+    /* be sure that menu is sensitive if non empty */
+    if( p_intf->p_input->stream.p_selected_area->i_angle_nb > 1 )
+    {
+        gtk_widget_set_sensitive( p_angle, TRUE );
+    }
+
+    return TRUE;
+}
+
+/*****************************************************************************
  * GnomeChapterMenu: generate chapter menu for current title
  *****************************************************************************/
 static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
@@ -661,6 +752,10 @@ static gint GnomeTitleMenu( gpointer       p_data,
 
     /* cast */
     p_intf = (intf_thread_t*)p_data;
+
+    /* removes previous menu */
+    gtk_menu_item_remove_submenu( GTK_MENU_ITEM( p_navigation ) );
+    gtk_widget_set_sensitive( p_navigation, FALSE );
 
     p_title_menu = gtk_menu_new();
     p_title_group = NULL;
@@ -845,8 +940,8 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
     GtkWidget *         p_popup_menu;
     gint                i;
 
-    p_intf->p_sys->b_title_update &= ( p_intf->p_input->stream.i_area_nb > 1 );
     p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update;
+    p_intf->p_sys->b_angle_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update;
 
@@ -883,7 +978,21 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
 
         p_intf->p_sys->i_part =
                 p_intf->p_input->stream.p_selected_area->i_part;
+
         p_intf->p_sys->b_chapter_update = 0;
+    }
+
+    if( p_intf->p_sys->b_angle_update )
+    {
+        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                             p_intf->p_sys->p_window ), "menubar_angle" ) );
+        GnomeAngleMenu( p_intf, p_menubar_menu, on_menubar_angle_toggle );
+
+        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                             p_intf->p_sys->p_popup ), "popup_angle" ) );
+        GnomeAngleMenu( p_intf, p_popup_menu, on_popup_angle_toggle );
+
+        p_intf->p_sys->b_angle_update = 0;
     }
     
     /* look for selected ES */
@@ -1006,7 +1115,7 @@ static gint GnomeFileModeManage( intf_thread_t * p_intf )
     GtkWidget *     p_dvd_box;
     GtkWidget *     p_file_box;
     GtkWidget *     p_network_box;
-//    char *          psz_name;
+    char *          psz_name;
 
     p_network_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
                  p_intf->p_sys->p_window ), "network_box" ) );
@@ -1019,9 +1128,12 @@ static gint GnomeFileModeManage( intf_thread_t * p_intf )
     p_file_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
                  p_intf->p_sys->p_window ), "file_box" ) );
     gtk_widget_show( GTK_WIDGET( p_file_box ) );
-#if 0
-    psz_name = malloc( 16 + strlen( p_intf->p_input->p_source ) );
-    sprintf( psz_name, "Status: playing %s", p_intf->p_input->p_source );
+
+#if 1
+//    psz_name = malloc( 16 + strlen( p_intf->p_input->p_source ) );
+//    sprintf( psz_name, "Status: playing %s", p_intf->p_input->p_source );
+
+    psz_name = strdup( p_intf->p_input->p_source );
 
     gtk_label_set_text( p_intf->p_sys->p_label_status, psz_name );
 

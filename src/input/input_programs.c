@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.49 2001/04/13 05:36:12 stef Exp $
+ * $Id: input_programs.c,v 1.50 2001/04/22 00:08:26 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,7 +57,10 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
 
     p_input->stream.i_method = INPUT_METHOD_NONE;
     p_input->stream.i_stream_id = 0;
-    p_input->stream.b_changed = 1;
+
+    /* initialized to 0 since we don't give the signal to the interface
+     * before the end of input initialization */
+    p_input->stream.b_changed = 0;
     p_input->stream.pp_es = NULL;
     p_input->stream.pp_selected_es = NULL;
     p_input->stream.pp_programs = NULL;
@@ -281,6 +284,8 @@ input_area_t * input_AddArea( input_thread_t * p_input )
     p_input->stream.pp_areas[i_area_index]->i_seek = NO_SEEK;
     p_input->stream.pp_areas[i_area_index]->i_part_nb = 1;
     p_input->stream.pp_areas[i_area_index]->i_part= 0;
+    p_input->stream.pp_areas[i_area_index]->i_angle_nb = 1;
+    p_input->stream.pp_areas[i_area_index]->i_angle = 0;
 
     return p_input->stream.pp_areas[i_area_index];
 }

@@ -2,7 +2,7 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.23 2001/04/20 05:40:03 stef Exp $
+ * $Id: gnome_callbacks.c,v 1.24 2001/04/22 00:08:26 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -408,6 +408,25 @@ on_menubar_chapter_toggle              (GtkCheckMenuItem     *menuitem,
 
 }
 
+
+void
+on_menubar_angle_toggle                (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data)
+{
+    intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    input_area_t *  p_area    = p_intf->p_input->stream.p_selected_area;
+    gint            i_angle   = (gint)user_data;
+
+    if( menuitem->active && !p_intf->p_sys->b_angle_update )
+    {
+        p_area->i_angle = i_angle;
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
+        p_intf->p_sys->b_angle_update = 1;
+    }
+}
+
+
 void
 on_menubar_modules_activate            (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
@@ -746,6 +765,24 @@ on_popup_navigation_toggle             (GtkCheckMenuItem     *menuitem,
 
 
 void
+on_popup_angle_toggle                  (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data)
+{
+    intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+    input_area_t *  p_area    = p_intf->p_input->stream.p_selected_area;
+    gint            i_angle   = (gint)user_data;
+
+    if( menuitem->active && !p_intf->p_sys->b_angle_update )
+    {
+        p_area->i_angle = i_angle;
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
+        p_intf->p_sys->b_angle_update = 1;
+    }
+}
+
+
+void
 on_popup_open_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
@@ -846,11 +883,10 @@ on_fileopen_ok_clicked                 (GtkButton       *button,
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)filename );
 
     /* Select added item and switch to file interface */
-    intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
     if( p_intf->p_input != NULL )
         p_intf->p_input->b_eof = 1;
-    p_intf->p_sys->i_intf_mode = FILE_MODE;
-    p_intf->p_sys->b_mode_changed = 1;
+
+//    p_intf->p_sys->b_mode_changed = 1;
 }
 
 
@@ -1018,7 +1054,7 @@ on_disc_ok_clicked                     (GtkButton       *button,
     intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
     if( p_intf->p_input != NULL )
         p_intf->p_input->b_eof = 1;
-    p_intf->p_sys->b_mode_changed = 1;
+//    p_intf->p_sys->b_mode_changed = 1;
 
     gtk_widget_hide( p_intf->p_sys->p_disc );
 }
@@ -1089,8 +1125,7 @@ on_network_ok_clicked                  (GtkButton       *button,
     intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
     if( p_intf->p_input != NULL )
         p_intf->p_input->b_eof = 1;
-    p_intf->p_sys->b_mode_changed = 1;
-    p_intf->p_sys->i_intf_mode = NET_MODE;
+//    p_intf->p_sys->b_mode_changed = 1;
 
     gtk_widget_hide( p_intf->p_sys->p_network );
 }

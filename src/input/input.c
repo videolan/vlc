@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.98 2001/04/15 04:19:58 sam Exp $
+ * $Id: input.c,v 1.99 2001/04/22 00:08:26 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -224,6 +224,11 @@ static void RunThread( input_thread_t *p_input )
         DestroyThread( p_input );
         return;
     }
+
+    /* initialization is completed */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.b_changed = 1;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
     {

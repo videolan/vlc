@@ -157,6 +157,7 @@
 	      <class>GtkMenuItem</class>
 	      <name>menubar_title</name>
 	      <sensitive>False</sensitive>
+	      <tooltip>Choose title</tooltip>
 	      <label>_Title</label>
 	      <right_justify>False</right_justify>
 	    </widget>
@@ -165,7 +166,17 @@
 	      <class>GtkMenuItem</class>
 	      <name>menubar_chapter</name>
 	      <sensitive>False</sensitive>
+	      <tooltip>Choose chapter</tooltip>
 	      <label>_Chapter</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_angle</name>
+	      <sensitive>False</sensitive>
+	      <tooltip>Choose angle</tooltip>
+	      <label>An_gle</label>
 	      <right_justify>False</right_justify>
 	    </widget>
 
@@ -491,6 +502,7 @@
       <widget>
 	<class>GtkHBox</class>
 	<name>hbox4</name>
+	<width>650</width>
 	<homogeneous>True</homogeneous>
 	<spacing>0</spacing>
 	<child>
@@ -519,6 +531,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <name>label_status</name>
+	  <width>350</width>
 	  <label>Status: foo</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -528,8 +541,8 @@
 	  <ypad>0</ypad>
 	  <child>
 	    <padding>0</padding>
-	    <expand>True</expand>
-	    <fill>True</fill>
+	    <expand>False</expand>
+	    <fill>False</fill>
 	  </child>
 	</widget>
 
@@ -796,9 +809,8 @@
       <widget>
 	<class>GtkHBox</class>
 	<name>network_box</name>
-	<height>24</height>
 	<visible>False</visible>
-	<homogeneous>False</homogeneous>
+	<homogeneous>True</homogeneous>
 	<spacing>0</spacing>
 	<child>
 	  <padding>0</padding>
@@ -807,109 +819,64 @@
 	</child>
 
 	<widget>
-	  <class>GtkLabel</class>
-	  <name>label_network</name>
-	  <label>Network Channel:</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
+	  <class>Placeholder</class>
+	</widget>
+
+	<widget>
+	  <class>Placeholder</class>
+	</widget>
+
+	<widget>
+	  <class>GtkHBox</class>
+	  <name>network_channel_box</name>
+	  <homogeneous>False</homogeneous>
+	  <spacing>0</spacing>
 	  <child>
 	    <padding>0</padding>
 	    <expand>True</expand>
-	    <fill>False</fill>
-	  </child>
-	</widget>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <name>button_network_channel_1</name>
-	  <can_focus>True</can_focus>
-	  <label>Channel 1</label>
-	  <relief>GTK_RELIEF_HALF</relief>
-	  <active>True</active>
-	  <child>
-	    <padding>2</padding>
-	    <expand>False</expand>
 	    <fill>True</fill>
 	  </child>
-	</widget>
 
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <name>button_network_channel_2</name>
-	  <sensitive>False</sensitive>
-	  <can_focus>True</can_focus>
-	  <label>Channel 2</label>
-	  <relief>GTK_RELIEF_HALF</relief>
-	  <active>False</active>
-	  <child>
-	    <padding>2</padding>
-	    <expand>False</expand>
-	    <fill>True</fill>
-	  </child>
-	</widget>
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label_network</name>
+	    <label>Network Channel:</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <padding>0</padding>
+	      <expand>True</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
 
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <name>button_network_channel_3</name>
-	  <sensitive>False</sensitive>
-	  <can_focus>True</can_focus>
-	  <label>Channel 3</label>
-	  <relief>GTK_RELIEF_HALF</relief>
-	  <active>False</active>
-	  <child>
-	    <padding>2</padding>
-	    <expand>False</expand>
-	    <fill>True</fill>
-	  </child>
-	</widget>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <name>button_network_channel_4</name>
-	  <sensitive>False</sensitive>
-	  <can_focus>True</can_focus>
-	  <label>Channel 4</label>
-	  <relief>GTK_RELIEF_HALF</relief>
-	  <active>False</active>
-	  <child>
-	    <padding>2</padding>
-	    <expand>False</expand>
-	    <fill>True</fill>
-	  </child>
-	</widget>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <name>button_network_channel_5</name>
-	  <sensitive>False</sensitive>
-	  <can_focus>True</can_focus>
-	  <label>Channel 5</label>
-	  <relief>GTK_RELIEF_HALF</relief>
-	  <active>False</active>
-	  <child>
-	    <padding>2</padding>
-	    <expand>False</expand>
-	    <fill>True</fill>
-	  </child>
-	</widget>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <name>button_network_channel_6</name>
-	  <sensitive>False</sensitive>
-	  <can_focus>True</can_focus>
-	  <label>Channel 6</label>
-	  <relief>GTK_RELIEF_HALF</relief>
-	  <active>False</active>
-	  <child>
-	    <padding>2</padding>
-	    <expand>False</expand>
-	    <fill>True</fill>
-	  </child>
+	  <widget>
+	    <class>GtkSpinButton</class>
+	    <name>network_spinbutton</name>
+	    <sensitive>False</sensitive>
+	    <can_focus>True</can_focus>
+	    <climb_rate>1</climb_rate>
+	    <digits>0</digits>
+	    <numeric>False</numeric>
+	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
+	    <snap>False</snap>
+	    <wrap>False</wrap>
+	    <value>1</value>
+	    <lower>0</lower>
+	    <upper>100</upper>
+	    <step>1</step>
+	    <page>10</page>
+	    <page_size>10</page_size>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>True</fill>
+	    </child>
+	  </widget>
 	</widget>
       </widget>
     </widget>
@@ -997,6 +964,14 @@
     <sensitive>False</sensitive>
     <tooltip>Navigate through titles and chapters</tooltip>
     <label>_Navigation</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_angle</name>
+    <sensitive>False</sensitive>
+    <label>An_gle</label>
     <right_justify>False</right_justify>
   </widget>
 

@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.16 2001/04/20 05:40:03 stef Exp $
+ * $Id: input_ps.c,v 1.17 2001/04/22 00:08:26 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -348,6 +348,7 @@ static void PSInit( input_thread_t * p_input )
     {
         /* The programs will be added when we read them. */
         vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_input->stream.i_method = INPUT_METHOD_FILE;
         p_input->stream.pp_programs[0]->b_is_ok = 0;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }

@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.23 2001/04/20 05:40:03 stef Exp $
+ * $Id: dvd_ifo.c,v 1.24 2001/04/22 00:08:25 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -663,9 +663,9 @@ DumpBits( p_ifo, pi_buffer, &p_current, 2 );
             p_current = FillBuffer( p_ifo, pi_buffer, i_start +
                             title_inf.pi_start_byte[i] );
 
-            title_inf.p_title_start[i].i_program_chain_num =
+            title_inf.p_title_start[i].i_title_id =
                                                        ReadWord( p_ifo, pi_buffer, &p_current );
-            title_inf.p_title_start[i].i_program_num = ReadWord( p_ifo, pi_buffer, &p_current );
+            title_inf.p_title_start[i].i_chapter = ReadWord( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "VTS %d title_inf Pgc: %d Prg: %d\n", i,title_inf.p_title_start[i].i_program_chain_num, title_inf.p_title_start[i].i_program_num );
         }
     }
