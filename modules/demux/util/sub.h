@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sub.h,v 1.1 2002/11/15 18:10:26 fenrir Exp $
+ * $Id: sub.h,v 1.2 2003/01/02 23:50:55 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -144,7 +144,7 @@ static inline
     }
     else
     {
-        msg_Err( p_input, "failed to start subtitle demux" );
+        msg_Warn( p_input, "failed to start subtitle demux" );
         if( p_sub->p_module )
         {
             module_Unneed( p_sub, p_sub->p_module );

@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.5 2002/12/10 00:02:29 gitan Exp $
+ * $Id: sap.c,v 1.6 2003/01/02 23:50:55 massiot Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -186,7 +186,7 @@ static void Run( intf_thread_t *p_intf )
 
     if( !( p_network = module_Need( p_intf, "network", psz_network ) ) )
     {
-        msg_Err( p_intf, "failed to open a connection (udp)" );
+        msg_Warn( p_intf, "failed to open a connection (udp)" );
         return;
     }
     module_Unneed( p_intf, p_network );

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.108 2002/12/13 01:56:30 gbazin Exp $
+ * $Id: modules.c,v 1.109 2003/01/02 23:50:55 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -496,8 +496,8 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     }
     else if( psz_name != NULL && *psz_name )
     {
-        msg_Err( p_this, "no %s module matching \"%s\" could be loaded",
-                 psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
+        msg_Warn( p_this, "no %s module matching \"%s\" could be loaded",
+                  psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
     }
 
     if( psz_shortcuts )

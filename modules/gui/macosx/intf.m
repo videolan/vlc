@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.15 2003/01/02 23:09:30 massiot Exp $
+ * $Id: intf.m,v 1.16 2003/01/02 23:50:55 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -218,7 +218,7 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_stop setTitle: _NS("Stop")];
     [o_mi_faster setTitle: _NS("Faster")];
     [o_mi_slower setTitle: _NS("Slower")];
-    [o_mi_previous setTitle: _NS("Prev")];
+    [o_mi_previous setTitle: _NS("Previous")];
     [o_mi_next setTitle: _NS("Next")];
     [o_mi_loop setTitle: _NS("Loop")];
     [o_mi_vol_up setTitle: _NS("Louder")];

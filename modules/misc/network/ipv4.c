@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.10 2002/12/16 16:48:04 gbazin Exp $
+ * $Id: ipv4.c,v 1.11 2003/01/02 23:50:55 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -319,10 +319,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
         {
 #ifdef HAVE_ERRNO_H
-            msg_Err( p_this, "failed to join IP multicast group (%s)",
-                             strerror(errno) );
+            msg_Warn( p_this, "failed to join IP multicast group (%s)",
+                              strerror(errno) );
 #else
-            msg_Err( p_this, "failed to join IP multicast group" );
+            msg_Warn( p_this, "failed to join IP multicast group" );
 #endif
 #if defined( WIN32 ) || defined( UNDER_CE )
             closesocket( i_handle );
