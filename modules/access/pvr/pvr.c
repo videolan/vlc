@@ -137,6 +137,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_bitrate = -1;
     p_sys->i_bitrate_peak = -1;
     p_sys->i_bitrate_mode = -1;
+    p_sys->i_audio_bitmask = -1;
     p_sys->i_input = -1;
 
     /* parse command line options */
@@ -464,6 +465,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* do a quick read */
+#if 0
     if ( p_sys->i_fd )
     {
         if ( read( p_sys->i_fd, psz_tmp, 1 ) )
@@ -475,6 +477,7 @@ static int Open( vlc_object_t * p_this )
             msg_Warn(p_input, "Could not read byte from device");
         }
     }
+#endif
     return VLC_SUCCESS;
 }
 
