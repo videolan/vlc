@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.27 2001/09/26 12:32:25 massiot Exp $
+ * $Id: vout_xvideo.c,v 1.28 2001/09/30 01:05:37 stef Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -54,6 +54,7 @@
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
+#include <X11/extensions/dpms.h>
 
 #include "config.h"
 #include "common.h"
@@ -429,6 +430,7 @@ static int vout_Manage( vout_thread_t *p_vout )
             /* Update dimensions */
             p_vout->p_sys->i_window_width = xevent.xconfigure.width;
             p_vout->p_sys->i_window_height = xevent.xconfigure.height;
+//            p_vout->i_changes |= VOUT_SIZE_CHANGE;
         }
         /* MapNotify event: change window status and disable screen saver */
         else if( xevent.type == MapNotify)
@@ -627,11 +629,12 @@ static int vout_Manage( vout_thread_t *p_vout )
     {
         intf_DbgMsg( "vout: resizing window" );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-        /* Nothing to do here...
-         * vout_Display() detects size changes of the image to be displayed and
-         * re-creates the XvImage.*/
-        intf_Msg( "vout: video display resized (%dx%d)",
-                  p_vout->i_width, p_vout->i_height );
+
+        p_vout->i_width = p_vout->p_sys->i_window_width;
+        p_vout->i_height = p_vout->p_sys->i_window_height;
+
+        intf_WarnMsg( 3, "vout: video display resized (%dx%d)",
+                      p_vout->i_width, p_vout->i_height );
     }
 
     /* Autohide Cursor */
@@ -797,8 +800,6 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
                                                       p_vout->p_sys->i_screen );
         p_vout->p_sys->i_window_height =  DisplayHeight( p_vout->p_sys->p_display,
                                                          p_vout->p_sys->i_screen );
-/*      p_vout->i_width =  p_vout->p_sys->i_window_width;
-        p_vout->i_height = p_vout->p_sys->i_window_height; */
     }
     else
     {
@@ -1058,6 +1059,8 @@ void XVideoEnableScreenSaver( vout_thread_t *p_vout )
                      p_vout->p_sys->i_ss_interval,
                      p_vout->p_sys->i_ss_blanking,
                      p_vout->p_sys->i_ss_exposure );
+
+    DPMSEnable( p_vout->p_sys->p_display );
 }
 
 /*****************************************************************************
@@ -1079,6 +1082,8 @@ void XVideoDisableScreenSaver( vout_thread_t *p_vout )
                      p_vout->p_sys->i_ss_interval,
                      p_vout->p_sys->i_ss_blanking,
                      p_vout->p_sys->i_ss_exposure );
+
+    DPMSDisable( p_vout->p_sys->p_display );
 }
 
 /*****************************************************************************
@@ -1107,57 +1112,34 @@ void X11ToggleMousePointer( vout_thread_t *p_vout )
  * used by the xvideo plugin, but others may want to use it. */
 static void XVideoOutputCoords( const picture_t *p_pic, const boolean_t scale,
                                 const int win_w, const int win_h,
-                                int *dx, int *dy, int *w, int *h)
+                                int *dx, int *dy, int *w, int *h )
 {
     if( !scale )
     {
-        *w = p_pic->i_width; *h = p_pic->i_height;
+        *w = p_pic->i_width;
+        *h = p_pic->i_height;
     }
     else
     {
-        *w = win_w;
+        *h = win_h;
         switch( p_pic->i_aspect_ratio )
         {
             case AR_3_4_PICTURE:
-                *h = win_w * 3 / 4;
+                *w = win_h * 4 / 3;
                 break;
 
             case AR_16_9_PICTURE:
-                *h = win_w * 9 / 16;
+                *w = win_h * 16 / 9;
                 break;
 
             case AR_221_1_PICTURE:
-                *h = win_w * 100 / 221;
+                *w = win_h * 221 / 100;
                 break;
 
             case AR_SQUARE_PICTURE:
             default:
-                *h = win_w * p_pic->i_height / p_pic->i_width;
+                *w = win_h * p_pic->i_width / p_pic->i_height;
                 break;
-        }
-
-        if( *h > win_h )
-        {
-            *h = win_h;
-            switch( p_pic->i_aspect_ratio )
-            {
-                case AR_3_4_PICTURE:
-                    *w = win_h * 4 / 3;
-                    break;
-
-                case AR_16_9_PICTURE:
-                    *w = win_h * 16 / 9;
-                    break;
-
-                case AR_221_1_PICTURE:
-                    *w = win_h * 221 / 100;
-                    break;
-
-                case AR_SQUARE_PICTURE:
-                default:
-                    *w = win_h * p_pic->i_width / p_pic->i_height;
-                    break;
-            }
         }
     }
 
@@ -1353,6 +1335,7 @@ static void XVideoDisplay( vout_thread_t *p_vout )
                         &i_dest_x, &i_dest_y,
                         &i_dest_width, &i_dest_height);
 
+
     XvShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->xv_port,
                    p_vout->p_sys->yuv_window, p_vout->p_sys->gc,
                    p_vout->p_sys->p_xvimage,
@@ -1362,10 +1345,23 @@ static void XVideoDisplay( vout_thread_t *p_vout )
                    0 /*dest_x*/, 0 /*dest_y*/, i_dest_width, i_dest_height,
                    False );
 
+    /* YUV window */
     XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
                    i_dest_width, i_dest_height );
     XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
                  i_dest_x, i_dest_y );
+
+    /* Root window */
+    if( ( ( i_dest_width != p_vout->p_sys->i_window_width ) ||
+          ( i_dest_height != p_vout->p_sys->i_window_height ) ) &&
+        ! p_vout->b_fullscreen )
+    {
+        p_vout->p_sys->i_window_width = i_dest_width;
+        p_vout->p_sys->i_window_height = i_dest_height;
+//        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                       i_dest_width, i_dest_height );
+    }
 
     /* Send the order to the X server */
     XSync( p_vout->p_sys->p_display, False );
