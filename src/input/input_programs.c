@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.39 2001/03/02 15:51:22 massiot Exp $
+ * $Id: input_programs.c,v 1.40 2001/03/07 10:31:10 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -371,6 +371,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     p_es->p_pes = NULL;
     p_es->p_decoder_fifo = NULL;
     p_es->b_audio = 0;
+    p_es->b_spu = 0;
 
     if( i_data_len )
     {
@@ -508,6 +509,7 @@ static int InitDecConfig( input_thread_t * p_input, es_descriptor_t * p_es,
     p_config->pf_init_bit_stream = InitBitstream;
 
     p_input->stream.i_selected_es_number++;
+
     p_input->stream.pp_selected_es = realloc(
                                        p_input->stream.pp_selected_es,
                                        p_input->stream.i_selected_es_number

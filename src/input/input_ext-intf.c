@@ -225,3 +225,69 @@ void input_DumpStream( input_thread_t * p_input )
     }
 }
 
+/*****************************************************************************
+ * input_ChangeES: answers to a user request with calls to (Un)SelectES
+ * ---
+ * Useful since the interface plugins know p_es
+ *****************************************************************************/
+int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
+                    int i_type )
+{
+    boolean_t               b_audio;
+    boolean_t               b_spu;
+    int                     i_index;
+    int                     i;
+
+    i_index = -1;
+    b_audio = ( i_type == 1 ) ? 1 : 0;
+    b_spu   = ( i_type == 2 ) ? 1 : 0;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    for( i = 0 ; i < p_input->stream.i_selected_es_number ; i++ )
+    {
+        if( ( b_audio && p_input->stream.pp_selected_es[i]->b_audio ) 
+         || ( b_spu   && p_input->stream.pp_selected_es[i]->b_spu ) )
+        {
+            i_index = i;
+            break;
+        }
+    }
+
+
+    if( p_es != NULL )
+    {
+
+    
+        if( i_index != -1 )
+        {
+            
+            if( p_input->stream.pp_selected_es[i_index] != p_es )
+            {
+                input_UnselectES( p_input,
+                                  p_input->stream.pp_selected_es[i_index] );
+                input_SelectES( p_input, p_es );
+                intf_WarnMsg( 1, "dvd info: ES selected -> %s (0x%x)",
+                                                p_es->psz_desc, p_es->i_id );
+            }
+        }
+        else
+        {
+            input_SelectES( p_input, p_es );
+            intf_WarnMsg( 1, "dvd info: selected -> %s (0x%x)",
+                          p_es->psz_desc, p_es->i_id );
+        }
+    }
+    else
+    {
+        if( i_index != -1 )
+        {
+            input_UnselectES( p_input,
+                              p_input->stream.pp_selected_es[i_index] );
+        }
+    }
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return 0;
+}

@@ -49,6 +49,9 @@ typedef void *  module_handle_t;
 #define MODULE_CAPABILITY_AFX      1 << 11  /* Audio effects */
 #define MODULE_CAPABILITY_VFX      1 << 12  /* Video effects */
 
+/* FIXME: kludge */
+struct input_area_s;
+
 /* FIXME: not yet used */
 typedef struct probedata_s
 {
@@ -81,9 +84,6 @@ typedef struct function_list_s
             void ( * pf_close )( struct input_thread_s * );
             void ( * pf_end )  ( struct input_thread_s * );
 
-            int  ( * pf_set_area ) ( struct input_thread_s *,
-                                     int, int, int, int );
-
             int  ( * pf_read ) ( struct input_thread_s *,
                                  struct data_packet_s *
                                         pp_packets[] );
@@ -95,8 +95,11 @@ typedef struct function_list_s
             void ( * pf_delete_packet )  ( void *, struct data_packet_s * );
             void ( * pf_delete_pes )     ( void *, struct pes_packet_s * );
 
-            int  ( * pf_rewind ) ( struct input_thread_s * );
-            void ( * pf_seek )   ( struct input_thread_s *, off_t );
+
+            int  ( * pf_set_area ) ( struct input_thread_s *,
+                                     struct input_area_s * );
+            int  ( * pf_rewind )   ( struct input_thread_s * );
+            void ( * pf_seek )     ( struct input_thread_s *, off_t );
         } input;
 
         /* Audio output plugin */

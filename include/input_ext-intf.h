@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.27 2001/03/02 03:32:46 stef Exp $
+ * $Id: input_ext-intf.h,v 1.28 2001/03/07 10:31:10 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -52,6 +52,8 @@ typedef struct es_descriptor_s
     boolean_t               b_audio;      /* is the stream an audio stream that
                                            * will need to be discarded with
                                            * fast forward and slow motion ?  */
+    boolean_t               b_spu;
+
     char                    psz_desc[20]; /* description of ES: audio language
                                            * for instance ; NULL if not
                                            *  available */
@@ -269,6 +271,8 @@ typedef struct input_thread_s
     void                 (* pf_delete_pes)( void *, struct pes_packet_s * );
 
     /* Stream control capabilities */
+    int                  (* pf_set_area)( struct input_thread_s *,
+                                          struct input_area_s * );
     int                  (* pf_rewind)( struct input_thread_s * );
                                            /* NULL if we don't support going *
                                             * backwards (it's gonna be fun)  */
@@ -348,3 +352,4 @@ void input_SetRate  ( struct input_thread_s *, int );
 void input_Seek     ( struct input_thread_s *, off_t );
 void input_DumpStream( struct input_thread_s * );
 char * input_OffsetToTime( struct input_thread_s *, char * psz_buffer, off_t );
+int  input_ChangeES ( struct input_thread_s *, struct es_descriptor_s *, int );

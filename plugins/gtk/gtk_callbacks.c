@@ -4,6 +4,7 @@
  * Copyright (C) 2000, 2001 VideoLAN
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Stéphane Borel <stef@via.ecp.fr>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -733,3 +734,101 @@ on_popup_disc_activate                 (GtkMenuItem     *menuitem,
     gdk_window_raise( p_intf->p_sys->p_disc->window );
 }
 
+
+void
+on_popup_audio_activate                (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+    es_descriptor_t *       p_es;
+
+    p_es = (es_descriptor_t*)user_data;
+
+    input_ChangeES( p_intf->p_input, p_es, 1 );
+}
+
+
+void
+on_popup_subpictures_activate          (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+    es_descriptor_t *       p_es;
+
+    p_es = (es_descriptor_t*)user_data;
+
+    input_ChangeES( p_intf->p_input, p_es, 2 );
+}
+
+
+void
+on_menubar_audio_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    es_descriptor_t *       p_es;
+
+    p_es = (es_descriptor_t*)user_data;
+
+    input_ChangeES( p_intf->p_input, p_es, 1 );
+}
+
+
+void
+on_menubar_subpictures_activate        (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    es_descriptor_t *       p_es;
+
+    p_es = (es_descriptor_t*)user_data;
+
+    input_ChangeES( p_intf->p_input, p_es, 2 );
+}
+
+
+void
+on_popup_navigation_activate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+    input_area_t *  p_area;
+    gint            i_title;
+    gint            i_chapter;
+
+    i_title   = (gint)(user_data) / 100 ;
+    i_chapter = (gint)(user_data) - ( 100 * i_title );
+fprintf(stderr, "title %d chapter %d\n", i_title, i_chapter );
+    p_area    = p_intf->p_input->stream.pp_areas[i_title];
+    p_area->i_part = i_chapter;
+
+    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+}
+
+
+void
+on_menubar_title_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+
+    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)user_data );
+    p_intf->p_sys->b_menus_update = 1;
+    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+}
+
+
+void
+on_menubar_chapter_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    input_area_t *  p_area    = p_intf->p_input->stream.p_selected_area;
+    gint            i_chapter = (gint)user_data;
+
+    p_area->i_part = i_chapter;
+
+    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+}

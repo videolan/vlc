@@ -36,11 +36,18 @@ create_intf_window (void)
   GtkWidget *menubar_view;
   GtkWidget *menubar_view_menu;
   GtkAccelGroup *menubar_view_menu_accels;
+  GtkWidget *menubar_title;
+  GtkWidget *menubar_chapter;
+  GtkWidget *separator11;
   GtkWidget *menubar_playlist;
   GtkWidget *menubar_modules;
   GtkWidget *menubar_settings;
   GtkWidget *menubar_settings_menu;
   GtkAccelGroup *menubar_settings_menu_accels;
+  GtkWidget *separator7;
+  GtkWidget *menubar_audio;
+  GtkWidget *menubar_subpictures;
+  GtkWidget *separator8;
   GtkWidget *menubar_preferences;
   GtkWidget *menubar_help;
   GtkWidget *menubar_help_menu;
@@ -182,6 +189,39 @@ create_intf_window (void)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menubar_view), menubar_view_menu);
   menubar_view_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (menubar_view_menu));
 
+  menubar_title = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_title)->child),
+                                   _("_Title"));
+  gtk_widget_add_accelerator (menubar_title, "activate_item", menubar_view_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_title);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_title", menubar_title,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_title);
+  gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_title);
+  gtk_widget_set_sensitive (menubar_title, FALSE);
+  gtk_tooltips_set_tip (tooltips, menubar_title, _("Navigate through the stream"), NULL);
+
+  menubar_chapter = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_chapter)->child),
+                                   _("_Chapter"));
+  gtk_widget_add_accelerator (menubar_chapter, "activate_item", menubar_view_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_chapter);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_chapter", menubar_chapter,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_chapter);
+  gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_chapter);
+  gtk_widget_set_sensitive (menubar_chapter, FALSE);
+
+  separator11 = gtk_menu_item_new ();
+  gtk_widget_ref (separator11);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator11", separator11,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator11);
+  gtk_container_add (GTK_CONTAINER (menubar_view_menu), separator11);
+  gtk_widget_set_sensitive (separator11, FALSE);
+
   menubar_playlist = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_playlist)->child),
                                    _("_Playlist..."));
@@ -225,6 +265,48 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menubar_settings), menubar_settings_menu);
   menubar_settings_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (menubar_settings_menu));
+
+  separator7 = gtk_menu_item_new ();
+  gtk_widget_ref (separator7);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator7", separator7,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator7);
+  gtk_container_add (GTK_CONTAINER (menubar_settings_menu), separator7);
+  gtk_widget_set_sensitive (separator7, FALSE);
+
+  menubar_audio = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_audio)->child),
+                                   _("A_udio"));
+  gtk_widget_add_accelerator (menubar_audio, "activate_item", menubar_settings_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_audio);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_audio", menubar_audio,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_audio);
+  gtk_container_add (GTK_CONTAINER (menubar_settings_menu), menubar_audio);
+  gtk_widget_set_sensitive (menubar_audio, FALSE);
+  gtk_tooltips_set_tip (tooltips, menubar_audio, _("Select audio language"), NULL);
+
+  menubar_subpictures = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_subpictures)->child),
+                                   _("Sub _Pictures"));
+  gtk_widget_add_accelerator (menubar_subpictures, "activate_item", menubar_settings_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_subpictures);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_subpictures", menubar_subpictures,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_subpictures);
+  gtk_container_add (GTK_CONTAINER (menubar_settings_menu), menubar_subpictures);
+  gtk_widget_set_sensitive (menubar_subpictures, FALSE);
+  gtk_tooltips_set_tip (tooltips, menubar_subpictures, _("Select sub-title"), NULL);
+
+  separator8 = gtk_menu_item_new ();
+  gtk_widget_ref (separator8);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator8", separator8,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator8);
+  gtk_container_add (GTK_CONTAINER (menubar_settings_menu), separator8);
+  gtk_widget_set_sensitive (separator8, FALSE);
 
   menubar_preferences = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_preferences)->child),
@@ -545,6 +627,11 @@ create_intf_popup (void)
   GtkWidget *popup_open;
   GtkWidget *popup_disc;
   GtkWidget *separator5;
+  GtkWidget *popup_navigation;
+  GtkWidget *separator10;
+  GtkWidget *popup_audio;
+  GtkWidget *popup_subpictures;
+  GtkWidget *separator9;
   GtkWidget *popup_about;
   GtkWidget *popup_exit;
   GtkTooltips *tooltips;
@@ -626,6 +713,54 @@ create_intf_popup (void)
   gtk_widget_show (separator5);
   gtk_container_add (GTK_CONTAINER (intf_popup), separator5);
   gtk_widget_set_sensitive (separator5, FALSE);
+
+  popup_navigation = gtk_menu_item_new_with_label (_("Navigation"));
+  gtk_widget_ref (popup_navigation);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_navigation", popup_navigation,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_navigation);
+  gtk_container_add (GTK_CONTAINER (intf_popup), popup_navigation);
+  gtk_widget_set_sensitive (popup_navigation, FALSE);
+
+  separator10 = gtk_menu_item_new ();
+  gtk_widget_ref (separator10);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator10", separator10,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator10);
+  gtk_container_add (GTK_CONTAINER (intf_popup), separator10);
+  gtk_widget_set_sensitive (separator10, FALSE);
+
+  popup_audio = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_audio)->child),
+                                   _("A_udio"));
+  gtk_widget_add_accelerator (popup_audio, "activate_item", intf_popup_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (popup_audio);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio", popup_audio,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_audio);
+  gtk_container_add (GTK_CONTAINER (intf_popup), popup_audio);
+  gtk_widget_set_sensitive (popup_audio, FALSE);
+
+  popup_subpictures = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_subpictures)->child),
+                                   _("Sub _Pictures"));
+  gtk_widget_add_accelerator (popup_subpictures, "activate_item", intf_popup_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (popup_subpictures);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_subpictures", popup_subpictures,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_subpictures);
+  gtk_container_add (GTK_CONTAINER (intf_popup), popup_subpictures);
+  gtk_widget_set_sensitive (popup_subpictures, FALSE);
+
+  separator9 = gtk_menu_item_new ();
+  gtk_widget_ref (separator9);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator9", separator9,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator9);
+  gtk_container_add (GTK_CONTAINER (intf_popup), separator9);
+  gtk_widget_set_sensitive (separator9, FALSE);
 
   popup_about = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_about)->child),

@@ -2,7 +2,7 @@
  * gtk_sys.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_sys.h,v 1.2 2001/03/04 03:12:00 sam Exp $
+ * $Id: gtk_sys.h,v 1.3 2001/03/07 10:31:10 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,6 +38,7 @@ typedef struct intf_sys_s
     boolean_t           b_popup_changed;                   /* display menu ? */
     boolean_t           b_window_changed;        /* window display toggled ? */
     boolean_t           b_playlist_changed;    /* playlist display toggled ? */
+    boolean_t           b_menus_update;              /* menus have changed ? */
     boolean_t           b_scale_isfree;       /* user isn't dragging scale ? */
 
     /* intf_Manage callback timeout */

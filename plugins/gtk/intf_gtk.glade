@@ -144,6 +144,29 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
+	      <name>menubar_title</name>
+	      <sensitive>False</sensitive>
+	      <tooltip>Navigate through the stream</tooltip>
+	      <label>_Title</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_chapter</name>
+	      <sensitive>False</sensitive>
+	      <label>_Chapter</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator11</name>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
 	      <name>menubar_playlist</name>
 	      <sensitive>False</sensitive>
 	      <tooltip>Open the playlist window</tooltip>
@@ -181,6 +204,36 @@
 	  <widget>
 	    <class>GtkMenu</class>
 	    <name>menubar_settings_menu</name>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator7</name>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_audio</name>
+	      <sensitive>False</sensitive>
+	      <tooltip>Select audio language</tooltip>
+	      <label>A_udio</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_subpictures</name>
+	      <sensitive>False</sensitive>
+	      <tooltip>Select sub-title</tooltip>
+	      <label>Sub _Pictures</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator8</name>
+	      <right_justify>False</right_justify>
+	    </widget>
 
 	    <widget>
 	      <class>GtkMenuItem</class>
@@ -582,6 +635,42 @@
   <widget>
     <class>GtkMenuItem</class>
     <name>separator5</name>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_navigation</name>
+    <sensitive>False</sensitive>
+    <label>Navigation</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>separator10</name>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_audio</name>
+    <sensitive>False</sensitive>
+    <label>A_udio</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_subpictures</name>
+    <sensitive>False</sensitive>
+    <label>Sub _Pictures</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>separator9</name>
     <right_justify>False</right_justify>
   </widget>
 
