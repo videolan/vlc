@@ -343,6 +343,8 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "prev", Playlist, NULL );
     var_Create( p_intf, "next", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "next", Playlist, NULL );
+    var_Create( p_intf, "goto", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "goto", Playlist, NULL );
   
     var_Create( p_intf, "marq-marquee", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-marquee", Other, NULL );
@@ -369,6 +371,11 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "chapter_n", Input, NULL );
     var_Create( p_intf, "chapter_p", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "chapter_p", Input, NULL );
+
+    var_Create( p_intf, "fastforward", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "fastforward", Input, NULL );
+    var_Create( p_intf, "rewind", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "rewind", Input, NULL );
 
     var_Create( p_intf, "volume", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "volume", Volume, NULL );
@@ -607,38 +614,42 @@ static void Run( intf_thread_t *p_intf )
         case 'h':
         case 'H':
             msg_rtci(_("+----[ Remote control commands ]\n"));
-            msg_rtci("| \n");
+            msg_rtci(  "| \n");
             msg_rtci(_("| add XYZ  . . . . . . . . . . add XYZ to playlist\n"));
             msg_rtci(_("| playlist . . .  show items currently in playlist\n"));
             msg_rtci(_("| play . . . . . . . . . . . . . . . . play stream\n"));
             msg_rtci(_("| stop . . . . . . . . . . . . . . . . stop stream\n"));
             msg_rtci(_("| next . . . . . . . . . . . .  next playlist item\n"));
             msg_rtci(_("| prev . . . . . . . . . .  previous playlist item\n"));
+            msg_rtci(_("| goto . . . . . . . . . . . .  goto item at index\n"));
             msg_rtci(_("| title [X]  . . . . set/get title in current item\n"));
             msg_rtci(_("| title_n  . . . . . .  next title in current item\n"));
             msg_rtci(_("| title_p  . . . .  previous title in current item\n"));
             msg_rtci(_("| chapter [X]  . . set/get chapter in current item\n"));
             msg_rtci(_("| chapter_n  . . . .  next chapter in current item\n"));
             msg_rtci(_("| chapter_p  . .  previous chapter in current item\n"));
-            msg_rtci("| \n");
+            msg_rtci(  "| \n");
             msg_rtci(_("| seek X . seek in seconds, for instance `seek 12'\n"));
             msg_rtci(_("| pause  . . . . . . . . . . . . . .  toggle pause\n"));
+            msg_rtci(_("| fastforward  . . . . . .  .  set to maximum rate\n"));
+            msg_rtci(_("| rewind  . . . . . . . . . .  set to minimum rate\n"));
             msg_rtci(_("| f  . . . . . . . . . . . . . . toggle fullscreen\n"));
             msg_rtci(_("| info . . .  information about the current stream\n"));
-            msg_rtci("| \n");
+            msg_rtci(  "| \n");
             msg_rtci(_("| volume [X] . . . . . . . .  set/get audio volume\n"));
             msg_rtci(_("| volup [X]  . . . . .  raise audio volume X steps\n"));
             msg_rtci(_("| voldown [X]  . . . .  lower audio volume X steps\n"));
             msg_rtci(_("| adev [X] . . . . . . . . .  set/get audio device\n"));
             msg_rtci(_("| achan [X]. . . . . . . .  set/get audio channels\n"));
-            msg_rtci("| \n");
+            msg_rtci(  "| \n");
+
             if (p_intf->p_sys->b_extend)
             {
-	           msg_rtci(_("| marq-marquee STRING  . . overlay STRING in video\n"));
-               msg_rtci(_("| marq-x X . . . . . .offset of marquee, from left\n"));
-               msg_rtci(_("| marq-y Y . . . . . . offset of marquee, from top\n"));
-               msg_rtci(_("| marq-timeout T. . . . .timeout of marquee, in ms\n"));
-               msg_rtci("| \n");
+	        msg_rtci(_("| marq-marquee STRING  . . overlay STRING in video\n"));
+                msg_rtci(_("| marq-x X . . . . . .offset of marquee, from left\n"));
+                msg_rtci(_("| marq-y Y . . . . . . offset of marquee, from top\n"));
+                msg_rtci(_("| marq-timeout T. . . . .timeout of marquee, in ms\n"));
+                msg_rtci("| \n");
             }    
             msg_rtci(_("| help . . . . . . . . . . . . . this help message\n"));
             msg_rtci(_("| logout . . . . . .exit (if in socket connection)\n"));
@@ -708,7 +719,22 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
-   
+    else if ( !strcmp( psz_cmd, "fastforward" ) )
+    {
+        val.i_int = INPUT_RATE_MAX;
+
+        var_Set( p_input, "rate", val );
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
+    }
+    else if ( !strcmp( psz_cmd, "rewind" ) )
+    {
+        val.i_int = INPUT_RATE_MIN;
+
+        var_Set( p_input, "rate", val );
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
+    }
     else if( !strcmp( psz_cmd, "chapter" ) ||
              !strcmp( psz_cmd, "chapter_n" ) ||
              !strcmp( psz_cmd, "chapter_p" ) )
@@ -820,6 +846,14 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     {
         playlist_Play( p_playlist );
     }
+    else if (!strcmp( psz_cmd, "goto" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            playlist_Goto( p_playlist, val.i_int); 
+        }
+    }
     else if( !strcmp( psz_cmd, "stop" ) )
     {
         playlist_Stop( p_playlist );
@@ -835,9 +869,11 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         int i;
         for ( i = 0; i < p_playlist->i_size; i++ )
         {
-            msg_rtci( "|%s%s   %s|\n", i == p_playlist->i_index?"*":" ",
+            msg_rtci( "|%s%s   %s|\n", i == p_playlist->i_index ? "*" : " ",
                     p_playlist->pp_items[i]->input.psz_name,
-                    p_playlist->pp_items[i]->input.psz_uri );
+                    p_playlist->pp_items[i]->input.psz_uri,
+                    p_playlist->pp_items[i]->i_parents > 0 ?
+                    p_playlist->pp_items[i]->pp_parents[0]->p_parent->input.psz_name : "" );
         }
         if ( i == 0 )
         {
