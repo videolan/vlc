@@ -24,10 +24,6 @@
  *****************************************************************************/
 
 /* TODO
- * connect delegates, actions and outlets in IB
- * implement delete by backspace
- * implement playlist item rightclick menu
- * implement sorting
  * add 'icons' for different types of nodes? (http://www.cocoadev.com/index.pl?IconAndTextInTableCell)
  * create a new 'playlist toggle' that hides the playlist and in effect give you the old controller
  * create a new search field build with pictures from the 'regular' search field, so it can be emulated on 10.2
@@ -140,6 +136,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
 
     o_outline_dict = [[NSMutableDictionary alloc] init];
+    o_tc_sortColumn = nil;
 
     [self initStrings];
     //[self playlistUpdated];
@@ -172,6 +169,17 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (void)playlistUpdated
 {
+    unsigned int i;
+
+    /* Clear indications of any existing column sorting*/
+    for( i = 0 ; i < [[o_outline_view tableColumns] count] ; i++ )
+    {
+        [o_outline_view setIndicatorImage:nil inTableColumn:
+                            [[o_outline_view tableColumns] objectAtIndex:i]];
+    }
+
+    [o_outline_view setHighlightedTableColumn:nil];
+    o_tc_sortColumn = nil;
     [o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
 }
@@ -661,6 +669,77 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 {
     return [[o_outline_view itemAtRow: [o_outline_view selectedRow]]
                                                                 pointerValue];
+}
+
+- (void) outlineView:(NSTableView*)o_tv
+                  didClickTableColumn:(NSTableColumn *)o_tc
+{
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    playlist_view_t * p_view  = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+    int i_mode = 0, i_type;
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    /* Check whether the selected table column header corresponds to a
+       sortable table column*/
+    if ( !(o_tc == o_tc_name || o_tc == o_tc_author))
+    {
+        return;
+    }
+
+    if( o_tc_sortColumn == o_tc )
+    {
+        b_isSortDescending = !b_isSortDescending;
+    }
+    else
+    {
+        b_isSortDescending = VLC_FALSE;
+    }
+
+    if (o_tc == o_tc_name)
+    {
+        i_mode = SORT_TITLE;
+    }
+    else if (o_tc == o_tc_author)
+    {
+        i_mode = SORT_AUTHOR;
+    }
+
+    if (b_isSortDescending)
+    {
+        i_type = ORDER_REVERSE;
+    }
+    else
+    {
+        i_type = ORDER_NORMAL;
+    }
+
+    vlc_mutex_lock(&p_playlist->object_lock );
+    playlist_RecursiveNodeSort(p_playlist, p_view->p_root, i_mode, i_type);
+    vlc_mutex_unlock(&p_playlist->object_lock );
+
+    vlc_object_release( p_playlist );
+    [self playlistUpdated];
+
+    o_tc_sortColumn = o_tc;
+    [o_outline_view setHighlightedTableColumn:o_tc];
+
+    if (b_isSortDescending)
+    {
+        [o_outline_view setIndicatorImage:o_descendingSortingImage
+                                                        inTableColumn:o_tc];
+    }
+    else
+    {
+        [o_outline_view setIndicatorImage:o_ascendingSortingImage
+                                                        inTableColumn:o_tc];
+    }
 }
 
 @end

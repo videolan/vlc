@@ -61,6 +61,8 @@
     NSMutableDictionary * o_outline_dict;
 
     bool b_selected_item_met;
+    bool b_isSortDescending;
+    id o_tc_sortColumn;
 }
 
 - (IBAction)handlePopUp:(id)sender;
