@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.10 2002/11/14 22:38:47 massiot Exp $
+ * $Id: rc.c,v 1.11 2002/11/20 15:34:39 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -152,6 +152,19 @@ static void Run( intf_thread_t *p_intf )
     var_Set( p_intf, "prev", (vlc_value_t)(void*)Playlist );
     var_Create( p_intf, "next", VLC_VAR_COMMAND );
     var_Set( p_intf, "next", (vlc_value_t)(void*)Playlist );
+
+    var_Create( p_intf, "title", VLC_VAR_COMMAND );
+    var_Set( p_intf, "title", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "title_n", VLC_VAR_COMMAND );
+    var_Set( p_intf, "title_n", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "title_p", VLC_VAR_COMMAND );
+    var_Set( p_intf, "title_p", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "chapter", VLC_VAR_COMMAND );
+    var_Set( p_intf, "chapter", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "chapter_n", VLC_VAR_COMMAND );
+    var_Set( p_intf, "chapter_n", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "chapter_p", VLC_VAR_COMMAND );
+    var_Set( p_intf, "chapter_p", (vlc_value_t)(void*)Playlist );
 
     var_Create( p_intf, "volume", VLC_VAR_COMMAND );
     var_Set( p_intf, "volume", (vlc_value_t)(void*)Volume );
@@ -386,6 +399,12 @@ static void Run( intf_thread_t *p_intf )
                 printf("| stop . . . . . . . . . . . . . . . . stop stream\n");
                 printf("| next . . . . . . . . . . . .  next playlist item\n");
                 printf("| prev . . . . . . . . . .  previous playlist item\n");
+                printf("| title [X]  . . . . set/get title in current item\n");
+                printf("| title_n  . . . . . .  next title in current item\n");
+                printf("| title_p  . . . .  previous title in current item\n");
+                printf("| chapter [X]  . . set/get chapter in current item\n");
+                printf("| chapter_n  . . . .  next chapter in current item\n");
+                printf("| chapter_p  . .  previous chapter in current item\n");
                 printf("| \n");
                 printf("| r X  . . . seek in seconds, for instance `r 3.5'\n");
                 printf("| pause  . . . . . . . . . . . . . .  toggle pause\n");
@@ -445,6 +464,115 @@ static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
+    else if( !strcmp( psz_cmd, "chapter" ) ||
+             !strcmp( psz_cmd, "chapter_n" ) ||
+             !strcmp( psz_cmd, "chapter_p" ) )
+    {
+        int i_chapter = 0;
+
+        if( !strcmp( psz_cmd, "chapter" ) )
+        {
+            if ( *psz_arg )
+            {
+                /* Set. */
+                i_chapter = atoi( psz_arg );
+            }
+            else
+            {
+                /* Get. */
+                vlc_mutex_lock( &p_input->stream.stream_lock );
+                printf( "Currently playing chapter %d\n",
+                        p_input->stream.p_selected_area->i_part );
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+                vlc_object_release( p_input );
+                return VLC_SUCCESS;
+            }
+        }
+        else if( !strcmp( psz_cmd, "chapter_n" ) )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            i_chapter = p_input->stream.p_selected_area->i_part + 1;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+        else if( !strcmp( psz_cmd, "chapter_p" ) )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            i_chapter = p_input->stream.p_selected_area->i_part - 1;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        if( ( i_chapter > 0 ) && ( i_chapter <=
+            p_input->stream.p_selected_area->i_part_nb ) )
+        {
+          p_input->stream.p_selected_area->i_part = i_chapter;
+          vlc_mutex_unlock( &p_input->stream.stream_lock );
+          input_ChangeArea( p_input,
+                            (input_area_t*)p_input->stream.p_selected_area );
+          input_SetStatus( p_input, INPUT_STATUS_PLAY );
+          vlc_mutex_lock( &p_input->stream.stream_lock );
+        }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
+    }
+    else if( !strcmp( psz_cmd, "title" ) ||
+             !strcmp( psz_cmd, "title_n" ) ||
+             !strcmp( psz_cmd, "title_p" ) )
+    {
+        int i_title = 0;
+
+        if( !strcmp( psz_cmd, "title" ) )
+        {
+            if ( *psz_arg )
+            {
+                /* Set. */
+                i_title = atoi( psz_arg );
+            }
+            else
+            {
+                /* Get. */
+                vlc_mutex_lock( &p_input->stream.stream_lock );
+                printf( "Currently playing title %d\n",
+                        p_input->stream.p_selected_area->i_id );
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+                vlc_object_release( p_input );
+                return VLC_SUCCESS;
+            }
+        }
+        else if( !strcmp( psz_cmd, "title_n" ) )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            i_title = p_input->stream.p_selected_area->i_id + 1;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+        else if( !strcmp( psz_cmd, "title_p" ) )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            i_title = p_input->stream.p_selected_area->i_id - 1;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        if( ( i_title > 0 ) && ( i_title <=
+            p_input->stream.p_selected_area->i_part_nb ) )
+        {
+          p_input->stream.p_selected_area->i_part = i_title;
+          vlc_mutex_unlock( &p_input->stream.stream_lock );
+          input_ChangeArea( p_input,
+                            (input_area_t*)p_input->stream.pp_areas[i_title] );
+          input_SetStatus( p_input, INPUT_STATUS_PLAY );
+          vlc_mutex_lock( &p_input->stream.stream_lock );
+        }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
+    }
+
 
     p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
                                            FIND_PARENT );
@@ -473,6 +601,7 @@ static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
         playlist_Stop( p_playlist );
     }
 
+    vlc_object_release( p_playlist );
     return VLC_SUCCESS;
 }
 
