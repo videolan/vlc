@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.11 2003/05/06 16:05:10 fenrir Exp $
+ * $Id: libmp4.h,v 1.12 2003/05/07 02:31:20 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@
 
 #define FOURCC_ftyp VLC_FOURCC( 'f', 't', 'y', 'p' )
 #define FOURCC_moov VLC_FOURCC( 'm', 'o', 'o', 'v' )
+#define FOURCC_foov VLC_FOURCC( 'f', 'o', 'o', 'v' )
 #define FOURCC_cmov VLC_FOURCC( 'c', 'm', 'o', 'v' )
 #define FOURCC_dcom VLC_FOURCC( 'd', 'c', 'o', 'm' )
 #define FOURCC_cmvd VLC_FOURCC( 'c', 'm', 'v', 'd' )
@@ -108,6 +109,7 @@
 #define FOURCC_alaw VLC_FOURCC( 'a', 'l', 'a', 'w' )
 #define FOURCC_ulaw VLC_FOURCC( 'u', 'l', 'a', 'w' )
 #define FOURCC_Qclp VLC_FOURCC( 'Q', 'c', 'l', 'p' )
+#define FOURCC_samr VLC_FOURCC( 's', 'a', 'm', 'r' )
 
 #define FOURCC_zlib VLC_FOURCC( 'z', 'l', 'i', 'b' )
 #define FOURCC_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )

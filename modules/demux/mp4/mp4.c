@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.29 2003/05/06 16:05:10 fenrir Exp $
+ * $Id: mp4.c,v 1.30 2003/05/07 02:31:20 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -147,6 +147,7 @@ static int MP4Init( vlc_object_t * p_this )
     {
         case( FOURCC_ftyp ):
         case( FOURCC_moov ):
+        case( FOURCC_foov ):
         case( FOURCC_moof ):
         case( FOURCC_mdat ):
         case( FOURCC_udta ):
@@ -201,13 +202,18 @@ static int MP4Init( vlc_object_t * p_this )
     }
 
     /* the file need to have one moov box */
-    if( MP4_BoxCount( &p_demux->box_root, "/moov" ) != 1 )
+    if( MP4_BoxCount( &p_demux->box_root, "/moov" ) <= 0 )
     {
-        msg_Err( p_input,
-                 "MP4 plugin discarded (%d moov boxes)",
-                 MP4_BoxCount( &p_demux->box_root, "/moov" ) );
-//        MP4End( p_input );
-//        return( -1 );
+        MP4_Box_t *p_foov = MP4_BoxGet( &p_demux->box_root, "/foov" );
+
+        if( !p_foov )
+        {
+            msg_Err( p_input, "MP4 plugin discarded (no moov box)" );
+            MP4End( p_input );
+            return( VLC_EGENERIC );
+        }
+        /* we have a free box as a moov, rename it */
+        p_foov->i_type = FOURCC_moov;
     }
 
     if( ( p_rmra = MP4_BoxGet( &p_demux->box_root,  "/moov/rmra" ) ) )

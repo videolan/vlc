@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.24 2003/05/06 16:05:10 fenrir Exp $
+ * $Id: libmp4.c,v 1.25 2003/05/07 02:31:20 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -658,6 +658,32 @@ void MP4_FreeBox_Common( input_thread_t *p_input, MP4_Box_t *p_box )
 
 int MP4_ReadBoxSkip( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
+    /* XXX sometime moov is hiden in a free box */
+    if( p_box->p_father && p_box->p_father->i_type == VLC_FOURCC( 'r', 'o', 'o', 't' )&&
+        p_box->i_type == FOURCC_free )
+    {
+        uint8_t *p_peek;
+        int     i_read;
+        vlc_fourcc_t i_fcc;
+
+        i_read  = MP4_PeekStream( p_stream, &p_peek, 44 );
+
+        p_peek += MP4_BOX_HEADERSIZE( p_box ) + 4;
+        i_read -= MP4_BOX_HEADERSIZE( p_box ) + 4;
+
+        if( i_read >= 8 )
+        {
+            i_fcc = VLC_FOURCC( p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
+
+            if( i_fcc == FOURCC_cmov || i_fcc == FOURCC_mvhd )
+            {
+                msg_Warn( p_stream->p_input, "Detected moov hidden in a free box ..." );
+
+                p_box->i_type = FOURCC_foov;
+                return MP4_ReadBoxContainer( p_stream, p_box );
+            }
+        }
+    }
     /* Nothing to do */
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Skip box: \"%4.4s\"",
@@ -1826,8 +1852,8 @@ int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     }
     memset( p_box->data.p_cmov, 0, sizeof( MP4_Box_data_cmov_t ) );
 
-    if( !( p_box->p_father )||
-        ( p_box->p_father->i_type != FOURCC_moov ) )
+    if( !p_box->p_father ||
+        ( p_box->p_father->i_type != FOURCC_moov && p_box->p_father->i_type != FOURCC_foov) )
     {
         msg_Warn( p_stream->p_input, "Read box: \"cmov\" box alone" );
         return( 1 );
@@ -2113,6 +2139,7 @@ static struct
     { FOURCC_MAC3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_MAC6,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_Qclp,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_samr,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
 
     { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mp4v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
@@ -2413,8 +2440,10 @@ int MP4_BoxGetRoot( input_thread_t *p_input, MP4_Box_t *p_root )
 
         /* check if there is a cmov, if so replace
           compressed moov by  uncompressed one */
-        if( ( p_moov = MP4_FindBox( p_root, FOURCC_moov ) )&&
-            ( p_cmov = MP4_FindBox( p_moov, FOURCC_cmov ) ) )
+        if( ( ( p_moov = MP4_FindBox( p_root, FOURCC_moov ) )&&
+              ( p_cmov = MP4_FindBox( p_moov, FOURCC_cmov ) ) ) ||
+            ( ( p_moov = MP4_FindBox( p_root, FOURCC_foov ) )&&
+              ( p_cmov = MP4_FindBox( p_moov, FOURCC_cmov ) ) ) )
         {
             /* rename the compressed moov as a box to skip */
             p_moov->i_type = FOURCC_skip;
