@@ -112,9 +112,10 @@ static int  Control( demux_t *, int, va_list );
 static void Seek   ( demux_t *, mtime_t i_date, int i_percent );
 
 #ifdef HAVE_ZLIB_H
-int do_zlib_decompress( unsigned char *src, unsigned char **_dst, int slen ) {
+block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
     int result, dstsize, n;
     unsigned char *dst;
+    block_t *p_block;
     z_stream d_stream;
 
     d_stream.zalloc = (alloc_func)0;
@@ -123,25 +124,27 @@ int do_zlib_decompress( unsigned char *src, unsigned char **_dst, int slen ) {
     result = inflateInit(&d_stream);
     if( result != Z_OK )
     {
-        printf( "inflateInit() failed. Result: %d\n", result );
-        return( -1 );
+        msg_Dbg( p_this, "inflateInit() failed. Result: %d", result );
+        return NULL;
     }
 
-    d_stream.next_in = (Bytef *)src;
-    d_stream.avail_in = slen;
+    d_stream.next_in = (Bytef *)p_in_block->p_buffer;
+    d_stream.avail_in = p_in_block->i_buffer;
     n = 0;
+    p_block = block_New( p_this, 0 );
     dst = NULL;
     do
     {
         n++;
-        dst = (unsigned char *)realloc(dst, n * 1000);
+        p_block = block_Realloc( p_block, 0, n * 1000 );
+        dst = (unsigned char *)p_block->p_buffer;
         d_stream.next_out = (Bytef *)&dst[(n - 1) * 1000];
         d_stream.avail_out = 1000;
         result = inflate(&d_stream, Z_NO_FLUSH);
         if( ( result != Z_OK ) && ( result != Z_STREAM_END ) )
         {
-            printf( "Zlib decompression failed. Result: %d\n", result );
-            return( -1 );
+            msg_Dbg( p_this, "Zlib decompression failed. Result: %d", result );
+            return NULL;
         }
     }
     while( ( d_stream.avail_out == 0 ) && ( d_stream.avail_in != 0 ) &&
@@ -150,9 +153,11 @@ int do_zlib_decompress( unsigned char *src, unsigned char **_dst, int slen ) {
     dstsize = d_stream.total_out;
     inflateEnd( &d_stream );
 
-    *_dst = (unsigned char *)realloc( dst, dstsize );
+    p_block = block_Realloc( p_block, 0, dstsize );
+    p_block->i_buffer = dstsize;
+    block_Release( p_in_block );
 
-    return dstsize;
+    return p_block;
 }
 #endif
 
@@ -1069,6 +1074,10 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         DataBuffer &data = block->GetBuffer(i);
 
         p_block = MemToBlock( p_demux, data.Buffer(), data.Size() );
+        if( p_block != NULL && tk.b_compression_zlib )
+        {
+            p_block = block_zlib_decompress( VLC_OBJECT(p_demux), p_block );
+        }
         if( p_block == NULL )
         {
             break;
