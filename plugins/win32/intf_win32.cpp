@@ -77,6 +77,8 @@ static int intf_Open( intf_thread_t *p_intf )
     /* Initialize Win32 thread */
     p_intf->p_sys->b_playing = 0;
     p_intf->p_sys->b_popup_changed = 0;
+
+    p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->i_playing = -1;
     p_intf->p_sys->b_slider_free = 1;
 
@@ -88,6 +90,11 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+    }
+
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     /* Destroy structure */
@@ -100,7 +107,7 @@ static void intf_Close( intf_thread_t *p_intf )
 static void intf_Run( intf_thread_t *p_intf )
 {
     p_intf->p_sys->p_window = new TMainFrameDlg( NULL );
-    p_intf->p_sys->p_playlist = new TPlaylistDlg( NULL );
+    p_intf->p_sys->p_playwin = new TPlaylistDlg( NULL );
     p_intf->p_sys->p_messages = new TMessagesDlg( NULL );
 
     /* show main window and wait until it is closed */
@@ -110,7 +117,7 @@ static void intf_Run( intf_thread_t *p_intf )
     if( p_intf->p_sys->p_network ) delete p_intf->p_sys->p_network;
     if( p_intf->p_sys->p_preferences ) delete p_intf->p_sys->p_preferences;
     delete p_intf->p_sys->p_messages;
-    delete p_intf->p_sys->p_playlist;
+    delete p_intf->p_sys->p_playwin;
 }
 
 /*****************************************************************************
@@ -138,16 +145,30 @@ int Win32Manage( intf_thread_t *p_intf )
     p_intf->p_sys->p_messages->UpdateLog();
 
     /* Update the playlist */
-    p_intf->p_sys->p_playlist->Manage( p_intf );
+    p_intf->p_sys->p_playwin->Manage( p_intf );
 
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    /* Update the input */
+    if( p_intf->p_sys->p_input == NULL )
     {
-        vlc_mutex_lock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+        p_intf->p_sys->p_input = (input_thread_t *)
+                    vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    }
+    else if( p_intf->p_sys->p_input->b_dead )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+        p_intf->p_sys->p_input = NULL;
+    }
+    
+    if( p_intf->p_sys->p_input )
+    {
+        input_thread_t *p_input = p_intf->p_sys->p_input;
 
-        if( !p_intf->p_vlc->p_input_bank->pp_input[0]->b_die )
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+
+        if( !p_input->b_die )
         {
             /* New input or stream map change */
-            if( p_intf->p_vlc->p_input_bank->pp_input[0]->stream.b_changed )
+            if( p_input->stream.b_changed )
             {
                 p_intf->p_sys->p_window->ModeManage();
                 SetupMenus( p_intf );
@@ -155,13 +176,12 @@ int Win32Manage( intf_thread_t *p_intf )
             }
 
             /* Manage the slider */
-            if( p_intf->p_vlc->p_input_bank->pp_input[0]->stream.b_seekable &&
-                p_intf->p_sys->b_playing )
+            if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
             {
                 TTrackBar * TrackBar = p_intf->p_sys->p_window->TrackBar;
                 off_t NewValue = TrackBar->Position;
 
-#define p_area p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area
+#define p_area p_input->stream.p_selected_area
                 /* If the user hasn't touched the slider since the last time,
                  * then the input can safely change it */
                 if( NewValue == p_intf->p_sys->OldValue )
@@ -179,9 +199,9 @@ int Win32Manage( intf_thread_t *p_intf )
                                 (off_t)SLIDER_MAX_VALUE;
 
                     /* release the lock to be able to seek */
-                    vlc_mutex_unlock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
-                    input_Seek( p_intf->p_vlc->p_input_bank->pp_input[0]->p_this, i_seek, INPUT_SEEK_SET );
-                    vlc_mutex_lock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+                    vlc_mutex_unlock( &p_input->stream.stream_lock );
+                    input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+                    vlc_mutex_lock( &p_input->stream.stream_lock );
 
                     /* Update the old value */
                     p_intf->p_sys->OldValue = NewValue;
@@ -194,23 +214,20 @@ int Win32Manage( intf_thread_t *p_intf )
             }
 
             if( p_intf->p_sys->i_part !=
-                p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_part )
+                p_input->stream.p_selected_area->i_part )
             {
 //                p_intf->p_sys->b_chapter_update = 1;
                 SetupMenus( p_intf );
             }
         }
 
-        vlc_mutex_unlock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     else if( p_intf->p_sys->b_playing && !p_intf->p_vlc->b_die )
     {
         p_intf->p_sys->p_window->ModeManage();
         p_intf->p_sys->b_playing = 0;
     }
-
-    /* Manage core vlc functions through the callback */
-    p_intf->pf_manage( p_intf );
 
     if( p_intf->p_vlc->b_die )
     {

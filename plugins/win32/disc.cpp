@@ -64,7 +64,14 @@ void __fastcall TDiscDlg::BitBtnCancelClick( TObject *Sender )
 void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
 {
     AnsiString  Device, Source, Method, Title, Chapter;
-    int         i_end = p_intfGlobal->p_vlc->p_playlist->i_size;
+    playlist_t *    p_playlist;
+
+    p_playlist = (playlist_t *)
+        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {   
+        return;
+    }                        
 
     Hide();
 
@@ -86,20 +93,13 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
 
     /* Build source name and add it to playlist */
     Source = Method + ":" + Device + "@" + Title + "," + Chapter;
-    intf_PlaylistAdd( p_intfGlobal->p_vlc->p_playlist,
-                      PLAYLIST_END, Source.c_str() );
+    playlist_Add( p_playlist, Source.c_str(),
+                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
     /* update the display */
-    p_intfGlobal->p_sys->p_playlist->
-                            UpdateGrid( p_intfGlobal->p_vlc->p_playlist );
+    p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
 
-    /* stop current item, select added item */
-    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
-    {
-        p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-    }
-
-    intf_PlaylistJumpto( p_intfGlobal->p_vlc->p_playlist, i_end - 1 );
+    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )

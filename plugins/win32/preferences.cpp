@@ -194,7 +194,7 @@ void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
              p_module != NULL ;
              p_module = p_module->next )
         {
-            if( strcmp( p_module->psz_name, Name.c_str() ) == 0 )
+            if( strcmp( p_module->psz_object_name, Name.c_str() ) == 0 )
             {
                 ModuleSelected = p_module;
                 LabelHint->Caption = p_module->psz_longname ?
@@ -210,12 +210,13 @@ void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
 void __fastcall TGroupBoxPlugin::ButtonSelectClick( TObject *Sender )
 {
     if( !ModuleSelected ) return;
-    Edit->Text = ModuleSelected->psz_name;
+    Edit->Text = ModuleSelected->psz_object_name;
 }
 //---------------------------------------------------------------------------
 void __fastcall TGroupBoxPlugin::ButtonConfigClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->CreatePreferences( ModuleSelected->psz_name );
+    p_intfGlobal->p_sys->p_window->
+                        CreatePreferences( ModuleSelected->psz_object_name );
 }
 //---------------------------------------------------------------------------
 void __fastcall TGroupBoxPlugin::UpdateChanges()
@@ -271,10 +272,6 @@ __fastcall TGroupBoxInteger::TGroupBoxInteger( TComponent* Owner,
     /* init spinedit */
     SpinEdit = CreateSpinEdit( this, 16, 164, 24, 21,
                                -1, 100000, p_config->i_value );
-
-    /* init updown */
-    UpDown = CreateUpDown( this, -1, 32767, p_config->i_value, false );
-    UpDown->Associate = Edit;
 
     /* vertical alignment */
     Height = LabelDesc->Height + 24;
@@ -380,8 +377,11 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     for( p_module = p_intfGlobal->p_vlc->module_bank.first ; p_module != NULL ;
          p_module = p_module->next )
     {
-        if( psz_module_name && !strcmp( psz_module_name, p_module->psz_name ) )
+        if( psz_module_name
+             && !strcmp( psz_module_name, p_module->psz_object_name ) )
+        {
             break;
+        }
     }
     if( !p_module ) return;
 
@@ -431,7 +431,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
                     ( 1 << p_item->i_value ) )
                 {
                     ListItem = GroupBoxPlugin->ListView->Items->Add();
-                    ListItem->Caption = p_module_plugins->psz_name;
+                    ListItem->Caption = p_module_plugins->psz_object_name;
                 }
             }
 

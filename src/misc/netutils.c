@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.70 2002/06/07 21:45:30 sam Exp $
+ * $Id: netutils.c,v 1.71 2002/06/07 23:53:44 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -75,7 +75,7 @@
 #endif
 
 #include "netutils.h"
-#include "playlist.h"
+#include "vlc_playlist.h"
 
 #include "network.h"
 

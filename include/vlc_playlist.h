@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: playlist.h,v 1.7 2002/06/07 19:54:37 sam Exp $
+ * $Id: vlc_playlist.h,v 1.1 2002/06/07 23:53:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

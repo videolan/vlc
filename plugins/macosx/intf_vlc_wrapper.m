@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.12 2002/06/02 22:31:52 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.13 2002/06/07 23:53:44 sam Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -33,7 +33,7 @@
 #include <videolan/vlc.h>
 
 #include "interface.h"
-#include "intf_playlist.h"
+#include "vlc_playlist.h"
 #include "intf_eject.h"
 
 #include "video.h"

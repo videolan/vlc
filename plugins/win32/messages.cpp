@@ -89,7 +89,7 @@ void __fastcall TMessagesDlg::UpdateLog()
 
             /* Limit log size */
             i_count = RichEditMessages->Lines->Count;
-            i_max_lines = config_GetIntVariable( "intfwin-max-lines" );
+            i_max_lines = config_GetInt( p_intfGlobal, "intfwin-max-lines" );
             if( i_max_lines > 0 )
             {
                 for( i_del = 0; i_del <= i_count - i_max_lines; i_del++ )

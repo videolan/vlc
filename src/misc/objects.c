@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.9 2002/06/07 16:06:09 sam Exp $
+ * $Id: objects.c,v 1.10 2002/06/07 23:53:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,7 +41,7 @@
 
 #include "audio_output.h"
 
-#include "playlist.h"
+#include "vlc_playlist.h"
 #include "interface.h"
 
 /*****************************************************************************

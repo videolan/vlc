@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.8 2002/06/07 14:30:41 sam Exp $
+ * $Id: libvlc.c,v 1.9 2002/06/07 23:53:44 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -72,7 +72,7 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
-#include "playlist.h"
+#include "vlc_playlist.h"
 #include "interface.h"
 
 #include "audio_output.h"

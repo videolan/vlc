@@ -91,21 +91,21 @@ void __fastcall TMainFrameDlg::TrackBarChange( TObject *Sender )
      * the stream. It is called whenever the slider changes its value.
      * The lock has to be taken before the function is called */
 
-//    vlc_mutex_lock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+//    vlc_mutex_lock( &p_intfGlobal->p_sys->p_input->stream.stream_lock );
 
-    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intfGlobal->p_sys->p_input != NULL )
     {
-#define p_area p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area
+#define p_area p_intfGlobal->p_sys->p_input->stream.p_selected_area
         char psz_time[ OFFSETTOTIME_MAX_SIZE ];
         off_t Value = TrackBar->Position;
 
         GroupBoxSlider->Caption =
-                input_OffsetToTime( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], psz_time,
+                input_OffsetToTime( p_intfGlobal->p_sys->p_input, psz_time,
                         ( p_area->i_size * Value ) / (off_t)SLIDER_MAX_VALUE );
 #undef p_area
      }
 
-//    vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+//    vlc_mutex_unlock( &p_intfGlobal->p_sys->p_input->stream.stream_lock );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::FormClose( TObject *Sender,
@@ -128,26 +128,28 @@ void __fastcall TMainFrameDlg::FormClose( TObject *Sender,
  ****************************************************************************/
 void __fastcall TMainFrameDlg::MenuOpenFileClick( TObject *Sender )
 {
-    int             i_end = p_intfGlobal->p_vlc->p_playlist->i_size;
     AnsiString      FileName;
+    playlist_t *    p_playlist;
+
+    p_playlist = (playlist_t *)vlc_object_find( p_intfGlobal,
+                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
     if( OpenDialog1->Execute() )
     {
         /* add the new file to the interface playlist */
         FileName = OpenDialog1->FileName;
-        intf_PlaylistAdd( p_intfGlobal->p_vlc->p_playlist, PLAYLIST_END,
-            (char*)FileName.c_str() );
+        playlist_Add( p_playlist, (char*)FileName.c_str(),
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
         /* update the plugin display */
-        p_intfGlobal->p_sys->p_playlist->UpdateGrid( p_intfGlobal->p_vlc->p_playlist );
-
-        /* end current item, select added item  */
-        if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
-        {
-            p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-        }
-
-        intf_PlaylistJumpto( p_intfGlobal->p_vlc->p_playlist, i_end - 1 );
+        p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
     };
+
+    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::MenuOpenDiscClick( TObject *Sender )
@@ -184,27 +186,39 @@ void __fastcall TMainFrameDlg::MenuHideinterfaceClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::MenuFullscreenClick( TObject *Sender )
 {
-    if( p_intfGlobal->p_vlc->p_vout_bank->i_count )
+    vout_thread_t *p_vout;
+
+    p_vout = (vout_thread_t *)vlc_object_find( p_intfGlobal->p_sys->p_input,
+                                               VLC_OBJECT_VOUT, FIND_CHILD );
+    if( p_vout == NULL )
     {
-        vlc_mutex_lock( &p_intfGlobal->p_vlc->p_vout_bank->pp_vout[0]->change_lock );
-
-        p_intfGlobal->p_vlc->p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
-
-        vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_vout_bank->pp_vout[0]->change_lock );
+        return;
     }
+
+    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    vlc_object_release( p_vout );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::MenuPlaylistClick( TObject *Sender )
 {
-    TPlaylistDlg *p_playlist = p_intfGlobal->p_sys->p_playlist;
-    if( p_playlist->Visible )
+    TPlaylistDlg *p_playwin = p_intfGlobal->p_sys->p_playwin;
+    if( p_playwin->Visible )
     {
-        p_playlist->Hide();
+        p_playwin->Hide();
     }
     else
     {
-        p_playlist->UpdateGrid( p_intfGlobal->p_vlc->p_playlist );
-        p_playlist->Show();
+        playlist_t * p_playlist;
+        p_playlist = (playlist_t *)vlc_object_find( p_intfGlobal,
+                                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        if( p_playlist == NULL )
+        {
+            return;
+        }
+
+        p_playwin->UpdateGrid( p_playlist );
+        vlc_object_release( p_playlist );
+        p_playwin->Show();
     }
 }
 //---------------------------------------------------------------------------
@@ -282,17 +296,26 @@ void __fastcall TMainFrameDlg::ToolButtonFastClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::ToolButtonPrevClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_playlist->Previous();
+    p_intfGlobal->p_sys->p_playwin->Previous();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::ToolButtonNextClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_playlist->Next();
+    p_intfGlobal->p_sys->p_playwin->Next();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::ToolButtonEjectClick( TObject *Sender )
 {
     AnsiString Device = "";
+    char * psz_current;
+    playlist_t * p_playlist;
+
+    p_playlist = (playlist_t *)vlc_object_find( p_intfGlobal,
+                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
 
     /*
      * Get the active input
@@ -300,17 +323,23 @@ void __fastcall TMainFrameDlg::ToolButtonEjectClick( TObject *Sender )
      * If it's neither a VCD nor a DVD, then return
      */
 
-    if( p_intfGlobal->p_vlc->p_playlist->current.psz_name != NULL )
+    vlc_mutex_lock( &p_playlist->object_lock );
+    psz_current = p_playlist->pp_items[ p_playlist->i_index ]->psz_name;
+
+    if( psz_current != NULL )
     {
-        if( strncmp( p_intfGlobal->p_vlc->p_playlist->current.psz_name, "dvd", 3 )
-            || strncmp( p_intfGlobal->p_vlc->p_playlist->current.psz_name, "vcd", 3 ) )
+        if( strncmp( psz_current, "dvd", 3 )
+            || strncmp( psz_current, "vcd", 3 ) )
         {
             /* Determine the device name by omitting the first 4 characters
              * and keeping 3 characters */
-            Device = strdup( ( p_intfGlobal->p_vlc->p_playlist->current.psz_name + 4 ) );
+            Device = strdup( ( psz_current + 4 ) );
             Device = Device.SubString( 1, 2 );
         }
     }
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_release( p_playlist );
 
     if( Device == "" )
     {
@@ -318,11 +347,11 @@ void __fastcall TMainFrameDlg::ToolButtonEjectClick( TObject *Sender )
     }
 
     /* If there's a stream playing, we aren't allowed to eject ! */
-    if( p_input_bank->pp_input[0] == NULL )
+    if( p_intfGlobal->p_sys->p_input == NULL )
     {
-        intf_WarnMsg( 4, "intf: ejecting %s", Device.c_str() );
+        msg_Dbg( p_intfGlobal, "ejecting %s", Device.c_str() );
 
-        intf_Eject( Device.c_str() );
+        intf_Eject( p_intfGlobal, Device.c_str() );
     }
 }
 //--------------------------------------------------------------------------
@@ -431,95 +460,89 @@ void __fastcall TMainFrameDlg::PopupNetworkStreamClick( TObject *Sender )
 void __fastcall TMainFrameDlg::ButtonTitlePrevClick( TObject *Sender )
 {
     intf_thread_t * p_intf;
-    input_bank_t  * p_input_bank;
     input_area_t  * p_area;
     int             i_id;
 
     p_intf = p_intfGlobal;
-    p_input_bank = p_intf->p_vlc->p_input_bank;
-    i_id = p_input_bank->pp_input[0]->stream.p_selected_area->i_id - 1;
+    i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id - 1;
 
     /* Disallow area 0 since it is used for video_ts.vob */
     if( i_id > 0 )
     {
-        p_area = p_input_bank->pp_input[0]->stream.pp_areas[i_id];
-        input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_title_update = 1;
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         SetupMenus( p_intf );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::ButtonTitleNextClick( TObject *Sender )
 {
     intf_thread_t * p_intf;
-    input_bank_t  * p_input_bank;
     input_area_t  * p_area;
     int             i_id;
 
     p_intf = p_intfGlobal;
-    p_input_bank = p_intf->p_vlc->p_input_bank;
-    i_id = p_input_bank->pp_input[0]->stream.p_selected_area->i_id + 1;
+    i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id + 1;
 
-    if( i_id < p_input_bank->pp_input[0]->stream.i_area_nb )
+    if( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
     {
-        p_area = p_input_bank->pp_input[0]->stream.pp_areas[i_id];   
-        input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];   
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
                   
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_title_update = 1;
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         SetupMenus( p_intf );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::ButtonChapterPrevClick( TObject *Sender )
 {
     intf_thread_t * p_intf = p_intfGlobal;
-    input_bank_t  * p_input_bank = p_intf->p_vlc->p_input_bank;
     input_area_t  * p_area;
 
-    p_area = p_input_bank->pp_input[0]->stream.p_selected_area;
+    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
 
     if( p_area->i_part > 0 )
     {
         p_area->i_part--;
-        input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_chapter_update = 1;
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         SetupMenus( p_intf );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::ButtonChapterNextClick( TObject *Sender )
 {
     intf_thread_t * p_intf = p_intfGlobal;
-    input_bank_t  * p_input_bank = p_intf->p_vlc->p_input_bank;
     input_area_t  * p_area;
 
-    p_area = p_input_bank->pp_input[0]->stream.p_selected_area;
+    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
     
     if( p_area->i_part < p_area->i_part_nb )
     {
         p_area->i_part++;
-        input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_chapter_update = 1;
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         SetupMenus( p_intf );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
 //---------------------------------------------------------------------------
@@ -531,7 +554,6 @@ void __fastcall TMainFrameDlg::ButtonChapterNextClick( TObject *Sender )
 void __fastcall TMainFrameDlg::ButtonGoClick( TObject *Sender )
 {
     intf_thread_t *p_intf = p_intfGlobal;
-    input_bank_t  *p_input_bank = p_intf->p_vlc->p_input_bank;
     int i_channel;
 
     i_channel = SpinEditChannel->Value;
@@ -541,7 +563,7 @@ void __fastcall TMainFrameDlg::ButtonGoClick( TObject *Sender )
     network_ChannelJoin( p_intf, i_channel );
     vlc_mutex_unlock( &p_intf->change_lock );
 
-//    input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+//    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 }
 //---------------------------------------------------------------------------
 
@@ -555,7 +577,6 @@ void __fastcall TMainFrameDlg::ButtonGoClick( TObject *Sender )
 void __fastcall TMainFrameDlg::ModeManage()
 {
     intf_thread_t * p_intf = p_intfGlobal;
-    input_bank_t  * p_input_bank = p_intf->p_vlc->p_input_bank;
     TGroupBox     * ActiveGB;
     int             i_Height;
     bool            b_control;
@@ -572,14 +593,14 @@ void __fastcall TMainFrameDlg::ModeManage()
     b_control = 0;
 
     /* show the box related to current input mode */
-    if( p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-        switch( p_input_bank->pp_input[0]->stream.i_method & 0xf0 )
+        switch( p_intf->p_sys->p_input->stream.i_method & 0xf0 )
         {    
             case INPUT_METHOD_FILE:
                 GroupBoxFile->Visible = true;
                 ActiveGB = GroupBoxFile;
-                LabelFileName->Caption = p_input_bank->pp_input[0]->psz_source;
+                LabelFileName->Caption = p_intf->p_sys->p_input->psz_source;
                 break;
             case INPUT_METHOD_DISC:
                 GroupBoxDisc->Visible = true;
@@ -588,7 +609,7 @@ void __fastcall TMainFrameDlg::ModeManage()
             case INPUT_METHOD_NETWORK:
                 GroupBoxNetwork->Visible = true;
                 ActiveGB = GroupBoxNetwork;
-                LabelServer->Caption = p_input_bank->pp_input[0]->psz_source;
+                LabelServer->Caption = p_intf->p_sys->p_input->psz_source;
                 if( config_GetInt( p_intf, "network-channel" ) )
                 {
                     LabelChannel->Visible = true;
@@ -602,14 +623,14 @@ void __fastcall TMainFrameDlg::ModeManage()
                 msg_Warn( p_intf, "cannot determine input method" );
                 GroupBoxFile->Visible = true;
                 ActiveGB = GroupBoxFile;
-                LabelFileName->Caption = p_input_bank->pp_input[0]->psz_source;
+                LabelFileName->Caption = p_intf->p_sys->p_input->psz_source;
                 break;
         }
 
         i_Height = StatusBar->Height + ActiveGB->Height + ToolBar->Height + 54;
 
         /* initialize and show slider for seekable streams */
-        if( p_input_bank->pp_input[0]->stream.b_seekable )
+        if( p_intf->p_sys->p_input->stream.b_seekable )
         {
             TrackBar->Position = p_intf->p_sys->OldValue = 0;
             GroupBoxSlider->Show();
@@ -617,7 +638,7 @@ void __fastcall TMainFrameDlg::ModeManage()
         }
 
         /* control buttons for free pace streams */
-        b_control = p_input_bank->pp_input[0]->stream.b_pace_control;
+        b_control = p_intf->p_sys->p_input->stream.b_pace_control;
 
         /* get ready for menu regeneration */
         p_intf->p_sys->b_program_update = 1;
@@ -627,7 +648,7 @@ void __fastcall TMainFrameDlg::ModeManage()
         p_intf->p_sys->b_spu_update = 1;
         p_intf->p_sys->i_part = 0;
 
-        p_input_bank->pp_input[0]->stream.b_changed = 0;
+        p_intf->p_sys->p_input->stream.b_changed = 0;
         msg_Dbg( p_intf, "stream has changed, refreshing interface" );
     }
     else

@@ -59,7 +59,7 @@ struct intf_sys_s
 
     /* windows and widgets */
     TMainFrameDlg     * p_window;                             /* main window */
-    TPlaylistDlg      * p_playlist;                              /* playlist */
+    TPlaylistDlg      * p_playwin;                               /* playlist */
     TPopupMenu        * p_popup;                               /* popup menu */
     TAboutDlg         * p_about;                             /* about window */
     TDiscDlg          * p_disc;                     /* disc selection window */
@@ -84,5 +84,8 @@ struct intf_sys_s
     /* Language information */
     es_descriptor_t   * p_audio_es_old;
     es_descriptor_t   * p_spu_es_old;
+
+    /* The input thread */
+    input_thread_t    * p_input;
 };
 

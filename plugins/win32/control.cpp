@@ -44,20 +44,15 @@ bool ControlBack( TObject *Sender )
 
 bool ControlStop( TObject *Sender )
 {
-    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
+    playlist_t * p_playlist = (playlist_t *)
+        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL )
     {
-        /* end playing item */
-        p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-
-        /* update playlist */
-        vlc_mutex_lock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
-
-        p_intfGlobal->p_vlc->p_playlist->i_index--;
-        p_intfGlobal->p_vlc->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
-
+        return false;
     }
+
+    playlist_Stop( p_playlist );
+    vlc_object_release( p_playlist );
 
     return true;
 }
@@ -65,34 +60,26 @@ bool ControlStop( TObject *Sender )
 
 bool ControlPlay( TObject *Sender )
 {
-    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
+    playlist_t * p_playlist = (playlist_t *)
+        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL )
     {
-        input_SetStatus( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
-        p_intfGlobal->p_vlc->p_playlist->b_stopped = 0;
+        p_intfGlobal->p_sys->p_window->MenuOpenFileClick( Sender );
+        return false;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    if( p_playlist->i_size )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        playlist_Play( p_playlist );
+        vlc_object_release( p_playlist );
     }
     else
     {
-        vlc_mutex_lock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
-
-        if( p_intfGlobal->p_vlc->p_playlist->b_stopped )
-        {
-            if( p_intfGlobal->p_vlc->p_playlist->i_size )
-            {
-                vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
-                intf_PlaylistJumpto( p_intfGlobal->p_vlc->p_playlist,
-                                     p_intfGlobal->p_vlc->p_playlist->i_index );
-            }
-            else
-            {
-                vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
-                p_intfGlobal->p_sys->p_window->MenuOpenFileClick( Sender );
-            }
-        }
-        else
-        {
-            vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
-        }
-
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );
+        p_intfGlobal->p_sys->p_window->MenuOpenFileClick( Sender );
     }
 
     return true;
@@ -101,13 +88,9 @@ bool ControlPlay( TObject *Sender )
 
 bool ControlPause( TObject *Sender )
 {
-    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intfGlobal->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
-
-        vlc_mutex_lock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
-        p_intfGlobal->p_vlc->p_playlist->b_stopped = 0;
-        vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
+        input_SetStatus( p_intfGlobal->p_sys->p_input, INPUT_STATUS_PAUSE );
     }
 
     return true;
@@ -116,13 +99,9 @@ bool ControlPause( TObject *Sender )
 
 bool ControlSlow( TObject *Sender )
 {
-    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intfGlobal->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_SLOWER );
-
-        vlc_mutex_lock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
-        p_intfGlobal->p_vlc->p_playlist->b_stopped = 0;
-        vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
+        input_SetStatus( p_intfGlobal->p_sys->p_input, INPUT_STATUS_SLOWER );
     }
 
     return true;
@@ -131,13 +110,9 @@ bool ControlSlow( TObject *Sender )
 
 bool ControlFast( TObject *Sender )
 {
-    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intfGlobal->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_FASTER );
-
-        vlc_mutex_lock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
-        p_intfGlobal->p_vlc->p_playlist->b_stopped = 0;
-        vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
+        input_SetStatus( p_intfGlobal->p_sys->p_input, INPUT_STATUS_FASTER );
     }
 
     return true;

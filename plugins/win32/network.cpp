@@ -90,33 +90,33 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
     AnsiString      Channel = ComboBoxCSAddress->Text;
     unsigned int    i_channel_port = SpinEditCSPort->Value;
     unsigned int    i_port;
-    int             i_end = p_intfGlobal->p_vlc->p_playlist->i_size;
+    playlist_t *    p_playlist;
+
+    p_playlist = (playlist_t *)
+        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {   
+        return;
+    }                        
 
     Hide();
-
-    /* select added item */
-    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
-    {
-        p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-    }
 
     /* Check which option was chosen */
     switch( OldRadioValue )
     {
         /* UDP */
         case 0:
-            config_PutIntVariable( "network-channel", FALSE );
+            config_PutInt( p_intfGlobal, "network-channel", FALSE );
             i_port = SpinEditUDPPort->Value;
 
             /* Build source name */
             Source = "udp:@:" + IntToStr( i_port );
 
-            intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, Source.c_str() );
+            playlist_Add( p_playlist, Source.c_str(),
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
             /* update the display */
-            p_intfGlobal->p_sys->p_playlist->UpdateGrid( p_main->p_playlist );
-
-            intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+            p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
             break;
 
         /* UDP Multicast */
@@ -128,12 +128,11 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             /* Build source name */
             Source = "udp:@" + Address + ":" + IntToStr( i_port );
 
-            intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, Source.c_str() );
+            playlist_Add( p_playlist, Source.c_str(),
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
             /* update the display */
-            p_intfGlobal->p_sys->p_playlist->UpdateGrid( p_main->p_playlist );
-
-            intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+            p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
             break;
 
         /* Channel server */
@@ -142,9 +141,9 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             config_PutPsz( p_intfGlobal, "channel-server", Channel.c_str() );
             config_PutInt( p_intfGlobal, "channel-port", i_channel_port );
 
-            if( p_main->p_channel == NULL )
+            if( p_intfGlobal->p_vlc->p_channel == NULL )
             {
-                network_ChannelCreate();
+                network_ChannelCreate( p_intfGlobal );
             }
 
             p_intfGlobal->p_sys->b_playing = 1;
@@ -165,14 +164,15 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
                 Source = "http://" + Address;
             }
 
-            intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, Source.c_str() );
+            playlist_Add( p_playlist, Source.c_str(),
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
             /* update the display */
-            p_intfGlobal->p_sys->p_playlist->UpdateGrid( p_main->p_playlist );
-
-            intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+            p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
             break;
     }
+
+    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::ChangeEnabled( int i_selected )

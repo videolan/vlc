@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.6 2002/06/04 00:11:12 sam Exp $
+ * $Id: vlc_common.h,v 1.7 2002/06/07 23:53:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -23,6 +23,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*****************************************************************************
+ * Compiler-specific workarounds
+ *****************************************************************************/
+#if defined( __BORLANDC__ )
+#   undef HAVE_VARIADIC_MACROS
+#   undef HAVE_STDINT_H
+#endif
 
 /*****************************************************************************
  * Required system headers
@@ -199,13 +207,6 @@ VLC_DECLARE_STRUCT(iso639_lang)
 #endif
 
 #include "vlc_threads.h"
-
-/*****************************************************************************
- * Compiler-specific workarounds
- *****************************************************************************/
-#if defined( __BORLANDC__ )
-#   undef HAVE_VARIADIC_MACROS
-#endif
 
 /*****************************************************************************
  * Common structure members
