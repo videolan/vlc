@@ -646,7 +646,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
                 p_pic->b_force = VLC_TRUE;
             }
 
-            p_pic->i_nb_fields = p_sys->p_ff_pic->repeat_pict;
+            p_pic->i_nb_fields = 2 + p_sys->p_ff_pic->repeat_pict;
 #if LIBAVCODEC_BUILD >= 4685
             p_pic->b_progressive = !p_sys->p_ff_pic->interlaced_frame;
             p_pic->b_top_field_first = p_sys->p_ff_pic->top_field_first;

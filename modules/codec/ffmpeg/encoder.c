@@ -608,11 +608,11 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     /* Let ffmpeg select the frame type */
     frame.pict_type = 0;
 
-    frame.repeat_pict = p_pict->i_nb_fields;
+    frame.repeat_pict = 2 - p_pict->i_nb_fields;
 
 #if LIBAVCODEC_BUILD >= 4685
     frame.interlaced_frame = !p_pict->b_progressive;
-    frame.top_field_first = p_pict->b_top_field_first;
+    frame.top_field_first = !!p_pict->b_top_field_first;
 #endif
 
 #if LIBAVCODEC_BUILD < 4702
