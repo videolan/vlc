@@ -368,7 +368,8 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    if( !strcmp( p_sys->psz_protocol, "ICY" ) || p_sys->b_icecast )
+    if( ( !strcmp( p_sys->psz_protocol, "ICY" ) || p_sys->b_icecast ) &&
+        ( strcasecmp( p_sys->psz_mime, "application/ogg" ) ) )
     {
         if( p_sys->psz_mime && ( !strcasecmp( p_sys->psz_mime, "video/nsv" ) ||
                                  !strcasecmp( p_sys->psz_mime, "video/nsa") ) )
@@ -378,8 +379,6 @@ static int Open( vlc_object_t *p_this )
                    !strcasecmp( p_sys->psz_mime, "audio/aacp" ) ) )
             p_access->psz_demux = strdup( "m4a" );
         else if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "audio/mpeg" ) )
-            p_access->psz_demux = strdup( "mp3" );
-        else /* assume mp3, though this is definetly not certain */
             p_access->psz_demux = strdup( "mp3" );
 
         msg_Info( p_access, "Raw-audio server found, %s demuxer selected",
