@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.50 2003/06/24 00:50:52 fenrir Exp $
+ * $Id: avi.c,v 1.51 2003/06/24 22:53:25 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -165,6 +165,9 @@ static int input_ReadInPES( input_thread_t *p_input,
 
     return p_pes->i_pes_size;
 }
+
+/* check if the file is interleaved */
+static vlc_bool_t AVI_Interleaved( input_thread_t *p_input );
 
 /* Test if it seems that it's a key frame */
 static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, uint8_t *p_byte )
@@ -630,6 +633,7 @@ static void AVI_IndexLoad_indx( input_thread_t *p_input )
 #undef p_stream
     }
 }
+
 static void AVI_IndexLoad( input_thread_t *p_input )
 {
     demux_sys_t *p_avi = p_input->p_demux_data;
@@ -655,7 +659,6 @@ static void AVI_IndexLoad( input_thread_t *p_input )
         }
     }
 
-
     for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
     {
         msg_Dbg( p_input,
@@ -664,6 +667,7 @@ static void AVI_IndexLoad( input_thread_t *p_input )
                 p_avi->pp_info[i_stream]->i_idxnb );
     }
 }
+
 static void AVI_IndexCreate( input_thread_t *p_input )
 {
     demux_sys_t *p_avi = p_input->p_demux_data;
@@ -984,6 +988,7 @@ static int AVIInit( vlc_object_t * p_this )
                         &&( p_input->stream.i_method == INPUT_METHOD_FILE ) );
     p_avi->i_movi_lastchunk_pos = 0;
     p_avi->b_odml = VLC_FALSE;
+    p_avi->b_interleaved = VLC_FALSE;
 
     /* *** for unseekable stream, automaticaly use AVIDemux_interleaved *** */
     if( !p_avi->b_seekable || config_GetInt( p_input, "avi-interleaved" ) )
@@ -1346,6 +1351,10 @@ static int AVIInit( vlc_object_t * p_this )
     {
         p_input->stream.i_mux_rate =
             p_input->stream.p_selected_area->i_size / 50 / p_avi->i_length;
+
+        msg_Dbg( p_input, "checking interleaved" );
+        p_avi->b_interleaved = AVI_Interleaved( p_input );
+        msg_Dbg( p_input, "interleaved=%s", p_avi->b_interleaved ? "yes" : "no" );
     }
     else
     {
@@ -1778,6 +1787,65 @@ static int AVI_StreamSeek( input_thread_t *p_input,
 }
 
 /*****************************************************************************
+ * AVI_Interleaved: check weither a file is interleaved or not.
+ *****************************************************************************/
+static vlc_bool_t AVI_Interleaved( input_thread_t *p_input )
+{
+    demux_sys_t     *p_sys = p_input->p_demux_data;
+    unsigned int    i;
+    mtime_t         i_time = 0;
+    vlc_bool_t      b_ret = VLC_TRUE;
+
+    int64_t         i_max;
+
+    if( p_input->stream.p_selected_area->i_size <= 100 )
+    {
+        return VLC_FALSE;
+    }
+
+    i_max = __MIN( 2000000, p_input->stream.p_selected_area->i_size / 100 );
+
+#define tk p_sys->pp_info[i]
+    while( i_time < p_sys->i_length * (mtime_t)1000000)
+    {
+        int64_t     i_ref;
+
+        i_ref = -1;
+        i_time += 50000;
+        for( i = 0; i < p_sys->i_streams; i++ )
+        {
+            while( AVI_GetPTS( tk ) < i_time && tk->i_idxposc < tk->i_idxnb - 1 )
+            {
+                tk->i_idxposc++;
+            }
+
+            if( i_ref == -1 )
+            {
+                i_ref = tk->p_index[tk->i_idxposc].i_pos;
+            }
+            if( tk->p_index[tk->i_idxposc].i_pos - i_ref > i_max ||
+                tk->p_index[tk->i_idxposc].i_pos - i_ref < -i_max ||
+                tk->p_index[tk->i_idxposc].i_length > i_max )
+            {
+                msg_Dbg( p_input, "interleaved=no because ref=%lld pos=%lld length=%d (max=%lld)",
+                         i_ref, tk->p_index[tk->i_idxposc].i_pos, tk->p_index[tk->i_idxposc].i_length, i_max  );
+                b_ret = VLC_FALSE;
+                goto exit;
+            }
+        }
+    }
+
+exit:
+    for( i = 0; i < p_sys->i_streams; i++ )
+    {
+        tk->i_idxposc = 0;
+        tk->i_idxposb = 0;
+    }
+#undef tk
+    return b_ret;
+}
+
+/*****************************************************************************
  * AVISeek: goto to i_date or i_percent
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
@@ -1795,15 +1863,18 @@ static int    AVISeek   ( input_thread_t *p_input,
 
     if( p_avi->b_seekable )
     {
-        if( !p_avi->i_length )
+        if( !p_avi->i_length || p_avi->b_interleaved )
         {
             avi_stream_t *p_stream;
             int64_t i_pos;
 
             /* use i_percent to create a true i_date */
-            msg_Warn( p_input,
-                      "mmh, seeking without index at %d%%"
-                      " work only for interleaved file", i_percent );
+            if( !p_avi->b_interleaved )
+            {
+                msg_Warn( p_input,
+                          "mmh, seeking without index at %d%%"
+                          " work only for interleaved file", i_percent );
+            }
 
             if( i_percent >= 100 )
             {
