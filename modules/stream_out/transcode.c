@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.24 2003/07/07 15:50:44 gbazin Exp $
+ * $Id: transcode.c,v 1.25 2003/07/13 13:18:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -159,8 +159,7 @@ static int Open( vlc_object_t *p_this )
             }
         }
 
-        msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
-                 fcc,
+        msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s", fcc,
                  p_sys->i_sample_rate, p_sys->i_channels,
                  p_sys->i_abitrate / 1024 );
     }
@@ -617,6 +616,9 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     id->i_buffer_out_pos = 0;
     id->p_buffer_out     = malloc( id->i_buffer_out );
 
+    /* Sanity check for audio channels */
+    id->f_dst.i_channels = __MIN( id->f_dst.i_channels, id->f_src.i_channels );
+
 #ifdef HAVE_VORBIS_VORBISENC_H
     if( id->f_dst.i_fourcc == VLC_FOURCC('v','o','r','b') )
     {
@@ -733,8 +735,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
 #endif
     id->i_dts = in->i_dts -
                 (mtime_t)1000000 *
-                (mtime_t)(id->i_buffer_pos / 2 / id->ff_enc_c->channels )/
-                (mtime_t)id->ff_enc_c->sample_rate;
+                (mtime_t)(id->i_buffer_pos / 2 / id->ff_dec_c->channels )/
+                (mtime_t)id->ff_dec_c->sample_rate;
 
     if( id->i_buffer_in_pos + (int)in->i_size > id->i_buffer_in )
     {
@@ -748,6 +750,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
 
     do
     {
+        int i_buffer_pos;
+
         /* decode as much data as possible */
         if( id->ff_dec )
         {
@@ -879,6 +883,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
             id->i_buffer_in_pos -= i_used;
         }
 
+        i_buffer_pos = id->i_buffer_pos;
+
         /* encode as much data as possible */
 
 #ifdef HAVE_VORBIS_VORBISENC_H
@@ -889,11 +895,6 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
             int i, j, i_samples;
             sout_buffer_t *p_out;
             ogg_packet op;
-
-            if( id->i_buffer_pos == 0 )
-            {
-                break;
-            }
 
             if( !id->b_headers_sent )
             {
@@ -916,7 +917,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
                 id->b_headers_sent = VLC_TRUE;
             }
 
-            i_samples = id->i_buffer_pos / id->f_dst.i_channels / 2;
+            i_samples = id->i_buffer_pos / id->f_src.i_channels / 2;
             id->i_samples_delay += i_samples;
             id->i_buffer_pos = 0;
 
@@ -928,7 +929,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
                 for( j = 0 ; j < i_samples ; j++ )
                 {
                     buffer[i][j]= ((float)( ((int16_t *)id->p_buffer)
-                                  [j*id->f_dst.i_channels + i ] ))/ 32768.f;
+                                  [j*id->f_src.i_channels + i ] ))/ 32768.f;
                 }
             }
 
@@ -978,28 +979,40 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         for( ;; )
         {
             int i_frame_size = id->ff_enc_c->frame_size * 2 *
-                                 id->ff_enc_c->channels;
-            int i_out_size;
+                                 id->ff_dec_c->channels;
+            int i_out_size, i, j;
             sout_buffer_t *p_out;
+            int16_t *p_buffer = (int16_t *)(id->p_buffer + i_buffer_pos -
+                                            id->i_buffer_pos);
 
             if( id->i_buffer_pos < i_frame_size )
             {
                 break;
             }
 
+            if( id->ff_dec_c->channels != id->ff_enc_c->channels )
+	    {
+                /* dumb downmixing */
+                for( i = 0; i < id->ff_enc_c->frame_size; i++ )
+                {
+                    for( j = 0 ; j < id->f_dst.i_channels; j++ )
+                    {
+                        p_buffer[i*id->f_dst.i_channels+j] =
+                            p_buffer[i*id->f_src.i_channels+j];
+                    }
+                }
+	    }
+
             /* msg_Warn( p_stream, "avcodec_encode_audio: frame size%d",
                          i_frame_size); */
             i_out_size = avcodec_encode_audio( id->ff_enc_c,
-                           id->p_buffer_out, id->i_buffer_out,
-                           (int16_t*)id->p_buffer );
+                           id->p_buffer_out, id->i_buffer_out, p_buffer );
 
             if( i_out_size <= 0 )
             {
                 break;
             }
-            memmove( id->p_buffer,
-                     &id->p_buffer[i_frame_size],
-                     id->i_buffer - i_frame_size );
+
             id->i_buffer_pos -= i_frame_size;
 
             p_out = sout_BufferNew( p_stream->p_sout, i_out_size );
@@ -1020,6 +1033,14 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
                         p_out->i_dts, p_out->i_length, i_out_size ); */
 
             sout_BufferChain( out, p_out );
+        }
+
+        /* Copy the remaining raw samples */
+        if( id->i_buffer_pos != 0 )
+        {
+            memmove( id->p_buffer,
+                     &id->p_buffer[i_buffer_pos - id->i_buffer_pos],
+                     id->i_buffer_pos );
         }
 
     } while( b_again );
