@@ -431,9 +431,16 @@ static void InformationCreate( input_thread_t *p_input  )
       if (p_cdda->i_cddb_enabled) {
         cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
                                             i_track);
-        if (t != NULL && t->artist != NULL) {
-	  input_AddInfo( p_cat, _("Artist"), "%s", t->artist );
-	  input_AddInfo( p_cat, _("Title"), "%s",  t->title );
+        if (t != NULL) {
+	  if ( t->artist != NULL && strlen(t->artist) ) {
+	    input_AddInfo( p_cat, _("Artist"), "%s", t->artist );
+	  }
+	  if ( t->title != NULL && strlen(t->title) ) {
+	    input_AddInfo( p_cat, _("Title"), "%s",  t->title );
+	  }
+	  if ( t->ext_data != NULL && strlen(t->ext_data) ) {
+	    input_AddInfo( p_cat, _("Extended Data"), "%s",  t->ext_data );
+	  }
 	}
       }
 #endif
