@@ -161,6 +161,8 @@ typedef struct
 
 typedef struct
 {
+    dvbpsi_handle   handle;
+
     int             i_version;
     int             i_number;
     int             i_pid_pcr;
@@ -170,10 +172,8 @@ typedef struct
 
 typedef struct
 {
-    /* Common PSI handle */
-    dvbpsi_handle   handle;
-
     /* for special PAT case */
+    dvbpsi_handle   handle;
     int             i_pat_version;
 
     /* For PMT */
@@ -404,7 +404,7 @@ static int Open( vlc_object_t *p_this )
             msg_Dbg( p_demux, "extra pmt specified (pid=0x%x)", i_pid );
             PIDInit( pmt, VLC_TRUE, NULL );
             /* FIXME we should also ask for a number */
-            pmt->psi->handle =
+            pmt->psi->prg[0]->handle =
                 dvbpsi_AttachPMT( 1, (dvbpsi_pmt_callback)PMTCallBack,
                                   p_demux );
             pmt->psi->prg[0]->i_number = 0; /* special one */
@@ -632,7 +632,18 @@ static int Demux( demux_t *p_demux )
         {
             if( p_pid->psi )
             {
-                dvbpsi_PushPacket( p_pid->psi->handle, p_pkt->p_buffer );
+                if( p_pid->i_pid == 0 )
+                {
+                    dvbpsi_PushPacket( p_pid->psi->handle, p_pkt->p_buffer );
+                }
+                else
+                {
+                    int i_prg;
+                    for( i_prg = 0; i_prg < p_pid->psi->i_prg; i_prg++ )
+                    {
+                        dvbpsi_PushPacket( p_pid->psi->prg[i_prg]->handle, p_pkt->p_buffer );
+                    }
+                }
                 block_Release( p_pkt );
             }
             else if( !p_sys->b_udp_out )
@@ -755,7 +766,7 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
             pid->psi = malloc( sizeof( ts_psi_t ) );
             pid->psi->i_prg = 0;
             pid->psi->prg   = NULL;
-            pid->psi->handle         = NULL;
+            pid->psi->handle= NULL;
         }
         pid->psi->i_pat_version  = -1;
         if( p_owner )
@@ -766,6 +777,7 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
             prg->i_number   = -1;
             prg->i_pid_pcr  = -1;
             prg->iod        = NULL;
+            prg->handle     = NULL;
 
             TAB_APPEND( pid->psi->i_prg, pid->psi->prg, prg );
         }
@@ -792,6 +804,7 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
         for( i = 0; i < pid->psi->i_prg; i++ )
         {
             if( pid->psi->prg[i]->iod ) IODFree( pid->psi->prg[i]->iod );
+            if( pid->psi->prg[i]->handle ) dvbpsi_DetachPMT( pid->psi->prg[i]->handle );
             free( pid->psi->prg[i] );
         }
         if( pid->psi->prg ) free( pid->psi->prg );
@@ -2043,20 +2056,10 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         if( p_program->i_number != 0 )
         {
             ts_pid_t *pmt = &p_sys->pid[p_program->i_pid];
+            vlc_bool_t b_add = VLC_TRUE;
 
-            if( !pmt->b_valid )
+            if( pmt->b_valid )
             {
-                PIDInit( pmt, VLC_TRUE, pat->psi );
-                pmt->psi->handle =
-                    dvbpsi_AttachPMT( p_program->i_number,
-                                      (dvbpsi_pmt_callback)PMTCallBack, p_demux );
-                pmt->psi->prg[0]->i_number = p_program->i_number;
-
-                TAB_APPEND( p_sys->i_pmt, p_sys->pmt, pmt );
-            }
-            else
-            {
-                vlc_bool_t b_add = VLC_TRUE;
                 int i_prg;
                 for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
                 {
@@ -2066,11 +2069,19 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                         break;
                     }
                 }
-                if( b_add )
-                {
-                    PIDInit( pmt, VLC_TRUE, pat->psi );
-                    pmt->psi->prg[pmt->psi->i_prg-1]->i_number = p_program->i_number;
-                }
+            }
+            else
+            {
+                TAB_APPEND( p_sys->i_pmt, p_sys->pmt, pmt );
+            }
+
+            if( b_add )
+            {
+                PIDInit( pmt, VLC_TRUE, pat->psi );
+                pmt->psi->prg[pmt->psi->i_prg-1]->handle =
+                    dvbpsi_AttachPMT( p_program->i_number,
+                                      (dvbpsi_pmt_callback)PMTCallBack, p_demux );
+                pmt->psi->prg[pmt->psi->i_prg-1]->i_number = p_program->i_number;
             }
         }
     }
