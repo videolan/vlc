@@ -6,70 +6,137 @@ mainmenu_name "VLC Configuration"
 
 choice 'Operating System' \
    "Linux		CONFIG_LINUX \
-    MacOS_X		CONFIG_MAC \
+   MacOS_X		CONFIG_MAC \
     Win32		CONFIG_WIN32" Linux
 
 mainmenu_option next_comment
-comment 'Graphical User Interfaces'
-bool 'GTK+ support' CONFIG_GTK
-dep_bool '   Gnome interface support' CONFIG_GNOME $CONFIG_GTK
-bool 'GTK2 support' CONFIG_GTK2
-dep_bool '   Gnome2 support' CONFIG_GNOME2 $CONFIG_GTK2
+comment 'Interfaces'
 bool 'Skins module' CONFIG_SKINS
-bool 'Basic skins module (without wxWindows)' CONFIG_BASIC_SKINS
-bool 'Familiar GTK+ support' CONFIG_FAMILIAR
+bool 'Skins2 module' CONFIG_SKINS2
+if [ "$CONFIG_SKINS2" = "y" ]; then
+  string 'xml2-config path' CONFIG_WITHXML2CONFIGPATH ""
+fi
+# TODO: --enable-pda
 bool 'wxWindows support' CONFIG_WXWINDOWS
-bool 'Qt interface support' CONFIG_QT
-bool 'KDE interface support' CONFIG_KDE
+if [ "$CONFIG_WXWINDOWS" = "y" ]; then
+  string 'wx-config path' CONFIG_WITHWXCONFIGPATH ""
+fi
 bool 'Qt embedded interface support' CONFIG_OPIE
+if [ "$CONFIG_OPIE" = "y" ]; then
+  string 'Qt Embedded headers and libraries' CONFIG_WITHQTE ""
+fi
 if [ "$CONFIG_MAC" = "y" ]; then
    bool 'MacOS X support' CONFIG_MACOSX
 fi
 bool 'QNX RTOS support' CONFIG_QNX
-if [ "$CONFIG_WIN32" = "y" ]; then
-   bool 'Win32 interface support' CONFIG_INTFWIN
-fi
-bool 'ncurses interface support' CONFIG_NCURSES
+bool 'Ncurses interface support' CONFIG_NCURSES
 bool 'xosd interface support' CONFIG_XOSD
+bool 'Visualization plugin' CONFIG_VISUAL
+bool 'Goom visualization plugin' CONFIG_GOOM
+if [ "$CONFIG_GOOM" = "y" ]; then
+  string 'goom tree for static linking' CONFIG_WITHGOOMTREE ""
+fi
+bool 'SLP service discovery support' CONFIG_SLP
+if [ "$CONFIG_SLP" = "y" ]; then
+  string 'libslp headers and libraries' CONFIG_WITHSLP ""
+fi
+bool 'IR remote control support' CONFIG_LIRC
+bool 'Joystick control' CONFIG_JOYSTICK
+bool 'Corba interface support' CONFIG_CORBA
 endmenu
 
 mainmenu_option next_comment
-comment 'Inputs'
+comment 'Input plugins'
+bool 'Live.com input plugin' CONFIG_LIVEDOTCOM
+if [ "$CONFIG_LIVEDOTCOM" = "y" ]; then
+  string 'live.com tree for static linking' CONFIG_WITHLIVEDOTCOMTREE ""
+fi
 bool 'DVD support' CONFIG_DVD
 if [ "$CONFIG_DVD" = "y" ]; then
-   bool '    DVD input module' CONFIG_DVDOLD
    bool '    dvdread input module' CONFIG_DVDREAD
-   bool '    dvdplay input module' CONFIG_DVDPLAY
-   bool '    dvbpsi ts mux and demux module' CONFIG_DVBPSI
+   if [ "$CONFIG_DVDREAD" = "y" ]; then
+      string '        libdvdread headers and libraries' CONFIG_WITHDVDREAD ""
+      string '        libdvdread tree for static linking' CONFIG_WITHDVDREADTREE ""
+   fi
+   bool '    dvdnav input module' CONFIG_DVDNAV
+   if [ "$CONFIG_DVDNAV" = "y" ]; then
+      string '        dvdnav-config path' CONFIG_WITHDVDNAVCONFIGPATH ""
+   fi
 fi
-bool 'VCD support' CONFIG_VCD
+boof 'Win32 DirectShow support' CONFIG_DSHOW
+bool 'Dvbpsi ts mux and demux module' CONFIG_DVBPSI
+if [ "$CONFIG_DVBPSI" = "y" ]; then
+   string '    libdvbpsi headers and libraries' CONFIG_WITHDVBPSI ""
+   string '    libdvbpsi tree for static linking' CONFIG_WITHDVBPSITREE ""
+fi
 bool 'Video for Linux (V4L) support' CONFIG_V4L
-bool 'Satellite support' CONFIG_SAT
+if [ "$CONFIG_V4L" = "y" ]; then
+   string '    path to a v4l-enabled kernel tree' CONFIG_WITHV4L
+fi
+bool 'PVR cards support' CONFIG_PVR
+bool 'VCD support for Linux, FreeBSD, MacOS X and Win32' CONFIG_VCD
+bool 'Satellite card support' CONFIG_SATELLITE
+bool 'DVB-S/T/C cards support' CONFIG_DVB
+if [ "$CONFIG_DVB" = "y" ]; then
+   string '    path to a dvb- and v4l2-enabled kernel tree' CONFIG_WITHDVB
+fi
+bool 'Ogg demux support' CONFIG_OGG
+bool 'Matroska demux support' CONFIG_MKV
+bool 'Mod demux support' CONFIG_MOD
 endmenu
 
 mainmenu_option next_comment
-comment 'Video outputs'
+comment 'Video plugins'
 if [ "$CONFIG_LINUX" = "y" ]; then
    bool 'X11 support' CONFIG_X11
    bool 'XVideo support' CONFIG_XVIDEO
    bool 'Linux framebuffer support' CONFIG_FB
+   bool 'Linux kernel Matrox support' CONFIG_MGA
 fi
+bool 'SDL support' CONFIG_SDL
+if [ "$CONFIG_SDL" = "y" ]; then
+   string '    SDL-config path' CONFIG_WITHSDLCONFIGPATH ""
+   string '    Path to libsdl' CONFIG_WITHSDLPREFIX ""
+fi
+bool 'freetype support' CONFIG_FREETYPE
+if [ "$CONFIG_FREETYPE" = "y" ]; then
+   string '    Freetype-config path' CONFIG_WITHFREETYPECONFIGPATH ""
+fi
+bool 'Fribidi support' CONFIG_FRIBIDI
+if [ "$CONFIG_FRIBIDI" = "y" ]; then
+   string '    Fribidi-config path' CONFIG_WITHFRIBIDICONFIGPATH ""
+fi
+bool 'SVG support' CONFIG_SVG
+bool 'QT Embedded support' CONFIG_QTE
+if [ "$CONFIG_QTE" = "y" ]; then
+   string '    Qt Embedded headers and libraries' CONFIG_WITHQTE ""
+fi
+bool 'HD1000 Video Output module' CONFIG_HD1000V
 if [ "$CONFIG_WIN32" = "y" ]; then
    bool 'Win32 DirectX support' CONFIG_DIRECTX
+   if [ "$CONFIG_DIRECTX" = "y" ]; then
+      string '    Win32 DirectX headers' CONFIG_WITHDIRECTX ""
+   fi
    bool 'Win32 GDI module' CONFIG_WINGDI
 fi
-bool 'SDL video output' CONFIG_SDL
-bool 'freetype support' CONFIG_FREETYPE
-bool 'QT Embedded support' CONFIG_QTE
-bool 'Linux kernel Matrox support' CONFIG_MGA
 bool 'SVGAlib support' CONFIG_SVGALIB
 bool 'GGI support' CONFIG_GGI
+if [ "$CONFIG_GGI" = "y" ]; then
+   string '    Path to libggi' CONFIG_WITHGGI ""
+fi
 bool 'Glide (3dfx) support' CONFIG_GLIDE
+if [ "$CONFIG_GLIDE" = "y" ]; then
+   string '    Path to libglide' CONFIG_WITHGLIDE ""
+fi
 bool 'aalib output' CONFIG_AA
+bool 'cacalib output' CONFIG_CACA
+if [ "$CONFIG_CACA" = "y" ]; then
+   string '    Caca-config path' CONFIG_WITHCACACONFIGPATH ""
+fi
 endmenu
 
 mainmenu_option next_comment
-comment 'Audio outputs'
+comment 'Audio plugins'
 if [ "$CONFIG_LINUX" = "y" ]; then
    bool 'Linux OSS /dev/dsp support' CONFIG_OSS
    bool 'Esound library support' CONFIG_ESD
@@ -82,39 +149,78 @@ fi
 if [ "$CONFIG_MAC" = "y" ]; then
    bool 'CoreAudio module' CONFIG_COREAUDIO
 fi
+bool 'HD1000 audio module' CONFIG_HD1000A
 endmenu
 
 mainmenu_option next_comment
-comment 'Codecs'
-bool 'Ogg demux support' CONFIG_OGG
-bool 'A/52 support' CONFIG_A52
-bool 'libmad module' CONFIG_MAD
-bool 'ffmpeg codec' CONFIG_FFMPEG
-if [ "$CONFIG_FFMPEG" = "y" ]; then
-   string "ffmpeg tree" CONFIG_FFMPEG_TREE /home/videolan/ffmpeg
+comment 'Codec plugins'
+bool 'Libmad module' CONFIG_MAD
+if [ "$CONFIG_MAD" = "y" ]; then
+   string '    Path to libmad' CONFIG_WITHMAD ""
+   string '    Mad tree for static linking' CONFIG_WITHMADTREE ""
 fi
-bool 'faad codec' CONFIG_FAAD
-bool 'xvid codec' CONFIG_XVID
-bool 'DV decoder support' CONFIG_DV
-bool 'flac decoder support' CONFIG_FLAC
-bool 'libmpeg2 decoder support' CONFIG_LIBMPEG2
+bool 'Ffmpeg codec' CONFIG_FFMPEG
+if [ "$CONFIG_FFMPEG" = "y" ]; then
+   bool   '    Ffmpeg has been compiled with mp3lame support' CONFIG_WITHFFMPEGMP3LAME
+   bool   '    Ffmpeg has been compiled with faac support' CONFIG_WITHFFMPEGFAAC
+   string '    Ffmpeg tree for static linking' CONFIG_WITHFFMPEGTREE ""
+fi
+bool 'Faad codec' CONFIG_FAAD
+if [ "$CONFIG_FAAD" = "y" ]; then
+   string '    Faad tree for static linking' CONFIG_WITHFAADTREE ""
+fi
+bool 'QuickTime module' CONFIG_QUICKTIME
+bool 'A/52 support with liba52' CONFIG_A52
+if [ "$CONFIG_A52" = "y" ]; then
+   string '    A52 headers and libraries' CONFIG_WITHA52 ""
+   string '    A52dec tree for static linking' CONFIG_WITHA52TREE ""
+fi
+bool 'DTS Coherent Acoustics support with libdts' CONFIG_DTS
+if [ "$CONFIG_DTS" = "y" ]; then
+   string '    Libdts tree for static linking' CONFIG_WITHDTSTREE ""
+fi
+bool 'Flac decoder support' CONFIG_FLAC
+bool 'Libmpeg2 decoder support' CONFIG_LIBMPEG2
+if [ "$CONFIG_LIBMPEG2" = "y" ]; then
+   string '    Libmpeg2 tree for static linking' CONFIG_WITHLIBMPEG2TREE ""
+fi
 bool 'Vorbis decoder support' CONFIG_VORBIS
 bool 'Tremor decoder support' CONFIG_TREMOR
-bool 'tarkin codec' CONFIG_TARKIN
-bool 'theora codec' CONFIG_THEORA
-endmenu
-
-mainmenu_option next_comment
-comment 'Streaming'
-bool 'Stream output modules' CONFIG_SOUT
+bool 'Speex decoder support' CONFIG_SPEEX
+bool 'Experimental tarkin codec' CONFIG_TARKIN
+if [ "$CONFIG_TARKIN" = "y" ]; then
+   string '    Tarkin tree for static linking' CONFIG_WITHTARKINTREE ""
+fi
+bool 'Experimental theora codec' CONFIG_THEORA
+bool 'CMML support' CONFIG_CMML
 endmenu
 
 mainmenu_option next_comment
 comment 'Miscellaneous options'
-bool 'SLP service discovery support' CONFIG_SLP
+bool 'UTF8 support' CONFIG_UTF8
+bool 'GNU Portable Threads support' CONFIG_PTH
+bool 'State threads support' CONFIG_ST
+bool 'Gprof profiling' CONFIG_GPROF
+bool 'Cprof profiling' CONFIG_CPROF
+# TODO: change to a tristate choice
+# bool 'Set endianness' CONFIG_ENDIANNESS
+bool 'Mozilla plugin' CONFIG_MOZILLA
+if [ "$CONFIG_MOZILLA" = "y" ]; then
+   string '    Path to win32 mozilla sdk' CONFIG_WITHMOZILLASDKPATH ""
+fi
+bool 'Build test modules' COFIG_TESTSUITE
+# TODO: --disable-plugins
 endmenu
 
 mainmenu_option next_comment
-comment 'Compilation options'
+comment 'Optimization options'
+# TODO: add --with-tuning=ARCH
+bool 'Compiler optimizations' CONFIG_OPTIMIZATIONS
+if [ "$CONFIG_MAC" = "y" ]; then
+   bool 'AltiVec optimizations' CONFIG_ALTIVEC
+fi
 bool 'Debug mode' CONFIG_DEBUG
+bool 'Extra optimizations' CONFIG_RELEASE
+bool 'Stream output modules' CONFIG_SOUT
 endmenu
+
