@@ -431,6 +431,7 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "audio-desync", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "cr-average", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "clock-synchro", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
     var_Create( p_input, "seekable", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE; /* Fixed later*/

@@ -2036,6 +2036,10 @@ static int InputSourceInit( input_thread_t *p_input,
             }
         }
     }
+
+    if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
+        in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );
+
     free( psz_dup );
     return VLC_SUCCESS;
 
@@ -2311,7 +2315,8 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
 
     var_Set( p_input, psz_name, val );
 
-    msg_Dbg( p_input, "set input option: %s to %s", psz_name, psz_value ? psz_value : ( val.b_bool ? "true" : "false") );
+    msg_Dbg( p_input, "set input option: %s to %s", psz_name,
+             psz_value ? psz_value : ( val.b_bool ? "true" : "false") );
 
   cleanup:
     if( psz_name ) free( psz_name );

@@ -288,6 +288,14 @@ static char *ppsz_align_descriptions[] =
     "When using the PVR input (or a very irregular source), you should " \
     "set this to 10000.")
 
+#define CLOCK_SYNCHRO_TEXT N_("Clock synchronisation")
+#define CLOCK_SYNCHRO_LONGTEXT N_( \
+    "Allows you to enable/disable the input clock synchronisation for " \
+    "real-time sources.")
+static int pi_clock_values[] = { -1, 0, 1 };
+static char *ppsz_clock_descriptions[] =
+{ N_("Default"), N_("Disable"), N_("Enable") };
+
 #define SERVER_PORT_TEXT N_("UDP port")
 #define SERVER_PORT_LONGTEXT N_( \
     "This is the port used for UDP streams. By default, we chose 1234.")
@@ -1062,6 +1070,9 @@ vlc_module_begin();
 
     add_integer( "cr-average", 40, NULL, CR_AVERAGE_TEXT,
                  CR_AVERAGE_LONGTEXT, VLC_FALSE );
+    add_integer( "clock-synchro", -1, NULL, CLOCK_SYNCHRO_TEXT,
+                 CLOCK_SYNCHRO_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_clock_values, ppsz_clock_descriptions, 0 );
 
     /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , VLC_TRUE );
