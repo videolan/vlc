@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.42 2003/06/01 23:48:17 hartman Exp $
+ * $Id: intf.h,v 1.43 2003/09/19 23:03:27 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -35,14 +35,11 @@
  *****************************************************************************/
 @interface VLCApplication : NSApplication
 {
-    NSStringEncoding i_encoding;
     intf_thread_t *p_intf;
 }
 
-- (void)initIntlSupport;
 - (NSString *)localizedString:(char *)psz;
 - (char *)delocalizeString:(NSString *)psz;
-- (NSStringEncoding)getEncoding;
 - (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;
 
 - (void)setIntf:(intf_thread_t *)p_intf;

@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.30 2003/08/14 13:02:55 sigmunau Exp $
+ * $Id: playlist.m,v 1.31 2003/09/19 23:03:27 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -298,7 +298,7 @@ int MacVersion102 = -1;
         return;
     }
 
-    for ( i_item = 0; i_item < [o_array count]; i_item++ )
+    for ( i_item = 0; i_item < (int)[o_array count]; i_item++ )
     {
         /* One item */
         NSDictionary *o_one_item;
@@ -497,8 +497,6 @@ int MacVersion102 = -1;
     else
     {
         NSPasteboard * o_pasteboard;
-        
-        intf_thread_t * p_intf = [NSApp getIntf];
         o_pasteboard = [o_info draggingPasteboard];
         
         if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
@@ -508,7 +506,7 @@ int MacVersion102 = -1;
             NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]
                         sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
-            for( i = 0; i < [o_values count]; i++)
+            for( i = 0; i < (int)[o_values count]; i++)
             {
                 NSDictionary *o_dic;
                 o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];

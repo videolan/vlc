@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.33 2003/08/08 16:41:04 massiot Exp $
+ * $Id: prefs.m,v 1.34 2003/09/19 23:03:27 hartman Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -848,7 +848,7 @@ static VLCTreeItem *o_root_item = nil;
                         {
                             o_capability = [NSApp localizedString: p_submodule->psz_capability];
                             BOOL b_found = FALSE;
-                            for( j = 0; j < [o_children count]; j++ )
+                            for( j = 0; j < (int)[o_children count]; j++ )
                             {
                                 if( [[[o_children objectAtIndex:j] getName] isEqualToString: o_capability] )
                                 {
@@ -866,7 +866,7 @@ static VLCTreeItem *o_root_item = nil;
                 }
 
                 BOOL b_found = FALSE;
-                for( j = 0; j < [o_children count]; j++ )
+                for( j = 0; j < (int)[o_children count]; j++ )
                 {
                     if( [[[o_children objectAtIndex:j] getName] isEqualToString: o_capability] )
                     {
@@ -959,7 +959,7 @@ static VLCTreeItem *o_root_item = nil;
 
 - (int)numberOfChildren {
     id i_tmp = [self children];
-    return (i_tmp == IsALeafNode) ? (-1) : [i_tmp count];
+    return (i_tmp == IsALeafNode) ? (-1) : (int)[i_tmp count];
 }
 
 - (BOOL)hasPrefs:(NSString *)o_module_name

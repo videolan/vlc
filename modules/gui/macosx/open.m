@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.37 2003/09/09 13:51:45 hartman Exp $
+ * $Id: open.m,v 1.38 2003/09/19 23:03:27 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -635,7 +635,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         NSArray *o_values = [[o_open_panel filenames]
                 sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
-        for( i = 0; i < [o_values count]; i++)
+        for( i = 0; i < (int)[o_values count]; i++)
         {
             NSDictionary *o_dic;
             o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];

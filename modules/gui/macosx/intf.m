@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.93 2003/07/27 23:05:41 hartman Exp $
+ * $Id: intf.m,v 1.94 2003/09/19 23:03:27 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -70,7 +70,6 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     p_intf->pf_run = Run;
     
     [[VLCApplication sharedApplication] autorelease];
-    [NSApp initIntlSupport];
     [NSApp setIntf: p_intf];
 
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
@@ -111,18 +110,6 @@ static void Run( intf_thread_t *p_intf )
  *****************************************************************************/
 @implementation VLCApplication
 
-- (id)init
-{
-    /* default encoding: ISO-8859-1 */
-    i_encoding = NSUTF8StringEncoding;
-
-    return( [super init] );
-}
-
-- (void)initIntlSupport
-{
-}
-
 - (NSString *)localizedString:(char *)psz
 {
     NSString * o_str = nil;
@@ -141,13 +128,13 @@ static void Run( intf_thread_t *p_intf )
 
 - (char *)delocalizeString:(NSString *)id
 {
-    NSData * o_data = [id dataUsingEncoding: i_encoding
+    NSData * o_data = [id dataUsingEncoding: NSUTF8StringEncoding
                           allowLossyConversion: NO];
     char * psz_string;
 
     if ( o_data == nil )
     {
-        o_data = [id dataUsingEncoding: i_encoding
+        o_data = [id dataUsingEncoding: NSUTF8StringEncoding
                      allowLossyConversion: YES];
         psz_string = malloc( [o_data length] + 1 ); 
         [o_data getBytes: psz_string];
@@ -163,11 +150,6 @@ static void Run( intf_thread_t *p_intf )
     }
 
     return psz_string;
-}
-
-- (NSStringEncoding)getEncoding
-{
-    return i_encoding;
 }
 
 /* i_width is in pixels */
@@ -569,20 +551,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
         
         msg_Dbg( p_intf, "stream has changed, refreshing interface" );
     }
-    else
-    {
-        vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                                          FIND_ANYWHERE );
-        if( p_vout != NULL )
-        {
-            vlc_object_detach( p_vout );
-            vlc_object_release( p_vout );
-
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            vout_Destroy( p_vout );
-            vlc_mutex_lock( &p_playlist->object_lock );
-        }
-    }
 
     p_intf->p_sys->b_intf_update = VLC_TRUE;
 }
@@ -617,7 +585,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                                               FIND_ANYWHERE );
         if( p_vout != NULL )
         {
-            /* We need to lock the vout here to make sure it does not disappear */
             id o_vout_wnd;
             NSEnumerator * o_enum = [[NSApp windows] objectEnumerator];
             
@@ -640,11 +607,6 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
 #define p_input p_playlist->p_input
 
-    if( p_input != NULL )
-    {
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-    }
-
     if( p_intf->p_sys->b_intf_update )
     {
         vlc_bool_t b_input = VLC_FALSE;
@@ -657,6 +619,8 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
         if( ( b_input = ( p_input != NULL ) ) )
         {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+
             /* seekable streams */
             b_seekable = p_input->stream.b_seekable;
 
@@ -669,6 +633,8 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
             /* play status */
             p_intf->p_sys->b_play_status = 
                 p_input->stream.control.i_status != PAUSE_S;
+            
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
         else
         {
@@ -693,13 +659,14 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
         p_intf->p_sys->b_intf_update = VLC_FALSE;
     }
-
+    
 #define p_area p_input->stream.p_selected_area
 
     if( p_intf->p_sys->b_playing && p_input != NULL )
     {
         vlc_bool_t b_field_update = TRUE;
-
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        
         if( !p_input->b_die && ( p_intf->p_sys->b_play_status !=
             ( p_input->stream.control.i_status != PAUSE_S ) ) ) 
         {
@@ -750,6 +717,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
             o_time = [NSString stringWithUTF8String: psz_time];
             [o_timefield setStringValue: o_time];
         }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         /* disable screen saver */
         UpdateSystemActivity( UsrActivity );
