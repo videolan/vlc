@@ -5,8 +5,9 @@
 # Author: Cyril Deguet <asmax@via.ecp.fr>
 
 
-import cfg, SocketServer, string, sys
+import cfg, sap, SocketServer, string, sys, time
 
+from announce import AnnounceList
 from playlist import PlayList
 from rtsp import RtspServerHandler
 from session import SessionList
@@ -21,6 +22,7 @@ if len(sys.argv) == 1:
 cfg.playlist = PlayList()
 cfg.playlist.readConfig(sys.argv[1])
 cfg.sessionList = SessionList()
+cfg.announceList = AnnounceList()
 
 rtspServer = SocketServer.TCPServer(('', PORT), RtspServerHandler)
 try:

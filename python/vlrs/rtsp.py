@@ -10,37 +10,7 @@
 
 import cfg, mimetools, re, socket, time, SocketServer, string, sys
 
-
-def ntpTime():
-    "return the current time in NTP decimal format"
-    return "%d" % (int(time.time()) + 2208988800L)
-
-
-
-class SdpMessage:
-    "Build a SDP message"
- 
-    uri = "http://www.videolan.org"
-
-    def __init__(self, sessionName, address, uri):
-        "Build the message"
-        self.sessionName = sessionName
-        self.address = address
-        self.uri = uri
-        
-    def getMessage(self):
-        "Return the SDP message"
-        msg = "v=0\r\n" + \
-              "o=asmax " + ntpTime() + " " + ntpTime() + \
-                  " IN IP4 sphinx.via.ecp.fr\r\n" + \
-              "s=" + self.sessionName + "\r\n" + \
-              "u=" + self.uri + "\r\n" + \
-              "t=0 0\r\n" + \
-              "c=IN IP4 " + self.address + "/1\r\n" + \
-              "m=video 1234 RTP/MP2T 33\r\n" + \
-              "a=control:" + self.uri + "\r\n"
-        return msg
-
+from sap import SdpMessage
 
 
 class RtspServerHandler(SocketServer.StreamRequestHandler):

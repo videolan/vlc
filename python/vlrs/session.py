@@ -20,6 +20,7 @@ class Session:
         self.state = 'ready'
         media = cfg.playlist.getMedia(self.uri)
         self.fileName = media['file']
+        self.name = media['name']
         address = "rtp/ts://" + dest
         self.streamer = VlcStreamer(self.fileName, address)
         
@@ -35,6 +36,7 @@ class Session:
         except VlcError:
             print "Streamer: play failed"
             return -1
+        cfg.announceList.addMulticastSession(self)
         return 0
 
     def pause(self):
