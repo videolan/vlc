@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.23 2004/01/29 17:51:07 zorglub Exp $
+ * $Id: access.c,v 1.24 2004/02/11 18:08:05 gbazin Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -52,7 +52,7 @@
 #include "cdda.h"
 
 /* how many blocks Open will read in each loop */
-#define CDDA_BLOCKS_ONCE 1
+#define CDDA_BLOCKS_ONCE 20
 #define CDDA_DATA_ONCE   (CDDA_BLOCKS_ONCE * CDIO_CD_FRAMESIZE_RAW)
 
 #define CDDA_MRL_PREFIX "cddax://"
@@ -187,24 +187,31 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
 
     p_cdda = (cdda_data_t *)p_input->p_access_data;
 
+    /* Compute the number of blocks we have to read */
+    i_blocks = i_len / CDIO_CD_FRAMESIZE_RAW;
     i_read = 0;
 
-    /* Compute the number of blocks we have to read */
+    if( !p_cdda->i_header_pos )
+    {
+        p_cdda->i_header_pos = sizeof(WAVEHEADER);
+        i_blocks = (i_len - sizeof(WAVEHEADER)) / CDIO_CD_FRAMESIZE_RAW;
+        memcpy( p_buffer, &p_cdda->waveheader, sizeof(WAVEHEADER) );
+        p_buffer += sizeof(WAVEHEADER);
+        i_read += sizeof(WAVEHEADER);
+    }
 
-    i_blocks = i_len / CDIO_CD_FRAMESIZE_RAW;
-
-    for ( i_index = 0; i_index < i_blocks; i_index++ )
+    for( i_index = 0; i_index < i_blocks; i_index++ )
     {
 
-      if (cdio_read_audio_sector(p_cdda->p_cddev->cdio, p_buffer,
-                                 p_cdda->i_sector) != 0)
+        if( cdio_read_audio_sector( p_cdda->p_cddev->cdio, p_buffer,
+                                    p_cdda->i_sector) != 0 )
         {
-          msg_Err( p_input, "could not read sector %d", p_cdda->i_sector );
-          return -1;
+            msg_Err( p_input, "could not read sector %d", p_cdda->i_sector );
+            return -1;
         }
 
         p_cdda->i_sector ++;
-        if ( p_cdda->i_sector == p_cdda->p_sectors[p_cdda->i_track + 1] )
+        if( p_cdda->i_sector == p_cdda->p_sectors[p_cdda->i_track + 1] )
         {
             input_area_t *p_area;
 
@@ -223,6 +230,7 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
         i_read += CDIO_CD_FRAMESIZE_RAW;
+        p_buffer += CDIO_CD_FRAMESIZE_RAW;
     }
 
     if ( i_len % CDIO_CD_FRAMESIZE_RAW ) /* this should not happen */
@@ -901,6 +909,7 @@ E_(Open)( vlc_object_t *p_this )
     int                     i;
     int                     i_track = 1;
     cddev_t                 *p_cddev;
+    vlc_value_t             val;
     bool                    play_single_track = false;
 
     /* Set where to log errors messages from libcdio. */
@@ -1036,21 +1045,37 @@ E_(Open)( vlc_object_t *p_this )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    if( !p_input->psz_demux || !*p_input->psz_demux )
-    {
-        p_input->psz_demux = "cdda";
-    }
-
     p_input->pf_read = CDDARead;
     p_input->pf_seek = CDDASeek;
     p_input->pf_set_area = CDDASetArea;
     p_input->pf_set_program = CDDASetProgram;
 
     /* Update default_pts to a suitable value for cdda access */
-    p_input->i_pts_delay = config_GetInt( p_input,
-                                          MODULE_STRING "-caching" ) * 1000;
+    var_Create( p_input, MODULE_STRING "-caching",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, MODULE_STRING "-caching", &val );
+    p_input->i_pts_delay = val.i_int * 1000;
 
     free( psz_source );
+
+    /* Build a WAV header for the output data */
+    memset( &p_cdda->waveheader, 0, sizeof(WAVEHEADER) );
+    SetWLE( &p_cdda->waveheader.Format, 1 ); /*WAVE_FORMAT_PCM*/
+    SetWLE( &p_cdda->waveheader.BitsPerSample, 16);
+    p_cdda->waveheader.MainChunkID = VLC_FOURCC('R', 'I', 'F', 'F');
+    p_cdda->waveheader.Length = 0;                     /* we just don't know */
+    p_cdda->waveheader.ChunkTypeID = VLC_FOURCC('W', 'A', 'V', 'E');
+    p_cdda->waveheader.SubChunkID = VLC_FOURCC('f', 'm', 't', ' ');
+    SetDWLE( &p_cdda->waveheader.SubChunkLength, 16);
+    SetWLE( &p_cdda->waveheader.Modus, 2);
+    SetDWLE( &p_cdda->waveheader.SampleFreq, 44100);
+    SetWLE( &p_cdda->waveheader.BytesPerSample,
+            2 /*Modus*/ * 16 /*BitsPerSample*/ / 8 );
+    SetDWLE( &p_cdda->waveheader.BytesPerSec,
+             16 /*BytesPerSample*/ * 44100 /*SampleFreq*/ );
+    p_cdda->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
+    p_cdda->waveheader.DataLength = 0;                 /* we just don't know */
+    p_cdda->i_header_pos = 0;
 
     return 0;
 }

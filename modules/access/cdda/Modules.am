@@ -4,5 +4,4 @@ SOURCES_cddax = \
 	access.c \
 	cdda.c \
 	cdda.h \
-	demux.c \
 	$(NULL)
