@@ -2,7 +2,7 @@
  * sgimb.c: a meta demux to parse sgimb referrer files
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: $
+ * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *
@@ -86,6 +86,9 @@ struct demux_sys_t
     char        *psz_name;      /* sgiShowingName= */
     char        *psz_user;      /* sgiUserAccount= */
     char        *psz_password;  /* sgiUserPassword= */
+    char        *psz_mcast_ip;  /* sgiMulticastAddress= */
+    int         i_mcast_port;   /* sgiMulticastPort= */
+    int         i_packet_size;  /* sgiPacketSize= */
     mtime_t     i_duration;     /* sgiDuration= */
     int         i_port;         /* sgiRtspPort= */
     int         i_sid;          /* sgiSid= */
@@ -113,6 +116,9 @@ static int Activate( vlc_object_t * p_this )
     p_sys->psz_name = NULL;
     p_sys->psz_user = NULL;
     p_sys->psz_password = NULL;
+    p_sys->psz_mcast_ip = NULL;
+    p_sys->i_mcast_port = 0;
+    p_sys->i_packet_size = 0;
     p_sys->i_duration = (mtime_t)0;
     p_sys->i_port = 0;
 
@@ -154,6 +160,8 @@ static void Deactivate( vlc_object_t *p_this )
         free( p_sys->psz_user );
     if( p_sys->psz_password )
         free( p_sys->psz_password );
+    if( p_sys->psz_mcast_ip )
+        free( p_sys->psz_mcast_ip );
     free( p_demux->p_sys );
     return;
 }
@@ -218,6 +226,21 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
         psz_bol += sizeof("sgiShowingName=") - 1;
         p_sys->psz_name = strdup( psz_bol );
     }
+    else if( !strncasecmp( psz_bol, "sgiMulticastAddress=", sizeof("sgiMulticastAddress=") - 1 ) )
+    {
+        psz_bol += sizeof("sgiMulticastAddress=") - 1;
+        p_sys->psz_mcast_ip = strdup( psz_bol );
+    }
+    else if( !strncasecmp( psz_bol, "sgiMulticastPort=", sizeof("sgiMulticastPort=") - 1 ) )
+    {
+        psz_bol += sizeof("sgiMulticastPort=") - 1;
+        p_sys->i_mcast_port = (int) strtol( psz_bol, NULL, 0 );
+    }
+    else if( !strncasecmp( psz_bol, "sgiPacketSize=", sizeof("sgiPacketSize=") - 1 ) )
+    {
+        psz_bol += sizeof("sgiPacketSize=") - 1;
+        p_sys->i_packet_size = (int) strtol( psz_bol, NULL, 0 );
+    }
     else if( !strncasecmp( psz_bol, "sgiDuration=", sizeof("sgiDuration=") - 1 ) )
     {
         psz_bol += sizeof("sgiDuration=") - 1;
@@ -244,6 +267,7 @@ static int Demux ( demux_t *p_demux )
 {
     demux_sys_t     *p_sys = p_demux->p_sys;
     playlist_t      *p_playlist;
+    playlist_item_t *p_item;
     
     char            *psz_line;
     int             i_position;
@@ -264,8 +288,18 @@ static int Demux ( demux_t *p_demux )
         ParseLine( p_demux, psz_line );
         if( psz_line ) free( psz_line );
     }
-    
-    if( p_sys->psz_uri == NULL )
+
+    if( p_sys->psz_mcast_ip )
+    {
+        char *temp;
+
+        temp = (char *)malloc( sizeof("udp/ts2://@000.000.000.000:123456789" ) );
+        sprintf( temp, "udp/ts2://@" "%s:%i", p_sys->psz_mcast_ip, p_sys->i_mcast_port );
+        if( p_sys->psz_uri ) free( p_sys->psz_uri );
+        p_sys->psz_uri = strdup( temp );
+        free( temp );
+    }
+    else if( p_sys->psz_uri == NULL )
     {
         if( p_sys->psz_server && p_sys->psz_location )
         {
@@ -280,10 +314,26 @@ static int Demux ( demux_t *p_demux )
             free( temp );
         }
     }
-    
-    playlist_AddExt( p_playlist, p_sys->psz_uri,
-        p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri,
-        PLAYLIST_INSERT, i_position, p_sys->i_duration, NULL, 0 );
+
+    p_item = playlist_ItemNew( p_playlist, p_sys->psz_uri,
+                      p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri );
+
+    if( !p_item || !p_item->input.psz_uri )
+    {
+        msg_Err( p_demux, "A valid playlistitem could not be created" );
+        return VLC_EGENERIC;
+    }
+
+    if( p_sys->i_packet_size && p_sys->psz_mcast_ip )
+    {
+        char *psz_option = (char *) malloc( 20 );
+        sprintf( psz_option, "mtu=%i", p_sys->i_packet_size );
+        playlist_ItemAddOption( p_item, psz_option );
+        free( psz_option );
+    }
+
+    playlist_ItemSetDuration( p_item, p_sys->i_duration );
+    playlist_AddItem( p_playlist, p_item, PLAYLIST_INSERT, i_position );
 
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;

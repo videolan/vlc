@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.25 2004/02/22 23:09:25 titer Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -153,6 +153,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     int i_handle, i_opt;
     socklen_t i_opt_size;
     struct sockaddr_in sock;
+    vlc_value_t val;
 
     /* If IP_ADD_SOURCE_MEMBERSHIP is not defined in the headers
        (because it's not in glibc for example), we have to define the
@@ -420,7 +421,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
 
     p_socket->i_handle = i_handle;
-    p_socket->i_mtu = config_GetInt( p_this, "mtu" );
+
+    var_Create( p_this, "mtu", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "mtu", &val );
+    p_socket->i_mtu = val.i_int;
     return( 0 );
 }
 

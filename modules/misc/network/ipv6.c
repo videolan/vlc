@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.16 2004/02/15 22:20:56 gbazin Exp $
+ * $Id$
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -250,6 +250,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     int i_handle, i_opt;
     socklen_t i_opt_size;
     struct sockaddr_in6 sock;
+    vlc_value_t val;
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET6 domain, automatic (0)
      * protocol */
@@ -428,7 +429,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
 
     p_socket->i_handle = i_handle;
-    p_socket->i_mtu = config_GetInt( p_this, "mtu" );
+
+    var_Create( p_this, "mtu", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "mtu", &val );
+    p_socket->i_mtu = val.i_int;
 
     return( 0 );
 }

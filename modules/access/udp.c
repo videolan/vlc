@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP input module
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: udp.c,v 1.29 2004/01/31 18:02:32 alexis Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -215,7 +215,9 @@ static int Open( vlc_object_t *p_this )
     free( psz_name );
 
     /* FIXME */
-    p_input->i_mtu = config_GetInt( p_this, "mtu" );
+    var_Create( p_input, "mtu", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "mtu", &val);
+    p_input->i_mtu = val.i_int;
 
     /* fill p_input fields */
     p_input->pf_read = RTPChoose;
