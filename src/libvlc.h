@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.85 2003/09/20 02:47:41 hartman Exp $
+ * $Id: libvlc.h,v 1.86 2003/09/20 19:37:54 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -374,15 +374,15 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "es", "de", "fr", "it", 
     "When selected, VLC will randomly play files in the playlist until " \
     "interrupted.")
 
-#define ENQUEUE_TEXT N_("Enqueue items in playlist")
-#define ENQUEUE_LONGTEXT N_( \
-    "If you want VLC to add items to the playlist as you open them, then " \
-    "enable this option.")
-
 #define LOOP_TEXT N_("Loop playlist on end")
 #define LOOP_LONGTEXT N_( \
     "If you want VLC to keep playing the playlist indefinitely then enable " \
     "this option.")
+    
+#define REPEAT_TEXT N_("Repeat the current playlistitem")
+#define REPEAT_LONGTEXT N_( \
+    "When this is active VLC will keep playing the current playlistitem " \
+    "over and over again.")
 
 #define MEMCPY_TEXT N_("Memory copy module")
 #define MEMCPY_LONGTEXT N_( \
@@ -606,8 +606,8 @@ vlc_module_begin();
     /* Playlist options */
     add_category_hint( N_("Playlist"), NULL, VLC_FALSE );
     add_bool_with_short( "random", 'Z', 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
-    add_bool( "enqueue", 0, NULL, ENQUEUE_TEXT, ENQUEUE_LONGTEXT, VLC_FALSE );
     add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
+    add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
 
     /* Misc options */
     add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );

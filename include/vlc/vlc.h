@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.26 2003/09/07 22:45:16 fenrir Exp $
+ * $Id: vlc.h,v 1.27 2003/09/20 19:37:53 hartman Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,15 +96,6 @@ struct vlc_list_t
 #define PLAYLIST_CHECK_INSERT    0x0010
 
 #define PLAYLIST_END           -666
-
-/* Playlist parsing mode */
-#define PLAYLIST_REPEAT_CURRENT   0             /* Keep playing current item */
-#define PLAYLIST_FORWARD          1              /* Parse playlist until end */
-#define PLAYLIST_BACKWARD        -1                       /* Parse backwards */
-#define PLAYLIST_FORWARD_LOOP     2               /* Parse playlist and loop */
-#define PLAYLIST_BACKWARD_LOOP   -2              /* Parse backwards and loop */
-#define PLAYLIST_RANDOM           3                          /* Shuffle play */
-#define PLAYLIST_REVERSE_RANDOM  -3                  /* Reverse shuffle play */
 
 /** Playlist commands */
 typedef enum {

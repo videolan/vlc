@@ -27,6 +27,8 @@
                 pause = id; 
                 play = id; 
                 prev = id; 
+                random = id; 
+                repeat = id; 
                 slower = id; 
                 stop = id; 
                 toggleVar = id; 
@@ -130,7 +132,9 @@
                 "o_mi_previous" = id; 
                 "o_mi_program" = id; 
                 "o_mi_quit" = id; 
+                "o_mi_random" = id; 
                 "o_mi_readme" = id; 
+                "o_mi_repeat" = id; 
                 "o_mi_reportabug" = id; 
                 "o_mi_screen" = id; 
                 "o_mi_select_all" = id; 

@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.95 2003/09/20 13:46:00 hartman Exp $
+ * $Id: intf.m,v 1.96 2003/09/20 19:37:53 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -347,7 +347,9 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     [o_mi_slower setTitle: _NS("Slower")];
     [o_mi_previous setTitle: _NS("Previous")];
     [o_mi_next setTitle: _NS("Next")];
-    [o_mi_loop setTitle: _NS("Loop")];
+    [o_mi_random setTitle: _NS("Shuffle")];
+    [o_mi_repeat setTitle: _NS("Repeat Item")];
+    [o_mi_loop setTitle: _NS("Repeat Playlist")];
     [o_mi_fwd setTitle: _NS("Step Forward")];
     [o_mi_bwd setTitle: _NS("Step Backward")];
     [o_mi_program setTitle: _NS("Program")];

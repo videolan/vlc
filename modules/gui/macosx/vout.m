@@ -3,7 +3,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.56 2003/09/20 13:46:00 hartman Exp $
+ * $Id: vout.m,v 1.57 2003/09/20 19:37:53 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1412,7 +1412,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             backing: NSBackingStoreBuffered
             defer: NO screen: o_screen];
 
-        [p_vout->p_sys->o_window setLevel: NSPopUpMenuWindowLevel - 1];
+        //[p_vout->p_sys->o_window setLevel: NSPopUpMenuWindowLevel - 1];
         p_vout->p_sys->b_mouse_moved = YES;
         p_vout->p_sys->i_time_mouse_last_moved = mdate();
     }

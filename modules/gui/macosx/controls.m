@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.48 2003/09/20 13:46:00 hartman Exp $
+ * $Id: controls.m,v 1.49 2003/09/20 19:37:53 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -207,10 +207,10 @@
     vlc_object_release( p_playlist );
 }
 
-- (IBAction)loop:(id)sender
+- (IBAction)random:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-
+    vlc_value_t val;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -218,8 +218,45 @@
         return;
     }
 
-    config_PutInt( p_playlist, "loop",
-                   !config_GetInt( p_playlist, "loop" ) );
+    var_Get( p_playlist, "random", &val );
+    val.b_bool = !val.b_bool;
+    var_Set( p_playlist, "random", val );
+
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)repeat:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    vlc_value_t val;
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    var_Get( p_playlist, "repeat", &val );
+    val.b_bool = !val.b_bool;
+    var_Set( p_playlist, "repeat", val );
+
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)loop:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    vlc_value_t val;
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    var_Get( p_playlist, "loop", &val );
+    val.b_bool = !val.b_bool;
+    var_Set( p_playlist, "loop", val );
 
     vlc_object_release( p_playlist );
 }
@@ -232,7 +269,7 @@
     if( p_input != NULL )
     {
         vlc_value_t time;
-        time.f_float = 5;
+        time.i_time = 5 * 1000000;
         var_Set( p_input, "time-offset", time );
         vlc_object_release( p_input );
     }
@@ -246,7 +283,7 @@
     if( p_input != NULL )
     {
         vlc_value_t time;
-        time.f_float = -5;
+        time.i_time = -5 * 1000000;
         var_Set( p_input, "time-offset", time );
         vlc_object_release( p_input );
     }
@@ -589,8 +626,8 @@
 - (BOOL)validateMenuItem:(NSMenuItem *)o_mi
 {
     BOOL bEnabled = TRUE;
+    vlc_value_t val;
     intf_thread_t * p_intf = [NSApp getIntf];
-
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
 
@@ -641,11 +678,25 @@
             }
         }
     }
-    else if( [[o_mi title] isEqualToString: _NS("Loop")] )
+    else if( [[o_mi title] isEqualToString: _NS("Shuffle")] )
     {
-        int i_state = config_GetInt( p_playlist, "loop" ) ?
-                      NSOnState : NSOffState;
-
+        int i_state;
+        var_Get( p_playlist, "random", &val );
+        i_state = val.b_bool ? NSOnState : NSOffState;
+        [o_mi setState: i_state];
+    }
+    else if( [[o_mi title] isEqualToString: _NS("Repeat Item")] )
+    {
+        int i_state;
+        var_Get( p_playlist, "repeat", &val );
+        i_state = val.b_bool ? NSOnState : NSOffState;
+        [o_mi setState: i_state];
+    }
+    else if( [[o_mi title] isEqualToString: _NS("Repeat Playlist")] )
+    {
+        int i_state;
+        var_Get( p_playlist, "loop", &val );
+        i_state = val.b_bool ? NSOnState : NSOffState;
         [o_mi setState: i_state];
     }
     else if( [[o_mi title] isEqualToString: _NS("Step Forward")] ||

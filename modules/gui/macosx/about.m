@@ -2,7 +2,7 @@
  * about.m: MacOS X About Panel
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: about.m,v 1.2 2003/05/11 23:17:30 hartman Exp $
+ * $Id: about.m,v 1.3 2003/09/20 19:37:53 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -84,7 +84,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         o_credits = [[NSString alloc] initWithData: [NSData dataWithContentsOfFile: o_credits_path ] encoding:NSWindowsCP1252StringEncoding];
         
         /* Parse the authors string */
-        NSMutableString *o_outString = [NSMutableString string];
+        NSMutableString *o_outString = [NSMutableString stringWithFormat: @"%@\n\n", _NS(INTF_ABOUT_MSG)];
         NSScanner *o_scan_credits = [NSScanner scannerWithString: o_credits];
         NSCharacterSet *o_stopSet = [NSCharacterSet characterSetWithCharactersInString:@"\n\r"];
         

@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.53 2003/09/19 21:53:48 fenrir Exp $
+ * $Id: playlist.c,v 1.54 2003/09/20 19:37:54 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -73,6 +73,10 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     var_Create( p_playlist, "intf-show", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-show", val );
+    
+    var_Create( p_playlist, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "repeat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     p_playlist->p_input = NULL;
     p_playlist->i_status = PLAYLIST_STOPPED;
@@ -784,7 +788,7 @@ static void RunThread ( playlist_t *p_playlist )
 static void SkipItem( playlist_t *p_playlist, int i_arg )
 {
     int i_oldindex = p_playlist->i_index;
-    vlc_bool_t b_random;
+    vlc_bool_t b_random, b_repeat, b_loop;
     vlc_value_t val;
 
     /* If the playlist is empty, there is no current item */
@@ -794,7 +798,12 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
         return;
     }
 
-    b_random = config_GetInt( p_playlist, "random" );
+    var_Get( p_playlist, "random", &val );
+    b_random = val.b_bool;
+    var_Get( p_playlist, "repeat", &val );
+    b_repeat = val.b_bool;
+    var_Get( p_playlist, "loop", &val );
+    b_loop = val.b_bool;
 
     /* Increment */
     if( b_random )
@@ -809,7 +818,10 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
             i_arg = (int)((float)p_playlist->i_size * rand() / (RAND_MAX+1.0));
         }
     }
-
+    if( b_repeat )
+    {
+        i_arg = 0;
+    }
     p_playlist->i_index += i_arg;
 
     /* Boundary check */
@@ -817,7 +829,7 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     {
         if( p_playlist->i_status == PLAYLIST_STOPPED
              || b_random
-             || config_GetInt( p_playlist, "loop" ) )
+             || b_loop )
         {
             p_playlist->i_index -= p_playlist->i_size
                          * ( p_playlist->i_index / p_playlist->i_size );
