@@ -160,7 +160,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     vlc_mutex_lock( &p_item->lock );
     for( i = 0; i < p_item->i_options; i++ )
     {
-        msg_Dbg( p_input, "option: %s", p_item->ppsz_options[i] );
+//        msg_Dbg( p_input, "option: %s", p_item->ppsz_options[i] );
         ParseOption( p_input, p_item->ppsz_options[i] );
     }
     vlc_mutex_unlock( &p_item->lock );

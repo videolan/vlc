@@ -630,7 +630,9 @@ public:
     wxComboBox *file_combo;
     wxComboBox *encoding_combo;
     wxComboBox *size_combo;
+    wxComboBox *align_combo;
     wxSpinCtrl *fps_spinctrl;
+    wxSpinCtrl *delay_spinctrl;
 
 private:
     /* Event handlers (these functions should _not_ be virtual) */
