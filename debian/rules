@@ -121,9 +121,9 @@ binary-arch: build install
 	dh_installman doc/vlc.1
 #	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt ChangeLog
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad ChangeLog
 # libdvdcss start
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt ChangeLog.libdvdcss
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad ChangeLog.libdvdcss
 # libdvdcss stop
 	dh_link
 	dh_strip
