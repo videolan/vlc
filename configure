@@ -12462,10 +12462,11 @@ fi;
     test_LDFLAGS="-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'`"
     test_CFLAGS="-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'`"
   else
-    test_LDFLAGS="-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'``"
-    test_CFLAGS="-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'``"
+    test_LDFLAGS="-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'`"
+    test_CFLAGS="-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'`"
   fi
   CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
+  ac_cv_qte_headers=yes
 
 
 for ac_header in qt.h jpeglib.h
@@ -12577,33 +12578,23 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
 
-    qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -ljpeg -lqte"
-    PLUGINS="${PLUGINS} qte"
-
 else
-   { { echo "$as_me:$LINENO: error: echo \"Cannot find QT Embedded development headers.\"" >&5
+
+    ac_cv_qte_headers=no
+    { { echo "$as_me:$LINENO: error: echo \"Cannot find QT Embedded development headers.\"" >&5
 echo "$as_me: error: echo \"Cannot find QT Embedded development headers.\"" >&2;}
    { (exit 1); exit 1; }; }
+
 fi
 
 done
 
-  CPPFLAGS="${save_CPPFLAGS}"
-
-#  AC_ARG_WITH(qte_system,
-#  [    --with-qte-system=PATH Additional headers and libraries for Qt Embedded.
-#                           (The usr/lib, usr/include directories)])
-#  if test "x${with_qte_system}" != "xno" -a "x${with_qte_system}" != "x"
-#  then
-#    test_CFLAGS="-I${with_qte_system}/include"
-#    test_LDFLAGS="-L${with_qte_system}/lib"
-#  fi
-#  CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
-#  AC_CHECK_HEADERS(jpeglib.h, [
-#    qte_LDFLAGS="${test_LDFLAGS} -ljpeg ${qte_LDFLAGS}"
-#  ],
-#  [ AC_MSG_ERROR([echo "Cannot find additional QT Embedded system development headers."]) ] )
+  if test "x${ac_cv_qte_headers}" = "xyes"
+  then
+    qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -ljpeg -lqte"
+    PLUGINS="${PLUGINS} qte"
+  fi
   CPPFLAGS="${save_CPPFLAGS}"
 fi
 
