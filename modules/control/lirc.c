@@ -462,30 +462,12 @@ static void Run( intf_thread_t *p_intf )
 
                     if( !strcmp( c, "CHAPTER_N" ) )
                     {
-                        vlc_mutex_lock( &p_input->stream.stream_lock );
-                        i_chapter = p_input->stream.p_selected_area->i_part + 1;
-                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                        var_SetVoid( p_input, "next-chapter" );
                     }
                     else if( !strcmp( c, "CHAPTER_P" ) )
                     {
-                        vlc_mutex_lock( &p_input->stream.stream_lock );
-                        i_chapter = p_input->stream.p_selected_area->i_part - 1;
-                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                        var_SetVoid( p_input, "prev-chapter" );
                     }
-
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
-                    if( ( i_chapter > 0 ) && ( i_chapter <
-                                               p_input->stream.p_selected_area->i_part_nb ) )
-                    {
-                        input_area_t *p_area = p_input->stream.p_selected_area;
-                        p_input->stream.p_selected_area->i_part = i_chapter;
-                        vlc_mutex_unlock( &p_input->stream.stream_lock );
-                        input_ChangeArea( p_input, p_area );
-
-                        var_SetInteger( p_input, "state", PLAYING_S );
-                        vlc_mutex_lock( &p_input->stream.stream_lock );
-                    }
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
                 }
 /* end of modification by stephane Thu Jun 19 15:29:49 CEST 2003 */
             }
