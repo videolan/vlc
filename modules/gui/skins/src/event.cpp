@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.23 2003/10/17 18:17:28 ipkiss Exp $
+ * $Id: event.cpp,v 1.24 2004/02/15 18:58:38 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -146,6 +146,10 @@ unsigned int Event::GetMessageType( string Desc )
         return VLC_STREAM_TITLE;
     else if( Desc == "VLC_HELP_TEXT" )
         return VLC_HELP_TEXT;
+    else if( Desc == "VLC_SLOWER" )
+        return VLC_SLOWER;
+    else if( Desc == "VLC_FASTER" )
+        return VLC_FASTER;
 
     // Volume control
     else if( Desc == "VLC_VOLUME_CHANGE" )

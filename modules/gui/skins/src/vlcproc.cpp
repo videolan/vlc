@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.53 2004/01/05 13:07:03 zorglub Exp $
+ * $Id: vlcproc.cpp,v 1.54 2004/02/15 18:58:38 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -52,7 +52,7 @@ VlcProc::VlcProc( intf_thread_t *_p_intf )
         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
-        // We want to be notified of playlit changes
+        // We want to be notified of playlist changes
         var_AddCallback( p_playlist, "intf-change", RefreshCallback, this );
 
         // Raise/lower interface with middle click on vout
@@ -160,6 +160,14 @@ bool VlcProc::EventProc( Event *evt )
 
         case VLC_PREV:
             PrevStream();
+            return true;
+
+        case VLC_SLOWER:
+            SlowStream();
+            return true;
+
+        case VLC_FASTER:
+            FastStream();
             return true;
 
         case VLC_PLAYLIST_ADD_FILE:
@@ -530,6 +538,34 @@ void VlcProc::PrevStream()
 
     // Refresh interface
     InterfaceRefresh();
+}
+//---------------------------------------------------------------------------
+void VlcProc::SlowStream()
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( p_input )
+    {
+        vlc_value_t val; val.b_bool = VLC_TRUE;
+
+        var_Set( p_input, "rate-slower", val );
+        vlc_object_release( p_input );
+    }
+}
+//---------------------------------------------------------------------------
+void VlcProc::FastStream()
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( p_input )
+    {
+        vlc_value_t val; val.b_bool = VLC_TRUE;
+
+        var_Set( p_input, "rate-faster", val );
+        vlc_object_release( p_input );
+    }
 }
 //---------------------------------------------------------------------------
 void VlcProc::MoveStream( long Pos )

@@ -100,6 +100,14 @@ EVENT is the action to execute, it can be one of the following:
    Action    : go to the previous file in the playlist.
    Parameters: none.
 
+ - VLC_SLOWER:
+   Action    : play the stream slower.
+   Parameters: none.
+
+ - VLC_FASTER:
+   Action    : play the stream faster.
+   Parameters: none.
+
  - VLC_STREAMPOS:
    Not supported yet.
 
@@ -196,6 +204,8 @@ shortcut.
   stop         V            Stop.
   next         B            Next file.
   prev         Z            Previous file.
+  slow                      Play slower.
+  fast                      Play faster.
   fullscreen   F            Switch to fullscreen mode.
   mute                      Mute the sound.
   volume_up

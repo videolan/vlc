@@ -2,7 +2,7 @@
  * banks.cpp: Bitmap bank, Event bank, Font bank and OffSet bank
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: banks.cpp,v 1.11 2003/10/17 20:21:59 ipkiss Exp $
+ * $Id: banks.cpp,v 1.12 2004/02/15 18:58:38 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -164,6 +164,8 @@ EventBank::EventBank( intf_thread_t *_p_intf )
     Add( "stop",             "VLC_STOP",                "V" );
     Add( "next",             "VLC_NEXT",                "B" );
     Add( "prev",             "VLC_PREV",                "Z" );
+    Add( "slow",             "VLC_SLOWER",              "none" );
+    Add( "fast",             "VLC_FASTER",              "none" );
     Add( "fullscreen",       "VLC_FULLSCREEN",          "F" );
 
     // Volume control
