@@ -235,4 +235,6 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_CUBESPEED_UP          52
 #define ACTIONID_CUBESPEED_DOWN        53
 #define ACTIONID_INTF_SHOW             52
+#define ACTIONID_AUDIODELAY_UP         53
+#define ACTIONID_AUDIODELAY_DOWN       54
 

@@ -694,6 +694,12 @@ static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
 
+    /*Change i_pts_delay to make sure es are decoded in time*/
+    if (newval.i_int < 0 || oldval.i_int < 0 )
+    {
+        p_input->i_pts_delay -= newval.i_int - oldval.i_int;
+    }
+
     if( !strcmp( psz_cmd, "audio-delay" ) )
         input_ControlPush( p_input, INPUT_CONTROL_SET_AUDIO_DELAY, &newval );
     else if( !strcmp( psz_cmd, "spu-delay" ) )

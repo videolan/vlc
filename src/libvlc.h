@@ -750,6 +750,10 @@ static char *ppsz_align_descriptions[] =
 #define SUBDELAY_UP_KEY_LONGTEXT N_("Select the key to increase the subtitle delay.")
 #define SUBDELAY_DOWN_KEY_TEXT N_("Subtitle delay down")
 #define SUBDELAY_DOWN_KEY_LONGTEXT N_("Select the key to decrease the subtitle delay.")
+#define AUDIODELAY_UP_KEY_TEXT N_("Audio delay up")
+#define AUDIODELAY_UP_KEY_LONGTEXT N_("Select the key to increase the audio delay.")
+#define AUDIODELAY_DOWN_KEY_TEXT N_("Audio delay down")
+#define AUDIODELAY_DOWN_KEY_LONGTEXT N_("Select the key to decrease the audio delay.")
 #define PLAY_BOOKMARK1_KEY_TEXT N_("Play playlist bookmark 1")
 #define PLAY_BOOKMARK2_KEY_TEXT N_("Play playlist bookmark 2")
 #define PLAY_BOOKMARK3_KEY_TEXT N_("Play playlist bookmark 3")
@@ -1184,6 +1188,8 @@ vlc_module_begin();
 #   define KEY_VOL_MUTE           KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m'
 #   define KEY_SUBDELAY_UP        KEY_MODIFIER_COMMAND|'k'
 #   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_COMMAND|'j'
+#   define KEY_AUDIODELAY_UP      KEY_MODIFIER_COMMAND|'h'
+#   define KEY_AUDIODELAY_DOWN    KEY_MODIFIER_COMMAND|'g'
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     's'
 #   define KEY_INTF_SHOW          'i'
@@ -1239,6 +1245,9 @@ vlc_module_begin();
 #   define KEY_VOL_MUTE           'm'
 #   define KEY_SUBDELAY_UP        KEY_MODIFIER_CTRL|'h'
 #   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_CTRL|'j'
+#   define KEY_AUDIODELAY_UP      KEY_MODIFIER_CTRL|'k'
+#   define KEY_AUDIODELAY_DOWN    KEY_MODIFIER_CTRL|'l'
+
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     'k'
 #   define KEY_INTF_SHOW          'i'
@@ -1323,6 +1332,10 @@ vlc_module_begin();
              SUBDELAY_UP_KEY_TEXT, SUBDELAY_UP_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-subdelay-down", KEY_SUBDELAY_DOWN, NULL,
              SUBDELAY_DOWN_KEY_TEXT, SUBDELAY_DOWN_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-audiodelay-up", KEY_AUDIODELAY_UP, NULL,
+             AUDIODELAY_UP_KEY_TEXT, AUDIODELAY_UP_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-audiodelay-down", KEY_AUDIODELAY_DOWN, NULL,
+             AUDIODELAY_DOWN_KEY_TEXT, AUDIODELAY_DOWN_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-audio-track", KEY_AUDIO_TRACK, NULL, AUDIO_TRACK_KEY_TEXT,
              AUDIO_TRACK_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-subtitle-track", KEY_SUBTITLE_TRACK, NULL,
@@ -1436,6 +1449,8 @@ static struct hotkey p_hotkeys[] =
     { "key-vol-mute", ACTIONID_VOL_MUTE, 0 },
     { "key-subdelay-down", ACTIONID_SUBDELAY_DOWN, 0 },
     { "key-subdelay-up", ACTIONID_SUBDELAY_UP, 0 },
+    { "key-audiodelay-down", ACTIONID_AUDIODELAY_DOWN, 0 },
+    { "key-audiodelay-up", ACTIONID_AUDIODELAY_UP, 0 },
     { "key-audio-track", ACTIONID_AUDIO_TRACK, 0},
     { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, 0},
     { "key-intf-show", ACTIONID_INTF_SHOW, 0},

@@ -321,6 +321,28 @@ static void Run( intf_thread_t *p_intf )
             vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
                                  (int)(i_delay/1000) );
         }
+        else if( i_action == ACTIONID_AUDIODELAY_DOWN )
+        {
+            int64_t i_delay = var_GetTime( p_input, "audio-delay" );
+
+            i_delay -= 50000;    /* 50 ms */
+
+            var_SetTime( p_input, "audio-delay", i_delay );
+            ClearChannels( p_intf, p_vout );
+            vout_OSDMessage( p_intf, DEFAULT_CHAN, "Audio delay %i ms",
+                                 (int)(i_delay/1000) );
+        }
+        else if( i_action == ACTIONID_AUDIODELAY_UP )
+        {
+            int64_t i_delay = var_GetTime( p_input, "audio-delay" );
+
+            i_delay += 50000;    /* 50 ms */
+
+            var_SetTime( p_input, "audio-delay", i_delay );
+            ClearChannels( p_intf, p_vout );
+            vout_OSDMessage( p_intf, DEFAULT_CHAN, "Audio delay %i ms",
+                                 (int)(i_delay/1000) );
+        }
         else if( i_action == ACTIONID_FULLSCREEN )
         {
             if( p_vout )
