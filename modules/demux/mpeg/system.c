@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.21 2003/11/24 03:30:38 fenrir Exp $
+ * $Id: system.c,v 1.22 2003/11/26 20:44:38 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -170,7 +170,7 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( (p_header[0] || p_header[1] || (p_header[2] != 1)) )
     {
         /* packet_start_code_prefix != 0x000001 */
-        msg_Err( p_input, "data loss, PES packet does not start with 000001" );
+        msg_Warn( p_input, "data loss, PES packet does not start with 000001" );
         input_DeletePES( p_input->p_method_data, p_pes );
         p_pes = NULL;
     }
@@ -289,7 +289,7 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 }
                 if( i_pes_header_size == 23 )
                 {
-                    msg_Err( p_input, "too much MPEG-1 stuffing" );
+                    msg_Warn( p_input, "too much MPEG-1 stuffing" );
                     input_DeletePES( p_input->p_method_data, p_pes );
                     p_pes = NULL;
                     return;
@@ -393,7 +393,7 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             /* Go to the next data packet. */
             if( (p_data = p_data->p_next) == NULL )
             {
-                msg_Err( p_input, "PES header bigger than payload" );
+                msg_Warn( p_input, "PES header bigger than payload" );
                 input_DeletePES( p_input->p_method_data, p_pes );
                 p_pes = NULL;
                 return;
@@ -404,7 +404,7 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         /* This last packet is partly header, partly payload. */
         if( i_payload_size < i_pes_header_size )
         {
-            msg_Err( p_input, "PES header bigger than payload" );
+            msg_Warn( p_input, "PES header bigger than payload" );
             input_DeletePES( p_input->p_method_data, p_pes );
             p_pes = NULL;
             return;
