@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.15 2003/09/02 13:42:43 sam Exp $
+ * $Id: themeloader.cpp,v 1.16 2003/12/16 18:18:14 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -308,7 +308,7 @@ int tar_open( TAR **t, char *pathname, int oflags )
     gzFile f = gzopen( pathname, "rb" );
     if( f == NULL )
     {
-        fprintf( stderr, "Couldn't gzopen %s\n", pathname );
+        //fprintf( stderr, "Couldn't gzopen %s\n", pathname );
         return -1;
     }
 
@@ -352,7 +352,15 @@ int tar_extract_all( TAR *t, char *prefix )
             if( (len == 0)  || (buffer.header.name[0]== 0) ) break;
 
             sprintf( fname, "%s/%s", prefix, buffer.header.name );
-          
+
+            /* Check magic value in header */
+            if( strncmp( buffer.header.magic, "GNUtar", 6 ) &&
+                strncmp( buffer.header.magic, "ustar", 5 ) )
+            {
+                //fprintf(stderr, "not a tar file\n");
+                return -1;
+            }
+
             switch (buffer.header.typeflag)
             {
             case DIRTYPE:
