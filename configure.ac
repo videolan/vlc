@@ -4105,6 +4105,7 @@ AC_CONFIG_FILES([
   modules/stream_out/transrate/Makefile
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
+  modules/video_filter/swscale/Makefile
   modules/video_output/Makefile
   modules/video_output/directx/Makefile
   modules/video_output/qte/Makefile
