@@ -34,15 +34,50 @@
 
 #define PLAYLIST_FILE_HEADER  "# vlc playlist file version 0.5"
 
-
 /**
- * Import a certain playlist file into the playlist
+ * Import a certain playlist file into the library
+ * This file will get inserted as a new category
  *
+ * XXX: TODO
  * \param p_playlist the playlist to which the new items will be added
  * \param psz_filename the name of the playlistfile to import
  * \return VLC_SUCCESS on success
  */
 int playlist_Import( playlist_t * p_playlist, const char *psz_filename )
+{
+    playlist_item_t *p_item;
+    char *psz_uri;
+    int i_id;
+
+    msg_Dbg( p_playlist, "clearing playlist");
+    playlist_Clear( p_playlist );
+
+
+    psz_uri = (char *)malloc(sizeof(char)*strlen(psz_filename) + 17 );
+    sprintf( psz_uri, "file/playlist://%s", psz_filename);
+
+    i_id = playlist_Add( p_playlist, psz_uri, psz_uri,
+                  PLAYLIST_INSERT  , PLAYLIST_END);
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    p_item = playlist_ItemGetById( p_playlist, i_id );
+    p_item->b_autodeletion = VLC_TRUE;
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    playlist_Play(p_playlist);
+
+    return VLC_SUCCESS;
+}
+
+/**
+ * Load a certain playlist file into the playlist
+ * This file will replace the contents of the "current" view
+ *
+ * \param p_playlist the playlist to which the new items will be added
+ * \param psz_filename the name of the playlistfile to import
+ * \return VLC_SUCCESS on success
+ */
+int playlist_Load( playlist_t * p_playlist, const char *psz_filename )
 {
     playlist_item_t *p_item;
     char *psz_uri;

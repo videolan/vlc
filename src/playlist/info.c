@@ -122,7 +122,7 @@ info_category_t * playlist_ItemGetCategory( playlist_item_t *p_item,
  * \return the info category.
  */
 info_category_t * playlist_ItemCreateCategory( playlist_item_t *p_item,
-					       const char *psz_cat )
+                                               const char *psz_cat )
 {
     info_category_t *p_cat;
     int i;

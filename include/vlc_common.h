@@ -205,17 +205,21 @@ typedef struct msg_subscription_t msg_subscription_t;
  * Playlist commands
  */
 typedef enum {
-    PLAYLIST_PLAY,                              /**< Starts playing. No arg. */
-    PLAYLIST_PAUSE,                     /**< Toggles playlist pause. No arg. */
-    PLAYLIST_STOP,                               /**< Stops playing. No arg. */
-    PLAYLIST_SKIP,                               /**< Skip X items and play. */
-    PLAYLIST_GOTO,                                       /**< Goto Xth item. */
+    PLAYLIST_PLAY,      /**< No arg.                            res=can fail*/
+    PLAYLIST_VIEWPLAY,  /**< arg1= int, arg2= playlist_item_t*,*/
+                        /**  arg3 = playlist_item_t*          , res=can fail */
+    PLAYLIST_ITEMPLAY,  /** <arg1 = playlist_item_t *         , res=can fail */
+    PLAYLIST_PAUSE,     /**< No arg                             res=can fail*/
+    PLAYLIST_STOP,      /**< No arg                             res=can fail*/
+    PLAYLIST_SKIP,      /**< arg1=int,                          res=can fail*/
+    PLAYLIST_GOTO,      /**< arg1=int                           res=can fail */
+    PLAYLIST_VIEWGOTO,      /**< arg1=int                       res=can fail */
 } playlist_command_t;
 
 
 typedef struct playlist_t playlist_t;
 typedef struct playlist_item_t playlist_item_t;
-typedef struct playlist_group_t playlist_group_t;
+typedef struct playlist_view_t playlist_view_t;
 typedef struct playlist_export_t playlist_export_t;
 
 /* Modules */

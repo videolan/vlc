@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,14 +32,24 @@
 
 #include "vlc_playlist.h"
 
-#define PLAYLIST_FILE_HEADER_0_5  "# vlc playlist file version 0.5"
+#define TITLE_CATEGORY N_( "By category" )
+#define TITLE_SIMPLE   N_( "Manually added" )
+#define TITLE_ALL      N_( "All items, unsorted" )
+
+#define PLAYLIST_PROFILE 1
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void RunThread ( playlist_t * );
-static void SkipItem  ( playlist_t *, int );
-static void PlayItem  ( playlist_t * );
+static playlist_item_t * NextItem  ( playlist_t * );
+static void PlayItem  ( playlist_t *, playlist_item_t * );
+
+static int ItemChange( vlc_object_t *, const char *,
+                       vlc_value_t, vlc_value_t, void * );
+
+int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args );
+
 
 /**
  * Create playlist
@@ -50,6 +61,7 @@ static void PlayItem  ( playlist_t * );
 playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist;
+    playlist_view_t *p_view;
     vlc_value_t     val;
 
     /* Allocate structure */
@@ -60,6 +72,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
         return NULL;
     }
 
+    /* These variables control updates */
     var_Create( p_playlist, "intf-change", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
@@ -78,31 +91,51 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-show", val );
 
+    /* Variables to control playback */
+    var_CreateGetBool( p_playlist, "play-and-stop" );
+    var_CreateGetBool( p_playlist, "random" );
+    var_CreateGetBool( p_playlist, "repeat" );
+    var_CreateGetBool( p_playlist, "loop" );
 
-    var_Create( p_playlist, "prevent-skip", VLC_VAR_BOOL );
-    val.b_bool = VLC_FALSE;
-    var_Set( p_playlist, "prevent-skip", val );
-
-    var_Create( p_playlist, "play-and-stop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_playlist, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_playlist, "repeat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_playlist, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
+    /* Initialise data structures */
+    p_playlist->b_go_next = VLC_TRUE;
     p_playlist->p_input = NULL;
-    p_playlist->i_status = PLAYLIST_STOPPED;
+
+    p_playlist->request_date = 0;
+
+    p_playlist->i_views = 0;
+    p_playlist->pp_views = NULL;
+
     p_playlist->i_index = -1;
     p_playlist->i_size = 0;
     p_playlist->pp_items = NULL;
 
-    p_playlist->i_groups = 0;
-    p_playlist->pp_groups = NULL;
-    p_playlist->i_last_group = 0;
+    playlist_ViewInsert( p_playlist, VIEW_CATEGORY, TITLE_CATEGORY );
+    playlist_ViewInsert( p_playlist, VIEW_SIMPLE, TITLE_SIMPLE );
+    playlist_ViewInsert( p_playlist, VIEW_ALL, TITLE_ALL );
+
+    p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
+
+    p_playlist->p_general = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
+                                        _( "General" ), p_view->p_root );
+
+    /* Set startup status
+     * We set to simple view on startup for interfaces that don't do
+     * anything */
+    p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+    p_playlist->status.i_view = VIEW_SIMPLE;
+    p_playlist->status.p_item = NULL;
+    p_playlist->status.p_node = p_view->p_root;
+    p_playlist->request.b_request = VLC_FALSE;
+    p_playlist->status.i_status = PLAYLIST_STOPPED;
+
+
     p_playlist->i_last_id = 0;
     p_playlist->i_sort = SORT_ID;
     p_playlist->i_order = ORDER_NORMAL;
 
-    playlist_CreateGroup( p_playlist, _("Normal") );
 
+    /* Finally, launch the thread ! */
     if( vlc_thread_create( p_playlist, "playlist", RunThread,
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
@@ -125,6 +158,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
  */
 void playlist_Destroy( playlist_t * p_playlist )
 {
+    int i;
     p_playlist->b_die = 1;
 
     vlc_thread_join( p_playlist );
@@ -134,20 +168,21 @@ void playlist_Destroy( playlist_t * p_playlist )
     var_Destroy( p_playlist, "playlist-current" );
     var_Destroy( p_playlist, "intf-popmenu" );
     var_Destroy( p_playlist, "intf-show" );
-    var_Destroy( p_playlist, "prevent-skip" );
     var_Destroy( p_playlist, "play-and-stop" );
     var_Destroy( p_playlist, "random" );
     var_Destroy( p_playlist, "repeat" );
     var_Destroy( p_playlist, "loop" );
 
-    while( p_playlist->i_groups > 0 )
-    {
-        playlist_DeleteGroup( p_playlist, p_playlist->pp_groups[0]->i_id );
-    }
+    playlist_Clear( p_playlist );
 
-    while( p_playlist->i_size > 0 )
+    for( i = p_playlist->i_views - 1; i >= 0 ; i-- )
     {
-        playlist_Delete( p_playlist, 0 );
+        playlist_view_t *p_view = p_playlist->pp_views[i];
+        if( p_view->psz_name )
+            free( p_view->psz_name );
+        playlist_ItemDelete( p_view->p_root );
+        REMOVE_ELEM( p_playlist->pp_views, p_playlist->i_views, i );
+        free( p_view );
     }
 
     vlc_object_destroy( p_playlist );
@@ -158,49 +193,100 @@ void playlist_Destroy( playlist_t * p_playlist )
  * Do a playlist action.
  *
  * If there is something in the playlist then you can do playlist actions.
+ *
+ * Playlist lock must not be taken when calling this function
+ *
  * \param p_playlist the playlist to do the command on
- * \param i_command the command to do
- * \param i_arg the argument to the command. See playlist_command_t for details
+ * \param i_query the command to do
+ * \param variable number of arguments
+ * \return VLC_SUCCESS or an error
  */
-void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
-                       int i_arg )
+int playlist_Control( playlist_t * p_playlist, int i_query, ... )
 {
+    va_list args;
+    int i_result;
+    va_start( args, i_query );
+    i_result = playlist_vaControl( p_playlist, i_query, args );
+    va_end( args );
+
+    return i_result;
+}
+
+int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
+{
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    playlist_view_t *p_view;
     vlc_value_t val;
 
-    vlc_mutex_lock( &p_playlist->object_lock );
+#ifdef PLAYLIST_PROFILE
+    p_playlist->request_date = mdate();
+#endif
 
     if( p_playlist->i_size <= 0 )
     {
         vlc_mutex_unlock( &p_playlist->object_lock );
-        return;
+        return VLC_EGENERIC;
     }
 
-    switch( i_command )
+    switch( i_query )
     {
     case PLAYLIST_STOP:
-        p_playlist->i_status = PLAYLIST_STOPPED;
-        if( p_playlist->p_input )
+        p_playlist->status.i_status = PLAYLIST_STOPPED;
+        p_playlist->request.b_request = VLC_TRUE;
+        break;
+
+    case PLAYLIST_ITEMPLAY:
+        p_playlist->status.i_status = PLAYLIST_RUNNING;
+        p_playlist->request.i_skip = 0;
+        p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.p_item = (playlist_item_t *)va_arg( args,
+                                                   playlist_item_t *);
+        p_playlist->request.i_view = p_playlist->status.i_view;
+        p_view = playlist_ViewFind( p_playlist, p_playlist->status.i_view );
+        p_playlist->request.p_node = p_view->p_root;
+        break;
+
+    case PLAYLIST_VIEWPLAY:
+        p_playlist->status.i_status = PLAYLIST_RUNNING;
+        p_playlist->request.i_skip = 0;
+        p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.i_view = (int)va_arg( args,int );
+        p_playlist->request.p_node = (playlist_item_t *)va_arg( args,
+                                                        playlist_item_t *);
+        p_playlist->request.p_item = (playlist_item_t *)va_arg( args,
+                                                        playlist_item_t *);
+
+        /* If we select a node, play only it.
+         * If we select an item, continue */
+        if( p_playlist->request.p_item == NULL ||
+            ! p_playlist->request.p_node->i_flags & PLAYLIST_SKIP_FLAG )
         {
-            input_StopThread( p_playlist->p_input );
-            val.i_int = p_playlist->i_index;
-            /* Does not matter if we unlock here */
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            var_Set( p_playlist, "item-change",val );
-            vlc_mutex_lock( &p_playlist->object_lock );
+            p_playlist->b_go_next = VLC_FALSE;
+        }
+        else
+        {
+            p_playlist->b_go_next = VLC_TRUE;
         }
         break;
 
     case PLAYLIST_PLAY:
-        p_playlist->i_status = PLAYLIST_RUNNING;
-        if( !p_playlist->p_input && p_playlist->i_enabled != 0 )
-        {
-            PlayItem( p_playlist );
-        }
+        p_playlist->status.i_status = PLAYLIST_RUNNING;
+
         if( p_playlist->p_input )
         {
             val.i_int = PLAYING_S;
             var_Set( p_playlist->p_input, "state", val );
+            break;
         }
+
+        /* FIXME : needed ? */
+        p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.i_view = p_playlist->status.i_view;
+        p_playlist->request.p_node = p_playlist->status.p_node;
+        p_playlist->request.p_item = p_playlist->status.p_item;
+        p_playlist->request.i_skip = 0;
+        p_playlist->request.i_goto = -1;
         break;
 
     case PLAYLIST_PAUSE:
@@ -210,7 +296,7 @@ void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
 
         if( val.i_int == PAUSE_S )
         {
-            p_playlist->i_status = PLAYLIST_RUNNING;
+            p_playlist->status.i_status = PLAYLIST_RUNNING;
             if( p_playlist->p_input )
             {
                 val.i_int = PLAYING_S;
@@ -219,7 +305,7 @@ void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
         }
         else
         {
-            p_playlist->i_status = PLAYLIST_PAUSED;
+            p_playlist->status.i_status = PLAYLIST_PAUSED;
             if( p_playlist->p_input )
             {
                 val.i_int = PAUSE_S;
@@ -229,48 +315,36 @@ void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
         break;
 
     case PLAYLIST_SKIP:
-        p_playlist->i_status = PLAYLIST_STOPPED;
-        if( p_playlist->i_enabled == 0)
+        if( p_playlist->status.i_view > -1 )
         {
-            break;
+            p_playlist->request.p_node = p_playlist->status.p_node;
+            p_playlist->request.p_item = p_playlist->status.p_item;
         }
-        SkipItem( p_playlist, i_arg );
-        if( p_playlist->p_input )
-        {
-            input_StopThread( p_playlist->p_input );
-        }
-        p_playlist->i_status = PLAYLIST_RUNNING;
+        p_playlist->request.i_skip = (int) va_arg( args, int );
+        p_playlist->request.b_request = VLC_TRUE;
         break;
 
     case PLAYLIST_GOTO:
-        if( i_arg >= 0 && i_arg < p_playlist->i_size &&
-            p_playlist->i_enabled != 0 )
-        {
-            p_playlist->i_index = i_arg;
-            if( p_playlist->p_input )
-            {
-                input_StopThread( p_playlist->p_input );
-            }
-            val.b_bool = VLC_TRUE;
-            var_Set( p_playlist, "prevent-skip", val );
-            p_playlist->i_status = PLAYLIST_RUNNING;
-        }
+        p_playlist->status.i_status = PLAYLIST_RUNNING;
+        p_playlist->request.p_node = NULL;
+        p_playlist->request.p_item = NULL;
+        p_playlist->request.i_view = -1;
+        p_playlist->request.i_goto = (int) va_arg( args, int );
+        p_playlist->request.b_request = VLC_TRUE;
         break;
 
     default:
-        msg_Err( p_playlist, "unknown playlist command" );
+        msg_Err( p_playlist, "unimplemented playlist query" );
+        return VLC_EBADVAR;
         break;
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
-#if 0
-    val.b_bool = VLC_TRUE;
-    var_Set( p_playlist, "intf-change", val );
-#endif
-    return;
+    return VLC_SUCCESS;
 }
 
 
+/* Destroy remaining objects */
 static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
                                        mtime_t destroy_date )
 {
@@ -316,7 +390,7 @@ static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
 static void RunThread ( playlist_t *p_playlist )
 {
     vlc_object_t *p_obj;
-    vlc_value_t val;
+    playlist_item_t *p_item;
 
     mtime_t    i_vout_destroyed_date = 0;
     mtime_t    i_sout_destroyed_date = 0;
@@ -329,6 +403,26 @@ static void RunThread ( playlist_t *p_playlist )
     while( !p_playlist->b_die )
     {
         vlc_mutex_lock( &p_playlist->object_lock );
+
+        /* First, check if we have something to do */
+        /* FIXME : this can be called several times */
+        if( p_playlist->request.b_request )
+        {
+#ifdef PLAYLIST_PROFILE
+            msg_Dbg(p_playlist, "beginning processing of request, "
+                         I64Fi" us ", mdate() - p_playlist->request_date );
+#endif
+            /* Stop the existing input */
+            if( p_playlist->p_input )
+            {
+                input_StopThread( p_playlist->p_input );
+            }
+            /* The code below will start the next input for us */
+            if( p_playlist->status.i_status == PLAYLIST_STOPPED )
+            {
+                p_playlist->request.b_request = VLC_FALSE;
+            }
+        }
 
         /* If there is an input, check that it doesn't need to die. */
         if( p_playlist->p_input )
@@ -376,27 +470,34 @@ static void RunThread ( playlist_t *p_playlist )
             else if( p_playlist->p_input->b_error
                       || p_playlist->p_input->b_eof )
             {
+                /* TODO FIXME XXX TODO FIXME XXX */
+                /* Check for autodeletion */
                 input_StopThread( p_playlist->p_input );
 
-                if( p_playlist->pp_items[p_playlist->i_index]->b_autodeletion )
+                if( p_playlist->status.p_item->i_flags & PLAYLIST_DEL_FLAG )
                 {
                     /* This ain't pretty but hey it works */
-                    p_autodelete_item =
-                        p_playlist->pp_items[p_playlist->i_index];
-                    p_playlist->pp_items[p_playlist->i_index] =
+                    p_autodelete_item = p_playlist->status.p_item;
+                    p_playlist->status.p_item =
                         playlist_ItemNew( p_playlist,
                                           p_autodelete_item->input.psz_uri, 0);
 
                     vlc_mutex_unlock( &p_playlist->object_lock );
-                    p_playlist->i_status = PLAYLIST_STOPPED;
-                    playlist_Delete( p_playlist, p_playlist->i_index );
-                    p_playlist->i_status = PLAYLIST_RUNNING;
+
+                    playlist_Delete( p_playlist,
+                                     p_playlist->status.p_item->input.i_id );
+                    p_playlist->request.i_skip = 1;
+                    p_playlist->status.i_status = PLAYLIST_RUNNING;
+
                     vlc_mutex_lock( &p_playlist->object_lock );
                 }
-
-                SkipItem( p_playlist, 1 );
-                vlc_mutex_unlock( &p_playlist->object_lock );
-                continue;
+                else
+                {
+                    /* Select the next playlist item */
+                    input_StopThread( p_playlist->p_input );
+                    vlc_mutex_unlock( &p_playlist->object_lock );
+                    continue;
+                }
             }
             else if( p_playlist->p_input->i_state != INIT_S )
             {
@@ -410,30 +511,25 @@ static void RunThread ( playlist_t *p_playlist )
                 vlc_mutex_lock( &p_playlist->object_lock );
             }
         }
-        else if( p_playlist->i_status != PLAYLIST_STOPPED )
+        else if( p_playlist->status.i_status != PLAYLIST_STOPPED )
         {
-            /* Start another input. Let's check if that item has
-             * been forced. In that case, we override random (by not skipping)
-             * and play-and-stop */
-            vlc_bool_t b_forced;
-            var_Get( p_playlist, "prevent-skip", &val );
-            b_forced = val.b_bool;
-            if( val.b_bool == VLC_FALSE )
+            /* Start another input.
+             * Get the next item to play */
+            p_item = NextItem( p_playlist );
+
+            /* We must stop */
+            if( p_item == NULL )
             {
-                SkipItem( p_playlist, 0 );
+                p_playlist->status.i_status = PLAYLIST_STOPPED;
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                continue;
             }
-            /* Reset forced status */
-            val.b_bool = VLC_FALSE;
-            var_Set( p_playlist, "prevent-skip", val );
-            /* Check for play-and-stop */
-            var_Get( p_playlist, "play-and-stop", &val );
-            if( val.b_bool == VLC_FALSE || b_forced == VLC_TRUE )
-            {
-                PlayItem( p_playlist );
-            }
+
+            PlayItem( p_playlist, p_item );
         }
-        else if( p_playlist->i_status == PLAYLIST_STOPPED )
+        else if( p_playlist->status.i_status == PLAYLIST_STOPPED )
         {
+            /* Collect garbage */
             vlc_mutex_unlock( &p_playlist->object_lock );
             i_sout_destroyed_date =
                 ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT, mdate() );
@@ -443,8 +539,20 @@ static void RunThread ( playlist_t *p_playlist )
         }
         vlc_mutex_unlock( &p_playlist->object_lock );
 
-        msleep( INTF_IDLE_SLEEP );
+        msleep( INTF_IDLE_SLEEP / 2 );
+
+        /* Stop sleeping earlier if we have work */
+        /* TODO : statistics about this */
+        if ( p_playlist->request.b_request &&
+                        p_playlist->status.i_status == PLAYLIST_RUNNING )
+        {
+            continue;
+        }
+
+        msleep( INTF_IDLE_SLEEP / 2 );
     }
+
+    /* Playlist dying */
 
     /* If there is an input, kill it */
     while( 1 )
@@ -516,45 +624,72 @@ static void RunThread ( playlist_t *p_playlist )
 }
 
 /*****************************************************************************
- * SkipItem: go to Xth playlist item
+ * NextItem
  *****************************************************************************
- * This function calculates the position of the next playlist item, depending
- * on the playlist course mode (forward, backward, random...).
+ * This function calculates the next playlist item, depending
+ * on the playlist course mode (forward, backward, random, view,...).
  *****************************************************************************/
-static void SkipItem( playlist_t *p_playlist, int i_arg )
+static playlist_item_t * NextItem( playlist_t *p_playlist )
 {
-    int i_oldindex = p_playlist->i_index;
-    vlc_bool_t b_random, b_repeat, b_loop;
-    vlc_value_t val;
-    int i_count;
+    playlist_item_t *p_new = NULL;
+    int i_skip,i_goto,i, i_new, i_count ;
+    playlist_view_t *p_view;
 
-    /* If the playlist is empty, there is no current item */
+    vlc_bool_t b_loop = var_GetBool( p_playlist, "loop");
+    vlc_bool_t b_random = var_GetBool( p_playlist, "random" );
+    vlc_bool_t b_repeat = var_GetBool( p_playlist, "repeat" );
+    vlc_bool_t b_playstop = var_GetBool( p_playlist, "play-and-stop" );
+
+#ifdef PLAYLIST_PROFILE
+    /* Calculate time needed */
+    int64_t start = mdate();
+#endif
+
+
+    /* Handle quickly a few special cases */
+
+    /* No items to play */
     if( p_playlist->i_size == 0 )
     {
-        p_playlist->i_index = -1;
-        return;
+        msg_Info( p_playlist, "playlist is empty" );
+        return NULL;
+    }
+    /* Nothing requested */
+    if( !p_playlist->request.b_request && p_playlist->status.p_item == NULL )
+    {
+        msg_Warn( p_playlist,"nothing requested" );
+        return NULL;
     }
 
-    var_Get( p_playlist, "random", &val );
-    b_random = val.b_bool;
-    var_Get( p_playlist, "repeat", &val );
-    b_repeat = val.b_bool;
-    var_Get( p_playlist, "loop", &val );
-    b_loop = val.b_bool;
+    /* Repeat and play/stop */
+    if( !p_playlist->request.b_request && b_repeat == VLC_TRUE )
+    {
+        msg_Dbg( p_playlist,"repeating item" );
+        return p_playlist->status.p_item;
+    }
 
-    /* Increment */
-    if( b_random )
+    if( !p_playlist->request.b_request && b_playstop == VLC_TRUE )
+    {
+        msg_Dbg( p_playlist,"stopping (play and stop)");
+        return NULL;
+    }
+
+    /* TODO: improve this (only use current node) */
+    /* TODO: use the "shuffled view" internally ? */
+    /* Random case. This is an exception: if request, but request is skip +- 1
+     * we don't go to next item but select a new random one. */
+    if( b_random && (!p_playlist->request.b_request ||
+        p_playlist->request.i_skip == 1 || p_playlist->request.i_skip == -1 ) )
     {
         srand( (unsigned int)mdate() );
-        i_count = 0;
-        while( i_count < p_playlist->i_size )
+        i_new = 0;
+        for( i_count = 0; i_count < p_playlist->i_size - 1 ; i_count ++ )
         {
-            p_playlist->i_index =
+            i_new =
                 (int)((float)p_playlist->i_size * rand() / (RAND_MAX+1.0));
             /* Check if the item has not already been played */
-            if( p_playlist->pp_items[p_playlist->i_index]->i_nb_played == 0 )
+            if( p_playlist->pp_items[i_new]->i_nb_played == 0 )
                 break;
-            i_count++;
         }
         if( i_count == p_playlist->i_size )
         {
@@ -563,12 +698,152 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
             {
                 p_playlist->pp_items[--i_count]->i_nb_played = 0;
             }
-            if( !b_loop )
+           if( !b_loop )
             {
-                p_playlist->i_status = PLAYLIST_STOPPED;
+                return NULL;
             }
         }
+        p_playlist->request.i_skip = 0;
+        p_playlist->request.b_request = VLC_FALSE;
+        return p_playlist->pp_items[i_new];
+   }
+
+    /* Start the real work */
+    if( p_playlist->request.b_request )
+    {
+        msg_Dbg( p_playlist,"processing request" );
+        /* We are not playing from a view */
+        if(  p_playlist->request.i_view == -1  )
+        {
+            /* Directly select the item, just like now */
+            i_skip = p_playlist->request.i_skip;
+            i_goto = p_playlist->request.i_goto;
+
+            if( p_playlist->i_index == -1 ) p_playlist->i_index = 0;
+            p_new = p_playlist->pp_items[p_playlist->i_index];
+
+            if( i_goto >= 0  && i_goto < p_playlist->i_size )
+            {
+                p_playlist->i_index = i_goto;
+                p_new = p_playlist->pp_items[p_playlist->i_index];
+                p_playlist->request.i_goto = -1;
+            }
+
+            if( i_skip != 0 )
+            {
+                if( p_playlist->i_index + i_skip < p_playlist->i_size &&
+                    p_playlist->i_index + i_skip >=  0 )
+                {
+                    p_playlist->i_index += i_skip;
+                    p_new = p_playlist->pp_items[p_playlist->i_index];
+                }
+            }
+        }
+        else
+        {
+            p_new = p_playlist->request.p_item;
+            i_skip = p_playlist->request.i_skip;
+
+            /* If we are asked for a node, take its first item */
+            if( p_playlist->request.p_item == NULL && i_skip == 0 )
+            {
+                i_skip++;
+            }
+
+            p_view = playlist_ViewFind( p_playlist,p_playlist->request.i_view );
+            p_playlist->status.p_node = p_playlist->request.p_node;
+            p_playlist->status.i_view = p_playlist->request.i_view;
+            if( i_skip > 0 )
+            {
+                for( i = i_skip; i > 0 ; i-- )
+                {
+                    p_new = playlist_FindNextFromParent( p_playlist,
+                                    p_playlist->request.i_view,
+                                    p_view->p_root,
+                                    p_playlist->request.p_node,
+                                    p_new );
+                    if( p_new == NULL ) break;
+                }
+            }
+            else if( i_skip < 0 )
+            {
+                for( i = i_skip; i < 0 ; i++ )
+                {
+                    p_new = playlist_FindPrevFromParent( p_playlist,
+                                    p_playlist->request.i_view,
+                                    p_view->p_root,
+                                    p_playlist->request.p_node,
+                                    p_new );
+                    if( p_new == NULL ) break;
+                }
+
+            }
+        }
+        /* Clear the request */
+        p_playlist->request.b_request = VLC_FALSE;
     }
+    /* "Automatic" item change ( next ) */
+    else
+    {
+        p_playlist->request_date = 0;
+
+
+        if( p_playlist->status.i_view == -1 )
+        {
+            if( p_playlist->i_index + 1 < p_playlist->i_size )
+            {
+                p_playlist->i_index++;
+                p_new = p_playlist->pp_items[p_playlist->i_index];
+            }
+            else
+            {
+                msg_Dbg( p_playlist,"finished" );
+                p_new = NULL;
+            }
+        }
+        /* We are playing with a view */
+        else
+        {
+            playlist_view_t *p_view =
+                    playlist_ViewFind( p_playlist,
+                                   p_playlist->status.i_view );
+            p_new = playlist_FindNextFromParent( p_playlist,
+                            p_playlist->status.i_view,
+                            p_view->p_root,
+                            p_playlist->status.p_node,
+                            p_playlist->status.p_item );
+        }
+    }
+
+    /* Reset index */
+    if( p_playlist->i_index >= 0 && p_new != NULL &&
+            p_playlist->pp_items[p_playlist->i_index] != p_new )
+    {
+        p_playlist->i_index = playlist_GetPositionById( p_playlist,
+                                                        p_new->input.i_id );
+    }
+
+#ifdef PLAYLIST_PROFILE
+    msg_Dbg(p_playlist,"next item found in "I64Fi " us\n",mdate()-start );
+#endif
+
+    if( p_new == NULL ) { msg_Info( p_playlist, "Nothing to play" ); }
+
+    return p_new;
+}
+
+
+#if 0
+
+
+static void SkipItem( playlist_t *p_playlist, int i_arg )
+{
+    int i_oldindex = p_playlist->i_index;
+    vlc_bool_t b_random, b_repeat, b_loop;
+    vlc_value_t val;
+    int i_count;
+
+    /* Increment */
     else if( !b_repeat )
     {
         p_playlist->i_index += i_arg;
@@ -602,38 +877,54 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     }
 }
 
+#endif
+
 /*****************************************************************************
- * PlayItem: play current playlist item
- *****************************************************************************
- * This function calculates the position of the next playlist item, depending
- * on the playlist course mode (forward, backward, random...).
- *****************************************************************************/
-static void PlayItem( playlist_t *p_playlist )
+ * PlayItem: start the input thread for an item
+ ****************************************************************************/
+static void PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
-    playlist_item_t *p_item;
     vlc_value_t val;
-    if( p_playlist->i_index == -1 )
-    {
-        if( p_playlist->i_size == 0 || p_playlist->i_enabled == 0)
-        {
-            return;
-        }
-        SkipItem( p_playlist, 1 );
-    }
-    if( p_playlist->i_enabled == 0)
-    {
-        return;
-    }
+    int i;
 
     msg_Dbg( p_playlist, "creating new input thread" );
-    p_item = p_playlist->pp_items[p_playlist->i_index];
 
     p_item->i_nb_played++;
+    p_playlist->status.p_item = p_item;
+
+#ifdef PLAYLIST_PROFILE
+    if( p_playlist->request_date != 0 )
+    {
+        msg_Dbg( p_playlist, "request processed after "I64Fi " us",
+                  mdate() - p_playlist->request_date );
+    }
+#endif
+
     p_playlist->p_input = input_CreateThread( p_playlist, &p_item->input );
 
-    val.i_int = p_playlist->i_index;
+    var_AddCallback( p_playlist->p_input, "item-change",
+                         ItemChange, p_playlist );
+
+    val.i_int = p_item->input.i_id;
     /* unlock the playlist to set the var...mmm */
     vlc_mutex_unlock( &p_playlist->object_lock);
     var_Set( p_playlist, "playlist-current", val);
     vlc_mutex_lock( &p_playlist->object_lock);
+
+}
+
+/* Forward item change from input */
+static int ItemChange( vlc_object_t *p_obj, const char *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    playlist_t *p_playlist = (playlist_t *)param;
+
+    //p_playlist->b_need_update = VLC_TRUE;
+    var_SetInteger( p_playlist, "item-change", newval.i_int );
+
+    /* Update view */
+    /* FIXME: Make that automatic */
+    playlist_ViewUpdate( p_playlist, VIEW_S_AUTHOR );
+
+    return VLC_SUCCESS;
 }

@@ -580,6 +580,7 @@ static int Init( input_thread_t * p_input )
         var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 
         UpdateItemLength( p_input, val.i_time );
+        p_input->input.p_item->i_duration = val.i_time;
     }
 
     /* Start title/chapter */
@@ -892,6 +893,11 @@ static int Init( input_thread_t * p_input )
 
     msg_Dbg( p_input, "`%s' sucessfully opened",
              p_input->input.p_item->psz_uri );
+
+    /* Trigger intf update for this item */
+    /* Playlist has a callback on this variable and will forward
+     * it to intf */
+    var_SetInteger( p_input, "item-change", p_input->input.p_item->i_id );
 
     /* initialization is complete */
     p_input->i_state = PLAYING_S;

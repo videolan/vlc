@@ -53,6 +53,9 @@ struct input_item_t
     mtime_t    i_duration;           /**< A hint about the duration of this
                                       * item, in milliseconds*/
 
+    int        i_id;                 /**< Identifier of the item */
+    uint8_t    i_type;               /**< Type (file, disc, ...) */
+
     int        i_categories;         /**< Number of info categories */
     info_category_t **pp_categories; /**< Pointer to the first info category */
 
@@ -62,14 +65,26 @@ struct input_item_t
     vlc_mutex_t lock;                /**< Item cannot be changed without this lock */
 };
 
+#define ITEM_TYPE_UNKNOWN       0
+#define ITEM_TYPE_FILE          1
+#define ITEM_TYPE_DIRECTORY     2
+#define ITEM_TYPE_DISC          3
+#define ITEM_TYPE_CARD          4
+#define ITEM_TYPE_NET           5
+#define ITEM_TYPE_PLAYLIST      6
+
 static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
 {
     memset( p_i, 0, sizeof(input_item_t) );
+    p_i->i_options  = 0;
+    p_i->i_es = 0;
+    p_i->i_categories = 0 ;
     p_i->psz_name = 0;
     p_i->psz_uri = 0;
     p_i->ppsz_options = 0;
     p_i->pp_categories = 0;
     p_i->es = 0;
+    p_i->i_type = ITEM_TYPE_UNKNOWN;
     vlc_mutex_init( p_o, &p_i->lock );
 }
 
