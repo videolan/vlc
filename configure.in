@@ -1525,7 +1525,7 @@ AC_ARG_ENABLE(alsa,
      AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_alsa="true", have_alsa="false"),have_alsa="false")
      if test "x${have_alsa}" = "xtrue"
      then
-       #PLUGINS="${PLUGINS} audio_output/alsa"
+       PLUGINS="${PLUGINS} audio_output/alsa"
        alsa_LDFLAGS="${alsa_LDFLAGS} -lasound -lm -ldl"
      fi
    fi])

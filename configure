@@ -8511,7 +8511,7 @@ fi
 
      if test "x${have_alsa}" = "xtrue"
      then
-       #PLUGINS="${PLUGINS} audio_output/alsa"
+       PLUGINS="${PLUGINS} audio_output/alsa"
        alsa_LDFLAGS="${alsa_LDFLAGS} -lasound -lm -ldl"
      fi
    fi
