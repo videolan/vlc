@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.11 2003/11/25 20:41:35 jpsaman Exp $
+ * $Id: pda.c,v 1.12 2003/11/30 10:26:19 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -290,12 +290,19 @@ static void Run( intf_thread_t *p_intf )
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvplaylist, 1 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 1 );
     gtk_tree_view_column_set_sort_column_id(column, 1);
+    /* Column 3 */
+    renderer = gtk_cell_renderer_text_new ();
+    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 2, _("Index"), renderer, NULL);
+    column = gtk_tree_view_get_column(p_intf->p_sys->p_tvplaylist, 2 );
+    gtk_tree_view_column_add_attribute(column, renderer, "text", 2 );
+    gtk_tree_view_column_set_sort_column_id(column, 2);
 
     /* update the playlist */
     msg_Dbg(p_intf, "Populating GtkTreeView Playlist" );
-    playlist = gtk_list_store_new (2,
+    playlist = gtk_list_store_new (3,
                 G_TYPE_STRING, /* Filename */
-                G_TYPE_STRING);/* Time */
+                G_TYPE_STRING, /* Time */
+                G_TYPE_UINT);  /* Hidden index */
     PlaylistRebuildListStore( playlist, vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ));
     msg_Dbg(p_intf, "Showing GtkTreeView Playlist" );
     gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvplaylist), GTK_TREE_MODEL(playlist));
@@ -430,12 +437,14 @@ static int Manage( intf_thread_t *p_intf )
                 if (p_playlist != NULL)
                 {
                     msg_Dbg(p_intf, "Manage: Populating GtkTreeView Playlist" );
-                    p_liststore = gtk_list_store_new (2,
+                    p_liststore = gtk_list_store_new (3,
                                                G_TYPE_STRING,
-                                               G_TYPE_STRING);
+                                               G_TYPE_STRING,
+                                               G_TYPE_UINT);  /* Hidden index */
                     PlaylistRebuildListStore(p_liststore, p_playlist);
                     msg_Dbg(p_intf, "Manage: Updating GtkTreeView Playlist" );
                     gtk_tree_view_set_model(p_intf->p_sys->p_tvplaylist, (GtkTreeModel*) p_liststore);
+                    g_object_unref(p_liststore);
                     vlc_object_release( p_playlist );
                 }
             }

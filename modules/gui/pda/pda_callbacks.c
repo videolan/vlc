@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.17 2003/11/25 20:41:35 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.18 2003/11/30 10:26:19 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -117,6 +117,7 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name)
             gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
                                     0, name,   /* Add path to it !!! */
                                     1, "no info",
+                                    2, p_playlist->i_size, /* Hidden index. */
                                     -1 );
 
             msg_Dbg( p_intf, "Adding files to playlist ...");
@@ -128,16 +129,15 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name)
                               PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END);
             }
             else
+#endif
             {
                 playlist_Add( p_playlist, (const char*)name, 0, 0,
                               PLAYLIST_APPEND, PLAYLIST_END );
-            }
-            
-#endif
-            vlc_object_release( p_playlist );
+            }            
             msg_Dbg( p_intf, "done");
         }
     }
+    vlc_object_release( p_playlist );
 }
 
 void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
@@ -151,7 +151,7 @@ void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
     red.green   = 0;
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    for( i_dummy = p_playlist->i_size ; i_dummy-- ; )
+    for( i_dummy = 0; i_dummy < p_playlist->i_size ; i_dummy++ )
     {
         ppsz_text[0] = p_playlist->pp_items[i_dummy]->psz_name;
         ppsz_text[1] = "no info";
@@ -159,6 +159,7 @@ void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
         gtk_list_store_set (p_list, &iter,
                             0, ppsz_text[0],
                             1, ppsz_text[1],
+                            2, i_dummy, /* Hidden index */
                             -1);
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
@@ -751,15 +752,110 @@ void
 onUpdatePlaylist                       (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *  p_intf = GtkGetIntf( button );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    GtkTreeView *p_tvplaylist = NULL;
 
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    p_tvplaylist = (GtkTreeView*) lookup_widget( GTK_WIDGET(button), "tvPlaylist");
+    if (p_tvplaylist)
+    {
+        GtkListStore *p_model = NULL;
+
+        /* Rebuild the playlist then. */
+        p_model = gtk_list_store_new (3,
+                    G_TYPE_STRING, /* Filename */
+                    G_TYPE_STRING, /* Time */
+                    G_TYPE_UINT);  /* Hidden field */
+        if (p_model)
+        {
+            PlaylistRebuildListStore(p_model, p_playlist);
+            msg_Dbg(p_intf, "Adding new model to Playlist" );
+            gtk_tree_view_set_model(GTK_TREE_VIEW(p_tvplaylist), GTK_TREE_MODEL(p_model));
+            g_object_unref(p_model);
+        }
+    }
+    vlc_object_release( p_playlist );
 }
-
 
 void
 onDeletePlaylist                       (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( button );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    GtkTreeView    *p_tvplaylist;
 
+    /* Delete an arbitrary item from the playlist */
+    msg_Dbg(p_intf, "Delete playlist item ... " );
+    p_tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(button), "tvPlaylist" );
+    if (p_tvplaylist != NULL)
+    {
+        GList *p_rows = NULL;
+        GList *p_node;
+        GtkTreeModel *p_model = NULL;
+        GtkTreeSelection *p_selection = gtk_tree_view_get_selection(p_tvplaylist);
+
+        p_model = gtk_tree_view_get_model(p_tvplaylist);
+        if (p_model)
+        {
+            p_rows = gtk_tree_selection_get_selected_rows(p_selection, &p_model);
+
+            if( g_list_length( p_rows ) )
+            {
+                /* reverse-sort so that we can delete from the furthest
+                 * to the closest item to delete...
+                 */
+                p_rows = g_list_reverse( p_rows );
+            }
+    
+            for (p_node=p_rows; p_node!=NULL; p_node = p_node->next)
+            {
+                GtkTreeIter iter;
+                GtkTreePath *p_path = NULL;
+
+                p_path = (GtkTreePath *)p_node->data;
+                if (p_path)
+                {
+                    if (gtk_tree_model_get_iter(p_model, &iter, p_path))
+                    {
+                        gchar *p_filename;
+                        gint item;
+
+                        gtk_tree_model_get(p_model, &iter, 0, &p_filename, -1);
+                        gtk_tree_model_get(p_model, &iter, 2, &item, -1);
+                        msg_Dbg(p_intf,  "Deleting %d %s", item, p_filename);
+                        playlist_Delete(p_playlist, item);
+                        g_free(p_filename);
+                    }
+                }
+            }
+            g_list_foreach (p_rows, gtk_tree_path_free, NULL);
+            g_list_free (p_rows);
+        }
+
+        /* Rebuild the playlist then. */
+        p_model = gtk_list_store_new (3,
+                    G_TYPE_STRING, /* Filename */
+                    G_TYPE_STRING, /* Time */
+                    G_TYPE_UINT);  /* Hidden field */
+        if (p_model)
+        {
+            PlaylistRebuildListStore(GTK_LIST_STORE(p_model), p_playlist);
+            msg_Dbg(p_intf, "Adding new model to Playlist" );
+            gtk_tree_view_set_model(GTK_TREE_VIEW(p_tvplaylist), GTK_TREE_MODEL(p_model));
+            g_object_unref(p_model);
+        }
+    }
+    vlc_object_release( p_playlist );
+
+    msg_Dbg(p_intf, "Delete playlist item ... done" );
 }
 
 
@@ -773,23 +869,18 @@ onClearPlaylist                        (GtkButton       *button,
     GtkTreeView    *p_tvplaylist;
     int item;
 
-    msg_Dbg(p_intf, "Clear VLC playlist" );
-
     if( p_playlist == NULL )
     {
         return;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
-    for(item = p_playlist->i_size - 1 ; item >= 0 ; item-- )
+    for(item = p_playlist->i_size - 1; item >= 0 ;item-- )
     {
         playlist_Delete( p_playlist, item);
     }
-    vlc_mutex_unlock( &p_playlist->object_lock );
     vlc_object_release( p_playlist );
 
     // Remove all entries from the Playlist widget.
-    msg_Dbg(p_intf, "Clear playlist widget" );
     p_tvplaylist = (GtkTreeView*) lookup_widget( GTK_WIDGET(button), "tvPlaylist");
     if (p_tvplaylist)
     {

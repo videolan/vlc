@@ -2,7 +2,7 @@
  * playlist.c : Playlist interface of the gtk-pda plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: playlist.c,v 1.1 2003/07/23 22:02:56 jpsaman Exp $
+ * $Id: playlist.c,v 1.2 2003/11/30 10:26:19 jpsaman Exp $
  *
  * Authors: Marc Ariberti <marcari@videolan.org>
  *      
@@ -178,7 +178,6 @@ PDAPlaylistDel                    (GtkButton       *button,
     {
         return;
     }
-
     
     /* lock the struct */
     vlc_mutex_lock( &p_intf->change_lock );
