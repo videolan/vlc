@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.1 2001/02/08 04:43:27 sam Exp $
+ * $Id: dvd_ifo.c,v 1.2 2001/02/08 08:08:03 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -592,12 +592,14 @@ static vmgi_mat_t ReadVMGInfMat( ifo_t* p_ifo )
     GETS( &mat.i_video_atrt );
     FLUSH( 1 );
     GETC( &mat.i_audio_nb );
+//fprintf( stderr, "vmgi audio nb : %d\n", mat.i_audio_nb );
     for( i=0 ; i < 8 ; i++ )
     {
         GETLL( &mat.pi_audio_atrt[i] );
     }
     FLUSH( 17 );
     GETC( &mat.i_subpic_nb );
+//fprintf( stderr, "vmgi subpic nb : %d\n", mat.i_subpic_nb );
     for( i=0 ; i < mat.i_subpic_nb ; i++ )
     {
         GET( &mat.pi_subpic_atrt[i], 6 );
@@ -744,12 +746,14 @@ static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
         GETS( &atrt.p_vts_atrt[i].i_vtsm_video_atrt );
         FLUSH( 1 );
         GETC( &atrt.p_vts_atrt[i].i_vtsm_audio_nb );
+//fprintf( stderr, "m audio nb : %d\n", atrt.p_vts_atrt[i].i_vtsm_audio_nb );
         for( j=0 ; j<8 ; j++ )
         {
             GETLL( &atrt.p_vts_atrt[i].pi_vtsm_audio_atrt[j] );
         }
         FLUSH( 17 );
         GETC( &atrt.p_vts_atrt[i].i_vtsm_subpic_nb );
+//fprintf( stderr, "m subp nb : %d\n", atrt.p_vts_atrt[i].i_vtsm_subpic_nb );
         for( j=0 ; j<28 ; j++ )
         {
             GET( &atrt.p_vts_atrt[i].pi_vtsm_subpic_atrt[j], 6 );
@@ -759,13 +763,15 @@ static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
         GETS( &atrt.p_vts_atrt[i].i_vtstt_video_atrt );
         FLUSH( 1 );
         GETL( &atrt.p_vts_atrt[i].i_vtstt_audio_nb );
+//fprintf( stderr, "tt audio nb : %d\n", atrt.p_vts_atrt[i].i_vtstt_audio_nb );
         for( j=0 ; j<8 ; j++ )
         {
             GETLL( &atrt.p_vts_atrt[i].pi_vtstt_audio_atrt[j] );
         }
         FLUSH( 17 );
         GETC( &atrt.p_vts_atrt[i].i_vtstt_subpic_nb );
-        for( j=0 ; j<atrt.p_vts_atrt[i].i_vtstt_subpic_nb ; j++ )
+//fprintf( stderr, "tt subp nb : %d\n", atrt.p_vts_atrt[i].i_vtstt_subpic_nb );
+        for( j=0 ; j<28/*atrt.p_vts_atrt[i].i_vtstt_subpic_nb*/ ; j++ )
         {
             GET( &atrt.p_vts_atrt[i].pi_vtstt_subpic_atrt[j], 6 );
             /* FIXME : Fix endianness issue here */
@@ -888,12 +894,14 @@ static vtsi_mat_t ReadVTSInfMat( ifo_t* p_ifo )
     GETS( &mat.i_video_atrt );
     FLUSH( 1 );
     GETC( &mat.i_audio_nb );
+//fprintf( stderr, "vtsi audio nb : %d\n", mat.i_audio_nb );
     for( i=0 ; i<8 ; i++ )
     {
         GETLL( &mat.pi_audio_atrt[i] );
     }
     FLUSH( 17 );
     GETC( &mat.i_subpic_nb );
+//fprintf( stderr, "vtsi subpic nb : %d\n", mat.i_subpic_nb );
     for( i=0 ; i<mat.i_subpic_nb ; i++ )
     {
         GET( &mat.pi_subpic_atrt[i], 6 );

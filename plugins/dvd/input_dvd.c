@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.2 2001/02/08 06:41:56 stef Exp $
+ * $Id: input_dvd.c,v 1.3 2001/02/08 08:08:03 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -185,8 +185,7 @@ static void DVDInit( input_thread_t * p_input )
         p_method->css = CSSInit( p_input->i_handle );
         p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
         if( (p_method->css.p_title_key =
-             malloc( p_method->css.i_title_nb *
-                     sizeof(p_method->css.p_title_key) ) ) == NULL )
+            malloc( p_method->css.i_title_nb *sizeof(title_key_t) ) ) == NULL )
         {
             intf_ErrMsg( "Out of memory" );
             p_input->b_error = 1;
