@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.41 2003/10/09 19:31:38 gbazin Exp $
+ * $Id: transcode.c,v 1.42 2003/10/09 19:40:29 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1496,8 +1496,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 sout_buffer_t *p_out;
                 p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
                 memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-                p_out->i_dts = id->i_dts;
-                p_out->i_pts = id->i_dts;
+                p_out->i_dts = in->i_dts;
+                p_out->i_pts = in->i_dts;
                 sout_BufferChain( out, p_out );
             }
 
