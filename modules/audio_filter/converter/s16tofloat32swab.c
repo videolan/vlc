@@ -3,7 +3,7 @@
  *                  with endianness change
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s16tofloat32swab.c,v 1.1 2002/09/18 01:28:04 henri Exp $
+ * $Id: s16tofloat32swab.c,v 1.2 2002/09/18 12:20:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -31,6 +31,11 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
 #include "audio_output.h"
 #include "aout_internal.h"
 
@@ -94,24 +99,28 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
 #ifdef HAVE_SWAB
     s16 * p_swabbed = malloc( i * sizeof(s16) );
-    swab( p_in_buf->p_buffer, p_swabbed, 
-          i * sizeof(s16) );
+    swab( p_in_buf->p_buffer, p_swabbed, i * sizeof(s16) );
     
-    p_in = p_swabbed +i - 1;
+    p_in = p_swabbed + i - 1;
 #else
-    byte_t temp;
+    byte_t p_tmp[2];
 #endif
    
     while( i-- )
     {
 #ifndef HAVE_SWAB
-        temp = *(byte_t*)p_in;
-        *(byte_t*)p_in = *(byte_t*)p_in+1;
-        *(byte_t*)p_in+1 = temp;
-#endif
+        p_tmp[0] = ((byte_t*)p_in)[1];
+        p_tmp[1] = ((byte_t*)p_in)[0];
+        *p_out = (float)*p_tmp / 32768.0;
+#else
         *p_out = (float)*p_in / 32768.0;
+#endif
         p_in--; p_out--;
     }
+
+#ifdef HAVE_SWAB
+    free( p_swabbed );
+#endif
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 2;
