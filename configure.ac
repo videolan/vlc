@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.114 2003/11/20 23:13:28 sigmunau Exp $
+dnl $Id: configure.ac,v 1.115 2003/11/22 15:53:18 sam Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2528,6 +2528,22 @@ then
 fi
 
 dnl
+dnl  libcaca plugin
+dnl
+AC_ARG_ENABLE(caca,
+  [  --enable-caca           libcaca output (default disabled)])
+if test "${enable_caca}" = "yes"
+then
+  AC_PATH_PROG(CACA_CONFIG, caca-config, no)
+  if test "${CACA_CONFIG}" != "no"
+  then
+    AX_ADD_PLUGINS([caca])
+    AX_ADD_CFLAGS([caca],[`${CACA_CONFIG} --cflags`])
+    AX_ADD_LDFLAGS([caca],[`${CACA_CONFIG} --plugin-libs`])
+  fi
+fi
+
+dnl
 dnl  win32 GDI plugin
 dnl
 AC_ARG_ENABLE(wingdi,
@@ -3397,7 +3413,7 @@ AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION} ${CODENAME}", [Simple version st
 AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VLC media player - version ${VERSION} ${CODENAME} - (c) 1996-2003 VideoLAN", [Copyright string])
 AC_DEFINE_UNQUOTED(CONFIGURE_LINE, "${CONFIGURE_LINE}", [The ./configure command line])
 
-VLC_SYMBOL="`echo ${VERSION} | sed -e 'y/.-/__/'`"
+VLC_SYMBOL="`echo ${VERSION} | sed -e 'y/.-+/___/'`"
 AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${VLC_SYMBOL}", [String suffix for module functions])
 AC_DEFINE_UNQUOTED(MODULE_SYMBOL, ${VLC_SYMBOL}, [Symbol suffix for module functions])
 AC_DEFINE_UNQUOTED(LIBEXT, "${LIBEXT}", [Dynamic object extension])
