@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.8 2002/11/25 15:08:34 fenrir Exp $
+ * $Id: mms.c,v 1.9 2002/11/25 19:12:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1458,7 +1458,7 @@ static int  NetFillBuffer( input_thread_t *p_input )
         i_udp_read = 0;
     }
 
-#if 0
+#if 1
     if( p_access->i_proto == MMS_PROTO_UDP )
     {
         msg_Dbg( p_input, 
@@ -1566,6 +1566,7 @@ static int  mms_ParsePacket( input_thread_t *p_input,
     uint8_t  *p_packet;
 
 
+//    *pi_used = i_data; /* default */
     *pi_used = i_data; /* default */
     if( i_data <= 8 )
     {
@@ -1583,6 +1584,7 @@ static int  mms_ParsePacket( input_thread_t *p_input,
         msg_Warn( p_input, 
                   "truncated packet (missing %d bytes)",
                   i_packet_length - i_data  );
+        *pi_used = 0;
         return( -1 );
     }
     else if( i_packet_length < i_data )
