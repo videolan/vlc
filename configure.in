@@ -116,6 +116,9 @@ AC_ARG_ENABLE(sdl,
 AC_ARG_ENABLE(glide,
   [  --enable-glide          Glide (3dfx) support (default disabled)],
   [if test x$enable_glide = xyes; then PLUGINS=${PLUGINS}"glide "; fi])
+AC_ARG_ENABLE(null,
+  [  --enable-null           Null plugin (default disabled)],
+  [if test x$enable_null = xyes; then PLUGINS=${PLUGINS}"null "; fi])
 AC_ARG_ENABLE(gnome,
   [  --enable-gnome          Gnome support (default disabled)],
   [if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"gnome "; ALIASES=${ALIASES}"gvlc "; fi])

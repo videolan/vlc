@@ -314,6 +314,8 @@ PLUGIN_SDL =	plugins/sdl/sdl.o \
 #		plugins/sdl/video_yuv.o \
 #		plugins/sdl/video_yuvall.o
 
+PLUGIN_NULL =	plugins/null/null.o
+
 PLUGIN_GLIDE =	plugins/glide/glide.o \
 		plugins/glide/intf_glide.o \
 		plugins/glide/vout_glide.o
@@ -363,7 +365,8 @@ STD_PLUGIN_OBJ =$(PLUGIN_BEOS) \
 		$(PLUGIN_YUV) \
 		$(PLUGIN_YUVMMX) \
 		$(PLUGIN_SDL) \
-		$(PLUGIN_ALSA)
+		$(PLUGIN_ALSA) \
+		$(PLUGIN_NULL)
 
 #
 # Other lists of files
@@ -500,6 +503,9 @@ lib/dsp.so: $(PLUGIN_DSP)
 	$(CC) -shared -o $@ $^
 
 lib/alsa.so: $(PLUGIN_ALSA)
+	$(CC) -shared -o $@ $^
+
+lib/null.so: $(PLUGIN_NULL)
 	$(CC) -shared -o $@ $^
 
 lib/dummy.so: $(PLUGIN_DUMMY)
