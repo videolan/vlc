@@ -810,6 +810,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
                             (void *)&vcodecs_array[i] );
     }
     i_video_codec = 0;
+    video_combo->SetSelection(0);
 
     video_sizer1->Add( video_combo, 0 , wxALIGN_LEFT , 0 );
 
@@ -817,7 +818,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
                        wxLEFT ,5);
     vb_combo = new wxComboBox( this, VideoBitrate_Event, wxT("1024"),
                                wxDefaultPosition, wxDefaultSize,
-                               WXSIZEOF(vbitrates_array), vbitrates_array );
+                               WXSIZEOF(vbitrates_array), vbitrates_array, wxCB_READONLY );
     video_sizer1->Add( vb_combo, 0, wxALIGN_LEFT , 0 );
 
     /* Line 3 : text */
@@ -848,14 +849,14 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
                             (void *)&acodecs_array[i] );
     }
     i_audio_codec = 0;
-
+    audio_combo->SetSelection(0);
     audio_sizer1->Add( audio_combo, 0 , wxALIGN_LEFT, 0 );
 
     audio_sizer1->Add( new wxStaticText(this, -1, wxU(_("Bitrate (kb/s)"))),0,
                        wxLEFT ,5);
     ab_combo = new wxComboBox( this, AudioBitrate_Event, wxT("192"),
                                wxDefaultPosition, wxDefaultSize,
-                               WXSIZEOF(abitrates_array), abitrates_array );
+                               WXSIZEOF(abitrates_array), abitrates_array, wxCB_READONLY );
     audio_sizer1->Add( ab_combo, 0, wxALIGN_LEFT, 0 );
 
     /* Line 3 : text */
