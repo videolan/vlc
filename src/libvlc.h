@@ -593,9 +593,9 @@ static char *ppsz_align_descriptions[] =
     "This option allows you to use a plugins cache which will greatly " \
     "improve the start time of VLC.")
 
-#define DAEMON_TEXT N_("Run as daemon proces")
+#define DAEMON_TEXT N_("Run as daemon process")
 #define DAEMON_LONGTEXT N_( \
-     "Runs VLC as a background daemon proces.")
+     "Runs VLC as a background daemon process.")
 
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
 #define ONEINSTANCE_LONGTEXT N_( \
@@ -976,8 +976,7 @@ vlc_module_begin();
                    PLUGIN_PATH_LONGTEXT, VLC_TRUE );
 
 #if !defined(WIN32)
-    add_bool( "daemon", 0, NULL, DAEMON_TEXT,
-              DAEMON_LONGTEXT, VLC_TRUE );
+    add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, VLC_TRUE );
         change_short('d');
 #endif
 

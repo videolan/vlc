@@ -339,6 +339,39 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     vlc_object_detach( p_help_module );
     /* End hack */
 
+    /* Will be re-done properly later on */
+    p_vlc->p_libvlc->i_verbose = config_GetInt( p_vlc, "verbose" );
+
+    /* Check for daemon mode */
+#ifndef WIN32
+    if( config_GetInt( p_vlc, "daemon" ) )
+    {
+        pid_t i_pid = 0;
+
+        if( ( i_pid = fork() ) < 0 )
+        {
+            msg_Err( p_vlc, "Unable to fork vlc to daemon mode" );
+            b_exit = VLC_TRUE;
+        }
+        else if( i_pid )
+        {
+            /* This is the parent, exit right now */
+            msg_Dbg( p_vlc, "closing parent process" );
+            b_exit = VLC_TRUE;
+        }
+        else
+        {
+            /* We are the child */
+            msg_Dbg( p_vlc, "daemon spawned" );
+            close( 0 );
+            close( 1 );
+            close( 2 );
+
+            p_vlc->p_libvlc->b_daemon = VLC_TRUE;
+        }
+    }
+#endif
+
     if( b_exit )
     {
         config_Free( p_help_module );
@@ -570,36 +603,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         p_vlc->pf_memset = memset;
     }
-    
-    /* Check for daemon mode */
-    if( config_GetInt( p_vlc, "daemon" ) )
-    {
-        pid_t i_pid = 0;
-        if( ( i_pid = fork() ) < 0 )
-        {
-            msg_Err( p_vlc, "Unable to fork vlc to daemon mode" );
-            exit(1);
-        }
-        else if( i_pid )
-        {
-            /* This is the parent, exit right now */
-            msg_Dbg( p_vlc, "closing parent process" );
-            exit(0);
-        }
-	else
-	{
-            /* we are the child */
-	    msg_Dbg( p_vlc, "we are the child !!!" );
-            close( 0 );
-            close( 1 );
-            close( 2 );
-
-            p_vlc->p_libvlc->b_daemon = VLC_TRUE;
-	    var_Create( p_vlc, "interface", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-	    var_SetString( p_vlc, "interface", "dummy" );
-    	    VLC_AddIntf( 0, "logger,none", VLC_FALSE, VLC_FALSE );
-	}
-    }
 
     /*
      * Initialize hotkey handling
@@ -703,6 +706,17 @@ int VLC_AddIntf( int i_object, char const *psz_module,
     {
         return VLC_ENOOBJ;
     }
+
+#ifndef WIN32
+    if( p_vlc->p_libvlc->b_daemon && b_block && !psz_module )
+    {
+        /* Daemon mode hack.
+         * We prefer the dummy interface if none is specified. */
+        char *psz_interface = config_GetPsz( p_vlc, "intf" );
+        if( !psz_interface || !*psz_interface ) psz_module = "dummy";
+        if( psz_interface ) free( psz_interface );
+    }
+#endif
 
     /* Try to create the interface */
     p_intf = intf_Create( p_vlc, psz_module ? psz_module : "$intf" );
