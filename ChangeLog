@@ -3,6 +3,10 @@
 #===================#
 
 HEAD
+  * Nothing yet
+
+0.2.92
+Fri,  7 Dec 2001 20:18:56 +0100
 
   * New libmad plug-in, courtesy of Jean-Paul Saman. We now have sound on
     iPAQ Familiar Linux.

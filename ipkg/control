@@ -1,7 +1,7 @@
 Package: vlc
 Section: graphics
 Priority: optional
-Version: 0.2.91-fam0
+Version: 0.2.92-dev
 Architecture: arm
 Maintainer: Christophe Massiot <massiot@via.ecp.fr>
 Depends: libc6, task-x

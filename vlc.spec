@@ -1,11 +1,11 @@
 # This is borrowed and adapted from Mandrake's Cooker
 %define name 	vlc
-%define vlc_ver 0.2.91
+%define vlc_ver 0.2.92-dev
 %define version	%vlc_ver
 
 # libdvdcss
 %define major   0
-%define lib_ver 1.0.0
+%define lib_ver 1.0.1-dev
 %define lib_name libdvdcss%{major}
 
 %define cvs     0

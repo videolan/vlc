@@ -4,6 +4,11 @@
 
 HEAD
 
+  * Nothing yet
+
+1.0.1
+Fri,  7 Dec 2001 20:18:56 +0100
+
   * Update for libdvdcss documentation.
   * Reworked Keith Packard's raw device patch. The name of the raw device
     is in the environment variable DVDCSS_RAW_DEVICE.

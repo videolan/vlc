@@ -1,6 +1,6 @@
 # This is borrowed and adapted from Mandrake's Cooker
 %define name 	libdvdcss
-%define version	1.0.0
+%define version	1.0.1-dev
 %define release	1
 %define major  	1
 %define lib_name %{name}%{major}
