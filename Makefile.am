@@ -101,6 +101,7 @@ HEADERS_include = \
 	include/vlc_filter.h \
 	include/vlc_help.h \
 	include/vlc_httpd.h \
+	include/vlc_tls.h \
 	include/vlc_input.h \
 	include/vlc_interface.h \
 	include/vlc_keys.h \
@@ -360,6 +361,7 @@ SOURCES_libvlc_common = \
 	src/stream_output/sap.c \
 	src/misc/charset.c \
 	src/misc/httpd.c \
+	src/misc/tls.c \
 	src/misc/mtime.c \
 	src/misc/block.c \
 	src/misc/modules.c \

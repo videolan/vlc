@@ -336,6 +336,8 @@ typedef struct data_buffer_t data_buffer_t;
 typedef struct stream_ctrl_t stream_ctrl_t;
 typedef struct pes_packet_t pes_packet_t;
 typedef struct network_socket_t network_socket_t;
+typedef struct tls_server_t tls_server_t;
+typedef struct tls_session_t tls_session_t;
 typedef struct iso639_lang_t iso639_lang_t;
 
 /* block */

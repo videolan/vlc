@@ -99,6 +99,7 @@
 #include "stream_output.h"
 #include "osd.h"
 #include "vlc_httpd.h"
+#include "vlc_tls.h"
 
 #include "iso_lang.h"
 #include "charset.h"

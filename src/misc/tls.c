@@ -28,7 +28,6 @@
 #include "vlc_tls.h"
 
 
-#define HAVE_GNUTLS 1
 /*
  * TODO:
  * - libgcrypt thread-safety !!!
