@@ -442,7 +442,9 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     theora_decode_packetin( &p_sys->td, p_oggpacket );
 
-    if( theora_packet_iskeyframe( p_oggpacket ) == 1 )
+    /* Check for keyframe */
+    if( !(p_oggpacket->packet[0] & 0x80) /* data packet */ &&
+        !(p_oggpacket->packet[0] & 0x40) /* intra frame */ )
         p_sys->b_decoded_first_keyframe = VLC_TRUE;
 
     /* If we haven't seen a single keyframe yet, don't let Theora decode
