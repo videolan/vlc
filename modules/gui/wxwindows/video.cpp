@@ -65,6 +65,7 @@ private:
     vout_thread_t *p_vout;
     wxWindow *p_parent;
     vlc_mutex_t lock;
+    vlc_bool_t b_shown;
 
     wxWindow *p_child_window;
 
@@ -114,6 +115,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     p_child_window = new wxWindow( this, -1, wxDefaultPosition, wxSize(0,0) );
     p_child_window->Show();
     Show();
+    b_shown = VLC_TRUE;
 
     p_intf->p_sys->p_video_sizer = new wxBoxSizer( wxHORIZONTAL );
     p_intf->p_sys->p_video_sizer->Add( this, 1, wxEXPAND );
@@ -235,11 +237,12 @@ void VideoWindow::ReleaseWindow( void *p_window )
 
 void VideoWindow::UpdateSize( wxSizeEvent &event )
 {
-    if( !IsShown() )
+    if( !b_shown )
     {
         p_intf->p_sys->p_video_sizer->Show( this, TRUE );
         p_intf->p_sys->p_video_sizer->Layout();
         SetFocus();
+        b_shown = VLC_TRUE;
     }
     p_intf->p_sys->p_video_sizer->SetMinSize( event.GetSize() );
 
@@ -249,10 +252,14 @@ void VideoWindow::UpdateSize( wxSizeEvent &event )
 
 void VideoWindow::UpdateHide( wxSizeEvent &event )
 {
-    if( IsShown() )
+    if( b_shown )
     {
         p_intf->p_sys->p_video_sizer->Show( this, FALSE );
         p_intf->p_sys->p_video_sizer->Layout();
+        b_shown = VLC_FALSE;
+
+        SetSize(0,0);
+        Show();
     }
     p_intf->p_sys->p_video_sizer->SetMinSize( event.GetSize() );
 
