@@ -1,0 +1,369 @@
+/*****************************************************************************
+ * vcdplayer.c : VCD input module for vlc
+ *               using libcdio, libvcd and libvcdinfo
+ *****************************************************************************
+ * Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
+ * $Id: vcdplayer.c,v 1.1 2003/10/04 18:55:13 gbazin Exp $
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+/*
+   This contains more of the vlc-independent parts that might be used
+   in any VCD input module for a media player. However at present there
+   are vlc-specific structures. See also vcdplayer.c of the xine plugin.
+ */
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+
+#include <vlc/vlc.h>
+#include <vlc/input.h>
+
+#include "vcd.h"
+#include "vcdplayer.h"
+
+#include <string.h>
+
+#include <cdio/cdio.h>
+#include <cdio/util.h>
+#include <libvcd/info.h>
+
+/*!
+  Return true if playback control (PBC) is on
+*/
+bool
+vcdplayer_pbc_is_on(const thread_vcd_data_t *p_vcd) 
+{
+  return VCDINFO_INVALID_ENTRY != p_vcd->cur_lid; 
+}
+
+lid_t
+vcdplayer_selection2lid ( input_thread_t *p_input, int entry_num ) 
+{
+  /* FIXME: Some of this probably gets moved to vcdinfo. */
+  /* Convert selection number to lid and then entry number...*/
+  thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
+  unsigned int offset;
+  unsigned int bsn=vcdinf_get_bsn(p_vcd->pxd.psd);
+  vcdinfo_obj_t *obj = p_vcd->vcd;
+
+  dbg_print( (INPUT_DBG_CALL|INPUT_DBG_PBC), 
+            "Called lid %u, entry_num %d bsn %d", p_vcd->cur_lid, 
+             entry_num, bsn);
+
+  if ( (entry_num - bsn + 1) > 0) {
+    offset = vcdinfo_lid_get_offset(obj, p_vcd->cur_lid, entry_num-bsn+1);
+  } else {
+    LOG_ERR( "Selection number %u too small. bsn %u", entry_num, bsn );
+    return VCDINFO_INVALID_LID;
+  }
+  
+  if (offset != VCDINFO_INVALID_OFFSET) {
+    vcdinfo_offset_t *ofs;
+    int old = entry_num;
+    
+    switch (offset) {
+    case PSD_OFS_DISABLED:
+      LOG_ERR( "Selection %u disabled", entry_num );
+      return VCDINFO_INVALID_LID;
+    case PSD_OFS_MULTI_DEF:
+      LOG_ERR( "Selection %u multi_def", entry_num );
+      return VCDINFO_INVALID_LID;
+    case PSD_OFS_MULTI_DEF_NO_NUM:
+      LOG_ERR( "Selection %u multi_def_no_num", entry_num );
+      return VCDINFO_INVALID_LID;
+    default: ;
+    }
+    
+    ofs = vcdinfo_get_offset_t(obj, offset);
+
+    if (NULL == ofs) {
+      LOG_ERR( "error in vcdinfo_get_offset" );
+      return -1;
+    }
+    dbg_print(INPUT_DBG_PBC,
+              "entry %u turned into selection lid %u", 
+              old, ofs->lid);
+    return ofs->lid;
+    
+  } else {
+    LOG_ERR( "invalid or unset entry %u", entry_num );
+    return VCDINFO_INVALID_LID;
+  }
+}
+
+static void
+vcdplayer_update_entry( input_thread_t * p_input, uint16_t ofs, 
+                        uint16_t *entry, const char *label)
+{
+  thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
+
+  if ( ofs == VCDINFO_INVALID_OFFSET ) {
+    *entry = VCDINFO_INVALID_ENTRY;
+  } else {
+    vcdinfo_offset_t *off_t = vcdinfo_get_offset_t(p_vcd->vcd, ofs);
+    if (off_t != NULL) {
+      *entry = off_t->lid;
+      dbg_print(INPUT_DBG_PBC, "%s: %d\n", label, off_t->lid);
+    } else
+      *entry = VCDINFO_INVALID_ENTRY;
+  }
+}
+
+/* Handles navigation when NOT in PBC reaching the end of a play item. 
+
+   The navigations rules here may be sort of made up, but the intent 
+   is to do something that's probably right or helpful.
+
+   return true if the caller should return.
+*/
+vcdplayer_read_status_t
+vcdplayer_non_pbc_nav ( input_thread_t * p_input )
+{
+  thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
+
+  /* Not in playback control. Do we advance automatically or stop? */
+  switch (p_vcd->play_item.type) {
+  case VCDINFO_ITEM_TYPE_TRACK:
+  case VCDINFO_ITEM_TYPE_ENTRY: {
+    input_area_t *p_area;
+
+    dbg_print( INPUT_DBG_LSN, "new track %d, lsn %d", p_vcd->cur_track, 
+               p_vcd->p_sectors[p_vcd->cur_track+1] );
+    
+    if ( p_vcd->cur_track >= p_vcd->num_tracks - 1 )
+      return READ_END; /* EOF */
+        
+    p_vcd->play_item.num = p_vcd->cur_track++;
+    
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_area = p_input->stream.pp_areas[p_vcd->cur_track];
+    
+    p_area->i_part = 1;
+    VCDSetArea( p_input, p_area );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    return READ_BLOCK;
+    break;
+  }
+  case VCDINFO_ITEM_TYPE_SPAREID2:  
+    dbg_print( (INPUT_DBG_STILL|INPUT_DBG_LSN), 
+               "SPAREID2" );
+    /* FIXME */
+    p_input->stream.b_seekable = 0;
+    if (p_vcd->in_still)
+    {
+      return READ_STILL_FRAME ;
+    }
+    return READ_END;
+  case VCDINFO_ITEM_TYPE_NOTFOUND:  
+    LOG_ERR ("NOTFOUND outside PBC -- not supposed to happen");
+    return READ_ERROR;
+  case VCDINFO_ITEM_TYPE_LID:  
+    LOG_ERR ("LID outside PBC -- not supposed to happen");
+    return READ_ERROR;
+  case VCDINFO_ITEM_TYPE_SEGMENT:
+      /* Hack: Just go back and do still again */
+    /* FIXME */
+    p_input->stream.b_seekable = 0;
+    if (p_vcd->in_still) 
+    {
+      dbg_print( (INPUT_DBG_STILL|INPUT_DBG_LSN), 
+                 "End of Segment - looping" );
+      return READ_STILL_FRAME;
+    }
+    return READ_END;
+  }
+  return READ_BLOCK;
+}
+
+/* FIXME: Will do whatever the right thing is later. */
+#define SLEEP_1_SEC_AND_HANDLE_EVENTS sleep(1)
+
+/* Handles PBC navigation when reaching the end of a play item. */
+vcdplayer_read_status_t
+vcdplayer_pbc_nav ( input_thread_t * p_input )
+{
+  thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
+
+  /* We are in playback control. */
+  vcdinfo_itemid_t itemid;
+
+  if (0 != p_vcd->in_still && p_vcd->in_still != -5) {
+      SLEEP_1_SEC_AND_HANDLE_EVENTS;
+      if (p_vcd->in_still > 0) p_vcd->in_still--;
+      return READ_STILL_FRAME;
+  }
+
+  /* The end of an entry is really the end of the associated 
+     sequence (or track). */
+  
+  if ( (VCDINFO_ITEM_TYPE_ENTRY == p_vcd->play_item.type) && 
+       (p_vcd->cur_lsn < p_vcd->end_lsn) ) {
+    /* Set up to just continue to the next entry */
+    p_vcd->play_item.num++;
+    dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC), 
+               "continuing into next entry: %u", p_vcd->play_item.num);
+    VCDPlay( p_input, p_vcd->play_item );
+    /* p_vcd->update_title(); */
+    return READ_BLOCK;
+  }
+  
+  switch (p_vcd->pxd.descriptor_type) {
+  case PSD_TYPE_END_LIST:
+    return READ_END;
+    break;
+  case PSD_TYPE_PLAY_LIST: {
+    int wait_time = vcdinf_get_wait_time(p_vcd->pxd.pld);
+    
+    dbg_print(INPUT_DBG_PBC, "playlist wait_time: %d", wait_time);
+    
+    if (vcdplayer_inc_play_item(p_input))
+      return READ_BLOCK;
+
+    /* Handle any wait time given. */
+    if (-5 == p_vcd->in_still) {
+      if (wait_time != 0) {
+        /* FIXME */
+        p_vcd->in_still = wait_time - 1;
+        SLEEP_1_SEC_AND_HANDLE_EVENTS ;
+        return READ_STILL_FRAME;
+      }
+    }
+    vcdplayer_update_entry( p_input, 
+                            vcdinf_pld_get_next_offset(p_vcd->pxd.pld),
+                            &itemid.num, "next" );
+    itemid.type = VCDINFO_ITEM_TYPE_LID;
+    VCDPlay( p_input, itemid );
+    break;
+  }
+  case PSD_TYPE_SELECTION_LIST:     /* Selection List (+Ext. for SVCD) */
+  case PSD_TYPE_EXT_SELECTION_LIST: /* Extended Selection List (VCD2.0) */
+    {
+      int wait_time         = vcdinf_get_timeout_time(p_vcd->pxd.psd);
+      uint16_t timeout_offs = vcdinf_get_timeout_offset(p_vcd->pxd.psd);
+      uint16_t max_loop     = vcdinf_get_loop_count(p_vcd->pxd.psd);
+      vcdinfo_offset_t *offset_timeout_LID = 
+        vcdinfo_get_offset_t(p_vcd->vcd, timeout_offs);
+      
+      dbg_print(INPUT_DBG_PBC, "wait_time: %d, looped: %d, max_loop %d", 
+                wait_time, p_vcd->loop_count, max_loop);
+      
+      /* Handle any wait time given */
+      if (-5 == p_vcd->in_still) {
+        p_vcd->in_still = wait_time - 1;
+        SLEEP_1_SEC_AND_HANDLE_EVENTS ;
+        return READ_STILL_FRAME;
+      }
+      
+      /* Handle any looping given. */
+      if ( max_loop == 0 || p_vcd->loop_count < max_loop ) {
+        p_vcd->loop_count++;
+        if (p_vcd->loop_count == 0x7f) p_vcd->loop_count = 0;
+        VCDSeek( p_input, 0 );
+        /* if (p_vcd->in_still) p_vcd->force_redisplay();*/
+        return READ_BLOCK;
+      }
+      
+      /* Looping finished and wait finished. Move to timeout
+         entry or next entry, or handle still. */
+      
+      if (NULL != offset_timeout_LID) {
+        /* Handle timeout_LID */
+        itemid.num  = offset_timeout_LID->lid;
+        itemid.type = VCDINFO_ITEM_TYPE_LID;
+        dbg_print(INPUT_DBG_PBC, "timeout to: %d", itemid.num);
+        VCDPlay( p_input, itemid );
+        return READ_BLOCK;
+      } else {
+        int num_selections = vcdinf_get_num_selections(p_vcd->pxd.psd);
+        if (num_selections > 0) {
+          /* Pick a random selection. */
+          unsigned int bsn=vcdinf_get_bsn(p_vcd->pxd.psd);
+          int rand_selection=bsn +
+            (int) ((num_selections+0.0)*rand()/(RAND_MAX+1.0));
+          lid_t rand_lid=vcdplayer_selection2lid (p_input, rand_selection);
+          itemid.num = rand_lid;
+          itemid.type = VCDINFO_ITEM_TYPE_LID;
+          dbg_print(INPUT_DBG_PBC, "random selection %d, lid: %d", 
+                    rand_selection - bsn, rand_lid);
+          VCDPlay( p_input, itemid );
+          return READ_BLOCK;
+        } else if (p_vcd->in_still) {
+          /* Hack: Just go back and do still again */
+          SLEEP_1_SEC_AND_HANDLE_EVENTS ;
+          return READ_STILL_FRAME;
+        }
+      }
+      break;
+    }
+  case VCDINFO_ITEM_TYPE_NOTFOUND:  
+    LOG_ERR( "NOTFOUND in PBC -- not supposed to happen" );
+    break;
+  case VCDINFO_ITEM_TYPE_SPAREID2:  
+    LOG_ERR( "SPAREID2 in PBC -- not supposed to happen" );
+    break;
+  case VCDINFO_ITEM_TYPE_LID:  
+    LOG_ERR( "LID in PBC -- not supposed to happen" );
+    break;
+    
+  default:
+    ;
+  }
+  /* FIXME: Should handle autowait ...  */
+
+  return READ_ERROR;
+}
+
+/*
+  Get the next play-item in the list given in the LIDs. Note play-item
+  here refers to list of play-items for a single LID It shouldn't be
+  confused with a user's list of favorite things to play or the 
+  "next" field of a LID which moves us to a different LID.
+ */
+bool
+vcdplayer_inc_play_item( input_thread_t *p_input )
+{
+  thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
+
+  int noi;
+
+  dbg_print(INPUT_DBG_CALL, "called pli: %d", p_vcd->pdi);
+
+  if ( NULL == p_vcd || NULL == p_vcd->pxd.pld  ) return false;
+
+  noi = vcdinf_pld_get_noi(p_vcd->pxd.pld);
+  
+  if ( noi <= 0 ) return false;
+  
+  /* Handle delays like autowait or wait here? */
+
+  p_vcd->pdi++;
+
+  if ( p_vcd->pdi < 0 || p_vcd->pdi >= noi ) return false;
+
+  else {
+    uint16_t trans_itemid_num=vcdinf_pld_get_play_item(p_vcd->pxd.pld, 
+                                                       p_vcd->pdi);
+    vcdinfo_itemid_t trans_itemid;
+
+    if (VCDINFO_INVALID_ITEMID == trans_itemid_num) return false;
+    
+    vcdinfo_classify_itemid(trans_itemid_num, &trans_itemid);
+    dbg_print(INPUT_DBG_PBC, "  play-item[%d]: %s",
+              p_vcd->pdi, vcdinfo_pin2str (trans_itemid_num));
+    return VLC_SUCCESS == VCDPlay( p_input, trans_itemid );
+  }
+}

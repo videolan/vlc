@@ -1,0 +1,12 @@
+SOURCES_vcdx = \
+	intf.c \
+	intf.h \
+	vcd.c \
+	vcd.h \
+	vcdplayer.h \
+	vcdplayer.c \
+	cdrom.c \
+	cdrom.h \
+	demux.c \
+	access.c \
+	$(NULL)

@@ -1,10 +1,8 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
+$Id: LIST,v 1.13 2003/10/04 18:55:13 gbazin Exp $
 
- * a52: A/52 basic parser
+ * a52: A/52 basic parser/packetizer
 
- * a52old: Old A/52 decoder
- 
  * a52sys: A/52 decapsulation demuxer.
 
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
@@ -63,6 +61,8 @@ $Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
 
  * cdda: input module to read audio CDs
 
+ * cddax: input module to read audio CDs vi libcdio
+
  * cinepak: Cinepack video decoder
 
  * clone: Clone video filter
@@ -85,15 +85,9 @@ $Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
 
  * distort: miscellaneous image effects filter.
 
- * downmix3dn: 3D Now! accelerated version of downmix.
-
- * downmix: downmix module, used by the AC3 decoder.
-
- * downmixsse: SSE accelerated version of downmix.
-
  * dshow: DirectShow access plugin for encoding cards under Windows
 
- * dts: DTS basic parser
+ * dts: DTS basic parser/packetizer
 
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
 
@@ -196,22 +190,6 @@ $Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
  
  * id3tag: ID3 tag parser/skipper using libid3tag
  
- * idctaltivec: AltiVec accelerated version of idct.
- 
- * idctclassic: another version of idct.
-
- * idct: inverse DCT module, used by mpeg_video_old
-
- * idctmmxext: MMX EXT accelerated version of idct.
- 
- * idctmmx: MMX accelerated version of idct.
- 
- * imdct3dn: 3D Now! Accelerated A/52 DCT
-
- * imdct: IMDCT module for the A/52 decoder
-
- * imdctsse: SSE accelerated A/52 DCT
-
  * invert: inverse video filter.
 
  * ipv4: IPv4 network abstraction layer
@@ -254,25 +232,13 @@ $Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
 
  * mkv: Matroska demuxer
 
- * motion3dnow: 3D Now! accelerated version of motion.
- 
- * motionaltivec: AltiVec accelerated version of motion.
-
  * motionblur: Motion blur filter
-
- * motionmmxext: MMX EXT accelerated version of motion.
- 
- * motionmmx: MMX accelerated version of motion.
-
- * motion: motion compensation module for mpeg_video_old
 
  * mp4: MP4 file input module
 
- * mpeg_audio: MPEG audio parser and packetizer
+ * mpeg_audio: MPEG audio parser/packetizer
 
  * mpeg_system: helper module for TS, PS and PES management
-
- * mpeg_video_old: MPEG and MPEG2 video decoder.
 
  * mpga: MPEG-I/II Audio demuxer
 
@@ -300,20 +266,14 @@ $Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
 
  * oss: audio output module using the OSS /dev/dsp interface.
  
- * packetizer_a52: A/52 audio packetizer
-
  * packetizer_copy: Simple copy packetizer
 
  * packetizer_mpeg4audio: MPEG4 audio packetizer
  
  * packetizer_mpeg4video: MPEG4 video packetizer
 
- * packetizer_mpegaudio: MPEG audio packetizer
- 
  * packetizer_mpegvideo: MPEG video packetizer
  
- * packetizer_vorbis: Vorbis packetizer
-
  * pda: interface for iPaq using the Gtk2+ widget set.
 
  * postprocessing_c: Video Postprocessing module
@@ -378,7 +338,7 @@ $Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
  
  * stream_out_transcode: audio & video transcoder using ffmpeg
 
- * subsdec: Another SPU decoder
+ * subsdec: Another SPU decoder for text subtitles
 
  * svgalib: SGVAlib output plugin
 
@@ -392,7 +352,7 @@ $Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
 
  * test4: Stress test module
 
- * theora: a theora video decoder using the libtheora library.
+ * theora: a theora video decoder/packetizer using the libtheora library.
 
  * transform: filter for horizontal and vertical image flips and
                      90° rotations.
@@ -419,9 +379,11 @@ $Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
 
  * vcd: input module for accessing Video CDs.
 
+ * vcdx: input module for accessing Video CDs with navigation & stills
+
  * visual: visualisation system
 
- * vorbis: a vorbis audio decoder using the libvorbis library.
+ * vorbis: a vorbis audio decoder/packetizer using the libvorbis library.
 
  * vout_directx: video output module using the DirectX API.
 
