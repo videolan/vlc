@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout.c,v 1.3 2002/11/18 18:05:13 sam Exp $
+ * $Id: vout.c,v 1.4 2003/03/28 11:34:52 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,11 +37,12 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static int  Manage    ( vout_thread_t * );
-static void Render    ( vout_thread_t *, picture_t * );
-static void Display   ( vout_thread_t *, picture_t * );
+static int  Init       ( vout_thread_t * );
+static void End        ( vout_thread_t * );
+static int  Manage     ( vout_thread_t * );
+static void Render     ( vout_thread_t *, picture_t * );
+static void Display    ( vout_thread_t *, picture_t * );
+static void SetPalette ( vout_thread_t *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
  * OpenVideo: activates dummy video thread output method
@@ -92,6 +93,10 @@ static int Init( vout_thread_t *p_vout )
         msg_Dbg( p_vout, "forcing chroma 0x%.8x (%4.4s)",
                          i_chroma, (char*)&i_chroma );
         p_vout->output.i_chroma = i_chroma;
+        if ( i_chroma == VLC_FOURCC( 'R', 'G', 'B', '2' ) )
+        {
+            p_vout->output.pf_setpalette = SetPalette;
+        }
         p_vout->output.i_width  = p_vout->render.i_width;
         p_vout->output.i_height = p_vout->render.i_height;
         p_vout->output.i_aspect = p_vout->render.i_aspect;
@@ -190,3 +195,11 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     /* No need to do anything, the fake direct buffers stay as they are */
 }
 
+/*****************************************************************************
+ * SetPalette: set the palette for the picture
+ *****************************************************************************/
+static void SetPalette ( vout_thread_t *p_vout, u16 *red, u16 *green,
+                         u16 *blue )
+{
+    /* No need to do anything, the fake direct buffers stay as they are */
+}    
