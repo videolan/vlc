@@ -215,21 +215,24 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         for( ; p_in < p_in_end ; )
         {
+            uint64_t *p_in64, *p_out64;
+
             p_line_end = p_in + p_pic->p[i_index].i_visible_pitch - 64;
 
-            for( ; p_in < p_line_end ; )
+            p_in64 = (uint64_t*)p_in;
+            p_out64 = (uint64_t*)p_out;
+
+            for( ; (ptrdiff_t)p_in64 < (ptrdiff_t)p_line_end ; )
             {
                 /* Do 64 pixels at a time */
-                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
-                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
-                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
-                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
-                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
-                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
-                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
-                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
+                *p_out64++ = ~*p_in64++; *p_out64++ = ~*p_in64++;
+                *p_out64++ = ~*p_in64++; *p_out64++ = ~*p_in64++;
+                *p_out64++ = ~*p_in64++; *p_out64++ = ~*p_in64++;
+                *p_out64++ = ~*p_in64++; *p_out64++ = ~*p_in64++;
             }
 
+            p_in = (uint8_t*)p_in64;
+            p_out = (uint8_t*)p_out64;
             p_line_end += 64;
 
             for( ; p_in < p_line_end ; )
