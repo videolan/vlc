@@ -39,7 +39,7 @@ Status: Todo
 
 Task
 Difficulty: Easy
-Platform: Linux, Win32, Mac
+Platform: Linux, Win32, Mac OS X
 Urgency: Normal
 Description: Streaming wizard
  Finish the streaming wizard (85% finished)<br />
@@ -239,7 +239,7 @@ Status: Todo
 Task
 Difficulty: Hard
 Urgency: Critical
-Platform: OSX
+Platform: Mac OS X
 Description: CoreAudio multichannel audio output.
  Convert to <a href="http://www.mat.ucsb.edu:8000/CoreAudio/108">AUHAL</a> based sytem.
 Still no info over S/PDIF output available.
@@ -304,7 +304,6 @@ Difficulty: Medium
 Urgency: Wishlist
 Platform: any
 Description: Subtitle work
-- scaling support (mostly for Vobsub with avi/mkv)
 - better SSA support with postioning, colors etc.
 - VobSub tracks support
 - Fix subtitles dialogs
@@ -541,6 +540,24 @@ Difficulty: Hard
 Platform: any
 Urgency: Wishlist
 Description: Matroska muxer
+Status: Todo
+
+Task
+Difficulty: Medium
+Platform: any
+Urgency: Wishlist
+Description: TTA decoder
+  TTA is said to be a fast en good lossless codec. Opensource library
+  availabe: http://tta.corecodec.org/
+Status: Todo
+
+Task
+Difficulty: Medium
+Platform: any
+Urgency: Wishlist
+Description: Option to automatically deinterlace when needed
+  Mkv stores wether a video track is interlaced in the traxk descriptor
+  libmpeg2 etc output this information on a per-picture bases
 Status: Todo
 
 # Do not remove me
