@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.6 2002/12/15 18:37:39 ipkiss Exp $
+ * $Id: wxwindows.h,v 1.7 2002/12/21 11:20:30 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -127,6 +127,7 @@ private:
     void OnMessages( wxCommandEvent& event );
     void OnPlaylist( wxCommandEvent& event );
     void OnLogs( wxCommandEvent& event );
+    void OnFileInfo( wxCommandEvent& event );
     void OnOpenFile( wxCommandEvent& event );
     void OnPlayStream( wxCommandEvent& event );
     void OnStopStream( wxCommandEvent& event );
@@ -195,6 +196,20 @@ private:
     Interface *p_main_interface;
     wxListView *listview;
     wxButton *ok_button;
+};
+
+/* File Info */
+class FileInfo: public wxFrame
+{
+public:
+    /* Constructor */
+    FileInfo( intf_thread_t *p_intf, Interface *p_main_interface );
+    virtual ~FileInfo();
+
+private:
+    void OnClose( wxCommandEvent& event );
+    DECLARE_EVENT_TABLE();
+    
 };
 
 #if !defined(__WXX11__)

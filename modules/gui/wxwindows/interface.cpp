@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.11 2002/12/15 18:37:39 ipkiss Exp $
+ * $Id: interface.cpp,v 1.12 2002/12/21 11:20:30 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -86,6 +86,7 @@ enum
 
     Playlist_Event,
     Logs_Event,
+    FileInfo_Event,
 
     Audio_Event,
     Subtitles_Event,
@@ -110,6 +111,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(About_Event, Interface::OnAbout)
     EVT_MENU(Playlist_Event, Interface::OnPlaylist)
     EVT_MENU(Logs_Event, Interface::OnLogs)
+    EVT_MENU(FileInfo_Event, Interface::OnFileInfo)
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
     /* Toolbar events */
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
@@ -189,6 +191,7 @@ void Interface::CreateOurMenuBar()
 
 #define HELP_PLAYLIST   N_("Open the playlist")
 #define HELP_LOGS       N_("Show the program logs")
+#define HELP_FILEINFO       N_("Show information about the file being played")
 
 #define HELP_AUDIO N_("Change the current audio track")
 #define HELP_SUBS  N_("Change the current subtitles stream")
@@ -213,6 +216,7 @@ void Interface::CreateOurMenuBar()
     wxMenu *view_menu = new wxMenu;
     view_menu->Append( Playlist_Event, _("&Playlist..."), HELP_PLAYLIST );
     view_menu->Append( Logs_Event, _("&Logs..."), HELP_LOGS );
+    view_menu->Append( FileInfo_Event, _("&File info..."), HELP_FILEINFO );
 
     /* Create the "Settings" menu */
     wxMenu *settings_menu = new wxMenu;
@@ -355,6 +359,16 @@ void Interface::OnLogs( wxCommandEvent& WXUNUSED(event) )
     if( p_messages_window )
     {
         p_messages_window->Show( ! p_messages_window->IsShown() );
+    }
+}
+
+void Interface::OnFileInfo( wxCommandEvent& WXUNUSED(event) )
+{
+    /* Show/hide the fileinfo window */
+    wxFrame *p_fileinfo_window = new FileInfo( p_intf, this );
+    if( p_fileinfo_window )
+    {
+        p_fileinfo_window->Show( true );//! p_messages_window->IsShown() );
     }
 }
 
