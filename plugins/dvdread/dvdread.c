@@ -2,7 +2,7 @@
  * dvdread.c : DvdRead input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dvdread.c,v 1.8 2002/01/23 03:15:31 stef Exp $
+ * $Id: dvdread.c,v 1.9 2002/02/25 18:42:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,6 +38,12 @@ void _M( input_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( "Play Options", NULL )
+ADD_INTEGER ( INPUT_TITLE_VAR, -1, NULL, "choose title", NULL )
+ADD_INTEGER ( INPUT_CHAPTER_VAR, -1, NULL, "choose chapter", NULL )
+ADD_INTEGER ( INPUT_ANGLE_VAR, -1, NULL, "choose angle", NULL )
+ADD_CATEGORY_HINT( "Misc Options", NULL )
+ADD_STRING  ( INPUT_DVD_DEVICE_VAR, "/dev/dvd", NULL, "DVD device", NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

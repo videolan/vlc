@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.153 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: main.c,v 1.154 2002/02/25 18:42:09 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -132,7 +132,6 @@ ADD_BOOL    ( AOUT_NOAUDIO_VAR, NULL, "disable audio", NULL )
 ADD_PLUGIN  ( AOUT_METHOD_VAR, MODULE_CAPABILITY_AOUT, NULL, NULL,
               "audio output method", NULL )
 ADD_BOOL    ( AOUT_MONO_VAR, NULL, "mono audio", NULL )
-ADD_BOOL    ( AOUT_SPDIF_VAR, NULL, "AC3 pass-through mode", NULL )
 ADD_INTEGER ( AOUT_VOLUME_VAR, VOLUME_DEFAULT, NULL, "VLC output volume", NULL)
 ADD_INTEGER ( AOUT_RATE_VAR, 44100, NULL, "VLC output frequency", NULL )
 ADD_INTEGER ( AOUT_DESYNC_VAR, 0, NULL, "Compensate desynchronization of the "
@@ -163,14 +162,10 @@ ADD_STRING  ( INPUT_CHANNEL_SERVER_VAR, "localhost", NULL,
 ADD_INTEGER ( INPUT_CHANNEL_PORT_VAR, 6010, NULL, "channel server port", NULL )
 ADD_STRING  ( INPUT_IFACE_VAR, "eth0", NULL, "network interface", NULL )
 
-ADD_INTEGER ( INPUT_TITLE_VAR, -1, NULL, "choose title", NULL )
-ADD_INTEGER ( INPUT_CHAPTER_VAR, -1, NULL, "choose chapter", NULL )
-ADD_INTEGER ( INPUT_ANGLE_VAR, -1, NULL, "chosse angle", NULL )
-ADD_INTEGER ( INPUT_AUDIO_VAR, -1, NULL, "choose audio", NULL )
 ADD_INTEGER ( INPUT_CHANNEL_VAR, -1, NULL, "choose channel", NULL )
+ADD_INTEGER ( INPUT_AUDIO_VAR, -1, NULL, "choose audio", NULL )
 ADD_INTEGER ( INPUT_SUBTITLE_VAR, -1, NULL, "choose subtitles", NULL )
 
-ADD_STRING  ( INPUT_DVD_DEVICE_VAR, "/dev/dvd", NULL, "DVD device", NULL )
 ADD_STRING  ( INPUT_VCD_DEVICE_VAR, "/dev/cdrom", NULL, "VCD device", NULL )
 
 /* Decoder options */
