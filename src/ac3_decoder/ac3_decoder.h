@@ -2,7 +2,7 @@
  * ac3_decoder.h : ac3 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.h,v 1.11 2001/07/08 23:15:11 reno Exp $
+ * $Id: ac3_decoder.h,v 1.12 2001/10/30 19:34:53 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -354,8 +354,8 @@ typedef struct mantissa_s
 
 struct ac3dec_s
 {
-    float               samples[6][256] __attribute__ ((aligned(16)));
-    imdct_t             imdct __attribute__ ((aligned(16)));
+    float *             samples;
+    imdct_t *           imdct;
 
     /*
      * Input properties

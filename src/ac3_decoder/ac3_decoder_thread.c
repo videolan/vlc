@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.37 2001/09/05 16:46:10 massiot Exp $
+ * $Id: ac3_decoder_thread.c,v 1.38 2001/10/30 19:34:53 reno Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -78,42 +78,37 @@ static void     BitstreamCallback       ( bit_stream_t *p_bit_stream,
 vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
 {
     ac3dec_thread_t *   p_ac3thread;
-    ac3dec_thread_t *   p_ac3thread_temp;
 
     intf_DbgMsg( "ac3dec debug: creating ac3 decoder thread" );
 
     /* Allocate the memory needed to store the thread's structure */
-    p_ac3thread_temp = (ac3dec_thread_t *)malloc(sizeof(ac3dec_thread_t) + 15);
-    memset( p_ac3thread_temp, 0, sizeof(ac3dec_thread_t) + 15 );
+    p_ac3thread = (ac3dec_thread_t *)memalign(16, sizeof(ac3dec_thread_t));
 
-    /* We need to be 16 bytes aligned */
-    p_ac3thread = (ac3dec_thread_t *)(((unsigned long)p_ac3thread_temp + 15)
-				      & ~0xFUL );
-    p_ac3thread->ac3thread = p_ac3thread_temp;
-    
     if(p_ac3thread == NULL)
     {
         intf_ErrMsg ( "ac3dec error: not enough memory "
                       "for ac3dec_CreateThread() to create the new thread");
         return 0;
     }
-    
+   
     /*
      * Initialize the thread properties
      */
     p_ac3thread->p_config = p_config;
     p_ac3thread->p_fifo = p_config->decoder_config.p_decoder_fifo;
+    p_ac3thread->ac3_decoder = memalign(16, sizeof(ac3dec_t));
 
     /*
      * Choose the best downmix module
      */
-#define DOWNMIX p_ac3thread->ac3_decoder.downmix
+#define DOWNMIX p_ac3thread->ac3_decoder->downmix
     DOWNMIX.p_module = module_Need( MODULE_CAPABILITY_DOWNMIX, NULL );
 
     if( DOWNMIX.p_module == NULL )
     {
         intf_ErrMsg( "ac3dec error: no suitable downmix module" );
-        free( p_ac3thread->ac3thread );
+        free( p_ac3thread->ac3_decoder );
+        free( p_ac3thread );
         return( 0 );
     }
 
@@ -131,28 +126,49 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
     /*
      * Choose the best IMDCT module
      */
-#define IMDCT p_ac3thread->ac3_decoder.imdct
-    IMDCT.p_module = module_Need( MODULE_CAPABILITY_IMDCT, NULL );
+    p_ac3thread->ac3_decoder->imdct = memalign(16, sizeof(imdct_t));
+    
+#define IMDCT p_ac3thread->ac3_decoder->imdct
+    IMDCT->p_module = module_Need( MODULE_CAPABILITY_IMDCT, NULL );
 
-    if( IMDCT.p_module == NULL )
+    if( IMDCT->p_module == NULL )
     {
         intf_ErrMsg( "ac3dec error: no suitable IMDCT module" );
-        module_Unneed( p_ac3thread->ac3_decoder.downmix.p_module );
-        free( p_ac3thread->ac3thread );
+        module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
+        free( p_ac3thread->ac3_decoder->imdct );
+        free( p_ac3thread->ac3_decoder );
+        free( p_ac3thread );
         return( 0 );
     }
 
-#define F IMDCT.p_module->p_functions->imdct.functions.imdct
-    IMDCT.pf_imdct_init    = F.pf_imdct_init;
-    IMDCT.pf_imdct_256     = F.pf_imdct_256;
-    IMDCT.pf_imdct_256_nol = F.pf_imdct_256_nol;
-    IMDCT.pf_imdct_512     = F.pf_imdct_512;
-    IMDCT.pf_imdct_512_nol = F.pf_imdct_512_nol;
+#define F IMDCT->p_module->p_functions->imdct.functions.imdct
+    IMDCT->pf_imdct_init    = F.pf_imdct_init;
+    IMDCT->pf_imdct_256     = F.pf_imdct_256;
+    IMDCT->pf_imdct_256_nol = F.pf_imdct_256_nol;
+    IMDCT->pf_imdct_512     = F.pf_imdct_512;
+    IMDCT->pf_imdct_512_nol = F.pf_imdct_512_nol;
 #undef F
 #undef IMDCT
 
     /* Initialize the ac3 decoder structures */
-    ac3_init (&p_ac3thread->ac3_decoder);
+    p_ac3thread->ac3_decoder->samples = memalign(16, 6 * 256 * sizeof(float));
+    p_ac3thread->ac3_decoder->imdct->buf = memalign(16, N/4 * sizeof(complex_t));
+    p_ac3thread->ac3_decoder->imdct->delay = memalign(16, 6 * 256 * sizeof(float));
+    p_ac3thread->ac3_decoder->imdct->delay1 = memalign(16, 6 * 256 * sizeof(float));
+    p_ac3thread->ac3_decoder->imdct->xcos1 = memalign(16, N/4 * sizeof(float));
+    p_ac3thread->ac3_decoder->imdct->xsin1 = memalign(16, N/4 * sizeof(float));
+    p_ac3thread->ac3_decoder->imdct->xcos2 = memalign(16, N/8 * sizeof(float));
+    p_ac3thread->ac3_decoder->imdct->xsin2 = memalign(16, N/8 * sizeof(float));
+    p_ac3thread->ac3_decoder->imdct->xcos_sin_sse = memalign(16, 128 * 4 * sizeof(float));
+    p_ac3thread->ac3_decoder->imdct->w_2 = memalign(16, 2 * sizeof(complex_t));
+    p_ac3thread->ac3_decoder->imdct->w_4 = memalign(16, 4 * sizeof(complex_t));
+    p_ac3thread->ac3_decoder->imdct->w_8 = memalign(16, 8 * sizeof(complex_t));
+    p_ac3thread->ac3_decoder->imdct->w_16 = memalign(16, 16 * sizeof(complex_t));
+    p_ac3thread->ac3_decoder->imdct->w_32 = memalign(16, 32 * sizeof(complex_t));
+    p_ac3thread->ac3_decoder->imdct->w_64 = memalign(16, 64 * sizeof(complex_t));
+    p_ac3thread->ac3_decoder->imdct->w_1 = memalign(16, sizeof(complex_t));
+
+    ac3_init (p_ac3thread->ac3_decoder);
 
     /*
      * Initialize the output properties
@@ -164,9 +180,27 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
                 (vlc_thread_func_t)RunThread, (void *)p_ac3thread))
     {
         intf_ErrMsg( "ac3dec error: can't spawn ac3 decoder thread" );
-        module_Unneed( p_ac3thread->ac3_decoder.downmix.p_module );
-        module_Unneed( p_ac3thread->ac3_decoder.imdct.p_module );
-        free (p_ac3thread->ac3thread);
+        module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
+        module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
+        free( p_ac3thread->ac3_decoder->imdct->w_1 );
+        free( p_ac3thread->ac3_decoder->imdct->w_64 );
+        free( p_ac3thread->ac3_decoder->imdct->w_32 );
+        free( p_ac3thread->ac3_decoder->imdct->w_16 );
+        free( p_ac3thread->ac3_decoder->imdct->w_8 );
+        free( p_ac3thread->ac3_decoder->imdct->w_4 );
+        free( p_ac3thread->ac3_decoder->imdct->w_2 );
+        free( p_ac3thread->ac3_decoder->imdct->xcos_sin_sse );
+        free( p_ac3thread->ac3_decoder->imdct->xsin2 );
+        free( p_ac3thread->ac3_decoder->imdct->xcos2 );
+        free( p_ac3thread->ac3_decoder->imdct->xsin1 );
+        free( p_ac3thread->ac3_decoder->imdct->xcos1 );
+        free( p_ac3thread->ac3_decoder->imdct->delay1 );
+        free( p_ac3thread->ac3_decoder->imdct->delay );
+        free( p_ac3thread->ac3_decoder->imdct->buf );
+        free( p_ac3thread->ac3_decoder->samples );
+        free( p_ac3thread->ac3_decoder->imdct );
+        free( p_ac3thread->ac3_decoder );
+        free( p_ac3thread );
         return 0;
     }
 
@@ -184,7 +218,7 @@ static int InitThread (ac3dec_thread_t * p_ac3thread)
     intf_DbgMsg("ac3dec debug: initializing ac3 decoder thread %p",p_ac3thread);
 
     p_ac3thread->p_config->decoder_config.pf_init_bit_stream(
-            &p_ac3thread->ac3_decoder.bit_stream,
+            &p_ac3thread->ac3_decoder->bit_stream,
             p_ac3thread->p_config->decoder_config.p_decoder_fifo,
             BitstreamCallback, (void *) p_ac3thread );
 
@@ -228,7 +262,7 @@ static void RunThread (ac3dec_thread_t * p_ac3thread)
 
         if (!sync) {
             do {
-                GetBits(&p_ac3thread->ac3_decoder.bit_stream,8);
+                GetBits(&p_ac3thread->ac3_decoder->bit_stream,8);
             } while ((!p_ac3thread->sync_ptr) && (!p_ac3thread->p_fifo->b_die)
                     && (!p_ac3thread->p_fifo->b_error));
             
@@ -237,7 +271,7 @@ static void RunThread (ac3dec_thread_t * p_ac3thread)
             while(ptr-- && (!p_ac3thread->p_fifo->b_die)
                 && (!p_ac3thread->p_fifo->b_error))
             {
-                p_ac3thread->ac3_decoder.bit_stream.p_byte++;
+                p_ac3thread->ac3_decoder->bit_stream.p_byte++;
             }
                         
             /* we are in sync now */
@@ -254,7 +288,7 @@ static void RunThread (ac3dec_thread_t * p_ac3thread)
                 LAST_MDATE;
         }
     
-        if (ac3_sync_frame (&p_ac3thread->ac3_decoder, &sync_info))
+        if (ac3_sync_frame (p_ac3thread->ac3_decoder, &sync_info))
         {
             sync = 0;
             goto bad_frame;
@@ -265,7 +299,7 @@ static void RunThread (ac3dec_thread_t * p_ac3thread)
         buffer = ((s16 *)p_ac3thread->p_aout_fifo->buffer) + 
             (p_ac3thread->p_aout_fifo->l_end_frame * AC3DEC_FRAME_SIZE);
 
-        if (ac3_decode_frame (&p_ac3thread->ac3_decoder, buffer))
+        if (ac3_decode_frame (p_ac3thread->ac3_decoder, buffer))
         {
             sync = 0;
             goto bad_frame;
@@ -278,7 +312,7 @@ static void RunThread (ac3dec_thread_t * p_ac3thread)
         vlc_mutex_unlock (&p_ac3thread->p_aout_fifo->data_lock);
 
         bad_frame:
-            RealignBits(&p_ac3thread->ac3_decoder.bit_stream);
+            RealignBits(&p_ac3thread->ac3_decoder->bit_stream);
     }
 
     /* If b_error is set, the ac3 decoder thread enters the error loop */
@@ -339,12 +373,30 @@ static void EndThread (ac3dec_thread_t * p_ac3thread)
     }
 
     /* Unlock the modules */
-    module_Unneed( p_ac3thread->ac3_decoder.downmix.p_module );
-    module_Unneed( p_ac3thread->ac3_decoder.imdct.p_module );
+    module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
+    module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
 
     /* Destroy descriptor */
+    free( p_ac3thread->ac3_decoder->imdct->w_1 );
+    free( p_ac3thread->ac3_decoder->imdct->w_64 );
+    free( p_ac3thread->ac3_decoder->imdct->w_32 );
+    free( p_ac3thread->ac3_decoder->imdct->w_16 );
+    free( p_ac3thread->ac3_decoder->imdct->w_8 );
+    free( p_ac3thread->ac3_decoder->imdct->w_4 );
+    free( p_ac3thread->ac3_decoder->imdct->w_2 );
+    free( p_ac3thread->ac3_decoder->imdct->xcos_sin_sse );
+    free( p_ac3thread->ac3_decoder->imdct->xsin2 );
+    free( p_ac3thread->ac3_decoder->imdct->xcos2 );
+    free( p_ac3thread->ac3_decoder->imdct->xsin1 );
+    free( p_ac3thread->ac3_decoder->imdct->xcos1 );
+    free( p_ac3thread->ac3_decoder->imdct->delay1 );
+    free( p_ac3thread->ac3_decoder->imdct->delay );
+    free( p_ac3thread->ac3_decoder->imdct->buf );
+    free( p_ac3thread->ac3_decoder->samples );
+    free( p_ac3thread->ac3_decoder->imdct );
+    free( p_ac3thread->ac3_decoder );
     free( p_ac3thread->p_config );
-    free( p_ac3thread->ac3thread );
+    free( p_ac3thread );
 
     intf_DbgMsg ("ac3dec debug: ac3 decoder thread %p destroyed", p_ac3thread);
 }

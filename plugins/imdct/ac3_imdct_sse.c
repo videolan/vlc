@@ -2,7 +2,7 @@
  * ac3_imdct_sse.c: accelerated SSE ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_sse.c,v 1.5 2001/07/26 20:00:33 reno Exp $
+ * $Id: ac3_imdct_sse.c,v 1.6 2001/10/30 19:34:53 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -249,7 +249,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps %%xmm2, %%xmm0\n"      /* 0.0 | im1 | 0.0 | im0 */
     "movlhps %%xmm3, %%xmm1\n"      /* 0.0 | re1 | 0.0 | re0 */
 
-    "movups (%%edx), %%xmm4\n"      /* w3 | w2 | w1 | w0 */
+    "movaps (%%edx), %%xmm4\n"      /* w3 | w2 | w1 | w0 */
     "movaps (%%ecx), %%xmm5\n"      /* d3 | d2 | d1 | d0 */
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* re1 | 0.0 | re0 | 0.0 */
 
@@ -263,7 +263,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps   %%xmm3, %%xmm2\n"    /* 0.0 | re3 | 0.0 | re2 */
     "addps  %%xmm5, %%xmm0\n"
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* re3 | 0.0 | re2 | 0.0 */
-    "movups 16(%%edx), %%xmm4\n"    /* w7 | w6 | w5 | w4 */
+    "movaps 16(%%edx), %%xmm4\n"    /* w7 | w6 | w5 | w4 */
     "movaps 16(%%ecx), %%xmm5\n"    /* d7 | d6 | d5 | d4 */
     "subps  %%xmm2, %%xmm6\n"       /* -re3 | im3 | -re2 | im2 */
     "addl   $32, %%edx\n"
@@ -292,7 +292,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps %%xmm2, %%xmm0\n"  /* 0.0 | re1 | 0.0 | re0 */
     "movlhps %%xmm3, %%xmm1\n"  /* 0.0 | im1 | 0.0 | im1 */
 
-    "movups (%%edx), %%xmm4\n"  /* w3 | w2 | w1 | w0 */
+    "movaps (%%edx), %%xmm4\n"  /* w3 | w2 | w1 | w0 */
     "movaps (%%ecx), %%xmm5\n"  /* d3 | d2 | d1 | d0 */
 
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* im1 | 0.0 | im0 | 0.0 */
@@ -305,7 +305,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps %%xmm3, %%xmm2\n"      /* 0.0 | im3 | 0.0 | im2 */
     "mulps   %%xmm4, %%xmm0\n"
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* im3 | 0.0 | im2 | 0.0 */
-    "movups 16(%%edx), %%xmm4\n"    /* w7 | w6 | w5 | w4 */
+    "movaps 16(%%edx), %%xmm4\n"    /* w7 | w6 | w5 | w4 */
     "addl   $32, %%esi\n"
     "subps  %%xmm2, %%xmm6\n"       /* -im3 | re3 | -im2 | re2 */
     "addps  %%xmm5, %%xmm0\n"
@@ -336,7 +336,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps %%xmm2, %%xmm0\n"      /* 0.0 | re1 | 0.0 | re0 */
     "movlhps %%xmm3, %%xmm1\n"      /* 0.0 | im1 | 0.0 | im0 */
 
-    "movups -16(%%edx), %%xmm4\n"   /* w3 | w2 | w1 | w0 */
+    "movaps -16(%%edx), %%xmm4\n"   /* w3 | w2 | w1 | w0 */
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* im1 | 0.0 | im0 | 0.0 */
     "movss  16(%%esi), %%xmm6\n"    /* re2 */
     "movss  24(%%esi), %%xmm7\n"    /* re3 */
@@ -347,7 +347,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps %%xmm7, %%xmm6\n"      /* 0.0 | re3 | 0.0 | re2 */
     "movlhps %%xmm3, %%xmm2\n"      /* 0.0 | im3 | 0.0 | im2 */
     "mulps   %%xmm4, %%xmm0\n"
-    "movups (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
+    "movaps (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* im3 | 0.0 | im2 | 0.0 */
     "movaps %%xmm0, (%%ecx)\n"
     "addl   $32, %%esi\n"
@@ -373,7 +373,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps %%xmm2, %%xmm0\n"      /* 0.0 | im1 | 0.0 | im0 */
     "movlhps %%xmm3, %%xmm1\n"      /* 0.0 | re1 | 0.0 | re0 */
 
-    "movups -16(%%edx), %%xmm4\n"   /* w3 | w2 | w1 | w0 */
+    "movaps -16(%%edx), %%xmm4\n"   /* w3 | w2 | w1 | w0 */
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* re1 | 0.0 | re0 | 0.0 */
     "movss  16(%%esi), %%xmm6\n"    /* im2 */
     "movss  24(%%esi), %%xmm7\n"    /* im3 */
@@ -384,7 +384,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps %%xmm7, %%xmm6\n"      /* 0.0 | im3 | 0.0 | im2 */
     "movlhps %%xmm3, %%xmm2\n"      /* 0.0 | re3 | 0.0 | re2 */
     "mulps   %%xmm4, %%xmm1\n"
-    "movups (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
+    "movaps (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* re3 | 0.0 | re2 | 0.0 */
     "movaps %%xmm1, (%%ecx)\n"
     "addl   $32, %%esi\n"
@@ -436,7 +436,7 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "movlhps %%xmm2, %%xmm0\n"      /* 0.0 | im1 | 0.0 | im0 */
     "movlhps %%xmm3, %%xmm1\n"      /* 0.0 | re1 | 0.0 | re0 */
 
-    "movups (%%edx), %%xmm4\n"      /* w3 | w2 | w1 | w0 */
+    "movaps (%%edx), %%xmm4\n"      /* w3 | w2 | w1 | w0 */
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* re1 | 0.0 | re0 | 0.0 */
 
     "movss  16(%%esi), %%xmm6\n"    /* im2 */
@@ -448,7 +448,7 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "movlhps %%xmm7, %%xmm6\n"      /* 0.0 | im3 | 0.0 | im2 */
     "movlhps %%xmm3, %%xmm2\n"      /* 0.0 | re3 | 0.0 | re2 */
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* re3 | 0.0 | re2 | 0.0 */
-    "movups 16(%%edx), %%xmm4\n"    /* w7 | w6 | w5 | w4 */
+    "movaps 16(%%edx), %%xmm4\n"    /* w7 | w6 | w5 | w4 */
     "subps  %%xmm2, %%xmm6\n"       /* -re3 | im3 | -re2 | im2 */
     "addl   $32, %%edx\n"
     "movaps %%xmm0, (%%eax)\n"
@@ -474,7 +474,7 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "movlhps %%xmm2, %%xmm0\n"      /* 0.0 | re1 | 0.0 | re0 */
     "movlhps %%xmm3, %%xmm1\n"      /* 0.0 | im1 | 0.0 | im1 */
     
-    "movups (%%edx), %%xmm4\n"      /* w3 | w2 | w1 | w0 */
+    "movaps (%%edx), %%xmm4\n"      /* w3 | w2 | w1 | w0 */
 
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* im1 | 0.0 | im0 | 0.0 */
     "movss  16(%%esi), %%xmm6\n"    /* re2 */
@@ -486,7 +486,7 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "movlhps %%xmm3, %%xmm2\n"      /* 0.0 | im3 | 0.0 | im2 */
     "mulps   %%xmm4, %%xmm0\n"
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* im3 | 0.0 | im2 | 0.0 */
-    "movups 16(%%edx), %%xmm4\n"    /* w7 | w6 | w5 | w4 */
+    "movaps 16(%%edx), %%xmm4\n"    /* w7 | w6 | w5 | w4 */
     "addl   $32, %%esi\n"
     "subps  %%xmm2, %%xmm6\n"       /* -im3 | re3 | -im2 | re2 */
     "mulps  %%xmm4, %%xmm6\n"
@@ -513,7 +513,7 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "movlhps %%xmm2, %%xmm0\n"  /* 0.0 | re1 | 0.0 | re0 */
     "movlhps %%xmm3, %%xmm1\n"  /* 0.0 | im1 | 0.0 | im0 */
 
-    "movups -16(%%edx), %%xmm4\n"   /* w3 | w2 | w1 | w0 */
+    "movaps -16(%%edx), %%xmm4\n"   /* w3 | w2 | w1 | w0 */
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* im1 | 0.0 | im0 | 0.0 */
     "movss  16(%%esi), %%xmm6\n"    /* re2 */
     "movss  24(%%esi), %%xmm7\n"    /* re3 */
@@ -524,7 +524,7 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "movlhps %%xmm7, %%xmm6\n"      /* 0.0 | re3 | 0.0 | re2 */
     "movlhps %%xmm3, %%xmm2\n"      /* 0.0 | im3 | 0.0 | im2 */
     "mulps   %%xmm4, %%xmm0\n"
-    "movups (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
+    "movaps (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* im3 | 0.0 | im2 | 0.0 */
     "movaps %%xmm0, (%%ecx)\n"
     "addl   $32, %%esi\n"
@@ -550,7 +550,7 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "movlhps %%xmm2, %%xmm0\n"  /* 0.0 | im1 | 0.0 | im0 */
     "movlhps %%xmm3, %%xmm1\n"  /* 0.0 | re1 | 0.0 | re0 */
 
-    "movups -16(%%edx), %%xmm4\n"   /* w3 | w2 | w1 | w0 */
+    "movaps -16(%%edx), %%xmm4\n"   /* w3 | w2 | w1 | w0 */
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* re1 | 0.0 | re0 | 0.0 */
     "movss  16(%%esi), %%xmm6\n"    /* im2 */
     "movss  24(%%esi), %%xmm7\n"    /* im3 */
@@ -561,7 +561,7 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "movlhps %%xmm7, %%xmm6\n"      /* 0.0 | im3 | 0.0 | im2 */
     "movlhps %%xmm3, %%xmm2\n"      /* 0.0 | re3 | 0.0 | re2 */
     "mulps   %%xmm4, %%xmm1\n"
-    "movups (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
+    "movaps (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* re3 | 0.0 | re2 | 0.0 */
     "movaps %%xmm1, (%%ecx)\n"
     "addl   $32, %%esi\n"

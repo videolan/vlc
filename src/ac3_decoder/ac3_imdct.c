@@ -2,7 +2,7 @@
  * ac3_imdct.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.c,v 1.21 2001/05/16 14:51:29 reno Exp $
+ * $Id: ac3_imdct.c,v 1.22 2001/10/30 19:34:53 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -76,11 +76,11 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
     /* test if dm in frequency is doable */
     if (!(doable = p_ac3dec->audblk.blksw[0]))
     {
-        do_imdct = p_ac3dec->imdct.pf_imdct_512;
+        do_imdct = p_ac3dec->imdct->pf_imdct_512;
     }
     else
     {
-        do_imdct = p_ac3dec->imdct.pf_imdct_256;
+        do_imdct = p_ac3dec->imdct->pf_imdct_256;
     }
 
     /* downmix in the frequency domain if all the channels
@@ -100,28 +100,28 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
         switch(p_ac3dec->bsi.acmod)
         {
             case 7:        /* 3/2 */
-                p_ac3dec->downmix.pf_downmix_3f_2r_to_2ch (p_ac3dec->samples[0], &p_ac3dec->dm_par);
+                p_ac3dec->downmix.pf_downmix_3f_2r_to_2ch (p_ac3dec->samples, &p_ac3dec->dm_par);
                 break;
             case 6:        /* 2/2 */
-                p_ac3dec->downmix.pf_downmix_2f_2r_to_2ch (p_ac3dec->samples[0], &p_ac3dec->dm_par);
+                p_ac3dec->downmix.pf_downmix_2f_2r_to_2ch (p_ac3dec->samples, &p_ac3dec->dm_par);
                 break;
             case 5:        /* 3/1 */
-                p_ac3dec->downmix.pf_downmix_3f_1r_to_2ch (p_ac3dec->samples[0], &p_ac3dec->dm_par);
+                p_ac3dec->downmix.pf_downmix_3f_1r_to_2ch (p_ac3dec->samples, &p_ac3dec->dm_par);
                 break;
             case 4:        /* 2/1 */
-                p_ac3dec->downmix.pf_downmix_2f_1r_to_2ch (p_ac3dec->samples[0], &p_ac3dec->dm_par);
+                p_ac3dec->downmix.pf_downmix_2f_1r_to_2ch (p_ac3dec->samples, &p_ac3dec->dm_par);
                 break;
             case 3:        /* 3/0 */
-                p_ac3dec->downmix.pf_downmix_3f_0r_to_2ch (p_ac3dec->samples[0], &p_ac3dec->dm_par);
+                p_ac3dec->downmix.pf_downmix_3f_0r_to_2ch (p_ac3dec->samples, &p_ac3dec->dm_par);
                 break;
             case 2:
                 break;
             default:    /* 1/0 */
 //                if (p_ac3dec->bsi.acmod == 1)
-                    center = p_ac3dec->samples[0];
+                    center = p_ac3dec->samples;
 //                else if (p_ac3dec->bsi.acmod == 0)
 //                  center = samples[ac3_config.dual_mono_ch_sel];
-                do_imdct(&p_ac3dec->imdct, center, p_ac3dec->imdct.delay[0]); /* no downmix*/
+                do_imdct(p_ac3dec->imdct, center, p_ac3dec->imdct->delay); /* no downmix*/
     
                 p_ac3dec->downmix.pf_stream_sample_1ch_to_s16 (buffer, center);
 
@@ -129,9 +129,9 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
                 break;
         }
 
-        do_imdct (&p_ac3dec->imdct, p_ac3dec->samples[0], p_ac3dec->imdct.delay[0]);
-        do_imdct (&p_ac3dec->imdct, p_ac3dec->samples[1], p_ac3dec->imdct.delay[1]);
-        p_ac3dec->downmix.pf_stream_sample_2ch_to_s16(buffer, p_ac3dec->samples[0], p_ac3dec->samples[1]);
+        do_imdct (p_ac3dec->imdct, p_ac3dec->samples, p_ac3dec->imdct->delay);
+        do_imdct (p_ac3dec->imdct, p_ac3dec->samples+256, p_ac3dec->imdct->delay+256);
+        p_ac3dec->downmix.pf_stream_sample_2ch_to_s16(buffer, p_ac3dec->samples, p_ac3dec->samples+256);
 
     } else {
         /* imdct and then downmix
@@ -141,27 +141,27 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
         {
             if (p_ac3dec->audblk.blksw[i])
                 /* There is only a C function */
-                p_ac3dec->imdct.pf_imdct_256_nol (&p_ac3dec->imdct, p_ac3dec->samples[i], p_ac3dec->imdct.delay1[i]);
+                p_ac3dec->imdct->pf_imdct_256_nol (p_ac3dec->imdct, p_ac3dec->samples+256*i, p_ac3dec->imdct->delay1+256*i);
             else
-                p_ac3dec->imdct.pf_imdct_512_nol (&p_ac3dec->imdct, p_ac3dec->samples[i], p_ac3dec->imdct.delay1[i]);
+                p_ac3dec->imdct->pf_imdct_512_nol (p_ac3dec->imdct, p_ac3dec->samples+256*i, p_ac3dec->imdct->delay1+256*i);
         }
 
         /* mix the sample, overlap */
         switch(p_ac3dec->bsi.acmod)
         {
             case 7:        /* 3/2 */
-                left = p_ac3dec->samples[0];
-                center = p_ac3dec->samples[1];
-                right = p_ac3dec->samples[2];
-                left_sur = p_ac3dec->samples[3];
-                right_sur = p_ac3dec->samples[4];
-                delay_left = p_ac3dec->imdct.delay[0];
-                delay_right = p_ac3dec->imdct.delay[1];
-                delay1_left = p_ac3dec->imdct.delay1[0];
-                delay1_center = p_ac3dec->imdct.delay1[1];
-                delay1_right = p_ac3dec->imdct.delay1[2];
-                delay1_sl = p_ac3dec->imdct.delay1[3];
-                delay1_sr = p_ac3dec->imdct.delay1[4];
+                left = p_ac3dec->samples;
+                center = p_ac3dec->samples+256;
+                right = p_ac3dec->samples+2*256;
+                left_sur = p_ac3dec->samples+3*256;
+                right_sur = p_ac3dec->samples+4*256;
+                delay_left = p_ac3dec->imdct->delay;
+                delay_right = p_ac3dec->imdct->delay+256;
+                delay1_left = p_ac3dec->imdct->delay1;
+                delay1_center = p_ac3dec->imdct->delay1+256;
+                delay1_right = p_ac3dec->imdct->delay1+2*256;
+                delay1_sl = p_ac3dec->imdct->delay1+3*256;
+                delay1_sr = p_ac3dec->imdct->delay1+4*256;
     
                 for (i = 0; i < 256; i++) {
                     left_tmp = p_ac3dec->dm_par.unit * *left++  + p_ac3dec->dm_par.clev * *center  + p_ac3dec->dm_par.slev * *left_sur++;
@@ -173,16 +173,16 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
                 }
                 break;
             case 6:        /* 2/2 */
-                left = p_ac3dec->samples[0];
-                right = p_ac3dec->samples[1];
-                left_sur = p_ac3dec->samples[2];
-                right_sur = p_ac3dec->samples[3];
-                delay_left = p_ac3dec->imdct.delay[0];
-                delay_right = p_ac3dec->imdct.delay[1];
-                delay1_left = p_ac3dec->imdct.delay1[0];
-                delay1_right = p_ac3dec->imdct.delay1[1];
-                delay1_sl = p_ac3dec->imdct.delay1[2];
-                delay1_sr = p_ac3dec->imdct.delay1[3];
+                left = p_ac3dec->samples;
+                right = p_ac3dec->samples+256;
+                left_sur = p_ac3dec->samples+2*256;
+                right_sur = p_ac3dec->samples+3*256;
+                delay_left = p_ac3dec->imdct->delay;
+                delay_right = p_ac3dec->imdct->delay+256;
+                delay1_left = p_ac3dec->imdct->delay1;
+                delay1_right = p_ac3dec->imdct->delay1+256;
+                delay1_sl = p_ac3dec->imdct->delay1+2*256;
+                delay1_sr = p_ac3dec->imdct->delay1+3*256;
     
                 for (i = 0; i < 256; i++) {
                     left_tmp = p_ac3dec->dm_par.unit * *left++  + p_ac3dec->dm_par.slev * *left_sur++;
@@ -194,16 +194,16 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
                 }
                 break;
             case 5:        /* 3/1 */
-                left = p_ac3dec->samples[0];
-                center = p_ac3dec->samples[1];
-                right = p_ac3dec->samples[2];
-                right_sur = p_ac3dec->samples[3];
-                delay_left = p_ac3dec->imdct.delay[0];
-                delay_right = p_ac3dec->imdct.delay[1];
-                delay1_left = p_ac3dec->imdct.delay1[0];
-                delay1_center = p_ac3dec->imdct.delay1[1];
-                delay1_right = p_ac3dec->imdct.delay1[2];
-                delay1_sl = p_ac3dec->imdct.delay1[3];
+                left = p_ac3dec->samples;
+                center = p_ac3dec->samples+256;
+                right = p_ac3dec->samples+2*256;
+                right_sur = p_ac3dec->samples+3*256;
+                delay_left = p_ac3dec->imdct->delay;
+                delay_right = p_ac3dec->imdct->delay+256;
+                delay1_left = p_ac3dec->imdct->delay1;
+                delay1_center = p_ac3dec->imdct->delay1+256;
+                delay1_right = p_ac3dec->imdct->delay1+2*256;
+                delay1_sl = p_ac3dec->imdct->delay1+3*256;
     
                 for (i = 0; i < 256; i++) {
                     left_tmp = p_ac3dec->dm_par.unit * *left++  + p_ac3dec->dm_par.clev * *center  - p_ac3dec->dm_par.slev * *right_sur;
@@ -215,14 +215,14 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
                 }
                 break;
             case 4:        /* 2/1 */
-                left = p_ac3dec->samples[0];
-                right = p_ac3dec->samples[1];
-                right_sur = p_ac3dec->samples[2];
-                delay_left = p_ac3dec->imdct.delay[0];
-                delay_right = p_ac3dec->imdct.delay[1];
-                delay1_left = p_ac3dec->imdct.delay1[0];
-                delay1_right = p_ac3dec->imdct.delay1[1];
-                delay1_sl = p_ac3dec->imdct.delay1[2];
+                left = p_ac3dec->samples;
+                right = p_ac3dec->samples+256;
+                right_sur = p_ac3dec->samples+2*256;
+                delay_left = p_ac3dec->imdct->delay;
+                delay_right = p_ac3dec->imdct->delay+256;
+                delay1_left = p_ac3dec->imdct->delay1;
+                delay1_right = p_ac3dec->imdct->delay1+256;
+                delay1_sl = p_ac3dec->imdct->delay1+2*256;
     
                 for (i = 0; i < 256; i++) {
                     left_tmp = p_ac3dec->dm_par.unit * *left++ - p_ac3dec->dm_par.slev * *right_sur;
@@ -234,14 +234,14 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
                 }
                 break;
             case 3:        /* 3/0 */
-                left = p_ac3dec->samples[0];
-                center = p_ac3dec->samples[1];
-                right = p_ac3dec->samples[2];
-                delay_left = p_ac3dec->imdct.delay[0];
-                delay_right = p_ac3dec->imdct.delay[1];
-                delay1_left = p_ac3dec->imdct.delay1[0];
-                   delay1_center = p_ac3dec->imdct.delay1[1];
-                delay1_right = p_ac3dec->imdct.delay1[2];
+                left = p_ac3dec->samples;
+                center = p_ac3dec->samples+256;
+                right = p_ac3dec->samples+2*256;
+                delay_left = p_ac3dec->imdct->delay;
+                delay_right = p_ac3dec->imdct->delay+256;
+                delay1_left = p_ac3dec->imdct->delay1;
+                delay1_center = p_ac3dec->imdct->delay1+256;
+                delay1_right = p_ac3dec->imdct->delay1+2*256;
 
                 for (i = 0; i < 256; i++) {
                     left_tmp = p_ac3dec->dm_par.unit * *left++  + p_ac3dec->dm_par.clev * *center;
@@ -254,8 +254,8 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
                 break;
             case 2:        /* copy to output */
                 for (i = 0; i < 256; i++) {
-                    *buffer++ = (s16)p_ac3dec->samples[0][i];
-                    *buffer++ = (s16)p_ac3dec->samples[1][i];
+                    *buffer++ = (s16) *(p_ac3dec->samples+i);
+                    *buffer++ = (s16) *(p_ac3dec->samples+256+i);
                 }
                 break;
         }

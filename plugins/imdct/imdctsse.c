@@ -2,7 +2,7 @@
  * imdctsse.c : accelerated SSE IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdctsse.c,v 1.6 2001/07/11 02:01:04 sam Exp $
+ * $Id: imdctsse.c,v 1.7 2001/10/30 19:34:53 reno Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -93,6 +93,9 @@ static void imdct_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int imdct_Probe( probedata_t *p_data )
 {
+#if defined ( __MINGW32__ )
+    return 0;
+#else
     if( !TestCPU( CPU_CAPABILITY_SSE ) )
     {
         return( 0 );
@@ -106,5 +109,6 @@ static int imdct_Probe( probedata_t *p_data )
 
     /* This plugin always works */
     return( 200 );
+#endif
 }
 

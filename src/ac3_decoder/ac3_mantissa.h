@@ -2,7 +2,7 @@
  * ac3_mantissa.h: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_mantissa.h,v 1.4 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_mantissa.h,v 1.5 2001/10/30 19:34:53 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -392,10 +392,10 @@ static __inline__ void uncouple_channel (ac3dec_t * p_ac3dec, u32 ch)
              * so the channels are uncorrelated */
             if (p_ac3dec->audblk.dithflag[ch] && !p_ac3dec->audblk.cpl_bap[i])
             {
-                p_ac3dec->samples[ch][i] = cpl_coord * dither_gen(&p_ac3dec->mantissa) *
+                *(p_ac3dec->samples+ch*256+i) = cpl_coord * dither_gen(&p_ac3dec->mantissa) *
                     scale_factor[p_ac3dec->audblk.cpl_exp[i]];
             } else {
-                p_ac3dec->samples[ch][i]  = cpl_coord * p_ac3dec->audblk.cpl_flt[i];
+                *(p_ac3dec->samples+ch*256+i) = cpl_coord * p_ac3dec->audblk.cpl_flt[i];
             }
             i++;
         }

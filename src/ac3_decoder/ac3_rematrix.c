@@ -2,7 +2,7 @@
  * ac3_rematrix.c: ac3 audio rematrixing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_rematrix.c,v 1.18 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_rematrix.c,v 1.19 2001/10/30 19:34:53 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -78,10 +78,10 @@ void rematrix (ac3dec_t * p_ac3dec)
         end = min_value(rematrix_band[i].end ,12 * p_ac3dec->audblk.cplbegf + 36);
 
         for (j=start;j < end; j++) {
-            left  = 0.5f * (p_ac3dec->samples[0][j] + p_ac3dec->samples[1][j]);
-            right = 0.5f * (p_ac3dec->samples[0][j] - p_ac3dec->samples[1][j]);
-            p_ac3dec->samples[0][j] = left;
-            p_ac3dec->samples[1][j] = right;
+            left  = 0.5f * ( *(p_ac3dec->samples+j) + *(p_ac3dec->samples+256+j) );
+            right = 0.5f * ( *(p_ac3dec->samples+j) - *(p_ac3dec->samples+256+j) );
+            *(p_ac3dec->samples+j) = left;
+            *(p_ac3dec->samples+256+j) = right;
         }
     }
 }

@@ -2,7 +2,7 @@
  * ac3_mantissa.c: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_mantissa.c,v 1.29 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_mantissa.c,v 1.30 2001/10/30 19:34:53 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -59,7 +59,7 @@ void mantissa_unpack (ac3dec_t * p_ac3dec)
 
     for (i=0; i< p_ac3dec->bsi.nfchans; i++) {
         for (j=0; j < p_ac3dec->audblk.endmant[i]; j++)
-            p_ac3dec->samples[i][j] = coeff_get_float(p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j],
+            *(p_ac3dec->samples+i*256+j) = coeff_get_float(p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j],
                     p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j]);
 
         if (p_ac3dec->audblk.cplinu && p_ac3dec->audblk.chincpl[i] && !(done_cpl)) {
@@ -85,7 +85,7 @@ void mantissa_unpack (ac3dec_t * p_ac3dec)
     if (p_ac3dec->bsi.lfeon) {
         /* There are always 7 mantissas for lfe, no dither for lfe */
         for (j=0; j < 7 ; j++)
-            p_ac3dec->samples[5][j] = coeff_get_float(p_ac3dec, p_ac3dec->audblk.lfe_bap[j],
+            *(p_ac3dec->samples+5*256+j) = coeff_get_float(p_ac3dec, p_ac3dec->audblk.lfe_bap[j],
                     0, p_ac3dec->audblk.lfe_exp[j]);
     }
 }

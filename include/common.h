@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.42 2001/10/22 12:28:53 massiot Exp $
+ * $Id: common.h,v 1.43 2001/10/30 19:34:53 reno Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -209,9 +209,15 @@ struct pgrm_descriptor_s;
 #       include <unistd.h>
 #       define memalign(align,size) valloc(size)
 #   else
+#       if defined( __MINGW32__ )
+#           define memalign(align,size) (void *)(((unsigned long)(malloc(size+align-1))+align-1)&~(align-1))
+#       else
         /* Assume malloc alignment is sufficient */
-#       define memalign(align,size) malloc(size)
+#           define memalign(align,size) malloc(size)
+#       endif
 #   endif
+
+    
 #endif
 
 /* win32, cl and icl support */
