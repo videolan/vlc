@@ -78,6 +78,7 @@ playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
 
     p_item->i_flags = 0;
     p_item->i_flags |= PLAYLIST_SKIP_FLAG;
+    p_item->i_flags |= PLAYLIST_SAVE_FLAG;
 
     p_item->input.i_duration = -1;
     p_item->input.ppsz_options = NULL;

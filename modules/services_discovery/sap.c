@@ -638,7 +638,6 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
 
     /* First, check the sap announce is correct */
     i_version = p_buffer[0] >> 5;
-msg_Dbg( p_sd, "." );
     if( i_version != 1 )
     {
        msg_Dbg( p_sd, "strange sap version %d found", i_version );
@@ -893,6 +892,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     }
 
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
+    p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
 
     playlist_NodeAddItem( p_playlist, p_item, VIEW_CATEGORY, p_child,
                           PLAYLIST_APPEND, PLAYLIST_END );
@@ -1100,7 +1100,6 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
     sdp_t *p_sdp;
     vlc_bool_t b_invalid = VLC_FALSE;
     vlc_bool_t b_end = VLC_FALSE;
-msg_Dbg( p_obj, "%s", psz_sdp );
     if( psz_sdp == NULL )
     {
         return NULL;
