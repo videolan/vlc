@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.8 2002/11/23 15:00:54 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.9 2002/11/26 01:06:08 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,11 +43,11 @@
 #include <vlc/intf.h>
 
 /* BeOS interface headers */
+#include "VlcWrapper.h"
 #include "MsgVals.h"
 #include "MediaControlView.h"
 #include "PlayListWindow.h"
 #include "PreferencesWindow.h"
-#include "VlcWrapper.h"
 #include "InterfaceWindow.h"
 
 #define INTERFACE_UPDATE_TIMEOUT 80000 // 2 frames if at 25 fps
@@ -62,19 +62,17 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	: BWindow( frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			   B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS ),
 	  p_intf( p_interface ),
-	  fInputThread( NULL ),
 	  fFilePanel( NULL ),
 	  fLastUpdateTime( system_time() ),
 	  fSettings( new BMessage( 'sett' ) )
 {
     p_intf = p_interface;
-    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
+    p_wrapper = p_intf->p_sys->p_wrapper;
     
-    fPlaylistIsEmpty = (p_playlist->i_size < 0);
+    fPlaylistIsEmpty = ( p_wrapper->PlaylistSize() < 0 );
     
     fPlaylistWindow = new PlayListWindow( BRect( 100.0, 100.0, 400.0, 350.0 ),
 	  									  "Playlist",
-	  									  p_playlist,
 	  									  this,
 	  									  p_intf );
     BScreen *p_screen = new BScreen();
@@ -214,7 +212,7 @@ InterfaceWindow::FrameResized(float width, float height)
 void InterfaceWindow::MessageReceived( BMessage * p_message )
 {
 	int playback_status;	  // remember playback state
-	playback_status = p_intf->p_sys->p_vlc_wrapper->inputGetStatus();
+	playback_status = p_wrapper->inputGetStatus();
 
 	switch( p_message->what )
 	{
@@ -256,7 +254,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				if( p_message->FindString( "device", &psz_device ) == B_OK )
 				{
 					BString device( psz_device );
-					p_intf->p_sys->p_vlc_wrapper->openDisc( type, device, 0, 0 );
+					p_wrapper->openDisc( type, device, 0, 0 );
 				}
 				_UpdatePlaylist();
 			}
@@ -266,9 +264,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			// this currently stops playback not nicely
 			if (playback_status > UNDEF_S)
 			{
-				p_intf->p_sys->p_vlc_wrapper->volume_mute();
+				p_wrapper->volume_mute();
 				snooze( 400000 );
-				p_intf->p_sys->p_vlc_wrapper->playlistStop();
+				p_wrapper->playlistStop();
 				p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
 			}
 			break;
@@ -283,20 +281,20 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				/* pause if currently playing */
 				if ( playback_status == PLAYING_S )
 				{
-					p_intf->p_sys->p_vlc_wrapper->volume_mute();
+					p_wrapper->volume_mute();
 					snooze( 400000 );
-					p_intf->p_sys->p_vlc_wrapper->playlistPause();
+					p_wrapper->playlistPause();
 				}
 				else
 				{
-					p_intf->p_sys->p_vlc_wrapper->volume_restore();
-					p_intf->p_sys->p_vlc_wrapper->playlistPlay();
+					p_wrapper->volume_restore();
+					p_wrapper->playlistPlay();
 				}
 			}
 			else
 			{
 				/* Play a new file */
-				p_intf->p_sys->p_vlc_wrapper->playlistPlay();
+				p_wrapper->playlistPlay();
 			}	
 			break;
 	
@@ -304,9 +302,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			/* cycle the fast playback modes */
 			if (playback_status > UNDEF_S)
 			{
-				p_intf->p_sys->p_vlc_wrapper->volume_mute();
+				p_wrapper->volume_mute();
 				snooze( 400000 );
-				p_intf->p_sys->p_vlc_wrapper->playFaster();
+				p_wrapper->playFaster();
 			}
 			break;
 	
@@ -314,9 +312,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			/*  cycle the slow playback modes */
 			if (playback_status > UNDEF_S)
 			{
-				p_intf->p_sys->p_vlc_wrapper->volume_mute();
+				p_wrapper->volume_mute();
 				snooze( 400000 );
-				p_intf->p_sys->p_vlc_wrapper->playSlower();
+				p_wrapper->playSlower();
 			}
 			break;
 	
@@ -324,8 +322,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			/*  restore speed to normal if already playing */
 			if (playback_status > UNDEF_S)
 			{
-				p_intf->p_sys->p_vlc_wrapper->volume_restore();
-				p_intf->p_sys->p_vlc_wrapper->playlistPlay();
+				p_wrapper->volume_restore();
+				p_wrapper->playlistPlay();
 			}
 			break;
 	
@@ -337,15 +335,15 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			/* adjust the volume */
 			if (playback_status > UNDEF_S)
 			{
-				p_intf->p_sys->p_vlc_wrapper->set_volume( p_mediaControl->GetVolume() );
-				p_mediaControl->SetMuted( p_intf->p_sys->p_vlc_wrapper->is_muted() );
+				p_wrapper->set_volume( p_mediaControl->GetVolume() );
+				p_mediaControl->SetMuted( p_wrapper->is_muted() );
 			}
 			break;
 	
 		case VOLUME_MUTE:
 			// toggle muting
-			p_intf->p_sys->p_vlc_wrapper->toggle_mute();
-			p_mediaControl->SetMuted( p_intf->p_sys->p_vlc_wrapper->is_muted() );
+			p_wrapper->toggle_mute();
+			p_mediaControl->SetMuted( p_wrapper->is_muted() );
 			break;
 	
 		case SELECT_CHANNEL:
@@ -354,14 +352,14 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				int32 channel;
 				if ( p_message->FindInt32( "channel", &channel ) == B_OK )
 				{
-					p_intf->p_sys->p_vlc_wrapper->toggleLanguage( channel );
+					p_wrapper->toggleLanguage( channel );
 					// vlc seems to remember the volume for every channel,
 					// but I would assume that to be somewhat annoying to the user
 					// the next call will also unmute the volume, which is probably
 					// desired as well, because if the user selects another language,
 					// he probably wants to hear the change as well
 					snooze( 400000 );	// we have to wait a bit, or the change will be reverted
-					p_intf->p_sys->p_vlc_wrapper->set_volume( p_mediaControl->GetVolume() );
+					p_wrapper->set_volume( p_mediaControl->GetVolume() );
 				}
 			}
 			break;
@@ -371,33 +369,19 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			{
 				int32 subtitle;
 				if ( p_message->FindInt32( "subtitle", &subtitle ) == B_OK )
-					p_intf->p_sys->p_vlc_wrapper->toggleSubtitle( subtitle );
+					 p_wrapper->toggleSubtitle( subtitle );
 			}
 			break;
 	
 		// specific navigation messages
 		case PREV_TITLE:
 		{
-			int             i_id;
-            i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id - 1;
-
-            /* Disallow area 0 since it is used for video_ts.vob */
-            if( i_id > 0 )
-            {
-                p_intf->p_sys->p_vlc_wrapper->toggleTitle(i_id);
-            }
+			p_wrapper->PrevTitle();
 			break;
 		}
 		case NEXT_TITLE:
 		{
-			int             i_id;
-
-            i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id + 1;
-
-            if( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
-            {
-                p_intf->p_sys->p_vlc_wrapper->toggleTitle(i_id);
-            }
+            p_wrapper->NextTitle();
 			break;
 		}
 		case TOGGLE_TITLE:
@@ -405,31 +389,17 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			{
 				int32 index;
 				if ( p_message->FindInt32( "index", &index ) == B_OK )
-					p_intf->p_sys->p_vlc_wrapper->toggleTitle( index );
+					p_wrapper->toggleTitle( index );
 			}
 			break;
 		case PREV_CHAPTER:
 		{
-			int             i_id;
-
-            i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_part - 1;
-
-            if( i_id >= 0 )
-            {
-                p_intf->p_sys->p_vlc_wrapper->toggleChapter(i_id);
-            }
+            p_wrapper->PrevChapter();
 			break;
 		}
 		case NEXT_CHAPTER:
 		{
-			int             i_id;
-
-            i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_part + 1;
-
-            if( i_id >= 0 )
-            {
-                p_intf->p_sys->p_vlc_wrapper->toggleChapter(i_id);
-            }
+            p_wrapper->NextChapter();
 			break;
 		}
 		case TOGGLE_CHAPTER:
@@ -437,21 +407,21 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			{
 				int32 index;
 				if ( p_message->FindInt32( "index", &index ) == B_OK )
-					p_intf->p_sys->p_vlc_wrapper->toggleChapter( index );
+                     p_wrapper->toggleChapter( index );
 			}
 			break;
 		case PREV_FILE:
-			p_intf->p_sys->p_vlc_wrapper->playlistPrev();
+			p_wrapper->playlistPrev();
 			break;
 		case NEXT_FILE:
-			p_intf->p_sys->p_vlc_wrapper->playlistNext();
+			p_wrapper->playlistNext();
 			break;
 		// general next/prev functionality (skips to whatever makes most sense)
 		case NAVIGATE_PREV:
-			p_intf->p_sys->p_vlc_wrapper->navigatePrev();
+			p_wrapper->navigatePrev();
 			break;
 		case NAVIGATE_NEXT:
-			p_intf->p_sys->p_vlc_wrapper->navigateNext();
+			p_wrapper->navigateNext();
 			break;
 		// drag'n'drop and system messages
 		case B_REFS_RECEIVED:
@@ -473,7 +443,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 						files.AddItem( new BString( (char*)path.Path() ) );
 				}
 				// give the list to VLC
-				p_intf->p_sys->p_vlc_wrapper->openFiles(&files, replace);
+				p_wrapper->openFiles(&files, replace);
 				_UpdatePlaylist();
 			}
 			break;
@@ -501,13 +471,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
  *****************************************************************************/
 bool InterfaceWindow::QuitRequested()
 {
-	if (p_intf->p_sys->p_input)
-	{
-		p_intf->p_sys->p_vlc_wrapper->volume_mute();
-		snooze( 400000 );
-		p_intf->p_sys->p_vlc_wrapper->playlistStop();
-		p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
-	}
+	p_wrapper->playlistStop();
+	p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
 	
 	p_intf->b_die = 1;
 
@@ -521,43 +486,36 @@ bool InterfaceWindow::QuitRequested()
  *****************************************************************************/
 void InterfaceWindow::updateInterface()
 {
-	input_thread_t* input = p_intf->p_sys->p_input;
-	if ( input )
-	{
+    if( /* has_input */ true )
+    {
 		if ( acquire_sem( p_mediaControl->fScrubSem ) == B_OK )
 		{
-		    p_intf->p_sys->p_vlc_wrapper->setTimeAsFloat(p_mediaControl->GetSeekTo());
+		    p_wrapper->setTimeAsFloat(p_mediaControl->GetSeekTo());
 		}
 		else if ( Lock() )
 		{
-			bool hasTitles = input->stream.i_area_nb > 1;
-			bool hasChapters = input->stream.p_selected_area->i_part_nb > 1;
-			p_mediaControl->SetStatus( input->stream.control.i_status, 
-									   input->stream.control.i_rate );
-			p_mediaControl->SetProgress( input->stream.p_selected_area->i_tell,
-										 input->stream.p_selected_area->i_size );
+			bool hasTitles = p_wrapper->HasTitles();
+			bool hasChapters = p_wrapper->HasChapters();
+			p_mediaControl->SetStatus( p_wrapper->InputStatus(), 
+									   p_wrapper->InputRate() );
+			p_mediaControl->SetProgress( p_wrapper->InputTell(),
+										 p_wrapper->InputSize() );
 			_SetMenusEnabled( true, hasChapters, hasTitles );
 
-			_UpdateSpeedMenu( input->stream.control.i_rate );
+			_UpdateSpeedMenu( p_wrapper->InputRate() );
 
 			// enable/disable skip buttons
 			bool canSkipPrev;
 			bool canSkipNext;
-			p_intf->p_sys->p_vlc_wrapper->getNavCapabilities( &canSkipPrev, &canSkipNext );
+			p_wrapper->getNavCapabilities( &canSkipPrev, &canSkipNext );
 			p_mediaControl->SetSkippable( canSkipPrev, canSkipNext );
 
-			if ( p_intf->p_sys->p_vlc_wrapper->has_audio() )
+			if ( p_wrapper->has_audio() )
 			{
 				p_mediaControl->SetAudioEnabled( true );
-				p_mediaControl->SetMuted( p_intf->p_sys->p_vlc_wrapper->is_muted() );
+				p_mediaControl->SetMuted( p_wrapper->is_muted() );
 			} else
 				p_mediaControl->SetAudioEnabled( false );
-
-			if ( input != fInputThread )
-			{
-				fInputThread = input;
-				_InputStreamChanged();
-			}
 
 			Unlock();
 		}
@@ -568,22 +526,15 @@ void InterfaceWindow::updateInterface()
 			fPlaylistWindow->Unlock();
 		}
 	}
-	else
-		_SetMenusEnabled(false);
 
-	playlist_t *p_playlist = p_intf->p_sys->p_playlist;
-	
-	if ( fPlaylistIsEmpty != ( p_playlist->i_size < 0) )
+    else
+    	_SetMenusEnabled(false);
+
+	if ( Lock() )
 	{
-		if ( Lock() )
-		{
-			fPlaylistIsEmpty = !fPlaylistIsEmpty;
-			p_mediaControl->SetEnabled( !fPlaylistIsEmpty );
-			Unlock();
-		}
+		p_mediaControl->SetEnabled( p_wrapper->PlaylistSize() );
+		Unlock();
 	}
-	if ( input != fInputThread )
-		fInputThread = input;
 
 	fLastUpdateTime = system_time();
 }
@@ -607,9 +558,7 @@ InterfaceWindow::_UpdatePlaylist()
 	{
 		fPlaylistWindow->UpdatePlaylist( true );
 		fPlaylistWindow->Unlock();
-		playlist_t *p_playlist = p_intf->p_sys->p_playlist;
-		fPlaylistIsEmpty = p_playlist->i_size < 1;
-		p_mediaControl->SetEnabled( !fPlaylistIsEmpty );
+		p_mediaControl->SetEnabled( p_wrapper->PlaylistSize() );
 	}
 }
 
@@ -684,7 +633,7 @@ InterfaceWindow::_InputStreamChanged()
 //printf("InterfaceWindow::_InputStreamChanged()\n");
 	// TODO: move more stuff from updateInterface() here!
 	snooze( 400000 );
-	p_intf->p_sys->p_vlc_wrapper->set_volume( p_mediaControl->GetVolume() );
+	p_wrapper->set_volume( p_mediaControl->GetVolume() );
 }
 
 /*****************************************************************************
@@ -1005,6 +954,7 @@ void LanguageMenu::_GetChannels()
 		menu_item->SetMarked( true );
 	}
 
+#if 0
 	input_thread_t* input = p_intf->p_sys->p_input;
 	if ( input )
 	{
@@ -1060,6 +1010,7 @@ void LanguageMenu::_GetChannels()
 		if ( ( emptyItemAdded || kind != AUDIO_ES ) && addedItems > 1 )
 			 AddItem( new BSeparatorItem(), 1 );
 	}
+#endif
 }
 
 
@@ -1089,6 +1040,7 @@ void TitleMenu::AttachedToWindow()
 	while ( BMenuItem* item = RemoveItem( 0L ) )
 		delete item;
 
+#if 0
 	input_thread_t* input = p_intf->p_sys->p_input;
 	if ( input )
 	{
@@ -1113,6 +1065,7 @@ void TitleMenu::AttachedToWindow()
 		// done messing with stream
 		vlc_mutex_unlock( &input->stream.stream_lock );
 	}
+#endif
 	BMenu::AttachedToWindow();
 }
 
@@ -1142,6 +1095,7 @@ void ChapterMenu::AttachedToWindow()
 	while ( BMenuItem* item = RemoveItem( 0L ) )
 		delete item;
 
+#if 0
 	input_thread_t* input = p_intf->p_sys->p_input;
 	if ( input )
 	{
@@ -1166,5 +1120,6 @@ void ChapterMenu::AttachedToWindow()
 		vlc_mutex_unlock( &input->stream.stream_lock );
 	}
 	BMenu::AttachedToWindow();
+#endif
 }
 

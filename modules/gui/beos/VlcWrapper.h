@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.6 2002/10/30 00:59:22 titer Exp $
+ * $Id: VlcWrapper.h,v 1.7 2002/11/26 01:06:08 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -37,10 +37,6 @@ struct intf_sys_t
 {
     InterfaceWindow * p_window;
     
-    input_thread_t *  p_input;
-    playlist_t *      p_playlist;
-    aout_instance_t * p_aout;
-    
     /* DVD mode */
     vlc_bool_t        b_disabled_menus;
     vlc_bool_t        b_loop;
@@ -49,7 +45,7 @@ struct intf_sys_t
     int               i_saved_volume;
     int               i_channel;
     
-    Intf_VLCWrapper * p_vlc_wrapper;
+    Intf_VLCWrapper * p_wrapper;
 };
 
 /*****************************************************************************
@@ -57,7 +53,7 @@ struct intf_sys_t
  *****************************************************************************
  * This class makes the link between the BeOS interface and the vlc core.
  * There is only one Intf_VLCWrapper instance at any time, which is stored
- * in p_intf->p_sys->p_vlc_wrapper
+ * in p_intf->p_sys->p_wrapper
  *****************************************************************************/
 class Intf_VLCWrapper
 {
@@ -65,10 +61,20 @@ public:
     Intf_VLCWrapper( intf_thread_t *p_intf );
     ~Intf_VLCWrapper();
     
+    bool UpdateInputAndAOut();
+    
     int inputGetStatus();
+    int InputStatus();
+    int InputRate();
+    int InputTell();
+    int InputSize();
     void inputSeek();
     
     /* playlist control */
+    int PlaylistSize();
+    char *PlaylistItemName( int );
+    int PlaylistCurrent();
+    
     bool playlistPlay();
     void playlistPause();
     void playlistStop();
@@ -95,6 +101,14 @@ public:
                              bool* canSkipNext );
 	void navigatePrev();
 	void navigateNext();
+
+    /* DVD */
+    bool HasTitles();
+    void PrevTitle();
+    void NextTitle();
+    bool HasChapters();
+    void PrevChapter();
+    void NextChapter();
 
     /*  Stream Control */
     void playSlower();
@@ -133,6 +147,9 @@ public:
     void channelPrev();
 
 private:
-    intf_thread_t *p_intf;
+    intf_thread_t * p_intf;
+    input_thread_t * p_input;
+    playlist_t * p_playlist;
+    aout_instance_t * p_aout;
 };
 

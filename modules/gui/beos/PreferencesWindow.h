@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.2 2002/11/23 15:00:54 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.3 2002/11/26 01:06:08 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -47,18 +47,18 @@ class PreferencesWindow : public BWindow
     private:
         void             SetDefaults();
         void             ApplyChanges();
-        BView *          p_prefs_view;
-        BTabView *       p_tabview;
-        BView *          p_ffmpeg_view;
-        BView *          p_adjust_view;
-        BTab *           p_ffmpeg_tab;
-        BTab *           p_adjust_tab;
-        BSlider *        p_pp_slider;
-        BSlider *        p_contrast_slider;
-        BSlider *        p_brightness_slider;
-        BSlider *        p_hue_slider;
-        BSlider *        p_saturation_slider;
-        BStringView *    p_restart_string;
+        BView *          fPrefsView;
+        BTabView *       fTabView;
+        BView *          fFfmpegView;
+        BView *          fAdjustView;
+        BTab *           fFfmpegTab;
+        BTab *           fAdjustTab;
+        BSlider *        fPpSlider;
+        BSlider *        fContrastSlider;
+        BSlider *        fBrightnessSlider;
+        BSlider *        fHueSlider;
+        BSlider *        fSaturationSlider;
+        BStringView *    fRestartString;
 
         intf_thread_t *  p_intf;
 };

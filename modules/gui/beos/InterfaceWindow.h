@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.4 2002/10/30 00:59:21 titer Exp $
+ * $Id: InterfaceWindow.h,v 1.5 2002/11/26 01:06:08 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -125,7 +125,6 @@ class InterfaceWindow : public BWindow
 
 	intf_thread_t*			p_intf;
 	es_descriptor_t*		p_spu_es;
-	input_thread_t*			fInputThread;
 
 	bool					fPlaylistIsEmpty;
 	BFilePanel*				fFilePanel;
@@ -153,7 +152,7 @@ class InterfaceWindow : public BWindow
 	BMessage*				fSettings;	// we keep the message arround
 										// for forward compatibility
 	
-	Intf_VLCWrapper *  p_vlc_wrapper;
+	Intf_VLCWrapper *  p_wrapper;
 };
 
 #endif	// BEOS_INTERFACE_WINDOW_H
