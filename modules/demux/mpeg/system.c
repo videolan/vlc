@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.22 2003/11/26 20:44:38 fenrir Exp $
+ * $Id: system.c,v 1.23 2003/12/01 23:39:11 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -363,15 +363,15 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         }
 
         /* Welcome to the kludge area ! --Meuuh */
-        if ( p_es->i_fourcc == VLC_FOURCC('a','5','2','b') )
+        if ( p_es->i_fourcc == VLC_FOURCC('a','5','2','b')
+              || p_es->i_fourcc == VLC_FOURCC('d','t','s','b') )
         {
-            /* With A/52 audio, we need to skip the first 4 bytes */
+            /* With A/52 or DTS audio, we need to skip the first 4 bytes */
             i_pes_header_size += 4;
         }
 
         if ( p_es->i_fourcc == VLC_FOURCC('l','p','c','b')
               || p_es->i_fourcc == VLC_FOURCC('s','p','u','b')
-              || p_es->i_fourcc == VLC_FOURCC('d','t','s','b')
               || p_es->i_fourcc == VLC_FOURCC('s','d','d','b') )
         {
             /* stream_private_id */

@@ -1,4 +1,5 @@
 SOURCES_a52sys = a52sys.c
+SOURCES_dtssys = dts.c
 SOURCES_flac = flac.c
 SOURCES_ogg = ogg.c
 SOURCES_m3u = m3u.c

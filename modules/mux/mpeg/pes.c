@@ -2,7 +2,7 @@
  * pes.c: PES packetizer used by the MPEG multiplexers
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.12 2003/11/15 18:57:12 fenrir Exp $
+ * $Id: pes.c,v 1.13 2003/12/01 23:39:11 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -59,7 +59,7 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
     if( i_stream_id == PES_PRIVATE_STREAM_1 && i_private_id != -1 )
     {
         i_extra = 1;
-        if( ( i_private_id&0xf8 ) == 0x80 )
+        if( ( i_private_id & 0xf0 ) == 0x80 )
         {
             i_extra += 3;
         }
