@@ -14,9 +14,9 @@
 #SHELL = /bin/sh
 
 # Video output settings
-#VIDEO=X11
+VIDEO=X11
 #VIDEO=DGA (not yet supported)
-VIDEO=FB
+#VIDEO=FB
 #VIDEO=GGI
 #VIDEO=BEOS (not yet supported)
 
@@ -27,8 +27,8 @@ ARCH=MMX
 #ARCH=SPARC
 
 # Decoder choice - ?? old decoder will be removed soon
-DECODER=old
-#DECODER=new
+#DECODER=old
+DECODER=new
 # !!! don't forget to run this command after changing decoder type !!!
 # touch input/input.c input/input_ctrl.c include/vlc.h include/video_decoder.h
 
@@ -232,8 +232,14 @@ misc_obj =			misc/mtime.o \
 						misc/netutils.o
 
 ifeq ($(ARCH),MMX)
+ifeq ($(DECODER),old)
 ASM_OBJ = 			video_decoder_ref/idctmmx.o \
 						video_output/video_yuv_mmx.o
+else
+ASM_OBJ = 			video_decoder/idctmmx.o \
+						video_output/video_yuv_mmx.o
+endif
+
 endif
 
 C_OBJ = $(interface_obj) \

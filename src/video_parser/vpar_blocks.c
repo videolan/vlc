@@ -1244,9 +1244,9 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
                                                         : i_level;
                 break;
             case DCT_EOB:
-                if( i_nc <= 0 )
+                if( i_nc <= 1 )
                 {
-                    p_mb->pf_idct[i_b] = vdec_IDCT;//vdec_SparseIDCT;
+                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
                     p_mb->pi_sparse_pos[i_b] = i_coef;
                 }
                 else
@@ -1479,7 +1479,7 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
             case DCT_EOB:
                 if( i_nc <= 1 )
                 {
-                    p_mb->pf_idct[i_b] = vdec_IDCT;//vdec_SparseIDCT;
+                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
                     p_mb->pi_sparse_pos[i_b] = i_coef;
                 }
                 else

@@ -44,8 +44,6 @@
  * Local prototypes
  */
 
-//extern IDCT_mmx(dctelem_t*);
-
 /* Our current implementation is a fast DCT, we might move to a fast DFT or
  * an MMX DCT in the future. */
 
@@ -80,7 +78,6 @@ void vdec_InitIDCT (vdec_thread_t * p_vdec)
 void vdec_SparseIDCT (vdec_thread_t * p_vdec, dctelem_t * p_block, 
                       int i_sparse_pos)
 {
-    /*debug*/
     short int val;
     int * dp;
     int v;
@@ -92,20 +89,7 @@ void vdec_SparseIDCT (vdec_thread_t * p_vdec, dctelem_t * p_block,
     if ( i_sparse_pos == 0 ) 
     {
 	    dp=(int *)p_block;
-//        v=*p_block;
-/* cuisine a verifier */        
-/*        if (v < 0) 
-        {
-            val=-v;
-            val+=4;
-            val/=8;
-            val=-val;
-        }
-        else
-        {*/
-/*            val= (v + 4) /8; */
         val=RIGHT_SHIFT((*p_block + 4), 3);
-//        }        
         /* Compute int to assign.  This speeds things up a bit */
         v = ((val & 0xffff) | (val << 16));
         dp[0] = v;     dp[1] = v;     dp[2] = v;     dp[3] = v;
@@ -150,9 +134,10 @@ void vdec_SparseIDCT (vdec_thread_t * p_vdec, dctelem_t * p_block,
 /*****************************************************************************
  * vdec_IDCT : IDCT function for normal matrices
  *****************************************************************************/
+
+#ifndef HAVE_MMX
 void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
 {
-//IDCT_mmx(p_block);
 #if 0 
     /* dct classique: pour tester la meilleure entre la classique et la */
     /* no classique */
@@ -372,7 +357,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
     }
 #endif    
 
-#if 1 /*dct avec no classique*/    
+#if 1  /*dct avec non classique*/    
     
     s32 tmp0, tmp1, tmp2, tmp3;
     s32 tmp10, tmp11, tmp12, tmp13;
@@ -389,6 +374,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
 
     dataptr = p_block;
 
+    fprintf( stderr, "normal dct" );
     for (rowctr = DCTSIZE-1; rowctr >= 0; rowctr--) 
     {
         /* Due to quantization, we will usually find that many of the input
@@ -1550,3 +1536,4 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
     }
 #endif
 }
+#endif

@@ -51,6 +51,8 @@ sixbitu:            .quad 0xc0c0c0c0c0c0c0c0
 #define LocalFrameSize  156
 #define RegisterStorageSize  16
 
+//#define DOUBLE /*double le nombre de colonnes */
+
 /* Arguments: */
 #define YPlane                    LocalFrameSize + RegisterStorageSize +  4
 #define UPlane                    LocalFrameSize + RegisterStorageSize +  8
@@ -476,11 +478,29 @@ do_next_8x2_block:
   por        %mm1,%mm2               /* mm2: low RBG16 */
   psllw      GLeftShift(%esp),%mm3   /* shift high G 5 positions */
   por        %mm3,%mm7               /* mm7: high RBG16 */
+#ifdef DOUBLE
+  movq       %mm2,%mm1
+  movq       %mm7,%mm5
+  movq       %mm2,%mm0
+  movq       %mm7,%mm3
+  punpckhwd  %mm2,%mm1
+  punpckhwd  %mm7,%mm5
+  punpcklwd  %mm2,%mm0
+  punpcklwd  %mm7,%mm3
+  movq       %mm0,(%edi,%eax,)
+  movq       %mm1,8(%edi,%eax,)
+  movq       %mm3,16(%edi,%eax,)
+  movq       %mm5,24(%edi,%eax,)
+  addl       $32,%edi
+  addl       $4,%ebx
+#endif
+#ifndef DOUBLE
   movq       %mm2,(%edi,%eax,)
   movq       %mm7,8(%edi,%eax,)      /* aligned */
   addl       $16,%edi                /* ih take 16 bytes (8 pixels-16 bit) */
   addl       $4,%ebx                 /* ? to take 4 pixels together
                                         instead of 2 */
+#endif					
   jl         do_next_8x2_block
 
   addl       CCOSkipDistance(%esp),%edi /* go to begin of next line */
