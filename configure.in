@@ -1019,6 +1019,7 @@ if test x$enable_dsp != xno &&
 then
   AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
     PLUGINS="${PLUGINS} dsp"
+    AC_CHECK_LIB(ossaudio,main,LIB_DSP="${LIB_DSP} -lossaudio")
   ])
 fi
 
@@ -1543,6 +1544,7 @@ AC_SUBST(LIB_ARTS)
 AC_SUBST(LIB_BEOS)
 AC_SUBST(LIB_DARWIN)
 AC_SUBST(LIB_DIRECTX)
+AC_SUBST(LIB_DSP)
 AC_SUBST(LIB_DVD)
 AC_SUBST(LIB_DVDREAD)
 AC_SUBST(LIB_ESD)
