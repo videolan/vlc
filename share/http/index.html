@@ -37,9 +37,12 @@
       <div class="sectitle">Misc controls</div>
       <div class="section-controls">
         <form method="get" action="">
+               <input type="hidden" name="control" value="volume" />
 	  Vol: <input type="text" name="value" size="5"/>
                <input type="submit" value="Set" /><br /> (0 -&gt;1024)<br />
-           <br />
+        </form>
+	<br />
+	<form method="get" action="">
           <input type="submit" name="control" value="fullscreen" />
         </form>
       </div>
