@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.17 2002/08/14 08:17:24 sam Exp $
+ * $Id: objects.c,v 1.18 2002/08/14 17:06:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,11 +46,15 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static vlc_object_t * vlc_object_find_inner( vlc_object_t *, int, int );
-static void vlc_object_detach_inner( vlc_object_t * );
-static void vlc_dumpstructure_inner( vlc_object_t *, int, char * );
-static int  find_index_inner( vlc_object_t *, vlc_object_t **, int );
-static void set_attachment_flag( vlc_object_t *, vlc_bool_t );
+static vlc_object_t * FindObject    ( vlc_object_t *, int, int );
+static void           DetachObject  ( vlc_object_t * );
+static void           PrintObject   ( vlc_object_t *, const char * );
+static void           DumpStructure ( vlc_object_t *, int, char * );
+static int            FindIndex     ( vlc_object_t *, vlc_object_t **, int );
+static void           SetAttachment ( vlc_object_t *, vlc_bool_t );
+
+static vlc_list_t *   NewList       ( void );
+static vlc_list_t *   ListAppend    ( vlc_list_t *, vlc_object_t * );
 
 /*****************************************************************************
  * vlc_object_create: initialize a vlc object
@@ -228,11 +232,12 @@ void __vlc_object_destroy( vlc_object_t *p_this )
      * useless to try and recover anything if pp_objects gets smashed. */
     if( p_this->p_vlc->i_objects > 1 )
     {
-        int i_index = find_index_inner( p_this, p_this->p_vlc->pp_objects,
-                                                p_this->p_vlc->i_objects );
+        int i_index = FindIndex( p_this, p_this->p_vlc->pp_objects,
+                                         p_this->p_vlc->i_objects );
         memmove( p_this->p_vlc->pp_objects + i_index,
                  p_this->p_vlc->pp_objects + i_index + 1,
-                 p_this->p_vlc->i_objects - i_index - 1 );
+                 (p_this->p_vlc->i_objects - i_index - 1)
+                   * sizeof( vlc_object_t *) );
 
         p_this->p_vlc->pp_objects =
             realloc( p_this->p_vlc->pp_objects,
@@ -252,46 +257,6 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     vlc_cond_destroy( &p_this->object_wait );
 
     free( p_this );
-}
-
-/*****************************************************************************
- * find_index_inner: find the index of an object in an array of objects
- *****************************************************************************
- * This function assumes that p_this can be found in pp_objects. It will not
- * crash if p_this cannot be found, but will return a random value. It is your
- * duty to check the return value if you are not certain that the object could
- * be found for sure.
- *****************************************************************************/
-static int find_index_inner( vlc_object_t *p_this,
-                             vlc_object_t **pp_objects, int i_count )
-{
-    int i_middle = i_count / 2;
-
-    if( i_count == 0 )
-    {
-        return 0;
-    }
-
-    if( pp_objects[i_middle] == p_this )
-    {
-        return i_middle;
-    }
-
-    if( i_count == 1 )
-    {
-        return 0;
-    }
-
-    /* We take advantage of the sorted array */
-    if( pp_objects[i_middle]->i_object_id < p_this->i_object_id )
-    {
-        return i_middle + find_index_inner( p_this, pp_objects + i_middle,
-                                                    i_count - i_middle );
-    }
-    else
-    {
-        return find_index_inner( p_this, pp_objects, i_middle );
-    }
 }
 
 /*****************************************************************************
@@ -317,70 +282,17 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     /* Otherwise, recursively look for the object */
     if( (i_mode & 0x000f) == FIND_ANYWHERE )
     {
-        p_found = vlc_object_find_inner( VLC_OBJECT(p_this->p_vlc),
-                                         i_type,
-                                         (i_mode & ~0x000f) | FIND_CHILD );
+        p_found = FindObject( VLC_OBJECT(p_this->p_vlc), i_type,
+                              (i_mode & ~0x000f) | FIND_CHILD );
     }
     else
     {
-        p_found = vlc_object_find_inner( p_this, i_type, i_mode );
+        p_found = FindObject( p_this, i_type, i_mode );
     }
 
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 
     return p_found;
-}
-
-static vlc_object_t * vlc_object_find_inner( vlc_object_t *p_this,
-                                             int i_type, int i_mode )
-{
-    int i;
-    vlc_object_t *p_tmp;
-
-    switch( i_mode & 0x000f )
-    {
-    case FIND_PARENT:
-        p_tmp = p_this->p_parent;
-        if( p_tmp )
-        {
-            if( p_tmp->i_object_type == i_type )
-            {
-                p_tmp->i_refcount++;
-                return p_tmp;
-            }
-            else
-            {
-                return vlc_object_find_inner( p_tmp, i_type, i_mode );
-            }
-        }
-        break;
-
-    case FIND_CHILD:
-        for( i = p_this->i_children; i--; )
-        {
-            p_tmp = p_this->pp_children[i];
-            if( p_tmp->i_object_type == i_type )
-            {
-                p_tmp->i_refcount++;
-                return p_tmp;
-            }
-            else if( p_tmp->i_children )
-            {
-                p_tmp = vlc_object_find_inner( p_tmp, i_type, i_mode );
-                if( p_tmp )
-                {
-                    return p_tmp;
-                }
-            }
-        }
-        break;
-
-    case FIND_ANYWHERE:
-        /* Handled in vlc_object_find */
-        break;
-    }
-
-    return NULL;
 }
 
 /*****************************************************************************
@@ -425,7 +337,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     /* Climb up the tree to see whether we are connected with the root */
     if( p_parent->b_attached )
     {
-        set_attachment_flag( p_this, VLC_TRUE );
+        SetAttachment( p_this, VLC_TRUE );
     }
 
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
@@ -449,14 +361,219 @@ void __vlc_object_detach( vlc_object_t *p_this )
     /* Climb up the tree to see whether we are connected with the root */
     if( p_this->p_parent->b_attached )
     {
-        set_attachment_flag( p_this, VLC_FALSE );
+        SetAttachment( p_this, VLC_FALSE );
     }
 
-    vlc_object_detach_inner( p_this );
+    DetachObject( p_this );
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 }
 
-static void vlc_object_detach_inner( vlc_object_t *p_this )
+/*****************************************************************************
+ * vlc_list_find: find a list typed objects and increment their refcount
+ *****************************************************************************
+ * This function recursively looks for a given object type. i_mode can be one
+ * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
+ *****************************************************************************/
+vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
+{
+    vlc_list_t *p_list = NewList();
+
+    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+
+    /* Look for the objects */
+    if( (i_mode & 0x000f) == FIND_ANYWHERE )
+    {
+        vlc_object_t **pp_current, **pp_end;
+
+        pp_current = p_this->p_vlc->pp_objects;
+        pp_end = pp_current + p_this->p_vlc->i_objects;
+
+        for( ; pp_current < pp_end ; pp_current++ )
+        {
+            if( (*pp_current)->b_attached
+                 && (*pp_current)->i_object_type == i_type )
+            {
+                p_list = ListAppend( p_list, *pp_current );
+            }
+        }
+    }
+    else
+    {
+        msg_Err( p_this, "unimplemented!" );
+    }
+
+    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+
+    return p_list;
+}
+
+/*****************************************************************************
+ * vlc_liststructure: print the current vlc objects
+ *****************************************************************************
+ * This function prints an ASCII tree showing the connections between vlc
+ * objects, and additional information such as their refcount, thread ID,
+ * address, etc.
+ *****************************************************************************/
+void __vlc_liststructure( vlc_object_t *p_this )
+{
+    vlc_object_t **pp_current, **pp_end;
+
+    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+
+    pp_current = p_this->p_vlc->pp_objects;
+    pp_end = pp_current + p_this->p_vlc->i_objects;
+
+    for( ; pp_current < pp_end ; pp_current++ )
+    {
+        if( (*pp_current)->b_attached )
+        {
+            PrintObject( *pp_current, "" );
+        }
+        else
+        {
+            msg_Info( p_this->p_vlc, "o %.6x %s (not attached)",
+                      (*pp_current)->i_object_id,
+                      (*pp_current)->psz_object_type );
+        }
+    }
+
+    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+}
+
+/*****************************************************************************
+ * vlc_dumpstructure: print the current vlc structure
+ *****************************************************************************
+ * This function prints an ASCII tree showing the connections between vlc
+ * objects, and additional information such as their refcount, thread ID,
+ * address, etc.
+ *****************************************************************************/
+void __vlc_dumpstructure( vlc_object_t *p_this )
+{
+    char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
+
+    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+    psz_foo[0] = '|';
+    DumpStructure( p_this, 0, psz_foo );
+    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+}
+
+/*****************************************************************************
+ * vlc_list_release: free a list previously allocated by vlc_list_find
+ *****************************************************************************
+ * This function decreases the refcount of all objects in the list and
+ * frees the list.
+ *****************************************************************************/
+void __vlc_list_release( vlc_object_t *p_this, vlc_list_t *p_list )
+{
+    vlc_object_t **p_current = p_list->pp_objects;
+
+    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+
+    while( p_current[0] )
+    {
+        p_current[0]->i_refcount--;
+        p_current++;
+    }
+
+    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+
+    free( p_list );
+}
+
+/* Following functions are local */
+
+/*****************************************************************************
+ * FindIndex: find the index of an object in an array of objects
+ *****************************************************************************
+ * This function assumes that p_this can be found in pp_objects. It will not
+ * crash if p_this cannot be found, but will return a wrong value. It is your
+ * duty to check the return value if you are not certain that the object could
+ * be found for sure.
+ *****************************************************************************/
+static int FindIndex( vlc_object_t *p_this,
+                      vlc_object_t **pp_objects, int i_count )
+{
+    int i_middle = i_count / 2;
+
+    if( i_count == 0 )
+    {
+        return 0;
+    }
+
+    if( pp_objects[i_middle] == p_this )
+    {
+        return i_middle;
+    }
+
+    if( i_count == 1 )
+    {
+        return 0;
+    }
+
+    /* We take advantage of the sorted array */
+    if( pp_objects[i_middle]->i_object_id < p_this->i_object_id )
+    {
+        return i_middle + FindIndex( p_this, pp_objects + i_middle,
+                                             i_count - i_middle );
+    }
+    else
+    {
+        return FindIndex( p_this, pp_objects, i_middle );
+    }
+}
+
+static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
+{
+    int i;
+    vlc_object_t *p_tmp;
+
+    switch( i_mode & 0x000f )
+    {
+    case FIND_PARENT:
+        p_tmp = p_this->p_parent;
+        if( p_tmp )
+        {
+            if( p_tmp->i_object_type == i_type )
+            {
+                p_tmp->i_refcount++;
+                return p_tmp;
+            }
+            else
+            {
+                return FindObject( p_tmp, i_type, i_mode );
+            }
+        }
+        break;
+
+    case FIND_CHILD:
+        for( i = p_this->i_children; i--; )
+        {
+            p_tmp = p_this->pp_children[i];
+            if( p_tmp->i_object_type == i_type )
+            {
+                p_tmp->i_refcount++;
+                return p_tmp;
+            }
+            else if( p_tmp->i_children )
+            {
+                p_tmp = FindObject( p_tmp, i_type, i_mode );
+                if( p_tmp )
+                {
+                    return p_tmp;
+                }
+            }
+        }
+        break;
+
+    case FIND_ANYWHERE:
+        /* Handled in vlc_object_find */
+        break;
+    }
+
+    return NULL;
+}
+
+static void DetachObject( vlc_object_t *p_this )
 {
     vlc_object_t *p_parent = p_this->p_parent;
     int i_index, i;
@@ -490,24 +607,24 @@ static void vlc_object_detach_inner( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * set_attachment_flag: recursively set the b_attached flag of a subtree.
+ * SetAttachment: recursively set the b_attached flag of a subtree.
  *****************************************************************************
  * This function is used by the attach and detach functions to propagate
  * the b_attached flag in a subtree.
  *****************************************************************************/
-static void set_attachment_flag( vlc_object_t *p_this, vlc_bool_t b_attached )
+static void SetAttachment( vlc_object_t *p_this, vlc_bool_t b_attached )
 {
     int i_index;
 
     for( i_index = p_this->i_children ; i_index-- ; )
     {
-        set_attachment_flag( p_this->pp_children[i_index], b_attached );
+        SetAttachment( p_this->pp_children[i_index], b_attached );
     }
 
     p_this->b_attached = b_attached;
 }
 
-static void vlc_print_object( vlc_object_t *p_this, const char *psz_prefix )
+static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 {
     char psz_children[20], psz_refcount[20], psz_thread[20], psz_name[50];
 
@@ -553,65 +670,13 @@ static void vlc_print_object( vlc_object_t *p_this, const char *psz_prefix )
               psz_name, psz_thread, psz_refcount, psz_children );
 }
 
-/*****************************************************************************
- * vlc_liststructure: print the current vlc objects
- *****************************************************************************
- * This function prints an ASCII tree showing the connections between vlc
- * objects, and additional information such as their refcount, thread ID,
- * address, etc.
- *****************************************************************************/
-void __vlc_liststructure( vlc_object_t *p_this )
-{
-    vlc_object_t ** p_all;
-    vlc_object_t *  p_current;
-    int             i_total;
-
-    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-
-    i_total = p_this->p_vlc->i_objects;
-    p_all = p_this->p_vlc->pp_objects;
-
-    for( p_current = p_all[0] ; p_current < p_all[i_total] ; p_current++ )
-    {
-        if( p_current->b_attached )
-        {
-            vlc_print_object( p_current, "" );
-        }
-        else
-        {
-            msg_Info( p_this->p_vlc, "o %.6x %s (not attached)",
-                      p_current->i_object_id, p_current->psz_object_type );
-        }
-    }
-
-    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
-}
-
-/*****************************************************************************
- * vlc_dumpstructure: print the current vlc structure
- *****************************************************************************
- * This function prints an ASCII tree showing the connections between vlc
- * objects, and additional information such as their refcount, thread ID,
- * address, etc.
- *****************************************************************************/
-void __vlc_dumpstructure( vlc_object_t *p_this )
-{
-    char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
-
-    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-    psz_foo[0] = '|';
-    vlc_dumpstructure_inner( p_this, 0, psz_foo );
-    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
-}
-
-static void vlc_dumpstructure_inner( vlc_object_t *p_this,
-                                     int i_level, char *psz_foo )
+static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )
 {
     int i;
     char i_back = psz_foo[i_level];
     psz_foo[i_level] = '\0';
 
-    vlc_print_object( p_this, psz_foo );
+    PrintObject( p_this, psz_foo );
 
     psz_foo[i_level] = i_back;
 
@@ -645,7 +710,62 @@ static void vlc_dumpstructure_inner( vlc_object_t *p_this,
         psz_foo[i_level+1] = '-';
         psz_foo[i_level+2] = '\0';
 
-        vlc_dumpstructure_inner( p_this->pp_children[i], i_level + 2, psz_foo );
+        DumpStructure( p_this->pp_children[i], i_level + 2, psz_foo );
     }
+}
+
+static vlc_list_t * NewList( void )
+{
+    vlc_list_t *p_list = malloc( sizeof( vlc_list_t )
+                                     + 3 * sizeof( vlc_object_t * ) );
+
+    if( p_list == NULL )
+    {
+        return NULL;
+    }
+
+    p_list->i_count = 0;
+    p_list->pp_objects = &p_list->_p_first;
+
+    /* We allocated space for NULL and for three extra objects */
+    p_list->_i_extra = 3;
+    p_list->_p_first = NULL;
+
+    return p_list;
+}
+
+static vlc_list_t * ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
+{
+    if( p_list == NULL )
+    {
+        return NULL;
+    }
+
+    if( p_list->_i_extra == 0 )
+    {
+        /* If we had X objects it means the array has a size of X+1, we
+         * make it size 2X+2, so we alloc 2X+1 because there is already
+         * one allocated in the real structure */
+        p_list = realloc( p_list, sizeof( vlc_list_t )
+                                   + (p_list->i_count * 2 + 1)
+                                       * sizeof( vlc_object_t * ) );
+        if( p_list == NULL ) 
+        {
+            return NULL;
+        }
+
+        /* We have X+1 extra slots */
+        p_list->_i_extra = p_list->i_count + 1;
+        p_list->pp_objects = &p_list->_p_first;
+    }
+
+    p_object->i_refcount++;
+
+    p_list->pp_objects[p_list->i_count] = p_object;
+    p_list->i_count++;
+    p_list->pp_objects[p_list->i_count] = NULL;
+    p_list->_i_extra--;
+
+    return p_list;
 }
 

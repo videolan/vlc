@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.29 2002/08/08 22:28:22 sam Exp $
+ * $Id: modules_inner.h,v 1.30 2002/08/14 17:06:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -129,6 +129,7 @@
                                 p_module->pp_shortcuts[ i_shortcut ];         \
     }                                                                         \
     p_submodule->psz_object_name = p_module->psz_object_name;                 \
+    p_submodule->psz_longname = p_module->psz_longname;                       \
     p_submodule->psz_program = p_module->psz_program;                         \
     p_submodule->psz_capability = p_module->psz_capability;                   \
     p_submodule->i_score = p_module->i_score;                                 \

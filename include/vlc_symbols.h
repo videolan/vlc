@@ -71,6 +71,7 @@ struct module_symbols_t
     u32 (* UnalignedShowBits_inner) ( bit_stream_t *, unsigned int ) ;
     vlc_bool_t (* NextDataPacket_inner) ( decoder_fifo_t *, data_packet_t ** ) ;
     vlc_error_t (* intf_RunThread_inner) ( intf_thread_t * ) ;
+    vlc_list_t * (* __vlc_list_find_inner) ( vlc_object_t *, int, int ) ;
     void (* BitstreamNextDataPacket_inner) ( bit_stream_t * ) ;
     void (* CurrentPTS_inner) ( bit_stream_t *, mtime_t *, mtime_t * ) ;
     void (* DecoderError_inner) ( decoder_fifo_t * p_fifo ) ;
@@ -92,6 +93,7 @@ struct module_symbols_t
     void (* __msg_Unsubscribe_inner) ( vlc_object_t *, msg_subscription_t * ) ;
     void (* __msg_Warn_inner) ( void *, const char *, ... ) ;
     void (* __vlc_dumpstructure_inner) ( vlc_object_t * ) ;
+    void (* __vlc_list_release_inner) ( vlc_object_t *, vlc_list_t * ) ;
     void (* __vlc_liststructure_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_attach_inner) ( vlc_object_t *, vlc_object_t * ) ;
     void (* __vlc_object_destroy_inner) ( vlc_object_t * ) ;
@@ -188,6 +190,8 @@ struct module_symbols_t
 #   define __vlc_cond_destroy p_symbols->__vlc_cond_destroy_inner
 #   define __vlc_cond_init p_symbols->__vlc_cond_init_inner
 #   define __vlc_dumpstructure p_symbols->__vlc_dumpstructure_inner
+#   define __vlc_list_find p_symbols->__vlc_list_find_inner
+#   define __vlc_list_release p_symbols->__vlc_list_release_inner
 #   define __vlc_liststructure p_symbols->__vlc_liststructure_inner
 #   define __vlc_mutex_destroy p_symbols->__vlc_mutex_destroy_inner
 #   define __vlc_mutex_init p_symbols->__vlc_mutex_init_inner

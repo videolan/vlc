@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: preferences.c,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: preferences.c,v 1.3 2002/08/14 17:06:53 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -118,7 +118,7 @@ void GtkPreferencesShow( GtkMenuItem * menuitem, gpointer user_data )
 static void GtkCreateConfigDialog( char *psz_module_name,
                                    intf_thread_t *p_intf )
 {
-    module_t *p_module, *p_module_bis;
+    module_t *p_module;
     module_config_t *p_item;
 
     guint rows = 0;
@@ -318,27 +318,22 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             /* build a list of available modules */
             {
                 gchar * entry[2];
-                char *  psz_capability;
+                vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
+                                                            FIND_ANYWHERE );
+                module_t **pp_parser = (module_t **)p_list->pp_objects;
 
-                for( p_module_bis = p_intf->p_vlc->p_module_bank->first ;
-                     p_module_bis != NULL ;
-                     p_module_bis = p_module_bis->next )
+                for( ; *pp_parser ; pp_parser++ )
                 {
-#if 0 /* FIXME */
-                    for( psz_capability = p_module_bis->pp_capabilities[0] ;
-                         *psz_capability ;
-                         psz_capability++ )
+                    if( !strcmp( (*pp_parser)->psz_capability,
+                                 p_item->psz_type ) )
                     {
-                        if( !strcmp( psz_capability, p_item->psz_type ) )
-                        {
-                            entry[0] = p_module_bis->psz_object_name;
-                            entry[1] = p_module_bis->psz_longname;
-                            gtk_clist_append( GTK_CLIST(module_clist), entry );
-                            break;
-                        }
+                        entry[0] = (*pp_parser)->psz_object_name;
+                        entry[1] = (*pp_parser)->psz_longname;
+                        gtk_clist_append( GTK_CLIST(module_clist), entry );
                     }
-#endif
                 }
+
+                vlc_list_release( p_intf, p_list );
             }
 
             gtk_clist_set_column_auto_resize( GTK_CLIST(module_clist),

@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.2 2002/08/12 17:38:10 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.3 2002/08/14 17:06:53 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -51,7 +51,9 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
     KDialogBase ( Tabbed, caption, Ok| Apply|Cancel|User1, Ok, parent,
                   "vlc preferences", true, false, "Save")
 {
-    module_t *p_module, *p_module_bis;
+    module_t *p_module;
+    module_t **pp_parser;
+    vlc_list_t *p_list;
     module_config_t *p_item;
     QVBox *category_table = NULL;
     QString *category_label;
@@ -116,18 +118,22 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
 
                 
                 /* build a list of available plugins */
-                
-#if 0 /* FIXME */
-                for( p_module_bis = p_intf->p_vlc->p_module_bank->first ;
-                     p_module_bis != NULL ;
-                     p_module_bis = p_module_bis->next ) {
-                    if( p_module_bis->i_capabilities & (1 << p_item->i_value)){
+                p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
+                                                FIND_ANYWHERE );
+                pp_parser = (module_t **)p_list->pp_objects;
+
+                for( ; *pp_parser ; pp_parser++ )
+                {
+                    if( !strcmp( (*pp_parser)->psz_capability,
+                                 p_item->psz_type ) )
+                    {
                         new QListViewItem(item_frame->getListView(),
-                                          p_module_bis->psz_object_name,
-                                          p_module_bis->psz_longname);
+                                          (*pp_parser)->psz_object_name,
+                                          (*pp_parser)->psz_longname);
                     }
                 }
-#endif
+                vlc_list_release( p_intf, p_list );
+
                 vlc_mutex_unlock( p_item->p_lock );
             }
             break;

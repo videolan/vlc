@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.85 2002/08/14 08:17:24 sam Exp $
+ * $Id: modules.c,v 1.86 2002/08/14 17:06:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -170,7 +170,8 @@ void __module_EndBank( vlc_object_t *p_this )
 
             /* We just free the module by hand. Niahahahahaha. */
             p_next = p_this->p_vlc->p_module_bank->first->next;
-            free( p_this->p_vlc->p_module_bank->first );
+            vlc_object_detach( p_this->p_vlc->p_module_bank->first );
+            vlc_object_destroy( p_this->p_vlc->p_module_bank->first );
             p_this->p_vlc->p_module_bank->first = p_next;
         }
     }
@@ -748,6 +749,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file )
     if( CallEntry( p_module ) != 0 )
     {
         /* We couldn't call module_init() */
+        msg_Err( p_this, "failed calling entry point in `%s'", psz_file );
         vlc_object_destroy( p_module );
         module_unload( handle );
         return -1;

@@ -360,7 +360,10 @@ void __fastcall TPreferencesDlg::FormHide( TObject *Sender )
 
 void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 {
-    module_t           *p_module, *p_module_plugins;
+    module_t           *p_module;
+    module_t          **pp_parser;
+    vlc_list_t         *p_list;
+
     module_config_t    *p_item;
     int                 i_pages, i_ctrl;
     
@@ -422,20 +425,20 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             /* add panel as separator */
             ADD_PANEL;
 
-#if 0 /* FIXME */
-            /* build a list of available plugins */
-            for( p_module_plugins = p_intfGlobal->p_vlc->p_module_bank->first ;
-                 p_module_plugins != NULL ;
-                 p_module_plugins = p_module_plugins->next )
+            /* Look for valid modules */
+            p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+            pp_parser = (module_t **)p_list->pp_objects;
+
+            for( ; *pp_parser ; pp_parser++ )
             {
-                if( p_module_plugins->i_capabilities &
-                    ( 1 << p_item->i_value ) )
+                if( !strcmp( (*pp_parser)->psz_capability, p_item->psz_type ) )
                 {
                     ListItem = GroupBoxPlugin->ListView->Items->Add();
-                    ListItem->Caption = p_module_plugins->psz_object_name;
+                    ListItem->Caption = (*pp_parser)->psz_object_name;
                 }
             }
-#endif
+
+            vlc_list_release( p_intf, p_list );
 
             break;
 

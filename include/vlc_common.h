@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.19 2002/08/12 22:12:50 massiot Exp $
+ * $Id: vlc_common.h,v 1.20 2002/08/14 17:06:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -269,6 +269,17 @@ struct vlc_object_t
 {
     VLC_COMMON_MEMBERS
 };
+
+/* The object list */
+struct vlc_list_t
+{
+    int             i_count;
+    vlc_object_t ** pp_objects;
+
+    /* Private */
+    int             _i_extra;
+    vlc_object_t *  _p_first;
+};  
 
 /* VLC_OBJECT: attempt at doing a clever cast */
 #define VLC_OBJECT( x ) \
