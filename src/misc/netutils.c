@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.57 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: netutils.c,v 1.58 2002/02/27 04:49:55 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -51,7 +51,7 @@
 
 #ifdef WIN32
 #   include <winsock2.h>
-#elif !defined( SYS_BEOS )
+#else
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>                           /* BSD: struct sockaddr */
 #   include <netinet/in.h>                            /* BSD: struct in_addr */
@@ -110,7 +110,7 @@ static int GetAdapterInfo  ( int i_adapter, char *psz_string );
 int network_BuildAddr( struct sockaddr_in * p_socket,
                        char * psz_address, int i_port )
 {
-#if defined( SYS_BEOS )
+#if 0
     intf_ErrMsg( "error: networking is not yet supported under BeOS" );
     return( 1 );
 

@@ -3110,7 +3110,7 @@ fi
     ;;
   xbeos)
     SYS=beos
-    LIB="${LIB} -lbe"
+    LIB="${LIB} -lbe -lbind"
     LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
     PLDFLAGS="${PLDFLAGS} -nostart"
     ;;

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.178 2002/02/26 17:22:12 xav Exp $
+ * $Id: input.c,v 1.179 2002/02/27 04:49:55 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -49,7 +49,9 @@
 #ifdef WIN32
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
-#elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#elif defined( SYS_NTO )
+    /* unsupported */
+#else
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
 #   include <netinet/in.h>
@@ -86,7 +88,7 @@ static void EndThread       ( input_thread_t *p_input );
 static void FileOpen        ( input_thread_t *p_input );
 static void StdOpen         ( input_thread_t *p_input );
 static void FileClose       ( input_thread_t *p_input );
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#if !defined( SYS_NTO )
 static void NetworkOpen     ( input_thread_t *p_input );
 static void HTTPOpen        ( input_thread_t *p_input );
 static void NetworkClose    ( input_thread_t *p_input );
@@ -484,7 +486,7 @@ static int InitThread( input_thread_t * p_input )
     {
         f.pf_open( p_input );
     }
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#if !defined( SYS_NTO )
     /* FIXME : this is waaaay too kludgy */
     else if( ( strlen( p_input->p_source ) >= 10
                && !strncasecmp( p_input->p_source, "udpstream:", 10 ) )
@@ -600,7 +602,7 @@ static void CloseThread( input_thread_t * p_input )
     {
         f.pf_close( p_input );
     }
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#if !defined( SYS_NTO )
     /* Close stream */
     else if( ( strlen( p_input->p_source ) > 10
                && !strncasecmp( p_input->p_source, "udpstream:", 10 ) )
@@ -757,7 +759,7 @@ static void FileClose( input_thread_t * p_input )
     return;
 }
 
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#if !defined( SYS_NTO )
 /*****************************************************************************
  * NetworkOpen : open a network socket 
  *****************************************************************************/
@@ -1307,5 +1309,5 @@ static void HTTPOpen( input_thread_t * p_input )
     intf_WarnMsg( 3, "input: successfully opened HTTP mode" );
 }
 
-#endif /* !defined( SYS_BEOS ) && !defined( SYS_NTO ) */
+#endif /* !defined( SYS_NTO ) */
 
