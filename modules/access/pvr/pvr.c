@@ -95,6 +95,8 @@ struct access_sys_t
     int i_height;
     int i_frequency;
     int i_framerate;
+    int i_bframes;
+    int i_keyint;
     int i_bitrate;
     int i_bitrate_peak;
     int i_bitrate_mode;
@@ -135,6 +137,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_height = -1;
     p_sys->i_frequency = -1;
     p_sys->i_framerate = -1;
+    p_sys->i_keyint = -1;
+    p_sys->i_bframes = -1;
     p_sys->i_bitrate = -1;
     p_sys->i_bitrate_peak = -1;
     p_sys->i_bitrate_mode = -1;
@@ -207,6 +211,20 @@ static int Open( vlc_object_t * p_this )
             {
                 p_sys->i_framerate =
                     strtol( psz_parser + strlen( "framerate=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "keyint=",
+                               strlen( "keyint=" ) ) )
+            {
+                p_sys->i_keyint =
+                    strtol( psz_parser + strlen( "keyint=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "bframes=",
+                               strlen( "bframes=" ) ) )
+            {
+                p_sys->i_bframes =
+                    strtol( psz_parser + strlen( "bframes=" ),
                             &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "width=",
@@ -403,6 +421,8 @@ static int Open( vlc_object_t * p_this )
 
     /* codec parameters */
     if ( p_sys->i_framerate != -1
+            || p_sys->i_keyint != -1
+            || p_sys->i_bframes != -1
             || p_sys->i_bitrate_mode != -1
             || p_sys->i_bitrate_peak != -1
             || p_sys->i_bitrate != -1
@@ -431,6 +451,16 @@ static int Open( vlc_object_t * p_this )
                         codec.framerate = 1;
                         break;
                 }
+            }
+
+            if ( p_sys->i_keyint != -1 )
+            {
+                codec.framespergop = p_sys->i_keyint;
+            }
+
+            if ( p_sys->i_bframes != -1 )
+            {
+                codec.bframes = p_sys->i_bframes;
             }
 
             if ( p_sys->i_bitrate != -1 )
