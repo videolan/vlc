@@ -60,7 +60,8 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
   "By default the encoding is CBR." )
 
 vlc_module_begin();
-    set_description( _("libtoolame audio encoder") );
+    set_shortname( _("Toolame"));
+    set_description( _("Libtoolame audio encoder") );
     set_capability( "encoder", 50 );
     set_callbacks( OpenEncoder, CloseEncoder );
     set_category( CAT_INPUT );

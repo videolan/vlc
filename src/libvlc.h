@@ -895,10 +895,10 @@ vlc_module_begin();
                          NULL, AUDIO_FILTER_TEXT,
                          AUDIO_FILTER_LONGTEXT, VLC_FALSE );
     set_subcategory( SUBCAT_AUDIO_VISUAL );
-    add_string( "audio-visual", 0, NULL,AUDIO_VISUAL_TEXT,
+    add_module( "audio-visual", "visualization",NULL, NULL,AUDIO_VISUAL_TEXT,
                 AUDIO_VISUAL_LONGTEXT, VLC_FALSE );
     set_subcategory( SUBCAT_AUDIO_MISC );
-    add_module( "audio-channel-mixer", "audio filter", NULL, NULL,
+    add_module_cat( "audio-channel-mixer", SUBCAT_AUDIO_MISC, NULL, NULL,
                 AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT, VLC_FALSE );
         change_short('A');
 
@@ -973,7 +973,7 @@ vlc_module_begin();
                  SUB_MARGIN_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Overlays" ) , NULL );
-    add_module( "sub-filter", "sub filter", NULL, NULL,
+    add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
                 SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_TRUE );
 
     set_subcategory( SUBCAT_VIDEO_TEXT );
@@ -981,7 +981,11 @@ vlc_module_begin();
     /* Input options */
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
+    add_module( "access", "access2", NULL, NULL, ACCESS_TEXT,
+                ACCESS_LONGTEXT, VLC_TRUE );
     set_subcategory( SUBCAT_INPUT_DEMUX );
+    add_module( "demux", "demux2", NULL, NULL, DEMUX_TEXT,
+                DEMUX_LONGTEXT, VLC_TRUE );
     set_subcategory( SUBCAT_INPUT_VCODEC );
     set_subcategory( SUBCAT_INPUT_ACODEC );
     set_subcategory( SUBCAT_INPUT_SCODEC );
@@ -1075,9 +1079,9 @@ vlc_module_begin();
 
     /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , VLC_TRUE );
-    add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT,
+    add_string( "codec", NULL, NULL, CODEC_TEXT,
                 CODEC_LONGTEXT, VLC_TRUE );
-    add_module( "encoder", "encoder", NULL, NULL, ENCODER_TEXT,
+    add_string( "encoder",  NULL, NULL, ENCODER_TEXT,
                 ENCODER_LONGTEXT, VLC_TRUE );
 
 
@@ -1107,7 +1111,7 @@ vlc_module_begin();
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
     set_subcategory( SUBCAT_SOUT_PACKETIZER );
-    add_module( "packetizer", "packetizer", NULL, NULL,
+    add_module( "packetizer","packetizer", NULL, NULL,
                 PACKETIZER_TEXT, PACKETIZER_LONGTEXT, VLC_TRUE );
 
     set_subcategory( SUBCAT_SOUT_SAP );
@@ -1134,10 +1138,6 @@ vlc_module_begin();
     set_subcategory( SUBCAT_ADVANCED_MISC );
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
                 MEMCPY_LONGTEXT, VLC_TRUE );
-    add_module( "access", "access", NULL, NULL, ACCESS_TEXT,
-                ACCESS_LONGTEXT, VLC_TRUE );
-    add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT,
-                DEMUX_LONGTEXT, VLC_TRUE );
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
               MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
     add_bool( "plugins-cache", VLC_TRUE, NULL, PLUGINS_CACHE_TEXT,

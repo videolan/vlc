@@ -66,7 +66,7 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define ASPECT_LONGTEXT N_("The aspect ratio of the individual displays building the display wall")
 
 vlc_module_begin();
-    set_description( _("wall video filter") );
+    set_description( _("Wall video filter") );
     set_shortname( N_("Image wall" ));
     set_capability( "video filter", 0 );
     set_category( CAT_VIDEO );

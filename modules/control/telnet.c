@@ -82,13 +82,14 @@ static void Close( vlc_object_t * );
 #define TELNETPWD_LONGTEXT N_( "Default to admin" )
 
 vlc_module_begin();
+    set_shortname( _("Telnet"));
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_integer( "telnet-port", 4212, NULL, TELNETPORT_TEXT,
                  TELNETPORT_LONGTEXT, VLC_TRUE );
     add_string( "telnet-password", "admin", NULL, TELNETPWD_TEXT,
                 TELNETPWD_LONGTEXT, VLC_TRUE );
-    set_description( _("Telnet remote control interface") );
+    set_description( _("VLM remote control interface") );
     add_category_hint( "VLM", NULL, VLC_FALSE );
     set_capability( "interface", 0 );
     set_callbacks( Open , Close );

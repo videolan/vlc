@@ -87,6 +87,7 @@ static mtime_t GetClockRef( intf_thread_t *, mtime_t );
   "the master client used for the network synchronisation." )
 
 vlc_module_begin();
+    set_shortname( _("Netsync"));
     set_description( _("Network synchronisation") );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );

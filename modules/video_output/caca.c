@@ -51,9 +51,10 @@ static void Display   ( vout_thread_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_shortname( _("Caca"));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( _("color ASCII art video output") );
+    set_description( _("Color ASCII art video output") );
     set_capability( "video output", 12 );
     set_callbacks( Create, Destroy );
 vlc_module_end();

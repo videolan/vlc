@@ -84,6 +84,7 @@ static void Close( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-rtp-"
 
 vlc_module_begin();
+    set_shortname( _("RTP"));
     set_description( _("RTP stream output") );
     set_capability( "sout stream", 0 );
     add_shortcut( "rtp" );

@@ -149,6 +149,7 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 #endif
 
 vlc_module_begin();
+    set_shortname( _("RC"));
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
     set_description( _("Remote control interface") );

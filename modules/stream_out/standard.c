@@ -75,6 +75,7 @@ static void     Close   ( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-standard-"
 
 vlc_module_begin();
+    set_shortname( _("Standard"));
     set_description( _("Standard stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "standard" );

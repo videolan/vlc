@@ -87,6 +87,7 @@ static char *button_list[] = { "left", "middle", "right" };
 static char *button_list_text[] = { N_("Left"), N_("Middle"), N_("Right") };
 
 vlc_module_begin();
+    set_shortname( _("Gestures"));
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_integer( "gestures-threshold", 30, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, VLC_TRUE );

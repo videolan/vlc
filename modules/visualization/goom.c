@@ -67,6 +67,7 @@ static void Close        ( vlc_object_t * );
 #define MAX_SPEED 10
 
 vlc_module_begin();
+    set_shortname( _("Goom"));
     set_description( _("Goom effect") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_VISUAL );

@@ -130,13 +130,14 @@ static void Close( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-transcode-"
 
 vlc_module_begin();
+    set_shortname( _("Transcode"));
     set_description( _("Transcode stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "transcode" );
     set_callbacks( Open, Close );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );
-
+    set_section( N_("Video"), NULL );
     add_string( SOUT_CFG_PREFIX "venc", NULL, NULL, VENC_TEXT,
                 VENC_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, NULL, VCODEC_TEXT,
@@ -163,6 +164,7 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "cropright", 0, NULL, CROPRIGHT_TEXT,
                  CROPRIGHT_LONGTEXT, VLC_TRUE );
 
+    set_section( N_("Audio"), NULL );
     add_string( SOUT_CFG_PREFIX "aenc", NULL, NULL, AENC_TEXT,
                 AENC_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "acodec", NULL, NULL, ACODEC_TEXT,
@@ -173,21 +175,24 @@ vlc_module_begin();
                  ACHANS_LONGTEXT, VLC_FALSE );
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, NULL, ARATE_TEXT,
                  ARATE_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "audio-sync", 0, NULL, ASYNC_TEXT,
+              ASYNC_LONGTEXT, VLC_FALSE );
 
+    set_section( N_("Overlays/Subtitles"), NULL );
     add_string( SOUT_CFG_PREFIX "senc", NULL, NULL, SENC_TEXT,
                 SENC_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "scodec", NULL, NULL, SCODEC_TEXT,
                 SCODEC_LONGTEXT, VLC_FALSE );
     add_bool( SOUT_CFG_PREFIX "soverlay", 0, NULL, SCODEC_TEXT,
                SCODEC_LONGTEXT, VLC_FALSE );
-    add_string( SOUT_CFG_PREFIX "sfilter", NULL, NULL, SFILTER_TEXT,
-                SFILTER_LONGTEXT, VLC_FALSE );
+    add_module_list_cat( SOUT_CFG_PREFIX "sfilter", SUBCAT_VIDEO_SUBPIC,
+                     NULL, NULL,
+                     SFILTER_TEXT, SFILTER_LONGTEXT, VLC_FALSE );
 
+    set_section( N_("Miscellaneous"), NULL );
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
                  THREADS_LONGTEXT, VLC_TRUE );
 
-    add_bool( SOUT_CFG_PREFIX "audio-sync", 0, NULL, ASYNC_TEXT,
-              ASYNC_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 static const char *ppsz_sout_options[] = {

@@ -105,8 +105,6 @@ vlc_module_begin();
     set_description( _("Mosaic video sub filter") );
     set_shortname( N_("Mosaic") );
     set_capability( "sub filter", 0 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_SUBPIC );
     set_callbacks( CreateFilter, DestroyFilter );
 
     add_integer( "mosaic-alpha", 255, NULL, ALPHA_TEXT, ALPHA_LONGTEXT, VLC_FALSE );

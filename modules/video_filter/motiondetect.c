@@ -60,8 +60,6 @@ vlc_module_begin();
     set_description( _("Motion detect video filter") );
     set_shortname( N_( "Motion detect" ));
     set_capability( "video filter", 0 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_integer( "motiondetect-history", 1, NULL, HISTORY_TEXT,
                                 HISTORY_LONGTEXT, VLC_FALSE );

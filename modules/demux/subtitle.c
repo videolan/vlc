@@ -58,6 +58,7 @@ static char *ppsz_sub_type[] =
 };
 
 vlc_module_begin();
+    set_shortname( _("Subtitles"));
     set_description( _("Text subtitles demux") );
     set_capability( "demux2", 0 );
     set_category( CAT_INPUT );

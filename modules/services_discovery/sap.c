@@ -103,6 +103,7 @@
     static void CloseDemux ( vlc_object_t * );
 
 vlc_module_begin();
+    set_shortname( _("SAP"));
     set_description( _("SAP announces") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
