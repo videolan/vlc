@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_video.h,v 1.1 2003/06/26 12:19:59 sam Exp $
+ * $Id: vlc_video.h,v 1.2 2003/07/15 18:12:05 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -153,34 +153,43 @@ struct picture_heap_t
 #define V_PIXELS     p[V_PLANE].p_pixels
 #define V_PITCH      p[V_PLANE].i_pitch
 
-/*****************************************************************************
- * subpicture_t: video subtitle
- *****************************************************************************
+/**
+ * Video subtitle
+ *
  * Any subtitle destined to be displayed by a video output thread should
  * be stored in this structure from it's creation to it's effective display.
  * Subtitle type and flags should only be modified by the output thread. Note
  * that an empty subtitle MUST have its flags set to 0.
- *****************************************************************************/
+ */
 struct subpicture_t
 {
-    /* Type and flags - should NOT be modified except by the vout thread */
-    int             i_type;                                          /* type */
-    int             i_status;                                       /* flags */
-    subpicture_t *  p_next;                 /* next subtitle to be displayed */
+    /** \name Type and flags
+       Should NOT be modified except by the vout thread */
+    /**@{*/
+    int             i_type;                                        /**< type */
+    int             i_status;                                     /**< flags */
+    subpicture_t *  p_next;               /**< next subtitle to be displayed */
+    /**@}*/
 
-    /* Date properties */
-    mtime_t         i_start;                    /* beginning of display date */
-    mtime_t         i_stop;                           /* end of display date */
-    vlc_bool_t      b_ephemer;             /* does the subtitle have a TTL ? */
+    /** \name Date properties */
+    /**@{*/
+    mtime_t         i_start;                  /**< beginning of display date */
+    mtime_t         i_stop;                         /**< end of display date */
+    vlc_bool_t      b_ephemer;     /**< If this flag is set to true
+                                      the subtitle will be displayed
+                                      untill the next one appear */
+    /**@}*/
 
-    /* Display properties - these properties are only indicative and may be
+    /** \name Display properties
+     * These properties are only indicative and may be
      * changed by the video output thread, or simply ignored depending of the
      * subtitle type. */
-    int             i_x;                   /* offset from alignment position */
-    int             i_y;                   /* offset from alignment position */
-    int             i_width;                                /* picture width */
-    int             i_height;                              /* picture height */
-
+    /**@{*/
+    int             i_x;                 /**< offset from alignment position */
+    int             i_y;                 /**< offset from alignment position */
+    int             i_width;                              /**< picture width */
+    int             i_height;                            /**< picture height */
+    /**@}*/
 #if 0
     /* Additionnal properties depending of the subpicture type */
     union
@@ -198,11 +207,12 @@ struct subpicture_t
     } type;
 #endif
 
-    /* The subpicture rendering and destruction routines */
+    /** Pointer to function that renders this subtitle in a picture */
     void ( *pf_render )  ( vout_thread_t *, picture_t *, const subpicture_t * );
+    /** Pointer to function that cleans up the private data of this subtitle */
     void ( *pf_destroy ) ( subpicture_t * );
 
-    /* Private data - the subtitle plugin might want to put stuff here to
+    /** Private data - the subtitle plugin might want to put stuff here to
      * keep track of the subpicture */
     subpicture_sys_t *p_sys;                              /* subpicture data */
 };

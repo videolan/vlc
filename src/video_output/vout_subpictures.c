@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.20 2003/06/26 12:19:59 sam Exp $
+ * $Id: vout_subpictures.c,v 1.21 2003/07/15 18:12:05 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,12 +34,14 @@
 #include "vlc_video.h"
 #include "video_output.h"
 
-/*****************************************************************************
- * vout_DisplaySubPicture: display a subpicture unit
- *****************************************************************************
+/**
+ * Display a subpicture unit
+ *
  * Remove the reservation flag of a subpicture, which will cause it to be
  * ready for display.
- *****************************************************************************/
+ * \param p_vout the video output this subpicture should be displayed on
+ * \param p_subpic the subpicture to display
+ */
 void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
     int         i_margin;
@@ -69,14 +71,17 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     p_subpic->i_status = READY_SUBPICTURE;
 }
 
-/*****************************************************************************
- * vout_CreateSubPicture: allocate a subpicture in the video output heap.
- *****************************************************************************
+/**
+ * Allocate a subpicture in the video output heap.
+ *
  * This function create a reserved subpicture in the video output heap.
  * A null pointer is returned if the function fails. This method provides an
  * already allocated zone of memory in the spu data fields. It needs locking
  * since several pictures can be created by several producers threads.
- *****************************************************************************/
+ * \param p_vout the vout in which to create the subpicture
+ * \param i_type the type of the subpicture
+ * \return NULL on error, a reserved subpicture otherwise
+ */
 subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type )
 {
     int                 i_subpic;                        /* subpicture index */
@@ -125,14 +130,14 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type )
     return p_subpic;
 }
 
-/*****************************************************************************
- * vout_DestroySubPicture: remove a subpicture from the heap
- *****************************************************************************
+/**
+ * Remove a subpicture from the heap
+ *
  * This function frees a previously reserved subpicture.
  * It is meant to be used when the construction of a picture aborted.
  * This function does not need locking since reserved subpictures are ignored
  * by the output thread.
- *****************************************************************************/
+ */
 void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
     /* Get lock */
