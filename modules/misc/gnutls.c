@@ -65,6 +65,14 @@ static void Close( vlc_object_t * );
     "Allows you to modify the maximum number of resumed TLS sessions that " \
     "the cache will hold." )
 
+#define CHECK_CERT_TEXT N_("Check TLS/SSL server certificate validity")
+#define CHECK_CERT_LONGTEXT N_( \
+    "Ensures that server certificate is valid " \
+    "(ie. signed by an approved Certificate Authority)." )
+
+#define CHECK_HOSTNAME_TEXT N_("Check TLS/SSL server hostname in certificate")
+#define CHECK_HOSTNAME_LONGTEXT N_( \
+    "Ensures that server hostname in certificate match requested host name." )
 
 vlc_module_begin();
     set_description( _("GnuTLS TLS encryption layer") );
@@ -72,6 +80,13 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     set_category( CAT_ADVANCED );
     set_subcategory( SUBCAT_ADVANCED_MISC );
+
+#if 0
+    add_bool( "tls-check-cert", VLC_FALSE, NULL, CHECK_CERT_TEXT,
+              CHECK_CERT_LONGTEXT, VLC_FALSE );
+    add_bool( "tls-check-hostname", VLC_FALSE, NULL, CHECK_HOSTNAME_TEXT,
+              CHECK_HOSTNAME_LONGTEXT, VLC_FALSE );
+#endif
 
     add_integer( "dh-bits", DH_BITS, NULL, DH_BITS_TEXT,
                  DH_BITS_LONGTEXT, VLC_TRUE );
@@ -865,6 +880,8 @@ Open( vlc_object_t *p_this )
 
     if( count.i_int == 0)
     {
+        const char *psz_version;
+
         __p_gcry_data = VLC_OBJECT( p_this->p_vlc );
 
         gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
@@ -874,14 +891,19 @@ Open( vlc_object_t *p_this )
             vlc_mutex_unlock( lock.p_address );
             return VLC_EGENERIC;
         }
-        if( gnutls_check_version( "1.0.0" ) == NULL )
+        /*
+         * FIXME: in fact, we currently depends on 1.0.17, but it breaks on
+         * Debian which as a patched 1.0.16 (which we can use).
+         */
+        psz_version = gnutls_check_version( "1.0.16" );
+        if( psz_version == NULL )
         {
             gnutls_global_deinit( );
             vlc_mutex_unlock( lock.p_address );
             msg_Err( p_this, "unsupported GnuTLS version" );
             return VLC_EGENERIC;
         }
-        msg_Dbg( p_this, "GnuTLS initialized" );
+        msg_Dbg( p_this, "GnuTLS v%s initialized", psz_version );
     }
 
     count.i_int++;

@@ -1273,8 +1273,8 @@ AS_IF([test "${enable_gnutls}" != "no"], [
   AC_CHECK_HEADER(gcrypt.h,
     [AC_CHECK_LIB(gcrypt, gcry_control,
       [AC_CHECK_HEADER(gnutls/gnutls.h,
-        [AC_CHECK_LIB(gnutls, gnutls_deinit,
-	  [have_gnutls="yes"],, ${gnutls_LIBS})])],,
+        [AC_CHECK_LIB(gnutls, gnutls_certificate_verify_peers2,
+	  [have_gnutls="yes"],[old_gnutls="yes"], ${gnutls_LIBS})])],,
      ${gcrypt_LIBS})])
 
   AS_IF([test "${have_gnutls}" = "yes"], [
@@ -1282,7 +1282,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     VLC_ADD_LDFLAGS([gnutls], [-lgnutls -lgcrypt -lgpg-error])
   ], [
     AS_IF([test "${enable_gnutls}" = "yes"], [
-      AC_MSG_ERROR([gnutls/gcrypt TLS/SSL support cannot be compiled])]
+      AC_MSG_ERROR([gnutls not present or too old (version 1.0.17 required)])]
     )]
   )]
 )
