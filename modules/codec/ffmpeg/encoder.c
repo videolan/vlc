@@ -306,6 +306,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
+        int i_aspect_num, i_aspect_den;
+
         if( !p_enc->fmt_in.video.i_width || !p_enc->fmt_in.video.i_height )
         {
             msg_Warn( p_enc, "invalid size %ix%i", p_enc->fmt_in.video.i_width,
@@ -335,11 +337,14 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->b_frame_strategy = 0;
 
 #if LIBAVCODEC_BUILD >= 4687
+        av_reduce( &i_aspect_num, &i_aspect_den,
+                   p_enc->fmt_in.video.i_aspect,
+                   VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
         av_reduce( &p_context->sample_aspect_ratio.num,
                    &p_context->sample_aspect_ratio.den,
-                   p_enc->fmt_in.video.i_aspect *
+                   i_aspect_num *
                    (int64_t)p_context->height / p_context->width,
-                   VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
+                   i_aspect_den, 1 << 30 /* something big */ );
 #else
         p_context->aspect_ratio = ((float)p_enc->fmt_in.video.i_aspect) /
             VOUT_ASPECT_FACTOR;

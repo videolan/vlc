@@ -152,6 +152,11 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         return NULL; /* invalid display size */
     }
 
+#if LIBAVCODEC_BUILD >= 4723
+    p_dec->fmt_out.video.i_width >>= p_context->lowres;
+    p_dec->fmt_out.video.i_height >>= p_context->lowres;
+#endif
+
     if( !p_dec->fmt_out.i_codec )
     {
         /* we make conversion if possible*/
@@ -243,6 +248,12 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     var_Get( p_dec, "ffmpeg-vismv", &val );
 #if LIBAVCODEC_BUILD >= 4698
     if( val.i_int ) p_sys->p_context->debug_mv = val.i_int;
+#endif
+
+    var_Create( p_dec, "ffmpeg-lowres", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_dec, "ffmpeg-lowres", &val );
+#if LIBAVCODEC_BUILD >= 4723
+    if( val.i_int > 0 && val.i_int <= 2 ) p_sys->p_context->lowres = val.i_int;
 #endif
 
     /* ***** ffmpeg frame skipping ***** */

@@ -124,6 +124,10 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "2 - visualize forward predicted MVs of B frames\n" \
     "4 - visualize backward predicted MVs of B frames" )
 
+#define LOWRES_TEXT N_( "Low resolution decoding" )
+#define LOWRES_LONGTEXT N_( "Will only decode a low resolution version of " \
+    "the video." )
+
 #define LIBAVCODEC_PP_TEXT N_("ffmpeg post processing filter chains")
 /* FIXME (cut/past from ffmpeg */
 #define LIBAVCODEC_PP_LONGTEXT \

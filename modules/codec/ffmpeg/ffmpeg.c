@@ -98,6 +98,9 @@ vlc_module_begin();
         VLC_FALSE );
     add_integer ( "ffmpeg-vismv", 0, NULL, VISMV_TEXT, VISMV_LONGTEXT,
         VLC_TRUE );
+    add_integer ( "ffmpeg-lowres", 0, NULL, LOWRES_TEXT, LOWRES_LONGTEXT,
+        VLC_TRUE );
+        change_integer_range( 0, 2 );
 
 #ifdef LIBAVCODEC_PP
     add_integer( "ffmpeg-pp-q", 0, NULL, PP_Q_TEXT, PP_Q_LONGTEXT, VLC_FALSE );
@@ -270,16 +273,6 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_context )
-    {
-        if( p_sys->p_context->extradata )
-            free( p_sys->p_context->extradata );
-
-        avcodec_close( p_sys->p_context );
-        msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->psz_namecodec );
-        av_free( p_sys->p_context );
-    }
-
     switch( p_sys->i_cat )
     {
     case AUDIO_ES:
@@ -290,9 +283,19 @@ static void CloseDecoder( vlc_object_t *p_this )
         break;
     }
 
+    if( p_sys->p_context )
+    {
+        if( p_sys->p_context->extradata )
+            free( p_sys->p_context->extradata );
+
+        avcodec_close( p_sys->p_context );
+        msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->psz_namecodec );
+        av_free( p_sys->p_context );
+    }
+
     free( p_sys );
 }
-  
+
 /*****************************************************************************
  * local Functions
  *****************************************************************************/
