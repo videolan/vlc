@@ -43,7 +43,7 @@ export LDFLAGS = -L$(PREFIX)/lib
 all: .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdplay .dvbpsi .live .goom .caca .dts .mod
+	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .dts .mod
 FORCE:
 
 # ***************************************************************************
@@ -615,25 +615,6 @@ libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 CLEAN_FILE += .dvdread
 CLEAN_PKG += libdvdread
 DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.gz
-
-# ***************************************************************************
-# libdvdplay
-# ***************************************************************************
-
-libdvdplay-$(LIBDVDPLAY_VERSION).tar.gz:
-	$(WGET) $(LIBDVDPLAY_URL)
-
-libdvdplay: libdvdplay-$(LIBDVDPLAY_VERSION).tar.gz
-	$(EXTRACT_GZ)
-
-.dvdplay: libdvdplay .dvdread
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-	$(INSTALL_NAME)
-	touch $@
-
-CLEAN_FILE += .dvdplay
-CLEAN_PKG += libdvdplay
-DISTCLEAN_PKG += libdvdplay-$(LIBDVDPLAY_VERSION).tar.gz
 
 # ***************************************************************************
 # libdvdnav
