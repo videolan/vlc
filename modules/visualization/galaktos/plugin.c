@@ -206,6 +206,7 @@ static void Thread( vlc_object_t *p_this )
         msg_Err( p_thread, "out of memory" );
         return;
     }
+    vlc_object_attach( p_thread->p_opengl, p_this );
 
     p_thread->p_opengl->i_window_width = p_thread->i_width;
     p_thread->p_opengl->i_window_height = p_thread->i_height;
@@ -218,11 +219,12 @@ static void Thread( vlc_object_t *p_this )
     if( p_thread->p_module == NULL )
     {
         msg_Err( p_thread, "No OpenGL provider found" );
+        vlc_object_detach( p_thread->p_opengl );
         vlc_object_destroy( p_thread->p_opengl );
         return;
     }
 
-    vlc_object_attach( p_thread->p_opengl, p_this );
+    p_thread->p_opengl->pf_init( p_thread->p_opengl );
 
     setup_opengl( p_thread->i_width, p_thread->i_height );
     CreateRenderTarget(512, &RenderTargetTextureID, NULL);

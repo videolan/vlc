@@ -70,6 +70,7 @@
  *****************************************************************************/
 static int  CreateOpenGL ( vlc_object_t * );
 static void DestroyOpenGL( vlc_object_t * );
+static int  InitOpenGL   ( vout_thread_t * );
 static void SwapBuffers  ( vout_thread_t * );
 
 /*****************************************************************************
@@ -115,27 +116,9 @@ static int CreateOpenGL( vlc_object_t *p_this )
     }
 
     /* Set the function pointer */
+    p_vout->pf_init = InitOpenGL;
     p_vout->pf_swap = SwapBuffers;
     p_vout->p_sys->b_glx13 = b_glx13;
-
-    /* Initialize GLX */
-    if( !b_glx13 )
-    {
-        if( InitGLX12( p_vout ) != VLC_SUCCESS )
-        {
-            return VLC_EGENERIC;
-        }
-    }
-    else
-    {
-        if( InitGLX13( p_vout ) != VLC_SUCCESS )
-        {
-            return VLC_EGENERIC;
-        }
-    }
-
-    /* Set the OpenGL context _for the current thread_ */
-    SwitchContext( p_vout );
 
     return VLC_SUCCESS;
 }
@@ -208,6 +191,33 @@ static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
     }
 
     XCloseDisplay( p_display );
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * InitOpenGL: initializes OpenGL provider
+ *****************************************************************************/
+static int InitOpenGL( vout_thread_t *p_vout )
+{
+    /* Initialize GLX */
+    if( !p_vout->p_sys->b_glx13 )
+    {
+        if( InitGLX12( p_vout ) != VLC_SUCCESS )
+        {
+            return VLC_EGENERIC;
+        }
+    }
+    else
+    {
+        if( InitGLX13( p_vout ) != VLC_SUCCESS )
+        {
+            return VLC_EGENERIC;
+        }
+    }
+
+    /* Set the OpenGL context _for the current thread_ */
+    SwitchContext( p_vout );
+
     return VLC_SUCCESS;
 }
 

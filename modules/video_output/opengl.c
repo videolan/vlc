@@ -122,6 +122,7 @@ static int CreateVout( vlc_object_t *p_this )
         msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
     }
+    vlc_object_attach( p_sys->p_vout, p_this );
 
     p_sys->p_vout->i_window_width = p_vout->i_window_width;
     p_sys->p_vout->i_window_height = p_vout->i_window_height;
@@ -136,10 +137,10 @@ static int CreateVout( vlc_object_t *p_this )
     if( p_sys->p_vout->p_module == NULL )
     {
         msg_Err( p_vout, "No OpenGL provider found" );
+        vlc_object_detach( p_sys->p_vout );
         vlc_object_destroy( p_sys->p_vout );
         return VLC_ENOOBJ;
     }
-    vlc_object_attach( p_sys->p_vout, p_this );
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -157,6 +158,8 @@ static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_pixel_pitch;
+
+    p_sys->p_vout->pf_init( p_sys->p_vout );
 
     /* No YUV textures :( */
 
