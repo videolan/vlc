@@ -104,6 +104,7 @@ HEADERS_include = \
 	include/vlc_keys.h \
 	include/vlc_messages.h \
 	include/vlc_meta.h \
+	include/vlc_vlm.h \
 	include/vlc_objects.h \
 	include/vlc_playlist.h \
 	include/vlc_threads.h \
