@@ -1364,7 +1364,7 @@ msgstr ""
 
 #: src/libvlc.h:295
 msgid "Time to live"
-msgstr "Hora para emisión en directo"
+msgstr "Tiempo de vida"
 
 #: src/libvlc.h:297
 msgid ""
