@@ -414,6 +414,11 @@ udpstream://@:1234
 	  <width>54</width>
 	  <height>24</height>
 	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_buttonSave_clicked</handler>
+	    <last_modification_time>Tue, 01 Oct 2002 21:12:20 GMT</last_modification_time>
+	  </signal>
 	  <label>Save</label>
 	  <relief>GTK_RELIEF_NORMAL</relief>
 	</widget>
@@ -426,6 +431,11 @@ udpstream://@:1234
 	  <width>54</width>
 	  <height>24</height>
 	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_buttonApply_clicked</handler>
+	    <last_modification_time>Tue, 01 Oct 2002 21:12:27 GMT</last_modification_time>
+	  </signal>
 	  <label>Apply</label>
 	  <relief>GTK_RELIEF_NORMAL</relief>
 	</widget>
@@ -438,6 +448,11 @@ udpstream://@:1234
 	  <width>54</width>
 	  <height>24</height>
 	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_buttonCancel_clicked</handler>
+	    <last_modification_time>Tue, 01 Oct 2002 21:12:35 GMT</last_modification_time>
+	  </signal>
 	  <label>Cancel</label>
 	  <relief>GTK_RELIEF_NORMAL</relief>
 	</widget>

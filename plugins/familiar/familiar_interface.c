@@ -498,6 +498,15 @@ create_familiar (void)
   gtk_signal_connect (GTK_OBJECT (clistmedia), "enter_notify_event",
                       GTK_SIGNAL_FUNC (on_clistmedia_enter_notify_event),
                       NULL);
+  gtk_signal_connect (GTK_OBJECT (buttonSave), "clicked",
+                      GTK_SIGNAL_FUNC (on_buttonSave_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (buttonApply), "clicked",
+                      GTK_SIGNAL_FUNC (on_buttonApply_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (buttonCancel), "clicked",
+                      GTK_SIGNAL_FUNC (on_buttonCancel_clicked),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (cbautoplay), "toggled",
                       GTK_SIGNAL_FUNC (on_cbautoplay_toggled),
                       NULL);

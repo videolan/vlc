@@ -1,8 +1,8 @@
 /*****************************************************************************
- * callbacks.h : familiar plugin for vlc
+ * familiar_callbacks.h : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar_callbacks.h,v 1.7.2.3 2002/10/01 19:46:47 jpsaman Exp $
+ * $Id: familiar_callbacks.h,v 1.7.2.4 2002/10/01 21:17:52 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -99,4 +99,16 @@ on_clistmedia_end_selection            (GtkCList        *clist,
 gboolean
 on_clistmedia_enter_notify_event       (GtkWidget       *widget,
                                         GdkEventCrossing *event,
+                                        gpointer         user_data);
+
+void
+on_buttonSave_clicked                  (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_buttonApply_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_buttonCancel_clicked                (GtkButton       *button,
                                         gpointer         user_data);

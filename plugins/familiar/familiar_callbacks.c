@@ -1,8 +1,8 @@
 /*****************************************************************************
- * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
+ * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.3 2002/10/01 19:46:47 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.4 2002/10/01 21:17:52 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -99,32 +99,23 @@ void * __GtkGetIntf( GtkWidget * widget )
  ****************************************************************************/
 static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 {
-    intf_thread_t *p_intf = GtkGetIntf( widget );
+//    intf_thread_t *p_intf = GtkGetIntf( widget );
+    int            i_end = p_main->p_playlist->i_size;
 
     intf_ErrMsg( "@@@ MediaURLOpenChanged" );
-    g_print( "%s\n",psz_url );
-    if( p_intf->p_sys->p_input != NULL )
+    // Add p_url to playlist .... but how ?
+    if( p_main->p_playlist )
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
-        p_main->p_playlist->b_stopped = 0;
+       intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)psz_url );
     }
-    else
+
+    /* end current item, select added item  */
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-        if( p_main->p_playlist->b_stopped )
-        {
-            if( p_main->p_playlist->i_size )
-            {
-                vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-                intf_PlaylistJumpto( p_main->p_playlist,
-                                     p_main->p_playlist->i_index );
-            }
-        }
-        else
-        {
-            vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-        }
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
+
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
 }
 
 /*****************************************************************
@@ -137,7 +128,6 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
     int n=-1;
     int status=-1;
 
-    intf_ErrMsg( "@@@ ReadDirectory - Enter" );
     if (psz_dir)
     {
        status = chdir(psz_dir);
@@ -156,7 +146,6 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
 
         gtk_clist_freeze( p_intf->p_sys->p_clist );
         gtk_clist_clear( p_intf->p_sys->p_clist );
-        g_print( "dir entries: %d\n",n );
         for (i=0; i<n; i++)
         {
             /* This is a list of strings. */
@@ -170,7 +159,6 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
         gtk_clist_thaw( p_intf->p_sys->p_clist );
         free(namelist);
     }
-    intf_ErrMsg( "@@@ ReadDirectory - Exit" );
 }
 
 static char* get_file_perm(const char *path)
@@ -531,5 +519,40 @@ on_clistmedia_enter_notify_event       (GtkWidget       *widget,
 {
   g_print( ">>>>enter_notify_event\n" );
   return FALSE;
+}
+
+
+void
+on_buttonSave_clicked                  (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    on_buttonApply_clicked( button, user_data );
+    config_SaveConfigFile( NULL );
+}
+
+
+void
+on_buttonApply_clicked                 (GtkButton       *button,
+                                        gpointer         user_data)
+{
+//    GHashTable *hash_table;
+//    GtkWidget *apply_button;
+//
+//    hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
+//                                                    "config_hash_table" );
+//    g_hash_table_foreach_remove( hash_table, GtkSaveHashValue, NULL );
+//
+//    /* change the highlight status of the Apply button */
+//    apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
+//                                                    "apply_button" );
+//    gtk_widget_set_sensitive( apply_button, FALSE );
+}
+
+
+void
+on_buttonCancel_clicked                (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    //gtk_widget_destroy( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
