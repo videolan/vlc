@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.47 2003/11/01 10:07:08 sam Exp $
+##  $Id: toolbox,v 1.48 2003/11/04 15:26:04 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -596,14 +596,13 @@ then
   #                  libdvdplay0-dev (>=1.0.1-2) with libdvdplay0-dev
   #                  libxosd-dev (>=2.2.4-1.3) with libxosd-dev
   #                  ttf-freefonts with ttf-thryomanes
-  #                  linux-kernel-headers (>= 2.5.999-test7-bk-5) with dvb-dev
+  #                  dvb-dev (>= 1.0.1-6) with dvb-dev
   #          remove libwxgtk2.4-dev
   #                 libflac-dev
   #                 libidl0 (workaround for mozilla-dev's bad deps)
   #                 libglib2.0-0 (workaround for mozilla-dev's bad deps)
   #                 libmatroska-dev
   #                 libspeex-dev
-  #                 dvb-dev (in build-conflicts)
   #          change Source: vlc with Source: vlc-woody
   #                 Section: gnome with Section: graphics
   #                 Section: kde with Section: kde
@@ -618,7 +617,7 @@ then
       -e 's/, libdvdplay0-dev[^,]*/, libdvdplay0-dev/' \
       -e 's/, libxosd-dev[^,]*/, libxosd-dev/' \
       -e 's/, ttf-freefonts[^,]*/, ttf-thryomanes/' \
-      -e 's/, linux-kernel-headers[^,]*/, dvb-dev/' \
+      -e 's/, dvb-dev[^,]*/, dvb-dev/' \
       -e 's/, libwx[^,]*//' \
       -e '/Package: wxvlc/,/^ *$/d' \
       -e 's/, libflac-dev[^,]*//' \
@@ -626,7 +625,6 @@ then
       -e 's/, libglib2.0-0[^,]*//' \
       -e 's/, libmatroska-dev[^,]*//' \
       -e 's/, libspeex-dev[^,]*//' \
-      -e 's/\(Build-Conflicts: .*\), dvb-dev/\1/' \
       -e 's/Source: vlc/Source: vlc-woody/' \
       -e 's/Section: gnome/Section: graphics/' \
       -e 's/Section: kde/Section: graphics/' \

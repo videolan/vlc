@@ -1,3 +1,10 @@
+vlc (XXX) unstable; urgency=low
+
+  * debian/control:
+    + Build-depend on fixed dvb-dev packages.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  XXX
+
 vlc (0.6.2+cvs20031030-2) unstable; urgency=low
 
   * debian/control:
