@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.16 2002/07/23 20:32:55 massiot Exp $
+ * $Id: http.c,v 1.17 2002/07/24 18:31:24 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -120,6 +120,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     module_t *          p_network;
     char                psz_buffer[256];
     byte_t *            psz_parser;
+    int                 i_returncode, i;
+    char *              psz_return_alpha;
 
     /* Find an appropriate network module */
     p_network = module_Need( p_input, MODULE_CAPABILITY_NETWORK,
@@ -178,6 +180,42 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 
     /* Parse HTTP header. */
 #define MAX_LINE 1024
+
+    /* get the returncode */
+    if( input_Peek( p_input, &psz_parser, MAX_LINE ) <= 0 )
+    {
+        msg_Err( p_input, "not enough data" );
+        input_FDNetworkClose( p_input );
+        return( -1 );
+    }
+
+    if( !strncmp( psz_parser, "HTTP/1.",
+                  strlen("HTTP/1.") ) )
+    {
+        psz_parser += strlen("HTTP 1.") + 2;
+        i_returncode = atoi( psz_parser );
+        msg_Dbg( p_input, "HTTP server replied: %i", i_returncode );
+        psz_parser += 4;
+        for ( i = 0; psz_parser[i] != '\r' || psz_parser[i+1] != '\n'; i++ )
+        {
+            ;
+        }
+        psz_return_alpha = malloc( i + 1 );
+        memcpy( psz_return_alpha, psz_parser, i );
+        psz_return_alpha[i] = '\0';
+    }
+    else
+    {
+        msg_Err( p_input, "http error: invalid http reply" );
+        return -1;
+    }
+    
+    if ( i_returncode >= 400 ) /* something is wrong */
+    {
+        msg_Err( p_input, "%i %s", i_returncode,
+                 psz_return_alpha );
+        return -1;
+    }
     for( ; ; ) 
     {
         if( input_Peek( p_input, &psz_parser, MAX_LINE ) <= 0 )
