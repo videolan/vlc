@@ -4,6 +4,12 @@
 
 HEAD
 
+  * ./plugins/macosx/intf_vlc_wrapper.m: fix for non-ASCII filenames in the
+    MacOS X interface, courtesy of Watanabe Go <go@dsl.gr.jp>.
+  * ./plugins/chroma/i420_yuy2.h: fixed an old overflow bug spotted by
+    Rudolf Cornelissen.
+  * ./plugins/chroma/i420_rgb16.c: fix for skewed display in software RV32
+    mode, courtesy of Pascal Levesque.
   * ./plugins/beos/InterfaceWindow.h: stopped more than one playlist being
     opened.
   * ./plugins/beos/InterfaceWindow.cpp: fixed segfault on exit with playlist
