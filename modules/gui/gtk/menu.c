@@ -200,7 +200,7 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
     {                                                                       \
         int i_program_id = (ptrdiff_t)user_data;                            \
                                                                             \
-        input_ChangeProgram( p_intf->p_sys->p_input, i_program_id );        \
+        var_SetInteger( p_intf->p_sys->p_input, "program", i_program_id );  \
                                                                             \
         p_intf->p_sys->b_program_update = VLC_TRUE;                         \
                                                                             \
