@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.74 2003/06/17 21:52:19 asmax Exp $
+ * $Id: libvlc.h,v 1.75 2003/06/20 15:34:51 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -450,8 +450,8 @@ vlc_module_begin();
     add_string_from_list( "language", "auto", ppsz_language, NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT, VLC_FALSE );
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT, VLC_FALSE );
-    add_string( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT, VLC_TRUE );
-    add_string( "plugin-path", NULL, NULL,
+    add_directory( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT, VLC_TRUE );
+    add_directory( "plugin-path", NULL, NULL,
                 PLUGIN_PATH_TEXT, PLUGIN_PATH_LONGTEXT, VLC_TRUE );
 
     /* Audio options */
