@@ -2,7 +2,7 @@
  * mms.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.h,v 1.3 2002/11/13 20:28:13 fenrir Exp $
+ * $Id: mms.h,v 1.4 2002/11/25 00:22:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -26,9 +26,13 @@ typedef struct url_s
 {
     char    *psz_server_addr;
     int     i_server_port;
+
+    char    *psz_bind_addr;
+    int     i_bind_port;
+    
     char    *psz_path;
 
-    // private
+    /* private */
     char *psz_private;
 } url_t;
 
@@ -39,10 +43,11 @@ typedef struct url_s
 #define MMS_PROTO_TCP   1
 #define MMS_PROTO_UDP   2
 
-#define MMS_PACKET_CMD          0
-#define MMS_PACKET_HEADER       1
-#define MMS_PACKET_MEDIA        2
-#define MMS_PACKET_UDP_TIMING    3
+#define MMS_PACKET_ANY          0
+#define MMS_PACKET_CMD          1
+#define MMS_PACKET_HEADER       2
+#define MMS_PACKET_MEDIA        3
+#define MMS_PACKET_UDP_TIMING   4
     
 
 #define MMS_STREAM_VIDEO    0x0001
@@ -54,27 +59,34 @@ typedef struct url_s
 
 typedef struct mms_stream_s
 {
-    int i_id;       // 1 -> 127
-    int i_cat;      // MMS_STREAM_VIDEO, MMS_STREAM_AUDIO
-    int i_bitrate;  // -1 if unknown
+    int i_id;       /* 1 -> 127 */
+    int i_cat;      /* MMS_STREAM_VIDEO, MMS_STREAM_AUDIO */
+    int i_bitrate;  /* -1 if unknown */
     int i_selected;
     
 } mms_stream_t;
 
-    
+#define MMS_BUFFER_SIZE 100000
 typedef struct access_s
 {
-    int                 i_proto;        // MMS_PROTO_TCP, MMS_PROTO_UDP
-    input_socket_t      socket_server;  // TCP socket for communication with server
-    input_socket_t      socket_data;    // Optional UDP socket for data(media/header packet) 
-                                        // send by server
+    int                 i_proto;        /* MMS_PROTO_TCP, MMS_PROTO_UDP */
+    input_socket_t      socket_tcp;     /* TCP socket for communication with server */
+    input_socket_t      socket_udp;     /* Optional UDP socket for data(media/header packet) */
+                                        /* send by server */
 
-    url_t   url;                        // connect to this server
+    url_t   url;                        /* connect to this server */
     
-    mms_stream_t        stream[128];    //in asf never more than 1->127 streams
+    mms_stream_t        stream[128];    /* in asf never more than 1->127 streams */
     
-    off_t               i_pos;          // position of next byte to be read
+    off_t               i_pos;          /* position of next byte to be read */
     
+    /* */
+    uint8_t             buffer_tcp[MMS_BUFFER_SIZE];
+    int                 i_buffer_tcp;
+    
+    uint8_t             buffer_udp[MMS_BUFFER_SIZE];
+    int                 i_buffer_udp;
+
     /* data necessary to send data to server */
     guid_t      guid;
     int         i_command_level;
@@ -84,26 +96,26 @@ typedef struct access_s
 
     int         i_packet_seq_num;
     
-    uint8_t     *p_cmd; // latest command read
-    int         i_cmd;  // allocated at the begining
+    uint8_t     *p_cmd;     /* latest command read */
+    int         i_cmd;      /* allocated at the begining */
 
-    uint8_t     *p_header; // allocated by mms_ReadPacket
+    uint8_t     *p_header;  /* allocated by mms_ReadPacket */
     int         i_header;
     
-    uint8_t     *p_media;  // allocated by mms_ReadPacket
+    uint8_t     *p_media;   /* allocated by mms_ReadPacket */
     int         i_media;
     int         i_media_used;
     
-    // extracted informations
+    /* extracted informations */
     int         i_command;
 
-    // from 0x01 answer (not yet set)
+    /* from 0x01 answer (not yet set) */
     char        *psz_server_version;
     char        *psz_tool_version;
     char        *psz_update_player_url;
     char        *psz_encryption_type;
 
-    // from 0x06 answer
+    /* from 0x06 answer */
     uint32_t    i_flags_broadcast;
     uint32_t    i_media_length;
     int         i_packet_length;

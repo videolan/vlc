@@ -2,7 +2,7 @@
  * buffer.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: buffer.h,v 1.1 2002/11/22 18:35:57 sam Exp $
+ * $Id: buffer.h,v 1.2 2002/11/25 00:22:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -50,7 +50,7 @@ uint8_t   var_buffer_get8 ( var_buffer_t *p_buf );
 uint16_t  var_buffer_get16( var_buffer_t *p_buf );
 uint32_t  var_buffer_get32( var_buffer_t *p_buf );
 uint64_t  var_buffer_get64( var_buffer_t *p_buf );
-int       var_buffer_getmemory ( var_buffer_t *p_buf, void *p_mem, int i_mem );
+int       var_buffer_getmemory ( var_buffer_t *p_buf, void *p_mem, int64_t i_mem );
 int       var_buffer_readempty( var_buffer_t *p_buf );
 void      var_buffer_getguid( var_buffer_t *p_buf, guid_t *p_guid );
 
