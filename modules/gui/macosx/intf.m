@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.101 2003/11/15 22:42:16 hartman Exp $
+ * $Id: intf.m,v 1.102 2003/11/20 14:39:31 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -698,7 +698,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         if( p_vout != NULL )
         {
             id o_vout_wnd;
-            NSEnumerator * o_enum = [[NSApp windows] objectEnumerator];
+            NSEnumerator * o_enum = [[NSApp orderedWindows] objectEnumerator];
             
             while( ( o_vout_wnd = [o_enum nextObject] ) )
             {

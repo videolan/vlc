@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.55 2003/11/19 19:00:16 bigben Exp $
+ * $Id: controls.m,v 1.56 2003/11/20 14:39:30 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -331,7 +331,7 @@
 {
     id o_window = [NSApp keyWindow];
     NSString *o_title = [sender title];
-    NSArray *o_windows = [NSApp windows];
+    NSArray *o_windows = [NSApp orderedWindows];
     NSEnumerator *o_enumerator = [o_windows objectEnumerator];
     vout_thread_t   *p_vout = vlc_object_find( [NSApp getIntf], VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
@@ -707,7 +707,7 @@
                 [[o_mi title] isEqualToString: _NS("Float On Top")] )
     {
         id o_window;
-        NSArray *o_windows = [NSApp windows];
+        NSArray *o_windows = [NSApp orderedWindows];
         NSEnumerator *o_enumerator = [o_windows objectEnumerator];
         bEnabled = FALSE;
         
