@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.18 2003/02/01 23:46:24 massiot Exp $
+ * $Id: open.m,v 1.19 2003/02/05 02:31:27 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -288,7 +288,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_tabview selectTabViewItemAtIndex: i_type];
     [o_ckbox_enqueue setState: NSOffState];
     [o_file_sub_path setStringValue: @""];
-    [o_file_sub_ckbox setState: NSOffState];
+    [o_file_sub_ckbox setState: NSOnState];
     [o_file_sub_path setEnabled: NO];
     [o_file_sub_btn_browse setEnabled: NO];
     
@@ -872,3 +872,31 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 }
 
 @end
+
+@implementation VLGetURLScriptCommand
+
+- (id)performDefaultImplementation {
+    NSString *command = [[self commandDescription] commandName];
+    NSString *urlString = [self directParameter];
+
+    if ( [command isEqualToString:@"GetURL"] )
+    {
+        intf_thread_t * p_intf = [NSApp getIntf];
+
+        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                        FIND_ANYWHERE );
+        if( p_playlist == NULL )
+        {
+            return nil;
+        }
+
+        [p_playlist appendArray: 
+            [NSArray arrayWithObject: urlString] atPos: -1 enqueue:NO];
+        
+        vlc_object_release( p_playlist );
+    }
+    return nil;
+}
+
+@end
+
