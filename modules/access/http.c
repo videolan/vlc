@@ -227,7 +227,21 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_remaining = 0;
 
     /* Parse URI */
-    ParseURL( p_sys, p_access->psz_path );
+    if( vlc_UrlIsNotEncoded( p_access->psz_path ) )
+    {
+        psz = vlc_UrlEncode( p_access->psz_path );
+        if( psz == NULL )
+        {
+            free( p_sys );
+            return VLC_ENOMEM;
+        }
+
+        ParseURL( p_sys, psz );
+        free( psz );
+    }
+    else
+        ParseURL( p_sys, p_access->psz_path );
+
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
         msg_Warn( p_access, "invalid host" );

@@ -1,11 +1,12 @@
 /*****************************************************************************
  * network.h: interface to communicate with network plug-ins
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
+ *          Rémi Denis-Courmont <courmisch # via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -165,6 +166,71 @@ static inline void vlc_UrlClean( vlc_url_t *url )
     url->i_port       = 0;
     url->psz_path     = NULL;
     url->psz_option   = NULL;
+}
+
+/*****************************************************************************
+ * vlc_UrlEncode: 
+ *****************************************************************************
+ * perform URL encoding
+ * (you do NOT want to do URL decoding - it is not reversible - do NOT do it)
+ *****************************************************************************/
+static inline char *vlc_UrlEncode( const char *psz_url )
+{
+    char *psz_enc, *out;
+    const char *in;
+
+    psz_enc = (char *)malloc( 3 * strlen( psz_url ) + 1 );
+    if( psz_enc == NULL )
+        return NULL;
+
+    out = psz_enc;
+    for( in = psz_url; *in; in++ )
+    {
+        char c = *in;
+
+        if( ( c <= 32 ) || ( c == '%' ) || ( c == '?' ) || ( c == '&' )
+         || ( c == '+' ) )
+        {
+            *out++ = '%';   
+            *out++ = ( ( c >> 4 ) >= 0xA ) ? 'A' + ( c >> 4 ) - 0xA
+                                           : '0' + ( c >> 4 );
+            *out++ = ( ( c & 0xf ) >= 0xA ) ? 'A' + ( c & 0xf ) - 0xA
+                                           : '0' + ( c & 0xf );
+        }
+        else
+            *out++ = c;
+    }
+    *out++ = '\0';
+
+    return (char *)realloc( psz_enc, out - psz_enc );
+}
+
+/*****************************************************************************
+ * vlc_UrlIsNotEncoded:
+ *****************************************************************************
+ * check if given string is not a valid URL and must hence be encoded
+ *****************************************************************************/
+#include <ctype.h>
+
+static inline int vlc_UrlIsNotEncoded( const char *psz_url )
+{
+    const char *ptr;
+
+    for( ptr = psz_url; *ptr; ptr++ )
+    {
+        char c = *ptr;
+
+        if( c == '%' )
+        {
+            if( !isxdigit( ptr[1] ) || !isxdigit( ptr[2] ) )
+                return 1; /* not encoded */
+            ptr += 2;
+        }
+        else
+        if( c == ' ' )
+            return 1;
+    }
+    return 0; /* looks fine - but maybe it is not encoded */
 }
                     
 /*****************************************************************************
