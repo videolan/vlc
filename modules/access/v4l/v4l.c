@@ -137,6 +137,11 @@ static void Close( vlc_object_t * );
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
     "(-1 for auto)" )
 
+static int i_norm_list[] =
+    { VIDEO_MODE_AUTO, VIDEO_MODE_SECAM, VIDEO_MODE_PAL, VIDEO_MODE_NTSC };
+static char *psz_norm_list_text[] =
+    { N_("Automatic"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
+
 vlc_module_begin();
     set_shortname( _("Video4Linux") );
     set_description( _("Video4Linux input") );
@@ -159,6 +164,7 @@ vlc_module_begin();
     add_integer( "v4l-tuner", -1, NULL, TUNER_TEXT, TUNER_LONGTEXT, VLC_TRUE );
     add_integer( "v4l-norm", VIDEO_MODE_AUTO, NULL, NORM_TEXT, NORM_LONGTEXT,
                 VLC_FALSE );
+        change_integer_list( i_norm_list, psz_norm_list_text, 0 );
     add_integer( "v4l-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
                 VLC_FALSE );
     add_integer( "v4l-audio", -1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, VLC_TRUE );
@@ -308,6 +314,7 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
+    vlc_value_t val;
 
     /* Only when selected */
     if( *p_demux->psz_access == '\0' )
@@ -322,25 +329,79 @@ static int Open( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
-    p_sys->i_audio          = -1;
-    p_sys->i_norm           = VIDEO_MODE_AUTO;    // auto
-    p_sys->i_tuner          = -1;
-    p_sys->i_frequency      = -1;
+    var_Create( p_demux, "v4l-audio", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-audio", &val );
+    p_sys->i_audio          = val.i_int;
 
-    p_sys->f_fps            = -1.0;
+    var_Create( p_demux, "v4l-channel", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-channel", &val );
+    p_sys->i_channel        = val.i_int;
+
+    var_Create( p_demux, "v4l-norm", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-norm", &val );
+    p_sys->i_norm           = val.i_int;
+
+    var_Create( p_demux, "v4l-tuner", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-tuner", &val );
+    p_sys->i_tuner          = val.i_int;
+
+    var_Create( p_demux, "v4l-frequency",
+                                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-frequency", &val );
+    p_sys->i_frequency      = val.i_int;
+
+    var_Create( p_demux, "v4l-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-fps", &val );
+    p_sys->f_fps            = val.f_float;
+
+    var_Create( p_demux, "v4l-width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-width", &val );
+    p_sys->i_width          = val.i_int;
+
+    var_Create( p_demux, "v4l-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-height", &val );
+    p_sys->i_width          = val.i_int;
+
     p_sys->i_video_pts      = -1;
 
-    p_sys->i_brightness     = -1;
+    var_Create( p_demux, "v4l-brightness", VLC_VAR_INTEGER |
+                                                        VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-brighness", &val );
+    p_sys->i_brightness     = val.i_int;
+
+    var_Create( p_demux, "v4l-hue", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-hue", &val );
     p_sys->i_hue            = -1;
-    p_sys->i_colour         = -1;
-    p_sys->i_contrast       = -1;
 
-    p_sys->b_mjpeg     = VLC_FALSE;
-    p_sys->i_decimation = 1;
-    p_sys->i_quality = 100;
+    var_Create( p_demux, "v4l-colour", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-colour", &val );
+    p_sys->i_colour         = val.i_int;
 
-    p_sys->i_sample_rate  = 44100;
-    p_sys->b_stereo       = VLC_TRUE;
+    var_Create( p_demux, "v4l-contrast", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-contrast", &val );
+    p_sys->i_contrast       = val.i_int;
+
+    var_Create( p_demux, "v4l-mjpeg", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-mjpeg", &val );
+    p_sys->b_mjpeg     = val.b_bool;
+
+    var_Create( p_demux, "v4l-decimation", VLC_VAR_INTEGER |
+                                                            VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-decimation", &val );
+    p_sys->i_decimation = val.i_int;
+
+    var_Create( p_demux, "v4l-quality", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-quality", &val );
+    p_sys->i_quality = val.i_int;
+
+    var_Create( p_demux, "v4l-samplerate",
+                                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-samplerate", &val );
+    p_sys->i_sample_rate  = val.i_int;
+
+    var_Create( p_demux, "v4l-stereo", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "v4l-stereo", &val );
+    p_sys->b_stereo       = val.b_bool;
 
     p_sys->psz_device = p_sys->psz_vdev = p_sys->psz_adev = NULL;
     p_sys->fd_video = -1;
