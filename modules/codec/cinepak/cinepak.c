@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.7 2002/11/27 13:17:27 fenrir Exp $
+ * $Id: cinepak.c,v 1.8 2002/11/27 15:18:24 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -392,13 +392,13 @@ void cinepak_Getv1( cinepak_context_t *p_context,
         for( j = 0; j < 2; j ++ )
         {
             PIX_SET_Y( 2*j + 0, 2*i + 0, 
-                       p_context->codebook_v1[i_strip][i_index].i_y[0] );
+                       p_context->codebook_v1[i_strip][i_index].i_y[2*i+j] );
             PIX_SET_Y( 2*j + 1, 2*i + 0, 
-                       p_context->codebook_v1[i_strip][i_index].i_y[1] );
+                       p_context->codebook_v1[i_strip][i_index].i_y[2*i+j] );
             PIX_SET_Y( 2*j + 0, 2*i + 1, 
-                       p_context->codebook_v1[i_strip][i_index].i_y[2] );
+                       p_context->codebook_v1[i_strip][i_index].i_y[2*i+j] );
             PIX_SET_Y( 2*j + 1, 2*i + 1, 
-                       p_context->codebook_v1[i_strip][i_index].i_y[3] );
+                       p_context->codebook_v1[i_strip][i_index].i_y[2*i+j] );
 
             PIX_SET_UV( 1,p_dst_u, j, i, 
                         p_context->codebook_v1[i_strip][i_index].i_u );
