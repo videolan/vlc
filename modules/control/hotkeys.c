@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.5 2003/10/30 22:34:48 hartman Exp $
+ * $Id: hotkeys.c,v 1.6 2003/10/30 23:17:59 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -271,32 +271,32 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC )
             {
-                Feedback( p_intf, _( "Jump -10 seconds" ) );
+                vout_OSDMessage( p_intf, _( "Jump -10 seconds" ) );
                 input_Seek( p_input, -10, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_10SEC )
             {
-                Feedback( p_intf, _( "Jump +10 seconds" ) );
+                vout_OSDMessage( p_intf, _( "Jump +10 seconds" ) );
                 input_Seek( p_input, 10, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN )
             {
-                Feedback( p_intf, _( "Jump -1 minute" ) );
+                vout_OSDMessage( p_intf, _( "Jump -1 minute" ) );
                 input_Seek( p_input, -60, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_1MIN )
             {
-                Feedback( p_intf, _( "Jump +1 minute" ) );
+                vout_OSDMessage( p_intf, _( "Jump +1 minute" ) );
                 input_Seek( p_input, 60, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN )
             {
-                Feedback( p_intf, _( "Jump -5 minutes" ) );
+                vout_OSDMessage( p_intf, _( "Jump -5 minutes" ) );
                 input_Seek( p_input, -300, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_5MIN )
             {
-                Feedback( p_intf, _( "Jump +5 minutes" ) );
+                vout_OSDMessage( p_intf, _( "Jump +5 minutes" ) );
                 input_Seek( p_input, 300, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
             }
             else if( i_action == ACTIONID_NEXT )
