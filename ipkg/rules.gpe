@@ -82,7 +82,10 @@ install: build
 	cp share/vlc48x48.png  ${PKGDIR}/usr/share/videolan
 	cp vlc $(PKGDIR)/usr/bin
 	cp ipkg/vlc.gpe ${PKGDIR}/usr/lib/menu/vlc
-#	cp plugins/*.so ${PKGDIR}/usr/lib/videolan/vlc
+
+install-plugins: install
+	cp plugins/*.so ${PKGDIR}/usr/lib/videolan/vlc
+	$(STRIP) ${PKGDIR}/usr/lib/videolan/vlc
 
 .PHONY: build clean install
 

@@ -48,6 +48,8 @@ AC_MSG_RESULT(not implemented yet)
 dnl Find the right ranlib, even when cross-compiling
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(STRIP, strip, :)
+AC_CHECK_TOOL(AR, ar, :)
+AC_CHECK_TOOL(LD, ld, :)
 
 dnl
 dnl Gettext stuff
@@ -874,7 +876,7 @@ dnl  DVD module: optionally check for installed libdvdcss
 dnl
 AC_ARG_ENABLE(dvd,
 [  --enable-dvd            DVD input module (default enabled)])
-if test "x${enable_dvd}" != "xno"
+if test "x${enable_dvd}" != "xno" -a "x${enable_dvd}" != "x"
 then
   AC_ARG_WITH(dvdcss,
   [    --with-dvdcss=PATH    libdvdcss headers and libraries])
@@ -1774,9 +1776,9 @@ then
   if test "x${SDL_CONFIG}" != "xno"
   then
     PLUGINS="${PLUGINS} vout_sdl aout_sdl"
-    CFLAGS_vout_sdl="${CFLAGS_vout_sdl} `${SDL_CONFIG} --cflags`"
+    CFLAGS_vout_sdl="${CFLAGS_vout_sdl} `${SDL_CONFIG} --cflags | sed 's,SDL,,'`"
     LDFLAGS_vout_sdl="${LDFLAGS_vout_sdl} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
-    CFLAGS_aout_sdl="${CFLAGS_aout_sdl} `${SDL_CONFIG} --cflags`"
+    CFLAGS_aout_sdl="${CFLAGS_aout_sdl} `${SDL_CONFIG} --cflags | sed 's,SDL,,'`"
     LDFLAGS_aout_sdl="${LDFLAGS_aout_sdl} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_vout_sdl}"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
@@ -1806,31 +1808,31 @@ dnl  (disabled by default)
 dnl
 AC_ARG_ENABLE(qte,
   [  --enable-qte            QT Embedded support (default disabled)])
-if test "x${enable_qte}" != "xno"
+if test "x${enable_qte}" = "xyes"
 then
   AC_ARG_WITH(qte,
-  [    --with-qte=PATH    Qt Embedded headers and libraries])
-  if test "x${with_qte}" = "x"
+  [    --with-qte=PATH       Qt Embedded headers and libraries])
+  if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
   then
-    LDFLAGS_test="-L${QTDIR}/lib"
-    CPPFLAGS_test="-I${QTDIR}/include"
+    LDFLAGS_qte="${LDFLAGS_qte} -L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte"
+    CFLAGS_qte="${CFLAGS_qte} -I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
   else
-    LDFLAGS_test="-L${with_qte}/lib"
-    CPPFLAGS_test="-I${with_qte}/include"
+    LDFLAGS_qte="${LDFLAGS_qte} -L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte"
+    CFLAGS_qte="${CFLAGS_qte} -I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
   fi
-
-  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
-  AC_CHECK_HEADERS(qt.h, [
-    CPPFLAGS_qte="${CPPFLAGS_qte} ${CPPFLAGS_test} -DQT_QWS_IPAQ -DQWS"
-    CXXFLAGS_qte="${CXXFLAGS_qte} -fno-exceptions -fno-rtti"
-    LDFLAGS_qte="${LDFLAGS_qte} ${LDFLAGS_test} -lqte"
-    if test "x${with_qte}" = "x"
-    then
-      PLUGINS="${PLUGINS} qte"
-    else
-      BUILTINS="${BUILTINS} qte"
-    fi
-  ])
+  PLUGINS="${PLUGINS} qte"
+  CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_qte}"
+#  ac_cv_qte_headers=yes
+  AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
+#    ac_cv_qte_headers=no
+    AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
+  ] )
+  if test "x${ac_cv_qte_headers}" = "xyes"
+  then
+#    CFLAGS_qte="${CFLAGS_qte} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+#    LDFLAGS_qte="${LDFLAGS_qte} -ljpeg -lqte"
+#    PLUGINS="${PLUGINS} qte"
+  fi
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
@@ -2130,14 +2132,24 @@ then
   then
     AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
   fi
+  # check for cross-compiling
+  GTK_PREFIX=
+  AC_ARG_WITH(gtk-prefix,
+    [    --with-gtk-prefix=PATH path to libgtk (needed for cross-compiling),
+                          e.g use as:
+                          --with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
+  if test "x$with_gtk_prefix" != "xno" -a "x$with_gtk_prefix" != "x"
+  then
+    GTK_PREFIX="--prefix=$with_gtk_prefix"
+  fi
   if test "x${GTK_CONFIG}" != "xno"
   then
     if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
     then
       AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-familiar.])
     fi
-    CFLAGS_familiar="${CFLAGS_familiar} `${GTK_CONFIG} --cflags gtk gthread`"
-    LDFLAGS_familiar="${LDFLAGS_familiar} `${GTK_CONFIG} --libs gtk gthread | sed 's,-rdynamic,,'`"
+    CFLAGS_familiar="${CFLAGS_familiar} `${GTK_CONFIG} ${GTK_PREFIX} --cflags gtk gthread`"
+    LDFLAGS_familiar="${LDFLAGS_familiar} `${GTK_CONFIG} ${GTK_PREFIX} --libs gtk gthread | sed 's,-rdynamic,,'`"
     # now look for the gtk.h header
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_familiar}"
     ac_cv_gtk_headers=yes
@@ -2145,6 +2157,35 @@ then
       ac_cv_gtk_headers=no
       echo "Cannot find gtk development headers."
     ])
+
+    # now look for gpe support
+    AC_ARG_WITH(gpe-prefix,
+    [    --with-gpe-prefix=PATH gpe installation path prefix (default search in \$PATH)],[],[])
+    if test "x$with_gpe_prefix" != "xno"  -a "x$with_gpe_prefix" != "x"
+    then
+      CFLAGS_gpe="-I$with_gpe_prefix/include"
+      LDFLAGS_gpe="-lXi -lgdk_pixbuf -L$with_gpe_prefix/lib -lgpewidget"
+      # now look for gpe/init.h header file
+      CFLAGS_save=$CFLAGS
+      LDFLAGS_save=$LDFLAGS
+      CFLAGS="${CFLAGS_familiar} ${CFLAGS_gpe}"
+      LDFLAGS="${LDFLAGS_familiar} ${LDFLAGS_gpe}"
+      CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_familiar} ${CFLAGS_gpe}"
+      ac_cv_gpe_headers=yes
+      AC_CHECK_HEADERS(gpe/init.h, ,
+        [ ac_cv_gpe_headers=no
+          AC_MSG_ERROR([Cannot find development headers for libgpewidget...]) ])
+#      AC_CHECK_LIB(gpewidget, gpe_application_init,
+#        [ LDFLAGS_gpe="${LDFLAGS_gpe} -lgpewidget" ],
+#        [ AC_MSG_ERROR([Cannot find libgpewidget library...]) ])
+      CFLAGS=$CFLAGS_save
+      LDFLAGS=$LDFLAG_save
+      if test "x${ac_cv_gpe_headers}" = "xyes"
+      then
+        CFLAGS_familiar="${CFLAGS_familiar} ${CFLAGS_gpe}"
+        LDFLAGS_familiar="${LDFLAGS_familiar} ${LDFLAGS_gpe}"
+      fi
+    fi
     if test "x${ac_cv_gtk_headers}" = "xyes"
     then
       PLUGINS="${PLUGINS} familiar"
@@ -2265,19 +2306,31 @@ AC_ARG_ENABLE(opie,
   [  --enable-opie           Qt embedded interface support (default disabled)],
   [if test "x${enable_opie}" = "xyes"; then
      AC_ARG_WITH(qte,
-     [    --with-qte=PATH    Qt Embedded headers and libraries])
-     if test "x${with_qte}" = "x"
+     [    --with-qte=PATH       Qt Embedded headers and libraries])
+     if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
      then
-       LDFLAGS_test="-L${QTDIR}/lib"
-       CPPFLAGS_test="-I${QTDIR}/include"
+       LDFLAGS_test="-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'`"
+       CFLAGS_test="-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'`"
      else
-       LDFLAGS_test="-L${with_qte}/lib"
-       CPPFLAGS_test="-I${with_qte}/include"
+       LDFLAGS_test="-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'`"
+       CFLAGS_test="-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'`"
      fi
+     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_test}"
+     ac_cv_qte_headers=yes
+     AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
+       ac_cv_qte_headers=no
+       AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
+     ] )
+     if test "x${ac_cv_qte_headers}" = "xyes"
+     then
+       CFLAGS_qte="${CFLAGS_qte} ${CFLAGS_test} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+       LDFLAGS_qte="${LDFLAGS_qte} ${LDFLAGS_test} -ljpeg -lqte"
+     fi
+     CPPFLAGS="${CPPFLAGS_save}"
 
      PLUGINS="${PLUGINS} opie"
-     LDFLAGS_opie="${LDFLAGS_opie} ${LDFLAGS_test} -lqte"
-     CPPFLAGS_opie="${CPPFLAGS_opie} ${CPPFLAGS_test}"
+     LDFLAGS_opie="${LDFLAGS_opie} -lqpe ${LDFLAGS_qte}"
+     CPPFLAGS_opie="${CPPFLAGS_opie} ${CPPFLAGS_qte}"
      if test -x ${QTEDIR}/bin/moc
      then
        MOC=${QTEDIR}/bin/moc

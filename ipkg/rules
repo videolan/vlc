@@ -11,6 +11,8 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr --disable-gtk --enable-fb --
 export VIDDIR="usr/share/videolan"
 export PIXDIR="usr/share/pixmaps"
 export DESTDIR=/tmp/vlc
+export DESTDIR=/usr/local/arm/2.95.3/arm-linux
+export PKGDIR=/home/jpsaman/iPaq/packages/vlc-0.5.0
 
 build: build-stamp
 build-stamp:
@@ -31,9 +33,13 @@ clean:
 	-$(MAKE) distclean
 
 install: build
-	mkdir -p $(DESTDIR)/usr/bin
+	mkdir -p $(PKGDIR)/usr/bin
 	$(STRIP) vlc
-	cp vlc $(DESTDIR)/usr/bin
+	cp vlc $(PKGDIR)/usr/bin
+
+install-plugins: install
+	cp plugins/*.so ${PKGDIR}/usr/lib/videolan/vlc
+	$(STRIP) ${PKGDIR}/usr/lib/videolan/vlc
 
 .PHONY: build clean install
 

@@ -1,4 +1,4 @@
-# $Id: MAINTAINERS,v 1.4 2002/12/04 02:16:23 titer Exp $
+# $Id: MAINTAINERS,v 1.5 2002/12/08 16:16:19 jpsaman Exp $
 #
 #                            VLC MAINTAINERS
 #
@@ -40,6 +40,7 @@
   - modules lirc, dummy, rc, ncurses : [sam]
   - modules qt, kde : [sigmund]
   - module xosd : [lool]
+  - module familar : [saman]
 
 * VIDEO OUTPUT
 
@@ -48,6 +49,7 @@
   - output filters & chroma : [sam]
   - modules x11, xvideo : [gibalou]
   - module aa : [sigmund]
+  - module qte : [saman]
 
 * AUDIO OUTPUT
 
