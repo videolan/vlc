@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.32 2003/06/19 21:09:27 gbazin Exp $
+ * $Id: video.c,v 1.33 2003/06/28 21:16:57 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -126,7 +126,7 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
 
     /* Spawn a video output if there is none. First we look for our children,
      * then we look for any other vout that might be available. */
-    p_vout = vout_Request( p_vdec->p_fifo, NULL,
+    p_vout = vout_Request( p_vdec->p_fifo, p_vdec->p_vout,
                            i_width, i_height, i_chroma, i_aspect );
 #ifdef LIBAVCODEC_PP
     if( p_vdec->pp_mode && !p_vdec->pp_context )
@@ -239,8 +239,11 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     /* FIXME search real LIBAVCODEC_BUILD */
 #if LIBAVCODEC_BUILD >= 4662
     i_truncated = config_GetInt( p_vdec->p_fifo, "ffmpeg-truncated" );
-    if( i_truncated == 1 || ( i_truncated == -1 &&
-        ( p_vdec->p_context->width == 0 || p_vdec->p_context->height == 0 ) ) )
+    if( i_truncated == 1 )
+#if 0
+        ||
+        ( i_truncated == -1 && ( p_vdec->p_context->width == 0 || p_vdec->p_context->height == 0 ) ) )
+#endif
     {
         p_vdec->p_context->flags |= CODEC_FLAG_TRUNCATED;
     }
@@ -364,6 +367,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
                     i_size );
         }
     }
+    p_vdec->p_vout = NULL;
 
     return( VLC_SUCCESS );
 }
