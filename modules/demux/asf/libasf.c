@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: libasf.c,v 1.19 2004/01/25 20:05:28 hartman Exp $
+ * $Id$
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -111,7 +111,7 @@ static int ASF_NextObject( stream_t *s, asf_object_t *p_obj )
 
     if( p_obj->common.i_object_size <= 0 )
     {
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
     if( p_obj->common.p_father && p_obj->common.p_father->common.i_object_size != 0 )
     {
@@ -119,7 +119,7 @@ static int ASF_NextObject( stream_t *s, asf_object_t *p_obj )
                 p_obj->common.i_object_pos + p_obj->common.i_object_size + 24 )
                                 /* 24 is min size of an object */
         {
-            return( VLC_EGENERIC );
+            return VLC_EGENERIC;
         }
 
     }
@@ -720,8 +720,8 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
 
     p_root->i_type = ASF_OBJECT_TYPE_ROOT;
     memcpy( &p_root->i_object_id, &asf_object_null_guid, sizeof( guid_t ) );
-    p_root->i_object_pos = 0;
-    p_root->i_object_size = stream_Tell( s );
+    p_root->i_object_pos = stream_Tell( s );
+    p_root->i_object_size = 0;
     p_root->p_first = NULL;
     p_root->p_last  = NULL;
     p_root->p_next  = NULL;

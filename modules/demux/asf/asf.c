@@ -87,6 +87,8 @@ struct demux_sys_t
 };
 
 static mtime_t  GetMoviePTS( demux_sys_t * );
+static int      DemuxInit( demux_t * );
+static void     DemuxEnd( demux_t * );
 static int      DemuxPacket( demux_t * );
 
 /*****************************************************************************
@@ -96,14 +98,8 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys;
-    uint8_t     *p_peek;
-
     guid_t      guid;
-
-    unsigned int    i_stream, i;
-    asf_object_content_description_t *p_cd;
-
-    vlc_bool_t  b_seekable;
+    uint8_t     *p_peek;
 
     /* a little test to see if it could be a asf stream */
     if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
@@ -124,217 +120,12 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
-    p_sys->i_time = -1;
-    p_sys->i_length = 0;
-    p_sys->i_bitrate = 0;
-
-    /* Now load all object ( except raw data ) */
-    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
-    if( (p_sys->p_root = ASF_ReadObjectRoot( p_demux->s, b_seekable )) == NULL )
+    /* Load the headers */
+    if( DemuxInit( p_demux ) )
     {
-        msg_Warn( p_demux, "ASF plugin discarded (not a valid file)" );
-        free( p_sys );
         return VLC_EGENERIC;
     }
-    p_sys->p_fp = p_sys->p_root->p_fp;
-
-    if( p_sys->p_fp->i_min_data_packet_size != p_sys->p_fp->i_max_data_packet_size )
-    {
-        msg_Warn( p_demux,
-                  "ASF plugin discarded (invalid file_properties object)" );
-        goto error;
-    }
-
-    p_sys->i_track = ASF_CountObject( p_sys->p_root->p_hdr,
-                                      &asf_object_stream_properties_guid );
-    if( !p_sys->i_track )
-    {
-        msg_Warn( p_demux, "ASF plugin discarded (cannot find any stream!)" );
-        goto error;
-    }
-
-    msg_Dbg( p_demux, "found %d streams", p_sys->i_track );
-
-    for( i_stream = 0; i_stream < p_sys->i_track; i_stream ++ )
-    {
-        asf_track_t    *tk;
-        asf_object_stream_properties_t *p_sp;
-
-        p_sp = ASF_FindObject( p_sys->p_root->p_hdr,
-                               &asf_object_stream_properties_guid,
-                               i_stream );
-
-        tk = p_sys->track[p_sp->i_stream_number] = malloc( sizeof( asf_track_t ) );
-        memset( tk, 0, sizeof( asf_track_t ) );
-
-        tk->i_time = -1;
-        tk->p_sp = p_sp;
-        tk->p_es = NULL;
-        tk->p_frame = NULL;
-
-        if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
-            p_sp->i_type_specific_data_length >= sizeof( WAVEFORMATEX ) - 2 )
-        {
-            es_format_t  fmt;
-            uint8_t      *p_data = p_sp->p_type_specific_data;
-
-            es_format_Init( &fmt, AUDIO_ES, 0 );
-            wf_tag_to_fourcc( GetWLE( &p_data[0] ), &fmt.i_codec, NULL );
-            fmt.audio.i_channels        = GetWLE(  &p_data[2] );
-            fmt.audio.i_rate      = GetDWLE( &p_data[4] );
-            fmt.i_bitrate         = GetDWLE( &p_data[8] ) * 8;
-            fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
-            fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
-
-            if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) )
-            {
-                fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
-                                     p_sp->i_type_specific_data_length - sizeof( WAVEFORMATEX ) );
-                fmt.p_extra = malloc( fmt.i_extra );
-                memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )], fmt.i_extra );
-            }
-
-            tk->i_cat = AUDIO_ES;
-            tk->p_es = es_out_Add( p_demux->out, &fmt );
-
-            msg_Dbg( p_demux, "added new audio stream(codec:0x%x,ID:%d)",
-                    GetWLE( p_data ), p_sp->i_stream_number );
-        }
-        else if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) &&
-                 p_sp->i_type_specific_data_length >= 11 + sizeof( BITMAPINFOHEADER ) )
-        {
-            es_format_t  fmt;
-            uint8_t      *p_data = &p_sp->p_type_specific_data[11];
-
-            es_format_Init( &fmt, VIDEO_ES,
-                            VLC_FOURCC( p_data[16], p_data[17], p_data[18], p_data[19] ) );
-            fmt.video.i_width = GetDWLE( p_data + 4 );
-            fmt.video.i_height= GetDWLE( p_data + 8 );
-
-            if( p_sp->i_type_specific_data_length > 11 + sizeof( BITMAPINFOHEADER ) )
-            {
-                fmt.i_extra = __MIN( GetDWLE( p_data ),
-                                     p_sp->i_type_specific_data_length - 11 - sizeof( BITMAPINFOHEADER ) );
-                fmt.p_extra = malloc( fmt.i_extra );
-                memcpy( fmt.p_extra, &p_data[sizeof( BITMAPINFOHEADER )], fmt.i_extra );
-            }
-
-            tk->i_cat = VIDEO_ES;
-            tk->p_es = es_out_Add( p_demux->out, &fmt );
-
-            msg_Dbg( p_demux, "added new video stream(ID:%d)",
-                     p_sp->i_stream_number );
-        }
-        else
-        {
-            tk->i_cat = UNKNOWN_ES;
-            msg_Dbg( p_demux, "ignoring unknown stream(ID:%d)",
-                     p_sp->i_stream_number );
-        }
-    }
-
-    p_sys->i_data_begin = p_sys->p_root->p_data->i_object_pos + 50;
-    if( p_sys->p_root->p_data->i_object_size != 0 )
-    { /* local file */
-        p_sys->i_data_end = p_sys->p_root->p_data->i_object_pos +
-                                    p_sys->p_root->p_data->i_object_size;
-    }
-    else
-    { /* live/broacast */
-        p_sys->i_data_end = -1;
-    }
-
-
-    /* go to first packet */
-    stream_Seek( p_demux->s, p_sys->i_data_begin );
-
-    /* try to calculate movie time */
-    if( p_sys->p_fp->i_data_packets_count > 0 )
-    {
-        int64_t i_count;
-        int64_t i_size = stream_Size( p_demux->s );
-
-        if( p_sys->i_data_end > 0 && i_size > p_sys->i_data_end )
-        {
-            i_size = p_sys->i_data_end;
-        }
-
-        /* real number of packets */
-        i_count = ( i_size - p_sys->i_data_begin ) /
-                  p_sys->p_fp->i_min_data_packet_size;
-
-        /* calculate the time duration in micro-s */
-        p_sys->i_length = (mtime_t)p_sys->p_fp->i_play_duration / 10 *
-                   (mtime_t)i_count /
-                   (mtime_t)p_sys->p_fp->i_data_packets_count;
-
-        if( p_sys->i_length > 0 )
-        {
-            p_sys->i_bitrate = 8 * i_size * (int64_t)1000000 / p_sys->i_length;
-        }
-    }
-
-    /* Create meta informations */
-    p_sys->meta = vlc_meta_New();
-
-    if( ( p_cd = ASF_FindObject( p_sys->p_root->p_hdr,
-                                 &asf_object_content_description_guid, 0 ) ) )
-    {
-        if( p_cd->psz_title && *p_cd->psz_title )
-        {
-            vlc_meta_Add( p_sys->meta, VLC_META_TITLE, p_cd->psz_title );
-        }
-        if( p_cd->psz_author && *p_cd->psz_author )
-        {
-             vlc_meta_Add( p_sys->meta, VLC_META_AUTHOR, p_cd->psz_author );
-        }
-        if( p_cd->psz_copyright && *p_cd->psz_copyright )
-        {
-            vlc_meta_Add( p_sys->meta, VLC_META_COPYRIGHT, p_cd->psz_copyright );
-        }
-        if( p_cd->psz_description && *p_cd->psz_description )
-        {
-            vlc_meta_Add( p_sys->meta, VLC_META_DESCRIPTION, p_cd->psz_description );
-        }
-        if( p_cd->psz_rating && *p_cd->psz_rating )
-        {
-            vlc_meta_Add( p_sys->meta, VLC_META_RATING, p_cd->psz_rating );
-        }
-    }
-    for( i_stream = 0, i = 0; i < 128; i++ )
-    {
-        asf_object_codec_list_t *p_cl = ASF_FindObject( p_sys->p_root->p_hdr,
-                                                        &asf_object_codec_list_guid, 0 );
-
-        if( p_sys->track[i] )
-        {
-            vlc_meta_t *tk = vlc_meta_New();
-            TAB_APPEND( p_sys->meta->i_track, p_sys->meta->track, tk );
-
-            if( p_cl && i_stream < p_cl->i_codec_entries_count )
-            {
-                if( p_cl->codec[i_stream].psz_name &&
-                    *p_cl->codec[i_stream].psz_name )
-                {
-                    vlc_meta_Add( tk, VLC_META_CODEC_NAME,
-                                  p_cl->codec[i_stream].psz_name );
-                }
-                if( p_cl->codec[i_stream].psz_description &&
-                    *p_cl->codec[i_stream].psz_description )
-                {
-                    vlc_meta_Add( tk, VLC_META_CODEC_DESCRIPTION,
-                                  p_cl->codec[i_stream].psz_description );
-                }
-            }
-            i_stream++;
-        }
-    }
     return VLC_SUCCESS;
-
-error:
-    ASF_FreeObjectRoot( p_demux->s, p_sys->p_root );
-    free( p_sys );
-    return VLC_EGENERIC;
 }
 
 
@@ -347,6 +138,7 @@ static int Demux( demux_t *p_demux )
 
     for( ;; )
     {
+        uint8_t *p_peek;
         mtime_t i_length;
         mtime_t i_time_begin = GetMoviePTS( p_sys );
         int i_result;
@@ -356,6 +148,29 @@ static int Demux( demux_t *p_demux )
             break;
         }
 
+        /* Check if we have concatenated files */
+        if( stream_Peek( p_demux->s, &p_peek, 16 ) == 16 )
+        {
+            guid_t guid;
+
+            ASF_GetGUID( &guid, p_peek );
+            if( ASF_CmpGUID( &guid, &asf_object_header_guid ) )
+            {
+                msg_Warn( p_demux, "Found a new ASF header" );
+                /* We end this stream */
+                DemuxEnd( p_demux );
+
+                /* And we prepare to read the next one */
+                if( DemuxInit( p_demux ) )
+                {
+                    msg_Err( p_demux, "failed to load the new header" );
+                    return 0;
+                }
+                continue;
+            }
+        }
+
+        /* Read and demux a packet */
         if( ( i_result = DemuxPacket( p_demux ) ) <= 0 )
         {
             return i_result;
@@ -374,6 +189,7 @@ static int Demux( demux_t *p_demux )
         }
     }
 
+    /* Set the PCR */
     p_sys->i_time = GetMoviePTS( p_sys );
     if( p_sys->i_time >= 0 )
     {
@@ -389,28 +205,10 @@ static int Demux( demux_t *p_demux )
 static void Close( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-    int         i;
 
-    msg_Dbg( p_demux, "freeing all memory" );
+    DemuxEnd( p_demux );
 
-    vlc_meta_Delete( p_sys->meta );
-
-    ASF_FreeObjectRoot( p_demux->s, p_sys->p_root );
-    for( i = 0; i < 128; i++ )
-    {
-        asf_track_t *tk = p_sys->track[i];
-
-        if( tk )
-        {
-            if( tk->p_frame )
-            {
-                block_ChainRelease( tk->p_frame );
-            }
-            free( tk );
-        }
-    }
-    free( p_sys );
+    free( p_demux->p_sys );
 }
 
 /*****************************************************************************
@@ -777,4 +575,276 @@ loop_error_recovery:
     return 1;
 }
 
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static int DemuxInit( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    vlc_bool_t  b_seekable;
+    int         i;
+
+    unsigned int    i_stream;
+    asf_object_content_description_t *p_cd;
+
+    /* init context */
+    p_sys->i_time   = -1;
+    p_sys->i_length = 0;
+    p_sys->i_bitrate = 0;
+    p_sys->p_root   = NULL;
+    p_sys->p_fp     = NULL;
+    p_sys->i_track  = 0;
+    for( i = 0; i < 128; i++ )
+    {
+        p_sys->track[i] = NULL;
+    }
+    p_sys->i_data_begin = -1;
+    p_sys->i_data_end   = -1;
+    p_sys->meta         = NULL;
+
+    /* Now load all object ( except raw data ) */
+    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
+    if( (p_sys->p_root = ASF_ReadObjectRoot( p_demux->s, b_seekable )) == NULL )
+    {
+        msg_Warn( p_demux, "ASF plugin discarded (not a valid file)" );
+        return VLC_EGENERIC;
+    }
+    p_sys->p_fp = p_sys->p_root->p_fp;
+
+    if( p_sys->p_fp->i_min_data_packet_size != p_sys->p_fp->i_max_data_packet_size )
+    {
+        msg_Warn( p_demux, "ASF plugin discarded (invalid file_properties object)" );
+        goto error;
+    }
+
+    p_sys->i_track = ASF_CountObject( p_sys->p_root->p_hdr,
+                                      &asf_object_stream_properties_guid );
+    if( p_sys->i_track <= 0 )
+    {
+        msg_Warn( p_demux, "ASF plugin discarded (cannot find any stream!)" );
+        goto error;
+    }
+
+    msg_Dbg( p_demux, "found %d streams", p_sys->i_track );
+
+    for( i_stream = 0; i_stream < p_sys->i_track; i_stream ++ )
+    {
+        asf_track_t    *tk;
+        asf_object_stream_properties_t *p_sp;
+
+        p_sp = ASF_FindObject( p_sys->p_root->p_hdr,
+                               &asf_object_stream_properties_guid,
+                               i_stream );
+
+        tk = p_sys->track[p_sp->i_stream_number] = malloc( sizeof( asf_track_t ) );
+        memset( tk, 0, sizeof( asf_track_t ) );
+
+        tk->i_time = -1;
+        tk->p_sp = p_sp;
+        tk->p_es = NULL;
+        tk->p_frame = NULL;
+
+        if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
+            p_sp->i_type_specific_data_length >= sizeof( WAVEFORMATEX ) - 2 )
+        {
+            es_format_t  fmt;
+            uint8_t      *p_data = p_sp->p_type_specific_data;
+
+            es_format_Init( &fmt, AUDIO_ES, 0 );
+            wf_tag_to_fourcc( GetWLE( &p_data[0] ), &fmt.i_codec, NULL );
+            fmt.audio.i_channels        = GetWLE(  &p_data[2] );
+            fmt.audio.i_rate      = GetDWLE( &p_data[4] );
+            fmt.i_bitrate         = GetDWLE( &p_data[8] ) * 8;
+            fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
+            fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
+
+            if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) )
+            {
+                fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
+                                     p_sp->i_type_specific_data_length - sizeof( WAVEFORMATEX ) );
+                fmt.p_extra = malloc( fmt.i_extra );
+                memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )], fmt.i_extra );
+            }
+
+            tk->i_cat = AUDIO_ES;
+            tk->p_es = es_out_Add( p_demux->out, &fmt );
+
+            msg_Dbg( p_demux, "added new audio stream(codec:0x%x,ID:%d)",
+                    GetWLE( p_data ), p_sp->i_stream_number );
+        }
+        else if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) &&
+                 p_sp->i_type_specific_data_length >= 11 + sizeof( BITMAPINFOHEADER ) )
+        {
+            es_format_t  fmt;
+            uint8_t      *p_data = &p_sp->p_type_specific_data[11];
+
+            es_format_Init( &fmt, VIDEO_ES,
+                            VLC_FOURCC( p_data[16], p_data[17], p_data[18], p_data[19] ) );
+            fmt.video.i_width = GetDWLE( p_data + 4 );
+            fmt.video.i_height= GetDWLE( p_data + 8 );
+
+            if( p_sp->i_type_specific_data_length > 11 + sizeof( BITMAPINFOHEADER ) )
+            {
+                fmt.i_extra = __MIN( GetDWLE( p_data ),
+                                     p_sp->i_type_specific_data_length - 11 - sizeof( BITMAPINFOHEADER ) );
+                fmt.p_extra = malloc( fmt.i_extra );
+                memcpy( fmt.p_extra, &p_data[sizeof( BITMAPINFOHEADER )], fmt.i_extra );
+            }
+
+            tk->i_cat = VIDEO_ES;
+            tk->p_es = es_out_Add( p_demux->out, &fmt );
+
+            msg_Dbg( p_demux, "added new video stream(ID:%d)",
+                     p_sp->i_stream_number );
+        }
+        else
+        {
+            tk->i_cat = UNKNOWN_ES;
+            msg_Dbg( p_demux, "ignoring unknown stream(ID:%d)",
+                     p_sp->i_stream_number );
+        }
+    }
+
+    p_sys->i_data_begin = p_sys->p_root->p_data->i_object_pos + 50;
+    if( p_sys->p_root->p_data->i_object_size != 0 )
+    { /* local file */
+        p_sys->i_data_end = p_sys->p_root->p_data->i_object_pos +
+                                    p_sys->p_root->p_data->i_object_size;
+    }
+    else
+    { /* live/broacast */
+        p_sys->i_data_end = -1;
+    }
+
+
+    /* go to first packet */
+    stream_Seek( p_demux->s, p_sys->i_data_begin );
+
+    /* try to calculate movie time */
+    if( p_sys->p_fp->i_data_packets_count > 0 )
+    {
+        int64_t i_count;
+        int64_t i_size = stream_Size( p_demux->s );
+
+        if( p_sys->i_data_end > 0 && i_size > p_sys->i_data_end )
+        {
+            i_size = p_sys->i_data_end;
+        }
+
+        /* real number of packets */
+        i_count = ( i_size - p_sys->i_data_begin ) /
+                  p_sys->p_fp->i_min_data_packet_size;
+
+        /* calculate the time duration in micro-s */
+        p_sys->i_length = (mtime_t)p_sys->p_fp->i_play_duration / 10 *
+                   (mtime_t)i_count /
+                   (mtime_t)p_sys->p_fp->i_data_packets_count;
+
+        if( p_sys->i_length > 0 )
+        {
+            p_sys->i_bitrate = 8 * i_size * (int64_t)1000000 / p_sys->i_length;
+        }
+    }
+
+    /* Create meta informations */
+    p_sys->meta = vlc_meta_New();
+
+    if( ( p_cd = ASF_FindObject( p_sys->p_root->p_hdr,
+                                 &asf_object_content_description_guid, 0 ) ) )
+    {
+        if( p_cd->psz_title && *p_cd->psz_title )
+        {
+            vlc_meta_Add( p_sys->meta, VLC_META_TITLE, p_cd->psz_title );
+        }
+        if( p_cd->psz_author && *p_cd->psz_author )
+        {
+             vlc_meta_Add( p_sys->meta, VLC_META_AUTHOR, p_cd->psz_author );
+        }
+        if( p_cd->psz_copyright && *p_cd->psz_copyright )
+        {
+            vlc_meta_Add( p_sys->meta, VLC_META_COPYRIGHT, p_cd->psz_copyright );
+        }
+        if( p_cd->psz_description && *p_cd->psz_description )
+        {
+            vlc_meta_Add( p_sys->meta, VLC_META_DESCRIPTION, p_cd->psz_description );
+        }
+        if( p_cd->psz_rating && *p_cd->psz_rating )
+        {
+            vlc_meta_Add( p_sys->meta, VLC_META_RATING, p_cd->psz_rating );
+        }
+    }
+    for( i_stream = 0, i = 0; i < 128; i++ )
+    {
+        asf_object_codec_list_t *p_cl = ASF_FindObject( p_sys->p_root->p_hdr,
+                                                        &asf_object_codec_list_guid, 0 );
+
+        if( p_sys->track[i] )
+        {
+            vlc_meta_t *tk = vlc_meta_New();
+            TAB_APPEND( p_sys->meta->i_track, p_sys->meta->track, tk );
+
+            if( p_cl && i_stream < p_cl->i_codec_entries_count )
+            {
+                if( p_cl->codec[i_stream].psz_name &&
+                    *p_cl->codec[i_stream].psz_name )
+                {
+                    vlc_meta_Add( tk, VLC_META_CODEC_NAME,
+                                  p_cl->codec[i_stream].psz_name );
+                }
+                if( p_cl->codec[i_stream].psz_description &&
+                    *p_cl->codec[i_stream].psz_description )
+                {
+                    vlc_meta_Add( tk, VLC_META_CODEC_DESCRIPTION,
+                                  p_cl->codec[i_stream].psz_description );
+                }
+            }
+            i_stream++;
+        }
+    }
+
+    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+    return VLC_SUCCESS;
+
+error:
+    ASF_FreeObjectRoot( p_demux->s, p_sys->p_root );
+    return VLC_EGENERIC;
+}
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static void DemuxEnd( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int         i;
+
+    if( p_sys->p_root )
+    {
+        ASF_FreeObjectRoot( p_demux->s, p_sys->p_root );
+        p_sys->p_root = NULL;
+    }
+    if( p_sys->meta )
+    {
+        vlc_meta_Delete( p_sys->meta );
+        p_sys->meta = NULL;
+    }
+
+    for( i = 0; i < 128; i++ )
+    {
+        asf_track_t *tk = p_sys->track[i];
+
+        if( tk )
+        {
+            if( tk->p_frame )
+            {
+                block_ChainRelease( tk->p_frame );
+            }
+            if( tk->p_es )
+            {
+                es_out_Del( p_demux->out, tk->p_es );
+            }
+            free( tk );
+        }
+        p_sys->track[i] = 0;
+    }
+}
 
