@@ -147,8 +147,12 @@ int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     {
         for( i_position = 0; i_position < i_items ; i_position ++ )
         {
-            int i_new  = rand() % (i_items - 1);
+            int i_new;
 
+            if( i_items > 1 )
+                i_new = rand() % (i_items - 1);
+            else
+                i_new = 0;
             p_temp = pp_items[i_position];
             pp_items[i_position] = pp_items[i_new];
             pp_items[i_new] = p_temp;
