@@ -1,5 +1,6 @@
 SOURCES_gestures = gestures.c
 SOURCES_http = http.c
+SOURCES_telnet = telnet.c
 SOURCES_ntservice = ntservice.c
 SOURCES_joystick = joystick.c
 SOURCES_hotkeys = hotkeys.c
