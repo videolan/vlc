@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.36 2003/10/26 23:03:47 sigmunau Exp $
+ * $Id: xcommon.c,v 1.37 2003/10/28 21:59:12 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -119,6 +119,8 @@ static void SetPalette     ( vout_thread_t *,
 #endif
 
 static void TestNetWMSupport( vout_thread_t * );
+
+static int ConvertKey( int );
 
 /*****************************************************************************
  * Activate: allocate X11 video thread output method
@@ -485,8 +487,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 static int ManageVideo( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
-    char        i_key;                                    /* ISO Latin-1 key */
-    KeySym      x_key_symbol;
     vlc_value_t val;
 
     /* Handle X11 events: ConfigureNotify events are parsed to know if the
@@ -518,117 +518,45 @@ static int ManageVideo( vout_thread_t *p_vout )
         /* Keyboard event */
         else if( xevent.type == KeyPress )
         {
-            vlc_value_t val;
-            val.i_int = 0;
+            unsigned int state = xevent.xkey.state;
+            KeySym x_key_symbol;
+            char i_key;                                   /* ISO Latin-1 key */
+
             /* We may have keys like F1 trough F12, ESC ... */
             x_key_symbol = XKeycodeToKeysym( p_vout->p_sys->p_display,
                                              xevent.xkey.keycode, 0 );
-            switch( (int)x_key_symbol )
-            {
-            case XK_F1:
-                val.i_int = KEY_F1;
-                break;
-            case XK_F2:
-                val.i_int = KEY_F2;
-                break;
-            case XK_F3:
-                val.i_int = KEY_F3;
-                break;
-            case XK_F4:
-                val.i_int = KEY_F4;
-                break;
-            case XK_F5:
-                val.i_int = KEY_F5;
-                break;
-            case XK_F6:
-                val.i_int = KEY_F6;
-                break;
-            case XK_F7:
-                val.i_int = KEY_F7;
-                break;
-            case XK_F8:
-                val.i_int = KEY_F8;
-                break;
-            case XK_F9:
-                val.i_int = KEY_F9;
-                break;
-            case XK_F10:
-                val.i_int = KEY_F10;
-                break;
-            case XK_F11:
-                val.i_int = KEY_F11;
-                break;
-            case XK_F12:
-                val.i_int = KEY_F12;
-                break;
-                
-            case XK_Return:
-            case XK_KP_Enter:
-                val.i_int = KEY_ENTER;
-                break;
-            case XK_Escape:
-                val.i_int = KEY_ESC;
-                break;
-            case XK_Menu:
-                val.i_int = KEY_MENU;
-                break;
-            case XK_Left:
-                val.i_int = KEY_LEFT;
-                break;
-            case XK_Right:
-                val.i_int = KEY_RIGHT;
-                break;
-            case XK_Up:
-                val.i_int = KEY_UP;
-                break;
-            case XK_Down:
-                val.i_int = KEY_DOWN;
-                break;
-            case XK_Home:
-                val.i_int = KEY_HOME;
-                break;
-            case XK_End:
-                val.i_int = KEY_END;
-                break;
-            case XK_Page_Up:
-                val.i_int = KEY_PAGEUP;
-                break;
-            case XK_Page_Down:
-                val.i_int = KEY_PAGEDOWN;
-                break;
-            case XK_space:
-                val.i_int = KEY_SPACE;
-                break;
+            val.i_int = ConvertKey( (int)x_key_symbol );
 
-            default:
+            xevent.xkey.state &= ~ShiftMask;
+            xevent.xkey.state &= ~ControlMask;
+            xevent.xkey.state &= ~Mod1Mask;
+
+            if( !val.i_int &&
+                XLookupString( &xevent.xkey, &i_key, 1, NULL, NULL ) )
+            {
                 /* "Normal Keys"
                  * The reason why I use this instead of XK_0 is that
                  * with XLookupString, we don't have to care about
                  * keymaps. */
-
-                if( XLookupString( &xevent.xkey, &i_key, 1, NULL, NULL ) )
-                {
-                    /* FIXME: handle stuff here */
-                    val.i_int = i_key;
-                }
-                break;
+                val.i_int = i_key;
             }
-            if ( val.i_int )
+
+            if( val.i_int )
             {
-                if ( xevent.xkey.state & ShiftMask )
+                if( state & ShiftMask )
                 {
                     val.i_int |= KEY_MODIFIER_SHIFT;
                 }
-                if ( xevent.xkey.state & ControlMask )
+                if( state & ControlMask )
                 {
-                    msg_Dbg( p_vout, "control pressed, key value is %x", val.i_int );
                     val.i_int |= KEY_MODIFIER_CTRL;
                 }
-                if ( xevent.xkey.state & Mod1Mask )
+                if( state & Mod1Mask )
                 {
                     val.i_int |= KEY_MODIFIER_ALT;
                 }
-                if ( val.i_int == config_GetInt( p_vout, "fullscreen-key" ) )
+
+                if( val.i_int == config_GetInt( p_vout, "fullscreen-key" ) )
                 {
                     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
                 }
@@ -1167,8 +1095,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Fill in picture_t fields */
     vout_InitPicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma,
-		      p_vout->output.i_width, p_vout->output.i_height,
-		      p_vout->output.i_aspect );
+                      p_vout->output.i_width, p_vout->output.i_height,
+                      p_vout->output.i_aspect );
 
 #ifdef HAVE_SYS_SHM_H
     if( p_vout->p_sys->b_shm )
@@ -2213,4 +2141,52 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
     }
 
     XFree( p_args );
+}
+
+/*****************************************************************************
+ * Key events handling
+ *****************************************************************************/
+static struct
+{
+    int i_x11key;
+    int i_vlckey;
+
+} x11keys_to_vlckeys[] =
+{
+    { XK_F1, KEY_F1 }, { XK_F2, KEY_F2 }, { XK_F3, KEY_F3 }, { XK_F4, KEY_F4 },
+    { XK_F5, KEY_F5 }, { XK_F6, KEY_F6 }, { XK_F7, KEY_F7 }, { XK_F8, KEY_F8 },
+    { XK_F9, KEY_F9 }, { XK_F10, KEY_F10 }, { XK_F11, KEY_F11 },
+    { XK_F12, KEY_F12 },
+
+    { XK_Return, KEY_ENTER },
+    { XK_KP_Enter, KEY_ENTER },
+    { XK_space, KEY_SPACE },
+    { XK_Escape, KEY_ESC },
+
+    { XK_Menu, KEY_MENU },
+    { XK_Left, KEY_LEFT },
+    { XK_Right, KEY_RIGHT },
+    { XK_Up, KEY_UP },
+    { XK_Down, KEY_DOWN },
+
+    { XK_Home, KEY_HOME },
+    { XK_End, KEY_END },
+    { XK_Page_Up, KEY_PAGEUP },
+    { XK_Page_Down, KEY_PAGEDOWN },
+    { 0, 0 }
+};
+
+static int ConvertKey( int i_key )
+{
+    int i;
+
+    for( i = 0; x11keys_to_vlckeys[i].i_x11key != 0; i++ )
+    {
+        if( x11keys_to_vlckeys[i].i_x11key == i_key )
+        {
+            return x11keys_to_vlckeys[i].i_vlckey;
+        }
+    }
+
+    return 0;
 }

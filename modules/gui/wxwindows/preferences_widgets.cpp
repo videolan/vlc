@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.5 2003/10/21 12:30:40 hartman Exp $
+ * $Id: preferences_widgets.cpp,v 1.6 2003/10/28 21:59:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -153,11 +153,13 @@ KeyConfigControl::KeyConfigControl( module_config_t *p_item, wxWindow *parent )
         /* HPReg says casting the int to void * is fine */
         combo->Append( wxU(_(keys[i].psz_key_string)),
                        (void*)keys[i].i_key_code );
-        if( keys[i].i_key_code == ( p_item->i_value & ~KEY_MODIFIER ) )
+        if( keys[i].i_key_code == ( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ) )
         {
             combo->SetSelection( i );
+            combo->SetValue( wxU(_(keys[i].psz_key_string)) );
         }
     }
+
     sizer->Add( label, 2, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 5 );
     sizer->Add( alt,   1, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 5 );
     sizer->Add( ctrl,  1, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 5 );
