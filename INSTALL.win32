@@ -1,26 +1,29 @@
-INSTALL file for the Windows9x/2k/XP version of vlc, the VideoLAN Client
+$Id: INSTALL.win32,v 1.13 2003/02/02 04:01:29 sam Exp $
 
-Running VideoLAN Client
-=======================
+INSTALL file for the Windows9x/2k/XP version of the VLC media player
 
-If you have already built vlc (see below) or are using a binary release,
+
+Running VLC
+===========
+
+If you have already built VLC (see below) or are using a binary release,
 just run 'vlc.exe'.
 
-You can also run vlc from a dos command box, in which case you'll be able
+You can also run VLC from a dos command box, in which case you'll be able
 to use the command line arguments. You can obtain a list of these command
 line arguments by typing 'vlc --help'.
-To store a debug log of the current vlc session, you can use
+To store a debug log of the current VLC session, you can use
 'vlc -vvvvv --intf=logger nameofyourvideofile', but this will unfortunatly
 disable the GUI. You will end-up with a vlc.log file in your current directory.
 
-If you want to play a DVD, run vlc and click on the Disc option in the
+If you want to play a DVD, run VLC and click on the Disc option in the
 interface. You then have to type your drive letter followed by a colon in
 the 'Device name' box (eg. 'D:' if this is the letter for your dvdrom drive).
 
-Building VideoLAN Client from the source code
-=============================================
+Building VLC from the source code
+=================================
 
-If you want to do the tricky job of building vlc from sources, you can do it
+If you want to do the tricky job of building VLC from sources, you can do it
 in several ways:
 
 - natively on Windows, using MSYS+MINGW (www.mingw.org)
@@ -87,7 +90,7 @@ to build the DirectX, GTK and SDL plugins.
 Configuring the build
 =====================
 
-The best way to configure the build process of vlc is to use the
+The best way to configure the build process of VLC is to use the
 `./configure' script.
 
 See `./configure --help' for more information.
@@ -124,7 +127,7 @@ along those lines:
   --with-directx=/c/dev/dxheaders \
   --with-dvdcss-tree=../libdvdcss-win
 
-If you are using cygwin, you can build vlc with or without the unix emulation
+If you are using cygwin, you can build VLC with or without the unix emulation
 layer (without is usually better). To build without the emulaion layer, use
 something like this:
   ./bootstrap; \
@@ -140,14 +143,14 @@ CXX="g++ -mno-cygwin" line.
 Note: when using the --with-dvdcss-tree you need to compile the libdvdcss tree
 beforehand.
 
-Building VideoLAN Client
-========================
+Building VLC
+============
 
 Have a look at the generated Makefile.opts file, you may want to choose
 which modules will be compiled as plugins, and which ones will remain in
 the core application. The configure script tries to guess for you.
 
-Once configured, to build vlc you have to:
+Once configured, to build VLC you have to:
 
 If you are cross-compiling from Debian or compiling natively on Windoze,
 then just run `make'.
@@ -166,7 +169,7 @@ Building Win32 interface with bcc32 (Borland's compiler)
 they can be symlinks to the Borland bpr2mak and make utilities, or wrappers
 that call them through Wine if you are cross-compiling from Linux.
 
-3) Configure vlc as usual with the --enable-intfwin flag and build it.
+3) Configure VLC as usual with the --enable-intfwin flag and build it.
 
-Well done, now you're ready to use vlc!
+Well done, now you're ready to use VLC!
 =======================================

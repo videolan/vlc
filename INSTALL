@@ -1,10 +1,12 @@
-INSTALL file for vlc, the VideoLAN Client
+$Id: INSTALL,v 1.24 2003/02/02 04:01:29 sam Exp $
+
+INSTALL file for the VLC media player
 
 
-Configuring VideoLAN
-====================
+Configuring VLC
+===============
 
-A typical way to configure vlc is:
+A typical way to configure VLC is:
 
    ./configure --prefix=/usr --enable-gnome
 
@@ -16,24 +18,24 @@ symbols:
    make distclean ; ./configure --prefix=/usr --enable-gnome --enable-debug
 
 
-Building VideoLAN
-=================
+Building VLC
+============
 
 Have a look at the generated Makefile.opts file, you may want to choose
 which modules will be compiled as plugins, and which ones will remain in
 the core application. The configure script tries to guess for you.
 
-Once configured, run `make' to build vlc.
+Once configured, run `make' to build VLC.
 
 
-Installing and running VideoLAN
-===============================
+Installing and running VLC
+==========================
 
-You can install the vlc and its plugins by typing:
+You can install the VLC and its plugins by typing:
 
    make install
 
-But you don't need to install it if you don't want to; vlc can be launched
+But you don't need to install it if you don't want to; VLC can be launched
 from the current directory as well:
 
    ./vlc

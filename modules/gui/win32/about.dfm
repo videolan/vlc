@@ -285,7 +285,7 @@ object AboutDlg: TAboutDlg
     Top = 80
     Width = 227
     Height = 13
-    Caption = 'the VideoLAN Team <videolan@videolan.org>'
+    Caption = 'the VideoLAN team <videolan@videolan.org>'
   end
   object Image1: TImage
     Left = 32

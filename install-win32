@@ -22,13 +22,13 @@
 
 OutFile ..\vlc-${VERSION}-win32.exe
 
-Name "the VideoLAN Client"
-Caption "VideoLAN Client '${VERSION}' for Win32 Setup"
+Name "VLC media player"
+Caption "VLC '${VERSION}' for Win32 Setup"
 ;Icon ../share/gvlc32x32.ico
 
 CRCCheck on
 
-InstallDir "$PROGRAMFILES\VideoLAN\VideoLAN Client"
+InstallDir "$PROGRAMFILES\VideoLAN\VLC"
 ; check if the program has already been installed, if so, take this dir
 ; as install dir
 InstallDirRegKey HKLM SOFTWARE\VideoLAN\VLC "Install_Dir"
@@ -42,7 +42,7 @@ SetDatablockOptimize on
 SetDateSave off
 SetCompress auto
 
-UninstallText "This will uninstall the VideoLAN Client. Hit next to continue."
+UninstallText "This will uninstall the VLC media player. Hit next to continue."
 
 ;;;;;;;;;;;;;;;;;;;;
 ; Install settings ;

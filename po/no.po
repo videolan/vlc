@@ -2885,9 +2885,8 @@ msgid "Report A Bug"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:327
-#, fuzzy
 msgid "VideoLAN Website"
-msgstr "VideoLAN Client"
+msgstr ""
 
 #: modules/gui/macosx/intf.m:328
 msgid "License"

@@ -8,7 +8,7 @@
     Caption = _( "VLC media player" );
     Caption = _( "(c) 1996-2003 the VideoLAN team" );
     Caption = _(       "This is the VideoLAN Client, a DVD, MPEG and DivX player. It can"       " play MPEG and MPEG2 files from a file or from a network source." );
-    Caption = _( "the VideoLAN Team <videolan@videolan.org>" );
+    Caption = _( "the VideoLAN team <videolan@videolan.org>" );
     Caption = _( "Version x.y.z" );
     Caption = _( "OK" );
 

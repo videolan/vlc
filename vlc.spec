@@ -120,7 +120,7 @@
 
 %{?_with_slp:		%{expand: %%define with_slp 1}}
 
-Summary:	VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+Summary:	VLC is a free MPEG, MPEG2, DVD and DivX player.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
@@ -219,10 +219,10 @@ Buildrequires:	libopenslp-devel
 VideoLAN is an OpenSource streaming solution for every OS developed by
 students from the Ecole Centrale Paris and developers from all over the
 World.
-The VideoLAN Client (vlc) plays MPEG1, MPEG2 and MPEG4 (aka DivX) files,
-DVDs, VCDs, SVCDs, from a satellite card, from an MPEG2 Transport
-Streams sent by the VideoLAN Server (vls) or from a Web server (with the
-HTTP input).
+VLC (VideoLAN Client) is a media player that can play MPEG1, MPEG2 and
+MPEG4 (aka DivX) files, DVDs, VCDs, SVCDs, from a satellite card, from
+a stream sent by VLS (VideoLAN Server), from another VLC, or from a Web
+server.
 You may install vlc-gnome or vlc-gtk to have a nice graphical interface.
 This package contains no CSS unscrambling functionality for DVDs ;
 you need the libdvdcss library available from 
@@ -230,17 +230,15 @@ http://www.videolan.org/libdvdcss/ or http://plf.zarb.org/
 
 #general packages
 %package -n %libname-devel
-Summary: Development files for the VideoLAN Client
+Summary: Development files for the VLC media player
 Group: Development/C
 Requires: %name = %version-%release
 Provides: %name-devel = %version-%release
 Provides: lib%name-devel = %version-%release
 %description -n %libname-devel
-Development files for the VideoLAN Client
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
+Development files for the VLC media player
 This package contains headers and a static library required to build plugins
-for the VideoLAN Client, or standalone applications using VideoLAN Client.
+for the VLC media player, or standalone applications using features from VLC.
 
 %package -n mozilla-plugin-vlc
 Summary: A multimedia plugin for Mozilla, based on vlc
@@ -255,137 +253,115 @@ support for fullscreen display.
 
 # intf plugins
 %package -n gvlc
-Summary: Gtk plugin for the VideoLAN client
+Summary: Gtk plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Provides: vlc-gui
 %description -n gvlc
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds a Gtk+ interface to vlc, the VideoLAN Client. To
+This plugin adds a Gtk+ interface to the VLC media player. To
 activate it, use the `--intf gtk' flag or run the `gvlc' program.
 
 %package -n gnome-vlc
-Summary: Gnome plugin for the VideoLAN client
+Summary: Gnome plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Provides: vlc-gui, vlc-gnome
 Obsoletes: vlc-gnome
 %description -n gnome-vlc
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds a Gnome interface to vlc, the VideoLAN Client. To
+This plugin adds a Gnome interface to the VLC media player. To
 activate it, use the `--intf gnome' flag or run the `gnome-vlc' program.
 
 %package -n qvlc
-Summary: Qt2 plugin for the VideoLAN client
+Summary: Qt2 plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Provides: vlc-gui, vlc-qt
 Obsoletes: vlc-qt
 %description -n qvlc
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds a Qt interface to vlc, the VideoLAN Client. To
-activate it, use the `--intf qt' flag or run the `qvlc' program.
+This plugin adds a Qt interface to the VLC media player. To activate it,
+use the `--intf qt' flag or run the `qvlc' program.
 
 %package -n kvlc
-Summary: KDE frontend for the VideoLAN client
+Summary: KDE frontend for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Provides: vlc-gui
 %description -n kvlc
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds a KDE interface to vlc, the VideoLAN Client. To
+This plugin adds a KDE interface to the VLC media player. To
 activate it, use the `--intf kde' flag or run the `kvlc' program.
 
 %package plugin-ncurses
-Summary: Ncurses console-based plugin for the VideoLAN client
+Summary: Ncurses console-based plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 %description plugin-ncurses
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds a ncurses interface to vlc, the VideoLAN Client. To
+This plugin adds a ncurses interface to the VLC media player. To
 activate it, use the `--intf ncurses' flag.
 
 %package plugin-lirc
-Summary: Lirc plugin for the VideoLAN client
+Summary: Lirc plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Obsoletes: vlc-lirc
 Provides: vlc-lirc
 %description plugin-lirc
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin is an infrared lirc interface for vlc, the
-VideoLAN Client. To activate it, use the `--intf lirc' flag.
+This plugin is an infrared lirc interface for the VLC media player. To
+activate it, use the `--extraintf lirc' flag.
 
 %package -n wxvlc
-Summary: WxWindow plugin for the VideoLAN client
+Summary: WxWindow plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Obsoletes: vlc-lirc
 Provides: vlc-lirc
 %description -n wxvlc
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds a wxWindow interface to vlc, the VideoLAN Client. To
+This plugin adds a wxWindow interface to the VLC media player. To
 activate it, use the `--intf wxwin' flag or run the `wxvlc' program.
 
 
 #
 # video plugins
 %package plugin-aa
-Summary: ASCII art video plugin for the VideoLAN client
+Summary: ASCII art video plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Obsoletes: vlc-aa
 Provides: vlc-aa
 %description plugin-aa
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This is an ASCII art video output plugin for vlc, the VideoLAN
-Client. To activate it, use the `--vout aa' flag or select the `aa'
-vout plugin from the preferences menu.
+This is an ASCII art video output plugin for the VLC media playe. To
+activate it, use the `--vout aa' flag or select the `aa' video output
+plugin from the preferences menu.
 
 
 %package plugin-sdl
-Summary: Simple DirectMedia Layer video plugin for the VideoLAN client
+Summary: Simple DirectMedia Layer video plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Obsoletes: vlc-sdl
 Provides: vlc-sdl
 %description plugin-sdl
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
 This plugin adds support for the Simple DirectMedia Layer library to
-vlc, the VideoLAN Client. To activate it, use the `--vout sdl' or
-`--aout sdl' flags or select the `sdl' vout or aout plugin from the
-preferences menu.
+the VLC media player. To activate it, use the `--vout sdl' or
+`--aout sdl' flags or select the `sdl' video or audio output plugin
+from the preferences menu.
 
 %package plugin-ggi
-Summary: GGI video plugin for the VideoLAN client
+Summary: GGI video plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Obsoletes: vlc-ggi
 Provides: vlc-ggi
 %description plugin-ggi
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This is a GGI plugin for vlc, the VideoLAN Client.  To activate it, use
-the `--vout ggi' flag or select the `ggi' vout plugin from the preferences
-menu.
+This is a GGI plugin for the VLC media player. To activate it, use
+the `--vout ggi' flag or select the `ggi' video output plugin from
+the preferences menu.
 
 %package plugin-svgalib
-Summary: SVGAlib video plugin for the VideoLAN client
+Summary: SVGAlib video plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 %description plugin-svgalib
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds support for SVGAlib to vlc, the VideoLAN Client. To
+This plugin adds support for SVGAlib to the VLC media player. To
 activate it, use the `--vout svgalib' flag or select the `svgalib' video
 output plugin from the preferences menu. Note that you will need root
 permissions to use SVGAlib.
@@ -394,124 +370,104 @@ permissions to use SVGAlib.
 #
 # visualization plugins
 %package plugin-xosd
-Summary: X On-Screen Display plugin for the VideoLAN client
+Summary: X On-Screen Display plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 %description plugin-xosd
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This is an On-Screen Display plugin for vlc, the VideoLAN Client. To
-activate it, use the `--intf xosd' flag or select the `xosd' interface
-plugin from the preferences menu.
+This is an On-Screen Display plugin for the VLC media player. To activate
+it, use the `--extraintf xosd' flag or select the `xosd' interface plugin
+from the preferences menu.
 
 # codec plugins
 %package plugin-mad
-Summary: MAD audio codec plugin for the VideoLAN client
+Summary: MAD audio codec plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Obsoletes: vlc-mad
 Provides: vlc-mad
 %description plugin-mad
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
 This plugin adds support for libmad, the MPEG audio decoder library,
-to the VideoLAN Client. MAD is 100% fixed-point based. To activate
+to the VLC media player. MAD is 100% fixed-point based. To activate
 this plugin, use the `--mpeg_adec mad' flag or select the `mad' MPEG
 decoder from the preferences menu.
 
 %package plugin-ogg
-Summary: Ogg demuxer and Vorbis codec plugin for the VideoLAN client
+Summary: Ogg demuxer and Vorbis codec plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 %description plugin-ogg
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
 These plugins add support for the Ogg bitstream format and the Ogg Vorbis
-compressed audio format to vlc, the VideoLAN Client. They are autodetected.
+compressed audio format to the VLC media player. They are autodetected.
 
 %package plugin-a52
-Summary: A-52 (AC-3) codec plugin for the VideoLAN client
+Summary: A-52 (AC-3) codec plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 %description plugin-a52
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
 This plugin adds support for the ATSC A-52 (aka. AC-3) audio format to
-vlc, the VideoLAN Client. The plugin is autodetected.
+the VLC media player. The plugin is autodetected.
 
 %package plugin-dv
-Summary: DV codec plugin for the VideoLAN client
+Summary: DV codec plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 %description plugin-dv
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds support for the DV video format to vlc, the VideoLAN
-Client. The plugin is autodetected.
+This plugin adds support for the DV video format to the VLC media player.
+The plugin is autodetected.
 
 #
 # input plugins
 %package plugin-dvb
-Summary: DVB input plugin for the VideoLAN client
+Summary: DVB input plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 %description plugin-dvb
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds support for DVB cards to vlc, the VideoLAN Client. Note
+This plugin adds support for DVB cards to the VLC media player. Note
 that your card needs to be supported by your kernel before vlc can use it.
 
 #
 # audio plugins
 %package plugin-esd
-Summary: Enlightened Sound Daemon audio plugin for the VideoLAN client
+Summary: Enlightened Sound Daemon audio plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Obsoletes: vlc-esd
 Provides: vlc-esd
 %description plugin-esd
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds support for the Enlightened Sound Daemon to vlc, the
-VideoLAN Client. To activate it, use the `--aout esd' flag or select
-the `esd' aout plugin from the preferences menu.
+This plugin adds support for the Enlightened Sound Daemon to the VLC
+media player. To activate it, use the `--aout esd' flag or select the
+`esd' audio output plugin from the preferences menu.
 
 %package plugin-arts
-Summary: aRts audio plugin for the VideoLAN client
+Summary: aRts audio plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Obsoletes: vlc-arts
 Provides: vlc-arts
 %description plugin-arts
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
-This plugin adds support for the aRts Sound System to vlc, the
-VideoLAN Client. To activate it, use the `--aout arts' flag or
-select the `arts' aout plugin from the preferences menu.
+This plugin adds support for the aRts Sound System to the VLC media
+player. To activate it, use the `--aout arts' flag or select the `arts'
+audio output plugin from the preferences menu.
 
 %package plugin-alsa
-Summary: Advanced Linux Sound Architecture audio plugin for the VideoLAN client
+Summary: Advanced Linux Sound Architecture audio plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 Obsoletes: vlc-alsa
 Provides: vlc-alsa
 %description plugin-alsa
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
 This plugin adds support for the Advanced Linux Sound Architecture to
-vlc, the VideoLAN Client. To activate it, use the `--aout alsa' flag or
-select the `alsa' aout plugin from the preferences menu.
+the VLC media player. To activate it, use the `--aout alsa' flag or
+select the `alsa' audio output plugin from the preferences menu.
 
 
 %package plugin-slp
-Summary: Service Location Protocol acces plugin for the VideoLAN client
+Summary: Service Location Protocol acces plugin for the VLC media player
 Group: Video
 Requires: %{name} = %{version}
 %description plugin-slp
-VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
-
 This plugin adds support for the Service Location Protocol to
-vlc, the VideoLAN Client.
+the VLC media player.
 
 
 %prep
@@ -636,30 +592,30 @@ install doc/vlc-config.1 %buildroot/%_mandir/man1
 # menu
 mkdir -p %buildroot/%_menudir
 cat > %buildroot/%_menudir/vlc << EOF
-?package(vlc): command="%_bindir/vlc" hotkey="V" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="VideoLAN Client" icon="vlc.png" hints="Video"
+?package(vlc): command="%_bindir/vlc" hotkey="V" needs="X11" longtitle="VLC is a free MPEG, MPEG2, DVD and DivX player" section="Multimedia/Video" title="VLC media player" icon="vlc.png" hints="Video"
 EOF
 %if %with_gtk
 cat > %buildroot/%_menudir/gvlc << EOF
-?package(gvlc): command="%_bindir/gvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gtk VideoLAN Client" icon="gvlc.png" hints="Video"
+?package(gvlc): command="%_bindir/gvlc" needs="X11" longtitle="VLC is a free MPEG, MPEG2, DVD and DivX player" section="Multimedia/Video" title="VLC Gtk media player" icon="gvlc.png" hints="Video"
 EOF
 %endif
 %if %with_gnome
 cat > %buildroot/%_menudir/gnome-vlc << EOF
-?package(gnome-vlc): command="%_bindir/gnome-vlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="gnome-vlc.png" hints="Video"
+?package(gnome-vlc): command="%_bindir/gnome-vlc" needs="X11" longtitle="VLC is a free MPEG, MPEG2, DVD and DivX player" section="Multimedia/Video" title="VLC Gnome media player" icon="gnome-vlc.png" hints="Video"
 EOF
 %endif
 %if %with_qt
 cat > %buildroot/%_menudir/qvlc << EOF
-?package(qvlc): command="%_bindir/qvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Qt VideoLAN Client" icon="qvlc.png" hints="Video"
+?package(qvlc): command="%_bindir/qvlc" needs="X11" longtitle="VLC is a free MPEG, MPEG2, DVD and DivX player" section="Multimedia/Video" title="VLC Qt media player" icon="qvlc.png" hints="Video"
 EOF
 %endif
 %if %with_kde
 cat > %buildroot/%_menudir/kvlc << EOF
-?package(kvlc): command="%_bindir/kvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="KDE VideoLAN Client" icon="kvlc.png" hints="Video"
+?package(kvlc): command="%_bindir/kvlc" needs="X11" longtitle="VLC is a free MPEG, MPEG2, DVD and DivX player" section="Multimedia/Video" title="VLC KDE media player" icon="kvlc.png" hints="Video"
 EOF
 %endif
 %if %with_wx
-?package(wxvlc): command="%_bindir/wxvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="wxWindow VideoLAN Client" icon="vlc.png" hints="Video"
+?package(wxvlc): command="%_bindir/wxvlc" needs="X11" longtitle="VLC is a free MPEG, MPEG2, DVD and DivX player" section="Multimedia/Video" title="VLC wxWindow media player" icon="vlc.png" hints="Video"
 %endif
 
 # icons

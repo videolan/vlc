@@ -1,7 +1,7 @@
 #! /bin/sh
 
-##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.41 2003/02/01 18:41:09 sam Exp $
+##  bootstrap file for the VLC media player
+##  $Id: bootstrap,v 1.42 2003/02/02 04:01:29 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
