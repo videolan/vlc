@@ -1411,6 +1411,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
         subpicture_t *p_subpic = 0;
+        mtime_t i_pic_date = p_pic->date;
 
         if( p_sys->b_audio_sync )
         {
@@ -1551,7 +1552,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
         /* Check if we have a subpicture to overlay */
         if( p_sys->p_spu )
         {
-            p_subpic = spu_SortSubpictures( p_sys->p_spu, p_pic->date );
+            p_subpic = spu_SortSubpictures( p_sys->p_spu, i_pic_date );
             /* TODO: get another pic */
         }
 
