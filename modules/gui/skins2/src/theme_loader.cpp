@@ -2,7 +2,7 @@
  * theme_loader.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme_loader.cpp,v 1.5 2004/01/24 13:08:12 asmax Exp $
+ * $Id: theme_loader.cpp,v 1.6 2004/01/24 14:25:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -166,6 +166,9 @@ void ThemeLoader::deleteTempFiles( const string &path )
 
 bool ThemeLoader::parse( const string &xmlFile )
 {
+    XMLParser parser( getIntf(), xmlFile );
+    parser.parse();
+
     // Set the file to parse
     FILE *file = fopen( xmlFile.c_str(), "r" );
     if( file == NULL )
@@ -207,9 +210,6 @@ bool ThemeLoader::parse( const string &xmlFile )
         msg_Warn( getIntf(), "yylex failed: %i", lex );
         return false;
     }
-
-    XMLParser parser( getIntf(), xmlFile );
-    parser.parse();
 
     // Build and store the theme
     Builder builder( getIntf(), context.m_data );

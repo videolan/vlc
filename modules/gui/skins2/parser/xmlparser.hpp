@@ -2,7 +2,7 @@
  * xmlparser.hpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: xmlparser.hpp,v 1.1 2004/01/24 13:08:12 asmax Exp $
+ * $Id: xmlparser.hpp,v 1.2 2004/01/24 14:25:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -56,6 +56,7 @@ class XMLParser: public SkinObject
         xmlTextReaderPtr m_pReader;
 
         void handleBeginElement( const string &rName, AttrList_t &attributes );
+        void handleEndElement( const string &rName );
 };
 
 #endif

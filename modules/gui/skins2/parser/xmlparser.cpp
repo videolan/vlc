@@ -2,7 +2,7 @@
  * xmlparser.cpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: xmlparser.cpp,v 1.1 2004/01/24 13:08:12 asmax Exp $
+ * $Id: xmlparser.cpp,v 1.2 2004/01/24 14:25:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -33,6 +33,8 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName ):
         msg_Err( getIntf(), "Failed to open %s for parsing",
                  rFileName.c_str() );
     }
+
+    xmlTextReaderSetParserProp( m_pReader, XML_PARSER_VALIDATE, 1 );
 }
 
 
@@ -66,6 +68,7 @@ int XMLParser::parse()
 
             // Begin element
             case 1:
+            {
                 // Read the element name
                 const xmlChar *eltName = xmlTextReaderConstName( m_pReader );
                 if( !eltName )
@@ -86,6 +89,18 @@ int XMLParser::parse()
                 }
                 handleBeginElement( (const char*)eltName, attributes);
                 break;
+            }
+
+            // End element
+            case 15:
+                // Read the element name
+                const xmlChar *eltName = xmlTextReaderConstName( m_pReader );
+                if( !eltName )
+                {
+                    return -1;
+                }
+                handleEndElement( (const char*)eltName );
+                break;
         }
         ret = xmlTextReaderRead( m_pReader );
     }
@@ -103,3 +118,9 @@ void XMLParser::handleBeginElement( const string &rName,
         fprintf(stderr,"  %s = %s\n", (*it).first, (*it).second);
     }
 }
+
+
+void XMLParser::handleEndElement( const string &rName )
+{
+    fprintf(stderr,"--> %s\n", rName.c_str());
+} 
