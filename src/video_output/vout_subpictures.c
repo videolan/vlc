@@ -32,6 +32,7 @@
 
 #include <vlc/vlc.h>
 
+#include "vlc_block.h"
 #include "vlc_video.h"
 #include "video_output.h"
 #include "vlc_filter.h"
@@ -59,23 +60,8 @@ void vout_InitSPU( vout_thread_t *p_vout )
         p_vout->p_subpicture[i_index].i_type   = EMPTY_SUBPICTURE;
     }
 
-    /* Load the text rendering module */
-    p_vout->p_text = vlc_object_create( p_vout, sizeof(filter_t) );
-    p_vout->p_text->pf_spu_buffer_new = spu_new_buffer;
-    p_vout->p_text->pf_spu_buffer_del = spu_del_buffer;
-    p_vout->p_text->p_owner = (filter_owner_sys_t *)p_vout;
-    vlc_object_attach( p_vout->p_text, p_vout );
-    p_vout->p_text->p_module =
-        module_Need( p_vout->p_text, "text renderer", 0, 0 );
-    if( p_vout->p_text->p_module == NULL )
-    {
-        msg_Warn( p_vout, "no suitable text renderer module" );
-        vlc_object_detach( p_vout->p_text );
-        vlc_object_destroy( p_vout->p_text );
-        p_vout->p_text = NULL;
-    }
-
     p_vout->p_blend = NULL;
+    p_vout->p_text = NULL;
 
     p_vout->i_crop_x = p_vout->i_crop_y =
         p_vout->i_crop_width = p_vout->i_crop_height = 0;
@@ -104,15 +90,6 @@ void vout_DestroySPU( vout_thread_t *p_vout )
         }
     }
 
-    if( p_vout->p_text )
-    {
-        if( p_vout->p_text->p_module )
-            module_Unneed( p_vout->p_text, p_vout->p_text->p_module );
-
-        vlc_object_detach( p_vout->p_text );
-        vlc_object_destroy( p_vout->p_text );
-    }
-
     if( p_vout->p_blend )
     {
         if( p_vout->p_blend->p_module )
@@ -120,6 +97,15 @@ void vout_DestroySPU( vout_thread_t *p_vout )
 
         vlc_object_detach( p_vout->p_blend );
         vlc_object_destroy( p_vout->p_blend );
+    }
+
+    if( p_vout->p_text )
+    {
+        if( p_vout->p_text->p_module )
+            module_Unneed( p_vout->p_text, p_vout->p_text->p_module );
+
+        vlc_object_detach( p_vout->p_text );
+        vlc_object_destroy( p_vout->p_text );
     }
 
     vout_AttachSPU( p_vout, VLC_FALSE );
@@ -166,6 +152,16 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     memset( p_region, 0, sizeof(subpicture_region_t) );
     p_region->p_next = 0;
     p_region->fmt = *p_fmt;
+    p_region->psz_text = 0;
+
+    if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
+        p_fmt->p_palette = p_region->fmt.p_palette =
+            malloc( sizeof(video_palette_t) );
+    else p_fmt->p_palette = p_region->fmt.p_palette = NULL;
+
+    p_region->picture.p_data_orig = 0;
+
+    if( p_fmt->i_chroma == VLC_FOURCC('T','E','X','T') ) return p_region;
 
     vout_AllocatePicture( p_this, &p_region->picture, p_fmt->i_chroma,
                           p_fmt->i_width, p_fmt->i_height, p_fmt->i_aspect );
@@ -173,13 +169,9 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     if( !p_region->picture.i_planes )
     {
         free( p_region );
+        free( p_fmt->p_palette );
         return NULL;
     }
-
-    if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
-        p_fmt->p_palette = p_region->fmt.p_palette =
-            malloc( sizeof(video_palette_t) );
-    else p_fmt->p_palette = p_region->fmt.p_palette = NULL;
 
     return p_region;
 }
@@ -195,6 +187,7 @@ void __spu_DestroyRegion( vlc_object_t *p_this, subpicture_region_t *p_region )
     if( !p_region ) return;
     if( p_region->picture.p_data_orig ) free( p_region->picture.p_data_orig );
     if( p_region->fmt.p_palette ) free( p_region->fmt.p_palette );
+    if( p_region->psz_text ) free( p_region->psz_text );
     free( p_region );
 }
 
@@ -389,10 +382,30 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic_dst,
         p_vout->p_blend->fmt_out.video.i_chroma =
             p_vout->output.i_chroma;
 
-        p_vout->p_blend->fmt_in.video = p_subpic->p_region->fmt;
+        p_vout->p_blend->fmt_in.video.i_chroma = VLC_FOURCC('Y','U','V','P');
 
         p_vout->p_blend->p_module =
             module_Need( p_vout->p_blend, "video blending", 0, 0 );
+    }
+
+    /* Load the text rendering module */
+    if( !p_vout->p_text && p_subpic && p_subpic->p_region )
+    {
+        p_vout->p_text = vlc_object_create( p_vout, sizeof(filter_t) );
+        vlc_object_attach( p_vout->p_text, p_vout );
+
+        p_vout->p_text->fmt_out.video.i_width =
+            p_vout->p_text->fmt_out.video.i_visible_width =
+                p_vout->output.i_width;
+        p_vout->p_text->fmt_out.video.i_height =
+            p_vout->p_text->fmt_out.video.i_visible_height =
+                p_vout->output.i_height;
+
+        p_vout->p_text->pf_spu_buffer_new = spu_new_buffer;
+        p_vout->p_text->pf_spu_buffer_del = spu_del_buffer;
+
+        p_vout->p_text->p_module =
+            module_Need( p_vout->p_text, "text renderer", 0, 0 );
     }
 
     /* Get lock */
@@ -412,6 +425,42 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic_dst,
         {
             int i_x_offset = p_region->i_x + p_subpic->i_x;
             int i_y_offset = p_region->i_y + p_subpic->i_y;
+
+            if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
+            {
+                if( p_vout->p_text && p_vout->p_text->p_module &&
+                    p_vout->p_text->pf_render_string )
+                {
+                    /* TODO: do it in a less hacky way
+                     * (modify text renderer API) */
+                    subpicture_t *p_spu;
+                    subpicture_region_t tmp_region;
+                    block_t *p_new_block =
+                        block_New( p_vout, strlen(p_region->psz_text) + 1 );
+
+                    if( p_new_block )
+                    {
+                        memcpy( p_new_block->p_buffer, p_region->psz_text,
+                                p_new_block->i_buffer );
+                        p_new_block->i_pts = p_new_block->i_dts =
+                            p_subpic->i_start;
+                        p_new_block->i_length =
+                            p_subpic->i_start - p_subpic->i_stop;
+                        p_spu = p_vout->p_text->pf_render_string(
+                            p_vout->p_text, p_new_block );
+
+                        if( p_spu )
+                        {
+                            tmp_region = *p_region;
+                            *p_region = *p_spu->p_region;
+                            p_region->p_next = tmp_region.p_next;
+                            *p_spu->p_region = tmp_region;
+                            p_vout->p_text->pf_spu_buffer_del( p_vout->p_text,
+                                                               p_spu );
+                        }
+                    }
+                }
+            }
 
             if( p_subpic->i_flags & OSD_ALIGN_BOTTOM )
             {
@@ -754,15 +803,24 @@ static int CropCallback( vlc_object_t *p_object, char const *psz_var,
  *****************************************************************************/
 static subpicture_t *spu_new_buffer( filter_t *p_filter )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_filter->p_owner;
-    subpicture_t *p_spu;
+    subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));
+    memset( p_subpic, 0, sizeof(subpicture_t) );
+    p_subpic->b_absolute = VLC_TRUE;
 
-    p_spu = vout_CreateSubPicture( p_vout, !DEFAULT_CHAN, MEMORY_SUBPICTURE );
-    return p_spu;
+    p_subpic->pf_create_region = __spu_CreateRegion;
+    p_subpic->pf_destroy_region = __spu_DestroyRegion;
+
+    return p_subpic;
 }
 
-static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_spu )
+static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_filter->p_owner;
-    vout_DestroySubPicture( p_vout, p_spu );
+    while( p_subpic->p_region )
+    {
+        subpicture_region_t *p_region = p_subpic->p_region;
+        p_subpic->p_region = p_region->p_next;
+        p_subpic->pf_destroy_region( VLC_OBJECT(p_filter), p_region );
+    }
+
+    free( p_subpic );
 }

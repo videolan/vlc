@@ -204,6 +204,8 @@ struct subpicture_region_t
     video_format_t  fmt;                          /**< format of the picture */
     picture_t       picture;             /**< picture comprising this region */
 
+    char            *psz_text;       /**< text string comprising this region */
+
     int             i_x;                             /**< position of region */
     int             i_y;                             /**< position of region */
 

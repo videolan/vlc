@@ -4,7 +4,7 @@
  * Copyright (C) 2000-2001 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,6 @@ struct decoder_sys_t
     iconv_t             iconv_handle;            /* handle to iconv instance */
 #endif
 
-    filter_t *p_render;                              /* text renderer filter */
 };
 
 /*****************************************************************************
@@ -61,9 +60,6 @@ static void CloseDecoder  ( vlc_object_t * );
 static subpicture_t *DecodeBlock   ( decoder_t *, block_t ** );
 static subpicture_t *ParseText     ( decoder_t *, block_t * );
 static void         StripTags      ( char * );
-
-static subpicture_t *spu_new_buffer( filter_t * );
-static void spu_del_buffer( filter_t *, subpicture_t * );
 
 #define DEFAULT_NAME "System Default"
 
@@ -188,22 +184,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     msg_Dbg( p_dec, "no iconv support available" );
 #endif
 
-    /* Load the text rendering module */
-    p_sys->p_render = vlc_object_create( p_dec, sizeof(filter_t) );
-    p_sys->p_render->pf_spu_buffer_new = spu_new_buffer;
-    p_sys->p_render->pf_spu_buffer_del = spu_del_buffer;
-    p_sys->p_render->p_owner = (filter_owner_sys_t *)p_dec;
-    vlc_object_attach( p_sys->p_render, p_dec );
-    p_sys->p_render->p_module =
-        module_Need( p_sys->p_render, "text renderer", 0, 0 );
-    if( p_sys->p_render->p_module == NULL )
-    {
-        msg_Warn( p_dec, "no suitable text renderer module" );
-        vlc_object_detach( p_sys->p_render );
-        vlc_object_destroy( p_sys->p_render );
-        p_sys->p_render = NULL;
-    }
-
     return VLC_SUCCESS;
 }
 
@@ -241,15 +221,6 @@ static void CloseDecoder( vlc_object_t *p_this )
     }
 #endif
 
-    if( p_sys->p_render )
-    {
-        if( p_sys->p_render->p_module )
-            module_Unneed( p_sys->p_render, p_sys->p_render->p_module );
-
-        vlc_object_detach( p_sys->p_render );
-        vlc_object_destroy( p_sys->p_render );
-    }
-
     free( p_sys );
 }
 
@@ -262,6 +233,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     subpicture_t *p_spu = 0;
     char *psz_subtitle;
     int i_align_h, i_align_v;
+    video_format_t fmt;
 
     /* We cannot display a subpicture with no date */
     if( p_block->i_pts == 0 )
@@ -271,7 +243,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Check validity of packet data */
-    if( p_block->i_buffer <= 1 ||  p_block->p_buffer[0] == '\0' )
+    if( p_block->i_buffer <= 1 || p_block->p_buffer[0] == '\0' )
     {
         msg_Warn( p_dec, "empty subtitle" );
         return NULL;
@@ -377,29 +349,39 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 
     StripTags( psz_subtitle );
 
-    if( p_sys->p_render && p_sys->p_render->p_module &&
-        p_sys->p_render->pf_render_string )
+    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    if( !p_spu )
     {
-        block_t *p_new_block = block_New( p_dec, strlen(psz_subtitle) + 1 );
-        if( p_new_block )
-        {
-            memcpy( p_new_block->p_buffer, psz_subtitle,
-                    p_new_block->i_buffer );
-            p_new_block->i_pts = p_new_block->i_dts = p_block->i_pts;
-            p_new_block->i_length = p_block->i_length;
-            p_spu = p_sys->p_render->pf_render_string( p_sys->p_render,
-                                                       p_new_block );
-        }
+        msg_Warn( p_dec, "can't get spu buffer" );
+        free( psz_subtitle );
+        return 0;
     }
 
-    if( p_spu )
+    /* Create a new subpicture region */
+    memset( &fmt, 0, sizeof(video_format_t) );
+    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+    fmt.i_aspect = 0;
+    fmt.i_width = fmt.i_height = 0;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+    if( !p_spu->p_region )
     {
-        p_spu->i_flags = OSD_ALIGN_BOTTOM | p_sys->i_align;
-        p_spu->i_x = i_align_h;
-        p_spu->i_y = i_align_v;
+        msg_Err( p_dec, "cannot allocate SPU region" );
+        free( psz_subtitle );
+        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        return 0;
     }
 
-    free( psz_subtitle );
+    p_spu->p_region->psz_text = psz_subtitle;
+    p_spu->i_start = p_block->i_pts;
+    p_spu->i_stop = p_block->i_pts + p_block->i_length;
+    p_spu->b_ephemer = (p_block->i_length == 0);
+    p_spu->b_absolute = VLC_FALSE;
+
+    p_spu->i_flags = OSD_ALIGN_BOTTOM | p_sys->i_align;
+    p_spu->i_x = i_align_h;
+    p_spu->i_y = i_align_v;
+
     return p_spu;
 }
 
@@ -444,19 +426,4 @@ static void StripTags( char *psz_text )
         i++;
     }
     psz_text[ i - i_left_moves ] = '\0';
-}
-
-/*****************************************************************************
- * Buffers allocation callbacks for the filters
- *****************************************************************************/
-static subpicture_t *spu_new_buffer( filter_t *p_filter )
-{
-    decoder_t *p_dec = (decoder_t *)p_filter->p_owner;
-    return p_dec->pf_spu_buffer_new( p_dec );
-}
-
-static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_spu )
-{
-    decoder_t *p_dec = (decoder_t *)p_filter->p_owner;
-    p_dec->pf_spu_buffer_del( p_dec, p_spu );
 }

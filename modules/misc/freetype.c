@@ -247,8 +247,7 @@ static int Create( vlc_object_t *p_this )
     else
     {
         var_Get( p_filter, "freetype-rel-fontsize", &val );
-        msg_Err( p_filter, "freetype-rel-font currenlty broken, FIXME" );
-        i_fontsize = (int) /*p_filter->render.i_height*/ 400 / val.i_int;
+        i_fontsize = (int)p_filter->fmt_out.video.i_height / val.i_int;
     }
     msg_Dbg( p_filter, "Using fontsize: %i", i_fontsize);
 

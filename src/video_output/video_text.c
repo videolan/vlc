@@ -41,39 +41,11 @@ int vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_duration )
 {
-    subpicture_t *p_subpic = NULL;
     mtime_t i_now = mdate();
 
-    if( p_vout->p_text && p_vout->p_text->p_module &&
-        p_vout->p_text->pf_render_string )
-    {
-        block_t *p_block = block_New( p_vout, strlen(psz_string) + 1 );
-        if( p_block )
-        {
-            memcpy( p_block->p_buffer, psz_string, p_block->i_buffer );
-            p_block->i_pts = p_block->i_dts = i_now;
-            p_block->i_length = i_duration;
-
-            p_subpic = p_vout->p_text->pf_render_string( p_vout->p_text,
-                                                         p_block );
-            if( p_subpic )
-            {
-                p_subpic->i_x = i_hmargin;
-                p_subpic->i_y = i_vmargin;
-                p_subpic->i_flags = i_flags;
-                p_subpic->i_channel = i_channel;
-
-                vout_DisplaySubPicture( p_vout, p_subpic );
-                return VLC_SUCCESS;
-            }
-        }
-        return VLC_EGENERIC;
-    }
-    else
-    {
-        msg_Warn( p_vout, "No text renderer found" );
-        return VLC_EGENERIC;
-    }
+    return vout_ShowTextAbsolute( p_vout, i_channel, psz_string,
+                                  p_style, i_flags, i_hmargin, i_vmargin,
+                                  i_now, i_now + i_duration );
 }
 
 /**
@@ -95,38 +67,42 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {
-    subpicture_t *p_subpic = NULL;
+    subpicture_t *p_spu;
+    video_format_t fmt;
 
-    if( p_vout->p_text && p_vout->p_text->p_module &&
-        p_vout->p_text->pf_render_string )
+    if( !psz_string ) return VLC_EGENERIC;
+
+    p_spu = vout_CreateSubPicture( p_vout, !DEFAULT_CHAN, MEMORY_SUBPICTURE );
+    if( !p_spu ) return VLC_EGENERIC;
+
+    /* Create a new subpicture region */
+    memset( &fmt, 0, sizeof(video_format_t) );
+    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+    fmt.i_aspect = 0;
+    fmt.i_width = fmt.i_height = 0;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_vout), &fmt );
+    if( !p_spu->p_region )
     {
-        block_t *p_block = block_New( p_vout, strlen(psz_string) + 1 );
-        if( p_block )
-        {
-            memcpy( p_block->p_buffer, psz_string, p_block->i_buffer );
-            p_block->i_pts = p_block->i_dts = i_start;
-            p_block->i_length = i_stop - i_start;
-
-            p_subpic = p_vout->p_text->pf_render_string( p_vout->p_text,
-                                                         p_block );
-            if( p_subpic )
-            {
-                p_subpic->i_x = i_hmargin;
-                p_subpic->i_y = i_vmargin;
-                p_subpic->i_flags = i_flags;
-                p_subpic->i_channel = i_channel;
-
-                vout_DisplaySubPicture( p_vout, p_subpic );
-                return VLC_SUCCESS;
-            }
-        }
+        msg_Err( p_vout, "cannot allocate SPU region" );
+        vout_DestroySubPicture( p_vout, p_spu );
         return VLC_EGENERIC;
     }
-    else
-    {
-        msg_Warn( p_vout, "No text renderer found" );
-        return VLC_EGENERIC;
-    }
+
+    p_spu->p_region->psz_text = strdup( psz_string );
+    p_spu->i_start = i_start;
+    p_spu->i_stop = i_stop;
+    p_spu->b_ephemer = 0;
+    p_spu->b_absolute = VLC_FALSE;
+
+    p_spu->i_x = i_hmargin;
+    p_spu->i_y = i_vmargin;
+    p_spu->i_flags = i_flags;
+    p_spu->i_channel = i_channel;
+
+    vout_DisplaySubPicture( p_vout, p_spu );
+
+    return VLC_SUCCESS;
 }
 
 
@@ -161,4 +137,3 @@ void __vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
         va_end( args );
     }
 }
-
