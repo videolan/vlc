@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.1 2002/06/01 12:32:01 sam Exp $
+ * $Id: threads.c,v 1.2 2002/06/01 14:31:32 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -173,12 +173,11 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
      * function and have a 100% correct vlc_cond_wait() implementation.
      * As this function is not available on Win9x, we can use the faster
      * CriticalSections */
-    if( (GetVersion() < 0x80000000) && !p_this->p_vlc->p_sys->b_fast_pthread )
+    if( (GetVersion() < 0x80000000) && !p_this->p_vlc->b_fast_pthread )
     {
         /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
         p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
-        p_mutex->SignalObjectAndWait =
-                            p_this->p_vlc->p_sys->SignalObjectAndWait;
+        p_mutex->SignalObjectAndWait = p_this->p_vlc->SignalObjectAndWait;
         return ( p_mutex->mutex ? 0 : 1 );
     }
     else

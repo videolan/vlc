@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.20 2002/06/01 13:52:24 sam Exp $
+ * $Id: beos_specific.cpp,v 1.21 2002/06/01 14:31:32 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -39,7 +39,7 @@ extern "C"
 class VlcApplication : public BApplication
 {
 public:
-    vlc_object_t *p_object;
+    vlc_object_t *p_this;
 
     VlcApplication(char* );
     ~VlcApplication();
@@ -52,7 +52,6 @@ public:
  * Static vars
  *****************************************************************************/
 static char *         psz_program_path;
-static vlc_object_t * p_appthread;
 
 extern "C"
 {
@@ -67,12 +66,11 @@ static void AppThread( vlc_object_t *p_appthread );
  *****************************************************************************/
 void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
-    p_appthread = vlc_object_create( p_this, sizeof(vlc_object_t) );
+    p_this->p_vlc->p_appthread =
+            (vlc_object_t *)vlc_object_create( p_this, sizeof(vlc_object_t) );
 
     /* Create the BApplication thread and wait for initialization */
-    vlc_thread_create( p_appthread, "app thread", AppThread, 1 );
-
-    vlc_object_attach( p_appthread, p_this->p_vlc );
+    vlc_thread_create( p_this->p_vlc->p_appthread, "app thread", AppThread, 1 );
 }
 
 /*****************************************************************************
@@ -88,13 +86,11 @@ void system_Configure( vlc_object_t * )
  *****************************************************************************/
 void system_End( vlc_object_t *p_this )
 {
-    vlc_object_unlink_all( p_appthread );
-
     /* Tell the BApplication to die */
     be_app->PostMessage( B_QUIT_REQUESTED );
-    vlc_thread_join( p_appthread );
 
-    vlc_object_destroy( p_appthread );
+    vlc_thread_join( p_this->p_vlc->p_appthread );
+    vlc_object_destroy( p_this->p_vlc->p_appthread );
 
     free( psz_program_path );
 }
@@ -110,12 +106,15 @@ char * system_GetProgramPath( void )
 /* following functions are local */
 
 /*****************************************************************************
- * system_AppThread: the BApplication thread.
+ * AppThread: the BApplication thread.
  *****************************************************************************/
-static void system_AppThread( void * args )
+static void AppThread( vlc_object_t * p_this )
 {
     VlcApplication *BeApp = new VlcApplication("application/x-vnd.Ink-vlc");
+    vlc_object_attach( p_this, p_this->p_vlc );
+    BeApp->p_this = p_this;
     BeApp->Run();
+    vlc_object_unlink_all( p_this );
     delete BeApp;
 }
 
@@ -166,6 +165,6 @@ void VlcApplication::ReadyToRun( )
     psz_program_path = strdup( path.Path() );
 
     /* Tell the main thread we are finished initializing the BApplication */
-    vlc_thread_ready( p_appthread );
+    vlc_thread_ready( p_this );
 }
 

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.1 2002/06/01 12:31:58 sam Exp $
+ * $Id: vlc_common.h,v 1.2 2002/06/01 14:31:32 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -113,9 +113,6 @@ typedef s64 mtime_t;
  * Classes declaration
  *****************************************************************************/
 
-/* System */
-VLC_DECLARE_STRUCT(main_sys)
-
 /* Messages */
 VLC_DECLARE_STRUCT(msg_bank)
 VLC_DECLARE_STRUCT(msg_subscription)
@@ -186,7 +183,12 @@ VLC_DECLARE_STRUCT(iso639_lang)
 /*****************************************************************************
  * OS-specific headers and thread types
  *****************************************************************************/
-#include "os_specific.h"
+#if defined( WIN32 )
+#   define WIN32_LEAN_AND_MEAN
+#   include <windows.h>
+    typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT)( HANDLE, HANDLE, DWORD, BOOL );
+#endif
+
 #include "vlc_threads.h"
 
 /*****************************************************************************

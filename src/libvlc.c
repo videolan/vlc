@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.1 2002/06/01 12:32:01 sam Exp $
+ * $Id: libvlc.c,v 1.2 2002/06/01 14:31:32 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,6 +65,7 @@
 #endif
 
 #include "vlc_cpu.h"                                        /* CPU detection */
+#include "os_specific.h"
 
 #include "netutils.h"                                 /* network_ChannelJoin */
 

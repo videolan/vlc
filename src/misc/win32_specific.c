@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.8 2002/06/01 12:32:02 sam Exp $
+ * $Id: win32_specific.c,v 1.9 2002/06/01 14:31:32 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -39,17 +39,9 @@ void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
     int i_err;
     HINSTANCE hInstLib;
 
-    /* Allocate structure */
-    p_this->p_vlc->p_sys = malloc( sizeof( main_sys_t ) );
-    if( p_this->p_vlc->p_sys == NULL )
-    {
-        fprintf( stderr, "error: out of memory\n" );
-        exit(-1);
-    }
-
     /* dynamically get the address of SignalObjectAndWait */
     hInstLib = LoadLibrary( "kernel32" );
-    p_this->p_vlc->p_sys->SignalObjectAndWait =
+    p_this->p_vlc->SignalObjectAndWait =
         (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib, "SignalObjectAndWait" );
 
     /* WinSock Library Init. */
@@ -68,8 +60,7 @@ void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
  *****************************************************************************/
 void system_Configure( vlc_object_t *p_this )
 {
-    p_this->p_vlc->p_sys->b_fast_pthread = config_GetInt( p_this,
-		                                          "fast_pthread" );
+    p_this->p_vlc->b_fast_pthread = config_GetInt( p_this, "fast_pthread" );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * win32_specific.h: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.h,v 1.3 2002/06/01 12:31:58 sam Exp $
+ * $Id: win32_specific.h,v 1.4 2002/06/01 14:31:32 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -21,21 +21,4 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT)( HANDLE, HANDLE, DWORD, BOOL );
-
-/*****************************************************************************
- * main_sys_t: system specific descriptor
- *****************************************************************************
- * This structure is a system specific descriptor. It describes the Win32
- * properties of the program.
- *****************************************************************************/
-struct main_sys_s
-{
-    SIGNALOBJECTANDWAIT SignalObjectAndWait;
-    vlc_bool_t b_fast_pthread;
-};
 
