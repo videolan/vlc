@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.17 2004/01/25 20:40:59 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -119,11 +119,11 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
     vlc_value_t val;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','u','b','t') && 
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','u','b','t') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') )
     {
         return VLC_EGENERIC;
@@ -144,37 +144,42 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_align = val.i_int;
 
 #if defined(HAVE_ICONV)
-    var_Create( p_dec, "subsdec-encoding",
-                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "subsdec-encoding", &val );
-    if( !strcmp( val.psz_string, DEFAULT_NAME ) )
+    if( p_dec->fmt_in.subs.psz_encoding && *p_dec->fmt_in.subs.psz_encoding )
     {
-        char *psz_charset =(char*)malloc( 100 );
-        vlc_current_charset( &psz_charset );
-        p_sys->iconv_handle = iconv_open( "UTF-8", psz_charset );
-        msg_Dbg( p_dec, "using character encoding: %s", psz_charset );
-        free( psz_charset );
+        msg_Dbg( p_dec, "using character encoding: %s",
+                 p_dec->fmt_in.subs.psz_encoding );
+        p_sys->iconv_handle = iconv_open( "UTF-8",
+                                          p_dec->fmt_in.subs.psz_encoding );
     }
-    else if( val.psz_string )
+    else
     {
-        msg_Dbg( p_dec, "using character encoding: %s", val.psz_string );
-        p_sys->iconv_handle = iconv_open( "UTF-8", val.psz_string );
-    }
+        var_Create( p_dec, "subsdec-encoding",
+                    VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Get( p_dec, "subsdec-encoding", &val );
+        if( !strcmp( val.psz_string, DEFAULT_NAME ) )
+        {
+            char *psz_charset =(char*)malloc( 100 );
+            vlc_current_charset( &psz_charset );
+            p_sys->iconv_handle = iconv_open( "UTF-8", psz_charset );
+            msg_Dbg( p_dec, "using character encoding: %s", psz_charset );
+            free( psz_charset );
+        }
+        else if( val.psz_string )
+        {
+            msg_Dbg( p_dec, "using character encoding: %s", val.psz_string );
+            p_sys->iconv_handle = iconv_open( "UTF-8", val.psz_string );
+        }
 
-    if( p_sys->iconv_handle == (iconv_t)-1 )
-    {
-        msg_Warn( p_dec, "unable to do requested conversion" );
-    }
+        if( p_sys->iconv_handle == (iconv_t)-1 )
+        {
+            msg_Warn( p_dec, "unable to do requested conversion" );
+        }
 
-    if( val.psz_string ) free( val.psz_string );
+        if( val.psz_string ) free( val.psz_string );
+    }
 #else
 
     msg_Dbg( p_dec, "no iconv support available" );
-#endif
-
-#if 0
-    if( p_demux_data )
-        msg_Dbg( p_dec, p_demux_data->psz_header );
 #endif
 
     return VLC_SUCCESS;
