@@ -1,5 +1,5 @@
 # Brazilian Portuguese Translation for VLC.  
-# 
+#
 # Copyright (C) 2003 VideoLAN <videolan@videolan.org> 
 # André de Barros Martins Ribeiro  <andrerib@ajato.com.br>, 2003 
 #  
@@ -20,13 +20,12 @@ msgid "VLC Preferences"
 msgstr "Preferências do VLC"
 
 #: include/vlc_help.h:34
-#, fuzzy
 msgid ""
 "Configure some global options in General Settings and configure each VLC "
 "plugin in the Plugins section.\n"
 "Click on \"Advanced Options\" to see all options."
 msgstr ""
-"Configure algumas opções globais em Configurações Gerais e configura cada "
+"Configure algumas opções globais em Configurações Gerais e configurae cada "
 "plugin do VLC na seção Plugin.\n"
 "Clique em 'Opções Avançadas' para ver todas as opções."
 
@@ -35,7 +34,6 @@ msgid "VLC Plugins Preferences"
 msgstr "Preferências dos Plugins do VLC"
 
 #: include/vlc_help.h:40
-#, fuzzy
 msgid ""
 "In this tree, you can set options for every plugin used by VLC.\n"
 "Plugins are sorted by type.\n"
@@ -50,7 +48,6 @@ msgid "Access modules settings"
 msgstr "Configurações de módulos de acesso"
 
 #: include/vlc_help.h:49
-#, fuzzy
 msgid ""
 "Settings related to the various access methods used by VLC.\n"
 "Common settings you may want to alter are HTTP proxy or caching settings."
@@ -98,7 +95,6 @@ msgid "Decoder modules settings"
 msgstr "Configurações de módulos decodificadores"
 
 #: include/vlc_help.h:69
-#, fuzzy
 msgid ""
 "In the Subsdec section you may want to set the text encoding of your "
 "preferred subtitles."
@@ -139,7 +135,6 @@ msgid "Subtitle demuxer settings"
 msgstr "Configurações do demuxer de legendas"
 
 #: include/vlc_help.h:87
-#, fuzzy
 msgid ""
 "In this section you can force the behavior of the subtitle demuxer, for "
 "example by setting the subtitles type or file name."
@@ -560,7 +555,6 @@ msgid "[module]              [description]\n"
 msgstr "[módulo]                [descrição]\n"
 
 #: src/libvlc.c:1486
-#, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -748,7 +742,6 @@ msgstr ""
 "procure por seus plugins."
 
 #: src/libvlc.h:99
-#, fuzzy
 msgid ""
 "These options allow you to tune VLC's audio subsystem, and to add audio "
 "filters which can be used for postprocessing or visual effects (spectrum "
@@ -1303,9 +1296,8 @@ msgid "Enable streaming of all ES"
 msgstr ""
 
 #: src/libvlc.h:374
-#, fuzzy
 msgid "This allows you to stream all ES (video, audio and subtitles)"
-msgstr "Isto permite que você force a codificação de audio"
+msgstr "Isto permite que você faça o stream de todos os ES (vídeo, audio e legendas)"
 
 #: src/libvlc.h:376
 msgid "Display while streaming"
@@ -1445,7 +1437,6 @@ msgstr ""
 "tirarvantagem delas"
 
 #: src/libvlc.h:439
-#, fuzzy
 msgid ""
 "These options define the behavior of the playlist. Some of them can be "
 "overriden in the playlist dialog box."
@@ -2009,9 +2000,8 @@ msgid "The above message had unknown vcdimager log level"
 msgstr "A mensagem acima tinha um nível de log de vcdimager desconhecido"
 
 #: modules/access/cdda/access.c:147
-#, fuzzy
 msgid "The above message had unknown cdio log level"
-msgstr "A mensagem acima tinha um nível de log de vcdimager desconhecido"
+msgstr "A mensagem acima tinha um nível de log de cdio desconhecido"
 
 #: modules/access/cdda/access.c:331 modules/access/cdda/access.c:371
 #: modules/demux/mkv.cpp:2175 modules/gui/gtk/gnome_interface.c:2436
@@ -2028,7 +2018,6 @@ msgid "CDDB Disc Category"
 msgstr ""
 
 #: modules/access/cdda/cdda.c:61
-#, fuzzy
 msgid ""
 "This integer when viewed in binary is a debugging mask\n"
 "meta info        1\n"
@@ -2042,12 +2031,16 @@ msgid ""
 "libcddb  (100) 256\n"
 msgstr ""
 "Este inteiro quando visto em binário é uma mascade de debugação\n"
-"MRL               1\n"
-"chamada externa   2\n"
-"todas as chamadas 4\n"
-"LSN               8\n"
-"libcdio     (10)  16\n"
-"procuras    (20)  32\n"
+"Este inteiro quando visto em binário é uma máscara de de depuração\n"
+"MRL           	  	 1\n"
+"eventos          	 2\n"
+"chamadas externas   	 4\n"
+"Todas as chamadas       8\n"
+"LSN      	(10)  	16\n"
+"libcdio  	(20)  	32\n"
+"Procuras    	(40)  	64\n"
+"libcdio   	(80) 	128\n"
+"libcddb  	(100) 	256\n"
 
 #: modules/access/cdda/cdda.c:73
 msgid ""
@@ -2059,12 +2052,11 @@ msgstr ""
 "apropriado."
 
 #: modules/access/cdda/cdda.c:77
-#, fuzzy
 msgid ""
 "Allows you to modify the default caching value for CDDA streams. This value "
 "should be set in millisecond units."
 msgstr ""
-"Permide que você modifique os valores pradões de cache para streams cdda. "
+"Permide que você modifique os valores pradões de cache para streams CDDA. "
 "Este valor deverá ser ajustado em unidades de milisegundos"
 
 #: modules/access/cdda/cdda.c:81
@@ -2100,13 +2092,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/cdda/cdda.c:113
-#, fuzzy
 msgid "cddax://[device-or-file][@[T]num]"
-msgstr "vcdx:[disp-ou-arquivo][@{P,S,T}num]"
+msgstr "cddax:[disp-ou-arquivo][@{T}num]"
 
 #: modules/access/cdda/cdda.c:114
 msgid "Compact Disc Digital Audio (CD-DA) input"
-msgstr ""
+msgstr "Entrada de Audio de CD Digital (CD-DA)"
 
 #: modules/access/cdda/cdda.c:121
 msgid "CDX"
@@ -2123,68 +2114,70 @@ msgstr "Nome do dispositivo de CD-ROM"
 #: modules/access/cdda/cdda.c:138
 msgid "Format to use in playlist 'title' field when no CDDB"
 msgstr ""
+"Formato a ser usado no campo 'título' da lista de reprodução "
+"quando não houver CDDB"
 
 #: modules/access/cdda/cdda.c:144
 msgid "Format to use in playlist 'title' field when using CDDB"
 msgstr ""
+"Formato a ser usado no campo 'título' da lista de reprodução "
+"quando usar CDDB"
 
 #: modules/access/cdda/cdda.c:148
 msgid "Do CDDB lookups?"
-msgstr ""
+msgstr "Fazer procuras CDDB"
 
 #: modules/access/cdda/cdda.c:149
 msgid "If set, lookup CD-DA track information using the CDDB protocol"
-msgstr ""
+msgstr "Se ativo, procurar informação de Faixa de CD-DA usando o protocolo CDDB"
 
 #: modules/access/cdda/cdda.c:154
-#, fuzzy
 msgid "CDDB server"
-msgstr "servidor"
+msgstr "servidor CDDB"
 
 #: modules/access/cdda/cdda.c:155
 msgid "Contact this CDDB server look up CD-DA information"
-msgstr ""
+msgstr "Contactar este servidor CDDB para procurar infomações CD-DA"
 
 #: modules/access/cdda/cdda.c:159
-#, fuzzy
 msgid "CDDB server port"
-msgstr "Porta do servidor"
+msgstr "Porta do servidor CDDB"
 
 #: modules/access/cdda/cdda.c:160
 msgid "CDDB server uses this port number to communicate on"
-msgstr ""
+msgstr "O servidor CDDB usa este número de porta para se comunicar"
 
 #: modules/access/cdda/cdda.c:164 modules/access/cdda/cdda.c:165
 msgid "email address reported to CDDB server"
-msgstr ""
+msgstr "endereço de e-mail reportado ao servidor CDDB"
 
 #: modules/access/cdda/cdda.c:169
 msgid "Cache CDDB lookups?"
-msgstr ""
+msgstr "Cachear procuras CDDB"
 
 #: modules/access/cdda/cdda.c:170
 msgid "If set cache CDDB information about this CD"
-msgstr ""
+msgstr "Se ativo, a informação CDDB sobre este CD será cacheada"
 
 #: modules/access/cdda/cdda.c:174
 msgid "Contact CDDB via the HTTP protocol?"
-msgstr ""
+msgstr "Contactar CDDB via o protocolo HTTP"
 
 #: modules/access/cdda/cdda.c:175
 msgid "If set, the CDDB server get information via the CDDB HTTP protocol"
-msgstr ""
+msgstr "Se ajustado, o servidor CDDB pega informações via o protocolo CDDB HTTP"
 
 #: modules/access/cdda/cdda.c:180
 msgid "CDDB server timeout"
-msgstr ""
+msgstr "timeout do servidor CDDB"
 
 #: modules/access/cdda/cdda.c:181
 msgid "Time (in seconds) to wait for a response from the CDDB server"
-msgstr ""
+msgstr "Tempo (em segundos) para esperar uma resposta do servidor CDDB"
 
 #: modules/access/cdda/cdda.c:186 modules/access/cdda/cdda.c:187
 msgid "Directory to cache CDDB requests"
-msgstr ""
+msgstr "Diretório para cachear requerimentos CDDB"
 
 #: modules/access/directory.c:82
 msgid "Standard filesystem directory input"
@@ -2256,7 +2249,6 @@ msgid "Video input chroma format"
 msgstr "Formato de chroma da entrada de vídeo"
 
 #: modules/access/dshow/dshow.cpp:126
-#, fuzzy
 msgid ""
 "Force the DirectShow video input to use a specific chroma format (eg. I420 "
 "(default), RV24, etc.)"
@@ -2265,9 +2257,8 @@ msgstr ""
 "(ex. I420 (padrão), RV24, etc...)"
 
 #: modules/access/dshow/dshow.cpp:128
-#, fuzzy
 msgid "Device properties"
-msgstr "Mostra os logs do programa"
+msgstr "Propriedades do dispositivo"
 
 #: modules/access/dshow/dshow.cpp:130
 msgid "Show the properties dialog of the selected device"
@@ -2608,7 +2599,7 @@ msgstr "Entrada SLP"
 
 #: modules/access/slp.c:81
 msgid "slp"
-msgstr ""
+msgstr "slp"
 
 #: modules/access/tcp.c:59 modules/access/udp.c:74
 #: modules/access_output/udp.c:75
@@ -2625,14 +2616,12 @@ msgstr ""
 "valor deverá ser ajustado em unidades de milisegundos."
 
 #: modules/access/tcp.c:68
-#, fuzzy
 msgid "TCP input"
-msgstr "Entrada FTP"
+msgstr "Entrada TCP"
 
 #: modules/access/tcp.c:69
-#, fuzzy
 msgid "TCP"
-msgstr "FTP"
+msgstr "TCP"
 
 #: modules/access/udp.c:80
 msgid "UDP/RTP input"
@@ -2666,13 +2655,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/v4l/v4l.c:89
-#, fuzzy
 msgid ""
 "Force the Video4Linux video device to use a specific chroma format (eg. I420 "
 "(default), RV24, etc.)"
 msgstr ""
-"Força a entrada de vídeo DirectShow a usar um formato de chroma específico "
-"(ex. I420 (padrão), RV24, etc...)"
+"Força a dispositivo Video4Linux a usar um formato de chroma específico  (ex. I420 "
+"(padrão), RV24, etc...)"
 
 #: modules/access/v4l/v4l.c:93
 msgid "Video4Linux input"
@@ -2691,9 +2679,8 @@ msgid "VCD input"
 msgstr "Entrada VCD"
 
 #: modules/access/vcdx/access.c:109
-#, fuzzy
 msgid "The above message had unknown log level"
-msgstr "A mensagem acima tinha um nível de log de vcdimager desconhecido"
+msgstr "A mensagem acima tinha um nível de log desconhecido"
 
 #: modules/access/vcdx/vcd.c:53
 msgid ""
@@ -2711,9 +2698,21 @@ msgid ""
 "still    (400) 1024\n"
 "vcdinfo  (800) 2048\n"
 msgstr ""
+"Estes inteiros quando vistos em binário é uma máscara de depuração\n"
+"meta info         1\n"
+"event info        2\n"
+"MRL               4\n"
+"external call     8\n"
+"all calls (10)   16\n"
+"LSN       (20)   32\n"
+"PBC       (40)   64\n"
+"libcdio   (80)  128\n"
+"seek-set (100)  256\n"
+"seek-cur (200)  512\n"
+"still    (400) 1024\n"
+"vcdinfo  (800) 2048\n"
 
 #: modules/access/vcdx/vcd.c:72
-#, fuzzy
 msgid "vcdx://[device-or-file][@{P,S,T}num]"
 msgstr "vcdx:[disp-ou-arquivo][@{P,S,T}num]"
 
@@ -2726,23 +2725,20 @@ msgid "VCDX"
 msgstr "VCDX"
 
 #: modules/access/vcdx/vcd.c:87
-#, fuzzy
 msgid "VCD device name"
-msgstr "Nome do dispositivo de CD-ROM"
+msgstr "Nome do dispositivo de VCD"
 
 #: modules/access/vcdx/vcd.c:88
-#, fuzzy
 msgid ""
 "Specify the name of the Video Compact Disc device that will be used by "
 "default. If you don't specify anything, we'll scan for a suitable VCD device."
 msgstr ""
 "Especifique o nome do dispositivo de VCD que será usado por padrão. Se você "
-"não especificar nada, nós iremos procurar por um dispositivo de VCD "
-"apropriado."
+"não especificar nada, nós iremos procurar por um dispositivo de VCD apropriado."
 
 #: modules/access/vcdx/vcd.c:94
 msgid "Use playback control?"
-msgstr ""
+msgstr "Usar controle de reprodução?"
 
 #: modules/access/vcdx/vcd.c:95
 msgid ""
@@ -3734,9 +3730,8 @@ msgid "ISO 13818-1 MPEG Transport Stream demuxstream (libdvbpsi)"
 msgstr ""
 
 #: modules/demux/dts.c:53
-#, fuzzy
 msgid "Raw DTS demuxer"
-msgstr "muxer TS"
+msgstr "demuxer raw DTS"
 
 #: modules/demux/flac.c:54
 msgid "flac demuxer"
@@ -3822,9 +3817,8 @@ msgid "MP4 demuxer"
 msgstr "demuxer MP4"
 
 #: modules/demux/mpeg/m4v.c:40
-#, fuzzy
 msgid "MPEG-4 Video demuxer"
-msgstr "Demuxer de vídeo MPEG I/II"
+msgstr "Demuxer de vídeo MPEG-4"
 
 #: modules/demux/mpeg/mpga.c:39
 msgid "MPEG-I/II Audio demuxer"
@@ -4933,7 +4927,7 @@ msgstr "atraso"
 #: modules/gui/gtk/gnome_interface.c:2020 modules/gui/gtk/gtk_interface.c:2338
 #: modules/gui/macosx/open.m:177
 msgid "fps"
-msgstr "qps"
+msgstr "fps"
 
 #: modules/gui/gtk/gnome_interface.c:2049 modules/gui/gtk/gtk_interface.c:2369
 #: modules/gui/macosx/open.m:172 modules/gui/macosx/output.m:127
@@ -5234,7 +5228,7 @@ msgstr "_Novo"
 
 #: modules/gui/gtk2/gnome2_interface.c:87
 msgid "gnome2"
-msgstr ""
+msgstr "gnome2"
 
 #: modules/gui/gtk2/gnome2_interface.c:112
 msgid "button4"
@@ -5354,7 +5348,7 @@ msgstr "Ajustar para a tela"
 #: modules/gui/macosx/controls.m:663 modules/gui/macosx/intf.m:477
 #: modules/gui/macosx/playlist.m:144
 msgid "Shuffle"
-msgstr ""
+msgstr "Embaralhar"
 
 #: modules/gui/macosx/controls.m:670 modules/gui/macosx/intf.m:478
 #: modules/gui/macosx/playlist.m:146
@@ -5377,7 +5371,7 @@ msgstr "Passo para Trás"
 #: modules/gui/macosx/info.m:157 modules/gui/macosx/intf.m:523
 #: modules/gui/macosx/intf.m:548
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: modules/gui/macosx/intf.m:429
 msgid "VLC - Controller"
@@ -5833,7 +5827,7 @@ msgstr "Tempo"
 
 #: modules/gui/pda/pda.c:296
 msgid "Index"
-msgstr ""
+msgstr "Índice"
 
 #: modules/gui/pda/pda_interface.c:283 modules/gui/pda/pda_interface.c:284
 msgid "Forward"
@@ -5939,7 +5933,7 @@ msgstr "Audio:"
 
 #: modules/gui/pda/pda_interface.c:573
 msgid "Channel:"
-msgstr "Canal"
+msgstr "Canal:"
 
 #: modules/gui/pda/pda_interface.c:582
 msgid "Norm:"
@@ -5963,7 +5957,7 @@ msgstr "Qualidade:"
 
 #: modules/gui/pda/pda_interface.c:627
 msgid "Tuner:"
-msgstr "Sintonizador"
+msgstr "Sintonizador:"
 
 #: modules/gui/pda/pda_interface.c:636
 msgid "Sound:"
@@ -6023,39 +6017,39 @@ msgstr "auto"
 
 #: modules/gui/pda/pda_interface.c:740
 msgid "240x192"
-msgstr ""
+msgstr "240x192"
 
 #: modules/gui/pda/pda_interface.c:741
 msgid "320x240"
-msgstr ""
+msgstr "320x240"
 
 #: modules/gui/pda/pda_interface.c:742
 msgid "qsif"
-msgstr ""
+msgstr "qsif"
 
 #: modules/gui/pda/pda_interface.c:743
 msgid "qcif"
-msgstr ""
+msgstr "qcif"
 
 #: modules/gui/pda/pda_interface.c:744
 msgid "sif"
-msgstr ""
+msgstr "sif"
 
 #: modules/gui/pda/pda_interface.c:745
 msgid "cif"
-msgstr ""
+msgstr "cif"
 
 #: modules/gui/pda/pda_interface.c:746
 msgid "vga"
-msgstr ""
+msgstr "vga"
 
 #: modules/gui/pda/pda_interface.c:762
 msgid "kHz"
-msgstr ""
+msgstr "kHz"
 
 #: modules/gui/pda/pda_interface.c:772
 msgid "Hz/s"
-msgstr ""
+msgstr "Hz/s"
 
 #: modules/gui/pda/pda_interface.c:794
 msgid "mono"
@@ -6083,22 +6077,20 @@ msgid "huffyuv"
 msgstr "huffyuv"
 
 #: modules/gui/pda/pda_interface.c:883
-#, fuzzy
 msgid "mp1v"
-msgstr "mpgv"
+msgstr "mp1v"
 
 #: modules/gui/pda/pda_interface.c:884
-#, fuzzy
 msgid "mp2v"
-msgstr "mpgv"
+msgstr "mp2v"
 
 #: modules/gui/pda/pda_interface.c:885
 msgid "mp4v"
-msgstr ""
+msgstr "mp4v"
 
 #: modules/gui/pda/pda_interface.c:886
 msgid "H263"
-msgstr ""
+msgstr "H263"
 
 #: modules/gui/pda/pda_interface.c:887
 msgid "I263"
@@ -6106,11 +6098,11 @@ msgstr ""
 
 #: modules/gui/pda/pda_interface.c:888
 msgid "WMV1"
-msgstr ""
+msgstr "WMV1"
 
 #: modules/gui/pda/pda_interface.c:889
 msgid "WMV2"
-msgstr ""
+msgstr "WMV2"
 
 #: modules/gui/pda/pda_interface.c:899
 msgid "Video Bitrate:"
@@ -6150,60 +6142,55 @@ msgstr "Tempo De Vida (TTL):"
 
 #: modules/gui/pda/pda_interface.c:996 modules/gui/pda/pda_interface.c:1006
 msgid "127.0.0.1"
-msgstr ""
+msgstr "127.0.0.1"
 
 #: modules/gui/pda/pda_interface.c:997
 msgid "localhost"
-msgstr ""
+msgstr "localhost"
 
 #: modules/gui/pda/pda_interface.c:998
 msgid "localhost.localdomain"
-msgstr ""
+msgstr "localhost.localdomain"
 
 #: modules/gui/pda/pda_interface.c:999
 msgid "239.0.0.42"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1017 modules/gui/pda/pda_interface.c:1031
-#, fuzzy
 msgid "ps"
-msgstr "qps"
+msgstr "ps"
 
 #: modules/gui/pda/pda_interface.c:1018
 msgid "ts"
-msgstr ""
+msgstr "ts"
 
 #: modules/gui/pda/pda_interface.c:1019
-#, fuzzy
 msgid "mpeg1"
-msgstr "ffmpeg"
+msgstr "mpeg1"
 
 #: modules/gui/pda/pda_interface.c:1020
-#, fuzzy
 msgid "avi"
-msgstr "Avi"
+msgstr "avi"
 
 #: modules/gui/pda/pda_interface.c:1021
-#, fuzzy
 msgid "ogg"
-msgstr "Ogg"
+msgstr "ogg"
 
 #: modules/gui/pda/pda_interface.c:1022
 msgid "mp4"
-msgstr ""
+msgstr "mp4"
 
 #: modules/gui/pda/pda_interface.c:1023
-#, fuzzy
 msgid "mov"
-msgstr "Remover"
+msgstr "mov"
 
 #: modules/gui/pda/pda_interface.c:1024
 msgid "asf"
-msgstr ""
+msgstr "asf"
 
 #: modules/gui/pda/pda_interface.c:1041 modules/gui/pda/pda_interface.c:1100
 msgid "kbits/s"
-msgstr ""
+msgstr "kbits/s"
 
 #: modules/gui/pda/pda_interface.c:1052 modules/gui/pda/pda_interface.c:1064
 msgid "alaw"
@@ -6219,49 +6206,43 @@ msgstr "mpga"
 
 #: modules/gui/pda/pda_interface.c:1055
 msgid "mp3"
-msgstr ""
+msgstr "mp3"
 
 #: modules/gui/pda/pda_interface.c:1056
-#, fuzzy
 msgid "a52"
-msgstr "A52"
+msgstr "a52"
 
 #: modules/gui/pda/pda_interface.c:1057
 msgid "vorb"
-msgstr ""
+msgstr "vorb"
 
 #: modules/gui/pda/pda_interface.c:1090
 msgid "bits/s"
-msgstr ""
+msgstr "bits/s"
 
 #: modules/gui/pda/pda_interface.c:1103
 msgid "Audio Bitrate :"
 msgstr "Taxa de bits do Audio:"
 
 #: modules/gui/pda/pda_interface.c:1121
-#, fuzzy
 msgid "display"
-msgstr "atraso"
+msgstr "mostrador"
 
 #: modules/gui/pda/pda_interface.c:1124
-#, fuzzy
 msgid "mmsh"
-msgstr "mms"
+msgstr "mmsh"
 
 #: modules/gui/pda/pda_interface.c:1137
-#, fuzzy
 msgid "SAP Announce:"
-msgstr "Anúncio SAP"
+msgstr "Anunciação SAP:"
 
 #: modules/gui/pda/pda_interface.c:1160
-#, fuzzy
 msgid "SLP Announce:"
-msgstr "Anúncio SLP"
+msgstr "Anunciação SLP:"
 
 #: modules/gui/pda/pda_interface.c:1169
-#, fuzzy
 msgid "Announce Channel:"
-msgstr "Anuncie streams via Canal SAP:"
+msgstr "Anunciar streams via Canal SAP:"
 
 #: modules/gui/pda/pda_interface.c:1201
 msgid "Transcode"
@@ -6351,9 +6332,8 @@ msgid "Open file"
 msgstr "Abrir arquivo"
 
 #: modules/gui/wxwindows/fileinfo.cpp:56
-#, fuzzy
 msgid "Stream and Media Info"
-msgstr "Informação do stream..."
+msgstr "Informação do stream e mídia"
 
 #: modules/gui/wxwindows/interface.cpp:290
 msgid "Quick file open"
@@ -6452,9 +6432,8 @@ msgid "&Messages..."
 msgstr "&Mensagens..."
 
 #: modules/gui/wxwindows/interface.cpp:339
-#, fuzzy
 msgid "&Stream and Media info..."
-msgstr "Informação do stream..."
+msgstr "Informação do &stream e mídia..."
 
 #: modules/gui/wxwindows/interface.cpp:360
 msgid "&About..."
@@ -6769,7 +6748,6 @@ msgid "&Close"
 msgstr "Fe&char"
 
 #: modules/gui/wxwindows/playlist.cpp:181
-#, fuzzy
 msgid "Sort by &title"
 msgstr "&Org. por título"
 
@@ -6778,7 +6756,6 @@ msgid "&Reverse sort by title"
 msgstr "Ordenar &Reverso por título"
 
 #: modules/gui/wxwindows/playlist.cpp:184
-#, fuzzy
 msgid "Sort by &author"
 msgstr "Org. por &Autor"
 
@@ -6787,7 +6764,6 @@ msgid "&Reverse sort by author"
 msgstr "Ordenar &Reverso por autor"
 
 #: modules/gui/wxwindows/playlist.cpp:187
-#, fuzzy
 msgid "Sort by &group"
 msgstr "&Org. por Grupo"
 
@@ -6796,9 +6772,8 @@ msgid "&Reverse sort by group"
 msgstr "Ordenar &Reverso por grupo"
 
 #: modules/gui/wxwindows/playlist.cpp:190
-#, fuzzy
 msgid "&Randomize Playlist"
-msgstr "Salvar Lista de Reprodução"
+msgstr "Aleatorizar Lista de &Reprodução"
 
 #: modules/gui/wxwindows/playlist.cpp:194
 msgid "&Enable"
@@ -6965,17 +6940,14 @@ msgid "Stream with VLC in three steps"
 msgstr "Stream com o VLC em três passos"
 
 #: modules/gui/wxwindows/streamwizard.cpp:41
-#, fuzzy
 msgid "Step 1: Select what to stream"
 msgstr "Passo 1:Selecione do que você quer fazer o stream"
 
 #: modules/gui/wxwindows/streamwizard.cpp:42
-#, fuzzy
 msgid "Step 2: Define streaming method"
 msgstr "Passo 2: Definir o método de streming"
 
 #: modules/gui/wxwindows/streamwizard.cpp:43
-#, fuzzy
 msgid "Step 3: Start streaming"
 msgstr "Passo 3: Iniciar o stream"
 
@@ -7037,9 +7009,8 @@ msgid "Standard of the analogic signal"
 msgstr ""
 
 #: modules/gui/wxwindows/v4l.cpp:308
-#, fuzzy
 msgid "The frequency in kHz"
-msgstr "A freqüência em KHz"
+msgstr "A freqüência em kHz"
 
 #: modules/gui/wxwindows/v4l.cpp:350
 msgid "Audio Device"
@@ -7054,9 +7025,8 @@ msgid "Bitrate Options"
 msgstr "Opções de taxa de bits"
 
 #: modules/gui/wxwindows/v4l.cpp:403
-#, fuzzy
 msgid "The average bitrate of the stream"
-msgstr "Navegar através do stream"
+msgstr "O bitrate médio do stream"
 
 #: modules/gui/wxwindows/v4l.cpp:411
 msgid "Maximum Bitrate"
@@ -7692,19 +7662,16 @@ msgid "No dithering"
 msgstr "Sem dithering"
 
 #: modules/video_output/caca.c:62
-#, fuzzy
 msgid "2x2 ordered dithering"
-msgstr "Dithering ordenado"
+msgstr "Dithering ordenado 2x2"
 
 #: modules/video_output/caca.c:63
-#, fuzzy
 msgid "4x4 ordered dithering"
-msgstr "Dithering ordenado"
+msgstr "Dithering ordenado 4x4"
 
 #: modules/video_output/caca.c:64
-#, fuzzy
 msgid "8x8 ordered dithering"
-msgstr "Dithering ordenado"
+msgstr "Dithering ordenado 8x8"
 
 #: modules/video_output/caca.c:65
 msgid "Random dithering"
@@ -7955,10 +7922,9 @@ msgid "Number of bands"
 msgstr "Número de faixas"
 
 #: modules/visualization/visual/visual.c:53
-#, fuzzy
 msgid "Number of bands used by spectrum analyzer, should be 20 or 80"
 msgstr ""
-"Número de faixas a serem usadas pelo analizador de espectro, deve se 20 ou 80"
+"Número de faixas a serem usadas pelo analizador de espectro, deve ser 20 ou 80"
 
 #: modules/visualization/visual/visual.c:55
 msgid "Band separator"
@@ -8039,11 +8005,9 @@ msgstr "Interface xosd"
 #~ msgid "no info"
 #~ msgstr "sem info."
 
-#, fuzzy
 #~ msgid "tcp"
-#~ msgstr "ftp"
+#~ msgstr "tcp"
 
-#, fuzzy
 #~ msgid ""
 #~ "This integer when viewed in binary is a debugging mask\n"
 #~ "MRL             1\n"
@@ -8056,13 +8020,16 @@ msgstr "Interface xosd"
 #~ "still    (80) 128\n"
 #~ "vcdinfo (100) 256\n"
 #~ msgstr ""
-#~ "Este inteiro quando visto em binário é uma mascade de debugação\n"
-#~ "MRL               1\n"
-#~ "chamada externa   2\n"
-#~ "todas as chamadas 4\n"
-#~ "LSN               8\n"
-#~ "libcdio     (10)  16\n"
-#~ "procuras    (20)  32\n"
+#~ "Este inteiro quando visto em binário é uma máscara de debugação\n"
+#~ "MRL             1\n"
+#~ "external call   2\n"
+#~ "all calls       4\n"
+#~ "LSN             8\n"
+#~ "PBC      (10)  16\n"
+#~ "libcdio  (20)  32\n"
+#~ "seeks    (40)  64\n"
+#~ "still    (80) 128\n"
+#~ "vcdinfo (100) 256\n"
 
 #~ msgid "vcdx:[device-or-file][@{P,S,T}num]"
 #~ msgstr "vcdx:[disp-ou-arquivo][@{P,S,T}num]"
