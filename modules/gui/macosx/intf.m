@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.63 2003/03/04 17:31:45 hartman Exp $
+ * $Id: intf.m,v 1.64 2003/03/04 22:36:18 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -305,7 +305,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_mi_quit setTitle: _NS("Quit VLC")];
 
     [o_mu_file setTitle: _ANS("1:File")];
-    NSLog(_ANS("1:File"));
     [o_mi_open_generic setTitle: _NS("Open...")];
     [o_mi_open_file setTitle: _NS("Open File...")];
     [o_mi_open_disc setTitle: _NS("Open Disc...")];
