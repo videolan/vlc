@@ -15,4 +15,6 @@ EXTRA_DIST += \
 	yuv2rgb_template.c \
 	yuv2rgb_altivec.c \
 	yuv2rgb_mlib.c \
-	rgb2rgb_template.c
+	rgb2rgb_template.c \
+	$(NULL)
+

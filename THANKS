@@ -95,3 +95,4 @@ Watanabe Go <go@dsl.gr.jp> - fix for non-ASCII filenames
 Xavier Maillard <zedek@fxgsproject.org> - audio converters
 Xavier Marchesini <xav@alarue.net> - Win32 fixes
 Yves Duret <yves@zarb.org> - RPM packages
+
