@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.2 2002/06/08 01:41:22 lool Exp $
+ * $Id: xosd.c,v 1.3 2002/06/08 02:50:26 lool Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -62,19 +62,23 @@ static void intf_Run          ( intf_thread_t *p_intf );
 #define POSITION_LONGTEXT N_("Display xosd output on the bottom of the " \
                              "screen instead of the top")
 
-#define OFFSET_TEXT N_("vertical offset")
-#define OFFSET_LONGTEXT N_("Vertical position offset of the text " \
-                           "displayed in pixels")
+#define TXT_OFS_TEXT N_("vertical offset")
+#define TXT_OFS_LONGTEXT N_("Vertical offset in pixels of the displayed text")
+
+#define SHD_OFS_TEXT N_("shadow offset")
+#define SHD_OFS_LONGTEXT N_("Offset in pixels of the shadow")
 
 #define FONT_TEXT N_("font")
 #define FONT_LONGTEXT N_("Font used to display text in the xosd output")
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_BOOL( "xosd-position", 0, NULL, POSITION_TEXT, POSITION_LONGTEXT )
-ADD_INTEGER( "xosd-text-offset", 0, NULL, OFFSET_TEXT, OFFSET_LONGTEXT )
-ADD_STRING( "xosd-font", "fixed", NULL, FONT_TEXT, FONT_LONGTEXT )
+ADD_BOOL( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT )
+ADD_INTEGER( "xosd-text-offset", 0, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT )
+ADD_INTEGER( "xosd-shadow-offset", 1, NULL, SHD_OFS_TEXT, SHD_OFS_LONGTEXT )
+ADD_STRING( "xosd-font", "-misc-fixed-medium-r-*-*-*-300-*-*-*-*-*-*", NULL, FONT_TEXT, FONT_LONGTEXT )
 MODULE_CONFIG_STOP
+// -misc-fixed-medium-r-normal-*-*-160-*-*-c-*-iso8859-15
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("xosd interface module") )
@@ -181,7 +185,11 @@ static void intf_Run( intf_thread_t *p_intf )
                                config_GetPsz( p_intf, "xosd-font" ) );
                 xosd_set_offset( p_intf->p_sys->p_osd,
                     config_GetInt( p_intf, "xosd-text-offset" ) );
-                xosd_set_pos( p_intf->p_sys->p_osd, config_GetInt( p_intf, "xosd-position" ) ? XOSD_bottom : XOSD_top );
+                xosd_set_shadow_offset( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-shadow-offset" ));
+                xosd_set_pos( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-position" ) ? XOSD_bottom
+                                                             : XOSD_top );
 
                 /* Display */
                 xosd_display( p_intf->p_sys->p_osd,
