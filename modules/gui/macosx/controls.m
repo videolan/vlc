@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.24 2003/02/09 01:13:43 massiot Exp $
+ * $Id: controls.m,v 1.25 2003/02/09 01:50:35 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -52,6 +52,9 @@
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;
 - (IBAction)loop:(id)sender;
+
+- (IBAction)forward:(id)sender;
+- (IBAction)backward:(id)sender;
 
 - (IBAction)volumeUp:(id)sender;
 - (IBAction)volumeDown:(id)sender;
@@ -272,6 +275,36 @@
     config_PutInt( p_playlist, "loop",
                    !config_GetInt( p_playlist, "loop" ) );
 
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)forward:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL || p_playlist->p_input == NULL )
+    {
+        if ( p_playlist != NULL ) vlc_object_release( p_playlist );
+        return;
+    }
+
+    input_Seek( p_playlist->p_input, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)backward:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL || p_playlist->p_input == NULL )
+    {
+        if ( p_playlist != NULL ) vlc_object_release( p_playlist );
+        return;
+    }
+
+    input_Seek( p_playlist->p_input, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
     vlc_object_release( p_playlist );
 }
 
@@ -679,6 +712,20 @@
                       NSOnState : NSOffState;
 
         [o_mi setState: i_state];
+    }
+    else if( [[o_mi title] isEqualToString: _NS("Step Forward")] ||
+             [[o_mi title] isEqualToString: _NS("Step Backward")] )
+    {
+        if( p_playlist != NULL && p_input != NULL )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            bEnabled = p_input->stream.b_seekable;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+        else
+        {
+            bEnabled = FALSE;
+        }
     }
     else if( [[o_mi title] isEqualToString: _NS("Mute")] ) 
     {

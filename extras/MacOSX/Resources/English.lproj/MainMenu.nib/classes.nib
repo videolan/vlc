@@ -4,9 +4,11 @@
         {CLASS = VLCApplication; LANGUAGE = ObjC; SUPERCLASS = NSApplication; }, 
         {
             ACTIONS = {
+                backward = id; 
                 deinterlace = id; 
                 doubleWindow = id; 
                 faster = id; 
+                forward = id; 
                 fullscreen = id; 
                 halfWindow = id; 
                 loop = id; 
@@ -71,6 +73,7 @@
                 "o_messages" = id; 
                 "o_mi_about" = id; 
                 "o_mi_bring_atf" = id; 
+                "o_mi_bwd" = id; 
                 "o_mi_channels" = id; 
                 "o_mi_chapter" = id; 
                 "o_mi_clear" = id; 
@@ -83,6 +86,7 @@
                 "o_mi_double_window" = id; 
                 "o_mi_faster" = id; 
                 "o_mi_fullscreen" = id; 
+                "o_mi_fwd" = id; 
                 "o_mi_half_window" = id; 
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
@@ -119,7 +123,7 @@
                 "o_mi_vol_down" = id; 
                 "o_mi_vol_up" = id; 
                 "o_mi_website" = id; 
-                "o_msgs_btn_crashog" = id; 
+                "o_msgs_btn_crashlog" = id; 
                 "o_msgs_btn_ok" = id; 
                 "o_msgs_panel" = id; 
                 "o_mu_audio" = id; 

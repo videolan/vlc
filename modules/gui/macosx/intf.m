@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.51 2003/02/09 01:13:43 massiot Exp $
+ * $Id: intf.m,v 1.52 2003/02/09 01:50:35 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -321,6 +321,8 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_mi_previous setTitle: _NS("Previous")];
     [o_mi_next setTitle: _NS("Next")];
     [o_mi_loop setTitle: _NS("Loop")];
+    [o_mi_fwd setTitle: _NS("Step Forward")];
+    [o_mi_bwd setTitle: _NS("Step Backward")];
     [o_mi_program setTitle: _NS("Program")];
     [o_mi_title setTitle: _NS("Title")];
     [o_mi_chapter setTitle: _NS("Chapter")];
