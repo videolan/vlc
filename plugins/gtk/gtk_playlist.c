@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.27 2002/01/17 23:02:45 gbazin Exp $
+ * $Id: gtk_playlist.c,v 1.28 2002/02/14 23:29:17 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -31,10 +31,6 @@
 #include <videolan/vlc.h>
 
 #include <sys/types.h>          /* for readdir  and stat stuff */
-
-#if !defined( _MSC_VER )
-#   include <dirent.h>
-#endif
 
 #include <sys/stat.h>
 #include <unistd.h>

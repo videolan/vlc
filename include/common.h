@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.71 2002/01/29 20:11:18 gbazin Exp $
+ * $Id: common.h,v 1.72 2002/02/14 23:29:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -428,8 +428,6 @@ typedef __int64 off_t;
 #else
 #   define _(String) (String)
 #   define N_(String) (String)
-#   define textdomain(Domain)
-#   define bindtextdomain(Package, Directory) 1
 #endif
 
 /*****************************************************************************

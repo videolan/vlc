@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.149 2002/02/13 22:10:40 sam Exp $
+ * $Id: main.c,v 1.150 2002/02/14 23:29:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -281,7 +281,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_aout_bank   = &aout_bank;
     p_vout_bank   = &vout_bank;
 
-#ifdef ENABLE_NLS
+#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
     /*
      * Support for getext
      */
