@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.3 2002/10/10 23:11:52 titer Exp $
+ * $Id: Interface.cpp,v 1.4 2002/10/30 06:12:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,6 +37,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc/aout.h>
+#include <aout_internal.h>
 
 #include "VlcWrapper.h"
 #include "InterfaceWindow.h"
@@ -71,10 +73,11 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     }
     
     p_intf->p_sys->p_input = NULL;
-    p_intf->p_sys->p_vlc_wrapper = new Intf_VLCWrapper( p_intf );
+    p_intf->p_sys->p_aout = NULL;
     p_intf->p_sys->p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
+                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
+    p_intf->p_sys->p_vlc_wrapper = new Intf_VLCWrapper( p_intf );
 
     p_intf->pf_run = Run;
 
@@ -112,6 +115,16 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
         vlc_object_release( p_intf->p_sys->p_input );
     }
     
+    if( p_intf->p_sys->p_playlist )
+    {
+        vlc_object_release( p_intf->p_sys->p_playlist );
+    }
+    
+    if( p_intf->p_sys->p_aout )
+    {
+        vlc_object_release( p_intf->p_sys->p_aout );
+    }
+    
     /* Destroy the interface window */
     p_intf->p_sys->p_window->Lock();
     p_intf->p_sys->p_window->Quit();
@@ -132,7 +145,13 @@ static void Run( intf_thread_t *p_intf )
         {
             p_intf->p_sys->p_input = 
                 (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                          FIND_ANYWHERE );
+                                                   FIND_ANYWHERE );
+        }
+        if( p_intf->p_sys->p_aout == NULL )
+        {
+            p_intf->p_sys->p_aout =
+                (aout_instance_t*)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                   FIND_ANYWHERE );
         }
         
         /* Update the input */
@@ -142,8 +161,14 @@ static void Run( intf_thread_t *p_intf )
             {
                 vlc_object_release( p_intf->p_sys->p_input );
                 p_intf->p_sys->p_input = NULL;
+                
+                if( p_intf->p_sys->p_aout )
+                {
+                    vlc_object_release( p_intf->p_sys->p_aout );
+                    p_intf->p_sys->p_aout = NULL;
+                }
             }
-        /* Manage the slider */
+            /* Manage the slider */
             p_intf->p_sys->p_window->updateInterface();
         }
 

@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.9 2002/10/30 00:59:22 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.10 2002/10/30 06:12:27 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -46,21 +46,17 @@ Intf_VLCWrapper::~Intf_VLCWrapper()
 /* playlist control */
 bool Intf_VLCWrapper::playlistPlay()
 {
-    playlist_t *p_playlist = 
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
 
     vlc_mutex_lock( &p_playlist->object_lock );
     if( p_playlist->i_size )
     {
         vlc_mutex_unlock( &p_playlist->object_lock );
         playlist_Play( p_playlist );
-        vlc_object_release( p_playlist );
     }
     else
     {
         vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
     }
 
     return( true );
@@ -68,61 +64,46 @@ bool Intf_VLCWrapper::playlistPlay()
 
 void Intf_VLCWrapper::playlistPause()
 {
-    toggle_mute(  );
-    playlist_t *p_playlist = 
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    playlist_Pause( p_playlist );
-    vlc_object_release( p_playlist );
+    toggle_mute();
+    if( p_intf->p_sys->p_input )
+    {
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+    }
 }
 
 void Intf_VLCWrapper::playlistStop()
 {
-    playlist_t *p_playlist = 
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
+
     playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
 }
 
 void Intf_VLCWrapper::playlistNext()
 {
-    playlist_t *p_playlist = 
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
 
     playlist_Next( p_playlist );
-    vlc_object_release( p_playlist );
 }
 
 void Intf_VLCWrapper::playlistPrev()
 {
-    playlist_t *p_playlist = 
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
 
     playlist_Prev( p_playlist );
-    vlc_object_release( p_playlist );
 }
 
 void Intf_VLCWrapper::playlistSkip(int i)
 {
-    playlist_t *p_playlist = 
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
 
     playlist_Skip( p_playlist, i );
-    vlc_object_release( p_playlist );
 }
 
 void Intf_VLCWrapper::playlistGoto(int i)
 {
-    playlist_t *p_playlist = 
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
 
     playlist_Goto( p_playlist, i );
-    vlc_object_release( p_playlist );
 }
 
 void Intf_VLCWrapper::playlistJumpTo( int pos )
@@ -416,9 +397,6 @@ void Intf_VLCWrapper::playFaster()
 
 void Intf_VLCWrapper::volume_mute()
 {
-    p_intf->p_sys->p_aout =
-        (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                           FIND_ANYWHERE );
     if( p_intf->p_sys->p_aout != NULL )
     {
 	    if( !p_intf->p_sys->b_mute )
@@ -433,9 +411,6 @@ void Intf_VLCWrapper::volume_mute()
 
 void Intf_VLCWrapper::volume_restore()
 {
-    p_intf->p_sys->p_aout =
-        (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                            FIND_ANYWHERE );
     if( p_intf->p_sys->p_aout != NULL )
     {
 	    p_intf->p_sys->p_aout->output.i_volume = p_intf->p_sys->i_saved_volume;
@@ -447,9 +422,6 @@ void Intf_VLCWrapper::volume_restore()
 
 void Intf_VLCWrapper::set_volume(int value)
 {
-    p_intf->p_sys->p_aout =
-        (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                            FIND_ANYWHERE );
     if( p_intf->p_sys->p_aout != NULL )
     {
 		// make sure value is within bounds
@@ -470,9 +442,6 @@ void Intf_VLCWrapper::set_volume(int value)
 
 void Intf_VLCWrapper::toggle_mute()
 {
-    p_intf->p_sys->p_aout =
-        (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                            FIND_ANYWHERE );
     if( p_intf->p_sys->p_aout != NULL )
    	{
 	    if ( p_intf->p_sys->b_mute )
@@ -490,9 +459,6 @@ bool Intf_VLCWrapper::is_muted()
 {
 	bool muted = true;
 	
-    p_intf->p_sys->p_aout =
-        (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                            FIND_ANYWHERE );
     if( p_intf->p_sys->p_aout != NULL )
 	{
 		vlc_mutex_lock( &p_intf->p_sys->p_aout->mixer_lock );
@@ -534,9 +500,6 @@ bool Intf_VLCWrapper::is_playing()
 
 void Intf_VLCWrapper::maxvolume()
 {
-    p_intf->p_sys->p_aout =
-        (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                            FIND_ANYWHERE );
     if( p_intf->p_sys->p_aout != NULL )
     {
 	    if( p_intf->p_sys->b_mute )
@@ -552,9 +515,6 @@ void Intf_VLCWrapper::maxvolume()
 
 bool Intf_VLCWrapper::has_audio()
 {
-    p_intf->p_sys->p_aout =
-        (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                            FIND_ANYWHERE );
     return( p_intf->p_sys->p_aout != NULL );
 }
 
@@ -611,9 +571,7 @@ void   Intf_VLCWrapper::setTimeAsFloat(float f_position)
 BList  *Intf_VLCWrapper::playlistAsArray()
 { 
     int i;
-    playlist_t *p_playlist = 
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
 
     BList* p_list = new BList(p_playlist->i_size);
     
@@ -625,7 +583,6 @@ BList  *Intf_VLCWrapper::playlistAsArray()
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
     return( p_list );
 }
 
@@ -698,8 +655,6 @@ void Intf_VLCWrapper::openFiles( BList* o_files, bool replace )
                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
         delete o_file;
     }
-
-    vlc_object_release( p_playlist );
 }
 
 void Intf_VLCWrapper::openDisc(BString o_type, BString o_device, int i_title, int i_chapter)
@@ -707,12 +662,9 @@ void Intf_VLCWrapper::openDisc(BString o_type, BString o_device, int i_title, in
     BString o_source("");
     o_source << o_type << ":" << o_device ;
 
-    playlist_t *p_playlist = 
-               (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                      FIND_ANYWHERE );
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
     playlist_Add( p_playlist, o_source.String(),
                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-    vlc_object_release( p_playlist );
 }
 
 void Intf_VLCWrapper::openNet(BString o_addr, int i_port)
@@ -824,5 +776,5 @@ void Intf_VLCWrapper::toggleSubtitle(int i_subtitle)
 
 int  Intf_VLCWrapper::inputGetStatus()
 {
-    return 0;
+    return p_intf->p_sys->p_playlist->i_status;
 }

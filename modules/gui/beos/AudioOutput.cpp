@@ -2,7 +2,7 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.13 2002/10/21 20:00:09 massiot Exp $
+ * $Id: AudioOutput.cpp,v 1.14 2002/10/30 06:12:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -36,7 +36,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
-#include "aout_internal.h"
+#include <aout_internal.h>
 
 #define FRAME_SIZE 2048
 
@@ -79,7 +79,7 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
     i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
     if ( i_nb_channels > 2 )
     {
-        /* I don't know if BeOS supports more than two channels. --Meuuh */
+        /* BSoundPlayer does not support more than 2 channels AFAIK */
         i_nb_channels = 2;
         p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
     }

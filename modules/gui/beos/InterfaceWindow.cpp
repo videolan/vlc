@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.6 2002/10/29 17:33:11 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.7 2002/10/30 06:12:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -68,8 +68,8 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	  fSettings( new BMessage( 'sett' ) )
 {
     p_intf = p_interface;
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
+    
     fPlaylistIsEmpty = (p_playlist->i_size < 0);
     
     fPlaylistWindow = new PlayListWindow( BRect( 100.0, 100.0, 400.0, 350.0 ),
@@ -169,15 +169,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     fSettingsMenu = new BMenu( "Settings" );
     fSettingsMenu->AddItem( fPreferencesMI =
         new BMenuItem( "Preferences", new BMessage( OPEN_PREFERENCES ) ) );
-	fMenuBar->AddItem( fSettingsMenu );
-	
-	/* Add the Config menu */
-//	BMenu* configMenu = new BMenu( "Config" );
-//	menu_bar->AddItem( configMenu );
-//	fOnTopMI = new BMenuItem( "Always on Top",
-//							  new BMessage( TOGGLE_ON_TOP ) )
-//	configMenu->AddItem(  );
-//	fOnTopMI->SetMarked(false);									
+	fMenuBar->AddItem( fSettingsMenu );							
 
 	// prepare fow showing
 	_SetMenusEnabled(false);
@@ -571,8 +563,8 @@ void InterfaceWindow::updateInterface()
 	else
 		_SetMenusEnabled(false);
 
-	playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+	playlist_t *p_playlist = p_intf->p_sys->p_playlist;
+	
 	if ( fPlaylistIsEmpty != ( p_playlist->i_size < 0) )
 	{
 		if ( Lock() )
@@ -607,8 +599,7 @@ InterfaceWindow::_UpdatePlaylist()
 	{
 		fPlaylistWindow->UpdatePlaylist( true );
 		fPlaylistWindow->Unlock();
-		playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+		playlist_t *p_playlist = p_intf->p_sys->p_playlist;
 		fPlaylistIsEmpty = p_playlist->i_size < 1;
 		p_mediaControl->SetEnabled( !fPlaylistIsEmpty );
 	}
