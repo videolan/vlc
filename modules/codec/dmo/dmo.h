@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 static const GUID IID_IUnknown = {0x00000000, 0x0000, 0x0000, {0xc0,0x00, 0x00,0x00,0x00,0x00,0x00,0x46}};
+static const GUID IID_IClassFactory = {0x00000001, 0x0000, 0x0000, {0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}};
 static const GUID IID_IMediaObject = {0xd8ad0f58, 0x5494, 0x4102, {0x97, 0xc5, 0xec, 0x79, 0x8e, 0x59, 0xbc, 0xf4}};
 static const GUID IID_IMediaBuffer = {0x59eff8b9, 0x938c, 0x4a26, {0x82, 0xf2, 0x95, 0xcb, 0x84, 0xcd, 0xc8, 0x37}};
 static const GUID MEDIATYPE_Video = {0x73646976, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
@@ -33,9 +34,13 @@ static const GUID GUID_NULL = {0x0000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 
 static const GUID MEDIASUBTYPE_I420 = {0x30323449, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 static const GUID MEDIASUBTYPE_YV12 = {0x32315659, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
-#ifdef WIN32
-#   define IUnknown IUnknownHack
-#endif
+#define IUnknown IUnknownHack
+#define IClassFactory IClassFactoryHack
+typedef struct _IUnknown IUnknown;
+typedef struct _IClassFactory IClassFactory;
+typedef struct _IEnumDMO IEnumDMO;
+typedef struct _IMediaBuffer IMediaBuffer;
+typedef struct _IMediaObject IMediaObject;
 
 #ifndef STDCALL
 #define STDCALL __stdcall
@@ -58,25 +63,6 @@ typedef struct
     GUID subtype;
 
 } DMO_PARTIAL_MEDIATYPE;
-
-/* Implementation of IMediaBuffer */
-typedef struct _CMediaBuffer
-{
-    IMediaBuffer_vt *vt;
-    int i_ref;
-    block_t *p_block;
-    int i_max_size;
-    vlc_bool_t b_own;
-
-} CMediaBuffer;
-
-CMediaBuffer *CMediaBufferCreate( block_t *, int, vlc_bool_t );
-
-#ifndef LOADER
-typedef struct _IUnknown IUnknown;
-typedef struct _IEnumDMO IEnumDMO;
-typedef struct _IMediaBuffer IMediaBuffer;
-typedef struct _IMediaObject IMediaObject;
 
 typedef struct
 #ifdef HAVE_ATTRIBUTE_PACKED
@@ -122,6 +108,21 @@ typedef struct IUnknown_vt
 
 } IUnknown_vt;
 struct _IUnknown { IUnknown_vt* vt; };
+
+/*
+ * IClassFactory interface
+ */
+typedef struct IClassFactory_vt
+{
+    long (STDCALL *QueryInterface)(IUnknown *This, const GUID* riid,
+                                   void **ppvObject);
+    long (STDCALL *AddRef)(IUnknown *This) ;
+    long (STDCALL *Release)(IUnknown *This) ;
+    long (STDCALL *CreateInstance)(IClassFactory *This, IUnknown *pUnkOuter,
+                                   const GUID* riid, void** ppvObject);
+} IClassFactory_vt;
+
+struct _IClassFactory { IClassFactory_vt* vt; };
 
 /*
  * IEnumDMO interface
@@ -245,5 +246,16 @@ typedef struct IMediaObject_vt
 
 } IMediaObject_vt;
 struct _IMediaObject { IMediaObject_vt* vt; };
-#endif  /* !define LOADER */
 
+/* Implementation of IMediaBuffer */
+typedef struct _CMediaBuffer
+{
+    IMediaBuffer_vt *vt;
+    int i_ref;
+    block_t *p_block;
+    int i_max_size;
+    vlc_bool_t b_own;
+
+} CMediaBuffer;
+
+CMediaBuffer *CMediaBufferCreate( block_t *, int, vlc_bool_t );

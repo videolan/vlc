@@ -32,19 +32,17 @@
 #include <vlc/decoder.h>
 #include <vlc/vout.h>
 
-#define LOADER
-#ifdef LOADER
-#   include <wine/winerror.h>
-#   include <dmo/dmo.h>
-#   include <dmo/dmo_interfaces.h>
-#   include <dmo/dmo_guids.h>
-#   define _RECT32_
-#   define _GUID_DEFINED
-#   define _REFERENCE_TIME_
-#   define _VIDEOINFOHEADER_
+#ifndef WIN32
+#    define LOADER
 #else
 #   include <objbase.h>
 #endif
+
+#ifdef LOADER
+#   include <wine/winerror.h>
+#   include <wine/windef.h>
+#endif
+
 #include "codecs.h"
 #include "dmo.h"
 

@@ -32,44 +32,34 @@
 #include <vlc/decoder.h>
 #include <vlc/vout.h>
 
-#define LOADER
-#ifdef LOADER
-/* Need the w32dll loader from mplayer */
-#   include <wine/winerror.h>
-#   include <dmo/dmo.h>
-#   include <dmo/dmo_interfaces.h>
-#   include <dmo/dmo_guids.h>
-#   include <ldt_keeper.h>
-
-/* Avoid  codecs.h to redefine a few symbols */
-#   define _RECT32_
-#   define _GUID_DEFINED
-#   define _REFERENCE_TIME_
-#   define _VIDEOINFOHEADER_
-
-/* Ugly, wine loader and vlc doesn't use the same field name for GUID */
-#define Data1 f1
-#define Data2 f2
-#define Data3 f3
-#define Data4 f4
-
-/* Not Needed */
-HRESULT CoInitialize( LPVOID pvReserved ) { return (HRESULT)-1; }
-void CoUninitialize(void) { }
-
-/* */
-HMODULE   WINAPI LoadLibraryA(LPCSTR);
-FARPROC   WINAPI GetProcAddress(HMODULE,LPCSTR);
-int       WINAPI FreeLibrary(HMODULE);
-
-typedef long STDCALL (*GETCLASS) (const GUID*, const GUID*, void**);
-
+#ifndef WIN32
+#    define LOADER
 #else
 #   include <objbase.h>
 #endif
 
-#include "dmo.h"
+#ifdef LOADER
+/* Need the w32dll loader from mplayer */
+#   include <wine/winerror.h>
+#   include <ldt_keeper.h>
+#   include <wine/windef.h>
+#endif
+
 #include "codecs.h"
+#include "dmo.h"
+
+#ifdef LOADER
+/* Not Needed */
+long CoInitialize( void *pvReserved ) { return -1; }
+void CoUninitialize( void ) { }
+
+/* A few prototypes */
+HMODULE WINAPI LoadLibraryA(LPCSTR);
+#define LoadLibrary LoadLibraryA
+FARPROC WINAPI GetProcAddress(HMODULE,LPCSTR);
+int     WINAPI FreeLibrary(HMODULE);
+typedef long STDCALL (*GETCLASS) ( const GUID*, const GUID*, void** );
+#endif /* LOADER */
 
 static int pi_channels_maps[7] =
 {
@@ -155,8 +145,7 @@ static const struct
     /* */
     { 0, NULL, NULL }
 };
-
-#endif
+#endif /* LOADER */
 
 /*****************************************************************************
  * Open: open dmo codec
@@ -165,6 +154,7 @@ static int Open( vlc_object_t *p_this )
 {
 #ifndef LOADER
     return DecoderOpen( p_this );
+
 #else
     decoder_t *p_dec = (decoder_t*)p_this;
     int i;
@@ -173,24 +163,25 @@ static int Open( vlc_object_t *p_this )
 
     p_dec->p_sys = NULL;
 
-
     /* Probe if we support it */
     for( i = 0; codecs_table[i].i_fourcc != 0; i++ )
     {
         if( codecs_table[i].i_fourcc == p_dec->fmt_in.i_codec )
         {
             msg_Dbg( p_dec, "DMO codec for %4.4s may work with dll=%s",
-                     (char*)&p_dec->fmt_in.i_codec,
-                     codecs_table[i].psz_dll );
+                     (char*)&p_dec->fmt_in.i_codec, codecs_table[i].psz_dll );
 
             /* Set callbacks */
-            p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))DecodeBlock;
-            p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))DecodeBlock;
+            p_dec->pf_decode_video =
+                (picture_t *(*)(decoder_t *, block_t **))DecodeBlock;
+            p_dec->pf_decode_audio =
+                (aout_buffer_t *(*)(decoder_t *, block_t **))DecodeBlock;
             return VLC_SUCCESS;
         }
     }
+
     return VLC_EGENERIC;
-#endif
+#endif /* LOADER */
 }
 
 /*****************************************************************************
@@ -232,15 +223,14 @@ static int DecoderOpen( vlc_object_t *p_this )
     }
 
 #ifndef LOADER
-  { /* <- ugly ? yes */
+  {
     IEnumDMO *p_enum_dmo = NULL;
     WCHAR *psz_dmo_name;
     GUID clsid_dmo;
-    HRESULT (STDCALL *OurDMOEnum)( const GUID *, uint32_t, uint32_t,
-                           const DMO_PARTIAL_MEDIATYPE *,
-                           uint32_t, const DMO_PARTIAL_MEDIATYPE *,
-                           IEnumDMO ** );
-
+    long (STDCALL *OurDMOEnum)( const GUID *, uint32_t, uint32_t,
+                               const DMO_PARTIAL_MEDIATYPE *,
+                               uint32_t, const DMO_PARTIAL_MEDIATYPE *,
+                               IEnumDMO ** );
 
     /* Load msdmo DLL */
     hmsdmo_dll = LoadLibrary( "msdmo.dll" );
@@ -293,11 +283,12 @@ static int DecoderOpen( vlc_object_t *p_this )
         goto error;
     }
   }
+
 #else   /* LOADER */
   {
     GETCLASS GetClass;
-    struct IClassFactory* cFactory = NULL;
-    struct IUnknown* cObject = NULL;
+    IClassFactory *cFactory = NULL;
+    IUnknown *cObject = NULL;
 
     int i_err;
     int i_codec;
@@ -316,7 +307,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    GetClass = (GETCLASS)GetProcAddress( hmsdmo_dll, "DllGetClassObject");
+    GetClass = (GETCLASS)GetProcAddress( hmsdmo_dll, "DllGetClassObject" );
     if (!GetClass)
     {
         msg_Dbg( p_dec, "GetProcAddress failed to find DllGetClassObject()" );
@@ -324,7 +315,8 @@ static int DecoderOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    i_err = GetClass( codecs_table[i_codec].p_guid, &IID_IClassFactory, (void**)&cFactory );
+    i_err = GetClass( codecs_table[i_codec].p_guid, &IID_IClassFactory,
+                      (void**)&cFactory );
     if( i_err || cFactory == NULL )
     {
         msg_Dbg( p_dec, "no such class object" );
@@ -332,7 +324,8 @@ static int DecoderOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    i_err = cFactory->vt->CreateInstance( cFactory, 0, &IID_IUnknown, (void**)&cObject );
+    i_err = cFactory->vt->CreateInstance( cFactory, 0, &IID_IUnknown,
+                                          (void**)&cObject );
     cFactory->vt->Release((IUnknown*)cFactory );
     if( i_err || !cObject )
     {
@@ -340,25 +333,8 @@ static int DecoderOpen( vlc_object_t *p_this )
         FreeLibrary( hmsdmo_dll );
         return VLC_EGENERIC;
     }
-    i_err = cObject->vt->QueryInterface( cObject, &IID_IMediaObject, (void**)&p_dmo );
-#if 0
-    if (hr == 0)
-    {
-            /* query for some extra available interface */
-        HRESULT r = object->vt->QueryInterface(object, &IID_IMediaObjectInPlace, (void**)&This->m_pInPlace);
-            if (r == 0 && This->m_pInPlace)
-        printf("DMO dll supports InPlace - PLEASE REPORT to developer\n");
-        r = object->vt->QueryInterface(object, &IID_IDMOVideoOutputOptimizations, (void**)&This->m_pOptim);
-        if (r == 0 && This->m_pOptim)
-        {
-                unsigned long flags;
-        r = This->m_pOptim->vt->QueryOperationModePreferences(This->m_pOptim, 0, &flags);
-        printf("DMO dll supports VO Optimizations %ld %lx\n", r, flags);
-        if (flags & DMO_VOSF_NEEDS_PREVIOUS_SAMPLE)
-            printf("DMO dll might use previous sample when requested\n");
-        }
-    }
-#endif
+    i_err = cObject->vt->QueryInterface( cObject, &IID_IMediaObject,
+                                        (void**)&p_dmo );
     cObject->vt->Release((IUnknown*)cObject );
   }
 #endif  /* LOADER */
