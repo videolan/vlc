@@ -43,13 +43,12 @@ static void Close( vlc_object_t * );
 #define FPS_TEXT N_("Frames per Second")
 #define FPS_LONGTEXT N_("Allows you to set the desired frame rate when " \
     "playing from files, use 0 for live.")
-#define VAR_FPS "mjpeg-fps"
 
 vlc_module_begin();
     set_description( _("JPEG camera demuxer") );
     set_capability( "demux2", 5 );
     set_callbacks( Open, Close );
-    add_float( VAR_FPS, 0.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
+    add_float( "mjpeg-fps", 0.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -282,16 +281,20 @@ static int Open( vlc_object_t * p_this )
     int         i_size;
     int         b_matched = VLC_FALSE;
     vlc_value_t val;
-    float       f_fps;
 
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es         = NULL;
     p_sys->i_time       = 1;
-    var_Create( p_demux, VAR_FPS, VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, VAR_FPS, &val );
-    f_fps = val.f_float;
-    p_sys->i_frame_length = 1000000.0 / f_fps;
+
+    var_Create( p_demux, "mjpeg-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "mjpeg-fps", &val );
+    p_sys->i_frame_length = 0;
+    if( val.f_float )
+    {
+        p_sys->i_frame_length = 1000000.0 / val.f_float;
+    }
+
     p_sys->psz_separator = NULL;
     p_sys->i_frame_size_estimate = 15 * 1024;
 
