@@ -106,8 +106,6 @@ plugin_info_t * GetConfig( void )
     
     p_info->i_score = 0x100;
     
-    
-    
     /* If this plugin was requested, score it higher */
     if( TestMethod( VOUT_METHOD_VAR, "sdl" ) )
     {

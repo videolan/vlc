@@ -136,9 +136,7 @@ void intf_SDLManage( intf_thread_t *p_intf )
     
     while ( SDL_PollEvent(&event) ) 
     {
-        
         i_key = event.key.keysym.sym;                  /* forward it */
-        intf_ErrMsgImm("key :%c:\n",(char) i_key);
         
         switch (event.type) {           
             case SDL_KEYDOWN:                         /* if a key is pressed */
@@ -180,7 +178,8 @@ void intf_SDL_Keymap(intf_thread_t * p_intf )
     /* intf_AssignKey(p_intf,'G','G'); */
     intf_AssignKey(p_intf, SDLK_c,      'c');
     intf_AssignKey(p_intf, SDLK_SPACE,  ' ');
-    intf_AssignKey(p_intf, 'i',      'i');
+    intf_AssignKey(p_intf, 'i',         'i');
     intf_AssignKey(p_intf, SDLK_s,      's');
 
 }
+
