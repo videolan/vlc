@@ -847,10 +847,11 @@ vlc_module_begin();
     add_integer( "sub-autodetect-fuzzy", 3, NULL,
                  SUB_FUZZY_TEXT, SUB_FUZZY_LONGTEXT, VLC_TRUE );
 #ifdef WIN32
-    add_string( "sub-autodetect-path", ".\\subtitles", NULL,
+#   define SUB_PATH ".\\subtitles"
 #else
-    add_string( "sub-autodetect-path", "./Subtitles, ./subtitles", NULL,
+#   define SUB_PATH "./Subtitles, ./subtitles"
 #endif
+    add_string( "sub-autodetect-path", SUB_PATH, NULL,
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, VLC_TRUE );
     add_file( "sub-file", NULL, NULL,
                  SUB_FILE_TEXT, SUB_FILE_LONGTEXT, VLC_TRUE );
