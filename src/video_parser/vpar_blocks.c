@@ -388,19 +388,21 @@ void __inline__ FillMbAddrIncTable( vpar_thread_t * p_vpar,
 {
     int i_dummy, i_dummy2;
     for( i_dummy = i_start ; i_dummy < i_end ; i_dummy += i_step )
+    {
         for( i_dummy2 = 0 ; i_dummy2 < i_step ; i_dummy2 ++ )
         {
             p_vpar->pl_mb_addr_inc[i_dummy + i_dummy2].i_value = * pi_value;
             p_vpar->pl_mb_addr_inc[i_dummy + i_dummy2].i_length = i_length;
         }
     (*pi_value)--;
+    }
 }
     
 /* Fonction that initialize the table using the last one */
 void InitMbAddrInc( vpar_thread_t * p_vpar )
 {
     int i_dummy;
-    int *  pi_value;
+    int i_value;
     for( i_dummy = 0 ; i_dummy < 8 ; i_dummy++ )
     {
         p_vpar->pl_mb_addr_inc[i_dummy].i_value = MB_ERROR;
@@ -424,16 +426,15 @@ void InitMbAddrInc( vpar_thread_t * p_vpar )
         p_vpar->pl_mb_addr_inc[i_dummy].i_value =  MB_ERROR;
         p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
     }
-    pi_value = (int *) malloc( sizeof( int ) );
-    * pi_value = 33;
-    FillMbAddrIncTable( p_vpar, 1024, 2048, 1024, pi_value, 1 );
-    FillMbAddrIncTable( p_vpar, 512, 1024, 256, pi_value, 3 );
-    FillMbAddrIncTable( p_vpar, 256, 512, 128, pi_value, 4 );
-    FillMbAddrIncTable( p_vpar, 128, 256, 64, pi_value, 5 );
-    FillMbAddrIncTable( p_vpar, 96, 128, 16, pi_value, 7 );
-    FillMbAddrIncTable( p_vpar, 48, 96, 8, pi_value, 8 );
-    FillMbAddrIncTable( p_vpar, 36, 48, 2, pi_value, 10 );
-    FillMbAddrIncTable( p_vpar, 24, 36, 1, pi_value, 11 );
+    i_value = 33;
+    FillMbAddrIncTable( p_vpar, 1024, 2048, 1024, &i_value, 1 );
+    FillMbAddrIncTable( p_vpar, 512, 1024, 256, &i_value, 3 );
+    FillMbAddrIncTable( p_vpar, 256, 512, 128, &i_value, 4 );
+    FillMbAddrIncTable( p_vpar, 128, 256, 64, &i_value, 5 );
+    FillMbAddrIncTable( p_vpar, 96, 128, 16, &i_value, 7 );
+    FillMbAddrIncTable( p_vpar, 48, 96, 8, &i_value, 8 );
+    FillMbAddrIncTable( p_vpar, 36, 48, 2, &i_value, 10 );
+    FillMbAddrIncTable( p_vpar, 24, 36, 1, &i_value, 11 );
 }
 
 /*****************************************************************************
@@ -501,8 +502,7 @@ void InitBMBType( vpar_thread_t * p_vpar )
  *****************************************************************************/
 void InitCodedPattern( vpar_thread_t * p_vpar )
 {
-   memcpy( p_vpar->pl_coded_pattern, pl_coded_pattern_init_table ,
-            sizeof(pl_coded_pattern_init_table) );
+    p_vpar->pl_coded_pattern = pl_coded_pattern_init_table;
 }
 
 /*****************************************************************************
@@ -510,40 +510,58 @@ void InitCodedPattern( vpar_thread_t * p_vpar )
  *           from the vlc code
  *****************************************************************************/
 
+/* First fonction for filling the table */
+static void __inline__ FillDCTTable( vpar_thread_t * p_vpar,
+                                     dct_lookup_t * pl_DCT_tab,
+                                     int i_intra, int i_dec, int i_off )
+{
+    int i_dummy, i_dummy2;
+    int i_end;
+    i_end = sizeof(pl_DCT_tab) / sizeof(dct_lookup_t);
+    for( i_dummy = 0; i_dummy < i_end; i_dummy++ )
+    {
+        for( i_dummy2 = 0; i_dummy2 < ( 1 << i_dec ); i_dummy2++ )
+        {
+            p_vpar->pppl_dct_coef
+                [i_intra][( ( i_dummy + i_off ) << i_dec ) + i_dummy2] =
+                                                         &pl_DCT_tab[i_dummy];
+        }
+    }
+}
+
+
+/* Fonction that actually fills the table or create the pointers */
 void InitDCTTables( vpar_thread_t * p_vpar )
 {
     /* Tables are cut in two parts to reduce memory occupation */
-    memcpy( p_vpar->pppl_dct_dc_size[0][0], pl_dct_dc_lum_init_table_1,
-            sizeof( pl_dct_dc_lum_init_table_1 ) );
-    memcpy( p_vpar->pppl_dct_dc_size[0][1], pl_dct_dc_lum_init_table_2,
-            sizeof( pl_dct_dc_lum_init_table_2 ) );
-    memcpy( p_vpar->pppl_dct_dc_size[1][0], pl_dct_dc_chrom_init_table_1,
-            sizeof( pl_dct_dc_chrom_init_table_1 ) );
-    memcpy( p_vpar->pppl_dct_dc_size[1][1], pl_dct_dc_chrom_init_table_2,
-            sizeof( pl_dct_dc_chrom_init_table_2 ) );
+    
+    p_vpar->pppl_dct_dc_size[0][0] = pl_dct_dc_lum_init_table_1;
+    p_vpar->pppl_dct_dc_size[0][1] = pl_dct_dc_lum_init_table_2;
+    p_vpar->pppl_dct_dc_size[1][0] = pl_dct_dc_chrom_init_table_1;
+    p_vpar->pppl_dct_dc_size[1][1] = pl_dct_dc_chrom_init_table_2;
+    
     /* For table B14 & B15, we have a pointer to tables */
-    p_vpar->ppl_dct_coef[0] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab_dc ) );
-    memcpy( p_vpar->ppl_dct_coef[0], pl_DCT_tab_dc, sizeof( pl_DCT_tab_dc ) );
-    p_vpar->ppl_dct_coef[1] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab_ac ) );
-    memcpy( p_vpar->ppl_dct_coef[1], pl_DCT_tab_ac, sizeof( pl_DCT_tab_ac ) );
-    p_vpar->ppl_dct_coef[2] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab0 ) );
-    memcpy( p_vpar->ppl_dct_coef[2], pl_DCT_tab0, sizeof( pl_DCT_tab0 ) );
-    p_vpar->ppl_dct_coef[3] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab1 ) );
-    memcpy( p_vpar->ppl_dct_coef[3], pl_DCT_tab1, sizeof( pl_DCT_tab1 ) );
-    p_vpar->ppl_dct_coef[4] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab2 ) );
-    memcpy( p_vpar->ppl_dct_coef[4], pl_DCT_tab2, sizeof( pl_DCT_tab2 ) );
-    p_vpar->ppl_dct_coef[5] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab3 ) );
-    memcpy( p_vpar->ppl_dct_coef[5], pl_DCT_tab3, sizeof( pl_DCT_tab3 ) );
-    p_vpar->ppl_dct_coef[6] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab4 ) );
-    memcpy( p_vpar->ppl_dct_coef[6], pl_DCT_tab4, sizeof( pl_DCT_tab4 ) );
-    p_vpar->ppl_dct_coef[7] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab5 ) );
-    memcpy( p_vpar->ppl_dct_coef[7], pl_DCT_tab5, sizeof( pl_DCT_tab5 ) );
-    p_vpar->ppl_dct_coef[8] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab6 ) );
-    memcpy( p_vpar->ppl_dct_coef[8], pl_DCT_tab6, sizeof( pl_DCT_tab6 ) );
-    p_vpar->ppl_dct_coef[9] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab0a ) );
-    memcpy( p_vpar->ppl_dct_coef[9], pl_DCT_tab0a, sizeof( pl_DCT_tab0a ) );
-    p_vpar->ppl_dct_coef[10] = (dct_lookup_t*) malloc( sizeof( pl_DCT_tab1a ) );
-    memcpy( p_vpar->ppl_dct_coef[10], pl_DCT_tab1a, sizeof( pl_DCT_tab1a ) );
+    /* We fill the table thanks to the fonction defined above */
+
+    FillDCTTable(  p_vpar, pl_DCT_tab_dc, 0, 12, 4 );
+    FillDCTTable(  p_vpar, pl_DCT_tab_ac, 0, 12, 4 );
+    FillDCTTable(  p_vpar, pl_DCT_tab0, 0, 8, 4 );
+    FillDCTTable(  p_vpar, pl_DCT_tab1, 0, 6, 8 );
+    FillDCTTable(  p_vpar, pl_DCT_tab2, 0, 4, 16 );
+    FillDCTTable(  p_vpar, pl_DCT_tab3, 0, 3, 16 );
+    FillDCTTable(  p_vpar, pl_DCT_tab4, 0, 2, 16 );
+    FillDCTTable(  p_vpar, pl_DCT_tab5, 0, 1, 16 );
+    FillDCTTable(  p_vpar, pl_DCT_tab6, 0, 0, 16 );
+    FillDCTTable(  p_vpar, pl_DCT_tab_dc, 1, 12, 4 );
+    FillDCTTable(  p_vpar, pl_DCT_tab_ac, 1, 12, 4 );
+    FillDCTTable(  p_vpar, pl_DCT_tab0a, 1, 8, 4 );
+    FillDCTTable(  p_vpar, pl_DCT_tab1a, 1, 6, 8);
+    FillDCTTable(  p_vpar, pl_DCT_tab2, 1, 4, 16 );
+    FillDCTTable(  p_vpar, pl_DCT_tab3, 1, 3, 16 );
+    FillDCTTable(  p_vpar, pl_DCT_tab4, 1, 2, 16 );
+    FillDCTTable(  p_vpar, pl_DCT_tab5, 1, 1, 16 );
+    FillDCTTable(  p_vpar, pl_DCT_tab6, 1, 0, 16 );
+    
 }
 
 /*
@@ -803,7 +821,9 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 {
     /* Index in the lookup table mb_addr_inc */
     int    i_index = ShowBits( &p_vpar->bit_stream, 11 );
+    
     p_vpar->mb.i_addr_inc = 0;
+    
     /* Test the presence of the escape character */
     while( i_index == 8 )
     {
@@ -811,8 +831,10 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
         p_vpar->mb.i_addr_inc += 33;
         i_index = ShowBits( &p_vpar->bit_stream, 11 );
     }
+    
     /* Affect the value from the lookup table */
     p_vpar->mb.i_addr_inc += p_vpar->pl_mb_addr_inc[i_index].i_value;
+    
     /* Dump the good number of bits */
     DumpBits( &p_vpar->bit_stream, p_vpar->pl_mb_addr_inc[i_index].i_length );
 }
@@ -904,11 +926,13 @@ int vpar_IMBType( vpar_thread_t * p_vpar )
 {
     /* Take two bits for testing */
     int                 i_type = ShowBits( &p_vpar->bit_stream, 2 );
+    
     /* Lookup table for macroblock_type */
     static lookup_t     pl_mb_Itype[4] = { {MB_ERROR, 0},
                                            {MB_QUANT|MB_INTRA, 2},
                                            {MB_INTRA, 1},
-                                           {MB_INTRA, 2} };
+                                           {MB_INTRA, 1} };
+                                           
     /* Dump the good number of bits */
     DumpBits( &p_vpar->bit_stream, pl_mb_Itype[i_type].i_length );
     return pl_mb_Itype[i_type].i_value;
@@ -921,8 +945,10 @@ int vpar_PMBType( vpar_thread_t * p_vpar )
 {
     /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
+    
     /* Dump the good number of bits */
     DumpBits( &p_vpar->bit_stream, p_vpar->ppl_mb_type[0][i_type].i_length );
+
     /* return the value from the lookup table for P type */
     return p_vpar->ppl_mb_type[0][i_type].i_value;
 }
@@ -934,8 +960,10 @@ int vpar_BMBType( vpar_thread_t * p_vpar )
 {
      /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
+    
     /* Dump the good number of bits */
     DumpBits( &p_vpar->bit_stream, p_vpar->ppl_mb_type[1][i_type].i_length );
+    
     /* return the value from the lookup table for B type */
     return p_vpar->ppl_mb_type[1][i_type].i_value;
 }
@@ -947,8 +975,10 @@ int vpar_DMBType( vpar_thread_t * p_vpar )
 {
     /* Taking 1 bit */
     int               i_type = GetBits( &p_vpar->bit_stream, 1 );
+    
     /* Lookup table */
     static int        pi_mb_Dtype[2] = { MB_ERROR, 1 };
+    
     return pi_mb_Dtype[i_type];
 }
 
@@ -959,8 +989,10 @@ int vpar_CodedPattern420( vpar_thread_t * p_vpar )
 {
     /* Take the max 9 bits length vlc code for testing */
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
+    
     /* Trash the good number of bits read in  the lookup table */
     DumpBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
+    
     /* return the value from the vlc table */
     return p_vpar->pl_coded_pattern[i_vlc].i_value;
 }
@@ -971,10 +1003,13 @@ int vpar_CodedPattern420( vpar_thread_t * p_vpar )
 int vpar_CodedPattern422( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
+    
     /* Supplementary 2 bits long code for 422 format */
     int      i_coded_block_pattern_1;
+    
     DumpBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
     i_coded_block_pattern_1 = GetBits( &p_vpar->bit_stream, 2 );
+    
     /* the code is just to be added to the value found in the table */
     return p_vpar->pl_coded_pattern[i_vlc].i_value |
            (i_coded_block_pattern_1 << 6);
@@ -987,8 +1022,10 @@ int vpar_CodedPattern444( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
     int      i_coded_block_pattern_2;
+    
     DumpBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
     i_coded_block_pattern_2 = GetBits( &p_vpar->bit_stream, 6 );
+    
     return p_vpar->pl_coded_pattern[i_vlc].i_value |
            ( i_coded_block_pattern_2 << 6 );
 }
@@ -1035,8 +1072,7 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
     int         i_offset;
     int         i_run;
     int         i_level;
-    int         i_2b;
-    int         i_4b;
+    boolean_t   b_intra;
     boolean_t   b_sign;
     /* Lookup table for the offset in the tables for ac coef decoding */
     static lookup_t pl_offset_table[8] = { { 12, 4 }, { 8, 4 }, { 6, 8 },
@@ -1052,25 +1088,13 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
     i_nc = 0;
 #endif
 
-    for( i_dummy = 0; i_dummy < 64; i_dummy++ )
+    b_intra = p_vpar->picture.b_intra_vlc_format;
+    for( i_dummy = 1; i_dummy < 64; i_dummy++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
-        i_2b = ! ( i_code >> 14 );
-        i_4b = ! ( ( i_code & 0x3C00 ) >> 10 );
-        /* Will contain the number of table to use in ppl_dct_coef */
-        i_select = i_2b + i_4b + ( i_code & 0x0200 ) + ( i_code & 0x0100 ) + 
-                                 ( i_code & 0x0080 ) + ( i_code & 0x0040 ) +
-                                 ( i_code & 0x0020 ) + ( i_code & 0x0010 );
-        /* Shall we use the first table or the next tables */
-        i_type = ( i_select & 1 ) & ( i_dummy & 0 );
-        i_select -= i_type;
-        i_offset = ( i_code >> pl_offset_table[i_select].i_value ) - 
-                               pl_offset_table[i_select].i_length;
-        i_run = ( * ( p_vpar->ppl_dct_coef[i_select]
-                    + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_run;
-        DumpBits( &p_vpar->bit_stream, 
-                  ( * ( p_vpar->ppl_dct_coef[i_select]
-                    + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_length );
+        i_run = (*p_vpar->pppl_dct_coef[b_intra][i_code]).i_run;
+        DumpBits( &p_vpar->bit_stream,
+                  (*p_vpar->pppl_dct_coef[b_intra][i_code]).i_length );
         switch( i_run )
         {
             case DCT_ESCAPE:
@@ -1087,8 +1111,7 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
                 i_dummy = 64;
                 break;
             default:
-                i_level = ( * ( p_vpar->ppl_dct_coef[i_select]
-                              + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_level;
+                i_level = (*p_vpar->pppl_dct_coef[b_intra][i_code]).i_level;
                 b_sign = GetBits( &p_vpar->bit_stream, 1 );
                 p_mb->ppi_blocks[i_b][i_dummy] = b_sign ? -i_level : i_level;
                 i_coef = i_dummy;
@@ -1126,37 +1149,44 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
     int         i_dct_dc_diff;
     int         i_run;
     int         i_level;
-    int         i_2b;
-    int         i_4b;
+    boolean_t   b_intra;
     boolean_t   b_sign;
+    
     /* Lookup Table for the chromatic component */
     static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
+    
     /* Lookup table for the offset in the tables for ac coef decoding */
     static lookup_t pl_offset_table[8] = { { 12, 4 }, { 8, 4 }, { 6, 8 },
                                            { 4, 16 }, { 3, 16 }, { 2, 16 },
                                            { 1, 16 }, { 0, 16 } };
     i_cc = pi_cc_index[i_b];
+    
     /* Determine whether it is luminance or not (chrominance) */
     i_type = ( i_cc + 1 ) >> 1;
 
     /* Decoding of the DC intra coefficient */
     /* The nb of bits to parse depends on i_type */
     i_code = ShowBits( &p_vpar->bit_stream, 9 + i_type );
+    
     /* To reduce memory occupation, there are two lookup tables
      * See InitDCT above */
     i_code5 = i_code >> 4;
+    
     /* Shall we lookup in the first or in the second table ? */
     i_select = ( i_code5 - 1 ) / 31;
     /* Offset value for looking in the second table */
     i_offset = 0x1f0 + ( i_type * 0x1f0 );
     i_pos = ( i_code5 * ( ! i_select ) ) + ( ( i_code - i_offset ) * i_select );
     i_dct_dc_size = p_vpar->pppl_dct_dc_size[i_type][i_select][i_pos].i_value;
+    
     /* Dump the variable length code */
     DumpBits( &p_vpar->bit_stream, 
               p_vpar->pppl_dct_dc_size[i_type][i_select][i_pos].i_length );
+    
     /* Read the actual code with the good length */
     i_dct_dc_diff = GetBits( &p_vpar->bit_stream, i_dct_dc_size );
     p_vpar->slice.pi_dc_dct_pred[i_cc] += i_dct_dc_diff;
+
 #ifndef VDEC_DFT
     p_mb->ppi_blocks[i_b][0] = ( p_vpar->slice.pi_dc_dct_pred[i_cc] <<
                                ( 3 - p_vpar->picture.i_intra_dc_precision ) );
@@ -1168,26 +1198,15 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
 #endif
 
     /* Decoding of the AC coefficients */
+    
     i_coef = 0;
+    b_intra = p_vpar->picture.b_intra_vlc_format;
     for( i_dummy = 1; i_dummy < 64; i_dummy++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
-        i_2b = ! ( i_code >> 14 );
-        i_4b = ! ( ( i_code & 0x3C00 ) >> 10 );
-        /* Will contain the number of table to use in ppl_dct_coef */
-        i_select = i_2b + i_4b + ( i_code & 0x0200 ) + ( i_code & 0x0100 ) + 
-                                 ( i_code & 0x0080 ) + ( i_code & 0x0040 ) +
-                                 ( i_code & 0x0020 ) + ( i_code & 0x0010 );
-        /* Shall we use B15 table or not */
-        i_type = p_vpar->picture.b_intra_vlc_format & ( ( i_select & 3 ) >> 1 );
-        i_select += (i_type * 7 );
-        i_offset = ( i_code >> pl_offset_table[i_select].i_value ) - 
-                               pl_offset_table[i_select].i_length;
-        i_run = ( * ( p_vpar->ppl_dct_coef[i_select]
-                    + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_run;
-        DumpBits( &p_vpar->bit_stream, 
-                  ( * ( p_vpar->ppl_dct_coef[i_select]
-                    + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_length );
+        i_run = (*p_vpar->pppl_dct_coef[b_intra][i_code]).i_run;
+        DumpBits( &p_vpar->bit_stream,
+                  (*p_vpar->pppl_dct_coef[b_intra][i_code]).i_length );
         switch( i_run )
         {
             case DCT_ESCAPE:
@@ -1204,8 +1223,7 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
                 i_dummy = 64;
                 break;
             default:
-                i_level = ( * ( p_vpar->ppl_dct_coef[i_select]
-                              + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_level;
+                i_level = (*p_vpar->pppl_dct_coef[b_intra][i_code]).i_level;
                 b_sign = GetBits( &p_vpar->bit_stream, 1 );
                 p_mb->ppi_blocks[i_b][i_dummy] = b_sign ? -i_level : i_level;
                 i_coef = i_dummy;

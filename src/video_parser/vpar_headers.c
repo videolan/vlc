@@ -392,6 +392,9 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         static f_chroma_pattern_t   ppf_chroma_pattern[4] =
                             {NULL, vpar_CodedPattern420,
                              vpar_CodedPattern422, vpar_CodedPattern444};
+
+        /* Turn the MPEG2 flag on */
+        p_vpar->sequence.b_mpeg2 = 1;
     
         /* Parse sequence_extension */
         DumpBits32( &p_vpar->bit_stream );
@@ -416,6 +419,8 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     else
     {
         /* It's an MPEG-1 stream. Put adequate parameters. */
+
+        p_vpar->sequence.b_mpeg2 = 0;
         p_vpar->sequence.b_progressive = 1;
         p_vpar->sequence.i_chroma_format = CHROMA_420;
         p_vpar->sequence.pf_decode_pattern = vpar_CodedPattern420;
