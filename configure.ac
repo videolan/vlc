@@ -192,7 +192,7 @@ AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 dnl
 dnl Gettext stuff
 dnl
-ALL_LINGUAS="da de en_GB es fr hu it ja nl no pl pt_BR ru sv"
+ALL_LINGUAS="da de en_GB es fr hu it ja nl no pl pt_BR ru sv el"
 AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
@@ -4092,7 +4092,7 @@ dnl
 dnl  Stuff used by the program
 dnl
 AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION} ${CODENAME}", [Simple version string])
-AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VLC media player - version ${VERSION} ${CODENAME} - (c) 1996-2004 VideoLAN", [Copyright string])
+AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VLC media player - version ${VERSION} ${CODENAME} - (c) 1996-2005 VideoLAN", [Copyright string])
 AC_DEFINE_UNQUOTED(CONFIGURE_LINE, "${CONFIGURE_LINE}", [The ./configure command line])
 
 VLC_SYMBOL="`echo ${VERSION} | sed -e 'y/.-+/___/'`"
