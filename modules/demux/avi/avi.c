@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.47 2003/05/05 22:23:35 gbazin Exp $
+ * $Id: avi.c,v 1.48 2003/05/22 21:42:44 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -2047,17 +2047,8 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
     }
 #endif
 
-    /* *** send audio data to decoder if rate == DEFAULT_RATE or no video *** */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( p_input->stream.control.i_rate == DEFAULT_RATE || !b_video )
-    {
-        b_play_audio = VLC_TRUE;
-    }
-    else
-    {
-        b_play_audio = VLC_FALSE;
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    /* Check if we need to send the audio data to decoder */
+    b_play_audio = !p_input->stream.control.b_mute;
 
     /* init toread */
     for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
@@ -2326,6 +2317,8 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                                       p_input->stream.p_selected_program,
                                       p_pes->i_pts * 9/100);
 
+            p_pes->i_rate = p_input->stream.control.i_rate;
+
             input_DecodePES( p_stream->p_es->p_decoder_fifo, p_pes );
         }
         else
@@ -2349,10 +2342,8 @@ static int AVIDemux_UnSeekable( input_thread_t *p_input )
     unsigned int i_stream;
     unsigned int i_packet;
 
-    /* *** send audio data to decoder only if rate == DEFAULT_RATE *** */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    b_audio = p_input->stream.control.i_rate == DEFAULT_RATE;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    /* Check if we need to send the audio data to decoder */
+    b_audio = !p_input->stream.control.b_mute;
 
     input_ClockManageRef( p_input,
                           p_input->stream.p_selected_program,
@@ -2456,6 +2447,9 @@ static int AVIDemux_UnSeekable( input_thread_t *p_input )
                             input_ClockGetTS( p_input,
                                           p_input->stream.p_selected_program,
                                           AVI_GetPTS( p_stream ) * 9/100);
+
+                    p_pes->i_rate = p_input->stream.control.i_rate;
+
                     input_DecodePES( p_stream->p_es->p_decoder_fifo, p_pes );
                 }
                 else

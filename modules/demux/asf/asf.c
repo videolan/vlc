@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.28 2003/05/05 22:23:35 gbazin Exp $
+ * $Id: asf.c,v 1.29 2003/05/22 21:42:43 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -682,13 +682,16 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
             }
 
             /* FIXME I don't use i_media_object_number, sould I ? */
-            if( p_stream->p_pes && i_media_object_offset == 0 )                 {
+            if( p_stream->p_pes && i_media_object_offset == 0 )
+            {
                 /* send complete packet to decoder */
                 if( p_stream->p_pes->i_pes_size > 0 )
                 {
                     if( p_stream->p_es->p_decoder_fifo &&
                         ( b_play_audio || p_stream->i_cat != AUDIO_ES ) )
                     {
+                        p_stream->p_pes->i_rate =
+                            p_input->stream.control.i_rate;
                         input_DecodePES( p_stream->p_es->p_decoder_fifo,
                                          p_stream->p_pes );
                     }
@@ -829,29 +832,8 @@ static int Demux( input_thread_t *p_input )
         }
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( p_input->stream.control.i_rate == DEFAULT_RATE )
-    {
-        b_play_audio = VLC_TRUE;
-    }
-    else
-    {
-        int i;
-
-        b_play_audio = VLC_TRUE;
-        for( i = 0; i < 128; i++ )
-        {
-            if( p_demux->stream[i] &&
-                p_demux->stream[i]->i_cat == VIDEO_ES &&
-                p_demux->stream[i]->p_es &&
-                p_demux->stream[i]->p_es->p_decoder_fifo )
-            {
-                /* there is at least ine video track so no need to play audio */
-                b_play_audio = VLC_FALSE;
-            }
-        }
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    /* Check if we need to send the audio data to decoder */
+    b_play_audio = !p_input->stream.control.b_mute;
 
     for( ;; )
     {

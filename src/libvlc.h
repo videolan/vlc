@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.69 2003/05/21 13:19:32 sigmunau Exp $
+ * $Id: libvlc.h,v 1.70 2003/05/22 21:42:43 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -388,7 +388,7 @@ static char *ppsz_language[] = { "auto", "de", "en_GB", "fr", "it",
 #define DEMUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure demux modules")
 
-#define FAST_MUTEX_TEXT N_("Dast mutex on NT/2K/XP (developers only)")
+#define FAST_MUTEX_TEXT N_("Fast mutex on NT/2K/XP (developers only)")
 #define FAST_MUTEX_LONGTEXT N_( \
     "On Windows NT/2K/XP we use a slow mutex implementation but which " \
     "allows us to correctely implement condition variables. " \

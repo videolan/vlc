@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.31 2003/05/09 19:29:57 fenrir Exp $
+ * $Id: mp4.c,v 1.32 2003/05/22 21:42:44 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -511,17 +511,8 @@ static int MP4Demux( input_thread_t *p_input )
     p_demux->i_time += __MAX( p_demux->i_timescale / 10 , 1 );
 
 
-    /* *** send audio data to decoder if rate == DEFAULT_RATE or no video *** */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( p_input->stream.control.i_rate == DEFAULT_RATE || !b_video )
-    {
-        b_play_audio = VLC_TRUE;
-    }
-    else
-    {
-        b_play_audio = VLC_FALSE;
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    /* Check if we need to send the audio data to decoder */
+    b_play_audio = !p_input->stream.control.b_mute;
 
     for( i_track = 0; i_track < p_demux->i_tracks; i_track++ )
     {
@@ -603,6 +594,8 @@ static int MP4Demux( input_thread_t *p_input )
 
                 if( track.p_es->p_decoder_fifo )
                 {
+
+                    p_pes->i_rate = p_input->stream.control.i_rate;
                     input_DecodePES( track.p_es->p_decoder_fifo, p_pes );
                 }
                 else
@@ -1380,7 +1373,10 @@ static int  TrackGotoChunkSample( input_thread_t   *p_input,
         {
             if( p_track->p_pes_init != NULL )
             {
-                input_DecodePES( p_track->p_es->p_decoder_fifo, p_track->p_pes_init );
+                p_track->p_pes_init->i_rate = p_input->stream.control.i_rate;
+
+                input_DecodePES( p_track->p_es->p_decoder_fifo,
+                                 p_track->p_pes_init );
                 p_track->p_pes_init = NULL;
             }
             p_track->b_selected = VLC_TRUE;

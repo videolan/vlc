@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.15 2003/05/13 11:44:53 gbazin Exp $
+ * $Id: preferences.cpp,v 1.16 2003/05/22 21:42:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -787,7 +787,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                    wxString::Format(wxT("%d"),p_item->i_value),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, p_item->i_value);
+                                   -16000, 16000, p_item->i_value);
             spin->SetToolTip( wxU(p_item->psz_longtext) );
             config_data->control.spinctrl = spin;
             panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
@@ -802,7 +802,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                    wxString::Format(wxT("%f"),p_item->f_value),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, (int)p_item->f_value);
+                                   -16000, 16000, (int)p_item->f_value);
             spin->SetToolTip( wxU(p_item->psz_longtext) );
             config_data->control.spinctrl = spin;
             panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
