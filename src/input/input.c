@@ -594,6 +594,7 @@ static int Init( input_thread_t * p_input )
     if( psz - psz_dup == 1 )
     {
         msg_Warn( p_input, "drive letter %c: found in source string", psz_dup[0] );
+        psz_path = psz_dup;
     }
     else
 #endif
