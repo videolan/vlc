@@ -238,7 +238,7 @@ static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     void *p_state;
     SpeexHeader *p_header;
-    SpeexMode *p_mode;
+    const SpeexMode *p_mode;
     SpeexCallback callback;
 
     p_sys->p_header = p_header =
@@ -460,7 +460,7 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     char *p_buf = (char *)p_oggpacket->packet;
-    SpeexMode *p_mode;
+    const SpeexMode *p_mode;
     int i_len;
 
     p_mode = speex_mode_list[p_sys->p_header->mode];
@@ -519,7 +519,7 @@ struct encoder_sys_t
     int i_headers;
 
     char *p_buffer;
-    char *p_buffer_out[MAX_FRAME_BYTES];
+    char p_buffer_out[MAX_FRAME_BYTES];
 
     /*
      * Speex properties
@@ -549,7 +549,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
-    SpeexMode *p_speex_mode = &speex_nb_mode;
+    const SpeexMode *p_speex_mode = &speex_nb_mode;
     int i_quality;
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC('s','p','x',' ') &&
