@@ -166,7 +166,7 @@ void *VideoWindow::GetWindow( int *pi_x_hint, int *pi_y_hint,
 #endif
 
 #elif defined(WIN32)
-    return GetHandle();
+    return (void*)GetHandle();
 
 #endif
 
