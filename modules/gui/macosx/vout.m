@@ -93,7 +93,7 @@
         [self initWithContentRect: screen_rect
               styleMask: NSBorderlessWindowMask
               backing: NSBackingStoreBuffered
-              defer: NO screen: o_screen];
+              defer: YES screen: o_screen];
 
         if( b_main_screen )
         {
@@ -122,7 +122,7 @@
         [self initWithContentRect: s_rect
               styleMask: i_stylemask
               backing: NSBackingStoreBuffered
-              defer: NO screen: o_screen];
+              defer: YES screen: o_screen];
 
         [self setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
 
