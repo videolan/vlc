@@ -190,6 +190,7 @@ struct intf_sys_t
     playlist_t          *p_playlist;
     input_thread_t      *p_input;
     vlm_t               *p_vlm;
+    tls_t               *p_tls;
 };
 
 
@@ -236,13 +237,27 @@ static int Open( vlc_object_t *p_this )
     if ( psz_cert != NULL )
     {
         const char *psz_pem;
+
+        p_sys->p_tls = vlc_object_create( p_this, VLC_OBJECT_TLS );
+        vlc_object_attach( p_sys->p_tls, p_this );
+
+        p_sys->p_tls->p_module = module_Need( p_sys->p_tls, "tls", 0, 0 );
+        if( p_sys->p_tls->p_module == NULL )
+        {
+            msg_Err( p_this, "cannot find TLS/SSL provider" );
+            vlc_object_detach( p_sys->p_tls );
+            vlc_object_destroy( p_sys->p_tls );
+            p_sys->p_tls = NULL;
+            return VLC_EGENERIC;
+        }
+
         msg_Dbg( p_intf, "enablind TLS for HTTP interface (cert file: %s)",
                  psz_cert );
         psz_pem = config_GetPsz( p_intf, "http-intf-key" );
         if ( psz_pem == NULL )
             psz_pem = psz_cert;
 
-        p_tls = tls_ServerCreate( VLC_OBJECT(p_intf), psz_cert, psz_pem );
+        p_tls = tls_ServerCreate( p_sys->p_tls, psz_cert, psz_pem );
         if ( p_tls == NULL )
         {
             msg_Err( p_intf, "TLS initialization error" );
@@ -273,6 +288,7 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
+        p_sys->p_tls = NULL;
         p_tls = NULL;
         if( i_port <= 0 )
             i_port= 8080;
@@ -382,7 +398,6 @@ void Close ( vlc_object_t *p_this )
     {
         vlm_Delete( p_sys->p_vlm );
     }
-
     for( i = 0; i < p_sys->i_files; i++ )
     {
        httpd_FileDelete( p_sys->pp_files[i]->p_file );
@@ -400,6 +415,13 @@ void Close ( vlc_object_t *p_this )
         free( p_sys->pp_files );
     }
     httpd_HostDelete( p_sys->p_httpd_host );
+    /* TODO: do this in the httpd code to avoid code duplication */
+    if( p_sys->p_tls != NULL )
+    {
+        module_Unneed( p_sys->p_tls, p_sys->p_tls->p_module );
+        vlc_object_detach( p_sys->p_tls );
+        vlc_object_destroy( p_sys->p_tls );
+    }
 
     free( p_sys );
 }
