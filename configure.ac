@@ -1914,13 +1914,44 @@ then
       fi
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
+
+      if fgrep -s "CONFIG_ZLIB=yes" "${real_ffmpeg_tree}/config.mak"; then
+        if test "${with_ffmpeg_zlib}" != "yes"; then
+          VLC_ADD_LDFLAGS([ffmpeg],[-lz])
+        fi
+      fi
+      if fgrep -s "CONFIG_MP3LAME=yes" "${real_ffmpeg_tree}/config.mak"; then
+        if test "${with_ffmpeg_mp3lame}" != "yes"; then
+          VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame])
+        fi
+      fi
+      if fgrep -s "CONFIG_FAAC=yes" "${real_ffmpeg_tree}/config.mak"; then
+        if test "${with_ffmpeg_faac}" != "yes"; then
+          VLC_ADD_LDFLAGS([ffmpeg],[-lfaac])
+        fi
+      fi
+      if fgrep -s "CONFIG_DTS=yes" "${real_ffmpeg_tree}/config.mak"; then
+        if test "${with_ffmpeg_dts}" != "yes"; then
+          VLC_ADD_LDFLAGS([ffmpeg],[-ldts])
+        fi
+      fi
+      if fgrep -s "CONFIG_VORBIS=yes" "${real_ffmpeg_tree}/config.mak"; then
+        VLC_ADD_LDFLAGS([ffmpeg],[-lvorbis -lvorbisenc])
+      fi
+      if fgrep -s "CONFIG_FAAD=yes" "${real_ffmpeg_tree}/config.mak"; then
+        VLC_ADD_LDFLAGS([ffmpeg],[-lfaad])
+      fi
+      if fgrep -s "CONFIG_XVID=yes" "${real_ffmpeg_tree}/config.mak"; then
+        VLC_ADD_LDFLAGS([ffmpeg],[-lxvidcore])
+      fi
+
       VLC_ADD_BUILTINS([ffmpeg])
-      VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec -lavcodec])
-      VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
+      VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
+      VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec])
 
       if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
         AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
-        VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat -lavformat -lz])
+        VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat ${real_ffmpeg_tree}/libavformat/libavformat.a])
         VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
       fi
     fi
