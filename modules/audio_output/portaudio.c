@@ -66,7 +66,24 @@ struct aout_sys_t
     int i_sample_size;
     PaDeviceIndex i_device_id;
     const PaDeviceInfo *deviceInfo;
+
+    vlc_bool_t b_chan_reorder;              /* do we need channel reordering */
+    int pi_chan_table[AOUT_CHAN_MAX];
+    uint32_t i_channel_mask;
+    uint32_t i_bits_per_sample;
+    uint32_t i_channels;
 };
+
+static const uint32_t pi_channels_in[] =
+    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+      AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
+static const uint32_t pi_channels_out[] =
+    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+      AOUT_CHAN_CENTER, AOUT_CHAN_LFE,
+      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, 0 };
 
 #ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
 static vlc_bool_t b_init = 0;
@@ -118,6 +135,13 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
 
     if ( p_buffer != NULL )
     {
+        if( p_sys->b_chan_reorder )
+        {
+            /* Do the channel reordering here */
+            aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_nb_bytes,
+                                 p_sys->i_channels, p_sys->pi_chan_table,
+                                 p_sys->i_bits_per_sample );
+        }
         p_aout->p_vlc->pf_memcpy( outputBuffer, p_buffer->p_buffer,
                                   framesPerBuffer * p_sys->i_sample_size );
         /* aout_BufferFree may be dangereous here, but then so is
@@ -437,6 +461,7 @@ static int PAOpenStream( aout_instance_t *p_aout )
     PaStreamParameters paStreamParameters;
     vlc_value_t val;
     int i_channels, i_err;
+    uint32_t i_channel_mask;
 
     if( var_Get( p_aout, "audio-device", &val ) < 0 )
     {
@@ -474,12 +499,28 @@ static int PAOpenStream( aout_instance_t *p_aout )
 
     i_channels = aout_FormatNbChannels( &p_aout->output.output );
     msg_Dbg( p_aout, "nb_channels requested = %d", i_channels );
+    i_channel_mask = p_aout->output.output.i_physical_channels;
 
     /* Calculate the frame size in bytes */
     p_sys->i_sample_size = 4 * i_channels;
     p_aout->output.i_nb_samples = FRAME_SIZE;
     aout_FormatPrepare( &p_aout->output.output );
     aout_VolumeSoftInit( p_aout );
+
+    /* Check for channel reordering */
+    p_aout->output.p_sys->i_channel_mask = i_channel_mask;
+    p_aout->output.p_sys->i_bits_per_sample = 32; /* forced to paFloat32 */
+    p_aout->output.p_sys->i_channels = i_channels;
+
+    p_aout->output.p_sys->b_chan_reorder =
+        aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
+                                  i_channel_mask, i_channels,
+                                  p_aout->output.p_sys->pi_chan_table );
+
+    if( p_aout->output.p_sys->b_chan_reorder )
+    {
+        msg_Dbg( p_aout, "channel reordering needed" );
+    }
 
     paStreamParameters.device = p_sys->i_device_id;
     paStreamParameters.channelCount = i_channels;
