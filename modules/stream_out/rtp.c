@@ -600,6 +600,7 @@ static int rtp_packetize_mpv  ( sout_stream_t *, sout_stream_id_t *, block_t * )
 static int rtp_packetize_ac3  ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_split( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_mp4a ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_h263 ( sout_stream_t *, sout_stream_id_t *, block_t * );
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 {
@@ -727,6 +728,13 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->psz_rtpmap = strdup( "ac3/90000" );
             id->pf_packetize = rtp_packetize_ac3;
             break;
+        case VLC_FOURCC( 'H', '2', '6', '3' ):
+            id->i_payload_type = 34;  // from live.com MediaSession.cpp
+            id->i_clock_rate = 90000;
+            id->psz_rtpmap = strdup( "H263-1998/90000" );
+            id->pf_packetize = rtp_packetize_h263;
+            break;
+
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
         {
             char hexa[2*p_fmt->i_extra +1];
@@ -1774,3 +1782,69 @@ static int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     return VLC_SUCCESS;
 }
+
+
+/* rfc2429 */
+#define RTP_H263_HEADER_SIZE (2)  // plen = 0
+#define RTP_H263_PAYLOAD_START (14)  // plen = 0
+static int rtp_packetize_h263( sout_stream_t *p_stream, sout_stream_id_t *id,
+                               block_t *in )
+{
+    uint8_t *p_data = in->p_buffer;
+    int     i_data  = in->i_buffer;
+    int     i;
+    int     i_max   = id->i_mtu - 12 - RTP_H263_HEADER_SIZE; /* payload max in one packet */
+    int     i_count;
+    int     b_p_bit;
+    int     b_v_bit = 0; // no pesky error resilience
+    int     i_plen = 0; // normally plen=0 for PSC packet
+    int     i_pebit = 0; // because plen=0
+    uint16_t h;
+
+    if( i_data < 2 )
+    {
+        return VLC_EGENERIC;
+    }
+    if( p_data[0] || p_data[1] )
+    {
+        return VLC_EGENERIC;
+    }
+    /* remove 2 leading 0 bytes */
+    p_data += 2;
+    i_data -= 2;
+    i_count = ( i_data + i_max - 1 ) / i_max;
+
+    for( i = 0; i < i_count; i++ )
+    {
+        int      i_payload = __MIN( i_max, i_data );
+        block_t *out = block_New( p_stream,
+                                  RTP_H263_PAYLOAD_START + i_payload );
+        b_p_bit = (i == 0) ? 1 : 0;
+        h = ( b_p_bit << 10 )|
+            ( b_v_bit << 9  )|
+            ( i_plen  << 3  )|
+              i_pebit;
+
+        /* rtp common header */
+        //b_m_bit = 1; // always contains end of frame
+        rtp_packetize_common( id, out, (i == i_count - 1)?1:0,
+                              in->i_pts > 0 ? in->i_pts : in->i_dts );
+
+        /* h263 header */
+        out->p_buffer[12] = ( h >>  8 )&0xff;
+        out->p_buffer[13] = ( h       )&0xff;
+        memcpy( &out->p_buffer[RTP_H263_PAYLOAD_START], p_data, i_payload );
+
+        out->i_buffer = RTP_H263_PAYLOAD_START + i_payload;
+        out->i_dts    = in->i_dts + i * in->i_length / i_count;
+        out->i_length = in->i_length / i_count;
+
+        rtp_packetize_send( id, out );
+
+        p_data += i_payload;
+        i_data -= i_payload;
+    }
+
+    return VLC_SUCCESS;
+}
+
