@@ -15,6 +15,11 @@
 
 <sect>
   <heading>Introduction</heading>
+  <p>
+  This document is only a first draft. It does not intend to cover all the 
+  subject. You may still have some problems at some steps or find better 
+  way to do them. If you have any comment do not hesitate to contact us.
+  </p>
   <sect1>
     <heading>Which platforms are targeted ?</heading>
     <p>
@@ -58,25 +63,52 @@
   <sect1>
     <heading>Prerequisite</heading>
     <sect2>
-      <heading></heading>
+      <heading>Importants paths</heading>
       <p>
-        During this section, we will use the following variables :
-        <itemize>
-          <item><bf>${PREFIX}</bf> will designate where you want to install 
-            your toolchain (eg: <tt>/usr/local/arm/2.95.3</tt>).</item>
-          <item><bf>${SRCDIR}</bf> will designate the directory where 
-            sources will be uncompressed 
-            (eg: <tt>/usr/src</tt> or <tt>/home/foobar/cross-arm</tt>).</item>
-        </itemize>
+        During this section, we will use the following paths :
       </p>
+      <p>I would personally advise to compile everything as a normal user and
+      then install everything as root.</p>
+      <sect3>
+        <heading>${SRCDIR}</heading>
+        <p>
+        This is where the sources will be located and where the compilation
+        will be done.
+        (eg: <tt>/usr/src</tt> or <tt>/home/foobar/arm-src</tt>).
+        </p>
+      </sect3>
+      <sect3>
+        <heading>${PREFIX}</heading>
+        <p>This is where you want to install your cross compilation toolchain.
+        It can be either installed system-wide (in <tt>/usr/local/arm/2.95.3</tt> for example). Installation steps (i.e. <tt>make install</tt>) will have
+        to be done as <tt>root</tt>.
+        Or it can be installed in user-land, for the user's own use (<tt>/home/foobar/arm/2.95.3</tt> for example).
+        In this paper, the chosen prefix is <tt>/usr/local/arm/2.95.3</tt>,
+        you will have to adapt the commands to what you choose..
+        </p>
+      </sect3>
     </sect2>
     <sect2>
       <heading>Files needed</heading>
-      <p>Download the following files and put them in the <bf>${SRCDIR}</bf> :
+      <p>Download the following files and put them in the <bf>${SRCDIR}</bf>.
+      Most of them are available on the <htmlurl url="http://www.videolan.org/vlc/download-sources.html" name="VideoLAN website">.
         <itemize>
           <item><tt>binutils-2.11.2.tar.gz</tt></item>
           <item><tt>linux-2.4.19.tar.bz2</tt></item>
           <item><tt>patch-2.4.19-rmk4.bz2</tt></item>
+          <item><tt>gcc-2.95.3.tar.gz</tt></item>
+          <item><tt>gcc-2.95.3.diff.bz2</tt></item>
+          <item><tt>gcc-2.95.3.diffbis.bz2</tt></item>
+          <item><tt>gcc-2.95.3.diff2</tt></item>
+          <item><tt>glibc-2.2.5.tar.gz</tt></item>
+          <item><tt>glibc-linuxthreads-2.2.5.tar.gz</tt></item>
+          <item><tt>SDL-1.2.5.tar.gz</tt></item>
+          <item><tt>glib-1.2.10.tar.gz</tt></item>
+          <item><tt>ffmpeg.tar.gz</tt></item>
+          <item><tt>mad-0.14.2b.tar.gz</tt></item>
+          <item><tt>flac-1.1.0.tar.gz</tt></item>
+          <item><tt>libdvbpsi-0.1.2.tar.gz</tt></item>
+          <item><tt>a52dec-0.7.4.tar.gz</tt></item>
         </itemize>
       </p>
     </sect2>
@@ -85,12 +117,11 @@
     <heading>Binutils</heading>
     <p>Compiling binutils is pretty simple :
     <tscreen><verb>
-% tar xzf binutils-2.11.2.tar.gz
-% cd binutils-2.11.2
-% ./configure --target=arm-linux --prefix=/usr/local/arm/2.95.3
-% make
-% su 
-# make install
+tar xzf binutils-2.11.2.tar.gz
+cd binutils-2.11.2
+./configure --target=arm-linux --prefix=/usr/local/arm/2.95.3
+make
+make install
     </verb></tscreen>
     </p>
   </sect1>
@@ -98,35 +129,41 @@
     <heading>Preparing linux kernel</heading>
     <p>
     <tscreen><verb>
-        % tar xzf linux-2.4.19.tar.bz2
-        % bunzip2 patch-2.4.19-rmk4.bz2
-        % cd linux-2.4.19
-        % patch -p1 &lt; ../patch-2.4.19-rmk4.bz2
-        % make clean ARCH=arm CROSS_COMPILE=arm-linux-
-        % make ARCH=arm h3600_config
-        !!! don't forget to save the configuration even if no changes are made
-        % make ARCH=arm menuconfig
-        % make symlinks ARCH=arm CROSS_COMPILE=arm-linux-
-        % mkdir -p /usr/local/arm/2.95.3/arm-linux/include
-        % cp -Rf include/asm include/asm-arm include/linux /usr/local/arm/2.95.3/arm-linux/include
-        % cd /usr/local/arm/2.95.3/arm-linux
-        % ln -s include sys-linux
-
+tar xzf linux-2.4.19.tar.bz2
+bunzip2 patch-2.4.19-rmk4.bz2
+cd linux-2.4.19
+patch -p1 &lt; ../patch-2.4.19-rmk4.bz2
+make clean ARCH=arm CROSS_COMPILE=arm-linux-
+make ARCH=arm h3600_config
+  </verb></tscreen>
+  <bf>Do not forget</bf> to save the configuration even if no changes 
+  are made !
+  <tscreen><verb>
+make ARCH=arm menuconfig
+make symlinks ARCH=arm CROSS_COMPILE=arm-linux-
+mkdir -p /usr/local/arm/2.95.3/arm-linux/include
+cp -Rf include/asm include/asm-arm include/linux \
+                      /usr/local/arm/2.95.3/arm-linux/include
+cd /usr/local/arm/2.95.3/arm-linux
+ln -s include sys-linux
     </verb></tscreen>
     </p>
   </sect1>
   <sect1>
     <heading>Basic cross compiler (gcc)</heading>
     <p>
-    tar xvzf gcc-2.95.3.tar.gz
-    bunzip2 gcc-2.95.3.diff.bz2
-    bunzip2 gcc-2.95.3.diffbis.bz2
-    patch -p1 -d gcc-2.95.3 &lt; gcc-2.95.3.diff
-    patch -p1 -d gcc-2.95.3 &lt; gcc-2.95.3.diffbis
-    cd gcc-2.95.3
-    ./configure --target=arm-linux --disable-threads --enable-languages=c --prefix=/usr/local/arm/2.95.3 --with-headers=linux-2.4.19/include
-    make
-    make install
+    <tscreen><verb>
+tar xvzf gcc-2.95.3.tar.gz
+bunzip2 gcc-2.95.3.diff.bz2
+bunzip2 gcc-2.95.3.diffbis.bz2
+patch -p1 -d gcc-2.95.3 &lt; gcc-2.95.3.diff
+patch -p1 -d gcc-2.95.3 &lt; gcc-2.95.3.diffbis
+cd gcc-2.95.3
+./configure --target=arm-linux --disable-threads --enable-languages=c \
+        --prefix=/usr/local/arm/2.95.3 --with-headers=linux-2.4.19/include
+make
+make install
+    </verb></tscreen>
     </p>
 
   </sect1>
@@ -134,177 +171,275 @@
     <heading>Compiling glibc</heading>
     <p>
     Depending on your target, you may choose another glibc version (eg: 2.1.3 for linupy 1.4)
-    tar xvzf glibc-2.2.5.tar.gz
-    cd glibc-2.2.5
-    tar xvzf ../glibc-linuxthreads-2.2.5.tar.gz
-    CC=arm-linux-gcc ./configure arm-linux --target=arm-linux --prefix=/usr/local/arm/2.95.3/arm-linux --enable-add-ons
-    
-    The following step is quite long !
-    
-    CC=arm-linux-gcc make
+    <tscreen><verb>
+tar xvzf glibc-2.2.5.tar.gz
+cd glibc-2.2.5
+tar xvzf ../glibc-linuxthreads-2.2.5.tar.gz
+CC=arm-linux-gcc ./configure arm-linux --target=arm-linux \
+          --prefix=/usr/local/arm/2.95.3/arm-linux --enable-add-ons
+    </verb></tscreen>
 
-    If you have problems compiling glibc due to pread/pwrite, edit sysdeps/unix/sysv/linux/kernel-features.h
-    and turn  __ASSUME_PREAD_SYSCALL and __ASSUME_PWRITE_SYSCALL from 1 to 0.
-    
-    CC=arm-linux-gcc make install
+The following step is quite long !
+
+    <tscreen><verb>
+CC=arm-linux-gcc make
+    </verb></tscreen>
+
+If you have problems compiling glibc due to pread/pwrite, edit <tt>sysdeps/unix/sysv/linux/kernel-features.h</tt>
+and turn <tt>__ASSUME_PREAD_SYSCALL</tt> and 
+<tt>__ASSUME_PWRITE_SYSCALL</tt> from 1 to 0.
+
+    <tscreen><verb>
+CC=arm-linux-gcc make install
+    </verb></tscreen>
     </p>
   </sect1>
   <sect1>
     <heading>Full cross compiler (gcc)</heading>
-    rm -Rf gcc-2.95.3
-    tar xvzf gcc-2.95.3.tar.gz
-    patch -p1 -d gcc-2.95.3 &lt; gcc-2.95.3.diff
-    patch -p1 -d gcc-2.95.3 &lt; gcc-2.95.3.diff2
-    cd gcc-2.95.3
-    ./configure --target=arm-linux --prefix=/usr/local/arm/2.95.3
-    make
-    make install
+    <p>
+    <tscreen><verb>
+rm -Rf gcc-2.95.3
+tar xvzf gcc-2.95.3.tar.gz
+patch -p1 -d gcc-2.95.3 &lt; gcc-2.95.3.diff
+patch -p1 -d gcc-2.95.3 &lt; gcc-2.95.3.diff2
+cd gcc-2.95.3
+./configure --target=arm-linux --prefix=/usr/local/arm/2.95.3
+make
+make install
+    </verb></tscreen>
+    </p>
+  </sect1>
+  <sect1>
+    <heading>Compiling linux kernel</heading>
   </sect1>
   <sect1>
     <heading>Misc</heading>
-    Add  /usr/local/arm/2.95.3/bin to your PATH. Add the following line (depends on your shell)
+    <p>
+    Add <tt>/usr/local/arm/2.95.3/bin</tt> to your PATH. Add the following line (depends on your shell)
     to your shell's configuration file :
-    export PATH=/usr/local/arm/2.95.3/bin:$PATH
+    <tscreen><verb>
+export PATH=/usr/local/arm/2.95.3/bin:$PATH
+    </verb></tscreen>
+    I would advise you to completely log out and then log in again, so that
+    the change would be taken into account. You can now check that when you
+    type <tt>arm-linux-gcc</tt>, it launches the cross-compiler.
+    </p>
 
-    cp libgcc_s.so.1 /usr/local/arm/2.95.3-new/arm-linux/lib                         
+    <p>
+    Next are some packages that you may compile by yourself, but I found
+    it was easier to use the precompiled packages. You can take them
+    at <htmlurl url="http://ipkgfind.handhelds.org/" name="ipkgfind">.
+    You may find packages with other version numbers which should not be
+    a problem.
+    <descrip>
+    <tag><tt>libgcc1_3.1.1-1_arm.ipk</tt></tag>
+        This provides libgcc.so.1 which is needed to compile some libraries.
+    <tag><tt>xlibs_4.1-5_arm.ipk</tt>, <tt>xlibs-dev_4.1.0-16_arm.ipk</tt></tag>
+        Those are the libraries ans the development files for X windows.
+    <tag><tt>zlib1g_1.1.4-3_arm.ipk</tt>, <tt>zlib1g-dev_1.1.3-fam1_arm.ipk</tt></tag>
+        These libraries are needed by some libraries to compile.
+    </descrip>
     
-    Install theses packages on your compiler box in /usr/local/arm/2.95.3/arm-linux
-     xlibs_4.1-5_arm.ipk
-     xlibs-dev_4.1.0-16_arm.ipk
-     zlib1g_1.1.4-3_arm.ipk
-     zlib1g-dev_1.1.3-fam1_arm.ipk
+    Install these packages on your compiler box in <tt>/usr/local/arm/2.95.3/arm-linux</tt> :
+     You can use the script <tt>install.sh</tt> :
+    <tscreen><verb>
+#!/bin/sh
+# script to install .ipk into the arm-toolchain
+# usage : ./install.sh foobar.ipk
+
+if ! tar xvzf $1 2> /dev/null
+then
+    ar xv $1 2> /dev/null
+fi
+cp data.tar.gz /usr/local/arm/2.95.3/arm-linux
+cd /usr/local/arm/2.95.3/arm-linux
+tar xvzf data.tar.gz
+    </verb></tscreen>
+    </p>
   </sect1>
 </sect>
-
-
 
 
 
 <sect>
   <heading>Cross compiling libraries needed by vlc</heading>
+  <p>
   Download <tt>ipaq-config.site</tt> to ${SOURCES}.
   When downloading source tarballs copy them to your ${SOURCES} directory.
   Each section is supposed to begin with <tt>cd ${SOURCES}</tt>.
+  </p>
   <sect1>
     <heading>SDL</heading>
-    !!!! beurk but did not found a better working method ¡¡¡¡
-    tar xvzf SDL-1.2.5.tar.gz
-    cd SDL-1.2.5
+    <p>
+    It is not clean at all but did not found a better working method.
+    Using config.site
+    it compiles well, but when linking with vlc there are problems !
+    </p>
+    <p>
+    <tt>/usr/local/arm/2.95.3/arm-linux/bin</tt> should contain the cross 
+    compiler without the prefix <tt>arm-linux-</tt>.
+    
+    <tscreen><verb>
+tar xvzf SDL-1.2.5.tar.gz
+cd SDL-1.2.5
 ./configure --enable-release --target=arm-linux --host=arm-linux \
-    --disable-esd \
-    --prefix=/usr/local/arm/2.95.3/arm-linux/usr \
-    --x-includes=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/include \
-    --x-libraries=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/lib \
-    --disable-video-opengl
+      --disable-esd \
+      --prefix=/usr/local/arm/2.95.3/arm-linux/usr \
+      --x-includes=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/include \
+      --x-libraries=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/lib \
+      --disable-video-opengl
+
 export PATH=/usr/local/arm/2.95.3/arm-linux/bin:$PATH
 
-  
 make && make install
-    
+    </verb></tscreen>
+    </p>
   </sect1>
   <sect1>
     <heading>Glib/GTK+</heading>
-    tar xvzf glib-1.2.10.tar.gz
-    cd glib-1.2.10
-    CONFIG_SITE=../ipaq-config.site ./configure --prefix=/usr/local/arm/2.95.3/arm-linux/usr
-    make
-    make install
-    cd ..
-    tar xvzf gtk+-1.2.10.tar.gz
-    cd gtk+-1.2.10
-    CONFIG_SITE=../ipaq-config.site ./configure --prefix=/usr/local/arm/2.95.3/arm-linux/usr --with-glib=../glib-1.2.10
-    make 
-    make install
+    <p>
+    <tscreen><verb>
+tar xvzf glib-1.2.10.tar.gz
+cd glib-1.2.10
+CONFIG_SITE=../ipaq-config.site ./configure \
+      --prefix=/usr/local/arm/2.95.3/arm-linux/usr
+make
+make install
+cd ..
+tar xvzf gtk+-1.2.10.tar.gz
+cd gtk+-1.2.10
+CONFIG_SITE=../ipaq-config.site ./configure \
+      --prefix=/usr/local/arm/2.95.3/arm-linux/usr --with-glib=../glib-1.2.10
+make 
+make install
+    </verb></tscreen>
+    </p>
   </sect1>
   <sect1>
     <heading>ffmpeg</heading>
-    tar xvzf ffmpeg.tar.gz
-    cd ffmpeg
-    ./configure --cpu=armv4l --cc=arm-linux-gcc --disable-mmx --prefix=/usr/local/arm/2.95.3/arm-linux/usr --enable-shared
-    cd libavcodec
-    make
+    <p>
+    <tscreen><verb>
+tar xvzf ffmpeg.tar.gz
+cd ffmpeg
+./configure --cpu=armv4l --cc=arm-linux-gcc --disable-mmx \
+        --prefix=/usr/local/arm/2.95.3/arm-linux/usr --enable-shared
+cd libavcodec
+make
+    </verb></tscreen>
 
     Vlc does not require that you install ffmpeg.
+    </p>
   </sect1>
   <sect1>
     <heading>mad</heading>
-    tar xvzf mad-0.14.2b.tar.gz
-    cd mad-0.14.2b
+    <p>
+    <tscreen><verb>
+tar xvzf mad-0.14.2b.tar.gz
+cd mad-0.14.2b
 ./configure --enable-release --target=arm-linux --host=arm-linux \
-    --disable-esd \
-    --prefix=/usr/local/arm/2.95.3/arm-linux/usr \
-    --x-includes=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/include \
-    --x-libraries=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/lib \
-    --disable-video-opengl
+      --disable-esd \
+      --prefix=/usr/local/arm/2.95.3/arm-linux/usr \
+      --x-includes=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/include \
+      --x-libraries=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/lib \
+      --disable-video-opengl
 export PATH=/usr/local/arm/2.95.3/arm-linux/bin:$PATH
-    make
-    
+make
+    </verb></tscreen>
+    </p>
   </sect1>
   <sect1>
     <heading>gpe</heading>
   </sect1>
-  %%%%%%%%%%%%%%%%%%%%%%%
-  First get Tremor and ogg sources from xiph.org (through CVS for example).       
-Then for each them, do :                                                        
-% ./configure  --enable-release --prefix=/usr/local/arm/2.95.3/arm-linux        
-% export PATH=/usr/local/arm/2.95.3/arm-linux/bin:$PATH                         
-% make                                                                          
-% su                                                                            
-# make install                                                                  
-                                                                                
-I know it is not clean, but --host or --target switches does not work.          
-The PATH I include, contains all the gcc utils for cross compilation            
-without the arm-linux- prefix.                                                  
-                                                                                
-If you want to link them statically : edit the libvorbisidec.a and remove       
-from the archive bitwise.o and framing.o (conflict with libogg.a)               
-                                                                                
-For flac, get the source tarball (from the videolan website for example)        
-% ./configure --enable-release --host=arm-linux --target=arm-linux              
---prefix=/usr/local/arm/2.95.3/arm-linux                                        
-% make                                                                          
--> will fail (xmms plugin), but not a problem, continue installation by hand    
-% su                                                                            
-# cp -Rf include/FLAC /usr/local/arm/2.95.3/arm-linux/include                   
-# cd src/libFLAC                                                                
-# make install                                                                  
-                                                                                
-When compiling vlc, add to the ./configure :                                    
-        --enable-ogg                                                            
-        --enable-tremor                                                         
-        --enable-flac                                                           
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
   <sect1>
     <heading>tremor</heading>
+    <p>
+    Tremor is an integer decoder for the vorbis audio codec. Download the
+    source through CVS at the <htmlurl url="http://www.xiph.org" name="xiph.org"> website.
+    </p>
+    <p>
+    Log into CVS using the password : <tt>anoncvs</tt>.
+    <tscreen><verb>
+cvs -d :pserver:anoncvs@xiph.org:/usr/local/cvsroot login
+cvs -d :pserver:anoncvs@xiph.org:/usr/local/cvsroot co Tremor
+cd Tremor
+CONFIG_SITE=../ipaq-config.site ./configure \
+              --prefix=/usr/local/arm/2.95.3/arm-linux/usr
+make
+</verb></tscreen>
+    </p>
   </sect1>
   <sect1>
     <heading>ogg</heading>
+    <p>
+    For ogg, it is the same as Tremor.
+    <tscreen><verb>
+cvs -d :pserver:anoncvs@xiph.org:/usr/local/cvsroot login
+cvs -d :pserver:anoncvs@xiph.org:/usr/local/cvsroot co ogg
+cd ogg
+CONFIG_SITE=../ipaq-config.site ./configure \
+             --prefix=/usr/local/arm/2.95.3/arm-linux/usr
+make
+    </verb></tscreen>
+    </p>
   </sect1>
   <sect1>
     <heading>flac</heading>
+    <p>
+    <tscreen><verb>
+tar xvzf flac-1.1.0.tar.gz
+cd flac-1.1.0
+./configure --enable-release --host=arm-linux --target=arm-linux \
+            --prefix=/usr/local/arm/2.95.3/arm-linux/usr
+    </verb></tscreen>
+    It will probably fail (due to the xmms plugin), but it is not a problem, 
+    we will continue installation by hand.
+    <tscreen><verb>
+cp -Rf include/FLAC /usr/local/arm/2.95.3/arm-linux/include
+cd src/libFLAC
+make install
+    </verb></tscreen>
+    </p>
   </sect1>
   <sect1>
     <heading>libdvbpsi</heading>
-    tar xvzf libdvbpsi-0.1.2.tar.gz
-    cd libdvbpsi-0.1.2
-    ./bootstrap
-    ./configure --target=arm-linux --host=arm-linux
-    make
-    
+    <p>
+    <tscreen><verb>
+tar xvzf libdvbpsi-0.1.2.tar.gz
+cd libdvbpsi-0.1.2
+./bootstrap
+./configure --target=arm-linux --host=arm-linux
+make
+    </verb></tscreen>
+    </p>
   </sect1>
   <sect1>
     <heading>a52</heading>
-    tar xvzf a52dec-0.7.4.tar.gz
-    cd a52dec-0.7.4
-    ./configure --enable-release --host=arm-linux --target=arm-linux --prefix=/usr/local/arm/2.95.3/arm-linux
-    make && make install
-
+    <p>
+    <tscreen><verb>
+tar xvzf a52dec-0.7.4.tar.gz
+cd a52dec-0.7.4
+./configure --enable-release --host=arm-linux --target=arm-linux \
+            --prefix=/usr/local/arm/2.95.3/arm-linux/usr
+make && make install
+    </verb></tscreen>
+    </p>
   </sect1>
 </sect>
 
 <sect>
   <heading>Cross compiling vlc itself</heading>
-  have a look à rules.* in the ipkg directory.
+  <p>
+  First of all, run the <tt>./bootstrap</tt> script.
+  Then run one of the <tt>ipkg/rules.*</tt>, according to what you want to compile.
+  Finally you just have to type make and you'll get a stand alone vlc.
+  </p>
+  <p>
+  Run <tt>arm-linux-strip</tt> to remove symbols and so the size of the file,
+  and now you can test it easily on your PDA.
+  </p>
+  <p>
+    Enjoy !
+  </p>
 </sect>
 
 </article></linuxdoc>
