@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.185 2004/02/29 13:05:21 gbazin Exp $
+dnl $Id: configure.ac,v 1.186 2004/02/29 19:28:10 gbazin Exp $
 
 AC_INIT(vlc,0.7.1)
 
@@ -2136,13 +2136,13 @@ if test "${enable_dts}" != "no"; then
     then
       AC_MSG_RESULT(yes)
       AX_ADD_CPPFLAGS([dtstofloat32],[-I${real_dts_tree}/include])
-      AX_ADD_LDFLAGS([dtstofloat32],[-L${real_dts_tree}/libdts/.libs])
+      AX_ADD_LDFLAGS([dtstofloat32],[-L${real_dts_tree}/libdts])
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_dtstofloat32}"
       AC_CHECK_LIB(dts, dts_free, [
         AX_ADD_BUILTINS([dtstofloat32])
         AX_ADD_LDFLAGS([dtstofloat32],[-ldts])
         ],[
-        if test -f ${real_dts_tree}/libdts/.libs/libdts.a
+        if test -f ${real_dts_tree}/libdts/libdts.a
         then
           AC_MSG_ERROR([make sure you have at least libdts-0.0.2])
         else
