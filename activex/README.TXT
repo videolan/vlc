@@ -3,13 +3,16 @@
 The VLC ActiveX Control has been primary designed to work with Internet Explorer.
 however it may also work with Visual Basic and/or .NET
 Please note, that this code does not rely upon MFC/ATL, hence good compatibility
-is not guaranteed
+is not guaranteed. 
 
 == Compiling ==
 
-In order to script the ActiveX Control on Internet Explorer, a type library is required.
+The Active Control should compile without any glitches as long as you have the latest
+version of mingw gcc and headers. However, In order to script the ActiveX Control
+on Internet Explorer, a type library is required.
+
 This type library is usually generated from an IDL file using Microsoft MIDL compiler.
-However, for convenience I have checked in the output of the MIDL compiler in the
+Therefore, for convenience I have checked in the output of the MIDL compiler in the
 repository so that you will only need the MIDL compiler if you change axvlc.idl.
 the generated files are as follow:
 
@@ -28,18 +31,36 @@ export MIDL="midl"
 if you are cross-compiling on Linux, you may be able to use 'widl' which is part of
 the WINE project (http://www.winehq.com), however I have not tested it.
 
-== Installing ==
+== Local Install ==
 
-The ActiveX control is built as axvlc.dll, which is the only file that needs be
+The ActiveX control is built as a DLL file, which is the only file that needs be
 distributed and it may be installed anywhere on the target machine as long as 
-its path is correct within the registry.
-the necessary registry settings are stored in axvlc.reg
+its path is specified within your PATH environment variable. Typically, you would
+install it into your WINDOWS directory.
 
-in order to use the plugin, you will need to VLC properly installed on your system
-otherwise make sure that the plugin path is set in the registry as indicated below
+if the control needs other VLC plugins, you will need to have VLC installed
+on your system, otherwise make sure that the plugin path is set in the registry
+as indicated below
 
 [HKEY_LOCAL_MACHINE\Software\VideoLAN\VLC]
 InstallDir="path\\dir\\"
 
+WARNING: The plugins version must also match the ActiveX control version,
+otherwise it may crash while attempting to load incompatible plugins
+
+== Internet Install ==
+
+The activex control may be installed from a remote through Internet Installer if
+it is packaged up in a CAB file. The following link explains how to achieve this
+
+http://msdn.microsoft.com/workshop/components/activex/packaging.asp
+
+For convenience, I have provide a sample axvlc.INF file, which installs the ActiveX Control
+into the WINDOWS directory, feel free to adapt it to your need.
+
+WARNING: For remote install, the ActiveX Control should be built with all required VLC
+plugins built-in.
+
 regards,
     Damien Fouilleul <Damien dot Fouilleul at laposte dot net>
+

@@ -232,12 +232,20 @@ STDMETHODIMP VLCOleObject::GetMiscStatus(DWORD dwAspect, DWORD *pdwStatus)
 {
     if( NULL != pdwStatus )
         return E_POINTER;
- 
-    *pdwStatus = OLEMISC_RECOMPOSEONRESIZE
-        | OLEMISC_CANTLINKINSIDE
-        | OLEMISC_INSIDEOUT
-        | OLEMISC_ACTIVATEWHENVISIBLE
-        | OLEMISC_SETCLIENTSITEFIRST;
+
+    switch( dwAspect )
+    {
+        case DVASPECT_CONTENT:
+            *pdwStatus = OLEMISC_RECOMPOSEONRESIZE
+                | OLEMISC_CANTLINKINSIDE
+                | OLEMISC_INSIDEOUT
+                | OLEMISC_ACTIVATEWHENVISIBLE
+                | OLEMISC_SETCLIENTSITEFIRST;
+            break;
+        default:
+            *pdwStatus = 0;
+    }
+
     return S_OK;
 };
 

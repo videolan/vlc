@@ -229,7 +229,7 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class) :
     _psz_src(NULL),
     _b_autostart(TRUE),
     _b_loopmode(FALSE),
-    _b_showdisplay(TRUE),
+    _b_visible(TRUE),
     _b_sendevents(TRUE),
     _i_vlc(0)
 {
@@ -590,12 +590,13 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
     SetWindowLongPtr(_videownd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
+    if( getVisible() )
+        ShowWindow(_inplacewnd, SW_SHOWNORMAL);
+
     /* horrible cast there */
     vlc_value_t val;
     val.i_int = reinterpret_cast<int>(_videownd);
     VLC_VariableSet(_i_vlc, "drawable", val);
-
-    setVisible(_b_showdisplay);
 
     if( NULL != _psz_src )
     {
@@ -631,14 +632,12 @@ HRESULT VLCPlugin::onInPlaceDeactivate(void)
     return S_OK;
 };
 
-BOOL VLCPlugin::isVisible(void)
-{
-    return GetWindowLong(_inplacewnd, GWL_STYLE) & WS_VISIBLE;
-};
-
 void VLCPlugin::setVisible(BOOL fVisible)
 {
-    ShowWindow(_inplacewnd, fVisible ? SW_SHOW : SW_HIDE);
+    _b_visible = fVisible;
+    if( isInPlaceActive() )
+        ShowWindow(_inplacewnd, fVisible ? SW_SHOWNORMAL : SW_HIDE);
+    firePropChangedEvent(DISPID_Visible);
 };
 
 void VLCPlugin::setFocus(BOOL fFocus)
@@ -738,12 +737,20 @@ void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
     UpdateWindow(_videownd);
 };
 
+void VLCPlugin::firePropChangedEvent(DISPID dispid)
+{
+    if( _b_sendevents )
+    {
+        vlcConnectionPointContainer->firePropChangedEvent(dispid); 
+    }
+};
+
 void VLCPlugin::fireOnPlayEvent(void)
 {
     if( _b_sendevents )
     {
         DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-        vlcConnectionPointContainer->fireEvent(1, &dispparamsNoArgs); 
+        vlcConnectionPointContainer->fireEvent(DISPID_PlayEvent, &dispparamsNoArgs); 
     }
 };
 
@@ -752,7 +759,7 @@ void VLCPlugin::fireOnPauseEvent(void)
     if( _b_sendevents )
     {
         DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-        vlcConnectionPointContainer->fireEvent(2, &dispparamsNoArgs); 
+        vlcConnectionPointContainer->fireEvent(DISPID_PauseEvent, &dispparamsNoArgs); 
     }
 };
 
@@ -761,7 +768,7 @@ void VLCPlugin::fireOnStopEvent(void)
     if( _b_sendevents )
     {
         DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-        vlcConnectionPointContainer->fireEvent(3, &dispparamsNoArgs); 
+        vlcConnectionPointContainer->fireEvent(DISPID_StopEvent, &dispparamsNoArgs); 
     }
 };
 

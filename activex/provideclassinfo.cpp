@@ -32,7 +32,7 @@ STDMETHODIMP VLCProvideClassInfo::GetClassInfo(ITypeInfo **ppTI)
     if( NULL == ppTI )
         return E_POINTER;
 
-    HRESULT hr = _p_instance->getTypeLib(&p_typelib);
+    HRESULT hr = _p_instance->getTypeLib(LOCALE_NEUTRAL, &p_typelib);
     if( SUCCEEDED(hr) )
     {
         hr = p_typelib->GetTypeInfoOfGuid(_p_instance->getClassID(), ppTI);

@@ -1,0 +1,11 @@
+[version]
+  signature="$CHICAGO$"
+  AdvancedINF=2.0
+[Add.Code]
+  axvlc.dll=axvlc.dll
+[axvlc.dll]
+  file-win32-x86=thiscab
+  clsid={E23FE9C6-778E-49d4-B537-38FCDE4887D8}
+  FileVersion=0,8,2,0
+  DestDir=10
+  RegisterServer=yes

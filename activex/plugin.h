@@ -79,8 +79,8 @@ public:
     STDMETHODIMP_(ULONG) Release(void);
 
     /* custom methods */
-    HRESULT getTypeLib(ITypeLib **pTL)
-        { return LoadRegTypeLib(LIBID_AXVLC, 1, 0, LOCALE_USER_DEFAULT, pTL); };
+    HRESULT getTypeLib(LCID lcid, ITypeLib **pTL)
+        { return LoadRegTypeLib(LIBID_AXVLC, 1, 0, lcid, pTL); };
     REFCLSID getClassID(void) { return (REFCLSID)CLSID_VLCPlugin; };
     REFIID getDispEventID(void) { return (REFIID)DIID_DVLCEvents; };
 
@@ -91,9 +91,6 @@ public:
     HRESULT onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprcPosRect, LPCRECT lprcClipRect);
     HRESULT onInPlaceDeactivate(void);
     HWND getInPlaceWindow(void) const { return _inplacewnd; };
-
-    BOOL isVisible(void);
-    void setVisible(BOOL fVisible);
 
     BOOL hasFocus(void);
     void setFocus(BOOL fFocus);
@@ -113,15 +110,16 @@ public:
             VLC_VolumeMute(_i_vlc);
         }
     };
-    void setShowDisplay(BOOL show) { _b_showdisplay = show; };
-    BOOL getShowDisplay(void) { return _b_showdisplay; };
     void setSendEvents(BOOL sendevents) { _b_sendevents = sendevents; };
+    void setVisible(BOOL fVisible);
+    BOOL getVisible(void) { return _b_visible; };
 
     // container events
     void onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect);
     void onPaint(PAINTSTRUCT &ps, RECT &pr);
 
     // control events
+    void firePropChangedEvent(DISPID dispid);
     void fireOnPlayEvent(void);
     void fireOnPauseEvent(void);
     void fireOnStopEvent(void);
@@ -160,7 +158,7 @@ private:
     char *_psz_src;
     BOOL _b_autostart;
     BOOL _b_loopmode;
-    BOOL _b_showdisplay;
+    BOOL _b_visible;
     BOOL _b_sendevents;
     int _i_vlc;
 };

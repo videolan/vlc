@@ -34,15 +34,27 @@ library AXVLC
     dispinterface DVLCEvents;
 
     enum VLCPlaylistMode {
-        VLCPlayListInsert      =  1,
-        VLCPlayListReplace     =  2,
-        VLCPlayListAppend      =  4,
-        VLCPlayListGo          =  8,
-        VLCPlayListCheckInsert = 16
+        VLCPlayListInsert       =  1,
+        VLCPlayListReplace      =  2,
+        VLCPlayListAppend       =  4,
+        VLCPlayListGo           =  8,
+        VLCPlayListCheckInsert  = 16
     };
 
     // playlist target position
-    const int VLCPlayListEnd = -666;
+    const int VLCPlayListEnd    = -666;
+
+    // DISPID definitions
+    const int DISPID_Visible    = 1;
+    const int DISPID_Playing    = 2;
+    const int DISPID_Position   = 3;
+    const int DISPID_Time       = 4;
+    const int DISPID_Length     = 5;
+    const int DISPID_Volume     = 6;
+
+    const int DISPID_PlayEvent  = 1;
+    const int DISPID_PauseEvent = 2;
+    const int DISPID_StopEvent  = 3;
 
     [
       odl,
@@ -53,13 +65,14 @@ library AXVLC
       oleautomation
     ]
     interface IVLCControl : IDispatch {
+
         [id(0), bindable, defaultbind, propget, helpstring("Specifies current target in playlist")]
         HRESULT Value([out, retval] VARIANT* pvarValue);
         [id(0), bindable, defaultbind, propput, helpstring("Specifies current target in playlist")]
         HRESULT Value([in] VARIANT pvarValue);
-        [propget, bindable, helpstring("Shows or hides plugin.")]
+        [id(DISPID_Visible), propget, bindable, helpstring("Shows or hides plugin.")]
         HRESULT Visible([out, retval] VARIANT_BOOL* visible);
-        [propput, bindable, helpstring("Shows or hides plugin.")]
+        [id(DISPID_Visible), propput, bindable, helpstring("Shows or hides plugin.")]
         HRESULT Visible([in] VARIANT_BOOL visible);
         [helpstring("Play current target in playlist.")]
         HRESULT play();
@@ -67,31 +80,31 @@ library AXVLC
         HRESULT pause();
         [helpstring("Stop playback.")]
         HRESULT stop();
-        [propget, helpstring("Specifies whether VLC is playing.")]
+        [id(DISPID_Playing), bindable, propget, helpstring("Specifies whether VLC is playing.")]
         HRESULT Playing([out, retval] VARIANT_BOOL* isPlaying);
-        [propput, helpstring("Specifies whether VLC is playing.")]
+        [id(DISPID_Playing), bindable, propput, helpstring("Specifies whether VLC is playing.")]
         HRESULT Playing([in] VARIANT_BOOL isPlaying);
-        [propget, helpstring("Specifies playback position within current target in playlist, position is a relative value ranging from 0.0 to 1.0.")]
+        [id(DISPID_Position), bindable, propget, helpstring("Specifies playback position within current target in playlist, position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([out, retval] float* position);
-        [propput, helpstring("Specifies playback position within current target in playlist, position is a relative value ranging from 0.0 to 1.0.")]
+        [id(DISPID_Position), bindable, propput, helpstring("Specifies playback position within current target in playlist, position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([in] float position);
-        [propget, helpstring("Specifies playback time relative to the start of current target in playlist.")]
+        [id(DISPID_Time), bindable, propget, helpstring("Specifies playback time relative to the start of current target in playlist.")]
         HRESULT Time([out, retval] int* seconds);
-        [propput, helpstring("Specifies playback time relative to the start of current target in playlist.")]
+        [id(DISPID_Time), bindable, propput, helpstring("Specifies playback time relative to the start of current target in playlist.")]
         HRESULT Time([in] int seconds);
         [helpstring("Advance or backtrack playback time, relative to current time.")]
         HRESULT shuttle([in] int seconds);
         [helpstring("Switch between normal and fullscreen video.")]
         HRESULT fullscreen();
-        [propget, helpstring("Returns total length in seconds of current target in playlist, may be unknown.")]
+        [id(DISPID_Length), bindable, propget, helpstring("Returns total length in seconds of current target in playlist, may be unknown.")]
         HRESULT Length([out, retval] int* seconds);
         [helpstring("Increases playback speed, one of 1x, 2x, 4x, 8x.")]
         HRESULT playFaster();
         [helpstring("Decreases playback speed, one of 1x, 2x, 4x, 8x.")]
         HRESULT playSlower();
-        [propget, helpstring("Specifies playback sound volume, ranges from 0 to 200%.")]
+        [id(DISPID_Volume), bindable, propget, helpstring("Specifies playback sound volume, ranges from 0 to 200%.")]
         HRESULT Volume([out, retval] int* volume);
-        [propput, helpstring("Specifies playback sound volume, ranges from 0 to 200%.")]
+        [id(DISPID_Volume), bindable, propput, helpstring("Specifies playback sound volume, ranges from 0 to 200%.")]
         HRESULT Volume([in] int volume);
         [helpstring("Mute/unmute playback sound volume.")]
         HRESULT toggleMute();
@@ -125,11 +138,11 @@ library AXVLC
     dispinterface DVLCEvents {
         properties:
         methods:
-            [id(1), helpstring("Playback in progress")]
+            [id(DISPID_PlayEvent), helpstring("Playback in progress")]
             void Play();
-            [id(2), helpstring("Playback has paused")]
+            [id(DISPID_PauseEvent), helpstring("Playback has paused")]
             void Pause();
-            [id(3), helpstring("Playback has stopped")]
+            [id(DISPID_StopEvent), helpstring("Playback has stopped")]
             void Stop();
     };
 

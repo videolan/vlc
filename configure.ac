@@ -4040,10 +4040,10 @@ if test "${enable_activex}" != "no"
 then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
   then
-    AC_CHECK_PROG(MIDL, midl, :)
+    AC_CHECK_PROGS(MIDL, [midl widl], no)
     AC_CHECK_HEADERS(ole2.h olectl.h,
       [ VLC_ADD_CXXFLAGS([activex],[-fno-exceptions])
-        VLC_ADD_LDFLAGS([activex],[-lole32 -loleaut32 -luuid]) 
+        VLC_ADD_LDFLAGS([activex],[-lole32 -loleaut32 -luuid -lshlwapi]) 
         AC_CHECK_HEADERS(objsafe.h,
           VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER])
         )
@@ -4054,7 +4054,7 @@ then
   fi
 fi
 AC_ARG_VAR(MIDL, [Microsoft IDL compiler (Win32 platform only)])
-AM_CONDITIONAL(HAS_MIDL_COMPILER, test -n "${MIDL}")
+AM_CONDITIONAL(HAS_MIDL_COMPILER, test "${MIDL}" != "no")
 AM_CONDITIONAL(BUILD_ACTIVEX,${activex})
 
 dnl

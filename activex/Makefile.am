@@ -38,21 +38,21 @@ SOURCES_activex = \
     plugin.h \
     axvlc_idl.c \
     axvlc_idl.h \
-	$(NULL)
+    $(NULL)
 
 DIST_rsrc = \
-	axvlc_rc.rc \
-	$(NULL)
+    axvlc_rc.rc \
+    $(NULL)
 
 DIST_misc = \
-	README.TXT \
-	axvlc.def \
-	axvlc.idl \
-	axvlc.reg \
-	axvlc.tlb \
-	inplace.bmp \
-	test.html \
-	$(NULL)
+    README.TXT \
+    axvlc.def \
+    axvlc.idl \
+    axvlc.reg \
+    axvlc.tlb \
+    inplace.bmp \
+    test.html \
+    $(NULL)
 
 LIBRARIES_libvlc = $(top_builddir)/lib/libvlc.a
 
@@ -96,7 +96,7 @@ endif
 DATA_axvlc_rc = $(noinst_axvlc_rc_DATA)
 noinst_axvlc_rc_DATA = axvlc_rc.$(OBJEXT)
 noinst_axvlc_rcdir = $(libdir)
-axvlc_rc.$(OBJEXT): axvlc_rc.rc inplace.bmp $(axvlc_tlb_DATA)
+axvlc_rc.$(OBJEXT): axvlc_rc.rc inplace.bmp axvlc.tlb
 	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir) -i $< -o $@
 
 else

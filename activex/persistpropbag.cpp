@@ -108,7 +108,7 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
     V_VT(&value) = VT_BOOL;
     if( S_OK == pPropBag->Read(OLESTR("showdisplay"), &value, pErrorLog) )
     {
-        _p_instance->setShowDisplay(V_BOOL(&value) != VARIANT_FALSE);
+        _p_instance->setVisible(V_BOOL(&value) != VARIANT_FALSE);
         VariantClear(&value);
     }
 

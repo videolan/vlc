@@ -38,7 +38,7 @@ HRESULT VLCControl::getTypeInfo(void)
     {
         ITypeLib *p_typelib;
 
-        HRESULT hr = _p_instance->getTypeLib(&p_typelib);
+        HRESULT hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
         if( SUCCEEDED(hr) )
         {
             hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCControl, &_p_typeinfo);
@@ -129,20 +129,14 @@ STDMETHODIMP VLCControl::get_Visible(VARIANT_BOOL *isVisible)
     if( NULL == isVisible )
         return E_INVALIDARG;
 
-    if( _p_instance->isInPlaceActive() )
-        *isVisible = _p_instance->isVisible() ? VARIANT_TRUE : VARIANT_FALSE;
-    else
-        *isVisible =  _p_instance->getShowDisplay() ? VARIANT_TRUE : VARIANT_FALSE;
+    *isVisible = _p_instance->getVisible();
 
     return NOERROR;
 };
         
 STDMETHODIMP VLCControl::put_Visible(VARIANT_BOOL isVisible)
 {
-    if( _p_instance->isInPlaceActive() )
-        _p_instance->setVisible(isVisible != VARIANT_FALSE);
-    else
-        _p_instance->setShowDisplay(isVisible != VARIANT_FALSE);
+    _p_instance->setVisible(isVisible != VARIANT_FALSE);
 
     return NOERROR;
 };

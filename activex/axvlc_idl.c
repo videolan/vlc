@@ -1,25 +1,17 @@
-/*****************************************************************************
- * axvlc_idl.c: ActiveX control for VLC
- *****************************************************************************
- * Copyright (C) 2005 VideoLAN
- *
- * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
- *****************************************************************************/
+/* this file contains the actual definitions of */
+/* the IIDs and CLSIDs */
 
+/* link this file in with the server and any clients */
+
+
+/* File created by MIDL compiler version 5.01.0164 */
+/* at Thu Feb 17 09:25:54 2005
+ */
+/* Compiler settings for axvlc.idl:
+    Oicf (OptLev=i2), W1, Zp8, env=Win32, ms_ext, c_ext
+    error checks: allocation ref bounds_check enum stub_data 
+*/
+//@@MIDL_FILE_HEADING(  )
 #ifdef __cplusplus
 extern "C"{
 #endif 
