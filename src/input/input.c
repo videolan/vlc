@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.274 2004/01/07 17:57:56 fenrir Exp $
+ * $Id: input.c,v 1.275 2004/01/10 23:46:39 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -86,7 +86,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 {
     input_thread_t *    p_input;                        /* thread descriptor */
     input_info_category_t * p_info;
-    item_info_category_t *p_cat;
     vlc_value_t val;
     int i,j;
 
