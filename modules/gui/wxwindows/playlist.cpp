@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.23 2003/10/29 17:32:54 zorglub Exp $
+ * $Id: playlist.cpp,v 1.24 2003/11/17 00:06:19 sigmunau Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -114,6 +114,7 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
 
     /* Listview events */
     EVT_LIST_ITEM_ACTIVATED(ListView_Event, Playlist::OnActivateItem)
+    EVT_LIST_COL_CLICK(ListView_Event, Playlist::OnColSelect)
     EVT_LIST_KEY_DOWN(ListView_Event, Playlist::OnKeyDown)
 
     /* Button events */
@@ -655,6 +656,36 @@ void Playlist::OnSort( wxCommandEvent& event )
         case RSortGroup_Event:
            playlist_SortGroup( p_playlist , 1 );
            break;
+    }
+    vlc_object_release( p_playlist );
+
+    Rebuild();
+
+    return;
+}
+
+void Playlist::OnColSelect( wxListEvent& event )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+    switch( event.GetColumn() )
+    {
+        case 0:
+            playlist_SortTitle( p_playlist, 0 );
+            break;
+        case 1:
+            playlist_SortAuthor( p_playlist, 0 );
+            break;
+        case 2:
+            playlist_SortGroup( p_playlist, 0 );
+            break;
+        default:
+            break;
     }
     vlc_object_release( p_playlist );
 
