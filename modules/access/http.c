@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.12 2002/11/28 15:18:27 sigmunau Exp $
+ * $Id: http.c,v 1.13 2002/11/28 18:16:02 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -106,7 +106,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 {
     _input_socket_t *   p_access_data;
     module_t *          p_network;
-    char                psz_buffer[256];
+    char                psz_buffer[1024];
     byte_t *            psz_parser;
     int                 i_pos, i_returncode, i, i_size;
     char *              psz_return_alpha;
@@ -145,7 +145,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
                    p_access_data->psz_buffer );
     }
     psz_buffer[sizeof(psz_buffer) - 1] = '\0';
-
+    printf(psz_buffer);
     /* Send GET ... */
     if( send( p_access_data->_socket.i_handle, psz_buffer,
                strlen( psz_buffer ), 0 ) == (-1) )
@@ -281,8 +281,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
             psz_parser++;
         }
         psz_header_value = psz_parser;
-        msg_Dbg( p_input, "found header \"%s: %s\"",
-                 psz_header_name, psz_header_value );
+/*        msg_Dbg( p_input, "found header \"%s: %s\"",
+          psz_header_name, psz_header_value );*/
         
         if( !strcasecmp( psz_header_name, "Content-Length" ) )
         {
