@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.1 2002/04/23 23:44:36 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.2 2002/04/25 03:01:03 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -83,7 +83,7 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( "ffmpeg video decoder module (MSMPEG4,MPEG4)" )
     ADD_CAPABILITY( DECODER, 50 )
-    ADD_SHORTCUT( "ffmpeg_vdec" )
+    ADD_SHORTCUT( "ffmpeg" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -94,17 +94,18 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 
-static u16 __GetWordLittleEndianFromBuff( byte_t *p_buff )
+static __inline__ u16 __GetWordLittleEndianFromBuff( byte_t *p_buff )
 {
     u16 i;
     i = (*p_buff) + ( *(p_buff + 1) <<8 );
     return ( i );
 }
 
-static u32 __GetDoubleWordLittleEndianFromBuff( byte_t *p_buff )
+static __inline__ u32 __GetDoubleWordLittleEndianFromBuff( byte_t *p_buff )
 {
     u32 i;
-    i = (*p_buff) + ( *(p_buff + 1) <<8 ) + ( *(p_buff + 2) <<16 ) + ( *(p_buff + 3) <<24 );
+    i = (*p_buff) + ( *(p_buff + 1) <<8 ) + 
+                ( *(p_buff + 2) <<16 ) + ( *(p_buff + 3) <<24 );
     return ( i );
 }
 
@@ -151,7 +152,7 @@ static int __ParseBitMapInfoHeader( bitmapinfoheader_t *h, byte_t *p_data )
 static pes_packet_t *__PES_GET( decoder_fifo_t *p_fifo )
 {
     pes_packet_t *p_pes;
-    /* get a p_pes ie data for a frame ! */
+
     vlc_mutex_lock( &p_fifo->data_lock );
 
     /* if fifo is emty wait */
@@ -232,10 +233,6 @@ static void __PACKET_NEXT( videodec_thread_t *p_vdec )
             p_vdec->i_data_size = p_vdec->p_data->p_payload_end -
                                     p_vdec->p_data->p_payload_start;
         }
-        if( p_vdec->i_data_size == 0 )
-        {
-            p_vdec->p_data = NULL;
-        } 
         
     } while( p_vdec->i_data_size <= 0 );
 }
@@ -276,7 +273,6 @@ static __inline__ u32 __FfmpegChromaToFourCC( int i_ffmpegchroma )
     switch( i_ffmpegchroma )
     {
         case( PIX_FMT_YUV420P ):
-            return FOURCC_I420;
         case( PIX_FMT_YUV422 ):
             return FOURCC_I420;
         case( PIX_FMT_RGB24 ):
@@ -312,7 +308,6 @@ static int decoder_Run ( decoder_config_t * p_config )
 
     p_vdec->p_fifo = p_config->p_decoder_fifo;
     p_vdec->p_config = p_config;
-    p_vdec->p_vout = NULL;
 
     if( InitThread( p_vdec ) != 0 )
     {
@@ -364,8 +359,8 @@ static int InitThread( videodec_thread_t *p_vdec )
     /* we cannot create vout because we don't know what chroma */
 
     /*init ffmpeg */
-    /* XXX maybe it's not multi thread capable */
-    /* TODO: add a global variable to know if init was already done */
+    /* TODO: add a global variable to know if init was already done 
+        in case we use it also for audio */
     if( b_ffmpeginit == 0 )
     {
         avcodec_init();
@@ -462,7 +457,6 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
     int i_len;
     int b_gotpicture;
     int b_convert;
-    int i_aspect;
    
     pes_packet_t  *p_pes;
     AVPicture avpicture;  /* ffmpeg picture */
@@ -485,7 +479,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
     do
     {
         __PACKET_FILL( p_vdec );
-        if( p_vdec->p_fifo->b_die )
+        if( (p_vdec->p_fifo->b_die)||(p_vdec->p_fifo->b_error) )
         {
             return;
         }
@@ -528,10 +522,6 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
          */
 
         /* create vout */
-        /* FIXME */
-/*
-        p_vdec->i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;   AR_3_4_PICTURE 
-*/      
 
         /* ffmpeg set it for our with some codec */  
         if( (p_vdec->format.i_width == 0)||(p_vdec->format.i_height == 0) )
@@ -540,32 +530,15 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
             p_vdec->format.i_height = p_vdec->p_context->height; 
         }
         /* calculate i_aspect */
-        i_aspect = VOUT_ASPECT_FACTOR * p_vdec->format.i_width /
-                        p_vdec->format.i_height;
-        /* FIXME comment faire ca proprement */ 
-/*
-        if( i_aspect == VOUT_ASPECT_FACTOR * 4 /3 )
-        {
-            i_aspect = 1;
-        }
-        else
-        {
-            if( i_aspect == VOUT_ASPECT_FACTOR * 16 /9 )
-            {
-                i_aspect = 2;
-            }
-        }
-*/ 
-        p_vdec->i_aspect = i_aspect;
+        p_vdec->i_aspect = VOUT_ASPECT_FACTOR * p_vdec->format.i_width /
+                                p_vdec->format.i_height;
         p_vdec->i_chroma = i_chroma;
 
-        intf_WarnMsg( 1, "vdec info: creating vout %dx%d chroma %4.4s %s %s",
+        intf_WarnMsg( 1, "vdec info: creating vout %dx%d chroma %4.4s %s",
                          p_vdec->format.i_width,
                          p_vdec->format.i_height,
-                         (char*)&i_chroma,
-                         b_convert ? "(with convertion)" : "",
-                         /*i_aspect ==1 ? "aspect 4:3" : "aspect 16:9"*/ 
-                         "free aspect" ); 
+                         (char*)&p_vdec->i_chroma,
+                         b_convert ? "(with convertion)" : "" );
 
         p_vdec->p_vout = vout_CreateThread( 
                                 NULL,
