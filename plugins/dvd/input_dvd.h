@@ -37,12 +37,17 @@ typedef struct thread_dvd_data_s
     int                     i_block_once;       // Nb of block read once by 
                                                 // readv
 
+    /* Navigation information */
+    int                     i_title;
+    int                     i_vts_title;
     int                     i_chapter_nb;
     off_t                   i_start;
     off_t                   i_size;
 
+    int                     i_end_cell;
+
     /* Scrambling Information */
-    struct css_s            css;
+    struct css_s *          p_css;
 
     /* Structure that contains all information of the DVD */
     struct ifo_s            ifo;
@@ -52,16 +57,17 @@ typedef struct thread_dvd_data_s
 /*****************************************************************************
  * Prototypes in dvd_ifo.c
  *****************************************************************************/
-struct ifo_s    IfoInit( int );
-int             IfoReadVTS( struct ifo_s * );
-void            IfoRead( struct ifo_s * );
-void            IfoEnd( ifo_t * );
+struct ifo_s    IfoInit     ( int );
+int             IfoReadVTS  ( struct ifo_s * );
+void            IfoRead     ( struct ifo_s * );
+void            IfoEnd      ( ifo_t * );
 
 /*****************************************************************************
  * Prototypes in dvd_css.c
  *****************************************************************************/
-int             CSSTest     ( int );
-struct css_s    CSSInit     ( int );
-int             CSSGetKey   ( struct css_s * );
-int             CSSDescrambleSector( u8 * , u8 * );
+int             CSSTest             ( int );
+struct css_s *  CSSInit             ( int );
+void            CSSEnd              ( struct css_s * );
+int             CSSGetKey           ( struct css_s * );
+int             CSSDescrambleSector ( u8 * , u8 * );
 

@@ -2,7 +2,7 @@
  * dvd_netlist.h: Specific netlist structures for DVD packets
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.h,v 1.1 2001/03/02 03:32:46 stef Exp $
+ * $Id: dvd_netlist.h,v 1.2 2001/03/03 07:07:01 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -25,7 +25,7 @@
 /*****************************************************************************
  * netlist_t: structure to manage a netlist
  *****************************************************************************/
-typedef struct netlist_s
+typedef struct dvd_netlist_s
 {
     vlc_mutex_t             lock;
 
@@ -57,14 +57,12 @@ typedef struct netlist_s
     /* Nb of packets read once */
     unsigned int            i_read_once;
 
-} netlist_t;
+} dvd_netlist_t;
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int                     DVDNetlistInit( struct input_thread_s *,
-                                        int , int, int, size_t, int );
-
+struct dvd_netlist_s *  DVDNetlistInit( int , int, int, size_t, int );
 struct iovec *          DVDGetiovec( void * p_method_data );
 void                    DVDMviovec( void * , int, struct data_packet_s **);
 struct data_packet_s *  DVDNewPtr( void * );
@@ -72,4 +70,4 @@ struct data_packet_s *  DVDNewPacket( void *, size_t );
 struct pes_packet_s *   DVDNewPES( void * );
 void                    DVDDeletePacket( void *, struct data_packet_s * );
 void                    DVDDeletePES( void *, struct pes_packet_s * );
-void                    DVDNetlistEnd( struct input_thread_s * );
+void                    DVDNetlistEnd( struct dvd_netlist_s * );

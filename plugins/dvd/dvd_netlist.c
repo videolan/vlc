@@ -7,7 +7,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.1 2001/03/02 03:32:46 stef Exp $
+ * $Id: dvd_netlist.c,v 1.2 2001/03/03 07:07:01 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -64,23 +64,21 @@
  *
  * Warning: i_nb_iovec, i_nb_data, i_nb_pes have to be 2^x
  *****************************************************************************/
-int DVDNetlistInit( input_thread_t * p_input,
-                    int i_nb_iovec, int i_nb_data, int i_nb_pes,
-                    size_t i_buffer_size, int i_read_once )
+dvd_netlist_t * DVDNetlistInit( int i_nb_iovec, int i_nb_data, int i_nb_pes,
+                                size_t i_buffer_size, int i_read_once )
 {
-    unsigned int i_loop;
-    netlist_t * p_netlist;
+    unsigned int        i_loop;
+    dvd_netlist_t *     p_netlist;
 
     /* First we allocate and initialise our netlist struct */
-    p_input->p_method_data = malloc(sizeof(netlist_t));
-    if ( p_input->p_method_data == NULL )
+    p_netlist = malloc( sizeof(dvd_netlist_t) );
+    if ( p_netlist == NULL )
     {
         intf_ErrMsg("Unable to malloc the DVD netlist struct");
-        return (-1);
+        free( p_netlist );
+        return NULL;
     }
     
-    p_netlist = (netlist_t *) p_input->p_method_data;
-
     /* Nb of packets read once by input */
     p_netlist->i_read_once = i_read_once;
     
@@ -89,7 +87,9 @@ int DVDNetlistInit( input_thread_t * p_input,
     if ( p_netlist->p_buffers == NULL )
     {
         intf_ErrMsg ("Unable to malloc in DVD netlist initialization (1)");
-        return (-1);
+        free( p_netlist->p_buffers );
+        free( p_netlist );
+        return NULL;
     }
     
     /* table of pointers to data packets */
@@ -97,7 +97,10 @@ int DVDNetlistInit( input_thread_t * p_input,
     if ( p_netlist->p_data == NULL )
     {
         intf_ErrMsg ("Unable to malloc in DVD netlist initialization (2)");
-        return (-1);
+        free( p_netlist->p_buffers );
+        free( p_netlist->p_data );
+        free( p_netlist );
+        return NULL;
     }
     
     /* table of pointer to PES packets */
@@ -105,7 +108,11 @@ int DVDNetlistInit( input_thread_t * p_input,
     if ( p_netlist->p_pes == NULL )
     {
         intf_ErrMsg ("Unable to malloc in DVD netlist initialization (3)");
-        return (-1);
+        free( p_netlist->p_buffers );
+        free( p_netlist->p_data );
+        free( p_netlist->p_pes );
+        free( p_netlist );
+        return NULL;
     }
     
     /* allocate the FIFOs : tables of free pointers */
@@ -114,12 +121,25 @@ int DVDNetlistInit( input_thread_t * p_input,
     if ( p_netlist->pp_free_data == NULL )
     {
         intf_ErrMsg ("Unable to malloc in DVD netlist initialization (4)");
+        free( p_netlist->p_buffers );
+        free( p_netlist->p_data );
+        free( p_netlist->p_pes );
+        free( p_netlist->pp_free_data );
+        free( p_netlist );
+        return NULL;
     }
     p_netlist->pp_free_pes = 
                         malloc( i_nb_pes *sizeof(pes_packet_t *) );
     if ( p_netlist->pp_free_pes == NULL )
     {
         intf_ErrMsg ("Unable to malloc in DVD netlist initialization (5)");
+        free( p_netlist->p_buffers );
+        free( p_netlist->p_data );
+        free( p_netlist->p_pes );
+        free( p_netlist->pp_free_data );
+        free( p_netlist->pp_free_pes );
+        free( p_netlist );
+        return NULL;
     }
     
     p_netlist->p_free_iovec =
@@ -127,6 +147,14 @@ int DVDNetlistInit( input_thread_t * p_input,
     if ( p_netlist->p_free_iovec == NULL )
     {
         intf_ErrMsg ("Unable to malloc in DVD netlist initialization (6)");
+        free( p_netlist->p_buffers );
+        free( p_netlist->p_data );
+        free( p_netlist->p_pes );
+        free( p_netlist->pp_free_data );
+        free( p_netlist->pp_free_pes );
+        free( p_netlist->p_free_iovec );
+        free( p_netlist );
+        return NULL;
     }
 
     /* table for reference counter of iovecs */
@@ -134,7 +162,15 @@ int DVDNetlistInit( input_thread_t * p_input,
     if ( p_netlist->pi_refcount == NULL )
     {
         intf_ErrMsg ("Unable to malloc in DVD netlist initialization (7)");
-        return (-1);
+        free( p_netlist->p_buffers );
+        free( p_netlist->p_data );
+        free( p_netlist->p_pes );
+        free( p_netlist->pp_free_data );
+        free( p_netlist->pp_free_pes );
+        free( p_netlist->p_free_iovec );
+        free( p_netlist->pi_refcount );
+        free( p_netlist );
+        return NULL;
     }
 
     /* Fill the data FIFO */
@@ -183,7 +219,7 @@ int DVDNetlistInit( input_thread_t * p_input,
     p_netlist->i_nb_pes = i_nb_pes - 1;
     p_netlist->i_buffer_size = i_buffer_size;
 
-    return (0); /* Everything went all right */
+    return p_netlist; /* Everything went all right */
 }
 
 /*****************************************************************************
@@ -195,10 +231,10 @@ int DVDNetlistInit( input_thread_t * p_input,
  *****************************************************************************/
 struct iovec * DVDGetiovec( void * p_method_data )
 {
-    netlist_t * p_netlist;
+    dvd_netlist_t *     p_netlist;
 
     /* cast */
-    p_netlist = ( netlist_t * ) p_method_data;
+    p_netlist = (dvd_netlist_t *)p_method_data;
     
     /* check */
     if( (
@@ -236,11 +272,11 @@ struct iovec * DVDGetiovec( void * p_method_data )
 void DVDMviovec( void * p_method_data, int i_nb_iovec,
                  struct data_packet_s ** pp_data )
 {
-    netlist_t * p_netlist;
-    unsigned int i_loop = 0;
+    dvd_netlist_t *     p_netlist;
+    unsigned int        i_loop = 0;
 
     /* cast */
-    p_netlist = (netlist_t *)p_method_data;
+    p_netlist = (dvd_netlist_t *)p_method_data;
     
     /* lock */
     vlc_mutex_lock( &p_netlist->lock );
@@ -275,11 +311,11 @@ void DVDMviovec( void * p_method_data, int i_nb_iovec,
  *****************************************************************************/
 struct data_packet_s * DVDNewPtr( void * p_method_data )
 {    
-    netlist_t * p_netlist; 
-    struct data_packet_s * p_return;
+    dvd_netlist_t *         p_netlist; 
+    struct data_packet_s *  p_return;
     
     /* cast */
-    p_netlist = ( netlist_t * ) p_method_data; 
+    p_netlist = (dvd_netlist_t *)p_method_data; 
 
 #ifdef DEBUG
     if( i_buffer_size > p_netlist->i_buffer_size )
@@ -318,11 +354,11 @@ struct data_packet_s * DVDNewPtr( void * p_method_data )
 struct data_packet_s * DVDNewPacket( void * p_method_data,
                                      size_t i_buffer_size )
 {
-    netlist_t *             p_netlist;
+    dvd_netlist_t *         p_netlist;
     struct data_packet_s *  p_packet;
 
     /* cast */
-    p_netlist = (netlist_t *)p_method_data;
+    p_netlist = (dvd_netlist_t *)p_method_data;
     
     /* lock */
     vlc_mutex_lock( &p_netlist->lock );
@@ -371,11 +407,11 @@ struct data_packet_s * DVDNewPacket( void * p_method_data,
  *****************************************************************************/
 struct pes_packet_s * DVDNewPES( void * p_method_data )
 {
-    netlist_t * p_netlist;
-    pes_packet_t * p_return;
+    dvd_netlist_t *     p_netlist;
+    pes_packet_t *      p_return;
     
     /* cast */ 
-    p_netlist = (netlist_t *) p_method_data;
+    p_netlist = (dvd_netlist_t *)p_method_data;
     
     /* lock */
     vlc_mutex_lock ( &p_netlist->lock );
@@ -410,10 +446,10 @@ struct pes_packet_s * DVDNewPES( void * p_method_data )
  *****************************************************************************/
 void DVDDeletePacket( void * p_method_data, data_packet_t * p_data )
 {
-    netlist_t * p_netlist;
+    dvd_netlist_t * p_netlist;
     
     /* cast */
-    p_netlist = (netlist_t *) p_method_data;
+    p_netlist = (dvd_netlist_t *) p_method_data;
 
     /* lock */
     vlc_mutex_lock ( &p_netlist->lock );
@@ -450,11 +486,12 @@ void DVDDeletePacket( void * p_method_data, data_packet_t * p_data )
  *****************************************************************************/
 void DVDDeletePES( void * p_method_data, pes_packet_t * p_pes )
 {
-    netlist_t * p_netlist; 
-    data_packet_t * p_current_packet,* p_next_packet;
+    dvd_netlist_t *     p_netlist; 
+    data_packet_t *     p_current_packet;
+    data_packet_t *     p_next_packet;
     
     /* cast */
-    p_netlist = (netlist_t *)p_method_data;
+    p_netlist = (dvd_netlist_t *)p_method_data;
 
     /* lock */
     vlc_mutex_lock ( &p_netlist->lock );
@@ -502,24 +539,19 @@ void DVDDeletePES( void * p_method_data, pes_packet_t * p_pes )
 /*****************************************************************************
  * DVDNetlistEnd: frees all allocated structures
  *****************************************************************************/
-void DVDNetlistEnd( input_thread_t * p_input)
+void DVDNetlistEnd( dvd_netlist_t * p_netlist )
 {
-    netlist_t * p_netlist;
-
-    /* cast */
-    p_netlist = ( netlist_t * ) p_input->p_method_data;
-    
     /* destroy the mutex lock */
-    vlc_mutex_destroy (&p_netlist->lock);
+    vlc_mutex_destroy( &p_netlist->lock );
     
     /* free the FIFO, the buffer, and the netlist structure */
-    free (p_netlist->pp_free_data);
-    free (p_netlist->pp_free_pes);
-    free (p_netlist->pi_refcount);
-    free (p_netlist->p_pes);
-    free (p_netlist->p_data);
-    free (p_netlist->p_buffers);
+    free( p_netlist->pp_free_data );
+    free( p_netlist->pp_free_pes );
+    free( p_netlist->pi_refcount );
+    free( p_netlist->p_pes );
+    free( p_netlist->p_data );
+    free( p_netlist->p_buffers );
 
     /* free the netlist */
-    free (p_netlist);
+    free( p_netlist );
 }
