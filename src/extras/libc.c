@@ -23,6 +23,7 @@
  *****************************************************************************/
 #include <string.h>                                              /* strdup() */
 #include <stdlib.h>
+#include <ctype.h>
 
 #include <vlc/vlc.h>
 
@@ -250,25 +251,84 @@ double vlc_atof( const char *nptr )
 #endif
 
 /*****************************************************************************
- * atoll: convert a string to a 64 bits int.
+ * strtoll: convert a string to a 64 bits int.
  *****************************************************************************/
-#if !defined( HAVE_ATOLL )
-int64_t vlc_atoll( const char *str )
+#if !defined( HAVE_STRTOLL )
+int64_t vlc_strtoll( const char *nptr, char **endptr, int base )
 {
     int64_t i_value = 0;
-    int sign = 1;
+    int sign = 1, newbase = base ? base : 10;
 
-    if( *str == '-' )
+    while( isspace(*nptr) ) nptr++;
+
+    if( *nptr == '-' )
     {
         sign = -1;
+        nptr++;
     }
 
-    while( *str >= '0' && *str <= '9' )
+    /* Try to detect base */
+    if( *nptr == '0' )
     {
-        i_value = i_value * 10 + ( *str++ - '0' );
+        newbase = 8;
+        nptr++;
+
+        if( *nptr == 'x' )
+        {
+            newbase = 16;
+            nptr++;
+        }
+    }
+
+    if( base && newbase != base )
+    {
+        if( endptr ) *endptr = (char *)nptr;
+        return i_value;
+    }
+
+    switch( newbase )
+    {
+        case 10:
+            while( *nptr >= '0' && *nptr <= '9' )
+            {
+                i_value *= 10;
+                i_value += ( *nptr++ - '0' );
+            }
+            if( endptr ) *endptr = (char *)nptr;
+            break;
+
+        case 16:
+            while( (*nptr >= '0' && *nptr <= '9') ||
+                   (*nptr >= 'a' && *nptr <= 'f') ||
+                   (*nptr >= 'A' && *nptr <= 'F') )
+            {
+                int i_valc = 0;
+                if(*nptr >= '0' && *nptr <= '9') i_valc = *nptr - '0';
+                else if(*nptr >= 'a' && *nptr <= 'f') i_valc = *nptr - 'a' +10;
+                else if(*nptr >= 'A' && *nptr <= 'F') i_valc = *nptr - 'A' +10;
+                i_value *= 16;
+                i_value += i_valc;
+                nptr++;
+            }
+            if( endptr ) *endptr = (char *)nptr;
+            break;
+
+        default:
+            i_value = strtol( nptr, endptr, newbase );
+            break;
     }
 
     return i_value * sign;
+}
+#endif
+
+/*****************************************************************************
+ * atoll: convert a string to a 64 bits int.
+ *****************************************************************************/
+#if !defined( HAVE_ATOLL )
+int64_t vlc_atoll( const char *nptr )
+{
+    return strtoll( nptr, (char **)NULL, 10 );
 }
 #endif
 

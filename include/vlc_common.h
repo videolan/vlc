@@ -780,6 +780,13 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define vlc_atoll NULL
 #endif
 
+#ifndef HAVE_STRTOLL
+#   define strtoll vlc_strtoll
+    VLC_EXPORT( int64_t, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_strtoll NULL
+#endif
+
 #ifndef HAVE_GETENV
 #   define getenv vlc_getenv
     VLC_EXPORT( char *, vlc_getenv, ( const char *name ) );
