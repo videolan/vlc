@@ -61,8 +61,10 @@ Note: an element is a media or a schedule.
         "del all" destroys all elements.
         "del media" destroys all medias.
         "del schedule" destroys all schedules.
-    control (name) (command)
-        Changes the state of the (name) media.
+    control (name) [instance_name] (command)
+        Changes the state of the (instance_name) instance of (name) media.
+        If (instance_name) is not specified, the control command affects the
+        default instance.
         See Commands section for more information.
     save (config_file)
         Saves all media and schedule configurations in the (config_file)
