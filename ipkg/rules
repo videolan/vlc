@@ -19,7 +19,7 @@ build-stamp:
 		$(shell echo $(CONFIG_FLAGS))
 
 # This is ugly -- I know
-	patch -p 0 < ipkg/patch
+	patch -p 0 < ipkg/sdl.patch
 
 	$(MAKE)
 
