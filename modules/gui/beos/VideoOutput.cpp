@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.8 2002/12/04 06:23:08 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.9 2002/12/07 22:00:36 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -529,11 +529,7 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
     if (*mode == BITMAP)
 	{
         // fallback to RGB
-        colspace_index = DEFAULT_COL;	// B_RGB16
-// FIXME: an error in the YUV->RGB32 module prevents this from being used!
-/*        BScreen screen( B_MAIN_SCREEN_ID );
-        if ( screen.ColorSpace() == B_RGB32 )
-        	colspace_index = 3;			// B_RGB32 (faster on 32 bit screen)*/
+        colspace_index = DEFAULT_COL;	// B_RGB32
         SetTitle( VOUT_TITLE " (Bitmap)" );
         bitmap[0] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );
         bitmap[1] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );

@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.4 2002/12/03 02:00:38 titer Exp $
+ * $Id: VideoWindow.h,v 1.5 2002/12/07 22:00:36 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -53,7 +53,7 @@ colorcombo colspace[]=
 };
 
 #define COLOR_COUNT 5
-#define DEFAULT_COL 4
+#define DEFAULT_COL 3
 
 
 class VLCView : public BView
