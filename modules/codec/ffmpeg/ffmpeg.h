@@ -108,6 +108,9 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "Higher levels require considerable more CPU power, but produce " \
     "better looking pictures." )
 
+#define DEBUG_TEST N_( "Debug mask" )
+#define DEBUG_LONGTEST N_( "Set ffmpeg debug mask" )
+
 #define LIBAVCODEC_PP_TEXT N_("ffmpeg postproc filter chains")
 /* FIXME (cut/past from ffmpeg */
 #define LIBAVCODEC_PP_LONGTEXT \

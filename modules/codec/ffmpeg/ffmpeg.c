@@ -93,6 +93,7 @@ vlc_module_begin();
     add_string( "ffmpeg-pp-name", "default", NULL, LIBAVCODEC_PP_TEXT,
         LIBAVCODEC_PP_LONGTEXT, VLC_TRUE );
 #endif
+    add_integer( "ffmpeg-debug", 0, NULL, DEBUG_TEST, DEBUG_LONGTEST, VLC_TRUE );
 
     /* chroma conversion submodule */
     add_submodule();
@@ -154,6 +155,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* *** get a p_context *** */
     p_context = avcodec_alloc_context();
+    p_context->debug = config_GetInt( p_dec, "ffmpeg-debug" );
 
     /* Set CPU capabilities */
     p_context->dsp_mask = 0;
