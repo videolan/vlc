@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.26 2003/02/10 00:16:51 hartman Exp $
+ * $Id: controls.m,v 1.27 2003/02/10 00:41:45 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -435,7 +435,7 @@
     {
         config_PutPsz( p_intf, "filter", "deinterlace" );
 	config_PutPsz( p_intf, "deinterlace-mode",
-                    [[sender title] lossyCString] );	Ê
+                    [[sender title] lossyCString] );
     }
     else
     {
@@ -765,33 +765,33 @@
     else if( o_menu != nil && 
              [[o_menu title] isEqualToString: _NS("Deinterlace")] )
     {
-        char * psz_filter = config_GetPsz( p_intf, "filter" );	Ê
+        char * psz_filter = config_GetPsz( p_intf, "filter" );
         
-        if( psz_filter != NULL )	Ê
-        {	Ê
-            free( psz_filter );	Ê
+        if( psz_filter != NULL )
+        {
+            free( psz_filter );
             
-            psz_filter = config_GetPsz( p_intf, "deinterlace-mode" );	Ê
-        }	Ê
-        Ê	Ê
-        if( psz_filter != NULL )	Ê
-        {	Ê
-            if( strcmp( psz_filter, [[o_mi title] lossyCString] ) == 0 )	Ê
-            {	Ê
-                [o_mi setState: NSOnState]; 	Ê
-            }	Ê
-            else	Ê
-            {	Ê
-                [o_mi setState: NSOffState];	Ê
-            }	Ê
-            
-            free( psz_filter );	Ê
-        } 	Ê
-        else	Ê
-        {	Ê
-            [o_mi setState: NSOffState];	Ê
+            psz_filter = config_GetPsz( p_intf, "deinterlace-mode" );
         }
-    } 
+
+        if( psz_filter != NULL )
+        {
+            if( strcmp( psz_filter, [[o_mi title] lossyCString] ) == 0 )
+            {
+                [o_mi setState: NSOnState];
+            }
+            else
+            {
+                [o_mi setState: NSOffState];
+            }
+
+            free( psz_filter );
+        }
+        else
+        {
+            [o_mi setState: NSOffState];
+        }
+    }
 
     if( p_playlist != NULL )
     {
