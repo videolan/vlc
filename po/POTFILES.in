@@ -8,7 +8,6 @@ include/charset.h
 include/codecs.h
 include/configuration.h
 include/darwin_specific.h
-include/httpd.h
 include/input_ext-dec.h
 include/input_ext-intf.h
 include/input_ext-plugins.h
@@ -44,6 +43,7 @@ include/vlc_cpu.h
 include/vlc_error.h
 include/vlc_es.h
 include/vlc_help.h
+include/vlc_httpd.h
 include/vlc_interface.h
 include/vlc_keys.h
 include/vlc_messages.h
@@ -53,6 +53,7 @@ include/vlc_playlist.h
 include/vlc_threads.h
 include/vlc_threads_funcs.h
 include/vlc_video.h
+include/vlc_vlm.h
 include/vout_synchro.h
 include/win32_specific.h
 src/audio_output/common.c
@@ -68,6 +69,7 @@ src/extras/getopt.c
 src/extras/getopt.h
 src/extras/getopt1.c
 src/extras/libc.c
+src/input/control.c
 src/input/demux.c
 src/input/es_out.c
 src/input/input.c
@@ -90,6 +92,7 @@ src/misc/configuration.c
 src/misc/cpu.c
 src/misc/darwin_specific.m
 src/misc/error.c
+src/misc/httpd.c
 src/misc/iso-639_def.h
 src/misc/iso_lang.c
 src/misc/messages.c
@@ -99,6 +102,7 @@ src/misc/net.c
 src/misc/objects.c
 src/misc/threads.c
 src/misc/variables.c
+src/misc/vlm.c
 src/misc/win32_specific.c
 src/playlist/group.c
 src/playlist/info.c
@@ -110,6 +114,7 @@ src/playlist/sort.c
 src/stream_output/stream_output.c
 src/video_output/video_output.c
 src/video_output/video_text.c
+src/video_output/vout_intf.c
 src/video_output/vout_pictures.c
 src/video_output/vout_pictures.h
 src/video_output/vout_subpictures.c
@@ -235,6 +240,7 @@ modules/audio_output/coreaudio.c
 modules/audio_output/directx.c
 modules/audio_output/esd.c
 modules/audio_output/file.c
+modules/audio_output/hd1000a.cpp
 modules/audio_output/oss.c
 modules/audio_output/sdl.c
 modules/audio_output/waveout.c
@@ -296,9 +302,10 @@ modules/control/gestures.c
 modules/control/hotkeys.c
 modules/control/http.c
 modules/control/joystick.c
-modules/control/lirc/lirc.c
+modules/control/lirc.c
 modules/control/ntservice.c
-modules/control/rc/rc.c
+modules/control/rc.c
+modules/control/telnet.c
 modules/demux/a52.c
 modules/demux/aac.c
 modules/demux/aiff.c
@@ -307,7 +314,6 @@ modules/demux/asf/libasf.c
 modules/demux/asf/libasf.h
 modules/demux/au.c
 modules/demux/avi/avi.c
-modules/demux/avi/avi.h
 modules/demux/avi/libavi.c
 modules/demux/avi/libavi.h
 modules/demux/demux2.c
@@ -451,6 +457,8 @@ modules/gui/macosx/output.h
 modules/gui/macosx/output.m
 modules/gui/macosx/playlist.h
 modules/gui/macosx/playlist.m
+modules/gui/macosx/playlistinfo.h
+modules/gui/macosx/playlistinfo.m
 modules/gui/macosx/prefs.h
 modules/gui/macosx/prefs.m
 modules/gui/macosx/prefs_widgets.h
@@ -608,6 +616,8 @@ modules/gui/skins2/controls/ctrl_slider.cpp
 modules/gui/skins2/controls/ctrl_slider.hpp
 modules/gui/skins2/controls/ctrl_text.cpp
 modules/gui/skins2/controls/ctrl_text.hpp
+modules/gui/skins2/controls/ctrl_video.cpp
+modules/gui/skins2/controls/ctrl_video.hpp
 modules/gui/skins2/events/evt_enter.hpp
 modules/gui/skins2/events/evt_focus.hpp
 modules/gui/skins2/events/evt_generic.hpp
@@ -635,12 +645,15 @@ modules/gui/skins2/parser/xmlparser.cpp
 modules/gui/skins2/parser/xmlparser.hpp
 modules/gui/skins2/src/anchor.cpp
 modules/gui/skins2/src/anchor.hpp
+modules/gui/skins2/src/bitmap_font.cpp
+modules/gui/skins2/src/bitmap_font.hpp
 modules/gui/skins2/src/dialogs.cpp
 modules/gui/skins2/src/dialogs.hpp
 modules/gui/skins2/src/ft2_bitmap.cpp
 modules/gui/skins2/src/ft2_bitmap.hpp
 modules/gui/skins2/src/ft2_font.cpp
 modules/gui/skins2/src/ft2_font.hpp
+modules/gui/skins2/src/generic_bitmap.cpp
 modules/gui/skins2/src/generic_bitmap.hpp
 modules/gui/skins2/src/generic_font.hpp
 modules/gui/skins2/src/generic_layout.cpp
@@ -668,10 +681,14 @@ modules/gui/skins2/src/theme_loader.cpp
 modules/gui/skins2/src/theme_loader.hpp
 modules/gui/skins2/src/tooltip.cpp
 modules/gui/skins2/src/tooltip.hpp
+modules/gui/skins2/src/top_window.cpp
+modules/gui/skins2/src/top_window.hpp
 modules/gui/skins2/src/var_manager.cpp
 modules/gui/skins2/src/var_manager.hpp
 modules/gui/skins2/src/vlcproc.cpp
 modules/gui/skins2/src/vlcproc.hpp
+modules/gui/skins2/src/vout_window.cpp
+modules/gui/skins2/src/vout_window.hpp
 modules/gui/skins2/src/window_manager.cpp
 modules/gui/skins2/src/window_manager.hpp
 modules/gui/skins2/utils/bezier.cpp
@@ -695,6 +712,8 @@ modules/gui/skins2/utils/var_text.hpp
 modules/gui/skins2/utils/variable.hpp
 modules/gui/skins2/vars/playlist.cpp
 modules/gui/skins2/vars/playlist.hpp
+modules/gui/skins2/vars/stream.cpp
+modules/gui/skins2/vars/stream.hpp
 modules/gui/skins2/vars/time.cpp
 modules/gui/skins2/vars/time.hpp
 modules/gui/skins2/vars/volume.cpp
@@ -729,6 +748,7 @@ modules/gui/skins2/x11/x11_tooltip.cpp
 modules/gui/skins2/x11/x11_tooltip.hpp
 modules/gui/skins2/x11/x11_window.cpp
 modules/gui/skins2/x11/x11_window.hpp
+modules/gui/wxwindows/bookmarks.cpp
 modules/gui/wxwindows/dialogs.cpp
 modules/gui/wxwindows/fileinfo.cpp
 modules/gui/wxwindows/interface.cpp
@@ -745,6 +765,7 @@ modules/gui/wxwindows/streamwizard.cpp
 modules/gui/wxwindows/subtitles.cpp
 modules/gui/wxwindows/timer.cpp
 modules/gui/wxwindows/v4l.cpp
+modules/gui/wxwindows/video.cpp
 modules/gui/wxwindows/wxwindows.cpp
 modules/gui/wxwindows/wxwindows.h
 modules/misc/dummy/aout.c
@@ -758,8 +779,7 @@ modules/misc/dummy/renderer.c
 modules/misc/dummy/vout.c
 modules/misc/freetype.c
 modules/misc/gtk_main.c
-modules/misc/httpd.c
-modules/misc/logger/logger.c
+modules/misc/logger.c
 modules/misc/memcpy/fastmemcpy.h
 modules/misc/memcpy/memcpy.c
 modules/misc/memcpy/memcpyaltivec.c
@@ -802,9 +822,11 @@ modules/stream_out/gather.c
 modules/stream_out/rtp.c
 modules/stream_out/standard.c
 modules/stream_out/transcode.c
+modules/stream_out/transrate/frame.c
 modules/stream_out/transrate/getvlc.h
 modules/stream_out/transrate/putvlc.h
 modules/stream_out/transrate/transrate.c
+modules/stream_out/transrate/transrate.h
 modules/video_chroma/i420_rgb.c
 modules/video_chroma/i420_rgb.h
 modules/video_chroma/i420_rgb16.c
@@ -819,7 +841,7 @@ modules/video_chroma/i422_yuy2.h
 modules/video_filter/adjust.c
 modules/video_filter/clone.c
 modules/video_filter/crop.c
-modules/video_filter/deinterlace/deinterlace.c
+modules/video_filter/deinterlace.c
 modules/video_filter/distort.c
 modules/video_filter/filter_common.h
 modules/video_filter/invert.c
@@ -835,7 +857,7 @@ modules/video_output/directx/vout.h
 modules/video_output/fb.c
 modules/video_output/ggi.c
 modules/video_output/glide.c
-modules/video_output/mga/mga.c
+modules/video_output/mga.c
 modules/video_output/qte/qte.cpp
 modules/video_output/qte/qte.h
 modules/video_output/sdl.c
@@ -846,10 +868,9 @@ modules/video_output/x11/xcommon.c
 modules/video_output/x11/xcommon.h
 modules/video_output/x11/xvideo.c
 modules/visualization/goom.c
-modules/visualization/scope/scope.c
 modules/visualization/visual/effects.c
 modules/visualization/visual/fft.c
 modules/visualization/visual/fft.h
 modules/visualization/visual/visual.c
 modules/visualization/visual/visual.h
-modules/visualization/xosd/xosd.c
+modules/visualization/xosd.c
