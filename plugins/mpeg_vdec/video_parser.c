@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.24 2002/06/05 18:01:31 stef Exp $
+ * $Id: video_parser.c,v 1.25 2002/07/16 21:25:43 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -266,6 +266,14 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->sequence.i_matrix_coefficients = 1;
     p_vpar->sequence.next_pts = p_vpar->sequence.next_dts = 0;
     p_vpar->sequence.b_expect_discontinuity = 0;
+
+    p_vpar->sequence.i_width = 0;
+    p_vpar->sequence.i_height = 0;
+    p_vpar->sequence.i_frame_rate = 0;
+    p_vpar->sequence.i_scalable_mode = 0;
+    p_vpar->sequence.i_matrix_coefficients = 0;
+    p_vpar->sequence.b_mpeg2 = 0;
+    p_vpar->sequence.b_progressive = 0;
 
     /* Initialize copyright information */
     p_vpar->sequence.b_copyright_flag = 0;
