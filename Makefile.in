@@ -116,11 +116,9 @@ ifneq (,$(findstring 86,$(ARCH)))
 CFLAGS += -malign-double
 # Optional Pentium Pro optimizations
 ifneq (,$(findstring ppro,$(ARCH)))
-ifneq ($(SYS), BSD)
-CFLAGS += -march=pentiumpro
-endif
+CFLAGS += -march=pentiumpro -mcpu=pentiumpro
 else
-CFLAGS += -march=pentium
+CFLAGS += -march=pentium -mcpu=pentium
 endif
 endif
 

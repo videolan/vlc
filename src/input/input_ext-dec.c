@@ -43,6 +43,8 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo )
 {
     p_bit_stream->p_decoder_fifo = p_fifo;
     p_bit_stream->pf_next_data_packet = NextDataPacket;
+    p_bit_stream->pf_bitstream_callback = NULL;
+    p_bit_stream->p_callback_arg = NULL;
 
     /* Get the first data packet. */
     vlc_mutex_lock( &p_fifo->data_lock );
@@ -149,6 +151,12 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
     /* We've found a data packet which contains interesting data... */
     p_bit_stream->p_byte = p_bit_stream->p_data->p_payload_start;
     p_bit_stream->p_end  = p_bit_stream->p_data->p_payload_end;
+
+    /* Call back the decoder. */
+    if( p_bit_stream->pf_bitstream_callback != NULL )
+    {
+        p_bit_stream->pf_bitstream_callback( p_bit_stream );
+    }
 
     /* Copy remaining bits of the previous packet */
     *((WORD_TYPE *)p_bit_stream->p_byte - 1) = buffer_left;

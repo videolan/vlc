@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.18 2001/01/05 18:46:44 massiot Exp $
+ * $Id: input_ps.c,v 1.19 2001/01/10 16:24:11 massiot Exp $
  *
  * Authors: 
  *
@@ -92,6 +92,7 @@ static void PSInit( input_thread_t * p_input )
     }
 
     p_input->p_plugin_data = (void *)p_method;
+    p_input->p_method_data = NULL;
 
     /* Re-open the socket as a buffered FILE stream */
     if( (p_method->stream = fdopen( p_input->i_handle, "r" )) == NULL )
