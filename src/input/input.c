@@ -211,6 +211,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
     /* Access */
     p_input->p_access = NULL;
+    p_input->pf_access_control = NULL;
 
     p_input->i_bufsize = 0;
     p_input->i_mtu = 0;

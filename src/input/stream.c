@@ -244,6 +244,22 @@ static int IStreamControl( stream_t *s, int i_query, va_list args )
             *p_int = p_input->i_mtu;
             return VLC_SUCCESS;
 
+        case STREAM_CONTROL_ACCESS:
+        {
+            int i_int = (int) va_arg( args, int );
+            if( i_int != ACCESS_SET_PRIVATE_ID_STATE )
+            {
+                msg_Err( s, "Hey, what are you thinking ?"
+                            "DON'T USE STREAM_CONTROL_ACCESS !!!" );
+                return VLC_EGENERIC;
+            }
+            if( p_input->pf_access_control )
+            {
+                return p_input->pf_access_control( p_input, i_int, args );
+            }
+            return VLC_EGENERIC;
+        }
+
         default:
             msg_Err( s, "invalid stream_vaControl query=0x%x", i_query );
             return VLC_EGENERIC;

@@ -237,6 +237,10 @@ enum access_query_e
     /* */
     ACCESS_SET_TITLE,       /* arg1= int            can fail */
     ACCESS_SET_SEEKPOINT,   /* arg1= int            can fail */
+
+    /* Special mode for access/demux communication
+     * XXX: avoid to use it unless you can't */
+    ACCESS_SET_PRIVATE_ID_STATE,    /* arg1= vlc_bool_t b_selected, int i_private_data can fail */
 };
 
 struct access_t
@@ -248,18 +252,28 @@ struct access_t
 
     /* Access name (empty if non forced) */
     char        *psz_access;
+    /* Access path/url/filename/.... */
     char        *psz_path;
-    /* Access can fill this entry to force a demuxer */
+
+    /* Access can fill this entry to force a demuxer
+     * XXX: fill it once you know for sure you will succed
+     * (if you fail, this value won't be reseted */
     char        *psz_demux;
 
-    /* set by access (only one of pf_read/pf_block may be filled) */
+    /* pf_read/pf_block is used to read data.
+     * XXX A access should set one and only one of them */
     int         (*pf_read) ( access_t *, uint8_t *, int );  /* Return -1 if no data yet, 0 if no more data, else real data read */
-    block_t    *(*pf_block)( access_t * );                  /* return a block of data in his 'natural' size */
+    block_t    *(*pf_block)( access_t * );                  /* return a block of data in his 'natural' size, NULL if not yet data or eof */
+
+    /* Called for each seek.
+     * XXX can be null */
     int         (*pf_seek) ( access_t *, int64_t );         /* can be null if can't seek */
 
-    int         (*pf_control)( access_t *, int i_query, va_list args);  /* mandatory */
+    /* Used to retreive and configure the access
+     * XXX mandatory. look at access_query_e to know what query you *have to* support */
+    int         (*pf_control)( access_t *, int i_query, va_list args);
 
-    /* access has to maintain them uptodate */
+    /* Access has to maintain them uptodate */
     struct
     {
         unsigned int i_update;  /* Access sets them on change,
@@ -320,7 +334,12 @@ enum stream_query_e
 
     STREAM_GET_SIZE,            /**< arg1= int64_t *      res=cannot fail (0 if no sense)*/
 
-    STREAM_GET_MTU              /**< arg1= int *          res=cannot fail (0 if no sense)*/
+    STREAM_GET_MTU,             /**< arg1= int *          res=cannot fail (0 if no sense)*/
+
+    /* Special for direct access control from demuxer.
+     * XXX: avoid using it by all means */
+    STREAM_CONTROL_ACCESS,      /* arg1= int i_access_query, args   res: can fail
+                                   if access unreachable or access control answer */
 };
 
 /**
@@ -478,7 +497,8 @@ struct demux_t
     int (*pf_control)( demux_t *, int i_query, va_list args);
 
     /* Demux has to maintain them uptodate
-     * when it is responsible of seekpoint/title*/
+     * when it is responsible of seekpoint/title
+     * XXX: don't use them yet */
     struct
     {
         unsigned int i_update;  /* Demux sets them on change,
