@@ -240,6 +240,17 @@ static void Manager( intf_thread_t *p_intf )
  *****************************************************************************/
 static void RunInterface( intf_thread_t *p_intf )
 {
+    static char *ppsz_interfaces[] =
+    {
+        "skins", "Skins",
+        "skins2", "Skins 2",
+        "wxwindows", "wxWindows",
+        NULL, NULL
+    };
+    char **ppsz_parser;
+
+    vlc_list_t *p_list;
+    int i;
     vlc_value_t val, text;
     char *psz_intf;
 
@@ -250,12 +261,24 @@ static void RunInterface( intf_thread_t *p_intf )
     text.psz_string = _("Switch interface");
     var_Change( p_intf, "intf-switch", VLC_VAR_SETTEXT, &text, NULL );
 
-    val.psz_string = "skins"; text.psz_string = "Skins";
-    var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "skins2"; text.psz_string = "Skins 2";
-    var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "wxwin"; text.psz_string = "wxWindows";
-    var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE, &val, &text );
+    /* Only fill the list with available modules */
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    for( ppsz_parser = ppsz_interfaces; *ppsz_parser; ppsz_parser += 2 )
+    {
+        for( i = 0; i < p_list->i_count; i++ )
+        {
+            module_t *p_module = (module_t *)p_list->p_values[i].p_object;
+            if( !strcmp( p_module->psz_object_name, ppsz_parser[0] ) )
+            {
+                val.psz_string = ppsz_parser[0];
+                text.psz_string = ppsz_parser[1];
+                var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE,
+                            &val, &text );
+                break;
+            }
+        }
+    }
+    vlc_list_release( p_list );
 
     var_AddCallback( p_intf, "intf-switch", SwitchIntfCallback, NULL );
 
