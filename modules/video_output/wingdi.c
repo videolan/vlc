@@ -4,8 +4,8 @@
  * Copyright (C) 2002 VideoLAN
  * $Id$
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
- *          Gildas Bazin <gbazin@videolan.org>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,6 +106,8 @@ static int  Manage    ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 #ifdef MODULE_NAME_IS_wingapi
 static void DisplayGAPI( vout_thread_t *, picture_t * );
+static int GAPILockSurface( vout_thread_t *, picture_t * );
+static int GAPIUnlockSurface( vout_thread_t *, picture_t * );
 #else
 static void DisplayGDI( vout_thread_t *, picture_t * );
 #endif
@@ -153,7 +155,9 @@ struct vout_sys_t
     /* Our offscreen bitmap and its framebuffer */
     HDC        off_dc;
     HBITMAP    off_bitmap;
-    uint8_t *  p_buffer;
+    uint8_t *  p_pic_buffer;
+    int        i_pic_pitch;
+    int        i_pic_pixel_pitch;
 
     BITMAPINFO bitmapinfo;
     RGBQUAD    red;
@@ -296,14 +300,13 @@ static void CloseVideo ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-#ifdef MODULE_NAME_IS_wingapi
-    GXCloseDisplay();
-    FreeLibrary( p_vout->p_sys->gapi_dll );
-#endif
-
     p_vout->p_sys->p_event->b_die = VLC_TRUE;
     PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0 );
     vlc_thread_join( p_vout->p_sys->p_event );
+
+#ifdef MODULE_NAME_IS_wingapi
+    FreeLibrary( p_vout->p_sys->gapi_dll );
+#endif
 
     var_Destroy( p_vout->p_sys->p_event, "p_vout" );
     vlc_object_destroy( p_vout->p_sys->p_event );
@@ -315,7 +318,6 @@ static void CloseVideo ( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int i_index;
     picture_t *p_pic;
 
     p_vout->p_sys->rect_display.left = 0;
@@ -366,47 +368,37 @@ static int Init( vout_thread_t *p_vout )
         break;
     }
 
+    p_pic = &p_vout->p_picture[0];
+
 #ifdef MODULE_NAME_IS_wingapi
+    p_vout->output.i_width  = 0;
+    p_vout->output.i_height = 0;
+    p_pic->pf_lock  = GAPILockSurface;
+    p_pic->pf_unlock = GAPIUnlockSurface;
+    Manage( p_vout );
+    GAPILockSurface( p_vout, p_pic );
+    p_vout->i_changes = 0;
     p_vout->output.i_width  = p_vout->p_sys->render_width;
     p_vout->output.i_height = p_vout->p_sys->render_height;
+
 #else
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
 #endif
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
-    /* Try to initialize MAX_DIRECTBUFFERS direct buffers */
-    while( I_OUTPUTPICTURES < MAX_DIRECTBUFFERS )
-    {
-        p_pic = NULL;
+    p_pic->p->p_pixels = p_vout->p_sys->p_pic_buffer;
+    p_pic->p->i_lines = p_vout->output.i_height;
+    p_pic->p->i_visible_lines = p_vout->output.i_height;
+    p_pic->p->i_pitch = p_vout->p_sys->i_pic_pitch;
+    p_pic->p->i_pixel_pitch = p_vout->p_sys->i_pic_pixel_pitch;
+    p_pic->p->i_visible_pitch = p_vout->output.i_width *
+        p_pic->p->i_pixel_pitch;
+    p_pic->i_planes = 1;
+    p_pic->i_status = DESTROYED_PICTURE;
+    p_pic->i_type   = DIRECT_PICTURE;
 
-        /* Find an empty picture slot */
-        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
-        {
-            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-            {
-                p_pic = p_vout->p_picture + i_index;
-                break;
-            }
-        }
-
-        /* Allocate the picture */
-        if( p_pic == NULL ) break;
-
-        vout_AllocatePicture( VLC_OBJECT(p_vout), p_pic,
-                              p_vout->output.i_chroma,
-                              p_vout->output.i_width, p_vout->output.i_height,
-                              p_vout->output.i_aspect );
-
-        if( p_pic->i_planes == 0 ) break;
-
-        p_pic->i_status = DESTROYED_PICTURE;
-        p_pic->i_type   = DIRECT_PICTURE;
-
-        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
-        I_OUTPUTPICTURES++;
-    }
+    PP_OUTPUTPICTURE[ I_OUTPUTPICTURES++ ] = p_pic;
 
     return VLC_SUCCESS;
 }
@@ -416,14 +408,6 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
-    int i_index;
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
 }
 
 /*****************************************************************************
@@ -569,17 +553,9 @@ static int Manage( vout_thread_t *p_vout )
             //PostMessage( p_vout->p_sys->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
         }
 
-#ifdef MODULE_NAME_IS_wingapi
-        GXCloseDisplay();
-#endif
-
         /* Change window style, borders and title bar */
         ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
         UpdateWindow( p_vout->p_sys->hwnd );
-
-#ifdef MODULE_NAME_IS_wingapi
-        GXOpenDisplay( p_vout->p_sys->hvideownd, GX_FULLSCREEN );
-#endif
 
         /* Update the object variable and trigger callback */
         val.b_bool = p_vout->b_fullscreen;
@@ -612,29 +588,11 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 static void DisplayGDI( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-    int i_src_bytes, i_dest_bytes;
     RECT rect_dst = rect_dest_clipped;
     HDC hdc = GetDC( p_sys->hvideownd );
 
     OffsetRect( &rect_dst, -rect_dest.left, -rect_dest.top );
     SelectObject( p_sys->off_dc, p_sys->off_bitmap );
-
-#if 1
-    /* Stupid GDI is upside-down */
-    i_src_bytes = p_pic->p->i_lines * p_pic->p->i_pitch;
-    i_dest_bytes = 0;
-
-    while( i_src_bytes )
-    {
-        i_src_bytes -= p_pic->p->i_pitch;
-
-        p_vout->p_vlc->pf_memcpy( p_sys->p_buffer + i_dest_bytes,
-                                  p_pic->p->p_pixels + i_src_bytes,
-                                  p_pic->p->i_visible_pitch );
-
-        i_dest_bytes += p_pic->p->i_pitch;
-    }
-#endif
 
     if( rect_dest_clipped.right - rect_dest_clipped.left !=
         rect_src_clipped.right - rect_src_clipped.left ||
@@ -658,7 +616,7 @@ static void DisplayGDI( vout_thread_t *p_vout, picture_t *p_pic )
 }
 #else
 
-static void DisplayGAPI( vout_thread_t *p_vout, picture_t *p_pic )
+static int GAPILockSurface( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_x, i_y, i_width, i_height;
@@ -669,7 +627,7 @@ static void DisplayGAPI( vout_thread_t *p_vout, picture_t *p_pic )
     if( ( GetForegroundWindow() != GetParent(p_sys->hwnd) ) ||
         ( p_sys->b_video_display == VLC_FALSE ) )
     {
-        return;
+        //return VLC_EGENERIC;
     }
 
     GetClientRect( p_sys->hwnd, &video_rect);
@@ -684,9 +642,19 @@ static void DisplayGAPI( vout_thread_t *p_vout, picture_t *p_pic )
     if( i_width != p_vout->output.i_width ||
         i_height != p_vout->output.i_height )
     {
+        GXDisplayProperties gxdisplayprop = GXGetDisplayProperties();
+
         p_sys->render_width = i_width;
         p_sys->render_height = i_height;
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
+
+        msg_Dbg( p_vout, "vout size change (%ix%i -> %ix%i)",
+                 i_width, i_height, p_vout->output.i_width,
+                 p_vout->output.i_height );
+
+        p_vout->p_sys->i_pic_pixel_pitch = gxdisplayprop.cbxPitch;
+        p_vout->p_sys->i_pic_pitch = gxdisplayprop.cbyPitch;
+        return VLC_EGENERIC;
     }
     else
     {
@@ -705,7 +673,7 @@ static void DisplayGAPI( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( !IntersectRect( &dest_rect, &video_rect, &display_rect ) )
         {
-            return;
+            return VLC_EGENERIC;
         }
 
 #if 0
@@ -722,7 +690,7 @@ static void DisplayGAPI( vout_thread_t *p_vout, picture_t *p_pic )
         if( !(p_dest = GXBeginDraw()) )
         {
             msg_Err( p_vout, "GXBeginDraw error %d ", GetLastError() );
-            return;
+            return VLC_EGENERIC;
         }
 
         p_src += (dest_rect.left - video_rect.left) * gxdisplayprop.cbxPitch +
@@ -732,16 +700,20 @@ static void DisplayGAPI( vout_thread_t *p_vout, picture_t *p_pic )
         i_width = dest_rect.right - dest_rect.left;
         i_height = dest_rect.bottom - dest_rect.top;
 
-        while( i_height-- )
-        {
-            p_vout->p_vlc->pf_memcpy( p_dest, p_src,
-                                      i_width * gxdisplayprop.cbxPitch );
-            p_src += p_pic->p->i_pitch;
-            p_dest += gxdisplayprop.cbyPitch;
-        }
+        p_pic->p->p_pixels = p_dest;
     }
 
+    return VLC_SUCCESS;
+}
+
+static int GAPIUnlockSurface( vout_thread_t *p_vout, picture_t *p_pic )
+{
     GXEndDraw();
+    return VLC_SUCCESS;
+}
+
+static void DisplayGAPI( vout_thread_t *p_vout, picture_t *p_pic )
+{
 }
 #endif
 
@@ -792,7 +764,7 @@ static void EventThread ( vlc_object_t *p_event )
     RegisterClass(&wc);
 
     /* Create output window */
-    p_vout->p_sys->hparent = p_vout->p_sys->hwnd = (HWND)
+    p_vout->p_sys->hparent = (HWND)
         vout_RequestWindow( p_vout, &p_vout->p_sys->i_window_x,
                             &p_vout->p_sys->i_window_y,
                             (unsigned int *)&p_vout->p_sys->i_window_width,
@@ -859,8 +831,6 @@ static void EventThread ( vlc_object_t *p_event )
                     NULL, GetModuleHandle(NULL),
                     (LPVOID)p_vout );            /* send p_vout to WM_CREATE */
 
-    ShowWindow( p_vout->p_sys->hvideownd, SW_SHOW );
-
     /* Initialize offscreen buffer */
     InitBuffers( p_vout );
 
@@ -913,14 +883,18 @@ static void EventThread ( vlc_object_t *p_event )
 
     msg_Dbg( p_vout, "CloseWindow" );
 
+#ifdef MODULE_NAME_IS_wingapi
+    GXCloseDisplay();
+#else
+    DeleteDC( p_vout->p_sys->off_dc );
+    DeleteObject( p_vout->p_sys->off_bitmap );
+#endif
+
     DestroyWindow( p_vout->p_sys->hwnd );
     if( p_vout->p_sys->hfswnd ) DestroyWindow( p_vout->p_sys->hfswnd );
 
     if( p_vout->p_sys->hparent )
         vout_ReleaseWindow( p_vout, (void *)p_vout->p_sys->hparent );
-
-    DeleteDC( p_vout->p_sys->off_dc );
-    DeleteObject( p_vout->p_sys->off_bitmap );
 }
 
 /*****************************************************************************
@@ -1043,8 +1017,8 @@ static void UpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
 /*****************************************************************************
  * Message handler for the main window
  *****************************************************************************/
-static long FAR PASCAL WndProc ( HWND hWnd, UINT message,
-                                 WPARAM wParam, LPARAM lParam )
+static long FAR PASCAL WndProc( HWND hWnd, UINT message,
+                                WPARAM wParam, LPARAM lParam )
 {
     vout_thread_t *p_vout;
 
@@ -1077,13 +1051,15 @@ static long FAR PASCAL WndProc ( HWND hWnd, UINT message,
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
 
-    if( hWnd != p_vout->p_sys->hwnd )
+    if( hWnd != p_vout->p_sys->hwnd &&
+        hWnd != p_vout->p_sys->hvideownd )
         return DefWindowProc(hWnd, message, wParam, lParam);
 
     switch( message )
     {
     case WM_WINDOWPOSCHANGED:
-        UpdateRects( p_vout, VLC_TRUE );
+        if( hWnd == p_vout->p_sys->hwnd )
+            UpdateRects( p_vout, VLC_TRUE );
         break;
     case WM_LBUTTONDOWN:
         p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
@@ -1091,9 +1067,6 @@ static long FAR PASCAL WndProc ( HWND hWnd, UINT message,
     case WM_MOUSEMOVE:
         break;
     case WM_LBUTTONUP:
-        break;
-
-    case WM_CREATE:
         break;
 
     case WM_INITMENUPOPUP:
@@ -1127,16 +1100,12 @@ static void InitBuffers( vout_thread_t *p_vout )
     BITMAPINFOHEADER *p_header = &p_vout->p_sys->bitmapinfo.bmiHeader;
     BITMAPINFO *p_info = &p_vout->p_sys->bitmapinfo;
     int i_pixels = p_vout->render.i_height * p_vout->render.i_width;
-    HDC window_dc;
-
-    window_dc = GetDC( p_vout->p_sys->hvideownd );
+    HDC window_dc = GetDC( p_vout->p_sys->hvideownd );
 
     /* Get screen properties */
 #ifdef MODULE_NAME_IS_wingapi
-    {
     GXDisplayProperties gx_displayprop = GXGetDisplayProperties();
     p_vout->p_sys->i_depth = gx_displayprop.cBPP;
-    }
 #else
     p_vout->p_sys->i_depth = GetDeviceCaps( window_dc, PLANES ) *
         GetDeviceCaps( window_dc, BITSPIXEL );
@@ -1177,7 +1146,6 @@ static void InitBuffers( vout_thread_t *p_vout )
                           0, 0, CW_USEDEFAULT, CW_USEDEFAULT, SWP_SHOWWINDOW );
         }
 
-        GXCloseDisplay();
     }
 
     GXOpenDisplay( p_vout->p_sys->hvideownd, GX_FULLSCREEN );
@@ -1231,15 +1199,18 @@ static void InitBuffers( vout_thread_t *p_vout )
         break;
     }
     p_header->biWidth = p_vout->render.i_width;
-    p_header->biHeight = p_vout->render.i_height;
+    p_header->biHeight = -p_vout->render.i_height;
     p_header->biClrImportant = 0;
     p_header->biClrUsed = 0;
     p_header->biXPelsPerMeter = 0;
     p_header->biYPelsPerMeter = 0;
 
+    p_vout->p_sys->i_pic_pixel_pitch = p_header->biBitCount / 8;
+    p_vout->p_sys->i_pic_pitch = p_header->biBitCount * p_header->biWidth / 8;
+
     p_vout->p_sys->off_bitmap =
         CreateDIBSection( window_dc, (BITMAPINFO *)p_header, DIB_RGB_COLORS,
-                          (void**)&p_vout->p_sys->p_buffer, NULL, 0 );
+                          (void**)&p_vout->p_sys->p_pic_buffer, NULL, 0 );
 
     p_vout->p_sys->off_dc = CreateCompatibleDC( window_dc );
 
