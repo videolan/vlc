@@ -44,11 +44,11 @@ typedef struct vout_spu_s
     byte_t *p_data;
 
     /* drawing coordinates inside the spu */
-    int x;
-    int y;
+    int i_x;
+    int i_y;
     /* target size */
-    int width;
-    int height;
+    int i_width;
+    int i_height;
 
 } vout_spu_t;
 
@@ -117,14 +117,16 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
     p_from[1] = p_subpic->p_data + p_subpic->type.spu.i_offset[1];
     p_from[0] = p_subpic->p_data + p_subpic->type.spu.i_offset[0];
 
-    vspu.x = 0;
-    vspu.y = 0;
-    vspu.width = TARGET_WIDTH;
-    vspu.height = TARGET_HEIGHT;
+    vspu.i_x = 0;
+    vspu.i_y = 0;
+    vspu.i_width = TARGET_WIDTH;
+    vspu.i_height = TARGET_HEIGHT;
     vspu.p_data = p_buffer->p_data
                     /* add the picture coordinates and the SPU coordinates */
-                    + ( p_buffer->i_pic_x + p_subpic->i_x ) * i_bytes_per_pixel
-                    + ( p_buffer->i_pic_y + p_subpic->i_y ) * i_bytes_per_line;
+                    + ( p_buffer->i_pic_x + ((p_subpic->i_x * i_x_scale) >> 6))
+                        * i_bytes_per_pixel
+                    + ( p_buffer->i_pic_y + ((p_subpic->i_y * i_y_scale) >> 6))
+                        * i_bytes_per_line;
 
     while( p_from[0] < (byte_t *)p_subpic->p_data
                          + p_subpic->type.spu.i_offset[1] )
@@ -135,13 +137,13 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
         {
             found_code:
 
-            if( ((i_code >> 2) + vspu.x + vspu.y * vspu.width)
-                    > vspu.height * vspu.width )
+            if( ((i_code >> 2) + vspu.i_x + vspu.i_y * vspu.i_width)
+                    > vspu.i_height * vspu.i_width )
             {
                 intf_DbgMsg ( "video_spu: invalid draw request ! %d %d\n",
-                              i_code >> 2, vspu.height * vspu.width
-                               - ( (i_code >> 2) + vspu.x
-                                   + vspu.y * vspu.width ) );
+                              i_code >> 2, vspu.i_height * vspu.i_width
+                               - ( (i_code >> 2) + vspu.i_x
+                                   + vspu.i_y * vspu.i_width ) );
                 return;
             }
             else
@@ -149,8 +151,8 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
                 if( (i_color = i_code & 0x3) )
                 {
                     u8 *p_target = &vspu.p_data[
-                        i_bytes_per_pixel * ((vspu.x * i_x_scale) >> 6)
-                        + i_bytes_per_line * ((vspu.y * i_y_scale) >> 6) ];
+                        i_bytes_per_pixel * ((vspu.i_x * i_x_scale) >> 6)
+                        + i_bytes_per_line * ((vspu.i_y * i_y_scale) >> 6) ];
 
                     memset( p_target, p_palette[i_color],
                             ((((i_code - 1) * i_x_scale) >> 8) + 1)
@@ -168,10 +170,10 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
                                 * i_bytes_per_pixel );
                     }
                 }
-                vspu.x += i_code >> 2;
+                vspu.i_x += i_code >> 2;
             }
 
-            if( vspu.x >= vspu.width )
+            if( vspu.i_x >= vspu.i_width )
             {
                 /* byte-align the stream */
                 b_aligned = 1;
@@ -207,7 +209,7 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
             /* we have a boo boo ! */
             intf_DbgMsg( "video_spu: unknown code 0x%x "
                          "(dest %x side %x, x=%d, y=%d)\n",
-                         i_code, p_from[i_id], i_id, vspu.x, vspu.y );
+                         i_code, p_from[i_id], i_id, vspu.i_x, vspu.i_y );
             if( NewLine( &vspu, &i_id ) < 0 )
                 return;
             continue;
@@ -219,10 +221,10 @@ static int NewLine( vout_spu_t *p_vspu, int *i_id )
 {
     *i_id = 1 - *i_id;
 
-    p_vspu->x = 0;
-    p_vspu->y++;
+    p_vspu->i_x = 0;
+    p_vspu->i_y++;
 
-    return( p_vspu->width - p_vspu->y );
+    return( p_vspu->i_width - p_vspu->i_y );
 
 }
 

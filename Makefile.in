@@ -42,7 +42,7 @@ PROGRAM_BUILD = `date` $(USER)
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.
-DEFINE += -DSYS_`echo $(SYS) | sed 's/-.*//' | tr a-z A-Z`
+DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr a-z A-Z)
 DEFINE += -DPLUGIN_PATH="\"$(prefix)/lib/videolan/vlc\""
 DEFINE += -DDATA_PATH="\"$(prefix)/share/videolan/vlc\""
 #DEFINE += -DPROGRAM_OPTIONS="\"$(shell echo $(PROGRAM_OPTIONS) | tr 'A-Z' 'a-z')\""
@@ -340,79 +340,65 @@ $(dependancies): %.d: FORCE
 $(C_OBJ): %.o: Makefile.dep
 $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
-	@echo "compiling $*.o from $*.c"
-	@$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 $(CPP_OBJ): %.o: %.cpp
-	@echo "compiling $*.o from $*.cpp"
-	@$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 $(ASM_OBJ): %.o: Makefile.dep
 $(ASM_OBJ): %.o: %.S
-	@echo "assembling $*.o from $*.S"
-	@$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 #$(PLUGIN_OBJ): %.so: Makefile.dep
 #$(PLUGIN_OBJ): %.so: .dep/%.d
 
 # audio plugins
 plugins/aout/aout_dummy.so plugins/aout/aout_dsp.so: %.so: %.c
-		@echo "compiling $*.so from $*.c"
 ifeq ($(SYS),beos)
-		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
+	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
 else
-		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
 endif
 
 plugins/aout/aout_esd.so: %.so: %.c
-		@echo "compiling $*.so from $*.c"
 ifneq (,$(findstring bsd,$(SYS)))
-		@$(CC) $(CCFLAGS) $(CFLAGS) -lesd -shared -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -lesd -shared -o $@ $<
 else
-		@$(CC) $(CCFLAGS) $(CFLAGS) -laudiofile -lesd -shared -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -laudiofile -lesd -shared -o $@ $<
 endif
 
 # video plugins
 plugins/intf/intf_dummy.so plugins/vout/vout_dummy.so \
 	plugins/intf/intf_fb.so plugins/vout/vout_fb.so: %.so: %.c
-		@echo "compiling $*.so from $*.c"
 ifeq ($(SYS),beos)
-		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
+	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
 else
-		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
 endif
 
 plugins/intf/intf_x11.so plugins/vout/vout_x11.so: %.so: %.c
-		@echo "compiling $*.so from $*.c"
-		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
 
 plugins/intf/intf_mga.so plugins/vout/vout_mga.so: %.so: %.c
-		@echo "compiling $*.so from $*.c"
-		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
 
 plugins/intf/intf_gnome.so: %.so: %.c
-		@echo "compiling $*.so from $*.c"
-		@$(CC) $(CCFLAGS) $(CFLAGS) $(LCFLAGS) `gnome-config --libs --cflags gnomeui` -shared -o $@ $< plugins/intf/intf_gnome_callbacks.c plugins/intf/intf_gnome_interface.c plugins/intf/intf_gnome_support.c
+	$(CC) $(CCFLAGS) $(CFLAGS) $(LCFLAGS) `gnome-config --libs --cflags gnomeui` -shared -o $@ $< plugins/intf/intf_gnome_callbacks.c plugins/intf/intf_gnome_interface.c plugins/intf/intf_gnome_support.c
 
 plugins/vout/vout_gnome.so: %.so: %.c
-		@echo "compiling $*.so from $*.c"
-		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
 
 plugins/intf/intf_glide.so plugins/vout/vout_glide.so: %.so: %.c
-		@echo "compiling $*.so from $*.c"
-		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/include/glide -lglide2x -shared -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/include/glide -lglide2x -shared -o $@ $<
 
 plugins/intf/intf_ggi.so plugins/vout/vout_ggi.so: %.so: %.c
-		@echo "compiling $*.so from $*.c"
-		@$(CC) $(CCFLAGS) $(CFLAGS) -lggi -shared -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -lggi -shared -o $@ $<
 
 plugins/intf/intf_beos.so: %.so: %.cpp
-		@echo "compiling $*.so from $*.cpp"
-		@$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
+	$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
 
 plugins/vout/vout_beos.so: %.so: %.cpp
-		@echo "compiling $*.so from $*.cpp"
-		@$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
+	$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
 		
 
 ################################################################################

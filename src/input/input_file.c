@@ -952,7 +952,7 @@ int input_FileOpen( input_thread_t *p_input )
         ps_thread( &input_file );
         break;
     case 0x47:
-        intf_ErrMsg( "input error: ts file are not currently supported\n" );
+        intf_ErrMsg( "input error: ts files are not currently supported\n" );
         return( 1 );
     default:
         intf_ErrMsg( "input error: cannot determine stream type\n" );
