@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.10 2002/03/13 08:39:39 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.11 2002/03/17 05:48:18 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -29,6 +29,7 @@ public:
 	~VLCView();
 	
 	void MouseDown(BPoint point);
+	void Draw(BRect updateRect);
 };
 
 
@@ -40,16 +41,14 @@ public:
                  struct vout_thread_s *p_video_output); 
     ~VideoWindow();
     
-    void resizeIfRequired(int newWidth, int newHeight);
     void drawBuffer(int bufferIndex);
     
     // this is the hook controling direct screen connection
     int32           i_width;     // incomming bitmap size 
     int32           i_height;
-    float           f_w_width;   // current window size
-    float           f_w_height;
-    bool            resized;
-    bool            is_zoomed;
+    BRect           winSize;     // current window size
+    float           width_scale, height_scale;
+    bool            is_zoomed, resized;
     BBitmap	        *bitmap[2];
     VLCView	        *view;
     BWindow         *voutWindow;
@@ -72,8 +71,6 @@ public:
     virtual void    FrameResized(float width, float height);
     virtual void	Zoom(BPoint origin, float width, float height);
 private:
-    bool            is_zoomed;
-	BRect           origRect;
 	VideoWindow     *owner;
 };
 
@@ -90,7 +87,5 @@ public:
     virtual void	Zoom(BPoint origin, float width, float height);
     virtual void    DirectConnected(direct_buffer_info *info);
 private:
-    bool            is_zoomed;
-	BRect           origRect;
     VideoWindow     *owner;
 };
