@@ -490,7 +490,10 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
                                    "a=tool:"PACKAGE_STRING"\r\n"
                                    "a=type:broadcast\r\n")
                            + strlen( p_session->psz_name )
-                           + strlen( p_session->psz_uri ) + 300 );
+                           + strlen( p_session->psz_uri ) + 300
+                           + ( p_session->psz_group ?
+                                 strlen( p_session->psz_group ) : 0 ) );
+
     if( !p_session->psz_sdp )
     {
         msg_Err( p_sap, "out of memory" );
@@ -509,6 +512,14 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
                             p_session->psz_name,
                             p_session->psz_uri, p_session->i_ttl,
                             p_session->i_port, p_session->i_payload );
+
+    if( p_session->psz_group )
+    {
+        sprintf( p_session->psz_sdp, "%sa=x-plgroup:%s\r\n",
+                                     p_session->psz_sdp,
+                                     p_session->psz_group );
+    }
+
     msg_Dbg( p_sap, "Generated SDP (%i bytes):\n%s", strlen(p_session->psz_sdp),
                     p_session->psz_sdp );
     return VLC_SUCCESS;
