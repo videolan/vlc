@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.42 2003/10/25 00:49:14 sam Exp $
+ * $Id: ogg.c,v 1.43 2003/11/17 22:53:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -361,6 +361,38 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
           if( p_stream->i_packets_backup == 3 ) p_stream->b_force_backup = 0;
           break;
 
+        case VLC_FOURCC( 'f','l','a','c' ):
+          if( p_stream->i_packets_backup == 2 )
+          {
+#ifdef HAVE_OGGPACKB
+              oggpack_buffer opb;
+
+              /* Parse the STREAMINFO metadata */
+              oggpackB_readinit(&opb, p_oggpacket->packet, p_oggpacket->bytes);
+              oggpackB_adv( &opb, 1 );
+              if( oggpackB_read( &opb, 7 ) == 0 )
+              {
+                  if( oggpackB_read( &opb, 24 ) >= 34 /*size STREAMINFO*/ )
+                  {
+                      oggpackB_adv( &opb, 80 );
+                      p_stream->f_rate = oggpackB_read( &opb, 20 );
+                      p_stream->i_channels = oggpackB_read( &opb, 3 ) + 1;
+                  }
+                  else
+                  {
+                      msg_Dbg( p_input, "STREAMINFO metadata too short" );
+                  }
+              }
+              else
+              {
+                  /* This ain't a STREAMINFO metadata */
+                  msg_Dbg( p_input, "Invalid STREAMINFO metadata" );
+              }
+#endif
+              p_stream->b_force_backup = 0;
+          }
+          break;
+
         default:
           p_stream->b_force_backup = 0;
           break;
@@ -400,7 +432,8 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
 
     /* Convert the pcr into a pts */
     if( p_stream->i_fourcc == VLC_FOURCC( 'v','o','r','b' ) ||
-        p_stream->i_fourcc == VLC_FOURCC( 's','p','x',' ' ) )
+        p_stream->i_fourcc == VLC_FOURCC( 's','p','x',' ' ) ||
+        p_stream->i_fourcc == VLC_FOURCC( 'f','l','a','c' ) )
     {
         if( p_stream->i_pcr >= 0 )
         {
@@ -487,6 +520,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
 
     if( p_stream->i_fourcc != VLC_FOURCC( 'v','o','r','b' ) &&
         p_stream->i_fourcc != VLC_FOURCC( 's','p','x',' ' ) &&
+        p_stream->i_fourcc != VLC_FOURCC( 'f','l','a','c' ) &&
         p_stream->i_fourcc != VLC_FOURCC( 't','a','r','k' ) &&
         p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
     {
@@ -647,6 +681,20 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                                  p_stream->i_channels,
                                  (int)p_stream->f_rate, p_stream->i_bitrate );
                     }
+                }
+                /* Check for Flac header */
+                else if( oggpacket.bytes >= 4 &&
+                    ! strncmp( &oggpacket.packet[0], "fLaC", 4 ) )
+                {
+                    msg_Dbg( p_input, "found Flac header" );
+
+                    /* Grrrr!!!! Did they really have to put all the
+                     * important info in the second header packet!!!
+                     * (STREAMINFO metadata is in the following packet) */
+                    p_stream->b_force_backup = 1;
+
+                    p_stream->i_cat = AUDIO_ES;
+                    p_stream->i_fourcc = VLC_FOURCC( 'f','l','a','c' );
                 }
                 /* Check for Theora header */
                 else if( oggpacket.bytes >= 7 &&
@@ -1536,7 +1584,8 @@ static int Demux( input_thread_t * p_input )
 
                 /* An Ogg/vorbis packet contains an end date granulepos */
                 if( p_stream->i_fourcc == VLC_FOURCC( 'v','o','r','b' ) ||
-                    p_stream->i_fourcc == VLC_FOURCC( 's','p','x',' ' ) )
+                    p_stream->i_fourcc == VLC_FOURCC( 's','p','x',' ' ) ||
+                    p_stream->i_fourcc == VLC_FOURCC( 'f','l','a','c' ) )
                 {
                     if( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
                     {
