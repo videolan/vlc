@@ -246,31 +246,37 @@ static int Init( vout_thread_t *p_vout )
     var_Create( p_vout, "align", VLC_VAR_INTEGER );
 
     w1 = p_vout->output.i_width / p_vout->p_sys->i_col;
-    h1 = w1 * VOUT_ASPECT_FACTOR / i_aspect;
-    w1 &= ~1; h1 &= ~1;
+    w1 &= ~1;
+    h1 = w1 * VOUT_ASPECT_FACTOR / i_aspect&~1;
+    h1 &= ~1;
     
-    h2 = p_vout->output.i_height / p_vout->p_sys->i_row;
-    w2 = h2 * i_aspect / VOUT_ASPECT_FACTOR;
-    w2 &= ~1; h2 &= ~1;
+    h2 = p_vout->output.i_height / p_vout->p_sys->i_row&~1;
+    h2 &= ~1;
+    w2 = h2 * i_aspect / VOUT_ASPECT_FACTOR&~1;
+    w2 &= ~1;
     
     if ( h1 * p_vout->p_sys->i_row < p_vout->output.i_height )
     {
+        int i_tmp;
         i_target_width = w2;        
         i_target_height = h2;
         i_vstart = 0;
         i_vend = p_vout->output.i_height;
-        i_hstart = ( i_target_width * p_vout->p_sys->i_col
-                     - p_vout->output.i_width ) / 2;
+        i_tmp = i_target_width * p_vout->p_sys->i_col;
+        while( i_tmp < p_vout->output.i_width ) i_tmp += p_vout->p_sys->i_col;
+        i_hstart = (( i_tmp - p_vout->output.i_width ) / 2)&~1;
         i_hend = i_hstart + p_vout->output.i_width;
     }
     else
     {
+        int i_tmp;
         i_target_height = h1;
         i_target_width = w1;
         i_hstart = 0;
         i_hend = p_vout->output.i_width;
-        i_vstart = ( i_target_height * p_vout->p_sys->i_row
-                     - p_vout->output.i_height ) / 2;
+        i_tmp = i_target_height * p_vout->p_sys->i_row;
+        while( i_tmp < p_vout->output.i_height ) i_tmp += p_vout->p_sys->i_row;
+        i_vstart = ( ( i_tmp - p_vout->output.i_height ) / 2 ) & ~1;
         i_vend = i_vstart + p_vout->output.i_height;
     }
     msg_Dbg( p_vout, "target resolution %dx%d", i_target_width, i_target_height );
