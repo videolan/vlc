@@ -4,23 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
  <head>
     <title>VLC Media Player</title>
-    <style type="css">
-	body {font-family:Verdana, Arial, Sans Serif; }
-	h2 { text-align:center; }
-	table {width:100%;}
-	table.add {width:70%;}
-	div.section {background-color:#FFFFCC;
-	     border:1pt black solid;
-	     margin-bottom:2em; 
-	     padding:0.5em;}
-	div.sectitle {	background-color:#FFFF99; 
-			color:#019;
-			border:1pt black solid;
-			width:20%;
-			font-weight:bold;}
-	tr.ligne1 { background-color:#FFFFEE; }
-	tr.ligne2 { background-color:#FFFFAA; }
-    </style>
+    <link href="/style.css" title="Default" rel="stylesheet" />
+
     <vlc id="if" param1="url_param"/>
         <meta http-equiv="refresh" content="0;URL=/" />
     <vlc id="end" />
@@ -40,6 +25,7 @@
         <td><input type="submit" name="control" value="pause" /></td>
         <td><input type="submit" name="control" value="previous" /></td>
         <td><input type="submit" name="control" value="next" /></td>
+        <td><a href="info.html">Informations</a></td>
         <td><a href="admin/">Administration</a></td>
        </tr>
       </table>
