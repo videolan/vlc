@@ -1,4 +1,4 @@
-vlc (0.6.0+cvs-20030702-1) unstable; urgency=low
+vlc (0.6.0+cvs-20030703-1) unstable; urgency=low
 
   * New CVS snapshot.
     + Includes previous Debian fixes.
@@ -12,7 +12,7 @@ vlc (0.6.0+cvs-20030702-1) unstable; urgency=low
     + aclocal-1.7 && autoconf && automake-1.7 -a -c && libtoolize -c -f
     + Fixes build on parisc (Closes: #199693).
 
- -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sun, 29 Jun 2003 21:12:10 +0200
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Thu,  3 Jul 2003 11:25:57 +0200
 
 vlc (0.6.0+cvs-20030627-2) unstable; urgency=low
 
