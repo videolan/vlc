@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
+#include <vlc/input.h>
 #include <vlc/sout.h>
 
 #include <ogg/ogg.h>
