@@ -1441,6 +1441,17 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
 /*****************************************************************************
  * input_SetStatus: change the reading status
  *****************************************************************************/
+
+/* Status changing methods */
+enum
+{
+    INPUT_STATUS_END    = 0,
+    INPUT_STATUS_PLAY   = 1,
+    INPUT_STATUS_PAUSE  = 2,
+    INPUT_STATUS_FASTER = 3,
+    INPUT_STATUS_SLOWER = 4
+};
+
 static void input_SetStatus( input_thread_t *p_input, int i_mode )
 {
     vlc_mutex_lock( &p_input->stream.stream_lock );

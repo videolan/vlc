@@ -307,6 +307,35 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
     free( p_pgrm );
 }
 
+/****************************************************************************
+ * input_ChangeProgram: interface request a program change (internal)
+ ****************************************************************************/
+static int input_ChangeProgram( input_thread_t * p_input, uint16_t i_program_number )
+{
+    pgrm_descriptor_t *       p_program;
+    vlc_value_t val;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_program = input_FindProgram( p_input, i_program_number );
+
+    if ( p_program == NULL )
+    {
+        msg_Err( p_input, "could not find selected program" );
+        return -1;
+    }
+
+    p_input->stream.p_new_program = p_program;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = i_program_number;
+    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
+
+    return 0;
+}
+
 /*****************************************************************************
  * input_AddArea: add and init an area descriptor
  *****************************************************************************
@@ -574,6 +603,19 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
     }
 }
 
+/****************************************************************************
+ * input_ChangeArea: interface request an area change (internal)
+ ****************************************************************************/
+static int input_ChangeArea( input_thread_t * p_input, input_area_t * p_area )
+{
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_input->stream.p_new_area = p_area;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return 0;
+}
 
 /*****************************************************************************
  * input_FindES: returns a pointer to an ES described by its ID
