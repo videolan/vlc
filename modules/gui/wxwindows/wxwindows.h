@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.8 2003/01/23 23:57:50 gbazin Exp $
+ * $Id: wxwindows.h,v 1.9 2003/03/22 03:14:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -175,7 +175,7 @@ private:
     wxPanel *NetPanel( wxWindow* parent );
     wxPanel *SatPanel( wxWindow* parent );
 
-    void OpenDialog::UpdateMRL( int i_access_method );
+    void UpdateMRL( int i_access_method );
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
@@ -184,7 +184,7 @@ private:
     void OnPageChange( wxNotebookEvent& event );
     void OnMRLChange( wxCommandEvent& event );
 
-    /* Event handlers for the disc page */
+    /* Event handlers for the file page */
     void OnFilePanelChange( wxCommandEvent& event );
     void OnFileBrowse( wxCommandEvent& event );
 
@@ -195,6 +195,10 @@ private:
     /* Event handlers for the net page */
     void OnNetPanelChange( wxCommandEvent& event );
     void OnNetTypeChange( wxCommandEvent& event );
+
+    /* Event handlers for the stream output */
+    void OnSoutEnable( wxCommandEvent& event );
+    void OnSoutSettings( wxCommandEvent& WXUNUSED(event) );
 
     DECLARE_EVENT_TABLE();
 
@@ -219,6 +223,9 @@ private:
     wxRadioButton *net_radios[4];
     wxSpinCtrl *net_ports[4];
     wxTextCtrl *net_addrs[4];
+
+    /* Controls for the stream output */
+    wxButton *sout_button;
 };
 
 enum
@@ -227,6 +234,65 @@ enum
     DISC_ACCESS,
     NET_ACCESS,
     SAT_ACCESS
+};
+
+/* Stream output Dialog */
+class SoutDialog: public wxDialog
+{
+public:
+    /* Constructor */
+    SoutDialog( intf_thread_t *p_intf, Interface *p_main_interface );
+    virtual ~SoutDialog();
+
+    wxString mrl;
+
+private:
+    void UpdateMRL();
+    wxPanel *AccessPanel( wxWindow* parent );
+    wxPanel *EncapsulationPanel( wxWindow* parent );
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnOk( wxCommandEvent& event );
+    void OnCancel( wxCommandEvent& event );
+    void OnMRLChange( wxCommandEvent& event );
+    void OnAccessTypeChange( wxCommandEvent& event );
+
+    /* Event handlers for the file access output */
+    void OnFileChange( wxCommandEvent& event );
+    void OnFileBrowse( wxCommandEvent& event );
+
+    /* Event handlers for the net access output */
+    void OnNetChange( wxCommandEvent& event );
+    void OnMulticastChange( wxCommandEvent& event );
+
+    /* Event handlers for the encapsulation panel */
+    void OnEncapsulationChange( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    Interface *p_main_interface;
+
+    wxComboBox *mrl_combo;
+    wxPanel *access_panel;
+    wxPanel *encapsulation_panel;
+
+    /* Controls for the access outputs */
+    wxPanel *access_subpanels[4];
+    wxRadioButton *access_radios[4];
+    wxCheckBox *multicast_checkbox;
+
+    int i_access_type;
+    vlc_bool_t b_multicast;
+
+    wxComboBox *file_combo;
+    wxSpinCtrl *net_port;
+    wxTextCtrl *net_addr;
+
+    /* Controls for the encapsulation */
+    wxRadioButton *encapsulation_radios[4];
+    int i_encapsulation_type;
+
 };
 
 /* Messages */

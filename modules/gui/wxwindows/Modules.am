@@ -3,6 +3,7 @@ SOURCES_wxwindows = \
 	modules/gui/wxwindows/wxwindows.h \
 	modules/gui/wxwindows/interface.cpp \
 	modules/gui/wxwindows/open.cpp \
+	modules/gui/wxwindows/streamout.cpp \
 	modules/gui/wxwindows/messages.cpp \
 	modules/gui/wxwindows/playlist.cpp \
 	modules/gui/wxwindows/popup.cpp \
