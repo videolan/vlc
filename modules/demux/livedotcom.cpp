@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.10 2003/11/21 00:38:01 gbazin Exp $
+ * $Id: livedotcom.cpp,v 1.11 2003/11/21 06:14:59 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -258,6 +258,8 @@ static int  AccessOpen( vlc_object_t *p_this )
         p_input->stream.p_selected_area->i_size = 0;
         p_input->stream.i_method = INPUT_METHOD_NETWORK;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        return VLC_SUCCESS;
     }
 }
 
@@ -296,7 +298,7 @@ static ssize_t Read ( input_thread_t *p_input, byte_t *p_buffer, size_t i_len )
 static ssize_t MRLRead ( input_thread_t *p_input, byte_t *p_buffer, size_t i_len )
 {
     int i_done = (int)p_input->p_access_data;
-    int            i_copy = __MIN( (int)i_len, strlen(p_input->psz_name) - i_done );
+    int            i_copy = __MIN( (int)i_len, (int)strlen(p_input->psz_name) - i_done );
 
     if( i_copy > 0 )
     {
