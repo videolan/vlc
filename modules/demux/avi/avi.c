@@ -206,24 +206,17 @@ static int Open( vlc_object_t * p_this )
 
     uint8_t  *p_peek;
 
-
     /* Is it an avi file ? */
-    if( stream_Peek( p_demux->s, &p_peek, 200 ) < 200 )
-    {
-        msg_Dbg( p_demux, "cannot peek()" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 200 ) < 200 ) return VLC_EGENERIC;
+
     for( i_peeker = 0; i_peeker < 188; i_peeker++ )
     {
-        if( !strncmp( &p_peek[0], "RIFF", 4 ) && !strncmp( &p_peek[8], "AVI ", 4 ) )
-        {
-            break;
-        }
+        if( !strncmp( &p_peek[0], "RIFF", 4 ) &&
+            !strncmp( &p_peek[8], "AVI ", 4 ) ) break;
         p_peek++;
     }
     if( i_peeker == 188 )
     {
-        msg_Warn( p_demux, "avi module discarded (invalid header)" );
         return VLC_EGENERIC;
     }
 

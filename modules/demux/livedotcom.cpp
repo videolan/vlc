@@ -193,16 +193,12 @@ static int  Open ( vlc_object_t *p_this )
     {
         /* See if it looks like a SDP
            v, o, s fields are mandatory and in this order */
-        if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
-        {
-            msg_Err( p_demux, "cannot peek" );
-            return VLC_EGENERIC;
-        }
+        if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 ) return VLC_EGENERIC;
+
         if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) &&
             strncmp( (char*)p_peek, "v=0\n", 4 ) &&
             ( p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
         {
-            msg_Warn( p_demux, "SDP module discarded" );
             return VLC_EGENERIC;
         }
     }

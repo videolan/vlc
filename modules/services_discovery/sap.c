@@ -368,24 +368,17 @@ static int OpenDemux( vlc_object_t *p_this )
     char *psz_sdp = (char *)malloc( i_max_sdp );
     sdp_t *p_sdp = NULL;
 
-    if( !psz_sdp )
-    {
-        return VLC_EGENERIC;
-    }
+    if( !psz_sdp ) return VLC_EGENERIC;
 
     /* Probe for SDP */
     if( p_demux->s )
     {
-        if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
-        {
-            msg_Err( p_demux, "cannot peek" );
-            return VLC_EGENERIC;
-        }
+        if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 ) return VLC_EGENERIC;
+
         if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) &&
             strncmp( (char*)p_peek, "v=0\n", 4 ) &&
             ( p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
         {
-            msg_Warn( p_demux, "SDP (UDP) module discarded" );
             return VLC_EGENERIC;
         }
     }

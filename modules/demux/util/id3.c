@@ -60,11 +60,7 @@ static int SkipID3Tag( vlc_object_t *p_this )
     msg_Dbg( p_demux, "checking for ID3 tag" );
 
     /* get 10 byte id3 header */
-    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
-    {
-        msg_Err( p_demux, "cannot peek()" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) return VLC_EGENERIC;
 
     if( p_peek[0] != 'I' || p_peek[1] != 'D' || p_peek[2] != '3' )
     {

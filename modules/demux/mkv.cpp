@@ -483,21 +483,11 @@ static int Open( vlc_object_t * p_this )
     EbmlElement *el = NULL, *el1 = NULL;
 
     /* peek the begining */
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
-    {
-        msg_Warn( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
     /* is a valid file */
     if( p_peek[0] != 0x1a || p_peek[1] != 0x45 ||
-        p_peek[2] != 0xdf || p_peek[3] != 0xa3 )
-    {
-        msg_Warn( p_demux, "matroska module discarded "
-                           "(invalid header 0x%.2x%.2x%.2x%.2x)",
-                           p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
-        return VLC_EGENERIC;
-    }
+        p_peek[2] != 0xdf || p_peek[3] != 0xa3 ) return VLC_EGENERIC;
 
     /* Set the demux function */
     p_demux->pf_demux   = Demux;

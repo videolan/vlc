@@ -88,22 +88,14 @@ static int Open( vlc_object_t * p_this )
 
     if( p_peek[0] != 0x00 || p_peek[1] != 0x00 || p_peek[2] != 0x01 )
     {
-        if( !b_forced )
-        {
-            msg_Warn( p_demux, "ES module discarded (no startcode)" );
-            return VLC_EGENERIC;
-        }
+        if( !b_forced ) return VLC_EGENERIC;
 
         msg_Err( p_demux, "this doesn't look like an MPEG ES stream, continuing" );
     }
 
     if( p_peek[3] > 0xb9 )
     {
-        if( !b_forced )
-        {
-            msg_Warn( p_demux, "ES module discarded (system startcode)" );
-            return VLC_EGENERIC;
-        }
+        if( !b_forced ) return VLC_EGENERIC;
         msg_Err( p_demux, "this seems to be a system stream (PS plug-in ?), but continuing" );
     }
 

@@ -110,11 +110,9 @@ static int Open( vlc_object_t *p_this )
     /* We accept file based on extention match */
     if( strcasecmp( p_demux->psz_demux, "mod" ) )
     {
-        if( ( ext = strchr( p_demux->psz_path, '.' ) ) == NULL || stream_Size( p_demux->s ) == 0 )
-        {
-            msg_Warn( p_demux, "MOD module discarded (path=%s)", p_demux->psz_path );
-            return VLC_EGENERIC;
-        }
+        if( ( ext = strchr( p_demux->psz_path, '.' ) ) == NULL ||
+            stream_Size( p_demux->s ) == 0 ) return VLC_EGENERIC;
+
         ext++;  /* skip . */
         for( i = 0; mod_ext[i] != NULL; i++ )
         {
@@ -123,11 +121,7 @@ static int Open( vlc_object_t *p_this )
                 break;
             }
         }
-        if( mod_ext[i] == NULL )
-        {
-            msg_Warn( p_demux, "MOD module discarded (extention '%s' unknown)", ext );
-            return VLC_EGENERIC;
-        }
+        if( mod_ext[i] == NULL ) return VLC_EGENERIC;
         msg_Dbg( p_demux, "running MOD demuxer (ext=%s)", mod_ext[i] );
     }
 

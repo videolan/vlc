@@ -123,7 +123,6 @@ static int Open( vlc_object_t * p_this )
         /* I haven't find any sure working aac detection so only forced or
          * extention check
          */
-        msg_Warn( p_demux, "AAC module discarded" );
         return VLC_EGENERIC;
     }
 

@@ -92,16 +92,8 @@ static int Open( vlc_object_t *p_this )
 
     uint8_t     *p_peek;
 
-    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
-    if( strncmp( p_peek, ".RMF", 4 ) )
-    {
-        msg_Warn( p_demux, "Real module discarded" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) return VLC_EGENERIC;
+    if( strncmp( p_peek, ".RMF", 4 ) ) return VLC_EGENERIC;
 
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;

@@ -84,17 +84,12 @@ static int Open( vlc_object_t *p_this )
     es_format_t  fmt;
     uint8_t     *p_peek;
 
-    if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
     if( p_peek[0] != 'A' || p_peek[1] != 'V' || p_peek[4] != 0x55 )
     {
         /* In case we had forced this demuxer we try to resynch */
         if( strcasecmp( p_demux->psz_demux, "pva" ) || ReSynch( p_demux ) )
         {
-            msg_Warn( p_demux, "PVA module discarded" );
             return VLC_EGENERIC;
         }
     }

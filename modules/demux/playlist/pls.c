@@ -55,11 +55,7 @@ int Import_PLS( vlc_object_t *p_this )
     uint8_t *p_peek;
     char    *psz_ext;
 
-    if( stream_Peek( p_demux->s , &p_peek, 7 ) < 7 )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s , &p_peek, 7 ) < 7 ) return VLC_EGENERIC;
     psz_ext = strrchr ( p_demux->psz_path, '.' );
 
     if( !strncasecmp( p_peek, "[playlist]", 10 ) )
@@ -71,12 +67,8 @@ int Import_PLS( vlc_object_t *p_this )
     {
         ;
     }
-    else
-    {
-        msg_Warn(p_demux, "pls import module discarded");
-        return VLC_EGENERIC;
-        
-    }
+    else return VLC_EGENERIC;
+
     msg_Dbg( p_demux, "found valid PLS playlist file");
 
     p_demux->pf_control = Control;

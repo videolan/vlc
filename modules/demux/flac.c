@@ -73,18 +73,12 @@ static int Open( vlc_object_t * p_this )
     es_format_t  fmt;
 
     /* Have a peep at the show. */
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
-    {
-        /* Stream shorter than 4 bytes... */
-        msg_Err( p_demux, "cannot peek()" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
     if( p_peek[0]!='f' || p_peek[1]!='L' || p_peek[2]!='a' || p_peek[3]!='C' )
     {
         if( strncmp( p_demux->psz_demux, "flac", 4 ) )
         {
-            msg_Warn( p_demux, "flac module discarded (no startcode)" );
             return VLC_EGENERIC;
         }
         /* User forced */

@@ -108,18 +108,11 @@ static int Open( vlc_object_t * p_this )
     guid_t      guid;
     uint8_t     *p_peek;
 
-    /* a little test to see if it could be a asf stream */
-    if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
-    {
-        msg_Warn( p_demux, "ASF plugin discarded (cannot peek)" );
-        return VLC_EGENERIC;
-    }
+    /* A little test to see if it could be a asf stream */
+    if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 ) return VLC_EGENERIC;
+
     ASF_GetGUID( &guid, p_peek );
-    if( !ASF_CmpGUID( &guid, &asf_object_header_guid ) )
-    {
-        msg_Warn( p_demux, "ASF plugin discarded (not a valid file)" );
-        return VLC_EGENERIC;
-    }
+    if( !ASF_CmpGUID( &guid, &asf_object_header_guid ) ) return VLC_EGENERIC;
 
     /* Set p_demux fields */
     p_demux->pf_demux = Demux;

@@ -327,11 +327,7 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t  val;
 
     if( stream_Peek( p_demux->s, &p_peek, TS_PACKET_SIZE_MAX ) <
-        TS_PACKET_SIZE_MAX )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
+        TS_PACKET_SIZE_MAX ) return VLC_EGENERIC;
 
     /* Search first sync byte */
     for( i_sync = 0; i_sync < TS_PACKET_SIZE_MAX; i_sync++ )
@@ -340,11 +336,7 @@ static int Open( vlc_object_t *p_this )
     }
     if( i_sync >= TS_PACKET_SIZE_MAX )
     {
-        if( strcmp( p_demux->psz_demux, "ts" ) )
-        {
-            msg_Warn( p_demux, "TS module discarded" );
-            return VLC_EGENERIC;
-        }
+        if( strcmp( p_demux->psz_demux, "ts" ) ) return VLC_EGENERIC;
         msg_Warn( p_demux, "this does not look like a TS stream, continuing" );
     }
 

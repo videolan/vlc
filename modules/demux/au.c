@@ -105,14 +105,10 @@ static int Open( vlc_object_t *p_this )
     int          i_cat;
     int          i_samples, i_modulo;
 
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
-    {
-        msg_Warn( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
+
     if( strncmp( p_peek, ".snd", 4 ) )
     {
-        msg_Warn( p_demux, "AU module discarded" );
         return VLC_EGENERIC;
     }
 

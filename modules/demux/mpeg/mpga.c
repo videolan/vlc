@@ -142,7 +142,6 @@ static int Open( vlc_object_t * p_this )
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
-        msg_Err( p_demux, "cannot peek" );
         if( p_meta ) vlc_meta_Delete( p_meta );
         return VLC_EGENERIC;
     }
@@ -171,7 +170,6 @@ static int Open( vlc_object_t * p_this )
         }
         if( !b_ok && !p_demux->b_force )
         {
-            msg_Warn( p_demux, "mpga module discarded" );
             if( p_meta ) vlc_meta_Delete( p_meta );
             return VLC_EGENERIC;
         }

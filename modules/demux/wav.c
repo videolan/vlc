@@ -110,11 +110,8 @@ static int Open( vlc_object_t * p_this )
     WAVEFORMATEX         *p_wf;
 
     /* Is it a wav file ? */
-    if( stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
-    {
-        msg_Warn( p_demux, "WAV module discarded (cannot peek)" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 12 ) < 12 ) return VLC_EGENERIC;
+
     if( strncmp( p_peek, "RIFF", 4 ) || strncmp( &p_peek[8], "WAVE", 4 ) )
     {
         return VLC_EGENERIC;

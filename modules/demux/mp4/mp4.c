@@ -259,12 +259,9 @@ static int Open( vlc_object_t * p_this )
     unsigned int    i;
     vlc_bool_t      b_seekable;
 
-    /* a little test to see if it could be a mp4 */
-    if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
-    {
-        msg_Warn( p_demux, "MP4 plugin discarded (cannot peek)" );
-        return VLC_EGENERIC;
-    }
+    /* A little test to see if it could be a mp4 */
+    if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 ) return VLC_EGENERIC;
+
     switch( VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] ) )
     {
         case FOURCC_ftyp:
@@ -279,7 +276,6 @@ static int Open( vlc_object_t * p_this )
         case VLC_FOURCC( 'p', 'n', 'o', 't' ):
             break;
          default:
-            msg_Warn( p_demux, "MP4 plugin discarded (not a valid file)" );
             return VLC_EGENERIC;
     }
 

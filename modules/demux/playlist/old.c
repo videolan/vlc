@@ -49,17 +49,10 @@ int Import_Old( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     uint8_t *p_peek;
 
-    if( stream_Peek( p_demux->s, &p_peek, 31 ) < 31 )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 31 ) < 31 ) return VLC_EGENERIC;
 
-    if( strncmp( p_peek, PLAYLIST_FILE_HEADER , 31 ) )
-    {
-        msg_Warn(p_demux, "old import module discarded: invalid file");
-        return VLC_EGENERIC;
-    }
+    if( strncmp( p_peek, PLAYLIST_FILE_HEADER , 31 ) ) return VLC_EGENERIC;
+
     msg_Dbg( p_demux, "found valid old playlist file");
 
     p_demux->pf_control = Control;
