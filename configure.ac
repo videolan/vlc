@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.124 2003/11/30 14:28:07 fenrir Exp $
+dnl $Id: configure.ac,v 1.125 2003/11/30 18:14:20 rocky Exp $
 
 AC_INIT(vlc,0.7.0-test1)
 
@@ -295,7 +295,7 @@ fi
 
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
-    AX_ADD_LDFLAGS([vlc ipv4],-lsocket)
+    AX_ADD_LDFLAGS([vlc ipv4 cddax],-lsocket)
   ])
 ])
 
@@ -307,7 +307,7 @@ AC_CHECK_FUNCS(send,,[
 
 AC_CHECK_FUNCS(gethostbyname,,[
   AC_CHECK_LIB(nsl,gethostbyname,[
-    AX_ADD_LDFLAGS([ipv4 httpd vlc],[-lnsl])
+    AX_ADD_LDFLAGS([cddax ipv4 httpd vlc],[-lnsl])
   ],[
     AC_CHECK_LIB(bind,gethostbyname,[
       AX_ADD_LDFLAGS([ipv4 access_mms httpd],[-lbind])
@@ -1475,6 +1475,56 @@ then
 fi
 
 dnl
+dnl  VCDX and CDDAX modules
+dnl
+AC_ARG_ENABLE(libcdio,
+  [  --enable-libcdio         CDDA support via libcdio (default enabled)])
+
+AC_ARG_ENABLE(libcddb,
+  [  --enable-libcddb         CDDB support for CDDAX (default enabled)])
+
+AC_ARG_ENABLE(vcdx,
+  [  --enable-vcdx            VCD support with Navigation (default enabled)])
+
+if test "${enable_cddax}" != "no"
+then
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
+   [enable_cddax="no"
+    AX_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
+    AX_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
+    AX_ADD_PLUGINS([cddax])], 
+   [AC_MSG_WARN(libcdio library not found)])
+
+  if test x$enable_cddb != no; then
+    PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.4, [
+      HAVE_LIBCDDB=yes 
+      AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
+      AX_ADD_LDFLAGS([cddax],[$LIBCDDB_LIBS])
+      AX_ADD_CFLAGS([cddax],[$LIBCDDB_CFLAGS])
+      ],
+      [AC_MSG_WARN(new enough libcddb not found. CDDB access disabled) 
+      HAVE_LIBCDDB=no])
+  fi
+
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
+   [enable_cddax="no"
+    AX_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
+    AX_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
+    AX_ADD_PLUGINS([cddax])], 
+   [AC_MSG_WARN(libcdio library not found)])
+
+  if test "${enable_vcdx}" != "no"
+  then
+    PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20-cdio,
+     [enable_vcd="no"
+      AX_ADD_LDFLAGS([vcdx],[$VCDINFO_LIBS])
+      AX_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
+      AX_ADD_PLUGINS([vcdx])], 
+     [AC_MSG_WARN(vcdinfo library not found)])
+  fi
+fi
+
+dnl
 dnl  VCD module
 dnl
 AC_ARG_ENABLE(vcd,
@@ -1518,29 +1568,6 @@ then
     AX_ADD_PLUGINS([vcd cdda])
     AX_ADD_LDFLAGS([vcd cdda],[-framework IOKit -framework CoreFoundation])
   fi
-fi
-
-dnl
-dnl  VCDX and CDX modules
-dnl
-AC_ARG_ENABLE(vcdx,
-  [  --enable-vcdx            VCD support with Navigation for Linux and Win32 (default enabled)])
-
-if test "${enable_vcdx}" != "no"
-then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
-   [enable_cdda="no"
-    AX_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
-    AX_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
-    AX_ADD_PLUGINS([cddax])], 
-   [AC_MSG_WARN(libcdio library not found)])
-
-  PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20-cdio,
-   [enable_vcd="no"
-    AX_ADD_LDFLAGS([vcdx],[$VCDINFO_LIBS])
-    AX_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
-    AX_ADD_PLUGINS([vcdx])], 
-   [AC_MSG_WARN(vcdinfo library not found)])
 fi
 
 dnl

@@ -3,7 +3,7 @@
  *          using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cdda.h,v 1.1 2003/11/26 03:35:26 rocky Exp $
+ * $Id: cdda.h,v 1.2 2003/11/30 18:14:20 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -24,16 +24,22 @@
 
 #include "../vcdx/cdrom.h"
 
+#ifdef HAVE_LIBCDDB
+#include <cddb/cddb.h>
+#endif
+
 /*****************************************************************************
  * Debugging 
  *****************************************************************************/
-#define INPUT_DBG_MRL         1 
+#define INPUT_DBG_META        1 /* Meta information */
 #define INPUT_DBG_EVENT       2 /* Trace keyboard events */
-#define INPUT_DBG_EXT         4 /* Calls from external routines */
-#define INPUT_DBG_CALL        8 /* all calls */
-#define INPUT_DBG_LSN        16 /* LSN changes */
-#define INPUT_DBG_CDIO       32 /* Debugging from CDIO */
+#define INPUT_DBG_MRL         4 /* MRL debugging */
+#define INPUT_DBG_EXT         8 /* Calls from external routines */
+#define INPUT_DBG_CALL       16 /* all calls */
+#define INPUT_DBG_LSN        32 /* LSN changes */
 #define INPUT_DBG_SEEK       64 /* Seeks to set location */
+#define INPUT_DBG_CDIO      128 /* Debugging from CDIO */
+#define INPUT_DBG_CDDB      256 /* CDDB debugging  */
 
 #define INPUT_DEBUG 1
 #if INPUT_DEBUG
@@ -57,6 +63,30 @@ typedef struct cdda_data_s
     vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
     int         i_debug;                  /* Debugging mask */
     intf_thread_t *p_intf;
+
+#ifdef HAVE_LIBCDDB
+  struct  {
+    bool             have_info;      /* True if we have any info */
+    cddb_disc_t     *disc;           /* libcdio uses this to get disc info */
+    char            *cdiscid;
+    char            *disc_title;
+    char             disc_year[5];   /* Year. Probably 19XX or 20XX */
+    char            *disc_artist;
+    char            *disc_genre;
+    cddb_cat_t       disc_category;  /* CDDB category */
+    int              disc_seconds;   /* Length in seconds listed in CDDB
+				        catalog. May or may not match
+					length below.
+				     */
+
+    int              disc_length;    /* Length in frames of cd. Used in 
+					CDDB lookups */
+    unsigned int     disc_id;        /* This along with the length and 
+					num_tracks below is what CDDB uses
+					to look up CD info */
+  } cddb;
+#endif
+
 
 } cdda_data_t;
 

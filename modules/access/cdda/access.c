@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.3 2003/11/30 02:41:00 rocky Exp $
+ * $Id: access.c,v 1.4 2003/11/30 18:14:20 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -31,6 +31,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+
 #include <sys/types.h>
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
@@ -50,6 +51,8 @@
 #define CDDA_BLOCKS_ONCE 1
 #define CDDA_DATA_ONCE   (CDDA_BLOCKS_ONCE * CDIO_CD_FRAMESIZE_RAW)
 
+#define CDDA_MRL_PREFIX "cddax://"
+
 /* FIXME: This variable is a hack. Would be nice to eliminate. */
 static input_thread_t *p_cdda_input = NULL;
 
@@ -60,6 +63,10 @@ static int  CDDARead         ( input_thread_t *, byte_t *, size_t );
 static void CDDASeek         ( input_thread_t *, off_t );
 static int  CDDASetArea      ( input_thread_t *, input_area_t * );
 static int  CDDASetProgram   ( input_thread_t *, pgrm_descriptor_t * );
+
+static int  CDDAFixupPlayList(const input_thread_t *p_input, 
+			      cdda_data_t *p_cdda, const char *psz_source, 
+			      bool play_single_track, unsigned int i_track);
 
 /****************************************************************************
  * Private functions
@@ -110,6 +117,58 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
 }
 
 
+#ifdef HAVE_LIBCDDB
+/*! This routine is called by libcddb routines on error. 
+   Setup is done by init_input_plugin.
+*/
+static void 
+cddb_log_handler (cddb_log_level_t level, const char message[])
+{
+  cdda_data_t *p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
+  switch (level) {
+  case CDDB_LOG_DEBUG:
+  case CDDB_LOG_INFO:
+    if (!(p_cdda->i_debug & INPUT_DBG_CDDB)) return;
+    /* Fall through if to warn case */
+  default:
+    cdio_log_handler (level, message);
+  }
+}
+#endif /*HAVE_LIBCDDB*/
+
+
+/*! This routine is when xine is not fully set up (before full initialization)
+   or is not around (before finalization). 
+*/
+static void 
+uninit_log_handler (cdio_log_level_t level, const char message[])
+{
+  cdda_data_t *p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
+  switch (level) {
+  case CDIO_LOG_DEBUG:
+  case CDIO_LOG_INFO:
+    if (!(p_cdda->i_debug & (INPUT_DBG_CDIO|INPUT_DBG_CDDB)))
+      return;
+    /* Fall through if to warn case */
+  case CDIO_LOG_WARN:
+    fprintf(stderr, "WARN: %s\n", message);
+    break;
+  case CDIO_LOG_ERROR:
+    fprintf(stderr, "ERROR: %s\n", message);
+    break;
+  case CDIO_LOG_ASSERT:
+    fprintf(stderr, "ASSERT ERROR: %s\n", message);
+    break;
+  default:
+    fprintf(stderr, "UNKNOWN ERROR: %s\n%s %d\n",
+            message, 
+            _("The above message had unknown cdio log level"), 
+            level);
+  }
+  
+  /* gl_default_cdio_log_handler (level, message); */
+}
+
 /*****************************************************************************
  * Open: open cdda
  *****************************************************************************/
@@ -122,8 +181,9 @@ E_(Open)( vlc_object_t *p_this )
     char *                  psz_source;
     cdda_data_t *           p_cdda;
     int                     i;
-    int                     i_title = 1;
+    int                     i_track = 1;
     cddev_t                 *p_cddev;
+    bool                    play_single_track = false;
 
     /* Set where to log errors messages from libcdio. */
     p_cdda_input = (input_thread_t *)p_this;
@@ -150,8 +210,9 @@ E_(Open)( vlc_object_t *p_this )
         if ('T' == *psz_parser || 't' == *psz_parser ) 
             ++psz_parser;
           
-        i_title = (int)strtol( psz_parser, NULL, 10 );
-        i_title = i_title ? i_title : 1;
+        i_track = (int)strtol( psz_parser, NULL, 10 );
+        i_track = i_track ? i_track : 1;
+	play_single_track = true;
     }
 
     if( !*psz_source ) {
@@ -178,6 +239,9 @@ E_(Open)( vlc_object_t *p_this )
 
     /* Open CDDA */
     cdio_log_set_handler ( cdio_log_handler );
+#ifdef HAVE_LIBCDDB
+    cddb_log_set_handler ( cddb_log_handler );
+#endif
 
     if( !(p_cddev = ioctl_Open( p_this, psz_source )) )
     {
@@ -185,7 +249,6 @@ E_(Open)( vlc_object_t *p_this )
         free( psz_source );
         return -1;
     }
-    free( psz_source );
 
     p_cdda = malloc( sizeof(cdda_data_t) );
     if( p_cdda == NULL )
@@ -215,11 +278,12 @@ E_(Open)( vlc_object_t *p_this )
     {
         ioctl_Close( p_cdda->p_cddev );
         free( p_cdda );
+	free( psz_source );
         return -1;
     }
 
-    if( i_title >= p_cdda->i_nb_tracks || i_title < 1 )
-        i_title = 1;
+    if( i_track >= p_cdda->i_nb_tracks || i_track < 1 )
+        i_track = 1;
 
     /* Set stream and area data */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -248,7 +312,9 @@ E_(Open)( vlc_object_t *p_this )
     }
 #undef area
 
-    CDDAPlay( p_input, i_title);
+    CDDAFixupPlayList(p_input, p_cdda, psz_source, play_single_track, i_track);
+
+    CDDAPlay( p_input, i_track);
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -268,6 +334,7 @@ E_(Open)( vlc_object_t *p_this )
 
     p_cdda->p_intf = intf_Create( p_input, "cddax" );
     intf_RunThread( p_cdda->p_intf );
+    free( psz_source );
 
     return 0;
 }
@@ -299,6 +366,14 @@ E_(Close)( vlc_object_t *p_this )
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "" );
     ioctl_Close( p_cdda->p_cddev );
+
+    cdio_log_set_handler (uninit_log_handler);
+
+#ifdef HAVE_LIBCDDB
+    cddb_log_set_handler (uninit_log_handler);
+    cddb_disc_destroy(p_cdda->cddb.disc);
+#endif
+
     free( p_cdda );
     p_cdda_input = NULL;
 }
@@ -440,4 +515,195 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
     "sector %ud, offset: %lld, i_tell: %lld",  p_cdda->i_sector, i_off, 
                p_input->stream.p_selected_area->i_tell );
 
+}
+
+#ifdef HAVE_LIBCDDB
+static void
+GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
+{
+
+  dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "" );
+
+  if (config_GetInt( p_input, MODULE_STRING "-cddb-enabled" )) {
+    int i, i_matches;
+    cddb_conn_t  *conn = cddb_new();
+    const CdIo *cdio = p_cdda->p_cddev->cdio;
+    
+    
+    cddb_log_set_handler (uninit_log_handler);
+
+    if (!conn) {
+      msg_Warn( p_input, "unable to initialize libcddb" );
+      goto cddb_destroy;
+    }
+    
+    cddb_set_email_address( conn, 
+			    config_GetPsz( p_input, 
+					   MODULE_STRING "-cddb-email") );
+    
+    cddb_set_server_name( conn, 
+			  config_GetPsz( p_input, 
+					 MODULE_STRING "-cddb-server") );
+
+    cddb_set_server_port(conn, 
+			  config_GetInt( p_input, 
+					 MODULE_STRING "-cddb-port") );
+
+    /* Set the location of the local CDDB cache directory.
+       The default location of this directory is */
+
+    if (!config_GetInt( p_input, MODULE_STRING "-cddb-enable-cache" )) 
+      cddb_cache_disable(conn);
+
+    cddb_cache_set_dir(conn, 
+		       config_GetPsz( p_input, 
+				      MODULE_STRING "-cddb-cachedir") );
+
+    cddb_set_timeout(conn, 
+		     config_GetInt( p_input, MODULE_STRING "-cddb-timeout") );
+
+
+    if (config_GetInt( p_input, MODULE_STRING "-cddb-httpd" )) {
+      cddb_http_enable(conn);
+    } else
+      cddb_http_disable(conn);
+    
+    p_cdda->cddb.disc = cddb_disc_new();
+    if (!p_cdda->cddb.disc) {
+      msg_Err( p_input, "Unable to create CDDB disc structure." );
+      goto cddb_end;
+    }
+
+    for(i = 1; i <= p_cdda->i_nb_tracks; i++) {
+      cddb_track_t *t = cddb_track_new(); 
+      t->frame_offset = cdio_get_track_lba(cdio, i);
+      cddb_disc_add_track(p_cdda->cddb.disc, t);
+    }
+    
+    p_cdda->cddb.disc->length = 
+      cdio_get_track_lba(cdio, CDIO_CDROM_LEADOUT_TRACK) 
+      / CDIO_CD_FRAMES_PER_SEC;
+
+
+    if (!cddb_disc_calc_discid(p_cdda->cddb.disc)) {
+      msg_Err( p_input, "CDDB disc calc failed" );
+      goto cddb_destroy;
+    }
+
+    i_matches = cddb_query(conn, p_cdda->cddb.disc);
+    if (i_matches > 0) {
+      if (i_matches > 1)
+	msg_Warn( p_input, "Found %d matches in CDDB. Using first one.", 
+		  i_matches);
+      cddb_read(conn, p_cdda->cddb.disc);
+
+      if (p_cdda->i_debug & INPUT_DBG_CDDB) 
+	cddb_disc_print(p_cdda->cddb.disc);
+
+#if FIXED
+      if ((_cdda_is_cd_changed(this) == 1)) 
+#endif
+	/**** _cdda_cddb_set_info(this, this->cddb.disc); ***/
+    } else {
+      msg_Warn( p_input, "CDDB error: %s", cddb_error_str(errno));
+    }
+
+  cddb_destroy:
+    cddb_destroy(conn);
+  }
+  cddb_end: ;
+}
+#endif /*HAVE_LIBCDDB*/
+
+static void
+CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda, 
+		       playlist_t *p_playlist, unsigned int i_track, 
+		       char *psz_mrl, int psz_mrl_max, 
+		       const char *psz_source, int i_cddb_enabled, 
+		       int playlist_operation, unsigned int i_pos)
+{
+  mtime_t i_duration = 
+    (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
+    * 1000 / CDIO_CD_FRAMES_PER_SEC;
+  char *p_title = psz_mrl;
+  
+  snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u", 
+	   CDDA_MRL_PREFIX, psz_source, i_track);
+  if (i_cddb_enabled) {
+    cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, i_track-1);
+    if (t != NULL && t->title != NULL) 
+      p_title = t->title;
+  }
+  playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration, 
+		   0, 0, playlist_operation, i_pos );
+}
+
+static int
+CDDAFixupPlayList(const input_thread_t *p_input, cdda_data_t *p_cdda, 
+		  const char *psz_source, bool play_single_track, 
+		  unsigned int i_track)
+{
+  int i;
+  playlist_t * p_playlist;
+  char       * psz_mrl;
+  unsigned int psz_mrl_max = strlen(CDDA_MRL_PREFIX) + strlen(psz_source) + 
+    strlen("@T") + strlen("100") + 1;
+  int i_cddb_enabled = 
+#ifdef HAVE_LIBCDDB
+    config_GetInt( p_input, MODULE_STRING "-cddb-enabled" );
+#else
+     0
+#endif
+  
+  if (play_single_track && !i_cddb_enabled) return 0;
+
+  psz_mrl = malloc( psz_mrl_max );
+
+  if( psz_mrl == NULL )
+    {
+      msg_Warn( p_input, "out of memory" );
+      return -1;
+    }
+
+  p_playlist = (playlist_t *) vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+					       FIND_ANYWHERE );
+  if( !p_playlist )
+    {
+      msg_Warn( p_input, "can't find playlist" );
+      free(psz_mrl);
+      return -1;
+    }
+
+#ifdef HAVE_LIBCDDB
+  if (i_cddb_enabled)
+    GetCDDBInfo(p_input, p_cdda);
+#endif
+  
+  if (play_single_track) {
+    /* May fill out more information when the playlist user interface becomes
+       more mature.
+     */
+    CDDACreatePlayListItem(p_input, p_cdda, p_playlist, i_track, 
+		       psz_mrl, psz_mrl_max, 
+		       psz_source, i_cddb_enabled,
+		       PLAYLIST_REPLACE, p_playlist->i_index);
+  } else {
+  
+    playlist_Delete( p_playlist, p_playlist->i_index);
+
+    for( i = 1 ; i <= p_cdda->i_nb_tracks ; i++ )
+      {
+	CDDACreatePlayListItem(p_input, p_cdda, p_playlist, i, psz_mrl, 
+			       psz_mrl_max, psz_source, i_cddb_enabled,
+			       PLAYLIST_APPEND, PLAYLIST_END);
+
+      }
+
+    playlist_Command( p_playlist, PLAYLIST_GOTO, 0 );
+
+  }
+    
+  vlc_object_release( p_playlist );
+  free(psz_mrl);
+  return 0;
 }
