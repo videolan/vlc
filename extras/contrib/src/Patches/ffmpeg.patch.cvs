@@ -10,23 +10,6 @@ diff -ru ffmpeg-original/libavcodec/eval.c ffmpeg/libavcodec/eval.c
  #ifndef NAN
    #define NAN 0
  #endif
-diff -ru ffmpeg-original/libavcodec/h261.c ffmpeg/libavcodec/h261.c
---- ffmpeg-original/libavcodec/h261.c	Thu Jul 22 10:23:28 2004
-+++ ffmpeg/libavcodec/h261.c	Fri Jul 23 11:47:30 2004
-@@ -524,11 +524,12 @@
- 
- static int h261_decode_gob(H261Context *h){
-     MpegEncContext * const s = &h->s;
-+    int v;
-     
-     ff_set_qscale(s, s->qscale);
- 
-     /* check for empty gob */
--    int v= show_bits(&s->gb, 15);
-+    v= show_bits(&s->gb, 15);
- 
-     if(get_bits_count(&s->gb) + 15 > s->gb.size_in_bits){
-         v>>= get_bits_count(&s->gb) + 15 - s->gb.size_in_bits;
 diff -ru ffmpeg-original/libavcodec/msmpeg4.c ffmpeg/libavcodec/msmpeg4.c
 --- ffmpeg-original/libavcodec/msmpeg4.c	Tue May 25 18:07:24 2004
 +++ ffmpeg/libavcodec/msmpeg4.c	Fri Jul 23 11:49:38 2004
