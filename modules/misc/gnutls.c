@@ -63,8 +63,8 @@ vlc_module_begin();
     set_capability( "tls", 1 );
     set_callbacks( Open, Close );
 
-    /*add_integer( "dh-bits", 1024, NULL, DH_BITS_TEXT,
-                 DH_BITS_LONGTEXT, VLC_TRUE );*/
+    add_integer( "dh-bits", DH_BITS, NULL, DH_BITS_TEXT,
+                 DH_BITS_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 
@@ -168,6 +168,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     tls_session_t *p_session;
     gnutls_session *p_sys;
     int val;
+    vlc_value_t bits;
 
     p_sys = (gnutls_session *)malloc( sizeof(gnutls_session *) );
     if( p_sys == NULL )
@@ -208,7 +209,14 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     /*gnutls_certificate_server_set_request( p_session->session,
                                            GNUTLS_CERT_REQUEST ); */
 
-    gnutls_dh_set_prime_bits( *p_sys, DH_BITS );
+    if( var_Get( p_server->p_tls, "dh-bits", &bits ) != VLC_SUCCESS )
+    {
+        var_Create( p_server->p_tls, "dh-bits",
+                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+        var_Get( p_server->p_tls, "dh-bits", &bits );
+    }
+
+    gnutls_dh_set_prime_bits( *p_sys, bits.i_int );
 
     p_session = malloc( sizeof (struct tls_session_t) );
     if( p_session == NULL )
@@ -350,8 +358,18 @@ gnutls_ServerCreate( tls_t *p_this, const char *psz_cert_path,
     val = gnutls_dh_params_init( &p_server_sys->dh_params );
     if( val >= 0 )
     {
+        vlc_value_t bits;
+
+        if( var_Get( p_this, "dh-bits", &bits ) != VLC_SUCCESS )
+        {
+            var_Create( p_this, "dh-bits",
+                        VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+            var_Get( p_this, "dh-bits", &bits );
+        }
+
         msg_Dbg( p_this, "Computing Diffie Hellman ciphers parameters" );
-        val = gnutls_dh_params_generate2( p_server_sys->dh_params, DH_BITS );
+        val = gnutls_dh_params_generate2( p_server_sys->dh_params,
+                                          bits.i_int );
     }
     if( val < 0 )
     {
@@ -459,13 +477,13 @@ Open( vlc_object_t *p_this )
         if( gnutls_global_init( ) )
         {
             msg_Warn( p_this, "cannot initialize GNUTLS" );
-            vlc_mutex_unlock( lock.p_address);
+            vlc_mutex_unlock( lock.p_address );
             return VLC_EGENERIC;
         }
         if( gnutls_check_version( "1.0.0" ) == NULL )
         {
             gnutls_global_deinit( );
-            vlc_mutex_unlock( lock.p_address);
+            vlc_mutex_unlock( lock.p_address );
             msg_Err( p_this, "unsupported GNUTLS version" );
             return VLC_EGENERIC;
         }

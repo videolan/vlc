@@ -42,22 +42,23 @@ struct filter_sys_t
 static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
 
+/* TODO i_alpha support for BlendR16 */
 static void Blend( filter_t *, picture_t *, picture_t *, picture_t *,
-                   int, int );
+                   int, int, int );
 static void BlendI420( filter_t *, picture_t *, picture_t *, picture_t *,
-                       int, int, int, int );
+                       int, int, int, int, int );
 static void BlendR16( filter_t *, picture_t *, picture_t *, picture_t *,
-                      int, int, int, int );
+                      int, int, int, int, int );
 static void BlendR24( filter_t *, picture_t *, picture_t *, picture_t *,
-                      int, int, int, int );
+                      int, int, int, int, int );
 static void BlendYUY2( filter_t *, picture_t *, picture_t *, picture_t *,
-                       int, int, int, int );
+                       int, int, int, int, int );
 static void BlendPalI420( filter_t *, picture_t *, picture_t *, picture_t *,
-                          int, int, int, int );
+                          int, int, int, int, int );
 static void BlendPalYUY2( filter_t *, picture_t *, picture_t *, picture_t *,
-                          int, int, int, int );
+                          int, int, int, int, int );
 static void BlendPalRV( filter_t *, picture_t *, picture_t *, picture_t *,
-                        int, int, int, int );
+                        int, int, int, int, int );
 
 /*****************************************************************************
  * Module descriptor
@@ -116,7 +117,7 @@ static int OpenFilter( vlc_object_t *p_this )
  ****************************************************************************/
 static void Blend( filter_t *p_filter, picture_t *p_dst,
                    picture_t *p_dst_orig, picture_t *p_src,
-                   int i_x_offset, int i_y_offset )
+                   int i_x_offset, int i_y_offset, int i_alpha )
 {
     int i_width, i_height;
 
@@ -133,21 +134,21 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
           p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','1','2') ) )
     {
         BlendI420( p_filter, p_dst, p_dst_orig, p_src,
-                   i_x_offset, i_y_offset, i_width, i_height );
+                   i_x_offset, i_y_offset, i_width, i_height, i_alpha );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') &&
         p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
     {
         BlendYUY2( p_filter, p_dst, p_dst_orig, p_src,
-                   i_x_offset, i_y_offset, i_width, i_height );
+                   i_x_offset, i_y_offset, i_width, i_height, i_alpha );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') &&
         p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','1','6') )
     {
         BlendR16( p_filter, p_dst, p_dst_orig, p_src,
-                  i_x_offset, i_y_offset, i_width, i_height );
+                  i_x_offset, i_y_offset, i_width, i_height, i_alpha );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') &&
@@ -155,7 +156,7 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
           p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','3','2') ) )
     {
         BlendR24( p_filter, p_dst, p_dst_orig, p_src,
-                  i_x_offset, i_y_offset, i_width, i_height );
+                  i_x_offset, i_y_offset, i_width, i_height, i_alpha );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') &&
@@ -163,14 +164,14 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
           p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','1','2') ) )
     {
         BlendPalI420( p_filter, p_dst, p_dst_orig, p_src,
-                      i_x_offset, i_y_offset, i_width, i_height );
+                      i_x_offset, i_y_offset, i_width, i_height, i_alpha );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') &&
         p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
     {
         BlendPalYUY2( p_filter, p_dst, p_dst_orig, p_src,
-                      i_x_offset, i_y_offset, i_width, i_height );
+                      i_x_offset, i_y_offset, i_width, i_height, i_alpha );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') &&
@@ -179,7 +180,7 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
           p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','3','2') ) )
     {
         BlendPalRV( p_filter, p_dst, p_dst_orig, p_src,
-                    i_x_offset, i_y_offset, i_width, i_height );
+                    i_x_offset, i_y_offset, i_width, i_height, i_alpha );
         return;
     }
 
@@ -189,14 +190,14 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
 static void BlendI420( filter_t *p_filter, picture_t *p_dst,
                        picture_t *p_dst_orig, picture_t *p_src,
                        int i_x_offset, int i_y_offset,
-                       int i_width, int i_height )
+                       int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1_y, *p_src2_y, *p_dst_y;
     uint8_t *p_src1_u, *p_src2_u, *p_dst_u;
     uint8_t *p_src1_v, *p_src2_v, *p_dst_v;
     uint8_t *p_trans;
-    int i_x, i_y;
+    int i_x, i_y, i_trans;
     vlc_bool_t b_even_scanline = i_y_offset % 2;
 
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
@@ -261,12 +262,13 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
         /* Draw until we reach the end of the line */
         for( i_x = 0; i_x < i_width; i_x++ )
         {
-            if( !p_trans[i_x] )
+            i_trans = ( p_trans[i_x] * i_alpha ) / 255;
+            if( !i_trans )
             {
                 /* Completely transparent. Don't change pixel */
                 continue;
             }
-            else if( p_trans[i_x] == MAX_TRANS )
+            else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
                 p_dst_y[i_x] = p_src2_y[i_x];
@@ -280,17 +282,17 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
             }
 
             /* Blending */
-            p_dst_y[i_x] = ( (uint16_t)p_src2_y[i_x] * p_trans[i_x] +
-                (uint16_t)p_src1_y[i_x] * (MAX_TRANS - p_trans[i_x]) )
+            p_dst_y[i_x] = ( (uint16_t)p_src2_y[i_x] * i_trans +
+                (uint16_t)p_src1_y[i_x] * (MAX_TRANS - i_trans) )
                 >> TRANS_BITS;
 
             if( b_even_scanline && i_x % 2 == 0 )
             {
-                p_dst_u[i_x/2] = ( (uint16_t)p_src2_u[i_x] * p_trans[i_x] +
-                (uint16_t)p_src1_u[i_x/2] * (MAX_TRANS - p_trans[i_x]) )
+                p_dst_u[i_x/2] = ( (uint16_t)p_src2_u[i_x] * i_trans +
+                (uint16_t)p_src1_u[i_x/2] * (MAX_TRANS - i_trans) )
                 >> TRANS_BITS;
-                p_dst_v[i_x/2] = ( (uint16_t)p_src2_v[i_x] * p_trans[i_x] +
-                (uint16_t)p_src1_v[i_x/2] * (MAX_TRANS - p_trans[i_x]) )
+                p_dst_v[i_x/2] = ( (uint16_t)p_src2_v[i_x] * i_trans +
+                (uint16_t)p_src1_v[i_x/2] * (MAX_TRANS - i_trans) )
                 >> TRANS_BITS;
             }
         }
@@ -328,7 +330,7 @@ static inline void yuv_to_rgb( int *r, int *g, int *b,
 static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
                       picture_t *p_dst_orig, picture_t *p_src,
                       int i_x_offset, int i_y_offset,
-                      int i_width, int i_height )
+                      int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
@@ -409,13 +411,13 @@ static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
 static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
                       picture_t *p_dst_orig, picture_t *p_src,
                       int i_x_offset, int i_y_offset,
-                      int i_width, int i_height )
+                      int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
     uint8_t *p_src2_u, *p_src2_v;
     uint8_t *p_trans;
-    int i_x, i_y, i_pix_pitch;
+    int i_x, i_y, i_pix_pitch, i_trans;
     int r, g, b;
 
     i_pix_pitch = p_dst_pic->p->i_pixel_pitch;
@@ -458,12 +460,13 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
         /* Draw until we reach the end of the line */
         for( i_x = 0; i_x < i_width; i_x++ )
         {
-            if( !p_trans[i_x] )
+            i_trans = ( p_trans[i_x] * i_alpha ) / 255;
+            if( !i_trans )
             {
                 /* Completely transparent. Don't change pixel */
                 continue;
             }
-            else if( p_trans[i_x] == MAX_TRANS )
+            else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
                 yuv_to_rgb( &r, &g, &b,
@@ -479,15 +482,15 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
             yuv_to_rgb( &r, &g, &b,
                         p_src2_y[i_x], p_src2_u[i_x], p_src2_v[i_x] );
 
-            p_dst[i_x * i_pix_pitch]     = ( r * p_trans[i_x] +
+            p_dst[i_x * i_pix_pitch]     = ( r * i_trans +
                 (uint16_t)p_src1[i_x * i_pix_pitch] *
-                (MAX_TRANS - p_trans[i_x]) ) >> TRANS_BITS;
-            p_dst[i_x * i_pix_pitch + 1] = ( g * p_trans[i_x] +
+                (MAX_TRANS - i_trans) ) >> TRANS_BITS;
+            p_dst[i_x * i_pix_pitch + 1] = ( g * i_trans +
                 (uint16_t)p_src1[i_x * i_pix_pitch + 1] *
-                (MAX_TRANS - p_trans[i_x]) ) >> TRANS_BITS;
-            p_dst[i_x * i_pix_pitch + 2] = ( b * p_trans[i_x] +
+                (MAX_TRANS - i_trans) ) >> TRANS_BITS;
+            p_dst[i_x * i_pix_pitch + 2] = ( b * i_trans +
                 (uint16_t)p_src1[i_x * i_pix_pitch + 2] *
-                (MAX_TRANS - p_trans[i_x]) ) >> TRANS_BITS;
+                (MAX_TRANS - i_trans) ) >> TRANS_BITS;
         }
     }
 
@@ -500,13 +503,13 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
 static void BlendYUY2( filter_t *p_filter, picture_t *p_dst_pic,
                        picture_t *p_dst_orig, picture_t *p_src,
                        int i_x_offset, int i_y_offset,
-                       int i_width, int i_height )
+                       int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
     uint8_t *p_src2_u, *p_src2_v;
     uint8_t *p_trans;
-    int i_x, i_y, i_pix_pitch;
+    int i_x, i_y, i_pix_pitch, i_trans;
 
     i_pix_pitch = 2;
     i_dst_pitch = p_dst_pic->p->i_pitch;
@@ -548,11 +551,12 @@ static void BlendYUY2( filter_t *p_filter, picture_t *p_dst_pic,
         /* Draw until we reach the end of the line */
         for( i_x = 0; i_x < i_width; i_x += 2 )
         {
-            if( !p_trans[i_x] )
+            i_trans = ( p_trans[i_x] * i_alpha ) / 255;
+            if( !i_trans )
             {
                 /* Completely transparent. Don't change pixel */
             }
-            else if( p_trans[i_x] == MAX_TRANS )
+            else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
                 p_dst[i_x * 2]     = p_src2_y[i_x];
@@ -562,22 +566,23 @@ static void BlendYUY2( filter_t *p_filter, picture_t *p_dst_pic,
             else
             {
                 /* Blending */
-                p_dst[i_x * 2]     = ( (uint16_t)p_src2_y[i_x] * p_trans[i_x] +
-                    (uint16_t)p_src1[i_x * 2] *
-                    (MAX_TRANS - p_trans[i_x]) ) >> TRANS_BITS;
-                p_dst[i_x * 2 + 1] = ( (uint16_t)p_src2_u[i_x] * p_trans[i_x] +
-                    (uint16_t)p_src1[i_x * 2 + 1] *
-                    (MAX_TRANS - p_trans[i_x]) ) >> TRANS_BITS;
-                p_dst[i_x * 2 + 3] = ( (uint16_t)p_src2_v[i_x] * p_trans[i_x] +
-                    (uint16_t)p_src1[i_x * 2 + 3] *
-                    (MAX_TRANS - p_trans[i_x]) ) >> TRANS_BITS;
+                p_dst[i_x * 2]     = ( (uint16_t)p_src2_y[i_x] * i_trans +
+                    (uint16_t)p_src1[i_x * 2] * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS;
+                p_dst[i_x * 2 + 1] = ( (uint16_t)p_src2_u[i_x] * i_trans +
+                    (uint16_t)p_src1[i_x * 2 + 1] * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS;
+                p_dst[i_x * 2 + 3] = ( (uint16_t)p_src2_v[i_x] * i_trans +
+                    (uint16_t)p_src1[i_x * 2 + 3] * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS;
             }
 
-            if( !p_trans[i_x+1] )
+            i_trans = ( p_trans[i_x+1] * i_alpha ) / 255;
+            if( !i_trans )
             {
                 /* Completely transparent. Don't change pixel */
             }
-            else if( p_trans[i_x+1] == MAX_TRANS )
+            else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
                 p_dst[i_x * 2 + 2] = p_src2_y[i_x + 1];
@@ -585,9 +590,9 @@ static void BlendYUY2( filter_t *p_filter, picture_t *p_dst_pic,
             else
             {
                 /* Blending */
-                p_dst[i_x * 2 + 2] = ( (uint16_t)p_src2_y[i_x+1] *
-                    p_trans[i_x+1] + (uint16_t)p_src1[i_x * 2 + 2] *
-                    (MAX_TRANS - p_trans[i_x+1]) ) >> TRANS_BITS;
+                p_dst[i_x * 2 + 2] = ( (uint16_t)p_src2_y[i_x+1] * i_trans +
+                    (uint16_t)p_src1[i_x * 2 + 2] * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS;
             }
         }
     }
@@ -601,13 +606,13 @@ static void BlendYUY2( filter_t *p_filter, picture_t *p_dst_pic,
 static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
                           picture_t *p_dst_orig, picture_t *p_src,
                           int i_x_offset, int i_y_offset,
-                          int i_width, int i_height )
+                          int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1_y, *p_src2, *p_dst_y;
     uint8_t *p_src1_u, *p_dst_u;
     uint8_t *p_src1_v, *p_dst_v;
-    int i_x, i_y;
+    int i_x, i_y, i_trans;
     vlc_bool_t b_even_scanline = i_y_offset % 2;
 
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
@@ -661,12 +666,13 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
         /* Draw until we reach the end of the line */
         for( i_x = 0; i_x < i_width; i_x++ )
         {
-            if( !p_pal[p_trans[i_x]][3] )
+            i_trans = ( p_pal[p_trans[i_x]][3] * i_alpha ) / 255;
+            if( !i_trans )
             {
                 /* Completely transparent. Don't change pixel */
                 continue;
             }
-            else if( p_pal[p_trans[i_x]][3] == MAX_TRANS )
+            else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
                 p_dst_y[i_x] = p_pal[p_src2[i_x]][0];
@@ -680,18 +686,18 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
             }
 
             /* Blending */
-            p_dst_y[i_x] = ( (uint16_t)p_pal[p_src2[i_x]][0] *
-                p_pal[p_trans[i_x]][3] + (uint16_t)p_src1_y[i_x] *
-                (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+            p_dst_y[i_x] = ( (uint16_t)p_pal[p_src2[i_x]][0] * i_trans +
+                (uint16_t)p_src1_y[i_x] * (MAX_TRANS - i_trans) )
+                >> TRANS_BITS;
 
             if( b_even_scanline && i_x % 2 == 0 )
             {
-                p_dst_u[i_x/2] = ( (uint16_t)p_pal[p_src2[i_x]][1] *
-                    p_pal[p_trans[i_x]][3] + (uint16_t)p_src1_u[i_x/2] *
-                    (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
-                p_dst_v[i_x/2] = ( (uint16_t)p_pal[p_src2[i_x]][2] *
-                    p_pal[p_trans[i_x]][3] + (uint16_t)p_src1_v[i_x/2] *
-                    (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+                p_dst_u[i_x/2] = ( (uint16_t)p_pal[p_src2[i_x]][1] * i_trans +
+                    (uint16_t)p_src1_u[i_x/2] * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS;
+                p_dst_v[i_x/2] = ( (uint16_t)p_pal[p_src2[i_x]][2] * i_trans +
+                    (uint16_t)p_src1_v[i_x/2] * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS;
             }
         }
     }
@@ -707,11 +713,11 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
 static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
                           picture_t *p_dst_orig, picture_t *p_src,
                           int i_x_offset, int i_y_offset,
-                          int i_width, int i_height )
+                          int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1, *p_src2, *p_dst;
-    int i_x, i_y, i_pix_pitch;
+    int i_x, i_y, i_pix_pitch, i_trans;
 
     i_pix_pitch = 2;
     i_dst_pitch = p_dst_pic->p->i_pitch;
@@ -740,11 +746,12 @@ static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
         /* Draw until we reach the end of the line */
         for( i_x = 0; i_x < i_width; i_x += 2 )
         {
-            if( !p_pal[p_trans[i_x]][3] )
+            i_trans = ( p_pal[p_trans[i_x]][3] * i_alpha ) / 255;
+            if( !i_trans )
             {
                 /* Completely transparent. Don't change pixel */
             }
-            else if( p_pal[p_trans[i_x]][3] == MAX_TRANS )
+            else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
                 p_dst[i_x * 2]     = p_pal[p_src2[i_x]][0];
@@ -755,21 +762,22 @@ static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
             {
                 /* Blending */
                 p_dst[i_x * 2]     = ( (uint16_t)p_pal[p_src2[i_x]][0] *
-                    p_pal[p_trans[i_x]][3] + (uint16_t)p_src1[i_x * 2] *
-                    (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+                    i_trans + (uint16_t)p_src1[i_x * 2] *
+                    (MAX_TRANS - i_trans) ) >> TRANS_BITS;
                 p_dst[i_x * 2 + 1] = ( (uint16_t)p_pal[p_src2[i_x]][1] *
-                    p_pal[p_trans[i_x]][3] + (uint16_t)p_src1[i_x * 2 + 1] *
-                    (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+                    i_trans + (uint16_t)p_src1[i_x * 2 + 1] *
+                    (MAX_TRANS - i_trans) ) >> TRANS_BITS;
                 p_dst[i_x * 2 + 3] = ( (uint16_t)p_pal[p_src2[i_x]][2] *
-                    p_pal[p_trans[i_x]][3] + (uint16_t)p_src1[i_x * 2 + 3] *
-                    (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+                    i_trans + (uint16_t)p_src1[i_x * 2 + 3] *
+                    (MAX_TRANS - i_trans) ) >> TRANS_BITS;
             }
 
-            if( !p_pal[p_trans[i_x+1]][3] )
+            i_trans = ( p_pal[p_trans[i_x+1]][3] * i_alpha ) / 255;
+            if( !i_trans )
             {
                 /* Completely transparent. Don't change pixel */
             }
-            else if( p_pal[p_trans[i_x+1]][3] == MAX_TRANS )
+            else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
                 p_dst[i_x * 2 + 2] = p_pal[p_src2[i_x + 1]][0];
@@ -778,8 +786,8 @@ static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
             {
                 /* Blending */
                 p_dst[i_x * 2 + 2] = ( (uint16_t)p_pal[p_src2[i_x+1]][0] *
-                    p_pal[p_trans[i_x+1]][3] + (uint16_t)p_src1[i_x * 2 + 2] *
-                    (MAX_TRANS - p_pal[p_trans[i_x+1]][3]) ) >> TRANS_BITS;
+                    i_trans + (uint16_t)p_src1[i_x * 2 + 2] *
+                    (MAX_TRANS - i_trans) ) >> TRANS_BITS;
             }
         }
     }
@@ -795,11 +803,11 @@ static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
 static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
                         picture_t *p_dst_orig, picture_t *p_src,
                         int i_x_offset, int i_y_offset,
-                        int i_width, int i_height )
+                        int i_width, int i_height, int i_alpha )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1, *p_src2, *p_dst;
-    int i_x, i_y, i_pix_pitch;
+    int i_x, i_y, i_pix_pitch, i_trans;
     int r, g, b;
     video_palette_t rgbpalette;
 
@@ -848,12 +856,13 @@ static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
         /* Draw until we reach the end of the line */
         for( i_x = 0; i_x < i_width; i_x++ )
         {
-            if( !p_pal[p_trans[i_x]][3] )
+            i_trans = ( p_pal[p_trans[i_x]][3] * i_alpha ) / 255;
+            if( !i_trans )
             {
                 /* Completely transparent. Don't change pixel */
                 continue;
             }
-            else if( p_pal[p_trans[i_x]][3] == MAX_TRANS ||
+            else if( i_trans == MAX_TRANS ||
                      p_filter->fmt_out.video.i_chroma ==
                      VLC_FOURCC('R','V','1','6') )
             {
@@ -868,17 +877,14 @@ static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
 
             /* Blending */
             p_dst[i_x * i_pix_pitch]     = ( (uint16_t)rgbpal[p_src2[i_x]][0] *
-                p_pal[p_trans[i_x]][3] +
-                (uint16_t)p_src1[i_x * i_pix_pitch] *
-                (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+                i_trans + (uint16_t)p_src1[i_x * i_pix_pitch] *
+                (MAX_TRANS - i_trans) ) >> TRANS_BITS;
             p_dst[i_x * i_pix_pitch + 1] = ( (uint16_t)rgbpal[p_src2[i_x]][1] *
-                p_pal[p_trans[i_x]][3] +
-                (uint16_t)p_src1[i_x * i_pix_pitch + 1] *
-                (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+                i_trans + (uint16_t)p_src1[i_x * i_pix_pitch + 1] *
+                (MAX_TRANS - i_trans) ) >> TRANS_BITS;
             p_dst[i_x * i_pix_pitch + 2] = ( (uint16_t)rgbpal[p_src2[i_x]][2] *
-                p_pal[p_trans[i_x]][3] +
-                (uint16_t)p_src1[i_x * i_pix_pitch + 2] *
-                (MAX_TRANS - p_pal[p_trans[i_x]][3]) ) >> TRANS_BITS;
+                i_trans + (uint16_t)p_src1[i_x * i_pix_pitch + 2] *
+                (MAX_TRANS - i_trans) ) >> TRANS_BITS;
         }
     }
 

@@ -441,7 +441,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_DatePicture( p_sys->p_vout, p_outpic, p_pic->date );
 
     p_sys->p_blend->pf_video_blend( p_sys->p_blend, p_outpic, p_outpic,
-                                    p_sys->p_pic, p_sys->posx, p_sys->posy );
+                                    p_sys->p_pic, p_sys->posx, p_sys->posy,
+                                    255 );
 
     vout_DisplayPicture( p_sys->p_vout, p_outpic );
 }
