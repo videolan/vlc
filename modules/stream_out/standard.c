@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.1 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: standard.c,v 1.2 2003/05/20 16:20:33 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -26,9 +26,11 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
+#include <announce.h>
 
 /*****************************************************************************
  * Exported prototypes
@@ -53,7 +55,9 @@ vlc_module_end();
 
 struct sout_stream_sys_t
 {
-    sout_mux_t *p_mux;
+    sout_mux_t           *p_mux;
+    sap_session_t        *p_sap;
+    unsigned int          b_sap;
 };
 
 /*****************************************************************************
@@ -63,18 +67,39 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_instance_t     *p_sout = p_stream->p_sout;
-    sout_stream_sys_t   *p_sys;
+    sout_stream_sys_t   *p_sys = malloc( sizeof( sout_stream_sys_t) );
 
     char                *psz_mux    = sout_cfg_find_value( p_stream->p_cfg, "mux" );
     char                *psz_access = sout_cfg_find_value( p_stream->p_cfg, "access" );
     char                *psz_url    = sout_cfg_find_value( p_stream->p_cfg, "url" );
 
+    sout_cfg_t          *p_sap_cfg  = sout_cfg_find( p_stream->p_cfg, "sap" );
+
+    char                *psz_sap = NULL;
+
+    sap_session_t       *p_sap = NULL;
+    
     sout_access_out_t *p_access;
-    sout_mux_t        *p_mux;
-
-    msg_Dbg( p_this, "creating `%s/%s://%s'",
+    sout_mux_t        *p_mux;    
+   
+   p_sys->b_sap=0;
+   /* SAP is only valid for UDP or RTP streaming */
+   if(p_sap_cfg && (strstr(psz_access,"udp") || strstr( psz_access ,  "rtp" )))
+   {
+        msg_Info( p_this, "SAP Enabled");
+        p_sys->b_sap=1;
+        if(p_sap_cfg->psz_value)
+        {
+                psz_sap = strdup( p_sap_cfg->psz_value );
+        }
+        else
+        {
+                psz_sap = strdup ( psz_url );
+        }        
+   }
+   msg_Dbg( p_this, "creating `%s/%s://%s'",
              psz_access, psz_mux, psz_url );
-
+       
     /* *** find and open appropriate access module *** */
     p_access = sout_AccessOutNew( p_sout, psz_access, psz_url );
     if( p_access == NULL )
@@ -97,18 +122,25 @@ static int Open( vlc_object_t *p_this )
     }
     msg_Dbg( p_stream, "mux opened" );
 
+    /*  *** Create the SAP Session structure *** */
+    if(p_sys->b_sap)
+    {        
+        msg_Dbg( p_sout , "Creating SAP" );
+        p_sap = sout_SAPNew( p_sout , psz_url , psz_sap );
+    }   
+    
     /* XXX beurk */
     p_sout->i_preheader = __MAX( p_sout->i_preheader, p_mux->i_preheader );
 
-    p_sys        = malloc( sizeof( sout_stream_sys_t ) );
-    p_sys->p_mux = p_mux;
 
+    p_sys->p_mux = p_mux;
+    p_sys->p_sap = p_sap;
+    
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
 
     p_stream->p_sys     = p_sys;
-
     return VLC_SUCCESS;
 }
 
@@ -123,6 +155,8 @@ static void Close( vlc_object_t * p_this )
 
     sout_access_out_t *p_access = p_sys->p_mux->p_access;
 
+    if(p_sys -> b_sap)
+            sout_SAPDelete( p_sys->p_sap ); 
 
     sout_MuxDelete( p_sys->p_mux );
     sout_AccessOutDelete( p_access );
@@ -167,8 +201,14 @@ static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_bu
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
+        sout_instance_t         *p_sout = p_stream->p_sout;
+
+    
     sout_MuxSendBuffer( p_sys->p_mux, id->p_input, p_buffer );
 
+    if(p_sys -> b_sap)
+       sout_SAPSend( p_sout , p_sys->p_sap );
+   
     return VLC_SUCCESS;
 }
 

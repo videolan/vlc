@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.42 2003/05/18 18:56:57 hartman Exp $
+$Id: NEWS,v 1.43 2003/05/20 16:20:33 zorglub Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -31,6 +31,7 @@ Interfaces:
 Stream output:
  * New stream output scheme. It is now possible to build a chain of stream outputs allowing for instance to stream and display some content at the same time.
  * The stream output now allows to transcode content on the fly.
+ * SAP (Session Announcement Protocol) support.
 
 Miscellaneous:
  * New reset option for the preferences

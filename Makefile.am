@@ -194,6 +194,7 @@ HEADERS_include = \
 	include/os_specific.h \
 	include/stream_control.h \
 	include/stream_output.h \
+	include/announce.h \
 	include/variables.h \
 	include/video.h \
 	include/video_output.h \
@@ -426,6 +427,7 @@ SOURCES_libvlc_common = \
 	src/audio_output/output.c \
 	src/audio_output/intf.c \
 	src/stream_output/stream_output.c \
+	src/stream_output/announce.c \
 	src/misc/mtime.c \
 	src/misc/modules.c \
 	src/misc/threads.c \
