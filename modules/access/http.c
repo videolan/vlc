@@ -156,6 +156,7 @@ static int Control( access_t *, int, va_list );
 static void ParseURL( access_sys_t *, char *psz_url );
 static int  Connect( access_t *, int64_t );
 static int Request( access_t *p_access, int64_t i_tell );
+static void Disconnect( access_t * );
 
 /*****************************************************************************
  * Open:
@@ -354,11 +355,7 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->psz_user ) free( p_sys->psz_user );
         if( p_sys->psz_passwd ) free( p_sys->psz_passwd );
 
-        /* FIXME: cleanup SSL */
-        if( p_sys->fd > 0 )
-        {
-            net_Close( p_sys->fd );
-        }
+        Disconnect( p_access );
         free( p_sys );
 
         /* Do new Open() run with new data */
@@ -410,12 +407,7 @@ error:
     if( p_sys->psz_user ) free( p_sys->psz_user );
     if( p_sys->psz_passwd ) free( p_sys->psz_passwd );
 
-    if( p_sys->p_tls != NULL )
-        tls_ClientDelete( p_sys->p_tls );
-    if( p_sys->fd > 0 )
-    {
-        net_Close( p_sys->fd );
-    }
+    Disconnect( p_access );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -444,12 +436,7 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
 
-    if( p_sys->p_tls != NULL )
-        tls_ClientDelete( p_sys->p_tls );
-    if( p_sys->fd > 0 )
-    {
-        net_Close( p_sys->fd );
-    }
+    Disconnect( p_access );
     free( p_sys );
 }
 
@@ -572,13 +559,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         if( p_sys->b_reconnect )
         {
             msg_Dbg( p_access, "got disconnected, trying to reconnect" );
-            if( p_sys->p_tls != NULL )
-            {
-                tls_ClientDelete( p_sys->p_tls );
-                p_sys->p_tls = NULL;
-                p_sys->p_vs = NULL;
-            }
-            net_Close( p_sys->fd ); p_sys->fd = -1;
+            Disconnect( p_access );
             if( Connect( p_access, p_access->info.i_pos ) )
             {
                 msg_Dbg( p_access, "reconnection failed" );
@@ -673,17 +654,9 @@ static int ReadICYMeta( access_t *p_access )
  *****************************************************************************/
 static int Seek( access_t *p_access, int64_t i_pos )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
     msg_Dbg( p_access, "trying to seek to "I64Fd, i_pos );
 
-    if( p_sys->p_tls != NULL )
-    {
-        tls_ClientDelete( p_sys->p_tls );
-        p_sys->p_tls = NULL;
-        p_sys->p_vs = NULL;
-    }
-    net_Close( p_sys->fd ); p_sys->fd = -1;
+    Disconnect( p_access );
 
     if( Connect( p_access, i_pos ) )
     {
@@ -864,8 +837,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
         if( p_sys->b_proxy )
         {
             msg_Err( p_access, "HTTP/SSL through HTTP proxy not supported yet" );
-            net_Close( p_sys->fd );
-            p_sys->fd = -1;
+            Disconnect( p_access );
             return VLC_EGENERIC;
         }
 
@@ -873,8 +845,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
         if( p_sys->p_tls == NULL )
         {
             msg_Err( p_access, "cannot establish HTTP/SSL session" );
-            net_Close( p_sys->fd );
-            p_sys->fd = -1;
+            Disconnect( p_access );
             return VLC_EGENERIC;
         }
         p_sys->p_vs = &p_sys->p_tls->sock;
@@ -973,13 +944,7 @@ static int Request( access_t *p_access, int64_t i_tell )
     if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "\r\n" ) < 0 )
     {
         msg_Err( p_access, "failed to send request" );
-        if( p_sys->p_tls != NULL )
-        {
-            tls_ClientDelete( p_sys->p_tls );
-            p_sys->p_tls = NULL;
-            p_sys->p_vs = NULL;
-        }
-        net_Close( p_sys->fd ); p_sys->fd = -1;
+        Disconnect( p_access );
         return VLC_EGENERIC;
     }
 
@@ -1152,14 +1117,27 @@ static int Request( access_t *p_access, int64_t i_tell )
     return VLC_SUCCESS;
 
 error:
-    if( p_sys->p_tls != NULL )
+    Disconnect( p_access );
+    return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * Disconnect:
+ *****************************************************************************/
+static void Disconnect( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    if( p_sys->p_tls != NULL)
     {
         tls_ClientDelete( p_sys->p_tls );
         p_sys->p_tls = NULL;
         p_sys->p_vs = NULL;
     }
-
-    net_Close( p_sys->fd ); p_sys->fd = -1;
-    return VLC_EGENERIC;
+    if( p_sys->fd != -1)
+    {
+        net_Close(p_sys->fd);
+        p_sys->fd = -1;
+    }
+    
 }
-
