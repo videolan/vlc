@@ -88,6 +88,7 @@ case x"${target_os}" in
     ;;
   xbeos)
     SYS=beos
+    save_CFLAGS="${save_CFLAGS} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"
     vlc_LDFLAGS="${vlc_LDFLAGS} -lbe"
     plugins_LDFLAGS="${plugins_LDFLAGS} -nostart"
     beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker"
@@ -97,12 +98,6 @@ case x"${target_os}" in
     SYS="${target_os}"
     ;;
 esac
-
-dnl Flags needed for clean BeOS compilation
-if test x"${SYS}" != xbeos
-then
-  save_CFLAGS="${save_CFLAGS} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"
-fi
 
 dnl Flags for plugin compilation
 if test x"${SYS}" = xmingw32

@@ -4,6 +4,7 @@
 
 HEAD
 
+  * ./Makefile, ./configure.in: misc BeOS build fixes.
   * ./plugins/win32/win32.cpp: fixed `--intf intfwin' which wasn't working.
   * ./Makefile: we don't include the Gtk+ and SDL DLLs in the win32 package
     anymore, the package is now 700k instead of 4MB.

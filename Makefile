@@ -401,7 +401,9 @@ package-win32:
 			unix2dos tmp/$${file}.txt ; done
 	mkdir tmp/plugins
 	cp $(PLUGINS:%=plugins/%.so) tmp/plugins/ 
-	$(STRIP) tmp/$(PLUGINS:%=plugins/%.so)
+	# don't include these two
+	#rm -f tmp/plugins/gtk.so tmp/plugins/sdl.so
+	$(STRIP) $(PLUGINS:%=tmp/plugins/%.so)
 	mkdir tmp/share
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/share/ ; done
@@ -422,13 +424,17 @@ package-beos:
 	mkdir -p tmp/vlc/share
 	# Copy relevant files
 	cp vlc tmp/vlc/
+	strip tmp/vlc/vlc
 	cp AUTHORS COPYING ChangeLog README FAQ TODO tmp/vlc/
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/vlc/share/ ; done
+	mkdir tmp/vlc/plugins
+	cp $(PLUGINS:%=plugins/%.so) tmp/vlc/plugins/ 
+	strip $(PLUGINS:%=tmp/vlc/plugins/%.so)
 	# Create package 
 	mv tmp/vlc tmp/vlc-${VERSION}
 	(cd tmp ; find vlc-${VERSION} | \
-	zip -9 -@ vlc-${VERSION}-beos.zip )
+	zip -9 -@ vlc-${VERSION}-BeOS-x86.zip )
 	mv tmp/vlc-${VERSION}-BeOS-x86.zip .
 	# Clean up
 	rm -Rf tmp
