@@ -30,23 +30,66 @@
  * This stems from the fact that the MediaBase servers were first introduced by SGI?????.
  *
  * sgiNameServerHost=host.name.tld
+ *     Obvious: the host hosting this stream
  * Stream="xdma://host.name.tld/demo/a_very_cool.mpg"
+ *     Not always present. xdma can be read as RTSP.
  * sgiMovieName=/demo/a_very_cool.mpg
- * sgiAuxState=1
+ *     The path to the asset
+ * sgiAuxState=1|2
+ *     AuxState=2 is always Video On Demand (so not Scheduled)
+ *     Not present with Live streams
+ * sgiLiveFeed=True|False
+ *     Denounces if the stream is live or from assets (Canned?)
+ *     Live appears as a little sattelite dish in the web interface of Kasenna
  * sgiFormatName=PARTNER_41_MPEG-4
+ *     The type of stream. One of:
+ *       PARTNER_41_MPEG-4 (RTSP MPEG-4 fully compliant)
+ *       MPEG1-Audio       (MP3 Audio streams in MPEG TS)
+ *       MPEG-1            (MPEG 1 A/V in MPEG TS)
+ *       MPEG-2            (MPEG 2 A/V in MPEG TS)
+ * sgiWidth=720
+ *     The width of the to be received stream. Only present if stream is not Live.
+ * sgiHeight=576
+ *     The height of the to be received stream. Only present if stream is not Live.
  * sgiBitrate=1630208
+ *     The bitrate of the to be received stream. Only present if stream is not Live.
  * sgiDuration=378345000
+ *     The duration of the to be received stream. Only present if stream is not Live.
  * sgiQTFileBegin
  * rtsptext
  * rtsp://host.name.tld/demo/a_very_cool.mpg
  * sgiQTFileEnd
+ *     Sometimes present. QT will recognize this as a RTSP reference file, if present.
  * sgiApplicationName=MediaBaseURL
+ *     Beats me !! :)
  * sgiElapsedTime=0
+ *     Time passed since the asset was started (resets for repeating non live assets?)
+ * sgiMulticastAddress=233.81.233.15
+ *     The multicast IP used for the Multicast feed.
+ *     Also defines if a stream is multicast or not. (blue dot in kasenna web interface)
+ * sgiMulticastPort=1234
+ *     The multicast port for the same Multicast feed.
+ * sgiPacketSize=16384
+ *     The packetsize of the UDP frames that Kasenna sends. They should have used a default
+ *     that is a multiple of 188 (TS frame size). Most networks don't support more than 1500 anyways.
+ *     Also, when you loose a frame of this size, imagecorruption is more likely then with smaller
+ *     frames.
  * sgiServerVersion=6.1.2
+ *     Version of the server
  * sgiRtspPort=554
+ *     TCP port used for RTSP communication
  * AutoStart=True
+ *     Start playing automatically
+ * DeliveryService=cds
+ *     Simulcasted (scheduled unicast) content. (Green dot in Kasenna web interface) 
+ * sgiShowingName=A nice name that everyone likes
+ *     A human readible descriptive title for this stream.
+ * sgiSid=2311
+ *     Looks like this is the ID of the scheduled asset?
  * sgiUserAccount=pid=1724&time=1078527309&displayText=You%20are%20logged%20as%20guest&
+ *     User Authentication. Above is a default guest entry. Not required for RTSP communication.
  * sgiUserPassword=
+ *     Password :)
  *
  *****************************************************************************/
 
