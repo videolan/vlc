@@ -1,4 +1,0 @@
-SOURCES_wav = \
-	wav.c \
-	wav.h \
-	$(NULL)
