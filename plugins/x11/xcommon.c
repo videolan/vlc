@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.29 2002/04/28 11:56:13 sam Exp $
+ * $Id: xcommon.c,v 1.30 2002/05/05 08:25:15 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -142,16 +142,15 @@ typedef struct vout_sys_s
 
     Visual *            p_visual;                          /* visual pointer */
     int                 i_screen;                           /* screen number */
-    Window              window;                               /* root window */
     GC                  gc;              /* graphic context instance handler */
+    Window              window;                               /* root window */
+    Window              video_window;     /* sub-window for displaying video */
 
 #ifdef HAVE_SYS_SHM_H
     boolean_t           b_shm;               /* shared memory extension flag */
 #endif
 
 #ifdef MODULE_NAME_IS_xvideo
-    Window              yuv_window;   /* sub-window for displaying yuv video
-                                                                        data */
     int                 i_xvport;
 #else
     Colormap            colormap;               /* colormap used (8bpp only) */
@@ -192,6 +191,7 @@ typedef struct vout_sys_s
     boolean_t           b_mouse_pointer_visible;
     mtime_t             i_time_mouse_last_moved; /* used to auto-hide pointer*/
     Cursor              blank_cursor;                   /* the hidden cursor */
+    mtime_t             i_time_button_last_pressed;   /* to track dbl-clicks */
     Pixmap              cursor_pixmap;
 
 } vout_sys_t;
@@ -378,6 +378,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     /* Misc init */
     p_vout->p_sys->b_altfullscreen = 0;
+    p_vout->p_sys->i_time_button_last_pressed = 0;
 
     return( 0 );
 }
@@ -470,12 +471,14 @@ static int vout_Init( vout_thread_t *p_vout )
             return( 0 );
     }
 
-    p_vout->output.i_width = p_vout->p_sys->i_width;
-    p_vout->output.i_height = p_vout->p_sys->i_height;
+    vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
+                       p_vout->p_sys->i_height,
+                       &i_index, &i_index,
+                       &p_vout->output.i_width, &p_vout->output.i_height );
 
     /* Assume we have square pixels */
-    p_vout->output.i_aspect = p_vout->p_sys->i_width
-                               * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
+    p_vout->output.i_aspect = p_vout->output.i_width
+                               * VOUT_ASPECT_FACTOR / p_vout->output.i_height;
 #endif
 
     /* Try to initialize up to MAX_DIRECTBUFFERS direct buffers */
@@ -486,7 +489,7 @@ static int vout_Init( vout_thread_t *p_vout )
         /* Find an empty picture slot */
         for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
         {
-            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+          if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
             {
                 p_pic = p_vout->p_picture + i_index;
                 break;
@@ -537,13 +540,13 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         /* Display rendered image using shared memory extension */
 #   ifdef MODULE_NAME_IS_xvideo
         XvShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport,
-                       p_vout->p_sys->yuv_window, p_vout->p_sys->gc,
+                       p_vout->p_sys->video_window, p_vout->p_sys->gc,
                        p_pic->p_sys->p_image, 0 /*src_x*/, 0 /*src_y*/,
                        p_vout->output.i_width, p_vout->output.i_height,
                        0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height,
                        False /* Don't put True here or you'll waste your CPU */ );
 #   else
-        XShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->window,
+        XShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
                       p_vout->p_sys->gc, p_pic->p_sys->p_image,
                       0 /*src_x*/, 0 /*src_y*/, 0 /*dest_x*/, 0 /*dest_y*/,
                       p_vout->output.i_width, p_vout->output.i_height,
@@ -556,12 +559,12 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         /* Use standard XPutImage -- this is gonna be slow ! */
 #ifdef MODULE_NAME_IS_xvideo
         XvPutImage( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport,
-                    p_vout->p_sys->yuv_window, p_vout->p_sys->gc,
+                    p_vout->p_sys->video_window, p_vout->p_sys->gc,
                     p_pic->p_sys->p_image, 0 /*src_x*/, 0 /*src_y*/,
                     p_vout->output.i_width, p_vout->output.i_height,
                     0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height );
 #else
-        XPutImage( p_vout->p_sys->p_display, p_vout->p_sys->window,
+        XPutImage( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
                    p_vout->p_sys->gc, p_pic->p_sys->p_image,
                    0 /*src_x*/, 0 /*src_y*/, 0 /*dest_x*/, 0 /*dest_y*/,
                    p_vout->output.i_width, p_vout->output.i_height );
@@ -726,10 +729,17 @@ static int vout_Manage( vout_thread_t *p_vout )
             {
                 case Button1:
                     /* In this part we will eventually manage
-                     * clicks for DVD navigation for instance. For the
-                     * moment just pause the stream. */
-                    input_SetStatus( p_input_bank->pp_input[0],
-                                     INPUT_STATUS_PAUSE );
+                     * clicks for DVD navigation for instance. */
+
+                    /* detect double-clicks */
+                    if( ( ((XButtonEvent *)&xevent)->time -
+                          p_vout->p_sys->i_time_button_last_pressed ) < 300 )
+                    {
+                      p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                    }
+
+                    p_vout->p_sys->i_time_button_last_pressed =
+                        ((XButtonEvent *)&xevent)->time;
                     break;
 
                 case Button4:
@@ -773,10 +783,9 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
     }
 
-#ifdef MODULE_NAME_IS_xvideo
-    /* Handle events for YUV video output sub-window */
+    /* Handle events for video output sub-window */
     while( XCheckWindowEvent( p_vout->p_sys->p_display,
-                              p_vout->p_sys->yuv_window,
+                              p_vout->p_sys->video_window,
                               ExposureMask, &xevent ) == True )
     {
         /* Window exposed (only handled if stream playback is paused) */
@@ -788,15 +797,14 @@ static int vout_Manage( vout_thread_t *p_vout )
                 if( p_input_bank->pp_input[0] != NULL )
                 {
                     if( PAUSE_S ==
-                            p_input_bank->pp_input[0]->stream.control.i_status )
+                           p_input_bank->pp_input[0]->stream.control.i_status )
                     {
-/*                        XVideoDisplay( p_vout )*/;
+                        /* XVideoDisplay( p_vout )*/;
                     }
                 }
             }
         }
     }
-#endif
 
     /* ClientMessage event - only WM_PROTOCOLS with WM_DELETE_WINDOW data
      * are handled - according to the man pages, the format is always 32
@@ -822,66 +830,6 @@ static int vout_Manage( vout_thread_t *p_vout )
     }
 
 
-#ifdef MODULE_NAME_IS_x11
-    /*
-     * Handle vout window resizing
-     */
-#if 0
-    if( b_resized )
-    {
-        /* If interface window has been resized, change vout size */
-        p_vout->i_width =  p_vout->p_sys->i_width;
-        p_vout->i_height = p_vout->p_sys->i_height;
-        p_vout->i_changes |= VOUT_SIZE_CHANGE;
-    }
-    else if( (p_vout->i_width  != p_vout->p_sys->i_width) ||
-             (p_vout->i_height != p_vout->p_sys->i_height) )
-    {
-        /* If video output size has changed, change interface window size */
-        p_vout->p_sys->i_width =    p_vout->i_width;
-        p_vout->p_sys->i_height =   p_vout->i_height;
-        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                       p_vout->p_sys->i_width, p_vout->p_sys->i_height );
-    }
-    /*
-     * Color/Grayscale or gamma change: in 8bpp, just change the colormap
-     */
-    if( (p_vout->i_changes & VOUT_GRAYSCALE_CHANGE)
-        && (p_vout->i_screen_depth == 8) )
-    {
-        /* FIXME: clear flags ?? */
-    }
-
-    /*
-     * Size change
-     */
-    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
-    {
-        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-
-        /* Resize window */
-        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                       p_vout->i_width, p_vout->i_height );
-
-        /* Destroy XImages to change their size */
-        vout_End( p_vout );
-
-        /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        if( vout_Init( p_vout ) )
-        {
-            intf_ErrMsg( "vout error: cannot resize display" );
-            return( 1 );
-       }
-
-        /* Tell the video output thread that it will need to rebuild YUV
-         * tables. This is needed since conversion buffer size may have
-         * changed */
-        p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg( "vout: video display resized (%dx%d)",
-                  p_vout->i_width, p_vout->i_height);
-    }
-#endif /* #if 0 */
-#else
     /*
      * Size change
      *
@@ -898,18 +846,36 @@ static int vout_Manage( vout_thread_t *p_vout )
                       p_vout->p_sys->i_width,
                       p_vout->p_sys->i_height );
  
+#ifdef MODULE_NAME_IS_x11
+
+        /* Destroy XImages to change their size */
+        vout_End( p_vout );
+        for( i_x = 0; i_x < I_OUTPUTPICTURES; i_x++ )
+            p_vout->p_picture[ i_x ].i_status = FREE_PICTURE;
+
+        /* Recreate XImages. If SysInit failed, the thread can't go on. */
+        if( vout_Init( p_vout ) )
+        {
+            intf_ErrMsg( "vout error: cannot resize display" );
+            return( 1 );
+        }
+
+        /* Need to reinitialise the chroma plugin */
+        p_vout->chroma.pf_end( p_vout );
+        p_vout->chroma.pf_init( p_vout );
+
+#endif
+
         vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
                            p_vout->p_sys->i_height,
                            &i_x, &i_y, &i_width, &i_height );
 
-        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
+        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
                        i_width, i_height );
         
-        XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
+        XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
                      i_x, i_y );
-
     }
-#endif
 
     /* Autohide Cursour */
     if( mdate() - p_vout->p_sys->i_time_mouse_last_moved > 2000000 )
@@ -917,7 +883,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Hide the mouse automatically */
         if( p_vout->p_sys->b_mouse_pointer_visible )
         {
-            ToggleCursor( p_vout ); 
+            ToggleCursor( p_vout );
         }
     }
 
@@ -1076,28 +1042,31 @@ static int CreateWindow( vout_thread_t *p_vout )
                                  CWColormap, &xwindow_attributes );
     }
 
-#else
-    /* Create YUV output sub-window. */
-    p_vout->p_sys->yuv_window = XCreateSimpleWindow( p_vout->p_sys->p_display,
-                         p_vout->p_sys->window, 0, 0,
-                         p_vout->p_sys->i_width,
-                         p_vout->p_sys->i_height,
-                         0,
-                         BlackPixel( p_vout->p_sys->p_display,
-                                         p_vout->p_sys->i_screen ),
-                         WhitePixel( p_vout->p_sys->p_display,
-                                         p_vout->p_sys->i_screen ) );
+#endif
+    /* Create video output sub-window. */
+    p_vout->p_sys->video_window = XCreateSimpleWindow(
+                                      p_vout->p_sys->p_display,
+                                      p_vout->p_sys->window, 0, 0,
+                                      p_vout->p_sys->i_width,
+                                      p_vout->p_sys->i_height,
+                                      0,
+                                      BlackPixel( p_vout->p_sys->p_display,
+                                                  p_vout->p_sys->i_screen ),
+                                      WhitePixel( p_vout->p_sys->p_display,
+                                                  p_vout->p_sys->i_screen ) );
     
-    XSetWindowBackground( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
-             BlackPixel(p_vout->p_sys->p_display, p_vout->p_sys->i_screen ) );
+    XSetWindowBackground( p_vout->p_sys->p_display,
+                          p_vout->p_sys->video_window,
+                          BlackPixel( p_vout->p_sys->p_display,
+                                      p_vout->p_sys->i_screen ) );
     
-    XMapWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window );
-    XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
+    XMapWindow( p_vout->p_sys->p_display, p_vout->p_sys->video_window );
+    XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
                   ExposureMask );
 
-    /* make sure the YUV window will be centered in the next vout_Manage() */
+    /* make sure the video window will be centered in the next vout_Manage() */
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
-#endif
+
 
     /* If the cursor was formerly blank than blank it again */
     if( !p_vout->p_sys->b_mouse_pointer_visible )
@@ -1125,10 +1094,7 @@ static void DestroyWindow( vout_thread_t *p_vout )
     /* Do NOT use XFlush here ! */
     XSync( p_vout->p_sys->p_display, False );
 
-#ifdef MODULE_NAME_IS_xvideo
-    XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window );
-#endif
-
+    XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->video_window );
     XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
     XFreeGC( p_vout->p_sys->p_display, p_vout->p_sys->gc );
     XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.173 2002/04/25 21:52:42 sam Exp $
+ * $Id: video_output.c,v 1.174 2002/05/05 08:25:15 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -433,6 +433,7 @@ static int InitThread( vout_thread_t *p_vout )
         }
 
 #define f p_vout->chroma.p_module->p_functions->chroma.functions.chroma
+        p_vout->chroma.pf_init       = f.pf_init;
         p_vout->chroma.pf_end        = f.pf_end;
 #undef f
 
