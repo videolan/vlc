@@ -214,7 +214,7 @@ int vout_SysManage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_SIZE_CHANGE ) 
     {        
         intf_DbgMsg("resizing window\n");      
-        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;        
+        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;       
 
         /* Resize window */
         XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window, 

@@ -71,11 +71,6 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
 
     /* Initialize some fields used by the system-dependant method - these fields will
      * probably be modified by the method, and are only preferences */
-#ifdef DEBUG
-    p_vout->b_info              = 1;    
-#else
-    p_vout->b_info              = 0;    
-#endif
     p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR, 
                                                        VOUT_GRAYSCALE_DEFAULT );
     p_vout->i_width             = i_width;
@@ -83,13 +78,15 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     p_vout->i_bytes_per_line    = i_width * 2;    
     p_vout->i_screen_depth      = 15;
     p_vout->i_bytes_per_pixel   = 2;
-    p_vout->i_horizontal_scale  = 0;
-    p_vout->i_vertical_scale    = 0;
     p_vout->f_gamma             = VOUT_GAMMA;    
-    intf_DbgMsg("wished configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line), scaling %+d:%+d, gray=%d\n",
+#ifdef DEBUG
+    p_vout->b_info              = 1;    
+#else
+    p_vout->b_info              = 0;    
+#endif
+    intf_DbgMsg("wished configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line)\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-                p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                p_vout->i_horizontal_scale, p_vout->i_vertical_scale, p_vout->b_grayscale );
+                p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
    
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
@@ -98,10 +95,9 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
       free( p_vout );
       return( NULL );
     }
-    intf_DbgMsg("actual configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line), scaling %+d:%+d, gray=%d\n",
+    intf_DbgMsg("actual configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line)\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-                p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                p_vout->i_horizontal_scale, p_vout->i_vertical_scale, p_vout->b_grayscale );
+                p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
  
 #ifdef STATS
     /* Initialize statistics fields */
@@ -828,37 +824,64 @@ static void RenderBlank( vout_thread_t *p_vout )
  *******************************************************************************/
 static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank )
 {
+    int         i_display_height, i_display_width;       /* display dimensions */
+    int         i_height, i_width;                /* source picture dimensions */
+    int         i_scaled_height;               /* scaled height of the picture */   
+    int         i_aspect_scale;                 /* aspect ratio vertical scale */
+    int         i_eol;                        /* end of line offset for source */    
+    byte_t *    p_convert_dst;                       /* convertion destination */        
+    
 #ifdef STATS
     /* Start recording render time */
     p_vout->render_time = mdate();
 #endif
 
     /* Mark last picture date */
-    p_vout->last_picture_date = p_pic->date;    
+    p_vout->last_picture_date = p_pic->date;
+    i_width =                   p_pic->i_width;    
+    i_height =                  p_pic->i_height;
+    i_display_width =           p_vout->i_width;    
+    i_display_height =          p_vout->i_height;    
 
-    /* Blank screen if required */
-    if( b_blank )
+    /* Select scaling depending of aspect ratio */
+    switch( p_pic->i_aspect_ratio )
     {
-// ?????       RenderBlank( p_vout );
+    case AR_3_4_PICTURE:
+        i_aspect_scale = (4 * i_height - 3 * i_width) ? 
+            1 + 3 * i_width / ( 4 * i_height - 3 * i_width ) : 0;
+        break;
+    case AR_16_9_PICTURE:
+        i_aspect_scale = ( 16 * i_height - 9 * i_width ) ? 
+            1 + 9 * i_width / ( 16 * i_height - 9 * i_width ) : 0;
+        break;
+    case AR_221_1_PICTURE:        
+        i_aspect_scale = ( 221 * i_height - 100 * i_width ) ?
+            1 + 100 * i_width / ( 221 * i_height - 100 * i_width ) : 0;
+        break;               
+    case AR_SQUARE_PICTURE:
+    default:
+        i_aspect_scale = 0;        
     }
-
-    /* 
-     * Prepare scaling 
-     */
-    if( (p_pic->i_width > p_vout->i_width) || (p_pic->i_height > p_vout->i_height) )
+    i_scaled_height = (i_aspect_scale ? i_height * (i_aspect_scale - 1) / i_aspect_scale : i_height);
+    
+    /* Crop picture if too large for the screen */
+    if( i_width > i_display_width )
     {
-#ifdef VIDEO_X11
-        /* X11: window can be resized, so resize it - the picture won't be 
-         * rendered since any alteration of the window size means recreating the
-         * XImages */
-/*        p_vout->i_new_width =   p_pic->i_width;
-        p_vout->i_new_height =  p_pic->i_height;*/
-#else
-        /* Other drivers: the video output thread can't change its size, so
-         * we need to change the aspect ratio */
-        //????
-#endif
+        i_eol = i_width - i_display_width / 16 * 16;
+        i_width = i_display_width / 16 * 16;        
+    }
+    else
+    {
+        i_eol = 0;        
+    }
+    if( i_scaled_height > i_display_height )
+    {
+        i_height = (i_aspect_scale * i_display_height / (i_aspect_scale - 1)) / 2 * 2;
+        i_scaled_height = i_display_height;        
     }    
+    p_convert_dst = vout_SysGetPicture( p_vout ) + 
+        ( i_display_width - i_width ) / 2 * p_vout->i_bytes_per_pixel +
+        ( i_display_height - i_scaled_height ) / 2 * p_vout->i_bytes_per_line;
 
     /*
      * Choose appropriate rendering function and render picture
@@ -866,38 +889,32 @@ static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_b
     switch( p_pic->i_type )
     {
     case YUV_420_PICTURE:
-        p_vout->p_ConvertYUV420( p_vout, vout_SysGetPicture( p_vout ),
+        p_vout->p_ConvertYUV420( p_vout, p_convert_dst, 
                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                 p_pic->i_width, p_pic->i_height, 0, 0,
-                                 4, p_pic->i_matrix_coefficients );
+                                 i_width, i_height, i_eol, 
+                                 p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width,
+                                 i_aspect_scale, p_pic->i_matrix_coefficients );
         break;        
     case YUV_422_PICTURE:
- /* ??? p_vout->p_convert_yuv_420( p_vout, 
-                                   p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                   i_chroma_width, i_chroma_height,
-                                    p_vout->i_width / 2, p_vout->i_height,
-                                   p_vout->i_bytes_per_line,
-                                   0, 0, 0 );
-  */      break;        
+        p_vout->p_ConvertYUV422( p_vout, p_convert_dst, 
+                                 p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                                 i_width, i_height, i_eol, 
+                                 p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width,
+                                 i_aspect_scale, p_pic->i_matrix_coefficients );
+        break;        
     case YUV_444_PICTURE:
-/*  ???      p_vout->p_convert_yuv_420( p_vout, 
-                                   p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                   i_chroma_width, i_chroma_height,
-                                   p_vout->i_width, p_vout->i_height,
-                                   p_vout->i_bytes_per_line,
-                                   0, 0, 0 );
-  */      break;                
+        p_vout->p_ConvertYUV444( p_vout, p_convert_dst, 
+                                 p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                                 i_width, i_height, i_eol, 
+                                 p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width,
+                                 i_aspect_scale, p_pic->i_matrix_coefficients );
+        break;                
 #ifdef DEBUG
     default:        
         intf_DbgMsg("error: unknown picture type %d\n", p_pic->i_type );
         break;        
 #endif
     }
-
-    /* 
-     * Terminate scaling 
-     */
-    //??
 
 #ifdef STATS
     /* End recording render time */
@@ -1010,10 +1027,8 @@ static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
             break;            
         }        
     }
-    sprintf( psz_buffer, "%s %dx%d:%d scaling %+d:%+d g%+.2f   pic: %d/%d/%d", 
-             p_vout->b_grayscale ? "gray" : "rgb", 
+    sprintf( psz_buffer, "%dx%d:%d g%+.2f   pic: %d/%d/%d", 
              p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth, 
-             p_vout->i_horizontal_scale, p_vout->i_vertical_scale, 
              p_vout->f_gamma, i_reserved_pic, i_ready_pic,
              VOUT_MAX_PICTURES );
     vout_SysPrint( p_vout, 0, p_vout->i_height, -1, 1, psz_buffer );    
@@ -1035,7 +1050,8 @@ static int Manage( vout_thread_t *p_vout )
     }    
 
     /* Clear changes flags which does not need management or have been handled */
-    p_vout->i_changes &= ~(VOUT_INFO_CHANGE | VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE);
+    p_vout->i_changes &= ~(VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE |
+                           VOUT_INFO_CHANGE );
 
     /* Detect unauthorized changes */
     if( p_vout->i_changes )

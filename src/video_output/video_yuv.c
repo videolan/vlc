@@ -72,12 +72,6 @@ static void     ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
                                     int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
 static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                     int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
-static void     Scale16           ( p_vout_thread_t p_vout, void *p_pic, void *p_buffer, 
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, float f_alpha, float f_beta );
-static void     Scale24           ( p_vout_thread_t p_vout, void *p_pic, void *p_buffer, 
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, float f_alpha, float f_beta );
-static void     Scale32           ( p_vout_thread_t p_vout, void *p_pic, void *p_buffer, 
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, float f_alpha, float f_beta );
 
 /*******************************************************************************
  * CLIP_BYTE macro: boundary detection
@@ -516,19 +510,16 @@ static void SetTables( vout_thread_t *p_vout )
             p_vout->p_ConvertYUV420 = (vout_convert_t *) ConvertY4Gray16;        
             p_vout->p_ConvertYUV420 = (vout_convert_t *) ConvertY4Gray16;        
             p_vout->p_ConvertYUV420 = (vout_convert_t *) ConvertY4Gray16;        
-            p_vout->p_Scale =           (vout_scale_t *) Scale16;                    
             break;        
         case 24:
             p_vout->p_ConvertYUV420 = (vout_convert_t *) ConvertY4Gray24;        
             p_vout->p_ConvertYUV420 = (vout_convert_t *) ConvertY4Gray24;        
             p_vout->p_ConvertYUV420 = (vout_convert_t *) ConvertY4Gray24;        
-            p_vout->p_Scale =           (vout_scale_t *) Scale24;
             break;        
         case 32:        
             p_vout->p_ConvertYUV420 = (vout_convert_t *) ConvertY4Gray32;        
             p_vout->p_ConvertYUV420 = (vout_convert_t *) ConvertY4Gray32;        
             p_vout->p_ConvertYUV420 = (vout_convert_t *) ConvertY4Gray32;        
-            p_vout->p_Scale =           (vout_scale_t *) Scale32;                    
             break;        
         }        
     }
@@ -542,19 +533,16 @@ static void SetTables( vout_thread_t *p_vout )
             p_vout->p_ConvertYUV420 =   (vout_convert_t *) ConvertYUV420RGB16;        
             p_vout->p_ConvertYUV422 =   (vout_convert_t *) ConvertYUV422RGB16;        
             p_vout->p_ConvertYUV444 =   (vout_convert_t *) ConvertYUV444RGB16;        
-            p_vout->p_Scale =           (vout_scale_t *)   Scale16;                    
             break;        
         case 24:
             p_vout->p_ConvertYUV420 =   (vout_convert_t *) ConvertYUV420RGB24;        
             p_vout->p_ConvertYUV422 =   (vout_convert_t *) ConvertYUV422RGB24;        
             p_vout->p_ConvertYUV444 =   (vout_convert_t *) ConvertYUV444RGB24;        
-            p_vout->p_Scale =           (vout_scale_t *)   Scale24;                    
             break;        
         case 32:        
             p_vout->p_ConvertYUV420 =   (vout_convert_t *) ConvertYUV420RGB32;        
             p_vout->p_ConvertYUV422 =   (vout_convert_t *) ConvertYUV422RGB32;        
             p_vout->p_ConvertYUV444 =   (vout_convert_t *) ConvertYUV444RGB32;        
-            p_vout->p_Scale =           (vout_scale_t *)   Scale32;                    
             break;        
         }
     }        
@@ -820,33 +808,6 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic,
     i_chroma_width =    i_width;
     i_chroma_eol =      i_eol;
     CONVERT_YUV_RGB( 444 )
-}
-
-/*******************************************************************************
- * Scale16: 15 or 16 bpp picture scaling
- *******************************************************************************/
-static void Scale16( p_vout_thread_t p_vout, void *p_pic, void *p_buffer, 
-                     int i_width, int i_height, int i_eol, int i_pic_eol, float f_alpha, float f_beta )
-{
-    //???
-}
-
-/*******************************************************************************
- * Scale24: 24 bpp picture scaling
- *******************************************************************************/
-static void Scale24( p_vout_thread_t p_vout, void *p_pic, void *p_buffer, 
-                     int i_width, int i_height, int i_eol, int i_pic_eol, float f_alpha, float f_beta )
-{
-    //???
-}
-
-/*******************************************************************************
- * Scale32: 32 bpp picture scaling
- *******************************************************************************/
-static void Scale32( p_vout_thread_t p_vout, void *p_pic, void *p_buffer, 
-                     int i_width, int i_height, int i_eol, int i_pic_eol, float f_alpha, float f_beta )
-{
-    //???
 }
 
 //-------------------- walken code follow --------------------------------

@@ -50,28 +50,6 @@ typedef void (vout_convert_t)( p_vout_thread_t p_vout, void *p_pic,
                                int i_scale, int i_matrix_coefficients );
 
 /*******************************************************************************
- * vout_scale_t: horizontal scaling function
- *******************************************************************************
- * The convertion function only perform a vertical scaling. Horizontal scaling
- * is done later using this function.
- * Parameters:
- *      p_vout                  video output thread
- *      p_src                   source address (start address in picture)
- *      p_dst                   destination address (start address in picture)
- *      i_width                 source width
- *      i_height                source height
- *      i_line_width            source total pixels per line              
- *      i_dst_line_width        destination total pixels per line          
- *      i_scale                 if non 0, horizontal scaling is 1 - 1/i_scale
- * Conditions:      
- *      i_height % 16
- *      i_scale < 0             if p_src == p_dst
- *******************************************************************************/
-typedef void (vout_scale_t)( p_vout_thread_t p_vout, void *p_src, void *p_dst, 
-                             int i_width, int i_height, int i_line_width, 
-                             int i_dst_line_width, int i_scale );
-
-/*******************************************************************************
  * vout_thread_t: video output thread descriptor
  *******************************************************************************
  * Any independant video output device, such as an X11 window or a GGI device,
@@ -91,17 +69,17 @@ typedef struct vout_thread_s
     int *               pi_status;                    /* temporary status flag */
     p_vout_sys_t        p_sys;                         /* system output method */
 
-    /* Current display properties */
-    boolean_t           b_info;              /* print additionnal informations */
-    boolean_t           b_grayscale;             /* color or grayscale display */
+    /* Current display properties */    
+    boolean_t           b_grayscale;             /* color or grayscale display */   
     int                 i_width;                /* current output method width */
     int                 i_height;              /* current output method height */
     int                 i_bytes_per_line;/* bytes per line (including virtual) */
     int                 i_screen_depth;                      /* bits per pixel */
     int                 i_bytes_per_pixel;                /* real screen depth */
-    int                 i_horizontal_scale;        /* horizontal display scale */
-    int                 i_vertical_scale;            /* vertical display scale */
     float               f_gamma;                                      /* gamma */
+
+    /* Pictures and rendering properties */
+    boolean_t           b_info;              /* print additionnal informations */
 
 #ifdef STATS    
     /* Statistics - these numbers are not supposed to be accurate, but are a
@@ -123,18 +101,16 @@ typedef struct vout_thread_s
     vout_convert_t *    p_ConvertYUV420;                /* YUV 4:2:0 converter */
     vout_convert_t *    p_ConvertYUV422;                /* YUV 4:2:2 converter */
     vout_convert_t *    p_ConvertYUV444;                /* YUV 4:4:4 converter */
-    vout_scale_t *      p_Scale;                                     /* scaler */
 } vout_thread_t;
 
 /* Flags for changes - these flags are set in the i_changes field when another
  * thread changed a variable */
 #define VOUT_INFO_CHANGE        0x0001                       /* b_info changed */
 #define VOUT_GRAYSCALE_CHANGE   0x0002                  /* b_grayscale changed */
-#define VOUT_SIZE_CHANGE        0x0004                         /* size changed */
-#define VOUT_DEPTH_CHANGE       0x0008                        /* depth changed */
-#define VOUT_RATIO_CHANGE       0x0010                /* display ratio changed */
-#define VOUT_GAMMA_CHANGE       0x0020                        /* gamma changed */
-#define VOUT_NODISPLAY_CHANGE   0xffdc   /* changes which forbiden the display */
+#define VOUT_SIZE_CHANGE        0x0008                         /* size changed */
+#define VOUT_DEPTH_CHANGE       0x0010                        /* depth changed */
+#define VOUT_GAMMA_CHANGE       0x0080                        /* gamma changed */
+#define VOUT_NODISPLAY_CHANGE   0xffff      /* changes which forbidden display */
 
 /*******************************************************************************
  * Prototypes

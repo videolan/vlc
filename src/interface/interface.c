@@ -222,45 +222,6 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );      
         }
         break;  
-    case 'x':                                     /* horizontal aspect ratio - */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->i_horizontal_scale > -INTF_SCALE_LIMIT) )
-        {
-            vlc_mutex_lock( &p_intf->p_vout->change_lock );
-            p_intf->p_vout->i_horizontal_scale--;                        
-            p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
-            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
-        }                    
-        break;                                        
-    case 'X':                                     /* horizontal aspect ratio + */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->i_horizontal_scale < INTF_SCALE_LIMIT) )
-        {       
-            vlc_mutex_lock( &p_intf->p_vout->change_lock );
-            p_intf->p_vout->i_horizontal_scale++;
-            p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
-            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
-        }                    
-        break;  
-    case 'y':                                       /* vertical aspect ratio - */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->i_vertical_scale > -INTF_SCALE_LIMIT) )
-        {
-            vlc_mutex_lock( &p_intf->p_vout->change_lock );
-            p_intf->p_vout->i_vertical_scale--;
-            p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
-            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
-        }                    
-        break;                                        
-    case 'Y':                                     /* horizontal aspect ratio + */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->i_vertical_scale < INTF_SCALE_LIMIT) )
-        {       
-            vlc_mutex_lock( &p_intf->p_vout->change_lock );
-            p_intf->p_vout->i_vertical_scale++;
-            p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
-            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
-        }
-        break;        
-    case 'f':                                             /* toggle fullscreen */
-        //??
-        break;                                        
     case ' ':                                                   /* toggle info */
         if( p_intf->p_vout != NULL )
         {
