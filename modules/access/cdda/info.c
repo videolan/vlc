@@ -797,7 +797,6 @@ CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
                psz_mrl, psz_title, (long int) i_mduration / 1000000 );
 
     p_child = playlist_ItemNew( p_playlist, psz_mrl, psz_title );
-    p_child->input.b_fixed_name = VLC_TRUE;
     p_child->input.i_duration   = i_mduration;
 
     if( !p_child ) return NULL;
@@ -959,11 +958,13 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         p_access->info.i_size =
 	  i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 	p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
+	p_item->input.psz_uri    = strdup(psz_mrl);
 	p_item->input.i_duration = i_track_frames 
 	  * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC);
     }
     else
     {
+        input_title_t *t;
         playlist_ItemToNode( p_playlist, p_item );
         for( i = 0 ; i < p_cdda->i_tracks ; i++ )
         {
@@ -973,7 +974,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 	      cdio_get_track_lsn(p_cdda->p_cdio, i_track+1) - 
 	      cdio_get_track_lsn(p_cdda->p_cdio, i_track);
 
-            input_title_t *t = p_cdda->p_title[i] = vlc_input_title_New();
+            t = p_cdda->p_title[i] = vlc_input_title_New();
 
             asprintf( &t->psz_name, _("Track %i"), i_track );
             t->i_size = i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
@@ -986,13 +987,15 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
                                               psz_mrl_max ) ;
             CDDAAddMetaToItem( p_access, p_cdda, p_child, i_track, VLC_TRUE );
         }
-        p_cdda->i_titles = p_cdda->i_tracks; /* should be +1 */
+
+        p_cdda->i_titles = p_cdda->i_tracks;
         p_access->info.i_size = 
 	  cdio_get_track_lba(p_cdda->p_cdio, CDIO_CDROM_LEADOUT_TRACK)
 	  * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 	p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
 	p_item->input.i_duration = 
 	  p_access->info.i_size * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) ;
+	p_item->input.psz_uri    = strdup(psz_mrl);
     }
 
     if( b_play )
