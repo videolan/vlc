@@ -367,8 +367,8 @@ static int  Open ( vlc_object_t *p_this )
         tk->b_rtcp_sync = VLC_FALSE;
         tk->p_out_muxed = NULL;
         tk->p_es        = NULL;
-        tk->i_buffer    = 65535;
-        tk->p_buffer    = (uint8_t *)malloc( 65535 );
+        tk->i_buffer    = 65536;
+        tk->p_buffer    = (uint8_t *)malloc( 65536 );
 
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
@@ -904,8 +904,8 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     if( tk->i_buffer < i_size + 1500 && tk->i_buffer < 2000000 )
     {
         void *p_tmp;
-        msg_Dbg( p_demux, "increasing buffer size to %d", tk->i_buffer + 2000 );
-        tk->i_buffer += 2000;
+        msg_Dbg( p_demux, "increasing buffer size to %d", tk->i_buffer * 2 );
+        tk->i_buffer *= 2;
         p_tmp = realloc( tk->p_buffer, tk->i_buffer );
         if (p_tmp == NULL)
         {
