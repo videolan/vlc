@@ -1197,16 +1197,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             return VLC_EGENERIC;
 
-        case DEMUX_GET_SEEKPOINT_TIME:
-            i_skp = (int)va_arg( args, int );
-            i_sk_time = (mtime_t *)va_arg( args, mtime_t * );
-            if( p_sys->title && i_skp < p_sys->title->i_seekpoint)
-            {
-                *i_sk_time = p_sys->title->seekpoint[i_skp]->i_time_offset;
-                return VLC_SUCCESS;
-            }
-            return VLC_EGENERIC;
-
         case DEMUX_SET_TIME:
         case DEMUX_GET_FPS:
         default:

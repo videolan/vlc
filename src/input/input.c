@@ -183,7 +183,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
         psz_parser = val.psz_string;
         while( (psz_start = strchr( psz_parser, '{' ) ) )
         {
-            seekpoint_t seekpoint;
+            seekpoint_t *p_seekpoint = vlc_seekpoint_New();
             char backup;
             psz_start++;
             psz_end = strchr( psz_start, '}' );
@@ -193,30 +193,28 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
             *psz_parser = 0;
             *psz_end = ',';
 
-            seekpoint.psz_name = 0;
-            seekpoint.i_byte_offset = 0;
-            seekpoint.i_time_offset = 0;
             while( (psz_end = strchr( psz_start, ',' ) ) )
             {
                 *psz_end = 0;
                 if( !strncmp( psz_start, "name=", 5 ) )
                 {
-                    seekpoint.psz_name = psz_start + 5;
+                    p_seekpoint->psz_name = psz_start + 5;
                 }
                 else if( !strncmp( psz_start, "bytes=", 6 ) )
                 {
-                    seekpoint.i_byte_offset = atoll(psz_start + 6);
+                    p_seekpoint->i_byte_offset = atoll(psz_start + 6);
                 }
                 else if( !strncmp( psz_start, "time=", 5 ) )
                 {
-                    seekpoint.i_time_offset = atoll(psz_start + 5) * 1000000;
+                    p_seekpoint->i_time_offset = atoll(psz_start + 5) * 1000000;
                 }
                 psz_start = psz_end + 1;
             }
             msg_Dbg( p_input, "adding bookmark: %s, bytes="I64Fd", time="I64Fd,
-                     seekpoint.psz_name, seekpoint.i_byte_offset,
-                     seekpoint.i_time_offset );
-            input_Control( p_input, INPUT_ADD_BOOKMARK, &seekpoint );
+                     p_seekpoint->psz_name, p_seekpoint->i_byte_offset,
+                     p_seekpoint->i_time_offset );
+            input_Control( p_input, INPUT_ADD_BOOKMARK, p_seekpoint );
+            vlc_seekpoint_Delete( p_seekpoint );
             *psz_parser = backup;
         }
         free( val.psz_string );
@@ -1499,7 +1497,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
                 {
                     i_seekpoint = p_demux->info.i_seekpoint;
-                    if (demux2_Control( p_demux, DEMUX_GET_SEEKPOINT_TIME, p_demux->info.i_seekpoint, &i_seekpoint_time) == VLC_SUCCESS)
+                    i_seekpoint_time = p_input->input.title[p_demux->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
+                    if ( i_seekpoint_time != -1 )
                     {
                         demux2_Control( p_demux, INPUT_GET_TIME, &i_input_time );
                         if ( i_input_time < i_seekpoint_time + 3000000 )

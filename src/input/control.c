@@ -384,12 +384,12 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 vlc_value_t pos;
                 int i_ret;
 
-                if( p_input->bookmark[i_bkmk]->i_time_offset )
+                if( p_input->bookmark[i_bkmk]->i_time_offset != -1 )
                 {
                     pos.i_time = p_input->bookmark[i_bkmk]->i_time_offset;
                     i_ret = var_Set( p_input, "time", pos );
                 }
-                else if( p_input->bookmark[i_bkmk]->i_byte_offset )
+                else if( p_input->bookmark[i_bkmk]->i_byte_offset != -1 )
                 {
                     // don't crash on bookmarks in live streams
                     if( stream_Size( p_input->input.p_stream ) == 0 )
