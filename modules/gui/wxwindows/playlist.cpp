@@ -1127,7 +1127,7 @@ void Playlist::OnEnDis( wxCommandEvent& event )
         return;
     }
 
-    long i_item = listview->GetNextItem( i_item, wxLIST_NEXT_ALL,
+    long i_item = listview->GetNextItem( -1, wxLIST_NEXT_ALL,
                                          wxLIST_STATE_SELECTED );
 
     if( i_item >= 0 && i_item < p_playlist->i_size )
