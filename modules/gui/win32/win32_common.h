@@ -62,6 +62,7 @@ struct intf_sys_t
     TDiscDlg          * p_disc;                     /* disc selection window */
     TNetworkDlg       * p_network;                  /* network stream window */
     TPreferencesDlg   * p_preferences;                 /* preferences window */
+    TMenusGen         * p_menus;               /* object for menu generation */
 
     /* The slider */
     off_t               OldValue;                          /* previous value */
@@ -77,10 +78,6 @@ struct intf_sys_t
     TLabel            * p_label_title;
     TLabel            * p_label_chapter;
     int                 i_part;                           /* current chapter */
-
-    /* Language information */
-    es_descriptor_t   * p_audio_es_old;
-    es_descriptor_t   * p_spu_es_old;
 
     /* The input thread */
     input_thread_t    * p_input;

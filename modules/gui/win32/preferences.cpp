@@ -662,7 +662,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
             break;
         default:
-            msg_Warn( p_intf, "unknown config type" );
+            msg_Warn( p_intf, "unknown config type: %i", p_item->i_type );
             break;
         }
 

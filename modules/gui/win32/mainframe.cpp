@@ -398,7 +398,7 @@ void __fastcall TMainFrameDlg::PrevTitleActionExecute( TObject *Sender )
 
         p_intf->p_sys->b_title_update = 1;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        SetupMenus( p_intf );
+        p_intf->p_sys->p_menus->SetupMenus();
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
@@ -412,14 +412,14 @@ void __fastcall TMainFrameDlg::NextTitleActionExecute( TObject *Sender )
 
     if( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
     {
-        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];   
+        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
         input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
-                  
+
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_title_update = 1;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        SetupMenus( p_intf );
+        p_intf->p_sys->p_menus->SetupMenus();
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
@@ -439,7 +439,7 @@ void __fastcall TMainFrameDlg::PrevChapterActionExecute( TObject *Sender )
 
         p_intf->p_sys->b_chapter_update = 1;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        SetupMenus( p_intf );
+        p_intf->p_sys->p_menus->SetupMenus();
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
@@ -449,7 +449,7 @@ void __fastcall TMainFrameDlg::NextChapterActionExecute( TObject *Sender )
     input_area_t  * p_area;
 
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
-    
+
     if( p_area->i_part < p_area->i_part_nb )
     {
         p_area->i_part++;
@@ -459,7 +459,7 @@ void __fastcall TMainFrameDlg::NextChapterActionExecute( TObject *Sender )
 
         p_intf->p_sys->b_chapter_update = 1;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        SetupMenus( p_intf );
+        p_intf->p_sys->p_menus->SetupMenus();
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
@@ -512,7 +512,7 @@ void __fastcall TMainFrameDlg::ModeManage()
     if( p_intf->p_sys->p_input != NULL )
     {
         switch( p_intf->p_sys->p_input->stream.i_method & 0xf0 )
-        {    
+        {
             case INPUT_METHOD_FILE:
                 GroupBoxFile->Visible = true;
                 ActiveGB = GroupBoxFile;
@@ -580,7 +580,7 @@ void __fastcall TMainFrameDlg::ModeManage()
         else
         {
             /* add space between tolbar and statusbar when
-             * nothing is displayed; isn't it nicer ? :) */ 
+             * nothing is displayed; isn't it nicer ? :) */
             i_Height += 17;
         }
 

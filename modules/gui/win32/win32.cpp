@@ -2,14 +2,15 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
+ * $Id: win32.cpp,v 1.5 2002/12/13 03:52:58 videolan Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr> 
+ * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -50,8 +51,6 @@ static void Run    ( intf_thread_t * );
 
 int Win32Manage( void *p_data );
 
-intf_thread_t *p_intfGlobal;
-
 /*****************************************************************************
  * Open: initialize interface
  *****************************************************************************/
@@ -67,7 +66,6 @@ static int Open ( vlc_object_t *p_this )
         return( 1 );
     };
 
-    p_intfGlobal = p_intf;
     p_intf->pf_run = Run;
 
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
@@ -109,6 +107,7 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_window = new TMainFrameDlg( NULL, p_intf );
     p_intf->p_sys->p_playwin = new TPlaylistDlg( NULL, p_intf );
     p_intf->p_sys->p_messages = new TMessagesDlg( NULL, p_intf );
+    p_intf->p_sys->p_menus = new TMenusGen( p_intf );
 
     /* show main window and wait until it is closed */
     p_intf->p_sys->p_window->ShowModal();
@@ -116,6 +115,7 @@ static void Run( intf_thread_t *p_intf )
     if( p_intf->p_sys->p_disc ) delete p_intf->p_sys->p_disc;
     if( p_intf->p_sys->p_network ) delete p_intf->p_sys->p_network;
     if( p_intf->p_sys->p_preferences ) delete p_intf->p_sys->p_preferences;
+    delete p_intf->p_sys->p_menus;
     delete p_intf->p_sys->p_messages;
     delete p_intf->p_sys->p_playwin;
 }
@@ -158,7 +158,7 @@ int Win32Manage( intf_thread_t *p_intf )
         vlc_object_release( p_intf->p_sys->p_input );
         p_intf->p_sys->p_input = NULL;
     }
-    
+
     if( p_intf->p_sys->p_input )
     {
         input_thread_t *p_input = p_intf->p_sys->p_input;
@@ -171,7 +171,7 @@ int Win32Manage( intf_thread_t *p_intf )
             if( p_input->stream.b_changed )
             {
                 p_intf->p_sys->p_window->ModeManage();
-                SetupMenus( p_intf );
+                p_intf->p_sys->p_menus->SetupMenus();
                 p_intf->p_sys->b_playing = 1;
             }
 
@@ -209,7 +209,7 @@ int Win32Manage( intf_thread_t *p_intf )
 
                 /* Update the display */
 //                TrackBar->Invalidate();
-                
+
 #    undef p_area
             }
 
@@ -217,7 +217,7 @@ int Win32Manage( intf_thread_t *p_intf )
                 p_input->stream.p_selected_area->i_part )
             {
 //                p_intf->p_sys->b_chapter_update = 1;
-                SetupMenus( p_intf );
+                p_intf->p_sys->p_menus->SetupMenus();
             }
         }
 
@@ -239,7 +239,7 @@ int Win32Manage( intf_thread_t *p_intf )
         /* Just in case */
         return( FALSE );
     }
-     
+
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return( TRUE );
