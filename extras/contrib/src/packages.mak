@@ -22,7 +22,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 # ***************************************************************************
 
-GNU=http://ftp.heanet.ie/mirrors/ftp.gnu.org/gnu/gnu
+GNU=ftp://ftp.leo.org/pub/comp/os/unix/gnu/
 SF=http://heanet.dl.sourceforge.net/sourceforge
 VIDEOLAN=http://download.videolan.org/pub/videolan
 PERL_VERSION=5.8.5
