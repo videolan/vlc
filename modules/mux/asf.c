@@ -488,6 +488,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 tk->psz_name = "Windows Media Video 2";
                 tk->i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '2' );
             }
+            else if( p_input->p_fmt->i_codec == VLC_FOURCC('W','M','V','3') )
+            {
+                tk->psz_name = "Windows Media Video 3";
+                tk->i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '3' );
+            }
             else
             {
                 tk->psz_name = _("Unknown Video");

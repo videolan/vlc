@@ -357,6 +357,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
         case VLC_FOURCC( 'W', 'M', 'V', '1' ):
         case VLC_FOURCC( 'W', 'M', 'V', '2' ):
+        case VLC_FOURCC( 'W', 'M', 'V', '3' ):
             memcpy( p_stream->oggds_header.stream_type, "video", 5 );
             if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) )
             {

@@ -568,6 +568,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 /* I didn't want to do that :P */
                 case VLC_FOURCC( 'H', '2', '6', '3' ):
                 case VLC_FOURCC( 'I', '2', '6', '3' ):
+                case VLC_FOURCC( 'W', 'M', 'V', '3' ):
                 case VLC_FOURCC( 'W', 'M', 'V', '2' ):
                 case VLC_FOURCC( 'W', 'M', 'V', '1' ):
                 case VLC_FOURCC( 'D', 'I', 'V', '3' ):
