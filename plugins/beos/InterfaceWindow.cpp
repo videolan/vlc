@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.14 2002/03/26 10:29:19 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.15 2002/03/31 08:13:38 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -182,7 +182,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         miOnTop->SetMarked(! miOnTop->IsMarked() );
         if ( miOnTop->IsMarked() )
         {
-            SetFeel(B_FLOATING_APP_WINDOW_FEEL);
+            SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
             SetWorkspaces(B_CURRENT_WORKSPACE); 
         }
         else

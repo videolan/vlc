@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.13 2002/03/22 13:16:35 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.14 2002/03/31 08:13:38 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -38,12 +38,12 @@ public:
 };
 
 
-class VideoWindow 
+class VideoWindow : public BWindow
 {
 public:
     // standard constructor and destructor
     VideoWindow( int v_width, int v_height,
-                 int w_width, int w_height); 
+                 BRect frame); 
     ~VideoWindow();
     
     void	        Zoom(BPoint origin, float width, float height);
@@ -51,58 +51,27 @@ public:
     void            FrameMoved(BPoint origin);
     void            ScreenChanged(BRect frame, color_space mode);
     void            drawBuffer(int bufferIndex);
+    void            WindowActivated(bool active);
     
     // this is the hook controling direct screen connection
     int32           i_width;     // incomming bitmap size 
     int32           i_height;
     BRect           winSize;     // current window size
-    float           width_scale, height_scale;
-    float           out_top, out_left, out_height, out_width;
-    bool            is_zoomed, resized, vsync;
+//    float           width_scale, height_scale;
+//    float           out_top, out_left, out_height, out_width;
+    bool            is_zoomed, vsync, is_overlay;
     BBitmap	        *bitmap[2];
+    BBitmap         *overlaybitmap;
     VLCView	        *view;
-    BWindow         *voutWindow;
     int             i_buffer;
     bool			teardownwindow;
     thread_id       fDrawThreadID;
+    int             mode;
 
 private:
     // display_mode old_mode;
     struct vout_thread_s   *p_vout;
-    int             mode;
 
-};
-
-class bitmapWindow : public BWindow
-{
-public:
-    bitmapWindow(BRect frame, VideoWindow *theOwner);
-    ~bitmapWindow();
-    // standard window member
-    virtual void    FrameResized(float width, float height);
-    virtual void    FrameMoved(BPoint origin);
-    virtual void	Zoom(BPoint origin, float width, float height);
-    virtual void    ScreenChanged(BRect frame, color_space mode);
-    void            drawBuffer(int bufferIndex);
-private:
-	VideoWindow     *owner;
 };
 
  
-class directWindow : public BDirectWindow
-{
-public:
-    // standard constructor and destructor
-    directWindow( BRect frame, VideoWindow *theOwner); 
-    ~directWindow();
-
-    // standard window member
-    virtual void    FrameResized(float width, float height);
-    virtual void    FrameMoved(BPoint origin);    
-    virtual void	Zoom(BPoint origin, float width, float height);
-    virtual void    DirectConnected(direct_buffer_info *info);
-    virtual void    ScreenChanged(BRect frame, color_space mode);
-    void            drawBuffer(int bufferIndex);
-private:
-    VideoWindow     *owner;
-};
