@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.18 2003/05/24 13:05:55 massiot Exp $
+ * $Id: libmpeg2.c,v 1.19 2003/06/02 12:42:15 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -367,8 +367,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             buf[0] = buf[1] = buf[2] = NULL;
 
             msg_Warn( p_dec->p_fifo, "invalid picture encountered" );
-            if ( (p_dec->p_info->current_picture->flags & PIC_MASK_CODING_TYPE)
-                  != B_CODING_TYPE )
+            if ( ( p_dec->p_info->current_picture == NULL ) || 
+               ( ( p_dec->p_info->current_picture->flags & PIC_MASK_CODING_TYPE)
+                  != B_CODING_TYPE ) )
             {
                 vout_SynchroReset( p_dec->p_synchro );
             }
