@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.5 2002/10/28 19:42:24 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.6 2002/10/29 17:33:11 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -479,10 +479,14 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			break;
 
 		case OPEN_PREFERENCES:
-			if (fPreferencesWindow->IsHidden())
-				fPreferencesWindow->Show();
-			else
-				fPreferencesWindow->Activate();
+		    if( fPreferencesWindow->Lock() )
+		    {
+			    if (fPreferencesWindow->IsHidden())
+				    fPreferencesWindow->Show();
+			    else
+				    fPreferencesWindow->Activate();
+				fPreferencesWindow->Unlock();
+			}
 			break;
 				
 		default:

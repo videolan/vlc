@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.7 2002/10/28 19:42:24 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.8 2002/10/29 17:33:11 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -887,4 +887,7 @@ void Intf_VLCWrapper::toggleSubtitle(int i_subtitle)
 
 
 void Intf_VLCWrapper::setupMenus(){}
-int  Intf_VLCWrapper::inputGetStatus() {}
+int  Intf_VLCWrapper::inputGetStatus()
+{
+    return 0;
+}

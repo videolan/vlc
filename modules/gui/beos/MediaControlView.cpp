@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.5 2002/10/28 19:42:24 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.6 2002/10/29 17:33:11 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -684,7 +684,7 @@ SeekSlider::Draw(BRect updateRect)
 		// stripes
 		float width = floorf(StringWidth(kDisabledSeekMessage));
 		float textPos = r.left + r.Width() / 2.0 - width / 2.0;
-		pattern stripes = { 0xc7, 0x8f, 0x1f, 0x3e, 0x7c, 0xf8, 0xf1, 0xe3 };
+		pattern stripes = {{ 0xc7, 0x8f, 0x1f, 0x3e, 0x7c, 0xf8, 0xf1, 0xe3 }};
 		BRect stripesRect(r);
 		stripesRect.right = textPos - 5.0;
 		FillRect(stripesRect, stripes);

@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.3 2002/10/28 16:55:05 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.4 2002/10/29 17:33:11 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -260,7 +260,7 @@ VideoWindow::MessageReceived( BMessage *p_message )
 				BBitmap* temp = new BBitmap( current->Bounds(), current->ColorSpace() );
 				if ( temp && temp->IsValid() )
 				{
-					int32 height = current->Bounds().Height();
+					int32 height = (int32)current->Bounds().Height();
 					uint8* dst = (uint8*)temp->Bits();
 					uint8* src = (uint8*)current->Bits();
 					int32 dstBpr = temp->BytesPerRow();
@@ -1109,7 +1109,7 @@ VLCView::Draw(BRect updateRect)
  *****************************************************************************/
 static int  Init       ( vout_thread_t * );
 static void End        ( vout_thread_t * );
-static int  Manage     ( vout_thread_t * );
+// static int  Manage     ( vout_thread_t * );
 static void Display    ( vout_thread_t *, picture_t * );
 
 static int  BeosOpenDisplay ( vout_thread_t *p_vout );

@@ -2,7 +2,7 @@
  * TransportButton.cpp
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: TransportButton.cpp,v 1.2 2002/09/30 18:30:27 titer Exp $
+ * $Id: TransportButton.cpp,v 1.3 2002/10/29 17:33:11 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -308,7 +308,7 @@ TransportButton::MakeBitmap(uint32 mask)
 	uint8* src = (uint8*)BitsForMask(mask);
 
 	if (src && result && result->IsValid()) {
-		int32 width = r.IntegerWidth() + 1;
+		// int32 width = r.IntegerWidth() + 1;
 		int32 height = r.IntegerHeight() + 1;
 		int32 bpr = result->BytesPerRow();
 		uint8* dst = (uint8*)result->Bits();
