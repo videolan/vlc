@@ -37,7 +37,7 @@
 
 #include "ffmpeg.h"
 
-static unsigned int pi_channels_maps[6] =
+static unsigned int pi_channels_maps[7] =
 {
     0,
     AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
@@ -45,7 +45,9 @@ static unsigned int pi_channels_maps[6] =
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
      | AOUT_CHAN_REARRIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE
 };
 
 /*****************************************************************************
@@ -143,7 +145,7 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
-    p_dec->fmt_out.audio.i_bitspersample = 2;
+    p_dec->fmt_out.audio.i_bitspersample = 16;
 
     return VLC_SUCCESS;
 }
