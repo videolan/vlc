@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.96 2003/07/14 21:32:58 sigmunau Exp $
+ * $Id: video_output.h,v 1.97 2003/08/14 18:21:58 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -133,8 +133,9 @@ struct vout_thread_t
     text_renderer_sys_t * p_text_renderer_data;        /**< private data for
 						           the text renderer */
     module_t *            p_text_renderer_module;  /**< text renderer module */
+    /** callback used when a new string needs to be shown on the vout */
     int ( *pf_add_string ) ( vout_thread_t *, char *, text_style_t *, int,  
-			     int, int, mtime_t, mtime_t ); /**< callback used when a new string needs to be shown on the vout */
+			     int, int, mtime_t, mtime_t ); 
 };
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures
