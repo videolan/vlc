@@ -211,6 +211,32 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             // Register this variable in the manager
             pVarManager->registerVar( VariablePtr( pNewVar ) );
         }
+        else if( token == "or" )
+        {
+            // Get the 2 last variables on the stack
+            if( varStack.empty() )
+            {
+                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                         rName.c_str());
+                return NULL;
+            }
+            VarBool *pVar1 = varStack.back();
+            varStack.pop_back();
+            if( varStack.empty() )
+            {
+                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                         rName.c_str());
+                return NULL;
+            }
+            VarBool *pVar2 = varStack.back();
+            varStack.pop_back();
+
+            // Create a composite boolean variable
+            VarBool *pNewVar = new VarBoolOrBool( getIntf(), *pVar1, *pVar2 );
+            varStack.push_back( pNewVar );
+            // Register this variable in the manager
+            pVarManager->registerVar( VariablePtr( pNewVar ) );
+        }
         else if( token == "not" )
         {
             // Get the last variable on the stack

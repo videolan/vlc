@@ -69,7 +69,7 @@ void ExprEvaluator::parse( const string &rExpr )
         {
             // Skip white spaces
             end = begin;
-            while( pString[end] && pString[end] != ' ' )
+            while( pString[end] && pString[end] != ' ' && pString[end] != ')' )
             {
                 end++;
             }
