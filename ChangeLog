@@ -1,3 +1,39 @@
+2003-08-12 Tuesday 18:25  gbazin
+
+ * po/de.po: update of the german translation by Felix Kühne.
+
+2003-08-12 Tuesday 17:01  gbazin
+
+ *  modules/codec/ffmpeg/video.[ch]: another temporary workaround.
+
+2003-08-12 Tuesday 15:35  jpsaman
+
+ Fixed long problem with tuning to frequencies like; 12669500 Hz which is not possible with the old satellite plugin, because it reads 12669,5 in kHz and could not be expressed.
+ * Frequency, symbol rate, LNB_LOF1, LNB_LOF2 and LNB_SLOF are in Hz now. Input methods "dvb", "qpsk", "cable", "terrestrial" use this policy.
+ * Added backwards compatibility with access method "satellite" as used by the GUI; frequency and symbol rate are interpreted as kHz.
+
+2003-08-12 Tuesday 14:15  jpsaman
+
+ * more cleanup
+
+2003-08-12 Tuesday 12:43  jpsaman
+
+ * Audio is verified to work, it was a problem with the test setup and not with the code ;-).
+ * Added code to support LNB_LOF1, LNB_LOF2, LNB_SLOF commandline options.
+ * Cleanup of code.
+
+2003-08-12 Tuesday 08:19  sam
+
+   * modules/demux/mkv.cpp: support for libmatroska 0.5.0.
+
+2003-08-11 Monday 23:07  gbazin
+
+ * share/http/index.html: added "del" and "empty" controls.
+
+2003-08-11 Monday 20:49  gbazin
+
+ * ChangeLog: updated changelog for 0.6.2.
+
 2003-08-11 Monday 20:48  gbazin
 
  * modules/stream_out/transcode.c: work around a problem in ffmpeg with mpeg4 encoding.
