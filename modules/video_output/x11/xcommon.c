@@ -1043,6 +1043,10 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
             && (xevent.xexpose.window == p_win->base_window) )
         {
             b_expose = VLC_TRUE;
+            /* ConfigureNotify isn't sent if there isn't a window manager.
+             * Expose should be the last event to be received so it should
+             * be fine to assume we won't receive it anymore. */
+            b_configure_notify = VLC_TRUE;
         }
         else if( (xevent.type == MapNotify)
                  && (xevent.xmap.window == p_win->base_window) )
