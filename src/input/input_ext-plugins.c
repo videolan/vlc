@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.32 2003/05/27 22:42:58 hartman Exp $
+ * $Id: input_ext-plugins.c,v 1.33 2003/07/20 15:17:47 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -483,20 +483,29 @@ void input_DeletePES( input_buffers_t * p_buffers, pes_packet_t * p_pes )
 ssize_t input_FillBuffer( input_thread_t * p_input )
 {
     ptrdiff_t i_remains = p_input->p_last_data - p_input->p_current_data;
-    data_buffer_t * p_buf;
+    data_buffer_t * p_buf = NULL;
     ssize_t i_ret;
 
     vlc_mutex_lock( &p_input->p_method_data->lock );
 
-    p_buf = NewBuffer( p_input->p_method_data,
-                       i_remains + p_input->i_bufsize, VLC_FALSE );
-    if( p_buf == NULL )
+    while( p_buf == NULL )
     {
-        vlc_mutex_unlock( &p_input->p_method_data->lock );
-        msg_Err( p_input, "failed allocating a new buffer (decoder stuck?)" );
-        msleep( INPUT_IDLE_SLEEP );
-        return -1;
+        if( p_input->b_die || p_input->b_error || p_input->b_eof )
+        {
+            return -1;
+        }
+
+        p_buf = NewBuffer( p_input->p_method_data,
+                           i_remains + p_input->i_bufsize, VLC_FALSE );
+        if( p_buf == NULL )
+        {
+            vlc_mutex_unlock( &p_input->p_method_data->lock );
+            msg_Err( p_input,
+                     "failed allocating a new buffer (decoder stuck?)" );
+            msleep( INPUT_IDLE_SLEEP );
+        }
     }
+
     p_buf->i_refcount = 1;
 
     if( p_input->p_data_buffer != NULL )
