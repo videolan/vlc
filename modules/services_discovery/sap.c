@@ -83,6 +83,11 @@
 #define SAP_PARSE_LONGTEXT N_( \
        "When SAP can it will try to parse the SAP. If you don't select " \
        "this, all announces will be parsed by the livedotcom module" )
+#define SAP_CACHE_TEXT N_("Use SAP cache")
+#define SAP_CACHE_LONGTEXT N_( \
+       "If this option is selected, a SAP caching mechanism will be used." \
+       "This will result in lower SAP startup time, but you could end up " \
+        "with items corresponding to legacy streams." )
 
 /* Callbacks */
     static int  Open ( vlc_object_t * );
@@ -105,6 +110,8 @@ vlc_module_begin();
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE );
     add_bool( "sap-parse", 1 , NULL,
                SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, VLC_TRUE );
+    add_bool( "sap-cache", 0 , NULL,
+               SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, VLC_TRUE );
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );
@@ -243,7 +250,7 @@ static int Open( vlc_object_t *p_this )
     /* FIXME */
     p_sys->b_strict = VLC_FALSE;
 
-    if( config_GetInt( p_sd, "sap-use-cache" ) )
+    if( config_GetInt( p_sd, "sap-cache" ) )
     {
         CacheLoad( p_sd );
     }
@@ -331,7 +338,7 @@ static void Close( vlc_object_t *p_this )
         net_Close( p_sys->pi_fd[i] );
     }
 
-    if( config_GetInt( p_sd, "sap-use-cache" ) )
+    if( config_GetInt( p_sd, "sap-cache" ) )
     {
         CacheSave( p_sd );
     }
