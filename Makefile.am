@@ -127,7 +127,7 @@ $(SOURCES_libvlc): src/misc/modules_plugin.h src/misc/modules_builtin.h $(LIB_in
 ###############################################################################
 
 intl/libintl.a: FORCE
-	cd $(srcdir)/intl && $(MAKE)
+	cd $(top_builddir)/intl && $(MAKE)
 
 if BUILD_INTL
 LIB_intl = intl/libintl.a
