@@ -1,4 +1,13 @@
-$Id: NEWS,v 1.85 2004/02/29 19:12:00 gbazin Exp $
+$Id: NEWS,v 1.86 2004/03/02 23:49:38 hartman Exp $
+
+Changes between 0.7.1 and 0.7.1a:
+---------------------------------
+
+Mac OS X:
+ * Fixed the infamous 'mp3 takes twice the CPU it should take' bug
+ * Playing MOD files is working now.
+
+
 Changes between 0.7.0 and 0.7.1:
 ---------------------------------
 
