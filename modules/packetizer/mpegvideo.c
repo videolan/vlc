@@ -6,7 +6,7 @@
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -502,6 +502,9 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->i_frame_rate = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][0];
         p_sys->i_frame_rate_base =
             code_to_frame_rate[p_frag->p_buffer[7]&0x0f][1];
+
+        p_dec->fmt_out.video.i_frame_rate = p_sys->i_frame_rate;
+        p_dec->fmt_out.video.i_frame_rate_base = p_sys->i_frame_rate_base;
 
         p_sys->b_seq_progressive = VLC_TRUE;
         p_sys->b_low_delay = VLC_TRUE;
