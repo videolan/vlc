@@ -587,6 +587,11 @@ static char *ppsz_clock_descriptions[] =
     "These options allow you to enable special CPU optimizations.\n" \
     "You should always leave all these enabled." )
 
+#define FPU_TEXT N_("Enable FPU support")
+#define FPU_LONGTEXT N_( \
+    "If your processor has a floating point calculation unit, VLC can take " \
+    "advantage of it.")
+
 #define MMX_TEXT N_("Enable CPU MMX support")
 #define MMX_LONGTEXT N_( \
     "If your processor supports the MMX instructions set, VLC can take " \
@@ -1149,6 +1154,7 @@ vlc_module_begin();
     set_category( CAT_ADVANCED );
     set_subcategory( SUBCAT_ADVANCED_CPU );
     add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, VLC_TRUE );
+    add_bool( "fpu", 1, NULL, FPU_TEXT, FPU_LONGTEXT, VLC_TRUE );
 #if defined( __i386__ )
     add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, VLC_TRUE );
     add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, VLC_TRUE );

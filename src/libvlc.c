@@ -571,6 +571,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 
     /* p_vlc initialization. FIXME ? */
 
+    if( !config_GetInt( p_vlc, "fpu" ) )
+        libvlc.i_cpu &= ~CPU_CAPABILITY_FPU;
+
 #if defined( __i386__ )
     if( !config_GetInt( p_vlc, "mmx" ) )
         libvlc.i_cpu &= ~CPU_CAPABILITY_MMX;
