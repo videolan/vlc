@@ -90,7 +90,7 @@ msgstr "Instellingen van chroma modules"
 #: include/vlc_help.h:65 include/vlc_help.h:73 src/libvlc.h:262
 #: src/libvlc.h:540
 msgid " "
-msgstr ""
+msgstr " "
 
 #: include/vlc_help.h:67
 msgid "Decoder modules settings"
@@ -165,12 +165,11 @@ msgid ""
 "Choose your preferred video output in the Video section, and configure it "
 "here."
 msgstr ""
-""
+"Kies je de gewenste video uivoer methode in de sectie 'Video' en configureer deze hier."
 
 #: include/vlc_help.h:100
-#, fuzzy
 msgid "Video filters settings"
-msgstr "Video filter module"
+msgstr "Video filter instelling"
 
 #: include/vlc_help.h:102
 msgid ""
@@ -232,9 +231,8 @@ msgid "Spectrum"
 msgstr "Spectrum"
 
 #: src/audio_output/input.c:91
-#, fuzzy
 msgid "Goom"
-msgstr "Ga naar:"
+msgstr "Goom"
 
 #: src/audio_output/input.c:105 src/libvlc.h:156
 msgid "Audio filters"
@@ -5961,7 +5959,7 @@ msgstr "Bestandsnaam"
 
 #: modules/gui/pda/pda.c:224
 msgid "Permissions"
-msgstr ""
+msgstr "Rechten"
 
 #: modules/gui/pda/pda.c:230 modules/gui/wxwindows/v4l.cpp:270
 msgid "Size"
@@ -5982,7 +5980,7 @@ msgstr "Positie"
 
 #: modules/gui/pda/pda.c:286
 msgid "Index"
-msgstr ""
+msgstr "Index"
 
 #: modules/gui/pda/pda_interface.c:283 modules/gui/pda/pda_interface.c:284
 msgid "Forward"
@@ -6003,31 +6001,31 @@ msgstr "MRL :"
 
 #: modules/gui/pda/pda_interface.c:393
 msgid "udp://@:1234"
-msgstr ""
+msgstr "udp://@:1234"
 
 #: modules/gui/pda/pda_interface.c:394
 msgid "udp6://@:1234"
-msgstr ""
+msgstr "udp6://@:1234"
 
 #: modules/gui/pda/pda_interface.c:395
 msgid "rtp://"
-msgstr ""
+msgstr "rtp://"
 
 #: modules/gui/pda/pda_interface.c:396
 msgid "rtp6://"
-msgstr ""
+msgstr "rtp6://"
 
 #: modules/gui/pda/pda_interface.c:397
 msgid "ftp://"
-msgstr ""
+msgstr "ftp://"
 
 #: modules/gui/pda/pda_interface.c:398
 msgid "http://"
-msgstr ""
+msgstr "http://"
 
 #: modules/gui/pda/pda_interface.c:399
 msgid "mms://"
-msgstr ""
+msgstr "mms://"
 
 #: modules/gui/pda/pda_interface.c:420
 msgid "Port:"
@@ -6055,400 +6053,352 @@ msgstr "udp6"
 
 #: modules/gui/pda/pda_interface.c:497 modules/gui/pda/pda_interface.c:1122
 msgid "rtp"
-msgstr ""
+msgstr "rtp"
 
 #: modules/gui/pda/pda_interface.c:498
 msgid "rtp4"
-msgstr ""
+msgstr "rtp4"
 
 #: modules/gui/pda/pda_interface.c:499 modules/gui/pda/pda_interface.c:1124
 msgid "ftp"
 msgstr "ftp"
 
 #: modules/gui/pda/pda_interface.c:501
-#, fuzzy
 msgid "sout"
-msgstr "Over"
+msgstr "sout"
 
 #: modules/gui/pda/pda_interface.c:502
 msgid "mms"
-msgstr ""
+msgstr "mms"
 
 #: modules/gui/pda/pda_interface.c:510
 msgid "Protocol:"
-msgstr ""
+msgstr "Protocol:"
 
 #: modules/gui/pda/pda_interface.c:556
-#, fuzzy
 msgid "Video:"
-msgstr "Video"
+msgstr "Video:"
 
 #: modules/gui/pda/pda_interface.c:565
-#, fuzzy
 msgid "Audio:"
-msgstr "Audio"
+msgstr "Audio:"
 
 #: modules/gui/pda/pda_interface.c:574
 msgid "Channel:"
 msgstr "Kanaal:"
 
 #: modules/gui/pda/pda_interface.c:583
-#, fuzzy
 msgid "Norm:"
-msgstr "Normaal"
+msgstr "Normaal:"
 
 #: modules/gui/pda/pda_interface.c:592
-#, fuzzy
 msgid "Size:"
-msgstr "Grootte"
+msgstr "Grootte:"
 
 #: modules/gui/pda/pda_interface.c:601
-#, fuzzy
 msgid "Frequency:"
-msgstr "Frequentie"
+msgstr "Frequentie:"
 
 #: modules/gui/pda/pda_interface.c:610
-#, fuzzy
 msgid "Samplerate:"
-msgstr "Sample Rate"
+msgstr "Samplerate"
 
 #: modules/gui/pda/pda_interface.c:619
-#, fuzzy
 msgid "Quality:"
-msgstr "Afsluiten"
+msgstr "Kwaliteit"
 
 #: modules/gui/pda/pda_interface.c:628
 msgid "Tuner:"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:637
-#, fuzzy
 msgid "Sound:"
-msgstr "Soundtrack"
+msgstr "Geluid:"
 
 #: modules/gui/pda/pda_interface.c:646
-#, fuzzy
 msgid "MJPEG:"
-msgstr "MPEG1"
+msgstr "MJPEG:"
 
 #: modules/gui/pda/pda_interface.c:655
-#, fuzzy
 msgid "Decimation:"
-msgstr "Beschrijving"
+msgstr ""
 
 #: modules/gui/pda/pda_interface.c:673
 msgid "/dev/video"
-msgstr ""
+msgstr "/dev/video"
 
 #: modules/gui/pda/pda_interface.c:674
 msgid "/dev/video0"
-msgstr ""
+msgstr "/dev/video0"
 
 #: modules/gui/pda/pda_interface.c:675
 msgid "/dev/video1"
-msgstr ""
+msgstr "/dev/video1"
 
 #: modules/gui/pda/pda_interface.c:692
 msgid "/dev/dsp"
-msgstr ""
+msgstr "/dev/dsp"
 
 #: modules/gui/pda/pda_interface.c:693
 msgid "/dev/audio"
-msgstr ""
+msgstr "/dev/audio"
 
 #: modules/gui/pda/pda_interface.c:694
 msgid "/dev/audio0"
-msgstr ""
+msgstr "/dev/audio0"
 
 #: modules/gui/pda/pda_interface.c:695
 msgid "/dev/audio1"
-msgstr ""
+msgstr "/dev/audio1"
 
 #: modules/gui/pda/pda_interface.c:721
 msgid "pal"
-msgstr ""
+msgstr "pal"
 
 #: modules/gui/pda/pda_interface.c:722
-#, fuzzy
 msgid "ntsc"
-msgstr "Lettertypen"
+msgstr "ntsc"
 
 #: modules/gui/pda/pda_interface.c:723
-#, fuzzy
 msgid "secam"
-msgstr "Dream"
+msgstr "secam"
 
 #: modules/gui/pda/pda_interface.c:724
-#, fuzzy
 msgid "auto"
-msgstr "Auteur"
+msgstr "auto"
 
 #: modules/gui/pda/pda_interface.c:741
 msgid "240x192"
-msgstr ""
+msgstr "240x192"
 
 #: modules/gui/pda/pda_interface.c:742
 msgid "320x240"
-msgstr ""
+msgstr "320x240"
 
 #: modules/gui/pda/pda_interface.c:743
 msgid "qsif"
-msgstr ""
+msgstr "qsif"
 
 #: modules/gui/pda/pda_interface.c:744
 msgid "qcif"
-msgstr ""
+msgstr "qcif"
 
 #: modules/gui/pda/pda_interface.c:745
-#, fuzzy
 msgid "sif"
-msgstr "Asf"
+msgstr "sif"
 
 #: modules/gui/pda/pda_interface.c:746
 msgid "cif"
-msgstr ""
+msgstr "cif"
 
 #: modules/gui/pda/pda_interface.c:747
 msgid "vga"
-msgstr ""
+msgstr "vga"
 
 #: modules/gui/pda/pda_interface.c:763
 msgid "kHz"
-msgstr ""
+msgstr "kHz"
 
 #: modules/gui/pda/pda_interface.c:773
 msgid "Hz/s"
-msgstr ""
+msgstr "Hz/s"
 
 #: modules/gui/pda/pda_interface.c:795
-#, fuzzy
 msgid "mono"
-msgstr "Mono"
+msgstr "mono"
 
 #: modules/gui/pda/pda_interface.c:796
-#, fuzzy
 msgid "stereo"
-msgstr "Stereo"
+msgstr "stereo"
 
 #: modules/gui/pda/pda_interface.c:814 modules/gui/pda/pda_interface.c:1064
 #: modules/gui/pda/pda_interface.c:1142 modules/gui/pda/pda_interface.c:1149
-#, fuzzy
 msgid "enable"
-msgstr "Schakel video in"
+msgstr "schakel in"
 
 #: modules/gui/pda/pda_interface.c:839
-#, fuzzy
 msgid "Camera"
-msgstr "Hoofdstuk"
+msgstr "Camera"
 
 #: modules/gui/pda/pda_interface.c:866
-#, fuzzy
 msgid "Video Codec:"
-msgstr "Video codec"
+msgstr "Video Codec:"
 
 #: modules/gui/pda/pda_interface.c:883
 msgid "huffyuv"
-msgstr ""
+msgstr "huffyuv"
 
 #: modules/gui/pda/pda_interface.c:884
-#, fuzzy
 msgid "mp1v"
-msgstr "mpeg"
+msgstr "mp1v"
 
 #: modules/gui/pda/pda_interface.c:885
-#, fuzzy
 msgid "mp2v"
-msgstr "mpeg"
+msgstr "mp2v"
 
 #: modules/gui/pda/pda_interface.c:886
-#, fuzzy
 msgid "mp4v"
-msgstr "mp4"
+msgstr "mp4v"
 
 #: modules/gui/pda/pda_interface.c:887
 msgid "H263"
-msgstr ""
+msgstr "H263"
 
 #: modules/gui/pda/pda_interface.c:888
 msgid "I263"
-msgstr ""
+msgstr "I263"
 
 #: modules/gui/pda/pda_interface.c:889
 msgid "WMV1"
-msgstr ""
+msgstr "WMV1"
 
 #: modules/gui/pda/pda_interface.c:890
 msgid "WMV2"
-msgstr ""
+msgstr "WMV2"
 
 #: modules/gui/pda/pda_interface.c:899
-#, fuzzy
 msgid "Video Bitrate:"
-msgstr "Audio Bitrate"
+msgstr "Video Bitrate"
 
 #: modules/gui/pda/pda_interface.c:908
-#, fuzzy
 msgid "Bitrate Tolerance:"
-msgstr "Bit Rate"
+msgstr "Bitrate tolerantie"
 
 #: modules/gui/pda/pda_interface.c:917
 msgid "Keyframe Interval:"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:926
-#, fuzzy
 msgid "Audio Codec:"
-msgstr "Audio codec"
+msgstr "Audio Codec"
 
 #: modules/gui/pda/pda_interface.c:935
-#, fuzzy
 msgid "Deinterlace:"
-msgstr "Deinterlace"
+msgstr "Deinterlace:"
 
 #: modules/gui/pda/pda_interface.c:944
-#, fuzzy
 msgid "Access:"
-msgstr "Adres:"
+msgstr "Invoer:"
 
 #: modules/gui/pda/pda_interface.c:953
-#, fuzzy
 msgid "Muxer:"
-msgstr "Geluid Stil"
+msgstr "Muxer:"
 
 #: modules/gui/pda/pda_interface.c:962
 msgid "URL:"
 msgstr "URL:"
 
 #: modules/gui/pda/pda_interface.c:971
-#, fuzzy
 msgid "Time To Live (TTL):"
-msgstr "Multicast timeout"
+msgstr "Time To Live (TTL):"
 
 #: modules/gui/pda/pda_interface.c:996
-#, fuzzy
 msgid "127.0.0.1"
-msgstr "239.239.0.1"
+msgstr "127.0.0.1"
 
 #: modules/gui/pda/pda_interface.c:997
 msgid "localhost"
-msgstr ""
+msgstr "localhost"
 
 #: modules/gui/pda/pda_interface.c:998
 msgid "localhost.localdomain"
-msgstr ""
+msgstr "localhost.localdomain"
 
 #: modules/gui/pda/pda_interface.c:999
-#, fuzzy
 msgid "239.0.0.42"
-msgstr "239.239.0.1"
+msgstr "239.0.0.42"
 
 #: modules/gui/pda/pda_interface.c:1016
-#, fuzzy
 msgid "ps"
-msgstr "fps"
+msgstr "ps"
 
 #: modules/gui/pda/pda_interface.c:1017
 msgid "ts"
-msgstr ""
+msgstr "ts"
 
 #: modules/gui/pda/pda_interface.c:1018
-#, fuzzy
 msgid "mpeg1"
-msgstr "mpeg"
+msgstr "mpeg1"
 
 #: modules/gui/pda/pda_interface.c:1019
-#, fuzzy
 msgid "avi"
-msgstr "Avi"
+msgstr "avi"
 
 #: modules/gui/pda/pda_interface.c:1020
-#, fuzzy
 msgid "ogg"
-msgstr "Ogg"
+msgstr "ogg"
 
 #: modules/gui/pda/pda_interface.c:1021
-#, fuzzy
 msgid "mp4"
 msgstr "mp4"
 
 #: modules/gui/pda/pda_interface.c:1022
-#, fuzzy
 msgid "mov"
-msgstr "Verwijder"
+msgstr "mov"
 
 #: modules/gui/pda/pda_interface.c:1023
-#, fuzzy
 msgid "asf"
-msgstr "Asf"
+msgstr "asf"
 
 #: modules/gui/pda/pda_interface.c:1039 modules/gui/pda/pda_interface.c:1097
 msgid "kbits/s"
-msgstr ""
+msgstr "kbits/s"
 
 #: modules/gui/pda/pda_interface.c:1050
 msgid "alaw"
-msgstr ""
+msgstr "alaw"
 
 #: modules/gui/pda/pda_interface.c:1051
 msgid "ulaw"
-msgstr ""
+msgstr "ulaw"
 
 #: modules/gui/pda/pda_interface.c:1052
 msgid "mpga"
 msgstr "mpga"
 
 #: modules/gui/pda/pda_interface.c:1053
-#, fuzzy
 msgid "mp3"
-msgstr "mp4"
+msgstr "mpe"
 
 #: modules/gui/pda/pda_interface.c:1054
-#, fuzzy
 msgid "a52"
-msgstr "a52 "
+msgstr "a52"
 
 #: modules/gui/pda/pda_interface.c:1055
-#, fuzzy
 msgid "vorb"
-msgstr "Vorbis"
+msgstr "vorb"
 
 #: modules/gui/pda/pda_interface.c:1087
 msgid "bits/s"
-msgstr ""
+msgstr "bits/s"
 
 #: modules/gui/pda/pda_interface.c:1100
-#, fuzzy
 msgid "Audio Bitrate :"
-msgstr "Audio Bitrate"
+msgstr "Audio Bitrate :"
 
 #: modules/gui/pda/pda_interface.c:1118
-#, fuzzy
 msgid "display"
-msgstr "vertraging"
+msgstr "scherm"
 
 #: modules/gui/pda/pda_interface.c:1121
 msgid "mmsh"
-msgstr ""
+msgstr "mmsh"
 
 #: modules/gui/pda/pda_interface.c:1133
-#, fuzzy
 msgid "SAP Announce:"
-msgstr "SAP Aankondigingen"
+msgstr "SAP Aankondigingen:"
 
 #: modules/gui/pda/pda_interface.c:1156
-#, fuzzy
 msgid "SLP Announce:"
-msgstr "SAP Aankondigingen"
+msgstr "SLP Aankondigingen:"
 
 #: modules/gui/pda/pda_interface.c:1165
-#, fuzzy
 msgid "Announce Channel:"
-msgstr "Streams via SAP kanaal verkondingen:"
+msgstr "Naam Kanaal:"
 
 #: modules/gui/pda/pda_interface.c:1197
-#, fuzzy
 msgid "Transcode"
-msgstr "Trance"
+msgstr "Transcode"
 
 #: modules/gui/pda/pda_interface.c:1225
 msgid "Update"
@@ -6475,24 +6425,21 @@ msgid "Preference"
 msgstr "Voorkeur"
 
 #: modules/gui/pda/pda_interface.c:1309
-#, fuzzy
 msgid ""
 "The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input "
 "from  local or network sources and is licensed under the GPL (http://www.gnu."
 "org/copyleft/gpl.html)."
 msgstr ""
-"De VideoLAN Client is een MPEG 1, MPEG 2, MP3, DivX multimedia speler, die "
+"De VideoLAN Client is een MPEG, MPEG 2, MP3, DivX multimedia speler, die "
 "invoer zowel van schijf als van netwerk kan afspelen."
 
 #: modules/gui/pda/pda_interface.c:1317
-#, fuzzy
 msgid "Authors: The VideoLAN Team, http://www.videolan.org/team/"
-msgstr "Auteurs: Het VideoLAN Team, http://www.videolan.org"
+msgstr "Auteurs: Het VideoLAN Team, http://www.videolan.org/team/"
 
 #: modules/gui/pda/pda_interface.c:1325
-#, fuzzy
 msgid "(C) 1996-2003 the VideoLAN team"
-msgstr "(c) 1996-2003 het VideoLAN team"
+msgstr "(C) 1996-2003 het VideoLAN team"
 
 #: modules/gui/qnx/qnx.c:44
 msgid "QNX RTOS video and audio output"
@@ -6536,18 +6483,16 @@ msgid "Open file"
 msgstr "Open een bestand"
 
 #: modules/gui/wxwindows/fileinfo.cpp:56
-#, fuzzy
 msgid "Stream and Media Info"
-msgstr "Stream informatie..."
+msgstr "Stream en Media informatie..."
 
 #: modules/gui/wxwindows/interface.cpp:289
 msgid "Quick file open"
-msgstr ""
+msgstr "Open versneld bestand "
 
 #: modules/gui/wxwindows/interface.cpp:290
-#, fuzzy
 msgid "Advanced open"
-msgstr "Toon geavanceerde opties"
+msgstr "Geavanceerde open"
 
 #: modules/gui/wxwindows/interface.cpp:293
 msgid "Open a network stream"
@@ -6566,14 +6511,12 @@ msgid "Exit this program"
 msgstr "Sluit programma af"
 
 #: modules/gui/wxwindows/interface.cpp:298
-#, fuzzy
 msgid "Open the streaming wizard"
-msgstr "Open the stream output"
+msgstr "Open the streaming wizard"
 
 #: modules/gui/wxwindows/interface.cpp:299
-#, fuzzy
 msgid "Open other types of inputs"
-msgstr "Open the stream output"
+msgstr "Open ander soorten invoer"
 
 #: modules/gui/wxwindows/interface.cpp:301
 msgid "Open the playlist"
@@ -6593,16 +6536,15 @@ msgstr "Ga naar het voorkeuren menu"
 
 #: modules/gui/wxwindows/interface.cpp:306
 msgid "Shows the extended GUI"
-msgstr ""
+msgstr "Toont de uitgebreide GUI"
 
 #: modules/gui/wxwindows/interface.cpp:308
 msgid "About this program"
 msgstr "Over dit programma"
 
 #: modules/gui/wxwindows/interface.cpp:312
-#, fuzzy
 msgid "Quick &Open ..."
-msgstr "Simpel &Open Bestand..."
+msgstr "Simpel &Open..."
 
 #: modules/gui/wxwindows/interface.cpp:316 modules/gui/wxwindows/menus.cpp:94
 msgid "Open &File..."
@@ -6621,9 +6563,8 @@ msgid "Open &Satellite Stream..."
 msgstr "Open &Sateliet Stream..."
 
 #: modules/gui/wxwindows/interface.cpp:328
-#, fuzzy
 msgid "Streaming Wizard..."
-msgstr "Stream informatie..."
+msgstr "Streaming Wizard..."
 
 #: modules/gui/wxwindows/interface.cpp:331
 msgid "E&xit"
@@ -6716,63 +6657,53 @@ msgid "Play faster"
 msgstr "Speel Sneller"
 
 #: modules/gui/wxwindows/interface.cpp:403
-#, fuzzy
 msgid "Quick"
-msgstr "Afsluiten"
+msgstr "Snel"
 
 #: modules/gui/wxwindows/interface.cpp:501
 msgid "Image adjust"
-msgstr ""
+msgstr "Pas beeld aan"
 
 #: modules/gui/wxwindows/interface.cpp:512
-#, fuzzy
 msgid "Enable"
-msgstr "Schakel video in"
+msgstr "Activeer"
 
 #: modules/gui/wxwindows/interface.cpp:517
-#, fuzzy
 msgid "Hue"
-msgstr "House"
+msgstr "Tint"
 
 #: modules/gui/wxwindows/interface.cpp:527
-#, fuzzy
 msgid "Contrast"
-msgstr "Bediening"
+msgstr "Contrast"
 
 #: modules/gui/wxwindows/interface.cpp:536
-#, fuzzy
 msgid "Brightness"
-msgstr "Wijzig helderheid"
+msgstr "Helderheid"
 
 #: modules/gui/wxwindows/interface.cpp:545
-#, fuzzy
 msgid "Saturation"
-msgstr "Duur"
+msgstr "Verzadiging"
 
 #: modules/gui/wxwindows/interface.cpp:566
-#, fuzzy
 msgid "Video Options"
 msgstr "Audio Instellingen"
 
 #: modules/gui/wxwindows/interface.cpp:580
-#, fuzzy
 msgid "Ratio"
-msgstr "Beoordeling"
+msgstr "Verhouding"
 
 #: modules/gui/wxwindows/interface.cpp:597
-#, fuzzy
 msgid "Visualisation"
-msgstr "Navigatie"
+msgstr "Visualisatie effecten"
 
 #: modules/gui/wxwindows/interface.cpp:603 modules/gui/wxwindows/v4l.cpp:337
-#, fuzzy
 msgid "Audio Options"
 msgstr "Audio Instellingen"
 
 #: modules/gui/wxwindows/interface.cpp:742
 #: modules/gui/wxwindows/interface.cpp:820
 msgid "&Extended GUI"
-msgstr ""
+msgstr "Uitgebreide GUI"
 
 #: modules/gui/wxwindows/interface.cpp:743
 #: modules/gui/wxwindows/interface.cpp:822
@@ -6811,35 +6742,29 @@ msgid "About %s"
 msgstr "Over %s"
 
 #: modules/gui/wxwindows/iteminfo.cpp:87
-#, fuzzy
 msgid "Playlist Item options"
-msgstr "Afspeellijst element"
+msgstr "Afspeellijst element opties"
 
 #: modules/gui/wxwindows/iteminfo.cpp:147
-#, fuzzy
 msgid "Item informations"
-msgstr "print versie informatie"
+msgstr "Element informatie"
 
 #: modules/gui/wxwindows/iteminfo.cpp:158
-#, fuzzy
 msgid "URI"
-msgstr "URL"
+msgstr "URI"
 
 #: modules/gui/wxwindows/iteminfo.cpp:218
-#, fuzzy
 msgid "Group Info"
-msgstr "Groep"
+msgstr "Groep Informatie"
 
 #: modules/gui/wxwindows/iteminfo.cpp:225
-#, fuzzy
 msgid "Item enabled"
-msgstr " (standaard)"
+msgstr "Element beschikbaar"
 
 #: modules/gui/wxwindows/iteminfo.cpp:246
 #: modules/gui/wxwindows/playlist.cpp:1022
-#, fuzzy
 msgid "New Group"
-msgstr "Groep"
+msgstr "Nieuwe Groep"
 
 #: modules/gui/wxwindows/menus.cpp:93
 msgid "Simple &Open ..."
@@ -6858,9 +6783,8 @@ msgid "Input menu"
 msgstr "Input menu"
 
 #: modules/gui/wxwindows/menus.cpp:197
-#, fuzzy
 msgid "Interface menu"
-msgstr "Interface module"
+msgstr "Interface menu"
 
 #: modules/gui/wxwindows/menus.cpp:424 modules/gui/wxwindows/menus.cpp:451
 msgid "Empty"
@@ -6880,15 +6804,17 @@ msgid ""
 "Alternatively, the field will be filled automatically when you use the "
 "controls below."
 msgstr ""
+"Dit veld kan direct gebruikt worden door handmatig de MRL in te tikken.\n"
+"Bij het gebruik van de bedieningselementen hier beneden wordt hij "
+"automatisch ingevuld."
 
 #: modules/gui/wxwindows/open.cpp:284
 msgid "Use VLC as a stream server"
 msgstr "Gebruik VLC als stream server"
 
 #: modules/gui/wxwindows/open.cpp:324
-#, fuzzy
 msgid "Video For Linux"
-msgstr "Video menu"
+msgstr "Video For Linux"
 
 #: modules/gui/wxwindows/open.cpp:431 modules/gui/wxwindows/subtitles.cpp:84
 msgid "Subtitles file"
@@ -6910,47 +6836,43 @@ msgstr "CD Audio"
 
 #: modules/gui/wxwindows/open.cpp:615
 msgid "WebCam"
-msgstr ""
+msgstr "WebCam"
 
 #: modules/gui/wxwindows/open.cpp:616
 msgid "TV Card"
-msgstr ""
+msgstr "TV Kaart"
 
 #: modules/gui/wxwindows/open.cpp:617
 msgid "PVR"
-msgstr ""
+msgstr "PVR"
 
 #: modules/gui/wxwindows/open.cpp:618
 msgid "Kfir"
-msgstr ""
+msgstr "Kfir"
 
 #: modules/gui/wxwindows/open.cpp:622
-#, fuzzy
 msgid "Video Device Type"
-msgstr "Video apparaat"
+msgstr "Soort Video Apparaat"
 
 #: modules/gui/wxwindows/open.cpp:632
-#, fuzzy
 msgid "Video Device"
-msgstr "Video apparaat"
+msgstr "Video Apparaat"
 
 #: modules/gui/wxwindows/open.cpp:636
 msgid "Device corresponding to your acquisition card or your webcam"
-msgstr ""
+msgstr "Te gebruiken webcam of videocapture kaart"
 
 #: modules/gui/wxwindows/open.cpp:641 modules/gui/wxwindows/v4l.cpp:356
-#, fuzzy
 msgid "Channel"
 msgstr "Kanalen"
 
 #: modules/gui/wxwindows/open.cpp:643
 msgid "Usually 0 is for tuner, 1 for composite and 2 for svideo"
-msgstr ""
+msgstr "Meestal is 0 voor de tuner, 1 voor composite en 2 voor svideo"
 
 #: modules/gui/wxwindows/open.cpp:651
-#, fuzzy
 msgid "Advanced Settings..."
-msgstr "Toon geavanceerde opties"
+msgstr "Geavanceerde Instellingen..."
 
 #: modules/gui/wxwindows/playlist.cpp:171
 msgid "&Simple Add..."
@@ -6973,49 +6895,40 @@ msgid "&Close"
 msgstr "S&luit"
 
 #: modules/gui/wxwindows/playlist.cpp:181
-#, fuzzy
 msgid "Sort by &title"
-msgstr "Sorteer op Pad"
+msgstr "Sorteer op titel"
 
 #: modules/gui/wxwindows/playlist.cpp:182
-#, fuzzy
 msgid "&Reverse sort by title"
-msgstr "Server poort"
+msgstr "Sorteer op titel (inverse)"
 
 #: modules/gui/wxwindows/playlist.cpp:184
-#, fuzzy
 msgid "Sort by &author"
-msgstr "Sorteer op Pad"
+msgstr "Sorteer op auteur"
 
 #: modules/gui/wxwindows/playlist.cpp:185
-#, fuzzy
 msgid "&Reverse sort by author"
-msgstr "Server poort"
+msgstr "Sorteer op auteur (inverse)"
 
 #: modules/gui/wxwindows/playlist.cpp:187
-#, fuzzy
 msgid "Sort by &group"
-msgstr "Sorteer op Naam"
+msgstr "Sorteer op Groep"
 
 #: modules/gui/wxwindows/playlist.cpp:188
-#, fuzzy
 msgid "&Reverse sort by group"
-msgstr "Server poort"
+msgstr "Sorteer op Groep (inverse)"
 
 #: modules/gui/wxwindows/playlist.cpp:190
-#, fuzzy
 msgid "&Randomize Playlist"
-msgstr "Bewaar speellijst"
+msgstr "Shuffle Afspeellijst"
 
 #: modules/gui/wxwindows/playlist.cpp:194
-#, fuzzy
 msgid "&Enable"
-msgstr "Schakel video in"
+msgstr "Activeer"
 
 #: modules/gui/wxwindows/playlist.cpp:195
-#, fuzzy
 msgid "&Disable"
-msgstr "Geen"
+msgstr "Deactiveer"
 
 #: modules/gui/wxwindows/playlist.cpp:197
 msgid "&Invert"
@@ -7030,101 +6943,89 @@ msgid "&Select All"
 msgstr "Alles &selecteren"
 
 #: modules/gui/wxwindows/playlist.cpp:203
-#, fuzzy
 msgid "&Enable all group items"
-msgstr "Verwijder allen"
+msgstr "Schakel alle elementen in de groep in"
 
 #: modules/gui/wxwindows/playlist.cpp:205
-#, fuzzy
 msgid "&Disable all group items"
-msgstr "Verwijder allen"
+msgstr "Schakel alle elementen in de groep uit"
 
 #: modules/gui/wxwindows/playlist.cpp:209
 msgid "&Manage"
 msgstr "&Manage"
 
 #: modules/gui/wxwindows/playlist.cpp:210
-#, fuzzy
 msgid "S&ort"
-msgstr "Poort"
+msgstr "Sorteer"
 
 #: modules/gui/wxwindows/playlist.cpp:211
 msgid "&Selection"
 msgstr "&Selectie"
 
 #: modules/gui/wxwindows/playlist.cpp:212
-#, fuzzy
 msgid "&Groups"
-msgstr "Groep"
+msgstr "Groepen"
 
 #: modules/gui/wxwindows/playlist.cpp:231
 msgid "Loop"
-msgstr "Herhaal"
+msgstr "Herhaal Alles"
 
 #: modules/gui/wxwindows/playlist.cpp:238
-#, fuzzy
 msgid "Repeat one"
-msgstr "Repeteertijd"
+msgstr "Herhaal"
 
 #: modules/gui/wxwindows/playlist.cpp:272
 msgid "Up"
-msgstr ""
+msgstr "Naar Boven"
 
 #: modules/gui/wxwindows/playlist.cpp:275
 msgid "Down"
-msgstr ""
+msgstr "Naar Beneden"
 
 #: modules/gui/wxwindows/playlist.cpp:279
-#, fuzzy
 msgid "Item Infos"
-msgstr "Codec Info"
+msgstr "Info voor Elementen"
 
 #: modules/gui/wxwindows/playlist.cpp:531
 msgid "Save playlist"
 msgstr "Bewaar speellijst"
 
 #: modules/gui/wxwindows/playlist.cpp:1036
-#, fuzzy
 msgid "Enter the name for the new group"
-msgstr "Zet de afmetingen van de te verkleinen zone"
+msgstr "Voer de naam in voor de nieuwe groep"
 
 #: modules/gui/wxwindows/preferences.cpp:207
 msgid "Advanced options"
-msgstr "Toon geavanceerde opties"
+msgstr "Geavanceerde opties"
 
 #: modules/gui/wxwindows/preferences.cpp:278
 msgid "Reset config file"
 msgstr "Standaardwaarden"
 
 #: modules/gui/wxwindows/preferences.cpp:370
-#, fuzzy
 msgid "General Settings"
-msgstr "_Instellingen"
+msgstr "Algemene Instellingen"
 
 #: modules/gui/wxwindows/preferences_widgets.cpp:238
-#, fuzzy
 msgid "Alt"
-msgstr "Allemaal"
+msgstr "Alt"
 
 #: modules/gui/wxwindows/preferences_widgets.cpp:240
-#, fuzzy
 msgid "Ctrl"
-msgstr "Bediening"
+msgstr "Ctrl"
 
 #: modules/gui/wxwindows/preferences_widgets.cpp:404
 #: modules/gui/wxwindows/preferences_widgets.cpp:593
 msgid "Refresh"
-msgstr ""
+msgstr "Ververs"
 
 #: modules/gui/wxwindows/preferences_widgets.cpp:509
-#, fuzzy
 msgid "Choose Directory"
-msgstr "Bronmap"
+msgstr "Kies map"
 
 #: modules/gui/wxwindows/preferences_widgets.cpp:518
-#, fuzzy
 msgid "Choose File"
-msgstr "Kies een titel"
+msgstr "Kies Bestand"
 
 #: modules/gui/wxwindows/streamout.cpp:166
 msgid "Stream output MRL"
@@ -7140,6 +7041,9 @@ msgid ""
 "Alternatively, the field will be filled automatically when you use the "
 "controls below"
 msgstr ""
+"Dit veld kan direct gebruikt worden door handmatig de MRL in te tikken.\n"
+"Bij het gebruik van de bedieningselementen hier beneden wordt hij "
+"automatisch ingevuld."
 
 #: modules/gui/wxwindows/streamout.cpp:409
 msgid "Output Methods"
@@ -7158,9 +7062,8 @@ msgid "SAP Announce"
 msgstr "SAP Aankondigingen"
 
 #: modules/gui/wxwindows/streamout.cpp:534
-#, fuzzy
 msgid "SLP Announce"
-msgstr "SAP Aankondigingen"
+msgstr "SLP Aankondigingen"
 
 #: modules/gui/wxwindows/streamout.cpp:616
 msgid "Transcoding options"
@@ -7171,9 +7074,8 @@ msgid "Video codec"
 msgstr "Video codec"
 
 #: modules/gui/wxwindows/streamout.cpp:679
-#, fuzzy
 msgid "Scale"
-msgstr "Satelliet"
+msgstr "Vergroting"
 
 #: modules/gui/wxwindows/streamout.cpp:728
 msgid "Audio codec"
@@ -7185,44 +7087,39 @@ msgstr "Bewaar bestand"
 
 #: modules/gui/wxwindows/streamwizard.cpp:40
 msgid "Stream with VLC in three steps"
-msgstr ""
+msgstr "Stream met VLC in drie stappen"
 
 #: modules/gui/wxwindows/streamwizard.cpp:41
-#, fuzzy
 msgid "Step 1: Select what to stream"
-msgstr "Selecteer een Netwerk Stream"
+msgstr "Stap 1: Selecteer wat te streamen"
 
 #: modules/gui/wxwindows/streamwizard.cpp:42
 msgid "Step 2: Define streaming method"
-msgstr ""
+msgstr "Stap 2: Definieer streaming methode"
 
 #: modules/gui/wxwindows/streamwizard.cpp:43
-#, fuzzy
 msgid "Step 3: Start streaming"
-msgstr "Selecteer een Netwerk Stream"
+msgstr "Stap 3: Start met streamen"
 
 #: modules/gui/wxwindows/streamwizard.cpp:105
 msgid "Open..."
 msgstr "Open..."
 
 #: modules/gui/wxwindows/streamwizard.cpp:108
-#, fuzzy
 msgid "Choose..."
-msgstr "Blader..."
+msgstr "Kies..."
 
 #: modules/gui/wxwindows/streamwizard.cpp:111
-#, fuzzy
 msgid "Start !"
-msgstr "Sat"
+msgstr "Start !"
 
 #: modules/gui/wxwindows/subtitles.cpp:67
 msgid "Open Subtitles File"
-msgstr "Open bestand met ondertitels"
+msgstr "Open Bestand met Ondertitels"
 
 #: modules/gui/wxwindows/subtitles.cpp:107
-#, fuzzy
 msgid "Subtitles encoding"
-msgstr "tekstcodering van de ondertiteling"
+msgstr "Tekstcodering van de ondertiteling"
 
 #: modules/gui/wxwindows/subtitles.cpp:139
 msgid "Subtitles options"
@@ -7243,21 +7140,18 @@ msgstr ""
 "ondertiteling."
 
 #: modules/gui/wxwindows/v4l.cpp:107
-#, fuzzy
 msgid "Video Device Advanced Options"
-msgstr "Toon geavanceerde opties"
+msgstr "Geavanceerde Opties Video Apparaat"
 
 #: modules/gui/wxwindows/v4l.cpp:122
-#, fuzzy
 msgid "Video Device MRL"
-msgstr "Video apparaat"
+msgstr "MRL Video Apparaat"
 
 #: modules/gui/wxwindows/v4l.cpp:248
 msgid "Common Options"
-msgstr ""
+msgstr "Algemene Opties"
 
 #: modules/gui/wxwindows/v4l.cpp:291
-#, fuzzy
 msgid "Norm"
 msgstr "Normaal"
 
@@ -7267,31 +7161,27 @@ msgstr ""
 
 #: modules/gui/wxwindows/v4l.cpp:308
 msgid "The frequency in kHz"
-msgstr ""
+msgstr "De frequentie in kHz"
 
 #: modules/gui/wxwindows/v4l.cpp:350
-#, fuzzy
 msgid "Audio Device"
-msgstr "Audio apparaat"
+msgstr "Audio Apparaat"
 
 #: modules/gui/wxwindows/v4l.cpp:359
 msgid "Usually 0 is for mono and 1 for stereo"
-msgstr ""
+msgstr "Normaal gesproken is 0 mono en 1 stereo geluid"
 
 #: modules/gui/wxwindows/v4l.cpp:389
-#, fuzzy
 msgid "Bitrate Options"
-msgstr "Bitrate (bps)"
+msgstr "Bitrate Opties"
 
 #: modules/gui/wxwindows/v4l.cpp:403
-#, fuzzy
 msgid "The average bitrate of the stream"
-msgstr "Navigeer door de stream"
+msgstr "De gemiddelde bitrate van de stream"
 
 #: modules/gui/wxwindows/v4l.cpp:411
-#, fuzzy
 msgid "Maximum Bitrate"
-msgstr "Audio Bitrate"
+msgstr "Maximale Bitrate"
 
 #: modules/gui/wxwindows/wxwindows.cpp:85
 msgid "wxWindows interface module"
@@ -7316,16 +7206,15 @@ msgstr ""
 
 #: modules/misc/dummy/dummy.c:43
 msgid "Save raw codec data"
-msgstr ""
+msgstr "Sla de ruwe codec data op"
 
 #: modules/misc/dummy/dummy.c:45
-#, fuzzy
 msgid ""
 "This option allows you to save the raw codec data if you have selected/"
 "forced the dummy decoder in the main options."
 msgstr ""
-"Vertraag de audio output, deze optie is handig als audio en video niet "
-"synchroon lopen."
+"Met deze optie kan de ruwe codec data worden opgeslagen indien de dummy "
+"interface is geselecteerd in de algemene opties."
 
 #: modules/misc/dummy/dummy.c:49
 msgid "Don't open a dos command box interface"
@@ -7358,17 +7247,16 @@ msgid "dummy decoder function"
 msgstr "dummy decoder functie"
 
 #: modules/misc/dummy/dummy.c:80
-#, fuzzy
 msgid "dummy encoder function"
-msgstr "dummy decoder functie"
+msgstr "dummy encoder functie"
 
 #: modules/misc/dummy/dummy.c:84
 msgid "dummy audio output function"
-msgstr "dummy audio output functie"
+msgstr "dummy audio uitvoer functie"
 
 #: modules/misc/dummy/dummy.c:88
 msgid "dummy video output function"
-msgstr "dummy video output functie"
+msgstr "dummy video uitvoer functie"
 
 #: modules/misc/dummy/dummy.c:94
 msgid "dummy font renderer function"
@@ -7384,18 +7272,20 @@ msgstr "Lettertype"
 
 #: modules/misc/freetype.c:95
 msgid "Filename of Font"
-msgstr "Bestandsnaam van Lettertype"
+msgstr "Bestandsnaam van lettertype"
 
 #: modules/misc/freetype.c:96
-#, fuzzy
 msgid "Font size in pixels"
-msgstr "Lettertype grootte"
+msgstr "Lettertype grootte in pixels"
 
 #: modules/misc/freetype.c:97
 msgid ""
 "The size of the fonts used by the osd module. If  set to something different "
 "than 0 this option will override the relative font size "
 msgstr ""
+"De grootte van de lettertypen die zal worden gebruikt voor de OSD module. "
+"Indien deze optie ongelijk is aan 0 zal deze waarde en niet de  de relatieve "
+"lettertype grootte worden gebruikt."  
 
 #: modules/misc/freetype.c:99
 msgid "Font size"
@@ -7407,28 +7297,24 @@ msgstr ""
 "De grootte van de lettertypen die zal worden gebruikt voor de OSD module"
 
 #: modules/misc/freetype.c:103
-#, fuzzy
 msgid "Smaller"
-msgstr "Satelliet"
+msgstr "Kleiner"
 
 #: modules/misc/freetype.c:103
 msgid "Small"
-msgstr ""
+msgstr "Klein"
 
 #: modules/misc/freetype.c:103
-#, fuzzy
 msgid "Normal"
 msgstr "Normaal"
 
 #: modules/misc/freetype.c:104
-#, fuzzy
 msgid "Large"
-msgstr "Taal"
+msgstr "Groot"
 
 #: modules/misc/freetype.c:104
-#, fuzzy
 msgid "Larger"
-msgstr "Laag"
+msgstr "Groter"
 
 #: modules/misc/freetype.c:107
 msgid "Fonts"
@@ -7447,13 +7333,12 @@ msgid "HTTP 1.0 daemon"
 msgstr "HTTP 1.0 server"
 
 #: modules/misc/logger/logger.c:85
-#, fuzzy
 msgid "Text"
-msgstr "Volgende"
+msgstr "Tekst"
 
 #: modules/misc/logger/logger.c:85
 msgid "Html"
-msgstr ""
+msgstr "Html"
 
 #: modules/misc/logger/logger.c:87
 msgid "Log format"
@@ -7512,13 +7397,15 @@ msgstr "IPv6 network abstractie laag"
 
 #: modules/misc/qte_main.cpp:66
 msgid "Run as standalone Qt/Embedded Gui Server"
-msgstr ""
+msgstr "Draai als standalone Qt/Embedded GUI server"
 
 #: modules/misc/qte_main.cpp:67
 msgid ""
 "Use this option to run as standalone Qt/Embedded Gui Server. This option is "
 "equivalent to the -qws option from normal Qt."
 msgstr ""
+"Gebruik deze optie om als standalone Qt/Embedded GUI server te draaien. Deze "
+"optie is gelijk aan de -qws optie bij normaal Qt."
 
 #: modules/misc/qte_main.cpp:71
 msgid "Qt Embedded GUI helper"
@@ -7529,23 +7416,20 @@ msgid "SAP multicast address"
 msgstr "SAP multicast adres"
 
 #: modules/misc/sap.c:89
-#, fuzzy
 msgid "IPv4-SAP listening"
-msgstr "Luister naar IPv6 SAP"
+msgstr "Luister naar IPv4 SAP"
 
 #: modules/misc/sap.c:91
-#, fuzzy
 msgid "Set this if you want the SAP module to listen to IPv4 announces"
-msgstr "Selecteer dit als u wilt luisteren naar IPv6 SAP verkondigen"
+msgstr "Selecteer dit als de SAP module naar IPv4 aankondigen moet luisteren"
 
 #: modules/misc/sap.c:92
 msgid "IPv6-SAP listening"
 msgstr "Luister naar IPv6 SAP"
 
 #: modules/misc/sap.c:94
-#, fuzzy
 msgid "Set this if you want the SAP module to listen to IPv6 announces"
-msgstr "Selecteer dit als u wilt luisteren naar IPv6 SAP verkondigen"
+msgstr "Selecteer dit als de SAP module naar IPv6 aankondigen moet luisteren"
 
 #: modules/misc/sap.c:95
 msgid "IPv6 SAP scope"
@@ -7576,18 +7460,16 @@ msgid "Miscellaneous stress tests"
 msgstr "Verschillende stress tests"
 
 #: modules/mux/asf.c:42
-#, fuzzy
 msgid "Asf muxer"
-msgstr "Avi muxer"
+msgstr "Asf muxer"
 
 #: modules/mux/avi.c:44
 msgid "Avi muxer"
 msgstr "Avi muxer"
 
 #: modules/mux/dummy.c:43
-#, fuzzy
 msgid "Dummy/Raw muxer"
-msgstr "Dummy muxer"
+msgstr "Dummy/Raw muxer"
 
 #: modules/mux/mp4.c:56
 msgid "MP4/MOV muxer"
@@ -7642,14 +7524,12 @@ msgid "ES stream"
 msgstr "ES stream"
 
 #: modules/stream_out/gather.c:40
-#, fuzzy
 msgid "Gather stream"
-msgstr "Pauzeer stream"
+msgstr "Voeg streams samen"
 
 #: modules/stream_out/rtp.c:43
-#, fuzzy
 msgid "RTP stream"
-msgstr "Start stream"
+msgstr "RTP stream"
 
 #: modules/stream_out/standard.c:51
 msgid "Standard stream"
@@ -7660,9 +7540,8 @@ msgid "Transcode stream"
 msgstr "Transcode stream"
 
 #: modules/stream_out/transrate/transrate.c:61
-#, fuzzy
 msgid "Transrate stream"
-msgstr "Transcode stream"
+msgstr "Transrate stream"
 
 #: modules/video_chroma/i420_rgb.c:67
 msgid "I420,IYUV,YV12 to RGB2,RV15,RV16,RV24,RV32 conversions"
@@ -7766,6 +7645,8 @@ msgid ""
 "Set the geometry of the zone to crop. This is set as width x heigth + left "
 "offset + top offset."
 msgstr ""
+"Stel de uit te knippen zone in. Dit is gespecificeerd als breedte x hoogte + "
+"afstand van linkerkant + afstand van boven."
 
 #: modules/video_filter/crop.c:57
 msgid "Automatic cropping"
@@ -7773,7 +7654,7 @@ msgstr "Automatische verkleining"
 
 #: modules/video_filter/crop.c:58
 msgid "Activate automatic black border cropping"
-msgstr "Activeer automatische een zwarte rand verkleining"
+msgstr "Activeer de automatische zwarte rand verkleining"
 
 #: modules/video_filter/crop.c:64
 msgid "crop video filter"
@@ -7781,14 +7662,13 @@ msgstr "verklein video filter"
 
 #: modules/video_filter/deinterlace/deinterlace.c:75
 msgid "Deinterlace mode"
-msgstr "Deinterface mode"
+msgstr "Deinterface methode"
 
 #: modules/video_filter/deinterlace/deinterlace.c:76
 msgid "You can choose the default deinterlace mode"
-msgstr "U kunt de te gebruiken deinterlace mode kiezen"
+msgstr "U kunt de te gebruiken deinterlace methode kiezen"
 
 #: modules/video_filter/deinterlace/deinterlace.c:79
-#, fuzzy
 msgid "discard"
 msgstr "Discard"
 
@@ -7798,29 +7678,27 @@ msgstr "deinterlacing video filter"
 
 #: modules/video_filter/distort.c:59
 msgid "Distort mode"
-msgstr "Distort mode"
+msgstr "Verstorings methode"
 
 #: modules/video_filter/distort.c:60
 msgid "Distort mode, one of \"wave\" and \"ripple\""
-msgstr "Distort mode, een van \"wave\" en \"ripple\""
+msgstr "Verstorings methode, of \"wave\" of \"ripple\""
 
 #: modules/video_filter/distort.c:63
-#, fuzzy
 msgid "Wave"
-msgstr "Rave"
+msgstr "Golven"
 
 #: modules/video_filter/distort.c:63
-#, fuzzy
 msgid "Ripple"
-msgstr "Bestand"
+msgstr "Rimpelingen"
 
 #: modules/video_filter/distort.c:66
 msgid "Distort"
-msgstr "Distort"
+msgstr "Verstoring"
 
 #: modules/video_filter/distort.c:70
 msgid "miscellaneous distort video effects filter"
-msgstr "overige distort video effecten filter"
+msgstr "verstoringen video effecten filter"
 
 #: modules/video_filter/invert.c:52
 msgid "invert video filter"
@@ -7831,7 +7709,6 @@ msgid "Logo File"
 msgstr "Logo Bestand"
 
 #: modules/video_filter/logo.c:59
-#, fuzzy
 msgid "The file must in PNG RGBA 8bits format (for now)"
 msgstr "Dit moet een PNG in 8 bits RGBA waarden zijn (voorlopig)"
 
@@ -7879,7 +7756,7 @@ msgstr "motion blur filter"
 
 #: modules/video_filter/transform.c:57
 msgid "Transform type"
-msgstr "Transform type"
+msgstr "Transformatie type"
 
 #: modules/video_filter/transform.c:58
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
@@ -7887,25 +7764,23 @@ msgstr "Een van '90', '180', '270', 'hflip' en 'vflip'"
 
 #: modules/video_filter/transform.c:61
 msgid "Rotate by 90 degrees"
-msgstr ""
+msgstr "Draai 90 graden"
 
 #: modules/video_filter/transform.c:62
 msgid "Rotate by 180 degrees"
-msgstr ""
+msgstr "Draai 180 graden"
 
 #: modules/video_filter/transform.c:62
 msgid "Rotate by 270 degrees"
-msgstr ""
+msgstr "Draai 270 graden"
 
 #: modules/video_filter/transform.c:63
-#, fuzzy
 msgid "Flip horizontally"
-msgstr "Horizontaal"
+msgstr "Keer Horizontaal om"
 
 #: modules/video_filter/transform.c:63
-#, fuzzy
 msgid "Flip vertically"
-msgstr "Roteer vertikaal"
+msgstr "Keer vertikaal om"
 
 #: modules/video_filter/transform.c:70
 msgid "video transformation filter"
@@ -7948,50 +7823,43 @@ msgstr "videowall filter"
 
 #: modules/video_output/aa.c:55
 msgid "ASCII-art video output"
-msgstr "ASCII-art video output"
+msgstr "video uitvoer in ASCII karakters"
 
 #: modules/video_output/caca.c:53
-#, fuzzy
 msgid "dithering mode"
-msgstr "Distort mode"
+msgstr "Dithering methode"
 
 #: modules/video_output/caca.c:54
 msgid "Choose the libcaca dithering mode"
-msgstr ""
+msgstr "Kies de dithering methode voor libcaca"
 
 #: modules/video_output/caca.c:61
 msgid "No dithering"
-msgstr ""
+msgstr "Geen dithering"
 
 #: modules/video_output/caca.c:62
-#, fuzzy
 msgid "2x2 ordered dithering"
-msgstr "Direct renderen"
+msgstr "2x2 geordende dithering"
 
 #: modules/video_output/caca.c:63
-#, fuzzy
 msgid "4x4 ordered dithering"
-msgstr "Direct renderen"
+msgstr "4x4 geordende dithering"
 
 #: modules/video_output/caca.c:64
-#, fuzzy
 msgid "8x8 ordered dithering"
-msgstr "Direct renderen"
+msgstr "8x8 geordende dithering"
 
 #: modules/video_output/caca.c:65
-#, fuzzy
 msgid "Random dithering"
-msgstr "Shuffle"
+msgstr "Willekeurige dithering"
 
 #: modules/video_output/caca.c:68
-#, fuzzy
 msgid "Dithering"
-msgstr "tekst"
+msgstr "Dithering"
 
 #: modules/video_output/caca.c:72
-#, fuzzy
 msgid "colour ASCII art video output"
-msgstr "ASCII-art video output"
+msgstr "video uitvoer in gekleurde ASCII karakters"
 
 #: modules/video_output/directx/directx.c:103
 msgid "Use hardware YUV->RGB conversions"
@@ -8188,41 +8056,40 @@ msgid "XVideo extension video output"
 msgstr "XVideo extensie video uitvoer"
 
 #: modules/visualization/goom.c:50
-#, fuzzy
 msgid "goom effect"
-msgstr "scope effect"
+msgstr "goom effect"
 
 #: modules/visualization/scope/scope.c:65
 msgid "scope effect"
 msgstr "scope effect"
 
 #: modules/visualization/visual/visual.c:38
-#, fuzzy
 msgid "Effects list"
-msgstr "Verwijder schijf"
+msgstr "Lijst van effecten"
 
 #: modules/visualization/visual/visual.c:40
 msgid ""
 "A list of visual effect, separated by commas.\n"
 "Current effects include: dummy, random, scope, spectrum"
 msgstr ""
+"Een lijst met visuele effecten gescheiden door comma's.\n"
+"Huidige effecten zijn: dummy, random, scope, spectrum"
 
 #: modules/visualization/visual/visual.c:45
 msgid "The width of the effects video window, in pixels."
-msgstr ""
+msgstr "De breedte van het venster van de effecten in pixels"
 
 #: modules/visualization/visual/visual.c:49
 msgid "The height of the effects video window, in pixels."
-msgstr ""
+msgstr "De hoogte van het venster van de effecten in pixels."
 
 #: modules/visualization/visual/visual.c:51
-#, fuzzy
 msgid "Number of bands"
-msgstr "Aantal klonen"
+msgstr "Aantal banden"
 
 #: modules/visualization/visual/visual.c:53
 msgid "Number of bands used by spectrum analyzer, should be 20 or 80"
-msgstr ""
+msgstr "Aantal strepen dat de spectrum analyzer (20 of 80)"
 
 #: modules/visualization/visual/visual.c:55
 msgid "Band separator"
@@ -8230,42 +8097,39 @@ msgstr ""
 
 #: modules/visualization/visual/visual.c:57
 msgid "Number of blank pixels between bands"
-msgstr ""
+msgstr "Aantal blanko pieken tussen de banden."
 
 #: modules/visualization/visual/visual.c:59
 msgid "Amplification"
-msgstr ""
+msgstr "Versterking"
 
 #: modules/visualization/visual/visual.c:61
 msgid "This is a coefficient that modifies the height of the bands"
-msgstr ""
+msgstr "Dit is de waarde die de hoogte van de banden bepaald"
 
 #: modules/visualization/visual/visual.c:63
-#, fuzzy
 msgid "Enable peaks"
-msgstr "Schakel video in"
+msgstr "Schakel pieken in"
 
 #: modules/visualization/visual/visual.c:65
 msgid "Defines whether to draw peaks"
-msgstr ""
+msgstr "Bepaald of er pieken moeten worden getekend."
 
 #: modules/visualization/visual/visual.c:67
-#, fuzzy
 msgid "Number of stars"
-msgstr "Aantal streams"
+msgstr "Aantal sterren"
 
 #: modules/visualization/visual/visual.c:69
 msgid "Defines the number of stars to draw with random effect"
-msgstr ""
+msgstr "Het aantal te tekenen sterren bij het random effect"
 
 #: modules/visualization/visual/visual.c:75
 msgid "visualizer"
-msgstr ""
+msgstr "visuele effecten"
 
 #: modules/visualization/visual/visual.c:76
-#, fuzzy
 msgid "visualizer filter"
-msgstr "videowall filter"
+msgstr "visuele effecten filter"
 
 #: modules/visualization/xosd/xosd.c:61
 msgid "Flip vertical position"
