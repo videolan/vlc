@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.39 2003/05/27 13:22:45 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.40 2003/05/30 17:30:54 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -283,12 +283,20 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     /* Add the Speed menu */
     fSpeedMenu = new BMenu( _("Speed") );
     fSpeedMenu->SetRadioMode( true );
-    fSpeedMenu->AddItem( fSlowerMI = new BMenuItem( _("Slower"), new BMessage( SLOWER_PLAY ) ) );
-    fNormalMI = new BMenuItem( _("Normal"), new BMessage( NORMAL_PLAY ) );
-    fNormalMI->SetMarked(true); // default to normal speed
-    fSpeedMenu->AddItem( fNormalMI );
-    fSpeedMenu->AddItem( fFasterMI = new BMenuItem( _("Faster"), new BMessage( FASTER_PLAY) ) );
-    fSpeedMenu->SetTargetForItems( this );
+    fSpeedMenu->AddItem(
+        fHeighthMI = new BMenuItem( "1/8x", new BMessage( HEIGHTH_PLAY ) ) );
+    fSpeedMenu->AddItem(
+        fQuarterMI = new BMenuItem( "1/4x", new BMessage( QUARTER_PLAY ) ) );
+    fSpeedMenu->AddItem(
+        fHalfMI = new BMenuItem( "1/2x", new BMessage( HALF_PLAY ) ) );
+    fSpeedMenu->AddItem(
+        fNormalMI = new BMenuItem( "1x", new BMessage( NORMAL_PLAY ) ) );
+    fSpeedMenu->AddItem(
+        fTwiceMI = new BMenuItem( "2x", new BMessage( TWICE_PLAY ) ) );
+    fSpeedMenu->AddItem(
+        fFourMI = new BMenuItem( "4x", new BMessage( FOUR_PLAY ) ) );
+    fSpeedMenu->AddItem(
+        fHeightMI = new BMenuItem( "8x", new BMessage( HEIGHT_PLAY ) ) );
     fMenuBar->AddItem( fSpeedMenu );
 
     /* Add the Show menu */
@@ -436,30 +444,34 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             }    
             break;
     
-        case FASTER_PLAY:
-            /* cycle the fast playback modes */
-            if (playback_status > UNDEF_S)
-            {
-                p_wrapper->InputFaster();
-            }
+        case HEIGHTH_PLAY:
+            p_wrapper->InputSetRate( DEFAULT_RATE * 8 );
             break;
-    
-        case SLOWER_PLAY:
-            /*  cycle the slow playback modes */
-            if (playback_status > UNDEF_S)
-            {
-                p_wrapper->InputSlower();
-            }
+
+        case QUARTER_PLAY:
+            p_wrapper->InputSetRate( DEFAULT_RATE * 4 );
             break;
-    
+
+        case HALF_PLAY:
+            p_wrapper->InputSetRate( DEFAULT_RATE * 2 );
+            break;
+
         case NORMAL_PLAY:
-            /*  restore speed to normal if already playing */
-            if (playback_status > UNDEF_S)
-            {
-                p_wrapper->PlaylistPlay();
-            }
+            p_wrapper->InputSetRate( DEFAULT_RATE );
             break;
-    
+
+        case TWICE_PLAY:
+            p_wrapper->InputSetRate( DEFAULT_RATE / 2 );
+            break;
+
+        case FOUR_PLAY:
+            p_wrapper->InputSetRate( DEFAULT_RATE / 4 );
+            break;
+
+        case HEIGHT_PLAY:
+            p_wrapper->InputSetRate( DEFAULT_RATE / 8 );
+            break;
+
         case SEEK_PLAYBACK:
             /* handled by semaphores */
             break;
@@ -860,32 +872,41 @@ InterfaceWindow::_SetMenusEnabled(bool hasFile, bool hasChapters, bool hasTitles
 void
 InterfaceWindow::_UpdateSpeedMenu( int rate )
 {
-    if ( rate == DEFAULT_RATE )
+    BMenuItem * toMark = NULL;
+    
+    switch( rate )
     {
-        if ( !fNormalMI->IsMarked() )
-            fNormalMI->SetMarked( true );
+        case ( DEFAULT_RATE * 8 ):
+            toMark = fHeighthMI;
+            break;
+            
+        case ( DEFAULT_RATE * 4 ):
+            toMark = fQuarterMI;
+            break;
+            
+        case ( DEFAULT_RATE * 2 ):
+            toMark = fHalfMI;
+            break;
+            
+        case ( DEFAULT_RATE ):
+            toMark = fNormalMI;
+            break;
+            
+        case ( DEFAULT_RATE / 2 ):
+            toMark = fTwiceMI;
+            break;
+            
+        case ( DEFAULT_RATE / 4 ):
+            toMark = fFourMI;
+            break;
+            
+        case ( DEFAULT_RATE / 8 ):
+            toMark = fHeightMI;
+            break;
     }
-    else if ( rate < DEFAULT_RATE )
-    {
-        if ( !fFasterMI->IsMarked() )
-            fFasterMI->SetMarked( true );
-    }
-    else
-    {
-        if ( !fSlowerMI->IsMarked() )
-            fSlowerMI->SetMarked( true );
-    }
-}
 
-/*****************************************************************************
- * InterfaceWindow::_InputStreamChanged
- *****************************************************************************/
-void
-InterfaceWindow::_InputStreamChanged()
-{
-    // TODO: move more stuff from updateInterface() here!
-    snooze( 400000 );
-    p_wrapper->SetVolume( p_mediaControl->GetVolume() );
+    if ( !toMark->IsMarked() )
+        toMark->SetMarked( true );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.12 2003/05/03 13:37:21 titer Exp $
+ * $Id: Interface.cpp,v 1.13 2003/05/30 17:30:54 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -126,11 +126,11 @@ static void Run( intf_thread_t *p_intf )
 {
     while( !p_intf->b_die )
     {
-        if( p_intf->p_sys->p_wrapper->UpdateInput() )
-        {
-            /* Manage the slider */
-            p_intf->p_sys->p_window->UpdateInterface();
-        }
+        /* Update VlcWrapper internals (p_input, etc) */
+        p_intf->p_sys->p_wrapper->UpdateInput();
+        
+        /* Manage the slider */
+        p_intf->p_sys->p_window->UpdateInterface();
 
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );

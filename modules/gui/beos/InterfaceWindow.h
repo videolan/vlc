@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.13 2003/02/10 15:23:46 titer Exp $
+ * $Id: InterfaceWindow.h,v 1.14 2003/05/30 17:30:54 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -114,7 +114,6 @@ class InterfaceWindow : public BWindow
                                               bool hasChapters = false,
                                               bool hasTitles = false );
             void            _UpdateSpeedMenu( int rate );
-            void            _InputStreamChanged();
             void			_ShowFilePanel( uint32 command,
             								const char* windowTitle );
 			void			_RestoreSettings();
@@ -134,9 +133,13 @@ class InterfaceWindow : public BWindow
     BMenuItem*              fNextChapterMI;
     BMenuItem*              fPrevChapterMI;
     BMenuItem*              fOnTopMI;
-    BMenuItem*              fSlowerMI;
+    BMenuItem*              fHeighthMI;
+    BMenuItem*              fQuarterMI;
+    BMenuItem*              fHalfMI;
     BMenuItem*              fNormalMI;
-    BMenuItem*              fFasterMI;
+    BMenuItem*              fTwiceMI;
+    BMenuItem*              fFourMI;
+    BMenuItem*              fHeightMI;
     BMenu*                  fAudioMenu;
     BMenu*                  fNavigationMenu;
     BMenu*                  fTitleMenu;

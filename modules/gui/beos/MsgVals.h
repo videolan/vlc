@@ -2,23 +2,23 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.8 2003/05/08 10:40:31 titer Exp $
+ * $Id: MsgVals.h,v 1.9 2003/05/30 17:30:54 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation either version 2 of the License, or
  * (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * along with this program if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
@@ -28,49 +28,53 @@
 #define PLAYING       0
 #define PAUSED        1
 
-const uint32 OPEN_FILE          = 'opfl';
-const uint32 OPEN_DVD           = 'opdv';
-const uint32 LOAD_SUBFILE       = 'losu';
-const uint32 SUBFILE_RECEIVED   = 'sure';
-const uint32 OPEN_PLAYLIST      = 'oppl';
-const uint32 STOP_PLAYBACK      = 'stpl';
-const uint32 START_PLAYBACK     = 'play';
-const uint32 PAUSE_PLAYBACK     = 'papl';
-const uint32 FASTER_PLAY        = 'fapl';
-const uint32 SLOWER_PLAY        = 'slpl';
-const uint32 NORMAL_PLAY        = 'nrpl';
-const uint32 SEEK_PLAYBACK      = 'seek';
-const uint32 VOLUME_CHG         = 'voch';
-const uint32 VOLUME_MUTE        = 'mute';
-const uint32 SELECT_CHANNEL     = 'chan';
-const uint32 SELECT_SUBTITLE    = 'subt';
-const uint32 PREV_TITLE         = 'prti';
-const uint32 NEXT_TITLE         = 'nxti';
-const uint32 TOGGLE_TITLE       = 'tgti';
-const uint32 NAVIGATE_MENU      = 'navm';
-const uint32 PREV_CHAPTER       = 'prch';
-const uint32 NEXT_CHAPTER       = 'nxch';
-const uint32 TOGGLE_CHAPTER     = 'tgch';
-const uint32 PREV_FILE          = 'prfl';
-const uint32 NEXT_FILE          = 'nxfl';
-const uint32 NAVIGATE_PREV      = 'navp';    // could be chapter, title or file
-const uint32 NAVIGATE_NEXT      = 'navn';    // could be chapter, title or file
-const uint32 OPEN_PREFERENCES   = 'pref';
-const uint32 OPEN_MESSAGES      = 'mess';
-const uint32 TOGGLE_ON_TOP      = 'ontp';
-const uint32 SHOW_INTERFACE     = 'shin';
-const uint32 TOGGLE_FULL_SCREEN = 'tgfs';
-const uint32 RESIZE_50          = 'rshl';
-const uint32 RESIZE_100         = 'rsor';
-const uint32 RESIZE_200         = 'rsdb';
-const uint32 RESIZE_TRUE        = 'rstr';
-const uint32 ASPECT_CORRECT     = 'asco';
-const uint32 VERT_SYNC			= 'vsyn';
-const uint32 WINDOW_FEEL		= 'wfel';
-const uint32 SCREEN_SHOT		= 'scrn';
-const uint32 MSG_UPDATE			= 'updt';
-const uint32 MSG_SOUNDPLAY		= 'move';	// drag'n'drop from soundplay playlist
-const uint32 INTERFACE_CREATED  = 'ifcr';  /* see VlcApplication::MessageReceived()
+#define OPEN_FILE          'opfl'
+#define OPEN_DVD           'opdv'
+#define LOAD_SUBFILE       'losu'
+#define SUBFILE_RECEIVED   'sure'
+#define OPEN_PLAYLIST      'oppl'
+#define STOP_PLAYBACK      'stpl'
+#define START_PLAYBACK     'play'
+#define PAUSE_PLAYBACK     'papl'
+#define HEIGHTH_PLAY       'hhpl'
+#define QUARTER_PLAY       'qupl'
+#define HALF_PLAY          'hapl'
+#define NORMAL_PLAY        'nrpl'
+#define TWICE_PLAY         'twpl'
+#define FOUR_PLAY          'fopl'
+#define HEIGHT_PLAY        'hepl'
+#define SEEK_PLAYBACK      'seek'
+#define VOLUME_CHG         'voch'
+#define VOLUME_MUTE        'mute'
+#define SELECT_CHANNEL     'chan'
+#define SELECT_SUBTITLE    'subt'
+#define PREV_TITLE         'prti'
+#define NEXT_TITLE         'nxti'
+#define TOGGLE_TITLE       'tgti'
+#define NAVIGATE_MENU      'navm'
+#define PREV_CHAPTER       'prch'
+#define NEXT_CHAPTER       'nxch'
+#define TOGGLE_CHAPTER     'tgch'
+#define PREV_FILE          'prfl'
+#define NEXT_FILE          'nxfl'
+#define NAVIGATE_PREV      'navp'    // could be chapter, title or file
+#define NAVIGATE_NEXT      'navn'    // could be chapter, title or file
+#define OPEN_PREFERENCES   'pref'
+#define OPEN_MESSAGES      'mess'
+#define TOGGLE_ON_TOP      'ontp'
+#define SHOW_INTERFACE     'shin'
+#define TOGGLE_FULL_SCREEN 'tgfs'
+#define RESIZE_50          'rshl'
+#define RESIZE_100         'rsor'
+#define RESIZE_200         'rsdb'
+#define RESIZE_TRUE        'rstr'
+#define ASPECT_CORRECT     'asco'
+#define VERT_SYNC          'vsyn'
+#define WINDOW_FEEL        'wfel'
+#define SCREEN_SHOT        'scrn'
+#define MSG_UPDATE         'updt'
+#define MSG_SOUNDPLAY      'move'  // drag'n'drop from soundplay playlist
+#define INTERFACE_CREATED  'ifcr'  /* see VlcApplication::MessageReceived()
                                             * in src/misc/beos_specific.cpp */
 
 #endif    // BEOS_MESSAGE_VALUES_H

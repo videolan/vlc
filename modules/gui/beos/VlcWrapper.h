@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.23 2003/05/12 19:59:48 titer Exp $
+ * $Id: VlcWrapper.h,v 1.24 2003/05/30 17:30:54 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -66,14 +66,13 @@ public:
     VlcWrapper( intf_thread_t *p_intf );
     ~VlcWrapper();
     
-    bool UpdateInput();
+    void UpdateInput();
     
     /* Input */
     bool         HasInput();
     int          InputStatus();
     int          InputRate();
-    void         InputSlower();
-    void         InputFaster();
+    void         InputSetRate( int rate );
     BList *      GetChannels( int i_cat );
     void         ToggleLanguage( int i_language );
     void         ToggleSubtitle( int i_subtitle );

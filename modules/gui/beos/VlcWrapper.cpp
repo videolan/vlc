@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.30 2003/05/07 14:49:19 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.31 2003/05/30 17:30:54 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -33,7 +33,7 @@
 #include <vlc/vout.h>
 extern "C"
 {
-  #include <input_ext-plugins.h>	// needed here when compiling without plugins
+  #include <input_ext-plugins.h> // needed here when compiling without plugins
   #include <audio_output.h>
   #include <aout_internal.h>
 }
@@ -62,35 +62,25 @@ VlcWrapper::VlcWrapper( intf_thread_t *p_interface )
 VlcWrapper::~VlcWrapper()
 {
     if( p_input )
-    {
         vlc_object_release( p_input );
-    }
+
     if( p_playlist )
-    {
         vlc_object_release( p_playlist );
-    }
 }
 
-/* UpdateInput: updates p_input, returns true if the interface needs to
-   be updated */
-bool VlcWrapper::UpdateInput()
+/* UpdateInput: updates p_input */
+void VlcWrapper::UpdateInput()
 {
-    if( p_input == NULL )
-    {
+    if( !p_input )
         p_input = (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                      FIND_ANYWHERE );
-    }
         
-    if( p_input != NULL )
-    {
+    if( p_input )
         if( p_input->b_dead )
         {
             vlc_object_release( p_input );
             p_input = NULL;
         }
-        return true;
-    }
-    return false;
 }
 
 
@@ -106,34 +96,64 @@ bool VlcWrapper::HasInput()
 int VlcWrapper::InputStatus()
 {
     if( !p_input )
-    {
         return UNDEF_S;
-    }
+    
     return p_input->stream.control.i_status;
 }
 
 int VlcWrapper::InputRate()
 {
     if( !p_input )
-    {
         return DEFAULT_RATE;
-    }
+    
     return p_input->stream.control.i_rate;
 }
 
-void VlcWrapper::InputSlower()
+void VlcWrapper::InputSetRate( int rate )
 {
-    if( p_input != NULL )
-    {
-        input_SetStatus( p_input, INPUT_STATUS_SLOWER );
-    }
-}
+    if( !p_input )
+        return;
 
-void VlcWrapper::InputFaster()
-{
-    if( p_input != NULL )
+    int times = 0;
+    int oldrate = InputRate();
+    switch( ( rate > oldrate ) ? ( rate / oldrate ) : ( oldrate / rate ) )
     {
-        input_SetStatus( p_input, INPUT_STATUS_FASTER );
+        case 64:
+            times = 6;
+            break;
+        case 32:
+            times = 5;
+            break;
+        case 16:
+            times = 4;
+            break;
+        case 8:
+            times = 3;
+            break;
+        case 4:
+            times = 2;
+            break;
+        case 2:
+            times = 1;
+            break;
+    }
+
+    int newrate = oldrate;
+    for( int i = 0; i < times; i++ )
+    {
+        if( rate > oldrate )
+        {
+            input_SetStatus( p_input, INPUT_STATUS_SLOWER );
+            newrate *= 2;
+        }
+        else
+        {
+            input_SetStatus( p_input, INPUT_STATUS_FASTER );
+            newrate /= 2;
+        }
+        /* Wait it's actually done */
+        while( InputRate() != newrate )
+            msleep( 10000 );
     }
 }
 
@@ -317,9 +337,9 @@ void VlcWrapper::SetTimeAsFloat( float f_position )
     if( p_input != NULL )
     {
         input_Seek( p_input, 
-                   (long long int)(p_input->stream.p_selected_area->i_size
+                   (long long)(p_input->stream.p_selected_area->i_size
                        * f_position / SEEKSLIDER_RANGE ), 
-                   INPUT_SEEK_SET);
+                   INPUT_SEEK_SET );
     }
 }
 
