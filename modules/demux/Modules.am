@@ -17,3 +17,4 @@ SOURCES_real = real.c
 SOURCES_ts2 = ts.c
 SOURCES_ps2 = ps.c
 SOURCES_dvdnav = dvdnav.c
+SOURCES_mod = mod.c
