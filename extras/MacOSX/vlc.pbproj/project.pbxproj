@@ -446,8 +446,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1058C7AFFEA557BF11CA2CBB,
-				8E1803AE03F1C65F0059A3A7,
-				8E1803AF03F1C65F0059A3A7,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -532,8 +530,6 @@
 		1058C7ACFEA557BF11CA2CBB = {
 			children = (
 				1058C7ADFEA557BF11CA2CBB,
-				8E1803AC03F1C65F0059A3A7,
-				8E1803AD03F1C65F0059A3A7,
 			);
 			isa = PBXGroup;
 			name = "Linked Frameworks";
@@ -588,30 +584,6 @@
 //8E2
 //8E3
 //8E4
-		8E1803AC03F1C65F0059A3A7 = {
-			isa = PBXFrameworkReference;
-			name = AudioUnit.framework;
-			path = /System/Library/Frameworks/AudioUnit.framework;
-			refType = 0;
-		};
-		8E1803AD03F1C65F0059A3A7 = {
-			isa = PBXFrameworkReference;
-			name = CoreAudio.framework;
-			path = /System/Library/Frameworks/CoreAudio.framework;
-			refType = 0;
-		};
-		8E1803AE03F1C65F0059A3A7 = {
-			fileRef = 8E1803AC03F1C65F0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8E1803AF03F1C65F0059A3A7 = {
-			fileRef = 8E1803AD03F1C65F0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		8E68B0BE03E2EA230059A3A7 = {
 			isa = PBXFileReference;
 			name = README.MacOSX.rtf;
