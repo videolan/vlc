@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.11 2003/08/17 20:58:44 alexis Exp $
+$Id: THANKS,v 1.12 2003/11/17 06:31:22 hartman Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -23,8 +23,9 @@ Christopher Johnson <cjohnson@mint.net> - Qt fix in vlc.spec
 Colin Simmonds <colin_simmonds@Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian@cisco.com> - ac3dec uninitialized data structure fix
 David Kennedy <dkennedy@tinytoad.com> - X11 fullscreen patch
-David Weber <david_weber@gmx.de> - Mac OS X interface design & graphics
+David Weber <david_weber@gmx.de> - Mac OS X interface design & graphics (v0.5.0)
 Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
+DirektX <direktx at freemail.hu> - Hungarian translation
 Emmanuel Blindauer <manu@agat.net> - aRts audio output
 Espen Skoglund <esk@ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE@cadmus.com> - directory browsing code
@@ -36,7 +37,7 @@ Jean-Philippe Grimaldi <jeanphi@via.ecp.fr> - bug fixes
 Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be> - French translation
 Jeffrey Baker <jwbaker@acm.org> - port of the ALSA plugin to the ALSA 1.0 API
 Joel Arvidsson <dogai@privat.utfors.se> - Swedish translation
-Joeri van Dooren <joeri@van.dooren.be> - OS X icon
+Joeri van Dooren <joeri@van.dooren.be> - OS X icon (v0.4.0)
 Johen Michael Zorko <zorko@att.net> - fix for delay issues in udp sout
 John Paul Lorenti <jpl31@columbia.edu> - ALSA device selection patch
 Julien Blache <jb@technologeek.org> - disc ejection code
@@ -44,6 +45,7 @@ Mark Gritter <mgritter@kealia.com> - fix for netlist packet leak in demuxPSI
 Markus Kuespert <ltlBeBoy@beosmail.com> - BeOS CSS support
 Mathias Kretschmer <mathias@research.att.com> - IP Multicast support
 Matthieu Lochegnies <lochegm1@cti.ecp.fr> - MPEG audio emphasis fix
+Max Rudberg <max_08 at mac.com> - Mac OS X controller art (v0.7.0)
 Michael Mondragon <mammon@lokmail.net> - ncurses compilation fix
 Michel Lanners <mlan@cpu.lu> - fixed typos and AltiVec detection
 Nilmoni Deb <ndeb@ece.cmu.edu> - autoconf and Makefile fixes

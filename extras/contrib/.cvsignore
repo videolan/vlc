@@ -9,4 +9,4 @@ sbin
 share
 vlc-lib
 config.mak
-contrib.tar.bz2
+contrib*.tar.bz2

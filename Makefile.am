@@ -177,17 +177,32 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/vob.icns \
 	extras/MacOSX/Resources/wma.icns \
 	extras/MacOSX/Resources/wmv.icns \
-	extras/MacOSX/Resources/back.png \
-	extras/MacOSX/Resources/begin.png \
-	extras/MacOSX/Resources/end.png \
-	extras/MacOSX/Resources/forw.png \
-	extras/MacOSX/Resources/list.png \
 	extras/MacOSX/Resources/pause.png \
+	extras/MacOSX/Resources/pause_blue.png \
 	extras/MacOSX/Resources/play.png \
-	extras/MacOSX/Resources/prefs.png \
-	extras/MacOSX/Resources/slow.png \
+	extras/MacOSX/Resources/play_blue.png \
 	extras/MacOSX/Resources/stop.png \
-	extras/MacOSX/Resources/vlc_hg.png \
+	extras/MacOSX/Resources/stop_blue.png \
+	extras/MacOSX/Resources/display.png \
+	extras/MacOSX/Resources/display_slider.png \
+	extras/MacOSX/Resources/display_track.png \
+	extras/MacOSX/Resources/fullscreen_active.png \
+	extras/MacOSX/Resources/fullscreen_blue.png \
+	extras/MacOSX/Resources/next_active.png \
+	extras/MacOSX/Resources/next_blue.png \
+	extras/MacOSX/Resources/playlistdrawer_active.png \
+	extras/MacOSX/Resources/playlistdrawer_blue.png \
+	extras/MacOSX/Resources/previous_active.png \
+	extras/MacOSX/Resources/previous_blue.png \
+	extras/MacOSX/Resources/skip_forward_active.png \
+	extras/MacOSX/Resources/skip_forward_blue.png \
+	extras/MacOSX/Resources/skip_previous_active.png \
+	extras/MacOSX/Resources/skip_previous_blue.png \
+	extras/MacOSX/Resources/volume_high.png \
+	extras/MacOSX/Resources/volume_low.png \
+	extras/MacOSX/Resources/volumeslider_blue.png \
+	extras/MacOSX/Resources/volumeslider_normal.png \
+	extras/MacOSX/Resources/volumetrack.png \
 	extras/MacOSX/Resources/about_bg.png \
 	extras/MacOSX/Resources/vlc.scriptSuite \
 	extras/MacOSX/Resources/README \

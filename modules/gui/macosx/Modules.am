@@ -18,6 +18,8 @@ SOURCES_macosx = \
 	playlist.h \
 	prefs.m \
 	prefs.h \
+	prefs_widgets.h \
+	prefs_widgets.m \
 	output.h \
 	output.m \
 	vout.m \

@@ -1,5 +1,5 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
+$Id: LIST,v 1.17 2003/11/17 06:31:22 hartman Exp $
 
  * a52: A/52 basic parser/packetizer
 
@@ -55,13 +55,15 @@ $Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
 
  * avi: AVI File stream demuxer
 
- * bandlimited_resampler: Badnlimited interpolation audio resampler
+ * bandlimited_resampler: Bandlimited interpolation audio resampler
 
  * beos: Audio output, video output and interface module for BeOS.
 
+ * caca: color ASCII art video output using libcaca
+
  * cdda: input module to read audio CDs
 
- * cddax: input module to read audio CDs vi libcdio
+ * cddax: input module to read audio CDs via libcdio
 
  * cinepak: Cinepack video decoder
 
@@ -95,7 +97,11 @@ $Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
 
  * dummy: dummy audio output, video output, interface and input modules.
 
+ * dv: DV video decoder
+
  * dvb: input module for DVB-S/C/T streaming using v4l2 API
+
+ * dvbsub: decoder module for subs in dvb streams.
 
  * dvd: input module for accessing DVDs.
 
@@ -103,11 +109,9 @@ $Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
 
  * dvdread: input module for accessing DVDs, uses libdvdread.
 
- * dv: DV video decoder
- 
- * esd: audio output module using the Esound sound daemon.
-
  * es: input module for MPEG ES decapsulation.
+
+ * esd: audio output module using the Esound sound daemon.
 
  * faad: AAC decoder using libfaad2
 
@@ -164,15 +168,15 @@ $Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
  * headphone_channel_mixer:
 	 headphone channel mixer with virtual spatialization effect.
 
- * hotkeys : hotkeys control module
+ * hotkeys: hotkeys control module
+
+ * http: HTTP remote control webinterface
 
  * httpd: HTTP server
 
- * http: HTTP remote control interface
+ * i420_rgb: planar YUV to packed RGB conversion functions.
 
  * i420_rgb_mmx: MMX accelerated version of i420_rgb.
-
- * i420_rgb: planar YUV to packed RGB conversion functions.
 
  * i420_ymga_mmx: MMX accelerated version of i420_ymga
 
@@ -206,6 +210,8 @@ $Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
 
  * lirc: Linux infrared control module
 
+ * livedotcom: rtp demux based on liveMedia (live.com)
+
  * logger: file logger plugin
 
  * logo: video filter to put a logo on the video
@@ -216,7 +222,7 @@ $Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
 
  * m4v: MPEG-4 Video Stream demuxer
 
- * macosx: Audio output, Video output, and nterface module for Mac OS X.
+ * macosx: Video output, and interface module for Mac OS X.
 
  * memcpy3dn: 3D Now! accelerated version of memcpy.
 
@@ -322,8 +328,6 @@ $Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
 
  * screensaver: screensaver disabling module
 
- * sdp: SDP file demuxer
-
  * skins: Skinnable interface
 
  * slp: input module to access SLP registered sessions
@@ -349,6 +353,8 @@ $Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
  * stream_out_rtp: output using the RTP protocol
 
  * stream_out_transcode: audio & video transcoder using ffmpeg
+
+ * stream_out_transrate: audio & video transrater using ffmpeg
 
  * subsdec: Another SPU decoder for text subtitles
 
@@ -403,9 +409,9 @@ $Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
 
  * wall: image wall filter.
 
- * waveout: simple audio output module for Windows.
-
  * wav: Wav demuxer
+
+ * waveout: simple audio output module for Windows.
 
  * wingdi: WIN 32 / WIN CE GDI video output
 
