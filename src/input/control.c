@@ -188,7 +188,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             break;
 
         case INPUT_GET_SUBDELAY:
-            pi = (int)va_arg( args, int *);
+            pi = (int*)va_arg( args, int *);
             /* We work on the first subtitle */
             if( p_input->p_sys != NULL )
             {

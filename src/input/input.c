@@ -1093,6 +1093,7 @@ static int InitThread( input_thread_t * p_input )
     /* Get fps */
     if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
     {
+        i_microsecondperframe = 0;
     }
     else
     {
