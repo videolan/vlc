@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.57 2003/10/29 19:35:43 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.58 2003/10/29 20:53:41 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -258,15 +258,20 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
     case VLC_FOURCC('m','p','1','v'):
         i_cat = VIDEO_ES;
         i_codec = CODEC_ID_MPEG1VIDEO;
-        psz_name = "MPEG-1/2 Video";
+        psz_name = "MPEG-1 Video";
         break;
 
     /* MPEG-2 Video */
     case VLC_FOURCC('m','p','2','v'):
     case VLC_FOURCC('m','p','g','v'):
         i_cat = VIDEO_ES;
+#if LIBAVCODEC_BUILD >= 4676
         i_codec = CODEC_ID_MPEG2VIDEO;
         psz_name = "MPEG-2 Video";
+#else
+        i_codec = CODEC_ID_MPEG1VIDEO;
+        psz_name = "MPEG-1 Video";
+#endif
         break;
 
     /* MPEG-4 Video */
@@ -617,7 +622,11 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         break;
     case VLC_FOURCC('m','p','3',' '):
         i_cat    = AUDIO_ES;
+#if LIBAVCODEC_BUILD >= 4678
+        i_codec  = CODEC_ID_MP3;
+#else
         i_codec  = CODEC_ID_MP3LAME;
+#endif
         psz_name = "MPEG Audio layer 1/2/3";
         break;
 
