@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.h,v 1.7 2003/03/17 17:10:21 hartman Exp $
+ * $Id: playlist.h,v 1.8 2003/03/17 21:47:21 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -27,9 +27,8 @@
  *****************************************************************************/
 @interface VLCPlaylistView : NSTableView
 {
+    NSColor *o_striped_row_color;
 }
-
-- (void) drawStripesInRect:(NSRect)clipRect;
 
 @end
 
@@ -38,6 +37,8 @@
  *****************************************************************************/
 @interface VLCPlaylist : NSObject
 {
+    int i_moveRow;
+        
     IBOutlet id o_table_view;
 
     IBOutlet id o_ctx_menu;

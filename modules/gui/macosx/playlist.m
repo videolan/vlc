@@ -2,16 +2,10 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.15 2003/03/17 17:10:21 hartman Exp $
+ * $Id: playlist.m,v 1.16 2003/03/17 21:47:21 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
- * Thanks:  Andrew Stone for documenting the row reordering methods on the net
- *              http://www.omnigroup.com/mailman/archive/macosx-dev/
- *              2001-January/008195.html
- *          Apple Computer for documenting the Alternating row colors
- *		http://developer.apple.com/samplecode/Sample_Code/Cocoa/
- *              MP3_Player/MyTableView.m.htm
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,16 +32,19 @@
 #include "intf.h"
 #include "playlist.h"
 
-// RGB values for stripe color (light blue)
-#define STRIPE_RED   (237.0 / 255.0)
-#define STRIPE_GREEN (243.0 / 255.0)
-#define STRIPE_BLUE  (254.0 / 255.0)
-static NSColor *sStripeColor = nil;
-
 /*****************************************************************************
  * VLCPlaylistView implementation 
  *****************************************************************************/
 @implementation VLCPlaylistView
+
+- (void)dealloc
+{
+    if( o_striped_row_color != nil )
+    {
+        [o_striped_row_color release];
+    }
+    [super dealloc];
+}
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
@@ -114,39 +111,34 @@ static NSColor *sStripeColor = nil;
     }
 }
 
-
-/* This is called after the table background is filled in, but before the cell contents are drawn.
- * We override it so we can do our own light-blue row stripes a la iTunes.
- */
-- (void) highlightSelectionInClipRect:(NSRect)rect {
-    [self drawStripesInRect:rect];
-    [super highlightSelectionInClipRect:rect];
-}
-
-/* This routine does the actual blue stripe drawing, filling in every other row of the table
- * with a blue background so you can follow the rows easier with your eyes.
- */
-- (void) drawStripesInRect:(NSRect)clipRect {
-    NSRect stripeRect;
-    float fullRowHeight = [self rowHeight] + [self intercellSpacing].height;
-    float clipBottom = NSMaxY(clipRect);
-    int firstStripe = clipRect.origin.y / fullRowHeight;
-    if (firstStripe % 2 == 0)
-        firstStripe++;   // we're only interested in drawing the stripes
-                         // set up first rect
-    stripeRect.origin.x = clipRect.origin.x;
-    stripeRect.origin.y = firstStripe * fullRowHeight;
-    stripeRect.size.width = clipRect.size.width;
-    stripeRect.size.height = fullRowHeight;
-    // set the color
-    if (sStripeColor == nil)
-        sStripeColor = [[NSColor colorWithCalibratedRed:STRIPE_RED green:STRIPE_GREEN blue:STRIPE_BLUE alpha:1.0] retain];
-    [sStripeColor set];
-    // and draw the stripes
-    while (stripeRect.origin.y < clipBottom) {
-        NSRectFill(stripeRect);
-        stripeRect.origin.y += fullRowHeight * 2.0;
+- (void) highlightSelectionInClipRect:(NSRect)o_rect {
+    NSRect o_new_rect;
+    float f_height = [self rowHeight] + [self intercellSpacing].height;
+    float f_origin_y = NSMaxY( o_rect );
+    int i_row = o_rect.origin.y / f_height;
+    
+    if ( i_row % 2 == 0 )
+    {
+        i_row++;
     }
+    
+    o_new_rect.size.width = o_rect.size.width;
+    o_new_rect.size.height = f_height;
+    o_new_rect.origin.x = o_rect.origin.x;
+    o_new_rect.origin.y = i_row * f_height;
+    
+    if ( o_striped_row_color == nil )
+    {
+        o_striped_row_color = [[[NSColor alternateSelectedControlColor]
+                                highlightWithLevel: 0.90] retain];
+    }
+    [o_striped_row_color set];
+    
+    while ( o_new_rect.origin.y < f_origin_y ) {
+        NSRectFill( o_new_rect );
+        o_new_rect.origin.y += f_height * 2.0;
+    }
+    [super highlightSelectionInClipRect:o_rect];
 }
 
 @end
@@ -155,6 +147,16 @@ static NSColor *sStripeColor = nil;
  * VLCPlaylist implementation 
  *****************************************************************************/
 @implementation VLCPlaylist
+
+- (id)init
+{
+    self = [super init];
+    if ( self !=nil )
+    {
+        i_moveRow = -1;
+    }
+    return self;
+}
 
 - (void)awakeFromNib
 {
@@ -369,40 +371,31 @@ static NSColor *sStripeColor = nil;
     return( o_value );
 }
 
-// NEW API for Dragging in TableView:
-// typedef enum { NSTableViewDropOn, NSTableViewDropAbove } NSTableViewDropOperation;
-// In drag and drop, used to specify a dropOperation. For example, given a table with N rows (numbered with row 0 at the top visually), a row of N-1 and operation of NSTableViewDropOn would specify a drop on the last row. To specify a drop below the last row, one would use a row of N and NSTableViewDropAbove for the operation.
-
-static int _moveRow = -1;
-
-- (BOOL)tableView:(NSTableView *)tv
-                    writeRows:(NSArray*)rows
-                    toPasteboard:(NSPasteboard*)pboard 
-// This method is called after it has been determined that a drag should begin, but before the drag has been started. To refuse the drag, return NO. To start a drag, return YES and place the drag data onto the pasteboard (data, owner, etc...). The drag image and other drag related information will be set up and provided by the table view once this call returns with YES. The rows array is the list of row numbers that will be participating in the drag.
+- (BOOL)tableView:(NSTableView *)o_tv
+                    writeRows:(NSArray*)o_rows
+                    toPasteboard:(NSPasteboard*)o_pasteboard 
 {
-    int rowCount = [rows count];
+    int i_rows = [o_rows count];
     NSArray *o_filenames = [NSArray array];
     
-    // we should allow group selection and copy between windows: PENDING
-    [pboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType] owner:self];
-    [pboard setPropertyList:o_filenames forType:NSFilenamesPboardType];
-    if (rowCount == 1)
+    [o_pasteboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType] owner:self];
+    [o_pasteboard setPropertyList:o_filenames forType:NSFilenamesPboardType];
+    if ( i_rows == 1 )
     {
-        _moveRow = [[rows objectAtIndex:0]intValue];
+        i_moveRow = [[o_rows objectAtIndex:0]intValue];
         return YES;
     }
     return NO;
 }
 
-- (NSDragOperation)tableView:(NSTableView*)tv
-                    validateDrop:(id <NSDraggingInfo>)info
-                    proposedRow:(int)row
-                    proposedDropOperation:(NSTableViewDropOperation)op 
-// This method is used by NSTableView to determine a valid drop target. Based on the mouse position, the table view will suggest a proposed drop location. This method must return a value that indicates which dragging operation the data source will perform. The data source may "re-target" a drop if desired by calling setDropRow:dropOperation: and returning something other than NSDragOperationNone. One may choose to re-target for various reasons (eg. for better visual feedback when inserting into a sorted position).
+- (NSDragOperation)tableView:(NSTableView*)o_tv
+                    validateDrop:(id <NSDraggingInfo>)o_info
+                    proposedRow:(int)i_row
+                    proposedDropOperation:(NSTableViewDropOperation)o_operation 
 {
-    if ( op == NSTableViewDropAbove )
+    if ( o_operation == NSTableViewDropAbove )
     {
-        if ( row != _moveRow && _moveRow >= 0 )
+        if ( i_row != i_moveRow && i_moveRow >= 0 )
         {
             return NSDragOperationMove;
         }
@@ -411,58 +404,51 @@ static int _moveRow = -1;
     return NSDragOperationNone;
 }
 
-- (BOOL)tableView:(NSTableView*)tv
-                    acceptDrop:(id <NSDraggingInfo>)info
-                    row:(int)i_row
-                    dropOperation:(NSTableViewDropOperation)op 
-// This method is called when the mouse is released over an outline view that previously decided to allow a drop via the validateDrop method. The data source should incorporate the data from the dragging pasteboard at this time. 
+- (BOOL)tableView:(NSTableView*)o_tv
+                    acceptDrop:(id <NSDraggingInfo>)o_info
+                    row:(int)i_proposed_row
+                    dropOperation:(NSTableViewDropOperation)o_operation 
 {
-    if (  _moveRow >= 0 )
+    if (  i_moveRow >= 0 )
     {
-        BOOL result = [self tableView:tv didDepositRow:_moveRow at:(int)i_row];
+        if (i_moveRow != -1 && i_proposed_row != -1)
+        {
+            intf_thread_t * p_intf = [NSApp getIntf];
+            playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                            FIND_ANYWHERE );
+        
+            if( p_playlist == NULL )
+            {
+                i_moveRow = -1;
+                return NO;
+            }
+    
+            playlist_Move( p_playlist, i_moveRow, i_proposed_row ); 
+        
+            vlc_object_release( p_playlist );
+        }
         [self playlistUpdated];
-        _moveRow = -1;
-        return result;
+        i_moveRow = -1;
+        return YES;
     }
     else
     {
         NSArray * o_values;
         NSPasteboard * o_pasteboard;
         
-        o_pasteboard = [info draggingPasteboard];
+        o_pasteboard = [o_info draggingPasteboard];
         
         if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
         {
             o_values = [o_pasteboard propertyListForType: NSFilenamesPboardType];
         
-            [self appendArray: o_values atPos: i_row enqueue:YES];
+            [self appendArray: o_values atPos: i_proposed_row enqueue:YES];
         
             return( YES );
         }
         
         return( NO );
     }
-}
-
--  (BOOL)tableView:(NSTableView *)tv didDepositRow:(int)i_row at:(int)i_newrow
-{
-    if (i_row != -1 && i_newrow != -1)
-    {
-        intf_thread_t * p_intf = [NSApp getIntf];
-        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                        FIND_ANYWHERE );
-    
-        if( p_playlist == NULL )
-        {
-            return NO;
-        }
-
-        playlist_Move( p_playlist, i_row, i_newrow ); 
-    
-        vlc_object_release( p_playlist );
-        return YES;
-    }
-    return NO;
 }
 
 @end
