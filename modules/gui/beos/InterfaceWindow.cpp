@@ -1304,6 +1304,7 @@ void TitleMenu::AttachedToWindow()
         var_Change( p_input, "title", VLC_VAR_FREELIST,
                     &val_list, &text_list );
     }
+    vlc_object_release( p_input );
     BMenu::AttachedToWindow();
 }
 
@@ -1367,6 +1368,7 @@ void ChapterMenu::AttachedToWindow()
         var_Change( p_input, "chapter", VLC_VAR_FREELIST,
                     &val_list, &text_list );
     }
+    vlc_object_release( p_input );
     BMenu::AttachedToWindow();
 }
 
