@@ -348,6 +348,8 @@ SOURCES_libvlc_common = \
 	src/audio_output/output.c \
 	src/audio_output/intf.c \
 	src/stream_output/stream_output.c \
+	src/stream_output/announce.c \
+	src/stream_output/sap.c \
 	src/misc/charset.c \
 	src/misc/httpd.c \
 	src/misc/mtime.c \

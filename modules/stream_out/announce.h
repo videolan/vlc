@@ -51,7 +51,7 @@
 /*****************************************************************************
  * sap_session_t: SAP Session descriptor
  *****************************************************************************/
-struct sap_session_t
+struct sap_session_t2
 {
         char * psz_sdp;
         module_t p_network;
@@ -60,7 +60,7 @@ struct sap_session_t
         int i_ip_version;
 };
 
-typedef struct sap_session_t sap_session_t;
+typedef struct sap_session_t2 sap_session_t2;
 /*****************************************************************************
  * slp_session_t: SLP Session descriptor
  *****************************************************************************/
@@ -75,12 +75,13 @@ typedef struct slp_session_t slp_session_t;
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+sap_session_t2 *  sout_SAPNew        (sout_instance_t *, char * psz_sdp_arg,
+                                                      int ip_version,
+                                                      char * psz_v6_scope );
 
 char * SDPGenerateUDP(char * ,char *);
-sap_session_t *  sout_SAPNew        (sout_instance_t *,
-                                     char* , int, char *);
-void             sout_SAPDelete     (sout_instance_t *,sap_session_t*);
-void             sout_SAPSend       (sout_instance_t *,sap_session_t *);
+void             sout_SAPDelete     (sout_instance_t *,sap_session_t2*);
+void             sout_SAPSend       (sout_instance_t *,sap_session_t2 *);
 int              sout_SLPReg        (sout_instance_t *,char *,char *);
 int              sout_SLPDereg      (sout_instance_t *,char *,char *);
 

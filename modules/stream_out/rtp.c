@@ -76,8 +76,13 @@ struct sout_stream_sys_t
     int64_t i_sdp_id;
     int     i_sdp_version;
     char    *psz_sdp;
-
     vlc_mutex_t  lock_sdp;
+
+    char        *psz_session_name;
+
+    /* sap */
+    vlc_bool_t b_export_sap;
+    session_descriptor_t *p_session;
 
     httpd_host_t *p_httpd_host;
     httpd_file_t *p_httpd_file;
@@ -155,6 +160,7 @@ struct sout_stream_id_t
 
 static int AccessOutGrabberWrite( sout_access_out_t *, block_t * );
 
+static int SapSetup( sout_stream_t *p_stream );
 static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
 static int RtspSetup( sout_stream_t *p_stream, vlc_url_t * );
 
@@ -181,6 +187,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
     p_sys->psz_destination = sout_cfg_find_value( p_stream->p_cfg, "dst" );
+    p_sys->psz_session_name = sout_cfg_find_value( p_stream->p_cfg, "name" );
     if( ( val = sout_cfg_find_value( p_stream->p_cfg, "port" ) ) )
     {
         p_sys->i_port = atoi( val );
@@ -188,6 +195,18 @@ static int Open( vlc_object_t *p_this )
     else
     {
         p_sys->i_port = 1234;
+    }
+
+    if( !p_sys->psz_session_name )
+    {
+        if( p_sys->psz_destination )
+        {
+            p_sys->psz_session_name = strdup( p_sys->psz_destination );
+        }
+        else
+        {
+           p_sys->psz_session_name = strdup( "NONE" );
+        }
     }
 
     if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
@@ -227,6 +246,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sdp_id = mdate();
     p_sys->i_sdp_version = 1;
     p_sys->psz_sdp = NULL;
+
+    p_sys->b_export_sap = VLC_FALSE;
+    p_sys->p_session = NULL;
+
     p_sys->p_httpd_host = NULL;
     p_sys->p_httpd_file = NULL;
     p_sys->p_rtsp_host  = NULL;
@@ -320,15 +343,15 @@ static int Open( vlc_object_t *p_this )
         sprintf( p_sys->psz_sdp,
                  "v=0\n"
                  "o=- "I64Fd" %d IN IP4 127.0.0.1\n"
-                 "s=NONE\n"
+                 "s=%s\n"
                  "c=IN IP4 %s/%d\n"
                  "m=video %d RTP/AVP %d\n"
                  "a=rtpmap:%d %s\n",
                  p_sys->i_sdp_id, p_sys->i_sdp_version,
+                 p_sys->psz_session_name,
                  p_sys->psz_destination, p_sys->i_ttl,
                  p_sys->i_port, p_sys->i_payload_type,
                  p_sys->i_payload_type, psz_rtpmap );
-
         fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
 
         /* create the rtp context */
@@ -366,6 +389,11 @@ static int Open( vlc_object_t *p_this )
             {
                 msg_Err( p_stream, "cannot export sdp as rtsp" );
             }
+        }
+        else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) )
+        {
+            p_sys->b_export_sap = VLC_TRUE;
+            SapSetup( p_stream );
         }
         else
         {
@@ -426,7 +454,13 @@ static void Close( vlc_object_t * p_this )
     {
         httpd_HostDelete( p_sys->p_rtsp_host );
     }
-
+#if 0
+    if( p_sys->psz_session_name )
+    {
+        free( p_sys->psz_session_name );
+        p_sys->psz_session_name = NULL;
+    }
+#endif
     if( p_sys->psz_sdp )
     {
         free( p_sys->psz_sdp );
@@ -446,9 +480,10 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
 
     i_size = strlen( "v=0\n" ) +
              strlen( "o=- * * IN IP4 127.0.0.1\n" ) +
-             strlen( "s=NONE\n" ) +
+             strlen( "s=\n" ) +
              strlen( "c=IN IP4 */*\n" ) +
              strlen( psz_destination ? psz_destination : "0.0.0.0") +
+             strlen( p_sys->psz_session_name ) +
              20 + 10 + 10 + 1;
     for( i = 0; i < p_sys->i_es; i++ )
     {
@@ -473,7 +508,7 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
     p += sprintf( p, "v=0\n" );
     p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\n",
                   p_sys->i_sdp_id, p_sys->i_sdp_version );
-    p += sprintf( p, "s=NONE\n" );
+    p += sprintf( p, "s=%s\n", p_sys->psz_session_name );
     p += sprintf( p, "c=IN IP4 %s/%d\n", psz_destination ? psz_destination : "0.0.0.0",
                   p_sys->i_ttl );
 
@@ -746,6 +781,12 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_sys->i_sdp_version++;
 
         fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
+
+        /* Update the SAP announce */
+        if( p_sys->b_export_sap )
+        {
+            SapSetup( p_stream );
+        }
     }
 
     return id;
@@ -783,6 +824,12 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     }
     vlc_mutex_destroy( &id->lock_rtsp );
     if( id->rtsp_access ) free( id->rtsp_access );
+
+    /* Update the SAP announce */
+    if( p_sys->b_export_sap )
+    {
+        SapSetup( p_stream );
+    }
 
     free( id );
     return VLC_SUCCESS;
@@ -896,6 +943,37 @@ static int AccessOutGrabberWrite( sout_access_out_t *p_access,
         p_buffer = p_next;
     }
 
+    return VLC_SUCCESS;
+}
+
+/****************************************************************************
+ * SAP:
+ ****************************************************************************/
+static int SapSetup( sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_instance_t   *p_sout = p_stream->p_sout;
+    announce_method_t *p_method = (announce_method_t *)
+                                  malloc(sizeof(announce_method_t));
+
+    /* Remove the previous session */
+    if( p_sys->p_session != NULL)
+    {
+        sout_AnnounceUnRegister( p_sout, p_sys->p_session);
+        sout_AnnounceSessionDestroy( p_sys->p_session );
+        p_sys->p_session = NULL;
+    }
+    p_method->i_type = METHOD_TYPE_SAP;
+    p_method->psz_address = NULL; /* FIXME */
+    p_method->i_ip_version = 4; /* FIXME ! */
+
+    if( p_sys->i_es > 0 && p_sys->psz_sdp && *p_sys->psz_sdp )
+    {
+        p_sys->p_session = sout_AnnounceRegisterSDP( p_sout, p_sys->psz_sdp,
+                                                     p_method );
+    }
+
+    free( p_method );
     return VLC_SUCCESS;
 }
 

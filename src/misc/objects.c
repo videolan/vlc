@@ -160,6 +160,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof( vlm_t );
             psz_type = "vlm dameon";
             break;
+        case VLC_OBJECT_ANNOUNCE:
+            i_size = sizeof( announce_handler_t );
+            psz_type = "announce handler";
+            break;
         default:
             i_size = i_type > 0
                       ? i_type > (int)sizeof(vlc_object_t)

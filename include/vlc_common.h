@@ -272,8 +272,13 @@ typedef struct sout_access_out_t sout_access_out_t;
 typedef struct sout_mux_t sout_mux_t;
 typedef struct sout_stream_t    sout_stream_t;
 typedef struct sout_cfg_t       sout_cfg_t;
-/*typedef struct sap_session_t    sap_session_t;
-typedef struct slp_session_t    slp_session_t;*/
+typedef struct sap_session_t    sap_session_t;
+typedef struct sap_address_t sap_address_t;
+typedef struct session_descriptor_t session_descriptor_t;
+typedef struct announce_method_t announce_method_t;
+typedef struct announce_handler_t announce_handler_t;
+typedef struct sap_handler_t sap_handler_t;
+//typedef struct slp_session_t    slp_session_t;
 
 /* Decoders */
 typedef struct decoder_t      decoder_t;

@@ -265,6 +265,70 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
     return i_total;
 }
 
+/*****************************************************************************
+ * __net_ReadNonBlock:
+ *****************************************************************************
+ * Read from a network socket, non blocking mode (with timeout)
+ *****************************************************************************/
+int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
+                        int i_data, mtime_t i_wait)
+{
+    struct timeval  timeout;
+    fd_set          fds_r, fds_e;
+    int             i_recv;
+    int             i_ret;
+
+    /* Initialize file descriptor set */
+    FD_ZERO( &fds_r );
+    FD_SET( fd, &fds_r );
+    FD_ZERO( &fds_e );
+    FD_SET( fd, &fds_e );
+
+    timeout.tv_sec = 0;
+    timeout.tv_usec = i_wait;
+
+    i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout);
+
+    if( i_ret < 0 && errno == EINTR )
+    {
+        return 0;
+    }
+    else if( i_ret < 0 )
+    {
+        msg_Err( p_this, "network select error (%s)", strerror(errno) );
+        return -1;
+    }
+    else if( i_ret == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        if( ( i_recv = recv( fd, p_data, i_data, 0 ) ) < 0 )
+        {
+#ifdef WIN32
+            /* For udp only */
+            /* On win32 recv() will fail if the datagram doesn't fit inside
+             * the passed buffer, even though the buffer will be filled with
+             * the first part of the datagram. */
+            if( WSAGetLastError() == WSAEMSGSIZE )
+            {
+                msg_Err( p_this, "recv() failed. "
+                         "Increase the mtu size (--mtu option)" );
+            }
+            else
+                msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
+#else
+            msg_Err( p_this, "recv failed (%s)", strerror(errno) );
+#endif
+            return -1;
+        }
+        return i_recv;
+    }
+    /* We will never be here */
+    return -1;
+}
+
 /* Write exact amount requested */
 int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
 {

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: libvlc.c,v 1.118 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -75,6 +75,8 @@
 
 #include "vlc_video.h"
 #include "video_output.h"
+
+#include "stream_output.h"
 
 #include "libvlc.h"
 
@@ -1023,10 +1025,11 @@ int VLC_Play( int i_object )
  *****************************************************************************/
 int VLC_Stop( int i_object )
 {
-    intf_thread_t *   p_intf;
-    playlist_t    *   p_playlist;
-    vout_thread_t *   p_vout;
-    aout_instance_t * p_aout;
+    intf_thread_t      * p_intf;
+    playlist_t         * p_playlist;
+    vout_thread_t      * p_vout;
+    aout_instance_t    * p_aout;
+    announce_handler_t * p_announce;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
     /* Check that the handle is valid */
@@ -1082,6 +1085,18 @@ int VLC_Stop( int i_object )
         vlc_object_release( (vlc_object_t *)p_aout );
         aout_Delete( p_aout );
     }
+
+    /*
+     * Free announce handler(s?)
+     */
+    msg_Dbg( p_vlc, "removing announce handler" );
+    while( (p_announce = vlc_object_find( p_vlc, VLC_OBJECT_ANNOUNCE,
+                                                 FIND_CHILD ) ) )
+   {
+        vlc_object_detach( p_announce );
+        vlc_object_release( p_announce );
+        announce_HandlerDestroy( p_announce );
+   }
 
     if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;

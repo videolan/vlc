@@ -138,12 +138,12 @@ char * SDPGenerateUDP(char * psz_name_arg,char * psz_url_arg)
 /*****************************************************************************
  * sout_SAPNew: Creates a SAP Session
  *****************************************************************************/
-sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
+sap_session_t2 * sout_SAPNew ( sout_instance_t *p_sout,
                                      char * psz_sdp_arg,
                                      int ip_version,
                                      char * psz_v6_scope )
 {
-    sap_session_t       *p_sap; /* The SAP structure */
+    sap_session_t2       *p_sap; /* The SAP structure */
     char                *sap_ipv6_addr = NULL; /* IPv6 built address */
     vlc_value_t         val;
 
@@ -151,7 +151,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
     var_Create( p_sout, "ipv4", VLC_VAR_BOOL );
 
     /* Allocate the SAP structure */
-    p_sap = (sap_session_t *) malloc( sizeof ( sap_session_t ) ) ;
+    p_sap = (sap_session_t2 *) malloc( sizeof ( sap_session_t2 ) ) ;
     if ( !p_sap )
     {
         msg_Err( p_sout, "out of memory" );
@@ -214,7 +214,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
 /*****************************************************************************
  * sout_SAPDelete: Deletes a SAP Session
  *****************************************************************************/
-void sout_SAPDelete( sout_instance_t *p_sout, sap_session_t * p_sap )
+void sout_SAPDelete( sout_instance_t *p_sout, sap_session_t2 * p_sap )
 {
     int i_ret;
 
@@ -243,7 +243,7 @@ void sout_SAPDelete( sout_instance_t *p_sout, sap_session_t * p_sap )
 /*****************************************************************************
  * sout_SAPSend: Sends a SAP packet
  *****************************************************************************/
-void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_sap )
+void sout_SAPSend( sout_instance_t *p_sout, sap_session_t2 * p_sap )
 {
     char *psz_msg;                     /* SDP content */
     char *psz_head;                         /* SAP header */

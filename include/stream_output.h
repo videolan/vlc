@@ -181,6 +181,108 @@ struct sout_instance_t
     sout_instance_sys_t *p_sys;
 };
 
+
+/* Announce handler structures */
+
+/* Session and method descriptors */
+
+struct sap_session_t;
+
+struct session_descriptor_t
+{
+    char *psz_name;
+    char *psz_uri;
+    int i_port;
+    int i_ttl;
+    int i_payload;   /* SAP Payload type */
+
+    sap_session_t *p_sap; /* If we have a sap session, remember it */
+    char *psz_sdp;
+};
+
+#define METHOD_TYPE_SAP 1
+#define METHOD_TYPE_SLP 2
+
+struct announce_method_t
+{
+    int i_type;
+
+    /* For SAP */
+    int i_ip_version;
+    char *psz_ipv6_scope;
+    char *psz_address; /* If we use a custom address */
+};
+
+
+/* SAP Specific structures */
+
+/* 100ms */
+#define SAP_IDLE ((mtime_t)(0.100*CLOCK_FREQ))
+#define SAP_MAX_BUFFER 65534
+#define MIN_INTERVAL 2
+#define MAX_INTERVAL 300
+
+/* A SAP announce address. For each of these, we run the
+ * control flow algorithm */
+struct sap_address_t
+{
+    char *psz_address;
+    int i_port;
+    int i_rfd; /* Read socket */
+    int i_wfd; /* Write socket */
+
+    /* Used for flow control */
+    mtime_t t1;
+    vlc_bool_t b_enabled;
+    vlc_bool_t b_ready;
+    int i_interval;
+    int i_buff;
+    int i_limit;
+};
+
+/* A SAP session descriptor, enqueued in the SAP handler queue */
+struct sap_session_t
+{
+    char          *psz_sdp;
+    char          *psz_data;
+    int            i_length;
+    sap_address_t *p_address;
+
+    /* Last and next send */
+    mtime_t        i_last;
+    mtime_t        i_next;
+};
+
+/* The SAP handler, running in a separate thread */
+struct sap_handler_t
+{
+    VLC_COMMON_MEMBERS /* needed to create a thread */
+
+    sap_session_t **pp_sessions;
+    sap_address_t **pp_addresses;
+
+    vlc_bool_t b_control;
+
+    int i_sessions;
+    int i_addresses;
+
+    int i_current_session;
+
+    int (*pf_add)  ( sap_handler_t*, session_descriptor_t *,announce_method_t*);
+    int (*pf_del)  ( sap_handler_t*, session_descriptor_t *);
+};
+
+/* The main announce handler object */
+struct announce_handler_t
+{
+    VLC_COMMON_MEMBERS
+
+    sap_handler_t *p_sap;
+};
+
+/* End */
+
+
 static inline sout_cfg_t *sout_cfg_find( sout_cfg_t *p_cfg, char *psz_name )
 {
     while( p_cfg && strcmp( p_cfg->psz_name, psz_name ) )
@@ -205,6 +307,9 @@ static inline char *sout_cfg_find_value( sout_cfg_t *p_cfg, char *psz_name )
 
     return NULL;
 }
+
+
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
@@ -232,3 +337,25 @@ VLC_EXPORT( char *,             sout_cfg_parser, ( char **, sout_cfg_t **, char 
 VLC_EXPORT( sout_stream_t *,    sout_stream_new, ( sout_instance_t *, char *psz_chain ) );
 VLC_EXPORT( void,               sout_stream_delete, ( sout_stream_t *p_stream ) );
 
+/* Announce system */
+VLC_EXPORT( int,                sout_AnnounceRegister, (sout_instance_t *,session_descriptor_t*, announce_method_t* ) );
+VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, (sout_instance_t *,char *, announce_method_t* ) );
+VLC_EXPORT( int,                sout_AnnounceUnRegister, (sout_instance_t *,session_descriptor_t* ) );
+
+VLC_EXPORT(session_descriptor_t*,sout_AnnounceSessionCreate, () );
+VLC_EXPORT(void,                 sout_AnnounceSessionDestroy, (session_descriptor_t *) );
+VLC_EXPORT(announce_method_t*,   sout_AnnounceMethodCreate, (int) );
+
+#define announce_HandlerCreate(a) __announce_HandlerCreate(VLC_OBJECT(a))
+announce_handler_t*  __announce_HandlerCreate( vlc_object_t *);
+
+/* Private functions for the announce handler */
+int announce_HandlerDestroy( announce_handler_t * );
+int announce_Register( announce_handler_t *p_announce,
+                session_descriptor_t *p_session,
+                announce_method_t *p_method );
+int announce_UnRegister( announce_handler_t *p_announce,
+                session_descriptor_t *p_session );
+
+sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce );
+void announce_SAPHandlerDestroy( sap_handler_t *p_sap );

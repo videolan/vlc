@@ -1,4 +1,29 @@
-$Id: NEWS,v 1.86 2004/03/02 23:49:38 hartman Exp $
+$Id$
+
+Changes between 0.7.1 and 0.7.2:
+--------------------------------
+
+Core support:
+ * Bookmarks feature
+ * Support for video output embedded in interfaces
+
+Codecs:
+
+Playlist:
+
+Input:
+
+Stream output:
+ * Improved session announcement system
+
+Interfaces:
+ * Skins
+    - Ability to embed video output
+
+ * wxWindows
+    - new design and set of icons
+    - new streaming wizard
+    - Ability to embed video output
 
 Changes between 0.7.1 and 0.7.1a:
 ---------------------------------

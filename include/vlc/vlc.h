@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.30 2004/01/25 18:17:08 zorglub Exp $
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/**
+ * \defgroup libvlc Libvlc
+ * This is libvlc.
+ *
+ * @{
+ */
+
+
 #ifndef _VLC_VLC_H
 #define _VLC_VLC_H 1
 
@@ -33,6 +41,9 @@ typedef int vlc_bool_t;
 typedef struct vlc_list_t vlc_list_t;
 typedef struct vlc_object_t vlc_object_t;
 
+/**
+ * VLC value structure
+ */
 typedef union
 {
     int             i_int;
@@ -56,6 +67,9 @@ typedef union
 
 } vlc_value_t;
 
+/**
+ * VLC list structure
+ */
 struct vlc_list_t
 {
     int             i_count;
@@ -102,7 +116,9 @@ struct vlc_list_t
 
 #define PLAYLIST_END           -666
 
-/** Playlist commands */
+/**
+ * Playlist commands
+ */
 typedef enum {
     PLAYLIST_PLAY,                              /**< Starts playing. No arg. */
     PLAYLIST_PAUSE,                     /**< Toggles playlist pause. No arg. */
@@ -122,16 +138,94 @@ typedef enum {
 /*****************************************************************************
  * Exported libvlc API
  *****************************************************************************/
-char const * VLC_Version ( void );
-char const * VLC_Error   ( int );
 
+/**
+ * Retrieve libvlc version
+ *
+ * \return a string containing the libvlc version
+ */
+char const * VLC_Version ( void );
+
+/**
+ * Return an error string
+ *
+ * \param i_err an error code
+ * \return an error string
+ */
+char const * VLC_Error ( int i_err );
+
+/**
+ * Initialize libvlc
+ *
+ * This function allocates a vlc_t structure and returns a negative value
+ * in case of failure. Also, the thread system is initialized
+ *
+ * \return vlc object id or an error code
+ */
 int     VLC_Create       ( void );
+
+/**
+ * Initialize a vlc_t structure
+ *
+ * This function initializes a previously allocated vlc_t structure:
+ *  - CPU detection
+ *  - gettext initialization
+ *  - message queue, module bank and playlist initialization
+ *  - configuration and commandline parsing
+ *
+ *  \param i_object a vlc object id
+ *  \param i_argc the number of arguments
+ *  \param ppsz_argv an array of arguments
+ *  \return VLC_SUCCESS on success
+ */
 int     VLC_Init         ( int, int, char *[] );
+
+/**
+ * Ask vlc to die
+ *
+ * This function sets p_vlc->b_die to VLC_TRUE, but does not do any other
+ * task. It is your duty to call VLC_End and VLC_Destroy afterwards.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
 int     VLC_Die          ( int );
+
+/**
+ * Stop playing and destroy everything.
+ *
+ * This function requests the running threads to finish, waits for their
+ * termination, and destroys their structure.
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
 int     VLC_Destroy      ( int );
 
+/**
+ * Set a VLC variable
+ *
+ * This function sets a variable of VLC
+ *
+ * \param i_object a vlc object id
+ * \param psz_var a vlc variable name
+ * \param value a vlc_value_t structure
+ * \return VLC_SUCCESS on success
+ */
 int     VLC_Set          ( int, char const *, vlc_value_t );
+
+/**
+ * Get a VLC variable
+ *
+ * This function gets the value of a variable of VLC
+ * It stores it in the p_value argument
+ *
+ * \param i_object a vlc object id
+ * \param psz_var a vlc variable name
+ * \param p_value a pointer to a vlc_value_t structure
+ * \return VLC_SUCCESS on success
+ */
 int     VLC_Get          ( int, char const *, vlc_value_t * );
+
 int     VLC_AddIntf      ( int, char const *, vlc_bool_t );
 int     VLC_AddTarget    ( int, char const *, const char **, int, int, int );
 

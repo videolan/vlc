@@ -1,4 +1,3 @@
-
 /*****************************************************************************
  * sap.c :  SAP interface module
  *****************************************************************************
@@ -527,6 +526,7 @@ static void Run( intf_thread_t *p_intf )
             msg_Warn( p_intf, "ditching sap packet" );
         }
 
+        memset( buffer, 0, MAX_SAP_BUFFER );
     }
 }
 
@@ -972,7 +972,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
 
         if( p_packet[1] != '=' )
         {
-            msg_Warn( p_intf, "packet invalid" );
+            msg_Warn( p_intf, "invalid packet") ;
             free_sd( sd );
             return NULL;
         }

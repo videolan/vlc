@@ -2,7 +2,7 @@
  * network.h: interface to communicate with network plug-ins
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: network.h,v 1.10 2004/01/21 10:22:31 fenrir Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -172,6 +172,9 @@ VLC_EXPORT( void, net_Close, ( int fd ) );
 
 #define net_Read(a,b,c,d,e) __net_Read(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __net_Read, ( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data, vlc_bool_t b_retry ) );
+
+#define net_ReadNonBlock(a,b,c,d,e) __net_ReadNonBlock(VLC_OBJECT(a),b,c,d,e)
+VLC_EXPORT( int, __net_ReadNonBlock, ( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data, mtime_t i_wait ) );
 
 #define net_Write(a,b,c,d) __net_Write(VLC_OBJECT(a),b,c,d)
 VLC_EXPORT( int, __net_Write, ( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data ) );
