@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.18 2002/05/14 19:33:54 bozo Exp $
+ * $Id: dvd_summary.c,v 1.19 2002/05/15 23:53:45 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -125,12 +125,12 @@ void IfoPrintAudio( thread_dvd_data_t * p_dvd, int i )
 {
     if( audio_status.i_available )
     {
-        char* ppsz_mode[7] =
-                { "ac3", "unknown", "mpeg-1", "mpeg-2", "lpcm", "sdds", "dts" };
-        char* ppsz_appl_mode[3] =
-                { "no application specified", "karaoke", "surround sound" };
+        char* ppsz_mode[8] =
+            { "AC3", "unknown", "MPEG", "MPEG-2", "LPCM", "SDDS", "DTS", "" };
+        char* ppsz_appl_mode[4] =
+            { "no application specified", "karaoke", "surround sound", "" };
         char* ppsz_quant[4] =
-                { "16 bits", "20 bits", "24 bits", "drc" };
+            { "16 bits", "20 bits", "24 bits", "drc" };
     
         intf_WarnMsg( 5, "dvd info: audio %d (%s) is %s, "
                          "%d%s channel%s, %dHz, %s", i,
@@ -140,7 +140,7 @@ void IfoPrintAudio( thread_dvd_data_t * p_dvd, int i )
                          audio.i_multichannel_extension ? " ext." : "",
                          audio.i_num_channels ? "s" : "",
                          audio.i_sample_freq ? 96000 : 48000,
-                         ppsz_appl_mode[audio.i_appl_mode & 0x2] );
+                         ppsz_appl_mode[audio.i_appl_mode & 0x3] );
 
         intf_WarnMsg( 5, "dvd info: %s, quantization %s, status %x",
                          (audio.i_caption == 1) ? "normal caption"
