@@ -26,7 +26,7 @@
     <USERDEFINES value="_DEBUG"/>
     <SYSDEFINES value="NO_STRICT"/>
     <MAINSOURCE value="win32.bpf"/>
-    <INCLUDEPATH value="..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\..\include;..\..\src\misc"/>
+    <INCLUDEPATH value="..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\..\include;..\..\.."/>
     <LIBPATH value="..\..\win32;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par"/>
   </MACROS>
