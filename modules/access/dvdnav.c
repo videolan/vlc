@@ -116,14 +116,6 @@ static int Control( demux_t *, int, va_list );
 static int Demux  ( demux_t * );
 static int DemuxBlock  ( demux_t *, uint8_t *pkt, int i_pkt );
 
-enum
-{
-    AR_SQUARE_PICTURE = 1,                          /* square pixels */
-    AR_3_4_PICTURE    = 2,                       /* 3:4 picture (TV) */
-    AR_16_9_PICTURE   = 3,             /* 16:9 picture (wide screen) */
-    AR_221_1_PICTURE  = 4,                 /* 2.21:1 picture (movie) */
-};
-
 static void DemuxTitles( demux_t *p_demux );
 static void ESSubtitleUpdate( demux_t * );
 static void ButtonUpdate( demux_t * );
@@ -229,13 +221,13 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    if( i_chapter != 0 && i_title != 0 )
+    if( i_chapter != 1 && i_title != 0 )
     {
         if( dvdnav_part_play( p_sys->dvdnav, i_title, i_chapter ) !=
             DVDNAV_STATUS_OK )
         {
             msg_Warn( p_demux, "cannot set chapter" );
-            i_chapter = 0;
+            i_chapter = 1;
         }
         else
         {
@@ -395,7 +387,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 msg_Warn( p_demux, "cannot set title/chapter" );
                 return VLC_EGENERIC;
             }
-            p_demux->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT;
+            p_demux->info.i_update |=
+                INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             p_demux->info.i_title = i;
             p_demux->info.i_seekpoint = 0;
             return VLC_SUCCESS;
@@ -702,7 +695,8 @@ static int Demux( demux_t *p_demux )
 }
 
 /*****************************************************************************
- * ParseCL: parse command line
+ * ParseCL: parse command line.
+ * Titles start from 0 (menu), chapters and angles start from 1.
  *****************************************************************************/
 static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
                       int *i_title, int *i_chapter, int *i_angle )
@@ -713,7 +707,7 @@ static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
     if( psz_source == NULL ) return NULL;
 
     *i_title = 0;
-    *i_chapter = 0;
+    *i_chapter = 1;
     *i_angle = 1;
 
     /* Start with the end, because you could have :
@@ -742,8 +736,8 @@ static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
     }
 
     *i_title   = *i_title >= 0 ? *i_title : 0;
-    *i_chapter = *i_chapter    ? *i_chapter : 0;
-    *i_angle   = *i_angle      ? *i_angle : 1;
+    *i_chapter = *i_chapter > 0 ? *i_chapter : 1;
+    *i_angle   = *i_angle > 0 ? *i_angle : 1;
 
     if( !*psz_source )
     {
@@ -826,6 +820,8 @@ static void DemuxTitles( demux_t *p_demux )
         for( j = 0; j < __MAX( i_chapters, 1 ); j++ )
         {
             s = vlc_seekpoint_New();
+            s->psz_name = malloc( strlen( _("Chapter %i") ) + 20 );
+            sprintf( s->psz_name, _("Chapter %i"), j + 1 );
             TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
         }
 

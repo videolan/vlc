@@ -862,8 +862,6 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
         return;
     }
 
-	msg_Err( p_intf, "received event: %i", event.GetId() );
-
     /* Check if this is an hotkey event */
     if( event.GetId() >= i_hotkey_event &&
         event.GetId() < i_hotkey_event + i_hotkeys )
