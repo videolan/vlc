@@ -2,7 +2,7 @@
  * network.h: interface to communicate with network plug-ins
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: network.h,v 1.5 2003/11/07 17:44:43 fenrir Exp $
+ * $Id: network.h,v 1.6 2004/01/05 14:10:58 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -152,4 +152,20 @@ static inline void vlc_UrlClean( vlc_url_t *url )
     url->psz_path     = NULL;
     url->psz_option   = NULL;
 }
+
+#define net_OpenTCP(a, b, c) __net_OpenTCP(VLC_OBJECT(a), b, c)
+VLC_EXPORT( int, __net_OpenTCP, ( vlc_object_t *p_this, char *psz_host, int i_port ) );
+
+VLC_EXPORT( void, net_Close, ( int fd ) );
+
+#define net_Read(a,b,c,d,e) __net_Read(VLC_OBJECT(a),b,c,d,e)
+VLC_EXPORT( int, __net_Read, ( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data, vlc_bool_t b_retry ) );
+
+#define net_Write(a,b,c,d) __net_Write(VLC_OBJECT(a),b,c,d)
+VLC_EXPORT( int, __net_Write, ( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data ) );
+
+#define net_Gets(a,b) __net_Gets(VLC_OBJECT(a),b)
+VLC_EXPORT( char *, __net_Gets, ( vlc_object_t *p_this, int fd ) );
+
+VLC_EXPORT( int, net_Printf, ( vlc_object_t *p_this, int fd, char *psz_fmt, ... ) );
 
