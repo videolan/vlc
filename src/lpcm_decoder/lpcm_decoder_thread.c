@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.12 2001/04/02 23:30:41 sam Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.13 2001/04/06 09:15:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,6 +29,7 @@
 #include <unistd.h>                                              /* getpid() */
 
 #include <stdio.h>                                           /* "intf_msg.h" */
+#include <string.h>                                    /* memcpy(), memset() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include "config.h"
@@ -201,7 +202,9 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
         vlc_mutex_unlock (&p_lpcmdec->p_aout_fifo->data_lock);
 
         intf_DbgMsg( "LPCM Debug: %x", *buffer );
-        bad_frame:
+
+    bad_frame:
+        continue;
     }
 
     /* If b_error is set, the lpcm decoder thread enters the error loop */

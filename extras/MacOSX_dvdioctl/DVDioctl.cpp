@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1998-2000 Apple Computer, Inc. All rights reserved.
  * Copyright (C) 2001 VideoLAN
- * $Id: DVDioctl.cpp,v 1.3 2001/04/04 16:33:07 sam Exp $
+ * $Id: DVDioctl.cpp,v 1.4 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -460,6 +460,8 @@ static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
         case IODVD_READ_STRUCTURE:
 
             log( LOG_INFO, "DVD ioctl: IODVD_READ_STRUCTURE\n" );
+
+            /* We don't do anything, since I don't know what to do */
 
             return 0;
 

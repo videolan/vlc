@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.81 2001/04/05 03:50:38 sam Exp $
+ * $Id: main.c,v 1.82 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -558,12 +558,12 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             Version();
             return( -1 );
             break;
-	case 'v':                                           /* -v, --verbose */
+        case 'v':                                           /* -v, --verbose */
             p_main->i_warning_level--;
-	    break;
+            break;
 
         /* Interface warning messages level */
-	case 'I':                                              /* -I, --intf */
+        case 'I':                                              /* -I, --intf */
             main_PutPszVariable( INTF_METHOD_VAR, optarg );
             break;
         case OPT_WARNING:                                       /* --warning */
@@ -940,14 +940,14 @@ static int CPUCapabilities( void )
                  : "cc" );         \
 
     /* test for a 486 CPU */
-    asm volatile ( "pushfl
-                    popl %%eax
-                    movl %%eax, %%ebx
-                    xorl $0x200000, %%eax
-                    pushl %%eax
-                    popfl
-                    pushfl
-                    popl %%eax"
+    asm volatile ( "pushfl\n\t"
+                   "popl %%eax\n\t"
+                   "movl %%eax, %%ebx\n\t"
+                   "xorl $0x200000, %%eax\n\t"
+                   "pushl %%eax\n\t"
+                   "popfl\n\t"
+                   "pushfl\n\t"
+                   "popl %%eax"
                  : "=a" ( i_eax ),
                    "=b" ( i_ebx )
                  :

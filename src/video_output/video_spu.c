@@ -2,7 +2,7 @@
  * video_spu.c : DVD subpicture units functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_spu.c,v 1.19 2001/03/21 13:42:35 sam Exp $
+ * $Id: video_spu.c,v 1.20 2001/04/06 09:15:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  * 
@@ -27,6 +27,7 @@
 #include "defs.h"
 
 #include <stdio.h>
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"
 #include "common.h"
@@ -99,7 +100,7 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_spu,
                 }
             }
         }
-	else
+        else
         {
             i_yreal = i_bytes_per_line * i_ytmp;
             i_ynext = i_bytes_per_line * i_y >> 6;

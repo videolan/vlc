@@ -2,7 +2,7 @@
  * idct_common.c : common IDCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct_common.c,v 1.3 2001/01/17 18:17:30 massiot Exp $
+ * $Id: idct_common.c,v 1.4 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -25,6 +25,8 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
+
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"
 #include "common.h"

@@ -2,7 +2,7 @@
  * adec_layer1.c: MPEG Layer I audio decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: adec_layer1.c,v 1.3 2001/03/21 13:42:34 sam Exp $
+ * $Id: adec_layer1.c,v 1.4 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -30,6 +30,9 @@
  */
 
 #include "defs.h"
+
+#include <stdlib.h>                                                  /* NULL */
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"
 #include "common.h"

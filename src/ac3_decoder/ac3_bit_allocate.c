@@ -2,7 +2,7 @@
  * ac3_bit_allocate.c: ac3 allocation tables
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: ac3_bit_allocate.c,v 1.16 2001/03/21 13:42:34 sam Exp $
+ * $Id: ac3_bit_allocate.c,v 1.17 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -23,6 +23,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 #include "defs.h"
+
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "int_types.h"
 #include "ac3_decoder.h"

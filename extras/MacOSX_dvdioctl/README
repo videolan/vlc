@@ -1,0 +1,31 @@
+
+DVD driver for Darwin and Mac OS X
+==================================
+
+This experimental kernel extension (KEXT) for Darwin is a wrapper for
+the DVD-related kernel IOKit functions. It was written for two main reasons:
+
+  - the lack of userland support for DVD key negociation functions
+  - the fact that the kernel locks mounted device, preventing raw device
+    reads if the DVD is mounted
+
+Building the driver
+===================
+
+You can either load the project in Project Builder and press the "build"
+icon, or open a terminal window and type "pbxbuild".
+
+Installing the driver
+=====================
+
+Open a terminal window, and type "kextload build/DVDioctl.kext", or whatever
+the path to the build tree is. You need to be root in order to do this.
+
+Using the driver
+================
+
+The driver creates a special /dev/dvd block device upon loading. When a
+process tries to open this device, it looks for an IODVDMedia object and
+opens it. All further operation done to the /dev/dvd device are then
+forwarded to the IODVDMedia device.
+

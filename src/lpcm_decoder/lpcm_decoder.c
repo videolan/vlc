@@ -2,7 +2,7 @@
  * lpcm_decoder.c: core lpcm decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder.c,v 1.6 2001/03/21 13:42:34 sam Exp $
+ * $Id: lpcm_decoder.c,v 1.7 2001/04/06 09:15:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -20,8 +20,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include <stdio.h>
 #include "defs.h"
+
+#include <stdio.h>
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"
 #include "common.h"

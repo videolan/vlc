@@ -19,7 +19,7 @@
  * More informations about parameters stand in `list of commands' section.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_ctrl.c,v 1.34 2001/03/21 13:42:34 sam Exp $
+ * $Id: intf_ctrl.c,v 1.35 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -45,6 +45,7 @@
 
 #include <sys/stat.h>                        /* on BSD, fstat() needs stat.h */
 #include <stdio.h>                                              /* fprintf() */
+#include <string.h>                                              /* strcmp() */
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <unistd.h>                                       /* close(), read() */
 #include <fcntl.h>                                                 /* open() */

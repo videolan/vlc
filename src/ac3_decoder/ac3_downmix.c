@@ -2,7 +2,7 @@
  * ac3_downmix.c: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_downmix.c,v 1.18 2001/03/21 13:42:34 sam Exp $
+ * $Id: ac3_downmix.c,v 1.19 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -65,31 +65,31 @@ int __inline__ downmix (ac3dec_t * p_ac3dec, float * channel, s16 * out_buf)
     
     switch(p_ac3dec->bsi.acmod)
     {
-        case 7:		// 3/2
-		    downmix_3f_2r_to_2ch_c (channel, &dm_par);
-   			break;
-   		case 6:		// 2/2
-   			downmix_2f_2r_to_2ch_c (channel, &dm_par);
-   			break;
-   		case 5:		// 3/1
-   			downmix_3f_1r_to_2ch_c (channel, &dm_par);
-   			break;
-   		case 4:		// 2/1
-   			downmix_2f_1r_to_2ch_c (channel, &dm_par);
-   			break;
-   		case 3:		// 3/0
-   			downmix_3f_0r_to_2ch_c (channel, &dm_par);
-   			break;
-   		case 2:
-   			break;
-   		default:	// 1/0
+        case 7: // 3/2
+            downmix_3f_2r_to_2ch_c (channel, &dm_par);
+            break;
+        case 6: // 2/2
+            downmix_2f_2r_to_2ch_c (channel, &dm_par);
+            break;
+        case 5: // 3/1
+            downmix_3f_1r_to_2ch_c (channel, &dm_par);
+            break;
+        case 4: // 2/1
+            downmix_2f_1r_to_2ch_c (channel, &dm_par);
+            break;
+        case 3: // 3/0
+            downmix_3f_0r_to_2ch_c (channel, &dm_par);
+            break;
+        case 2:
+            break;
+        default: // 1/0
             /* FIXME
-   			if (p_ac3dec->bsi.acmod == 1)
-   				center = p_ac3dec->samples.channel[0];
-   			else if (p_ac3dec->bsi.acmod == 0)
-   				center = p_ac3dec->samples.channel[0]; */
+            if (p_ac3dec->bsi.acmod == 1)
+                center = p_ac3dec->samples.channel[0];
+            else if (p_ac3dec->bsi.acmod == 0)
+                center = p_ac3dec->samples.channel[0]; */
             return 1;
-	}
+    }
     return 0;
 }
 

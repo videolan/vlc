@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.46 2001/04/05 14:00:28 asmax Exp $
+ * $Id: mpeg_system.c,v 1.47 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -31,6 +31,7 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"
 #include "common.h"

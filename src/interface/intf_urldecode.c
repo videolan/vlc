@@ -26,33 +26,33 @@
 /* URL-decode a file: URL path, return NULL if it's not what we expect */
 void urldecode_path(char *encoded_path)
 {
-	char *tmp = NULL, *cur = NULL, *ext = NULL;
-	int realchar;
+    char *tmp = NULL, *cur = NULL, *ext = NULL;
+    int realchar;
 
 
-	if (!encoded_path || *encoded_path == '\0' )
+    if (!encoded_path || *encoded_path == '\0' )
         return;
     
     cur = encoded_path ;
     
-	tmp = calloc(strlen(encoded_path) + 1,  sizeof(char) );
+    tmp = calloc(strlen(encoded_path) + 1,  sizeof(char) );
 
     
-	while ( ( ext = strchr(cur, '%') ) != NULL)
-	{
-		strncat(tmp, cur, (ext - cur) / sizeof(char));
-		ext++;
-		
+    while ( ( ext = strchr(cur, '%') ) != NULL)
+    {
+        strncat(tmp, cur, (ext - cur) / sizeof(char));
+        ext++;
+
         if (!sscanf(ext, "%2x", &realchar))
-		{
-			free(tmp);
-			return;
-		}
-		
+        {
+            free(tmp);
+            return;
+        }
+
         tmp[strlen(tmp)] = (char)realchar;
         
-		cur = ext + 2;
-	}
-	strcat(tmp, cur);
+        cur = ext + 2;
+    }
+    strcat(tmp, cur);
     strcpy(encoded_path,tmp);
 }

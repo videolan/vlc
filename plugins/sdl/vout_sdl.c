@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.45 2001/03/21 13:42:34 sam Exp $
+ * $Id: vout_sdl.c,v 1.46 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -296,7 +296,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                     p_vout->p_sys->b_cursor_autohidden = 0;
                     SDL_ShowCursor( 1 );
                 }
-		else
+                else
                 {
                     p_vout->p_sys->i_lastmoved = mdate();
                 }

@@ -2,7 +2,7 @@
  * ac3_downmix_c.c: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_c.c,v 1.3 2001/03/21 13:42:34 sam Exp $
+ * $Id: ac3_downmix_c.c,v 1.4 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -32,9 +32,9 @@
 #include "ac3_downmix.h"
 void __inline__ downmix_3f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
-	int i;
-	float *left, *right, *center, *left_sur, *right_sur;
-	float left_tmp, right_tmp;
+    int i;
+    float *left, *right, *center, *left_sur, *right_sur;
+    float left_tmp, right_tmp;
     
     left      = samples;
     center    = samples + 256;
@@ -42,108 +42,108 @@ void __inline__ downmix_3f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
     left_sur  = samples + 256*3;
     right_sur = samples + 256*4;
 
-	for (i=0; i < 256; i++) {
+    for (i=0; i < 256; i++) {
         left_tmp = dm_par->unit * *left + dm_par->clev * *center + dm_par->slev * *left_sur++;
         right_tmp = dm_par->unit * *right++ + dm_par->clev * *center + dm_par->slev * *right_sur++;
-		*left++ = left_tmp;
-		*center++ = right_tmp;
-	}
+        *left++ = left_tmp;
+        *center++ = right_tmp;
+    }
 }
 
 void __inline__ downmix_2f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
-	int i;
-	float *left, *right, *left_sur, *right_sur;
-	float left_tmp, right_tmp;
+    int i;
+    float *left, *right, *left_sur, *right_sur;
+    float left_tmp, right_tmp;
                
-	left = &samples[0];
-	right = &samples[256];
-	left_sur = &samples[512];
-	right_sur = &samples[768];
+    left = &samples[0];
+    right = &samples[256];
+    left_sur = &samples[512];
+    right_sur = &samples[768];
 
-	for (i = 0; i < 256; i++) {
-		left_tmp = dm_par->unit * *left  + dm_par->slev * *left_sur++;
-		right_tmp= dm_par->unit * *right + dm_par->slev * *right_sur++;
-		*left++ = left_tmp;
-		*right++ = right_tmp;
-	}
+    for (i = 0; i < 256; i++) {
+        left_tmp = dm_par->unit * *left  + dm_par->slev * *left_sur++;
+        right_tmp= dm_par->unit * *right + dm_par->slev * *right_sur++;
+        *left++ = left_tmp;
+        *right++ = right_tmp;
+    }
 }
 
 void __inline__ downmix_3f_1r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
-	int i;
-	float *left, *right, *center, *right_sur;
-	float left_tmp, right_tmp;
+    int i;
+    float *left, *right, *center, *right_sur;
+    float left_tmp, right_tmp;
 
-	left = &samples[0];
-	right = &samples[512];
-	center = &samples[256];
-	right_sur = &samples[768];
+    left = &samples[0];
+    right = &samples[512];
+    center = &samples[256];
+    right_sur = &samples[768];
 
-	for (i = 0; i < 256; i++) {
-		left_tmp = dm_par->unit * *left  + dm_par->clev * *center  - dm_par->slev * *right_sur;
-		right_tmp= dm_par->unit * *right++ + dm_par->clev * *center + dm_par->slev * *right_sur++;
-		*left++ = left_tmp;
-		*center++ = right_tmp;
-	}
+    for (i = 0; i < 256; i++) {
+        left_tmp = dm_par->unit * *left  + dm_par->clev * *center  - dm_par->slev * *right_sur;
+        right_tmp= dm_par->unit * *right++ + dm_par->clev * *center + dm_par->slev * *right_sur++;
+        *left++ = left_tmp;
+        *center++ = right_tmp;
+    }
 }
 
 
 void __inline__ downmix_2f_1r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
-	int i;
-	float *left, *right, *right_sur;
-	float left_tmp, right_tmp;
+    int i;
+    float *left, *right, *right_sur;
+    float left_tmp, right_tmp;
 
-	left = &samples[0];
-	right = &samples[256];
-	right_sur = &samples[512];
+    left = &samples[0];
+    right = &samples[256];
+    right_sur = &samples[512];
 
-	for (i = 0; i < 256; i++) {
-		left_tmp = dm_par->unit * *left  - dm_par->slev * *right_sur;
-		right_tmp= dm_par->unit * *right + dm_par->slev * *right_sur++;
-		*left++ = left_tmp;
-		*right++ = right_tmp;
-	}
+    for (i = 0; i < 256; i++) {
+        left_tmp = dm_par->unit * *left  - dm_par->slev * *right_sur;
+        right_tmp= dm_par->unit * *right + dm_par->slev * *right_sur++;
+        *left++ = left_tmp;
+        *right++ = right_tmp;
+    }
 }
 
 
 void __inline__ downmix_3f_0r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
-	int i;
-	float *left, *right, *center;
-	float left_tmp, right_tmp;
+    int i;
+    float *left, *right, *center;
+    float left_tmp, right_tmp;
 
-	left = &samples[0];
-	center = &samples[256];
-	right = &samples[512];
+    left = &samples[0];
+    center = &samples[256];
+    right = &samples[512];
 
-	for (i = 0; i < 256; i++) {
-		left_tmp = dm_par->unit * *left  + dm_par->clev * *center;
-		right_tmp= dm_par->unit * *right++ + dm_par->clev * *center;
-		*left++ = left_tmp;
-		*center++ = right_tmp;
-	}
+    for (i = 0; i < 256; i++) {
+        left_tmp = dm_par->unit * *left  + dm_par->clev * *center;
+        right_tmp= dm_par->unit * *right++ + dm_par->clev * *center;
+        *left++ = left_tmp;
+        *center++ = right_tmp;
+    }
 }
 
 
 void __inline__ stream_sample_2ch_to_s16_c (s16 *out_buf, float *left, float *right)
 {
-	int i;
-	for (i=0; i < 256; i++) {
-		*out_buf++ = (s16) (*left++  * NORM);
-		*out_buf++ = (s16) (*right++ * NORM);
-	}
+    int i;
+    for (i=0; i < 256; i++) {
+        *out_buf++ = (s16) (*left++  * NORM);
+        *out_buf++ = (s16) (*right++ * NORM);
+    }
 }
 
 
 void __inline__ stream_sample_1ch_to_s16_c (s16 *out_buf, float *center)
 {
-	int i;
-	float tmp;
+    int i;
+    float tmp;
 
-	for (i=0; i < 256; i++) {
-		*out_buf++ = tmp = (s16) (0.7071f * *center++ * NORM);
-		*out_buf++ = tmp;
-	}
+    for (i=0; i < 256; i++) {
+        *out_buf++ = tmp = (s16) (0.7071f * *center++ * NORM);
+        *out_buf++ = tmp;
+    }
 }

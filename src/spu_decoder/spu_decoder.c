@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.34 2001/03/21 13:42:34 sam Exp $
+ * $Id: spu_decoder.c,v 1.35 2001/04/06 09:15:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,8 +26,10 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <unistd.h>                                              /* getpid() */
+
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"
 #include "common.h"

@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.26 2001/02/22 05:31:55 reno Exp $
+ * $Id: ac3_decoder_thread.c,v 1.27 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -38,6 +38,7 @@
 #include <unistd.h>                                              /* getpid() */
 
 #include <stdio.h>                                           /* "intf_msg.h" */
+#include <string.h>                                    /* memcpy(), memset() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include "config.h"
@@ -254,6 +255,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
         vlc_mutex_unlock (&p_ac3dec->p_aout_fifo->data_lock);
 
     bad_frame:
+        continue;
     }
 
     /* If b_error is set, the ac3 decoder thread enters the error loop */

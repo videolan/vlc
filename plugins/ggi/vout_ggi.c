@@ -2,7 +2,7 @@
  * vout_ggi.c: GGI video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_ggi.c,v 1.8 2001/03/21 13:42:34 sam Exp $
+ * $Id: vout_ggi.c,v 1.9 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -231,7 +231,6 @@ int vout_Manage( vout_thread_t *p_vout )
                     default:
                         break;
                 }
-
                 break;
 
             case evPtrButtonRelease:
@@ -243,8 +242,10 @@ int vout_Manage( vout_thread_t *p_vout )
                         p_main->p_intf->b_menu_change = 1;
                         break;
                 }
+                break;
 
             default:
+                break;
         }
     }
 

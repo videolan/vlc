@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-intf.c,v 1.18 2001/04/01 07:31:38 stef Exp $
+ * $Id: input_ext-intf.c,v 1.19 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,6 +25,8 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
+
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"
 #include "common.h"
@@ -119,6 +121,7 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
         break;
 
     default:
+        break;
     }
 
     vlc_cond_signal( &p_input->stream.stream_wait );

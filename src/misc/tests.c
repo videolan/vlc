@@ -3,7 +3,7 @@
  * Functions are prototyped in tests.h.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: tests.c,v 1.5 2001/03/21 13:42:34 sam Exp $
+ * $Id: tests.c,v 1.6 2001/04/06 09:15:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *
@@ -26,6 +26,8 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
+
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"
 #include "common.h"

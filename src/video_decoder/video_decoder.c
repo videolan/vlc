@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.47 2001/02/19 19:08:59 massiot Exp $
+ * $Id: video_decoder.c,v 1.48 2001/04/06 09:15:48 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -27,8 +27,10 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include <stdlib.h>                                                /* free() */
 #include <unistd.h>                                              /* getpid() */
+
+#include <stdlib.h>                                                /* free() */
+#include <string.h>                                    /* memcpy(), memset() */
 #include <errno.h>                                                  /* errno */
 
 #include "config.h"
@@ -238,92 +240,93 @@ static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
 }
 #else
 static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                          yuv_data_t * p_data, int i_incr )
+                                 yuv_data_t * p_data, int i_incr )
 {
-    asm __volatile__ (
+    asm __volatile__ ( 
             "pxor       %%mm7,%%mm7\n\t"
 
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
             "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      (%1),%%mm2\n\t"
-            "paddw      8(%1),%%mm1\n\t"
+            "paddw      (%2),%%mm2\n\t"
+            "paddw      8(%2),%%mm1\n\t"
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
-            "addl       %2,%0\n\t"
+            "addl       %3,%0\n\t"
 
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
             "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      16(%1),%%mm2\n\t"
-            "paddw      24(%1),%%mm1\n\t"
+            "paddw      16(%2),%%mm2\n\t"
+            "paddw      24(%2),%%mm1\n\t"
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
-            "addl       %2,%0\n\t"
+            "addl       %3,%0\n\t"
 
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
             "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      32(%1),%%mm2\n\t"
-            "paddw      40(%1),%%mm1\n\t"
+            "paddw      32(%2),%%mm2\n\t"
+            "paddw      40(%2),%%mm1\n\t"
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
-            "addl       %2,%0\n\t"
+            "addl       %3,%0\n\t"
 
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
             "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      48(%1),%%mm2\n\t"
-            "paddw      56(%1),%%mm1\n\t"
+            "paddw      48(%2),%%mm2\n\t"
+            "paddw      56(%2),%%mm1\n\t"
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
-            "addl       %2,%0\n\t"
+            "addl       %3,%0\n\t"
 
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
             "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      64(%1),%%mm2\n\t"
-            "paddw      72(%1),%%mm1\n\t"
+            "paddw      64(%2),%%mm2\n\t"
+            "paddw      72(%2),%%mm1\n\t"
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
-            "addl       %2,%0\n\t"
+            "addl       %3,%0\n\t"
 
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
             "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      80(%1),%%mm2\n\t"
-            "paddw      88(%1),%%mm1\n\t"
+            "paddw      80(%2),%%mm2\n\t"
+            "paddw      88(%2),%%mm1\n\t"
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
-            "addl       %2,%0\n\t"
+            "addl       %3,%0\n\t"
 
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
             "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      96(%1),%%mm2\n\t"
-            "paddw      104(%1),%%mm1\n\t"
+            "paddw      96(%2),%%mm2\n\t"
+            "paddw      104(%2),%%mm1\n\t"
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
-            "addl       %2,%0\n\t"
+            "addl       %3,%0\n\t"
 
             "movq       (%0),%%mm1\n\t"
             "movq       %%mm1,%%mm2\n\t"
             "punpckhbw  %%mm7,%%mm1\n\t"
             "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      112(%1),%%mm2\n\t"
-            "paddw      120(%1),%%mm1\n\t"
+            "paddw      112(%2),%%mm2\n\t"
+            "paddw      120(%2),%%mm1\n\t"
             "packuswb   %%mm1,%%mm2\n\t"
             "movq       %%mm2,(%0)\n\t"
 
             //"emms"
-            :"+r" (p_data): "r" (p_block),"r" (i_incr+8));
+            : "=r" (p_data)
+            : "0" (p_data), "r" (p_block), "r" (i_incr + 8) );
 }
 #endif
 
@@ -348,49 +351,51 @@ static __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
 }
 #else
 static  __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                          yuv_data_t * p_data, int i_incr )
+                                   yuv_data_t * p_data, int i_incr )
 {
     asm __volatile__ (
-            "movq         (%1),%%mm0\n\t"
-            "packuswb   8(%1),%%mm0\n\t"
+            "movq         (%2),%%mm0\n\t"
+            "packuswb   8(%2),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
-            "addl           %2,%0\n\t"
+            "addl           %3,%0\n\t"
 
-            "movq        16(%1),%%mm0\n\t"
-            "packuswb   24(%1),%%mm0\n\t"
+            "movq        16(%2),%%mm0\n\t"
+            "packuswb   24(%2),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
-            "addl           %2,%0\n\t"
+            "addl           %3,%0\n\t"
 
-            "movq        32(%1),%%mm0\n\t"
-            "packuswb   40(%1),%%mm0\n\t"
+            "movq        32(%2),%%mm0\n\t"
+            "packuswb   40(%2),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
-            "addl           %2,%0\n\t"
+            "addl           %3,%0\n\t"
 
-            "movq        48(%1),%%mm0\n\t"
-            "packuswb   56(%1),%%mm0\n\t"
+            "movq        48(%2),%%mm0\n\t"
+            "packuswb   56(%2),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
-            "addl           %2,%0\n\t"
+            "addl           %3,%0\n\t"
 
-            "movq        64(%1),%%mm0\n\t"
-            "packuswb   72(%1),%%mm0\n\t"
+            "movq        64(%2),%%mm0\n\t"
+            "packuswb   72(%2),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
-            "addl           %2,%0\n\t"
+            "addl           %3,%0\n\t"
 
-            "movq        80(%1),%%mm0\n\t"
-            "packuswb   88(%1),%%mm0\n\t"
+            "movq        80(%2),%%mm0\n\t"
+            "packuswb   88(%2),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
-            "addl           %2,%0\n\t"
+            "addl           %3,%0\n\t"
 
-            "movq        96(%1),%%mm0\n\t"
-            "packuswb   104(%1),%%mm0\n\t"
+            "movq        96(%2),%%mm0\n\t"
+            "packuswb   104(%2),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
-            "addl           %2,%0\n\t"
+            "addl           %3,%0\n\t"
 
-            "movq        112(%1),%%mm0\n\t"
-            "packuswb   120(%1),%%mm0\n\t"
+            "movq        112(%2),%%mm0\n\t"
+            "packuswb   120(%2),%%mm0\n\t"
             "movq        %%mm0,(%0)\n\t"
+
             //"emms"
-            :"+r" (p_data): "r" (p_block),"r" (i_incr+8));
+            : "=r" (p_data)
+            : "0" (p_data), "r" (p_block), "r" (i_incr + 8) );
 }
 #endif
 

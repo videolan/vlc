@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.80 2001/03/02 13:20:29 massiot Exp $
+ * $Id: vpar_headers.c,v 1.81 2001/04/06 09:15:48 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -28,6 +28,7 @@
 #include "defs.h"
 
 #include <stdlib.h>                                                /* free() */
+#include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"
 #include "common.h"
@@ -282,6 +283,7 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
             break;
 
         default:
+            break;
         }
     }
 
@@ -910,6 +912,7 @@ static void ExtensionAndUserData( vpar_thread_t * p_vpar )
                 CopyrightExtension( p_vpar );
                 break;
             default:
+                break;
             }
             break;
 

@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: aout_alsa.c,v 1.12 2001/03/21 13:42:33 sam Exp $
+ * $Id: aout_alsa.c,v 1.13 2001/04/06 09:15:47 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  * 
@@ -270,8 +270,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
        snd_pcm_playback_go( p_aout->p_sys->p_alsa_handle );
     if( i_playback_go_returns )
     {
-        intf_ErrMsg( "ALSA_PLUGIN : Unable to prepare channel (bis) : 
-                exit  = %i", i_playback_go_returns );
+        intf_ErrMsg( "ALSA_PLUGIN : Unable to prepare channel (bis) : "
+                "exit  = %i", i_playback_go_returns );
         intf_ErrMsg( "This means : %s",
                 snd_strerror( i_set_param_returns ) );
         return( -1 );
