@@ -388,13 +388,33 @@ static void Run( intf_thread_t *p_intf )
     {
         char *psz_cmd, *psz_arg;
         vlc_bool_t b_complete;
-
+        
         if( p_intf->p_sys->i_socket_listen != - 1 &&
-            p_intf->p_sys->i_socket == -1 )
+               p_intf->p_sys->i_socket == -1 )
         {
+#ifdef WIN32
+            /* If rc-quiet is specified, only check for socket connections
+               once per second, to not flood the CPU.  */
+	        if( config_GetInt( p_intf, "rc-quiet" ) )
+	        {
+                do
+                {
+                    p_intf->p_sys->i_socket =
+                        net_Accept( p_intf, p_intf->p_sys->i_socket_listen, 0 );
+                    msleep( 1000 );
+                } while  ( p_intf->p_sys->i_socket == -1 );
+            }
+            else
+            {
+                p_intf->p_sys->i_socket =
+                    net_Accept( p_intf, p_intf->p_sys->i_socket_listen, 0 );
+	        }
+#else
             p_intf->p_sys->i_socket =
                 net_Accept( p_intf, p_intf->p_sys->i_socket_listen, 0 );
+#endif        
         }
+ 
 
         b_complete = ReadCommand( p_intf, p_buffer, &i_size );
 
