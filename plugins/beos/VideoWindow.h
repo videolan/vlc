@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.9 2001/12/06 10:29:40 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.10 2002/03/13 08:39:39 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -44,8 +44,12 @@ public:
     void drawBuffer(int bufferIndex);
     
     // this is the hook controling direct screen connection
-    int32           i_width;
+    int32           i_width;     // incomming bitmap size 
     int32           i_height;
+    float           f_w_width;   // current window size
+    float           f_w_height;
+    bool            resized;
+    bool            is_zoomed;
     BBitmap	        *bitmap[2];
     VLCView	        *view;
     BWindow         *voutWindow;
