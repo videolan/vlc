@@ -267,7 +267,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
                     ((p_font->p_data[ i_char * pi_buffer[1] + i_line ] << 1) |
                      (p_font->p_data[ i_char * pi_buffer[1] + i_line ] >> 1) |
                      (i_line > 0 ? p_font->p_data[ i_char * pi_buffer[1] + i_line - 1]: 0) |
-                     (i_line < pi_buffer[1] ? p_font->p_data[ i_char * pi_buffer[1] + i_line + 1]: 0)) 
+                     (i_line < pi_buffer[1] - 1 ? p_font->p_data[ i_char * pi_buffer[1] + i_line + 1]: 0)) 
                     & ~p_font->p_data[ i_char * pi_buffer[1] + i_line ];          
             }            
         }
