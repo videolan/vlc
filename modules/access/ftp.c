@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.12 2003/03/24 20:00:51 gbazin Exp $
+ * $Id: ftp.c,v 1.13 2003/03/24 23:04:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -70,7 +70,6 @@ static void Close       ( vlc_object_t * );
 static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
                           size_t i_len );
 static void Seek        ( input_thread_t *, off_t );
-static int  SetProgram  ( input_thread_t *, pgrm_descriptor_t * );
 
 
 static ssize_t NetRead ( input_thread_t *, input_socket_t *, byte_t *, size_t );
@@ -364,7 +363,7 @@ static int Open( vlc_object_t *p_this )
     /* *** set exported functions *** */
     p_input->pf_read = Read;
     p_input->pf_seek = Seek;
-    p_input->pf_set_program = SetProgram;
+    p_input->pf_set_program = input_SetProgram;
     p_input->pf_set_area = NULL;
 
     p_input->p_private = NULL;
@@ -415,15 +414,6 @@ static void Close( vlc_object_t *p_this )
 
     /* free memory */
     FREE( p_access->url.psz_private );
-}
-
-/*****************************************************************************
- * SetProgram: do nothing
- *****************************************************************************/
-static int SetProgram( input_thread_t * p_input,
-                       pgrm_descriptor_t * p_program )
-{
-    return( 0 );
 }
 
 /*****************************************************************************

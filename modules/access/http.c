@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.30 2003/03/24 20:00:51 gbazin Exp $
+ * $Id: http.c,v 1.31 2003/03/24 23:04:07 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -65,7 +65,6 @@
 static int  Open       ( vlc_object_t * );
 static void Close      ( vlc_object_t * );
 
-static int  SetProgram ( input_thread_t *, pgrm_descriptor_t * );
 static void Seek       ( input_thread_t *, off_t );
 static ssize_t Read    ( input_thread_t *, byte_t *, size_t );
 
@@ -604,7 +603,7 @@ static int Open( vlc_object_t *p_this )
                       psz_server_addr, i_server_port, psz_path );
 
     p_input->pf_read = Read;
-    p_input->pf_set_program = SetProgram;
+    p_input->pf_set_program = input_SetProgram;
     p_input->pf_set_area = NULL;
     p_input->pf_seek = Seek;
 
@@ -664,15 +663,6 @@ static void Close( vlc_object_t *p_this )
 #endif
 
     free( p_access_data );
-}
-
-/*****************************************************************************
- * SetProgram: do nothing
- *****************************************************************************/
-static int SetProgram( input_thread_t * p_input,
-                       pgrm_descriptor_t * p_program )
-{
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
