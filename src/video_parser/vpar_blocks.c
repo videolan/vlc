@@ -579,6 +579,7 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
     p_mb->p_picture = p_vpar->picture.p_picture;
     p_mb->i_structure = p_vpar->picture.i_structure;
     p_mb->i_current_structure = p_vpar->picture.i_current_structure;
+    p_mb->b_top_field_first = p_vpar->picture.b_top_field_first;
     p_mb->i_l_x = p_vpar->mb.i_l_x;
     p_mb->i_motion_l_y = p_mb->i_l_y = p_vpar->mb.i_l_y;
     p_mb->i_c_x = p_vpar->mb.i_c_x;

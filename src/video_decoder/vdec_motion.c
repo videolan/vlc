@@ -225,6 +225,50 @@ static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
     }
 }
 
+/*****************************************************************************
+ * DualPrimeArithmetic : Dual Prime Additional arithmetic (7.6.3.6)
+ *****************************************************************************/ 
+static void __inline__ DualPrimeArithmetic( macroblock_t * p_mb,
+                                            int ppi_dmv[2][2],
+                                            int i_mv_x, int i_mv_y )
+{
+    if( p_mb->i_structure == FRAME_STRUCTURE )
+    {
+        if( p_mb->b_top_field_first )
+        {
+            /* vector for prediction of top field from bottom field */
+            ppi_dmv[0][0] = ((i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
+            ppi_dmv[0][1] = ((i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1] - 1;
+
+            /* vector for prediction of bottom field from top field */
+            ppi_dmv[1][0] = ((3*i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
+            ppi_dmv[1][1] = ((3*i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1] + 1;
+        }
+        else
+        {
+            /* vector for prediction of top field from bottom field */
+            ppi_dmv[0][0] = ((3*i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
+            ppi_dmv[0][1] = ((3*i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1] - 1;
+
+            /* vector for prediction of bottom field from top field */
+            ppi_dmv[1][0] = ((i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
+            ppi_dmv[1][1] = ((i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1] + 1;
+        }
+    }
+    else
+    {
+        /* vector for prediction from field of opposite 'parity' */
+        ppi_dmv[0][0] = ((i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
+        ppi_dmv[0][1] = ((i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1];
+
+        /* correct for vertical field shift */
+        if( p_mb->i_structure == TOP_FIELD )
+            ppi_dmv[0][1]--;
+        else
+            ppi_dmv[0][1]++;
+    }
+}
+
 
 typedef struct motion_arg_s
 {
@@ -348,7 +392,37 @@ void vdec_MotionField16x8( macroblock_t * p_mb )
 void vdec_MotionFieldDMV( macroblock_t * p_mb )
 {
     /* This is necessarily a MOTION_FORWARD only macroblock */
-    fprintf(stderr, "DMV pas code !!!\n");
+    motion_arg_t    args;
+    picture_t *     p_pred;
+    int             ppi_dmv[2][2];
+
+    args.i_height = 16;
+    args.b_average = 0;
+    args.b_dest_field = p_mb->b_motion_field;
+    args.i_offset = 0;
+
+    if( p_mb->i_current_structure == FRAME_STRUCTURE )
+        p_pred = p_mb->p_picture;
+    else
+        p_pred = p_mb->p_forward;
+
+    DualPrimeArithmetic( p_mb, ppi_dmv, p_mb->pppi_motion_vectors[0][0][0],
+                         p_mb->pppi_motion_vectors[0][0][1] );
+
+    /* predict from field of same parity */
+    args.p_source = p_mb->p_forward;
+    args.b_source_field = p_mb->b_motion_field;
+    args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
+    args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1];
+    p_mb->pf_chroma_motion( p_mb, &args );
+
+    /* predict from field of opposite parity */
+    args.b_average = 1;
+    args.p_source = p_pred;
+    args.b_source_field = !p_mb->b_motion_field;
+    args.i_mv_x = ppi_dmv[0][0];
+    args.i_mv_y = ppi_dmv[0][1];
+    p_mb->pf_chroma_motion( p_mb, &args );
 }
 
 /*****************************************************************************
@@ -440,7 +514,47 @@ void vdec_MotionFrameField( macroblock_t * p_mb )
 void vdec_MotionFrameDMV( macroblock_t * p_mb )
 {
     /* This is necessarily a MOTION_FORWARD only macroblock */
-    fprintf(stderr, "DMV pas codee 2 !!!!!\n");
+    motion_arg_t    args;
+    int             ppi_dmv[2][2];
+
+    p_mb->i_l_stride <<= 1;
+    p_mb->i_c_stride <<= 1;
+    args.i_height = 8;
+    args.b_average = 0;
+    args.b_dest_field = 0;
+    args.i_offset = 0;
+    args.p_source = p_mb->p_forward;
+
+    DualPrimeArithmetic( p_mb, ppi_dmv, p_mb->pppi_motion_vectors[0][0][0],
+                         p_mb->pppi_motion_vectors[0][0][1] );
+
+    /* predict top field from top field */
+    args.b_source_field = 0;
+    args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
+    args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
+    p_mb->pf_chroma_motion( p_mb, &args );
+
+    /* predict and add to top field from bottom field */
+    args.b_average = 1;
+    args.b_source_field = 1;
+    args.i_mv_x = ppi_dmv[0][0];
+    args.i_mv_y = ppi_dmv[0][1];
+    p_mb->pf_chroma_motion( p_mb, &args );
+
+    /* predict bottom field from bottom field */
+    args.b_average = 0;
+    args.b_dest_field = 1;
+    args.b_source_field = 0;
+    args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
+    args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
+    p_mb->pf_chroma_motion( p_mb, &args );
+
+    /* predict and add to bottom field from top field */
+    args.b_average = 1;
+    args.b_source_field = 1;
+    args.i_mv_x = ppi_dmv[1][0];
+    args.i_mv_y = ppi_dmv[1][1];
+    p_mb->pf_chroma_motion( p_mb, &args );
 }
 
 /*****************************************************************************
