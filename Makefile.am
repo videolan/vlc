@@ -524,7 +524,7 @@ package-beos:
 	mkdir -p $(srcdir)/tmp/vlc
 	cd $(srcdir) && \
 	  cp vlc AUTHORS COPYING ChangeLog README THANKS NEWS tmp/vlc/
-# We cannot use ${PLUGIN_FILES}, it looks like it is too long for the BeOS shell...
+# We cannot use ${PLUGIN_FILES} as it looks like it is too "long" for the BeOS shell...
 	if [ `find $(srcdir)/modules -name "lib*_plugin.so" | wc -l` -gt 0 ]; then \
 	  mkdir -p $(srcdir)/tmp/vlc/plugins; \
 	  find $(srcdir)/modules -name "lib*_plugin.so" | xargs -i{} cp {} $(srcdir)/tmp/vlc/plugins/; \
@@ -533,7 +533,6 @@ package-beos:
 	  mkdir -p $(srcdir)/tmp/vlc/locale/$${i}/LC_MESSAGES ; \
 	  cp $(srcdir)/po/$${i}.gmo $(srcdir)/tmp/vlc/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	done
-	mkdir -p $(srcdir)/tmp/vlc/share
 
 # Create package with debug symbols
 	mimeset -f $(srcdir)/tmp/vlc/* $(srcdir)/tmp/vlc/*/*
@@ -542,12 +541,14 @@ package-beos:
 	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS-debug.zip $(srcdir)/
 
 # Create package without debug symbols
-	strip $(srcdir)/tmp/vlc-${VERSION}/vlc
-	if [ -d $(srcdir)/tmp/vlc-${VERSION}/plugins ]; then \
-	  strip $(srcdir)/tmp/vlc-${VERSION}/plugins/lib*_plugin.so; \
+	mv $(srcdir)/tmp/vlc-${VERSION} $(srcdir)/tmp/vlc
+	strip $(srcdir)/tmp/vlc/vlc
+	if [ -d $(srcdir)/tmp/vlc/plugins ]; then \
+	  strip $(srcdir)/tmp/vlc/plugins/lib*_plugin.so; \
 	fi
-	xres -o $(srcdir)/tmp/vlc-${VERSION}/vlc $(srcdir)/share/vlc_beos.rsrc
-	mimeset -f $(srcdir)/tmp/vlc-${VERSION}/* $(srcdir)/tmp/vlc-${VERSION}/*/*
+	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc
+	mimeset -f $(srcdir)/tmp/vlc/* $(srcdir)/tmp/vlc/*/*
+	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION}
 	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS.zip vlc-${VERSION} )
 	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS.zip $(srcdir)/
 

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.52 2003/08/02 14:06:22 gbazin Exp $
+dnl $Id: configure.ac,v 1.53 2003/08/03 13:49:37 titer Exp $
 
 AC_INIT(vlc,0.6.2-cvs)
 
@@ -138,9 +138,13 @@ case "${target_os}" in
     AX_ADD_LDFLAGS([vlc beos],[-lbe])
     AX_ADD_CXXFLAGS([beos],[])
     AX_ADD_LDFLAGS([beos],[-lmedia -ltranslation -ltracker -lgame])
-    dnl Check if we have BONE (old net_server doesn't have libsocket.so)
+
+    dnl Check for BONE presence
     AC_CHECK_LIB(socket, connect,
         AX_ADD_LDFLAGS([vlc access_mms ipv4 httpd],[-lsocket -lbind]))
+
+    dnl Check for Zeta
+    AC_CHECK_LIB(zeta, find_directory_r, AX_ADD_LDFLAGS([vlc beos],[-lzeta]))
     ;;
   *)
     SYS="${target_os}"
