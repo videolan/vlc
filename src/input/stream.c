@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: stream.c,v 1.11 2004/01/16 11:12:16 fenrir Exp $
+ * $Id: stream.c,v 1.12 2004/01/21 17:01:54 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -116,7 +116,9 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case STREAM_SET_POSITION:
+        {
             i64 = (int64_t) va_arg( args, int64_t );
+            int64_t i_skip;
 
             vlc_mutex_lock( &s->p_input->stream.stream_lock );
             if( i64 < 0 ||
@@ -127,34 +129,44 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
                 msg_Warn( s, "seek out of bound" );
                 return VLC_EGENERIC;
             }
-            vlc_mutex_unlock( &s->p_input->stream.stream_lock );
 
-            if( i64 == s->p_input->stream.p_selected_area->i_tell )
+            i_skip = i64 - s->p_input->stream.p_selected_area->i_tell;
+
+            if( i_skip == 0 )
             {
+                vlc_mutex_unlock( &s->p_input->stream.stream_lock );
                 return VLC_SUCCESS;
             }
 
+            if( i_skip > 0 && i_skip < s->p_input->p_last_data - s->p_input->p_current_data - 1 )
+            {
+                /* We can skip without reading/seeking */
+                s->p_input->p_current_data += i_skip;
+                s->p_input->stream.p_selected_area->i_tell = i64;
+                vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+                return VLC_SUCCESS;
+            }
+            vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+
             if( s->p_input->stream.b_seekable &&
                 ( s->p_input->stream.i_method == INPUT_METHOD_FILE ||
-                  i64 - s->p_input->stream.p_selected_area->i_tell < 0 ||
-                  i64 - s->p_input->stream.p_selected_area->i_tell > 4096 ) )
+                  i_skip < 0 || i_skip >= ( s->p_input->i_mtu > 0 ? s->p_input->i_mtu : 4096 ) ) )
             {
                 input_AccessReinit( s->p_input );
                 s->p_input->pf_seek( s->p_input, i64 );
                 return VLC_SUCCESS;
             }
 
-            if( i64 - s->p_input->stream.p_selected_area->i_tell > 0 )
+            if( i_skip > 0 )
             {
                 data_packet_t *p_data;
-                int i_skip = i64 - s->p_input->stream.p_selected_area->i_tell;
 
                 if( i_skip > 1000 )
                 {
-                    msg_Warn( s, "will skip %d bytes, slow", i_skip );
+                    msg_Warn( s, "will skip "I64Fd" bytes, slow", i_skip );
                 }
 
-                while (i_skip > 0 )
+                while( i_skip > 0 )
                 {
                     int i_read;
 
@@ -174,6 +186,7 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
                 }
             }
             return VLC_SUCCESS;
+        }
 
         case STREAM_GET_MTU:
             p_int = (int*) va_arg( args, int * );
@@ -333,112 +346,3 @@ char *stream_ReadLine( stream_t *s )
     }
 }
 
-/**
- * Read "i_size" bytes and store them in a pes_packet_t.  Only fields
- * p_first, p_last, i_nb_data, and i_pes_size are set.  (Of course,
- * you need to fill i_dts, i_pts, ... ) If only less than "i_size"
- * bytes are available NULL is returned.
- */
-pes_packet_t *stream_PesPacket( stream_t *s, int i_data )
-{
-    pes_packet_t  *p_pes;
-    data_packet_t *p_packet;
-
-
-    if( !(p_pes = input_NewPES( s->p_input->p_method_data ) ) )
-    {
-        return NULL;
-    }
-
-    if( i_data <= 0 )
-    {
-        p_pes->p_first =
-            p_pes->p_last = input_NewPacket( s->p_input->p_method_data, 0 );
-        p_pes->i_nb_data = 1;
-        return p_pes;
-    }
-
-    while( i_data > 0 )
-    {
-        int i_read;
-
-        i_read = input_SplitBuffer( s->p_input, &p_packet,
-                     __MIN( i_data, (int)s->p_input->i_bufsize ) );
-        if( i_read <= 0 )
-        {
-            /* should occur only with EOF and max allocation reached 
-             * it safer to  return an error */
-            /* free pes */
-            input_DeletePES( s->p_input->p_method_data, p_pes );
-            return NULL;
-        }
-
-        if( p_pes->p_first == NULL )
-        {
-            p_pes->p_first = p_packet;
-        }
-        else
-        {
-            p_pes->p_last->p_next = p_packet;
-        }
-        p_pes->p_last = p_packet;
-        p_pes->i_nb_data++;
-        p_pes->i_pes_size += i_read;
-        i_data -= i_read;
-    }
-
-    return p_pes;
-}
-
-/**
- * Read i_size into a data_packet_t. If b_force is not set, fewer bytes can
- * be returned. You should always set b_force, unless you know what you are
- * doing.
- */
-data_packet_t *stream_DataPacket( stream_t *s, int i_size, vlc_bool_t b_force )
-{
-    data_packet_t *p_pk;
-    int           i_read;
-
-    if( i_size <= 0 )
-    {
-        p_pk = input_NewPacket( s->p_input->p_method_data, 0 );
-        if( p_pk )
-        {
-            p_pk->p_payload_end = p_pk->p_payload_start;
-        }
-        return p_pk;
-    }
-
-    i_read = input_SplitBuffer( s->p_input, &p_pk, i_size );
-    if( i_read <= 0 )
-    {
-        return NULL;
-    }
-
-    /* Should be really rare, near 0 */
-    if( i_read < i_size && b_force )
-    {
-        data_packet_t *p_old = p_pk;
-        int           i_missing = i_size - i_read;
-
-        p_pk = input_NewPacket( s->p_input->p_method_data, i_size );
-        if( p_pk == NULL )
-        {
-            input_DeletePacket( s->p_input->p_method_data, p_old );
-            return NULL;
-        }
-        p_pk->p_payload_end = p_pk->p_payload_start + i_size;
-        memcpy( p_pk->p_payload_start, p_old->p_payload_start, i_read );
-        input_DeletePacket( s->p_input->p_method_data, p_old );
-
-        if( stream_Read( s, &p_pk->p_payload_start[i_read], i_missing )
-            < i_missing )
-        {
-            input_DeletePacket( s->p_input->p_method_data, p_pk );
-            return NULL;
-        }
-    }
-
-    return p_pk;
-}
