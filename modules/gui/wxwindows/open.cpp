@@ -447,11 +447,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     common_opt_sizer->Add( caching_checkbox, 0,
                            wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     caching_value = new wxSpinCtrl( panel, CachingChange_Event );
-#ifdef WIN32  /* WIN32 uses 16 bit integer */
-    caching_value->SetRange( 0, 32767 );
-#else
     caching_value->SetRange( 0, 1000000 );
-#endif
     caching_value->Disable();
     common_opt_sizer->Add( caching_value, 0,
                            wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );

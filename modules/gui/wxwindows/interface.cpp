@@ -120,6 +120,7 @@ enum
     OpenFileSimple_Event,
     OpenAdv_Event,
     OpenFile_Event,
+    OpenDir_Event,
     OpenDisc_Event,
     OpenNet_Event,
     OpenCapture_Event,
@@ -185,6 +186,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(OpenFileSimple_Event, Interface::OnShowDialog)
     EVT_MENU(OpenAdv_Event, Interface::OnShowDialog)
     EVT_MENU(OpenFile_Event, Interface::OnShowDialog)
+    EVT_MENU(OpenDir_Event, Interface::OnShowDialog)
     EVT_MENU(OpenDisc_Event, Interface::OnShowDialog)
     EVT_MENU(OpenNet_Event, Interface::OnShowDialog)
     EVT_MENU(OpenCapture_Event, Interface::OnShowDialog)
@@ -379,6 +381,7 @@ void Interface::CreateOurMenuBar()
 
     file_menu->AppendSeparator();
     file_menu->Append( OpenFile_Event, wxU(_("Open &File...\tCtrl-F")) );
+    file_menu->Append( OpenDir_Event, wxU(_("Open D&irectory...\tCtrl-I")) );
     file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...\tCtrl-D")) );
     file_menu->Append( OpenNet_Event,
                        wxU(_("Open &Network Stream...\tCtrl-N")) );
@@ -747,6 +750,9 @@ void Interface::OnShowDialog( wxCommandEvent& event )
             i_id = INTF_DIALOG_FILE;
         case OpenFile_Event:
             i_id = INTF_DIALOG_FILE;
+            break;
+        case OpenDir_Event:
+            i_id = INTF_DIALOG_DIRECTORY;
             break;
         case OpenDisc_Event:
             i_id = INTF_DIALOG_DISC;
