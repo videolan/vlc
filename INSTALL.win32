@@ -69,12 +69,6 @@ exception of the autoconf tool for which I'm using the autoconf-devel-2.52-4
 package (I had problems with 2.53a-1). You will need to make sure you install
 at least the gcc-mingw, mingw-runtime and w32api packages.
 
-Also note that currently, even when using the -mno-cygwin option, the final
-executable requires cygwin1.dll even if none of the objects linked to form the
-executable does depend on cygwin1.dll itself. I don't know yet why the linker
-plays this trick...
-
-
 NOTE: by default, the GTK package is configured to be installed in
 /usr/local/gtk-win32, if you want to change this path, then you need to edit
 the gtk-win32/bin/gtk-config file and change "gtk_dir=" accordingly.
@@ -102,7 +96,7 @@ If you are cross-compiling from Debian, you can use something
 along those lines:
 
   ./bootstrap; \
-  CC=i586-mingw32msvc-gcc \
+  CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
   ./configure --host=i586-mingw32msvc --build=i386-linux \
   --with-gtk-config-path=/usr/local/gtk-win32/bin \
   --with-sdl-config-path=/usr/local/SDL-1.2.3-win32/i386-mingw32msvc/bin \
@@ -113,7 +107,7 @@ If you are cross-compiling using the mingw32 package provided by
 www.videolan.org, you have to use something along those lines:
 
   ./bootstrap; \
-  CC=i586-mingw32msvc-gcc \
+  CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
   PATH=/usr/local/cross-tools/bin:$PATH \
   ./configure --host=i586-mingw32msvc --build=i386-linux \
   --with-gtk-config-path=/usr/local/gtk-win32/bin \
@@ -134,14 +128,14 @@ If you are using cygwin, you can build vlc with or without the unix emulation
 layer (without is usually better). To build without the emulaion layer, use
 something like this:
   ./bootstrap; \
-  CC="gcc -mno-cygwin" \
+  CC="gcc -mno-cygwin" CXX="g++ -mno-cygwin" \
   ./configure \
   --with-gtk-config-path=/cygdrive/c/dev/gtk-win32/bin \
   --with-sdl-config-path=/cygdrive/c/dev/SDL-1.2.3-win32/i386-mingw32msvc/bin \
   --with-directx=/cygdrive/c/dev/dxheaders \
   --with-dvdcss-tree=../libdvdcss-win
 If you want to use the emulation layer, then just omit the CC="gcc -mno-cygwin"
-line.
+CXX="g++ -mno-cygwin" line.
 
 Note: when using the --with-dvdcss-tree you need to compile the libdvdcss tree
 beforehand.

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.203 2002/12/07 23:50:31 massiot Exp $
+ * $Id: video_output.c,v 1.204 2002/12/18 08:08:29 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -98,7 +98,8 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
     {
         if( ( p_vout->render.i_width != i_width ) ||
             ( p_vout->render.i_height != i_height ) ||
-            ( p_vout->render.i_chroma != i_chroma ) )
+            ( p_vout->render.i_chroma != i_chroma ) ||
+            ( p_vout->render.i_aspect != i_aspect ) )
         {
             /* We are not interested in this format, close this vout */
             vlc_object_detach( p_vout );
