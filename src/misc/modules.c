@@ -174,6 +174,9 @@ void module_DestroyBank( module_bank_t * p_bank )
         }
     }
 
+    /* Destory the lock */
+    vlc_mutex_destroy( &p_bank->lock );
+    
     /* We can free the module bank */
     free( p_bank );
 

@@ -2,7 +2,7 @@
  * video_fifo.c : video FIFO management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_fifo.c,v 1.25 2001/01/05 18:46:45 massiot Exp $
+ * $Id: video_fifo.c,v 1.26 2001/01/07 03:56:40 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -62,6 +62,7 @@ void vpar_InitFIFO( vpar_thread_t * p_vpar )
     p_vpar->vfifo.p_vpar = p_vpar;
 
 #ifdef VDEC_SMP
+
     /* Initialize mutex and cond */
     vlc_mutex_init( &p_vpar->vfifo.lock );
     vlc_cond_init( &p_vpar->vfifo.wait );

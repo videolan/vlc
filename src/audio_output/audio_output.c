@@ -339,6 +339,9 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
  *****************************************************************************/
 void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
 {
+
+    int i_fifo;
+    
     /* FIXME: pi_status is not handled correctly: check vout how to do!?? */
 
     intf_DbgMsg("aout debug: requesting termination of audio output thread (%p)", p_aout);
@@ -351,6 +354,14 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     free( p_aout->buffer );
     free( p_aout->s32_buffer );
 
+    /* Destroy the condition and mutex locks */
+    vlc_mutex_destroy( &p_aout->fifos_lock );
+    for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
+    {
+        vlc_mutex_destroy( &p_aout->fifo[i_fifo].data_lock );
+        vlc_cond_destroy( &p_aout->fifo[i_fifo].data_wait );
+    }
+    
     /* Free the structure */
     p_aout->p_sys_close( p_aout );
     intf_DbgMsg("aout debug: audio device (%s) closed", p_aout->psz_device);

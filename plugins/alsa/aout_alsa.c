@@ -259,7 +259,7 @@ long aout_AlsaGetBufInfo ( aout_thread_t *p_aout, long l_buffer_limit )
         return ( 1 );
     }
 
-    switch (alsa_channel_status.status)
+    switch( alsa_channel_status.status )
     {
         case SND_PCM_STATUS_NOTREADY : intf_ErrMsg("Status NOT READY");
                                        break;

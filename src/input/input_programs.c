@@ -1,9 +1,8 @@
 /*****************************************************************************
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
- * FIXME : check the return value of realloc() and malloc() !
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.18 2000/12/28 18:00:38 massiot Exp $
+ * $Id: input_programs.c,v 1.19 2001/01/07 03:56:40 henri Exp $
  *
  * Authors:
  *
@@ -62,7 +61,12 @@ void input_InitStream( input_thread_t * p_input, size_t i_data_len )
 
     if( i_data_len )
     {
-        p_input->stream.p_demux_data = malloc( i_data_len );
+        if ( (p_input->stream.p_demux_data = malloc( i_data_len )) == NULL )
+        {
+            intf_ErrMsg( "Unable to allocate memory in input_InitStream");
+            /* FIXME : find a way to tell if failed */
+            return;
+        }
         memset( p_input->stream.p_demux_data, 0, i_data_len );
     }
 }
@@ -127,11 +131,21 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
     p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
                                            p_input->stream.i_pgrm_number
                                             * sizeof(pgrm_descriptor_t *) );
-
+    if( p_input->stream.pp_programs == NULL )
+    {
+        intf_ErrMsg( "Unable to realloc memory in input_AddProgram" );
+        return NULL;
+    }
+    
     /* Allocate the structure to store this description */
     p_input->stream.pp_programs[i_pgrm_index] =
                                         malloc( sizeof(pgrm_descriptor_t) );
-
+    if( p_input->stream.pp_programs[i_pgrm_index] == NULL )
+    {
+        intf_ErrMsg( "Unable to allocate memory in input_AddProgram" );
+        return NULL;
+    }
+    
     /* Init this entry */
     p_input->stream.pp_programs[i_pgrm_index]->i_number = i_pgrm_id;
     p_input->stream.pp_programs[i_pgrm_index]->b_is_ok = 0;
@@ -157,6 +171,11 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
     {
         p_input->stream.pp_programs[i_pgrm_index]->p_demux_data =
             malloc( i_data_len );
+        if( p_input->stream.pp_programs[i_pgrm_index]->p_demux_data == NULL )
+        {
+            intf_ErrMsg( "Unable to allocate memory in input_AddProgram" );
+            return NULL;
+        }
         memset( p_input->stream.pp_programs[i_pgrm_index]->p_demux_data, 0,
                 i_data_len );
     }
@@ -208,6 +227,10 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
                                            p_input->stream.i_pgrm_number
                                             * sizeof(pgrm_descriptor_t *) );
 
+    if( p_input->stream.pp_programs == NULL)
+    {
+        intf_ErrMsg( "Unable to realloc memory in input_DelProgram" );
+    }
     /* Free the description of this program */
     free( p_pgrm );
 }
@@ -246,10 +269,20 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     intf_DbgMsg("Adding description for ES 0x%x", i_es_id);
 
     p_es = (es_descriptor_t *)malloc( sizeof(es_descriptor_t) );
+    if( p_es == NULL )
+    {
+        intf_ErrMsg( "Unable to allocate memory in input_AddES" );
+        return NULL;
+    }
     p_input->stream.i_es_number++;
     p_input->stream.pp_es = realloc( p_input->stream.pp_es,
                                      p_input->stream.i_es_number
                                       * sizeof(es_descriptor_t *) );
+    if( p_input->stream.pp_es == NULL )
+    {
+        intf_ErrMsg( "Unable to realloc memory in input_AddES" );
+        return NULL;
+    }
     p_input->stream.pp_es[p_input->stream.i_es_number - 1] = p_es;
     p_es->i_id = i_es_id;
 
@@ -261,6 +294,11 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     if( i_data_len )
     {
         p_es->p_demux_data = malloc( i_data_len );
+        if( p_es->p_demux_data == NULL )
+        {
+            intf_ErrMsg( "Unable to allocate memory in input_AddES" );
+            return NULL;
+        }
         memset( p_es->p_demux_data, 0, i_data_len );
     }
     else
@@ -275,6 +313,11 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         p_pgrm->pp_es = realloc( p_pgrm->pp_es,
                                  p_pgrm->i_es_number
                                   * sizeof(es_descriptor_t *) );
+        if( p_pgrm->pp_es == NULL )
+        {
+            intf_ErrMsg( "Unable to realloc memory in input_AddES" );
+            return NULL;
+        }
         p_pgrm->pp_es[p_pgrm->i_es_number - 1] = p_es;
         p_es->p_pgrm = p_pgrm;
     }
@@ -317,6 +360,10 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
                 p_pgrm->pp_es = realloc( p_pgrm->pp_es,
                                          p_pgrm->i_es_number
                                           * sizeof(es_descriptor_t *));
+                if( p_pgrm->pp_es == NULL )
+                {
+                    intf_ErrMsg( "Unable to realloc memory in input_DelES" );
+                }
                 break;
             }
         }
@@ -344,6 +391,11 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     p_input->stream.pp_es = realloc( p_input->stream.pp_es,
                                      p_input->stream.i_es_number
                                       * sizeof(es_descriptor_t *));
+    if( p_input->stream.pp_es == NULL )
+    {
+        intf_ErrMsg( "Unable to realloc memory in input_DelES" );
+    }
+    
 }
 
 #ifdef STATS
@@ -425,7 +477,11 @@ static vdec_config_t * GetVdecConfig( input_thread_t * p_input,
 {
     vdec_config_t *     p_config;
 
-    p_config = (vdec_config_t *)malloc( sizeof(vdec_config_t) );
+    if( (p_config = (vdec_config_t *)malloc( sizeof(vdec_config_t) )) == NULL)
+    {
+        intf_ErrMsg( "Unable to allocate memory in GetVdecConfig" );
+        return NULL;
+    }
     p_config->p_vout = p_input->p_default_vout;
     if( InitDecConfig( p_input, p_es, &p_config->decoder_config ) == -1 )
     {
@@ -444,7 +500,11 @@ static adec_config_t * GetAdecConfig( input_thread_t * p_input,
 {
     adec_config_t *     p_config;
 
-    p_config = (adec_config_t *)malloc( sizeof(adec_config_t) );
+    if ( (p_config = (adec_config_t *)malloc( sizeof(adec_config_t))) ==NULL )
+    {
+        intf_ErrMsg( "Unable to allocate memory in GetAdecConfig" );
+        return NULL;
+    }
     p_config->p_aout = p_input->p_default_aout;
     if( InitDecConfig( p_input, p_es, &p_config->decoder_config ) == -1 )
     {
@@ -532,6 +592,11 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
                                            p_input->stream.pp_selected_es,
                                            p_input->stream.i_selected_es_number
                                             * sizeof(es_descriptor_t *) );
+        if( p_input->stream.pp_selected_es == NULL )
+        {
+            intf_ErrMsg( "Unable to realloc memory in input_SelectES" );
+            return(-1);
+        }
         p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number - 1]
                 = p_es;
     }

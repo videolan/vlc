@@ -708,6 +708,10 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         intf_DbgMsg("picture %p (in free picture slot)", p_free_picture );
 #endif
         vlc_mutex_unlock( &p_vout->picture_lock );
+
+        /* Initialize mutex */
+        vlc_mutex_init( &(p_free_picture->lock_deccount) );
+        
         return( p_free_picture );
     }
 
@@ -744,6 +748,10 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #ifdef DEBUG_VOUT
    intf_DbgMsg("picture %p", p_pic);
 #endif
+
+   /* destroy the lock that had been initialized in CreatePicture */
+   vlc_mutex_destroy( &(p_pic->lock_deccount) );
+   
    vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
@@ -1311,6 +1319,11 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     vout_UnloadFont( p_vout->p_large_font );
     p_vout->p_sys_destroy( p_vout );
 
+    /* Destroy the locks */
+    vlc_mutex_destroy( &p_vout->picture_lock );
+    vlc_mutex_destroy( &p_vout->subpicture_lock );
+    vlc_mutex_destroy( &p_vout->change_lock );
+                
     /* Free structure */
     free( p_vout );
     *pi_status = i_status;

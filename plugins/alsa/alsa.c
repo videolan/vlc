@@ -66,7 +66,6 @@ void    aout_AlsaClose        ( aout_thread_t *p_aout );
  *****************************************************************************/
 plugin_info_t * GetConfig( void )
 {
-    int i_fd;
     plugin_info_t * p_info = (plugin_info_t *) malloc( sizeof(plugin_info_t) );
 
     p_info->psz_name    = "Alsa plugin";

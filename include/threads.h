@@ -70,7 +70,13 @@
  * Types definition
  *****************************************************************************/
 
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+
+typedef pthread_t        vlc_thread_t;
+typedef pthread_mutex_t  vlc_mutex_t;
+typedef pthread_cond_t   vlc_cond_t;
+
+#elif defined(HAVE_CTHREADS_H)
 
 typedef cthread_t        vlc_thread_t;
 
@@ -111,12 +117,6 @@ typedef struct
     thread_id       thread;
 } vlc_cond_t;
 
-#elif defined(HAVE_PTHREAD_H)
-
-typedef pthread_t        vlc_thread_t;
-typedef pthread_mutex_t  vlc_mutex_t;
-typedef pthread_cond_t   vlc_cond_t;
-
 #endif
 
 typedef void *(*vlc_thread_func_t)(void *p_data);
@@ -130,13 +130,15 @@ static __inline__ int  vlc_thread_create( vlc_thread_t *p_thread, char *psz_name
 static __inline__ void vlc_thread_exit  ( void );
 static __inline__ void vlc_thread_join  ( vlc_thread_t thread );
 
-static __inline__ int  vlc_mutex_init   ( vlc_mutex_t *p_mutex );
-static __inline__ int  vlc_mutex_lock   ( vlc_mutex_t *p_mutex );
-static __inline__ int  vlc_mutex_unlock ( vlc_mutex_t *p_mutex );
+static __inline__ int  vlc_mutex_init    ( vlc_mutex_t *p_mutex );
+static __inline__ int  vlc_mutex_lock    ( vlc_mutex_t *p_mutex );
+static __inline__ int  vlc_mutex_unlock  ( vlc_mutex_t *p_mutex );
+static __inline__ int  vlc_mutex_destroy ( vlc_mutex_t *p_mutex );
 
 static __inline__ int  vlc_cond_init    ( vlc_cond_t *p_condvar );
 static __inline__ int  vlc_cond_signal  ( vlc_cond_t *p_condvar );
 static __inline__ int  vlc_cond_wait    ( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex );
+static __inline__ int vlc_cond_destroy  ( vlc_cond_t *p_condvar );
 
 #if 0
 static _inline__ int    vlc_cond_timedwait   ( vlc_cond_t * condvar, vlc_mutex_t * mutex,
@@ -170,15 +172,15 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
  *****************************************************************************/
 static __inline__ void vlc_thread_exit( void )
 {
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+    pthread_exit( 0 );
+
+#elif defined(HAVE_CTHREADS_H)
     int result;
     cthread_exit( &result );
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     exit_thread( 0 );
-
-#elif defined(HAVE_PTHREAD_H)
-    pthread_exit( 0 );
 
 #endif
 }
@@ -188,15 +190,15 @@ static __inline__ void vlc_thread_exit( void )
  *****************************************************************************/
 static __inline__ void vlc_thread_join( vlc_thread_t thread )
 {
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+    pthread_join( thread, NULL );
+
+#elif defined(HAVE_CTHREADS_H)
     cthread_join( thread );
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     int32 exit_value;
     wait_for_thread( thread, &exit_value );
-
-#elif defined(HAVE_PTHREAD_H)
-    pthread_join( thread, NULL );
 
 #endif
 }
@@ -206,7 +208,10 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
  *****************************************************************************/
 static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+    return pthread_mutex_init( p_mutex, NULL );
+
+#elif defined(HAVE_CTHREADS_H)
     mutex_init( p_mutex );
     return 0;
 
@@ -225,9 +230,6 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     p_mutex->init = 9999;
     return B_OK;
 
-#elif defined(HAVE_PTHREAD_H)
-    return pthread_mutex_init( p_mutex, NULL );
-
 #endif
 }
 
@@ -236,7 +238,10 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
 {
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+    return pthread_mutex_lock( p_mutex );
+
+#elif defined(HAVE_CTHREADS_H)
     mutex_lock( p_mutex );
     return 0;
 
@@ -249,9 +254,6 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
     err = acquire_sem( p_mutex->lock );
     return err;
 
-#elif defined(HAVE_PTHREAD_H)
-    return pthread_mutex_lock( p_mutex );
-
 #endif
 }
 
@@ -260,7 +262,10 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 {
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+    return pthread_mutex_unlock( p_mutex );
+
+#elif defined(HAVE_CTHREADS_H)
     mutex_unlock( p_mutex );
     return 0;
 
@@ -272,10 +277,17 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
     release_sem( p_mutex->lock );
     return B_OK;
 
-#elif defined(HAVE_PTHREAD_H)
-    return pthread_mutex_unlock( p_mutex );
-
 #endif
+}
+
+/*****************************************************************************
+ * vlc_mutex_destroy: destory a mutex
+ *****************************************************************************/
+static __inline__ int vlc_mutex_destroy( vlc_mutex_t *p_mutex )
+{
+#if defined(HAVE_PTHREAD_H)    
+    return pthread_mutex_destroy( p_mutex );
+#endif    
 }
 
 /*****************************************************************************
@@ -283,7 +295,10 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 {
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+    return pthread_cond_init( p_condvar, NULL );
+
+#elif defined(HAVE_CTHREADS_H)
     /* condition_init() */
     spin_lock_init( &p_condvar->lock );
     cthread_queue_init( &p_condvar->queue );
@@ -303,9 +318,6 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
     p_condvar->init = 9999;
     return 0;
 
-#elif defined(HAVE_PTHREAD_H)
-    return pthread_cond_init( p_condvar, NULL );
-
 #endif
 }
 
@@ -314,7 +326,10 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
  *****************************************************************************/
 static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
 {
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+    return pthread_cond_signal( p_condvar );
+
+#elif defined(HAVE_CTHREADS_H)
     /* condition_signal() */
     if ( p_condvar->queue.head || p_condvar->implications )
     {
@@ -351,9 +366,6 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
     
     return 0;
 
-#elif defined(HAVE_PTHREAD_H)
-    return pthread_cond_signal( p_condvar );
-
 #endif
 }
 
@@ -362,7 +374,10 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
  *****************************************************************************/
 static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex )
 {
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+    return pthread_cond_wait( p_condvar, p_mutex );
+
+#elif defined(HAVE_CTHREADS_H)
     condition_wait( (condition_t)p_condvar, (mutex_t)p_mutex );
     return 0;
 
@@ -384,9 +399,15 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
     vlc_mutex_lock( p_mutex );
     return 0;
 
-#elif defined(HAVE_PTHREAD_H)
-    return pthread_cond_wait( p_condvar, p_mutex );
-
 #endif
 }
 
+/*****************************************************************************
+ * vlc_cond_destory: destroy a condition
+ *****************************************************************************/
+static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
+{
+#if defined(HAVE_PTHREAD_H)
+    return pthread_cond_destroy( p_condvar );
+#endif    
+}

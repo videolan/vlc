@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.66 2001/01/05 18:46:45 massiot Exp $
+ * $Id: vpar_headers.c,v 1.67 2001/01/07 03:56:40 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -698,7 +698,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                     << ( 1 - p_vpar->picture.b_frame_structure ));
 
         P_picture->i_deccount = p_vpar->sequence.i_mb_size;
-        vlc_mutex_init( &p_vpar->picture.p_picture->lock_deccount );
 #ifdef VDEC_SMP
         memset( p_vpar->picture.pp_mb, 0, MAX_MB*sizeof(macroblock_t *) );
 #endif

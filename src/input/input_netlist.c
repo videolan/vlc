@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.27 2001/01/06 05:44:45 henri Exp $
+ * $Id: input_netlist.c,v 1.28 2001/01/07 03:56:40 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -386,6 +386,9 @@ void input_NetlistEnd( input_thread_t * p_input)
 
     /* cast */
     p_netlist = ( netlist_t * ) p_input->p_method_data;
+    
+    /* destroy the mutex lock */
+    vlc_mutex_destroy (&p_netlist->lock);
     
     /* free the FIFO, the buffer, and the netlist structure */
     free (p_netlist->pp_free_data);

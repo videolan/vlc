@@ -175,6 +175,9 @@ void intf_MsgDestroy( void )
     }
 #endif
 
+    /* destroy lock */
+    vlc_mutex_destroy( &p_main->p_msg->lock );
+    
     /* Free structure */
     free( p_main->p_msg );
 }
