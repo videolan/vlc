@@ -873,6 +873,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_out.audio.i_channels =
         __MIN( id->p_encoder->fmt_out.audio.i_channels,
                id->p_decoder->fmt_in.audio.i_channels );
+    id->p_encoder->fmt_out.audio.i_physical_channels =
+        id->p_encoder->fmt_out.audio.i_original_channels =
+            pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
 
     /* Initialization of encoder format structures */
     es_format_Init( &id->p_encoder->fmt_in, AUDIO_ES, AOUT_FMT_S16_NE );
@@ -896,6 +899,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         id->p_decoder->p_module = 0;
         return VLC_EGENERIC;
     }
+    id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.audio.i_codec;
 
     /* Check if we need a filter for chroma conversion or resizing */
     if( id->p_decoder->fmt_out.i_codec !=

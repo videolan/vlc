@@ -674,7 +674,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
 
     p_enc->pf_encode_audio = Encode;
-    p_enc->fmt_in.i_codec = AUDIO_FMT_S16_NE;
+    p_enc->fmt_in.i_codec = VLC_FOURCC('f','l','3','2');
     p_enc->fmt_out.i_codec = VLC_FOURCC('v','o','r','b');
 
     sout_CfgParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
@@ -797,8 +797,8 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     {
         for( j = 0 ; j < p_aout_buf->i_nb_samples ; j++ )
         {
-            buffer[i][j]= ((float)( ((int16_t *)p_aout_buf->p_buffer )
-                                    [j * p_sys->i_channels + i ] )) / 32768.f;
+            buffer[i][j]= ((float *)p_aout_buf->p_buffer)
+                                    [j * p_sys->i_channels + i ];
         }
     }
 
