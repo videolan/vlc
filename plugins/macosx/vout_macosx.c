@@ -3,8 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
  *
- * Authors: Colin Delacroix <colin@zoy.org>
- *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
+ * Authors: 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -236,7 +235,6 @@ void FindBestMemoryLocation( vout_thread_t *p_vout )
 
         intf_ErrMsg( "FindBestMemoryLocation : gNewNewGWorld = false !" );
 #if 0
-//EJ added
         p_vout->i_screen_depth = wPixDepth;
         p_vout->i_bytes_per_pixel = wPixDepth;
         p_vout->i_bytes_per_line   = p_vout->i_width * p_vout->i_bytes_per_pixel;
@@ -283,10 +281,8 @@ static int CreateDisplay( vout_thread_t *p_vout )
         return( 1 );
     }
 
+//FIXME ? - lock this down until the end...
     hPixmap0 = GetGWorldPixMap( p_vout->p_sys->p_gw[0] );
-//FIXME BIGTIME - in SDL they just lock this down until the end...KLUDGE
-//but alas sounds good to me to try it.
-//well fuck a duck it works.
     LockPixels(hPixmap0);
     hPixmap1 = GetGWorldPixMap( p_vout->p_sys->p_gw[1] );
     LockPixels(hPixmap1);
@@ -310,7 +306,7 @@ static int CreateDisplay( vout_thread_t *p_vout )
         return( 1 );
     }
 
-//FIXME TODO - if I ever dispose of the Gworlds and recreate them, i'll have a new address
+//FIXME - if I ever dispose of the Gworlds and recreate them, i'll have a new address
 //and I'll need to tell vout about them...  dunno what problems vout might have if we just updateGworld  
     vout_SetBuffers( p_vout, hPixmapBaseAddr0, hPixmapBaseAddr1 );
 
@@ -354,9 +350,7 @@ static int MakeWindow( vout_thread_t *p_vout )
     p_vout->i_bytes_per_line   = p_vout->i_width * p_vout->i_bytes_per_pixel;
     p_vout->p_sys->i_page_size = p_vout->i_width * p_vout->i_height * p_vout->i_bytes_per_pixel;
 
-//EJ added
-#if 1
-p_vout->i_bytes_per_line = (**(**GetWindowDevice( p_vout )).gdPMap).rowBytes & 0x3FFF ;
+    p_vout->i_bytes_per_line = (**(**GetWindowDevice( p_vout )).gdPMap).rowBytes & 0x3FFF ;
 
     switch ( p_vout->i_screen_depth )
     {
@@ -375,9 +369,7 @@ p_vout->i_bytes_per_line = (**(**GetWindowDevice( p_vout )).gdPMap).rowBytes & 0
         default:
             break;
     }
-#endif
 
-//EJ - not sure about these...
 #if 0
     p_vout->i_red_lshift = 0x10;
     p_vout->i_red_rshift = 0x0;
@@ -574,15 +566,8 @@ void BlitToWindow( vout_thread_t *p_vout, short index )
                     GetPortBitMapForCopyBits( GetWindowPort( p_vout->p_sys->p_window ) ), 
                     &rectSource, &rectDest, srcCopy, NULL);
 //        UnlockPixels( GetGWorldPixMap( p_vout->p_sys->p_gw[index] ) );
-//EJ
         //flushQD( p_vout );
-/*
-    }
-    else
-    {
-        intf_ErrMsg( "error: Could not LockPixels" );
-    }
-*/
+//    }
     SetPort ( pCGrafSave );
 }
 

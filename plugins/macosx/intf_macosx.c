@@ -3,8 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
  *
- * Authors: Colin Delacroix <colin@zoy.org>
- *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
+ * Authors: 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,9 +38,6 @@
 
 #include "intf_msg.h"
 #include "interface.h"
-
-/* FIXME: get rid of this and do menus & command keys*/
-#include "keystrokes.h"
 
 #include "modules.h"
 
@@ -100,12 +96,13 @@ enum
     kMenuControls   = 130,
 
     kAppleAbout = 1, 
-    kAppleQuit = 7, //is this always the same?
+    kAppleQuit = 8, //is this always the same?
 
     kFileNew   = 1, 
     kFileOpen,
     kFileCloseDivisor,
     kFileClose,
+    kFileQuitHack,
 
     kControlsPlayORPause   = 1, 
     kControlsStop,
@@ -122,7 +119,6 @@ enum
     kControlsVolumeMute,
     kControlsEjectDiv,
     kControlsEject 
-
 
 
 #if 0
@@ -223,44 +219,11 @@ static int intf_Open( intf_thread_t *p_intf )
     InitCursor();
     SetQDGlobalsRandomSeed( TickCount() );
 
-#if 0
-    p_intf->p_intf_get_key = intf_GetKey;
-
-    intf_AssignKey( p_intf , 'Q', INTF_KEY_QUIT, 0);
-    intf_AssignKey( p_intf , 'q', INTF_KEY_QUIT, 0);
-    intf_AssignKey( p_intf ,  27, INTF_KEY_QUIT, 0);
-    intf_AssignKey( p_intf ,   3, INTF_KEY_QUIT, 0);
-    intf_AssignKey( p_intf , '0', INTF_KEY_SET_CHANNEL, 0);
-    intf_AssignKey( p_intf , '1', INTF_KEY_SET_CHANNEL, 1);
-    intf_AssignKey( p_intf , '2', INTF_KEY_SET_CHANNEL, 2);
-    intf_AssignKey( p_intf , '3', INTF_KEY_SET_CHANNEL, 3);
-    intf_AssignKey( p_intf , '4', INTF_KEY_SET_CHANNEL, 4);
-    intf_AssignKey( p_intf , '5', INTF_KEY_SET_CHANNEL, 5);
-    intf_AssignKey( p_intf , '6', INTF_KEY_SET_CHANNEL, 6);
-    intf_AssignKey( p_intf , '7', INTF_KEY_SET_CHANNEL, 7);
-    intf_AssignKey( p_intf , '8', INTF_KEY_SET_CHANNEL, 8);
-    intf_AssignKey( p_intf , '9', INTF_KEY_SET_CHANNEL, 9);
-    intf_AssignKey( p_intf , '0', INTF_KEY_SET_CHANNEL, 0);
-    intf_AssignKey( p_intf , '+', INTF_KEY_INC_VOLUME, 0);
-    intf_AssignKey( p_intf , '-', INTF_KEY_DEC_VOLUME, 0);
-    intf_AssignKey( p_intf , 'm', INTF_KEY_TOGGLE_VOLUME, 0);
-    intf_AssignKey( p_intf , 'M', INTF_KEY_TOGGLE_VOLUME, 0);
-    intf_AssignKey( p_intf , 'g', INTF_KEY_DEC_GAMMA, 0);
-    intf_AssignKey( p_intf , 'G', INTF_KEY_INC_GAMMA, 0);
-    intf_AssignKey( p_intf , 'c', INTF_KEY_TOGGLE_GRAYSCALE, 0);
-    intf_AssignKey( p_intf , ' ', INTF_KEY_TOGGLE_INTERFACE, 0);
-    intf_AssignKey( p_intf , 'i', INTF_KEY_TOGGLE_INFO, 0);
-    intf_AssignKey( p_intf , 's', INTF_KEY_TOGGLE_SCALING, 0);
-    intf_AssignKey( p_intf , 'd', INTF_KEY_DUMP_STREAM, 0);
-
-
-//EJ - neat menu but don't know if we want it.
+// neat menu but don't know if we want it.
 // Install the Windows menu. Free of charge!
 //    CreateStandardWindowMenu( 0, &windMenu );
 //    InsertMenu( windMenu, 0 );
 //    DrawMenuBar();
-
-#else
 
     menu = NewMenu( kMenuApple, "\p\024" );
     AppendMenu( menu, "\pAbout VLCÉ/A" );
@@ -271,6 +234,8 @@ static int intf_Open( intf_thread_t *p_intf )
     AppendMenu( menu, "\pOpenÉ/O" );
     AppendMenu( menu, "\p(-" );
     AppendMenu( menu, "\pClose/W" );
+    //standard OS X application menu quit isn't working nicely
+    AppendMenu( menu, "\pQuit/Q" );
     InsertMenu( menu, 0 );
 
 //BIG HONKING MENU - in order Mac OS 9 dvd player
@@ -321,7 +286,8 @@ static int intf_Open( intf_thread_t *p_intf )
     AppendMenu( menu, "\pEject/E" ); //14
 
     InsertMenu( menu, 0 );
-#endif
+
+
 
     DrawMenuBar();
 
@@ -346,6 +312,10 @@ static void intf_Run( intf_thread_t *p_intf )
 
     EventLoopTimerUPP manageUPP;
 
+/*
+Eventually we want to use Carbon events, or maybe even write this app in Cocoa
+*/
+
 //    EventTypeSpec windowEventType = { kEventClassWindow, kEventWindowClose };
 //    EventHandlerUPP windowHandlerUPP;
 
@@ -369,7 +339,7 @@ static void intf_Run( intf_thread_t *p_intf )
 */
 
 
-#ifndef CocoaEvents
+#ifndef CarbonEvents
     //UGLY Event Loop!
     EventLoop( p_intf );
 #else
@@ -395,7 +365,7 @@ void CarbonManageCallback ( EventLoopTimerRef inTimer, void *inUserData )
     }
 }
 
-#ifndef CocoaEvents
+#ifndef CarbonEvents
 
 void EventLoop( intf_thread_t *p_intf )
 {
@@ -404,13 +374,15 @@ void EventLoop( intf_thread_t *p_intf )
     
     do
     {
+    p_intf->pf_manage( p_intf );
         gotEvent = WaitNextEvent(everyEvent,&event,32767,nil);
         if (gotEvent)
             DoEvent( p_intf, &event);
     } while (! p_intf->b_die );
     
-    ExitToShell();					
+    //ExitToShell();					
 }
+
 
 void DoEvent( intf_thread_t *p_intf , EventRecord *event)
 {
@@ -514,6 +486,8 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
                     
                 case kAppleQuit:
                     p_intf->b_die = true;
+                    //hrmm...
+                    ExitToShell();
                     return;
                     break;
 				
@@ -552,6 +526,10 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
                     //Fixme
                     SysBeep(30);
                     //DoAboutBox();
+                    break;
+                    
+                case kFileQuitHack:
+                    p_intf->b_die = true;
                     break;
                     
                 default:
@@ -630,13 +608,21 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
                     break;
                 
                 case kControlsChapterNext:
-                    //Fixme
-                    SysBeep(30);
+                    if( p_intf->p_input != NULL )
+                    {
+                        /* FIXME: temporary hack */
+                        p_intf->p_input->b_eof = 1;
+                    }
                     break;
 
                 case kControlsChapterPrevious:
-                    //Fixme
-                    SysBeep(30);
+                    if( p_intf->p_input != NULL )
+                    {
+                        /* FIXME: temporary hack */
+                        intf_PlaylistPrev( p_main->p_playlist );
+                        intf_PlaylistPrev( p_main->p_playlist );
+                        p_intf->p_input->b_eof = 1;
+                    }
                     break;
 
                 case kControlsDVDMenu:
