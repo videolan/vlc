@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.m,v 1.53 2004/01/14 18:45:45 bigben Exp $
+ * $Id: playlist.m,v 1.54 2004/01/20 15:34:43 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -423,7 +423,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         /* One item */
         NSDictionary *o_one_item;
-        int j, i_new_position = -1;
+        int j, i_new_id = -1;
         int i_mode = PLAYLIST_INSERT;
         BOOL b_rem = FALSE, b_dir = FALSE;
         NSString *o_uri, *o_name;
@@ -455,12 +455,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             psz_dev[temp - psz_dev] = '\0';
             o_uri = [NSString stringWithCString: psz_dev ];
         }
-    
-        if (i_item == 0 && !b_enqueue)
-            i_mode |= PLAYLIST_GO;
         
         /* Add the item */
-        i_new_position = playlist_Add( p_playlist, [o_uri fileSystemRepresentation], 
+        i_new_id = playlist_Add( p_playlist, [o_uri fileSystemRepresentation], 
                       [o_name UTF8String], i_mode, 
                       i_position == -1 ? PLAYLIST_END : i_position + i_item);
         
@@ -469,9 +466,15 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             for( j = 0; j < [o_options count]; j++ )
             {
-                playlist_AddOption( p_playlist, i_new_position,
+                playlist_AddOption( p_playlist, i_new_id,
                  strdup( [[o_options objectAtIndex:j] UTF8String] ) );
             }
+        }
+        
+        if( i_item == 0 && !b_enqueue )
+        {
+            playlist_Goto( p_playlist, playlist_GetPositionById( p_playlist, i_new_id ) );
+            playlist_Play( p_playlist );
         }
     
         /* Recent documents menu */

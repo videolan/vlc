@@ -2,7 +2,7 @@
  * applescript.m: MacOS X AppleScript support
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: applescript.m,v 1.5 2004/01/05 13:07:03 zorglub Exp $
+ * $Id: applescript.m,v 1.6 2004/01/20 15:34:43 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -53,10 +53,10 @@
         {
             NSURL * o_url;
     
-            int i_mode = PLAYLIST_INSERT | PLAYLIST_GO;
+            int i_mode = PLAYLIST_INSERT;
             
             playlist_Add( p_playlist, [o_urlString fileSystemRepresentation],
-                          [o_urlString fileSystemRepresentation],
+                          [[o_urlString fileSystemRepresentation] lastPathComponent],
                           i_mode, PLAYLIST_END );
 
             o_url = [NSURL fileURLWithPath: o_urlString];

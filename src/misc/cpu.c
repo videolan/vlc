@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: cpu.c,v 1.12 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: cpu.c,v 1.13 2004/01/20 15:34:44 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -34,10 +34,7 @@
 #endif
 
 #ifdef SYS_DARWIN
-#   include <mach/mach.h>                               /* AltiVec detection */
-#   include <mach/mach_error.h>       /* some day the header files||compiler *
-                                                       will define it for us */
-#   include <mach/bootstrap.h>
+#include <sys/sysctl.h>
 #endif
 
 #include "vlc_cpu.h"
@@ -70,34 +67,15 @@ uint32_t CPUCapabilities( void )
     volatile uint32_t i_capabilities = CPU_CAPABILITY_NONE;
 
 #if defined( SYS_DARWIN )
-    struct host_basic_info hi;
-    kern_return_t          ret;
-    host_name_port_t       host;
-
-    int i_size;
-    char *psz_name, *psz_subname;
+    int selectors[2] = { CTL_HW, HW_VECTORUNIT };
+    int i_has_altivec = 0;
+    size_t i_length = sizeof( i_has_altivec );
+    int i_error = sysctl( selectors, 2, &i_has_altivec, &i_length, NULL, 0);
 
     i_capabilities |= CPU_CAPABILITY_FPU;
 
-    /* Should 'never' fail? */
-    host = mach_host_self();
-
-    i_size = sizeof( hi ) / sizeof( int );
-    ret = host_info( host, HOST_BASIC_INFO, ( host_info_t )&hi, &i_size );
-
-    if( ret != KERN_SUCCESS )
-    {
-        fprintf( stderr, "error: couldn't get CPU information\n" );
-        return i_capabilities;
-    }
-
-    slot_name( hi.cpu_type, hi.cpu_subtype, &psz_name, &psz_subname );
-    /* FIXME: need better way to detect newer proccessors.
-     * could do strncmp(a,b,5), but that's real ugly */
-    if( !strcmp(psz_name, "ppc7400") || !strcmp(psz_name, "ppc7450") )
-    {
+    if( i_error == 0 && i_has_altivec != 0 )
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
-    }
 
     return i_capabilities;
 
