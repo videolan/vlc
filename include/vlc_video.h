@@ -292,16 +292,6 @@ struct subpicture_t
  * Prototypes
  *****************************************************************************/
 /**
- * vout_AspectRatio
- *
- * Set the i_aspect_x and i_aspect_y from the encoded aspect ratio i_aspect.
- * \param i_aspect the encoded aspect ratio
- * \param i_aspect_x the decoded x-axis portion of i_aspect. This is set.
- * \param i_aspect_y the decoded y-axis portion of i_aspect  This is set.
- */
-VLC_EXPORT( void, vout_AspectRatio, ( unsigned int i_aspect, unsigned int *i_aspect_x, unsigned int *i_aspect_y ) );
-
-/**
  * vout_CopyPicture
  *
  * Copy the source picture onto the destination picture.

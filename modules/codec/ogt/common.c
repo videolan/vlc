@@ -2,7 +2,7 @@
  * Common SVCD and CVD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.13 2004/02/22 10:52:23 rocky Exp $
+ * $Id$
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from:
@@ -349,7 +349,7 @@ VCDSubHandleScaling( subpicture_t *p_spu, decoder_t *p_dec )
   vlc_object_t * p_input = p_spu->p_sys->p_input;
   vout_thread_t *p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, 
                                            FIND_CHILD );
-  unsigned int i_aspect_x, i_aspect_y;
+  int i_aspect_x, i_aspect_y;
   uint8_t *p_dest = (uint8_t *)p_spu->p_sys->p_data;
 
   if (p_vout) {
@@ -405,11 +405,12 @@ VCDSubHandleScaling( subpicture_t *p_spu, decoder_t *p_dec )
             break;
           }
         /* We get here only for scaled chromas. */
-        vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_y, 
-                          &i_aspect_x );
+        vlc_reduce( &i_aspect_x, &i_aspect_y, p_vout->render.i_aspect,
+                    VOUT_ASPECT_FACTOR, 0 );
       } else {
         /* User knows best? */
-        vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+        vlc_reduce( &i_aspect_x, &i_aspect_y, p_vout->render.i_aspect,
+                    VOUT_ASPECT_FACTOR, 0 );
       }
       VCDSubScaleX( p_dec, p_spu, i_aspect_x, i_aspect_y );
     }

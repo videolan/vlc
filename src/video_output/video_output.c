@@ -63,20 +63,6 @@ static int DeinterlaceCallback( vlc_object_t *, char const *,
 static int FilterCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
-/**
- * vout_AspectRatio
- *
- * Set the i_aspect_x and i_aspect_y from i_aspect.
- */
-void vout_AspectRatio( unsigned int i_aspect,
-                       /*out*/ unsigned int *i_aspect_x,
-                       /*out*/ unsigned int *i_aspect_y )
-{
-  unsigned int i_pgcd = ReduceHeight( i_aspect );
-  *i_aspect_x = i_aspect / i_pgcd;
-  *i_aspect_y = VOUT_ASPECT_FACTOR / i_pgcd;
-}
-
 /*****************************************************************************
  * vout_Request: find a video output thread, create one, or destroy one.
  *****************************************************************************
