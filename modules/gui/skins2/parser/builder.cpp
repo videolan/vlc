@@ -2,7 +2,7 @@
  * builder.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.cpp,v 1.7 2004/02/29 16:49:55 asmax Exp $
+ * $Id: builder.cpp,v 1.8 2004/03/01 18:33:31 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -143,7 +143,7 @@ void Builder::addWindow( const BuilderData::Window &rData )
                            m_pTheme->getWindowManager(), *pFont,
                            rData.m_dragDrop, rData.m_playOnDrop );
 
-    m_pTheme->m_windows[uniqueId( rData.m_id) ] = GenericWindowPtr( pWin );
+    m_pTheme->m_windows[rData.m_id] = GenericWindowPtr( pWin );
 }
 
 
@@ -166,7 +166,7 @@ void Builder::addLayout( const BuilderData::Layout &rData )
                                                 rData.m_height,
                                                 minWidth, maxWidth, minHeight,
                                                 maxHeight );
-    m_pTheme->m_layouts[uniqueId( rData.m_id) ] = GenericLayoutPtr( pLayout );
+    m_pTheme->m_layouts[rData.m_id] = GenericLayoutPtr( pLayout );
 
     // Attach the layout to its window
     pWin->setActiveLayout( pLayout );
@@ -227,7 +227,7 @@ void Builder::addButton( const BuilderData::Button &rData )
 
     pLayout->addControl( pButton, pos, rData.m_layer );
 
-    m_pTheme->m_controls[uniqueId( rData.m_id) ] = CtrlGenericPtr( pButton );
+    m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pButton );
 }
 
 
@@ -298,7 +298,7 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
 
     pLayout->addControl( pCheckbox, pos, rData.m_layer );
 
-    m_pTheme->m_controls[uniqueId( rData.m_id) ] = CtrlGenericPtr( pCheckbox );
+    m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pCheckbox );
 }
 
 
@@ -350,7 +350,7 @@ void Builder::addImage( const BuilderData::Image &rData )
         pLayout->addControl( pImage, pos, rData.m_layer );
     }
 
-    m_pTheme->m_controls[uniqueId( rData.m_id) ] = CtrlGenericPtr( pImage );
+    m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pImage );
 }
 
 
@@ -386,7 +386,7 @@ void Builder::addText( const BuilderData::Text &rData )
                                           rData.m_yPos + height, *pLayout ),
                          rData.m_layer );
 
-    m_pTheme->m_controls[uniqueId( rData.m_id) ] = CtrlGenericPtr( pText );
+    m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pText );
 }
 
 
@@ -428,7 +428,7 @@ void Builder::addRadialSlider( const BuilderData::RadialSlider &rData )
 
     pLayout->addControl( pRadial, pos, rData.m_layer );
 
-    m_pTheme->m_controls[uniqueId( rData.m_id) ] = CtrlGenericPtr( pRadial );
+    m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pRadial );
 }
 
 
@@ -492,9 +492,8 @@ void Builder::addSlider( const BuilderData::Slider &rData )
     pLayout->addControl( pBackground, pos, rData.m_layer );
     pLayout->addControl( pCursor, pos, rData.m_layer );
 
-    string newId = uniqueId( rData.m_id );
-    m_pTheme->m_controls[newId] = CtrlGenericPtr( pCursor );
-    m_pTheme->m_controls[newId + "_bg"] = CtrlGenericPtr( pBackground );
+    m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pCursor );
+    m_pTheme->m_controls[rData.m_id + "_bg"] = CtrlGenericPtr( pBackground );
 }
 
 
@@ -537,48 +536,8 @@ void Builder::addList( const BuilderData::List &rData )
 
     pLayout->addControl( pList, pos, rData.m_layer );
 
-    m_pTheme->m_controls[uniqueId( rData.m_id) ] = CtrlGenericPtr( pList );
+    m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pList );
 }
-
-
-const string Builder::generateId() const
-{
-    static int i = 1;
-
-    char genId[5];
-    snprintf( genId, 4, "%i", i++ );
-
-    string base = "_ReservedId_" + (string)genId;
-
-    return base;
-}
-
-
-const string Builder::uniqueId( const string &id )
-{
-    string newId;
-
-    if( m_idSet.find( id ) != m_idSet.end() )
-    {
-        // The id was already used
-        if( id != "none" )
-        {
-            msg_Warn( getIntf(), "Non unique id: %s", id.c_str() );
-        }
-        newId = generateId();
-    }
-    else
-    {
-        // OK, this is a new id
-        newId = id;
-    }
-
-    // Add the id to the set
-    m_idSet.insert( newId );
-
-    return newId;
-}
-
 
 
 const Position Builder::makePosition( const string &rLeftTop,

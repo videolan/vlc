@@ -2,7 +2,7 @@
  * skin_parser.cpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: skin_parser.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id: skin_parser.cpp,v 1.3 2004/03/01 18:33:31 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -46,14 +46,14 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Bitmap" )
     {
-        const BuilderData::Bitmap bitmap( attr["id"], attr["file"],
+        const BuilderData::Bitmap bitmap( attr["id"] , attr["file"],
                 ConvertColor( attr["alphacolor"] ) );
         m_data.m_listBitmap.push_back( bitmap );
     }
 
     else if( rName == "Button" )
     {
-        const BuilderData::Button button( attr["id"], atoi( attr["x"] ) +
+        const BuilderData::Button button( uniqueId( attr["id"] ), atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["lefttop"],
                 attr["rightbottom"], attr["up"], attr["down"], attr["over"],
                 attr["action"], attr["tooltiptext"], attr["help"], m_curLayer,
@@ -64,7 +64,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "CheckBox" )
     {
-        const BuilderData::Checkbox checkbox( attr["id"], atoi( attr["x"] ) +
+        const BuilderData::Checkbox checkbox( uniqueId( attr["id"] ), atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["lefttop"],
                 attr["rightbottom"], attr["up1"], attr["down1"], attr["over1"],
                 attr["up2"], attr["down2"], attr["over2"], attr["state"],
@@ -92,7 +92,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Image" )
     {
-        const BuilderData::Image imageData( attr["id"], atoi( attr["x"] ) +
+        const BuilderData::Image imageData( uniqueId( attr["id"] ), atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["lefttop"],
                 attr["rightbottom"], ConvertBoolean( attr["visible"] ),
                 attr["image"], attr["onclick"], attr["help"], m_curLayer,
@@ -103,18 +103,19 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Layout" )
     {
-        const BuilderData::Layout layout( attr["id"], atoi( attr["width"] ),
+        m_curLayoutId = uniqueId( attr["id"] );
+        const BuilderData::Layout layout( m_curLayoutId, atoi( attr["width"] ),
                 atoi( attr["height"] ), atoi( attr["minwidth"] ),
                 atoi( attr["maxwidth"] ), atoi( attr["minheight"] ),
                 atoi( attr["maxheight"] ), m_curWindowId );
         m_data.m_listLayout.push_back( layout );
-        m_curLayoutId = attr["id"];
         m_curLayer = 0;
     }
 
     else if( rName == "Playlist" )
     {
-        const BuilderData::List listData( attr["id"], atoi( attr["x"] ) +
+        m_curListId = uniqueId( attr["id"] );
+        const BuilderData::List listData( m_curListId, atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, atoi( attr["width"]),
                 atoi( attr["height"] ), attr["lefttop"], attr["rightbottom"],
                 attr["font"], attr["var"], ConvertColor( attr["fgcolor"] ),
@@ -124,13 +125,12 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 ConvertColor( attr["selcolor"] ), attr["help"],
                 m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
-        m_curListId = attr["id"];
         m_data.m_listList.push_back( listData );
     }
 
     else if( rName == "RadialSlider" )
     {
-        const BuilderData::RadialSlider radial( attr["id"], attr["visible"],
+        const BuilderData::RadialSlider radial( uniqueId( attr["id"] ), attr["visible"],
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 attr["lefttop"], attr["rightbottom"], attr["sequence"],
                 atoi( attr["nbImages"] ), atof( attr["minAngle"] ) * M_PI / 180,
@@ -149,7 +149,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
             // Slider associated to a list
             newValue = "playlist.slider";
         }
-        const BuilderData::Slider slider( attr["id"], attr["visible"],
+        const BuilderData::Slider slider( uniqueId( attr["id"] ), attr["visible"],
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 attr["lefttop"], attr["rightbottom"], attr["up"], attr["down"],
                 attr["over"], attr["points"], atoi( attr["thickness"] ),
@@ -161,7 +161,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Text" )
     {
-        const BuilderData::Text textData( attr["id"], atoi( attr["x"] ) +
+        const BuilderData::Text textData( uniqueId( attr["id"] ), atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["font"],
                 attr["text"], atoi( attr["width"] ),
                 ConvertColor( attr["color"] ), attr["help"], m_curLayer,
@@ -192,13 +192,13 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Window" )
     {
-        const BuilderData::Window window( attr["id"],
+        m_curWindowId = uniqueId( attr["id"] );
+        const BuilderData::Window window( m_curWindowId,
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 ConvertBoolean( attr["visible"] ),
                 ConvertBoolean( attr["dragdrop"] ),
                 ConvertBoolean( attr["playondrop"] ) );
         m_data.m_listWindow.push_back( window );
-        m_curWindowId = attr["id"];
     }
 }
 
@@ -232,5 +232,43 @@ int SkinParser::ConvertColor( const char *transcolor ) const
     iRed = iGreen = iBlue = 0;
     sscanf( transcolor, "#%2lX%2lX%2lX", &iRed, &iGreen, &iBlue );
     return ( iRed << 16 | iGreen << 8 | iBlue );
+}
+
+const string SkinParser::generateId() const
+{
+    static int i = 1;
+
+    char genId[5];
+    snprintf( genId, 4, "%i", i++ );
+
+    string base = "_ReservedId_" + (string)genId;
+
+    return base;
+}
+
+
+const string SkinParser::uniqueId( const string &id )
+{
+    string newId;
+
+    if( m_idSet.find( id ) != m_idSet.end() )
+    {
+        // The id was already used
+        if( id != "none" )
+        {
+            msg_Warn( getIntf(), "Non unique id: %s", id.c_str() );
+        }
+        newId = generateId();
+    }
+    else
+    {
+        // OK, this is a new id
+        newId = id;
+    }
+
+    // Add the id to the set
+    m_idSet.insert( newId );
+
+    return newId;
 }
 

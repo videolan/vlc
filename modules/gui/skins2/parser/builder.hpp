@@ -2,7 +2,7 @@
  * builder.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.hpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
+ * $Id: builder.hpp,v 1.4 2004/03/01 18:33:31 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -37,7 +37,6 @@
 
 #include <string>
 #include <list>
-#include <set>
 #include <map>
 
 class Theme;
@@ -64,9 +63,6 @@ class Builder: public SkinObject
         /// Theme under construction
         Theme *m_pTheme;
 
-        /// Set of used id
-        set<string> m_idSet;
-
         void addTheme( const BuilderData::Theme &rData );
         void addBitmap( const BuilderData::Bitmap &rData );
         void addFont( const BuilderData::Font &rData );
@@ -81,13 +77,7 @@ class Builder: public SkinObject
         void addSlider( const BuilderData::Slider &rData );
         void addList( const BuilderData::List &rData );
 
-        /// Generate a new id
-        const string generateId() const;
-
-        /// Check if the id is unique, and if not generate a new one
-        const string uniqueId( const string &id );
-
-        /// Compute the position of a control
+       /// Compute the position of a control
         const Position makePosition( const string &rLeftTop,
                                      const string &rRightBottom,
                                      int xPos, int yPos, int width, int height,

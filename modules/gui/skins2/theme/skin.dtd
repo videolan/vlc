@@ -42,7 +42,7 @@
     >
 <!ELEMENT Window (Layout)+>
     <!ATTLIST Window
-        id          CDATA   #REQUIRED
+        id          CDATA   "none"
         visible     CDATA   "true"
         x           CDATA   "0"
         y           CDATA   "0"

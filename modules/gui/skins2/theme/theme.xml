@@ -64,7 +64,7 @@
   <Font id="default_font" font="FreeSansBold.ttf" size="15"/> 
   <Font id="playlist_font" font="FreeSansBold.ttf" size="12"/> 
 
-  <Window id="mainwindow" x="230" y="250" dragdrop="true">
+  <Window x="230" y="250" dragdrop="true">
 
     <Layout id="testlayout" width="424" height="152">
     <Group x="0" y="0">

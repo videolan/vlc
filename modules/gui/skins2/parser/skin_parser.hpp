@@ -2,7 +2,7 @@
  * skin_parser.hpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: skin_parser.hpp,v 1.1 2004/01/25 11:44:19 asmax Exp $
+ * $Id: skin_parser.hpp,v 1.2 2004/03/01 18:33:31 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -26,6 +26,7 @@
 
 #include "xmlparser.hpp"
 #include "builder_data.hpp"
+#include <set>
 
 
 /// Parser for the skin DTD
@@ -49,6 +50,8 @@ class SkinParser: public XMLParser
         list<int> m_xOffsetList, m_yOffsetList;
         /// Layer of the current control in the layout
         int m_curLayer;
+        /// Set of used id
+        set<string> m_idSet;
 
         /// Callbacks
         virtual void handleBeginElement( const string &rName, AttrList_t &attr );
@@ -57,6 +60,12 @@ class SkinParser: public XMLParser
         /// Helper functions
         bool ConvertBoolean( const char *value ) const;
         int ConvertColor( const char *transcolor ) const;
+
+        /// Generate a new id
+        const string generateId() const;
+
+        /// Check if the id is unique, and if not generate a new one
+        const string uniqueId( const string &id );
 };
 
 #endif
