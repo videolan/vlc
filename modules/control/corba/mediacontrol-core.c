@@ -313,23 +313,28 @@ mediacontrol_set_media_position(mediacontrol_Instance *self,
 				const mediacontrol_Position * a_position,
 				mediacontrol_Exception *exception)
 {
-  off_t l_offset_destination = 0;
-  int i_whence = 0;
-  input_thread_t * p_input = self->p_playlist->p_input;
+    off_t l_offset_destination = 0;
+    int i_whence = 0;
+    input_thread_t * p_input = self->p_playlist->p_input;
 
-  exception=mediacontrol_exception_init(exception);
-  if (! p_input)
+    exception=mediacontrol_exception_init(exception);
+    if (! p_input)
     {
-      RAISE(mediacontrol_InternalException, "No input thread.");
-      return;
+        RAISE(mediacontrol_InternalException, "No input thread.");
+        return;
     }
 
-  if ( !p_input->stream.b_seekable )
+    if ( !p_input->stream.b_seekable )
     {
-      RAISE(mediacontrol_InvalidPosition, "Stream not seekable");
-      return;
+        RAISE(mediacontrol_InvalidPosition, "Stream not seekable");
+        return;
     }
 
+    /* FIXME FIXME FIXME input_Seek is deprecated, and I don't know how to fix that --fenrir */
+    /* You need to do a var_SetFloat( p_input, pos ); where pos is a float between 0.0 and 1.0 */
+    RAISE(mediacontrol_InvalidPosition, "mediacontrol_set_media_position is not usable for now");
+    return
+#if 0
   l_offset_destination = a_position->value;
 
   i_whence |= INPUT_SEEK_BYTES;
@@ -358,6 +363,7 @@ mediacontrol_set_media_position(mediacontrol_Instance *self,
      function (cf input_ext-intf.c) */
   input_Seek (p_input, l_offset_destination, i_whence);
   return;
+#endif
 }
 
 /* Starts playing a stream */
@@ -403,20 +409,18 @@ mediacontrol_pause(mediacontrol_Instance *self,
 		   const mediacontrol_Position * a_position, 
 		   mediacontrol_Exception *exception)
 {
-  input_thread_t *p_input = self->p_playlist->p_input;;
+    input_thread_t *p_input = self->p_playlist->p_input;;
 
-  /* FIXME: use the a_position parameter */
-  exception=mediacontrol_exception_init(exception);
-  if (p_input != NULL)
+    /* FIXME: use the a_position parameter */
+    exception=mediacontrol_exception_init(exception);
+    if (p_input != NULL)
     {
-      input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+        var_SetInteger( p_input, "state", PAUSE_S );
     }
-  else
+    else
     {
-      RAISE(mediacontrol_InternalException, "No input");
+        RAISE(mediacontrol_InternalException, "No input");
     }
-  
-  return;
 }
 
 void
@@ -424,20 +428,18 @@ mediacontrol_resume(mediacontrol_Instance *self,
 		    const mediacontrol_Position * a_position, 
 		    mediacontrol_Exception *exception)
 {
-  input_thread_t *p_input = self->p_playlist->p_input;
+    input_thread_t *p_input = self->p_playlist->p_input;
 
-  /* FIXME: use the a_position parameter */
-  exception=mediacontrol_exception_init(exception);
-  if (p_input != NULL)
+    /* FIXME: use the a_position parameter */
+    exception=mediacontrol_exception_init(exception);
+    if (p_input != NULL)
     {
-      input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+        var_SetInteger( p_input, "state", PAUSE_S );
     }
-  else
+    else
     {
-      RAISE(mediacontrol_InternalException, "No input");
+        RAISE(mediacontrol_InternalException, "No input");
     }
-  
-  return;
 }
 
 void

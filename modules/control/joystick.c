@@ -547,9 +547,9 @@ static int Forward(intf_thread_t *p_intf)
     if(p_intf->p_sys->p_input)
     {
         msg_Dbg(p_intf,"seeking %f seconds",p_intf->p_sys->f_seconds);
-        input_Seek( p_intf->p_sys->p_input, p_intf->p_sys->f_seconds,
-                    INPUT_SEEK_SECONDS | INPUT_SEEK_CUR);
-    return 0;
+        var_SetTime( p_intf->p_sys->p_input, "time-offset",
+                     (int64_t)p_intf->p_sys->f_seconds * I64C(1000000) );
+        return 0;
     }
     return -1;
 }
@@ -560,8 +560,9 @@ static int Back(intf_thread_t *p_intf)
     if(p_intf->p_sys->p_input)
     {
         msg_Dbg(p_intf,"seeking -%f seconds",p_intf->p_sys->f_seconds);
-        input_Seek( p_intf->p_sys->p_input, -(p_intf->p_sys->f_seconds),
-                    INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+
+        var_SetTime( p_intf->p_sys->p_input, "time-offset",
+                     -(int64_t)p_intf->p_sys->f_seconds * I64C(1000000) );
         return 0;
     }
     return -1;
@@ -572,7 +573,7 @@ static int Play(intf_thread_t *p_intf)
 {
     if(p_intf->p_sys->p_input)
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+        var_SetInteger( p_input, "state", PAUSE_S );
         return 0;
     }
     return -1;

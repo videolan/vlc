@@ -481,7 +481,8 @@ static void Run( intf_thread_t *p_intf )
                         p_input->stream.p_selected_area->i_part = i_chapter;
                         vlc_mutex_unlock( &p_input->stream.stream_lock );
                         input_ChangeArea( p_input, p_area );
-                        input_SetStatus( p_input, INPUT_STATUS_PLAY );
+
+                        var_SetInteger( p_input, "state", PLAYING_S );
                         vlc_mutex_lock( &p_input->stream.stream_lock );
                     }
                     vlc_mutex_unlock( &p_input->stream.stream_lock );
