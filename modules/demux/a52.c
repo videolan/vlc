@@ -2,7 +2,7 @@
  * a52.c : raw A/52 stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.3 2004/02/13 22:14:11 gbazin Exp $
+ * $Id: a52.c,v 1.4 2004/02/13 22:37:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -32,7 +32,8 @@
 #   include <unistd.h>
 #endif
 
-#define A52_PACKET_SIZE 16384
+#define PCM_FRAME_SIZE (1536 * 4)
+#define A52_PACKET_SIZE (4 * PCM_FRAME_SIZE)
 #define A52_MAX_HEADER_SIZE 10
 
 /*****************************************************************************
@@ -61,7 +62,7 @@ struct demux_sys_t
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("Raw A/52 demuxer") );
-    set_capability( "demux", 155 );
+    set_capability( "demux", 145 );
     set_callbacks( Open, Close );
     add_shortcut( "a52" );
 vlc_module_end();
@@ -123,7 +124,7 @@ static int Open( vlc_object_t * p_this )
         /* Some A52 wav files don't begin with a sync code so we do a more
          * extensive search */
         i_size = input_Peek( p_input, &p_peek, i_peek + A52_PACKET_SIZE * 2);
-        i_size -= A52_MAX_HEADER_SIZE;
+        i_size -= (PCM_FRAME_SIZE + A52_MAX_HEADER_SIZE);
 
         while( i_peek < i_size )
         {
@@ -131,7 +132,17 @@ static int Open( vlc_object_t * p_this )
                 /* The data is stored in 16 bits words */
                 i_peek += 2;
             else
+            {
+                /* Check following sync code */
+                if( CheckSync( p_peek + i_peek + PCM_FRAME_SIZE,
+                               &b_big_endian ) != VLC_SUCCESS )
+                {
+                    i_peek += 2;
+                    continue;
+                }
+
                 break;
+            }
         }
     }
 
