@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -248,7 +248,8 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->p_context->pix_fmt != PIX_FMT_YUV422P &&
         /* H264 uses too many reference frames */
         p_sys->i_codec_id != CODEC_ID_H264 &&
-        !(p_sys->p_context->width % 16) && !(p_sys->p_context->height % 16) )
+        !(p_sys->p_context->width % 16) && !(p_sys->p_context->height % 16) &&
+        !p_sys->p_context->debug_mv )
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
          * so we need to do another check in ffmpeg_GetFrameBuf() */
