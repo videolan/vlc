@@ -209,7 +209,7 @@ class CaptureEnumMediaTypes : public IEnumMediaTypes
     access_t * p_input;
     CapturePin     *p_pin;
 
-    int i_position;
+    size_t i_position;
     long i_ref;
 
 public:

@@ -471,7 +471,7 @@ static int AccessOpen( vlc_object_t *p_this )
         if( SUCCEEDED(pXbar->Route(VideoOutputIndex, VideoInputIndex)) )
         {
             msg_Dbg( p_access, "Crossbar at depth %d, Routed video "
-                     "ouput %d to video input %d", i, VideoOutputIndex,
+                     "ouput %ld to video input %ld", i, VideoOutputIndex,
                      VideoInputIndex );
 
             if( AudioOutputIndex != -1 && AudioInputIndex != -1 )
@@ -480,7 +480,7 @@ static int AccessOpen( vlc_object_t *p_this )
                                             AudioInputIndex)) )
                 {
                     msg_Dbg(p_access, "Crossbar at depth %d, Routed audio "
-                            "ouput %d to audio input %d", i,
+                            "ouput %ld to audio input %ld", i,
                             AudioOutputIndex, AudioInputIndex );
                 }
             }
@@ -745,7 +745,7 @@ static HRESULT FindCrossbarRoutes( access_t *p_access, IPin *p_input_pin,
             p_sys->crossbar_routes[depth].AudioOutputIndex = outputPinIndexRelated;
 
             msg_Dbg( p_access, "Crossbar at depth %d, Found Route For "
-                     "ouput %ld (type %ld) to input %d (type %ld)", depth,
+                     "ouput %ld (type %ld) to input %ld (type %ld)", depth,
                      outputPinIndex, outputPinPhysicalType, inputPinIndex,
                      inputPinPhysicalType );
 
@@ -865,12 +865,13 @@ static int GetFourCCPriority(int i_fourcc)
     switch( i_fourcc )
     {
         case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('a','r','a','w'):
+        case VLC_FOURCC('f','l','3','2'):
         {
             return 9;
         }
 
         case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('a','r','a','w'):
         {
             return 8;
         }
@@ -883,7 +884,6 @@ static int GetFourCCPriority(int i_fourcc)
         case VLC_FOURCC('Y','U','Y','2'):
         case VLC_FOURCC('R','V','3','2'):
         case VLC_FOURCC('R','G','B','A'):
-        case VLC_FOURCC('f','l','3','2'):
         {
             return 6;
         }
@@ -940,6 +940,7 @@ static int OpenDevice( access_t *p_access, string devicename,
         return VLC_EGENERIC;
     }
 
+    AM_MEDIA_TYPE *mt;
     AM_MEDIA_TYPE media_types[MAX_MEDIA_TYPES];
 
     size_t mt_count = EnumDeviceCaps( (vlc_object_t *)p_access,
@@ -947,42 +948,101 @@ static int OpenDevice( access_t *p_access, string devicename,
                                       p_sys->i_width, p_sys->i_height,
                                       0, 0, 0, media_types, MAX_MEDIA_TYPES );
 
-    if( 0 == mt_count )
+    if( mt_count > 0 )
     {
-        msg_Err( p_access, "can't use device: %s, unsupported media types",
-                 devicename.c_str() );
-        return VLC_EGENERIC;
-    }
- 
-    AM_MEDIA_TYPE *mt =
-        (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
+	mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
 
-    // Order and copy returned media types according to arbitrary
-    // fourcc priority
-    for( size_t c=0; c<mt_count; c++ )
-    {
-        int slot_priority =
-            GetFourCCPriority(GetFourCCFromMediaType(media_types[c]));
-        int slot_copy = c;
-        for( size_t d=c+1; d<mt_count; d++ )
-        {
-            int priority =
-                GetFourCCPriority(GetFourCCFromMediaType(media_types[d]));
-            if( priority > slot_priority )
-            {
-                slot_priority = priority;
-                slot_copy = d;
-            }
-        }
-        if( slot_copy != c )
-        {
-            mt[c] = media_types[slot_copy];
-            media_types[slot_copy] = media_types[c];
-        }
-        else
-        {
-            mt[c] = media_types[c];
-        }
+	// Order and copy returned media types according to arbitrary
+	// fourcc priority
+	for( size_t c=0; c<mt_count; c++ )
+	{
+	    int slot_priority =
+		GetFourCCPriority(GetFourCCFromMediaType(media_types[c]));
+	    size_t slot_copy = c;
+	    for( size_t d=c+1; d<mt_count; d++ )
+	    {
+		int priority =
+		    GetFourCCPriority(GetFourCCFromMediaType(media_types[d]));
+		if( priority > slot_priority )
+		{
+		    slot_priority = priority;
+		    slot_copy = d;
+		}
+	    }
+	    if( slot_copy != c )
+	    {
+		mt[c] = media_types[slot_copy];
+		media_types[slot_copy] = media_types[c];
+	    }
+	    else
+	    {
+		mt[c] = media_types[c];
+	    }
+	}
+    }
+    else if( ! b_audio ) {
+	// Use default video media type
+        AM_MEDIA_TYPE mtr;
+	VIDEOINFOHEADER vh;
+
+	mtr.majortype            = MEDIATYPE_Video;
+	mtr.subtype              = MEDIASUBTYPE_I420;
+	mtr.bFixedSizeSamples    = TRUE;
+	mtr.bTemporalCompression = FALSE;
+	mtr.lSampleSize          = 0;
+	mtr.pUnk                 = NULL;
+	mtr.formattype           = FORMAT_VideoInfo;
+	mtr.cbFormat             = sizeof(vh);
+	mtr.pbFormat             = (BYTE *)&vh;
+
+        memset(&vh, 0, sizeof(vh));
+
+	vh.bmiHeader.biSize        = sizeof(vh.bmiHeader);
+	vh.bmiHeader.biWidth       = p_sys->i_width > 0 ? p_sys->i_width: 320;
+	vh.bmiHeader.biHeight      = p_sys->i_height > 0 ? p_sys->i_height : 240;
+	vh.bmiHeader.biPlanes      = 1;
+	vh.bmiHeader.biBitCount    = 24;
+	vh.bmiHeader.biCompression = VLC_FOURCC('I','4','2','0');
+	vh.bmiHeader.biSizeImage   = p_sys->i_width * 24 * p_sys->i_height / 8;
+
+        msg_Warn( p_access, "device %s using built-in video media type",
+                 devicename.c_str() );
+
+	mt_count = 1;
+	mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
+	CopyMediaType(mt, &mtr);
+    }
+    else {
+	// Use default audio media type
+        AM_MEDIA_TYPE mtr;
+	WAVEFORMATEX wf;
+
+	mtr.majortype            = MEDIATYPE_Audio;
+	mtr.subtype              = MEDIASUBTYPE_PCM;
+	mtr.bFixedSizeSamples    = TRUE;
+	mtr.bTemporalCompression = FALSE;
+	mtr.lSampleSize          = 0;
+	mtr.pUnk                 = NULL;
+	mtr.formattype           = FORMAT_WaveFormatEx;
+	mtr.cbFormat             = sizeof(wf);
+	mtr.pbFormat             = (BYTE *)&wf;
+
+        memset(&wf, 0, sizeof(wf));
+
+	wf.wFormatTag = WAVE_FORMAT_PCM;
+	wf.nChannels = 2;
+	wf.nSamplesPerSec = 44100;
+	wf.wBitsPerSample = 16;
+	wf.nBlockAlign = wf.nSamplesPerSec * wf.wBitsPerSample / 8;
+	wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
+	wf.cbSize = 0;
+
+        msg_Warn( p_access, "device %s using built-in audio media type",
+                 devicename.c_str() );
+
+	mt_count = 1;
+	mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
+	CopyMediaType(mt, &mtr);
     }
 
     /* Create and add our capture filter */
@@ -1026,8 +1086,6 @@ static int OpenDevice( access_t *p_access, string devicename,
         {
             if( dshow_stream.mt.majortype == MEDIATYPE_Video )
             {
-                msg_Dbg( p_access, "MEDIATYPE_Video");
-
                 dshow_stream.header.video =
                     *(VIDEOINFOHEADER *)dshow_stream.mt.pbFormat;
 
@@ -1087,13 +1145,11 @@ static int OpenDevice( access_t *p_access, string devicename,
                 /* Greatly simplifies the reading routine */
                 int i_mtu = dshow_stream.header.video.bmiHeader.biWidth *
                     i_height * 4;
-                p_sys->i_mtu = __MAX( p_sys->i_mtu, (unsigned int)i_mtu );
+                p_sys->i_mtu = __MAX( p_sys->i_mtu, i_mtu );
             }
 
             else if( dshow_stream.mt.majortype == MEDIATYPE_Audio )
             {
-                msg_Dbg( p_access, "MEDIATYPE_Audio");
-
                 dshow_stream.header.audio =
                     *(WAVEFORMATEX *)dshow_stream.mt.pbFormat;
 
@@ -1135,7 +1191,7 @@ static int OpenDevice( access_t *p_access, string devicename,
                         dshow_stream.header.audio.wBitsPerSample / 8;
                 }
                 p_pin->Release();
-                p_sys->i_mtu = __MAX( p_sys->i_mtu, (unsigned int)i_mtu );
+                p_sys->i_mtu = __MAX( p_sys->i_mtu, i_mtu );
             }
 
             else if( dshow_stream.mt.majortype == MEDIATYPE_Stream )
@@ -1200,7 +1256,7 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
                            IID_ICreateDevEnum, (void **)&p_dev_enum );
     if( FAILED(hr) )
     {
-        msg_Err( p_this, "failed to create the device enumerator (0x%x)", hr);
+        msg_Err( p_this, "failed to create the device enumerator (0x%lx)", hr);
         return NULL;
     }
 
@@ -1215,7 +1271,7 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
     p_dev_enum->Release();
     if( FAILED(hr) )
     {
-        msg_Err( p_this, "failed to create the class enumerator (0x%x)", hr );
+        msg_Err( p_this, "failed to create the class enumerator (0x%lx)", hr );
         return NULL;
     }
 
@@ -1263,7 +1319,7 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
                     if( FAILED(hr) )
                     {
                         msg_Err( p_this, "couldn't bind moniker to filter "
-                                 "object (0x%x)", hr );
+                                 "object (0x%lx)", hr );
                         p_moniker->Release();
                         p_class_enum->Release();
                         return NULL;
@@ -1293,7 +1349,11 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
     IEnumMediaTypes *p_enummt;
     size_t mt_count = 0;
 
-    if( S_OK != p_filter->EnumPins( &p_enumpins ) ) return 0;
+    if( FAILED(p_filter->EnumPins( &p_enumpins )) )
+    {
+	msg_Dbg( p_this, "EnumDeviceCaps failed: no pin enumeration !");
+	return 0;
+    }
 
     while( S_OK == p_enumpins->Next( 1, &p_output_pin, NULL ) )
     {
@@ -1309,6 +1369,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
 
         p_output_pin->Release();
     }
+
     p_enumpins->Reset();
 
     while( !mt_count && p_enumpins->Next( 1, &p_output_pin, NULL ) == S_OK )
@@ -1414,8 +1475,6 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                     }
                     else if( p_mt->majortype == MEDIATYPE_Stream )
                     {
-                        msg_Dbg( p_this, "EnumDeviceCaps: MEDIATYPE_Stream" );
-
                         if( ( !i_fourcc || i_fourcc == i_current_fourcc ) &&
                                 (mt_count < mt_max) )
                         {
