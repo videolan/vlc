@@ -97,6 +97,7 @@ struct intf_sys_t
     
 #ifdef WIN32
     HANDLE hConsoleIn;
+    vlc_bool_t b_quiet;
 #endif
 };
 
@@ -265,7 +266,8 @@ static int Activate( vlc_object_t *p_this )
     p_intf->pf_run = Run;
 
 #ifdef WIN32
-    if( !config_GetInt( p_intf, "rc-quiet" ) ) { CONSOLE_INTRO_MSG; }
+    p_intf->p_sys->b_quiet = config_GetInt( p_intf, "rc-quiet" );
+    if( !p_intf->p_sys->b_quiet ) { CONSOLE_INTRO_MSG; }
 #else
     CONSOLE_INTRO_MSG;
 #endif
@@ -388,33 +390,13 @@ static void Run( intf_thread_t *p_intf )
     {
         char *psz_cmd, *psz_arg;
         vlc_bool_t b_complete;
-        
+
         if( p_intf->p_sys->i_socket_listen != - 1 &&
-               p_intf->p_sys->i_socket == -1 )
+            p_intf->p_sys->i_socket == -1 )
         {
-#ifdef WIN32
-            /* If rc-quiet is specified, only check for socket connections
-               once per second, to not flood the CPU.  */
-	        if( config_GetInt( p_intf, "rc-quiet" ) )
-	        {
-                do
-                {
-                    p_intf->p_sys->i_socket =
-                        net_Accept( p_intf, p_intf->p_sys->i_socket_listen, 0 );
-                    msleep( 1000 );
-                } while  ( p_intf->p_sys->i_socket == -1 );
-            }
-            else
-            {
-                p_intf->p_sys->i_socket =
-                    net_Accept( p_intf, p_intf->p_sys->i_socket_listen, 0 );
-	        }
-#else
             p_intf->p_sys->i_socket =
                 net_Accept( p_intf, p_intf->p_sys->i_socket_listen, 0 );
-#endif        
         }
- 
 
         b_complete = ReadCommand( p_intf, p_buffer, &i_size );
 
@@ -647,7 +629,7 @@ static void Run( intf_thread_t *p_intf )
             printf("| \n");
             if (p_intf->p_sys->b_extend)
             {
-	           printf(_("| marq-marquee STRING  . . overlay STRING in video\n"));
+                   printf(_("| marq-marquee STRING  . . overlay STRING in video\n"));
                printf(_("| marq-x X . . . . . .offset of marquee, from left\n"));
                printf(_("| marq-y Y . . . . . . offset of marquee, from top\n"));
                printf(_("| marq-timeout T. . . . .timeout of marquee, in ms\n"));
@@ -894,8 +876,8 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         }
         else 
         {
-	        val.psz_string = "";
-	        var_Set( p_pl, "marq-marquee", val);
+                val.psz_string = "";
+                var_Set( p_pl, "marq-marquee", val);
         }
     }
     else if( !strcmp( psz_cmd, "marq-x" ) )
@@ -1172,8 +1154,13 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     int i_read = 0;
 
 #ifdef WIN32
-    if( p_intf->p_sys->i_socket == -1 )
+    if( p_intf->p_sys->i_socket == -1 && !p_intf->p_sys->b_quiet )
         return ReadWin32( p_intf, p_buffer, pi_size );
+    else if( p_intf->p_sys->i_socket == -1 )
+    {
+        msleep( INTF_IDLE_SLEEP );
+        return VLC_FALSE;
+    }
 #endif
 
     while( !p_intf->b_die && *pi_size < MAX_LINE_LENGTH &&
