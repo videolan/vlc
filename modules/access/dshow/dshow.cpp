@@ -2,7 +2,7 @@
  * dshow.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.3 2003/08/25 22:57:40 gbazin Exp $
+ * $Id: dshow.cpp,v 1.4 2003/08/26 19:14:09 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -303,12 +303,13 @@ static int AccessOpen( vlc_object_t *p_this )
 
     if( !p_sys->i_streams )
     {
-        /* Uninitialize OLE/COM */
-        CoUninitialize();   
-
         /* Release directshow objects */
         p_sys->p_control->Release();
         p_sys->p_graph->Release();
+
+        /* Uninitialize OLE/COM */
+        CoUninitialize();   
+
         free( p_sys->p_header );
         free( p_sys );
         return VLC_EGENERIC;
@@ -336,7 +337,6 @@ static void AccessClose( vlc_object_t *p_this )
     p_sys->p_control->Stop();
     p_sys->p_control->Release();
 
-#if 0
     /* Remove filters from graph */
     for( int i = 0; i < p_sys->i_streams; i++ )
     {
@@ -346,7 +346,6 @@ static void AccessClose( vlc_object_t *p_this )
         p_sys->pp_streams[i]->p_capture_filter->Release();
     }
     p_sys->p_graph->Release();
-#endif
 
     /* Uninitialize OLE/COM */
     CoUninitialize();   
@@ -705,7 +704,7 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         }
 
         /* Get new sample/frame from next stream */
-        //if( p_sream->sample.p_sample ) p_stream->sample.p_sample->Release();
+        //if( p_stream->sample.p_sample ) p_stream->sample.p_sample->Release();
         p_sys->i_current_stream =
             (p_sys->i_current_stream + 1) % p_sys->i_streams;
         p_stream = p_sys->pp_streams[p_sys->i_current_stream];

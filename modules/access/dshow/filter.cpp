@@ -2,7 +2,7 @@
  * filter.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.cpp,v 1.2 2003/08/25 21:45:04 gbazin Exp $
+ * $Id: filter.cpp,v 1.3 2003/08/26 19:14:10 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -180,11 +180,13 @@ STDMETHODIMP CapturePin::QueryInterface(REFIID riid, void **ppv)
     if( riid == IID_IUnknown ||
         riid == IID_IPin )
     {
+        AddRef();
         *ppv = (IPin *)this;
         return NOERROR;
     }
     if( riid == IID_IMemInputPin )
     {
+        AddRef();
         *ppv = (IMemInputPin *)this;
         return NOERROR;
     }
@@ -200,8 +202,7 @@ STDMETHODIMP_(ULONG) CapturePin::AddRef()
     msg_Dbg( p_input, "CapturePin::AddRef" );
 #endif
 
-    i_ref++;
-    return NOERROR;
+    return i_ref++;
 };
 STDMETHODIMP_(ULONG) CapturePin::Release()
 {
@@ -212,7 +213,7 @@ STDMETHODIMP_(ULONG) CapturePin::Release()
     i_ref--;
     if( !i_ref ) delete this;
 
-    return NOERROR;
+    return i_ref;
 };
 
 /* IPin methods */
@@ -251,6 +252,8 @@ STDMETHODIMP CapturePin::ConnectedTo( IPin **pPin )
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::ConnectedTo" );
 #endif
+
+    if( !p_connected_pin ) return VFW_E_NOT_CONNECTED;
 
     p_connected_pin->AddRef();
     *pPin = p_connected_pin;
@@ -452,21 +455,25 @@ STDMETHODIMP CaptureFilter::QueryInterface( REFIID riid, void **ppv )
 
     if( riid == IID_IUnknown )
     {
+        AddRef();
         *ppv = (IUnknown *)this;
         return NOERROR;
     }
     if( riid == IID_IPersist )
     {
+        AddRef();
         *ppv = (IPersist *)this;
         return NOERROR;
     }
     if( riid == IID_IMediaFilter )
     {
+        AddRef();
         *ppv = (IMediaFilter *)this;
         return NOERROR;
     }
     if( riid == IID_IBaseFilter )
     {
+        AddRef();
         *ppv = (IBaseFilter *)this;
         return NOERROR;
     }
@@ -482,8 +489,7 @@ STDMETHODIMP_(ULONG) CaptureFilter::AddRef()
     msg_Dbg( p_input, "CaptureFilter::AddRef" );
 #endif
 
-    i_ref++;
-    return NOERROR;
+    return i_ref++;
 };
 STDMETHODIMP_(ULONG) CaptureFilter::Release()
 {
@@ -494,7 +500,7 @@ STDMETHODIMP_(ULONG) CaptureFilter::Release()
     i_ref--;
     if( !i_ref ) delete this;
 
-    return NOERROR;
+    return i_ref;
 };
 
 /* IPersist method */
@@ -646,6 +652,7 @@ STDMETHODIMP CaptureEnumPins::QueryInterface( REFIID riid, void **ppv )
     if( riid == IID_IUnknown ||
         riid == IID_IEnumPins )
     {
+        AddRef();
         *ppv = (IEnumPins *)this;
         return NOERROR;
     }
@@ -661,8 +668,7 @@ STDMETHODIMP_(ULONG) CaptureEnumPins::AddRef()
     msg_Dbg( p_input, "CaptureEnumPins::AddRef" );
 #endif
 
-    i_ref++;
-    return NOERROR;
+    return i_ref++;
 };
 STDMETHODIMP_(ULONG) CaptureEnumPins::Release()
 {
@@ -673,7 +679,7 @@ STDMETHODIMP_(ULONG) CaptureEnumPins::Release()
     i_ref--;
     if( !i_ref ) delete this;
 
-    return NOERROR;
+    return i_ref;
 };
 
 /* IEnumPins */
@@ -693,10 +699,9 @@ STDMETHODIMP CaptureEnumPins::Next( ULONG cPins, IPin ** ppPins,
         pPin->AddRef();
         *pcFetched = 1;
         i_position++;
-        return NOERROR;
     }
 
-    return S_FALSE;
+    return *pcFetched == cPins ? NOERROR : S_FALSE;
 };
 STDMETHODIMP CaptureEnumPins::Skip( ULONG cPins )
 {
@@ -772,6 +777,7 @@ STDMETHODIMP CaptureEnumMediaTypes::QueryInterface( REFIID riid, void **ppv )
     if( riid == IID_IUnknown ||
         riid == IID_IEnumMediaTypes )
     {
+        AddRef();
         *ppv = (IEnumMediaTypes *)this;
         return NOERROR;
     }
@@ -787,8 +793,7 @@ STDMETHODIMP_(ULONG) CaptureEnumMediaTypes::AddRef()
     msg_Dbg( p_input, "CaptureEnumMediaTypes::AddRef" );
 #endif
 
-    i_ref++;
-    return NOERROR;
+    return i_ref++;
 };
 STDMETHODIMP_(ULONG) CaptureEnumMediaTypes::Release()
 {
@@ -799,7 +804,7 @@ STDMETHODIMP_(ULONG) CaptureEnumMediaTypes::Release()
     i_ref--;
     if( !i_ref ) delete this;
 
-    return NOERROR;
+    return i_ref;
 };
 
 /* IEnumMediaTypes */
@@ -833,7 +838,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Skip( ULONG cMediaTypes )
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Skip" );
 #endif
 
-    if( cMediaTypes > 1 )
+    if( cMediaTypes > 0 )
     {
         return S_FALSE;
     }
