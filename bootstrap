@@ -347,7 +347,8 @@ rm -Rf autom4te.cache
 # remove old autotools extra cruft
 rm -f config.guess config.sub missing mkinstalldirs compile depcomp install-sh
 # remove new autotools extra cruft
-(cd autotools && rm -f config.guess config.sub missing mkinstalldirs compile depcomp install-sh)
+rm -Rf autotools
+mkdir autotools
 # remove libtool cruft
 rm -f ltmain.sh libtool ltconfig
 # remove gettext cruft
