@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.19 2003/04/16 21:50:19 karibu Exp $
+ * $Id: gtk2_window.cpp,v 1.20 2003/04/18 16:04:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -234,12 +234,12 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
         case GDK_LEAVE_NOTIFY:
             OSAPI_PostMessage( this, WINDOW_LEAVE, 0, 0 );
             return true;
-/*
-        case WM_LBUTTONDBLCLK:
-            MouseDblClick( LOWORD( p2 ), HIWORD( p2 ), 1 );
+
+        case GDK_2BUTTON_PRESS:
+            MouseDblClick( (int)( (GdkEventButton *)p2 )->x,
+                           (int)( (GdkEventButton *)p2 )->y, 1 );
             return true;
 
-*/
         default:
             return false;
     }

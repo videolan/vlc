@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.10 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: skin_main.cpp,v 1.11 2003/04/18 16:04:17 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -304,8 +304,9 @@ int SkinManage( intf_thread_t *p_intf )
 
 
         // Refresh slider
-        //if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
-        //{
+       // if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
+        if( p_input->stream.b_seekable )
+        {
 #define p_area p_input->stream.p_selected_area
 
             // Set value of sliders
@@ -341,7 +342,7 @@ int SkinManage( intf_thread_t *p_intf )
             delete[] text;
 
 #undef p_area
-        //}
+        }
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     //-------------------------------------------------------------------------
