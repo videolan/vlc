@@ -95,7 +95,6 @@ Timer::~Timer()
  *****************************************************************************/
 void Timer::Notify()
 {
-    input_thread_t *p_input = NULL;
 #if defined( __WXMSW__ ) /* Work-around a bug with accelerators */
     if( !b_init )
     {
@@ -114,7 +113,11 @@ void Timer::Notify()
                                            FIND_ANYWHERE );
         if( p_playlist != NULL )
         {
+            vlc_mutex_lock( &p_playlist->object_lock );
             p_intf->p_sys->p_input = p_playlist->p_input;
+            if( p_intf->p_sys->p_input )
+                vlc_object_yield( p_intf->p_sys->p_input );
+            vlc_mutex_unlock( &p_playlist->object_lock );
             vlc_object_release( p_playlist );
         }
 
@@ -153,6 +156,7 @@ void Timer::Notify()
         p_main_interface->statusbar->SetStatusText( wxT(""), 0 );
         p_main_interface->statusbar->SetStatusText( wxT(""), 2 );
 
+        vlc_object_release( p_intf->p_sys->p_input );
         p_intf->p_sys->p_input = NULL;
     }
 
@@ -177,7 +181,6 @@ void Timer::Notify()
             /* Change the name of b_old_seekable into b_show_bar or something like that */
             var_Get( p_input, "position", &pos );
 
-            vlc_value_t val;
             var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
             if( val.i_int > 0 && !b_disc_shown )
             {
