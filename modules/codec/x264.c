@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
+#include <vlc/sout.h>
 #include <vlc/decoder.h>
 
 #include <x264.h>
@@ -36,9 +37,25 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-x264-"
+static char *enc_analyse_list[] = {
+    "all", "slowest", "slow", "normal", "fast", "fastest", "none"
+};
+
+static char *enc_analyse_list_text[] = {
+    N_("all"), N_("slowest"), N_("slow"), N_("normal"), N_("fast"), N_("fastest"), N_("none")
+};
+
 vlc_module_begin();
     set_description( _("h264 video encoder using x264 library"));
     set_capability( "encoder", 200 );
+
+    add_integer( SOUT_CFG_PREFIX "qp", 0, NULL, "Set fixed QP (1-51)", "", VLC_FALSE );
+    add_bool( SOUT_CFG_PREFIX "cabac", 1, NULL, "Enable CABAC", "", VLC_FALSE );
+    add_bool( SOUT_CFG_PREFIX "loopfilter", 1, NULL, "Enable loop filter", "", VLC_FALSE );
+
+    add_string( SOUT_CFG_PREFIX "analyse", "", NULL, "Analyse mode", "", VLC_FALSE );
+        change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -46,6 +63,10 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "qp", "cabac", "loopfilter", "analyse", NULL
+};
+
 static block_t *Encode( encoder_t *, picture_t * );
 
 struct encoder_sys_t
@@ -65,13 +86,9 @@ static int  Open ( vlc_object_t *p_this )
 {
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
-    int           i_nal;
-    x264_nal_t    *nal;
+    vlc_value_t    val;
 
-    int i;
-
-    if( p_enc->fmt_out.i_cat != VIDEO_ES ||
-        p_enc->fmt_out.i_codec != VLC_FOURCC( 'h', '2', '6', '4' ) )
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'h', '2', '6', '4' ) && !p_enc->b_force )
     {
         return VLC_EGENERIC;
     }
@@ -84,6 +101,11 @@ static int  Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    sout_ParseCfg( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
+
+    p_enc->fmt_out.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
+    p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
@@ -91,12 +113,22 @@ static int  Open ( vlc_object_t *p_this )
     x264_param_default( &p_sys->param );
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
     p_sys->param.i_height = p_enc->fmt_in.video.i_height;
-    p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4  |
-                                 X264_ANALYSE_P16x16 |
-                                 X264_ANALYSE_P16x8 | X264_ANALYSE_P8x16 |
-                                 X264_ANALYSE_P8x8 | X264_ANALYSE_SMART_PSUB;
     p_sys->param.i_idrframe = 1;
-    p_sys->param.b_cabac = 1;
+    if( p_enc->i_iframes > 0 )
+    {
+        p_sys->param.i_iframe = p_enc->i_iframes;
+    }
+    var_Get( p_enc, SOUT_CFG_PREFIX "qp", &val );
+    if( val.i_int >= 1 && val.i_int <= 51 )
+    {
+        p_sys->param.i_qp_constant = val.i_int;
+    }
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "cabac", &val );
+    p_sys->param.b_cabac = val.b_bool;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "loopfilter", &val );
+    p_sys->param.b_deblocking_filter = val.b_bool;
 
     if( p_enc->fmt_in.video.i_aspect > 0 )
     {
@@ -123,34 +155,60 @@ static int  Open ( vlc_object_t *p_this )
     {
         p_sys->param.cpu &= ~(X264_CPU_SSE|X264_CPU_SSE2);
     }
-    if( p_enc->i_key_int > 0 )
-    {
-        p_sys->param.i_iframe = p_enc->i_key_int;
-    }
 
-    p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
-    if( p_enc->i_qmin == p_enc->i_qmax )
+    p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4  |
+                                 X264_ANALYSE_P16x16 |
+                                 X264_ANALYSE_P16x8 | X264_ANALYSE_P8x16 |
+                                 X264_ANALYSE_P8x8 | X264_ANALYSE_SMART_PSUB;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "analyse", &val );
+    if( !strcmp( val.psz_string, "none" ) )
     {
-        p_sys->param.i_qp_constant = p_enc->i_qmin;
+        p_sys->param.analyse.inter = 0;
     }
-    switch( p_enc->i_hq )
+    else if( !strcmp( val.psz_string, "fastest" ) )
     {
-        case -1:
-            p_sys->param.analyse.inter = 0;
-            break;
-        case -2:
-            p_sys->param.analyse.inter = X264_ANALYSE_I16x16|X264_ANALYSE_I4x4|X264_ANALYSE_P16x16;
-            break;
-        case -3:
-            p_sys->param.analyse.inter = X264_ANALYSE_I16x16|X264_ANALYSE_I4x4|X264_ANALYSE_P16x16|
-                                         X264_ANALYSE_P16x8|X264_ANALYSE_P8x16|X264_ANALYSE_P8x8|X264_ANALYSE_SMART_PSUB;
-            break;
-        case -4:
-            p_sys->param.analyse.inter = X264_ANALYSE_I16x16|X264_ANALYSE_I4x4|X264_ANALYSE_P16x16|
-                                         X264_ANALYSE_P16x8|X264_ANALYSE_P8x16|X264_ANALYSE_P8x8|
-                                         X264_ANALYSE_P8x4|X264_ANALYSE_P4x8|X264_ANALYSE_P4x4|
-                                         X264_ANALYSE_SMART_PSUB;
-            break;
+        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_P16x16;
+    }
+    else if( !strcmp( val.psz_string, "fast" ) )
+    {
+        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
+                                     X264_ANALYSE_P16x16 |
+                                     X264_ANALYSE_P16x8 | X264_ANALYSE_P8x16 |
+                                     X264_ANALYSE_SMART_PSUB;
+    }
+    else if( !strcmp( val.psz_string, "normal" ) )
+    {
+        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
+                                     X264_ANALYSE_P16x16 |
+                                     X264_ANALYSE_P16x8 | X264_ANALYSE_P8x16 |
+                                     X264_ANALYSE_P8x8 |
+                                     X264_ANALYSE_SMART_PSUB;
+    }
+    else if( !strcmp( val.psz_string, "slow" ) )
+    {
+        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
+                                     X264_ANALYSE_P16x16 | X264_ANALYSE_P16x8 |
+                                     X264_ANALYSE_P8x16 | X264_ANALYSE_P8x8 |
+                                     X264_ANALYSE_P8x4 | X264_ANALYSE_P4x8 |
+                                     X264_ANALYSE_SMART_PSUB;
+    }
+    else if( !strcmp( val.psz_string, "slowest" ) )
+    {
+        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
+                                     X264_ANALYSE_P16x16 | X264_ANALYSE_P16x8 |
+                                     X264_ANALYSE_P8x16 | X264_ANALYSE_P8x8 |
+                                     X264_ANALYSE_P8x4 | X264_ANALYSE_P4x8 |
+                                     X264_ANALYSE_P4x4 |
+                                     X264_ANALYSE_SMART_PSUB;
+    }
+    else if( !strcmp( val.psz_string, "all" ) )
+    {
+        p_sys->param.analyse.inter = X264_ANALYSE_I16x16 | X264_ANALYSE_I4x4 |
+                                     X264_ANALYSE_P16x16 | X264_ANALYSE_P16x8 |
+                                     X264_ANALYSE_P8x16 | X264_ANALYSE_P8x8 |
+                                     X264_ANALYSE_P8x4 | X264_ANALYSE_P4x8 |
+                                     X264_ANALYSE_P4x4;
     }
 
     /* Open the encoder */
@@ -164,6 +222,7 @@ static int  Open ( vlc_object_t *p_this )
     /* get the globals headers */
     p_enc->fmt_out.i_extra = 0;
     p_enc->fmt_out.p_extra = NULL;
+
 #if 0
     x264_encoder_headers( p_sys->h, &nal, &i_nal );
     for( i = 0; i < i_nal; i++ )

@@ -942,6 +942,7 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix,
         }
         if( ppsz_options[i] == NULL )
         {
+            msg_Warn( p_this, "option %s is unknown", cfg->psz_name );
             cfg = cfg->p_next;
             continue;
         }
