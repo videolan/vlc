@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.94 2004/03/03 20:39:53 gbazin Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -60,6 +60,8 @@ static es_format_t null_es_format = {0};
 struct decoder_owner_sys_t
 {
     vlc_bool_t      b_own_thread;
+
+    input_thread_t  *p_input;
 
     aout_instance_t *p_aout;
     aout_input_t    *p_aout_input;
@@ -279,6 +281,15 @@ void input_DecodeBlock( decoder_t * p_dec, block_t *p_block )
     if( p_dec->p_owner->b_own_thread )
     {
         block_FifoPut( p_dec->p_owner->p_fifo, p_block );
+
+        if( p_dec->p_owner->p_input->b_out_pace_control )
+        {
+            /* FIXME !!!!! */
+            while( p_dec->p_owner->p_fifo->i_depth > 10 )
+            {
+                msleep( 1000 );
+            }
+        }
     }
     else
     {
@@ -462,12 +473,15 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
         return NULL;
     }
     p_dec->p_owner->b_own_thread = VLC_TRUE;
+    p_dec->p_owner->p_input = p_input;
     p_dec->p_owner->p_aout = NULL;
     p_dec->p_owner->p_aout_input = NULL;
     p_dec->p_owner->p_vout = NULL;
     p_dec->p_owner->p_sout = p_input->stream.p_sout;
     p_dec->p_owner->p_sout_input = NULL;
     p_dec->p_owner->p_es_descriptor = p_es;
+
+
     /* decoder fifo */
     if( ( p_dec->p_owner->p_fifo = block_FifoNew( p_dec ) ) == NULL )
     {
@@ -618,6 +632,20 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 sout_InputSendBuffer( p_dec->p_owner->p_sout_input, p_sout_buffer );
 
                 p_sout_block = p_next;
+            }
+
+            /* For now it's enough, as only sout inpact on this flag */
+            if( p_dec->p_owner->p_sout->i_out_pace_nocontrol > 0 &&
+                p_dec->p_owner->p_input->b_out_pace_control )
+            {
+                msg_Dbg( p_dec, "switching to synch mode" );
+                p_dec->p_owner->p_input->b_out_pace_control = VLC_FALSE;
+            }
+            else if( p_dec->p_owner->p_sout->i_out_pace_nocontrol <= 0 &&
+                     !p_dec->p_owner->p_input->b_out_pace_control )
+            {
+                msg_Dbg( p_dec, "switching to asynch mode" );
+                p_dec->p_owner->p_input->b_out_pace_control = VLC_TRUE;
             }
         }
     }

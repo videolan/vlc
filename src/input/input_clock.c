@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_clock.c,v 1.45 2004/01/06 12:02:06 zorglub Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -248,7 +248,10 @@ void input_ClockManageRef( input_thread_t * p_input,
              && p_input->stream.p_selected_program == p_pgrm )
         {
             p_pgrm->last_cr = i_clock;
-            mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
+            if( !p_input->b_out_pace_control )
+            {
+                mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
+            }
         }
         else
         {
@@ -280,7 +283,10 @@ void input_ClockManageRef( input_thread_t * p_input,
             /* Wait a while before delivering the packets to the decoder.
              * In case of multiple programs, we arbitrarily follow the
              * clock of the selected program. */
-            mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
+            if( !p_input->b_out_pace_control )
+            {
+                mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
+            }
 
             /* Now take into account interface changes. */
             input_ClockManageControl( p_input, p_pgrm, i_clock );

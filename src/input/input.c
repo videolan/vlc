@@ -88,9 +88,9 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
                                       char **ppsz_options, int i_options )
 
 {
-    input_thread_t *    p_input;                        /* thread descriptor */
-    vlc_value_t val;
-    int i;
+    input_thread_t *p_input;                        /* thread descriptor */
+    vlc_value_t     val;
+    int             i;
 
     /* Allocate descriptor */
     p_input = vlc_object_create( p_parent, VLC_OBJECT_INPUT );
@@ -178,6 +178,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
 
     /* Initialize thread properties */
     p_input->b_eof      = 0;
+    p_input->b_out_pace_control = VLC_FALSE;
     p_input->p_sys      = NULL;
 
     /* Set target */
@@ -1020,6 +1021,20 @@ static int InitThread( input_thread_t * p_input )
     {
         es_out_Control( p_input->p_es_out, ES_OUT_SET_ES,
                         p_sub_toselect->p_es, VLC_TRUE );
+    }
+
+    if( p_input->stream.p_sout )
+    {
+        if( p_input->stream.p_sout->i_out_pace_nocontrol > 0 )
+        {
+            p_input->b_out_pace_control = VLC_FALSE;
+        }
+        else
+        {
+            p_input->b_out_pace_control = VLC_TRUE;
+        }
+        msg_Dbg( p_input, "starting in %s mode",
+                 p_input->b_out_pace_control ? "asynch" : "synch" );
     }
 
     return VLC_SUCCESS;

@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: stream_output.c,v 1.41 2004/03/03 20:39:53 gbazin Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -119,6 +119,7 @@ sout_instance_t * __sout_NewInstance ( vlc_object_t *p_parent,
     p_sout->psz_sout    = strdup( psz_dest );
     p_sout->i_preheader = 0;
     p_sout->i_padding   = 0;
+    p_sout->i_out_pace_nocontrol = 0;
     p_sout->p_sys       = NULL;
 
     vlc_mutex_init( p_sout, &p_sout->lock );
