@@ -1387,6 +1387,13 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
             vdec_MotionFrameFrame444},
     };
 
+    if( i_coding_type == I_CODING_TYPE )
+    {
+        intf_DbgMsg("vpar error: skipped macroblock in I-picture\n");
+        p_vpar->picture.b_error = 1;
+        return;
+    }
+    
     if( (p_mb = vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
     {
         /* b_die == 1 */
@@ -1495,6 +1502,17 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * ParseMacroblock : Parse the next macroblock
  *****************************************************************************/
+#define PARSEERROR                                                      \
+if( p_vpar->picture.b_error )                                           \
+{                                                                       \
+    /* Mark this block as skipped (better than green blocks), and       \
+     * go to the next slice. */                                         \
+    (*pi_mb_address)--;                                                 \
+    vpar_DestroyMacroblock( &p_vpar->vfifo, p_mb );                     \
+    return;                                                             \
+} 
+ 
+
 #define PARSEBLOCKS( MPEG1FUNC, MPEG2FUNC )                             \
 {                                                                       \
     i_mask = 1 << (3 + (1 << i_chroma_format));                         \
@@ -1518,16 +1536,9 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                 + pi_y[p_vpar->mb.b_dct_type][i_b]      \
                                 * p_vpar->sequence.i_width              \
                                 + pi_x[i_b];                            \
-        }                                                               \
-    }                                                                   \
                                                                         \
-    if( p_vpar->picture.b_error )                                       \
-    {                                                                   \
-        /* Mark this block as skipped (better than green blocks), and   \
-         * go to the next slice. */                                     \
-        (*pi_mb_address)--;                                             \
-        vpar_DestroyMacroblock( &p_vpar->vfifo, p_mb );                 \
-        return;                                                         \
+            PARSEERROR                                                  \
+        }                                                               \
     }                                                                   \
                                                                         \
     /* chrominance */                                                   \
@@ -1558,6 +1569,8 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                  + pi_y[p_vpar->mb.b_dct_type][i_b]     \
                                    * p_vpar->sequence.i_chroma_width    \
                                  + pi_x[i_b];                           \
+                                                                        \
+            PARSEERROR                                                  \
         }                                                               \
     }                                                                   \
 }
@@ -1660,6 +1673,7 @@ static __inline__ void ParseMacroblock(
             DecodeMVMPEG2( p_vpar, p_mb, 0, i_structure );
         else
             DecodeMVMPEG1( p_vpar, p_mb, 0, i_structure );
+        PARSEERROR
     }
 
     if( (i_coding_type == B_CODING_TYPE)
@@ -1669,6 +1683,7 @@ static __inline__ void ParseMacroblock(
             DecodeMVMPEG2( p_vpar, p_mb, 1, i_structure );
         else
             DecodeMVMPEG1( p_vpar, p_mb, 1, i_structure );
+        PARSEERROR
     }
 
     if( i_coding_type == P_CODING_TYPE
@@ -1855,7 +1870,7 @@ static __inline__ void PictureData( vpar_thread_t * p_vpar, int i_mb_base,
     u32         i_dummy;
 
     NextStartCode( p_vpar );
-    while( (i_coding_type != I_CODING_TYPE || i_coding_type != D_CODING_TYPE
+    while( ((i_coding_type != I_CODING_TYPE && i_coding_type != D_CODING_TYPE)
              || !p_vpar->picture.b_error)
            && i_mb_address+i_mb_base < p_vpar->sequence.i_mb_size
            && !p_vpar->b_die )

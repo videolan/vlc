@@ -135,6 +135,7 @@ input_thread_t *input_CreateThread ( int i_method, char *psz_source, int i_port,
     for( i_index = 0; i_index < INPUT_MAX_ES; i_index++ )
     {
         p_input->p_es[i_index].i_id = EMPTY_PID;
+        p_input->pp_selected_es[i_index] = NULL;
     }
     
     /* Initialize default settings for spawned decoders */
