@@ -38,11 +38,11 @@
 {
     int i_moveRow;
     bool b_isSortDescending;
-    
+
     IBOutlet id o_window;
     IBOutlet id o_btn_playlist;
     IBOutlet id o_table_view;
-    
+
     IBOutlet id o_status_field;
     IBOutlet id o_tc_id;
     IBOutlet id o_tc_name;
@@ -70,9 +70,9 @@
     IBOutlet id o_uri_lbl;
     IBOutlet id o_title_lbl;
     IBOutlet id o_author_lbl;
-    IBOutlet id o_uri_txt; 
-    IBOutlet id o_title_txt; 
-    IBOutlet id o_author_txt; 
+    IBOutlet id o_uri_txt;
+    IBOutlet id o_title_txt;
+    IBOutlet id o_author_txt;
     IBOutlet id o_btn_info_ok;
     IBOutlet id o_btn_info_cancel;
     IBOutlet id o_tbv_info;
@@ -100,6 +100,7 @@
 /*For playlist info window*/
 
 - (int)selectedPlaylistItem;
+- (NSColor *)getColor:(int)i_group;
 
 @end
 

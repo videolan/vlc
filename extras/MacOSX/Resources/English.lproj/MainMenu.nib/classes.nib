@@ -366,7 +366,12 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {infoCancel = id; infoOk = id; togglePlaylistInfoPanel = id; }; 
+            ACTIONS = {
+                handleGroup = id; 
+                infoCancel = id; 
+                infoOk = id; 
+                togglePlaylistInfoPanel = id; 
+            }; 
             CLASS = VLCPlaylistInfo; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -374,6 +379,9 @@
                 "o_author_txt" = id; 
                 "o_btn_cancel" = id; 
                 "o_btn_ok" = id; 
+                "o_group_cbx" = id; 
+                "o_group_color" = id; 
+                "o_group_lbl" = id; 
                 "o_info_window" = id; 
                 "o_outline_view" = id; 
                 "o_title_lbl" = id; 

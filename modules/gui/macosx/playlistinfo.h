@@ -39,11 +39,15 @@
     IBOutlet id o_btn_info_cancel;
     IBOutlet id o_outline_view;
     IBOutlet id o_vlc_playlist;
+    IBOutlet id o_group_lbl;
+    IBOutlet id o_group_cbx;
+    IBOutlet id o_group_color;
 }
 
 - (IBAction)togglePlaylistInfoPanel:(id)sender;
 - (IBAction)infoCancel:(id)sender;
 - (IBAction)infoOk:(id)sender;
+- (IBAction)handleGroup:(id)sender;
 
 @end
 

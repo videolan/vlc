@@ -1,5 +1,5 @@
 /*****************************************************************************
- * playlistinfo.m: MacOS X interface module
+ r playlistinfo.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
  * $Id: playlistinfo.m 7015 2004-03-08 15:22:58Z bigben $
@@ -37,7 +37,6 @@
 
 - (void)awakeFromNib
 {
-
     [o_info_window setExcludedFromWindowsMenu: TRUE];
 
     [o_info_window setTitle: _NS("Properties")];
@@ -46,6 +45,7 @@
     [o_author_lbl setStringValue: _NS("Author")];
     [o_btn_info_ok setTitle: _NS("OK")];
     [o_btn_info_cancel setTitle: _NS("Cancel")];
+    [o_group_lbl setStringValue: _NS("Group")];
 }
 
 - (IBAction)togglePlaylistInfoPanel:(id)sender
@@ -65,6 +65,7 @@
         if (p_playlist)
         {
             /*fill uri / title / author info */
+            int i;
             int i_item = [o_vlc_playlist selectedPlaylistItem];
             [o_uri_txt setStringValue:
                 ([NSString stringWithUTF8String:p_playlist->
@@ -82,10 +83,29 @@
                 [NSString stringWithUTF8String:p_playlist->
                     pp_items[i_item]->input.psz_name]];
 
-            [o_author_txt setStringValue:[NSString stringWithUTF8String: playlist_GetInfo(p_playlist, i_item ,_("General"),_("Author") )]];
+            [o_author_txt setStringValue:
+                [NSString stringWithUTF8String:playlist_GetInfo
+                (p_playlist, i_item ,_("General"),_("Author") )]];
 
             [[VLCInfoTreeItem rootItem] refresh];
             [o_outline_view reloadData];
+
+            [o_group_cbx removeAllItems];
+
+            for (i = 0; i < p_playlist->i_groups ; i++)
+            {
+                [o_group_cbx addItemWithObjectValue: 
+                    [NSString stringWithUTF8String:
+                    p_playlist->pp_groups[i]->psz_name]];
+                if (p_playlist->pp_items[i_item]->i_group == p_playlist
+                    ->pp_groups[i]->i_id)
+                {
+                    [o_group_cbx selectItemAtIndex:i];
+                }
+            }
+
+            [self handleGroup:self];
+
             vlc_object_release( p_playlist );
         }
         [o_info_window makeKeyAndOrderFront: sender];
@@ -115,7 +135,21 @@
         p_playlist->pp_items[i_item]->input.psz_name =
             strdup([[o_title_txt stringValue] cString]);
         playlist_ItemAddInfo(p_playlist->pp_items[i_item],_("General"),_("Author"), [[o_author_txt stringValue] cString]);
- 
+
+        if ([[o_group_cbx stringValue] isEqual:
+                    [o_group_cbx objectValueOfSelectedItem]])
+        {
+            p_playlist->pp_items[i_item]->i_group = p_playlist->
+                    pp_groups[[o_group_cbx indexOfSelectedItem]]->i_id; 
+        }
+        else
+        {
+            playlist_group_t * p_group = playlist_CreateGroup( p_playlist, 
+                strdup([[o_group_cbx stringValue] cString]));
+            p_playlist->pp_items[i_item]->i_group = p_group->i_id;
+        }
+
+
         vlc_mutex_unlock(&p_playlist->pp_items[i_item]->input.lock);
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist,"intf-change",val );
@@ -124,6 +158,30 @@
     [self togglePlaylistInfoPanel:self];
 }
 
+- (IBAction)handleGroup:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+
+    if (p_playlist)
+    {
+        if ([[o_group_cbx stringValue] isEqual: 
+                    [o_group_cbx objectValueOfSelectedItem]])
+        {
+            [o_group_color setBackgroundColor:[o_vlc_playlist 
+                getColor: p_playlist->pp_groups[
+                [o_group_cbx indexOfSelectedItem]]->i_id]];
+        }
+        else
+        {
+            [o_group_color setBackgroundColor:[o_vlc_playlist 
+                getColor:p_playlist->pp_groups[
+                [o_group_cbx numberOfItems] - 1]->i_id + 1]];
+        }
+    vlc_object_release(p_playlist);
+    }
+}
 
 @end
 

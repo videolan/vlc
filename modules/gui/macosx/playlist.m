@@ -621,6 +621,53 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     return [o_table_view selectedRow];
 }
 
+- (NSColor *)getColor:(int)i_group
+{
+    switch ( i_group % 8 )
+    {
+        case 1:
+            /*white*/
+            return [NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:1.0];
+        break;
+
+        case 2:
+            /*red*/
+           return [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:0.76471 alpha:1.0];
+        break;
+
+	    case 3:
+              /*dark blue*/
+		   return [NSColor colorWithDeviceRed:0.76471 green:0.76471 blue:1.0 alpha:1.0];
+        break; 
+
+        case 4:
+               /*orange*/
+           return [NSColor colorWithDeviceRed:1.0 green:0.89804 blue:0.76471 alpha:1.0];
+        break;
+
+        case 5:
+               /*purple*/
+           return [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:1.0 alpha:1.0];
+        break;
+ 
+        case 6:
+              /*green*/
+           return [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:0.76471 alpha:1.0];
+        break; 
+
+        case 7:
+              /*light blue*/
+           return [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:1.0 alpha:1.0];
+        break;
+
+        case 0:
+              /*yellow*/
+           return [NSColor colorWithDeviceRed:1.0 green:1.0 blue:0.76471 alpha:1.0];
+        break;
+   	}
+}
+
+
 @end
 
 @implementation VLCPlaylist (NSTableDataSource)
@@ -712,49 +759,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     if ((p_playlist->i_groups) > 1 )
     {
        [o_cell setDrawsBackground: VLC_TRUE];
-       switch ( p_playlist->pp_items[o_rows]->i_group % 8 )
-       {
-            case 1:
-              /*white*/
-              [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:1.0]];
-              break;
+       [o_cell setBackgroundColor:
+                [self getColor:p_playlist->pp_items[o_rows]->i_group]];
 
-            case 2:
-              /*red*/
-             [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:0.76471 alpha:1.0]];
-	    break;
-
-	    case 3:
-              /*dark blue*/
-		   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:0.76471 green:0.76471 blue:1.0 alpha:1.0]];
-            break; 
-
-            case 4:
-               /*orange*/
-                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:0.89804 blue:0.76471 alpha:1.0]];
-            break;
-
-            case 5:
-                /*purple*/
-                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:1.0 alpha:1.0]];
-            break;
- 
-            case 6:
-                /*green*/
-                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:0.76471 alpha:1.0]];
-            break; 
-
-            case 7:
-               /*light blue*/
-                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:1.0 alpha:1.0]];
-            break;
-
-            case 0:
-               /*yellow*/
-                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:1.0 blue:0.76471 alpha:1.0]];
-            break;
-	}
-     
+    
     }
 vlc_object_release( p_playlist );
 }
