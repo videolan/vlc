@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.23 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: wxwindows.h,v 1.24 2003/05/13 22:33:33 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -226,6 +226,10 @@ private:
     void OnNetTypeChange( wxCommandEvent& event );
 
     /* Event handlers for the stream output */
+    void OnSubsFileEnable( wxCommandEvent& event );
+    void OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) );
+
+    /* Event handlers for the stream output */
     void OnSoutEnable( wxCommandEvent& event );
     void OnSoutSettings( wxCommandEvent& WXUNUSED(event) );
 
@@ -258,6 +262,10 @@ private:
     wxRadioButton *net_radios[4];
     wxSpinCtrl *net_ports[4];
     wxTextCtrl *net_addrs[4];
+
+    /* Controls for the subtitles file */
+    wxButton *subsfile_button;
+    wxCheckBox *subsfile_checkbox;
 
     /* Controls for the stream output */
     wxButton *sout_button;
@@ -332,6 +340,30 @@ private:
     wxRadioButton *encapsulation_radios[4];
     int i_encapsulation_type;
 
+};
+
+/* Subtitles File Dialog */
+class SubsFileDialog: public wxDialog
+{
+public:
+    /* Constructor */
+    SubsFileDialog( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~SubsFileDialog();
+
+    wxComboBox *file_combo;
+    wxSpinCtrl *delay_spinctrl;
+    wxSpinCtrl *fps_spinctrl;
+
+private:
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnOk( wxCommandEvent& event );
+    void OnCancel( wxCommandEvent& event );
+    void OnFileBrowse( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    wxWindow *p_parent;
 };
 
 /* Preferences Dialog */

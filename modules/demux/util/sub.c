@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.14 2003/05/11 14:33:32 sigmunau Exp $
+ * $Id: sub.c,v 1.15 2003/05/13 22:33:33 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -59,28 +59,29 @@ static char *ppsz_sub_type[] = { "microdvd", "subrip", "ssa1", "ssa2-4", "vplaye
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-
+#define SUB_DELAY_LONGTEXT \
+    "Delay subtitles (in 1/10s)"
 #define SUB_FPS_LONGTEXT \
     "Override frames per second. " \
-    "It will work only with MicroDVD"
+    "It will only work with MicroDVD subtitles."
 #define SUB_TYPE_LONGTEXT \
-    "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\", \"vplayer\" \"sami\"" \
-    "(nothing for autodetection, it should always work)"
+    "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\", \"vplayer\" " \
+    "\"sami\" (nothing for autodetection, it should always work)."
 
 vlc_module_begin();
-    set_description( _("text subtitle demux") );
+    set_description( _("Text subtitles demux") );
     set_capability( "subtitle demux", 12 );
-    add_category_hint( "subtitle", NULL, VLC_TRUE );
+    add_category_hint( "Subtitles", NULL, VLC_TRUE );
         add_file( "sub-file", NULL, NULL,
-                  "subtitle file name", "subtitle file name", VLC_TRUE );
+                  "Subtitles file name", "Subtitles file name", VLC_TRUE );
         add_float( "sub-fps", 0.0, NULL,
-                   "override frames per second",
+                   "Frames per second",
                    SUB_FPS_LONGTEXT, VLC_TRUE );
         add_integer( "sub-delay", 0, NULL,
-                     "delay subtitles (in 1/10s)",
-                     "delay subtitles (in 1/10s)", VLC_TRUE );
+                     "Delay subtitles (in 1/10s)",
+                     SUB_DELAY_LONGTEXT, VLC_TRUE );
         add_string_from_list( "sub-type", NULL, ppsz_sub_type, NULL,
-                              "subtitle type",
+                              "subtitles type",
                               SUB_TYPE_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, NULL );
 vlc_module_end();

@@ -10,6 +10,7 @@ SOURCES_wxwindows = \
 	modules/gui/wxwindows/preferences.cpp \
 	modules/gui/wxwindows/timer.cpp \
 	modules/gui/wxwindows/fileinfo.cpp \
+	modules/gui/wxwindows/subtitles.cpp \
 	$(NULL)
 
 EXTRA_DIST += \

@@ -516,8 +516,8 @@ package-win32:
 # Create installation script
 	cp install-win32 tmp/nsi
 # Copy relevant files
-	cp vlc.exe tmp/ 
-	$(STRIP) tmp/vlc.exe
+	cp vlc$(EXEEXT) tmp/ 
+	$(STRIP) tmp/vlc$(EXEEXT)
 	cp INSTALL.win32 tmp/INSTALL.txt ; unix2dos tmp/INSTALL.txt
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
 			do cp $$file tmp/$${file}.txt ; \
