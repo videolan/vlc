@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.7 2002/12/23 16:21:54 massiot Exp $
+ * $Id: ipv6.c,v 1.8 2003/02/07 23:36:55 marcari Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -141,13 +141,15 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
                              psz_multicast_interface );
 
             /* now convert that interface name to an index */
-#if !defined( WIN32 )
+#if __GLIBC__ > 2 || __GLIBC__ == 2 && __GLIBC_MINOR__ >= 2
+#   if !defined( WIN32 )
             p_socket->sin6_scope_id = if_nametoindex(psz_multicast_interface);
-#else
+#   else
             /* FIXME: for now we always use the default interface */
             p_socket->sin6_scope_id = 0;
-#endif
+#   endif
             msg_Warn( p_this, " = #%i", p_socket->sin6_scope_id );
+#endif
         }
         psz_address[strlen(psz_address) - 1] = '\0' ;
 
@@ -315,6 +317,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
  
     /* Join the multicast group if the socket is a multicast address */
+#if __GLIBC__ > 2 || __GLIBC__ == 2 && __GLIBC_MINOR__ >= 2
     if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
     {
         struct ipv6_mreq     imr;
@@ -328,8 +331,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         if( res == -1 )
         {
             msg_Err( p_this, "setsockopt JOIN_GROUP failed" );
-        }
+        } 
     }
+#else
+    msg_Warn( p_this, "setsockopt JOIN_GROUP not supported with glibc < 2.2" );
+#endif
 
 
     if( *psz_server_addr )

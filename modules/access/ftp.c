@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.6 2003/02/04 10:07:40 massiot Exp $
+ * $Id: ftp.c,v 1.7 2003/02/07 23:36:55 marcari Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>

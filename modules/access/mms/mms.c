@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.17 2003/01/27 16:28:42 fenrir Exp $
+ * $Id: mms.c,v 1.18 2003/02/07 23:36:55 marcari Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -33,6 +33,7 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>

@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.21 2003/02/04 10:07:40 massiot Exp $
+ * $Id: http.c,v 1.22 2003/02/07 23:36:55 marcari Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
