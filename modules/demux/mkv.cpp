@@ -1358,8 +1358,6 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         if (i_pts < p_sys->i_start_pts)
         {
             p_block->i_pts = -1;
-            p_block->i_dts = -1;
-/*            p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;*/
         }
         else if( tk.fmt.i_cat != VIDEO_ES )
         {
@@ -1559,7 +1557,7 @@ static int Demux( demux_t *p_demux)
 
         p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000;
 
-        if( p_sys->i_pts > 0 )
+        if( p_sys->i_pts > p_sys->i_start_pts  )
         {
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
         }
