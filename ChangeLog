@@ -4,6 +4,8 @@
 
 HEAD
 
+  * Changed broadcast handling
+  * Added a vlc-howto in sgml format in the doc directory.
   * Fixed the continuous 'seeking position' bug in network mode.
   * Support for `ts://foo:42' style input source.
   * rc interface plugin for vlc control through /dev/stdin courtesy

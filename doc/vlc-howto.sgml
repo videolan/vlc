@@ -1,0 +1,445 @@
+<!doctype linuxdoc system>
+<linuxdoc><article>
+<titlepag>
+ <title>VLC HOWTO</title>
+ <author>by the Videolan Team<tt><htmlurl url="mailto:videolan-faq@videlan.org" name="videolan-faq@videlan.org"></tt></author>
+ <date>v0.0.2, 21 apr 2001</date>
+
+ <abstract>
+  This document describes how to use the vlc (VideoLAN client) to read DVDs and mpeg files and DVDs.
+ </abstract>
+</titlepag>
+
+<toc>
+
+<sect>
+ <heading>Introduction</heading>
+
+ <sect1>
+  <heading>What is VideoLAN ?</heading>
+  <p>
+   VideoLAN is a project of sudent of  the École Centrale Paris which aims 
+   to broadcast video on the campus, and provide the students with a MPEG2 
+   software-only decoder. VideoLAN is an OpenSource project which will thus 
+   allow anyone to watch DVD movies under Linux, BeOS, MacOS and most Unix 
+   systems
+  </p>
+  <p>
+    You may want to look at the port section on our website : 
+    <htmlurl url="http://www.videolan.org" name="http://www.videolan.org/">.
+  </p>
+ </sect1>
+ 
+ <sect1>
+  <heading>What is the vlc</heading>
+  <p>
+   Vlc stands for VideoLAN client. It is the name of the program which is
+   capable of decoding MPEG streams, and displaying them onto your screen,
+   so you can watch you favorite movies, confortably sit in your armchair
+   :-).
+  </p>
+ </sect1>
+
+ <sect1>
+  <heading>Translated versions of this document</heading>
+  <p>
+    No translation is currently available.
+  </p>
+
+  <p>
+   The English version is maintained by Henri Fallon,
+   and the VideoLAN team. It can be found at:
+   <htmlurl url="http://www.videolan.org/doc.html"
+   name="http://www.videolan.org/doc.html">.
+  </p>
+ </sect1>
+
+ <sect1> 
+  <heading>Disclaimer</heading> 
+  <p> 
+   This documentation is given "as is", and any comment and improvement
+   are welcome. 
+  </p>
+
+  <p>
+   In this HOWTO, we consider you already have a little knowledge about Linux, and you 
+   know how to use a DVD. If not, good howtos can be found on the Linux Documentation
+   Projet.
+  </p>
+ </sect1>
+  
+ <sect1>
+  <heading>Legal</heading>
+  <p>
+   Copyright (©) 2001 by the VideoLAN project. This document may be distributed only
+   subject to the terms and conditions set forth in 
+   <htmlurl url="http://metalab.unc.edu/LDP/LDP-COPYRIGHT.html" name="the LDP license">.
+  </p>
+ </sect1>
+</sect>
+
+<sect>
+ <heading>Installing the vlc : the packages</heading>
+  <p>
+   This is certainly the most simple way to intsall the vlc on your system,
+   especially if you're using a packaged OS.
+  </p>
+
+  <p>
+   The first thing to do is to get an archive, on our web site 
+   <htmlurl url="http://www.videolan.org/download.html" name="http://www.videolan.org/download.html">
+  </p>
+ 
+ <sect1>
+  <heading>Linux/Unix users</heading>
+  <sect2>
+   <heading>What package to chose ?</heading>
+   <p>
+    There are different packages because vlc has "plugins" which provide functionnalities 
+    but also enlarges the executable and requires external libs. 
+   </p>
+   <p>
+    SDL is a lib which allows you to have an accelerated video output.
+    You will need libsdl > 1.1.6
+   </p>
+   <p>
+    If you're using the enlighted sound daemon, you may want to try 
+    the esd-aware vlc.
+   </p>
+   <p>
+    Generally, when you don't know what a module name is, you don't need/use it :-)
+   </p>
+  </sect2>
+  
+  <sect2>
+   <heading>Binary archive</heading>
+   <p>
+    Untar it typing
+    <verb>
+     tar xvzf vlc-x.x.x.tar.gz
+    </verb>
+     Go in the vlc directory and get to the 'How to play movies' section If
+     you wish not to keep vlc in this single directory but install it fully
+     on your system, you may, as root, type
+    <verb>
+     make install
+    </verb>
+   </p>
+  </sect2>
+   
+  <sect2>
+   <heading>Debian package</heading>
+   <p>
+    Just use dpkg :
+    <verb>
+     dpkg -i vlc-x.x.x.deb
+    </verb>
+   </p>
+   <p>
+    Depending on the package you have downloaded, you may have dependency
+    problems. You have to solve them, by installing the required libs.
+   </p>
+  </sect2>
+   
+  <sect2>
+    <heading>RPM package</heading>
+   <p>
+    Install vlc just as you would install any rpm package : 
+    <verb>
+     rpm -i vlc-x.x.x.rpm
+    </verb>
+   </p>
+   <p>
+    You may have to install external libs to meet dependencies, depending on
+    the package you downloaded (gnome, gtk, esd, ...).
+   </p>
+  </sect2>
+ </sect1>
+
+ <sect1>
+  <heading>BeOS users</heading>
+  <p>
+   Double-click on the archive. It should open your favorite archive extracter.
+   You can then execute the vlc from there, or extract the archive to a 
+   diretory and run it from there.
+  </p>
+ </sect1>
+ 
+ <sect1>
+  <heading>MacOS X users</heading>
+  <p>
+   To be completed
+  </p>
+ </sect1> 
+</sect>    
+    
+<sect>
+ <heading>Using the vlc</heading>
+ <p>
+  Good job, you have installed the vlc on your system. Now, it's time to 
+  use it. Don't worry, it's not that difficult.
+ </p>
+ <sect1>
+  <heading>Lauching</heading>
+  <sect2>
+   <heading>The graphical interface</heading>
+   <p>
+    Basically, double clicking on the vlc icon, or typing 'vlc' in a 
+    console should launch a graphical interface On Linux/Unix, you may want
+    to specify gnome or gtk interface, with the "--intf" option.
+   </p>
+  </sect2>
+
+  <sect2>
+   <heading>In case it doesn't work</heading>
+   <p>
+    In case this does not work, you'll have to use command line options.
+    Usually, to play a file, you'll use :
+    <verb>
+     vlc [file name]
+    </verb>
+    To play a dvd, if you dvd device is "/dev/dvd", you'll type :
+    <verb>
+     vlc dvd:/dev/dvd
+    </verb>
+   On BeOS, the dvd device looks like "/dev/disk/ide/atapi/1/slave/0/raw"
+   </sect2>  
+ </sect1>
+ 
+ <sect1>
+  <heading>Using the interface</heading>
+  <p>
+   By now you should see a beautiful interface, with buttons and menus.
+   The text should be quite self-explaining : "Open file", "Open Disc", ...
+  </p>
+  <p>
+   For Dvd's you can choose directly from the "open" box the title & chapter 
+   you want to play.
+  </p>
+ </sect1>
+ <sect1>
+  <heading>Fullscreen - chapters - features</heading>
+  <p>
+   Some of the following features don't work yet on some platforms.
+   We're doing our best to get the ports in sync.
+  </p>
+  <p>
+   At any time you can change the audio/subtitles channel using either the 
+   "setting" menu from the interface or using the "right click" menu from
+   the video output window.
+  </p>
+  <p>
+   To change chapter, you can use the right-click menu or the interface. 
+   Please note that the gnome interface is more advanced than the gtk or 
+   qt ones.
+  </p>
+  <p>
+   Using the 'f' key when using SDL or XVideo output toggles the 
+   fullscreen mode. Be warned that "right click" menus are a bit 
+   unstable.
+  </p>
+ </sect1>
+ <sect1>
+  <heading>User help</heading>
+  <p>
+   First of all, it something seems to go wrong, read and try try to 
+   understand the error messages. If you are a confirmed user, you 
+   may try the "-vvv" option which makes the vlc very verbose.
+  </p>
+  <p>
+   There is a FAQ page on our website :
+   <htmlurl url="http://www.videolan.org/doc.html" name="http://www.videolan.org/doc.html">.
+   If you think one question should be in the FAQ, please contact
+   <htmlurl url="mailto:videolan-faq@videlan.org" name="videolan-faq@videlan.org">
+  </p>
+  <p>
+   Finally, there's a users mailing list (English speaking). To subscribe, send a mail to 
+   <htmlurl url="mailto:listar@videlan.org" name="listar@videlan.org"> containing
+   "subscribe vlc" as message body.
+  </p>
+</sect> 
+
+<sect>
+ <heading>Advanced use of the vlc</heading>
+ <sect1>
+  <heading>Command line options</heading>
+  <sect2>
+   <heading>Choosing the video output</heading>
+   <p>
+    You have to use the "-V" otpion. For example :
+    <verb>
+     vlc -V xvideo
+    </verb>
+   </p>
+  </sect2>
+  
+  <sect2>
+   <heading>Choosing the audio output</heading>
+   <p>
+    Use the "-A" option. For example :
+    <verb>
+     vlc -A alsa
+    </verb>
+   </p>
+  </sect2>
+
+  <sect2>
+   <heading>Specifying a file</heading>
+   <p>
+    Simply put the file name at the end of the command line, you won't need then 
+    to click "open" when the interface launches :
+    <verb>
+     vlc myfile.mpeg
+    </verb>
+   </p>
+  </sect2>
+  
+  <sect2>
+   <heading>Specifying the title and chapter where to start</heading>
+   <p>
+    Use the "-t" and "-T" to specify title and chapter. For example, to go to the 12th 
+    chapter of the 2nd title, you'll type :
+    <verb>
+     vlc -t 2 -T 12
+    </verb>
+   </p>
+  </sect2>
+ </sect1>
+</sect> 
+
+<sect>
+ <heading>For real men : building your vlc :-)</heading>
+ <p>
+  You can choose either to take the latest release, or a CVS source. Note that
+  CVS snapshots may be broken, although we do our best to prevent this from
+  happening.
+ </p>
+ <p>
+  From here, you have to be a little experienced, even more if you want to use
+  the cvs.
+ </p>
+ <sect1>
+  <heading>Getting an archive</heading>
+  <p>
+   You have guessed it, the first thing to do is to get the source.
+   Until there, everyone should understand :)
+  </p>
+  <sect2>
+   <heading>Web site</heading>
+   <p>
+    Source packages can be found in the "tarballs" section of the download page :
+    <htmlurl url="http://www.videolan.org/download.html" name="http://www.videolan.org/dowload.html">.
+   </p>
+   <p>
+    CVS snapshots are available from the address : 
+    <htmlurl url="http://www.videolan.org/packages/snapshots/" 
+    name="http://www.videolan.org/packages/snapshots/">.
+   </p>
+   <p>
+    Then untar the archive :
+    <verb>
+     tar xzf vlc-x-x-x.tar.gz
+    </verb>
+   </p>
+  </sect2>
+  <sect2>
+   <heading>Directly from CVS</heading>
+   <p>
+    Firs log in as suer anonymous with an empty password :
+    <verb>
+     cvs -d :pserver:anonymous@anoncvs.videolan.org:/var/cvs/videolan login
+    </verb>
+   Then retrieve the repository :
+   <verb>
+    cvs -d :pserver:anonymous@anoncvs.videolan.org:/var/cvs/videolan -z3 checkout vlc
+   </verb>
+   </p>
+  </sect2>
+ </sect1>
+ 
+ <sect1>
+  <heading>Building the program</heading>
+  <p>
+   Go into the vlc directory and run the configure script :
+   <verb>
+    ./configure
+   </verb>
+   If you want to enable options, you may add "--enable-option" to the previous line.
+   For example, to build with the xvideo extension, and alsa support, you should type :
+   <verb>
+    ./configure --enable-xvideo --enable-alsa
+   </verb>
+   To get the list of the available options, and know if they are enabled by default,
+   you can try :
+   <verb>
+    ./configure --help
+   </verb>
+   A very typical installation, on a XFree 4.1 system, recent video card, with gnome, is :
+   <verb>
+    ./configure --enable-xvideo --enable-esd --enable-gnome
+   </verb>
+  <p>
+ </sect1>
+ <sect1>
+  <heading>Plugins, builtins ...</heading>
+  <p>
+   The configure script should create a Makefile.opts file, which you can edit and modify.
+   Indeed you can chose to have features (as esd support, for example) built as plugins
+   or inside the program.
+  </p>
+  <p>
+   If you build a feature as a plugin, it can lead to a little loss of performance.
+   It you build it inside the code, i'll enlarge a bit the size of the executable.
+  </p>
+  <p>
+   When you're done with Makefile.opts (which also works if you leave it untouched), just 
+   make, typing :
+    <verb>
+    make
+    </verb>
+   It should compile without any error. If there are, please check you have the required libs 
+   installed on your system, as the configure script can't check them all.
+  </p>
+  <p>
+   When you're done with it, as root, type :
+   <verb>
+    make install
+   </verb>
+  if you wish to have vlc fully installed on your system. If you prefer to keep in in the 
+  current directory, you may skip the "make install". You'll then have to cd into the vlc 
+  directory and type "./vlc" instead of just typing vlc.
+  </p>
+ </sect1>
+</sect>
+
+<sect>
+ <heading>Really advanced use</heading>
+ <sect1>
+  <heading>Using the videolan network solution</heading>
+  <p>
+   I'll only speak about the vlc here. There will be a howto on the whole network solution.
+   You have to say to the vlc that it'll receive network streams. This can be done either by *
+   using the "network" button of the interface, or in the command line : 
+   <verb>
+    vlc ts://server[:port]
+   </verb>
+  </p>
+  <p>
+   This works for unicast. If you are receiving a broadcasted stream, you have to specify the 
+   broadcast address : 
+   <verb>
+    vlc --broadcast broadcast_addr ts://server[:port]
+   </verb>
+  </p>
+ </sect1>
+
+ <sect1>
+  <heading>Developping the vlc</heading>
+  <p>
+   Christophe Massiot has written a documentation for developpers.
+  </p>
+ </sect1>
+
+</sect>
+
+</article></linuxdoc>
