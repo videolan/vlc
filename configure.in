@@ -681,14 +681,14 @@ then
     PLUGINS="${PLUGINS} sdl"
     CFLAGS_SDL="`${SDL_CONFIG} --cflags`"
     LIB_SDL="`${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
-    save_CFLAGS=$CFLAGS
-    CFLAGS="$CFLAGS $CFLAGS_SDL"
+    save_CPPFLAGS=$CPPFLAGS
+    CPPFLAGS="$CPPFLAGS $CFLAGS_SDL"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
       <${SDL_HEADER}>, Indicate whether we should use SDL/SDL.h or SDL11/SDL.h),
       [ echo "The development package for SDL is not installed. Please install it"
         echo "and try again. Alternatively you can also configure with --disable-sdl."
         exit 1 ])
-    CFLAGS=$save_CFLAGS
+    CPPFLAGS=$save_CPPFLAGS
     if expr 1.1.5 \> `$SDL_CONFIG --version` >/dev/null
     then
       echo "You need SDL version 1.1.5 or later. Install it and try again."
