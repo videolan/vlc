@@ -1253,6 +1253,7 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
     p_es->i_type = 0;  /* ??? */
     p_es->b_psi = 0;
     p_es->b_pcr = 0;
+    p_es->i_continuity_counter = 0xFF;
     
     p_es->p_pes_packet = NULL;
 //    p_es->p_next_pes_packet = NULL;
