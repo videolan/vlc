@@ -93,6 +93,7 @@ typedef struct ps_stream_s
 {
     int i_stream_id;
     int i_stream_type;
+    int i_max_buff_size; /* used in system header */
 
     /* Language is iso639-2T */
     uint8_t lang[3];
@@ -114,7 +115,8 @@ struct sout_mux_sys_t
     int i_pes_count;
     int i_system_header;
     int i_dts_delay;
-
+    int i_rate_bound; /* units of 50 bytes/second */
+    
     int64_t i_instant_bitrate;
     int64_t i_instant_size;
     int64_t i_instant_dts;
@@ -165,7 +167,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_instant_bitrate  = 0;
     p_sys->i_instant_size     = 0;
     p_sys->i_instant_dts      = 0;
-
+    p_sys->i_rate_bound      = 0;
     p_sys->b_mpeg2 = !(p_mux->psz_mux && !strcmp( p_mux->psz_mux, "mpeg1" ));
 
     var_Get( p_mux, SOUT_CFG_PREFIX "dts-delay", &val );
@@ -247,6 +249,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     ps_stream_t *p_stream;
+    
 
     msg_Dbg( p_mux, "adding input codec=%4.4s",
              (char*)&p_input->p_fmt->i_codec );
@@ -313,15 +316,25 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     if( p_input->p_fmt->i_cat == AUDIO_ES )
     {
         p_sys->i_audio_bound++;
+        p_stream->i_max_buff_size = 4 * 1024;
     }
     else if( p_input->p_fmt->i_cat == VIDEO_ES )
     {
         p_sys->i_video_bound++;
+        p_stream->i_max_buff_size = 400 * 1024; /* FIXME -- VCD uses 46, SVCD
+                        uses 230, ffmpeg has 230 with a note that it is small */
+    }
+    else
+    {   /* FIXME -- what's valid for not audio or video? */
+        p_stream->i_max_buff_size = 4 * 1024;
     }
 
     /* Try to set a sensible default value for the instant bitrate */
     p_sys->i_instant_bitrate += p_input->p_fmt->i_bitrate + 1000/* overhead */;
 
+    /* FIXME -- spec requires  an upper limit rate boundary in the system header;
+       our codecs are VBR; using 2x nominal rate, convert to 50 bytes/sec */ 
+    p_sys->i_rate_bound += p_input->p_fmt->i_bitrate * 2 / (8 * 50);
     p_sys->i_psm_version++;
 
     p_stream->lang[0] = p_stream->lang[1] = p_stream->lang[2] = 0;
@@ -352,7 +365,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                      p_stream->lang[0], p_stream->lang[1], p_stream->lang[2] );
         }
     }
-
     return VLC_SUCCESS;
 
 error:
@@ -411,6 +423,8 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     /* Try to set a sensible default value for the instant bitrate */
     p_sys->i_instant_bitrate -= (p_input->p_fmt->i_bitrate + 1000);
+    /* rate_bound is in units of 50 bytes/second */
+    p_sys->i_rate_bound -= (p_input->p_fmt->i_bitrate * 2)/(8 * 50);
 
     p_sys->i_psm_version++;
 
@@ -607,7 +621,7 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf,
     block_t   *p_hdr;
     bits_buffer_t   bits;
     vlc_bool_t      b_private;
-    int i_mux_rate;
+    int i_rate_bound;
 
     int             i_nb_private, i_nb_stream;
     int i;
@@ -632,14 +646,14 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf,
     p_hdr = block_New( p_mux, 12 + i_nb_stream * 3 );
     p_hdr->i_dts = p_hdr->i_pts = i_dts;
 
-    /* The spec specifies that the mux rate must be rounded upwards */
-    i_mux_rate = (p_sys->i_instant_bitrate + 8 * 50 - 1 ) / (8 * 50);
+    /* The spec specifies that the reported rate_bound must be upper limit */
+    i_rate_bound = (p_sys->i_rate_bound);
 
     bits_initwrite( &bits, 12 + i_nb_stream * 3, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01bb );
     bits_write( &bits, 16, 12 - 6 + i_nb_stream * 3 );
     bits_write( &bits, 1,  1 ); // marker bit
-    bits_write( &bits, 22, i_mux_rate); // FIXME rate bound
+    bits_write( &bits, 22, i_rate_bound); 
     bits_write( &bits, 1,  1 ); // marker bit
 
     bits_write( &bits, 6,  p_sys->i_audio_bound );
@@ -683,18 +697,18 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf,
         if( p_input->p_fmt->i_cat == AUDIO_ES )
         {
             bits_write( &bits, 1, 0 );
-            bits_write( &bits, 13, /* stream->max_buffer_size */ 0 / 128 );
+            bits_write( &bits, 13, p_stream->i_max_buff_size / 128 );
         }
         else if( p_input->p_fmt->i_cat == VIDEO_ES )
         {
             bits_write( &bits, 1, 1 );
-            bits_write( &bits, 13, /* stream->max_buffer_size */ 0 / 1024);
+            bits_write( &bits, 13, p_stream->i_max_buff_size / 1024);
         }
         else
         {
-            /* FIXME */
+            /* FIXME -- the scale of 0 means do a /128 */
             bits_write( &bits, 1, 0 );
-            bits_write( &bits, 13, /* stream->max_buffer_size */ 0 );
+            bits_write( &bits, 13, p_stream->i_max_buff_size / 128 );
         }
     }
 
