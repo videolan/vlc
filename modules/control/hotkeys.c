@@ -685,10 +685,13 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
         sprintf( psz_bookmark_name, "bookmark%i", i_num );
         var_Create( p_intf, psz_bookmark_name,
                     VLC_VAR_STRING|VLC_VAR_DOINHERIT );
-        val.psz_string = strdup( p_playlist->pp_items[p_playlist->i_index]->input.psz_uri );
-        var_Set( p_intf, psz_bookmark_name, val );
-        msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num,
-                  val.psz_string );
+        if( p_playlist->status.p_item )
+        {
+            val.psz_string = strdup( p_playlist->status.p_item->input.psz_uri );
+            var_Set( p_intf, psz_bookmark_name, val );
+            msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num,
+                      val.psz_string );
+        }
         vlc_object_release( p_playlist );
     }
 }
