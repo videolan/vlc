@@ -1,0 +1,16 @@
+$Id: README,v 1.1 2003/02/02 03:03:01 sam Exp $
+
+Notes for anyone wanting to build Debian packages of VLC.
+
+ - Default configuration is supposed to be latest unstable.
+
+ - Usually VLC will come with a copy of ffmpeg and faad2 in the extras/
+   directory, because they are not yet available in Debian.
+
+ - If there is no CVS directory in the root, debian/rules will assume a
+   full build is requested and will clean ffmpeg and faad2.
+
+ - VLC does not link with libdvdcss by default, thus it will not depend
+   on the libdvdcss packages. To build packages that link against it,
+   remove the --without-dvdcss flag in debian/rules.
+

@@ -1,9 +1,12 @@
 NULL =
 
 EXTRA_DIST = \
+	README \
 	changelog \
 	control \
+	control.woody \
 	rules \
+	rules.woody \
 	vlc.copyright \
 	vlc.desktop \
 	vlc.dirs \
