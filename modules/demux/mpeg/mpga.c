@@ -117,7 +117,7 @@ static int Open( vlc_object_t * p_this )
     uint32_t     header;
     uint8_t     *p_peek;
     module_t    *p_id3;
-    vlc_meta_t  *p_meta;
+    vlc_meta_t  *p_meta = NULL;
 
     if( p_demux->psz_path )
     {
