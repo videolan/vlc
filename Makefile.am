@@ -323,17 +323,17 @@ SOURCES_libvlc_common = \
 	src/playlist/item.c \
 	src/playlist/item-ext.c \
 	src/playlist/info.c \
-	src/input/input.c \
-	src/input/control.c \
-	src/input/es_out.c \
-	src/input/stream.c \
 	src/input/access.c \
+	src/input/clock.c \
+	src/input/control.c \
+	src/input/decoder.c \
 	src/input/demux.c \
+	src/input/es_out.c \
+	src/input/input.c \
+	src/input/input_internal.h \
+	src/input/stream.c \
 	src/input/subtitles.c \
-	src/input/input_ext-plugins.c \
-	src/input/input_dec.c \
-	src/input/input_programs.c \
-	src/input/input_clock.c \
+	src/input/var.c \
 	src/video_output/video_output.c \
 	src/video_output/vout_pictures.c \
 	src/video_output/vout_pictures.h \
