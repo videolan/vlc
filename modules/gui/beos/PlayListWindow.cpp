@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.2 2002/09/30 18:30:27 titer Exp $
+ * $Id: PlayListWindow.cpp,v 1.3 2002/10/10 23:11:52 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -58,12 +58,14 @@ enum
  *****************************************************************************/
 PlayListWindow::PlayListWindow( BRect frame, const char* name,
 								playlist_t *playlist,
-								InterfaceWindow* mainWindow )
+								InterfaceWindow* mainWindow,
+								intf_thread_t *p_interface )
 	:	BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 				 B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS ),
 		fPlaylist( playlist ),
 		fMainWindow( mainWindow )
 {
+	this->p_intf = p_interface;
     SetName( "playlist" );
 
     // set up the main menu bar
@@ -222,7 +224,7 @@ void
 PlayListWindow::ReallyQuit()
 {
     Lock();
-    Hide(); 
+    Hide();
     Quit();
 }
 
@@ -232,7 +234,7 @@ PlayListWindow::ReallyQuit()
 void
 PlayListWindow::UpdatePlaylist( bool rebuild )
 {
-	/* if ( rebuild )
+	if ( rebuild )
 	{
 		// remove all items
 		int32 count = fListView->CountItems();
@@ -241,8 +243,8 @@ PlayListWindow::UpdatePlaylist( bool rebuild )
 	
 		// rebuild listview from VLC's playlist
 		for ( int i = 0; i < fPlaylist->i_size; i++ )
-			fListView->AddItem( new PlaylistItem( fPlaylist->p_item[i].psz_name ) );
+			fListView->AddItem( new PlaylistItem( fPlaylist->pp_items[i]->psz_name ) );
 	}
 	fListView->SetCurrent( fPlaylist->i_index );
-	fListView->SetPlaying( Intf_VLCWrapper::is_playing() ); */
+	fListView->SetPlaying( p_intf->p_sys->p_vlc_wrapper->is_playing() );
 }

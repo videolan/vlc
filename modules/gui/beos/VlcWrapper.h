@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.2 2002/09/30 18:30:27 titer Exp $
+ * $Id: VlcWrapper.h,v 1.3 2002/10/10 23:11:52 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -24,6 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 class InterfaceWindow;
+class Intf_VLCWrapper;
 
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
@@ -33,8 +34,9 @@ struct intf_sys_t
     InterfaceWindow * p_window;
     char              i_key;
     
-    /* The input thread */
-    input_thread_t * p_input;
+    input_thread_t *  p_input;
+    playlist_t *      p_playlist;
+    aout_instance_t * p_aout;
     
     /* DVD mode */
     vlc_bool_t        b_disabled_menus;
@@ -43,6 +45,8 @@ struct intf_sys_t
     int	              i_part;
     int               i_saved_volume;
     int               i_channel;
+    
+    Intf_VLCWrapper * p_vlc_wrapper;
 };
 
 /* Intf_VLCWrapper is a singleton class
@@ -143,8 +147,8 @@ public:
     void loop(); 
     
 //private:
-    Intf_VLCWrapper( intf_thread_t *p_if );
-  	es_descriptor_t *  p_audio_es;
+    Intf_VLCWrapper( intf_thread_t *p_intf );
+    es_descriptor_t *  p_audio_es;
     intf_thread_t *p_intf;
 };
 

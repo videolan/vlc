@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.2 2002/09/30 18:30:27 titer Exp $
+ * $Id: Interface.cpp,v 1.3 2002/10/10 23:11:52 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -71,6 +71,10 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     }
     
     p_intf->p_sys->p_input = NULL;
+    p_intf->p_sys->p_vlc_wrapper = new Intf_VLCWrapper( p_intf );
+    p_intf->p_sys->p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
 
     p_intf->pf_run = Run;
 
@@ -124,6 +128,13 @@ static void Run( intf_thread_t *p_intf )
 {
     while( !p_intf->b_die )
     {
+        if( p_intf->p_sys->p_input == NULL )
+        {
+            p_intf->p_sys->p_input = 
+                (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                          FIND_ANYWHERE );
+        }
+        
         /* Update the input */
         if( p_intf->p_sys->p_input != NULL )
         {
@@ -134,13 +145,6 @@ static void Run( intf_thread_t *p_intf )
             }
         /* Manage the slider */
             p_intf->p_sys->p_window->updateInterface();
-        }
-    
-        if( p_intf->p_sys->p_input == NULL )
-        {
-            p_intf->p_sys->p_input = 
-                        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                          FIND_ANYWHERE );
         }
 
         /* Wait a bit */
