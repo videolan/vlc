@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.71 2001/02/07 15:32:26 massiot Exp $
+ * $Id: video_parser.c,v 1.72 2001/02/08 17:44:13 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -537,5 +537,28 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
             DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_dts;
         p_vpar->sequence.i_current_rate =
             DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_rate;
+
+        if( DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->b_discontinuity )
+        {
+            /* Escape the current picture and reset the picture predictors. */
+            p_vpar->picture.b_error = 1;
+            if( p_vpar->sequence.p_forward != NULL )
+            {
+                vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+            }
+            if( p_vpar->sequence.p_backward != NULL )
+            {
+                vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
+                                  vpar_SynchroDate( p_vpar ) );
+                vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+            }
+            p_vpar->sequence.p_forward = p_vpar->sequence.p_backward = NULL;
+        }
+    }
+
+    if( p_bit_stream->p_data->b_discard_payload )
+    {
+        /* 1 packet messed up, trash the slice. */
+        p_vpar->picture.b_error = 1;
     }
 }

@@ -96,8 +96,8 @@ void input_Pause( input_thread_t * p_input )
  *****************************************************************************/
 void input_Seek( input_thread_t * p_input, off_t i_position )
 {
-    intf_Msg( "input: seeking position %d/%d", i_position,
-                                               p_input->stream.i_size );
+    intf_Msg( "input: seeking position %lld/%lld", i_position,
+                                                   p_input->stream.i_size );
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.i_seek = i_position;
     vlc_cond_signal( &p_input->stream.stream_wait );

@@ -44,15 +44,20 @@ DEFINE += -DSTATS
 endif
 
 # PROGRAM_BUILD is a complete identification of the build
-# ( we can't use fancy options with date since OSes like Solaris
-# or FreeBSD have strange date implementations )
+# (we can't use fancy options with date since OSes like Solaris
+# or FreeBSD have strange date implementations)
 PROGRAM_BUILD = `date` $(USER)
-# XXX: beos does not support hostname
+# XXX: beos does not support hostname (how lame...)
 #PROGRAM_BUILD = `date` $(USER)@`hostname`
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.
 DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr a-z. A-Z_)
+
+# On Linux activate 64-bit off_t (by default under BSD)
+ifneq (,$(findstring linux,$(SYS)))
+DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98
+endif
 
 ################################################################################
 # Tuning and other variables - do not change anything except if you know

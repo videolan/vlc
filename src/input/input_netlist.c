@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.29 2001/02/08 01:34:42 stef Exp $
+ * $Id: input_netlist.c,v 1.30 2001/02/08 17:44:12 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -311,8 +311,7 @@ struct pes_packet_s * input_NetlistNewPES( void * p_method_data )
     vlc_mutex_unlock (&p_netlist->lock);
     
     /* initialize PES */
-    p_return->b_messed_up = 
-        p_return->b_data_alignment = 
+    p_return->b_data_alignment = 
         p_return->b_discontinuity = 
         p_return->i_pts = p_return->i_dts = 0;
     p_return->i_pes_size = 0;

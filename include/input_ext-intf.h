@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.17 2001/02/08 13:52:34 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.18 2001/02/08 17:44:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -60,7 +60,6 @@ typedef struct es_descriptor_s
     struct pes_packet_s *   p_pes;                            /* Current PES */
     struct data_packet_s *  p_last;   /* The last packet gathered at present */
     int                     i_pes_real_size;   /* as indicated by the header */
-    boolean_t               b_discontinuity;               /* Stream changed */
 
     /* Decoder information */
     struct decoder_fifo_s * p_decoder_fifo;
@@ -115,7 +114,6 @@ typedef struct pgrm_descriptor_s
     count_t                 c_average_count;
                            /* counter used to compute dynamic average values */
     int                     i_synchro_state;
-    boolean_t               b_discontinuity;
 
     /* Demultiplexer data */
     void *                  p_demux_data;

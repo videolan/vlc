@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.3 2001/02/08 13:52:35 massiot Exp $
+ * $Id: input_ps.c,v 1.4 2001/02/08 17:44:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -132,7 +132,7 @@ static void PSInit( input_thread_t * p_input )
         p_input->b_error = 1;
         return;
     }
-    fseek( p_method->stream, 0, SEEK_SET );
+    rewind( p_method->stream );
 
     /* FIXME : detect if InitStream failed */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
@@ -181,7 +181,7 @@ static void PSInit( input_thread_t * p_input )
                 break;
             }
         }
-        fseek( p_method->stream, 0, SEEK_SET );
+        rewind( p_method->stream );
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.i_tell = 0;
         if( p_demux_data->b_has_PSM )
@@ -439,7 +439,7 @@ static void PSSeek( input_thread_t * p_input, off_t i_position )
     p_method = (thread_ps_data_t *)p_input->p_plugin_data;
 
     /* A little bourrin but should work for a while --Meuuh */
-    fseek( p_method->stream, i_position, SEEK_SET );
+    fseeko( p_method->stream, i_position, SEEK_SET );
 
     p_input->stream.i_tell = i_position;
 }
@@ -499,7 +499,7 @@ static pes_packet_t * NewPES( void * p_garbage )
         return NULL;
     }
 
-    p_pes->b_messed_up = p_pes->b_data_alignment = p_pes->b_discontinuity =
+    p_pes->b_data_alignment = p_pes->b_discontinuity =
         p_pes->i_pts = p_pes->i_dts = 0;
     p_pes->i_pes_size = 0;
     p_pes->p_first = NULL;

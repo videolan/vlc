@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.21 2001/02/08 13:52:34 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.22 2001/02/08 17:44:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -53,8 +53,6 @@ typedef struct data_packet_s
 typedef struct pes_packet_s
 {
     /* PES properties */
-    boolean_t               b_messed_up;  /* At least one of the data packets
-                                           * has a questionable content      */
     boolean_t               b_data_alignment;  /* used to find the beginning of
                                                 * a video or audio unit      */
     boolean_t               b_discontinuity; /* This packet doesn't follow the

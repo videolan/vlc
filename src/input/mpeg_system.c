@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.33 2001/02/08 13:52:35 massiot Exp $
+ * $Id: mpeg_system.c,v 1.34 2001/02/08 17:44:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -164,7 +164,6 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             /* PES_packet_length is set and != total received payload */
             /* Warn the decoder that the data may be corrupt. */
             intf_WarnMsg( 3, "PES sizes do not match : packet corrupted" );
-            p_pes->b_messed_up = 1;
         }
 
         switch( p_es->i_stream_id )
@@ -414,7 +413,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
     /* If we lost data, insert a NULL data packet (philosophy : 0 is quite
      * often an escape sequence in decoders, so that should make them wait
      * for the next start code). */
-    if( b_packet_lost || p_es->b_discontinuity )
+    if( b_packet_lost )
     {
         input_NullPacket( p_input, p_es );
     }
@@ -964,7 +963,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                         /* If the PID carries the PCR, there will be a system
                          * time-based discontinuity. We let the PCR decoder
                          * handle that. */
-                        p_es->p_pgrm->b_discontinuity = 1;
+                        p_es->p_pgrm->i_synchro_state = SYNCHRO_REINIT;
     
                         /* There also may be a continuity_counter
                          * discontinuity: resynchronise our counter with

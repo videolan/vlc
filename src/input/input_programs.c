@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.30 2001/02/08 13:52:35 massiot Exp $
+ * $Id: input_programs.c,v 1.31 2001/02/08 17:44:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -152,7 +152,6 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
 
     p_input->stream.pp_programs[i_pgrm_index]->i_synchro_state
                                                 = SYNCHRO_START;
-    p_input->stream.pp_programs[i_pgrm_index]->b_discontinuity = 0;
 
     p_input->stream.pp_programs[i_pgrm_index]->p_vout
                                             = p_input->p_default_vout;
@@ -279,7 +278,6 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
 
     /* Init its values */
     p_es->i_id = i_es_id;
-    p_es->b_discontinuity = 0;
     p_es->p_pes = NULL;
     p_es->p_decoder_fifo = NULL;
     p_es->b_audio = 0;
@@ -400,7 +398,7 @@ void input_DumpStream( input_thread_t * p_input )
 #define S   p_input->stream
     intf_Msg( "input info: Dumping stream ID 0x%x", S.i_stream_id );
     if( S.b_seekable )
-        intf_Msg( "input info: seekable stream, position: %d/%d",
+        intf_Msg( "input info: seekable stream, position: %lld/%lld",
                   S.i_tell, S.i_size );
     else
         intf_Msg( "input info: %s", S.b_pace_control ? "pace controlled" :

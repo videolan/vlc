@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.27 2001/02/08 13:52:34 massiot Exp $
+ * $Id: input.h,v 1.28 2001/02/08 17:44:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -109,7 +109,7 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
 
     if( p_pes != NULL )
     {
-        p_pes->b_messed_up = 1;
+        p_pes->b_discontinuity = 1;
         p_es->p_last->p_next = p_pad_data;
         p_es->p_last = p_pad_data;
     }
@@ -124,10 +124,8 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
 
         p_pes->i_rate = p_input->stream.control.i_rate;
         p_pes->p_first = p_pad_data;
-        p_pes->b_messed_up = p_pes->b_discontinuity = 1;
+        p_pes->b_discontinuity = 1;
         input_DecodePES( p_es->p_decoder_fifo, p_pes );
     }
-
-    p_es->b_discontinuity = 0;
 }
 

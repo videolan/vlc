@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.2 2001/02/08 06:41:56 stef Exp $
+ * $Id: dvd_css.c,v 1.3 2001/02/08 17:44:12 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -32,7 +32,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
-#include <malloc.h>
 #include <netinet/in.h>
 #include <sys/ioctl.h>
 #ifdef HAVE_SYS_DVDIO_H
@@ -930,7 +929,7 @@ int CSSGetKeys( css_t * p_css )
     DVD_key_t   my_key;
     title_key_t title_key[MaxKeys] ;
     int         i_title;
-    off64_t		i_pos = 0;
+    off_t		i_pos = 0;
     int         i_bytes_read;
     int         i_best_plen;
     int         i_best_p;
@@ -948,7 +947,7 @@ int CSSGetKeys( css_t * p_css )
         i_pos = p_css->p_title_key[i_title].i;
         do
         {
-            i_pos = lseek64( i_fd, i_pos, SEEK_SET );
+            i_pos = lseek( i_fd, i_pos, SEEK_SET );
             i_bytes_read = read( i_fd, pi_buf, 0x800 );
             if( pi_buf[0x14] & 0x30 ) // PES_scrambling_control
             {

@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.1 2001/02/08 04:43:27 sam Exp $
+ * $Id: dvd_ifo.h,v 1.2 2001/02/08 17:44:12 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -477,9 +477,9 @@ typedef struct ifo_s
     /* File descriptor for the device */
     int             i_fd;
     /* Offset to video_ts.ifo on the device */
-    off64_t         i_off;
+    off_t           i_off;
     /* Position of stream pointer */
-    off64_t         i_pos;
+    off_t           i_pos;
     /* Error Management */
     boolean_t       b_error;
     /* Structure described in video_ts */
