@@ -770,8 +770,8 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             {
                 psz_http_path = strdup(  p_sd->pp_attributes[i]->psz_value );
             }
-            if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup" ) ||
-                !strcasecmp( p_sd->pp_attributes[i]->psz_field , "x-plgroup" ) )
+            if( ( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup" ) ) ||
+                ( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "x-plgroup" ) ) )
             {
                 int i_group_id;
                 p_playlist =
