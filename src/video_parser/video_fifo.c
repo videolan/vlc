@@ -133,24 +133,6 @@ void vpar_DecodeMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
  *****************************************************************************/
 void vpar_ReleaseMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
 {
-    /* Unlink referenced pictures */
-    if( p_mb->p_forw_top != NULL )
-    {
-	vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forw_top );
-    }
-    if( p_mb->p_backw_top != NULL )
-    {
-        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backw_top );
-    }
-    if( p_mb->p_forw_bot != NULL )
-    {
-        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forw_bot );
-    }
-    if( p_mb->p_backw_bot != NULL )
-    {
-        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backw_bot );
-    }
-
     /* Unlink picture buffer */
     vlc_mutex_lock( &p_mb->p_picture->lock_deccount );
     p_mb->p_picture->i_deccount--;
@@ -161,7 +143,17 @@ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
 
         /* Warn Synchro for its records. */
         vpar_SynchroEnd( p_fifo->p_vpar );
-    }
+     
+        /* Unlink referenced pictures */
+        if( p_mb->p_forward != NULL )
+        {
+	        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forward );
+        }
+        if( p_mb->p_backward != NULL )
+        {
+            vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backward );
+        }
+   }
     vlc_mutex_unlock( & p_mb->p_picture->lock_deccount );
 
     /* Release the macroblock_t structure */
@@ -177,24 +169,6 @@ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
  *****************************************************************************/
 void vpar_DestroyMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
 {
-    /* Unlink referenced pictures */
-    if( p_mb->p_forw_top != NULL )
-    {
-        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forw_top );
-    }
-    if( p_mb->p_backw_top != NULL )
-    {
-        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backw_top );
-    }
-    if( p_mb->p_forw_bot != NULL )
-    {
-        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forw_bot );
-    }
-    if( p_mb->p_backw_bot != NULL )
-    {
-        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backw_bot );
-    }
-
     /* Release the macroblock_t structure */
 #define P_buffer p_fifo->p_vpar->vbuffer
     vlc_mutex_lock( &P_buffer.lock );

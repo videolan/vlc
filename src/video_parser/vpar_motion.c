@@ -86,6 +86,7 @@ static __inline__ int vpar_MotionCode( vpar_thread_t * p_vpar )
 
    if( (i_code -= 12) < 0 )
    {
+       p_vpar->picture.b_error = 1;
        intf_DbgMsg( "vpar debug: Invalid motion_vector code\n" );
        return 0;
    }

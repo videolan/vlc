@@ -652,10 +652,10 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     {
         /* This is a new frame. Get a structure from the video_output. */
         P_picture = vout_CreatePicture( p_vpar->p_vout,
-                                        SPLITTED_YUV_PICTURE,
+                                        99+p_vpar->sequence.i_chroma_format, /*???*/
                                         p_vpar->sequence.i_width,
                                         p_vpar->sequence.i_height,
-                                        p_vpar->sequence.i_chroma_format );
+                                        p_vpar->sequence.i_width*sizeof(yuv_data_t) );
 
         /* Initialize values. */
         P_picture->date = vpar_SynchroDecode( p_vpar,
@@ -710,7 +710,18 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         /* Decode slice data. */
         SliceHeader( p_vpar, &i_mb_address, i_mb_base, i_dummy & 255 );
     }
-
+    
+    /* Link referenced pictures for the decoder 
+     * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
+    if( p_vpar->sequence.p_forward != NULL )
+    {
+	    vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+    }
+    if( p_vpar->sequence.p_backward != NULL )
+    {
+        vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+    }
+    
     if( p_vpar->picture.b_error )
     {
         /* Trash picture. */
@@ -722,13 +733,23 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         ReferenceReplace( p_vpar, p_vpar->picture.i_coding_type, NULL );
         vout_DestroyPicture( p_vpar->p_vout, P_picture );
 
+        /* Unlink referenced pictures */
+        if(  p_vpar->sequence.p_forward != NULL  )
+        {
+	        vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+        }
+        if( p_vpar->sequence.p_backward != NULL )
+        {
+            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+        }
+
         /* Prepare context for the next picture. */
         P_picture = NULL;
     }
     else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
     {
         /* Frame completely parsed. */
-        P_picture.i_deccount = p_vpar->sequence.i_mb_size;
+        P_picture->i_deccount = p_vpar->sequence.i_mb_size;
         for( i_mb = 0; i_mb < p_vpar->sequence.i_mb_size; i_mb++ )
         {
             vpar_DecodeMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
