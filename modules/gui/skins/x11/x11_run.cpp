@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.11 2003/05/29 16:48:29 asmax Exp $
+ * $Id: x11_run.cpp,v 1.12 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -209,6 +209,15 @@ int ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
             return 1;      // Exit VLC !
         }
     }
+    else if( wnd == p_intf->p_sys->mainWin )
+    {
+        // Broadcast event
+        for( win = p_intf->p_sys->p_theme->WindowList.begin();
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+        {
+            (*win)->ProcessEvent( evt );
+        }
+    }
     else
     {
         // Find window matching with gwnd
@@ -280,7 +289,6 @@ void OSRun( intf_thread_t *p_intf )
             SkinManage( p_intf );    // Call every 100 ms
         }
     }
-    
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )

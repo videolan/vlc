@@ -2,7 +2,7 @@
  * x11_font.h: X11 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_font.h,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_font.h,v 1.2 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -41,9 +41,8 @@ class Graphics;
 class X11Font : SkinFont
 {
     private:
-/*        PangoContext  *Context;
-        PangoLayout   *Layout;
-        PangoFontDescription *FontDesc;*/
+        Display *display;
+        Font font;
 
         // Assign font to Device Context
         virtual void AssignFont( Graphics *dest );

@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.10 2003/05/26 02:09:27 gbazin Exp $
+ * $Id: skin_common.h,v 1.11 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -87,6 +87,7 @@ struct intf_sys_t
 
 #ifdef X11_SKINS
     Display *display;
+    Window mainWin;    // Window which receives "broadcast" events
 #endif
 
 #ifdef WIN32

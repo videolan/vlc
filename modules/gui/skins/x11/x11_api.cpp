@@ -2,7 +2,7 @@
  * x11_api.cpp: Various x11-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_api.cpp,v 1.3 2003/05/28 23:56:51 asmax Exp $
+ * $Id: x11_api.cpp,v 1.4 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -68,19 +68,13 @@ void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int para
     if( win == NULL )
     {
         // broadcast message
-        list<SkinWindow *>::const_iterator w;
-        for( w = g_pIntf->p_sys->p_theme->WindowList.begin();
-             w != g_pIntf->p_sys->p_theme->WindowList.end(); w++ )
-        {
-            event.xclient.window = (( X11Window *)*w)->GetHandle();
-            XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, &event );
-        }
+        event.xclient.window = g_pIntf->p_sys->mainWin;
     }
     else
     {
         event.xclient.window = (( X11Window *)win)->GetHandle();
-        XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, &event );
     }
+    XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, &event );
 }
 //---------------------------------------------------------------------------
 

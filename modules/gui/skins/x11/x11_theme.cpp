@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.7 2003/05/29 21:40:27 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.8 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -53,7 +53,7 @@ void SkinManage( intf_thread_t *p_intf );
 X11Theme::X11Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
 {
     //Initialize values
-    ParentWindow = 0;
+    p_intf = _p_intf;
     display = p_intf->p_sys->display;
 }
 
@@ -89,36 +89,10 @@ void X11Theme::OnLoadTheme()
 /*    // The create menu
     CreateSystemMenu();
 */
-    // Set the parent window attributes
-/*    GdkWindowAttr attr;
-    attr.title = "VLC Media Player";
-    attr.event_mask = GDK_ALL_EVENTS_MASK;
-    attr.x = 0;
-    attr.y = 0;
-    attr.width = 0;
-    attr.height = 0;
-    attr.window_type = GDK_WINDOW_TOPLEVEL;
-    attr.wclass = GDK_INPUT_ONLY;
-    attr.override_redirect = FALSE;
-    
-    gint mask = GDK_WA_TITLE|GDK_WA_X|GDK_WA_Y|GDK_WA_NOREDIR;
-    
-    // Create the parent window
-    ParentWindow = gdk_window_new( NULL, &attr, mask);
-    if( !ParentWindow )
-    {
-        msg_Err( p_intf, "gdk_window_new failed" );
-        return;
-    }*/
-
-/*    Window root = DefaultRootWindow( display );
-    ParentWindow = XCreateSimpleWindow( display, root, 0, 0, 100, 100, 0, 0, 0 );
-    XSelectInput( display, ParentWindow, ExposureMask|
-            KeyPressMask|KeyReleaseMask|ButtonPressMask|PointerMotionMask|
-            PointerMotionHintMask| EnterWindowMask|LeaveWindowMask);
-
-    XMapRaised( display, ParentWindow );
-    XFlush( display );*/
+    Window root = DefaultRootWindow( display );
+    p_intf->p_sys->mainWin = XCreateSimpleWindow( display, root, 0, 0, 1, 1, 
+                                                  0, 0, 0 );
+    XStoreName( display, p_intf->p_sys->mainWin, "VLC Media Player" );
 }
 //---------------------------------------------------------------------------
 void X11Theme::AddSystemMenu( string name, Event *event )
@@ -135,36 +109,13 @@ void X11Theme::AddSystemMenu( string name, Event *event )
 }
 //---------------------------------------------------------------------------
 void X11Theme::ChangeClientWindowName( string name )
-{/*
-    SetWindowText( ParentWindow, name.c_str() );*/
+{
+    XStoreName( display, p_intf->p_sys->mainWin, name.c_str() );
 }
 //---------------------------------------------------------------------------
 void X11Theme::AddWindow( string name, int x, int y, bool visible,
     int fadetime, int alpha, int movealpha, bool dragdrop )
 {
-/*    GdkWindowAttr attr;
-    attr.title = (gchar *)name.c_str();
-    attr.event_mask = GDK_ALL_EVENTS_MASK;
-    attr.width = 0;
-    attr.height = 0;
-    attr.window_type = GDK_WINDOW_TOPLEVEL;
-    attr.wclass = GDK_INPUT_OUTPUT;
-    attr.override_redirect = FALSE;
-
-    gint mask = GDK_WA_NOREDIR;
-
-    // Create the window
-    GdkWindow *gwnd = gdk_window_new( NULL, &attr, mask );
-    if( !gwnd )
-    {
-        msg_Err( p_intf, "gdk_window_new failed" );
-        return;
-    }
-
-    gdk_window_set_decorations( gwnd, (GdkWMDecoration)0 );
-
-    gdk_window_show( gwnd );*/
-
     // Create the window
     Window root = DefaultRootWindow( display );
     XSetWindowAttributes attr;
@@ -190,6 +141,9 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     XChangeProperty( display, wnd, hints_atom, hints_atom, 32, 
                      PropModeReplace, (unsigned char *)&motifWmHints, 
                      sizeof( motifWmHints ) / sizeof( long ) );
+
+    // Change the window title
+    XStoreName( display, wnd, name.c_str() );
 
     // Display the window
     XMapRaised( display, wnd );

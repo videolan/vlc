@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.27 2003/05/29 21:40:27 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.28 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -102,10 +102,11 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_OPEN:
-            // FIXME: just for testing
+#ifndef BASIC_SKINS
             wxMutexGuiEnter();
             OpenFile( true );
             wxMutexGuiLeave();
+#endif            
             return true;
 
         case VLC_LOAD_SKIN:
@@ -137,15 +138,15 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_PLAYLIST_ADD_FILE:
-            // FIXME: just for testing
+#ifndef BASIC_SKINS
             wxMutexGuiEnter();
             OpenFile( false );
             wxMutexGuiLeave();
+#endif            
             return true;
 
 #ifndef BASIC_SKINS
         case VLC_LOG_SHOW:
-            // FIXME: just for testing
             wxMutexGuiEnter();
             p_intf->p_sys->MessagesDlg->Show(
                 !p_intf->p_sys->MessagesDlg->IsShown() );
@@ -156,7 +157,6 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_PREFS_SHOW:
-            // FIXME: just for testing
             wxMutexGuiEnter();
             p_intf->p_sys->PrefsDlg->Show(
                 !p_intf->p_sys->PrefsDlg->IsShown() );
@@ -164,7 +164,6 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_INFO_SHOW:
-            // FIXME: just for testing
             wxMutexGuiEnter();
             p_intf->p_sys->InfoDlg->Show(
                 !p_intf->p_sys->InfoDlg->IsShown() );

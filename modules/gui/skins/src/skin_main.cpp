@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.28 2003/05/26 19:06:47 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.29 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -168,7 +168,6 @@ static int Open ( vlc_object_t *p_this )
 static void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-
 
     if( p_intf->p_sys->p_input )
     {

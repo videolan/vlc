@@ -2,7 +2,7 @@
  * x11_bitmap.cpp: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.cpp,v 1.7 2003/05/29 21:40:27 asmax Exp $
+ * $Id: x11_bitmap.cpp,v 1.8 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -73,7 +73,7 @@ X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
  
     AlphaColor = (AColor & 0xff) << 16 | (AColor & 0xff00) | 
                  (AColor & 0xff0000) >> 16;
-
+                 
     imlib_context_set_display( display );
     imlib_context_set_visual( visual );
     imlib_context_set_colormap( DefaultColormap( display, screen ) );

@@ -2,7 +2,7 @@
  * x11_theme.h: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.h,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_theme.h,v 1.2 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -44,9 +44,9 @@ class FontBank;
 class X11Theme : public Theme
 {
     protected:
+        intf_thread_t *p_intf;
         // Handles
         Display *display;
-        Window ParentWindow;
 /*
         // System tray icon
         NOTIFYICONDATA TrayIcon;
@@ -62,7 +62,6 @@ class X11Theme : public Theme
 
         // Specific methods
         Display * GetDisplay()   { return display; }
-        Window GetParentWindow() { return ParentWindow; }
 
         // !!!
         virtual void AddWindow( string name, int x, int y, bool visible,

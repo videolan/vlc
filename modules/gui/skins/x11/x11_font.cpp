@@ -2,10 +2,9 @@
  * x11_font.cpp: X11 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_font.cpp,v 1.3 2003/05/19 21:39:34 asmax Exp $
+ * $Id: x11_font.cpp,v 1.4 2003/06/01 16:39:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,12 +31,14 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
+#include "../src/skin_common.h"
 #include "../src/graphics.h"
 #include "../os_graphics.h"
 #include "../src/font.h"
 #include "../os_font.h"
 
-
+// FIXME ...
+extern intf_thread_t *g_pIntf;
 
 //---------------------------------------------------------------------------
 // Font object
@@ -46,39 +47,10 @@ X11Font::X11Font( intf_thread_t *_p_intf, string fontname, int size,
     int color, int weight, bool italic, bool underline )
     : SkinFont( _p_intf, fontname, size, color, weight, italic, underline )
 {
-/*    Context = gdk_pango_context_get();
-    Layout = pango_layout_new( Context );
+    display = g_pIntf->p_sys->display;
 
-    // Text properties setting
-    FontDesc    = pango_font_description_new();
-
-    pango_font_description_set_family( FontDesc, fontname.c_str() );
-
-    pango_font_description_set_size( FontDesc, size * PANGO_SCALE );
-
-    if( italic )
-    {
-        pango_font_description_set_style( FontDesc, PANGO_STYLE_ITALIC );
-    }
-    else
-    {
-        pango_font_description_set_style( FontDesc, PANGO_STYLE_NORMAL );
-    }
-
-    pango_font_description_set_weight( FontDesc, (PangoWeight)weight );
-
-    //pango_context_set_font_description( Context, FontDesc );
-    pango_layout_set_font_description( Layout, FontDesc );
-
-    // Set attributes
-    PangoAttrList *attrs = pango_attr_list_new();
-    // FIXME: doesn't work 
-    if( underline )
-    {
-        pango_attr_list_insert( attrs, 
-            pango_attr_underline_new( PANGO_UNDERLINE_SINGLE ) );
-    }
-    pango_layout_set_attributes( Layout, attrs );*/
+    // FIXME: just a beginning...
+    font = XLoadFont( display, "-misc-fixed-*-*-*-*-*-*-*-*-*-*-*-*" );
 }
 //---------------------------------------------------------------------------
 X11Font::~X11Font()
@@ -91,48 +63,30 @@ void X11Font::AssignFont( Graphics *dest )
 //---------------------------------------------------------------------------
 void X11Font::GetSize( string text, int &w, int &h )
 {
-    w = 42;
-    h = 12;
-/*    pango_layout_set_text( Layout, text.c_str(), text.length() );
-    pango_layout_get_pixel_size( Layout, &w, &h );*/
+    int direction, fontAscent, fontDescent;
+    XCharStruct overall;
+    
+    XQueryTextExtents( display, font, text.c_str(), text.size(), &direction,
+                       &fontAscent, &fontDescent, &overall );
+
+    w = overall.rbearing - overall.lbearing;
+    h = overall.ascent + overall.descent;
 }
 //---------------------------------------------------------------------------
 void X11Font::GenericPrint( Graphics *dest, string text, int x, int y,
                                  int w, int h, int align, int color )
 {
-/*    // Set text
-    pango_layout_set_text( Layout, text.c_str(), -1 );
-
-    // Set size
-    pango_layout_set_width( Layout, -1 );
-    int real_w, real_h;
-
-    // Create buffer image
-    Graphics* cov = (Graphics *)new OSGraphics( w, h );
-    cov->CopyFrom( 0, 0, w, h, dest, x, y, SRC_COPY );
-
     // Get handles
-    GdkDrawable *drawable = ( (X11Graphics *)cov )->GetImage();
-    GdkGC *gc = ( (X11Graphics *)cov )->GetGC();
+    Drawable drawable = ( (X11Graphics *)dest )->GetImage();
+    GC gc = ( (X11Graphics *)dest )->GetGC();
 
-    // Set width of text
-    pango_layout_set_width( Layout, w * PANGO_SCALE );
-
-    // Set attributes
-    pango_layout_set_alignment( Layout, (PangoAlignment)align );
-    
-    // Avoid transârency for black text
-    if( color == 0 ) color = 10;
-    gdk_rgb_gc_set_foreground( gc, color );
+    XGCValues gcVal;
+    gcVal.foreground = (color == 0 ? 10 : color);
+    gcVal.font = font;
+    XChangeGC( display, gc, GCForeground|GCFont,  &gcVal );
 
     // Render text on buffer
-    gdk_draw_layout( drawable, gc, 0, 0, Layout );
-
-    // Copy buffer on dest graphics
-    dest->CopyFrom( x, y, w, h, cov, 0, 0, SRC_COPY );
-
-    // Free memory
-    delete (OSGraphics *)cov;*/
+    XDrawString( display, drawable, gc, x, y+h, text.c_str(), text.size());
 }
 
 //---------------------------------------------------------------------------

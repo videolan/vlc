@@ -1706,6 +1706,8 @@ dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
   LDFLAGS_mp4="${LDFLAGS_mp4} -lz"
+  LDFLAGS_skins="${LDFLAGS_skins} -lz"
+  LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lz"
 ] )
 
 
