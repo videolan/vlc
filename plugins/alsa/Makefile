@@ -49,7 +49,7 @@ $(STD_BUILTIN_OBJ): %-BUILTIN.o: %.c
 # Real targets
 #
 ../../lib/alsa.so: $(PLUGIN_ALSA)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lasound
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_ALSA)
 
 ../../lib/alsa.a: $(BUILTIN_ALSA)
 	ar r $@ $^

@@ -35,23 +35,19 @@ $(cdependancies): %.d: FORCE
 
 $(ALL_OBJ): %.o: ../../Makefile.dep Makefile
 
-$(STD_PLUGIN_OBJ): %.o: .dep/%.d
-$(STD_PLUGIN_OBJ): %.o: %.c
+$(PLUGIN_SDL): %.o: .dep/%.d
+$(PLUGIN_SDL): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
-$(STD_BUILTIN_OBJ): %-BUILTIN.o: .dep/%.d
-$(STD_BUILTIN_OBJ): %-BUILTIN.o: %.c
+$(BUILTIN_SDL): %-BUILTIN.o: .dep/%.d
+$(BUILTIN_SDL): %-BUILTIN.o: %.c
 	$(CC) $(CFLAGS) -DBUILTIN -c -o $@ $<
 
 #
 # Real targets
 #
 ../../lib/sdl.so: $(PLUGIN_SDL)
-ifneq (,$(findstring darwin,$(SYS)))
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_SDL) -framework Carbon -framework AGL
-else
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_SDL)
-endif
 
 ../../lib/sdl.a: $(BUILTIN_SDL)
 	ar r $@ $^

@@ -26,10 +26,3 @@ PLCFLAGS += -shared
 endif
 endif
 
-#
-# Libraries for special cases
-#
-LIB_GGI = @LIB_GGI@
-LIB_GLIDE = @LIB_GLIDE@
-LIB_SDL = @LIB_SDL@
-

@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.23 2001/04/15 04:19:58 sam Exp $
+ * $Id: modules.c,v 1.24 2001/04/15 10:54:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -276,6 +276,9 @@ void module_ManageBank( module_bank_t * p_bank )
                 intf_WarnMsg( 3, "module: hiding unused module `%s'",
                               p_module->psz_name );
                 HideModule( p_module );
+
+                /* Break here, so that we only hide one module at a time */
+                break;
             }
         }
     }

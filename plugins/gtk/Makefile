@@ -47,7 +47,7 @@ $(BUILTIN_GTK): %-BUILTIN.o: %.c
 # Real targets
 #
 ../../lib/gtk.so: $(PLUGIN_GTK)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) `gtk-config --libs gtk | sed 's,-rdynamic,,'`
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GTK)
 
 ../../lib/gtk.a: $(BUILTIN_GTK)
 	ar r $@ $^

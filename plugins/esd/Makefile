@@ -49,11 +49,7 @@ $(STD_BUILTIN_OBJ): %-BUILTIN.o: %.c
 # Real targets
 #
 ../../lib/esd.so: $(PLUGIN_ESD)
-ifneq (,$(findstring bsd,$(SYS)))
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lesd
-else
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -laudiofile -lesd
-endif
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_ESD)
 
 ../../lib/esd.a: $(BUILTIN_ESD)
 	ar r $@ $^

@@ -88,9 +88,3 @@ $(BUILTIN_MOTIONMMXEXT): %-BUILTIN-MOTIONMMXEXT.o: %.c
 ../../lib/motionmmxext.a: $(BUILTIN_MOTIONMMXEXT)
 	ar r $@ $^
 
-../../lib/motionaltivec.so: $(PLUGIN_MOTIONALTIVEC) $(PLUGIN_MOTIONCOMMON)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework vecLib
-
-../../lib/motionaltivec.a: $(BUILTIN_MOTIONALTIVEC)
-	ar r $@ $^
-

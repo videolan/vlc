@@ -53,9 +53,9 @@ $(STD_BUILTIN_OBJ): %-BUILTIN.o: %.c
 #
 ../../lib/x11.so: $(PLUGIN_X11)
 ifeq ($(SYS),nto-qnx)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lsocket
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_X11) -lsocket
 else
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_X11)
 endif
 
 ../../lib/x11.a: $(BUILTIN_X11)
@@ -63,9 +63,9 @@ endif
 
 ../../lib/xvideo.so: $(PLUGIN_XVIDEO)
 ifeq ($(SYS),nto-qnx)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXv -lsocket
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_XVIDEO) -lsocket
 else
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext -lXv
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_XVIDEO)
 endif
 
 ../../lib/xvideo.a: $(BUILTIN_XVIDEO)

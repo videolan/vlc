@@ -1,8 +1,5 @@
 ###############################################################################
-# vlc (VideoLAN Client) main makefile
-# (c)1998 VideoLAN
-###############################################################################
-# This makefile is the main makefile for the VideoLAN client.
+# vlc (VideoLAN Client) main Makefile - (c)1998 VideoLAN
 ###############################################################################
 
 include Makefile.opts
@@ -36,8 +33,8 @@ PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin dsp/dsp dummy/dummy \
 #
 # Translate plugin names
 #
-PLUGINS_OBJ := $(shell for i in $(PLUGINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed 's@.*/\('$$i'\) .*@lib/\1.so@ ; s@^ .*@@' ; done)
-BUILTINS_OBJ := $(shell for i in $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed 's@.*/\('$$i'\) .*@lib/\1.a@ ; s@^ .*@@' ; done)
+PLUGINS_OBJ := $(shell for i in : $(PLUGINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed 's@.*/\('$$i'\) .*@lib/\1.so@ ; s@^ .*@@' ; done)
+BUILTINS_OBJ := $(shell for i in : $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed 's@.*/\('$$i'\) .*@lib/\1.a@ ; s@^ .*@@' ; done)
 
 #
 # C Objects
@@ -164,8 +161,18 @@ export
 #
 all: vlc ${ALIASES} plugins vlc.app
 
+Makefile.opts:
+	@echo
+	@echo "Sorry, you need to run ./configure before using this makefile."
+	@echo "To make clean or make distclean, use this:"
+	@echo
+	@echo "    touch Makefile.opts Makefile.modules && make distclean"
+	@echo
+	@exit 1
+
 clean:
-	for d in $(PLUGINS_DIR) ; do ( cd plugins/$${d} && make clean ) ; done
+	for d in $(PLUGINS_DIR) ; do ( cd plugins/$${d} && $(MAKE) clean ) ; done
+	rm -f plugins/*/*.o plugins/*/*.moc plugins/*/*.bak
 	rm -f $(C_OBJ) $(CPP_OBJ)
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so lib/*.a vlc gnome-vlc gvlc kvlc qvlc
@@ -203,6 +210,7 @@ show:
 	@echo cppobjects: $(cppobjects)
 	@echo PLUGINS_OBJ: $(PLUGINS_OBJ)
 	@echo BUILTINS_OBJ: $(BUILTINS_OBJ)
+
 
 # ugliest of all, but I have no time to do it -- sam
 snapshot:
@@ -331,12 +339,12 @@ endif
 #
 plugins: $(PLUGINS_OBJ)
 $(PLUGINS_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed 's@.* \([^/]*/\)'$(@:lib/%.so=%)' .*@plugins/\1@ ; s@^ .*@@') && make $(@:%=../../%)
+	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed 's@.* \([^/]*/\)'$(@:lib/%.so=%)' .*@plugins/\1@ ; s@^ .*@@') && $(MAKE) $(@:%=../../%)
 
 #
 # Built-in modules target
 #
 builtins: $(BUILTINS_OBJ)
 $(BUILTINS_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed 's@.* \([^/]*/\)'$(@:lib/%.a=%)' .*@plugins/\1@ ; s@^ .*@@') && make $(@:%=../../%)
+	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed 's@.* \([^/]*/\)'$(@:lib/%.a=%)' .*@plugins/\1@ ; s@^ .*@@') && $(MAKE) $(@:%=../../%)
 

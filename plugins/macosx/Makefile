@@ -47,7 +47,7 @@ $(BUILTIN_MACOSX): %-BUILTIN.o: %.c
 # Real targets
 #
 ../../lib/macosx.so: $(PLUGIN_MACOSX)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework CoreAudio -framework Carbon -framework AGL
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_MACOSX)
 
 ../../lib/macosx.a: $(BUILTIN_MACOSX)
 	ar r $@ $^

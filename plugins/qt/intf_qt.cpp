@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.2 2001/03/18 00:01:13 sam Exp $
+ * $Id: intf_qt.cpp,v 1.3 2001/04/15 10:54:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -140,7 +140,11 @@ private:
     QLabel     *p_date;
 };
 
-#include "intf_qt.moc"
+#ifdef BUILTIN
+#   include "intf_qt-BUILTIN.moc"
+#else
+#   include "intf_qt.moc"
+#endif
 
 #define SLIDER_MIN    0x00000
 #define SLIDER_MAX    0x10000

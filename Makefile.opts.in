@@ -7,28 +7,57 @@
 # Configuration
 ###############################################################################
 
-# Debugging mode on or off (set to 1 to activate)
-DEBUG=@DEBUG@
-STATS=@STATS@
-OPTIMS=@OPTIMS@
-GETOPT=@GETOPT@
+#
+# Compilation options
+#
+DEBUG = @DEBUG@
+STATS = @STATS@
+OPTIMS = @OPTIMS@
+GETOPT = @GETOPT@
 
-PLUGINS:=@PLUGINS@
-BUILTINS:=@BUILTINS@
+PLUGINS := @PLUGINS@
+BUILTINS := @BUILTINS@
 
-SYS=@SYS@
-ALIASES=@ALIASES@
-INSTALL=@INSTALL@
-ARCH=@ARCH@
+SYS = @SYS@
+ALIASES =@ALIASES@
+INSTALL = @INSTALL@
+ARCH = @ARCH@
 
-exec_prefix=@exec_prefix@
-prefix=@prefix@
-bindir=@bindir@
-datadir=@datadir@
-libdir=@libdir@
+# 
+# Build environment
+# 
+CC = @CC@
+SHELL = @SHELL@
 
-CC=@CC@
-SHELL=@SHELL@
+# 
+# Installation environment
+# 
+exec_prefix = @exec_prefix@
+prefix = @prefix@
+bindir = @bindir@
+datadir = @datadir@
+libdir = @libdir@
+
+#
+# Libraries for special cases
+#
+LIB_ALSA = @LIB_ALSA@
+LIB_BEOS = @LIB_BEOS@
+LIB_DARWIN = @LIB_DARWIN@
+LIB_ESD = @LIB_ESD@
+LIB_GGI = @LIB_GGI@
+LIB_GLIDE = @LIB_GLIDE@
+LIB_GNOME = @LIB_GNOME@
+LIB_GTK = @LIB_GTK@
+LIB_IDCTALTIVEC = @LIB_IDCTALTIVEC@
+LIB_MACOSX = @LIB_MACOSX@
+LIB_NCURSES = @LIB_NCURSES@
+LIB_QT = @LIB_QT@
+LIB_TS = @LIB_TS@
+LIB_SDL = @LIB_SDL@
+LIB_X11 = @LIB_X11@
+LIB_XVIDEO = @LIB_XVIDEO@
+LIB_YUV = @LIB_YUV@
 
 ###############################################################################
 # Configuration pre-processing
@@ -81,13 +110,12 @@ INCLUDE += -Iinclude -Iextras -I/usr/local/include
 #
 # Libraries
 #
-LIB = @LIB@ -L/usr/local/lib
+LIB += @LIB@ -L/usr/local/lib
 
-ifeq ($(SYS),beos)
-LIB += -lbe -lroot -lgame
-else
-LIB += -lm
-endif
+#
+# Libraries needed by built-in modules
+#
+LIB += $(shell for i in ${BUILTINS} ; do echo $$i | tr '[a-z]' '[A-Z]' | sed 's/.*/$$LIB_&/' ; done)
 
 #
 # C compiler flags: mainstream compilation

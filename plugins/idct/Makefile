@@ -107,7 +107,7 @@ $(BUILTIN_IDCTALTIVEC): %-BUILTIN-IDCTALTIVEC.o: %.c
 	ar r $@ $^
 
 ../../lib/idctaltivec.so: $(PLUGIN_IDCTALTIVEC) $(PLUGIN_IDCTCOMMON)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework vecLib
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_IDCTALTIVEC)
 
 ../../lib/idctaltivec.a: $(BUILTIN_IDCTALTIVEC)
 	ar r $@ $^

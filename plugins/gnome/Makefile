@@ -47,7 +47,7 @@ $(BUILTIN_GNOME): %-BUILTIN.o: %.c
 # Real targets
 #
 ../../lib/gnome.so: $(PLUGIN_GNOME)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GNOME)
 
 ../../lib/gnome.a: $(BUILTIN_GNOME)
 	ar r $@ $^

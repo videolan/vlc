@@ -49,7 +49,7 @@ $(BUILTIN_BEOS): %-BUILTIN.o: %.cpp
 # Real targets
 #
 ../../lib/beos.so: $(PLUGIN_BEOS)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lbe -lgame -lroot -ltracker
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_BEOS)
 
 ../../lib/beos.a: $(BUILTIN_BEOS)
 	ar r $@ $^

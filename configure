@@ -2248,9 +2248,9 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-echo $ac_n "checking for powl in -lm""... $ac_c" 1>&6
-echo "configure:2253: checking for powl in -lm" >&5
-ac_lib_var=`echo m'_'powl | sed 'y%./+-%__p_%'`
+echo $ac_n "checking for pow in -lm""... $ac_c" 1>&6
+echo "configure:2253: checking for pow in -lm" >&5
+ac_lib_var=`echo m'_'pow | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2262,10 +2262,10 @@ cat > conftest.$ac_ext <<EOF
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
     builtin and then its argument prototype would still apply.  */
-char powl();
+char pow();
 
 int main() {
-powl()
+pow()
 ; return 0; }
 EOF
 if { (eval echo configure:2272: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
@@ -2283,7 +2283,7 @@ LIBS="$ac_save_LIBS"
 fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
-  LIB=${LIB}" -lm"
+  LIB_YUV=${LIB_YUV}" -lm"
 else
   echo "$ac_t""no" 1>&6
 fi
@@ -3085,6 +3085,8 @@ EOF
 fi
 
 
+ARCH=${host_cpu}
+
 #PLUGINS=${PLUGINS}"ps ts yuv idct idctclassic motion "
 BUILTINS=${BUILTINS}"ps ts yuv idct idctclassic motion "
 if test x$host_os = xbeos; then
@@ -3097,17 +3099,17 @@ for ac_hdr in sys/ioctl.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3101: checking for $ac_hdr" >&5
+echo "configure:3103: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3106 "configure"
+#line 3108 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3111: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3113: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3127,23 +3129,23 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   cat >> confdefs.h <<EOF
 #define $ac_tr_hdr 1
 EOF
- #PLUGINS=${PLUGINS}"dvd "
-   BUILTINS=${BUILTINS}"dvd "
-   for ac_hdr in linux/cdrom.h
+ 
+  BUILTINS=${BUILTINS}"dvd "
+  for ac_hdr in linux/cdrom.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3137: checking for $ac_hdr" >&5
+echo "configure:3139: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3142 "configure"
+#line 3144 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3147: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3149: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3169,20 +3171,23 @@ else
 fi
 done
 
-   cat > conftest.$ac_ext <<EOF
-#line 3174 "configure"
+  cat > conftest.$ac_ext <<EOF
+#line 3176 "configure"
 #include "confdefs.h"
 #include <linux/cdrom.h>
 EOF
 if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
   egrep "dvd" >/dev/null 2>&1; then
   rm -rf conftest*
-  cat >> confdefs.h <<\EOF
+  
+    cat >> confdefs.h <<\EOF
 #define LINUX_DVD 1
 EOF
 
+  
 fi
 rm -f conftest*
+
 
 else
   echo "$ac_t""no" 1>&6
@@ -3190,7 +3195,6 @@ fi
 done
 
 
-ARCH=${host_cpu}
 # Check whether --enable-dummy or --disable-dummy was given.
 if test "${enable_dummy+set}" = set; then
   enableval="$enable_dummy"
@@ -3198,8 +3202,8 @@ if test "${enable_dummy+set}" = set; then
 fi
 
 if test x$enable_dummy != xno; then
-  #PLUGINS=${PLUGINS}"dummy ";
   BUILTINS=${BUILTINS}"dummy "; fi
+
 # Check whether --enable-null or --disable-null was given.
 if test "${enable_null+set}" = set; then
   enableval="$enable_null"
@@ -3207,8 +3211,8 @@ if test "${enable_null+set}" = set; then
 fi
 
 if test x$enable_null != xno; then
-  #PLUGINS=${PLUGINS}"null ";
   BUILTINS=${BUILTINS}"null "; fi
+
 # Check whether --enable-ppro or --disable-ppro was given.
 if test "${enable_ppro+set}" = set; then
   enableval="$enable_ppro"
@@ -3217,27 +3221,29 @@ else
    if test x${host_cpu} = xi686; then ARCH=${ARCH}" ppro"; fi 
 fi
 
+
 # Check whether --enable-mmx or --disable-mmx was given.
 if test "${enable_mmx+set}" = set; then
   enableval="$enable_mmx"
    if test x$enableval = xyes; then ARCH=${ARCH}" mmx";
-  #PLUGINS=${PLUGINS}${ACCEL_PLUGINS};
   BUILTINS=${BUILTINS}}${ACCEL_PLUGINS}; fi 
 else
    if test x${host_cpu} = xi686 -o x${host_cpu} = xi586 -o x${host_cpu} = xx86; then ARCH=${ARCH}" mmx";
-  #PLUGINS=${PLUGINS}${ACCEL_PLUGINS};
   BUILTINS=${BUILTINS}${ACCEL_PLUGINS}; fi 
 fi
+
 
 # Check whether --enable-altivec or --disable-altivec was given.
 if test "${enable_altivec+set}" = set; then
   enableval="$enable_altivec"
    if test x$enableval = xyes; then ARCH=${ARCH}" altivec";
-  #PLUGINS=${PLUGINS}"idctaltivec ";
-  BUILTINS=${BUILTINS}"idctaltivec "; fi 
+    BUILTINS=${BUILTINS}"idctaltivec "
+    LIB_IDCTALTIVEC="-framework vecLib"
+  fi 
 fi
 
 #[ if test -d /System/Library/Frameworks/vecLib.framework; then ARCH=${ARCH}" altivec"; PLUGINS=${PLUGINS}"idctaltivec "; fi ])
+
 # Check whether --enable-css or --disable-css was given.
 if test "${enable_css+set}" = set; then
   enableval="$enable_css"
@@ -3250,17 +3256,20 @@ if test x${CSS} = x1; then cat >> confdefs.h <<\EOF
 #define HAVE_CSS 1
 EOF
  fi
+
 # Check whether --enable-debug or --disable-debug was given.
 if test "${enable_debug+set}" = set; then
   enableval="$enable_debug"
    if test x$enableval = xyes; then DEBUG=1; fi 
 fi
 
+
 # Check whether --enable-stats or --disable-stats was given.
 if test "${enable_stats+set}" = set; then
   enableval="$enable_stats"
    if test x$enableval = xyes; then STATS=1; fi 
 fi
+
 
 # Check whether --enable-optimizations or --disable-optimizations was given.
 if test "${enable_optimizations+set}" = set; then
@@ -3274,8 +3283,8 @@ fi
 SYS=${host_os}
 
 if test x$host_os = xbeos; then
-    PLUGINS=${PLUGINS}"beos "
-    LIB=${LIB}" -lbe -lgame -lroot"
+    BUILTINS=${BUILTINS}"beos "
+    LIB_BEOS="-lbe -lgame -lroot -ltracker"
 
 else
 
@@ -3290,38 +3299,52 @@ if test x$enable_dsp != xno; then
     PLUGINS=${PLUGINS}"dsp "
   fi
 fi
+
 # Check whether --enable-esd or --disable-esd was given.
 if test "${enable_esd+set}" = set; then
   enableval="$enable_esd"
-  if test x$enable_esd = xyes; then PLUGINS=${PLUGINS}"esd "; fi
+  if test x$enable_esd = xyes; then
+     PLUGINS=${PLUGINS}"esd "
+     LIB_ESD="`esd-config --libs`"
+   fi
 fi
+
 
 # Check whether --enable-darwin or --disable-darwin was given.
 if test "${enable_darwin+set}" = set; then
   enableval="$enable_darwin"
-  if test x$enable_darwin = xyes; then PLUGINS=${PLUGINS}"darwin "; fi
+  if test x$enable_darwin = xyes; then
+     PLUGINS=${PLUGINS}"darwin "
+     LIB_DARWIN="-framework CoreAudio"
+   fi
 fi
+
 
 # Check whether --enable-macosx or --disable-macosx was given.
 if test "${enable_macosx+set}" = set; then
   enableval="$enable_macosx"
-  if test x$enable_macosx = xyes; then PLUGINS=${PLUGINS}"macosx "; fi
+  if test x$enable_macosx = xyes; then
+     BUILTINS=${BUILTINS}"macosx "
+     LIB_MACOSX="-framework CoreAudio -framework Carbon -framework AGL"
+     LIB_TS=${LIB_TS}" -framework AGL -framework Carbon"
+     LIB_SDL=${LIB_SDL}" -framework AGL -framework Carbon"
+   fi
 else
   for ac_hdr in Carbon/Carbon.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3315: checking for $ac_hdr" >&5
+echo "configure:3338: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3320 "configure"
+#line 3343 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3325: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3348: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3341,7 +3364,11 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   cat >> confdefs.h <<EOF
 #define $ac_tr_hdr 1
 EOF
- PLUGINS=${PLUGINS}"macosx "
+ BUILTINS=${BUILTINS}"macosx "
+     LIB_MACOSX="-framework CoreAudio -framework Carbon -framework AGL"
+     LIB_TS=${LIB_TS}" -framework AGL -framework Carbon"
+     LIB_SDL=${LIB_SDL}" -framework AGL -framework Carbon"
+   
 else
   echo "$ac_t""no" 1>&6
 fi
@@ -3349,11 +3376,13 @@ done
 
 fi
 
+
 # Check whether --enable-fb or --disable-fb was given.
 if test "${enable_fb+set}" = set; then
   enableval="$enable_fb"
   if test x$enable_fb = xyes; then PLUGINS=${PLUGINS}"fb "; fi
 fi
+
 
 # Check whether --with-ggi or --without-ggi was given.
 if test "${with_ggi+set}" = set; then
@@ -3370,6 +3399,7 @@ if test "${with_ggi+set}" = set; then
     fi 
 fi
 
+
 # Check whether --with-sdl or --without-sdl was given.
 if test "${with_sdl+set}" = set; then
   withval="$with_sdl"
@@ -3378,24 +3408,24 @@ if test "${with_sdl+set}" = set; then
       PLUGINS=${PLUGINS}"sdl ";
       if test "x$withval" != "xyes";
       then
-        LIB_SDL="-L/usr/X11R6/lib -L"$withval"/lib -l"$withval
+        LIB_SDL=${LIB_SDL}" -L/usr/X11R6/lib -L"$withval"/lib -l"$withval
         INCLUDE=${INCLUDE}" -I"$withval"/include"
       else
         for ac_hdr in SDL/SDL.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3389: checking for $ac_hdr" >&5
+echo "configure:3419: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3394 "configure"
+#line 3424 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3399: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3429: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3422,7 +3452,7 @@ echo "Cannot find SDL headers !"; exit
 fi
 done
 
-        LIB_SDL="-L/usr/X11R6/lib -lSDL"
+        LIB_SDL=${LIB_SDL}" -L/usr/X11R6/lib -lSDL"
       fi
     fi 
 fi
@@ -3433,17 +3463,17 @@ fi
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3437: checking for $ac_hdr" >&5
+echo "configure:3467: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3442 "configure"
+#line 3472 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3447: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3477: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3464,13 +3494,14 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
 #define $ac_tr_hdr 1
 EOF
  PLUGINS=${PLUGINS}"sdl "
-       LIB_SDL="-L/usr/X11R6/lib -lSDL"
+       LIB_SDL=${LIB_SDL}" -L/usr/X11R6/lib -lSDL"
 else
   echo "$ac_t""no" 1>&6
 fi
 done
 
     fi
+
 # Check whether --with-glide or --without-glide was given.
 if test "${with_glide+set}" = set; then
   withval="$with_glide"
@@ -3486,17 +3517,27 @@ if test "${with_glide+set}" = set; then
     fi 
 fi
 
+
 # Check whether --enable-ncurses or --disable-ncurses was given.
 if test "${enable_ncurses+set}" = set; then
   enableval="$enable_ncurses"
-  if test x$enable_ncurses = xyes; then PLUGINS=${PLUGINS}"ncurses "; fi
+  if test x$enable_ncurses = xyes; then
+     PLUGINS=${PLUGINS}"ncurses "
+     LIB_NCURSES="-lncurses"
+   fi
 fi
+
 
 # Check whether --enable-qt or --disable-qt was given.
 if test "${enable_qt+set}" = set; then
   enableval="$enable_qt"
-  if test x$enable_qt = xyes; then PLUGINS=${PLUGINS}"qt "; ALIASES=${ALIASES}"qvlc "; fi
+  if test x$enable_qt = xyes; then
+     PLUGINS=${PLUGINS}"qt "
+     ALIASES=${ALIASES}"qvlc "
+     LIB_QT="-lqt -L${QTDIR}/lib"
+   fi
 fi
+
 
 # Check whether --enable-kde or --disable-kde was given.
 if test "${enable_kde+set}" = set; then
@@ -3504,11 +3545,17 @@ if test "${enable_kde+set}" = set; then
   if test x$enable_kde = xyes; then PLUGINS=${PLUGINS}"kde "; ALIASES=${ALIASES}"kvlc "; fi
 fi
 
+
 # Check whether --enable-gnome or --disable-gnome was given.
 if test "${enable_gnome+set}" = set; then
   enableval="$enable_gnome"
-  if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"gnome "; ALIASES=${ALIASES}"gnome-vlc "; fi
+  if test x$enable_gnome = xyes; then
+     PLUGINS=${PLUGINS}"gnome "
+     ALIASES=${ALIASES}"gnome-vlc "
+     LIB_GNOME="`gnome-config --libs gnomeui | sed 's,-rdynamic,,'`"
+   fi
 fi
+
 
 # Check whether --enable-gtk or --disable-gtk was given.
 if test "${enable_gtk+set}" = set; then
@@ -3518,9 +3565,12 @@ fi
 
 if test x$enable_gtk != xno; then
   if which gtk-config; then
-    PLUGINS=${PLUGINS}"gtk "; ALIASES=${ALIASES}"gvlc "
+    PLUGINS=${PLUGINS}"gtk "
+    ALIASES=${ALIASES}"gvlc "
+    LIB_GTK="`gtk-config --libs gtk | sed 's,-rdynamic,,'`"
   fi
 fi
+
 # Check whether --enable-x11 or --disable-x11 was given.
 if test "${enable_x11+set}" = set; then
   enableval="$enable_x11"
@@ -3532,17 +3582,17 @@ if test x$enable_x11 != xno; then
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3536: checking for $ac_hdr" >&5
+echo "configure:3586: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3541 "configure"
+#line 3591 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3546: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3596: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3562,17 +3612,24 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   cat >> confdefs.h <<EOF
 #define $ac_tr_hdr 1
 EOF
- PLUGINS=${PLUGINS}"x11 "
+ 
+    PLUGINS=${PLUGINS}"x11 "
+    LIB_X11="-L/usr/X11R6/lib -lX11 -lXext"
+  
 else
   echo "$ac_t""no" 1>&6
 fi
 done
 
 fi
+
 # Check whether --enable-xvideo or --disable-xvideo was given.
 if test "${enable_xvideo+set}" = set; then
   enableval="$enable_xvideo"
-  if test x$enable_xvideo = xyes; then PLUGINS=${PLUGINS}"xvideo "; fi
+  if test x$enable_xvideo = xyes; then
+     PLUGINS=${PLUGINS}"xvideo "
+     LIB_XVIDEO="-L/usr/X11R6/lib -lX11 -lXext"
+   fi
 fi
 
 
@@ -3581,17 +3638,17 @@ if test "${enable_alsa+set}" = set; then
   enableval="$enable_alsa"
   if test x$enable_alsa = xyes; then ac_safe=`echo "sys/asoundlib.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for sys/asoundlib.h""... $ac_c" 1>&6
-echo "configure:3585: checking for sys/asoundlib.h" >&5
+echo "configure:3642: checking for sys/asoundlib.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3590 "configure"
+#line 3647 "configure"
 #include "confdefs.h"
 #include <sys/asoundlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3595: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3652: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3608,7 +3665,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
-echo "configure:3612: checking for main in -lasound" >&5
+echo "configure:3669: checking for main in -lasound" >&5
 ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3616,14 +3673,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lasound  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 3620 "configure"
+#line 3677 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:3627: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:3684: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -3648,11 +3705,28 @@ else
   echo "$ac_t""no" 1>&6
 have_alsa="false"
 fi
- if test $have_alsa = true; then PLUGINS=${PLUGINS}"alsa "; fi; fi
+ if test $have_alsa = true; then
+     PLUGINS=${PLUGINS}"alsa "
+     LIB_ALSA="-lasound"
+   fi; fi
 fi
 
 
 fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3831,9 +3905,23 @@ s%@OPTIMS@%$OPTIMS%g
 s%@CSS@%$CSS%g
 s%@LCFLAGS@%$LCFLAGS%g
 s%@LIB@%$LIB%g
-s%@LIB_SDL@%$LIB_SDL%g
-s%@LIB_GLIDE@%$LIB_GLIDE%g
+s%@LIB_ALSA@%$LIB_ALSA%g
+s%@LIB_BEOS@%$LIB_BEOS%g
+s%@LIB_DARWIN@%$LIB_DARWIN%g
+s%@LIB_ESD@%$LIB_ESD%g
 s%@LIB_GGI@%$LIB_GGI%g
+s%@LIB_GLIDE@%$LIB_GLIDE%g
+s%@LIB_GNOME@%$LIB_GNOME%g
+s%@LIB_GTK@%$LIB_GTK%g
+s%@LIB_IDCTALTIVEC@%$LIB_IDCTALTIVEC%g
+s%@LIB_MACOSX@%$LIB_MACOSX%g
+s%@LIB_NCURSES@%$LIB_NCURSES%g
+s%@LIB_QT@%$LIB_QT%g
+s%@LIB_TS@%$LIB_TS%g
+s%@LIB_SDL@%$LIB_SDL%g
+s%@LIB_X11@%$LIB_X11%g
+s%@LIB_XVIDEO@%$LIB_XVIDEO%g
+s%@LIB_YUV@%$LIB_YUV%g
 
 CEOF
 EOF

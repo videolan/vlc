@@ -47,7 +47,7 @@ $(BUILTIN_NCURSES): %-BUILTIN.o: %.c
 # Real targets
 #
 ../../lib/ncurses.so: $(PLUGIN_NCURSES)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lncurses
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_NCURSES)
 
 ../../lib/ncurses.a: $(BUILTIN_NCURSES)
 	ar r $@ $^

@@ -52,7 +52,7 @@ $(STD_BUILTIN_OBJ): %-BUILTIN.o: %.c
 # Real targets
 #
 ../../lib/yuv.so: $(PLUGIN_YUV)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_YUV)
 
 ../../lib/yuv.a: $(BUILTIN_YUV)
 	ar r $@ $^

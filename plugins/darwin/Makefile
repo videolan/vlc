@@ -49,7 +49,7 @@ $(STD_BUILTIN_OBJ): %-BUILTIN.o: %.c
 # Real targets
 #
 ../../lib/darwin.so: $(PLUGIN_DARWIN)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework CoreAudio
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_DARWIN)
 
 ../../lib/darwin.a: $(BUILTIN_DARWIN)
 	ar r $@ $^

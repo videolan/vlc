@@ -7,6 +7,138 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
+Task: 0x5e
+Difficulty: Hard
+Urgency: Wishlist
+Description: All-in-one interface window
+ Find a way for the interface plugin to provide video output capabilities
+ and have it display the stream in the same window.
+Status: Todo
+
+Task: 0x5d
+Difficulty: Guru
+Urgency: Normal
+Description: Win32 port
+ Win32 is probably the most common desktop platform, we should support it
+ as well. Besides, most students at Centrale use Windows and VideoLAN was
+ originally designed for them.
+Status: Todo
+
+Task: 0x5c
+Difficulty: Normal
+Urgency: Wishlist
+Description: Infrared support
+ Write a plugin which listens to the infrared port and sends appropriate
+ commands to the application. This can either be an interface plugin, or,
+ preferably, a new kind of interface-agnostic "command" plugin.
+Status: Todo
+
+Task: 0x5b
+Difficulty: Hard
+Urgency: Critical
+Description: Fix the FreeBSD port
+ The FreeBSD port of vlc doesn't run, probably because of a pthread
+ issue. This should be investigated.
+Status: Todo
+
+Task: 0x5a
+Difficulty: Hard
+Urgency: Wishlist
+Description: Share stream information between vlc and vls
+ vls should send misc TS packets to let us know what the stream PID
+ contain, such as the language, or the subtitle palette.
+Status: Todo
+
+Task: 0x59
+Difficulty: Hard
+Urgency: Important
+Description: Cope with vls/vlc clock jitter
+ The internal clocks of the server and the client are not assured to be
+ in perfect synchronization, which may be annoying when playing a movie.
+ Reduce this jitter by using a well-chosen filter.
+Status: Todo
+
+Task: 0x58
+Difficulty: Normal
+Urgency: Critical
+Description: Language and subtitles selection in network input
+ The vls will probably have to be modified as well.
+Status: Todo
+
+Task: 0x57
+Difficulty: Guru
+Urgency: Low
+Description: Full DVD navigation
+ Once the core DVD navigation features are ready (see item 0x52), port the
+ interface and video output modules so that they can handle it.
+Status: Todo
+
+Task: 0x56
+Difficulty: Important
+Urgency: Normal
+Description: XVideo video output
+ XVideo is reported to work a bit better than the SDL wrapper on some
+ configurations. Modify the X11 plugin so that it supports XVideo.
+Status: Done 1 Apr 2001 (shane)
+
+Task: 0x55
+Difficulty: Hard
+Urgency: Critical
+Description: Video output IV
+ The new video output should support subtitles both in software and hardware
+ YUV (see item 0x4d). One should also care about XVideo buffers, there is a
+ way to directly decode into them, which would improve performances.
+Status: Todo
+
+Task: 0x54
+Difficulty: Hard
+Urgency: Wishlist
+Description: Hardware AC3 decoding
+ Some soundcards directly grok Dolby AC3. This would spare a lot of CPU time.
+Status: Todo
+
+Task: 0x53
+Difficulty: Normal
+Urgency: Critical
+Description: Fix AC3 decoder
+ The AC3 decoder still has a few quality issues; fix them, and try to add
+ MMX support to it as well.
+Status: Todo
+
+Task: 0x52
+Difficulty: Guru
+Urgency: Low
+Description: DVD navigation core features
+ We need an interpreter for the DVD virtual machine to make it easier to
+ browse DVDs later.
+Status: Todo
+
+Task: 0x51
+Difficulty: Easy
+Urgency: Normal
+Description: Better subtitle color handling
+ The subtitle palette is pretty ugly for the moment, since we don't parse
+ the color information. Find it in the IFO file and pass the information to
+ the video output.
+Status: Todo
+
+Task: 0x50
+Difficulty: Hard
+Urgency: Critical
+Description: Multi-angle multi-language support
+ Some DVDs have several languages encoded in the same video stream, we
+ need to properly parse them.
+Status: Todo
+
+Task: 0x4f
+Difficulty: Hard
+Urgency: Critical
+Description: Fix all known DVD playback issues
+ A few DVDs are still reported not to work at all. Try to find what is
+ causing this, have a more robust DVD input, and list all discs reported
+ to work flawlessly to prevent bug regression.
+Status: Todo
+
 Task: 0x4e
 Difficulty: Hard
 Urgency: High
@@ -260,7 +392,7 @@ Description: Enable compiled-in plugins
  Some plugins may have their place inside the main program, such as the
  dummy plugin, or the beos plugin under BeOS. We should allow to link
  them with the main app.
-Status: Todo
+Status: Done 15 Apr 2001 (sam)
 
 Task: 0x31
 Difficulty: Easy
@@ -516,7 +648,7 @@ Urgency: Normal
 Description: Draw a vlc icon
  The vlc needs an icon. It should render well in 48x48 but
  can be any size.
-Status: Todo
+Status: Done 11 Apr 2001 (sam)
 
 Task: 0x0f
 Difficulty: Easy

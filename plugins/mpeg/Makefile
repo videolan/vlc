@@ -57,11 +57,7 @@ $(STD_BUILTIN_OBJ): %-BUILTIN.o: %.c
 	ar r $@ $^
 
 ../../lib/ts.so: $(PLUGIN_TS)
-ifneq (,$(findstring darwin,$(SYS)))
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework AGL -framework Carbon
-else
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
-endif
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_TS)
 
 ../../lib/ts.a: $(BUILTIN_TS)
 	ar r $@ $^
