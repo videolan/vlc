@@ -169,6 +169,9 @@ VLC_EXPORT( int, __net_OpenTCP, ( vlc_object_t *p_this, char *psz_host, int i_po
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_ListenTCP, ( vlc_object_t *p_this, char *psz_localaddr, int i_port ) );
 
+#define net_Accept(a, b, c) __net_Accept(VLC_OBJECT(a), b, c)
+VLC_EXPORT( int, __net_Accept, ( vlc_object_t *p_this, int fd_listen, mtime_t i_wait ) );
+
 #define net_OpenUDP(a, b, c, d, e ) __net_OpenUDP(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, char *psz_bind, int i_bind, char *psz_server, int i_server ) );
 
@@ -186,5 +189,7 @@ VLC_EXPORT( int, __net_Write, ( vlc_object_t *p_this, int fd, uint8_t *p_data, i
 #define net_Gets(a,b) __net_Gets(VLC_OBJECT(a),b)
 VLC_EXPORT( char *, __net_Gets, ( vlc_object_t *p_this, int fd ) );
 
-VLC_EXPORT( int, net_Printf, ( vlc_object_t *p_this, int fd, char *psz_fmt, ... ) );
+VLC_EXPORT( int, net_Printf, ( vlc_object_t *p_this, int fd, const char *psz_fmt, ... ) );
 
+#define net_vaPrintf(a,b,c,d) __net_vaPrintf(VLC_OBJECT(a),b,c,d)
+VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, const char *psz_fmt, va_list args ) );

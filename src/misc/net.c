@@ -163,6 +163,61 @@ int __net_ListenTCP( vlc_object_t *p_this, char *psz_host, int i_port )
 }
 
 /*****************************************************************************
+ * __net_Accept:
+ *****************************************************************************
+ * Accept a connection on a listening socket and return it
+ *****************************************************************************/
+int __net_Accept( vlc_object_t *p_this, int fd, mtime_t i_wait )
+{
+    vlc_bool_t b_die = p_this->b_die, b_block = (i_wait < 0);
+    struct timeval timeout;
+    fd_set fds_r, fds_e;
+    int i_ret;
+
+    while( p_this->b_die == b_die )
+    {
+        /* Initialize file descriptor set */
+        FD_ZERO( &fds_r );
+        FD_SET( fd, &fds_r );
+        FD_ZERO( &fds_e );
+        FD_SET( fd, &fds_e );
+
+        timeout.tv_sec = 0;
+        timeout.tv_usec = b_block ? 500000 : i_wait;
+
+        i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout);
+        if( (i_ret < 0 && errno == EINTR) || i_ret == 0 )
+        {
+            if( b_block ) continue;
+            else return -1;
+        }
+        else if( i_ret < 0 )
+        {
+#ifdef WIN32
+            msg_Err( p_this, "network select error (%s)", WSAGetLastError() );
+#else
+            msg_Err( p_this, "network select error (%s)", strerror(errno) );
+#endif
+            return -1;
+        }
+
+        if( ( i_ret = accept( fd, 0, 0 ) ) <= 0 )
+        {
+#ifdef WIN32
+            msg_Err( p_this, "accept failed (%i)", WSAGetLastError() );
+#else
+            msg_Err( p_this, "accept failed (%s)", strerror(errno) );
+#endif
+            return -1;
+        }
+
+        return i_ret;
+    }
+
+    return -1;
+}
+
+/*****************************************************************************
  * __net_OpenUDP:
  *****************************************************************************
  * Open a UDP connection and return a handle
@@ -356,7 +411,9 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
     }
     else
     {
-        if( ( i_recv = recv( fd, p_data, i_data, 0 ) ) < 0 )
+        if( fd == STDIN_FILENO ) i_recv = read( fd, p_data, i_data ); else
+
+        if( ( i_recv = recv( fd, p_data, i_data, 0 ) ) <= 0 )
         {
 #ifdef WIN32
             /* For udp only */
@@ -375,8 +432,10 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
 #endif
             return -1;
         }
-        return i_recv;
+
+        return i_recv ? i_recv : -1;  /* !i_recv -> connection closed if tcp */
     }
+
     /* We will never be here */
     return -1;
 }
@@ -479,18 +538,25 @@ char *__net_Gets( vlc_object_t *p_this, int fd )
     return psz_line;
 }
 
-int net_Printf( vlc_object_t *p_this, int fd, char *psz_fmt, ... )
+int net_Printf( vlc_object_t *p_this, int fd, const char *psz_fmt, ... )
 {
+    int i_ret;
     va_list args;
+    va_start( args, psz_fmt );
+    i_ret = net_vaPrintf( p_this, fd, psz_fmt, args );
+    va_end( args );
+
+    return i_ret;
+}
+
+int __net_vaPrintf( vlc_object_t *p_this, int fd, const char *psz_fmt,
+                    va_list args )
+{
     char    *psz;
     int     i_size, i_ret;
 
-    va_start( args, psz_fmt );
     vasprintf( &psz, psz_fmt, args );
-    va_end( args );
-
     i_size = strlen( psz );
-
     i_ret = __net_Write( p_this, fd, psz, i_size ) < i_size ? -1 : i_size;
     free( psz );
 
