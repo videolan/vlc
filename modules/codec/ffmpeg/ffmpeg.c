@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.32 2003/04/20 14:11:25 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.33 2003/04/27 15:25:11 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -68,6 +68,7 @@
 /*
  * Local prototypes
  */
+int             E_(OpenChroma)  ( vlc_object_t * );
 static int      OpenDecoder     ( vlc_object_t * );
 static int      RunDecoder      ( decoder_fifo_t * );
 
@@ -151,6 +152,10 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 
 vlc_module_begin();
     add_category_hint( N_("ffmpeg"), NULL, VLC_FALSE );
+    set_capability( "decoder", 70 );
+    set_callbacks( OpenDecoder, NULL );
+    set_description( _("ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
+
     add_bool( "ffmpeg-dr", 0, NULL,
               "direct rendering",
               "direct rendering", VLC_TRUE );
@@ -191,9 +196,13 @@ vlc_module_begin();
               "force chrominance deringing",
               "force chrominance deringing (override other settings)", VLC_TRUE );
 #endif
-    set_description( _("ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
-    set_capability( "decoder", 70 );
-    set_callbacks( OpenDecoder, NULL );
+
+    /* chroma conversion submodule */
+    add_submodule();
+    set_capability( "chroma", 50 );
+    set_callbacks( E_(OpenChroma), NULL );
+    set_description( _("ffmpeg chroma conversion") );
+
 vlc_module_end();
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.6 2003/04/27 14:56:47 gbazin Exp $
+ * $Id: rawdv.c,v 1.7 2003/04/27 15:25:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -343,8 +343,8 @@ static void Deactivate( vlc_object_t *p_this )
 static int Demux( input_thread_t * p_input )
 {
     demux_sys_t    *p_rawdv = (demux_sys_t *)p_input->p_demux_data;
-    pes_packet_t   *p_pes;
-    pes_packet_t   *p_audio_pes;
+    pes_packet_t   *p_pes = NULL;
+    pes_packet_t   *p_audio_pes = NULL;
     data_packet_t  *p_data;
     ssize_t        i_read;
 
@@ -404,7 +404,7 @@ static int Demux( input_thread_t * p_input )
     if( p_rawdv->p_audio_es->p_decoder_fifo )
     {
         p_audio_pes = input_NewPES( p_input->p_method_data );
-        if( p_pes == NULL )
+        if( p_audio_pes == NULL )
         {
             msg_Err( p_input, "out of memory" );
             input_DeletePacket( p_input->p_method_data, p_data );
