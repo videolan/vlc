@@ -2,11 +2,11 @@ Package: vlc
 Section: graphics
 Priority: optional
 Version: 0.5.1
-Release: 1
+Release: 2
 Architecture: arm
 Conflicts: gpe-vlc, gpe-apps, opie-vlc, opie-libsdl,  opie-oipkg, opie-base, opie-multikey, opie-handwriting, opie-volumeapplet, opie-embeddedkonsole, opie-handwriting, opie-irdaapplet, opie-launcher-settings, opie-networksetup
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>
-Depends: libc6, procps, xserver-tiny-h3600, xbase-clients, xfonts-base, xfonts-75dpi, xfonts-ttf, matchbox, xcalibrate, libsdl, libgtk1.2, esddsp, ffmpeg
+Depends: libc6, procps, xserver-tiny-h3600, xbase-clients, xfonts-base, xfonts-75dpi, xfonts-ttf, matchbox, xcalibrate, libsdl, libgtk1.2, esddsp, libffmpeg
 Copyright: GPL
 Description: VideoLAN Client is a free network-aware MPEG and DVD player.
  VideoLAN is a free MPEG1/2 software solution licensed under GPL. The original 
