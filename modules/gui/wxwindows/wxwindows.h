@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.39 2003/07/09 09:30:23 adn Exp $
+ * $Id: wxwindows.h,v 1.40 2003/07/10 11:15:18 adn Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -434,6 +434,7 @@ private:
     void OnClose( wxCommandEvent& event );
     void OnVerbose( wxCommandEvent& event );
     void OnClear( wxCommandEvent& event );
+    void OnSaveLog( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -444,6 +445,8 @@ private:
     wxTextAttr *warn_attr;
     wxTextAttr *dbg_attr;
 
+    wxFileDialog *save_log_dialog;
+    
     vlc_bool_t b_verbose;
 };
 
