@@ -3,7 +3,7 @@ vlc (0.6.0+cvs-20030627-2) unstable; urgency=low
   * extras/ffmpeg:
     + Fixed compilation for Alpha.
   * debian/rules:
-    + Enabled the video4linux input plugin.
+    + Enabled the video4linux input plugin (Closes: #199427).
 
  -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sun, 29 Jun 2003 21:12:10 +0200
 

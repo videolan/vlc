@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.53 2003/06/27 23:31:24 sam Exp $
+##  $Id: bootstrap,v 1.54 2003/07/01 12:50:56 sam Exp $
 ##
 ##  Authors: Sam Hocevar <sam@zoy.org>
 
@@ -131,6 +131,15 @@ EOF
 #   work properly with any automake version I tested.
     cat >> ${dir}/Makefile.am << EOF
 # The ${mod} plugin
+
+all: all-${mod}
+
+all-${mod}:
+	if \$(VLC_CONFIG) --target plugin | grep -q "${dir}/lib${mod}_plugin"; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_plugin\$(LIBEXT); fi
+	if \$(VLC_CONFIG) --target builtin | grep -q "${dir}/lib${mod}\\.a"; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}.a; fi
+if BUILD_MOZILLA
+	if \$(VLC_CONFIG) --target builtin pic | grep -q "${dir}/lib${mod}_pic\\.a"; then \$(MAKE) \$(AM_MAKEFLAGS) lib${mod}_pic.a; fi
+endif
 
 if UNTRUE
 L${count}p = lib${mod}_plugin.a

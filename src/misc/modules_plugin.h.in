@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h.in,v 1.9 2003/02/10 20:11:14 sam Exp $
+ * $Id: modules_plugin.h.in,v 1.10 2003/07/01 12:50:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -58,6 +58,7 @@ static int module_load( const MYCHAR * psz_filename, module_handle_t * handle )
     /* XXX HACK #2 - the ugly KDE workaround. It seems that libkdewhatever
      * causes dlopen() to segfault if libstdc++ is not loaded in the caller,
      * so we just load libstdc++. Bwahahaha! ph34r! -- Sam. */
+    /* Update: FYI, this is Debian bug #180505, and seems to be fixed. */
     if( !b_kde && !strstr( psz_filename, "kde" ) )
     {
         dlopen( "libstdc++.so.6", RTLD_NOW )

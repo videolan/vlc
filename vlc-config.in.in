@@ -13,11 +13,11 @@ optim="@optim@"
 plugins="@PLUGINS@"
 builtins="@BUILTINS@"
 
-cppflags="${cppflags} -DDEBUG"
-cflags="${cflags} -g"
-cxxflags="${cxxflags} -g"
-objcflags="${objcflags} -g"
-ldflags="${objcflags} -g"
+cppflags=""
+cflags=""
+cxxflags=""
+objcflags=""
+ldflags=""
 
 cflags_tuning="@CFLAGS_TUNING@"
 cflags_optim="@CFLAGS_OPTIM@"
@@ -105,7 +105,7 @@ if [ "${debug}" = yes ]; then
   cflags="${cflags} -g"
   cxxflags="${cxxflags} -g"
   objcflags="${objcflags} -g"
-  ldflags="${objcflags} -g"
+  ldflags="${ldflags} -g"
 fi
 if [ "${cprof}" = yes ]; then
   cppflags="${cppflags} -DCPROF"

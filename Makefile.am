@@ -36,9 +36,6 @@ ACLOCAL_AMFLAGS = -I m4
 # because old versions of automake don't support them in configure.ac.
 AUTOMAKE_OPTIONS = dist-bzip2 subdir-objects
 
-# Don't forget to build plugins
-all: plugins
-
 ###############################################################################
 # Headers
 ###############################################################################
@@ -127,7 +124,7 @@ $(SOURCES_libvlc): src/misc/modules_plugin.h src/misc/modules_builtin.h $(LIB_in
 ###############################################################################
 
 intl/libintl.a: FORCE
-	cd $(top_builddir)/intl && $(MAKE)
+	cd $(top_builddir)/intl && $(MAKE) $(AM_MAKEFLAGS)
 
 if BUILD_INTL
 LIB_intl = intl/libintl.a
@@ -350,7 +347,7 @@ vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
-DEPENDENCIES_vlc = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl) builtins
+DEPENDENCIES_vlc = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f $(srcdir)/vlc$(EXEEXT)
@@ -388,7 +385,7 @@ if HAVE_DARWIN
 # Create the MacOS X app
 vlc_app_DATA = VLC.app
 vlc_appdir = $(bindir)
-VLC.app: vlc plugins
+VLC.app: vlc
 	rm -Rf VLC.app
 	cd $(srcdir)/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
 	cp -r $(srcdir)/extras/MacOSX/build/vlc.bundle $(srcdir)/VLC.app
@@ -421,18 +418,6 @@ noinst_share_vlc_win32_rcdir = $(libdir)
 share/vlc_win32_rc.$(OBJEXT): share/vlc_win32_rc.rc
 	$(WINDRES) --include-dir $(srcdir)/share -i $< -o $@
 endif
-
-###############################################################################
-# Building modules
-###############################################################################
-plugins: FORCE
-	$(MAKE) `$(VLC_CONFIG) --target plugin` FORCE
-
-builtins: FORCE
-	$(MAKE) `$(VLC_CONFIG) --target builtin` FORCE
-
-builtins_pic: FORCE
-	$(MAKE) `$(VLC_CONFIG) --target builtin pic` FORCE
 
 ###############################################################################
 # Building architecture-specific binary packages
