@@ -2,6 +2,12 @@
 # ChangeLog for vlc #
 #===================#
 
+0.4.6
+Not released yet.
+
+  * plugins/network/ipv4.c: fixed a crash with multicast addresses when no
+    interface address is given.
+
 0.4.5
 Fri, 11 Oct 2002 15:37:41 +0200
 

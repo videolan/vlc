@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.12.2.2 2002/10/01 22:26:39 massiot Exp $
+ * $Id: ipv4.c,v 1.12.2.3 2002/10/24 21:08:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -273,7 +273,8 @@ static int OpenUDP( network_socket_t * p_socket )
         char * psz_if_addr = config_GetPszVariable( "iface-addr" );
         imr.imr_multiaddr.s_addr = inet_addr(psz_bind_addr);
 #endif
-        if ( *psz_if_addr && inet_addr(psz_if_addr) != -1 )
+        if ( psz_if_addr != NULL && *psz_if_addr
+              && inet_addr(psz_if_addr) != -1 )
         {
             imr.imr_interface.s_addr = inet_addr(psz_if_addr);
         }
@@ -281,7 +282,7 @@ static int OpenUDP( network_socket_t * p_socket )
         {
             imr.imr_interface.s_addr = INADDR_ANY;
         }
-        free( psz_if_addr );
+        if ( psz_if_addr != NULL ) free( psz_if_addr );
 
         if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )

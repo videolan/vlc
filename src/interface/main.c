@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.195.2.9 2002/10/11 09:01:18 gbazin Exp $
+ * $Id: main.c,v 1.195.2.10 2002/10/24 21:08:28 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -422,7 +422,7 @@ ADD_STRING  ( "channel-server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LON
 ADD_INTEGER ( "channel-port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
 ADD_INTEGER ( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT )
 ADD_STRING  ( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT )
-ADD_STRING  ( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT )
+ADD_STRING  ( "iface-addr", NULL, NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT )
 
 ADD_INTEGER ( "program", 0, NULL, INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT )
 ADD_INTEGER ( "audio-type", -1, NULL, INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT )
