@@ -4131,15 +4131,15 @@ fi
 set dummy sdl11-config; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
 echo "configure:4134: checking for $ac_word" >&5
-if eval "test \"`echo '$''{'ac_cv_path_SDL_CONFIG'+set}'`\" = set"; then
+if eval "test \"`echo '$''{'ac_cv_path_SDL11_CONFIG'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  case "$SDL_CONFIG" in
+  case "$SDL11_CONFIG" in
   /*)
-  ac_cv_path_SDL_CONFIG="$SDL_CONFIG" # Let the user override the test with a path.
+  ac_cv_path_SDL11_CONFIG="$SDL11_CONFIG" # Let the user override the test with a path.
   ;;
   ?:/*)			 
-  ac_cv_path_SDL_CONFIG="$SDL_CONFIG" # Let the user override the test with a dos path.
+  ac_cv_path_SDL11_CONFIG="$SDL11_CONFIG" # Let the user override the test with a dos path.
   ;;
   *)
   IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
@@ -4147,38 +4147,39 @@ else
   for ac_dir in $ac_dummy; do 
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
-      ac_cv_path_SDL_CONFIG="$ac_dir/$ac_word"
+      ac_cv_path_SDL11_CONFIG="$ac_dir/$ac_word"
       break
     fi
   done
   IFS="$ac_save_ifs"
-  test -z "$ac_cv_path_SDL_CONFIG" && ac_cv_path_SDL_CONFIG="no"
+  test -z "$ac_cv_path_SDL11_CONFIG" && ac_cv_path_SDL11_CONFIG="no"
   ;;
 esac
 fi
-SDL_CONFIG="$ac_cv_path_SDL_CONFIG"
-if test -n "$SDL_CONFIG"; then
-  echo "$ac_t""$SDL_CONFIG" 1>&6
+SDL11_CONFIG="$ac_cv_path_SDL11_CONFIG"
+if test -n "$SDL11_CONFIG"; then
+  echo "$ac_t""$SDL11_CONFIG" 1>&6
 else
   echo "$ac_t""no" 1>&6
 fi
 
+    SDL_CONFIG=${SDL11_CONFIG}
     SDL_HEADER="SDL11/SDL.h"
   fi
   if test x${SDL_CONFIG} = xno; then
     # Extract the first word of "sdl12-config", so it can be a program name with args.
 set dummy sdl12-config; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4173: checking for $ac_word" >&5
-if eval "test \"`echo '$''{'ac_cv_path_SDL_CONFIG'+set}'`\" = set"; then
+echo "configure:4174: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_path_SDL12_CONFIG'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  case "$SDL_CONFIG" in
+  case "$SDL12_CONFIG" in
   /*)
-  ac_cv_path_SDL_CONFIG="$SDL_CONFIG" # Let the user override the test with a path.
+  ac_cv_path_SDL12_CONFIG="$SDL12_CONFIG" # Let the user override the test with a path.
   ;;
   ?:/*)			 
-  ac_cv_path_SDL_CONFIG="$SDL_CONFIG" # Let the user override the test with a dos path.
+  ac_cv_path_SDL12_CONFIG="$SDL12_CONFIG" # Let the user override the test with a dos path.
   ;;
   *)
   IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
@@ -4186,22 +4187,23 @@ else
   for ac_dir in $ac_dummy; do 
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
-      ac_cv_path_SDL_CONFIG="$ac_dir/$ac_word"
+      ac_cv_path_SDL12_CONFIG="$ac_dir/$ac_word"
       break
     fi
   done
   IFS="$ac_save_ifs"
-  test -z "$ac_cv_path_SDL_CONFIG" && ac_cv_path_SDL_CONFIG="no"
+  test -z "$ac_cv_path_SDL12_CONFIG" && ac_cv_path_SDL12_CONFIG="no"
   ;;
 esac
 fi
-SDL_CONFIG="$ac_cv_path_SDL_CONFIG"
-if test -n "$SDL_CONFIG"; then
-  echo "$ac_t""$SDL_CONFIG" 1>&6
+SDL12_CONFIG="$ac_cv_path_SDL12_CONFIG"
+if test -n "$SDL12_CONFIG"; then
+  echo "$ac_t""$SDL12_CONFIG" 1>&6
 else
   echo "$ac_t""no" 1>&6
 fi
 
+    SDL_CONFIG=${SDL12_CONFIG}
     SDL_HEADER="SDL12/SDL.h"
   fi
   if test x${SDL_CONFIG} != xno; then
@@ -4209,17 +4211,17 @@ fi
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:4213: checking for $ac_hdr" >&5
+echo "configure:4215: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4218 "configure"
+#line 4220 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:4223: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:4225: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -4279,17 +4281,17 @@ if test "${with_directx+set}" = set; then
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:4283: checking for $ac_hdr" >&5
+echo "configure:4285: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4288 "configure"
+#line 4290 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:4293: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:4295: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -4327,17 +4329,17 @@ fi
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:4331: checking for $ac_hdr" >&5
+echo "configure:4333: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4336 "configure"
+#line 4338 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:4341: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:4343: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -4441,7 +4443,7 @@ if test x$enable_gtk != xno; then
   # Extract the first word of "gtk-config", so it can be a program name with args.
 set dummy gtk-config; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4445: checking for $ac_word" >&5
+echo "configure:4447: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_GTK_CONFIG'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4501,17 +4503,17 @@ if test x$enable_x11 != xno; then
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:4505: checking for $ac_hdr" >&5
+echo "configure:4507: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4510 "configure"
+#line 4512 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:4515: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:4517: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -4563,17 +4565,17 @@ if test x$enable_xvideo != xno; then
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:4567: checking for $ac_hdr" >&5
+echo "configure:4569: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4572 "configure"
+#line 4574 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:4577: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:4579: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -4613,17 +4615,17 @@ if test "${enable_alsa+set}" = set; then
    then
      ac_safe=`echo "sys/asoundlib.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for sys/asoundlib.h""... $ac_c" 1>&6
-echo "configure:4617: checking for sys/asoundlib.h" >&5
+echo "configure:4619: checking for sys/asoundlib.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4622 "configure"
+#line 4624 "configure"
 #include "confdefs.h"
 #include <sys/asoundlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:4627: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:4629: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -4640,7 +4642,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
-echo "configure:4644: checking for main in -lasound" >&5
+echo "configure:4646: checking for main in -lasound" >&5
 ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4648,14 +4650,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lasound  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 4652 "configure"
+#line 4654 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:4659: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:4661: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -4895,6 +4897,8 @@ s%@INSTALL_SCRIPT@%$INSTALL_SCRIPT%g
 s%@INSTALL_DATA@%$INSTALL_DATA%g
 s%@ESD_CONFIG@%$ESD_CONFIG%g
 s%@SDL_CONFIG@%$SDL_CONFIG%g
+s%@SDL11_CONFIG@%$SDL11_CONFIG%g
+s%@SDL12_CONFIG@%$SDL12_CONFIG%g
 s%@GTK_CONFIG@%$GTK_CONFIG%g
 s%@SYS@%$SYS%g
 s%@ARCH@%$ARCH%g

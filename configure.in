@@ -536,11 +536,13 @@ then
   AC_PATH_PROG(SDL_CONFIG, sdl-config, no)
   SDL_HEADER="SDL/SDL.h"
   if test x${SDL_CONFIG} = xno; then
-    AC_PATH_PROG(SDL_CONFIG, sdl11-config, no)
+    AC_PATH_PROG(SDL11_CONFIG, sdl11-config, no)
+    SDL_CONFIG=${SDL11_CONFIG}
     SDL_HEADER="SDL11/SDL.h"
   fi
   if test x${SDL_CONFIG} = xno; then
-    AC_PATH_PROG(SDL_CONFIG, sdl12-config, no)
+    AC_PATH_PROG(SDL12_CONFIG, sdl12-config, no)
+    SDL_CONFIG=${SDL12_CONFIG}
     SDL_HEADER="SDL12/SDL.h"
   fi
   if test x${SDL_CONFIG} != xno; then
