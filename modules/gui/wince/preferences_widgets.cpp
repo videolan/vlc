@@ -28,19 +28,16 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
-#include <string>
-using namespace std;
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+
+#include "wince.h"
 
 #include <windows.h>
 #include <windowsx.h>
 #include <winuser.h>
 #include <commctrl.h>
-#include <aygshell.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-#include "wince.h"
 #include "preferences_widgets.h"
 
 /*****************************************************************************

@@ -28,11 +28,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
-
-#include <string>
-#include <stdio.h>
-using namespace std; 
-
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 

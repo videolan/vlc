@@ -24,16 +24,21 @@
 
 #ifndef WINCE_RESOURCE
 
-#define MENU_HEIGHT 26
 #define SLIDER_HEIGHT 50
-
 #define SLIDER_MAX_POS 10000
+#define MENU_HEIGHT 26
 
 #define FILE_ACCESS 1
 #define NET_ACCESS 2
 
 #define OPEN_NORMAL 0
 #define OPEN_STREAM 1
+
+#if defined( UNDER_CE ) && defined(__MINGW32__)
+    /* This is a gross hack for the wince gcc cross-compiler */
+    char *strerror( int );
+#   define _off_t long
+#endif
 
 #include "vlc_keys.h"
 
@@ -548,6 +553,58 @@ protected:
 #else // ENABLE_NLS && ENABLE_UTF8
 #   define ISUTF8 0
 #endif
+
+/*****************************************************************************
+ * Misc definitions (mainly from aygshell.h)
+ *****************************************************************************/
+#define _WIN32_IE 0x0500
+
+#define SHFS_HIDESIPBUTTON          0x0008
+#define SHIDIM_FLAGS                0x0001
+#define SHIDIF_DONEBUTTON           0x0001
+#define SHIDIF_SIPDOWN              0x0008
+#define SHIDIF_FULLSCREENNOMENUBAR  0x0010
+#define SHCMBF_HMENU                0x0010
+#define SHFS_SHOWSIPBUTTON          0x0004
+#define GN_CONTEXTMENU              1000
+#define SHCMBM_GETSUBMENU           (WM_USER + 401)
+#define lstrlenW wcslen
+#define TrackPopupMenu(hm,u,x,y,r,hw,p) \
+        TrackPopupMenuEx((hm),(u),(x),(y),(hw),0)
+
+extern "C" {
+    typedef struct tagSHMENUBARINFO
+    {
+        DWORD cbSize;
+        HWND hwndParent;
+        DWORD dwFlags;
+        UINT nToolBarId;
+        HINSTANCE hInstRes;
+        int nBmpId;
+        int cBmpImages;
+        HWND hwndMB;
+        COLORREF clrBk;
+    } SHMENUBARINFO, *PSHMENUBARINFO;
+
+    BOOL SHCreateMenuBar( SHMENUBARINFO *pmbi );
+    BOOL SHFullScreen(HWND hwndRequester, DWORD dwState);
+
+    typedef struct tagSHINITDLGINFO
+    {
+        DWORD dwMask;
+        HWND  hDlg;
+        DWORD dwFlags;
+    } SHINITDLGINFO, *PSHINITDLGINFO;
+
+    BOOL SHInitDialog(PSHINITDLGINFO pshidi);
+
+    typedef struct tagNMRGINFO
+    {
+        NMHDR hdr;
+        POINT ptAction;
+        DWORD dwItemSpec;
+    } NMRGINFO, *PNMRGINFO;
+}
 
 #endif //WINCE_RESOURCE
 

@@ -8,36 +8,16 @@
 #endif
 
 #if defined(_WIN32_WCE)
-	#if !defined(WCEOLE_ENABLE_DIALOGEX)
-		#define DIALOGEX DIALOG DISCARDABLE
-	#endif
-	#include <commctrl.h>
-	#define  SHMENUBAR RCDATA
-	#if defined(WIN32_PLATFORM_PSPC) && (_WIN32_WCE >= 300)
-		#include <aygshell.h>
-		#define AFXCE_IDR_SCRATCH_SHMENU  28700
-	#else
-		#define I_IMAGENONE		(-2)
-		#define NOMENU			0xFFFF
-		#define IDS_SHNEW		1
-
-		#define IDM_SHAREDNEW        10
-		#define IDM_SHAREDNEWDEFAULT 11
-	#endif // _WIN32_WCE_PSPC
-	#define AFXCE_IDD_SAVEMODIFIEDDLG 28701
+    #define _WIN32_IE 0x0500
+    #include <commctrl.h>
 #endif // _WIN32_WCE
 
 #ifdef RC_INVOKED
 #ifndef _INC_WINDOWS
 #define _INC_WINDOWS
-	#include "winuser.h"           // extract from windows header
+    #include "winuser.h" // extract from windows header
 #endif
 #endif
-
-#ifdef IDC_STATIC
-#undef IDC_STATIC
-#endif
-#define IDC_STATIC      (-1)
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
@@ -47,40 +27,6 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_ABOUT DIALOG DISCARDABLE  0, 0, 159, 62
-STYLE WS_CHILD | WS_CAPTION | WS_SYSMENU
-CAPTION "About"
-FONT 8, "MS Sans Serif"
-BEGIN
-    LTEXT           "TODO: Place controls to manipulate properties of the Control on this dialog.",
-                    IDC_STATIC,15,23,125,16
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
-BEGIN
-    IDD_ABOUT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 152
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 55
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -162,7 +108,7 @@ END
 // Data
 //
 
-IDR_MENUBAR SHMENUBAR DISCARDABLE 
+IDR_MENUBAR RCDATA DISCARDABLE 
 BEGIN
     IDR_MENUBAR, 6,
     I_IMAGENONE, IDM_FILE, TBSTATE_ENABLED, 
@@ -176,10 +122,10 @@ BEGIN
     I_IMAGENONE, IDM_VIDEO, TBSTATE_ENABLED, 
     TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_VIDEO, IDM_VIDEO, 4,
     I_IMAGENONE, IDM_NAVIGATION, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_NAVIGATION, IDM_NAVIGATION, 5,
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_NAVIGATION, IDM_NAVIGATION, 5
 END
 
-IDR_MENUBAR2 SHMENUBAR DISCARDABLE 
+IDR_MENUBAR2 RCDATA DISCARDABLE 
 BEGIN
     IDR_MENUBAR2, 4,
     I_IMAGENONE, IDM_MANAGE, TBSTATE_ENABLED, 
@@ -187,9 +133,8 @@ BEGIN
     I_IMAGENONE, IDM_SORT, TBSTATE_ENABLED, 
     TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_SORT, IDM_SORT, 1,
     I_IMAGENONE, IDM_SEL, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_SEL, IDM_SEL, 2,
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_SEL, IDM_SEL, 2
 END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -268,34 +213,6 @@ BEGIN
     PUSHBUTTON      "Clear",IDCLEAR,11,7,50,14
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
-BEGIN
-    IDD_DUMMY, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 179
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 83
-    END
-
-    IDD_MESSAGES, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 131
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 83
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menubar
@@ -306,22 +223,16 @@ BEGIN
     MENUITEM "",                            ID_MENUITEM40108
 END
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Data
 //
 
-IDR_MENUBAR2 RCDATA DISCARDABLE 
-BEGIN
-
-END
-
-IDR_DUMMYMENU SHMENUBAR DISCARDABLE 
+IDR_DUMMYMENU RCDATA DISCARDABLE 
 BEGIN
     IDR_DUMMYMENU, 1,
     I_IMAGENONE, ID_MENUITEM40108, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 
-    IDS_CAP_MENUITEM40109, 0, 0,
+    IDS_CAP_MENUITEM40109, 0, 0
 END
 
 /////////////////////////////////////////////////////////////////////////////
@@ -404,23 +315,5 @@ BEGIN
     IDM_SETTINGS            "Settings"
 END
 
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_CAP_XXX             "xxx"
-END
-
 #endif    // French (France) resources
 /////////////////////////////////////////////////////////////////////////////
-
-
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-
-
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
-

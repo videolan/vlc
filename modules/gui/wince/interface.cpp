@@ -31,19 +31,13 @@
 #include <vlc/vout.h>
 #include <vlc/intf.h>
 
-#include <string>
-#include <stdio.h>
-using namespace std; 
+#include "wince.h"
 
 #include <winuser.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
-#include <aygshell.h>
-
 #include <commdlg.h> // common dialogs -> fileopen.lib ?
-
-#include "wince.h"
 
 #define NUMIMAGES     9   // Number of buttons in the toolbar           
 #define IMAGEWIDTH    17   // Width of the buttons in the toolbar  
@@ -451,7 +445,7 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
             MessageBox(hwnd, L"SHCreateMenuBar Failed", L"Error", MB_OK);
             //return -1;
         }
-    
+
         hwndCB = mbi.hwndMB;
 
         // Creates the toolbar
@@ -470,7 +464,8 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         hwndSB = CreateStatusbar( hwnd );
 
         /* Video window */
-        video = CreateVideoWindow( pIntf, hInst, hwnd );
+        if( config_GetInt( pIntf, "wince-embed" ) )
+            video = CreateVideoWindow( pIntf, hInst, hwnd );
 
         ti = new Timer(pIntf, hwnd, this);
 
@@ -611,7 +606,6 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         break;
 
     case WM_INITMENUPOPUP:
-      msg_Err( pIntf, "WM_INITMENUPOPUP" );
         RefreshSettingsMenu( pIntf,
             (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
                                 (LPARAM)IDM_SETTINGS ) );
@@ -625,7 +619,6 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
             (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
                                 (LPARAM)IDM_NAVIGATION ) );
 
-      msg_Err( pIntf, "WM_MEND" );
 #if 0
         // Undo the video display because menu is opened
         // due to GAPI, menu top display is not assumed

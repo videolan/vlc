@@ -28,6 +28,14 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
+#if defined( UNDER_CE ) && defined(__MINGW32__)
+/* This is a gross hack for the wince gcc cross-compiler */
+#undef strerror
+#define _off_t long
+char *strerror( int i_err ){ return "error message not available"; };
+void abort (void){};
+#endif
+
 #include "wince.h"
 
 /*****************************************************************************
@@ -40,12 +48,19 @@ static void Run    ( intf_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define EMBED_TEXT N_("Embed video in interface")
+#define EMBED_LONGTEXT N_("Embed the video inside the interface instead " \
+    "of having it in a separate window.")
+
 vlc_module_begin();
     set_description( (char *) _("WinCE interface module") );
     set_capability( "interface", 200 );
     set_callbacks( Open, Close );
     add_shortcut( "wince" );
     set_program( "wcevlc" );
+
+    add_bool( "wince-embed", 1, NULL,
+              EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 HINSTANCE hInstance = 0;
@@ -120,6 +135,8 @@ static void Run( intf_thread_t *p_intf )
 {
     MSG msg;
     Interface *pInterface = new Interface();
+
+    if( !hInstance ) hInstance = GetModuleHandle(NULL);
 
     if( !pInterface->InitInstance( hInstance, p_intf ) ) return;
 

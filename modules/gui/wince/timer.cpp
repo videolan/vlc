@@ -28,18 +28,13 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
-
-#include <string>
-#include <stdio.h>
-using namespace std; 
-
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/intf.h>
 
-#include <commctrl.h>
-
 #include "wince.h"
+
+#include <commctrl.h>
 
 /* Callback prototype */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,

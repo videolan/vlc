@@ -25,16 +25,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>                                            /* strerror() */
+#include <stdio.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-#include <string>
-#include <stdio.h>
-using namespace std; 
+#include "wince.h"
 
+#include <commctrl.h>
 #include <commdlg.h>
-
-#include <newmenu.h>
 
 #ifndef NMAXFILE
 #define NMAXFILE 512 // at least 256
@@ -45,10 +45,6 @@ using namespace std;
 #endif
 
 #define LONG2POINT(l, pt)  ((pt).x = (SHORT)LOWORD(l), (pt).y = (SHORT)HIWORD(l))
-
-#include "wince.h"
-
-#include <aygshell.h>
 
 #define NUMIMAGES     11   // Number of buttons in the toolbar           
 #define IMAGEWIDTH    16   // Width of the buttons in the toolbar  

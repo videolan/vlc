@@ -25,24 +25,19 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>                                            /* strerror() */
+#include <stdio.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
-#include <string.h>
 
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string>
-#include <stdio.h>
-using namespace std; 
+#include "wince.h"
 
 #include <winuser.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
-#include <aygshell.h>
-
 #include <commdlg.h>
-
-#include "wince.h"
 
 /*****************************************************************************
  * Event Table.
