@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.177 2004/02/10 14:04:55 sam Exp $
+dnl $Id: configure.ac,v 1.178 2004/02/10 17:36:45 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-test1)
 
@@ -873,7 +873,7 @@ dnl
 dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc logger gestures memcpy hotkeys])
-AX_ADD_PLUGINS([mpgv mpga m4v mpeg_system ps ps2 ts avi asf aac mp4 rawdv demux2 nsv real aiff])
+AX_ADD_PLUGINS([mpgv mpga m4v mpeg_system ps ps2 pva ts avi asf aac mp4 rawdv demux2 nsv real aiff])
 AX_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
@@ -1721,6 +1721,19 @@ if test "${enable_mkv}" != "no"; then
     ])
   ])
   AC_LANG_POP(C++)
+fi
+
+dnl
+dnl  modplug demux plugin
+dnl
+AC_ARG_ENABLE(mod,
+  [  --enable-mod            Mod demux support (default enabled)])
+if test "${enable_mod}" != "no"
+then
+  AC_CHECK_HEADERS(libmodplug/modplug.h, [
+    AX_ADD_PLUGINS([mod])
+    AX_ADD_CXXFLAGS([mod],[])
+    AX_ADD_LDFLAGS([mod],[-lmodplug])])
 fi
 
 dnl
