@@ -30,6 +30,7 @@
 #include <Buttons.hpp>
 #include <ComCtrls.hpp>
 #include <ExtCtrls.hpp>
+#include "CSPIN.h"
 //---------------------------------------------------------------------------
 class TDiscDlg : public TForm
 {
@@ -38,14 +39,12 @@ __published:	// IDE-managed Components
     TGroupBox *GroupBoxPosition;
     TLabel *LabelTitle;
     TLabel *LabelChapter;
-    TEdit *EditTitle;
-    TEdit *EditChapter;
-    TUpDown *UpDownTitle;
-    TUpDown *UpDownChapter;
     TRadioGroup *RadioGroupType;
     TBitBtn *BitBtnOk;
     TBitBtn *BitBtnCancel;
     TEdit *EditDevice;
+    TCSpinEdit *SpinEditTitle;
+    TCSpinEdit *SpinEditChapter;
     void __fastcall FormShow(TObject *Sender);
     void __fastcall FormHide(TObject *Sender);
     void __fastcall BitBtnCancelClick(TObject *Sender);

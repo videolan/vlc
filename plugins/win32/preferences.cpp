@@ -35,6 +35,7 @@
 
 //---------------------------------------------------------------------------
 //#pragma package(smart_init)
+#pragma link "CSPIN"
 #pragma resource "*.dfm"
 
 extern struct intf_thread_s *p_intfGlobal;
@@ -117,16 +118,20 @@ TEdit * __fastcall TGroupBoxPref::CreateEdit( TWinControl *Parent,
     return Edit;
 }
 //---------------------------------------------------------------------------
-TUpDown * __fastcall TGroupBoxPref::CreateUpDown( TWinControl *Parent,
-            int Min, int Max, int Position, bool Thousands )
+TCSpinEdit * __fastcall TGroupBoxPref::CreateSpinEdit( TWinControl *Parent,
+            int Left, int Width, int Top, int Height,
+            long Min, long Max, long Value )
 {
-    TUpDown *UpDown = new TUpDown( Parent );
-    UpDown->Parent = Parent;
-    UpDown->Min = Min;
-    UpDown->Max = Max;
-    UpDown->Position = Position;
-    UpDown->Thousands = Thousands;
-    return UpDown;
+    TCSpinEdit *SpinEdit = new TCSpinEdit( Parent );
+    SpinEdit->Parent = Parent;
+    SpinEdit->Left = Left;
+    SpinEdit->Width = Width;
+    SpinEdit->Top = Top;
+    SpinEdit->Height = Height;
+    SpinEdit->MinValue = Min;
+    SpinEdit->MaxValue = Max;
+    SpinEdit->Value = Value;
+    return SpinEdit;
 }
 //---------------------------------------------------------------------------
 void __fastcall TGroupBoxPref::UpdateChanges()
@@ -264,22 +269,20 @@ __fastcall TGroupBoxInteger::TGroupBoxInteger( TComponent* Owner,
     LabelDesc = CreateLabel( this, 230, 225, 19, 26,
                              p_config->psz_longtext, true );
 
-    /* init edit */
-    Edit = CreateEdit( this, 16, 148, 24, 21, "" );
-
-    /* init updown */
-    UpDown = CreateUpDown( this, -1, 32767, p_config->i_value, false );
-    UpDown->Associate = Edit;
+    /* init spinedit */
+    SpinEdit = CreateSpinEdit( this, 16, 164, 24, 21,
+                               -1, 100000, p_config->i_value );
 
     /* vertical alignment */
     Height = LabelDesc->Height + 24;
     LabelDesc->Top = Top + ( Height - LabelDesc->Height ) / 2 + 4;
-    Edit->Top = Top + ( Height - Edit->Height ) / 2 + 4;
+    SpinEdit->Top = Top + ( Height - SpinEdit->Height ) / 2 + 4;
 };
 //---------------------------------------------------------------------------
 void __fastcall TGroupBoxInteger::UpdateChanges()
 {
-    p_config->i_value = StrToInt( Edit->Text );
+    /* Warning: we're casting from long to int */
+    p_config->i_value = (int)SpinEdit->Value;
 }
 
 

@@ -1,9 +1,9 @@
 object NetworkDlg: TNetworkDlg
-  Left = 353
-  Top = 273
+  Left = 369
+  Top = 301
   BorderStyle = bsDialog
   Caption = 'Open network'
-  ClientHeight = 222
+  ClientHeight = 206
   ClientWidth = 482
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -249,7 +249,7 @@ object NetworkDlg: TNetworkDlg
   TextHeight = 13
   object BitBtnOk: TBitBtn
     Left = 40
-    Top = 184
+    Top = 168
     Width = 177
     Height = 25
     TabOrder = 0
@@ -258,7 +258,7 @@ object NetworkDlg: TNetworkDlg
   end
   object BitBtnCancel: TBitBtn
     Left = 256
-    Top = 184
+    Top = 168
     Width = 177
     Height = 25
     TabOrder = 1
@@ -269,19 +269,19 @@ object NetworkDlg: TNetworkDlg
     Left = 8
     Top = 8
     Width = 465
-    Height = 161
+    Height = 145
     Caption = 'Network mode'
     TabOrder = 2
     object LabelUDPPort: TLabel
       Left = 148
-      Top = 34
+      Top = 26
       Width = 22
       Height = 13
       Caption = 'Port:'
     end
     object LabelMulticastPort: TLabel
       Left = 364
-      Top = 66
+      Top = 54
       Width = 22
       Height = 13
       Caption = 'Port:'
@@ -289,7 +289,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelCSPort: TLabel
       Left = 364
-      Top = 98
+      Top = 82
       Width = 22
       Height = 13
       Caption = 'Port:'
@@ -297,7 +297,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelMulticastAddress: TLabel
       Left = 139
-      Top = 66
+      Top = 54
       Width = 41
       Height = 13
       Caption = 'Address:'
@@ -305,7 +305,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelCSAddress: TLabel
       Left = 139
-      Top = 98
+      Top = 82
       Width = 41
       Height = 13
       Caption = 'Address:'
@@ -313,7 +313,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelHTTPURL: TLabel
       Left = 147
-      Top = 130
+      Top = 110
       Width = 25
       Height = 13
       Caption = 'URL:'
@@ -321,7 +321,7 @@ object NetworkDlg: TNetworkDlg
     end
     object RadioButtonUDP: TRadioButton
       Left = 16
-      Top = 32
+      Top = 24
       Width = 97
       Height = 17
       Caption = 'UDP'
@@ -332,7 +332,7 @@ object NetworkDlg: TNetworkDlg
     end
     object RadioButtonMulticast: TRadioButton
       Left = 16
-      Top = 64
+      Top = 52
       Width = 97
       Height = 17
       Caption = 'UDP Multicast'
@@ -341,7 +341,7 @@ object NetworkDlg: TNetworkDlg
     end
     object RadioButtonCS: TRadioButton
       Left = 16
-      Top = 96
+      Top = 80
       Width = 97
       Height = 17
       Caption = 'Channel Server'
@@ -350,108 +350,76 @@ object NetworkDlg: TNetworkDlg
     end
     object RadioButtonHTTP: TRadioButton
       Left = 16
-      Top = 128
+      Top = 108
       Width = 97
       Height = 17
       Caption = 'HTTP'
       TabOrder = 3
       OnEnter = RadioButtonHTTPEnter
     end
-    object EditUDPPort: TEdit
-      Left = 184
-      Top = 30
-      Width = 41
-      Height = 21
-      TabOrder = 4
-      Text = '1234'
-    end
-    object UpDownUDPPort: TUpDown
-      Left = 225
-      Top = 30
-      Width = 16
-      Height = 21
-      Associate = EditUDPPort
-      Min = 0
-      Max = 32767
-      Position = 1234
-      TabOrder = 5
-      Thousands = False
-      Wrap = False
-    end
-    object EditMulticastPort: TEdit
-      Left = 392
-      Top = 62
-      Width = 41
-      Height = 21
-      Enabled = False
-      TabOrder = 7
-      Text = '1234'
-    end
-    object UpDownMulticastPort: TUpDown
-      Left = 433
-      Top = 62
-      Width = 16
-      Height = 21
-      Associate = EditMulticastPort
-      Enabled = False
-      Min = 0
-      Max = 32767
-      Position = 1234
-      TabOrder = 8
-      Thousands = False
-      Wrap = False
-    end
-    object EditCSPort: TEdit
-      Left = 392
-      Top = 94
-      Width = 41
-      Height = 21
-      Enabled = False
-      TabOrder = 10
-      Text = '6010'
-    end
-    object UpDownCSPort: TUpDown
-      Left = 433
-      Top = 94
-      Width = 16
-      Height = 21
-      Associate = EditCSPort
-      Enabled = False
-      Min = 0
-      Max = 32767
-      Position = 6010
-      TabOrder = 11
-      Thousands = False
-      Wrap = False
-    end
     object ComboBoxMulticastAddress: TComboBox
       Left = 184
-      Top = 62
+      Top = 50
       Width = 161
       Height = 21
       Enabled = False
       ItemHeight = 13
-      TabOrder = 6
+      TabOrder = 5
     end
     object ComboBoxCSAddress: TComboBox
       Left = 184
-      Top = 94
+      Top = 78
       Width = 161
       Height = 21
       Enabled = False
       ItemHeight = 13
-      TabOrder = 9
+      TabOrder = 7
       Text = '138.195.156.230'
       Items.Strings = (
         '138.195.159.230')
     end
     object EditHTTPURL: TEdit
       Left = 184
-      Top = 126
+      Top = 106
       Width = 265
       Height = 21
       Enabled = False
-      TabOrder = 12
+      TabOrder = 9
+    end
+    object SpinEditUDPPort: TCSpinEdit
+      Left = 184
+      Top = 21
+      Width = 57
+      Height = 22
+      TabStop = True
+      MaxValue = 65535
+      ParentColor = False
+      TabOrder = 4
+      Value = 1234
+    end
+    object SpinEditMulticastPort: TCSpinEdit
+      Left = 392
+      Top = 49
+      Width = 57
+      Height = 22
+      TabStop = True
+      Enabled = False
+      MaxValue = 65535
+      ParentColor = False
+      TabOrder = 6
+      Value = 1234
+    end
+    object SpinEditCSPort: TCSpinEdit
+      Left = 392
+      Top = 77
+      Width = 57
+      Height = 22
+      TabStop = True
+      Enabled = False
+      MaxValue = 65535
+      ParentColor = False
+      TabOrder = 8
+      Value = 6010
     end
   end
 end

@@ -275,47 +275,29 @@ object DiscDlg: TDiscDlg
       Height = 13
       Caption = 'Chapter'
     end
-    object EditTitle: TEdit
+    object SpinEditTitle: TCSpinEdit
       Left = 64
-      Top = 20
-      Width = 57
-      Height = 21
+      Top = 19
+      Width = 73
+      Height = 22
+      TabStop = True
+      MaxValue = 65535
+      MinValue = 1
+      ParentColor = False
       TabOrder = 0
-      Text = '1'
+      Value = 1
     end
-    object EditChapter: TEdit
+    object SpinEditChapter: TCSpinEdit
       Left = 64
-      Top = 48
-      Width = 57
-      Height = 21
+      Top = 47
+      Width = 73
+      Height = 22
+      TabStop = True
+      MaxValue = 65535
+      MinValue = 1
+      ParentColor = False
       TabOrder = 1
-      Text = '1'
-    end
-    object UpDownTitle: TUpDown
-      Left = 121
-      Top = 20
-      Width = 15
-      Height = 21
-      Associate = EditTitle
-      Min = 1
-      Max = 32767
-      Position = 1
-      TabOrder = 2
-      Thousands = False
-      Wrap = False
-    end
-    object UpDownChapter: TUpDown
-      Left = 121
-      Top = 48
-      Width = 15
-      Height = 21
-      Associate = EditChapter
-      Min = 1
-      Max = 32767
-      Position = 1
-      TabOrder = 3
-      Thousands = False
-      Wrap = False
+      Value = 1
     end
   end
   object RadioGroupType: TRadioGroup

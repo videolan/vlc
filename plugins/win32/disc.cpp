@@ -36,6 +36,7 @@
 
 //---------------------------------------------------------------------------
 //#pragma package(smart_init)
+#pragma link "CSPIN"
 #pragma resource "*.dfm"
 
 extern  struct intf_thread_s *p_intfGlobal;
@@ -84,8 +85,8 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
     }
 
     /* Select title and chapter */
-    Title.sprintf( "%d", UpDownTitle->Position );
-    Chapter.sprintf( "%d", UpDownChapter->Position );
+    Title.sprintf( "%d", SpinEditTitle->Value );
+    Chapter.sprintf( "%d", SpinEditChapter->Value );
 
     /* Build source name and add it to playlist */
     Source = Method + ":" + Device + "@" + Title + "," + Chapter;

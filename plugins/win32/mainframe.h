@@ -35,6 +35,7 @@
 #include <ToolWin.hpp>
 #include <AppEvnts.hpp>
 #include <ExtCtrls.hpp>
+#include "CSPIN.h"
 //---------------------------------------------------------------------------
 class TMainFrameDlg : public TForm
 {
@@ -109,8 +110,6 @@ __published:	// IDE-managed Components
     TGroupBox *GroupBoxFile;
     TLabel *LabelFileName;
     TGroupBox *GroupBoxNetwork;
-    TEdit *EditChannel;
-    TUpDown *UpDownChannel;
     TLabel *LabelChannel;
     TLabel *LabelServer;
     TGroupBox *GroupBoxDisc;
@@ -135,6 +134,7 @@ __published:	// IDE-managed Components
     TMenuItem *PopupNetworkStream;
     TMenuItem *PopupClose;
     TMenuItem *N9;
+    TCSpinEdit *SpinEditChannel;
     void __fastcall TimerManageTimer( TObject *Sender );
     void __fastcall TrackBarChange( TObject *Sender );
     void __fastcall FormClose( TObject *Sender, TCloseAction &Action );

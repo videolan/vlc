@@ -30,6 +30,7 @@
 #include <Buttons.hpp>
 #include <ComCtrls.hpp>
 #include <ExtCtrls.hpp>
+#include "CSPIN.h"
 //---------------------------------------------------------------------------
 
 #define NOT( var ) ( (var) ? false : true )
@@ -45,20 +46,17 @@ __published:	// IDE-managed Components
     TRadioButton *RadioButtonCS;
     TRadioButton *RadioButtonHTTP;
     TLabel *LabelUDPPort;
-    TEdit *EditUDPPort;
-    TUpDown *UpDownUDPPort;
     TLabel *LabelMulticastPort;
-    TEdit *EditMulticastPort;
-    TUpDown *UpDownMulticastPort;
     TLabel *LabelCSPort;
-    TEdit *EditCSPort;
-    TUpDown *UpDownCSPort;
     TLabel *LabelMulticastAddress;
     TComboBox *ComboBoxMulticastAddress;
     TLabel *LabelCSAddress;
     TComboBox *ComboBoxCSAddress;
     TEdit *EditHTTPURL;
     TLabel *LabelHTTPURL;
+    TCSpinEdit *SpinEditUDPPort;
+    TCSpinEdit *SpinEditMulticastPort;
+    TCSpinEdit *SpinEditCSPort;
     void __fastcall FormShow( TObject *Sender );
     void __fastcall FormHide( TObject *Sender );
     void __fastcall BitBtnCancelClick( TObject *Sender );

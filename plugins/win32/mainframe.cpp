@@ -50,6 +50,7 @@
 
 //---------------------------------------------------------------------------
 //#pragma package(smart_init)
+#pragma link "CSPIN"
 #pragma resource "*.dfm"
 
 extern struct intf_thread_s *p_intfGlobal;
@@ -529,7 +530,7 @@ void __fastcall TMainFrameDlg::ButtonGoClick( TObject *Sender )
     intf_thread_t *p_intf = p_intfGlobal;
     int i_channel;
 
-    i_channel = UpDownChannel->Position;
+    i_channel = SpinEditChannel->Value;
     intf_WarnMsg( 3, "intf info: joining channel %d", i_channel );
 
     vlc_mutex_lock( &p_intf->change_lock );
@@ -658,6 +659,10 @@ void __fastcall TMainFrameDlg::ModeManage()
         }
         else
         {
+            /* add space between tolbar and statusbar when
+             * nothing is displayed; isn't it nicer ? :) */ 
+            i_Height += 18;
+
             /* unsensitize menus */
             MenuProgram->Enabled = false;
             MenuTitle->Enabled = false;

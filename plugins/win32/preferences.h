@@ -30,6 +30,7 @@
 #include <Buttons.hpp>
 #include <ComCtrls.hpp>
 #include <ExtCtrls.hpp>
+#include "CSPIN.h"
 //---------------------------------------------------------------------------
 class TGroupBoxPref : public TGroupBox
 {
@@ -48,8 +49,9 @@ public:
             bool WordWrap );
     TEdit * __fastcall CreateEdit( TWinControl *Parent,
             int Left, int Width, int Top, int Height, AnsiString Text );
-    TUpDown * __fastcall CreateUpDown( TWinControl *Parent,
-            int Min, int Max, int Position, bool Thousands );
+    TCSpinEdit * __fastcall CreateSpinEdit( TWinControl *Parent,
+            int Left, int Width, int Top, int Height,
+            long Min, long Max, long Value );
 };
 //---------------------------------------------------------------------------
 class TGroupBoxPlugin : public TGroupBoxPref
@@ -85,8 +87,7 @@ class TGroupBoxInteger : public TGroupBoxPref
 public:
     __fastcall TGroupBoxInteger( TComponent* Owner, module_config_t *p_config );
     TLabel *LabelDesc;
-    TEdit *Edit;
-    TUpDown *UpDown;
+    TCSpinEdit *SpinEdit;
     void __fastcall UpdateChanges();
 };
 //---------------------------------------------------------------------------

@@ -38,6 +38,7 @@
 
 //---------------------------------------------------------------------------
 //#pragma package(smart_init)
+#pragma link "CSPIN"
 #pragma resource "*.dfm"
 
 extern struct intf_thread_s *p_intfGlobal;
@@ -51,8 +52,8 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
         OldRadioValue = 0;
 
         /* server port */
-        UpDownUDPPort->Position = config_GetIntVariable( "server-port" );
-        UpDownMulticastPort->Position = config_GetIntVariable( "server-port" );
+        SpinEditUDPPort->Value = config_GetIntVariable( "server-port" );
+        SpinEditMulticastPort->Value = config_GetIntVariable( "server-port" );
 
         /* channel server */
         if( config_GetIntVariable( "network-channel" ) )
@@ -68,7 +69,7 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
             free( psz_channel_server );
         }
 
-        UpDownCSPort->Position = config_GetIntVariable( "channel-port" );
+        SpinEditCSPort->Value = config_GetIntVariable( "channel-port" );
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormShow( TObject *Sender )
@@ -92,7 +93,7 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
 {
     AnsiString      Source, Address;
     AnsiString      Channel = ComboBoxCSAddress->Text;
-    unsigned int    i_channel_port = UpDownCSPort->Position;
+    unsigned int    i_channel_port = SpinEditCSPort->Value;
     unsigned int    i_port;
     int             i_end = p_main->p_playlist->i_size;
 
@@ -110,7 +111,7 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
         /* UDP */
         case 0:
             config_PutIntVariable( "network-channel", FALSE );
-            i_port = UpDownUDPPort->Position;
+            i_port = SpinEditUDPPort->Value;
 
             /* Build source name */
             Source = "udp:@:" + IntToStr( i_port );
@@ -127,7 +128,7 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
         case 1:
             config_PutIntVariable( "network-channel", FALSE );
             Address = ComboBoxMulticastAddress->Text;
-            i_port = UpDownMulticastPort->Position;
+            i_port = SpinEditMulticastPort->Value;
 
             /* Build source name */
             Source = "udp:@" + Address + ":" + IntToStr( i_port );
@@ -178,8 +179,7 @@ void __fastcall TNetworkDlg::ChangeEnabled( int i_selected )
     {
         case 0:
             LabelUDPPort->Enabled = NOT( LabelUDPPort->Enabled );
-            EditUDPPort->Enabled = NOT( EditUDPPort->Enabled );
-            UpDownUDPPort->Enabled = NOT( UpDownUDPPort->Enabled );
+            SpinEditUDPPort->Enabled = NOT( SpinEditUDPPort->Enabled );
             break;
         case 1:
             LabelMulticastAddress->Enabled =
@@ -187,15 +187,13 @@ void __fastcall TNetworkDlg::ChangeEnabled( int i_selected )
             ComboBoxMulticastAddress->Enabled =
                     NOT( ComboBoxMulticastAddress->Enabled );
             LabelMulticastPort->Enabled = NOT( LabelMulticastPort->Enabled );
-            EditMulticastPort->Enabled = NOT( EditMulticastPort->Enabled );
-            UpDownMulticastPort->Enabled = NOT( UpDownMulticastPort->Enabled );
+            SpinEditMulticastPort->Enabled = NOT( SpinEditMulticastPort->Enabled );
             break;
         case 2:
             LabelCSAddress->Enabled = NOT( LabelCSAddress->Enabled );
             ComboBoxCSAddress->Enabled = NOT( ComboBoxCSAddress->Enabled );
             LabelCSPort->Enabled = NOT( LabelCSPort->Enabled );
-            EditCSPort->Enabled = NOT( EditCSPort->Enabled );
-            UpDownCSPort->Enabled = NOT( UpDownCSPort->Enabled );
+            SpinEditCSPort->Enabled = NOT( SpinEditCSPort->Enabled );
             break;
         case 3:
             LabelHTTPURL->Enabled = NOT( LabelHTTPURL->Enabled );

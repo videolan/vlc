@@ -320,38 +320,28 @@ object MainFrameDlg: TMainFrameDlg
     object LabelServer: TLabel
       Left = 64
       Top = 16
-      Width = 52
+      Width = 49
       Height = 13
-      Caption = 'No server !'
-    end
-    object EditChannel: TEdit
-      Left = 336
-      Top = 12
-      Width = 17
-      Height = 21
-      TabOrder = 0
-      Text = '0'
-    end
-    object UpDownChannel: TUpDown
-      Left = 353
-      Top = 12
-      Width = 15
-      Height = 21
-      Associate = EditChannel
-      Min = 0
-      Position = 0
-      TabOrder = 1
-      Thousands = False
-      Wrap = False
+      Caption = 'No server!'
     end
     object ButtonGo: TButton
-      Left = 376
+      Left = 384
       Top = 10
       Width = 25
       Height = 25
       Caption = 'Go!'
-      TabOrder = 2
+      TabOrder = 0
       OnClick = ButtonGoClick
+    end
+    object SpinEditChannel: TCSpinEdit
+      Left = 336
+      Top = 11
+      Width = 41
+      Height = 22
+      TabStop = True
+      MaxValue = 99
+      ParentColor = False
+      TabOrder = 1
     end
   end
   object GroupBoxDisc: TGroupBox
