@@ -2,7 +2,7 @@
  * intf_ncurses.c: ncurses interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_ncurses.c,v 1.3 2001/03/21 13:42:34 sam Exp $
+ * $Id: intf_ncurses.c,v 1.4 2001/07/25 03:12:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,7 +41,6 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -49,7 +48,10 @@
 #include "intf_msg.h"
 #include "interface.h"
 
+#include "modules.h"
 #include "main.h"
+
+#include "modules_export.h"
 
 /*****************************************************************************
  * intf_sys_t: description and status of ncurses interface

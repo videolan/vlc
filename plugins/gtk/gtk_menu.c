@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.12 2001/07/08 17:45:52 gbazin Exp $
+ * $Id: gtk_menu.c,v 1.13 2001/07/25 03:12:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -29,7 +29,15 @@
 #include <sys/types.h>                                              /* off_t */
 #include <stdlib.h>
 
-#include <gtk/gtk.h>
+#define gtk 12
+#define gnome 42
+#if ( MODULE_NAME == gtk )
+#   include <gtk/gtk.h>
+#elif ( MODULE_NAME == gnome )
+#   include <gnome.h>
+#endif
+#undef gtk
+#undef gnome
 
 #include <string.h>
 

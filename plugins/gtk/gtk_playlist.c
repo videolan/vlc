@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.17 2001/05/31 03:23:24 sam Exp $
+ * $Id: gtk_playlist.c,v 1.18 2001/07/25 03:12:33 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -39,7 +39,15 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <gtk/gtk.h>
+#define gtk 12
+#define gnome 42
+#if ( MODULE_NAME == gtk )
+#   include <gtk/gtk.h>
+#elif ( MODULE_NAME == gnome )
+#   include <gnome.h>
+#endif
+#undef gtk
+#undef gnome
 
 #include "config.h"
 #include "common.h"

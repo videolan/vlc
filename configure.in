@@ -110,6 +110,13 @@ void foo() { int meuh; ntohl(meuh); }],,
  AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
+dnl Check for inline function size limit
+CFLAGS="${save_CFLAGS} -finline-limit=12"
+AC_MSG_CHECKING([if \$CC accepts -finline-limit])
+AC_TRY_COMPILE([],,
+ save_CFLAGS="${save_CFLAGS} -finline-limit=31337"; AC_MSG_RESULT(yes),
+ AC_MSG_RESULT(no))
+
 dnl Check for Darwin plugin linking flags
 CFLAGS="${save_CFLAGS} -bundle -undefined suppress"
 AC_MSG_CHECKING([if \$CC compiles plugins with -bundle -undefined suppress])

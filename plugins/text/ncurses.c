@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.5 2001/05/30 17:03:12 sam Exp $
+ * $Id: ncurses.c,v 1.6 2001/07/25 03:12:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -37,6 +37,7 @@
 #include "mtime.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.

@@ -7,17 +7,19 @@
 # Objects
 #
 
-PLUGIN_GTK = gtk.o intf_gtk.o gtk_interface.o gtk_support.o
+PLUGIN_GTK = gtk.o intf_gtk.o gtk_interface.o gtk_support.o gtk_callbacks.o
 PLUGIN_GNOME = gnome.o intf_gnome.o gnome_interface.o gnome_support.o gnome_callbacks.o
-PLUGIN_GTKCOMMON = gtk_display.o gtk_callbacks.o gtk_open.o gtk_control.o gtk_menu.o gtk_playlist.o gtk_modules.o gtk_preferences.o
+
+PLUGIN_GTK_SPECIFIC = gtk_display.o gtk_open.o gtk_control.o gtk_menu.o gtk_playlist.o gtk_modules.o gtk_preferences.o
+PLUGIN_GNOME_SPECIFIC = $(PLUGIN_GTK_SPECIFIC:gtk%=gnome%)
 
 BUILTIN_GTK = $(PLUGIN_GTK:%.o=BUILTIN_GTK_%.o) \
-        $(PLUGIN_GTKCOMMON:%.o=BUILTIN_GTK_%.o)
+        $(PLUGIN_GTK_SPECIFIC:%.o=BUILTIN_GTK_%.o)
 BUILTIN_GNOME = $(PLUGIN_GNOME:%.o=BUILTIN_GNOME_%.o) \
-        $(PLUGIN_GTKCOMMON:%.o=BUILTIN_GNOME_%.o)
+        $(PLUGIN_GTK_SPECIFIC:%.o=BUILTIN_GNOME_%.o)
 
-ALL_OBJ = $(PLUGIN_GTK) $(PLUGIN_GNOME) $(PLUGIN_GTKCOMMON) \
-          $(BUILTIN_GTK) $(BUILTIN_GNOME)
+ALL_OBJ = $(PLUGIN_GTK) $(PLUGIN_GNOME) $(PLUGIN_GTK_SPECIFIC) \
+          $(PLUGIN_GNOME_SPECIFIC) $(BUILTIN_GTK) $(BUILTIN_GNOME)
 
 #
 # Virtual targets
@@ -25,20 +27,22 @@ ALL_OBJ = $(PLUGIN_GTK) $(PLUGIN_GNOME) $(PLUGIN_GTKCOMMON) \
 
 include ../../Makefile.modules
 
-$(PLUGIN_GTKCOMMON): %.o: .dep/%.d
-$(PLUGIN_GTKCOMMON): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_GTK) -DPLUGIN -c -o $@ $<
-
-$(PLUGIN_GTK): %.o: .dep/%.d
-$(PLUGIN_GTK): %.o: %.c
+# Gtk+
+$(PLUGIN_GTK) $(PLUGIN_GTK_SPECIFIC): %.o: .dep/%.d
+$(PLUGIN_GTK) $(PLUGIN_GTK_SPECIFIC): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_GTK) -DPLUGIN -DMODULE_NAME=gtk -c -o $@ $<
 
 $(BUILTIN_GTK): BUILTIN_GTK_%.o: .dep/%.d
 $(BUILTIN_GTK): BUILTIN_GTK_%.o: %.c
 	$(CC) $(CFLAGS) $(CFLAGS_GTK) -DBUILTIN -DMODULE_NAME=gtk -c -o $@ $<
 
+# Gnome
 $(PLUGIN_GNOME): %.o: .dep/%.d
 $(PLUGIN_GNOME): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) -DPLUGIN -DMODULE_NAME=gnome `gnome-config --cflags gtk gnomeui` -c -o $@ $<
+
+$(PLUGIN_GNOME_SPECIFIC): gnome%.o: .dep/gtk%.d
+$(PLUGIN_GNOME_SPECIFIC): gnome%.o: gtk%.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -DPLUGIN -DMODULE_NAME=gnome `gnome-config --cflags gtk gnomeui` -c -o $@ $<
 
 $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: .dep/%.d
@@ -50,7 +54,7 @@ $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: %.c
 # Real targets
 #
 
-../../plugins/gtk.so: $(PLUGIN_GTK) $(PLUGIN_GTKCOMMON)
+../../plugins/gtk.so: $(PLUGIN_GTK) $(PLUGIN_GTK_SPECIFIC)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GTK)
 
 ../../plugins/gtk.a: $(BUILTIN_GTK)
@@ -58,7 +62,7 @@ $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: %.c
 	$(RANLIB) $@
 
 
-../../plugins/gnome.so: $(PLUGIN_GNOME) $(PLUGIN_GTKCOMMON)
+../../plugins/gnome.so: $(PLUGIN_GNOME) $(PLUGIN_GNOME_SPECIFIC)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GNOME)
 
 ../../plugins/gnome.a: $(BUILTIN_GNOME)

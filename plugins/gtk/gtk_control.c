@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_control.c,v 1.4 2001/05/30 17:03:12 sam Exp $
+ * $Id: gtk_control.c,v 1.5 2001/07/25 03:12:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -29,7 +29,15 @@
 #include <sys/types.h>                                              /* off_t */
 #include <stdlib.h>
 
-#include <gtk/gtk.h>
+#define gtk 12
+#define gnome 42
+#if ( MODULE_NAME == gtk )
+#   include <gtk/gtk.h>
+#elif ( MODULE_NAME == gnome )
+#   include <gnome.h>
+#endif
+#undef gtk
+#undef gnome
 
 #include <string.h>
 

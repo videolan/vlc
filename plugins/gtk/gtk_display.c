@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.4 2001/05/30 23:02:03 stef Exp $
+ * $Id: gtk_display.c,v 1.5 2001/07/25 03:12:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -32,7 +32,15 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <gtk/gtk.h>
+#define gtk 12
+#define gnome 42
+#if ( MODULE_NAME == gtk )
+#   include <gtk/gtk.h>
+#elif ( MODULE_NAME == gnome )
+#   include <gnome.h>
+#endif
+#undef gtk
+#undef gnome
 
 #include "config.h"
 #include "common.h"
