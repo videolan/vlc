@@ -76,7 +76,8 @@ AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
 AC3_SPDIF = src/ac3_spdif/ac3_spdif.o \
 	        src/ac3_spdif/ac3_iec958.o
 
-LPCM_DECODER =	src/lpcm_decoder/lpcm_decoder_thread.o
+LPCM_DECODER =	src/lpcm_decoder/lpcm_decoder_thread.o \
+    	src/lpcm_decoder/lpcm_decoder.o
 
 AUDIO_DECODER =	src/audio_decoder/audio_decoder.o \
 		src/audio_decoder/adec_generic.o \
