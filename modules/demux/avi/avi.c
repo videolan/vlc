@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.63 2003/10/19 13:39:11 hartman Exp $
+ * $Id: avi.c,v 1.64 2003/11/04 02:23:11 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1087,7 +1087,7 @@ static int Seek( input_thread_t *p_input, mtime_t i_date, int i_percent )
 
     if( p_avi->b_seekable )
     {
-        if( !p_avi->i_length || p_avi->b_interleaved )
+        if( !p_avi->i_length ) //|| p_avi->b_interleaved )
         {
             avi_stream_t *p_stream;
             int64_t i_pos;
@@ -1201,6 +1201,39 @@ static int Seek( input_thread_t *p_input, mtime_t i_date, int i_percent )
  *****************************************************************************
  *
  *****************************************************************************/
+static double ControlGetPosition( input_thread_t *p_input )
+{
+    demux_sys_t *p_sys = p_input->p_demux_data;
+
+    if( p_sys->i_length > 0 )
+    {
+        return (double)p_sys->i_time / (double)( p_sys->i_length * (mtime_t)1000000 );
+    }
+    else if( stream_Size( p_input->s ) > 0 )
+    {
+        unsigned int i;
+        int64_t i_tmp;
+        int64_t i64 = 0;
+
+        /* search the more advanced selected es */
+        for( i = 0; i < p_sys->i_streams; i++ )
+        {
+            avi_stream_t *tk = p_sys->pp_info[i];
+            if( tk->b_activated && tk->i_idxposc < tk->i_idxnb )
+            {
+                i_tmp = tk->p_index[tk->i_idxposc].i_pos +
+                        tk->p_index[tk->i_idxposc].i_length + 8;
+                if( i_tmp > i64 )
+                {
+                    i64 = i_tmp;
+                }
+            }
+        }
+        return (double)i64 / (double)stream_Size( p_input->s );
+    }
+    return 0.0;
+}
+
 static int    Control( input_thread_t *p_input, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_input->p_demux_data;
@@ -1212,64 +1245,38 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
     {
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
-            if( p_sys->i_length > 0 )
-            {
-                *pf = (double)p_sys->i_time / (double)( p_sys->i_length * (mtime_t)1000000 );
-                return VLC_SUCCESS;
-            }
-            else if( stream_Size( p_input->s ) > 0 )
-            {
-                unsigned int i;
-                int64_t i_tmp;
-
-                i64 = 0;
-                /* search the more advanced selected es */
-                for( i = 0; i < p_sys->i_streams; i++ )
-                {
-#define tk  p_sys->pp_info[i]
-                    if( tk->b_activated && tk->i_idxposc < tk->i_idxnb )
-                    {
-                        i_tmp = tk->p_index[tk->i_idxposc].i_pos +
-                                tk->p_index[tk->i_idxposc].i_length + 8;
-                        if( i_tmp > i64 )
-                        {
-                            i64 = i_tmp;
-                        }
-                    }
-#undef tk
-                }
-                *pf = (double)i64 / (double)stream_Size( p_input->s );
-                return VLC_SUCCESS;
-            }
-            else
-            {
-                *pf = 0.0;
-                return VLC_SUCCESS;
-            }
+            *pf = ControlGetPosition( p_input );
+            return VLC_SUCCESS;
         case DEMUX_SET_POSITION:
             if( p_sys->b_seekable )
             {
-                int i_ret;
-
                 f = (double)va_arg( args, double );
                 i64 = (mtime_t)(1000000.0 * p_sys->i_length * f );
-                i_ret = Seek( p_input, i64, (int)(f * 100) );
-                return i_ret;
+                return Seek( p_input, i64, (int)(f * 100) );
             }
-            else
-            {
-                return demux_vaControlDefault( p_input, i_query, args );
-            }
+            return demux_vaControlDefault( p_input, i_query, args );
+
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = p_sys->i_time;
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
-            msg_Err( p_input, "FIXME DEMUX_SET_TIME to be implemented" );
-            return VLC_EGENERIC;
-            /* return demux_vaControlDefault( p_input, i_query, args ); */
+        {
+            int i_percent = 0;
 
+            i64 = (int64_t)va_arg( args, int64_t );
+            if( p_sys->i_length > 0 )
+            {
+                i_percent = 100 * i64 / (p_sys->i_length*1000000ULL);
+            }
+            else if( p_sys->i_time > 0 )
+            {
+                i_percent = (int)( 100.0 * ControlGetPosition( p_input ) *
+                                   (double)i64 / (double)p_sys->i_time );
+            }
+            return Seek( p_input, i64, i_percent );
+        }
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = p_sys->i_length * (mtime_t)1000000;
@@ -1280,13 +1287,12 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
             *pf = 0.0;
             for( i = 0; i < (int)p_sys->i_streams; i++ )
             {
-#define tk p_sys->pp_info[i]
+                avi_stream_t *tk = p_sys->pp_info[i];
                 if( tk->i_cat == VIDEO_ES && tk->i_scale > 0)
                 {
                     *pf = (float)tk->i_rate / (float)tk->i_scale;
                     break;
                 }
-#undef tk
             }
             return VLC_SUCCESS;
 

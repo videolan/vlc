@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.250 2003/10/29 01:33:26 gbazin Exp $
+ * $Id: input.c,v 1.251 2003/11/04 02:23:11 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -127,6 +127,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     val.f_float = 0.0;
     var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
     var_AddCallback( p_input, "position", PositionCallback, NULL );
+    var_AddCallback( p_input, "position-offset", PositionCallback, NULL );
 
     /* time variable */
     var_Create( p_input, "time",  VLC_VAR_TIME );
@@ -134,6 +135,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     val.i_time = 0;
     var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
     var_AddCallback( p_input, "time", TimeCallback, NULL );
+    var_AddCallback( p_input, "time-offset", TimeCallback, NULL );
 
     /* length variable */
     var_Create( p_input, "length",  VLC_VAR_TIME );
@@ -1219,22 +1221,23 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
                              void *p_data )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    int64_t i_offset;
 
     msg_Dbg( p_input, "cmd=%s old=%f new=%f", psz_cmd,
              oldval.f_float, newval.f_float );
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    i_offset = (int64_t)( newval.f_float *
-                          (double)p_input->stream.p_selected_area->i_size );
     if( !strcmp( psz_cmd, "position-offset" ) )
     {
-        p_input->stream.p_selected_area->i_seek += i_offset;
+        vlc_value_t val;
+        var_Get( p_input, "position", &val );
+
+        newval.f_float += val.f_float;
     }
-    else
-    {
-        p_input->stream.p_selected_area->i_seek = i_offset;
-    }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.p_selected_area->i_seek =
+                    (int64_t)( newval.f_float *
+                               (double)p_input->stream.p_selected_area->i_size );
+
     if( p_input->stream.p_selected_area->i_seek < 0 )
     {
         p_input->stream.p_selected_area->i_seek = 0;
@@ -1248,29 +1251,29 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    int64_t i_offset;
+    vlc_value_t     val;
 
     /* FIXME TODO FIXME */
     msg_Dbg( p_input, "cmd=%s old=%lld new=%lld", psz_cmd,
              oldval.i_time, newval.i_time );
 
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    i_offset = newval.i_time / 1000000 * 50 * p_input->stream.i_mux_rate;
-    if( !strcmp( psz_cmd, "time-offset" ) )
+    var_Get( p_input, "length", &val );
+    if( val.i_time > 0 )
     {
-        p_input->stream.p_selected_area->i_seek += i_offset;
+        val.f_float = (double)newval.i_time / (double)val.i_time;
+        if( !strcmp( psz_cmd, "time-offset" ) )
+        {
+            var_Set( p_input, "position-offset", val );
+        }
+        else
+        {
+            var_Set( p_input, "position", val );
+        }
     }
     else
     {
-        p_input->stream.p_selected_area->i_seek = i_offset;
+        msg_Warn( p_input, "TimeCallback: length <= 0 -> can't seek" );
     }
-    if( p_input->stream.p_selected_area->i_seek < 0 )
-    {
-        p_input->stream.p_selected_area->i_seek = 0;
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
     return VLC_SUCCESS;
 }
 

@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.7 2003/10/31 18:18:46 gbazin Exp $
+ * $Id: hotkeys.c,v 1.8 2003/11/04 02:23:11 fenrir Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
@@ -240,11 +239,16 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( i_action == ACTIONID_PLAY_PAUSE )
         {
-            if( p_input &&
-                p_input->stream.control.i_status != PAUSE_S )
+            val.i_int = PLAYING_S;
+            if( p_input )
+            {
+                var_Get( p_input, "state", &val );
+            }
+            if( p_input && val.i_int != PAUSE_S )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Pause" ) );
-                input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+                val.i_int = PAUSE_S;
+                var_Set( p_input, "state", val );
             }
             else
             {
@@ -265,48 +269,47 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( p_input )
         {
-            uint64_t i_time;
-
             if( i_action == ACTIONID_PAUSE )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Pause" ) );
-                input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+                val.i_int = PAUSE_S;
+                var_Set( p_input, "state", val );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -10 seconds" ) );
-                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
-                demux_Control( p_input, DEMUX_SET_TIME, i_time - 10000000 );
+                val.i_time = -10000000LL;
+                var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_10SEC )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +10 seconds" ) );
-                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
-                demux_Control( p_input, DEMUX_SET_TIME, i_time + 10000000 );
+                val.i_time = 10000000LL;
+                var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -1 minute" ) );
-                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
-                demux_Control( p_input, DEMUX_SET_TIME, i_time - 60000000 );
+                val.i_time = -60000000LL;
+                var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_1MIN )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +1 minute" ) );
-                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
-                demux_Control( p_input, DEMUX_SET_TIME, i_time + 60000000 );
+                val.i_time = 60000000LL;
+                var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -5 minutes" ) );
-                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
-                demux_Control( p_input, DEMUX_SET_TIME, i_time - 300000000 );
+                val.i_time = -300000000LL;
+                var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_5MIN )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +5 minutes" ) );
-                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
-                demux_Control( p_input, DEMUX_SET_TIME, i_time + 300000000 );
+                val.i_time = 300000000LL;
+                var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_NEXT )
             {

@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: faad.c,v 1.1 2003/11/03 22:30:15 fenrir Exp $
+ * $Id: faad.c,v 1.2 2003/11/04 02:23:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -320,18 +320,6 @@ static int  EndDecoder    ( decoder_t *p_dec )
 
     return VLC_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
