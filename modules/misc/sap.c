@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.50 2004/01/22 01:14:50 sigmunau Exp $
+ * $Id: sap.c,v 1.51 2004/01/25 18:53:07 gbazin Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -104,23 +104,19 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    add_category_hint( N_("SAP"), NULL, VLC_TRUE );
-        add_string( "sap-addr", NULL, NULL,
-                     SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
-
-        add_bool( "sap-ipv4", 1 , NULL,
-                     SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE);
-
-        add_bool( "sap-ipv6", 0 , NULL,
-                   SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, VLC_TRUE);
-
-        add_string( "sap-ipv6-scope", "8" , NULL,
-                    SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
-
-        add_integer( "sap-timeout", 1800, NULL,
-                     SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE);
-
     set_description( _("SAP interface") );
+
+    add_string( "sap-addr", NULL, NULL,
+                SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
+    add_bool( "sap-ipv4", 1 , NULL,
+               SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE);
+    add_bool( "sap-ipv6", 0 , NULL,
+              SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, VLC_TRUE);
+    add_string( "sap-ipv6-scope", "8" , NULL,
+                SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
+    add_integer( "sap-timeout", 1800, NULL,
+                 SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE);
+
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();

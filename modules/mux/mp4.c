@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.12 2004/01/25 13:29:04 gbazin Exp $
+ * $Id: mp4.c,v 1.13 2004/01/25 18:53:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin at videolan dot org>
@@ -62,8 +62,8 @@ static int Mux      ( sout_mux_t * );
 vlc_module_begin();
     set_description( _("MP4/MOV muxer") );
 
-    add_category_hint( "MP4/MOV muxer", NULL, VLC_TRUE );
-        add_bool( "mp4-faststart", 1, NULL, FASTSTART_TEXT, FASTSTART_LONGTEXT, VLC_TRUE );
+    add_bool( "mp4-faststart", 1, NULL, FASTSTART_TEXT, FASTSTART_LONGTEXT,
+              VLC_TRUE );
 
     set_capability( "sout mux", 5 );
     add_shortcut( "mp4" );

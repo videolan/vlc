@@ -2,7 +2,7 @@
  * macosx.m: MacOS X module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.17 2004/01/25 17:01:57 murray Exp $
+ * $Id: macosx.m,v 1.18 2004/01/25 18:53:07 gbazin Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -61,7 +61,6 @@ vlc_module_begin();
     add_submodule();
         set_capability( "video output", 200 );
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );
-        add_category_hint( N_("Video"), NULL, VLC_FALSE );
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT, VLC_FALSE );
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL, OPAQUENESS_TEXT,
             OPAQUENESS_LONGTEXT, VLC_TRUE );

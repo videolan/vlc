@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.39 2003/12/22 02:24:52 sam Exp $
+ * $Id: freetype.c,v 1.40 2004/01/25 18:53:07 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -105,13 +105,16 @@ static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
                                    N_("Large"), N_("Larger") };
 
 vlc_module_begin();
-    add_category_hint( N_("Fonts"), NULL, VLC_FALSE );
-    add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT, VLC_FALSE );
-    add_integer( "freetype-fontsize", 0, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_TRUE );
-    add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT, FONTSIZER_LONGTEXT,
-                 VLC_FALSE );
-        change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
     set_description( _("freetype2 font renderer") );
+
+    add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
+              VLC_FALSE );
+    add_integer( "freetype-fontsize", 0, NULL, FONTSIZE_TEXT,
+                 FONTSIZE_LONGTEXT, VLC_TRUE );
+    add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
+                 FONTSIZER_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
+
     set_capability( "text renderer", 100 );
     add_shortcut( "text" );
     set_callbacks( Create, Destroy );

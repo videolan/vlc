@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.18 2003/12/22 14:32:56 sam Exp $
+ * $Id: pda.c,v 1.19 2004/01/25 18:53:07 gbazin Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -63,9 +63,8 @@ gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
-//    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, VLC_TRUE );
     set_description( _("PDA Linux Gtk2+ interface") );
+//    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, VLC_TRUE );
     set_capability( "interface", 70 );
     set_callbacks( Open, Close );
     add_shortcut( "pda" );

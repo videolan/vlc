@@ -2,7 +2,7 @@
  * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: coreaudio.c,v 1.9 2004/01/25 17:58:29 murray Exp $
+ * $Id: coreaudio.c,v 1.10 2004/01/25 18:53:07 gbazin Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -224,7 +224,6 @@ vlc_module_begin();
     set_description( _("CoreAudio output") );
     set_capability( "audio output", 100 );
     set_callbacks( Open, Close );
-    add_category_hint( N_("Audio"), NULL, VLC_FALSE );
     add_integer( "coreaudio-dev", -1, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE ); 
 vlc_module_end();
 

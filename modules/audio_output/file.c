@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.26 2004/01/25 17:58:29 murray Exp $
+ * $Id: file.c,v 1.27 2004/01/25 18:53:07 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -105,14 +105,15 @@ static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
 #define FILE_LONGTEXT N_("File to which the audio samples will be written to")
 
 vlc_module_begin();
-    add_category_hint( N_("Audio"), NULL, VLC_FALSE );
+    set_description( N_("File audio output") );
+
     add_string( "audiofile-format", "s16", NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, VLC_TRUE );
         change_string_list( format_list, 0, 0 );
     add_file( "audiofile", "audiofile.wav", NULL, FILE_TEXT,
               FILE_LONGTEXT, VLC_FALSE );
     add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, VLC_TRUE );
-    set_description( N_("File audio output") );
+
     set_capability( "audio output", 0 );
     add_shortcut( "file" );
     add_shortcut( "audiofile" );

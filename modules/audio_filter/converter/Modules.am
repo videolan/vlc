@@ -5,6 +5,7 @@ SOURCES_float32tou8 = float32tou8.c
 SOURCES_a52tospdif = a52tospdif.c
 SOURCES_a52tofloat32 = a52tofloat32.c
 SOURCES_dtstospdif = dtstospdif.c
+SOURCES_dtstofloat32 = dtstofloat32.c
 SOURCES_fixed32tos16 = fixed32tos16.c
 SOURCES_s16tofixed32 = s16tofixed32.c
 SOURCES_fixed32tofloat32 = fixed32tofloat32.c

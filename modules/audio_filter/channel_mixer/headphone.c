@@ -3,7 +3,7 @@
  *               -> gives the feeling of a real room with a simple headphone
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: headphone.c,v 1.6 2003/12/20 22:57:36 babal Exp $
+ * $Id: headphone.c,v 1.7 2004/01/25 18:53:06 gbazin Exp $
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
  *
@@ -59,10 +59,10 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
      "distance between front left speaker and listener in meters.")
 
 vlc_module_begin();
-    add_category_hint( N_("headphone"), MODULE_DESCRIPTION, VLC_FALSE );
+    set_description( N_("headphone channel mixer with virtual spatialization effect") );
+
     add_integer( "headphone-dim", 10, NULL, HEADPHONE_DIM_TEXT,
                  HEADPHONE_DIM_LONGTEXT, VLC_FALSE );
-    set_description( N_("headphone channel mixer with virtual spatialization effect") );
 
     set_capability( "audio filter", 0 );
     set_callbacks( Create, Destroy );
