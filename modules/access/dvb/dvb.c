@@ -613,6 +613,7 @@ int ioctl_UnsetDMXFilter(input_thread_t * p_input, int demux)
 #   endif
         return -1;
     }
+    msg_Dbg( p_input, "ioctl_UnsetDMXFilter closing demux %d", demux);
     close(demux);
     return 0;
 }
