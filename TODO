@@ -14,7 +14,7 @@ Description: Fix backwards moves
  Sometimes the frames seem to go backwards for a short period of
  time. This is due to the output methods and is known to happen
  with the x11 and SDL plugins.
-Status: Todo
+Status: Done 27 Nov 2000 (Meuuh)
 
 Task: 0x3d
 Difficulty: Easy
@@ -149,6 +149,25 @@ Description: SPU error recovery
  The SPU decoder does not behave very well when a packet is missed or when
  it gets the stream at the middle of an SPU packet. Make it more error-
  friendly.
+Status: Todo
+
+Task: 0x2b
+Difficulty: Hard
+Urgency: Wishlist
+Description: Shoot the TODO list on the web site
+ The TODO list on the web site hasn't been updated for months. We may
+ wonder then why the hell to we put a TODO list on the web site ? Maybe
+ we'd better shoot it in the head, that would make its suffering end.
+Status: Todo
+
+Task: 0x2a
+Difficulty: Guru
+Urgency: Critical
+Description: Buy a new brain for Sam
+ Sam likes to show that he is a good developer, and for a good developer
+ hexadecimal notation really rules, though nobody really needs it. In this
+ TODO list, Sam has forgotten that 0x29 + 1 != 0x30, but 0x2a ! So, please
+ do something, and send your donations to sam@via.ecp.fr. Thanks for him.
 Status: Todo
 
 Task: 0x29

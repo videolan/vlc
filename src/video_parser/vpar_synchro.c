@@ -48,13 +48,19 @@
  * tau[I,P,B]   : Mean time to decode an [I,P,B] picture.
  * tauYUV       : Mean time to render a picture (given by the video_output).
  * tau´[I,P,B] = 2 * tau[I,P,B] + tauYUV
- *              : Mean time + typical difference (estimated to tau, that
+ *              : Mean time + typical difference (estimated to tau/2, that
  *                needs to be confirmed) + render time.
  * DELTA        : A given error margin.
  *
- * 3. Decoding of an I picture
+ * 3. General considerations
+ *    ======================
+ * We define to types of machines :
+ *      2T > tauP  : machines capable of decoding all P pictures
+ *      14T > tauI : machines capable of decoding all I pictures
+ *
+ * 4. Decoding of an I picture
  *    ========================
- * On fast machines (ie. those who can decode all Is), we decode all I.
+ * On fast machines, we decode all I's.
  * Otherwise :
  * We can decode an I picture if we simply have enough time to decode it 
  * before displaying :
@@ -62,13 +68,13 @@
  *
  * 4. Decoding of a P picture
  *    =======================
- * On fast machines (ie. those who can decode all Ps), we decode all P.
+ * On fast machines, we decode all P's.
  * Otherwise :
  * First criterion : have time to decode it.
  *      t2 - t > tau´P + DELTA
  *
- * Second criterion : it shouldn't prevent us from decoding the forthcoming I
- * picture, which is more important.
+ * Second criterion : it shouldn't prevent us from displaying the forthcoming
+ * I picture, which is more important.
  *      t12 - t > tau´P + tau´I + DELTA
  *
  * 5. Decoding of a B picture
@@ -76,20 +82,9 @@
  * First criterion : have time to decode it.
  *      t1 - t > tau´B + DELTA
  *
- * Second criterion : it shouldn't prevent us from decoding all P pictures
- * until the next I, which are more important.
+ * Second criterion : it shouldn't prevent us from displaying the forthcoming
+ * P picture, which is more important.
  *      t4 - t > tau´B + tau´P + DELTA
- *      [...]
- *      t10 - t > tau´B + 4 * tau´P + DELTA
- * It is possible to demonstrate that if the first and the last inequations
- * are verified, the inequations in between will be verified too.
- *
- * Third criterion : it shouldn't prevent us from decoding the forthcoming I
- * picture, which is more important.
- *      t12 - t > tau´B + 4 * tau´P + tau´I + DELTA
- *
- * If STATS is defined, the counters in p_vpar->synchro will refer to the
- * number of failures of these inequations.
  *
  * I hope you will have a pleasant flight and do not forget your life
  * jacket.
@@ -136,9 +131,7 @@ static int  SynchroType( void );
 static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type );
 
 /* Error margins */
-#define DELTA_I                 (int)(0.010*CLOCK_FREQ)
-#define DELTA_P                 (int)(0.010*CLOCK_FREQ)
-#define DELTA_B                 (int)(0.060*CLOCK_FREQ)
+#define DELTA                   (int)(0.060*CLOCK_FREQ)
 
 #define DEFAULT_NB_P            5
 #define DEFAULT_NB_B            1
@@ -227,14 +220,14 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 #define S                           p_vpar->synchro
         /* VPAR_SYNCHRO_DEFAULT */
         mtime_t         now, pts, period, tau_yuv;
-        boolean_t       b_decode = 0, b_decode2;
+        boolean_t       b_decode = 0;
 
         now = mdate();
         period = 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
 
-        //vlc_mutex_lock( &p_vpar->p_vout->change_lock );
+        vlc_mutex_lock( &p_vpar->p_vout->change_lock );
         tau_yuv = p_vpar->p_vout->render_time;
-        //vlc_mutex_unlock( &p_vpar->p_vout->change_lock );
+        vlc_mutex_unlock( &p_vpar->p_vout->change_lock );
 
         vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
 
@@ -242,7 +235,8 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         {
         case I_CODING_TYPE:
             /* Stream structure changes */
-            S.i_n_p = S.i_eta_p || DEFAULT_NB_P;
+            if( S.i_n_p )
+                S.i_n_p = S.i_eta_p;
 
             if( S.backward_pts )
             {
@@ -255,14 +249,15 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 
             b_decode = ( (1 + S.i_n_p * (S.i_n_b + 1)) * period > 
                            S.p_tau[I_CODING_TYPE] ) ||
-                       ( (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA_I) );
+                       ( (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA) );
             if( !b_decode )
-                intf_Msg("vpar synchro: trashing I\n");
+                intf_WarnMsg( 3, "vpar synchro warning: trashing I\n" );
             break;
 
         case P_CODING_TYPE:
             /* Stream structure changes */
-            S.i_n_b = S.i_eta_b || DEFAULT_NB_B;
+            if( S.i_n_b )
+                S.i_n_b = S.i_eta_b;
             if( S.i_eta_p + 1 > S.i_n_p )
                 S.i_n_p++;
 
@@ -277,17 +272,18 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 
             if( (S.i_n_b + 1) * period > S.p_tau[P_CODING_TYPE] )
             {
+                /* Security in case we're _really_ late */
                 b_decode = (pts - now > 0);
             }
             else
             {
-                b_decode = (pts - now) > (TAU_PRIME(P_CODING_TYPE) + DELTA_P);
+                b_decode = (pts - now) > (TAU_PRIME(P_CODING_TYPE) + DELTA);
                 /* next I */
                 b_decode &= (pts - now
                               + period
                           * ( (S.i_n_p - S.i_eta_p - 1) * (1 + S.i_n_b) - 1 ))
                             > (TAU_PRIME(P_CODING_TYPE)
-                                + TAU_PRIME(I_CODING_TYPE) + DELTA_P);
+                                + TAU_PRIME(I_CODING_TYPE) + DELTA);
             }
             break;
 
@@ -300,51 +296,25 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 
             if( (S.i_n_b + 1) * period > S.p_tau[P_CODING_TYPE] )
             {
-                b_decode = (pts - now) > (TAU_PRIME(B_CODING_TYPE) + DELTA_B);
-#ifdef STATS
-                S.i_B_self += !b_decode;
-#endif
+                b_decode = (pts - now) > (TAU_PRIME(B_CODING_TYPE) + DELTA);
+
                 /* Remember that S.i_eta_b is for the moment only eta_b - 1. */
                 if( S.i_eta_p != S.i_n_p ) /* next P */
                 {
-                    b_decode2 = (pts - now
-                                  + period
-                                  * ( 2 * S.i_n_b - S.i_eta_b - 1))
-                                    > (TAU_PRIME(B_CODING_TYPE)
-                                        + TAU_PRIME(P_CODING_TYPE) + DELTA_B);
-                    b_decode &= b_decode2;
-#ifdef STATS
-                    S.i_B_next += !b_decode2;
-#endif
+                    b_decode &= (pts - now
+                                 + period
+                                 * ( 2 * S.i_n_b - S.i_eta_b - 1))
+                                   > (TAU_PRIME(B_CODING_TYPE)
+                                       + TAU_PRIME(P_CODING_TYPE) + DELTA);
                 }
-                if( S.i_eta_p < S.i_n_p - 1 ) /* last P */
+                else /* next I */
                 {
-                    b_decode2 = (pts - now
-                                  + period
-                                  * ( (S.i_n_p - S.i_eta_p) * (1 + S.i_n_b)
-                                        + S.i_n_b - (S.i_eta_b + 1) + 1))
-                                    > (TAU_PRIME(B_CODING_TYPE)
-                                        + (S.i_n_p - S.i_eta_p)
-                                        * TAU_PRIME(P_CODING_TYPE)
-                                        + DELTA_B);
-                    b_decode &= b_decode2;
-#ifdef STATS
-                    S.i_B_last += !b_decode2;
-#endif
+                    b_decode &= (pts - now
+                                 + period
+                                 * ( 2 * S.i_n_b - S.i_eta_b - 1))
+                                   > (TAU_PRIME(B_CODING_TYPE)
+                                       + TAU_PRIME(I_CODING_TYPE) + DELTA);
                 }
-                b_decode2 = (pts - now
-                              + period
-                              * ( (S.i_n_p - S.i_eta_p + 1) * (1 + S.i_n_b)
-                                        + S.i_n_b - (S.i_eta_b + 1) + 1 ))
-                                    > (TAU_PRIME(B_CODING_TYPE)
-                                        + (S.i_n_p - S.i_eta_p)
-                                        * TAU_PRIME(P_CODING_TYPE)
-                                        + TAU_PRIME(I_CODING_TYPE)
-                                        + DELTA_B);
-                b_decode &= b_decode2;
-#ifdef STATS
-                S.i_B_I += !b_decode2;
-#endif
             }
             else
             {
@@ -366,6 +336,9 @@ void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
                         int i_structure )
 {
     SynchroNewPicture( p_vpar, i_coding_type );
+#ifdef STATS
+    p_vpar->synchro.i_trashed_pic++;
+#endif
 }
 
 /*****************************************************************************
@@ -499,15 +472,17 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
     case I_CODING_TYPE:
         p_vpar->synchro.i_eta_p = p_vpar->synchro.i_eta_b = 0;
 #ifdef STATS
-        intf_Msg( "vpar synchro stats: I(%lld) P(%lld) B(%lld)[%d:%d:%d:%d] YUV(%lld)\n",
+        intf_Msg( "vpar synchro stats: I(%lld) P(%lld)[%d] B(%lld)[%d] YUV(%lld) : %d/%d\n",
                   p_vpar->synchro.p_tau[I_CODING_TYPE],
                   p_vpar->synchro.p_tau[P_CODING_TYPE],
+                  p_vpar->synchro.i_n_p,
                   p_vpar->synchro.p_tau[B_CODING_TYPE],
-                  p_vpar->synchro.i_B_self, p_vpar->synchro.i_B_next,
-                  p_vpar->synchro.i_B_last, p_vpar->synchro.i_B_I,
-                  p_vpar->p_vout->render_time );
-        p_vpar->synchro.i_B_self = p_vpar->synchro.i_B_next =
-            p_vpar->synchro.i_B_last = p_vpar->synchro.i_B_I = 0;
+                  p_vpar->synchro.i_n_b,
+                  p_vpar->p_vout->render_time,
+                  1 + p_vpar->synchro.i_n_p * (1 + p_vpar->synchro.i_n_b) -
+                  p_vpar->synchro.i_trashed_pic,
+                  1 + p_vpar->synchro.i_n_p * (1 + p_vpar->synchro.i_n_b) );
+        p_vpar->synchro.i_trashed_pic = 0;
 #endif
         break;
     case P_CODING_TYPE:
@@ -527,7 +502,8 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
         {
             if( p_pes->i_pts < p_vpar->synchro.current_pts )
             {
-                intf_ErrMsg("vpar warning: pts_date < current_date\n");
+                intf_WarnMsg( 2,
+                        "vpar synchro warning: pts_date < current_date\n" );
             }
             p_vpar->synchro.current_pts = p_pes->i_pts;
             p_pes->b_has_pts = 0;
@@ -547,7 +523,8 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
         {
             if( p_vpar->synchro.backward_pts < p_vpar->synchro.current_pts )
             {
-                intf_ErrMsg("vpar warning: backward_date < current_date\n");
+                intf_WarnMsg( 2,
+                        "vpar warning: backward_date < current_date\n" );
             }
             p_vpar->synchro.current_pts = p_vpar->synchro.backward_pts;
             p_vpar->synchro.backward_pts = 0;

@@ -18,7 +18,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --enable-debug          Enable debug mode (default is no)"
 ac_help="$ac_help
-  --enable-stats          Enable printing of statistics (default is yes)"
+  --enable-stats          Enable printing of statistics (default is no)"
 ac_help="$ac_help
   --enable-optimizations  Enable compiler optimizations (default enabled)"
 ac_help="$ac_help
@@ -40,7 +40,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --enable-x11            X11 support (default enabled)"
 ac_help="$ac_help
-  --enable-alsa	     Alsa sound drivers supprt (default disabled)"
+  --enable-alsa   Alsa sound drivers supprt (Only for linux) (default disabled)"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -3056,6 +3056,7 @@ fi
 
 
 PLUGINS=${PLUGINS}"yuv ";
+OPTIMS=1;
 
 ARCH=${host_cpu}
 # Check whether --enable-ppro or --disable-ppro was given.
@@ -3079,13 +3080,13 @@ fi
 # Check whether --enable-stats or --disable-stats was given.
 if test "${enable_stats+set}" = set; then
   enableval="$enable_stats"
-   if test x$enableval != xno; then STATS=1; fi 
+   if test x$enableval = xyes; then STATS=1; fi 
 fi
 
 # Check whether --enable-optimizations or --disable-optimizations was given.
 if test "${enable_optimizations+set}" = set; then
   enableval="$enable_optimizations"
-   if test x$enableval != xno; then OPTIMS=1; fi 
+   if test x$enableval = xno; then OPTIMS=0; fi 
 fi
 
 
@@ -3158,17 +3159,17 @@ if test "${enable_alsa+set}" = set; then
   enableval="$enable_alsa"
   if test x$enable_alsa = xyes; then ac_safe=`echo "sys/asoundlib.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for sys/asoundlib.h""... $ac_c" 1>&6
-echo "configure:3162: checking for sys/asoundlib.h" >&5
+echo "configure:3163: checking for sys/asoundlib.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3167 "configure"
+#line 3168 "configure"
 #include "confdefs.h"
 #include <sys/asoundlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3172: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3173: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3185,7 +3186,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
-echo "configure:3189: checking for main in -lasound" >&5
+echo "configure:3190: checking for main in -lasound" >&5
 ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3193,14 +3194,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lasound  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 3197 "configure"
+#line 3198 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:3204: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:3205: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else

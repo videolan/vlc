@@ -771,7 +771,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
 
         if(i_ts_payload_size < PES_HEADER_SIZE)
         {
-            intf_DbgMsg("Code never tested encountered, WARNING ! (benny)\n");
+            intf_WarnMsg(3, "Code never tested encountered, WARNING ! (benny)\n");
             if( !p_pes->p_pes_header_save )
             {
                 p_pes->p_pes_header_save = malloc(PES_HEADER_SIZE);

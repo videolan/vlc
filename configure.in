@@ -64,6 +64,7 @@ AC_HEADER_TIME
 
 dnl default plugins 
 PLUGINS=${PLUGINS}"yuv ";
+OPTIMS=1;
 
 ARCH=${host_cpu}
 AC_ARG_ENABLE(ppro,
@@ -76,11 +77,11 @@ AC_ARG_ENABLE(debug,
 [  --enable-debug          Enable debug mode (default is no)],
 [ if test x$enableval = xyes; then DEBUG=1; fi ])
 AC_ARG_ENABLE(stats,
-[  --enable-stats          Enable printing of statistics (default is yes)],
-[ if test x$enableval != xno; then STATS=1; fi ])
+[  --enable-stats          Enable printing of statistics (default is no)],
+[ if test x$enableval = xyes; then STATS=1; fi ])
 AC_ARG_ENABLE(optimizations,
 [  --enable-optimizations  Enable compiler optimizations (default enabled)],
-[ if test x$enableval != xno; then OPTIMS=1; fi ])
+[ if test x$enableval = xno; then OPTIMS=0; fi ])
 
 SYS=${host_os}
 

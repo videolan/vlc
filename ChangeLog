@@ -2,7 +2,8 @@
 
   * Minor changes in the Debian files.
   * Fixed fps display.
-  * Fixed MPEG1 video decoding.
+  * Fixed MPEG1 video decoding. We don't read MPEG 1 PS files for the
+    moment.
   * Fixed a 100% cpu usage bug, in the dummy aout.
   * Added a 'f' shortcut to switch between Windowed and Fullscreen
     mode.
@@ -18,6 +19,10 @@
   * Added --enable-debug, --enable-stats, and --disable-optims in the
     GNU configure stuff.
   * Added alsa audio support (plugin)  
+  * vlc is now compiled without the STATS mode by default.
+  * Fixed a bug which made frames go backwards with some displays (the
+    video_decoder thread is now niced).
+  * Added intf_WarnMsg(), and made use of it in the most needed places.
 
 Mon, 28 Aug 2000 02:34:18 +0200
 0.1.99i :

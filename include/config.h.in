@@ -399,6 +399,9 @@
 /* Maximum range of values out of the IDCT + motion compensation. */
 #define VDEC_CROPRANGE                  2048
 
+/* Nice increments for decoders -- necessary for x11 scheduling */
+#define VDEC_NICE						3
+
 /*****************************************************************************
  * Generic decoder configuration
  *****************************************************************************/

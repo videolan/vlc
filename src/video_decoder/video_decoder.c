@@ -183,6 +183,15 @@ int vdec_InitThread( vdec_thread_t *p_vdec )
     }
 #endif
 
+#ifdef VDEC_SMP
+    /* Re-nice ourself */
+    if( nice(VDEC_NICE) == -1 )
+    {
+        intf_WarnMsg( 2, "vdec warning : couldn't nice() (%s)\n",
+                      strerror(errno) );
+    }
+#endif
+
     /* Mark thread as running and return */
     intf_DbgMsg("vdec debug: InitThread(%p) succeeded\n", p_vdec);
     return( 0 );

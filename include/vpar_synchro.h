@@ -65,7 +65,7 @@ typedef struct video_synchro_s
     mtime_t         backward_pts, current_pts;
 
 #ifdef STATS
-    unsigned int    i_B_self, i_B_next, i_B_last, i_B_I;
+    unsigned int    i_trashed_pic;
 #endif
 } video_synchro_t;
 

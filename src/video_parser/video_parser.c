@@ -32,6 +32,8 @@
 #include <unistd.h>                                              /* getpid() */
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
+#include <errno.h>
+#include <string.h>
 
 #include "config.h"
 #include "common.h"
@@ -262,6 +264,13 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->pp_vdec[0]->b_die = 0;
     p_vpar->pp_vdec[0]->b_error = 0;
     p_vpar->pp_vdec[0]->p_vpar = p_vpar;
+
+    /* Re-nice ourself */
+    if( nice(VDEC_NICE) == -1 )
+    {
+        intf_WarnMsg( 2, "vpar warning : couldn't nice() (%s)\n",
+                      strerror(errno) );
+    }
 #endif
 
     /* Initialize lookup tables */

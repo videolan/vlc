@@ -176,10 +176,8 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     p_vout->init_display_date   = mdate();
     p_vout->render_time         = 10000;
 
-#ifdef STATS
     /* Initialize statistics fields */
     p_vout->c_fps_samples       = 0;
-#endif
 
     /* Initialize buffer index */
     p_vout->i_buffer_index      = 0;
@@ -993,10 +991,9 @@ static void RunThread( vout_thread_t *p_vout)
 
         if( p_pic )
         {
-#ifdef STATS
             /* Computes FPS rate */
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
-#endif
+
             if( display_date < current_date )
             {
                 /* Picture is late: it will be destroyed and the thread
@@ -1012,7 +1009,8 @@ static void RunThread( vout_thread_t *p_vout)
                     p_pic->i_status = DESTROYED_PICTURE;
                     p_vout->i_pictures--;
                 }
-                intf_DbgMsg( "warning: late picture skipped (%p)\n", p_pic );
+                intf_WarnMsg( 3,
+                        "warning: late picture skipped (%p)\n", p_pic );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
 		continue;
@@ -1687,11 +1685,8 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#if defined(STATS) || defined(DEBUG)
     char        psz_buffer[256];                            /* string buffer */
-#endif
 
-#ifdef STATS
     /*
      * Print FPS rate in upper right corner
      */
@@ -1712,7 +1707,6 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
     sprintf( psz_buffer, "%ld frames, render: %ldus",
              (long) p_vout->c_fps_samples, (long) p_vout->render_time );
     Print( p_vout, 0, 0, LEFT_RALIGN, TOP_RALIGN, psz_buffer );
-#endif
 
 #ifdef DEBUG
     /*

@@ -188,12 +188,10 @@ typedef struct vout_thread_s
     mtime_t             last_idle_date;            /* last idle display date */
     mtime_t             init_display_date;
 
-#ifdef STATS
     /* Statistics - these numbers are not supposed to be accurate, but are a
      * good indication of the thread status */
     count_t             c_fps_samples;                     /* picture counts */
     mtime_t             p_fps_sample[VOUT_FPS_SAMPLES]; /* FPS samples dates */
-#endif
 
     /* Rendering buffers */
     int                 i_buffer_index;                      /* buffer index */
