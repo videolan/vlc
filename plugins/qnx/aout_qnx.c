@@ -180,6 +180,7 @@ static int aout_Open( aout_thread_t *p_aout )
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
     int i_ret;
+    int i_bytes_per_sample;
     snd_pcm_channel_info_t pi;
     snd_pcm_channel_params_t pp;
 
@@ -195,15 +196,14 @@ static int aout_SetFormat( aout_thread_t *p_aout )
         return( 1 );
     }
 
-    pp.mode       = SND_PCM_MODE_STREAM;
+    pp.mode       = SND_PCM_MODE_BLOCK;
     pp.channel    = SND_PCM_CHANNEL_PLAYBACK;
-    pp.start_mode = SND_PCM_START_DATA;
+    pp.start_mode = SND_PCM_START_FULL;
     pp.stop_mode  = SND_PCM_STOP_STOP;
 
-    pp.buf.stream.queue_size = pi.max_fragment_size;
-    pp.buf.stream.fill       = SND_PCM_FILL_NONE;
-    pp.buf.stream.max_fill   = 0;
-
+    pp.buf.block.frags_max   = 1;
+    pp.buf.block.frags_min   = 1;
+    
     pp.format.interleave     = 1;
     pp.format.rate           = p_aout->l_rate;
     pp.format.voices         = p_aout->i_channels;
@@ -212,12 +212,18 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     {
         case AOUT_FMT_S16_LE:
             pp.format.format = SND_PCM_SFMT_S16_LE;
+            i_bytes_per_sample = 2;
             break;
 
         default:
             pp.format.format = SND_PCM_SFMT_S16_BE;
+            i_bytes_per_sample = 2;
             break;
     }
+
+    pp.buf.block.frag_size =
+        (((s64)p_aout->l_rate * AOUT_BUFFER_DURATION) / 1000000) *
+        p_aout->i_channels * i_bytes_per_sample;
 
     /* set parameters */
     if( ( i_ret = snd_pcm_plugin_params( p_aout->p_sys->p_pcm_handle,
