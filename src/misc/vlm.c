@@ -881,7 +881,7 @@ static int ExecuteCommand( vlm_t *vlm, char *command , vlm_message_t **p_message
     }
     else
     {
-        message = vlm_MessageNew( p_command[0] , "Unknown comand" );
+        message = vlm_MessageNew( p_command[0] , "Unknown command" );
         i_return = 1;
         goto end_seq;
     }
