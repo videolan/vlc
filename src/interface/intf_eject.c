@@ -2,10 +2,11 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.9 2002/04/04 22:08:05 massiot Exp $
+ * $Id: intf_eject.c,v 1.10 2002/05/06 22:59:46 massiot Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
+ *         Jon Lech Johanson <jon-vl@nanocrew.net> for Darwin
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,7 +82,6 @@ static int EjectSCSI ( int i_fd );
  *****************************************************************************/
 int intf_Eject( const char *psz_device )
 {
-    int i_fd;
     int i_ret;
 
 #ifdef SYS_DARWIN
@@ -99,7 +99,7 @@ int intf_Eject( const char *psz_device )
     if( ( psz_disk = (char *)strstr( psz_device, "disk" ) ) != NULL &&
         strlen( psz_disk ) > 4 )
     {
-#define EJECT_CMD "disktool -e %s 0"
+#define EJECT_CMD "/usr/sbin/disktool -e %s 0"
         snprintf( sz_cmd, sizeof(sz_cmd), EJECT_CMD, psz_disk );
 #undef EJECT_CMD
 
@@ -127,7 +127,9 @@ int intf_Eject( const char *psz_device )
 
     return 1;
 
-#endif
+#else /* SYS_DARWIN */
+
+    int i_fd;
 
     /* This code could be extended to support CD/DVD-ROM chargers */
 
@@ -164,6 +166,7 @@ int intf_Eject( const char *psz_device )
     close( i_fd );
 
     return i_ret;
+#endif
 }
 
 /* The following functions are local */

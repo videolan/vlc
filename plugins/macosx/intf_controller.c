@@ -2,7 +2,7 @@
  * intf_controller.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.c,v 1.6 2002/04/23 03:21:21 jlj Exp $
+ * $Id: intf_controller.c,v 1.7 2002/05/06 22:59:46 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -153,6 +153,32 @@
 - (IBAction)next:(id)sender
 {
     [o_intf playlistNext];
+}
+
+- (IBAction)mute:(id)sender
+{
+    NSMenuItem * item = (NSMenuItem *)sender;
+
+    [o_intf mute];
+
+    if( p_main->p_intf->p_sys->b_mute )
+    {
+        [item setState:NSOnState];
+    }
+    else
+    {
+        [item setState:NSOffState];
+    }
+}
+
+- (IBAction)fullscreen:(id)sender
+{
+    [o_intf fullscreen];
+}
+
+- (IBAction)eject:(id)sender
+{
+    [o_intf eject];
 }
 
 - (IBAction)timesliderUpdate:(id)slider

@@ -2,10 +2,11 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.c,v 1.10 2002/04/23 03:21:21 jlj Exp $
+ * $Id: intf_vlc_wrapper.c,v 1.11 2002/05/06 22:59:46 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +27,19 @@
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
 
+#include <IOKit/storage/IOCDMedia.h>
+#include <IOKit/storage/IODVDMedia.h>
+
 #include <videolan/vlc.h>
 
 #include "interface.h"
 #include "intf_playlist.h"
+#include "intf_eject.h"
 
 #include "video.h"
 #include "video_output.h"
+#include "audio_output.h"
+
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
@@ -77,6 +84,28 @@ static Intf_VLCWrapper *o_intf = nil;
         vout_InitBank();
 
         return( 1 );
+    }
+
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+
+        if( !p_input_bank->pp_input[0]->b_die )
+        {
+            /* New input or stream map change */
+            if( p_input_bank->pp_input[0]->stream.b_changed ||
+                p_main->p_intf->p_sys->i_part !=
+                p_input_bank->pp_input[0]->stream.p_selected_area->i_part )
+            {
+                [self setupMenus];
+            }
+        }
+
+        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+    }
+    else
+    {
+        [self setupMenus];
     }
 
     return( 0 );
@@ -193,6 +222,47 @@ static Intf_VLCWrapper *o_intf = nil;
         p_main->p_playlist->b_stopped = 0;
         vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     }
+}
+
+- (void)mute
+{
+    if( p_aout_bank->pp_aout[0] == NULL ) return;
+
+    if( p_main->p_intf->p_sys->b_mute )
+    {
+        p_aout_bank->pp_aout[0]->i_volume = 
+                            p_main->p_intf->p_sys->i_saved_volume;
+    }
+    else
+    {
+        p_main->p_intf->p_sys->i_saved_volume = 
+                            p_aout_bank->pp_aout[0]->i_volume;
+        p_aout_bank->pp_aout[0]->i_volume = 0;
+    }
+    p_main->p_intf->p_sys->b_mute = !p_main->p_intf->p_sys->b_mute;
+}
+
+- (void)fullscreen
+{
+    if( p_vout_bank->pp_vout[0] != NULL )
+    {
+        p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    }
+}
+
+- (void)eject
+{
+    /* FIXME : this will only eject the first drive found */
+    NSArray * o_devices = GetEjectableMediaOfClass(kIODVDMediaClass);
+    const char * psz_device;
+
+    if ( o_devices == nil )
+    {
+        o_devices = GetEjectableMediaOfClass(kIOCDMediaClass);
+    }
+
+    psz_device = [[o_devices objectAtIndex:0] cString];
+    intf_Eject( psz_device );
 }
 
 /* playback info */
@@ -416,6 +486,27 @@ static Intf_VLCWrapper *o_intf = nil;
 
     config_PutPszVariable( "channel_server", (char*)[o_addr lossyCString] );
     config_PutIntVariable( "channel_port", i_port ); 
+}
+
+- (void)setupMenus
+{
+#if 0
+    NSMenu * o_main_menu = [NSApp mainMenu];
+    NSMenuItem * o_program_item = [o_main_menu itemWithTitle:@"Program"];
+
+    if( p_input_bank->pp_input[0] == NULL )
+    {
+        NSMenu * o_program = [o_program_item submenu];
+        [o_program_item setEnabled:0];
+        [o_program removeItemAtIndex:0];
+    }
+    else
+    {
+        NSMenu * o_program = [o_program_item submenu];
+        [o_program_item setEnabled:1];
+        [o_program removeItemAtIndex:0];
+    }
+#endif
 }
 
 @end

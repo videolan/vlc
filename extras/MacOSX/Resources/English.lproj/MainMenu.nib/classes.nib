@@ -3,7 +3,10 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {
+                eject = id; 
                 faster = id; 
+                fullscreen = id; 
+                mute = id; 
                 next = id; 
                 pause = id; 
                 play = id; 

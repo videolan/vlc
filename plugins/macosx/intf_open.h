@@ -2,7 +2,7 @@
  * intf_open.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_open.h,v 1.1 2002/04/23 03:21:21 jlj Exp $
+ * $Id: intf_open.h,v 1.2 2002/05/06 22:59:46 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -25,6 +25,8 @@
  * Preamble
  *****************************************************************************/
 #import <Cocoa/Cocoa.h>
+
+NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
 /*****************************************************************************
  * Intf_Open interface

@@ -105,7 +105,7 @@
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */
-#define DEFAULT_PTS_DELAY               (mtime_t)(.2*CLOCK_FREQ)
+#define DEFAULT_PTS_DELAY               (mtime_t)(.35*CLOCK_FREQ)
 
 /*****************************************************************************
  * Audio configuration
@@ -134,7 +134,7 @@
  * - short, in order to be able to play a new song very quickly (especially a
  *   song from the interface)
  * - long, in order to perform the buffer calculations as few as possible */
-#define AOUT_BUFFER_DURATION            100000
+#define AOUT_BUFFER_DURATION            90000
 
 /*****************************************************************************
  * Video configuration

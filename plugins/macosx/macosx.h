@@ -2,7 +2,7 @@
  * macosx.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.h,v 1.7 2002/04/25 23:07:23 massiot Exp $
+ * $Id: macosx.h,v 1.8 2002/05/06 22:59:46 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -37,6 +37,11 @@ typedef struct intf_sys_s
 {
     NSPort *o_port;
     NSAutoreleasePool *o_pool;
+
+    boolean_t b_mute;
+    int i_saved_volume;
+    
+    int i_part;
 } intf_sys_t;
 
 /*****************************************************************************
@@ -52,7 +57,7 @@ typedef struct vout_sys_s
     boolean_t b_mouse_moved;
     boolean_t b_mouse_pointer_visible;
     mtime_t i_time_mouse_last_moved;
-
+    
     CodecType i_codec;
     CGrafPtr p_qdport;
     ImageSequence i_seq;
