@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.30 2001/11/07 02:10:14 stef Exp $
+ * $Id: vout_xvideo.c,v 1.31 2001/11/27 14:31:19 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -943,11 +943,15 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
         X11ToggleMousePointer( p_vout );
     }
 
+    XSync( p_vout->p_sys->p_display, False );
+
     return( 0 );
 }
 
 static void XVideoDestroyWindow( vout_thread_t *p_vout )
 {
+    XSync( p_vout->p_sys->p_display, False );
+
     XFreeGC( p_vout->p_sys->p_display, p_vout->p_sys->yuv_gc );
     XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window );
 
@@ -992,12 +996,6 @@ static int XVideoCreateShmImage( Display* dpy, int xv_port,
                                                         0, 0 );
     p_shm_info->readOnly = False;
 
-#if 0
-    /* Mark the shm segment to be removed when there will be no more
-     * attachements, so it is automatic on process exit or after shmdt */
-    shmctl( p_shm_info->shmid, IPC_RMID, 0 );
-#endif
-
     if( !XShmAttach( dpy, p_shm_info ) )
     {
         intf_ErrMsg( "vout error: XShmAttach failed" );
@@ -1008,7 +1006,11 @@ static int XVideoCreateShmImage( Display* dpy, int xv_port,
 
     /* Send image to X server. This instruction is required, since having
      * built a Shm XImage and not using it causes an error on XCloseDisplay */
-    XFlush( dpy );
+    XSync( dpy, False );
+
+    /* Mark the shm segment to be removed when there will be no more
+     * attachements, so it is automatic on process exit or after shmdt */
+    shmctl( p_shm_info->shmid, IPC_RMID, 0 );
 
     return( 0 );
 }
@@ -1029,12 +1031,12 @@ static void XVideoDestroyShmImage( vout_thread_t *p_vout, XvImage *p_xvimage,
         return;
     }
 
+    XSync( p_vout->p_sys->p_display, False );
     XShmDetach( p_vout->p_sys->p_display, p_shm_info );/* detach from server */
 #if 0
     XDestroyImage( p_ximage ); /* XXX */
 #endif
-
-    shmctl( p_shm_info->shmid, IPC_RMID, 0 );
+    XFree( p_xvimage );
 
     if( shmdt( p_shm_info->shmaddr ) )  /* detach shared memory from process */
     {
