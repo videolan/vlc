@@ -380,7 +380,7 @@ msgstr "Débit"
 #: src/input/es_out.c:365
 #, c-format
 msgid "%d Hz"
-msgstr ""
+msgstr "%d Hz"
 
 #: src/input/es_out.c:370 modules/gui/wxwindows/v4l.cpp:401
 msgid "Bitrate"
@@ -389,7 +389,7 @@ msgstr "Débit"
 #: src/input/es_out.c:370
 #, c-format
 msgid "%d bps"
-msgstr ""
+msgstr "%d bps"
 
 #: src/input/es_out.c:375
 msgid "Bits per sample"
@@ -891,6 +891,10 @@ msgid ""
 "give the feeling that you are standing in a room with a complete 5.1 speaker "
 "set when using only a headphone."
 msgstr ""
+"Cette option vous permet de choisir un mélangeur de canaux spécifique."
+"Par exemple  le mélangeur \"headphone\" transformera toute source"
+"audio en sortie stéréo, tout en donnant l'impression que vous êtes dans"
+"une pièce avec un système 5.1 en utilisant seulement un casque."
 
 #: src/libvlc.h:169
 msgid ""
@@ -1096,6 +1100,9 @@ msgid ""
 "as the DVD or VCD device, the network interface settings or the subtitle "
 "channel."
 msgstr ""
+"Ces options vous permettent de modifier les options liées au modules "
+"d'entrée, comme le périphérique DVD ou VCD, les réglages de l'interface"
+"réseau, ou le canal de sous-titres."
 
 #: src/libvlc.h:265
 msgid "Clock reference average counter"
@@ -1105,7 +1112,8 @@ msgstr ""
 msgid ""
 "When using the PVR input (or a very irregular source), you should set this "
 "to 10000."
-msgstr ""
+msgstr "Lors de l'utilisation de l'entrée PVR ou de toute autre source très"
+"irrégulière, vous devriez régler cette valeur à 10000."
 
 #: src/libvlc.h:270
 msgid "Server port"
@@ -1330,7 +1338,7 @@ msgstr "Vide si le flux de sortie n'est pas utilisé."
 
 #: src/libvlc.h:393
 msgid "Enable streaming of all ES"
-msgstr ""
+msgstr "Activer la diffusion de tous les flux élémentaires"
 
 #: src/libvlc.h:395
 msgid "This allows you to stream all ES (video, audio and subtitles)"
@@ -1575,7 +1583,7 @@ msgstr ""
 
 #: src/libvlc.h:503 src/libvlc.h:504
 msgid "Minimize number of threads needed to run VLC"
-msgstr ""
+msgstr "Minimiser le nombre de threads nécessaires à VLC"
 
 #: src/libvlc.h:506
 msgid "Allow only one running instance of VLC"
@@ -1652,7 +1660,8 @@ msgstr ""
 
 #: src/libvlc.h:541
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
-msgstr ""
+msgstr "Ces réglages sont les attributions globales de touches de VLC"
+"\"hotkeys\"."
 
 #: src/libvlc.h:544 src/video_output/video_output.c:413
 #: modules/gui/beos/VideoOutput.cpp:1182 modules/gui/macosx/applescript.m:122
@@ -1912,115 +1921,94 @@ msgstr ""
 "Sélectionnez la combinaison de touche à utiliser pour mettre le volume à zéro"
 
 #: src/libvlc.h:599
-#, fuzzy
 msgid "Play playlist bookmark 1"
-msgstr "Joue l'élément courant de la liste de lecture"
+msgstr "Lire le favori n°1"
 
 #: src/libvlc.h:600
-#, fuzzy
 msgid "Play playlist bookmark 2"
-msgstr "Joue l'élément courant de la liste de lecture"
+msgstr "Lire le favori n°2"
 
 #: src/libvlc.h:601
-#, fuzzy
 msgid "Play playlist bookmark 3"
-msgstr "Joue l'élément courant de la liste de lecture"
+msgstr "Lire le favori n°3"
 
 #: src/libvlc.h:602
-#, fuzzy
 msgid "Play playlist bookmark 4"
-msgstr "Joue l'élément courant de la liste de lecture"
+msgstr "Lire le favori n°4"
 
 #: src/libvlc.h:603
-#, fuzzy
 msgid "Play playlist bookmark 5"
-msgstr "Joue l'élément courant de la liste de lecture"
+msgstr "Lire le favori n°5"
 
 #: src/libvlc.h:604
-#, fuzzy
 msgid "Play playlist bookmark 6"
-msgstr "Joue l'élément courant de la liste de lecture"
+msgstr "Lire le favori n°6"
 
 #: src/libvlc.h:605
-#, fuzzy
 msgid "Play playlist bookmark 7"
-msgstr "Joue l'élément courant de la liste de lecture"
+msgstr "Lire le favori n°7"
 
 #: src/libvlc.h:606
-#, fuzzy
 msgid "Play playlist bookmark 8"
-msgstr "Joue l'élément courant de la liste de lecture"
+msgstr "Lire le favori n°8"
 
 #: src/libvlc.h:607
-#, fuzzy
 msgid "Play playlist bookmark 9"
-msgstr "Joue l'élément courant de la liste de lecture"
+msgstr "Lire le favori n°9"
 
 #: src/libvlc.h:608
 msgid "Play playlist bookmark 10"
-msgstr ""
+msgstr "Lire le favori n°10"
 
 #: src/libvlc.h:609
-#, fuzzy
 msgid "Select the key to play this bookmark"
 msgstr ""
-"Sélectionnez la combinaison de touche à utiliser pour arrêter la lecture"
+"Sélectionnez la combinaison de touche à utiliser pour lire ce favori"
 
 #: src/libvlc.h:610
-#, fuzzy
 msgid "Set playlist bookmark 1"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°1"
 
 #: src/libvlc.h:611
-#, fuzzy
 msgid "Set playlist bookmark 2"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°2"
 
 #: src/libvlc.h:612
-#, fuzzy
 msgid "Set playlist bookmark 3"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°3"
 
 #: src/libvlc.h:613
-#, fuzzy
 msgid "Set playlist bookmark 4"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°4"
 
 #: src/libvlc.h:614
-#, fuzzy
 msgid "Set playlist bookmark 5"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°5"
 
 #: src/libvlc.h:615
-#, fuzzy
 msgid "Set playlist bookmark 6"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°6"
 
 #: src/libvlc.h:616
-#, fuzzy
 msgid "Set playlist bookmark 7"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°7"
 
 #: src/libvlc.h:617
-#, fuzzy
 msgid "Set playlist bookmark 8"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°8"
 
 #: src/libvlc.h:618
-#, fuzzy
 msgid "Set playlist bookmark 9"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°9"
 
 #: src/libvlc.h:619
-#, fuzzy
 msgid "Set playlist bookmark 10"
-msgstr "Élement suivant"
+msgstr "Régler le favori n°10"
 
 #: src/libvlc.h:620
-#, fuzzy
 msgid "Select the key to set this playlist bookmark"
 msgstr ""
-"Sélectionnez la combinaison de touche à utiliser pour arrêter la lecture"
+"Sélectionnez la combinaison de touche à utiliser pour régler ce favori"
 
 #: src/libvlc.h:622
 msgid ""
@@ -2209,15 +2197,15 @@ msgstr "Le message ci-dessus avait un niveau de verbosité inconnu"
 
 #: modules/access/cdda/access.c:151
 msgid "The above message had unknown cdio log level"
-msgstr ""
+msgstr "Le message ci-dessus avait un niveau de verbosité inconnu (cdio)"
 
 #: modules/access/cdda/access.c:341
 msgid "CDDB Disc ID"
-msgstr ""
+msgstr "Identifiant de disque CDDB"
 
 #: modules/access/cdda/access.c:346
 msgid "CDDB Disc Category"
-msgstr ""
+msgstr "Catégorie de disque CDDB"
 
 #: modules/access/cdda/access.c:363 modules/demux/mkv.cpp:2175
 #: modules/gui/gtk/gnome_interface.c:2448 modules/gui/gtk/gtk_interface.c:2869
@@ -2274,6 +2262,23 @@ msgid ""
 "   %Y : The year 19xx or 20xx\n"
 "   %% : a % \n"
 msgstr ""
+"Format utilisé dans le Titre de la liste de lecture, similaire aux dates"
+" Unix.\n"
+"Les spécificateurs de format commencent par %. Les spécificateurs sont : \n"
+"   %a : Artiste\n"
+"   %A : Informations sur l'album\n"
+"   %C : Categorie\n"
+"   %I : Identifiant CDDB du disque\n"
+"   %G : Genre\n"
+"   %M : MRL courant\n"
+"   %m : Numéro de catalogue du CD Audio (MCN)\n"
+"   %n : Nombre de pistes du CD\n"
+"   %p : Artiste / interprète / compositeur de la piste\n"
+"   %T : Numéro de piste\n"
+"   %s : Nombre de secondes de la piste \n"
+"   %t : Titre\n"
+"   %Y : L'année (19xx ou 20xx)\n"
+"   %% : un signe % \n"
 
 #: modules/access/cdda/cdda.c:95
 msgid ""
@@ -2286,10 +2291,19 @@ msgid ""
 "   %s : Number of seconds in this track \n"
 "   %% : a % \n"
 msgstr ""
+"Format utilisé dans le Titre de la liste de lecture, similaire aux dates"
+" Unix.\n"
+"Les spécificateurs de format commencent par %. Les spécificateurs sont : \n"
+"   %M : MRL actuel\n"
+"   %m : Numéro de catalogue du CD Audio (MCN)\n"
+"   %n : Nombre de pistes du CD\n"
+"   %T : Numéro de piste\n"
+"   %s : Nombre de secondes de la piste \n"
+"   %% : un signe % \n"
 
 #: modules/access/cdda/cdda.c:109
 msgid "cddax://[device-or-file][@[T]num]"
-msgstr ""
+msgstr "cddax://[périphérique-ou-fichier][@[T]num]"
 
 #: modules/access/cdda/cdda.c:110
 msgid "Compact Disc Digital Audio (CD-DA) input"
@@ -2306,23 +2320,24 @@ msgstr "régler le masque de déboggage pour plus de messages"
 
 #: modules/access/cdda/cdda.c:130
 msgid "Format to use in playlist \"author\" field"
-msgstr ""
+msgstr "Format à utiliser dans le champ \"auteur\" de la liste de lecture"
 
 #: modules/access/cdda/cdda.c:135
 msgid "Format to use in playlist \"title\" field when no CDDB"
-msgstr ""
+msgstr "Format à utiliser dans le champ \"titre\" quand CDDB n'est pas utilisé"
 
 #: modules/access/cdda/cdda.c:141
 msgid "Format to use in playlist \"title\" field when using CDDB"
-msgstr ""
+msgstr "Format à utiliser dans le champ \"titre\" quand CDDB est utilisé"
 
 #: modules/access/cdda/cdda.c:145
 msgid "Do CDDB lookups?"
-msgstr ""
+msgstr "Effectuer les recherches CDDB ?"
 
 #: modules/access/cdda/cdda.c:146
 msgid "If set, lookup CD-DA track information using the CDDB protocol"
-msgstr ""
+msgstr "Si cette option est activée, les informations sur le CD seront "
+"recherchées en utilisant le protocole CDDB"
 
 #: modules/access/cdda/cdda.c:151
 msgid "CDDB server"
@@ -2330,7 +2345,7 @@ msgstr "serveur CDDB"
 
 #: modules/access/cdda/cdda.c:152
 msgid "Contact this CDDB server look up CD-DA information"
-msgstr ""
+msgstr "Serveur CDDB à utiliser pour rechercher les informations sur le CD"
 
 #: modules/access/cdda/cdda.c:156
 msgid "CDDB server port"
@@ -2338,39 +2353,41 @@ msgstr "Port du serveur CDDB"
 
 #: modules/access/cdda/cdda.c:157
 msgid "CDDB server uses this port number to communicate on"
-msgstr ""
+msgstr "Port de communication utilisé par le serveur CDDB"
 
 #: modules/access/cdda/cdda.c:161 modules/access/cdda/cdda.c:162
 msgid "email address reported to CDDB server"
-msgstr ""
+msgstr "Adresse e-mail rapportée au serveur CDDB"
 
 #: modules/access/cdda/cdda.c:166
 msgid "Cache CDDB lookups?"
-msgstr ""
+msgstr "Mettre en cache les requêtes CDDB ?"
 
 #: modules/access/cdda/cdda.c:167
 msgid "If set cache CDDB information about this CD"
-msgstr ""
+msgstr "Si cette option est activée, les informations CDDB sur ce CD seront"
+"mises en cache."
 
 #: modules/access/cdda/cdda.c:171
 msgid "Contact CDDB via the HTTP protocol?"
-msgstr ""
+msgstr "Contacter la base CDDB en utilisant le protocole HTTP ?"
 
 #: modules/access/cdda/cdda.c:172
 msgid "If set, the CDDB server gets information via the CDDB HTTP protocol"
-msgstr ""
+msgstr "Si cette options est activée, le serveur CDDB enverra les informations"
+"en utilisant le protocole HTTP CDDB."
 
 #: modules/access/cdda/cdda.c:177
 msgid "CDDB server timeout"
-msgstr ""
+msgstr "Timeout du serveur CDDB"
 
 #: modules/access/cdda/cdda.c:178
 msgid "Time (in seconds) to wait for a response from the CDDB server"
-msgstr ""
+msgstr "Temps (en secondes) d'attente d'une réponse du serveur CDDB"
 
 #: modules/access/cdda/cdda.c:183 modules/access/cdda/cdda.c:184
 msgid "Directory to cache CDDB requests"
-msgstr ""
+msgstr "Répertoire dans lequel mettre les requêtes CDDB mises en cache"
 
 #: modules/access/directory.c:82
 msgid "Standard filesystem directory input"
@@ -2895,7 +2912,7 @@ msgstr "Segment"
 #: modules/access/vcdx/access.c:1107 modules/access/vcdx/access.c:1108
 #: modules/access/vcdx/access.c:1125
 msgid "List ID"
-msgstr ""
+msgstr "Identifiant de liste"
 
 #: modules/access/vcdx/vcd.c:53
 msgid ""
@@ -2948,6 +2965,24 @@ msgid ""
 "       A number between 1 and the volume count.\n"
 "   %% : a % \n"
 msgstr ""
+"Format utilisé dans le Titre de la liste de lecture, similaire aux dates"
+" Unix.\n"
+"Les spécificateurs de format commencent par %. Les spécificateurs sont : \n"
+"   %A : Informations sur l'album\n"
+"   %C : Compte de volumes VCD - nombre de CD de la collection\n"
+"   %c : Numéro de volume VCD - nombre de CD de la collection\n"
+"   %F : Format du VCD, par ex VCD 1.0, VCD 1.1, VCD 2.0, ou SVC\n"
+"   %I : Type actuel d'entrée/segment, par ex ENTRY, TRACK, SEGMENT...\n"
+"   %L : Identifiant de liste, préfixé par  \" LID\", si existant\n"
+"   %N : Numéro actuel de %I - nombre décimal\n"
+"   %P : Identifiant du publieur\n"
+"   %p : Préparateur I\n"
+"   %S : Si dans un segment (menu), type de segment\n"
+"   %T : Numéro de piste\n"
+"   %V : Réglage de volume\n"
+"   %v : Volume. Un nombre entre 1 et le volume.\n"
+"   %% : un signe %\n"
+
 
 #: modules/access/vcdx/vcd.c:91
 msgid "vcdx://[device-or-file][@{P,S,T}num]"
@@ -2963,21 +2998,23 @@ msgstr "VCDX"
 
 #: modules/access/vcdx/vcd.c:106
 msgid "Use playback control?"
-msgstr ""
+msgstr "Utiliser le contrôle de lecture ?"
 
 #: modules/access/vcdx/vcd.c:107
 msgid ""
 "If VCD is authored with playback control, use it. Otherwise we play by "
 "tracks."
 msgstr ""
+"Si le VCD permet le contrôle de lecture, cette option permet de l'activer."
+"Dans le cas contraire, la lecture se fait par pistes."
 
 #: modules/access/vcdx/vcd.c:114
 msgid "Format to use in playlist \"author\""
-msgstr ""
+msgstr "Format à utiliser dans le champ \"auteur\" de la liste de lecture"
 
 #: modules/access/vcdx/vcd.c:120
 msgid "Format to use in playlist \"title\" field"
-msgstr ""
+msgstr "Format à utiliser dans le champ \"titre\" de la liste de lecture"
 
 #: modules/access_output/dummy.c:56
 msgid "Dummy stream ouput"
@@ -3452,17 +3489,14 @@ msgid "6 (Highest)"
 msgstr "6 (La plus haute)"
 
 #: modules/codec/ffmpeg/postprocessing/postprocessing.c:49
-#, fuzzy
 msgid "C post processing"
-msgstr "Post-traitement"
+msgstr "Module de post-traitement"
 
 #: modules/codec/ffmpeg/postprocessing/postprocessing.c:53
-#, fuzzy
 msgid "MMX post processing"
 msgstr "Module de post-traitement optimisé MMX"
 
 #: modules/codec/ffmpeg/postprocessing/postprocessing.c:58
-#, fuzzy
 msgid "MMXEXT post processing"
 msgstr "Module de post-traitement optimisé MMXEXT"
 
@@ -3499,7 +3533,6 @@ msgid "MPEG audio layer I/II/III packetizer"
 msgstr "Empaqueteur MPEG audio layer I/II/III"
 
 #: modules/codec/ogt/ogt.c:38
-#, fuzzy
 msgid ""
 "This integer when viewed in binary is a debugging mask\n"
 "external call     1\n"
@@ -3507,39 +3540,29 @@ msgid ""
 "misc              4\n"
 msgstr ""
 "Cet entier, en binaire, est un masque de déboggage\n"
-"MRL             1\n"
-"appels externes 2\n"
-"tous les appels 4\n"
-"LSN             8\n"
-"LSN      (10)  16\n"
-"libcdio  (20)  32\n"
-"Seeks    (40)  64\n"
-"still    (80) 128\n"
-"vcdinfo (100) 256\n"
+"appel externe     1\n"
+"tous les appels   2\n"
+"divers            4\n"
 
 #: modules/codec/ogt/ogt.c:53
-#, fuzzy
 msgid "Philips OGT (SVCD subtitle) decoder"
-msgstr "Décodeur de sous-titres DVD"
+msgstr "Décodeur de sous-titres Philips OGT (Sous-titres SVCD)"
 
 #: modules/codec/ogt/ogt.c:62
-#, fuzzy
 msgid "Philips OGT (SVCD subtitle) packetizer"
-msgstr "Empaqueteur de sous-titres DVD"
+msgstr "Empaqueteur de sous-titres Philips OGT (Sous-titres SVCD)"
 
 #: modules/codec/quicktime.c:59
 msgid "QuickTime library decoder"
 msgstr "Décodeur de la bibliothèque QuickTime"
 
 #: modules/codec/rawvideo.c:66
-#, fuzzy
 msgid "Pseudo raw video decoder"
-msgstr "Décodeur audio Pseudo Raw"
+msgstr "Pseudo-décodeur vidéo brute"
 
 #: modules/codec/rawvideo.c:71
-#, fuzzy
 msgid "Pseudo raw video packetizer"
-msgstr "Empaqueteur audio Pseudo Raw"
+msgstr "Pseuado-empaqueteur vidéo brute"
 
 #: modules/codec/speex.c:101
 msgid "Speex audio decoder"
@@ -3554,7 +3577,6 @@ msgid "Speex audio encoder"
 msgstr "Encodeur audio Speex"
 
 #: modules/codec/speex.c:463
-#, fuzzy
 msgid "Speex comment"
 msgstr "Commentaires Speex"
 
@@ -3632,7 +3654,6 @@ msgid "Vorbis audio encoder"
 msgstr "Encodeur audio Vorbis"
 
 #: modules/codec/vorbis.c:455
-#, fuzzy
 msgid "Vorbis comment"
 msgstr "Commentaires Vorbis"
 
@@ -3677,58 +3698,48 @@ msgid "mouse gestures control interface"
 msgstr "Interface de contrôle de mouvements de souris"
 
 #: modules/control/hotkeys.c:72
-#, fuzzy
 msgid "Playlist bookmark 1"
-msgstr "Liste de lecture"
+msgstr "Favori n°1"
 
 #: modules/control/hotkeys.c:73
-#, fuzzy
 msgid "Playlist bookmark 2"
-msgstr "Liste de lecture"
+msgstr "Favori n°2"
 
 #: modules/control/hotkeys.c:74
-#, fuzzy
 msgid "Playlist bookmark 3"
-msgstr "Liste de lecture"
+msgstr "Favori n°3"
 
 #: modules/control/hotkeys.c:75
-#, fuzzy
 msgid "Playlist bookmark 4"
-msgstr "Liste de lecture"
+msgstr "Favori n°4"
 
 #: modules/control/hotkeys.c:76
-#, fuzzy
 msgid "Playlist bookmark 5"
-msgstr "Liste de lecture"
+msgstr "Favori n°5"
 
 #: modules/control/hotkeys.c:77
-#, fuzzy
 msgid "Playlist bookmark 6"
-msgstr "Liste de lecture"
+msgstr "Favori n°6"
 
 #: modules/control/hotkeys.c:78
-#, fuzzy
 msgid "Playlist bookmark 7"
-msgstr "Liste de lecture"
+msgstr "Favori n°7"
 
 #: modules/control/hotkeys.c:79
-#, fuzzy
 msgid "Playlist bookmark 8"
-msgstr "Liste de lecture"
+msgstr "Favori n°8"
 
 #: modules/control/hotkeys.c:80
-#, fuzzy
 msgid "Playlist bookmark 9"
-msgstr "Liste de lecture"
+msgstr "Favori n°9"
 
 #: modules/control/hotkeys.c:81
-#, fuzzy
 msgid "Playlist bookmark 10"
-msgstr "Liste de lecture"
+msgstr "Favori n°10"
 
 #: modules/control/hotkeys.c:83
 msgid "This option allows you to define playlist bookmarks"
-msgstr ""
+msgstr "Cette option vous permet de définir des favoris"
 
 #: modules/control/hotkeys.c:86
 msgid "hotkey interface"
@@ -3824,7 +3835,6 @@ msgid "Repeat time"
 msgstr "Temps de répétition"
 
 #: modules/control/joystick.c:149
-#, fuzzy
 msgid ""
 "The time waited before the action is repeated if it is still triggered, in "
 "milliseconds"
@@ -3835,7 +3845,6 @@ msgid "Wait time"
 msgstr "Temps d'attente"
 
 #: modules/control/joystick.c:154
-#, fuzzy
 msgid "The time waited before the repeat starts, in milliseconds."
 msgstr "Le temps avant que la répétition commence, en millisecondes "
 
@@ -3896,14 +3905,13 @@ msgid "This allows you to change the display name of the service."
 msgstr "Ceci vous permet de changer le nom du service"
 
 #: modules/control/ntservice.c:50
-#, fuzzy
 msgid ""
 "This option allows you to select additional interfaces spawned by the "
 "service. It should be specified at install time so the service is properly "
 "configured. Use a comma separated list of interface modules. (common values "
 "are: logger, sap, rc, http)"
 msgstr ""
-"Cette option vous permetde sélectionner les interfaces supplémentaires "
+"Cette option vous permet de sélectionner les interfaces supplémentaires "
 "lancées par le service. Ceci devrait être spécifié lors de l'installation "
 "afin que le service soit correctement configuré. Utilisez une liste de "
 "modules séparés par des virgules. (les valeurs habituelles sont: logger, "
@@ -4113,9 +4121,8 @@ msgid "mka/mkv stream demuxer"
 msgstr "Démultiplexeur de flux mka/mkv"
 
 #: modules/demux/mkv.cpp:2185
-#, fuzzy
 msgid "UTC date"
-msgstr "Mettre à jour"
+msgstr "Date UTC"
 
 #: modules/demux/mkv.cpp:2189
 msgid "Segment filename"
@@ -4819,7 +4826,6 @@ msgstr "Ouvrir _disque..."
 #: modules/gui/gtk/gnome_interface.c:993 modules/gui/gtk/gtk_interface.c:188
 #: modules/gui/gtk/gtk_interface.c:630 modules/gui/gtk/gtk_interface.c:1411
 #: modules/gui/wxwindows/interface.cpp:292
-#, fuzzy
 msgid "Open Disc Media"
 msgstr "Ouvrir disque"
 
@@ -5536,7 +5542,7 @@ msgstr "Chapitre %d"
 
 #: modules/gui/gtk/open.c:276
 msgid "PBC LID"
-msgstr ""
+msgstr "PBC LID"
 
 #: modules/gui/gtk/preferences.c:371
 msgid "Configure"
@@ -6094,7 +6100,7 @@ msgstr "Temps"
 
 #: modules/gui/pda/pda.c:286
 msgid "Index"
-msgstr ""
+msgstr "Index"
 
 #: modules/gui/pda/pda_interface.c:279 modules/gui/pda/pda_interface.c:280
 msgid "Forward"
@@ -6131,7 +6137,7 @@ msgstr "Réseau : "
 
 #: modules/gui/pda/pda_interface.c:491 modules/gui/pda/pda_interface.c:1089
 msgid "udp"
-msgstr ""
+msgstr "udp"
 
 #: modules/gui/pda/pda_interface.c:492
 msgid "udp6"
@@ -6288,11 +6294,11 @@ msgstr "huffyuv"
 
 #: modules/gui/pda/pda_interface.c:866
 msgid "mp1v"
-msgstr ""
+msgstr "mp1v"
 
 #: modules/gui/pda/pda_interface.c:867
 msgid "mp2v"
-msgstr ""
+msgstr "mp2v"
 
 #: modules/gui/pda/pda_interface.c:868
 msgid "mp4v"
@@ -6300,19 +6306,19 @@ msgstr "mp4v"
 
 #: modules/gui/pda/pda_interface.c:869
 msgid "H263"
-msgstr ""
+msgstr "H263"
 
 #: modules/gui/pda/pda_interface.c:870
 msgid "I263"
-msgstr ""
+msgstr "I263"
 
 #: modules/gui/pda/pda_interface.c:871
 msgid "WMV1"
-msgstr ""
+msgstr "WMV1"
 
 #: modules/gui/pda/pda_interface.c:872
 msgid "WMV2"
-msgstr ""
+msgstr "WMV2"
 
 #: modules/gui/pda/pda_interface.c:881
 msgid "Video Bitrate:"
@@ -6368,7 +6374,7 @@ msgstr "239.0.0.42"
 
 #: modules/gui/pda/pda_interface.c:989
 msgid "ps"
-msgstr ""
+msgstr "ps"
 
 #: modules/gui/pda/pda_interface.c:990
 msgid "ts"
@@ -6376,27 +6382,27 @@ msgstr "ts"
 
 #: modules/gui/pda/pda_interface.c:991
 msgid "mpeg1"
-msgstr ""
+msgstr "mpeg1"
 
 #: modules/gui/pda/pda_interface.c:992
 msgid "avi"
-msgstr ""
+msgstr "avi"
 
 #: modules/gui/pda/pda_interface.c:993
 msgid "ogg"
-msgstr ""
+msgstr "ogg"
 
 #: modules/gui/pda/pda_interface.c:994
 msgid "mp4"
-msgstr ""
+msgstr "mp4"
 
 #: modules/gui/pda/pda_interface.c:995
 msgid "mov"
-msgstr ""
+msgstr "mov"
 
 #: modules/gui/pda/pda_interface.c:996
 msgid "asf"
-msgstr ""
+msgstr "asf"
 
 #: modules/gui/pda/pda_interface.c:1012 modules/gui/pda/pda_interface.c:1070
 msgid "kbits/s"
@@ -6420,11 +6426,11 @@ msgstr "mp3"
 
 #: modules/gui/pda/pda_interface.c:1027
 msgid "a52"
-msgstr ""
+msgstr "a52"
 
 #: modules/gui/pda/pda_interface.c:1028
 msgid "vorb"
-msgstr ""
+msgstr "vorb"
 
 #: modules/gui/pda/pda_interface.c:1060
 msgid "bits/s"
@@ -6436,11 +6442,11 @@ msgstr "Débit audio :"
 
 #: modules/gui/pda/pda_interface.c:1090
 msgid "display"
-msgstr ""
+msgstr "affichage"
 
 #: modules/gui/pda/pda_interface.c:1093
 msgid "mmsh"
-msgstr ""
+msgstr "mmsh"
 
 #: modules/gui/pda/pda_interface.c:1105
 msgid "SAP Announce:"
@@ -6538,9 +6544,8 @@ msgid "Open file"
 msgstr "Ouvrir un fichier"
 
 #: modules/gui/wxwindows/fileinfo.cpp:56
-#, fuzzy
 msgid "Stream and media info"
-msgstr "Info flux..."
+msgstr "Info flux et média..."
 
 #: modules/gui/wxwindows/interface.cpp:289
 msgid "Quick file open"
@@ -6636,7 +6641,7 @@ msgstr "&Messages..."
 
 #: modules/gui/wxwindows/interface.cpp:338
 msgid "&Stream and Media info..."
-msgstr ""
+msgstr "&Information sur le flux"
 
 #: modules/gui/wxwindows/interface.cpp:359
 msgid "&About..."
@@ -6796,7 +6801,6 @@ msgid "About %s"
 msgstr "À propos de %s"
 
 #: modules/gui/wxwindows/iteminfo.cpp:87
-#, fuzzy
 msgid "Playlist item options"
 msgstr "Options des éléments de la liste de lecture"
 
@@ -6908,7 +6912,7 @@ msgstr "Type de périphérique vidéo"
 
 #: modules/gui/wxwindows/open.cpp:646
 msgid "Device corresponding to your acquisition card or your webcam"
-msgstr ""
+msgstr "Périphérique correspondant à votre carte d'acquisition ou votre caméra"
 
 #: modules/gui/wxwindows/open.cpp:651 modules/gui/wxwindows/v4l.cpp:356
 msgid "Channel"
@@ -6916,7 +6920,8 @@ msgstr "Canal"
 
 #: modules/gui/wxwindows/open.cpp:653
 msgid "Usually 0 is for tuner, 1 for composite and 2 for svideo"
-msgstr ""
+msgstr "Habituellement, 0 pour le tuner, 1 pour l'entrée composite et 2 pour"
+"S-Video."
 
 #: modules/gui/wxwindows/open.cpp:661
 msgid "Advanced settings..."
@@ -7119,9 +7124,8 @@ msgid "Video codec"
 msgstr "Codec vidéo"
 
 #: modules/gui/wxwindows/streamout.cpp:679
-#, fuzzy
 msgid "Scale"
-msgstr "Plus petit"
+msgstr "Echelle"
 
 #: modules/gui/wxwindows/streamout.cpp:728
 msgid "Audio codec"
@@ -7207,7 +7211,7 @@ msgstr "Norme"
 
 #: modules/gui/wxwindows/v4l.cpp:297
 msgid "Standard of the analogic signal"
-msgstr ""
+msgstr "Standard du signal analogique"
 
 #: modules/gui/wxwindows/v4l.cpp:308
 msgid "The frequency in kHz"
@@ -7219,7 +7223,7 @@ msgstr "Paramètres audio"
 
 #: modules/gui/wxwindows/v4l.cpp:359
 msgid "Usually 0 is for mono and 1 for stereo"
-msgstr ""
+msgstr "Habituellemetn, 0 pour mono et 1 pour stéréo"
 
 #: modules/gui/wxwindows/v4l.cpp:389
 msgid "Bitrate options"
@@ -7256,23 +7260,21 @@ msgstr ""
 
 #: modules/misc/dummy/dummy.c:43
 msgid "Save raw codec data"
-msgstr ""
+msgstr "Enregistrer les données brutes"
 
 #: modules/misc/dummy/dummy.c:45
-#, fuzzy
 msgid ""
 "This option allows you to save the raw codec data if you have selected/"
 "forced the dummy decoder in the main options."
 msgstr ""
-"Cette option permet de retarder la sortie audio. Cela peut être utile si "
-"vous remarquez un décalage entre le son et l'image."
+"Cette option permet de sauvegarder les données  brutes si vous avez "
+"sélectionné ou forcé le décodeur dummy dans les options générales."
 
 #: modules/misc/dummy/dummy.c:49
 msgid "Do not open a DOS command box interface"
 msgstr "Ne pas ouvrir une interface de commande DOS"
 
 #: modules/misc/dummy/dummy.c:51
-#, fuzzy
 msgid ""
 "By default the dummy interface plugin will start a DOS command box. Enabling "
 "the quiet mode will not bring this command box but can also be pretty "
@@ -7749,9 +7751,8 @@ msgid "invert video filter"
 msgstr "Filtre d'inversion vidéo"
 
 #: modules/video_filter/logo.c:58
-#, fuzzy
 msgid "Logo filename"
-msgstr "Nom du fichier"
+msgstr "Nom du fichier de logo"
 
 #: modules/video_filter/logo.c:59
 msgid "The file must be in PNG RGBA 8bits format (for now)"
