@@ -465,6 +465,7 @@
 				8EBF3FA403F13FFB0059A3A7,
 				8EBF3FA803F140A80059A3A7,
 				A0E6B59904407FBD0080DD97,
+				8EDAC3440440F72D0059A3A7,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -511,6 +512,7 @@
 				A0E6B59804407FBD0080DD97,
 				8EBF3FA303F13FFB0059A3A7,
 				8EBF3FA703F140A80059A3A7,
+				8EDAC3430440F72D0059A3A7,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -684,9 +686,9 @@
 		8ED6C27A03E2EB1C0059A3A7 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
-			name = aout.m;
-			path = ../../modules/gui/macosx/aout.m;
-			refType = 2;
+			name = coreaudio.c;
+			path = /Volumes/Users/pjotr/Development/vlc/modules/audio_output/coreaudio.c;
+			refType = 0;
 		};
 		8ED6C27B03E2EB1C0059A3A7 = {
 			fileEncoding = 30;
@@ -808,6 +810,18 @@
 		};
 		8ED6C2A003E2F32E0059A3A7 = {
 			fileRef = 8ED6C29E03E2F32E0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8EDAC3430440F72D0059A3A7 = {
+			isa = PBXFileReference;
+			name = README.MacOSX.rtf;
+			path = ../../README.MacOSX.rtf;
+			refType = 2;
+		};
+		8EDAC3440440F72D0059A3A7 = {
+			fileRef = 8EDAC3430440F72D0059A3A7;
 			isa = PBXBuildFile;
 			settings = {
 			};
