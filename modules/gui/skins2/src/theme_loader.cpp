@@ -233,7 +233,7 @@ bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
             stat( newURI.c_str(), &stat_data );
             if( S_ISDIR(stat_data.st_mode) )
 #elif defined( DT_DIR )
-            if( pDirContent->d_type == DT_DIR )
+            if( pDirContent->d_type & DT_DIR )
 #else
             if( 0 )
 #endif
