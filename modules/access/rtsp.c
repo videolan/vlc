@@ -2,7 +2,7 @@
  * rtsp.c: Retreive a description from an RTSP url.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: rtsp.c,v 1.1 2003/08/03 02:00:00 fenrir Exp $
+ * $Id: rtsp.c,v 1.2 2003/08/03 12:04:28 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -301,6 +301,7 @@ static int Open( vlc_object_t *p_this )
     /* Update default_pts to a suitable value for RTSP access */
     p_input->i_pts_delay = config_GetInt( p_input, "rtsp-caching" ) * 1000;
 
+    NetClose( p_input, i_handle );
     url_Clean( &url );
     return VLC_SUCCESS;
 
