@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.3 2003/05/26 13:45:52 zorglub Exp $
+ * $Id: standard.c,v 1.4 2003/06/12 11:37:48 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -129,6 +129,11 @@ static int Open( vlc_object_t *p_this )
     {        
         msg_Dbg( p_sout , "Creating SAP" );
         p_sap = sout_SAPNew( p_sout , psz_url , psz_port , psz_sap );
+        if(!p_sap)
+        {
+                msg_Err( p_sout,"Unable to initialize SAP. SAP disabled");
+                p_sys->b_sap=0;
+        }
     }   
     
     /* XXX beurk */
@@ -158,7 +163,7 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_t *p_access = p_sys->p_mux->p_access;
 
     if(p_sys -> b_sap)
-            sout_SAPDelete( p_sys->p_sap ); 
+          sout_SAPDelete( p_this ,p_sys->p_sap ); 
 
     sout_MuxDelete( p_sys->p_mux );
     sout_AccessOutDelete( p_access );

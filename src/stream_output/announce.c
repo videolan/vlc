@@ -51,6 +51,9 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout , char * psz_url_arg , cha
         struct                  sockaddr_in addr;
               
         p_new = (sap_session_t *)malloc( sizeof ( sap_session_t ) ) ;
+
+        if ( !p_new )
+                return NULL;
         
         sprintf ( p_new->psz_url , "%s" , psz_url_arg );
         sprintf ( p_new->psz_name , "%s" , psz_name_arg );
@@ -91,10 +94,11 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout , char * psz_url_arg , cha
 /*****************************************************************************
  * sout_SAPDelete: Deletes a SAP Session 
  *****************************************************************************/
-void sout_SAPDelete( sap_session_t * p_this )
+void sout_SAPDelete( sout_instance_t *p_sout , sap_session_t * p_this )
 {
-        shutdown(p_this->socket,0);
-        free(p_this);        
+        if( close(p_this->socket) )
+                msg_Err ( p_sout, "Unable to close SAP socket");
+        if( p_this ) free(p_this);        
 }       
 
 /*****************************************************************************
@@ -112,11 +116,17 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_this )
       int i_msg_size;
       int i_size;
      
-    if( p_this->sendnow == 1 )
+    if( p_this->sendnow == 24 )
     {
-         i_header_size = 9 + strlen( payload_type );
-         sap_head = ( char * )malloc( i_header_size * sizeof( char ) );
-                
+          i_header_size = 9 + strlen( payload_type );
+          sap_head = ( char * )malloc( i_header_size * sizeof( char ) );
+        
+          if( ! sap_head )         
+          {
+                  msg_Err( p_sout , "No memory left");
+                  return;
+          }       
+         
           sap_head[0]=0x20; /* Means IPv4, not encrypted, not compressed */
           sap_head[1]=0x00; /* No authentification */
           sap_head[2]=0x42; /* Version */
@@ -130,7 +140,7 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_this )
           strncpy( sap_head+8 , payload_type , 15 );
           sap_head[ i_header_size-1 ] = '\0'; 
        
-        /* Do not add spaces at beginning of the lines ! */  
+           /* Do not add spaces at beginning of the lines ! */  
           sprintf(sap_msg,"v=0\n\
 o=VideoLAN 3247692199 3247895918 IN IP4 VideoLAN\n\
 s=%s\n\
@@ -144,7 +154,13 @@ a=type:test\n", p_this->psz_name , p_this->psz_port , p_this->psz_url );
      i_size = i_msg_size + i_header_size;
      
      sap_send = ( char* )malloc( i_size*sizeof(char) ); 
-          
+        
+      if(! sap_send)
+      {
+             msg_Err( p_sout ,  "No memory left") ;
+             return;
+      }
+      
       for(i=0 ; i<i_header_size ; i++)
       {
            sap_send[i] = sap_head[i];
