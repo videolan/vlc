@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.13 2003/04/16 00:12:36 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.14 2003/06/06 13:34:21 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -228,6 +228,7 @@ static void PacketizeThread( packetizer_t *p_pack )
     int i_picture_structure = 0x03; /* frame picture */
     int i_top_field_first = 0;
     int i_repeat_first_field = 0;
+    int i_progressive_frame = 0;
 
     if( !p_pack->p_sout_input )
     {
@@ -403,6 +404,12 @@ static void PacketizeThread( packetizer_t *p_pack )
                     ShowBits( &p_pack->bit_stream, 25 ) & 0x01;
                 i_repeat_first_field =
                     ShowBits( &p_pack->bit_stream, 31 ) & 0x01;
+
+                GetChunk( &p_pack->bit_stream,
+                          p_sout_buffer->p_buffer + i_pos, 4 ); i_pos += 4;
+
+                i_progressive_frame =
+                    ShowBits( &p_pack->bit_stream, 1 ) & 0x01;
             }
             CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
         }
@@ -487,6 +494,11 @@ static void PacketizeThread( packetizer_t *p_pack )
         if( i_picture_structure == 0x03 )
         {
             p_pack->i_last_dts += i_duration;
+
+            if( i_progressive_frame && i_repeat_first_field )
+            {
+                p_pack->i_last_dts += i_duration / 2;
+            }
         }
         else if( i_picture_structure == p_pack->i_last_picture_structure )
         {
