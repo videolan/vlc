@@ -7,7 +7,7 @@
 # Objects
 #
 
-PLUGIN_C = directx.o vout_directx.o aout_directx.o
+PLUGIN_C = directx.o vout_directx.o vout_events.o aout_directx.o
 BUILTIN_C = $(PLUGIN_C:%.o=BUILTIN_%.o)
 
 ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
