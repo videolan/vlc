@@ -31,7 +31,7 @@ Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Conflicts: vlc-gnome (<< 0.5.0)
 Replaces: vlc-gnome (<< 0.5.0)
 Provides: vlc-gui
-Description: GNOME interface plugin for vlc
+Description: GNOME frontend for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds a Gnome interface to vlc, the VideoLAN Client. To
@@ -43,7 +43,7 @@ Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Conflicts: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
 Replaces: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
 Provides: vlc-gui
-Description: Gtk+ interface plugin for vlc
+Description: Gtk+ frontend for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds a Gtk+ interface to vlc, the VideoLAN Client. To
@@ -116,7 +116,7 @@ Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Conflicts: vlc-qt (<< 0.5.0)
 Replaces: vlc-qt (<< 0.5.0)
 Provides: vlc-gui
-Description: Qt interface plugin for vlc
+Description: Qt frontend for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds a Qt interface to vlc, the VideoLAN Client. To
@@ -199,7 +199,7 @@ Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Conflicts: vlc-kde (<< 0.5.0)
 Replaces: vlc-kde (<< 0.5.0)
 Provides: vlc-gui
-Description: KDE interface plugin for vlc
+Description: KDE frontend for vlc
  VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
  .
  This plugin adds a KDE interface to vlc, the VideoLAN Client. To
