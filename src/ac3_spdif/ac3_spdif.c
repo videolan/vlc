@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.6 2001/05/30 05:19:03 stef Exp $
+ * $Id: ac3_spdif.c,v 1.7 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -32,7 +32,10 @@
 #include <stdlib.h>
 #include <string.h>                                              /* memcpy() */
 #include <fcntl.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -204,8 +207,8 @@ static void RunThread( ac3_spdif_thread_t * p_spdif )
                 m_last_pts;
     
             /* Write in the first free packet of aout fifo */
-            p_spdif->p_iec = (p_spdif->p_aout_fifo->buffer) + 
-                (p_spdif->p_aout_fifo->l_end_frame * SPDIF_FRAME_SIZE );
+            p_spdif->p_iec = ((u8*)(p_spdif->p_aout_fifo->buffer) + 
+                (p_spdif->p_aout_fifo->l_end_frame * SPDIF_FRAME_SIZE ));
     
             /* Build burst to be sent to hardware decoder */
             ac3_iec958_build_burst( p_spdif );

@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_msg.h,v 1.13 2001/04/30 15:00:59 massiot Exp $
+ * $Id: intf_msg.h,v 1.14 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -48,8 +48,13 @@ void    _intf_DbgMsgImm     ( char *psz_file, char *psz_function, int i_line,
 #else
 
 /* Non-TRACE mode */
+#if defined( _MSC_VER )
+#define intf_DbgMsg
+#define intf_DbgMsgImm
+#else
 #define intf_DbgMsg( format, args... )
 #define intf_DbgMsgImm( format, args...)
+#endif
 
 #endif
 

@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.31 2001/05/30 17:03:12 sam Exp $
+ * $Id: modules.c,v 1.32 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -34,7 +34,10 @@
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
+
+#if !defined( _MSC_VER )
 #include <dirent.h>
+#endif
 
 #if defined(HAVE_DLFCN_H)                                /* Linux, BSD, Hurd */
 #   include <dlfcn.h>                        /* dlopen(), dlsym(), dlclose() */

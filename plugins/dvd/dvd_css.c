@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.29 2001/05/19 00:39:29 stef Exp $
+ * $Id: dvd_css.c,v 1.30 2001/05/31 01:37:08 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -36,7 +36,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#elif defined( _MSC_VER ) && defined( _WIN32 )
+#include <io.h>
+#endif
+
 #include <string.h>
 
 #include "common.h"

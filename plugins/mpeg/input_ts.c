@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.21 2001/05/30 17:03:12 sam Exp $
+ * $Id: input_ts.c,v 1.22 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -37,25 +37,29 @@
 #include <errno.h>
 
 #include <sys/types.h>
+
+#if !defined( _MSC_VER )
 #include <sys/time.h>
+#endif
 
 #ifdef SYS_NTO
 #include <sys/select.h>
 #endif
 
-#ifndef WIN32 
-#   include <sys/uio.h>                                      /* struct iovec */
-#else
-    struct iovec
-    {
-        void *iov_base; /* Pointer to data.  */
-        size_t iov_len; /* Length of data.  */
-    };
+#include <sys/stat.h>
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
 #endif
 
-#include <sys/stat.h>
-#include <unistd.h>
 #include <fcntl.h>
+
+#if !defined( WIN32 )
+#include <sys/uio.h>                                         /* struct iovec */
+#else
+#include <io.h>
+#include "iovec.h"
+#endif
 
 #include "config.h"
 #include "common.h"

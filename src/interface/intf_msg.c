@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.34 2001/05/07 03:14:09 stef Exp $
+ * $Id: intf_msg.c,v 1.35 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -34,7 +34,10 @@
 #include <stdarg.h>                                       /* va_list for BSD */
 #include <stdlib.h>                                              /* malloc() */
 #include <string.h>                                            /* strerror() */
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>                                      /* close(), write() */
+#endif
 
 #include "config.h"
 #include "common.h"

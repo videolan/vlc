@@ -2,7 +2,7 @@
  * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.c,v 1.50 2001/05/01 04:18:18 sam Exp $
+ * $Id: audio_decoder.c,v 1.51 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -36,7 +36,9 @@
  *****************************************************************************/
 #include "defs.h"
 
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* getpid() */
+#endif
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <string.h>                                    /* memcpy(), memset() */

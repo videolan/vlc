@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.6 2001/04/28 03:36:25 sam Exp $
+ * $Id: dvd_udf.c,v 1.7 2001/05/31 01:37:08 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -41,7 +41,13 @@
 #include "modules_inner.h"
 
 #include <stdio.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#elif defined( _MSC_VER ) && defined( _WIN32 )
+#include <io.h>
+#endif
+
 #include <string.h>
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>

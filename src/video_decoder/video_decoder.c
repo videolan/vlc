@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.50 2001/05/30 17:03:12 sam Exp $
+ * $Id: video_decoder.c,v 1.51 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -27,7 +27,9 @@
  *****************************************************************************/
 #include "defs.h"
 
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* getpid() */
+#endif
 
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                    /* memcpy(), memset() */

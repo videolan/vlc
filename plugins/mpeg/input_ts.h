@@ -2,7 +2,7 @@
  * input_ts.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ts.h,v 1.5 2001/05/28 04:23:52 sam Exp $
+ * $Id: input_ts.h,v 1.6 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *
@@ -32,46 +32,3 @@ typedef struct thread_ts_data_s {
     fd_set s_fdset;
     
 } thread_ts_data_t;
-
-#ifdef WIN32
-static __inline__ int readv( int i_fd, struct iovec *p_iovec, int i_count )
-{
-    int i_index, i_len, i_total = 0;
-    char *p_base;
-
-    for( i_index = i_count; i_index; i_index-- )
-    {
-        i_len  = p_iovec->iov_len;
-        p_base = p_iovec->iov_base;
-
-        while( i_len > 0 )
-        {
-            register signed int i_bytes;
-            i_bytes = read( i_fd, p_base, i_len );
-
-            if( i_total == 0 )
-            {
-                if( i_bytes < 0 )
-                {
-                    intf_ErrMsg( "input error: read failed on socket" );
-                    return -1;
-                }
-            }
-
-            if( i_bytes <= 0 )
-            {
-                return i_total;
-            }
-
-            i_len   -= i_bytes;
-            i_total += i_bytes;
-            p_base  += i_bytes;
-        }
-
-        p_iovec++;
-    }
-
-    return i_total;
-}
-#endif
-

@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.8 2001/05/30 17:03:12 sam Exp $
+ * $Id: intf_dummy.c,v 1.9 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,7 +50,9 @@
  *****************************************************************************/
 typedef struct intf_sys_s
 {
-
+#if defined( _MSC_VER )
+    int i_dummy;
+#endif
 } intf_sys_t;
 
 /*****************************************************************************

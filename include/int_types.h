@@ -2,7 +2,7 @@
  * int_types.h: internal types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: int_types.h,v 1.6 2001/03/21 13:42:33 sam Exp $
+ * $Id: int_types.h,v 1.7 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -28,5 +28,10 @@ typedef unsigned short          u16;
 typedef signed short            s16;
 typedef unsigned int            u32;
 typedef signed int              s32;
+#if defined( _MSC_VER )
+typedef unsigned __int64        u64;
+typedef signed __int64          s64;
+#else
 typedef unsigned long long      u64;
 typedef signed long long        s64;
+#endif

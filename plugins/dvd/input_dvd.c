@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.62 2001/05/30 22:16:07 sam Exp $
+ * $Id: input_dvd.c,v 1.63 2001/05/31 01:37:08 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -43,18 +43,30 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+#if !defined( WIN32 )
 #include <netinet/in.h>
+#endif
 
 #include <fcntl.h>
 #include <sys/types.h>
-#include <sys/uio.h>
 
 #include <string.h>
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
 #endif
 #include <errno.h>
+
+#if !defined( WIN32 )
+#include <sys/uio.h>                                         /* struct iovec */
+#else
+#include <io.h>
+#include "iovec.h"
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -785,7 +797,7 @@ static int DVDRead( input_thread_t * p_input,
     thread_dvd_data_t *     p_dvd;
     dvd_netlist_t *         p_netlist;
     struct iovec *          p_vec;
-    struct data_packet_s *  pp_data[p_input->i_read_once];
+    struct data_packet_s ** pp_data;
     u8 *                    pi_cur;
     int                     i_block_once;
     int                     i_packet_size;
@@ -798,6 +810,14 @@ static int DVDRead( input_thread_t * p_input,
     boolean_t               b_eof;
     boolean_t               b_eot;
 
+    pp_data = (struct data_packet_s **) malloc( p_input->i_read_once *
+                                        sizeof( struct data_packet_s * ) );
+    if( pp_data == NULL )
+    {
+        intf_ErrMsg( "dvd error: out of memory" );
+        return -1;
+    }
+
     p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
     p_netlist = (dvd_netlist_t *)p_input->p_method_data;
 
@@ -805,6 +825,7 @@ static int DVDRead( input_thread_t * p_input,
     if( ( p_vec = DVDGetiovec( p_netlist ) ) == NULL )
     {
         intf_ErrMsg( "dvd error: can't get iovec" );
+        free( pp_data );
         return -1;
     }
 
@@ -823,6 +844,7 @@ static int DVDRead( input_thread_t * p_input,
         {
             pp_packets[0] = NULL;
             intf_ErrMsg( "dvd error: can't find next cell" );
+            free( pp_data );
             return 1;
         }
 
@@ -900,7 +922,7 @@ static int DVDRead( input_thread_t * p_input,
 
         while( i_pos < p_netlist->i_buffer_size )
         {
-            pi_cur = (u8*)(p_vec[i_iovec].iov_base + i_pos);
+            pi_cur = ((u8*)p_vec[i_iovec].iov_base + i_pos);
 
             /*default header */
             if( U32_AT( pi_cur ) != 0x1BA )
@@ -925,6 +947,7 @@ static int DVDRead( input_thread_t * p_input,
                 else
                 {
                     intf_ErrMsg( "Unable to determine stream type" );
+                    free( pp_data );
                     return( -1 );
                 }
 
@@ -961,6 +984,8 @@ static int DVDRead( input_thread_t * p_input,
     b_eof = b_eot && ( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    free( pp_data );
 
     if( b_eof )
     {

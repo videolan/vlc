@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.98 2001/05/30 23:02:04 stef Exp $
+ * $Id: main.c,v 1.99 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,7 +51,10 @@
 #include <netinet/in.h>                               /* BSD: struct in_addr */
 #endif
 
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                  /* getenv(), strtol(),  */
 #include <string.h>                                            /* strerror() */

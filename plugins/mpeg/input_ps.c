@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.25 2001/05/30 17:03:12 sam Exp $
+ * $Id: input_ps.c,v 1.26 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -39,7 +39,13 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#elif defined( _MSC_VER ) && defined( _WIN32 )
+#include <io.h>
+#endif
+
 #include <fcntl.h>
 
 #include "config.h"

@@ -7,7 +7,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.5 2001/04/06 09:15:47 sam Exp $
+ * $Id: dvd_netlist.c,v 1.6 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -35,8 +35,17 @@
 #include <stdlib.h>
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>
-#include <sys/uio.h>                                         /* struct iovec */
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+#if !defined( WIN32 )
+#include <sys/uio.h>                                         /* struct iovec */
+#else
+#include <io.h>
+#include "iovec.h"
+#endif
 
 #include "config.h"
 #include "common.h"

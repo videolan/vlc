@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.35 2001/05/30 23:02:04 stef Exp $
+ * $Id: netutils.c,v 1.36 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -32,10 +32,18 @@
 #include <stdlib.h>                             /* free(), realloc(), atoi() */
 #include <errno.h>                                                /* errno() */
 #include <string.h>                                              /* memset() */
-#include <unistd.h>                                         /* gethostname() */
-#include <sys/time.h>                                        /* gettimeofday */
 
-#ifndef WIN32
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>                                         /* gethostname() */
+#elif defined( _MSC_VER ) && defined( _WIN32 )
+#include <io.h>
+#endif
+
+#if !defined( _MSC_VER )
+#include <sys/time.h>                                        /* gettimeofday */
+#endif
+
+#if !defined( WIN32 )
 #include <netdb.h>                                        /* gethostbyname() */
 #include <netinet/in.h>                               /* BSD: struct in_addr */
 #include <sys/socket.h>                              /* BSD: struct sockaddr */
@@ -49,7 +57,7 @@
 #include <sys/ioctl.h>                                            /* ioctl() */
 #endif
 
-#ifdef WIN32                            /* tools to get the MAC adress from  */
+#if defined( WIN32 )                    /* tools to get the MAC adress from  */
 #include <windows.h>                    /* the interface under Windows	     */
 #include <stdio.h>
 #endif

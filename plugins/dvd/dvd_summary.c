@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.1 2001/05/19 00:39:30 stef Exp $
+ * $Id: dvd_summary.c,v 1.2 2001/05/31 01:37:08 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -36,12 +36,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+#if !defined( WIN32 )
 #include <netinet/in.h>
+#endif
 
 #include <fcntl.h>
 #include <sys/types.h>
-#include <sys/uio.h>
 
 #include <string.h>
 #ifdef STRNCASECMP_IN_STRINGS_H

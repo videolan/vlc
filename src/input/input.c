@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.114 2001/05/30 22:16:07 sam Exp $
+ * $Id: input.c,v 1.115 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,7 +32,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#elif defined( _MSC_VER ) && defined( _WIN32 )
+#include <io.h>
+#endif
+
 #include <string.h>
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
@@ -231,6 +237,7 @@ void input_DestroyThread( input_thread_t *p_input, int *pi_status )
 static void RunThread( input_thread_t *p_input )
 {
     int                     i_error, i;
+    data_packet_t **        pp_packets;
 
     if( InitThread( p_input ) )
     {
@@ -248,10 +255,16 @@ static void RunThread( input_thread_t *p_input )
     p_input->stream.b_changed = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+    pp_packets = (data_packet_t **) malloc( p_input->i_read_once *
+                                        sizeof( data_packet_t * ) );
+    if( pp_packets == NULL )
+    {
+        intf_ErrMsg( "input error: out of memory" );
+        p_input->b_error = 1;
+    }
+
     while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
     {
-        data_packet_t *         pp_packets[p_input->i_read_once];
-
 #ifdef STATS
         p_input->c_loops++;
 #endif
@@ -323,6 +336,8 @@ static void RunThread( input_thread_t *p_input )
             }
         }
     }
+
+    free( pp_packets );
 
     if( p_input->b_error || p_input->b_eof )
     {
@@ -717,7 +732,7 @@ static void NetworkOpen( input_thread_t * p_input )
     /* We may want to reuse an already used socket */
     i_opt = 1;
     if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_REUSEADDR,
-                    &i_opt, sizeof( i_opt ) ) == -1 )
+                    (void*) &i_opt, sizeof( i_opt ) ) == -1 )
     {
         intf_ErrMsg( "input error: can't configure socket (SO_REUSEADDR: %s)",
                      strerror(errno));
@@ -730,7 +745,7 @@ static void NetworkOpen( input_thread_t * p_input )
      * packet loss caused by scheduling problems */
     i_opt = 0x80000;
     if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF,
-                    &i_opt, sizeof( i_opt ) ) == -1 )
+                    (void*) &i_opt, sizeof( i_opt ) ) == -1 )
     {
         intf_ErrMsg( "input error: can't configure socket (SO_RCVBUF: %s)", 
                      strerror(errno));

@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.33 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_decoder_thread.c,v 1.34 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -35,7 +35,9 @@
  *****************************************************************************/
 #include "defs.h"
 
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* getpid() */
+#endif
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* memset() */

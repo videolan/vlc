@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: audio_output.c,v 1.62 2001/05/30 05:19:03 stef Exp $
+ * $Id: audio_output.c,v 1.63 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -38,7 +38,10 @@
  *****************************************************************************/
 #include "defs.h"
 
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* getpid() */
+#endif
+
 #ifdef WIN32                   /* getpid() for win32 is located in process.h */
 #include <process.h>
 #endif

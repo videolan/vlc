@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mtime.c,v 1.18 2001/05/07 04:42:42 sam Exp $
+ * $Id: mtime.c,v 1.19 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -33,14 +33,20 @@
 #include "defs.h"
 
 #include <stdio.h>                                              /* sprintf() */
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* select() */
+#endif
+
+#if !defined( _MSC_VER )
 #include <sys/time.h>
+#endif
 
 #ifdef HAVE_KERNEL_OS_H
 #include <kernel/OS.h>
 #endif
 
-#ifdef WIN32
+#if defined( WIN32 )
 #include <windows.h>
 #endif
 
@@ -58,11 +64,11 @@
 char *mstrtime( char *psz_buffer, mtime_t date )
 {
     sprintf( psz_buffer, "%02d:%02d:%02d-%03d.%03d",
-             (int) (date / (1000LL * 1000LL * 60LL * 60LL) % 24LL),
-             (int) (date / (1000LL * 1000LL * 60LL) % 60LL),
-             (int) (date / (1000LL * 1000LL) % 60LL),
-             (int) (date / 1000LL % 1000LL),
-             (int) (date % 1000LL) );
+             (int) (date / (I64C(1000) * I64C(1000) * I64C(60) * I64C(60)) % I64C(24)),
+             (int) (date / (I64C(1000) * I64C(1000) * I64C(60)) % I64C(60)),
+             (int) (date / (I64C(1000) * I64C(1000)) % I64C(60)),
+             (int) (date / I64C(1000) % I64C(1000)),
+             (int) (date % I64C(1000)) );
     return( psz_buffer );
 }
 

@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.c,v 1.26 2001/04/28 03:36:25 sam Exp $
+ * $Id: video_text.c,v 1.27 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -32,7 +32,12 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <fcntl.h>                                                 /* open() */
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>                                       /* read(), close() */
+#elif defined( _MSC_VER ) && defined( _WIN32 )
+#include <io.h>
+#endif
 
 #ifdef SYS_BEOS
 #   include "beos_specific.h"
@@ -481,7 +486,7 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
                                                      p_font->i_interspacing);
 
     /* compute where to stop... */
-    i_end = (int) (i_percent * strlen(psz_text) / 100LL);
+    i_end = (int) (i_percent * strlen(psz_text) / I64C(100));
     if(i_end > strlen(psz_text))
         i_end = strlen(psz_text);
     

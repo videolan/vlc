@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.14 2001/05/01 04:18:18 sam Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.15 2001/05/31 01:37:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,7 +26,9 @@
  *****************************************************************************/
 #include "defs.h"
 
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* getpid() */
+#endif
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <string.h>                                    /* memcpy(), memset() */
