@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.240 2003/09/13 17:42:16 fenrir Exp $
+ * $Id: input.c,v 1.241 2003/09/15 18:05:13 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -397,6 +397,7 @@ static int RunThread( input_thread_t *p_input )
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
                 }
 
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
                 if( !demux_Control( p_input, DEMUX_GET_TIME, &i_time ) )
                 {
                     int i;
@@ -412,6 +413,7 @@ static int RunThread( input_thread_t *p_input )
                         subtitle_Seek( p_input->p_sys->sub[i], i_time );
                     }
                 }
+                vlc_mutex_lock( &p_input->stream.stream_lock );
             }
             p_input->stream.p_selected_area->i_seek = NO_SEEK;
         }
