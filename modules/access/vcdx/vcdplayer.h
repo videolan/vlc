@@ -76,8 +76,13 @@ typedef struct thread_vcd_data_s
   int          cur_lid;                 /* LID that play item is in. Implies 
                                            PBC is on. VCDPLAYER_BAD_ENTRY if 
                                            not none or not in PBC */
+#if (defined LIBVCD_VERSION_NUM) && (LIBVCD_VERSION_NUM >= 21)
   PsdListDescriptor_t pxd;              /* If PBC is on, the relevant 
+                                            PSD/PLD */
+#else
+  PsdListDescriptor pxd;                /* If PBC is on, the relevant
                                            PSD/PLD */
+#endif
   int          pdi;                     /* current pld index of pxd. -1 if 
                                            no index*/
   vcdinfo_itemid_t loop_item;           /* Where do we loop back to? 
