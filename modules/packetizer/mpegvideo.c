@@ -268,17 +268,9 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
             /* Get the new fragment and set the pts/dts */
             p_pic = block_New( p_dec, p_sys->i_offset );
+            block_BytestreamFlush( &p_sys->bytestream );
             p_pic->i_pts = p_sys->bytestream.p_block->i_pts;
             p_pic->i_dts = p_sys->bytestream.p_block->i_dts;
-
-            /* FIXME ? Should we flush the bytestream chain before ? */
-            if( p_sys->bytestream.p_block->i_buffer ==
-                p_sys->bytestream.i_offset &&
-                p_sys->bytestream.p_block->p_next )
-            {
-                p_pic->i_pts = p_sys->bytestream.p_block->p_next->i_pts;
-                p_pic->i_dts = p_sys->bytestream.p_block->p_next->i_dts;
-            }
 
             block_GetBytes( &p_sys->bytestream, p_pic->p_buffer,
                             p_pic->i_buffer );
