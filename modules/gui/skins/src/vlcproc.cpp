@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.7 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: vlcproc.cpp,v 1.8 2003/04/16 21:50:19 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -623,10 +623,10 @@ void VlcProc::AddNetworkUDP( int port )
 void VlcProc::AddNetworkChannelServer( char *server )
 {
     char *name = new char[MAX_PARAM_SIZE];
-    int   port = 0;
+    int  port = 0;
 
     // Scan the server address
-    int scan = sscanf( server, "%[^:]:%i", name, port );
+    int scan = sscanf( server, "%[^:]:%i", name, &port );
 
     if( scan != 2)
     {

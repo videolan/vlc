@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.18 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: gtk2_window.cpp,v 1.19 2003/04/16 21:50:19 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -76,6 +76,9 @@ GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
 
     LButtonDown = false;
     RButtonDown = false;
+
+    // Removing fading effect
+    Transition  = 0;
 /*
     // Set position parameters
     CursorPos    = new POINT;
