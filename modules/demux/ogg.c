@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.46 2003/11/23 13:15:27 gbazin Exp $
+ * $Id: ogg.c,v 1.47 2003/11/26 08:18:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -78,7 +78,6 @@ struct demux_sys_t
      * the sub-streams */
     mtime_t i_pcr;
     int     b_reinit;
-    int     i_prev_sync_state;
 
     /* stream state */
     int     i_eos;
@@ -1028,8 +1027,6 @@ static int Activate( vlc_object_t * p_this )
     /* Begnning of stream, tell the demux to look for elementary streams. */
     p_ogg->i_eos = 0;
 
-    p_ogg->i_prev_sync_state = SYNCHRO_REINIT;
-
     return 0;
 
  error:
@@ -1170,13 +1167,10 @@ static int Demux( input_thread_t * p_input )
             p_stream->b_reinit = 1;
             p_stream->i_pcr = -1;
             p_stream->i_interpolated_pcr = -1;
+            ogg_stream_reset( &p_stream->os );
         }
-        if( p_ogg->i_prev_sync_state != SYNCHRO_REINIT )
-            ogg_sync_reset( &p_ogg->oy );
+        ogg_sync_reset( &p_ogg->oy );
     }
-
-    p_ogg->i_prev_sync_state =
-        p_input->stream.p_selected_program->i_synchro_state;
 
     /*
      * Demux an ogg page from the stream
@@ -1225,7 +1219,8 @@ static int Demux( input_thread_t * p_input )
                     else
                     {
                         input_ClockManageRef( p_input,
-                            p_input->stream.p_selected_program, p_ogg->i_pcr );
+				      p_input->stream.p_selected_program,
+				      p_stream->i_pcr );
                     }
                     continue;
                 }
@@ -1248,7 +1243,7 @@ static int Demux( input_thread_t * p_input )
             p_ogg->i_pcr = p_stream->i_interpolated_pcr;
     }
 
-    if( p_input->stream.p_selected_program->i_synchro_state != SYNCHRO_REINIT )
+    if( p_ogg->i_pcr >= 0 )
     {
         input_ClockManageRef( p_input, p_input->stream.p_selected_program,
                               p_ogg->i_pcr );

@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.76 2003/11/24 13:40:03 gbazin Exp $
+ * $Id: avi.c,v 1.77 2003/11/26 08:18:09 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -278,15 +278,11 @@ static int Open( vlc_object_t * p_this )
                 fmt.i_bitrate               = p_auds->p_wf->nAvgBytesPerSec*8;
                 fmt.audio.i_blockalign      = p_auds->p_wf->nBlockAlign;
                 fmt.audio.i_bitspersample   = p_auds->p_wf->wBitsPerSample;
-                if( ( fmt.i_extra = __MIN( p_auds->p_wf->cbSize,
-                                           p_auds->i_chunk_size - sizeof(WAVEFORMATEX) ) ) > 0 )
-                {
-                    fmt.p_extra = malloc( fmt.i_extra );
-                    memcpy( fmt.p_extra, &p_auds->p_wf[1], fmt.i_extra );
-                }
+                fmt.i_extra = __MIN( p_auds->p_wf->cbSize,
+                    p_auds->i_chunk_size - sizeof(WAVEFORMATEX) );
+                fmt.p_extra = &p_auds->p_wf[1];
                 msg_Dbg( p_input, "stream[%d] audio(0x%x) %d channels %dHz %dbits",
-                         i,
-                         p_auds->p_wf->wFormatTag, p_auds->p_wf->nChannels,
+                         i, p_auds->p_wf->wFormatTag, p_auds->p_wf->nChannels,
                          p_auds->p_wf->nSamplesPerSec, p_auds->p_wf->wBitsPerSample);
                 break;
 
@@ -298,12 +294,10 @@ static int Open( vlc_object_t * p_this )
                 tk->i_samplesize = 0;
                 fmt.video.i_width  = p_vids->p_bih->biWidth;
                 fmt.video.i_height = p_vids->p_bih->biHeight;
-                if( ( fmt.i_extra = __MIN( p_vids->p_bih->biSize - sizeof( BITMAPINFOHEADER ),
-                                           p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER) ) ) > 0 )
-                {
-                    fmt.p_extra = malloc( fmt.i_extra );
-                    memcpy( fmt.p_extra, &p_vids->p_bih[1], fmt.i_extra );
-                }
+                fmt.i_extra =
+                    __MIN( p_vids->p_bih->biSize - sizeof( BITMAPINFOHEADER ),
+                           p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER) );
+                fmt.p_extra = &p_vids->p_bih[1];
                 msg_Dbg( p_input, "stream[%d] video(%4.4s) %dx%d %dbpp %ffps",
                         i,
                          (char*)&p_vids->p_bih->biCompression,

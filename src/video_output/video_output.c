@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.240 2003/11/24 00:39:02 fenrir Exp $
+ * $Id: video_output.c,v 1.241 2003/11/26 08:18:09 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -438,6 +438,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     if( var_Get( p_vout, "deinterlace-mode", &val ) == VLC_SUCCESS )
     {
         var_Set( p_vout, "deinterlace", val );
+        if( val.psz_string ) free( val.psz_string );
     }
     var_AddCallback( p_vout, "deinterlace", DeinterlaceCallback, NULL );
 
@@ -446,9 +447,10 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     text.psz_string = _("Filters");
     var_Change( p_vout, "filter", VLC_VAR_SETTEXT, &text, NULL );
     var_Change( p_vout, "filter", VLC_VAR_INHERITVALUE, &val, NULL );
-    if( var_Get( p_vout, "filter", &val ) == VLC_SUCCESS )
+    if( val.psz_string )
     {
         var_Set( p_vout, "filter", val );
+        free( val.psz_string );
     }
     var_AddCallback( p_vout, "filter", FilterCallback, NULL );
 
@@ -497,6 +499,8 @@ void vout_Destroy( vout_thread_t *p_vout )
 
     p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST, 
                                   FIND_ANYWHERE );
+
+    if( p_vout->psz_filter_chain ) free( p_vout->psz_filter_chain );
 
     /* Free structure */
     vlc_object_destroy( p_vout );

@@ -2,7 +2,7 @@
  * mpeg4video.c: mpeg 4 video packetizer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.16 2003/11/18 20:15:38 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.17 2003/11/26 08:18:09 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -128,8 +128,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pts = 0;
     p_sys->b_vop = VLC_FALSE;
     p_sys->i_buffer = 0;
-    p_sys->i_buffer_size = 10000;
-    p_sys->p_buffer = malloc( p_sys->i_buffer_size );
+    p_sys->i_buffer_size = 0;
+    p_sys->p_buffer = 0;
 
     /* Setup properties */
     p_dec->fmt_out = p_dec->fmt_in;
@@ -167,6 +167,7 @@ static void Close( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
+    if( p_dec->p_sys->p_buffer ) free( p_dec->p_sys->p_buffer );
     free( p_dec->p_sys );
 }
 

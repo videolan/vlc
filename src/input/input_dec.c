@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.79 2003/11/24 23:22:01 gbazin Exp $
+ * $Id: input_dec.c,v 1.80 2003/11/26 08:18:09 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -610,7 +610,13 @@ static void DeleteDecoder( decoder_t * p_dec )
     }
 
     if( p_dec->p_owner->p_sout )
+    {
         sout_InputDelete( p_dec->p_owner->p_sout );
+        if( p_dec->p_owner->sout.i_extra ) free(p_dec->p_owner->sout.p_extra);
+    }
+
+    if( p_dec->fmt_in.i_extra ) free( p_dec->fmt_in.p_extra );
+    if( p_dec->fmt_out.i_extra ) free( p_dec->fmt_out.p_extra );
 
     free( p_dec->p_owner );
 }

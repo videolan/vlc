@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.34 2003/10/07 14:59:10 gbazin Exp $
+ * $Id: libmp4.c,v 1.35 2003/11/26 08:18:09 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1204,6 +1204,14 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_READBOX_ENTER( MP4_Box_data_sample_soun_t );
 
+    /* Sanity check needed because the "wave" box does also contain an
+     * "mp4a" box that we don't understand. */
+    if( i_read < 28 )
+    {
+        i_read -= 30;
+        MP4_READBOX_EXIT( 0 );
+    }
+
     for( i = 0; i < 6 ; i++ )
     {
         MP4_GET1BYTE( p_box->data.p_sample_soun->i_reserved1[i] );
@@ -1214,19 +1222,9 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     /*
      * XXX hack -> produce a copy of the nearly complete chunk
      */
-    if( i_read > 0 )
-    {
-        p_box->data.p_sample_soun->i_qt_description = i_read;
-        p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
-        memcpy( p_box->data.p_sample_soun->p_qt_description,
-                p_peek,
-                i_read );
-    }
-    else
-    {
-        p_box->data.p_sample_soun->i_qt_description = 0;
-        p_box->data.p_sample_soun->p_qt_description = NULL;
-    }
+    p_box->data.p_sample_soun->i_qt_description = i_read;
+    p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
+    memcpy( p_box->data.p_sample_soun->p_qt_description, p_peek, i_read );
 
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_version );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_revision_level );

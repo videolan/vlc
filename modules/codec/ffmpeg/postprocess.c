@@ -2,7 +2,7 @@
  * postprocess.c: video postprocessing using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: postprocess.c,v 1.5 2003/11/24 00:01:42 gbazin Exp $
+ * $Id: postprocess.c,v 1.6 2003/11/26 08:18:09 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -81,7 +81,7 @@ void *E_(OpenPostproc)( decoder_t *p_dec, vlc_bool_t *pb_pp )
     {
         var_Create( p_dec, "ffmpeg-pp-q",
                     VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
-        text.psz_string = _("Post-Processing");
+        text.psz_string = _("Post processing");
         var_Change( p_dec, "ffmpeg-pp-q", VLC_VAR_SETTEXT, &text, NULL );
 
         var_Get( p_dec, "ffmpeg-pp-q", &val_orig );
@@ -200,6 +200,8 @@ void E_(ClosePostproc)( decoder_t *p_dec, void *p_data )
     }
 
     var_DelCallback( p_dec, "ffmpeg-pp-q", PPQCallback, p_sys );
+
+    if( p_sys ) free( p_sys );
 }
 
 /*****************************************************************************
