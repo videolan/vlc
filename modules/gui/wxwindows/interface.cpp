@@ -139,6 +139,7 @@ enum
     FastStream_Event,
 
     Adjust_Event,
+    RestoreDefaults_Event,
     Hue_Event,
     Contrast_Event,
     Brightness_Event,
@@ -170,6 +171,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU( Bookmarks_Event, Interface::OnShowDialog)
 
     EVT_CHECKBOX( Adjust_Event, Interface::OnEnableAdjust)
+    EVT_BUTTON( RestoreDefaults_Event, Interface::OnRestoreDefaults)
     EVT_TEXT( Ratio_Event, Interface::OnRatio)
     EVT_CHECKBOX( Visual_Event, Interface::OnEnableVisual)
 
@@ -197,12 +199,12 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
 
     /* Slider events */
     EVT_COMMAND_SCROLL(SliderScroll_Event, Interface::OnSliderUpdate)
-
-    EVT_COMMAND_SCROLL(Hue_Event, Interface::OnHueUpdate)
-    EVT_COMMAND_SCROLL(Contrast_Event, Interface::OnContrastUpdate)
-    EVT_COMMAND_SCROLL(Brightness_Event, Interface::OnBrightnessUpdate)
-    EVT_COMMAND_SCROLL(Saturation_Event, Interface::OnSaturationUpdate)
-    EVT_COMMAND_SCROLL(Gamma_Event, Interface::OnGammaUpdate)
+    
+    EVT_COMMAND_SCROLL(Hue_Event, Interface::OnAdjustUpdate)
+    EVT_COMMAND_SCROLL(Contrast_Event, Interface::OnAdjustUpdate)
+    EVT_COMMAND_SCROLL(Brightness_Event, Interface::OnAdjustUpdate)
+    EVT_COMMAND_SCROLL(Saturation_Event, Interface::OnAdjustUpdate)
+    EVT_COMMAND_SCROLL(Gamma_Event, Interface::OnAdjustUpdate)
 
     /* Custom events */
     EVT_COMMAND(0, wxEVT_INTF, Interface::OnControlEvent)
@@ -507,6 +509,11 @@ void Interface::CreateOurExtendedPanel()
     wxStaticBoxSizer *adjust_sizer =
         new wxStaticBoxSizer( adjust_box, wxVERTICAL );
     adjust_sizer->SetMinSize( -1, 50 );
+    
+    /* Create flex grid */
+    wxFlexGridSizer *adjust_gridsizer =
+        new wxFlexGridSizer( 6, 2, 0, 0);
+    adjust_gridsizer->AddGrowableCol(1);
 
     /* Create every controls */
 
@@ -514,60 +521,52 @@ void Interface::CreateOurExtendedPanel()
     wxCheckBox * adjust_check = new wxCheckBox( extra_frame, Adjust_Event,
                                                  wxU(_("Enable")));
 
+    /* Create the restore to defaults button */
+    restoredefaults_button = 
+        new wxButton( extra_frame, RestoreDefaults_Event,
+        wxU(_("Restore Defaults")), wxDefaultPosition);
 
-    wxBoxSizer *hue_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticText *hue_text = new wxStaticText( extra_frame, -1,
                                        wxU(_("Hue")) );
     hue_slider = new wxSlider ( extra_frame, Hue_Event, 0, 0,
                                 360, wxDefaultPosition, wxDefaultSize );
 
-    hue_sizer->Add(hue_text,1, 0 ,0);
-    hue_sizer->Add(hue_slider,1, 0 ,0);
-    hue_sizer->Layout();
 
-    wxBoxSizer *contrast_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticText *contrast_text = new wxStaticText( extra_frame, -1,
                                        wxU(_("Contrast")) );
     contrast_slider = new wxSlider ( extra_frame, Contrast_Event, 0, 0,
                                 200, wxDefaultPosition, wxDefaultSize);
-    contrast_sizer->Add(contrast_text,1, 0 ,0);
-    contrast_sizer->Add(contrast_slider,1, 0 ,0);
-    contrast_sizer->Layout();
 
-    wxBoxSizer *brightness_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticText *brightness_text = new wxStaticText( extra_frame, -1,
                                        wxU(_("Brightness")) );
     brightness_slider = new wxSlider ( extra_frame, Brightness_Event, 0, 0,
                            200, wxDefaultPosition, wxDefaultSize) ;
-    brightness_sizer->Add(brightness_text,1,0,0);
-    brightness_sizer->Add(brightness_slider,1,0,0);
-    brightness_sizer->Layout();
 
-    wxBoxSizer *saturation_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticText *saturation_text = new wxStaticText( extra_frame, -1,
                                           wxU(_("Saturation")) );
     saturation_slider = new wxSlider ( extra_frame, Saturation_Event, 0, 0,
                            300, wxDefaultPosition, wxDefaultSize );
-    saturation_sizer->Add(saturation_text,1,0,0);
-    saturation_sizer->Add(saturation_slider,1,0,0);
-    saturation_sizer->Layout();
 
-    wxBoxSizer *gamma_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticText *gamma_text = new wxStaticText( extra_frame, -1,
                                           wxU(_("Gamma")) );
     gamma_slider = new wxSlider ( extra_frame, Gamma_Event, 0, 0,
                            100, wxDefaultPosition, wxDefaultSize );
-    gamma_sizer->Add(gamma_text,1,0,0);
-    gamma_sizer->Add(gamma_slider,1,0,0);
-    gamma_sizer->Layout();
 
-    adjust_sizer->Add(adjust_check, 1, wxEXPAND, 0);
-    adjust_sizer->Add(hue_sizer, 1, wxEXPAND, 0);
-    adjust_sizer->Add(contrast_sizer, 1, wxEXPAND, 0);
-    adjust_sizer->Add(brightness_sizer, 1, wxEXPAND, 0);
-    adjust_sizer->Add(saturation_sizer, 1, wxEXPAND, 0);
-    adjust_sizer->Add(gamma_sizer, 1, wxEXPAND, 0);
-
+    adjust_gridsizer->Add(adjust_check, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(restoredefaults_button, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(hue_text, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(hue_slider, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(contrast_text, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(contrast_slider, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(brightness_text, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(brightness_slider, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(saturation_text, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(saturation_slider, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(gamma_text, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add(gamma_slider, 1, wxEXPAND, 0);
+    
+    adjust_sizer->Add(adjust_gridsizer,1,wxEXPAND, 0);
+    
     extra_sizer->Add(adjust_sizer,1,wxBOTTOM,5);
 
     /* Create sizer to surround the other controls */
@@ -649,6 +648,7 @@ void Interface::CreateOurExtendedPanel()
     if( psz_filters && strstr( psz_filters, "adjust" ) )
     {
         adjust_check->SetValue( 1 );
+        restoredefaults_button->Enable();
         saturation_slider->Enable();
         contrast_slider->Enable();
         brightness_slider->Enable();
@@ -658,6 +658,7 @@ void Interface::CreateOurExtendedPanel()
     else
     {
         adjust_check->SetValue( 0 );
+        restoredefaults_button->Disable();
         saturation_slider->Disable();
         contrast_slider->Disable();
         brightness_slider->Disable();
@@ -911,6 +912,7 @@ void Interface::OnEnableAdjust(wxCommandEvent& event)
             vlc_object_release( p_vout );
         }
         if( val.psz_string ) free( val.psz_string );
+        restoredefaults_button->Enable();
         brightness_slider->Enable();
         saturation_slider->Enable();
         contrast_slider->Enable();
@@ -954,6 +956,7 @@ void Interface::OnEnableAdjust(wxCommandEvent& event)
             }
             if( val.psz_string ) free( val.psz_string );
         }
+        restoredefaults_button->Disable();
         brightness_slider->Disable();
         saturation_slider->Disable();
         contrast_slider->Disable();
@@ -964,29 +967,89 @@ void Interface::OnEnableAdjust(wxCommandEvent& event)
     if(psz_new) free(psz_new);
 }
 
-void Interface::OnHueUpdate( wxScrollEvent& event)
+void Interface::OnRestoreDefaults( wxCommandEvent &event)
 {
-    config_PutInt( p_intf , "hue" , event.GetPosition() );
+    hue_slider->SetValue(0);
+    saturation_slider->SetValue(100);
+    brightness_slider->SetValue(100);
+    contrast_slider->SetValue(100),
+    gamma_slider->SetValue(10);
+
+    wxScrollEvent *hscroll_event = new wxScrollEvent(0, Hue_Event, 0);
+    OnAdjustUpdate(*hscroll_event);
+    
+    wxScrollEvent *sscroll_event = new wxScrollEvent(0, Saturation_Event, 100);
+    OnAdjustUpdate(*sscroll_event);
+    
+    wxScrollEvent *bscroll_event = new wxScrollEvent(0, Brightness_Event, 100);
+    OnAdjustUpdate(*bscroll_event);
+    
+    wxScrollEvent *cscroll_event = new wxScrollEvent(0, Contrast_Event, 100);
+    OnAdjustUpdate(*cscroll_event);
+    
+    wxScrollEvent *gscroll_event = new wxScrollEvent(0, Gamma_Event, 10);
+    OnAdjustUpdate(*gscroll_event);
+
 }
 
-void Interface::OnSaturationUpdate( wxScrollEvent& event)
+void Interface::OnAdjustUpdate( wxScrollEvent &event)
 {
-    config_PutFloat( p_intf , "saturation" , (float)event.GetPosition()/100 );
-}
-
-void Interface::OnBrightnessUpdate( wxScrollEvent& event)
-{
-    config_PutFloat( p_intf , "brightness", (float)event.GetPosition()/100 );
-}
-
-void Interface::OnContrastUpdate(wxScrollEvent& event)
-{
-    config_PutFloat( p_intf , "contrast" , (float)event.GetPosition()/100 );
-}
-
-void Interface::OnGammaUpdate(wxScrollEvent& event)
-{
-    config_PutFloat( p_intf , "gamma" , (float)event.GetPosition()/10 );
+    vout_thread_t *p_vout = (vout_thread_t *)vlc_object_find(p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE);
+    if(p_vout == NULL)
+        switch(event.GetId())
+        {
+            case Hue_Event: 
+                config_PutInt( p_intf , "hue" , event.GetPosition() );
+                break;
+            
+            case Saturation_Event: 
+                config_PutFloat( p_intf , "saturation" , (float)event.GetPosition()/100 );
+                break;
+            
+            case Brightness_Event: 
+                config_PutFloat( p_intf , "brightness" , (float)event.GetPosition()/100 );
+                break;
+            
+            case Contrast_Event: 
+                config_PutFloat( p_intf , "contrast" , (float)event.GetPosition()/100 );
+                break;
+            
+            case Gamma_Event: 
+                config_PutFloat( p_intf , "gamma" , (float)event.GetPosition()/10 );
+                break;
+        }
+    else
+    {
+        vlc_value_t val;
+        switch(event.GetId())
+        {
+            case Hue_Event: 
+                val.i_int = event.GetPosition();
+                var_Set(p_vout, "hue", val);
+                break;
+            
+            case Saturation_Event:
+                val.f_float = (float)event.GetPosition()/100;
+                var_Set(p_vout, "saturation", val);
+                break;
+            
+            case Brightness_Event: 
+                val.f_float = (float)event.GetPosition()/100;
+                var_Set(p_vout, "brightness", val);
+                break;
+            
+            case Contrast_Event: 
+                val.f_float = (float)event.GetPosition()/100;
+                var_Set(p_vout, "contrast", val);
+                break;
+            
+            case Gamma_Event: 
+                val.f_float = (float)event.GetPosition()/10;
+                var_Set(p_vout, "gamma", val);
+                break;
+        }
+        vlc_object_release(p_vout);
+    }
 }
 
 void Interface::OnRatio( wxCommandEvent& event )

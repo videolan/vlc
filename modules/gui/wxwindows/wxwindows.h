@@ -196,6 +196,7 @@ public:
     vlc_bool_t b_extra;
 
     wxStaticBox *adjust_box;
+    wxButton *restoredefaults_button;
     wxSlider *brightness_slider;
     wxSlider *contrast_slider;
     wxSlider *saturation_slider;
@@ -236,11 +237,8 @@ private:
     void OnFastStream( wxCommandEvent& event );
 
     void OnEnableAdjust( wxCommandEvent& event );
-    void OnHueUpdate( wxScrollEvent& event );
-    void OnContrastUpdate( wxScrollEvent& event );
-    void OnBrightnessUpdate( wxScrollEvent& event );
-    void OnSaturationUpdate( wxScrollEvent& event );
-    void OnGammaUpdate( wxScrollEvent& event );
+    void OnRestoreDefaults( wxCommandEvent& event);
+    void OnAdjustUpdate( wxScrollEvent& event );
 
     void OnRatio( wxCommandEvent& event );
     void OnEnableVisual( wxCommandEvent& event );
