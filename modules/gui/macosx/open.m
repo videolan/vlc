@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.6 2003/01/05 02:39:48 massiot Exp $
+ * $Id: open.m,v 1.7 2003/01/06 02:45:09 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -136,6 +136,36 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 - (void)awakeFromNib
 {
     intf_thread_t * p_intf = [NSApp getIntf];
+    char * psz_sout = config_GetPsz( p_intf, "sout" );
+
+    if ( psz_sout != NULL && *psz_sout )
+    {
+        [o_sout_cbox setState: YES];
+
+        NSRect s_rect = [o_panel frame];
+        s_rect.size.height = OPEN_PANEL_FULL_HEIGHT + WINDOW_TITLE_HEIGHT;
+        [o_panel setFrame: s_rect display: NO];
+
+        NSPoint s_point;
+        s_point.x = 0;
+        s_point.y = 0;
+        [[o_panel contentView] setBoundsOrigin: s_point];
+    }
+    else
+    {
+        [o_sout_cbox setState: NO];
+
+        NSRect s_rect = [o_panel frame];
+        s_rect.size.height = OPEN_PANEL_SHORT_HEIGHT + WINDOW_TITLE_HEIGHT;
+        [o_panel setFrame: s_rect display: NO];
+
+        NSPoint s_point;
+        s_point.x = 0;
+        s_point.y = OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
+        [[o_panel contentView] setBoundsOrigin: s_point];
+
+        free(psz_sout);
+    }
 
     [o_panel setTitle: _NS("Open Target")];
     [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
@@ -176,6 +206,19 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_cs_port setIntValue: config_GetInt( p_intf, "channel-port" )];
     [o_net_cs_port_stp setIntValue: config_GetInt( p_intf, "channel-port" )];
+
+    [o_sout_cbox setTitle: _NS("Stream output")];
+    [o_sout_mrl_lbl setTitle: _NS("Stream output MRL")];
+    [[o_sout_access cellAtRow:0 column:0] setTitle: _NS("File")];
+    [[o_sout_access cellAtRow:1 column:0] setTitle: _NS("UDP")];
+    [[o_sout_access cellAtRow:2 column:0] setTitle: _NS("RTP")];
+
+    [o_sout_file_btn_browse setStringValue: _NS("Browse...")];
+    [o_sout_udp_addr_lbl setStringValue: _NS("Address")];
+    [o_sout_udp_port_lbl setStringValue: _NS("Port")];
+
+    [[o_sout_mux cellAtRow:0 column:0] setTitle: _NS("PS")];
+    [[o_sout_mux cellAtRow:0 column:1] setTitle: _NS("TS")];
 
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openFilePathChanged:)
@@ -223,6 +266,19 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         selector: @selector(openNetInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: o_net_http_url];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(soutInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_sout_file_path];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(soutInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_sout_udp_addr];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(soutInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_sout_udp_port];
 }
 
 - (void)openTarget:(int)i_type
@@ -236,11 +292,21 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     if( i_result )
     {
+        NSString *o_sout = [o_sout_mrl stringValue];
+
+        if ( [o_sout_cbox state] )
+        {
+            intf_thread_t * p_intf = [NSApp getIntf];
+            config_PutPsz( p_intf, "sout", [o_sout lossyCString] );
+        }
+
         NSString *o_source = [o_mrl stringValue];
 
         [o_playlist appendArray: 
             [NSArray arrayWithObject: o_source] atPos: -1];
     }
+
+    [self soutModeChanged: nil];
 }
 
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi
@@ -289,6 +355,23 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
                     b_stream ? "stream" : "file",
                     o_filename];
     [o_mrl setStringValue: o_mrl_string]; 
+}
+
+- (IBAction)openFileBrowse:(id)sender
+{
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+    
+    [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setTitle: _NS("Open File")];
+    [o_open_panel setPrompt: _NS("Open")];
+
+    if( [o_open_panel runModalForDirectory: nil 
+            file: nil types: nil] == NSOKButton )
+    {
+        NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
+        [o_file_path setStringValue: o_filename];
+        [self openFilePathChanged: nil];
+    }
 }
 
 - (IBAction)openFileStreamChanged:(id)sender
@@ -439,6 +522,25 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [self openDiscTypeChanged: nil];
 }
 
+- (IBAction)openVTSBrowse:(id)sender
+{
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+
+    [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setCanChooseFiles: NO];
+    [o_open_panel setCanChooseDirectories: YES];
+    [o_open_panel setTitle: _NS("Open VIDEO_TS Directory")];
+    [o_open_panel setPrompt: _NS("Open")];
+
+    if( [o_open_panel runModalForDirectory: nil
+            file: nil types: nil] == NSOKButton )
+    {
+        NSString *o_dirname = [[o_open_panel filenames] objectAtIndex: 0];
+        [o_disc_videots_folder setStringValue: o_dirname];
+        [self openDiscInfoChanged: nil];
+    }
+}
+
 - (IBAction)openNetModeChanged:(id)sender
 {
     NSString *o_mode;
@@ -449,10 +551,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     o_mode = [[o_net_mode selectedCell] title];
 
-    if( [o_mode isEqualToString: @"UDP/RTP"] ) b_udp = TRUE;   
-    else if( [o_mode isEqualToString: @"UDP/RTP Multicast"] ) b_udpm = TRUE;
-    else if( [o_mode isEqualToString: @"Channel server"] ) b_cs = TRUE;
-    else if( [o_mode isEqualToString: @"HTTP/FTP/MMS"] ) b_http = TRUE;
+    if( [o_mode isEqualToString: _NS("UDP/RTP")] ) b_udp = TRUE;   
+    else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] ) b_udpm = TRUE;
+    else if( [o_mode isEqualToString: _NS("Channel server")] ) b_cs = TRUE;
+    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS")] ) b_http = TRUE;
 
     [o_net_udp_port setEnabled: b_udp];
     [o_net_udp_port_stp setEnabled: b_udp];
@@ -557,40 +659,130 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_mrl setStringValue: o_mrl_string];
 }
 
-- (IBAction)openFileBrowse:(id)sender
+- (IBAction)soutChanged:(id)sender;
 {
-    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-    
-    [o_open_panel setAllowsMultipleSelection: NO];
-    [o_open_panel setTitle: _NS("Open File")];
-    [o_open_panel setPrompt: _NS("Open")];
+    [self soutModeChanged: nil];
 
-    if( [o_open_panel runModalForDirectory: nil 
-            file: nil types: nil] == NSOKButton )
+    if ( [o_sout_cbox state] )
     {
-        NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
-        [o_file_path setStringValue: o_filename];
-        [self openFilePathChanged: nil];
+        NSPoint s_point;
+        s_point.x = 0;
+        s_point.y = 0;
+        [[o_panel contentView] setBoundsOrigin: s_point];
+        [[o_panel contentView] setNeedsDisplay: YES];
+
+        NSRect s_rect = [o_panel frame];
+        s_rect.size.height = OPEN_PANEL_FULL_HEIGHT + WINDOW_TITLE_HEIGHT;
+        s_rect.origin.y -= OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
+        [o_panel setFrame: s_rect display: YES animate: YES];
+    }
+    else
+    {
+        NSPoint s_point;
+        s_point.x = 0;
+        s_point.y = OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
+        [[o_panel contentView] setBoundsOrigin: s_point];
+        [[o_panel contentView] setNeedsDisplay: YES];
+
+        NSRect s_rect = [o_panel frame];
+        s_rect.size.height = OPEN_PANEL_SHORT_HEIGHT + WINDOW_TITLE_HEIGHT;
+        s_rect.origin.y += OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
+        [o_panel setFrame: s_rect display: YES animate:YES];
     }
 }
 
-- (IBAction)openVTSBrowse:(id)sender
+- (IBAction)soutFileBrowse:(id)sender
 {
-    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+    NSSavePanel *o_save_panel = [NSSavePanel savePanel];
+    NSString *o_mux_string;
+    if ( [[[o_sout_mux selectedCell] title] isEqualToString: _NS("PS")] )
+        o_mux_string = @"vob";
+    else
+        o_mux_string = @"ts";
 
-    [o_open_panel setAllowsMultipleSelection: NO];
-    [o_open_panel setCanChooseFiles: NO];
-    [o_open_panel setCanChooseDirectories: YES];
-    [o_open_panel setTitle: _NS("Open VIDEO_TS Directory")];
-    [o_open_panel setPrompt: _NS("Open")];
+    NSString * o_name = [NSString stringWithFormat: @"vlc-output.%@",
+                         o_mux_string];
 
-    if( [o_open_panel runModalForDirectory: nil
-            file: nil types: nil] == NSOKButton )
+    [o_save_panel setTitle: _NS("Save File")];
+    [o_save_panel setPrompt: _NS("Save")];
+
+    if( [o_save_panel runModalForDirectory: nil
+            file: o_name] == NSOKButton )
     {
-        NSString *o_dirname = [[o_open_panel filenames] objectAtIndex: 0];
-        [o_disc_videots_folder setStringValue: o_dirname];
-        [self openDiscInfoChanged: nil];
+        NSString *o_filename = [o_save_panel filename];
+        [o_sout_file_path setStringValue: o_filename];
+        [self soutInfoChanged: nil];
     }
+}
+
+- (void)soutModeChanged:(NSNotification *)o_notification
+{
+    NSString *o_mode;
+    BOOL b_file = FALSE;
+    BOOL b_udp = FALSE;
+    BOOL b_rtp = FALSE;
+
+    o_mode = [[o_sout_access selectedCell] title];
+
+    if( [o_mode isEqualToString: _NS("File")] ) b_file = TRUE;   
+    else if( [o_mode isEqualToString: _NS("UDP")] ) b_udp = TRUE;
+    else if( [o_mode isEqualToString: _NS("RTP")] ) b_rtp = TRUE;
+
+    [o_sout_file_path setEnabled: b_file];
+    [o_sout_file_btn_browse setEnabled: b_file];
+    [o_sout_udp_addr setEnabled: b_udp|b_rtp];
+    [o_sout_udp_port setEnabled: b_udp|b_rtp];
+    [o_sout_udp_port_stp setEnabled: b_udp|b_rtp];
+    [[o_sout_mux cellAtRow:0 column: 0] setEnabled: !b_rtp];
+
+    if ( b_rtp )
+    {
+        [[o_sout_mux cellAtRow: 0 column:1] setState: YES];
+    }
+
+    [self soutInfoChanged: nil];
+}
+
+- (void)soutInfoChanged:(NSNotification *)o_notification
+{
+    NSString *o_mode;
+    NSString *o_mux;
+    NSString *o_mrl_string;
+    NSString *o_mux_string;
+
+    o_mode = [[o_sout_access selectedCell] title];
+    o_mux = [[o_sout_mux selectedCell] title];
+
+    if ( [o_mux isEqualToString: _NS("PS")] ) o_mux_string = @"ps";
+    else o_mux_string = @"ts";
+
+    if ( [o_mode isEqualToString: _NS("File")] )
+    {
+        o_mrl_string = [NSString stringWithFormat: @"file/%@://%@",
+                        o_mux_string, [o_sout_file_path stringValue]];
+    }
+    else if ( [o_mode isEqualToString: _NS("UDP")] )
+    {
+        o_mrl_string = [NSString stringWithFormat: @"udp/%@://%@:%i",
+                        o_mux_string, [o_sout_udp_addr stringValue],
+                        [o_sout_udp_port intValue]];
+    }
+    else
+    {
+        o_mrl_string = [NSString stringWithFormat: @"rtp/%@://%@:%i",
+                        o_mux_string, [o_sout_udp_addr stringValue],
+                        [o_sout_udp_port intValue]];
+    }
+
+
+    [o_sout_mrl setStringValue: o_mrl_string];
+}
+
+- (IBAction)soutStepperChanged:(id)sender
+{
+    [o_sout_udp_port setIntValue: [o_net_udp_port_stp intValue]];
+
+    [self soutInfoChanged: nil];
 }
 
 - (IBAction)openFile:(id)sender
@@ -604,6 +796,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     if( [o_open_panel runModalForDirectory: nil
             file: nil types: nil] == NSOKButton )
     {
+        intf_thread_t * p_intf = [NSApp getIntf];
+        config_PutPsz( p_intf, "sout", NULL );
         [o_playlist appendArray: [o_open_panel filenames] atPos: -1];
     }
 }
