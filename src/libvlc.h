@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.128 2004/01/06 03:59:48 rocky Exp $
+ * $Id: libvlc.h,v 1.129 2004/01/20 15:47:42 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -199,6 +199,12 @@ static char *ppsz_language_text[] =
     "You can enforce the video alignement in its window. By default (0) it " \
     "will be centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
     "also use combinations of these values).")
+static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static char *ppsz_align_descriptions[] = { N_("Center"),
+                                           N_("Left"), N_("Right"),
+                                           N_("Top"), N_("Bottom"),
+                                           N_("Top-Left"), N_("Top-Right"),
+                                           N_("Bottom-Left"), N_("Bottom-Right")};
 
 #define ZOOM_TEXT N_("Zoom video")
 #define ZOOM_LONGTEXT N_( \
@@ -707,6 +713,7 @@ vlc_module_begin();
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
+        change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );
     add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT, VLC_TRUE );
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
