@@ -1232,7 +1232,6 @@ matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
                         else if( MKV_IS_ID( l, KaxSegmentFamily ) )
                         {
                             KaxSegmentFamily *p_fam = new KaxSegmentFamily( *static_cast<KaxSegmentFamily*>(l) );
-                            std::vector<KaxSegmentFamily>::iterator iter;
                             p_segment1->families.push_back( *p_fam );
                         }
                     }
