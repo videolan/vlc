@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.18 2003/11/30 10:26:19 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.19 2003/11/30 11:22:29 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -120,7 +120,6 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name)
                                     2, p_playlist->i_size, /* Hidden index. */
                                     -1 );
 
-            msg_Dbg( p_intf, "Adding files to playlist ...");
             /* Add to VLC's playlist */
 #if 0
             if (p_intf->p_sys->b_autoplayfile)
@@ -134,7 +133,6 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name)
                 playlist_Add( p_playlist, (const char*)name, 0, 0,
                               PLAYLIST_APPEND, PLAYLIST_END );
             }            
-            msg_Dbg( p_intf, "done");
         }
     }
     vlc_object_release( p_playlist );
@@ -334,7 +332,6 @@ onPDADeleteEvent                       (GtkWidget       *widget,
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
-    msg_Dbg( p_intf, "about to exit vlc ... " );
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_vlc->b_die = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->change_lock );
@@ -562,6 +559,7 @@ void
 NetworkBuildMRL                        (GtkEditable     *editable,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET(editable) );
     GtkSpinButton *networkPort = NULL;
     GtkEntry      *entryMRL = NULL;
     GtkEntry      *networkType = NULL;
@@ -595,7 +593,10 @@ NetworkBuildMRL                        (GtkEditable     *editable,
     pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "%s:%d", (char*)mrlAddress, (int)mrlPort );
 
     if (pos >= VLC_MAX_MRL)
+    {
         text[VLC_MAX_MRL-1]='\0';
+        msg_Err( p_intf, "Media Resource Locator is truncated to: %s", text);
+    }
 
     gtk_entry_set_text(entryMRL,text);
 }
@@ -775,7 +776,6 @@ onUpdatePlaylist                       (GtkButton       *button,
         if (p_model)
         {
             PlaylistRebuildListStore(p_model, p_playlist);
-            msg_Dbg(p_intf, "Adding new model to Playlist" );
             gtk_tree_view_set_model(GTK_TREE_VIEW(p_tvplaylist), GTK_TREE_MODEL(p_model));
             g_object_unref(p_model);
         }
@@ -793,7 +793,6 @@ onDeletePlaylist                       (GtkButton       *button,
     GtkTreeView    *p_tvplaylist;
 
     /* Delete an arbitrary item from the playlist */
-    msg_Dbg(p_intf, "Delete playlist item ... " );
     p_tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(button), "tvPlaylist" );
     if (p_tvplaylist != NULL)
     {
@@ -825,14 +824,10 @@ onDeletePlaylist                       (GtkButton       *button,
                 {
                     if (gtk_tree_model_get_iter(p_model, &iter, p_path))
                     {
-                        gchar *p_filename;
                         gint item;
 
-                        gtk_tree_model_get(p_model, &iter, 0, &p_filename, -1);
                         gtk_tree_model_get(p_model, &iter, 2, &item, -1);
-                        msg_Dbg(p_intf,  "Deleting %d %s", item, p_filename);
                         playlist_Delete(p_playlist, item);
-                        g_free(p_filename);
                     }
                 }
             }
@@ -848,14 +843,11 @@ onDeletePlaylist                       (GtkButton       *button,
         if (p_model)
         {
             PlaylistRebuildListStore(GTK_LIST_STORE(p_model), p_playlist);
-            msg_Dbg(p_intf, "Adding new model to Playlist" );
             gtk_tree_view_set_model(GTK_TREE_VIEW(p_tvplaylist), GTK_TREE_MODEL(p_model));
             g_object_unref(p_model);
         }
     }
     vlc_object_release( p_playlist );
-
-    msg_Dbg(p_intf, "Delete playlist item ... done" );
 }
 
 
@@ -899,9 +891,12 @@ void
 onPreferenceSave                       (GtkButton       *button,
                                         gpointer         user_data)
 {
+#if 0
     intf_thread_t *p_intf = GtkGetIntf( button );
 
     msg_Dbg(p_intf, "Preferences Save" );
+    config_SaveConfigFile( p_intf, NULL );
+#endif
 }
 
 
@@ -909,9 +904,11 @@ void
 onPreferenceApply                      (GtkButton       *button,
                                         gpointer         user_data)
 {
+#if 0
     intf_thread_t *p_intf = GtkGetIntf( button );
 
     msg_Dbg(p_intf, "Preferences Apply" );
+#endif
 }
 
 
@@ -919,9 +916,14 @@ void
 onPreferenceCancel                     (GtkButton       *button,
                                         gpointer         user_data)
 {
+#if 0
     intf_thread_t *p_intf = GtkGetIntf( button );
 
     msg_Dbg(p_intf, "Preferences Cancel" );
+    config_ResetAll( p_intf );
+    /* Cancel interface changes. */
+    config_SaveConfigFile( p_intf, NULL );
+#endif
 }
 
 

@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.12 2003/11/30 10:26:19 jpsaman Exp $
+ * $Id: pda.c,v 1.13 2003/11/30 11:22:29 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -161,13 +161,12 @@ static void Run( intf_thread_t *p_intf )
 #endif
 
     /* Create some useful widgets that will certainly be used */
-// FIXME: magic path
+/* FIXME: magic path */
     add_pixmap_directory("share");
     add_pixmap_directory("/usr/share/vlc");
 
     /* Path for pixmaps under linupy 1.4 */
     add_pixmap_directory("/usr/local/share/pixmaps/vlc");
-
     /* Path for pixmaps under linupy 2.0 */
     add_pixmap_directory("/usr/share/pixmaps/vlc");
 
@@ -178,10 +177,8 @@ static void Run( intf_thread_t *p_intf )
     }
 
     /* Store p_intf to keep an eye on it */
-    msg_Dbg( p_intf, "trying to store p_intf pointer ... " );
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
                          "p_intf", p_intf );
-    msg_Dbg( p_intf, "trying to store p_intf pointer ... done" );
 
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -193,17 +190,23 @@ static void Run( intf_thread_t *p_intf )
     
     /* Get the slider object */
     p_intf->p_sys->p_slider = GTK_HSCALE( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "slider" ) );
+        GTK_OBJECT( p_intf->p_sys->p_window ), "timeSlider" ) );
     p_intf->p_sys->p_slider_label = GTK_LABEL( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "slider_label" ) );
+        GTK_OBJECT( p_intf->p_sys->p_window ), "timeLabel" ) );
+
+    if (p_intf->p_sys->p_slider == NULL)
+        msg_Err( p_intf, "Time slider widget not found." );
+    if (p_intf->p_sys->p_slider_label == NULL)
+        msg_Err( p_intf, "Time label widget not found." );
 
 #if 0
     /* Connect the date display to the slider */
     msg_Dbg( p_intf, "setting slider adjustment ... " );
 #define P_SLIDER GTK_RANGE( gtk_object_get_data( \
-                         GTK_OBJECT( p_intf->p_sys->p_window ), "slider" ) )
+                         GTK_OBJECT( p_intf->p_sys->p_window ), "timeSlider" ) )
     p_intf->p_sys->p_adj = gtk_range_get_adjustment( P_SLIDER );
-
+    if (p_intf->p_sys->p_adj == NULL)
+        msg_Err( p_intf, "Adjustment range not found." );
     gtk_signal_connect ( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
                          GTK_SIGNAL_FUNC( E_(GtkDisplayDate) ), NULL );
     p_intf->p_sys->f_adj_oldvalue = 0;
@@ -213,7 +216,6 @@ static void Run( intf_thread_t *p_intf )
 #endif
 
     /* BEGIN OF FILEVIEW GTK_TREE_VIEW */
-    msg_Dbg(p_intf, "Getting GtkTreeView FileList" );
     p_intf->p_sys->p_tvfile = NULL;
     p_intf->p_sys->p_tvfile = (GtkTreeView *) lookup_widget( p_intf->p_sys->p_window,
                                                              "tvFileList");
@@ -252,7 +254,6 @@ static void Run( intf_thread_t *p_intf )
     gtk_tree_view_column_set_sort_column_id(column, 4);
 
     /* Get new directory listing */
-    msg_Dbg(p_intf, "Populating GtkTreeView FileList" );
     filelist = gtk_list_store_new (5,
                 G_TYPE_STRING, /* Filename */
                 G_TYPE_STRING, /* permissions */
@@ -260,7 +261,6 @@ static void Run( intf_thread_t *p_intf )
                 G_TYPE_STRING, /* Owner */
                 G_TYPE_STRING);/* Group */
     ReadDirectory(p_intf, filelist, ".");
-    msg_Dbg(p_intf, "Showing GtkTreeView FileList" );
     gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvfile), GTK_TREE_MODEL(filelist));
     g_object_unref(filelist);     /* Model will be released by GtkTreeView */
     gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(p_intf->p_sys->p_tvfile)),GTK_SELECTION_MULTIPLE);
@@ -272,7 +272,6 @@ static void Run( intf_thread_t *p_intf )
     /* END OF FILEVIEW GTK_TREE_VIEW */
 
     /* BEGIN OF PLAYLIST GTK_TREE_VIEW */
-    msg_Dbg(p_intf, "Getting GtkTreeView PlayList" );
     p_intf->p_sys->p_tvplaylist = NULL;
     p_intf->p_sys->p_tvplaylist = (GtkTreeView *) lookup_widget( p_intf->p_sys->p_window, "tvPlaylist");   
     if (NULL == p_intf->p_sys->p_tvplaylist)
@@ -290,21 +289,20 @@ static void Run( intf_thread_t *p_intf )
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvplaylist, 1 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 1 );
     gtk_tree_view_column_set_sort_column_id(column, 1);
-    /* Column 3 */
+#if 0
+    /* Column 3 - is a hidden column used for reliable deleting items from the underlying playlist */
     renderer = gtk_cell_renderer_text_new ();
     gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 2, _("Index"), renderer, NULL);
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvplaylist, 2 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 2 );
     gtk_tree_view_column_set_sort_column_id(column, 2);
-
+#endif
     /* update the playlist */
-    msg_Dbg(p_intf, "Populating GtkTreeView Playlist" );
     playlist = gtk_list_store_new (3,
                 G_TYPE_STRING, /* Filename */
                 G_TYPE_STRING, /* Time */
                 G_TYPE_UINT);  /* Hidden index */
     PlaylistRebuildListStore( playlist, vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ));
-    msg_Dbg(p_intf, "Showing GtkTreeView Playlist" );
     gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvplaylist), GTK_TREE_MODEL(playlist));
     g_object_unref(playlist);
     gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(p_intf->p_sys->p_tvplaylist)),GTK_SELECTION_MULTIPLE);
@@ -436,13 +434,11 @@ static int Manage( intf_thread_t *p_intf )
                         p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
                 if (p_playlist != NULL)
                 {
-                    msg_Dbg(p_intf, "Manage: Populating GtkTreeView Playlist" );
                     p_liststore = gtk_list_store_new (3,
                                                G_TYPE_STRING,
                                                G_TYPE_STRING,
                                                G_TYPE_UINT);  /* Hidden index */
                     PlaylistRebuildListStore(p_liststore, p_playlist);
-                    msg_Dbg(p_intf, "Manage: Updating GtkTreeView Playlist" );
                     gtk_tree_view_set_model(p_intf->p_sys->p_tvplaylist, (GtkTreeModel*) p_liststore);
                     g_object_unref(p_liststore);
                     vlc_object_release( p_playlist );
@@ -600,6 +596,7 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
         /* initialize and show slider for seekable streams */
         if( p_intf->p_sys->p_input->stream.b_seekable )
         {
+            msg_Dbg( p_intf, "Updating slider widget" );
             if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
                 p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue = 0;
             else
