@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.30 2003/12/21 23:32:58 sam Exp $
+ * $Id: httpd.c,v 1.31 2004/02/05 19:51:46 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -173,7 +173,7 @@ struct httpd_file_t
     int         i_buffer_size;      /* buffer size, can't be reallocated smaller */
     uint8_t     *p_buffer;          /* buffer */
     int64_t     i_buffer_pos;       /* absolute position from begining */
-    int         i_buffer_last_pos;  /* a new connection will start with that */
+    int64_t     i_buffer_last_pos;  /* a new connection will start with that */
 
     /* data to be send at connection time (if any) */
     int         i_header_size;
