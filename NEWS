@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.77 2003/12/13 11:22:15 gbazin Exp $
+$Id: NEWS,v 1.78 2003/12/13 15:28:41 rocky Exp $
 
 Changes between 0.6.2 and 0.7.0:
 ---------------------------------
@@ -58,6 +58,7 @@ Interface:
     - Playlist improvements (Sort, Search, mode buttons).
     - Improvements and help in preferences
     - New streaming wizard
+    - Revised Disc Open menu
  * HTTP
     - Improvements of the standard pages
     - Support for new commands
