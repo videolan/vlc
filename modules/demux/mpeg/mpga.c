@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.13 2003/12/27 14:47:10 asmax Exp $
+ * $Id: mpga.c,v 1.14 2003/12/27 16:14:48 asmax Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -252,7 +252,6 @@ static int Open( vlc_object_t * p_this )
         char psz_description[50];
 
         p_sys->i_bitrate_avg = MPGA_BITRATE( header ) * 1000;
-    fprintf(stderr,"rate1 %d\n", p_sys->i_bitrate_avg);
         if( ( i_xing = stream_Peek( p_input->s, &p_xing, 1024 ) ) >= 21 )
         {
             int i_skip;
