@@ -187,9 +187,9 @@ AC_ARG_WITH(glide,
 AC_ARG_ENABLE(gnome,
   [  --disable-gnome         Gnome support (default enabled)])
 if test x$enable_gnome != xno; then PLUGINS=${PLUGINS}"gnome "; ALIASES=${ALIASES}"gvlc "; fi
-AC_ARG_ENABLE(x11,
-  [  --enable-x11            X11 support (default disabled)],
-  [if test x$enable_x11 = xyes; then PLUGINS=${PLUGINS}"x11 "; fi])
+AC_ARG_ENABLE(gnome,
+  [  --disable-x11           X11 support (default enabled)])
+if test x$enable_x11 != xno; then PLUGINS=${PLUGINS}"x11 "; fi
 
 AC_ARG_ENABLE(alsa,
   [  --enable-alsa           Alsa sound drivers support (Only for linux) (default disabled)],
