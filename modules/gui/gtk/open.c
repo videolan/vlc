@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.c,v 1.19 2003/12/12 22:46:25 rocky Exp $
+ * $Id: open.c,v 1.20 2003/12/13 00:00:45 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -45,6 +45,18 @@
 
 #include "playlist.h"
 #include "common.h"
+
+#ifdef HAVE_CDDAX
+#define CDDA_MRL "cddax://"
+#else 
+#define CDDA_MRL "cdda://"
+#endif
+
+#ifdef HAVE_VCDX
+#define VCD_MRL "vcdx://"
+#else
+#define VCD_MRL "vcdx://"
+#endif
 
 static void GtkOpenShow( intf_thread_t *, int );
 
@@ -177,6 +189,10 @@ void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
             GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
                                       "disc_name" ) ), psz_device );
 	   free( psz_device );
+	 } else {
+            gtk_entry_set_text(
+            GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
+                                      "disc_name" ) ), "" );
 	 }
 	GtkDiscOpenChanged( (GtkWidget *) togglebutton, user_data );
       }
@@ -195,6 +211,10 @@ void GtkDiscOpenCDDA( GtkToggleButton * togglebutton, gpointer user_data )
             GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
                                       "disc_name" ) ), psz_device );
           free( psz_device );
+	} else {
+          gtk_entry_set_text(
+            GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
+                                      "disc_name" ) ), "" );
 	}
 	GtkDiscOpenChanged( (GtkWidget *) togglebutton, user_data );
       }
@@ -204,15 +224,17 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
 {
     intf_thread_t * p_intf = GtkGetIntf( button );
     GString * p_target = g_string_new( "" );
-    GtkWidget * p_open;
+    GtkWidget * p_open = gtk_widget_get_toplevel( GTK_WIDGET (button) );
     vlc_bool_t b_menus = VLC_FALSE;
     vlc_bool_t b_chapter_menu = VLC_TRUE;
-
-    p_open = gtk_widget_get_toplevel( GTK_WIDGET (button) );
+    GtkWidget *p_label = gtk_object_get_data( GTK_OBJECT( p_open ),
+					      "disc_title_label" );
 
     if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                           "disc_dvd" ) )->active )
     {
+	gtk_label_set_text( GTK_LABEL( p_label ), _("Title") );
+
         b_menus = GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "disc_dvd_use_menu" ) )->active;
 
@@ -243,60 +265,53 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
     else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "disc_vcd" ) )->active )
     {
-#ifdef HAVE_VCDX
         int i = gtk_spin_button_get_value_as_int(
                            GTK_SPIN_BUTTON( lookup_widget(
 	                   GTK_WIDGET(button), "disc_title" ) ) );
+
+#ifdef HAVE_VCDX
+	int i_pbc = config_GetInt( p_intf, "vcdx-PBC"  );
+
+	gtk_label_set_text( GTK_LABEL( p_label ), 
+			    i_pbc ? _("PBC LID") : _("Entry") );
 	
-        g_string_append( p_target, "vcdx://" );
+        g_string_append( p_target, VCD_MRL );
 	g_string_append( p_target,
 			 gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                          GTK_WIDGET(button), "disc_name" ) ) ) );
 
 	if ( i ) 
-	  g_string_sprintfa( p_target, "@%c%d",
-			     config_GetInt( p_intf, "vcdx-PBC"  )
-			     ? 'P' : 'E', i );
+	  g_string_sprintfa( p_target, "@%c%d", i_pbc ? 'P' : 'E', i );
 	
 #else
-        g_string_append( p_target, "vcd://" );
-        g_string_sprintfa( p_target, "@%d",
-                           gtk_spin_button_get_value_as_int(
-                           GTK_SPIN_BUTTON( lookup_widget(
-                           GTK_WIDGET(button), "disc_title" ) ) ) );
-#endif
+	gtk_label_set_text( GTK_LABEL( p_label ), _("Track") );
+        g_string_append( p_target, VCD_MRL );
+        g_string_sprintfa( p_target, "@%d", i );
+#endif /* HAVE_VCDX */
+        b_chapter_menu = VLC_FALSE;
     }
 
     else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "disc_cdda" ) )->active )
     {
-#ifdef HAVE_CDDAX
         int i = gtk_spin_button_get_value_as_int(
                            GTK_SPIN_BUTTON( lookup_widget(
 	                   GTK_WIDGET(button), "disc_title" ) ) );
 
-        g_string_append( p_target, "cddax://" );
+	gtk_label_set_text( GTK_LABEL( p_label ), _("Track") );
+        b_chapter_menu = VLC_FALSE;
+
+        g_string_append( p_target, CDDA_MRL );
 	g_string_append( p_target,
                      gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                      GTK_WIDGET(button), "disc_name" ) ) ) );
-
+#ifdef HAVE_CDDAX
 	if ( i ) 
-	  g_string_sprintfa( p_target, "@T%i",
-                             gtk_spin_button_get_value_as_int(
-                             GTK_SPIN_BUTTON( lookup_widget(
-			     GTK_WIDGET(button), "disc_title" ) ) ) );
-
+	  g_string_sprintfa( p_target, "@T%i", i );
 #else
-        g_string_append( p_target, "cdda://" );
-	g_string_append( p_target,
-                     gtk_entry_get_text( GTK_ENTRY( lookup_widget(
-                                     GTK_WIDGET(button), "disc_name" ) ) ) );
-        g_string_sprintfa( p_target, "@%i:%i",
-                           gtk_spin_button_get_value_as_int(
-                           GTK_SPIN_BUTTON( lookup_widget(
-			   GTK_WIDGET(button), "disc_title" ) ) ) );
+        g_string_sprintfa( p_target, "@%i", i );
+
 #endif
-	b_chapter_menu = VLC_FALSE;
     }
 
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
@@ -567,6 +582,7 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
         GTK_OBJECT( p_intf->p_sys->p_open ), "network_http_url" ) ),
         "http://" );
 
+#if SATELLITE_OPTIONS_FIXED
     /* Satellite stuff */
     psz_var = config_GetPsz( p_intf, "frequency" );
     if( psz_var )
@@ -585,6 +601,7 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
             psz_var );
         free( psz_var );
     }
+#endif /*SATELITE_OPTIONS_FIXED*/
 
     /* subtitle stuff */
     /* hide hbox_subtitle */
