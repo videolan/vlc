@@ -10,12 +10,12 @@ HEAD
 Wed, 10 Oct 2001 15:00:29 +0200
 
   * XVideo module now compiled as built-in for Debian packages, to avoid
-  PIC and non-PIC code collision (Closes Debian bug #111790).
+    PIC and non-PIC code collision (Closes Debian bug #111790).
   * MacOS X port : replaced -traditional-cpp (deprecated) with -no-cpp-precomp.
   * MacOS X port : native QuickTime video output, courtesy of Florian G.
-  Pflug <fgp@phlo.org>. Use it with -I macosx_qt.
+    Pflug <fgp@phlo.org>. Use it with -I macosx_qt.
   * Fixed bugs in the altivec detection, courtesy of Michel Lanners
-  <mlan@cpu.lu>.
+    <mlan@cpu.lu>.
   * Added HTTP url drop (from a WWW browser) to the gtk/gnome interface.
   * Added User-Agent header in the HTTP input.
   * Fixed an input segfault which occured using ES input.
@@ -31,36 +31,36 @@ Wed, 10 Oct 2001 15:00:29 +0200
   * Enabled mouse clicks in the GGI plugin.
   * Fixed a warning in input_es.c.
   * Don't connect on INADDR_ANY, patch courtesy of Mathias Kretschmer
-  <mathias@research.att.com>.
+    <mathias@research.att.com>.
   * Cleaned up sam's mess with input's pf_open and pf_close (not completely).
   * With -vvv modules now show up their scores.
   * HTTP input support.
   * Borrowed Mandrakesoft's vlc.spec and libdvdcss.spec.
   * New configure option --with-tuning=[arch], extending --enable-pentiumpro ;
-  for Pentium, use --with-tuning=pentium, for PowerPC 604 use --with-tuning=604,
-  and so on.
+    for Pentium, use --with-tuning=pentium, for PowerPC 604 use
+    --with-tuning=604, and so on.
   * Dramatically improve compilation time, with a negligible performance
-  tradeoff.
+    tradeoff.
   * Removed -march=pentiumpro ; should now work on pentium-class machines.
   * Removed --enable-stats configuration directive. Stats are now activated
-  at runtime with --stats.
+    at runtime with --stats.
   * New intf_StatMsg() call.
   * Vout picture heap is now 8 pictures instead of 5 (better synchro).
   * Tremendous enhancements in statistics display.
   * Better capabilities handling.
   * Error checks in debug mode : pthread ERRORCHECK_MUTEX and MALLOC_CHECK_=2.
   * "added support for an unusual construct at the start of some
-  slices", says walken :-).
+    slices", says walken :-).
   * In spdif ac3 is selected by default
   * Video output grows to respect acpect ratio instead of shrinking (not
-  in x11 because it takes cpu to resize a picture).
+    in x11 because it takes cpu to resize a picture).
   * Disable dpms in xvideo.
   * Better handling of the buffer of the sound driver to try to remove
-  sratches in spdif.
+    sratches in spdif.
   * Fix bad dates in ac3 spdif "decoder" (playing with the bit stream is very
-  funny).
+    funny).
   * Thanks to Stef for his ideas, Meuuh for his bit stream, and Sam for his
-  trolls :)
+    trolls :)
   * Fixed bugs in the MacOS X port.
   * Faster configure script and as-yet untested Darwin patches.
   * Test for Altivec C extensions.
@@ -68,49 +68,49 @@ Wed, 10 Oct 2001 15:00:29 +0200
   * Fixed a stupid mistake in NormScan().   
   * By default, use the real size of the stream for the video output size.
   * Altivec IDCT and motion compensation, courtesy of Michel Lespinasse for
-  mpeg2dec (untested).
+    mpeg2dec (untested).
   * Fixed many alignment issues.
   * Miscellaneous updates to configure, especially for cross-compilation.
   * Fixed the BeOS slider overflow problem.
   * Corrected BeOS Slider and button status behaviour.
   * Simplified Code in the vout_beos ready for another developer to implement
-  more advanced video output.
+    more advanced video output.
   * Fixed typos, courtesy of Michel Lanners <mlan@cpu.lu>.
   * Fixed a netlist packet leak in demuxPSI (Mark Gritter
-  <mgritter@kealia.com>).
+    <mgritter@kealia.com>).
   * Removed the nuts message "unable to allocate memory" when the netlist got
-  empty.
+    empty.
   * Various fixes for GCC 3.0.
   * Reworked jlj's patch for field pictures.
   * Fixed numerous bugs with the Altivec IDCT (still not compiling).
   * MPEG audio emphasis fix, courtesy of Matthieu Lochegnies
-  <lochegm1@cti.ecp.fr>.
+    <lochegm1@cti.ecp.fr>.
   * ac3dec uninitialized data structure fix, courtesy of Damian Ivereigh
-  <damian@cisco.com>.
+    <damian@cisco.com>.
   * Altivec IDCT and motion compensation, based on Paul Mackerras's mpeg2dec.
   * Local minor optimizations in IDCT.
   * Removed a hopeless kludge in input_clock.c.
   * Fixed a problem with field streams not working with new video decoder.
   * IP Multicast support, courtesy of Mathias Kretschmer
-  <mathias@research.att.com>.
+    <mathias@research.att.com>.
   * Removed O_NONBLCK in aout_Play because we don't use it and some drivers
-  (e.g. esssolo1 have problems with this) ;
+    (e.g. esssolo1 have problems with this) ;
   * Added warning messages.
   * Fixed build dependencies for architectures not supporting libasound2
-  (Closes Debian bug #109722).
+    (Closes Debian bug #109722).
   * Install doesn't explode if libdvdcss hasn't been compiled.
   * Attempt to fix the SDL detection under *BSD.
   * Removed /usr/local/include, because it is unsafe in a cross-compilation
-  environment.
+    environment.
   * The win32 port is once again using msvcrt.dll instead of msvcrt40.dll.
   * Fixed a synchro bug (typo) in video_output.c.
   * Added documentation to use VLC as a netscape plug-in and do some
-  (buggy) web streaming.
+    (buggy) web streaming.
   * Totally rewrote the video decoder (inspired by walken's mpeg2dec),
-  implying - performance boost ; - fixed the "Dual Prime Arithmetic" bug ;
-  - 3DNow! motion compensation module.
+    implying - performance boost ; - fixed the "Dual Prime Arithmetic" bug ;
+    - 3DNow! motion compensation module.
   * AC3dec statistics do not show up with --enable-stats, because I doubt
-  they're understandable by a normal human being, and they pollute the output.
+    they're understandable by a normal human being, and they pollute the output.
   * Minor changes to the (non-working) ncurses interface.
   * Fixed a packet leak in DemuxPSI.
   * Added gnome.h check and cleaned the error messages in the configure script.
