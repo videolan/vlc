@@ -2,10 +2,10 @@
  * intf_macosx.c: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_macosx.c,v 1.11 2002/02/18 01:34:44 jlj Exp $
+ * $Id: intf_macosx.c,v 1.12 2002/04/16 23:00:54 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
- *	        Florian G. Pflug <fgp@phlo.org>
+ *          Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify

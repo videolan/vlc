@@ -2,7 +2,7 @@
  * intf_controller.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.c,v 1.4 2002/03/19 03:33:52 jlj Exp $
+ * $Id: intf_controller.c,v 1.5 2002/04/16 23:00:54 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -91,7 +91,7 @@
             UpdateSystemActivity( UsrActivity );
         }
 
-        sleepDate = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+        sleepDate = [NSDate dateWithTimeIntervalSinceNow: 0.5];
         [NSThread sleepUntilDate: sleepDate];
     }
 
