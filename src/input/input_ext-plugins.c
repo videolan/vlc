@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.34 2003/07/20 20:33:17 gbazin Exp $
+ * $Id: input_ext-plugins.c,v 1.35 2003/07/27 15:49:27 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -503,6 +503,7 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
             {
                 return -1;
             }
+            vlc_mutex_lock( &p_input->p_method_data->lock );
         }
     }
 
