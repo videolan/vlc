@@ -130,7 +130,10 @@ void X11Loop::run()
 
         // Wait for the next timer and execute it
         // The sleep is interrupted if an X11 event is received
-        pTimerLoop->waitNextTimer();
+        if( !m_exit )
+        {
+            pTimerLoop->waitNextTimer();
+        }
     }
 }
 
@@ -138,12 +141,6 @@ void X11Loop::run()
 void X11Loop::exit()
 {
     m_exit = true;
-}
-
-
-void X11Loop::flush()
-{
-    XFlush( XDISPLAY );
 }
 
 
@@ -155,16 +152,20 @@ void X11Loop::handleX11Event()
     // Look for the next event in the queue
     XNextEvent( XDISPLAY, &event );
 
-    // If the "parent" window is mapped, show all the windows
-    if( event.xany.window == m_rDisplay.getMainWindow()
-        && event.type == MapNotify )
+    if( event.xany.window == m_rDisplay.getMainWindow() )
     {
-        getIntf()->p_sys->p_theme->getWindowManager().showAll();
+        if( event.type == MapNotify )
+        {
+            // When the "parent" window is mapped, show all the visible
+            // windows, as it is not automatic, unfortunately
+            getIntf()->p_sys->p_theme->getWindowManager().synchVisibility();
+        }
+        return;
     }
 
     // Find the window to which the event is sent
-    X11Factory *pFactory = (X11Factory*)X11Factory::instance( getIntf() );
-    GenericWindow *pWin = pFactory->m_windowMap[event.xany.window];
+    GenericWindow *pWin =
+        ((X11Factory*)pOsFactory)->m_windowMap[event.xany.window];
 
     if( !pWin )
     {
@@ -359,7 +360,8 @@ void X11Loop::handleX11Event()
             string type = XGetAtomName( XDISPLAY, event.xclient.message_type );
 
             // Find the DnD object for this window
-            X11DragDrop *pDnd = pFactory->m_dndMap[event.xany.window];
+            X11DragDrop *pDnd =
+                ((X11Factory*)pOsFactory)->m_dndMap[event.xany.window];
             if( !pDnd )
             {
                 msg_Err( getIntf(), "No associated D&D object !!" );
@@ -384,12 +386,6 @@ void X11Loop::handleX11Event()
             }
             break;
         }
-
-        case UnmapNotify:
-            // Hack to update the visibility variable if the window
-            // is unmapped by the window manager
-            ((VarBoolImpl&)pWin->getVisibleVar()).set( false, false );
-            break;
     }
 }
 

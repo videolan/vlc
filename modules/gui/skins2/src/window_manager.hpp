@@ -67,14 +67,14 @@ class WindowManager: public SkinObject
         /// If a new anchoring is detected, the windows will move accordingly.
         void move( TopWindow &rWindow, int left, int top ) const;
 
-        /// Raise all the windows
-        void raiseAll() const;
-
         /// Show all the registered windows
         void showAll() const;
 
         /// Hide all the registered windows
         void hideAll() const;
+
+        /// Synchronize the windows with their visibility variable
+        void synchVisibility() const;
 
         /// Raise the given window
         void raise( TopWindow &rWindow ) const { rWindow.raise(); }

@@ -2,7 +2,7 @@
  * os_loop.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_loop.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -39,9 +39,6 @@ class OSLoop: public SkinObject
 
         /// Exit the main loop
         virtual void exit() = 0;
-
-        /// Flush the event queue
-        virtual void flush() {}
 
     protected:
         OSLoop( intf_thread_t *pIntf ): SkinObject( pIntf ) {}

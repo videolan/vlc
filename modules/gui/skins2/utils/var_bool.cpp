@@ -34,15 +34,12 @@ VarBoolImpl::VarBoolImpl( intf_thread_t *pIntf ):
 }
 
 
-void VarBoolImpl::set( bool value, bool doNotify )
+void VarBoolImpl::set( bool value )
 {
     if( value != m_value )
     {
         m_value = value;
-        if( doNotify )
-        {
-            notify();
-        }
+        notify();
     }
 }
 

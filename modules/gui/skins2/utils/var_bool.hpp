@@ -60,7 +60,7 @@ class VarBoolImpl: public VarBool
         virtual bool get() const { return m_value; }
 
         /// Set the internal value
-        virtual void set( bool value, bool doNotify = true );
+        virtual void set( bool value );
 
     private:
         /// Boolean value

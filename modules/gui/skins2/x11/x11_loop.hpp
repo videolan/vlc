@@ -2,7 +2,7 @@
  * x11_loop.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_loop.hpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -48,9 +48,6 @@ class X11Loop: public OSLoop
 
         /// Exit the main loop
         virtual void exit();
-
-        /// Flush the event queue
-        virtual void flush();
 
     private:
         /// X11 Display

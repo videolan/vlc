@@ -147,13 +147,16 @@ void WindowManager::move( TopWindow &rWindow, int left, int top ) const
 }
 
 
-void WindowManager::raiseAll() const
+void WindowManager::synchVisibility() const
 {
-    // Raise all the windows
     WinSet_t::const_iterator it;
     for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
     {
-        (*it)->raise();
+        // Show the window if it has to be visible
+        if( (*it)->getVisibleVar().get() )
+        {
+            (*it)->innerShow();
+        }
     }
 }
 
