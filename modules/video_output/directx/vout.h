@@ -2,7 +2,7 @@
  * vout.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: vout.h,v 1.12 2004/01/02 22:17:57 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -77,6 +77,12 @@ struct vout_sys_t
     RECT         rect_src_clipped;
     RECT         rect_dest;
     RECT         rect_dest_clipped;
+
+    /* Overlay alignment restrictions */
+    int          i_align_src_boundary;
+    int          i_align_src_size;
+    int          i_align_dest_boundary;
+    int          i_align_dest_size;
 
     /* DDraw capabilities */
     int          b_caps_overlay_clipping;

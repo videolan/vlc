@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: events.c,v 1.38 2004/02/26 13:58:23 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -508,6 +508,20 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
     rect_dest.top = point.y + i_y;
     rect_dest.bottom = rect_dest.top + i_height;
 
+    /* Apply overlay hardware constraints */
+    if( p_vout->p_sys->b_using_overlay )
+    {
+        if( p_vout->p_sys->i_align_dest_boundary )
+            rect_dest.left = ( rect_dest.left +
+                p_vout->p_sys->i_align_dest_boundary / 2 ) & 
+                ~p_vout->p_sys->i_align_dest_boundary;
+
+        if( p_vout->p_sys->i_align_dest_size )
+            rect_dest.right = (( rect_dest.right - rect_dest.left +
+                p_vout->p_sys->i_align_dest_size / 2 ) & 
+                ~p_vout->p_sys->i_align_dest_size) + rect_dest.left;
+    }
+
     /* UpdateOverlay directdraw function doesn't automatically clip to the
      * display size so we need to do it otherwise it will fail */
 
@@ -552,12 +566,20 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
       (rect_dest.bottom - rect_dest_clipped.bottom) * p_vout->render.i_height /
       (rect_dest.bottom - rect_dest.top);
 
-    /* The destination coordinates need to be relative to the current
-     * directdraw primary surface (display) */
-    rect_dest_clipped.left -= p_vout->p_sys->rect_display.left;
-    rect_dest_clipped.right -= p_vout->p_sys->rect_display.left;
-    rect_dest_clipped.top -= p_vout->p_sys->rect_display.top;
-    rect_dest_clipped.bottom -= p_vout->p_sys->rect_display.top;
+    /* Apply overlay hardware constraints */
+    if( p_vout->p_sys->b_using_overlay )
+    {
+        if( p_vout->p_sys->i_align_src_boundary )
+            rect_src_clipped.left = ( rect_src_clipped.left +
+                p_vout->p_sys->i_align_src_boundary / 2 ) & 
+                ~p_vout->p_sys->i_align_src_boundary;
+
+        if( p_vout->p_sys->i_align_src_size )
+            rect_src_clipped.right = (( rect_src_clipped.right -
+                rect_src_clipped.left +
+                p_vout->p_sys->i_align_src_size / 2 ) & 
+                ~p_vout->p_sys->i_align_src_size) + rect_src_clipped.left;
+    }
 
 #if 0
     msg_Dbg( p_vout, "DirectXUpdateRects image_src_clipped"
@@ -565,6 +587,13 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
                      rect_src_clipped.left, rect_src_clipped.top,
                      rect_src_clipped.right, rect_src_clipped.bottom );
 #endif
+
+    /* The destination coordinates need to be relative to the current
+     * directdraw primary surface (display) */
+    rect_dest_clipped.left -= p_vout->p_sys->rect_display.left;
+    rect_dest_clipped.right -= p_vout->p_sys->rect_display.left;
+    rect_dest_clipped.top -= p_vout->p_sys->rect_display.top;
+    rect_dest_clipped.bottom -= p_vout->p_sys->rect_display.top;
 
     /* Signal the change in size/position */
     p_vout->p_sys->i_changes |= DX_POSITION_CHANGE;

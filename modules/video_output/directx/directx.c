@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: directx.c,v 1.36 2004/02/26 13:58:23 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -172,6 +172,7 @@ static int OpenVideo( vlc_object_t *p_this )
         msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
     }
+    memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
     /* Initialisations */
     p_vout->pf_init = Init;
@@ -1597,33 +1598,58 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
     }
     else
     {
-        BOOL bHasOverlay, bHasOverlayFourCC, bCanDeinterlace,
-             bHasColorKey, bCanStretch, bCanBltFourcc;
+        vlc_bool_t bHasOverlay, bHasOverlayFourCC, bCanDeinterlace,
+             bHasColorKey, bCanStretch, bCanBltFourcc,
+             bAlignBoundarySrc, bAlignBoundaryDest,
+             bAlignSizeSrc, bAlignSizeDest;
 
         /* Determine if the hardware supports overlay surfaces */
-        bHasOverlay = ((ddcaps.dwCaps & DDCAPS_OVERLAY) ==
-                       DDCAPS_OVERLAY) ? TRUE : FALSE;
+        bHasOverlay = (ddcaps.dwCaps & DDCAPS_OVERLAY) ? 1 : 0;
         /* Determine if the hardware supports overlay surfaces */
-        bHasOverlayFourCC = ((ddcaps.dwCaps & DDCAPS_OVERLAYFOURCC) ==
-                       DDCAPS_OVERLAYFOURCC) ? TRUE : FALSE;
+        bHasOverlayFourCC = (ddcaps.dwCaps & DDCAPS_OVERLAYFOURCC) ? 1 : 0;
         /* Determine if the hardware supports overlay deinterlacing */
-        bCanDeinterlace = ((ddcaps.dwCaps & DDCAPS2_CANFLIPODDEVEN) ==
-                       0 ) ? TRUE : FALSE;
+        bCanDeinterlace = (ddcaps.dwCaps & DDCAPS2_CANFLIPODDEVEN) ? 1 : 0;
         /* Determine if the hardware supports colorkeying */
-        bHasColorKey = ((ddcaps.dwCaps & DDCAPS_COLORKEY) ==
-                        DDCAPS_COLORKEY) ? TRUE : FALSE;
+        bHasColorKey = (ddcaps.dwCaps & DDCAPS_COLORKEY) ? 1 : 0;
         /* Determine if the hardware supports scaling of the overlay surface */
-        bCanStretch = ((ddcaps.dwCaps & DDCAPS_OVERLAYSTRETCH) ==
-                       DDCAPS_OVERLAYSTRETCH) ? TRUE : FALSE;
+        bCanStretch = (ddcaps.dwCaps & DDCAPS_OVERLAYSTRETCH) ? 1 : 0;
         /* Determine if the hardware supports color conversion during a blit */
-        bCanBltFourcc = ((ddcaps.dwCaps & DDCAPS_BLTFOURCC ) ==
-                        DDCAPS_BLTFOURCC) ? TRUE : FALSE;
-
+        bCanBltFourcc = (ddcaps.dwCaps & DDCAPS_BLTFOURCC) ? 1 : 0;
+        /* Determine overlay source boundary alignment */
+        bAlignBoundarySrc = (ddcaps.dwCaps & DDCAPS_ALIGNBOUNDARYSRC) ? 1 : 0;
+        /* Determine overlay destination boundary alignment */
+        bAlignBoundaryDest = (ddcaps.dwCaps & DDCAPS_ALIGNBOUNDARYDEST) ? 1:0;
+        /* Determine overlay destination size alignment */
+        bAlignSizeSrc = (ddcaps.dwCaps & DDCAPS_ALIGNSIZESRC) ? 1 : 0;
+        /* Determine overlay destination size alignment */
+        bAlignSizeDest = (ddcaps.dwCaps & DDCAPS_ALIGNSIZEDEST) ? 1 : 0;
+ 
         msg_Dbg( p_vout, "DirectDraw Capabilities: overlay=%i yuvoverlay=%i "
                          "can_deinterlace_overlay=%i colorkey=%i stretch=%i "
                          "bltfourcc=%i",
                          bHasOverlay, bHasOverlayFourCC, bCanDeinterlace,
                          bHasColorKey, bCanStretch, bCanBltFourcc );
+
+        if( bAlignBoundarySrc || bAlignBoundaryDest ||
+            bAlignSizeSrc || bAlignSizeDest )
+        {
+            if( bAlignBoundarySrc ) p_vout->p_sys->i_align_src_boundary =
+                ddcaps.dwAlignBoundarySrc;
+            if( bAlignBoundaryDest ) p_vout->p_sys->i_align_dest_boundary =
+                ddcaps.dwAlignBoundaryDest;
+            if( bAlignSizeDest ) p_vout->p_sys->i_align_src_size =
+                ddcaps.dwAlignSizeSrc;
+            if( bAlignSizeDest ) p_vout->p_sys->i_align_dest_size =
+                ddcaps.dwAlignSizeDest;
+
+            msg_Dbg( p_vout, "align_boundary_src=%i,%i "
+                     "align_boundary_dest=%i,%i "
+                     "align_size_src=%i,%i align_size_dest=%i,%i",
+                     bAlignBoundarySrc, p_vout->p_sys->i_align_src_boundary,
+                     bAlignBoundaryDest, p_vout->p_sys->i_align_dest_boundary,
+                     bAlignSizeSrc, p_vout->p_sys->i_align_src_size,
+                     bAlignSizeDest, p_vout->p_sys->i_align_dest_size );
+        }
 
         /* Don't ask for troubles */
         if( !bCanBltFourcc ) p_vout->p_sys->b_hw_yuv = FALSE;
