@@ -269,12 +269,14 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         free( val.psz_string );
         val.psz_string = 0;
     }
+
 #ifdef SYS_DARWIN
     if( !val.psz_string && p_vout->p_vlc->psz_homedir )
     {
         asprintf( &val.psz_string, "%s/Desktop",
                   p_vout->p_vlc->psz_homedir );
     }
+
 #elif defined(WIN32) && !defined(UNDER_CE)
     if( !val.psz_string && p_vout->p_vlc->psz_homedir )
     {
@@ -301,11 +303,11 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         {
             SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
                                                       _T("SHGetFolderPathA") );
-            if ( SHGetFolderPath != NULL )
+            if( SHGetFolderPath != NULL )
             {
                 p_mypicturesdir = (char *)malloc( MAX_PATH );
                 if( p_mypicturesdir ) 
-                    {
+                {
 
                     if( S_OK != SHGetFolderPath( NULL,
                                         CSIDL_MYPICTURES | CSIDL_FLAG_CREATE,
@@ -320,14 +322,18 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             FreeLibrary( shfolder_dll );
         }
 
-        if( p_mypicturesdir == NULL){
+        if( p_mypicturesdir == NULL )
+        {
             asprintf( &val.psz_string, "%s/" CONFIG_DIR,
-                  p_vout->p_vlc->psz_homedir );
-        } else {
+                      p_vout->p_vlc->psz_homedir );
+        }
+        else
+        {
             asprintf( &val.psz_string, p_mypicturesdir );
             free( p_mypicturesdir );
         }
     }
+
 #else
     if( !val.psz_string && p_vout->p_vlc->psz_homedir )
     {
@@ -335,20 +341,22 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
                   p_vout->p_vlc->psz_homedir );
     }
 #endif
+
     if( !val.psz_string )
     {
         msg_Err( p_vout, "no directory specified for snapshots" );
         return VLC_EGENERIC;
     }
     var_Get( p_vout, "snapshot-format", &format );
-    if( format.psz_string && !*format.psz_string )
+    if( !format.psz_string || !*format.psz_string )
     {
-        free( format.psz_string );
+        if( format.psz_string ) free( format.psz_string );
         format.psz_string = strdup( "png" );
     }
 
     asprintf( &psz_filename, "%s/vlcsnap-%u.%s", val.psz_string,
-              (unsigned int)(p_pic->date / 100000) & 0xFFFFFF, format.psz_string );
+              (unsigned int)(p_pic->date / 100000) & 0xFFFFFF,
+              format.psz_string );
     free( val.psz_string );
     free( format.psz_string );
 
