@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.136 2001/10/03 02:19:21 tcastley Exp $
+ * $Id: input.c,v 1.137 2001/10/03 03:32:05 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,7 +57,10 @@
 #   include <sys/socket.h>
 #endif
 
+#ifdef WIN32
+#else
 #include <sys/times.h>
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -492,6 +495,7 @@ static void EndThread( input_thread_t * p_input )
     if( p_main->b_stats )
     {
         /* Display statistics */
+        #ifndef WIN32
         struct tms  cpu_usage;
         times( &cpu_usage );
 
@@ -500,6 +504,7 @@ static void EndThread( input_thread_t * p_input )
                       cpu_usage.tms_utime, cpu_usage.tms_stime );
 
         input_DumpStream( p_input );
+        #endif
     }
 
     /* Free all ES and destroy all decoder threads */

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.6 2001/10/01 16:18:49 massiot Exp $
+ * $Id: video_parser.c,v 1.7 2001/10/03 03:32:05 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -36,7 +36,9 @@
 #include <errno.h>
 #include <string.h>
 
+#ifndef WIN32
 #include <sys/times.h>
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -316,6 +318,7 @@ static void EndThread( vpar_thread_t *p_vpar )
 
     if( p_main->b_stats )
     {
+        #ifndef WIN32
         struct tms cpu_usage;
         times( &cpu_usage );
 
@@ -356,6 +359,7 @@ static void EndThread( vpar_thread_t *p_vpar )
                       S.i_scalable_mode ? "scalable" : "non-scalable",
                       S.i_matrix_coefficients );
 #undef S
+        #endif
     }
 
     /* Dispose of matrices if they have been allocated. */

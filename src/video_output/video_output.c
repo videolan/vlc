@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.141 2001/10/01 16:18:49 massiot Exp $
+ * $Id: video_output.c,v 1.142 2001/10/03 03:32:05 xav Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -34,7 +34,9 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
+#ifndef WIN32
 #include <sys/times.h>
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -1358,6 +1360,7 @@ static void EndThread( vout_thread_t *p_vout )
 
     if( p_main->b_stats )
     {
+        #ifndef WIN32
         struct tms cpu_usage;
         times( &cpu_usage );
 
@@ -1367,6 +1370,7 @@ static void EndThread( vout_thread_t *p_vout )
                       p_vout->c_pictures, p_vout->c_late_pictures );
         intf_StatMsg( "vout info: average display jitter of %lld µs",
                       p_vout->display_jitter );
+        #endif
     }
 
     /* Destroy all remaining pictures and subpictures */
