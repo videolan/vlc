@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.10 2003/01/05 21:03:58 sigmunau Exp $
+ * $Id: libasf.c,v 1.11 2003/02/24 09:26:26 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -128,8 +128,8 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
           i_pos < i_filepos ||
           i_pos - i_filepos > 10000 ) )
     {
-        p_input->pf_seek( p_input, i_pos );
         input_AccessReinit( p_input );
+        p_input->pf_seek( p_input, i_pos );
         return( 1 );
     }
     else if( i_pos > i_filepos )
