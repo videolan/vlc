@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: adjust.c,v 1.2 2002/11/28 17:35:00 sam Exp $
+ * $Id: adjust.c,v 1.3 2002/11/28 21:49:04 garf Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>, Samuel Hocevar <sam@zoy.org>
  *
@@ -33,6 +33,9 @@
 #include <vlc/vout.h>
 
 #include "filter_common.h"
+
+
+#define eight_times( x )    x x x x x x x x
 
 /*****************************************************************************
  * Local prototypes
@@ -81,7 +84,9 @@ struct vout_sys_t
         vout_thread_t *p_vout;
 };
 
-static int32_t maxmin( int32_t a )
+static int p_lum_func[256];
+
+inline static int32_t maxmin( int32_t a )
 {
     if ( a > 255 )
         return 255;
@@ -205,6 +210,7 @@ cleaner :) */
     int i_sat;
     int i_Sin;
     int i_Cos;
+    int i;
     
     /* This is a new frame. Get a structure from the video_output. */
 
@@ -245,18 +251,18 @@ cleaner :) */
         
         p_out = p_outpic->p[i_index].p_pixels;
 
+        for( i = 0 ; i < 256 ; i++ )
+        {
+            p_lum_func[ i ] = maxmin( (( i * cont ) >> 8 ) + lum + dec );
+        }
 
+        
         for( ; p_in < p_in_end ; )
         {
             /* Do 8 pixels at a time */
-                *p_out = maxmin( (( *p_in * cont ) >> 8 ) + lum + dec ); p_out++; p_in++;
-                *p_out = maxmin( (( *p_in * cont ) >> 8 ) + lum + dec ); p_out++; p_in++;
-                *p_out = maxmin( (( *p_in * cont ) >> 8 ) + lum + dec ); p_out++; p_in++;
-                *p_out = maxmin( (( *p_in * cont ) >> 8 ) + lum + dec ); p_out++; p_in++;
-                *p_out = maxmin( (( *p_in * cont ) >> 8 ) + lum + dec ); p_out++; p_in++;
-                *p_out = maxmin( (( *p_in * cont ) >> 8 ) + lum + dec ); p_out++; p_in++;
-                *p_out = maxmin( (( *p_in * cont ) >> 8 ) + lum + dec ); p_out++; p_in++;
-                *p_out = maxmin( (( *p_in * cont ) >> 8 ) + lum + dec ); p_out++; p_in++;
+
+            eight_times( *p_out = p_lum_func[ *p_in ]; p_out++; p_in++; )
+
         }
 
         p_in_end += 8;
@@ -264,7 +270,7 @@ cleaner :) */
         for( ; p_in < p_in_end ; )
         {
             /* Do 1 pixel at a time */
-                *p_out = maxmin( (( *p_in * cont ) >> 8 ) + lum + dec ); p_out++; p_in++;
+                *p_out = p_lum_func[ *p_in ]; p_out++; p_in++;
         }
     }
     else
@@ -273,6 +279,7 @@ cleaner :) */
     {
 
         u8 *p_in_u, *p_in_v, *p_in_end, *p_out_u, *p_out_v, i_u, i_v;
+        s32 cospsin, cosmsin;
 
         p_in_u = p_pic->p[i_index].p_pixels;
         p_in_v = p_pic->p[i_index + 1].p_pixels;
@@ -282,76 +289,63 @@ cleaner :) */
         p_out_u = p_outpic->p[i_index].p_pixels;
         p_out_v = p_outpic->p[i_index + 1].p_pixels;
 
+        cospsin = 128 * ( i_Cos + i_Sin );
+        cosmsin = 128 * ( i_Cos - i_Sin );
 
-        for( ; p_in_u < p_in_end ; )
+        if ( i_sat > 256 )
         {
-            /* Do 8 pixels at a time */
+            for( ; p_in_u < p_in_end ; )
+            {
+                /* Do 8 pixels at a time */
 
-                i_u = *p_in_u ;
-                i_v = *p_in_v ;
-                *p_out_u = maxmin( (((((i_u * i_Cos + i_v * i_Sin) >> 8) - 128) * i_sat) >> 8) + 128);
-                *p_out_v = maxmin( (((((i_v * i_Cos - i_u * i_Sin) >> 8 ) - 128) * i_sat) >> 8) + 128);
-                p_out_u++; p_in_u++; p_out_v++; p_in_v++;
+       eight_times( i_u = *p_in_u ;
+                    i_v = *p_in_v ;
+                    *p_out_u = maxmin( (( ((i_u * i_Cos + i_v * i_Sin - cospsin) >> 8)  * i_sat) >> 8) + 128);
+                    *p_out_v = maxmin( (( ((i_v * i_Cos - i_u * i_Sin - cosmsin) >> 8)  * i_sat) >> 8) + 128);
+                    p_out_u++; p_in_u++; p_out_v++; p_in_v++; )
 
-                i_u = *p_in_u ;
-                i_v = *p_in_v ;
-                *p_out_u = maxmin( (((((i_u * i_Cos + i_v * i_Sin) >> 8) - 128) * i_sat) >> 8) + 128);
-                *p_out_v = maxmin( (((((i_v * i_Cos - i_u * i_Sin) >> 8 ) - 128) * i_sat) >> 8) + 128);
-                p_out_u++; p_in_u++; p_out_v++; p_in_v++;
+            }
 
-                i_u = *p_in_u ;
-                i_v = *p_in_v ;
-                *p_out_u = maxmin( (((((i_u * i_Cos + i_v * i_Sin) >> 8) - 128) * i_sat) >> 8) + 128);
-                *p_out_v = maxmin( (((((i_v * i_Cos - i_u * i_Sin) >> 8 ) - 128) * i_sat) >> 8) + 128);
-                p_out_u++; p_in_u++; p_out_v++; p_in_v++;
+            p_in_end += 8;
 
-                i_u = *p_in_u ;
-                i_v = *p_in_v ;
-                *p_out_u = maxmin( (((((i_u * i_Cos + i_v * i_Sin) >> 8) - 128) * i_sat) >> 8) + 128);
-                *p_out_v = maxmin( (((((i_v * i_Cos - i_u * i_Sin) >> 8 ) - 128) * i_sat) >> 8) + 128);
-                p_out_u++; p_in_u++; p_out_v++; p_in_v++;
-
-                i_u = *p_in_u ;
-                i_v = *p_in_v ;
-                *p_out_u = maxmin( (((((i_u * i_Cos + i_v * i_Sin) >> 8) - 128) * i_sat) >> 8) + 128);
-                *p_out_v = maxmin( (((((i_v * i_Cos - i_u * i_Sin) >> 8 ) - 128) * i_sat) >> 8) + 128);
-                p_out_u++; p_in_u++; p_out_v++; p_in_v++;
-
-                i_u = *p_in_u ;
-                i_v = *p_in_v ;
-                *p_out_u = maxmin( (((((i_u * i_Cos + i_v * i_Sin) >> 8) - 128) * i_sat) >> 8) + 128);
-                *p_out_v = maxmin( (((((i_v * i_Cos - i_u * i_Sin) >> 8 ) - 128) * i_sat) >> 8) + 128);
-                p_out_u++; p_in_u++; p_out_v++; p_in_v++;
-
-                i_u = *p_in_u ;
-                i_v = *p_in_v ;
-                *p_out_u = maxmin( (((((i_u * i_Cos + i_v * i_Sin) >> 8) - 128) * i_sat) >> 8) + 128);
-                *p_out_v = maxmin( (((((i_v * i_Cos - i_u * i_Sin) >> 8 ) - 128) * i_sat) >> 8) + 128);
-                p_out_u++; p_in_u++; p_out_v++; p_in_v++;
-
-                i_u = *p_in_u ;
-                i_v = *p_in_v ;
-                *p_out_u = maxmin( (((((i_u * i_Cos + i_v * i_Sin) >> 8) - 128) * i_sat) >> 8) + 128);
-                *p_out_v = maxmin( (((((i_v * i_Cos - i_u * i_Sin) >> 8 ) - 128) * i_sat) >> 8) + 128);
-                p_out_u++; p_in_u++; p_out_v++; p_in_v++;
+            for( ; p_in_u < p_in_end ; )
+            {
+                /* Do 1 pixel at a time */
+                    i_u = *p_in_u ;
+                    i_v = *p_in_v ;
+                    *p_out_u = maxmin( (( ((i_u * i_Cos + i_v * i_Sin - cospsin) >> 8)  * i_sat) >> 8) + 128);
+                    *p_out_v = maxmin( (( ((i_v * i_Cos - i_u * i_Sin - cosmsin) >> 8)  * i_sat) >> 8) + 128);
+                    p_out_u++; p_in_u++; p_out_v++; p_in_v++;
 
 
-
-
+            }
         }
-
-        p_in_end += 8;
-
-        for( ; p_in_u < p_in_end ; )
+        else
         {
-            /* Do 1 pixel at a time */
-                i_u = *p_in_u ;
-                i_v = *p_in_v ;
-                *p_out_u = maxmin( (((((i_u * i_Cos + i_v * i_Sin) >> 8) - 128) * i_sat) >> 8) + 128);
-                *p_out_v = maxmin( (((((i_v * i_Cos - i_u * i_Sin) >> 8 ) - 128) * i_sat) >> 8) + 128);
-                p_out_u++; p_in_u++; p_out_v++; p_in_v++;
+            for( ; p_in_u < p_in_end ; )
+            {
+                /* Do 8 pixels at a time */
 
+       eight_times( i_u = *p_in_u ;
+                    i_v = *p_in_v ;
+                    *p_out_u = (( ((i_u * i_Cos + i_v * i_Sin - cospsin) >> 8)  * i_sat) >> 8) + 128;
+                    *p_out_v = (( ((i_v * i_Cos - i_u * i_Sin - cosmsin) >> 8)  * i_sat) >> 8) + 128;
+                    p_out_u++; p_in_u++; p_out_v++; p_in_v++; )
 
+            }
+
+            p_in_end += 8;
+
+            for( ; p_in_u < p_in_end ; )
+            {
+                /* Do 1 pixel at a time */
+                    i_u = *p_in_u ;
+                    i_v = *p_in_v ;
+                    *p_out_u = (( ((i_u * i_Cos + i_v * i_Sin - cospsin) >> 8)  * i_sat) >> 8) + 128;
+                    *p_out_v = (( ((i_v * i_Cos - i_u * i_Sin - cosmsin) >> 8)  * i_sat) >> 8) + 128;
+                    p_out_u++; p_in_u++; p_out_v++; p_in_v++;
+
+            }
         }
     }
 
