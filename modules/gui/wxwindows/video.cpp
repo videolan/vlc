@@ -169,6 +169,7 @@ void *VideoWindow::GetWindow( vout_thread_t *_p_vout,
 
     if( p_vout )
     {
+        vlc_mutex_unlock( &lock );
         msg_Dbg( p_intf, "Video window already in use" );
         return NULL;
     }
