@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.15 2002/11/10 02:47:27 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.16 2002/11/17 06:46:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -98,7 +98,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 vlc_module_begin();
     add_category_hint( N_("Ffmpeg"), NULL );
 #if LIBAVCODEC_BUILD >= 4615
-    add_bool( "ffmpeg-dr", 1, NULL,
+    add_bool( "ffmpeg-dr", 0, NULL,
               "direct rendering", 
               "direct rendering" );
 #endif

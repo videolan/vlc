@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.3 2002/09/17 11:57:38 fenrir Exp $
+ * $Id: libmp4.h,v 1.4 2002/11/17 06:46:56 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -115,13 +115,13 @@
 
 typedef struct MP4_Stream_s
 {
-    int b_memory;   /* do we uses a memory buffer */
+    int     b_memory;   /* do we uses a memory buffer */
 
     input_thread_t *p_input;
     
-    off_t i_start; /* in the buffer position for memory stream */
-    off_t i_stop;
-    u8  *p_buffer;
+    off_t   i_start; /* in the buffer position for memory stream */
+    off_t   i_stop;
+    uint8_t *p_buffer;
 
 } MP4_Stream_t;
     
@@ -131,38 +131,38 @@ struct MP4_Box_s;
 /* uuid Universal Unique IDentifiers */
 typedef struct UUID_s 
 {
-    u8 b[16];
+    uint8_t b[16];
 } UUID_t;
 
 /* specific structure for all boxes */
 
 typedef struct MP4_Box_data_ftyp_s
 {
-    u32 i_major_brand;
-    u32 i_minor_version;
+    uint32_t i_major_brand;
+    uint32_t i_minor_version;
 
-    u32 i_compatible_brands_count;
-    u32 *i_compatible_brands;
+    uint32_t i_compatible_brands_count;
+    uint32_t *i_compatible_brands;
 
 } MP4_Box_data_ftyp_t;
 
 typedef struct MP4_Box_data_mvhd_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
         
-    u64 i_creation_time;
-    u64 i_modification_time;
-    u32 i_timescale;
-    u64 i_duration;
+    uint64_t i_creation_time;
+    uint64_t i_modification_time;
+    uint32_t i_timescale;
+    uint64_t i_duration;
 
-    s32 i_rate;
-    s16 i_volume;
-    s16 i_reserved1;
-    u32 i_reserved2[2];
-    s32 i_matrix[9];
-    u32 i_predefined[6];
-    u32 i_next_track_id;
+    int32_t  i_rate;
+    int16_t  i_volume;
+    int16_t  i_reserved1;
+    uint32_t i_reserved2[2];
+    int32_t  i_matrix[9];
+    uint32_t i_predefined[6];
+    uint32_t i_next_track_id;
 
 } MP4_Box_data_mvhd_t;
 
@@ -171,51 +171,51 @@ typedef struct MP4_Box_data_mvhd_s
 #define MP4_TRACK_IN_PREVIEW 0x000004
 typedef struct MP4_Box_data_tkhd_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
         
-    u64 i_creation_time;
-    u64 i_modification_time;
-    u32 i_track_ID;
-    u32 i_reserved;
-    u64 i_duration;
+    uint64_t i_creation_time;
+    uint64_t i_modification_time;
+    uint32_t i_track_ID;
+    uint32_t i_reserved;
+    uint64_t i_duration;
     
-    u32 i_reserved2[2];
-    s16 i_layer;
-    s16 i_predefined;
+    uint32_t i_reserved2[2];
+    int16_t  i_layer;
+    int16_t  i_predefined;
     
-    s16 i_volume;
-    u16 i_reserved3;
-    s32 i_matrix[9];
-    s32 i_width;
-    s32 i_height;
+    int16_t  i_volume;
+    uint16_t i_reserved3;
+    int32_t  i_matrix[9];
+    int32_t  i_width;
+    int32_t  i_height;
     
 } MP4_Box_data_tkhd_t;
 
 typedef struct MP4_Box_data_mdhd_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
         
-    u64 i_creation_time;
-    u64 i_modification_time;
-    u32 i_timescale;
-    u64 i_duration;
+    uint64_t i_creation_time;
+    uint64_t i_modification_time;
+    uint32_t i_timescale;
+    uint64_t i_duration;
 
     /* one bit for pad */
     /* unsigned int(5)[3] language difference with 0x60*/
     unsigned char i_language[3]; 
-    u16 i_predefined;
+    uint16_t i_predefined;
 
 } MP4_Box_data_mdhd_t;
 
 typedef struct MP4_Box_data_hdlr_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
     
-    u32 i_predefined;
-    u32 i_handler_type; /* "vide" "soun" "hint" "odsm" 
+    uint32_t i_predefined;
+    uint32_t i_handler_type; /* "vide" "soun" "hint" "odsm" 
                            "crsm" "sdsm" "m7sm" "ocsm" 
                            "ipsm" "mjsm" */
     
@@ -225,41 +225,41 @@ typedef struct MP4_Box_data_hdlr_s
 
 typedef struct MP4_Box_data_vmhd_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
     
-    s16 i_graphics_mode;
-    s16 i_opcolor[3];    
+    int16_t  i_graphics_mode;
+    int16_t  i_opcolor[3];    
 
 } MP4_Box_data_vmhd_t;
 
 typedef struct MP4_Box_data_smhd_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
     
-    s16 i_balance;
-    s16 i_reserved;
+    int16_t  i_balance;
+    int16_t  i_reserved;
 
 } MP4_Box_data_smhd_t;
 
 typedef struct MP4_Box_data_hmhd_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
        
-    u16 i_max_PDU_size;
-    u16 i_avg_PDU_size;
-    u32 i_max_bitrate;
-    u32 i_avg_bitrate;
-    u32 i_reserved;
+    uint16_t i_max_PDU_size;
+    uint16_t i_avg_PDU_size;
+    uint32_t i_max_bitrate;
+    uint32_t i_avg_bitrate;
+    uint32_t i_reserved;
 
 } MP4_Box_data_hmhd_t;
 
 typedef struct MP4_Box_data_url_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
     
     unsigned char *psz_location;
     
@@ -267,8 +267,8 @@ typedef struct MP4_Box_data_url_s
 
 typedef struct MP4_Box_data_urn_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
     unsigned char *psz_name;
     unsigned char *psz_location;
@@ -277,89 +277,89 @@ typedef struct MP4_Box_data_urn_s
 
 typedef struct MP4_Box_data_dref_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u32 i_entry_count;
+    uint32_t i_entry_count;
 /* XXX it's also a container with i_entry_count entry */
 } MP4_Box_data_dref_t;
 
 typedef struct MP4_Box_data_stts_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u32 i_entry_count;
-    u32 *i_sample_count; /* these are array */
-    s32 *i_sample_delta;
+    uint32_t i_entry_count;
+    uint32_t *i_sample_count; /* these are array */
+    int32_t  *i_sample_delta;
 
 } MP4_Box_data_stts_t;
 
 typedef struct MP4_Box_data_ctts_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
     
-    u32 i_entry_count;
+    uint32_t i_entry_count;
 
-    u32 *i_sample_count; /* these are array */
-    s32 *i_sample_offset;
+    uint32_t *i_sample_count; /* these are array */
+    int32_t  *i_sample_offset;
 
 } MP4_Box_data_ctts_t;
 
 
 typedef struct MP4_Box_data_sample_soun_s
 {
-    u8  i_reserved1[6];
-    u16 i_data_reference_index;
+    uint8_t  i_reserved1[6];
+    uint16_t i_data_reference_index;
 
-    u32 i_reserved2[2];
-    u16 i_channelcount;
-    u16 i_samplesize;
-    u16 i_predefined;
-    u16 i_reserved3;
-    u16 i_sampleratehi; /* timescale of track */
-    u16 i_sampleratelo;
+    uint32_t i_reserved2[2];
+    uint16_t i_channelcount;
+    uint16_t i_samplesize;
+    uint16_t i_predefined;
+    uint16_t i_reserved3;
+    uint16_t i_sampleratehi; /* timescale of track */
+    uint16_t i_sampleratelo;
     
 } MP4_Box_data_sample_soun_t;
 
 typedef struct MP4_Box_data_sample_vide_s
 {
-    u8  i_reserved1[6];
-    u16 i_data_reference_index;
+    uint8_t  i_reserved1[6];
+    uint16_t i_data_reference_index;
 
-    u16 i_predefined1;
-    u16 i_reserved2;
-    u32 i_predefined2[3];
+    uint16_t i_predefined1;
+    uint16_t i_reserved2;
+    uint32_t i_predefined2[3];
 
-    s16 i_width;
-    s16 i_height;
+    int16_t  i_width;
+    int16_t  i_height;
 
-    u32 i_horizresolution;
-    u32 i_vertresolution;
+    uint32_t i_horizresolution;
+    uint32_t i_vertresolution;
 
-    u32 i_reserved3;
-    u16 i_predefined3;
+    uint32_t i_reserved3;
+    uint16_t i_predefined3;
     
-    u8  i_compressorname[32];
-    s16 i_depth;
+    uint8_t  i_compressorname[32];
+    int16_t  i_depth;
 
-    s16 i_predefined4;
+    int16_t  i_predefined4;
     
 } MP4_Box_data_sample_vide_t;
 
 typedef struct MP4_Box_data_sample_hint_s
 {
-    u8  i_reserved1[6];
-    u16 i_data_reference_index;
+    uint8_t  i_reserved1[6];
+    uint16_t i_data_reference_index;
 
-    u8 *p_data;
+    uint8_t *p_data;
 
 } MP4_Box_data_sample_hint_t;
 
 typedef struct MP4_Box_data_moviehintinformation_rtp_s
 {
-    u32 i_description_format;
+    uint32_t i_description_format;
     unsigned char *psz_text;
 
 } MP4_Box_data_moviehintinformation_rtp_t;
@@ -368,10 +368,10 @@ typedef struct MP4_Box_data_moviehintinformation_rtp_s
 
 typedef struct MP4_Box_data_stsd_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
     
-    u32 i_entry_count;
+    uint32_t i_entry_count;
 
     /* it contains SampleEntry handled as if it was Box */
     
@@ -380,98 +380,98 @@ typedef struct MP4_Box_data_stsd_s
 
 typedef struct MP4_Box_data_stsz_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u32 i_sample_size;
-    u32 i_sample_count;
+    uint32_t i_sample_size;
+    uint32_t i_sample_count;
    
-    u32 *i_entry_size; /* array , empty if i_sample_size != 0 */
+    uint32_t *i_entry_size; /* array , empty if i_sample_size != 0 */
 
 } MP4_Box_data_stsz_t;
 
 typedef struct MP4_Box_data_stz2_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u32 i_sample_size; /* 24 bits */
-    u8  i_field_size;
-    u32 i_sample_count;
+    uint32_t i_sample_size; /* 24 bits */
+    uint8_t  i_field_size;
+    uint32_t i_sample_count;
 
-    u32 *i_entry_size; /* array: unsigned int(i_field_size) entry_size */
+    uint32_t *i_entry_size; /* array: unsigned int(i_field_size) entry_size */
 
 } MP4_Box_data_stz2_t;
 
 typedef struct MP4_Box_data_stsc_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u32 i_entry_count;
+    uint32_t i_entry_count;
 
-    u32 *i_first_chunk; /* theses are arrays */
-    u32 *i_samples_per_chunk;
-    u32 *i_sample_description_index;
+    uint32_t *i_first_chunk; /* theses are arrays */
+    uint32_t *i_samples_per_chunk;
+    uint32_t *i_sample_description_index;
     
 } MP4_Box_data_stsc_t;
 
 
 typedef struct MP4_Box_data_co64_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u32 i_entry_count;
+    uint32_t i_entry_count;
     
-    u64 *i_chunk_offset;
+    uint64_t *i_chunk_offset;
 
 } MP4_Box_data_co64_t;
 
 
 typedef struct MP4_Box_data_stss_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
     
-    u32 i_entry_count;
+    uint32_t i_entry_count;
     
-    u32 *i_sample_number;
+    uint32_t *i_sample_number;
     
 } MP4_Box_data_stss_t;
 
 typedef struct MP4_Box_data_stsh_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u32 i_entry_count;
+    uint32_t i_entry_count;
     
-    u32 *i_shadowed_sample_number;
-    u32 *i_sync_sample_number;
+    uint32_t *i_shadowed_sample_number;
+    uint32_t *i_sync_sample_number;
 
 } MP4_Box_data_stsh_t;
 
 typedef struct MP4_Box_data_stdp_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u16 *i_priority;
+    uint16_t *i_priority;
 
 } MP4_Box_data_stdp_t;
 
 typedef struct MP4_Box_data_padb_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u32 i_sample_count;
+    uint32_t i_sample_count;
 
-    u16 *i_reserved1;   /* 1bit  */
-    u16 *i_pad2;        /* 3bits */
-    u16 *i_reserved2;   /* 1bit  */
-    u16 *i_pad1;        /* 3bits */
+    uint16_t *i_reserved1;   /* 1bit  */
+    uint16_t *i_pad2;        /* 3bits */
+    uint16_t *i_reserved2;   /* 1bit  */
+    uint16_t *i_pad1;        /* 3bits */
     
 
 } MP4_Box_data_padb_t;
@@ -479,23 +479,23 @@ typedef struct MP4_Box_data_padb_s
 
 typedef struct MP4_Box_data_elst_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
-    u32 i_entry_count;
+    uint32_t i_entry_count;
 
-    u64 *i_segment_duration;
-    s64 *i_media_time;
-    u16 *i_media_rate_integer;
-    u16 *i_media_rate_fraction;
+    uint64_t *i_segment_duration;
+    int64_t  *i_media_time;
+    uint16_t *i_media_rate_integer;
+    uint16_t *i_media_rate_fraction;
 
     
 } MP4_Box_data_elst_t;
 
 typedef struct MP4_Box_data_cprt_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
     /* 1 pad bit */
     unsigned char i_language[3];
     
@@ -506,15 +506,15 @@ typedef struct MP4_Box_data_cprt_s
 /* DecoderConfigDescriptor */
 typedef struct MP4_descriptor_decoder_config_s
 {
-    u8  i_objectTypeIndication;
-    u8  i_streamType;
-    int b_upStream;
-    int i_buffer_sizeDB;
-    int i_max_bitrate;
-    int i_avg_bitrate;
+    uint8_t i_objectTypeIndication;
+    uint8_t i_streamType;
+    int     b_upStream;
+    int     i_buffer_sizeDB;
+    int     i_max_bitrate;
+    int     i_avg_bitrate;
     
-    int i_decoder_specific_info_len;
-    u8  *p_decoder_specific_info;
+    int     i_decoder_specific_info_len;
+    uint8_t *p_decoder_specific_info;
     /* some other stuff */
     
 } MP4_descriptor_decoder_config_t;
@@ -529,17 +529,17 @@ typedef struct MP4_descriptor_SL_config_s
 
 typedef struct MP4_descriptor_ES_s
 {
-    u16 i_ES_ID;
-    int b_stream_dependence;
-    int b_url;
-    int b_OCRstream;
-    int i_stream_priority;
+    uint16_t i_ES_ID;
+    int      b_stream_dependence;
+    int      b_url;
+    int      b_OCRstream;
+    int      i_stream_priority;
 
-    int i_depend_on_ES_ID; /* if b_stream_dependence set */
+    int      i_depend_on_ES_ID; /* if b_stream_dependence set */
 
     unsigned char *psz_URL;
 
-    u16 i_OCR_ES_ID;       /* if b_OCRstream */
+    uint16_t i_OCR_ES_ID;       /* if b_OCRstream */
     MP4_descriptor_decoder_config_t *p_decConfigDescr;
     
     MP4_descriptor_SL_config_t *p_slConfigDescr;
@@ -551,8 +551,8 @@ typedef struct MP4_descriptor_ES_s
 /* ES descriptor */
 typedef struct MP4_Box_data_esds_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
     
     MP4_descriptor_ES_t es_descriptor;
     
@@ -561,17 +561,17 @@ typedef struct MP4_Box_data_esds_s
 
 typedef struct MP4_Box_data_dcom_s
 {
-    u32 i_algorithm; /* fourcc */
+    uint32_t i_algorithm; /* fourcc */
     
 } MP4_Box_data_dcom_t;
 
 typedef struct MP4_Box_data_cmvd_s
 {
-    u32 i_uncompressed_size;
-    u32 i_compressed_size;
+    uint32_t i_uncompressed_size;
+    uint32_t i_compressed_size;
 
-    int b_compressed; /* Set to 1 if compressed data, 0 if uncompressed */
-    u8 *p_data;
+    int     b_compressed; /* Set to 1 if compressed data, 0 if uncompressed */
+    uint8_t *p_data;
 
 } MP4_Box_data_cmvd_t;
 
@@ -584,8 +584,8 @@ typedef struct MP4_Box_data_cmov_s
 /*
 typedef struct MP4_Box_data_cmov_s
 {
-    u8  i_version;
-    u32 i_flags;
+    uint8_t  i_version;
+    uint32_t i_flags;
 
 } MP4_Box_data__t;
 
@@ -638,14 +638,14 @@ typedef union MP4_Box_data_s
 /* the most basic structure */
 typedef struct MP4_Box_s
 {
-    off_t   i_pos;      /* absolute position */
+    off_t        i_pos;      /* absolute position */
     
-    u32     i_type;
-    u32     i_shortsize;
+    uint32_t     i_type;
+    uint32_t     i_shortsize;
 
-    UUID_t  i_uuid;  /* Set if i_type == "uuid" */
+    UUID_t       i_uuid;  /* Set if i_type == "uuid" */
     
-    u64     i_size; /* always set so use it */
+    uint64_t     i_size; /* always set so use it */
 
     MP4_Box_data_t   data;   /* union of pointers on extended data depending    
                                 on i_type (or i_usertype) */
@@ -671,7 +671,7 @@ typedef struct MP4_Box_s
 
 off_t MP4_TellAbsolute( input_thread_t *p_input );
 int   MP4_SeekAbsolute( input_thread_t *p_input, off_t i_pos);
-int   MP4_ReadData( input_thread_t *p_input, u8 *p_buff, int i_size );
+int   MP4_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size );
 
 /*****************************************************************************
  * MP4_BoxGetRoot : Parse the entire file, and create all boxes in memory
@@ -734,14 +734,14 @@ int MP4_BoxCount( MP4_Box_t *p_box, char *psz_fmt, ... );
  * MP4_CountBox: given a box, count how many child have the requested type 
  * FIXME : support GUUID 
  *****************************************************************************/
-int MP4_CountBox( MP4_Box_t *p_box, u32 i_type );
+int MP4_CountBox( MP4_Box_t *p_box, uint32_t i_type );
 #endif
 
 /*****************************************************************************
  * MP4_FindBox:  find first box with i_type child of p_box
  *      return NULL if not found
  *****************************************************************************/
-MP4_Box_t *MP4_FindBox( MP4_Box_t *p_box, u32 i_type );
+MP4_Box_t *MP4_FindBox( MP4_Box_t *p_box, uint32_t i_type );
 
 #if 0
 /*****************************************************************************
@@ -753,7 +753,7 @@ MP4_Box_t *MP4_FindNextBox( MP4_Box_t *p_box );
 /*****************************************************************************
  * MP4_FindNbBox:  find the box i_number 
  *****************************************************************************/
-MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, u32 i_number );
+MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, uint32_t i_number );
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -780,19 +780,19 @@ MP4_Stream_t *MP4_InputStream( input_thread_t *p_input );
  *
  ****************************************************************************/
 MP4_Stream_t *MP4_MemoryStream( input_thread_t *p_input,
-                                int i_size, u8 *p_buffer );
+                                int i_size, uint8_t *p_buffer );
 
 /****************************************************************************
  * MP4_ReadStream read from a MP4_Stream_t
  *
  ****************************************************************************/
-int MP4_ReadStream( MP4_Stream_t *p_stream, u8 *p_buff, int i_size );
+int MP4_ReadStream( MP4_Stream_t *p_stream, uint8_t *p_buff, int i_size );
 
 /****************************************************************************
  * MP4_PeekStream guess it ;)
  *
  ****************************************************************************/
-int MP4_PeekStream( MP4_Stream_t *p_stream, u8 **pp_peek, int i_size );
+int MP4_PeekStream( MP4_Stream_t *p_stream, uint8_t **pp_peek, int i_size );
     
 /****************************************************************************
  * MP4_TellStream give absolute position in the stream

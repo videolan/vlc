@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.4 2002/09/17 11:57:38 fenrir Exp $
+ * $Id: mp4.c,v 1.5 2002/11/17 06:46:56 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -73,14 +73,14 @@ static int  MP4_ReadSample();
 static int  MP4_DecodeSample();
 
 #define MP4_Set4BytesLE( p, dw ) \
-    *((u8*)p)   = ( (dw)&0xff ); \
-    *((u8*)p+1) = ( ((dw)>> 8)&0xff ); \
-    *((u8*)p+2) = ( ((dw)>>16)&0xff ); \
-    *((u8*)p+3) = ( ((dw)>>24)&0xff )
+    *((uint8_t*)p)   = ( (dw)&0xff ); \
+    *((uint8_t*)p+1) = ( ((dw)>> 8)&0xff ); \
+    *((uint8_t*)p+2) = ( ((dw)>>16)&0xff ); \
+    *((uint8_t*)p+3) = ( ((dw)>>24)&0xff )
 
 #define MP4_Set2BytesLE( p, dw ) \
-    *((u8*)p) = ( (dw)&0xff ); \
-    *((u8*)p+1) = ( ((dw)>> 8)&0xff )
+    *((uint8_t*)p) = ( (dw)&0xff ); \
+    *((uint8_t*)p+1) = ( ((dw)>> 8)&0xff )
 
     
 /*****************************************************************************
@@ -88,19 +88,19 @@ static int  MP4_DecodeSample();
  *****************************************************************************/
 static int MP4Init( vlc_object_t * p_this )
 {   
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    u8  *p_peek;
-    u32 i_type;
+    input_thread_t  *p_input = (input_thread_t *)p_this;
+    uint8_t         *p_peek;
+    uint32_t        i_type;
     
-    demux_sys_t *p_demux;
+    demux_sys_t     *p_demux;
     
-    MP4_Box_t *p_ftyp;
+    MP4_Box_t       *p_ftyp;
 
 
-    MP4_Box_t *p_mvhd;
-    MP4_Box_t *p_trak;
+    MP4_Box_t       *p_mvhd;
+    MP4_Box_t       *p_trak;
 
-    int i;
+    int             i;
     /* I need to seek */
     if( !p_input->stream.b_seekable )
     {
@@ -351,7 +351,6 @@ static int MP4Demux( input_thread_t *p_input )
         {
             continue; /* no need to read something */
         }
-
         while( MP4_GetTrackPTS( &p_demux->track[i_track] ) <
                         MP4_GetMoviePTS( p_demux ) )
         {
@@ -769,13 +768,13 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
                           as a unique type */
     /* TODO use also stss and stsh table for seeking */
     /* FIXME use edit table */
-    int i_sample;
-    int i_chunk;
+    int64_t i_sample;
+    int64_t i_chunk;
 
-    int i_index;
-    int i_index_sample_used;
+    int64_t i_index;
+    int64_t i_index_sample_used;
 
-    u64 i_last_dts; 
+    int64_t i_last_dts; 
     
     p_stts = MP4_BoxGet( p_demux_track->p_stbl, "stts" );
     p_stsz = MP4_BoxGet( p_demux_track->p_stbl, "stsz" ); /* FIXME and stz2 */
@@ -802,7 +801,7 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
         /* 2: each sample can have a different size */
         p_demux_track->i_sample_size = 0;
         p_demux_track->p_sample_size = 
-            calloc( p_demux_track->i_sample_count, sizeof( u32 ) );
+            calloc( p_demux_track->i_sample_count, sizeof( uint32_t ) );
         
         for( i_sample = 0; i_sample < p_demux_track->i_sample_count; i_sample++ )
         {
@@ -819,18 +818,20 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
         
     i_last_dts = 0;
     i_index = 0; i_index_sample_used =0;
+
     /* create and init last data for each chunk */
     for(i_chunk = 0 ; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
     {
 
-        int i_entry, i_sample_count, i;
+        int64_t i_entry, i_sample_count, i;
         /* save last dts */
         p_demux_track->chunk[i_chunk].i_first_dts = i_last_dts;
     /* count how many entries needed for this chunk 
        for p_sample_delta_dts and p_sample_count_dts */
 
-        i_entry = 0;
         i_sample_count = p_demux_track->chunk[i_chunk].i_sample_count;
+
+        i_entry = 0;
         while( i_sample_count > 0 )
         {
             i_sample_count -= p_stts->data.p_stts->i_sample_count[i_index+i_entry];
@@ -841,24 +842,26 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
             }
             i_entry++;
         }
+
         /* allocate them */
         p_demux_track->chunk[i_chunk].p_sample_count_dts = 
-            calloc( i_entry, sizeof( u32 ) );
+            calloc( i_entry, sizeof( uint32_t ) );
         p_demux_track->chunk[i_chunk].p_sample_delta_dts =
-            calloc( i_entry, sizeof( u32 ) );
+            calloc( i_entry, sizeof( uint32_t ) );
 
         /* now copy */
         i_sample_count = p_demux_track->chunk[i_chunk].i_sample_count;
         for( i = 0; i < i_entry; i++ )
         {
-            int i_used;
-            int i_rest;
+            int64_t i_used;
+            int64_t i_rest;
             
             i_rest = p_stts->data.p_stts->i_sample_count[i_index] - i_index_sample_used;
 
             i_used = __MIN( i_rest, i_sample_count );
 
             i_index_sample_used += i_used;
+            i_sample_count -= i_used;
 
             p_demux_track->chunk[i_chunk].p_sample_count_dts[i] = i_used;
 
@@ -871,6 +874,7 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
             if( i_index_sample_used >=
                              p_stts->data.p_stts->i_sample_count[i_index] )
             {
+
                 i_index++;
                 i_index_sample_used = 0;
             }
@@ -879,9 +883,10 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
     }
 
     msg_Dbg( p_input, 
-             "track[Id 0x%x] read %d samples", 
+             "track[Id 0x%x] read %d samples length:"I64Fd"s", 
              p_demux_track->i_track_ID,
-             p_demux_track->i_sample_count );
+             p_demux_track->i_sample_count,
+             i_last_dts / p_demux_track->i_timescale );
 
     return( 1 );
 }
@@ -889,16 +894,16 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
 static void MP4_StartDecoder( input_thread_t *p_input,
                                  track_data_mp4_t *p_demux_track )
 {
-    MP4_Box_t *p_sample;
-    int i;
-    int i_chunk;
+    MP4_Box_t   *p_sample;
+    int         i;
+    int         i_chunk;
 
-    int i_decoder_specific_info_len;
-    u8  *p_decoder_specific_info;
+    int         i_decoder_specific_info_len;
+    uint8_t     *p_decoder_specific_info;
     
-    u8  *p_init;
+    uint8_t     *p_init;
  
-    MP4_Box_t *p_esds;
+    MP4_Box_t   *p_esds;
 
     
     if( (!p_demux_track->b_ok )||( p_demux_track->i_cat == UNKNOWN_ES ) )
