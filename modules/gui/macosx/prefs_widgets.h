@@ -2,7 +2,7 @@
  * prefs_widgets.h: Preferences controls
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs_widgets.h,v 1.1 2003/11/17 06:31:22 hartman Exp $
+ * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org> 
  *

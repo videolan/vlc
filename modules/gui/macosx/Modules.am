@@ -16,6 +16,8 @@ SOURCES_macosx = \
 	open.h \
 	playlist.m \
 	playlist.h \
+	playlistinfo.h \
+	playlistinfo.m \
 	prefs.m \
 	prefs.h \
 	prefs_widgets.h \

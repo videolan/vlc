@@ -136,7 +136,9 @@
         [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
     [o_table_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
     [o_window setExcludedFromWindowsMenu: TRUE];
-    [o_info_window setExcludedFromWindowsMenu: TRUE];
+
+//    [o_tbv_info setDataSource: [VLCInfoDataSource init]];
+
 /* We need to check whether _defaultTableHeaderSortImage exists, since it 
 belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
@@ -170,6 +172,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
     [o_mi_info setTitle: _NS("Proprieties")];
+
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
@@ -179,13 +182,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_loop_popup itemAtIndex:0] setTitle: _NS("Standard Play")];
     [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
     [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
-
-    [o_info_window setTitle: _NS("Proprieties")];
-    [o_uri_lbl setStringValue: _NS("URI")];
-    [o_title_lbl setStringValue: _NS("Title")];
-    [o_author_lbl setStringValue: _NS("Author")];
-    [o_btn_info_ok setTitle: _NS("OK")];
-    [o_btn_info_cancel setTitle: _NS("Cancel")];
 }
 
 - (void) tableView:(NSTableView*)o_tv
@@ -205,7 +201,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
 
     if( o_tc_sortColumn == o_tc )
-    { 
+    {
         b_isSortDescending = !b_isSortDescending;
     }
     else if( o_tc == o_tc_name || o_tc == o_tc_author || 
@@ -620,59 +616,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_table_view scrollRowToVisible: i_row];
 }
 
-/*For info window*/
-
-- (IBAction)togglePlaylistInfoPanel:(id)sender
+- (int)selectedPlaylistItem
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist;
-    if( [o_info_window isVisible] )
-    {
-        [o_info_window orderOut: sender];
-    }
-    else
-    {
-        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
-
-        if (p_playlist)
-        {
-            int i_item = [o_table_view selectedRow];
-            [o_uri_txt setStringValue:[NSString stringWithUTF8String: p_playlist->pp_items[i_item]->psz_uri]];
-            [o_title_txt setStringValue:[NSString stringWithUTF8String: p_playlist->pp_items[i_item]->psz_name]];
-            [o_author_txt setStringValue:[NSString stringWithUTF8String: playlist_GetInfo(p_playlist, i_item ,_("General"),_("Author") )]];
-            vlc_object_release ( p_playlist );
-        }
-        [o_info_window makeKeyAndOrderFront: sender];
-    }
+    return [o_table_view selectedRow];
 }
-
-- (IBAction)infoCancel:(id)sender
-{
-    [self togglePlaylistInfoPanel:self];
-}
-
-- (IBAction)infoOk:(id)sender
-{
-    int i_item = [o_table_view selectedRow];
-    intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
-    if (p_playlist)
-    {
-        vlc_mutex_lock(&p_playlist->pp_items[i_item]->lock);
-
-        p_playlist->pp_items[i_item]->psz_uri = strdup([[o_uri_txt stringValue] cString]);
-        p_playlist->pp_items[i_item]->psz_name = strdup([[o_title_txt stringValue] cString]);
-        playlist_ItemAddInfo(p_playlist->pp_items[i_item],_("General"),_("Author"), [[o_author_txt stringValue] cString]);
-
-        vlc_mutex_unlock(&p_playlist->pp_items[i_item]->lock);
-        vlc_object_release ( p_playlist );
-    }
-    [self togglePlaylistInfoPanel:self];
-    [self playlistUpdated];
-}
-
 
 @end
 
@@ -905,4 +852,5 @@ vlc_object_release( p_playlist );
 }
 
 @end
+
 

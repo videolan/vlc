@@ -75,6 +75,7 @@
     IBOutlet id o_author_txt; 
     IBOutlet id o_btn_info_ok;
     IBOutlet id o_btn_info_cancel;
+    IBOutlet id o_tbv_info;
 
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
@@ -98,8 +99,7 @@
 
 /*For playlist info window*/
 
-- (IBAction)togglePlaylistInfoPanel:(id)sender;
-- (IBAction)infoCancel:(id)sender;
-- (IBAction)infoOk:(id)sender;
+- (int)selectedPlaylistItem;
 
 @end
+

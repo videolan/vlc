@@ -2,7 +2,7 @@
  * info.h: MacOS X info panel
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: info.h,v 1.2 2003/02/23 05:53:53 jlj Exp $
+ * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
