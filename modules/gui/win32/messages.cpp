@@ -102,7 +102,12 @@ void __fastcall TMessagesDlg::UpdateLog()
             /* Add message */
             if( i_max_lines )
             {
-                RichEditMessages->Lines->Add( p_sub->p_msg[i_start].psz_msg );
+                /* We don't use RichEditMessages->Lines->Add(), because with
+                 * some versions of rich32.dll it can trigger the
+                 * "RichEdit line insertion error" bug... */
+                RichEditMessages->SelStart = RichEditMessages->GetTextLen();
+                RichEditMessages->SelText = p_sub->p_msg[i_start].psz_msg;
+                RichEditMessages->SelText = RichEditMessages->SelText + "\r\n";
             }
         }
 
@@ -112,3 +117,18 @@ void __fastcall TMessagesDlg::UpdateLog()
     } 
 }
 //---------------------------------------------------------------------------
+void __fastcall TMessagesDlg::PopupCopyTextClick( TObject *Sender )
+{
+    /* If nothinf is selected, select everything */
+    if( RichEditMessages->SelLength == 0 )
+    {
+        RichEditMessages->SelStart = 0;
+        RichEditMessages->SelLength = RichEditMessages->GetTextLen();
+    }
+
+    /* Copy selected text to clipboard */
+    RichEditMessages->CopyToClipboard();
+}
+//---------------------------------------------------------------------------
+
+

@@ -35,9 +35,12 @@ class TMessagesDlg : public TForm
 __published:	// IDE-managed Components
     TRichEdit *RichEditMessages;
     TButton *ButtonOK;
+    TPopupMenu *PopupMenu1;
+    TMenuItem *PopupCopyText;
     void __fastcall ButtonOKClick( TObject *Sender );
     void __fastcall FormHide( TObject *Sender );
     void __fastcall FormShow( TObject *Sender );
+    void __fastcall PopupCopyTextClick( TObject *Sender );
 private:	// User declarations
     intf_thread_t *p_intf;
 public:		// User declarations

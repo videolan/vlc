@@ -29,6 +29,7 @@ object MessagesDlg: TMessagesDlg
     Font.Name = 'MS Sans Serif'
     Font.Style = []
     ParentFont = False
+    PopupMenu = PopupMenu1
     ReadOnly = True
     ScrollBars = ssBoth
     TabOrder = 0
@@ -46,5 +47,14 @@ object MessagesDlg: TMessagesDlg
     ModalResult = 1
     TabOrder = 1
     OnClick = ButtonOKClick
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 304
+    Top = 432
+    object PopupCopyText: TMenuItem
+      Caption = '&Copy text'
+      ShortCut = 16451
+      OnClick = PopupCopyTextClick
+    end
   end
 end
