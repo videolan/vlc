@@ -38,17 +38,29 @@
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-asf-"
+
 vlc_module_begin();
     set_description( _("ASF muxer") );
     set_capability( "sout mux", 5 );
     add_shortcut( "asf" );
     add_shortcut( "asfh" );
     set_callbacks( Open, Close );
+
+    add_string( SOUT_CFG_PREFIX "title",    "", NULL, "title",     "title", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "author",   "", NULL, "author",    "author", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "copyright","", NULL, "copyright", "copyright", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "comment",  "", NULL, "comment",   "comment", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "rating",  "", NULL, "rating",   "rating", VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
  * Locales prototypes
  *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "title", "author", "copyright", "comment", "rating", NULL
+};;
+
 static int  Capability(sout_mux_t *, int, void *, void * );
 static int  AddStream( sout_mux_t *, sout_input_t * );
 static int  DelStream( sout_mux_t *, sout_input_t * );
@@ -138,9 +150,11 @@ static int Open( vlc_object_t *p_this )
 {
     sout_mux_t     *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys;
+    vlc_value_t    val;
     int i;
 
     msg_Dbg( p_mux, "Asf muxer opened" );
+    sout_ParseCfg( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_mux->pf_capacity  = Capability;
     p_mux->pf_addstream = AddStream;
@@ -175,31 +189,21 @@ static int Open( vlc_object_t *p_this )
         p_sys->fid.v4[i] = ( (uint64_t)rand() << 8 ) / RAND_MAX;
     }
     /* meta data */
-    p_sys->psz_title    = sout_cfg_find_value( p_mux->p_cfg, "title" );
-    p_sys->psz_author   = sout_cfg_find_value( p_mux->p_cfg, "author" );
-    p_sys->psz_copyright= sout_cfg_find_value( p_mux->p_cfg, "copyright" );
-    p_sys->psz_comment  = sout_cfg_find_value( p_mux->p_cfg, "comment" );
-    p_sys->psz_rating   = sout_cfg_find_value( p_mux->p_cfg, "rating" );
-    if( p_sys->psz_title == NULL )
-    {
-        p_sys->psz_title = "";
-    }
-    if( p_sys->psz_author == NULL )
-    {
-        p_sys->psz_author = "";
-    }
-    if( p_sys->psz_copyright == NULL )
-    {
-        p_sys->psz_copyright = "";
-    }
-    if( p_sys->psz_comment == NULL )
-    {
-        p_sys->psz_comment = "";
-    }
-    if( p_sys->psz_rating == NULL )
-    {
-        p_sys->psz_rating = "";
-    }
+    var_Get( p_mux, SOUT_CFG_PREFIX "title", &val );
+    p_sys->psz_title = val.psz_string;
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "author", &val );
+    p_sys->psz_author = val.psz_string;
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "copyright", &val );
+    p_sys->psz_copyright = val.psz_string;
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "comment", &val );
+    p_sys->psz_comment = val.psz_string;
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "rating", &val );
+    p_sys->psz_rating = val.psz_string;
+
     msg_Dbg( p_mux,
              "meta data: title='%s' author='%s' copyright='%s' comment='%s' rating='%s'",
              p_sys->psz_title, p_sys->psz_author, p_sys->psz_copyright,
