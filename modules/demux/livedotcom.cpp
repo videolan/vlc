@@ -283,7 +283,7 @@ static int  Open ( vlc_object_t *p_this )
         }
         p_sys->p_sdp = (char*)p_sdp;
 
-        fprintf( stderr, "sdp=%s\n", p_sys->p_sdp );
+        msg_Dbg( p_demux, "sdp=%s\n", p_sys->p_sdp );
     }
     if( ( p_sys->ms = MediaSession::createNew(*p_sys->env, p_sys->p_sdp ) ) == NULL )
     {
