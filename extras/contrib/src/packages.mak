@@ -2,7 +2,7 @@
 # src/packages.mak : Archive locations
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: packages.mak,v 1.14 2004/02/22 15:41:27 massiot Exp $
+# $Id: packages.mak,v 1.15 2004/02/29 13:03:19 gbazin Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -90,5 +90,5 @@ LIVEDOTCOM_URL=http://download.videolan.org/pub/testing/contrib/live.$(LIVEDOTCO
 GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
 LIBCACA_VERSION=0.8
 LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
-DTSDEC_VERSION=0.0.1
-DTSDEC_URL=http://download.videolan.org/pub/videolan/dtsdec/$(DTSDEC_VERSION)/dtsdec-$(DTSDEC_VERSION).tar.gz
+LIBDTS_VERSION=0.0.2
+DTSDEC_URL=http://download.videolan.org/pub/videolan/libdts/$(LIBDTS_VERSION)/libdts-$(LIBDTS_VERSION).tar.gz
