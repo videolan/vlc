@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.30 2002/07/15 20:09:31 sam Exp $
+ * $Id: gnome.c,v 1.31 2002/07/23 19:28:25 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -478,11 +478,14 @@ static gint GnomeManage( gpointer p_data )
                  * finished dragging the slider */
                 else if( p_intf->p_sys->b_slider_free )
                 {
-                    off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+                    if( newvalue > 0. && newvalue < 100. )
+                    {
+                        off_t i_seek = ( newvalue * p_area->i_size ) / 100;
 
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
-                    input_Seek( p_input, i_seek, INPUT_SEEK_SET );
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
+                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                        input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+                        vlc_mutex_lock( &p_input->stream.stream_lock );
+                    }
 
                     /* Update the old value */
                     p_intf->p_sys->f_adj_oldvalue = newvalue;

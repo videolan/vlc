@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.27 2002/07/11 19:28:13 sam Exp $
+ * $Id: gtk_menu.c,v 1.28 2002/07/23 19:28:25 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -59,7 +59,7 @@ void GtkPopupSubtitleToggle  ( GtkCheckMenuItem *, gpointer );
 static gint GtkTitleMenu( gpointer, GtkWidget *, 
                     void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) );
 static gint GtkRadioMenu( intf_thread_t *, GtkWidget *, GSList *,
-                          char *, int, int,
+                          char *, int, int, int,
                    void( *pf_toggle )( GtkCheckMenuItem *, gpointer ) );
 
 gint GtkSetupMenus( intf_thread_t * p_intf );
@@ -277,7 +277,7 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 static gint GtkRadioMenu( intf_thread_t * p_intf,
                             GtkWidget * p_root, GSList * p_menu_group,
                             char * psz_item_name,
-                            int i_nb, int i_selected,
+                            int i_start, int i_end, int i_selected,
                      void( *pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     char                psz_name[ GTK_MENU_LABEL_SIZE ];
@@ -306,12 +306,12 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
     p_menu = gtk_menu_new();
     gtk_object_set_data( GTK_OBJECT( p_menu ), "p_intf", p_intf );
 
-    for( i_item = 0 ; i_item < i_nb ; i_item++ )
+    for( i_item = i_start ; i_item <= i_end ; i_item++ )
     {
         /* we group chapters in packets of ten for small screens */
-        if( ( i_item % 10 == 0 ) && ( i_nb > 20 ) )
+        if( ( i_item % 10 == i_start ) && ( i_end > 20 ) )
         {
-            if( i_item != 0 )
+            if( i_item != i_start )
             {
                 gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_item_group ),
                                            p_submenu );
@@ -319,7 +319,7 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
             }
 
             snprintf( psz_name, GTK_MENU_LABEL_SIZE,
-                      "%ss %d to %d", psz_item_name, i_item + 1, i_item + 10);
+                      "%ss %d to %d", psz_item_name, i_item, i_item + 9 );
             psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
             p_item_group = gtk_menu_item_new_with_label( psz_name );
             gtk_widget_show( p_item_group );
@@ -328,13 +328,13 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
         }
 
         snprintf( psz_name, GTK_MENU_LABEL_SIZE, "%s %d",
-                  psz_item_name, i_item + 1 );
+                  psz_item_name, i_item );
         psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
 
         p_item = gtk_radio_menu_item_new_with_label( p_group, psz_name );
         p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
 
-        if( i_selected == i_item + 1 )
+        if( i_selected == i_item )
         {
             p_item_selected = p_item;
         }
@@ -345,9 +345,9 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
         gtk_signal_connect( GTK_OBJECT( p_item ),
                             "toggled",
                             GTK_SIGNAL_FUNC( pf_toggle ),
-                            (gpointer)((long)(i_item + 1)) );
+                            (gpointer)((long)(i_item)) );
 
-        if( i_nb > 20 )
+        if( i_end > 20 )
         {
             gtk_menu_append( GTK_MENU( p_submenu ), p_item );
         }
@@ -357,7 +357,7 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
         }
     }
 
-    if( i_nb > 20 )
+    if( i_end > 20 )
     {
         gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_item_group ), p_submenu );
         gtk_menu_append( GTK_MENU( p_menu ), p_item_group );
@@ -375,7 +375,7 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
     }
 
     /* be sure that menu is sensitive, if there are several items */
-    if( i_nb > 1 )
+    if( i_end > i_start )
     {
         gtk_widget_set_sensitive( p_root, TRUE );
     }
@@ -655,12 +655,12 @@ static gint GtkTitleMenu( gpointer       p_data,
     gtk_object_set_data( GTK_OBJECT( p_title_menu ), "p_intf", p_intf );
 
     /* loop on titles */
-    for( i_title = 1 ; i_title < i_title_nb ; i_title++ )
+    for( i_title = 0 ; i_title < i_title_nb ; i_title++ )
     {
         /* we group titles in packets of ten for small screens */
-        if( ( i_title % 10 == 1 ) && ( i_title_nb > 20 ) )
+        if( ( i_title % 10 == 0 ) && ( i_title_nb > 20 ) )
         {
-            if( i_title != 1 )
+            if( i_title != 0 )
             {
                 gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_title_menu_item ),
                                            p_title_submenu );
@@ -798,7 +798,7 @@ static gint GtkTitleMenu( gpointer       p_data,
 #else
             GtkRadioMenu( p_intf, p_title_item, p_chapter_group, _("Chapter"),
                 p_intf->p_sys->p_input->stream.pp_areas[i_title]->i_part_nb,
-                i_title * 100,
+                1, i_title * 100,
                 p_intf->p_sys->p_input->stream.p_selected_area->i_part +
                 p_intf->p_sys->p_input->stream.p_selected_area->i_id *100,
                 pf_toggle );
@@ -901,7 +901,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
 
         p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                             p_intf->p_sys->p_window ), "menubar_title" ) );
-        GtkRadioMenu( p_intf, p_menubar_menu, NULL, _("Title"),
+        GtkRadioMenu( p_intf, p_menubar_menu, NULL, _("Title"), 0,
                       p_intf->p_sys->p_input->stream.i_area_nb - 1,
                       p_intf->p_sys->p_input->stream.p_selected_area->i_id,
                       GtkMenubarTitleToggle );
@@ -922,7 +922,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
                              p_intf->p_sys->p_popup ), "popup_navigation" ) );
         GtkTitleMenu( p_intf, p_popup_menu, GtkPopupNavigationToggle );
 #if 0
-        GtkRadioMenu( p_intf, p_menubar_menu, NULL, _("Title"),
+        GtkRadioMenu( p_intf, p_menubar_menu, NULL, _("Title"), 0,
                         p_intf->p_sys->p_input->stream.i_area_nb - 1,
                         p_intf->p_sys->p_input->stream.p_selected_area->i_id,
                         on_menubar_chapter_toggle );
@@ -931,7 +931,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
         p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                              p_intf->p_sys->p_window ), "menubar_chapter" ) );
 
-        GtkRadioMenu( p_intf, p_menubar_menu, NULL, _("Chapter"),
+        GtkRadioMenu( p_intf, p_menubar_menu, NULL, _("Chapter"), 1,
                         p_intf->p_sys->p_input->stream.p_selected_area->i_part_nb,
                         p_intf->p_sys->p_input->stream.p_selected_area->i_part,
                         GtkMenubarChapterToggle );

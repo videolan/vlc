@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.49 2002/07/15 20:09:31 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.50 2002/07/23 19:28:25 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -212,8 +212,7 @@ void GtkTitlePrev( GtkButton * button, gpointer user_data )
 
     i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id - 1;
 
-    /* Disallow area 0 since it is used for video_ts.vob */
-    if( i_id > 0 )
+    if( i_id >= 0 )
     {
         p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
         input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
