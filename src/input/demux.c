@@ -252,10 +252,8 @@ int demux2_vaControlHelper( stream_t *s,
 typedef struct
 {
     /* Data buffer */
-    vlc_mutex_t lock;
-    int         i_buffer;
-    int         i_buffer_size;
-    uint8_t     *p_buffer;
+    block_fifo_t *p_fifo;
+    block_t      *p_block;
 
     int64_t     i_pos;
 
@@ -290,19 +288,24 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, char *psz_demux,
     s->p_sys = malloc( sizeof( d_stream_sys_t) );
     p_sys = (d_stream_sys_t*)s->p_sys;
 
-    vlc_mutex_init( s, &p_sys->lock );
-    p_sys->i_buffer = 0;
-    p_sys->i_buffer_size = 1000000;
-    p_sys->p_buffer = malloc( p_sys->i_buffer_size );
     p_sys->i_pos = 0;
-    p_sys->psz_name = strdup( psz_demux );
     p_sys->out = out;
     p_sys->p_demux = NULL;
+    p_sys->p_block = NULL;
+    p_sys->psz_name = strdup( psz_demux );
+
+    /* decoder fifo */
+    if( ( p_sys->p_fifo = block_FifoNew( s ) ) == NULL )
+    {
+        msg_Err( s, "out of memory" );
+        vlc_object_destroy( s );
+        free( p_sys );
+        return NULL;
+    }
 
     if( vlc_thread_create( s, "stream out", DStreamThread,
                            VLC_THREAD_PRIORITY_INPUT, VLC_FALSE ) )
     {
-        vlc_mutex_destroy( &p_sys->lock );
         vlc_object_destroy( s );
         free( p_sys );
         return NULL;
@@ -314,38 +317,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, char *psz_demux,
 void stream_DemuxSend( stream_t *s, block_t *p_block )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
-
-    if( p_block->i_buffer > 0 )
-    {
-        vlc_mutex_lock( &p_sys->lock );
-
-        /* Realloc if needed */
-        if( p_sys->i_buffer + p_block->i_buffer > p_sys->i_buffer_size )
-        {
-            if( p_sys->i_buffer_size > 5000000 )
-            {
-                vlc_mutex_unlock( &p_sys->lock );
-                msg_Err( s, "stream_DemuxSend: buffer size > 5000000" );
-                block_Release( p_block );
-                return;
-            }
-            /* I know, it's more than needed but that's perfect */
-            p_sys->i_buffer_size += p_block->i_buffer;
-            /* FIXME won't work with PEEK -> segfault */
-            p_sys->p_buffer = realloc( p_sys->p_buffer, p_sys->i_buffer_size );
-            msg_Dbg( s, "stream_DemuxSend: realloc to %d",
-                     p_sys->i_buffer_size );
-        }
-
-        /* copy data */
-        memcpy( &p_sys->p_buffer[p_sys->i_buffer], p_block->p_buffer,
-                p_block->i_buffer );
-        p_sys->i_buffer += p_block->i_buffer;
-
-        vlc_mutex_unlock( &p_sys->lock );
-    }
-
-    block_Release( p_block );
+    if( p_block ) block_FifoPut( p_sys->p_fifo, p_block );
 }
 
 void stream_DemuxDelete( stream_t *s )
@@ -354,17 +326,14 @@ void stream_DemuxDelete( stream_t *s )
 
     s->b_die = VLC_TRUE;
 
-    vlc_mutex_lock( &p_sys->lock );
     if( p_sys->p_demux ) p_sys->p_demux->b_die = VLC_TRUE;
-    vlc_mutex_unlock( &p_sys->lock );
-
     vlc_thread_join( s );
 
     if( p_sys->p_demux ) demux2_Delete( p_sys->p_demux );
-    vlc_mutex_destroy( &p_sys->lock );
+    if( p_sys->p_block ) block_Release( p_sys->p_block );
     free( p_sys->psz_name );
-    free( p_sys->p_buffer );
     free( p_sys );
+
     vlc_object_destroy( s );
 }
 
@@ -372,59 +341,80 @@ void stream_DemuxDelete( stream_t *s )
 static int DStreamRead( stream_t *s, void *p_read, int i_read )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
-    int i_copy;
+    uint8_t *p_out = p_read;
+    int i_out = 0;
 
     //msg_Dbg( s, "DStreamRead: wanted %d bytes", i_read );
-    for( ;; )
+
+    while( !s->b_die && !s->b_error && i_read )
     {
-        vlc_mutex_lock( &p_sys->lock );
-        //msg_Dbg( s, "DStreamRead: buffer %d", p_sys->i_buffer );
-        if( p_sys->i_buffer >= i_read || s->b_die ) break;
-        vlc_mutex_unlock( &p_sys->lock );
-        msleep( 10000 );
-    }
+        block_t *p_block = p_sys->p_block;
+        int i_copy;
 
-    //msg_Dbg( s, "DStreamRead: read %d buffer %d", i_read, p_sys->i_buffer );
-
-    i_copy = __MIN( i_read, p_sys->i_buffer );
-    if( i_copy > 0 )
-    {
-        if( p_read ) memcpy( p_read, p_sys->p_buffer, i_copy );
-
-        p_sys->i_buffer -= i_copy;
-        p_sys->i_pos += i_copy;
-
-        if( p_sys->i_buffer > 0 )
+        if( !p_block )
         {
-            memmove( p_sys->p_buffer, &p_sys->p_buffer[i_copy],
-                     p_sys->i_buffer );
+            p_block = block_FifoGet( p_sys->p_fifo );
+            if( !p_block ) s->b_error = 1;
+            p_sys->p_block = p_block;
+        }
+
+        if( p_block && i_read )
+        {
+            i_copy = __MIN( i_read, p_block->i_buffer );
+            if( p_out && i_copy ) memcpy( p_out, p_block->p_buffer, i_copy );
+            i_read -= i_copy;
+            i_out += i_copy;
+            p_block->i_buffer -= i_copy;
+            p_block->p_buffer += i_copy;
+
+            if( !p_block->i_buffer )
+            {
+                block_Release( p_block );
+                p_sys->p_block = NULL;
+            }
         }
     }
-    vlc_mutex_unlock( &p_sys->lock );
 
-    return i_copy;
+    p_sys->i_pos += i_out;
+    return i_out;
 }
 
 static int DStreamPeek( stream_t *s, uint8_t **pp_peek, int i_peek )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
-    int i_copy;
+    block_t **pp_block = &p_sys->p_block;
+    int i_out = 0;
+    *pp_peek = 0;
 
     //msg_Dbg( s, "DStreamPeek: wanted %d bytes", i_peek );
-    for( ;; )
+
+    while( !s->b_die && !s->b_error && i_peek )
     {
-        vlc_mutex_lock( &p_sys->lock );
-        //msg_Dbg( s, "DStreamPeek: buffer %d", p_sys->i_buffer );
-        if( p_sys->i_buffer >= i_peek || s->b_die ) break;
-        vlc_mutex_unlock( &p_sys->lock );
-        msleep( 10000 );
+        int i_copy;
+
+        if( !*pp_block )
+        {
+            *pp_block = block_FifoGet( p_sys->p_fifo );
+            if( !*pp_block ) s->b_error = 1;
+        }
+
+        if( *pp_block && i_peek )
+        {
+            i_copy = __MIN( i_peek, (*pp_block)->i_buffer );
+            i_peek -= i_copy;
+            i_out += i_copy;
+
+            if( i_peek ) pp_block = &(*pp_block)->p_next;
+        }
     }
-    *pp_peek = p_sys->p_buffer;
-    i_copy = __MIN( i_peek, p_sys->i_buffer );
 
-    vlc_mutex_unlock( &p_sys->lock );
+    if( p_sys->p_block )
+    {
+        p_sys->p_block = block_ChainGather( p_sys->p_block );
+        *pp_peek = p_sys->p_block->p_buffer;
+    }
 
-    return i_copy;
+    return i_out;
 }
 
 static int DStreamControl( stream_t *s, int i_query, va_list args )
@@ -489,7 +479,7 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
 static int DStreamThread( stream_t *s )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
-    demux_t      *p_demux;
+    demux_t *p_demux;
 
     /* Create the demuxer */
     if( !(p_demux = demux2_New( s, "", p_sys->psz_name, "", s, p_sys->out )) )
@@ -497,9 +487,7 @@ static int DStreamThread( stream_t *s )
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_lock( &p_sys->lock );
     p_sys->p_demux = p_demux;
-    vlc_mutex_unlock( &p_sys->lock );
 
     /* Main loop */
     while( !s->b_die && !p_demux->b_die )
