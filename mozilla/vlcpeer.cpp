@@ -163,7 +163,7 @@ NS_IMETHODIMP VlcPeer::Get_position( PRInt64 *i_position )
 {
     if( p_plugin->i_vlc )
     {
-        *i_position = VLC_PositionGet( p_plugin->i_vlc );
+        *i_position = (PRInt64)VLC_PositionGet( p_plugin->i_vlc );
     }
     return NS_OK;
 }
