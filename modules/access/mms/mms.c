@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.2 2002/11/12 13:57:12 sam Exp $
+ * $Id: mms.c,v 1.3 2002/11/13 20:28:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -116,6 +116,16 @@ static void mms_ParseURL( url_t *p_url, char *psz_url );
 vlc_module_begin();
     set_description( _("MMS access module") );
     set_capability( "access", 0 );
+    add_category_hint( "stream", NULL );
+        add_bool( "mms-all", 0, NULL, 
+                  "force selection of all streams",
+                  "force selection of all streams" );
+        add_string( "mms-stream", NULL, NULL,
+                    "streams selection",
+                    "force this stream selection" );
+        add_integer( "mms-maxbitrate", 0, NULL, 
+                     "max bitrate",
+                     "set max bitrate for auto streams selections" );
     add_shortcut( "mms" );
     add_shortcut( "mmsu" );
     add_shortcut( "mmst" );
@@ -527,6 +537,140 @@ static void asf_HeaderParse( mms_stream_t stream[128],
     }
 }
 
+static void mms_StreamSelect( input_thread_t * p_input, 
+                              mms_stream_t stream[128] )
+{
+    /* XXX FIXME use mututal eclusion information */
+    int i;
+    int i_audio, i_video;
+    int i_bitrate_total;
+    int i_bitrate_max;
+    char *psz_stream;
+
+    i_audio = 0;
+    i_video = 0;
+    i_bitrate_total = 0;
+    i_bitrate_max = config_GetInt( p_input, "mms-maxbitrate" );
+    
+    if( config_GetInt( p_input, "mms-all" ) )
+    {
+        /* select all valid stream */
+        for( i = 1; i < 128; i++ )
+        {
+            if( stream[i].i_cat != MMS_STREAM_UNKNOWN )
+            {
+                stream[i].i_selected = 1;
+            }
+        }
+        return;
+    }
+    else
+    {
+        for( i = 0; i < 128; i++ )
+        {
+            stream[i].i_selected = 0; /* by default, not selected */
+        }
+    }
+    psz_stream = config_GetPsz( p_input, "mms-stream" );
+
+    if( psz_stream && *psz_stream )
+    {
+        char *psz_tmp = psz_stream;
+        while( *psz_tmp )
+        {
+            if( *psz_tmp == ',' )
+            {
+                psz_tmp++;
+            }
+            else
+            {
+                int i_stream;
+                i_stream = atoi( psz_tmp );
+                while( *psz_tmp != '\0' && *psz_tmp != ',' )
+                {
+                    psz_tmp++;
+                }
+
+                if( i_stream > 0 && i_stream < 128 &&
+                    stream[i_stream].i_cat != MMS_STREAM_UNKNOWN )
+                {
+                    stream[i_stream].i_selected = 1;
+                }
+            }
+        }
+        FREE( psz_stream );
+        return;
+    }
+    FREE( psz_stream );
+
+    for( i = 1; i < 128; i++ )
+    {
+        if( stream[i].i_cat == MMS_STREAM_UNKNOWN )
+        {
+            continue;
+        }
+        else if( stream[i].i_cat == MMS_STREAM_AUDIO && i_audio <= 0 )
+        {
+            stream[i].i_selected = 1;
+            if( stream[i].i_bitrate> 0 )
+            {
+                i_bitrate_total += stream[i].i_bitrate;
+            }
+            i_audio = i;
+        }
+        else if( stream[i].i_cat == MMS_STREAM_VIDEO && i_video <= 0 )
+        {
+            stream[i].i_selected = 1;
+            if( stream[i].i_bitrate> 0 )
+            {
+                i_bitrate_total += stream[i].i_bitrate;
+            }
+            i_video = i;
+        }
+        else if( i_bitrate_max > 0  )
+        {   
+            int i_index;
+            // select this stream if it's bitrate is lower or upper
+            if( stream[i].i_cat == MMS_STREAM_AUDIO )
+            {
+                i_index = i_audio;
+            }
+            else 
+            {
+                i_index = i_video;
+            }
+#define MMS_SELECT_XCHG( i1, i2 ) \
+    stream[i1].i_selected = 0; \
+    i_bitrate_total -= stream[i1].i_bitrate; \
+    stream[i2].i_selected = 1; \
+    i_bitrate_total += stream[i2].i_bitrate
+                                                    
+            if( stream[i].i_bitrate > 0 )
+            {
+                if( stream[i].i_bitrate < stream[i_index].i_bitrate &&
+                    i_bitrate_total >= i_bitrate_max )
+                {
+                    MMS_SELECT_XCHG( i_index, i );
+                }
+                else if( stream[i].i_bitrate > stream[i_index].i_bitrate &&
+                         i_bitrate_total < i_bitrate_max )
+                {
+                    MMS_SELECT_XCHG( i, i_index );
+                }
+            }
+            if( stream[i].i_cat == MMS_STREAM_AUDIO )
+            {
+                i_audio = i;
+            }
+            else
+            {
+                i_video = i;
+            }
+           
+        }
+    }
+}
+
 /****************************************************************************
  * MMSOpen : Open a connection with the server over mmst or mmsu(not yet)
  ****************************************************************************/
@@ -551,8 +695,6 @@ static int MMSOpen( input_thread_t  *p_input,
     int          i;
     int          i_streams;
     int          i_first;
-    int          b_audio;
-    int          b_video;
 
 
     /* *** Open a TCP connection with server *** */
@@ -808,57 +950,49 @@ static int MMSOpen( input_thread_t  *p_input,
     //        and bitrate mutual exclusion(optional)
     asf_HeaderParse( p_access->stream, 
                      p_access->p_header, p_access->i_header );
-    
+    mms_StreamSelect( p_input, p_access->stream );
     /* *** now select stream we want to receive *** */
     // TODO take care of stream bitrate TODO
     i_streams = 0;
     i_first = -1;
     var_buffer_reinitwrite( &buffer, 0 );
     /* for now, select first audio and video stream */
-    b_audio = 0;
-    b_video = 0;
     for( i = 1; i < 128; i++ )
     {
-
-        if( ( p_access->stream[i].i_cat == MMS_STREAM_AUDIO && !b_audio )||
-            ( p_access->stream[i].i_cat == MMS_STREAM_VIDEO && !b_video ) )
+        
+        if( p_access->stream[i].i_cat != MMS_STREAM_UNKNOWN )
         {
             i_streams++;
-            if( i_first == -1 )
-            {   
-                i_first = i;
-                var_buffer_add16( &buffer, 0x0000 ); // on
-            }   
-            else
+            if( i_first != -1 )
             {
                 var_buffer_add16( &buffer, 0xffff );
                 var_buffer_add16( &buffer, i );
+            }
+            else
+            {
+                i_first = i;
+            }
+            if( p_access->stream[i].i_selected )
+            {
                 var_buffer_add16( &buffer, 0x0000 );
+                msg_Info( p_input, 
+                          "selecting stream[0x%x] %s (%d kb/s)",
+                          i,
+                          ( p_access->stream[i].i_cat == MMS_STREAM_AUDIO  ) ? 
+                                                  "audio" : "video" ,
+                          p_access->stream[i].i_bitrate / 1024);
             }
-            msg_Info( p_input, 
-                      "selecting stream[0x%x] %s (%d kb/s)",
-                      i,
-                      ( p_access->stream[i].i_cat == MMS_STREAM_AUDIO  ) ? 
-                        "audio" : "video" ,
-                        p_access->stream[i].i_bitrate / 1024);
-            if( p_access->stream[i].i_cat == MMS_STREAM_AUDIO )
+            else
             {
-                b_audio = 1;
-            }
-            if( p_access->stream[i].i_cat == MMS_STREAM_VIDEO )
-            {
-                b_video = 1;
-            }
+                var_buffer_add16( &buffer, 0x0002 );
+                msg_Info( p_input, 
+                          "ignoring stream[0x%x] %s (%d kb/s)",
+                          i,
+                          ( p_access->stream[i].i_cat == MMS_STREAM_AUDIO  ) ? 
+                                    "audio" : "video" ,
+                          p_access->stream[i].i_bitrate / 1024);
 
-        }
-        else if( p_access->stream[i].i_cat != MMS_STREAM_UNKNOWN )
-        {
-            msg_Info( p_input, 
-                      "ignoring stream[0x%x] %s (%d kb/s)",
-                      i,
-                      ( p_access->stream[i].i_cat == MMS_STREAM_AUDIO  ) ? 
-                        "audio" : "video" ,
-                       p_access->stream[i].i_bitrate / 1024);
+            }
         }
     } 
 

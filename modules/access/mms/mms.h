@@ -2,9 +2,9 @@
  * mms.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.h,v 1.2 2002/11/12 13:57:13 sam Exp $
+ * $Id: mms.h,v 1.3 2002/11/13 20:28:13 fenrir Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ typedef struct mms_stream_s
     int i_id;       // 1 -> 127
     int i_cat;      // MMS_STREAM_VIDEO, MMS_STREAM_AUDIO
     int i_bitrate;  // -1 if unknown
-//    int i_selected;
+    int i_selected;
     
 } mms_stream_t;
 

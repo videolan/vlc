@@ -2,9 +2,9 @@
  * asf.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: asf.h,v 1.1 2002/11/12 00:54:40 fenrir Exp $
+ * $Id: asf.h,v 1.2 2002/11/13 20:28:13 fenrir Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
