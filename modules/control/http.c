@@ -1758,6 +1758,14 @@ static void MacroDo( httpd_file_sys_t *p_args,
                             msg_Dbg( p_intf, "requested volume set: -%i", (i_volume - i_value) );
                         }
                     } else
+                    if( strstr(vol, "%") != NULL )
+                    {
+                        i_value = atoi( vol );
+                        if( (i_value <= 100) && (i_value>=0) ){
+                            aout_VolumeSet( p_intf, (i_value * (AOUT_VOLUME_MAX - AOUT_VOLUME_MIN))/100+AOUT_VOLUME_MIN);
+                            msg_Dbg( p_intf, "requested volume set: %i%%", atoi( vol ));
+                        }
+                    } else
                     {
                         i_value = atoi( vol );
                         if( ( i_value <= AOUT_VOLUME_MAX ) && ( i_value >= AOUT_VOLUME_MIN ) )
