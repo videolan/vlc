@@ -182,6 +182,11 @@ N: Roine Gustafsson
 E: roine@popstar.com
 D: spudec bug fixes
 
+N: Gerald Hansink
+E: gerald.hansink@ordina.nl
+D: Qt Embedded Video Output
+S: Netherlands
+
 N: Shane Harper
 E: shanegh@optusnet.com.au
 D: SDL plugin fixes and enhancements
@@ -365,6 +370,8 @@ N: Jean-Paul Saman
 E: jpsaman@wxs.nl
 D: libmad plug-in
 D: iPAQ port
+D: Familiar Linux interface
+D: Dutch Translation
 S: Netherlands
 
 N: Steven M. Schultz
