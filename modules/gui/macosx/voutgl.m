@@ -274,10 +274,19 @@ static void Swap( vout_thread_t * p_vout )
 - (void) reshape
 {
     int x, y;
+    vlc_value_t val;
     NSRect bounds = [self bounds];
+
     [[self openGLContext] makeCurrentContext];
-    if( bounds.size.height * p_vout->render.i_aspect <
-            bounds.size.width * VOUT_ASPECT_FACTOR )
+
+    var_Get( p_vout, "macosx-stretch", &val );
+    if( val.b_bool )
+    {
+        x = bounds.size.width;
+        y = bounds.size.height;
+    }
+    else if( bounds.size.height * p_vout->render.i_aspect <
+             bounds.size.width * VOUT_ASPECT_FACTOR )
     {
         x = bounds.size.height * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
         y = bounds.size.height;
