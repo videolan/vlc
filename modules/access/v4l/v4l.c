@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.21 2003/08/28 21:11:55 gbazin Exp $
+ * $Id: v4l.c,v 1.22 2003/08/29 18:58:49 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -33,7 +33,6 @@
 #include <vlc/input.h>
 #include <vlc/vout.h>
 #include <codecs.h>
-#include "encoder.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
