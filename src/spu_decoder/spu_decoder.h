@@ -2,7 +2,7 @@
  * spu_decoder.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spu_decoder.h,v 1.9 2001/05/10 06:47:31 sam Exp $
+ * $Id: spu_decoder.h,v 1.10 2001/05/11 15:10:01 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,12 +51,14 @@ typedef struct spudec_thread_s
 
  //   subpicture_t *      p_spu;
     int                 i_spu_size;            /* size of current SPU packet */
-
     int                 i_rle_size;                  /* size of the RLE part */
-    int                 i_skipped_top;                  /* skipped RLE lines */
-    int                 i_skipped_bottom;
 
 } spudec_thread_t;
+
+/*****************************************************************************
+ * Amount of bytes we GetChunk() in one go
+ *****************************************************************************/
+#define SPU_CHUNK_SIZE              0x200
 
 /*****************************************************************************
  * SPU commands

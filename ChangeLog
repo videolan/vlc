@@ -3,9 +3,10 @@
 #===================#
 
 HEAD
+  * Fixed a deadlock in spudec.
   * Added SPU cropping.
   * Gnome interface segfault fix.
-  * BeOS interface segfault fix by AnEvilYak (what's you real name btw?).
+  * BeOS interface segfault fix by Rene Gollent <rgollent@u.arizona.edu>.
   * Fixed an aspect ratio issue in the SPU decoder, and optimized the
     SPU renderer.
   * Speed optimization in the handling of the unusual ephemer DVD subtitles.

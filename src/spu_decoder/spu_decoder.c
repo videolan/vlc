@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.44 2001/05/10 06:47:31 sam Exp $
+ * $Id: spu_decoder.c,v 1.45 2001/05/11 15:10:01 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -271,6 +271,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 {
     subpicture_t * p_spu;
     u8           * p_src;
+    unsigned int   i_offset;
 
     intf_WarnMsg( 3, "spudec: trying to gather a 0x%.2x long subtitle",
                   p_spudec->i_spu_size );
@@ -309,7 +310,22 @@ static void ParsePacket( spudec_thread_t *p_spudec )
     }
 
     /* Get RLE data */
-    GetChunk( &p_spudec->bit_stream, p_src, p_spudec->i_rle_size );
+    for( i_offset = 0;
+         i_offset + SPU_CHUNK_SIZE < p_spudec->i_rle_size;
+         i_offset += SPU_CHUNK_SIZE )
+    {
+        GetChunk( &p_spudec->bit_stream, p_src + i_offset, SPU_CHUNK_SIZE );
+
+        if( p_spudec->p_fifo->b_die )
+        {
+            free( p_src );
+            vout_DestroySubPicture( p_spudec->p_vout, p_spu );
+            return;
+        }
+    }
+
+    GetChunk( &p_spudec->bit_stream, p_src + i_offset,
+              p_spudec->i_rle_size - i_offset );
 
 #if 0
     /* Dump the subtitle info */
@@ -317,15 +333,13 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 #endif
 
     /* Getting the control part */
-    if( ParseControlSequences( p_spudec, p_spu ) )
+    if( p_spudec->p_fifo->b_die || ParseControlSequences( p_spudec, p_spu ) )
     {
         /* There was a parse error, delete the subpicture */
         free( p_src );
         vout_DestroySubPicture( p_spudec->p_vout, p_spu );
         return;
     }
-
-    p_spudec->i_skipped_top = p_spudec->i_skipped_bottom = 0;
 
     if( ParseRLE( p_spudec, p_spu, p_src ) )
     {
@@ -333,20 +347,6 @@ static void ParsePacket( spudec_thread_t *p_spudec )
         free( p_src );
         vout_DestroySubPicture( p_spudec->p_vout, p_spu );
         return;
-    }
-
-    intf_WarnMsg( 3, "spudec: valid subtitle, size: %ix%i, position: %i,%i",
-                  p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
-
-    /* Crop if necessary */
-    if( p_spudec->i_skipped_top || p_spudec->i_skipped_bottom )
-    {
-        p_spu->i_y += p_spudec->i_skipped_top;
-        p_spu->i_height -= p_spudec->i_skipped_top
-                            + p_spudec->i_skipped_bottom;
-
-        intf_WarnMsg( 3, "spudec: cropped to: %ix%i, position: %i,%i",
-                      p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
     }
 
     intf_WarnMsg( 3, "spudec: total size: 0x%x, RLE offsets: 0x%x 0x%x",
@@ -578,9 +578,8 @@ static int ParseRLE( spudec_thread_t *p_spudec,
 
     boolean_t b_empty_top = 1,
               b_empty_bottom = 0;
-
-    /* XXX: temporary variables */
-    boolean_t b_padding_bytes = 0;
+    unsigned int i_skipped_top = 0,
+                 i_skipped_bottom = 0;
 
     pi_table[ 0 ] = p_spu->type.spu.i_offset[ 0 ] << 1;
     pi_table[ 1 ] = p_spu->type.spu.i_offset[ 1 ] << 1;
@@ -633,12 +632,12 @@ static int ParseRLE( spudec_thread_t *p_spudec,
                 return( 1 );
             }
 
-            if( i_code == (i_width << 2) )
+            if( i_code == (i_width << 2) ) /* FIXME: we assume 0 is transp */
             {
                 if( b_empty_top )
                 {
                     /* This is a blank top line, we skip it */
-                    p_spudec->i_skipped_top++;
+                    i_skipped_top++;
                 }
                 else
                 {
@@ -647,7 +646,7 @@ static int ParseRLE( spudec_thread_t *p_spudec,
                     *p_dest++ = i_code;
 
                     b_empty_bottom = 1;
-                    p_spudec->i_skipped_bottom++;
+                    i_skipped_bottom++;
                 }
             }
             else
@@ -658,7 +657,7 @@ static int ParseRLE( spudec_thread_t *p_spudec,
                 /* Valid code means no blank line */
                 b_empty_top = 0;
                 b_empty_bottom = 0;
-                p_spudec->i_skipped_bottom = 0;
+                i_skipped_bottom = 0;
             }
         }
 
@@ -680,19 +679,34 @@ static int ParseRLE( spudec_thread_t *p_spudec,
         i_id = ~i_id & 0x1;
     }
 
-    /* FIXME: we shouldn't need these padding bytes */
-    while( i_y < i_height )
-    {
-        b_padding_bytes = 1;
-        *p_dest++ = i_width << 2;
-        i_y++;
-    }
-
-    if( b_padding_bytes )
+    /* We shouldn't get any padding bytes */
+    if( i_y < i_height )
     {
         intf_ErrMsg( "spudec: padding bytes found in RLE sequence" );
         intf_ErrMsg( "spudec: send mail to <sam@zoy.org> if you "
                      "want to help debugging this" );
+
+        /* Skip them just in case */
+        while( i_y < i_height )
+	{
+            *p_dest++ = i_width << 2;
+            i_y++;
+	}
+
+        return( 1 );
+    }
+
+    intf_WarnMsg( 3, "spudec: valid subtitle, size: %ix%i, position: %i,%i",
+                  p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
+
+    /* Crop if necessary */
+    if( i_skipped_top || i_skipped_bottom )
+    {
+        p_spu->i_y += i_skipped_top;
+        p_spu->i_height -= i_skipped_top + i_skipped_bottom;
+
+        intf_WarnMsg( 3, "spudec: cropped to: %ix%i, position: %i,%i",
+                      p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
     }
 
     return( 0 );
