@@ -2376,6 +2376,16 @@ static struct
     { FOURCC_0xa9prd,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9prf,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9src,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9alb,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9dis,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9enc,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9gen,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9trk,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9dsa,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9hst,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9url,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9ope,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9com,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
 
     /* Last entry */
     { 0,             MP4_ReadBox_default,       NULL }

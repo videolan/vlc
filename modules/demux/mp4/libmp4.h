@@ -187,6 +187,18 @@
 #define FOURCC_0xa9prd VLC_FOURCC( 0xa9, 'p', 'r', 'd' )
 #define FOURCC_0xa9prf VLC_FOURCC( 0xa9, 'p', 'r', 'f' )
 #define FOURCC_0xa9src VLC_FOURCC( 0xa9, 's', 'r', 'c' )
+#define FOURCC_0xa9alb VLC_FOURCC( 0xa9, 'a', 'l', 'b' )
+#define FOURCC_0xa9dis VLC_FOURCC( 0xa9, 'd', 'i', 's' )
+#define FOURCC_0xa9enc VLC_FOURCC( 0xa9, 'e', 'n', 'c' )
+#define FOURCC_0xa9trk VLC_FOURCC( 0xa9, 't', 'r', 'k' )
+#define FOURCC_0xa9url VLC_FOURCC( 0xa9, 'u', 'r', 'l' )
+#define FOURCC_0xa9dsa VLC_FOURCC( 0xa9, 'd', 's', 'a' )
+#define FOURCC_0xa9hst VLC_FOURCC( 0xa9, 'h', 's', 't' )
+#define FOURCC_0xa9ope VLC_FOURCC( 0xa9, 'o', 'p', 'e' )
+#define FOURCC_0xa9wrt VLC_FOURCC( 0xa9, 'w', 'r', 't' )
+#define FOURCC_0xa9com VLC_FOURCC( 0xa9, 'c', 'o', 'm' )
+#define FOURCC_0xa9gen VLC_FOURCC( 0xa9, 'g', 'e', 'n' )
+#define FOURCC_WLOC VLC_FOURCC( 'W', 'L', 'O', 'C' )
 
 /* Do you want some debug information on all read boxes ? */
 #define MP4_VERBOSE  1

@@ -751,7 +751,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 switch( p_0xa9xxx->i_type )
                 {
-                case FOURCC_0xa9nam:
+                case FOURCC_0xa9nam: /* Full name */
                     vlc_meta_Add( meta, VLC_META_TITLE,
                                   p_0xa9xxx->data.p_0xa9xxx->psz_text );
                     break;
@@ -767,24 +767,39 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     vlc_meta_Add( meta, VLC_META_COPYRIGHT,
                                   p_0xa9xxx->data.p_0xa9xxx->psz_text );
                     break;
-                case FOURCC_0xa9day:
+                case FOURCC_0xa9day: /* Creation Date */
                     vlc_meta_Add( meta, VLC_META_DATE,
                                   p_0xa9xxx->data.p_0xa9xxx->psz_text );
                     break;
-                case FOURCC_0xa9des:
+                case FOURCC_0xa9des: /* Description */
                     vlc_meta_Add( meta, VLC_META_DESCRIPTION,
+                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    break;
+                case FOURCC_0xa9gen: /* Genre */
+                    vlc_meta_Add( meta, VLC_META_GENRE,
                                   p_0xa9xxx->data.p_0xa9xxx->psz_text );
                     break;
 
                 case FOURCC_0xa9swr:
-                case FOURCC_0xa9inf:
-                case FOURCC_0xa9dir:
-                case FOURCC_0xa9cmt:
-                case FOURCC_0xa9req:
-                case FOURCC_0xa9fmt:
-                case FOURCC_0xa9prd:
-                case FOURCC_0xa9prf:
-                case FOURCC_0xa9src:
+                case FOURCC_0xa9inf: /* Information */
+                case FOURCC_0xa9alb: /* Album */
+                case FOURCC_0xa9dir: /* Director */
+                case FOURCC_0xa9dis: /* Disclaimer */
+                case FOURCC_0xa9enc: /* Encoded By */
+                case FOURCC_0xa9trk: /* Track */
+                case FOURCC_0xa9cmt: /* Commment */
+                case FOURCC_0xa9url: /* URL */
+                case FOURCC_0xa9req: /* Requirements */
+                case FOURCC_0xa9fmt: /* Original Format */
+                case FOURCC_0xa9dsa: /* Display Source As */
+                case FOURCC_0xa9hst: /* Host Computer */
+                case FOURCC_0xa9prd: /* Producer */
+                case FOURCC_0xa9prf: /* Performers */
+                case FOURCC_0xa9ope: /* Original Performer */
+                case FOURCC_0xa9src: /* Providers Source Content */
+                case FOURCC_0xa9wrt: /* Writer */
+                case FOURCC_0xa9com: /* Composer */
+                case FOURCC_WLOC:    /* Window Location */
                     /* TODO one day, but they aren't really meaningfull */
                     break;
 
@@ -1547,6 +1562,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     MP4_Box_t *p_elst;
 
     MP4_Box_t *p_mdhd;
+    MP4_Box_t *p_udta;
     MP4_Box_t *p_hdlr;
 
     MP4_Box_t *p_vmhd;
@@ -1667,6 +1683,22 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     if( strcmp( language, "```" ) && strcmp( language, "und" ) )
     {
         p_track->fmt.psz_language = strdup( language );
+    }
+
+    p_udta = MP4_BoxGet( p_box_trak, "udta" );
+    if( p_udta )
+    {
+        MP4_Box_t *p_0xa9xxx;
+        for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
+                 p_0xa9xxx = p_0xa9xxx->p_next )
+        {
+            switch( p_0xa9xxx->i_type )
+            {
+                case FOURCC_0xa9nam:
+                    p_track->fmt.psz_description = strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    break;
+            }
+        }
     }
 
     /* fxi i_timescale for AUDIO_ES with i_qt_version == 0 */
