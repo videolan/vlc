@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.143 2001/10/15 14:59:56 sam Exp $
+ * $Id: input.c,v 1.144 2001/10/22 02:33:54 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,6 +47,7 @@
 #endif
 
 #ifdef WIN32
+#   include <winsock.h>
 #   include <winsock2.h>
 #elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
 #   include <netdb.h>                                         /* hostent ... */
@@ -865,9 +866,10 @@ static void NetworkOpen( input_thread_t * p_input )
     {
         sock.sin_addr.s_addr = INADDR_ANY;
     }
+    
 #define IN_MULTICAST(a)         IN_CLASSD(a)
 #endif
-    
+
     /* Bind it */
     if( bind( p_input->i_handle, (struct sockaddr *)&sock, 
               sizeof( sock ) ) < 0 )
@@ -879,6 +881,8 @@ static void NetworkOpen( input_thread_t * p_input )
     }
 
     /* Join the multicast group if the socket is a multicast address */
+
+#ifndef WIN32    
     if( IN_MULTICAST( ntohl(i_mc_group) ) )
     {
         struct ip_mreq imr;
@@ -895,7 +899,8 @@ static void NetworkOpen( input_thread_t * p_input )
             return;
         }
     }
-
+#endif
+    
     /* Build socket for remote connection */
     if ( network_BuildRemoteAddr( &sock, psz_server ) == -1 )
     {

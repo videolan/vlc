@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.34 2001/10/02 16:46:59 massiot Exp $
+ * $Id: input_ts.c,v 1.35 2001/10/22 02:33:54 xav Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -240,7 +240,7 @@ static int TSRead( input_thread_t * p_input,
     thread_ts_data_t    * p_method;
     unsigned int    i_loop;
     int             i_read;
-    int             i_data = 0;
+    int             i_data = 1;
     struct iovec  * p_iovec;
     struct timeval  timeout;
 
