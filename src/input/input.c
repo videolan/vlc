@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.91 2001/03/07 10:31:10 stef Exp $
+ * $Id: input.c,v 1.92 2001/03/11 19:00:18 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -68,6 +68,9 @@
 #include "interface.h"
 
 #include "main.h"
+
+ /* #include <netutils.h> */
+
 
 /*****************************************************************************
  * Local prototypes
@@ -508,108 +511,8 @@ void input_FileClose( input_thread_t * p_input )
     return;
 }
 
+
 #ifndef SYS_BEOS
-/*****************************************************************************
- * input_BuildLocalAddr : fill a sockaddr_in structure for local binding
- *****************************************************************************/
-int input_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port, 
-                      boolean_t b_broadcast )
-{
-    char                psz_hostname[INPUT_MAX_SOURCE_LENGTH];
-    struct hostent    * p_hostent;
-    
-    /* Reset struct */
-    memset( p_socket, 0, sizeof( struct sockaddr_in ) );
-    p_socket->sin_family = AF_INET;                                 /* family */
-    p_socket->sin_port = htons( i_port );
-    
-    if( !b_broadcast )
-    {
-        /* Try to get our own IP */
-        if( gethostname( psz_hostname, sizeof(psz_hostname) ) )
-        {
-            intf_ErrMsg( "BuildLocalAddr : unable to resolve local name : %s",
-                         strerror( errno ) );
-            return( -1 );
-        }
-
-    }
-    else
-    {
-        /* Using broadcast address. There are many ways of doing it, one of
-         * the simpliest being a #define ...
-         * FIXME : this is ugly */ 
-        strncpy( psz_hostname, INPUT_BCAST_ADDR,INPUT_MAX_SOURCE_LENGTH );
-    }
-
-    /* Try to convert address directly from in_addr - this will work if
-     * psz_in_addr is dotted decimal. */
-
-#ifdef HAVE_ARPA_INET_H
-    if( !inet_aton( psz_hostname, &p_socket->sin_addr) )
-#else
-    if( (p_socket->sin_addr.s_addr = inet_addr( psz_hostname )) == -1 )
-#endif
-    {
-        /* We have a fqdn, try to find its address */
-        if ( (p_hostent = gethostbyname( psz_hostname )) == NULL )
-        {
-            intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_hostname );
-            return( -1 );
-        }
-        
-        /* Copy the first address of the host in the socket address */
-        memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0], 
-                 p_hostent->h_length );
-    }
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * input_BuildRemoteAddr : fill a sockaddr_in structure for remote host
- *****************************************************************************/
-int input_BuildRemoteAddr( input_thread_t * p_input, 
-                           struct sockaddr_in * p_socket )
-{
-    struct hostent            * p_hostent;
-
-    /* Reset structure */
-    memset( p_socket, 0, sizeof( struct sockaddr_in ) );
-    p_socket->sin_family = AF_INET;                                 /* family */
-    p_socket->sin_port = htons( 0 );                /* This is for remote end */
-    
-    /* Get the remote server */
-    if( p_input->p_source == NULL )
-    {
-        p_input->p_source = main_GetPszVariable( INPUT_SERVER_VAR, 
-                                                 INPUT_SERVER_DEFAULT );
-    }
-
-     /* Try to convert address directly from in_addr - this will work if
-      * psz_in_addr is dotted decimal. */
-#ifdef HAVE_ARPA_INET_H
-    if( !inet_aton( p_input->p_source, &p_socket->sin_addr) )
-#else
-    if( (p_socket->sin_addr.s_addr = inet_addr( p_input->p_source )) == -1 )
-#endif
-    {
-        /* We have a fqdn, try to find its address */
-        if ( (p_hostent = gethostbyname(p_input->p_source)) == NULL )
-        {
-            intf_ErrMsg( "BuildRemoteAddr: unknown host %s", 
-                         p_input->p_source );
-            return( -1 );
-        }
-        
-        /* Copy the first address of the host in the socket address */
-        memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0], 
-                 p_hostent->h_length );
-    }
-
-    return( 0 );
-}
-
 /*****************************************************************************
  * input_NetworkOpen : open a network socket 
  *****************************************************************************/
@@ -621,7 +524,14 @@ void input_NetworkOpen( input_thread_t * p_input )
     boolean_t           b_broadcast;
     
     /* FIXME : we don't handle channels for the moment */
-
+    
+    /* Get the remote server */
+    if( p_input->p_source == NULL )
+    {
+        p_input->p_source = main_GetPszVariable( INPUT_SERVER_VAR, 
+                                                 INPUT_SERVER_DEFAULT );
+    }
+    
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
     p_input->i_handle = socket( AF_INET, SOCK_DGRAM, 0 );
@@ -644,7 +554,6 @@ void input_NetworkOpen( input_thread_t * p_input )
         return;
     }
 
-#ifndef SYS_BEOS
     /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
      * packet loss caused by scheduling problems */
     i_option_value = 524288;
@@ -657,14 +566,13 @@ void input_NetworkOpen( input_thread_t * p_input )
         p_input->b_error = 1;
         return;
     }
-#endif /* SYS_BEOS */
 
     /* Get details about what we are supposed to do */
     b_broadcast = (boolean_t)main_GetIntVariable( INPUT_BROADCAST_VAR, 0 );
     i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
 
     /* TODO : here deal with channel stufs */
-
+    
     /* Build the local socket */
     if ( input_BuildLocalAddr( &s_socket, i_port, b_broadcast ) 
          == -1 )
@@ -685,7 +593,7 @@ void input_NetworkOpen( input_thread_t * p_input )
     }
 
     /* Build socket for remote connection */
-    if ( input_BuildRemoteAddr( p_input, &s_socket ) 
+    if ( input_BuildRemoteAddr( &s_socket, p_input->p_source ) 
          == -1 )
     {
         close( p_input->i_handle );
