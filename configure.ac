@@ -3292,7 +3292,7 @@ if test "${enable_waveout}" != "no"; then
     VLC_ADD_PLUGINS([waveout])
     VLC_ADD_LDFLAGS([waveout],[-lwinmm])
   fi
-  if "${SYS}" = "mingwce"; then
+  if test "${SYS}" = "mingwce"; then
     VLC_ADD_PLUGINS([waveout])
   fi
 fi
