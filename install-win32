@@ -1,0 +1,88 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; NSIS installer script for vlc ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; written by Pierre Baillet <oct@zoy.org> 29/7/01 v0.2
+; modifications by Samuel Hocevar <sam@zoy.org> 12/11/01
+
+;;;;;;;;;;;;;
+; CHANGELOG ;
+;;;;;;;;;;;;;
+; . removed version information.
+; . lists all installed files so as to prevent installer.nsi to be included
+;   in the release.
+; . really remove the shortcuts.
+; . added an exec command to display the program file folder. (grOovy)
+
+OutFile vlc-@VERSION@.exe
+Name "the VideoLAN Client"
+Caption "vlc @VERSION@ for Win32 Setup"
+;Icon ../share/gvlc_win32.ico
+
+CRCCheck on
+
+InstallDir $PROGRAMFILES\vlc
+; check if the program has already been installed, if so, take this dir
+; as install dir
+InstallDirRegKey HKLM SOFTWARE\VideoLAN\VLC "Install_Dir"
+DirText "Choose a directory to install in to:"
+
+AutoCloseWindow false
+ShowInstDetails show
+
+; uninstall stuff
+UninstallText "This will uninstall the VideoLAN Client. Hit next to continue."
+UninstallExeName "vlc-uninst.exe"
+
+SetOverwrite ifnewer
+SetDatablockOptimize on
+SetDateSave off
+SetCompress auto
+
+Section "Install"
+	SetOutPath $INSTDIR
+
+	File  vlc.exe
+	File  directx.so
+	File  gtk.so
+	File  sdl.so
+
+	File  INSTALL-win32.txt
+	File  AUTHORS
+	File  COPYING
+	File  ChangeLog
+	File  ChangeLog.libdvdcss
+	File  README
+	File  README.libdvdcss
+	File  FAQ
+	File  TODO
+
+	File  SDL.dll
+	File  gtk-1.3.dll
+	File  gdk-1.3.dll
+	File  glib-1.3.dll
+	File  gmodule-1.3.dll
+	File  gnu-intl.dll
+
+	;File  README-GTK.txt
+	File  README-SDL.txt
+
+	File  /r share
+
+	CreateDirectory "$SMPROGRAMS\VideoLAN"
+	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc_@VERSION@.lnk" "$INSTDIR\vlc.exe" 
+	CreateShortCut "$SMPROGRAMS\VideoLAN\Uninstall VLC.lnk" "$INSTDIR\vlc-uninst.exe"
+	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "Install_Dir" $INSTDIR
+	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "version" "@VERSION@"
+	Exec "explorer $SMPROGRAMS\VideoLAN\"
+SectionEnd
+
+Section "Uninstall"
+	Delete $SMPROGRAMS\VideoLAN\*
+	RMDir $SMPROGRAMS\VideoLAN
+	Delete $INSTDIR\share\*
+	RMDir $INSTDIR\share
+	Delete $INSTDIR\*
+	RMDir $INSTDIR
+	DeleteRegKey HKLM SOFTWARE\VideoLAN
+SectionEnd
+

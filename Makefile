@@ -347,6 +347,35 @@ snapshot-nocss: snapshot-common
 	# Clean up
 	rm -Rf tmp
 
+package-win32:
+	# XXX: this rule is probably only useful to you if you have exactly
+	# the same setup as me. Contact sam@zoy.org if you need to use it.
+	#
+	# Check that tmp isn't in the way
+	@if test -e tmp; then \
+		echo "Error: please remove ./tmp, it is in the way"; false; \
+	else \
+		echo "OK."; mkdir tmp; \
+	fi
+	# Create installation script
+	sed -e 's#@VERSION@#'${VLC_QUICKVERSION}'#' < install-win32 > tmp/nsi
+	# Copy relevant files
+	cp vlc.exe plugins/directx.so plugins/gtk.so plugins/sdl.so tmp/ 
+	cp INSTALL-win32.txt AUTHORS COPYING ChangeLog ChangeLog.libdvdcss \
+		README README.libdvdcss FAQ TODO tmp/
+	for file in gtk-1.3.dll gdk-1.3.dll glib-1.3.dll gmodule-1.3.dll \
+		gnu-intl.dll SDL.dll README-SDL.txt ; \
+			do cp ../vlc-win32/$$file tmp/ ; done
+	mkdir tmp/share
+	for file in default8x16.psf default8x9.psf ; \
+		do cp share/$$file tmp/share/ ; done
+	# Create package 
+	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe /CD tmp/nsi
+	mv tmp/vlc-${VLC_QUICKVERSION}.exe \
+		vlc-${VLC_QUICKVERSION}-win32-installer.exe
+	# Clean up
+	rm -Rf tmp
+
 libdvdcss-snapshot: snapshot-common
 	# Remove vlc sources and icons, doc, debian directory...
 	rm -Rf tmp/vlc/src tmp/vlc/share tmp/vlc/plugins tmp/vlc/doc
