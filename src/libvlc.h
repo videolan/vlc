@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.35 2003/01/11 20:25:36 gitan Exp $
+ * $Id: libvlc.h,v 1.36 2003/01/22 10:44:50 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -24,6 +24,9 @@
  *****************************************************************************/
 
 #define Nothing here, this is just to prevent update-po from being stupid
+
+static char *ppsz_sout_acodec[] = { "", "mpeg1", "mpeg2", "mpeg4", "vorbis", NULL };
+static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
@@ -262,6 +265,15 @@
     "'any' at the end of the list to make sure there is a fallback for the " \
     "types you didn't specify.")
 
+#define ENCODER_VIDEO_TEXT N_("choose prefered video encoder list")
+#define ENCODER_VIDEO_LONGTEXT N_( \
+    "This allows you to select the order in which vlc will choose its " \
+    "codecs. " )
+#define ENCODER_AUDIO_TEXT N_("choose prefered audio encoder list")
+#define ENCODER_AUDIO_LONGTEXT N_( \
+    "This allows you to select the order in which vlc will choose its " \
+    "codecs. " )
+
 #define SOUT_TEXT N_("choose a stream output")
 #define SOUT_LONGTEXT N_( \
     "Empty if no stream output.")
@@ -271,10 +283,18 @@
     "This allows you to choose if the video stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
+#define SOUT_VCODEC_TEXT N_("video encoding codec" )
+#define SOUT_VCODEC_LONGTEXT N_( \
+    "This allows you to force video encoding")
+
 #define SOUT_AUDIO_TEXT N_("enable audio stream output")
 #define SOUT_AUDIO_LONGTEXT N_( \
     "This allows you to choose if the video stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
+
+#define SOUT_ACODEC_TEXT N_("audio encoding codec" )
+#define SOUT_ACODEC_LONGTEXT N_( \
+    "This allows you to force audio encoding")
 
 #define PACKETIZER_TEXT N_("choose prefered packetizer list")
 #define PACKETIZER_LONGTEXT N_( \
@@ -478,16 +498,22 @@ vlc_module_begin();
     add_category_hint( N_("Decoders"), NULL );
     add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT );
 
+    add_category_hint( N_("Encoders"), NULL );
+    add_module( "video-encoder", "video encoder", NULL, NULL, ENCODER_VIDEO_TEXT, ENCODER_VIDEO_LONGTEXT );
+    add_module( "audio-encoder", "audio encoder", NULL, NULL, ENCODER_AUDIO_TEXT, ENCODER_AUDIO_LONGTEXT );
+
     /* Stream output options */
     add_category_hint( N_("Stream output"), NULL );
+    add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT );
+    add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT, SOUT_AUDIO_LONGTEXT );
+    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT, SOUT_VIDEO_LONGTEXT );
+    add_string_from_list( "sout-acodec", "", ppsz_sout_acodec, NULL, SOUT_ACODEC_TEXT, SOUT_ACODEC_LONGTEXT );
+    add_string_from_list( "sout-vcodec", "", ppsz_sout_vcodec, NULL, SOUT_VCODEC_TEXT, SOUT_VCODEC_LONGTEXT );
     add_module( "packetizer", "packetizer", NULL, NULL,
                 PACKETIZER_TEXT, PACKETIZER_LONGTEXT );
     add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT, MUX_LONGTEXT );
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT );
-    add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT );
-    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT, SOUT_VIDEO_LONGTEXT );
-    add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT, SOUT_AUDIO_LONGTEXT );
 
     /* CPU options */
     add_category_hint( N_("CPU"), NULL );

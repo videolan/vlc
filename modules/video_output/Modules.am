@@ -5,3 +5,4 @@ SOURCES_glide = modules/video_output/glide.c
 SOURCES_vout_sdl = modules/video_output/sdl.c
 SOURCES_svgalib = modules/video_output/svgalib.c
 SOURCES_wingdi = modules/video_output/wingdi.c
+SOURCES_vout_encoder = modules/video_output/encoder.c

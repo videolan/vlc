@@ -36,6 +36,8 @@ EXTRA_DIST = \
 	demux/mpeg/Modules.am \
 	demux/util/Modules.am \
 	demux/wav/Modules.am \
+	encoder/Modules.am \
+	encoder/ffmpeg/Modules.am \
 	gui/beos/Modules.am \
 	gui/familiar/Modules.am \
 	gui/gtk/Modules.am \

@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.55 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: input_dec.c,v 1.56 2003/01/22 10:44:50 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -76,20 +76,48 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
 
         if( b_sout )
         {
-            p_fifo->p_module =
-                module_Need( p_fifo, "packetizer", "$packetizer" );
+            vlc_bool_t b_reencode = VLC_FALSE;
+
+            if( p_es->i_cat == AUDIO_ES )
+            {
+                char *psz_sout_acodec = config_GetPsz( p_input, "sout-acodec" );
+                if( psz_sout_acodec != NULL && *psz_sout_acodec != '\0' )
+                {
+                    msg_Dbg( p_input, "audio reencoding requested -> unsupported" );
+                    b_reencode = VLC_TRUE;
+                }
+            }
+            else if( p_es->i_cat == VIDEO_ES )
+            {
+                char *psz_sout_vcodec = config_GetPsz( p_input, "sout-vcodec" );
+                if( psz_sout_vcodec != NULL && *psz_sout_vcodec != '\0' )
+                {
+                    msg_Dbg( p_input, "video reencoding requested" );
+                    /* force encoder video output */
+                    config_PutPsz( p_input, "vout", "encoder" );
+                    b_reencode = VLC_TRUE;
+                }
+            }
+
+            if( !b_reencode )
+            {
+                /* we don't want to reencode so search for a packetizer */
+                p_fifo->p_module =
+                    module_Need( p_fifo, "packetizer", "$packetizer" );
+            }
+            else
+            {
+                /* get a suitable decoder module to do reencoding*/
+                p_fifo->p_module = module_Need( p_fifo, "decoder", "$codec" );
+            }
         }
     }
-
-    /* default Get a suitable decoder module */
-    if( p_fifo->p_module == NULL )
+    else
     {
+        /* default Get a suitable decoder module */
         p_fifo->p_module = module_Need( p_fifo, "decoder", "$codec" );
     }
-#if 0
-    /* Get a suitable module */
-    p_fifo->p_module = module_Need( p_fifo, "decoder", "$codec" );
-#endif
+
     if( p_fifo->p_module == NULL )
     {
         msg_Err( p_fifo, "no suitable decoder module for fourcc `%4.4s'",

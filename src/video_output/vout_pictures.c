@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.33 2003/01/15 13:16:40 sam Exp $
+ * $Id: vout_pictures.c,v 1.34 2003/01/22 10:44:50 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -674,4 +674,5 @@ static void CopyPicture( vout_thread_t * p_vout,
             }
         }
     }
+    p_dest->date = p_src->date;
 }

@@ -160,6 +160,7 @@ HEADERS_include = \
 	include/darwin_specific.h \
 	include/codecs.h \
 	include/error.h \
+	include/encoder.h \
 	include/input_ext-dec.h \
 	include/input_ext-intf.h \
 	include/input_ext-plugins.h \
