@@ -888,6 +888,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         p_data += 16+2+4+i_size;
     }
 
+    p_esp->p_sp = NULL;
     if( p_data < &p_peek[i_peek] )
     {
         asf_object_t *p_sp;
@@ -947,10 +948,6 @@ static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
     FREE( p_esp->ppsz_stream_name );
 }
 
-
-    guid_t  type;
-    int16_t i_stream_number_count;
-    int16_t *pi_stream_number;
 
 static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
                                                      asf_object_t *p_obj)
@@ -1231,7 +1228,10 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
     int i_result;
     int i_index;
 
-    if( !p_obj ) return( 0 );
+    if( !p_obj )
+        return( 0 );
+
+    memset( p_obj, 0, sizeof( p_obj ) );
 
     if( ASF_ReadObjectCommon( s, p_obj ) )
     {
