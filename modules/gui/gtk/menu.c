@@ -2,11 +2,12 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.3 2003/01/17 19:17:09 sam Exp $
+ * $Id: menu.c,v 1.4 2003/01/20 20:07:07 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +32,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc/aout.h>
+#include <vlc/vout.h>
 
 #ifdef MODULE_NAME_IS_gnome
 #   include <gnome.h>
@@ -62,6 +65,12 @@ static gint GtkTitleMenu( gpointer, GtkWidget *,
 static gint GtkRadioMenu( intf_thread_t *, GtkWidget *, GSList *,
                           char *, int, int, int,
                    void( *pf_toggle )( GtkCheckMenuItem *, gpointer ) );
+
+static void GtkMenubarDeinterlaceToggle( GtkCheckMenuItem * menuitem, gpointer user_data );
+static void GtkPopupDeinterlaceToggle( GtkCheckMenuItem * menuitem, gpointer user_data );
+static gint GtkDeinterlaceMenus( gpointer          p_data,
+                                 GtkWidget *       p_root,
+                                 void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) );
 
 gint GtkSetupMenus( intf_thread_t * p_intf );
 
@@ -283,6 +292,152 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
     }
 }
 
+
+static void GtkPopupObjectToggle( GtkCheckMenuItem * menuitem, gpointer user_data,
+                                  int i_object_type, char *psz_variable )
+{
+    intf_thread_t   *p_intf = GtkGetIntf( menuitem );
+    GtkLabel        *p_label;
+
+    p_label = GTK_LABEL( ( GTK_BIN( menuitem )->child ) );
+
+    if( menuitem->active && !p_intf->p_sys->b_aout_update && !p_intf->p_sys->b_vout_update )
+    {
+        vlc_object_t * p_obj;
+
+        p_obj = (vlc_object_t *)vlc_object_find( p_intf, i_object_type,
+                                                  FIND_ANYWHERE );
+        if( p_obj )
+        {
+            vlc_value_t val;
+
+            gtk_label_get( p_label, &val.psz_string );
+
+            if( var_Set( p_obj, psz_variable, val ) < 0 )
+            {
+                msg_Warn( p_obj, "cannot set variable (%s)", val.psz_string );
+            }
+            vlc_object_release( p_obj );
+        }
+    }
+}
+static void GtkPopupAoutChannelsToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
+{
+    GtkPopupObjectToggle( menuitem, user_data, VLC_OBJECT_AOUT, "audio-channels" );
+}
+
+static void GtkPopupAoutDeviceToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
+{
+    GtkPopupObjectToggle( menuitem, user_data, VLC_OBJECT_AOUT, "audio-device" );
+}
+
+
+static void GtkPopupVoutDeviceToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
+{
+    GtkPopupObjectToggle( menuitem, user_data, VLC_OBJECT_VOUT, "video-device" );
+}
+
+
+static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
+{
+    char *psz_filter;
+    int  i;
+
+    psz_filter = config_GetPsz( p_intf, "filter" );
+
+    if( !strcmp( psz_mode, "None" ) )
+    {
+        config_PutPsz( p_intf, "filter", "" );
+    }
+    else
+    {
+        if( !psz_filter || !*psz_filter )
+        {
+            config_PutPsz( p_intf, "filter", "deinterlace" );
+        }
+        else
+        {
+            if( strstr( psz_filter, "deinterlace" ) == NULL )
+            {
+                psz_filter = realloc( psz_filter, strlen( psz_filter ) + 20 );
+                strcat( psz_filter, ",deinterlace" );
+            }
+            config_PutPsz( p_intf, "filter", psz_filter );
+        }
+
+        config_PutPsz( p_intf, "deinterlace-mode", psz_mode );
+    }
+
+    if( psz_filter )
+        free( psz_filter );
+
+    /* now restart all video stream */
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+#define ES p_intf->p_sys->p_input->stream.pp_es[i]
+    /* create a set of language buttons and append them to the container */
+    for( i = 0 ; i < p_intf->p_sys->p_input->stream.i_es_number ; i++ )
+    {
+        if( ( ES->i_cat == VIDEO_ES ) &&
+                ES->p_decoder_fifo != NULL )
+        {
+            input_UnselectES( p_intf->p_sys->p_input, ES );
+            input_SelectES( p_intf->p_sys->p_input, ES );
+        }
+#undef ES
+    }
+    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+}
+
+static void GtkMenubarDeinterlaceToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
+{
+    intf_thread_t   *p_intf = GtkGetIntf( menuitem );
+    GtkLabel        *p_label;
+    char            *psz_mode;
+    GtkWidget       *p_popup_menu;
+
+    p_label = GTK_LABEL( ( GTK_BIN( menuitem )->child ) );
+
+    if( !p_intf->p_sys->b_deinterlace_update && menuitem->active )
+    {
+        gtk_label_get( p_label, &psz_mode );
+        GtkDeinterlaceUpdate( p_intf, psz_mode );
+
+        p_intf->p_sys->b_deinterlace_update = VLC_TRUE;
+
+        p_popup_menu   = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                                     p_intf->p_sys->p_popup ), "popup_deinterlace" ) );
+
+        GtkDeinterlaceMenus( p_intf, p_popup_menu, GtkPopupDeinterlaceToggle );
+
+        p_intf->p_sys->b_deinterlace_update = VLC_FALSE;
+
+    }
+}
+
+static void GtkPopupDeinterlaceToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
+{
+    intf_thread_t   *p_intf = GtkGetIntf( menuitem );
+    GtkLabel        *p_label;
+    char            *psz_mode;
+    GtkWidget       *p_menubar_menu;
+
+    p_label = GTK_LABEL( ( GTK_BIN( menuitem )->child ) );
+
+    if( !p_intf->p_sys->b_deinterlace_update && menuitem->active )
+    {
+        gtk_label_get( p_label, &psz_mode );
+        GtkDeinterlaceUpdate( p_intf, psz_mode );
+
+        p_intf->p_sys->b_deinterlace_update = VLC_TRUE;
+
+        p_menubar_menu   = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                                     p_intf->p_sys->p_window ), "menubar_deinterlace" ) );
+
+        GtkDeinterlaceMenus( p_intf, p_menubar_menu, GtkMenubarDeinterlaceToggle );
+
+        p_intf->p_sys->b_deinterlace_update = VLC_FALSE;
+    }
+}
 
 /****************************************************************************
  * Functions to generate menus
@@ -870,6 +1025,211 @@ static gint GtkTitleMenu( gpointer       p_data,
 }
 
 /*****************************************************************************
+ * GtkSetupVarMenu :
+ *****************************************************************************
+ *
+ *****************************************************************************/
+static gint GtkSetupVarMenu( intf_thread_t * p_intf,
+                             vlc_object_t * p_object,
+                             GtkWidget *p_root,
+                             char * psz_variable,
+                             void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
+{
+    vlc_value_t         val;
+    char              * psz_value;
+    GtkWidget *         p_menu;
+    GSList *            p_group = NULL;
+    GtkWidget *         p_item;
+    GtkWidget *         p_item_active = NULL;
+
+    int                 i_item;
+
+     /* temporary hack to avoid blank menu when an open menu is removed */
+    if( GTK_MENU_ITEM(p_root)->submenu != NULL )
+    {
+        gtk_menu_popdown( GTK_MENU( GTK_MENU_ITEM(p_root)->submenu ) );
+    }
+    /* removes previous menu */
+    gtk_menu_item_remove_submenu( GTK_MENU_ITEM( p_root ) );
+    gtk_widget_set_sensitive( p_root, FALSE );
+
+    /* get the current value */
+    if( var_Get( p_object, psz_variable, &val ) < 0 )
+    {
+        return FALSE;
+    }
+    psz_value = val.psz_string;
+
+    if( var_Change( p_object, psz_variable, VLC_VAR_GETLIST, &val ) < 0 )
+    {
+        free( psz_value );
+        return FALSE;
+    }
+
+    /* menu container */
+    p_menu = gtk_menu_new();
+    gtk_object_set_data( GTK_OBJECT( p_menu ), "p_intf", p_intf );
+
+    for( i_item = 0; i_item < val.p_list->i_count; i_item++ )
+    {
+        p_item = gtk_radio_menu_item_new_with_label( p_group,
+                                                     val.p_list->p_values[i_item].psz_string );
+        p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
+
+        if( !strcmp( psz_value, val.p_list->p_values[i_item].psz_string ) )
+        {
+            p_item_active = p_item;
+        }
+
+        gtk_widget_show( p_item );
+
+        /* signal hanling for off */
+        gtk_signal_connect( GTK_OBJECT( p_item ), "toggled",
+                        GTK_SIGNAL_FUNC ( pf_toggle ), NULL );
+
+        gtk_menu_append( GTK_MENU( p_menu ), p_item );
+
+    }
+    /* link the new menu to the menubar item */
+    gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_root ), p_menu );
+
+    if( p_item_active )
+    {
+        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (p_item_active), TRUE);
+    }
+
+    if( val.p_list->i_count > 0 )
+    {
+        gtk_widget_set_sensitive( p_root, TRUE );
+    }
+
+    /* clean up everything */
+    var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val );
+
+    return TRUE;
+}
+
+/*****************************************************************************
+ * GtkDeinterlaceMenus: update interactive menus of the interface
+ *****************************************************************************
+ *****************************************************************************/
+static gint GtkDeinterlaceMenus( gpointer          p_data,
+                                 GtkWidget *       p_root,
+                                 void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
+{
+    intf_thread_t *     p_intf;
+    GtkWidget *         p_menu;
+    GtkWidget *         p_separator;
+    GtkWidget *         p_item;
+    GtkWidget *         p_item_active;
+    GSList *            p_group;
+    guint               i_item;
+    guint               i;
+    char                *ppsz_deinterlace_mode[] = { "discard", "blend", "mean", "bob", "linear", NULL };
+    char                *psz_deinterlace_option;
+    char                *psz_filter;
+
+    p_intf = (intf_thread_t *)p_data;
+
+    /* temporary hack to avoid blank menu when an open menu is removed */
+    if( GTK_MENU_ITEM(p_root)->submenu != NULL )
+    {
+        gtk_menu_popdown( GTK_MENU( GTK_MENU_ITEM(p_root)->submenu ) );
+    }
+    /* removes previous menu */
+    gtk_menu_item_remove_submenu( GTK_MENU_ITEM( p_root ) );
+    gtk_widget_set_sensitive( p_root, FALSE );
+
+    p_group = NULL;
+
+    /* menu container */
+    p_menu = gtk_menu_new();
+    gtk_object_set_data( GTK_OBJECT( p_menu ), "p_intf", p_intf );
+
+    /* special case for "off" item */
+    p_item = gtk_radio_menu_item_new_with_label( p_group, "None" );
+    p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
+
+    gtk_widget_show( p_item );
+
+    /* signal hanling for off */
+    gtk_signal_connect( GTK_OBJECT( p_item ), "toggled",
+                        GTK_SIGNAL_FUNC ( pf_toggle ), NULL );
+
+    gtk_menu_append( GTK_MENU( p_menu ), p_item );
+
+    p_separator = gtk_menu_item_new();
+    gtk_widget_set_sensitive( p_separator, FALSE );
+    gtk_widget_show( p_separator );
+    gtk_menu_append( GTK_MENU( p_menu ), p_separator );
+
+
+    /* search actual deinterlace mode */
+    psz_filter = config_GetPsz( p_intf, "filter" );
+    psz_deinterlace_option = strdup( "None" );
+
+    if( psz_filter && *psz_filter )
+    {
+       if( strstr ( psz_filter, "deinterlace" ) )
+       {
+            free( psz_deinterlace_option );
+            psz_deinterlace_option = config_GetPsz( p_intf, "deinterlace-mode" );
+            if( !psz_deinterlace_option )
+                psz_deinterlace_option = strdup( "None" );
+       }
+    }
+    if( psz_filter )
+        free( psz_filter );
+
+    p_item_active = NULL;
+    i_item = 0;
+
+    /* create a set of deinteralce buttons and append them to the container */
+    for( i = 0; ppsz_deinterlace_mode[i] != NULL; i++ )
+    {
+        i_item++;
+
+        p_item = gtk_radio_menu_item_new_with_label( p_group, ppsz_deinterlace_mode[i] );
+        p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
+        gtk_widget_show( p_item );
+
+        if( !strcmp( ppsz_deinterlace_mode[i], psz_deinterlace_option ) )
+        {
+            p_item_active = p_item;
+        }
+        /* setup signal hanling */
+        gtk_signal_connect( GTK_OBJECT( p_item ), "toggled",
+                            GTK_SIGNAL_FUNC( pf_toggle ),
+                            NULL );
+
+        gtk_menu_append( GTK_MENU( p_menu ), p_item );
+
+    }
+
+    /* link the new menu to the menubar item */
+    gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_root ), p_menu );
+
+    /* acitvation will call signals so we can only do it
+     * when submenu is attached to menu - to get intf_window
+     * We have to release the lock since input_ToggleES needs it */
+    if( p_item_active != NULL )
+    {
+        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_active ),
+                                        TRUE );
+    }
+
+    /* be sure that menu is sensitive if non empty */
+    if( i_item > 0 )
+    {
+        gtk_widget_set_sensitive( p_root, TRUE );
+    }
+
+    return TRUE;
+}
+
+
+
+/*****************************************************************************
  * GtkSetupMenus: function that generates title/chapter/audio/subpic
  * menus with help from preceding functions
  *****************************************************************************
@@ -888,6 +1248,21 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
                                      p_intf->p_sys->b_program_update;
     p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update |
                                    p_intf->p_sys->b_program_update;
+
+    if( 1 )
+    {
+        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                                     p_intf->p_sys->p_window ), "menubar_deinterlace" ) );
+        p_popup_menu   = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                                     p_intf->p_sys->p_popup ), "popup_deinterlace" ) );
+
+        p_intf->p_sys->b_deinterlace_update = VLC_TRUE;
+        GtkDeinterlaceMenus( p_intf, p_menubar_menu, GtkMenubarDeinterlaceToggle );
+        p_intf->p_sys->b_deinterlace_update = VLC_TRUE;
+        GtkDeinterlaceMenus( p_intf, p_popup_menu, GtkPopupDeinterlaceToggle );
+
+        p_intf->p_sys->b_deinterlace_update = VLC_FALSE;
+    }
 
     if( p_intf->p_sys->b_program_update )
     {
@@ -1027,7 +1402,73 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
 
         p_intf->p_sys->b_spu_update = VLC_FALSE;
     }
+    /* create audio channels and device menu (in menubar _and_ popup */
+    if( p_intf->p_sys->b_aout_update )
+    {
+        aout_instance_t *p_aout;
 
+        p_aout = (aout_instance_t*)vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+
+        if( p_aout != NULL )
+        {
+            vlc_value_t val;
+            val.b_bool = VLC_FALSE;
+
+            var_Set( (vlc_object_t *)p_aout, "intf-change", val );
+
+            /* audio-channels */
+            p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                              p_intf->p_sys->p_window ), "menubar_audio_channels" ) );
+            p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                         p_intf->p_sys->p_popup ), "popup_audio_channels" ) );
+            GtkSetupVarMenu( p_intf, (vlc_object_t *)p_aout, p_popup_menu,
+                              "audio-channels",  GtkPopupAoutChannelsToggle );
+            GtkSetupVarMenu( p_intf, (vlc_object_t *)p_aout, p_menubar_menu,
+                              "audio-channels",  GtkPopupAoutChannelsToggle );
+
+            /* audio-device */
+            p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                              p_intf->p_sys->p_window ), "menubar_audio_device" ) );
+            p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                         p_intf->p_sys->p_popup ), "popup_audio_device" ) );
+            GtkSetupVarMenu( p_intf, (vlc_object_t *)p_aout, p_popup_menu,
+                              "audio-device",  GtkPopupAoutDeviceToggle );
+            GtkSetupVarMenu( p_intf, (vlc_object_t *)p_aout, p_menubar_menu,
+                              "audio-device",  GtkPopupAoutDeviceToggle );
+
+            vlc_object_release( (vlc_object_t *)p_aout );
+        }
+        p_intf->p_sys->b_aout_update = VLC_FALSE;
+    }
+
+    if( p_intf->p_sys->b_vout_update )
+    {
+        vout_thread_t *p_vout;
+
+        p_vout = (vout_thread_t*)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+
+        if( p_vout != NULL )
+        {
+            vlc_value_t val;
+            val.b_bool = VLC_FALSE;
+
+            var_Set( (vlc_object_t *)p_vout, "intf-change", val );
+
+            /* video-device */
+            p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                              p_intf->p_sys->p_window ), "menubar_video_device" ) );
+            p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                         p_intf->p_sys->p_popup ), "popup_video_device" ) );
+            GtkSetupVarMenu( p_intf, (vlc_object_t *)p_vout, p_popup_menu,
+                              "video-device",  GtkPopupVoutDeviceToggle );
+            GtkSetupVarMenu( p_intf, (vlc_object_t *)p_vout, p_menubar_menu,
+                              "video-device",  GtkPopupVoutDeviceToggle );
+
+
+            vlc_object_release( (vlc_object_t *)p_vout );
+        }
+        p_intf->p_sys->b_vout_update = VLC_FALSE;
+    }
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
 
     return TRUE;

@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.7 2003/01/17 19:17:09 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.8 2003/01/20 20:07:06 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -32,6 +32,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+#include <vlc/aout.h>
 
 #include <unistd.h>
 
@@ -568,7 +569,6 @@ gboolean GtkMessagesShow( GtkWidget       *widget,
     return TRUE;
 }
 
-
 void
 GtkMessagesOk                          (GtkButton       *button,
                                         gpointer         user_data)
@@ -597,4 +597,96 @@ GtkOpenNotebookChanged                 (GtkNotebook     *notebook,
 {
     GtkOpenChanged( GTK_WIDGET( notebook ), user_data );
 }
+
+/****************************************************************************
+ * Audio management
+ ****************************************************************************/
+void GtkVolumeUp                      ( GtkMenuItem     *menuitem,
+                                        gpointer         user_data )
+{
+    intf_thread_t   *p_intf = GtkGetIntf( menuitem );
+    aout_instance_t *p_aout;
+
+    p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    if( p_aout != NULL )
+    {
+        if( p_intf->p_sys->b_mute )
+        {
+            audio_volume_t i_volume;
+
+            aout_VolumeMute( p_aout, &i_volume );
+            p_intf->p_sys->b_mute = ( i_volume == 0 ) ? 1 : 0;
+
+        }
+        aout_VolumeUp( p_aout, 1, NULL );
+        vlc_object_release( (vlc_object_t *)p_aout );
+    }
+}
+
+
+void GtkVolumeDown                    ( GtkMenuItem     *menuitem,
+                                        gpointer         user_data )
+{
+    intf_thread_t   *p_intf = GtkGetIntf( menuitem );
+    aout_instance_t *p_aout;
+
+    p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    if( p_aout != NULL )
+    {
+        if( p_intf->p_sys->b_mute )
+        {
+            audio_volume_t i_volume;
+
+            aout_VolumeMute( p_aout, &i_volume );
+            p_intf->p_sys->b_mute = ( i_volume == 0 ) ? 1 : 0;
+        }
+        aout_VolumeDown( p_aout, 1, NULL );
+        vlc_object_release( (vlc_object_t *)p_aout );
+    }
+}
+
+
+void GtkVolumeMute                    ( GtkMenuItem     *menuitem,
+                                        gpointer         user_data )
+{
+    intf_thread_t   *p_intf = GtkGetIntf( menuitem );
+    aout_instance_t *p_aout;
+    audio_volume_t i_volume;
+
+    p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+
+    if( p_aout != NULL )
+    {
+        aout_VolumeMute( p_aout, &i_volume );
+
+        p_intf->p_sys->b_mute = ( i_volume == 0 ) ? 1 : 0;
+
+        vlc_object_release( (vlc_object_t *)p_aout );
+    }
+}
+
+void
+GtkMenubarDeinterlace                  ( GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t   *p_intf = GtkGetIntf( menuitem );
+
+    if( p_intf )
+        msg_Dbg( p_intf, "GtkMenubarDeinterlace" );
+
+    
+}
+
+
+void
+GtkPopupDeinterlace                    (GtkRadioMenuItem *radiomenuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t   *p_intf = GtkGetIntf( radiomenuitem );
+
+    if( p_intf )
+        msg_Dbg( p_intf, "GtkPopupDeinterlace" );
+}
+
+
 

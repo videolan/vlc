@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.5 2003/01/03 14:44:46 sam Exp $
+ * $Id: gnome.c,v 1.6 2003/01/20 20:07:06 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -111,6 +111,11 @@ static int Open( vlc_object_t *p_this )
 
     /* Initialize Gnome thread */
     p_intf->p_sys->b_playing = 0;
+    p_intf->p_sys->b_deinterlace_update = 0;
+
+    p_intf->p_sys->b_aout_update = 0;
+    p_intf->p_sys->b_vout_update = 0;
+
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
@@ -120,6 +125,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->b_slider_free = 1;
 
     p_intf->p_sys->i_part = 0;
+    p_intf->p_sys->b_mute = 0;
 
     return VLC_SUCCESS;
 }
@@ -367,6 +373,9 @@ static void Manage( intf_thread_t *p_intf )
     if( p_intf->p_sys->p_input )
     {
         input_thread_t *p_input = p_intf->p_sys->p_input;
+        aout_instance_t *p_aout  = NULL;
+        vout_thread_t   *p_vout  = NULL;
+        vlc_bool_t      b_need_menus = VLC_FALSE;
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -421,6 +430,44 @@ static void Manage( intf_thread_t *p_intf )
                 p_input->stream.p_selected_area->i_part )
             {
                 p_intf->p_sys->b_chapter_update = 1;
+                b_need_menus = VLC_TRUE;
+            }
+
+            /* Does the audio output require to update the menus ? */
+            p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                         FIND_ANYWHERE );
+            if( p_aout != NULL )
+            {
+                vlc_value_t val;
+                if( var_Get( (vlc_object_t *)p_aout, "intf-change", &val ) >= 0
+                    && val.b_bool )
+                {
+                    p_intf->p_sys->b_aout_update = 1;
+                    b_need_menus = 1;
+                }
+
+                vlc_object_release( (vlc_object_t *)p_aout );
+            }
+
+
+            /* Does the video output require to update the menus ? */
+            p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                       FIND_ANYWHERE );
+            if( p_vout != NULL ) 
+            {
+                vlc_value_t val;
+                if( var_Get( (vlc_object_t *)p_vout, "intf-change", &val ) >= 0
+                    && val.b_bool )
+                {
+                    p_intf->p_sys->b_vout_update = 1;
+                    b_need_menus = 1;
+                }
+
+                vlc_object_release( (vlc_object_t *)p_vout );
+            }
+
+            if( b_need_menus )
+            {
                 GtkSetupMenus( p_intf );
             }
         }

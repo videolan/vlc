@@ -2,7 +2,7 @@
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.c,v 1.6 2002/12/18 14:17:11 sam Exp $
+ * $Id: display.c,v 1.7 2003/01/20 20:07:06 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -177,7 +177,10 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
         p_intf->p_sys->b_audio_update = 1;
         p_intf->p_sys->b_spu_update = 1;
         p_intf->p_sys->i_part = 0;
-    
+#if 0
+        p_intf->p_sys->b_aout_update = 1;
+        p_intf->p_sys->b_vout_update = 1;
+#endif
         p_intf->p_sys->p_input->stream.b_changed = 0;
         msg_Dbg( p_intf, "stream has changed, refreshing interface" );
     }

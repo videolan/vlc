@@ -1,5 +1,5 @@
 /*
- * This file was created automatically by glade and fixed by bootstrap.sh
+ * This file was created automatically by glade and fixed by bootstrap
  */
 
 #ifdef HAVE_CONFIG_H

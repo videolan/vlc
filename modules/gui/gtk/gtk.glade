@@ -358,6 +358,100 @@
 
 	<widget>
 	  <class>GtkMenuItem</class>
+	  <name>menubar_config_audio</name>
+	  <label>_Audio</label>
+	  <right_justify>False</right_justify>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menubar_config_audio_menu</name>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_volume_up</name>
+	      <signal>
+		<name>activate</name>
+		<handler>GtkVolumeUp</handler>
+		<last_modification_time>Mon, 20 Jan 2003 10:11:53 GMT</last_modification_time>
+	      </signal>
+	      <label>Volume Up</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_volume_down</name>
+	      <signal>
+		<name>activate</name>
+		<handler>GtkVolumeDown</handler>
+		<last_modification_time>Mon, 20 Jan 2003 10:11:53 GMT</last_modification_time>
+	      </signal>
+	      <label>Volume Down</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_volume_mute</name>
+	      <signal>
+		<name>activate</name>
+		<handler>GtkVolumeMute</handler>
+		<last_modification_time>Mon, 20 Jan 2003 10:11:53 GMT</last_modification_time>
+	      </signal>
+	      <label>Mute</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator15</name>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_audio_channels</name>
+	      <label>Channels</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_audio_device</name>
+	      <label>Device</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menubar_config_video</name>
+	  <label>_Video</label>
+	  <right_justify>False</right_justify>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menubar_config_video_menu</name>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_video_device</name>
+	      <label>Screen</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_deinterlace</name>
+	      <label>Deinterlace</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
 	  <name>menubar_help</name>
 	  <label>_Help</label>
 	  <right_justify>False</right_justify>
@@ -1109,7 +1203,77 @@
 
   <widget>
     <class>GtkMenuItem</class>
+    <name>popup_video_device</name>
+    <label>Screen</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_deinterlace</name>
+    <label>Deinterlace</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
     <name>separator5</name>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_volume_up</name>
+    <signal>
+      <name>activate</name>
+      <handler>GtkVolumeUp</handler>
+      <last_modification_time>Mon, 20 Jan 2003 10:16:02 GMT</last_modification_time>
+    </signal>
+    <label>Volume Up</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_volume_down</name>
+    <signal>
+      <name>activate</name>
+      <handler>GtkVolumeDown</handler>
+      <last_modification_time>Mon, 20 Jan 2003 10:18:25 GMT</last_modification_time>
+    </signal>
+    <label>Volume Down</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_volume_mute</name>
+    <signal>
+      <name>activate</name>
+      <handler>GtkVolumeMute</handler>
+      <last_modification_time>Mon, 20 Jan 2003 10:18:25 GMT</last_modification_time>
+    </signal>
+    <label>Mute</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_audio_channels</name>
+    <label>Channels</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_audio_device</name>
+    <label>Device</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>separator16</name>
     <right_justify>False</right_justify>
   </widget>
 

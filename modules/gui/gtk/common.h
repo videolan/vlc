@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: common.h,v 1.5 2003/01/03 14:44:46 sam Exp $
+ * $Id: common.h,v 1.6 2003/01/20 20:07:06 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,8 +44,12 @@ struct intf_sys_t
     vlc_bool_t          b_window_changed;        /* window display toggled ? */
     vlc_bool_t          b_playlist_changed;    /* playlist display toggled ? */
     vlc_bool_t          b_slider_free;                      /* slider status */
+    vlc_bool_t          b_deinterlace_update;
 
     /* menus handlers */
+    vlc_bool_t          b_aout_update;
+    vlc_bool_t          b_vout_update;
+
     vlc_bool_t          b_program_update;   /* do we need to update programs
                                                                         menu */
     vlc_bool_t          b_title_update;  /* do we need to update title menus */
@@ -85,6 +89,9 @@ struct intf_sys_t
     GtkLabel *          p_label_title;
     GtkLabel *          p_label_chapter;
     guint               i_part;                           /* current chapter */
+
+    /* audio part */
+    vlc_bool_t          b_mute;
 };
 
 /*****************************************************************************
