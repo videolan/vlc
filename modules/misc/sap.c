@@ -84,22 +84,22 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define SAP_ADDR_TEXT N_("SAP multicast address")
-#define SAP_ADDR_LONGTEXT N_("SAP multicast address")
-#define SAP_IPV4_TEXT N_("IPv4-SAP listening")
+#define SAP_ADDR_TEXT N_( "SAP multicast address" )
+#define SAP_ADDR_LONGTEXT N_( "SAP multicast address" )
+#define SAP_IPV4_TEXT N_( "IPv4-SAP listening" )
 #define SAP_IPV4_LONGTEXT N_( \
-      "Set this if you want the SAP module to listen to IPv4 announces")
-#define SAP_IPV6_TEXT N_( "IPv6-SAP listening")
-#define SAP_IPV6_LONGTEXT N_(\
-      "Set this if you want the SAP module to listen to IPv6 announces")
-#define SAP_SCOPE_TEXT N_("IPv6 SAP scope")
+      "Set this if you want the SAP module to listen to IPv4 announces" )
+#define SAP_IPV6_TEXT N_( "IPv6-SAP listening" )
+#define SAP_IPV6_LONGTEXT N_( \
+      "Set this if you want the SAP module to listen to IPv6 announces" )
+#define SAP_SCOPE_TEXT N_( "IPv6 SAP scope" )
 #define SAP_SCOPE_LONGTEXT N_( \
-       "Sets the scope for IPv6 announces (default is 8)")
-#define SAP_TIMEOUT_TEXT N_("SAP timeout (seconds)")
+       "Sets the scope for IPv6 announces (default is 8)" )
+#define SAP_TIMEOUT_TEXT N_( "SAP timeout (seconds)" )
 #define SAP_TIMEOUT_LONGTEXT N_( \
        "Sets the time before SAP items get deleted if no new announce " \
-       "is received.")
-#define SAP_PARSE_TEXT N_("Try to parse the SAP")
+       "is received." )
+#define SAP_PARSE_TEXT N_( "Try to parse the SAP" )
 #define SAP_PARSE_LONGTEXT N_( \
        "When SAP can it will try to parse the SAP. Normal behavior is " \
        "to have livedotcom parse the announce." )
@@ -113,15 +113,15 @@ vlc_module_begin();
     add_string( "sap-addr", NULL, NULL,
                 SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
     add_bool( "sap-ipv4", 1 , NULL,
-               SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE);
+               SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE );
     add_bool( "sap-ipv6", 0 , NULL,
-              SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, VLC_TRUE);
+              SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, VLC_TRUE );
     add_string( "sap-ipv6-scope", "8" , NULL,
                 SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
     add_integer( "sap-timeout", 1800, NULL,
-                 SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE);
+                 SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE );
     add_bool( "sap-parse", 1 , NULL,
-               SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, VLC_TRUE);
+               SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, VLC_TRUE );
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
@@ -197,43 +197,47 @@ struct intf_sys_t
 };
 
 #ifdef HAVE_ZLIB_H
-int do_decompress(unsigned char *src, unsigned char **_dst, int slen) {
-  int result, dstsize, n;
-  unsigned char *dst;
-  z_stream d_stream;
+int do_decompress( unsigned char *src, unsigned char **_dst, int slen ) {
+    int result, dstsize, n;
+    unsigned char *dst;
+    z_stream d_stream;
 
-  d_stream.zalloc = (alloc_func)0;
-  d_stream.zfree = (free_func)0;
-  d_stream.opaque = (voidpf)0;
-  result = inflateInit(&d_stream);
-  if (result != Z_OK) {
-    printf("inflateInit() failed. Result: %d\n", result);
-    return(-1);
-  }
-
-  d_stream.next_in = (Bytef *)src;
-  d_stream.avail_in = slen;
-  n = 0;
-  dst = NULL;
-  do {
-    n++;
-    dst = (unsigned char *)realloc(dst, n * 1000);
-    d_stream.next_out = (Bytef *)&dst[(n - 1) * 1000];
-    d_stream.avail_out = 1000;
-    result = inflate(&d_stream, Z_NO_FLUSH);
-    if ((result != Z_OK) && (result != Z_STREAM_END)) {
-      printf("Zlib decompression failed. Result: %d\n", result);
-      return(-1);
+    d_stream.zalloc = (alloc_func)0;
+    d_stream.zfree = (free_func)0;
+    d_stream.opaque = (voidpf)0;
+    result = inflateInit(&d_stream);
+    if( result != Z_OK )
+    {
+        printf( "inflateInit() failed. Result: %d\n", result );
+        return( -1 );
     }
-  } while ((d_stream.avail_out == 0) && (d_stream.avail_in != 0) &&
-           (result != Z_STREAM_END));
 
-  dstsize = d_stream.total_out;
-  inflateEnd(&d_stream);
+    d_stream.next_in = (Bytef *)src;
+    d_stream.avail_in = slen;
+    n = 0;
+    dst = NULL;
+    do
+    {
+        n++;
+        dst = (unsigned char *)realloc(dst, n * 1000);
+        d_stream.next_out = (Bytef *)&dst[(n - 1) * 1000];
+        d_stream.avail_out = 1000;
+        result = inflate(&d_stream, Z_NO_FLUSH);
+        if( ( result != Z_OK ) && ( result != Z_STREAM_END ) )
+        {
+            printf( "Zlib decompression failed. Result: %d\n", result );
+            return( -1 );
+        }
+    }
+    while( ( d_stream.avail_out == 0 ) && ( d_stream.avail_in != 0 ) &&
+           ( result != Z_STREAM_END ) );
 
-  *_dst = (unsigned char *)realloc(dst, dstsize);
+    dstsize = d_stream.total_out;
+    inflateEnd( &d_stream );
 
-  return dstsize;
+    *_dst = (unsigned char *)realloc( dst, dstsize );
+
+    return dstsize;
 }
 #endif
 
@@ -242,12 +246,12 @@ int do_decompress(unsigned char *src, unsigned char **_dst, int slen) {
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_thread_t *p_intf = ( intf_thread_t* )p_this;
     intf_sys_t    *p_sys  = malloc( sizeof( intf_sys_t ) );
 
     playlist_t          *p_playlist;
 
-    p_sys->i_timeout = config_GetInt(p_intf,"sap-timeout");
+    p_sys->i_timeout = config_GetInt( p_intf,"sap-timeout" );
     p_sys->fd[0] = -1;
     p_sys->fd[1] = -1;
     if( config_GetInt( p_intf, "sap-ipv4" ) )
@@ -267,7 +271,7 @@ static int Open( vlc_object_t *p_this )
         sock.psz_server_addr   = "";
         sock.i_server_port     = 0;
         sock.i_ttl             = 0;
-        p_intf->p_private = (void*) &sock;
+        p_intf->p_private = ( void* ) &sock;
 
         p_network = module_Need( p_intf, "network", "ipv4", VLC_TRUE );
         if( p_network )
@@ -347,7 +351,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_thread_t *p_intf = ( intf_thread_t* )p_this;
     intf_sys_t    *p_sys  = p_intf->p_sys;
     int i;
 
@@ -386,8 +390,8 @@ static void Run( intf_thread_t *p_intf )
     uint8_t     buffer[MAX_SAP_BUFFER + 1];
     uint8_t    *p_end;
     
-    /* Dirty hack to slow down the startup of the sap interface*/ 
-    msleep(500000);    
+    /* Dirty hack to slow down the startup of the sap interface */ 
+    msleep( 500000 );
 
     /* read SAP packets */
     while( !p_intf->b_die )
@@ -409,12 +413,12 @@ static void Run( intf_thread_t *p_intf )
         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
         {
            struct sap_announce_t *p_announce;
-           mtime_t i_timeout = (mtime_t)1000000*p_sys->i_timeout;
+           mtime_t i_timeout = ( mtime_t ) 1000000*p_sys->i_timeout;
            if( mdate() - p_intf->p_sys->pp_announces[i]->i_last > i_timeout )
            {
-               msg_Dbg(p_intf,"Time out for %s, deleting (%i/%i)",
-                       p_intf->p_sys->pp_announces[i]->psz_name,
-                       i , p_intf->p_sys->i_announces );
+               msg_Dbg( p_intf,"Time out for %s, deleting (%i/%i)",
+                        p_intf->p_sys->pp_announces[i]->psz_name,
+                        i , p_intf->p_sys->i_announces );
 
                /* Remove the playlist item */
                p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -462,23 +466,23 @@ static void Run( intf_thread_t *p_intf )
         i_version = buffer[0] >> 5;
         if( i_version != 1 )
         {
-            msg_Warn( p_intf, "strange sap version %d found", i_version );
+            msg_Dbg( p_intf, "strange sap version %d found", i_version );
         }
         i_address_type = buffer[0] & 0x10;
         b_reserved = buffer[0] & 0x08;
         if( b_reserved != 0 )
         {
-            msg_Warn( p_intf, "reserved bit incorrectly set" );
+            msg_Dbg( p_intf, "reserved bit incorrectly set" );
         }
         b_message_type = buffer[0] & 0x04;
         if( b_message_type != 0 )
         {
-            msg_Warn( p_intf, "got session deletion packet" );
+            msg_Dbg( p_intf, "got session deletion packet" );
         }
         b_encrypted = buffer[0] & 0x02;
         if( b_encrypted )
         {
-            msg_Warn( p_intf, "encrypted packet" );
+            msg_Dbg( p_intf, "encrypted packet" );
         }
         b_compressed = buffer[0] & 0x01;
         p_sdp  = &buffer[4];
@@ -493,7 +497,8 @@ static void Run( intf_thread_t *p_intf )
         if( b_compressed )
         {
 #ifdef HAVE_ZLIB_H
-            i_decompressed_size = do_decompress( p_sdp, &p_decompressed_buffer, i_read - ( p_sdp - buffer ) );
+            i_decompressed_size = do_decompress( p_sdp, &p_decompressed_buffer,
+                                      i_read - ( p_sdp - buffer ) );
             if( i_decompressed_size > 0 && i_decompressed_size < MAX_SAP_BUFFER )
             {
                 memcpy( p_sdp, p_decompressed_buffer, i_decompressed_size );
@@ -541,7 +546,6 @@ static void Run( intf_thread_t *p_intf )
 
 static void cfield_parse( char *psz_cfield, char **ppsz_uri )
 {
-
     char *psz_pos;
     if( psz_cfield )
     {
@@ -572,7 +576,6 @@ static void cfield_parse( char *psz_cfield, char **ppsz_uri )
     }
 
     return;
-
 }
 
 /**********************************************************************
@@ -667,11 +670,11 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         /* Check if we have already added the item */
         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
         {
-            if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
-                        psz_uri ) )
+            if( !strcmp( p_intf->p_sys->pp_announces[i]->psz_uri,
+                         psz_uri ) )
             {
                 p_intf->p_sys->pp_announces[i]->i_last = mdate();
-                free(psz_uri);
+                free( psz_uri );
                 return;
             }
         }
@@ -687,8 +690,8 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         }
 
         /* Remember it */
-        p_announce = (struct sap_announce_t *)malloc(
-                      sizeof(struct sap_announce_t) );
+        p_announce = ( struct sap_announce_t * )malloc(
+                      sizeof( struct sap_announce_t ) );
         if( p_sd->psz_sessionname )
         {
             p_announce->psz_name = strdup(  p_sd->psz_sessionname );
@@ -723,6 +726,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
     for( i_count = 0 ; i_count < p_sd->i_media ; i_count++ )
     {
         int i_group = p_intf->p_sys->i_group;
+        int i_packetsize = config_GetInt( p_intf, "mtu" );
 
         /* Build what we have to put in psz_item_uri, with the m and
          * c fields  */
@@ -757,16 +761,16 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
         for( i = 0 ; i< p_sd->i_attributes ; i++ )
         {
-            if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "type") &&
-                strstr( p_sd->pp_attributes[i]->psz_value, "http") )
+            if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "type" ) &&
+                strstr( p_sd->pp_attributes[i]->psz_value, "http" ) )
             {
                 b_http = VLC_TRUE;
             }
-            if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "http-path"))
+            if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "http-path" ) )
             {
                 psz_http_path = strdup(  p_sd->pp_attributes[i]->psz_value );
             }
-            if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup"))
+            if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup" ) )
             {
                 int i_group_id;
                 p_playlist =
@@ -778,7 +782,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                 }
 
                 i_group_id = playlist_GroupToId( p_playlist,
-                                 p_sd->pp_attributes[i]->psz_value);
+                                 p_sd->pp_attributes[i]->psz_value );
                 if( i_group_id != 0 )
                 {
                     i_group = i_group_id;
@@ -787,26 +791,28 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                 {
                     playlist_group_t *p_group =
                             playlist_CreateGroup( p_playlist,
-                                       p_sd->pp_attributes[i]->psz_value);
+                                       p_sd->pp_attributes[i]->psz_value );
                     i_group = p_group->i_id;
                 }
                 vlc_object_release( p_playlist );
+            }
+            if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "packetsize" ) )
+            {
+                i_packetsize = strtol( p_sd->pp_attributes[i]->psz_value, NULL, 10 );
             }
         }
 
         /* Filling psz_uri */
         if( b_http == VLC_FALSE )
         {
-            psz_item_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
-                                 strlen( psz_port ) + 7 );
             if( ismult( psz_uri ) )
             {
-                sprintf( psz_item_uri, "%s://@%s:%s",
+                asprintf( &psz_item_uri, "%s://@%s:%s",
                          psz_proto, psz_uri, psz_port );
             }
             else
             {
-                sprintf( psz_item_uri, "%s://%s:%s",
+                asprintf( &psz_item_uri, "%s://%s:%s",
                          psz_proto, psz_uri, psz_port );
             }
         }
@@ -858,9 +864,14 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                                     p_intf->p_sys->pp_announces[i]->i_id );
 
                     /* Change the name in the item */
-                    if( p_item->input.psz_name )
-                        free( p_item->input.psz_name );
-                    p_item->input.psz_name = strdup( p_sd->psz_sessionname);
+                    if( p_item )
+                    {
+                        vlc_mutex_lock( &p_item->input.lock );
+                        if( p_item->input.psz_name )
+                            free( p_item->input.psz_name );
+                        p_item->input.psz_name = strdup( p_sd->psz_sessionname );
+                        vlc_mutex_unlock( &p_item->input.lock );
+                    }
 
                     /* Update the stored name */
                     if( p_intf->p_sys->pp_announces[i]->psz_name )
@@ -878,20 +889,25 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         /* Add the item in the playlist */
         p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                       FIND_ANYWHERE );
-        i_id = playlist_Add ( p_playlist, psz_item_uri ,
-                               p_sd->psz_sessionname,
-                               PLAYLIST_CHECK_INSERT, PLAYLIST_END );
-        p_item = playlist_ItemGetById( p_playlist, i_id );
+
+        p_item = playlist_ItemNew( p_intf, psz_item_uri, p_sd->psz_sessionname );
+
         if( p_item )
         {
-            vlc_mutex_lock( &p_item->input.lock );
             playlist_ItemSetGroup( p_item, i_group );
-            vlc_mutex_unlock( &p_item->input.lock );
+            if( i_packetsize > config_GetInt( p_intf, "mtu" ) )
+            {
+                char *psz_packetsize_option;
+                asprintf( &psz_packetsize_option, "mtu=%i", i_packetsize );
+                playlist_ItemAddOption( p_item, psz_packetsize_option );
+                free( psz_packetsize_option );
+            }
+            playlist_AddItem( p_playlist , p_item , PLAYLIST_CHECK_INSERT, PLAYLIST_END );
         }
 
         /* Then remember it */
         p_announce = (struct sap_announce_t *)malloc(
-                      sizeof(struct sap_announce_t) );
+                      sizeof( struct sap_announce_t ) );
         if(  p_sd->psz_sessionname )
         {
             p_announce->psz_name = strdup(  p_sd->psz_sessionname );
@@ -934,7 +950,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
 
     if( p_packet[0] != 'v' || p_packet[1] != '=' )
     {
-        msg_Warn(p_intf, "bad SDP packet");
+        msg_Warn( p_intf, "bad SDP packet" );
         return NULL;
     }
 
@@ -962,7 +978,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
         {
             psz_end = p_packet + strlen( p_packet );
         }
-        if( psz_end > p_packet && *(psz_end - 1 ) == '\r' )
+        if( psz_end > p_packet && *( psz_end - 1 ) == '\r' )
         {
             psz_end--;
         }
@@ -975,7 +991,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
 
         if( p_packet[1] != '=' )
         {
-            msg_Warn( p_intf, "invalid packet") ;
+            msg_Warn( p_intf, "invalid packet" ) ;
             free_sd( sd );
             return NULL;
         }
@@ -1100,12 +1116,12 @@ static int ismult( char *psz_uri )
     return( i_value < 224 ? VLC_FALSE : VLC_TRUE );
 }
 
-
-
 /*****************************************************************************
- * Read: read on a file descriptor, checking b_die periodically
+ * NetRead: read on a file descriptor, checking b_die periodically
  *****************************************************************************
- * Taken from udp.c
+ * Taken from net.c
+ * Code duplication because of select(). We need a net_Select() but that's 
+ * quite difficult.
  *****************************************************************************/
 static ssize_t NetRead( intf_thread_t *p_intf,
                         int fd[2], uint8_t *p_buffer, int i_len )
@@ -1119,6 +1135,7 @@ static ssize_t NetRead( intf_thread_t *p_intf,
     int             i_handle_max = __MAX( fd[0], fd[1] );
 
     /* Initialize file descriptor set */
+
     FD_ZERO( &fds );
     if( fd[0] > 0 ) FD_SET( fd[0], &fds );
     if( fd[1] > 0 ) FD_SET( fd[1], &fds );

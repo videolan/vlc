@@ -328,9 +328,9 @@ static int Demux ( demux_t *p_demux )
 
     if( p_sys->i_packet_size && p_sys->psz_mcast_ip )
     {
-        char *psz_option = (char *) malloc( 20 );
+        char *psz_option;
         p_sys->i_packet_size += 1000;
-        sprintf( psz_option, "mtu=%i", p_sys->i_packet_size );
+        asprintf( &psz_option, "mtu=%i", p_sys->i_packet_size );
         playlist_ItemAddOption( p_item, psz_option );
         free( psz_option );
     }
