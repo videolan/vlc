@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.15 2004/02/21 23:15:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin at videolan dot org>
@@ -411,7 +411,10 @@ static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
         if( p_sys->b_mov )
             memcpy( fcc, ".mp3", 4 );
         else
+        {
             memcpy( fcc, "mp4a", 4 );
+            b_descr = VLC_TRUE;
+        }
         break;
 
     default:
