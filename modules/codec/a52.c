@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.21 2003/01/15 10:58:47 massiot Exp $
+ * $Id: a52.c,v 1.22 2003/03/31 22:39:27 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -197,6 +197,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             p_dec->output_format.i_bytes_per_frame = i_frame_size;
             p_dec->output_format.i_frame_length = A52_FRAME_NB;
             aout_DateInit( &end_date, i_rate );
+            aout_DateSet( &end_date, pts );
             p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
                                                &p_dec->p_aout,
                                                &p_dec->output_format );

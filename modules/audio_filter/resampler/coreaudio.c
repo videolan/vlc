@@ -1,10 +1,11 @@
 /*****************************************************************************
- * ugly.c : ugly resampler (changes pitch)
+ * coreaudio.c resampler based on CoreAudio's AudioConverter
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: coreaudio.c,v 1.1 2003/03/30 01:13:37 massiot Exp $
+ * Copyright (C) 2003 VideoLAN
+ * $Id: coreaudio.c,v 1.2 2003/03/31 22:39:27 massiot Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,13 +61,13 @@ struct aout_filter_sys_t
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("audio filter for ugly resampling") );
-    set_capability( "audio filter", 50 );
+    set_description( _("audio filter using CoreAudio for resampling") );
+    set_capability( "audio filter", 0 );
     set_callbacks( Create, Close );
 vlc_module_end();
 
 /*****************************************************************************
- * Create: allocate ugly resampler
+ * Create: allocate resampler
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
