@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# $Id: woody-buildpackage,v 1.9 2003/03/11 20:40:50 sam Exp $
+# $Id: woody-buildpackage,v 1.10 2003/03/11 22:44:48 sam Exp $
 # Build VLC for a Woody Debian system
 
 if test ! -d debian
@@ -16,7 +16,7 @@ sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc (\1-0woody.\2)/' \
 # control: replace liba52-*-dev with a52dec-dev (>=0.7.3)
 #                  libdv*-dev with libdv-dev
 #                  kdelibs4-dev with kdelibs-dev
-#                  libqt3-mt-dev with libqt-dev
+#                  libqt3-mt-dev libqt3-compat-headers with libqt-dev
 #                  libarts1-dev with libarts-dev
 #          remove libwxgtk2.4-dev
 #                 libflac-dev
@@ -24,6 +24,7 @@ sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
     -e 's/libdv[0-9]*-dev/libdv-dev/' \
     -e 's/kdelibs[0-9]*-dev/kdelibs-dev/' \
     -e 's/libqt[0-9]*-mt-dev/libqt-dev/' \
+    -e 's/, libqt[0-9]*-compat-headers[^,]*//' \
     -e 's/libarts[0-9]*-dev/libarts-dev/' \
     -e 's/, libwx[^,]*//' \
     -e '/Package: wxvlc/,/^ *$/d' \
