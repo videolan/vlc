@@ -2,7 +2,7 @@
  * ac3_imdct_3dn.c: accelerated 3D Now! ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_3dn.c,v 1.5 2001/07/08 23:15:11 reno Exp $
+ * $Id: ac3_imdct_3dn.c,v 1.6 2001/07/26 20:00:33 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -90,23 +90,11 @@ static void imdct512_pre_ifft_twiddle_3dn (const int *pmt, complex_t *buf, float
 {
     __asm__ __volatile__ (	
     ".align 16\n"
-	"pushl %%ebp\n"
-	"movl  %%esp, %%ebp\n"
-	"addl  $-4, %%esp\n" /* local variable, loop counter */
-	
-	"pushl %%eax\n"
 	"pushl %%ebx\n"
-	"pushl %%ecx\n"
-	"pushl %%edx\n"
-	"pushl %%edi\n"
 	"pushl %%esi\n"
+    
+	"movl $128, %%ebx\n"         /* loop counter */
 
-	"movl  8(%%ebp), %%eax\n" 	/* pmt */
-	"movl 12(%%ebp), %%ebx\n"	/* buf */
-	"movl 16(%%ebp), %%ecx\n"	/* data */
-	"movl 20(%%ebp), %%edx\n" 	/* xcos_sin_sse */
-	"movl $128, -4(%%ebp)\n"
-	
     ".align 16\n"
 ".loop:\n"
 	"movl  (%%eax), %%esi\n"
@@ -126,24 +114,19 @@ static void imdct512_pre_ifft_twiddle_3dn (const int *pmt, complex_t *buf, float
 
 	"pfmul   %%mm4, %%mm0\n"    /* 255-2j * -s_j | 255-2j  * c_j */
 	"pfmul   %%mm1, %%mm2\n"    /* 2j * -c_j | 2j * -s_j */
-	"addl    $8, %%ebx\n"
+	"addl    $8, %%edi\n"
 	"pfadd   %%mm2, %%mm0\n"    /* 2j * -c_j + 255-2j * -s_j | 2j * -s_j + 255-2j * c_j */
     
-	"movq  %%mm0, -8(%%ebx)\n"
-	"decl -4(%%ebp)\n"
+	"movq  %%mm0, -8(%%edi)\n"
+	"decl %%ebx\n"
    	"jnz .loop\n"
 
 	"popl %%esi\n"
-	"popl %%edi\n"
-	"popl %%edx\n"
-	"popl %%ecx\n"
 	"popl %%ebx\n"
-	"popl %%eax\n"
 
-	"addl $4, %%esp\n"
-	"popl %%ebp\n"
 	"femms\n"
-    ::);
+    : "=D" (buf)
+    : "a" (pmt), "c" (data), "d" (xcos_sin_sse), "D" (buf));
 }
 
 static void imdct512_post_ifft_twiddle_3dn (complex_t *buf, float *xcos_sin_sse)
@@ -205,25 +188,21 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 {
     __asm__ __volatile__ (
     ".align 16\n"
-	"pushl %%ebp\n"
-	"movl  %%esp, %%ebp\n"
 
 	"pushl %%eax\n"
 	"pushl %%ebx\n"
 	"pushl %%ecx\n"
 	"pushl %%edx\n"
-	"pushl %%esi\n"
 	"pushl %%edi\n"
+	"pushl %%esi\n"
+	"pushl %%ebp\n"
 
-	"movl 20(%%ebp), %%ebx\n"   /* delay */
-	"movl 16(%%ebp), %%edx\n"   /* window */
+	"movl %%esi, %%ebp\n"         /* buf */
+	"movl $32, %%ebx\n"         /* loop count */
+	"leal 516(%%ebp), %%esi\n"  /* buf[64].im */
+	"leal 504(%%ebp), %%edi\n"  /* buf[63].re */
 
-	"movl 8(%%ebp), %%eax\n"    /* buf */
-	"movl $32, %%ecx\n"         /* loop count */
-	"leal 516(%%eax), %%esi\n"  /* buf[64].im */
-	"leal 504(%%eax), %%edi\n"  /* buf[63].re */
-	"movl  12(%%ebp), %%eax\n"  /* data */
-
+        
     ".align 16\n"
 ".first_128_samples:\n"
 	"movd   (%%esi), %%mm0\n" /* im0 */
@@ -241,8 +220,8 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 
 	"movq  (%%edx), %%mm0\n"      /* w1 | w0 */
 	"movq 8(%%edx), %%mm1\n"      /* w3 | w2 */
-	"movq  (%%ebx), %%mm2\n"      /* d1 | d0 */
-	"movq 8(%%ebx), %%mm3\n"      /* d3 | d2 */
+	"movq  (%%ecx), %%mm2\n"      /* d1 | d0 */
+	"movq 8(%%ecx), %%mm3\n"      /* d3 | d2 */
 
     "pfmul     %%mm4, %%mm0\n"      /* w1*re0 | -w0*im0 */
 	"pfmul     %%mm5, %%mm1\n"      /* w3*re1 | -w2*im1 */
@@ -253,16 +232,16 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 	"addl $16, %%edx\n"
 	"movq %%mm0,  (%%eax)\n"
 	"movq %%mm1, 8(%%eax)\n"
-	"addl $16, %%ebx\n"
+	"addl $16, %%ecx\n"
 	"addl $16, %%esi\n"
 	"addl $16, %%eax\n"
     "addl $-16, %%edi\n"
-	"decl %%ecx\n"
+	"decl %%ebx\n"
 	"jnz .first_128_samples\n"
 
-	"movl 8(%%ebp), %%esi\n"    /* buf[0].re */
-	"leal 1020(%%esi), %%edi\n" /* buf[127].im */
-	"movl $32, %%ecx\n"         /* loop count */
+	"movl %%ebp, %%esi\n"    /* buf[0].re */
+	"movl $32, %%ebx\n"         /* loop count */
+	"leal 1020(%%ebp), %%edi\n" /* buf[127].im */
     
     ".align 16\n"
 ".second_128_samples:\n"
@@ -270,7 +249,7 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 	"movd  8(%%esi), %%mm2\n" /* re1 */
 	"movd   (%%edi), %%mm1\n" /* buf[127-i].im */
 	"movd -8(%%edi), %%mm3\n" /* im1 */
-
+    
     "pxor   %%mm4, %%mm4\n"
     "pxor   %%mm5, %%mm5\n"
     "pfsub  %%mm0, %%mm4\n" /* -re0 */
@@ -281,8 +260,8 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 
 	"movq (%%edx), %%mm0\n"  /* w1 | w0 */
 	"movq 8(%%edx), %%mm1\n"  /* w3 | w2 */
-	"movq (%%ebx), %%mm2\n"  /* d1 | d0 */
-	"movq 8(%%ebx), %%mm3\n"  /* d3 | d2 */
+	"movq (%%ecx), %%mm2\n"  /* d1 | d0 */
+	"movq 8(%%ecx), %%mm3\n"  /* d3 | d2 */
 
 	"addl $16, %%esi\n"
     
@@ -299,15 +278,14 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
     
     "addl $16, %%edx\n"
 	"addl $16, %%eax\n"
-	"addl $16, %%ebx\n"
-	"decl %%ecx\n"
+	"addl $16, %%ecx\n"
+	"decl %%ebx\n"
 	"jnz .second_128_samples\n"
 
-	"movl   8(%%ebp), %%eax\n"
-	"leal 512(%%eax), %%esi\n"  /* buf[64].re */
-	"leal 508(%%eax), %%edi\n"  /* buf[63].im */
-	"movl $32, %%ecx\n"         /* loop count */
-	"movl  20(%%ebp), %%eax\n"  /* delay */
+	"leal 512(%%ebp), %%esi\n"  /* buf[64].re */
+	"leal 508(%%ebp), %%edi\n"  /* buf[63].im */
+	"movl $32, %%ebx\n"         /* loop count */
+    "addl $-1024, %%ecx\n"      /* delay */
 
     ".align 16\n"
 ".first_128_delay:\n"
@@ -333,19 +311,17 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
     "pfmul     %%mm4, %%mm0\n"      /* w1*im0 | -w0*re0 */
 	"pfmul     %%mm5, %%mm1\n"      /* w3*im1 | -w2*re1 */
 
-    
-	"movq %%mm0, (%%eax)\n"
-	"movq %%mm1, 8(%%eax)\n"
+	"movq %%mm0, (%%ecx)\n"
+	"movq %%mm1, 8(%%ecx)\n"
 	"addl  $16, %%esi\n"
 	"addl $-16, %%edi\n"
-	"addl  $16, %%eax\n"
-	"decl %%ecx\n"
+	"addl  $16, %%ecx\n"
+	"decl %%ebx\n"
 	"jnz .first_128_delay\n"
 
-	"movl    8(%%ebp), %%ebx\n"
-	"leal    4(%%ebx), %%esi\n" /* buf[0].im */
-	"leal 1016(%%ebx), %%edi\n" /* buf[127].re */
-	"movl $32, %%ecx\n"         /* loop count */
+	"leal    4(%%ebp), %%esi\n" /* buf[0].im */
+	"leal 1016(%%ebp), %%edi\n" /* buf[127].re */
+	"movl $32, %%ebx\n"         /* loop count */
     
     ".align 16\n"
 ".second_128_delay:\n"
@@ -372,48 +348,44 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 	"pfmul     %%mm2, %%mm3\n"      /* -w3*re1 | w2*im1 */
 
     
-	"movq %%mm1, (%%eax)\n"
-	"movq %%mm3, 8(%%eax)\n"
+	"movq %%mm1, (%%ecx)\n"
+	"movq %%mm3, 8(%%ecx)\n"
 	"addl  $16, %%esi\n"
 	"addl $-16, %%edi\n"
-	"addl  $16, %%eax\n"
-	"decl %%ecx\n"
+	"addl  $16, %%ecx\n"
+	"decl %%ebx\n"
     "jnz .second_128_delay\n"
 
-	"popl %%edi\n"
+	"popl %%ebp\n"
 	"popl %%esi\n"
+	"popl %%edi\n"
 	"popl %%edx\n"
 	"popl %%ecx\n"
 	"popl %%ebx\n"
 	"popl %%eax\n"
 	
-	"leave\n"
 	"femms\n"
-    ::);
+    : "=S" (buf), "=a" (data_ptr), "=c" (delay_prt), "=d" (window_prt)
+    : "S" (buf), "a" (data_ptr), "c" (delay_prt), "d" (window_prt));
 }
 
 static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, float *window_prt, float *delay_prt)
 {
     __asm__ __volatile__ (
     ".align 16\n"
-	"pushl %%ebp\n"
-	"movl  %%esp, %%ebp\n"
-	
+
 	"pushl %%eax\n"
 	"pushl %%ebx\n"
 	"pushl %%ecx\n"
 	"pushl %%edx\n"
-	"pushl %%esi\n"
 	"pushl %%edi\n"
+	"pushl %%esi\n"
+	"pushl %%ebp\n"
 
-	"movl 20(%%ebp), %%ebx\n"   /* delay */
-	"movl 16(%%ebp), %%edx\n"   /* window */
-
-	"movl 8(%%ebp), %%eax\n"    /* buf */
-	"movl $32, %%ecx\n"         /* loop count */
-	"leal 516(%%eax), %%esi\n"  /* buf[64].im */
-	"leal 504(%%eax), %%edi\n"  /* buf[63].re */
-	"movl  12(%%ebp), %%eax\n"  /* data */
+	"movl %%esi, %%ebp\n"         /* buf */
+	"movl $32, %%ebx\n"         /* loop count */
+	"leal 516(%%ebp), %%esi\n"  /* buf[64].im */
+	"leal 504(%%ebp), %%edi\n"  /* buf[63].re */
 
     ".align 16\n"
 ".first_128_samples2:\n"
@@ -439,16 +411,16 @@ static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, floa
 	"addl $16, %%edx\n"
 	"movq %%mm0, (%%eax)\n"
 	"movq %%mm1, 8(%%eax)\n"
-	"addl $16, %%ebx\n"
+	"addl $16, %%ecx\n"
 	"addl $16, %%esi\n"
 	"addl $16, %%eax\n"
     "addl $-16, %%edi\n"
-	"decl %%ecx\n"
+	"decl %%ebx\n"
 	"jnz .first_128_samples2\n"
 
-	"movl 8(%%ebp), %%esi\n"    /* buf[0].re */
-	"leal 1020(%%esi), %%edi\n" /* buf[127].im */
-	"movl $32, %%ecx\n"         /* loop count */
+	"movl %%ebp, %%esi\n"    /* buf[0].re */
+	"movl $32, %%ebx\n"         /* loop count */
+	"leal 1020(%%ebp), %%edi\n" /* buf[127].im */
     
     ".align 16\n"
 ".second_128_samples2:\n"
@@ -480,15 +452,14 @@ static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, floa
     
     "addl $16, %%edx\n"
 	"addl $16, %%eax\n"
-	"addl $16, %%ebx\n"
-	"decl %%ecx\n"
+	"addl $16, %%ecx\n"
+	"decl %%ebx\n"
 	"jnz .second_128_samples2\n"
 
-	"movl   8(%%ebp), %%eax\n"
-	"leal 512(%%eax), %%esi\n"  /* buf[64].re */
-	"leal 508(%%eax), %%edi\n"  /* buf[63].im */
-	"movl $32, %%ecx\n"         /* loop count */
-	"movl  20(%%ebp), %%eax\n"  /* delay */
+	"leal 512(%%ebp), %%esi\n"  /* buf[64].re */
+	"leal 508(%%ebp), %%edi\n"  /* buf[63].im */
+	"movl $32, %%ebx\n"         /* loop count */
+	"addl  $-1024, %%ecx\n"  /* delay */
 
     ".align 16\n"
 ".first_128_delays:\n"
@@ -515,18 +486,17 @@ static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, floa
 	"pfmul     %%mm5, %%mm1\n"      /* w3*im1 | -w2*re1 */
 
     
-	"movq %%mm0, (%%eax)\n"
-	"movq %%mm1, 8(%%eax)\n"
+	"movq %%mm0, (%%ecx)\n"
+	"movq %%mm1, 8(%%ecx)\n"
 	"addl  $16, %%esi\n"
 	"addl $-16, %%edi\n"
-	"addl  $16, %%eax\n"
-	"decl %%ecx\n"
+	"addl  $16, %%ecx\n"
+	"decl %%ebx\n"
 	"jnz .first_128_delays\n"
 
-	"movl    8(%%ebp), %%ebx\n"
-	"leal    4(%%ebx), %%esi\n" /* buf[0].im */
-	"leal 1016(%%ebx), %%edi\n" /* buf[127].re */
-	"movl $32, %%ecx\n"         /* loop count */
+	"leal    4(%%ebp), %%esi\n" /* buf[0].im */
+	"leal 1016(%%ebp), %%edi\n" /* buf[127].re */
+	"movl $32, %%ebx\n"         /* loop count */
     
     ".align 16\n"
 ".second_128_delays:\n"
@@ -553,23 +523,24 @@ static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, floa
 	"pfmul     %%mm2, %%mm3\n"      /* -w3*re1 | w2*im1 */
 
     
-	"movq %%mm1, (%%eax)\n"
-	"movq %%mm3, 8(%%eax)\n"
+	"movq %%mm1, (%%ecx)\n"
+	"movq %%mm3, 8(%%ecx)\n"
 	"addl  $16, %%esi\n"
 	"addl $-16, %%edi\n"
-	"addl  $16, %%eax\n"
-	"decl %%ecx\n"
+	"addl  $16, %%ecx\n"
+	"decl %%ebx\n"
     "jnz .second_128_delays\n"
 
-	"popl %%edi\n"
+    "popl %%ebp\n"
 	"popl %%esi\n"
+	"popl %%edi\n"
 	"popl %%edx\n"
 	"popl %%ecx\n"
 	"popl %%ebx\n"
 	"popl %%eax\n"
 	
-	"leave\n"
 	"femms\n"
-    ::);
+    : "=S" (buf), "=a" (data_ptr), "=c" (delay_prt), "=d" (window_prt)
+    : "S" (buf), "a" (data_ptr), "c" (delay_prt), "d" (window_prt));
 }
 

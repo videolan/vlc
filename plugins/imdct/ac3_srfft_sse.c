@@ -2,7 +2,7 @@
  * ac3_srfft_sse.c: accelerated SSE ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_srfft_sse.c,v 1.4 2001/07/08 23:15:11 reno Exp $
+ * $Id: ac3_srfft_sse.c,v 1.5 2001/07/26 20:00:33 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -228,28 +228,21 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     
     "pushl %%eax\n"
     "pushl %%ebx\n"
-    "pushl %%ecx\n" //
+    "pushl %%ecx\n"
     "pushl %%edx\n"
     "pushl %%esi\n"
-//    "movl %%edi, %%ecx\n" /* k */
-    "pushl %%edi\n" //
+    "pushl %%edi\n"
 
-    "movl  8(%%ebp), %%ecx\n"   /* k */
-    "movl 12(%%ebp), %%eax\n"   /* x */
     "movl %%ecx, -4(%%ebp)\n"   /* k */
-    "movl 16(%%ebp), %%ebx\n"   /* wT */
-    "movl 20(%%ebp), %%edx\n"   /* d */
-    "movl 24(%%ebp), %%esi\n"   /* d3 */
     "shll $4, %%ecx\n"          /* 16k */ ///
     "addl $8, %%edx\n" 
-    "leal (%%eax, %%ecx, 2), %%edi\n"
     "addl $8, %%esi\n"
 
     /* TRANSZERO and TRANS */
     ".align 16\n"
     "movaps (%%eax), %%xmm0\n"     /* x[1] | x[0] */
-    "movaps (%%ebx), %%xmm1\n"     /* wT[1] | wT[0] */
-    "movaps (%%ebx, %%ecx), %%xmm2\n" /* wB[1] | wB[0] */
+    "movaps (%%edi), %%xmm1\n"     /* wT[1] | wT[0] */
+    "movaps (%%edi, %%ecx), %%xmm2\n" /* wB[1] | wB[0] */
     "movlps (%%edx), %%xmm3\n"     /* d */
     "movlps (%%esi), %%xmm4\n"     /* d3 */
     "movhlps %%xmm1, %%xmm5\n"     /* wT[1] */
@@ -263,14 +256,14 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "movhlps %%xmm5, %%xmm7\n"      /* wT[1].im * d[1].im | wT[1].re * d[1].im */
     "movlhps %%xmm6, %%xmm5\n"      /* wB[1].im * d3[1].re | wB[1].re * d3[1].re | wT[1].im * d[1].re | wT[1].re * d[1].re */
     "shufps $0xb1, %%xmm6, %%xmm7\n" /* wB[1].re * d3[1].im | wB[i].im * d3[1].im | wT[1].re * d[1].im | wT[1].im * d[1].im */
-    "movl  $C_1_sse, %%edi\n"
-    "movaps (%%edi), %%xmm4\n"
+    "movl  $C_1_sse, %%ebx\n"
+    "movaps (%%ebx), %%xmm4\n"
     "mulps   %%xmm4, %%xmm7\n"
     "addps   %%xmm7, %%xmm5\n"      /* wB[1] * d3[1] | wT[1] * d[1] */
     "movlhps %%xmm5, %%xmm1\n"      /* d[1] * wT[1] | wT[0] */
     "shufps  $0xe4, %%xmm5, %%xmm2\n" /* d3[1] * wB[1] | wB[0] */
     "movaps  %%xmm1, %%xmm3\n"      /* d[1] * wT[1] | wT[0] */
-    "leal   (%%eax, %%ecx, 2), %%edi\n"
+    "leal   (%%eax, %%ecx, 2), %%ebx\n"
     "addps  %%xmm2, %%xmm1\n"       /* u */
     "subps  %%xmm2, %%xmm3\n"       /* v */
     "mulps  %%xmm4, %%xmm3\n"
@@ -283,21 +276,21 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "addps  %%xmm3, %%xmm5\n"
     "subps  %%xmm3, %%xmm6\n"
     "movaps %%xmm0, (%%eax)\n"
-    "movaps %%xmm2, (%%edi)\n"
+    "movaps %%xmm2, (%%ebx)\n"
     "movaps %%xmm5, (%%eax, %%ecx)\n"
-    "movaps %%xmm6, (%%edi, %%ecx)\n"
+    "movaps %%xmm6, (%%ebx, %%ecx)\n"
     "addl $16, %%eax\n"
-    "addl $16, %%ebx\n"
+    "addl $16, %%edi\n"
     "addl  $8, %%edx\n"
     "addl  $8, %%esi\n"
     "decl -4(%%ebp)\n"
 
     ".align 16\n"
 ".loop:\n"
-    "movaps (%%ebx), %%xmm0\n"      /* wT[1] | wT[0] */
+    "movaps (%%edi), %%xmm0\n"      /* wT[1] | wT[0] */
     "movaps (%%edx), %%xmm1\n"      /* d[1] | d[0] */
 
-    "movaps (%%ebx, %%ecx), %%xmm4\n" /* wB[1] | wB[0] */
+    "movaps (%%edi, %%ecx), %%xmm4\n" /* wB[1] | wB[0] */
     "movaps (%%esi), %%xmm5\n"      /* d3[1] | d3[0] */
 
     "movhlps %%xmm0, %%xmm2\n"      /* wT[1] */
@@ -324,8 +317,8 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "mulps   %%xmm5, %%xmm4\n"  /* wB[0].im * d3[0].im | wB[0].re * d3[0].im | wB[0].im * d3[0].re | wB[0].re * d3[0].re */
     "mulps   %%xmm7, %%xmm6\n"  /* wB[1].im * d3[1].im | wB[1].re * d3[1].im | wB[1].im * d3[1].re | wB[1].re * d3[1].re */
     "shufps $0xb1, %%xmm2, %%xmm1\n" /* d[1].im * wT[1].re | d[1].im * wT[1].im | d[0].im * wT[0].re | d[0].im * wT[0].im */
-    "movl  $C_1_sse, %%edi\n"
-    "movaps (%%edi), %%xmm3\n"  /* 1.0 | -1.0 | 1.0 | -1.0 */
+    "movl  $C_1_sse, %%ebx\n"
+    "movaps (%%ebx), %%xmm3\n"  /* 1.0 | -1.0 | 1.0 | -1.0 */
 
     "movhlps %%xmm4, %%xmm5\n"  /* wB[0].im * d3[0].im | wB[0].re * d3[0].im */
     "mulps   %%xmm3, %%xmm1\n"  /* d[1].im * wT[1].re | -d[1].im * wT[1].im | d[0].im * wT[0].re | -d[0].im * wT[0].im */
@@ -340,9 +333,9 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "addps  %%xmm4, %%xmm0\n"   /* u */
     "subps  %%xmm4, %%xmm1\n"   /* v */
     "movaps (%%eax), %%xmm6\n"  /* x[1] | x[0] */
-    "leal   (%%eax, %%ecx, 2), %%edi\n"
+    "leal   (%%eax, %%ecx, 2), %%ebx\n"
     "mulps  %%xmm3, %%xmm1\n"
-    "addl $16, %%ebx\n"
+    "addl $16, %%edi\n"
     "addl $16, %%esi\n"
     "shufps $0xb1, %%xmm1, %%xmm1\n"    /* -i * v */
     "movaps (%%eax, %%ecx), %%xmm7\n"   /* xk[1] | xk[0] */
@@ -351,12 +344,12 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "addps  %%xmm0, %%xmm6\n"
     "subps  %%xmm0, %%xmm2\n"
     "movaps %%xmm6, (%%eax)\n"
-    "movaps %%xmm2, (%%edi)\n"
+    "movaps %%xmm2, (%%ebx)\n"
     "addps  %%xmm1, %%xmm7\n"
     "subps  %%xmm1, %%xmm4\n"
     "addl $16, %%edx\n"
     "movaps %%xmm7, (%%eax, %%ecx)\n"
-    "movaps %%xmm4, (%%edi, %%ecx)\n"
+    "movaps %%xmm4, (%%ebx, %%ecx)\n"
 
     "addl $16, %%eax\n"
     "decl -4(%%ebp)\n"
@@ -364,16 +357,17 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
 
     ".align 16\n"
 ".end:\n"
-    "popl %%edi\n" //
+    "popl %%edi\n"
     "popl %%esi\n"
     "popl %%edx\n"
-    "popl %%ecx\n" //
+    "popl %%ecx\n"
     "popl %%ebx\n"
     "popl %%eax\n"
     
     "addl $4, %%esp\n"
 
     "leave\n"
-    ::);
+    : "=c" (k), "=a" (x), "=D" (wTB)
+    : "c" (k), "a" (x), "D" (wTB), "d" (d), "S" (d_3));
 }
 

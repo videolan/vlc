@@ -2,7 +2,7 @@
  * ac3_imdct_sse.c: accelerated SSE ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_sse.c,v 1.4 2001/07/08 23:15:11 reno Exp $
+ * $Id: ac3_imdct_sse.c,v 1.5 2001/07/26 20:00:33 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -103,10 +103,7 @@ static void imdct512_pre_ifft_twiddle_sse (const int *pmt, complex_t *buf, float
     "pushl %%edi\n"
     "pushl %%esi\n"
 
-    "movl  8(%%ebp), %%eax\n"     /* pmt */
-    "movl 12(%%ebp), %%ebx\n"     /* buf */
-    "movl 16(%%ebp), %%ecx\n"     /* data */
-    "movl 20(%%ebp), %%edx\n"     /* xcos_sin_sse */
+    "movl %%edi, %%ebx\n"   /* buf */
     "movl $64, -4(%%ebp)\n"
     
     ".align 16\n"
@@ -153,7 +150,9 @@ static void imdct512_pre_ifft_twiddle_sse (const int *pmt, complex_t *buf, float
 
     "addl $4, %%esp\n"
     "popl %%ebp\n"
-    ::);
+    : "=D" (buf)
+    : "a" (pmt), "c" (data), "d" (xcos_sin_sse), "D" (buf));
+    
 }
 
 static void imdct512_post_ifft_twiddle_sse (complex_t *buf, float *xcos_sin_sse)
@@ -226,24 +225,19 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
 {
     __asm__ __volatile__ (
     ".align 16\n"
-    "pushl %%ebp\n"
-    "movl  %%esp, %%ebp\n"
-    
+
     "pushl %%eax\n"
     "pushl %%ebx\n"
     "pushl %%ecx\n"
     "pushl %%edx\n"
-    "pushl %%esi\n"
     "pushl %%edi\n"
+    "pushl %%esi\n"
+    "pushl %%ebp\n"
 
-    "movl 20(%%ebp), %%ebx\n"   /* delay */
-    "movl 16(%%ebp), %%edx\n"   /* window */
-
-    "movl 8(%%ebp), %%eax\n"    /* buf */
-    "movl $16, %%ecx\n"         /* loop count */
-    "leal 516(%%eax), %%esi\n"  /* buf[64].im */
-    "leal 504(%%eax), %%edi\n"  /* buf[63].re */
-    "movl  12(%%ebp), %%eax\n"  /* data */
+    "movl %%esi, %%ebp\n"    /* buf */
+    "movl $16, %%ebx\n"         /* loop count */
+    "leal 516(%%ebp), %%esi\n"  /* buf[64].im */
+    "leal 504(%%ebp), %%edi\n"  /* buf[63].re */
 
     ".align 16\n"
 ".first_128_samples:\n"
@@ -256,7 +250,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps %%xmm3, %%xmm1\n"      /* 0.0 | re1 | 0.0 | re0 */
 
     "movups (%%edx), %%xmm4\n"      /* w3 | w2 | w1 | w0 */
-    "movaps (%%ebx), %%xmm5\n"      /* d3 | d2 | d1 | d0 */
+    "movaps (%%ecx), %%xmm5\n"      /* d3 | d2 | d1 | d0 */
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* re1 | 0.0 | re0 | 0.0 */
 
     "movss  16(%%esi), %%xmm6\n"    /* im2 */
@@ -270,23 +264,23 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "addps  %%xmm5, %%xmm0\n"
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* re3 | 0.0 | re2 | 0.0 */
     "movups 16(%%edx), %%xmm4\n"    /* w7 | w6 | w5 | w4 */
-    "movaps 16(%%ebx), %%xmm5\n"    /* d7 | d6 | d5 | d4 */
+    "movaps 16(%%ecx), %%xmm5\n"    /* d7 | d6 | d5 | d4 */
     "subps  %%xmm2, %%xmm6\n"       /* -re3 | im3 | -re2 | im2 */
     "addl   $32, %%edx\n"
     "movaps %%xmm0, (%%eax)\n"
-    "addl   $32, %%ebx\n"
+    "addl   $32, %%ecx\n"
     "mulps  %%xmm4, %%xmm6\n"
     "addl   $32, %%esi\n"
     "addl   $32, %%eax\n"
     "addps  %%xmm5, %%xmm6\n"
     "addl   $-32, %%edi\n"
     "movaps %%xmm6, -16(%%eax)\n"
-    "decl   %%ecx\n"
+    "decl   %%ebx\n"
     "jnz .first_128_samples\n"
 
-    "movl 8(%%ebp), %%esi\n"    /* buf[0].re */
-    "leal 1020(%%esi), %%edi\n" /* buf[127].im */
-    "movl $16, %%ecx\n"         /* loop count */
+    "movl %%ebp, %%esi\n"    /* buf[0].re */
+    "movl $16, %%ebx\n"         /* loop count */
+    "leal 1020(%%ebp), %%edi\n" /* buf[127].im */
     
     ".align 16\n"
 ".second_128_samples:\n"
@@ -299,7 +293,7 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "movlhps %%xmm3, %%xmm1\n"  /* 0.0 | im1 | 0.0 | im1 */
 
     "movups (%%edx), %%xmm4\n"  /* w3 | w2 | w1 | w0 */
-    "movaps (%%ebx), %%xmm5\n"  /* d3 | d2 | d1 | d0 */
+    "movaps (%%ecx), %%xmm5\n"  /* d3 | d2 | d1 | d0 */
 
     "shufps $0xb1, %%xmm1, %%xmm1\n"/* im1 | 0.0 | im0 | 0.0 */
     "movss  16(%%esi), %%xmm6\n"    /* re2 */
@@ -317,21 +311,20 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "addps  %%xmm5, %%xmm0\n"
     "mulps  %%xmm4, %%xmm6\n"
     "addl   $-32, %%edi\n"
-    "movaps 16(%%ebx), %%xmm5\n"    /* d7 | d6 | d5 | d4 */
+    "movaps 16(%%ecx), %%xmm5\n"    /* d7 | d6 | d5 | d4 */
     "movaps %%xmm0, (%%eax)\n"
     "addps  %%xmm5, %%xmm6\n"
     "addl   $32, %%edx\n"
     "addl   $32, %%eax\n"
-    "addl   $32, %%ebx\n"
+    "addl   $32, %%ecx\n"
     "movaps %%xmm6, -16(%%eax)\n"
-    "decl   %%ecx\n"
+    "decl   %%ebx\n"
     "jnz .second_128_samples\n"
 
-    "movl   8(%%ebp), %%eax\n"
-    "leal 512(%%eax), %%esi\n"  /* buf[64].re */
-    "leal 508(%%eax), %%edi\n"  /* buf[63].im */
-    "movl $16, %%ecx\n"         /* loop count */
-    "movl  20(%%ebp), %%eax\n"  /* delay */
+    "leal 512(%%ebp), %%esi\n"  /* buf[64].re */
+    "leal 508(%%ebp), %%edi\n"  /* buf[63].im */
+    "movl $16, %%ebx\n"         /* loop count */
+    "addl $-1024, %%ecx\n"  /* delay */
 
     ".align 16\n"
 ".first_128_delay:\n"
@@ -356,20 +349,19 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "mulps   %%xmm4, %%xmm0\n"
     "movups (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* im3 | 0.0 | im2 | 0.0 */
-    "movaps %%xmm0, (%%eax)\n"
+    "movaps %%xmm0, (%%ecx)\n"
     "addl   $32, %%esi\n"
     "subps  %%xmm2, %%xmm6\n"       /* -im3 | re3 | -im2 | re2 */
     "addl   $-32, %%edi\n"
     "mulps  %%xmm5, %%xmm6\n"
-    "addl   $32, %%eax\n"
-    "movaps %%xmm6, -16(%%eax)\n"
-    "decl   %%ecx\n"
+    "addl   $32, %%ecx\n"
+    "movaps %%xmm6, -16(%%ecx)\n"
+    "decl   %%ebx\n"
     "jnz .first_128_delay\n"
 
-    "movl    8(%%ebp), %%ebx\n"
-    "leal    4(%%ebx), %%esi\n" /* buf[0].im */
-    "leal 1016(%%ebx), %%edi\n" /* buf[127].re */
-    "movl $16, %%ecx\n"         /* loop count */
+    "leal    4(%%ebp), %%esi\n" /* buf[0].im */
+    "leal 1016(%%ebp), %%edi\n" /* buf[127].re */
+    "movl $16, %%ebx\n"         /* loop count */
     
     ".align 16\n"
 ".second_128_delay:\n"
@@ -394,49 +386,45 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     "mulps   %%xmm4, %%xmm1\n"
     "movups (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* re3 | 0.0 | re2 | 0.0 */
-    "movaps %%xmm1, (%%eax)\n"
+    "movaps %%xmm1, (%%ecx)\n"
     "addl   $32, %%esi\n"
     "subps  %%xmm6, %%xmm2\n"       /* re | -im3 | re | -im2 */
     "addl   $-32, %%edi\n"
     "mulps  %%xmm5, %%xmm2\n"
-    "addl   $32, %%eax\n"
-    "movaps %%xmm2, -16(%%eax)\n"
-    "decl   %%ecx\n"
+    "addl   $32, %%ecx\n"
+    "movaps %%xmm2, -16(%%ecx)\n"
+    "decl   %%ebx\n"
     "jnz .second_128_delay\n"
 
-    "popl %%edi\n"
+    "popl %%ebp\n"
     "popl %%esi\n"
+    "popl %%edi\n"
     "popl %%edx\n"
     "popl %%ecx\n"
     "popl %%ebx\n"
     "popl %%eax\n"
+    : "=S" (buf), "=a" (data_ptr), "=c" (delay_prt), "=d" (window_prt)
+    : "S" (buf), "a" (data_ptr), "c" (delay_prt), "d" (window_prt));
     
-    "leave\n"
-    ::);
 }
 
 static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, float *window_prt, float *delay_prt)
 {
     __asm__ __volatile__ (
     ".align 16\n"
-    "pushl %%ebp\n"
-    "movl  %%esp, %%ebp\n"
     
     "pushl %%eax\n"
     "pushl %%ebx\n"
     "pushl %%ecx\n"
     "pushl %%edx\n"
-    "pushl %%esi\n"
     "pushl %%edi\n"
+    "pushl %%esi\n"
+    "pushl %%ebp\n"
 
-    /* movl 20(%%ebp), %%ebx delay */
-    "movl 16(%%ebp), %%edx\n"   /* window */
-
-    "movl   8(%%ebp), %%eax\n"  /* buf */
-    "movl $16, %%ecx\n"         /* loop count */
-    "leal 516(%%eax), %%esi\n"  /* buf[64].im */
-    "leal 504(%%eax), %%edi\n"  /* buf[63].re */
-    "movl  12(%%ebp), %%eax\n"  /* data */
+    "movl %%esi, %%ebp\n"         /* buf */
+    "movl $16, %%ebx\n"         /* loop count */
+    "leal 516(%%ebp), %%esi\n"  /* buf[64].im */
+    "leal 504(%%ebp), %%edi\n"  /* buf[63].re */
     
     ".align 16\n"
 ".first_128_sample:\n"
@@ -469,12 +457,12 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "addl   $32, %%eax\n"
     "addl   $-32, %%edi\n"
     "movaps %%xmm6, -16(%%eax)\n"
-    "decl   %%ecx\n"
+    "decl   %%ebx\n"
     "jnz .first_128_sample\n"
 
-    "movl    8(%%ebp), %%esi\n"     /* buf[0].re */
-    "leal 1020(%%esi), %%edi\n"     /* buf[127].im */
-    "movl $16, %%ecx\n"             /* loop count */
+    "movl %%ebp, %%esi\n"     /* buf[0].re */
+    "movl $16, %%ebx\n"             /* loop count */
+    "leal 1020(%%ebp), %%edi\n"     /* buf[127].im */
     
     ".align 16\n"
 ".second_128_sample:\n"
@@ -507,14 +495,13 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "addl   $32, %%edx\n"
     "addl   $32, %%eax\n"
     "movaps %%xmm6, -16(%%eax)\n"
-    "decl   %%ecx\n"
+    "decl   %%ebx\n"
     "jnz .second_128_sample\n"
 
-    "movl   8(%%ebp), %%eax\n"
-    "leal 512(%%eax), %%esi\n"  /* buf[64].re */
-    "leal 508(%%eax), %%edi\n"  /* buf[63].im */
-    "movl $16, %%ecx\n"         /* loop count */
-    "movl  20(%%ebp), %%eax\n"  /* delay */
+    "leal 512(%%ebp), %%esi\n"  /* buf[64].re */
+    "leal 508(%%ebp), %%edi\n"  /* buf[63].im */
+    "movl $16, %%ebx\n"         /* loop count */
+    "addl  $-1024, %%ecx\n"  /* delay */
     
     ".align 16\n"
 ".first_128_delays:\n"
@@ -539,20 +526,19 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "mulps   %%xmm4, %%xmm0\n"
     "movups (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* im3 | 0.0 | im2 | 0.0 */
-    "movaps %%xmm0, (%%eax)\n"
+    "movaps %%xmm0, (%%ecx)\n"
     "addl   $32, %%esi\n"
     "subps  %%xmm2, %%xmm6\n"       /* -im3 | re3 | -im2 | re2 */
     "addl   $-32, %%edi\n"
     "mulps  %%xmm5, %%xmm6\n"
-    "addl   $32, %%eax\n"
-    "movaps %%xmm6, -16(%%eax)\n"
-    "decl   %%ecx\n"
+    "addl   $32, %%ecx\n"
+    "movaps %%xmm6, -16(%%ecx)\n"
+    "decl   %%ebx\n"
     "jnz .first_128_delays\n"
 
-    "movl    8(%%ebp), %%ebx\n"
-    "leal    4(%%ebx), %%esi\n" /* buf[0].im */
-    "leal 1016(%%ebx), %%edi\n" /* buf[127].re */
-    "movl $16, %%ecx\n"         /* loop count */
+    "leal    4(%%ebp), %%esi\n" /* buf[0].im */
+    "leal 1016(%%ebp), %%edi\n" /* buf[127].re */
+    "movl $16, %%ebx\n"         /* loop count */
     
     ".align 16\n"
 ".second_128_delays:\n"
@@ -577,23 +563,24 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "mulps   %%xmm4, %%xmm1\n"
     "movups (%%edx), %%xmm5\n"      /* w7 | w6 | w5 | w4 */
     "shufps $0xb1, %%xmm2, %%xmm2\n"/* re3 | 0.0 | re2 | 0.0 */
-    "movaps %%xmm1, (%%eax)\n"
+    "movaps %%xmm1, (%%ecx)\n"
     "addl   $32, %%esi\n"
     "subps  %%xmm6, %%xmm2\n"       /* re | -im3 | re | -im2 */
     "addl   $-32, %%edi\n"
     "mulps  %%xmm5, %%xmm2\n"
-    "addl   $32, %%eax\n"
-    "movaps %%xmm2, -16(%%eax)\n"
-    "decl   %%ecx\n"
+    "addl   $32, %%ecx\n"
+    "movaps %%xmm2, -16(%%ecx)\n"
+    "decl   %%ebx\n"
     "jnz .second_128_delays\n"
 
-    "popl %%edi\n"
+    "popl %%ebp\n"
     "popl %%esi\n"
+    "popl %%edi\n"
     "popl %%edx\n"
     "popl %%ecx\n"
     "popl %%ebx\n"
     "popl %%eax\n"
-    
-    "leave\n"
-    ::);
+    : "=S" (buf), "=a" (data_ptr), "=c" (delay_prt), "=d" (window_prt)
+    : "S" (buf), "a" (data_ptr), "c" (delay_prt), "d" (window_prt));
+
 }
