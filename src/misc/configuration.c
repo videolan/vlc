@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.37 2002/08/15 12:11:15 sam Exp $
+ * $Id: configuration.c,v 1.38 2002/08/20 18:25:42 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -374,9 +374,7 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
             p_module->p_config[i].ppsz_list[j] = NULL;
         }
 
-        /* the callback pointer is only valid when the module is loaded so this
-         * value is set in module_activate() and reset in module_deactivate() */
-        p_module->p_config[i].pf_callback = NULL;
+        p_module->p_config[i].pf_callback = p_orig[i].pf_callback;
     }
 }
 

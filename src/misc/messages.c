@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.8 2002/08/10 19:23:06 sam Exp $
+ * $Id: messages.c,v 1.9 2002/08/20 18:25:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -445,7 +445,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     if( p_this->p_vlc->b_color )
     {
         fprintf( stderr, "[" GREEN "%.2x" GRAY ":" GREEN "%.6x" GRAY "] "
-                         "%s%s: %s%s" GRAY "\n", p_this->p_vlc->i_unique,
+                         "%s%s: %s%s" GRAY "\n", p_this->p_vlc->i_instance,
                          p_item->i_object_id, p_item->psz_module,
                          ppsz_type[i_type], ppsz_color[i_type],
                          p_item->psz_msg );
@@ -453,7 +453,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     else
     {
         fprintf( stderr, "[%.2x:%.6x] %s%s: %s\n",
-                         p_this->p_vlc->i_unique, p_item->i_object_id,
+                         p_this->p_vlc->i_instance, p_item->i_object_id,
                          p_item->psz_module, ppsz_type[i_type],
                          p_item->psz_msg );
     }

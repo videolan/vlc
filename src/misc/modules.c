@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.88 2002/08/15 12:22:45 sam Exp $
+ * $Id: modules.c,v 1.89 2002/08/20 18:25:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -684,7 +684,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file )
     if( CallEntry( p_module ) != 0 )
     {
         /* We couldn't call module_init() */
-        msg_Err( p_this, "failed calling entry point in `%s'", psz_file );
         vlc_object_destroy( p_module );
         module_unload( handle );
         return -1;
