@@ -7,7 +7,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.2 2001/03/03 07:07:01 stef Exp $
+ * $Id: dvd_netlist.c,v 1.3 2001/03/22 01:23:03 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -241,10 +241,19 @@ struct iovec * DVDGetiovec( void * p_method_data )
      (p_netlist->i_iovec_end - p_netlist->i_iovec_start)
         & p_netlist->i_nb_iovec ) < p_netlist->i_read_once )
     {
-        intf_ErrMsg("Empty iovec FIFO. Unable to allocate memory");
+        intf_ErrMsg("Empty iovec FIFO (%d:%d). Unable to allocate memory",
+                    p_netlist->i_iovec_start, p_netlist->i_iovec_end );
         return (NULL);
     }
 
+    if( (
+     (p_netlist->i_data_end - p_netlist->i_data_start)
+        & p_netlist->i_nb_data ) < p_netlist->i_read_once )
+    {
+        intf_ErrMsg("Empty data FIFO (%d:%d). Unable to allocate memory", 
+                    p_netlist->i_data_start, p_netlist->i_data_end );
+        return (NULL);
+    }
     /* readv only takes contiguous buffers 
      * so, as a solution, we chose to have a FIFO a bit longer
      * than i_nb_data, and copy the begining of the FIFO to its end
@@ -291,6 +300,7 @@ void DVDMviovec( void * p_method_data, int i_nb_iovec,
         
         pp_data[i_loop]->pi_refcount = p_netlist->pi_refcount +
                                        p_netlist->i_iovec_start;
+
         p_netlist->i_iovec_start ++;
         p_netlist->i_iovec_start &= p_netlist->i_nb_iovec;
 
@@ -316,15 +326,6 @@ struct data_packet_s * DVDNewPtr( void * p_method_data )
     
     /* cast */
     p_netlist = (dvd_netlist_t *)p_method_data; 
-
-#ifdef DEBUG
-    if( i_buffer_size > p_netlist->i_buffer_size )
-    {
-        /* This should not happen */
-        intf_ErrMsg( "Netlist packet too small !" );
-        return NULL;
-    }
-#endif
 
     /* lock */
     vlc_mutex_lock ( &p_netlist->lock );
@@ -437,7 +438,7 @@ struct pes_packet_s * DVDNewPES( void * p_method_data )
         p_return->i_pts = p_return->i_dts = 0;
     p_return->i_pes_size = 0;
     p_return->p_first = NULL;
-   
+
     return ( p_return );
 }
 
@@ -472,10 +473,6 @@ void DVDDeletePacket( void * p_method_data, data_packet_t * p_data )
         p_netlist->p_free_iovec[p_netlist->i_iovec_end].iov_base =
                                                             p_data->p_buffer;
     }
-
-    /* re initialize for next time */
-    p_data->p_next = NULL;
-    p_data->b_discard_payload = 0;
  
     /* unlock */
     vlc_mutex_unlock (&p_netlist->lock);
@@ -505,7 +502,7 @@ void DVDDeletePES( void * p_method_data, pes_packet_t * p_pes )
         p_netlist->i_data_end ++;
         p_netlist->i_data_end &= p_netlist->i_nb_data;
 
-        /* re initialize*/
+        /* re initialize */
         p_current_packet->p_payload_start = p_current_packet->p_buffer;
         
         p_netlist->pp_free_data[p_netlist->i_data_end] = p_current_packet;

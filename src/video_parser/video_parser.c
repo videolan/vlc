@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.77 2001/03/02 13:20:29 massiot Exp $
+ * $Id: video_parser.c,v 1.78 2001/03/22 01:23:03 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -543,6 +543,7 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
 
         if( DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->b_discontinuity )
         {
+            intf_WarnMsg( 1, "Discontinuity in BitstreamCallback" );
             /* Escape the current picture and reset the picture predictors. */
             p_vpar->sequence.b_expect_discontinuity = 1;
             p_vpar->picture.b_error = 1;
@@ -551,6 +552,7 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
 
     if( p_bit_stream->p_data->b_discard_payload )
     {
+        intf_WarnMsg( 1, "Discard payload in BitstreamCallback" );
         /* 1 packet messed up, trash the slice. */
         p_vpar->picture.b_error = 1;
     }
