@@ -2,7 +2,7 @@
  * info.cpp: the KInfoWindow class
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: info.cpp,v 1.2 2003/12/22 14:23:14 sam Exp $
+ * $Id$
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -34,10 +34,15 @@ KInfoWindow::KInfoWindow( intf_thread_t * p_intf,  input_thread_t *p_input ) :
 //    clearWFlags(~0);
 //    setWFlags(WType_TopLevel);
     setSizeGripEnabled(true);
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    input_info_category_t *p_category = p_input->stream.p_info;
-    while ( p_category )
+
+    int i, j;
+
+    vlc_mutex_lock( &p_input->p_item->lock );
+    for ( i = 0; i < p_input->p_item->i_categories; i++ )
     {
+        info_category_t *p_category =
+           p_input->p_item->pp_categories[i];
+
         QFrame *page = addPage( QString(p_category->psz_name) );
         QVBoxLayout *toplayout = new QVBoxLayout( page);
         QVBox *category_table = new QVBox(page);
@@ -45,17 +50,17 @@ KInfoWindow::KInfoWindow( intf_thread_t * p_intf,  input_thread_t *p_input ) :
         toplayout->setResizeMode(QLayout::FreeResize);
         toplayout->addStretch(10);
         category_table->setSpacing(spacingHint());
-        input_info_t *p_info = p_category->p_info;
-        while ( p_info )
+
+        for ( j = 0; j < p_category->i_infos; j++ )
         {
+            info_t *p_info = p_category->pp_infos[j];
+
             QHBox *hb = new QHBox( category_table );
             new QLabel( QString(p_info->psz_name) + ":", hb );
             new QLabel( p_info->psz_value, hb );
-            p_info = p_info->p_next;
         }
-        p_category = p_category->p_next;
     }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    vlc_mutex_unlock( &p_input->p_item->lock );
     resize(300,400);
     show();
 }
