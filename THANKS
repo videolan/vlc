@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.8 2003/05/24 11:53:12 sam Exp $
+$Id: THANKS,v 1.9 2003/06/21 20:45:53 sam Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -27,7 +27,7 @@ Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
 Emmanuel Blindauer <manu@agat.net> - aRts audio output
 Espen Skoglund <esk@ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE@cadmus.com> - directory browsing code
-Felix Kühne <fk@aenneburghardt.de> - german translation
+Felix Kühne <fk@aenneburghardt.de> - German translation
 Fumio Nakayama <endymion@ca2.so-net.ne.jp> - Japanese translation
 Haakon Meland Eriksen - Norwegian translation
 Hans-Peter Jansen <hpj@urpla.net> - patch for module options handling
@@ -58,9 +58,9 @@ Rudolf Cornelissen <rag.cornelissen@inter.nl.net> - BeOS fixes
 Sebastien Chaumat <Sebastien.Chaumat@ens-lyon.fr> - YOPY port tests
 Steve Brown <sbrown@cortland.com> - fix for optional PES size bug
 Steven M. Schultz <sms@TO.GD-ES.COM> - BSD/OS port
-Thomas Graf <tgraf@europe.com> - gettext support, german translation
+Thomas Graf <tgraf@europe.com> - gettext support, German translation
 Thomas L. Wood <twood@lucent.com> - fixed a bug in QuantMatrixExtension
-Valek Filippov <frob@df.ru> - russian translation
+Valek Filippov <frob@df.ru> - Russian translation
 Vladimir Chernyshov <greengrass@writeme.com> - MMX motion optimizations
 Wade Majors <guru@startrek.com> - BeOS icon integration, debugging and fixes
 Watanabe Go <go@dsl.gr.jp> - fix for non-ASCII filenames

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.49 2003/06/21 17:04:20 sam Exp $
+##  $Id: bootstrap,v 1.50 2003/06/21 20:45:53 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -91,8 +91,8 @@ EOF
         NODIST=''; else
         NODIST='#'; fi
     cat >> m4/vlc.m4 << EOF
-AM_CONDITIONAL(${mod}_plugin, test x\$${mod}_plugin = xyes)
-AM_CONDITIONAL(${mod}_builtin, test x\$${mod}_builtin = xyes)
+AM_CONDITIONAL(${mod}_p, test x\$${mod}_p = xyes)
+AM_CONDITIONAL(${mod}_b, test x\$${mod}_b = xyes)
 EOF
 # Generation of Modules.am
 # ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,14 +104,14 @@ EOF
     cat >> Modules.am << EOF
 # The ${mod} plugin
 
-if ${mod}_plugin
+if ${mod}_p
 if UNTRUE
 L_${mod}_p = ${dir}/lib${mod}_plugin.a
 endif
 D_${mod}_p = ${dir}/lib${mod}_plugin\$(LIBEXT)
 ${NODIST}B_${mod}_p = \$(nodist_SOURCES_${mod})
 endif
-if ${mod}_builtin
+if ${mod}_b
 L_${mod}_b = ${dir}/lib${mod}.a
 F_${mod}_b = \$(LDFLAGS_${mod})
 if BUILD_MOZILLA

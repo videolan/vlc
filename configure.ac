@@ -72,14 +72,14 @@ LIBEXT=".so"
 dnl
 dnl  Check the operating system
 dnl
-case "x${target_os}" in
-  x)
+case "${target_os}" in
+  "")
     SYS=unknown
     ;;
-  xlinux*)
+  linux*)
     SYS=linux
     ;;
-  xbsdi*)
+  bsdi*)
     SYS=bsdi
     CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
     LDFLAGS_dvd="${LDFLAGS_dvd} -ldvd"
@@ -87,11 +87,11 @@ case "x${target_os}" in
     LDFLAGS_vcd="${LDFLAGS_vcd} -ldvd"
     LDFLAGS_cdda="${LDFLAGS_cdda} -ldvd"
     ;;
-  x*bsd*)
+  *bsd*)
     SYS="${target_os}"
     CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
     ;;
-  xdarwin*)
+  darwin*)
     SYS=darwin
     CFLAGS_save="${CFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
@@ -100,15 +100,15 @@ case "x${target_os}" in
     LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -all_load"
     LIBEXT=".dylib"
     ;;
-  x*mingw32* | x*cygwin*)
+  *mingw32* | *cygwin*)
     AC_CHECK_TOOL(WINDRES, windres, :)
     LIBEXT=".dll"
 
-    case "x${target_os}" in
-      x*mingw32*)
+    case "${target_os}" in
+      *mingw32*)
         SYS=mingw32
         ;;
-      x*cygwin*)
+      *cygwin*)
         dnl Check if we are using the mno-cygwin mode in which case we are
         dnl actually dealing with a mingw32 compiler.
         AC_EGREP_CPP(yes,
@@ -119,7 +119,7 @@ case "x${target_os}" in
         ;;
     esac
 
-    if test "x$SYS" = "xmingw32"; then
+    if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"
         CPPFLAGS="${CPPFLAGS_save}"
@@ -137,19 +137,19 @@ case "x${target_os}" in
         LDFLAGS_httpd="${LDFLAGS_httpd} -lws2_32"
     fi
     ;;
-  x*nto*)
+  *nto*)
     SYS=nto
     LDFLAGS_x11="${LDFLAGS_x11} -lsocket"
     LDFLAGS_xvideo="${LDFLAGS_xvideo} -lsocket"
     ;;
-  xsolaris*)
+  solaris*)
     SYS=solaris
     ;;
-  xhpux*)
+  hpux*)
     SYS=hpux
     LIBEXT=".sl"
     ;;
-  xbeos)
+  beos)
     SYS=beos
     CFLAGS_save="${CFLAGS_save} -Wno-multichar"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
@@ -162,13 +162,13 @@ case "x${target_os}" in
         LDFLAGS_ipv4="${LDFLAGS_ipv4} -lsocket -lbind"
         LDFLAGS_httpd="${LDFLAGS_httpd} -lsocket -lbind" )
     ;;
-  x*)
+  *)
     SYS="${target_os}"
     ;;
 esac
-AM_CONDITIONAL(HAVE_BEOS, test "x${SYS}" = "xbeos")
-AM_CONDITIONAL(HAVE_DARWIN, test "x${SYS}" = "xdarwin")
-AM_CONDITIONAL(HAVE_WIN32, test "x${SYS}" = "xmingw32")
+AM_CONDITIONAL(HAVE_BEOS, test "${SYS}" = "beos")
+AM_CONDITIONAL(HAVE_DARWIN, test "${SYS}" = "darwin")
+AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 
 dnl
 dnl Gettext stuff
@@ -194,7 +194,7 @@ AC_MSG_CHECKING(for suffix of libraries)
 AC_MSG_RESULT(${LIBEXT})
 
 dnl Check for the need to include the mingwex lib for mingw32
-if test x$SYS = xmingw32
+if test "${SYS}" = "mingw32"
 then
     AC_CHECK_LIB(mingwex,opendir,
         AC_CHECK_LIB(mingw32,opendir,LDFLAGS_vlc="${LDFLAGS_vlc}",
@@ -204,13 +204,13 @@ then
 fi
 
 dnl Check for fnative-struct or mms-bitfields support for mingw32
-if test x$SYS = xmingw32
+if test "${SYS}" = "mingw32"
 then
     AC_CACHE_CHECK([if \$CC accepts -mms-bitfields],
         [ac_cv_c_mms_bitfields],
         [CFLAGS="${CFLAGS_save} -mms-bitfields"
          AC_TRY_COMPILE([],,ac_cv_c_mms_bitfields=yes, ac_cv_c_mms_bitfields=no)])
-    if test x"$ac_cv_c_mms_bitfields" != x"no"; then
+    if test "${ac_cv_c_mms_bitfields}" != "no"; then
         CFLAGS_save="${CFLAGS_save} -mms-bitfields";
         CXXFLAGS_save="${CXXFLAGS_save} -mms-bitfields";
     else
@@ -218,7 +218,7 @@ then
             [ac_cv_c_fnative_struct],
             [CFLAGS="${CFLAGS_save} -fnative-struct"
              AC_TRY_COMPILE([],,ac_cv_c_fnative_struct=yes, ac_cv_c_fnative_struct=no)])
-        if test x"$ac_cv_c_fnative_struct" != x"no"; then
+        if test "${ac_cv_c_fnative_struct}" != "no"; then
             CFLAGS_save="${CFLAGS_save} -fnative-struct";
             CXXFLAGS_save="${CXXFLAGS_save} -fnative-struct";
         fi
@@ -228,7 +228,7 @@ then
 fi
 
 dnl Check for fvtable-thunks support for mingw32
-if test x$SYS = xmingw32
+if test "${SYS}" = "mingw32"
 then
 AC_LANG_PUSH(C++)
     AC_CACHE_CHECK([if \$CXX accepts -fvtable-thunks],
@@ -236,7 +236,7 @@ AC_LANG_PUSH(C++)
         [CXXFLAGS="${CXXFLAGS_save} -Wall -Werror -fvtable-thunks"
          AC_TRY_COMPILE([],,ac_cv_cxx_fvtable_thunks=yes,
                         ac_cv_cxx_fvtable_thunks=no)])
-    if test x"$ac_cv_cxx_fvtable_thunks" = x"yes"; then
+    if test "${ac_cv_cxx_fvtable_thunks}" = "yes"; then
         CXXFLAGS_mingw32_special="-fvtable-thunks"
     fi
 
@@ -246,8 +246,8 @@ AC_LANG_POP(C++)
 fi
 
 dnl Flags for plugin compilation
-case "x${SYS}" in
-  xmingw32|xcygwin)
+case "${SYS}" in
+  mingw32|cygwin)
     CFLAGS_pics="${CFLAGS_pics} ${CFLAGS_mingw32_special}"
     CXXFLAGS_pics="${CXXFLAGS_pics} ${CFLAGS_mingw32_special} ${CXXFLAGS_mingw32_special}"
     OBJCFLAGS_pics="${OBJCFLAGS_pics} ${CFLAGS_mingw32_special}"
@@ -255,7 +255,7 @@ case "x${SYS}" in
     CXXFLAGS_plugins="${CXXFLAGS_plugins} ${CFLAGS_mingw32_special} ${CXXFLAGS_mingw32_special}"
     OBJCFLAGS_plugins="${OBJCFLAGS_plugins} ${CFLAGS_mingw32_special}"
     ;;
-  x*)
+  *)
     CFLAGS_pics="${CFLAGS_pics} -fPIC"
     CXXFLAGS_pics="${CXXFLAGS_pics} -fPIC"
     OBJCFLAGS_pics="${OBJCFLAGS_pics} -fPIC"
@@ -309,7 +309,7 @@ AC_CACHE_CHECK([for socklen_t], ac_cv_type_socklen_t,
      [socklen_t len = 42; return len;],
      ac_cv_type_socklen_t=yes,
      ac_cv_type_socklen_t=no)])
-if test x$ac_cv_type_socklen_t != xno; then
+if test "${ac_cv_type_socklen_t}" != "no"; then
   AC_DEFINE(HAVE_SOCKLEN_T, 1, [Define if <sys/socket.h> defines socklen_t.])
 fi
 
@@ -320,7 +320,7 @@ AC_CACHE_CHECK([for va_copy], ac_cv_c_va_copy,
     [va_list ap1, ap2; va_copy(ap1,ap2);],
     [ac_cv_c_va_copy="yes"],
     [ac_cv_c_va_copy="no"]))
-if test "$ac_cv_c_va_copy" = "yes"; then
+if test "${ac_cv_c_va_copy}" = "yes"; then
   AC_DEFINE(HAVE_VA_COPY, 1, [Define if <stdarg.h> defines va_copy.])
 fi
 AC_CACHE_CHECK([for __va_copy], ac_cv_c___va_copy,
@@ -329,7 +329,7 @@ AC_CACHE_CHECK([for __va_copy], ac_cv_c___va_copy,
     [va_list ap1, ap2; __va_copy(ap1,ap2);],
     [ac_cv_c___va_copy="yes"],
     [ac_cv_c___va_copy="no"]))
-if test "$ac_cv_c___va_copy" = "yes"; then
+if test "${ac_cv_c___va_copy}" = "yes"; then
   AC_DEFINE(HAVE___VA_COPY, 1, [Define if <stdarg.h> defines __va_copy.])
 fi
 
@@ -346,7 +346,7 @@ AC_CHECK_FUNCS(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
     [need_getopt=:])])
 AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 
-if test "x$SYS" != "xmingw32"; then
+if test "${SYS}" != "mingw32"; then
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LDFLAGS_vlc="${LDFLAGS_vlc} -ldl")
 AC_CHECK_LIB(m,cos,
@@ -366,21 +366,21 @@ AC_CHECK_LIB(m,pow,
 AC_CHECK_LIB(m,sqrt,
   LDFLAGS_headphone_channel_mixer="${LDFLAGS_headphone_channel_mixer} -lm"
 )
-fi # end "x$SYS" != "xmingw32"
+fi # end "${SYS}" != "mingw32"
 
-if test "x$SYS" != "xmingw32"; then
+if test "${SYS}" != "mingw32"; then
 dnl Check for pthreads - borrowed from XMMS
 THREAD_LIB=error
-if test "x${THREAD_LIB}" = "xerror"; then
+if test "${THREAD_LIB}" = "error"; then
   AC_CHECK_LIB(pthread,main,THREAD_LIB="-lpthread")
 fi
-if test "x${THREAD_LIB}" = "xerror"; then
+if test "${THREAD_LIB}" = "error"; then
   AC_CHECK_LIB(pthreads,main,THREAD_LIB="-lpthreads")
 fi
-if test "x${THREAD_LIB}" = "xerror"; then
+if test "${THREAD_LIB}" = "error"; then
   AC_CHECK_LIB(c_r,main,THREAD_LIB="-lc_r")
 fi
-if test "x${THREAD_LIB}" = "xerror"; then
+if test "${THREAD_LIB}" = "error"; then
   AC_CHECK_FUNCS(pthread_mutex_lock)
   THREAD_LIB=""
 fi
@@ -393,7 +393,7 @@ dnl  GNU portable threads
 dnl
 AC_ARG_ENABLE(pth,
   [  --enable-pth            GNU Pth support (default disabled)],
-  [ if test "x${enable_pth}" = "xyes"; then
+  [ if test "${enable_pth}" = "yes"; then
     AC_CHECK_LIB(pth,pth_init)
     AC_MSG_CHECKING(for pth_init in pth.h)
     AC_EGREP_HEADER(pth_init,pth.h,[
@@ -412,7 +412,7 @@ dnl  State Threads
 dnl
 AC_ARG_ENABLE(st,
   [  --enable-st             State Threads (default disabled)],
-  [ if test "x${enable_st}" = "xyes"; then
+  [ if test "${enable_st}" = "yes"; then
     AC_CHECK_LIB(st,st_init)
     AC_MSG_CHECKING(for st_init in st.h)
     AC_EGREP_HEADER(st_init,st.h,[
@@ -430,7 +430,7 @@ LDFLAGS_vlc="${LDFLAGS_vlc} ${THREAD_LIB}"
 LDFLAGS_plugins="${LDFLAGS_plugins} ${THREAD_LIB}"
 
 dnl Don't link with rt when using GNU-pth
-if test "x${THREAD_LIB}" != "x-lpth" && test "x${THREAD_LIB}" != "x-lst"; then
+if test "${THREAD_LIB}" != "-lpth" && test "${THREAD_LIB}" != "-lst"; then
   dnl HP/UX port
   AC_CHECK_LIB(rt,sem_init, [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"])
 
@@ -462,7 +462,7 @@ AC_EGREP_HEADER(pthread_once,pthread.h,[
   AC_DEFINE(PTHREAD_ONCE_IN_PTHREAD_H, 1,
             Define if <pthread.h> defines pthread_once.)],[
   AC_MSG_RESULT(no)])
-fi # end "x$SYS" != "xmingw32"
+fi # end "${SYS}" != "mingw32"
 
 AC_MSG_CHECKING(for strncasecmp in strings.h)
 AC_EGREP_HEADER(strncasecmp,strings.h,[
@@ -476,10 +476,10 @@ AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h getopt.h strings.h inttypes.h 
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
-if test "x$SYS" != "xmingw32"; then
+if test "${SYS}" != "mingw32"; then
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
 AC_CHECK_HEADERS(linux/version.h)
-fi # end "x$SYS" != "xmingw32"
+fi # end "${SYS}" != "mingw32"
 
 AC_HEADER_TIME
 
@@ -489,7 +489,7 @@ AC_CHECK_HEADERS(dirent.h,,[need_dirent=:])
 AM_CONDITIONAL(BUILD_DIRENT, ${need_dirent})
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep
-if test "x$SYS" != "xmingw32"; then
+if test "${SYS}" != "mingw32"; then
 AC_MSG_CHECKING(for nanosleep in time.h)
 AC_EGREP_HEADER(nanosleep,time.h,[
   AC_MSG_RESULT(yes)
@@ -498,7 +498,7 @@ AC_EGREP_HEADER(nanosleep,time.h,[
 ],[
   AC_MSG_RESULT(no)
 ])
-fi # end "x$SYS" != "xmingw32"
+fi # end "${SYS}" != "mingw32"
 
 dnl Make sure we have timespecs
 AC_MSG_CHECKING(for timespec in sys/time.h)
@@ -511,15 +511,15 @@ AC_EGREP_HEADER(timespec,sys/time.h,[
 ])
 
 dnl Check for threads library
-if test "x$SYS" != "xmingw32"; then
+if test "${SYS}" != "mingw32"; then
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
-fi # end "x$SYS" != "xmingw32"
+fi # end "${SYS}" != "mingw32"
 
 dnl Default X headers and libraries
-if test "x${x_includes}" = "xNONE"; then
+if test "${x_includes}" = "NONE"; then
   x_includes="/usr/X11R6/include"
 fi
-if test "x${x_libraries}" = "xNONE"; then
+if test "${x_libraries}" = "NONE"; then
   x_libraries="/usr/X11R6/lib"
 fi
 
@@ -539,7 +539,7 @@ AC_CACHE_CHECK([for ntohl in sys/param.h],
      AC_TRY_COMPILE([#include <sys/param.h>],
         [void foo() { int meuh; ntohl(meuh); }],
         ac_cv_c_ntohl_sys_param_h=yes, ac_cv_c_ntohl_sys_param_h=no)])
-if test "x${ac_cv_c_ntohl_sys_param_h}" != "xno"; then
+if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
     AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
 
@@ -548,7 +548,7 @@ AC_CACHE_CHECK([if \$CC accepts -finline-limit],
     [ac_cv_c_inline_limit],
     [CFLAGS="${CFLAGS_save} -finline-limit-30000"
      AC_TRY_COMPILE([],,ac_cv_c_inline_limit=yes, ac_cv_c_inline_limit=no)])
-if test "x${ac_cv_c_inline_limit}" != "xno"; then
+if test "${ac_cv_c_inline_limit}" != "no"; then
     CFLAGS_save="${CFLAGS_save} -finline-limit-30000"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -finline-limit-30000"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -finline-limit-30000"; OBJCFLAGS="${OBJCFLAGS_save}"
@@ -562,7 +562,7 @@ fi
 #        [ac_cv_c_W${flag}],
 #        [CFLAGS="-W${flag} ${CFLAGS_save}"
 #         AC_TRY_COMPILE([],,ac_cv_c_W${flag}=yes, ac_cv_c_W${flag}=no)])
-#    if test "x${ac_cv_c_W${flag}}" != "xno"; then
+#    if test "${ac_cv_c_W${flag}}" != "no"; then
 #        CFLAGS_save="-W${flag} ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
 #        CXXFLAGS_save="-W${flag} ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
 #        OBJCFLAGS_save="-W${flag} ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
@@ -599,43 +599,43 @@ AC_CACHE_CHECK([if \$CC accepts -Winline],
     [CFLAGS="-Winline ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Winline=yes, ac_cv_c_Winline=no)])
 
-if test "x${ac_cv_c_Wall}" != "xno"; then
+if test "${ac_cv_c_Wall}" != "no"; then
     CFLAGS_save="-Wall ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wall ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wall ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
-if test "x${ac_cv_c_Wunreachable_code}" != "xno"; then
+if test "${ac_cv_c_Wunreachable_code}" != "no"; then
 #    CFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
 #    CXXFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
 #    OBJCFLAGS_save="-Wunreachable-code ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 
     dnl -Wunreachable-code means gcc-3.x, we can use -Wconversion and we can
     dnl activate -Winline for C++, it won't choke on system headers.
-#    if test "x${ac_cv_c_Wconversion}" != "xno"; then
+#    if test "${ac_cv_c_Wconversion}" != "no"; then
 #        CFLAGS_save="-Wconversion ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
 #        CXXFLAGS_save="-Wconversion ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
 #        OBJCFLAGS_save="-Wconversion ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 #    fi
-    if test "x${ac_cv_c_Winline}" != "xno"; then
+    if test "${ac_cv_c_Winline}" != "no"; then
         CXXFLAGS_save="-Winline ${CXXFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     fi
 
 fi
 
-if test "x${ac_cv_c_Wsign_compare}" != "xno"; then
+if test "${ac_cv_c_Wsign_compare}" != "no"; then
     CFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wsign-compare ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
-if test "x${ac_cv_c_Wdisabled_optimization}" != "xno"; then
+if test "${ac_cv_c_Wdisabled_optimization}" != "no"; then
     CFLAGS_save="-Wdisabled-optimization ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wdisabled-optimization ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wdisabled-optimization ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
-if test "x${ac_cv_c_Winline}" != "xno"; then
+if test "${ac_cv_c_Winline}" != "no"; then
     CFLAGS_save="-Winline ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     OBJCFLAGS_save="-Winline ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
@@ -645,7 +645,7 @@ AC_CACHE_CHECK([if \$CC accepts -pipe],
     [ac_cv_c_pipe],
     [CFLAGS="${CFLAGS_save} -pipe"
      AC_TRY_COMPILE([],,ac_cv_c_pipe=yes, ac_cv_c_pipe=no)])
-if test "x${ac_cv_c_pipe}" != "xno"; then
+if test "${ac_cv_c_pipe}" != "no"; then
     CFLAGS_save="${CFLAGS_save} -pipe"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -pipe"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -pipe"; OBJCFLAGS="${OBJCFLAGS_save}"
@@ -656,7 +656,7 @@ AC_CACHE_CHECK([if \$CC accepts -O3],
     [ac_cv_c_o3],
     [CFLAGS="${CFLAGS_save} -O3"
      AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
-if test "x${ac_cv_c_o3}" != "xno"; then
+if test "${ac_cv_c_o3}" != "no"; then
     CFLAGS_OPTIM="${CFLAGS_OPTIM} -O3"
 fi
 
@@ -664,8 +664,8 @@ AC_CACHE_CHECK([if \$CC accepts -O2],
     [ac_cv_c_o2],
     [CFLAGS="${CFLAGS_save} -O2"
      AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
-if test "x${ac_cv_c_o2}" != "xno"; then
-    if test "x${ac_cv_c_o3}" = "xno"; then
+if test "${ac_cv_c_o2}" != "no"; then
+    if test "${ac_cv_c_o3}" = "no"; then
         CFLAGS_OPTIM="${CFLAGS_OPTIM} -O2"
     fi
     CFLAGS_NOOPTIM="${CFLAGS_NOOPTIM} -O2"
@@ -674,8 +674,8 @@ else
         [ac_cv_c_o],
         [CFLAGS="${CFLAGS_save} -O"
          AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
-    if test "x${ac_cv_c_o}" != "xno"; then
-        if test "x${ac_cv_c_o3}" = "xno"; then
+    if test "${ac_cv_c_o}" != "no"; then
+        if test "${ac_cv_c_o3}" = "no"; then
             CFLAGS_OPTIM="${CFLAGS_OPTIM} -O"
 	fi
         CFLAGS_NOOPTIM="${CFLAGS_NOOPTIM} -O"
@@ -687,19 +687,19 @@ AC_CACHE_CHECK([if \$CC accepts -ffast-math],
     [ac_cv_c_fast_math],
     [CFLAGS="${CFLAGS_save} -ffast-math"
      AC_TRY_COMPILE([],,ac_cv_c_fast_math=yes, ac_cv_c_fast_math=no)])
-if test "x${ac_cv_c_fast_math}" != "xno"; then
+if test "${ac_cv_c_fast_math}" != "no"; then
     CFLAGS_OPTIM="${CFLAGS_OPTIM} -ffast-math"
 fi
 
 dnl Check for -funroll-loops
 dnl Disabled on BeOS because BeOS' gcc is buggy and may crash with it
-if test "x${SYS}" != "xbeos"
+if test "${SYS}" != "beos"
 then
   AC_CACHE_CHECK([if \$CC accepts -funroll-loops],
       [ac_cv_c_unroll_loops],
       [CFLAGS="${CFLAGS_save} -funroll-loops"
        AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
-  if test "x${ac_cv_c_unroll_loops}" != "xno"; then
+  if test "${ac_cv_c_unroll_loops}" != "no"; then
       CFLAGS_OPTIM="${CFLAGS_OPTIM} -funroll-loops"
   fi
 fi
@@ -709,7 +709,7 @@ AC_CACHE_CHECK([if \$CC accepts -fomit-frame-pointer],
     [ac_cv_c_omit_frame_pointer],
     [CFLAGS="${CFLAGS_save} -fomit-frame-pointer"
      AC_TRY_COMPILE([],,ac_cv_c_omit_frame_pointer=yes, ac_cv_c_omit_frame_pointer=no)])
-if test "x${ac_cv_c_omit_frame_pointer}" != "xno"; then
+if test "${ac_cv_c_omit_frame_pointer}" != "no"; then
     CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
     # this plugin does not compile without -fomit-frame-pointer, damn gcc!
     CFLAGS_i420_yuy2_mmx="${CFLAGS_i420_yuy2_mmx} -fomit-frame-pointer"
@@ -720,7 +720,7 @@ AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
     [ac_cv_c_dynamic_no_pic],
     [CFLAGS="${CFLAGS_save} -mdynamic-no-pic"
      AC_TRY_COMPILE([],,ac_cv_c_dynamic_no_pic=yes, ac_cv_c_dynamic_no_pic=no)])
-if test "x${ac_cv_c_dynamic_no_pic}" != "xno"; then
+if test "${ac_cv_c_dynamic_no_pic}" != "no"; then
     CFLAGS_builtins="${CFLAGS_builtins} -mdynamic-no-pic"
     CFLAGS_libvlc="${CFLAGS_libvlc} -mdynamic-no-pic"
 fi
@@ -730,20 +730,20 @@ AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error -lcc_dynamic],
     [ac_cv_ld_darwin],
     [CFLAGS="${CFLAGS_save} -bundle -undefined error -lcc_dynamic"
      AC_TRY_COMPILE([],,ac_cv_ld_darwin=yes, ac_cv_ld_darwin=no)])
-if test "x${ac_cv_ld_darwin}" != "xno"; then
+if test "${ac_cv_ld_darwin}" != "no"; then
     LDFLAGS_plugins="${LDFLAGS_plugins} -bundle -undefined error -lcc_dynamic"
 fi
 
 dnl Check for standard plugin linking flags
 dnl BeOS' gcc needs -nostart instead of -shared, even if -shared isn't harmful (just a warning)
-if test "x${SYS}" = "xbeos"; then
+if test "${SYS}" = "beos"; then
     LDFLAGS_plugins="${LDFLAGS_plugins} -nostart"
 else
     AC_CACHE_CHECK([if \$CC accepts -shared],
         [ac_cv_ld_plugins],
         [CFLAGS="${CFLAGS_save} -shared"
          AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
-    if test "x${ac_cv_ld_plugins}" != "xno"; then
+    if test "${ac_cv_ld_plugins}" != "no"; then
         LDFLAGS_plugins="${LDFLAGS_plugins} -shared"
     fi
 fi
@@ -758,7 +758,7 @@ AC_CACHE_CHECK([for variadic cpp macros],
          [a("foo");a("%s","bar");a("%s%s","baz","quux");],
          ac_cv_cpp_variadic_macros=yes,
          ac_cv_cpp_variadic_macros=no)])
-if test "x${ac_cv_cpp_variadic_macros}" != "xno"; then
+if test "${ac_cv_cpp_variadic_macros}" != "no"; then
     AC_DEFINE(HAVE_VARIADIC_MACROS, 1, Support for variadic macros)
 fi
 
@@ -773,7 +773,7 @@ AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
         [ac_cv_c_attribute_aligned="${ac_cv_c_attr_align_try}"])
     done
         CFLAGS="${CFLAGS_save}"])
-if test "x${ac_cv_c_attribute_aligned}" != "x0"; then
+if test "${ac_cv_c_attribute_aligned}" != "0"; then
     AC_DEFINE_UNQUOTED([ATTRIBUTE_ALIGNED_MAX],
         [${ac_cv_c_attribute_aligned}],[Maximum supported data alignment])
 fi
@@ -787,15 +787,15 @@ AC_CACHE_CHECK([__attribute__ ((format ())) support with function pointers],
         [static void (*pf_printf)(const char *, ...) __attribute__ ((format(printf,1,2)));(void)pf_printf;],
         [ac_cv_c_attribute_format=yes])
         CFLAGS="${CFLAGS_save}"])
-if test "x${ac_cv_c_attribute_format}" != "xno"; then
+if test "${ac_cv_c_attribute_format}" != "no"; then
     AC_DEFINE(HAVE_ATTRIBUTE_FORMAT, 1, Support for __attribute__((format())) with function pointers)
 fi
 
 dnl
 dnl  Check the CPU
 dnl
-case "x${target_cpu}" in
-  x)
+case "${target_cpu}" in
+  "")
     ARCH=unknown
     ;;
   *)
@@ -845,7 +845,7 @@ dnl  Switch to enable a version of VLC where most modules will be builtin
 dnl
 AC_ARG_ENABLE(mostly-builtin,
 [  --enable-mostly-builtin most modules will be built-in (default disabled)])
-if test "x${enable_mostly_builtin}" = "xyes"; then
+if test "${enable_mostly_builtin}" = "yes"; then
   BUILTINS="${BUILTINS} ${PLUGINS}"
   PLUGINS=""
 fi
@@ -853,7 +853,7 @@ fi
 dnl
 dnl Some plugins aren't useful on some platforms
 dnl
-if test "x${SYS}" != "xmingw32"; then
+if test "${SYS}" != "mingw32"; then
     PLUGINS="${PLUGINS} screensaver"
 fi
 
@@ -879,7 +879,7 @@ AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [CFLAGS="${CFLAGS_save}"
      AC_TRY_COMPILE(,[void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));],
                     ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
-if test "x${ac_cv_mmx_inline}" != "xno"; then
+if test "${ac_cv_mmx_inline}" != "no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
 fi
 
@@ -888,7 +888,7 @@ AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
     [CFLAGS="${CFLAGS_save}"
      AC_TRY_COMPILE(,[void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));],
                     ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
-if test "x${ac_cv_mmxext_inline}" != "xno"; then
+if test "${ac_cv_mmxext_inline}" != "no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
 fi
 
@@ -897,7 +897,7 @@ AC_CACHE_CHECK([if \$CC groks 3D Now! inline assembly],
     [CFLAGS="${CFLAGS_save}"
      AC_TRY_COMPILE(,[void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));],
                     ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
-if test "x${ac_cv_3dnow_inline}" != "xno"; then
+if test "${ac_cv_3dnow_inline}" != "no"; then
   AC_DEFINE(CAN_COMPILE_3DNOW, 1, Define if \$CC groks 3D Now! inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${THREEDNOW_MODULES}"
 fi
@@ -907,12 +907,12 @@ AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
     [CFLAGS="${CFLAGS_save}"
      AC_TRY_COMPILE(,[void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));],
                     ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
-if test "x${ac_cv_sse_inline}" != "xno" -a "x${SYS}" != "xmingw32"; then
+if test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "mingw32"; then
   AC_DEFINE(CAN_COMPILE_SSE, 1, Define if \$CC groks SSE inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
 fi
 
-if test "x${SYS}" != "xmingw32"; then
+if test "${SYS}" != "mingw32"; then
 AC_CACHE_CHECK([if \$CC groks AltiVec inline assembly],
     [ac_cv_altivec_inline],
     [CFLAGS="${CFLAGS_save}"
@@ -923,9 +923,9 @@ AC_CACHE_CHECK([if \$CC groks AltiVec inline assembly],
             [ac_cv_altivec_inline="-Wa,-m7400"],
             ac_cv_altivec_inline=no)
          ])])
-if test "x${ac_cv_altivec_inline}" != "xno"; then
+if test "${ac_cv_altivec_inline}" != "no"; then
   AC_DEFINE(CAN_COMPILE_ALTIVEC, 1, Define if \$CC groks AltiVec inline assembly.)
-  if test "x${ac_cv_altivec_inline}" != "xyes"; then
+  if test "${ac_cv_altivec_inline}" != "yes"; then
     CFLAGS_idctaltivec="${CFLAGS_idctaltivec} ${ac_cv_altivec_inline}"
     CFLAGS_motionaltivec="${CFLAGS_motionaltivec} ${ac_cv_altivec_inline}"
     CFLAGS_memcpyaltivec="${CFLAGS_memcpyaltivec} ${ac_cv_altivec_inline}"
@@ -946,7 +946,7 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
             [ac_cv_c_altivec="-fvec"], ac_cv_c_altivec=no)
         ])
      CFLAGS="${CFLAGS_save}"])
-if test "x${ac_cv_c_altivec}" != "xno"; then
+if test "${ac_cv_c_altivec}" != "no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
   CFLAGS_idctaltivec="${CFLAGS_idctaltivec} ${ac_cv_c_altivec}"
   CFLAGS_motionaltivec="${CFLAGS_motionaltivec} ${ac_cv_c_altivec}"
@@ -961,13 +961,13 @@ AC_CACHE_CHECK([if linker needs -framework vecLib],
      AC_TRY_LINK([],,ac_cv_ld_altivec=yes,ac_cv_ld_altivec=no)
      LDFLAGS="${LDFLAGS_save}"
     ])
-if test "x${ac_cv_ld_altivec}" != "xno"; then
+if test "${ac_cv_ld_altivec}" != "no"; then
   LDFLAGS_idctaltivec="${LDFLAGS_idctaltivec} -framework vecLib"
   LDFLAGS_motionaltivec="${LDFLAGS_motionaltivec} -framework vecLib"
   LDFLAGS_memcpyaltivec="${LDFLAGS_memcpyaltivec} -framework vecLib"
   LDFLAGS_vlc="${LDFLAGS_vlc} -framework vecLib"
 fi
-fi # end "x$SYS" != "xmingw32"
+fi # end "${SYS}" != "mingw32"
 
 AC_ARG_WITH(,[])
 AC_ARG_WITH(,[Optimization options:])
@@ -978,23 +978,23 @@ dnl
 AC_ARG_WITH(tuning,
 [  --with-tuning=ARCH      enable special tuning for an architecture
                           (default i686 on IA-32 and 750 on PPC)])
-if test "x${with_tuning}" != "x"; then
-    if test "x${target_cpu}" = "xpowerpc"; then
+if test "${with_tuning}" != ""; then
+    if test "${target_cpu}" = "powerpc"; then
         CFLAGS_TUNING="-mtune=${with_tuning}"
     else
         CFLAGS_TUNING="-mcpu=${with_tuning}"
     fi
 else
-    if test "x${target_cpu}" = "xi686" -o "x${target_cpu}" = "xi586" -o "x${target_cpu}" = "xi486" -o "x${target_cpu}" = "xi386"; then CFLAGS_TUNING="-mcpu=pentiumpro"
+    if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "i486" -o "${target_cpu}" = "i386"; then CFLAGS_TUNING="-mcpu=pentiumpro"
     else
-        if test "x${target_cpu}" = "xpowerpc"; then CFLAGS_TUNING="-mtune=750"; fi
+        if test "${target_cpu}" = "powerpc"; then CFLAGS_TUNING="-mtune=750"; fi
     fi
 fi
 
 dnl
 dnl  x86 accelerations
 dnl
-if test "x${target_cpu}" = "xi686" -o "x${target_cpu}" = "xi586" -o "x${target_cpu}" = "xx86" -o "x${target_cpu}" = "xi386"
+if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "x86" -o "${target_cpu}" = "i386"
 then
     ARCH="${ARCH} mmx"
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"
@@ -1005,16 +1005,16 @@ dnl  Enable/disable optimizations
 dnl
 AC_ARG_ENABLE(optimizations,
 [  --disable-optimizations disable compiler optimizations (default enabled)])
-AM_CONDITIONAL(OPTIM, test "x${enable_optimizations}" != "xno")
+AM_CONDITIONAL(OPTIM, test "${enable_optimizations}" != "no")
 
 dnl
 dnl  AltiVec acceleration
 dnl
 AC_ARG_ENABLE(altivec,
 [  --disable-altivec       disable AltiVec optimizations (default enabled on PPC)],
-[ if test "x${enable_altivec}" = "xyes"; then ARCH="${ARCH} altivec";
+[ if test "${enable_altivec}" = "yes"; then ARCH="${ARCH} altivec";
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ],
-[ if test "x${target_cpu}" = "xpowerpc"; then ARCH="${ARCH} altivec";
+[ if test "${target_cpu}" = "powerpc"; then ARCH="${ARCH} altivec";
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ])
 
 dnl
@@ -1022,21 +1022,21 @@ dnl  Debugging mode
 dnl
 AC_ARG_ENABLE(debug,
 [  --enable-debug          debug mode (default disabled)])
-AM_CONDITIONAL(DEBUG, test "x${enable_debug}" = "xyes")
+AM_CONDITIONAL(DEBUG, test "${enable_debug}" = "yes")
 
 dnl
 dnl  Enable release-specific flags
 dnl
 AC_ARG_ENABLE(release,
 [  --enable-release        activate extra optimizations (default disabled)])
-AM_CONDITIONAL(RELEASE, test "x${enable_release}" = "xyes")
+AM_CONDITIONAL(RELEASE, test "${enable_release}" = "yes")
 
 dnl
 dnl Stream output
 dnl
 AC_ARG_ENABLE(sout,
   [  --enable-sout           Stream output modules (default enabled)])
-if test "x${enable_sout}" != "xno"
+if test "${enable_sout}" != "no"
 then
   PLUGINS="${PLUGINS} access_output_dummy access_output_udp access_output_file access_output_http"
   PLUGINS="${PLUGINS} mux_ts mux_ps mux_avi mux_dummy"
@@ -1067,15 +1067,15 @@ dnl  DVD module: optionally check for installed libdvdcss
 dnl
 AC_ARG_ENABLE(dvd,
 [  --enable-dvd            DVD input module (default enabled)])
-if test "x${enable_dvd}" != "xno"
+if test "${enable_dvd}" != "no"
 then
   AC_ARG_WITH(dvdcss,
   [    --with-dvdcss=PATH    libdvdcss headers and libraries])
   AC_ARG_WITH(dvdcss-tree,
   [    --with-dvdcss-tree=PATH libdvdcss tree for static linking])
-  case "x${with_dvdcss}" in
-  x|xyes)
-    if test "x${with_dvdcss_tree}" = x
+  case "${with_dvdcss}" in
+  ""|yes)
+    if test "${with_dvdcss_tree}" = ""
     then
       AC_CHECK_HEADERS(dvdcss/dvdcss.h,
         [ PLUGINS="${PLUGINS} dvd"
@@ -1086,7 +1086,7 @@ then
     else
       AC_MSG_CHECKING(for libdvdcss.a in ${with_dvdcss_tree})
       real_dvdcss_tree="`cd ${with_dvdcss_tree} 2>/dev/null && pwd`"
-      if test "x${real_dvdcss_tree}" = "x"
+      if test "${real_dvdcss_tree}" = ""
       then
         dnl  The given directory can't be found
         AC_MSG_RESULT(no)
@@ -1107,7 +1107,7 @@ then
       fi
     fi
   ;;
-  xno)
+  no)
     dnl  Compile without dvdcss (dlopen version, works only under Linux)
     PLUGINS="${PLUGINS} dvd"
     CPPFLAGS_dvd="${CPPFLAGS_dvd} -DGOD_DAMN_DMCA"
@@ -1137,20 +1137,20 @@ dnl dvdread module: check for libdvdread
 dnl
 AC_ARG_ENABLE(dvdread,
 [  --enable-dvdread        dvdread input module (default disabled)])
-if test "x${enable_dvdread}" != "xno"
+if test "${enable_dvdread}" != "no"
 then
   AC_ARG_WITH(dvdread,
   [    --with-dvdread=PATH    libdvdread headers and libraries])
   AC_ARG_WITH(dvdread-tree,
   [    --with-dvdread-tree=PATH libdvdread tree for static linking])
-  if test "x${with_dvdread}" = x
+  if test "${with_dvdread}" = ""
   then
-    if test "x${with_dvdread_tree}" = x
+    if test "${with_dvdread_tree}" = ""
     then
       AC_CHECK_HEADERS(dvdread/dvd_reader.h,
         [ PLUGINS="${PLUGINS} dvdread"
           LDFLAGS_dvdread="${LDFLAGS_dvdread} -ldvdread ${LDFLAGS_dvdcss}" ],
-        [ if test "x${enable_dvdread}" != "x"
+        [ if test "${enable_dvdread}" != ""
           then
             AC_MSG_WARN([Please get libdvdread from http://www.dtek.chalmers.se/groups/dvd/downloads.shtml])
             AC_MSG_ERROR([cannot find libdvdread headers])
@@ -1158,7 +1158,7 @@ then
     else
       AC_MSG_CHECKING(for libdvdread.a in ${with_dvdread_tree})
       real_dvdread_tree="`cd ${with_dvdread_tree} 2>/dev/null && pwd`"
-      if test "x${real_dvdread_tree}" = "x"
+      if test "${real_dvdread_tree}" = ""
       then
         dnl  The given directory can't be found
         AC_MSG_RESULT(no)
@@ -1199,21 +1199,21 @@ dnl dvdplay module: check for libdvdplay
 dnl
 AC_ARG_ENABLE(dvdplay,
 [  --enable-dvdplay        dvdplay input module (default enabled)])
-if test "x${enable_dvdplay}" != "xno"
+if test "${enable_dvdplay}" != "no"
 then
   AC_ARG_WITH(dvdplay,
   [    --with-dvdplay=PATH    libdvdplay headers and libraries])
   AC_ARG_WITH(dvdplay-tree,
   [    --with-dvdplay-tree=PATH libdvdplay tree for static linking])
-  if test "x${with_dvdplay}" = x
+  if test "${with_dvdplay}" = ""
   then
-    if test "x${with_dvdplay_tree}" = x
+    if test "${with_dvdplay_tree}" = ""
     then
       AC_CHECK_HEADERS(dvdplay/dvdplay.h,
         [ PLUGINS="${PLUGINS} dvdplay"
           LDFLAGS_dvdplay="${LDFLAGS_dvdplay} -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}"
           CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread}" ],
-        [ if test "x${enable_dvdplay}" != "x"
+        [ if test "${enable_dvdplay}" != ""
           then
             AC_MSG_WARN([Please get libdvdplay from http://www.videolan.org/.])
             AC_MSG_ERROR([cannot find libdvdplay headers])
@@ -1221,7 +1221,7 @@ then
     else
       AC_MSG_CHECKING(for libdvdplay.a in ${with_dvdplay_tree})
       real_dvdplay_tree="`cd ${with_dvdplay_tree} 2>/dev/null && pwd`"
-      if test "x${real_dvdplay_tree}" = "x"
+      if test "${real_dvdplay_tree}" = ""
       then
         dnl  The given directory can't be found
         AC_MSG_RESULT(no)
@@ -1262,15 +1262,15 @@ dnl  libdvbpsi ts demux/mux
 dnl
 AC_ARG_ENABLE(dvbpsi,
 [  --enable-dvbpsi         dvbpsi ts mux and demux module (default enabled)])
-if test "x${enable_dvbpsi}" != "xno"
+if test "${enable_dvbpsi}" != "no"
 then
   AC_ARG_WITH(dvbpsi,
   [    --with-dvbpsi=PATH    libdvbpsi headers and libraries])
   AC_ARG_WITH(dvbpsi,
   [    --with-dvbpsi-tree=PATH libdvbpsi tree for static linking])
-  case "x${with_dvbpsi}" in
-  x|xyes)
-    if test "x${with_dvbpsi_tree}" = "x"
+  case "${with_dvbpsi}" in
+  ""|yes)
+    if test "${with_dvbpsi_tree}" = ""
     then
       AC_CHECK_HEADERS(dvbpsi/dr.h,
         [ PLUGINS="${PLUGINS} ts_dvbpsi"
@@ -1290,7 +1290,7 @@ then
     else
       AC_MSG_CHECKING(for libdvbpsi.a in ${with_dvbpsi_tree})
       real_dvbpsi_tree="`cd ${with_dvbpsi_tree} 2>/dev/null && pwd`"
-      if test "x${real_dvbpsi_tree}" = "x"
+      if test "${real_dvbpsi_tree}" = ""
       then
         dnl  The given directory can't be found
         AC_MSG_RESULT(no)
@@ -1315,12 +1315,12 @@ then
       fi
     fi
   ;;
-  xno)
+  no)
     dnl  Compile without dvbpsi
   ;;
   *)
     AC_MSG_CHECKING(for dvbpsi headers in ${with_dvbpsi})
-    if test "x${with_dvbpsi}" = "x"
+    if test "${with_dvbpsi}" = ""
     then
       LDFLAGS_test=""
       CPPFLAGS_test=""
@@ -1338,7 +1338,7 @@ then
       CPPFLAGS_mux_ts_dvbpsi="${CPPFLAGS_mux_ts_dvbpsi} ${CPPFLAGS_test}"
 
       ],[
-      if test "x${enable_dvbpsi}" != "x"
+      if test "${enable_dvbpsi}" != ""
       then
         AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1])
       fi
@@ -1353,7 +1353,7 @@ dnl  Video4Linux plugin
 dnl
 AC_ARG_ENABLE(v4l,
   [  --enable-v4l            Video4Linux input support (default disabled)])
-if test "x${enable_v4l}" = "xyes"
+if test "${enable_v4l}" = "yes"
 then
   AC_CHECK_HEADERS(linux/videodev.h, [
     PLUGINS="${PLUGINS} v4l"
@@ -1365,7 +1365,7 @@ dnl  special access module for Hauppauge PVR cards
 dnl
 AC_ARG_ENABLE(pvr,
   [  --enable-pvr            PVR cards access module (default disabled)])
-if test "x${enable_pvr}" = "xyes"
+if test "${enable_pvr}" = "yes"
 then
   PLUGINS="${PLUGINS} pvr"
 fi
@@ -1376,7 +1376,7 @@ dnl
 AC_ARG_ENABLE(vcd,
   [  --enable-vcd            VCD support for Linux, FreeBSD, MacOS X and Win32 (default enabled)])
 
-if test "x${enable_vcd}" != "xno"
+if test "${enable_vcd}" != "no"
 then
   AC_MSG_CHECKING(for cdrom_msf0 in linux/cdrom.h)
   AC_EGREP_HEADER(cdrom_msf0,linux/cdrom.h,[
@@ -1404,12 +1404,12 @@ then
     AC_MSG_RESULT(no)
   ])
 
-  if test "x${SYS}" = "xbsdi" -o "x${SYS}" = "xmingw32"
+  if test "${SYS}" = "bsdi" -o "${SYS}" = "mingw32"
   then
     PLUGINS="${PLUGINS} vcd cdda"
   fi
 
-  if test "x${SYS}" = "xdarwin"
+  if test "${SYS}" = "darwin"
   then
     PLUGINS="${PLUGINS} vcd cdda"
     LDFLAGS_vcd="${LDFLAGS_vcd} -framework IOKit -framework CoreFoundation"
@@ -1422,7 +1422,7 @@ dnl  Satellite input module
 dnl
 AC_ARG_ENABLE(satellite,
   [  --enable-satellite      satellite card support (default disabled)],
-  [ if test "x${enable_satellite}" = "xyes"
+  [ if test "${enable_satellite}" = "yes"
     then
       PLUGINS="${PLUGINS} satellite"
     fi])
@@ -1430,7 +1430,7 @@ AC_ARG_ENABLE(satellite,
 dnl
 dnl  ipv6 plugin - not for QNX yet
 dnl
-if test "x${SYS}" != "xnto" && test "x${SYS}" != "xmingw32"
+if test "${SYS}" != "nto" && test "${SYS}" != "mingw32"
 then
   have_ipv6=false
   AC_CHECK_FUNCS(inet_pton,[have_ipv6=:],[
@@ -1445,7 +1445,7 @@ then
     PLUGINS="${PLUGINS} ipv6"
   fi
 fi
-if test "x${SYS}" = "xmingw32"
+if test "${SYS}" = "mingw32"
 then
   AC_MSG_CHECKING(for getaddrinfo in ws2tcpip.h)
   AC_EGREP_HEADER(addrinfo,ws2tcpip.h,[AC_MSG_RESULT(yes)
@@ -1457,7 +1457,7 @@ dnl  ogg plugin
 dnl
 AC_ARG_ENABLE(ogg,
   [  --enable-ogg            Ogg demux support (default enabled)])
-if test "x${enable_ogg}" != "xno"
+if test "${enable_ogg}" != "no"
 then
   AC_CHECK_HEADERS(ogg/ogg.h, [
     AC_CHECK_LIB( ogg, oggpack_read, [
@@ -1479,11 +1479,11 @@ dnl  mad plugin
 dnl
 AC_ARG_ENABLE(mad,
   [  --enable-mad            libmad module (default enabled)])
-if test "x${enable_mad}" != "xno"
+if test "${enable_mad}" != "no"
 then
   AC_ARG_WITH(mad,
     [    --with-mad=PATH       path to libmad],[],[])
-  if test "x${with_mad}" != "xno" -a "x${with_mad}" != "x"
+  if test "${with_mad}" != "no" -a "${with_mad}" != ""
   then
     CPPFLAGS_mpgatofixed32="${CPPFLAGS_mpgatofixed32} -I${with_mad}/include"
     LDFLAGS_mpgatofixed32="${LDFLAGS_mpgatofixed32} -L${with_mad}/lib"
@@ -1491,10 +1491,10 @@ then
 
   AC_ARG_WITH(mad-tree,
     [    --with-mad-tree=PATH  mad tree for static linking],[],[])
-  if test "x${with_mad_tree}" != "xno" -a "x${with_mad_tree}" != "x"
+  if test "${with_mad_tree}" != "no" -a "${with_mad_tree}" != ""
   then
     real_mad_tree="`cd ${with_mad_tree} 2>/dev/null && pwd`"
-    if test "x${real_mad_tree}" = "x"
+    if test "${real_mad_tree}" = ""
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1545,7 +1545,7 @@ dnl  ffmpeg decoder plugin
 dnl
 AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default enabled)])
-if test "x${enable_ffmpeg}" != "xno"
+if test "${enable_ffmpeg}" != "no"
 then
   AC_ARG_WITH(ffmpeg-tree,
     [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
@@ -1553,7 +1553,7 @@ then
   dnl
   dnl test for !(--with-ffmpeg-tree)
   dnl
-  if test "x${with_ffmpeg_tree}" == "xno" -o "x${with_ffmpeg_tree}" == "x";then
+  if test "${with_ffmpeg_tree}" == "no" -o "${with_ffmpeg_tree}" == "";then
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
     AC_CHECK_HEADERS(ffmpeg/avcodec.h postproc/postprocess.h)
@@ -1571,10 +1571,10 @@ then
   dnl
   dnl test for --with-ffmpeg-tree
   dnl
-  if test "x${with_ffmpeg_tree}" != "xno" -a "x${with_ffmpeg_tree}" != "x";then
+  if test "${with_ffmpeg_tree}" != "no" -a "${with_ffmpeg_tree}" != "";then
     AC_MSG_CHECKING(for libavcodec.a in ${with_ffmpeg_tree})
     real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
-    if test "x${real_ffmpeg_tree}" = x; then
+    if test "${real_ffmpeg_tree}" = ""; then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
@@ -1608,15 +1608,15 @@ dnl  faad decoder plugin
 dnl
 AC_ARG_ENABLE(faad,
 [  --enable-faad           faad codec (default disabled)])
-if test "x${enable_faad}" = "xyes"
+if test "${enable_faad}" = "yes"
 then
   AC_ARG_WITH(faad-tree,
   [    --with-faad-tree=PATH faad tree for static linking])
-  if test "x${with_faad_tree}" != "x"
+  if test "${with_faad_tree}" != ""
   then
     AC_MSG_CHECKING(for libfaad.a in ${with_faad_tree})
     real_faad_tree="`cd ${with_faad_tree} 2>/dev/null && pwd`"
-    if test "x${real_faad_tree}" = x
+    if test "${real_faad_tree}" = ""
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1666,11 +1666,11 @@ dnl  xvid decoder plugin
 dnl
 AC_ARG_ENABLE(xvid,
 [  --enable-xvid           xvid codec (default disabled)])
-if test "x${enable_xvid}" = "xyes"
+if test "${enable_xvid}" = "yes"
 then
   AC_ARG_WITH(xvid,
     [    --with-xvid=PATH      path to xvid installation],[],[])
-  if test "x${with_xvid}" != "xno" -a "x${with_xvid}" != "x"
+  if test "${with_xvid}" != "no" -a "${with_xvid}" != ""
   then
     CPPFLAGS_xvid="${CPPFLAGS_xvid} -I${with_xvid}/include"
     LDFLAGS_xvid="${LDFLAGS_xvid} -L${with_xvid}/lib"
@@ -1679,11 +1679,11 @@ then
 
   AC_ARG_WITH(xvid-tree,
   [    --with-xvid-tree=PATH xvid tree for static linking])
-  if test "x${with_xvid_tree}" != "x"
+  if test "${with_xvid_tree}" != ""
   then
     AC_MSG_CHECKING(for libxvidcore.a in ${with_xvid_tree})
     real_xvid_tree="`cd ${with_xvid_tree} 2>/dev/null && pwd`"
-    if test "x${real_xvid_tree}" = x
+    if test "${real_xvid_tree}" = ""
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1724,8 +1724,8 @@ dnl  QuickTime plugin
 dnl
 AC_ARG_ENABLE(quicktime,
   [  --enable-quicktime      QuickTime module (default enabled on MacOS X)])
-if test "x${enable_quicktime}" != "xno" &&
-  (test "x${SYS}" = "xdarwin" || test "x${enable_quicktime}" = "xyes")
+if test "${enable_quicktime}" != "no" &&
+  (test "${SYS}" = "darwin" || test "${enable_quicktime}" = "yes")
 then
   AC_CHECK_HEADERS(QuickTime/QuickTime.h,
     [ BUILTINS="${BUILTINS} quicktime"
@@ -1758,16 +1758,16 @@ dnl  a52 AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
   [  --enable-a52            A/52 support with liba52 (default enabled)])
-if test "x${enable_a52}" != "xno"
+if test "${enable_a52}" != "no"
 then
   AC_ARG_WITH(a52,
     [    --with-a52=PATH       a52 headers and libraries])
   AC_ARG_WITH(a52-tree,
     [    --with-a52-tree=PATH  a52dec tree for static linking ],[],[])
-  if test "x${with_a52_tree}" != "xno" -a "x${with_a52_tree}" != "x"
+  if test "${with_a52_tree}" != "no" -a "${with_a52_tree}" != ""
   then
     real_a52_tree="`cd ${with_a52_tree} 2>/dev/null && pwd`"
-    if test "x${real_a52_tree}" = "x"
+    if test "${real_a52_tree}" = ""
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1799,7 +1799,7 @@ then
       AC_MSG_ERROR([the specified tree doesn't have a52.h])
     fi
   else
-    if test "x${with_a52}" = "x"
+    if test "${with_a52}" = ""
     then
       LDFLAGS_test=""
       CPPFLAGS_test=""
@@ -1828,7 +1828,7 @@ dnl  DV plugin
 dnl
 AC_ARG_ENABLE(dv,
   [  --enable-dv             DV decoder support (deprecated in favor of ffmpeg) (default disabled)])
-if test "x${enable_dv}" = "xyes"
+if test "${enable_dv}" = "yes"
 then
   AC_CHECK_HEADERS(libdv/dv.h, [
     PLUGINS="${PLUGINS} dv"
@@ -1841,7 +1841,7 @@ dnl  Flac plugin
 dnl
 AC_ARG_ENABLE(flac,
   [  --enable-flac           flac decoder support (default disabled)])
-if test "x${enable_flac}" = "xyes"
+if test "${enable_flac}" = "yes"
 then
   AC_CHECK_HEADERS(FLAC/stream_decoder.h, [
     PLUGINS="${PLUGINS} flac flacdec"
@@ -1854,15 +1854,15 @@ dnl  Libmpeg2 plugin
 dnl
 AC_ARG_ENABLE(libmpeg2,
   [  --enable-libmpeg2       libmpeg2 decoder support (default enabled)])
-if test "x${enable_libmpeg2}" != "xno"
+if test "${enable_libmpeg2}" != "no"
 then
   AC_ARG_WITH(libmpeg2-tree,
   [    --with-libmpeg2-tree=PATH libmpeg2 tree for static linking])
-  if test "x${with_libmpeg2_tree}" != "x"
+  if test "${with_libmpeg2_tree}" != ""
   then
     AC_MSG_CHECKING(for libmpeg2.a in ${with_libmpeg2_tree})
     real_libmpeg2_tree="`cd ${with_libmpeg2_tree} 2>/dev/null && pwd`"
-    if test "x${real_libmpeg2_tree}" = x
+    if test "${real_libmpeg2_tree}" = ""
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1907,7 +1907,7 @@ dnl  Vorbis plugin
 dnl
 AC_ARG_ENABLE(vorbis,
   [  --enable-vorbis         Vorbis decoder support (default enabled)])
-if test "x${enable_vorbis}" != "xno"
+if test "${enable_vorbis}" != "no"
 then
   AC_CHECK_HEADERS(vorbis/codec.h, [
     PLUGINS="${PLUGINS} vorbis"
@@ -1920,7 +1920,7 @@ dnl  Tremor plugin
 dnl
 AC_ARG_ENABLE(tremor,
   [  --enable-tremor         Tremor decoder support (default disabled)])
-if test "x${enable_tremor}" = "xyes"
+if test "${enable_tremor}" = "yes"
 then
   AC_CHECK_HEADERS(tremor/ivorbiscodec.h, [
     PLUGINS="${PLUGINS} tremor"
@@ -1933,11 +1933,11 @@ dnl  tarkin decoder plugin
 dnl
 AC_ARG_ENABLE(tarkin,
 [  --enable-tarkin         experimental tarkin codec (default disabled)])
-if test "x${enable_tarkin}" = "xyes"
+if test "${enable_tarkin}" = "yes"
 then
   AC_ARG_WITH(tarkin-tree,
   [    --with-tarkin-tree=PATH tarkin tree for static linking])
-  if test "x${with_tarkin_tree}" != "x"
+  if test "${with_tarkin_tree}" != ""
   then
     AC_MSG_CHECKING(for tarkin.o in ${with_tarkin_tree})
     real_tarkin_tree="`cd ${with_tarkin_tree} 2>/dev/null && pwd`"
@@ -1961,7 +1961,7 @@ dnl  theora decoder plugin
 dnl
 AC_ARG_ENABLE(theora,
 [  --enable-theora         experimental theora codec (default disabled)])
-if test "x${enable_theora}" = "xyes"
+if test "${enable_theora}" = "yes"
 then
   AC_CHECK_HEADERS(theora/theora.h, [
     AC_CHECK_LIB(theora, theora_granule_time, [
@@ -1980,7 +1980,7 @@ dnl
 AC_ARG_WITH(,[Video plugins:])
 
 dnl Check for DPMS
-if test "x${SYS}" != "xmingw32"
+if test "${SYS}" != "mingw32"
 then
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   AC_CHECK_HEADERS(X11/extensions/dpms.h, [
@@ -2004,8 +2004,8 @@ dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(x11,
   [  --enable-x11            X11 support (default enabled)])
-if test "x${enable_x11}" != "xno" &&
-  (test "x${SYS}" != "xmingw32" || test "x${enable_x11}" = "xyes"); then
+if test "${enable_x11}" != "no" &&
+  (test "${SYS}" != "mingw32" || test "${enable_x11}" = "yes"); then
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   AC_CHECK_HEADERS(X11/Xlib.h, [
     PLUGINS="${PLUGINS} x11"
@@ -2028,8 +2028,8 @@ dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(xvideo,
   [  --enable-xvideo         XVideo support (default enabled)])
-if test "x${enable_xvideo}" != "xno" &&
-  (test "x${SYS}" != "xmingw32" || test "x${enable_xvideo}" = "xyes"); then
+if test "${enable_xvideo}" != "no" &&
+  (test "${SYS}" != "mingw32" || test "${enable_xvideo}" = "yes"); then
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
     CFLAGS="${CFLAGS_save} -L${x_libraries} -lX11 -lXext"
@@ -2062,25 +2062,25 @@ dnl  SDL module
 dnl
 AC_ARG_ENABLE(sdl,
   [  --enable-sdl            SDL support (default enabled)])
-if test "x${enable_sdl}" != "xno"
+if test "${enable_sdl}" != "no"
 then
   SDL_PATH="${PATH}"
   AC_ARG_WITH(sdl-config-path,
     [    --with-sdl-config-path=PATH sdl-config path (default search in \$PATH)],
-    [ if test "x${with_sdl_config_path}" != "xno"
+    [ if test "${with_sdl_config_path}" != "no"
       then
         SDL_PATH="${with_sdl_config_path}:${PATH}"
       fi ])
   AC_PATH_PROG(SDL12_CONFIG, sdl12-config, no, ${SDL_PATH})
   SDL_CONFIG="${SDL12_CONFIG}"
   SDL_HEADER="SDL12/SDL.h"
-  if test "x${SDL_CONFIG}" = "xno"
+  if test "${SDL_CONFIG}" = "no"
   then
     AC_PATH_PROG(SDL11_CONFIG, sdl11-config, no, ${SDL_PATH})
     SDL_CONFIG=${SDL11_CONFIG}
     SDL_HEADER="SDL11/SDL.h"
   fi
-  if test "x${SDL_CONFIG}" = "xno"
+  if test "${SDL_CONFIG}" = "no"
   then
     AC_PATH_PROG(SDL_CONFIG, sdl-config, no, ${SDL_PATH})
     SDL_HEADER="SDL/SDL.h"
@@ -2091,11 +2091,11 @@ then
     [    --with-sdl-prefix=PATH path to libsdl (needed for cross-compiling),
                                e.g use as:
                                --with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-  if test "x${with_sdl_prefix}" != "xno" -a "x${with_sdl_prefix}" != "x"
+  if test "${with_sdl_prefix}" != "no" -a "${with_sdl_prefix}" != ""
   then
     SDL_PREFIX="--prefix=${with_sdl_prefix}"
   fi
-  if test "x${SDL_CONFIG}" != "xno"
+  if test "${SDL_CONFIG}" != "no"
   then
     PLUGINS="${PLUGINS} vout_sdl aout_sdl"
     CFLAGS_vout_sdl="${CFLAGS_vout_sdl} `${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`"
@@ -2118,7 +2118,7 @@ Please install it and try again. Alternatively you can also configure with
 Please install it and try again. Alternatively you can also configure with
 --disable-sdl.])
     fi
-  elif test "x${enable_sdl}" =  "xyes"
+  elif test "${enable_sdl}" =  "yes"
   then
     AC_MSG_ERROR([I couldn't find the SDL package. You can download libSDL
 from http://www.libsdl.org/, or configure with --disable-sdl. Have a nice day.
@@ -2131,24 +2131,24 @@ dnl  freetype module
 dnl
 AC_ARG_ENABLE(freetype,
   [  --enable-freetype       freetype support (default enabled)])
-if test "x${enable_freetype}" != "xno"
+if test "${enable_freetype}" != "no"
 then
   FREETYPE_PATH="${PATH}"
   AC_ARG_WITH(freetype-config-path,
     [    --with-freetype-config-path=PATH freetype-config path (default search in \$PATH)],
-    [ if test "x${with_freetype_config_path}" != "xno"
+    [ if test "${with_freetype_config_path}" != "no"
       then
         FREETYPE_PATH="${with_freetype_config_path}:${PATH}"
       fi ])
   AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no, ${FREETYPE_PATH})
 
-  if test "x${FREETYPE_CONFIG}" != "xno"
+  if test "${FREETYPE_CONFIG}" != "no"
   then
     PLUGINS="${PLUGINS} osdtext"
     CFLAGS_osdtext="${CFLAGS_osdtext} `${FREETYPE_CONFIG} --cflags`"
     LDFLAGS_osdtext="${LDFLAGS_osdtext} `${FREETYPE_CONFIG} --libs`"
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_freetype}"
-  elif test "x${enable_freetype}" =  "xyes"
+  elif test "${enable_freetype}" =  "yes"
   then
     AC_MSG_ERROR([I couldn't find the freetype package. You can download libfreetype2
 from http://www.freetype.org/, or configure with --disable-freetype. Have a nice day.
@@ -2162,11 +2162,11 @@ dnl  (disabled by default)
 dnl
 AC_ARG_ENABLE(qte,
   [  --enable-qte            QT Embedded support (default disabled)])
-if test "x${enable_qte}" = "xyes"
+if test "${enable_qte}" = "yes"
 then
   AC_ARG_WITH(qte,
   [    --with-qte=PATH       Qt Embedded headers and libraries])
-  if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
+  if test "${with_qte}" != "no" -a "${with_qte}" != ""
   then
     LDFLAGS_qte="${LDFLAGS_qte} -L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte"
     CPPFLAGS_qte="${CPPFLAGS_qte} -I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
@@ -2188,13 +2188,13 @@ dnl  Windows DirectX module
 dnl
 AC_ARG_ENABLE(directx,
   [  --enable-directx        Win32 DirectX support (default enabled on Win32)])
-if test "x${enable_directx}" != "xno"
+if test "${enable_directx}" != "no"
 then
-  if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
   then
     AC_ARG_WITH(directx,
     [    --with-directx=PATH   Win32 DirectX headers])
-    if test "x${with_directx}" = "x"
+    if test "${with_directx}" = ""
     then
       AC_CHECK_HEADERS(ddraw.h,
       [ PLUGINS="${PLUGINS} vout_directx aout_directx"
@@ -2221,7 +2221,7 @@ dnl  Linux framebuffer module
 dnl
 AC_ARG_ENABLE(fb,
   [  --enable-fb             Linux framebuffer support (default enabled on Linux)])
-    if test "x${enable_fb}" != "xno"
+    if test "${enable_fb}" != "no"
     then
       AC_CHECK_HEADERS(linux/fb.h, [
         PLUGINS="${PLUGINS} fb"
@@ -2233,7 +2233,7 @@ dnl  Linux MGA module
 dnl
 AC_ARG_ENABLE(mga,
   [  --enable-mga            Linux kernel Matrox support (default disabled)],
-  [ if test "x${enable_mga}" = "xyes"
+  [ if test "${enable_mga}" = "yes"
     then
       PLUGINS="${PLUGINS} mga xmga"
     fi ])
@@ -2243,7 +2243,7 @@ dnl  SVGAlib module
 dnl
 AC_ARG_ENABLE(svgalib,
   [  --enable-svgalib        SVGAlib support (default disabled)])
-if test "x${enable_svgalib}" = "xyes"
+if test "${enable_svgalib}" = "yes"
 then
   PLUGINS="${PLUGINS} svgalib"
   LDFLAGS_svgalib="${LDFLAGS_svgalib} -lvgagl -lvga"
@@ -2254,13 +2254,13 @@ dnl  GGI module
 dnl
 AC_ARG_ENABLE(ggi,
   [  --enable-ggi            GGI support (default disabled)])
-if test "x${enable_ggi}" = "xyes"
+if test "${enable_ggi}" = "yes"
 then
   PLUGINS="${PLUGINS} ggi"
   LDFLAGS_ggi="${LDFLAGS_ggi} -lggi"
   AC_ARG_WITH(ggi,
     [    --with-ggi=PATH       path to libggi],
-    [ if test "x${with_ggi}" != "xno" -a "x${with_ggi}" != "x"
+    [ if test "${with_ggi}" != "no" -a "${with_ggi}" != ""
       then
         CPPFLAGS_ggi="${CPPFLAGS_ggi} -I${with_ggi}/include"
         LDFLAGS_ggi="${LDFLAGS_ggi} -L${with_ggi}/lib"
@@ -2272,14 +2272,14 @@ dnl  Glide module
 dnl
 AC_ARG_ENABLE(glide,
   [  --enable-glide          Glide (3dfx) support (default disabled)])
-if test "x${enable_glide}" = "xyes"
+if test "${enable_glide}" = "yes"
 then
   PLUGINS="${PLUGINS} glide"
   LDFLAGS_glide="${LDFLAGS_glide} -lglide2x -lm"
   CPPFLAGS_glide="${CPPFLAGS_glide} -I/usr/include/glide"
   AC_ARG_WITH(glide,
     [    --with-glide=PATH     path to libglide],
-    [ if test "x${with_glide}" != "xno" -a "x${with_glide}" != "x"
+    [ if test "${with_glide}" != "no" -a "${with_glide}" != ""
       then
         CPPFLAGS_glide="${CPPFLAGS_glide} -I${with_glide}/include"
         LDFLAGS_glide="${LDFLAGS_glide} -L${with_glide}/lib"
@@ -2291,10 +2291,10 @@ dnl  AA plugin
 dnl
 AC_ARG_ENABLE(aa,
   [  --enable-aa             aalib output (default disabled)])
-if test "x${enable_aa}" = "xyes"
+if test "${enable_aa}" = "yes"
 then
   AC_CHECK_HEADER(aalib.h,have_aa="true",have_aa="false")
-  if test "x${have_aa}" = "xtrue"
+  if test "${have_aa}" = "true"
   then
     PLUGINS="${PLUGINS} aa"
     LDFLAGS_aa="${LDFLAGS_aa} -laa"
@@ -2306,8 +2306,8 @@ dnl  win32 GDI plugin
 dnl
 AC_ARG_ENABLE(wingdi,
   [  --enable-wingdi         Win32 GDI module (default enabled on Win32)])
-if test "x${enable_wingdi}" != "xno"; then
-  if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
+if test "${enable_wingdi}" != "no"; then
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
     PLUGINS="${PLUGINS} wingdi"
     LDFLAGS_wingdi="${LDFLAGS_wingdi} -lgdi32"
   fi
@@ -2325,8 +2325,8 @@ dnl
 AC_ARG_ENABLE(oss,
   [  --enable-oss            Linux OSS /dev/dsp support (enabled on Linux)])
 
-if test "x${enable_oss}" != "xno" &&
-  (test "x${SYS}" != "xmingw32" || test "x${enable_oss}" = "xyes")
+if test "${enable_oss}" != "no" &&
+  (test "${SYS}" != "mingw32" || test "${enable_oss}" = "yes")
 then
   AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
     PLUGINS="${PLUGINS} oss"
@@ -2339,10 +2339,10 @@ dnl  Esound module
 dnl
 AC_ARG_ENABLE(esd,
   [  --enable-esd            Esound library support (default disabled)],
-  [if test "x${enable_esd}" = "xyes"
+  [if test "${enable_esd}" = "yes"
    then
      AC_PATH_PROG(ESD_CONFIG, esd-config, no)
-     if test "x${ESD_CONFIG}" != "xno"
+     if test "${ESD_CONFIG}" != "no"
      then
        PLUGINS="${PLUGINS} esd"
        CFLAGS_esd="${CFLAGS_esd} `${ESD_CONFIG} --cflags`"
@@ -2355,10 +2355,10 @@ dnl  aRts module
 dnl
 AC_ARG_ENABLE(arts,
   [  --enable-arts           aRts sound server (default disabled)],
-  [if test "x${enable_arts}" = "xyes"
+  [if test "${enable_arts}" = "yes"
    then
      AC_PATH_PROG(ARTS_CONFIG, artsc-config, no)
-     if test "x${ARTS_CONFIG}" != "xno"
+     if test "${ARTS_CONFIG}" != "no"
      then
        PLUGINS="${PLUGINS} arts"
        CFLAGS_arts="${CFLAGS_arts} `${ARTS_CONFIG} --cflags`"
@@ -2371,10 +2371,10 @@ dnl  ALSA module
 dnl
 AC_ARG_ENABLE(alsa,
   [  --enable-alsa           ALSA sound support for Linux (default disabled)],
-  [if test "x${enable_alsa}" = "xyes"
+  [if test "${enable_alsa}" = "yes"
    then
      AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_alsa="true", have_alsa="false"),have_alsa="false")
-     if test "x${have_alsa}" = "xtrue"
+     if test "${have_alsa}" = "true"
      then
        AC_TRY_COMPILE([#define ALSA_PCM_NEW_HW_PARAMS_API
                        #define ALSA_PCM_NEW_SW_PARAMS_API
@@ -2393,8 +2393,8 @@ dnl  win32 waveOut plugin
 dnl
 AC_ARG_ENABLE(waveout,
   [  --enable-waveout        Win32 waveOut module (default enabled on Win32)])
-if test "x${enable_waveout}" != "xno"; then
-  if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
+if test "${enable_waveout}" != "no"; then
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
     PLUGINS="${PLUGINS} waveout"
     LDFLAGS_waveout="-lwinmm"
   fi
@@ -2405,8 +2405,8 @@ dnl  CoreAudio plugin
 dnl
 AC_ARG_ENABLE(coreaudio,
   [  --enable-coreaudio      CoreAudio module (default enabled on MacOS X)])
-if test "x${enable_coreaudio}" != "xno" &&
-  (test "x${SYS}" = "xdarwin" || test "x${enable_coreaudio}" = "xyes")
+if test "${enable_coreaudio}" != "no" &&
+  (test "${SYS}" = "darwin" || test "${enable_coreaudio}" = "yes")
 then
   AC_CHECK_HEADERS(CoreAudio/CoreAudio.h, 
     [ BUILTINS="${BUILTINS} coreaudio"
@@ -2427,7 +2427,7 @@ dnl
 AC_ARG_WITH(,[Interface plugins:])
 
 dnl special case for BeOS
-if test "x${SYS}" = "xbeos"
+if test "${SYS}" = "beos"
 then
     PLUGINS="${PLUGINS} beos"
 fi
@@ -2437,17 +2437,17 @@ dnl Skins module
 dnl
 AC_ARG_ENABLE(skins,
   [  --enable-skins          Skins interface module (default enabled on Win32)])
-if test "x${enable_skins}" != "xno"; then
+if test "${enable_skins}" != "no"; then
   WXWINDOWS_PATH="${PATH}"
   AC_ARG_WITH(skins-wx-config-path,
     [    --with-skins-wx-config-path=PATH wx-config path for the skins plugin (default search in \$PATH)],
-    [ if test "x${with_skins_wx_config_path}" != "xno"
+    [ if test "${with_skins_wx_config_path}" != "no"
       then
         WXWINDOWS_PATH="${with_skins_wx_config_path}:${PATH}"
       fi ])
   # look for wx-config
   AC_PATH_PROG(WX_CONFIG_SKINS, wx-config, no, ${WXWINDOWS_PATH})
-  if test "x${WX_CONFIG_SKINS}" != "xno"
+  if test "${WX_CONFIG_SKINS}" != "no"
   then
     if expr 2.3.0 \> `${WX_CONFIG_SKINS} --version` >/dev/null
     then
@@ -2457,15 +2457,15 @@ if test "x${enable_skins}" != "xno"; then
     LDFLAGS_skins="${LDFLAGS_skins} `${WX_CONFIG_SKINS} --libs`"
   fi
 
-  if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
     PLUGINS="${PLUGINS} skins"
     CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -U_OFF_T_ -U_off_t -fno-rtti -Imodules/gui/skins"
     LDFLAGS_skins="${LDFLAGS_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
   else
-    if test "x${enable_skins}" = "xyes"; then
+    if test "${enable_skins}" = "yes"; then
       IMLIB2_PATH="${PATH}"
       AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
-      if test "x${IMLIB2_CONFIG_SKINS}" = "xno"; then
+      if test "${IMLIB2_CONFIG_SKINS}" = "no"; then
         AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-skins.])
       fi
 
@@ -2482,8 +2482,8 @@ dnl Basic skins module (i.e. without wxWindows dialogs)
 dnl
 AC_ARG_ENABLE(basic-skins,
   [  --enable-basic-skins    Skins interface module without wxWindows dialogs (default disabled)])
-if test "x${enable_basic_skins}" = "xyes"; then
-  if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
+if test "${enable_basic_skins}" = "yes"; then
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
 
     CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -U_OFF_T_ -U_off_t -fno-rtti -Imodules/gui/skins"
     LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
@@ -2491,7 +2491,7 @@ if test "x${enable_basic_skins}" = "xyes"; then
   else
     IMLIB2_PATH="${PATH}"
     AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
-    if test "x${IMLIB2_CONFIG_SKINS}" = "xno"; then
+    if test "${IMLIB2_CONFIG_SKINS}" = "no"; then
     AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-basic-skins.])
     fi
 
@@ -2508,29 +2508,29 @@ dnl  Gtk+ module
 dnl
 AC_ARG_ENABLE(gtk,
   [  --enable-gtk            Gtk+ support (default enabled)])
-if test "x${enable_gtk}" != "xno"
+if test "${enable_gtk}" != "no"
 then
   GTK_PATH="${PATH}"
   AC_ARG_WITH(gtk-config-path,
     [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
-    [ if test "x${with_gtk_config_path}" != "xno"
+    [ if test "${with_gtk_config_path}" != "no"
       then
         GTK_PATH="${with_gtk_config_path}:${PATH}"
       fi ])
   # look for gtk-config
   AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, ${GTK_PATH})
   GTK_CONFIG=${GTK12_CONFIG}
-  if test "x${GTK_CONFIG}" = "xno"
+  if test "${GTK_CONFIG}" = "no"
   then
     AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
   fi
-  if test "x${GTK_CONFIG}" != "xno"
+  if test "${GTK_CONFIG}" != "no"
   then
     if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
     then
       AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-gtk.])
     fi
-    if test "x${SYS}" != "xmingw32"; then
+    if test "${SYS}" != "mingw32"; then
       CFLAGS_gtk="${CFLAGS_gtk} `${GTK_CONFIG} --cflags gtk gthread`"
       LDFLAGS_gtk="${LDFLAGS_gtk} `${GTK_CONFIG} --libs gtk gthread | sed 's,-rdynamic,,'`"
     else
@@ -2544,10 +2544,10 @@ then
       ac_cv_gtk_headers=no
       echo "Cannot find gtk development headers."
     ])
-    if test "x${ac_cv_gtk_headers}" = "xyes"
+    if test "${ac_cv_gtk_headers}" = "yes"
     then
       PLUGINS="${PLUGINS} gtk"
-      if test "x${SYS}" != "xmingw32"; then
+      if test "${SYS}" != "mingw32"; then
         NEED_GTK_MAIN=yes
       fi
       ALIASES="${ALIASES} gvlc"
@@ -2561,13 +2561,13 @@ dnl  Gtk+2 module
 dnl
 AC_ARG_ENABLE(gtk2,
   [  --enable-gtk2           Gtk2 support (default disabled)])
-if test "x${enable_gtk2}" = "xyes"
+if test "${enable_gtk2}" = "yes"
 then
   PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
   CFLAGS_gtk2="${CFLAGS_gtk2} ${GTK2_CFLAGS}"
   LDFLAGS_gtk2="${LDFLAGS_gtk2} ${GTK2_LIBS}"
   PLUGINS="${PLUGINS} gtk2"
-  if test "x${SYS}" != "xmingw32"; then
+  if test "${SYS}" != "mingw32"; then
     NEED_GTK2_MAIN=yes
   fi
 fi
@@ -2577,19 +2577,19 @@ dnl  Familiar module uses Gtk+ library
 dnl
 AC_ARG_ENABLE(familiar,
   [  --enable-familiar       Familiar Gtk+ support (default disabled)])
-if test "x${enable_familiar}" = "xyes"
+if test "${enable_familiar}" = "yes"
 then
   GTK_PATH="${PATH}"
   AC_ARG_WITH(gtk-config-path,
     [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
-    [ if test "x${with_gtk_config_path}" != "xno"
+    [ if test "${with_gtk_config_path}" != "no"
       then
         GTK_PATH="${with_gtk_config_path}:${PATH}"
       fi ])
   # look for gtk-config
   AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, ${GTK_PATH})
   GTK_CONFIG=${GTK12_CONFIG}
-  if test "x${GTK_CONFIG}" = "xno"
+  if test "${GTK_CONFIG}" = "no"
   then
     AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
   fi
@@ -2599,11 +2599,11 @@ then
     [    --with-gtk-prefix=PATH path to libgtk (needed for cross-compiling),
                           e.g use as:
                           --with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-  if test "x${with_gtk_prefix}" != "xno" -a "x${with_gtk_prefix}" != "x"
+  if test "${with_gtk_prefix}" != "no" -a "${with_gtk_prefix}" != ""
   then
-    GTK_PREFIX="--prefix=$with_gtk_prefix"
+    GTK_PREFIX="--prefix=${with_gtk_prefix}"
   fi
-  if test "x${GTK_CONFIG}" != "xno"
+  if test "${GTK_CONFIG}" != "no"
   then
     if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
     then
@@ -2618,7 +2618,7 @@ then
       ac_cv_gtk_headers=no
       echo "Cannot find gtk development headers."
     ])
-    if test "x${ac_cv_gtk_headers}" = "xyes"
+    if test "${ac_cv_gtk_headers}" = "yes"
     then
       PLUGINS="${PLUGINS} familiar"
     fi
@@ -2627,13 +2627,13 @@ then
     # now look for gpe support
     AC_ARG_WITH(gpe-prefix,
     [    --with-gpe-prefix=PATH gpe installation path prefix (default search in \$PATH)],[],[])
-    if test "x$with_gpe_prefix" != "xno"  -a "x$with_gpe_prefix" != "x"
+    if test "${with_gpe_prefix}" != "no"  -a "${with_gpe_prefix}" != ""
     then
-      CFLAGS_gpe="-I$with_gpe_prefix/include"
-      LDFLAGS_gpe="-lXi -lgdk_pixbuf -L$with_gpe_prefix/lib -lgpewidget"
+      CFLAGS_gpe="-I${with_gpe_prefix}/include"
+      LDFLAGS_gpe="-lXi -lgdk_pixbuf -L${with_gpe_prefix}/lib -lgpewidget"
       # now look for gpe/init.h header file
-      CFLAGS_save=$CFLAGS
-      LDFLAGS_save=$LDFLAGS
+      CFLAGS_save="${CFLAGS}"
+      LDFLAGS_save="${LDFLAGS}"
       CFLAGS="${CFLAGS_familiar} ${CFLAGS_gpe}"
       LDFLAGS="${LDFLAGS_familiar} ${LDFLAGS_gpe}"
       CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_familiar} ${CFLAGS_gpe}"
@@ -2641,9 +2641,9 @@ then
       AC_CHECK_HEADERS(gpe/init.h, ,
         [ ac_cv_gpe_headers=no
           AC_MSG_ERROR([Cannot find development headers for libgpewidget...]) ])
-      CFLAGS=$CFLAGS_save
-      LDFLAGS=$LDFLAG_save
-      if test "x${ac_cv_gpe_headers}" = "xyes"
+      CFLAGS="${CFLAGS_save}"
+      LDFLAGS="${LDFLAG_save}"
+      if test "${ac_cv_gpe_headers}" = "yes"
       then
         CFLAGS_familiar="${CFLAGS_familiar} ${CFLAGS_gpe}"
         LDFLAGS_familiar="${LDFLAGS_familiar} ${LDFLAGS_gpe}"
@@ -2659,7 +2659,7 @@ dnl  Gnome module
 dnl
 AC_ARG_ENABLE(gnome,
   [  --enable-gnome          Gnome interface support (default disabled)],
-  [if test "x${enable_gnome}" = "xyes"; then
+  [if test "${enable_gnome}" = "yes"; then
     # look for gnome-config
     AC_PATH_PROG(GNOME_CONFIG, gnome-config, no)
     if test -x ${GNOME_CONFIG}
@@ -2693,13 +2693,13 @@ dnl  Gnome2 module
 dnl
 AC_ARG_ENABLE(gnome2,
   [  --enable-gnome2         Gnome2 support (default disabled)])
-if test "x${enable_gnome2}" = "xyes"
+if test "${enable_gnome2}" = "yes"
 then
   PKG_CHECK_MODULES(GNOME2, [libgnomeui-2.0])
   CFLAGS_gnome2="${CFLAGS_gnome2} ${GNOME2_CFLAGS}"
   LDFLAGS_gnome2="${LDFLAGS_gnome2} ${GNOME2_LIBS}"
   PLUGINS="${PLUGINS} gnome2"
-  if test "x${SYS}" != "xmingw32"; then
+  if test "${SYS}" != "mingw32"; then
     NEED_GNOME2_MAIN=yes
   fi
 fi
@@ -2709,18 +2709,18 @@ dnl  wxWindows module
 dnl
 AC_ARG_ENABLE(wxwindows,
   [  --enable-wxwindows      wxWindows support (default enabled)])
-if test "x${enable_wxwindows}" != "xno"
+if test "${enable_wxwindows}" != "no"
 then
   WXWINDOWS_PATH="${PATH}"
   AC_ARG_WITH(wx-config-path,
     [    --with-wx-config-path=PATH wx-config path (default search in \$PATH)],
-    [ if test "x${with_wx_config_path}" != "xno"
+    [ if test "${with_wx_config_path}" != "no"
       then
         WXWINDOWS_PATH="${with_wx_config_path}:${PATH}"
       fi ])
   # look for wx-config
   AC_PATH_PROG(WX_CONFIG, wx-config, no, ${WXWINDOWS_PATH})
-  if test "x${WX_CONFIG}" != "xno"
+  if test "${WX_CONFIG}" != "no"
   then
     if expr 2.3.0 \> `${WX_CONFIG} --version` >/dev/null
     then
@@ -2735,7 +2735,7 @@ then
       ac_cv_wx_headers=no
       echo "Cannot find wxWindows development headers."
     ])
-    if test "x${ac_cv_wx_headers}" = "xyes"
+    if test "${ac_cv_wx_headers}" = "yes"
     then
       PLUGINS="${PLUGINS} wxwindows"
       ALIASES="${ALIASES} wxvlc"
@@ -2749,7 +2749,7 @@ dnl  Qt module
 dnl
 AC_ARG_ENABLE(qt,
   [  --enable-qt             Qt interface support (default disabled)],
-  [if test "x${enable_qt}" = "xyes"; then
+  [if test "${enable_qt}" = "yes"; then
      PLUGINS="${PLUGINS} qt"
      ALIASES="${ALIASES} qvlc"
      LDFLAGS_qt="${LDFLAGS_qt} -L${QTDIR}/lib"
@@ -2776,7 +2776,7 @@ dnl  KDE module
 dnl
 AC_ARG_ENABLE(kde,
   [  --enable-kde            KDE interface support (default disabled)],
-  [if test "x${enable_kde}" = "xyes"; then
+  [if test "${enable_kde}" = "yes"; then
      PLUGINS="${PLUGINS} kde"
      ALIASES="${ALIASES} kvlc"
      LDFLAGS_kde="${LDFLAGS_kde} -L${KDEDIR}/lib"
@@ -2809,10 +2809,10 @@ dnl  Opie QT embedded module
 dnl
 AC_ARG_ENABLE(opie,
   [  --enable-opie           Qt embedded interface support (default disabled)],
-  [if test "x${enable_opie}" = "xyes"; then
+  [if test "${enable_opie}" = "yes"; then
      AC_ARG_WITH(qte,
      [    --with-qte=PATH       Qt Embedded headers and libraries])
-     if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
+     if test "${with_qte}" != "no" -a "${with_qte}" != ""
      then
        LDFLAGS_qte="-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte"
        CPPFLAGS_qte="-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
@@ -2830,7 +2830,7 @@ AC_ARG_ENABLE(opie,
      NEED_QTE_MAIN=yes
      LDFLAGS_opie="${LDFLAGS_opie} -lqpe ${LDFLAGS_qte}"
      CPPFLAGS_opie="${CPPFLAGS_opie} ${CPPFLAGS_qte}"
-     if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
+     if test "${with_qte}" != "no" -a "${with_qte}" != ""
      then
        MOC=${with_qte}/bin/moc
      else
@@ -2843,7 +2843,7 @@ dnl  MacOS X module
 dnl
 AC_ARG_ENABLE(macosx,
   [  --enable-macosx         MacOS X support (default enabled on MacOS X)],
-  [if test "x${enable_macosx}" = "xyes"
+  [if test "${enable_macosx}" = "yes"
    then
      BUILTINS="${BUILTINS} macosx"
      LDFLAGS_macosx="${LDFLAGS_macosx} -framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC"
@@ -2858,7 +2858,7 @@ dnl  QNX RTOS module
 dnl
 AC_ARG_ENABLE(qnx,
   [  --enable-qnx            QNX RTOS support (default enabled on QNX RTOS)])
-    if test "x${enable_qnx}" != "xno"
+    if test "${enable_qnx}" != "no"
     then
       AC_CHECK_HEADERS(Ph.h, [
         PLUGINS="${PLUGINS} qnx"
@@ -2871,7 +2871,7 @@ dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
   [  --enable-ncurses        ncurses interface support (default disabled)],
-  [if test "x${enable_ncurses}" = "xyes"; then
+  [if test "${enable_ncurses}" = "yes"; then
      PLUGINS="${PLUGINS} ncurses"
      LDFLAGS_ncurses="${LDFLAGS_ncurses} -lncurses"
    fi])
@@ -2881,7 +2881,7 @@ dnl  XOSD plugin
 dnl
 AC_ARG_ENABLE(xosd,
   [  --enable-xosd           xosd interface support (default disabled)])
-if test "x${enable_xosd}" = "xyes"
+if test "${enable_xosd}" = "yes"
 then
   AC_CHECK_HEADER(xosd.h, have_xosd="true", have_xosd="false")
   AC_CHECK_LIB(xosd,xosd_set_offset,
@@ -2891,7 +2891,7 @@ then
       AC_TRY_COMPILE([#include <xosd.h>],
          [void foo() { xosd_init("foo","bar",12,XOSD_top,2,12,42); }],,
           AC_DEFINE(HAVE_XOSD_VERSION_0, 1, Define if <xosd.h> is pre-1.0.0))))
-  if test "x${have_xosd}" = "xtrue"
+  if test "${have_xosd}" = "true"
   then
     PLUGINS="${PLUGINS} xosd"
     LDFLAGS_xosd="${LDFLAGS_xosd} -lxosd"
@@ -2903,14 +2903,14 @@ dnl  SLP access plugin
 dnl
 AC_ARG_ENABLE(slp,
   [  --enable-slp            SLP service discovery support (default enabled)])
-if test "x${enable_slp}" != "xno"
+if test "${enable_slp}" != "no"
 then
   AC_ARG_WITH(slp,
   [    --with-slp=PATH       libslp headers and libraries])
-  if test "x${with_slp}" = x
+  if test "${with_slp}" = ""
   then
     AC_CHECK_HEADER(slp.h, have_slp="true", have_slp="false")
-    if test "x${have_slp}" = "xtrue"
+    if test "${have_slp}" = "true"
     then
       PLUGINS="${PLUGINS} slp"
       LDFLAGS_slp="-lslp ${LDFLAGS_slp}"
@@ -2937,10 +2937,10 @@ dnl  Lirc plugin
 dnl
 AC_ARG_ENABLE(lirc,
   [  --enable-lirc           lirc support (default disabled)])
-if test "x${enable_lirc}" = "xyes"
+if test "${enable_lirc}" = "yes"
 then
   AC_CHECK_HEADER(lirc/lirc_client.h, AC_CHECK_LIB(lirc_client, lirc_init, have_lirc="true", have_lirc="false"),have_lirc="false")
-  if test "x${have_lirc}" = "xtrue"
+  if test "${have_lirc}" = "true"
   then
     PLUGINS="${PLUGINS} lirc"
     LDFLAGS_lirc="${LDFLAGS_lirc} -llirc_client"
@@ -2957,11 +2957,11 @@ dnl  --with-words=big or --with-words=little ; otherwise, try to guess
 dnl
 AC_ARG_WITH(words,
   [  --with-words=endianness set endianness (big or little)])
-  case "x${with_words}" in
-    xbig)
+  case "${with_words}" in
+    big)
       ac_cv_c_bigendian=yes
       ;;
-    xlittle)
+    little)
       ac_cv_c_bigendian=no
       ;;
     *)
@@ -2996,7 +2996,7 @@ EOF
           fi
         fi
       ])
-      if test "x${ac_cv_c_bigendian}" = "xunknown"
+      if test "${ac_cv_c_bigendian}" = "unknown"
       then
         AC_MSG_ERROR([Could not guess endianness, please use --with-words])
       fi
@@ -3014,12 +3014,12 @@ dnl
 mozilla=false
 AC_ARG_ENABLE(mozilla,
   [  --enable-mozilla        build a vlc-based Mozilla plugin (default disabled)])
-if test "x${enable_mozilla}" = "xyes"
+if test "${enable_mozilla}" = "yes"
 then
   AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
-  if test "x${MOZILLA_CONFIG}" != "xno"
+  if test "${MOZILLA_CONFIG}" != "no"
   then
-    if test "x${SYS}" != "xmingw32"; then
+    if test "${SYS}" != "mingw32"; then
       LDFLAGS="${LDFLAGS_save} -L${x_libraries}"
       AC_CHECK_LIB(Xt,XtStrings,[
         LDFLAGS_mozilla="${LDFLAGS_mozilla} -L${x_libraries} -lXt"
@@ -3032,7 +3032,7 @@ then
     #[CPPFLAGS_mozilla="${CPPFLAGS_mozilla} `${MOZILLA_CONFIG} --cflags plugin xpcom java --defines | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`"]
     LDFLAGS_mozilla="${LDFLAGS_mozilla} `${MOZILLA_CONFIG} --libs plugin xpcom`"
     dnl Not necessarily in ${PATH}
-    if test "x${XPIDL}" = "x" -o ! -x "${XPIDL}"
+    if test "${XPIDL}" = "" -o ! -x "${XPIDL}"
     then
       XPIDL="/usr/lib/mozilla/xpidl"
     fi
@@ -3045,7 +3045,7 @@ dnl  test plugins
 dnl
 AC_ARG_ENABLE(testsuite,
   [  --enable-testsuite      build test modules (default disabled)])
-if test "x${enable_testsuite}" = "xyes"
+if test "${enable_testsuite}" = "yes"
 then
   TESTS="test1 test2 test3 test4"
 
@@ -3062,7 +3062,7 @@ fi
 dnl
 dnl  gtk_main plugin
 dnl
-if test "x${NEED_GTK_MAIN}" != "xno"
+if test "${NEED_GTK_MAIN}" != "no"
 then
     PLUGINS="${PLUGINS} gtk_main"
     CFLAGS_gtk="${CFLAGS_gtk} -DNEED_GTK_MAIN"
@@ -3071,14 +3071,14 @@ then
     LDFLAGS_gtk_main="${LDFLAGS_gtk_main} ${LDFLAGS_gtk} ${LDFLAGS_familiar}"
 fi
 
-if test "x${NEED_GNOME_MAIN}" != "xno"
+if test "${NEED_GNOME_MAIN}" != "no"
 then
     PLUGINS="${PLUGINS} gnome_main"
     CFLAGS_gnome_main="${CFLAGS_gnome_main} ${CFLAGS_gtk} ${CFLAGS_familiar} ${CFLAGS_gnome}"
     LDFLAGS_gnome_main="${LDFLAGS_gnome_main} ${LDFLAGS_gtk} ${LDFLAGS_familiar} ${LDFLAGS_gnome}"
 fi
 
-if test "x${NEED_GTK2_MAIN}" != "xno"
+if test "${NEED_GTK2_MAIN}" != "no"
 then
     PLUGINS="${PLUGINS} gtk2_main"
     CFLAGS_gtk2="${CFLAGS_gtk2} -DNEED_GTK2_MAIN"
@@ -3086,7 +3086,7 @@ then
     LDFLAGS_gtk2_main="${LDFLAGS_gtk2_main} ${LDFLAGS_gtk2}"
 fi
 
-if test "x${NEED_GNOME2_MAIN}" != "xno"
+if test "${NEED_GNOME2_MAIN}" != "no"
 then
     PLUGINS="${PLUGINS} gnome2_main"
     CFLAGS_gnome2_main="${CFLAGS_gnome2_main} ${CFLAGS_gtk2} ${CFLAGS_gnome2}"
@@ -3096,7 +3096,7 @@ fi
 dnl
 dnl  qte_main plugin
 dnl
-if test "x${NEED_QTE_MAIN}" != "xno"
+if test "${NEED_QTE_MAIN}" != "no"
 then
     PLUGINS="${PLUGINS} qte_main"
     CPPFLAGS_qte="${CPPFLAGS_qte} -DNEED_QTE_MAIN"
@@ -3116,7 +3116,7 @@ plugin_support=:
 dnl Support for plugins - this must be AT THE END
 AC_ARG_ENABLE(plugins,
   [  --disable-plugins       make all plugins built-in (default plugins enabled)],
-  [if test "x${enable_plugins}" = "xno"
+  [if test "${enable_plugins}" = "no"
    then
      plugin_support=false
    fi])
@@ -3124,7 +3124,7 @@ AC_ARG_ENABLE(plugins,
 dnl Automagically disable plugins if there is no system support for
 dnl dynamically loadable files (.so, .dll, .dylib).
 dnl don't forget vlc-win32 still can load .dll as plugins
-if test "x${ac_cv_header_dlfcn_h}" = "xno" -a "x${ac_cv_header_image_h}" = "xno" -a "x${SYS}" != "xmingw32"
+if test "${ac_cv_header_dlfcn_h}" = "no" -a "${ac_cv_header_image_h}" = "no" -a "${SYS}" != "mingw32"
 then
   echo "*** Your system doesn't have plugin support. All plugins will be built"
   echo "statically."
@@ -3136,7 +3136,7 @@ if ${plugin_support}
 then
   for plugin in `echo ${PLUGINS}`
   do
-    eval "${plugin}_plugin=yes"
+    eval "${plugin}_p=yes"
   done
 else
   BUILTINS="${BUILTINS} ${PLUGINS}"
@@ -3149,10 +3149,13 @@ then
   builtin_support=:
   for builtin in `echo ${BUILTINS}`
   do
-    eval "${builtin}_builtin=yes"
+    eval "${builtin}_b=yes"
   done
 fi]
 AM_CONDITIONAL(HAVE_BUILTINS, ${builtin_support})
+
+dnl Import substitution variables generated by bootstrap
+VLC_VARIABLES()
 
 dnl
 dnl  Stuff used by the program
@@ -3185,11 +3188,6 @@ dnl  Fool automake (see Makefile.am)
 dnl
 AUTOMAKE_SUCKS="\$(L_builtin) \$(LDFLAGS_builtin)"
 AC_SUBST(AUTOMAKE_SUCKS)
-
-dnl
-dnl  Import substitution variables generated by bootstrap
-dnl
-VLC_VARIABLES
 
 dnl
 dnl  Create the vlc-config script
@@ -3258,11 +3256,11 @@ vlc version           : ${VERSION}
 system                : ${SYS}
 architecture          : ${ARCH}
 build flavour         : "
-test "x${DEBUG_TRUE}" = "x" && printf "debug "
-test "x${CPROF_TRUE}" = "x" && printf "cprof "
-test "x${GPROF_TRUE}" = "x" && printf "gprof "
-test "x${OPTIM_TRUE}" = "x" && printf "optim "
-test "x${RELEASE_TRUE}" = "x" && printf "release " || printf "devel "
+test "${DEBUG_TRUE}" = "" && printf "debug "
+test "${CPROF_TRUE}" = "" && printf "cprof "
+test "${GPROF_TRUE}" = "" && printf "gprof "
+test "${OPTIM_TRUE}" = "" && printf "optim "
+test "${RELEASE_TRUE}" = "" && printf "release " || printf "devel "
 echo "
 vlc aliases           :${ALIASES}
 

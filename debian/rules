@@ -41,6 +41,9 @@ CONFIG_FLAGS += \
 	--enable-wxwindows \
 	--enable-slp \
 	--enable-flac \
+	--enable-skins \
+	--disable-basic-skins \
+	--disable-freetype \
 	$(NULL)
 
 # These ones are currently shipped with VLC

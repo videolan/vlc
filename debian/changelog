@@ -211,6 +211,12 @@ vlc (0.2.91-1) unstable; urgency=low
 
  -- Samuel Hocevar <sam@zoy.org>  Mon, 12 Nov 2001 17:14:29 +0100
 
+vlc (0.2.90-3) unstable; urgency=low
+
+  * Added stricter Build-Depends on libsdl1.2-dev (Closes: #117180).
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri, 26 Oct 2001 16:06:01 +0200
+
 vlc (0.2.90-2) unstable; urgency=low
 
   * Various upstream bugfixes.
@@ -335,7 +341,7 @@ vlc (0.2.60-1) unstable; urgency=low
 
  -- Samuel Hocevar <sam@zoy.org>  Wed, 14 Feb 2001 08:33:46 +0100
 
-vlc (0.2.50-1) unstable; urgency=low
+vlc (0.2.50nocss-1) unstable; urgency=low
 
   * Only build vlc-glide under x86 (Closes: #84046).
   * Switched PentiumPro optimization off (Closes: #83707).
