@@ -2,7 +2,7 @@
  * output.h: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.h,v 1.3 2003/07/27 23:05:41 hartman Exp $
+ * $Id: output.h,v 1.4 2003/11/06 18:35:19 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -38,6 +38,7 @@
     IBOutlet id o_display;
     IBOutlet id o_method;
     IBOutlet id o_file_field;
+    IBOutlet id o_dump_chkbox;
     IBOutlet id o_btn_browse;
     IBOutlet id o_stream_address;
     IBOutlet id o_stream_address_lbl;
@@ -67,7 +68,9 @@
     
     IBOutlet id o_misc_lbl;
     IBOutlet id o_sap_chkbox;
-    IBOutlet id o_sap_name;
+    IBOutlet id o_slp_chkbox;
+    IBOutlet id o_channel_name;
+    IBOutlet id o_channel_name_lbl;
     
     NSString *o_mrl;
     NSString *o_transcode;
@@ -88,5 +91,5 @@
 - (IBAction)outputFileBrowse:(id)sender;
 - (void)transcodeChanged:(NSNotification *)o_notification;
 - (void)transcodeInfoChanged:(NSNotification *)o_notification;
-- (IBAction)sapChanged:(id)sender;
+- (IBAction)announceChanged:(id)sender;
 @end

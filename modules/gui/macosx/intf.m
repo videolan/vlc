@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.98 2003/11/03 15:27:28 hartman Exp $
+ * $Id: intf.m,v 1.99 2003/11/06 18:35:19 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -376,8 +376,8 @@ int CocoaConvertKey( unichar i_key )
     [o_mi_quit setTitle: _NS("Quit VLC")];
 
     [o_mu_file setTitle: _ANS("1:File")];
-    [o_mi_open_generic setTitle: _NS("Open...")];
-    [o_mi_open_file setTitle: _NS("Open File...")];
+    [o_mi_open_generic setTitle: _NS("Open File...")];
+    [o_mi_open_file setTitle: _NS("Quick Open File...")];
     [o_mi_open_disc setTitle: _NS("Open Disc...")];
     [o_mi_open_net setTitle: _NS("Open Network...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];

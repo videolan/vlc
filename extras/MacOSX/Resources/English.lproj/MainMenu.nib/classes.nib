@@ -258,13 +258,13 @@
         }, 
         {
             ACTIONS = {
+                announceChanged = id; 
                 outputChanged = id; 
                 outputCloseSheet = id; 
                 outputFileBrowse = id; 
                 outputInfoChanged = id; 
                 outputMethodChanged = id; 
                 outputSettings = id; 
-                sapChanged = id; 
                 streamPortStepperChanged = id; 
                 streamTTLStepperChanged = id; 
                 transcodeChanged = id; 
@@ -275,7 +275,10 @@
             OUTLETS = {
                 "o_btn_browse" = id; 
                 "o_btn_ok" = id; 
+                "o_channel_name" = id; 
+                "o_channel_name_lbl" = id; 
                 "o_display" = id; 
+                "o_dump_chkbox" = id; 
                 "o_file_field" = id; 
                 "o_method" = id; 
                 "o_misc_lbl" = id; 
@@ -287,7 +290,7 @@
                 "o_output_settings" = id; 
                 "o_output_sheet" = id; 
                 "o_sap_chkbox" = id; 
-                "o_sap_name" = id; 
+                "o_slp_chkbox" = id; 
                 "o_stream_address" = id; 
                 "o_stream_address_lbl" = id; 
                 "o_stream_port" = id; 

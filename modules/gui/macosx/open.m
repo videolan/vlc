@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.40 2003/10/31 15:54:53 hartman Exp $
+ * $Id: open.m,v 1.41 2003/11/06 18:35:19 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -245,7 +245,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         }
         if( [o_output_ckbox state] == NSOnState )
         {
-            [o_options addObject: [NSString stringWithFormat: @"sout=%@", [(VLCOutput *)o_sout_options getMRL]]];
+            [o_options addObject: [NSString stringWithString: [(VLCOutput *)o_sout_options getMRL]]];
         }
         [o_dic setObject: (NSArray *)[o_options copy] forKey: @"ITEM_OPTIONS"];
         [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:NO];
