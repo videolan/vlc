@@ -1074,6 +1074,13 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name,
                 media->i_index = 0;
             }
 
+            if( media->item.psz_uri )
+            {
+                free( media->item.psz_uri );
+                media->item.psz_uri =NULL;
+            }
+            media->item.psz_uri = strdup( media->input[media->i_index] );
+
             /* FIXME!!! we need an input_item_t per input spawned */
             //input_ItemNew( &media->item );
             if( media->psz_output != NULL )
