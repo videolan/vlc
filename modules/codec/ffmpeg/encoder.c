@@ -147,7 +147,7 @@ struct encoder_sys_t
 };
 
 static const char *ppsz_enc_options[] = {
-    "keyint", "bframes", "vt", "qmin", "qmax", "hq", "strict_rc",
+    "keyint", "bframes", "vt", "qmin", "qmax", "hq", "strict-rc",
     "rc-buffer-size", "rc-buffer-aggressivity", "pre-me", "hurry-up",
     "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", "qscale", "strict", NULL
