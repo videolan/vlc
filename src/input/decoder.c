@@ -674,8 +674,6 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
  */
 static void DeleteDecoder( decoder_t * p_dec )
 {
-    vlc_object_detach( p_dec );
-
     msg_Dbg( p_dec, "killing decoder fourcc `%4.4s', %d PES in FIFO",
              (char*)&p_dec->fmt_in.i_codec,
              p_dec->p_owner->p_fifo->i_depth );
@@ -684,7 +682,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     block_FifoEmpty( p_dec->p_owner->p_fifo );
     block_FifoRelease( p_dec->p_owner->p_fifo );
 
-   /* Cleanup */
+    /* Cleanup */
     if( p_dec->p_owner->p_aout_input )
         aout_DecDelete( p_dec->p_owner->p_aout, p_dec->p_owner->p_aout_input );
 
@@ -738,6 +736,8 @@ static void DeleteDecoder( decoder_t * p_dec )
         vlc_object_detach( p_dec->p_owner->p_packetizer );
         vlc_object_destroy( p_dec->p_owner->p_packetizer );
     }
+
+    vlc_object_detach( p_dec );
 
     free( p_dec->p_owner );
 }

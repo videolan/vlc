@@ -297,6 +297,13 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     vlc_mutex_init( p_vout, &p_vout->subpicture_lock );
     vlc_mutex_init( p_vout, &p_vout->change_lock );
 
+    /* Mouse coordinates */
+    var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
+    var_Create( p_vout, "mouse-y", VLC_VAR_INTEGER );
+    var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
+    var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
+    var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
+
     /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach( p_vout, p_parent );
 
