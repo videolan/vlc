@@ -1,13 +1,14 @@
 #!/bin/sh
 
 SRC="${HOME}/src"
+ROKU="${HOME}/src/roku-dev"
 
 # do it.
 make distclean
 ./bootstrap
 CC=mipsel-linux-gcc CXX=mipsel-linux-g++ AR=mipsel-linux-ar LD=mipsel-linux-ld RANLIB=mipsel-linux-ranlib STRIP=mipsel-linux-strip \
  ./configure --host=mipsel --enable-release --enable-static --enable-shared --enable-plugins \
-  --prefix=${HOME}/src/roku-dev/usr \
+  --prefix=${ROKU}/usr \
   --disable-sdl \
   --enable-mad \
   --disable-libmpeg2 --with-libmpeg2-tree=${SRC}/mpeg2dec-0.4.0 \
@@ -51,8 +52,9 @@ CC=mipsel-linux-gcc CXX=mipsel-linux-g++ AR=mipsel-linux-ar LD=mipsel-linux-ld R
   --enable-oss --disable-alsa \
   --disable-visual --disable-goom \
   --enable-hd1000a --disable-hd1000v \
-  CFLAGS="-I${HOME}/src/roku-dev/usr/include -I${HOME}/src/roku-dev/usr/local/include/roku" \
+  CFLAGS="-I${ROKU}/usr/include -I${ROKU}/usr/local/include/roku" \
   CXXFLAGS="-I/usr/tools/roku/include" \
-  CPPFLAGS="-I${HOME}/src/roku-dev/usr/local/include" \
-  LDFLAGS="-L/usr/tools/roku/mipsel-linux/lib -L${HOME}/src/roku-dev/lib -L${HOME}/src/roku-dev/usr/local/lib -Wl,-rpath-link -Wl,${HOME}/src/roku-dev/usr/local/lib -lm" && \
-  make
+  CPPFLAGS="-I${ROKU}/usr/local/include" \
+  LDFLAGS="-L/usr/tools/roku/mipsel-linux/lib -L${ROKU}/lib -L${ROKU}/usr/local/lib -Wl,-rpath-link -Wl,${ROKU}/usr/local/lib" && \
+  make &&
+  ${STRIP} -s vlc

@@ -709,11 +709,19 @@ if test "${ac_cv_c_pipe}" != "no"; then
 fi
 
 dnl Check for various optimization flags
+AC_CACHE_CHECK([if \$CC accepts -Os],
+    [ac_cv_c_os],
+    [CFLAGS="${CFLAGS_save} -Os"
+     AC_TRY_COMPILE([],,ac_cv_c_os=yes, ac_cv_c_os=no)])
+if test "${ac_cv_c_os}" != "no" -a "${target_cpu}" = "mipsel"; then
+    CFLAGS_OPTIM="${CFLAGS_OPTIM} -Os"
+fi
+
 AC_CACHE_CHECK([if \$CC accepts -O3],
     [ac_cv_c_o3],
     [CFLAGS="${CFLAGS_save} -O3"
      AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
-if test "${ac_cv_c_o3}" != "no"; then
+if test "${ac_cv_c_o3}" != "no" -a "${target_cpu}" != "mipsel"; then
     CFLAGS_OPTIM="${CFLAGS_OPTIM} -O3"
 fi
 
@@ -721,17 +729,17 @@ AC_CACHE_CHECK([if \$CC accepts -O2],
     [ac_cv_c_o2],
     [CFLAGS="${CFLAGS_save} -O2"
      AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
-if test "${ac_cv_c_o2}" != "no"; then
+if test "${ac_cv_c_o2}" != "no" -a "${target_cpu}" != "mipsel"; then
     if test "${ac_cv_c_o3}" = "no"; then
         CFLAGS_OPTIM="${CFLAGS_OPTIM} -O2"
     fi
     CFLAGS_NOOPTIM="${CFLAGS_NOOPTIM} -O2"
-else
+else 
     AC_CACHE_CHECK([if \$CC accepts -O],
         [ac_cv_c_o],
         [CFLAGS="${CFLAGS_save} -O"
          AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
-    if test "${ac_cv_c_o}" != "no"; then
+    if test "${ac_cv_c_o}" != "no" -a "${target_cpu}" != "mipsel"; then
         if test "${ac_cv_c_o3}" = "no"; then
             CFLAGS_OPTIM="${CFLAGS_OPTIM} -O"
 	fi
