@@ -2,7 +2,7 @@
  * mpeg4audio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.3 2003/03/11 19:02:31 fenrir Exp $
+ * $Id: mpeg4audio.c,v 1.4 2003/03/31 03:46:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -62,8 +62,8 @@ typedef struct packetizer_thread_s
     sout_packetizer_input_t *p_sout_input;
     sout_packet_format_t    output_format;
 
-    mtime_t                 i_pts_start;
-    mtime_t                 i_pts;
+//    mtime_t                 i_pts_start;
+    mtime_t                 i_last_pts;
 
     WAVEFORMATEX            *p_wf;
 
@@ -233,19 +233,18 @@ static int InitThread( packetizer_thread_t *p_pack )
 
     }
 
-    p_pack->p_sout_input = 
+    p_pack->p_sout_input =
         sout_InputNew( p_pack->p_fifo,
                        &p_pack->output_format );
 
     if( !p_pack->p_sout_input )
     {
-        msg_Err( p_pack->p_fifo, 
+        msg_Err( p_pack->p_fifo,
                  "cannot add a new stream" );
         return( -1 );
     }
 
-    p_pack->i_pts_start = -1;
-    p_pack->i_pts = 0;
+    p_pack->i_last_pts = 0;
     return( 0 );
 }
 
@@ -256,7 +255,8 @@ static void PacketizeThreadMPEG4( packetizer_thread_t *p_pack )
 {
     sout_buffer_t   *p_sout_buffer;
     pes_packet_t    *p_pes;
-    ssize_t          i_size;
+    ssize_t         i_size;
+    mtime_t         i_pts;
 
     /* **** get samples count **** */
     input_ExtractPES( p_pack->p_fifo, &p_pes );
@@ -273,6 +273,14 @@ static void PacketizeThreadMPEG4( packetizer_thread_t *p_pack )
     p_pack->i_pts = p_pes->i_pts - p_pack->i_pts_start;
 #endif
 
+    i_pts = p_pes->i_pts;
+
+    if( i_pts <= 0 && p_pack->i_last_pts <= 0 )
+    {
+        msg_Dbg( p_pack->p_fifo, "need a starting pts" );
+        input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
+        return;
+    }
     i_size = p_pes->i_pes_size;
 
     if( i_size > 0 )
@@ -285,6 +293,7 @@ static void PacketizeThreadMPEG4( packetizer_thread_t *p_pack )
         if( !p_sout_buffer )
         {
             p_pack->p_fifo->b_error = 1;
+            input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
             return;
         }
         /* TODO: memcpy of the pes packet */
@@ -305,15 +314,24 @@ static void PacketizeThreadMPEG4( packetizer_thread_t *p_pack )
             i_buffer += i_copy;
         }
 
-        p_sout_buffer->i_length = (mtime_t)1000000 * (mtime_t)p_pack->i_frame_size / (mtime_t)p_pack->i_sample_rate;
+        if( i_pts <= 0 )
+        {
+            i_pts = p_pack->i_last_pts +
+                        (mtime_t)1000000 *
+                        (mtime_t)p_pack->i_frame_size /
+                        (mtime_t)p_pack->i_sample_rate;
+        }
+        p_pack->i_last_pts = i_pts;
+
+        p_sout_buffer->i_length = (mtime_t)1000000 *
+                                  (mtime_t)p_pack->i_frame_size /
+                                  (mtime_t)p_pack->i_sample_rate;
         p_sout_buffer->i_bitrate = 0;
-        p_sout_buffer->i_dts = p_pack->i_pts;
-        p_sout_buffer->i_pts = p_pack->i_pts;
+        p_sout_buffer->i_dts = i_pts;
+        p_sout_buffer->i_pts = i_pts;
 
         sout_InputSendBuffer( p_pack->p_sout_input,
                                p_sout_buffer );
-
-        p_pack->i_pts += (mtime_t)1000000 * (mtime_t)p_pack->i_frame_size / (mtime_t)p_pack->i_sample_rate;
     }
 
     input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );

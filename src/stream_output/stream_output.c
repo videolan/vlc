@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.22 2003/03/17 23:42:12 fenrir Exp $
+ * $Id: stream_output.c,v 1.23 2003/03/31 03:46:11 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -681,9 +681,9 @@ static void MuxSendBuffer       ( sout_mux_t    *p_mux,
     if( p_mux->b_waiting_stream )
     {
         if( p_mux->i_add_stream_start > 0 &&
-            p_mux->i_add_stream_start + (mtime_t)1000000 < mdate() )
+            p_mux->i_add_stream_start + (mtime_t)1500000 < mdate() )
         {
-            /* more than 1 second, start muxing */
+            /* more than 1.5 second, start muxing */
             p_mux->b_waiting_stream = VLC_FALSE;
         }
         else

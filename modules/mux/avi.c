@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.10 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: avi.c,v 1.11 2003/03/31 03:46:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -106,6 +106,7 @@ typedef struct avi_stream_s
 
     char fcc[4];
 
+    //mtime_t i_first_pts;
     mtime_t i_duration;       // in µs
 
     int     i_frames;        // total frame count
@@ -138,6 +139,8 @@ typedef struct avi_idx1_s
 
 struct sout_mux_sys_t
 {
+    vlc_bool_t b_write_header;
+
     int i_streams;
     int i_stream_video;
 
@@ -156,7 +159,7 @@ static int Open( vlc_object_t *p_this )
 {
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    sout_buffer_t   *p_hdr;
+    //sout_buffer_t   *p_hdr;
 
     p_sys = malloc( sizeof( sout_mux_sys_t ) );
     p_sys->i_streams = 0;
@@ -166,6 +169,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->idx1.i_entry_count = 0;
     p_sys->idx1.i_entry_max = 10000;
     p_sys->idx1.entry = calloc( p_sys->idx1.i_entry_max, sizeof( avi_idx1_entry_t ) );
+    p_sys->b_write_header = VLC_TRUE;
 
     msg_Info( p_mux, "Open" );
 
@@ -176,10 +180,12 @@ static int Open( vlc_object_t *p_this )
     p_mux->p_sys        = p_sys;
     p_mux->i_preheader  = 8; // (fourcc,length) header
 
+#if 0
     /* room to add header at the end */
     p_hdr = sout_BufferNew( p_mux->p_sout, HDR_SIZE );
     memset( p_hdr->p_buffer, 0, HDR_SIZE );
     sout_AccessOutWrite( p_mux->p_access, p_hdr );
+#endif
 
     return VLC_SUCCESS;
 }
@@ -227,7 +233,8 @@ static void Close( vlc_object_t * p_this )
         }
         msg_Err( p_mux, "stream[%d] duration:%lld totalsize:%lld frames:%d fps:%f kb/s:%d",
                  i_stream,
-                 p_stream->i_duration/1000000, p_stream->i_totalsize,
+                 (int64_t)p_stream->i_duration / (int64_t)1000000,
+                 p_stream->i_totalsize,
                  p_stream->i_frames,
                  p_stream->f_fps, p_stream->i_bitrate/1024 );
     }
@@ -242,7 +249,7 @@ static int Capability( sout_mux_t *p_mux, int i_query, void *p_args, void *p_ans
    switch( i_query )
    {
         case SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME:
-            *(vlc_bool_t*)p_answer = VLC_TRUE;
+            *(vlc_bool_t*)p_answer = VLC_FALSE;
             return( SOUT_MUX_CAP_ERR_OK );
         default:
             return( SOUT_MUX_CAP_ERR_UNIMPLEMENTED );
@@ -316,8 +323,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             return( -1 );
     }
     p_stream->i_totalsize = 0;
-    p_stream->i_frames     = 0;
+    p_stream->i_frames    = 0;
     p_stream->i_duration  = 0;
+    //p_stream->i_first_pts = 0;
+
+    /* fixed later */
+    p_stream->f_fps = 25;
+    p_stream->i_bitrate = 128 * 1024;
+
 
     p_sys->i_streams++;
     return( 0 );
@@ -340,6 +353,18 @@ static int Mux      ( sout_mux_t *p_mux )
     int i_stream;
     int i;
 
+    if( p_sys->b_write_header )
+    {
+        sout_buffer_t *p_hdr;
+
+        msg_Dbg( p_mux, "writing header" );
+
+        p_hdr = avi_HeaderCreateRIFF( p_mux );
+        sout_AccessOutWrite( p_mux->p_access, p_hdr );
+
+        p_sys->b_write_header = VLC_FALSE;
+    }
+
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
         int i_count;
@@ -358,6 +383,11 @@ static int Mux      ( sout_mux_t *p_mux )
             p_data = sout_FifoGet( p_fifo );
 
             p_stream->i_frames++;
+            if( p_data->i_length < 0 )
+            {
+                msg_Warn( p_mux, "argg length < 0 l" );
+                p_data->i_length = 0;
+            }
             p_stream->i_duration  += p_data->i_length;
             p_stream->i_totalsize += p_data->i_size;
 
@@ -527,7 +557,7 @@ static int avi_HeaderAdd_avih( sout_mux_t *p_mux,
         p_video = &p_sys->stream[p_sys->i_stream_video];
         if( p_video->i_frames <= 0 )
         {
-            p_video = NULL;
+        //    p_video = NULL;
         }
     }
 
@@ -540,14 +570,14 @@ static int avi_HeaderAdd_avih( sout_mux_t *p_mux,
     }
     else
     {
-        msg_Warn( p_mux, "avi file without audio video track isn't a good idea..." );
+        msg_Warn( p_mux, "avi file without video track isn't a good idea..." );
         i_microsecperframe = 0;
         i_totalframes = 0;
     }
 
     for( i_stream = 0,i_maxbytespersec = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
-        if( p_sys->stream[p_sys->i_stream_video].i_duration > 0 )
+        if( p_sys->stream[i_stream].i_duration > 0 )
         {
             i_maxbytespersec +=
                 p_sys->stream[p_sys->i_stream_video].i_totalsize /

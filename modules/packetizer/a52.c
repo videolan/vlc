@@ -2,7 +2,7 @@
  * a52.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.2 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: a52.c,v 1.3 2003/03/31 03:46:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -49,6 +49,7 @@ typedef struct packetizer_s
 
     uint64_t                i_samplescount;
 
+    mtime_t                 i_last_pts;
 } packetizer_t;
 
 static int  Open    ( vlc_object_t * );
@@ -156,9 +157,10 @@ static int InitThread( packetizer_t *p_pack )
 
     p_pack->output_format.p_format = NULL;
 
-    p_pack->p_sout_input = NULL;
+    p_pack->p_sout_input   = NULL;
 
     p_pack->i_samplescount = 0;
+    p_pack->i_last_pts     = 0;
 
     if( InitBitstream( &p_pack->bit_stream, p_pack->p_fifo,
                        NULL, NULL ) != VLC_SUCCESS )
@@ -179,8 +181,9 @@ static void PacketizeThread( packetizer_t *p_pack )
 
 
     uint8_t p_header[7];
-    int i_channels, i_samplerate, i_bitrate;
-    int i_framelength;
+    int     i_channels, i_samplerate, i_bitrate;
+    int     i_framelength;
+    mtime_t i_pts;
 
     /* search a valid start code */
     for( ;; )
@@ -202,6 +205,9 @@ static void PacketizeThread( packetizer_t *p_pack )
         {
             return;
         }
+
+        /* Set the Presentation Time Stamp */
+        NextPTS( &p_pack->bit_stream, &i_pts, NULL );
 
         GetChunk( &p_pack->bit_stream, p_header, 7 );
         if( p_pack->p_fifo->b_die ) return;
@@ -254,6 +260,22 @@ static void PacketizeThread( packetizer_t *p_pack )
                  i_channels, i_samplerate, i_bitrate );
     }
 
+    if( i_pts <= 0 && p_pack->i_last_pts <= 0 )
+    {
+        msg_Dbg( p_pack->p_fifo, "need a starting pts" );
+        return;
+    }
+
+    /* fix pts */
+    if( i_pts <= 0 )
+    {
+        i_pts = p_pack->i_last_pts +
+                    (uint64_t)1000000 *
+                    (uint64_t)A52_FRAME_NB /
+                    (uint64_t)i_samplerate;
+    }
+    p_pack->i_last_pts = i_pts;
+
     p_sout_buffer =
         sout_BufferNew( p_pack->p_sout_input->p_sout, i_framelength );
     if( !p_sout_buffer )
@@ -265,10 +287,8 @@ static void PacketizeThread( packetizer_t *p_pack )
     p_sout_buffer->i_bitrate = i_bitrate;
 
     p_sout_buffer->i_pts =
-        p_sout_buffer->i_dts =
-            (uint64_t)1000000 *
-            (uint64_t)p_pack->i_samplescount /
-            (uint64_t)i_samplerate;
+        p_sout_buffer->i_dts = i_pts;
+
     p_sout_buffer->i_length =
             (uint64_t)1000000 *
             (uint64_t)A52_FRAME_NB /

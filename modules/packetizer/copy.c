@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.5 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: copy.c,v 1.6 2003/03/31 03:46:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -47,7 +47,7 @@ typedef struct packetizer_thread_s
     sout_packetizer_input_t *p_sout_input;
     sout_packet_format_t    output_format;
 
-    mtime_t i_pts_start;
+//    mtime_t i_last_pts;
 
 } packetizer_thread_t;
 
@@ -304,7 +304,7 @@ static int InitThread( packetizer_thread_t *p_pack )
         msg_Err( p_pack->p_fifo, "cannot add a new stream" );
         return( -1 );
     }
-    p_pack->i_pts_start = -1;
+//    p_pack->i_last_pts = 0;
     return( 0 );
 }
 
@@ -315,7 +315,8 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
 {
     sout_buffer_t   *p_sout_buffer;
     pes_packet_t    *p_pes;
-    ssize_t          i_size;
+    ssize_t         i_size;
+    mtime_t         i_pts;
 
     /* **** get samples count **** */
     input_ExtractPES( p_pack->p_fifo, &p_pes );
@@ -324,11 +325,17 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
         p_pack->p_fifo->b_error = 1;
         return;
     }
-    if( p_pack->i_pts_start < 0 && p_pes->i_pts > 0 )
+    i_pts = p_pes->i_pts;
+
+    if( i_pts <= 0 ) //&& p_pack->i_last_pts <= 0 )
     {
-        p_pack->i_pts_start = p_pes->i_pts;
+        msg_Err( p_pack->p_fifo, "need pts != 0" );
+        input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
+        return;
     }
+
     i_size = p_pes->i_pes_size;
+
 //    msg_Dbg( p_pack->p_fifo, "pes size:%d", i_size );
     if( i_size > 0 )
     {
@@ -336,11 +343,12 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
         data_packet_t   *p_data;
         ssize_t          i_buffer;
 
-        p_sout_buffer = 
+        p_sout_buffer =
             sout_BufferNew( p_pack->p_sout_input->p_sout, i_size );
         if( !p_sout_buffer )
         {
             p_pack->p_fifo->b_error = 1;
+            input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
             return;
         }
         /* TODO: memcpy of the pes packet */
@@ -350,7 +358,7 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
         {
             ssize_t i_copy;
 
-            i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, 
+            i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
                             i_size - i_buffer );
             if( i_copy > 0 )
             {
@@ -361,14 +369,14 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
             i_buffer += i_copy;
         }
         p_sout_buffer->i_length = 0;
-        p_sout_buffer->i_dts = p_pes->i_pts - p_pack->i_pts_start;
-        p_sout_buffer->i_pts = p_pes->i_pts - p_pack->i_pts_start;
+        p_sout_buffer->i_dts = i_pts; //p_pes->i_pts - p_pack->i_pts_start;
+        p_sout_buffer->i_pts = i_pts; //p_pes->i_pts - p_pack->i_pts_start;
         p_sout_buffer->i_bitrate = 0;
 
         input_ShowPES( p_pack->p_fifo, &p_pes_next );
         if( p_pes_next )
         {
-            p_sout_buffer->i_length = p_pes_next->i_pts - p_pes->i_pts;
+            p_sout_buffer->i_length = p_pes_next->i_pts - i_pts;
         }
         sout_InputSendBuffer( p_pack->p_sout_input,
                                p_sout_buffer );

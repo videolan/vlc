@@ -2,7 +2,7 @@
  * ogg.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.3 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: ogg.c,v 1.4 2003/03/31 03:46:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -123,9 +123,10 @@ typedef struct
 
 struct sout_mux_sys_t
 {
-    int b_write_header;
-    int i_streams;
+    int     b_write_header;
+    int     i_streams;
 
+    mtime_t i_start_dts;
 };
 
 #define SetWLE( p, v ) _SetWLE( (uint8_t*)p, v)
@@ -326,17 +327,20 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     /* flush all remaining data */
 
-    p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
-    if( p_og )
+    if( p_input->p_sys )
     {
-        OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
+        p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+        if( p_og )
+        {
+            OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
 
-        sout_AccessOutWrite( p_mux->p_access, p_og );
+            sout_AccessOutWrite( p_mux->p_access, p_og );
+        }
+
+        ogg_stream_clear( &p_stream->os );
+
+        FREE( p_input->p_sys );
     }
-
-    ogg_stream_clear( &p_stream->os );
-
-    FREE( p_input->p_sys );
     return( 0 );
 }
 
@@ -553,8 +557,12 @@ static int Mux      ( sout_mux_t *p_mux )
     {
         if( MuxGetStream( p_mux, &i_stream, &i_dts) < 0 )
         {
+            msg_Dbg( p_mux, "waiting data..." );
             return( VLC_SUCCESS );
         }
+        p_sys->i_start_dts = i_dts;
+
+        msg_Dbg( p_mux, "writing header" );
         sout_BufferChain( &p_og, OggCreateHeader( p_mux, i_dts ) );
         p_sys->b_write_header = VLC_FALSE;
     }
@@ -568,8 +576,10 @@ static int Mux      ( sout_mux_t *p_mux )
 
         if( MuxGetStream( p_mux, &i_stream, &i_dts) < 0 )
         {
+            //msg_Dbg( p_mux, "waiting data..." );
             return( VLC_SUCCESS );
         }
+        //msg_Dbg( p_mux, "doing job" );
 
         p_input  = p_mux->pp_inputs[i_stream];
         p_stream = (ogg_stream_t*)p_input->p_sys;
@@ -586,11 +596,12 @@ static int Mux      ( sout_mux_t *p_mux )
         if( p_stream->i_cat == AUDIO_ES )
         {
             /* number of sample from begining */
-            op.granulepos = i_dts * p_stream->header.i_samples_per_unit / (int64_t)1000000;
+            op.granulepos = ( i_dts - p_sys->i_start_dts ) *
+                                p_stream->header.i_samples_per_unit / (int64_t)1000000;
         }
         else if( p_stream->i_cat == VIDEO_ES )
         {
-            op.granulepos = i_dts/1000;//p_stream->i_packet_no;
+            op.granulepos = ( i_dts - p_sys->i_start_dts ) / 1000;//p_stream->i_packet_no;
         }
         op.packetno = p_stream->i_packet_no++;
         ogg_stream_packetin( &p_stream->os, &op );
@@ -598,13 +609,15 @@ static int Mux      ( sout_mux_t *p_mux )
         sout_BufferChain( &p_og,
                           OggStreamPageOut( p_mux,
                                             &p_stream->os,
-                                            p_data->i_pts ) );
+                                            p_data->i_dts ) );
 
         if( p_og )
         {
             OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
             p_stream->i_dts = -1;
-            p_stream->i_length = 0;;
+            p_stream->i_length = 0;
+
+            msg_Dbg( p_mux, "writing data..." );
             sout_AccessOutWrite( p_mux->p_access, p_og );
 
             p_og = NULL;
@@ -613,7 +626,7 @@ static int Mux      ( sout_mux_t *p_mux )
         {
             if( p_stream->i_dts < 0 )
             {
-                p_stream->i_dts     = p_data->i_dts;
+                p_stream->i_dts = p_data->i_dts;
             }
             p_stream->i_length += p_data->i_length;
         }

@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.8 2003/03/11 19:02:31 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.9 2003/03/31 03:46:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -48,7 +48,7 @@ typedef struct packetizer_thread_s
     sout_packetizer_input_t *p_sout_input;
     sout_packet_format_t    output_format;
 
-    mtime_t i_pts_start;
+    mtime_t                 i_last_pts;
 
     int                     i_vol;
     uint8_t                 *p_vol;
@@ -224,8 +224,9 @@ static int InitThread( packetizer_thread_t *p_pack )
         msg_Err( p_pack->p_fifo, "cannot add a new stream" );
         return( -1 );
     }
-    p_pack->i_pts_start = -1;
-    return( 0 );
+    p_pack->i_last_pts = 0;
+
+    return VLC_SUCCESS;
 }
 
 static int m4v_FindStartCode( uint8_t **pp_data, uint8_t *p_end )
@@ -247,7 +248,8 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
 {
     sout_buffer_t   *p_sout_buffer;
     pes_packet_t    *p_pes;
-    ssize_t          i_size;
+    ssize_t         i_size;
+    mtime_t         i_pts;
 
     /* **** get samples count **** */
     input_ExtractPES( p_pack->p_fifo, &p_pes );
@@ -256,9 +258,13 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
         p_pack->p_fifo->b_error = 1;
         return;
     }
-    if( p_pack->i_pts_start < 0 )
+
+    i_pts = p_pes->i_pts;
+    if( i_pts <= 0 && p_pack->i_last_pts <= 0 )
     {
-        p_pack->i_pts_start = p_pes->i_pts;
+        msg_Err( p_pack->p_fifo, "need a starting pts" );
+        input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
+        return;
     }
 
     i_size = p_pes->i_pes_size;
@@ -268,7 +274,7 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
         data_packet_t   *p_data;
         ssize_t          i_buffer;
 
-        p_sout_buffer = 
+        p_sout_buffer =
             sout_BufferNew( p_pack->p_sout_input->p_sout, i_size );
         if( !p_sout_buffer )
         {
@@ -292,9 +298,21 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
             }
             i_buffer += i_copy;
         }
-        p_sout_buffer->i_length = 0;
-        p_sout_buffer->i_dts = p_pes->i_pts - p_pack->i_pts_start;
-        p_sout_buffer->i_pts = p_pes->i_pts - p_pack->i_pts_start;
+
+        input_ShowPES( p_pack->p_fifo, &p_pes_next );
+        if( p_pes_next && p_pes_next->i_pts > 0 )
+        {
+            mtime_t i_gap;
+
+            i_gap = p_pes_next->i_pts - p_pes->i_pts;
+            p_sout_buffer->i_length = i_gap;
+        }
+        else
+        {
+            p_sout_buffer->i_length = 0;
+        }
+        p_sout_buffer->i_dts = i_pts;
+        p_sout_buffer->i_pts = i_pts;
         p_sout_buffer->i_bitrate = 0;
 
         if( p_pack->p_vol == NULL )
@@ -392,37 +410,6 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
             }
         }
 
-        input_ShowPES( p_pack->p_fifo, &p_pes_next );
-        if( p_pes_next )
-        {
-            mtime_t i_gap;
-
-            i_gap = p_pes_next->i_pts - p_pes->i_pts;
-#if 0
-            if( i_gap > 1000000 / 4 )  // too littl fps < 4 is no sense
-            {
-                i_gap = 1000000 / 25;
-                p_pack->i_pts_start =
-                    - ( p_pes->i_pts - p_pack->i_pts_start ) + p_pes_next->i_pts - i_gap;
-
-            }
-            else if( i_gap < 0 )
-            {
-                p_pack->i_pts_start =
-                    ( p_pes->i_pts - p_pack->i_pts_start ) + p_pes_next->i_pts;
-                i_gap = 0;
-            }
-            if( i_gap < 0 )
-            {
-                msg_Dbg( p_pack->p_fifo, "pts:%lld next_pts:%lld", p_pes->i_pts, p_pes_next->i_pts );
-                /* work around for seek */
-                p_pack->i_pts_start -= i_gap;
-            }
-
-//            msg_Dbg( p_pack->p_fifo, "gap %lld date %lld next diff %lld", i_gap, p_pes->i_pts,  p_pes_next->i_pts-p_pack->i_pts_start );
-#endif
-            p_sout_buffer->i_length = i_gap;
-        }
         sout_InputSendBuffer( p_pack->p_sout_input,
                                p_sout_buffer );
     }

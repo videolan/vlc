@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.10 2003/03/11 19:02:31 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.11 2003/03/31 03:46:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -210,9 +210,12 @@ static int CopyUntilNextStartCode( packetizer_t   *p_pack,
 static void PacketizeThread( packetizer_t *p_pack )
 {
     sout_buffer_t *p_sout_buffer = NULL;
-    int32_t i_pos;
-    int i_skipped;
-    mtime_t i_duration; /* of the parsed picture */
+    int32_t       i_pos;
+    int           i_skipped;
+    mtime_t       i_duration; /* of the parsed picture */
+
+    mtime_t       i_pts;
+    mtime_t       i_dts;
 
     /* needed to calculate pts/dts */
     int i_temporal_ref = 0;
@@ -319,6 +322,7 @@ static void PacketizeThread( packetizer_t *p_pack )
         if( !p_pack->p_sout_input )
         {
             msg_Err( p_pack->p_fifo, "cannot add a new stream" );
+            p_pack->p_fifo->b_error = VLC_TRUE;
             return;
         }
 
@@ -369,6 +373,8 @@ static void PacketizeThread( packetizer_t *p_pack )
             /* picture_start_code */
             GetChunk( &p_pack->bit_stream,
                       p_sout_buffer->p_buffer + i_pos, 4 ); i_pos += 4;
+
+            NextPTS( &p_pack->bit_stream, &i_pts, &i_dts );
             i_temporal_ref = ShowBits( &p_pack->bit_stream, 10 );
 
             CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
@@ -420,6 +426,26 @@ static void PacketizeThread( packetizer_t *p_pack )
     else
     {
         i_duration = (mtime_t)( 1000000 / p_pack->d_frame_rate / 2);
+    }
+
+    /* fix i_last_dts and i_last_ref_pts with i_dts and i_pts from stream */
+    if( i_dts <= 0 && p_pack->i_last_dts <= 0 )
+    {
+        msg_Dbg( p_pack->p_fifo, "need a starting pts" );
+        sout_BufferDelete( p_pack->p_sout_input->p_sout,
+                           p_sout_buffer );
+        return;
+    }
+
+    if( i_dts > 0 )
+    {
+        p_pack->i_last_dts = i_dts;
+    }
+    if( i_pts > 0 )
+    {
+        p_pack->i_last_ref_pts =
+            i_pts - i_temporal_ref *
+                    (mtime_t)( 1000000 / p_pack->d_frame_rate );
     }
 
     p_sout_buffer->i_dts = p_pack->i_last_dts;

@@ -2,7 +2,7 @@
  * mpegaudio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegaudio.c,v 1.4 2003/03/11 19:02:31 fenrir Exp $
+ * $Id: mpegaudio.c,v 1.5 2003/03/31 03:46:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -50,6 +50,7 @@ typedef struct packetizer_s
     uint64_t                i_samplescount;
     uint32_t                i_samplespersecond;
 
+    mtime_t                 i_last_pts;
 } packetizer_t;
 
 static int  Open    ( vlc_object_t * );
@@ -186,6 +187,7 @@ static int InitThread( packetizer_t *p_pack )
 
     p_pack->i_samplescount = 0;
     p_pack->i_samplespersecond = 0;
+    p_pack->i_last_pts = 0;
 
     if( InitBitstream( &p_pack->bit_stream, p_pack->p_fifo,
                        NULL, NULL ) != VLC_SUCCESS )
@@ -204,6 +206,7 @@ static void PacketizeThread( packetizer_t *p_pack )
 {
     sout_buffer_t   *p_sout_buffer;
     size_t          i_size;
+    mtime_t         i_pts;
 
     uint32_t        i_sync, i_header;
     int             i_version, i_layer;
@@ -232,6 +235,9 @@ static void PacketizeThread( packetizer_t *p_pack )
         {
             return;
         }
+
+        /* Set the Presentation Time Stamp */
+        NextPTS( &p_pack->bit_stream, &i_pts, NULL );
 
         i_sync      = GetBits( &p_pack->bit_stream, 12 );
         i_header    = ShowBits( &p_pack->bit_stream, 20 );
@@ -325,6 +331,20 @@ static void PacketizeThread( packetizer_t *p_pack )
                  i_bitrate, i_framelength );
     }
 
+    if( i_pts <= 0 && p_pack->i_last_pts <= 0 )
+    {
+        msg_Dbg( p_pack->p_fifo, "need a starting pts" );
+        return;
+    }
+    if( i_pts <= 0 )
+    {
+        i_pts = p_pack->i_last_pts +
+            (uint64_t)1000000 *
+            (uint64_t)i_samplesperframe /
+            (uint64_t)i_samplerate;
+    }
+    p_pack->i_last_pts = i_pts;
+
     i_size = __MAX( i_framelength, 4 );
 //    msg_Dbg( p_pack->p_fifo, "frame length %d b", i_size );
     p_sout_buffer =
@@ -341,11 +361,9 @@ static void PacketizeThread( packetizer_t *p_pack )
     p_sout_buffer->p_buffer[3] = ( i_header      )&0xff;
     p_sout_buffer->i_bitrate = i_bitrate;
 
-    p_sout_buffer->i_pts =
-        p_sout_buffer->i_dts =
-            (uint64_t)1000000 *
-            (uint64_t)p_pack->i_samplescount /
-            (uint64_t)i_samplerate;
+    p_sout_buffer->i_dts = i_pts;
+    p_sout_buffer->i_pts = i_pts;
+
     p_sout_buffer->i_length =
             (uint64_t)1000000 *
             (uint64_t)i_samplesperframe /
