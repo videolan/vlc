@@ -14,6 +14,7 @@ dist_pkgdata_DATA = \
 
 nobase_dist_pkgdata_DATA = \
 	$(DIST_skins) \
+	$(DIST_skins2) \
 	$(DIST_http) \
 	$(NULL)
 
@@ -130,6 +131,73 @@ DIST_skins = \
 	skins/default/stop1.bmp \
 	$(NULL)
 
+DIST_skins2 = \
+	skins2/default/FreeSansBold.ttf \
+	skins2/default/add_item.png \
+	skins2/default/add_item_onclick.png \
+	skins2/default/body.png \
+	skins2/default/close.png \
+	skins2/default/close_mouseover.png \
+	skins2/default/close_onclick.png \
+	skins2/default/delete_item.png \
+	skins2/default/delete_item_onclick.png \
+	skins2/default/disabled.png \
+	skins2/default/fast.png \
+	skins2/default/fast_disabled.png \
+	skins2/default/fast_onclick.png \
+	skins2/default/next.png \
+	skins2/default/next_disabled.png \
+	skins2/default/next_onclick.png \
+	skins2/default/pause.png \
+	skins2/default/pause_onclick.png \
+	skins2/default/play.png \
+	skins2/default/play_onclick.png \
+	skins2/default/playlist.png \
+	skins2/default/playlist_body1.png \
+	skins2/default/playlist_body2.png \
+	skins2/default/playlist_body3.png \
+	skins2/default/playlist_body4.png \
+	skins2/default/playlist_body6.png \
+	skins2/default/playlist_body7.png \
+	skins2/default/playlist_body8.png \
+	skins2/default/playlist_body9.png \
+	skins2/default/playlist_button.png \
+	skins2/default/playlist_button2.png \
+	skins2/default/playlist_button_onclick.png \
+	skins2/default/playlist_button_onclick2.png \
+	skins2/default/preferences.png \
+	skins2/default/preferences_onclick.png \
+	skins2/default/previous.png \
+	skins2/default/previous_disabled.png \
+	skins2/default/previous_onclick.png \
+	skins2/default/reduce.png \
+	skins2/default/reduce_disabled.png \
+	skins2/default/reduce_onclick.png \
+	skins2/default/resize.png \
+	skins2/default/rev.png \
+	skins2/default/rev_disabled.png \
+	skins2/default/rev_onclick.png \
+	skins2/default/skin.dtd \
+	skins2/default/slider.png \
+	skins2/default/slider2.png \
+	skins2/default/slider_onclick.png \
+	skins2/default/slider_playlist.png \
+	skins2/default/slider_volume.png \
+	skins2/default/slider_volume_onclick.png \
+	skins2/default/slow.png \
+	skins2/default/slow_disabled.png \
+	skins2/default/slow_onclick.png \
+	skins2/default/sort.png \
+	skins2/default/sort_onclick.png \
+	skins2/default/stop.png \
+	skins2/default/stop_disabled.png \
+	skins2/default/stop_onclick.png \
+	skins2/default/theme.xml \
+	skins2/default/volume.png \
+	\
+	skins2/fonts/FreeSans.ttf \
+	$(NULL)
+
 DIST_http = \
 	http/index.html \
 	http/info.html \
@@ -137,5 +205,8 @@ DIST_http = \
 	http/admin/browse.html \
 	http/admin/dboxfiles.html \
 	http/admin/.access \
+	http/vlm/edit.html \
+	http/vlm/index.html \
+	http/vlm/new.html \
 	http/style.css \
 	$(NULL)
