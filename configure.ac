@@ -1259,8 +1259,33 @@ dnl
 dnl TLS/SSL
 dnl
 AC_ARG_ENABLE(gnutls,
-  [  --enable-gnutls         gnutls TLS/SSL support (default disabled)])
-AS_IF([test "${enable_gnutls}" == "yes"], VLC_ADD_PLUGINS([gnutls]))
+  [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
+AS_IF([test "${enable_gnutls}" != "no"], [
+
+  gcrypt_LIBS="-lgpg-error"
+  AS_IF([test "${SYS}" = "mingw32"],
+    [gcrypt_LIBS="${gcrypt_LIBS} -lws2_32"
+     VLC_ADD_LDFLAGS([gnutls],[-lws2_32])]
+  )
+
+  gnutls_LIBS="-lgcrypt ${gcrypt_LIBS}"
+
+  AC_CHECK_HEADER(gcrypt.h,
+    [AC_CHECK_LIB(gcrypt, gcry_control,
+      [AC_CHECK_HEADER(gnutls/gnutls.h,
+        [AC_CHECK_LIB(gnutls, gnutls_deinit,
+	  [have_gnutls="yes"],, ${gnutls_LIBS})])],,
+     ${gcrypt_LIBS})])
+
+  AS_IF([test "${have_gnutls}" = "yes"], [
+    VLC_ADD_PLUGINS([gnutls])
+    VLC_ADD_LDFLAGS([gnutls], [-lgnutls -lgcrypt -lgpg-error])
+  ], [
+    AS_IF([test "${enable_gnutls}" = "yes"], [
+      AC_MSG_ERROR([gnutls/gcrypt TLS/SSL support cannot be compiled])]
+    )]
+  )]
+)
 
 
 dnl
@@ -3951,45 +3976,6 @@ fi
 AM_CONDITIONAL(ENABLE_CORBA, test "$enablecorba" = "true")
 
 AC_ARG_WITH(,[Misc options:])
-
-dnl
-dnl GnuTLS-based TLS/SSL support
-dnl
-AC_ARG_WITH(libgnutls-prefix,
-          [    --with-libgnutls-prefix=PREFIX set prefix where libgnutls is installed],
-          libgnutls_config_prefix="$withval", libgnutls_config_prefix="")
-
-AS_IF([test x$libgnutls_config_prefix != x],
-  AS_IF([test x${LIBGNUTLS_CONFIG+set} != xset],
-    LIBGNUTLS_CONFIG=$libgnutls_config_prefix/bin/libgnutls-config
-  )
-)
-
-if test "x$enable_gnutls" == "xyes"; then
-  AC_PATH_PROG(LIBGNUTLS_CONFIG, libgnutls-config, no)
-  no_libgnutls=""
-
-  AC_MSG_CHECKING(for libgnutls - version >= 1.0.0)
-  AS_IF([test "$LIBGNUTLS_CONFIG" = "no"],
-    no_libgnutls=yes
-    ,
-    LIBGNUTLS_CFLAGS=`$LIBGNUTLS_CONFIG $libgnutls_config_args --cflags`
-    LIBGNUTLS_LIBS=`$LIBGNUTLS_CONFIG $libgnutls_config_args --libs`
-    libgnutls_config_version=`$LIBGNUTLS_CONFIG $libgnutls_config_args --version`
-  )
-
-  AS_IF([test "x$no_libgnutls" = x],
-    AC_MSG_RESULT(yes)
-    VLC_ADD_CFLAGS([gnutls], [$LIBGNUTLS_CFLAGS])
-    VLC_ADD_LDFLAGS([gnutls], [$LIBGNUTLS_LIBS])
-    AC_DEFINE(HAVE_GNUTLS, 1, Define to 1 if you have libgnutls)
-    ,
-    AC_MSG_RESULT(no)
-    LIBGNUTLS_CFLAGS=""
-    LIBGNUTLS_LIBS=""
-    AC_MSG_ERROR(gnutls TLS/SSL support cannot be compiled)
-  )
-fi
 
 dnl
 dnl  Endianness check, AC_C_BIGENDIAN doesn't work if we are cross-compiling

@@ -640,17 +640,6 @@ Video Files( .avi, .mkv, .mov, .mpg, .m2v, etc)<br />
 Subtitle Files( .idx, .sub, .utf, .srt)<br />
 Status: Todo
 
-Task
-Difficulty: Medium
-Platform: win32
-Urgency: Wishlist
-Description: SSL support
-Support SSL/TLS encryption layer on Windows<br />
-We can't use OpenSSL because it is not GPL-compatible<br />
-and GnuTLS does not seem to compile on Windows<br />
-Might try to use Secure channels<br />
-Status: Todo
-
 
 # Do not remove me
 Task
