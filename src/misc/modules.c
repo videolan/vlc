@@ -224,7 +224,7 @@ void __module_ResetBank( vlc_object_t *p_this )
 void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next;
-    vlc_value_t  lockval;
+    vlc_value_t lockval;
 
     var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
     var_Get( p_this->p_libvlc, "libvlc", &lockval );
@@ -245,7 +245,21 @@ void __module_EndBank( vlc_object_t *p_this )
     var_Destroy( p_this->p_libvlc, "libvlc" );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-    if( p_this->p_libvlc->p_module_bank->b_cache ) CacheSave( p_this );
+#define p_bank p_this->p_libvlc->p_module_bank
+    if( p_bank->b_cache ) CacheSave( p_this );
+    while( p_bank->i_loaded_cache-- )
+    {
+        free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
+        free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
+        if( !p_bank->i_loaded_cache ) free( p_bank->pp_loaded_cache );
+    }
+    while( p_bank->i_cache-- )
+    {
+        free( p_bank->pp_cache[p_bank->i_cache]->psz_file );
+        free( p_bank->pp_cache[p_bank->i_cache] );
+        if( !p_bank->i_cache ) free( p_bank->pp_cache );
+    }
+#undef p_bank
 #endif
 
     vlc_object_detach( p_this->p_libvlc->p_module_bank );
@@ -1015,8 +1029,6 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
     }
 
     DupModule( p_module );
-    p_module->psz_filename = strdup( p_module->psz_filename );
-    p_module->psz_longname = strdup( p_module->psz_longname );
 
     /* Everything worked fine ! The module is ready to be added to the list. */
     p_module->b_builtin = VLC_FALSE;
@@ -1044,6 +1056,9 @@ static void DupModule( module_t *p_module )
      * module is unloaded. */
     p_module->psz_object_name = strdup( p_module->psz_object_name );
     p_module->psz_capability = strdup( p_module->psz_capability );
+    p_module->psz_filename = strdup( p_module->psz_filename );
+    p_module->psz_shortname = strdup( p_module->psz_shortname );
+    p_module->psz_longname = strdup( p_module->psz_longname );
 
     if( p_module->psz_program != NULL )
     {
@@ -1078,6 +1093,9 @@ static void UndupModule( module_t *p_module )
 
     free( p_module->psz_object_name );
     free( p_module->psz_capability );
+    free( p_module->psz_filename );
+    free( p_module->psz_shortname );
+    free( p_module->psz_longname );
 
     if( p_module->psz_program != NULL )
     {
@@ -1147,8 +1165,6 @@ static int DeleteModule( module_t * p_module )
             CloseModule( p_module->handle );
         }
         UndupModule( p_module );
-        free( p_module->psz_filename );
-        free( p_module->psz_longname );
     }
 #endif
 
@@ -1654,7 +1670,7 @@ static void CacheLoad( vlc_object_t *p_this )
         {
             module_t *p_module = vlc_object_create( p_this, VLC_OBJECT_MODULE);
             vlc_object_attach( p_module, pp_cache[i]->p_module );
-            p_module->b_submodule = VLC_TRUE; 
+            p_module->b_submodule = VLC_TRUE;
 
             LOAD_STRING( p_module->psz_object_name );
             LOAD_STRING( p_module->psz_shortname );
