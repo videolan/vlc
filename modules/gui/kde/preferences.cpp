@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.14 2003/03/30 11:59:00 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.15 2003/04/09 12:03:44 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -167,9 +167,14 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                     while ( *ppsz_list )
                     {
                         p_combobox->insertItem( *ppsz_list );
-                        if ( !strcmp( *ppsz_list, p_item->psz_value?p_item->psz_value: "" ) )
+                        if ( !strcmp( *ppsz_list, p_item->psz_value ?
+                                                  p_item->psz_value : "" ) )
                         {
+#if KDE_VERSION_MAJOR >= 3
                             p_combobox->setCurrentText( *ppsz_list );
+#else
+                            p_combobox->setCurrentItem( p_combobox->count() );
+#endif
                         }
                         ppsz_list++;
                     }
