@@ -377,6 +377,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
         return;
     }
 
+    p_saved_item = NULL;
+
     /* Update the playlist */
     Rebuild();
 
@@ -650,12 +652,12 @@ void Playlist::RemoveItem( int i )
     if( item.IsOk() )
     {
         treectrl->Delete( item );
-    }    
+    }
 }
 
 
 /**********************************************************************
- * Search functions (internal
+ * Search functions (internal)
  **********************************************************************/
 
 /* Find a wxItem from a playlist_item */
@@ -666,6 +668,11 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
     wxTreeItemId search;
     wxTreeItemId item = treectrl->GetFirstChild( root, cookie );
     wxTreeItemId child;
+
+    if( p_item == p_saved_item && saved_tree_item.IsOk() )
+    {
+        return saved_tree_item;
+    }
 
     p_wxcurrent = (PlaylistItem *)treectrl->GetItemData( root );
 
@@ -685,6 +692,8 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
         p_wxcurrent = (PlaylistItem *)treectrl->GetItemData( item );
         if( p_wxcurrent->p_item == p_item )
         {
+            saved_tree_item = item;
+            p_saved_item = p_item;
             return item;
         }
         if( treectrl->ItemHasChildren( item ) )
@@ -692,6 +701,8 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
             wxTreeItemId search = FindItem( item, p_item );
             if( search.IsOk() )
             {
+                saved_tree_item = search;
+                p_saved_item = p_item;
                 return search;
             }
         }

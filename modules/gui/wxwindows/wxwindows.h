@@ -883,6 +883,10 @@ private:
     wxTreeItemId FindItemByName( wxTreeItemId, wxString,
                                  wxTreeItemId, vlc_bool_t *);
 
+    wxTreeItemId saved_tree_item;
+    playlist_item_t *p_saved_item;
+
+
     /* Custom events */
     void OnPlaylistEvent( wxCommandEvent& event );
 
