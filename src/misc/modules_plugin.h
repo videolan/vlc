@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.25 2002/05/10 02:04:17 fenrir Exp $
+ * $Id: modules_plugin.h,v 1.26 2002/05/14 19:33:54 bozo Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -293,6 +293,9 @@ module_error( char *psz_buffer )
     (p_symbols)->UnalignedRemoveBits = UnalignedRemoveBits; \
     (p_symbols)->UnalignedShowBits = UnalignedShowBits; \
     (p_symbols)->CurrentPTS = CurrentPTS; \
+    (p_symbols)->GetLang_1 = GetLang_1; \
+    (p_symbols)->GetLang_2T = GetLang_2T; \
+    (p_symbols)->GetLang_2B = GetLang_2B; \
     (p_symbols)->DecodeLanguage = DecodeLanguage; \
     (p_symbols)->module_Need = module_Need; \
     (p_symbols)->module_Unneed = module_Unneed;

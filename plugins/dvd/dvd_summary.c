@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.17 2002/04/25 21:52:42 sam Exp $
+ * $Id: dvd_summary.c,v 1.18 2002/05/14 19:33:54 bozo Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -134,7 +134,7 @@ void IfoPrintAudio( thread_dvd_data_t * p_dvd, int i )
     
         intf_WarnMsg( 5, "dvd info: audio %d (%s) is %s, "
                          "%d%s channel%s, %dHz, %s", i,
-                         DecodeLanguage( hton16( audio.i_lang_code ) ),
+                         DecodeLanguage( audio.i_lang_code ),
                          ppsz_mode[audio.i_coding_mode & 0x7],
                          audio.i_num_channels + 1,
                          audio.i_multichannel_extension ? " ext." : "",
@@ -166,7 +166,7 @@ void IfoPrintSpu( thread_dvd_data_t * p_dvd, int i )
     {
         intf_WarnMsg( 5, "dvd info: spu %d (%s), caption %d "
                          "prefix %x, modes [%s%s%s%s ]", i,
-                         DecodeLanguage( hton16( spu.i_lang_code ) ),
+                         DecodeLanguage( spu.i_lang_code ),
                          spu.i_caption, spu.i_prefix,
                          spu_status.i_position_43 ? " 4:3" : "",
                          spu_status.i_position_wide ? " wide" : "",

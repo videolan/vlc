@@ -2,9 +2,10 @@
  * iso_lang.c: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: iso_lang.c,v 1.3 2001/12/30 07:09:56 sam Exp $
+ * $Id: iso_lang.c,v 1.4 2002/05/14 19:33:54 bozo Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
+ *         Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,165 +29,20 @@
 
 #include <videolan/vlc.h>
 
+#include "iso_lang.h"
+
 /*****************************************************************************
  * Local tables
  *****************************************************************************/
-static struct
-{
-    char    p_code[3];
-    char    p_lang_long[20];
-}
 
-lang_tbl[] =
+static iso639_lang_t p_iso_languages[] =
 {
-    /* The ISO 639 language codes.
-     * Language names with * prefix are not spelled in their own language 
-     */
-    { "  ", "Not Specified" },
-    { "aa", "*Afar" },
-    { "ab", "*Abkhazian" },
-    { "af", "*Afrikaans" },
-    { "am", "*Amharic" },
-    { "ar", "*Arabic" },
-    { "as", "*Assamese" },
-    { "ay", "*Aymara" },
-    { "az", "*Azerbaijani" },
-    { "ba", "*Bashkir" },
-    { "be", "*Byelorussian" },
-    { "bg", "*Bulgarian" },
-    { "bh", "*Bihari" },
-    { "bi", "*Bislama" },
-    { "bn", "*Bengali; Bangla" },
-    { "bo", "*Tibetan" },
-    { "br", "*Breton" },
-    { "ca", "*Catalan" },
-    { "co", "*Corsican" },
-    { "cs", "*Czech(Ceske)" },
-    { "cy", "*Welsh" },
-    { "da", "Dansk" },
-    { "de", "Deutsch" },
-    { "dz", "*Bhutani" },
-    { "el", "*Greek" },
-    { "en", "English" },
-    { "eo", "*Esperanto" },
-    { "es", "Espanol" },
-    { "et", "*Estonian" },
-    { "eu", "*Basque" },
-    { "fa", "*Persian" },
-    { "fi", "Suomi" },
-    { "fj", "*Fiji" },
-    { "fo", "*Faroese" },
-    { "fr", "Francais" },
-    { "fy", "*Frisian" },
-    { "ga", "*Irish" },
-    { "gd", "*Scots Gaelic" },
-    { "gl", "*Galician" },
-    { "gn", "*Guarani" },
-    { "gu", "*Gujarati" },
-    { "ha", "*Hausa" },
-    { "he", "*Hebrew" },                                      /* formerly iw */
-    { "hi", "*Hindi" },
-    { "hr", "Hrvatski" },                                        /* Croatian */
-    { "hu", "Magyar" },
-    { "hy", "*Armenian" },
-    { "ia", "*Interlingua" },
-    { "id", "*Indonesian" },                                  /* formerly in */
-    { "ie", "*Interlingue" },
-    { "ik", "*Inupiak" },
-    { "in", "*Indonesian" },                               /* replaced by id */
-    { "is", "Islenska" },
-    { "it", "Italiano" },
-    { "iu", "*Inuktitut" },
-    { "iw", "*Hebrew" },                                   /* replaced by he */
-    { "ja", "*Japanese" },
-    { "ji", "*Yiddish" },                                  /* replaced by yi */
-    { "jw", "*Javanese" },
-    { "ka", "*Georgian" },
-    { "kk", "*Kazakh" },
-    { "kl", "*Greenlandic" },
-    { "km", "*Cambodian" },
-    { "kn", "*Kannada" },
-    { "ko", "*Korean" },
-    { "ks", "*Kashmiri" },
-    { "ku", "*Kurdish" },
-    { "ky", "*Kirghiz" },
-    { "la", "*Latin" },
-    { "ln", "*Lingala" },
-    { "lo", "*Laothian" },
-    { "lt", "*Lithuanian" },
-    { "lv", "*Latvian, Lettish" },
-    { "mg", "*Malagasy" },
-    { "mi", "*Maori" },
-    { "mk", "*Macedonian" },
-    { "ml", "*Malayalam" },
-    { "mn", "*Mongolian" },
-    { "mo", "*Moldavian" },
-    { "mr", "*Marathi" },
-    { "ms", "*Malay" },
-    { "mt", "*Maltese" },
-    { "my", "*Burmese" },
-    { "na", "*Nauru" },
-    { "ne", "*Nepali" },
-    { "nl", "Nederlands" },
-    { "no", "Norsk" },
-    { "oc", "*Occitan" },
-    { "om", "*(Afan) Oromo" },
-    { "or", "*Oriya" },
-    { "pa", "*Punjabi" },
-    { "pl", "*Polish" },
-    { "ps", "*Pashto, Pushto" },
-    { "pt", "Portugues" },
-    { "qu", "*Quechua" },
-    { "rm", "*Rhaeto-Romance" },
-    { "rn", "*Kirundi" },
-    { "ro", "*Romanian"  },
-    { "ru", "*Russian" },
-    { "rw", "*Kinyarwanda" },
-    { "sa", "*Sanskrit" },
-    { "sd", "*Sindhi" },
-    { "sg", "*Sangho" },
-    { "sh", "*Serbo-Croatian" },
-    { "si", "*Sinhalese" },
-    { "sk", "*Slovak" },
-    { "sl", "*Slovenian" },
-    { "sm", "*Samoan" },
-    { "sn", "*Shona"  },
-    { "so", "*Somali" },
-    { "sq", "*Albanian" },
-    { "sr", "*Serbian" },
-    { "ss", "*Siswati" },
-    { "st", "*Sesotho" },
-    { "su", "*Sundanese" },
-    { "sv", "Svenska" },
-    { "sw", "*Swahili" },
-    { "ta", "*Tamil" },
-    { "te", "*Telugu" },
-    { "tg", "*Tajik" },
-    { "th", "*Thai" },
-    { "ti", "*Tigrinya" },
-    { "tk", "*Turkmen" },
-    { "tl", "*Tagalog" },
-    { "tn", "*Setswana" },
-    { "to", "*Tonga" },
-    { "tr", "*Turkish" },
-    { "ts", "*Tsonga" },
-    { "tt", "*Tatar" },
-    { "tw", "*Twi" },
-    { "ug", "*Uighur" },
-    { "uk", "*Ukrainian" },
-    { "ur", "*Urdu" },
-    { "uz", "*Uzbek" },
-    { "vi", "*Vietnamese" },
-    { "vo", "*Volapuk" },
-    { "wo", "*Wolof" },
-    { "xh", "*Xhosa" },
-    { "yi", "*Yiddish" },                                     /* formerly ji */
-    { "yo", "*Yoruba" },
-    { "za", "*Zhuang" },
-    { "zh", "*Chinese" },
-    { "zu", "*Zulu" },
-    { "\0", "" }
+#define DEFINE_LANGUAGE_CODE(engName, nativeName, iso1, iso2T, iso2B) \
+          { engName, nativeName, #iso1, #iso2T, #iso2B },
+    { "", "", "", "", "" },
+#include "iso-639.def"
 };
+
 
 /*****************************************************************************
  * DecodeLanguage: gives the long language name from the two-letters
@@ -194,14 +50,62 @@ lang_tbl[] =
  *****************************************************************************/
 char * DecodeLanguage( u16 i_code )
 {
-    int     i = 0;
-
-    while( memcmp( lang_tbl[i].p_code, &i_code, 2 ) &&
-           lang_tbl[i].p_lang_long[0] )
+    u8 code[2];
+    iso639_lang_t * p_iso;
+    code[0] = i_code >> 8;
+    code[1] = i_code;
+    p_iso = GetLang_1( code );
+    if( p_iso )
     {
-        i++;
+        if( p_iso->psz_native_name[0] )
+            return p_iso->psz_native_name;
+        else
+            return p_iso->psz_eng_name;
     }
+    return p_iso_languages[sizeof( p_iso_languages ) /
+                           sizeof( iso639_lang_t ) - 1].psz_native_name;
+}
 
-    return lang_tbl[i].p_lang_long;
+
+iso639_lang_t * GetLang_1( const char * psz_iso639_1 )
+{
+    unsigned int i;
+    for( i = 0; i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ); i++ )
+    {
+        if( !strncmp( p_iso_languages[i].psz_iso639_1, psz_iso639_1, 2 ) )
+            break;
+    }
+    if( i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ) )
+        return &p_iso_languages[i];
+    else
+        return NULL;
+}
+
+iso639_lang_t * GetLang_2T( const char * psz_iso639_2T )
+{
+    unsigned int i;
+    for( i = 0; i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ); i++ )
+    {
+        if( !strncmp( p_iso_languages[i].psz_iso639_2T, psz_iso639_2T, 2 ) )
+            break;
+    }
+    if( i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ) )
+        return &p_iso_languages[i];
+    else
+        return NULL;
+}
+
+iso639_lang_t * GetLang_2B( const char * psz_iso639_2B )
+{
+    unsigned int i;
+    for( i = 0; i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ); i++ )
+    {
+        if( !strncmp( p_iso_languages[i].psz_iso639_2B, psz_iso639_2B, 2 ) )
+            break;
+    }
+    if( i < sizeof( p_iso_languages ) / sizeof( iso639_lang_t ) )
+        return &p_iso_languages[i];
+    else
+        return NULL;
 }
 

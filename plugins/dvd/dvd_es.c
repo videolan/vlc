@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.9 2002/04/25 21:52:42 sam Exp $
+ * $Id: dvd_es.c,v 1.10 2002/05/14 19:33:54 bozo Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -76,7 +76,7 @@ void DVDLaunchDecoders( input_thread_t * p_input );
     p_es->i_cat = (cat);                                                \
     if( lang )                                                          \
     {                                                                   \
-        strcpy( p_es->psz_desc, DecodeLanguage( hton16( lang ) ) );     \
+        strcpy( p_es->psz_desc, DecodeLanguage( lang ) );               \
     }
 
 

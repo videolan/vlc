@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.37 2002/04/25 21:52:42 sam Exp $
+ * $Id: input_dvdread.c,v 1.38 2002/05/14 19:33:54 bozo Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -683,8 +683,8 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     p_es->i_type = AC3_AUDIO_ES;
                     p_es->b_audio = 1;
                     p_es->i_cat = AUDIO_ES;
-                    strcpy( p_es->psz_desc, DecodeLanguage( hton16(
-                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ) ); 
+                    strcpy( p_es->psz_desc, DecodeLanguage(
+                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ); 
                     strcat( p_es->psz_desc, " (ac3)" );
 
                     break;
@@ -696,8 +696,8 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     p_es->i_type = MPEG2_AUDIO_ES;
                     p_es->b_audio = 1;
                     p_es->i_cat = AUDIO_ES;
-                    strcpy( p_es->psz_desc, DecodeLanguage( hton16(
-                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ) ); 
+                    strcpy( p_es->psz_desc, DecodeLanguage(
+                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ); 
                     strcat( p_es->psz_desc, " (mpeg)" );
 
                     break;
@@ -709,8 +709,8 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     p_es->i_type = LPCM_AUDIO_ES;
                     p_es->b_audio = 1;
                     p_es->i_cat = AUDIO_ES;
-                    strcpy( p_es->psz_desc, DecodeLanguage( hton16(
-                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ) ); 
+                    strcpy( p_es->psz_desc, DecodeLanguage(
+                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ); 
                     strcat( p_es->psz_desc, " (lpcm)" );
 
                     break;
@@ -772,8 +772,8 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = DVD_SPU_ES;
                 p_es->i_cat = SPU_ES;
-                strcpy( p_es->psz_desc, DecodeLanguage( hton16(
-                    p_vts->vtsi_mat->vts_subp_attr[i-1].lang_code ) ) ); 
+                strcpy( p_es->psz_desc, DecodeLanguage(
+                    p_vts->vtsi_mat->vts_subp_attr[i-1].lang_code ) ); 
             }
         }
 #undef spu_control

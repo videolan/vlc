@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.10 2002/04/26 20:18:26 jobi Exp $
+ * $Id: mpeg_ts.c,v 1.11 2002/05/14 19:33:54 bozo Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -36,11 +36,14 @@
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
 
+#include "iso_lang.h"
+
 #if defined MODULE_NAME_IS_mpeg_ts_dvbpsi
 #include <dvbpsi/dvbpsi.h>
 #include <dvbpsi/descriptor.h>
 #include <dvbpsi/pat.h>
 #include <dvbpsi/pmt.h>
+#include <dvbpsi/dr.h>
 #endif
 /*****************************************************************************
  * Constants
@@ -841,6 +844,51 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                 default:
                     p_new_es->i_cat = UNKNOWN_ES;
             }
+
+            if( p_new_es->i_cat == AUDIO_ES )
+            {
+                dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;
+                while( p_dr && ( p_dr->i_tag != 0x0a ) )
+                    p_dr = p_dr->p_next;
+                if( p_dr )
+                {
+                    dvbpsi_iso639_dr_t *p_decoded =
+                                                dvbpsi_DecodeISO639Dr( p_dr );
+                    if( p_decoded->i_code_count > 0 )
+                    {
+                        iso639_lang_t * p_iso;
+                        p_iso = GetLang_2T(p_decoded->i_iso_639_code);
+                        if(p_iso)
+                        {
+                            if(p_iso->psz_native_name[0])
+                                strcpy( p_new_es->psz_desc,
+                                        p_iso->psz_native_name );
+                            else
+                                strcpy( p_new_es->psz_desc,
+                                        p_iso->psz_eng_name );
+                        }
+                        else
+                        {
+                            strncpy( p_new_es->psz_desc,
+                                     p_decoded->i_iso_639_code, 3 );
+                        }
+                    }
+                }
+                switch( p_es->i_type )
+                {
+                    case MPEG1_AUDIO_ES:
+                    case MPEG2_AUDIO_ES:
+                        strcat( p_new_es->psz_desc, " (mpeg)" );
+                        break;
+                    case LPCM_AUDIO_ES:
+                        strcat( p_new_es->psz_desc, " (lpcm)" );
+                        break;
+                    case AC3_AUDIO_ES:
+                        strcat( p_new_es->psz_desc, " (ac3)" );
+                        break;
+                }
+            }
+
             p_es = p_es->p_next;
         }
         

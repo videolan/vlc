@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.104 2002/05/10 02:04:16 fenrir Exp $
+ * $Id: common.h,v 1.105 2002/05/14 19:33:54 bozo Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -200,6 +200,8 @@ struct bit_stream_s;
 struct input_buffers_s;
 struct network_socket_s;
 struct intf_subscription_s;
+
+typedef struct iso639_lang_s iso639_lang_t;
 
 /*****************************************************************************
  * Macros and inline functions
@@ -700,6 +702,9 @@ typedef struct module_symbols_s
     void ( * CurrentPTS )           ( struct bit_stream_s *, mtime_t *,
                                       mtime_t * );
 
+    iso639_lang_t * ( * GetLang_1 ) ( const char * );
+    iso639_lang_t * ( * GetLang_2T ) ( const char * );
+    iso639_lang_t * ( * GetLang_2B ) ( const char * );
     char * ( * DecodeLanguage ) ( u16 );
 
     struct module_s * ( * module_Need )   ( int, char *, void * );
