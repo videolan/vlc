@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.48 2001/04/28 03:36:25 sam Exp $
+ * $Id: vout_sdl.c,v 1.49 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -80,7 +80,6 @@ typedef struct vout_sys_s
     SDL_Surface *   p_display;                             /* display device */
     SDL_Overlay *   p_overlay;                             /* overlay device */
 
-    boolean_t   b_fullscreen;
     boolean_t   b_overlay;
     boolean_t   b_cursor;
     boolean_t   b_reopen_display;
@@ -175,7 +174,7 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_cursor_autohidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
 
-    p_vout->p_sys->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
+    p_vout->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
                                 VOUT_FULLSCREEN_DEFAULT );
     p_vout->p_sys->b_overlay = main_GetIntVariable( VOUT_OVERLAY_VAR,
                                 VOUT_OVERLAY_DEFAULT );
@@ -455,7 +454,7 @@ static int vout_Manage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
-        p_vout->p_sys->b_fullscreen = ! p_vout->p_sys->b_fullscreen;
+        p_vout->b_fullscreen = ! p_vout->b_fullscreen;
 
         SDL_WM_ToggleFullScreen(p_vout->p_sys->p_display);
 
@@ -606,7 +605,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
     /* init flags and cursor */
     flags = SDL_ANYFORMAT | SDL_HWPALETTE;
 
-    if( p_vout->p_sys->b_fullscreen )
+    if( p_vout->b_fullscreen )
     {
         flags |= SDL_FULLSCREEN;
     }

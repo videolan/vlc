@@ -2,7 +2,7 @@
  * ac3_spdif.h: header for ac3 pass-through
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.h,v 1.2 2001/05/01 04:18:18 sam Exp $
+ * $Id: ac3_spdif.h,v 1.3 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -20,8 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  ****************************************************************************/
-
-#define SPDIF_FRAME_SIZE 6144
 
 typedef struct ac3_info_s
 {

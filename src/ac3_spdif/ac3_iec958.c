@@ -2,7 +2,7 @@
  * ac3_iec958.c: ac3 to spdif converter
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_iec958.c,v 1.3 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_iec958.c,v 1.4 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -105,7 +105,7 @@ static const frame_size_t p_frame_size_code[64] =
  ****************************************************************************/
 void ac3_iec958_build_burst( ac3_spdif_thread_t *p_spdif )
 {
-    const u8 p_sync[4] = { 0x72, 0xF8, 0x1F, 0x4E };
+    const u8 p_sync[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x01, 0x00 };
     int      i_length  = p_spdif->ac3_info.i_frame_size;
 #ifndef HAVE_SWAB
     /* Skip the first byte if i_length is odd */
@@ -114,9 +114,7 @@ void ac3_iec958_build_burst( ac3_spdif_thread_t *p_spdif )
 #endif
 
     /* Add the spdif headers */
-    memcpy( p_spdif->p_iec, p_sync, 4 );
-    p_spdif->p_iec[4] = i_length ? 0x01 : 0x00;
-    p_spdif->p_iec[5] = 0x00;
+    memcpy( p_spdif->p_iec, p_sync, 6 );
     p_spdif->p_iec[6] = ( i_length * 8 ) & 0xFF;
     p_spdif->p_iec[7] = ( ( i_length * 8 ) >> 8 ) & 0xFF;
 

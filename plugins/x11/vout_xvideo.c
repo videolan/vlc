@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.13 2001/05/01 04:18:18 sam Exp $
+ * $Id: vout_xvideo.c,v 1.14 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -128,9 +128,6 @@ typedef struct vout_sys_s
     boolean_t           b_mouse_pointer_visible;
     mtime_t             i_time_mouse_last_moved; /* used to auto-hide pointer*/
 
-    /* Displaying fullscreen */
-    boolean_t           b_fullscreen;
-
 } vout_sys_t;
 
 /* Fullscreen needs to be able to hide the wm decorations */
@@ -241,7 +238,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
-    p_vout->p_sys->b_fullscreen
+    p_vout->b_fullscreen
         = main_GetIntVariable( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT );
     
     if( !XVideoCheckForXv( p_vout->p_sys->p_display ) )
@@ -336,11 +333,8 @@ static void vout_Destroy( vout_thread_t *p_vout )
 static int vout_Manage( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
-    boolean_t   b_toggle_fullscreen;               /* user wants full-screen */
     char        i_key;                                    /* ISO Latin-1 key */
     KeySym      x_key_symbol;
-
-    b_toggle_fullscreen = 0;
 
     /* Handle X11 events: ConfigureNotify events are parsed to know if the
      * output window's size changed, MapNotify and UnmapNotify to know if the
@@ -409,7 +403,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                             break;
                         case 'f':
                         case 'F':
-                            b_toggle_fullscreen = 1;
+                            p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
                             break;
                         case '0':
                             network_ChannelJoin( 0 );
@@ -525,11 +519,11 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
     }
 
-    if ( b_toggle_fullscreen )
+    if ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         intf_DbgMsg( "vout: changing full-screen status" );
 
-        p_vout->p_sys->b_fullscreen = !p_vout->p_sys->b_fullscreen;
+        p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
         /* Get rid of the old window */
         XVideoDestroyWindow( p_vout );
@@ -717,7 +711,7 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
 
     /* Set main window's size */
     /* If we're full screen, we're full screen! */
-    if( p_vout->p_sys->b_fullscreen )
+    if( p_vout->b_fullscreen )
     {
         p_vout->p_sys->i_window_width = DisplayWidth( p_vout->p_sys->p_display,
                                                       p_vout->p_sys->i_screen );
@@ -761,7 +755,7 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
                            CWBackPixel | CWEventMask,
                            &xwindow_attributes );
 
-    if ( p_vout->p_sys->b_fullscreen )
+    if ( p_vout->b_fullscreen )
     {
         prop = XInternAtom(p_vout->p_sys->p_display, "_MOTIF_WM_HINTS", False);
         mwmhints.flags = MWM_HINTS_DECORATIONS;
@@ -837,7 +831,7 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
                   ButtonPressMask | ButtonReleaseMask | 
                   PointerMotionMask );
 
-    if( p_vout->p_sys->b_fullscreen )
+    if( p_vout->b_fullscreen )
     {
         XSetInputFocus( p_vout->p_sys->p_display, p_vout->p_sys->window,
                         RevertToNone, CurrentTime );

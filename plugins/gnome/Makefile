@@ -7,7 +7,7 @@
 # Objects
 #
 
-PLUGIN_GNOME = gnome.o intf_gnome.o gnome_callbacks.o gnome_interface.o gnome_support.o
+PLUGIN_GNOME = gnome.o intf_gnome.o gnome_callbacks.o gnome_interface.o gnome_support.o gnome_playlist.o
 BUILTIN_GNOME = $(PLUGIN_GNOME:%.o=BUILTIN_%.o)
 
 ALL_OBJ = $(PLUGIN_GNOME) $(BUILTIN_GNOME)

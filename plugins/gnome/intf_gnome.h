@@ -2,7 +2,7 @@
  * intf_gnome.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.h,v 1.9 2001/05/01 15:12:22 sam Exp $
+ * $Id: intf_gnome.h,v 1.10 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,6 +41,18 @@
 #define GNOME_MENU_LABEL_SIZE 64
 
 /*****************************************************************************
+ * Inline function to retrieve the interface structure
+ *****************************************************************************/
+static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
+{
+    return( gtk_object_get_data( GTK_OBJECT( lookup_widget(item, psz_parent) ),
+                                 "p_intf" ) );
+}
+
+
+
+
+/*****************************************************************************
  * intf_sys_t: description and status of Gnome interface
  *****************************************************************************/
 typedef struct intf_sys_s
@@ -66,26 +78,30 @@ typedef struct intf_sys_s
     GtkWidget *         p_fileopen;                      /* file open window */
     GtkWidget *         p_disc;                     /* disc selection window */
     GtkWidget *         p_network;                  /* network stream window */
+    GtkWidget *         p_preferences;                 /* preferences window */
+    GtkWidget *         p_jump;                               /* jump window */
 
     /* The slider */
+    GtkFrame *          p_slider_frame;
     GtkAdjustment *     p_adj;                   /* slider adjustment object */
     float               f_adj_oldvalue;                    /* previous value */
 
     /* The window labels */
-    GtkLabel *          p_label_date;
-    GtkLabel *          p_label_status;
     GtkLabel *          p_label_title;
     GtkLabel *          p_label_chapter;
+
+    /* Playlist management */
+    int                 i_list_timeout;
+    int                 i_playing;                 /* playlist selected item */
 
     /* input mode management */
     boolean_t           b_mode_changed;
     gint                i_intf_mode;      /* interface mode: file, net, disc */
 
-    gint                i_part;                  /* current chapter */
+    gint                i_part;                           /* current chapter */
 
     /* XXX: Ugly kludge, see intf_gnome.c */
     void             ( *pf_gtk_callback ) ( void );
     void             ( *pf_gdk_callback ) ( void );
 
 } intf_sys_t;
-

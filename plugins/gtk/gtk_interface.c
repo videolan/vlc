@@ -37,8 +37,11 @@ create_intf_window (void)
   GtkWidget *menubar_view;
   GtkWidget *menubar_view_menu;
   GtkAccelGroup *menubar_view_menu_accels;
+  GtkWidget *menubar_fullscreen;
+  GtkWidget *separator13;
   GtkWidget *menubar_title;
   GtkWidget *menubar_chapter;
+  GtkWidget *menubar_angle;
   GtkWidget *separator11;
   GtkWidget *menubar_playlist;
   GtkWidget *menubar_modules;
@@ -68,10 +71,7 @@ create_intf_window (void)
   GtkWidget *toolbar_playlist;
   GtkWidget *toolbar_prev;
   GtkWidget *toolbar_next;
-  GtkWidget *hbox7;
-  GtkWidget *label_date;
-  GtkWidget *label_status;
-  GtkWidget *label_bar;
+  GtkWidget *slider_frame;
   GtkWidget *slider;
   GtkWidget *intf_statusbar;
   GtkAccelGroup *accel_group;
@@ -110,7 +110,7 @@ create_intf_window (void)
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_file)->child),
                                    _("_File"));
   gtk_widget_add_accelerator (menubar_file, "activate_item", accel_group,
-                              tmp_key, GDK_MOD1_MASK, 0);
+                              tmp_key, GDK_MOD1_MASK, (GtkAccelFlags) 0);
   gtk_widget_ref (menubar_file);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_file", menubar_file,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -196,7 +196,7 @@ create_intf_window (void)
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_view)->child),
                                    _("_View"));
   gtk_widget_add_accelerator (menubar_view, "activate_item", accel_group,
-                              tmp_key, GDK_MOD1_MASK, 0);
+                              tmp_key, GDK_MOD1_MASK, (GtkAccelFlags) 0);
   gtk_widget_ref (menubar_view);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_view", menubar_view,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -209,6 +209,26 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menubar_view), menubar_view_menu);
   menubar_view_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (menubar_view_menu));
+
+  menubar_fullscreen = gtk_check_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_fullscreen)->child),
+                                   _("_Fullscreen"));
+  gtk_widget_add_accelerator (menubar_fullscreen, "activate_item", menubar_view_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_fullscreen);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_fullscreen", menubar_fullscreen,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_fullscreen);
+  gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_fullscreen);
+  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (menubar_fullscreen), TRUE);
+
+  separator13 = gtk_menu_item_new ();
+  gtk_widget_ref (separator13);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator13", separator13,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator13);
+  gtk_container_add (GTK_CONTAINER (menubar_view_menu), separator13);
+  gtk_widget_set_sensitive (separator13, FALSE);
 
   menubar_title = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_title)->child),
@@ -234,6 +254,17 @@ create_intf_window (void)
   gtk_widget_show (menubar_chapter);
   gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_chapter);
   gtk_widget_set_sensitive (menubar_chapter, FALSE);
+
+  menubar_angle = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_angle)->child),
+                                   _("An_gle"));
+  gtk_widget_add_accelerator (menubar_angle, "activate_item", menubar_view_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_angle);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_angle", menubar_angle,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_angle);
+  gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_angle);
 
   separator11 = gtk_menu_item_new ();
   gtk_widget_ref (separator11);
@@ -272,7 +303,7 @@ create_intf_window (void)
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_settings)->child),
                                    _("_Settings"));
   gtk_widget_add_accelerator (menubar_settings, "activate_item", accel_group,
-                              tmp_key, GDK_MOD1_MASK, 0);
+                              tmp_key, GDK_MOD1_MASK, (GtkAccelFlags) 0);
   gtk_widget_ref (menubar_settings);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_settings", menubar_settings,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -345,7 +376,7 @@ create_intf_window (void)
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_help)->child),
                                    _("_Help"));
   gtk_widget_add_accelerator (menubar_help, "activate_item", accel_group,
-                              tmp_key, GDK_MOD1_MASK, 0);
+                              tmp_key, GDK_MOD1_MASK, (GtkAccelFlags) 0);
   gtk_widget_ref (menubar_help);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_help", menubar_help,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -392,7 +423,7 @@ create_intf_window (void)
   toolbar_open = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
-                                _("Open"),
+                                _("File"),
                                 _("Open a File"), NULL,
                                 NULL, NULL, NULL);
   gtk_widget_ref (toolbar_open);
@@ -527,40 +558,20 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_next);
 
-  hbox7 = gtk_hbox_new (TRUE, 0);
-  gtk_widget_ref (hbox7);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "hbox7", hbox7,
+  slider_frame = gtk_frame_new (_("-:--:--"));
+  gtk_widget_ref (slider_frame);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "slider_frame", slider_frame,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (hbox7);
-  gtk_box_pack_start (GTK_BOX (vbox2), hbox7, TRUE, TRUE, 0);
-
-  label_date = gtk_label_new (_("-:--:--"));
-  gtk_widget_ref (label_date);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_date", label_date,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label_date);
-  gtk_box_pack_start (GTK_BOX (hbox7), label_date, FALSE, FALSE, 0);
-
-  label_status = gtk_label_new (_("Status: foo"));
-  gtk_widget_ref (label_status);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_status", label_status,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label_status);
-  gtk_box_pack_start (GTK_BOX (hbox7), label_status, FALSE, FALSE, 0);
-
-  label_bar = gtk_label_new (_("Bar: baz"));
-  gtk_widget_ref (label_bar);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_bar", label_bar,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label_bar);
-  gtk_box_pack_start (GTK_BOX (hbox7), label_bar, FALSE, FALSE, 0);
+  gtk_widget_show (slider_frame);
+  gtk_box_pack_start (GTK_BOX (vbox2), slider_frame, TRUE, TRUE, 0);
+  gtk_frame_set_label_align (GTK_FRAME (slider_frame), 0.05, 0.5);
 
   slider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 6.25, 0)));
   gtk_widget_ref (slider);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "slider", slider,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (slider);
-  gtk_box_pack_start (GTK_BOX (vbox2), slider, TRUE, TRUE, 0);
+  gtk_container_add (GTK_CONTAINER (slider_frame), slider);
   gtk_scale_set_draw_value (GTK_SCALE (slider), FALSE);
   gtk_scale_set_digits (GTK_SCALE (slider), 3);
 
@@ -588,6 +599,12 @@ create_intf_window (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (menubar_exit), "activate",
                       GTK_SIGNAL_FUNC (on_menubar_exit_activate),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (menubar_fullscreen), "activate",
+                      GTK_SIGNAL_FUNC (on_menubar_fullscreen_activate),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (menubar_angle), "activate",
+                      GTK_SIGNAL_FUNC (on_menubar_angle_activate),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (menubar_playlist), "activate",
                       GTK_SIGNAL_FUNC (on_menubar_playlist_activate),

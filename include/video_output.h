@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppenned video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.59 2001/05/06 04:32:02 sam Exp $
+ * $Id: video_output.h,v 1.60 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -210,6 +210,7 @@ typedef struct vout_thread_s
     boolean_t           b_info;              /* print additional information */
     boolean_t           b_interface;                     /* render interface */
     boolean_t           b_scale;                    /* allow picture scaling */
+    boolean_t           b_fullscreen;           /* toogle fullscreen dusplay */
     mtime_t             render_time;             /* last picture render time */
 
 

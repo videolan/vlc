@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.22 2001/04/28 03:36:25 sam Exp $
+ * $Id: vout_x11.c,v 1.23 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -109,9 +109,6 @@ typedef struct vout_sys_s
     /* Mouse pointer properties */
     boolean_t           b_mouse;         /* is the mouse pointer displayed ? */
 
-    /* Displaying fullscreen */
-    boolean_t           b_fullscreen;
-
 } vout_sys_t;
 
 /* Fullscreen needs to be able to hide the wm decorations */
@@ -215,7 +212,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
-    p_vout->p_sys->b_fullscreen
+    p_vout->b_fullscreen
         = main_GetIntVariable( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT );
 
     /* Spawn base window - this window will include the video output window,
@@ -380,7 +377,6 @@ static int vout_Manage( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
     boolean_t   b_resized;                        /* window has been resized */
-    boolean_t   b_gofullscreen;                    /* user wants full-screen */
     char        i_key;                                    /* ISO Latin-1 key */
     KeySym      x_key_symbol;
 
@@ -388,9 +384,8 @@ static int vout_Manage( vout_thread_t *p_vout )
      * output window's size changed, MapNotify and UnmapNotify to know if the
      * window is mapped (and if the display is useful), and ClientMessages
      * to intercept window destruction requests */
-    b_resized = 0;
-    b_gofullscreen = 0;
 
+    b_resized = 0;
     while( XCheckWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
                               StructureNotifyMask | KeyPressMask |
                               ButtonPressMask | ButtonReleaseMask | 
@@ -456,7 +451,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                             break;
                         case 'f':
                         case 'F':
-                            b_gofullscreen = 1;
+                            p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
                             break;
                         case '0':
                             network_ChannelJoin( 0 );
@@ -556,7 +551,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
     }
 
-    if ( b_gofullscreen )
+    if ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         char *psz_display;
         /* Open display, unsing 'vlc_display' or the DISPLAY
@@ -565,7 +560,8 @@ static int vout_Manage( vout_thread_t *p_vout )
 
         intf_DbgMsg( "vout: changing full-screen status" );
 
-        p_vout->p_sys->b_fullscreen = !p_vout->p_sys->b_fullscreen;
+        p_vout->b_fullscreen = !p_vout->b_fullscreen;
+        p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
 
         /* Get rid of the old window */
         XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
@@ -750,7 +746,7 @@ static int X11CreateWindow( vout_thread_t *p_vout )
     boolean_t               b_map_notify;
 
     /* If we're full screen, we're full screen! */
-    if( p_vout->p_sys->b_fullscreen ) 
+    if( p_vout->b_fullscreen ) 
     {
         p_vout->p_sys->i_width = DisplayWidth( p_vout->p_sys->p_display, 
                                                p_vout->p_sys->i_screen );
@@ -798,7 +794,7 @@ static int X11CreateWindow( vout_thread_t *p_vout )
                        CWBackingStore | CWBackPixel | CWEventMask,
                        &xwindow_attributes );
 
-    if ( p_vout->p_sys->b_fullscreen )
+    if ( p_vout->b_fullscreen )
     {
         prop = XInternAtom(p_vout->p_sys->p_display, "_MOTIF_WM_HINTS", False);
         mwmhints.flags = MWM_HINTS_DECORATIONS;
@@ -889,7 +885,7 @@ static int X11CreateWindow( vout_thread_t *p_vout )
                                  CWColormap, &xwindow_attributes );
     }
 
-    if( p_vout->p_sys->b_fullscreen )
+    if( p_vout->b_fullscreen )
     {
         XSetInputFocus( p_vout->p_sys->p_display, p_vout->p_sys->window,
                         RevertToNone, CurrentTime );

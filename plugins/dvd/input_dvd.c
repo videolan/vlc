@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.54 2001/04/29 17:57:50 stef Exp $
+ * $Id: input_dvd.c,v 1.55 2001/05/06 18:32:30 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -380,8 +380,8 @@ static void DVDInit( input_thread_t * p_input )
     /* reading several block once seems to cause lock-up
      * when using input_ToggleES
      * who wrote thez damn buggy piece of shit ??? --stef */
-    p_dvd->i_block_once = 32;
-    p_input->i_read_once = 128;
+    p_dvd->i_block_once = 1;//32;
+    p_input->i_read_once = 8;//128;
 
     i = CSSTest( p_input->i_handle );
 
@@ -398,7 +398,7 @@ static void DVDInit( input_thread_t * p_input )
 
     /* Reading structures initialisation */
     p_input->p_method_data =
-        DVDNetlistInit( 8192, 16384, 2048, DVD_LB_SIZE, p_dvd->i_block_once );
+        DVDNetlistInit( 2048, 4096, 2048, DVD_LB_SIZE, p_dvd->i_block_once );
     intf_WarnMsg( 2, "dvd info: netlist initialized" );
 
     /* Ifo allocation & initialisation */
@@ -1350,12 +1350,17 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
     }
 
     /* Find start and end sectors of new cell */
+#if 1
     p_dvd->i_sector = MAX(
          p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_start_sector,
          title.p_cell_play[p_dvd->i_prg_cell].i_start_sector );
     p_dvd->i_end_sector = MIN(
          p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector,
          title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
+#else
+    p_dvd->i_sector = title.p_cell_play[p_dvd->i_prg_cell].i_start_sector;
+    p_dvd->i_end_sector = title.p_cell_play[p_dvd->i_prg_cell].i_end_sector;
+#endif
 
 /*
     intf_WarnMsg( 1, "cell: %d sector1: 0x%x end1: 0x%x\n"

@@ -123,6 +123,7 @@
 
 /* Environment variable containing the display method */
 #define INTF_METHOD_VAR                 "vlc_intf"
+#define INTF_METHOD_DEFAULT             "gtk"
 
 /* Environment variable used to store startup script name and default value */
 #define INTF_INIT_SCRIPT_VAR            "vlcrc"
@@ -142,12 +143,16 @@
 /* Maximum number of channels */
 #define INTF_MAX_CHANNELS               10
 
+/* Default search path for interface file browser */
+#define INTF_PATH_VAR                   "vlc_search_path"
+
 /*****************************************************************************
  * Input thread configuration
  *****************************************************************************/
 
-/* Environment variable containing the display method */
+/* Environment variable containing the input method */
 #define INPUT_METHOD_VAR                "vlc_input"
+#define INPUT_METHOD_DEFAULT            "ps"
 
 /* XXX?? */
 #define INPUT_IDLE_SLEEP                ((int)(0.100*CLOCK_FREQ))
@@ -169,14 +174,21 @@
 /* Maximum length of a hostname or source name */
 #define INPUT_MAX_SOURCE_LENGTH         100
 
+/* Default network protocol */
+#define INPUT_NETWORK_PROTOCOL_VAR      "vlc_network_protocol"
+#define INPUT_NETWORK_PROTOCOL_DEFAULT  "ts"
+
 /* Default remote server */
 #define INPUT_SERVER_VAR                "vlc_server"
 #define INPUT_SERVER_DEFAULT            "138.195.143.220"
-#define INPUT_BCAST_ADDR                "138.195.143.255"
 
 /* Default input port */
 #define INPUT_PORT_VAR                  "vlc_server_port"
 #define INPUT_PORT_DEFAULT              1234
+
+/* Default broadcast address */
+#define INPUT_BCAST_ADRR_VAR            "vlc_broadcast_addr"
+#define INPUT_BCAST_ADDR_DEFAULT        "138.195.143.255"
 
 /* Broadcast mode */
 #define INPUT_BROADCAST_VAR             "vlc_broadcast"
@@ -204,6 +216,7 @@
  * mark it to be presented */
 #define DEFAULT_PTS_DELAY               (mtime_t)(.2*CLOCK_FREQ)
 
+/* DVD defaults */
 #define INPUT_DVD_DEVICE_VAR            "vlc_dvd_device"
 #define INPUT_DVD_DEVICE_DEFAULT        "/dev/dvd"
 
@@ -214,6 +227,10 @@
 #define INPUT_CHANNEL_VAR               "vlc_input_channel"
 #define INPUT_SUBTITLE_VAR              "vlc_input_subtitle"
 
+/* VCD defaults */
+#define INPUT_VVC_DEVICE_VAR            "vlc_vcd_device"
+#define INPUT_VCD_DEVICE_DEFAULT        "/dev/cdrom"
+
 /*****************************************************************************
  * Audio configuration
  *****************************************************************************/
@@ -223,6 +240,7 @@
 
 /* Environment variable containing the audio output method */
 #define AOUT_METHOD_VAR                 "vlc_aout"
+#define AOUT_METHOD_DEFAULT             "dsp"
 
 /* Environment variable used to store dsp device name, and default value */
 #define AOUT_DSP_VAR                    "vlc_dsp"
@@ -284,6 +302,7 @@
 
 /* Environment variable containing the display method */
 #define VOUT_METHOD_VAR                 "vlc_vout"
+#define VOUT_METHOD_DEFAULT             "x11"
 
 /* Environment variable containing the motion compensation method */
 #define MOTION_METHOD_VAR               "vlc_motion"
@@ -303,6 +322,15 @@
 #define VOUT_HEIGHT_VAR                 "vlc_height"
 #define VOUT_WIDTH_DEFAULT              720
 #define VOUT_HEIGHT_DEFAULT             576
+
+#define VOUT_DEPTH_VAR                  "vlc_depth"
+#define VOUT_DEPTH_DEFAULT              15
+
+#define VOUT_FULLSCREEN_VAR             "vlc_fullscreen"
+#define VOUT_FULLSCREEN_DEFAULT         0
+
+#define VOUT_FULLSCREEN_DEPTH_VAR       "vlc_fullscreen_depth"
+#define VOUT_FULLSCREEN_DEPTH_DEFAULT   32
 
 /* Maximum width of a scaled source picture - this should be relatively high,
  * since higher stream values will result in no display at all. */
@@ -335,7 +363,8 @@
 #define VOUT_OVERLAY_DEFAULT            0
 
 /* Default gamma */
-#define VOUT_GAMMA                      0.
+#define VOUT_GAMMA_VAR                  "vlc_gamma"
+#define VOUT_GAMMA_DEFAULT              0.
 
 /* Default fonts */
 #define VOUT_DEFAULT_FONT               "default8x9.psf"
@@ -446,7 +475,7 @@
 #define INTF_MSG_QSIZE                  64
 
 /* Interface warnig message level */
-#define INTF_WARNING_VAR                "warning_level"
+#define INTF_WARNING_VAR                "vlc_warning_level"
 #define INTF_WARNING_DEFAULT            12
 
 /* Define to enable messages queues - disabling messages queue can be useful
@@ -472,4 +501,20 @@
 
 /* Maximal number of commands which can be saved in history list */
 #define INTF_CONSOLE_MAX_HISTORY        20
+
+/****************************************************************************
+ * Playlist defaults
+ ****************************************************************************/
+
+/* Launch on start-up */
+#define PLAYLIST_STARTUP_VAR            "vlc_playlist_on_start_up"
+#define PLAYLIST_STARTUP_DEFAULT        0
+
+/* Enqueue drag'n dropped item */
+#define PLAYLIST_ENQUEUE_VAR            "vlc_playlist_enqueue"
+#define PLAYLIST_ENQUEUE_DZFAULT        0
+
+/* Loop on playlist end */
+#define PLAYLIST_LOOP_VAR               "vlc_playlist_loop"
+#define PLAYLIST_LOOP_DEFAULT           0
 

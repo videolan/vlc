@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.105 2001/05/01 12:22:18 sam Exp $
+ * $Id: input.c,v 1.106 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -541,13 +541,10 @@ void input_FileClose( input_thread_t * p_input )
 void input_NetworkOpen( input_thread_t * p_input )
 {
     char                *psz_server = NULL;
+    char                *psz_broadcast = NULL;
     int                 i_port = 0;
     int                 i_opt;
     struct sockaddr_in  sock;
-    char *              psz_broadcast;
-    
-    /* Are we broadcasting ? */
-    psz_broadcast = main_GetPszVariable( INPUT_BROADCAST_VAR, NULL );
     
     /* Get the remote server */
     if( p_input->p_source != NULL )
@@ -584,7 +581,31 @@ void input_NetworkOpen( input_thread_t * p_input )
                 *psz_port = '\0';
                 psz_port++;
 
-                i_port = atoi( psz_port );
+                psz_broadcast = psz_port;
+                while( *psz_broadcast && *psz_broadcast != ':' )
+                {
+                    psz_broadcast++;
+                }
+
+                if( *psz_broadcast )
+                {
+                    *psz_broadcast = '\0';
+                    psz_broadcast++;
+                    while( *psz_broadcast && *psz_broadcast == ':' )
+                    {
+                        psz_broadcast++;
+                    }
+                }
+                else
+                {
+                    psz_broadcast = NULL;
+                }
+
+                /* port before broadcast address */
+                if( *psz_port != ':' )
+                {
+                    i_port = atoi( psz_port );
+                }
             }
         }
         else
@@ -605,7 +626,16 @@ void input_NetworkOpen( input_thread_t * p_input )
     {
         i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
     }
-    
+
+    if( psz_broadcast == NULL )
+    {
+        /* Are we broadcasting ? */
+        psz_broadcast = main_GetPszVariable( INPUT_BROADCAST_VAR, NULL );
+    }
+
+    intf_WarnMsg( 2, "input: server: %s port: %d broadcast: %s",
+                     psz_server, i_port, psz_broadcast );
+
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
     p_input->i_handle = socket( AF_INET, SOCK_DGRAM, 0 );

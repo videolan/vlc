@@ -2,7 +2,7 @@
  * gnome_callbacks.h : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.h,v 1.15 2001/04/22 00:08:26 stef Exp $
+ * $Id: gnome_callbacks.h,v 1.16 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -123,14 +123,6 @@ on_popup_about_activate                (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_intf_playlist_destroy               (GtkObject       *object,
-                                        gpointer         user_data);
-
-void
-on_playlist_close_clicked              (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
 on_popup_slow_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
@@ -160,14 +152,6 @@ on_modules_apply_clicked               (GtkButton       *button,
 
 void
 on_modules_cancel_clicked              (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-on_intf_playlist_destroy               (GtkObject       *object,
-                                        gpointer         user_data);
-
-void
-on_playlist_ok_clicked                 (GtkButton       *button,
                                         gpointer         user_data);
 
 void
@@ -297,3 +281,148 @@ on_menubar_angle_toggle                (GtkCheckMenuItem     *menuitem,
 void
 on_popup_angle_toggle                  (GtkCheckMenuItem     *menuitem,
                                         gpointer             user_data);
+
+void
+on_popup_stop_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_jump_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_preferences_activate          (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_broadcast_check_toggled             (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+on_jump_ok_clicked                     (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_jump_apply_clicked                  (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_jump_cancel_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_popup_playlist_activate             (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_preferences_ok_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_preferences_apply_clicked           (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_preferences_cancel_clicked          (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_menubar_fullscreen_activate         (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_fullscreen_activate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_close_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_intf_playlist_destroy               (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_intf_playlist_destroy               (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_playlist_ok_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_playlist_disc_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_file_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_network_activate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_url_activate               (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_crop_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_invert_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_select_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+gboolean
+on_playlist_clist_event                (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+void
+on_playlist_clist_drag_data_received   (GtkWidget       *widget,
+                                        GdkDragContext  *drag_context,
+                                        gint             x,
+                                        gint             y,
+                                        GtkSelectionData *data,
+                                        guint            info,
+                                        guint            time,
+                                        gpointer         user_data);
+
+gboolean
+on_playlist_clist_drag_motion          (GtkWidget       *widget,
+                                        GdkDragContext  *drag_context,
+                                        gint             x,
+                                        gint             y,
+                                        guint            time,
+                                        gpointer         user_data);
+
+
+
+void
+on_playlist_delete_all_activate        (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_delete_item_activate       (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_ok_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_playlist_apply_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_playlist_cancel_clicked             (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_popup_back_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);

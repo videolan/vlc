@@ -308,3 +308,11 @@ gboolean
 on_slider_button_press_event           (GtkWidget       *widget,
                                         GdkEventButton  *event,
                                         gpointer         user_data);
+
+void
+on_menubar_fullscreen_activate         (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_angle_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);

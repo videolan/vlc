@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.2 2001/05/06 04:32:02 sam Exp $
+ * $Id: aout_ext-dec.c,v 1.3 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -119,6 +119,7 @@ aout_fifo_t * aout_CreateFifo( int i_type, int i_channels, long l_rate,
 
         case AOUT_ADEC_MONO_FIFO:
         case AOUT_ADEC_STEREO_FIFO:
+        case AOUT_ADEC_SPDIF_FIFO:
             p_aout->fifo[i_fifo].b_die = 0;
 
             p_aout->fifo[i_fifo].i_channels = i_channels;
@@ -221,6 +222,7 @@ void aout_FreeFifo( aout_fifo_t * p_fifo )
 
         case AOUT_ADEC_MONO_FIFO:
         case AOUT_ADEC_STEREO_FIFO:
+        case AOUT_ADEC_SPDIF_FIFO:
 
             free( p_fifo->buffer );
             free( p_fifo->date );

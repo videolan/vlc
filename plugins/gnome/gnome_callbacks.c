@@ -2,7 +2,7 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.25 2001/05/01 04:18:18 sam Exp $
+ * $Id: gnome_callbacks.c,v 1.26 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -44,22 +44,17 @@
 #include "intf_playlist.h"
 #include "intf_msg.h"
 
+#include "video.h"
+#include "video_output.h"
+#include "audio_output.h"
+
 #include "gnome_callbacks.h"
+#include "gnome_playlist.h"
 #include "gnome_interface.h"
 #include "gnome_support.h"
 #include "intf_gnome.h"
 
 #include "main.h"
-
-/*****************************************************************************
- * Inline function to retrieve the interface structure
- *****************************************************************************/
-static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
-{
-    return( gtk_object_get_data( GTK_OBJECT( lookup_widget(item, psz_parent) ),
-                                 "p_intf" ) );
-}
-
 
 /*****************************************************************************
  * Interface callbacks
@@ -118,6 +113,7 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
                                         guint            time,
                                         gpointer         user_data)
 {
+#if 0
     char *psz_text = data->data;
     int i_len      = strlen( psz_text );
 
@@ -157,6 +153,21 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
         intf_ErrMsg( "intf error: unknown dropped type");
         break;
     }
+#else
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET( widget ), "intf_window" );
+    int             i_end  = p_main->p_playlist->i_size;
+
+    GnomeDropDataReceived( p_intf, data, info, PLAYLIST_END );
+
+     if( p_intf->p_input != NULL )
+     {
+        /* FIXME: temporary hack */
+        p_intf->p_input->b_eof = 1;
+     }
+     
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+
+#endif
 }
 
 
@@ -263,7 +274,7 @@ on_menubar_open_activate               (GtkMenuItem     *menuitem,
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
     /* If we have never used the file selector, open it */
-    if( p_intf->p_sys->p_fileopen == NULL)
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_fileopen ) )
     {
         p_intf->p_sys->p_fileopen = create_intf_fileopen();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
@@ -281,6 +292,14 @@ on_menubar_disc_activate               (GtkMenuItem     *menuitem,
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
+    /* If we have never used the file selector, open it */
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_disc ) )
+    {
+        p_intf->p_sys->p_disc = create_intf_disc();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_disc ),
+                             "p_intf", p_intf );
+    }
+
     gtk_widget_show( p_intf->p_sys->p_disc );
     gdk_window_raise( p_intf->p_sys->p_disc->window );
 }
@@ -291,6 +310,14 @@ on_menubar_network_activate            (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+
+    /* If we have never used the file selector, open it */
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_network ) )
+    {
+        p_intf->p_sys->p_network = create_intf_network();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_network ),
+                             "p_intf", p_intf );
+    }
 
     gtk_widget_show( p_intf->p_sys->p_network );
     gdk_window_raise( p_intf->p_sys->p_network->window );
@@ -313,7 +340,9 @@ void
 on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    playlist_t *    p_playlist ;
+    GtkCList *      p_list;
 
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
     {
@@ -321,6 +350,17 @@ on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
                              "p_intf", p_intf );
     }
+
+    vlc_mutex_lock( &p_main->p_playlist->change_lock );
+    if( p_main->p_playlist->i_size > 0 )
+    {
+        p_playlist = p_main->p_playlist;
+        p_list = GTK_CLIST( lookup_widget( p_intf->p_sys->p_playlist,
+                                           "playlist_clist" ) );
+        GnomeRebuildCList( p_list, p_playlist );
+    }
+    vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+
     gtk_widget_show( p_intf->p_sys->p_playlist );
     gdk_window_raise( p_intf->p_sys->p_playlist->window );
 }
@@ -367,6 +407,22 @@ on_menubar_subtitle_toggle             (GtkCheckMenuItem     *menuitem,
 
 
 void
+on_menubar_fullscreen_activate         (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    if( p_vout_bank->i_count )
+    {
+        vlc_mutex_lock( &p_vout_bank->pp_vout[0]->change_lock );
+        if( p_vout_bank->pp_vout[0]->b_fullscreen ==
+                !GTK_CHECK_MENU_ITEM( menuitem )->active )
+            p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
+        vlc_mutex_unlock( &p_vout_bank->pp_vout[0]->change_lock );
+    }
+}
+
+
+
+void
 on_menubar_title_toggle                (GtkCheckMenuItem     *menuitem,
                                         gpointer              user_data)
 {
@@ -374,8 +430,9 @@ on_menubar_title_toggle                (GtkCheckMenuItem     *menuitem,
 
     if( menuitem->active && !p_intf->p_sys->b_title_update )
     {
+        gint i_title = (gint)user_data;
         p_intf->p_input->pf_set_area( p_intf->p_input,
-                                     (input_area_t*)user_data );
+            p_intf->p_input->stream.pp_areas[i_title] );
 
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 
@@ -391,7 +448,7 @@ on_menubar_chapter_toggle              (GtkCheckMenuItem     *menuitem,
     intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
     input_area_t *  p_area    = p_intf->p_input->stream.p_selected_area;
     gint            i_chapter = (gint)user_data;
-    char            psz_chapter[3];
+    char            psz_chapter[5];
 
     if( menuitem->active && !p_intf->p_sys->b_chapter_update )
     {
@@ -448,7 +505,18 @@ void
 on_menubar_preferences_activate        (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
+    /* If we have never used the file selector, open it */
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_preferences ) )
+    {
+        p_intf->p_sys->p_preferences = create_intf_preferences();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_preferences ),
+                             "p_intf", p_intf );
+    }
+
+    gtk_widget_show( p_intf->p_sys->p_preferences );
+    gdk_window_raise( p_intf->p_sys->p_preferences->window );
 }
 
 
@@ -482,7 +550,7 @@ on_toolbar_open_clicked                (GtkButton       *button,
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
 
     /* If we have never used the file selector, open it */
-    if( p_intf->p_sys->p_fileopen == NULL)
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_fileopen ) )
     {
         p_intf->p_sys->p_fileopen = create_intf_fileopen();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
@@ -500,6 +568,14 @@ on_toolbar_disc_clicked                (GtkButton       *button,
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
 
+    /* If we have never used the file selector, open it */
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_disc ) )
+    {
+        p_intf->p_sys->p_disc = create_intf_disc();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_disc ),
+                             "p_intf", p_intf );
+    }
+
     gtk_widget_show( p_intf->p_sys->p_disc );
     gdk_window_raise( p_intf->p_sys->p_disc->window );
 }
@@ -510,6 +586,14 @@ on_toolbar_network_clicked             (GtkButton       *button,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+
+    /* If we have never used the file selector, open it */
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_network ) )
+    {
+        p_intf->p_sys->p_network = create_intf_network();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_network ),
+                             "p_intf", p_intf );
+    }
 
     gtk_widget_show( p_intf->p_sys->p_network );
     gdk_window_raise( p_intf->p_sys->p_network->window );
@@ -528,7 +612,14 @@ void
 on_toolbar_stop_clicked                (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
 
+    if( p_intf->p_input != NULL )
+    {
+        p_vout_bank->pp_vout[0]->b_die = 1;
+        p_aout_bank->pp_aout[0]->b_die = 1;
+        p_intf->p_input->b_die = 1;
+    }
 }
 
 
@@ -596,8 +687,21 @@ on_toolbar_playlist_clicked            (GtkButton       *button,
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
                              "p_intf", p_intf );
     }
-    gtk_widget_show( p_intf->p_sys->p_playlist );
-    gdk_window_raise( p_intf->p_sys->p_playlist->window );
+
+    if( GTK_WIDGET_VISIBLE( p_intf->p_sys->p_playlist ) )
+    {
+        gtk_widget_hide( p_intf->p_sys->p_playlist );
+    } 
+    else 
+    {        
+        GtkCList * p_clist;
+
+        p_clist = GTK_CLIST( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+        GnomeRebuildCList( p_clist , p_main->p_playlist );
+        gtk_widget_show( p_intf->p_sys->p_playlist );
+        gdk_window_raise( p_intf->p_sys->p_playlist->window );
+    }
 }
 
 
@@ -655,6 +759,14 @@ on_popup_play_activate                 (GtkMenuItem     *menuitem,
 
 
 void
+on_popup_back_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
 on_popup_pause_activate                (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
@@ -689,6 +801,21 @@ on_popup_fast_activate                 (GtkMenuItem     *menuitem,
     if( p_intf->p_input != NULL )
     {
         input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
+    }
+}
+
+
+void
+on_popup_fullscreen_activate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    if( p_vout_bank->i_count )
+    {
+        vlc_mutex_lock( &p_vout_bank->pp_vout[0]->change_lock );
+        if( p_vout_bank->pp_vout[0]->b_fullscreen ==
+                !GTK_CHECK_MENU_ITEM( menuitem )->active )
+            p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
+        vlc_mutex_unlock( &p_vout_bank->pp_vout[0]->change_lock );
     }
 }
 
@@ -789,7 +916,7 @@ on_popup_open_activate                 (GtkMenuItem     *menuitem,
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
 
     /* If we have never used the file selector, open it */
-    if( p_intf->p_sys->p_fileopen == NULL)
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_fileopen ) )
     {
         p_intf->p_sys->p_fileopen = create_intf_fileopen();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
@@ -852,6 +979,66 @@ on_popup_exit_activate                 (GtkMenuItem     *menuitem,
 }
 
 
+void
+on_popup_stop_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+
+    if( p_intf->p_input != NULL )
+    {
+        p_intf->p_input->b_die = 1;
+    }
+}
+
+
+void
+on_popup_playlist_activate             (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
+    {
+        p_intf->p_sys->p_playlist = create_intf_playlist();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
+                             "p_intf", p_intf );
+    }
+    gtk_widget_show( p_intf->p_sys->p_playlist );
+    gdk_window_raise( p_intf->p_sys->p_playlist->window );
+}
+
+
+void
+on_popup_jump_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_jump ) )
+    {
+        p_intf->p_sys->p_jump = create_intf_jump();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_jump ),
+                             "p_intf", p_intf );
+    }
+
+    gtk_widget_show( p_intf->p_sys->p_jump );
+    gdk_window_raise( p_intf->p_sys->p_jump->window );
+}
+
+
+void
+on_popup_preferences_activate          (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+
+    gtk_widget_show( p_intf->p_sys->p_preferences );
+    gdk_window_raise( p_intf->p_sys->p_preferences->window );
+
+}
+
+
 /*****************************************************************************
  * Fileopen callbacks
  *****************************************************************************
@@ -861,9 +1048,7 @@ void
 on_intf_fileopen_destroy               (GtkObject       *object,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(object), "intf_fileopen" );
-
-    p_intf->p_sys->p_fileopen = NULL;
+    gtk_widget_hide( GTK_WIDGET( object ) );
 }
 
 
@@ -871,22 +1056,32 @@ void
 on_fileopen_ok_clicked                 (GtkButton       *button,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_fileopen" );
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(button), "intf_fileopen" );
+    GtkCList *      p_playlist_clist;
+    GtkWidget *     p_filesel;
+    gchar *         psz_filename;
+    int             i_end = p_main->p_playlist->i_size;
 
-    GtkWidget *filesel;
-    gchar *filename;
+    p_filesel = gtk_widget_get_toplevel( GTK_WIDGET(button) );
+    gtk_widget_hide( p_filesel );
+    psz_filename =
+        gtk_file_selection_get_filename( GTK_FILE_SELECTION( p_filesel ) );
 
-    filesel = gtk_widget_get_toplevel (GTK_WIDGET (button));
-    gtk_widget_hide (filesel);
-    filename = gtk_file_selection_get_filename (GTK_FILE_SELECTION (filesel));
+    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)psz_filename );
 
-    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)filename );
+    /* catch the GTK CList */
+    p_playlist_clist = GTK_CLIST( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+    /* update the display */
+    GnomeRebuildCList( p_playlist_clist, p_main->p_playlist );
 
     /* Select added item and switch to file interface */
     if( p_intf->p_input != NULL )
+    {
         p_intf->p_input->b_eof = 1;
+    }
 
-//    p_intf->p_sys->b_mode_changed = 1;
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
 }
 
 
@@ -896,40 +1091,6 @@ on_fileopen_cancel_clicked             (GtkButton       *button,
 {
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
-
-
-/*****************************************************************************
- * Playlist callbacks
- *****************************************************************************
- * The following callbacks are related to the playlist.
- *****************************************************************************/
-void
-on_intf_playlist_destroy               (GtkObject       *object,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(object), "intf_playlist" );
-
-    p_intf->p_sys->p_playlist = NULL;
-}
-
-
-void
-on_playlist_ok_clicked                 (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_playlist" );
-
-    gtk_widget_hide( p_intf->p_sys->p_playlist );
-}
-
-
-void
-on_playlist_close_clicked              (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
-}
-
 
 
 /*****************************************************************************
@@ -1004,9 +1165,12 @@ void
 on_disc_ok_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_disc" );
-    char *psz_device, *psz_source, *psz_method;
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(button), "intf_disc" );
+    GtkCList *      p_playlist_clist;
+    char *          psz_device, *psz_source, *psz_method;
+    int             i_end = p_main->p_playlist->i_size;
 
+    gtk_widget_hide( p_intf->p_sys->p_disc );
     psz_device = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                          GTK_WIDGET(button), "disc_name" ) ) );
 
@@ -1051,13 +1215,19 @@ on_disc_ok_clicked                     (GtkButton       *button,
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
     free( psz_source );
 
-    /* Select added item and switch to DVD interface */
-    intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
-    if( p_intf->p_input != NULL )
-        p_intf->p_input->b_eof = 1;
-//    p_intf->p_sys->b_mode_changed = 1;
+    /* catch the GTK CList */
+    p_playlist_clist = GTK_CLIST( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+    /* update the display */
+    GnomeRebuildCList( p_playlist_clist, p_main->p_playlist );
 
-    gtk_widget_hide( p_intf->p_sys->p_disc );
+    /* Select added item and switch to DVD interface */
+    if( p_intf->p_input != NULL )
+    {
+        p_intf->p_input->b_eof = 1;
+    }
+
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
 }
 
 
@@ -1078,10 +1248,14 @@ void
 on_network_ok_clicked                  (GtkButton       *button,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_network" );
-    char *psz_source, *psz_server, *psz_protocol;
-    unsigned int i_port;
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(button), "intf_network" );
+    GtkCList *      p_playlist_clist;
+    char *          psz_source, *psz_server, *psz_protocol;
+    unsigned int    i_port;
+    boolean_t       b_broadcast;
+    int             i_end = p_main->p_playlist->i_size;
 
+    gtk_widget_hide( p_intf->p_sys->p_network );
     psz_server = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                  GTK_WIDGET(button), "network_server" ) ) );
 
@@ -1110,32 +1284,140 @@ on_network_ok_clicked                  (GtkButton       *button,
         intf_ErrMsg( "intf error: invalid port %i", i_port );
     }
 
-    /* Allocate room for "protocol://server:port" */
-    psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
-                           + strlen( psz_server ) + 1 /* ":" */
-                           + 5 /* 0-65535 */ + 1 /* "\0" */ );
-    if( psz_source == NULL )
+    /* do we have a broadcast address */
+    b_broadcast = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(
+        lookup_widget( GTK_WIDGET(button), "broadcast_check" ) ) );
+    if( b_broadcast )
     {
-        return;
+        char *  psz_broadcast;
+        psz_broadcast = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
+                                 GTK_WIDGET(button), "network_broadcast" ) ) );
+        /* Allocate room for "protocol://server:port" */
+        psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
+                               + strlen( psz_server ) + 1 /* ":" */
+                               + 5 /* 0-65535 */
+                               + strlen( psz_broadcast ) + 2 /* "::" */ 
+                               + 1 /* "\0" */ );
+        if( psz_source == NULL )
+        {
+            return;
+        }
+
+        /* Build source name and add it to playlist */
+        sprintf( psz_source, "%s://%s:%i::%s", psz_protocol,
+                                               psz_server,
+                                               i_port,
+                                               psz_broadcast );
     }
-   
-    /* Build source name and add it to playlist */
-    sprintf( psz_source, "%s://%s:%i", psz_protocol, psz_server, i_port );
+    else
+    {
+        /* Allocate room for "protocol://server:port" */
+        psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
+                               + strlen( psz_server ) + 1 /* ":" */
+                               + 5 /* 0-65535 */ + 1 /* "\0" */ );
+        if( psz_source == NULL )
+        {
+            return;
+        }
+       
+        /* Build source name and add it to playlist */
+        sprintf( psz_source, "%s://%s:%i", psz_protocol, psz_server, i_port );
+    }
+
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
     free( psz_source );
 
-    /* Select added item and switch to network interface */
-    intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
-    if( p_intf->p_input != NULL )
-        p_intf->p_input->b_eof = 1;
-//    p_intf->p_sys->b_mode_changed = 1;
+    /* catch the GTK CList */
+    p_playlist_clist = GTK_CLIST( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+    /* update the display */
+    GnomeRebuildCList( p_playlist_clist, p_main->p_playlist );
 
-    gtk_widget_hide( p_intf->p_sys->p_network );
+    /* Select added item and switch to network interface */
+    if( p_intf->p_input != NULL )
+    {
+        p_intf->p_input->b_eof = 1;
+    }
+
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
 }
 
 
 void
 on_network_cancel_clicked              (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
+
+
+void
+on_broadcast_check_toggled             (GtkToggleButton *togglebutton,
+                                        gpointer         user_data)
+{
+    GtkWidget *     p_network;
+
+    p_network = gtk_widget_get_toplevel( GTK_WIDGET (togglebutton) );
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_broadcast_combo" ),
+            gtk_toggle_button_get_active( togglebutton ) );
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_broadcast" ),
+            gtk_toggle_button_get_active( togglebutton ) );
+}
+
+
+/****************************************************************************
+ * Jump window
+ ****************************************************************************
+ * Those callback are received from the jump window that allow to select
+ * an arbitrary position of the stream.
+ ****************************************************************************/
+void
+on_jump_ok_clicked                     (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
+
+
+void
+on_jump_apply_clicked                  (GtkButton       *button,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
+on_jump_cancel_clicked                 (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
+
+
+/****************************************************************************
+ * Preferences window callbacks
+ ****************************************************************************/
+void
+on_preferences_ok_clicked              (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
+
+
+void
+on_preferences_apply_clicked           (GtkButton       *button,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
+on_preferences_cancel_clicked          (GtkButton       *button,
                                         gpointer         user_data)
 {
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );

@@ -48,6 +48,14 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
 static GnomeUIInfo menubar_view_menu_uiinfo[] =
 {
   {
+    GNOME_APP_UI_TOGGLEITEM, N_("_Fullscreen"),
+    NULL,
+    (gpointer) on_menubar_fullscreen_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+  {
     GNOME_APP_UI_ITEM, N_("_Title"),
     N_("Choose title"),
     (gpointer) NULL, NULL, NULL,
@@ -141,26 +149,27 @@ create_intf_window (void)
   GtkWidget *toolbar_playlist;
   GtkWidget *toolbar_prev;
   GtkWidget *toolbar_next;
-  GtkWidget *vbox2;
-  GtkWidget *hbox4;
-  GtkWidget *label_date;
-  GtkWidget *label_status;
-  GtkWidget *label_bar;
+  GtkWidget *vbox8;
+  GtkWidget *slider_handlebox;
+  GtkWidget *slider_frame;
   GtkWidget *slider;
   GtkWidget *file_box;
-  GtkWidget *label_file;
+  GtkWidget *label_status;
   GtkWidget *dvd_box;
+  GtkWidget *label21;
   GtkWidget *title_chapter_box;
   GtkWidget *label19;
   GtkWidget *label_title;
   GtkWidget *button_title_prev;
   GtkWidget *button_title_next;
+  GtkWidget *vseparator1;
   GtkWidget *dvd_chapter_box;
   GtkWidget *label20;
   GtkWidget *label_chapter;
   GtkWidget *button_chapter_prev;
   GtkWidget *button_chapter_next;
   GtkWidget *network_box;
+  GtkWidget *network_address_label;
   GtkWidget *network_channel_box;
   GtkWidget *label_network;
   GtkObject *network_spinbutton_adj;
@@ -172,6 +181,7 @@ create_intf_window (void)
 
   intf_window = gnome_app_new ("VideoLAN Client", _("VideoLAN Client"));
   gtk_object_set_data (GTK_OBJECT (intf_window), "intf_window", intf_window);
+  gtk_window_set_policy (GTK_WINDOW (intf_window), FALSE, TRUE, TRUE);
 
   dockitem = GNOME_APP (intf_window)->dock;
   gtk_widget_ref (dockitem);
@@ -217,39 +227,48 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[0].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_title",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_fullscreen",
                             menubar_view_menu_uiinfo[0].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[0].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[1].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_chapter",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator9",
                             menubar_view_menu_uiinfo[1].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[1].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[2].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_angle",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_title",
                             menubar_view_menu_uiinfo[2].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_set_sensitive (menubar_view_menu_uiinfo[2].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[3].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator7",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_chapter",
                             menubar_view_menu_uiinfo[3].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[3].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[4].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_playlist",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_angle",
                             menubar_view_menu_uiinfo[4].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_set_sensitive (menubar_view_menu_uiinfo[4].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[5].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_modules",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator7",
                             menubar_view_menu_uiinfo[5].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[5].widget, FALSE);
+
+  gtk_widget_ref (menubar_view_menu_uiinfo[6].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_playlist",
+                            menubar_view_menu_uiinfo[6].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (menubar_view_menu_uiinfo[7].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_modules",
+                            menubar_view_menu_uiinfo[7].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[7].widget, FALSE);
 
   gtk_widget_ref (menubar_uiinfo[2].widget);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_settings",
@@ -277,7 +296,6 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_preferences",
                             menubar_settings_menu_uiinfo[3].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (menubar_settings_menu_uiinfo[3].widget, FALSE);
 
   gtk_widget_ref (menubar_uiinfo[3].widget);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_help",
@@ -305,7 +323,7 @@ create_intf_window (void)
   toolbar_file = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
-                                _("Open"),
+                                _("File"),
                                 _("Open a File"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_file);
@@ -376,6 +394,7 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_play", toolbar_play,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_play);
+  gtk_widget_set_sensitive (toolbar_play, FALSE);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_BOTTOM);
   toolbar_pause = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -388,6 +407,7 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_pause", toolbar_pause,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_pause);
+  gtk_widget_set_sensitive (toolbar_pause, FALSE);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_TIMER_STOP);
   toolbar_slow = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -400,6 +420,7 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_slow", toolbar_slow,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_slow);
+  gtk_widget_set_sensitive (toolbar_slow, FALSE);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_TIMER);
   toolbar_fast = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -412,6 +433,7 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_fast", toolbar_fast,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_fast);
+  gtk_widget_set_sensitive (toolbar_fast, FALSE);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -426,7 +448,6 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_playlist", toolbar_playlist,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_playlist);
-  gtk_widget_set_sensitive (toolbar_playlist, FALSE);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_FIRST);
   toolbar_prev = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -452,49 +473,34 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_next);
 
-  vbox2 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_ref (vbox2);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "vbox2", vbox2,
+  vbox8 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_ref (vbox8);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "vbox8", vbox8,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (vbox2);
-  gnome_app_set_contents (GNOME_APP (intf_window), vbox2);
+  gtk_widget_show (vbox8);
+  gnome_app_set_contents (GNOME_APP (intf_window), vbox8);
 
-  hbox4 = gtk_hbox_new (TRUE, 0);
-  gtk_widget_ref (hbox4);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "hbox4", hbox4,
+  slider_handlebox = gtk_handle_box_new ();
+  gtk_widget_ref (slider_handlebox);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "slider_handlebox", slider_handlebox,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (hbox4);
-  gtk_box_pack_start (GTK_BOX (vbox2), hbox4, TRUE, TRUE, 0);
-  gtk_widget_set_usize (hbox4, 650, -2);
+  gtk_box_pack_start (GTK_BOX (vbox8), slider_handlebox, TRUE, TRUE, 0);
 
-  label_date = gtk_label_new (_("-:--:--"));
-  gtk_widget_ref (label_date);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_date", label_date,
+  slider_frame = gtk_frame_new (_("-:--:--"));
+  gtk_widget_ref (slider_frame);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "slider_frame", slider_frame,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label_date);
-  gtk_box_pack_start (GTK_BOX (hbox4), label_date, FALSE, FALSE, 0);
-
-  label_status = gtk_label_new (_("Status: foo"));
-  gtk_widget_ref (label_status);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_status", label_status,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label_status);
-  gtk_box_pack_start (GTK_BOX (hbox4), label_status, FALSE, FALSE, 0);
-  gtk_widget_set_usize (label_status, 350, -2);
-
-  label_bar = gtk_label_new (_("Bar: baz"));
-  gtk_widget_ref (label_bar);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_bar", label_bar,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label_bar);
-  gtk_box_pack_start (GTK_BOX (hbox4), label_bar, FALSE, FALSE, 0);
+  gtk_widget_show (slider_frame);
+  gtk_container_add (GTK_CONTAINER (slider_handlebox), slider_frame);
+  gtk_frame_set_label_align (GTK_FRAME (slider_frame), 0.05, 0.5);
 
   slider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 6.25, 0)));
   gtk_widget_ref (slider);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "slider", slider,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (slider);
-  gtk_box_pack_start (GTK_BOX (vbox2), slider, TRUE, TRUE, 0);
+  gtk_container_add (GTK_CONTAINER (slider_frame), slider);
+  gtk_widget_set_usize (slider, 500, 15);
   gtk_scale_set_draw_value (GTK_SCALE (slider), FALSE);
   gtk_scale_set_digits (GTK_SCALE (slider), 3);
 
@@ -503,22 +509,29 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "file_box", file_box,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (file_box);
-  gtk_box_pack_start (GTK_BOX (vbox2), file_box, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox8), file_box, TRUE, TRUE, 0);
+  gtk_widget_set_usize (file_box, 500, 24);
 
-  label_file = gtk_label_new (_("Vlc File Mode"));
-  gtk_widget_ref (label_file);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_file", label_file,
+  label_status = gtk_label_new (_("Playlist empty"));
+  gtk_widget_ref (label_status);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_status", label_status,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label_file);
-  gtk_box_pack_start (GTK_BOX (file_box), label_file, TRUE, TRUE, 0);
-  gtk_widget_set_usize (label_file, -2, 24);
+  gtk_widget_show (label_status);
+  gtk_box_pack_start (GTK_BOX (file_box), label_status, TRUE, TRUE, 0);
 
   dvd_box = gtk_hbox_new (FALSE, 0);
   gtk_widget_ref (dvd_box);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "dvd_box", dvd_box,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_box_pack_start (GTK_BOX (vbox2), dvd_box, TRUE, TRUE, 0);
-  gtk_widget_set_usize (dvd_box, -2, 24);
+  gtk_box_pack_start (GTK_BOX (vbox8), dvd_box, TRUE, TRUE, 0);
+  gtk_widget_set_usize (dvd_box, 500, 24);
+
+  label21 = gtk_label_new (_("DVD  "));
+  gtk_widget_ref (label21);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label21", label21,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label21);
+  gtk_box_pack_start (GTK_BOX (dvd_box), label21, TRUE, FALSE, 0);
 
   title_chapter_box = gtk_hbox_new (FALSE, 10);
   gtk_widget_ref (title_chapter_box);
@@ -558,6 +571,13 @@ create_intf_window (void)
   gtk_box_pack_start (GTK_BOX (title_chapter_box), button_title_next, FALSE, FALSE, 0);
   gtk_button_set_relief (GTK_BUTTON (button_title_next), GTK_RELIEF_NONE);
 
+  vseparator1 = gtk_vseparator_new ();
+  gtk_widget_ref (vseparator1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "vseparator1", vseparator1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (vseparator1);
+  gtk_box_pack_start (GTK_BOX (dvd_box), vseparator1, FALSE, FALSE, 0);
+
   dvd_chapter_box = gtk_hbox_new (FALSE, 10);
   gtk_widget_ref (dvd_chapter_box);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "dvd_chapter_box", dvd_chapter_box,
@@ -572,7 +592,7 @@ create_intf_window (void)
   gtk_widget_show (label20);
   gtk_box_pack_start (GTK_BOX (dvd_chapter_box), label20, FALSE, FALSE, 0);
 
-  label_chapter = gtk_label_new (_("--"));
+  label_chapter = gtk_label_new (_("---"));
   gtk_widget_ref (label_chapter);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_chapter", label_chapter,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -601,21 +621,28 @@ create_intf_window (void)
   gtk_widget_ref (network_box);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_box", network_box,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_box_pack_start (GTK_BOX (vbox2), network_box, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox8), network_box, FALSE, FALSE, 0);
+  gtk_widget_set_usize (network_box, 500, 24);
+
+  network_address_label = gtk_label_new (_("No server"));
+  gtk_widget_ref (network_address_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_address_label", network_address_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_address_label);
+  gtk_box_pack_start (GTK_BOX (network_box), network_address_label, FALSE, FALSE, 0);
 
   network_channel_box = gtk_hbox_new (FALSE, 0);
   gtk_widget_ref (network_channel_box);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_channel_box", network_channel_box,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_channel_box);
-  gtk_box_pack_start (GTK_BOX (network_box), network_channel_box, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (network_box), network_channel_box, FALSE, FALSE, 0);
 
   label_network = gtk_label_new (_("Network Channel:"));
   gtk_widget_ref (label_network);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_network", label_network,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label_network);
-  gtk_box_pack_start (GTK_BOX (network_channel_box), label_network, TRUE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (network_channel_box), label_network, TRUE, FALSE, 5);
 
   network_spinbutton_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
   network_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (network_spinbutton_adj), 1, 0);
@@ -623,15 +650,16 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_spinbutton", network_spinbutton,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_spinbutton);
-  gtk_box_pack_start (GTK_BOX (network_channel_box), network_spinbutton, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (network_channel_box), network_spinbutton, FALSE, TRUE, 5);
   gtk_widget_set_sensitive (network_spinbutton, FALSE);
 
-  appbar = gnome_appbar_new (TRUE, TRUE, GNOME_PREFERENCES_NEVER);
+  appbar = gnome_appbar_new (FALSE, TRUE, GNOME_PREFERENCES_NEVER);
   gtk_widget_ref (appbar);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "appbar", appbar,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (appbar);
   gnome_app_set_statusbar (GNOME_APP (intf_window), appbar);
+  gtk_widget_set_usize (appbar, 500, -2);
 
   gtk_signal_connect (GTK_OBJECT (intf_window), "destroy",
                       GTK_SIGNAL_FUNC (on_intf_window_destroy),
@@ -731,7 +759,7 @@ static GnomeUIInfo popup_file_menu_uiinfo[] =
 static GnomeUIInfo intf_popup_uiinfo[] =
 {
   {
-    GNOME_APP_UI_ITEM, N_("_Play"),
+    GNOME_APP_UI_ITEM, N_("Play"),
     NULL,
     (gpointer) on_popup_play_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_FORWARD,
@@ -742,6 +770,20 @@ static GnomeUIInfo intf_popup_uiinfo[] =
     NULL,
     (gpointer) on_popup_pause_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_BOTTOM,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Stop"),
+    NULL,
+    (gpointer) on_popup_stop_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_STOP,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Back"),
+    NULL,
+    (gpointer) on_popup_back_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_BACK,
     0, (GdkModifierType) 0, NULL
   },
   {
@@ -760,10 +802,25 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   },
   GNOMEUIINFO_SEPARATOR,
   {
+    GNOME_APP_UI_TOGGLEITEM, N_("_Fullscreen"),
+    N_("Toggle fullscreen mode"),
+    (gpointer) on_popup_fullscreen_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+  {
+    GNOME_APP_UI_ITEM, N_("_Jump"),
+    N_("Got directly so specified point"),
+    (gpointer) on_popup_jump_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_JUMP_TO,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
     GNOME_APP_UI_ITEM, N_("_Navigation"),
     N_("Navigate through titles and chapters"),
     (gpointer) NULL, NULL, NULL,
-    GNOME_APP_PIXMAP_NONE, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_SEARCH,
     0, (GdkModifierType) 0, NULL
   },
   {
@@ -777,17 +834,26 @@ static GnomeUIInfo intf_popup_uiinfo[] =
     GNOME_APP_UI_ITEM, N_("_Audio"),
     N_("Select audio channel"),
     (gpointer) NULL, NULL, NULL,
-    GNOME_APP_PIXMAP_NONE, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_VOLUME,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("_Subtitles"),
     N_("Select subtitle channel"),
     (gpointer) NULL, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_FONT,
+    0, (GdkModifierType) 0, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_MENU_FILE_TREE (popup_file_menu_uiinfo),
+  {
+    GNOME_APP_UI_ITEM, N_("Playlist..."),
+    NULL,
+    (gpointer) on_popup_playlist_activate, NULL, NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
-  GNOMEUIINFO_MENU_FILE_TREE (popup_file_menu_uiinfo),
+  GNOMEUIINFO_MENU_PREFERENCES_ITEM (on_popup_preferences_activate, NULL),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_MENU_EXIT_ITEM (on_popup_exit_activate, NULL),
   GNOMEUIINFO_END
@@ -814,47 +880,78 @@ create_intf_popup (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[2].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_slow",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_stop",
                             intf_popup_uiinfo[2].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[3].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_fast",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_back",
                             intf_popup_uiinfo[3].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (intf_popup_uiinfo[3].widget, FALSE);
 
   gtk_widget_ref (intf_popup_uiinfo[4].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator3",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_slow",
                             intf_popup_uiinfo[4].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[5].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_navigation",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_fast",
                             intf_popup_uiinfo[5].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (intf_popup_uiinfo[5].widget, FALSE);
 
   gtk_widget_ref (intf_popup_uiinfo[6].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_angle",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator3",
                             intf_popup_uiinfo[6].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (intf_popup_uiinfo[6].widget, FALSE);
 
   gtk_widget_ref (intf_popup_uiinfo[7].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_fullscreen",
                             intf_popup_uiinfo[7].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (intf_popup_uiinfo[7].widget, FALSE);
 
   gtk_widget_ref (intf_popup_uiinfo[8].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_subtitle",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator8",
                             intf_popup_uiinfo[8].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (intf_popup_uiinfo[8].widget, FALSE);
 
   gtk_widget_ref (intf_popup_uiinfo[9].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_file",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_jump",
                             intf_popup_uiinfo[9].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (intf_popup_uiinfo[10].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_navigation",
+                            intf_popup_uiinfo[10].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (intf_popup_uiinfo[10].widget, FALSE);
+
+  gtk_widget_ref (intf_popup_uiinfo[11].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_angle",
+                            intf_popup_uiinfo[11].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (intf_popup_uiinfo[11].widget, FALSE);
+
+  gtk_widget_ref (intf_popup_uiinfo[12].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio",
+                            intf_popup_uiinfo[12].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (intf_popup_uiinfo[12].widget, FALSE);
+
+  gtk_widget_ref (intf_popup_uiinfo[13].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_subtitle",
+                            intf_popup_uiinfo[13].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (intf_popup_uiinfo[13].widget, FALSE);
+
+  gtk_widget_ref (intf_popup_uiinfo[14].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator13",
+                            intf_popup_uiinfo[14].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (intf_popup_uiinfo[15].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_file",
+                            intf_popup_uiinfo[15].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (popup_file_menu_uiinfo[0].widget);
@@ -882,14 +979,24 @@ create_intf_popup (void)
                             popup_file_menu_uiinfo[4].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
-  gtk_widget_ref (intf_popup_uiinfo[10].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator2",
-                            intf_popup_uiinfo[10].widget,
+  gtk_widget_ref (intf_popup_uiinfo[16].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_playlist",
+                            intf_popup_uiinfo[16].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
-  gtk_widget_ref (intf_popup_uiinfo[11].widget);
+  gtk_widget_ref (intf_popup_uiinfo[17].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_preferences",
+                            intf_popup_uiinfo[17].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (intf_popup_uiinfo[18].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator2",
+                            intf_popup_uiinfo[18].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (intf_popup_uiinfo[19].widget);
   gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_exit",
-                            intf_popup_uiinfo[11].widget,
+                            intf_popup_uiinfo[19].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   return intf_popup;
@@ -1036,97 +1143,6 @@ create_intf_modules (void)
                       NULL);
 
   return intf_modules;
-}
-
-GtkWidget*
-create_intf_playlist (void)
-{
-  GtkWidget *intf_playlist;
-  GtkWidget *dialog_vbox2;
-  GtkWidget *label11;
-  GtkWidget *scrolledwindow3;
-  GtkWidget *clist2;
-  GtkWidget *label8;
-  GtkWidget *label9;
-  GtkWidget *label10;
-  GtkWidget *dialog_action_area2;
-  GtkWidget *playlist_ok;
-
-  intf_playlist = gnome_dialog_new (_("Playlist"), NULL);
-  gtk_object_set_data (GTK_OBJECT (intf_playlist), "intf_playlist", intf_playlist);
-
-  dialog_vbox2 = GNOME_DIALOG (intf_playlist)->vbox;
-  gtk_object_set_data (GTK_OBJECT (intf_playlist), "dialog_vbox2", dialog_vbox2);
-  gtk_widget_show (dialog_vbox2);
-
-  label11 = gtk_label_new (_("Sorry, the playlist isn't functional yet. Please retry in a later version."));
-  gtk_widget_ref (label11);
-  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label11", label11,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label11);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox2), label11, FALSE, FALSE, 0);
-
-  scrolledwindow3 = gtk_scrolled_window_new (NULL, NULL);
-  gtk_widget_ref (scrolledwindow3);
-  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "scrolledwindow3", scrolledwindow3,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (scrolledwindow3);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox2), scrolledwindow3, TRUE, TRUE, 0);
-
-  clist2 = gtk_clist_new (3);
-  gtk_widget_ref (clist2);
-  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "clist2", clist2,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (clist2);
-  gtk_container_add (GTK_CONTAINER (scrolledwindow3), clist2);
-  gtk_clist_set_column_width (GTK_CLIST (clist2), 0, 211);
-  gtk_clist_set_column_width (GTK_CLIST (clist2), 1, 49);
-  gtk_clist_set_column_width (GTK_CLIST (clist2), 2, 35);
-  gtk_clist_column_titles_hide (GTK_CLIST (clist2));
-
-  label8 = gtk_label_new (_("Name"));
-  gtk_widget_ref (label8);
-  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label8", label8,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label8);
-  gtk_clist_set_column_widget (GTK_CLIST (clist2), 0, label8);
-
-  label9 = gtk_label_new (_("Type"));
-  gtk_widget_ref (label9);
-  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label9", label9,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label9);
-  gtk_clist_set_column_widget (GTK_CLIST (clist2), 1, label9);
-
-  label10 = gtk_label_new (_("Length"));
-  gtk_widget_ref (label10);
-  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label10", label10,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label10);
-  gtk_clist_set_column_widget (GTK_CLIST (clist2), 2, label10);
-
-  dialog_action_area2 = GNOME_DIALOG (intf_playlist)->action_area;
-  gtk_object_set_data (GTK_OBJECT (intf_playlist), "dialog_action_area2", dialog_action_area2);
-  gtk_widget_show (dialog_action_area2);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area2), GTK_BUTTONBOX_END);
-  gtk_button_box_set_spacing (GTK_BUTTON_BOX (dialog_action_area2), 8);
-
-  gnome_dialog_append_button (GNOME_DIALOG (intf_playlist), GNOME_STOCK_BUTTON_OK);
-  playlist_ok = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_playlist)->buttons)->data);
-  gtk_widget_ref (playlist_ok);
-  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_ok", playlist_ok,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (playlist_ok);
-  GTK_WIDGET_SET_FLAGS (playlist_ok, GTK_CAN_DEFAULT);
-
-  gtk_signal_connect (GTK_OBJECT (intf_playlist), "destroy",
-                      GTK_SIGNAL_FUNC (on_intf_playlist_destroy),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (playlist_ok), "clicked",
-                      GTK_SIGNAL_FUNC (on_playlist_ok_clicked),
-                      NULL);
-
-  return intf_playlist;
 }
 
 GtkWidget*
@@ -1337,10 +1353,17 @@ create_intf_network (void)
   GtkWidget *label18;
   GtkObject *network_port_adj;
   GtkWidget *network_port;
+  GtkWidget *broadcast_check;
+  GtkWidget *network_broadcast_combo;
+  GtkWidget *network_broadcast;
+  GtkWidget *network_server_combo;
   GtkWidget *network_server;
   GtkWidget *hbuttonbox1;
   GtkWidget *network_ok;
   GtkWidget *network_cancel;
+  GtkTooltips *tooltips;
+
+  tooltips = gtk_tooltips_new ();
 
   intf_network = gnome_dialog_new (_("Network Stream"), NULL);
   gtk_object_set_data (GTK_OBJECT (intf_network), "intf_network", intf_network);
@@ -1405,7 +1428,7 @@ create_intf_network (void)
   gtk_widget_show (frame4);
   gtk_box_pack_start (GTK_BOX (hbox3), frame4, TRUE, TRUE, 0);
 
-  table2 = gtk_table_new (2, 2, FALSE);
+  table2 = gtk_table_new (3, 2, FALSE);
   gtk_widget_ref (table2);
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "table2", table2,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1444,15 +1467,47 @@ create_intf_network (void)
   gtk_table_attach (GTK_TABLE (table2), network_port, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_tooltips_set_tip (tooltips, network_port, _("Port of the stream server"), NULL);
 
-  network_server = gtk_entry_new ();
+  broadcast_check = gtk_check_button_new_with_label (_("Broadcast"));
+  gtk_widget_ref (broadcast_check);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "broadcast_check", broadcast_check,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (broadcast_check);
+  gtk_table_attach (GTK_TABLE (table2), broadcast_check, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  network_broadcast_combo = gnome_entry_new (NULL);
+  gtk_widget_ref (network_broadcast_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_broadcast_combo", network_broadcast_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_broadcast_combo);
+  gtk_table_attach (GTK_TABLE (table2), network_broadcast_combo, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  network_broadcast = gnome_entry_gtk_entry (GNOME_ENTRY (network_broadcast_combo));
+  gtk_widget_ref (network_broadcast);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_broadcast", network_broadcast,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_broadcast);
+  gtk_widget_set_sensitive (network_broadcast, FALSE);
+
+  network_server_combo = gnome_entry_new (NULL);
+  gtk_widget_ref (network_server_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_server_combo", network_server_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_server_combo);
+  gtk_table_attach (GTK_TABLE (table2), network_server_combo, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  network_server = gnome_entry_gtk_entry (GNOME_ENTRY (network_server_combo));
   gtk_widget_ref (network_server);
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_server", network_server,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_server);
-  gtk_table_attach (GTK_TABLE (table2), network_server, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
   gtk_entry_set_text (GTK_ENTRY (network_server), _("vls"));
 
   hbuttonbox1 = GNOME_DIALOG (intf_network)->action_area;
@@ -1477,6 +1532,9 @@ create_intf_network (void)
   gtk_widget_show (network_cancel);
   GTK_WIDGET_SET_FLAGS (network_cancel, GTK_CAN_DEFAULT);
 
+  gtk_signal_connect (GTK_OBJECT (broadcast_check), "toggled",
+                      GTK_SIGNAL_FUNC (on_broadcast_check_toggled),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (network_ok), "clicked",
                       GTK_SIGNAL_FUNC (on_network_ok_clicked),
                       NULL);
@@ -1484,6 +1542,1264 @@ create_intf_network (void)
                       GTK_SIGNAL_FUNC (on_network_cancel_clicked),
                       NULL);
 
+  gtk_object_set_data (GTK_OBJECT (intf_network), "tooltips", tooltips);
+
   return intf_network;
+}
+
+static GnomeUIInfo playlist_add_menu_uiinfo[] =
+{
+  {
+    GNOME_APP_UI_ITEM, N_("Disc"),
+    NULL,
+    (gpointer) on_playlist_disc_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("File"),
+    NULL,
+    (gpointer) on_playlist_file_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Network"),
+    NULL,
+    (gpointer) on_playlist_network_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Url"),
+    NULL,
+    (gpointer) on_playlist_url_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  GNOMEUIINFO_END
+};
+
+static GnomeUIInfo playlist_delete_menu_uiinfo[] =
+{
+  {
+    GNOME_APP_UI_ITEM, N_("All"),
+    NULL,
+    (gpointer) on_playlist_delete_all_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Item"),
+    NULL,
+    (gpointer) on_playlist_delete_item_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  GNOMEUIINFO_END
+};
+
+static GnomeUIInfo playlist_selection_menu_uiinfo[] =
+{
+  {
+    GNOME_APP_UI_ITEM, N_("Crop"),
+    NULL,
+    (gpointer) on_playlist_crop_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Invert"),
+    NULL,
+    (gpointer) on_playlist_invert_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Select"),
+    NULL,
+    (gpointer) on_playlist_select_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  GNOMEUIINFO_END
+};
+
+static GnomeUIInfo playlist_menubar_uiinfo[] =
+{
+  {
+    GNOME_APP_UI_SUBTREE, N_("Add"),
+    NULL,
+    playlist_add_menu_uiinfo, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_SUBTREE, N_("Delete"),
+    NULL,
+    playlist_delete_menu_uiinfo, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_SUBTREE, N_("Selection"),
+    NULL,
+    playlist_selection_menu_uiinfo, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  GNOMEUIINFO_END
+};
+
+GtkWidget*
+create_intf_playlist (void)
+{
+  GtkWidget *intf_playlist;
+  GtkWidget *playlist_vbox;
+  GtkWidget *playlist_scrolledwindow;
+  GtkWidget *playlist_viewport;
+  GtkWidget *playlist_frame;
+  GtkWidget *playlist_clist;
+  GtkWidget *playlist_label_url;
+  GtkWidget *playlist_label_duration;
+  GtkWidget *playlist_menubar;
+  GtkWidget *playlist_action;
+  GtkWidget *playlist_ok;
+  GtkWidget *playlist_cancel;
+
+  intf_playlist = gnome_dialog_new (_("Playlist"), NULL);
+  gtk_object_set_data (GTK_OBJECT (intf_playlist), "intf_playlist", intf_playlist);
+  gtk_window_set_default_size (GTK_WINDOW (intf_playlist), 400, 300);
+  gtk_window_set_policy (GTK_WINDOW (intf_playlist), TRUE, TRUE, FALSE);
+
+  playlist_vbox = GNOME_DIALOG (intf_playlist)->vbox;
+  gtk_object_set_data (GTK_OBJECT (intf_playlist), "playlist_vbox", playlist_vbox);
+  gtk_widget_show (playlist_vbox);
+
+  playlist_scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_ref (playlist_scrolledwindow);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_scrolledwindow", playlist_scrolledwindow,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_scrolledwindow);
+  gtk_box_pack_start (GTK_BOX (playlist_vbox), playlist_scrolledwindow, TRUE, TRUE, 0);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (playlist_scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+  playlist_viewport = gtk_viewport_new (NULL, NULL);
+  gtk_widget_ref (playlist_viewport);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_viewport", playlist_viewport,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_viewport);
+  gtk_container_add (GTK_CONTAINER (playlist_scrolledwindow), playlist_viewport);
+
+  playlist_frame = gtk_frame_new (_("Playlist"));
+  gtk_widget_ref (playlist_frame);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_frame", playlist_frame,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_frame);
+  gtk_container_add (GTK_CONTAINER (playlist_viewport), playlist_frame);
+  gtk_frame_set_label_align (GTK_FRAME (playlist_frame), 0.05, 0.5);
+
+  playlist_clist = gtk_clist_new (2);
+  gtk_widget_ref (playlist_clist);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_clist", playlist_clist,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_clist);
+  gtk_container_add (GTK_CONTAINER (playlist_frame), playlist_clist);
+  gtk_clist_set_column_width (GTK_CLIST (playlist_clist), 0, 287);
+  gtk_clist_set_column_width (GTK_CLIST (playlist_clist), 1, 70);
+  gtk_clist_column_titles_show (GTK_CLIST (playlist_clist));
+
+  playlist_label_url = gtk_label_new (_("Url"));
+  gtk_widget_ref (playlist_label_url);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_label_url", playlist_label_url,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_label_url);
+  gtk_clist_set_column_widget (GTK_CLIST (playlist_clist), 0, playlist_label_url);
+
+  playlist_label_duration = gtk_label_new (_("Duration"));
+  gtk_widget_ref (playlist_label_duration);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_label_duration", playlist_label_duration,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_label_duration);
+  gtk_clist_set_column_widget (GTK_CLIST (playlist_clist), 1, playlist_label_duration);
+
+  playlist_menubar = gtk_menu_bar_new ();
+  gtk_widget_ref (playlist_menubar);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_menubar", playlist_menubar,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_menubar);
+  gtk_box_pack_start (GTK_BOX (playlist_vbox), playlist_menubar, FALSE, FALSE, 0);
+  gnome_app_fill_menu (GTK_MENU_SHELL (playlist_menubar), playlist_menubar_uiinfo,
+                       NULL, FALSE, 0);
+
+  gtk_widget_ref (playlist_menubar_uiinfo[0].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_add",
+                            playlist_menubar_uiinfo[0].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_add_menu_uiinfo[0].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_add_disc",
+                            playlist_add_menu_uiinfo[0].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_add_menu_uiinfo[1].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_add_file",
+                            playlist_add_menu_uiinfo[1].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_add_menu_uiinfo[2].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_add_network",
+                            playlist_add_menu_uiinfo[2].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_add_menu_uiinfo[3].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_add_url",
+                            playlist_add_menu_uiinfo[3].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_menubar_uiinfo[1].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_delete",
+                            playlist_menubar_uiinfo[1].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_delete_menu_uiinfo[0].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_delete_all",
+                            playlist_delete_menu_uiinfo[0].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_delete_menu_uiinfo[1].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playmist_delete_item",
+                            playlist_delete_menu_uiinfo[1].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_menubar_uiinfo[2].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_selection",
+                            playlist_menubar_uiinfo[2].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_selection_menu_uiinfo[0].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_selection_crop",
+                            playlist_selection_menu_uiinfo[0].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_selection_menu_uiinfo[1].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_selection_invert",
+                            playlist_selection_menu_uiinfo[1].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (playlist_selection_menu_uiinfo[2].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_selection_select",
+                            playlist_selection_menu_uiinfo[2].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  playlist_action = GNOME_DIALOG (intf_playlist)->action_area;
+  gtk_object_set_data (GTK_OBJECT (intf_playlist), "playlist_action", playlist_action);
+  gtk_widget_show (playlist_action);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (playlist_action), GTK_BUTTONBOX_END);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (playlist_action), 8);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (playlist_action), 100, 38);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_playlist), GNOME_STOCK_BUTTON_OK);
+  playlist_ok = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_playlist)->buttons)->data);
+  gtk_widget_ref (playlist_ok);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_ok", playlist_ok,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_ok);
+  GTK_WIDGET_SET_FLAGS (playlist_ok, GTK_CAN_DEFAULT);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_playlist), GNOME_STOCK_BUTTON_CANCEL);
+  playlist_cancel = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_playlist)->buttons)->data);
+  gtk_widget_ref (playlist_cancel);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_cancel", playlist_cancel,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_cancel);
+  GTK_WIDGET_SET_FLAGS (playlist_cancel, GTK_CAN_DEFAULT);
+
+  gtk_signal_connect (GTK_OBJECT (playlist_clist), "event",
+                      GTK_SIGNAL_FUNC (on_playlist_clist_event),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (playlist_clist), "drag_data_received",
+                      GTK_SIGNAL_FUNC (on_playlist_clist_drag_data_received),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (playlist_clist), "drag_motion",
+                      GTK_SIGNAL_FUNC (on_playlist_clist_drag_motion),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (playlist_ok), "clicked",
+                      GTK_SIGNAL_FUNC (on_playlist_ok_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (playlist_cancel), "clicked",
+                      GTK_SIGNAL_FUNC (on_playlist_cancel_clicked),
+                      NULL);
+
+  return intf_playlist;
+}
+
+GtkWidget*
+create_intf_jump (void)
+{
+  GtkWidget *intf_jump;
+  GtkWidget *jump_vbox;
+  GtkWidget *jump_frame;
+  GtkWidget *jump_box;
+  GtkObject *jump_second_spinbutton_adj;
+  GtkWidget *jump_second_spinbutton;
+  GtkWidget *jump_label1;
+  GtkObject *jump_minute_spinbutton_adj;
+  GtkWidget *jump_minute_spinbutton;
+  GtkWidget *jump_label2;
+  GtkObject *jump_hour_spinbutton_adj;
+  GtkWidget *jump_hour_spinbutton;
+  GtkWidget *jump_action;
+  GtkWidget *jump_ok;
+  GtkWidget *jump_cancel;
+
+  intf_jump = gnome_dialog_new (NULL, NULL);
+  gtk_object_set_data (GTK_OBJECT (intf_jump), "intf_jump", intf_jump);
+  gtk_window_set_policy (GTK_WINDOW (intf_jump), FALSE, FALSE, FALSE);
+
+  jump_vbox = GNOME_DIALOG (intf_jump)->vbox;
+  gtk_object_set_data (GTK_OBJECT (intf_jump), "jump_vbox", jump_vbox);
+  gtk_widget_show (jump_vbox);
+
+  jump_frame = gtk_frame_new (_("Jump to:"));
+  gtk_widget_ref (jump_frame);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_frame", jump_frame,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (jump_frame);
+  gtk_box_pack_start (GTK_BOX (jump_vbox), jump_frame, FALSE, FALSE, 0);
+  gtk_frame_set_label_align (GTK_FRAME (jump_frame), 0.05, 0.5);
+
+  jump_box = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (jump_box);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_box", jump_box,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (jump_box);
+  gtk_container_add (GTK_CONTAINER (jump_frame), jump_box);
+
+  jump_second_spinbutton_adj = gtk_adjustment_new (0, 0, 100, 1, 10, 10);
+  jump_second_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (jump_second_spinbutton_adj), 1, 0);
+  gtk_widget_ref (jump_second_spinbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_second_spinbutton", jump_second_spinbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (jump_second_spinbutton);
+  gtk_box_pack_end (GTK_BOX (jump_box), jump_second_spinbutton, FALSE, FALSE, 5);
+
+  jump_label1 = gtk_label_new (_(":"));
+  gtk_widget_ref (jump_label1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_label1", jump_label1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (jump_label1);
+  gtk_box_pack_end (GTK_BOX (jump_box), jump_label1, FALSE, FALSE, 5);
+
+  jump_minute_spinbutton_adj = gtk_adjustment_new (0, 0, 59, 1, 10, 10);
+  jump_minute_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (jump_minute_spinbutton_adj), 1, 0);
+  gtk_widget_ref (jump_minute_spinbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_minute_spinbutton", jump_minute_spinbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (jump_minute_spinbutton);
+  gtk_box_pack_end (GTK_BOX (jump_box), jump_minute_spinbutton, FALSE, FALSE, 5);
+
+  jump_label2 = gtk_label_new (_(":"));
+  gtk_widget_ref (jump_label2);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_label2", jump_label2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (jump_label2);
+  gtk_box_pack_end (GTK_BOX (jump_box), jump_label2, FALSE, FALSE, 5);
+
+  jump_hour_spinbutton_adj = gtk_adjustment_new (0, 0, 10, 1, 10, 10);
+  jump_hour_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (jump_hour_spinbutton_adj), 1, 0);
+  gtk_widget_ref (jump_hour_spinbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_hour_spinbutton", jump_hour_spinbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (jump_hour_spinbutton);
+  gtk_box_pack_end (GTK_BOX (jump_box), jump_hour_spinbutton, FALSE, FALSE, 5);
+
+  jump_action = GNOME_DIALOG (intf_jump)->action_area;
+  gtk_object_set_data (GTK_OBJECT (intf_jump), "jump_action", jump_action);
+  gtk_widget_show (jump_action);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (jump_action), GTK_BUTTONBOX_END);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (jump_action), 8);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_jump), GNOME_STOCK_BUTTON_OK);
+  jump_ok = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_jump)->buttons)->data);
+  gtk_widget_ref (jump_ok);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_ok", jump_ok,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (jump_ok);
+  GTK_WIDGET_SET_FLAGS (jump_ok, GTK_CAN_DEFAULT);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_jump), GNOME_STOCK_BUTTON_CANCEL);
+  jump_cancel = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_jump)->buttons)->data);
+  gtk_widget_ref (jump_cancel);
+  gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_cancel", jump_cancel,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (jump_cancel);
+  GTK_WIDGET_SET_FLAGS (jump_cancel, GTK_CAN_DEFAULT);
+
+  gtk_signal_connect (GTK_OBJECT (jump_ok), "clicked",
+                      GTK_SIGNAL_FUNC (on_jump_ok_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (jump_cancel), "clicked",
+                      GTK_SIGNAL_FUNC (on_jump_cancel_clicked),
+                      NULL);
+
+  return intf_jump;
+}
+
+GtkWidget*
+create_intf_preferences (void)
+{
+  GtkWidget *intf_preferences;
+  GtkWidget *preferences_vbox;
+  GtkWidget *preferences_frame;
+  GtkWidget *preferences_notebook;
+  GtkWidget *preferences_file_table;
+  GtkWidget *preferences_file_combo;
+  GtkWidget *preferences_file_entry;
+  GtkWidget *preferences_file_path_label;
+  GtkWidget *preferences_file;
+  GtkWidget *preferences_disc_table;
+  GtkWidget *preferences_disc_dvd_combo;
+  GtkWidget *preferences_disc_dvd_entry;
+  GtkWidget *preferences_file_vcd_combo;
+  GtkWidget *preferences_disc_vcd_entry;
+  GtkWidget *preferences_disc_dvd_label;
+  GtkWidget *preferences_disc_vcd_label;
+  GtkWidget *preferences_disc;
+  GtkWidget *preferences_network_table;
+  GtkWidget *preferences_network_server_label;
+  GtkObject *preferences_network_port_spinbutton_adj;
+  GtkWidget *preferences_network_port_spinbutton;
+  GtkWidget *preferences_network_broadcast_label;
+  GtkWidget *preferences_network_port_label;
+  GtkWidget *preferences_network_server_combo;
+  GtkWidget *preferences_network_server_entry;
+  GtkWidget *preferences_network_broadcast_combo;
+  GtkWidget *preferences_network_broadcast_entry;
+  GtkWidget *preferences_network_broadcast_check_button;
+  GSList *preferences_network_protocol_group_group = NULL;
+  GtkWidget *preferences_network_ts_radiobutton;
+  GtkWidget *preferences_network_rtp_radiobutton;
+  GtkWidget *preferences_network_http_radiobutton;
+  GtkWidget *preferences_network_protocol_label;
+  GtkWidget *preferences_network;
+  GtkWidget *preferences_network_interface_table;
+  GtkWidget *preferences_interface_label;
+  GtkWidget *preferences_network_interface_combo;
+  GtkWidget *preferences_network_interface_entry;
+  GtkWidget *preferences_interface;
+  GtkWidget *preferences_video_table;
+  GtkWidget *preferences_video_output_label;
+  GtkWidget *preferences_video_height;
+  GtkObject *preferences_video_height_spinbutton_adj;
+  GtkWidget *preferences_video_height_spinbutton;
+  GtkObject *preferences_video_width_spinbutton_adj;
+  GtkWidget *preferences_video_width_spinbutton;
+  GtkWidget *preferences_video_width_label;
+  GtkWidget *preferences_video_output_combo;
+  GtkWidget *preferences_video_output_entry;
+  GtkWidget *preferences_video_depth;
+  GtkWidget *preferences_video_depth_optionmenu;
+  GtkWidget *preferences_video_depth_optionmenu_menu;
+  GtkWidget *glade_menuitem;
+  GtkWidget *preferences_video_fullscreen_depth;
+  GtkWidget *preferences_video_fullscreen_depth_optionmenu;
+  GtkWidget *preferences_video_fullscreen_depth_optionmenu_menu;
+  GtkWidget *preferences_video_fullscreen_checkbutton;
+  GtkWidget *preferences_video_grayscale_checkbutton;
+  GtkWidget *preferences_video_gamma_label;
+  GtkObject *spinbutton4_adj;
+  GtkWidget *spinbutton4;
+  GtkWidget *preferences_video;
+  GtkWidget *preference_audio_table;
+  GtkWidget *preferences_audio_spdif_checkbutton;
+  GtkWidget *preferences_audio_output_label;
+  GtkWidget *preferences_audio_output_combo;
+  GtkWidget *preferences_audio_output_entry;
+  GtkWidget *preferences_audio_frequency_label;
+  GtkWidget *preferences_audio_frequency_optionmenu;
+  GtkWidget *preferences_audio_frequency_optionmenu_menu;
+  GtkWidget *preferences_audio_quality_label;
+  GtkWidget *preferences_audio_quality_optionmenu;
+  GtkWidget *preferences_audio_quality_optionmenu_menu;
+  GtkWidget *preferences_audio_channels_label;
+  GtkWidget *preferences_audio_channels_optionmenu;
+  GtkWidget *preferences_audio_channels_optionmenu_menu;
+  GtkWidget *preferences_audio;
+  GtkWidget *preference_playlist_table;
+  GtkWidget *preferences_playlist_launch_on_startup_checkbutton;
+  GtkWidget *preferences_playlist_loop_checkbutton;
+  GtkWidget *playlist_enqueue_as_default_checkbutton;
+  GtkWidget *preferences_playlist;
+  GtkWidget *preferences_misc_table;
+  GtkWidget *preferences_misc_associated_filesframe;
+  GtkWidget *preferences_misc_associated_files_vbox;
+  GtkWidget *preferences_misc_mpeg_checkbutton;
+  GtkWidget *preferences_misc_mp2_checkbutton;
+  GtkWidget *preferences_misc_vob_checkbutton;
+  GtkWidget *preferences_misc_ts_checkbutton;
+  GtkWidget *preferences_misc;
+  GtkWidget *preferences_dialog;
+  GtkWidget *preferences_ok;
+  GtkWidget *preferences_apply;
+  GtkWidget *preferences_cancel;
+
+  intf_preferences = gnome_dialog_new (_("Preferences"), NULL);
+  gtk_object_set_data (GTK_OBJECT (intf_preferences), "intf_preferences", intf_preferences);
+  gtk_window_set_default_size (GTK_WINDOW (intf_preferences), 450, 350);
+  gtk_window_set_policy (GTK_WINDOW (intf_preferences), TRUE, TRUE, FALSE);
+
+  preferences_vbox = GNOME_DIALOG (intf_preferences)->vbox;
+  gtk_object_set_data (GTK_OBJECT (intf_preferences), "preferences_vbox", preferences_vbox);
+  gtk_widget_show (preferences_vbox);
+
+  preferences_frame = gtk_frame_new (_("Preferences"));
+  gtk_widget_ref (preferences_frame);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_frame", preferences_frame,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_frame);
+  gtk_box_pack_start (GTK_BOX (preferences_vbox), preferences_frame, TRUE, TRUE, 0);
+  gtk_frame_set_label_align (GTK_FRAME (preferences_frame), 0.05, 0.5);
+
+  preferences_notebook = gtk_notebook_new ();
+  gtk_widget_ref (preferences_notebook);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_notebook", preferences_notebook,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_notebook);
+  gtk_container_add (GTK_CONTAINER (preferences_frame), preferences_notebook);
+
+  preferences_file_table = gtk_table_new (1, 2, FALSE);
+  gtk_widget_ref (preferences_file_table);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_file_table", preferences_file_table,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_file_table);
+  gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_file_table);
+
+  preferences_file_combo = gnome_file_entry_new (NULL, NULL);
+  gtk_widget_ref (preferences_file_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_file_combo", preferences_file_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_file_combo);
+  gtk_table_attach (GTK_TABLE (preferences_file_table), preferences_file_combo, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_file_entry = gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (preferences_file_combo));
+  gtk_widget_ref (preferences_file_entry);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_file_entry", preferences_file_entry,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_file_entry);
+
+  preferences_file_path_label = gtk_label_new (_("Default path: "));
+  gtk_widget_ref (preferences_file_path_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_file_path_label", preferences_file_path_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_file_path_label);
+  gtk_table_attach (GTK_TABLE (preferences_file_table), preferences_file_path_label, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_file_path_label), 0, 0.5);
+
+  preferences_file = gtk_label_new (_("File"));
+  gtk_widget_ref (preferences_file);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_file", preferences_file,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_file);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (preferences_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (preferences_notebook), 0), preferences_file);
+
+  preferences_disc_table = gtk_table_new (2, 2, FALSE);
+  gtk_widget_ref (preferences_disc_table);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_disc_table", preferences_disc_table,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_disc_table);
+  gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_disc_table);
+
+  preferences_disc_dvd_combo = gnome_file_entry_new (NULL, NULL);
+  gtk_widget_ref (preferences_disc_dvd_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_disc_dvd_combo", preferences_disc_dvd_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_disc_dvd_combo);
+  gtk_table_attach (GTK_TABLE (preferences_disc_table), preferences_disc_dvd_combo, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_disc_dvd_entry = gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (preferences_disc_dvd_combo));
+  gtk_widget_ref (preferences_disc_dvd_entry);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_disc_dvd_entry", preferences_disc_dvd_entry,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_disc_dvd_entry);
+
+  preferences_file_vcd_combo = gnome_file_entry_new (NULL, NULL);
+  gtk_widget_ref (preferences_file_vcd_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_file_vcd_combo", preferences_file_vcd_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_file_vcd_combo);
+  gtk_table_attach (GTK_TABLE (preferences_disc_table), preferences_file_vcd_combo, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_disc_vcd_entry = gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (preferences_file_vcd_combo));
+  gtk_widget_ref (preferences_disc_vcd_entry);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_disc_vcd_entry", preferences_disc_vcd_entry,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_disc_vcd_entry);
+
+  preferences_disc_dvd_label = gtk_label_new (_("Default DVD path: "));
+  gtk_widget_ref (preferences_disc_dvd_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_disc_dvd_label", preferences_disc_dvd_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_disc_dvd_label);
+  gtk_table_attach (GTK_TABLE (preferences_disc_table), preferences_disc_dvd_label, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_disc_dvd_label), 0, 0.5);
+
+  preferences_disc_vcd_label = gtk_label_new (_("Default VCD path: "));
+  gtk_widget_ref (preferences_disc_vcd_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_disc_vcd_label", preferences_disc_vcd_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_disc_vcd_label);
+  gtk_table_attach (GTK_TABLE (preferences_disc_table), preferences_disc_vcd_label, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_disc_vcd_label), 0, 0.5);
+
+  preferences_disc = gtk_label_new (_("Disc"));
+  gtk_widget_ref (preferences_disc);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_disc", preferences_disc,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_disc);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (preferences_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (preferences_notebook), 1), preferences_disc);
+
+  preferences_network_table = gtk_table_new (7, 2, FALSE);
+  gtk_widget_ref (preferences_network_table);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_table", preferences_network_table,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_table);
+  gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_network_table);
+
+  preferences_network_server_label = gtk_label_new (_("Default server: "));
+  gtk_widget_ref (preferences_network_server_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_server_label", preferences_network_server_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_server_label);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_server_label, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_network_server_label), 0, 0.5);
+
+  preferences_network_port_spinbutton_adj = gtk_adjustment_new (1234, 0, 65535, 1, 10, 10);
+  preferences_network_port_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (preferences_network_port_spinbutton_adj), 1, 0);
+  gtk_widget_ref (preferences_network_port_spinbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_port_spinbutton", preferences_network_port_spinbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_port_spinbutton);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_port_spinbutton, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_network_broadcast_label = gtk_label_new (_("Broadcast address: "));
+  gtk_widget_ref (preferences_network_broadcast_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_broadcast_label", preferences_network_broadcast_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_broadcast_label);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_broadcast_label, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_network_broadcast_label), 0, 0.5);
+
+  preferences_network_port_label = gtk_label_new (_("Default port: "));
+  gtk_widget_ref (preferences_network_port_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_port_label", preferences_network_port_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_port_label);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_port_label, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_network_port_label), 0, 0.5);
+
+  preferences_network_server_combo = gnome_entry_new (NULL);
+  gtk_widget_ref (preferences_network_server_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_server_combo", preferences_network_server_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_server_combo);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_server_combo, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_network_server_entry = gnome_entry_gtk_entry (GNOME_ENTRY (preferences_network_server_combo));
+  gtk_widget_ref (preferences_network_server_entry);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_server_entry", preferences_network_server_entry,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_server_entry);
+  gtk_entry_set_text (GTK_ENTRY (preferences_network_server_entry), _("vls"));
+
+  preferences_network_broadcast_combo = gnome_entry_new (NULL);
+  gtk_widget_ref (preferences_network_broadcast_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_broadcast_combo", preferences_network_broadcast_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_broadcast_combo);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_broadcast_combo, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_network_broadcast_entry = gnome_entry_gtk_entry (GNOME_ENTRY (preferences_network_broadcast_combo));
+  gtk_widget_ref (preferences_network_broadcast_entry);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_broadcast_entry", preferences_network_broadcast_entry,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_broadcast_entry);
+
+  preferences_network_broadcast_check_button = gtk_check_button_new_with_label (_("Broadcast mode"));
+  gtk_widget_ref (preferences_network_broadcast_check_button);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_broadcast_check_button", preferences_network_broadcast_check_button,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_broadcast_check_button);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_broadcast_check_button, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_network_ts_radiobutton = gtk_radio_button_new_with_label (preferences_network_protocol_group_group, _("TS"));
+  preferences_network_protocol_group_group = gtk_radio_button_group (GTK_RADIO_BUTTON (preferences_network_ts_radiobutton));
+  gtk_widget_ref (preferences_network_ts_radiobutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_ts_radiobutton", preferences_network_ts_radiobutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_ts_radiobutton);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_ts_radiobutton, 1, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_SHRINK), 0, 0);
+
+  preferences_network_rtp_radiobutton = gtk_radio_button_new_with_label (preferences_network_protocol_group_group, _("RTP"));
+  preferences_network_protocol_group_group = gtk_radio_button_group (GTK_RADIO_BUTTON (preferences_network_rtp_radiobutton));
+  gtk_widget_ref (preferences_network_rtp_radiobutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_rtp_radiobutton", preferences_network_rtp_radiobutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_rtp_radiobutton);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_rtp_radiobutton, 1, 2, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_SHRINK), 0, 0);
+
+  preferences_network_http_radiobutton = gtk_radio_button_new_with_label (preferences_network_protocol_group_group, _("HTTP"));
+  preferences_network_protocol_group_group = gtk_radio_button_group (GTK_RADIO_BUTTON (preferences_network_http_radiobutton));
+  gtk_widget_ref (preferences_network_http_radiobutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_http_radiobutton", preferences_network_http_radiobutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_http_radiobutton);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_http_radiobutton, 1, 2, 6, 7,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_SHRINK), 0, 0);
+
+  preferences_network_protocol_label = gtk_label_new (_("Default protocol: "));
+  gtk_widget_ref (preferences_network_protocol_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_protocol_label", preferences_network_protocol_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_protocol_label);
+  gtk_table_attach (GTK_TABLE (preferences_network_table), preferences_network_protocol_label, 0, 1, 4, 7,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_network_protocol_label), 0, 0.5);
+
+  preferences_network = gtk_label_new (_("Network"));
+  gtk_widget_ref (preferences_network);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network", preferences_network,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (preferences_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (preferences_notebook), 2), preferences_network);
+
+  preferences_network_interface_table = gtk_table_new (1, 2, FALSE);
+  gtk_widget_ref (preferences_network_interface_table);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_interface_table", preferences_network_interface_table,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_interface_table);
+  gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_network_interface_table);
+
+  preferences_interface_label = gtk_label_new (_("Default interface: "));
+  gtk_widget_ref (preferences_interface_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_interface_label", preferences_interface_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_interface_label);
+  gtk_table_attach (GTK_TABLE (preferences_network_interface_table), preferences_interface_label, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_interface_label), 0, 0.5);
+
+  preferences_network_interface_combo = gnome_entry_new (NULL);
+  gtk_widget_ref (preferences_network_interface_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_interface_combo", preferences_network_interface_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_interface_combo);
+  gtk_table_attach (GTK_TABLE (preferences_network_interface_table), preferences_network_interface_combo, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_network_interface_entry = gnome_entry_gtk_entry (GNOME_ENTRY (preferences_network_interface_combo));
+  gtk_widget_ref (preferences_network_interface_entry);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_network_interface_entry", preferences_network_interface_entry,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_network_interface_entry);
+
+  preferences_interface = gtk_label_new (_("Interface"));
+  gtk_widget_ref (preferences_interface);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_interface", preferences_interface,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_interface);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (preferences_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (preferences_notebook), 3), preferences_interface);
+
+  preferences_video_table = gtk_table_new (7, 2, FALSE);
+  gtk_widget_ref (preferences_video_table);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_table", preferences_video_table,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_table);
+  gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_video_table);
+
+  preferences_video_output_label = gtk_label_new (_("Default output: "));
+  gtk_widget_ref (preferences_video_output_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_output_label", preferences_video_output_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_output_label);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_output_label, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_video_output_label), 0, 0.5);
+
+  preferences_video_height = gtk_label_new (_("Default height: "));
+  gtk_widget_ref (preferences_video_height);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_height", preferences_video_height,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_height);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_height, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_video_height), 0, 0.5);
+
+  preferences_video_height_spinbutton_adj = gtk_adjustment_new (576, 0, 1600, 1, 10, 10);
+  preferences_video_height_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (preferences_video_height_spinbutton_adj), 1, 0);
+  gtk_widget_ref (preferences_video_height_spinbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_height_spinbutton", preferences_video_height_spinbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_height_spinbutton);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_height_spinbutton, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_video_width_spinbutton_adj = gtk_adjustment_new (720, 100, 1600, 1, 10, 10);
+  preferences_video_width_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (preferences_video_width_spinbutton_adj), 1, 0);
+  gtk_widget_ref (preferences_video_width_spinbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_width_spinbutton", preferences_video_width_spinbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_width_spinbutton);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_width_spinbutton, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_video_width_label = gtk_label_new (_("Default width: "));
+  gtk_widget_ref (preferences_video_width_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_width_label", preferences_video_width_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_width_label);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_width_label, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_video_width_label), 0, 0.5);
+
+  preferences_video_output_combo = gnome_entry_new (NULL);
+  gtk_widget_ref (preferences_video_output_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_output_combo", preferences_video_output_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_output_combo);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_output_combo, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_video_output_entry = gnome_entry_gtk_entry (GNOME_ENTRY (preferences_video_output_combo));
+  gtk_widget_ref (preferences_video_output_entry);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_output_entry", preferences_video_output_entry,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_output_entry);
+
+  preferences_video_depth = gtk_label_new (_("Default depth:"));
+  gtk_widget_ref (preferences_video_depth);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_depth", preferences_video_depth,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_depth);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_depth, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_video_depth), 0, 0.5);
+
+  preferences_video_depth_optionmenu = gtk_option_menu_new ();
+  gtk_widget_ref (preferences_video_depth_optionmenu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_depth_optionmenu", preferences_video_depth_optionmenu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_depth_optionmenu);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_depth_optionmenu, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  preferences_video_depth_optionmenu_menu = gtk_menu_new ();
+  glade_menuitem = gtk_menu_item_new_with_label (_("15 bits"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_video_depth_optionmenu_menu), glade_menuitem);
+  glade_menuitem = gtk_menu_item_new_with_label (_("16 bits"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_video_depth_optionmenu_menu), glade_menuitem);
+  glade_menuitem = gtk_menu_item_new_with_label (_("32 bits"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_video_depth_optionmenu_menu), glade_menuitem);
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (preferences_video_depth_optionmenu), preferences_video_depth_optionmenu_menu);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (preferences_video_depth_optionmenu), 1);
+
+  preferences_video_fullscreen_depth = gtk_label_new (_("Fullscreen depth:"));
+  gtk_widget_ref (preferences_video_fullscreen_depth);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_fullscreen_depth", preferences_video_fullscreen_depth,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_fullscreen_depth);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_fullscreen_depth, 0, 1, 4, 5,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_video_fullscreen_depth), 0, 0.5);
+
+  preferences_video_fullscreen_depth_optionmenu = gtk_option_menu_new ();
+  gtk_widget_ref (preferences_video_fullscreen_depth_optionmenu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_fullscreen_depth_optionmenu", preferences_video_fullscreen_depth_optionmenu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_fullscreen_depth_optionmenu);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_fullscreen_depth_optionmenu, 1, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+  preferences_video_fullscreen_depth_optionmenu_menu = gtk_menu_new ();
+  glade_menuitem = gtk_menu_item_new_with_label (_("15 bits"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_video_fullscreen_depth_optionmenu_menu), glade_menuitem);
+  glade_menuitem = gtk_menu_item_new_with_label (_("16 bits"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_video_fullscreen_depth_optionmenu_menu), glade_menuitem);
+  glade_menuitem = gtk_menu_item_new_with_label (_("32 bits"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_video_fullscreen_depth_optionmenu_menu), glade_menuitem);
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (preferences_video_fullscreen_depth_optionmenu), preferences_video_fullscreen_depth_optionmenu_menu);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (preferences_video_fullscreen_depth_optionmenu), 2);
+
+  preferences_video_fullscreen_checkbutton = gtk_check_button_new_with_label (_("Fullscreen on play"));
+  gtk_widget_ref (preferences_video_fullscreen_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_fullscreen_checkbutton", preferences_video_fullscreen_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_fullscreen_checkbutton);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_fullscreen_checkbutton, 0, 1, 6, 7,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_video_grayscale_checkbutton = gtk_check_button_new_with_label (_("Grayscale"));
+  gtk_widget_ref (preferences_video_grayscale_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_grayscale_checkbutton", preferences_video_grayscale_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_grayscale_checkbutton);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_grayscale_checkbutton, 1, 2, 6, 7,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_video_gamma_label = gtk_label_new (_("Gamma:"));
+  gtk_widget_ref (preferences_video_gamma_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video_gamma_label", preferences_video_gamma_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video_gamma_label);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), preferences_video_gamma_label, 0, 1, 5, 6,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_video_gamma_label), 0, 0.5);
+
+  spinbutton4_adj = gtk_adjustment_new (0, 0, 5, 0.1, 10, 10);
+  spinbutton4 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton4_adj), 1, 1);
+  gtk_widget_ref (spinbutton4);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "spinbutton4", spinbutton4,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (spinbutton4);
+  gtk_table_attach (GTK_TABLE (preferences_video_table), spinbutton4, 1, 2, 5, 6,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  preferences_video = gtk_label_new (_("Video"));
+  gtk_widget_ref (preferences_video);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_video", preferences_video,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_video);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (preferences_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (preferences_notebook), 4), preferences_video);
+
+  preference_audio_table = gtk_table_new (5, 2, FALSE);
+  gtk_widget_ref (preference_audio_table);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preference_audio_table", preference_audio_table,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preference_audio_table);
+  gtk_container_add (GTK_CONTAINER (preferences_notebook), preference_audio_table);
+
+  preferences_audio_spdif_checkbutton = gtk_check_button_new_with_label (_("Spdif output"));
+  gtk_widget_ref (preferences_audio_spdif_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_spdif_checkbutton", preferences_audio_spdif_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_spdif_checkbutton);
+  gtk_table_attach (GTK_TABLE (preference_audio_table), preferences_audio_spdif_checkbutton, 0, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_audio_output_label = gtk_label_new (_("Default output: "));
+  gtk_widget_ref (preferences_audio_output_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_output_label", preferences_audio_output_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_output_label);
+  gtk_table_attach (GTK_TABLE (preference_audio_table), preferences_audio_output_label, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_audio_output_label), 0, 0.5);
+
+  preferences_audio_output_combo = gnome_entry_new (NULL);
+  gtk_widget_ref (preferences_audio_output_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_output_combo", preferences_audio_output_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_output_combo);
+  gtk_table_attach (GTK_TABLE (preference_audio_table), preferences_audio_output_combo, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_audio_output_entry = gnome_entry_gtk_entry (GNOME_ENTRY (preferences_audio_output_combo));
+  gtk_widget_ref (preferences_audio_output_entry);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_output_entry", preferences_audio_output_entry,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_output_entry);
+
+  preferences_audio_frequency_label = gtk_label_new (_("Frequency: "));
+  gtk_widget_ref (preferences_audio_frequency_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_frequency_label", preferences_audio_frequency_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_frequency_label);
+  gtk_table_attach (GTK_TABLE (preference_audio_table), preferences_audio_frequency_label, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_audio_frequency_label), 0, 0.5);
+
+  preferences_audio_frequency_optionmenu = gtk_option_menu_new ();
+  gtk_widget_ref (preferences_audio_frequency_optionmenu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_frequency_optionmenu", preferences_audio_frequency_optionmenu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_frequency_optionmenu);
+  gtk_table_attach (GTK_TABLE (preference_audio_table), preferences_audio_frequency_optionmenu, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  preferences_audio_frequency_optionmenu_menu = gtk_menu_new ();
+  glade_menuitem = gtk_menu_item_new_with_label (_("48000 Hz"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_audio_frequency_optionmenu_menu), glade_menuitem);
+  glade_menuitem = gtk_menu_item_new_with_label (_("44100 Hz"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_audio_frequency_optionmenu_menu), glade_menuitem);
+  glade_menuitem = gtk_menu_item_new_with_label (_("32000 Hz"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_audio_frequency_optionmenu_menu), glade_menuitem);
+  glade_menuitem = gtk_menu_item_new_with_label (_("22050 Hz"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_audio_frequency_optionmenu_menu), glade_menuitem);
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (preferences_audio_frequency_optionmenu), preferences_audio_frequency_optionmenu_menu);
+
+  preferences_audio_quality_label = gtk_label_new (_("Quality: "));
+  gtk_widget_ref (preferences_audio_quality_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_quality_label", preferences_audio_quality_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_quality_label);
+  gtk_table_attach (GTK_TABLE (preference_audio_table), preferences_audio_quality_label, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_audio_quality_label), 0, 0.5);
+
+  preferences_audio_quality_optionmenu = gtk_option_menu_new ();
+  gtk_widget_ref (preferences_audio_quality_optionmenu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_quality_optionmenu", preferences_audio_quality_optionmenu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_quality_optionmenu);
+  gtk_table_attach (GTK_TABLE (preference_audio_table), preferences_audio_quality_optionmenu, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  preferences_audio_quality_optionmenu_menu = gtk_menu_new ();
+  glade_menuitem = gtk_menu_item_new_with_label (_("16 bits"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_audio_quality_optionmenu_menu), glade_menuitem);
+  glade_menuitem = gtk_menu_item_new_with_label (_("8 bits"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_audio_quality_optionmenu_menu), glade_menuitem);
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (preferences_audio_quality_optionmenu), preferences_audio_quality_optionmenu_menu);
+
+  preferences_audio_channels_label = gtk_label_new (_("Channels: "));
+  gtk_widget_ref (preferences_audio_channels_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_channels_label", preferences_audio_channels_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_channels_label);
+  gtk_table_attach (GTK_TABLE (preference_audio_table), preferences_audio_channels_label, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (preferences_audio_channels_label), 0, 0.5);
+
+  preferences_audio_channels_optionmenu = gtk_option_menu_new ();
+  gtk_widget_ref (preferences_audio_channels_optionmenu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio_channels_optionmenu", preferences_audio_channels_optionmenu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio_channels_optionmenu);
+  gtk_table_attach (GTK_TABLE (preference_audio_table), preferences_audio_channels_optionmenu, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  preferences_audio_channels_optionmenu_menu = gtk_menu_new ();
+  glade_menuitem = gtk_menu_item_new_with_label (_("Mono"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_audio_channels_optionmenu_menu), glade_menuitem);
+  glade_menuitem = gtk_menu_item_new_with_label (_("Stereo"));
+  gtk_widget_show (glade_menuitem);
+  gtk_menu_append (GTK_MENU (preferences_audio_channels_optionmenu_menu), glade_menuitem);
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (preferences_audio_channels_optionmenu), preferences_audio_channels_optionmenu_menu);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (preferences_audio_channels_optionmenu), 1);
+
+  preferences_audio = gtk_label_new (_("Audio"));
+  gtk_widget_ref (preferences_audio);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_audio", preferences_audio,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_audio);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (preferences_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (preferences_notebook), 5), preferences_audio);
+
+  preference_playlist_table = gtk_table_new (3, 1, FALSE);
+  gtk_widget_ref (preference_playlist_table);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preference_playlist_table", preference_playlist_table,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preference_playlist_table);
+  gtk_container_add (GTK_CONTAINER (preferences_notebook), preference_playlist_table);
+
+  preferences_playlist_launch_on_startup_checkbutton = gtk_check_button_new_with_label (_("Launch on startup"));
+  gtk_widget_ref (preferences_playlist_launch_on_startup_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_playlist_launch_on_startup_checkbutton", preferences_playlist_launch_on_startup_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_playlist_launch_on_startup_checkbutton);
+  gtk_table_attach (GTK_TABLE (preference_playlist_table), preferences_playlist_launch_on_startup_checkbutton, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_playlist_loop_checkbutton = gtk_check_button_new_with_label (_("Loop on playlist end"));
+  gtk_widget_ref (preferences_playlist_loop_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_playlist_loop_checkbutton", preferences_playlist_loop_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_playlist_loop_checkbutton);
+  gtk_table_attach (GTK_TABLE (preference_playlist_table), preferences_playlist_loop_checkbutton, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  playlist_enqueue_as_default_checkbutton = gtk_check_button_new_with_label (_("Enqueue as default"));
+  gtk_widget_ref (playlist_enqueue_as_default_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "playlist_enqueue_as_default_checkbutton", playlist_enqueue_as_default_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_enqueue_as_default_checkbutton);
+  gtk_table_attach (GTK_TABLE (preference_playlist_table), playlist_enqueue_as_default_checkbutton, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
+
+  preferences_playlist = gtk_label_new (_("Playlist"));
+  gtk_widget_ref (preferences_playlist);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_playlist", preferences_playlist,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_playlist);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (preferences_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (preferences_notebook), 6), preferences_playlist);
+
+  preferences_misc_table = gtk_table_new (1, 1, FALSE);
+  gtk_widget_ref (preferences_misc_table);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_table", preferences_misc_table,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_table);
+  gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_misc_table);
+
+  preferences_misc_associated_filesframe = gtk_frame_new (_("Files associated with vlc"));
+  gtk_widget_ref (preferences_misc_associated_filesframe);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_associated_filesframe", preferences_misc_associated_filesframe,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_associated_filesframe);
+  gtk_table_attach (GTK_TABLE (preferences_misc_table), preferences_misc_associated_filesframe, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+  gtk_widget_set_sensitive (preferences_misc_associated_filesframe, FALSE);
+  gtk_frame_set_label_align (GTK_FRAME (preferences_misc_associated_filesframe), 0.05, 0.5);
+
+  preferences_misc_associated_files_vbox = gtk_vbox_new (FALSE, 0);
+  gtk_widget_ref (preferences_misc_associated_files_vbox);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_associated_files_vbox", preferences_misc_associated_files_vbox,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_associated_files_vbox);
+  gtk_container_add (GTK_CONTAINER (preferences_misc_associated_filesframe), preferences_misc_associated_files_vbox);
+
+  preferences_misc_mpeg_checkbutton = gtk_check_button_new_with_label (_("mpeg"));
+  gtk_widget_ref (preferences_misc_mpeg_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_mpeg_checkbutton", preferences_misc_mpeg_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_mpeg_checkbutton);
+  gtk_box_pack_start (GTK_BOX (preferences_misc_associated_files_vbox), preferences_misc_mpeg_checkbutton, FALSE, FALSE, 0);
+
+  preferences_misc_mp2_checkbutton = gtk_check_button_new_with_label (_("mp2"));
+  gtk_widget_ref (preferences_misc_mp2_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_mp2_checkbutton", preferences_misc_mp2_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_mp2_checkbutton);
+  gtk_box_pack_start (GTK_BOX (preferences_misc_associated_files_vbox), preferences_misc_mp2_checkbutton, FALSE, FALSE, 0);
+
+  preferences_misc_vob_checkbutton = gtk_check_button_new_with_label (_("vob"));
+  gtk_widget_ref (preferences_misc_vob_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_vob_checkbutton", preferences_misc_vob_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_vob_checkbutton);
+  gtk_box_pack_start (GTK_BOX (preferences_misc_associated_files_vbox), preferences_misc_vob_checkbutton, FALSE, FALSE, 0);
+
+  preferences_misc_ts_checkbutton = gtk_check_button_new_with_label (_("ts"));
+  gtk_widget_ref (preferences_misc_ts_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_ts_checkbutton", preferences_misc_ts_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_ts_checkbutton);
+  gtk_box_pack_start (GTK_BOX (preferences_misc_associated_files_vbox), preferences_misc_ts_checkbutton, FALSE, FALSE, 0);
+
+  preferences_misc = gtk_label_new (_("Misc"));
+  gtk_widget_ref (preferences_misc);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc", preferences_misc,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (preferences_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (preferences_notebook), 7), preferences_misc);
+
+  preferences_dialog = GNOME_DIALOG (intf_preferences)->action_area;
+  gtk_object_set_data (GTK_OBJECT (intf_preferences), "preferences_dialog", preferences_dialog);
+  gtk_widget_show (preferences_dialog);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (preferences_dialog), GTK_BUTTONBOX_END);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (preferences_dialog), 8);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_preferences), GNOME_STOCK_BUTTON_OK);
+  preferences_ok = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_preferences)->buttons)->data);
+  gtk_widget_ref (preferences_ok);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_ok", preferences_ok,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_ok);
+  GTK_WIDGET_SET_FLAGS (preferences_ok, GTK_CAN_DEFAULT);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_preferences), GNOME_STOCK_BUTTON_APPLY);
+  preferences_apply = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_preferences)->buttons)->data);
+  gtk_widget_ref (preferences_apply);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_apply", preferences_apply,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_apply);
+  GTK_WIDGET_SET_FLAGS (preferences_apply, GTK_CAN_DEFAULT);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_preferences), GNOME_STOCK_BUTTON_CANCEL);
+  preferences_cancel = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_preferences)->buttons)->data);
+  gtk_widget_ref (preferences_cancel);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_cancel", preferences_cancel,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_cancel);
+  GTK_WIDGET_SET_FLAGS (preferences_cancel, GTK_CAN_DEFAULT);
+
+  gtk_signal_connect (GTK_OBJECT (preferences_ok), "clicked",
+                      GTK_SIGNAL_FUNC (on_preferences_ok_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (preferences_apply), "clicked",
+                      GTK_SIGNAL_FUNC (on_preferences_apply_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (preferences_cancel), "clicked",
+                      GTK_SIGNAL_FUNC (on_preferences_cancel_clicked),
+                      NULL);
+
+  return intf_preferences;
 }
 

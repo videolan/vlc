@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.123 2001/05/06 04:32:02 sam Exp $
+ * $Id: video_output.c,v 1.124 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -178,9 +178,11 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     p_vout->i_height              = main_GetIntVariable( VOUT_HEIGHT_VAR,
                                                          VOUT_HEIGHT_DEFAULT );
     p_vout->i_bytes_per_line      = p_vout->i_width * 2;
-    p_vout->i_screen_depth        = 15;
+    p_vout->i_screen_depth        = main_GetIntVariable( VOUT_DEPTH_VAR,
+                                                         VOUT_DEPTH_DEFAULT );
     p_vout->i_bytes_per_pixel     = 2;
-    p_vout->f_gamma               = VOUT_GAMMA;
+    p_vout->f_gamma               = VOUT_GAMMA_DEFAULT; // FIXME: replace with 
+                                                        // variable
     p_vout->b_need_render         = 1;
     p_vout->b_YCbr                = 0;
     
@@ -189,6 +191,8 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     p_vout->b_info                = 0;
     p_vout->b_interface           = 0;
     p_vout->b_scale               = 1;
+    p_vout->b_fullscreen          = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
+                                                     VOUT_FULLSCREEN_DEFAULT );
 
     intf_WarnMsg( 1, "wished configuration: %dx%d, %d/%d bpp (%d Bpl)",
                   p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,

@@ -2,7 +2,7 @@
  * intf_gtk.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.h,v 1.2 2001/05/01 15:12:22 sam Exp $
+ * $Id: intf_gtk.h,v 1.3 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -69,12 +69,9 @@ typedef struct intf_sys_s
     GtkWidget *         p_network;                  /* network stream window */
 
     /* The slider */
+    GtkFrame *          p_slider_frame;
     GtkAdjustment *     p_adj;                   /* slider adjustment object */
     float               f_adj_oldvalue;                    /* previous value */
-
-    /* The window labels */
-    GtkLabel *          p_label_date;
-    GtkLabel *          p_label_status;
 
     /* XXX: Ugly kludge, see intf_gnome.c */
     void             ( *pf_gtk_callback ) ( void );

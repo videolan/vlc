@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.15 2001/05/01 15:12:22 sam Exp $
+ * $Id: intf_gtk.c,v 1.16 2001/05/06 18:32:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -225,11 +225,8 @@ static void intf_Run( intf_thread_t *p_intf )
                        1, GDK_ACTION_COPY );
 
     /* Get the interface labels */
-    #define P_LABEL( name ) GTK_LABEL( gtk_object_get_data( \
-                         GTK_OBJECT( p_intf->p_sys->p_window ), name ) )
-    p_intf->p_sys->p_label_date = P_LABEL( "label_date" );
-    p_intf->p_sys->p_label_status = P_LABEL( "label_status" );
-    #undef P_LABEL
+    p_intf->p_sys->p_slider_frame = GTK_FRAME( gtk_object_get_data(
+        GTK_OBJECT(p_intf->p_sys->p_window ), "slider_frame" ) ); 
 
     /* Connect the date display to the slider */
     #define P_SLIDER GTK_RANGE( gtk_object_get_data( \
@@ -303,7 +300,7 @@ static gint GtkManage( gpointer p_data )
 {
 #define p_intf ((intf_thread_t *)p_data)
 
-    GtkPlayListManage( p_data ); 
+    GtkPlayListManage( p_data );
 
     vlc_mutex_lock( &p_intf->change_lock );
     
@@ -758,7 +755,7 @@ void GtkDisplayDate( GtkAdjustment *p_adj )
 
         vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
 
-        gtk_label_set_text( p_intf->p_sys->p_label_date,
+        gtk_frame_set_label( p_intf->p_sys->p_slider_frame,
                             input_OffsetToTime( p_intf->p_input, psz_time,
                                    ( p_area->i_size * p_adj->value ) / 100 ) );
 
