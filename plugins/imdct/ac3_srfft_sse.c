@@ -2,7 +2,7 @@
  * ac3_srfft_sse.c: accelerated SSE ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_srfft_sse.c,v 1.11 2001/12/30 07:09:55 sam Exp $
+ * $Id: ac3_srfft_sse.c,v 1.12 2002/05/14 18:11:15 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -274,7 +274,7 @@ static void fft_asmb_sse (ck_sse_t * ck, int k, complex_t *x, complex_t *wTB,
     "decl -8(%%ebp)\n"
 
     ".align 16\n"
-".loop:\n"
+"0:\n"
     "movaps (%%edi), %%xmm0\n"      /* wT[1] | wT[0] */
     "movaps (%%edx), %%xmm1\n"      /* d[1] | d[0] */
 
@@ -341,10 +341,10 @@ static void fft_asmb_sse (ck_sse_t * ck, int k, complex_t *x, complex_t *wTB,
 
     "addl $16, %%eax\n"
     "decl -8(%%ebp)\n"
-    "jnz .loop\n"
+    "jnz 0b\n"
 
     ".align 16\n"
-".end:\n"
+"1:\n"
     "popl %%edi\n"
     "popl %%esi\n"
     "popl %%edx\n"

@@ -2,7 +2,7 @@
  * ac3_imdct_3dn.c: accelerated 3D Now! ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_3dn.c,v 1.9 2001/12/30 07:09:55 sam Exp $
+ * $Id: ac3_imdct_3dn.c,v 1.10 2002/05/14 18:11:15 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -88,7 +88,7 @@ static void imdct512_pre_ifft_twiddle_3dn (const int *pmt, complex_t *buf, float
 	"movl $128, %%ebx\n"         /* loop counter */
 
     ".align 16\n"
-".loop:\n"
+"0:\n"
 	"movl  (%%eax), %%esi\n"
 	"movd (%%ecx, %%esi, 8), %%mm1\n"   /* 2j */
     "punpckldq %%mm1, %%mm1\n"          /* 2j | 2j */
@@ -111,7 +111,7 @@ static void imdct512_pre_ifft_twiddle_3dn (const int *pmt, complex_t *buf, float
     
 	"movq  %%mm0, -8(%%edi)\n"
 	"decl %%ebx\n"
-   	"jnz .loop\n"
+   	"jnz 0b\n"
 
 	"popl %%esi\n"
 	"popl %%ebx\n"
@@ -129,7 +129,7 @@ static void imdct512_post_ifft_twiddle_3dn (complex_t *buf, float *xcos_sin_sse)
 	"movl $64, %%ebx\n"         /* loop counter */
 
     ".align 16\n"
-".loop1:\n"
+"0:\n"
 	"movq	(%%eax), %%mm0\n"   /* im0 | re0 */
 	"movq	  %%mm0, %%mm1\n"   /* im0 | re0 */
     "punpckldq %%mm0, %%mm0\n"  /* re0 | re0 */
@@ -168,7 +168,7 @@ static void imdct512_post_ifft_twiddle_3dn (complex_t *buf, float *xcos_sin_sse)
 	"addl $32, %%ecx\n"
 	"addl $16, %%eax\n"
 	"decl %%ebx\n"
-	"jnz .loop1\n"
+	"jnz 0b\n"
 
 	"popl %%ebx\n"
 	"femms\n"

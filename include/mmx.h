@@ -41,16 +41,16 @@ typedef	union {
 #define	mmx_i2r(op,imm,reg) \
 	__asm__ __volatile__ (#op " %0, %%" #reg \
 			      : /* nothing */ \
-			      : "X" (imm) )
+			      : "i" (imm) )
 
 #define	mmx_m2r(op,mem,reg) \
 	__asm__ __volatile__ (#op " %0, %%" #reg \
 			      : /* nothing */ \
-			      : "X" (mem))
+			      : "m" (mem))
 
 #define	mmx_r2m(op,reg,mem) \
 	__asm__ __volatile__ (#op " %%" #reg ", %0" \
-			      : "=X" (mem) \
+			      : "=m" (mem) \
 			      : /* nothing */ )
 
 #define	mmx_r2r(op,regs,regd) \

@@ -2,7 +2,7 @@
  * ac3_imdct_sse.c: accelerated SSE ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_sse.c,v 1.10 2001/12/30 07:09:55 sam Exp $
+ * $Id: ac3_imdct_sse.c,v 1.11 2002/05/14 18:11:15 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -103,7 +103,7 @@ static void imdct512_pre_ifft_twiddle_sse (const int *pmt, complex_t *buf, float
     "movl $64, -4(%%ebp)\n"
     
     ".align 16\n"
-".loop:\n"
+"0:\n"
     "movl  (%%eax), %%esi\n"
     "movl 4(%%eax), %%edi\n"
     "movss (%%ecx, %%esi, 8), %%xmm1\n" /* 2j */
@@ -135,7 +135,7 @@ static void imdct512_pre_ifft_twiddle_sse (const int *pmt, complex_t *buf, float
     
     "movaps  %%xmm0, -16(%%ebx)\n"
     "decl    -4(%%ebp)\n"
-    "jnz     .loop\n"
+    "jnz     0b\n"
 
     "popl %%esi\n"
     "popl %%edi\n"
@@ -159,7 +159,7 @@ static void imdct512_post_ifft_twiddle_sse (complex_t *buf, float *xcos_sin_sse)
     "movl  $32, %%ebx\n"               /* loop counter */
 
     ".align 16\n"
-".loop1:\n"
+"0:\n"
     "movaps (%%eax), %%xmm0\n"         /*  im1 | re1 | im0 | re0 */
 
     "movaps (%%ecx), %%xmm2\n"         /* -c | -s | -s | c */
@@ -210,7 +210,7 @@ static void imdct512_post_ifft_twiddle_sse (complex_t *buf, float *xcos_sin_sse)
     "addl $64, %%ecx\n"
     "addl $32, %%eax\n"
     "decl %%ebx\n"
-    "jnz .loop1\n"
+    "jnz 0b\n"
 
     "popl %%ebx\n"
     : "=a" (buf)
