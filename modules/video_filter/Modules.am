@@ -1,6 +1,6 @@
 SOURCES_transform = modules/video_filter/transform.c
 SOURCES_invert = modules/video_filter/invert.c
-SOURCES_yuv = modules/video_filter/yuv.c
+SOURCES_adjust = modules/video_filter/adjust.c
 SOURCES_distort = modules/video_filter/distort.c
 SOURCES_wall = modules/video_filter/wall.c
 SOURCES_clone = modules/video_filter/clone.c
