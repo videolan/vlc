@@ -2,7 +2,7 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.9 2004/02/29 17:36:55 asmax Exp $
+ * $Id: skin_main.cpp,v 1.10 2004/03/01 19:58:16 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -168,13 +168,13 @@ static void Run( intf_thread_t *p_intf )
         // Too bad, it failed. Let's try with the default theme
 #ifdef WIN32_SKINS
         string default_dir = (string)p_intf->p_libvlc->psz_vlcpath +
-                             "\\skins\\default\\theme.xml";
+                             "\\skins2\\default\\theme.xml";
         if( !pLoader->load( default_dir ) )
 #else
         string user_skin = (string)p_intf->p_vlc->psz_homedir +
-                           "/" + CONFIG_DIR + "/skins/default/theme.xml";
+                           "/" + CONFIG_DIR + "/skins2/default/theme.xml";
 
-        string default_skin = (string)DATA_PATH + "/skins/default/theme.xml";
+        string default_skin = (string)DATA_PATH + "/skins2/default/theme.xml";
         if( !pLoader->load( user_skin ) && !pLoader->load( default_skin ) )
 #endif
         {
