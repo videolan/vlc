@@ -468,12 +468,29 @@ void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
     /*
      * Prepare horizontal offset array
      */
-    if( i_pic_width - i_width > 0 )
+    if( i_pic_width - i_width == 0 )
+    {
+        /* No horizontal scaling: YUV conversion is done directly to picture */
+        *pb_h_scaling = 0;
+    }
+    else if( i_pic_width - i_width > 0 )
     {
         /* Prepare scaling array for horizontal extension */
         *pb_h_scaling = 1;
         i_scale_count = i_pic_width;
-        if( b_double )
+        if( !b_double )
+        {
+            for( i_x = i_width; i_x--; )
+            {
+                while( (i_scale_count -= i_width) > 0 )
+                {
+                    *p_offset++ = 0;
+                }
+                *p_offset++ = 1;
+                i_scale_count += i_pic_width;
+            }
+        }
+        else
         {
             int i_dummy = 0;
             for( i_x = i_width; i_x--; )
@@ -484,37 +501,38 @@ void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
                     *p_offset++ = 0;
                 }
                 *p_offset++ = 1;
-                *p_offset++ = i_dummy & 1;
-                i_dummy++;
-                i_scale_count += i_pic_width;
-            }
-        }
-        else
-        {
-            for( i_x = i_width; i_x--; )
-            {
-                while( (i_scale_count -= i_width) > 0 )
-                {
-                    *p_offset++ = 0;
-                }
-                *p_offset++ = 1;
+                *p_offset++ = i_dummy;
+                i_dummy = 1 - i_dummy;
                 i_scale_count += i_pic_width;
             }
         }
     }
-    else if( i_pic_width - i_width < 0 )
+    else /* if( i_pic_width - i_width < 0 ) */
     {
         /* Prepare scaling array for horizontal reduction */
-        *pb_h_scaling =  1;
-        i_scale_count =         i_pic_width;
-        if( b_double )
+        *pb_h_scaling = 1;
+        i_scale_count = i_width;
+        if( !b_double )
+        {
+           for( i_x = i_pic_width; i_x--; )
+            {
+                *p_offset = 1;
+                while( (i_scale_count -= i_pic_width) > 0 )
+                {
+                    *p_offset += 1;
+                }
+                p_offset++;
+                i_scale_count += i_width;
+            }
+        }
+        else
         {
             int i_remainder = 0;
             int i_jump;
             for( i_x = i_pic_width; i_x--; )
             {
                 i_jump = 1;
-                while( (i_scale_count -= i_pic_width) >= 0 )
+                while( (i_scale_count -= i_pic_width) > 0 )
                 {
                     i_jump += 1;
                 }
@@ -523,41 +541,23 @@ void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
                 i_remainder = i_jump & 1;
                 i_scale_count += i_width;
             }
-         }
-        else
-        {
-           for( i_x = i_pic_width; i_x--; )
-            {
-                *p_offset = 1;
-                while( (i_scale_count -= i_pic_width) >= 0 )
-                {
-                    *p_offset += 1;
-                }
-                p_offset++;
-                i_scale_count += i_width;
-            }
         }
-    }
-    else
-    {
-        /* No horizontal scaling: YUV conversion is done directly to picture */
-        *pb_h_scaling = 0;
-    }
+     }
 
     /*
      * Set vertical scaling indicator
      */
-    if( i_pic_height - i_height > 0 )
+    if( i_pic_height - i_height == 0 )
+    {
+        *pi_v_scaling = 0;
+    }
+    else if( i_pic_height - i_height > 0 )
     {
         *pi_v_scaling = 1;
     }
-    else if( i_pic_height - i_height < 0 )
+    else /* if( i_pic_height - i_height < 0 ) */
     {
         *pi_v_scaling = -1;
-    }
-    else
-    {
-        *pi_v_scaling = 0;
     }
 }
 

@@ -160,21 +160,28 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 
 #if 1
             if( p_vpar->synchro.b_all_I )
-                intf_ErrMsg( " I: 1024/1024  " );
+                intf_ErrMsg( "  I: 1024/1024  " );
+
             if( p_vpar->synchro.b_all_P )
                 intf_ErrMsg( "P: %i/%i  ", p_vpar->synchro.i_P_seen,
                                            p_vpar->synchro.i_P_seen );
             else if( p_vpar->synchro.displayable_p > 0 )
                 intf_ErrMsg( "P: %i/%i  ", p_vpar->synchro.displayable_p,
                                              p_vpar->synchro.i_P_seen );
+            else
+                intf_ErrMsg( "                " );
+
             if( p_vpar->synchro.b_all_B )
                 intf_ErrMsg( "B: %i/%i", p_vpar->synchro.i_B_seen,
                                          p_vpar->synchro.i_B_seen );
             else if( p_vpar->synchro.displayable_b > 0 )
                 intf_ErrMsg( "B: %i/%i", p_vpar->synchro.displayable_b,
                                            p_vpar->synchro.i_B_seen );
-//            intf_ErrMsg( "                             " );
-            intf_ErrMsg( "\n" );
+            else
+                intf_ErrMsg( "                " );
+
+            intf_ErrMsg( "Decoding: " );
+            /*intf_ErrMsg( "\n" );*/
 #endif
             p_vpar->synchro.i_P_seen = 0;
             p_vpar->synchro.i_B_seen = 0;

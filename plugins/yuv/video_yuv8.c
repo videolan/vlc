@@ -77,7 +77,7 @@ void ConvertY4Gray8( YUV_ARGS_8BPP )
     /*
      * Perform conversion
      */
-    i_scale_count = i_pic_height;
+    i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
     for( i_y = 0; i_y < i_height; i_y++ )
     {
         /* Mark beginnning of line for possible later line copy, and initialize
@@ -146,7 +146,7 @@ void ConvertYUV420RGB8( YUV_ARGS_8BPP )
     /*
      * Perform conversion
      */
-    i_scale_count = i_pic_height;
+    i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
     i_real_y = 0;
     for( i_y = 0; i_y < i_height; i_y++ )
     {

@@ -107,7 +107,7 @@
     switch( i_vertical_scaling )                                              \
     {                                                                         \
     case -1:                             /* vertical scaling factor is < 1 */ \
-        while( (i_scale_count -= i_pic_height) >= 0 )                         \
+        while( (i_scale_count -= i_pic_height) > 0 )                          \
         {                                                                     \
             /* Height reduction: skip next source line */                     \
             p_y += i_width;                                                   \

@@ -110,7 +110,7 @@ Urgency: Important
 Description: Fix 8bpp YUV
  The 8bpp YUV function is broken, there is some serious
  alpha blending, and it scales pretty badly. Fix it.
-Status: Todo
+Status: Done 14 Aug 2000 (sam)
 
 Task: 0x15
 Difficulty: Medium

@@ -136,7 +136,7 @@
     switch( i_vertical_scaling )                                              \
     {                                                                         \
     case -1:                             /* vertical scaling factor is < 1 */ \
-        while( (i_scale_count -= i_pic_height) >= 0 )                         \
+        while( (i_scale_count -= i_pic_height) > 0 )                          \
         {                                                                     \
             /* Height reduction: skip next source line */                     \
             p_y += i_width;                                                   \
@@ -160,11 +160,10 @@
     case 1:                              /* vertical scaling factor is > 1 */ \
         while( (i_scale_count -= i_height) > 0 )                              \
         {                                                                     \
-            SCALE_WIDTH_DITHER( CHROMA );                                     \
             p_y -= i_width;                                                   \
             p_u -= i_chroma_width;                                            \
             p_v -= i_chroma_width;                                            \
-            p_pic += i_pic_line_width;                                        \
+            SCALE_WIDTH_DITHER( CHROMA );                                     \
         }                                                                     \
         i_scale_count += i_pic_height;                                        \
         break;                                                                \

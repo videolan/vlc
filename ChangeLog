@@ -7,7 +7,8 @@
   * now scaling is on by default, so that people won't tell that the vlc
     cannot do scaling :-)
   * fixed a few long lines.
-  * _almost_ fixed 8bpp YUV.
+  * fixed 8bpp YUV.
+  * fixed the fscked up Bresenham algorithm in all YUV functions.
 
 Tue Aug  8 11:24:01 CEST 2000
 0.1.99f :

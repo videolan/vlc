@@ -76,7 +76,7 @@ void ConvertY4Gray16( YUV_ARGS_16BPP )
     /*
      * Perform conversion
      */
-    i_scale_count = i_pic_height;
+    i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
     for( i_y = 0; i_y < i_height; i_y++ )
     {
         /* Mark beginnning of line for possible later line copy, and initialize
@@ -138,7 +138,7 @@ void ConvertYUV420RGB16( YUV_ARGS_16BPP )
     /*
      * Perform conversion
      */
-    i_scale_count = i_pic_height;
+    i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
     for( i_y = 0; i_y < i_height; i_y++ )
     {
         /* Mark beginnning of line for possible later line copy, and initialize
@@ -200,7 +200,7 @@ void ConvertYUV422RGB16( YUV_ARGS_16BPP )
     /*
      * Perform conversion
      */
-    i_scale_count = i_pic_height;
+    i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
     for( i_y = 0; i_y < i_height; i_y++ )
     {
         /* Mark beginnning of line for possible later line copy, and initialize
@@ -261,7 +261,7 @@ void ConvertYUV444RGB16( YUV_ARGS_16BPP )
     /*
      * Perform conversion
      */
-    i_scale_count = i_pic_height;
+    i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
     for( i_y = 0; i_y < i_height; i_y++ )
     {
         /* Mark beginnning of line for possible later line copy, and initialize
