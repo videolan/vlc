@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.40 2004/01/25 18:53:07 gbazin Exp $
+ * $Id: freetype.c,v 1.41 2004/01/25 22:16:51 rocky Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -648,7 +648,10 @@ static subpicture_t *AddText ( vout_thread_t *p_vout, char *psz_string,
     line_desc_t  *p_line,  *p_next;
     uint32_t *p_unicode_string, i_char;
     int i_string_length;
+
+#if defined(HAVE_ICONV)
     iconv_t iconv_handle;
+#endif
 
     FT_BBox line;
     FT_BBox glyph_size;
