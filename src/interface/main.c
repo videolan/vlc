@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.195.2.7 2002/08/07 21:35:24 massiot Exp $
+ * $Id: main.c,v 1.195.2.8 2002/10/01 22:26:39 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -239,6 +239,12 @@
     "If you have several interfaces on your Linux machine and use the " \
     "VLAN solution, you may indicate here which interface to use.")
 
+#define IFACE_ADDR_TEXT N_("network interface address")
+#define IFACE_ADDR_LONGTEXT N_( \
+    "If you have several interfaces on your machine and use the " \
+    "multicast solution, you will probably have to indicate the IP address " \
+    "of your multicasting interface here.")
+
 #define INPUT_PROGRAM_TEXT N_("choose program (SID)")
 #define INPUT_PROGRAM_LONGTEXT N_( \
     "Choose the program to select by giving its Service ID.")
@@ -410,6 +416,7 @@ ADD_STRING  ( "channel-server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LON
 ADD_INTEGER ( "channel-port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
 ADD_INTEGER ( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT )
 ADD_STRING  ( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT )
+ADD_STRING  ( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT )
 
 ADD_INTEGER ( "program", 0, NULL, INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT )
 ADD_INTEGER ( "audio-type", -1, NULL, INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT )
