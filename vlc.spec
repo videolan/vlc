@@ -1,6 +1,7 @@
 %define name 		vlc
-%define vlc_ver 	0.5.0
-%define version		%vlc_ver
+%define version 	0.5.0
+%define rel		0.1
+
 %define	libmajor	0
 %define libname		lib%name%libmajor
 
@@ -10,13 +11,95 @@
 %define release		0.%{cvsdate}
 %define cvs_name 	%{name}-%version-cvs
 %else
-%define release 	0.1mdk
+%define release 	%{rel}mdk
 %endif
 
-# The QT interface is not functional yet
-%define	plugin_qt	0
-%define	plugin_lirc	1
-%define	plugin_svgalib	0
+%define with_dvdplay 0
+
+%define with_mozilla 0
+%define with_gtk 1
+%define with_gnome 1
+%define with_qt 0
+%define with_kde 0
+%define with_ncurses 1
+%define with_lirc 1
+%define	with_wx 0
+
+%define with_aa 1
+%define with_sdl 1
+%define with_ggi 1
+%define with_svgalib 0
+%define with_xosd 0
+
+%define with_mad 1
+%define with_ogg 1
+%define with_a52 1
+%define with_dv 0
+%define with_dvb 0
+%define	with_ffmpeg 0
+
+%define with_esd 1
+%define with_arts 1
+%define with_alsa 1
+
+%define redhat80 0
+%if %redhat80
+%define release %rel
+# adjust define for Redhat.
+%endif
+
+# without
+%{?_without_mozilla:	%{expand: %%define with_mozilla 0}}
+%{?_without_gtk:	%{expand: %%define with_gtk 0}}
+%{?_without_gnome:	%{expand: %%define with_gnome 0}}
+%{?_without_qt:		%{expand: %%define with_qt 0}}
+%{?_without_kde:	%{expand: %%define with_kde 0}}
+%{?_without_ncurses:	%{expand: %%define with_ncurses 0}}
+%{?_without_lirc:	%{expand: %%define with_lirc 0}}
+%{?_without_wx:		%{expand: %%define with_wx 0}}
+
+%{?_without_aa:   	%{expand: %%define with_aa 0}}
+%{?_without_sdl:   	%{expand: %%define with_sdl 0}}
+%{?_without_ggi:   	%{expand: %%define with_ggi 0}}
+%{?_without_svgalib:	%{expand: %%define with_svgalib 0}}
+%{?_without_xosd:	%{expand: %%define with_xosd 0}}
+
+%{?_without_mad:	%{expand: %%define with_mad 0}}
+%{?_without_ogg:	%{expand: %%define with_ogg 0}}
+%{?_without_a52:	%{expand: %%define with_a52 0}}
+%{?_without_dv:		%{expand: %%define with_dv 0}}
+%{?_without_dvb:	%{expand: %%define with_dvb 0}}
+
+%{?_without_esd:	%{expand: %%define with_esd 0}}
+%{?_without_arts:	%{expand: %%define with_arts 0}}
+%{?_without_alsa:	%{expand: %%define with_alsa 0}}
+
+# with
+%{?_with_mozilla:    	%{expand: %%define with_mozilla 1}}
+%{?_with_gtk:		%{expand: %%define with_gtk 1}}
+%{?_with_gnome:		%{expand: %%define with_gnome 1}}
+%{?_with_qt:		%{expand: %%define with_qt 1}}
+%{?_with_kde:		%{expand: %%define with_kde 1}}
+%{?_with_ncurses:    	%{expand: %%define with_ncurses 1}}
+%{?_with_lirc:       	%{expand: %%define with_lirc 1}}
+%{?_with_wx:		%{expand: %%define with_wx 0}}
+
+%{?_with_aa:         	%{expand: %%define with_aa 1}}
+%{?_with_sdl:        	%{expand: %%define with_sdl 1}}
+%{?_with_ggi:        	%{expand: %%define with_ggi 1}}
+%{?_with_svgalib:    	%{expand: %%define with_svgalib 1}}
+%{?_with_xosd:       	%{expand: %%define with_xosd 1}}
+
+%{?_with_mad:		%{expand: %%define with_mad 1}}
+%{?_with_ogg:        	%{expand: %%define with_ogg 1}}
+%{?_with_a52:        	%{expand: %%define with_a52 1}}
+%{?_with_dv:         	%{expand: %%define with_dv 1}}
+%{?_with_dvb:        	%{expand: %%define with_dvb 1}}
+
+%{?_with_esd:        	%{expand: %%define with_esd 1}}
+%{?_with_arts:       	%{expand: %%define with_arts 1}}
+%{?_with_alsa:       	%{expand: %%define with_alsa 1}}
+
 
 Summary:	VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 Name:		%{name}
@@ -37,26 +120,74 @@ Requires:	vlc-gui
 Requires:	vlc-mad
 
 BuildRoot:	%_tmppath/%name-%version-%release-root
-#Buildrequires:	libncurses5-devel
-#Buildrequires:	libqt2-devel
-#Buildrequires:	libgtk+1.2-devel
-#Buildrequires:	gnome-libs-devel
-#Buildrequires:	db1-devel
-Buildrequires:	libalsa2-devel
-Buildrequires:	libesound0-devel
-#Buildrequires:	libarts-devel
-#Buildrequires:	libggi-devel
-#Buildrequires:	aalib-devel
-#Buildrequires:	SDL-devel
+
+%if %with_mozilla
+Buildrequires:	mozilla-devel
+%endif
+%if %with_gtk
+Buildrequires:	libgtk+1.2-devel
+%endif
+%if %with_gnome
+Buildrequires:	gnome-libs-devel
+%endif
+%if %with_qt
+Buildrequires:	libqt2-devel
+%endif
+%if %with_kde
+Buildrequires:	libkde2-devel
+%endif
+%if %with_ncurses
+Buildrequires:	libncurses5-devel
+%if %with_wx
+Buildrequires:	wxwindows
+%endif
+%endif
+%if %with_lirc
+Buildrequires:	liblirc-devel
+%endif
+%if %with_aa
+Buildrequires:	aalib-devel
+%endif
+%if %with_sdl
+Buildrequires:	SDL-devel
+%endif
+%if %with_ggi
+Buildrequires:	libggi-devel
+%endif
+%if %with_svgalib
+Buildrequires:	svgalib-devel
+%endif
+%if %with_xosd
+Buildrequires:	libxosd2-devel
+%endif
+%if %with_mad
+Buildrequires:	libmad-devel
+%endif
+%if %with_ogg
+Buildrequires:	libvorbis-devel
+Buildrequires:	libogg-devel
+%endif
+%if %with_dv
+Buildrequires:	libdv2-devel
+%endif
+
+%if %with_a52
 #Buildrequires:	liba52dec-devel
-#Buildrequires:	libmad-devel
-#Buildrequires:	liblirc-devel
-#Buildrequires:	libffmpeg-devel
-#Buildrequires:	libvorbis-devel
-#Buildrequires:	libogg-devel
-#Buildrequires:	mozilla-devel
-#Buildrequires:	libdev2-devel
-#Buildrequires:	libxosd2-devel
+%endif
+
+%if %with_ffmpeg
+Buildrequires:	libffmpeg-devel
+%endif
+
+%if %with_alsa
+Buildrequires:	libalsa2-devel
+%endif
+%if %with_esd
+Buildrequires:	libesound0-devel
+%endif
+%if %with_arts
+Buildrequires:	libarts-devel
+%endif
 
 %description
 VideoLAN is an OpenSource streaming solution for every OS developed by
@@ -343,16 +474,93 @@ select the `alsa' aout plugin from the preferences menu.
 %build
 # yves 0.4.0-1mdk
 # ffmpeg: static linking cause no official ffmpeg release aith a stable ABI
-# ffmpeg: no plugin posible on ia64 due to the static linking (can not put .a in a .so)
-%configure  --enable-release \
-            --enable-dvd --without-dvdcss --enable-dvdplay \
-#            --enable-gtk --enable-gnome --disable-qt --disable-kde --enable-ncurses --enable-lirc \
-            --enable-x11 --enable-xvideo \
-	    #--enable-ggi --enable-sdl --enable-fb --enable-mga --enable-aa \
-            --enable-esd --enable-alsa \
-#--enable-arts \
-#	    --enable-mad --enable-ffmpeg --with-ffmpeg=/usr
-	    
+# ffmpeg:no plugin posible on ia64 due to the static linking (can not put .a in a .so)
+
+# NO empty line or comments for the configure --switch or it won't work.
+%configure2_5x  --enable-release \
+	--enable-dvd --without-dvdcss \
+%if %with_dvdplay
+	--enable-dvdplay \
+%else
+	--disable-dvdplay \
+%endif
+%if %with_mozilla
+	--enable-mozilla \
+%else
+	--disable-mozilla \
+%endif
+%if %with_gtk
+	--enable-gtk \
+%else
+	--disable-gtk \
+%endif
+%if %with_gnome
+	--enable-gnome \
+%else
+	--disable-gnome \
+%endif
+%if %with_qt
+	--enable-qt \
+%endif
+%if %with_kde
+	--enable-kde \
+%endif
+%if %with_ncurses
+	--enable-ncurses \
+%endif
+%if %with_lirc
+	--enable-lirc \
+%endif
+%if %with_wx
+	--enable-wxwindows \
+%else 
+	--disable-wxwindows \
+%endif
+	--enable-x11 --enable-xvideo \
+	--enable-fb --disable-mga \
+%if %with_aa
+	--enable-aa \
+%endif
+%if %with_sdl
+	--enable-sdl \
+%endif
+%if %with_ggi
+	--enable-ggi \
+%endif
+%if %with_svgalib
+        --enable-svgalib \
+%endif
+%if %with_xosd
+	--enable-xosd \
+%else
+	--disable-xosd \
+%endif
+%if %with_mad
+        --enable-mad \
+%endif  
+%if %with_ffmpeg
+        --enable-ffmpeg --with-ffmpeg=/usr --with-ffmpeg-tree=/usr/lib \
+%else
+        --disable-ffmpeg \
+%endif
+%if %with_ogg
+	--enable-vorbis \
+	--enable-ogg \
+%else
+	--disable-vorbis \
+	--disable-ogg \
+%endif
+%if %with_esd
+	--enable-esd \
+%endif
+%if %with_alsa
+	--enable-alsa \
+%endif
+%if %with_arts
+	--enable-arts \
+%endif
+
+# debian configure
 # --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-mp4 --enable-dvb --enable-dv --enable-svgalib --enable-satellite --enable-ogg --enable-vorbis
 
 export QTDIR=%{_libdir}/qt3 
@@ -361,45 +569,70 @@ export QTDIR=%{_libdir}/qt3
 %install
 %makeinstall_std
 %find_lang %name
-#install -d %buildroot/%_mandir/man1
-#install doc/vlc.1 %buildroot/%_mandir/man1
+install -d %buildroot/%_mandir/man1
+install doc/vlc.1 %buildroot/%_mandir/man1
+install doc/vlc-config.1 %buildroot/%_mandir/man1
 
 # menu
-mkdir -p %buildroot/%{_menudir}
-cat > %buildroot/%{_menudir}/vlc << EOF
-?package(vlc): command="%{_bindir}/vlc" hotkey="V" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="VideoLAN Client" icon="vlc.png" hints="Video"
+mkdir -p %buildroot/%_menudir
+cat > %buildroot/%_menudir/vlc << EOF
+?package(vlc): command="%_bindir/vlc" hotkey="V" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="VideoLAN Client" icon="vlc.png" hints="Video"
 EOF
-cat > %buildroot/%{_menudir}/gvlc << EOF
-?package(gvlc): command="%{_bindir}/gvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gtk VideoLAN Client" icon="gvlc.png" hints="Video"
+%if %with_gtk
+cat > %buildroot/%_menudir/gvlc << EOF
+?package(gvlc): command="%_bindir/gvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gtk VideoLAN Client" icon="gvlc.png" hints="Video"
 EOF
-cat > %buildroot/%{_menudir}/gnome-vlc << EOF
-?package(gnome-vlc): command="%{_bindir}/gnome-vlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="gnome-vlc.png" hints="Video"
+%endif
+%if %with_gnome
+cat > %buildroot/%_menudir/gnome-vlc << EOF
+?package(gnome-vlc): command="%_bindir/gnome-vlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="gnome-vlc.png" hints="Video"
 EOF
-%if %{plugin_qt}
-cat > %buildroot/%{_menudir}/qvlc << EOF
-?package(qvlc): command="%{_bindir}/qvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Qt VideoLAN Client" icon="qvlc.png" hints="Video"
+%endif
+%if %with_qt
+cat > %buildroot/%_menudir/qvlc << EOF
+?package(qvlc): command="%_bindir/qvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Qt VideoLAN Client" icon="qvlc.png" hints="Video"
+EOF
+%endif
+%if %with_kde
+cat > %buildroot/%_menudir/kvlc << EOF
+?package(kvlc): command="%_bindir/kvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="kvlc.png" hints="Video"
 EOF
 %endif
 
+
 # icons
+%define pngdir %buildroot/%_datadir/vlc
 mkdir -p %{buildroot}/{%{_miconsdir},%{_liconsdir}}
-install -m 644 %buildroot/%_datadir/vlc/vlc16x16.png %buildroot/%_miconsdir/vlc.png
-install -m 644 %buildroot/%_datadir/vlc/vlc32x32.png %buildroot/%_iconsdir/vlc.png
-install -m 644 %buildroot/%_datadir/vlc/vlc48x48.png %buildroot/%_liconsdir/vlc.png
-install -m 644 %buildroot/%_datadir/vlc/gnome-vlc16x16.png %buildroot/%_miconsdir/gnome-vlc.png
-install -m 644 %buildroot/%_datadir/vlc/gnome-vlc32x32.png %buildroot/%_iconsdir/gnome-vlc.png
-install -m 644 %buildroot/%_datadir/vlc/gnome-vlc48x48.png %buildroot/%_liconsdir/gnome-vlc.png
-install -m 644 %buildroot/%_datadir/vlc/gvlc16x16.png %buildroot/%_miconsdir/gvlc.png
-install -m 644 %buildroot/%_datadir/vlc/gvlc32x32.png %buildroot/%_iconsdir/gvlc.png
-install -m 644 %buildroot/%_datadir/vlc/gvlc48x48.png %buildroot/%_liconsdir/gvlc.png
-install -m 644 %buildroot/%_datadir/vlc/kvlc16x16.png %buildroot/%_miconsdir/kvlc.png
-install -m 644 %buildroot/%_datadir/vlc/kvlc32x32.png %buildroot/%_iconsdir/kvlc.png
-install -m 644 %buildroot/%_datadir/vlc/kvlc48x48.png %buildroot/%_liconsdir/kvlc.png
-%if %{plugin_qt}
-install -m 644 %buildroot/%_datadir/vlc/qvlc16x16.png %buildroot/%_miconsdir/qvlc.png
-install -m 644 %buildroot/%_datadir/vlc/qvlc32x32.png %buildroot/%_iconsdir/qvlc.png
-install -m 644 %buildroot/%_datadir/vlc/qvlc48x48.png %buildroot/%_liconsdir/qvlc.png
+install -m 644 %pngdir/vlc16x16.png %buildroot/%_miconsdir/vlc.png
+install -m 644 %pngdir/vlc32x32.png %buildroot/%_iconsdir/vlc.png
+install -m 644 %pngdir/vlc48x48.png %buildroot/%_liconsdir/vlc.png
+%if %with_gnome
+install -m 644 %pngdir/gnome-vlc16x16.png %buildroot/%_miconsdir/gnome-vlc.png
+install -m 644 %pngdir/gnome-vlc32x32.png %buildroot/%_iconsdir/gnome-vlc.png
+install -m 644 %pngdir/gnome-vlc48x48.png %buildroot/%_liconsdir/gnome-vlc.png
 %endif
+%if %with_gtk
+install -m 644 %pngdir/gvlc16x16.png %buildroot/%_miconsdir/gvlc.png
+install -m 644 %pngdir/gvlc32x32.png %buildroot/%_iconsdir/gvlc.png
+install -m 644 %pngdir/gvlc48x48.png %buildroot/%_liconsdir/gvlc.png
+%endif
+%if %with_kde
+install -m 644 %pngdir/kvlc16x16.png %buildroot/%_miconsdir/kvlc.png
+install -m 644 %pngdir/kvlc32x32.png %buildroot/%_iconsdir/kvlc.png
+install -m 644 %pngdir/kvlc48x48.png %buildroot/%_liconsdir/kvlc.png
+%endif
+%if %with_qt
+install -m 644 %pngdir/qvlc16x16.png %buildroot/%_miconsdir/qvlc.png
+install -m 644 %pngdir/qvlc32x32.png %buildroot/%_iconsdir/qvlc.png
+install -m 644 %pngdir/qvlc48x48.png %buildroot/%_liconsdir/qvlc.png
+%endif
+
+#rpm (>= 4.0.4-20mdk) now checks for installed (but unpackaged) files
+rm -f %pngdir/*
+#rm -f %buildroot/%_libdir/vlc/demux/libts_dvbpsi_plugin.so
+#FIXME: why ?
+#mv %buildroot/%_bindir/i586-mandrake-linux-gnu-vlc %buildroot/%_bindir/vlc
+#mv %buildroot/%_bindir/i586-mandrake-linux-gnu-vlc-config %buildroot/%_bindir/vlc-config
 
 %post
 %update_menus
@@ -412,7 +645,7 @@ rm -fr %buildroot
 %files -f %name.lang
 %defattr(-,root,root)
 %doc README COPYING
-%_bindir/vlc
+%_bindir/*vlc
 
 %dir %_libdir/vlc
 
@@ -422,12 +655,20 @@ rm -fr %buildroot
 %_libdir/vlc/access/libaccess_mms_plugin.so
 %_libdir/vlc/access/libaccess_rtp_plugin.so
 %_libdir/vlc/access/libaccess_udp_plugin.so
+%if %with_dvdplay
 %_libdir/vlc/access/libdvdplay_plugin.so
+%endif
 %_libdir/vlc/access/libdvd_plugin.so
 %_libdir/vlc/access/libdvdread_plugin.so
 %_libdir/vlc/access/libvcd_plugin.so
 
+%dir %_libdir/vlc/access_output/
+%_libdir/vlc/access_output/libaccess_output_dummy_plugin.so
+%_libdir/vlc/access_output/libaccess_output_file_plugin.so
+%_libdir/vlc/access_output/libaccess_output_udp_plugin.so
+
 %dir %_libdir/vlc/audio_filter
+%_libdir/vlc/audio_filter/liba52tofloat32_plugin.so
 %_libdir/vlc/audio_filter/liba52tospdif_plugin.so
 %_libdir/vlc/audio_filter/libfixed32tofloat32_plugin.so
 %_libdir/vlc/audio_filter/libfixed32tos16_plugin.so
@@ -455,9 +696,7 @@ rm -fr %buildroot
 %_libdir/vlc/audio_output/libaout_file_plugin.so
 %_libdir/vlc/audio_output/liboss_plugin.so
 
-
 %dir %_libdir/vlc/codec
-%_libdir/vlc/codec/liba52_plugin.so
 %_libdir/vlc/codec/libadpcm_plugin.so
 %_libdir/vlc/codec/libaraw_plugin.so
 %_libdir/vlc/codec/libcinepak_plugin.so
@@ -478,6 +717,7 @@ rm -fr %buildroot
 %_libdir/vlc/codec/libspudec_plugin.so
 
 %dir %_libdir/vlc/control
+%_libdir/vlc/control/librc_plugin.so
 
 %dir %_libdir/vlc/demux
 %_libdir/vlc/demux/libaac_plugin.so
@@ -493,6 +733,7 @@ rm -fr %buildroot
 %_libdir/vlc/demux/libmpeg_system_plugin.so
 %_libdir/vlc/demux/libps_plugin.so
 %_libdir/vlc/demux/libts_plugin.so
+%_libdir/vlc/demux/libts_dvbpsi_plugin.so
 %_libdir/vlc/demux/libwav_plugin.so
 
 %dir %_libdir/vlc/misc
@@ -505,6 +746,18 @@ rm -fr %buildroot
 %_libdir/vlc/misc/libmemcpymmx_plugin.so
 %_libdir/vlc/misc/libmemcpy_plugin.so
 %_libdir/vlc/misc/libsap_plugin.so
+
+%dir %_libdir/vlc/mux
+%_libdir/vlc/mux/libmux_dummy_plugin.so
+%_libdir/vlc/mux/libmux_ps_plugin.so
+%_libdir/vlc/mux/libmux_ts_plugin.so
+
+%dir %_libdir/vlc/packetizer
+%_libdir/vlc/packetizer/libpacketizer_a52_plugin.so
+%_libdir/vlc/packetizer/libpacketizer_copy_plugin.so
+%_libdir/vlc/packetizer/libpacketizer_mpeg4video_plugin.so
+%_libdir/vlc/packetizer/libpacketizer_mpegaudio_plugin.so
+%_libdir/vlc/packetizer/libpacketizer_mpegvideo_plugin.so
 
 %dir %_libdir/vlc/video_chroma
 %_libdir/vlc/video_chroma/libi420_rgb_mmx_plugin.so
@@ -534,7 +787,7 @@ rm -fr %buildroot
 
 %dir %_libdir/vlc/visualization
 
-%_mandir/man1/*
+%_mandir/man1/vlc.*
 %_menudir/vlc
 %_miconsdir/vlc.png
 %_iconsdir/vlc.png
@@ -547,16 +800,20 @@ rm -fr %buildroot
 %_includedir/vlc/*
 %_libdir/*a
 %_libdir/vlc/*a
-%_bindir/vlc-config
+%_bindir/*vlc-config
+%_mandir/man1/vlc-config*
 
+%if %with_mozilla
 %files -n mozilla-plugin-vlc
 %defattr(-,root,root)
 %doc README
 # FIXME: seems to be mozilla-version/plugin on Mandrake
 #%dir %_libdir/mozilla
 %_libdir/mozilla/*
+%endif
 
 # intf plugins
+%if %with_gtk
 %files -n gvlc
 %defattr(-,root,root)
 %doc README
@@ -571,7 +828,9 @@ rm -fr %buildroot
 %update_menus
 %postun -n gvlc
 %update_menus
+%endif
 
+%if %with_gnome
 %files -n gnome-vlc
 %defattr(-,root,root)
 %doc README
@@ -586,8 +845,9 @@ rm -fr %buildroot
 %update_menus
 %postun -n gnome-vlc
 %update_menus
+%endif
 
-%if %{plugin_qt}
+%if %with_qt
 %files -n qvlc
 %defattr(-,root,root)
 %doc README
@@ -603,6 +863,7 @@ rm -fr %buildroot
 %update_menus
 %endif
 
+%if %with_kde
 %files -n kvlc
 %doc README
 %_libdir/vlc/gui/libkde_plugin.so
@@ -615,14 +876,16 @@ rm -fr %buildroot
 %update_menus
 %postun -n kvlc
 %update_menus
+%endif
 
-
+%if %with_ncurses
 %files plugin-ncurses
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/gui/libncurses_plugin.so
+%endif
 
-%if %plugin_lirc
+%if %with_lirc
 %files plugin-lirc
 %defattr(-,root,root)
 %doc README
@@ -630,23 +893,29 @@ rm -fr %buildroot
 %endif
 
 # video plugins
+%if %with_sdl
 %files plugin-sdl
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/audio_output/libaout_sdl_plugin.so
 %_libdir/vlc/video_output/libvout_sdl_plugin.so
+%endif
 
+%if %with_ggi
 %files plugin-ggi
 %defattr(-,root,root)
 %doc README
 %{_libdir}/vlc/video_output/libggi_plugin.so
+%endif
 
+%if %with_aa
 %files plugin-aa
 %defattr(-,root,root)
 %doc README
 %{_libdir}/vlc/video_output/libaa_plugin.so
+%endif
 
-%if %plugin_svgalib
+%if %with_svgalib
 %files plugin-svgalib
 %defattr(-,root,root)
 %doc README
@@ -654,54 +923,73 @@ rm -fr %buildroot
 %endif
 
 # visualization plugin
+%if %with_xosd
 %files plugin-xosd
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/visualization/libxosd_plugin.so
+%endif
 
 # codec plugin
+%if %with_mad
 %files plugin-mad
 %defattr(-,root,root)
 %doc README
-%{_libdir}/vlc/codec/libmad_plugin.so
+%_libdir/vlc/codec/libmad_plugin.so
+%_libdir/vlc/demux/libid3tag_plugin.so
+%endif
 
+%if %with_ogg
 %files plugin-ogg
 %defattr(-,root,root)
 %doc README
-%{_libdir}/vlc/demux/libogg_plugin.so
-%{_libdir}/vlc/vlc/codec/libvorbis_plugin.so
+%_libdir/vlc/demux/libogg_plugin.so
+%_libdir/vlc/codec/libvorbis_plugin.so
+%endif
 
+%if %with_dv
 %files plugin-dv
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/codec/libdv_plugin.so
+%endif
 
+%if %with_a52
 %files plugin-a52
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/codec/liba52_plugin.so
+%endif
 
 # input plugin
+%if %with_dvb
 %files plugin-dvb
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/access/libsatellite_plugin.so
+%endif
 
 #audio plugins
+%if %with_esd
 %files plugin-esd
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/audio_output/libesd_plugin.so
+%endif
 
+%if %with_arts
 %files plugin-arts
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/audio_output/libarts_plugin.so
+%endif
 
+%if %with_alsa
 %files plugin-alsa
 %defattr(-,root,root)
 %doc README
 %_libdir/vlc/audio_output/libalsa_plugin.so
+%endif
 
 %changelog
 * Mon Jun 20 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.2-1mdk
