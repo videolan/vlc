@@ -2868,7 +2868,7 @@ static void ParseInfo( demux_t *p_demux, EbmlElement *info )
 
             msg_Dbg( p_demux, "|   |   + Title=%s", p_segment->psz_title );
         }
-        if( MKV_IS_ID( l, KaxSegmentFamily ) )
+        else if( MKV_IS_ID( l, KaxSegmentFamily ) )
         {
             KaxSegmentFamily *uid = static_cast<KaxSegmentFamily*>(l);
 
