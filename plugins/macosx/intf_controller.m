@@ -2,7 +2,7 @@
  * intf_controller.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.m,v 1.2 2002/05/18 13:33:44 massiot Exp $
+ * $Id: intf_controller.m,v 1.3 2002/05/19 23:51:37 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -191,7 +191,7 @@
     switch( [[NSApp currentEvent] type] )
     {
         case NSLeftMouseDown:
-            [o_slider_lock lock];
+            [o_slider_lock tryLock];
             break;
 
         case NSLeftMouseUp:

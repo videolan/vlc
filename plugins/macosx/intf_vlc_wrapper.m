@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.5 2002/05/19 19:16:40 jlj Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.6 2002/05/19 23:51:37 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -316,28 +316,20 @@ static Intf_VLCWrapper *o_intf = nil;
 {
     float f_time = 0.0;
 
-    vlc_mutex_lock( &p_input_bank->lock );
-
     if( p_input_bank->pp_input[0] != NULL )
     {
         f_time = (float)p_area->i_tell / (float)p_area->i_size;
     }    
-
-    vlc_mutex_unlock( &p_input_bank->lock );
 
     return( f_time );
 }
 
 - (void)setTimeAsFloat:(float)f_position
 {
-    vlc_mutex_lock( &p_input_bank->lock );
-
     if( p_input_bank->pp_input[0] != NULL )
     {
         input_Seek( p_input_bank->pp_input[0], p_area->i_size * f_position );
     }
-
-    vlc_mutex_unlock( &p_input_bank->lock );
 }
 
 #undef p_area

@@ -2,7 +2,7 @@
  * darwin_specific.c: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.8 2002/04/26 00:20:00 jlj Exp $
+ * $Id: darwin_specific.c,v 1.9 2002/05/19 23:51:37 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -53,8 +53,16 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 
         p_char++;
     }
-    
-    return;
+
+    /* Run the interface with a real-time priority too */
+    {
+        struct sched_param param;
+        param.sched_priority = 10;
+        if (pthread_setschedparam(pthread_self(), SCHED_RR, &param))  
+        {
+            intf_ErrMsg("pthread_setschedparam failed");
+        }
+    }
 }
 
 /*****************************************************************************

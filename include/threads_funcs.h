@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads_funcs.h,v 1.3 2002/05/18 17:47:46 sam Exp $
+ * $Id: threads_funcs.h,v 1.4 2002/05/19 23:51:37 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -750,6 +750,17 @@ static inline int _vlc_thread_create( char * psz_file, int i_line,
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_create( p_thread, NULL, func, p_data );
+
+#ifdef SYS_DARWIN
+    {
+        struct sched_param param;
+        param.sched_priority = 10;
+        if (pthread_setschedparam(*p_thread, SCHED_RR, &param))
+        {
+            intf_ErrMsg("pthread_setschedparam failed");
+        }
+    }
+#endif
 
 #elif defined( HAVE_CTHREADS_H )
     *p_thread = cthread_fork( (cthread_fn_t)func, (any_t)p_data );

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.176 2002/05/17 14:17:05 lool Exp $
+ * $Id: video_output.c,v 1.177 2002/05/19 23:51:37 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -577,6 +577,8 @@ static void RunThread( vout_thread_t *p_vout)
 
                 continue;
             }
+#if 0
+            /* Removed because it causes problems for some people --Meuuh */
             else if( display_date > current_date + VOUT_BOGUS_DELAY )
             {
                 /* Picture is waaay too early: it will be destroyed */
@@ -599,6 +601,7 @@ static void RunThread( vout_thread_t *p_vout)
 
                 continue;
             }
+#endif
             else if( display_date > current_date + VOUT_DISPLAY_DELAY )
             {
                 /* A picture is ready to be rendered, but its rendering date
