@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.11 2002/12/31 01:54:35 massiot Exp $
+ * $Id: input.c,v 1.12 2003/01/23 09:58:02 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -17,7 +17,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -94,7 +94,7 @@ static void DvdReadSeek       ( input_thread_t *, off_t );
 
 /* called only from here */
 static void DvdReadLauchDecoders( input_thread_t * p_input );
-static void DvdReadHandleDSI( thread_dvd_data_t * p_dvd, u8 * p_data );
+static void DvdReadHandleDSI( thread_dvd_data_t * p_dvd, uint8_t * p_data );
 static void DvdReadFindCell ( thread_dvd_data_t * p_dvd );
 
 /*
@@ -111,13 +111,13 @@ int E_(InitDVD) ( vlc_object_t *p_this )
 
     if( p_input->stream.i_method != INPUT_METHOD_DVD )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_demux = p_input->p_demux_data = malloc( sizeof(demux_sys_t ) );
     if( p_demux == NULL )
     {
-        return -1;
+        return VLC_ENOMEM;
     }
 
     p_input->p_private = (void*)&p_demux->mpeg;
@@ -125,19 +125,19 @@ int E_(InitDVD) ( vlc_object_t *p_this )
     if( p_demux->p_module == NULL )
     {
         free( p_input->p_demux_data );
-        return -1;
+        return VLC_EMODULE;
     }
 
     p_input->pf_demux = DvdReadDemux;
     p_input->pf_rewind = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    
+
     DvdReadLauchDecoders( p_input );
-    
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -158,12 +158,12 @@ void E_(EndDVD) ( vlc_object_t *p_this )
     i_result = input_Peek( p_input, &p_peek, SIZE );                        \
     if( i_result == -1 )                                                    \
     {                                                                       \
-        return( -1 );                                                       \
+        return -1;                                                          \
     }                                                                       \
     else if( i_result < SIZE )                                              \
     {                                                                       \
         /* EOF */                                                           \
-        return( 0 );                                                        \
+        return 0;                                                           \
     }
 
 static int DvdReadDemux( input_thread_t * p_input )
@@ -181,8 +181,8 @@ static int DvdReadDemux( input_thread_t * p_input )
 
         /* Read what we believe to be a packet header. */
         PEEK( 4 );
-            
-        /* Default header */ 
+
+        /* Default header */
         if( U32_AT( p_peek ) != 0x1BA )
         {
             /* That's the case for all packets, except pack header. */
@@ -212,7 +212,7 @@ static int DvdReadDemux( input_thread_t * p_input )
         }
 
         p_input->p_demux_data->mpeg.pf_demux_ps( p_input, p_data );
-     
+
     }
 
     return i;
@@ -223,7 +223,7 @@ static int DvdReadDemux( input_thread_t * p_input )
  *****************************************************************************/
 static int DvdReadRewind( input_thread_t * p_input )
 {
-    return( -1 );
+    return -1;
 }
 
 /*
@@ -251,7 +251,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     psz_parser = psz_source = strdup( p_input->psz_name );
     if( !psz_source )
     {
-        return( -1 );
+        return VLC_ENOMEM;
     }
 
     p_input->pf_read = DvdReadRead;
@@ -291,18 +291,18 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
         free( psz_source );
         if( !p_input->psz_access )
         {
-            return -1;
+            return VLC_EGENERIC;
         }
         psz_source = config_GetPsz( p_input, "dvd" );
-        if( !psz_source ) return -1;
+        if( !psz_source ) return VLC_EGENERIC;
     }
 
     if( stat( psz_source, &stat_info ) == -1 )
     {
-        msg_Err( p_input, "cannot stat() source `%s' (%s)",
-                          psz_source, strerror(errno));
+        msg_Warn( p_input, "cannot stat() source `%s' (%s)",
+                           psz_source, strerror(errno) );
         free( psz_source );
-        return( -1 );
+        return VLC_EGENERIC;
     }
     if( !S_ISBLK(stat_info.st_mode) &&
         !S_ISCHR(stat_info.st_mode) &&
@@ -310,12 +310,12 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     {
         msg_Warn( p_input, "dvdread module discarded (not a valid source)" );
         free( psz_source );
-        return -1;
+        return VLC_EGENERIC;
     }
-    
+
     msg_Dbg( p_input, "dvdroot=%s title=%d chapter=%d angle=%d",
                       psz_source, i_title, i_chapter, i_angle );
-    
+
 
     p_dvdread = DVDOpen( psz_source );
 
@@ -325,7 +325,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     if( ! p_dvdread )
     {
         msg_Err( p_input, "libdvdcss cannot open source" );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     /* set up input  */
@@ -335,7 +335,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     if( p_dvd == NULL )
     {
         msg_Err( p_input, "out of memory" );
-        return -1;
+        return VLC_ENOMEM;
     }
 
     p_dvd->p_dvdread = p_dvdread;
@@ -350,7 +350,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     {
         msg_Err( p_input, "cannot open VMG info" );
         free( p_dvd );
-        return -1;
+        return VLC_EGENERIC;
     }
     msg_Dbg( p_input, "VMG opened" );
 
@@ -360,10 +360,10 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     p_input->stream.i_method = INPUT_METHOD_DVD;
 
     /* If we are here we can control the pace... */
-    p_input->stream.b_pace_control = 1;
-    p_input->stream.b_seekable = 1;
-    p_input->stream.b_connected = 1;
-    
+    p_input->stream.b_pace_control = VLC_TRUE;
+    p_input->stream.b_seekable = VLC_TRUE;
+    p_input->stream.b_connected = VLC_TRUE;
+
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.p_selected_area->i_tell = 0;
 
@@ -408,14 +408,14 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
 
     p_dvd->i_chapter = i_chapter < p_area->i_part_nb ? i_chapter : 1;
     p_area->i_part = p_dvd->i_chapter;
-    
+
     p_dvd->i_angle = i_angle;
 
     /* set title, chapter, audio and subpic */
     if( DvdReadSetArea( p_input, p_area ) )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -425,7 +425,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
         p_input->psz_demux = "dvdread";
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -463,7 +463,7 @@ static int DvdReadSetProgram( input_thread_t * p_input,
     if( p_input->stream.p_selected_program != p_program )
     {
         thread_dvd_data_t *  p_dvd;
-    
+
         p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
         p_dvd->i_angle = p_program->i_number;
 
@@ -475,7 +475,7 @@ static int DvdReadSetProgram( input_thread_t * p_input,
         msg_Dbg( p_input, "angle %d selected", p_dvd->i_angle );
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 #define p_pgc         p_dvd->p_cur_pgc
@@ -496,7 +496,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
     p_dvd = (thread_dvd_data_t*)p_input->p_access_data;
 
     /* we can't use the interface slider until initilization is complete */
-    p_input->stream.b_seekable = 0;
+    p_input->stream.b_seekable = VLC_FALSE;
 
     if( p_area != p_input->stream.p_selected_area )
     {
@@ -538,7 +538,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
             msg_Err( p_input, "fatal error in vts ifo" );
             ifoClose( p_vmg );
             DVDClose( p_dvd->p_dvdread );
-            return -1;
+            return VLC_EGENERIC;
         }
 
         /* title position inside the selected vts */
@@ -574,7 +574,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
          */
         /* Remeber current chapter */
         p_dvd->i_chapter = p_area->i_part;
-        p_dvd->b_eoc = 0;
+        p_dvd->b_eoc = VLC_FALSE;
 
         pgc_id = p_vts->vts_ptt_srpt->title[
                     p_dvd->i_ttn-1].ptt[p_area->i_part-1].pgcn;
@@ -611,7 +611,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
             ifoClose( p_vts );
             ifoClose( p_vmg );
             DVDClose( p_dvd->p_dvdread );
-            return -1;
+            return VLC_EGENERIC;
         }
 
 //        IfoPrintTitle( p_dvd );
@@ -650,12 +650,12 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
         {
             input_AddProgram( p_input, i+1, 0 );
         }
-        
+
         DvdReadSetProgram( p_input,
-                           p_input->stream.pp_programs[p_dvd->i_angle-1] ); 
+                           p_input->stream.pp_programs[p_dvd->i_angle-1] );
 
         /* No PSM to read in DVD mode, we already have all information */
-        p_input->stream.p_selected_program->b_is_ok = 1;
+        p_input->stream.p_selected_program->b_is_ok = VLC_TRUE;
 
         p_es = NULL;
 
@@ -673,7 +673,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
         for( i = 1 ; i <= p_vts->vtsi_mat->nr_of_vts_audio_streams ; i++ )
         {
             int i_position = 0;
-            u16 i_id;
+            uint16_t i_id;
 
 //            IfoPrintAudio( p_dvd, i );
 
@@ -693,7 +693,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     p_es->i_fourcc = VLC_FOURCC('a','5','2','b');
                     p_es->i_cat = AUDIO_ES;
                     strcpy( p_es->psz_desc, DecodeLanguage(
-                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ); 
+                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) );
                     strcat( p_es->psz_desc, " (A52)" );
 
                     break;
@@ -705,7 +705,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     p_es->i_fourcc = VLC_FOURCC('m','p','g','a');
                     p_es->i_cat = AUDIO_ES;
                     strcpy( p_es->psz_desc, DecodeLanguage(
-                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ); 
+                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) );
                     strcat( p_es->psz_desc, " (mpeg)" );
 
                     break;
@@ -717,7 +717,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     p_es->i_fourcc = VLC_FOURCC('l','p','c','b');
                     p_es->i_cat = AUDIO_ES;
                     strcpy( p_es->psz_desc, DecodeLanguage(
-                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ); 
+                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) );
                     strcat( p_es->psz_desc, " (lpcm)" );
 
                     break;
@@ -742,7 +742,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
         for( i = 1 ; i <= p_vts->vtsi_mat->nr_of_vts_subp_streams; i++ )
         {
             int i_position = 0;
-            u16 i_id;
+            uint16_t i_id;
 
 //            IfoPrintSpu( p_dvd, i );
             msg_Dbg( p_input, "spu %d 0x%02x", i, spu_control );
@@ -780,7 +780,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                 p_es->i_fourcc = VLC_FOURCC('s','p','u','b');
                 p_es->i_cat = SPU_ES;
                 strcpy( p_es->psz_desc, DecodeLanguage(
-                    p_vts->vtsi_mat->vts_subp_attr[i-1].lang_code ) ); 
+                    p_vts->vtsi_mat->vts_subp_attr[i-1].lang_code ) );
             }
         }
 #undef spu_control
@@ -791,7 +791,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
         {
             DvdReadLauchDecoders( p_input );
         }
-            
+
     } /* i_title >= 0 */
     else
     {
@@ -833,10 +833,10 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
 
     /* warn interface that something has changed */
     p_area->i_tell = LB2OFF( p_dvd->i_next_vobu ) - p_area->i_start;
-    p_input->stream.b_seekable = 1;
-    p_input->stream.b_changed = 1;
+    p_input->stream.b_seekable = VLC_TRUE;
+    p_input->stream.b_changed = VLC_TRUE;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 
@@ -855,7 +855,7 @@ static int DvdReadRead( input_thread_t * p_input,
     int                     i_blocks;
     int                     i_read;
     int                     i_read_total;
-    vlc_bool_t              b_eot = 0;
+    vlc_bool_t              b_eot = VLC_FALSE;
 
     p_dvd = (thread_dvd_data_t *)p_input->p_access_data;
     p_buf = p_buffer;
@@ -869,7 +869,7 @@ static int DvdReadRead( input_thread_t * p_input,
 
     while( i_blocks )
     {
-        /* 
+        /*
          * End of pack, we select the following one
          */
         if( ! p_dvd->i_pack_len )
@@ -888,7 +888,7 @@ static int DvdReadRead( input_thread_t * p_input,
             /* basic check to be sure we don't have a empty title
              * go to next title if so */
             //assert( p_buffer[41] == 0xbf && p_buffer[1027] == 0xbf );
-            
+
             /*
              * Parse the contained dsi packet.
              */
@@ -946,14 +946,14 @@ static int DvdReadRead( input_thread_t * p_input,
         /* We modify i_part only at end of chapter not to erase
          * some modification from the interface */
         p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
-        p_dvd->b_eoc = 0;
+        p_dvd->b_eoc = VLC_FALSE;
     }
-    
+
     if( ( LB2OFF( p_dvd->i_cur_block )
           - p_input->stream.p_selected_area->i_start )
             >= p_input->stream.p_selected_area->i_size || b_eot )
     {
-        if( ( p_input->stream.p_selected_area->i_id + 1 ) >= 
+        if( ( p_input->stream.p_selected_area->i_id + 1 ) >=
                         p_input->stream.i_area_nb )
         {
             /* EOF */
@@ -995,7 +995,7 @@ static void DvdReadSeek( input_thread_t * p_input, off_t i_off )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     i_off += p_input->stream.p_selected_area->i_start;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
+
     i_lb = OFF2LB( i_off );
     p_dvd = ( thread_dvd_data_t * )p_input->p_access_data;
 
@@ -1064,7 +1064,7 @@ static void DvdReadSeek( input_thread_t * p_input, off_t i_off )
 /*****************************************************************************
  * DvdReadHandleDSI
  *****************************************************************************/
-static void DvdReadHandleDSI( thread_dvd_data_t * p_dvd, u8 * p_data )
+static void DvdReadHandleDSI( thread_dvd_data_t * p_dvd, uint8_t * p_data )
 {
     navRead_DSI( &(p_dvd->dsi_pack), &(p_data[ DSI_START_BYTE ]) );
 
@@ -1149,7 +1149,7 @@ static void DvdReadHandleDSI( thread_dvd_data_t * p_dvd, u8 * p_data )
              p_dvd->dsi_pack.dsi_gi.vobu_vob_idn,
              p_dvd->dsi_pack.dsi_gi.vobu_c_idn );
 
-    msg_Dbg( p_input, 12, "cat 0x%02x ilvu_ea %d ilvu_sa %d size %d", 
+    msg_Dbg( p_input, 12, "cat 0x%02x ilvu_ea %d ilvu_sa %d size %d",
              p_dvd->dsi_pack.sml_pbi.category,
              p_dvd->dsi_pack.sml_pbi.ilvu_ea,
              p_dvd->dsi_pack.sml_pbi.ilvu_sa,
@@ -1200,7 +1200,7 @@ static void DvdReadFindCell( thread_dvd_data_t * p_dvd )
     if( p_pgc->program_map[pgn-1] <= p_dvd->i_cur_cell )
     {
         p_dvd->i_chapter++;
-        p_dvd->b_eoc = 1;
+        p_dvd->b_eoc = VLC_TRUE;
     }
 }
 
