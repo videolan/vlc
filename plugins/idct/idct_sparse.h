@@ -2,7 +2,7 @@
  * idct_sparse.h : Sparse IDCT functions (must be include at the end)
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct_sparse.h,v 1.1 2001/09/05 16:07:49 massiot Exp $
+ * $Id: idct_sparse.h,v 1.2 2002/04/21 11:23:03 gbazin Exp $
  *
  * Author: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -40,6 +40,8 @@ static void InitIDCT ( void ** pp_idct_data )
     }
 
     InitBlock();
+
+    RestoreCPUState();
 }
 
 /*****************************************************************************

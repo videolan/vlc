@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.15 2002/04/19 13:56:12 sam Exp $
+ * $Id: configuration.c,v 1.16 2002/04/21 11:23:03 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,7 +26,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <string.h>                                              /* strdup() */
-#include <errno.h>					           /* errno */
+#include <errno.h>                                                  /* errno */
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>                                          /* getuid() */
@@ -75,6 +75,34 @@ int config_GetIntVariable( const char *psz_name )
     }
 
     return p_config->i_value;
+}
+
+/*****************************************************************************
+ * config_GetFloatVariable: get the value of a float variable
+ *****************************************************************************
+ * This function is used to get the value of variables which are internally
+ * represented by a float (MODULE_CONFIG_ITEM_FLOAT).
+ *****************************************************************************/
+float config_GetFloatVariable( const char *psz_name )
+{
+    module_config_t *p_config;
+
+    p_config = config_FindConfig( psz_name );
+
+    /* sanity checks */
+    if( !p_config )
+    {
+        intf_ErrMsg( "config error: option %s doesn't exist", psz_name );
+        return -1;
+    }
+    if( p_config->i_type != MODULE_CONFIG_ITEM_FLOAT )
+    {
+        intf_ErrMsg( "config error: option %s doesn't refer to a float",
+                     psz_name );
+        return -1;
+    }
+
+    return p_config->f_value;
 }
 
 /*****************************************************************************
@@ -189,6 +217,34 @@ void config_PutIntVariable( const char *psz_name, int i_value )
 }
 
 /*****************************************************************************
+ * config_PutFloatVariable: set the value of a float variable
+ *****************************************************************************
+ * This function is used to set the value of variables which are internally
+ * represented by a float (MODULE_CONFIG_ITEM_FLOAT).
+ *****************************************************************************/
+void config_PutFloatVariable( const char *psz_name, float f_value )
+{
+    module_config_t *p_config;
+
+    p_config = config_FindConfig( psz_name );
+
+    /* sanity checks */
+    if( !p_config )
+    {
+        intf_ErrMsg( "config error: option %s doesn't exist", psz_name );
+        return;
+    }
+    if( p_config->i_type != MODULE_CONFIG_ITEM_FLOAT )
+    {
+        intf_ErrMsg( "config error: option %s doesn't refer to a float",
+                     psz_name );
+        return;
+    }
+
+    p_config->f_value = f_value;
+}
+
+/*****************************************************************************
  * config_FindConfig: find the config structure associated with an option.
  *****************************************************************************
  * FIXME: This function really needs to be optimized.
@@ -249,6 +305,7 @@ module_config_t *config_Duplicate( module_config_t *p_orig )
     {
         p_config[i].i_type = p_orig[i].i_type;
         p_config[i].i_value = p_orig[i].i_value;
+        p_config[i].f_value = p_orig[i].f_value;
         p_config[i].b_dirty = p_orig[i].b_dirty;
 
         p_config[i].psz_name = p_orig[i].psz_name ?
@@ -384,6 +441,15 @@ int config_LoadConfigFile( const char *psz_module_name )
                         intf_WarnMsg( 7, "config: found <%s> option %s=%i",
                                          p_module->psz_name,
                                          p_item->psz_name, p_item->i_value );
+                        break;
+
+                    case MODULE_CONFIG_ITEM_FLOAT:
+                        if( !*psz_option_value )
+                            break;                    /* ignore empty option */
+                        p_item->f_value = (float)atof( psz_option_value);
+                        intf_WarnMsg( 7, "config: found <%s> option %s=%f",
+                                         p_module->psz_name, p_item->psz_name,
+                                         (double)p_item->f_value );
                         break;
 
                     default:
@@ -609,10 +675,17 @@ int config_SaveConfigFile( const char *psz_module_name )
             case MODULE_CONFIG_ITEM_INTEGER:
                 if( p_item->psz_text )
                     fprintf( file, "# %s %s\n", p_item->psz_text,
-                             MODULE_CONFIG_ITEM_BOOL ? _("<boolean>")
-                                                     : _("<integer>") );
+                             (p_item->i_type == MODULE_CONFIG_ITEM_BOOL) ?
+                             _("<boolean>") : _("<integer>") );
                 fprintf( file, "%s=%i\n", p_item->psz_name,
                          p_item->i_value );
+                break;
+
+            case MODULE_CONFIG_ITEM_FLOAT:
+                if( p_item->psz_text )
+                    fprintf( file, _("# %s <float>\n"), p_item->psz_text );
+                fprintf( file, "%s=%f\n", p_item->psz_name,
+                         (double)p_item->f_value );
                 break;
 
             default:
@@ -761,6 +834,10 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
                 break;
             case MODULE_CONFIG_ITEM_INTEGER:
                 config_PutIntVariable( p_longopts[i_index].name, atoi(optarg));
+                break;
+            case MODULE_CONFIG_ITEM_FLOAT:
+                config_PutFloatVariable( p_longopts[i_index].name,
+                                         (float)atof(optarg) );
                 break;
             case MODULE_CONFIG_ITEM_BOOL:
                 config_PutIntVariable( p_longopts[i_index].name, 1 );

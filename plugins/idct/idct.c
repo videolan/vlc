@@ -2,7 +2,7 @@
  * idct.c : C IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idct.c,v 1.21 2002/04/19 13:56:11 sam Exp $
+ * $Id: idct.c,v 1.22 2002/04/21 11:23:03 gbazin Exp $
  *
  * Author: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -1245,6 +1245,11 @@ static __inline__ void IDCT( dctelem_t * p_block )
 
     dataptr++;             /* advance pointer to next column */
     }
+}
+
+static __inline__ void RestoreCPUState( )
+{
+    ;
 }
 
 #include "idct_sparse.h"

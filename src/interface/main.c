@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.181 2002/04/21 10:32:21 sam Exp $
+ * $Id: main.c,v 1.182 2002/04/21 11:23:03 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -183,6 +183,10 @@
     "You can enforce the video height here.\nNote that by default vlc will " \
     "adapt to the video characteristics.")
 
+#define ZOOM_TEXT N_("zoom video")
+#define ZOOM_LONGTEXT N_( \
+    "You can zoom the video by the specified factor.")
+
 #define GRAYSCALE_TEXT N_("grayscale video output")
 #define GRAYSCALE_LONGTEXT N_( \
     "Using this option, vlc will not decode the color information from the " \
@@ -331,7 +335,7 @@
 MODULE_CONFIG_START
 
 /* Interface options */
-ADD_CATEGORY_HINT( N_("Interface"), NULL)
+ADD_CATEGORY_HINT( N_("Interface"), NULL )
 ADD_PLUGIN  ( "intf", MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
 ADD_INTEGER ( "warning", 0, NULL, WARNING_TEXT, WARNING_LONGTEXT )
 ADD_BOOL    ( "stats", NULL, STATS_TEXT, STATS_LONGTEXT )
@@ -354,6 +358,7 @@ ADD_PLUGIN  ( "vout", MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTE
 ADD_BOOL    ( "novideo", NULL, NOVIDEO_TEXT, NOVIDEO_LONGTEXT )
 ADD_INTEGER ( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
 ADD_INTEGER ( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT )
+ADD_FLOAT   ( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT )
 ADD_BOOL    ( "grayscale", NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT )
 ADD_BOOL    ( "fullscreen", NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT )
 ADD_BOOL    ( "nooverlay", NULL, NOOVERLAY_TEXT, NOOVERLAY_LONGTEXT )
@@ -440,16 +445,16 @@ MODULE_DEACTIVATE_STOP
 static module_t help_module;
 static module_config_t p_help_config[] = {
     { MODULE_CONFIG_ITEM_BOOL, "help", N_("print help (or use -h)"),
-      NULL, NULL, 0, NULL, NULL, 0 },
+      NULL, NULL, 0, 0, NULL, NULL, 0 },
     { MODULE_CONFIG_ITEM_BOOL, "longhelp", N_("print detailed help (or use -H)"),
-      NULL, NULL, 0, NULL, NULL, 0 },
+      NULL, NULL, 0, 0, NULL, NULL, 0 },
     { MODULE_CONFIG_ITEM_BOOL, "list", N_("print a list of available plugins "
-      "(or use -l)"), NULL, NULL, 0, NULL, NULL, 0 },
+      "(or use -l)"), NULL, NULL, 0, 0, NULL, NULL, 0 },
     { MODULE_CONFIG_ITEM_STRING, "plugin", N_("print help on plugin "
-      "(or use -p)"), NULL, NULL, 0, NULL, &help_module.config_lock, 0 },
+      "(or use -p)"), NULL, NULL, 0, 0, NULL, &help_module.config_lock, 0 },
     { MODULE_CONFIG_ITEM_BOOL, "version", N_("print version information"),
-      NULL, NULL, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_HINT_END, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0 } };
+      NULL, NULL, 0, 0, NULL, NULL, 0 },
+    { MODULE_CONFIG_HINT_END, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, 0 } };
 
 /*****************************************************************************
  * End configuration.
@@ -972,6 +977,17 @@ static void Usage( const char *psz_module_name )
 
                 intf_Msg( "  --%s%s%s %s", p_item->psz_name,
                           _(" <integer>"), psz_spaces, p_item->psz_text );
+                psz_spaces[i] = 32;
+                break;
+            case MODULE_CONFIG_ITEM_FLOAT:
+                /* Nasty hack, but right now I'm too tired to think about
+                 * a nice solution */
+                i = 25 - strlen( p_item->psz_name )
+                    - strlen(_(" <float>")) - 1;
+                if( i < 0 ) i = 0; psz_spaces[i] = 0;
+
+                intf_Msg( "  --%s%s%s %s", p_item->psz_name,
+                          _(" <float>"), psz_spaces, p_item->psz_text );
                 psz_spaces[i] = 32;
                 break;
             case MODULE_CONFIG_ITEM_BOOL:

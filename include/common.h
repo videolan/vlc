@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.95 2002/04/19 13:56:10 sam Exp $
+ * $Id: common.h,v 1.96 2002/04/21 11:23:03 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -512,12 +512,14 @@ typedef struct module_symbols_s
     struct aout_bank_s*  p_aout_bank;
     struct vout_bank_s*  p_vout_bank;
 
-    int    ( * config_GetIntVariable ) ( const char * );
-    char * ( * config_GetPszVariable ) ( const char * );
-    void   ( * config_PutIntVariable ) ( const char *, int );
-    void   ( * config_PutPszVariable ) ( const char *, char * );
-    int    ( * config_LoadConfigFile ) ( const char * );
-    int    ( * config_SaveConfigFile ) ( const char * );
+    int    ( * config_GetIntVariable )   ( const char * );
+    float  ( * config_GetFloatVariable ) ( const char * );
+    char * ( * config_GetPszVariable )   ( const char * );
+    void   ( * config_PutIntVariable )   ( const char *, int );
+    void   ( * config_PutFloatVariable ) ( const char *, float );
+    void   ( * config_PutPszVariable )   ( const char *, char * );
+    int    ( * config_LoadConfigFile )   ( const char * );
+    int    ( * config_SaveConfigFile )   ( const char * );
     struct module_config_s * ( * config_FindConfig ) ( const char * );
     struct module_config_s * ( * config_Duplicate ) ( struct module_config_s* );
 

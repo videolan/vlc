@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.24 2002/04/21 10:32:20 sam Exp $
+ * $Id: gtk_preferences.c,v 1.25 2002/04/21 11:23:03 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -62,6 +62,7 @@ static void GtkConfigDialogDestroyed ( GtkObject *, gpointer );
 
 static void GtkStringChanged     ( GtkEditable *, gpointer );
 static void GtkIntChanged        ( GtkEditable *, gpointer );
+static void GtkFloatChanged      ( GtkEditable *, gpointer );
 static void GtkBoolChanged       ( GtkToggleButton *, gpointer );
 
 static void GtkFreeHashTable     ( gpointer );
@@ -149,6 +150,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     GtkWidget *item_vbox;
     GtkWidget *string_entry;
     GtkWidget *integer_spinbutton;
+    GtkWidget *float_spinbutton;
     GtkObject *item_adj;
     GtkWidget *bool_checkbutton;
     GtkWidget *plugin_clist;
@@ -439,6 +441,25 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                               integer_spinbutton, p_item->psz_longtext );
             break;
 
+        case MODULE_CONFIG_ITEM_FLOAT:
+
+            /* add input box with default value */
+            item_adj = gtk_adjustment_new( p_item->f_value,
+                                           0, 99999, 0.01, 10, 10 );
+            float_spinbutton = gtk_spin_button_new( GTK_ADJUSTMENT(item_adj),
+                                                    0.01, 2 );
+
+            /* connect signal to track changes in the spinbutton value */
+            gtk_object_set_data( GTK_OBJECT(float_spinbutton),
+                                 "config_option", p_item->psz_name );
+            gtk_signal_connect( GTK_OBJECT(float_spinbutton), "changed",
+                                GTK_SIGNAL_FUNC(GtkFloatChanged),
+                                (gpointer)config_dialog );
+
+            LABEL_AND_WIDGET( p_item->psz_text,
+                              float_spinbutton, p_item->psz_longtext );
+            break;
+
         case MODULE_CONFIG_ITEM_BOOL:
 
             /* add check button */
@@ -677,7 +698,7 @@ static void GtkStringChanged( GtkEditable *editable, gpointer user_data )
 }
 
 /****************************************************************************
- * GtkIntChanged: signal called when the user changes a an integer value.
+ * GtkIntChanged: signal called when the user changes an integer value.
  ****************************************************************************/
 static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
 {
@@ -695,8 +716,36 @@ static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
 
     p_config = malloc( sizeof(module_config_t) );
     p_config->i_type = MODULE_CONFIG_ITEM_INTEGER;
-    p_config->i_value =  gtk_spin_button_get_value_as_int(
-                             GTK_SPIN_BUTTON(editable) );
+    p_config->i_value = gtk_spin_button_get_value_as_int(
+                            GTK_SPIN_BUTTON(editable) );
+    p_config->psz_name = (char *)gtk_object_get_data( GTK_OBJECT(editable),
+                                                      "config_option" );
+
+    g_hash_table_insert( hash_table, (gpointer)editable,
+                         (gpointer)p_config );
+}
+
+/****************************************************************************
+ * GtkFloatChanged: signal called when the user changes a float value.
+ ****************************************************************************/
+static void GtkFloatChanged( GtkEditable *editable, gpointer user_data )
+{
+    module_config_t *p_config;
+
+    GHashTable *hash_table;
+
+    hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "config_hash_table" );
+
+    /* free old p_config */
+    p_config = (module_config_t *)g_hash_table_lookup( hash_table,
+                                                       (gpointer)editable );
+    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, NULL );
+
+    p_config = malloc( sizeof(module_config_t) );
+    p_config->i_type = MODULE_CONFIG_ITEM_FLOAT;
+    p_config->f_value = gtk_spin_button_get_value_as_float(
+                           GTK_SPIN_BUTTON(editable) );
     p_config->psz_name = (char *)gtk_object_get_data( GTK_OBJECT(editable),
                                                       "config_option" );
 
@@ -775,6 +824,9 @@ static void GtkSaveHashValue( gpointer key, gpointer value, gpointer user_data)
     case MODULE_CONFIG_ITEM_INTEGER:
     case MODULE_CONFIG_ITEM_BOOL:
         config_PutIntVariable( p_config->psz_name, p_config->i_value );
+        break;
+    case MODULE_CONFIG_ITEM_FLOAT:
+        config_PutFloatVariable( p_config->psz_name, p_config->f_value );
         break;
     }
 }

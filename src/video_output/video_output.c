@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.171 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: video_output.c,v 1.172 2002/04/21 11:23:03 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -812,47 +812,51 @@ static void MaskToShift( int *pi_left, int *pi_right, u32 i_mask )
 /*****************************************************************************
  * InitWindowSize: find the initial dimensions the video window should have.
  *****************************************************************************
- * This function will check the "width" and "height" config options and
+ * This function will check the "width", "height" and "zoom" config options and
  * will calculate the size that the video window should have.
  *****************************************************************************/
 static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
                             int *pi_height )
 {
     int i_width, i_height;
+    double f_zoom;
 
     i_width = config_GetIntVariable( "width" );
     i_height = config_GetIntVariable( "height" );
+    f_zoom = config_GetFloatVariable( "zoom" );
 
     if( (i_width >= 0) && (i_height >= 0))
     {
-        *pi_width = i_width;
-        *pi_height = i_height;
+        *pi_width = i_width * f_zoom;
+        *pi_height = i_height * f_zoom;
         return;
     }
     else if( i_width >= 0 )
     {
-        *pi_width = i_width;
-        *pi_height = i_width * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
+        *pi_width = i_width * f_zoom;
+        *pi_height = i_width * f_zoom * VOUT_ASPECT_FACTOR /
+                        p_vout->render.i_aspect;
         return;
     }
     else if( i_height >= 0 )
     {
-        *pi_height = i_height;
-        *pi_width = i_height * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
+        *pi_height = i_height * f_zoom;
+        *pi_width = i_height * f_zoom * p_vout->render.i_aspect /
+                       VOUT_ASPECT_FACTOR;
         return;
     }
 
     if( p_vout->render.i_height * p_vout->render.i_aspect
         >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
     {
-        *pi_width = p_vout->render.i_height
+        *pi_width = p_vout->render.i_height * f_zoom
           * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
-        *pi_height = p_vout->render.i_height;
+        *pi_height = p_vout->render.i_height * f_zoom;
     }
     else
     {
-        *pi_width = p_vout->render.i_width;
-        *pi_height = p_vout->render.i_width
+        *pi_width = p_vout->render.i_width * f_zoom;
+        *pi_height = p_vout->render.i_width * f_zoom
           * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
     }
 }

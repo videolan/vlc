@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmxext.c,v 1.21 2002/04/19 13:56:11 sam Exp $
+ * $Id: idctmmxext.c,v 1.22 2002/04/21 11:23:03 gbazin Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -392,6 +392,12 @@ static void IDCT( dctelem_t * p_block )
 
     Col( p_block, 0 );
     Col( p_block, 4 );
+}
+
+static __inline__ void RestoreCPUState( )
+{
+    /* reenables the FPU */
+    __asm__ __volatile__ ("emms");
 }
 
 #include "idct_sparse.h"

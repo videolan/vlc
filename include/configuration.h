@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.5 2002/04/19 13:56:10 sam Exp $
+ * $Id: configuration.h,v 1.6 2002/04/21 11:23:03 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -41,7 +41,7 @@
 #define MODULE_CONFIG_ITEM_PLUGIN           0x0030  /* Plugin option */
 #define MODULE_CONFIG_ITEM_INTEGER          0x0040  /* Integer option */
 #define MODULE_CONFIG_ITEM_BOOL             0x0050  /* Bool option */
-#define MODULE_CONFIG_ITEM_ALIAS            0x0060  /* Alias option */
+#define MODULE_CONFIG_ITEM_FLOAT            0x0060  /* Float option */
 
 #define MODULE_CONFIG_ITEM                  0x00F0
 
@@ -53,6 +53,7 @@ typedef struct module_config_s
     char        *psz_longtext;   /* Long comment on the configuration option */
     char        *psz_value;                                  /* Option value */
     int         i_value;                                     /* Option value */
+    float       f_value;                                     /* Option value */
     void        *p_callback;     /* Function to call when commiting a change */
     vlc_mutex_t *p_lock;            /* lock to use when modifying the config */
     boolean_t   b_dirty;           /* Dirty flag to indicate a config change */
@@ -65,8 +66,10 @@ typedef struct module_config_s
  *****************************************************************************/
 #ifndef PLUGIN
 int    config_GetIntVariable( const char *psz_name );
+float  config_GetFloatVariable( const char *psz_name );
 char * config_GetPszVariable( const char *psz_name );
 void   config_PutIntVariable( const char *psz_name, int i_value );
+void   config_PutFloatVariable( const char *psz_name, float f_value );
 void   config_PutPszVariable( const char *psz_name, char *psz_value );
 
 int config_LoadConfigFile( const char *psz_module_name );
@@ -80,6 +83,8 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
 #else
 #   define config_GetIntVariable p_symbols->config_GetIntVariable
 #   define config_PutIntVariable p_symbols->config_PutIntVariable
+#   define config_GetFloatVariable p_symbols->config_GetFloatVariable
+#   define config_PutFloatVariable p_symbols->config_PutFloatVariable
 #   define config_GetPszVariable p_symbols->config_GetPszVariable
 #   define config_PutPszVariable p_symbols->config_PutPszVariable
 #   define config_Duplicate      p_symbols->config_Duplicate
@@ -104,29 +109,32 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
     static module_config_t p_config[] = {
 
 #define MODULE_CONFIG_STOP \
-    { MODULE_CONFIG_HINT_END, NULL, NULL, NULL, NULL, 0, NULL, 0 } };
+    { MODULE_CONFIG_HINT_END, NULL, NULL, NULL, NULL, 0, 0, NULL, 0 } };
 
 #define ADD_CATEGORY_HINT( text, longtext ) \
-    { MODULE_CONFIG_HINT_CATEGORY, NULL, text, longtext, NULL, 0, NULL, \
+    { MODULE_CONFIG_HINT_CATEGORY, NULL, text, longtext, NULL, 0, 0, NULL, \
       NULL, 0 },
 #define ADD_SUBCATEGORY_HINT( text, longtext ) \
-    { MODULE_CONFIG_HINT_SUBCATEGORY, NULL, text, longtext, NULL, 0, NULL, \
+    { MODULE_CONFIG_HINT_SUBCATEGORY, NULL, text, longtext, NULL, 0, 0, NULL, \
       NULL, 0 },
 #define END_SUBCATEGORY_HINT \
-    { MODULE_CONFIG_HINT_SUBCATEGORY_END, NULL, NULL, NULL, NULL, 0, NULL, \
+    { MODULE_CONFIG_HINT_SUBCATEGORY_END, NULL, NULL, NULL, NULL, 0, 0, NULL, \
       NULL, 0 },
 #define ADD_STRING( name, value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_STRING, name, text, longtext, value, 0, \
+    { MODULE_CONFIG_ITEM_STRING, name, text, longtext, value, 0, 0, \
       p_callback, NULL, 0 },
 #define ADD_FILE( name, psz_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_FILE, name, text, longtext, psz_value, 0, \
+    { MODULE_CONFIG_ITEM_FILE, name, text, longtext, psz_value, 0, 0, \
       p_callback, NULL, 0 },
 #define ADD_PLUGIN( name, i_capability, psz_value, p_callback, text, longtext)\
     { MODULE_CONFIG_ITEM_PLUGIN, name, text, longtext, psz_value, \
-      i_capability, p_callback, NULL, 0 },
+      i_capability, 0, p_callback, NULL, 0 },
 #define ADD_INTEGER( name, i_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_INTEGER, name, text, longtext, NULL, i_value, \
+    { MODULE_CONFIG_ITEM_INTEGER, name, text, longtext, NULL, i_value, 0, \
+      p_callback, NULL, 0 },
+#define ADD_FLOAT( name, f_value, p_callback, text, longtext ) \
+    { MODULE_CONFIG_ITEM_FLOAT, name, text, longtext, NULL, 0, f_value, \
       p_callback, NULL, 0 },
 #define ADD_BOOL( name, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_BOOL, name, text, longtext, NULL, 0, p_callback, \
+    { MODULE_CONFIG_ITEM_BOOL, name, text, longtext, NULL, 0, 0, p_callback, \
       NULL, 0 },
