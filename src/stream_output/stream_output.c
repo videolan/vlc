@@ -41,7 +41,8 @@
  *****************************************************************************/
 static void sout_CfgDestroy( sout_cfg_t * );
 
-#define sout_stream_url_to_chain( p, s ) _sout_stream_url_to_chain( VLC_OBJECT(p), s )
+#define sout_stream_url_to_chain( p, s ) \
+    _sout_stream_url_to_chain( VLC_OBJECT(p), s )
 static char *_sout_stream_url_to_chain( vlc_object_t *, char * );
 
 /*
@@ -364,20 +365,17 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
     sout_mux_t *p_mux;
     char       *psz_next;
 
-    p_mux = vlc_object_create( p_sout,
-                               sizeof( sout_mux_t ) );
+    p_mux = vlc_object_create( p_sout, sizeof( sout_mux_t ) );
     if( p_mux == NULL )
     {
         msg_Err( p_sout, "out of memory" );
         return NULL;
     }
 
-    p_mux->p_sout       = p_sout;
+    p_mux->p_sout = p_sout;
     psz_next = sout_CfgCreate( &p_mux->psz_mux, &p_mux->p_cfg, psz_mux );
-    if( psz_next )
-    {
-        free( psz_next );
-    }
+    if( psz_next ) free( psz_next );
+
     p_mux->p_access     = p_access;
     p_mux->pf_control   = NULL;
     p_mux->pf_addstream = NULL;
@@ -387,11 +385,15 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
     p_mux->pp_inputs    = NULL;
 
     p_mux->p_sys        = NULL;
-    p_mux->p_module = NULL;
+    p_mux->p_module     = NULL;
+
+    p_mux->b_add_stream_any_time = VLC_FALSE;
+    p_mux->b_waiting_stream = VLC_TRUE;
+    p_mux->i_add_stream_start = -1;
 
     vlc_object_attach( p_mux, p_sout );
 
-    p_mux->p_module     =
+    p_mux->p_module =
         module_Need( p_mux, "sout mux", p_mux->psz_mux, VLC_TRUE );
 
     if( p_mux->p_module == NULL )
@@ -406,21 +408,32 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
     /* *** probe mux capacity *** */
     if( p_mux->pf_control )
     {
-        int b_answer;
-        if( sout_MuxControl( p_mux, MUX_CAN_ADD_STREAM_WHILE_MUXING, &b_answer ) )
+        int b_answer = VLC_FALSE;
+
+        if( sout_MuxControl( p_mux, MUX_CAN_ADD_STREAM_WHILE_MUXING,
+                             &b_answer ) )
         {
             b_answer = VLC_FALSE;
         }
+
         if( b_answer )
         {
             msg_Dbg( p_sout, "muxer support adding stream at any time" );
             p_mux->b_add_stream_any_time = VLC_TRUE;
             p_mux->b_waiting_stream = VLC_FALSE;
 
-            if( sout_MuxControl( p_mux, MUX_GET_ADD_STREAM_WAIT, &b_answer ) )
+            /* If we control the output pace then it's better to wait before
+             * starting muxing (generates better streams/files). */
+            if( !p_sout->i_out_pace_nocontrol )
+            {
+                b_answer = VLC_TRUE;
+            }
+            else if( sout_MuxControl( p_mux, MUX_GET_ADD_STREAM_WAIT,
+                                      &b_answer ) )
             {
                 b_answer = VLC_FALSE;
             }
+
             if( b_answer )
             {
                 msg_Dbg( p_sout, "muxer prefers waiting for all ES before "
@@ -428,18 +441,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
                 p_mux->b_waiting_stream = VLC_TRUE;
             }
         }
-        else
-        {
-            p_mux->b_add_stream_any_time = VLC_FALSE;
-            p_mux->b_waiting_stream = VLC_TRUE;
-        }
     }
-    else
-    {
-        p_mux->b_add_stream_any_time = VLC_FALSE;
-        p_mux->b_waiting_stream = VLC_TRUE;
-    }
-    p_mux->i_add_stream_start = -1;
 
     return p_mux;
 }
@@ -473,11 +475,6 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
         msg_Err( p_mux, "cannot add a new stream (unsuported while muxing "
                         "for this format)" );
         return NULL;
-    }
-    if( p_mux->i_add_stream_start < 0 )
-    {
-        /* we wait for one second */
-        p_mux->i_add_stream_start = mdate();
     }
 
     msg_Dbg( p_mux, "adding a new input" );
@@ -548,10 +545,16 @@ void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 
     if( p_mux->b_waiting_stream )
     {
-        if( p_mux->i_add_stream_start > 0 &&
-            p_mux->i_add_stream_start + (mtime_t)1500000 < mdate() )
+        if( p_mux->i_add_stream_start < 0 )
         {
-            /* more than 1.5 second, start muxing */
+            p_mux->i_add_stream_start = p_buffer->i_dts;
+        }
+
+        if( p_mux->i_add_stream_start >= 0 &&
+            p_mux->i_add_stream_start + I64C(15000000) < p_buffer->i_dts )
+        {
+            /* Wait until we have more than 1.5 seconds worth of data
+             * before start muxing */
             p_mux->b_waiting_stream = VLC_FALSE;
         }
         else
