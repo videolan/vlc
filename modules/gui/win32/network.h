@@ -68,8 +68,9 @@ __published:	// IDE-managed Components
 private:	// User declarations
     int OldRadioValue;
     void __fastcall ChangeEnabled( int i_selected );
+    intf_thread_t *p_intf;
 public:		// User declarations
-    __fastcall TNetworkDlg( TComponent* Owner );
+    __fastcall TNetworkDlg( TComponent* Owner, intf_thread_t *_p_intf );
 };
 //---------------------------------------------------------------------------
 #endif

@@ -43,8 +43,9 @@ __published:	// IDE-managed Components
     TLabel *Label5;
     TLabel *LabelVersion;
 private:	// User declarations
+    intf_thread_t *p_intf;
 public:		// User declarations
-    __fastcall TAboutDlg( TComponent* Owner );
+    __fastcall TAboutDlg( TComponent* Owner, intf_thread_t *_p_intf );
 };
 //---------------------------------------------------------------------------
 #endif

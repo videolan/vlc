@@ -59,7 +59,6 @@ struct intf_sys_t
     TMainFrameDlg     * p_window;                             /* main window */
     TPlaylistDlg      * p_playwin;                               /* playlist */
     TPopupMenu        * p_popup;                               /* popup menu */
-    TAboutDlg         * p_about;                             /* about window */
     TDiscDlg          * p_disc;                     /* disc selection window */
     TNetworkDlg       * p_network;                  /* network stream window */
     TPreferencesDlg   * p_preferences;                 /* preferences window */

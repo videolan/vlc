@@ -192,9 +192,10 @@ __published:	// IDE-managed Components
     void __fastcall PrevChapterActionExecute( TObject *Sender );
     void __fastcall NextChapterActionExecute( TObject *Sender );
 private:	// User declarations
+    intf_thread_t *p_intf;
 public:		// User declarations
     TStringList *StringListPref;                   /* stores config dialogs */
-    __fastcall TMainFrameDlg( TComponent* Owner );
+    __fastcall TMainFrameDlg( TComponent* Owner, intf_thread_t *_p_intf );
     virtual __fastcall ~TMainFrameDlg();
     void __fastcall DisplayHint( TObject *Sender );
     void __fastcall ModeManage();

@@ -34,13 +34,12 @@
 //#pragma package(smart_init)
 #pragma resource "*.dfm"
 
-extern intf_thread_t *p_intfGlobal;
-
 //---------------------------------------------------------------------------
-__fastcall TPlaylistDlg::TPlaylistDlg( TComponent* Owner )
-        : TForm( Owner )
+__fastcall TPlaylistDlg::TPlaylistDlg(
+    TComponent* Owner, intf_thread_t *_p_intf ) : TForm( Owner )
 {
-    Icon = p_intfGlobal->p_sys->p_window->Icon;
+    p_intf = _p_intf;
+    Icon = p_intf->p_sys->p_window->Icon;
     Translate( this );
 }
 //---------------------------------------------------------------------------
@@ -70,12 +69,12 @@ char * __fastcall TPlaylistDlg::rindex( char *s, char c )
  ****************************************************************************/
 void __fastcall TPlaylistDlg::FormShow( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->PlaylistAction->Checked = true;
+    p_intf->p_sys->p_window->PlaylistAction->Checked = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::FormHide( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->PlaylistAction->Checked = false;
+    p_intf->p_sys->p_window->PlaylistAction->Checked = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::BitBtnOkClick( TObject *Sender )
@@ -90,7 +89,7 @@ void __fastcall TPlaylistDlg::PlayStreamActionExecute( TObject *Sender )
     TItemStates Focused;
 
     playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
@@ -140,7 +139,7 @@ void __fastcall TPlaylistDlg::ListViewPlaylistCustomDrawItem(
     TRect Rect = Item->DisplayRect( drBounds );
 
     /* set the background color */
-    if( Item->Index == p_intfGlobal->p_sys->i_playing )
+    if( Item->Index == p_intf->p_sys->i_playing )
     {
         Sender->Canvas->Brush->Color = clRed;
     }
@@ -159,17 +158,17 @@ void __fastcall TPlaylistDlg::ListViewPlaylistCustomDrawItem(
  ****************************************************************************/
 void __fastcall TPlaylistDlg::MenuAddFileClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->OpenFileActionExecute( Sender );
+    p_intf->p_sys->p_window->OpenFileActionExecute( Sender );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddDiscClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->OpenDiscActionExecute( Sender );
+    p_intf->p_sys->p_window->OpenDiscActionExecute( Sender );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddNetClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->NetworkStreamActionExecute( Sender );
+    p_intf->p_sys->p_window->NetworkStreamActionExecute( Sender );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddUrlClick( TObject *Sender )
@@ -182,10 +181,10 @@ void __fastcall TPlaylistDlg::DeleteSelectionActionExecute( TObject *Sender )
 #if 0 /* PLAYLIST TARASS */
     /* user wants to delete a file in the queue */
     int         i_pos;
-    playlist_t *p_playlist = p_intfGlobal->p_vlc->p_playlist;
+    playlist_t *p_playlist = p_intf->p_vlc->p_playlist;
 
     /* lock the struct */
-    vlc_mutex_lock( &p_intfGlobal->change_lock );
+    vlc_mutex_lock( &p_intf->change_lock );
 
     /* delete the items from the last to the first */
     for( i_pos = p_playlist->i_size - 1; i_pos >= 0; i_pos-- )
@@ -199,7 +198,7 @@ void __fastcall TPlaylistDlg::DeleteSelectionActionExecute( TObject *Sender )
     /* Rebuild the ListView */
     UpdateGrid( p_playlist );
 
-    vlc_mutex_unlock( &p_intfGlobal->change_lock );
+    vlc_mutex_unlock( &p_intf->change_lock );
 #endif
 }
 //---------------------------------------------------------------------------
@@ -207,10 +206,10 @@ void __fastcall TPlaylistDlg::DeleteAllActionExecute( TObject *Sender )
 {
 #if 0 /* PLAYLIST TARASS */
     int         i_pos;
-    playlist_t *p_playlist = p_intfGlobal->p_vlc->p_playlist;
+    playlist_t *p_playlist = p_intf->p_vlc->p_playlist;
 
     /* lock the struct */
-    vlc_mutex_lock( &p_intfGlobal->change_lock );
+    vlc_mutex_lock( &p_intf->change_lock );
 
     /* delete the items from the last to the first */
     for( i_pos = p_playlist->i_size - 1; i_pos >= 0; i_pos-- )
@@ -221,7 +220,7 @@ void __fastcall TPlaylistDlg::DeleteAllActionExecute( TObject *Sender )
     /* Rebuild the ListView */
     UpdateGrid( p_playlist );
 
-    vlc_mutex_unlock( &p_intfGlobal->change_lock );
+    vlc_mutex_unlock( &p_intf->change_lock );
 #endif
 }
 //---------------------------------------------------------------------------
@@ -230,7 +229,7 @@ void __fastcall TPlaylistDlg::InvertSelectionActionExecute( TObject *Sender )
 #if 0 /* PLAYLIST TARASS */
 #define NOT( var ) ( (var) ? false : true )
     int         i_pos;
-    playlist_t *p_playlist = p_intfGlobal->p_vlc->p_playlist;
+    playlist_t *p_playlist = p_intf->p_vlc->p_playlist;
     TListItems *Items = ListViewPlaylist->Items;
 
     /* delete the items from the last to the first */
@@ -293,10 +292,10 @@ void __fastcall TPlaylistDlg::UpdateGrid( playlist_t * p_playlist )
     ListViewPlaylist->Items->EndUpdate();
 }
 //---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::Manage( intf_thread_t * p_intf )
+void __fastcall TPlaylistDlg::Manage()
 {
     playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
@@ -319,37 +318,40 @@ void __fastcall TPlaylistDlg::Manage( intf_thread_t * p_intf )
 void __fastcall TPlaylistDlg::DeleteItem( int i_pos )
 {
     playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
     }
 
     playlist_Delete( p_playlist, i_pos );
+    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::Previous()
 {
     playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
     }
 
     playlist_Prev( p_playlist );
+    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::Next()
 {
     playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
     }
 
     playlist_Next( p_playlist );
+    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 

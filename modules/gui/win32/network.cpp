@@ -37,47 +37,46 @@
 #pragma link "CSPIN"
 #pragma resource "*.dfm"
 
-extern intf_thread_t *p_intfGlobal;
-
 //---------------------------------------------------------------------------
-__fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
+__fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner, intf_thread_t *_p_intf )
         : TForm( Owner )
 {
-        char *psz_channel_server;
+    p_intf = _p_intf;
+    char *psz_channel_server;
 
-        OldRadioValue = 0;
+    OldRadioValue = 0;
 
-        /* server port */
-        SpinEditUDPPort->Value = config_GetInt( p_intfGlobal, "server-port" );
-        SpinEditMulticastPort->Value = config_GetInt( p_intfGlobal, "server-port" );
+    /* server port */
+    SpinEditUDPPort->Value = config_GetInt( p_intf, "server-port" );
+    SpinEditMulticastPort->Value = config_GetInt( p_intf, "server-port" );
 
-        /* channel server */
-        if( config_GetInt( p_intfGlobal, "network-channel" ) )
-        {
-            RadioButtonCS->Checked = true;
-            RadioButtonCSEnter( RadioButtonCS );
-        }
+    /* channel server */
+    if( config_GetInt( p_intf, "network-channel" ) )
+    {
+        RadioButtonCS->Checked = true;
+        RadioButtonCSEnter( RadioButtonCS );
+    }
 
-        psz_channel_server = config_GetPsz( p_intfGlobal, "channel-server" );
-        if( psz_channel_server )
-        {
-            ComboBoxCSAddress->Text = psz_channel_server;
-            free( psz_channel_server );
-        }
+    psz_channel_server = config_GetPsz( p_intf, "channel-server" );
+    if( psz_channel_server )
+    {
+        ComboBoxCSAddress->Text = psz_channel_server;
+        free( psz_channel_server );
+    }
 
-        SpinEditCSPort->Value = config_GetInt( p_intfGlobal, "channel-port" );
+    SpinEditCSPort->Value = config_GetInt( p_intf, "channel-port" );
 
-        Translate( this );
+    Translate( this );
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormShow( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->NetworkStreamAction->Checked = true;
+    p_intf->p_sys->p_window->NetworkStreamAction->Checked = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormHide( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->NetworkStreamAction->Checked = false;
+    p_intf->p_sys->p_window->NetworkStreamAction->Checked = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::BitBtnCancelClick( TObject *Sender )
@@ -94,7 +93,7 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
     playlist_t *    p_playlist;
 
     p_playlist = (playlist_t *)
-        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {   
         return;
@@ -107,7 +106,7 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
     {
         /* UDP */
         case 0:
-            config_PutInt( p_intfGlobal, "network-channel", FALSE );
+            config_PutInt( p_intf, "network-channel", FALSE );
             i_port = SpinEditUDPPort->Value;
 
             /* Build source name */
@@ -117,12 +116,12 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
             /* update the display */
-            p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
+            p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
             break;
 
         /* UDP Multicast */
         case 1:
-            config_PutInt( p_intfGlobal, "network-channel", FALSE );
+            config_PutInt( p_intf, "network-channel", FALSE );
             Address = ComboBoxMulticastAddress->Text;
             i_port = SpinEditMulticastPort->Value;
 
@@ -133,26 +132,26 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
             /* update the display */
-            p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
+            p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
             break;
 
         /* Channel server */
         case 2:
-            config_PutInt( p_intfGlobal, "network-channel", TRUE );
-            config_PutPsz( p_intfGlobal, "channel-server", Channel.c_str() );
-            config_PutInt( p_intfGlobal, "channel-port", i_channel_port );
+            config_PutInt( p_intf, "network-channel", TRUE );
+            config_PutPsz( p_intf, "channel-server", Channel.c_str() );
+            config_PutInt( p_intf, "channel-port", i_channel_port );
 
-            if( p_intfGlobal->p_vlc->p_channel == NULL )
+            if( p_intf->p_vlc->p_channel == NULL )
             {
-                network_ChannelCreate( p_intfGlobal );
+                network_ChannelCreate( p_intf );
             }
 
-            p_intfGlobal->p_sys->b_playing = 1;
+            p_intf->p_sys->b_playing = 1;
             break;
 
         /* HTTP */
         case 3:
-            config_PutInt( p_intfGlobal, "network-channel", FALSE );
+            config_PutInt( p_intf, "network-channel", FALSE );
             Address = EditHTTPURL->Text;
 
             /* Build source name with a basic test */
@@ -169,7 +168,7 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
             /* update the display */
-            p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
+            p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
             break;
     }
 

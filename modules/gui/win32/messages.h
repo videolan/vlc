@@ -39,8 +39,9 @@ __published:	// IDE-managed Components
     void __fastcall FormHide( TObject *Sender );
     void __fastcall FormShow( TObject *Sender );
 private:	// User declarations
+    intf_thread_t *p_intf;
 public:		// User declarations
-    __fastcall TMessagesDlg( TComponent* Owner );
+    __fastcall TMessagesDlg( TComponent* Owner, intf_thread_t *_p_intf );
     void __fastcall UpdateLog();
 };
 //---------------------------------------------------------------------------

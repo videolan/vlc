@@ -35,12 +35,11 @@
 #pragma link "CSPIN"
 #pragma resource "*.dfm"
 
-extern  intf_thread_t *p_intfGlobal;
-
 //---------------------------------------------------------------------------
-__fastcall TDiscDlg::TDiscDlg( TComponent* Owner )
+__fastcall TDiscDlg::TDiscDlg( TComponent* Owner, intf_thread_t *_p_intf )
         : TForm( Owner )
 {
+    p_intf = _p_intf;
     /* Simulate a click to get the correct device name */
     RadioGroupTypeClick( RadioGroupType );
     Translate( this );
@@ -48,12 +47,12 @@ __fastcall TDiscDlg::TDiscDlg( TComponent* Owner )
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::FormShow( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->OpenDiscAction->Checked = true;
+    p_intf->p_sys->p_window->OpenDiscAction->Checked = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::FormHide( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->OpenDiscAction->Checked = false;
+    p_intf->p_sys->p_window->OpenDiscAction->Checked = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::BitBtnCancelClick( TObject *Sender )
@@ -67,7 +66,7 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
     playlist_t *    p_playlist;
 
     p_playlist = (playlist_t *)
-        vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {   
         return;
@@ -97,7 +96,7 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
     /* update the display */
-    p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
+    p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
 
     vlc_object_release( p_playlist );
 }
@@ -109,11 +108,11 @@ void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )
 
     if( RadioGroupType->ItemIndex == 0 )
     {
-        psz_device = config_GetPsz( p_intfGlobal, "dvd" );
+        psz_device = config_GetPsz( p_intf, "dvd" );
     }
     else
     {
-        psz_device = config_GetPsz( p_intfGlobal, "vcd" );
+        psz_device = config_GetPsz( p_intf, "vcd" );
     }
 
     if( psz_device )

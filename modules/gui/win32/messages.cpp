@@ -34,13 +34,12 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 
-extern intf_thread_t *p_intfGlobal;
-
 //---------------------------------------------------------------------------
-__fastcall TMessagesDlg::TMessagesDlg( TComponent* Owner )
-    : TForm( Owner )
+__fastcall TMessagesDlg::TMessagesDlg(
+    TComponent* Owner, intf_thread_t *_p_intf ) : TForm( Owner )
 {
-    Icon = p_intfGlobal->p_sys->p_window->Icon;
+    p_intf = _p_intf;
+    Icon = p_intf->p_sys->p_window->Icon;
     Translate( this );
 }
 //---------------------------------------------------------------------------
@@ -51,17 +50,17 @@ void __fastcall TMessagesDlg::ButtonOKClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMessagesDlg::FormHide( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MessagesAction->Checked = false;
+    p_intf->p_sys->p_window->MessagesAction->Checked = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMessagesDlg::FormShow( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MessagesAction->Checked = true;
+    p_intf->p_sys->p_window->MessagesAction->Checked = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMessagesDlg::UpdateLog()
 {
-    msg_subscription_t *p_sub = p_intfGlobal->p_sys->p_sub;
+    msg_subscription_t *p_sub = p_intf->p_sys->p_sub;
     int                 i_start, i_stop, i_del, i_count;
     int                 i_max_lines;
 
@@ -91,7 +90,7 @@ void __fastcall TMessagesDlg::UpdateLog()
 
             /* Limit log size */
             i_count = RichEditMessages->Lines->Count;
-            i_max_lines = config_GetInt( p_intfGlobal, "intfwin-max-lines" );
+            i_max_lines = config_GetInt( p_intf, "intfwin-max-lines" );
             if( i_max_lines > 0 )
             {
                 for( i_del = 0; i_del <= i_count - i_max_lines; i_del++ )

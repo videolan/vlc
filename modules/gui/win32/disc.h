@@ -45,14 +45,15 @@ __published:	// IDE-managed Components
     TEdit *EditDevice;
     TCSpinEdit *SpinEditTitle;
     TCSpinEdit *SpinEditChapter;
-    void __fastcall FormShow(TObject *Sender);
-    void __fastcall FormHide(TObject *Sender);
-    void __fastcall BitBtnCancelClick(TObject *Sender);
-    void __fastcall BitBtnOkClick(TObject *Sender);
-    void __fastcall RadioGroupTypeClick(TObject *Sender);
+    void __fastcall FormShow( TObject *Sender );
+    void __fastcall FormHide( TObject *Sender );
+    void __fastcall BitBtnCancelClick( TObject *Sender );
+    void __fastcall BitBtnOkClick( TObject *Sender);
+    void __fastcall RadioGroupTypeClick( TObject *Sender );
 private:	// User declarations
+    intf_thread_t *p_intf;
 public:		// User declarations
-    __fastcall TDiscDlg( TComponent* Owner );
+    __fastcall TDiscDlg( TComponent* Owner, intf_thread_t *_p_intf );
 };
 //---------------------------------------------------------------------------
 #endif

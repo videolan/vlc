@@ -83,10 +83,11 @@ __published:	// IDE-managed Components
     void __fastcall PlayStreamActionExecute( TObject *Sender );
 private:	// User declarations
     char * __fastcall rindex( char *s, char c );
+    intf_thread_t *p_intf;
 public:		// User declarations
-    __fastcall TPlaylistDlg( TComponent* Owner );
+    __fastcall TPlaylistDlg( TComponent* Owner, intf_thread_t *_p_intf );
     void __fastcall UpdateGrid( playlist_t * p_playlist );
-    void __fastcall Manage( intf_thread_t * p_intf );
+    void __fastcall Manage();
     void __fastcall DeleteItem( int i_pos );
     void __fastcall Previous();
     void __fastcall Next();

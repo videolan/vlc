@@ -46,13 +46,14 @@
 #pragma link "CSPIN"
 #pragma resource "*.dfm"
 
-extern intf_thread_t *p_intfGlobal;
 extern int Win32Manage( intf_thread_t *p_intf );
 
 //---------------------------------------------------------------------------
-__fastcall TMainFrameDlg::TMainFrameDlg( TComponent* Owner )
-        : TForm( Owner )
+__fastcall TMainFrameDlg::TMainFrameDlg(
+    TComponent* Owner, intf_thread_t *_p_intf ) : TForm( Owner )
 {
+    p_intf = _p_intf;
+
     Application->ShowHint = true;
     Application->OnHint = DisplayHint;
 
@@ -81,7 +82,7 @@ __fastcall TMainFrameDlg::~TMainFrameDlg()
  ****************************************************************************/
 void __fastcall TMainFrameDlg::TimerManageTimer( TObject *Sender )
 {
-    Win32Manage( p_intfGlobal );
+    Win32Manage( p_intf );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::DisplayHint( TObject *Sender )
@@ -95,28 +96,26 @@ void __fastcall TMainFrameDlg::TrackBarChange( TObject *Sender )
      * the stream. It is called whenever the slider changes its value.
      * The lock has to be taken before the function is called */
 
-//    vlc_mutex_lock( &p_intfGlobal->p_sys->p_input->stream.stream_lock );
+//    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
 
-    if( p_intfGlobal->p_sys->p_input != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-#define p_area p_intfGlobal->p_sys->p_input->stream.p_selected_area
+#define p_area p_intf->p_sys->p_input->stream.p_selected_area
         char psz_time[ OFFSETTOTIME_MAX_SIZE ];
         off_t Value = TrackBar->Position;
 
         GroupBoxSlider->Caption =
-                input_OffsetToTime( p_intfGlobal->p_sys->p_input, psz_time,
+                input_OffsetToTime( p_intf->p_sys->p_input, psz_time,
                         ( p_area->i_size * Value ) / (off_t)SLIDER_MAX_VALUE );
 #undef p_area
      }
 
-//    vlc_mutex_unlock( &p_intfGlobal->p_sys->p_input->stream.stream_lock );
+//    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::FormClose( TObject *Sender,
       TCloseAction &Action )
 {
-    intf_thread_t *p_intf = p_intfGlobal;
-
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_vlc->b_die = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->change_lock );
@@ -135,7 +134,7 @@ void __fastcall TMainFrameDlg::OpenFileActionExecute( TObject *Sender )
     AnsiString      FileName;
     playlist_t *    p_playlist;
 
-    p_playlist = (playlist_t *)vlc_object_find( p_intfGlobal,
+    p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
@@ -150,7 +149,7 @@ void __fastcall TMainFrameDlg::OpenFileActionExecute( TObject *Sender )
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
         /* update the plugin display */
-        p_intfGlobal->p_sys->p_playwin->UpdateGrid( p_playlist );
+        p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
     };
 
     vlc_object_release( p_playlist );
@@ -158,22 +157,22 @@ void __fastcall TMainFrameDlg::OpenFileActionExecute( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::OpenDiscActionExecute( TObject *Sender )
 {
-    TDiscDlg *p_disc = p_intfGlobal->p_sys->p_disc;
+    TDiscDlg *p_disc = p_intf->p_sys->p_disc;
     if( p_disc == NULL )
     {
-        p_disc = new TDiscDlg( this );
-        p_intfGlobal->p_sys->p_disc = p_disc;
+        p_disc = new TDiscDlg( this, p_intf );
+        p_intf->p_sys->p_disc = p_disc;
     }
     p_disc->Show();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::NetworkStreamActionExecute( TObject *Sender )
 {
-    TNetworkDlg *p_network = p_intfGlobal->p_sys->p_network;
+    TNetworkDlg *p_network = p_intf->p_sys->p_network;
     if( p_network == NULL )
     {
-        p_network = new TNetworkDlg( this );
-        p_intfGlobal->p_sys->p_network = p_network;
+        p_network = new TNetworkDlg( this, p_intf );
+        p_intf->p_sys->p_network = p_network;
     }
     p_network->Show();
 }
@@ -187,7 +186,7 @@ void __fastcall TMainFrameDlg::FullscreenActionExecute( TObject *Sender )
 {
     vout_thread_t *p_vout;
 
-    p_vout = (vout_thread_t *)vlc_object_find( p_intfGlobal->p_sys->p_input,
+    p_vout = (vout_thread_t *)vlc_object_find( p_intf->p_sys->p_input,
                                                VLC_OBJECT_VOUT, FIND_CHILD );
     if( p_vout == NULL )
     {
@@ -200,7 +199,7 @@ void __fastcall TMainFrameDlg::FullscreenActionExecute( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PlaylistActionExecute( TObject *Sender )
 {
-    TPlaylistDlg *p_playwin = p_intfGlobal->p_sys->p_playwin;
+    TPlaylistDlg *p_playwin = p_intf->p_sys->p_playwin;
     if( p_playwin->Visible )
     {
         p_playwin->Hide();
@@ -208,7 +207,7 @@ void __fastcall TMainFrameDlg::PlaylistActionExecute( TObject *Sender )
     else
     {
         playlist_t * p_playlist;
-        p_playlist = (playlist_t *)vlc_object_find( p_intfGlobal,
+        p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         if( p_playlist == NULL )
         {
@@ -223,7 +222,7 @@ void __fastcall TMainFrameDlg::PlaylistActionExecute( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::MessagesActionExecute( TObject *Sender )
 {
-     p_intfGlobal->p_sys->p_messages->Show();
+     p_intf->p_sys->p_messages->Show();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PreferencesActionExecute( TObject *Sender )
@@ -233,9 +232,9 @@ void __fastcall TMainFrameDlg::PreferencesActionExecute( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::AboutActionExecute( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_about = new TAboutDlg( this );
-    p_intfGlobal->p_sys->p_about->ShowModal();
-    delete p_intfGlobal->p_sys->p_about;
+    TAboutDlg *AboutDlg = new TAboutDlg( this, p_intf );
+    AboutDlg->ShowModal();
+    delete AboutDlg;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::BackActionExecute( TObject *Sender )
@@ -270,12 +269,12 @@ void __fastcall TMainFrameDlg::FastActionExecute( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PreviousActionExecute(TObject *Sender)
 {
-    p_intfGlobal->p_sys->p_playwin->Previous();
+    p_intf->p_sys->p_playwin->Previous();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::NextActionExecute(TObject *Sender)
 {
-    p_intfGlobal->p_sys->p_playwin->Next();
+    p_intf->p_sys->p_playwin->Next();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::EjectActionExecute( TObject *Sender )
@@ -284,7 +283,7 @@ void __fastcall TMainFrameDlg::EjectActionExecute( TObject *Sender )
     char * psz_current;
     playlist_t * p_playlist;
 
-    p_playlist = (playlist_t *)vlc_object_find( p_intfGlobal,
+    p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
@@ -321,11 +320,11 @@ void __fastcall TMainFrameDlg::EjectActionExecute( TObject *Sender )
     }
 
     /* If there's a stream playing, we aren't allowed to eject ! */
-    if( p_intfGlobal->p_sys->p_input == NULL )
+    if( p_intf->p_sys->p_input == NULL )
     {
-        msg_Dbg( p_intfGlobal, "ejecting %s", Device.c_str() );
+        msg_Dbg( p_intf, "ejecting %s", Device.c_str() );
 
-        intf_Eject( p_intfGlobal, Device.c_str() );
+        intf_Eject( p_intf, Device.c_str() );
     }
 }
 //--------------------------------------------------------------------------
@@ -363,11 +362,9 @@ void __fastcall TMainFrameDlg::PopupJumpClick( TObject *Sender )
  ****************************************************************************/
 void __fastcall TMainFrameDlg::PrevTitleActionExecute( TObject *Sender )
 {
-    intf_thread_t * p_intf;
     input_area_t  * p_area;
     int             i_id;
 
-    p_intf = p_intfGlobal;
     i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id - 1;
 
     /* Disallow area 0 since it is used for video_ts.vob */
@@ -387,11 +384,9 @@ void __fastcall TMainFrameDlg::PrevTitleActionExecute( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::NextTitleActionExecute( TObject *Sender )
 {
-    intf_thread_t * p_intf;
     input_area_t  * p_area;
     int             i_id;
 
-    p_intf = p_intfGlobal;
     i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id + 1;
 
     if( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
@@ -410,7 +405,6 @@ void __fastcall TMainFrameDlg::NextTitleActionExecute( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PrevChapterActionExecute( TObject *Sender )
 {
-    intf_thread_t * p_intf = p_intfGlobal;
     input_area_t  * p_area;
 
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
@@ -431,7 +425,6 @@ void __fastcall TMainFrameDlg::PrevChapterActionExecute( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::NextChapterActionExecute( TObject *Sender )
 {
-    intf_thread_t * p_intf = p_intfGlobal;
     input_area_t  * p_area;
 
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
@@ -457,7 +450,6 @@ void __fastcall TMainFrameDlg::NextChapterActionExecute( TObject *Sender )
  ****************************************************************************/
 void __fastcall TMainFrameDlg::ButtonGoClick( TObject *Sender )
 {
-    intf_thread_t *p_intf = p_intfGlobal;
     int i_channel;
 
     i_channel = SpinEditChannel->Value;
@@ -480,7 +472,6 @@ void __fastcall TMainFrameDlg::ButtonGoClick( TObject *Sender )
  *****************************************************************************/
 void __fastcall TMainFrameDlg::ModeManage()
 {
-    intf_thread_t * p_intf = p_intfGlobal;
     TGroupBox     * ActiveGB;
     int             i_Height;
     bool            b_control;

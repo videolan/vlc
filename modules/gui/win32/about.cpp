@@ -34,13 +34,12 @@
 //#pragma package(smart_init)
 #pragma resource "*.dfm"
 
-extern  intf_thread_t *p_intfGlobal;
-
 //---------------------------------------------------------------------------
-__fastcall TAboutDlg::TAboutDlg( TComponent* Owner )
+__fastcall TAboutDlg::TAboutDlg( TComponent* Owner, intf_thread_t *_p_intf )
         : TForm( Owner )
 {
-    Image1->Picture->Icon = p_intfGlobal->p_sys->p_window->Icon;
+    p_intf = _p_intf;
+    Image1->Picture->Icon = p_intf->p_sys->p_window->Icon;
     LabelVersion->Caption = "Version " VERSION;
     Translate( this );
 }

@@ -106,9 +106,9 @@ static void Close ( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    p_intf->p_sys->p_window = new TMainFrameDlg( NULL );
-    p_intf->p_sys->p_playwin = new TPlaylistDlg( NULL );
-    p_intf->p_sys->p_messages = new TMessagesDlg( NULL );
+    p_intf->p_sys->p_window = new TMainFrameDlg( NULL, p_intf );
+    p_intf->p_sys->p_playwin = new TPlaylistDlg( NULL, p_intf );
+    p_intf->p_sys->p_messages = new TMessagesDlg( NULL, p_intf );
 
     /* show main window and wait until it is closed */
     p_intf->p_sys->p_window->ShowModal();
@@ -145,7 +145,7 @@ int Win32Manage( intf_thread_t *p_intf )
     p_intf->p_sys->p_messages->UpdateLog();
 
     /* Update the playlist */
-    p_intf->p_sys->p_playwin->Manage( p_intf );
+    p_intf->p_sys->p_playwin->Manage();
 
     /* Update the input */
     if( p_intf->p_sys->p_input == NULL )
