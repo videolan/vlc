@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.48 2001/11/13 12:09:17 henri Exp $
+ * $Id: common.h,v 1.49 2001/11/21 10:47:20 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -126,7 +126,6 @@ struct vout_sys_s;
 struct vdec_thread_s;
 struct vpar_thread_s;
 struct video_parser_s;
-struct picture_t;
 
 typedef struct vout_thread_s *          p_vout_thread_t;
 typedef struct vout_font_s *            p_vout_font_t;
