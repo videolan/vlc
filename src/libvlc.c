@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.12 2002/07/03 19:40:49 sam Exp $
+ * $Id: libvlc.c,v 1.13 2002/07/11 18:44:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1182,19 +1182,19 @@ static void FatalSignalHandler( int i_signal )
      * armed and following signals will be ignored to avoid sending messages
      * to an interface having been destroyed */
 
-    vlc_mutex_lock( &global_lock );
     if( !b_die )
     {
         b_die = VLC_TRUE;
         abort_time = mdate();
+
+        fprintf( stderr, "signal %d received, terminating libvlc - do it "
+                         "again in case your process gets stuck\n", i_signal );
 
         /* Try to terminate everything - this is done by requesting the end of
          * all the p_vlc structures */
         for( i_index = 0 ; i_index < i_vlc ; i_index++ )
         {
             /* Acknowledge the signal received */
-            msg_Err( pp_vlc[ i_index ], "signal %d received, exiting - do it "
-                     "again in case vlc gets stuck", i_signal );
             pp_vlc[ i_index ]->b_die = VLC_TRUE;
         }
     }
@@ -1205,16 +1205,10 @@ static void FatalSignalHandler( int i_signal )
         signal( SIGHUP,  SIG_IGN );
         signal( SIGQUIT, SIG_IGN );
 
-        for( i_index = 0 ; i_index < i_vlc ; i_index++ )
-        {
-            msg_Err( pp_vlc[ i_index ], "user insisted too much, dying badly" );
-        }
+        fprintf( stderr, "user insisted too much, dying badly\n" );
 
-        vlc_mutex_unlock( &global_lock );
         exit( 1 );
     }
-
-    vlc_mutex_unlock( &global_lock );
 }
 #endif
 

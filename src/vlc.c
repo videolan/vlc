@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.3 2002/07/03 19:40:49 sam Exp $
+ * $Id: vlc.c,v 1.4 2002/07/11 18:44:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -68,9 +68,10 @@ int main(int i_argc, char *ppsz_argv[], char *ppsz_env[])
 
     /* Add background interfaces */
     //{ int i; for( i=10; i--; ) vlc_add_intf( p_vlc, "dummy", 0 ); }
-    vlc_add_intf( p_vlc, "dummy", VLC_FALSE );
-    vlc_add_intf( p_vlc, "logger", VLC_FALSE );
+    //vlc_add_intf( p_vlc, "dummy", VLC_FALSE );
+    //vlc_add_intf( p_vlc, "logger", VLC_FALSE );
     //vlc_add_intf( p_vlc, "xosd", VLC_FALSE );
+    //vlc_add_intf( p_vlc, "gtk", VLC_FALSE );
     //vlc_add_intf( p_vlc, "kde", VLC_FALSE );
     vlc_add_intf( p_vlc, "rc", VLC_FALSE );
 
