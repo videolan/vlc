@@ -2,7 +2,7 @@
  * block.c: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: block.c,v 1.3 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: block.c,v 1.4 2003/11/22 04:02:10 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -52,6 +52,7 @@ static void BlockRelease( block_t *p_block )
     if( p_block->p_sys->i_duplicated < 0 )
     {
         vlc_mutex_unlock( &p_block->p_sys->lock );
+        vlc_mutex_destroy( &p_block->p_sys->lock );
         free( p_block->p_sys->p_allocated_buffer );
         free( p_block->p_sys );
         free( p_block );
