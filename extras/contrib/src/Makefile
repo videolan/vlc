@@ -306,10 +306,10 @@ fribidi-$(FRIBIDI_VERSION).tar.gz:
 
 fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/fribidi.patch
+	patch -p 0 < Patches/fribidi.patch.real
 
 .fribidi: fribidi
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./bootstrap && ./configure --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
