@@ -468,7 +468,8 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
             {
                for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
                {
-                   p_y[i_offset + x] = i_y;
+                   p_y[i_offset + x] = i_y*pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]] *
+                                       opacity / ( 256 * 256 );
                    p_u[i_offset + x] = i_u; 
                    p_v[i_offset + x] = i_v;
                }
