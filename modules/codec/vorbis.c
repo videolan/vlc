@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.13 2003/01/28 14:41:05 gbazin Exp $
+ * $Id: vorbis.c,v 1.14 2003/01/28 14:49:12 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -192,6 +192,11 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         while ( i < p_dec->vc.comments )
         {
             psz_comment = strdup( p_dec->vc.user_comments[i] );
+            if ( !psz_comment )
+            {
+                msg_Warn( p_dec->p_fifo, "Out of memory" );
+                break;
+            }
             psz_name = psz_comment;
             psz_value = strchr( psz_comment, '=' );
             if( psz_value )
