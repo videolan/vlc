@@ -104,7 +104,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Bitmap" )
     {
-        const BuilderData::Bitmap bitmap( attr["id"] ,
+        const BuilderData::Bitmap bitmap( uniqueId( attr["id"] ),
                 convertFileName( attr["file"] ),
                 convertColor( attr["alphacolor"] ) );
         m_data.m_listBitmap.push_back( bitmap );
@@ -112,7 +112,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "BitmapFont" )
     {
-        const BuilderData::BitmapFont font( attr["id"],
+        const BuilderData::BitmapFont font( uniqueId( attr["id"] ),
                 convertFileName( attr["file"] ),
                 attr["type"] );
         m_data.m_listBitmapFont.push_back( font );
@@ -144,7 +144,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "Font" )
     {
-        const BuilderData::Font fontData( attr["id"],
+        const BuilderData::Font fontData( uniqueId( attr["id"] ),
                 convertFileName( attr["file"] ),
                 atoi( attr["size"] ) );
         m_data.m_listFont.push_back( fontData );
