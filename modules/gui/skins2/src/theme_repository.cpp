@@ -36,7 +36,7 @@
 #endif
 
 
-const char *ThemeRepository::kOpenDialog = "@openSkin@";
+const char *ThemeRepository::kOpenDialog = "{openSkin}";
 
 
 ThemeRepository *ThemeRepository::instance( intf_thread_t *pIntf )

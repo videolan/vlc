@@ -188,7 +188,7 @@ static void Run( intf_thread_t *p_intf )
         list<string>::const_iterator it;
         for( it = resPath.begin(); it != resPath.end(); it++ )
         {
-            string path = (*it) + sep + "default" + sep + "theme.xml";
+            string path = (*it) + sep + "default.vlt";
             if( pLoader->load( path ) )
             {
                 // Theme loaded successfully
