@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.13 2003/01/25 16:59:49 fenrir Exp $
+ * $Id: audio.c,v 1.14 2003/02/07 01:22:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -66,34 +66,11 @@ static unsigned int pi_channels_maps[6] =
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-};  
+};
 
 /*****************************************************************************
  * locales Functions
  *****************************************************************************/
-#if 0
-static void ffmpeg_GetWaveFormatEx( waveformatex_t *p_wh,
-                                    u8 *p_data )
-{
-    WAVEFORMATEX *p_wfdata = (WAVEFORMATEX*)p_data;
-    
-    p_wh->i_formattag     = p_wfdata->wFormatTag;
-    p_wh->i_nb_channels   = p_wfdata->nChannels;
-    p_wh->i_samplespersec = p_wfdata->nSamplesPerSec;
-    p_wh->i_avgbytespersec= p_wfdata->nAvgBytesPerSec;
-    p_wh->i_blockalign    = p_wfdata->nBlockAlign;
-    p_wh->i_bitspersample = p_wfdata->wBitsPerSample;
-    p_wh->i_size          = p_wfdata->cbSize;
-
-    if( p_wh->i_size )
-    {
-        p_wh->p_data = malloc( p_wh->i_size );
-        memcpy( p_wh->p_data, 
-                p_data + sizeof(WAVEFORMATEX) , 
-                p_wh->i_size );
-    }
-}
-#endif
 
 /*****************************************************************************
  *
@@ -108,8 +85,8 @@ static void ffmpeg_GetWaveFormatEx( waveformatex_t *p_wh,
 /*****************************************************************************
  * InitThread: initialize vdec output thread
  *****************************************************************************
- * This function is called from decoder_Run and performs the second step 
- * of the initialization. It returns 0 on success. Note that the thread's 
+ * This function is called from decoder_Run and performs the second step
+ * of the initialization. It returns 0 on success. Note that the thread's
  * flag are not modified inside this function.
  *
  * ffmpeg codec will be open, some memory allocated.
@@ -158,14 +135,14 @@ int E_( InitThread_Audio )( adec_thread_t *p_adec )
                  p_adec->psz_namecodec );
     }
 
-    p_adec->p_output = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE );
+    p_adec->p_output = malloc( 3 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
 
 
     p_adec->output_format.i_format = AOUT_FMT_S16_NE;
     p_adec->output_format.i_rate = p_wf->nSamplesPerSec;
     p_adec->output_format.i_physical_channels
         = p_adec->output_format.i_original_channels
-        = p_wf->nChannels;
+        = pi_channels_maps[p_wf->nChannels];
 
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
@@ -268,7 +245,7 @@ usenextdata:
                   i_output_size );
     }
 
-    if( p_adec->p_context->channels <= 0 || 
+    if( p_adec->p_context->channels <= 0 ||
         p_adec->p_context->channels > 5 )
     {
         msg_Warn( p_adec->p_fifo,
@@ -281,7 +258,7 @@ usenextdata:
                            / aout_FormatNbChannels( &p_adec->output_format );
     /* **** First check if we have a valid output **** */
     if( ( p_adec->p_aout_input == NULL )||
-        ( p_adec->output_format.i_original_channels != 
+        ( p_adec->output_format.i_original_channels !=
                     pi_channels_maps[p_adec->p_context->channels] ) )
     {
         if( p_adec->p_aout_input != NULL )
@@ -291,8 +268,8 @@ usenextdata:
         }
 
         /* **** Create a new audio output **** */
-        p_adec->output_format.i_physical_channels = 
-            p_adec->output_format.i_original_channels = 
+        p_adec->output_format.i_physical_channels =
+            p_adec->output_format.i_original_channels =
                 pi_channels_maps[p_adec->p_context->channels];
 
         aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
