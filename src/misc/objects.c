@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.1 2002/06/01 12:32:01 sam Exp $
+ * $Id: objects.c,v 1.2 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -101,8 +101,8 @@ static void vlc_dumpstructure_inner( vlc_object_t *p_this,
     }
 
     psz_foo[i_level] = '\0';
-    msg_Dbg( p_this, "%so %s %p%s%s%s%s", psz_foo, p_this->psz_object_type,
-             p_this, psz_name, psz_thread, psz_refcount, psz_children );
+    msg_Info( p_this, "%so %s %p%s%s%s%s", psz_foo, p_this->psz_object_type,
+              p_this, psz_name, psz_thread, psz_refcount, psz_children );
     psz_foo[i_level] = i_back;
 
     if( i_level / 2 >= MAX_TREE_DEPTH )
@@ -139,7 +139,7 @@ static void vlc_dumpstructure_inner( vlc_object_t *p_this,
     }
 }
 
-/* vlc_object_create: initialize a vlc object and set its parent */
+/* vlc_object_create: initialize a vlc object */
 void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 {
     vlc_object_t * p_new;
@@ -181,7 +181,8 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             psz_type = "audio output";
             break;
         default:
-            i_size = i_type;
+            i_size = i_type > sizeof(vlc_object_t)
+                   ? i_type : sizeof(vlc_object_t);
             i_type = VLC_OBJECT_PRIVATE;
             psz_type = "private";
             break;

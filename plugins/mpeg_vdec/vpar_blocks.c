@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_blocks.c,v 1.10 2002/06/01 12:32:00 sam Exp $
+ * $Id: vpar_blocks.c,v 1.11 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -33,6 +33,7 @@
 #include <vlc/decoder.h>
 
 #include "vdec_ext-plugins.h"
+#include "video_decoder.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
 

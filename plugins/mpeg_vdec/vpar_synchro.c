@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_synchro.c,v 1.10 2002/06/01 12:32:00 sam Exp $
+ * $Id: vpar_synchro.c,v 1.11 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -102,6 +102,7 @@
 #include <vlc/decoder.h>
 
 #include "vdec_ext-plugins.h"
+#include "video_decoder.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
 

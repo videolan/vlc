@@ -2,7 +2,7 @@
  * vpar_pool.h : video parser/video decoders communication
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_pool.h,v 1.3 2002/06/01 12:32:00 sam Exp $
+ * $Id: vpar_pool.h,v 1.4 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -40,7 +40,7 @@ struct vdec_pool_s
                                          * parser */
 
     /* Video decoder threads */
-    struct vdec_thread_s ** pp_vdec;       /* Array of video decoder threads */
+    vdec_thread_t **    pp_vdec;           /* Array of video decoder threads */
     int                 i_smp;     /* Number of symmetrical decoder threads,
                                     * hence size of the pp_vdec, p_macroblocks
                                     * and pp_new_macroblocks array */
@@ -59,7 +59,7 @@ struct vdec_pool_s
     /* Undecoded macroblock, used when the parser and the decoder share the
      * same thread */
     macroblock_t        mb;
-    struct vdec_thread_s * p_vdec;                     /* Fake video decoder */
+    vdec_thread_t *     p_vdec;                        /* Fake video decoder */
 
     /* Pointers to usual pool functions */
     void             (* pf_wait_pool) ( vdec_pool_t * );

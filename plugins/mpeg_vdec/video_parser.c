@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.21 2002/06/01 12:32:00 sam Exp $
+ * $Id: video_parser.c,v 1.22 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -43,6 +43,7 @@
 #endif
 
 #include "vdec_ext-plugins.h"
+#include "video_decoder.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
 

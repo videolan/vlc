@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.9 2002/06/01 12:32:00 sam Exp $
+ * $Id: vpar_pool.c,v 1.10 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,9 +32,9 @@
 #include <vlc/decoder.h>
 
 #include "vdec_ext-plugins.h"
+#include "video_decoder.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
-#include "video_decoder.h"
 
 /*
  * Local prototypes

@@ -2,7 +2,7 @@
  * video_decoder.h : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.h,v 1.2 2002/06/01 12:32:00 sam Exp $
+ * $Id: video_decoder.h,v 1.3 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -21,6 +21,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
  
+/*****************************************************************************
+ * vdec_thread_t: video decoder thread descriptor
+ *****************************************************************************/
+typedef struct vdec_thread_s
+{
+    VLC_COMMON_MEMBERS
+
+    /* IDCT iformations */
+    void *               p_idct_data;
+
+    /* Input properties */
+    struct vdec_pool_s * p_pool;
+
+} vdec_thread_t;
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/

@@ -2,7 +2,7 @@
  * i420_yuy2.h : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.h,v 1.8 2002/06/01 12:31:58 sam Exp $
+ * $Id: i420_yuy2.h,v 1.9 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,43 +24,25 @@
 #ifdef MODULE_NAME_IS_chroma_i420_yuy2_mmx
 
 #define UNUSED_LONGLONG(foo) \
-    static const unsigned long long foo __asm__ (#foo) __attribute__((unused))
+    unsigned long long foo __asm__ (#foo) __attribute__((unused))
 UNUSED_LONGLONG(woo_00ffw) = 0x00ff00ff00ff00ff;
 UNUSED_LONGLONG(woo_80w)   = 0x0000000080808080;
 
-#define MMX_LOAD "                                                        \n\
-movl         %9,%%ebx                                                     \n\
-"
-
-#define MMX_SAVE "                                                        \n\
-movl      %%ebx,%9                                                        \n\
-"
-
-#define MMX_INC "                                                         \n\
-addl         $16, %0                                                      \n\
-addl         $16, %1                                                      \n\
-addl         $8, %2                                                       \n\
-addl         $8, %3                                                       \n\
-addl         $4, %%eax                                                    \n\
-addl         $4, %%ebx                                                    \n\
-"
-
-#define MMX_CALL(MMX_INSTRUCTIONS)                                  \
-    __asm__ __volatile__(                                           \
-        MMX_LOAD                                                    \
-        ".align 8 \n\t"                                             \
-        MMX_INSTRUCTIONS                                            \
-        MMX_INC                                                     \
-        MMX_SAVE                                                    \
-        : "=c" (p_line1), "=d" (p_line2), "=D" (p_y1), "=S" (p_y2)  \
-        :  "c" (p_line1),  "d" (p_line2),  "D" (p_y1),  "S" (p_y2), \
-          "a" (p_u), "m" (p_v)                                      \
-        : "ebx", "memory" );
+#define MMX_CALL(MMX_INSTRUCTIONS)                                          \
+    do {                                                                    \
+    __asm__ __volatile__(                                                   \
+        ".align 8 \n\t"                                                     \
+        MMX_INSTRUCTIONS                                                    \
+        :                                                                   \
+        : "r" (p_line1),  "r" (p_line2),  "r" (p_y1),  "r" (p_y2),          \
+          "r" (p_u), "r" (p_v) );                                           \
+    p_line1 += 16; p_line2 += 16; p_y1 += 8; p_y2 += 8; p_u += 4; p_v += 4; \
+    } while(0);                                                             \
 
 #define MMX_YUV420_YUYV "                                                 \n\
 movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
-movd    (%%eax), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-movd    (%%ebx), %%mm2  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movd       (%4), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+movd       (%5), %%mm2  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
 punpcklbw %%mm2, %%mm1  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 movq      %%mm0, %%mm2  #                     y7 y6 y5 y4 y3 y2 y1 y0     \n\
 punpcklbw %%mm1, %%mm2  #                     v1 y3 u1 y2 v0 y1 u0 y0     \n\
@@ -77,8 +59,8 @@ movq      %%mm0, 8(%1)  # Store high YUYV                                 \n\
 
 #define MMX_YUV420_YVYU "                                                 \n\
 movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
-movd    (%%eax), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-movd    (%%ebx), %%mm1  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movd       (%4), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+movd       (%5), %%mm1  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
 punpcklbw %%mm2, %%mm1  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
 movq      %%mm0, %%mm2  #                     y7 y6 y5 y4 y3 y2 y1 y0     \n\
 punpcklbw %%mm1, %%mm2  #                     u1 y3 v1 y2 u0 y1 v0 y0     \n\
@@ -96,8 +78,8 @@ movq      %%mm0, 8(%1)  # Store high YUYV                                 \n\
 #define MMX_YUV420_UYVY "                                                 \n\
 movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
 movq       (%3), %%mm3  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-movd    (%%eax), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-movd    (%%ebx), %%mm1  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movd       (%4), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+movd       (%5), %%mm1  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
 punpcklbw %%mm2, %%mm1  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
 movq      %%mm1, %%mm2  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
 punpcklbw %%mm0, %%mm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
@@ -116,8 +98,8 @@ movq      %%mm1, 8(%1)  # Store high UYVY                                 \n\
 #define MMX_YUV420_Y211 "                                                 \n\
 movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
 movq       (%3), %%mm1  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-movd    (%%eax), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-movd    (%%ebx), %%mm3  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movd       (%4), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+movd       (%5), %%mm3  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
 pand  woo_00ffw, %%mm0  # get Y even          00 Y6 00 Y4 00 Y2 00 Y0     \n\
 packuswb  %%mm0, %%mm0  # pack Y              y6 y4 y2 y0 y6 y4 y2 y0     \n\
 pand  woo_00ffw, %%mm2  # get U even          00 u6 00 u4 00 u2 00 u0     \n\

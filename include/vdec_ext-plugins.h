@@ -2,7 +2,7 @@
  * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.12 2002/06/01 12:31:58 sam Exp $
+ * $Id: vdec_ext-plugins.h,v 1.13 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -73,20 +73,4 @@ struct macroblock_s
 #define MB_MOTION_FORWARD               8
 #define MB_QUANT                        16
 #define DCT_TYPE_INTERLACED             32
-
-/*****************************************************************************
- * vdec_thread_t: video decoder thread descriptor
- *****************************************************************************/
-typedef struct vdec_thread_s vdec_thread_t;
-
-struct vdec_thread_s
-{
-    VLC_COMMON_MEMBERS
-
-    /* IDCT iformations */
-    void *               p_idct_data;
-
-    /* Input properties */
-    struct vdec_pool_s * p_pool;
-};
 

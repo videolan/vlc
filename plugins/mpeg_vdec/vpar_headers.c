@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.23 2002/06/01 12:32:00 sam Exp $
+ * $Id: vpar_headers.c,v 1.24 2002/06/01 13:52:24 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -33,9 +33,9 @@
 #include <vlc/decoder.h>
 
 #include "vdec_ext-plugins.h"
+#include "video_decoder.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
-#include "video_decoder.h"
 
 /*
  * Local prototypes

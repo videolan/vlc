@@ -93,7 +93,7 @@ msgstr ""
 #. * libvlc.h: main libvlc header
 #. *****************************************************************************
 #. * Copyright (C) 1998-2002 VideoLAN
-#. * $Id: en_GB.po,v 1.5 2002/06/01 12:32:01 sam Exp $
+#. * $Id: en_GB.po,v 1.6 2002/06/01 13:52:24 sam Exp $
 #. *
 #. * Authors: Vincent Seguin <seguin@via.ecp.fr>
 #. *          Samuel Hocevar <sam@zoy.org>
@@ -173,7 +173,7 @@ msgid "audio output module"
 msgstr ""
 
 #: src/libvlc.h:58
-#, fuzzy
+msgid ""
 "This option allows you to select the audio audio output method used by vlc. "
 "The default behavior is to automatically select the best method available."
 msgstr ""
