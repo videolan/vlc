@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.8 2003/06/22 15:03:33 hartman Exp $
+# $Id: vlc.ebuild,v 1.9 2003/06/23 00:18:50 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -36,7 +36,7 @@ DESCRIPTION="VLC media player - A videoplayer that plays DVD,
 
 SRC_URI="http://www.videolan.org/pub/${PN}/${PV}/${P}.tar.bz2
 		 http://www.videolan.org/pub/${PN}/${PV}/contrib/mpeg2dec-20030612.tar.bz2
-		 http://www.videolan.org/pub/${PN}/${PV}/contrib/ffmpeg-20030612.tar.bz2"
+		 http://www.videolan.org/pub/${PN}/${PV}/contrib/ffmpeg-20030622.tar.bz2"
 
 HOMEPAGE="http://www.videolan.org/vlc"
 
