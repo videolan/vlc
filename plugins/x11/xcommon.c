@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.5 2002/01/04 14:01:34 sam Exp $
+ * $Id: xcommon.c,v 1.6 2002/01/05 02:22:03 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -112,7 +112,7 @@ static void DestroyCursor  ( vout_thread_t * );
 static void ToggleCursor   ( vout_thread_t * );
 
 #ifdef MODULE_NAME_IS_xvideo
-static int  XVideoGetPort         ( Display *, int );
+static int  XVideoGetPort         ( Display *, u32, u32 * );
 static void XVideoReleasePort     ( Display *, int );
 #endif
 
@@ -138,7 +138,6 @@ typedef struct vout_sys_s
     Window              yuv_window;   /* sub-window for displaying yuv video
                                                                         data */
     int                 i_xvport;
-    u32                 i_chroma;               /* the chroma we will select */
 #else
     Colormap            colormap;               /* colormap used (8bpp only) */
 
@@ -237,41 +236,6 @@ static __inline__ void vout_Seek( off_t i_seek )
 }
 
 /*****************************************************************************
- * Return the best suited FourCC value for a given chroma. We use this
- * because a decoder may output FOURCC_IYUV, which is exactly the same as
- * FOURCC_I420, but X servers usually know FOURCC_I420 and not FOURCC_IYUV.
- *****************************************************************************/
-static __inline__ u32 BestChroma( u32 i_chroma )
-{
-    /* XXX: don't forget to update vout_Init if you change this */
-    switch( i_chroma )
-    {
-        /* These ones are all the same */
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
-            return FOURCC_I420;
-
-        /* These ones are all the same */
-        case FOURCC_YUY2:
-        case FOURCC_YUNV:
-            return FOURCC_YUY2;
-
-        /* We know this one */
-        case FOURCC_Y211:
-            return FOURCC_Y211;
-
-        /* This is seldom supported, but we know how to convert */
-        case FOURCC_I422:
-            return FOURCC_YUY2;
-
-        default:
-            return i_chroma;
-            break;
-    }
-}
-
-/*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
@@ -299,7 +263,7 @@ static int vout_Probe( probedata_t *p_data )
     Display *p_display;                                   /* display pointer */
     char    *psz_display;
 #ifdef MODULE_NAME_IS_xvideo
-    int      i_xvport;
+    int      i_xvport, i_dummy;
 #endif
 
     /* Open display, unsing 'vlc_display' or DISPLAY environment variable */
@@ -312,17 +276,23 @@ static int vout_Probe( probedata_t *p_data )
     }
 
 #ifdef MODULE_NAME_IS_xvideo
-    /* Check that there is an available XVideo port */
-    i_xvport = XVideoGetPort( p_display, BestChroma( p_data->vout.i_chroma ) );
+    /* Check that there is an available XVideo port for this format */
+    i_xvport = XVideoGetPort( p_display, p_data->vout.i_chroma, &i_dummy );
     if( i_xvport < 0 )
     {
         /* It failed, but it's not completely lost ! We try to open an
-         * XVideo port for a simple 16bpp RGB picture */
-        i_xvport = XVideoGetPort( p_display, FOURCC_RV16 );
+         * XVideo port for a YUY2 picture */
+        i_xvport = XVideoGetPort( p_display, FOURCC_YUY2, &i_dummy );
         if( i_xvport < 0 )
         {
-            XCloseDisplay( p_display );
-            return( 0 );
+            /* It failed, but it's not completely lost ! We try to open an
+             * XVideo port for a simple 16bpp RGB picture */
+            i_xvport = XVideoGetPort( p_display, FOURCC_RV16, &i_dummy );
+            if( i_xvport < 0 )
+            {
+                XCloseDisplay( p_display );
+                return( 0 );
+            }
         }
     }
     XVideoReleasePort( p_display, i_xvport );
@@ -370,27 +340,33 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
 #ifdef MODULE_NAME_IS_xvideo
-    /* Try to guess the chroma format we will be using */
-    p_vout->p_sys->i_chroma = BestChroma( p_vout->render.i_chroma );
-
     /* Check that we have access to an XVideo port providing this chroma */
     p_vout->p_sys->i_xvport = XVideoGetPort( p_vout->p_sys->p_display,
-                                             p_vout->p_sys->i_chroma );
+                                             p_vout->render.i_chroma,
+                                             &p_vout->output.i_chroma );
     if( p_vout->p_sys->i_xvport < 0 )
     {
         /* It failed, but it's not completely lost ! We try to open an
-         * XVideo port for a simple 16bpp RGB picture */
+         * XVideo port for an YUY2 picture. We'll need to do an YUV
+         * conversion, but at least it has got scaling. */
         p_vout->p_sys->i_xvport = XVideoGetPort( p_vout->p_sys->p_display,
-                                                 FOURCC_RV16 );
+                                                 FOURCC_YUY2,
+                                                 &p_vout->output.i_chroma );
         if( p_vout->p_sys->i_xvport < 0 )
         {
-            XCloseDisplay( p_vout->p_sys->p_display );
-            free( p_vout->p_sys );
-            return 1;
+            /* It failed, but it's not completely lost ! We try to open an
+             * XVideo port for a simple 16bpp RGB picture. We'll need to do
+             * an YUV conversion, but at least it has got scaling. */
+            p_vout->p_sys->i_xvport = XVideoGetPort( p_vout->p_sys->p_display,
+                                                     FOURCC_RV16,
+                                                     &p_vout->output.i_chroma );
+            if( p_vout->p_sys->i_xvport < 0 )
+            {
+                XCloseDisplay( p_vout->p_sys->p_display );
+                free( p_vout->p_sys );
+                return 1;
+            }
         }
-
-        /* This one worked ! That's better than nothing, it has HW scaling. */
-        p_vout->p_sys->i_chroma = FOURCC_RV16;
     }
 #endif
 
@@ -475,49 +451,12 @@ static int vout_Init( vout_thread_t *p_vout )
     I_OUTPUTPICTURES = 0;
 
 #ifdef MODULE_NAME_IS_xvideo
-    /* Initialize the output structure ; we already found an XVideo port,
-     * which either suits p_vout->render.i_chroma or p_vout->p_sys->i_chroma
-     * if nothing was found at the first attempt. */
-    switch( p_vout->render.i_chroma )
-    {
-        /* These ones are equivalent to what we chose instead, for instance
-         * we tell the video output we can do FOURCC_IYUV even though we
-         * actually do FOURCC_I420. */
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
-
-        case FOURCC_YUY2:
-        case FOURCC_YUNV:
-
-        case FOURCC_Y211:
-            p_vout->output.i_chroma = p_vout->render.i_chroma;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
-            break;
-
-        /* These ones aren't equivalent to what we chose, so we need to
-         * warn the decoder that we chose another chroma and that it has
-         * conversion to do. */
-
-        /* At least for this one we can have the aspect ratio */
-        case FOURCC_I422:
-            p_vout->output.i_chroma = p_vout->p_sys->i_chroma;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
-            break;
-
-        /* Here we don't even control the aspect ratio */
-        default:
-            p_vout->output.i_chroma = p_vout->p_sys->i_chroma;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->p_sys->i_width
-                               * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
-            break;
-    }
+    /* Initialize the output structure; we already found an XVideo port,
+     * and the corresponding chroma we will be using. Since we can
+     * arbitrary scale, stick to the coordinates and aspect. */
+    p_vout->output.i_width  = p_vout->render.i_width;
+    p_vout->output.i_height = p_vout->render.i_height;
+    p_vout->output.i_aspect = p_vout->render.i_aspect;
 
 #else
     /* Initialize the output structure: RGB with square pixels, whatever
@@ -1236,7 +1175,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             CreateShmImage( p_vout->p_sys->p_display,
 #ifdef MODULE_NAME_IS_xvideo
                             p_vout->p_sys->i_xvport,
-                            p_vout->p_sys->i_chroma,
+                            p_vout->output.i_chroma,
 #else
                             p_vout->p_sys->p_visual,
                             p_vout->p_sys->i_screen_depth,
@@ -1251,7 +1190,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             CreateImage( p_vout->p_sys->p_display,
 #ifdef MODULE_NAME_IS_xvideo
                          p_vout->p_sys->i_xvport,
-                         p_vout->p_sys->i_chroma,
+                         p_vout->output.i_chroma,
 #else
                          p_vout->p_sys->p_visual,
                          p_vout->p_sys->i_screen_depth, 
@@ -1266,9 +1205,9 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         return -1;
     }
 
-#ifdef MODULE_NAME_IS_xvideo
-    switch( p_vout->p_sys->i_chroma )
+    switch( p_vout->output.i_chroma )
     {
+#ifdef MODULE_NAME_IS_xvideo
         case FOURCC_I420:
 
             p_pic->Y_PIXELS = p_pic->p_sys->p_image->data
@@ -1295,19 +1234,59 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->i_planes = 3;
             break;
 
+        case FOURCC_YV12:
+
+            p_pic->Y_PIXELS = p_pic->p_sys->p_image->data
+                               + p_pic->p_sys->p_image->offsets[0];
+            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
+            p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[0];
+            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+            p_pic->p[Y_PLANE].b_margin = 0;
+
+            p_pic->U_PIXELS = p_pic->p_sys->p_image->data
+                               + p_pic->p_sys->p_image->offsets[2];
+            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[2];
+            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+            p_pic->p[Y_PLANE].b_margin = 0;
+
+            p_pic->V_PIXELS = p_pic->p_sys->p_image->data
+                               + p_pic->p_sys->p_image->offsets[1];
+            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[1];
+            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+            p_pic->p[Y_PLANE].b_margin = 0;
+
+            p_pic->i_planes = 3;
+            break;
+
         case FOURCC_Y211:
 
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->offsets[0];
             p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
-            p_pic->p->i_pixel_bytes = 1;
+            /* XXX: this just looks so plain wrong... check it out ! */
+            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0] / 4;
+            p_pic->p->i_pixel_bytes = 4;
             p_pic->p->b_margin = 0;
 
             p_pic->i_planes = 1;
             break;
 
         case FOURCC_YUY2:
+        case FOURCC_UYVY:
+
+            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
+                                  + p_pic->p_sys->p_image->offsets[0];
+            p_pic->p->i_lines = p_vout->output.i_height;
+            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
+            p_pic->p->i_pixel_bytes = 4;
+            p_pic->p->b_margin = 0;
+
+            p_pic->i_planes = 1;
+            break;
+
+        case FOURCC_RV15:
 
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->offsets[0];
@@ -1315,6 +1294,10 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
             p_pic->p->i_pixel_bytes = 2;
             p_pic->p->b_margin = 0;
+
+            p_pic->p->i_red_mask   = 0x001f;
+            p_pic->p->i_green_mask = 0x07e0;
+            p_pic->p->i_blue_mask  = 0xf800;
 
             p_pic->i_planes = 1;
             break;
@@ -1335,18 +1318,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->i_planes = 1;
             break;
 
-        default:
-            /* Unknown chroma, tell the guy to get lost */
-            IMAGE_FREE( p_pic->p_sys->p_image );
-            free( p_pic->p_sys );
-            intf_ErrMsg( "vout error: never heard of chroma 0x%.8x",
-                         p_vout->p_sys->i_chroma );
-            p_pic->i_planes = 0;
-            return -1;
-    }
 #else
-    switch( p_vout->output.i_chroma )
-    {
         case FOURCC_RV16:
 
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
@@ -1373,17 +1345,18 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->i_planes = 1;
 
             break;
+#endif
 
         default:
             /* Unknown chroma, tell the guy to get lost */
             IMAGE_FREE( p_pic->p_sys->p_image );
             free( p_pic->p_sys );
-            intf_ErrMsg( "vout error: never heard of chroma 0x%.8x",
-                         p_vout->output.i_chroma );
+            intf_ErrMsg( "vout error: never heard of chroma 0x%.8x (%4.4s)",
+                         p_vout->output.i_chroma,
+                         (char*)&p_vout->output.i_chroma );
             p_pic->i_planes = 0;
             return -1;
     }
-#endif
 
     return 0;
 }
@@ -1565,7 +1538,9 @@ static void EnableXScreenSaver( vout_thread_t *p_vout )
     if( DPMSQueryExtension( p_vout->p_sys->p_display, &dummy, &dummy ) )
     {
         if( p_vout->p_sys->b_ss_dpms )
+        {
             DPMSEnable( p_vout->p_sys->p_display );
+        }
     }
 }
 
@@ -1666,7 +1641,7 @@ static void ToggleCursor( vout_thread_t *p_vout )
 /*****************************************************************************
  * XVideoGetPort: get YUV12 port
  *****************************************************************************/
-static int XVideoGetPort( Display *dpy, int i_id )
+static int XVideoGetPort( Display *dpy, u32 i_chroma, u32 *pi_newchroma )
 {
     XvAdaptorInfo *p_adaptor;
     unsigned int i;
@@ -1713,7 +1688,6 @@ static int XVideoGetPort( Display *dpy, int i_id )
     i_selected_port = -1;
     i_requested_adaptor = main_GetIntVariable( VOUT_XVADAPTOR_VAR, -1 );
 
-    /* No special xv port has been requested so try all of them */
     for( i_adaptor = 0; i_adaptor < i_num_adaptors; ++i_adaptor )
     {
         XvImageFormatValues *p_formats;
@@ -1734,19 +1708,22 @@ static int XVideoGetPort( Display *dpy, int i_id )
             continue;
         }
 
-        /* Check that port supports YUV12 planar format... */
+        /* Check that adaptor supports our requested format... */
         p_formats = XvListImageFormats( dpy, p_adaptor[i_adaptor].base_id,
                                         &i_num_formats );
 
-        for( i_format = 0; i_format < i_num_formats; i_format++ )
+        for( i_format = 0;
+             i_format < i_num_formats && ( i_selected_port == -1 );
+             i_format++ )
         {
             XvEncodingInfo  *p_enc;
             int             i_enc, i_num_encodings;
             XvAttribute     *p_attr;
             int             i_attr, i_num_attributes;
 
-            /* If this is not the format we want, forget it */
-            if( p_formats[ i_format ].id != i_id )
+            /* If this is not the format we want, or at least a
+             * similar one, forget it */
+            if( !vout_ChromaCmp( p_formats[ i_format ].id, i_chroma ) )
             {
                 continue;
             }
@@ -1761,6 +1738,7 @@ static int XVideoGetPort( Display *dpy, int i_id )
                 if( XvGrabPort( dpy, i_port, CurrentTime ) == Success )
                 {
                     i_selected_port = i_port;
+                    *pi_newchroma = p_formats[ i_format ].id;
                 }
             }
 
@@ -1840,13 +1818,13 @@ static int XVideoGetPort( Display *dpy, int i_id )
         if( i_requested_adaptor == -1 )
         {
             intf_WarnMsg( 3, "vout: no free XVideo port found for format "
-                             "0x%.8x", i_id );
+                             "0x%.8x (%4.4s)", i_chroma, (char*)&i_chroma );
         }
         else
         {
             intf_WarnMsg( 3, "vout: XVideo adaptor %i does not have a free "
-                             "XVideo port for format 0x%.8x",
-                             i_requested_adaptor, i_id );
+                             "XVideo port for format 0x%.8x (%4.4s)",
+                             i_requested_adaptor, i_chroma, (char*)&i_chroma );
         }
     }
 

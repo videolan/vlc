@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.8 2002/01/04 14:01:35 sam Exp $
+ * $Id: vout_pictures.c,v 1.9 2002/01/05 02:22:03 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -487,6 +487,7 @@ void vout_AllocatePicture( picture_t *p_pic,
         case FOURCC_Y211:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width;
+            p_pic->p->i_pixel_bytes = 4;
             p_pic->i_planes = 1;
             break;
 
@@ -511,7 +512,8 @@ void vout_AllocatePicture( picture_t *p_pic,
             break;
 
         default:
-            intf_ErrMsg( "vout error: unknown chroma type %.8x", i_chroma );
+            intf_ErrMsg( "vout error: unknown chroma type 0x%.8x (%4.4s)",
+                         i_chroma, (char*)&i_chroma );
             p_pic->i_planes = 0;
             return;
     }

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.39 2002/01/04 14:01:34 sam Exp $
+ * $Id: video.h,v 1.40 2002/01/05 02:22:03 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -173,6 +173,62 @@ typedef struct picture_heap_s
 #define Y_PIXELS     p[Y_PLANE].p_pixels
 #define U_PIXELS     p[U_PLANE].p_pixels
 #define V_PIXELS     p[V_PLANE].p_pixels
+
+static __inline__ int vout_ChromaCmp( u32 i_chroma, u32 i_amorhc )
+{
+    /* If they are the same, they are the same ! */
+    if( i_chroma == i_amorhc )
+    {
+        return 1;
+    }
+
+    /* Check for equivalence classes */
+    switch( i_chroma )
+    {
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
+            switch( i_amorhc )
+            {
+                case FOURCC_I420:
+                case FOURCC_IYUV:
+                case FOURCC_YV12:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        case FOURCC_UYVY:
+        case FOURCC_UYNV:
+        case FOURCC_Y422:
+            switch( i_amorhc )
+            {
+                case FOURCC_UYVY:
+                case FOURCC_UYNV:
+                case FOURCC_Y422:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        case FOURCC_YUY2:
+        case FOURCC_YUNV:
+            switch( i_amorhc )
+            {
+                case FOURCC_YUY2:
+                case FOURCC_YUNV:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        default:
+            return 0;
+    }
+}
 
 /*****************************************************************************
  * vout_CopyPicture: copy a picture to another one

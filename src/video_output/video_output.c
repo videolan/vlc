@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.152 2002/01/04 14:01:35 sam Exp $
+ * $Id: video_output.c,v 1.153 2002/01/05 02:22:03 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -279,24 +279,26 @@ static int InitThread( vout_thread_t *p_vout )
     intf_WarnMsg( 1, "vout info: got %i direct buffer(s)", I_OUTPUTPICTURES );
 
     i_pgcd = ReduceHeight( p_vout->render.i_aspect );
-    intf_WarnMsg( 1, "vout info: picture in %ix%i, chroma 0x%.8x, "
+    intf_WarnMsg( 1, "vout info: picture in %ix%i, chroma 0x%.8x (%4.4s), "
                      "aspect ratio %i:%i",
                   p_vout->render.i_width, p_vout->render.i_height,
-                  p_vout->render.i_chroma, p_vout->render.i_aspect / i_pgcd,
+                  p_vout->render.i_chroma, (char*)&p_vout->render.i_chroma,
+                  p_vout->render.i_aspect / i_pgcd,
                   VOUT_ASPECT_FACTOR / i_pgcd );
 
     i_pgcd = ReduceHeight( p_vout->output.i_aspect );
-    intf_WarnMsg( 1, "vout info: picture out %ix%i, chroma 0x%.8x, "
+    intf_WarnMsg( 1, "vout info: picture out %ix%i, chroma 0x%.8x (%4.4s), "
                      "aspect ratio %i:%i",
                   p_vout->output.i_width, p_vout->output.i_height,
-                  p_vout->output.i_chroma, p_vout->output.i_aspect / i_pgcd,
+                  p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma,
+                  p_vout->output.i_aspect / i_pgcd,
                   VOUT_ASPECT_FACTOR / i_pgcd );
 
     /* Check whether we managed to create direct buffers similar to
      * the render buffers, ie same size, chroma and aspect ratio */
     if( ( p_vout->output.i_width == p_vout->render.i_width )
      && ( p_vout->output.i_height == p_vout->render.i_height )
-     && ( p_vout->output.i_chroma == p_vout->render.i_chroma )
+     && ( vout_ChromaCmp( p_vout->output.i_chroma, p_vout->render.i_chroma ) )
      && ( p_vout->output.i_aspect == p_vout->render.i_aspect ) )
     {
         /* Cool ! We have direct buffers, we can ask the decoder to
@@ -305,7 +307,7 @@ static int InitThread( vout_thread_t *p_vout )
          * for memcpy operations */
         p_vout->b_direct = 1;
 
-        intf_WarnMsg( 2, "vout info: mapping "
+        intf_WarnMsg( 2, "vout info: direct render, mapping "
                          "render pictures 0-%i to system pictures 1-%i",
                          VOUT_MAX_PICTURES - 2, VOUT_MAX_PICTURES - 1 );
 
@@ -351,7 +353,7 @@ static int InitThread( vout_thread_t *p_vout )
             return( 1 );
         }
 
-        intf_WarnMsg( 2, "vout info: mapping "
+        intf_WarnMsg( 2, "vout info: indirect render, mapping "
                          "render pictures %i-%i to system pictures %i-%i",
                          I_OUTPUTPICTURES - 1, VOUT_MAX_PICTURES - 2,
                          I_OUTPUTPICTURES, VOUT_MAX_PICTURES - 1 );

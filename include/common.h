@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.64 2002/01/04 14:01:34 sam Exp $
+ * $Id: common.h,v 1.65 2002/01/05 02:22:02 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -286,8 +286,6 @@ struct probedata_s;
  * byte orders other than little and big endians are not supported, but only
  * the VAX seems to have such exotic properties - note that these 'functions'
  * needs <netinet/in.h> or the local equivalent. */
-/* FIXME: hton64 should be declared as an extern inline function to avoid
- * border effects (see byteorder.h) */
 #if WORDS_BIGENDIAN
 #   define hton16      htons
 #   define hton32      htonl
@@ -298,7 +296,12 @@ struct probedata_s;
 #else
 #   define hton16      htons
 #   define hton32      htonl
-#   define hton64(i)   ( ((u64)(htonl((i) & 0xffffffff)) << 32) | htonl(((i) >> 32) & 0xffffffff ) )
+    static __inline__ u64 __hton64( u64 i )
+    {
+        return ((u64)(htonl((i) & 0xffffffff)) << 32)
+                | htonl(((i) >> 32) & 0xffffffff );
+    }
+#   define hton64(i)   __hton64( i )
 #   define ntoh16      ntohs
 #   define ntoh32      ntohl
 #   define ntoh64      hton64

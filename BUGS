@@ -1,5 +1,5 @@
 List of known vlc bugs
-$Id: BUGS,v 1.1 2002/01/04 14:01:33 sam Exp $
+$Id: BUGS,v 1.2 2002/01/05 02:22:02 sam Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -23,9 +23,17 @@ Input:
   * vlc:foo targets don't work anymore.
 
 
+Audio output:
+
+  * Audio output stutters on some audio cards. For instance kwyxz's SB
+  128 with an es1371 chip.
+
+
 Video output:
 
   * We don't render subtitles on RGB surfaces.
+
+  * Subtitle colors are just plain wrong.
 
   * The DirectX video output plugin is broken because of vout4.
 
