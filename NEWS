@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.76 2003/11/23 16:02:56 zorglub Exp $
+$Id: NEWS,v 1.77 2003/12/13 11:22:15 gbazin Exp $
 
 Changes between 0.6.2 and 0.7.0:
 ---------------------------------
@@ -26,13 +26,14 @@ Input:
  * Reworked DVB tuning.
  * Better Icecast support.
  * New MPEG video elementary streams demuxer.
+ * New DTS audio elementary streams demuxer.
 
 Codecs:
  * Support for Theora video encoding.
  * Support for Speex audio decoding/encoding.
  * Rewrite of the Flac decoder + encoding support.
  * Support for MPEG2 422 decoding which was recently added to libmpeg2 (cvs).
- * Support for AAC + SBR.
+ * Support for AAC + SBR and proper multi-channel re-ordering.
  * MPEG 2.5 audio support.
  * Removed deprecated decoders (a52_old, mpeg_video and mpeg_audio).
 
@@ -86,12 +87,14 @@ Mac OS X port:
  * Mozilla plugin for Mac OS X (experimental).
 
 Win32 port:
- * New DirectShow input module (for video acquisition cards, webcams...).
+ * New DirectShow input module (for video acquisition cards, webcams, PVRs...).
  * VLC can be installed as a Windows NT service.
  * Allow on the fly switching of the main interface.
  * Support for 3F2R in audio output.
  * New --one-instance option to "force" only one running instance of VLC.
  * Mozilla plugin for Windows (experimental).
+ * Multimonitor support (untested).
+ * Fixed nasty timing bug on some dual-cpu / P4 with hyperthreading systems.
 
 Linux port:
  * Improved Video4Linux input. Also added support for an audio only input.
