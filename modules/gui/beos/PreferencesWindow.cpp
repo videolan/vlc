@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.7 2003/01/16 15:26:23 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.8 2003/01/17 18:19:43 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -75,13 +75,9 @@ PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
     rect = fGeneralView->Bounds();
     rect.InsetBy( 10, 10 );
     rect.bottom = rect.top + 10;
-    fOldDvdCheck = new BCheckBox( rect, "olddvd", "Do not use DVD menus",
-                                  new BMessage( OLDDVD_CHECK ) );
-    fGeneralView->AddChild( fOldDvdCheck );
-    fprintf( stderr, "%s\n", config_GetPsz( p_intf, "access" ) );
-    if( config_GetPsz( p_intf, "access" ) &&
-        !strncmp( config_GetPsz( p_intf, "access" ), "dvdold,any", 10 ) )
-        fOldDvdCheck->SetValue( 1 );
+    fDvdOldCheck = new BCheckBox( rect, "dvdold", "Do not use DVD menus",
+                                  new BMessage( DVDOLD_CHECK ) );
+    fGeneralView->AddChild( fDvdOldCheck );
     
     rect.top = rect.bottom + 20;
     rect.bottom = rect.top + 30;
@@ -177,7 +173,7 @@ void PreferencesWindow::MessageReceived( BMessage * p_message )
 {
 	switch ( p_message->what )
 	{
-	    case OLDDVD_CHECK:
+	    case DVDOLD_CHECK:
 	    case SLIDER_UPDATE:
 	    {
 	        ApplyChanges();
@@ -221,7 +217,7 @@ void PreferencesWindow::ReallyQuit()
  *****************************************************************************/
 void PreferencesWindow::SetDefaults()
 {
-    fOldDvdCheck->SetValue( 0 );
+    fDvdOldCheck->SetValue( 0 );
     fPpSlider->SetValue( 0 );
     fBrightnessSlider->SetValue( 100 );
     fContrastSlider->SetValue( 100 );
@@ -234,10 +230,10 @@ void PreferencesWindow::SetDefaults()
  *****************************************************************************/
 void PreferencesWindow::ApplyChanges()
 {
-    if( fOldDvdCheck->Value() )
-        config_PutPsz( p_intf, "access", "dvdold,any" );
+    if( fDvdOldCheck->Value() )
+        p_intf->p_sys->b_dvdold = true;
     else
-        config_PutPsz( p_intf, "access", NULL );
+        p_intf->p_sys->b_dvdold = false;
     
     config_PutInt( p_intf, "ffmpeg-pp-q", fPpSlider->Value() );
     config_PutFloat( p_intf, "brightness",
