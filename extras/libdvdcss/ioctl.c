@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.4 2001/07/19 11:50:50 massiot Exp $
+ * $Id: ioctl.c,v 1.5 2001/07/25 00:23:40 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -115,9 +115,6 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
     *pi_copyright = p_buffer[ 4 ];
 
 #elif defined( SYS_DARWIN )
-    _dvd_error( dvdcss, "DVD ioctls not fully functional yet, "
-                           "assuming disc is encrypted" );
-
     *pi_copyright = 1;
 
     i_ret = 0;
@@ -241,9 +238,6 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
     memcpy( p_key, p_buffer + 4, 2048 );
 
 #elif defined( SYS_DARWIN )
-    _dvd_error( dvdcss, "DVD ioctls not fully functional yet, "
-                           "sending an empty key" );
-
     i_ret = 0;
 
     memset( p_key, 0x00, 2048 );

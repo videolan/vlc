@@ -2,7 +2,7 @@
  * private.h: private DVD reading library data
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.h,v 1.4 2001/07/11 02:01:03 sam Exp $
+ * $Id: libdvdcss.h,v 1.5 2001/07/25 00:23:40 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -39,7 +39,7 @@ struct dvdcss_s
     /* Decryption stuff */
     css_t        css;
     boolean_t    b_encrypted;
-    title_key_t *p_keys;
+    dvd_title_t *p_titles;
 
     /* Error management */
     char     *psz_error;
