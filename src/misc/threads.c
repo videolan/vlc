@@ -587,10 +587,12 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
             i_priority = 0;
         }
     }
+#ifndef SYS_DARWIN
     else
     {
         i_priority = 0;
     }
+#endif
 
 #elif defined( HAVE_CTHREADS_H )
     p_this->thread_id = cthread_fork( (cthread_fn_t)func, (any_t)p_data );

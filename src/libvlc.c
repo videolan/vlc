@@ -211,7 +211,6 @@ int VLC_Create( void )
         return VLC_EGENERIC;
     }
     p_vlc->thread_id = 0;
-    vlc_thread_set_priority( p_vlc, VLC_THREAD_PRIORITY_LOW );
 
     p_vlc->psz_object_name = "root";
 
@@ -219,6 +218,7 @@ int VLC_Create( void )
     vlc_mutex_init( p_vlc, &p_vlc->config_lock );
 #ifdef SYS_DARWIN
     vlc_mutex_init( p_vlc, &p_vlc->quicktime_lock );
+    vlc_thread_set_priority( p_vlc, VLC_THREAD_PRIORITY_LOW );
 #endif
 
     /* Store our newly allocated structure in the global list */
