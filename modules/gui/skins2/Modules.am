@@ -7,6 +7,8 @@ SOURCES_skins2 = \
 	commands/cmd_change_skin.cpp \
 	commands/cmd_change_skin.hpp \
 	commands/cmd_dialogs.hpp \
+	commands/cmd_fullscreen.cpp \
+	commands/cmd_fullscreen.hpp \
 	commands/cmd_input.cpp \
 	commands/cmd_input.hpp \
 	commands/cmd_layout.cpp \

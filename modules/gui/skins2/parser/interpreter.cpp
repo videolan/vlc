@@ -2,7 +2,7 @@
  * interpreter.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: interpreter.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: interpreter.cpp,v 1.2 2004/01/05 22:17:32 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -29,6 +29,7 @@
 #include "../commands/cmd_layout.hpp"
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_input.hpp"
+#include "../commands/cmd_fullscreen.hpp"
 #include "../src/theme.hpp"
 #include "../src/vlcproc.hpp"
 #include "../vars/playlist.hpp"
@@ -106,6 +107,10 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
     else if( rAction == "playlist.sort()" )
     {
         pCommand = new CmdPlaylistSort( getIntf() );
+    }
+    else if( rAction == "vlc.fullscreen()" )
+    {
+        pCommand = new CmdFullscreen( getIntf() );
     }
     else if( rAction == "vlc.quit()" )
     {

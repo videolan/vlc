@@ -2,7 +2,7 @@
  * cmd_dummy.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_dummy.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: cmd_dummy.hpp,v 1.2 2004/01/05 22:17:32 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -29,17 +29,8 @@
 
 
 /// Dummy command
-class CmdDummy: public CmdGeneric
-{
-    public:
-        CmdDummy( intf_thread_t *pIntf ): CmdGeneric( pIntf ) {}
-        virtual ~CmdDummy() {}
+DEFINE_COMMAND( Dummy, "dummy" )
 
-        /// This method does the real job of the command
-        virtual void execute() {}
-
-        /// Return the type of the command
-        virtual string getType() const { return "dummy"; }
-};
+void CmdDummy::execute() {}
 
 #endif

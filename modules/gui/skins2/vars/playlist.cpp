@@ -2,7 +2,7 @@
  * playlist.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.5 2004/01/05 20:02:21 gbazin Exp $
+ * $Id: playlist.cpp,v 1.6 2004/01/05 22:17:32 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -65,13 +65,6 @@ Playlist::~Playlist()
         iconv_close( iconvHandle );
     }
 #endif
-}
-
-
-void Playlist::add( const UStringPtr &rcString )
-{
-    VarList::add( rcString );
-    //XXX
 }
 
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * playlist.hpp
+ * cmd_fullscreen.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.hpp,v 1.3 2004/01/05 22:17:32 asmax Exp $
+ * $Id: cmd_fullscreen.cpp,v 1.1 2004/01/05 22:17:32 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -22,44 +22,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef PLAYLIST_HPP
-#define PLAYLIST_HPP
+#include "cmd_fullscreen.hpp"
+#include <vlc/vout.h>
 
-#include "../utils/var_list.hpp"
 
-#ifndef iconv_t
-#  define iconv_t libiconv_t
-   typedef void* iconv_t;
-#endif
-
-/// Variable for VLC playlist
-class Playlist: public VarList
+void CmdFullscreen::execute()
 {
-    public:
-        Playlist( intf_thread_t *pIntf );
-        virtual ~Playlist();
+    vout_thread_t *pVout;
 
-        /// Remove the selected elements from the list
-        virtual void delSelected();
+    if( getIntf()->p_sys->p_input == NULL )
+    {
+        return;
+    }
 
-        /// Execute the action associated to this item
-        virtual void action( Elem_t *pItem );
-
-        /// Function called to notify playlist changes
-        void onChange();
-
-    private:
-        /// VLC playlist object
-        playlist_t *m_pPlaylist;
-        /// Iconv handle
-        iconv_t iconvHandle;
-
-        /// Build the list from the VLC playlist
-        void buildList();
-
-        /// Convert a string to UTF8 from the current encoding
-        UString *convertName( const char *pName );
-};
-
-
-#endif
+    pVout = (vout_thread_t *)vlc_object_find( getIntf()->p_sys->p_input,
+                                              VLC_OBJECT_VOUT, FIND_CHILD );
+    if( pVout )
+    {
+        // Switch to fullscreen
+        pVout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+        vlc_object_release( pVout );
+    }
+}

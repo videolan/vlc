@@ -1,8 +1,8 @@
 /*****************************************************************************
- * playlist.hpp
+ * cmd_fullscreen.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.hpp,v 1.3 2004/01/05 22:17:32 asmax Exp $
+ * $Id: cmd_fullscreen.hpp,v 1.1 2004/01/05 22:17:32 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -22,44 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef PLAYLIST_HPP
-#define PLAYLIST_HPP
+#ifndef CMD_FULLSCREEN_HPP
+#define CMD_FULLSCREEN_HPP
 
-#include "../utils/var_list.hpp"
+#include "cmd_generic.hpp"
 
-#ifndef iconv_t
-#  define iconv_t libiconv_t
-   typedef void* iconv_t;
-#endif
 
-/// Variable for VLC playlist
-class Playlist: public VarList
-{
-    public:
-        Playlist( intf_thread_t *pIntf );
-        virtual ~Playlist();
-
-        /// Remove the selected elements from the list
-        virtual void delSelected();
-
-        /// Execute the action associated to this item
-        virtual void action( Elem_t *pItem );
-
-        /// Function called to notify playlist changes
-        void onChange();
-
-    private:
-        /// VLC playlist object
-        playlist_t *m_pPlaylist;
-        /// Iconv handle
-        iconv_t iconvHandle;
-
-        /// Build the list from the VLC playlist
-        void buildList();
-
-        /// Convert a string to UTF8 from the current encoding
-        UString *convertName( const char *pName );
-};
-
+/// Command to switch the vout to fullscreen
+DEFINE_COMMAND( Fullscreen, "fullscreen" )
 
 #endif
