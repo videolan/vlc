@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.43 2002/02/24 22:06:50 sam Exp $
+ * $Id: modules.h,v 1.44 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,10 +52,10 @@ static __inline__ char *GetCapabilityName( unsigned int i_capa )
 #define MODULE_CAPABILITY_INTF      1  /* Interface */
         "access",
 #define MODULE_CAPABILITY_ACCESS    2  /* Input */
-        "input",
-#define MODULE_CAPABILITY_INPUT     3  /* Input */
-        "decaps",
-#define MODULE_CAPABILITY_DECAPS    4  /* Decaps */
+        "demux",
+#define MODULE_CAPABILITY_DEMUX     3  /* Input */
+        "network",
+#define MODULE_CAPABILITY_NETWORK   4  /* Network */
         "decoder",
 #define MODULE_CAPABILITY_DECODER   5  /* Audio or video decoder */
         "motion",
@@ -174,38 +174,33 @@ typedef struct function_list_s
             void ( * pf_run )  ( struct intf_thread_s * );
         } intf;
 
-        /* Input plugin */
+        /* Access plugin */
         struct
         {
-            int  ( * pf_probe )( struct input_thread_s * );
-            void ( * pf_init ) ( struct input_thread_s * );
-            void ( * pf_open ) ( struct input_thread_s * );
+            int  ( * pf_open ) ( struct input_thread_s * );
             void ( * pf_close )( struct input_thread_s * );
-            void ( * pf_end )  ( struct input_thread_s * );
-            void ( * pf_init_bit_stream ) ( struct bit_stream_s *,
-                                            struct decoder_fifo_s *,
-                      void (* pf_bitstream_callback)( struct bit_stream_s *,
-                                                      boolean_t ),
-                                           void * );
-
-            int  ( * pf_read ) ( struct input_thread_s *,
-                                 struct data_packet_s ** );
-            void ( * pf_demux )( struct input_thread_s *,
-                                 struct data_packet_s * );
-
-            struct data_packet_s * ( * pf_new_packet ) ( void *, size_t );
-            struct pes_packet_s *  ( * pf_new_pes )    ( void * );
-            void ( * pf_delete_packet )  ( void *, struct data_packet_s * );
-            void ( * pf_delete_pes )     ( void *, struct pes_packet_s * );
-
+            ssize_t ( * pf_read ) ( struct input_thread_s *, byte_t *, size_t );
+            void ( * pf_seek ) ( struct input_thread_s *, off_t );
             int  ( * pf_set_program ) ( struct input_thread_s *,
-                                     struct pgrm_descriptor_s * );
-
+                                        struct pgrm_descriptor_s * );
             int  ( * pf_set_area ) ( struct input_thread_s *,
                                      struct input_area_s * );
+        } access;
+
+        /* Demux plugin */
+        struct
+        {
+            int  ( * pf_init ) ( struct input_thread_s * );
+            void ( * pf_end )  ( struct input_thread_s * );
+            int  ( * pf_demux )( struct input_thread_s * );
             int  ( * pf_rewind )   ( struct input_thread_s * );
-            void ( * pf_seek )     ( struct input_thread_s *, off_t );
-        } input;
+        } demux;
+
+        /* Network plugin */
+        struct
+        {
+            int  ( * pf_open )( struct network_socket_s * );
+        } network;
 
         /* Audio output plugin */
         struct
@@ -312,8 +307,8 @@ typedef struct module_functions_s
     /* XXX: The order here has to be the same as above for the #defines */
     function_list_t intf;
     function_list_t access;
-    function_list_t input;
-    function_list_t decaps;
+    function_list_t demux;
+    function_list_t network;
     function_list_t dec;
     function_list_t motion;
     function_list_t idct;

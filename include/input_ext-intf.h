@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.60 2002/02/24 21:36:20 jobi Exp $
+ * $Id: input_ext-intf.h,v 1.61 2002/03/01 00:33:17 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -261,49 +261,45 @@ typedef struct input_thread_s
     vlc_thread_t            thread_id;            /* id for thread functions */
     int                     i_status;                         /* status flag */
 
-    /* Input module */
-    struct module_s *       p_input_module;
-
-    /* Init/End */
-    int                  (* pf_probe)( struct input_thread_s * );
-    void                 (* pf_init)( struct input_thread_s * );
-    void                 (* pf_open)( struct input_thread_s * );
+    /* Access module */
+    struct module_s *       p_access_module;
+    int                  (* pf_open)( struct input_thread_s * );
     void                 (* pf_close)( struct input_thread_s * );
-    void                 (* pf_end)( struct input_thread_s * );
-
-    /* Read & Demultiplex */
-    int                  (* pf_read)( struct input_thread_s *,
-                                      struct data_packet_s ** );
-    void                 (* pf_demux)( struct input_thread_s *,
-                                       struct data_packet_s * );
-
-    /* Packet management facilities */
-    struct data_packet_s *(*pf_new_packet)( void *, size_t );
-    struct pes_packet_s *(* pf_new_pes)( void * );
-    void                 (* pf_delete_packet)( void *,
-                                               struct data_packet_s * );
-    void                 (* pf_delete_pes)( void *, struct pes_packet_s * );
-
-    /* Stream control capabilities */
+    ssize_t              (* pf_read) ( struct input_thread_s *,
+                                       byte_t *, size_t );
     int                  (* pf_set_program)( struct input_thread_s *,
                                              struct pgrm_descriptor_s * );
     int                  (* pf_set_area)( struct input_thread_s *,
                                           struct input_area_s * );
+    void                 (* pf_seek)( struct input_thread_s *, off_t );
+    void *                  p_access_data;
+    size_t                  i_mtu;
+
+    /* Demux module */
+    struct module_s *       p_demux_module;
+    int                  (* pf_init)( struct input_thread_s * );
+    void                 (* pf_end)( struct input_thread_s * );
+    int                  (* pf_demux)( struct input_thread_s * );
     int                  (* pf_rewind)( struct input_thread_s * );
                                            /* NULL if we don't support going *
                                             * backwards (it's gonna be fun)  */
-    void                 (* pf_seek)( struct input_thread_s *, off_t );
+    void *                  p_demux_data;               /* data of the demux */
 
-    char *                  p_source;
-
-    int                     i_handle;           /* socket or file descriptor */
-    FILE *                  p_stream;                       /* if applicable */
-    void *                  p_handle;          /* if i_handle isn't suitable */
-    void *                  p_method_data;     /* data of the packet manager */
-    void *                  p_plugin_data;             /* data of the plugin */
+    /* Buffer manager */
+    struct input_buffers_s *p_method_data;     /* data of the packet manager */
+    struct data_buffer_s *  p_data_buffer;
+    byte_t *                p_current_data;
+    byte_t *                p_last_data;
+    size_t                  i_bufsize;
 
     /* General stream description */
-    stream_descriptor_t     stream;                            /* PAT tables */
+    stream_descriptor_t     stream;
+
+    /* Playlist item */
+    char *                  psz_source;
+    char *                  psz_access;
+    char *                  psz_demux;
+    char *                  psz_name;
 
     count_t                 c_loops;
 } input_thread_t;

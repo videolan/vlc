@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.36 2002/02/27 03:47:56 sam Exp $
+ * $Id: threads.h,v 1.37 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -37,6 +37,10 @@
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )  /* pthreads (like Linux & BSD) */
 #   include <pthread.h>
+#   ifdef DEBUG
+/* Needed for pthread_cond_timedwait */
+#       include <errno.h>
+#   endif
 /* This is not prototyped under Linux, though it exists. */
 int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 
@@ -716,15 +720,21 @@ static __inline__ int _vlc_cond_wait( char * psz_file, int i_line,
         timeout.tv_sec = now.tv_sec + THREAD_COND_TIMEOUT;
         timeout.tv_nsec = now.tv_usec * 1000;
 
-        if( (i_result = pthread_cond_timedwait( p_condvar, p_mutex, &timeout )) )
+        i_result = pthread_cond_timedwait( p_condvar, p_mutex, &timeout );
+
+        if( i_result == ETIMEDOUT )
         {
             intf_WarnMsg( 1, "thread %d warning: Possible deadlock detected in cond_wait at %s:%d (%s)",
                           pthread_self(), psz_file, i_line, strerror(i_result) );
+            continue;
         }
-        else
+
+        if( i_result )
         {
-            return i_result;
+            intf_ErrMsg( "thread %d error: cond_wait failed at %s:%d (%s)",
+                         pthread_self(), psz_file, i_line, strerror(i_result) );
         }
+        return( i_result );
     }
 #endif
 

@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.52 2002/01/21 23:57:46 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.53 2002/03/01 00:33:17 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -40,25 +40,21 @@
  *****************************************************************************
  * Describe a data packet.
  *****************************************************************************/
-#define DATA_PACKET                                                         \
-    /* start of the PS or TS packet */                                      \
-    byte_t *                p_demux_start;                                  \
-    /* start of the PES payload in this packet */                           \
-    byte_t *                p_payload_start;                                \
-    byte_t *                p_payload_end; /* guess ? :-) */                \
-    /* is the packet messed up ? */                                         \
-    boolean_t               b_discard_payload;
-
 typedef struct data_packet_s
 {
     /* Used to chain the packets that carry data for a same PES or PSI */
     struct data_packet_s *  p_next;
 
-    DATA_PACKET
+    /* start of the PS or TS packet */
+    byte_t *                p_demux_start;
+    /* start of the PES payload in this packet */
+    byte_t *                p_payload_start;
+    byte_t *                p_payload_end; /* guess ? :-) */
+    /* is the packet messed up ? */
+    boolean_t               b_discard_payload;
 
-    /* Please note that at least one buffer allocator (in particular, the
-     * Next Generation Buffer Allocator) extends this structure with
-     * private data after DATA_PACKET. */
+    /* pointer to the real data */
+    struct data_buffer_s *  p_buffer;
 } data_packet_t;
 
 /*****************************************************************************
@@ -113,10 +109,8 @@ typedef struct decoder_fifo_s
     /* Communication interface between input and decoders */
     boolean_t               b_die;          /* the decoder should return now */
     boolean_t               b_error;      /* the decoder is in an error loop */
-    void *                  p_packets_mgt;   /* packets management services
-                                              * data (netlist...)            */
-    void                 (* pf_delete_pes)( void *, pes_packet_t * );
-                                     /* function to use when releasing a PES */
+    struct input_buffers_s *p_packets_mgt;   /* packets management services
+                                              * data */
 } decoder_fifo_t;
 
 /*****************************************************************************

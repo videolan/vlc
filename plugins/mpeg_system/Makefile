@@ -1,3 +1,3 @@
-mpeg_es_SOURCES = mpeg_es.c input_es.c
-mpeg_ps_SOURCES = mpeg_ps.c input_ps.c
-mpeg_ts_SOURCES = mpeg_ts.c input_ts.c
+mpeg_es_SOURCES = mpeg_es.c
+mpeg_ps_SOURCES = mpeg_ps.c
+mpeg_ts_SOURCES = mpeg_ts.c

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.79 2002/02/27 03:47:56 sam Exp $
+ * $Id: common.h,v 1.80 2002/03/01 00:33:17 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -171,6 +171,8 @@ struct pgrm_descriptor_s;
 struct pes_packet_s;
 struct input_area_s;
 struct bit_stream_s;
+struct input_buffers_s;
+struct network_socket_s;
 struct intf_subscription_s;
 
 /*****************************************************************************
@@ -537,10 +539,31 @@ typedef struct module_symbols_s
                                       struct data_packet_s *,
                                       struct es_descriptor_s *, 
                                       boolean_t, boolean_t );
-
     int ( * input_ClockManageControl )   ( struct input_thread_s *,
                                            struct pgrm_descriptor_s *,
                                            mtime_t );
+    void ( * input_FDSeek )         ( struct input_thread_s *, off_t );
+    void ( * input_FDClose )        ( struct input_thread_s * );
+    ssize_t ( * input_FDRead )          ( struct input_thread_s *, byte_t *,
+                                      size_t );
+    ssize_t ( * input_FDNetworkRead )   ( struct input_thread_s *, byte_t *,
+                                      size_t );
+    void * ( * input_BuffersInit )( void );
+    void ( * input_BuffersEnd )( struct input_buffers_s * );
+    struct data_buffer_s * ( * input_NewBuffer )( struct input_buffers_s *, size_t );
+    void ( * input_ReleaseBuffer )( struct input_buffers_s *, struct data_buffer_s * );
+    struct data_packet_s * ( * input_ShareBuffer )( struct input_buffers_s *,
+                                              struct data_buffer_s * );
+    struct data_packet_s * ( * input_NewPacket )( struct input_buffers_s *, size_t );
+    void ( * input_DeletePacket )( struct input_buffers_s *, struct data_packet_s * );
+    struct pes_packet_s * ( * input_NewPES )( struct input_buffers_s * );
+    void ( * input_DeletePES )( struct input_buffers_s *, struct pes_packet_s * );
+    ssize_t ( * input_FillBuffer )( struct input_thread_s * );
+    ssize_t ( * input_Peek )( struct input_thread_s *, byte_t **, size_t );
+    ssize_t ( * input_SplitBuffer )( struct input_thread_s *, struct data_packet_s **, size_t );
+    int ( * input_AccessInit )( struct input_thread_s * );
+    void ( * input_AccessReinit )( struct input_thread_s * );
+    void ( * input_AccessEnd )( struct input_thread_s * );
 
     struct aout_fifo_s * ( * aout_CreateFifo ) ( int, int, int, int, void * );
     void ( * aout_DestroyFifo )     ( struct aout_fifo_s * );

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.43 2002/02/19 00:50:19 sam Exp $
+ * $Id: video.h,v 1.44 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -83,11 +83,6 @@ typedef struct picture_s
     boolean_t       b_progressive;            /* is it a progressive frame ? */
     boolean_t       b_repeat_first_field;                         /* RFF bit */
     boolean_t       b_top_field_first;               /* which field is first */
-
-    /* Macroblock counter - the decoder uses it to verify if it has
-     * decoded all the macroblocks of the picture */
-    int             i_deccount;
-    vlc_mutex_t     lock_deccount;
 
     /* Private data - the video output plugin might want to put stuff here to
      * keep track of the picture */

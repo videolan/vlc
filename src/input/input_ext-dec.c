@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.29 2002/01/21 23:57:46 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.30 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -96,7 +96,7 @@ void DecoderError( decoder_fifo_t * p_fifo )
     while (!p_fifo->b_die)
     {
         /* Trash all received PES packets */
-        p_fifo->pf_delete_pes( p_fifo->p_packets_mgt, p_fifo->p_first );
+        input_DeletePES( p_fifo->p_packets_mgt, p_fifo->p_first );
         p_fifo->p_first = NULL;
         p_fifo->pp_last = &p_fifo->p_first;
 
@@ -132,8 +132,7 @@ static __inline__ boolean_t _NextDataPacket( decoder_fifo_t * p_fifo,
             /* Free the previous PES packet. */
             p_next = p_fifo->p_first->p_next;
             p_fifo->p_first->p_next = NULL;
-            p_fifo->pf_delete_pes( p_fifo->p_packets_mgt,
-                                   p_fifo->p_first );
+            input_DeletePES( p_fifo->p_packets_mgt, p_fifo->p_first );
             p_fifo->p_first = p_next;
             p_fifo->i_depth--;
 

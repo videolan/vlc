@@ -15,6 +15,7 @@ endif
 #
 PLUGINS_DIR :=	ac3_adec \
 		ac3_spdif \
+		access \
 		alsa \
 		arts \
 		beos \
@@ -57,6 +58,9 @@ PLUGINS_DIR :=	ac3_adec \
 
 PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		ac3_spdif/ac3_spdif \
+		access/file \
+		access/udp \
+		access/http \
 		alsa/alsa \
 		arts/arts \
 		beos/beos \
@@ -119,6 +123,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		mpeg_system/mpeg_ts \
 		mpeg_adec/mpeg_adec \
 		mpeg_vdec/mpeg_vdec \
+		network/ipv4 \
 		qnx/qnx \
 		qt/qt \
 		sdl/sdl \
@@ -136,7 +141,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 # C Objects
 # 
 INTERFACE := main interface intf_msg intf_playlist intf_eject
-INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_clock mpeg_system
+INPUT := input input_ext-plugins input_ext-dec input_ext-intf input_dec input_programs input_clock mpeg_system
 VIDEO_OUTPUT := video_output video_text vout_pictures vout_subpictures
 AUDIO_OUTPUT := audio_output aout_ext-dec aout_pcm aout_spdif
 MISC := mtime modules configuration netutils iso_lang

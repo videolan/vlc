@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.54 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: modules.c,v 1.55 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -385,9 +385,19 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
         /* Test the requested capability */
         switch( i_capability )
         {
-            case MODULE_CAPABILITY_INPUT:
-                i_ret = p_first->p_module->p_functions->input.functions.
-                              input.pf_probe( (input_thread_t *)p_data );
+            case MODULE_CAPABILITY_ACCESS:
+                i_ret = p_first->p_module->p_functions->access.functions.
+                              access.pf_open( (struct input_thread_s *)p_data );
+                break;
+
+            case MODULE_CAPABILITY_DEMUX:
+                i_ret = p_first->p_module->p_functions->demux.functions.
+                              demux.pf_init( (struct input_thread_s *)p_data );
+                break;
+
+            case MODULE_CAPABILITY_NETWORK:
+                i_ret = p_first->p_module->p_functions->network.functions.
+                              network.pf_open( (struct network_socket_s *)p_data );
                 break;
 
             case MODULE_CAPABILITY_DECODER:
@@ -397,22 +407,22 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
 
             case MODULE_CAPABILITY_INTF:
                 i_ret = p_first->p_module->p_functions->intf.functions.
-                              intf.pf_open( (intf_thread_t *)p_data );
+                              intf.pf_open( (struct intf_thread_s *)p_data );
                 break;
 
             case MODULE_CAPABILITY_AOUT:
                 i_ret = p_first->p_module->p_functions->aout.functions.
-                              aout.pf_open( (aout_thread_t *)p_data );
+                              aout.pf_open( (struct aout_thread_s *)p_data );
                 break;
 
             case MODULE_CAPABILITY_VOUT:
                 i_ret = p_first->p_module->p_functions->vout.functions.
-                              vout.pf_create( (vout_thread_t *)p_data );
+                              vout.pf_create( (struct vout_thread_s *)p_data );
                 break;
 
             case MODULE_CAPABILITY_CHROMA:
                 i_ret = p_first->p_module->p_functions->chroma.functions.
-                              chroma.pf_init( (vout_thread_t *)p_data );
+                              chroma.pf_init( (struct vout_thread_s *)p_data );
                 break;
 
             case MODULE_CAPABILITY_IDCT:

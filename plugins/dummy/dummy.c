@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.16 2002/02/27 03:47:56 sam Exp $
+ * $Id: dummy.c,v 1.17 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -32,7 +32,8 @@
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void _M( input_getfunctions ) ( function_list_t * p_function_list );
+void _M( access_getfunctions ) ( function_list_t * p_function_list );
+void _M( demux_getfunctions ) ( function_list_t * p_function_list );
 void _M( aout_getfunctions )  ( function_list_t * p_function_list );
 void _M( vout_getfunctions )  ( function_list_t * p_function_list );
 void _M( intf_getfunctions )  ( function_list_t * p_function_list );
@@ -48,17 +49,19 @@ MODULE_INIT_START
     SET_DESCRIPTION( "dummy functions module" )
     /* Capability score set to 0 because we don't want to be spawned
      * unless explicitly requested to */
-    ADD_CAPABILITY( AOUT, 1 )
-    ADD_CAPABILITY( VOUT, 1 )
-    ADD_CAPABILITY( INTF, 1 )
-    /* This one is ok. */
-    ADD_CAPABILITY( INPUT, 100 )
+    ADD_CAPABILITY( AOUT, 0 )
+    ADD_CAPABILITY( VOUT, 0 )
+    ADD_CAPABILITY( INTF, 0 )
+    ADD_CAPABILITY( ACCESS, 0 )
+    ADD_CAPABILITY( DEMUX, 0 )
     ADD_SHORTCUT( "dummy" )
+    ADD_SHORTCUT( "vlc" )
 MODULE_INIT_STOP
 
 
 MODULE_ACTIVATE_START
-    _M( input_getfunctions )( &p_module->p_functions->input );
+    _M( access_getfunctions )( &p_module->p_functions->access );
+    _M( demux_getfunctions )( &p_module->p_functions->demux );
     _M( aout_getfunctions )( &p_module->p_functions->aout );
     _M( vout_getfunctions )( &p_module->p_functions->vout );
     _M( intf_getfunctions )( &p_module->p_functions->intf );

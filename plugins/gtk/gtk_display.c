@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.15 2002/02/24 21:36:20 jobi Exp $
+ * $Id: gtk_display.c,v 1.16 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -131,7 +131,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
                             p_intf->p_sys->p_window ),
                             "label_status" );
                 gtk_label_set_text( GTK_LABEL( p_label ),
-                                    p_input_bank->pp_input[0]->p_source );
+                                    p_input_bank->pp_input[0]->psz_source );
                 break;
             case INPUT_METHOD_DISC:
 //intf_WarnMsg( 2, "intf info: disc method" );
@@ -144,7 +144,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
                             p_intf->p_sys->p_window ),
                             "network_address_label" );
                 gtk_label_set_text( GTK_LABEL( p_label ),
-                                    p_input_bank->pp_input[0]->p_source );
+                                    p_input_bank->pp_input[0]->psz_source );
                 p_channel = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
                            p_intf->p_sys->p_window ), "network_channel_box" ) );
                 if( config_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR ) )
@@ -164,7 +164,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
                             p_intf->p_sys->p_window ),
                             "label_status" );
                 gtk_label_set_text( GTK_LABEL( p_label ),
-                                    p_input_bank->pp_input[0]->p_source );
+                                    p_input_bank->pp_input[0]->psz_source );
                 break;
         }
     

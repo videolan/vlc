@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.12 2002/02/24 21:36:20 jobi Exp $
+ * $Id: modules_plugin.h,v 1.13 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -214,6 +214,25 @@ module_error( void )
     (p_symbols)->input_DemuxTS = input_DemuxTS; \
     (p_symbols)->input_DemuxPSI = input_DemuxPSI; \
     (p_symbols)->input_ClockManageControl = input_ClockManageControl; \
+    (p_symbols)->input_FDSeek = input_FDSeek; \
+    (p_symbols)->input_FDClose = input_FDClose; \
+    (p_symbols)->input_FDRead = input_FDRead; \
+    (p_symbols)->input_FDNetworkRead = input_FDNetworkRead; \
+    (p_symbols)->input_BuffersInit = input_BuffersInit; \
+    (p_symbols)->input_BuffersEnd = input_BuffersEnd; \
+    (p_symbols)->input_NewBuffer = input_NewBuffer; \
+    (p_symbols)->input_ReleaseBuffer = input_ReleaseBuffer; \
+    (p_symbols)->input_ShareBuffer = input_ShareBuffer; \
+    (p_symbols)->input_NewPacket = input_NewPacket; \
+    (p_symbols)->input_DeletePacket = input_DeletePacket; \
+    (p_symbols)->input_NewPES = input_NewPES; \
+    (p_symbols)->input_DeletePES = input_DeletePES; \
+    (p_symbols)->input_FillBuffer = input_FillBuffer; \
+    (p_symbols)->input_Peek = input_Peek; \
+    (p_symbols)->input_SplitBuffer = input_SplitBuffer; \
+    (p_symbols)->input_AccessInit = input_AccessInit; \
+    (p_symbols)->input_AccessReinit = input_AccessReinit; \
+    (p_symbols)->input_AccessEnd = input_AccessEnd; \
     (p_symbols)->aout_CreateFifo = aout_CreateFifo; \
     (p_symbols)->aout_DestroyFifo = aout_DestroyFifo; \
     (p_symbols)->vout_CreateThread = vout_CreateThread; \

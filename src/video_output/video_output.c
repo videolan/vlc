@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.162 2002/02/27 18:19:21 sam Exp $
+ * $Id: video_output.c,v 1.163 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -125,7 +125,6 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     {
         p_vout->p_picture[i_index].i_status = FREE_PICTURE;
         p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
-        vlc_mutex_init( &p_vout->p_picture[i_index].lock_deccount );
     }
 
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
@@ -641,7 +640,6 @@ static void EndThread( vout_thread_t *p_vout )
         {
             free( p_vout->p_picture[i_index].p_data );
         }
-        vlc_mutex_destroy( &p_vout->p_picture[i_index].lock_deccount );
     }
 
     /* Destroy all remaining subpictures */

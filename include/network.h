@@ -1,8 +1,8 @@
 /*****************************************************************************
- * input_es.h: thread structure of the ES plugin
+ * network.h: interface to communicate with network plug-ins
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: input_es.h,v 1.3 2001/12/27 03:47:09 massiot Exp $
+ * Copyright (C) 2002 VideoLAN
+ * $Id: network.h,v 1.1 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -21,6 +21,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define ES_PACKET_SIZE 2048
-#define ES_READ_ONCE 50
-#define MAX_PACKETS_IN_FIFO 50
+/*****************************************************************************
+ * network_socket_t: structure passed to a network plug-in to define the
+ *                   kind of socket we want
+ *****************************************************************************/
+typedef struct network_socket_s
+{
+    unsigned int i_type;
+
+    char * psz_bind_addr;
+    int i_bind_port;
+
+    char * psz_server_addr;
+    int i_server_port;
+
+    /* Return values */
+    int i_handle;
+    size_t i_mtu;
+} network_socket_t;
+
+/* Socket types */
+#define NETWORK_UDP 1
+#define NETWORK_TCP 2
+

@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.3 2001/12/31 04:53:33 sam Exp $
+ * $Id: mpeg_ts.c,v 1.4 2002/03/01 00:33:18 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *
@@ -24,15 +24,31 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 #include <videolan/vlc.h>
 
+#include "stream_control.h"
+#include "input_ext-intf.h"
+#include "input_ext-dec.h"
+#include "input_ext-plugins.h"
+
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Constants
  *****************************************************************************/
-void _M( input_getfunctions )( function_list_t * p_function_list );
+#define TS_READ_ONCE 200
+#define TS_PACKET_SIZE 188
+#define TS_SYNC_CODE 0x47
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static void input_getfunctions( function_list_t * p_function_list );
+static int  TSInit      ( struct input_thread_s * );
+static void TSEnd       ( struct input_thread_s * );
+static int  TSDemux     ( struct input_thread_s * );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -42,14 +58,170 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( "ISO 13818-1 MPEG Transport Stream input" )
-    ADD_CAPABILITY( INPUT, 150 )
+    ADD_CAPABILITY( DEMUX, 160 )
     ADD_SHORTCUT( "ts" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
-    _M( input_getfunctions )( &p_module->p_functions->input );
+    input_getfunctions( &p_module->p_functions->demux );
 MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+static void input_getfunctions( function_list_t * p_function_list )
+{
+#define input p_function_list->functions.demux
+    input.pf_init             = TSInit;
+    input.pf_end              = TSEnd;
+    input.pf_demux            = TSDemux;
+    input.pf_rewind           = NULL;
+#undef input
+}
+
+/*****************************************************************************
+ * TSInit: initializes TS structures
+ *****************************************************************************/
+static int TSInit( input_thread_t * p_input )
+{
+    es_descriptor_t     * p_pat_es;
+    es_ts_data_t        * p_demux_data;
+    stream_ts_data_t    * p_stream_data;
+    byte_t              * p_peek;
+
+    /* Initialize access plug-in structures. */
+    if( p_input->i_mtu == 0 )
+    {
+        /* Improve speed. */
+        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
+    }
+
+    /* Have a peep at the show. */
+    if( input_Peek( p_input, &p_peek, 1 ) < 1 )
+    {
+        intf_ErrMsg( "input error: cannot peek() (mpeg_ts)" );
+        return( -1 );
+    }
+
+    if( *p_peek != TS_SYNC_CODE )
+    {
+        if( p_input->psz_demux && strncmp( p_input->psz_demux, "ts", 3 ) )
+        {
+            /* User forced */
+            intf_ErrMsg( "input error: this doesn't seem like a TS stream, continuing" );
+        }
+        else
+        {
+            intf_WarnMsg( 2, "input: TS plug-in discarded (no sync)" );
+            return( -1 );
+        }
+    }
+
+    /* Adapt the bufsize for our only use. */
+    if( p_input->i_mtu != 0 )
+    {
+        /* Have minimum granularity to avoid bottlenecks at the input level. */
+        p_input->i_bufsize = (p_input->i_mtu / TS_PACKET_SIZE) * TS_PACKET_SIZE;
+    }
+
+    if( input_InitStream( p_input, sizeof( stream_ts_data_t ) ) == -1 )
+    {
+        return( -1 );
+    }
+
+    p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
+    p_stream_data->i_pat_version = PAT_UNINITIALIZED ;
+
+    /* We'll have to catch the PAT in order to continue
+     * Then the input will catch the PMT and then the others ES
+     * The PAT es is indepedent of any program. */
+    p_pat_es = input_AddES( p_input, NULL,
+                            0x00, sizeof( es_ts_data_t ) );
+    p_demux_data = (es_ts_data_t *)p_pat_es->p_demux_data;
+    p_demux_data->b_psi = 1;
+    p_demux_data->i_psi_type = PSI_IS_PAT;
+    p_demux_data->p_psi_section = malloc(sizeof(psi_section_t));
+    p_demux_data->p_psi_section->b_is_complete = 1;
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * TSEnd: frees unused data
+ *****************************************************************************/
+static void TSEnd( input_thread_t * p_input )
+{
+}
+
+/*****************************************************************************
+ * TSDemux: reads and demuxes data packets
+ *****************************************************************************
+ * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
+ * packets.
+ *****************************************************************************/
+#define PEEK( SIZE )                                                        \
+    i_error = input_Peek( p_input, &p_peek, SIZE );                         \
+    if( i_error == -1 )                                                     \
+    {                                                                       \
+        return( -1 );                                                       \
+    }                                                                       \
+    else if( i_error < SIZE )                                               \
+    {                                                                       \
+        /* EOF */                                                           \
+        return( 0 );                                                        \
+    }
+
+static int TSDemux( input_thread_t * p_input )
+{
+    int             i_read_once = (p_input->i_mtu ?
+                                   p_input->i_bufsize / TS_PACKET_SIZE :
+                                   TS_READ_ONCE);
+    int             i;
+
+    for( i = 0; i < i_read_once; i++ )
+    {
+        data_packet_t *     p_data;
+        ssize_t             i_read, i_error;
+        byte_t *            p_peek;
+
+        PEEK( 1 );
+
+        if( *p_peek != TS_SYNC_CODE )
+        {
+            intf_WarnMsg( 3, "input warning: garbage at input (%x)", *p_peek );
+
+            if( p_input->i_mtu )
+            {
+                /* Try to resync on next packet. */
+                PEEK( TS_PACKET_SIZE );
+                p_input->p_current_data += TS_PACKET_SIZE;
+            }
+            else
+            {
+                /* Move forward until we find 0x47 (and hope it's the good
+                 * one... FIXME) */
+                while( *p_peek != TS_SYNC_CODE )
+                {
+                    p_input->p_current_data++;
+                    PEEK( 1 );
+                }
+            }
+        }
+
+        i_read = input_SplitBuffer( p_input, &p_data, TS_PACKET_SIZE );
+
+        if( i_read <= 0 )
+        {
+            return( i_read );
+        }
+
+        input_DemuxTS( p_input, p_data );
+    }
+
+    return( i_read_once );
+}
 
