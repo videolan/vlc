@@ -4384,11 +4384,6 @@ AC_CONFIG_FILES([
 dnl Generate makefiles
 AC_OUTPUT
 
-# Cannot use AC_CONFIG_FILES([vlc-config]) as is automatically built,
-# not provided with the source
-${SHELL} ./config.status --file=vlc-config
-chmod 0755 vlc-config
-
 printf "
 vlc configuration
 --------------------
