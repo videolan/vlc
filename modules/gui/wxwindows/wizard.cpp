@@ -682,7 +682,8 @@ void wizInputPage::OnEnablePartial(wxCommandEvent& event)
 void wizInputPage::OnChoose(wxCommandEvent& event)
 {
     p_open_dialog = new OpenDialog( p_intf, this, -1, -1, OPEN_STREAM );
-    if(  p_open_dialog->ShowModal() == wxID_OK )
+    if(  p_open_dialog->ShowModal() == wxID_OK &&
+         !p_open_dialog->mrl.IsEmpty() )
     {
         mrl_text->SetValue(p_open_dialog->mrl[0] );
     }
@@ -1273,7 +1274,7 @@ void wizTranscodeExtraPage::OnWizardPageChanging( wxWizardEvent& event )
     }
     if( event.GetDirection() )
     {
-       p_parent->SetTranscodeOut( (char *)file_text->GetValue().mb_str());
+       p_parent->SetTranscodeOut( file_text->GetValue().mb_str());
     }
 }
 
@@ -1485,7 +1486,7 @@ void WizardDialog::SetStream( char *method, char *address )
     this->address = strdup( address );
 }
 
-void WizardDialog::SetTranscodeOut( char *address )
+void WizardDialog::SetTranscodeOut( const char *address )
 {
     this->address = strdup( address );
 }

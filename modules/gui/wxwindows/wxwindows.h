@@ -704,7 +704,7 @@ public:
     void SetTTL( int i_ttl );
     void SetPartial( int, int );
     void SetStream( char *method, char *address );
-    void SetTranscodeOut( char *address );
+    void SetTranscodeOut( const char *address );
     void SetAction( int i_action );
     int  GetAction();
     void SetSAP( bool b_enabled, const char *psz_name );
