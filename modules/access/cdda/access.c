@@ -667,6 +667,14 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
           add_format_str_info(t->artist);
       } else goto not_special;
       break;
+    case 'e':
+      if (p_cdda->i_cddb_enabled) {
+        cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
+                                            i_track-1);
+        if (t != NULL && t->ext_data != NULL)
+          add_format_str_info(t->ext_data);
+      } else goto not_special;
+      break;
 #endif
 
     case 'M':

@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.18 2004/02/14 17:36:05 gbazin Exp $
+ * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -73,9 +73,10 @@ int  E_(CDDBEnabledCB)( vlc_object_t *p_this, const char *psz_name,
 #define CDDB_TITLE_FMT_LONGTEXT N_( \
 "Format used in the GUI Playlist Title. Similar to the Unix date \n" \
 "Format specifiers that start with a percent sign. Specifiers are: \n" \
-"   %a : The artist\n" \
+"   %a : The artist (for the album)\n" \
 "   %A : The album information\n" \
 "   %C : Category\n" \
+"   %e : The extended data (for a track)\n" \
 "   %I : CDDB disk ID\n" \
 "   %G : Genre\n" \
 "   %M : The current MRL\n" \
