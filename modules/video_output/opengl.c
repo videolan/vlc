@@ -451,19 +451,6 @@ static int Manage( vout_thread_t *p_vout )
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-    float f_width, f_height;
-
-    /* glTexCoord works differently with GL_TEXTURE_2D and
-       GL_TEXTURE_RECTANGLE_EXT */
-#ifdef SYS_DARWIN
-    f_width = (float)p_vout->output.i_width;
-    f_height = (float)p_vout->output.i_height;
-#else
-    f_width = (float)p_vout->output.i_width / p_sys->i_tex_width;
-    f_height = (float)p_vout->output.i_height / p_sys->i_tex_height;
-#endif
-
-    glClear( GL_COLOR_BUFFER_BIT );
 
     /* On Win32/GLX, we do this the usual way:
        + Fill the buffer with new content,
@@ -483,14 +470,53 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
        time. */
 
 #ifdef SYS_DARWIN
-    glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
-#else
+    int i_new_index;
+    i_new_index = ( p_sys->i_index + 1 ) & 1;
 
+    /* Update the texture */
+    glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_new_index] );
+    glTexSubImage2D( VLCGL_TARGET, 0, 0, 0, p_sys->i_tex_width,
+                     p_sys->i_tex_height, VLCGL_FORMAT, VLCGL_TYPE,
+                     p_sys->pp_buffer[i_new_index] );
+
+    /* Bind to the previous texture for drawing */
+    glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
+
+    /* Switch buffers */
+    p_sys->i_index = i_new_index;
+    p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
+
+#else
     /* Update the texture */
     glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0,
                      p_vout->render.i_width, p_vout->render.i_height,
                      VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->pp_buffer[0] );
 #endif
+}
+
+/*****************************************************************************
+ * DisplayVideo: displays previously rendered output
+ *****************************************************************************/
+static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    vout_sys_t *p_sys = p_vout->p_sys;
+    float f_width, f_height;
+
+    /* glTexCoord works differently with GL_TEXTURE_2D and
+       GL_TEXTURE_RECTANGLE_EXT */
+#ifdef SYS_DARWIN
+    f_width = (float)p_vout->output.i_width;
+    f_height = (float)p_vout->output.i_height;
+#else
+    f_width = (float)p_vout->output.i_width / p_sys->i_tex_width;
+    f_height = (float)p_vout->output.i_height / p_sys->i_tex_height;
+#endif
+
+    /* Why drawing here and not in Render()? Because this way, the
+       OpenGL providers can call pf_display to force redraw. Currently,
+       the OS X provider uses it to get a smooth window resizing */
+
+    glClear( GL_COLOR_BUFFER_BIT );
 
     if( p_sys->i_effect == OPENGL_EFFECT_NONE )
     {
@@ -549,25 +575,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     glDisable( VLCGL_TARGET );
 
-#ifdef SYS_DARWIN
-    /* Switch buffers */
-    p_sys->i_index = ( p_sys->i_index + 1 ) & 1;
-    p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
-
-    /* Update the texture */
-    glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
-    glTexSubImage2D( VLCGL_TARGET, 0, 0, 0, p_sys->i_tex_width,
-                     p_sys->i_tex_height, VLCGL_FORMAT, VLCGL_TYPE,
-                     p_sys->pp_buffer[p_sys->i_index] );
-#endif
-}
-
-/*****************************************************************************
- * DisplayVideo: displays previously rendered output
- *****************************************************************************/
-static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    vout_sys_t *p_sys = p_vout->p_sys;
     p_sys->p_vout->pf_swap( p_sys->p_vout );
 }
 

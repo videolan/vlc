@@ -55,11 +55,12 @@
 
 struct vout_sys_t
 {
-    NSAutoreleasePool *o_pool;
-    VLCWindow * o_window;
-    VLCGLView * o_glview;
-    vlc_bool_t  b_saved_frame;
-    NSRect      s_frame;
+    NSAutoreleasePool * o_pool;
+    VLCWindow         * o_window;
+    VLCGLView         * o_glview;
+    vlc_bool_t          b_saved_frame;
+    NSRect              s_frame;
+    vlc_bool_t        * b_got_frame;
 };
 
 /*****************************************************************************
@@ -82,7 +83,6 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
  * - the green line is gone
  * - other problems?????
  */
-    return( 1 );
 
     if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
     {
@@ -176,6 +176,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     }
 
     /* Spawn window */
+    p_vout->p_sys->b_got_frame = VLC_FALSE;
     p_vout->p_sys->o_window = [[VLCWindow alloc] initWithVout: p_vout
                                                  frame: nil];
     
@@ -279,6 +280,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
 static void Swap( vout_thread_t * p_vout )
 {
+    p_vout->p_sys->b_got_frame = VLC_TRUE;
     [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
     if( [p_vout->p_sys->o_glview lockFocusIfCanDraw] )
     {
@@ -349,7 +351,21 @@ static void Swap( vout_thread_t * p_vout )
     }
     glViewport( ( bounds.size.width - x ) / 2,
                 ( bounds.size.height - y ) / 2, x, y );
-    glClear( GL_COLOR_BUFFER_BIT );
+
+    if( p_vout->p_sys->b_got_frame )
+    {
+        /* Ask the opengl module to redraw */
+        vout_thread_t * p_parent;
+        p_parent = (vout_thread_t *) p_vout->p_parent;
+        if( p_parent && p_parent->pf_display )
+        {
+            p_parent->pf_display( p_parent, NULL );
+        }
+    }
+    else
+    {
+        glClear( GL_COLOR_BUFFER_BIT );
+    }
 }
 
 - (void) drawRect: (NSRect) rect
