@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.31 2003/09/01 18:30:01 gbazin Exp $
+ * $Id: xcommon.c,v 1.32 2003/10/08 21:03:35 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -366,7 +366,7 @@ static int InitVideo( vout_thread_t *p_vout )
         case 24:
             p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4'); break;
         case 32:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4'); break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2'); break;
         default:
             msg_Err( p_vout, "unknown screen depth %i",
                      p_vout->p_sys->i_screen_depth );

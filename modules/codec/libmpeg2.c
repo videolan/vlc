@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.29 2003/10/01 22:40:39 hartman Exp $
+ * $Id: libmpeg2.c,v 1.30 2003/10/08 21:03:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -62,7 +62,6 @@ struct decoder_sys_t
     mtime_t          i_pts;
     mtime_t          i_previous_pts;
     mtime_t          i_current_pts;
-    mtime_t          i_period_remainder;
     int              i_current_rate;
     picture_t *      p_picture_to_destroy;
     vlc_bool_t       b_garbage_pic;
@@ -81,10 +80,10 @@ struct decoder_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  OpenDecoder  ( vlc_object_t * );
-static int  InitDecoder  ( decoder_t * );
-static int  RunDecoder   ( decoder_t *, block_t * );
-static int  EndDecoder   ( decoder_t * );
+static int OpenDecoder( vlc_object_t * );
+static int InitDecoder( decoder_t * );
+static int RunDecoder ( decoder_t *, block_t * );
+static int EndDecoder ( decoder_t * );
 
 static picture_t *GetNewPicture( decoder_t *, uint8_t ** );
 
@@ -107,8 +106,10 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('m','p','g','v') &&
         p_dec->p_fifo->i_fourcc != VLC_FOURCC('m','p','g','1') &&
-        p_dec->p_fifo->i_fourcc != VLC_FOURCC('P','I','M','1') && /* Pinnacle hardware-mpeg1 */
-        p_dec->p_fifo->i_fourcc != VLC_FOURCC('V','C','R','2') && /* ATI Video */
+        /* Pinnacle hardware-mpeg1 */
+        p_dec->p_fifo->i_fourcc != VLC_FOURCC('P','I','M','1') &&
+        /* ATI Video */
+        p_dec->p_fifo->i_fourcc != VLC_FOURCC('V','C','R','2') &&
         p_dec->p_fifo->i_fourcc != VLC_FOURCC('m','p','g','2') )
     {
         return VLC_EGENERIC;
@@ -144,7 +145,6 @@ static int InitDecoder( decoder_t *p_dec )
     p_dec->p_sys->i_pts      = mdate() + DEFAULT_PTS_DELAY;
     p_dec->p_sys->i_current_pts  = 0;
     p_dec->p_sys->i_previous_pts = 0;
-    p_dec->p_sys->i_period_remainder = 0;
     p_dec->p_sys->p_picture_to_destroy = NULL;
     p_dec->p_sys->b_garbage_pic = 0;
     p_dec->p_sys->b_slice_i  = 0;
@@ -565,28 +565,27 @@ static int EndDecoder( decoder_t * p_dec )
 static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-
     picture_t *p_pic;
+
     vlc_bool_t b_progressive = p_sys->p_info->current_picture != NULL ?
-        p_sys->p_info->current_picture->flags & PIC_FLAG_PROGRESSIVE_FRAME :
-        1;
+        p_sys->p_info->current_picture->flags & PIC_FLAG_PROGRESSIVE_FRAME : 1;
     vlc_bool_t b_top_field_first = p_sys->p_info->current_picture != NULL ?
-        p_sys->p_info->current_picture->flags & PIC_FLAG_TOP_FIELD_FIRST :
-        1;
+        p_sys->p_info->current_picture->flags & PIC_FLAG_TOP_FIELD_FIRST : 1;
     unsigned int i_nb_fields = p_sys->p_info->current_picture != NULL ?
         p_sys->p_info->current_picture->nb_fields : 2;
 
     /* Get a new picture */
-    while( !(p_pic = vout_CreatePicture( p_sys->p_vout,
-        b_progressive, b_top_field_first, i_nb_fields )) )
+    while( !( p_pic = vout_CreatePicture( p_sys->p_vout,
+              b_progressive, b_top_field_first, i_nb_fields ) ) )
     {
         if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
             break;
 
         msleep( VOUT_OUTMEM_SLEEP );
     }
-    if( p_pic == NULL )
-        return NULL;
+
+    if( p_pic == NULL ) return NULL;
+
     vout_LinkPicture( p_sys->p_vout, p_pic );
 
     pp_buf[0] = p_pic->p[0].p_pixels;

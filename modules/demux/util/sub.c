@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.26 2003/09/22 03:40:06 hartman Exp $
+ * $Id: sub.c,v 1.27 2003/10/08 21:03:36 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -247,10 +247,10 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     p_sub->subtitle = NULL;
     p_sub->p_input = p_input;
 
-    if( !psz_name )
+    if( !psz_name || !*psz_name )
     {
-        msg_Err( p_sub, "no subtitle file specified", psz_name );
-        free( psz_name );
+        msg_Err( p_sub, "no subtitle file specified" );
+        if( psz_name ) free( psz_name );
         return VLC_EGENERIC;
     }
     

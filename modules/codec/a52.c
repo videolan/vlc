@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.26 2003/10/01 18:32:13 gbazin Exp $
+ * $Id: a52.c,v 1.27 2003/10/08 21:03:36 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -36,10 +36,6 @@
 #include <vlc/input.h>
 #include <vlc/aout.h>
 #include <vlc/sout.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
 
 #include "vlc_block_helper.h"
 
