@@ -116,6 +116,14 @@ int screen_InitCapture( demux_t *p_demux )
     p_data->bmi.bmiHeader.biClrUsed = 0;
     p_data->bmi.bmiHeader.biClrImportant = 0;
 
+    if( i_chroma == VLC_FOURCC('R','V','2','4') )
+    {
+        /* This is in BGR format */
+        p_sys->fmt.video.i_bmask = 0x00ff0000;
+        p_sys->fmt.video.i_gmask = 0x0000ff00;
+        p_sys->fmt.video.i_rmask = 0x000000ff;
+    }
+
     var_Create( p_demux, "screen-fragment-size",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "screen-fragment-size", &val );
