@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.127 2003/12/24 12:38:04 gbazin Exp $
+ * $Id: libvlc.h,v 1.128 2004/01/06 03:59:48 rocky Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -296,12 +296,12 @@ static char *ppsz_language_text[] =
     "Give the default type of audio you want to use in a DVD. " \
     "(Developers only)")
 
-#define INPUT_CHAN_TEXT N_("Choose channel")
+#define INPUT_CHAN_TEXT N_("Choose audio channel")
 #define INPUT_CHAN_LONGTEXT N_( \
     "Give the stream number of the audio channel you want to use in a DVD " \
     "(from 1 to n).")
 
-#define INPUT_SUBT_TEXT N_("Choose subtitles track")
+#define INPUT_SUBT_TEXT N_("Choose subtitle track")
 #define INPUT_SUBT_LONGTEXT N_( \
     "Give the stream number of the subtitle channel you want to use " \
     "(from 1 to n).")
@@ -636,15 +636,18 @@ static char *ppsz_language_text[] =
 /*
  * Quick usage guide for the configuration options:
  *
- * add_category_hint( N_(text), N_(longtext) );
- * add_subcategory_hint( N_(text), N_(longtext) );
- * add_usage_hint( N_(text) );
- * add_string( option_name, value, p_callback, N_(text), N_(longtext) );
+ * add_category_hint( N_(text), N_(longtext), b_advanced_option );
+ * add_subcategory_hint( N_(text), N_(longtext), b_advanced_option );
+ * add_usage_hint( N_(text), b_advanced_option );
+ * add_string( option_name, value, p_callback, N_(text), N_(longtext),
+               b_advanced_option );
  * add_file( option_name, psz_value, p_callback, N_(text), N_(longtext) );
  * add_module( option_name, psz_value, i_capability, p_callback,
  *             N_(text), N_(longtext) );
- * add_integer( option_name, i_value, p_callback, N_(text), N_(longtext) );
- * add_bool( option_name, b_value, p_callback, N_(text), N_(longtext) );
+ * add_integer( option_name, i_value, p_callback, N_(text), N_(longtext),
+                b_advanced_option );
+ * add_bool( option_name, b_value, p_callback, N_(text), N_(longtext), 
+             b_advanced_option );
  */
 
 vlc_module_begin();
@@ -738,9 +741,9 @@ vlc_module_begin();
     add_integer( "audio-type", -1, NULL,
                  INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT, VLC_TRUE );
     add_integer( "audio-channel", -1, NULL,
-                 INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT, VLC_TRUE );
+                 INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT, VLC_FALSE );
     add_integer( "spu-channel", -1, NULL,
-                 INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT, VLC_TRUE );
+                 INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT, VLC_FALSE );
     add_bool( "sub-autodetect-file", VLC_TRUE, NULL,
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, VLC_FALSE );
     add_integer( "sub-autodetect-fuzzy", 3, NULL,
