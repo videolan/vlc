@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.22 2001/03/25 17:09:14 richards Exp $
+ * $Id: intf_beos.cpp,v 1.23 2001/04/09 04:15:30 stef Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -553,30 +553,19 @@ int LanguageMenu::GetChannels()
 		
 	for (i = 0; i < p_intf->p_input->stream.i_selected_es_number; i++)
 	{
-		if ((kind == 0) && p_intf->p_input->stream.pp_selected_es[i]->b_audio)
-		{
-			p_es = p_intf->p_input->stream.pp_selected_es[i];
-		}
-		else if ((kind == 1) && p_intf->p_input->stream.pp_selected_es[i]->b_spu)
+		if (kind ==
+			p_intf->p_input->stream.pp_selected_es[i]->i_cat)
 		{
 			p_es = p_intf->p_input->stream.pp_selected_es[i];
 		}
 	}		
 	for (i = 0; i < p_intf->p_input->stream.i_es_number; i++)
 	{
-		if (kind == 0) //audio
-		{
-			b_found = p_intf->p_input->stream.pp_es[i]->b_audio;
-		}
-		else
-		{
-			b_found = p_intf->p_input->stream.pp_es[i]->b_spu;
-		}
-		if (b_found)
+		if (kind == p_intf->p_input->stream.pp_es[i]->i_cat)
 		{
 			psz_name = p_intf->p_input->stream.pp_es[i]->psz_desc;
 			BMessage *msg;
-			if (kind == 0) //audio
+			if (kind == AUDIO_ES) //audio
 			{
 				msg = new BMessage(SELECT_CHANNEL);
 				msg->AddInt32("channel", i);
