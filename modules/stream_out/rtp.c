@@ -2,7 +2,7 @@
  * rtp.c: rtp stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: rtp.c,v 1.8 2004/01/25 14:34:25 gbazin Exp $
+ * $Id: rtp.c,v 1.9 2004/01/30 15:56:28 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -462,7 +462,7 @@ static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 
     for( i = 0; i < i_data; i++ )
     {
-        s[2*i+0] = hex[(p_data[i]>>8)&0xf];
+        s[2*i+0] = hex[(p_data[i]>>4)&0xf];
         s[2*i+1] = hex[(p_data[i]   )&0xf];
     }
     s[2*i_data] = '\0';
@@ -582,7 +582,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 id->psz_fmtp = malloc( 100 + 2 * p_fmt->i_extra );
                 sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
                 sprintf( id->psz_fmtp,
-                         "profile-level-id=3; config=%s", hexa );
+                         "profile-level-id=3;config=%s", hexa );
             }
             break;
         }
@@ -598,9 +598,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra );
             sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
             sprintf( id->psz_fmtp,
-                     "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
-                     "config=%s; SizeLength=13; IndexLength=3; "
-                     "IndexDeltaLength=3; Profile=1;", hexa );
+                     "streamtype=5;profile-level-id=15;mode=AAC-hbr;"
+                     "config=%s;SizeLength=13;IndexLength=3; "
+                     "IndexDeltaLength=3;Profile=1;", hexa );
             break;
         }
 
