@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.20 2003/05/07 12:23:06 gbazin Exp $
+ * $Id: wxwindows.h,v 1.21 2003/05/07 15:54:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -473,7 +473,7 @@ class Menu: public wxMenu
 public:
     /* Constructor */
     Menu( intf_thread_t *p_intf, Interface *p_main_interface, int i_count,
-          char **ppsz_names, int *pi_objects );
+          char **ppsz_names, int *pi_objects, int i_start_id );
     virtual ~Menu();
 
 private:
