@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.32 2003/03/30 18:14:35 gbazin Exp $
+ * $Id: http.c,v 1.33 2003/04/30 04:13:12 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -306,13 +306,22 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 #ifdef HAVE_ATOLL
             i_size = i_tell + atoll( psz_value );
 #else
+            int sign = 1;
             psz_parser = psz_value;
-            while( psz_parser[0] >= '0' && psz_parser[0] <= '9' )
+            
+            while( *psz_value == ' ' || *psz_value == '\t' )
+                psz_value++;
+
+            if( *psz_value == '-' )
+                sign = -1;
+            while( *psz_value != '\0')
             {
-                i_size *= 10;
-                i_size += psz_parser[0] - '0';
+                if( *psz_value >= '0' && *psz_value <= '9' )
+                    i_size = i_size * 10 + *psz_value++ - '0';
+                else
+                    psz_value++;
             }
-            i_size += i_tell;
+            i_size = i_tell + ( i_size * sign );
 #endif
             msg_Dbg( p_input, "stream size is "I64Fd, i_size );
 
