@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.h,v 1.9 2002/06/02 01:20:52 massiot Exp $
+ * $Id: intf_vlc_wrapper.h,v 1.10 2002/06/02 12:16:31 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -44,6 +44,7 @@
 - (void)playlistPrev;
 - (void)channelNext;
 - (void)channelPrev;
+- (void)loop;
 
 - (void)playSlower;
 - (void)playFaster;

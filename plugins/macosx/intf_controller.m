@@ -2,7 +2,7 @@
  * intf_controller.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.m,v 1.6 2002/06/02 01:20:52 massiot Exp $
+ * $Id: intf_controller.m,v 1.7 2002/06/02 12:16:31 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -175,6 +175,22 @@
     [o_intf channelNext];
 }
 
+- (IBAction)loop:(id)sender
+{
+    NSMenuItem * item = (NSMenuItem *)sender;
+
+    [o_intf loop];
+
+    if( p_main->p_intf->p_sys->b_loop )
+    {
+        [item setState:NSOnState];
+    }
+    else
+    {
+        [item setState:NSOffState];
+    }
+}
+
 - (IBAction)mute:(id)sender
 {
     NSMenuItem * item = (NSMenuItem *)sender;
@@ -227,6 +243,21 @@
 - (IBAction)quit:(id)sender
 {
     [o_intf quit];
+}
+
+- (BOOL)validateMenuItem:(id)sender
+{
+    NSMenuItem * o_item = (NSMenuItem *)sender;
+
+    if ( [o_item tag] == 12 || [o_item tag] == 13 )
+    {
+        if( !config_GetIntVariable( "network-channel" ) )
+        {
+            return NO;
+        }
+    }
+        
+    return YES;
 }
 
 @end

@@ -2,7 +2,7 @@
  * intf_controller.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.h,v 1.9 2002/06/02 01:20:52 massiot Exp $
+ * $Id: intf_controller.h,v 1.10 2002/06/02 12:16:31 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *
@@ -68,7 +68,7 @@
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification;
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename;
 
-/* Functions atteched to user interface */
+/* Functions attached to user interface */
 - (IBAction)pause:(id)sender;
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;
@@ -78,11 +78,14 @@
 - (IBAction)next:(id)sender;
 - (IBAction)prevChannel:(id)sender;
 - (IBAction)nextChannel:(id)sender;
+- (IBAction)loop:(id)sender;
 - (IBAction)mute:(id)sender;
 - (IBAction)fullscreen:(id)fullscreen;
 - (IBAction)eject:(id)sender;
 - (IBAction)maxvolume:(id)sender;
 - (IBAction)timesliderUpdate:(id)slider;
 - (IBAction)quit:(id)sender;
+
+- (BOOL)validateMenuItem:(id)sender;
 
 @end

@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.10 2002/06/02 01:20:52 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.11 2002/06/02 12:16:31 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -275,6 +275,23 @@ static Intf_VLCWrapper *o_intf = nil;
     vlc_mutex_unlock( &p_intf->change_lock );
 }
 
+- (void)loop
+{
+    intf_thread_t * p_intf = p_main->p_intf;
+
+    if ( p_intf->p_sys->b_loop )
+    {
+        intf_PlaylistDelete( p_main->p_playlist,
+                             p_main->p_playlist->i_size - 1 );
+    }
+    else
+    {
+        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, 
+                          "vlc:loop" );
+    }
+    p_intf->p_sys->b_loop = !p_intf->p_sys->b_loop;
+}
+
 - (void)playSlower
 {
     if( p_input_bank->pp_input[0] != NULL )
@@ -499,6 +516,13 @@ static Intf_VLCWrapper *o_intf = nil;
     NSString *o_file;
     int i_end = p_main->p_playlist->i_size;
     NSEnumerator *o_enum = [o_files objectEnumerator];
+    intf_thread_t * p_intf = p_main->p_intf;
+
+    if ( p_intf->p_sys->b_loop )
+    {
+        intf_PlaylistDelete( p_main->p_playlist,
+                             p_main->p_playlist->i_size - 1 );
+    }
 
     while( ( o_file = (NSString *)[o_enum nextObject] ) )
     {
@@ -513,15 +537,28 @@ static Intf_VLCWrapper *o_intf = nil;
     }
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+
+    if ( p_intf->p_sys->b_loop )
+    {
+        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, 
+                          "vlc:loop" );
+    }
 }
 
 - (void)openDisc:(NSString*)o_type device:(NSString*)o_device title:(int)i_title chapter:(int)i_chapter
 {
     NSString *o_source;
     int i_end = p_main->p_playlist->i_size;
+    intf_thread_t * p_intf = p_main->p_intf;
 
     o_source = [NSString stringWithFormat: @"%@:%@@%d,%d", 
                     o_type, o_device, i_title, i_chapter];
+
+    if ( p_intf->p_sys->b_loop )
+    {
+        intf_PlaylistDelete( p_main->p_playlist,
+                             p_main->p_playlist->i_size - 1 );
+    }
 
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END,
                       [o_source fileSystemRepresentation] );
@@ -533,12 +570,19 @@ static Intf_VLCWrapper *o_intf = nil;
     }
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+
+    if ( p_intf->p_sys->b_loop )
+    {
+        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, 
+                          "vlc:loop" );
+    }
 }
 
 - (void)openNet:(NSString*)o_protocol addr:(NSString*)o_addr port:(int)i_port baddr:(NSString*)o_baddr
 {
     NSString *o_source;
     int i_end = p_main->p_playlist->i_size;
+    intf_thread_t * p_intf = p_main->p_intf;
 
     if( p_input_bank->pp_input[0] != NULL )
     {
@@ -558,10 +602,22 @@ static Intf_VLCWrapper *o_intf = nil;
                         o_protocol, o_addr, i_port];
     }
 
+    if ( p_intf->p_sys->b_loop )
+    {
+        intf_PlaylistDelete( p_main->p_playlist,
+                             p_main->p_playlist->i_size - 1 );
+    }
+
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END,
                       [o_source fileSystemRepresentation] );
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+
+    if ( p_intf->p_sys->b_loop )
+    {
+        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, 
+                          "vlc:loop" );
+    }
 }
 
 - (void)openNetChannel:(NSString*)o_addr port:(int)i_port
@@ -737,8 +793,8 @@ static Intf_VLCWrapper *o_intf = nil;
     o_chapter_item = [[o_controls_item submenu] itemWithTitle: @"Chapter"]; 
     o_language_item = [[o_controls_item submenu] itemWithTitle: @"Language"]; 
     o_subtitle_item = [[o_controls_item submenu] itemWithTitle: @"Subtitles"]; 
-    o_next_channel_item = [[o_controls_item submenu] itemWithTag: 2]; 
-    o_prev_channel_item = [[o_controls_item submenu] itemWithTag: 1]; 
+    o_next_channel_item = [[o_controls_item submenu] itemWithTag: 13]; 
+    o_prev_channel_item = [[o_controls_item submenu] itemWithTag: 12]; 
 
     if( p_input == NULL )
     {
@@ -1006,17 +1062,6 @@ static Intf_VLCWrapper *o_intf = nil;
             [o_subtitle_item setEnabled: 0];
         }
         p_input->stream.b_changed = 0;
-    }
-
-    if( config_GetIntVariable( "network-channel" ) )
-    {
-        [o_next_channel_item setEnabled: 1];
-        [o_prev_channel_item setEnabled: 1];
-    }
-    else
-    {
-        [o_next_channel_item setEnabled: 0];
-        [o_prev_channel_item setEnabled: 0];
     }
 }
 
