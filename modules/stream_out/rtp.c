@@ -402,17 +402,36 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        /* create the SDP only once */
+        /* create the SDP for a muxed stream (only once) */
+        /* FIXME  http://www.faqs.org/rfcs/rfc2327.html
+           All text fields should be UTF-8 encoded. Use global a:charset to announce this.
+           o= - should be local username (no spaces allowed)
+           o= time should be hashed with some other value to garantue uniqueness
+           o= we need IP6 support?
+           o= don't use the localhost address. use fully qualified domain name or IP4 address
+           i= description of session (pass via vars?)
+           u= URI to more information on session (pass via vars?)
+           e= email address (pass via vars?) (multiple formats are supported)
+           p= international phone number (pass via vars?)
+           c= IP6 support
+           c= /ttl should only be added in case of multicast
+           t= missing (required)
+           a= tool param missing (highly recommended)
+           a= recvonly (missing)
+           a= type:broadcast (missing)
+           a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
+           a= x-plgroup: (missing)
+           RTP packets need to get the correct src IP address  */
         p_sys->psz_sdp =
             malloc( 200 + 20 + 10 + strlen( p_sys->psz_destination ) +
                     10 + 10 + 10 + 10 + strlen( psz_rtpmap ) );
         sprintf( p_sys->psz_sdp,
-                 "v=0\n"
-                 "o=- "I64Fd" %d IN IP4 127.0.0.1\n"
-                 "s=%s\n"
-                 "c=IN IP4 %s/%d\n"
-                 "m=video %d RTP/AVP %d\n"
-                 "a=rtpmap:%d %s\n",
+                 "v=0\r\n"
+                 "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n"
+                 "s=%s\r\n"
+                 "c=IN IP4 %s/%d\r\n"
+                 "m=video %d RTP/AVP %d\r\n"
+                 "a=rtpmap:%d %s\r\n",
                  p_sys->i_sdp_id, p_sys->i_sdp_version,
                  p_sys->psz_session_name,
                  p_sys->psz_destination, p_sys->i_ttl,
@@ -470,7 +489,7 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
-            msg_Warn( p_stream, "unknow protocol for SDP (%s)",
+            msg_Warn( p_stream, "unknown protocol for SDP (%s)",
                       url.psz_protocol );
         }
         vlc_UrlClean( &url );
@@ -545,6 +564,25 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * SDPGenerate
  *****************************************************************************/
+        /* FIXME  http://www.faqs.org/rfcs/rfc2327.html
+           All text fields should be UTF-8 encoded. Use global a:charset to announce this.
+           o= - should be local username (no spaces allowed)
+           o= time should be hashed with some other value to garantue uniqueness
+           o= we need IP6 support?
+           o= don't use the localhost address. use fully qualified domain name or IP4 address
+           i= description of session (pass via vars?)
+           u= URI to more information on session (pass via vars?)
+           e= email address (pass via vars?) (multiple formats are supported)
+           p= international phone number (pass via vars?)
+           c= IP6 support
+           c= /ttl should only be added in case of multicast
+           t= missing (required)
+           a= tool param missing (highly recommended)
+           a= recvonly (missing)
+           a= type:broadcast (missing)
+           a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
+           a= x-plgroup: (missing)
+           RTP packets need to get the correct src IP address  */
 static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bool_t b_rtsp )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -552,10 +590,10 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
     char *psz_sdp, *p;
     int i;
 
-    i_size = strlen( "v=0\n" ) +
-             strlen( "o=- * * IN IP4 127.0.0.1\n" ) +
-             strlen( "s=\n" ) +
-             strlen( "c=IN IP4 */*\n" ) +
+    i_size = strlen( "v=0\r\n" ) +
+             strlen( "o=- * * IN IP4 127.0.0.1\r\n" ) +
+             strlen( "s=\r\n" ) +
+             strlen( "c=IN IP4 */*\r\n" ) +
              strlen( psz_destination ? psz_destination : "0.0.0.0") +
              strlen( p_sys->psz_session_name ) +
              20 + 10 + 10 + 1;
@@ -563,27 +601,27 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
     {
         sout_stream_id_t *id = p_sys->es[i];
 
-        i_size += strlen( "m=**d*o * RTP/AVP *\n" ) + 10 + 10;
+        i_size += strlen( "m=**d*o * RTP/AVP *\r\n" ) + 10 + 10;
         if( id->psz_rtpmap )
         {
-            i_size += strlen( "a=rtpmap:* *\n" ) + strlen( id->psz_rtpmap )+10;
+            i_size += strlen( "a=rtpmap:* *\r\n" ) + strlen( id->psz_rtpmap )+10;
         }
         if( id->psz_fmtp )
         {
-            i_size += strlen( "a=fmtp:* *\n" ) + strlen( id->psz_fmtp ) + 10;
+            i_size += strlen( "a=fmtp:* *\r\n" ) + strlen( id->psz_fmtp ) + 10;
         }
         if( b_rtsp )
         {
-            i_size += strlen( "a=control:*/trackid=*\n" ) + strlen( p_sys->psz_rtsp_control ) + 10;
+            i_size += strlen( "a=control:*/trackid=*\r\n" ) + strlen( p_sys->psz_rtsp_control ) + 10;
         }
     }
 
     p = psz_sdp = malloc( i_size );
-    p += sprintf( p, "v=0\n" );
-    p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\n",
+    p += sprintf( p, "v=0\r\n" );
+    p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n",
                   p_sys->i_sdp_id, p_sys->i_sdp_version );
-    p += sprintf( p, "s=%s\n", p_sys->psz_session_name );
-    p += sprintf( p, "c=IN IP4 %s/%d\n", psz_destination ? psz_destination : "0.0.0.0",
+    p += sprintf( p, "s=%s\r\n", p_sys->psz_session_name );
+    p += sprintf( p, "c=IN IP4 %s/%d\r\n", psz_destination ? psz_destination : "0.0.0.0",
                   p_sys->i_ttl );
 
     for( i = 0; i < p_sys->i_es; i++ )
@@ -592,12 +630,12 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
 
         if( id->i_cat == AUDIO_ES )
         {
-            p += sprintf( p, "m=audio %d RTP/AVP %d\n",
+            p += sprintf( p, "m=audio %d RTP/AVP %d\r\n",
                           id->i_port, id->i_payload_type );
         }
         else if( id->i_cat == VIDEO_ES )
         {
-            p += sprintf( p, "m=video %d RTP/AVP %d\n",
+            p += sprintf( p, "m=video %d RTP/AVP %d\r\n",
                           id->i_port, id->i_payload_type );
         }
         else
@@ -606,17 +644,17 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
         }
         if( id->psz_rtpmap )
         {
-            p += sprintf( p, "a=rtpmap:%d %s\n", id->i_payload_type,
+            p += sprintf( p, "a=rtpmap:%d %s\r\n", id->i_payload_type,
                           id->psz_rtpmap );
         }
         if( id->psz_fmtp )
         {
-            p += sprintf( p, "a=fmtp:%d %s\n", id->i_payload_type,
+            p += sprintf( p, "a=fmtp:%d %s\r\n", id->i_payload_type,
                           id->psz_fmtp );
         }
         if( b_rtsp )
         {
-            p += sprintf( p, "a=control:%s/trackid=%d\n", p_sys->psz_rtsp_control, i );
+            p += sprintf( p, "a=control:%s/trackid=%d\r\n", p_sys->psz_rtsp_control, i );
         }
     }
 
