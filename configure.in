@@ -103,14 +103,19 @@ AC_HEADER_TIME
 dnl Checks for DVD ioctls
 AC_CHECK_HEADERS(sys/ioctl.h,
   [AC_CHECK_HEADERS(linux/cdrom.h)
-   AC_EGREP_HEADER(dvd,linux/cdrom.h,AC_DEFINE(LINUX_DVD,1,DVD support for linux))])
+   AC_EGREP_HEADER(dvd,linux/cdrom.h,[AC_DEFINE(LINUX_DVD,1,DVD support for linux)
+   DVD=1])])
 
 dnl default plugins 
-PLUGINS=${PLUGINS}"ps ts dvd yuv idct idctclassic motion "
+PLUGINS=${PLUGINS}"ps ts yuv idct idctclassic motion "
 if test x$host_os = xbeos; then
     ACCEL_PLUGINS="yuvmmx idctmmx motionmmx "
 else
     ACCEL_PLUGINS="yuvmmx idctmmx idctmmxext motionmmx motionmmxext "
+fi
+
+if test x$DVD = x1; then
+    PLUGINS=${PLUGINS}"dvd "
 fi
 
 ARCH=${host_cpu}
