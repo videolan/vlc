@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.21 2003/07/01 19:17:32 sam Exp $
+dnl $Id: configure.ac,v 1.22 2003/07/02 22:47:42 sam Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -91,6 +91,7 @@ case "${target_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
     AX_ADD_LDFLAGS([vlc ffmpeg],[-all_load])
+    AX_ADD_LDFLAGS([vlc],[-Wl,-multiply_defined,suppress])
     LIBEXT=".dylib"
     ;;
   *mingw32* | *cygwin*)
