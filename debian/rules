@@ -149,7 +149,7 @@ build-stamp: patch configure-stamp
 	  && sed 's/^CFLAGS *=/&-fPIC -DPIC /' <Makefile >Makefile.pic \
 	  && $(MAKE) -f Makefile.pic \
 	  && rm -f Makefile.pic \
-	  && ../libavformat \
+	  && cd ../libavformat \
 	  && $(MAKE) clean \
 	  && rm -f Makefile.pic \
 	  && sed 's/^CFLAGS *=/&-fPIC -DPIC /' <Makefile >Makefile.pic \
