@@ -292,6 +292,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     
     o_about = [[VLAboutBox alloc] init];
+    o_prefs = [[VLCPrefs alloc] init];
     
     return _o_sharedMainInstance;
 }

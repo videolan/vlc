@@ -38,28 +38,34 @@
  *****************************************************************************/
 @implementation VLCPrefs
 
+static VLCPrefs *_o_sharedMainInstance = nil;
+
++ (VLCPrefs *)sharedInstance
+{
+    return _o_sharedMainInstance ? _o_sharedMainInstance : [[self alloc] init];
+}
+
 - (id)init
 {
-    self = [super init];
-
-    if( self != nil )
-    {
-        o_empty_view = [[NSView alloc] init];
-        o_save_prefs = [[NSMutableDictionary alloc] init];
+    if( _o_sharedMainInstance) {
+        [self dealloc];
+    } else {
+        _o_sharedMainInstance = [super init];
     }
-
-    return( self );
+    
+    return _o_sharedMainInstance;
 }
 
-- (void)dealloc
+- (void)showPrefs
 {
-    [o_empty_view release];
-    [o_save_prefs release];
-    [super dealloc];
-}
+    /* load our nib */
+    [NSBundle loadNibNamed:@"Preferences" owner:self];
+    
+    /* from "init" > r8571 */
+    o_empty_view = [[NSView alloc] init];
+    o_save_prefs = [[NSMutableDictionary alloc] init];
 
-- (void)awakeFromNib
-{
+    /* from "awakeFromNib" > r8571 */
     p_intf = VLCIntf;
     b_advanced = config_GetInt( p_intf, "advanced" );
 
@@ -71,6 +77,14 @@
     [o_prefs_view setRulersVisible: NO];
     [o_prefs_view setDocumentView: o_empty_view];
     [o_tree selectRow:0 byExtendingSelection:NO];
+    /* end of the previous "awakeFromNib" method */
+
+    [o_save_prefs release];
+    o_save_prefs = [[NSMutableDictionary alloc] init];
+    [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
+        andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
+    [o_prefs_window center];
+    [o_prefs_window makeKeyAndOrderFront:self];
 }
 
 - (void)initStrings
@@ -80,16 +94,6 @@
     [o_cancel_btn setTitle: _NS("Cancel")];
     [o_reset_btn setTitle: _NS("Reset All")];
     [o_advanced_ckb setTitle: _NS("Advanced")];
-}
-
-- (void)showPrefs
-{
-    [o_save_prefs release];
-    o_save_prefs = [[NSMutableDictionary alloc] init];
-    [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
-        andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
-    [o_prefs_window center];
-    [o_prefs_window makeKeyAndOrderFront:self];
 }
 
 - (IBAction)savePrefs: (id)sender
