@@ -54,7 +54,7 @@
 
 #define BLOCKS_PER_READ_LONGTEXT N_( \
     "Allows you to specify how many CD blocks to get on a single CD read. " \
-    "Generally on newer/faster CD's, this increases throughput at the " \
+    "Generally on newer/faster CDs, this increases throughput at the " \
     "expense of a little more memory usage and initial delay. SCSI-MMC " \
     "limitations generally don't allow for more than 25 blocks per access.")
 
