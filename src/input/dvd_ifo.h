@@ -118,13 +118,13 @@ typedef struct pgc_s
  */
 
 /* Menu PGCI Language unit Descriptor */
-typedef struct pgci_lu_desc_s
+typedef struct pgci_lu_s
 {
     u16             i_lang_code;                // 2 bytes (ISO-xx)
 //    char            ???
     u8              i_existence_mask;           // 1 byte
     u32             i_lu_sbyte;                 // 4 bytes
-} pgci_lu_desc_t;
+} pgci_lu_t;
 
 typedef struct pgci_srp_s
 {
@@ -137,13 +137,13 @@ typedef struct pgci_srp_s
 
 /* Menu PGCI Language Unit Table 
  * - start at i_lu_sbyte */
-typedef struct pgci_lu_s
+typedef struct pgci_inf_s
 {
     u16             i_srp_nb;                   // 2 bytes
 //    char[2]         ???
     u32             i_lu_ebyte;                 // 4 bytes
     pgci_srp_t*     p_srp;                      // i_srp_nb * 8 bytes
-} pgci_lu_t;
+} pgci_inf_t;
 
 /* Main Struct for Menu PGCI
  * - start at i_*_pgci_ut_ssector */
@@ -152,8 +152,8 @@ typedef struct pgci_ut_s
     u16             i_lu_nb;                    // 2 bytes; ???
 //    char[2]         ???
     u32             i_ebyte;                    // 4 bytes
-    pgci_lu_desc_t* p_lu_desc;                  // i_lu_nb * 8 bytes
     pgci_lu_t*      p_lu;                       // i_lu_nb * 8 bytes
+    pgci_inf_t*     p_pgci_inf;                 // i_lu_nb * 8 bytes
 } pgci_ut_t;
 
 /*
@@ -445,7 +445,7 @@ typedef struct vts_s
     /* Video Title Set Menu PGCI Unit Table */
     pgci_ut_t       pgci_ut;
     /* Video Title Set Program Chain Info Table */
-    pgci_ut_t       pgci_ti;
+    pgci_inf_t       pgci_ti;
     /* Video Title Set Time Map Table */
     vts_tmap_ti_t   tmap_ti;
     /* VTSM Cell Adress Table Information */

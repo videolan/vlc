@@ -128,9 +128,12 @@ void IfoEnd( ifo_t* p_ifo )
         }
         free( p_ifo->p_vts[j].tmap_ti.pi_sbyte );
         free( p_ifo->p_vts[j].tmap_ti.p_tmap );
-        free( p_ifo->p_vts[j].pgci_ti.p_lu_desc );
-        free( p_ifo->p_vts[j].pgci_ti.p_lu );
-        free( p_ifo->p_vts[j].pgci_ut.p_lu_desc );
+        free( p_ifo->p_vts[j].pgci_ti.p_srp );
+        for( i=0 ; i<p_ifo->p_vts[j].pgci_ut.i_lu_nb ; i++ )
+        {
+            free( p_ifo->p_vts[j].pgci_ut.p_pgci_inf[i].p_srp );
+        }
+        free( p_ifo->p_vts[j].pgci_ut.p_pgci_inf );
         free( p_ifo->p_vts[j].pgci_ut.p_lu );
     }
 
@@ -141,9 +144,9 @@ void IfoEnd( ifo_t* p_ifo )
     free( p_ifo->vmg.c_adt.p_cell_inf );
     for( i=0 ; i<p_ifo->vmg.pgci_ut.i_lu_nb ; i++ )
     {
-        free( p_ifo->vmg.pgci_ut.p_lu[i].p_srp );
+        free( p_ifo->vmg.pgci_ut.p_pgci_inf[i].p_srp );
     }
-    free( p_ifo->vmg.pgci_ut.p_lu_desc );
+    free( p_ifo->vmg.pgci_ut.p_pgci_inf );
     free( p_ifo->vmg.pgci_ut.p_lu );
     for( i=1 ; i<=8 ; i++ )
     {
@@ -169,50 +172,53 @@ void IfoEnd( ifo_t* p_ifo )
  
 #define GET( p_field , i_len )                                              \
     {                                                                       \
-        read( p_ifo->i_fd , p_field , i_len );                              \
-fprintf(stderr, "Pos : %d\n", p_ifo->i_pos - i_start);                      \
-        p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + i_len , SEEK_SET );\
+        read( p_ifo->i_fd , (p_field) , (i_len) );                          \
+fprintf(stderr, "Pos : %d Val : %llx\n", p_ifo->i_pos - i_start,            \
+                                        (long long int) *(p_field) );       \
+        p_ifo->i_pos =                                                      \
+                   lseek( p_ifo->i_fd, p_ifo->i_pos + (i_len), SEEK_SET );  \
     }
 
 #define GETC( p_field )                                                     \
     {                                                                       \
-        read( p_ifo->i_fd , p_field , 1 );                                  \
+        read( p_ifo->i_fd , (p_field) , 1 );                                \
 fprintf(stderr, "Pos : %d Value : %d\n", p_ifo->i_pos - i_start,            \
-                                          *p_field );                       \
+                                          *(p_field) );                     \
         p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + 1 , SEEK_SET );  \
     }
 
 #define GETS( p_field )                                                     \
     {                                                                       \
-        read( p_ifo->i_fd , p_field , 2 );                                  \
-        *p_field = ntohs( *p_field );                                       \
+        read( p_ifo->i_fd , (p_field) , 2 );                                \
+        *(p_field) = ntohs( *(p_field) );                                   \
 fprintf(stderr, "Pos : %d Value : %d\n", p_ifo->i_pos - i_start,            \
-                                          *p_field );                       \
+                                          *(p_field) );                     \
         p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + 2 , SEEK_SET );  \
     }
 
 #define GETL( p_field )                                                     \
     {                                                                       \
-        read( p_ifo->i_fd , p_field , 4 );                                  \
-        *p_field = ntohl( *p_field );                                       \
+        read( p_ifo->i_fd , (p_field) , 4 );                                \
+        *(p_field) = ntohl( *(p_field) );                                   \
 fprintf(stderr, "Pos : %d Value : %d\n", p_ifo->i_pos - i_start,            \
-                                          *p_field );                       \
+                                          *(p_field) );                     \
         p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + 4 , SEEK_SET );  \
     }
 
 #define GETLL( p_field )                                                    \
     {                                                                       \
-        read( p_ifo->i_fd , p_field , 8 );                                  \
-        *p_field = ntoh64( *p_field );                                      \
+        read( p_ifo->i_fd , (p_field) , 8 );                                \
+        *(p_field) = ntoh64( *(p_field) );                                  \
 fprintf(stderr, "Pos : %d Value : %lld\n", p_ifo->i_pos - i_start,          \
-                                            *p_field );                     \
+                                            *(p_field) );                   \
         p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + 8 , SEEK_SET );  \
     }
 
 #define FLUSH( i_len )                                                      \
     {                                                                       \
 fprintf(stderr, "Pos : %d\n", p_ifo->i_pos - i_start );                     \
-        p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + i_len , SEEK_SET );\
+        p_ifo->i_pos = lseek( p_ifo->i_fd ,                                 \
+                              p_ifo->i_pos + (i_len), SEEK_SET );           \
     }
 
 /*
@@ -266,37 +272,50 @@ fprintf( stderr, "PGC\n" );
         GETS( &pgc.com_tab.i_pre_com_nb );
         GETS( &pgc.com_tab.i_post_com_nb );
         GETS( &pgc.com_tab.i_cell_com_nb );
-        pgc.com_tab.psz_pre_com = malloc(sizeof(8*pgc.com_tab.i_pre_com_nb));
-        if( pgc.com_tab.psz_pre_com == NULL )
+        FLUSH( 2 );
+        if( pgc.com_tab.i_pre_com_nb )
         {
-            intf_ErrMsg( "Out of memory" );
-            p_ifo->b_error = 1;
-            return pgc;
+            pgc.com_tab.psz_pre_com =
+                                malloc(8*pgc.com_tab.i_pre_com_nb);
+            if( pgc.com_tab.psz_pre_com == NULL )
+            {
+                intf_ErrMsg( "Out of memory" );
+                p_ifo->b_error = 1;
+                return pgc;
+            }
+            GET( pgc.com_tab.psz_pre_com, (8*pgc.com_tab.i_pre_com_nb) );
         }
-        GET( pgc.com_tab.psz_pre_com, 8*pgc.com_tab.i_pre_com_nb );
-        pgc.com_tab.psz_post_com = malloc(sizeof(8*pgc.com_tab.i_pre_com_nb));
-        if( pgc.com_tab.psz_post_com == NULL )
+        if( pgc.com_tab.i_post_com_nb )
         {
-            intf_ErrMsg( "Out of memory" );
-            p_ifo->b_error = 1;
-            return pgc;
+            pgc.com_tab.psz_post_com =
+                                malloc(8*pgc.com_tab.i_post_com_nb);
+            if( pgc.com_tab.psz_post_com == NULL )
+            {
+                intf_ErrMsg( "Out of memory" );
+                p_ifo->b_error = 1;
+                return pgc;
+            }
+            GET( pgc.com_tab.psz_post_com, 8*pgc.com_tab.i_post_com_nb );
         }
-        GET( pgc.com_tab.psz_post_com, 8*pgc.com_tab.i_post_com_nb );
-        pgc.com_tab.psz_cell_com = malloc(sizeof(8*pgc.com_tab.i_pre_com_nb));
-        if( pgc.com_tab.psz_cell_com == NULL )
+        if( pgc.com_tab.i_cell_com_nb )
         {
-            intf_ErrMsg( "Out of memory" );
-            p_ifo->b_error = 1;
-            return pgc;
+            pgc.com_tab.psz_cell_com =
+                                malloc(8*pgc.com_tab.i_cell_com_nb);
+            if( pgc.com_tab.psz_cell_com == NULL )
+            {
+                intf_ErrMsg( "Out of memory" );
+                p_ifo->b_error = 1;
+                return pgc;
+            }
+            GET( pgc.com_tab.psz_cell_com, 8*pgc.com_tab.i_cell_com_nb );
         }
-        GET( pgc.com_tab.psz_cell_com, 8*pgc.com_tab.i_cell_com_nb );
     }
     /* Parsing of pgc_prg_map_t */
     if( pgc.i_prg_map_sbyte )
     {
         p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
                             + pgc.i_prg_map_sbyte, SEEK_SET );
-        pgc.prg_map.pi_entry_cell = malloc( sizeof(pgc.i_prg_nb) );
+        pgc.prg_map.pi_entry_cell = malloc( pgc.i_prg_nb *sizeof(u8) );
         if( pgc.prg_map.pi_entry_cell == NULL )
         {
             intf_ErrMsg( "Out of memory" );
@@ -322,7 +341,7 @@ fprintf( stderr, "PGC\n" );
         {
             GETS( &pgc.p_cell_play_inf[i].i_cat );
             GETC( &pgc.p_cell_play_inf[i].i_still_time );
-            GETS( &pgc.p_cell_play_inf[i].i_com_nb );
+            GETC( &pgc.p_cell_play_inf[i].i_com_nb );
             GETL( &pgc.p_cell_play_inf[i].i_play_time );
             GETL( &pgc.p_cell_play_inf[i].i_entry_sector );
             GETL( &pgc.p_cell_play_inf[i].i_first_ilvu_vobu_esector );
@@ -354,75 +373,88 @@ fprintf( stderr, "PGC\n" );
 }
 
 /*****************************************************************************
- * ReadUnitTable : Fills the Language Unit structure.
+ * ReadUnit : Fills Menu Language Unit Table/ PGC Info Table
+ *****************************************************************************/
+static pgci_inf_t ReadUnit( ifo_t* p_ifo )
+{
+    pgci_inf_t      inf;
+    int             i;
+    int             i_start = p_ifo->i_pos;
+
+fprintf( stderr, "Unit\n" );
+
+    GETS( &inf.i_srp_nb );
+    FLUSH( 2 );
+    GETL( &inf.i_lu_ebyte );
+    inf.p_srp = malloc( inf.i_srp_nb *sizeof(pgci_srp_t) );
+    if( inf.p_srp == NULL )
+    {
+        intf_ErrMsg( "Out of memory" );
+        p_ifo->b_error = 1;
+        return inf;
+    }
+    for( i=0 ; i<inf.i_srp_nb ; i++ )
+    {
+        GETC( &inf.p_srp[i].i_pgc_cat_mask );
+        GETC( &inf.p_srp[i].i_pgc_cat );
+        GETS( &inf.p_srp[i].i_par_mask );
+        GETL( &inf.p_srp[i].i_pgci_sbyte );
+    }
+    for( i=0 ; i<inf.i_srp_nb ; i++ )
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd,
+                         i_start + inf.p_srp[i].i_pgci_sbyte,
+                         SEEK_SET );
+        inf.p_srp[i].pgc = ReadPGC( p_ifo );
+    }
+
+    return inf;
+}
+
+/*****************************************************************************
+ * ReadUnitTable : Fills the PGCI Unit structure.
  *****************************************************************************/
 static pgci_ut_t ReadUnitTable( ifo_t* p_ifo )
 {
-    pgci_ut_t       lang;
-    int             i, j;
+    pgci_ut_t       pgci;
+    int             i;
     int             i_start = p_ifo->i_pos;
 
-fprintf( stderr, "LU\n" );
+fprintf( stderr, "Unit Table\n" );
 
-    GETS( &lang.i_lu_nb );
+    GETS( &pgci.i_lu_nb );
     FLUSH( 2 );
-    GETL( &lang.i_ebyte );
-    lang.p_lu_desc = malloc( lang.i_lu_nb *sizeof(pgci_lu_desc_t) );
-    if( lang.p_lu_desc == NULL )
+    GETL( &pgci.i_ebyte );
+    pgci.p_lu = malloc( pgci.i_lu_nb *sizeof(pgci_lu_t) );
+    if( pgci.p_lu == NULL )
     {
         intf_ErrMsg( "Out of memory" );
         p_ifo->b_error = 1;
-        return lang;
+        return pgci;
     }
-    for( i=0 ; i<lang.i_lu_nb ; i++ )
+    for( i=0 ; i<pgci.i_lu_nb ; i++ )
     {
-        GETS( &lang.p_lu_desc[i].i_lang_code );
+        GETS( &pgci.p_lu[i].i_lang_code );
         FLUSH( 1 );
-        GETC( &lang.p_lu_desc[i].i_existence_mask );
-        GETL( &lang.p_lu_desc[i].i_lu_sbyte );
+        GETC( &pgci.p_lu[i].i_existence_mask );
+        GETL( &pgci.p_lu[i].i_lu_sbyte );
     }
-    lang.p_lu = malloc( lang.i_lu_nb *sizeof(pgci_lu_t) );
-    if( lang.p_lu == NULL )
+    pgci.p_pgci_inf = malloc( pgci.i_lu_nb *sizeof(pgci_inf_t) );
+    if( pgci.p_pgci_inf == NULL )
     {
         intf_ErrMsg( "Out of memory" );
         p_ifo->b_error = 1;
-        return lang;
+        return pgci;
     }
-    for( i=0 ; i<lang.i_lu_nb ; i++ )
+    for( i=0 ; i<pgci.i_lu_nb ; i++ )
     {
         p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
-                                lang.p_lu_desc[i].i_lu_sbyte,
+                                pgci.p_lu[i].i_lu_sbyte,
                                 SEEK_SET );
-        GETS( &lang.p_lu[i].i_srp_nb );
-        FLUSH( 2 );
-        GETL( &lang.p_lu[i].i_lu_ebyte );
-        lang.p_lu[i].p_srp = malloc( lang.p_lu[i].i_srp_nb *
-                                         sizeof(pgci_srp_t) );
-        if( lang.p_lu[i].p_srp == NULL )
-        {
-            intf_ErrMsg( "Out of memory" );
-            p_ifo->b_error = 1;
-            return lang;
-        }
-        for( j=0 ; j<lang.p_lu[i].i_srp_nb ; j++ )
-        {
-            GETC( &lang.p_lu[i].p_srp[j].i_pgc_cat_mask );
-            GETC( &lang.p_lu[i].p_srp[j].i_pgc_cat );
-            GETS( &lang.p_lu[i].p_srp[j].i_par_mask );
-            GETL( &lang.p_lu[i].p_srp[j].i_pgci_sbyte );
-        }
-        for( j=0 ; j<lang.p_lu[i].i_srp_nb ; j++ )
-        {
-            p_ifo->i_pos = lseek( p_ifo->i_fd,
-                             i_start + lang.p_lu[i].p_srp[j].i_pgci_sbyte,
-                             SEEK_SET );
-            /* FIXME : Bad parsing somiewhere by here : various information
-             * don't match */
-            //lang.p_lu[i].p_srp[j].pgc = ReadPGC( p_ifo );
-        }
+        pgci.p_pgci_inf[i] = ReadUnit( p_ifo );
     }
 
-    return lang;
+    return pgci;
 }
 
 /*****************************************************************************
@@ -965,7 +997,7 @@ static vts_t ReadVTS( ifo_t* p_ifo )
         p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
                         vts.mat.i_pgcit_ssector *DVD_LB_SIZE,
                         SEEK_SET );
-        vts.pgci_ti = ReadUnitTable( p_ifo );
+        vts.pgci_ti = ReadUnit( p_ifo );
     }
     if( vts.mat.i_tmap_ti_ssector )
     {

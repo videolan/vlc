@@ -88,7 +88,7 @@ static int DVDProbe( input_thread_t * p_input )
 static void DVDInit( input_thread_t * p_input )
 {
     thread_dvd_data_t *  p_method;
-    u32                  i_start;// = 2048*90000;
+    u32                  i_start;
 
     if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
     {
@@ -101,17 +101,13 @@ static void DVDInit( input_thread_t * p_input )
 
     lseek( p_input->i_handle, 0, SEEK_SET );
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
+    /* Ifo initialisation */
     p_method->ifo = IfoInit( p_input->i_handle );
     IfoRead( &(p_method->ifo) );
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     i_start = p_method->ifo.p_vts[0].i_pos +
               p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
     fprintf(stderr, "Begin at : %d\n", i_start );
-
     lseek( p_input->i_handle, i_start, SEEK_SET );
 
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
