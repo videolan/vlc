@@ -42,6 +42,11 @@ typedef struct
      * vout_Unlink functions, or directly if the picture is independant */
     int             i_refcount;                      /* link reference counter */
 
+    /* Macroblock counter - the decoder use it to verify if it has
+     * decoded all the macroblocks of the picture */
+    int             i_deccount;
+    vlc_mutex_t     lock_deccount;
+    
     /* Video properties - those properties should not be modified once 
      * the picture is in a heap, but can be freely modified if it is 
      * independant */
