@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.26 2003/01/12 19:08:09 jpsaman Exp $
+ * $Id: familiar.c,v 1.27 2003/01/17 18:19:11 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -139,7 +139,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-#ifndef NEED_GTK_MAIN 
+#ifndef NEED_GTK_MAIN
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
     char  *p_args[] = { "" };
@@ -226,14 +226,20 @@ static void Run( intf_thread_t *p_intf )
         /* Sleep to avoid using all CPU - since some interfaces need to
          * access keyboard events, a 100ms delay is a good compromise */
         gdk_threads_leave();
-        msleep( INTF_IDLE_SLEEP );
+        if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+            msleep( INTF_IDLE_SLEEP );
+        else
+            msleep( 1000 );
         gdk_threads_enter();
     }
 #else
     msg_Dbg( p_intf, "Manage GTK keyboard events using timeouts" );
     /* Sleep to avoid using all CPU - since some interfaces needs to access
-     * keyboard events, a 100ms delay is a good compromise */
-    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, (GtkFunction)Manage, p_intf );
+     * keyboard events, a 1000ms delay is a good compromise */
+    if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+        i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, (GtkFunction)Manage, p_intf );
+    else
+        i_dummy = gtk_timeout_add( 1000, (GtkFunction)Manage, p_intf );
 
     /* Enter Gtk mode */
     gtk_main();
