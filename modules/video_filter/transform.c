@@ -1,8 +1,8 @@
 /*****************************************************************************
  * transform.c : transform image plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: transform.c,v 1.6 2003/01/09 17:47:05 sam Exp $
+ * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
+ * $Id: transform.c,v 1.7 2003/01/17 16:18:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -47,6 +47,9 @@ static void Destroy   ( vlc_object_t * );
 static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
+
+static int  SendEvents( vlc_object_t *, char const *,
+                        vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -94,7 +97,7 @@ static int Create( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return( 1 );
+        return VLC_ENOMEM;
     }
 
     p_vout->pf_init = Init;
@@ -150,7 +153,7 @@ static int Create( vlc_object_t *p_this )
         free( psz_method );
     }
 
-    return( 0 );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -192,12 +195,14 @@ static int Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "cannot open vout, aborting" );
-        return( 0 );
+        return VLC_EGENERIC;
     }
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
-    return( 0 );
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -224,6 +229,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
+    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
     vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
@@ -298,7 +304,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
                 for( ; p_in < p_in_end ; )
                 {
-                    uint8_t *p_line_start = p_in - p_pic->p[i_index].i_pitch;
+                    uint8_t *p_line_start = p_in_end
+                                             - p_pic->p[i_index].i_pitch;
                     p_in_end -= p_pic->p[i_index].i_pitch
                                  - p_pic->p[i_index].i_visible_pitch;
 
@@ -393,5 +400,65 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+}
+
+/*****************************************************************************
+ * SendEvents: forward mouse and keyboard events to the parent p_vout
+ *****************************************************************************/
+static int SendEvents( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
+    vlc_value_t sentval = newval;
+
+    /* Translate the mouse coordinates */
+    if( !strcmp( psz_var, "mouse-x" ) )
+    {
+        switch( p_vout->p_sys->i_mode )
+        {
+        case TRANSFORM_MODE_270:
+            sentval.i_int = p_vout->p_sys->p_vout->output.i_width
+                             - sentval.i_int;
+        case TRANSFORM_MODE_90:
+            var_Set( p_vout, "mouse-y", sentval );
+            return VLC_SUCCESS;
+
+        case TRANSFORM_MODE_180:
+        case TRANSFORM_MODE_HFLIP:
+            sentval.i_int = p_vout->p_sys->p_vout->output.i_width
+                             - sentval.i_int;
+            break;
+
+        case TRANSFORM_MODE_VFLIP:
+        default:
+            break;
+        }
+    }
+    else if( !strcmp( psz_var, "mouse-y" ) )
+    {
+        switch( p_vout->p_sys->i_mode )
+        {
+        case TRANSFORM_MODE_90:
+            sentval.i_int = p_vout->p_sys->p_vout->output.i_height
+                             - sentval.i_int;
+        case TRANSFORM_MODE_270:
+            var_Set( p_vout, "mouse-x", sentval );
+            return VLC_SUCCESS;
+
+        case TRANSFORM_MODE_180:
+        case TRANSFORM_MODE_VFLIP:
+            sentval.i_int = p_vout->p_sys->p_vout->output.i_height
+                             - sentval.i_int;
+            break;
+
+        case TRANSFORM_MODE_HFLIP:
+        default:
+            break;
+        }
+    }
+
+    var_Set( p_vout, psz_var, sentval );
+
+    return VLC_SUCCESS;
 }
 

@@ -1,10 +1,10 @@
 /*****************************************************************************
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: adjust.c,v 1.8 2003/01/09 17:47:05 sam Exp $
+ * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
+ * $Id: adjust.c,v 1.9 2003/01/17 16:18:03 sam Exp $
  *
- * Authors: Simon Latapie <garf@via.ecp.fr>, Samuel Hocevar <sam@zoy.org>
+ * Authors: Simon Latapie <garf@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,9 @@ static void Destroy   ( vlc_object_t * );
 static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
+
+static int  SendEvents( vlc_object_t *, char const *,
+                        vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -151,6 +154,8 @@ static int Init( vout_thread_t *p_vout )
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
     return VLC_SUCCESS;
 }
 
@@ -178,6 +183,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
+    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
     vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
@@ -359,5 +365,16 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+}
+
+/*****************************************************************************
+ * SendEvents: forward mouse and keyboard events to the parent p_vout
+ *****************************************************************************/
+static int SendEvents( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    var_Set( (vlc_object_t *)p_data, psz_var, newval );
+
+    return VLC_SUCCESS;
 }
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * filter_common.h: Common filter functions
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: filter_common.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * Copyright (C) 2001, 2002, 2003 VideoLAN
+ * $Id: filter_common.h,v 1.2 2003/01/17 16:18:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -60,4 +60,18 @@
                                                                               \
         I_OUTPUTPICTURES++;                                                   \
     }                                                                         \
+
+#define ADD_CALLBACKS( newvout, handler ) \
+    var_AddCallback( newvout, "mouse-x", SendEvents, p_vout );                \
+    var_AddCallback( newvout, "mouse-y", SendEvents, p_vout );                \
+    var_AddCallback( newvout, "mouse-moved", SendEvents, p_vout );            \
+    var_AddCallback( newvout, "mouse-clicked", SendEvents, p_vout );          \
+    var_AddCallback( newvout, "key-pressed", SendEvents, p_vout )
+
+#define DEL_CALLBACKS( newvout, handler ) \
+    var_DelCallback( newvout, "mouse-x", SendEvents, p_vout );                \
+    var_DelCallback( newvout, "mouse-y", SendEvents, p_vout );                \
+    var_DelCallback( newvout, "mouse-moved", SendEvents, p_vout );            \
+    var_DelCallback( newvout, "mouse-clicked", SendEvents, p_vout );          \
+    var_DelCallback( newvout, "key-pressed", SendEvents, p_vout )
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.5 2003/01/09 17:47:05 sam Exp $
+ * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
+ * $Id: wall.c,v 1.6 2003/01/17 16:18:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,6 +43,9 @@ static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 
 static void RemoveAllVout  ( vout_thread_t *p_vout );
+
+static int  SendEvents( vlc_object_t *, char const *,
+                        vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -260,6 +263,9 @@ static int Init( vout_thread_t *p_vout )
                 RemoveAllVout( p_vout );
                 return VLC_EGENERIC;
             }
+            ADD_CALLBACKS(
+                p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout,
+                SendEvents );
 
             p_vout->p_sys->i_vout++;
         }
@@ -414,8 +420,55 @@ static void RemoveAllVout( vout_thread_t *p_vout )
          --p_vout->p_sys->i_vout;
          if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active )
          {
+             DEL_CALLBACKS(
+                 p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout,
+                 SendEvents );
              vout_Destroy(
-               p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
+                 p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
          }
     }
 }
+
+/*****************************************************************************
+ * SendEvents: forward mouse and keyboard events to the parent p_vout
+ *****************************************************************************/
+static int SendEvents( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
+    int i_vout;
+    vlc_value_t sentval = newval;
+
+    /* Find the video output index */
+    for( i_vout = 0; i_vout < p_vout->p_sys->i_vout; i_vout++ )
+    {
+        if( p_this == (vlc_object_t *)p_vout->p_sys->pp_vout[ i_vout ].p_vout )
+        {
+            break;
+        }
+    }
+
+    if( i_vout == p_vout->p_sys->i_vout )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* Translate the mouse coordinates */
+    if( !strcmp( psz_var, "mouse-x" ) )
+    {
+        sentval.i_int += p_vout->output.i_width
+                          * (i_vout % p_vout->p_sys->i_col)
+                          / p_vout->p_sys->i_col;
+    }
+    else if( !strcmp( psz_var, "mouse-y" ) )
+    {
+        sentval.i_int += p_vout->output.i_height
+                          * (i_vout / p_vout->p_sys->i_row)
+                          / p_vout->p_sys->i_row;
+    }
+
+    var_Set( p_vout, psz_var, sentval );
+
+    return VLC_SUCCESS;
+}
+

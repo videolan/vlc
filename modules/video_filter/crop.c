@@ -1,8 +1,8 @@
 /*****************************************************************************
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: crop.c,v 1.6 2003/01/09 17:47:05 sam Exp $
+ * Copyright (C) 2002, 2003 VideoLAN
+ * $Id: crop.c,v 1.7 2003/01/17 16:18:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,6 +44,9 @@ static int  Manage    ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 
 static void UpdateStats    ( vout_thread_t *, picture_t * );
+
+static int  SendEvents( vlc_object_t *, char const *,
+                        vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -243,6 +246,8 @@ static int Init( vout_thread_t *p_vout )
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
     return VLC_SUCCESS;
 }
 
@@ -270,7 +275,9 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
+    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
     vout_Destroy( p_vout->p_sys->p_vout );
+
     free( p_vout->p_sys );
 }
 
@@ -458,5 +465,29 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
                             * p_vout->p_sys->i_width / p_vout->output.i_width;
 
     p_vout->p_sys->b_changed = VLC_TRUE;
+}
+
+/*****************************************************************************
+ * SendEvents: forward mouse and keyboard events to the parent p_vout
+ *****************************************************************************/
+static int SendEvents( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
+    vlc_value_t sentval = newval;
+
+    /* Translate the mouse coordinates */
+    if( !strcmp( psz_var, "mouse-x" ) )
+    {
+        sentval.i_int += p_vout->p_sys->i_x;
+    }
+    else if( !strcmp( psz_var, "mouse-y" ) )
+    {
+        sentval.i_int += p_vout->p_sys->i_y;
+    }
+
+    var_Set( p_vout, psz_var, sentval );
+
+    return VLC_SUCCESS;
 }
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * invert.c : Invert video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: invert.c,v 1.4 2003/01/09 17:47:05 sam Exp $
+ * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
+ * $Id: invert.c,v 1.5 2003/01/17 16:18:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,6 +42,9 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 
+static int  SendEvents( vlc_object_t *, char const *,
+                        vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -77,7 +80,7 @@ static int Create( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return( 1 );
+        return VLC_ENOMEM;
     }
 
     p_vout->pf_init = Init;
@@ -86,7 +89,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -117,12 +120,14 @@ static int Init( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "can't open vout, aborting" );
 
-        return( 0 );
+        return VLC_EGENERIC;
     }
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
-    return( 0 );
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -149,6 +154,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
+    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
     vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
@@ -224,5 +230,16 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+}
+
+/*****************************************************************************
+ * SendEvents: forward mouse and keyboard events to the parent p_vout
+ *****************************************************************************/
+static int SendEvents( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    var_Set( (vlc_object_t *)p_data, psz_var, newval );
+
+    return VLC_SUCCESS;
 }
 

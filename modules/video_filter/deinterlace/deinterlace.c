@@ -1,8 +1,8 @@
 /*****************************************************************************
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.5 2002/11/28 17:35:00 sam Exp $
+ * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
+ * $Id: deinterlace.c,v 1.6 2003/01/17 16:18:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -57,6 +57,9 @@ static void RenderLinear ( vout_thread_t *, picture_t *, picture_t *, int );
 
 static void Merge        ( void *, const void *, const void *, size_t );
 
+static int  SendEvents   ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -98,7 +101,7 @@ struct vout_sys_t
  * This function allocates and initializes a Deinterlace vout method.
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
-{   
+{
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *psz_method;
 
@@ -107,7 +110,7 @@ static int Create( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return 1;
+        return VLC_ENOMEM;
     }
 
     p_vout->pf_init = Init;
@@ -165,7 +168,7 @@ static int Create( vlc_object_t *p_this )
         free( psz_method );
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -175,7 +178,7 @@ static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
-    
+
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure, full of directbuffers since we want
@@ -193,7 +196,7 @@ static int Init( vout_thread_t *p_vout )
             break;
 
         default:
-            return 0; /* unknown chroma */
+            return VLC_EGENERIC; /* unknown chroma */
             break;
     }
 
@@ -242,12 +245,14 @@ static int Init( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "cannot open vout, aborting" );
 
-        return 0;
+        return VLC_EGENERIC;
     }
- 
+
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
-    return 0;
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -273,6 +278,8 @@ static void End( vout_thread_t *p_vout )
 static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
 
     vout_Destroy( p_vout->p_sys->p_vout );
 
@@ -317,7 +324,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
                 return;
             }
             msleep( VOUT_OUTMEM_SLEEP );
-        }   
+        }
 
         /* 20ms is a bit arbitrary, but it's only for the first image we get */
         if( !p_vout->p_sys->last_date )
@@ -377,7 +384,7 @@ static void RenderDiscard( vout_thread_t *p_vout,
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
-        u8 *p_in, *p_out_end, *p_out;
+        uint8_t *p_in, *p_out_end, *p_out;
         int i_increment;
 
         p_in = p_pic->p[i_plane].p_pixels
@@ -444,12 +451,12 @@ static void RenderDiscard( vout_thread_t *p_vout,
 static void RenderBob( vout_thread_t *p_vout,
                        picture_t *p_outpic, picture_t *p_pic, int i_field )
 {
-    int i_plane;  
+    int i_plane;
 
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
-        u8 *p_in, *p_out_end, *p_out;
+        uint8_t *p_in, *p_out_end, *p_out;
 
         p_in = p_pic->p[i_plane].p_pixels;
         p_out = p_outpic->p[i_plane].p_pixels;
@@ -460,33 +467,33 @@ static void RenderBob( vout_thread_t *p_vout,
         if( i_field == 1 )
         {
             p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
-            p_in += p_pic->p[i_plane].i_pitch;   
+            p_in += p_pic->p[i_plane].i_pitch;
             p_out += p_pic->p[i_plane].i_pitch;
         }
-                  
+
         p_out_end -= 2 * p_outpic->p[i_plane].i_pitch;
-    
+
         for( ; p_out < p_out_end ; )
         {
             p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
-     
+
             p_out += p_pic->p[i_plane].i_pitch;
 
             p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
-        
+
             p_in += 2 * p_pic->p[i_plane].i_pitch;
             p_out += p_pic->p[i_plane].i_pitch;
         }
- 
+
         p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
-         
+
         /* For TOP field we need to add the last line */
         if( i_field == 0 )
         {
-            p_in += p_pic->p[i_plane].i_pitch;   
+            p_in += p_pic->p[i_plane].i_pitch;
             p_out += p_pic->p[i_plane].i_pitch;
             p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
-        }         
+        }
     }
 }
 
@@ -501,7 +508,7 @@ static void RenderLinear( vout_thread_t *p_vout,
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
-        u8 *p_in, *p_out_end, *p_out;
+        uint8_t *p_in, *p_out_end, *p_out;
 
         p_in = p_pic->p[i_plane].p_pixels;
         p_out = p_outpic->p[i_plane].p_pixels;
@@ -555,7 +562,7 @@ static void RenderMean( vout_thread_t *p_vout,
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
-        u8 *p_in, *p_out_end, *p_out;
+        uint8_t *p_in, *p_out_end, *p_out;
 
         p_in = p_pic->p[i_plane].p_pixels;
 
@@ -583,7 +590,7 @@ static void RenderBlend( vout_thread_t *p_vout,
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
-        u8 *p_in, *p_out_end, *p_out;
+        uint8_t *p_in, *p_out_end, *p_out;
 
         p_in = p_pic->p[i_plane].p_pixels;
 
@@ -608,27 +615,56 @@ static void RenderBlend( vout_thread_t *p_vout,
     }
 }
 
-static void Merge( void *p_dest, const void *p_s1,
-                   const void *p_s2, size_t i_bytes )
+static void Merge( void *_p_dest, const void *_p_s1,
+                   const void *_p_s2, size_t i_bytes )
 {
-    u8* p_end = (u8*)p_dest + i_bytes - 8;
+    uint8_t* p_dest = (uint8_t*)_p_dest;
+    const uint8_t *p_s1 = (const uint8_t *)_p_s1;
+    const uint8_t *p_s2 = (const uint8_t *)_p_s2;
+    uint8_t* p_end = p_dest + i_bytes - 8;
 
-    while( (u8*)p_dest < p_end )
+    while( p_dest < p_end )
     {
-        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
 
     p_end += 8;
 
-    while( (u8*)p_dest < p_end )
+    while( p_dest < p_end )
     {
-        *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
 }
+
+/*****************************************************************************
+ * SendEvents: forward mouse and keyboard events to the parent p_vout
+ *****************************************************************************/
+static int SendEvents( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
+    vlc_value_t sentval = newval;
+
+    if( !strcmp( psz_var, "mouse-y" ) )
+    {
+        switch( p_vout->p_sys->i_mode )
+        {
+            case DEINTERLACE_MEAN:
+            case DEINTERLACE_DISCARD:
+                sentval.i_int *= 2;
+                break;
+        }
+    }
+
+    var_Set( p_vout, psz_var, sentval );
+
+    return VLC_SUCCESS;
+}
+

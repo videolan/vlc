@@ -1,8 +1,8 @@
 /*****************************************************************************
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.5 2003/01/09 17:47:05 sam Exp $
+ * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
+ * $Id: distort.c,v 1.6 2003/01/17 16:18:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,6 +49,9 @@ static void Render    ( vout_thread_t *, picture_t * );
 
 static void DistortWave    ( vout_thread_t *, picture_t *, picture_t * );
 static void DistortRipple  ( vout_thread_t *, picture_t *, picture_t * );
+
+static int  SendEvents   ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -196,6 +199,8 @@ static int Init( vout_thread_t *p_vout )
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
+    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
     p_vout->p_sys->f_angle = 0.0;
     p_vout->p_sys->last_date = 0;
 
@@ -226,6 +231,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
+    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
     vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
@@ -418,3 +424,15 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
         }
     }
 }
+
+/*****************************************************************************
+ * SendEvents: forward mouse and keyboard events to the parent p_vout
+ *****************************************************************************/
+static int SendEvents( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    var_Set( (vlc_object_t *)p_data, psz_var, newval );
+
+    return VLC_SUCCESS;
+}
+
