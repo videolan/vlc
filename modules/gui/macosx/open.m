@@ -226,7 +226,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_file_sub_delay_stp setEnabled: NO];
     [o_file_sub_fps_lbl setStringValue: _NS("fps")];
     [o_file_sub_fps_stp setEnabled: NO];
-    [o_file_sub_encoding_lbl setStringValue: _NS("Subtitles text encoding")];
+    [o_file_sub_encoding_lbl setStringValue: _NS("Subtitles encoding")];
     [o_file_sub_encoding_pop removeAllItems];
     [o_file_sub_size_lbl setStringValue: _NS("Font size")];
     [o_file_sub_size_pop removeAllItems];
