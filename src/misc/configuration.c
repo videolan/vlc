@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: configuration.c,v 1.72 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: configuration.c,v 1.73 2004/01/09 19:45:46 jlj Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -53,8 +53,11 @@
 #if defined( HAVE_SYS_TYPES_H )
 #   include <sys/types.h>
 #endif
-#if defined( WIN32 ) && !defined( UNDER_CE )
-#   include <direct.h>
+#if defined( WIN32 )
+#   if !defined( UNDER_CE )
+#       include <direct.h>
+#   endif
+#include <tchar.h>
 #endif
 
 
@@ -1505,7 +1508,7 @@ char *config_GetHomeDir( void )
 
 #if defined(WIN32) || defined(UNDER_CE)
     typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
-                                               LPTSTR );
+                                               LPSTR );
 #   define CSIDL_FLAG_CREATE 0x8000
 #   define CSIDL_APPDATA 0x1A
 #   define SHGFP_TYPE_CURRENT 0
@@ -1514,10 +1517,10 @@ char *config_GetHomeDir( void )
     SHGETFOLDERPATH SHGetFolderPath ;
 
     /* load the shfolder dll to retrieve SHGetFolderPath */
-    if( ( shfolder_dll = LoadLibrary("shfolder.dll") ) != NULL )
+    if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
     {
         SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
-                                                  "SHGetFolderPathA" );
+                                                  _T("SHGetFolderPathA") );
         if ( SHGetFolderPath != NULL )
         {
             p_homedir = (char *)malloc( MAX_PATH );
