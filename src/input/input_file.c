@@ -738,7 +738,7 @@ ssize_t ps_read( options_t *p_options, ps_t * p_ps, void *ts )
             /* read some bytes */
             readbytes = safe_read( p_options, p_ps->ps_buffer + datasize, PS_BUFFER_SIZE - datasize);
 
-            if(readbytes == 0)
+            if(readbytes <= 0)
             {
                 input_file.b_die = 1;
                 return -1;
@@ -1021,12 +1021,18 @@ int input_FileOpen( input_thread_t *p_input )
 
     if( file_next( p_options ) < 0 )
     {
-        intf_ErrMsg( "input error: cannot open the file %s",
+        intf_ErrMsg( "input error: cannot open the file %s\n",
                      p_input->p_source );
+        return( 1 );
     }
 
     input_file.b_die = 0;
-    safe_read( p_options, &p_options->i_file_type, 1 );
+    if( safe_read( p_options, &p_options->i_file_type, 1 ) <= 0 )
+    {
+        intf_ErrMsg( "input error: cannot read file type\n");
+        close( p_options->in );
+        return( 1 );
+    }
     
     switch( p_options->i_file_type )
     {
@@ -1036,9 +1042,11 @@ int input_FileOpen( input_thread_t *p_input )
         break;
     case 0x47:
         intf_ErrMsg( "input error: ts files are not currently supported\n" );
+        close( p_options->in );
         return( 1 );
     default:
         intf_ErrMsg( "input error: cannot determine stream type\n" );
+        close( p_options->in );
         return( 1 );
     }
 
