@@ -406,8 +406,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_TITLE_INFO:
             ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
             pi_int    = (int*)va_arg( args, int* );
-	    *((int*)va_arg( args, int* )) = 0; /* Title offset */
-	    *((int*)va_arg( args, int* )) = 1; /* Chapter offset */
+            *((int*)va_arg( args, int* )) = 0; /* Title offset */
+            *((int*)va_arg( args, int* )) = 1; /* Chapter offset */
 
             /* Duplicate title infos */
             *pi_int = p_sys->i_title;
@@ -550,10 +550,31 @@ static int Demux( demux_t *p_demux )
         msleep( 40000 );
         break;
     }
+
+    case DVDNAV_SPU_CLUT_CHANGE:
+    {
+        int i;
+
+        msg_Dbg( p_demux, "DVDNAV_SPU_CLUT_CHANGE" );
+        /* Update color lookup table (16 *uint32_t in packet) */
+        memcpy( p_sys->clut, packet, 16 * sizeof( uint32_t ) );
+
+        /* HACK to get the SPU tracks registered in the right order */
+        for( i = 0; i < 0x1f; i++ )
+        {
+            if( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i ) != 0xffff )
+                ESNew( p_demux, 0xbd20 + i );
+        }
+        /* END HACK */
+        break;
+    }
+
     case DVDNAV_SPU_STREAM_CHANGE:
     {
         dvdnav_spu_stream_change_event_t *event =
             (dvdnav_spu_stream_change_event_t*)packet;
+        int i;
+
         msg_Dbg( p_demux, "DVDNAV_SPU_STREAM_CHANGE" );
         msg_Dbg( p_demux, "     - physical_wide=%d",
                  event->physical_wide );
@@ -563,8 +584,17 @@ static int Demux( demux_t *p_demux )
                  event->physical_pan_scan );
 
         ESSubtitleUpdate( p_demux );
+
+        /* HACK to get the SPU tracks registered in the right order */
+        for( i = 0; i < 0x1f; i++ )
+        {
+            if( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i ) != 0xffff )
+                ESNew( p_demux, 0xbd20 + i );
+        }
+        /* END HACK */
         break;
     }
+
     case DVDNAV_AUDIO_STREAM_CHANGE:
     {
         dvdnav_audio_stream_change_event_t *event =
@@ -574,6 +604,7 @@ static int Demux( demux_t *p_demux )
         /* TODO */
         break;
     }
+
     case DVDNAV_VTS_CHANGE:
     {
         int32_t i_title = 0;
@@ -615,6 +646,7 @@ static int Demux( demux_t *p_demux )
         }
         break;
     }
+
     case DVDNAV_CELL_CHANGE:
     {
         int32_t i_title = 0;
@@ -659,6 +691,7 @@ static int Demux( demux_t *p_demux )
         DemuxBlock( p_demux, packet, i_len );
         break;
     }
+
     case DVDNAV_STOP:   /* EOF */
         msg_Dbg( p_demux, "DVDNAV_STOP" );
         return 0;
@@ -670,24 +703,6 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - display=%d", event->display );
         msg_Dbg( p_demux, "     - buttonN=%d", event->buttonN );
         ButtonUpdate( p_demux );
-        break;
-    }
-
-    case DVDNAV_SPU_CLUT_CHANGE:
-    {
-        int i;
-
-        msg_Dbg( p_demux, "DVDNAV_SPU_CLUT_CHANGE" );
-        /* Update color lookup table (16 *uint32_t in packet) */
-        memcpy( p_sys->clut, packet, 16 * sizeof( uint32_t ) );
-
-        /* HACK to get the SPU tracks registered in the right order */
-        for( i = 0; i < 0x1f; i++ )
-        {
-            if( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i ) != 0xffff )
-                ESNew( p_demux, 0xbd20 + i );
-        }
-        /* END HACK */
         break;
     }
 
@@ -851,19 +866,14 @@ static void ESSubtitleUpdate( demux_t *p_demux )
     ButtonUpdate( p_demux );
 
     dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
-    if( i_title > 0 )
-    {
-        return;
-    }
+    if( i_title > 0 ) return;
 
     if( i_spu >= 0 && i_spu <= 0x1f )
     {
         ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(0xbd20 + i_spu)];
 
-        if( !tk->b_seen )
-        {
-            ESNew( p_demux, 0xbd20 + i_spu);
-        }
+        ESNew( p_demux, 0xbd20 + i_spu );
+
         /* be sure to unselect it (reset) */
         es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es,
                         (vlc_bool_t)VLC_FALSE );
@@ -981,10 +991,7 @@ static void ESNew( demux_t *p_demux, int i_id )
     ps_track_t  *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
     vlc_bool_t  b_select = VLC_FALSE;
 
-    if( tk->b_seen )
-    {
-        return;
-    }
+    if( tk->b_seen ) return;
 
     if( ps_track_fill( tk, i_id ) )
     {
@@ -1069,6 +1076,8 @@ static void ESNew( demux_t *p_demux, int i_id )
         es_out_Control( p_demux->out, ES_OUT_SET_ES, tk->es );
     }
     tk->b_seen = VLC_TRUE;
+
+    if( tk->fmt.i_cat == VIDEO_ES ) ButtonUpdate( p_demux );
 }
 
 /*****************************************************************************
