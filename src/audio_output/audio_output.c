@@ -508,8 +508,8 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
 
     l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) * (p_fifo->l_frame_size >> p_fifo->b_stereo);
 
-    l_rate = p_fifo->l_rate + ((aout_date - p_fifo->date[p_fifo->l_start_frame]) / 8);
-//    fprintf( stderr, "aout debug: %lli;\n", aout_date - p_fifo->date[p_fifo->l_start_frame] );
+    l_rate = p_fifo->l_rate + ((aout_date - p_fifo->date[p_fifo->l_start_frame]) / 256);
+    fprintf( stderr, "aout debug: %lli (%li);\n", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
 
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->dsp.l_rate );
 
