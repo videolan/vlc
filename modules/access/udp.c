@@ -212,7 +212,16 @@ static int Open( vlc_object_t *p_this )
 
     /* Set up p_access */
     p_access->pf_read = NULL;
-    p_access->pf_block = BlockChoose;
+    if( !strcasecmp( p_access->psz_access, "rtp" )
+          || !strcasecmp( p_access->psz_access, "rtp4" )
+          || !strcasecmp( p_access->psz_access, "rtp6" ) )
+    {
+        p_access->pf_block = BlockRTP;
+    }
+    else
+    {
+        p_access->pf_block = BlockChoose;
+    }
     p_access->pf_control = Control;
     p_access->pf_seek = NULL;
     p_access->info.i_update = 0;
