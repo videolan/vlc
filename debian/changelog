@@ -1,3 +1,9 @@
+vlc (0.2.62-1) unstable; urgency=low
+
+  * New release. Glide and GGI packages build again.
+
+ -- Samuel Hocevar <sam@zoy.org>  Tue, 20 Feb 2001 23:34:34 +0100
+
 vlc (0.2.61-1) unstable; urgency=low
 
   * New release. The package build works again.

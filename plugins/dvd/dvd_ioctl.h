@@ -2,7 +2,7 @@
  * dvd_ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.h,v 1.1 2001/02/20 07:49:12 sam Exp $
+ * $Id: dvd_ioctl.h,v 1.2 2001/02/20 23:30:15 sam Exp $
  *
  * Authors: David Giller <rafetmad@oxy.edu>
  *          Eberhard Moenkeberg <emoenke@gwdg.de>
@@ -556,9 +556,9 @@ struct dvd_layer {
 	unsigned char track_density	: 4;
 	unsigned char linear_density	: 4;
 	unsigned char bca		: 1;
-	uint32 start_sector;
-	uint32 end_sector;
-	uint32 end_sector_l0;
+	u32 start_sector;
+	u32 end_sector;
+	u32 end_sector_l0;
 };
 
 struct dvd_physical {
@@ -745,7 +745,7 @@ struct request_sense {
 };
 
 typedef struct {
-	uint16 report_key_length;
+	u16 report_key_length;
 	unsigned char reserved1;
 	unsigned char reserved2;
 #if defined(__BIG_ENDIAN_BITFIELD)

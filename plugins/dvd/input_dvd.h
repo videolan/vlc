@@ -40,9 +40,7 @@ typedef struct thread_dvd_data_s
     int                     i_end_cell;
 
     /* Scrambling Information */
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
     struct css_s            css;
-#endif
 
     /* Structure that contains all information of the DVD */
     struct ifo_s            ifo;
@@ -60,10 +58,8 @@ void            IfoEnd( ifo_t * );
 /*****************************************************************************
  * Prototypes in dvd_css.c
  *****************************************************************************/
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
 int             CSSTest     ( int );
 struct css_s    CSSInit     ( int );
 int             CSSGetKey   ( struct css_s * );
 int             CSSDescrambleSector( u8 * , u8 * );
 
-#endif

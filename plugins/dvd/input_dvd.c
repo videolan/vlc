@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.17 2001/02/20 08:47:25 stef Exp $
+ * $Id: input_dvd.c,v 1.18 2001/02/20 23:30:15 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -332,14 +332,7 @@ static int DVDProbe( probedata_t *p_data )
  *****************************************************************************/
 static int DVDCheckCSS( input_thread_t * p_input )
 {
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
     return CSSTest( p_input->i_handle );
-#else
-    /* DVD ioctls unavailable.
-     * FIXME: Check the stream to see whether it is encrypted or not 
-     * to give and accurate error message */
-    return 0;
-#endif
 }
 
 /*****************************************************************************
@@ -373,7 +366,6 @@ static int DVDSetArea( input_thread_t * p_input,
     IfoReadVTS( &(p_method->ifo) );
     intf_WarnMsg( 2, "Ifo: VTS initialized" );
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
     if( p_method->b_encrypted )
     {
         p_method->css.i_title = i_title;
@@ -383,7 +375,6 @@ static int DVDSetArea( input_thread_t * p_input,
         CSSGetKey( &(p_method->css) );
         intf_WarnMsg( 2, "CSS: VTS key initialized" );
     }
-#endif
 
     /* Set selected title start and size */
     p_pgc = &p_method->ifo.vts.pgci_ti.p_srp[0].pgc;
@@ -671,8 +662,6 @@ static void DVDInit( input_thread_t * p_input )
     /* CSS initialisation */
     if( p_method->b_encrypted )
     {
-
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
         p_method->css = CSSInit( p_input->i_handle );
 
         if( ( p_input->b_error = p_method->css.b_error ) )
@@ -681,11 +670,6 @@ static void DVDInit( input_thread_t * p_input )
             return;
         }
         intf_WarnMsg( 2, "CSS: initialized" );
-#else
-        intf_ErrMsg( "Unscrambling not supported" );
-        p_input->b_error = 1;
-        return;
-#endif
     }
 
     /* Initialize ES structures */
@@ -779,7 +763,6 @@ static int DVDRead( input_thread_t * p_input,
     /* Reads from DVD */
     readv( p_input->i_handle, p_vec, p_method->i_read_once );
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
     if( p_method->b_encrypted )
     {
         for( i=0 ; i<p_method->i_read_once ; i++ )
@@ -789,7 +772,6 @@ static int DVDRead( input_thread_t * p_input,
             ((u8*)(p_vec[i].iov_base))[0x14] &= 0x8F;
         }
     }
-#endif
 
     /* Update netlist indexes */
     input_NetlistMviovec( p_netlist, p_method->i_read_once, &p_data );

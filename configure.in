@@ -4,7 +4,7 @@ AC_CONFIG_HEADER(include/defs.h)
 
 AC_CANONICAL_HOST
 
-VLC_VERSION=0.2.61
+VLC_VERSION=0.2.62
 AC_SUBST(VLC_VERSION)
 VLC_CODENAME=Urumov
 AC_SUBST(VLC_CODENAME)
@@ -58,7 +58,7 @@ CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
 AC_CHECK_HEADERS(stddef.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(sys/sockio.h)
-AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h)
+AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h)
 AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
@@ -100,12 +100,6 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 
-dnl Checks for DVD ioctls
-AC_CHECK_HEADERS(sys/ioctl.h,
-  [AC_CHECK_HEADERS(linux/cdrom.h)
-   AC_EGREP_HEADER(dvd,linux/cdrom.h,[AC_DEFINE(LINUX_DVD,1,DVD support for linux)
-   DVD=1])])
-
 dnl default plugins 
 PLUGINS=${PLUGINS}"ps ts yuv idct idctclassic motion "
 if test x$host_os = xbeos; then
@@ -114,9 +108,11 @@ else
     ACCEL_PLUGINS="yuvmmx idctmmx idctmmxext motionmmx motionmmxext "
 fi
 
-if test x$DVD = x1; then
-    PLUGINS=${PLUGINS}"dvd "
-fi
+dnl Checks for DVD ioctls
+AC_CHECK_HEADERS(sys/ioctl.h,
+  [PLUGINS=${PLUGINS}"dvd "
+   AC_CHECK_HEADERS(linux/cdrom.h)
+   AC_EGREP_HEADER(dvd,linux/cdrom.h,[AC_DEFINE(LINUX_DVD,1,DVD support for linux)])])
 
 ARCH=${host_cpu}
 AC_ARG_ENABLE(ppro,

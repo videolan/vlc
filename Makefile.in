@@ -323,6 +323,10 @@ PLUGIN_GNOME =	plugins/gnome/gnome.o \
 		plugins/gnome/gnome_interface.o \
 		plugins/gnome/gnome_support.o
 
+PLUGIN_KDE =	plugins/kde/kde.o \
+		plugins/kde/intf_kde.o \
+		plugins/kde/kvlc.o
+
 PLUGIN_IDCT =	plugins/idct/idct.o \
 		plugins/idct/idct_common.o
 
@@ -414,7 +418,8 @@ NONSTD_PLUGIN_OBJ = \
 		$(PLUGIN_GNOME)
 
 NONSTD_CPP_PLUGIN_OBJ = \
-		$(PLUGIN_BEOS)
+		$(PLUGIN_BEOS) \
+		$(PLUGIN_KDE)
 
 #
 # Other lists of files
@@ -582,6 +587,11 @@ $(PLUGIN_GLIDE): %.o: .dep/%.d
 $(PLUGIN_GLIDE): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/glide -c -o $@ $<
 
+$(PLUGIN_KDE): %.o: Makefile.dep
+$(PLUGIN_KDE): %.o: .dep/%.dpp
+$(PLUGIN_KDE): %.o: %.cpp
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -fno-rtti -c -o $@ $<
+
 $(PLUGIN_BEOS): %.o: Makefile.dep
 $(PLUGIN_BEOS): %.o: .dep/%.dpp
 $(PLUGIN_BEOS): %.o: %.cpp
@@ -616,6 +626,9 @@ endif
 
 lib/dsp.so: $(PLUGIN_DSP)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/kde.so: $(PLUGIN_KDE)
+	$(CC) $(PCFLAGS) -shared -o $@ $^ -lkdeui -lkdecore -lqt -ldl
 
 lib/alsa.so: $(PLUGIN_ALSA)
 	$(CC) $(PCFLAGS) -shared -o $@ $^ -lasound

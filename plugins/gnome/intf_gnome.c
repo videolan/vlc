@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.17 2001/02/20 09:10:36 sam Exp $
+ * $Id: intf_gnome.c,v 1.18 2001/02/20 23:30:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -170,7 +170,7 @@ static void intf_Run( intf_thread_t *p_intf )
 {
     /* gnome_init needs to know the command line. We don't care, so we
      * give it an empty one */
-    char *p_args[] = { };
+    char *p_args[] = { "" };
 
     /* The data types we are allowed to receive */
     static GtkTargetEntry target_table[] =
@@ -182,29 +182,33 @@ static void intf_Run( intf_thread_t *p_intf )
     /* Initialize Gnome */
     gnome_init( p_main->psz_arg0, VERSION, 1, p_args );
 
-    /* create some useful widgets that will certainly be used */
+    /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window( );
     p_intf->p_sys->p_popup = create_intf_popup( );
 
-    /* accept file drops on the main window */
+    /* Set the title of the main window */
+    gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
+                          VOUT_TITLE " (Gnome interface)");
+
+    /* Accept file drops on the main window */
     gtk_drag_dest_set( GTK_WIDGET( p_intf->p_sys->p_window ),
                        GTK_DEST_DEFAULT_ALL, target_table,
                        1, GDK_ACTION_COPY );
 
-    /* we don't create these ones yet because we perhaps won't need them */
+    /* We don't create these ones yet because we perhaps won't need them */
     p_intf->p_sys->p_about = NULL;
     p_intf->p_sys->p_playlist = NULL;
     p_intf->p_sys->p_modules = NULL;
     p_intf->p_sys->p_fileopen = NULL;
 
-    /* store p_sys to keep an eye on it */
+    /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
                          "p_intf", p_intf );
 
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_popup),
                          "p_intf", p_intf );
 
-    /* show the control window */
+    /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
 
     /* Sleep to avoid using all CPU - since some interfaces needs to access
@@ -213,7 +217,7 @@ static void intf_Run( intf_thread_t *p_intf )
                                                 GnomeManage, p_intf );
  
 
-    /* enter gnome mode */
+    /* Enter gnome mode */
     gtk_main();
 
     /* launch stored callbacks */

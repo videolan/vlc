@@ -49,10 +49,10 @@ static __inline__ int CPUCapabilities( void )
             | CPU_CAPABILITY_586
             | CPU_CAPABILITY_MMX );
 #else
-    int         i_capabilities = CPU_CAPABILITY_NONE;
+    int           i_capabilities = CPU_CAPABILITY_NONE;
 #ifdef __i386__
-    int         i_eax, i_ebx, i_ecx, i_edx;
-    boolean_t   b_amd;
+    unsigned int  i_eax, i_ebx, i_ecx, i_edx;
+    boolean_t     b_amd;
 
 #define cpuid( a )                 \
     asm volatile ( "cpuid"         \
