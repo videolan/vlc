@@ -2,7 +2,7 @@
  * libasf.h :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.h,v 1.6 2003/08/17 23:42:37 fenrir Exp $
+ * $Id: libasf.h,v 1.7 2003/08/18 19:18:47 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -211,16 +211,6 @@ typedef struct asf_object_index_s
 
 } asf_object_index_t;
 
-typedef struct asf_object_root_s
-{
-    ASF_OBJECT_COMMON
-
-    asf_object_header_t *p_hdr;
-    asf_object_data_t   *p_data;
-    asf_object_index_t  *p_index;
-
-} asf_object_root_t;
-
 /****************************************************************************
  * Sub level asf object
  ****************************************************************************/
@@ -338,6 +328,26 @@ typedef struct asf_object_marker_s
 
 } asf_object_marker_t;
 
+/****************************************************************************
+ * Special Root Object
+ ****************************************************************************/
+typedef struct asf_object_root_s
+{
+    ASF_OBJECT_COMMON
+
+    asf_object_header_t *p_hdr;
+    asf_object_data_t   *p_data;
+    /* could be NULL if !b_seekable or not-present */
+    asf_object_index_t  *p_index;
+
+    /* from asf_object_header_t */
+    asf_object_file_properties_t *p_fp;
+    
+} asf_object_root_t;
+
+/****************************************************************************
+ * asf_object_t: union of all objects.
+ ****************************************************************************/
 typedef union asf_object_u
 {
     asf_object_common_t common;
@@ -354,35 +364,16 @@ typedef union asf_object_u
 } asf_object_t;
 
 
-off_t   ASF_TellAbsolute( input_thread_t *p_input );
-int     ASF_SeekAbsolute( input_thread_t *p_input, off_t i_pos);
-int     ASF_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size );
-int     ASF_SkipBytes( input_thread_t *p_input, int i_count );
 
-void ASF_GetGUID( guid_t *p_guid, uint8_t *p_data );
-int  ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 );
+void ASF_GetGUID         ( guid_t *p_guid, uint8_t *p_data );
+int  ASF_CmpGUID         ( const guid_t *p_guid1, const guid_t *p_guid2 );
 
-int  ASF_ReadObjectCommon( input_thread_t *p_input,
-                           asf_object_t *p_obj );
-int  ASF_NextObject( input_thread_t *p_input,
-                     asf_object_t *p_obj );
-int  ASF_GotoObject( input_thread_t *p_input,
-                     asf_object_t *p_obj );
+asf_object_root_t *ASF_ReadObjectRoot( stream_t *, int b_seekable );
+void               ASF_FreeObjectRoot  ( stream_t *, asf_object_root_t *p_root );
 
-int  ASF_ReadObject( input_thread_t *p_input,
-                     asf_object_t *p_obj,
-                     asf_object_t *p_father );
-void ASF_FreeObject( input_thread_t *p_input,
-                     asf_object_t *p_obj );
-int  ASF_ReadObjectRoot( input_thread_t *p_input,
-                         asf_object_root_t *p_root,
-                         int b_seekable );
-void ASF_FreeObjectRoot( input_thread_t *p_input,
-                         asf_object_root_t *p_root );
 #define ASF_CountObject( a, b ) __ASF_CountObject( (asf_object_t*)(a), b )
-int  __ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid );
+int  __ASF_CountObject   ( asf_object_t *p_obj, const guid_t *p_guid );
 
 #define ASF_FindObject( a, b, c )  __ASF_FindObject( (asf_object_t*)(a), b, c )
-void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid, int i_number );
-
+void *__ASF_FindObject   ( asf_object_t *p_obj, const guid_t *p_guid, int i_number );
 
