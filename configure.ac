@@ -129,7 +129,7 @@ case "${target_os}" in
     VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc],[-x objective-c])
     VLC_ADD_CFLAGS([vlc],[-x objective-c])
-    VLC_ADD_LDFLAGS([vlc],[-Wl,-multiply_defined,suppress])
+    VLC_ADD_LDFLAGS([vlc],[-Wl,-m -Wl,-multiply_defined -Wl,suppress])
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
     AC_CHECK_TOOL(WINDRES, windres, :)
