@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: interface.c,v 1.110 2004/01/10 12:35:33 zorglub Exp $
+ * $Id: interface.c,v 1.111 2004/01/13 18:45:06 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -285,6 +285,8 @@ static void RunInterface( intf_thread_t *p_intf )
     val.psz_string = "http"; text.psz_string = "HTTP remote control";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "sap"; text.psz_string = "SAP interface";
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "gestures"; text.psz_string = "Mouse gestures control";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
