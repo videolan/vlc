@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.38 2003/11/11 01:33:18 fenrir Exp $
+ * $Id: mkv.cpp,v 1.39 2003/11/13 12:28:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -2242,47 +2242,6 @@ static void InformationsCreate( input_thread_t *p_input )
         {
             input_AddInfo( p_cat, _("Codec Download"), "%s", tk.psz_codec_download_url );
         }
-
-        switch( tk.fmt.i_cat )
-        {
-            case AUDIO_ES:
-                input_AddInfo( p_cat, _("Type"), _("Audio") );
-                input_AddInfo( p_cat, _("Codec"), "%.4s (%s)", (char*)&tk.fmt.i_codec, tk.psz_codec );
-                if( tk.fmt.audio.i_channels > 0 )
-                {
-                    input_AddInfo( p_cat, _("Channels"), "%d", tk.fmt.audio.i_channels );
-                }
-                if( tk.fmt.audio.i_samplerate > 0 )
-                {
-                    input_AddInfo( p_cat, _("Sample Rate"), "%d", tk.fmt.audio.i_samplerate );
-                }
-                if( tk.fmt.audio.i_bitspersample )
-                {
-                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d", tk.fmt.audio.i_bitspersample );
-                }
-                break;
-            case VIDEO_ES:
-                input_AddInfo( p_cat, _("Type"), _("Video") );
-                input_AddInfo( p_cat, _("Codec"), "%.4s (%s)", (char*)&tk.fmt.i_codec, tk.psz_codec );
-                if( tk.fmt.video.i_width > 0 && tk.fmt.video.i_height )
-                {
-                    input_AddInfo( p_cat, _("Resolution"), "%dx%d", tk.fmt.video.i_width, tk.fmt.video.i_height );
-                }
-                if( tk.fmt.video.i_display_width > 0 && tk.fmt.video.i_display_height )
-                {
-                    input_AddInfo( p_cat, _("Display Resolution"), "%dx%d", tk.fmt.video.i_display_width, tk.fmt.video.i_display_height );
-                }
-                if( tk.f_fps > 0.1 )
-                {
-                    input_AddInfo( p_cat, _("Frame Per Second"), "%.3f", tk.f_fps );
-                }
-                break;
-            case SPU_ES:
-                input_AddInfo( p_cat, _("Type"), _("Subtitle") );
-                input_AddInfo( p_cat, _("Codec"), "%s", tk.psz_codec );
-                break;
-        }
-
 #undef  tk
     }
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.252 2003/11/05 17:57:29 gbazin Exp $
+ * $Id: input.c,v 1.253 2003/11/13 12:28:34 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -1029,6 +1029,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     input_thread_t    *p_input = p_sys->p_input;
     es_out_id_t       *id = malloc( sizeof( es_out_id_t ) );
     pgrm_descriptor_t *p_prgm = NULL;
+    char              psz_cat[strlen( "Stream " ) + 10];
+    input_info_category_t *p_cat;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( fmt->i_group >= 0 )
@@ -1137,11 +1139,57 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             out->p_sys->i_video = fmt->i_priority;
         }
     }
+
+    sprintf( psz_cat, _("Stream %d"), out->p_sys->i_id );
+    if( ( p_cat = input_InfoCategory( p_input, psz_cat ) ) )
+    {
+        /* Add information */
+        switch( fmt->i_cat )
+        {
+            case AUDIO_ES:
+                input_AddInfo( p_cat, _("Type"), _("Audio") );
+                input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&fmt->i_codec );
+                if( fmt->audio.i_channels > 0 )
+                {
+                    input_AddInfo( p_cat, _("Channels"), "%d", fmt->audio.i_channels );
+                }
+                if( fmt->audio.i_samplerate > 0 )
+                {
+                    input_AddInfo( p_cat, _("Sample Rate"), "%d", fmt->audio.i_samplerate );
+                }
+                if( fmt->audio.i_bitrate > 0 )
+                {
+                    input_AddInfo( p_cat, _("Bitrate"), "%d", fmt->audio.i_bitrate );
+                }
+                if( fmt->audio.i_bitspersample )
+                {
+                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d", fmt->audio.i_bitspersample );
+                }
+                break;
+            case VIDEO_ES:
+                input_AddInfo( p_cat, _("Type"), _("Video") );
+                input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&fmt->i_codec );
+                if( fmt->video.i_width > 0 && fmt->video.i_height > 0 )
+                {
+                    input_AddInfo( p_cat, _("Resolution"), "%dx%d", fmt->video.i_width, fmt->video.i_height );
+                }
+                if( fmt->video.i_display_width > 0 && fmt->video.i_display_height > 0 )
+                {
+                    input_AddInfo( p_cat, _("Display Resolution"), "%dx%d", fmt->video.i_display_width, fmt->video.i_display_height);
+                }
+                break;
+            case SPU_ES:
+                input_AddInfo( p_cat, _("Type"), _("Subtitle") );
+                input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&fmt->i_codec );
+                break;
+            default:
+
+                break;
+        }
+    }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-
     TAB_APPEND( out->p_sys->i_id, out->p_sys->id, id );
-
     return id;
 }
 static int EsOutSend( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )

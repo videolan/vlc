@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.65 2003/11/13 11:49:27 fenrir Exp $
+ * $Id: avi.c,v 1.66 2003/11/13 12:28:34 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -289,30 +289,6 @@ static int Open( vlc_object_t * p_this )
                          i,
                          p_auds->p_wf->wFormatTag, p_auds->p_wf->nChannels,
                          p_auds->p_wf->nSamplesPerSec, p_auds->p_wf->wBitsPerSample);
-                {
-                    char psz_cat[ sizeof("Stream") + 10 ];
-                    input_info_category_t *p_cat;
-                    sprintf( psz_cat, _("Stream %d"), i );
-                    p_cat = input_InfoCategory( p_input, psz_cat );
-                    input_AddInfo( p_cat, _("Type"), "Audio(0x%x)",
-                                   p_auds->p_wf->wFormatTag );
-                    input_AddInfo( p_cat, _("Codec"), "%4.4s",
-                                   (const char*)&(tk->i_codec) );
-                    input_AddInfo( p_cat, _("FOURCC"), "0x%x",
-                                   tk->i_codec );
-                    input_AddInfo( p_cat, _("Channels"), "%d",
-                                   p_auds->p_wf->nChannels );
-                    input_AddInfo( p_cat, _("Sample Rate"), "%d",
-                                   p_auds->p_wf->nSamplesPerSec );
-                    if( p_auds->p_wf->wBitsPerSample > 0 && tk->i_scale != 0 )
-                    {
-                        input_AddInfo( p_cat, _("Bits Per Sample"), "%d",
-                                       p_auds->p_wf->wBitsPerSample );
-                        input_AddInfo( p_cat, _("Audio Bitrate"), "%d",
-                                       tk->i_samplesize * tk->i_rate
-                                       / tk->i_scale );
-                    }
-                }
                 break;
 
             case( AVIFOURCC_vids ):
@@ -337,22 +313,6 @@ static int Open( vlc_object_t * p_this )
                          p_vids->p_bih->biHeight,
                          p_vids->p_bih->biBitCount,
                          (float)tk->i_rate/(float)tk->i_scale );
-                {
-                    char psz_cat[ sizeof("Stream") + 10 ];
-                    input_info_category_t *p_cat;
-                    sprintf( psz_cat, "Stream %d", i );
-                    p_cat = input_InfoCategory( p_input, psz_cat );
-                    input_AddInfo( p_cat, _("Type"), _("Video") );
-                    input_AddInfo( p_cat, _("Codec"), "%4.4s",
-                                   (const char*)&(tk->i_codec) );
-                    input_AddInfo( p_cat, _("FOURCC"), "0x%x",
-                                   tk->i_codec );
-                    input_AddInfo( p_cat, _("Resolution"), "%dx%d",
-                                   p_vids->p_bih->biWidth,
-                                   p_vids->p_bih->biHeight );
-                    input_AddInfo( p_cat, _("Frame Rate"), "%f",
-                                   (float)tk->i_rate/(float)tk->i_scale );
-                }
                 break;
             default:
                 msg_Warn( p_input, "stream[%d] unknown type", i );

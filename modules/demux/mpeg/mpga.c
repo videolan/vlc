@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.6 2003/09/13 17:42:16 fenrir Exp $
+ * $Id: mpga.c,v 1.7 2003/11/13 12:28:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -57,9 +57,8 @@ struct demux_sys_t
     mtime_t         i_time;
 
     int             i_bitrate_avg;  /* extracted from Xing header */
-    es_out_id_t     *p_es;
 
-    //es_descriptor_t *p_es;
+    es_out_id_t     *p_es;
 };
 
 static int HeaderCheck( uint32_t h )
@@ -244,16 +243,12 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_time = 0;
     p_sys->i_bitrate_avg = 0;
 
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
+
     if( HeaderCheck( header ) )
     {
         int     i_xing;
         uint8_t *p_xing;
-
-        input_info_category_t * p_cat;
-        static char* mpga_mode[4] =
-        {
-            "stereo", "joint stereo", "dual channel", "mono"
-        };
 
         p_sys->i_bitrate_avg = MPGA_BITRATE( header ) * 1000;
         if( ( i_xing = stream_Peek( p_input->s, &p_xing, 1024 ) ) >= 21 )
@@ -315,20 +310,9 @@ static int Open( vlc_object_t * p_this )
                  MPGA_CHANNELS( header ),
                  MPGA_SAMPLE_RATE( header ) );
 
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        p_cat = input_InfoCategory( p_input, _("MPEG") );
-        input_AddInfo( p_cat, _("Input Type"), "Audio MPEG-%d",
-                       MPGA_VERSION( header) + 1 );
-        input_AddInfo( p_cat, _("Layer"), "%d",
-                       MPGA_LAYER( header ) + 1 );
-        input_AddInfo( p_cat, _("Mode"),
-                       mpga_mode[MPGA_MODE( header )] );
-        input_AddInfo( p_cat, _("Sample Rate"), "%dHz",
-                       MPGA_SAMPLE_RATE( header ) );
-        input_AddInfo( p_cat, _("Average Bitrate"), "%dKb/s",
-                       p_sys->i_bitrate_avg / 1000 );
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        fmt.audio.i_channels = MPGA_CHANNELS( header );
+        fmt.audio.i_samplerate = MPGA_SAMPLE_RATE( header );
+        fmt.audio.i_bitrate = p_sys->i_bitrate_avg;
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -341,7 +325,6 @@ static int Open( vlc_object_t * p_this )
     p_input->stream.i_mux_rate = p_sys->i_bitrate_avg / 8 / 50;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
     p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
     return VLC_SUCCESS;
 

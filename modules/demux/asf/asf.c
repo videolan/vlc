@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.39 2003/11/11 00:37:59 fenrir Exp $
+ * $Id: asf.c,v 1.40 2003/11/13 12:28:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -94,7 +94,7 @@ static int Open( vlc_object_t * p_this )
     guid_t          guid;
 
     demux_sys_t     *p_sys;
-    unsigned int    i_stream;
+    unsigned int    i_stream, i;
     asf_object_content_description_t *p_cd;
 
     vlc_bool_t      b_seekable;
@@ -311,54 +311,29 @@ static int Open( vlc_object_t * p_this )
             input_AddInfo( p_cat, _("Rating"), p_cd->psz_rating );
     }
 
-#if 0
     /* FIXME to port to new way */
     for( i_stream = 0, i = 0; i < 128; i++ )
     {
-        asf_stream_t *tk =  p_sys->stream[i];
         asf_object_codec_list_t *p_cl =
             ASF_FindObject( p_sys->p_root->p_hdr,
                             &asf_object_codec_list_guid, 0 );
-        char psz_cat[sizeof(_("Stream "))+10];
 
-        if( p_sys->stream[i] == NULL )
+        if( p_sys->stream[i] )
         {
-            continue;
-        }
-        sprintf( psz_cat, _("Stream %d"), i_stream );
-        p_cat = input_InfoCategory( p_input, psz_cat);
+            char psz_cat[sizeof(_("Stream "))+10];
+            sprintf( psz_cat, _("Stream %d"), i_stream );
+            p_cat = input_InfoCategory( p_input, psz_cat);
 
-        input_AddInfo( p_cat, _("Type"),
-                       ( tk->i_cat == AUDIO_ES ? _("Audio") : _("Video") ) );
-        input_AddInfo( p_cat, _("Codec"), "%.4s",
-                           (char*)&tk->p_es->i_fourcc );
-        if( p_cl && i_stream < p_cl->i_codec_entries_count )
-        {
-            input_AddInfo( p_cat, _("Codec name"),
-                           p_cl->codec[i_stream].psz_name );
-            input_AddInfo( p_cat, _("Codec description"),
-                           p_cl->codec[i_stream].psz_description );
+            if( p_cl && i_stream < p_cl->i_codec_entries_count )
+            {
+                input_AddInfo( p_cat, _("Codec name"),
+                               p_cl->codec[i_stream].psz_name );
+                input_AddInfo( p_cat, _("Codec description"),
+                               p_cl->codec[i_stream].psz_description );
+            }
+            i_stream++;
         }
-
-        if( tk->i_cat == AUDIO_ES && tk->p_es->p_waveformatex )
-        {
-            WAVEFORMATEX    *p_wf = tk->p_es->p_waveformatex;
-            input_AddInfo( p_cat, _("Channels"), "%d", p_wf->nChannels );
-            input_AddInfo( p_cat, _("Sample Rate"), "%d", p_wf->nSamplesPerSec );
-            input_AddInfo( p_cat, _("Avg. byterate"), "%d", p_wf->nAvgBytesPerSec );
-            input_AddInfo( p_cat, _("Bits Per Sample"), "%d", p_wf->wBitsPerSample );
-        }
-        else if( tk->i_cat == VIDEO_ES && tk->p_es->p_bitmapinfoheader )
-        {
-            BITMAPINFOHEADER *p_bih = tk->p_es->p_bitmapinfoheader;
-
-            input_AddInfo( p_cat, _("Resolution"), "%dx%d",
-                           p_bih->biWidth, p_bih->biHeight );
-        }
-
-        i_stream++;
     }
-#endif
 
     return VLC_SUCCESS;
 

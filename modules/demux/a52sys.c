@@ -2,7 +2,7 @@
  * a52.c : Raw a52 Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52sys.c,v 1.7 2003/11/11 00:37:59 fenrir Exp $
+ * $Id: a52sys.c,v 1.8 2003/11/13 12:28:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -139,26 +139,15 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', ' ' ) );
     if( HeaderCheck( p_peek ) )
     {
-        int i_channels, i_sample_rate, i_frame_size;
-        input_info_category_t * p_category;
+        int i_frame_size;
 
-        HeaderInfo( p_peek, &i_channels, &i_sample_rate, &i_frame_size );
+        HeaderInfo( p_peek, &fmt.audio.i_channels, &fmt.audio.i_samplerate, &i_frame_size );
 
-        msg_Dbg( p_input,
-                 "a52 channels=%d sample_rate=%d",
-                 i_channels, i_sample_rate );
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        p_category = input_InfoCategory( p_input, _("A52") );
-
-        input_AddInfo( p_category, _("Input Type"), "A52" );
-        input_AddInfo( p_category, _("Channels"), "%d", i_channels );
-        input_AddInfo( p_category, _("Sample Rate"), "%dHz", i_sample_rate );
-
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        msg_Dbg( p_input, "a52 channels=%d sample_rate=%d",
+                 fmt.audio.i_channels, fmt.audio.i_samplerate );
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -171,7 +160,6 @@ static int Open( vlc_object_t * p_this )
     p_input->stream.i_mux_rate = 0 / 50;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', ' ' ) );
     p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
     return VLC_SUCCESS;
 

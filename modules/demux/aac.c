@@ -2,7 +2,7 @@
  * aac.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aac.c,v 1.5 2003/11/11 00:37:59 fenrir Exp $
+ * $Id: aac.c,v 1.6 2003/11/13 12:28:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -153,27 +153,17 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', '4', 'a' ) );
     if( HeaderCheck( p_peek ) )
     {
-        input_info_category_t * p_category;
+        fmt.audio.i_channels = AAC_CHANNELS( p_peek );
+        fmt.audio.i_samplerate = AAC_SAMPLE_RATE( p_peek );
+
         msg_Dbg( p_input,
                  "adts header: id=%d channels=%d sample_rate=%d",
                  AAC_ID( p_peek ),
                  AAC_CHANNELS( p_peek ),
                  AAC_SAMPLE_RATE( p_peek ) );
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        p_category = input_InfoCategory( p_input, _("Aac") );
-
-        input_AddInfo( p_category, _("Input Type"), "MPEG-%d AAC",
-                       AAC_ID( p_peek ) == 1 ? 2 : 4 );
-        input_AddInfo( p_category, _("Channels"), "%d",
-                       AAC_CHANNELS( p_peek ) );
-        input_AddInfo( p_category, _("Sample Rate"), "%dHz",
-                       AAC_SAMPLE_RATE( p_peek ) );
-
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -186,7 +176,6 @@ static int Open( vlc_object_t * p_this )
     p_input->stream.i_mux_rate = 0 / 50;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', '4', 'a' ) );
     p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
 
     return VLC_SUCCESS;
