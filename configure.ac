@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.111 2003/11/09 16:00:54 titer Exp $
+dnl $Id: configure.ac,v 1.112 2003/11/10 17:47:42 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1096,15 +1096,16 @@ then
       AC_MSG_RESULT(${real_livedotcom_tree}/liveMedia/libliveMedia.a)
 
       AX_ADD_BUILTINS([livedotcom])
-      AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/liveMedia -lliveMedia])
-      AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/BasicUsageEnvironment -lBasicUsageEnvironment])
-      AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/groupsock -lgroupsock])
-      AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/UsageEnvironment -lUsageEnvironment])
 
       if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
         AX_ADD_LDFLAGS([livedotcom],[-lws2_32])
       fi
+
+      AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/liveMedia -lliveMedia])
+      AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/BasicUsageEnvironment -lBasicUsageEnvironment])
+      AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/groupsock -lgroupsock])
+      AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/UsageEnvironment -lUsageEnvironment])
 
       AX_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/BasicUsageEnvironment/include])
       AX_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/groupsock/include])
