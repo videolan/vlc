@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.32 2003/01/23 22:25:32 hartman Exp $
+ * $Id: intf.m,v 1.33 2003/01/24 16:19:15 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -938,6 +938,22 @@ static void Run( intf_thread_t *p_intf )
      * always sensitive. --Meuuh */
     [o_mi setEnabled: TRUE];
 
+#if 0
+    /* We do not use this code, because you need to start stop .avi for
+     * it to work, so not very useful now  --hartman */
+    if ( o_mi == o_mi_subtitle ) {
+        NSLog(@"testing");
+        [o_mi setEnabled: TRUE ];
+        NSMenuItem * o_lmi;
+        NSString * o_title;
+        o_title = _NS("Load from file..");
+        o_lmi = [o_menu addItemWithTitle: o_title
+                 action: pf_callback keyEquivalent: @""];
+        [o_lmi setTag: 2000];
+        [o_lmi setTarget: o_controls];
+    }
+#endif
+
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
 
 #define ES p_intf->p_sys->p_input->stream.pp_es[i]
@@ -1015,7 +1031,7 @@ static void Run( intf_thread_t *p_intf )
     }
 
     /* make (un)sensitive */
-    [o_mi setEnabled: (val.p_list->i_count > 0)];
+    [o_mi setEnabled: ( val.p_list->i_count > 0 )];
 
     for ( i = 0; i < val.p_list->i_count; i++ )
     {

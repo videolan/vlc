@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.13 2003/01/24 00:53:41 hartman Exp $
+ * $Id: controls.m,v 1.14 2003/01/24 16:19:15 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -464,6 +464,26 @@
     NSMenuItem * o_mi = (NSMenuItem *)sender;
     intf_thread_t * p_intf = [NSApp getIntf];
 
+#if 0
+    /* We do not use this code, because you need to start stop .avi for
+     * it to work, so not very useful now  --hartman */
+    if ( [o_mi state] == NSOffState && [o_mi tag] == 2000 )
+    {
+        NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+        
+        [o_open_panel setAllowsMultipleSelection: NO];
+        [o_open_panel setTitle: _NS("Open subtitlefile")];
+        [o_open_panel setPrompt: _NS("Open")];
+    
+        if( [o_open_panel runModalForDirectory: nil 
+                file: nil types: nil] == NSOKButton )
+        {
+            NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
+            config_PutPsz( p_intf, "sub-file", strdup( [o_filename cString] ));
+        }
+    }
+#endif
+
 #define p_input p_intf->p_sys->p_input
 
     if( !p_intf->p_sys->b_audio_update )
@@ -511,7 +531,7 @@
 - (IBAction)toggleVar:(id)sender
 {
     NSMenuItem * o_mi = (NSMenuItem *)sender;
-
+    
     if( [o_mi state] == NSOffState )
     {
         const char * psz_variable = (const char *)[o_mi tag];
