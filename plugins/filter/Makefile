@@ -4,3 +4,4 @@ filter_invert_SOURCES = invert.c
 filter_distort_SOURCES = distort.c
 filter_wall_SOURCES = wall.c
 filter_clone_SOURCES = clone.c
+filter_crop_SOURCES = crop.c

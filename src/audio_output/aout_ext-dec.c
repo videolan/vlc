@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.17 2002/06/01 18:04:49 sam Exp $
+ * $Id: aout_ext-dec.c,v 1.18 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -44,14 +44,14 @@ aout_fifo_t * __aout_CreateFifo( vlc_object_t *p_this, int i_format,
     int i_index;
 
     /* Spawn an audio output if there is none */
-    p_aout = vlc_object_find( p_this->p_vlc, VLC_OBJECT_AOUT, FIND_CHILD );
+    p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
     if( p_aout )
     {
         if( p_aout->fifo[0].i_format != i_format )
         {
             msg_Dbg( p_this, "changing aout type" );
-            vlc_object_unlink_all( p_aout );
+            vlc_object_detach_all( p_aout );
             vlc_object_release( p_aout );
             aout_DestroyThread( p_aout );
             p_aout = NULL;

@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.93 2002/06/01 18:04:49 sam Exp $
+ * $Id: vout_sdl.c,v 1.94 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -339,8 +339,8 @@ static int vout_Manage( vout_thread_t *p_vout )
             case SDL_BUTTON_RIGHT:
                 {
                     intf_thread_t *p_intf;
-                    p_intf = vlc_object_find( p_vout->p_vlc, VLC_OBJECT_INTF,
-                                                             FIND_CHILD );
+                    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
+                                                      FIND_ANYWHERE );
                     if( p_intf )
                     {
                         p_intf->b_menu_change = 1;
@@ -425,8 +425,8 @@ static int vout_Manage( vout_thread_t *p_vout )
             case SDLK_MENU:
                 {
                     intf_thread_t *p_intf;
-                    p_intf = vlc_object_find( p_vout->p_vlc, VLC_OBJECT_INTF,
-                                                             FIND_CHILD );
+                    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
+                                                      FIND_ANYWHERE );
                     if( p_intf )
                     {
                         p_intf->b_menu_change = 1;

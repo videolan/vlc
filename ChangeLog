@@ -4,6 +4,10 @@
 
 HEAD
 
+  * ./src/misc/objects.c: commented all functions.
+  * ./src/misc/objects.c: implemented vlc_object_find( , , FIND_ANYWHERE).
+  * ./src/misc/objects.c: renamed vlc_object_unlink to vlc_object_detach.
+  * ALL: got rid of p_object->p_this which is now useless.
   * ./include/main.h, ./plugins/beos/intf_beos.cpp: BeOS compilation fixes.
   * ./bootstrap.sh, ./src/libvlc.h, ./po/*: fixed bootstrap.sh so that it does
     not include CVS Id lines in automatically created files.
@@ -27,6 +31,19 @@ HEAD
 
 0.4.1
 
+  * ./src/video_output/video_output.c: fixed the "picture has invalid status"
+    bug which might have been the cause of crashes.
+  * ./plugins/filter/crop.c: attempt at an automatic border cropping filter,
+    using "--filter crop --autocrop".
+  * ./vlc.spec: added missing filters to the RPM generation.
+  * ./plugins/macosx/*: channel change support on Mac OS X.
+  * ./extras/MacOSX/Resources/vlc.icns: new OS X icon, courtesy of Benjamin 
+    Mironer <bmironer@noos.fr>.
+  * ./plugins/filter/crop.c: crop filter. Usage examples:
+      --filter crop --crop-geometry 640x480
+      --filter crop --crop-geometry 320x200+10+10
+  * ./plugins/macosx/intf_vlc_wrapper.m: fixed a bug in the chapter handling.
+  * ./plugins/macosx/vout_vlc_wrapper.m: more keystrokes.  
   * ./plugins/chroma/i420_yuy2.h: simplified the chroma code. Please test
     under BeOS and QNX.
   * ./plugins/macosx/intf_vlc_wrapper.m: fix for non-ASCII filenames in the

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.182 2002/06/01 18:04:49 sam Exp $
+ * $Id: video_output.c,v 1.183 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -195,7 +195,7 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
 void vout_DestroyThread( vout_thread_t *p_vout )
 {
     /* Unlink object */
-    vlc_object_unlink_all( p_vout );
+    vlc_object_detach_all( p_vout );
 
     /* Request thread destruction */
     p_vout->b_die = 1;
@@ -513,6 +513,7 @@ static void RunThread( vout_thread_t *p_vout)
                     p_vout->i_heap_size--;
                 }
                 vlc_mutex_unlock( &p_vout->picture_lock );
+                p_last_picture = NULL;
             }
 
             /* Compute FPS rate */

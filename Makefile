@@ -97,6 +97,7 @@ PLUGINS_TARGETS := a52/a52 \
 		fb/fb \
 		ffmpeg/ffmpeg \
 		filter/filter_clone \
+		filter/filter_crop \
 		filter/filter_deinterlace \
 		filter/filter_distort \
 		filter/filter_invert \

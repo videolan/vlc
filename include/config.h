@@ -267,3 +267,6 @@
 /* Maximal size of the message queue - in case of overflow, all messages in the
  * queue are printed, but not sent to the threads */
 #define VLC_MSG_QSIZE                   256
+
+/* Maximal depth of the object tree output by vlc_dumpstructure */
+#define MAX_DUMPSTRUCTURE_DEPTH         100

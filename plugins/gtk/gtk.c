@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.25 2002/06/01 18:04:48 sam Exp $
+ * $Id: gtk.c,v 1.26 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -407,8 +407,8 @@ static gint GtkManage( gpointer p_data )
 
     if( p_intf->p_sys->p_input == NULL )
     {
-        p_intf->p_sys->p_input = vlc_object_find( p_intf->p_vlc,
-                                              VLC_OBJECT_INPUT, FIND_CHILD );
+        p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                          FIND_ANYWHERE );
     }
 
     if( p_intf->p_sys->p_input )

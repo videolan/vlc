@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.25 2002/06/01 18:04:49 sam Exp $
+ * $Id: vpar_headers.c,v 1.26 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -488,8 +488,8 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     /* Spawn a video output if there is none */
 
-    p_vpar->p_vout = vlc_object_find( p_vpar->p_fifo->p_vlc, VLC_OBJECT_VOUT,
-                                                             FIND_CHILD );
+    p_vpar->p_vout = vlc_object_find( p_vpar->p_fifo, VLC_OBJECT_VOUT,
+                                                      FIND_ANYWHERE );
     
     if( p_vpar->p_vout )
     {
@@ -499,7 +499,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
              || p_vpar->p_vout->render.i_aspect != p_vpar->sequence.i_aspect )
         {
             /* We are not interested in this format, close this vout */
-            vlc_object_unlink_all( p_vpar->p_vout );
+            vlc_object_detach_all( p_vpar->p_vout );
             vlc_object_release( p_vpar->p_vout );
             vout_DestroyThread( p_vpar->p_vout );
             p_vpar->p_vout = NULL;
@@ -507,7 +507,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         else
         {
             /* This video output is cool! Hijack it. */
-            vlc_object_unlink_all( p_vpar->p_vout );
+            vlc_object_detach_all( p_vpar->p_vout );
             vlc_object_attach( p_vpar->p_vout, p_vpar->p_fifo );
             vlc_object_release( p_vpar->p_vout );
         }

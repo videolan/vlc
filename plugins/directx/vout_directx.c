@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.38 2002/06/01 16:45:34 sam Exp $
+ * $Id: vout_directx.c,v 1.39 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -245,7 +245,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
     DirectXCloseDisplay( p_vout );
     DirectXCloseDDraw( p_vout );
 
-    vlc_object_unlink_all( p_vout->p_sys->p_event );
+    vlc_object_detach_all( p_vout->p_sys->p_event );
 
     /* Kill DirectXEventThread */
     p_vout->p_sys->p_event->b_die = 1;

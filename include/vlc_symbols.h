@@ -129,8 +129,8 @@ struct module_symbols_s
     void * (* __vlc_object_find_inner) ( vlc_object_t *, int, int ) ;
     void (* __vlc_object_yield_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_release_inner) ( vlc_object_t * ) ;
-    void (* __vlc_object_unlink_inner) ( vlc_object_t *, vlc_object_t * ) ;
-    void (* __vlc_object_unlink_all_inner) ( vlc_object_t * ) ;
+    void (* __vlc_object_detach_inner) ( vlc_object_t *, vlc_object_t * ) ;
+    void (* __vlc_object_detach_all_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_attach_inner) ( vlc_object_t *, vlc_object_t * ) ;
     void (* __vlc_dumpstructure_inner) ( vlc_object_t * ) ;
 };
@@ -263,8 +263,8 @@ struct module_symbols_s
 #   define __vlc_object_find p_symbols->__vlc_object_find_inner
 #   define __vlc_object_yield p_symbols->__vlc_object_yield_inner
 #   define __vlc_object_release p_symbols->__vlc_object_release_inner
-#   define __vlc_object_unlink p_symbols->__vlc_object_unlink_inner
-#   define __vlc_object_unlink_all p_symbols->__vlc_object_unlink_all_inner
+#   define __vlc_object_detach p_symbols->__vlc_object_detach_inner
+#   define __vlc_object_detach_all p_symbols->__vlc_object_detach_all_inner
 #   define __vlc_object_attach p_symbols->__vlc_object_attach_inner
 #   define __vlc_dumpstructure p_symbols->__vlc_dumpstructure_inner
 #endif /* __PLUGIN__ */

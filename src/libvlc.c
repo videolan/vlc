@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.4 2002/06/01 18:04:49 sam Exp $
+ * $Id: libvlc.c,v 1.5 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -605,7 +605,7 @@ vlc_error_t vlc_stop( vlc_t *p_vlc )
     while( (p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_CHILD )) )
     {
         intf_StopThread( p_intf );
-        vlc_object_unlink_all( p_intf );
+        vlc_object_detach_all( p_intf );
         vlc_object_release( p_intf );
         intf_Destroy( p_intf );
     }
@@ -617,7 +617,7 @@ vlc_error_t vlc_stop( vlc_t *p_vlc )
     while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
                                           FIND_CHILD )) )
     {
-        vlc_object_unlink_all( p_playlist );
+        vlc_object_detach_all( p_playlist );
         vlc_object_release( p_playlist );
         playlist_Destroy( p_playlist );
     }
@@ -628,7 +628,7 @@ vlc_error_t vlc_stop( vlc_t *p_vlc )
     msg_Dbg( p_vlc, "removing all video outputs" );
     while( (p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
     {
-        vlc_object_unlink_all( p_vout );
+        vlc_object_detach_all( p_vout );
         vlc_object_release( p_vout );
         vout_DestroyThread( p_vout );
     }
@@ -639,7 +639,7 @@ vlc_error_t vlc_stop( vlc_t *p_vlc )
     msg_Dbg( p_vlc, "removing all audio outputs" );
     while( (p_aout = vlc_object_find( p_vlc, VLC_OBJECT_AOUT, FIND_CHILD )) )
     {
-        vlc_object_unlink_all( p_aout );
+        vlc_object_detach_all( p_aout );
         vlc_object_release( p_aout );
         aout_DestroyThread( p_aout );
     }

@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.3 2002/06/01 18:04:49 sam Exp $
+ * $Id: objects.c,v 1.4 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
 #include <vlc/vlc.h>
 
 #ifdef HAVE_STDLIB_H
@@ -41,105 +44,20 @@
 #include "playlist.h"
 #include "interface.h"
 
-static void vlc_dumpstructure_inner( vlc_object_t *, int, char * );
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
 static vlc_object_t * vlc_object_find_inner( vlc_object_t *, int, int );
-static void vlc_object_unlink_inner( vlc_object_t *, vlc_object_t * );
+static void vlc_object_detach_inner( vlc_object_t *, vlc_object_t * );
+static void vlc_dumpstructure_inner( vlc_object_t *, int, char * );
 
-#define MAX_TREE_DEPTH 100
-
-void __vlc_dumpstructure( vlc_object_t *p_this )
-{
-    char psz_foo[2 * MAX_TREE_DEPTH + 1];
-
-    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-    psz_foo[0] = '|';
-    vlc_dumpstructure_inner( p_this, 0, psz_foo );
-    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
-}
-
-static void vlc_dumpstructure_inner( vlc_object_t *p_this,
-                                     int i_level, char *psz_foo )
-{
-    int i;
-    char i_back = psz_foo[i_level];
-    char psz_children[20], psz_refcount[20], psz_thread[20], psz_name[50];
-
-    psz_name[0] = '\0';
-    if( p_this->psz_object_name )
-    {
-        snprintf( psz_name, 50, " \"%s\"", p_this->psz_object_name );
-        psz_name[48] = '\"';
-        psz_name[49] = '\0';
-    }
-
-    psz_children[0] = '\0';
-    switch( p_this->i_children )
-    {
-        case 0:
-            break;
-        case 1:
-            strcpy( psz_children, ", 1 child" );
-            break;
-        default:
-            snprintf( psz_children, 20, ", %i children", p_this->i_children );
-            psz_children[19] = '\0';
-            break;
-    }
-
-    psz_refcount[0] = '\0';
-    if( p_this->i_refcount )
-    {
-        snprintf( psz_refcount, 20, ", refcount %i", p_this->i_refcount );
-        psz_refcount[19] = '\0';
-    }
-
-    psz_thread[0] = '\0';
-    if( p_this->b_thread )
-    {
-        snprintf( psz_thread, 20, " (thread %d)", p_this->i_thread );
-        psz_thread[19] = '\0';
-    }
-
-    psz_foo[i_level] = '\0';
-    msg_Info( p_this, "%so %s %p%s%s%s%s", psz_foo, p_this->psz_object_type,
-              p_this, psz_name, psz_thread, psz_refcount, psz_children );
-    psz_foo[i_level] = i_back;
-
-    if( i_level / 2 >= MAX_TREE_DEPTH )
-    {
-        msg_Warn( p_this, "structure tree is too deep" );
-        return;
-    }
-
-    for( i = 0 ; i < p_this->i_children ; i++ )
-    {
-        if( i_level )
-        {
-            psz_foo[i_level-1] = ' ';
-
-            if( psz_foo[i_level-2] == '`' )
-            {
-                psz_foo[i_level-2] = ' ';
-            }
-        }
-
-        if( i == p_this->i_children - 1 )
-        {
-            psz_foo[i_level] = '`';
-        }
-        else
-        {
-            psz_foo[i_level] = '|';
-        }
-
-        psz_foo[i_level+1] = '-';
-        psz_foo[i_level+2] = '\0';
-
-        vlc_dumpstructure_inner( p_this->pp_children[i], i_level + 2, psz_foo );
-    }
-}
-
-/* vlc_object_create: initialize a vlc object */
+/*****************************************************************************
+ * vlc_object_create: initialize a vlc object
+ *****************************************************************************
+ * This function allocates memory for a vlc object and initializes it. If
+ * i_type is not a known value such as VLC_OBJECT_ROOT, VLC_OBJECT_VOUT and
+ * so on, vlc_object_create will use its value for the object size.
+ *****************************************************************************/
 void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 {
     vlc_object_t * p_new;
@@ -233,7 +151,13 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     return p_new;
 }
 
-/* vlc_object_destroy: initialize a vlc object and set its parent */
+/*****************************************************************************
+ * vlc_object_destroy: destroy a vlc object
+ *****************************************************************************
+ * This function destroys an object that has been previously allocated with
+ * vlc_object_create. The object's refcount must be zero and it must not be
+ * attached to other objects in any way.
+ *****************************************************************************/
 void __vlc_object_destroy( vlc_object_t *p_this )
 {
     if( p_this->i_refcount )
@@ -259,7 +183,12 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     free( p_this );
 }
 
-/* vlc_object_find: find a typed object and increment its refcount */
+/*****************************************************************************
+ * vlc_object_find: find a typed object and increment its refcount
+ *****************************************************************************
+ * This function recursively looks for a given object type. i_mode can be one
+ * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
+ *****************************************************************************/
 void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 {
     vlc_object_t *p_found;
@@ -275,7 +204,16 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     }
 
     /* Otherwise, recursively look for the object */
-    p_found = vlc_object_find_inner( p_this, i_type, i_mode );
+    if( (i_mode & 0x000f) == FIND_ANYWHERE )
+    {
+        p_found = vlc_object_find_inner( CAST_TO_VLC_OBJECT(p_this->p_vlc),
+                                         i_type,
+                                         (i_mode & ~0x000f) | FIND_CHILD );
+    }
+    else
+    {
+        p_found = vlc_object_find_inner( p_this, i_type, i_mode );
+    }
 
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 
@@ -331,14 +269,16 @@ static vlc_object_t * vlc_object_find_inner( vlc_object_t *p_this,
         break;
 
     case FIND_ANYWHERE:
-        /* FIXME: unimplemented */
+        /* Handled in vlc_object_find */
         break;
     }
 
     return NULL;
 }
 
-/* vlc_object_yield: increment an object refcount */
+/*****************************************************************************
+ * vlc_object_yield: increment an object refcount
+ *****************************************************************************/
 void __vlc_object_yield( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &p_this->p_vlc->structure_lock );
@@ -346,7 +286,9 @@ void __vlc_object_yield( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 }
 
-/* vlc_object_release: decrement an object refcount */
+/*****************************************************************************
+ * vlc_object_release: decrement an object refcount
+ *****************************************************************************/
 void __vlc_object_release( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &p_this->p_vlc->structure_lock );
@@ -354,8 +296,57 @@ void __vlc_object_release( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 }
 
-/* vlc_object_unlink: detach object from its parents */
-void __vlc_object_unlink_all( vlc_object_t *p_this )
+/*****************************************************************************
+ * vlc_object_attach: attach object to a parent object
+ *****************************************************************************
+ * This function sets p_this as a child of p_parent, and p_parent as a parent
+ * of p_this. This link can be undone using vlc_object_detach.
+ *****************************************************************************/
+void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
+{
+    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+
+    p_this->i_parents++;
+    p_this->pp_parents = (vlc_object_t **)realloc( p_this->pp_parents,
+                            p_this->i_parents * sizeof(vlc_object_t *) );
+    p_this->pp_parents[p_this->i_parents - 1] = p_parent;
+
+    p_parent->i_children++;
+    p_parent->pp_children = (vlc_object_t **)realloc( p_parent->pp_children,
+                               p_parent->i_children * sizeof(vlc_object_t *) );
+    p_parent->pp_children[p_parent->i_children - 1] = p_this;
+
+    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+}
+
+#if 0 /* UNUSED */
+/* vlc_object_setchild: attach a child object */
+void __vlc_object_setchild( vlc_object_t *p_this, vlc_object_t *p_child )
+{
+    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+
+    p_this->i_children++;
+    p_this->pp_children = (vlc_object_t **)realloc( p_this->pp_children,
+                             p_this->i_children * sizeof(vlc_object_t *) );
+    p_this->pp_children[p_this->i_children - 1] = p_child;
+
+    p_child->i_parents++;
+    p_child->pp_parents = (vlc_object_t **)realloc( p_child->pp_parents,
+                             p_child->i_parents * sizeof(vlc_object_t *) );
+    p_child->pp_parents[p_child->i_parents - 1] = p_this;
+
+    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+}
+#endif
+
+/*****************************************************************************
+ * vlc_object_detach_all: detach object from its parents
+ *****************************************************************************
+ * This function unlinks an object from all its parents. It is up to the
+ * object to get rid of its children, so this function doesn't do anything
+ * with them.
+ *****************************************************************************/
+void __vlc_object_detach_all( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &p_this->p_vlc->structure_lock );
 
@@ -365,21 +356,25 @@ void __vlc_object_unlink_all( vlc_object_t *p_this )
         /* Not very effective because we know the index, but we'd have to
          * parse p_parent->pp_children anyway. Plus, we remove duplicates
          * by not using the object's index */
-        vlc_object_unlink_inner( p_this, p_this->pp_parents[0] );
+        vlc_object_detach_inner( p_this, p_this->pp_parents[0] );
     }
 
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 }
 
-/* vlc_object_unlink: remove a parent/child link */
-void __vlc_object_unlink( vlc_object_t *p_this, vlc_object_t *p_parent )
+/*****************************************************************************
+ * vlc_object_detach: remove a parent/child link
+ *****************************************************************************
+ * This function removes all links between an object and a given parent.
+ *****************************************************************************/
+void __vlc_object_detach( vlc_object_t *p_this, vlc_object_t *p_parent )
 {
     vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-    vlc_object_unlink_inner( p_this, p_parent );
+    vlc_object_detach_inner( p_this, p_parent );
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 }
 
-static void vlc_object_unlink_inner( vlc_object_t *p_this,
+static void vlc_object_detach_inner( vlc_object_t *p_this,
                                      vlc_object_t *p_parent )
 {
     int i_index, i;
@@ -433,41 +428,102 @@ static void vlc_object_unlink_inner( vlc_object_t *p_this,
     }
 }
 
-/* vlc_object_attach: attach object to a parent object */
-void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
+/*****************************************************************************
+ * vlc_dumpstructure: print the current vlc structure
+ *****************************************************************************
+ * This function prints an ASCII tree showing the connections between vlc
+ * objects, and additional information such as their refcount, thread ID,
+ * address, etc.
+ *****************************************************************************/
+void __vlc_dumpstructure( vlc_object_t *p_this )
 {
+    char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
+
     vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-
-    p_this->i_parents++;
-    p_this->pp_parents = (vlc_object_t **)realloc( p_this->pp_parents,
-                            p_this->i_parents * sizeof(vlc_object_t *) );
-    p_this->pp_parents[p_this->i_parents - 1] = p_parent;
-
-    p_parent->i_children++;
-    p_parent->pp_children = (vlc_object_t **)realloc( p_parent->pp_children,
-                               p_parent->i_children * sizeof(vlc_object_t *) );
-    p_parent->pp_children[p_parent->i_children - 1] = p_this;
-
+    psz_foo[0] = '|';
+    vlc_dumpstructure_inner( p_this, 0, psz_foo );
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 }
 
-#if 0 /* UNUSED */
-/* vlc_object_setchild: attach a child object */
-void __vlc_object_setchild( vlc_object_t *p_this, vlc_object_t *p_child )
+static void vlc_dumpstructure_inner( vlc_object_t *p_this,
+                                     int i_level, char *psz_foo )
 {
-    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+    int i;
+    char i_back = psz_foo[i_level];
+    char psz_children[20], psz_refcount[20], psz_thread[20], psz_name[50];
 
-    p_this->i_children++;
-    p_this->pp_children = (vlc_object_t **)realloc( p_this->pp_children,
-                             p_this->i_children * sizeof(vlc_object_t *) );
-    p_this->pp_children[p_this->i_children - 1] = p_child;
+    psz_name[0] = '\0';
+    if( p_this->psz_object_name )
+    {
+        snprintf( psz_name, 50, " \"%s\"", p_this->psz_object_name );
+        psz_name[48] = '\"';
+        psz_name[49] = '\0';
+    }
 
-    p_child->i_parents++;
-    p_child->pp_parents = (vlc_object_t **)realloc( p_child->pp_parents,
-                             p_child->i_parents * sizeof(vlc_object_t *) );
-    p_child->pp_parents[p_child->i_parents - 1] = p_this;
+    psz_children[0] = '\0';
+    switch( p_this->i_children )
+    {
+        case 0:
+            break;
+        case 1:
+            strcpy( psz_children, ", 1 child" );
+            break;
+        default:
+            snprintf( psz_children, 20, ", %i children", p_this->i_children );
+            psz_children[19] = '\0';
+            break;
+    }
 
-    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+    psz_refcount[0] = '\0';
+    if( p_this->i_refcount )
+    {
+        snprintf( psz_refcount, 20, ", refcount %i", p_this->i_refcount );
+        psz_refcount[19] = '\0';
+    }
+
+    psz_thread[0] = '\0';
+    if( p_this->b_thread )
+    {
+        snprintf( psz_thread, 20, " (thread %d)", p_this->i_thread );
+        psz_thread[19] = '\0';
+    }
+
+    psz_foo[i_level] = '\0';
+    msg_Info( p_this, "%so %s %p%s%s%s%s", psz_foo, p_this->psz_object_type,
+              p_this, psz_name, psz_thread, psz_refcount, psz_children );
+    psz_foo[i_level] = i_back;
+
+    if( i_level / 2 >= MAX_DUMPSTRUCTURE_DEPTH )
+    {
+        msg_Warn( p_this, "structure tree is too deep" );
+        return;
+    }
+
+    for( i = 0 ; i < p_this->i_children ; i++ )
+    {
+        if( i_level )
+        {
+            psz_foo[i_level-1] = ' ';
+
+            if( psz_foo[i_level-2] == '`' )
+            {
+                psz_foo[i_level-2] = ' ';
+            }
+        }
+
+        if( i == p_this->i_children - 1 )
+        {
+            psz_foo[i_level] = '`';
+        }
+        else
+        {
+            psz_foo[i_level] = '|';
+        }
+
+        psz_foo[i_level+1] = '-';
+        psz_foo[i_level+2] = '\0';
+
+        vlc_dumpstructure_inner( p_this->pp_children[i], i_level + 2, psz_foo );
+    }
 }
-#endif
 

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.64 2002/06/01 18:04:49 sam Exp $
+ * $Id: modules.c,v 1.65 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -693,8 +693,6 @@ static int AllocatePluginModule( vlc_object_t * p_this, char * psz_filename )
         return -1;
     }
 
-    vlc_object_attach( p_module, p_this );
-
     /* We need to fill these since they may be needed by CallSymbol() */
     p_module->is.plugin.psz_filename = psz_filename;
     p_module->is.plugin.handle = handle;
@@ -789,6 +787,8 @@ static int AllocatePluginModule( vlc_object_t * p_this, char * psz_filename )
 
     msg_Dbg( p_this, "plugin `%s', %s",
              p_module->psz_object_name, p_module->psz_longname );
+
+    vlc_object_attach( p_module, p_this );
 
     return 0;
 }
@@ -926,7 +926,7 @@ static int DeleteModule( module_t * p_module )
     }
 #endif
 
-    vlc_object_unlink_all( p_module );
+    vlc_object_detach_all( p_module );
 
     /* Unlink the module from the linked list. */
     if( p_module->prev != NULL )

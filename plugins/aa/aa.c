@@ -2,7 +2,7 @@
  * vout_aa.c: Aa video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aa.c,v 1.5 2002/06/01 12:31:58 sam Exp $
+ * $Id: aa.c,v 1.6 2002/06/02 09:03:53 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -220,8 +220,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         if ( b & AA_BUTTON3 )
         {
             intf_thread_t *p_intf;
-            p_intf = vlc_object_find( p_vout->p_vlc, VLC_OBJECT_INTF,
-                                                     FIND_CHILD );
+            p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF, FIND_ANYWHERE );
             if( p_intf )
             {
                 p_intf->b_menu_change = 1;

@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.26 2002/06/01 18:04:48 sam Exp $
+ * $Id: gtk_open.c,v 1.27 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -93,8 +93,7 @@ void GtkFileOpenOk( GtkButton * button, gpointer user_data )
     GtkWidget *     p_filesel;
     gchar *         psz_filename;
 
-    p_playlist = vlc_object_find( p_intf->p_vlc,
-                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
@@ -192,8 +191,7 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     char *          psz_device, *psz_source, *psz_method;
     int             i_title, i_chapter;
 
-    p_playlist = vlc_object_find( p_intf->p_vlc,
-                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
@@ -326,8 +324,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
     unsigned int    i_port;
     vlc_bool_t      b_channel;
 
-    p_playlist = vlc_object_find( p_intf->p_vlc,
-                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
@@ -624,8 +621,7 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
     int             i_fec;
     vlc_bool_t      b_pol;
 
-    p_playlist = vlc_object_find( p_intf->p_vlc,
-                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;

@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_control.c,v 1.10 2002/06/01 12:31:59 sam Exp $
+ * $Id: gtk_control.c,v 1.11 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -66,8 +66,7 @@ gboolean GtkControlStop( GtkWidget       *widget,
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
     playlist_t *p_playlist;
 
-    p_playlist = vlc_object_find( p_intf->p_vlc,
-                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
     if( p_playlist )
     {
@@ -86,8 +85,7 @@ gboolean GtkControlPlay( GtkWidget       *widget,
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
     playlist_t *p_playlist;
 
-    p_playlist = vlc_object_find( p_intf->p_vlc,
-                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
     if( p_playlist )
     {
@@ -113,8 +111,7 @@ gboolean GtkControlPause( GtkWidget       *widget,
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
     playlist_t *p_playlist;
 
-    p_playlist = vlc_object_find( p_intf->p_vlc,
-                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
     if( p_playlist )
     {
@@ -133,8 +130,7 @@ gboolean GtkControlSlow( GtkWidget       *widget,
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
     playlist_t *p_playlist;
 
-    p_playlist = vlc_object_find( p_intf->p_vlc,
-                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
 #if 0
     if( p_playlist )
@@ -155,8 +151,7 @@ gboolean GtkControlFast( GtkWidget       *widget,
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
     playlist_t *p_playlist;
 
-    p_playlist = vlc_object_find( p_intf->p_vlc,
-                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
 #if 0
     if( p_playlist )

@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.2 2002/06/01 18:04:49 sam Exp $
+ * $Id: playlist.c,v 1.3 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -70,7 +70,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
         vlc_mutex_destroy( &p_playlist->change_lock );
-        vlc_object_unlink_all( p_playlist );
+        vlc_object_detach_all( p_playlist );
         vlc_object_destroy( p_playlist );
         return NULL;
     }
@@ -103,8 +103,7 @@ int __playlist_Add( vlc_object_t *p_this, int i_pos, const char * psz_item )
 {
     playlist_t *p_playlist;
 
-    p_playlist = vlc_object_find( p_this->p_vlc, VLC_OBJECT_PLAYLIST,
-                                                 FIND_CHILD );
+    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
     if( p_playlist == NULL )
     {
@@ -211,7 +210,7 @@ static void RunThread ( playlist_t *p_playlist )
                 vlc_mutex_unlock( &p_playlist->change_lock );
 
                 /* Destroy input */
-                vlc_object_unlink_all( p_input );
+                vlc_object_detach_all( p_input );
                 vlc_object_release( p_input );
                 input_DestroyThread( p_input );
             }
@@ -269,7 +268,7 @@ static void RunThread ( playlist_t *p_playlist )
             vlc_mutex_unlock( &p_playlist->change_lock );
 
             /* Destroy input */
-            vlc_object_unlink_all( p_input );
+            vlc_object_detach_all( p_input );
             vlc_object_release( p_input );
             input_DestroyThread( p_input );
         }

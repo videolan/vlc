@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.21 2002/06/01 18:04:48 sam Exp $
+ * $Id: vout_events.c,v 1.22 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -116,8 +116,8 @@ void DirectXEventThread( event_thread_t *p_event )
         case WM_RBUTTONUP:
             {
                 intf_thread_t *p_intf;
-                p_intf = vlc_object_find( p_event->p_vlc, VLC_OBJECT_INTF,
-                                                          FIND_CHILD );
+                p_intf = vlc_object_find( p_event, VLC_OBJECT_INTF,
+                                                   FIND_ANYWHERE );
                 if( p_intf )
                 {
                     p_intf->b_menu_change = 1;

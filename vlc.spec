@@ -282,6 +282,8 @@ rm -fr %buildroot
 %{_libdir}/vlc/dvd.so
 %{_libdir}/vlc/fb.so
 %{_libdir}/vlc/file.so
+%{_libdir}/vlc/filter_clone.so
+%{_libdir}/vlc/filter_crop.so
 %{_libdir}/vlc/filter_deinterlace.so
 %{_libdir}/vlc/filter_distort.so
 %{_libdir}/vlc/filter_invert.so

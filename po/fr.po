@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-01 19:57+0200\n"
+"POT-Creation-Date: 2002-06-02 10:58+0200\n"
 "PO-Revision-Date: 2001-12-10 13:32+0100\n"
 "Last-Translator: Samuel Hocevar <sam@zoy.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -186,13 +186,12 @@ msgid "enable audio"
 msgstr "activer l'audio"
 
 #: src/libvlc.h:66
-#, fuzzy
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "stage won't be done, and it will save some processing power."
 msgstr ""
 "Cette option désactive complètement la sortie audio. Le décodage des pistes "
-"audio ne sera pas non plus fait, afin d'économiser du temps processeur."
+"audio ne sera pas effectué, afin d'économiser du temps processeur."
 
 #: src/libvlc.h:69
 msgid "force mono audio"
@@ -277,18 +276,16 @@ msgstr ""
 "disponible."
 
 #: src/libvlc.h:106
-#, fuzzy
 msgid "enable video"
-msgstr "désactiver la vidéo"
+msgstr "activer la vidéo"
 
 #: src/libvlc.h:108
-#, fuzzy
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
 msgstr ""
-"Cette option désactive complètement la sortie audio. Le décodage des pistes "
-"audio ne sera pas non plus fait, afin d'économiser du temps processeur."
+"Cette option désactive complètement la sortie vidéo. Le décodage des pistes "
+"vidéo ne sera pas effectué, afin d'économiser du temps processeur."
 
 #: src/libvlc.h:111
 msgid "display identifier"
@@ -337,7 +334,6 @@ msgid "grayscale video output"
 msgstr "sortie vidéo en niveaux de gris"
 
 #: src/libvlc.h:132
-#, fuzzy
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
@@ -357,12 +353,10 @@ msgstr ""
 "plein écran."
 
 #: src/libvlc.h:140
-#, fuzzy
 msgid "overlay video output"
 msgstr "sortie vidéo en overlay"
 
 #: src/libvlc.h:142
-#, fuzzy
 msgid ""
 "If enabled, vlc will try to take advantage of the overlay capabilities of "
 "you graphics card."

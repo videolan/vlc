@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.23 2002/06/01 12:31:59 sam Exp $
+ * $Id: gtk_display.c,v 1.24 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -240,8 +240,8 @@ gint GtkModeManage( intf_thread_t * p_intf )
  *****************************************************************************/
 void GtkHideTooltips( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = vlc_object_find( p_this->p_vlc,
-                                             VLC_OBJECT_INTF, FIND_CHILD );
+    intf_thread_t *p_intf = vlc_object_find( p_this, VLC_OBJECT_INTF,
+                                                     FIND_ANYWHERE );
 
     if( !p_intf )
     {
@@ -272,8 +272,8 @@ void GtkHideToolbarText( vlc_object_t *p_this )
     GtkToolbarStyle style;
     GtkToolbar * p_toolbar;
 
-    intf_thread_t *p_intf = vlc_object_find( p_this->p_vlc,
-                                             VLC_OBJECT_INTF, FIND_CHILD );
+    intf_thread_t *p_intf = vlc_object_find( p_this, VLC_OBJECT_INTF,
+                                                     FIND_ANYWHERE );
 
     if( !p_intf )
     {

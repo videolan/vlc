@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.21 2002/06/01 12:31:59 sam Exp $
+ * $Id: ggi.c,v 1.22 2002/06/02 09:03:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -325,8 +325,8 @@ int vout_Manage( vout_thread_t *p_vout )
                     case GII_PBUTTON_RIGHT:
                         {
                             intf_thread_t *p_intf;
-                            p_intf = vlc_object_find( p_vout->p_vlc,
-                                             VLC_OBJECT_INTF, FIND_CHILD );
+                            p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
+                                                              FIND_ANYWHERE );
                             if( p_intf )
                             {
                                 p_intf->b_menu_change = 1;
