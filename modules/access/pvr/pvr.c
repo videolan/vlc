@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.1 2003/06/04 21:41:47 titer Exp $
+ * $Id: pvr.c,v 1.2 2003/06/07 03:45:38 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -32,6 +32,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 #include <linux/types.h>
 #include <sys/ioctl.h>
 #include "videodev2.h"
