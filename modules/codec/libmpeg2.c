@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.1 2003/02/25 17:15:32 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.2 2003/02/25 21:09:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -51,6 +51,8 @@ typedef struct dec_thread_t
     decoder_fifo_t   *p_fifo;                  /* stores the PES stream data */
     pes_packet_t     *p_pes;                  /* current PES we are decoding */
     mtime_t          i_pts;
+    mtime_t          i_previous_pts;
+    mtime_t          i_current_pts;
 
     /*
      * Output properties
@@ -118,6 +120,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     p_dec->p_mpeg2dec = NULL;
     p_dec->p_info     = NULL;
     p_dec->i_pts      = 0;
+    p_dec->i_current_pts  = 0;
+    p_dec->i_previous_pts = 0;
 
     /* Initialize decoder */
     p_dec->p_mpeg2dec = mpeg2_init();
@@ -152,7 +156,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 if( p_dec->p_pes->i_pts )
                 {
                     mpeg2_pts( p_dec->p_mpeg2dec,
-                               p_dec->p_pes->i_pts * 9 / 100 );
+                               (uint32_t)p_dec->p_pes->i_pts );
+                    p_dec->i_previous_pts = p_dec->i_current_pts;
+                    p_dec->i_current_pts = p_dec->p_pes->i_pts;
                 }
                 p_data = p_dec->p_pes->p_first;
             }
@@ -205,7 +211,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
           break;
 
         case STATE_END:
+#if 0
             msg_Err( p_dec->p_fifo, "STATE_END" );
+#endif
         case STATE_SLICE:
 #if 0
             msg_Err( p_dec->p_fifo, "STATE_SLICE: %i",
@@ -219,9 +227,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
                 if( p_dec->p_info->display_picture->flags & PIC_FLAG_PTS )
                 {
-                    p_dec->i_pts =
-                        ((mtime_t)p_dec->p_info->display_picture->pts)
-                        * 100 / 9;
+                    p_dec->i_pts = ( p_dec->p_info->display_picture->pts ==
+                                     (uint32_t)p_dec->i_current_pts ) ?
+                        p_dec->i_current_pts : p_dec->i_previous_pts;
                 }
                 else
                 {
