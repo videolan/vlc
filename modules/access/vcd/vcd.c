@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.21 2003/05/18 15:44:03 gbazin Exp $
+ * $Id: vcd.c,v 1.22 2003/05/22 12:00:57 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -102,12 +102,6 @@ static int VCDOpen( vlc_object_t *p_this )
     int                     i_title = 1;
     int                     i_chapter = 1;
     vcddev_t                *vcddev;
-
-#ifdef WIN32
-    /* On Win32 we want the VCD access plugin to be explicitly requested,
-     * we end up with lots of problems otherwise */
-    if( !p_input->psz_access || !*p_input->psz_access ) return( -1 );
-#endif
 
     /* parse the options passed in command line : */
     psz_orig = psz_parser = psz_source = strdup( p_input->psz_name );

@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.11 2003/05/18 15:44:03 gbazin Exp $
+ * $Id: cdrom.c,v 1.12 2003/05/22 12:00:57 gbazin Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -101,8 +101,7 @@ vcddev_t *ioctl_Open( vlc_object_t *p_this, const char *psz_dev )
      *  Check if we are dealing with a device or a file (vcd image)
      */
 #ifdef WIN32
-    if( strlen( psz_dev ) == 1 ||
-        (strlen( psz_dev ) == 2 && psz_dev[1] == ':') )
+    if( (strlen( psz_dev ) == 2 && psz_dev[1] == ':') )
     {
         b_is_file = 0;
     }

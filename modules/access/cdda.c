@@ -2,7 +2,7 @@
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cdda.c,v 1.3 2003/05/19 20:47:16 gbazin Exp $
+ * $Id: cdda.c,v 1.4 2003/05/22 12:00:56 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -116,12 +116,6 @@ static int CDDAOpen( vlc_object_t *p_this )
     input_area_t *          p_area;
     int                     i_title = 1;
     vcddev_t                *vcddev;
-
-#ifdef WIN32
-    /* On Win32 we want the CDDA access plugin to be explicitly requested,
-     * we end up with lots of problems otherwise */
-    if( !p_input->psz_access || !*p_input->psz_access ) return( -1 );
-#endif
 
     /* parse the options passed in command line : */
     psz_orig = psz_parser = psz_source = strdup( p_input->psz_name );

@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.13 2003/05/20 23:17:59 gbazin Exp $
+ * $Id: streamout.cpp,v 1.14 2003/05/22 12:00:56 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -168,7 +168,7 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
                                                         wxHORIZONTAL );
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
                                                 wxU(_("Destination Target:")));
-    mrl_combo = new wxComboBox( panel, MRL_Event, mrl,
+    mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
                                 wxPoint(20,25), wxSize(120, -1), 0, NULL );
     mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
         "the full MRL you want to open.\n""Alternatively, the field will be "
@@ -215,9 +215,6 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     main_sizer->Add( panel, 1, wxGROW, 0 );
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
-
-    /* Update all the values */
-    //ParseMRL();
 }
 
 SoutDialog::~SoutDialog()
@@ -320,11 +317,9 @@ void SoutDialog::UpdateMRL()
     }
 
     if( !transcode.IsEmpty() || !duplicate.IsEmpty() )
-        mrl = wxT("#") + transcode + duplicate;
+        mrl_combo->SetValue( wxT("#") + transcode + duplicate );
     else
-        mrl = wxT("");
-
-    mrl_combo->SetValue( mrl );
+        mrl_combo->SetValue( wxT("") );
 }
 
 wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
@@ -583,96 +578,13 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     return panel;
 }
 
-#if 0
-void SoutDialog::ParseMRL()
-{
-    /* Initialise MRL value */
-    char *psz_sout = config_GetPsz( p_intf, "sout" );
-    if( psz_sout )
-    {
-        mrl = wxU(psz_sout);
-        free( psz_sout );
-    }
-
-    /* Parse the MRL */
-    wxString access = mrl.BeforeFirst( wxT('/') );
-    wxString encapsulation = mrl.BeforeFirst( wxT(':') ).AfterFirst(wxT('/'));
-
-    if( !access.Cmp( wxT("http") ) )
-    {
-        i_access_type = HTTP_ACCESS_OUT;
-    }
-    else if( !access.Cmp( wxT("udp") ) )
-    {
-        i_access_type = UDP_ACCESS_OUT;
-    }
-    else if( !access.Cmp( wxT("rtp") ) )
-    {
-        i_access_type = RTP_ACCESS_OUT;
-    }
-    else
-    {
-        i_access_type = FILE_ACCESS_OUT;
-    }
-
-    if( !encapsulation.Cmp( wxT("ps") ) )
-    {
-        i_encapsulation_type = PS_ENCAPSULATION;
-    }
-    else if( !encapsulation.Cmp( wxT("avi") ) )
-    {
-        i_encapsulation_type = AVI_ENCAPSULATION;
-    }
-    else if( !encapsulation.Cmp( wxT("ogg") ) )
-    {
-        i_encapsulation_type = OGG_ENCAPSULATION;
-    }
-    else
-    {
-        i_encapsulation_type = TS_ENCAPSULATION;
-    }
-
-    wxString second_part = mrl.AfterFirst( wxT(':') );
-
-    if( i_access_type == FILE_ACCESS_OUT )
-    {
-        /* The whole second part of the MRL is the filename */
-        file_combo->SetValue( second_part );
-    }
-    else
-    {
-        /* we've got address:port */
-        wxString address = second_part.BeforeLast( wxT(':') );
-        net_addr->SetValue( address );
-
-        long int i_port;
-        wxString port = second_part.AfterLast( wxT(':') );
-        if( port.ToLong( &i_port ) )
-        {
-            net_port->SetValue( i_port );
-        }
-        else
-        {
-            net_port->SetValue( config_GetInt( p_intf, "server-port" ) );
-        }
-    }
-
-    /* Update access output panel */
-    wxCommandEvent dummy_event;
-    dummy_event.SetId( AccessType1_Event + i_access_type );
-    OnAccessTypeChange( dummy_event );
-
-    /* Update encapsulation output panel */
-    dummy_event.SetId( EncapsulationRadio1_Event + i_encapsulation_type );
-    OnEncapsulationChange( dummy_event );
-}
-#endif
-
 /*****************************************************************************
  * Events methods.
  *****************************************************************************/
 void SoutDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
+    mrl_combo->Append( mrl_combo->GetValue() );
+    mrl = mrl_combo->GetValue();
     EndModal( wxID_OK );
 }
 
@@ -683,7 +595,7 @@ void SoutDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
 
 void SoutDialog::OnMRLChange( wxCommandEvent& event )
 {
-    mrl = event.GetString();
+    //mrl = event.GetString();
 }
 
 /*****************************************************************************

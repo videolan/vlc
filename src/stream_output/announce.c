@@ -84,9 +84,10 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout , char * psz_url_arg , cha
         addr.sin_addr.s_addr = inet_addr(SAP_ADDR);
         addr.sin_port        = htons( SAP_PORT );
     
-        setsockopt( p_new->socket, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl) );
+        setsockopt( p_new->socket, IPPROTO_IP, IP_MULTICAST_TTL,
+                    (void*)&ttl, sizeof(ttl) );
      
-        p_new->addr=(struct sockaddr_in)addr;
+        p_new->addr = addr;
     
         return(p_new);
 }

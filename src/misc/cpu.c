@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.10 2002/12/06 16:34:08 sam Exp $
+ * $Id: cpu.c,v 1.11 2003/05/22 12:00:57 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -282,6 +282,10 @@ uint32_t CPUCapabilities( void )
 
 #elif defined( __sparc__ )
 
+    i_capabilities |= CPU_CAPABILITY_FPU;
+    return i_capabilities;
+
+#elif defined( _MSC_VER )
     i_capabilities |= CPU_CAPABILITY_FPU;
     return i_capabilities;
 
