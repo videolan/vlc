@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.9 2003/07/21 17:48:31 gbazin Exp $
+ * $Id: quicktime.c,v 1.10 2003/08/01 20:06:43 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -521,8 +521,6 @@ static int InitThreadAudio( adec_thread_t *p_dec )
     p_dec->i_buffer_size = 100*1000;
     p_dec->p_buffer      = malloc( p_dec->i_buffer_size );
 
-    p_dec->pts = -1;
-
     vlc_mutex_unlock( lockval.p_address );
     return VLC_SUCCESS;
 
@@ -549,10 +547,8 @@ static void DecodeThreadAudio( adec_thread_t *p_dec )
         p_dec->p_fifo->b_error = 1;
         return;
     }
-    /*if( p_dec->pts <= 0 )*/
-    {
-        p_dec->pts = p_pes->i_pts;
-    }
+
+    p_dec->pts = p_pes->i_pts;
 
     if( p_pes->i_pes_size > 0 && p_pes->i_pts > mdate() )
     {
@@ -663,8 +659,6 @@ static void DecodeThreadAudio( adec_thread_t *p_dec )
                     p_buff += i_frames * 4;
                     i_out_frames -= i_frames;
                 }
-
-                p_dec->pts = -1;
             }
         }
     }
