@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.30 2002/06/01 18:04:48 sam Exp $
+ * $Id: interface.h,v 1.31 2002/07/17 21:54:37 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -50,14 +50,15 @@ struct intf_thread_s
     vlc_mutex_t  change_lock;
     vlc_bool_t   b_menu_change;
     vlc_bool_t   b_menu;
+
 };
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
 #define intf_Create(a) __intf_Create(CAST_TO_VLC_OBJECT(a))
-intf_thread_t * __intf_Create     ( vlc_object_t * );
-vlc_error_t       intf_RunThread  ( intf_thread_t * );
-void              intf_StopThread ( intf_thread_t * );
-void              intf_Destroy    ( intf_thread_t * );
+VLC_EXPORT( intf_thread_t *, __intf_Create,     ( vlc_object_t * ) );
+VLC_EXPORT( vlc_error_t,       intf_RunThread,  ( intf_thread_t * ) );
+VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
+VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 

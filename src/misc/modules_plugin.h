@@ -255,6 +255,10 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->input_FDRead_inner = input_FDRead; \
     (p_symbols)->input_FDNetworkRead_inner = input_FDNetworkRead; \
     (p_symbols)->input_FDSeek_inner = input_FDSeek; \
+    (p_symbols)->__intf_Create_inner = __intf_Create; \
+    (p_symbols)->intf_RunThread_inner = intf_RunThread; \
+    (p_symbols)->intf_StopThread_inner = intf_StopThread; \
+    (p_symbols)->intf_Destroy_inner = intf_Destroy; \
     (p_symbols)->__intf_Eject_inner = __intf_Eject; \
     (p_symbols)->GetLang_1_inner = GetLang_1; \
     (p_symbols)->GetLang_2T_inner = GetLang_2T; \
