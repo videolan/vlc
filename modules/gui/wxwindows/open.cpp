@@ -161,7 +161,6 @@ private:
 };
 
 BEGIN_EVENT_TABLE(AutoBuiltPanel, wxPanel)
-    EVT_BUTTON(wxID_OK, AutoBuiltPanel::OnAdvanced)
     EVT_BUTTON(AdvancedOptions_Event, AutoBuiltPanel::OnAdvanced)
 END_EVENT_TABLE()
 
@@ -275,11 +274,17 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
             new wxStaticLine( p_advanced_dialog, wxID_OK );
         sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
 
-        /* Create OK button */
+        /* Create buttons */
         wxButton *ok_button =
             new wxButton( p_advanced_dialog, wxID_OK, wxU(_("OK")) );
         ok_button->SetDefault();
-        sizer->Add( ok_button, 0, wxALL, 5 );
+        wxButton *cancel_button =
+            new wxButton( p_advanced_dialog, wxID_CANCEL, wxU(_("Cancel")) );
+        wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
+        button_sizer->Add( ok_button, 0, wxALL, 5 );
+        button_sizer->Add( cancel_button, 0, wxALL, 5 );
+        button_sizer->Layout();
+        sizer->Add( button_sizer, 0, wxALL, 0 );
 
         sizer->SetMinSize( 400, -1 );
         p_advanced_dialog->SetSizerAndFit( sizer );
@@ -290,9 +295,11 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
 
 void AutoBuiltPanel::OnAdvanced( wxCommandEvent& event )
 {
-    p_advanced_dialog->Show( !p_advanced_dialog->IsShown() );
-    UpdateAdvancedMRL();
-    p_open_dialog->UpdateMRL();
+    if( p_advanced_dialog->ShowModal() == wxID_OK )
+    {
+        UpdateAdvancedMRL();
+        p_open_dialog->UpdateMRL();
+    }
 }
 
 void AutoBuiltPanel::UpdateAdvancedMRL()
@@ -594,8 +601,8 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
         wxU(_("DVD (menus support)")),
         wxU(_("DVD")),
         wxU(_("VCD")),
-        wxU(_("Audio CD"))
-
+        wxU(_("Audio CD")),
+        wxU(_("DVD (experimental)"))
     };
 
     disc_type = new wxRadioBox( panel, DiscType_Event, wxU(_("Disc type")),
@@ -826,6 +833,17 @@ void OpenDialog::UpdateMRL( int i_access_method )
                                       disc_title->GetValue() );
 #endif
           break;
+
+        case 4: /* DVD of some sort */
+          disc_chapter->Enable();
+          disc_chapter_label->Enable();
+          mrltemp = wxT("dvdnav://")
+                  + disc_device->GetValue()
+                  + wxString::Format( wxT("@%d:%d"),
+                                      disc_title->GetValue(),
+                                      disc_chapter->GetValue() );
+          break;
+
         default: ;
           msg_Err( p_intf, "invalid selection (%d)",
                    disc_type->GetSelection() );
@@ -1112,9 +1130,10 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
     switch( disc_type->GetSelection() )
     {
 
-    case 0: /* DVD with menues */
-      i_selection=0;
-      /* Fall through... */
+    case 0: /* DVD with menus */
+    case 4: /* DVD with menus (dvdnav) */
+        i_selection=0;
+        /* Fall through... */
 
     case 1: /* DVD of some sort */
         psz_device = config_GetPsz( p_intf, "dvd" );
