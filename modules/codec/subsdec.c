@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.13 2003/12/14 19:18:11 gbazin Exp $
+ * $Id: subsdec.c,v 1.14 2003/12/14 23:14:20 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -265,7 +265,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
         msg_Warn( p_dec, "subtitle without a date" );
         return;
     }
-
+    
     /* Check validity of packet data */
     if( p_block->i_buffer <= 1 ||  p_block->p_buffer[0] == '\0' )
     {
@@ -298,7 +298,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
 
         if( inbytes_left )
         {
-            msg_Warn( p_dec, "Failed to convert subtitle encoding, dropping subtitle" );
+            msg_Warn( p_dec, "Failed to convert subtitle encoding, dropping subtitle.\nTry setting a different character-encoding for the subtitle." );
             free( psz_subtitle );
             return;
         }
