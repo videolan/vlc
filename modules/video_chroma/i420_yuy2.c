@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.5 2004/01/25 17:20:18 kuehne Exp $
+ * $Id: i420_yuy2.c,v 1.6 2004/01/26 16:54:56 titer Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,8 +36,10 @@
 
 #if defined (MODULE_NAME_IS_i420_yuy2)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv,Y211"
-#else
+#elif defined (MODULE_NAME_IS_i420_yuy2_mmx)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv"
+#elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
+#    define DEST_FOURCC "YUY2,YUNV"
 #endif
 
 /*****************************************************************************
@@ -46,10 +48,12 @@
 static int  Activate ( vlc_object_t * );
 
 static void I420_YUY2           ( vout_thread_t *, picture_t *, picture_t * );
+#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
 static void I420_YVYU           ( vout_thread_t *, picture_t *, picture_t * );
 static void I420_UYVY           ( vout_thread_t *, picture_t *, picture_t * );
 static void I420_IUYV           ( vout_thread_t *, picture_t *, picture_t * );
 static void I420_cyuv           ( vout_thread_t *, picture_t *, picture_t * );
+#endif
 #if defined (MODULE_NAME_IS_i420_yuy2)
 static void I420_Y211           ( vout_thread_t *, picture_t *, picture_t * );
 #endif
@@ -73,6 +77,11 @@ vlc_module_begin();
     /* Initialize MMX-specific constants */
     i_00ffw = 0x00ff00ff00ff00ffULL;
     i_80w   = 0x0000000080808080ULL;
+#elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
+    set_description(
+            _("Altivec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_capability( "chroma", 100 );
+    add_requirement( ALTIVEC );
 #endif
     set_callbacks( Activate, NULL );
 vlc_module_end();
@@ -103,6 +112,7 @@ static int Activate( vlc_object_t *p_this )
                     p_vout->chroma.pf_convert = I420_YUY2;
                     break;
 
+#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
                 case VLC_FOURCC('Y','V','Y','U'):
                     p_vout->chroma.pf_convert = I420_YVYU;
                     break;
@@ -120,6 +130,7 @@ static int Activate( vlc_object_t *p_this )
                 case VLC_FOURCC('c','y','u','v'):
                     p_vout->chroma.pf_convert = I420_cyuv;
                     break;
+#endif
 
 #if defined (MODULE_NAME_IS_i420_yuy2)
                 case VLC_FOURCC('Y','2','1','1'):
@@ -159,6 +170,14 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
+#if defined (MODULE_NAME_IS_i420_yuy2_altivec)
+    vector unsigned char u_vec;
+    vector unsigned char v_vec;
+    vector unsigned char uv_vec;
+    vector unsigned char y_vec;
+    int high = 1;
+#endif
+
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
         p_line1 = p_line2;
@@ -167,6 +186,29 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
         p_y1 = p_y2;
         p_y2 += p_source->p[Y_PLANE].i_pitch;
 
+#if defined (MODULE_NAME_IS_i420_yuy2_altivec)
+        /* FIXME Thats only works for sizes multiple of 16 */
+        for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+        {
+            if( high )
+            {
+                u_vec = vec_ld( 0, p_u ); p_u += 16;
+                v_vec = vec_ld( 0, p_v ); p_v += 16;
+                uv_vec = vec_mergeh( u_vec, v_vec );
+            }
+            else
+            {
+                uv_vec = vec_mergel( u_vec, v_vec );
+            }
+            y_vec = vec_ld( 0, p_y1 ); p_y1 += 16;
+            vec_st( vec_mergeh( y_vec, uv_vec ), 0, p_line1 ); p_line1 += 16;
+            vec_st( vec_mergel( y_vec, uv_vec ), 0, p_line1 ); p_line1 += 16;
+            y_vec = vec_ld( 0, p_y2 ); p_y2 += 16;
+            vec_st( vec_mergeh( y_vec, uv_vec ), 0, p_line2 ); p_line2 += 16;
+            vec_st( vec_mergel( y_vec, uv_vec ), 0, p_line2 ); p_line2 += 16;
+            high = !high;
+        }
+#else
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_i420_yuy2)
@@ -178,6 +220,7 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV420_YUYV );
 #endif
         }
+#endif
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
@@ -189,6 +232,7 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 /*****************************************************************************
  * I420_YVYU: planar YUV 4:2:0 to packed YVYU 4:2:2
  *****************************************************************************/
+#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
 static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
@@ -334,6 +378,7 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
         p_line2 += i_dest_margin;
     }
 }
+#endif // !defined (MODULE_NAME_IS_i420_yuy2_altivec)
 
 /*****************************************************************************
  * I420_Y211: planar YUV 4:2:0 to packed YUYV 2:1:1

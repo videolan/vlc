@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.159 2004/01/26 10:35:28 gbazin Exp $
+dnl $Id: configure.ac,v 1.160 2004/01/26 16:54:56 titer Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -913,7 +913,7 @@ MMXEXT_MODULES="memcpymmxext"
 #MMXEXT_MODULES="${MMXEXT_MODULES} idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn"
 SSE_MODULES=""
-ALTIVEC_MODULES="memcpyaltivec"
+ALTIVEC_MODULES="memcpyaltivec i420_yuy2_altivec"
 #ALTIVEC_MODULES="${ALTIVEC_MODULES} idctaltivec motionaltivec"
 
 if test "${enable_gprof}" != "yes"
@@ -995,7 +995,7 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
      CFLAGS="${CFLAGS_save}"])
 if test "${ac_cv_c_altivec}" != "no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
-  AX_ADD_CFLAGS([vlc idctaltivec motionaltivec memcpyaltivec deinterlace],[${ac_cv_c_altivec}])
+  AX_ADD_CFLAGS([vlc idctaltivec motionaltivec memcpyaltivec deinterlace i420_yuy2_altivec],[${ac_cv_c_altivec}])
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
