@@ -194,7 +194,7 @@ int E_(Open) ( vlc_object_t *p_this )
                 psz_parser_init = psz_parser;
                 while ( *psz_parser != ':')
                 {
-                psz_parser++;
+                   psz_parser++;
                 }
                 if ((!strncmp( psz_parser_init, "V" ,
                      psz_parser - psz_parser_init ) ) || 
@@ -335,7 +335,7 @@ int E_(Open) ( vlc_object_t *p_this )
             if( *psz_parser )
                 psz_parser++;
             else
-            break;
+                break;
         }
     }
     else
