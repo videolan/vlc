@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.14 2002/07/15 19:33:02 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.15 2002/07/15 22:45:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -625,10 +625,11 @@ static void ffmpeg_ConvertPicture( picture_t *p_pic,
     /* we need to convert to I420 */
     switch( p_vdec->p_context->pix_fmt )
     {
+#if LIBAVCODEC_BUILD >= 4615
         case( PIX_FMT_YUV410P ):
             ffmpeg_ConvertPictureI410toI420( p_pic, p_avpicture, p_vdec );
             break;
-            
+#endif            
         default:
             p_vdec->p_fifo->b_error =1;
             break;
