@@ -2,6 +2,7 @@
  * intf_glide.c: 3dfx interface plugin
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: intf_glide.c,v 1.6 2001/01/05 18:46:43 massiot Exp $
  *
  * Authors:
  *
@@ -26,8 +27,6 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                          /* for input.h */
 #include <linutil.h>                            /* Glide kbhit() and getch() */
 
 #include "config.h"

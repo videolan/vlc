@@ -39,9 +39,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>
 
 #include "config.h"
 #include "common.h"

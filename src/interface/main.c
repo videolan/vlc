@@ -39,8 +39,8 @@
 #include <string.h>                                            /* strerror() */
 
 #include "config.h"
-#include "debug.h"
 #include "common.h"
+#include "debug.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"                                              /* TestMMX() */

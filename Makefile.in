@@ -23,6 +23,9 @@ prefix=@prefix@
 CC=@CC@
 SHELL=@SHELL@
 
+LIB_SDL=@LIB_SDL@
+LIB_GLIDE=@LIB_GLIDE@
+LIB_GGI=@LIB_GGI@
 
 #----------------- do not change anything below this line ----------------------
 
@@ -50,7 +53,7 @@ PROGRAM_BUILD = `date` $(USER)
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.
-DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr a-z A-Z)
+DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr a-z. A-Z_)
 
 ################################################################################
 # Tuning and other variables - do not change anything except if you know
@@ -495,49 +498,49 @@ lib/beos.so: $(PLUGIN_BEOS)
 
 lib/esd.so: $(PLUGIN_ESD)
 ifneq (,$(findstring bsd,$(SYS)))
-	$(CC) -shared -lesd -o $@ $^
+	$(CC) $(LCFLAGS) -shared -lesd -o $@ $^
 else
-	$(CC) -shared -laudiofile -lesd -o $@ $^
+	$(CC) $(LCFLAGS) -shared -laudiofile -lesd -o $@ $^
 endif
 
 lib/dsp.so: $(PLUGIN_DSP)
-	$(CC) -shared -o $@ $^
+	$(CC) $(LCFLAGS) -shared -o $@ $^
 
 lib/alsa.so: $(PLUGIN_ALSA)
-	$(CC) -shared -o $@ $^
+	$(CC) $(LCFLAGS) -shared -o $@ $^
 
 lib/null.so: $(PLUGIN_NULL)
-	$(CC) -shared -o $@ $^
+	$(CC) $(LCFLAGS) -shared -o $@ $^
 
 lib/dummy.so: $(PLUGIN_DUMMY)
-	$(CC) -shared -o $@ $^
+	$(CC) $(LCFLAGS) -shared -o $@ $^
 
 lib/fb.so: $(PLUGIN_FB)
-	$(CC) -shared -o $@ $^
+	$(CC) $(LCFLAGS) -shared -o $@ $^
 
 lib/x11.so: $(PLUGIN_X11)
-	$(CC) -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
+	$(CC) $(LCFLAGS) -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
 
 lib/mga.so: $(PLUGIN_MGA)
-	$(CC) -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
+	$(CC) $(LCFLAGS) -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
 
 lib/gnome.so: $(PLUGIN_GNOME)
-	$(CC) -shared `gnome-config --libs gnomeui | sed 's,-rdynamic,,'` -o $@ $^
+	$(CC) $(LCFLAGS) -shared `gnome-config --libs gnomeui | sed 's,-rdynamic,,'` -o $@ $^
 
 lib/glide.so: $(PLUGIN_GLIDE)
-	$(CC) -shared -lglide2x -o $@ $^
+	$(CC) $(LCFLAGS) -shared $(LIB_GLIDE) -o $@ $^
 
 lib/ggi.so: $(PLUGIN_GGI)
-	$(CC) -shared -lggi -o $@ $^
+	$(CC) $(LCFLAGS) -shared $(LIB_GGI) -o $@ $^
 
 lib/sdl.so: $(PLUGIN_SDL)
-	$(CC) -shared -lSDL -o $@ $^
+	$(CC) $(LCFLAGS) -shared $(LIB_SDL) -o $@ $^
 
 lib/yuv.so: $(PLUGIN_YUV)
 ifeq ($(SYS),beos)
 	$(CC) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
-	$(CC) -shared -o $@ $^
+	$(CC) $(LCFLAGS) -shared -o $@ $^
 endif
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)

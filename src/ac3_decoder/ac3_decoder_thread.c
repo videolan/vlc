@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.22 2000/12/27 18:35:45 massiot Exp $
+ * $Id: ac3_decoder_thread.c,v 1.23 2001/01/05 18:46:44 massiot Exp $
  *
  * Authors:
  *
@@ -39,15 +39,12 @@
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                            /* "input.h" */
 
 #include "config.h"
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
-#include "debug.h"                                      /* "input_netlist.h" */
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 

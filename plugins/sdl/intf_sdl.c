@@ -2,6 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: intf_sdl.c,v 1.19 2001/01/05 18:46:43 massiot Exp $
  *
  * Authors:
  *
@@ -29,8 +30,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <SDL/SDL.h>                                /* for all the SDL stuff */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                          /* for input.h */
 
 #include "config.h"
 #include "common.h"

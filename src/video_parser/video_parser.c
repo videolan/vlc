@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.60 2001/01/02 14:03:30 massiot Exp $
+ * $Id: video_parser.c,v 1.61 2001/01/05 18:46:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -29,8 +29,6 @@
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <unistd.h>                                              /* getpid() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                            /* "input.h" */
 #include <errno.h>
 #include <string.h>
 

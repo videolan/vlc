@@ -42,7 +42,7 @@
 #endif
 
 #include <unistd.h>                           /* needed for ioctl on Solaris */
-#include <stropts.h>
+//#include <stropts.h>
 
 #if defined (HAVE_NET_IF_H)
 #include <net/if.h>                            /* interface (arch-dependent) */
@@ -137,6 +137,9 @@ int ServerPort( char *psz_addr )
  *****************************************************************************
  * i_sockfd must reference a socket open as follow: AF_INET, DOCK_DGRAM, 0
  *****************************************************************************/
+#if 0
+/* pbm :  SIOCGIFHWADDR, doesn't exist on BSD -> find a portable way to
+   do this --Meuuh */
 int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
 {
     int i_rc = 0;
@@ -229,7 +232,6 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
 
     return i_rc;
 }
-
 
 
 /*****************************************************************************
@@ -330,3 +332,4 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 }
 
 
+#endif

@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.24 2000/12/30 00:38:19 massiot Exp $
+ * $Id: input_netlist.c,v 1.25 2001/01/05 18:46:44 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -27,7 +27,9 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <sys/types.h>
 #include <sys/uio.h>                                         /* struct iovec */
+#include <unistd.h>
 
 #include "config.h"
 #include "common.h"

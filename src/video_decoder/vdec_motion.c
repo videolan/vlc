@@ -2,7 +2,7 @@
  * vdec_motion.c : motion compensation routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion.c,v 1.34 2001/01/05 14:46:37 sam Exp $
+ * $Id: vdec_motion.c,v 1.35 2001/01/05 18:46:44 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -27,9 +27,6 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
-
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                          /* for input.h */
 
 #include "config.h"
 #include "common.h"

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.65 2000/12/29 12:49:30 massiot Exp $
+ * $Id: vpar_headers.c,v 1.66 2001/01/05 18:46:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -28,8 +28,6 @@
 #include "defs.h"
 
 #include <stdlib.h>                                                /* free() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                            /* "input.h" */
 
 #include "config.h"
 #include "common.h"

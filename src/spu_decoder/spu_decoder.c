@@ -26,8 +26,6 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                          /* for input.h */
 #include <unistd.h>                                              /* getpid() */
 
 #include "config.h"

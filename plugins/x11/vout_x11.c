@@ -2,6 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * $Id: vout_x11.c,v 1.7 2001/01/05 18:46:44 massiot Exp $
  *
  * Authors:
  *
@@ -29,8 +30,11 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#ifdef SYS_BSD
+#ifdef HAVE_MACHINE_PARAM_H
+/* BSD */
+#include <machine/param.h>
 #include <sys/types.h>                                     /* typedef ushort */
+#include <sys/ipc.h>
 #endif
 
 #include <sys/shm.h>                                   /* shmget(), shmctl() */

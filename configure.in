@@ -49,15 +49,28 @@ dnl check for getopt_long, substitute the distributed versions if not
 AC_CHECK_FUNC(getopt_long,,[LIBOBJS="$LIBOBJS getopt.o getopt1.o"])
 AC_SUBST(LIBOBJS)
 
+CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+AC_CHECK_HEADERS(stddef.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(sys/sockio.h)
 AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h)
 AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
+AC_CHECK_HEADERS(machine/param.h)
 
 dnl Check for threads library
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
+
+dnl Check for ntohl, etc.
+save_CFLAGS=$CFLAGS
+CFLAGS="${CFLAGS} -Wall -Werror"
+AC_MSG_CHECKING([for ntohl in sys/param.h])
+AC_TRY_COMPILE([#include <sys/param.h>
+void foo() { int meuh; ntohl(meuh); }],,
+ AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Gabuzomeu)
+ AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+CFLAGS=$save_CFLAGS
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -73,8 +86,9 @@ AC_ARG_ENABLE(ppro,
 [ if test x$enableval = xyes; then ARCH=${ARCH}" ppro"; fi ],
 [ if test x${host_cpu} = xi686; then ARCH=${ARCH}" ppro"; fi ])
 AC_ARG_ENABLE(mmx,
-[  --disable-mmx           Disable MMX optimizations (default enabled for x86)])
-if test x${host_cpu} = xi686 -o x${host_cpu} = xi586; then if test x$enableval != xno; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi ; fi
+[  --disable-mmx           Disable MMX optimizations (default enabled for x86)],
+[ if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi ],
+[ if test x${host_cpu} = xi686 -o x${host_cpu} = xi586; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi ])
 AC_ARG_ENABLE(debug,
 [  --enable-debug          Enable debug mode (default disabled)],
 [ if test x$enableval = xyes; then DEBUG=1; fi ])
@@ -107,15 +121,33 @@ AC_ARG_ENABLE(esd,
 AC_ARG_ENABLE(fb,
   [  --enable-fb             Linux framebuffer support (default disabled)],
   [if test x$enable_fb = xyes; then PLUGINS=${PLUGINS}"fb "; ALIASES=${ALIASES}"fbvlc "; fi])
-AC_ARG_ENABLE(ggi,
-  [  --enable-ggi            GGI support (default disabled)],
-  [if test x$enable_ggi = xyes; then PLUGINS=${PLUGINS}"ggi "; fi])
-AC_ARG_ENABLE(sdl,
-  [  --enable-sdl            SDL support (default disabled)],
-  [if test x$enable_sdl = xyes; then PLUGINS=${PLUGINS}"sdl "; fi])
-AC_ARG_ENABLE(glide,
-  [  --enable-glide          Glide (3dfx) support (default disabled)],
-  [if test x$enable_glide = xyes; then PLUGINS=${PLUGINS}"glide "; fi])
+AC_ARG_WITH(ggi,
+  [  --with-ggi[=name]       GGI support (default disabled)],
+  [ PLUGINS=${PLUGINS}"ggi ";
+    if test "x$withval" != "xyes";
+    then
+      LIB_GGI="-l"$withval
+    else
+      LIB_GGI="-lggi"
+    fi ])
+AC_ARG_WITH(sdl,
+  [  --with-sdl[=name]       SDL support (default disabled)],
+  [ PLUGINS=${PLUGINS}"sdl ";
+    if test "x$withval" != "xyes";
+    then
+      LIB_SDL="-l"$withval
+    else
+      LIB_SDL="-lSDL"
+    fi ])
+AC_ARG_WITH(glide,
+  [  --with-glide[=name]     Glide (3dfx) support (default disabled)],
+  [ PLUGINS=${PLUGINS}"glide ";
+    if test "x$withval" != "xyes";
+    then
+      LIB_GLIDE="-l"$withval
+    else
+      LIB_GLIDE="-lglide2x"
+    fi ])
 AC_ARG_ENABLE(null,
   [  --enable-null           Null plugin (default disabled)],
   [if test x$enable_null = xyes; then PLUGINS=${PLUGINS}"null "; fi])
@@ -138,6 +170,9 @@ AC_SUBST(ALIASES)
 AC_SUBST(DEBUG)
 AC_SUBST(STATS)
 AC_SUBST(OPTIMS)
+AC_SUBST(LIB_SDL)
+AC_SUBST(LIB_GLIDE)
+AC_SUBST(LIB_GGI)
 
 AC_OUTPUT([Makefile include/config.h])
 

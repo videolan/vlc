@@ -71,6 +71,8 @@ bzero(&(r_Var), sizeof((r_Var)));
  * This macro is used to initiase the memory pointed out by a pointer to 0.
  * It has the same purpose than RZERO, but for pointers.
  *****************************************************************************/
+/* It is already defined on BSD */
+#ifndef PZERO
 #ifdef DEBUG
 #define PZERO(p_Mem)                                                          \
 bzero((p_Mem), sizeof(*(p_Mem)));
@@ -78,6 +80,7 @@ bzero((p_Mem), sizeof(*(p_Mem)));
 #else
 #define PZERO(p_Mem)
 
+#endif
 #endif
 
 

@@ -6,6 +6,7 @@
  * driver.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: intf_ggi.c,v 1.7 2001/01/05 18:46:43 massiot Exp $
  *
  * Authors:
  *
@@ -33,8 +34,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ggi/ggi.h>
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                          /* for input.h */
 
 #include "config.h"
 #include "common.h"

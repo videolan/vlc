@@ -2,6 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: intf_gnome.c,v 1.6 2001/01/05 18:46:43 massiot Exp $
  *
  * Authors:
  *
@@ -28,8 +29,6 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                          /* for input.h */
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

@@ -2,6 +2,7 @@
  * aout_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: aout_beos.cpp,v 1.7 2001/01/05 18:46:43 massiot Exp $
  *
  * Authors:
  * Samuel Hocevar <sam@via.ecp.fr>
@@ -28,8 +29,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                            /* "input.h" */
 #include <kernel/OS.h>
 #include <View.h>
 #include <Application.h>

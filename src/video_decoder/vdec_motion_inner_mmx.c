@@ -3,7 +3,7 @@
  *                           MMX
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_inner_mmx.c,v 1.6 2001/01/05 14:46:37 sam Exp $
+ * $Id: vdec_motion_inner_mmx.c,v 1.7 2001/01/05 18:46:44 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>, largerly inspired by the
  *          work done by the livid project <http://www.linuxvideo.org/>
@@ -27,9 +27,6 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
-
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                          /* for input.h */
 
 #include "config.h"
 #include "common.h"

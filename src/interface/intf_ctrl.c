@@ -42,9 +42,7 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/stat.h>                        /* on BSD, fstat() needs stat.h */
-#include <sys/uio.h>                                            /* "input.h" */
 #include <stdio.h>                                              /* fprintf() */
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <unistd.h>                                       /* close(), read() */

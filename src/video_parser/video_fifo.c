@@ -2,7 +2,7 @@
  * video_fifo.c : video FIFO management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_fifo.c,v 1.24 2000/12/21 17:19:54 massiot Exp $
+ * $Id: video_fifo.c,v 1.25 2001/01/05 18:46:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,9 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
-
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                             /* "input.h */
 
 #include "config.h"
 #include "common.h"

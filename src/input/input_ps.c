@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.17 2000/12/29 14:04:59 sam Exp $
+ * $Id: input_ps.c,v 1.18 2001/01/05 18:46:44 massiot Exp $
  *
  * Authors: 
  *
@@ -27,10 +27,8 @@
 #include "defs.h"
 
 #include <stdlib.h>
-#include <netinet/in.h>
 #include <string.h>
 #include <errno.h>
-#include <malloc.h>
 
 #include "config.h"
 #include "common.h"

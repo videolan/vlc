@@ -2,6 +2,7 @@
  * intf_fb.c: Linux framebuffer interface plugin
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: intf_fb.c,v 1.7 2001/01/05 18:46:43 massiot Exp $
  *
  * Authors:
  *
@@ -31,8 +32,6 @@
 #include <string.h>                                            /* strerror() */
 #include <unistd.h>                                                /* read() */
 #include <sys/ioctl.h>                                            /* ioctl() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                          /* for input.h */
 
 #include <termios.h>                                       /* struct termios */
 #include <linux/vt.h>                                                /* VT_* */

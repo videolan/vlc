@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.68 2000/12/22 13:04:45 sam Exp $
+ * $Id: vpar_blocks.c,v 1.69 2001/01/05 18:46:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -28,8 +28,6 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                            /* "input.h" */
 #include <string.h>                                                /* memset */
 
 #include "config.h"

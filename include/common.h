@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.19 2000/12/26 19:14:46 massiot Exp $
+ * $Id: common.h,v 1.20 2001/01/05 18:46:43 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -47,16 +47,15 @@ typedef int                 boolean_t;
 #endif
 
 /* ptrdiff_t definition */
-#ifdef _HAVE_STDDEF_H
+#ifdef HAVE_STDDEF_H
 #   include <stddef.h>
 #else
 #   include <malloc.h>
-#endif
-
-#ifndef _PTRDIFF_T
-#   define _PTRDIFF_T
+#   ifndef _PTRDIFF_T
+#       define _PTRDIFF_T
 /* Not portable in a 64-bit environment. */
 typedef int                 ptrdiff_t;
+#   endif
 #endif
 
 /* Counter for statistics and profiling */
@@ -125,6 +124,12 @@ typedef struct video_parser_s *         p_video_parser_t;
 /*****************************************************************************
  * Macros and inline functions
  *****************************************************************************/
+
+#ifdef NTOHL_IN_SYS_PARAM_H
+#   include <sys/param.h>
+#else
+#   include <netinet/in.h>
+#endif
 
 /* CEIL: division with round to nearest greater integer */
 #define CEIL(n, d)  ( ((n) / (d)) + ( ((n) % (d)) ? 1 : 0) )
