@@ -1832,6 +1832,16 @@ then
       [
         VLC_ADD_LDFLAGS([ffmpeg],[-lfaac]) ])
 
+    AC_ARG_WITH(ffmpeg-dts,
+      [    --with-ffmpeg-dts   if ffmpeg has been compiled with dts support],
+      [
+        VLC_ADD_LDFLAGS([ffmpeg],[-lz]) ])
+
+    AC_ARG_WITH(ffmpeg-zlib,
+      [    --with-ffmpeg-zlib   if ffmpeg has been compiled with zlib support],
+      [
+        VLC_ADD_LDFLAGS([ffmpeg],[-lz]) ])
+
     AC_ARG_WITH(ffmpeg-tree,
       [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
 
