@@ -106,6 +106,8 @@
 /*For playlist info window*/
 
 - (int)selectedPlaylistItem;
+- (void)deleteGroup:(int)i_id;
+- (NSMutableArray *)selectedPlaylistItemsList;
 - (NSColor *)getColor:(int)i_group;
 
 @end

@@ -45,6 +45,8 @@
     [o_author_lbl setStringValue: _NS("Author")];
     [o_btn_info_ok setTitle: _NS("OK")];
     [o_btn_info_cancel setTitle: _NS("Cancel")];
+    [o_btn_delete_group setTitle: _NS("Delete Group")];
+    [o_btn_add_group setTitle: _NS("Add Group")];
     [o_group_lbl setStringValue: _NS("Group")];
 }
 
@@ -65,7 +67,6 @@
         if (p_playlist)
         {
             /*fill uri / title / author info */
-            int i;
             int i_item = [o_vlc_playlist selectedPlaylistItem];
             [o_uri_txt setStringValue:
                 ([NSString stringWithUTF8String:p_playlist->
@@ -90,20 +91,7 @@
             [[VLCInfoTreeItem rootItem] refresh];
             [o_outline_view reloadData];
 
-            [o_group_cbx removeAllItems];
-
-            for (i = 0; i < p_playlist->i_groups ; i++)
-            {
-                [o_group_cbx addItemWithObjectValue: 
-                    [NSString stringWithUTF8String:
-                    p_playlist->pp_groups[i]->psz_name]];
-                if (p_playlist->pp_items[i_item]->i_group == p_playlist
-                    ->pp_groups[i]->i_id)
-                {
-                    [o_group_cbx selectItemAtIndex:i];
-                }
-            }
-
+            [self createComboBox];
             [self handleGroup:self];
 
             vlc_object_release( p_playlist );
@@ -120,33 +108,54 @@
 
 - (IBAction)infoOk:(id)sender
 {
+    int i,i_row,c;
     int i_item = [o_vlc_playlist selectedPlaylistItem];
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
     vlc_value_t val;
+    NSMutableArray * o_selected = [o_vlc_playlist selectedPlaylistItemsList];
+    NSNumber * o_number;
 
-    if (p_playlist)                       
+
+    if (p_playlist)
     {
         vlc_mutex_lock(&p_playlist->pp_items[i_item]->input.lock);
-        
+
         p_playlist->pp_items[i_item]->input.psz_uri =
             strdup([[o_uri_txt stringValue] cString]);
         p_playlist->pp_items[i_item]->input.psz_name =
             strdup([[o_title_txt stringValue] cString]);
         playlist_ItemAddInfo(p_playlist->pp_items[i_item],_("General"),_("Author"), [[o_author_txt stringValue] cString]);
 
+        c = (int)[o_selected count];
+
         if ([[o_group_cbx stringValue] isEqual:
                     [o_group_cbx objectValueOfSelectedItem]])
         {
-            p_playlist->pp_items[i_item]->i_group = p_playlist->
-                    pp_groups[[o_group_cbx indexOfSelectedItem]]->i_id; 
+            for (i = 0 ; i < c ; i++)
+            {
+                o_number = [o_selected lastObject];
+                i_row = [o_number intValue];
+                p_playlist->pp_items[i_row]->i_group = p_playlist->
+                    pp_groups[[o_group_cbx indexOfSelectedItem]]->i_id;
+                [o_selected removeObject: o_number];
+            }
         }
         else
         {
-            playlist_group_t * p_group = playlist_CreateGroup( p_playlist, 
+            playlist_group_t * p_group = playlist_CreateGroup( p_playlist,
                 strdup([[o_group_cbx stringValue] cString]));
-            p_playlist->pp_items[i_item]->i_group = p_group->i_id;
+            if (p_group)
+            {
+                for (i = 0 ; i < c ; i++)
+                {
+                    o_number = [o_selected lastObject];
+                    i_row = [o_number intValue];
+                    p_playlist->pp_items[i_row]->i_group = p_group->i_id;
+                    [o_selected removeObject: o_number];
+                }
+            }
         }
 
 
@@ -154,7 +163,7 @@
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist,"intf-change",val );
         vlc_object_release ( p_playlist );
-    } 
+    }
     [self togglePlaylistInfoPanel:self];
 }
 
@@ -183,7 +192,76 @@
     }
 }
 
+- (IBAction)deleteOutlineGroup:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+
+    if(p_playlist)
+    {
+        if ([[o_group_cbx stringValue] isEqual:
+                    [o_group_cbx objectValueOfSelectedItem]])
+        {
+            [o_vlc_playlist deleteGroup:p_playlist->pp_groups[
+                    [o_group_cbx indexOfSelectedItem]]->i_id];
+            [self createComboBox];
+            [self handleGroup:self];
+            [o_group_cbx reloadData];
+        }
+        else
+        {
+            msg_Warn(p_playlist,"Group doesn't exist, cannot delete");
+        } 
+    vlc_object_release(p_playlist);
+    }
+}
+
+- (IBAction)createOutlineGroup:(id)sender; 
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    if(p_playlist)
+    {
+        playlist_CreateGroup( p_playlist,
+                    strdup([[o_group_cbx stringValue] cString]));
+        [self createComboBox];
+        [o_group_cbx reloadData];
+        [o_vlc_playlist playlistUpdated];
+        vlc_object_release(p_playlist);
+    }
+}
+
+-(void)createComboBox
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    int i;
+    int i_item = [o_vlc_playlist selectedPlaylistItem];
+
+    [o_group_cbx removeAllItems];
+
+    if (p_playlist)
+    {
+        for (i = 0; i < p_playlist->i_groups ; i++)
+        {
+            [o_group_cbx addItemWithObjectValue:
+                [NSString stringWithUTF8String:
+                p_playlist->pp_groups[i]->psz_name]];
+            if (p_playlist->pp_items[i_item]->i_group == p_playlist
+                ->pp_groups[i]->i_id)
+            {
+                [o_group_cbx selectItemAtIndex:i];
+            }
+        }
+    vlc_object_release(p_playlist);
+    }
+}      
+
 @end
+
 
 @implementation VLCPlaylistInfo (NSTableDataSource)
 

@@ -54,7 +54,7 @@
     int i, c, i_row;
     NSMutableArray *o_to_delete;
     NSNumber *o_number;
-    
+
     playlist_t * p_playlist;
     intf_thread_t * p_intf = [NSApp getIntf];
 
@@ -65,12 +65,12 @@
 
     p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
-    
+
     if ( p_playlist == NULL )
     {
         return;
     }
-    
+
     switch( key )
     {
         case NSDeleteCharacter:
@@ -79,11 +79,11 @@
         case NSBackspaceCharacter:
             o_to_delete = [NSMutableArray arrayWithArray:[[self selectedRowEnumerator] allObjects]];
             c = [o_to_delete count];
-            
+
             for( i = 0; i < c; i++ ) {
                 o_number = [o_to_delete lastObject];
                 i_row = [o_number intValue];
-                
+
                 if( p_playlist->i_index == i_row && p_playlist->i_status )
                 {
                     playlist_Stop( p_playlist );
@@ -94,7 +94,7 @@
             }
             [self reloadData];
             break;
-            
+
         default:
             [super keyDown: o_event];
             break;
@@ -221,14 +221,14 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
 
     if( o_tc_id == o_tc && !b_isSortDescending )
-    {    
+    {
         playlist_SortID( p_playlist , ORDER_NORMAL );
-        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];    
+        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
     }
     else if( o_tc_name == o_tc && !b_isSortDescending )
-    {    
+    {
         playlist_SortTitle( p_playlist , ORDER_NORMAL );
-        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];    
+        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
     }
     else if( o_tc_author == o_tc && !b_isSortDescending )
     {
@@ -236,12 +236,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
     }
     else if( o_tc_id == o_tc && b_isSortDescending )
-    {    
+    {
         playlist_SortID( p_playlist , ORDER_REVERSE );
-        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];    
+        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
     }
     else if( o_tc_name == o_tc && b_isSortDescending )
-    {    
+    {
         playlist_SortTitle( p_playlist , ORDER_REVERSE );
         [o_table_view setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
     }
@@ -249,13 +249,13 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         playlist_SortAuthor( p_playlist , ORDER_REVERSE );
         [o_table_view setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
-    } 
+    }
     vlc_object_release( p_playlist );
     [self playlistUpdated];
 }
 
 
-- (BOOL)tableView:(NSTableView *)o_tv 
+- (BOOL)tableView:(NSTableView *)o_tv
                   shouldEditTableColumn:(NSTableColumn *)o_tc
                   row:(int)i_row
 {
@@ -274,7 +274,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_bool_t b_rows;
     vlc_bool_t b_item_sel;
 
-    pt = [o_table_view convertPoint: [o_event locationInWindow] 
+    pt = [o_table_view convertPoint: [o_event locationInWindow]
                                                  fromView: nil];
     b_item_sel = ( [o_table_view rowAtPoint: pt] != -1 &&
                    [o_table_view selectedRow] != -1 );
@@ -319,7 +319,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    
+
     NSSavePanel *o_save_panel = [NSSavePanel savePanel];
     NSString * o_name = [NSString stringWithFormat: @"%@.m3u", _NS("Untitled")];
     [o_save_panel setTitle: _NS("Save Playlist")];
@@ -360,14 +360,14 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         return;
     }
-    
+
     o_to_delete = [NSMutableArray arrayWithArray:[[o_table_view selectedRowEnumerator] allObjects]];
     c = (int)[o_to_delete count];
-    
+
     for( i = 0; i < c; i++ ) {
         o_number = [o_to_delete lastObject];
         i_row = [o_number intValue];
-        
+
         if( p_playlist->i_index == i_row && p_playlist->i_status )
         {
             playlist_Stop( p_playlist );
@@ -380,7 +380,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release( p_playlist );
 
     /* this is actually duplicity, because the intf.m manage also updates the view
-     * when the playlist changes. we do this on purpose, because else there is a 
+     * when the playlist changes. we do this on purpose, because else there is a
      * delay of .5 sec or so when we delete an item */
     [self playlistUpdated];
     [self updateRowSelection];
@@ -446,7 +446,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
 }
 
-- (IBAction)disableGroup:(id)sender 
+- (IBAction)disableGroup:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -475,7 +475,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
-    
+
     if( p_playlist == NULL )
     {
         return;
@@ -491,7 +491,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
     else
     {
-        i_current = [o_table_view selectedRow]; 
+        i_current = [o_table_view selectedRow];
     }
 
     do
@@ -499,9 +499,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         i_current++;
 
         vlc_mutex_lock( &p_playlist->object_lock );
-        o_current_name = [NSString stringWithUTF8String: 
+        o_current_name = [NSString stringWithUTF8String:
             p_playlist->pp_items[i_current]->input.psz_name];
-        o_current_author = [NSString stringWithUTF8String: 
+        o_current_author = [NSString stringWithUTF8String:
             playlist_GetInfo(p_playlist, i_current ,_("General"),_("Author") )];
         vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -594,16 +594,16 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         NSArray *o_options;
         NSURL *o_true_file;
         char **ppsz_options = NULL;
-    
+
         /* Get the item */
         o_one_item = [o_array objectAtIndex: i_item];
         o_uri = (NSString *)[o_one_item objectForKey: @"ITEM_URL"];
         o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
         o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
-        
+
         /* If no name, then make a guess */
         if( !o_name) o_name = [[NSFileManager defaultManager] displayNameAtPath: o_uri];
-    
+
         if( [[NSFileManager defaultManager] fileExistsAtPath:o_uri isDirectory:&b_dir] && b_dir &&
             [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath: o_uri isRemovable: &b_rem
                     isWritable:NULL isUnmountable:NULL description:NULL type:NULL] && b_rem   )
@@ -622,24 +622,24 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             /* Count the input options */
             i_total_options = [o_options count];
-    
+
             /* Allocate ppsz_options */
             for( j = 0; j < i_total_options; j++ )
             {
                 if( !ppsz_options )
                     ppsz_options = (char **)malloc( sizeof(char *) * i_total_options );
-    
+
                 ppsz_options[j] = strdup([[o_options objectAtIndex:j] UTF8String]);
             }
         }
 
         /* Add the item */
-        i_new_id = playlist_AddExt( p_playlist, [o_uri fileSystemRepresentation], 
-                      [o_name UTF8String], i_mode, 
+        i_new_id = playlist_AddExt( p_playlist, [o_uri fileSystemRepresentation],
+                      [o_name UTF8String], i_mode,
                       i_position == -1 ? PLAYLIST_END : i_position + i_item,
                       0, (ppsz_options != NULL ) ? (const char **)ppsz_options : 0, i_total_options );
 
-        /* clean up 
+        /* clean up
         for( j = 0; j < i_total_options; j++ )
             free( ppsz_options[j] );
         if( ppsz_options ) free( ppsz_options ); */
@@ -647,11 +647,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         /* Recent documents menu */
         o_true_file = [NSURL fileURLWithPath: o_uri];
         if( o_true_file != nil )
-        { 
+        {
             [[NSDocumentController sharedDocumentController]
-                noteNewRecentDocumentURL: o_true_file]; 
+                noteNewRecentDocumentURL: o_true_file];
         }
-        
+
         if( i_item == 0 && !b_enqueue )
         {
             playlist_Goto( p_playlist, playlist_GetPositionById( p_playlist, i_new_id ) );
@@ -717,6 +717,65 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     return [o_table_view selectedRow];
 }
 
+- (NSMutableArray *)selectedPlaylistItemsList
+{
+    return [NSMutableArray arrayWithArray:[[o_table_view
+                        selectedRowEnumerator] allObjects]];
+
+}
+
+- (void)deleteGroup:(int)i_id
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    int i;
+    int i_newgroup = 0;
+
+    if (p_playlist)
+    {
+
+    /*first, change the group of all the items that belong to the group to
+    delete. Change it to the group with the smallest id.*/
+
+    /*search for the group with the smallest id*/
+
+        if(p_playlist->i_groups == 1)
+        {
+            msg_Warn(p_playlist,"Trying to delete last group, cancelling");
+            vlc_object_release(p_playlist);
+            return;
+        }
+
+        for (i = 0 ; i<p_playlist->i_groups ; i++)
+        {
+            if((i_newgroup == 0 || i_newgroup > p_playlist->pp_groups[i]->i_id)
+                            && p_playlist->pp_groups[i]->i_id != i_id)
+            {
+                i_newgroup = p_playlist->pp_groups[i]->i_id;
+            }
+        }
+
+        vlc_mutex_lock( &p_playlist->object_lock );
+
+        for (i = 0; i < p_playlist->i_size;i++)
+        {
+            if (p_playlist->pp_items[i]->i_group == i_id)
+            {
+                vlc_mutex_lock(&p_playlist->pp_items[i]->input.lock);
+                p_playlist->pp_items[i]->i_group = i_newgroup;
+                vlc_mutex_unlock(&p_playlist->pp_items[i]->input.lock);
+            }
+        }
+        vlc_mutex_unlock( &p_playlist->object_lock );
+
+        playlist_DeleteGroup( p_playlist, i_id );
+
+        vlc_object_release(p_playlist);
+        [self playlistUpdated];
+    }
+}
+
 - (NSColor *)getColor:(int)i_group
 {
     NSColor * o_color = nil;
@@ -732,10 +791,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
            o_color = [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:0.76471 alpha:1.0];
         break;
 
-	    case 3:
+        case 3:
               /*dark blue*/
-		   o_color = [NSColor colorWithDeviceRed:0.76471 green:0.76471 blue:1.0 alpha:1.0];
-        break; 
+           o_color = [NSColor colorWithDeviceRed:0.76471 green:0.76471 blue:1.0 alpha:1.0];
+        break;
 
         case 4:
                /*orange*/
@@ -746,11 +805,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                /*purple*/
            o_color = [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:1.0 alpha:1.0];
         break;
- 
+
         case 6:
               /*green*/
            o_color = [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:0.76471 alpha:1.0];
-        break; 
+        break;
 
         case 7:
               /*light blue*/
@@ -761,7 +820,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
               /*yellow*/
            o_color = [NSColor colorWithDeviceRed:1.0 green:1.0 blue:0.76471 alpha:1.0];
         break;
-   	}
+    }
     return o_color;
 }
 
@@ -787,8 +846,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     return( i_count );
 }
 
-- (id)tableView:(NSTableView *)o_tv 
-                objectValueForTableColumn:(NSTableColumn *)o_tc 
+- (id)tableView:(NSTableView *)o_tv
+                objectValueForTableColumn:(NSTableColumn *)o_tc
                 row:(int)i_row
 {
     id o_value = nil;
@@ -808,20 +867,20 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     else if( [[o_tc identifier] isEqualToString:@"1"] )
     {
         vlc_mutex_lock( &p_playlist->object_lock );
-        o_value = [NSString stringWithUTF8String: 
+        o_value = [NSString stringWithUTF8String:
             p_playlist->pp_items[i_row]->input.psz_name];
         if( o_value == NULL )
-            o_value = [NSString stringWithCString: 
+            o_value = [NSString stringWithCString:
                 p_playlist->pp_items[i_row]->input.psz_name];
         vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else if( [[o_tc identifier] isEqualToString:@"2"] )
     {
         vlc_mutex_lock( &p_playlist->object_lock );
-        o_value = [NSString stringWithUTF8String: 
+        o_value = [NSString stringWithUTF8String:
             playlist_GetInfo(p_playlist, i_row ,_("General"),_("Author") )];
         if( o_value == NULL )
-            o_value = [NSString stringWithCString: 
+            o_value = [NSString stringWithCString:
                 playlist_GetInfo(p_playlist, i_row ,_("General"),_("Author") )];
         vlc_mutex_unlock( &p_playlist->object_lock );
     }
@@ -846,9 +905,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 }
 
 - (void)tableView:(NSTableView *)o_tv
-	            willDisplayCell:(id)o_cell
-	            forTableColumn:(NSTableColumn *)o_tc
-	            row:(int)i_rows
+                willDisplayCell:(id)o_cell
+                forTableColumn:(NSTableColumn *)o_tc
+                row:(int)i_rows
 {
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -860,7 +919,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             [o_cell setDrawsBackground: VLC_TRUE];
             [o_cell setBackgroundColor:
                 [self getColor:p_playlist->pp_items[i_rows]->i_group]];
-       
+        }
+        else
+        {
+            [o_cell setDrawsBackground: VLC_FALSE];
         }
 
         if (!p_playlist->pp_items[i_rows]->b_enabled)
@@ -877,11 +939,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (BOOL)tableView:(NSTableView *)o_tv
                     writeRows:(NSArray*)o_rows
-                    toPasteboard:(NSPasteboard*)o_pasteboard 
+                    toPasteboard:(NSPasteboard*)o_pasteboard
 {
     int i_rows = [o_rows count];
     NSArray *o_filenames = [NSArray array];
-    
+
     [o_pasteboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType] owner:self];
     [o_pasteboard setPropertyList:o_filenames forType:NSFilenamesPboardType];
     if ( i_rows == 1 )
@@ -895,7 +957,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 - (NSDragOperation)tableView:(NSTableView*)o_tv
                     validateDrop:(id <NSDraggingInfo>)o_info
                     proposedRow:(int)i_row
-                    proposedDropOperation:(NSTableViewDropOperation)o_operation 
+                    proposedDropOperation:(NSTableViewDropOperation)o_operation
 {
     if ( o_operation == NSTableViewDropAbove )
     {
@@ -905,7 +967,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             {
                 return NSDragOperationMove;
             }
-            /* what if in the previous run, the row wasn't actually moved? 
+            /* what if in the previous run, the row wasn't actually moved?
                then we can't drop new files on this location */
             return NSDragOperationNone;
         }
@@ -917,7 +979,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 - (BOOL)tableView:(NSTableView*)o_tv
                     acceptDrop:(id <NSDraggingInfo>)o_info
                     row:(int)i_proposed_row
-                    dropOperation:(NSTableViewDropOperation)o_operation 
+                    dropOperation:(NSTableViewDropOperation)o_operation
 {
     if (  i_moveRow >= 0 )
     {
@@ -926,15 +988,15 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             intf_thread_t * p_intf = [NSApp getIntf];
             playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                             FIND_ANYWHERE );
-        
+
             if( p_playlist == NULL )
             {
                 i_moveRow = -1;
                 return NO;
             }
-    
-            playlist_Move( p_playlist, i_moveRow, i_proposed_row ); 
-        
+
+            playlist_Move( p_playlist, i_moveRow, i_proposed_row );
+
             vlc_object_release( p_playlist );
         }
         [self playlistUpdated];
@@ -945,7 +1007,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         NSPasteboard * o_pasteboard;
         o_pasteboard = [o_info draggingPasteboard];
-        
+
         if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
         {
             int i;

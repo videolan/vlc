@@ -37,6 +37,8 @@
     IBOutlet id o_author_txt;
     IBOutlet id o_btn_info_ok;
     IBOutlet id o_btn_info_cancel;
+    IBOutlet id o_btn_delete_group;
+    IBOutlet id o_btn_add_group;
     IBOutlet id o_outline_view;
     IBOutlet id o_vlc_playlist;
     IBOutlet id o_group_lbl;
@@ -48,6 +50,9 @@
 - (IBAction)infoCancel:(id)sender;
 - (IBAction)infoOk:(id)sender;
 - (IBAction)handleGroup:(id)sender;
+- (IBAction)deleteOutlineGroup:(id)sender;
+- (IBAction)createOutlineGroup:(id)sender;
+- (void)createComboBox;
 
 @end
 

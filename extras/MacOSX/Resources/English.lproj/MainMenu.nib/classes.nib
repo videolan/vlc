@@ -373,6 +373,8 @@
         }, 
         {
             ACTIONS = {
+                createOutlineGroup = id; 
+                deleteOutlineGroup = id; 
                 handleGroup = id; 
                 infoCancel = id; 
                 infoOk = id; 
@@ -383,7 +385,9 @@
             OUTLETS = {
                 "o_author_lbl" = id; 
                 "o_author_txt" = id; 
+                "o_btn_add_group" = id; 
                 "o_btn_cancel" = id; 
+                "o_btn_delete_group" = id; 
                 "o_btn_ok" = id; 
                 "o_group_cbx" = id; 
                 "o_group_color" = id; 
