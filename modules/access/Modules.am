@@ -4,6 +4,7 @@ SOURCES_access_udp = udp.c
 SOURCES_access_tcp = tcp.c
 SOURCES_access_http = http.c
 SOURCES_access_ftp = ftp.c
+SOURCES_access_smb = smb.c
 SOURCES_dvdnav = dvdnav.c
 SOURCES_dvdread = dvdread.c
 SOURCES_slp = slp.c

@@ -1410,6 +1410,20 @@ then
 fi
 
 dnl
+dnl  libsmbclient plugin
+dnl
+AC_ARG_ENABLE(smb,
+  [  --enable-smb         smb input module (default enabled)])
+if test "${enable_smb}" != "no"; then
+  AC_CHECK_HEADERS(libsmbclient.h,
+    [ VLC_ADD_PLUGINS([access_smb])
+      VLC_ADD_LDFLAGS([access_smb],[-lsmbclient]) ],
+    [ if test -n "${enable_smb}"; then
+        AC_MSG_ERROR([cannot find libsmbclient headers])
+     fi ])
+fi
+
+dnl
 dnl  libdvbpsi ts demux/mux
 dnl
 AC_ARG_ENABLE(dvbpsi,
