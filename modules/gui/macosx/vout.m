@@ -71,8 +71,9 @@ static int  ControlVideo        ( vout_thread_t *, int, va_list );
 
 static int  CoCreateWindow      ( vout_thread_t * );
 static int  CoDestroyWindow     ( vout_thread_t * );
-static int  CoToggleFullscreen  ( vout_thread_t * );
 
+static int  CoToggleFullscreen  ( vout_thread_t * );
+static int  CoSetWindowOnTop    ( vout_thread_t *, BOOL );
 static void VLCHideMouse        ( vout_thread_t *, BOOL );
 
 static void QTScaleMatrix       ( vout_thread_t * );
@@ -582,12 +583,13 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int ControlVideo( vout_thread_t *p_vout, int i_query, va_list args )
 {
+    vlc_bool_t b_arg;
+
     switch( i_query )
     {
-        case VOUT_SET_ZOOM:
-            return VLC_SUCCESS;
-
         case VOUT_SET_STAY_ON_TOP:
+            b_arg = va_arg( args, vlc_bool_t );
+            CoSetWindowOnTop( p_vout, b_arg );
             return VLC_SUCCESS;
 
         case VOUT_CLOSE:
@@ -798,7 +800,29 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
     }
 
     [o_pool release];
-    return( 0 );
+    return 0;
+}
+
+/*****************************************************************************
+ * CoSetWindowOnTop: Switches the "always on top" state of the video window 
+ *****************************************************************************
+ * Returns 0 on success, 1 otherwise
+ *****************************************************************************/
+static int CoSetWindowOnTop( vout_thread_t *p_vout, BOOL b_on_top )
+{
+    if( p_vout->p_sys->o_window )
+    {
+        if( b_on_top )
+        {
+            [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
+        }
+        else
+        {
+            [p_vout->p_sys->o_window setLevel: NSNormalWindowLevel];
+        }
+        return VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -1103,13 +1127,11 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         val.b_bool = VLC_FALSE;
         var_Set( p_vout, "video-on-top", val );
-        [p_vout->p_sys->o_window setLevel: NSNormalWindowLevel];
     }
     else
     {
         val.b_bool = VLC_TRUE;
         var_Set( p_vout, "video-on-top", val );
-        [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
     }
 }
 

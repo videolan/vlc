@@ -52,13 +52,16 @@ struct intf_sys_t
     NSAutoreleasePool * o_pool;
     NSPort * o_sendport;
 
+    /* the current input */
+    input_thread_t * p_input;
+
     /* special actions */
     vlc_bool_t b_playing;
     vlc_bool_t b_mute;
+    int i_play_status;
 
     /* interface update */
     vlc_bool_t b_intf_update;
-    vlc_bool_t b_play_status;
     vlc_bool_t b_playlist_update;
     vlc_bool_t b_current_title_update;
     vlc_bool_t b_fullscreen_update;
@@ -245,7 +248,7 @@ struct intf_sys_t
 - (void)setupMenus;
 
 - (void)updateMessageArray;
-- (void)playStatusUpdated:(BOOL)b_pause;
+- (void)playStatusUpdated:(int) i_status;
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)manageVolumeSlider;
 - (IBAction)timesliderUpdate:(id)sender;
