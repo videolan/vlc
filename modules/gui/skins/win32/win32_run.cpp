@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.7 2003/04/21 00:54:26 ipkiss Exp $
+ * $Id: win32_run.cpp,v 1.8 2003/04/21 02:50:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -95,6 +95,11 @@ bool Instance::OnInit()
     p_intf->p_sys->SoutDlg = new SoutDialog( p_intf, NULL );
     p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
     p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
+
+    vlc_mutex_lock( &p_intf->p_sys->init_lock );
+    vlc_cond_signal( &p_intf->p_sys->init_cond );
+    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+    
     return TRUE;
 }
 
@@ -165,7 +170,11 @@ void OSRun( intf_thread_t *p_intf )
     HANDLE hThread;
     hThread = CreateThread( NULL, 0, ThreadFunc, (LPVOID) p_intf, 0, 0 );
 
-    // Create refresh timer
+    vlc_mutex_lock( &p_intf->p_sys->init_lock );
+    vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+ 
+     // Create refresh timer
     SetTimer( ((OSTheme *)p_intf->p_sys->p_theme)->GetParentWindow(), 42, 200,
               (TIMERPROC)RefreshTimer );
 

@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.16 2003/04/21 01:47:42 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.17 2003/04/21 02:50:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -192,38 +192,6 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     // Check if vlc is closing
     proc->IsClosing();
 
-#if 0
-    // If Window is parent window
-    if( hwnd == ( (GTK2Theme *)p_intf->p_sys->p_theme )->GetParentWindow() )
-    {
-        if( uMsg == WM_SYSCOMMAND )
-        {
-            if( (Event *)wParam != NULL )
-                ( (Event *)wParam )->SendEvent();
-            return 0;
-        }
-        else if( uMsg == WM_RBUTTONDOWN && wParam == 42 &&
-                 lParam == WM_RBUTTONDOWN )
-        {
-            int x, y;
-            OSAPI_GetMousePos( x, y );
-            TrackPopupMenu(
-                ( (GTK2Theme *)p_intf->p_sys->p_theme )->GetSysMenu(),
-                0, x, y, 0, hwnd, NULL );
-        }
-    }
-
-
-    // If closing parent window
-    if( uMsg == WM_CLOSE )
-    {
-        OSAPI_PostMessage( NULL, VLC_HIDE, VLC_QUIT, 0 );
-        return 0;
-    }
-
-    // If hwnd does not match any window or message not processed
-    return DefWindowProc( hwnd, uMsg, wParam, lParam );
-#endif
     gtk_main_do_event( event );
 
 }
@@ -257,6 +225,11 @@ bool Instance::OnInit()
     p_intf->p_sys->SoutDlg = new SoutDialog( p_intf, NULL );
     p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
     p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
+    
+    vlc_mutex_lock( &p_intf->p_sys->init_lock );
+    vlc_cond_signal( &p_intf->p_sys->init_cond );
+    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+    
     return TRUE;
 }
 
@@ -287,6 +260,10 @@ void OSRun( intf_thread_t *p_intf )
 
     wxTheApp = new Instance( p_intf, callbackobj );
 
+    vlc_mutex_lock( &p_intf->p_sys->init_lock );
+    vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+ 
     // Add timer
     g_timeout_add( 200, (GSourceFunc)RefreshTimer, (gpointer)p_intf );
     
