@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.44 2003/07/31 13:06:05 sam Exp $
+##  $Id: toolbox,v 1.45 2003/09/15 18:28:47 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -594,6 +594,7 @@ then
   #                  libarts1-dev with libarts-dev
   #                  libdvdread3-dev with libdvdread2-dev
   #                  libdvdplay0-dev (>=1.0.1-2) with libdvdplay0-dev
+  #                  libxosd-dev (>=2.2.4-1.3) with libxosd-dev
   #          remove libwxgtk2.4-dev
   #                 libflac-dev
   #                 libidl0 (workaround for mozilla-dev's bad deps)
@@ -611,6 +612,7 @@ then
       -e 's/libarts[0-9]*-dev/libarts-dev/' \
       -e 's/libdvdread[0-9]*-dev/libdvdread2-dev/' \
       -e 's/, libdvdplay0-dev[^,]*/, libdvdplay0-dev/' \
+      -e 's/, libxosd-dev[^,]*/, libxosd-dev/' \
       -e 's/, libwx[^,]*//' \
       -e '/Package: wxvlc/,/^ *$/d' \
       -e 's/, libflac-dev[^,]*//' \
