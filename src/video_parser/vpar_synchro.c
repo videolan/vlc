@@ -59,12 +59,13 @@ double vpar_SynchroUpdateTab( video_synchro_tab_t * tab, int count )
     tab->deviation = ( (tab->count-1) * tab->deviation
                     + abs (tab->mean - count) ) / tab->count;
 
+    return tab->deviation;
 }
 
 /*****************************************************************************
  * vpar_SynchroUpdateStructures : Update the synchro structures
  *****************************************************************************/
-void vpar_SynchroUpdateStructures( video_synchro_tab_t * tab,
+void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                                    int i_coding_type )
 {
     double candidate_deviation;
@@ -88,21 +89,21 @@ void vpar_SynchroUpdateStructures( video_synchro_tab_t * tab,
             predict = p_vpar->synchro.tab_p[0].mean;
 
             candidate_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_p[1 + (modulo & 0x1)],
+                            &p_vpar->synchro.tab_p[1 + (p_vpar->synchro.modulo & 0x1)],
                             p_vpar->synchro.current_p_count);
             if (candidate_deviation < optimal_deviation)
 	    {
                 optimal_deviation = candidate_deviation;
-                predict = p_vpar->synchro.tab_p[1 + (modulo & 0x1)].mean;
+                predict = p_vpar->synchro.tab_p[1 + (p_vpar->synchro.modulo & 0x1)].mean;
             }
 
             candidate_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_p[3 + (modulo % 3)],
+                            &p_vpar->synchro.tab_p[3 + (p_vpar->synchro.modulo % 3)],
                             p_vpar->synchro.current_p_count);
             if (candidate_deviation < optimal_deviation)
 	    {
                 optimal_deviation = candidate_deviation;
-                predict = p_vpar->synchro.tab_p[1 + (modulo & 0x1)].mean;
+                predict = p_vpar->synchro.tab_p[1 + (p_vpar->synchro.modulo % 3)].mean;
             }
 
 	    p_vpar->synchro.p_count_predict = predict;
@@ -115,21 +116,21 @@ void vpar_SynchroUpdateStructures( video_synchro_tab_t * tab,
             predict = p_vpar->synchro.tab_b[0].mean;
 
             candidate_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_b[1 + (modulo & 0x1)],
+                            &p_vpar->synchro.tab_b[1 + (p_vpar->synchro.modulo & 0x1)],
                             p_vpar->synchro.current_b_count);
             if (candidate_deviation < optimal_deviation)
 	    {
                 optimal_deviation = candidate_deviation;
-                predict = p_vpar->synchro.tab_b[1 + (modulo & 0x1)].mean;
+                predict = p_vpar->synchro.tab_b[1 + (p_vpar->synchro.modulo & 0x1)].mean;
             }
 
             candidate_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_b[3 + (modulo % 3)],
+                            &p_vpar->synchro.tab_b[3 + (p_vpar->synchro.modulo % 3)],
                             p_vpar->synchro.current_b_count);
             if (candidate_deviation < optimal_deviation)
 	    {
                 optimal_deviation = candidate_deviation;
-                predict = p_vpar->synchro.tab_b[1 + (modulo & 0x1)].mean;
+                predict = p_vpar->synchro.tab_b[1 + (p_vpar->synchro.modulo % 3)].mean;
             }
 
 	    p_vpar->synchro.b_count_predict = predict;
@@ -147,7 +148,7 @@ void vpar_SynchroUpdateStructures( video_synchro_tab_t * tab,
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
-//    return( 1 );
+    return( 1 );
     return( i_coding_type == I_CODING_TYPE || i_coding_type == P_CODING_TYPE );
     //return( i_coding_type == I_CODING_TYPE );
 }
@@ -158,7 +159,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
                         int i_structure )
 {
-    vpar_SynchroUpdateStructures (p_vpar, i_coding_type, i_structure);
+    vpar_SynchroUpdateStructures (p_vpar, i_coding_type);
 
 }
 
@@ -168,7 +169,7 @@ void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
 mtime_t vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
                             int i_structure )
 {
-    vpar_SynchroUpdateStructures (p_vpar, i_coding_type, i_structure);
+    vpar_SynchroUpdateStructures (p_vpar, i_coding_type);
 
     return mdate() + 3000000;
 }
