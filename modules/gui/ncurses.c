@@ -133,6 +133,7 @@ struct intf_sys_t
 
     int             i_box_plidx;    /* Playlist index */
     int             b_box_plidx_follow;
+    int             i_box_bidx;    /* browser index */
 
     int             b_box_cleared;
 
@@ -175,6 +176,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_box_plidx_follow = VLC_TRUE;
     p_sys->b_box_cleared = VLC_FALSE;
     p_sys->i_box_plidx = 0;
+    p_sys->i_box_bidx = 0;
     p_sys->p_sub = msg_Subscribe( p_intf );
 
     /* Initialize the curses library */
@@ -322,7 +324,6 @@ static void Run( intf_thread_t *p_intf )
             p_sys->i_box_plidx = p_sys->p_playlist->i_index;
         }
 
-
         while( ( i_key = getch()) != -1 )
         {
             /*
@@ -450,33 +451,33 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         switch( i_key )
         {
             case KEY_HOME:
-                p_sys->i_box_plidx = 0;
+                p_sys->i_box_bidx = 0;
                 break;
             case KEY_END:
-                p_sys->i_box_plidx = p_sys->i_dir_entries - 1;
+                p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
                 break;
             case KEY_UP:
-                p_sys->i_box_plidx--;
+                p_sys->i_box_bidx--;
                 break;
             case KEY_DOWN:
-                p_sys->i_box_plidx++;
+                p_sys->i_box_bidx++;
                 break;
             case KEY_PPAGE:
-                p_sys->i_box_plidx -= p_sys->i_box_lines;
+                p_sys->i_box_bidx -= p_sys->i_box_lines;
                 break;
             case KEY_NPAGE:
-                p_sys->i_box_plidx += p_sys->i_box_lines;
+                p_sys->i_box_bidx += p_sys->i_box_lines;
                 break;
 
             case KEY_ENTER:
             case 0x0d:
-                if( p_sys->pp_dir_entries[p_sys->i_box_plidx]->b_file )
+                if( p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file )
                 {
                     int i_size_entry = strlen( p_sys->psz_current_dir ) +
-                                       strlen( p_sys->pp_dir_entries[p_sys->i_box_plidx]->psz_path ) + 2;
+                                       strlen( p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path ) + 2;
                     char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
 
-                    sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_plidx]->psz_path );
+                    sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path );
                     playlist_Add( p_sys->p_playlist, psz_uri,
                                   psz_uri,
                                   PLAYLIST_APPEND, PLAYLIST_END );
@@ -486,10 +487,10 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 else
                 {
                     int i_size_entry = strlen( p_sys->psz_current_dir ) +
-                                       strlen( p_sys->pp_dir_entries[p_sys->i_box_plidx]->psz_path ) + 2;
+                                       strlen( p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path ) + 2;
                     char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
 
-                    sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_plidx]->psz_path );
+                    sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path );
                     
                     p_sys->psz_current_dir = strdup( psz_uri );
                     ReadDir( p_intf );
@@ -497,14 +498,11 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 }
                 break;
             default:
+                return 1;
                 break;
 
-            if( p_sys->i_box_plidx >= p_sys->i_dir_entries ) p_sys->i_box_plidx = p_sys->i_dir_entries - 1;
-            if( p_sys->i_box_plidx < 0 ) p_sys->i_box_plidx = 0;
-            if( p_sys->i_box_plidx == p_sys->i_dir_entries )
-                p_sys->b_box_plidx_follow = VLC_TRUE;
-            else
-                p_sys->b_box_plidx_follow = VLC_FALSE;
+            if( p_sys->i_box_bidx >= p_sys->i_dir_entries ) p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
+            if( p_sys->i_box_bidx < 0 ) p_sys->i_box_bidx = 0;
             return 1;
         }
     }
@@ -1251,17 +1249,17 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         int        i_item;
         DrawBox( p_sys->w, y++, 0, h, COLS, " Browse " );
 
-        if( p_sys->i_box_plidx >= p_sys->i_dir_entries ) p_sys->i_box_plidx = p_sys->i_dir_entries - 1;
-        if( p_sys->i_box_plidx < 0 ) p_sys->i_box_plidx = 0;
+        if( p_sys->i_box_bidx >= p_sys->i_dir_entries ) p_sys->i_box_plidx = p_sys->i_dir_entries - 1;
+        if( p_sys->i_box_bidx < 0 ) p_sys->i_box_bidx = 0;
 
-        if( p_sys->i_box_plidx < (h - 2)/2 )
+        if( p_sys->i_box_bidx < (h - 2)/2 )
         {
             i_start = 0;
             i_stop = h - 2;
         }
-        else if( p_sys->i_dir_entries - p_sys->i_box_plidx > (h - 2)/2 )
+        else if( p_sys->i_dir_entries - p_sys->i_box_bidx > (h - 2)/2 )
         {
-            i_start = p_sys->i_box_plidx - (h - 2)/2;
+            i_start = p_sys->i_box_bidx - (h - 2)/2;
             i_stop = i_start + h - 2;
         }
         else
@@ -1280,7 +1278,7 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
 
         for( i_item = i_start; i_item < i_stop; i_item++ )
         {
-            vlc_bool_t b_selected = ( p_sys->i_box_plidx == i_item );
+            vlc_bool_t b_selected = ( p_sys->i_box_bidx == i_item );
 
             if( y >= y_end ) break;
             if( b_selected )
