@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.25 2003/03/15 03:02:13 fenrir Exp $
+ * $Id: mms.c,v 1.26 2003/03/16 01:37:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -329,15 +329,6 @@ static int SetProgram( input_thread_t * p_input,
  *****************************************************************************/
 static void Seek( input_thread_t * p_input, off_t i_pos )
 {
-    /*
-     * FIXME
-     * Don't work
-     * Probably some bad or missing command
-     *
-     *
-     */
-#if 1
-
     access_t    *p_access = (access_t*)p_input->p_access_data;
     uint32_t    i_packet;
     uint32_t    i_offset;
@@ -421,8 +412,6 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
     p_access->i_pos = i_pos;
     p_input->stream.p_selected_area->i_tell = i_pos;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-#endif
 }
 
 static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
@@ -934,7 +923,7 @@ static int MMSOpen( input_thread_t  *p_input,
     }
     else
     {
-        sprintf( tmp, "\\\\127.0.0.1\\TCP\\1242"  );
+        sprintf( tmp, "\\\\192.168.0.1\\TCP\\1242"  );
     }
     var_buffer_addUTF16( &buffer, tmp );
     var_buffer_add16( &buffer, '0' );
