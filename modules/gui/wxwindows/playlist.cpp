@@ -29,7 +29,7 @@
 
 #include "wxwindows.h"
 
-#include "bitmaps/shuffle_on.xpm"
+#include "bitmaps/shuffle.xpm"
 #include "bitmaps/repeat.xpm"
 #include "bitmaps/loop.xpm"
 
