@@ -4,6 +4,8 @@
 
 HEAD
 
+  * ./plugins/gtk/gtk_display.c, ./plugins/win32/mainframe.cpp: we deactivate
+    popup menus when no stream is being played, even in network mode.
   * ./src/input/mpeg_system.c: removed unnecessarily verbose message.
   * ./src/video_output/video_output.c: fixed the "picture has invalid status"
     bug which might have been the cause of crashes.

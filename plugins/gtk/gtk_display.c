@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.22 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: gtk_display.c,v 1.22.2.1 2002/06/02 11:55:32 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -209,22 +209,22 @@ gint GtkModeManage( intf_thread_t * p_intf )
                     GTK_OBJECT( p_intf->p_sys->p_window ), "label_status" );
             gtk_label_set_text( GTK_LABEL( p_label ), "" );
             gtk_widget_show( GTK_WIDGET( p_file_box ) );
-
-            /* unsensitize menus */
-            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_program"),
-                    FALSE );
-            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_title"), FALSE );
-            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_chapter"),
-                                      FALSE );
-            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_audio"), FALSE );
-            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_subpictures"),
-                                      FALSE );
-            gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_navigation"),
-                                      FALSE );
-            gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_audio"), FALSE );
-            gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_subpictures"),
-                                      FALSE );
         }
+
+        /* unsensitize menus */
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_program"),
+                                  FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_title"), FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_chapter"),
+                                  FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_audio"), FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_subpictures"),
+                                  FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_navigation"),
+                                  FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_audio"), FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_subpictures"),
+                                  FALSE );
     }
 
     /* set control items */
