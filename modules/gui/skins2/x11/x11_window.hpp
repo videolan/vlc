@@ -2,7 +2,7 @@
  * x11_window.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.hpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -43,22 +43,23 @@ class X11Window: public OSWindow
         virtual ~X11Window();
 
         // Show the window
-        virtual void show( int left, int top );
+        virtual void show( int left, int top ) const;
 
         // Hide the window
-        virtual void hide();
+        virtual void hide() const;
 
         /// Move the window
-        virtual void moveResize( int left, int top, int width, int height );
+        virtual void moveResize( int left, int top,
+                                 int width, int height ) const;
 
         /// Bring the window on top
-        virtual void raise();
+        virtual void raise() const;
 
         /// Set the opacity of the window (0 = transparent, 255 = opaque)
         virtual void setOpacity( uint8_t value );
 
         /// Toggle the window on top
-        virtual void toggleOnTop( bool onTop );
+        virtual void toggleOnTop( bool onTop ) const;
 
         /// Get the window ID
         Window getDrawable() const { return m_wnd; }

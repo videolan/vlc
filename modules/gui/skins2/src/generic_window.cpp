@@ -156,7 +156,7 @@ void GenericWindow::processEvent( EvtMouse &rEvtMouse )
     if( rEvtMouse.getAction() == EvtMouse::kDown )
     {
         // Raise all the windows
-        m_rWindowManager.raise( this );
+        m_rWindowManager.raiseAll( this );
 
         if( pNewHitControl && pNewHitControl->isFocusable() )
         {
@@ -335,7 +335,7 @@ void GenericWindow::resize( int width, int height )
 }
 
 
-void GenericWindow::raise()
+void GenericWindow::raise() const
 {
     m_pOsWindow->raise();
 }
@@ -347,7 +347,7 @@ void GenericWindow::setOpacity( uint8_t value )
 }
 
 
-void GenericWindow::toggleOnTop( bool onTop )
+void GenericWindow::toggleOnTop( bool onTop ) const
 {
     m_pOsWindow->toggleOnTop( onTop );
 }

@@ -2,7 +2,7 @@
  * os_window.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_window.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -38,22 +38,23 @@ class OSWindow: public SkinObject
         virtual ~OSWindow() {}
 
         // Show the window
-        virtual void show( int left, int top ) = 0;
+        virtual void show( int left, int top ) const = 0;
 
         // Hide the window
-        virtual void hide() = 0;
+        virtual void hide() const = 0;
 
         /// Move and resize the window
-        virtual void moveResize( int left, int top, int width, int height ) = 0;
+        virtual void moveResize( int left, int top,
+                                 int width, int height ) const = 0;
 
         /// Bring the window on top
-        virtual void raise() = 0;
+        virtual void raise() const = 0;
 
         /// Set the opacity of the window (0 = transparent, 255 = opaque)
         virtual void setOpacity( uint8_t value ) = 0;
 
         /// Toggle the window on top
-        virtual void toggleOnTop( bool onTop ) = 0;
+        virtual void toggleOnTop( bool onTop ) const = 0;
 
     protected:
         OSWindow( intf_thread_t *pIntf ): SkinObject( pIntf ) {}

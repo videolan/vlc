@@ -2,7 +2,7 @@
  * win32_window.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -40,22 +40,23 @@ class Win32Window: public OSWindow
         virtual ~Win32Window();
 
         // Show the window
-        virtual void show( int left, int top );
+        virtual void show( int left, int top ) const;
 
         // Hide the window
-        virtual void hide();
+        virtual void hide() const;
 
         /// Move and resize the window
-        virtual void moveResize( int left, int top, int width, int height );
+        virtual void moveResize( int left, int top,
+                                 int width, int height ) const;
 
         /// Bring the window on top
-        virtual void raise();
+        virtual void raise() const;
 
         /// Set the opacity of the window (0 = transparent, 255 = opaque)
         virtual void setOpacity( uint8_t value );
 
         /// Toggle the window on top
-        virtual void toggleOnTop( bool onTop );
+        virtual void toggleOnTop( bool onTop ) const;
 
         /// Getter for the window handle
         HWND getHandle() const { return m_hWnd; }

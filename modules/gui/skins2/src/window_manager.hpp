@@ -2,7 +2,7 @@
  * window_manager.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window_manager.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -62,8 +62,8 @@ class WindowManager: public SkinObject
         /// If a new anchoring is detected, the windows will move accordingly.
         void move( GenericWindow *pWindow, int left, int top ) const;
 
-        /// Raise a window and its anchored windows
-        void raise( GenericWindow *pWindow );
+        /// Raise all the windows, pWindow being above the others
+        void raiseAll( GenericWindow *pWindow ) const;
 
         /// Show all the registered windows
         void showAll() const;

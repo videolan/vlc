@@ -2,7 +2,7 @@
  * generic_window.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic_window.hpp,v 1.2 2004/01/18 19:54:46 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -86,13 +86,13 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         virtual void resize( int width, int height );
 
         /// Bring the window on top
-        virtual void raise();
+        virtual void raise() const;
 
         /// Set the opacity of the window (0 = transparent, 255 = opaque)
         virtual void setOpacity( uint8_t value );
 
         /// Toggle the window on top
-        virtual void toggleOnTop( bool onTop );
+        virtual void toggleOnTop( bool onTop ) const;
 
         /// Change the active layout
         virtual void setActiveLayout( GenericLayout *pLayout );

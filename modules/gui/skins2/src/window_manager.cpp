@@ -2,7 +2,7 @@
  * window_manager.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window_manager.cpp,v 1.4 2004/01/25 11:44:19 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -137,7 +137,7 @@ void WindowManager::move( GenericWindow *pWindow, int left, int top ) const
 }
 
 
-void WindowManager::raise( GenericWindow *pWindow )
+void WindowManager::raiseAll( GenericWindow *pWindow ) const
 {
     // Raise all the windows
     WinSet_t::const_iterator it;
@@ -148,6 +148,7 @@ void WindowManager::raise( GenericWindow *pWindow )
             (*it)->raise();
         }
     }
+    // Make sure to raise the given window at the end, so that it is above
     pWindow->raise();
 }
 
@@ -196,11 +197,8 @@ void WindowManager::buildDependSet( WinSet_t &rWinSet,
     WinSet_t::const_iterator iter;
     for( iter = anchored.begin(); iter != anchored.end(); iter++ )
     {
-        // Check that the window is visible
-        bool visible = (*iter)->getVisibleVar().get();
-
         // Check that the window isn't already in the set before adding it
-        if( visible && rWinSet.find( *iter ) == rWinSet.end() )
+        if( rWinSet.find( *iter ) == rWinSet.end() )
         {
             buildDependSet( rWinSet, *iter );
         }
@@ -250,6 +248,12 @@ void WindowManager::checkAnchors( GenericWindow *pWindow,
     for( itMov = m_movingWindows.begin();
          itMov != m_movingWindows.end(); itMov++ )
     {
+        // Skip the invisible windows
+        if( ! (*itMov)->getVisibleVar().get() )
+        {
+            continue;
+        }
+
         // Get the anchors of this moving window
         const AncList_t &movAnchors = (*itMov)->getAnchorList();
 
@@ -257,8 +261,9 @@ void WindowManager::checkAnchors( GenericWindow *pWindow,
         for( itSta = m_allWindows.begin();
              itSta != m_allWindows.end(); itSta++ )
         {
-            // Skip the moving windows
-            if( m_movingWindows.find( (*itSta) ) != m_movingWindows.end() )
+            // Skip the moving windows and the invisible ones
+            if( m_movingWindows.find( (*itSta) ) != m_movingWindows.end() ||
+                ! (*itSta)->getVisibleVar().get() )
             {
                 continue;
             }

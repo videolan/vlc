@@ -2,7 +2,7 @@
  * win32_window.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -91,25 +91,25 @@ Win32Window::~Win32Window()
 }
 
 
-void Win32Window::show( int left, int top )
+void Win32Window::show( int left, int top ) const
 {
     ShowWindow( m_hWnd, SW_SHOW );
 }
 
 
-void Win32Window::hide()
+void Win32Window::hide() const
 {
     ShowWindow( m_hWnd, SW_HIDE );
 }
 
 
-void Win32Window::moveResize( int left, int top, int width, int height )
+void Win32Window::moveResize( int left, int top, int width, int height ) const
 {
     MoveWindow( m_hWnd, left, top, width, height, true );
 }
 
 
-void Win32Window::raise()
+void Win32Window::raise() const
 {
     SetWindowPos( m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
 }
@@ -164,7 +164,7 @@ void Win32Window::setOpacity( uint8_t value )
 }
 
 
-void Win32Window::toggleOnTop( bool onTop )
+void Win32Window::toggleOnTop( bool onTop ) const
 {
     if( onTop )
     {

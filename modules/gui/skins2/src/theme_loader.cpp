@@ -2,7 +2,7 @@
  * theme_loader.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme_loader.cpp,v 1.9 2004/02/08 11:23:17 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -76,10 +76,10 @@ bool ThemeLoader::load( const string &fileName )
     char *skin_last = config_GetPsz( getIntf(), "skins2-last" );
     if( skin_last != NULL && fileName == (string)skin_last )
     {
-        // Used to anchor the windows at the beginning
-        pNewTheme->getWindowManager().stopMove();
         // Restore the theme configuration
         getIntf()->p_sys->p_theme->loadConfig();
+        // Used to anchor the windows at the beginning
+        pNewTheme->getWindowManager().stopMove();
     }
     else
     {

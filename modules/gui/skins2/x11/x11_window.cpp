@@ -2,7 +2,7 @@
  * x11_window.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.3 2004/01/25 18:41:08 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -112,7 +112,7 @@ X11Window::~X11Window()
 }
 
 
-void X11Window::show( int left, int top )
+void X11Window::show( int left, int top ) const
 {
     // Map the window
     XMapRaised( XDISPLAY, m_wnd );
@@ -120,20 +120,20 @@ void X11Window::show( int left, int top )
 }
 
 
-void X11Window::hide()
+void X11Window::hide() const
 {
     // Unmap the window
     XUnmapWindow( XDISPLAY, m_wnd );
 }
 
 
-void X11Window::moveResize( int left, int top, int width, int height )
+void X11Window::moveResize( int left, int top, int width, int height ) const
 {
     XMoveResizeWindow( XDISPLAY, m_wnd, left, top, width, height );
 }
 
 
-void X11Window::raise()
+void X11Window::raise() const
 {
     XRaiseWindow( XDISPLAY, m_wnd );
 }
@@ -145,9 +145,9 @@ void X11Window::setOpacity( uint8_t value )
 }
 
 
-void X11Window::toggleOnTop( bool onTop )
+void X11Window::toggleOnTop( bool onTop ) const
 {
-    // XXX TODO
+    // TODO
 }
 
 #endif
