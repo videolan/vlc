@@ -1,8 +1,8 @@
 /*****************************************************************************
- * win32_specific.h: Win32 specific features 
+ * os_specific.h: OS specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.h,v 1.2 2002/04/02 23:43:57 gbazin Exp $
+ * $Id: os_specific.h,v 1.1 2002/04/02 23:43:57 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -22,20 +22,39 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#ifdef SYS_BEOS
+#   include "beos_specific.h"
+#endif
+#ifdef SYS_DARWIN
+#   include "darwin_specific.h"
+#endif
+#ifdef WIN32
+#   include "win32_specific.h"
+#endif
 
-typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT)( HANDLE, HANDLE, DWORD, BOOL );
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*****************************************************************************
  * main_sys_t: system specific descriptor
- *****************************************************************************
- * This structure is a system specific descriptor. It describes the Win32
- * properties of the program.
- *****************************************************************************/
-typedef struct main_sys_s
-{
-    SIGNALOBJECTANDWAIT SignalObjectAndWait;
-    boolean_t b_fast_pthread;
+ ****************************************************************************/
+struct main_sys_s;
 
-} main_sys_t;
+#ifndef PLUGIN
+extern struct main_sys_s *p_main_sys;
+#else
+#   define p_main_sys (p_symbols->p_main_sys)
+#endif
+
+
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+void system_Init ( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] );
+void system_Configure  ( void );
+void system_End  ( void );
+
+#ifdef __cplusplus
+}
+#endif

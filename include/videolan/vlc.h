@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.5 2002/03/03 04:37:29 sam Exp $
+ * $Id: vlc.h,v 1.6 2002/04/02 23:43:57 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -35,15 +35,7 @@
 
 #include "common.h"
 
-#ifdef SYS_BEOS
-#   include "beos_specific.h"
-#endif
-#ifdef SYS_DARWIN
-#   include "darwin_specific.h"
-#endif
-#ifdef WIN32
-#   include "win32_specific.h"
-#endif
+#include "os_specific.h"
 
 #include "intf_msg.h"
 #include "threads.h"

@@ -2,7 +2,7 @@
  * darwin_specific.h: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.h,v 1.2 2001/05/06 04:32:02 sam Exp $
+ * $Id: darwin_specific.h,v 1.3 2002/04/02 23:43:57 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,7 +24,4 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void    system_Init ( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] );
-void    system_End  ( void );
 char  * system_GetProgramPath( void );
-

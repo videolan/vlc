@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.38 2002/03/28 10:17:06 gbazin Exp $
+ * $Id: threads.h,v 1.39 2002/04/02 23:43:57 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -53,8 +53,6 @@ int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 #   include <byteorder.h>
 
 #elif defined( WIN32 )
-#define WIN32_LEAN_AND_MEAN
-#   include <windows.h>
 #   include <process.h>
 
 #else
@@ -147,8 +145,13 @@ typedef struct
 } vlc_cond_t;
 
 #elif defined( WIN32 )
-typedef HANDLE           vlc_thread_t;
-typedef CRITICAL_SECTION vlc_mutex_t;
+typedef HANDLE vlc_thread_t;
+
+typedef struct
+{
+    CRITICAL_SECTION csection;
+    HANDLE           mutex;
+} vlc_mutex_t;
 
 typedef struct
 {
@@ -308,8 +311,22 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     return B_OK;
 
 #elif defined( WIN32 )
-    InitializeCriticalSection( p_mutex );
-    return 0;
+    /* We use mutexes on WinNT/2K/XP because we can use the SignalObjectAndWait
+     * function and have a 100% correct vlc_cond_wait() implementation.
+     * As this function is not available on Win9x, we can use the faster
+     * CriticalSections */
+    if( (GetVersion() < 0x80000000) && !p_main_sys->b_fast_pthread )
+    {
+        /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
+        p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
+        return ( p_mutex->mutex ? 0 : 1 );
+    }
+    else
+    {
+        InitializeCriticalSection( &p_mutex->csection );
+        p_mutex->mutex = NULL;
+        return 0;
+    }
 
 #endif
 }
@@ -364,7 +381,14 @@ static __inline__ int _vlc_mutex_lock( char * psz_file, int i_line,
     return err;
 
 #elif defined( WIN32 )
-    EnterCriticalSection( p_mutex );
+    if( p_mutex->mutex )
+    {
+        WaitForSingleObject( p_mutex->mutex, INFINITE );
+    }
+    else
+    {
+        EnterCriticalSection( &p_mutex->csection );
+    }
     return 0;
 
 #endif
@@ -418,7 +442,14 @@ static __inline__ int _vlc_mutex_unlock( char * psz_file, int i_line,
     return B_OK;
 
 #elif defined( WIN32 )
-    LeaveCriticalSection( p_mutex );
+    if( p_mutex->mutex )
+    {
+        ReleaseMutex( p_mutex->mutex );
+    }
+    else
+    {
+        LeaveCriticalSection( &p_mutex->csection );
+    }
     return 0;
 
 #endif
@@ -466,7 +497,14 @@ static __inline__ int _vlc_mutex_destroy( char * psz_file, int i_line,
     return B_OK;
 
 #elif defined( WIN32 )
-    DeleteCriticalSection( p_mutex );
+    if( p_mutex->mutex )
+    {
+        CloseHandle( p_mutex->mutex );
+    }
+    else
+    {
+        DeleteCriticalSection( &p_mutex->csection );
+    }
     return 0;
 
 #endif    
@@ -664,7 +702,7 @@ static __inline__ int vlc_cond_broadcast( vlc_cond_t *p_condvar )
     while( p_condvar->i_waiting_threads )
     {
         PulseEvent( p_condvar->signal );
-        Sleep( 0 ); /* deschedule the current thread */
+        Sleep( 1 ); /* deschedule the current thread */
     }
     return 0;
 
@@ -777,13 +815,18 @@ static __inline__ int _vlc_cond_wait( char * psz_file, int i_line,
 
     p_condvar->i_waiting_threads ++;
 
-    /* Release the mutex */
-    vlc_mutex_unlock( p_mutex );
-
-    i_result = WaitForSingleObject( p_condvar->signal, INFINITE); 
-
-    /* maybe we should protect this with a mutex ? */
-    p_condvar->i_waiting_threads --;
+    if( p_mutex->mutex )
+    {
+        p_main_sys->SignalObjectAndWait( p_mutex->mutex, p_condvar->signal,
+					 INFINITE, FALSE );
+    }
+    else
+    {
+        /* Release the mutex */
+        vlc_mutex_unlock( p_mutex );
+        i_result = WaitForSingleObject( p_condvar->signal, INFINITE); 
+        p_condvar->i_waiting_threads --;
+    }
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
@@ -892,19 +935,12 @@ static __inline__ int _vlc_thread_create( char * psz_file, int i_line,
     i_ret = resume_thread( *p_thread );
 
 #elif defined( WIN32 )
-#if 0
-    DWORD threadID;
-    /* This method is not recommended when using the MSVCRT C library,
-     * so we'll have to use _beginthreadex instead */
-    *p_thread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE) func, 
-                             p_data, 0, &threadID);
-#endif
     unsigned threadID;
     /* When using the MSVCRT C library you have to use the _beginthreadex
      * function instead of CreateThread, otherwise you'll end up with memory
-     * leaks and the signal function not working */
-    *p_thread = (HANDLE)_beginthreadex(NULL, 0, (PTHREAD_START) func, 
-                             p_data, 0, &threadID);
+     * leaks and the signal functions not working */
+    *p_thread = (HANDLE)_beginthreadex( NULL, 0, (PTHREAD_START) func, 
+                                        p_data, 0, &threadID );
     
     i_ret = ( *p_thread ? 0 : 1 );
 
@@ -958,9 +994,6 @@ static __inline__ void vlc_thread_exit( void )
     exit_thread( 0 );
 
 #elif defined( WIN32 )
-#if 0
-    ExitThread( 0 );
-#endif
     /* For now we don't close the thread handles (because of race conditions).
      * Need to be looked at. */
     _endthreadex(0);
@@ -1037,4 +1070,3 @@ static void *vlc_thread_wrapper( void *p_wrapper )
     return func( p_data );
 }
 #endif
-

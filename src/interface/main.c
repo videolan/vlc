@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.174 2002/04/02 21:56:19 ipkiss Exp $
+ * $Id: main.c,v 1.175 2002/04/02 23:43:57 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -282,6 +282,12 @@
 #define MEMCPY_TEXT "memory copy method"
 #define MEMCPY_LONGTEXT NULL
 
+#define FAST_PTHREAD_TEXT "fast pthread on NT/2K/XP (developpers only)"
+#define FAST_PTHREAD_LONGTEXT "On Windows NT/2K/XP we use a slow but correct "\
+                              "pthread implementation, you can also use this "\
+                              "faster implementation but you might "\
+                              "experience problems with it"
+
 /* Quick usage guide
 MODULE_CONFIG_START
 MODULE_CONFIG_STOP
@@ -376,6 +382,10 @@ ADD_BOOL    ( "playlist_loop", NULL, PLAYLIST_LOOP_TEXT, PLAYLIST_LOOP_LONGTEXT 
 ADD_CATEGORY_HINT( "Miscellaneous", NULL )
 ADD_PLUGIN  ( "memcpy", MODULE_CAPABILITY_MEMCPY, NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT )
 
+#if defined(WIN32)
+ADD_BOOL    ( "fast_pthread", NULL, FAST_PTHREAD_TEXT, FAST_PTHREAD_LONGTEXT )
+#endif
+
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -413,6 +423,7 @@ static module_config_t p_help_config[] = {
  * Global variables - these are the only ones, see main.h and modules.h
  *****************************************************************************/
 main_t        *p_main;
+p_main_sys_t  p_main_sys;
 module_bank_t *p_module_bank;
 input_bank_t  *p_input_bank;
 aout_bank_t   *p_aout_bank;
@@ -641,6 +652,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         return( errno );
     }
 
+
+    /*
+     * System specific configuration
+     */
+#if defined( WIN32 )
+    system_Configure();
+#endif
 
     /* p_main inititalization. FIXME ? */
     p_main->i_desync = (mtime_t)config_GetIntVariable( "desync" )
