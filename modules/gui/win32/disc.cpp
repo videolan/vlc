@@ -63,14 +63,6 @@ void __fastcall TDiscDlg::BitBtnCancelClick( TObject *Sender )
 void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
 {
     AnsiString  Device, Source, Method, Title, Chapter;
-    playlist_t *    p_playlist;
-
-    p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {   
-        return;
-    }                        
 
     Hide();
 
@@ -78,13 +70,9 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
 
     /* Check which method was activated */
     if( RadioGroupType->ItemIndex == 0 )
-    {
         Method = "dvd";
-    }
     else
-    {
         Method = "vcd";
-    }
 
     /* Select title and chapter */
     Title.sprintf( "%d", SpinEditTitle->Value );
@@ -92,13 +80,9 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
 
     /* Build source name and add it to playlist */
     Source = Method + ":" + Device + "@" + Title + "," + Chapter;
-    playlist_Add( p_playlist, Source.c_str(),
-                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
-    /* update the display */
-    p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
-
-    vlc_object_release( p_playlist );
+    p_intf->p_sys->p_playwin->Add( Source, PLAYLIST_APPEND | PLAYLIST_GO,
+                                   PLAYLIST_END );
 }
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )

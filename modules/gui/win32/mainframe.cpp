@@ -27,9 +27,9 @@
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 
+#include "dragdrop.h"
 #include "mainframe.h"
 #include "menu.h"
-#include "control.h"
 #include "disc.h"
 #include "network.h"
 #include "about.h"
@@ -42,7 +42,6 @@
 #include "netutils.h"
 
 //---------------------------------------------------------------------------
-//#pragma package(smart_init)
 #pragma link "CSPIN"
 #pragma resource "*.dfm"
 
@@ -66,8 +65,18 @@ __fastcall TMainFrameDlg::TMainFrameDlg(
     Caption = VOUT_TITLE " (Win32 interface)";
 
     StringListPref = new TStringList();
-    
+
     Translate( this );
+
+    /* drag and drop stuff */
+
+    /* initialize the OLE library */
+    OleInitialize( NULL );
+    /* TDropTarget will send the WM_OLEDROP message to the form */
+    lpDropTarget = (LPDROPTARGET)new TDropTarget( this->Handle );
+    CoLockObjectExternal( lpDropTarget, true, true );
+    /* register the form as a drop target */
+    RegisterDragDrop( this->Handle, lpDropTarget );
 }
 //---------------------------------------------------------------------------
 __fastcall TMainFrameDlg::~TMainFrameDlg()
@@ -96,8 +105,6 @@ void __fastcall TMainFrameDlg::TrackBarChange( TObject *Sender )
      * the stream. It is called whenever the slider changes its value.
      * The lock has to be taken before the function is called */
 
-//    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-
     if( p_intf->p_sys->p_input != NULL )
     {
 #define p_area p_intf->p_sys->p_input->stream.p_selected_area
@@ -109,8 +116,6 @@ void __fastcall TMainFrameDlg::TrackBarChange( TObject *Sender )
                         ( p_area->i_size * Value ) / (off_t)SLIDER_MAX_VALUE );
 #undef p_area
      }
-
-//    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::FormClose( TObject *Sender,
@@ -119,6 +124,14 @@ void __fastcall TMainFrameDlg::FormClose( TObject *Sender,
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_vlc->b_die = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->change_lock );
+
+    /* remove the form from the list of drop targets */
+    RevokeDragDrop( this->Handle );
+    lpDropTarget->Release();
+    CoLockObjectExternal( lpDropTarget, false, true );
+
+    /* uninitialize the OLE library */
+    OleUninitialize();
 
     /* we don't destroy the form immediatly */
     Action = caHide;
@@ -131,28 +144,13 @@ void __fastcall TMainFrameDlg::FormClose( TObject *Sender,
  ****************************************************************************/
 void __fastcall TMainFrameDlg::OpenFileActionExecute( TObject *Sender )
 {
-    AnsiString      FileName;
-    playlist_t *    p_playlist;
-
-    p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
     if( OpenDialog1->Execute() )
     {
         /* add the new file to the interface playlist */
-        FileName = OpenDialog1->FileName;
-        playlist_Add( p_playlist, (char*)FileName.c_str(),
-                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-
-        /* update the plugin display */
-        p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
+         p_intf->p_sys->p_playwin->Add( OpenDialog1->FileName,
+                                        PLAYLIST_APPEND | PLAYLIST_GO,
+                                        PLAYLIST_END );
     };
-
-    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::OpenDiscActionExecute( TObject *Sender )
@@ -206,16 +204,7 @@ void __fastcall TMainFrameDlg::PlaylistActionExecute( TObject *Sender )
     }
     else
     {
-        playlist_t * p_playlist;
-        p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        if( p_playlist == NULL )
-        {
-            return;
-        }
-
-        p_playwin->UpdateGrid( p_playlist );
-        vlc_object_release( p_playlist );
+        p_playwin->UpdateGrid();
         p_playwin->Show();
     }
 }
@@ -239,32 +228,32 @@ void __fastcall TMainFrameDlg::AboutActionExecute( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::BackActionExecute( TObject *Sender )
 {
-    ControlBack( Sender );
+    /* TODO */
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PlayActionExecute( TObject *Sender )
 {
-    ControlPlay( Sender );
+    p_intf->p_sys->p_playwin->Play();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PauseActionExecute( TObject *Sender )
 {
-    ControlPause( Sender );
+    p_intf->p_sys->p_playwin->Pause();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::StopActionExecute( TObject *Sender )
 {
-    ControlStop( Sender );
+    p_intf->p_sys->p_playwin->Stop();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::SlowActionExecute( TObject *Sender )
 {
-    ControlSlow( Sender );
+    p_intf->p_sys->p_playwin->Slow();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::FastActionExecute( TObject *Sender )
 {
-    ControlFast( Sender );
+    p_intf->p_sys->p_playwin->Fast();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PreviousActionExecute(TObject *Sender)
@@ -331,8 +320,40 @@ void __fastcall TMainFrameDlg::EjectActionExecute( TObject *Sender )
 
 
 /*****************************************************************************
+ * External drop handling
+ *****************************************************************************/
+void __fastcall TMainFrameDlg::OnDrop( TMessage &Msg )
+{
+    /* find the number of files dropped */
+    int num_files = DragQueryFile( (HDROP)Msg.WParam, 0xFFFFFFFF,
+                                   (LPSTR)NULL, NULL );
+
+    /* append each file to the playlist */
+    for( int i = 0; i < num_files; i++ )
+    {
+        /* find the length of the filename */
+        int name_length = DragQueryFile( (HDROP)Msg.WParam, i, NULL, NULL ) + 1;
+
+        /* get the filename */
+        char *FileName = new char[name_length];
+        DragQueryFile( (HDROP)Msg.WParam, i, FileName, name_length );
+
+        /* add the new file to the playlist */
+        p_intf->p_sys->p_playwin->Add( FileName, PLAYLIST_APPEND | PLAYLIST_GO,
+                                       PLAYLIST_END );
+
+        delete[] FileName;
+    }
+
+    DragFinish( (HDROP)Msg.WParam );
+    Msg.Result = 0;
+}
+//--------------------------------------------------------------------------
+
+
+/*****************************************************************************
  * Menu and popup callbacks
- ****************************************************************************/
+ *****************************************************************************/
 void __fastcall TMainFrameDlg::MenuHideinterfaceClick( TObject *Sender )
 {
      this->SendToBack();

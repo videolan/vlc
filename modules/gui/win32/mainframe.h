@@ -37,6 +37,14 @@
 #include <ExtCtrls.hpp>
 #include "CSPIN.h"
 #include <ActnList.hpp>
+
+#include <oleidl.h>                                   /* for drag and drop */
+
+/*****************************************************************************
+ * This message is sent to the controls registered as drop targets
+ *****************************************************************************/
+#define WM_OLEDROP WM_USER + 1
+
 //---------------------------------------------------------------------------
 class TMainFrameDlg : public TForm
 {
@@ -193,6 +201,11 @@ __published:	// IDE-managed Components
     void __fastcall NextChapterActionExecute( TObject *Sender );
 private:	// User declarations
     intf_thread_t *p_intf;
+    /* drag and drop handling */
+    LPDROPTARGET lpDropTarget;
+    BEGIN_MESSAGE_MAP
+        MESSAGE_HANDLER( WM_OLEDROP, TMessage, OnDrop )
+    END_MESSAGE_MAP( TForm )
 public:		// User declarations
     TStringList *StringListPref;                   /* stores config dialogs */
     __fastcall TMainFrameDlg( TComponent* Owner, intf_thread_t *_p_intf );
@@ -209,6 +222,7 @@ public:		// User declarations
     void __fastcall PopupAudioClick( TObject *Sender );
     void __fastcall PopupSubtitleClick( TObject *Sender );
     void __fastcall PopupNavigationClick( TObject *Sender );
+    void __fastcall OnDrop( TMessage &Msg );
 };
 //---------------------------------------------------------------------------
 #endif

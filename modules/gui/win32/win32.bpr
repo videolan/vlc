@@ -5,7 +5,7 @@
     <VERSION value="BCB.05.03"/>
     <PROJECT value="libwin32_plugin.dll"/>
     <OBJFILES value="win32.obj mainframe.obj network.obj playlist.obj preferences.obj about.obj 
-      disc.obj control.obj menu.obj messages.obj misc.obj"/>
+      disc.obj menu.obj messages.obj misc.obj dragdrop.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES) mainframe.dfm network.dfm playlist.dfm preferences.dfm 
@@ -26,8 +26,8 @@
     <USERDEFINES value="_DEBUG;WIN32;__VLC__;__PLUGIN__;MODULE_NAME_IS_win32"/>
     <SYSDEFINES value="NO_STRICT"/>
     <MAINSOURCE value="win32.bpf"/>
-    <INCLUDEPATH value="..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\..\include;..\..\.."/>
-    <LIBPATH value="..\..\win32;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <INCLUDEPATH value="F:\ProgInst\Borland\CBuilder5\Bin;..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\..\include;..\..\.."/>
+    <LIBPATH value="F:\ProgInst\Borland\CBuilder5\Bin;..\..\win32;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par"/>
   </MACROS>
   <OPTIONS>

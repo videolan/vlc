@@ -33,6 +33,13 @@
 #include <ComCtrls.hpp>
 #include <ActnList.hpp>
 
+#include <oleidl.h>                                   /* for drag and drop */
+
+/*****************************************************************************
+ * This message is sent to the controls registered as drop targets
+ *****************************************************************************/
+#define WM_OLEDROP WM_USER + 1
+
 //---------------------------------------------------------------------------
 class TPlaylistDlg : public TForm
 {
@@ -84,9 +91,23 @@ __published:	// IDE-managed Components
 private:	// User declarations
     char * __fastcall rindex( char *s, char c );
     intf_thread_t *p_intf;
+    playlist_t *p_playlist;
+    /* drag and drop handling */
+    LPDROPTARGET lpDropTarget;
+    BEGIN_MESSAGE_MAP
+        MESSAGE_HANDLER( WM_OLEDROP, TMessage, OnDrop )
+    END_MESSAGE_MAP( TForm )
+    void __fastcall OnDrop( TMessage &Msg );
 public:		// User declarations
     __fastcall TPlaylistDlg( TComponent* Owner, intf_thread_t *_p_intf );
-    void __fastcall UpdateGrid( playlist_t * p_playlist );
+    __fastcall ~TPlaylistDlg();
+    void __fastcall Add( AnsiString FileName, int i_mode, int i_pos );
+    void __fastcall Stop();
+    void __fastcall Play();
+    void __fastcall Pause();
+    void __fastcall Slow();
+    void __fastcall Fast();
+    void __fastcall UpdateGrid();
     void __fastcall Manage();
     void __fastcall DeleteItem( int i_pos );
     void __fastcall Previous();

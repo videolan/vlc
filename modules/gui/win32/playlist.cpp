@@ -27,20 +27,51 @@
 #include <vlc/intf.h>
 
 #include "playlist.h"
+#include "dragdrop.h"
 #include "misc.h"
 #include "win32_common.h"
 
 //---------------------------------------------------------------------------
-//#pragma package(smart_init)
 #pragma resource "*.dfm"
 
 //---------------------------------------------------------------------------
-__fastcall TPlaylistDlg::TPlaylistDlg(
+_fastcall TPlaylistDlg::TPlaylistDlg(
     TComponent* Owner, intf_thread_t *_p_intf ) : TForm( Owner )
 {
     p_intf = _p_intf;
     Icon = p_intf->p_sys->p_window->Icon;
     Translate( this );
+
+    /* store a pointer to the core playlist */
+    p_playlist = (playlist_t *)
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        msg_Err( p_intf, "cannot find a playlist object" );
+    }
+
+    /* drag and drop stuff */
+
+    /* initialize the OLE library */
+    OleInitialize( NULL );
+    /* TDropTarget will send the WM_OLEDROP message to the form */
+    lpDropTarget = (LPDROPTARGET)new TDropTarget( this->Handle );
+    CoLockObjectExternal( lpDropTarget, true, true );
+    /* register the listview as a drop target */
+    RegisterDragDrop( ListViewPlaylist->Handle, lpDropTarget );
+}
+//---------------------------------------------------------------------------
+__fastcall TPlaylistDlg::~TPlaylistDlg()
+{
+    /* release the core playlist */
+    vlc_object_release( p_playlist );
+
+    /* remove the listview from the list of drop targets */
+    RevokeDragDrop( ListViewPlaylist->Handle );
+    lpDropTarget->Release();
+    CoLockObjectExternal( lpDropTarget, false, true );
+    /* uninitialize the OLE library */
+    OleUninitialize();
 }
 //---------------------------------------------------------------------------
 char * __fastcall TPlaylistDlg::rindex( char *s, char c )
@@ -62,6 +93,16 @@ char * __fastcall TPlaylistDlg::rindex( char *s, char c )
     }
 }
 //---------------------------------------------------------------------------
+
+
+/*****************************************************************************
+ * External drop handling
+ *****************************************************************************/
+void __fastcall TPlaylistDlg::OnDrop( TMessage &Msg )
+{
+    p_intf->p_sys->p_window->OnDrop( Msg );
+}
+//--------------------------------------------------------------------------
 
 
 /*****************************************************************************
@@ -88,12 +129,8 @@ void __fastcall TPlaylistDlg::PlayStreamActionExecute( TObject *Sender )
     TListItem *ItemStart;
     TItemStates Focused;
 
-    playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
-    {
         return;
-    }
 
     /* search the selected item */
     if( ListViewPlaylist->SelCount > 0 )
@@ -110,10 +147,8 @@ void __fastcall TPlaylistDlg::PlayStreamActionExecute( TObject *Sender )
             Item = ListViewPlaylist->GetNextItem( ItemStart, sdAll, Focused );
         }
 
-        playlist_Goto( p_playlist, Item->Index - 1 );
+        playlist_Goto( p_playlist, Item->Index );
     }
-
-    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::ListViewPlaylistKeyDown( TObject *Sender,
@@ -140,13 +175,9 @@ void __fastcall TPlaylistDlg::ListViewPlaylistCustomDrawItem(
 
     /* set the background color */
     if( Item->Index == p_intf->p_sys->i_playing )
-    {
         Sender->Canvas->Brush->Color = clRed;
-    }
     else
-    {
         Sender->Canvas->Brush->Color = clWhite;
-    }
 
     Sender->Canvas->FillRect( Rect );
 }
@@ -178,10 +209,8 @@ void __fastcall TPlaylistDlg::MenuAddUrlClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::DeleteSelectionActionExecute( TObject *Sender )
 {
-#if 0 /* PLAYLIST TARASS */
     /* user wants to delete a file in the queue */
-    int         i_pos;
-    playlist_t *p_playlist = p_intf->p_vlc->p_playlist;
+    int i_pos;
 
     /* lock the struct */
     vlc_mutex_lock( &p_intf->change_lock );
@@ -195,18 +224,15 @@ void __fastcall TPlaylistDlg::DeleteSelectionActionExecute( TObject *Sender )
         }
     }
 
-    /* Rebuild the ListView */
-    UpdateGrid( p_playlist );
+    /* rebuild the ListView */
+    UpdateGrid();
 
     vlc_mutex_unlock( &p_intf->change_lock );
-#endif
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::DeleteAllActionExecute( TObject *Sender )
 {
-#if 0 /* PLAYLIST TARASS */
-    int         i_pos;
-    playlist_t *p_playlist = p_intf->p_vlc->p_playlist;
+    int i_pos;
 
     /* lock the struct */
     vlc_mutex_lock( &p_intf->change_lock );
@@ -218,18 +244,15 @@ void __fastcall TPlaylistDlg::DeleteAllActionExecute( TObject *Sender )
     }
 
     /* Rebuild the ListView */
-    UpdateGrid( p_playlist );
+    UpdateGrid();
 
     vlc_mutex_unlock( &p_intf->change_lock );
-#endif
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::InvertSelectionActionExecute( TObject *Sender )
 {
-#if 0 /* PLAYLIST TARASS */
 #define NOT( var ) ( (var) ? false : true )
     int         i_pos;
-    playlist_t *p_playlist = p_intf->p_vlc->p_playlist;
     TListItems *Items = ListViewPlaylist->Items;
 
     /* delete the items from the last to the first */
@@ -238,7 +261,6 @@ void __fastcall TPlaylistDlg::InvertSelectionActionExecute( TObject *Sender )
         Items->Item[i_pos]->Selected = NOT( Items->Item[i_pos]->Selected );
     }
 #undef NOT
-#endif
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::CropSelectionActionExecute( TObject *Sender )
@@ -250,9 +272,60 @@ void __fastcall TPlaylistDlg::CropSelectionActionExecute( TObject *Sender )
 
 
 /*****************************************************************************
- * Useful functions, needed by the event handlers
+ * Useful functions, needed by the event handlers or by other windows
  ****************************************************************************/
-void __fastcall TPlaylistDlg::UpdateGrid( playlist_t * p_playlist )
+void __fastcall TPlaylistDlg::Add( AnsiString FileName, int i_mode, int i_pos )
+{
+    if( p_playlist == NULL )
+        return;
+
+    playlist_Add( p_playlist, FileName.c_str(), i_mode, i_pos );
+    
+    /* refresh the display */
+    UpdateGrid();
+}
+//---------------------------------------------------------------------------
+void __fastcall TPlaylistDlg::Stop()
+{
+    if( p_playlist == NULL )
+        return;
+
+    playlist_Stop( p_playlist );
+}
+//---------------------------------------------------------------------------
+void __fastcall TPlaylistDlg::Play()
+{
+    if( p_playlist == NULL )
+        return;
+
+    playlist_Play( p_playlist );
+}
+//---------------------------------------------------------------------------
+void __fastcall TPlaylistDlg::Pause()
+{
+    if( p_intf->p_sys->p_input != NULL )
+    {
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TPlaylistDlg::Slow()
+{
+    if( p_intf->p_sys->p_input != NULL )
+    {
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TPlaylistDlg::Fast()
+{
+    if( p_intf->p_sys->p_input != NULL )
+    {
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TPlaylistDlg::UpdateGrid()
 {
     int i_dummy;
     char *FileName;
@@ -294,12 +367,8 @@ void __fastcall TPlaylistDlg::UpdateGrid( playlist_t * p_playlist )
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::Manage()
 {
-    playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
-    {
         return;
-    }
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
@@ -308,50 +377,34 @@ void __fastcall TPlaylistDlg::Manage()
         p_intf->p_sys->i_playing = p_playlist->i_index;
 
         /* update the background color */
-        UpdateGrid( p_playlist );
+        UpdateGrid();
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::DeleteItem( int i_pos )
 {
-    playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
-    {
         return;
-    }
 
     playlist_Delete( p_playlist, i_pos );
-    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::Previous()
 {
-    playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
-    {
         return;
-    }
 
     playlist_Prev( p_playlist );
-    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::Next()
 {
-    playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
-    {
         return;
-    }
 
     playlist_Next( p_playlist );
-    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 

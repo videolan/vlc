@@ -90,14 +90,6 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
     AnsiString      Channel = ComboBoxCSAddress->Text;
     unsigned int    i_channel_port = SpinEditCSPort->Value;
     unsigned int    i_port;
-    playlist_t *    p_playlist;
-
-    p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {   
-        return;
-    }                        
 
     Hide();
 
@@ -112,11 +104,9 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             /* Build source name */
             Source = "udp:@:" + IntToStr( i_port );
 
-            playlist_Add( p_playlist, Source.c_str(),
-                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-
-            /* update the display */
-            p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
+            p_intf->p_sys->p_playwin->Add( Source,
+                                           PLAYLIST_APPEND | PLAYLIST_GO,
+                                           PLAYLIST_END );
             break;
 
         /* UDP Multicast */
@@ -128,12 +118,9 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             /* Build source name */
             Source = "udp:@" + Address + ":" + IntToStr( i_port );
 
-            playlist_Add( p_playlist, Source.c_str(),
-                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-
-            /* update the display */
-            p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
-            break;
+            p_intf->p_sys->p_playwin->Add( Source,
+                                           PLAYLIST_APPEND | PLAYLIST_GO,
+                                           PLAYLIST_END );
 
         /* Channel server */
         case 2:
@@ -164,15 +151,12 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
                 Source = "http://" + Address;
             }
 
-            playlist_Add( p_playlist, Source.c_str(),
-                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+            p_intf->p_sys->p_playwin->Add( Source,
+                                           PLAYLIST_APPEND | PLAYLIST_GO,
+                                           PLAYLIST_END );
 
-            /* update the display */
-            p_intf->p_sys->p_playwin->UpdateGrid( p_playlist );
             break;
     }
-
-    vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::ChangeEnabled( int i_selected )

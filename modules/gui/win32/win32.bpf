@@ -5,11 +5,11 @@ USEFORM("playlist.cpp", PlaylistDlg);
 USEFORM("preferences.cpp", PreferencesDlg);
 USEFORM("about.cpp", AboutDlg);
 USEFORM("disc.cpp", DiscDlg);
-USEUNIT("control.cpp");
 USE("win32_common.h", File);
 USEUNIT("menu.cpp");
 USEFORM("messages.cpp", MessagesDlg);
 USEUNIT("misc.cpp");
+USEUNIT("dragdrop.cpp");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 

@@ -32,8 +32,8 @@
 void __fastcall Translate( TForm *Form )
 {
 #if 0
-    Form->Hint = N_( Form->Hint );
-    Form->Caption = N_( Form->Caption );
+    Form->Hint = _( Form->Hint );
+    Form->Caption = _( Form->Caption );
 
     int i;
     for( i = 0; i < Form->ComponentCount; i++ )
@@ -49,12 +49,12 @@ void __fastcall Translate( TForm *Form )
                 if( Component->InheritsFrom( __classid( TControl ) ) )
                 {
                     TControl *Object = (TControl *) Component;
-                    Object->Hint = N_( Object->Hint );
+                    Object->Hint = _( Object->Hint );
                 }
                 else if( Component->InheritsFrom( __classid( TMenuItem ) ) )
                 {
                     TMenuItem *Object = (TMenuItem *) Component;
-                    Object->Hint = N_( Object->Hint );
+                    Object->Hint = _( Object->Hint );
                 }
             }
 
@@ -64,47 +64,47 @@ void __fastcall Translate( TForm *Form )
                 if( Component->InheritsFrom( __classid( TMenuItem ) ) )
                 {
                     TMenuItem *Object = (TMenuItem *) Component;
-                    Object->Caption = N_( Object->Caption );
+                    Object->Caption = _( Object->Caption );
                 }
                 else if( Component->InheritsFrom( __classid( TLabel ) ) )
                 {
                     TLabel *Object = (TLabel *) Component;
-                    Object->Caption = N_( Object->Caption );
+                    Object->Caption = _( Object->Caption );
                 }
                 else if( Component->InheritsFrom( __classid( TButton ) ) )
                 {
                     TButton *Object = (TButton *) Component;
-                    Object->Caption = N_( Object->Caption );
+                    Object->Caption = _( Object->Caption );
                 }
                 else if( Component->InheritsFrom( __classid( TToolButton ) ) )
                 {
                     TToolButton *Object = (TToolButton *) Component;
-                    Object->Caption = N_( Object->Caption );
+                    Object->Caption = _( Object->Caption );
                 }
                 else if( Component->InheritsFrom( __classid( TRadioButton ) ) )
                 {
                     TRadioButton *Object = (TRadioButton *) Component;
-                    Object->Caption = N_( Object->Caption );
+                    Object->Caption = _( Object->Caption );
                 }
                 else if( Component->InheritsFrom( __classid( TCheckBox ) ) )
                 {
                     TCheckBox *Object = (TCheckBox *) Component;
-                    Object->Caption = N_( Object->Caption );
+                    Object->Caption = _( Object->Caption );
                 }
                 else if( Component->InheritsFrom( __classid( TRadioGroup ) ) )
                 {
                     TRadioGroup *Object = (TRadioGroup *) Component;
-                    Object->Caption = N_( Object->Caption );
+                    Object->Caption = _( Object->Caption );
                 }
                 else if( Component->InheritsFrom( __classid( TGroupBox ) ) )
                 {
                     TGroupBox *Object = (TGroupBox *) Component;
-                    Object->Caption = N_( Object->Caption );
+                    Object->Caption = _( Object->Caption );
                 }
                 else if( Component->InheritsFrom( __classid( TTabSheet ) ) )
                 {
                     TTabSheet *Object = (TTabSheet *) Component;
-                    Object->Caption = N_( Object->Caption );
+                    Object->Caption = _( Object->Caption );
                 }
                 else if( Component->InheritsFrom( __classid( TListView ) ) )
                 {
@@ -112,7 +112,7 @@ void __fastcall Translate( TForm *Form )
                     int iCol;
                     for( iCol = 0; iCol < Object->Columns->Count; iCol++ )
                         Object->Columns->Items[iCol]->Caption =
-                                 N_( Object->Columns->Items[iCol]->Caption );
+                                 _( Object->Columns->Items[iCol]->Caption );
                 }
             }
 
@@ -122,12 +122,12 @@ void __fastcall Translate( TForm *Form )
                 if( Component->InheritsFrom( __classid( TEdit ) ) )
                 {
                     TEdit *Object = (TEdit *) Component;
-                    Object->Text = N_( Object->Text );
+                    Object->Text = _( Object->Text );
                 }
                 else if( Component->InheritsFrom( __classid( TComboBox ) ) )
                 {
                     TComboBox *Object = (TComboBox *) Component;
-                    Object->Text = N_( Object->Text );
+                    Object->Text = _( Object->Text );
                 }
             }
         }
