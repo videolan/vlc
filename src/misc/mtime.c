@@ -94,7 +94,7 @@ mtime_t mdate( void )
 void mwait( mtime_t date )
 {
 #ifdef HAVE_KERNEL_OS_H
-	
+
     mtime_t delay;
     
     delay = date - real_time_clock_usecs();

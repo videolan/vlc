@@ -24,9 +24,9 @@
 typedef struct lpcmdec_s lpcmdec_t;
 
 typedef struct lpcm_sync_info_s {
-    int sample_rate;	/* sample rate in Hz */
-    int frame_size;	/* frame size in bytes */
-    int bit_rate;	/* nominal bit rate in kbps */
+    int sample_rate;    /* sample rate in Hz */
+    int frame_size;     /* frame size in bytes */
+    int bit_rate;       /* nominal bit rate in kbps */
 } lpcm_sync_info_t;
 
 typedef struct lpcm_byte_stream_s {
@@ -57,7 +57,7 @@ struct lpcmdec_s {
      */
 
     /* The bit stream structure handles the PES stream at the bit level */
-    lpcm_bit_stream_t	bit_stream;
+    lpcm_bit_stream_t bit_stream;
 };
 
 

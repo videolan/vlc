@@ -263,7 +263,7 @@ static void RunThread( spudec_thread_t *p_spudec )
                                 p_spu->i_height = p_spu->i_y - ( (i_word << 8)
                                     | GetByte( &p_spudec->bit_stream ) ) + 1;
 
-				i_index += 6;
+                                i_index += 6;
                                 break;
                             case SPU_CMD_SET_OFFSETS:
                                 /* 06xxxxyyyy (byte offsets) */

@@ -94,7 +94,7 @@ int BuildInetAddr( struct sockaddr_in *p_sa_in, char *psz_in_addr, int i_port )
         intf_DbgMsg("debug: resolving internet address %s...", psz_in_addr);
         if ( (p_hostent = gethostbyname(psz_in_addr)) == NULL)
         {
-            intf_ErrMsg("error: unknown host %s", psz_in_addr);
+            intf_ErrMsg( "net error: unknown host %s", psz_in_addr );
             return( -1 );
         }
 
@@ -158,8 +158,8 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
     }
     else
     {
-        intf_ErrMsg("Cannot read flags for interface %s: %s", psz_name,
-                    strerror(errno));
+        intf_ErrMsg( "net error: cannot read flags for interface %s (%s)",
+                     psz_name, strerror(errno) );
         return -1;
     }
 
@@ -182,8 +182,8 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
     }
     else
     {
-        intf_ErrMsg("Cannot read hardware address for interface %s: %s",
-                    psz_name, strerror(errno));
+        intf_ErrMsg( "net error: cannot read hardware address for %s (%s)",
+                     psz_name, strerror(errno) );
         return -1;
     }
 
@@ -197,8 +197,8 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
     }
     else
     {
-        intf_ErrMsg("Cannot read network address for interface %s: %s",
-                    psz_name, strerror(errno));
+        intf_ErrMsg( "net error: cannot read network address for %s (%s)",
+                     psz_name, strerror(errno) );
         return -1;
     }
 
@@ -221,8 +221,8 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
     }
     else
     {
-        intf_ErrMsg("Cannot read broadcast address for interface %s: %s",
-                    psz_name, strerror(errno));
+        intf_ErrMsg( "net error: cannot read broadcast address for %s (%s)",
+                     psz_name, strerror(errno));
         return -1;
     }
 #endif
@@ -267,8 +267,8 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
         i_rc = ioctl(i_sockfd, SIOCGIFCONF, (byte_t*)&ifc_netconf);
         if( i_rc )
         {
-            intf_ErrMsg("Cannot read network configuration: %s",
-                        strerror(errno));
+            intf_ErrMsg( "net error: cannot read network configuration (%s)",
+                         strerror(errno));
             break;
         }
     }
@@ -298,8 +298,8 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
             /* Read the status of this interface */
             if( ioctl(i_sockfd, SIOCGIFFLAGS, (byte_t *)p_ifr_current_if) < 0 )
             {
-                intf_ErrMsg("Cannot access interface %s: %s",
-                            p_ifr_current_if->ifr_name, strerror(errno));
+                intf_ErrMsg( "net error: cannot access interface %s (%s)",
+                             p_ifr_current_if->ifr_name, strerror(errno) );
                 i_rc = -1;
                 break;
             }

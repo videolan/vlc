@@ -2,7 +2,7 @@
  * vdec_motion_inner.c : motion compensation inner routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_inner.c,v 1.10 2000/12/21 17:19:52 massiot Exp $
+ * $Id: vdec_motion_inner.c,v 1.11 2001/01/05 14:46:37 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -55,190 +55,190 @@
 #include "video_parser.h"
 #include "video_fifo.h"
 
-#define __MotionComponent_x_y_copy(width,height)			\
-void MotionComponent_x_y_copy_##width##_##height(yuv_data_t * p_src,	\
-						 yuv_data_t * p_dest,	\
-						 int i_stride)		\
-{									\
-    int i_x, i_y;      							\
-									\
-    for( i_y = 0; i_y < height; i_y ++ )				\
-    {									\
-	for( i_x = 0; i_x < width; i_x++ )     				\
-	{								\
-	    p_dest[i_x] = p_src[i_x];					\
-	}								\
-	p_dest += i_stride;						\
-	p_src += i_stride;						\
-    }									\
+#define __MotionComponent_x_y_copy(width,height)                        \
+void MotionComponent_x_y_copy_##width##_##height(yuv_data_t * p_src,    \
+                                                 yuv_data_t * p_dest,   \
+                                                 int i_stride)          \
+{                                                                       \
+    int i_x, i_y;                                                       \
+                                                                        \
+    for( i_y = 0; i_y < height; i_y ++ )                                \
+    {                                                                   \
+        for( i_x = 0; i_x < width; i_x++ )                              \
+        {                                                               \
+            p_dest[i_x] = p_src[i_x];                                   \
+        }                                                               \
+        p_dest += i_stride;                                             \
+        p_src += i_stride;                                              \
+    }                                                                   \
 }
 
-#define __MotionComponent_X_y_copy(width,height)			\
-void MotionComponent_X_y_copy_##width##_##height(yuv_data_t * p_src,	\
-						 yuv_data_t * p_dest,	\
-						 int i_stride)		\
-{									\
-    int i_x, i_y;      							\
-									\
-    for( i_y = 0; i_y < height; i_y ++ )				\
-    {									\
-	for( i_x = 0; i_x < width; i_x++ )     				\
-	{								\
-	    p_dest[i_x] = (unsigned int)(p_src[i_x]			\
-					 + p_src[i_x + 1]		\
-					 + 1) >> 1;			\
-	}								\
-	p_dest += i_stride;						\
-	p_src += i_stride;						\
-    }									\
+#define __MotionComponent_X_y_copy(width,height)                        \
+void MotionComponent_X_y_copy_##width##_##height(yuv_data_t * p_src,    \
+                                                 yuv_data_t * p_dest,   \
+                                                 int i_stride)          \
+{                                                                       \
+    int i_x, i_y;                                                       \
+                                                                        \
+    for( i_y = 0; i_y < height; i_y ++ )                                \
+    {                                                                   \
+        for( i_x = 0; i_x < width; i_x++ )                              \
+        {                                                               \
+            p_dest[i_x] = (unsigned int)(p_src[i_x]                     \
+                                         + p_src[i_x + 1]               \
+                                         + 1) >> 1;                     \
+        }                                                               \
+        p_dest += i_stride;                                             \
+        p_src += i_stride;                                              \
+    }                                                                   \
 }
 
-#define __MotionComponent_x_Y_copy(width,height)			\
-void MotionComponent_x_Y_copy_##width##_##height(yuv_data_t * p_src,	\
-						 yuv_data_t * p_dest,	\
-						 int i_stride)		\
-{									\
-    int i_x, i_y;      							\
-									\
-    for( i_y = 0; i_y < height; i_y ++ )				\
-    {									\
-	for( i_x = 0; i_x < width; i_x++ )     				\
-	{								\
-	    p_dest[i_x] = (unsigned int)(p_src[i_x]			\
-					 + p_src[i_x + i_stride]	\
-					 + 1) >> 1;			\
-	}								\
-	p_dest += i_stride;						\
-	p_src += i_stride;						\
-    }									\
+#define __MotionComponent_x_Y_copy(width,height)                        \
+void MotionComponent_x_Y_copy_##width##_##height(yuv_data_t * p_src,    \
+                                                 yuv_data_t * p_dest,   \
+                                                 int i_stride)          \
+{                                                                       \
+    int i_x, i_y;                                                       \
+                                                                        \
+    for( i_y = 0; i_y < height; i_y ++ )                                \
+    {                                                                   \
+        for( i_x = 0; i_x < width; i_x++ )                              \
+        {                                                               \
+            p_dest[i_x] = (unsigned int)(p_src[i_x]                     \
+                                         + p_src[i_x + i_stride]        \
+                                         + 1) >> 1;                     \
+        }                                                               \
+        p_dest += i_stride;                                             \
+        p_src += i_stride;                                              \
+    }                                                                   \
 }
 
-#define __MotionComponent_X_Y_copy(width,height)			\
-void MotionComponent_X_Y_copy_##width##_##height(yuv_data_t * p_src,	\
-						 yuv_data_t * p_dest,	\
-						 int i_stride)		\
-{									\
-    int i_x, i_y;      							\
-									\
-    for( i_y = 0; i_y < height; i_y ++ )				\
-    {									\
-	for( i_x = 0; i_x < width; i_x++ )     				\
-	{								\
-	    p_dest[i_x] = (unsigned int)(p_src[i_x]			\
-					 + p_src[i_x + 1]		\
-					 + p_src[i_x + i_stride]	\
-					 + p_src[i_x + i_stride + 1]	\
-					 + 2) >> 2;			\
-	}								\
-	p_dest += i_stride;						\
-	p_src += i_stride;						\
-    }									\
+#define __MotionComponent_X_Y_copy(width,height)                        \
+void MotionComponent_X_Y_copy_##width##_##height(yuv_data_t * p_src,    \
+                                                 yuv_data_t * p_dest,   \
+                                                 int i_stride)          \
+{                                                                       \
+    int i_x, i_y;                                                       \
+                                                                        \
+    for( i_y = 0; i_y < height; i_y ++ )                                \
+    {                                                                   \
+        for( i_x = 0; i_x < width; i_x++ )                              \
+        {                                                               \
+            p_dest[i_x] = (unsigned int)(p_src[i_x]                     \
+                                         + p_src[i_x + 1]               \
+                                         + p_src[i_x + i_stride]        \
+                                         + p_src[i_x + i_stride + 1]    \
+                                         + 2) >> 2;                     \
+        }                                                               \
+        p_dest += i_stride;                                             \
+        p_src += i_stride;                                              \
+    }                                                                   \
 }
 
-#define __MotionComponent_x_y_avg(width,height)				\
-void MotionComponent_x_y_avg_##width##_##height(yuv_data_t * p_src,	\
-						yuv_data_t * p_dest,	\
-						int i_stride)		\
-{									\
-    int i_x, i_y;      							\
-    unsigned int i_dummy;						\
-									\
-    for( i_y = 0; i_y < height; i_y ++ )				\
-    {									\
-	for( i_x = 0; i_x < width; i_x++ )     				\
-	{								\
-	    i_dummy = p_dest[i_x] + p_src[i_x];				\
-	    p_dest[i_x] = (i_dummy + 1) >> 1;  				\
-	}								\
-	p_dest += i_stride;						\
-	p_src += i_stride;						\
-    }									\
+#define __MotionComponent_x_y_avg(width,height)                         \
+void MotionComponent_x_y_avg_##width##_##height(yuv_data_t * p_src,     \
+                                                yuv_data_t * p_dest,    \
+                                                int i_stride)           \
+{                                                                       \
+    int i_x, i_y;                                                       \
+    unsigned int i_dummy;                                               \
+                                                                        \
+    for( i_y = 0; i_y < height; i_y ++ )                                \
+    {                                                                   \
+        for( i_x = 0; i_x < width; i_x++ )                              \
+        {                                                               \
+            i_dummy = p_dest[i_x] + p_src[i_x];                         \
+            p_dest[i_x] = (i_dummy + 1) >> 1;                           \
+        }                                                               \
+        p_dest += i_stride;                                             \
+        p_src += i_stride;                                              \
+    }                                                                   \
 }
 
-#define __MotionComponent_X_y_avg(width,height)				\
-void MotionComponent_X_y_avg_##width##_##height(yuv_data_t * p_src,	\
-						yuv_data_t * p_dest,	\
-						int i_stride)		\
-{									\
-    int i_x, i_y;      							\
-    unsigned int i_dummy;						\
-									\
-    for( i_y = 0; i_y < height; i_y ++ )				\
-    {									\
-	for( i_x = 0; i_x < width; i_x++ )     				\
-	{								\
-	    i_dummy = p_dest[i_x] + ((unsigned int)(p_src[i_x]		\
-						    + p_src[i_x + 1]	\
-						    + 1) >> 1);		\
-	    p_dest[i_x] = (i_dummy + 1) >> 1;  				\
-	}								\
-	p_dest += i_stride;						\
-	p_src += i_stride;						\
-    }									\
+#define __MotionComponent_X_y_avg(width,height)                         \
+void MotionComponent_X_y_avg_##width##_##height(yuv_data_t * p_src,     \
+                                                yuv_data_t * p_dest,    \
+                                                int i_stride)           \
+{                                                                       \
+    int i_x, i_y;                                                       \
+    unsigned int i_dummy;                                               \
+                                                                        \
+    for( i_y = 0; i_y < height; i_y ++ )                                \
+    {                                                                   \
+        for( i_x = 0; i_x < width; i_x++ )                              \
+        {                                                               \
+            i_dummy = p_dest[i_x] + ((unsigned int)(p_src[i_x]          \
+                                                    + p_src[i_x + 1]    \
+                                                    + 1) >> 1);         \
+            p_dest[i_x] = (i_dummy + 1) >> 1;                           \
+        }                                                               \
+        p_dest += i_stride;                                             \
+        p_src += i_stride;                                              \
+    }                                                                   \
 }
 
-#define __MotionComponent_x_Y_avg(width,height)				\
-void MotionComponent_x_Y_avg_##width##_##height(yuv_data_t * p_src,	\
-						yuv_data_t * p_dest,	\
-						int i_stride)		\
-{									\
-    int i_x, i_y;      							\
-    unsigned int i_dummy;						\
-									\
-    for( i_y = 0; i_y < height; i_y ++ )				\
-    {									\
-	for( i_x = 0; i_x < width; i_x++ )     				\
-	{								\
-	    i_dummy =							\
-		p_dest[i_x] + ((unsigned int)(p_src[i_x]		\
-					      + p_src[i_x + i_stride]	\
-					      + 1) >> 1);		\
-	    p_dest[i_x] = (i_dummy + 1) >> 1;  				\
-	}								\
-	p_dest += i_stride;						\
-	p_src += i_stride;						\
-    }									\
+#define __MotionComponent_x_Y_avg(width,height)                         \
+void MotionComponent_x_Y_avg_##width##_##height(yuv_data_t * p_src,     \
+                                                yuv_data_t * p_dest,    \
+                                                int i_stride)           \
+{                                                                       \
+    int i_x, i_y;                                                       \
+    unsigned int i_dummy;                                               \
+                                                                        \
+    for( i_y = 0; i_y < height; i_y ++ )                                \
+    {                                                                   \
+        for( i_x = 0; i_x < width; i_x++ )                              \
+        {                                                               \
+            i_dummy =                                                   \
+                p_dest[i_x] + ((unsigned int)(p_src[i_x]                \
+                                              + p_src[i_x + i_stride]   \
+                                              + 1) >> 1);               \
+            p_dest[i_x] = (i_dummy + 1) >> 1;                           \
+        }                                                               \
+        p_dest += i_stride;                                             \
+        p_src += i_stride;                                              \
+    }                                                                   \
 }
 
-#define __MotionComponent_X_Y_avg(width,height)				\
-void MotionComponent_X_Y_avg_##width##_##height(yuv_data_t * p_src,	\
-						yuv_data_t * p_dest,	\
-						int i_stride)		\
-{									\
-    int i_x, i_y;      							\
-    unsigned int i_dummy;						\
-									\
-    for( i_y = 0; i_y < height; i_y ++ )				\
-    {									\
-	for( i_x = 0; i_x < width; i_x++ )     				\
-	{								\
-	    i_dummy =							\
-		p_dest[i_x] + ((unsigned int)(p_src[i_x]		\
-					    + p_src[i_x + 1]		\
-					    + p_src[i_x + i_stride]	\
-					    + p_src[i_x + i_stride + 1]	\
-					    + 2) >> 2);                 \
-	    p_dest[i_x] = (i_dummy + 1) >> 1;  				\
-	}								\
-	p_dest += i_stride;						\
-	p_src += i_stride;						\
-    }									\
+#define __MotionComponent_X_Y_avg(width,height)                         \
+void MotionComponent_X_Y_avg_##width##_##height(yuv_data_t * p_src,     \
+                                                yuv_data_t * p_dest,    \
+                                                int i_stride)           \
+{                                                                       \
+    int i_x, i_y;                                                       \
+    unsigned int i_dummy;                                               \
+                                                                        \
+    for( i_y = 0; i_y < height; i_y ++ )                                \
+    {                                                                   \
+        for( i_x = 0; i_x < width; i_x++ )                              \
+        {                                                               \
+            i_dummy =                                                   \
+                p_dest[i_x] + ((unsigned int)(p_src[i_x]                \
+                                            + p_src[i_x + 1]            \
+                                            + p_src[i_x + i_stride]     \
+                                            + p_src[i_x + i_stride + 1] \
+                                            + 2) >> 2);                 \
+            p_dest[i_x] = (i_dummy + 1) >> 1;                           \
+        }                                                               \
+        p_dest += i_stride;                                             \
+        p_src += i_stride;                                              \
+    }                                                                   \
 }
 
-#define __MotionComponents(width,height)	\
-__MotionComponent_x_y_copy(width,height)	\
-__MotionComponent_X_y_copy(width,height)	\
-__MotionComponent_x_Y_copy(width,height)	\
-__MotionComponent_X_Y_copy(width,height)	\
-__MotionComponent_x_y_avg(width,height)		\
-__MotionComponent_X_y_avg(width,height)		\
-__MotionComponent_x_Y_avg(width,height)		\
+#define __MotionComponents(width,height)        \
+__MotionComponent_x_y_copy(width,height)        \
+__MotionComponent_X_y_copy(width,height)        \
+__MotionComponent_x_Y_copy(width,height)        \
+__MotionComponent_X_Y_copy(width,height)        \
+__MotionComponent_x_y_avg(width,height)         \
+__MotionComponent_X_y_avg(width,height)         \
+__MotionComponent_x_Y_avg(width,height)         \
 __MotionComponent_X_Y_avg(width,height)
 
-__MotionComponents (16,16)	/* 444, 422, 420 */
-__MotionComponents (16,8)	/* 444, 422, 420 */
-__MotionComponents (8,8)	/* 422, 420 */
-__MotionComponents (8,4)	/* 420 */
+__MotionComponents (16,16)      /* 444, 422, 420 */
+__MotionComponents (16,8)       /* 444, 422, 420 */
+__MotionComponents (8,8)        /* 422, 420 */
+__MotionComponents (8,4)        /* 420 */
 #if 0
-__MotionComponents (8,16)	/* 422 */
+__MotionComponents (8,16)       /* 422 */
 #endif

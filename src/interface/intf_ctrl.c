@@ -498,8 +498,8 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
     p_main->p_intf->p_input = input_CreateThread( i_method, p_source, i_port, i_vlan_id,
                                                   p_main->p_intf->p_vout, p_main->p_aout,
                                                   NULL );
-    return( INTF_NO_ERROR );
 #endif
+    return( INTF_NO_ERROR );
 }
 
 /*****************************************************************************

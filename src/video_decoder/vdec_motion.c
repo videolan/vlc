@@ -2,7 +2,7 @@
  * vdec_motion.c : motion compensation routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion.c,v 1.33 2000/12/22 13:04:45 sam Exp $
+ * $Id: vdec_motion.c,v 1.34 2001/01/05 14:46:37 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -55,71 +55,71 @@
 #include "video_parser.h"
 #include "video_fifo.h"
 
-#define __MotionComponents(width,height)		\
-void MotionComponent_x_y_copy_##width##_##height ();	\
-void MotionComponent_X_y_copy_##width##_##height ();	\
-void MotionComponent_x_Y_copy_##width##_##height ();	\
-void MotionComponent_X_Y_copy_##width##_##height ();	\
-void MotionComponent_x_y_avg_##width##_##height ();	\
-void MotionComponent_X_y_avg_##width##_##height ();	\
-void MotionComponent_x_Y_avg_##width##_##height ();	\
+#define __MotionComponents(width,height)                \
+void MotionComponent_x_y_copy_##width##_##height ();    \
+void MotionComponent_X_y_copy_##width##_##height ();    \
+void MotionComponent_x_Y_copy_##width##_##height ();    \
+void MotionComponent_X_Y_copy_##width##_##height ();    \
+void MotionComponent_x_y_avg_##width##_##height ();     \
+void MotionComponent_X_y_avg_##width##_##height ();     \
+void MotionComponent_x_Y_avg_##width##_##height ();     \
 void MotionComponent_X_Y_avg_##width##_##height ();
 
-__MotionComponents (16,16)	/* 444, 422, 420 */
-__MotionComponents (16,8)	/* 444, 422, 420 */
-__MotionComponents (8,8)	/* 422, 420 */
-__MotionComponents (8,4)	/* 420 */
+__MotionComponents (16,16)        /* 444, 422, 420 */
+__MotionComponents (16,8)        /* 444, 422, 420 */
+__MotionComponents (8,8)        /* 422, 420 */
+__MotionComponents (8,4)        /* 420 */
 #if 0
-__MotionComponents (8,16)	/* 422 */
+__MotionComponents (8,16)        /* 422 */
 #endif
 
-#define ___callTheRightOne(width,height)				     \
-    if ((i_width == width) && (i_height == height))			     \
-    {									     \
-	if (!b_average)							     \
-	{								     \
-	    switch (i_select)						     \
-	    {								     \
-	    case 0:							     \
-		MotionComponent_x_y_copy_##width##_##height (p_src, p_dest,  \
-							     i_stride);	     \
-		break;							     \
-	    case 1:							     \
-		MotionComponent_X_y_copy_##width##_##height (p_src, p_dest,  \
-							     i_stride);	     \
-		break;							     \
-	    case 2:							     \
-		MotionComponent_x_Y_copy_##width##_##height (p_src, p_dest,  \
-							     i_stride);      \
-		break;							     \
-	    case 3:							     \
-		MotionComponent_X_Y_copy_##width##_##height (p_src, p_dest,  \
-							     i_stride);	     \
-		break;							     \
-	    }								     \
-	}								     \
-	else								     \
-	{								     \
-	    switch (i_select)						     \
-	    {								     \
-	    case 0:							     \
-		MotionComponent_x_y_avg_##width##_##height (p_src, p_dest,   \
-							    i_stride);	     \
-		break;							     \
-	    case 1:							     \
-		MotionComponent_X_y_avg_##width##_##height (p_src, p_dest,   \
-							    i_stride);	     \
-		break;							     \
-	    case 2:							     \
-		MotionComponent_x_Y_avg_##width##_##height (p_src, p_dest,   \
-							    i_stride);       \
-		break;							     \
-	    case 3:							     \
-		MotionComponent_X_Y_avg_##width##_##height (p_src, p_dest,   \
-							    i_stride);	     \
-		break;							     \
-	    }								     \
-	}								     \
+#define ___callTheRightOne(width,height)                                     \
+    if ((i_width == width) && (i_height == height))                          \
+    {                                                                        \
+        if (!b_average)                                                      \
+        {                                                                    \
+            switch (i_select)                                                \
+            {                                                                \
+            case 0:                                                          \
+                MotionComponent_x_y_copy_##width##_##height (p_src, p_dest,  \
+                                                             i_stride);      \
+                break;                                                       \
+            case 1:                                                          \
+                MotionComponent_X_y_copy_##width##_##height (p_src, p_dest,  \
+                                                             i_stride);      \
+                break;                                                       \
+            case 2:                                                          \
+                MotionComponent_x_Y_copy_##width##_##height (p_src, p_dest,  \
+                                                             i_stride);      \
+                break;                                                       \
+            case 3:                                                          \
+                MotionComponent_X_Y_copy_##width##_##height (p_src, p_dest,  \
+                                                             i_stride);      \
+                break;                                                       \
+            }                                                                \
+        }                                                                    \
+        else                                                                 \
+        {                                                                    \
+            switch (i_select)                                                \
+            {                                                                \
+            case 0:                                                          \
+                MotionComponent_x_y_avg_##width##_##height (p_src, p_dest,   \
+                                                            i_stride);       \
+                break;                                                       \
+            case 1:                                                          \
+                MotionComponent_X_y_avg_##width##_##height (p_src, p_dest,   \
+                                                            i_stride);       \
+                break;                                                       \
+            case 2:                                                          \
+                MotionComponent_x_Y_avg_##width##_##height (p_src, p_dest,   \
+                                                            i_stride);       \
+                break;                                                       \
+            case 3:                                                          \
+                MotionComponent_X_Y_avg_##width##_##height (p_src, p_dest,   \
+                                                            i_stride);       \
+                break;                                                       \
+            }                                                                \
+        }                                                                    \
     }
 
 /*****************************************************************************
@@ -136,12 +136,12 @@ static __inline__ void MotionComponent(
                     boolean_t b_average     /* (explicit) averaging of several
                                              * predictions */ )
 {
-___callTheRightOne (16,16)
-___callTheRightOne (16,8)
-___callTheRightOne (8,8)
-___callTheRightOne (8,4)
+    ___callTheRightOne (16,16)
+    ___callTheRightOne (16,8)
+    ___callTheRightOne (8,8)
+    ___callTheRightOne (8,4)
 #if 0
-___callTheRightOne (8,16)
+    ___callTheRightOne (8,16)
 #endif
 }
 
@@ -263,7 +263,7 @@ static __inline__ void Motion422(
                        + (p_mb->i_l_x + (i_mv_x >> 1))
                        + (p_mb->i_motion_l_y + i_offset
                           + b_source_field)
-		       * p_mb->p_picture->i_width
+                       * p_mb->p_picture->i_width
                        + (i_mv_y >> 1) * p_mb->i_l_stride,
                      /* destination */
                      p_mb->p_picture->p_y
@@ -671,7 +671,7 @@ void vdec_MotionFrameField444( macroblock_t * p_mb )
     MOTION( p_mb, p_mb->p_forward, 0, 0,                                \
             p_mb->pppi_motion_vectors[0][0][0],                         \
             p_mb->pppi_motion_vectors[0][0][1],                         \
-            /* XXX?? XXX?? >> 1 ? */                                        \
+            /* XXX?? XXX?? >> 1 ? */                                    \
             p_mb->i_l_stride << 1, p_mb->i_c_stride << 1, 8, 0, 0 );    \
                                                                         \
     /* predict and add to top field from bottom field */                \
@@ -683,7 +683,7 @@ void vdec_MotionFrameField444( macroblock_t * p_mb )
     MOTION( p_mb, p_mb->p_forward, 1, 1,                                \
             p_mb->pppi_motion_vectors[0][0][0],                         \
             p_mb->pppi_motion_vectors[0][0][1],                         \
-            /* XXX?? XXX?? >> 1 ? */                                        \
+            /* XXX?? XXX?? >> 1 ? */                                    \
             p_mb->i_l_stride << 1, p_mb->i_c_stride << 1, 8, 0, 0 );    \
                                                                         \
     /* predict and add to bottom field from top field */                \

@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.7 2000/12/27 18:35:45 massiot Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.8 2001/01/05 14:46:37 sam Exp $
  *
  * Authors:
  *
@@ -66,11 +66,11 @@ static void     EndThread               (lpcmdec_thread_t * p_adec);
 vlc_thread_t lpcmdec_CreateThread (adec_config_t * p_config)
 {
     lpcmdec_thread_t *   p_lpcmdec;
-    intf_DbgMsg ( "LPCM Debug: creating lpcm decoder thread" );
+    intf_DbgMsg ( "lpcm: creating lpcm decoder thread" );
 
     /* Allocate the memory needed to store the thread's structure */
     if ((p_lpcmdec = (lpcmdec_thread_t *)malloc (sizeof(lpcmdec_thread_t))) == NULL) {
-        intf_ErrMsg ( "LPCM Error: not enough memory for lpcmdec_CreateThread() to create the new thread" );
+        intf_ErrMsg ( "lpcm error: cannot create lpcmdec_thread_t" );
         return 0;
     }
 
@@ -92,7 +92,7 @@ vlc_thread_t lpcmdec_CreateThread (adec_config_t * p_config)
 
     /* Spawn the lpcm decoder thread */
     if (vlc_thread_create(&p_lpcmdec->thread_id, "lpcm decoder", (vlc_thread_func_t)RunThread, (void *)p_lpcmdec)) {
-        intf_ErrMsg  ( "LPCM Error: can't spawn lpcm decoder thread" );
+        intf_ErrMsg  ( "lpcm error: cannot spawn thread" );
         free (p_lpcmdec);
         return 0;
     }
@@ -171,38 +171,38 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
    
     while ((!p_lpcmdec->p_fifo->b_die) && (!p_lpcmdec->p_fifo->b_error))
     {
-	    s16 * buffer;
-	    lpcm_sync_info_t sync_info;
+        s16 * buffer;
+        lpcm_sync_info_t sync_info;
 
-	    if (!sync)
+        if (!sync)
         {
             /* have to find a synchro point */
         }
     
         if (DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts)
         {
-	        p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts;
-	        DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts = 0;
+            p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts;
+            DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts = 0;
         }
         else
         {
-	        p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] = LAST_MDATE;
+            p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] = LAST_MDATE;
         }
 
-    	p_lpcmdec->p_aout_fifo->l_rate = sync_info.sample_rate;
+        p_lpcmdec->p_aout_fifo->l_rate = sync_info.sample_rate;
 
-	    buffer = ((s16 *)p_lpcmdec->p_aout_fifo->buffer) + (p_lpcmdec->p_aout_fifo->l_end_frame * LPCMDEC_FRAME_SIZE);
+        buffer = ((s16 *)p_lpcmdec->p_aout_fifo->buffer) + (p_lpcmdec->p_aout_fifo->l_end_frame * LPCMDEC_FRAME_SIZE);
 
-	    if (lpcm_decode_frame (&p_lpcmdec->lpcm_decoder, buffer))
+        if (lpcm_decode_frame (&p_lpcmdec->lpcm_decoder, buffer))
         {
-	        sync = 0;
-	        goto bad_frame;
-	    }
+            sync = 0;
+            goto bad_frame;
+        }
 
-	    vlc_mutex_lock (&p_lpcmdec->p_aout_fifo->data_lock);
-	    p_lpcmdec->p_aout_fifo->l_end_frame = (p_lpcmdec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-	    vlc_cond_signal (&p_lpcmdec->p_aout_fifo->data_wait);
-	    vlc_mutex_unlock (&p_lpcmdec->p_aout_fifo->data_lock);
+        vlc_mutex_lock (&p_lpcmdec->p_aout_fifo->data_lock);
+        p_lpcmdec->p_aout_fifo->l_end_frame = (p_lpcmdec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+        vlc_cond_signal (&p_lpcmdec->p_aout_fifo->data_wait);
+        vlc_mutex_unlock (&p_lpcmdec->p_aout_fifo->data_lock);
 
         intf_DbgMsg( "LPCM Debug: %x", *buffer );
         bad_frame:

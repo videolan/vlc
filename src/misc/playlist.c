@@ -54,14 +54,14 @@ playlist_t * playlist_Create ( void )
     p_playlist->i_index = 0;
     p_playlist->p_list = NULL;
 
-    intf_Msg("Playlist initialized");
+    intf_Msg("Playlist created");
     return( p_playlist );
 }
 
 void playlist_Init( playlist_t * p_playlist, int i_optind )
 {
     int i_list_index = 0;
-    int i_index = 0;
+    int i_index;
     int i_argc = p_main->i_argc;
 
     if( i_optind < i_argc )
@@ -70,11 +70,17 @@ void playlist_Init( playlist_t * p_playlist, int i_optind )
 
         p_playlist->p_list = malloc( i_list_index * sizeof( int ) );
 
-        while( i_argc - i_index > i_optind )
+        for( i_index = 0 ; i_argc - i_index > i_optind ; i_index++ )
         {
-            p_playlist->p_list[ i_index ] =
-                            p_main->ppsz_argv[ i_argc - i_index - 1];
-            i_index++;
+            if( strncmp( p_main->ppsz_argv[ i_argc - i_index - 1], "-", 1 ) )
+            {
+                p_playlist->p_list[ i_index ] =
+                                p_main->ppsz_argv[ i_argc - i_index - 1];
+            }
+            else
+            {
+                p_playlist->p_list[ i_index ] = "/dev/stdin";
+            }
         }
     }
     else

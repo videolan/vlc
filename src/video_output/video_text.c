@@ -228,7 +228,8 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     p_font = malloc( sizeof( vout_font_t ) );
     if( p_font == NULL )
     {
-        intf_ErrMsg("vout error: %s", strerror(ENOMEM));
+        intf_ErrMsg( "vout error: cannot allocate vout_font_t (%s)",
+                     strerror(ENOMEM) );
         close( i_file );
         return( NULL );
     }
@@ -245,7 +246,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         /* Read font header - two bytes indicate the font properties */
         if( read( i_file, pi_buffer, 2 ) != 2)
         {
-            intf_ErrMsg("error: unexpected end of file '%s'", psz_name );
+            intf_ErrMsg( "vout error: unexpected end of file '%s'", psz_name );
             free( p_font );
             close( i_file );
             return( NULL );
@@ -265,7 +266,8 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         p_font->p_data = malloc( 2 * 256 * pi_buffer[1] );
         if( p_font->p_data == NULL )
         {
-            intf_ErrMsg("error: %s", strerror(ENOMEM));
+            intf_ErrMsg( "vout error: cannot allocate font space (%s)",
+                         strerror(ENOMEM) );
             free( p_font );
             close( i_file );
             return( NULL );
@@ -274,7 +276,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         /* Copy raw data */
         if( read( i_file, p_font->p_data, 256 * pi_buffer[1] ) != 256 * pi_buffer[1] )
         {
-            intf_ErrMsg("error: unexpected end of file '%s'", psz_name );
+            intf_ErrMsg("vout error: unexpected end of file '%s'", psz_name );
             free( p_font->p_data );
             free( p_font );
             close( i_file );
@@ -300,7 +302,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
 
         break;
     default:
-        intf_ErrMsg("error: file '%s' has an unknown format", psz_name );
+        intf_ErrMsg("vout error: file '%s' has an unknown format", psz_name );
         free( p_font );
         close( i_file );
         return( NULL );

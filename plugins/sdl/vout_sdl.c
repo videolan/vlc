@@ -331,7 +331,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         SDL_ShowCursor( 1 );
 
     SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
-    SDL_EventState(SDL_KEYUP , SDL_IGNORE);	/* ignore keys up */
+    SDL_EventState(SDL_KEYUP , SDL_IGNORE); /* ignore keys up */
 
     if( p_vout->b_need_render )
     {
@@ -382,8 +382,8 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
     p_vout->i_changes |= VOUT_YUV_CHANGE;
 
-    /* Check buffers properties */	
-    p_vout->p_sys->b_must_acquire = 1;		/* always acquire */
+    /* Check buffers properties */
+    p_vout->p_sys->b_must_acquire = 1; /* always acquire */
 
     return( 0 );
 }

@@ -115,6 +115,7 @@ void bank_Init( plugin_bank_t * p_bank )
     
     /* Dummy plugin */
     SEEK_PLUGIN( "dummy" );
+    SEEK_PLUGIN( "null" );
 
 #undef SEEK_PLUGIN
 }
@@ -190,7 +191,7 @@ char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
         }
 
 #ifndef SYS_BEOS
-        intf_WarnMsg( 1, "Plugin %s failed: %s", psz_plugin, dlerror() );
+        intf_ErrMsg( "plugin error: cannot open %s (%s)", psz_plugin, dlerror() );
 #endif
 
         free( psz_plugin );

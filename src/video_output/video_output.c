@@ -104,7 +104,8 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
     if( p_vout == NULL )
     {
-        intf_ErrMsg( "vout error: %s", strerror(ENOMEM) );
+        intf_ErrMsg( "vout error: vout thread creation returned %s",
+                     strerror(ENOMEM) );
         return( NULL );
     }
 
@@ -460,7 +461,8 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
             p_free_subpic->i_type   =  EMPTY_SUBPICTURE;
             p_free_subpic->i_status =  FREE_SUBPICTURE;
             p_free_subpic =            NULL;
-            intf_ErrMsg("spu warning: %s", strerror( ENOMEM ) );
+            intf_ErrMsg( "vout error: spu allocation returned %s",
+                         strerror( ENOMEM ) );
         }
 
 #ifdef DEBUG_VOUT
@@ -698,7 +700,8 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             p_free_picture->i_type   =  EMPTY_PICTURE;
             p_free_picture->i_status =  FREE_PICTURE;
             p_free_picture =            NULL;
-            intf_ErrMsg( "vout warning: %s", strerror( ENOMEM ) );
+            intf_ErrMsg( "vout error: picture allocation returned %s",
+                         strerror( ENOMEM ) );
         }
 
 #ifdef DEBUG_VOUT
@@ -929,7 +932,7 @@ static int InitThread( vout_thread_t *p_vout )
         /* Initialize convertion tables and functions */
         if( vout_InitYUV( p_vout ) )
         {
-            intf_ErrMsg("error: can't allocate YUV translation tables");
+            intf_ErrMsg("vout error: can't allocate YUV translation tables");
             return( 1 );
         }
     }
@@ -1142,7 +1145,6 @@ static void RunThread( vout_thread_t *p_vout)
                 
             } else {
                 /* no splash screen ! */
-                intf_ErrMsgImm("End of splash screen");  
                 p_vout->init_display_date=0;
             }
         }
@@ -2042,7 +2044,7 @@ static int Manage( vout_thread_t *p_vout )
     {
         if( vout_ResetYUV( p_vout ) )
         {
-            intf_ErrMsg("error: can't rebuild convertion tables");
+            intf_ErrMsg( "vout error: can't rebuild conversion tables" );
             return( 1 );
         }
     }
@@ -2058,7 +2060,7 @@ static int Manage( vout_thread_t *p_vout )
     {
         /* Some changes were not acknowledged by p_vout->p_sys_manage or this
          * function, it means they should not be authorized */
-        intf_ErrMsg( "error: unauthorized changes in the video output thread" );
+        intf_ErrMsg( "vout error: unauthorized changes in the vout thread" );
         return( 1 );
     }
 
@@ -2127,6 +2129,6 @@ static int Align( vout_thread_t *p_vout, int *pi_x, int *pi_y,
 static void     SetPalette        ( p_vout_thread_t p_vout, u16 *red,
                                     u16 *green, u16 *blue, u16 *transp )
 {
-    intf_ErrMsg( "SetPalette: method does not support palette changing" );
+    intf_ErrMsg( "vout error: method does not support palette changing" );
 }
 

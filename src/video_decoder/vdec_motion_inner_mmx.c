@@ -3,7 +3,7 @@
  *                           MMX
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_inner_mmx.c,v 1.5 2000/12/21 17:19:52 massiot Exp $
+ * $Id: vdec_motion_inner_mmx.c,v 1.6 2001/01/05 14:46:37 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>, largerly inspired by the
  *          work done by the livid project <http://www.linuxvideo.org/>
@@ -487,10 +487,10 @@ __MotionComponent_X_y_avg(width,height)                                     \
 __MotionComponent_x_Y_avg(width,height)                                     \
 __MotionComponent_X_Y_avg(width,height)
 
-__MotionComponents (16,16)        /* 444, 422, 420 */
-__MotionComponents (16,8)        /* 444, 422, 420 */
+__MotionComponents (16,16)      /* 444, 422, 420 */
+__MotionComponents (16,8)       /* 444, 422, 420 */
 __MotionComponents (8,8)        /* 422, 420 */
 __MotionComponents (8,4)        /* 420 */
 #if 0
-__MotionComponents (8,16)        /* 422 */
+__MotionComponents (8,16)       /* 422 */
 #endif
