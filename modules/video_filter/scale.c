@@ -124,12 +124,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         for( i = 0; i < p_pic_dst->p[i_plane].i_visible_lines; i++ )
         {
-            l = p_filter->fmt_in.video.i_height * i /
+            l = ( p_filter->fmt_in.video.i_height * i +
+                  p_filter->fmt_out.video.i_height / 2 ) /
                 p_filter->fmt_out.video.i_height;
 
             for( j = 0; j < p_pic_dst->p[i_plane].i_visible_pitch; j++ )
             {
-                k = p_filter->fmt_in.video.i_width * j /
+                k = ( p_filter->fmt_in.video.i_width * j +
+                      p_filter->fmt_out.video.i_width / 2 ) /
                     p_filter->fmt_out.video.i_width;
 
                 p_dst[i * i_dst_pitch + j] = p_src[l * i_src_pitch + k];
