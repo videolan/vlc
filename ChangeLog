@@ -1,3 +1,43 @@
+2003-08-13 Wednesday 18:39  gbazin
+
+ * modules/video_output/x11/xcommon.c: fixed a bug with fullscreen and sawfish.
+ * modules/codec/ffmpeg/video.c: forgot a debug message.
+
+2003-08-13 Wednesday 14:17  zorglub
+
+ * configure.ac : we need to define HAVE_SLP_H
+
+ * include/announce.h & vlc_common.h: slp_session_t structure definition
+
+ * module/stream_out/standard.c & src/stream_output/announce.c :
+     SLP announcing support by vlc
+
+2003-08-13 Wednesday 14:06  fenrir
+
+  * ts.c: commented out useless code and an annoying error message.
+
+2003-08-13 Wednesday 13:54  jpsaman
+
+ Fixed segmentation fault in input_SplitBuffer() when input_FillBuffer() could not allocate (actually input_NewBuffer()) another buffer. The code tested for:
+ if (!i_size)
+ {
+   /* Handle error */
+ }
+
+ However input_SplitBuffer() returns -1, which results in if (false) here and a segmentation fault will happen when input_ShareBuffer() is called. All constructs of the above form are supicious to produce a segfault in the code!
+
+2003-08-13 Wednesday 13:50  jpsaman
+
+ Keep track of ioctl_UnsetDMXFilter
+
+2003-08-13 Wednesday 07:03  titer
+
+  Missing file
+
+2003-08-13 Wednesday 01:50  gbazin
+
+ * ChangeLog: guess what ? yeah, yet another update for 0.6.2.
+
 2003-08-13 Wednesday 01:45  gbazin
 
  * modules/access/dvdplay/*: support for dvd menus navigation ("dvd_menus" object variable).
