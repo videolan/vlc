@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.4 2003/02/16 10:25:57 sigmunau Exp $
+ * $Id: lirc.c,v 1.5 2003/03/23 16:38:40 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -33,6 +33,7 @@
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>
+#include <osd.h>
 
 #include <lirc/lirc_client.h>
 
@@ -45,6 +46,7 @@ struct intf_sys_t
     vlc_mutex_t         change_lock;
 
     input_thread_t *    p_input;
+    vout_thread_t *     p_vout;
 };
 
 /*****************************************************************************
@@ -53,6 +55,7 @@ struct intf_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
+static void Feedback( intf_thread_t *, char * );
 
 /*****************************************************************************
  * Module descriptor
@@ -116,7 +119,10 @@ static void Close( vlc_object_t *p_this )
     {
         vlc_object_release( p_intf->p_sys->p_input );
     }
-
+    if( p_intf->p_sys->p_vout )
+    {
+        vlc_object_release( p_intf->p_sys->p_vout );
+    }
     /* Destroy structure */
     lirc_freeconfig( p_intf->p_sys->config );
     lirc_deinit();
@@ -131,7 +137,8 @@ static void Run( intf_thread_t *p_intf )
     char *code, *c;
     playlist_t *p_playlist;
     input_thread_t *p_input;
-
+    vout_thread_t *p_vout = NULL;
+    
     while( !p_intf->b_die )
     {
         /* Sleep a bit */
@@ -150,6 +157,20 @@ static void Run( intf_thread_t *p_intf )
         }
         p_input = p_intf->p_sys->p_input;
 
+        /* Update the vout */
+        if( p_vout == NULL )
+        {
+            p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                      FIND_ANYWHERE );
+            p_intf->p_sys->p_vout = p_vout;
+        }
+        else if( p_vout->b_die )
+        {
+            vlc_object_release( p_vout );
+            p_vout = NULL;
+            p_intf->p_sys->p_vout = NULL;
+        }
+
         /* We poll the lircsocket */
         if( lirc_nextcode(&code) != 0 )
         {
@@ -165,37 +186,37 @@ static void Run( intf_thread_t *p_intf )
                 && lirc_code2char( p_intf->p_sys->config, code, &c ) == 0
                 && c != NULL )
         {
+            
             if( !strcmp( c, "QUIT" ) )
             {
                 p_intf->p_vlc->b_die = VLC_TRUE;
+                Feedback( p_intf, _("Quit" ) );
                 continue;
             }
             if( !strcmp( c, "VOL_UP" ) )
             {
-                aout_VolumeUp( p_intf, 1, NULL );
+                audio_volume_t i_newvol;
+                char string[9];
+                aout_VolumeUp( p_intf, 1, &i_newvol );
+                sprintf( string, "Vol %%%d", i_newvol*100/AOUT_VOLUME_MAX );
+                Feedback( p_intf, string );
             }
             if( !strcmp( c, "VOL_DOWN" ) )
             {
-                aout_VolumeDown( p_intf, 1, NULL );
+                audio_volume_t i_newvol;
+                char string[9];
+                aout_VolumeDown( p_intf, 1, &i_newvol );
+                sprintf( string, "Vol %%%d", i_newvol*100/AOUT_VOLUME_MAX );
+                Feedback( p_intf, string );
             }
-            if( !strcmp( c, "FULLSCREEN" ) )
+            if( p_vout )
             {
-                vout_thread_t *p_vout;
-                p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
-                if( p_vout )
+                if( !strcmp( c, "FULLSCREEN" ) )
                 {
                     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                    vlc_object_release( p_vout );
+                    continue;
                 }
-                continue;
-            }
-            if( !strcmp( c, "ACTIVATE" ) )
-            {
-                vout_thread_t *p_vout;
-                p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
-                if( p_vout )
+                if( !strcmp( c, "ACTIVATE" ) )
                 {
                     vlc_value_t val;
                     val.psz_string = "ENTER";
@@ -203,17 +224,10 @@ static void Run( intf_thread_t *p_intf )
                     {
                         msg_Warn( p_intf, "key-press failed" );
                     }
-                    vlc_object_release( p_vout );
+                    continue;
                 }
-                continue;
-            }
 
-            if( !strcmp( c, "LEFT" ) )
-            {
-                vout_thread_t *p_vout;
-                p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
-                if( p_vout )
+                if( !strcmp( c, "LEFT" ) )
                 {
                     vlc_value_t val;
                     val.psz_string = "LEFT";
@@ -221,17 +235,10 @@ static void Run( intf_thread_t *p_intf )
                     {
                         msg_Warn( p_intf, "key-press failed" );
                     }
-                    vlc_object_release( p_vout );
+                    continue;
                 }
-                continue;
-            }
 
-            if( !strcmp( c, "RIGHT" ) )
-            {
-                vout_thread_t *p_vout;
-                p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
-                if( p_vout )
+                if( !strcmp( c, "RIGHT" ) )
                 {
                     vlc_value_t val;
                     val.psz_string = "RIGHT";
@@ -239,17 +246,10 @@ static void Run( intf_thread_t *p_intf )
                     {
                         msg_Warn( p_intf, "key-press failed" );
                     }
-                    vlc_object_release( p_vout );
+                    continue;
                 }
-                continue;
-            }
 
-            if( !strcmp( c, "UP" ) )
-            {
-                vout_thread_t *p_vout;
-                p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
-                if( p_vout )
+                if( !strcmp( c, "UP" ) )
                 {
                     vlc_value_t val;
                     val.psz_string = "UP";
@@ -257,17 +257,10 @@ static void Run( intf_thread_t *p_intf )
                     {
                         msg_Warn( p_intf, "key-press failed" );
                     }
-                    vlc_object_release( p_vout );
+                    continue;
                 }
-                continue;
-            }
 
-            if( !strcmp( c, "DOWN" ) )
-            {
-                vout_thread_t *p_vout;
-                p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
-                if( p_vout )
+                if( !strcmp( c, "DOWN" ) )
                 {
                     vlc_value_t val;
                     val.psz_string = "DOWN";
@@ -275,11 +268,10 @@ static void Run( intf_thread_t *p_intf )
                     {
                         msg_Warn( p_intf, "key-press failed" );
                     }
-                    vlc_object_release( p_vout );
+                    continue;
                 }
-                continue;
             }
-
+            
             if( !strcmp( c, "PLAY" ) )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -294,12 +286,15 @@ static void Run( intf_thread_t *p_intf )
                         vlc_object_release( p_playlist );
                     }
                 }
+                continue;
             }
+            
             if( !strcmp( c, "PLAYPAUSE" ) )
             {
                 if( p_input &&
                     p_input->stream.control.i_status != PAUSE_S )
                 {
+                    Feedback( p_intf, _( "Pause" ) );
                     input_SetStatus( p_input, INPUT_STATUS_PAUSE );
                 }
                 else
@@ -312,16 +307,20 @@ static void Run( intf_thread_t *p_intf )
                         if( p_playlist->i_size )
                         {
                             vlc_mutex_unlock( &p_playlist->object_lock );
+                            Feedback( p_intf, _( "Play" ) );
                             playlist_Play( p_playlist );
                             vlc_object_release( p_playlist );
                         }
                     }
                 }                    
-            }                
+                continue;
+            }
+            
             else if( p_input )
             {
                 if( !strcmp( c, "PAUSE" ) )
                 {
+                    Feedback( p_intf, _( "Pause" ) );
                     input_SetStatus( p_input, INPUT_STATUS_PAUSE );
                 }
                 else if( !strcmp( c, "NEXT" ) )
@@ -369,3 +368,27 @@ static void Run( intf_thread_t *p_intf )
     }
 }
 
+static void Feedback( intf_thread_t *p_intf, char *psz_string )
+{
+        vlc_value_t val, lockval;
+    if ( p_intf->p_sys->p_vout
+         && var_Get( p_intf->p_sys->p_vout, "lock", &lockval ) == VLC_SUCCESS )
+    {
+        vlc_mutex_lock( lockval.p_address );
+        val.i_int = OSD_ALIGN_RIGHT|OSD_ALIGN_BOTTOM;
+        var_Set( p_intf->p_sys->p_vout, "flags", val ); 
+        val.i_int = 400000;
+        var_Set( p_intf->p_sys->p_vout, "duration", val ); 
+        val.i_int = 30;
+        var_Set( p_intf->p_sys->p_vout, "x-margin", val ); 
+        val.i_int = 20;
+        var_Set( p_intf->p_sys->p_vout, "y-margin", val );
+        val.psz_string = psz_string;
+        var_Set( p_intf->p_sys->p_vout, "string", val );
+        vlc_mutex_unlock( lockval.p_address );
+    }
+    else
+    {
+        msg_Dbg( p_intf, psz_string );
+    }
+}

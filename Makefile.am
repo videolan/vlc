@@ -193,6 +193,7 @@ HEADERS_include = \
 	include/vlc_threads.h \
 	include/vlc_threads_funcs.h \
 	include/win32_specific.h \
+	include/osd.h \
 	$(NULL)
 
 HEADERS_include_built = \
