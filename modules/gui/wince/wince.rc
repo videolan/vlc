@@ -1,0 +1,426 @@
+//Microsoft Developer Studio generated resource script.
+//
+#define WINCE_RESOURCE
+#include "wince.h"
+
+#if !defined(UNDER_CE)
+#define UNDER_CE _WIN32_WCE
+#endif
+
+#if defined(_WIN32_WCE)
+	#if !defined(WCEOLE_ENABLE_DIALOGEX)
+		#define DIALOGEX DIALOG DISCARDABLE
+	#endif
+	#include <commctrl.h>
+	#define  SHMENUBAR RCDATA
+	#if defined(WIN32_PLATFORM_PSPC) && (_WIN32_WCE >= 300)
+		#include <aygshell.h>
+		#define AFXCE_IDR_SCRATCH_SHMENU  28700
+	#else
+		#define I_IMAGENONE		(-2)
+		#define NOMENU			0xFFFF
+		#define IDS_SHNEW		1
+
+		#define IDM_SHAREDNEW        10
+		#define IDM_SHAREDNEWDEFAULT 11
+	#endif // _WIN32_WCE_PSPC
+	#define AFXCE_IDD_SAVEMODIFIEDDLG 28701
+#endif // _WIN32_WCE
+
+#ifdef RC_INVOKED
+#ifndef _INC_WINDOWS
+#define _INC_WINDOWS
+	#include "winuser.h"           // extract from windows header
+#endif
+#endif
+
+#ifdef IDC_STATIC
+#undef IDC_STATIC
+#endif
+#define IDC_STATIC      (-1)
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUT DIALOG DISCARDABLE  0, 0, 159, 62
+STYLE WS_CHILD | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "TODO: Place controls to manipulate properties of the Control on this dialog.",
+                    IDC_STATIC,15,23,125,16
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 152
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menubar
+//
+
+IDR_MENUBAR MENU DISCARDABLE 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "Quick &Open File",            ID_FILE_QUICKOPEN
+        MENUITEM SEPARATOR
+        MENUITEM "Open &File",                  ID_FILE_OPENFILE
+        MENUITEM "Open &Network Stream",        ID_FILE_OPENNET
+        MENUITEM SEPARATOR
+        MENUITEM "About VLC",                   ID_FILE_ABOUT
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+    POPUP "View"
+    BEGIN
+        MENUITEM "&Playlist",                   ID_VIEW_PLAYLIST
+        MENUITEM "&Messages",                   ID_VIEW_MESSAGES
+        MENUITEM "&Stream and Media info",      ID_VIEW_STREAMINFO
+    END
+    POPUP "Settings"
+    BEGIN
+        MENUITEM "&Extended GUI",               ID_SETTINGS_EXTEND
+        MENUITEM "&Preferences...",             ID_SETTINGS_PREF
+    END
+    POPUP "Audio"
+    BEGIN
+        MENUITEM "Empty",                       ID_EMPTY, GRAYED
+    END
+    POPUP "Video"
+    BEGIN
+        MENUITEM "Empty",                       ID_EMPTY, GRAYED
+    END
+    POPUP "Navigation"
+    BEGIN
+        MENUITEM "Empty",                       ID_EMPTY, GRAYED
+    END
+END
+
+IDR_MENUBAR2 MENU DISCARDABLE 
+BEGIN
+    POPUP "Manage"
+    BEGIN
+        MENUITEM "&Simple Add...",              ID_MANAGE_SIMPLEADD
+        MENUITEM "&Add MRL...",                 40106
+        MENUITEM SEPARATOR
+        MENUITEM "&Open Playlist...",           ID_MANAGE_OPENPL
+        MENUITEM "&Save Playlist...",           ID_MANAGE_SAVEPL
+    END
+    POPUP "Sort"
+    BEGIN
+        MENUITEM "Sort by &title",              ID_SORT_TITLE
+        MENUITEM "&Reverse sort by title",      ID_SORT_RTITLE
+        MENUITEM SEPARATOR
+        MENUITEM "Sort by &author",             ID_SORT_AUTHOR
+        MENUITEM "Reverse sort by author",      ID_SORT_RAUTHOR
+        MENUITEM SEPARATOR
+        MENUITEM "&Shuffle Playlist",           ID_SORT_SHUFFLE
+    END
+    POPUP "Selection"
+    BEGIN
+        MENUITEM "&Enable",                     ID_SEL_ENABLE
+        MENUITEM "&Disable",                    ID_SEL_DISABLE
+        MENUITEM SEPARATOR
+        MENUITEM "&Invert",                     ID_SEL_INVERT
+        MENUITEM "D&elete",                     ID_SEL_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "&Select All",                 ID_SEL_SELECTALL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Data
+//
+
+IDR_MENUBAR SHMENUBAR DISCARDABLE 
+BEGIN
+    IDR_MENUBAR, 6,
+    I_IMAGENONE, IDM_FILE, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_FILE, IDM_FILE, 0,
+    I_IMAGENONE, IDM_VIEW, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_VIEW, IDM_VIEW, 1,
+    I_IMAGENONE, IDM_SETTINGS, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_SETTINGS, IDM_SETTINGS, 2,
+    I_IMAGENONE, IDM_AUDIO, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_AUDIO, IDM_AUDIO, 3,
+    I_IMAGENONE, IDM_VIDEO, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_VIDEO, IDM_VIDEO, 4,
+    I_IMAGENONE, IDM_NAVIGATION, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_NAVIGATION, IDM_NAVIGATION, 5,
+END
+
+IDR_MENUBAR2 SHMENUBAR DISCARDABLE 
+BEGIN
+    IDR_MENUBAR2, 4,
+    I_IMAGENONE, IDM_MANAGE, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_MANAGE, IDM_MANAGE, 0,
+    I_IMAGENONE, IDM_SORT, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_SORT, IDM_SORT, 1,
+    I_IMAGENONE, IDM_SEL, TBSTATE_ENABLED, 
+    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_SEL, IDM_SEL, 2,
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDM_FILE                "File"
+    IDM_VIEW                "View"
+    IDM_SETTINGS            "Settings"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDM_AUDIO               "Audio"
+    IDM_VIDEO               "Video"
+    IDM_NAVIGATION          "Navigation"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDM_MANAGE              "Manage"
+    IDM_SORT                "Sort"
+    IDM_SEL                 "Selection"
+    ID_SORT_AUTHOR          "A"
+    ID_SORT_SHUFFLE         "S"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_SEL_INVERT           "I"
+    ID_SEL_DELETE           "E"
+    ID_SEL_SELECTALL        "S"
+    ID_SEL_ENABLE           "E"
+    ID_SEL_DISABLE          "D"
+    ID_SORT_TITLE           "T"
+    ID_SORT_RTITLE          "R"
+    ID_MANAGE_SIMPLEADD     "S"
+    ID_MANAGE_OPENPL        "O"
+    ID_MANAGE_ADDMRL        "A"
+    ID_MANAGE_SAVEPL        "S"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// French (France) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
+#ifdef _WIN32
+LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DUMMY DIALOG DISCARDABLE  0, 0, 186, 90
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dummy"
+FONT 8, "System"
+BEGIN
+END
+
+IDD_MESSAGES DIALOG DISCARDABLE  0, 0, 138, 90
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Messages"
+FONT 8, "System"
+BEGIN
+    PUSHBUTTON      "Save as...",IDSAVEAS,76,7,50,14
+    PUSHBUTTON      "Clear",IDCLEAR,11,7,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_DUMMY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 83
+    END
+
+    IDD_MESSAGES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 131
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 83
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menubar
+//
+
+IDR_DUMMYMENU MENU DISCARDABLE 
+BEGIN
+    MENUITEM "",                            ID_MENUITEM40108
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Data
+//
+
+IDR_MENUBAR2 RCDATA DISCARDABLE 
+BEGIN
+
+END
+
+IDR_DUMMYMENU SHMENUBAR DISCARDABLE 
+BEGIN
+    IDR_DUMMYMENU, 1,
+    I_IMAGENONE, ID_MENUITEM40108, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 
+    IDS_CAP_MENUITEM40109, 0, 0,
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON    DISCARDABLE     "bitmaps\\vlc16x16.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP1             BITMAP  DISCARDABLE     "bitmaps\\toolbar1.bmp"
+IDB_BITMAP2             BITMAP  DISCARDABLE     "bitmaps\\toolbar2.bmp"
+IDB_BITMAP3             BITMAP  DISCARDABLE     "bitmaps\\toolbar3.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_TITLE               "VLC Media PLayer"
+    IDS_CLASSNAME           "wince"
+    IDS_CAP_VIEW            "View"
+    IDS_CAP_SETTINGS        "Settings"
+    IDS_CAP_AUDIO           "Audio"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_CAP_VIDEO           "Video"
+    IDS_CAP_Navigation      "Navigation"
+    IDS_CAP_FILE            "File"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDM_AUDIO               "Audio"
+    IDM_VIDEO               "Video"
+    IDM_NAVIGATION          "Navigation"
+    ID_FILE_QUICK_OPEN      "O"
+    ID_FILE_OPENFILE        "F"
+    ID_FILE_QUICKOPEN       "O"
+    ID_FILE_OPENNETWORKSTREAM "N"
+    ID_FILE_OPENNET         "N"
+    ID_FILE_EXIT            "X"
+    ID_VIEW_PLAYLIST        "P"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    StopStream_Event        "StopStream_Event"
+    PlayStream_Event        "PlayStream_Event"
+    PrevStream_Event        "SlowStream_Event"
+    NextStream_Event        "NextStream_Event"
+    SlowStream_Event        "SlowStream_Event"
+    FastStream_Event        "FastStream_Event"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_VIEW_MESSAGES        "M"
+    ID_VIEW_MEDIAINFO       "S"
+    ID_VIEW_STREAMINFO      "S"
+    IDS_CAP_NAV             "Navigation"
+    ID_SETTINGS_PREF        "P"
+    ID_SETTINGS_EXTEND      "E"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDM_FILE                "File"
+    IDM_VIEW                "View"
+    IDM_SETTINGS            "Settings"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_CAP_XXX             "xxx"
+END
+
+#endif    // French (France) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
