@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.2 2002/08/09 23:47:23 massiot Exp $
+ * $Id: output.c,v 1.3 2002/08/11 22:36:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -61,7 +61,11 @@ int aout_OutputNew( aout_instance_t * p_aout,
     memcpy( &p_aout->output.output, p_format, sizeof(audio_sample_format_t) );
     if ( i_rate != -1 ) p_aout->output.output.i_rate = i_rate;
     if ( i_channels != -1 ) p_aout->output.output.i_channels = i_channels;
-    if ( p_aout->output.output.i_format != AOUT_FMT_A52 )
+    if ( AOUT_FMT_IS_SPDIF(&p_aout->output.output) )
+    {
+        p_aout->output.output.i_format = AOUT_FMT_SPDIF;
+    }
+    else
     {
         /* Non-S/PDIF mixer only deals with float32 or fixed32. */
         p_aout->output.output.i_format
@@ -84,8 +88,13 @@ int aout_OutputNew( aout_instance_t * p_aout,
     /* Calculate the resulting mixer output format. */
     p_aout->mixer.output.i_channels = p_aout->output.output.i_channels;
     p_aout->mixer.output.i_rate = p_aout->output.output.i_rate;
-    if ( p_aout->output.output.i_format != AOUT_FMT_A52 )
+    if ( AOUT_FMT_IS_SPDIF(&p_aout->output.output) )
     {
+        p_aout->mixer.output.i_format = AOUT_FMT_SPDIF;
+    }
+    else
+    {
+        /* Non-S/PDIF mixer only deals with float32 or fixed32. */
         p_aout->mixer.output.i_format
                      = (p_aout->p_vlc->i_cpu & CPU_CAPABILITY_FPU) ?
                         AOUT_FMT_FLOAT32 : AOUT_FMT_FIXED32;

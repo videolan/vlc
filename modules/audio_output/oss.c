@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.5 2002/08/11 01:27:01 massiot Exp $
+ * $Id: oss.c,v 1.6 2002/08/11 22:36:35 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -189,46 +189,49 @@ static int SetFormat( aout_instance_t *p_aout )
         return -1;
     }
 
-    /* FIXME */
-    if ( p_aout->output.output.i_channels > 2 )
+    if ( !AOUT_FMT_IS_SPDIF( &p_aout->output.output ) )
     {
-        msg_Warn( p_aout, "only two channels are supported at the moment" );
-        /* Trigger downmixing */
-        p_aout->output.output.i_channels = 2;
-    }
+        /* FIXME */
+        if ( p_aout->output.output.i_channels > 2 )
+        {
+            msg_Warn( p_aout, "only two channels are supported at the moment" );
+            /* Trigger downmixing */
+            p_aout->output.output.i_channels = 2;
+        }
 
-    /* Set the number of channels */
-    b_stereo = p_aout->output.output.i_channels - 1;
+        /* Set the number of channels */
+        b_stereo = p_aout->output.output.i_channels - 1;
 
-    if( ioctl( p_sys->i_fd, SNDCTL_DSP_STEREO, &b_stereo ) < 0 )
-    {
-        msg_Err( p_aout, "cannot set number of audio channels (%i)",
-                          p_aout->output.output.i_channels );
-        return -1;
-    }
+        if( ioctl( p_sys->i_fd, SNDCTL_DSP_STEREO, &b_stereo ) < 0 )
+        {
+            msg_Err( p_aout, "cannot set number of audio channels (%i)",
+                              p_aout->output.output.i_channels );
+            return -1;
+        }
 
-    if ( b_stereo + 1 != p_aout->output.output.i_channels )
-    {
-        msg_Warn( p_aout, "driver forced up/downmixing %li->%li",
-                          p_aout->output.output.i_channels,
-                          b_stereo + 1 );
-        p_aout->output.output.i_channels = b_stereo + 1;
-    }
+        if ( b_stereo + 1 != p_aout->output.output.i_channels )
+        {
+            msg_Warn( p_aout, "driver forced up/downmixing %li->%li",
+                              p_aout->output.output.i_channels,
+                              b_stereo + 1 );
+            p_aout->output.output.i_channels = b_stereo + 1;
+        }
 
-    /* Set the output rate */
-    i_rate = p_aout->output.output.i_rate;
-    if( ioctl( p_sys->i_fd, SNDCTL_DSP_SPEED, &i_rate ) < 0 )
-    {
-        msg_Err( p_aout, "cannot set audio output rate (%i)",
-                         p_aout->output.output.i_rate );
-        return -1;
-    }
+        /* Set the output rate */
+        i_rate = p_aout->output.output.i_rate;
+        if( ioctl( p_sys->i_fd, SNDCTL_DSP_SPEED, &i_rate ) < 0 )
+        {
+            msg_Err( p_aout, "cannot set audio output rate (%i)",
+                             p_aout->output.output.i_rate );
+            return -1;
+        }
 
-    if( i_rate != p_aout->output.output.i_rate )
-    {
-        msg_Warn( p_aout, "driver forced resampling %li->%li",
-                          p_aout->output.output.i_rate, i_rate );
-        p_aout->output.output.i_rate = i_rate;
+        if( i_rate != p_aout->output.output.i_rate )
+        {
+            msg_Warn( p_aout, "driver forced resampling %li->%li",
+                              p_aout->output.output.i_rate, i_rate );
+            p_aout->output.output.i_rate = i_rate;
+        }
     }
 
     p_sys->b_initialized = VLC_TRUE;

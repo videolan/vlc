@@ -2,7 +2,7 @@
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.2 2002/08/08 00:35:10 sam Exp $
+ * $Id: trivial.c,v 1.3 2002/08/11 22:36:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -51,8 +51,6 @@ vlc_module_end();
 
 /*****************************************************************************
  * Create: allocate trivial mixer
- *****************************************************************************
- * This function allocates and initializes a Crop vout method.
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {

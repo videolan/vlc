@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.1 2002/08/07 21:36:56 massiot Exp $
+ * $Id: mixer.c,v 1.2 2002/08/11 22:36:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -111,7 +111,10 @@ void aout_MixerRun( aout_instance_t * p_aout )
     /* Run the mixer. */
     aout_BufferAlloc( &p_aout->mixer.output_alloc,
                       (u64)(p_aout->output.i_nb_samples * 1000000)
-                        / p_aout->output.output.i_rate, NULL,
+                        / p_aout->output.output.i_rate,
+                      /* This is a bit kludgy, but is actually only used
+                       * for the S/PDIF dummy mixer : */
+                      p_aout->pp_inputs[0]->fifo.p_first,
                       p_output_buffer );
     if ( p_output_buffer == NULL )
     {

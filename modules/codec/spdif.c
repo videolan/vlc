@@ -2,7 +2,7 @@
  * spdif.c: A52 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: spdif.c,v 1.1 2002/08/11 01:27:01 massiot Exp $
+ * $Id: spdif.c,v 1.2 2002/08/11 22:36:35 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -145,6 +145,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         /* Temporary buffer to store the raw frame to be decoded */
         byte_t p_header[7];
         aout_buffer_t * p_buffer;
+        u16 * pi_length;
 
         /* Look for sync word - should be 0x0b77 */
         RealignBits( &p_dec->bit_stream );
@@ -215,9 +216,14 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                        / p_dec->output_format.i_rate;
         p_buffer->end_date = last_date;
 
+        /* The first two bytes store the length of the frame - this is
+         * a bit kludgy. */
+        pi_length = (u16 *)p_buffer->p_buffer;
+        *pi_length = i_frame_size;
+
         /* Get the whole frame. */
-        memcpy( p_buffer->p_buffer, p_header, 7 );
-        GetChunk( &p_dec->bit_stream, p_buffer->p_buffer + 7,
+        memcpy( p_buffer->p_buffer + sizeof(u16), p_header, 7 );
+        GetChunk( &p_dec->bit_stream, p_buffer->p_buffer + 7 + sizeof(u16),
                   i_frame_size - 7 );
         if( p_dec->p_fifo->b_die ) break;
 
