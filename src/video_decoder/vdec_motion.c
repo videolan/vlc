@@ -54,7 +54,7 @@ static __inline__ void MotionComponent(
                     boolean_t b_average     /* (explicit) averaging of several
                                              * predictions */ )
 {
-    int i_x, i_y, i_x1, i_y1;
+    int i_x, i_y, i_x1;
     unsigned int i_dummy;
 
     if( !b_average )
@@ -65,10 +65,8 @@ static __inline__ void MotionComponent(
         {
         case 0:
             /* !xh, !yh, !average */
-            for( i_y = 0; i_y < i_height; i_y += 4 )
+            for( i_y = 0; i_y < i_height; i_y ++ )
             {
-                for( i_y1 = 0; i_y1 < 4; i_y1++ )
-                {
                     for( i_x = 0; i_x < i_width; i_x += 8 )
                     {
                          for( i_x1 = 0; i_x1 < 8; i_x1++ )
@@ -78,16 +76,13 @@ static __inline__ void MotionComponent(
                     }
                     p_dest += i_stride;
                     p_src += i_stride;
-                }
             }
             break;
 
         case 1:
             /* xh, !yh, !average */
-            for( i_y = 0; i_y < i_height; i_y += 4 )
+            for( i_y = 0; i_y < i_height; i_y ++ )
             {
-                for( i_y1 = 0; i_y1 < 4; i_y1++ )
-                {
                     for( i_x = 0; i_x < i_width; i_x += 8 )
                     {
                          for( i_x1 = 0; i_x1 < 8; i_x1++ )
@@ -99,16 +94,13 @@ static __inline__ void MotionComponent(
                     }
                     p_dest += i_stride;
                     p_src += i_stride;
-                }
             }
             break;
 
         case 2:
             /* !xh, yh, !average */
-            for( i_y = 0; i_y < i_height; i_y += 4 )
+            for( i_y = 0; i_y < i_height; i_y ++ )
             {
-                for( i_y1 = 0; i_y1 < 4; i_y1++ )
-                {
                     for( i_x = 0; i_x < i_width; i_x += 8 )
                     {
                          for( i_x1 = 0; i_x1 < 8; i_x1++ )
@@ -120,16 +112,13 @@ static __inline__ void MotionComponent(
                     }
                     p_dest += i_stride;
                     p_src += i_stride;
-                }
             }
             break;
 
         case 3:
             /* xh, yh, !average (3) */
-            for( i_y = 0; i_y < i_height; i_y += 4 )
+            for( i_y = 0; i_y < i_height; i_y ++ )
             {
-                for( i_y1 = 0; i_y1 < 4; i_y1++ )
-                {
                     for( i_x = 0; i_x < i_width; i_x += 8 )
                     {
                          for( i_x1 = 0; i_x1 < 8; i_x1++ )
@@ -145,7 +134,6 @@ static __inline__ void MotionComponent(
                     }
                     p_dest += i_stride;
                     p_src += i_stride;
-                }
             }
             break;
         }
@@ -158,10 +146,8 @@ static __inline__ void MotionComponent(
         {
         case 0:
             /* !xh, !yh, average */
-            for( i_y = 0; i_y < i_height; i_y += 4 )
+            for( i_y = 0; i_y < i_height; i_y ++ )
             {
-                for( i_y1 = 0; i_y1 < 4; i_y1++ )
-                {
                     for( i_x = 0; i_x < i_width; i_x += 8 )
                     {
                          for( i_x1 = 0; i_x1 < 8; i_x1++ )
@@ -172,16 +158,13 @@ static __inline__ void MotionComponent(
                     }
                     p_dest += i_stride;
                     p_src += i_stride;
-                }
             }
             break;
 
         case 1:
             /* xh, !yh, average */
-            for( i_y = 0; i_y < i_height; i_y += 4 )
+            for( i_y = 0; i_y < i_height; i_y ++ )
             {
-                for( i_y1 = 0; i_y1 < 4; i_y1++ )
-                {
                     for( i_x = 0; i_x < i_width; i_x += 8 )
                     {
                          for( i_x1 = 0; i_x1 < 8; i_x1++ )
@@ -194,16 +177,13 @@ static __inline__ void MotionComponent(
                     }
                     p_dest += i_stride;
                     p_src += i_stride;
-                }
             }
             break;
 
         case 2:
             /* !xh, yh, average */
-            for( i_y = 0; i_y < i_height; i_y += 4 )
+            for( i_y = 0; i_y < i_height; i_y ++ )
             {
-                for( i_y1 = 0; i_y1 < 4; i_y1++ )
-                {
                     for( i_x = 0; i_x < i_width; i_x += 8 )
                     {
                          for( i_x1 = 0; i_x1 < 8; i_x1++ )
@@ -216,16 +196,13 @@ static __inline__ void MotionComponent(
                     }
                     p_dest += i_stride;
                     p_src += i_stride;
-                }
             }
             break;
 
         case 3:
             /* xh, yh, average */
-            for( i_y = 0; i_y < i_height; i_y += 4 )
+            for( i_y = 0; i_y < i_height; i_y ++ )
             {
-                for( i_y1 = 0; i_y1 < 4; i_y1++ )
-                {
                     for( i_x = 0; i_x < i_width; i_x += 8 )
                     {
                          for( i_x1 = 0; i_x1 < 8; i_x1++ )
@@ -242,7 +219,6 @@ static __inline__ void MotionComponent(
                     }
                     p_dest += i_stride;
                     p_src += i_stride;
-                }
             }
             break;
         }
