@@ -52,7 +52,7 @@ static void     ErrorThread       ( vout_thread_t * );
 static void     EndThread         ( vout_thread_t * );
 static void     DestroyThread     ( vout_thread_t * );
 
-static int      ReduceHeight      ( int );
+static void     AspectRatio       ( int, int *, int * );
 static int      BinaryLog         ( uint32_t );
 static void     MaskToShift       ( int *, int *, uint32_t );
 static void     InitWindowSize    ( vout_thread_t *, int *, int * );
@@ -331,9 +331,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
             if( i_new_aspect && i_new_aspect != i_aspect )
             {
-                unsigned int i_aspect_x, i_aspect_y;
+                int i_aspect_x, i_aspect_y;
 
-                vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+                AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
 
                 msg_Dbg( p_vout, "overriding source aspect ratio to %i:%i",
                          i_aspect_x, i_aspect_y );
@@ -527,8 +527,7 @@ void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static int InitThread( vout_thread_t *p_vout )
 {
-    int i;
-    unsigned int i_aspect_x, i_aspect_y;
+    int i, i_aspect_x, i_aspect_y;
 
     vlc_mutex_lock( &p_vout->change_lock );
 
@@ -577,7 +576,7 @@ static int InitThread( vout_thread_t *p_vout )
 
             if( i_new_aspect && i_new_aspect != p_vout->output.i_aspect )
             {
-                vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+                AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
 
                 msg_Dbg( p_vout, "output ratio forced to %i:%i\n",
                          i_aspect_x, i_aspect_y );
@@ -587,14 +586,14 @@ static int InitThread( vout_thread_t *p_vout )
     }
 #endif
 
-    vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_x, &i_aspect_y );
+    AspectRatio( p_vout->render.i_aspect, &i_aspect_x, &i_aspect_y );
     msg_Dbg( p_vout,
              "picture in %ix%i, chroma 0x%.8x (%4.4s), aspect ratio %i:%i",
              p_vout->render.i_width, p_vout->render.i_height,
              p_vout->render.i_chroma, (char*)&p_vout->render.i_chroma,
              i_aspect_x, i_aspect_y );
 
-    vout_AspectRatio( p_vout->output.i_aspect, &i_aspect_x, &i_aspect_y );
+    AspectRatio( p_vout->output.i_aspect, &i_aspect_x, &i_aspect_y );
     msg_Dbg( p_vout,
              "picture out %ix%i, chroma 0x%.8x (%4.4s), aspect ratio %i:%i",
              p_vout->output.i_width, p_vout->output.i_height,
@@ -1162,6 +1161,13 @@ static int ReduceHeight( int i_ratio )
     }
 
     return i_pgcd;
+}
+
+static void AspectRatio( int i_aspect, int *i_aspect_x, int *i_aspect_y )
+{
+    unsigned int i_pgcd = ReduceHeight( i_aspect );
+    *i_aspect_x = i_aspect / i_pgcd;
+    *i_aspect_y = VOUT_ASPECT_FACTOR / i_pgcd;
 }
 
 /*****************************************************************************
