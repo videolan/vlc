@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.25 2003/05/24 17:52:48 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.26 2003/05/29 16:48:29 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -394,7 +394,13 @@ void VlcProc::LoadSkin()
 void VlcProc::OpenFile( bool play )
 {
 #ifndef BASIC_SKINS
-    if( p_intf->p_sys->OpenDlg->ShowModal() != wxID_OK )
+    int iRc;
+    
+    // FIXME: just for testing
+    wxMutexGuiEnter();
+    iRc = p_intf->p_sys->OpenDlg->ShowModal();
+    wxMutexGuiLeave();
+    if( iRc != wxID_OK )
     {
         return;
     }
@@ -408,6 +414,7 @@ void VlcProc::OpenFile( bool play )
 
     if( play )
     {
+    wxMutexGuiEnter();
         // Append and play
         for( size_t i = 0; i < p_intf->p_sys->OpenDlg->mrl.GetCount(); i++ )
         {
@@ -415,11 +422,13 @@ void VlcProc::OpenFile( bool play )
                 (const char *)p_intf->p_sys->OpenDlg->mrl[i].mb_str(),
                 PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
         }
+    wxMutexGuiLeave();
 
         p_intf->p_sys->p_theme->EvtBank->Get( "play" )->SendEvent();
     }
     else
     {
+    wxMutexGuiEnter();
         // Append only
         for( size_t i = 0; i < p_intf->p_sys->OpenDlg->mrl.GetCount(); i++ )
         {
@@ -427,6 +436,7 @@ void VlcProc::OpenFile( bool play )
                 (const char *)p_intf->p_sys->OpenDlg->mrl[i].mb_str(),
                 PLAYLIST_APPEND, PLAYLIST_END );
         }
+    wxMutexGuiLeave();
     }
 
     // Refresh interface !

@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.10 2003/05/28 23:56:51 asmax Exp $
+ * $Id: x11_run.cpp,v 1.11 2003/05/29 16:48:29 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -55,9 +55,6 @@
 
 // include the icon graphic
 #include "share/vlc32x32.xpm"
-
-#include <unistd.h>
-
 
 //---------------------------------------------------------------------------
 // Specific method
@@ -150,7 +147,7 @@ void SkinsDialogsThread( intf_thread_t *p_intf )
 //---------------------------------------------------------------------------
 // X11 event processing
 //---------------------------------------------------------------------------
-void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
+int ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
 {
     // Variables
     list<SkinWindow *>::const_iterator win;
@@ -209,7 +206,7 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
 #ifndef BASIC_SKINS
             wxExit();
 #endif
-            return;      // Exit VLC !
+            return 1;      // Exit VLC !
         }
     }
     else
@@ -225,7 +222,7 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
                 if( (*win)->ProcessEvent( evt ) )
                 {
                     delete (OSEvent *)evt;
-                    return;
+                    return 0;
                 }
                 else
                 {
@@ -240,7 +237,8 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
 
     // Check if vlc is closing
     proc->IsClosing();
-
+    
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -248,9 +246,9 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
 //---------------------------------------------------------------------------
 void OSRun( intf_thread_t *p_intf )
 {
-    static char  *p_args[] = { "" };
-
     VlcProc *proc = new VlcProc( p_intf );
+
+    Display *display = ((OSTheme *)p_intf->p_sys->p_theme)->GetDisplay();
 
 #ifndef BASIC_SKINS
     // Create a new thread for wxWindows
@@ -262,20 +260,20 @@ void OSRun( intf_thread_t *p_intf )
         return;
     }
 #endif
-
-    Display *display = ((OSTheme *)p_intf->p_sys->p_theme)->GetDisplay();
     
     // Main event loop
+    int close = 0;
     int count = 0;
-    while( 1 )
+    while( !close )
     {
         XEvent event;
-        while( XPending( display ) > 0 )
+        while( !close && XPending( display ) > 0 )
         {
             XNextEvent( display, &event );
-            ProcessEvent( p_intf, proc, &event );
+            close = ProcessEvent( p_intf, proc, &event );
         }
-        usleep( 1000 );
+        
+        msleep( 1000 );
         if( ++count == 100 )
         {
             count = 0;

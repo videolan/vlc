@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.5 2003/05/28 23:56:51 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.6 2003/05/29 16:48:29 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -168,9 +168,8 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     // Create the window
     Window root = DefaultRootWindow( display );
     XSetWindowAttributes attr;
-    attr.override_redirect = True;
     Window wnd = XCreateWindow( display, root, 0, 0, 1, 1, 0, 0, InputOutput,
-                                CopyFromParent, CWOverrideRedirect, &attr );
+                                CopyFromParent, 0, &attr );
     XSelectInput( display, wnd, ExposureMask|StructureNotifyMask|
             KeyPressMask|KeyReleaseMask|ButtonPressMask|ButtonReleaseMask|
             PointerMotionMask|EnterWindowMask|LeaveWindowMask);
@@ -201,8 +200,6 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     {
         XNextEvent( display, &evt );
     } while( evt.type != MapNotify );
-
-    fprintf(stderr, "\nDONE\n");
 
     WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, wnd, x, y, 
         visible, fadetime, alpha, movealpha, dragdrop, name ) ) ;
