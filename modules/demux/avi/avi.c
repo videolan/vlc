@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: avi.c,v 1.87 2004/02/08 18:30:30 sigmunau Exp $
+ * $Id: avi.c,v 1.88 2004/02/27 14:05:55 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -323,7 +323,32 @@ static int Open( vlc_object_t * p_this )
                 tk->i_cat   = VIDEO_ES;
                 tk->i_codec = AVI_FourccGetCodec( VIDEO_ES,
                                                   p_vids->p_bih->biCompression );
-                es_format_Init( &fmt, VIDEO_ES, p_vids->p_bih->biCompression );
+                if( p_vids->p_bih->biCompression == 0x00 )
+                {
+                    switch( p_vids->p_bih->biBitCount )
+                    {
+                        case 32:
+                            tk->i_codec = VLC_FOURCC('R','V','3','2');
+                            break;
+                        case 24:
+                            tk->i_codec = VLC_FOURCC('R','V','2','4');
+                            break;
+                        case 16:
+                            tk->i_codec = VLC_FOURCC('R','V','1','6');
+                            break;
+                        case 15:
+                            tk->i_codec = VLC_FOURCC('R','V','1','5');
+                            break;
+                        case 9:
+                            tk->i_codec = VLC_FOURCC( 'Y', 'V', 'U', '9' ); /* <- TODO check that */
+                            break;
+                    }
+                    es_format_Init( &fmt, VIDEO_ES, tk->i_codec );
+                }
+                else
+                {
+                    es_format_Init( &fmt, VIDEO_ES, p_vids->p_bih->biCompression );
+                }
                 tk->i_samplesize = 0;
                 fmt.video.i_width  = p_vids->p_bih->biWidth;
                 fmt.video.i_height = p_vids->p_bih->biHeight;
