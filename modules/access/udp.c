@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.12 2003/02/07 23:36:55 marcari Exp $
+ * $Id: udp.c,v 1.13 2003/02/12 13:42:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -351,6 +351,18 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
         if( i_recv < 0 )
         {
+#ifdef WIN32
+            /* On win32 recv() will fail if the datagram doesn't fit inside
+             * the passed buffer, even though the buffer will be filled with
+             * the first part of the datagram. */
+            if( WSAGetLastError() == WSAEMSGSIZE )
+            {
+                msg_Err( p_input, "recv() failed. "
+                                  "Increase the mtu size (--mtu option)" );
+                i_recv = i_len;
+            }
+            else
+#endif
             msg_Err( p_input, "recv failed (%s)", strerror(errno) );
         }
 

@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.16 2003/02/08 19:10:21 massiot Exp $
+ * $Id: ts.c,v 1.17 2003/02/12 13:42:43 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -223,6 +223,7 @@ static int Activate( vlc_object_t * p_this )
     p_demux_data->i_psi_type = PSI_IS_PAT;
     p_demux_data->p_psi_section = malloc(sizeof(psi_section_t));
     p_demux_data->p_psi_section->b_is_complete = 1;
+    p_demux_data->i_continuity_counter = 0xFF;
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -539,6 +540,7 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
                     p_es_demux->p_psi_section =
                                             malloc( sizeof( psi_section_t ) );
                     p_es_demux->p_psi_section->b_is_complete = 0;
+                    p_es_demux->i_continuity_counter = 0xFF;
                 }
             }
 
@@ -630,6 +632,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                 /* Add this ES to the program */
                 p_new_es = input_AddES( p_input, p_es->p_pgrm,
                                         (u16)i_pid, sizeof( es_ts_data_t ) );
+                ((es_ts_data_t *)p_new_es->p_demux_data)->i_continuity_counter = 0xFF;
 
                 /* Tell the interface what kind of stream it is and select
                  * the required ones */
@@ -735,6 +738,13 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
             }
             else
                     p_input->pf_set_program( p_input, p_es->p_pgrm );
+        }
+
+        /* if the pmt belongs to the currently selected program, we
+         * reselect it to update its ES */
+        else if( p_es->p_pgrm == p_input->stream.p_selected_program )
+        {
+            p_input->pf_set_program( p_input, p_es->p_pgrm );
         }
 
         /* inform interface that stream has changed */
@@ -1155,7 +1165,7 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
 
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
 
-    if ( !p_new_pat->b_current_next ||
+    if ( ( p_new_pat->b_current_next && ( p_new_pat->i_version != p_stream_data->i_pat_version ) ) ||
             p_stream_data->i_pat_version == PAT_UNINITIALIZED  )
     {
         /* Delete all programs */
@@ -1204,6 +1214,7 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
                 }
 
                 p_es_demux->p_psi_section->b_is_complete = 0;
+                p_es_demux->i_continuity_counter = 0xFF;
 
                 /* Create a PMT decoder */
                 p_pgrm_demux->p_pmt_handle = (dvbpsi_handle *)
@@ -1253,7 +1264,7 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
     p_pgrm_demux = (pgrm_ts_data_t *)p_pgrm->p_demux_data;
     p_pgrm_demux->i_pcr_pid = p_new_pmt->i_pcr_pid;
 
-    if( !p_new_pmt->b_current_next ||
+    if( ( p_new_pmt->b_current_next && ( p_new_pmt->i_version != p_pgrm_demux->i_pmt_version ) ) ||
             p_pgrm_demux->i_pmt_version == PMT_UNINITIALIZED )
     {
         dvbpsi_descriptor_t *p_dr = p_new_pmt->p_first_descriptor;
@@ -1278,6 +1289,8 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                 p_input->b_error = 1;
                 return;
             }
+            ((es_ts_data_t *)p_new_es->p_demux_data)->i_continuity_counter = 0xFF;
+
             switch( p_es->i_type )
             {
                 case MPEG1_VIDEO_ES:
