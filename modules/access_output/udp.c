@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.20 2004/02/20 17:13:42 massiot Exp $
+ * $Id: udp.c,v 1.21 2004/03/01 12:50:39 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -222,8 +222,13 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_mtu = socket_desc.i_mtu;
 
+#ifdef WIN32
+    if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
+                           VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
+#else
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
                            VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+#endif
     {
         msg_Err( p_access->p_sout, "cannot spawn sout access thread" );
         vlc_object_destroy( p_sys->p_thread );
@@ -410,6 +415,7 @@ static void ThreadWrite( vlc_object_t *p_this )
     sout_access_thread_t *p_thread = (sout_access_thread_t*)p_this;
     sout_instance_t      *p_sout = p_thread->p_sout;
     mtime_t              i_date_last = -1;
+    int                  i_dropped_packets = 0;
 
     while( ! p_thread->b_die )
     {
@@ -423,18 +429,22 @@ static void ThreadWrite( vlc_object_t *p_this )
         {
             if( i_date - i_date_last > 2000000 )
             {
-                msg_Dbg( p_thread, "mmh, hole > 2s -> drop" );
+                if( !i_dropped_packets )
+                    msg_Dbg( p_thread, "mmh, hole > 2s -> drop" );
 
                 sout_BufferDelete( p_sout, p_pk );
                 i_date_last = i_date;
+                i_dropped_packets++;
                 continue;
             }
             else if( i_date - i_date_last < 0 )
             {
-                msg_Dbg( p_thread, "mmh, paquets in the past -> drop" );
+                if( !i_dropped_packets )
+                    msg_Dbg( p_thread, "mmh, paquets in the past -> drop" );
 
                 sout_BufferDelete( p_sout, p_pk );
                 i_date_last = i_date;
+                i_dropped_packets++;
                 continue;
             }
         }
@@ -442,22 +452,33 @@ static void ThreadWrite( vlc_object_t *p_this )
         i_sent = mdate();
         if ( i_sent > i_date + 100000 )
         {
-            msg_Dbg( p_thread, "late packet to send (" I64Fd ") -> drop",
-                     i_sent - i_date );
+            if( !i_dropped_packets )
+                msg_Dbg( p_thread, "late packet to send (" I64Fd ") -> drop",
+                         i_sent - i_date );
             sout_BufferDelete( p_sout, p_pk );
             i_date_last = i_date;
+            i_dropped_packets++;
             continue;
         }
 
         mwait( i_date );
         send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_size, 0 );
 
+        if( i_dropped_packets )
+        {
+            msg_Dbg( p_thread, "dropped %i packets", i_dropped_packets );
+            i_dropped_packets = 0;
+        }
+
+#if 0
         i_sent = mdate();
         if ( i_sent > i_date + 20000 )
         {
             msg_Dbg( p_thread, "packet has been sent too late (" I64Fd ")",
                      i_sent - i_date );
         }
+#endif
+
         sout_BufferDelete( p_sout, p_pk );
         i_date_last = i_date;
     }

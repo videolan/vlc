@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.22 2004/01/25 17:31:22 gbazin Exp $
+ * $Id: file.c,v 1.23 2004/03/01 12:50:39 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -113,6 +113,7 @@ static int Open( vlc_object_t *p_this )
 #endif
     _input_socket_t *   p_access_data;
     vlc_bool_t          b_stdin, b_kfir = 0;
+    vlc_value_t         val;
 
     p_input->i_mtu = 0;
 
@@ -258,7 +259,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Update default_pts to a suitable value for file access */
-    p_input->i_pts_delay = config_GetInt( p_input, "file-caching" ) * 1000;
+    var_Create( p_input, "file-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "file-caching", &val );
+    p_input->i_pts_delay = val.i_int * 1000;
 
     return VLC_SUCCESS;
 }
