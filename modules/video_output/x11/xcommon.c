@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.10 2003/01/15 13:48:14 sam Exp $
+ * $Id: xcommon.c,v 1.11 2003/01/28 13:03:13 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -757,10 +757,6 @@ static int ManageVideo( vout_thread_t *p_vout )
         int i_width, i_height, i_x, i_y;
 
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-
-        msg_Dbg( p_vout, "video display resized (%dx%d)",
-                         p_vout->p_sys->p_win->i_width,
-                         p_vout->p_sys->p_win->i_height );
 
 #ifdef MODULE_NAME_IS_x11
         /* We need to signal the vout thread about the size change because it

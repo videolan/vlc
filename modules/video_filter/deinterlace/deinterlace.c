@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.7 2003/01/28 12:30:44 gbazin Exp $
+ * $Id: deinterlace.c,v 1.8 2003/01/28 13:03:13 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -198,6 +198,8 @@ static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
         msg_Err( p_vout, "no valid deinterlace mode provided, "
                  "using \"discard\"" );
     }
+
+    msg_Dbg( p_vout, "using %s deinterlace method", psz_method );
 }
 
 /*****************************************************************************
@@ -727,7 +729,6 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     int i_old_mode = p_vout->p_sys->i_mode;
 
     vlc_mutex_lock( &p_vout->p_sys->filter_lock );
-    msg_Err( p_vout, "filter method: %s", newval.psz_string );
 
     SetFilterMethod( p_vout, newval.psz_string );
 
