@@ -1,25 +1,4 @@
-#include <unistd.h>                                              /* getpid() */
-
-#include <stdio.h>                                           /* "intf_msg.h" */
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/soundcard.h>                               /* "audio_output.h" */
-#include <sys/types.h>
-#include <sys/uio.h>                                            /* "input.h" */
-
-#include "common.h"
-#include "config.h"
-#include "mtime.h"
-#include "vlc_thread.h"
-#include "debug.h"                                      /* "input_netlist.h" */
-
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-
-#include "input.h"                                           /* pes_packet_t */
-#include "input_netlist.h"                         /* input_NetlistFreePES() */
-#include "decoder_fifo.h"         /* DECODER_FIFO_(ISEMPTY|START|INCSTART)() */
-
-#include "audio_output.h"
-
+#include "int_types.h"
 #include "ac3_decoder.h"
 #include "ac3_downmix.h"
 
@@ -29,7 +8,6 @@ typedef struct prefs_s
 {
     u16 use_dolby_surround;
     u16 dual_mono_channel_select;
-
 } prefs_t;
 
 prefs_t global_prefs = {0,0};

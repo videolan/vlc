@@ -1,30 +1,5 @@
-#include <unistd.h>                                              /* getpid() */
-
-#include <stdio.h>                                           /* "intf_msg.h" */
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/soundcard.h>                               /* "audio_output.h" */
-#include <sys/types.h>
-#include <sys/uio.h>                                            /* "input.h" */
-
-#include "common.h"
-#include "config.h"
-#include "mtime.h"
-#include "vlc_thread.h"
-#include "debug.h"                                      /* "input_netlist.h" */
-
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-
-#include "input.h"                                           /* pes_packet_t */
-#include "input_netlist.h"                         /* input_NetlistFreePES() */
-#include "decoder_fifo.h"         /* DECODER_FIFO_(ISEMPTY|START|INCSTART)() */
-
-#include "audio_output.h"
-
+#include "int_types.h"
 #include "ac3_decoder.h"
-#include "ac3_parse.h"
-#include "ac3_exponent.h"
-#include "ac3_bit_allocate.h"
-#include "ac3_mantissa.h"
 #include "ac3_rematrix.h"
 
 struct rematrix_band_s

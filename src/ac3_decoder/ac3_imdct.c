@@ -1,13 +1,6 @@
 #include <math.h>
-#include <sys/uio.h>                                            /* "input.h" */
 
-#include "common.h"
-#include "config.h"
-#include "vlc_thread.h"
-#include "mtime.h"
-#include "input.h"
-#include "decoder_fifo.h"
-#include "audio_output.h"
+#include "int_types.h"
 #include "ac3_decoder.h"
 #include "ac3_imdct.h"
 

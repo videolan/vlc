@@ -324,25 +324,37 @@ typedef struct stream_samples_s
  *****************************************************************************/
 typedef s16 ac3dec_frame_t[ AC3DEC_FRAME_SIZE ];
 
+typedef struct ac3_byte_stream_s
+{
+    u8 * p_byte;
+    u8 * p_end;
+    void * info;
+} ac3_byte_stream_t;
+
+typedef struct ac3_bit_stream_s
+{
+    u32 buffer;
+    int i_available;
+    ac3_byte_stream_t byte_stream;
+
+    unsigned int        total_bits_read;	/* temporary */
+} ac3_bit_stream_t;
+
 /*****************************************************************************
  * ac3dec_t : ac3 decoder descriptor
  *****************************************************************************/
 typedef struct ac3dec_s
 {
-    boolean_t           b_invalid;                         /* `invalid' flag */
-
     /*
      * Input properties
      */
 
     /* The bit stream structure handles the PES stream at the bit level */
-    bit_stream_t        bit_stream;
+    ac3_bit_stream_t     bit_stream;
 
     /*
      * Decoder properties
      */
-    unsigned int        total_bits_read;
-
     syncinfo_t          syncinfo;
     bsi_t               bsi;
     audblk_t            audblk;
@@ -353,3 +365,5 @@ typedef struct ac3dec_s
 } ac3dec_t;
 
 int ac3_audio_block (ac3dec_t * p_ac3dec, s16 * buffer);
+
+void ac3_byte_stream_next (ac3_byte_stream_t * p_byte_stream);

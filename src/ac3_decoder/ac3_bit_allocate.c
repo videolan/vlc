@@ -1,25 +1,4 @@
-#include <unistd.h>                                              /* getpid() */
-
-#include <stdio.h>                                           /* "intf_msg.h" */
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/soundcard.h>                               /* "audio_output.h" */
-#include <sys/types.h>
-#include <sys/uio.h>                                            /* "input.h" */
-
-#include "common.h"
-#include "config.h"
-#include "mtime.h"
-#include "vlc_thread.h"
-#include "debug.h"                                      /* "input_netlist.h" */
-
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-
-#include "input.h"                                           /* pes_packet_t */
-#include "input_netlist.h"                         /* input_NetlistFreePES() */
-#include "decoder_fifo.h"         /* DECODER_FIFO_(ISEMPTY|START|INCSTART)() */
-
-#include "audio_output.h"
-
+#include "int_types.h"
 #include "ac3_decoder.h"
 #include "ac3_bit_allocate.h"
 
@@ -29,6 +8,7 @@ static s16 calc_lowcomp(s16 a,s16 b0,s16 b1,s16 bin);
 static inline u16 min(s16 a,s16 b);
 static inline u16 max(s16 a,s16 b);
 */
+
 static void ba_compute_psd(s16 start, s16 end, s16 exps[],
                 s16 psd[], s16 bndpsd[]);
 
@@ -53,16 +33,16 @@ static s16 fastgain[] = { 0x080, 0x100, 0x180, 0x200, 0x280, 0x300, 0x380, 0x400
 
 
 static s16 bndtab[] = {  0,  1,  2,   3,   4,   5,   6,   7,   8,   9,
-                     10, 11, 12,  13,  14,  15,  16,  17,  18,  19,
-                     20, 21, 22,  23,  24,  25,  26,  27,  28,  31,
-                     34, 37, 40,  43,  46,  49,  55,  61,  67,  73,
-                     79, 85, 97, 109, 121, 133, 157, 181, 205, 229 };
+			10, 11, 12,  13,  14,  15,  16,  17,  18,  19,
+			20, 21, 22,  23,  24,  25,  26,  27,  28,  31,
+			34, 37, 40,  43,  46,  49,  55,  61,  67,  73,
+			79, 85, 97, 109, 121, 133, 157, 181, 205, 229 };
 
 static s16 bndsz[]  = { 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-                     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-                     1,  1,  1,  1,  1,  1,  1,  1,  3,  3,
-                     3,  3,  3,  3,  3,  6,  6,  6,  6,  6,
-                     6, 12, 12, 12, 12, 24, 24, 24, 24, 24 };
+			1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+			1,  1,  1,  1,  1,  1,  1,  1,  3,  3,
+			3,  3,  3,  3,  3,  6,  6,  6,  6,  6,
+			6, 12, 12, 12, 12, 24, 24, 24, 24, 24 };
 
 static s16 masktab[] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
                      16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 28, 28, 29,

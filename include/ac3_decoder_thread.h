@@ -19,6 +19,8 @@ typedef struct ac3dec_thread_s
      * Input properties
      */
     decoder_fifo_t      fifo;                  /* stores the PES stream data */
+    input_thread_t *    p_input;
+    ts_packet_t *       p_ts;
 
     /*
      * Decoder properties
