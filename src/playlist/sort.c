@@ -2,7 +2,7 @@
  * sort.c : Playlist sorting functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sort.c,v 1.7 2004/01/10 14:24:33 hartman Exp $
+ * $Id: sort.c,v 1.8 2004/01/10 23:44:19 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -82,7 +82,7 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
 
             if( i_mode == SORT_ID )
             {
-                i_test = p_playlist->pp_items[i]->i_id,
+                i_test = p_playlist->pp_items[i]->i_id -
                                  p_playlist->pp_items[i_small]->i_id;
             }
             else if( i_mode == SORT_TITLE )
