@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_messages.h,v 1.9 2003/12/03 23:01:48 sigmunau Exp $
+ * $Id: vlc_messages.h,v 1.10 2003/12/04 17:15:59 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -104,6 +104,7 @@ struct msg_subscription_t
  * Prototypes
  *****************************************************************************/
 VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 4, 5 ) );
+VLC_EXPORT( void, __msg_GenericVa, ( vlc_object_t *, int, const char *, const char *, va_list args ) );
 VLC_EXPORT( void, __msg_Info,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Err,     ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Warn,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
@@ -127,7 +128,42 @@ VLC_EXPORT( void, __msg_Dbg,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_
       __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_DBG, MODULE_STRING, \
                      psz_format, ## args )
 
-#else /* HAVE_VARIADIC_MACROS */
+#elif defined(_MSC_VER) /* To avoid warnings and even errors with c++ files */
+
+inline void msg_Info( void *p_this, const char *psz_format, ... )
+{
+  va_list ap;
+  va_start( ap, psz_format );
+  __msg_GenericVa( ( vlc_object_t *)p_this, VLC_MSG_INFO, MODULE_STRING,
+                   psz_format, ap );
+  va_end(ap);
+}
+inline void msg_Err( void *p_this, const char *psz_format, ... )
+{
+  va_list ap;
+  va_start( ap, psz_format );
+  __msg_GenericVa( ( vlc_object_t *)p_this, VLC_MSG_ERR, MODULE_STRING,
+                   psz_format, ap );
+  va_end(ap);
+}
+inline void msg_Warn( void *p_this, const char *psz_format, ... )
+{
+  va_list ap;
+  va_start( ap, psz_format );
+  __msg_GenericVa( ( vlc_object_t *)p_this, VLC_MSG_WARN, MODULE_STRING,
+                   psz_format, ap );
+  va_end(ap);
+}
+inline void msg_Dbg( void *p_this, const char *psz_format, ... )
+{
+  va_list ap;
+  va_start( ap, psz_format );
+  __msg_GenericVa( ( vlc_object_t *)p_this, VLC_MSG_DBG, MODULE_STRING,
+                   psz_format, ap );
+  va_end(ap);
+}
+
+#else /* _MSC_VER */
 
 #   define msg_Info __msg_Info
 #   define msg_Err __msg_Err

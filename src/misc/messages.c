@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.36 2003/12/03 23:01:48 sigmunau Exp $
+ * $Id: messages.c,v 1.37 2003/12/04 17:15:59 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -227,6 +227,12 @@ void __msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
     va_start( args, psz_format );
     QueueMsg( p_this, i_type, psz_module, psz_format, args );
     va_end( args );
+}
+
+void __msg_GenericVa( vlc_object_t *p_this, int i_type, const char *psz_module,
+                      const char *psz_format, va_list args )
+{
+    QueueMsg( p_this, i_type, psz_module, psz_format, args );
 }
 
 /* Generic functions used when variadic macros are not available. */

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.94 2003/12/04 16:02:54 sam Exp $
+ * $Id: vlc_common.h,v 1.95 2003/12/04 17:15:59 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -450,13 +450,14 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #define TAB_APPEND( count, tab, p )             \
     if( (count) > 0 )                           \
     {                                           \
-        (void *)(tab) = realloc( (tab), sizeof( void ** ) * ( (count) + 1 ) );\
+        (*(void **)(&tab)) =                    \
+            realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
     }                                           \
     else                                        \
     {                                           \
-        (void *)(tab) = malloc( sizeof( void ** ) );    \
+        (*(void **)(&tab)) = malloc( sizeof( void ** ) );    \
     }                                           \
-    (void**)(tab)[(count)] = (void*)(p);        \
+    ((void**)(tab))[count] = (void*)(p);        \
     (count)++
 
 #define TAB_FIND( count, tab, p, index )        \
@@ -465,7 +466,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
         (index) = -1;                           \
         for( _i_ = 0; _i_ < (count); _i_++ )    \
         {                                       \
-            if((void**)(tab)[_i_]==(void*)(p))  \
+            if( ((void**)(tab))[_i_] == (void*)(p) )  \
             {                                   \
                 (index) = _i_;                  \
                 break;                          \

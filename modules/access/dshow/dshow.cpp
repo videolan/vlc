@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.19 2003/12/04 16:49:43 sam Exp $
+ * $Id: dshow.cpp,v 1.20 2003/12/04 17:15:59 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -310,7 +310,7 @@ static int AccessOpen( vlc_object_t *p_this )
     p_input->i_pts_delay = val.i_int * 1000;
 
     /* Initialize OLE/COM */
-    CoInitializeEx( 0, COINIT_APARTMENTTHREADED );
+    CoInitialize( 0 );
 
     /* create access private data */
     p_input->p_access_data = p_sys =
