@@ -1034,7 +1034,7 @@ then
         AC_MSG_RESULT(no)
         AC_MSG_ERROR([cannot cd to ${with_dvdread_tree}])
       fi
-      if test -f "-L${real_dvdread_tree}/dvdread/.libs -ldvdread"
+      if test -f "${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
       then
         dnl  Use a custom libdvdread
         AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
@@ -1097,7 +1097,7 @@ then
         AC_MSG_RESULT(no)
         AC_MSG_ERROR([cannot cd to ${with_dvdplay_tree}])
       fi
-      if test -f "-L${real_dvdplay_tree}/src/.libs -ldvdplay"
+      if test -f "${real_dvdplay_tree}/src/.libs/libdvdplay.a"
       then
         dnl  Use a custom libdvdplay
         AC_MSG_RESULT(${real_dvdplay_tree}/src/.libs/libdvdplay.a)
@@ -1578,7 +1578,7 @@ then
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot cd to ${with_xvid_tree}])
     fi
-    if test -f "-L${real_xvid_tree}/build/generic -lxvidcore"
+    if test -f "${real_xvid_tree}/build/generic/libxvidcore.a"
     then
       dnl  Use a custom xvid
       AC_MSG_RESULT(${real_xvid_tree}/build/generic/libxvidcore.a)
