@@ -2,7 +2,7 @@
  * demux.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: demux.c,v 1.13 2004/03/03 20:39:53 gbazin Exp $
+ * $Id$
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -175,6 +175,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
 
     char    *psz_dup = strdup( psz_mrl ? psz_mrl : "" );
     char    *psz = strchr( psz_dup, ':' );
+    char    *psz_module;
 
     if( p_demux == NULL )
     {
@@ -235,11 +236,53 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
 
+    psz_module = p_demux->psz_demux;
+    if( *psz_module == '\0' && strrchr( p_demux->psz_path, '.' ) )
+    {
+        /* XXX: add only file without any problem here and with strong detection.
+         *  - no .mp3, .a52, ... (aac is added as it works only by file ext anyway
+         *  - wav can't be added 'cause of a52 and dts in them as raw audio
+         */
+        static struct { char *ext; char *demux; } exttodemux[] =
+        {
+            { "aac",  "aac" },
+            { "aiff", "aiff" },
+            { "asf",  "asf" }, { "wmv",  "asf" }, { "wma",  "asf" },
+            { "avi",  "avi" },
+            { "au",   "au" },
+            { "flac", "flac" },
+            { "dv",   "dv" },
+            { "m3u",  "m3u" },
+            { "mkv",  "mkv" }, { "mka",  "mkv" }, { "mks",  "mkv" },
+            { "mp4",  "mp4" }, { "m4a",  "mp4" }, { "mov",  "mp4" }, { "moov", "mp4" },
+            { "mod",  "mod" }, { "xm",   "mod" },
+            { "nsv",  "nsv" },
+            { "ogg",  "ogg" }, { "ogm",  "ogg" },
+            { "pva",  "pva" },
+            { "rm",   "rm" },
+            { "",  "" },
+        };
+
+        char *psz_ext = strrchr( p_demux->psz_path, '.' ) + 1;
+        int  i;
+
+        for( i = 0; exttodemux[i].ext != NULL; i++ )
+        {
+            if( !strcasecmp( psz_ext, exttodemux[i].ext ) )
+            {
+                psz_module = exttodemux[i].demux;
+                break;
+            }
+        }
+    }
+
     /* Before module_Need (for var_Create...) */
     vlc_object_attach( p_demux, p_obj );
 
     p_demux->p_module =
-        module_Need( p_demux, "demux2", p_demux->psz_demux, VLC_TRUE );
+        module_Need( p_demux, "demux2", psz_module,
+                     !strcmp( psz_module, p_demux->psz_demux ) ? VLC_TRUE : VLC_FALSE );
+
     if( p_demux->p_module == NULL )
     {
         vlc_object_detach( p_demux );
