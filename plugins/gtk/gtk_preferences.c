@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.22 2002/04/19 13:56:11 sam Exp $
+ * $Id: gtk_preferences.c,v 1.23 2002/04/20 15:40:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -459,9 +459,8 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
         }
 
-        p_item++;
     }
-    while( p_item->i_type != MODULE_CONFIG_HINT_END );
+    while( p_item->i_type != MODULE_CONFIG_HINT_END && p_item++ );
 
 #ifndef MODULE_NAME_IS_gnome
     /* Now let's add the action buttons at the bottom of the page */
