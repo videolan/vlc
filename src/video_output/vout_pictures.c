@@ -653,16 +653,16 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
     switch( i_chroma )
     {
         case FOURCC_I411:
-            p_pic->p[ Y_PLANE ].i_lines = i_height;
-            p_pic->p[ Y_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ Y_PLANE ].i_visible_pitch = i_width;
-            p_pic->p[ U_PLANE ].i_lines = i_height;
-            p_pic->p[ U_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ U_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ U_PLANE ].i_visible_lines = i_height;
             p_pic->p[ U_PLANE ].i_pitch = i_width_aligned / 4;
             p_pic->p[ U_PLANE ].i_visible_pitch = i_width / 4;
-            p_pic->p[ V_PLANE ].i_lines = i_height;
-            p_pic->p[ V_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ V_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ V_PLANE ].i_visible_lines = i_height;
             p_pic->p[ V_PLANE ].i_pitch = i_width_aligned / 4;
             p_pic->p[ V_PLANE ].i_visible_pitch = i_width / 4;
             p_pic->i_planes = 3;
@@ -670,16 +670,16 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
 
         case FOURCC_I410:
         case FOURCC_YVU9:
-            p_pic->p[ Y_PLANE ].i_lines = i_height;
-            p_pic->p[ Y_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ Y_PLANE ].i_visible_pitch = i_width;
-            p_pic->p[ U_PLANE ].i_lines = i_height / 4;
-            p_pic->p[ U_PLANE ].i_visible_lines = i_height_aligned / 4;
+            p_pic->p[ U_PLANE ].i_lines = i_height_aligned / 4;
+            p_pic->p[ U_PLANE ].i_visible_lines = i_height / 4;
             p_pic->p[ U_PLANE ].i_pitch = i_width_aligned / 4;
             p_pic->p[ U_PLANE ].i_visible_pitch = i_width / 4;
-            p_pic->p[ V_PLANE ].i_lines = i_height / 4;
-            p_pic->p[ V_PLANE ].i_visible_lines = i_height_aligned / 4;
+            p_pic->p[ V_PLANE ].i_lines = i_height_aligned / 4;
+            p_pic->p[ V_PLANE ].i_visible_lines = i_height / 4;
             p_pic->p[ V_PLANE ].i_pitch = i_width_aligned / 4;
             p_pic->p[ V_PLANE ].i_visible_pitch = i_width / 4;
             p_pic->i_planes = 3;
@@ -688,76 +688,76 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
         case FOURCC_YV12:
         case FOURCC_I420:
         case FOURCC_IYUV:
-            p_pic->p[ Y_PLANE ].i_lines = i_height;
-            p_pic->p[ Y_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ Y_PLANE ].i_visible_pitch = i_width;
-            p_pic->p[ U_PLANE ].i_lines = i_height / 2;
-            p_pic->p[ U_PLANE ].i_visible_lines = i_height_aligned / 2;
+            p_pic->p[ U_PLANE ].i_lines = i_height_aligned / 2;
+            p_pic->p[ U_PLANE ].i_visible_lines = i_height / 2;
             p_pic->p[ U_PLANE ].i_pitch = i_width_aligned / 2;
             p_pic->p[ U_PLANE ].i_visible_pitch = i_width / 2;
-            p_pic->p[ V_PLANE ].i_lines = i_height / 2;
-            p_pic->p[ V_PLANE ].i_visible_lines = i_height_aligned / 2;
+            p_pic->p[ V_PLANE ].i_lines = i_height_aligned / 2;
+            p_pic->p[ V_PLANE ].i_visible_lines = i_height / 2;
             p_pic->p[ V_PLANE ].i_pitch = i_width_aligned / 2;
             p_pic->p[ V_PLANE ].i_visible_pitch = i_width / 2;
             p_pic->i_planes = 3;
             break;
 
         case FOURCC_I422:
-            p_pic->p[ Y_PLANE ].i_lines = i_height;
-            p_pic->p[ Y_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ Y_PLANE ].i_visible_pitch = i_width;
-            p_pic->p[ U_PLANE ].i_lines = i_height;
-            p_pic->p[ U_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ U_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ U_PLANE ].i_visible_lines = i_height;
             p_pic->p[ U_PLANE ].i_pitch = i_width_aligned / 2;
             p_pic->p[ U_PLANE ].i_visible_pitch = i_width / 2;
-            p_pic->p[ V_PLANE ].i_lines = i_height;
-            p_pic->p[ V_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ V_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ V_PLANE ].i_visible_lines = i_height;
             p_pic->p[ V_PLANE ].i_pitch = i_width_aligned / 2;
             p_pic->p[ V_PLANE ].i_visible_pitch = i_width / 2;
             p_pic->i_planes = 3;
             break;
 
         case FOURCC_I444:
-            p_pic->p[ Y_PLANE ].i_lines = i_height;
-            p_pic->p[ Y_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ Y_PLANE ].i_visible_pitch = i_width;
-            p_pic->p[ U_PLANE ].i_lines = i_height;
-            p_pic->p[ U_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ U_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ U_PLANE ].i_visible_lines = i_height;
             p_pic->p[ U_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ U_PLANE ].i_visible_pitch = i_width;
-            p_pic->p[ V_PLANE ].i_lines = i_height;
-            p_pic->p[ V_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ V_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ V_PLANE ].i_visible_lines = i_height;
             p_pic->p[ V_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ V_PLANE ].i_visible_pitch = i_width;
             p_pic->i_planes = 3;
             break;
 
         case FOURCC_YUVA:
-            p_pic->p[ Y_PLANE ].i_lines = i_height;
-            p_pic->p[ Y_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ Y_PLANE ].i_visible_pitch = i_width;
-            p_pic->p[ U_PLANE ].i_lines = i_height;
-            p_pic->p[ U_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ U_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ U_PLANE ].i_visible_lines = i_height;
             p_pic->p[ U_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ U_PLANE ].i_visible_pitch = i_width;
-            p_pic->p[ V_PLANE ].i_lines = i_height;
-            p_pic->p[ V_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ V_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ V_PLANE ].i_visible_lines = i_height;
             p_pic->p[ V_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ V_PLANE ].i_visible_pitch = i_width;
-            p_pic->p[ A_PLANE ].i_lines = i_height;
-            p_pic->p[ A_PLANE ].i_visible_lines = i_height_aligned;
+            p_pic->p[ A_PLANE ].i_lines = i_height_aligned;
+            p_pic->p[ A_PLANE ].i_visible_lines = i_height;
             p_pic->p[ A_PLANE ].i_pitch = i_width_aligned;
             p_pic->p[ A_PLANE ].i_visible_pitch = i_width;
             p_pic->i_planes = 4;
             break;
 
         case FOURCC_YUVP:
-            p_pic->p->i_lines = i_height;
-            p_pic->p->i_visible_lines = i_height_aligned;
+            p_pic->p->i_lines = i_height_aligned;
+            p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned;
             p_pic->p->i_visible_pitch = i_width;
             p_pic->p->i_pixel_pitch = 8;
@@ -765,8 +765,8 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_Y211:
-            p_pic->p->i_lines = i_height;
-            p_pic->p->i_visible_lines = i_height_aligned;
+            p_pic->p->i_lines = i_height_aligned;
+            p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned;
             p_pic->p->i_visible_pitch = i_width;
             p_pic->p->i_pixel_pitch = 4;
@@ -775,8 +775,8 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
 
         case FOURCC_UYVY:
         case FOURCC_YUY2:
-            p_pic->p->i_lines = i_height;
-            p_pic->p->i_visible_lines = i_height_aligned;
+            p_pic->p->i_lines = i_height_aligned;
+            p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 2;
             p_pic->p->i_visible_pitch = i_width * 2;
             p_pic->p->i_pixel_pitch = 4;
@@ -784,8 +784,8 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_RGB2:
-            p_pic->p->i_lines = i_height;
-            p_pic->p->i_visible_lines = i_height_aligned;
+            p_pic->p->i_lines = i_height_aligned;
+            p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned;
             p_pic->p->i_visible_pitch = i_width;
             p_pic->p->i_pixel_pitch = 1;
@@ -793,8 +793,8 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_RV15:
-            p_pic->p->i_lines = i_height;
-            p_pic->p->i_visible_lines = i_height_aligned;
+            p_pic->p->i_lines = i_height_aligned;
+            p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 2;
             p_pic->p->i_visible_pitch = i_width * 2;
             p_pic->p->i_pixel_pitch = 2;
@@ -802,8 +802,8 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_RV16:
-            p_pic->p->i_lines = i_height;
-            p_pic->p->i_visible_lines = i_height_aligned;
+            p_pic->p->i_lines = i_height_aligned;
+            p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 2;
             p_pic->p->i_visible_pitch = i_width * 2;
             p_pic->p->i_pixel_pitch = 2;
@@ -811,8 +811,8 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_RV24:
-            p_pic->p->i_lines = i_height;
-            p_pic->p->i_visible_lines = i_height_aligned;
+            p_pic->p->i_lines = i_height_aligned;
+            p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 3;
             p_pic->p->i_visible_pitch = i_width * 3;
             p_pic->p->i_pixel_pitch = 3;
@@ -820,8 +820,8 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_RV32:
-            p_pic->p->i_lines = i_height;
-            p_pic->p->i_visible_lines = i_height_aligned;
+            p_pic->p->i_lines = i_height_aligned;
+            p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 4;
             p_pic->p->i_visible_pitch = i_width * 4;
             p_pic->p->i_pixel_pitch = 4;
