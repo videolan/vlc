@@ -51,8 +51,11 @@
 
  * Where to send bug reports?
 
-   - The vlc-devel mailing-list is probably the best place to send your
-  bug report, just email it to <vlc-devel@videolan.org>. If you are
-  concerned by the size of the attached files, you can put them on a
-  website and post their address instead.
+   - Use the Bugzilla interface at http://bugzilla.videolan.org/. If you
+  do not want to leave your email address, just use "guest" as both the
+  username and password. You will not be notified about the evolution of
+  your bug though.
+
+   - The vlc-devel mailing-list is also a good place to discuss issues
+  with all developers, but bug reports are better sent to Bugzilla.
 
