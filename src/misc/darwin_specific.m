@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.1 2002/12/30 08:56:19 massiot Exp $
+ * $Id: darwin_specific.m,v 1.2 2002/12/31 01:54:36 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -118,6 +118,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     /* Check if $LANG is set. */
     if ( (p_char = getenv("LANG")) == NULL )
     {
+        NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
         /* Retrieve user's preferences. */
         NSUserDefaults * p_defs =
             [[NSUserDefaults standardUserDefaults] autorelease];
@@ -135,6 +136,8 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
                 break;
             }
         }
+        /* FIXME : why does it segfault ??? */
+        //[o_pool release];
     }
 }
 

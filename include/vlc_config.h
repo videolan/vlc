@@ -72,8 +72,11 @@
  * Input thread configuration
  *****************************************************************************/
 
-/* XXX?? */
+/* Used in ErrorThread */
 #define INPUT_IDLE_SLEEP                ((mtime_t)(0.100*CLOCK_FREQ))
+
+/* Time to wait in case of read error */
+#define INPUT_ERROR_SLEEP               ((mtime_t)(0.10*CLOCK_FREQ))
 
 /*
  * General limitations

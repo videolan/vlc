@@ -287,6 +287,7 @@ int E_(Open) ( vlc_object_t *p_this )
 
     p_input->stream.b_pace_control = 1;
     p_input->stream.b_seekable = 0;
+    p_input->stream.b_connected = 0;
     p_input->stream.p_selected_area->i_tell = 0;
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );

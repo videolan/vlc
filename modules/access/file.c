@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.6 2002/12/12 15:10:58 gbazin Exp $
+ * $Id: file.c,v 1.7 2002/12/31 01:54:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -113,6 +113,7 @@ static int Open( vlc_object_t *p_this )
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
+    p_input->stream.b_connected = 1;
     if( *p_input->psz_access && !strncmp( p_input->psz_access, "stream", 7 ) )
     {
         /* stream:%s */
@@ -198,7 +199,7 @@ static int Open( vlc_object_t *p_this )
                         GetFileSize( (HANDLE)p_access_data->i_handle, NULL );
 #else
         p_access_data->i_handle = open( psz_name,
-                                        /*O_NONBLOCK | O_LARGEFILE*/ 0 );
+                                        O_NONBLOCK /*| O_LARGEFILE*/ );
         if( p_access_data->i_handle == -1 )
         {
 #   ifdef HAVE_ERRNO_H
@@ -211,6 +212,14 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 #endif
+    }
+
+    if ( p_input->stream.b_seekable
+          && !p_input->stream.p_selected_area->i_size )
+    {
+        msg_Err( p_input, "file %s is empty, aborting", psz_name );
+        free( p_access_data );
+        return VLC_EGENERIC;
     }
 
     /* Update default_pts to a suitable value for file access */
@@ -256,14 +265,19 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 #else
     i_ret = read( p_access_data->i_handle, p_buffer, i_len );
 #endif
- 
+
     if( i_ret < 0 )
     {
 #   ifdef HAVE_ERRNO_H
-        msg_Err( p_input, "read failed (%s)", strerror(errno) );
+        if ( errno != EINTR && errno != EAGAIN )
+            msg_Err( p_input, "read failed (%s)", strerror(errno) );
 #   else
         msg_Err( p_input, "read failed" );
 #   endif
+
+        /* Delay a bit to avoid consuming all the CPU. This is particularly
+         * useful when reading from an unconnected FIFO. */
+        msleep( INPUT_ERROR_SLEEP );
     }
  
     return i_ret;

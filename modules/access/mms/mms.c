@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.15 2002/12/30 08:56:19 massiot Exp $
+ * $Id: mms.c,v 1.16 2002/12/31 01:54:35 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -250,13 +250,14 @@ static int Open( vlc_object_t *p_this )
 
     /* *** finished to set some variable *** */
     vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.b_pace_control = 0;
     if( p_access->i_proto == MMS_PROTO_UDP )
     {
-        p_input->stream.b_pace_control = 0;
+        p_input->stream.b_connected = 0;
     }
     else
     {
-        p_input->stream.b_pace_control = 1;
+        p_input->stream.b_connected = 1;
     }
     p_input->stream.p_selected_area->i_tell = 0;
     if( p_access->i_packet_count <= 0 )

@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.19 2002/12/23 15:39:07 massiot Exp $
+ * $Id: http.c,v 1.20 2002/12/31 01:54:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -608,6 +608,7 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_pace_control = VLC_TRUE;
     p_input->stream.b_seekable = VLC_TRUE;
+    p_input->stream.b_connected = VLC_TRUE;
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.i_method = INPUT_METHOD_NETWORK;

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.220 2002/12/18 14:17:11 sam Exp $
+ * $Id: input.c,v 1.221 2002/12/31 01:54:36 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -341,7 +341,7 @@ static int RunThread( input_thread_t *p_input )
         /* Read and demultiplex some data. */
         i_count = p_input->pf_demux( p_input );
 
-        if( i_count == 0 && p_input->stream.b_seekable )
+        if( i_count == 0 && p_input->stream.b_connected )
         {
             /* End of file - we do not set b_die because only the
              * playlist is allowed to do so. */
@@ -488,7 +488,7 @@ static int InitThread( input_thread_t * p_input )
     p_input->p_demux = module_Need( p_input, "demux",
                                     p_input->psz_demux );
 
-    if( p_input->p_demux== NULL )
+    if( p_input->p_demux == NULL )
     {
         msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );

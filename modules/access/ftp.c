@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.4 2002/12/25 02:23:36 massiot Exp $
+ * $Id: ftp.c,v 1.5 2002/12/31 01:54:35 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -371,6 +371,7 @@ static int Open( vlc_object_t *p_this )
     p_input->stream.b_pace_control = 1;
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.b_seekable = 1;
+    p_input->stream.b_connected = 1;
     p_input->stream.p_selected_area->i_size = p_access->i_filesize;
     p_input->stream.i_method = INPUT_METHOD_NETWORK;
     vlc_mutex_unlock( &p_input->stream.stream_lock );

@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.10 2002/12/30 23:45:21 massiot Exp $
+ * $Id: input.c,v 1.11 2002/12/31 01:54:35 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -362,6 +362,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     /* If we are here we can control the pace... */
     p_input->stream.b_pace_control = 1;
     p_input->stream.b_seekable = 1;
+    p_input->stream.b_connected = 1;
     
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.p_selected_area->i_tell = 0;

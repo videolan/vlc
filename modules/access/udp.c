@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.9 2002/12/30 11:49:32 massiot Exp $
+ * $Id: udp.c,v 1.10 2002/12/31 01:54:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -233,6 +233,7 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_pace_control = 0;
     p_input->stream.b_seekable = 0;
+    p_input->stream.b_connected = 0;
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.i_method = INPUT_METHOD_NETWORK;
     vlc_mutex_unlock( &p_input->stream.stream_lock );

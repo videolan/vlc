@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.7 2002/12/30 23:45:21 massiot Exp $
+ * $Id: access.c,v 1.8 2002/12/31 01:54:35 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -191,6 +191,7 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
     p_input->stream.i_method = INPUT_METHOD_DVD;
     p_input->stream.b_pace_control = 1;
     p_input->stream.b_seekable = 1;
+    p_input->stream.b_connected = 1;
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.p_selected_area->i_tell = 0;
 

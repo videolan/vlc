@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: synchro.c,v 1.4 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: synchro.c,v 1.5 2002/12/31 01:54:36 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -386,6 +386,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
 
         if( p_vpar->synchro.i_type == VPAR_SYNCHRO_DEFAULT )
         {
+#if 0
             msg_Dbg( p_vpar->p_fifo, "I("I64Fd") P("I64Fd")[%d] B("I64Fd")"
                   "[%d] YUV("I64Fd") : trashed %d:%d/%d",
                   p_vpar->synchro.p_tau[I_CODING_TYPE],
@@ -400,6 +401,18 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                   p_vpar->synchro.i_pic );
             p_vpar->synchro.i_trashed_pic = p_vpar->synchro.i_not_chosen_pic
                 = p_vpar->synchro.i_pic = 0;
+#else
+            if ( p_vpar->synchro.i_pic >= 100 )
+            {
+                msg_Dbg( p_vpar->p_fifo, "decoded %d/%d pictures",
+                         p_vpar->synchro.i_pic
+                           - p_vpar->synchro.i_trashed_pic
+                           - p_vpar->synchro.i_not_chosen_pic,
+                         p_vpar->synchro.i_pic );
+                p_vpar->synchro.i_trashed_pic = p_vpar->synchro.i_not_chosen_pic
+                    = p_vpar->synchro.i_pic = 0;
+            }
+#endif
         }
         break;
 

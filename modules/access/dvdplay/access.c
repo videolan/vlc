@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.8 2002/12/13 01:50:32 gbazin Exp $
+ * $Id: access.c,v 1.9 2002/12/31 01:54:35 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -133,6 +133,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     p_input->stream.b_pace_control = 1;
     /* seek is only allowed when we have size info */
     p_input->stream.b_seekable = 0;
+    p_input->stream.b_connected = 1;
 
     /* Initialize ES structures */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
