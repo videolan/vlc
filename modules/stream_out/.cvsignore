@@ -1,6 +1,11 @@
 .deps
 .dirstamp
+*.lo
+*.la
 *.dll
 *.dylib
 *.sl
 *.so
+Makefile.am
+Makefile.in
+Makefile
