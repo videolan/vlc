@@ -592,7 +592,7 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 
-VLC_VERSION=0.1.99b
+VLC_VERSION=0.1.99c
 
 VLC_CODENAME=Onatopp
 
