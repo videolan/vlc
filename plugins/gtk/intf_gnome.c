@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.3 2001/05/30 23:02:04 stef Exp $
+ * $Id: intf_gnome.c,v 1.4 2001/10/04 00:50:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -185,6 +185,7 @@ static void intf_Run( intf_thread_t *p_intf )
     /* The data types we are allowed to receive */
     static GtkTargetEntry target_table[] =
     {
+        { "STRING", 0, DROP_ACCEPT_STRING },
         { "text/uri-list", 0, DROP_ACCEPT_TEXT_URI_LIST },
         { "text/plain",    0, DROP_ACCEPT_TEXT_PLAIN }
     };

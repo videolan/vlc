@@ -2,7 +2,7 @@
  * intf_gtk.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.h,v 1.7 2001/06/14 01:49:44 sam Exp $
+ * $Id: intf_gtk.h,v 1.8 2001/10/04 00:50:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,6 +26,7 @@
  *****************************************************************************/
 #define DROP_ACCEPT_TEXT_URI_LIST  0
 #define DROP_ACCEPT_TEXT_PLAIN     1
+#define DROP_ACCEPT_STRING         2
 
 /*****************************************************************************
  * Useful inline function

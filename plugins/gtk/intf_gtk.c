@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.25 2001/05/31 12:45:39 sam Exp $
+ * $Id: intf_gtk.c,v 1.26 2001/10/04 00:50:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -187,6 +187,7 @@ static void intf_Run( intf_thread_t *p_intf )
     /* The data types we are allowed to receive */
     static GtkTargetEntry target_table[] =
     {
+        { "STRING", 0, DROP_ACCEPT_STRING },
         { "text/uri-list", 0, DROP_ACCEPT_TEXT_URI_LIST },
         { "text/plain", 0, DROP_ACCEPT_TEXT_PLAIN }
     };

@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.18 2001/07/25 03:12:33 sam Exp $
+ * $Id: gtk_playlist.c,v 1.19 2001/10/04 00:50:24 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -79,26 +79,6 @@ gboolean GtkPlaylistShow( GtkWidget       *widget,
                           gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
-    {
-        /* The data types we are allowed to receive */
-        static GtkTargetEntry target_table[] =
-        {
-            { "text/uri-list", 0, DROP_ACCEPT_TEXT_URI_LIST },
-            { "text/plain", 0, DROP_ACCEPT_TEXT_PLAIN }
-        };
-
-        p_intf->p_sys->p_playlist = create_intf_playlist();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
-                             "p_intf", p_intf );
-
-        /* Accept file drops on the playlist window */
-        gtk_drag_dest_set( GTK_WIDGET( lookup_widget( p_intf->p_sys->p_playlist,
-                                       "playlist_clist") ),
-                           GTK_DEST_DEFAULT_ALL, target_table,
-                           1, GDK_ACTION_COPY );
-    }
 
     if( GTK_WIDGET_VISIBLE( p_intf->p_sys->p_playlist ) )
     {
@@ -425,6 +405,7 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
     /* first we'll have to split against all the '\n' we have */
     gchar *     p_protocol;
     gchar *     p_temp;
+    gchar *     p_next;
     gchar *     p_string = p_data->data ;
     GList *     p_files = NULL;
     GtkCList *  p_clist;
@@ -448,34 +429,36 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
     /* this code was borrowed from xmms, thx guys :) */
     while( *p_string)
     {
-        p_temp = strchr( p_string, '\n' );
-        if( p_temp )
+        p_next = strchr( p_string, '\n' );
+        if( p_next )
         {
-            if( *( p_temp - 1 ) == '\r' )
+            if( *( p_next - 1 ) == '\r' )
             {
-                *( p_temp - 1) = '\0';
+                *( p_next - 1) = '\0';
             }
-            *p_temp = '\0';
+            *p_next = '\0';
         }
 
         /* do we have a protocol or something ? */
-        p_protocol = strstr( p_string, ":/" );
-        if( p_protocol != NULL )
+        p_temp = strstr( p_string, ":" );
+        if( p_temp != NULL && p_temp[0] != '\0' )
         {
-            p_protocol = calloc( p_protocol - p_string + 2, sizeof(char) );
-            p_protocol = strncpy( p_protocol, p_string,
-                                  strstr( p_string, ":/" ) + 1 - p_string );
+            char i_save;
 
-            intf_WarnMsg( 4, "Protocol dropped is %s", p_protocol );
-            p_string += strlen( p_protocol );
-
+	    i_save = p_temp[0];
+	    p_temp[0] = '\0';
+	    p_protocol = strdup( p_string );
+	    p_temp[0] = i_save;
+	    p_temp++;
+	    
             /* Allowed things are proto: or proto:// */
-            if( p_string[0] == '/' && p_string[1] == '/')
+            if( p_temp[0] == '/' && p_temp[1] == '/')
             {
-                /* eat one '/' */
-                p_string++;
+                /* eat two '/'s */
+                p_temp += 2;
             }
-            intf_WarnMsg( 4, " Dropped %s", p_string );
+            intf_WarnMsg( 4, "playlist: protocol '%s', target '%s'",
+                          p_protocol, p_temp );
         } 
         else 
         {
@@ -491,14 +474,20 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
         {
             p_files = g_list_concat( p_files, GtkReadFiles( p_string ) ); 
         }
+	else
+	{
+            p_files = g_list_concat( p_files,
+                      g_list_append( NULL, g_strdup( p_string ) ) );
+	}
        
         /* free the malloc and go on... */
         free( p_protocol );
-        if( !p_temp )
+
+        if( p_next == NULL )
         {
             break;
         }
-        p_string = p_temp + 1;
+        p_string = p_next + 1;
     }
    
     /* At this point, we have a nice big list maybe NULL */
