@@ -663,7 +663,7 @@ lib/macosx.so: $(PLUGIN_MACOSX)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/darwin.so: $(PLUGIN_DARWIN)
-	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -framework CoreAudio
 
 lib/dsp.so: $(PLUGIN_DSP)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^

@@ -286,7 +286,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
 
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),5)) >= 27)
         {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (1)" );
         }
 
         p_ac3dec->mantissa.q_1[ 1 ] = q_1_1[ group_code ];
@@ -304,7 +304,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
         
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),7)) >= 125)
         {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (2)" );
         }
 
         p_ac3dec->mantissa.q_2[ 1 ] = q_2_1[ group_code ];
@@ -317,7 +317,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
     case 3:
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),3)) >= 7)
         {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (3)" );
         }
 
         return (q_3[group_code] * exp_lut[exp]);
@@ -330,7 +330,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
 
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),7)) >= 121)
         {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (4)" );
         }
 
         p_ac3dec->mantissa.q_4[ 0 ] = q_4_1[ group_code ];
@@ -342,7 +342,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
     case 5:
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),4)) >= 15)
         {
-            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa (5)" );
         }
 
         return (q_5[group_code] * exp_lut[exp]);

@@ -86,6 +86,6 @@ int                 CloseResourceFile   ( resource_file_t *p_file );
 int                 SeekResource        ( resource_file_t *p_file, char *psz_name, int i_type );
 int                 ReadResource        ( resource_file_t *p_file, char *psz_name, int i_type,
                                           size_t max_size, byte_t *p_data );
-int                 WriteResource       ( resource_file_t *p_file, char *psz_name, int i_type,
-                                          size_t size, byte_t *p_data );
+int                 vlc_WriteResource       ( resource_file_t *p_file, char *psz_name, int i_type,
+                                              size_t size, byte_t *p_data );
 

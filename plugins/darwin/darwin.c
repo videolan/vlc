@@ -61,7 +61,7 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
 MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "Darwin sound support module";
+    p_module->psz_longname = "Darwin HAL sound support module";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL

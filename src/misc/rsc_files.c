@@ -366,8 +366,9 @@ int ReadResource( resource_file_t *p_file, char *psz_name, int i_type,
  *****************************************************************************
  * Messages type: rsc, major code 107
  *****************************************************************************/
-int WriteResource( resource_file_t *p_file, char *psz_name, int i_type,
-                   size_t size, byte_t *p_data )
+/* Darwin port : namespace clash with Darwin's WriteResource */
+int vlc_WriteResource( resource_file_t *p_file, char *psz_name, int i_type,
+                       size_t size, byte_t *p_data )
 {
     int i_index;                                           /* resource index */
     int i_tmp_index;                             /* temporary resource index */
