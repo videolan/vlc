@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.10 2002/10/14 16:46:55 sam Exp $
+ * $Id: familiar.c,v 1.11 2002/12/09 21:37:41 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -34,6 +34,10 @@
 
 #include <gtk/gtk.h>
 
+#ifdef HAVE_GPE_INIT_H
+#include <gpe/init.h>
+#endif
+
 #include "callbacks.h"
 #include "interface.h"
 #include "support.h"
@@ -47,10 +51,21 @@ static void Close        ( vlc_object_t * );
 
 static void Run          ( intf_thread_t * );                  
 
+void GtkAutoPlayFile( void );
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define AUTOPLAYFILE_TEXT  N_("autoplay selected file")
+#define AUTOPLAYFILE_LONGTEXT N_("automatically play a file when selected in the "\
+        "file selection list")
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    add_category_Hint( N_("Miscellaneous"), NULL )
+    add_bool( "familiar-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT)
     set_description( _("Familiar Linux Gtk+ interface module") );
     set_capability( "interface", 70 );
     set_callbacks( Open, Close );
@@ -114,11 +129,22 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    gdk_threads_enter();
+#ifdef HAVE_GPE_INIT_H
+   /* Initialize GPE interface */
+   if (gpe_application_init(&i_args, &pp_args) == FALSE)
+        exit (1);	
+#else
+   /* Initialize Gtk+ */
+   gtk_set_locale ();
 
+   gdk_threads_enter();
+#endif
     /* Create some useful widgets that will certainly be used */
+
 // FIXME: magic path
     add_pixmap_directory("share");
+    add_pixmap_directory("/usr/share/videolan");
+
     p_intf->p_sys->p_window = create_familiar();
     if (p_intf->p_sys->p_window == NULL)
     {
@@ -149,7 +175,7 @@ static void Run( intf_thread_t *p_intf )
                          "p_intf", p_intf );
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
-    ReadDirectory(p_intf->p_sys->p_clist, ".");
+    ReadDirectory(p_intf->p_sys->p_clist, "/mnt");
 
     /* Sleep to avoid using all CPU - since some interfaces need to
      * access keyboard events, a 100ms delay is a good compromise */
@@ -166,3 +192,21 @@ static void Run( intf_thread_t *p_intf )
     gtk_main_quit();
 }
 
+/*****************************************************************************
+ * GtkAutoplayFile: Autoplay file depending on configuration settings
+ *****************************************************************************
+ * FIXME: we should get the intf as parameter
+ *****************************************************************************/
+void GtkAutoPlayFile( void )
+{
+    GtkWidget *cbautoplay;
+
+    cbautoplay = GTK_WIDGET( gtk_object_get_data(
+                   GTK_OBJECT( p_main->p_intf->p_sys->p_window ), "cbautoplay" ) );
+    if( !config_GetIntVariable( "familiar-autoplayfile" ) )
+       p_main->p_intf->p_sys->b_autoplayfile=0;
+    else
+       p_main->p_intf->p_sys->b_autoplayfile=1;
+
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(cbautoplay),p_main->p_intf->p_sys->b_autoplayfile);
+}

@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.10 2002/09/30 11:05:38 sam Exp $
+ * $Id: callbacks.c,v 1.11 2002/12/09 21:37:41 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -102,9 +102,17 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
              vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist )
     {
-       playlist_Add( p_playlist, (char*)psz_url,
-                     PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-       vlc_object_release( p_playlist );
+        if (p_intf->p_sys->b_autoplayfile)
+	    {
+            playlist_Add( p_playlist, (char*)psz_url,
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+        }
+	    else
+	    {
+            playlist_Add( p_playlist, (char*)psz_url,
+                          PLAYLIST_APPEND, PLAYLIST_END );
+        }
+        vlc_object_release( p_playlist );
     }
 }
 
@@ -115,21 +123,25 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
 {
     intf_thread_t *p_intf = GtkGetIntf( clist );
     struct dirent **namelist;
-    int n,i;
+    int n,status;
 
     if (psz_dir)
-       chdir(psz_dir);
-    n = scandir(".", &namelist, 0, NULL);
+    {
+       status = chdir(psz_dir);
+       if (status<0)
+          intf_ErrMsg("File is not a directory.");
+    }
+    n = scandir(".", &namelist, 0, alphasort);
 
     if (n<0)
         perror("scandir");
     else
     {
         gchar *ppsz_text[2];
+		int i;
 
         gtk_clist_freeze( clist );
         gtk_clist_clear( clist );
-
         for (i=0; i<n; i++)
         {
             /* This is a list of strings. */
@@ -140,8 +152,8 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
             gtk_clist_insert( clist, i, ppsz_text );
             free(namelist[i]);
         }
-        free(namelist);
         gtk_clist_thaw( clist );
+        free(namelist);
     }
 }
 
@@ -240,18 +252,16 @@ on_toolbar_open_clicked                (GtkButton       *button,
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
 
-    /* Testing routine */
-/*
-    GtkCList *clistmedia = NULL;
-    clistmedia = GTK_CLIST( lookup_widget( p_intf->p_sys->p_window,
-                               "clistmedia") );
-    if (GTK_CLIST(clistmedia))
+    if (p_intf->p_sys->p_notebook)
     {
-        ReadDirectory(clistmedia, ".");
+       gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+       gtk_notebook_set_page(p_intf->p_sys->p_notebook,0);
     }
-*/
-    gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
     gdk_window_raise( p_intf->p_sys->p_window->window );
+    if (p_intf->p_sys->p_clist)
+    {
+       ReadDirectory(p_intf->p_sys->p_clist, ".");
+    }
 }
 
 
@@ -261,7 +271,11 @@ on_toolbar_preferences_clicked         (GtkButton       *button,
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
 
-    gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+    if (p_intf->p_sys->p_notebook)
+    {
+       gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+       gtk_notebook_set_page(p_intf->p_sys->p_notebook,1);
+    }
     gdk_window_raise( p_intf->p_sys->p_window->window );
 }
 
@@ -299,27 +313,30 @@ on_toolbar_play_clicked                (GtkButton       *button,
     intf_thread_t *  p_intf = GtkGetIntf( button );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
+    if( p_playlist != NULL )
     {
-        gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-        gdk_window_raise( p_intf->p_sys->p_window->window );
-        /* Display open page */
-    }
-
-    /* If the playlist is empty, open a file requester instead */
-    vlc_mutex_lock( &p_playlist->object_lock );
-    if( p_playlist->i_size )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        playlist_Play( p_playlist );
-        vlc_object_release( p_playlist );
+        input_SetStatus( p_playlist, INPUT_STATUS_PLAY );
+        p_main->p_playlist->b_stopped = 0;
         gdk_window_lower( p_intf->p_sys->p_window->window );
     }
     else
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
-        /* Display open page */
+        /* If the playlist is empty, open a file requester instead */
+        vlc_mutex_lock( &p_playlist->object_lock );
+        if( p_playlist->i_size )
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            playlist_Play( p_playlist );
+            vlc_object_release( p_playlist );
+            gdk_window_lower( p_intf->p_sys->p_window->window );
+        }
+        else
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            vlc_object_release( p_playlist );
+            /* Display open page */
+            on_toolbar_open_clicked(button,user_data);
+       }
     }
 }
 
@@ -362,10 +379,8 @@ on_toolbar_about_clicked               (GtkButton       *button,
     // Toggle notebook
     if (p_intf->p_sys->p_notebook)
     {
-/*     if ( gtk_get_data(  GTK_WIDGET(p_intf->p_sys->p_notebook), "visible" ) )
- *         gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
- *     else
- */      gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+        gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+        gtk_notebook_set_page(p_intf->p_sys->p_notebook,2);
     }
     gdk_window_raise( p_intf->p_sys->p_window->window );
 }
@@ -377,12 +392,34 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
 {
     intf_thread_t * p_intf = GtkGetIntf( editable );
     gchar *       psz_url;
+    struct stat st;
 
-    if (p_intf->p_sys->b_autoplayfile == 1)
+    psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
+    if( (strncmp("file://",(const char *) psz_url,7)==0) ||
+        (strncmp("udp://",(const char *) psz_url,6)==0) ||
+        (strncmp("udp4://",(const char *) psz_url,7)==0) ||
+        (strncmp("udp6://",(const char *) psz_url,7)==0) ||
+        (strncmp("udpstream://",(const char *) psz_url,12)==0) ||
+        (strncmp("rtp://",(const char *) psz_url,6)==0) ||
+        (strncmp("rtp4://",(const char *) psz_url,7)==0) ||
+        (strncmp("rtp6://",(const char *) psz_url,7)==0) ||
+        (strncmp("rtpstream://",(const char *) psz_url,12)==0) ||
+        (strncmp("ftp://",(const char *) psz_url,6)==0) ||
+        (strncmp("http://",(const char *) psz_url,7)==0) )
     {
-        psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
-        MediaURLOpenChanged( GTK_WIDGET(editable), psz_url );
+        MediaURLOpenChanged(GTK_WIDGET(editable), psz_url);
     }
+    else if (lstat((char*)psz_url, &st)==0)
+    {
+        if (S_ISDIR(st.st_mode))
+           ReadDirectory(p_intf->p_sys->p_clist, psz_url);
+        else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
+                 (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
+                 (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
+        {
+           MediaURLOpenChanged(GTK_WIDGET(editable), psz_url);
+        }
+   }
 }
 
 void
@@ -416,19 +453,24 @@ on_clistmedia_select_row               (GtkCList        *clist,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = p_main->p_intf;
     gchar *text[2];
     gint ret;
     struct stat st;
 
-    ret = gtk_clist_get_text (clist, row, 0, text);
+    ret = gtk_clist_get_text (p_intf->p_sys->p_clist, row, 0, text);
     if (ret)
     {
         if (lstat((char*)text[0], &st)==0)
         {
             if (S_ISDIR(st.st_mode))
-               ReadDirectory(clist, text[0]);
-            else
-               MediaURLOpenChanged(GTK_WIDGET(clist), text[0]);
+               ReadDirectory(p_intf->p_sys->p_clist, text[0]);
+            else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
+                     (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
+                     (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
+            {
+               MediaURLOpenChanged(GTK_WIDGET(p_intf->p_sys->p_clist), text[0]);
+            }
        }
     }
 }
@@ -438,12 +480,12 @@ void
 on_cbautoplay_toggled                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
-    intf_thread_t * p_intf = GtkGetIntf( togglebutton );
-
-    if (p_intf->p_sys->b_autoplayfile == 1)
-       p_intf->p_sys->b_autoplayfile = 0;
-    else
-       p_intf->p_sys->b_autoplayfile = 1;
+//    intf_thread_t * p_intf = GtkGetIntf( togglebutton );
+//
+//    if (p_intf->p_sys->b_autoplayfile == 1)
+//       p_intf->p_sys->b_autoplayfile = 0;
+//    else
+//       p_intf->p_sys->b_autoplayfile = 1;
 }
 
 
