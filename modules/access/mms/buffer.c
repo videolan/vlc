@@ -1,8 +1,8 @@
 /*****************************************************************************
- * var_buffer.h: MMS access plug-in
+ * buffer.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: var_buffer.h,v 1.1 2002/11/12 00:54:40 fenrir Exp $
+ * $Id: buffer.c,v 1.1 2002/11/22 18:35:57 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -21,52 +21,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-typedef struct var_buffer_s
-{
-    uint8_t *p_data;    // pointer on data
-    int     i_data;     // number of bytes set in p_data
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#include <stdlib.h>
 
-    // private
-    int    i_size;     // size of p_data memory allocated
-} var_buffer_t;
+#include <vlc/vlc.h>
 
+#include "asf.h"
+#include "buffer.h"
 
 /*****************************************************************************
- * Macro/Function to create/manipulate buffer 
- *****************************************************************************/
-static inline int       var_buffer_initwrite( var_buffer_t *p_buf, 
-                                              int i_default_size );
-static inline int       var_buffer_reinitwrite( var_buffer_t *p_buf, 
-                                                int i_default_size );
-static inline void var_buffer_add8 ( var_buffer_t *p_buf, uint8_t  i_byte );
-static inline void var_buffer_add16( var_buffer_t *p_buf, uint16_t i_word );
-static inline void var_buffer_add32( var_buffer_t *p_buf, uint32_t i_word );
-static inline void var_buffer_add64( var_buffer_t *p_buf, uint64_t i_word );
-static inline void var_buffer_addmemory( var_buffer_t *p_buf, 
-                                         void *p_mem, int i_mem );
-static inline void var_buffer_addUTF16( var_buffer_t *p_buf, char *p_str );
-static inline void var_buffer_free( var_buffer_t *p_buf );
-
-
-static inline void      var_buffer_initread( var_buffer_t *p_buf,
-                                             void *p_data, int i_data );
-static inline uint8_t   var_buffer_get8 ( var_buffer_t *p_buf );
-static inline uint16_t  var_buffer_get16( var_buffer_t *p_buf );
-static inline uint32_t  var_buffer_get32( var_buffer_t *p_buf );
-static inline uint64_t  var_buffer_get64( var_buffer_t *p_buf );
-static inline int       var_buffer_getmemory ( var_buffer_t *p_buf, 
-                                               void *p_mem, int i_mem );
-static inline int       var_buffer_readempty( var_buffer_t *p_buf );
-static inline void      var_buffer_getguid( var_buffer_t *p_buf, 
-                                            guid_t *p_guid );
-
-
-
-/*****************************************************************************
+ * Buffer management functions
  *****************************************************************************/
 
-static inline int var_buffer_initwrite( var_buffer_t *p_buf, 
-                                        int i_default_size )
+int var_buffer_initwrite( var_buffer_t *p_buf, int i_default_size )
 {
     p_buf->i_size =  ( i_default_size > 0 ) ? i_default_size : 2048;
     p_buf->i_data = 0;
@@ -76,8 +45,8 @@ static inline int var_buffer_initwrite( var_buffer_t *p_buf,
     }
     return( 0 );
 }
-static inline int var_buffer_reinitwrite( var_buffer_t *p_buf, 
-                                          int i_default_size )
+
+int var_buffer_reinitwrite( var_buffer_t *p_buf, int i_default_size )
 {
     p_buf->i_data = 0;
     if( p_buf->i_size < i_default_size ) 
@@ -101,7 +70,7 @@ static inline int var_buffer_reinitwrite( var_buffer_t *p_buf,
     return( 0 );
 }
 
-static inline void var_buffer_add8 ( var_buffer_t *p_buf, uint8_t  i_byte )
+void var_buffer_add8 ( var_buffer_t *p_buf, uint8_t  i_byte )
 {
     /* check if there is enough data */
     if( p_buf->i_data >= p_buf->i_size )
@@ -113,25 +82,26 @@ static inline void var_buffer_add8 ( var_buffer_t *p_buf, uint8_t  i_byte )
     p_buf->i_data++;
 }
 
-static inline void var_buffer_add16( var_buffer_t *p_buf, uint16_t i_word )
+void var_buffer_add16( var_buffer_t *p_buf, uint16_t i_word )
 {
     var_buffer_add8( p_buf, i_word&0xff );
     var_buffer_add8( p_buf, ( i_word >> 8 )&0xff );
 }
-static inline void var_buffer_add32( var_buffer_t *p_buf, uint32_t i_dword )
+
+void var_buffer_add32( var_buffer_t *p_buf, uint32_t i_dword )
 {
     var_buffer_add16( p_buf, i_dword&0xffff );
     var_buffer_add16( p_buf, ( i_dword >> 16 )&0xffff );
 }
-static inline void var_buffer_add64( var_buffer_t *p_buf, uint64_t i_long )
+
+void var_buffer_add64( var_buffer_t *p_buf, uint64_t i_long )
 {
     var_buffer_add32( p_buf, i_long&0xffffffff );
     var_buffer_add32( p_buf, ( i_long >> 32 )&0xffffffff );
 }
 
 
-static inline void var_buffer_addmemory( var_buffer_t *p_buf, 
-                                         void *p_mem, int i_mem )
+void var_buffer_addmemory( var_buffer_t *p_buf, void *p_mem, int i_mem )
 {    
     /* check if there is enough data */
     if( p_buf->i_data + i_mem >= p_buf->i_size )
@@ -146,7 +116,7 @@ static inline void var_buffer_addmemory( var_buffer_t *p_buf,
     p_buf->i_data += i_mem;
 }
 
-static inline void var_buffer_addUTF16( var_buffer_t *p_buf, char *p_str )
+void var_buffer_addUTF16( var_buffer_t *p_buf, char *p_str )
 {
     int i;
     if( !p_str )
@@ -162,7 +132,7 @@ static inline void var_buffer_addUTF16( var_buffer_t *p_buf, char *p_str )
     }
 }
 
-static inline void     var_buffer_free( var_buffer_t *p_buf )
+void var_buffer_free( var_buffer_t *p_buf )
 {
     if( p_buf->p_data )
     {
@@ -172,15 +142,14 @@ static inline void     var_buffer_free( var_buffer_t *p_buf )
     p_buf->i_size = 0;
 }
 
-static inline void var_buffer_initread( var_buffer_t *p_buf,
-                                        void *p_data, int i_data )
+void var_buffer_initread( var_buffer_t *p_buf, void *p_data, int i_data )
 {
     p_buf->i_size = i_data;
     p_buf->i_data = 0;
     p_buf->p_data = p_data;
 }
 
-static inline uint8_t  var_buffer_get8 ( var_buffer_t *p_buf )
+uint8_t var_buffer_get8 ( var_buffer_t *p_buf )
 {
     uint8_t  i_byte;
     if( p_buf->i_data >= p_buf->i_size )
@@ -193,7 +162,7 @@ static inline uint8_t  var_buffer_get8 ( var_buffer_t *p_buf )
 }
 
 
-static inline uint16_t var_buffer_get16( var_buffer_t *p_buf )
+uint16_t var_buffer_get16( var_buffer_t *p_buf )
 {
     uint16_t i_b1, i_b2;
     
@@ -203,7 +172,8 @@ static inline uint16_t var_buffer_get16( var_buffer_t *p_buf )
     return( i_b1 + ( i_b2 << 8 ) );
 
 }
-static inline uint32_t var_buffer_get32( var_buffer_t *p_buf )
+
+uint32_t var_buffer_get32( var_buffer_t *p_buf )
 {
     uint32_t i_w1, i_w2;
     
@@ -212,7 +182,8 @@ static inline uint32_t var_buffer_get32( var_buffer_t *p_buf )
 
     return( i_w1 + ( i_w2 << 16 ) );
 }
-static inline uint64_t var_buffer_get64( var_buffer_t *p_buf )
+
+uint64_t var_buffer_get64( var_buffer_t *p_buf )
 {
     uint64_t i_dw1, i_dw2;
     
@@ -221,8 +192,8 @@ static inline uint64_t var_buffer_get64( var_buffer_t *p_buf )
 
     return( i_dw1 + ( i_dw2 << 32 ) );
 }
-static inline int var_buffer_getmemory ( var_buffer_t *p_buf, 
-                                         void *p_mem, int i_mem )
+
+int var_buffer_getmemory ( var_buffer_t *p_buf, void *p_mem, int i_mem )
 {
     int i_copy;
 
@@ -235,12 +206,12 @@ static inline int var_buffer_getmemory ( var_buffer_t *p_buf,
     return( i_copy );
 }
 
-static inline int var_buffer_readempty( var_buffer_t *p_buf )
+int var_buffer_readempty( var_buffer_t *p_buf )
 {
     return( ( p_buf->i_data >= p_buf->i_size ) ? 1 : 0 );
 }
 
-static inline void var_buffer_getguid( var_buffer_t *p_buf, guid_t *p_guid )
+void var_buffer_getguid( var_buffer_t *p_buf, guid_t *p_guid )
 {
     int i;
     

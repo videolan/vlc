@@ -2,7 +2,7 @@
  * asf.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: asf.h,v 1.2 2002/11/13 20:28:13 fenrir Exp $
+ * $Id: asf.h,v 1.3 2002/11/22 18:35:57 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -51,7 +51,7 @@ static inline int CmpGuid( const guid_t *p_guid1, const guid_t *p_guid2 )
               p_guid1->v4[7] == p_guid2->v4[7] ) ? 1 : 0 );
 }
 
-static inline void GenerateGuid( guid_t *p_guid )
+static void GenerateGuid( guid_t *p_guid )
 {
     int i;
 

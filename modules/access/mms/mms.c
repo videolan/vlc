@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.5 2002/11/14 16:32:43 fenrir Exp $
+ * $Id: mms.c,v 1.6 2002/11/22 18:35:57 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -60,8 +60,9 @@
 
 #include "network.h"
 #include "asf.h"
-#include "var_buffer.h"
+#include "buffer.h"
 #include "mms.h"
+
 /****************************************************************************
  * NOTES: 
  *  MMSProtocole documentation found at http://get.to/sdp
