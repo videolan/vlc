@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.10 2003/10/08 23:00:40 gbazin Exp $
+ * $Id: theora.c,v 1.11 2003/10/09 11:48:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -710,7 +710,7 @@ static void CloseEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     theora_info_clear( &p_sys->ti );
-    //theora_comment_clear( &p_sys->tc );
+    theora_comment_clear( &p_sys->tc );
 
     free( p_sys );
 }

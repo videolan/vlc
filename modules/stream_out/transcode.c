@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.37 2003/10/09 09:39:16 gbazin Exp $
+ * $Id: transcode.c,v 1.38 2003/10/09 11:48:41 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1361,7 +1361,7 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_
     if( id->p_encoder )
     {
         /* External encoding */
-        module_Unneed( p_stream, id->p_encoder->p_module );
+        module_Unneed( id->p_encoder, id->p_encoder->p_module );
         vlc_object_destroy( id->p_encoder->p_module );
     }
     else if( id->b_enc_inited )

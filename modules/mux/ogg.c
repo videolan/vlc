@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.14 2003/09/29 22:37:36 gbazin Exp $
+ * $Id: ogg.c,v 1.15 2003/10/09 11:48:41 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -110,12 +110,16 @@ typedef struct
 
     int32_t i_buffer_size;
     int16_t i_bits_per_sample;
-    int16_t i_padding_0;            // hum hum
+
+    int16_t i_padding_0; /* Because the original is using MSVC packing style */
+
     union
     {
         oggds_header_video_t video;
         oggds_header_audio_t audio;
     } header;
+
+    int32_t i_padding_1; /* Because the original is using MSVC packing style */
 
 } oggds_header_t;
 
@@ -330,6 +334,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     p_stream->i_sout_headers = 0;
 
+    memset( &p_stream->oggds_header, 0, sizeof(p_stream->oggds_header) );
     p_stream->oggds_header.i_packet_type = PACKET_TYPE_HEADER;
     switch( p_input->p_fmt->i_cat )
     {
@@ -338,7 +343,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
         case VLC_FOURCC( 'm', 'p','4', 'v' ):
         case VLC_FOURCC( 'D', 'I','V', '3' ):
-            memcpy( p_stream->oggds_header.stream_type, "video    ", 8 );
+            memcpy( p_stream->oggds_header.stream_type, "video", 5 );
             if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p','4', 'v' ) )
             {
                 memcpy( p_stream->oggds_header.sub_type, "XVID", 4 );
@@ -352,7 +357,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             SetQWLE( &p_stream->oggds_header.i_time_unit,
                      I64C(10000000)/(int64_t)25 );  // FIXME (25fps)
             SetQWLE( &p_stream->oggds_header.i_samples_per_unit, 1 );
-            SetDWLE( &p_stream->oggds_header.i_default_len, 0 );      /* ??? */
+            SetDWLE( &p_stream->oggds_header.i_default_len, 1 ); /* ??? */
             SetDWLE( &p_stream->oggds_header.i_buffer_size, 1024*1024 );
             SetWLE( &p_stream->oggds_header.i_bits_per_sample, 0 );
             SetDWLE( &p_stream->oggds_header.header.video.i_width,
@@ -377,7 +382,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
         case VLC_FOURCC( 'm', 'p','g', 'a' ):
         case VLC_FOURCC( 'a', '5','2', ' ' ):
-            memcpy( p_stream->oggds_header.stream_type, "audio    ", 8 );
+            memcpy( p_stream->oggds_header.stream_type, "audio", 5 );
             if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p','g', 'a' ) )
             {
                 memcpy( p_stream->oggds_header.sub_type, "55  ", 4 );
@@ -389,7 +394,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             SetDWLE( &p_stream->oggds_header.i_size,
                      sizeof( oggds_header_t ) - 1);
             SetQWLE( &p_stream->oggds_header.i_time_unit, 0 /* not used */ );
-            SetDWLE( &p_stream->oggds_header.i_default_len, 0 /* not used */ );
+            SetDWLE( &p_stream->oggds_header.i_default_len, 1 );
             SetDWLE( &p_stream->oggds_header.i_buffer_size, 30*1024 );
             SetQWLE( &p_stream->oggds_header.i_samples_per_unit,
                      p_input->p_fmt->i_sample_rate );
@@ -416,7 +421,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         switch( p_stream->i_fourcc )
         {
         case VLC_FOURCC( 's', 'u','b', 't' ):
-            memcpy( p_stream->oggds_header.stream_type, "text     ", 8 );
+            memcpy( p_stream->oggds_header.stream_type, "text", 4 );
             msg_Dbg( p_mux, "subtitles stream" );
             break;
 
