@@ -222,6 +222,7 @@ audio_output_obj = 		audio_output/audio_output.o
 
 video_output_obj = 		video_output/video_output.o \
 						video_output/video_text.o \
+						video_output/video_spu.o \
 						video_output/video_yuv.o
 
 ac3_decoder_obj =		ac3_decoder/ac3_decoder_thread.o \

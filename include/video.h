@@ -147,6 +147,11 @@ typedef struct subpicture_s
             u32                 i_border_color;              /* border color */
             u32                 i_bg_color;              /* background color */
         } text;
+        /* DVD subpicture units properties */
+        struct
+        {
+            int                 i_offset[2];         /* byte offsets to data */
+        } spu;
     } type;
 
     /* Subpicture data, format depends of type - data can always be freely

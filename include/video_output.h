@@ -57,7 +57,7 @@ typedef struct vout_yuv_s
     vout_yuv_convert_t *        p_Convert422;         /* YUV 4:2:2 converter */
     vout_yuv_convert_t *        p_Convert444;         /* YUV 4:4:4 converter */
 
-    /* Pre-calculated convertion tables */
+    /* Pre-calculated conversion tables */
     void *              p_base;            /* base for all conversion tables */
     union
     {
@@ -69,7 +69,7 @@ typedef struct vout_yuv_s
         u32 *           p_rgb32;                        /* RGB 32 bits table */
     } yuv;
 
-    /* Temporary convertion buffer and offset array */
+    /* Temporary conversion buffer and offset array */
     void *              p_buffer;                       /* convertion buffer */
     int *               p_offset;                            /* offset array */
 } vout_yuv_t;

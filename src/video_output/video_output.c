@@ -42,6 +42,7 @@
 #include "video.h"
 #include "video_output.h"
 #include "video_text.h"
+#include "video_spu.h"
 #include "video_yuv.h"
 
 #include "intf_msg.h"
@@ -360,9 +361,10 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
             if( (p_vout->p_subpicture[i_subpic].i_type  == i_type)   &&
                 (p_vout->p_subpicture[i_subpic].i_size  >= i_size) )
             {
-                /* Memory size do match or is smaller : memory will not be reallocated,
-                 * and function can end immediately - this is the best possible case,
-                 * since no memory allocation needs to be done */
+                /* Memory size do match or is smaller : memory will not be
+                 * reallocated, and function can end immediately - this is
+                 * the best possible case, since no memory allocation needs
+                 * to be done */
                 p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
 #ifdef DEBUG_VIDEO
                 intf_DbgMsg("subpicture %p (in destroyed subpicture slot)\n",
@@ -389,8 +391,8 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     /* If no free subpicture is available, use a destroyed subpicture */
     if( (p_free_subpic == NULL) && (p_destroyed_subpic != NULL ) )
     {
-        /* No free subpicture or matching destroyed subpicture has been found, but
-         * a destroyed subpicture is still avalaible */
+        /* No free subpicture or matching destroyed subpicture has been
+         * found, but a destroyed subpicture is still avalaible */
         free( p_destroyed_subpic->p_data );
         p_free_subpic = p_destroyed_subpic;
     }
@@ -1021,11 +1023,20 @@ last_display_date = display_date;
             }
         }
         /*
-         * Find the subpicture to display - this operation does not need lock, since
-         * only READY_SUBPICTURES are handled. If no picture has been selected,
-         * display_date will depend on the subpicture
+         * Find the subpictures to display - this operation does not need
+         * lock, since only READY_SUBPICTURE are handled. If no picture
+         * has been selected, display_date will depend on the subpicture
          */
-        /* XXX?? */
+        /* FIXME: we should find *all* subpictures to display, and
+         * check their displaying date as well */
+        for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
+        {
+            if( p_vout->p_subpicture[i_index].i_status == READY_SUBPICTURE )
+            {
+                p_subpic = &p_vout->p_subpicture[i_index];
+                break;
+            }
+        }
 
         /*
          * Perform rendering, sleep and display rendered picture
@@ -1075,9 +1086,9 @@ last_display_date = display_date;
                 }
 
                 /* Remove subpicture from heap */
-                vlc_mutex_lock( &p_vout->subpicture_lock );
+                /*vlc_mutex_lock( &p_vout->subpicture_lock );
                 p_subpic->i_status = DESTROYED_SUBPICTURE;
-                vlc_mutex_unlock( &p_vout->subpicture_lock );
+                vlc_mutex_unlock( &p_vout->subpicture_lock );*/
             }
 
         }
@@ -1104,9 +1115,9 @@ last_display_date = display_date;
             }
 
             /* Remove subpicture from heap */
-            vlc_mutex_lock( &p_vout->subpicture_lock );
+            /*vlc_mutex_lock( &p_vout->subpicture_lock );
             p_subpic->i_status = DESTROYED_SUBPICTURE;
-            vlc_mutex_unlock( &p_vout->subpicture_lock );
+            vlc_mutex_unlock( &p_vout->subpicture_lock );*/
         }
         else if( p_vout->b_active )        /* idle or interface screen alone */
         {
@@ -1816,6 +1827,11 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 
     switch( p_subpic->i_type )
     {
+    case DVD_SUBPICTURE:                              /* DVD subpicture unit */
+        vout_RenderSPU( p_subpic->p_data, p_subpic->type.spu.i_offset,
+                        p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
+                        p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
+        break;
     case TEXT_SUBPICTURE:                                /* single line text */
         /* Select default font if not specified */
         p_font = p_subpic->type.text.p_font;
@@ -1824,7 +1840,8 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
             p_font = p_vout->p_default_font;
         }
 
-        /* Computes text size (width and height fields are ignored) and print it */
+        /* Compute text size (width and height fields are ignored)
+         * and print it */
         vout_TextSize( p_font, p_subpic->type.text.i_style, p_subpic->p_data, &i_width, &i_height );
         if( !Align( p_vout, &p_subpic->i_x, &p_subpic->i_y, i_width, i_height,
                     p_subpic->i_horizontal_align, p_subpic->i_vertical_align ) )

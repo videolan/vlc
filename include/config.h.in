@@ -109,7 +109,7 @@
  * Decoders FIFO configuration
  */
 
-/* Size of the FIFO. FIFO_SIZE+1 must be a multiple of 2 */
+/* Size of the FIFO. FIFO_SIZE+1 must be a power of 2 */
 #define FIFO_SIZE                       1023
 
 
@@ -266,8 +266,8 @@
  * standard width and height broadcasted MPEG-2 streams */
 #define VOUT_WIDTH_VAR                  "vlc_width"
 #define VOUT_HEIGHT_VAR                 "vlc_height"
-#define VOUT_WIDTH_DEFAULT              640
-#define VOUT_HEIGHT_DEFAULT             480
+#define VOUT_WIDTH_DEFAULT              720
+#define VOUT_HEIGHT_DEFAULT             576
 
 /* Maximum width of a scaled source picture - this should be relatively high,
  * since higher stream values will result in no display at all. */

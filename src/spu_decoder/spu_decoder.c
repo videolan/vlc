@@ -202,141 +202,143 @@ static void RunThread( spudec_thread_t *p_spudec )
      */
     while( (!p_spudec->b_die) && (!p_spudec->b_error) )
     {
-        int i_spu_id;
         int i_packet_size;
         int i_rle_size;
         int i_index;
-	int i_pes_size;
-	boolean_t       b_finished;
+        int i_pes_size;
+        int i_pes_count;
+        boolean_t       b_finished;
         unsigned char * p_spu_data;
-        subpicture_t  * p_spu;
+        subpicture_t  * p_spu = NULL;
 
         while( !DECODER_FIFO_ISEMPTY(p_spudec->fifo) )
         {
-            printf( "*** tracking next SPU PES\n" );
+            /* wait for the next SPU ID.
+             * FIXME: We trash 0xff bytes since they come from
+             * an incomplete previous packet */
             do
             {
-                i_spu_id = GetByte( &p_spudec->bit_stream );
+                i_packet_size = GetByte( &p_spudec->bit_stream );
             }
-            while( (i_spu_id & 0xe0) != 0x20 );
-            i_pes_size = DECODER_FIFO_START(p_spudec->fifo)->i_pes_size;
-            printf( "got it. size = 0x%.4x\n", i_pes_size );
+            while( i_packet_size == 0xff );
 
-            printf( "SPU id: 0x%.2x\n", i_spu_id );
+            /* the total size - should equal the sum of the
+             * PES packet size that form the SPU packet */
+            i_packet_size = ( i_packet_size << 8 )
+                            + GetByte( &p_spudec->bit_stream );
+            i_index = 2;
 
-            i_index = 0;
+            /* get the useful PES size (real size - 10) */
+            i_pes_size = DECODER_FIFO_START(p_spudec->fifo)->i_pes_size - 9;
+            i_pes_count = 1;
 
-            GetWord( i_packet_size );
-            printf( "total size:  0x%.4x\n", i_packet_size );
-
+            /* the RLE stuff size */
             GetWord( i_rle_size );
-            printf( "RLE size:    0x%.4x\n", i_rle_size );
 
-            /* we already read 4 bytes for the total size and the RLE size */
-
-            p_spu = vout_CreateSubPicture( p_spudec->p_vout,
-                                           DVD_SUBPICTURE, i_rle_size );
-            p_spu_data = p_spu->p_data;
-
-            if( (i_rle_size < i_packet_size)
-                && ((i_spu_id & 0xe0) == 0x20) )
+            /* if the values we got aren't too strange, decode the data */
+            if( i_rle_size < i_packet_size )
             {
-                printf( "doing RLE stuff (%i bytes)\n", i_rle_size );
-		printf( "index/size %i/%i\n", i_index, i_pes_size );
-                while( i_index++ <i_rle_size )
-                {
-                    //*p_spu_data++ = GetByte( &p_spudec->bit_stream );
-                    if (i_index == i_pes_size) printf ("\n **** \n");
-		    /* kludge ??? */
-                    if (i_index == i_pes_size) printf( "%.2x", *p_spu_data++ = GetByte( &p_spudec->bit_stream ) );
-                    printf( "%.2x", *p_spu_data++ = GetByte( &p_spudec->bit_stream ) );
-                }
-		printf( "\nindex/size %i/%i\n", i_index, i_pes_size );
-                //printf( "\n" );
+                /* destroy the previous one */
+                if( p_spu ) vout_DestroySubPicture( p_spudec->p_vout, p_spu );
 
-		b_finished = 0;
-                printf( "control stuff\n" );
-		do
+                /* allocate the subpicture.
+                 * FIXME: we should check if the allocation failed */
+                p_spu = vout_CreateSubPicture( p_spudec->p_vout,
+                                           DVD_SUBPICTURE, i_rle_size );
+                p_spu_data = p_spu->p_data;
+
+                /* getting the RLE part */
+                while( i_index++ < i_rle_size )
+                {
+                    /* skip the leading byte of a PES */
+                    if ( !((i_index + 3) % i_pes_size) )
+                    {
+                        i_pes_count++;
+                    }
+                    *p_spu_data++ = GetByte( &p_spudec->bit_stream );
+                }
+
+                /* getting the control part */
+                b_finished = 0;
+                do
                 {
                     unsigned char i_cmd;
                     unsigned int i_word;
 
+                    /* the date */
                     GetWord( i_word );
-                    printf( "date: 0x%.4x\n", i_word );
 
+                    /* next offset, no next offset if == i_index-5 */
                     GetWord( i_word );
-                    printf( "  next: 0x%.4x (i-5: %.4x)\n", i_word, i_index-5 );
-		    b_finished = (i_index - 5 >= i_word );
+                    b_finished = ( i_index - 5 >= i_word );
 
-		    do
-		    {
+                    do
+                    {
                         i_cmd = GetByte( &p_spudec->bit_stream );
-			i_index++;
+                        i_index++;
 
-			switch(i_cmd)
-			{
+                        switch( i_cmd )
+                        {
                             case 0x00:
-                                printf( "  00 (display now)\n" );
+                                /* 00 (display now) */
                                 break;
                             case 0x01:
-                                printf( "  01 (start displaying)\n" );
+                                /* 01 (start displaying) */
                                 break;
                             case 0x02:
-                                printf( "  02 (stop displaying)\n" );
+                                /* 02 (stop displaying) */
                                 break;
                             case 0x03:
-				GetWord( i_word );
-                                printf( "  03 (palette) - %.4x\n", i_word );
+                                /* 03xxxx (palette) */
+                                GetWord( i_word );
                                 break;
                             case 0x04:
-				GetWord( i_word );
-                                printf( "  04 (alpha channel) - %.4x\n", i_word );
+                                /* 04xxxx (alpha channel) */
+                                GetWord( i_word );
                                 break;
                             case 0x05:
-				GetWord( i_word );
-                                printf( "  05 (coordinates) - %.4x", i_word );
-				GetWord( i_word );
-                                printf( "%.4x", i_word );
-				GetWord( i_word );
-                                printf( "%.4x\n", i_word );
+                                /* 05xxxyyyxxxyyy (coordinates) */
+                                GetWord( i_word );
+                                GetWord( i_word );
+                                GetWord( i_word );
                                 break;
                             case 0x06:
-				GetWord( i_word );
-                                printf( "  06 (byte offsets) - %.4x", i_word );
-				GetWord( i_word );
-                                printf( "%.4x\n", i_word );
+                                /* 06xxxxyyyy (byte offsets) */
+                                GetWord( i_word );
+                                p_spu->type.spu.i_offset[0] = i_word - 4;
+                                GetWord( i_word );
+                                p_spu->type.spu.i_offset[1] = i_word - 4;
                                 break;
                             case 0xff:
-                                printf( "  ff (end)\n" );
+                                /* ff (end) */
                                 break;
-			    default:
-                                printf( "  %.2x (unknown command)\n", i_cmd );
+                            default:
+                                /* ?? (unknown command) */
                                 break;
-			}
+                        }
+                    }
+                    while( i_cmd != 0xff );
+                }
+                while( !b_finished );
 
-		    }
-		    while( i_cmd != 0xff );
-
-		}
-		while( !b_finished );
-                printf( "control stuff finished\n" );
-                printf( "*** end of PES !\n\n" );
+                /* SPU is finished - we can display it */
+                vout_DisplaySubPicture( p_spudec->p_vout, p_spu );
             }
             else 
             {
-                printf( "*** invalid PES !\n\n" );
-                /* trash the PES packet */
-                /*vlc_mutex_lock( &p_spudec->fifo.data_lock );
+                /* Unexpected PES packet - trash it */
+                vlc_mutex_lock( &p_spudec->fifo.data_lock );
                 input_NetlistFreePES( p_spudec->bit_stream.p_input,
                                       DECODER_FIFO_START(p_spudec->fifo) );
                 DECODER_FIFO_INCSTART( p_spudec->fifo );
-                vlc_mutex_unlock( &p_spudec->fifo.data_lock );*/
+                vlc_mutex_unlock( &p_spudec->fifo.data_lock );
             }
 
         }
         /* Waiting for the input thread to put new PES packets in the fifo */
-        printf( "decoder fifo is empty\n" );
         vlc_cond_wait( &p_spudec->fifo.data_wait, &p_spudec->fifo.data_lock );
+
+        if( p_spu ) vout_DestroySubPicture( p_spudec->p_vout, p_spu );
     }
 
     /*

@@ -1226,8 +1226,9 @@ static __inline__ void input_ParsePES( input_thread_t *p_input,
                 break;
 
             case DVD_SPU_ES:
-                /* we skip 4 bytes at the beginning of the subpicture payload */
-                //p_ts->i_payload_start += 4;
+                /* we skip the first byte at the beginning of the
+                 * subpicture payload, it only contains the SPU ID. */
+                p_ts->i_payload_start++;
                 p_fifo = &(((spudec_thread_t *)(p_es_descriptor->p_dec))->fifo);
                 break;
 
