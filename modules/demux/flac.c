@@ -1,10 +1,10 @@
 /*****************************************************************************
- * flac.c : FLAC demuc module for vlc
+ * flac.c : FLAC demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: flac.c,v 1.5 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: flac.c,v 1.6 2003/11/21 01:45:48 gbazin Exp $
  *
- * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
+ * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,26 +24,28 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-#include <errno.h>
-
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_codec.h>
 
-#include <sys/types.h>
-
-/*****************************************************************************
- * Constants
- *****************************************************************************/
+#define STREAMINFO_SIZE 38
 #define FLAC_PACKET_SIZE 16384
-#define MAX_PACKETS_IN_FIFO 1
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Init  ( vlc_object_t * );
+static int  Open  ( vlc_object_t * );
+static void Close ( vlc_object_t * );
 static int  Demux ( input_thread_t * );
+
+struct demux_sys_t
+{
+    vlc_bool_t  b_start;
+    es_out_id_t *p_es;
+
+    /* Packetizer */
+    decoder_t *p_packetizer;
+};
 
 /*****************************************************************************
  * Module descriptor
@@ -51,25 +53,20 @@ static int  Demux ( input_thread_t * );
 vlc_module_begin();                                      
     set_description( _("flac demuxer") );                       
     set_capability( "demux", 155 );
-    set_callbacks( Init, NULL );
+    set_callbacks( Open, Close );
     add_shortcut( "flac" );
 vlc_module_end();
 
 /*****************************************************************************
- * Init: initializes ES structures
+ * Open: initializes ES structures
  *****************************************************************************/
-static int Init( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
-    input_thread_t *    p_input = (input_thread_t *)p_this;
-    es_descriptor_t *   p_es;
-    byte_t *            p_peek;
-
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
-    {
-        /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
-    }
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    demux_sys_t    *p_sys;
+    int            i_peek;
+    byte_t *       p_peek;
+    es_format_t    fmt;
 
     p_input->pf_demux = Demux;
     p_input->pf_demux_control = demux_vaControlDefault;
@@ -80,41 +77,117 @@ static int Init( vlc_object_t * p_this )
     {
         /* Stream shorter than 4 bytes... */
         msg_Err( p_input, "cannot peek()" );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 
-    if( *p_peek != 'f' || *(p_peek + 1) != 'L' || *(p_peek +2) != 'a'
-        || *(p_peek+3) != 'C')
+    if( p_peek[0]!='f' || p_peek[1]!='L' || p_peek[2]!='a' || p_peek[3]!='C' )
     {
-        if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "flac", 4 ) )
+        if( p_input->psz_demux && !strncmp( p_input->psz_demux, "flac", 4 ) )
         {
             /* User forced */
-            msg_Err( p_input, "this doesn't look like an flac stream, "
+            msg_Err( p_input, "this doesn't look like a flac stream, "
                      "continuing anyway" );
         }
         else
         {
             msg_Warn( p_input, "flac module discarded (no startcode)" );
-            return( -1 );
+            return VLC_EGENERIC;
         }
     }
 
+    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
+    p_sys->b_start = VLC_TRUE;
+
+    /* Skip stream marker */
+    stream_Read( p_input->s, NULL, 4 );
+
+    /* We need to read and store the STREAMINFO metadata */
+    i_peek = stream_Peek( p_input->s, &p_peek, 4 );
+    if( p_peek[0] & 0x7F )
+    {
+        msg_Err( p_input, "This isn't a STREAMINFO metadata block" );
+        return VLC_EGENERIC;
+    }
+
+    if( ((p_peek[1]<<16)+(p_peek[2]<<8)+p_peek[3]) != (STREAMINFO_SIZE - 4) )
+    {
+        msg_Err( p_input, "Invalid size for a STREAMINFO metadata block" );
+        return VLC_EGENERIC;
+    }
+
+    /*
+     * Load the FLAC packetizer
+     */
+    p_sys->p_packetizer = vlc_object_create( p_input, VLC_OBJECT_DECODER );
+    p_sys->p_packetizer->pf_decode = 0;
+    p_sys->p_packetizer->pf_decode_audio = 0;
+    p_sys->p_packetizer->pf_decode_video = 0;
+    p_sys->p_packetizer->pf_decode_sub = 0;
+    p_sys->p_packetizer->pf_packetize = 0;
+    p_sys->p_packetizer->pf_run = 0;
+
+    /* Initialization of decoder structure */
+    es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES,
+                    VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
+
+    /* Store STREAMINFO for the decoder an packetizer */
+    p_sys->p_packetizer->fmt_in.i_extra = fmt.i_extra = STREAMINFO_SIZE;
+    p_sys->p_packetizer->fmt_in.p_extra = malloc( STREAMINFO_SIZE );
+    stream_Read( p_input->s, p_sys->p_packetizer->fmt_in.p_extra,
+                 STREAMINFO_SIZE );
+
+    /* Fake this a the last metadata block */
+    ((uint8_t*)p_sys->p_packetizer->fmt_in.p_extra)[0] |= 0x80;
+    fmt.p_extra = malloc( STREAMINFO_SIZE );
+    memcpy( fmt.p_extra, p_sys->p_packetizer->fmt_in.p_extra, STREAMINFO_SIZE);
+
+    p_sys->p_packetizer->p_module =
+        module_Need( p_sys->p_packetizer, "packetizer", NULL );
+    if( !p_sys->p_packetizer->p_module )
+    {
+        if( p_sys->p_packetizer->fmt_in.p_extra )
+            free( p_sys->p_packetizer->fmt_in.p_extra );
+
+        vlc_object_destroy( p_sys->p_packetizer );
+        msg_Err( p_input, "cannot find flac packetizer" );
+        return VLC_EGENERIC;
+    }
+
+    /* Create one program */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1 )
     {
-        return( -1 );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        msg_Err( p_input, "cannot init stream" );
+        return VLC_EGENERIC;
     }
-    input_AddProgram( p_input, 0, 0 );
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 1,
-                        AUDIO_ES, NULL, 0 );
-    p_es->i_stream_id = 1;
-    p_es->i_fourcc = VLC_FOURCC('f','l','a','c');
-    input_SelectES( p_input, p_es );
-    p_input->stream.p_selected_program->b_is_ok = 1;
+    p_input->stream.i_mux_rate = 0;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return( 0 );
+    p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close: frees unused data
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    input_thread_t *p_input = (input_thread_t*)p_this;
+    demux_sys_t    *p_sys = p_input->p_demux_data;
+
+    /* Unneed module */
+    module_Unneed( p_input, p_sys->p_packetizer->p_module );
+
+    if( p_sys->p_packetizer->fmt_in.p_extra )
+        free( p_sys->p_packetizer->fmt_in.p_extra );
+
+    /* Delete the decoder */
+    vlc_object_destroy( p_sys->p_packetizer );
+
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -124,58 +197,45 @@ static int Init( vlc_object_t * p_this )
  *****************************************************************************/
 static int Demux( input_thread_t * p_input )
 {
-    ssize_t         i_read;
-    decoder_fifo_t * p_fifo =
-        p_input->stream.p_selected_program->pp_es[0]->p_decoder_fifo;
-    pes_packet_t *  p_pes;
-    data_packet_t * p_data;
+    demux_sys_t  *p_sys = p_input->p_demux_data;
+    block_t *p_block_in, *p_block_out;
 
-    if( p_fifo == NULL )
+    if( !( p_block_in = stream_Block( p_input->s, FLAC_PACKET_SIZE ) ) )
     {
-        return -1;
+        return 0;
     }
 
-    i_read = input_SplitBuffer( p_input, &p_data, FLAC_PACKET_SIZE );
-
-    if ( i_read <= 0 )
+    if( p_sys->b_start )
     {
-        return i_read;
+        p_block_in->i_pts = p_block_in->i_dts = 1;
+        p_sys->b_start = VLC_FALSE;
+    }
+    else
+    {
+        p_block_in->i_pts = p_block_in->i_dts = 0;
     }
 
-    p_pes = input_NewPES( p_input->p_method_data );
-
-    if( p_pes == NULL )
+    while( (p_block_out = p_sys->p_packetizer->pf_packetize(
+                p_sys->p_packetizer, &p_block_in )) )
     {
-        msg_Err( p_input, "out of memory" );
-        input_DeletePacket( p_input->p_method_data, p_data );
-        return( -1 );
+        while( p_block_out )
+        {
+            block_t *p_next = p_block_out->p_next;
+
+            input_ClockManageRef( p_input,
+                                  p_input->stream.p_selected_program,
+                                  p_block_out->i_pts * 9 / 100 );
+
+            p_block_in->b_discontinuity = 0;
+            p_block_out->i_dts = p_block_out->i_pts =
+                input_ClockGetTS( p_input, p_input->stream.p_selected_program,
+                                  p_block_out->i_pts * 9 / 100 );
+
+            es_out_Send( p_input->p_es_out, p_sys->p_es, p_block_out );
+
+            p_block_out = p_next;
+        }
     }
-
-    p_pes->i_rate = p_input->stream.control.i_rate;
-    p_pes->p_first = p_pes->p_last = p_data;
-    p_pes->i_pes_size = i_read;
-    p_pes->i_nb_data = 1;
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-    if( p_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
-    {
-        /* Wait for the decoder. */
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    vlc_mutex_unlock( &p_fifo->data_lock );
-
-    if( (p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT)
-       |(p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_START)
-         | (input_ClockManageControl( p_input, 
-                      p_input->stream.p_selected_program,
-                         (mtime_t)0 ) == PAUSE_S) )
-    {
-        msg_Warn( p_input, "synchro reinit" );
-        p_pes->i_pts = mdate() + DEFAULT_PTS_DELAY;
-        p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_OK;
-    }
-
-    input_DecodePES( p_fifo, p_pes );
 
     return 1;
 }

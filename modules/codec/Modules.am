@@ -1,7 +1,7 @@
 SOURCES_a52 = a52.c
 SOURCES_cinepak = cinepak.c
 SOURCES_dts = dts.c
-SOURCES_flacdec = flacdec.c
+SOURCES_flacdec = flac.c
 SOURCES_lpcm = lpcm.c
 SOURCES_araw = araw.c
 SOURCES_vorbis = vorbis.c
