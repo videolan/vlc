@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.10 2003/05/16 23:02:37 gbazin Exp $
+ * $Id: copy.c,v 1.11 2003/07/20 23:30:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -255,6 +255,26 @@ static int InitThread( packetizer_thread_t *p_pack )
             break;
         case VLC_FOURCC( 'I', '4', '2', '2' ):
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'I', '4', '2', '2' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'R', 'V', '1', '5' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'R', 'V', '1', '6' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'R', 'V', '2', '4' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'R', 'V', '3', '2' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'G', 'R', 'E', 'Y' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'G', 'R', 'E', 'Y' );
             p_pack->output_format.i_cat = VIDEO_ES;
             break;
 

@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.25 2003/07/13 13:18:25 gbazin Exp $
+ * $Id: transcode.c,v 1.26 2003/07/20 23:30:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -513,7 +513,10 @@ static struct
     { VLC_FOURCC( 'I', '4', '2', '0' ), CODEC_ID_RAWVIDEO },
     { VLC_FOURCC( 'I', '4', '2', '2' ), CODEC_ID_RAWVIDEO },
     { VLC_FOURCC( 'I', '4', '4', '4' ), CODEC_ID_RAWVIDEO },
+    { VLC_FOURCC( 'R', 'V', '1', '5' ), CODEC_ID_RAWVIDEO },
+    { VLC_FOURCC( 'R', 'V', '1', '6' ), CODEC_ID_RAWVIDEO },
     { VLC_FOURCC( 'R', 'V', '2', '4' ), CODEC_ID_RAWVIDEO },
+    { VLC_FOURCC( 'R', 'V', '3', '2' ), CODEC_ID_RAWVIDEO },
     { VLC_FOURCC( 'Y', 'U', 'Y', '2' ), CODEC_ID_RAWVIDEO },
 
     { VLC_FOURCC(   0,   0,   0,   0 ), 0 }
@@ -544,8 +547,16 @@ static inline int get_ff_chroma( vlc_fourcc_t i_chroma )
             return PIX_FMT_YUV422P;
         case VLC_FOURCC( 'I', '4', '4', '4' ):
             return PIX_FMT_YUV444P;
+        case VLC_FOURCC( 'R', 'V', '1', '5' ):
+            return PIX_FMT_RGB555;
+        case VLC_FOURCC( 'R', 'V', '1', '6' ):
+            return PIX_FMT_RGB565;
         case VLC_FOURCC( 'R', 'V', '2', '4' ):
             return PIX_FMT_RGB24;
+        case VLC_FOURCC( 'R', 'V', '3', '2' ):
+            return PIX_FMT_RGBA32;
+        case VLC_FOURCC( 'G', 'R', 'E', 'Y' ):
+            return PIX_FMT_GRAY8;
         case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
             return PIX_FMT_YUV422;
         default:
@@ -1063,7 +1074,11 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
         id->f_src.i_fourcc == VLC_FOURCC( 'I', '4', '2', '2' ) ||
         id->f_src.i_fourcc == VLC_FOURCC( 'I', '4', '4', '4' ) ||
         id->f_src.i_fourcc == VLC_FOURCC( 'Y', 'U', 'Y', '2' ) ||
-        id->f_src.i_fourcc == VLC_FOURCC( 'R', 'V', '2', '4' ) )
+        id->f_src.i_fourcc == VLC_FOURCC( 'R', 'V', '1', '5' ) ||
+        id->f_src.i_fourcc == VLC_FOURCC( 'R', 'V', '1', '6' ) ||
+        id->f_src.i_fourcc == VLC_FOURCC( 'R', 'V', '2', '4' ) ||
+        id->f_src.i_fourcc == VLC_FOURCC( 'R', 'V', '3', '2' ) ||
+        id->f_src.i_fourcc == VLC_FOURCC( 'G', 'R', 'E', 'Y' ) )
     {
         id->ff_dec   = NULL;
         id->ff_dec_c            = avcodec_alloc_context();
