@@ -967,6 +967,7 @@ libcdio: libcdio-$(CDIO_VERSION).tar.gz
 
 .cdio: libcdio
 	(cd $<; ./configure --prefix=$(PREFIX) --without-vcdinfo && make && make install)
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .cdio
@@ -1094,7 +1095,8 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .gnutls: gnutls
-	(cd $<; ./configure --prefix=$(PREFIX) && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .gnutls
