@@ -61,12 +61,24 @@
  *****************************************************************************/
 int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
 {
-    int i;
+    int i_volume, i_result = 0;
+    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
 
-    i = config_GetInt( p_object, "volume" );
-    if ( pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
+    i_volume = config_GetInt( p_object, "volume" );
+    if ( pi_volume != NULL ) *pi_volume = (audio_volume_t)i_volume;
 
-    return 0;
+    if ( p_aout == NULL ) return 0;
+
+    vlc_mutex_lock( &p_aout->mixer_lock );
+    if ( !p_aout->mixer.b_error )
+    {
+        i_result = p_aout->output.pf_volume_get( p_aout, pi_volume );
+    }
+    vlc_mutex_unlock( &p_aout->mixer_lock );
+
+    vlc_object_release( p_aout );
+    return i_result;
 }
 
 /*****************************************************************************
