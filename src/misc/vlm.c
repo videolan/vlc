@@ -38,6 +38,7 @@
 
 #ifdef HAVE_TIME_H
 #   include <time.h>                                              /* ctime() */
+#   include <sys/timeb.h>                                         /* ftime() */
 #endif
 
 #include "vlc_vlm.h"
@@ -1130,7 +1131,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_id,
 
     p_instance = vlm_MediaInstanceSearch( vlm, media, psz_id );
 
-    if( !strcmp( psz_command, "play" ) && !p_instance )
+    if( !strcmp( psz_command, "play" ) )
     {
         if( !media->b_enabled || media->i_input == 0 ) return 0;
 
@@ -1248,6 +1249,13 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_id,
 /*****************************************************************************
  * Schedule handling
  *****************************************************************************/
+static int64_t vlm_Date()
+{
+    struct timeb tm;
+    ftime( &tm );
+    return ((int64_t)tm.time) * 1000000 + ((int64_t)tm.millitm) * 1000;
+}
+
 vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm, char *psz_name )
 {
     vlm_schedule_t *p_sched = malloc( sizeof( vlm_schedule_t ) );
@@ -1801,7 +1809,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
                             vlm_MessageNew( "enabled", "yes" ) );
 
             /* calculate next date */
-            i_time = mdate();
+            i_time = vlm_Date();
             i_next_date = s->i_date;
 
             if( s->i_period != 0 )
@@ -2255,7 +2263,7 @@ static int Manage( vlc_object_t* p_object )
     mtime_t i_lastcheck;
     mtime_t i_time;
 
-    i_lastcheck = mdate();
+    i_lastcheck = vlm_Date();
 
     msleep( 100000 );
 
@@ -2302,7 +2310,7 @@ static int Manage( vlc_object_t* p_object )
         }
 
         /* scheduling */
-        i_time = mdate();
+        i_time = vlm_Date();
 
         for( i = 0; i < vlm->i_schedule; i++ )
         {
