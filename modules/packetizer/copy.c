@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.16 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: copy.c,v 1.17 2003/09/29 22:37:36 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -386,6 +386,12 @@ static int Init( packetizer_thread_t *p_pack )
             p_pack->output_format.i_cat = SPU_ES;
             p_pack->pf_packetize = PacketizeSPU;
             break;
+
+        case VLC_FOURCC( 's', 'u', 'b', 't' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 's', 'u', 'b', 't' );
+            p_pack->output_format.i_cat = SPU_ES;
+            break;
+
         default:
             msg_Err( p_pack->p_fifo, "unknown es type !!" );
             return VLC_EGENERIC;
