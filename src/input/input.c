@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.137 2001/10/03 03:32:05 xav Exp $
+ * $Id: input.c,v 1.138 2001/10/03 10:12:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,8 +57,7 @@
 #   include <sys/socket.h>
 #endif
 
-#ifdef WIN32
-#else
+#ifndef WIN32
 #include <sys/times.h>
 #endif
 
