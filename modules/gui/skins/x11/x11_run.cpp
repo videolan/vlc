@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.15 2003/06/05 22:16:15 asmax Exp $
+ * $Id: x11_run.cpp,v 1.16 2003/06/06 19:40:37 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -83,25 +83,21 @@ int ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     // Process keyboard shortcuts
     if( msg == KeyPress )
     {
-/*        int KeyModifier = 0;
+        int KeyModifier = 0;
         // If key is ALT
-        if( ((GdkEventKey *)event)->state & GDK_MOD1_MASK )
+        if( ((XKeyEvent *)event)->state & Mod1Mask )
         {
             KeyModifier = 1;
         }
         // If key is CTRL
-        else if( ((GdkEventKey *)event)->state & GDK_CONTROL_MASK )
+        else if( ((XKeyEvent *)event)->state & ControlMask )
         {
             KeyModifier = 2;
         }
-        int key = ((GdkEventKey *)event)->keyval;
-        // Translate into lower case
-        if( key >= 'a' && key <= 'z' )
-        {
-            key -= ('a' - 'A');
-        }
+        // Take the second keysym = upper case character
+        int key = XLookupKeysym( (XKeyEvent *)event, 1 );
         if( KeyModifier > 0 )
-            p_intf->p_sys->p_theme->EvtBank->TestShortcut( key , KeyModifier );*/
+            p_intf->p_sys->p_theme->EvtBank->TestShortcut( key , KeyModifier );
     }
 
     // Send event
