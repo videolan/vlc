@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.5 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: rawdv.c,v 1.6 2003/04/27 14:56:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -381,45 +381,64 @@ static int Demux( input_thread_t * p_input )
     }
 
     /* Build video PES packet */
-    p_pes = input_NewPES( p_input->p_method_data );
-    if( p_pes == NULL )
+    if( p_rawdv->p_video_es->p_decoder_fifo )
     {
-        msg_Err( p_input, "out of memory" );
-        input_DeletePacket( p_input->p_method_data, p_data );
-        return -1;
-    }
+        p_pes = input_NewPES( p_input->p_method_data );
+        if( p_pes == NULL )
+        {
+            msg_Err( p_input, "out of memory" );
+            input_DeletePacket( p_input->p_method_data, p_data );
+            return -1;
+        }
 
-    p_pes->i_rate = p_input->stream.control.i_rate;
-    p_pes->p_first = p_pes->p_last = p_data;
-    p_pes->i_pes_size = i_read;
-    p_pes->i_nb_data = 1;
-    p_pes->i_pts =
-        input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                          p_rawdv->i_pcr );
+        p_pes->i_rate = p_input->stream.control.i_rate;
+        p_pes->p_first = p_pes->p_last = p_data;
+        p_pes->i_pes_size = i_read;
+        p_pes->i_nb_data = 1;
+        p_pes->i_pts =
+            input_ClockGetTS( p_input, p_input->stream.p_selected_program,
+                              p_rawdv->i_pcr );
+    }
 
     /* Do the same for audio */
-    p_audio_pes = input_NewPES( p_input->p_method_data );
-    if( p_pes == NULL )
+    if( p_rawdv->p_audio_es->p_decoder_fifo )
     {
-        msg_Err( p_input, "out of memory" );
-        input_DeletePacket( p_input->p_method_data, p_data );
-        return -1;
-    }
-    p_audio_pes->i_rate = p_input->stream.control.i_rate;
-    p_audio_pes->p_first = p_audio_pes->p_last =
-        input_ShareBuffer( p_input->p_method_data, p_data->p_buffer );
-    p_audio_pes->p_first->p_next = p_data->p_next;
-    p_audio_pes->p_first->p_payload_start = p_data->p_payload_start;
-    p_audio_pes->p_first->p_payload_end = p_data->p_payload_end;
-    p_audio_pes->i_pes_size = i_read;
-    p_audio_pes->i_nb_data = 1;
-    p_audio_pes->i_pts = p_pes->i_pts;
+        p_audio_pes = input_NewPES( p_input->p_method_data );
+        if( p_pes == NULL )
+        {
+            msg_Err( p_input, "out of memory" );
+            input_DeletePacket( p_input->p_method_data, p_data );
+            return -1;
+        }
+        p_audio_pes->i_rate = p_input->stream.control.i_rate;
 
-    /* Decode PES packets */
-    input_DecodePES( p_rawdv->p_video_es->p_decoder_fifo, p_pes );
-    input_DecodePES( p_rawdv->p_audio_es->p_decoder_fifo, p_audio_pes );
+        if( p_rawdv->p_video_es->p_decoder_fifo )
+            p_audio_pes->p_first = p_audio_pes->p_last =
+                input_ShareBuffer( p_input->p_method_data, p_data->p_buffer );
+        else
+            p_audio_pes->p_first = p_audio_pes->p_last = p_data;
+
+        p_audio_pes->p_first->p_next = p_data->p_next;
+        p_audio_pes->p_first->p_payload_start = p_data->p_payload_start;
+        p_audio_pes->p_first->p_payload_end = p_data->p_payload_end;
+        p_audio_pes->i_pes_size = i_read;
+        p_audio_pes->i_nb_data = 1;
+        p_audio_pes->i_pts =
+            input_ClockGetTS( p_input, p_input->stream.p_selected_program,
+                              p_rawdv->i_pcr );
+    }
+
+    /* Decode PES packets if stream is selected */
+    if( p_rawdv->p_video_es->p_decoder_fifo )
+        input_DecodePES( p_rawdv->p_video_es->p_decoder_fifo, p_pes );
+    if( p_rawdv->p_audio_es->p_decoder_fifo )
+        input_DecodePES( p_rawdv->p_audio_es->p_decoder_fifo, p_audio_pes );
 
     p_rawdv->i_pcr += ( 90000 / p_rawdv->f_rate );
+
+    if( !p_rawdv->p_video_es->p_decoder_fifo &&
+        !p_rawdv->p_audio_es->p_decoder_fifo )
+        input_DeletePacket( p_input->p_method_data, p_data );
 
     return 1;
 }
