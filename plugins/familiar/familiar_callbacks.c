@@ -2,7 +2,7 @@
  * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.6 2002/10/02 20:12:02 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.7 2002/10/02 21:41:50 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -110,7 +110,6 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 
     if (p_intf->p_sys->b_autoplayfile)
     {
-       intf_ErrMsg("autoplay selected");
        /* end current item, select added item  */
        if( p_input_bank->pp_input[0] != NULL )
        {
@@ -324,7 +323,6 @@ on_toolbar_play_clicked                (GtkButton       *button,
 {
     intf_thread_t *  p_intf = GtkGetIntf( button );
 
-
     if( p_input_bank->pp_input[0] != NULL )
     {
         input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
@@ -352,10 +350,8 @@ on_toolbar_play_clicked                (GtkButton       *button,
         }
         else
         {
-
             vlc_mutex_unlock( &p_main->p_playlist->change_lock );
         }
-
     }
 }
 
@@ -418,12 +414,20 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
 {
     intf_thread_t * p_intf = GtkGetIntf( editable );
     gchar *       psz_url;
+    struct stat st;
 
-    if (p_intf->p_sys->b_autoplayfile == 1)
+    psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
+    if (lstat((char*)psz_url, &st)==0)
     {
-        psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
-        MediaURLOpenChanged( GTK_WIDGET(editable), psz_url );
-    }
+        if (S_ISDIR(st.st_mode))
+           ReadDirectory(p_intf->p_sys->p_clist, psz_url);
+        else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
+                 (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
+                 (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
+        {
+           MediaURLOpenChanged(GTK_WIDGET(editable), psz_url);
+        }
+   }
 }
 
 void
@@ -475,24 +479,11 @@ on_clistmedia_select_row               (GtkCList        *clist,
     }
 }
 
-
 void
 on_cbautoplay_toggled                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
-    intf_thread_t * p_intf = GtkGetIntf( togglebutton );
-
-    if (p_intf->p_sys->b_autoplayfile == 1)
-    {
-       p_intf->p_sys->b_autoplayfile = 0;
-       intf_ErrMsg("autoplay not selected");
-    }
-    else
-    {
-       p_intf->p_sys->b_autoplayfile = 1;
-       intf_ErrMsg("autoplay selected");
-    }
-}
+};
 
 
 gboolean
@@ -535,8 +526,10 @@ void
 on_buttonSave_clicked                  (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t * p_intf = GtkGetIntf( button );
     on_buttonApply_clicked( button, user_data );
-    config_SaveConfigFile( NULL );
+    config_PutIntVariable( "familiar-autoplayfile", p_intf->p_sys->b_autoplayfile );
+//    config_SaveConfigFile( NULL );
 }
 
 
@@ -544,17 +537,12 @@ void
 on_buttonApply_clicked                 (GtkButton       *button,
                                         gpointer         user_data)
 {
-    GtkWidget *apply_button;
-//    GHashTable *hash_table;
-//
-//    hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
-//                                                    "config_hash_table" );
-//    g_hash_table_foreach_remove( hash_table, GtkSaveHashValue, NULL );
+    intf_thread_t * p_intf = GtkGetIntf( button );
+    GtkWidget *cbautoplay;
 
-    /* change the highlight status of the Apply button */
-    apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
-                                                    "buttonAapply" );
-    gtk_widget_set_sensitive( apply_button, FALSE );
+    cbautoplay = GTK_WIDGET( gtk_object_get_data(
+                   GTK_OBJECT( p_intf->p_sys->p_window ), "cbautoplay" ) );
+    p_intf->p_sys->b_autoplayfile = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(cbautoplay));
 }
 
 
@@ -562,6 +550,11 @@ void
 on_buttonCancel_clicked                (GtkButton       *button,
                                         gpointer         user_data)
 {
-    //gtk_widget_destroy( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+    intf_thread_t * p_intf = GtkGetIntf( button );
+    GtkWidget *cbautoplay;
+
+    cbautoplay = GTK_WIDGET( gtk_object_get_data(
+                   GTK_OBJECT( p_intf->p_sys->p_window ), "cbautoplay" ) );
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(cbautoplay),p_intf->p_sys->b_autoplayfile);
 }
 

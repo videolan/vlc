@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.8.2.5 2002/10/02 20:12:02 jpsaman Exp $
+ * $Id: familiar.c,v 1.8.2.6 2002/10/02 21:41:50 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -56,11 +56,18 @@ static void Close        ( intf_thread_t *p_intf );
 static void Run          ( intf_thread_t * );
 
 static gint GtkManage         ( gpointer p_data );
+void GtkAutoPlayFile( void );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define AUTOPLAYFILE_TEXT  N_("autoplay selected file")
+#define AUTOPLAYFILE_LONGTEXT N_("automatically play a file when selected in the "\
+        "file selection list")
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_BOOL( "familiar-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT)
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -180,6 +187,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* Create some useful widgets that will certainly be used */
 // FIXME: magic path
+    add_pixmap_directory("share");
     add_pixmap_directory("/usr/share/videolan");
 
     p_intf->p_sys->p_window = create_familiar();
@@ -271,4 +279,23 @@ static gint GtkManage( gpointer p_data )
     return( TRUE );
 
 #undef p_intf
+}
+
+/*****************************************************************************
+ * GtkAutoplayFile: Autoplay file depending on configuration settings
+ *****************************************************************************
+ * FIXME: we should get the intf as parameter
+ *****************************************************************************/
+void GtkAutoPlayFile( void )
+{
+    GtkWidget *cbautoplay;
+
+    cbautoplay = GTK_WIDGET( gtk_object_get_data(
+                   GTK_OBJECT( p_main->p_intf->p_sys->p_window ), "cbautoplay" ) );
+    if( !config_GetIntVariable( "familiar-autoplayfile" ) )
+       p_main->p_intf->p_sys->b_autoplayfile=0;
+    else
+       p_main->p_intf->p_sys->b_autoplayfile=1;
+
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(cbautoplay),p_main->p_intf->p_sys->b_autoplayfile);
 }
