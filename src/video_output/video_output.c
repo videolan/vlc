@@ -34,12 +34,17 @@ static int      InitThread              ( vout_thread_t *p_vout );
 static void     RunThread               ( vout_thread_t *p_vout );
 static void     ErrorThread             ( vout_thread_t *p_vout );
 static void     EndThread               ( vout_thread_t *p_vout );
+static void     DestroyThread           ( vout_thread_t *p_vout, int i_status );
 static void     Print                   ( vout_thread_t *p_vout, int i_x, int i_y, int i_halign, int i_valign, unsigned char *psz_text );
-static void     RenderBlank             ( vout_thread_t *p_vout );
-static int      RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank );
-static int      RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank );
-static int      RenderIdle              ( vout_thread_t *p_vout, boolean_t b_blank );
-static int      RenderInfo              ( vout_thread_t *p_vout, boolean_t b_balnk );
+
+static void     SetBufferArea           ( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int i_h );
+static void     SetBufferPicture        ( vout_thread_t *p_vout, picture_t *p_pic );
+static void     RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic );
+static void     RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic );
+static void     RenderSubtitle          ( vout_thread_t *p_vout, subtitle_t *p_sub );
+static void     RenderInterface         ( vout_thread_t *p_vout );
+static void     RenderIdle              ( vout_thread_t *p_vout );
+static void     RenderInfo              ( vout_thread_t *p_vout );
 static int      Manage                  ( vout_thread_t *p_vout );
 
 /******************************************************************************
@@ -55,6 +60,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
 {
     vout_thread_t * p_vout;                              /* thread descriptor */
     int             i_status;                                /* thread status */
+    int             i_index;                /* index for array initialization */    
 
     /* Allocate descriptor */
     intf_DbgMsg("\n");    
@@ -65,7 +71,8 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
         return( NULL );
     }
 
-    /* Initialize thread properties */
+    /* Initialize thread properties - thread id and locks will be initialized 
+     * later */
     p_vout->b_die               = 0;
     p_vout->b_error             = 0;    
     p_vout->b_active            = 0;
@@ -74,22 +81,46 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
 
     /* Initialize some fields used by the system-dependant method - these fields will
      * probably be modified by the method, and are only preferences */
-    p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR, 
-                                                       VOUT_GRAYSCALE_DEFAULT );
     p_vout->i_width             = i_width;
     p_vout->i_height            = i_height;
     p_vout->i_bytes_per_line    = i_width * 2;    
     p_vout->i_screen_depth      = 15;
     p_vout->i_bytes_per_pixel   = 2;
     p_vout->f_gamma             = VOUT_GAMMA;    
-#ifdef DEBUG
-    p_vout->b_info              = 1;    
-#else
+
+    p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR, 
+                                                       VOUT_GRAYSCALE_DEFAULT );
     p_vout->b_info              = 0;    
-#endif
+    p_vout->b_interface         = 0;
+    p_vout->b_scale             = 0;
+    
     intf_DbgMsg("wished configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line)\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                 p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
+
+#ifdef STATS
+    /* Initialize statistics fields */
+    p_vout->render_time         = 0;    
+    p_vout->c_fps_samples       = 0;    
+#endif      
+
+    /* Initialize running properties */
+    p_vout->i_changes           = 0;
+    p_vout->last_picture_date   = 0;
+    p_vout->last_display_date   = 0;
+
+    /* Initialize buffer index */
+    p_vout->i_buffer_index      = 0;
+
+    /* Initialize pictures and subtitles - translation tables and functions
+     * will be initialized later in InitThread */    
+    for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
+    {
+        p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
+        p_vout->p_picture[i_index].i_status = FREE_PICTURE;
+        p_vout->p_subtitle[i_index].i_type  = EMPTY_SUBTITLE;
+        p_vout->p_subtitle[i_index].i_status= FREE_SUBTITLE;
+    }
    
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
@@ -102,7 +133,8 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                 p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
 
-    /* Load fonts */
+    /* Load fonts - fonts must be initialized after the systme method since
+     * they may be dependant of screen depth and other thread properties */
     p_vout->p_default_font      = vout_LoadFont( VOUT_DEFAULT_FONT );    
     if( p_vout->p_default_font == NULL )
     {
@@ -117,18 +149,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
         vout_SysDestroy( p_vout );        
         free( p_vout );        
         return( NULL );        
-    }    
- 
-#ifdef STATS
-    /* Initialize statistics fields */
-    p_vout->render_time           = 0;    
-    p_vout->c_fps_samples       = 0;    
-#endif      
-
-    /* Initialize running properties */
-    p_vout->i_changes           = 0;
-    p_vout->last_picture_date   = 0;
-    p_vout->last_display_date   = 0;
+    }     
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->picture_lock );
@@ -239,7 +260,7 @@ void  vout_DisplaySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
 subtitle_t *vout_CreateSubtitle( vout_thread_t *p_vout, int i_type, 
                                  int i_size )
 {
-    //???
+    //??
 }
 
 /******************************************************************************
@@ -553,6 +574,26 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
+/******************************************************************************
+ * vout_ClearBuffer: clear a whole buffer
+ ******************************************************************************
+ * This function is called when a buffer is initialized. It clears the whole
+ * buffer.
+ ******************************************************************************/
+void vout_ClearBuffer( vout_thread_t *p_vout, vout_buffer_t *p_buffer )
+{
+    /* No picture previously */
+    p_buffer->i_pic_x =         0;
+    p_buffer->i_pic_y =         0;
+    p_buffer->i_pic_width =     0;
+    p_buffer->i_pic_height =    0;
+
+    /* The first area covers all the screen */
+    p_buffer->i_areas =                 1;
+    p_buffer->pi_area_begin[0] =        0;
+    p_buffer->pi_area_end[0] =          p_vout->i_height - 1;
+}
+
 /* following functions are local */
 
 /******************************************************************************
@@ -564,8 +605,6 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
  ******************************************************************************/
 static int InitThread( vout_thread_t *p_vout )
 {
-    int     i_index;                                         /* generic index */    
-
     /* Update status */
     intf_DbgMsg("\n");
     *p_vout->pi_status = THREAD_START;    
@@ -573,18 +612,8 @@ static int InitThread( vout_thread_t *p_vout )
     /* Initialize output method - this function issues its own error messages */
     if( vout_SysInit( p_vout ) )
     {
-        *p_vout->pi_status = THREAD_ERROR;        
         return( 1 );
     } 
-
-    /* Initialize pictures and subtitles */    
-    for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
-    {
-        p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
-        p_vout->p_picture[i_index].i_status = FREE_PICTURE;
-        p_vout->p_subtitle[i_index].i_type  = EMPTY_SUBTITLE;
-        p_vout->p_subtitle[i_index].i_status= FREE_SUBTITLE;
-    }
 
     /* Initialize convertion tables and functions */
     if( vout_InitTables( p_vout ) )
@@ -609,20 +638,20 @@ static int InitThread( vout_thread_t *p_vout )
  ******************************************************************************/
 static void RunThread( vout_thread_t *p_vout)
 {
-    int             i_picture;                               /* picture index */
+    int             i_index;                                 /* index in heap */
     mtime_t         current_date;                             /* current date */
-    mtime_t         pic_date = 0;                             /* picture date */    
+    mtime_t         display_date;                             /* display date */    
     boolean_t       b_display;                                /* display flag */    
     picture_t *     p_pic;                                 /* picture pointer */
+    subtitle_t *    p_sub;                                /* subtitle pointer */    
      
     /* 
-     * Initialize thread and free configuration 
+     * Initialize thread
      */
     p_vout->b_error = InitThread( p_vout );
     if( p_vout->b_error )
     {
-        //??
-        free( p_vout );                                 /* destroy descriptor */
+        DestroyThread( p_vout, THREAD_ERROR );
         return;        
     }    
     intf_DbgMsg("\n");
@@ -632,115 +661,171 @@ static void RunThread( vout_thread_t *p_vout)
      * initialization
      */
     while( (!p_vout->b_die) && (!p_vout->b_error) )
-    {            
+    {
+        /* Initialize loop variables */
+        p_pic =         NULL;
+        p_sub =         NULL;
+        display_date =  0;        
+        current_date =  mdate();
+
         /* 
 	 * Find the picture to display - this operation does not need lock,
-         * since only READY_PICTURES are handled 
+         * since only READY_PICTUREs are handled 
          */
-        p_pic = NULL;         
-        current_date = mdate();
-        for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
+        for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
 	{
-	    if( (p_vout->p_picture[i_picture].i_status == READY_PICTURE) &&
+	    if( (p_vout->p_picture[i_index].i_status == READY_PICTURE) &&
 		( (p_pic == NULL) || 
-		  (p_vout->p_picture[i_picture].date < pic_date) ) )
+		  (p_vout->p_picture[i_index].date < display_date) ) )
 	    {
-                p_pic = &p_vout->p_picture[i_picture];
-                pic_date = p_pic->date;                
+                p_pic = &p_vout->p_picture[i_index];
+                display_date = p_pic->date;                
 	    }
 	}
  
-        /* 
-	 * Render picture if any
-	 */
         if( p_pic )
         {
 #ifdef STATS
             /* Computes FPS rate */
-            p_vout->fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = pic_date;
+            p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
 #endif	    
-	    if( pic_date < current_date )
+	    if( display_date < current_date )
 	    {
 		/* Picture is late: it will be destroyed and the thread will sleep and
                  * go to next picture */
                 vlc_mutex_lock( &p_vout->picture_lock );
                 p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
-#ifdef DEBUG_VIDEO
 		intf_DbgMsg( "warning: late picture %p skipped refcount=%d\n", p_pic, p_pic->i_refcount );
-#endif
                 vlc_mutex_unlock( &p_vout->picture_lock );
                 p_pic =         NULL;                
+                display_date =  0;                
 	    }
-	    else if( pic_date > current_date + VOUT_DISPLAY_DELAY )
+	    else if( display_date > current_date + VOUT_DISPLAY_DELAY )
 	    {
 		/* A picture is ready to be rendered, but its rendering date is
 		 * far from the current one so the thread will perform an empty loop
 		 * as if no picture were found. The picture state is unchanged */
                 p_pic =         NULL;                
+                display_date =  0;                
 	    }
         }
-              
+
+        /*
+         * Find the subtitle to display - this operation does not need lock, since
+         * only READY_SUBTITLEs are handled. If no picture has been selected,
+         * display_date will depend on the subtitle
+         */
+        //??
+
         /*
          * Perform rendering, sleep and display rendered picture
          */
-        if( p_pic )
+        if( p_pic )                            /* picture and perhaps subtitle */
         {
-            /* A picture is ready to be displayed : render it */
-            if( p_vout->b_active )
-            {                    
-                b_display = RenderPicture( p_vout, p_pic, 1 );
+            b_display = p_vout->b_active;            
+
+            if( b_display )
+            {                
+                /* Set picture dimensions and clear buffer */
+                SetBufferPicture( p_vout, p_pic );
+
+                /* Render picture and informations */
+                RenderPicture( p_vout, p_pic );             
                 if( p_vout->b_info )
                 {
-                    b_display |= RenderPictureInfo( p_vout, p_pic, b_display );
-                    b_display |= RenderInfo( p_vout, b_display );                    
-                }                    
+                    RenderPictureInfo( p_vout, p_pic );
+                    RenderInfo( p_vout );                
+                }
             }
-            else
-            {
-                b_display = 0;                
-            } 
-
+            
             /* Remove picture from heap */
             vlc_mutex_lock( &p_vout->picture_lock );
             p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
             vlc_mutex_unlock( &p_vout->picture_lock );                          
-        }            
-        else
-        {
-            /* No picture. However, an idle screen may be ready to display */
-            if( p_vout->b_active )
-            {                
-                b_display = RenderIdle( p_vout, 1 );
-                if( p_vout->b_info )
-                {                    
-                    b_display |= RenderInfo( p_vout, b_display );
-                }        
-            }
-            else
+
+            /* Render interface and subtitles */
+            if( b_display && p_vout->b_interface )
             {
-                b_display = 0;                
-            }            
+                RenderInterface( p_vout );                
+            }
+            if( p_sub )
+            {
+                if( b_display )
+                {                    
+                    RenderSubtitle( p_vout, p_sub );
+                }                
+
+                /* Remove subtitle from heap */
+                vlc_mutex_lock( &p_vout->subtitle_lock );
+                p_sub->i_status = DESTROYED_SUBTITLE;
+                vlc_mutex_unlock( &p_vout->subtitle_lock );                          
+            }
+
         }
+        else if( p_sub )                                     /* subtitle alone */
+        {
+            b_display = p_vout->b_active;
+
+            if( b_display )
+            {                
+                /* Clear buffer */
+                SetBufferPicture( p_vout, NULL );
+
+                /* Render informations, interface and subtitle */
+                if( p_vout->b_info )
+                {
+                    RenderInfo( p_vout );
+                }
+                if( p_vout->b_interface )
+                {
+                    RenderInterface( p_vout );
+                }
+                RenderSubtitle( p_vout, p_sub );            
+            }            
+
+            /* Remove subtitle from heap */
+            vlc_mutex_lock( &p_vout->subtitle_lock );
+            p_sub->i_status = DESTROYED_SUBTITLE;
+            vlc_mutex_unlock( &p_vout->subtitle_lock );                          
+        }
+        else                                              /* idle screen alone */
+        {            
+            //??? render on idle screen or interface change
+            b_display = 0;             //???
+        }
+
+        /*
+         * Sleep, wake up and display rendered picture
+         */
+
+#ifdef STATS
+        /* Store render time */
+        p_vout->render_time = mdate() - current_date;
+#endif
 
         /* Give back change lock */
         vlc_mutex_unlock( &p_vout->change_lock );        
 
         /* Sleep a while or until a given date */
-        if( p_pic )
+        if( display_date != 0 )
         {
-            mwait( pic_date );
+            mwait( display_date );
         }
         else
         {
             msleep( VOUT_IDLE_SLEEP );                
         }            
 
-        /* On awakening, take back lock and send immediately picture to display */
+        /* On awakening, take back lock and send immediately picture to display, 
+         * then swap buffers */
         vlc_mutex_lock( &p_vout->change_lock );        
-        if( b_display && p_vout->b_active && 
-            !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) )
+#ifdef DEBUG_VIDEO
+        intf_DbgMsg( "picture %p, subtitle %p\n", p_pic, p_sub );        
+#endif            
+        if( b_display && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) )
         {
             vout_SysDisplay( p_vout );
+            p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
         }
 
         /*
@@ -756,7 +841,7 @@ static void RunThread( vout_thread_t *p_vout)
     } 
 
     /*
-     * Error loop
+     * Error loop - wait until the thread destruction is requested
      */
     if( p_vout->b_error )
     {
@@ -765,6 +850,7 @@ static void RunThread( vout_thread_t *p_vout)
 
     /* End of thread */
     EndThread( p_vout );
+    DestroyThread( p_vout, THREAD_OVER ); 
     intf_DbgMsg( "thread end\n" );
 }
 
@@ -786,43 +872,58 @@ static void ErrorThread( vout_thread_t *p_vout )
     }
 }
 
-/******************************************************************************
+/*******************************************************************************
  * EndThread: thread destruction
- ******************************************************************************
+ *******************************************************************************
  * This function is called when the thread ends after a sucessfull 
- * initialization.
- ******************************************************************************/
+ * initialization. It frees all ressources allocated by InitThread.
+ *******************************************************************************/
 static void EndThread( vout_thread_t *p_vout )
 {
-    int *   pi_status;                                       /* thread status */
-    int     i_picture;
-        
+    int     i_index;                                          /* index in heap */
+            
     /* Store status */
     intf_DbgMsg("\n");
-    pi_status = p_vout->pi_status;    
-    *pi_status = THREAD_END;    
+    *p_vout->pi_status = THREAD_END;    
 
-    /* Destroy all remaining pictures */
-    for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
+    /* Destroy all remaining pictures and subtitles */
+    for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
     {
-	if( p_vout->p_picture[i_picture].i_status != FREE_PICTURE )
+	if( p_vout->p_picture[i_index].i_status != FREE_PICTURE )
 	{
-            free( p_vout->p_picture[i_picture].p_data );
+            free( p_vout->p_picture[i_index].p_data );
         }
+        if( p_vout->p_subtitle[i_index].i_status != FREE_SUBTITLE )
+        {
+            free( p_vout->p_subtitle[i_index].p_data );            
+        }        
     }
 
     /* Destroy translation tables */
-    vout_EndTables( p_vout );
+    vout_EndTables( p_vout );  
+    vout_SysEnd( p_vout );    
+}
+
+/*******************************************************************************
+ * DestroyThread: thread destruction
+ *******************************************************************************
+ * This function is called when the thread ends. It frees all ressources
+ * allocated by CreateThread. Status is available at this stage.
+ *******************************************************************************/
+static void DestroyThread( vout_thread_t *p_vout, int i_status )
+{  
+    int *pi_status;                                           /* status adress */
+    
+    /* Store status adress */
+    intf_DbgMsg("\n");
+    pi_status = p_vout->pi_status;    
     
     /* Destroy thread structures allocated by Create and InitThread */
-    vout_SysEnd( p_vout );
     vout_UnloadFont( p_vout->p_default_font );
     vout_UnloadFont( p_vout->p_large_font ); 
     vout_SysDestroy( p_vout );
     free( p_vout );
-
-    /* Update status */
-    *pi_status = THREAD_OVER;    
+    *pi_status = i_status;    
 }
 
 /*******************************************************************************
@@ -865,55 +966,308 @@ void Print( vout_thread_t *p_vout, int i_x, int i_y, int i_halign, int i_valign,
         return;        
     }    
 
-    /* Print text */
-    vout_Print( p_vout->p_default_font, vout_SysGetPicture( p_vout ) + 
+    /* Set area and print text */
+    SetBufferArea( p_vout, i_x, i_y, i_text_width, i_text_height );    
+    vout_Print( p_vout->p_default_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data + 
                 i_y * p_vout->i_bytes_per_line + i_x * p_vout->i_bytes_per_pixel,
                 p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line, 
-                0xffffffff, 0x00000000, 0x00000000, 0, psz_text );
+                0xffffffff, 0x00000000, 0x00000000, TRANSPARENT_TEXT, psz_text );
 }
 
-/******************************************************************************
- * RenderBlank: render a blank screen
- ******************************************************************************
- * This function is called by all other rendering functions when they arrive on
- * a non blanked screen.
- ******************************************************************************/
-static void RenderBlank( vout_thread_t *p_vout )
+/*******************************************************************************
+ * SetBufferArea: activate an area in current buffer
+ *******************************************************************************
+ * This function is called when something is rendered on the current buffer.
+ * It set the area as active and prepare it to be cleared on next rendering.
+ * Pay attention to the fact that in this functions, i_h is in fact the end y
+ * coordinate of the new area.
+ *******************************************************************************/
+static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int i_h )
 {
-    //?? toooooo slow
-    int  i_index;                                   /* current 64 bits sample */    
-    int  i_width;                                /* number of 64 bits samples */    
-    u64 *p_pic;                                 /* pointer to 64 bits samples */
+    vout_buffer_t *     p_buffer;                            /* current buffer */
+    int                 i_area_begin, i_area_end;   /* area vertical extension */
+    int                 i_area, i_area_copy;                     /* area index */    
+    int                 i_area_shift;              /* shift distance for areas */    
     
-    /* Initialize variables */
-    p_pic =     vout_SysGetPicture( p_vout );
-    i_width =   p_vout->i_bytes_per_line * p_vout->i_height / 256;
-
-    /* Clear beginning of screen by 256 bytes blocks */
-    for( i_index = 0; i_index < i_width; i_index++ )
+    /* Choose buffer and modify h to end of area position */
+    p_buffer =  &p_vout->p_buffer[ p_vout->i_buffer_index ];    
+    i_h +=      i_y - 1;
+ 
+    /* 
+     * Remove part of the area which is inside the picture - this is done
+     * by calling again SetBufferArea with the correct areas dimensions.
+     */
+    if( (i_x >= p_buffer->i_pic_x) && (i_x + i_w <= p_buffer->i_pic_x + p_buffer->i_pic_width) )
     {
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
-        *p_pic++ = 0;   *p_pic++ = 0;
+        i_area_begin =  p_buffer->i_pic_y;
+        i_area_end =    i_area_begin + p_buffer->i_pic_height - 1;
+
+        if( ((i_y >= i_area_begin) && (i_y <= i_area_end)) ||
+            ((i_h >= i_area_begin) && (i_h <= i_area_end)) ||
+            ((i_y <  i_area_begin) && (i_h > i_area_end)) )
+        {                    
+            /* Keep the stripe above the picture, if any */
+            if( i_y < i_area_begin )
+            {
+                SetBufferArea( p_vout, i_x, i_y, i_w, i_area_begin - i_y );            
+            }
+            /* Keep the stripe below the picture, if any */
+            if( i_h > i_area_end )
+            {
+                SetBufferArea( p_vout, i_x, i_area_end, i_w, i_h - i_area_end );
+            }        
+            return;
+        }        
+    }   
+
+    /* Skip some extensions until interesting areas */
+    for( i_area = 0; 
+         (i_area < p_buffer->i_areas) &&
+             (p_buffer->pi_area_end[i_area] + 1 <= i_y); 
+         i_area++ )
+    {
+        ;        
+    }
+    
+    if( i_area == p_buffer->i_areas )
+    {
+        /* New area is below all existing ones: just add it at the end of the 
+         * array, if possible - else, append it to the last one */
+        if( i_area < VOUT_MAX_AREAS )
+        {
+            p_buffer->pi_area_begin[i_area] = i_y;
+            p_buffer->pi_area_end[i_area] = i_h;            
+            p_buffer->i_areas++;            
+        }
+        else
+        {
+#ifdef DEBUG_VIDEO
+            intf_DbgMsg("areas overflow\n");            
+#endif
+            p_buffer->pi_area_end[VOUT_MAX_AREAS - 1] = i_h;  
+        }        
+    }
+    else 
+    {
+        i_area_begin =  p_buffer->pi_area_begin[i_area];
+        i_area_end =    p_buffer->pi_area_end[i_area];
+        
+        if( i_y < i_area_begin ) 
+        {
+            if( i_h >= i_area_begin - 1 )
+            {                
+                /* Extend area above */
+                p_buffer->pi_area_begin[i_area] = i_y;
+            }
+            else
+            {
+                /* Create a new area above : merge last area if overflow, then 
+                 * move all old areas down */
+                if( p_buffer->i_areas == VOUT_MAX_AREAS )
+                {                    
+#ifdef DEBUG_VIDEO
+                    intf_DbgMsg("areas overflow\n");       
+#endif
+                    p_buffer->pi_area_end[VOUT_MAX_AREAS - 2] = p_buffer->pi_area_end[VOUT_MAX_AREAS - 1];                    
+                }
+                else
+                {
+                    p_buffer->i_areas++;                    
+                }
+                for( i_area_copy = p_buffer->i_areas - 1; i_area_copy > i_area; i_area_copy++ )
+                {
+                    p_buffer->pi_area_begin[i_area_copy] = p_buffer->pi_area_begin[i_area_copy - 1];
+                    p_buffer->pi_area_end[i_area_copy] =   p_buffer->pi_area_end[i_area_copy - 1];
+                }
+                p_buffer->pi_area_begin[i_area] = i_y;
+                p_buffer->pi_area_end[i_area] = i_h;
+                return;
+            }              
+        }
+        if( i_h > i_area_end )
+        {
+            /* Find further areas which can be merged with the new one */
+            for( i_area_copy = i_area + 1; 
+                 (i_area_copy < p_buffer->i_areas) &&
+                     (p_buffer->pi_area_begin[i_area] <= i_h);
+                 i_area_copy++ )
+            {
+                ;                
+            }
+            i_area_copy--;            
+
+            if( i_area_copy != i_area )
+            {
+                /* Merge with last possible areas */
+                p_buffer->pi_area_end[i_area] = MAX( i_h, p_buffer->pi_area_end[i_area_copy] );
+
+                /* Shift lower areas upward */
+                i_area_shift = i_area_copy - i_area;                
+                p_buffer->i_areas -= i_area_shift;
+                for( i_area_copy = i_area + 1; i_area_copy < p_buffer->i_areas; i_area_copy++ )
+                {
+                    p_buffer->pi_area_begin[i_area_copy] = p_buffer->pi_area_begin[i_area_copy + i_area_shift];
+                    p_buffer->pi_area_end[i_area_copy] =   p_buffer->pi_area_end[i_area_copy + i_area_shift];
+                }
+            }
+            else
+            {
+                /* Extend area below */
+                p_buffer->pi_area_end[i_area] = i_h;
+            }            
+        }
+    }
+}
+
+/*******************************************************************************
+ * SetBufferPicture: clear buffer and set picture area
+ *******************************************************************************
+ * This function is called before any rendering. It clears the current 
+ * rendering buffer and set the new picture area. If the picture pointer is
+ * NULL, then no picture area is defined. Floating operations are avoided since
+ * some MMX calculations may follow.
+ *******************************************************************************/
+static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    vout_buffer_t *     p_buffer;                            /* current buffer */
+    int                 i_pic_x, i_pic_y;                  /* picture position */
+    int                 i_pic_width, i_pic_height;       /* picture dimensions */    
+    int                 i_old_pic_y, i_old_pic_height;     /* old picture area */    
+    int                 i_vout_width, i_vout_height;     /* display dimensions */
+    int                 i_area;                                  /* area index */    
+    int                 i_data_index;                       /* area data index */    
+    int                 i_data_size;     /* area data size, in 256 bytes blocs */
+    u64 *               p_data;                                   /* area data */    
+    
+    /* Choose buffer and set display dimensions */
+    p_buffer =          &p_vout->p_buffer[ p_vout->i_buffer_index ];    
+    i_vout_width =      p_vout->i_width;
+    i_vout_height =     p_vout->i_height;    
+
+    /*
+     * Computes new picture size 
+     */
+    if( p_pic != NULL )
+    {
+        /* Try horizontal scaling first */
+        i_pic_width = ( p_vout->b_scale || (p_pic->i_width > i_vout_width)) ? 
+            i_vout_width : p_pic->i_width;
+        i_pic_width = i_pic_width / 16 * 16; //?? currently, width must be multiple of 16        
+        switch( p_pic->i_aspect_ratio )
+        {
+        case AR_3_4_PICTURE:
+            i_pic_height = i_pic_width * 3 / 4;
+            break;                
+        case AR_16_9_PICTURE:
+            i_pic_height = i_pic_width * 9 / 16;
+            break;
+        case AR_221_1_PICTURE:        
+            i_pic_height = i_pic_width * 100 / 221;
+            break;               
+        case AR_SQUARE_PICTURE:
+        default:
+            i_pic_height = p_pic->i_height * i_pic_width / p_pic->i_width;            
+            break;
+        }
+
+        /* If picture dimensions using horizontal scaling are too large, use 
+         * vertical scaling */
+        if( i_pic_height > i_vout_height )
+        {
+            i_pic_height = ( p_vout->b_scale || (p_pic->i_height > i_vout_height)) ? 
+                i_vout_height : p_pic->i_height;
+            switch( p_pic->i_aspect_ratio )
+            {
+            case AR_3_4_PICTURE:
+                i_pic_width = i_pic_height * 4 / 3;
+                break;                
+            case AR_16_9_PICTURE:
+                i_pic_width = i_pic_height * 16 / 9;
+                break;
+            case AR_221_1_PICTURE:        
+                i_pic_width = i_pic_height * 221 / 100;
+                break;               
+            case AR_SQUARE_PICTURE:
+            default:
+                i_pic_width = p_pic->i_width * i_pic_height / p_pic->i_height;
+                break;
+            }        
+            i_pic_width = i_pic_width / 16 * 16; //?? currently, width must be multiple of 16        
+        }        
+
+        /* Set picture position */
+        i_pic_x = (p_vout->i_width - i_pic_width) / 2;
+        i_pic_y = (p_vout->i_height - i_pic_height) / 2;                
+    }    
+    else
+    {
+        /* No picture: size is 0 */
+        i_pic_x =       0;
+        i_pic_y =       0;
+        i_pic_width =   0;
+        i_pic_height =  0;
     }
 
-    /* Clear last pixels */
-    //??
-}
+    /*
+     * Set new picture size - if is is smaller than the previous one, clear 
+     * around it. Since picture are centered, only their size is tested.
+     */                                          
+    if( (p_buffer->i_pic_width > i_pic_width) || (p_buffer->i_pic_height > i_pic_height) )
+    {
+        i_old_pic_y =            p_buffer->i_pic_y;
+        i_old_pic_height =       p_buffer->i_pic_height;
+        p_buffer->i_pic_x =      i_pic_x;
+        p_buffer->i_pic_y =      i_pic_y;
+        p_buffer->i_pic_width =  i_pic_width;
+        p_buffer->i_pic_height = i_pic_height;                        
+        SetBufferArea( p_vout, 0, i_old_pic_y, p_vout->i_width, i_old_pic_height );
+    }
+    else
+    {
+        p_buffer->i_pic_x =      i_pic_x;
+        p_buffer->i_pic_y =      i_pic_y;
+        p_buffer->i_pic_width =  i_pic_width;
+        p_buffer->i_pic_height = i_pic_height;    
+    }
 
+    /*
+     * Clear areas
+     */
+    for( i_area = 0; i_area < p_buffer->i_areas; i_area++ )
+    {
+#ifdef DEBUG_VIDEO    
+        intf_DbgMsg("clearing picture %p area: %d-%d\n", p_pic, 
+                    p_buffer->pi_area_begin[i_area], p_buffer->pi_area_end[i_area]);    
+#endif
+        p_data = (u64*) (p_buffer->p_data + p_vout->i_bytes_per_line * p_buffer->pi_area_begin[i_area]);
+        i_data_size = (p_buffer->pi_area_end[i_area] - p_buffer->pi_area_begin[i_area] + 1) * 
+            p_vout->i_bytes_per_line / 256;
+        for( i_data_index = 0; i_data_index < i_data_size; i_data_index++ )
+        {
+            /* Clear 256 bytes block */
+            *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
+            *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
+            *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
+            *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
+            *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
+            *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
+            *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
+            *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
+        }
+        i_data_size = (p_buffer->pi_area_end[i_area] - p_buffer->pi_area_begin[i_area] + 1) *
+            p_vout->i_bytes_per_line % 256 / 4;
+        for( i_data_index = 0; i_data_index < i_data_size; i_data_index++ )
+        {
+            /* Clear remaining 4 bytes blocks */
+            *p_data++ = 0;
+        }
+    }    
+
+    /*
+     * Clear areas array
+     */
+    p_buffer->i_areas = 0;
+}
 
 /******************************************************************************
  * RenderPicture: render a picture
@@ -923,66 +1277,35 @@ static void RenderBlank( vout_thread_t *p_vout )
  * rendered picture has been determined as existant, and will only be destroyed
  * by the vout thread later.
  ******************************************************************************/
-static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank )
+static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    int         i_display_height, i_display_width;      /* display dimensions */
-    int         i_height, i_width;               /* source picture dimensions */
-    int         i_scaled_height;              /* scaled height of the picture */   
-    int         i_aspect_scale;                /* aspect ratio vertical scale */
-    int         i_eol;                       /* end of line offset for source */    
-    byte_t *    p_convert_dst;                      /* convertion destination */        
+    vout_buffer_t *     p_buffer;                         /* rendering buffer */    
+    byte_t *            p_convert_dst;              /* convertion destination */
+    int                 i_width, i_height, i_eol, i_pic_eol, i_scale;        /* ?? tmp variables*/
     
-#ifdef STATS
-    /* Start recording render time */
-    p_vout->render_time = mdate();
-#endif
-
-    /* Mark last picture date */
+    /* Get and set rendering informations */
+    p_buffer = &p_vout->p_buffer[ p_vout->i_buffer_index ];    
     p_vout->last_picture_date = p_pic->date;
-    i_width =                   p_pic->i_width;    
-    i_height =                  p_pic->i_height;
-    i_display_width =           p_vout->i_width;    
-    i_display_height =          p_vout->i_height;    
+    p_convert_dst = p_buffer->p_data + p_buffer->i_pic_x * p_vout->i_bytes_per_pixel +
+        p_buffer->i_pic_y * p_vout->i_bytes_per_line;
 
-    /* Select scaling depending of aspect ratio */
-    switch( p_pic->i_aspect_ratio )
-    {
-    case AR_3_4_PICTURE:
-        i_aspect_scale = (4 * i_height - 3 * i_width) ? 
-            1 + 3 * i_width / ( 4 * i_height - 3 * i_width ) : 0;
-        break;
-    case AR_16_9_PICTURE:
-        i_aspect_scale = ( 16 * i_height - 9 * i_width ) ? 
-            1 + 9 * i_width / ( 16 * i_height - 9 * i_width ) : 0;
-        break;
-    case AR_221_1_PICTURE:        
-        i_aspect_scale = ( 221 * i_height - 100 * i_width ) ?
-            1 + 100 * i_width / ( 221 * i_height - 100 * i_width ) : 0;
-        break;               
-    case AR_SQUARE_PICTURE:
-    default:
-        i_aspect_scale = 0;        
-    }
-    i_scaled_height = (i_aspect_scale ? i_height * (i_aspect_scale - 1) / i_aspect_scale : i_height);
-    
-    /* Crop picture if too large for the screen */
-    if( i_width > i_display_width )
-    {
-        i_eol = i_width - i_display_width / 16 * 16;
-        i_width = i_display_width / 16 * 16;        
-    }
+    // ?? temporary section: rebuild aspect scale from size informations.
+    // ?? when definitive convertion prototype will be used, those info will
+    // ?? no longer be required
+    i_width = MIN( p_pic->i_width, p_buffer->i_pic_width );
+    i_eol = p_pic->i_width - i_width / 16 * 16;
+    i_pic_eol = p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width;    
+    if( p_pic->i_height == p_buffer->i_pic_height )
+    {        
+        i_scale = 0;    
+    }    
     else
     {
-        i_eol = 0;        
-    }
-    if( i_scaled_height > i_display_height )
-    {
-        i_height = (i_aspect_scale * i_display_height / (i_aspect_scale - 1)) / 2 * 2;
-        i_scaled_height = i_display_height;        
+        i_scale = p_pic->i_height / (p_pic->i_height - p_buffer->i_pic_height);        
     }    
-    p_convert_dst = vout_SysGetPicture( p_vout ) + 
-        ( i_display_width - i_width ) / 2 * p_vout->i_bytes_per_pixel +
-        ( i_display_height - i_scaled_height ) / 2 * p_vout->i_bytes_per_line;
+    i_eol = p_pic->i_width - p_buffer->i_pic_width;    
+    i_height = p_pic->i_height * i_width / p_pic->i_width;
+    // ?? end of temporary code
 
     /*
      * Choose appropriate rendering function and render picture
@@ -992,23 +1315,20 @@ static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_b
     case YUV_420_PICTURE:
         p_vout->p_ConvertYUV420( p_vout, p_convert_dst, 
                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                 i_width, i_height, i_eol, 
-                                 p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width,
-                                 i_aspect_scale, p_pic->i_matrix_coefficients );
+                                 i_width, i_height, i_eol, i_pic_eol, i_scale, 
+                                 p_pic->i_matrix_coefficients );
         break;        
     case YUV_422_PICTURE:
         p_vout->p_ConvertYUV422( p_vout, p_convert_dst, 
                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                 i_width, i_height, i_eol, 
-                                 p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width,
-                                 i_aspect_scale, p_pic->i_matrix_coefficients );
+                                 i_width, i_height, i_eol, i_pic_eol, i_scale, 
+                                 p_pic->i_matrix_coefficients );
         break;        
     case YUV_444_PICTURE:
         p_vout->p_ConvertYUV444( p_vout, p_convert_dst, 
                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                 i_width, i_height, i_eol, 
-                                 p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width,
-                                 i_aspect_scale, p_pic->i_matrix_coefficients );
+                                 i_width, i_height, i_eol, i_pic_eol, i_scale, 
+                                 p_pic->i_matrix_coefficients );
         break;                
 #ifdef DEBUG
     default:        
@@ -1016,12 +1336,6 @@ static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_b
         break;        
 #endif
     }
-
-#ifdef STATS
-    /* End recording render time */
-    p_vout->render_time = mdate() - p_vout->render_time;
-#endif
-    return( 1 );    
 }
 
 /******************************************************************************
@@ -1030,9 +1344,11 @@ static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_b
  * This function will print informations such as fps and other picture
  * dependant informations.
  ******************************************************************************/
-static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank )
+static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
 {
+#if defined(STATS) || defined(DEBUG)
     char        psz_buffer[256];                             /* string buffer */
+#endif
 
 #ifdef STATS
     /* 
@@ -1041,24 +1357,24 @@ static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t
     if( p_vout->c_fps_samples > VOUT_FPS_SAMPLES )
     {        
         sprintf( psz_buffer, "%.2f fps", (double) VOUT_FPS_SAMPLES * 1000000 /
-                 ( p_vout->fps_sample[ (p_vout->c_fps_samples - 1) % VOUT_FPS_SAMPLES ] -
-                   p_vout->fps_sample[ p_vout->c_fps_samples % VOUT_FPS_SAMPLES ] ) );        
+                 ( p_vout->p_fps_sample[ (p_vout->c_fps_samples - 1) % VOUT_FPS_SAMPLES ] -
+                   p_vout->p_fps_sample[ p_vout->c_fps_samples % VOUT_FPS_SAMPLES ] ) );        
         Print( p_vout, p_vout->i_width, 0, 1, -1, psz_buffer );
     }
 
     /* 
      * Print frames count and loop time in upper left corner 
      */
-    sprintf( psz_buffer, "%ld frames   render time: %lu us", 
-             p_vout->c_fps_samples, (long unsigned) p_vout->render_time );
-    Print( p_vout, 0, 0, -1, -1, psz_buffer );    
+    sprintf( psz_buffer, "%ld frames   rendering: %ld us", 
+             (long) p_vout->c_fps_samples, (long) p_vout->render_time );
+    Print( p_vout, 0, 0, -1, -1, psz_buffer );
 #endif
 
 #ifdef DEBUG
     /*
      * Print picture information in lower right corner
      */
-    sprintf( psz_buffer, "%s picture %dx%d (%dx%d%+d%+d %s)",
+    sprintf( psz_buffer, "%s picture %dx%d (%dx%d%+d%+d %s) -> %dx%d+%d+%d",
              (p_pic->i_type == YUV_420_PICTURE) ? "4:2:0" :
              ((p_pic->i_type == YUV_422_PICTURE) ? "4:2:2" :
               ((p_pic->i_type == YUV_444_PICTURE) ? "4:4:4" : "ukn-type")),
@@ -1068,33 +1384,25 @@ static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t
              (p_pic->i_aspect_ratio == AR_SQUARE_PICTURE) ? "sq" :
              ((p_pic->i_aspect_ratio == AR_3_4_PICTURE) ? "4:3" :
               ((p_pic->i_aspect_ratio == AR_16_9_PICTURE) ? "16:9" :
-               ((p_pic->i_aspect_ratio == AR_221_1_PICTURE) ? "2.21:1" : "ukn-ar" ))));    
+               ((p_pic->i_aspect_ratio == AR_221_1_PICTURE) ? "2.21:1" : "ukn-ar" ))),
+             p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_width,
+             p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_height,
+             p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_x,
+             p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_y );    
     Print( p_vout, p_vout->i_width, p_vout->i_height, 1, 1, psz_buffer );
 #endif
-    
-    return( 0 );    
 }
 
 /******************************************************************************
  * RenderIdle: render idle picture
  ******************************************************************************
- * This function will clear the display or print a logo.
+ * This function will print something on the screen.
  ******************************************************************************/
-static int RenderIdle( vout_thread_t *p_vout, boolean_t b_blank )
+static void RenderIdle( vout_thread_t *p_vout )
 {
-    /* Blank screen if required */
-    if( (mdate() - p_vout->last_picture_date > VOUT_IDLE_DELAY) &&
-        (p_vout->last_picture_date > p_vout->last_display_date) &&
-        b_blank )
-    {        
-        RenderBlank( p_vout );
-        p_vout->last_display_date = mdate();        
-        Print( p_vout, p_vout->i_width / 2, p_vout->i_height / 2, 0, 0, 
-               "no stream" );        //??
-        return( 1 );        
-    }
-
-    return( 0 );    
+    //??
+    Print( p_vout, p_vout->i_width / 2, p_vout->i_height / 2, 0, 0, 
+           "no stream" );        //??
 }
 
 /******************************************************************************
@@ -1103,10 +1411,10 @@ static int RenderIdle( vout_thread_t *p_vout, boolean_t b_blank )
  * This function render informations which do not depend of the current picture
  * rendered.
  ******************************************************************************/
-static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
+static void RenderInfo( vout_thread_t *p_vout )
 {
-    char        psz_buffer[256];                             /* string buffer */
 #ifdef DEBUG
+    char        psz_buffer[256];                             /* string buffer */
     int         i_ready_pic = 0;                            /* ready pictures */
     int         i_reserved_pic = 0;                      /* reserved pictures */
     int         i_picture;                                   /* picture index */
@@ -1130,14 +1438,70 @@ static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
             break;            
         }        
     }
-    sprintf( psz_buffer, "%dx%d:%d g%+.2f   pic: %d/%d/%d", 
-             p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth, 
-             p_vout->f_gamma, i_reserved_pic, i_ready_pic,
-             VOUT_MAX_PICTURES );
+    sprintf( psz_buffer, "pic: %d/%d/%d", 
+             i_reserved_pic, i_ready_pic, VOUT_MAX_PICTURES );
     Print( p_vout, 0, p_vout->i_height, -1, 1, psz_buffer );    
 #endif
+}
 
-   return( 0 );    
+/*******************************************************************************
+ * RenderSubtitle: render a subtitle
+ *******************************************************************************
+ * This function render a subtitle.
+ *******************************************************************************/
+static void RenderSubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
+{
+    //??
+}
+
+/*******************************************************************************
+ * RenderInterface: render the interface
+ *******************************************************************************
+ * This function render the interface, if any.
+ * ?? this is obviously only a temporary interface !
+ *******************************************************************************/
+static void RenderInterface( vout_thread_t *p_vout )
+{
+    int         i_height, i_text_height;              /* total and text height */
+    int         i_width_1, i_width_2;                            /* text width */
+    int         i_byte;                                          /* byte index */    
+    const char *psz_text_1 = "[1-9] Channel   [i]nfo   [c]olor     [g/G]amma";
+    const char *psz_text_2 = "[+/-] Volume    [m]ute   [s]caling   [Q]uit";    
+
+    /* Get text size */
+    vout_TextSize( p_vout->p_large_font, OUTLINED_TEXT | TRANSPARENT_TEXT, psz_text_1, &i_width_1, &i_height );
+    vout_TextSize( p_vout->p_large_font, OUTLINED_TEXT | TRANSPARENT_TEXT, psz_text_2, &i_width_2, &i_text_height );
+    i_height += i_text_height;
+
+    /* Render background - effective background color will depend of the screen
+     * depth */
+    for( i_byte = (p_vout->i_height - i_height) * p_vout->i_bytes_per_line;
+         i_byte < p_vout->i_height * p_vout->i_bytes_per_line;
+         i_byte++ )
+    {
+        p_vout->p_buffer[ p_vout->i_buffer_index ].p_data[ i_byte ] = 0x33;        
+    }    
+
+    /* Render text, if not larger than screen */
+    if( i_width_1 < p_vout->i_width )
+    {        
+        vout_Print( p_vout->p_large_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
+                    (p_vout->i_height - i_height) * p_vout->i_bytes_per_line,
+                    p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
+                    0xffffffff, 0x00000000, 0x00000000,
+                    OUTLINED_TEXT | TRANSPARENT_TEXT, psz_text_1 );
+    }
+    if( i_width_2 < p_vout->i_width )
+    {        
+        vout_Print( p_vout->p_large_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
+                    (p_vout->i_height - i_height + i_text_height) * p_vout->i_bytes_per_line,
+                    p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
+                    0xffffffff, 0x00000000, 0x00000000,
+                    OUTLINED_TEXT | TRANSPARENT_TEXT, psz_text_2 );
+    }    
+
+    /* Activate modified area */
+    SetBufferArea( p_vout, 0, p_vout->i_height - i_height, p_vout->i_width, i_height );
 }
 
 /******************************************************************************
@@ -1147,6 +1511,14 @@ static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
  ******************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
+#ifdef DEBUG_VIDEO
+    if( p_vout->i_changes )
+    {
+        intf_DbgMsg("changes: 0x%x (no display: 0x%x)\n", p_vout->i_changes, 
+                    p_vout->i_changes & VOUT_NODISPLAY_CHANGE );        
+    }    
+#endif
+
     /* On gamma or grayscale change, rebuild tables */
     if( p_vout->i_changes & (VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE) )
     {
@@ -1155,7 +1527,7 @@ static int Manage( vout_thread_t *p_vout )
 
     /* Clear changes flags which does not need management or have been handled */
     p_vout->i_changes &= ~(VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE |
-                           VOUT_INFO_CHANGE );
+                           VOUT_INFO_CHANGE | VOUT_INTF_CHANGE | VOUT_SCALE_CHANGE );
 
     /* Detect unauthorized changes */
     if( p_vout->i_changes )

@@ -48,7 +48,6 @@ typedef struct vout_sys_s
     GC                  gc;                /* graphic context instance handler */    
 
     /* Display buffers and shared memory information */
-    int                 i_buffer_index;                        /* buffer index */
     XImage *            p_ximage[2];                         /* XImage pointer */   
     XShmSegmentInfo     shm_info[2];         /* shared memory zone information */
 } vout_sys_t;
@@ -157,8 +156,11 @@ int vout_SysInit( vout_thread_t *p_vout )
     /* Set bytes per line */
     p_vout->i_bytes_per_line = p_vout->p_sys->p_ximage[0]->bytes_per_line;    
 
-    /* Set buffer index to 0 */
-    p_vout->p_sys->i_buffer_index = 0;
+    /* Set and initialize buffers */
+    p_vout->p_buffer[0].p_data = p_vout->p_sys->p_ximage[ 0 ]->data;    
+    p_vout->p_buffer[1].p_data = p_vout->p_sys->p_ximage[ 1 ]->data;
+    vout_ClearBuffer( p_vout, &p_vout->p_buffer[0] );
+    vout_ClearBuffer( p_vout, &p_vout->p_buffer[1] );    
     return( 0 );
 }
 
@@ -222,7 +224,7 @@ int vout_SysManage( vout_thread_t *p_vout )
             intf_ErrMsg("error: can't resize display\n");
             return( 1 );            
         }
-        intf_Msg("Video display resized to %dx%d\n", p_vout->i_width, p_vout->i_height);            
+        intf_Msg("Video display resized (%dx%d)\n", p_vout->i_width, p_vout->i_height);
     }
     
     return 0;
@@ -240,10 +242,10 @@ void vout_SysDisplay( vout_thread_t *p_vout )
     {
         /* Display rendered image using shared memory extension */
         XShmPutImage(p_vout->p_sys->p_display, p_vout->p_sys->window, p_vout->p_sys->gc, 
-                     p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ], 
+                     p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ], 
                      0, 0, 0, 0,  
-                     p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->width,  
-                     p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->height, True);
+                     p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->width,  
+                     p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->height, True);
 
         /* Send the order to the X server */
         XFlush(p_vout->p_sys->p_display);
@@ -251,27 +253,14 @@ void vout_SysDisplay( vout_thread_t *p_vout )
     else                                  /* regular X11 capabilities are used */
     {
         XPutImage(p_vout->p_sys->p_display, p_vout->p_sys->window, p_vout->p_sys->gc, 
-                  p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ], 
+                  p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ], 
                   0, 0, 0, 0,  
-                  p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->width,  
-                  p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->height);
+                  p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->width,  
+                  p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->height);
 
         /* Send the order to the X server */
         XFlush(p_vout->p_sys->p_display);
     }
-
-    /* Swap buffers */
-    p_vout->p_sys->i_buffer_index = ++p_vout->p_sys->i_buffer_index & 1;
-}
-
-/*******************************************************************************
- * vout_SysGetPicture: get current display buffer informations
- *******************************************************************************
- * This function returns the address of the current display buffer.
- *******************************************************************************/
-void * vout_SysGetPicture( vout_thread_t *p_vout )
-{
-    return( p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->data );        
 }
 
 /* following functions are local */

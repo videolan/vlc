@@ -117,6 +117,5 @@ typedef struct subtitle_s
 #define FREE_SUBTITLE           0        /* subtitle is free and not allocated */
 #define RESERVED_SUBTITLE       1        /* subtitle is allocated and reserved */
 #define READY_SUBTITLE          2             /* subtitle is ready for display */
-#define DISPLAYED_SUBTITLE      3 /* subtitle has been displayed but is linked */
-#define DESTROYED_SUBTITLE      4    /* subtitle is allocated but no more used */
+#define DESTROYED_SUBTITLE      3    /* subtitle is allocated but no more used */
 

@@ -175,7 +175,7 @@ static void PutByte32( u32 *p_pic, int i_byte, byte_t i_char, byte_t i_border, b
  * This function will try to open a .psf font and load it. It will return
  * NULL on error.
  *******************************************************************************/
-vout_font_t *vout_LoadFont( char *psz_name )
+vout_font_t *vout_LoadFont( const char *psz_name )
 {
     int                 i_char, i_line;          /* character and line indexes */    
     int                 i_file;                                 /* source file */
@@ -305,7 +305,7 @@ void vout_UnloadFont( vout_font_t *p_font )
  * This function is used to align text. It returns the width and height of a
  * given text. 
  *******************************************************************************/
-void vout_TextSize( vout_font_t *p_font, int i_style, char *psz_text, int *pi_width, int *pi_height )
+void vout_TextSize( vout_font_t *p_font, int i_style, const char *psz_text, int *pi_width, int *pi_height )
 {
     switch( p_font->i_type )
     {
@@ -333,7 +333,7 @@ void vout_TextSize( vout_font_t *p_font, int i_style, char *psz_text, int *pi_wi
  * loaded bitmap font.
  *******************************************************************************/
 void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int i_bytes_per_line, 
-                 u32 i_char_color, u32 i_border_color, u32 i_bg_color, int i_style, char *psz_text )
+                 u32 i_char_color, u32 i_border_color, u32 i_bg_color, int i_style, const char *psz_text )
 {
     byte_t      *p_char, *p_border;          /* character and border mask data */    
     int         i_char_mask, i_border_mask, i_bg_mask;                /* masks */    

@@ -10,8 +10,8 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
-#include <errno.h>
 #include <math.h>
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -46,6 +46,7 @@ const int MATRIX_COEFFICIENTS_TABLE[8][4] =
  *******************************************************************************/
 static int      BinaryLog         ( u32 i );
 static void     MaskToShift       ( int *pi_right, int *pi_left, u32 i_mask );
+static void     SetGammaTable     ( int *pi_table, double f_gamma );
 static void     SetTables         ( vout_thread_t *p_vout );
 
 static void     ConvertY4Gray16   ( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
@@ -387,24 +388,38 @@ static void MaskToShift (int *pi_right, int *pi_left, u32 i_mask)
 }
 
 /*******************************************************************************
- * SetTables: compute tables and set function pointers
+ * SetGammaTable: return intensity table transformed by gamma curve.
+ *******************************************************************************
+ * pi_table is a table of 256 entries from 0 to 255.
  *******************************************************************************/
+static void SetGammaTable( int *pi_table, double f_gamma )
+{
+    int         i_y;                                         /* base intensity */
+
+    /* Use exp(gamma) instead of gamma */
+    f_gamma = exp(f_gamma );
+
+    /* Build gamma table */
+    for( i_y = 0; i_y < 256; i_y++ )
+    {
+        pi_table[ i_y ] = pow( (double)i_y / 256, f_gamma ) * 256;
+    }
+ }
+
+/*******************************************************************************
+ * SetTables: compute tables and set function pointers
++ *******************************************************************************/
 static void SetTables( vout_thread_t *p_vout )
 {
-    u8          i_gamma[256];                                   /* gamma table */    
+    int         pi_gamma[256];                                  /* gamma table */    
     int         i_index;                                    /* index in tables */
     int         i_red_right, i_red_left;                         /* red shifts */
     int         i_green_right, i_green_left;                   /* green shifts */
     int         i_blue_right, i_blue_left;                      /* blue shifts */
 
-    /*
-     * Build gamma table 
-     */     
-    for( i_index = 0; i_index < 256; i_index++ )
-    {
-        i_gamma[i_index] = 255. * pow( (double)i_index / 255., exp(p_vout->f_gamma) );        
-    }
-
+    /* Build gamma table */    
+    SetGammaTable( pi_gamma, p_vout->f_gamma );
+    
     /*          
      * Set color masks and shifts
      */
@@ -447,9 +462,9 @@ static void SetTables( vout_thread_t *p_vout )
             for( i_index = -384; i_index < 640; i_index++) 
             {
                 p_vout->tables.yuv.gray16.p_gray[ i_index ] = 
-                    ((i_gamma[CLIP_BYTE( i_index )] >> i_red_right)   << i_red_left)   |
-                    ((i_gamma[CLIP_BYTE( i_index )] >> i_green_right) << i_green_left) |
-                    ((i_gamma[CLIP_BYTE( i_index )] >> i_blue_right)  << i_blue_left);                
+                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_red_right)   << i_red_left)   |
+                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_green_right) << i_green_left) |
+                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_blue_right)  << i_blue_left);                
             }
             break;        
         case 24:
@@ -458,9 +473,9 @@ static void SetTables( vout_thread_t *p_vout )
             for( i_index = -384; i_index < 640; i_index++) 
             {
                 p_vout->tables.yuv.gray32.p_gray[ i_index ] = 
-                    ((i_gamma[CLIP_BYTE( i_index )] >> i_red_right)   << i_red_left)   |
-                    ((i_gamma[CLIP_BYTE( i_index )] >> i_green_right) << i_green_left) |
-                    ((i_gamma[CLIP_BYTE( i_index )] >> i_blue_right)  << i_blue_left);                
+                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_red_right)   << i_red_left)   |
+                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_green_right) << i_green_left) |
+                    ((pi_gamma[CLIP_BYTE( i_index )] >> i_blue_right)  << i_blue_left);                
             }        
             break;        
         }
@@ -477,9 +492,9 @@ static void SetTables( vout_thread_t *p_vout )
             p_vout->tables.yuv.rgb16.p_blue =   (u16 *)p_vout->tables.p_base + 2*1024 + 384;
             for( i_index = -384; i_index < 640; i_index++) 
             {
-                p_vout->tables.yuv.rgb16.p_red[i_index] =   (i_gamma[CLIP_BYTE(i_index)]>>i_red_right)<<i_red_left;
-                p_vout->tables.yuv.rgb16.p_green[i_index] = (i_gamma[CLIP_BYTE(i_index)]>>i_green_right)<<i_green_left;
-                p_vout->tables.yuv.rgb16.p_blue[i_index] =  (i_gamma[CLIP_BYTE(i_index)]>>i_blue_right)<<i_blue_left;
+                p_vout->tables.yuv.rgb16.p_red[i_index] =   (pi_gamma[CLIP_BYTE(i_index)]>>i_red_right)<<i_red_left;
+                p_vout->tables.yuv.rgb16.p_green[i_index] = (pi_gamma[CLIP_BYTE(i_index)]>>i_green_right)<<i_green_left;
+                p_vout->tables.yuv.rgb16.p_blue[i_index] =  (pi_gamma[CLIP_BYTE(i_index)]>>i_blue_right)<<i_blue_left;
             }
             break;        
         case 24:
@@ -489,9 +504,9 @@ static void SetTables( vout_thread_t *p_vout )
             p_vout->tables.yuv.rgb32.p_blue =   (u32 *)p_vout->tables.p_base + 2*1024 + 384;
             for( i_index = -384; i_index < 640; i_index++) 
             {
-                p_vout->tables.yuv.rgb32.p_red[i_index] =   (i_gamma[CLIP_BYTE(i_index)]>>i_red_right)<<i_red_left;
-                p_vout->tables.yuv.rgb32.p_green[i_index] = (i_gamma[CLIP_BYTE(i_index)]>>i_green_right)<<i_green_left;
-                p_vout->tables.yuv.rgb32.p_blue[i_index] =  (i_gamma[CLIP_BYTE(i_index)]>>i_blue_right)<<i_blue_left;
+                p_vout->tables.yuv.rgb32.p_red[i_index] =   (pi_gamma[CLIP_BYTE(i_index)]>>i_red_right)<<i_red_left;
+                p_vout->tables.yuv.rgb32.p_green[i_index] = (pi_gamma[CLIP_BYTE(i_index)]>>i_green_right)<<i_green_left;
+                p_vout->tables.yuv.rgb32.p_blue[i_index] =  (pi_gamma[CLIP_BYTE(i_index)]>>i_blue_right)<<i_blue_left;
             }
             break;        
         }

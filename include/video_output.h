@@ -25,6 +25,27 @@ typedef struct vout_tables_s
 } vout_tables_t;
 
 /*******************************************************************************
+ * vout_buffer_t: rendering buffer
+ *******************************************************************************
+ * This structure store informations about a buffer. Buffers are not completely
+ * cleared between displays, and modified areas needs to be stored.
+ *******************************************************************************/
+typedef struct vout_buffer_s
+{     
+    /* Picture area */
+    int         i_pic_x, i_pic_y;                         /* picture position  */
+    int         i_pic_width, i_pic_height;                /* picture extension */
+    
+    /* Other areas - only vertical extensions of areas are stored */
+    int         i_areas;                                    /* number of areas */    
+    int         pi_area_begin[VOUT_MAX_AREAS];            /* beginning of area */ 
+    int         pi_area_end[VOUT_MAX_AREAS];                    /* end of area */
+    
+    /* Picture data */
+    byte_t *    p_data;                                      /* memory address */
+} vout_buffer_t;
+
+/*******************************************************************************
  * vout_convert_t: convertion function
  *******************************************************************************
  * This is the prototype common to all convertion functions. The type of p_pic
@@ -70,7 +91,6 @@ typedef struct vout_thread_s
     p_vout_sys_t        p_sys;                         /* system output method */
 
     /* Current display properties */    
-    boolean_t           b_grayscale;             /* color or grayscale display */   
     int                 i_width;                /* current output method width */
     int                 i_height;              /* current output method height */
     int                 i_bytes_per_line;/* bytes per line (including virtual) */
@@ -79,20 +99,27 @@ typedef struct vout_thread_s
     float               f_gamma;                                      /* gamma */
 
     /* Pictures and rendering properties */
+    boolean_t           b_grayscale;             /* color or grayscale display */   
     boolean_t           b_info;              /* print additionnal informations */
+    boolean_t           b_interface;                       /* render interface */    
+    boolean_t           b_scale;                      /* allow picture scaling */    
 
 #ifdef STATS    
     /* Statistics - these numbers are not supposed to be accurate, but are a
      * good indication of the thread status */
     mtime_t             render_time;               /* last picture render time */
     count_t             c_fps_samples;                       /* picture counts */    
-    mtime_t             fps_sample[ VOUT_FPS_SAMPLES ];   /* FPS samples dates */
+    mtime_t             p_fps_sample[ VOUT_FPS_SAMPLES ]; /* FPS samples dates */
 #endif
 
     /* Running properties */
     u16                 i_changes;               /* changes made to the thread */    
     mtime_t             last_picture_date;        /* last picture display date */
     mtime_t             last_display_date;         /* last screen display date */    
+
+    /* Rendering buffers */
+    int                 i_buffer_index;                        /* buffer index */
+    vout_buffer_t       p_buffer[2];                     /* buffers properties */
 
     /* Videos heap and translation tables */
     picture_t           p_picture[VOUT_MAX_PICTURES];              /* pictures */
@@ -111,10 +138,12 @@ typedef struct vout_thread_s
  * thread changed a variable */
 #define VOUT_INFO_CHANGE        0x0001                       /* b_info changed */
 #define VOUT_GRAYSCALE_CHANGE   0x0002                  /* b_grayscale changed */
-#define VOUT_SIZE_CHANGE        0x0008                         /* size changed */
-#define VOUT_DEPTH_CHANGE       0x0010                        /* depth changed */
-#define VOUT_GAMMA_CHANGE       0x0080                        /* gamma changed */
-#define VOUT_NODISPLAY_CHANGE   0xffff      /* changes which forbidden display */
+#define VOUT_INTF_CHANGE        0x0004                  /* b_interface changed */
+#define VOUT_SCALE_CHANGE       0x0008                      /* b_scale changed */
+#define VOUT_SIZE_CHANGE        0x0200                         /* size changed */
+#define VOUT_DEPTH_CHANGE       0x0400                        /* depth changed */
+#define VOUT_GAMMA_CHANGE       0x0010                        /* gamma changed */
+#define VOUT_NODISPLAY_CHANGE   0xff00      /* changes which forbidden display */
 
 /*******************************************************************************
  * Prototypes
@@ -132,7 +161,7 @@ void            vout_UnlinkPicture      ( vout_thread_t *p_vout, picture_t *p_pi
 subtitle_t *    vout_CreateSubtitle     ( vout_thread_t *p_vout, int i_type, int i_size );
 void            vout_DestroySubtitle    ( vout_thread_t *p_vout, subtitle_t *p_sub );
 void            vout_DisplaySubtitle    ( vout_thread_t *p_vout, subtitle_t *p_sub );
-
+void            vout_ClearBuffer        ( vout_thread_t *p_vout, vout_buffer_t *p_buffer );
 
 
 

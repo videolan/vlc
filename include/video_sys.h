@@ -12,7 +12,6 @@ void         vout_SysEnd        ( p_vout_thread_t p_vout );
 void         vout_SysDestroy    ( p_vout_thread_t p_vout );
 int          vout_SysManage     ( p_vout_thread_t p_vout );
 void         vout_SysDisplay    ( p_vout_thread_t p_vout );
-void *       vout_SysGetPicture ( p_vout_thread_t p_vout );
 
 
 

@@ -15,14 +15,15 @@
 /*******************************************************************************
  * Prototypes
  *******************************************************************************/
-p_vout_font_t   vout_LoadFont   ( char *psz_name );
+p_vout_font_t   vout_LoadFont   ( const char *psz_name );
 void            vout_UnloadFont ( p_vout_font_t p_font );
-void            vout_TextSize   ( p_vout_font_t p_font, int i_style, char *psz_text,
+void            vout_TextSize   ( p_vout_font_t p_font, int i_style, 
+                                  const char *psz_text,
                                   int *pi_width, int *pi_height );
-void            vout_Print      ( p_vout_font_t p_font, byte_t *p_pic, int i_depth, 
-                                  int i_bytes_per_pixel, u32 i_char_color, 
-                                  u32 i_border_color, u32 i_bg_color,
-                                  int i_style, char *psz_text );
+void            vout_Print      ( p_vout_font_t p_font, byte_t *p_pic, 
+                                  int i_bytes_per_pixel, int i_bytes_per_line,
+                                  u32 i_char_color, u32 i_border_color, u32 i_bg_color,
+                                  int i_style, const char *psz_text );
 
 
 

@@ -41,25 +41,11 @@ typedef struct vout_sys_s
 {
     /* System informations */
     int                         i_fb_dev;        /* framebuffer device handle */
-    size_t                      i_page_size;                     /* page size */
     struct fb_var_screeninfo    var_info;    /* framebuffer mode informations */
 
     /* Video memory */
-    byte_t *                    p_video;
-
-    /* User settings */
-    boolean_t           b_shm;                /* shared memory extension flag */
-
-    /* Font information */
-    int                 i_char_bytes_per_line;     /* character width (bytes) */
-    int                 i_char_height;            /* character height (lines) */
-    int                 i_char_interspacing;/* space between centers (pixels) */
-    byte_t *            pi_font;                      /* pointer to font data */
-
-    /* Display buffers information */
-    int                 i_buffer_index;                       /* buffer index */
-    void *              p_image[2];                                  /* image */
-
+    byte_t *                    p_video;                       /* base adress */    
+    size_t                      i_page_size;                     /* page size */
 } vout_sys_t;
 
 /******************************************************************************
@@ -98,32 +84,18 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window 
 
 /******************************************************************************
  * vout_SysInit: initialize framebuffer video thread output method
- ******************************************************************************
- * This function creates the images needed by the output thread. It is called
- * at the beginning of the thread, but also each time the display is resized.
  ******************************************************************************/
 int vout_SysInit( vout_thread_t *p_vout )
 {
-    // Blank both screens
-    memset( p_vout->p_sys->p_video, 0x00, 2*p_vout->p_sys->i_page_size );
-    //memset( p_vout->p_sys->p_image[0], 0xf0, p_vout->p_sys->i_page_size );
-    //memset( p_vout->p_sys->p_image[1], 0x0f, p_vout->p_sys->i_page_size );
-
-    /* Set buffer index to 0 */
-    p_vout->p_sys->i_buffer_index = 0;
-
     return( 0 );
 }
 
 /******************************************************************************
  * vout_SysEnd: terminate FB video thread output method
- ******************************************************************************
- * Destroy the FB images created by vout_SysInit. It is called at the end of 
- * the thread, but also each time the window is resized.
  ******************************************************************************/
 void vout_SysEnd( vout_thread_t *p_vout )
-{
-    intf_DbgMsg("%p\n", p_vout );
+{       
+    ;    
 }
 
 /******************************************************************************
@@ -141,19 +113,10 @@ void vout_SysDestroy( vout_thread_t *p_vout )
  * vout_SysManage: handle FB events
  ******************************************************************************
  * This function should be called regularly by video output thread. It manages
- * console events and allows screen resizing. It returns a non null value on 
- * error.
+ * console events. It returns a non null value on error.
  ******************************************************************************/
 int vout_SysManage( vout_thread_t *p_vout )
 {
-    /* XXX */
-    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
-    {
-        intf_DbgMsg("resizing window\n");
-        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-	FBBlankDisplay( p_vout );
-    }
-					
     return 0;
 }
 
@@ -165,10 +128,6 @@ int vout_SysManage( vout_thread_t *p_vout )
  ******************************************************************************/
 void vout_SysDisplay( vout_thread_t *p_vout )
 {
-    /* Swap buffers */
-    //p_vout->p_sys->i_buffer_index = ++p_vout->p_sys->i_buffer_index & 1;
-    p_vout->p_sys->i_buffer_index = 0;
-
     /* tout est bien affiché, on peut échanger les 2 écrans */
     p_vout->p_sys->var_info.xoffset = 0;
     p_vout->p_sys->var_info.yoffset =
@@ -177,16 +136,6 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 
     //ioctl( p_vout->p_sys->i_fb_dev, FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );	
     ioctl( p_vout->p_sys->i_fb_dev, FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );	
-}
-
-/******************************************************************************
- * vout_SysGetPicture: get current display buffer informations
- ******************************************************************************
- * This function returns the address of the current display buffer.
- ******************************************************************************/
-void * vout_SysGetPicture( vout_thread_t *p_vout )
-{
-    return( p_vout->p_sys->p_image[ p_vout->p_sys->i_buffer_index ] );
 }
 
 /* following functions are local */
@@ -291,8 +240,12 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
         close( p_vout->p_sys->i_fb_dev );
         return( 1 );
     }
-    p_vout->p_sys->p_image[ 0 ] = p_vout->p_sys->p_video;
-    p_vout->p_sys->p_image[ 1 ] = p_vout->p_sys->p_video + p_vout->p_sys->i_page_size;
+
+    /* Set and initialize buffers */
+    p_vout->p_buffer[0].p_data = p_vout->p_sys->p_video;
+    p_vout->p_buffer[1].p_data = p_vout->p_sys->p_video + p_vout->p_sys->i_page_size;    
+    vout_ClearBuffer( p_vout, &p_vout->p_buffer[0] );
+    vout_ClearBuffer( p_vout, &p_vout->p_buffer[1] );    
 
     intf_DbgMsg("framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d\n",
                 fix_info.type, fix_info.visual, fix_info.ypanstep, fix_info.ywrapstep, fix_info.accel );
@@ -310,20 +263,6 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
  ******************************************************************************/
 static void FBCloseDisplay( vout_thread_t *p_vout )
 {
-    // Free font info
-    free( p_vout->p_sys->pi_font );    
-
     // Destroy window and close display
     close( p_vout->p_sys->i_fb_dev );    
-}
-
-/******************************************************************************
- * FBBlankDisplay: render a blank screen
- ******************************************************************************
- * This function is called by all other rendering functions when they arrive on
- * a non blanked screen.
- ******************************************************************************/
-static void FBBlankDisplay( vout_thread_t *p_vout )
-{
-    memset( p_vout->p_sys->p_video, 0x00, 2*p_vout->p_sys->i_page_size );
 }

@@ -89,7 +89,7 @@ endif
 # Libraries
 #
 LIB += -lpthread
-LIB += -lm
+LIN += -lm
 
 ifeq ($(VIDEO),X11)
 LIB += -L/usr/X11R6/lib

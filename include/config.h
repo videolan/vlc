@@ -228,9 +228,16 @@
 #define VOUT_WIDTH_DEFAULT              640
 #define VOUT_HEIGHT_DEFAULT             480
 
-/* Default video heap size - remember that a decompressed picture is big 
+/* Video heap size - remember that a decompressed picture is big 
  * (~1 Mbyte) before using huge values */
 #define VOUT_MAX_PICTURES               10
+
+/* Maximum number of active areas in a rendering buffer. Active areas are areas
+ * of the picture which need to be cleared before re-using the buffer. If a 
+ * picture, including its many additions such as subtitles, additionnal user
+ * informations and interface, has too many active areas, some of them are 
+ * joined. */
+#define VOUT_MAX_AREAS                  5
 
 /* Environment variable for grayscale output mode, and default value */
 #define VOUT_GRAYSCALE_VAR              "vlc_grayscale"

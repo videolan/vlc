@@ -33,13 +33,8 @@ typedef struct vout_sys_s
     ggi_visual_t        p_display;                           /* display device */
 
     /* Buffers informations */
-    int                 i_buffer_index;                        /* buffer index */
     ggi_directbuffer *  p_buffer[2];                                /* buffers */
     boolean_t           b_must_acquire;     /* must be acquired before writing */    
-
-    /* Characters size */
-    int                 i_char_width;
-    int                 i_char_height;    
 } vout_sys_t;
 
 /*******************************************************************************
@@ -72,7 +67,6 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window 
         free( p_vout->p_sys );
         return( 1 );        
     }
-    
     return( 0 );
 }
 
@@ -84,10 +78,9 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window 
 int vout_SysInit( vout_thread_t *p_vout )
 {
     /* Acquire first buffer */
-    p_vout->p_sys->i_buffer_index = 0;
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceAcquire( p_vout->p_sys->p_buffer[ 0 ]->resource, GGI_ACTYPE_WRITE );        
+        ggiResourceAcquire( p_vout->p_sys->p_buffer[ p_vout->i_buffer_index ]->resource, GGI_ACTYPE_WRITE );        
     }    
 
     return( 0 );
@@ -103,7 +96,7 @@ void vout_SysEnd( vout_thread_t *p_vout )
     /* Release buffer */
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceRelease( p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->resource );
+        ggiResourceRelease( p_vout->p_sys->p_buffer[ p_vout->i_buffer_index ]->resource );
     }
 }
 
@@ -140,64 +133,20 @@ void vout_SysDisplay( vout_thread_t *p_vout )
     /* Change display frame */
     if( p_vout->p_sys->b_must_acquire )
     {            
-        ggiResourceRelease( p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->resource );
+        ggiResourceRelease( p_vout->p_sys->p_buffer[ p_vout->i_buffer_index ]->resource );
     }    
     ggiFlush( p_vout->p_sys->p_display ); // ??    
     ggiSetDisplayFrame( p_vout->p_sys->p_display, 
-                        p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->frame );      
+                        p_vout->p_sys->p_buffer[ p_vout->i_buffer_index ]->frame );      
         
     /* Swap buffers and change write frame */
-    p_vout->p_sys->i_buffer_index = ++p_vout->p_sys->i_buffer_index & 1;
     if( p_vout->p_sys->b_must_acquire )
     {            
-        ggiResourceAcquire( p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->resource, 
+        ggiResourceAcquire( p_vout->p_sys->p_buffer[ (p_vout->i_buffer_index + 1) & 1]->resource, 
                             GGI_ACTYPE_WRITE );
     } 
     ggiSetWriteFrame( p_vout->p_sys->p_display,
-                      p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->frame );    
- }
-
-/*******************************************************************************
- * vout_SysGetPicture: get current display buffer informations
- *******************************************************************************
- * This function returns the address of the current display buffer.
- *******************************************************************************/
-void * vout_SysGetPicture( vout_thread_t *p_vout )
-{    
-    return( p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->write );        
-}
-
-/*******************************************************************************
- * vout_SysPrint: print simple text on a picture
- *******************************************************************************
- * This function will print a simple text on the picture. It is designed to
- * print debugging or general informations, not to render subtitles. 
- *******************************************************************************/
-void vout_SysPrint( vout_thread_t *p_vout, int i_x, int i_y, int i_halign, 
-                    int i_valign, unsigned char *psz_text )
-{
-    /* Update upper left coordinates according to alignment */
-    switch( i_halign )
-    {
-    case 0:                                                        /* centered */
-        i_x -= p_vout->p_sys->i_char_width * strlen( psz_text ) / 2;
-        break;        
-    case 1:                                                   /* right aligned */
-        i_x -= p_vout->p_sys->i_char_width * strlen( psz_text );
-        break;                
-    }
-    switch( i_valign )
-    {
-    case 0:                                                        /* centered */
-        i_y -= p_vout->p_sys->i_char_height / 2;
-        break;        
-    case 1:                                                   /* bottom aligned */
-        i_y -= p_vout->p_sys->i_char_height;
-        break;                
-    }
-
-    /* Print text */
-    ggiPuts( p_vout->p_sys->p_display, i_x, i_y, psz_text );
+                      p_vout->p_sys->p_buffer[ (p_vout->i_buffer_index + 1) & 1]->frame );    
 }
 
 /*******************************************************************************
@@ -372,6 +321,12 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display )
         return( 1 );        
         break;        
     }
+
+    /* Set and initialize buffers */
+    p_vout->p_buffer[0].p_data = p_vout->p_sys->p_buffer[ 0 ]->write;
+    p_vout->p_buffer[1].p_data = p_vout->p_sys->p_buffer[ 1 ]->write;
+    vout_ClearBuffer( p_vout, &p_vout->p_buffer[0] );
+    vout_ClearBuffer( p_vout, &p_vout->p_buffer[1] );    
 
     return( 0 );    
 }

@@ -443,11 +443,13 @@ static void Usage( void )
 
     /* Interfaces keys */
     intf_Msg("Interface keys: most interfaces accept the following commands:\n" \
+             "  [space]                           \ttoggle interface\n"
              "  [esc], q                          \tquit\n" \
+             "  0 - 9                             \tselect channel\n" \
              "  +, -, m                           \tchange volume, mute\n" \
              "  g, G, c                           \tchange gamma, toggle grayscale\n" \
-             "  0 - 9                             \tselect channel\n" \
-             "  [space]                           \ttoggle info printing\n" \
+             "  i                                 \ttoggle info printing\n" \
+             "  s                                 \ttoggle picture scaling\n" \
              );    
 }
 
