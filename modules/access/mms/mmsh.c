@@ -2,7 +2,7 @@
  * mmsh.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.c,v 1.1 2003/04/20 19:29:43 fenrir Exp $
+ * $Id: mmsh.c,v 1.2 2003/04/25 17:33:57 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -137,7 +137,6 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
     p_sys->i_request_context = 1;
 
     /* *** send first request *** */
-    /* FIXME use generateguid */
     p = &p_sys->buffer[0];
     p += sprintf( p, "GET %s HTTP/1.0\r\n", p_sys->p_url->psz_path );
     p += sprintf( p,"Accept: */*\r\n" );
@@ -273,11 +272,11 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
     p_input->pf_set_area = NULL;
 
     p_input->p_private = NULL;
-    //p_input->i_mtu = 5 * p_sys->asfh.i_min_data_packet_size;
+    p_input->i_mtu = 3 * p_sys->asfh.i_min_data_packet_size;
 
     /* *** finished to set some variable *** */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.b_pace_control = 1;
+    p_input->stream.b_pace_control = 0;
     if( p_sys->b_broadcast )
     {
         p_input->stream.p_selected_area->i_size = 0;
@@ -474,6 +473,9 @@ static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
             {
                 return 0;
             }
+
+            //fprintf( stderr, "type=0x%x size=%d sequence=%d unknown=%d size2=%d data=%d\n",
+            //         ck.i_type, ck.i_size, ck.i_sequence, ck.i_unknown, ck.i_size2, ck.i_data );
         }
     }
 
