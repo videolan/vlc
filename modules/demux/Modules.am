@@ -5,4 +5,6 @@ SOURCES_m3u = m3u.c
 SOURCES_demuxdump = demuxdump.c
 SOURCES_rawdv = rawdv.c
 SOURCES_au = au.c
+SOURCES_wav = wav.c
+SOURCES_aac = aac.c
 SOURCES_mkv = mkv.cpp

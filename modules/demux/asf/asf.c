@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.29 2003/05/22 21:42:43 gbazin Exp $
+ * $Id: asf.c,v 1.30 2003/08/01 00:16:37 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -280,16 +280,12 @@ static int Activate( vlc_object_t * p_this )
                 p_wf->nBlockAlign       = GetWLE( p_data + 12 );
                 p_wf->wBitsPerSample    = GetWLE( p_data + 14 );
                 input_AddInfo( p_cat, _("Bits Per Sample"), "%d", p_wf->wBitsPerSample );
-                p_wf->cbSize            = __MAX( 0,
-                                              i_size - sizeof( WAVEFORMATEX ));
-                if( i_size > sizeof( WAVEFORMATEX ) )
+                p_wf->cbSize            = __MIN( GetWLE( p_data + 16 ), i_size - sizeof( WAVEFORMATEX ));
+                if( p_wf->cbSize > 0 )
                 {
-                    memcpy( (uint8_t*)p_wf + sizeof( WAVEFORMATEX ),
-                            p_data + sizeof( WAVEFORMATEX ),
-                            i_size - sizeof( WAVEFORMATEX ) );
+                    memcpy( &p_wf[1], p_data + sizeof( WAVEFORMATEX ), p_wf->cbSize );
                 }
             }
-
         }
         else
         if( CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) )
