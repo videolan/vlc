@@ -91,10 +91,14 @@ static void Close        ( vlc_object_t * );
 static void Play         ( aout_instance_t * );
 static int  ALSAThread   ( aout_instance_t * );
 static void ALSAFill     ( aout_instance_t * );
+static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
+                                vlc_value_t newval, vlc_value_t oldval, void *p_unused );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static char *ppsz_devices[] = { "default" };
+static char *ppsz_devices_text[] = { N_("Default") };
 vlc_module_begin();
     set_shortname( "ALSA" );
     set_description( _("ALSA audio output") );
@@ -102,6 +106,11 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
                 N_("ALSA Device Name"), NULL, VLC_FALSE );
+        change_string_list( ppsz_devices, ppsz_devices_text, FindDevicesCallback );
+        change_action_add( FindDevicesCallback, N_("Refresh list") );
+
+
+
     set_capability( "audio output", 150 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -807,3 +816,141 @@ static void ALSAFill( aout_instance_t * p_aout )
         aout_BufferFree( p_buffer );
     }
 }
+
+static void GetDevicesForCard(module_config_t *p_item, int i_card);
+static void GetDevices( module_config_t *p_item );
+
+/*****************************************************************************
+ * config variable callback
+ *****************************************************************************/
+static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
+                               vlc_value_t newval, vlc_value_t oldval, void *p_unused )
+{
+    module_config_t *p_item;
+    int i;
+
+    p_item = config_FindConfig( p_this, psz_name );
+    if( !p_item ) return VLC_SUCCESS;
+
+    /* Clear-up the current list */
+    if( p_item->i_list )
+    {
+        /* Keep the first entrie */
+        for( i = 1; i < p_item->i_list; i++ )
+        {
+            free( p_item->ppsz_list[i] );
+            free( p_item->ppsz_list_text[i] );
+        }
+        /* TODO: Remove when no more needed */
+        p_item->ppsz_list[i] = NULL;
+        p_item->ppsz_list_text[i] = NULL;
+    }
+    p_item->i_list = 1;
+
+    GetDevices( p_item );
+
+    /* Signal change to the interface */
+    p_item->b_dirty = VLC_TRUE;
+
+    return VLC_SUCCESS;
+
+}
+
+
+static void GetDevicesForCard(module_config_t *p_item, int i_card)
+{
+    int i_pcm_device = -1;
+    int i_err = 0;
+    snd_pcm_info_t *p_pcm_info;
+    snd_ctl_t *p_ctl;
+    char psz_dev[64];
+    char *psz_card_name;
+    
+    sprintf(psz_dev, "hw:%i", i_card);
+    
+    if (( i_err = snd_ctl_open(&p_ctl, psz_dev, 0)) < 0 )
+    {
+        return;
+    }
+    
+    if ((i_err = snd_card_get_name(i_card, &psz_card_name)) != 0)
+    {
+        psz_card_name = _("Unknown soundcard");
+    }
+
+    snd_pcm_info_alloca(&p_pcm_info);
+
+    for (;;)
+    {
+        char *psz_device, *psz_descr;
+        if ((i_err = snd_ctl_pcm_next_device(p_ctl, &i_pcm_device)) < 0)
+        {
+            i_pcm_device = -1;
+        }
+        if ( i_pcm_device < 0 )
+            break;
+
+        snd_pcm_info_set_device(p_pcm_info, i_pcm_device);
+        snd_pcm_info_set_subdevice(p_pcm_info, 0);
+        snd_pcm_info_set_stream(p_pcm_info, SND_PCM_STREAM_PLAYBACK);
+
+        if ((i_err = snd_ctl_pcm_info(p_ctl, p_pcm_info)) < 0)
+        {
+            if (i_err != -ENOENT)
+            {
+/*                printf("get_devices_for_card(): "
+                         "snd_ctl_pcm_info() "
+                         "failed (%d:%d): %s.\n", i_card,
+                         i_pcm_device, snd_strerror(-i_err));*/
+            }
+            continue;
+        }
+
+        asprintf( &psz_device, "hw:%d,%d", i_card, i_pcm_device );
+        asprintf( &psz_descr, "%s: %s (%s)", psz_card_name,
+                  snd_pcm_info_get_name(p_pcm_info), psz_device );
+
+        printf( "Adding device: %s\n", psz_descr );
+        
+        p_item->ppsz_list =
+            (char **)realloc( p_item->ppsz_list,
+                              (p_item->i_list + 2) * sizeof(char *) );
+        p_item->ppsz_list_text =
+            (char **)realloc( p_item->ppsz_list_text,
+                              (p_item->i_list + 2) * sizeof(char *) );
+        p_item->ppsz_list[ p_item->i_list ] = psz_device;
+        p_item->ppsz_list_text[ p_item->i_list ] = psz_descr;
+        p_item->i_list++;
+        p_item->ppsz_list[ p_item->i_list ] = NULL;
+        p_item->ppsz_list_text[ p_item->i_list ] = NULL;
+                
+    }
+
+    snd_ctl_close( p_ctl );
+}
+
+
+
+static void GetDevices( module_config_t *p_item )
+{
+    int i_card = -1;
+    int i_err = 0;
+    
+    if ((i_err = snd_card_next(&i_card)) != 0)
+    {
+//        g_warning("snd_next_card() failed: %s", snd_strerror(-err));
+        return;
+    }
+    
+    while (i_card > -1)
+    {
+        GetDevicesForCard(p_item, i_card);
+        if ((i_err = snd_card_next(&i_card)) != 0)
+        {
+//            g_warning("snd_next_card() failed: %s",
+//                  snd_strerror(-err));
+            break;
+        }
+    }
+}
+
