@@ -3,11 +3,11 @@
  *         using libcdio, libvcd and libvcdinfo. vlc-specific things tend
  *         to go here.
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: access.c,v 1.2 2003/11/07 10:31:38 rocky Exp $
+ * Copyright (C) 2000,2003 VideoLAN
+ * $Id: access.c,v 1.3 2003/11/20 03:56:22 rocky Exp $
  *
- * Authors: Johan Bilien <jobi@via.ecp.fr>
- *          Rocky Bernstein <rocky@panix.com> 
+ * Authors: Rocky Bernstein <rocky@panix.com> 
+ *          Johan Bilien <jobi@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,9 @@
  * Preamble
  *****************************************************************************/
 
-#if 0 // Disabled until this is working
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_interface.h>
 
 #include "../../demux/mpeg/system.h"
 #include "vcd.h"
@@ -38,6 +38,7 @@
 #include "vcdplayer.h"
 
 #include <cdio/cdio.h>
+#include <cdio/cd_types.h>
 #include <cdio/logging.h>
 #include <cdio/util.h>
 #include <libvcd/info.h>
@@ -54,9 +55,6 @@
  *****************************************************************************/
 
 /* First those which are accessed from outside (via pointers). */
-static int  VCDOpen         ( vlc_object_t * );
-static void VCDClose        ( vlc_object_t * );
-static int  VCDRead         ( input_thread_t *, byte_t *, size_t );
 static int  VCDRead         ( input_thread_t *, byte_t *, size_t );
 static int  VCDSetProgram   ( input_thread_t *, pgrm_descriptor_t * );
 
@@ -79,33 +77,18 @@ static void VCDUpdateVar( input_thread_t *p_input, int i_entry, int i_action,
 
 static vcdinfo_obj_t *vcd_Open   ( vlc_object_t *p_this, const char *psz_dev );
 
-static int debug_callback   ( vlc_object_t *p_this, const char *psz_name,
-                               vlc_value_t oldval, vlc_value_t val, 
-                               void *p_data );
-
-#define DEBUG_TEXT N_("set debug mask for additional debugging.")
-#define DEBUG_LONGTEXT N_( \
-    "This integer when viewed in binary is a debugging mask\n" \
-    "MRL             1\n" \
-    "external call   2\n" \
-    "all calls       4\n" \
-    "LSN             8\n" \
-    "PBC      (10)  16\n" \
-    "libcdio  (20)  32\n" \
-    "seeks    (40)  64\n" \
-    "still    (80) 128\n" \
-    "vcdinfo (100) 256\n" )
-
 /****************************************************************************
  * Private functions
  ****************************************************************************/
+
 /* FIXME: This variable is a hack. Would be nice to eliminate the 
    global-ness. */
+
 static input_thread_t *p_vcd_input = NULL;
 
 int
-vcd_debug_callback   ( vlc_object_t *p_this, const char *psz_name,
-                       vlc_value_t oldval, vlc_value_t val, void *p_data )
+E_(DebugCallback)   ( vlc_object_t *p_this, const char *psz_name,
+		      vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
   thread_vcd_data_t *p_vcd;
 
@@ -186,14 +169,14 @@ vcd_log_handler (vcd_log_level_t level, const char message[])
   On success we return VLC_SUCCESS, on memory exhausted VLC_ENOMEM, 
   and VLC_EGENERIC for some other error.
  *****************************************************************************/
-static int 
-VCDOpen( vlc_object_t *p_this )
+int 
+E_(VCDOpen) ( vlc_object_t *p_this )
 {
     input_thread_t *        p_input = (input_thread_t *)p_this;
     thread_vcd_data_t *     p_vcd;
     char *                  psz_source;
     vcdinfo_itemid_t        itemid;
-    bool                    play_ok;
+    bool                    b_play_ok;
     
     p_input->pf_read        = VCDRead;
     p_input->pf_seek        = VCDSeek;
@@ -290,11 +273,11 @@ VCDOpen( vlc_object_t *p_this )
         msg_Warn( p_input, "could not read entry LIDs" );
     }
 
-    play_ok = (VLC_SUCCESS == VCDPlay( p_input, itemid ));
+    b_play_ok = (VLC_SUCCESS == VCDPlay( p_input, itemid ));
     
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    if ( ! play_ok ) {
+    if ( ! b_play_ok ) {
       vcdinfo_close( p_vcd->vcd );
       free( p_vcd );
       return VLC_EGENERIC;
@@ -309,14 +292,18 @@ VCDOpen( vlc_object_t *p_this )
 #endif
     }
 
+    p_vcd->p_intf = intf_Create( p_input, "vcdx" );
+    p_vcd->p_intf->b_block = VLC_FALSE;
+    intf_RunThread( p_vcd->p_intf );
+
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * VCDClose: closes VCD releasing allocated memory.
  *****************************************************************************/
-static void 
-VCDClose( vlc_object_t *p_this )
+void 
+E_(VCDClose) ( vlc_object_t *p_this )
 {
     input_thread_t *   p_input = (input_thread_t *)p_this;
     thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
@@ -326,7 +313,18 @@ VCDClose( vlc_object_t *p_this )
 
     free( p_vcd->p_entries );
     free( p_vcd->p_segments );
+
+    /* For reasons that are a mystery to me we don't have to deal with
+       stopping, and destroying the p_vcd->p_intf thread. And if we do
+       it causes problems upstream.
+     */
+    if( p_vcd->p_intf != NULL )
+    {
+	p_vcd->p_intf = NULL;
+    }
+
     free( p_vcd );
+    p_input->p_access_data = NULL;
     p_vcd_input = NULL;
 }
 
@@ -346,6 +344,8 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     byte_t                  p_last_sector[ M2F2_SECTOR_SIZE ];
 
     i_read = 0;
+
+    dbg_print( (INPUT_DBG_CALL), "lsn: %u", p_vcd->cur_lsn );
 
     /* Compute the number of blocks we have to read */
 
@@ -371,14 +371,32 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         case READ_ERROR:
           /* Some sort of error. */
           return i_read;
+
         case READ_STILL_FRAME: 
           {
+	    /* Reached the end of a still frame. */
+
             byte_t * p_buf = p_buffer;
+	    pgrm_descriptor_t * p_pgrm = p_input->stream.p_selected_program;;
+
             p_buf += (i_index*M2F2_SECTOR_SIZE);
             memset(p_buf, 0, M2F2_SECTOR_SIZE);
             p_buf += 2;
             *p_buf = 0x01;
             dbg_print(INPUT_DBG_STILL, "Handled still event\n");
+
+	    /* p_vcd->p_intf->b_end_of_cell = true; */
+	    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+
+	    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+	    p_pgrm = p_input->stream.p_selected_program;
+	    p_pgrm->i_synchro_state = SYNCHRO_REINIT;
+
+	    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+	    input_ClockManageControl( p_input, p_pgrm, 0 );
+
             return i_read + M2F2_SECTOR_SIZE;
           }
         default:
@@ -474,8 +492,10 @@ VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
     unsigned int i_nb    = p_area->i_plugin_data + p_area->i_part_nb;
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT),
-               "track: %d, entry %d, seekable %d",
-               i_track, i_entry, old_seekable );
+               "track: %d, entry %d, seekable %d, area %lx, select area %lx ",
+               i_track, i_entry, old_seekable, 
+	       (long unsigned int) p_area, 
+	       (long unsigned int) p_input->stream.p_selected_area );
 
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
@@ -577,6 +597,9 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
     input_area_t *          p_area;
     
     p_vcd->in_still = 0;
+
+    dbg_print(INPUT_DBG_CALL, "itemid.num: %d, itemid.type: %d\n", 
+	      itemid.num, itemid.type);
 
 #define area p_input->stream.pp_areas
 
@@ -791,8 +814,9 @@ VCDSegments( input_thread_t * p_input )
 
     area[0]->i_part_nb = 0;
     
-    dbg_print( INPUT_DBG_MRL, "area id %d, for segment track %d", 
-               area[0]->i_id, 0 );
+    dbg_print( INPUT_DBG_MRL, 
+	       "area[0] id: %d, i_start: %lld, i_size: %lld", 
+               area[0]->i_id, area[0]->i_start, area[0]->i_size );
 
     if (num_segments == 0) return 0;
 
@@ -977,14 +1001,27 @@ VCDParse( input_thread_t * p_input, /*out*/ vcdinfo_itemid_t * p_itemid )
       
     }
 
-    if( !*psz_source )
-    {
-        if( !p_input->psz_access )
-        {
-            return NULL;
+    if( !*psz_source ) {
+
+      /* No source specified, so figure it out. */
+      if( !p_input->psz_access ) return NULL;
+      
+      psz_source = config_GetPsz( p_input, MODULE_STRING "-device" );
+
+      if( !psz_source ) {
+        /* Scan for a CD with a VCD in it. */
+        char **cd_drives = cdio_get_devices_with_cap(NULL, 
+                            (CDIO_FS_ANAL_SVCD|CDIO_FS_ANAL_CVD
+                             |CDIO_FS_ANAL_VIDEOCD|CDIO_FS_UNKNOWN),
+                                                     true);
+        if (NULL == cd_drives) return NULL;
+        if (cd_drives[0] == NULL) {
+          cdio_free_device_list(cd_drives);
+          return NULL;
         }
-        psz_source = config_GetPsz( p_input, "vcd" );
-        if( !psz_source ) return NULL;
+        psz_source = strdup(cd_drives[0]);
+        cdio_free_device_list(cd_drives);
+      }
     }
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_MRL), 
@@ -1089,4 +1126,3 @@ VCDUpdateVar( input_thread_t *p_input, int i_num, int i_action,
   }
   var_Change( p_input, varname, i_action, &val, NULL );
 }
-#endif
