@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.25 2003/06/22 00:00:28 asmax Exp $
+ * $Id: x11_window.cpp,v 1.26 2003/06/22 12:54:03 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -274,8 +274,8 @@ bool X11Window::ProcessOSEvent( Event *evt )
         case ButtonPress:
             // Raise all the windows
             for( list<SkinWindow *>::const_iterator win = 
-                    SkinWindowList::Instance()->Begin();
-                    win != SkinWindowList::Instance()->End(); win++ )
+                    p_intf->p_sys->p_theme->WindowList.begin();
+                    win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
                 XLOCK;
                 XRaiseWindow( display, ( (X11Window *)(*win) )->GetHandle() );
@@ -407,10 +407,6 @@ bool X11Window::ProcessOSEvent( Event *evt )
             {
                 DropObject->DndDrop( ((XClientMessageEvent*)p2)->data.l );
                 return true;
-            }
-            else
-            {
-                fprintf( stderr, "Unsupported client event %s\n", type );
             }
             return false;
             
