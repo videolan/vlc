@@ -464,3 +464,11 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<Ourumov44> i'd like see satellite by my pc with vlc
+<Ourumov44> can i?
+<Meuuh> do you have a satellite dish and a dvb-s card ?
+<Ourumov44> no
+<Meuuh> then no
+
+  -- #videolan - let's emulate satellite dishes in software
+%
