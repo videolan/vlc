@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.247 2003/10/11 22:40:05 hartman Exp $
+ * $Id: input.c,v 1.248 2003/10/20 00:01:06 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -156,6 +156,10 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
     var_AddCallback( p_input, "state", StateCallback, NULL );
 
+    /* state variable */
+    var_Create( p_input, "demuxed-id3", VLC_VAR_BOOL );
+    val.b_bool = VLC_FALSE;
+    var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
 
     /* Initialize thread properties */
     p_input->b_eof      = 0;
