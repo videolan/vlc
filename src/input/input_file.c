@@ -6,12 +6,12 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
-#include <pthread.h>
 #include <sys/uio.h>
 
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 
 #include "input.h"
 #include "input_file.h"

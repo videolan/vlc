@@ -10,12 +10,12 @@
 #include <stdlib.h>                                       /* malloc(), free() */
 #include <netinet/in.h>                                            /* ntohl() */
 #include <sys/soundcard.h>                                /* "audio_output.h" */
-#include <pthread.h>
 #include <sys/uio.h>
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "debug.h"
 
 #include "intf_msg.h"                         /* intf_DbgMsg(), intf_ErrMsg() */

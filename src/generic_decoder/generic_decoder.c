@@ -16,7 +16,6 @@
  * Preamble
  *******************************************************************************/
 #include <errno.h>
-#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -28,6 +27,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "thread.h"
 
 #include "intf_msg.h"
@@ -100,7 +100,7 @@ gdec_thread_t * gdec_CreateThread( gdec_cfg_t *p_cfg, input_thread_t *p_input,
     p_gdec->b_active = 1;
 
     /* Create thread */
-    if( pthread_create( &p_gdec->thread_id, NULL, (void *) RunThread, (void *) p_gdec) )
+    if( vlc_thread_create( &p_gdec->thread_id, "generic decoder", (vlc_thread_func)RunThread, (void *) p_gdec) )
     {
         intf_ErrMsg("gdec error: %s\n", strerror(ENOMEM));
         intf_DbgMsg("failed\n");        
@@ -145,9 +145,9 @@ void gdec_DestroyThread( gdec_thread_t *p_gdec, int *pi_status )
     /* Request thread destruction */
     p_gdec->b_die = 1;
     /* Make sure the decoder thread leaves the GetByte() function */
-    pthread_mutex_lock( &(p_gdec->fifo.data_lock) );
-    pthread_cond_signal( &(p_gdec->fifo.data_wait) );
-    pthread_mutex_unlock( &(p_gdec->fifo.data_lock) );
+    vlc_mutex_lock( &(p_gdec->fifo.data_lock) );
+    vlc_cond_signal( &(p_gdec->fifo.data_wait) );
+    vlc_mutex_unlock( &(p_gdec->fifo.data_lock) );
 
     /* If status is NULL, wait until thread has been destroyed */
     if( pi_status )

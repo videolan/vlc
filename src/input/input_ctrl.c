@@ -10,7 +10,6 @@
  * Preamble
  *******************************************************************************/
 #include <errno.h>
-#include <pthread.h>
 #include <sys/uio.h>                                                 /* iovec */
 #include <stdlib.h>                               /* atoi(), malloc(), free() */
 #include <string.h>
@@ -25,6 +24,7 @@
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "intf_msg.h"
 #include "debug.h"
 
@@ -56,7 +56,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
     
     /* Since this function is intended to be called by interface, lock the
      * elementary stream structure. */
-    pthread_mutex_lock( &p_input->es_lock );
+    vlc_mutex_lock( &p_input->es_lock );
 
     /* Find out which PID we need. */
     for( i_es_loop = 0; i_es_loop < INPUT_MAX_ES; i_es_loop++ )
@@ -66,7 +66,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
             if( p_input->p_es[i_es_loop].p_dec != NULL )
             {
                 /* We already have a decoder for that PID. */
-                pthread_mutex_unlock( &p_input->es_lock );
+                vlc_mutex_unlock( &p_input->es_lock );
                 intf_ErrMsg("input error: PID %d already selected\n",
                             i_current_id);
                 return( -1 );
@@ -82,7 +82,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
             if( i_selected_es_loop == INPUT_MAX_SELECTED_ES )
             {
                 /* array full */
-                pthread_mutex_unlock( &p_input->es_lock );
+                vlc_mutex_unlock( &p_input->es_lock );
                 intf_ErrMsg("input error: MAX_SELECTED_ES reached: try increasing it in config.h\n");
                 return( -1 );
             }
@@ -91,7 +91,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
             if( p_input->p_es[i_es_loop].b_psi )
             {
                 intf_ErrMsg("input_error: trying to decode PID %d which is the one of a PSI\n");
-                pthread_mutex_unlock( &p_input->es_lock );
+                vlc_mutex_unlock( &p_input->es_lock );
                 return( -1 );
             }
             else
@@ -106,7 +106,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                             adec_CreateThread( p_input )) == NULL )
                         {
                             intf_ErrMsg("Could not start audio decoder\n");
-                            pthread_mutex_unlock( &p_input->es_lock );
+                            vlc_mutex_unlock( &p_input->es_lock );
                             return( -1 );
                         }
                         break;
@@ -119,7 +119,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                             vdec_CreateThread( p_input )) == NULL )
                         {
                             intf_ErrMsg("Could not start video decoder\n");
-                            pthread_mutex_unlock( &p_input->es_lock );
+                            vlc_mutex_unlock( &p_input->es_lock );
                             return( -1 );
                         }
                         break;
@@ -128,27 +128,27 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                         /* That should never happen. */
                         intf_DbgMsg("input error: unknown stream type (%d)\n",
                                     p_input->p_es[i_es_loop].i_type);
-                        pthread_mutex_unlock( &p_input->es_lock );
+                        vlc_mutex_unlock( &p_input->es_lock );
                         return( -1 );
                         break;
                 }
 
                 /* Initialise the demux */
                 p_input->p_es[i_es_loop].p_pes_packet = NULL;
-                p_input->p_es[i_es_loop].i_continuity_counter = 0xFF;
+                p_input->p_es[i_es_loop].i_continuity_counter = 0;
                 p_input->p_es[i_es_loop].b_random = 0;
 		
                 /* Mark stream to be demultiplexed. */
                 intf_DbgMsg("Stream %d added in %d\n", i_current_id, i_selected_es_loop);
                 p_input->pp_selected_es[i_selected_es_loop] = &p_input->p_es[i_es_loop];
-                pthread_mutex_unlock( &p_input->es_lock );
+                vlc_mutex_unlock( &p_input->es_lock );
                 return( 0 );
             }
         }
     }
     
     /* We haven't found this PID in the current stream. */
-    pthread_mutex_unlock( &p_input->es_lock );
+    vlc_mutex_unlock( &p_input->es_lock );
     intf_ErrMsg("input error: can't find PID %d\n", i_current_id);
     return( -1 );
 }
@@ -167,7 +167,7 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
 
     /* Since this function is intended to be called by interface, lock the
        structure. */
-    pthread_mutex_lock( &p_input->es_lock );
+    vlc_mutex_lock( &p_input->es_lock );
 
     /* Find out which PID we need. */
     for( i_selected_es_loop = 0; i_selected_es_loop < INPUT_MAX_SELECTED_ES;
@@ -180,7 +180,7 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
                 if( !(p_input->pp_selected_es[i_selected_es_loop]->p_dec) )
                 {
                     /* We don't have a decoder for that PID. */
-                    pthread_mutex_unlock( &p_input->es_lock );
+                    vlc_mutex_unlock( &p_input->es_lock );
                     intf_ErrMsg("input error: PID %d already deselected\n",
                                 i_current_id);
                     return( -1 );
@@ -217,14 +217,14 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
                             p_input->pp_selected_es[i_last_selected];
                 p_input->pp_selected_es[i_last_selected] = NULL;
 
-                pthread_mutex_unlock( &p_input->es_lock );
+                vlc_mutex_unlock( &p_input->es_lock );
                 return( 0 );
             }
         }
     }
 
     /* We haven't found this PID in the current stream. */
-    pthread_mutex_unlock( &p_input->es_lock );
+    vlc_mutex_unlock( &p_input->es_lock );
     intf_ErrMsg("input error: can't find PID %d\n", i_current_id);
     return( -1 );
 }
@@ -244,7 +244,7 @@ boolean_t input_IsElemRecv( input_thread_t *p_input, int i_id )
 
    /* Since this function is intended to be called by interface, lock the
        structure. */
-    pthread_mutex_lock( &p_input->es_lock );
+    vlc_mutex_lock( &p_input->es_lock );
 
     /* Scan the table */
     while( i_index < INPUT_MAX_SELECTED_ES && !p_input->pp_selected_es[i_index] )
@@ -257,7 +257,7 @@ boolean_t input_IsElemRecv( input_thread_t *p_input, int i_id )
     }
 
     /* Unlock the structure */
-    pthread_mutex_unlock( &p_input->es_lock );
+    vlc_mutex_unlock( &p_input->es_lock );
 
     return( b_is_recv );
 }

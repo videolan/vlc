@@ -24,7 +24,6 @@
  *******************************************************************************/
 #include <errno.h>
 #include <keysym.h>
-#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -34,6 +33,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "xutils.h"
 
 #include "xconsole.h"

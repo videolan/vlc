@@ -26,7 +26,6 @@
  *******************************************************************************/
 #include <errno.h>
 #include <fcntl.h>
-#include <pthread.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +40,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "debug.h"
 
 #include "intf_msg.h"

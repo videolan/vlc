@@ -9,7 +9,6 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
-#include <pthread.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <netinet/in.h>
@@ -25,6 +24,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "thread.h"
 #include "debug.h"
 

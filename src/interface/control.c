@@ -10,7 +10,6 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
-#include <pthread.h>
 #include <stdio.h>
 #include <netinet/in.h>
 #include <sys/soundcard.h>
@@ -21,6 +20,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 
 #include "input.h"
 #include "input_vlan.h"

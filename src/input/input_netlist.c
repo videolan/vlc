@@ -8,7 +8,6 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
-#include <pthread.h>
 #include <sys/uio.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,6 +17,7 @@
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "intf_msg.h"
 #include "debug.h"
 #include "input.h"

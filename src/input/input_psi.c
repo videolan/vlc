@@ -10,7 +10,6 @@
  * Preamble
  ******************************************************************************/
 #include <errno.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <sys/uio.h>                                                 /* iovec */
 #include <stdlib.h>                               /* atoi(), malloc(), free() */
@@ -23,6 +22,7 @@
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "intf_msg.h"
 #include "debug.h"
 
@@ -163,7 +163,7 @@ void input_PsiRead( input_thread_t *p_input /* ??? */ )
   ASSERT( p_input );
  
   /* Lock the tables, since this method can be called from any thread */
-  //pthread_mutex_lock()
+  //vlc_mutex_lock()
 
   /* Check if the table is complete or not */
   if( !p_input->p_stream->b_is_PMT_complete )
@@ -195,7 +195,7 @@ void input_PsiRead( input_thread_t *p_input /* ??? */ )
   }
 
   /* Unock the tables */
-  //pthread_mutex_unlock()
+  //vlc_mutex_unlock()
 }
 
 /******************************************************************************
@@ -566,7 +566,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
             intf_DbgMsg("ES Type: %d\n", p_pms[i_offset]);
 
             /* Read PID of that ES */
-            i_es_pid = U16_AT(&p_pms[i_offset+1]) & 0x1FFF;
+            i_es_pid = U16_AT(&p_pms[i_offset+1]) & 0x1FF;
             intf_DbgMsg("ES PID: %d\n", i_es_pid);
 
             /* Add the ES to the program description and reserve a slot in the
@@ -880,7 +880,7 @@ static int input_AddPsiPID( input_thread_t *p_input, int i_pid )
       /* Ask the input thread to demultiplex it: since the interface
          can also access the table of selected es, lock the elementary
          stream structure */
-      pthread_mutex_lock( &p_input->es_lock );
+      vlc_mutex_lock( &p_input->es_lock );
       for( i_index = 0; i_index < INPUT_MAX_SELECTED_ES; i_index++ )
       {
         if( !p_input->pp_selected_es[i_index] )
@@ -891,7 +891,7 @@ static int input_AddPsiPID( input_thread_t *p_input, int i_pid )
           break;
         }
       }
-      pthread_mutex_unlock( &p_input->es_lock );
+      vlc_mutex_unlock( &p_input->es_lock );
 
       if( i_index >= INPUT_MAX_SELECTED_ES )
       {
@@ -922,7 +922,7 @@ static int input_DelPsiPID( input_thread_t *p_input, int i_pid )
 
   /* Stop to receive the ES. Since the interface can also access the table
      of selected es, lock the elementary stream structure */
-  pthread_mutex_lock( &p_input->es_lock );
+  vlc_mutex_lock( &p_input->es_lock );
   
   for( i_es_index = 0; i_es_index < INPUT_MAX_SELECTED_ES; i_es_index++ )
   {
@@ -942,7 +942,7 @@ static int input_DelPsiPID( input_thread_t *p_input, int i_pid )
     }
   }
 
-  pthread_mutex_unlock( &p_input->es_lock );
+  vlc_mutex_unlock( &p_input->es_lock );
 
 #ifdef DEBUG
   /* Check if the pp_selected_es table may be corrupted */
@@ -1167,7 +1167,7 @@ static pgrm_descriptor_t* AddPgrmDescr( stream_descriptor_t* p_stream,
 }
 
 /******************************************************************************
- * DestroyPgrmDescr: destroy a program descriptor
+ * AddPgrmDescr: destroy a program descriptor
  ******************************************************************************
  * All ES descriptions referenced in the descriptor will be deleted.
  ******************************************************************************/
@@ -1253,7 +1253,6 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
     p_es->i_type = 0;  /* ??? */
     p_es->b_psi = 0;
     p_es->b_pcr = 0;
-    p_es->i_continuity_counter = 0xFF;
     
     p_es->p_pes_packet = NULL;
 //    p_es->p_next_pes_packet = NULL;
@@ -1270,7 +1269,7 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
                    i_es_pid, p_pgrm->i_number );
     }
     else
-      intf_DbgMsg( "ES %d not added to the definition of any pgrm\n",
+      intf_DbgMsg( "Added ES %d not added to the definition of any pgrm\n",
                    i_es_pid );
   }
   

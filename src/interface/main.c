@@ -11,7 +11,6 @@
  *******************************************************************************/
 #include <errno.h>
 #include <getopt.h>
-#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +24,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "netutils.h"
 #include "debug.h"
 

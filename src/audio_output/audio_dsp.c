@@ -15,7 +15,6 @@
 /******************************************************************************
  * Preamble
  ******************************************************************************/
-#include <pthread.h>
 #include <fcntl.h>                                        /* open(), O_WRONLY */
 #include <sys/ioctl.h>                                             /* ioctl() */
 #include <unistd.h>                                       /* write(), close() */
@@ -24,6 +23,7 @@
 
 #include "common.h"                                      /* boolean_t, byte_t */
 #include "mtime.h"
+#include "vlc_thread.h"
 
 #include "audio_output.h"                                       /* aout_dsp_t */
 #include "audio_dsp.h"

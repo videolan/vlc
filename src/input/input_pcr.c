@@ -9,7 +9,6 @@
  * Preamble
  *******************************************************************************/
 #include <stdio.h>
-#include <pthread.h>
 #include <sys/uio.h>                                                 /* iovec */
 #include <stdlib.h>                               /* atoi(), malloc(), free() */
 #include <netinet/in.h>
@@ -17,6 +16,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "debug.h"
 #include "input.h"
 #include "intf_msg.h"
@@ -54,7 +54,7 @@ int input_PcrInit( input_thread_t *p_input )
     {
         return( -1 );
     }
-    pthread_mutex_init( &p_input->p_pcr->lock, NULL );
+    vlc_mutex_init( &p_input->p_pcr->lock );
     input_PcrReInit(p_input);
     
     return( 0 );
@@ -81,7 +81,7 @@ void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
     sys_time = mdate();
     delta_clock = sys_time - pcr_time;
     
-    pthread_mutex_lock( &p_pcr->lock );
+    vlc_mutex_lock( &p_pcr->lock );
     
     if( p_es->b_discontinuity ||
         ( p_pcr->last_pcr != 0 && 
@@ -106,7 +106,7 @@ void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
         p_pcr->c_average++;
     }
 
-    pthread_mutex_unlock( &p_pcr->lock );
+    vlc_mutex_unlock( &p_pcr->lock );
     
 #ifdef STATS
     {

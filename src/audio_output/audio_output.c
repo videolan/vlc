@@ -12,7 +12,7 @@
  *     à chaque boucle
  *   = Utiliser des tables pour les gros calculs
  * - Faire une structure différente pour intf/adec fifo
- * - Rajouter des pthread_cond_signal ?
+ * - Rajouter des vlc_cond_signal ?
  *
  */
 
@@ -21,7 +21,6 @@
  ******************************************************************************/
 #include <unistd.h>
 
-#include <pthread.h>
 #include <sys/soundcard.h>
 #include <stdio.h>                                            /* "intf_msg.h" */
 #include <stdlib.h>                             /* calloc(), malloc(), free() */
@@ -29,6 +28,7 @@
 #include "common.h"
 #include "config.h"
 #include "mtime.h"                              /* mtime_t, mdate(), msleep() */
+#include "vlc_thread.h"
 
 #include "intf_msg.h"                         /* intf_DbgMsg(), intf_ErrMsg() */
 
@@ -112,13 +112,13 @@ int aout_SpawnThread( aout_thread_t * p_aout )
     p_aout->b_die = 0;
 
     /* Initialize the fifos lock */
-    pthread_mutex_init( &p_aout->fifos_lock, NULL );
+    vlc_mutex_init( &p_aout->fifos_lock );
     /* Initialize audio fifos : set all fifos as empty and initialize locks */
     for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
     {
         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO;
-        pthread_mutex_init( &p_aout->fifo[i_fifo].data_lock, NULL );
-        pthread_cond_init( &p_aout->fifo[i_fifo].data_wait, NULL );
+        vlc_mutex_init( &p_aout->fifo[i_fifo].data_lock );
+        vlc_cond_init( &p_aout->fifo[i_fifo].data_wait );
     }
 
     /* Compute the size (in audio units) of the audio output buffer. Although
@@ -239,7 +239,7 @@ int aout_SpawnThread( aout_thread_t * p_aout )
     p_aout->date = mdate();
 
     /* Launch the thread */
-    if ( pthread_create( &p_aout->thread_id, NULL, aout_thread, p_aout ) )
+    if ( vlc_thread_create( &p_aout->thread_id, "audio output", (vlc_thread_func)aout_thread, p_aout ) )
     {
         intf_ErrMsg("aout error: can't spawn audio output thread (%p)\n", p_aout);
         free( p_aout->buffer );
@@ -260,7 +260,7 @@ void aout_CancelThread( aout_thread_t * p_aout )
 
     /* Ask thread to kill itself and wait until it's done */
     p_aout->b_die = 1;
-    pthread_join( p_aout->thread_id, NULL );
+    vlc_thread_join( p_aout->thread_id );
 
     /* Free the allocated memory */
     free( p_aout->buffer );
@@ -284,7 +284,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
     int i_fifo;
 
     /* Take the fifos lock */
-    pthread_mutex_lock( &p_aout->fifos_lock );
+    vlc_mutex_lock( &p_aout->fifos_lock );
 
     /* Looking for a free fifo structure */
     for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
@@ -297,7 +297,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
     if ( i_fifo == AOUT_MAX_FIFOS )
     {
         intf_ErrMsg("aout error: no empty fifo available\n");
-        pthread_mutex_unlock( &p_aout->fifos_lock );
+        vlc_mutex_unlock( &p_aout->fifos_lock );
         return( NULL );
     }
 
@@ -333,7 +333,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
 	    {
                 intf_ErrMsg("aout error: not enough memory to create the frames buffer\n");
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO;
-	        pthread_mutex_unlock( &p_aout->fifos_lock );
+	        vlc_mutex_unlock( &p_aout->fifos_lock );
 	        return( NULL );
 	    }
 
@@ -343,7 +343,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
                 intf_ErrMsg("aout error: not enough memory to create the dates buffer\n");
                 free( p_aout->fifo[i_fifo].buffer );
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO;
-                pthread_mutex_unlock( &p_aout->fifos_lock );
+                vlc_mutex_unlock( &p_aout->fifos_lock );
                 return( NULL );
             }
 
@@ -365,12 +365,12 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
         default:
             intf_ErrMsg("aout error: unknown fifo type (%i)\n", p_aout->fifo[i_fifo].i_type);
             p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO;
-            pthread_mutex_unlock( &p_aout->fifos_lock );
+            vlc_mutex_unlock( &p_aout->fifos_lock );
             return( NULL );
     }
 
     /* Release the fifos lock */
-    pthread_mutex_unlock( &p_aout->fifos_lock );
+    vlc_mutex_unlock( &p_aout->fifos_lock );
 
     /* Return the pointer to the fifo structure */
     intf_DbgMsg("aout debug: audio output fifo (%p) allocated\n", &p_aout->fifo[i_fifo]);
@@ -431,7 +431,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
     long l_units, l_rate;
 
     /* We take the lock */
-    pthread_mutex_lock( &p_fifo->data_lock );
+    vlc_mutex_lock( &p_fifo->data_lock );
 
     /* Are we looking for a dated start frame ? */
     if ( !p_fifo->b_start_frame )
@@ -448,7 +448,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
         }
         if ( p_fifo->l_start_frame == p_fifo->l_end_frame )
         {
-            pthread_mutex_unlock( &p_fifo->data_lock );
+            vlc_mutex_unlock( &p_fifo->data_lock );
             return( -1 );
         }
     }
@@ -456,7 +456,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
     if ( aout_date < p_fifo->date[p_fifo->l_start_frame] )
     {
         fprintf(stderr, "+");
-        pthread_mutex_unlock( &p_fifo->data_lock );
+        vlc_mutex_unlock( &p_fifo->data_lock );
         return( -1 );
     }
 */
@@ -496,7 +496,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
             /* p_fifo->b_next_frame = 0; */
             p_fifo->l_end_frame = 0;
         }
-        pthread_mutex_unlock( &p_fifo->data_lock );
+        vlc_mutex_unlock( &p_fifo->data_lock );
         return( -1 );
     }
 
@@ -513,7 +513,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
         * p_aout->dsp.l_rate) / l_rate) + 1;
 
     /* We release the lock before leaving */
-    pthread_mutex_unlock( &p_fifo->data_lock );
+    vlc_mutex_unlock( &p_fifo->data_lock );
     return( 0 );
 }
 
@@ -549,7 +549,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
      * memory to zero and we can immediately jump into the thread's loop */
     while ( !p_aout->b_die )
     {
-        pthread_mutex_lock( &p_aout->fifos_lock );
+        vlc_mutex_lock( &p_aout->fifos_lock );
         for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
 	{
             switch ( p_aout->fifo[i_fifo].i_type )
@@ -674,10 +674,10 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                             }
                             l_units -= p_aout->fifo[i_fifo].l_units;
 
-                            pthread_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
+                            vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
                             p_aout->fifo[i_fifo].l_start_frame = p_aout->fifo[i_fifo].l_next_frame;
-                            pthread_cond_signal( &p_aout->fifo[i_fifo].data_wait );
-                            pthread_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+                            vlc_cond_signal( &p_aout->fifo[i_fifo].data_wait );
+                            vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
 
                             /* p_aout->fifo[i_fifo].b_start_frame = 1; */
                             p_aout->fifo[i_fifo].l_next_frame += 1;
@@ -742,10 +742,10 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                             }
                             l_units -= p_aout->fifo[i_fifo].l_units;
 
-                            pthread_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
+                            vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
                             p_aout->fifo[i_fifo].l_start_frame = p_aout->fifo[i_fifo].l_next_frame;
-                            pthread_cond_signal( &p_aout->fifo[i_fifo].data_wait );
-                            pthread_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+                            vlc_cond_signal( &p_aout->fifo[i_fifo].data_wait );
+                            vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
 
                             /* p_aout->fifo[i_fifo].b_start_frame = 1; */
                             p_aout->fifo[i_fifo].l_next_frame += 1;
@@ -760,7 +760,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     break;
             }
         }
-        pthread_mutex_unlock( &p_aout->fifos_lock );
+        vlc_mutex_unlock( &p_aout->fifos_lock );
 
         l_buffer_limit = p_aout->l_units << 1; /* p_aout->dsp.b_stereo == 1 */
 
@@ -790,7 +790,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
         UPDATE_INCREMENT( p_aout->date_increment, p_aout->date )
     }
 
-    pthread_mutex_lock( &p_aout->fifos_lock );
+    vlc_mutex_lock( &p_aout->fifos_lock );
     for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
     {
         switch ( p_aout->fifo[i_fifo].i_type )
@@ -817,7 +817,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                 break;
         }
     }
-    pthread_mutex_unlock( &p_aout->fifos_lock );
+    vlc_mutex_unlock( &p_aout->fifos_lock );
 }
 
 void aout_Thread_U16_Mono( aout_thread_t * p_aout )

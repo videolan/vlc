@@ -10,7 +10,6 @@
  * Preamble
  ******************************************************************************/
 #include <errno.h>
-#include <pthread.h>
 #include <sys/uio.h>                                                 /* iovec */
 #include <string.h>
 
@@ -27,6 +26,7 @@
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "intf_msg.h"
 #include "debug.h"
 
@@ -186,13 +186,13 @@ input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
 
     /* Create thread and set locks. */
     p_input->b_die = 0;
-    pthread_mutex_init( &p_input->netlist.lock, NULL );
-    pthread_mutex_init( &p_input->programs_lock, NULL );
-    pthread_mutex_init( &p_input->es_lock, NULL );
+    vlc_mutex_init( &p_input->netlist.lock );
+    vlc_mutex_init( &p_input->programs_lock );
+    vlc_mutex_init( &p_input->es_lock );
 #ifdef NO_THREAD
     input_Thread( p_input );
 #else
-    if( pthread_create(&p_input->thread_id, NULL, (void *) input_Thread, 
+    if( vlc_thread_create(&p_input->thread_id, "input", (vlc_thread_func)input_Thread, 
                        (void *) p_input) )
     {
         intf_ErrMsg("input error: can't spawn input thread (%s)\n", 
@@ -223,7 +223,7 @@ void input_DestroyThread( input_thread_t *p_input )
     p_input->b_die = 1;                          /* ask thread to kill itself */
 
     /* Remove this as soon as the "status" flag is implemented */
-    pthread_join( p_input->thread_id, NULL );         /* wait until it's done */
+    vlc_thread_join( p_input->thread_id );            /* wait until it's done */
 }
 
 #if 0
@@ -304,7 +304,7 @@ static void input_Thread( input_thread_t *p_input )
     EndThread( p_input );
 
     intf_DbgMsg("input debug: thread %p destroyed\n", p_input);
-    pthread_exit( 0 );
+    vlc_thread_exit( 0 );
 }
 
 
@@ -458,7 +458,7 @@ static __inline__ int input_ReadPacket( input_thread_t *p_input )
     /* Remove the TS packets we have just filled from the netlist */
 #ifdef INPUT_LIFO_TS_NETLIST
     /* We need to take a lock here while we're calculating index positions. */
-    pthread_mutex_lock( &p_input->netlist.lock );
+    vlc_mutex_lock( &p_input->netlist.lock );
 
     i_meanwhile_released = i_base_index - p_input->netlist.i_ts_index;
     if( i_meanwhile_released )
@@ -498,7 +498,7 @@ static __inline__ int input_ReadPacket( input_thread_t *p_input )
         p_input->netlist.i_ts_index = i_current_index;
     }
 
-    pthread_mutex_unlock( &p_input->netlist.lock );
+    vlc_mutex_unlock( &p_input->netlist.lock );
 
 #else /* FIFO netlist */
     /* & is modulo ; that's where we make the loop. */
@@ -538,7 +538,7 @@ static __inline__ void input_SortPacket( input_thread_t *p_input,
 //                    i_current_pid, p_ts_packet);
 
         /* Lock current ES state. */
-        pthread_mutex_lock( &p_input->es_lock );
+        vlc_mutex_lock( &p_input->es_lock );
         
 	/* Verify that we actually want this PID. */
         for( i_es_loop = 0; i_es_loop < INPUT_MAX_SELECTED_ES; i_es_loop++ )
@@ -553,7 +553,7 @@ static __inline__ void input_SortPacket( input_thread_t *p_input,
                        modified from inside the input_thread (by the PSI
                        decoder): interface thread is only allowed to modify
                        the pp_selected_es table */
-                    pthread_mutex_unlock( &p_input->es_lock );
+                    vlc_mutex_unlock( &p_input->es_lock );
 
                     /* We're interested. Pass it to the demultiplexer. */
                     input_DemuxTS( p_input, p_ts_packet,
@@ -567,7 +567,7 @@ static __inline__ void input_SortPacket( input_thread_t *p_input,
                 break;
             }
         }
-        pthread_mutex_unlock( &p_input->es_lock );
+        vlc_mutex_unlock( &p_input->es_lock );
     }
 
     /* We weren't interested in receiving this packet. Give it back to the
@@ -705,16 +705,6 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
             intf_DbgMsg("Duplicate packet received by TS demux\n");
             b_trash = 1;
         }
-        else if( p_es_descriptor->i_continuity_counter == 0xFF )
-        {
-            /* This means that the packet is the first one we receive for this
-               ES since the continuity counter ranges between 0 and 0x0F
-               excepts when it has been initialized by the input: Init the 
-               counter to the correct value. */
-            intf_DbgMsg("First packet for PID %d received by TS demux\n",
-                        p_es_descriptor->i_id);
-            p_es_descriptor->i_continuity_counter = (p[3] & 0x0f);
-        }
         else
         {
             /* This can indicate that we missed a packet or that the
@@ -841,7 +831,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                      so the PES won't be usefull for any decoder. Moreover,
                      this should never happen so we can trash the packet and
                      exit roughly without regrets */
-                  intf_DbgMsg("PES packet is too short: trashed\n");
+                  intf_DbgMsg("PES packet too short: trashed\n");
                   input_NetlistFreePES( p_input, p_pes );
                   p_pes = NULL;
                   /* Stats ?? */
@@ -915,7 +905,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                     pcr_descriptor_t * p_pcr;
 
                     p_pcr = p_input->p_pcr;
-                    pthread_mutex_lock( &p_pcr->lock );
+                    vlc_mutex_lock( &p_pcr->lock );
                     if( p_pcr->delta_clock == 0 )
                     {
                         p_pes->b_has_pts = 0;
@@ -935,7 +925,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                         p_pes->i_pts += p_pcr->delta_decode;
                         p_pcr->c_pts += 1;
                     }
-                    pthread_mutex_unlock( &p_pcr->lock );
+                    vlc_mutex_unlock( &p_pcr->lock );
                 }
                 break;
             }
@@ -982,7 +972,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
 
             if( p_fifo != NULL )
             {
-                pthread_mutex_lock( &p_fifo->data_lock );
+                vlc_mutex_lock( &p_fifo->data_lock );
                 if( DECODER_FIFO_ISFULL( *p_fifo ) )
                 {
                     /* The FIFO is full !!! This should not happen. */
@@ -1002,9 +992,9 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                     DECODER_FIFO_INCEND( *p_fifo );
 
                     /* Warn the decoder that it's got work to do. */
-                    pthread_cond_signal( &p_fifo->data_wait );
+                    vlc_cond_signal( &p_fifo->data_wait );
                 }
-                pthread_mutex_unlock( &p_fifo->data_lock );
+                vlc_mutex_unlock( &p_fifo->data_lock );
             }
             else
             {

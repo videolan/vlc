@@ -13,7 +13,6 @@
  ******************************************************************************/
 #include <unistd.h>
 
-#include <pthread.h>
 #include <stdio.h>                                            /* "intf_msg.h" */
 #include <stdlib.h>                                       /* malloc(), free() */
 #include <netinet/in.h>                                            /* ntohl() */
@@ -23,6 +22,7 @@
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "debug.h"                                       /* "input_netlist.h" */
 
 #include "intf_msg.h"                         /* intf_DbgMsg(), intf_ErrMsg() */
@@ -85,8 +85,8 @@ adec_thread_t * adec_CreateThread( input_thread_t * p_input )
      */
     /* Initialize the decoder fifo's data lock and conditional variable and set
      * its buffer as empty */
-    pthread_mutex_init( &p_adec->fifo.data_lock, NULL );
-    pthread_cond_init( &p_adec->fifo.data_wait, NULL );
+    vlc_mutex_init( &p_adec->fifo.data_lock );
+    vlc_cond_init( &p_adec->fifo.data_wait );
     p_adec->fifo.i_start = 0;
     p_adec->fifo.i_end = 0;
     /* Initialize the bit stream structure */
@@ -110,7 +110,7 @@ adec_thread_t * adec_CreateThread( input_thread_t * p_input )
     p_adec->p_aout_fifo = NULL;
 
     /* Spawn the audio decoder thread */
-    if ( pthread_create(&p_adec->thread_id, NULL, (void *)RunThread, (void *)p_adec) )
+    if ( vlc_thread_create(&p_adec->thread_id, "audio decoder", (vlc_thread_func)RunThread, (void *)p_adec) )
     {
         intf_ErrMsg("adec error: can't spawn audio decoder thread\n");
         free( p_adec );
@@ -137,13 +137,13 @@ void adec_DestroyThread( adec_thread_t * p_adec )
     /* Ask thread to kill itself */
     p_adec->b_die = 1;
     /* Make sure the decoder thread leaves the GetByte() function */
-    pthread_mutex_lock( &(p_adec->fifo.data_lock) );
-    pthread_cond_signal( &(p_adec->fifo.data_wait) );
-    pthread_mutex_unlock( &(p_adec->fifo.data_lock) );
+    vlc_mutex_lock( &(p_adec->fifo.data_lock) );
+    vlc_cond_signal( &(p_adec->fifo.data_wait) );
+    vlc_mutex_unlock( &(p_adec->fifo.data_lock) );
 
     /* Waiting for the decoder thread to exit */
     /* Remove this as soon as the "status" flag is implemented */
-    pthread_join( p_adec->thread_id, NULL );
+    vlc_thread_join( p_adec->thread_id );
 }
 
 /* Following functions are local */
@@ -702,14 +702,14 @@ static int InitThread( adec_thread_t * p_adec )
 
     /* Our first job is to initialize the bit stream structure with the
      * beginning of the input stream */
-    pthread_mutex_lock( &p_adec->fifo.data_lock );
+    vlc_mutex_lock( &p_adec->fifo.data_lock );
     while ( DECODER_FIFO_ISEMPTY(p_adec->fifo) )
     {
-        pthread_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
+        vlc_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
     }
     p_adec->bit_stream.p_ts = DECODER_FIFO_START( p_adec->fifo )->p_first_ts;
     p_adec->bit_stream.i_byte = p_adec->bit_stream.p_ts->i_payload_start;
-    pthread_mutex_unlock( &p_adec->fifo.data_lock );
+    vlc_mutex_unlock( &p_adec->fifo.data_lock );
 
     /* Now we look for an audio frame header in the input stream */
     if ( FindHeader(p_adec) )
@@ -836,7 +836,7 @@ static void RunThread( adec_thread_t * p_adec )
 
                     /* Waiting until there is enough free space in the audio output fifo
                      * in order to store the new decoded frames */
-                    pthread_mutex_lock( &p_adec->p_aout_fifo->data_lock );
+                    vlc_mutex_lock( &p_adec->p_aout_fifo->data_lock );
                     /* adec_Layer2_Stereo() produces 6 output frames (2*1152/384)...
                      * If these 6 frames were recorded in the audio output fifo, the
                      * l_end_frame index would be incremented 6 times. But, if after
@@ -844,14 +844,14 @@ static void RunThread( adec_thread_t * p_adec )
                      * it would mean that we had not enough room to store the 6 frames :-P */
                     while ( (((p_adec->p_aout_fifo->l_end_frame + 6) - p_adec->p_aout_fifo->l_start_frame) & AOUT_FIFO_SIZE) < 6 ) /* !! */
                     {
-                        pthread_cond_wait( &p_adec->p_aout_fifo->data_wait, &p_adec->p_aout_fifo->data_lock );
+                        vlc_cond_wait( &p_adec->p_aout_fifo->data_wait, &p_adec->p_aout_fifo->data_lock );
                     }
-                    pthread_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
+                    vlc_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
 
                     /* Decoding the frames */
                     if ( adec_Layer2_Stereo(p_adec) )
                     {
-                        pthread_mutex_lock( &p_adec->p_aout_fifo->data_lock );
+                        vlc_mutex_lock( &p_adec->p_aout_fifo->data_lock );
                         /* Frame 1 */
                         if ( DECODER_FIFO_START(p_adec->fifo)->b_has_pts )
                         {
@@ -878,7 +878,7 @@ static void RunThread( adec_thread_t * p_adec )
                         /* Frame 6 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-                        pthread_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
+                        vlc_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
                     }
                 }
                 break;
@@ -926,7 +926,7 @@ static void ErrorThread( adec_thread_t *p_adec )
 {
     /* We take the lock, because we are going to read/write the start/end
      * indexes of the decoder fifo */
-    pthread_mutex_lock( &p_adec->fifo.data_lock );
+    vlc_mutex_lock( &p_adec->fifo.data_lock );
 
     /* Wait until a `die' order is sent */
     while( !p_adec->b_die )
@@ -939,11 +939,11 @@ static void ErrorThread( adec_thread_t *p_adec )
         }
 
         /* Waiting for the input thread to put new PES packets in the fifo */
-        pthread_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
+        vlc_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
     }
 
     /* We can release the lock before leaving */
-    pthread_mutex_unlock( &p_adec->fifo.data_lock );
+    vlc_mutex_unlock( &p_adec->fifo.data_lock );
 }
 
 /******************************************************************************

@@ -29,7 +29,6 @@
  * Preamble
  *******************************************************************************/
 #include <errno.h>
-#include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,6 +45,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "netutils.h"
 
 #include "input.h"
@@ -172,7 +172,7 @@ int input_VlanMethodInit( input_vlan_method_t *p_method, char *psz_server, int i
     }      
 
     /* Initialize lock */
-    pthread_mutex_init( &p_method->lock, NULL );
+    vlc_mutex_init( &p_method->lock );
 
     intf_Msg("input: vlans input method installed\n", p_method->i_ifaces);
     return( 0 );    
@@ -270,7 +270,7 @@ int input_VlanJoin( int i_vlan_id )
     }
     
     /* Get lock */
-    pthread_mutex_lock( &p_method->lock );
+    vlc_mutex_lock( &p_method->lock );
     
     /* If the interface is in the wished vlan, increase lock counter */
     if( p_iface->i_vlan != VLAN_ID_VLAN( i_vlan_id ) )
@@ -301,7 +301,7 @@ int input_VlanJoin( int i_vlan_id )
     }                    
 
     /* Release lock (if this point is reached, the function succeeded) */
-    pthread_mutex_unlock( &p_method->lock );       
+    vlc_mutex_unlock( &p_method->lock );       
     return( i_err );    
 }
 
@@ -327,13 +327,13 @@ void input_VlanLeave( int i_vlan_id )
     }
     
     /* Get lock */
-    pthread_mutex_lock( &p_method->lock );
+    vlc_mutex_lock( &p_method->lock );
 
     /* Decrease reference counter */
     p_method->p_iface[ VLAN_ID_IFACE( i_vlan_id ) ].i_refcount--;    
 
     /* Release lock */
-    pthread_mutex_unlock( &p_method->lock );   
+    vlc_mutex_unlock( &p_method->lock );   
 }
 
 /*******************************************************************************
@@ -391,7 +391,7 @@ int input_VlanSynchronize( void )
     
     /* Get lock */
     p_method = &p_program_data->input_vlan_method;
-    pthread_mutex_lock( &p_method->lock );
+    vlc_mutex_lock( &p_method->lock );
 
     for( i_index = 0; i_index < p_method->i_ifaces; i_index++ )
     {        
@@ -431,7 +431,7 @@ int input_VlanSynchronize( void )
     }    
 
     /* Release lock */
-    pthread_mutex_unlock( &p_method->lock );   
+    vlc_mutex_unlock( &p_method->lock );   
     return( 0 );    
 }
 

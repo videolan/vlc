@@ -9,7 +9,6 @@
  * Preamble
  *******************************************************************************/
 #include <errno.h>
-#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -21,6 +20,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 
 #include "intf_msg.h"
 #include "debug.h"                      /* ?? temporaire, requis par netlist.h */
@@ -73,8 +73,8 @@ vdec_thread_t * vdec_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
      * Initialize the input properties
      */
     /* Initialize the decoder fifo's data lock and conditional variable and set     * its buffer as empty */
-    pthread_mutex_init( &p_vdec->fifo.data_lock, NULL );
-    pthread_cond_init( &p_vdec->fifo.data_wait, NULL );
+    vlc_mutex_init( &p_vdec->fifo.data_lock );
+    vlc_cond_init( &p_vdec->fifo.data_wait );
     p_vdec->fifo.i_start = 0;
     p_vdec->fifo.i_end = 0;
     /* Initialize the bit stream structure */
@@ -84,7 +84,7 @@ vdec_thread_t * vdec_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     p_vdec->bit_stream.fifo.i_available = 0;
 
     /* Spawn the video decoder thread */
-    if ( pthread_create(&p_vdec->thread_id, NULL, (void *)RunThread, (void *)p_vdec) )
+    if ( vlc_thread_create(&p_vdec->thread_id, "video decoder", (vlc_thread_func)RunThread, (void *)p_vdec) )
     {
         intf_ErrMsg("vdec error: can't spawn video decoder thread\n");
         free( p_vdec );
@@ -109,13 +109,13 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
     /* Ask thread to kill itself */
     p_vdec->b_die = 1;
     /* Make sure the decoder thread leaves the GetByte() function */
-    pthread_mutex_lock( &(p_vdec->fifo.data_lock) );
-    pthread_cond_signal( &(p_vdec->fifo.data_wait) );
-    pthread_mutex_unlock( &(p_vdec->fifo.data_lock) );
+    vlc_mutex_lock( &(p_vdec->fifo.data_lock) );
+    vlc_cond_signal( &(p_vdec->fifo.data_wait) );
+    vlc_mutex_unlock( &(p_vdec->fifo.data_lock) );
 
     /* Waiting for the decoder thread to exit */
     /* Remove this as soon as the "status" flag is implemented */
-    pthread_join( p_vdec->thread_id, NULL );
+    vlc_thread_join( p_vdec->thread_id );
 }
 
 /* following functions are local */
@@ -149,14 +149,14 @@ static int InitThread( vdec_thread_t *p_vdec )
 
     /* Our first job is to initialize the bit stream structure with the
      * beginning of the input stream */
-    pthread_mutex_lock( &p_vdec->fifo.data_lock );
+    vlc_mutex_lock( &p_vdec->fifo.data_lock );
     while ( DECODER_FIFO_ISEMPTY(p_vdec->fifo) )
     {
-        pthread_cond_wait( &p_vdec->fifo.data_wait, &p_vdec->fifo.data_lock );
+        vlc_cond_wait( &p_vdec->fifo.data_wait, &p_vdec->fifo.data_lock );
     }
     p_vdec->bit_stream.p_ts = DECODER_FIFO_START( p_vdec->fifo )->p_first_ts;
     p_vdec->bit_stream.i_byte = p_vdec->bit_stream.p_ts->i_payload_start;
-    pthread_mutex_unlock( &p_vdec->fifo.data_lock );
+    vlc_mutex_unlock( &p_vdec->fifo.data_lock );
 
 #if 0
     /* ?? */
@@ -250,7 +250,7 @@ static void ErrorThread( vdec_thread_t *p_vdec )
     {
         /* We take the lock, because we are going to read/write the start/end
          * indexes of the decoder fifo */
-        pthread_mutex_lock( &p_vdec->fifo.data_lock );
+        vlc_mutex_lock( &p_vdec->fifo.data_lock );
 
         /* ?? trash all trashable PES packets */
         while( !DECODER_FIFO_ISEMPTY(p_vdec->fifo) )
@@ -259,7 +259,7 @@ static void ErrorThread( vdec_thread_t *p_vdec )
             DECODER_FIFO_INCSTART( p_vdec->fifo );
         }
 
-        pthread_mutex_unlock( &p_vdec->fifo.data_lock );
+        vlc_mutex_unlock( &p_vdec->fifo.data_lock );
         /* Sleep a while */
         msleep( VDEC_IDLE_SLEEP );                
     }

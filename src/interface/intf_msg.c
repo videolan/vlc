@@ -15,7 +15,6 @@
  * Preamble
  *******************************************************************************/
 #include <errno.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -29,6 +28,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "debug.h"
 
 #include "input.h"
@@ -73,7 +73,7 @@ int intf_InitMsg( interface_msg_t *p_intf_msg )
 {
 #ifdef INTF_MSG_QUEUE
     /* Message queue initialization */
-    pthread_mutex_init( &p_intf_msg->lock, NULL );           /* intialize lock */
+    vlc_mutex_init( &p_intf_msg->lock );                     /* intialize lock */
     p_intf_msg->i_count = 0;                                 /* queue is empty */
 #endif
 
@@ -241,9 +241,9 @@ void _intf_DbgMsgImm( char *psz_file, char *psz_function, int i_line,
 #ifdef INTF_MSG_QUEUE
 void intf_FlushMsg( void )
 {
-    pthread_mutex_lock( &p_program_data->intf_msg.lock );          /* get lock */
+    vlc_mutex_lock( &p_program_data->intf_msg.lock );              /* get lock */
     FlushLockedMsg( &p_program_data->intf_msg );             /* flush messages */
-    pthread_mutex_unlock( &p_program_data->intf_msg.lock );  /* give lock back */
+    vlc_mutex_unlock( &p_program_data->intf_msg.lock );      /* give lock back */
 }
 #endif
 
@@ -280,7 +280,7 @@ static void QueueMsg(interface_msg_t *p_intf_msg, int i_type, char *psz_format, 
      * Queue mode: the queue is flushed if it is full, then the message is
      * queued. A lock is required on queue to avoid indexes corruption 
      */
-    pthread_mutex_lock( &p_intf_msg->lock );                        /* get lock */
+    vlc_mutex_lock( &p_intf_msg->lock );                            /* get lock */
     
     if( p_intf_msg->i_count == INTF_MSG_QSIZE )        /* flush queue if needed */
     {  
@@ -297,7 +297,7 @@ static void QueueMsg(interface_msg_t *p_intf_msg, int i_type, char *psz_format, 
     p_intf_msg->msg[ p_intf_msg->i_count ].date =       mdate();
 #endif
 
-    pthread_mutex_unlock( &p_intf_msg->lock );               /* give lock back */
+    vlc_mutex_unlock( &p_intf_msg->lock );                  /* give lock back */
 
 #else
 
@@ -346,7 +346,7 @@ static void QueueDbgMsg(interface_msg_t *p_intf_msg, char *psz_file, char *psz_f
      * Queue mode: the queue is flushed if it is full, then the message is
      * queued. A lock is required on queue to avoid indexes corruption 
      */
-    pthread_mutex_lock( &p_intf_msg->lock );                       /* get lock */
+    vlc_mutex_lock( &p_intf_msg->lock );                           /* get lock */
     
     if( p_intf_msg->i_count == INTF_MSG_QSIZE )       /* flush queue if needed */
     {  
@@ -362,7 +362,7 @@ static void QueueDbgMsg(interface_msg_t *p_intf_msg, char *psz_file, char *psz_f
     p_intf_msg->msg[ p_intf_msg->i_count ].i_line =         i_line;
     p_intf_msg->msg[ p_intf_msg->i_count++ ].psz_msg =      psz_str;    
 
-    pthread_mutex_unlock( &p_intf_msg->lock );               /* give lock back */
+    vlc_mutex_unlock( &p_intf_msg->lock );                  /* give lock back */
 
 #else
 

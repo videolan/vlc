@@ -11,7 +11,6 @@
  * Preamble
  *******************************************************************************/
 #include <errno.h> 
-#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -22,6 +21,7 @@
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 #include "thread.h"
 
 #include "video.h"
@@ -105,9 +105,9 @@ vout_thread_t *vout_CreateThread( video_cfg_t *p_cfg, int *pi_status )
     p_vout->b_active = 0;
 
     /* Create thread and set locks */
-    pthread_mutex_init( &p_vout->streams_lock, NULL );
-    pthread_mutex_init( &p_vout->pictures_lock, NULL );
-    if( pthread_create( &p_vout->thread_id, NULL, (void *) RunThread, (void *) p_vout) )
+    vlc_mutex_init( &p_vout->streams_lock );
+    vlc_mutex_init( &p_vout->pictures_lock );
+    if( vlc_thread_create( &p_vout->thread_id, "video output", (vlc_thread_func)RunThread, (void *) p_vout) )
     {
         intf_ErrMsg("vout error: %s\n", strerror(ENOMEM));
         intf_DbgMsg("failed\n");        
@@ -195,7 +195,7 @@ picture_t * vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Release lock and return */
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
     return( p_newpic );
 }
 
@@ -229,7 +229,7 @@ picture_t * vout_DisplayPictureCopy( vout_thread_t *p_vout, picture_t *p_pic )
                 /* Restore type and flags */
                 p_newpic->i_type = EMPTY_PICTURE;
                 p_newpic->i_flags = 0;
-                pthread_mutex_unlock( &p_vout->pictures_lock );            
+                vlc_mutex_unlock( &p_vout->pictures_lock );            
                 return( NULL );
             }
             memcpy( p_newpic->p_data, p_pic->p_data,
@@ -251,7 +251,7 @@ picture_t * vout_DisplayPictureCopy( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Release lock and return */
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
     return( p_newpic );
 }
 
@@ -286,7 +286,7 @@ picture_t * vout_DisplayPictureReplicate( vout_thread_t *p_vout, picture_t *p_pi
     }
 
    /* Release lock and return */
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
     return( p_newpic );
 }
 
@@ -301,7 +301,7 @@ picture_t * vout_DisplayPictureReplicate( vout_thread_t *p_vout, picture_t *p_pi
  *******************************************************************************/
 picture_t * vout_DisplayReservedPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    pthread_mutex_lock( &p_vout->pictures_lock );
+    vlc_mutex_lock( &p_vout->pictures_lock );
 
     /* Remove reservation flag */
     p_pic->i_flags &= ~RESERVED_PICTURE;
@@ -312,7 +312,7 @@ picture_t * vout_DisplayReservedPicture( vout_thread_t *p_vout, picture_t *p_pic
     p_vout->p_stream[ p_pic->i_stream ].c_pictures++;
 #endif
 
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
     return( p_pic );
 }
 
@@ -355,7 +355,7 @@ picture_t *vout_CreateReservedPicture( vout_thread_t *p_vout, video_cfg_t *p_cfg
             /* Error: restore type and flags */
             p_newpic->i_type = EMPTY_PICTURE;
             p_newpic->i_flags = 0;
-            pthread_mutex_unlock( &p_vout->pictures_lock );
+            vlc_mutex_unlock( &p_vout->pictures_lock );
             return( NULL );
         }
         p_newpic->i_flags |= RESERVED_PICTURE;
@@ -365,7 +365,7 @@ picture_t *vout_CreateReservedPicture( vout_thread_t *p_vout, video_cfg_t *p_cfg
     }
 
     /* Release lock and return */
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
     return( p_newpic );
 }
 
@@ -395,7 +395,7 @@ picture_t *vout_ReservePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Release lock and return */
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
     return( p_newpic );
 }
 
@@ -426,7 +426,7 @@ picture_t *vout_ReservePictureCopy( vout_thread_t *p_vout, picture_t *p_pic )
                 /* Restore type and flags */
                 p_newpic->i_type = EMPTY_PICTURE;
                 p_newpic->i_flags = 0;
-                pthread_mutex_unlock( &p_vout->pictures_lock );   
+                vlc_mutex_unlock( &p_vout->pictures_lock );   
                 return( NULL );
             }
             memcpy( p_newpic->p_data, p_pic->p_data,
@@ -445,7 +445,7 @@ picture_t *vout_ReservePictureCopy( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Release lock and return */
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
     return( p_newpic );
 }
 
@@ -475,7 +475,7 @@ picture_t *vout_ReservePictureReplicate( vout_thread_t *p_vout, picture_t *p_pic
     }
 
     /* Release lock and return */
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
     return( p_newpic );
 }
 
@@ -487,7 +487,7 @@ picture_t *vout_ReservePictureReplicate( vout_thread_t *p_vout, picture_t *p_pic
  *******************************************************************************/
 void vout_RemovePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    pthread_mutex_lock( &p_vout->pictures_lock );
+    vlc_mutex_lock( &p_vout->pictures_lock );
 
     /* Mark picture for destruction */
     p_pic->i_flags |= DESTROY_PICTURE;
@@ -496,7 +496,7 @@ void vout_RemovePicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic->i_flags &= ~PERMANENT_PICTURE;
     intf_DbgMsg("%p -> picture %p removing requested\n", p_vout, p_pic );
 
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
 }
 
 /*******************************************************************************
@@ -508,10 +508,10 @@ void vout_RemovePicture( vout_thread_t *p_vout, picture_t *p_pic )
 void vout_RefreshPermanentPicture( vout_thread_t *p_vout, picture_t *p_pic, 
                                    mtime_t display_date )
 {
-    pthread_mutex_lock( &p_vout->pictures_lock );
+    vlc_mutex_lock( &p_vout->pictures_lock );
     p_pic->i_flags &= ~DISPLAYED_PICTURE;
     p_pic->date = display_date;
-    pthread_mutex_lock( &p_vout->pictures_lock );
+    vlc_mutex_lock( &p_vout->pictures_lock );
 }
 
 /*******************************************************************************
@@ -522,9 +522,9 @@ void vout_RefreshPermanentPicture( vout_thread_t *p_vout, picture_t *p_pic,
  *******************************************************************************/
 void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    pthread_mutex_lock( &p_vout->pictures_lock );
+    vlc_mutex_lock( &p_vout->pictures_lock );
     p_pic->i_refcount++;
-    pthread_mutex_unlock( &p_vout->pictures_lock );
+    vlc_mutex_unlock( &p_vout->pictures_lock );
 }
 
 /*******************************************************************************
@@ -534,7 +534,7 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *******************************************************************************/
 void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    pthread_mutex_lock( &p_vout->pictures_lock );
+    vlc_mutex_lock( &p_vout->pictures_lock );
     p_pic->i_refcount--;
 #ifdef DEBUG
     if( p_pic->i_refcount < 0 )
@@ -542,7 +542,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
         intf_DbgMsg("%p -> picture %p i_refcount < 0\n", p_vout, p_pic);
     }
 #endif
-    pthread_mutex_unlock( &p_vout->pictures_lock );    
+    vlc_mutex_unlock( &p_vout->pictures_lock );    
 }
 
 /*******************************************************************************
@@ -558,7 +558,7 @@ int vout_CreateStream( vout_thread_t *p_vout )
     int     i_index;                                           /* stream index */
 
     /* Find free (inactive) stream id */
-    pthread_mutex_lock( &p_vout->streams_lock );                   /* get lock */
+    vlc_mutex_lock( &p_vout->streams_lock );                   /* get lock */
     for( i_index = 1; i_index < VOUT_MAX_STREAMS; i_index++ )  /* find free id */
     {
         if( p_vout->p_stream[i_index].i_status == VOUT_INACTIVE_STREAM )
@@ -572,14 +572,14 @@ int vout_CreateStream( vout_thread_t *p_vout )
             
             /* Return stream id */
             intf_DbgMsg("%p -> stream %i created\n", p_vout, i_index);
-            pthread_mutex_unlock( &p_vout->streams_lock );     /* release lock */
+            vlc_mutex_unlock( &p_vout->streams_lock );     /* release lock */
             return( i_index );                                    /* return id */
         }
     }
    
     /* Failure: all streams id are already active */
     intf_DbgMsg("%p -> failed\n", p_vout);    
-    pthread_mutex_unlock( &p_vout->streams_lock );    
+    vlc_mutex_unlock( &p_vout->streams_lock );    
     return( -1 );
 }
 
@@ -592,9 +592,9 @@ int vout_CreateStream( vout_thread_t *p_vout )
  *******************************************************************************/
 void vout_EndStream( vout_thread_t *p_vout, int i_stream )
 {
-    pthread_mutex_lock( &p_vout->streams_lock );                   /* get lock */
+    vlc_mutex_lock( &p_vout->streams_lock );                   /* get lock */
     p_vout->p_stream[i_stream].i_status = VOUT_ENDING_STREAM;   /* mark stream */
-    pthread_mutex_unlock( &p_vout->streams_lock );             /* release lock */
+    vlc_mutex_unlock( &p_vout->streams_lock );             /* release lock */
     intf_DbgMsg("%p -> stream %d\n", p_vout, i_stream);
 }
 
@@ -607,9 +607,9 @@ void vout_EndStream( vout_thread_t *p_vout, int i_stream )
  *******************************************************************************/
 void vout_DestroyStream( vout_thread_t *p_vout, int i_stream )
 {
-    pthread_mutex_lock( &p_vout->streams_lock );                   /* get lock */
+    vlc_mutex_lock( &p_vout->streams_lock );                   /* get lock */
     p_vout->p_stream[i_stream].i_status = VOUT_DESTROYED_STREAM;/* mark stream */
-    pthread_mutex_unlock( &p_vout->streams_lock );             /* release lock */
+    vlc_mutex_unlock( &p_vout->streams_lock );             /* release lock */
     intf_DbgMsg("%p -> stream %d\n", p_vout, i_stream);
 }
 
@@ -765,8 +765,8 @@ static void RunThread( vout_thread_t *p_vout)
     while( (!p_vout->b_die) && (!p_vout->b_error) )
     {
         /* Get locks on pictures and streams */
-        pthread_mutex_lock( &p_vout->streams_lock );
-        pthread_mutex_lock( &p_vout->pictures_lock );
+        vlc_mutex_lock( &p_vout->streams_lock );
+        vlc_mutex_lock( &p_vout->pictures_lock );
         
         /* Initialise streams: clear images from all streams */
         for( i_stream = 0; i_stream < VOUT_MAX_STREAMS; i_stream++ )
@@ -824,8 +824,8 @@ static void RunThread( vout_thread_t *p_vout)
         /* From now until next loop, only next_picture field in streams
          * will be used, and selected pictures structures won't modified.
          * Therefore, locks can be released */
-        pthread_mutex_unlock( &p_vout->pictures_lock );
-        pthread_mutex_unlock( &p_vout->streams_lock );
+        vlc_mutex_unlock( &p_vout->pictures_lock );
+        vlc_mutex_unlock( &p_vout->streams_lock );
 
         /* If there are some pictures to display, then continue */
         if( display_date != LAST_MDATE )
@@ -929,7 +929,7 @@ static void ErrorThread( vout_thread_t *p_vout )
     while( !p_vout->b_die )
     {
         /* Get lock on pictures */
-        pthread_mutex_lock( &p_vout->pictures_lock );     
+        vlc_mutex_lock( &p_vout->pictures_lock );     
 
         /* Try to remove all pictures - only removable pictures will be
          * removed */
@@ -942,7 +942,7 @@ static void ErrorThread( vout_thread_t *p_vout )
         }
         
         /* Release locks on pictures */
-        pthread_mutex_unlock( &p_vout->pictures_lock );
+        vlc_mutex_unlock( &p_vout->pictures_lock );
 
         /* Sleep a while */
         msleep( VOUT_IDLE_SLEEP );                
@@ -1008,7 +1008,7 @@ static picture_t *FindPicture( vout_thread_t *p_vout )
     int         i_picture;                                    /* picture index */
 
     /* Get lock */
-    pthread_mutex_lock( &p_vout->pictures_lock );
+    vlc_mutex_lock( &p_vout->pictures_lock );
 
     /* Look for an empty place */
     for( i_picture = 0; i_picture < p_vout->i_max_pictures; i_picture++ )
