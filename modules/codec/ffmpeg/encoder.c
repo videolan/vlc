@@ -361,6 +361,17 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_sys->p_buffer_out = malloc( AVCODEC_MAX_VIDEO_FRAME_SIZE );
 
         p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+        p_context->pix_fmt = E_(GetFfmpegChroma)( p_enc->fmt_in.i_codec );
+        if( p_codec->pix_fmts )
+        {
+            const enum PixelFormat *p = p_codec->pix_fmts;
+            for( ; *p != -1; p++ )
+            {
+                if( *p == p_context->pix_fmt ) break;
+            }
+            if( *p == -1 ) p_context->pix_fmt = p_codec->pix_fmts[0];
+            p_enc->fmt_in.i_codec = E_(GetVlcChroma)( p_context->pix_fmt );
+        }
 
         if ( p_sys->b_strict_rc )
         {
