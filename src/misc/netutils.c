@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.50 2001/11/26 23:06:02 marcari Exp $
+ * $Id: netutils.c,v 1.51 2001/11/27 14:42:46 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -351,12 +351,15 @@ int network_ChannelJoin( int i_channel )
         {
             free( p_item->psz_name );
             p_item->psz_name = strdup( psz_mess );
+            /* Unlock _afterwards_ */
+            vlc_mutex_unlock( &p_main->p_playlist->change_lock );
         }
         else
         {
+            /* Unlock _before_ */
+            vlc_mutex_unlock( &p_main->p_playlist->change_lock );
             intf_PlaylistAdd( p_main->p_playlist, 0, psz_mess );
         }
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     }
 
     /* Close the socket and return nicely */
