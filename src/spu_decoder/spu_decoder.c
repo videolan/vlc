@@ -255,6 +255,7 @@ static void RunThread( spudec_thread_t *p_spudec )
                 while( i_index++ < i_rle_size )
                 {
                     /* skip the leading byte of a PES */
+                    /* FIXME: this part definitely looks strange */
                     if ( !((i_index + 3) % i_pes_size) )
                     {
                         i_pes_count++;
@@ -288,20 +289,16 @@ static void RunThread( spudec_thread_t *p_spudec )
                                 /* 00 (force displaying) */
                                 break;
                             /* FIXME: here we have to calculate dates. It's
-                             * around i_date * 1000000 / 83 but I don't know
-                             * how much exactly. Here are my findings :
-                             *
-                             * - 80 is too small ( Lain Deus, VTS_01_2.VOB )
-                             *  -> 82 seems to be the minimum, 83 is fine.
-                             *
+                             * around i_date * 10000 but I don't know
+                             * how much exactly.
                              */
                             case 0x01:
                                 /* 01 (start displaying) */
-                                p_spu->begin_date += ( i_date * 1000000 / 83 );
+                                p_spu->begin_date += ( i_date * 10000 );
                                 break;
                             case 0x02:
                                 /* 02 (stop displaying) */
-                                p_spu->end_date += ( i_date * 1000000 / 83 );
+                                p_spu->end_date += ( i_date * 10000 );
                                 break;
                             case 0x03:
                                 /* 03xxxx (palette) */

@@ -20,12 +20,13 @@ AOUT += dsp
 AOUT += dummy
 
 # Video output settings
-#VOUT += x11
+VOUT += x11
 #VOUT += fb
 #VOUT += ggi
 #VOUT += glide
-# Not yet supported
 #VOUT += gnome
+# Not yet supported
+#VOUT += mga
 #VOUT += beos
 #VOUT += dga
 # Fallback method that should always work
@@ -36,8 +37,9 @@ INTF += x11
 #INTF += fb
 #INTF += ggi
 #INTF += glide
-# Not yet supported
 #INTF += gnome
+# Not yet supported
+#INTF += mga
 #INTF += beos
 #INTF += dga
 # Fallback method that should always work
@@ -448,6 +450,10 @@ else
 endif
 
 plugins/intf/intf_x11.so plugins/vout/vout_x11.so: %.so: %.c
+		@echo "compiling $*.so from $*.c"
+		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
+
+plugins/intf/intf_mga.so plugins/vout/vout_mga.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
 

@@ -1649,8 +1649,8 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
     /* Get and set rendering informations */
     p_buffer =          &p_vout->p_buffer[ p_vout->i_buffer_index ];
     p_pic_data =        p_buffer->p_data +
-        p_buffer->i_pic_x * p_vout->i_bytes_per_pixel +
-        p_buffer->i_pic_y * p_vout->i_bytes_per_line;
+                        p_buffer->i_pic_x * p_vout->i_bytes_per_pixel +
+                        p_buffer->i_pic_y * p_vout->i_bytes_per_line;
 #ifdef DEBUG_VIDEO
     render_time = mdate();
 #endif

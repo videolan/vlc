@@ -341,7 +341,7 @@ static int InitThread( vpar_thread_t *p_vpar )
 /*****************************************************************************
  * RunThread: generic parser thread
  *****************************************************************************
- * Video parser thread. This function does only returns when the thread is
+ * Video parser thread. This function only returns when the thread is
  * terminated.
  *****************************************************************************/
 static void RunThread( vpar_thread_t *p_vpar )
