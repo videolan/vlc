@@ -20,7 +20,7 @@ Description: a complete multimedia player
  from various network sources.
 
 Package: libvlc0-dev
-Section: devel
+Section: libdevel
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Description: development files for VLC

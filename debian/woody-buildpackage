@@ -1,5 +1,5 @@
 #! /bin/sh
-# $Id: woody-buildpackage,v 1.13 2003/04/09 11:43:03 sam Exp $
+# $Id: woody-buildpackage,v 1.14 2003/04/11 19:15:36 sam Exp $
 # Build VLC on a Debian woody system
 
 set -x
@@ -25,6 +25,7 @@ sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc (\1-0woody.\2)/' \
 #                 libglib2.0-0 (workaround for mozilla-dev's bad deps)
 #          change Section: gnome with Section: graphics
 #                 Section: kde with Section: kde
+#                 Section: libdevel with Section: devel
 sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
     -e 's/libdv[0-9]*-dev/libdv-dev/' \
     -e 's/kdelibs[0-9]*-dev/kdelibs-dev/' \
@@ -40,6 +41,7 @@ sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
     -e 's/, libglib2.0-0[^,]*//' \
     -e 's/Section: gnome/Section: graphics/' \
     -e 's/Section: kde/Section: graphics/' \
+    -e 's/Section: libdevel/Section: devel/' \
     < debian/control > debian/control.woody
 
 # rules: remove wxwindows stuff

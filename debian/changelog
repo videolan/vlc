@@ -1,3 +1,9 @@
+vlc (0.5.3-2) unstable; urgency=low
+
+  * Changed the libvlc0-dev section to libdevel.
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri, 11 Apr 2003 21:14:07 +0200
+
 vlc (0.5.3-1) unstable; urgency=low
 
   * New upstream release.
