@@ -114,7 +114,7 @@ static int Open( vlc_object_t *p_this )
         return( VLC_EGENERIC );
     }
 
-    sout_ParseCfg( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
+    sout_CfgParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     /* p_access->psz_name host.name:port/filename */
     psz_name = psz_parser = strdup( p_access->psz_name );
