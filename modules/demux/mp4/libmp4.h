@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.6 2003/02/18 23:34:14 gbazin Exp $
+ * $Id: libmp4.h,v 1.7 2003/03/09 16:22:35 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -82,7 +82,7 @@
 #define FOURCC_vide VLC_FOURCC( 'v', 'i', 'd', 'e' )
 #define FOURCC_soun VLC_FOURCC( 's', 'o', 'u', 'n' )
 #define FOURCC_hint VLC_FOURCC( 'h', 'i', 'n', 't' )
-    
+
 #define FOURCC_dpnd VLC_FOURCC( 'd', 'p', 'n', 'd' )
 #define FOURCC_ipir VLC_FOURCC( 'i', 'p', 'i', 'r' )
 #define FOURCC_mpod VLC_FOURCC( 'm', 'p', 'o', 'd' )
@@ -108,6 +108,8 @@
 #define FOURCC_dvc  VLC_FOURCC( 'd', 'v', 'c', ' ' )
 #define FOURCC_dvp  VLC_FOURCC( 'd', 'v', 'p', ' ' )
 #define FOURCC_twos VLC_FOURCC( 't', 'w', 'o', 's' )
+#define FOURCC_QDMC VLC_FOURCC( 'Q', 'D', 'M', 'C' )
+#define FOURCC_raw  VLC_FOURCC( 'r', 'a', 'w', ' ' )
 
 #define FOURCC_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
 
@@ -326,14 +328,23 @@ typedef struct MP4_Box_data_sample_soun_s
     uint8_t  i_reserved1[6];
     uint16_t i_data_reference_index;
 
-    uint32_t i_reserved2[2];
+    //uint32_t i_reserved2[2];
+    uint16_t i_qt_version;
+    uint16_t i_qt_revision_level;
+    uint32_t i_qt_vendor;
+
     uint16_t i_channelcount;
     uint16_t i_samplesize;
     uint16_t i_predefined;
     uint16_t i_reserved3;
     uint16_t i_sampleratehi; /* timescale of track */
     uint16_t i_sampleratelo;
-    
+
+    /* for version 1 (i_reserved1[0] == 1) */
+    uint32_t i_sample_per_packet;
+    uint32_t i_bytes_per_packet;
+    uint32_t i_bytes_per_frame;
+    uint32_t i_bytes_per_sample;
 } MP4_Box_data_sample_soun_t;
 
 typedef struct MP4_Box_data_sample_vide_s

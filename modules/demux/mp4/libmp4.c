@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.15 2003/02/18 23:34:14 gbazin Exp $
+ * $Id: libmp4.c,v 1.16 2003/03/09 16:22:35 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -192,7 +192,23 @@ void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
                    i_day, i_hour, i_min, i_sec );
 }
 
+#if 0
+static void DataDump( uint8_t *p_data, int i_data )
+{
+    int i;
+    fprintf( stderr, "\nDumping %d bytes\n", i_data );
+    for( i = 0; i < i_data; i++ )
+    {
+        int c;
 
+        c = p_data[i];
+        if( c < 32 || c > 127 ) c = '.';
+        fprintf( stderr, "%c", c );
+        if( i % 60 == 59 ) fprintf( stderr, "\n" );
+    }
+    fprintf( stderr, "\n" );
+}
+#endif
 
 /*****************************************************************************
  * Some basic functions to manipulate stream more easily in vlc
@@ -231,8 +247,8 @@ int MP4_SeekAbsolute( input_thread_t *p_input,
     i_filepos = MP4_TellAbsolute( p_input );
     if( i_pos != i_filepos )
     {
-        p_input->pf_seek( p_input, i_pos );
         input_AccessReinit( p_input );
+        p_input->pf_seek( p_input, i_pos );
     }
     return( 1 );
 }
@@ -316,7 +332,7 @@ MP4_Stream_t *MP4_MemoryStream( input_thread_t *p_input,
     p_stream->p_input = p_input;
     p_stream->i_start = 0;
     p_stream->i_stop = i_size;
-    if( !p_stream->p_buffer )
+    if( !p_buffer )
     {
         if( !( p_stream->p_buffer = malloc( i_size ) ) )
         {
@@ -1190,10 +1206,16 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_data_reference_index );
 
+    MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_version );
+    MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_revision_level );
+    MP4_GET4BYTES( p_box->data.p_sample_soun->i_qt_vendor );
+
+#if 0
     for( i = 0; i < 2 ; i++ )
     {
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_reserved2[i] );
     }
+#endif
 
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_channelcount );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_samplesize );
@@ -1202,7 +1224,37 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratehi );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratelo );
 
-    MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 28 );
+    if( p_box->data.p_sample_soun->i_qt_version == 1 &&
+        i_read >= 16 )
+    {
+        /* qt3+ */
+        MP4_GET4BYTES( p_box->data.p_sample_soun->i_sample_per_packet );
+        MP4_GET4BYTES( p_box->data.p_sample_soun->i_bytes_per_packet );
+        MP4_GET4BYTES( p_box->data.p_sample_soun->i_bytes_per_frame );
+        MP4_GET4BYTES( p_box->data.p_sample_soun->i_bytes_per_sample );
+
+#ifdef MP4_VERBOSE
+        msg_Dbg( p_stream->p_input, "" );
+        msg_Dbg( p_stream->p_input,
+                 "Read Box: \"soun\" qt3+ sample/packet=%d bytes/packet=%d bytes/frame=%d bytes/sample=%d",
+                 p_box->data.p_sample_soun->i_sample_per_packet, p_box->data.p_sample_soun->i_bytes_per_packet,
+                 p_box->data.p_sample_soun->i_bytes_per_frame, p_box->data.p_sample_soun->i_bytes_per_sample );
+        msg_Dbg( p_stream->p_input, "" );
+#endif
+        MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 44 );
+    }
+    else
+    {
+        p_box->data.p_sample_soun->i_sample_per_packet = 0;
+        p_box->data.p_sample_soun->i_bytes_per_packet = 0;
+        p_box->data.p_sample_soun->i_bytes_per_frame = 0;
+        p_box->data.p_sample_soun->i_bytes_per_sample = 0;
+
+        msg_Dbg( p_stream->p_input, "" );
+        msg_Dbg( p_stream->p_input, "Read Box: \"soun\" mp4 or qt1/2 (rest=%d)", i_read );
+        msg_Dbg( p_stream->p_input, "" );
+        MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 28 );
+    }
     MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
 
 #ifdef MP4_VERBOSE
@@ -1853,10 +1905,13 @@ int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     msg_Dbg( p_stream->p_input,
              "Read Box: \"cmov\" box succesfully uncompressed" );
 
+    //DataDump( p_data, p_cmvd->data.p_cmvd->i_uncompressed_size );
     /* now create a memory stream */
     p_stream_memory = MP4_MemoryStream( p_stream->p_input,
                                         p_cmvd->data.p_cmvd->i_uncompressed_size,
                                         p_cmvd->data.p_cmvd->p_data );
+
+    //DataDump( p_stream_memory->p_buffer, p_stream_memory->i_stop );
 
     /* and read uncompressd moov */
     p_umov = malloc( sizeof( MP4_Box_t ) );
@@ -2032,6 +2087,8 @@ static struct
     { FOURCC_ms55,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_mp4a,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_twos,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_QDMC,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_raw,   MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
 
     { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mp4v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
