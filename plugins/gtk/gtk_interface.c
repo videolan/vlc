@@ -826,40 +826,40 @@ create_intf_window (void)
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_open), "activate",
                       GTK_SIGNAL_FUNC (GtkFileOpenActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_disc), "activate",
                       GTK_SIGNAL_FUNC (GtkDiscOpenActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_network), "activate",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_eject), "activate",
                       GTK_SIGNAL_FUNC (GtkEjectDiscActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_exit), "activate",
                       GTK_SIGNAL_FUNC (GtkExitActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_interface_hide), "activate",
                       GTK_SIGNAL_FUNC (GtkWindowToggleActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_fullscreen), "activate",
                       GTK_SIGNAL_FUNC (GtkFullscreenActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_playlist), "activate",
                       GTK_SIGNAL_FUNC (GtkPlaylistActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_modules), "activate",
                       GTK_SIGNAL_FUNC (GtkModulesActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_messages), "activate",
                       GTK_SIGNAL_FUNC (GtkMessagesActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_preferences), "activate",
                       GTK_SIGNAL_FUNC (GtkPreferencesActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_about), "activate",
                       GTK_SIGNAL_FUNC (GtkAboutActivate),
-                      NULL);
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (toolbar_open), "button_press_event",
                       GTK_SIGNAL_FUNC (GtkFileOpenShow),
                       "intf_window");

@@ -89,6 +89,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkFileOpenActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:27:36 GMT</last_modification_time>
 	      </signal>
 	      <label>_Open File...</label>
@@ -107,6 +108,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkDiscOpenActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:27:47 GMT</last_modification_time>
 	      </signal>
 	      <label>Open _Disc...</label>
@@ -125,6 +127,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkNetworkOpenActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:28:06 GMT</last_modification_time>
 	      </signal>
 	      <label>_Network Stream...</label>
@@ -144,6 +147,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkEjectDiscActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Fri, 21 Dec 2001 12:51:34 GMT</last_modification_time>
 	      </signal>
 	      <label>_Eject Disc</label>
@@ -168,6 +172,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkExitActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:28:20 GMT</last_modification_time>
 	      </signal>
 	      <label>E_xit</label>
@@ -193,6 +198,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkWindowToggleActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:32:49 GMT</last_modification_time>
 	      </signal>
 	      <label>_Hide interface</label>
@@ -205,6 +211,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkFullscreenActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:29:21 GMT</last_modification_time>
 	      </signal>
 	      <label>_Fullscreen</label>
@@ -264,6 +271,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkPlaylistActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:29:34 GMT</last_modification_time>
 	      </signal>
 	      <label>_Playlist...</label>
@@ -278,6 +286,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkModulesActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:29:44 GMT</last_modification_time>
 	      </signal>
 	      <label>_Modules...</label>
@@ -291,6 +300,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkMessagesActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Tue, 19 Feb 2002 02:03:47 GMT</last_modification_time>
 	      </signal>
 	      <label>Messages...</label>
@@ -340,6 +350,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkPreferencesActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:30:02 GMT</last_modification_time>
 	      </signal>
 	      <label>_Preferences...</label>
@@ -365,6 +376,7 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GtkAboutActivate</handler>
+		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:30:15 GMT</last_modification_time>
 	      </signal>
 	      <label>_About...</label>

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.1 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: configuration.c,v 1.2 2002/02/26 22:08:57 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -233,12 +233,16 @@ module_config_t *config_Duplicate( module_config_t *p_config_orig,
         p_config[i].b_dirty = p_config_orig[i].b_dirty;
         if( p_config_orig[i].psz_name )
             p_config[i].psz_name = strdup( p_config_orig[i].psz_name );
+        else p_config[i].psz_name = NULL;
         if( p_config_orig[i].psz_text )
             p_config[i].psz_text = strdup( p_config_orig[i].psz_text );
+        else p_config[i].psz_text = NULL;
         if( p_config_orig[i].psz_longtext )
             p_config[i].psz_longtext = strdup( p_config_orig[i].psz_longtext );
+        else p_config[i].psz_longtext = NULL;
         if( p_config_orig[i].psz_value )
             p_config[i].psz_value = strdup( p_config_orig[i].psz_value );
+        else p_config[i].psz_value = NULL;
 
         /* the callback pointer is only valid when the module is loaded so this
          * value is set in ActivateModule() and reset in DeactivateModule() */
