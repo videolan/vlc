@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.31 2003/10/03 23:31:43 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.32 2003/10/04 23:52:32 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -841,10 +841,12 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         label = new wxStaticText( this, -1,
                                   wxU(_(psz_section ? p_item->psz_text :
                                   p_module->psz_longname )));
-
-        sizer->Add( label, 0, wxEXPAND | wxLEFT | wxTOP, 10 );
+        wxFont heading_font = label->GetFont();
+        heading_font.SetPointSize( heading_font.GetPointSize() + 5 );
+        label->SetFont( heading_font );
+        sizer->Add( label, 0, wxEXPAND | wxLEFT, 10 );
         sizer->Add( new wxStaticLine( this, 0 ), 0,
-                    wxEXPAND | wxLEFT | wxRIGHT | wxTOP, 2 );
+                    wxEXPAND | wxLEFT | wxRIGHT, 2 );
 
         /* Now put all the config options into a scrolled window */
         config_sizer = new wxBoxSizer( wxVERTICAL );
