@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.24 2001/08/19 23:35:13 sam Exp $
+ * $Id: threads.h,v 1.25 2001/10/01 12:48:01 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -34,6 +34,8 @@
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )  /* pthreads (like Linux & BSD) */
 #   include <pthread.h>
+/* This is not prototyped under Linux, though it exists. */
+int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 
 #elif defined( HAVE_CTHREADS_H )                                  /* GNUMach */
 #   include <cthreads.h>
@@ -267,6 +269,18 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     return pth_mutex_init( p_mutex );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#   if defined(DEBUG) && defined(SYS_LINUX)
+    /* Create error-checking mutex to detect threads problems more easily. */
+    pthread_mutexattr_t attr;
+    int                 i_result;
+
+    pthread_mutexattr_init( &attr );
+    pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
+    i_result = pthread_mutex_init( p_mutex, &attr );
+    pthread_mutexattr_destroy( &attr );
+    return( i_result );
+#   endif
+
     return pthread_mutex_init( p_mutex, NULL );
 
 #elif defined( HAVE_CTHREADS_H )

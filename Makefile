@@ -174,7 +174,7 @@ endif
 	$(INSTALL) -m 644 share/*.xpm $(DESTDIR)$(datadir)/videolan
 
 vlc-uninstall:
-	rm vlc $(DESTDIR)$(bindir)/vlc
+	rm $(DESTDIR)$(bindir)/vlc
 ifneq (,$(ALIASES))
 	for alias in $(ALIASES) ; do if test $$alias ; then rm -f $(DESTDIR)$(bindir)/$$alias ; fi ; done
 endif
