@@ -1042,8 +1042,6 @@ static int Demux_UnSeekable( demux_t *p_demux )
 
 /*****************************************************************************
  * Seek: goto to i_date or i_percent
- *****************************************************************************
- * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
 static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 {
@@ -1066,7 +1064,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             if( i_percent >= 100 )
             {
                 msg_Warn( p_demux, "cannot seek so far !" );
-                return( -1 );
+                return VLC_EGENERIC;
             }
             i_percent = __MAX( i_percent, 0 );
 
@@ -1086,14 +1084,14 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             if( !p_stream || !p_stream->b_activated )
             {
                 msg_Warn( p_demux, "cannot find any selected stream" );
-                return( -1 );
+                return VLC_EGENERIC;
             }
 
             /* be sure that the index exist */
             if( AVI_StreamChunkSet( p_demux, i_stream, 0 ) )
             {
                 msg_Warn( p_demux, "cannot seek" );
-                return( -1 );
+                return VLC_EGENERIC;
             }
 
             while( i_pos >= p_stream->p_index[p_stream->i_idxposc].i_pos +
@@ -1104,7 +1102,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
                                         i_stream, p_stream->i_idxposc + 1 ) )
                 {
                     msg_Warn( p_demux, "cannot seek" );
-                    return( -1 );
+                    return VLC_EGENERIC;
                 }
             }
 
@@ -1148,12 +1146,12 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             p_sys->i_time = i_date;
         }
 #undef p_stream
-        return( 1 );
+        return VLC_SUCCESS;
     }
     else
     {
         msg_Err( p_demux, "shouldn't yet be executed" );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 }
 
@@ -1214,7 +1212,7 @@ static int    Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->b_seekable )
             {
                 i64 = (mtime_t)(1000000.0 * p_sys->i_length * f );
-                return Seek( p_demux, i64, (int)(f * 100) ) < 0 ? VLC_EGENERIC : VLC_SUCCESS;
+                return Seek( p_demux, i64, (int)(f * 100) );
             }
             else
             {
