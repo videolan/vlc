@@ -27,7 +27,7 @@
  * their MPEG streams (MIME: application/x-sgimb). Very few applications
  * understand this format and the format is not really documented on the net.
  * Following a typical MediaBase file. Notice the sgi prefix of all the elements.
- * This stems from the fact that the MediaBase server were first introduced by SGI?????.
+ * This stems from the fact that the MediaBase servers were first introduced by SGI?????.
  *
  * sgiNameServerHost=host.name.tld
  * Stream="xdma://host.name.tld/demo/a_very_cool.mpg"
@@ -327,6 +327,7 @@ static int Demux ( demux_t *p_demux )
     if( p_sys->i_packet_size && p_sys->psz_mcast_ip )
     {
         char *psz_option = (char *) malloc( 20 );
+        p_sys->i_packet_size += 1000;
         sprintf( psz_option, "mtu=%i", p_sys->i_packet_size );
         playlist_ItemAddOption( p_item, psz_option );
         free( psz_option );
