@@ -121,15 +121,23 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     return VLC_SUCCESS;
 }
 
-int E_(CloseVideoGL) ( vlc_object_t * p_this )
+void E_(CloseVideoGL) ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
+    /* Remove the GLView from the window, because we are not sure OS X
+       will actually close the window right away. When it doesn't,
+       VLCGLView's reshape is called while p_vout and p_vout->p_sys
+       aren't valid anymore and crashes. */
+    [p_vout->p_sys->o_window setContentView: NULL];
+
+    /* Close the window */
     [p_vout->p_sys->o_window close];
 
+    /* Clean up */
     [o_pool release];
-    return VLC_SUCCESS;
+    free( p_vout->p_sys );
 }
 
 static int Init( vout_thread_t * p_vout )
@@ -263,7 +271,7 @@ static void Swap( vout_thread_t * p_vout )
     return self;
 }
 
-- (void)reshape
+- (void) reshape
 {
     int x, y;
     NSRect bounds = [self bounds];
