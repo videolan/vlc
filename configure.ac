@@ -437,7 +437,7 @@ AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 if test "${SYS}" != "mingw32"; then
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32],[-lm])
+  VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32 x264],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
   VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transcode stream_out_transcodealtivec stream_out_transrate i420_rgb faad toolame equalizer vlc],[-lm])
@@ -2444,6 +2444,58 @@ then
 You also need to check that you have a libogg posterior to the 1.0 release.])],
       [-logg])
   ])
+fi
+
+dnl
+dnl H264 encoder plugin (using libx264)
+dnl
+AC_ARG_ENABLE(x264,
+  [  --enable-x264           H264 encoding support with libx264 (default enabled)])
+if test "${enable_x264}" != "no"; then
+  AC_ARG_WITH(x264-tree,
+    [    --with-x264-tree=PATH  x264 tree for static linking ],[],[])
+  if test "${with_x264_tree}" != "no" -a -n "${with_x264_tree}"
+  then
+    real_x264_tree="`cd ${with_x264_tree} 2>/dev/null && pwd`"
+    if test -z "${real_x264_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${with_x264_tree} directory doesn't exist])
+    fi
+    dnl  Use a custom libx264
+    AC_MSG_CHECKING(for x264.h in ${real_x264_tree})
+    if test -f ${real_x264_tree}/x264.h
+    then
+      AC_MSG_RESULT(yes)
+      VLC_ADD_CPPFLAGS([x264],[-I${real_x264_tree}])
+      VLC_ADD_LDFLAGS([x264],[-L${real_x264_tree}])
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264}"
+      AC_CHECK_LIB(x264, x264_encoder_open, [
+        VLC_ADD_BUILTINS([x264])
+        VLC_ADD_LDFLAGS([x264],[-lx264])
+      ],[
+        AC_MSG_ERROR([the specified tree hasn't been compiled])
+      ])
+      LDFLAGS="${LDFLAGS_save}"
+    else
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([the specified tree doesn't have x264.h])
+    fi
+  else
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264}"
+    AC_CHECK_HEADERS(x264.h, [
+      AC_CHECK_LIB(x264, x264_encoder_open, [
+        VLC_ADD_PLUGINS([x264])
+        VLC_ADD_LDFLAGS([x264],[-lx264])
+      ],[
+        if test "${enable_x264}" = "yes"; then
+            AC_MSG_ERROR([Could not find libx264 on your system: you may get it from http://www.videolan.org/x264.html])
+          fi
+      ])
+    ])
+    LDFLAGS="${LDFLAGS_save}"
+  fi
 fi
 
 dnl
