@@ -45,7 +45,7 @@ static void Close( vlc_object_t * );
     "playing from files, use 0 for live.")
 
 vlc_module_begin();
-    set_shortname( "MJEPG");
+    set_shortname( "MJPEG");
     set_description( _("JPEG camera demuxer") );
     set_capability( "demux2", 5 );
     set_callbacks( Open, Close );

@@ -3343,25 +3343,25 @@ dnl
 dnl  ALSA module
 dnl
 AC_ARG_ENABLE(alsa,
-  [  --enable-alsa           ALSA sound support for Linux (default enabled)],
-  [if test "${enable_alsa}" != "no"
-   then
-     AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_alsa="true", have_alsa="false"),have_alsa="false")
-     if test "${have_alsa}" = "true"
-     then
-       AC_TRY_COMPILE([#define ALSA_PCM_NEW_HW_PARAMS_API
-                       #define ALSA_PCM_NEW_SW_PARAMS_API
-                       #include <alsa/asoundlib.h>],
-          [void foo() { snd_pcm_hw_params_get_period_time(0,0,0); }],
-           AC_DEFINE(HAVE_ALSA_NEW_API, 1, Define if ALSA is at least rc4))
-       VLC_ADD_PLUGINS([alsa])
-       VLC_ADD_LDFLAGS([alsa],[-lasound -lm -ldl])
-     else
-       if test "${enable_alsa}" = "yes"; then
-         AC_MSG_ERROR([Could not find ALSA development headers])
-       fi
-     fi
-   fi])
+  [  --enable-alsa           ALSA sound support for Linux (default enabled)])
+if test "${enable_alsa}" != "no"
+then
+  AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_alsa="true", have_alsa="false"),have_alsa="false")
+  if test "${have_alsa}" = "true"
+  then
+    AC_TRY_COMPILE([#define ALSA_PCM_NEW_HW_PARAMS_API
+                    #define ALSA_PCM_NEW_SW_PARAMS_API
+                    #include <alsa/asoundlib.h>],
+       [void foo() { snd_pcm_hw_params_get_period_time(0,0,0); }],
+        AC_DEFINE(HAVE_ALSA_NEW_API, 1, Define if ALSA is at least rc4))
+    VLC_ADD_PLUGINS([alsa])
+    VLC_ADD_LDFLAGS([alsa],[-lasound -lm -ldl])
+  else
+    if test "${enable_alsa}" = "yes"; then
+      AC_MSG_ERROR([Could not find ALSA development headers])
+    fi
+  fi
+fi
 
 dnl
 dnl  win32 waveOut plugin

@@ -127,7 +127,6 @@ static int Open( vlc_object_t *p_this )
     /* Open VCD */
     if( !(vcddev = ioctl_Open( p_this, psz_dup )) )
     {
-        msg_Warn( p_access, "could not open %s", psz_dup );
         free( psz_dup );
         return VLC_EGENERIC;
     }

@@ -97,7 +97,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_SCODEC );
 
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
-                 VLC_TRUE );
+                 VLC_FALSE );
         change_integer_list( pi_justification, ppsz_justification_text, 0 );
     add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
                 ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );

@@ -87,7 +87,7 @@ static void Close ( vlc_object_t * );
 #define CAPMT_SYSID_LONGTEXT N_("only forward descriptors from this SysID to the CAM")
 
 vlc_module_begin();
-    set_description( _("ISO 13818-1 MPEG Transport Stream input - new" ) );
+    set_description( _("MPEG Transport Stream demuxer") );
     set_shortname ( _("MPEG-TS") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );

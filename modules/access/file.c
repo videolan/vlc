@@ -557,6 +557,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_TITLE:
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_SET_PRIVATE_ID_STATE:
+        case ACCESS_GET_META:
             return VLC_EGENERIC;
 
         default:

@@ -914,7 +914,6 @@ VCDOpen ( vlc_object_t *p_this )
 
     if( !(p_vcdplayer->vcd = vcd_Open( p_this, psz_source )) )
     {
-        msg_Warn( p_access, "could not open %s", psz_source );
         goto err_exit;
     }
 
