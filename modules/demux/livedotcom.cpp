@@ -63,6 +63,11 @@ static void Close( vlc_object_t * );
     "Allows you to modify the default caching value for RTSP streams. This " \
     "value should be set in millisecond units." )
 
+#define KASENNA_TEXT N_( "Kasenna RTSP dialect")
+#define KASENNA_LONGTEXT N_( "Kasenna server speak an old and unstandard dialect of RTSP " \
+    "When you set this parameter, VLC will try this dialect for communication. In " \
+    "this mode you cannot talk to normal RTSP servers." )
+
 vlc_module_begin();
     set_description( _("live.com (RTSP/RTP/SDP) demuxer" ) );
     set_capability( "demux2", 50 );
@@ -80,6 +85,8 @@ vlc_module_begin();
                   N_("Use RTP over RTSP (TCP)"), VLC_TRUE );
         add_integer( "rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
             CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        add_bool( "rtsp-kasenna", VLC_FALSE, NULL, KASENNA_TEXT,
+                  KASENNA_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /* TODO:
@@ -230,6 +237,8 @@ static int  Open ( vlc_object_t *p_this )
         psz_url = (char*)malloc( strlen( p_demux->psz_path ) + 8 );
         sprintf( psz_url, "rtsp://%s", p_demux->psz_path );
 
+        /* Add kasenna option */
+        var_CreateGetBool( p_demux, "rtsp-kasenna" );
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
         if( psz_options )
             delete [] psz_options;
