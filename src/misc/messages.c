@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.10 2002/08/26 09:12:46 sam Exp $
+ * $Id: messages.c,v 1.11 2002/10/03 13:21:55 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -63,16 +63,16 @@ static char *ConvertPrintfFormatString ( const char *psz_format );
 void __msg_Create( vlc_object_t *p_this )
 {
     /* Message queue initialization */
-    vlc_mutex_init( p_this, &p_this->p_vlc->msg_bank.lock );
+    vlc_mutex_init( p_this, &p_this->p_libvlc->msg_bank.lock );
 
-    p_this->p_vlc->msg_bank.b_configured = VLC_FALSE;
-    p_this->p_vlc->msg_bank.b_overflow = VLC_FALSE;
+    p_this->p_libvlc->msg_bank.b_configured = VLC_FALSE;
+    p_this->p_libvlc->msg_bank.b_overflow = VLC_FALSE;
 
-    p_this->p_vlc->msg_bank.i_start = 0;
-    p_this->p_vlc->msg_bank.i_stop = 0;
+    p_this->p_libvlc->msg_bank.i_start = 0;
+    p_this->p_libvlc->msg_bank.i_stop = 0;
 
-    p_this->p_vlc->msg_bank.i_sub = 0;
-    p_this->p_vlc->msg_bank.pp_sub = NULL;
+    p_this->p_libvlc->msg_bank.i_sub = 0;
+    p_this->p_libvlc->msg_bank.pp_sub = NULL;
 }
 
 /*****************************************************************************
@@ -82,20 +82,20 @@ void __msg_Flush( vlc_object_t *p_this )
 {
     int i_index;
 
-    vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
+    vlc_mutex_lock( &p_this->p_libvlc->msg_bank.lock );
 
-    p_this->p_vlc->msg_bank.b_configured = VLC_TRUE;
+    p_this->p_libvlc->msg_bank.b_configured = VLC_TRUE;
 
-    for( i_index = p_this->p_vlc->msg_bank.i_start;
-         i_index != p_this->p_vlc->msg_bank.i_stop;
+    for( i_index = p_this->p_libvlc->msg_bank.i_start;
+         i_index != p_this->p_libvlc->msg_bank.i_stop;
          i_index = (i_index+1) % VLC_MSG_QSIZE )
     {
-        PrintMsg( p_this, &p_this->p_vlc->msg_bank.msg[i_index] );
+        PrintMsg( p_this, &p_this->p_libvlc->msg_bank.msg[i_index] );
     }
 
-    FlushMsg( &p_this->p_vlc->msg_bank );
+    FlushMsg( &p_this->p_libvlc->msg_bank );
 
-    vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
+    vlc_mutex_unlock( &p_this->p_libvlc->msg_bank.lock );
 }
 
 /*****************************************************************************
@@ -107,23 +107,23 @@ void __msg_Flush( vlc_object_t *p_this )
  *****************************************************************************/
 void __msg_Destroy( vlc_object_t *p_this )
 {
-    if( p_this->p_vlc->msg_bank.i_sub )
+    if( p_this->p_libvlc->msg_bank.i_sub )
     {
         msg_Err( p_this, "stale interface subscribers" );
     }
 
     /* Flush the queue */
-    if( !p_this->p_vlc->msg_bank.b_configured )
+    if( !p_this->p_libvlc->msg_bank.b_configured )
     {
         msg_Flush( p_this );
     }
     else
     {
-        FlushMsg( &p_this->p_vlc->msg_bank );
+        FlushMsg( &p_this->p_libvlc->msg_bank );
     }
 
     /* Destroy lock */
-    vlc_mutex_destroy( &p_this->p_vlc->msg_bank.lock );
+    vlc_mutex_destroy( &p_this->p_libvlc->msg_bank.lock );
 }
 
 /*****************************************************************************
@@ -131,24 +131,25 @@ void __msg_Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this )
 {
+    msg_bank_t *p_bank = &p_this->p_libvlc->msg_bank;
     msg_subscription_t *p_sub = malloc( sizeof( msg_subscription_t ) );
 
-    vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
+    vlc_mutex_lock( &p_bank->lock );
 
     /* Add subscription to the list */
-    p_this->p_vlc->msg_bank.i_sub++;
-    p_this->p_vlc->msg_bank.pp_sub = realloc( p_this->p_vlc->msg_bank.pp_sub,
-        p_this->p_vlc->msg_bank.i_sub * sizeof( msg_subscription_t* ) );
+    p_bank->i_sub++;
+    p_bank->pp_sub = realloc( p_bank->pp_sub,
+                              p_bank->i_sub * sizeof( msg_subscription_t* ) );
 
-    p_this->p_vlc->msg_bank.pp_sub[ p_this->p_vlc->msg_bank.i_sub - 1 ] = p_sub;
+    p_bank->pp_sub[ p_bank->i_sub - 1 ] = p_sub;
 
-    p_sub->i_start = p_this->p_vlc->msg_bank.i_start;
-    p_sub->pi_stop = &p_this->p_vlc->msg_bank.i_stop;
+    p_sub->i_start = p_bank->i_start;
+    p_sub->pi_stop = &p_bank->i_stop;
 
-    p_sub->p_msg   = p_this->p_vlc->msg_bank.msg;
-    p_sub->p_lock  = &p_this->p_vlc->msg_bank.lock;
+    p_sub->p_msg   = p_bank->msg;
+    p_sub->p_lock  = &p_bank->lock;
 
-    vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
+    vlc_mutex_unlock( &p_bank->lock );
 
     return p_sub;
 }
@@ -158,53 +159,54 @@ msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this )
  *****************************************************************************/
 void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
 {
+    msg_bank_t *p_bank = &p_this->p_libvlc->msg_bank;
     int i_index;
 
-    vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
+    vlc_mutex_lock( &p_bank->lock );
 
     /* Sanity check */
-    if( !p_this->p_vlc->msg_bank.i_sub )
+    if( !p_bank->i_sub )
     {
         msg_Err( p_this, "no subscriber in the list" );
         return;
     }
 
     /* Look for the appropriate subscription */
-    for( i_index = 0; i_index < p_this->p_vlc->msg_bank.i_sub; i_index++ )
+    for( i_index = 0; i_index < p_bank->i_sub; i_index++ )
     {
-        if( p_this->p_vlc->msg_bank.pp_sub[ i_index ] == p_sub )
+        if( p_bank->pp_sub[ i_index ] == p_sub )
         {
             break;
         }
     }
 
-    if( p_this->p_vlc->msg_bank.pp_sub[ i_index ] != p_sub )
+    if( p_bank->pp_sub[ i_index ] != p_sub )
     {
         msg_Err( p_this, "subscriber not found" );
-        vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
+        vlc_mutex_unlock( &p_bank->lock );
         return;
     }
 
     /* Remove this subscription */
-    for( ; i_index < (p_this->p_vlc->msg_bank.i_sub - 1); i_index++ )
+    for( ; i_index < (p_bank->i_sub - 1); i_index++ )
     {
-        p_this->p_vlc->msg_bank.pp_sub[ i_index ] = p_this->p_vlc->msg_bank.pp_sub[ i_index+1 ];
+        p_bank->pp_sub[ i_index ] = p_bank->pp_sub[ i_index+1 ];
     }
 
-    p_this->p_vlc->msg_bank.i_sub--;
-    if( p_this->p_vlc->msg_bank.i_sub )
+    p_bank->i_sub--;
+    if( p_bank->i_sub )
     {
-        p_this->p_vlc->msg_bank.pp_sub = realloc( p_this->p_vlc->msg_bank.pp_sub,
-            p_this->p_vlc->msg_bank.i_sub * sizeof( msg_subscription_t* ) );
+        p_bank->pp_sub = realloc( p_bank->pp_sub, p_bank->i_sub
+                                   * sizeof( msg_subscription_t* ) );
     }
     else
     {
-        free( p_this->p_vlc->msg_bank.pp_sub );
-        p_this->p_vlc->msg_bank.pp_sub = NULL;
+        free( p_bank->pp_sub );
+        p_bank->pp_sub = NULL;
     }
 
 
-    vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
+    vlc_mutex_unlock( &p_bank->lock );
 }
 
 /*****************************************************************************
@@ -250,15 +252,15 @@ DECLARE_MSG_FN( __msg_Dbg,  VLC_MSG_DBG );
 static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
                       const char *psz_format, va_list args )
 {
-    msg_bank_t *        p_bank = &p_this->p_vlc->msg_bank;   /* message bank */
-    char *              psz_str = NULL;          /* formatted message string */
-    msg_item_t *        p_item = NULL;                 /* pointer to message */
-    msg_item_t          item;             /* message in case of a full queue */
+    msg_bank_t * p_bank = &p_this->p_libvlc->msg_bank;       /* message bank */
+    char *       psz_str = NULL;                 /* formatted message string */
+    msg_item_t * p_item = NULL;                        /* pointer to message */
+    msg_item_t   item;                    /* message in case of a full queue */
 #ifdef WIN32
-    char *              psz_temp;
+    char *       psz_temp;
 #endif
 #ifndef HAVE_VASPRINTF
-    int                 i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
+    int          i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
 #endif
 
     /*
@@ -301,7 +303,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     /* Check there is room in the queue for our message */
     if( p_bank->b_overflow )
     {
-        FlushMsg( &p_this->p_vlc->msg_bank );
+        FlushMsg( p_bank );
 
         if( ((p_bank->i_stop - p_bank->i_start + 1) % VLC_MSG_QSIZE) == 0 )
         {
@@ -316,7 +318,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     }
     else if( ((p_bank->i_stop - p_bank->i_start + 2) % VLC_MSG_QSIZE) == 0 )
     {
-        FlushMsg( &p_this->p_vlc->msg_bank );
+        FlushMsg( p_bank );
 
         if( ((p_bank->i_stop - p_bank->i_start + 2) % VLC_MSG_QSIZE) == 0 )
         {
@@ -433,12 +435,12 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     char *psz_object = "private";
     int i_type = p_item->i_type;
 
-    if( p_this->p_vlc->b_quiet || !p_this->p_vlc->msg_bank.b_configured )
+    if( /*p_this->p_vlc->b_quiet ||*/ !p_this->p_libvlc->msg_bank.b_configured )
     {
         return;
     }
 
-    if( !p_this->p_vlc->b_verbose &&
+    if( /*!p_this->p_vlc->b_verbose && */
          ( (i_type == VLC_MSG_WARN) || (i_type == VLC_MSG_DBG) ) )
     {
         return;
@@ -447,6 +449,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     switch( p_item->i_object_type )
     {
         case VLC_OBJECT_ROOT: psz_object = "root"; break;
+        case VLC_OBJECT_VLC: psz_object = "vlc"; break;
         case VLC_OBJECT_MODULE: psz_object = "module"; break;
         case VLC_OBJECT_INTF: psz_object = "interface"; break;
         case VLC_OBJECT_PLAYLIST: psz_object = "playlist"; break;
@@ -459,18 +462,16 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     }
 
     /* Send the message to stderr */
-    if( p_this->p_vlc->b_color )
+    if( /*p_this->p_vlc->b_color*/1 )
     {
-        fprintf( stderr, "[" GREEN "%.2x" GRAY ":" GREEN "%.6x" GRAY "] "
-                         "%s %s%s: %s%s" GRAY "\n", p_this->p_vlc->i_instance,
+        fprintf( stderr, "[" GREEN "%.6x" GRAY "] %s %s%s: %s%s" GRAY "\n",
                          p_item->i_object_id, p_item->psz_module, psz_object,
                          ppsz_type[i_type], ppsz_color[i_type],
                          p_item->psz_msg );
     }
     else
     {
-        fprintf( stderr, "[%.2x:%.6x] %s %s%s: %s\n",
-                         p_this->p_vlc->i_instance, p_item->i_object_id,
+        fprintf( stderr, "[%.6x] %s %s%s: %s\n", p_item->i_object_id,
                          p_item->psz_module, psz_object, ppsz_type[i_type],
                          p_item->psz_msg );
     }

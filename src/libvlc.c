@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.33 2002/09/29 18:19:53 sam Exp $
+ * $Id: libvlc.c,v 1.34 2002/10/03 13:21:55 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -77,16 +77,12 @@
 #include "libvlc.h"
 
 /*****************************************************************************
- * The evil global variables. We handle them with care, don't worry.
+ * The evil global variable. We handle it with care, don't worry.
  *****************************************************************************/
+static libvlc_t libvlc;
 
-/* This global lock is used for critical sections - don't abuse it! */
-static vlc_mutex_t global_lock;
-void *             p_global_data;
-
-/* A list of all the currently allocated vlc objects */
-static int      volatile i_vlc = 0;
-static vlc_t ** volatile pp_vlc = NULL;
+//#define GLOBAL_VLC NULL
+#define GLOBAL_VLC ((vlc_t*)libvlc.pp_children[1])
 
 /*****************************************************************************
  * Local prototypes
@@ -111,13 +107,8 @@ vlc_error_t vlc_create( void )
     vlc_t * p_vlc;
     vlc_bool_t b_failed = VLC_FALSE;
 
-    /* This gives us a rather good protection against concurrent calls, but
-     * an additional check will be necessary for complete thread safety. */
-    if( i_vlc )
-    {
-        return VLC_EGENERIC;
-    }
-
+    /* This call should be thread-safe, but an additional check will be
+     * necessary afterwards to check that only one p_vlc is created. */
     p_vlc = vlc_create_r();
 
     if( p_vlc == NULL )
@@ -128,12 +119,14 @@ vlc_error_t vlc_create( void )
     /* We have created an object, which ensures us that p_global_lock has
      * been properly initialized. We can now atomically check that we are
      * the only p_vlc object. */
-    vlc_mutex_lock( p_vlc->p_global_lock );
-    if( i_vlc != 1 )
+#if 0
+    vlc_mutex_lock( libvlc.p_global_lock );
+    if( libvlc.i_children != 1 ) /* FIXME !!! FIXME */
     {
         b_failed = VLC_TRUE;
     }
-    vlc_mutex_unlock( p_vlc->p_global_lock );
+    vlc_mutex_unlock( libvlc.p_global_lock );
+#endif
 
     /* There can be only one */
     if( b_failed )
@@ -147,11 +140,47 @@ vlc_error_t vlc_create( void )
 
 vlc_t * vlc_create_r( void )
 {
-    static int i_instance = 0;
+    int i_ret;
     vlc_t * p_vlc = NULL;
 
-    /* Allocate the main structure */
-    p_vlc = vlc_object_create( p_vlc, VLC_OBJECT_ROOT );
+    /* vlc_threads_init *must* be the first internal call! No other call is
+     * allowed before the thread system has been initialized. */
+    i_ret = vlc_threads_init( &libvlc );
+    if( i_ret )
+    {
+        return NULL;
+    }
+
+    /* Now that the thread system is initialized, we don't have much, but
+     * at least we have libvlc.global_lock */
+    vlc_mutex_lock( &libvlc.global_lock );
+    if( !libvlc.b_ready )
+    {
+        vlc_mutex_init( &libvlc, &libvlc.structure_lock );
+        libvlc.p_global_data = NULL;
+        libvlc.b_ready = VLC_TRUE;
+
+        /* Guess what CPU we have */
+        libvlc.i_cpu = CPUCapabilities();
+
+        /* Initialize message queue */
+        msg_Create( &libvlc );
+
+        /* Announce who we are */
+        msg_Dbg( &libvlc, COPYRIGHT_MESSAGE );
+        msg_Dbg( &libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
+
+        /* Initialize the module bank and and load the configuration of the
+         * main module. We need to do this at this stage to be able to display
+         * a short help if required by the user. (short help == main module
+         * options) */
+        module_InitBank( &libvlc );
+        module_LoadMain( &libvlc );
+    }
+    vlc_mutex_unlock( &libvlc.global_lock );
+
+    /* Allocate a vlc object */
+    p_vlc = vlc_object_create( &libvlc, VLC_OBJECT_VLC );
     if( p_vlc == NULL )
     {
         return NULL;
@@ -159,27 +188,14 @@ vlc_t * vlc_create_r( void )
 
     p_vlc->psz_object_name = "root";
 
-    p_vlc->p_global_lock = &global_lock;
-    p_vlc->pp_global_data = &p_global_data;
-
-    p_vlc->b_verbose = VLC_FALSE;
+    p_vlc->b_verbose = VLC_TRUE;
     p_vlc->b_quiet = VLC_FALSE; /* FIXME: delay message queue output! */
-
-    /* Initialize the threads system */
-    vlc_threads_init( p_vlc );
 
     /* Initialize mutexes */
     vlc_mutex_init( p_vlc, &p_vlc->config_lock );
-    vlc_mutex_init( p_vlc, &p_vlc->structure_lock );
 
     /* Store our newly allocated structure in the global list */
-    vlc_mutex_lock( p_vlc->p_global_lock );
-    pp_vlc = realloc( pp_vlc, (i_vlc+1) * sizeof( vlc_t * ) );
-    pp_vlc[ i_vlc ] = p_vlc;
-    i_vlc++;
-    p_vlc->i_instance = i_instance;
-    i_instance++;
-    vlc_mutex_unlock( p_vlc->p_global_lock );
+    vlc_object_attach( p_vlc, &libvlc );
 
     /* Update the handle status */
     p_vlc->i_status = VLC_STATUS_CREATED;
@@ -198,7 +214,7 @@ vlc_t * vlc_create_r( void )
  *****************************************************************************/
 vlc_error_t vlc_init( int i_argc, char *ppsz_argv[] )
 {
-    return vlc_init_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL, i_argc, ppsz_argv );
+    return vlc_init_r( GLOBAL_VLC, i_argc, ppsz_argv );
 }
 
 vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
@@ -216,12 +232,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         return VLC_ESTATUS;
     }
 
-    /* Guess what CPU we have */
-    p_vlc->i_cpu = CPUCapabilities( p_vlc );
-
-    /*
-     * Support for gettext
-     */
+    /* Support for gettext */
 #if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
 #   if defined( HAVE_LOCALE_H ) && defined( HAVE_LC_MESSAGES )
     if( !setlocale( LC_MESSAGES, "" ) )
@@ -240,11 +251,6 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 
     textdomain( PACKAGE );
 #endif
-
-    /*
-     * Initialize message queue
-     */
-    msg_Create( p_vlc );
 
     /*
      * System specific initialization code
@@ -266,29 +272,16 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         p_vlc->psz_object_name = "vlc";
     }
 
-    /* Announce who we are */
-    msg_Dbg( p_vlc, COPYRIGHT_MESSAGE );
-    msg_Dbg( p_vlc, "libvlc was configured with %s", CONFIGURE_LINE );
-
-    /*
-     * Initialize the module bank and and load the configuration of the main
-     * module. We need to do this at this stage to be able to display a short
-     * help if required by the user. (short help == main module options)
-     */
-    module_InitBank( p_vlc );
-    module_LoadMain( p_vlc );
-
     /* Hack: insert the help module here */
     p_help_module = vlc_object_create( p_vlc, VLC_OBJECT_MODULE );
     if( p_help_module == NULL )
     {
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
+        //module_EndBank( p_vlc );
         return VLC_EGENERIC;
     }
     p_help_module->psz_object_name = "help";
     config_Duplicate( p_help_module, p_help_config );
-    vlc_object_attach( p_help_module, p_vlc->p_module_bank );
+    vlc_object_attach( p_help_module, libvlc.p_module_bank );
     /* End hack */
 
     if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE ) )
@@ -296,8 +289,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
+        //module_EndBank( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -327,8 +319,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     {
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
+        //module_EndBank( p_vlc );
         return VLC_EEXIT;
     }
 
@@ -338,13 +329,13 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
      * list of configuration options exported by each module and loads their
      * default values.
      */
-    module_LoadBuiltins( p_vlc );
-    module_LoadPlugins( p_vlc );
+    module_LoadBuiltins( &libvlc );
+    module_LoadPlugins( &libvlc );
     msg_Dbg( p_vlc, "module bank initialized, found %i modules",
-                    p_vlc->p_module_bank->i_children );
+                    libvlc.p_module_bank->i_children );
 
     /* Hack: insert the help module here */
-    vlc_object_attach( p_help_module, p_vlc->p_module_bank );
+    vlc_object_attach( p_help_module, libvlc.p_module_bank );
     /* End hack */
 
     /* Check for help on modules */
@@ -375,8 +366,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 
     if( b_exit )
     {
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
+        //module_EndBank( p_vlc );
         return VLC_EEXIT;
     }
 
@@ -398,8 +388,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
                  "that they are valid.\nPress the RETURN key to continue..." );
         getchar();
 #endif
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
+        //module_EndBank( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -418,6 +407,9 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 
     /* p_vlc inititalization. FIXME ? */
     p_vlc->i_desync = config_GetInt( p_vlc, "desync" ) * (mtime_t)1000;
+
+    p_vlc->i_cpu = libvlc.i_cpu;
+
 #if defined( __i386__ )
     if( !config_GetInt( p_vlc, "mmx" ) )
         p_vlc->i_cpu &= ~CPU_CAPABILITY_MMX;
@@ -491,8 +483,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         {
             module_Unneed( p_vlc, p_vlc->p_memcpy_module );
         }
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
+        //module_EndBank( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -517,7 +508,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 vlc_error_t vlc_add_intf( const char *psz_module, vlc_bool_t b_block )
 {
-    return vlc_add_intf_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL,
+    return vlc_add_intf_r( GLOBAL_VLC,
                            psz_module, b_block );
 }
 
@@ -580,13 +571,11 @@ vlc_error_t vlc_add_intf_r( vlc_t *p_vlc, const char *psz_module,
  *****************************************************************************/
 vlc_error_t vlc_destroy( void )
 {
-    return vlc_destroy_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+    return vlc_destroy_r( GLOBAL_VLC );
 }
 
 vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
 {
-    int               i_index;
-
     /* Check that the handle is valid */
     if( !p_vlc || (p_vlc->i_status != VLC_STATUS_STOPPED
                     && p_vlc->i_status != VLC_STATUS_CREATED) )
@@ -617,20 +606,15 @@ vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
         free( p_vlc->psz_homedir );
     
         /*
-         * Free module bank
+         * XXX: Free module bank !
          */
-        module_EndBank( p_vlc );
+        //module_EndBank( p_vlc );
     
         /*
          * System specific cleaning code
          */
         system_End( p_vlc );
     
-        /*
-         * Terminate messages interface and program
-         */
-        msg_Destroy( p_vlc );
-
         /* Update the handle status */
         p_vlc->i_status = VLC_STATUS_CREATED;
     }
@@ -638,50 +622,15 @@ vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
     /* Update the handle status, just in case */
     p_vlc->i_status = VLC_STATUS_NONE;
 
-    /* Remove our structure from the global list */
-    vlc_mutex_lock( p_vlc->p_global_lock );
-    for( i_index = 0 ; i_index < i_vlc ; i_index++ )
-    {
-        if( pp_vlc[ i_index ] == p_vlc )
-        {
-            break;
-        }
-    }
-
-    if( i_index == i_vlc )
-    {
-        fprintf( stderr, "error: trying to unregister %p which is not in "
-                         "the list\n", (void *)p_vlc );
-        vlc_mutex_unlock( p_vlc->p_global_lock );
-        vlc_object_destroy( p_vlc );
-        return VLC_EGENERIC;
-    }
-
-    for( i_index++ ; i_index < i_vlc ; i_index++ )
-    {
-        pp_vlc[ i_index - 1 ] = pp_vlc[ i_index ];
-    }
-
-    i_vlc--;
-    if( i_vlc )
-    {
-        pp_vlc = realloc( pp_vlc, i_vlc * sizeof( vlc_t * ) );
-    }
-    else
-    {
-        free( pp_vlc );
-        pp_vlc = NULL;
-    }
-    vlc_mutex_unlock( p_vlc->p_global_lock );
-
-    /* Stop thread system: last one out please shut the door! */
-    vlc_threads_end( p_vlc );
-
     /* Destroy mutexes */
-    vlc_mutex_destroy( &p_vlc->structure_lock );
     vlc_mutex_destroy( &p_vlc->config_lock );
 
+    vlc_object_detach( p_vlc );
+
     vlc_object_destroy( p_vlc );
+
+    /* Stop thread system: last one out please shut the door! */
+    vlc_threads_end( &libvlc );
 
     return VLC_SUCCESS;
 }
@@ -694,7 +643,7 @@ vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
  *****************************************************************************/
 vlc_error_t vlc_die( void )
 {
-    return vlc_die_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+    return vlc_die_r( GLOBAL_VLC );
 }
 
 vlc_error_t vlc_die_r( vlc_t *p_vlc )
@@ -717,7 +666,7 @@ vlc_error_t vlc_die_r( vlc_t *p_vlc )
  *****************************************************************************/
 vlc_status_t vlc_status( void )
 {
-    return vlc_status_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+    return vlc_status_r( GLOBAL_VLC );
 }
 
 vlc_status_t vlc_status_r( vlc_t *p_vlc )
@@ -738,7 +687,7 @@ vlc_status_t vlc_status_r( vlc_t *p_vlc )
  *****************************************************************************/
 vlc_error_t vlc_add_target( const char *psz_target, int i_mode, int i_pos )
 {
-    return vlc_add_target_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL,
+    return vlc_add_target_r( GLOBAL_VLC,
                              psz_target, i_mode, i_pos );
 }
 
@@ -784,7 +733,7 @@ vlc_error_t vlc_add_target_r( vlc_t *p_vlc, const char *psz_target,
  *****************************************************************************/
 vlc_error_t vlc_set( const char *psz_var, const char *psz_val )
 {
-    return vlc_set_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL, psz_var, psz_val );
+    return vlc_set_r( GLOBAL_VLC, psz_var, psz_val );
 }
 
 vlc_error_t vlc_set_r( vlc_t *p_vlc, const char *psz_var, const char *psz_val )
@@ -886,7 +835,7 @@ vlc_error_t vlc_set_r( vlc_t *p_vlc, const char *psz_var, const char *psz_val )
  *****************************************************************************/
 vlc_error_t vlc_play( )
 {
-    return vlc_play_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+    return vlc_play_r( GLOBAL_VLC );
 }
 
 vlc_error_t vlc_play_r( vlc_t *p_vlc )
@@ -931,7 +880,7 @@ vlc_error_t vlc_play_r( vlc_t *p_vlc )
  *****************************************************************************/
 vlc_error_t vlc_stop( )
 {
-    return vlc_stop_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+    return vlc_stop_r( GLOBAL_VLC );
 }
 
 vlc_error_t vlc_stop_r( vlc_t *p_vlc )
@@ -1006,7 +955,7 @@ vlc_error_t vlc_stop_r( vlc_t *p_vlc )
  *****************************************************************************/
 vlc_error_t vlc_pause( )
 {
-    return vlc_pause_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+    return vlc_pause_r( GLOBAL_VLC );
 }
 
 vlc_error_t vlc_pause_r( vlc_t *p_vlc )
@@ -1031,7 +980,7 @@ vlc_error_t vlc_pause_r( vlc_t *p_vlc )
  *****************************************************************************/
 vlc_error_t vlc_fullscreen( )
 {
-    return vlc_fullscreen_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+    return vlc_fullscreen_r( GLOBAL_VLC );
 }
 
 vlc_error_t vlc_fullscreen_r( vlc_t *p_vlc )

@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.6 2002/09/30 11:05:39 sam Exp $
+ * $Id: gtk_main.c,v 1.7 2002/10/03 13:21:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -80,12 +80,12 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    vlc_mutex_lock( p_this->p_vlc->p_global_lock );
+    vlc_mutex_lock( &p_this->p_libvlc->global_lock );
 
     if( i_refcount > 0 )
     {
         i_refcount++;
-        vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
+        vlc_mutex_unlock( &p_this->p_libvlc->global_lock );
 
         return VLC_SUCCESS;
     }
@@ -105,12 +105,12 @@ static int Open( vlc_object_t *p_this )
     {
         vlc_object_destroy( p_gtk_main );
         i_refcount--;
-        vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
+        vlc_mutex_unlock( &p_this->p_libvlc->global_lock );
         return VLC_ETHREAD;
     }
 
     i_refcount++;
-    vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
+    vlc_mutex_unlock( &p_this->p_libvlc->global_lock );
 
     return VLC_SUCCESS;
 }
@@ -120,13 +120,13 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    vlc_mutex_lock( p_this->p_vlc->p_global_lock );
+    vlc_mutex_lock( &p_this->p_libvlc->global_lock );
 
     i_refcount--;
 
     if( i_refcount > 0 )
     {
-        vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
+        vlc_mutex_unlock( &p_this->p_libvlc->global_lock );
         return;
     }
 
@@ -136,7 +136,7 @@ static void Close( vlc_object_t *p_this )
     vlc_object_destroy( p_gtk_main );
     p_gtk_main = NULL;
 
-    vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
+    vlc_mutex_unlock( &p_this->p_libvlc->global_lock );
 }
 
 static gint foo(gpointer foo)

@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.6 2002/08/19 11:37:57 sam Exp $
+ * $Id: cpu.c,v 1.7 2002/10/03 13:21:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -44,7 +44,6 @@
  * Local prototypes
  *****************************************************************************/
 static void SigHandler   ( int );
-static u32  Capabilities ( vlc_object_t * );
 
 /*****************************************************************************
  * Global variables - they're needed for signal handling
@@ -58,25 +57,9 @@ static char   *psz_capability;
 /*****************************************************************************
  * CPUCapabilities: get the CPU capabilities
  *****************************************************************************
- * This function is a wrapper around Capabilities().
- *****************************************************************************/
-u32 __CPUCapabilities( vlc_object_t *p_this )
-{
-    u32 i_capabilities;
-
-    vlc_mutex_lock( p_this->p_vlc->p_global_lock );
-    i_capabilities = Capabilities( p_this );
-    vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
-    
-    return i_capabilities;
-}
-
-/*****************************************************************************
- * Capabilities: list the processors MMX support and other capabilities
- *****************************************************************************
  * This function is called to list extensions the CPU may have.
  *****************************************************************************/
-static u32 Capabilities( vlc_object_t *p_this )
+u32 CPUCapabilities( void )
 {
     volatile u32 i_capabilities = CPU_CAPABILITY_NONE;
 

@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.45 2002/08/20 18:08:51 sam Exp $
+ * $Id: main.h,v 1.46 2002/10/03 13:21:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -23,65 +23,41 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * vlc_t, p_vlc (global variable)
+ * libvlc_t (global variable)
  *****************************************************************************
- * This structure has an unique instance, declared in main and pointed by the
- * only global variable of the program. It should allow access to any variable
- * of the program, for user-interface purposes or more easier call of interface
- * and common functions (example: the intf_*Msg functions). Please avoid using
- * it when you can access the members you need in an other way. In fact, it
- * should only be used by interface thread.
+ * This structure has an unique instance, statically allocated in main and
+ * never accessed from the outside. It store once-initialized data such as
+ * the CPU capabilities or the global lock.
  *****************************************************************************/
-struct vlc_t
+struct libvlc_t
 {
     VLC_COMMON_MEMBERS
 
-    /* The vlc structure status */
-    int                    i_status;
-    int                    i_instance;                   /* p_vlc instance # */
+    /* Initialization boolean */
+    vlc_bool_t             b_ready;
 
-    /* Global properties */
-    int                    i_argc;           /* command line arguments count */
-    char **                ppsz_argv;              /* command line arguments */
-    char *                 psz_homedir;             /* user's home directory */
-
-    u32                    i_cpu;                          /* CPU extensions */
-
-    /* Generic settings */
-    vlc_bool_t             b_quiet;                            /* be quiet ? */
-    vlc_bool_t             b_verbose;                     /* info messages ? */
-    vlc_bool_t             b_color;                      /* color messages ? */
-    mtime_t                i_desync;   /* relative desync of the audio ouput */
-
-    /* Fast memcpy plugin used */
-    module_t *             p_memcpy_module;
-    void* ( *pf_memcpy ) ( void *, const void *, size_t );
-    void* ( *pf_memset ) ( void *, int, size_t );
-
-    /* The module bank */
-    module_bank_t *        p_module_bank;
-
-    /* The message bank */
-    msg_bank_t             msg_bank;
-
-    /* Shared data - these structures are accessed directly from p_vlc by
-     * several modules */
-    input_channel_t *      p_channel;                /* channel library data */
-
-    /* Locks */
-    vlc_mutex_t            config_lock;          /* lock for the config file */
-    vlc_mutex_t            structure_lock;        /* lock for the p_vlc tree */
+    /* CPU extensions */
+    u32                    i_cpu;
 
     /* Object structure data */
     int                    i_counter;                      /* object counter */
     int                    i_objects;              /* Attached objects count */
     vlc_object_t **        pp_objects;               /* Array of all objects */
 
-    /* Pointer to the big, evil global lock */
-    vlc_mutex_t *          p_global_lock;
-    void **                pp_global_data;
+    /* The big, evil global lock */
+    vlc_mutex_t            global_lock;
+    void *                 p_global_data;
 
-    /* System-specific variables */
+    /* Locks */
+    vlc_mutex_t            structure_lock;        /* lock for the p_vlc tree */
+
+    /* The message bank */
+    msg_bank_t             msg_bank;
+
+    /* The module bank */
+    module_bank_t *        p_module_bank;
+
+    /* Arch-specific variables */
 #if defined( SYS_BEOS )
     vlc_object_t *         p_appthread;
 #elif defined( WIN32 )
@@ -89,5 +65,44 @@ struct vlc_t
     vlc_bool_t             b_fast_mutex;
     int                    i_win9x_cv;
 #endif
+};
+
+/*****************************************************************************
+ * vlc_t, p_vlc
+ *****************************************************************************
+ * This structure is a LibVLC instance.
+ *****************************************************************************/
+struct vlc_t
+{
+    VLC_COMMON_MEMBERS
+
+    /* The vlc structure status */
+    int                    i_status;
+
+    /* Global properties */
+    int                    i_argc;           /* command line arguments count */
+    char **                ppsz_argv;              /* command line arguments */
+    char *                 psz_homedir;             /* user's home directory */
+
+    /* Generic settings */
+    vlc_bool_t             b_quiet;                            /* be quiet ? */
+    vlc_bool_t             b_verbose;                     /* info messages ? */
+    vlc_bool_t             b_color;                      /* color messages ? */
+    mtime_t                i_desync;   /* relative desync of the audio ouput */
+
+    /* CPU extensions (inherited from libvlc_t) */
+    u32                    i_cpu;
+
+    /* Fast memcpy plugin used */
+    module_t *             p_memcpy_module;
+    void* ( *pf_memcpy ) ( void *, const void *, size_t );
+    void* ( *pf_memset ) ( void *, int, size_t );
+
+    /* Shared data - these structures are accessed directly from p_vlc by
+     * several modules */
+    input_channel_t *      p_channel;                /* channel library data */
+
+    /* Locks */
+    vlc_mutex_t            config_lock;          /* lock for the config file */
 };
 

@@ -17,6 +17,7 @@ Description: a free MPEG, DVD and DivX player
  DVDs, or MPEG streams from a network source.
 
 Package: libvlc0-dev
+Section: devel
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Description: development files for the VideoLAN Client

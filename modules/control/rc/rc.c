@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.5 2002/09/30 11:05:37 sam Exp $
+ * $Id: rc.c,v 1.6 2002/10/03 13:21:55 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -181,7 +181,7 @@ static void Run( intf_thread_t *p_intf )
             {
                 p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                    FIND_ANYWHERE );
-                //if( p_input )
+                if( p_input )
                 {
                     p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
                                                            FIND_PARENT );

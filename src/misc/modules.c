@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.93 2002/09/30 11:05:42 sam Exp $
+ * $Id: modules.c,v 1.94 2002/10/03 13:21:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -123,8 +123,8 @@ void __module_InitBank( vlc_object_t *p_this )
 #endif
 
     /* Everything worked, attach the object */
-    p_this->p_vlc->p_module_bank = p_bank;
-    vlc_object_attach( p_bank, p_this->p_vlc );
+    p_this->p_libvlc->p_module_bank = p_bank;
+    vlc_object_attach( p_bank, p_this->p_libvlc );
 
     return;
 }
@@ -151,11 +151,11 @@ void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next;
 
-    vlc_object_detach( p_this->p_vlc->p_module_bank );
+    vlc_object_detach( p_this->p_libvlc->p_module_bank );
 
-    while( p_this->p_vlc->p_module_bank->i_children )
+    while( p_this->p_libvlc->p_module_bank->i_children )
     {
-        p_next = (module_t *)p_this->p_vlc->p_module_bank->pp_children[0];
+        p_next = (module_t *)p_this->p_libvlc->p_module_bank->pp_children[0];
 
         if( DeleteModule( p_next ) )
         {
@@ -169,7 +169,7 @@ void __module_EndBank( vlc_object_t *p_this )
         }
     }
 
-    vlc_object_destroy( p_this->p_vlc->p_module_bank );
+    vlc_object_destroy( p_this->p_libvlc->p_module_bank );
 
     return;
 }
@@ -680,7 +680,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file )
     /* We need to fill these since they may be needed by CallEntry() */
     p_module->psz_filename = psz_file;
     p_module->handle = handle;
-    p_module->p_symbols = &p_this->p_vlc->p_module_bank->symbols;
+    p_module->p_symbols = &p_this->p_libvlc->p_module_bank->symbols;
 
     /* Initialize the module: fill p_module->psz_object_name, default config */
     if( CallEntry( p_module ) != 0 )
@@ -701,7 +701,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file )
     /* msg_Dbg( p_this, "plugin \"%s\", %s",
                 p_module->psz_object_name, p_module->psz_longname ); */
 
-    vlc_object_attach( p_module, p_this->p_vlc->p_module_bank );
+    vlc_object_attach( p_module, p_this->p_libvlc->p_module_bank );
 
     return 0;
 }
@@ -806,7 +806,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     /* msg_Dbg( p_this, "builtin \"%s\", %s",
                 p_module->psz_object_name, p_module->psz_longname ); */
 
-    vlc_object_attach( p_module, p_this->p_vlc->p_module_bank );
+    vlc_object_attach( p_module, p_this->p_libvlc->p_module_bank );
 
     return 0;
 }
