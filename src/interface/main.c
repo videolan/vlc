@@ -28,8 +28,11 @@
 #include "defs.h"
 
 #include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
-#include <getopt.h>                                              /* getopt() */
 #include <stdio.h>                                              /* sprintf() */
+
+#ifdef HAVE_LIBGNUGETOPT
+#include <getopt.h>                                              /* getopt() */
+#endif
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                  /* getenv(), strtol(),  */
@@ -91,6 +94,7 @@
 #define LONG_HELP                 2
 
 /* Long options */
+#ifdef HAVE_LIBGNUGETOPT
 static const struct option longopts[] =
 {
     /*  name,               has_arg,    flag,   val */
@@ -137,6 +141,8 @@ static const struct option longopts[] =
 
 /* Short options */
 static const char *psz_shortopts = "hHvga:s:c:";
+#endif
+
 
 /*****************************************************************************
  * Global variable program_data - this is the one and only, see main.h
@@ -465,6 +471,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /* Parse command line options */
+#ifdef HAVE_LIBGNUGETOPT
     opterr = 0;
     while( ( c = getopt_long( i_argc, ppsz_argv, psz_shortopts, longopts, 0 ) ) != EOF )
     {
@@ -579,6 +586,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
         }
     }
+#endif
 
     /* Parse command line parameters - no check is made for these options */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )

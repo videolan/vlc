@@ -36,7 +36,11 @@
 typedef u8                  byte_t;
 
 /* Boolean type */
+#ifndef SYS_SOLARIS
 typedef int                 boolean_t;
+#else
+#include <sys/types.h>
+#endif
 #ifdef SYS_GNU
 #define _MACH_I386_BOOLEAN_H_
 #endif

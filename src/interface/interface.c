@@ -128,6 +128,7 @@ intf_thread_t* intf_Create( void )
     if( i_best_score == 0 )
     {
         free( p_intf );
+	intf_ErrMsg( "error: no suitable plugin to create interface\n" );
         return( NULL );
     }
 

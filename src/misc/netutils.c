@@ -36,10 +36,19 @@
 #include <arpa/inet.h>                           /* inet_ntoa(), inet_aton() */
 #endif
 
-#if defined (HAVE_SYS_IOCTL_H) && defined (HAVE_NET_IF_H)
+#if defined (HAVE_SYS_IOCTL_H)
 #include <sys/ioctl.h>                                            /* ioctl() */
+#endif
+
+#include <unistd.h>                           /* needed for ioctl on Solaris */
+#include <stropts.h>
+
+#if defined (HAVE_NET_IF_H)
 #include <net/if.h>                            /* interface (arch-dependent) */
 #endif
+//#ifdef HAVE_SYS_SOCKIO_H
+#include <sys/sockio.h>
+//#endif
 
 #include "config.h"
 #include "common.h"
@@ -73,7 +82,7 @@ int BuildInetAddr( struct sockaddr_in *p_sa_in, char *psz_in_addr, int i_port )
     }
     /* Try to convert address directly from in_addr - this will work if
      * psz_in_addr is dotted decimal. */
-#ifdef HAVE_ARPA_INET_H
+#if defined HAVE_ARPA_INET_H && !defined SYS_SOLARIS
     else if( !inet_aton( psz_in_addr, &p_sa_in->sin_addr) )
 #else
     else if( (p_sa_in->sin_addr.s_addr = inet_addr( psz_in_addr )) == -1 )
@@ -154,7 +163,11 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
     }
 
    /* Read physical address of the interface and store it in our description */
+#ifdef SYS_SOLARIS
+    i_rc = ioctl(i_sockfd, SIOCGENADDR, (byte_t *)&ifr_config);
+#else
     i_rc = ioctl(i_sockfd, SIOCGIFHWADDR, (byte_t *)&ifr_config);
+#endif
     if( !i_rc )
     {
         memcpy(&p_ifdescr->sa_phys_addr, &ifr_config.ifr_addr, sizeof(struct sockaddr));
@@ -226,6 +239,8 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
  *****************************************************************************/
 int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 {
+    int i_rc = 0;
+
 #if defined (HAVE_SYS_IOCTL_H) && defined (HAVE_NET_IF_H)
     struct ifreq* a_ifr_ifconf = NULL;
     struct ifreq* p_ifr_current_if;
@@ -233,10 +248,7 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 
     int i_if_number;
     int i_remaining;
-#endif
-    int i_rc = 0;
 
-#if defined (HAVE_SYS_IOCTL_H) && defined (HAVE_NET_IF_H)
     ASSERT(p_net_descr);
 
     /* Start by assuming we have few than 3 interfaces (i_if_number will

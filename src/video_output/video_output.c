@@ -104,7 +104,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
     if( p_vout == NULL )
     {
-        intf_ErrMsg( "error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg( "vout error: %s\n", strerror(ENOMEM) );
         return( NULL );
     }
 
@@ -261,7 +261,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     if( vlc_thread_create( &p_vout->thread_id, "video output",
                            (void *) RunThread, (void *) p_vout) )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM));
         vout_UnloadFont( p_vout->p_default_font );
         vout_UnloadFont( p_vout->p_large_font );
         p_vout->p_sys_destroy( p_vout );
