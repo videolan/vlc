@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.12 2003/03/04 22:48:55 gbazin Exp $
+ * $Id: events.c,v 1.13 2003/05/05 16:09:37 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -34,8 +34,6 @@
 #include <vlc/intf.h>
 #include <vlc/input.h>
 #include <vlc/vout.h>
-
-#include "netutils.h"
 
 #include <windows.h>
 #include <windowsx.h>
@@ -208,18 +206,6 @@ void DirectXEventThread( event_thread_t *p_event )
                 break;
             }
 
-            case VK_F1: network_ChannelJoin( p_event, 1 ); break;
-            case VK_F2: network_ChannelJoin( p_event, 2 ); break;
-            case VK_F3: network_ChannelJoin( p_event, 3 ); break;
-            case VK_F4: network_ChannelJoin( p_event, 4 ); break;
-            case VK_F5: network_ChannelJoin( p_event, 5 ); break;
-            case VK_F6: network_ChannelJoin( p_event, 6 ); break;
-            case VK_F7: network_ChannelJoin( p_event, 7 ); break;
-            case VK_F8: network_ChannelJoin( p_event, 8 ); break;
-            case VK_F9: network_ChannelJoin( p_event, 9 ); break;
-            case VK_F10: network_ChannelJoin( p_event, 10 ); break;
-            case VK_F11: network_ChannelJoin( p_event, 11 ); break;
-            case VK_F12: network_ChannelJoin( p_event, 12 ); break;
             }
             TranslateMessage(&msg);
             break;

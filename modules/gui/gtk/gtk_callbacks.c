@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.13 2003/02/09 01:56:21 massiot Exp $
+ * $Id: gtk_callbacks.c,v 1.14 2003/05/05 16:09:39 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -45,8 +45,6 @@
 #include "gtk_support.h"
 
 #include "common.h"
-
-#include "netutils.h"
 
 /*****************************************************************************
  * Useful function to retrieve p_intf
@@ -323,44 +321,6 @@ void GtkChapterNext( GtkButton * button, gpointer user_data )
 
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
-
-/****************************************************************************
- * Network specific items
- ****************************************************************************/
-void GtkNetworkJoin( GtkEditable * editable, gpointer user_data )
-{
-    int     i_channel;
-
-    i_channel = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( editable ) );
-#if 0
-    msg_Dbg( "intf info: joining channel %d", i_channel );
-
-    network_ChannelJoin( i_channel );
-#endif
-}
-
-void GtkChannelGo( GtkButton * button, gpointer user_data )
-{
-    GtkWidget *     window;
-    GtkWidget *     spin;
-    int             i_channel;
-
-    intf_thread_t *p_intf = GtkGetIntf( button );
-
-    window = gtk_widget_get_toplevel( GTK_WIDGET (button) );
-    spin = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( window ),
-                       "network_channel_spinbutton" ) );
-
-    i_channel = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( spin ) );
-    msg_Dbg( p_intf, "joining channel %d", i_channel );
-
-    vlc_mutex_lock( &p_intf->change_lock );
-    network_ChannelJoin( p_intf, i_channel );
-    vlc_mutex_unlock( &p_intf->change_lock );
-
-/*    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY ); */
-}
-
 
 /****************************************************************************
  * About box

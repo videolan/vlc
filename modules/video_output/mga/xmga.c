@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.4 2003/03/30 18:14:39 gbazin Exp $
+ * $Id: xmga.c,v 1.5 2003/05/05 16:09:37 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,8 +51,6 @@
 #include <X11/keysym.h>
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/dpms.h>
-
-#include "netutils.h"                                 /* network_ChannelJoin */
 
 //#include "mga.h"
 
@@ -468,19 +466,6 @@ static int Manage( vout_thread_t *p_vout )
                 input_SetStatus( p_input_bank->pp_input[0],
                                  INPUT_STATUS_PAUSE );
                 break;
-
-            case XK_F1: network_ChannelJoin( p_vout, 1 ); break;
-            case XK_F2: network_ChannelJoin( p_vout, 2 ); break;
-            case XK_F3: network_ChannelJoin( p_vout, 3 ); break;
-            case XK_F4: network_ChannelJoin( p_vout, 4 ); break;
-            case XK_F5: network_ChannelJoin( p_vout, 5 ); break;
-            case XK_F6: network_ChannelJoin( p_vout, 6 ); break;
-            case XK_F7: network_ChannelJoin( p_vout, 7 ); break;
-            case XK_F8: network_ChannelJoin( p_vout, 8 ); break;
-            case XK_F9: network_ChannelJoin( p_vout, 9 ); break;
-            case XK_F10: network_ChannelJoin( p_vout, 10 ); break;
-            case XK_F11: network_ChannelJoin( p_vout, 11 ); break;
-            case XK_F12: network_ChannelJoin( p_vout, 12 ); break;
 
             default:
                 /* "Normal Keys"

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.228 2003/03/30 01:13:37 massiot Exp $
+ * $Id: input.c,v 1.229 2003/05/05 16:09:35 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -36,7 +36,6 @@
 #   include <sys/times.h>
 #endif
 
-#include "netutils.h"
 #include "vlc_playlist.h"
 
 #include "stream_control.h"

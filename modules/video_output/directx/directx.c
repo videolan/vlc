@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.17 2003/04/29 16:03:14 gbazin Exp $
+ * $Id: directx.c,v 1.18 2003/05/05 16:09:37 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -44,8 +44,6 @@
 
 #include <windows.h>
 #include <ddraw.h>
-
-#include "netutils.h"
 
 #include "vout.h"
 

@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2003 VideoLAN
- * $Id: qte.cpp,v 1.17 2003/03/30 18:14:39 gbazin Exp $
+ * $Id: qte.cpp,v 1.18 2003/05/05 16:09:38 gbazin Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -71,7 +71,6 @@ extern "C"
 
 extern "C"
 {
-#include "netutils.h"                                 /* network_ChannelJoin */
 #include "qte.h"
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.19 2003/05/05 12:15:25 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.20 2003/05/05 16:09:40 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -38,10 +38,6 @@
 #define WXINTL_NO_GETTEXT_MACRO
 #include <wx/wx.h>
 #endif
-
-extern "C" {
-#include "netutils.h"
-}
 
 //--- SKIN ------------------------------------------------------------------
 #include "../os_api.h"
@@ -181,10 +177,6 @@ bool VlcProc::EventProc( Event *evt )
 
         case VLC_NET_ADDUDP:
             AddNetworkUDP( (int)evt->GetParam2() );
-            return true;
-
-        case VLC_NET_ADDCS:
-            AddNetworkChannelServer( (char *)evt->GetParam1() );
             return true;
 
         default:

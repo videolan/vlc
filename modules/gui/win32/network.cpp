@@ -30,8 +30,6 @@
 #include "misc.h"
 #include "win32_common.h"
 
-#include "netutils.h"
-
 //---------------------------------------------------------------------------
 //#pragma package(smart_init)
 #pragma link "CSPIN"
@@ -123,20 +121,6 @@ void __fastcall TNetworkDlg::ButtonOkClick( TObject *Sender )
                     PLAYLIST_APPEND
                     | ( p_intf->p_sys->b_play_when_adding ? PLAYLIST_GO : 0 )
                     , PLAYLIST_END );
-
-        /* Channel server */
-        case 2:
-            config_PutInt( p_intf, "network-channel", TRUE );
-            config_PutPsz( p_intf, "channel-server", Channel.c_str() );
-            config_PutInt( p_intf, "channel-port", i_channel_port );
-
-            if( p_intf->p_vlc->p_channel == NULL )
-            {
-                network_ChannelCreate( p_intf );
-            }
-
-            p_intf->p_sys->b_playing = 1;
-            break;
 
         /* HTTP */
         case 3:

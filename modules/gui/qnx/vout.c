@@ -383,10 +383,6 @@ static int QNXManage( vout_thread_t *p_vout )
                         break;
 
                     default:
-                        if( i_key >= Pk_0 && i_key <= Pk_9 )
-                        {
-//                            network_ChannelJoin( i_key );
-                        }
                         break;
                     }
                 }

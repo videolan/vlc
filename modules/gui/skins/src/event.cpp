@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.13 2003/04/21 21:51:16 asmax Exp $
+ * $Id: event.cpp,v 1.14 2003/05/05 16:09:40 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -77,11 +77,6 @@ void Event::DestructParameters( bool force )
 
         case CTRL_SET_TEXT:
             delete[] (char *)Param2;
-            break;
-
-        case VLC_NET_ADDCS:
-            if( Param2 == (int)true || force )
-                delete[] (char *)Param1;
             break;
     }
 
@@ -180,8 +175,6 @@ unsigned int Event::GetMessageType( string Desc )
     // Network events
     else if( Desc == "VLC_NET_ADDUDP" )
         return VLC_NET_ADDUDP;
-    else if( Desc == "VLC_NET_ADDCS" )
-        return VLC_NET_ADDCS;
 
     // Window event
     else if( Desc == "WINDOW_MOVE" )
@@ -294,13 +287,6 @@ void Event::CreateEvent()
 
         case VLC_NET_ADDUDP:
             Param2 = atoi( para1 );
-            break;
-
-        case VLC_NET_ADDCS:
-            buf = new char[MAX_PARAM_SIZE + 7];
-            sprintf( buf, "%s:%s", para1, para2 );
-            Param1 = (unsigned int)buf;
-            Param2 = (int)false;
             break;
 
         case CTRL_ID_VISIBLE:

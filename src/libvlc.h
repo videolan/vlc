@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.58 2003/05/04 23:38:06 massiot Exp $
+ * $Id: libvlc.h,v 1.59 2003/05/05 16:09:35 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -209,23 +209,6 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define MTU_LONGTEXT N_( \
     "This is the typical size of UDP packets that we expect. On Ethernet " \
     "it is usually 1500.")
-
-#define NETCHANNEL_TEXT N_("Enable network channel mode")
-#define NETCHANNEL_LONGTEXT N_( \
-    "Activate this option if you want to use the VideoLAN Channel Server.")
-
-#define CHAN_SERV_TEXT N_("Channel server address")
-#define CHAN_SERV_LONGTEXT N_( \
-    "Indicate here the address of the VideoLAN Channel Server.")
-
-#define CHAN_PORT_TEXT N_("Channel server port")
-#define CHAN_PORT_LONGTEXT N_( \
-    "Indicate here the port on which the VideoLAN Channel Server runs.")
-
-#define IFACE_TEXT N_("Network interface")
-#define IFACE_LONGTEXT N_( \
-    "If you have several interfaces on your Linux machine and use the " \
-    "VLAN solution, you may indicate here which interface to use.")
 
 #define IFACE_ADDR_TEXT N_("Network interface address")
 #define IFACE_ADDR_LONGTEXT N_( \
@@ -507,18 +490,7 @@ vlc_module_begin();
     add_category_hint( N_("Input"), NULL, VLC_FALSE );
     add_integer( "server-port", 1234, NULL,
                  SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
-    add_bool( "network-channel", 0, NULL,
-              NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT, VLC_TRUE );
-    add_string( "channel-server", "localhost", NULL,
-                CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT, VLC_TRUE );
-    add_integer( "channel-port", 6010, NULL,
-                 CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT, VLC_TRUE );
     add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
-#ifdef SYS_DARWIN
-    add_string( "iface", "en0", NULL, IFACE_TEXT, IFACE_LONGTEXT, VLC_TRUE );
-#else
-    add_string( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT, VLC_TRUE );
-#endif
     add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT, VLC_TRUE );
     add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
 

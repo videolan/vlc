@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.12 2003/05/04 12:40:58 sam Exp $
+ * $Id: sdl.c,v 1.13 2003/05/05 16:09:37 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -41,8 +41,6 @@
 #endif
 
 #include SDL_INCLUDE_FILE
-
-#include "netutils.h"
 
 #define SDL_MAX_DIRECTBUFFERS 10
 #define SDL_DEFAULT_BPP 16
@@ -491,19 +489,6 @@ static int Manage( vout_thread_t *p_vout )
             case SDLK_DOWN:
                 input_Seek( p_vout, -60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
-
-            case SDLK_F1: network_ChannelJoin( p_vout, 1 ); break;
-            case SDLK_F2: network_ChannelJoin( p_vout, 2 ); break;
-            case SDLK_F3: network_ChannelJoin( p_vout, 3 ); break;
-            case SDLK_F4: network_ChannelJoin( p_vout, 4 ); break;
-            case SDLK_F5: network_ChannelJoin( p_vout, 5 ); break;
-            case SDLK_F6: network_ChannelJoin( p_vout, 6 ); break;
-            case SDLK_F7: network_ChannelJoin( p_vout, 7 ); break;
-            case SDLK_F8: network_ChannelJoin( p_vout, 8 ); break;
-            case SDLK_F9: network_ChannelJoin( p_vout, 9 ); break;
-            case SDLK_F10: network_ChannelJoin( p_vout, 10 ); break;
-            case SDLK_F11: network_ChannelJoin( p_vout, 11 ); break;
-            case SDLK_F12: network_ChannelJoin( p_vout, 12 ); break;
 
             case SDLK_b:
                 {

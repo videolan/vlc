@@ -2,7 +2,7 @@
  * sout.c :
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: sout.c,v 1.1 2003/01/26 14:49:09 fenrir Exp $
+ * $Id: sout.c,v 1.2 2003/05/05 16:09:39 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -44,8 +44,6 @@
 
 #include "playlist.h"
 #include "common.h"
-
-#include "netutils.h"
 
 void GtkSoutSettings ( GtkButton       *button,
                        gpointer         user_data );

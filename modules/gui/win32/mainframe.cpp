@@ -42,8 +42,6 @@
 #include "misc.h"
 #include "win32_common.h"
 
-#include "netutils.h"
-
 /*****************************************************************************
  * BORLAND SUCKS
  * If the following pragma doesn't end with \r\n instead of \n, the file
@@ -563,16 +561,7 @@ void __fastcall TMainFrameDlg::NextChapterActionExecute( TObject *Sender )
  ****************************************************************************/
 void __fastcall TMainFrameDlg::ButtonGoClick( TObject *Sender )
 {
-    int i_channel;
-
-    i_channel = SpinEditChannel->Value;
-    msg_Dbg( p_intf, "joining channel %d", i_channel );
-
-    vlc_mutex_lock( &p_intf->change_lock );
-    network_ChannelJoin( p_intf, i_channel );
-    vlc_mutex_unlock( &p_intf->change_lock );
-
-//    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+    msg_Err( p_intf, "Deprecated, doesn't do anything" );
 }
 //---------------------------------------------------------------------------
 

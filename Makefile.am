@@ -187,7 +187,6 @@ HEADERS_include = \
 	include/modules.h \
 	include/modules_inner.h \
 	include/mtime.h \
-	include/netutils.h \
 	include/network.h \
 	include/os_specific.h \
 	include/stream_control.h \
@@ -406,7 +405,6 @@ SOURCES_libvlc_common = \
 	src/misc/threads.c \
 	src/misc/cpu.c \
 	src/misc/configuration.c \
-	src/misc/netutils.c \
 	src/misc/iso_lang.c \
 	src/misc/iso-639_def.h \
 	src/misc/messages.c \

@@ -391,7 +391,7 @@ create_familiar (void)
   gtk_widget_show (vbox3);
   gtk_container_add (GTK_CONTAINER (mediabook), vbox3);
 
-  network_multicast = gtk_radio_button_new_with_label (network_group, _("UDP/RTP (Address when Multicast)"));
+  network_multicast = gtk_radio_button_new_with_label (network_group, _("UDP/RTP (Adress when Multicast)"));
   network_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_multicast));
   gtk_widget_set_name (network_multicast, "network_multicast");
   gtk_widget_ref (network_multicast);

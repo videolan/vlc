@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.81 2003/04/24 17:44:53 gbazin Exp $
+ * $Id: libvlc.c,v 1.82 2003/05/05 16:09:35 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -64,7 +64,6 @@
 #include "os_specific.h"
 
 #include "error.h"
-#include "netutils.h"                                 /* network_ChannelJoin */
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -497,18 +496,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     /*
-     * Initialize shared resources and libraries
-     */
-    if( config_GetInt( p_vlc, "network-channel" )
-         && network_ChannelCreate( p_vlc ) )
-    {
-        /* On error during Channels initialization, switch off channels */
-        msg_Warn( p_vlc,
-                  "channels initialization failed, deactivating channels" );
-        config_PutInt( p_vlc, "network-channel", VLC_FALSE );
-    }
-
-    /*
      * Initialize playlist and get commandline files
      */
     p_playlist = playlist_Create( p_vlc );
@@ -627,14 +614,6 @@ int VLC_Destroy( int i_object )
     if( !p_vlc )
     {
         return VLC_ENOOBJ;
-    }
-
-    /*
-     * Go back into channel 0 which is the network
-     */
-    if( config_GetInt( p_vlc, "network-channel" ) && p_vlc->p_channel )
-    {
-        network_ChannelJoin( p_vlc, COMMON_CHANNEL );
     }
 
     /*

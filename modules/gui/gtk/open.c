@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.13 2003/01/29 18:10:52 sam Exp $
+ * $Id: open.c,v 1.14 2003/05/05 16:09:39 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -45,8 +45,6 @@
 
 #include "playlist.h"
 #include "common.h"
-
-#include "netutils.h"
 
 static void GtkOpenShow( intf_thread_t *, int );
 
@@ -248,16 +246,9 @@ gboolean GtkNetworkOpenShow( GtkWidget       *widget,
 
 static void GtkNetworkOpenChanged( GtkWidget *button, gpointer user_data )
 {
-    intf_thread_t * p_intf = GtkGetIntf( button );
     GString *       p_target = g_string_new( "" );
 
     unsigned int    i_port;
-    vlc_bool_t      b_channel;
-
-    /* Manage channel server */
-    b_channel = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(
-            lookup_widget( GTK_WIDGET(button), "network_channel" ) ) );
-    config_PutInt( p_intf, "network-channel", b_channel );
 
 #define SELECTED( s ) GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button), \
                        (s) ) )->active
@@ -286,30 +277,6 @@ static void GtkNetworkOpenChanged( GtkWidget *button, gpointer user_data )
         {
             g_string_sprintfa( p_target, ":%i", i_port );
         }
-    }
-    else if( SELECTED( "network_channel" ) )
-    {
-        char *          psz_channel;
-        unsigned int    i_channel_port;
-
-        if( p_intf->p_vlc->p_channel == NULL )
-        {
-            network_ChannelCreate( p_intf );
-        }
-
-        psz_channel = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
-                        GTK_WIDGET(button), "network_channel_address" ) ) );
-        i_channel_port = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON(
-            lookup_widget( GTK_WIDGET(button), "network_channel_port" ) ) );
-
-        config_PutPsz( p_intf, "channel-server", psz_channel );
-        if( i_channel_port < 65536 )
-        {
-            config_PutInt( p_intf, "channel-port", i_channel_port );
-        }
-
-        /* FIXME: we should use a playlist server instead */
-        g_string_append( p_target, "udp://" );
     }
     else if( SELECTED( "network_http" ) )
     {
@@ -359,30 +326,6 @@ void GtkNetworkOpenMulticast( GtkToggleButton *togglebutton,
                     gtk_toggle_button_get_active( togglebutton ) );
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
                     "network_multicast_port" ),
-                    gtk_toggle_button_get_active( togglebutton ) );
-
-    GtkNetworkOpenChanged( GTK_WIDGET( togglebutton ), user_data );
-}
-
-
-void GtkNetworkOpenChannel( GtkToggleButton *togglebutton,
-                                       gpointer user_data )
-{
-    GtkWidget *     p_open;
-
-    p_open = gtk_widget_get_toplevel( GTK_WIDGET (togglebutton) );
-    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
-                    "network_channel_address_label" ),
-                    gtk_toggle_button_get_active( togglebutton ) );
-    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
-                    "network_channel_address_combo" ),
-                    gtk_toggle_button_get_active( togglebutton ) );
-
-    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
-                    "network_channel_port_label" ),
-                    gtk_toggle_button_get_active( togglebutton ) );
-    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
-                    "network_channel_port" ),
                     gtk_toggle_button_get_active( togglebutton ) );
 
     GtkNetworkOpenChanged( GTK_WIDGET( togglebutton ), user_data );
@@ -537,26 +480,9 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
         GTK_OBJECT( p_intf->p_sys->p_open ), "network_udp_port" ) ),
         config_GetInt( p_intf, "server-port" ) );
 
-    psz_var = config_GetPsz( p_intf, "channel-server" );
-    if( psz_var )
-    {
-        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
-            GTK_OBJECT( p_intf->p_sys->p_open ), "network_channel_address" ) ),
-            psz_var );
-        free( psz_var );
-    }
-
     gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_open ), "network_http_url" ) ),
         "http://" );
-
-    gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_open ), "network_channel_port" ) ),
-        config_GetInt( p_intf, "channel-port" ) );
-
-    gtk_toggle_button_set_active( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_open ), "network_channel" ),
-        config_GetInt( p_intf, "network-channel" ) );
 
     /* Satellite stuff */
     psz_var = config_GetPsz( p_intf, "frequency" );
@@ -669,35 +595,6 @@ void GtkOpenOk( GtkButton * button, gpointer user_data )
     {
         config_PutPsz( p_intf, "sout", "" );
     }
-
-    /* Enable the channel box when network channel is selected */
-    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
-                                               "network_channel" ) )->active )
-    {
-        GtkWidget *     p_network_box;
-        GtkWidget *     p_channel;
-        GtkWidget *     p_label;
-
-        p_network_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                        p_intf->p_sys->p_window ), "network_box" ) );
-        gtk_widget_show( GTK_WIDGET( p_network_box ) );
-        p_label = gtk_object_get_data( GTK_OBJECT(
-                   p_intf->p_sys->p_window ),
-                   "label_status" );
-        gtk_widget_hide( GTK_WIDGET( p_label ) );
-
-        p_channel = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                   p_intf->p_sys->p_window ), "network_channel_box" ) );
-        if( config_GetInt( p_intf, "network-channel" ) )
-        {
-            gtk_widget_show( GTK_WIDGET( p_channel ) );
-        }
-        else
-        {
-            gtk_widget_hide( GTK_WIDGET( p_channel ) );
-        }
-    }
-
 }
 
 void GtkOpenCancel( GtkButton * button, gpointer user_data )

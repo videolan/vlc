@@ -2,7 +2,7 @@
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.c,v 1.9 2003/02/05 22:11:52 sam Exp $
+ * $Id: display.c,v 1.10 2003/05/05 16:09:39 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -86,7 +86,6 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
     GtkWidget *     p_network_box;
     GtkWidget *     p_slider;
     GtkWidget *     p_label;
-    GtkWidget *     p_channel;
     vlc_bool_t      b_control;
 
 #define GETWIDGET( ptr, name ) GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( \
@@ -135,17 +134,6 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
                             "network_address_label" );
                 gtk_label_set_text( GTK_LABEL( p_label ),
                                     p_intf->p_sys->p_input->psz_source );
-                p_channel = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                           p_intf->p_sys->p_window ), "network_channel_box" ) );
-                if( config_GetInt( p_intf, "network-channel" ) )
-                {
-                    gtk_widget_show( GTK_WIDGET( p_channel ) );
-                }
-                else
-                {
-                    gtk_widget_hide( GTK_WIDGET( p_channel ) );
-                }
-
                 break;
             default:
                 msg_Warn( p_intf, "cannot determine input method" );
@@ -186,22 +174,11 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
     }
     else
     {
-        if( config_GetInt( p_intf, "network-channel" ) )
-        {
-            gtk_widget_show( GTK_WIDGET( p_network_box ) );
-
-            p_channel = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                       p_intf->p_sys->p_window ), "network_channel_box" ) );
-            gtk_widget_show( GTK_WIDGET( p_channel ) );
-        }
-        else
-        {
-            /* default mode */
-            p_label = gtk_object_get_data(
-                    GTK_OBJECT( p_intf->p_sys->p_window ), "label_status" );
-            gtk_label_set_text( GTK_LABEL( p_label ), "" );
-            gtk_widget_show( GTK_WIDGET( p_file_box ) );
-        }
+        /* default mode */
+        p_label = gtk_object_get_data(
+                  GTK_OBJECT( p_intf->p_sys->p_window ), "label_status" );
+        gtk_label_set_text( GTK_LABEL( p_label ), "" );
+        gtk_widget_show( GTK_WIDGET( p_file_box ) );
 
         /* unsensitize menus */
         gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_program"),
