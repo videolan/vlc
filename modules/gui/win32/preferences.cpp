@@ -268,6 +268,11 @@ __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
         ButtonDown->Hint = "Decrease the plugin priority";
         ButtonDown->ShowHint = true;
     }
+    else
+    {
+        ButtonUp = NULL;
+        ButtonDown = NULL;
+    }
 
     /* panel height */
     Height = CleanCheckListBox->Top + CleanCheckListBox->Height
@@ -284,8 +289,8 @@ void __fastcall TPanelPlugin::CheckListBoxClick( TObject *Sender )
      * started on an item */
     if( CleanCheckListBox->ItemIndex == -1 )
     {
-        ButtonUp->Enabled = false;
-        ButtonDown->Enabled = false;
+        if ( ButtonUp != NULL ) ButtonUp->Enabled = false;
+        if ( ButtonDown != NULL ) ButtonDown->Enabled = false;
         return;
     }
 
@@ -295,16 +300,13 @@ void __fastcall TPanelPlugin::CheckListBoxClick( TObject *Sender )
         return;
 
     /* enable up and down buttons */
-    if ( b_multi_plugins )
+    if ( b_multi_plugins && ButtonUp != NULL && ButtonDown != NULL )
     {
-        if ( CleanCheckListBox->ItemIndex != -1 )
-        {
-            if ( CleanCheckListBox->ItemIndex == 0 )
-                ButtonUp->Enabled = false; else ButtonUp->Enabled = true;
-            if ( CleanCheckListBox->ItemIndex
-                == CleanCheckListBox->Items->Count - 1 )
-                ButtonDown->Enabled = false; else ButtonDown->Enabled = true;
-        }
+        if ( CleanCheckListBox->ItemIndex == 0 )
+            ButtonUp->Enabled = false; else ButtonUp->Enabled = true;
+        if ( CleanCheckListBox->ItemIndex
+            == CleanCheckListBox->Items->Count - 1 )
+            ButtonDown->Enabled = false; else ButtonDown->Enabled = true;
     }
 
     /* look for module 'Name' */
