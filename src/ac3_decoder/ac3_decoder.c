@@ -192,7 +192,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 {
     int i;
     mtime_t mdate = 0;
-    byte_t byte;
+//    byte_t byte;
 
     intf_DbgMsg( "ac3dec debug: running ac3 decoder thread (%p) (pid == %i)\n", p_ac3dec, getpid() );
 
@@ -202,13 +202,12 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
         p_ac3dec->b_error = 1;
     }
 
-    i = open( "/tmp/taxi.ac3", O_WRONLY|O_CREAT|O_TRUNC );
+//    i = open( "/tmp/taxi.ac3", O_WRONLY|O_CREAT|O_TRUNC );
     /* ac3 decoder thread's main loop */
     while ( (!p_ac3dec->b_die) && (!p_ac3dec->b_error) )
     {
-	    byte = GetByte( &(p_ac3dec->bit_stream) );
-	    write( i, &byte, 1 );
-#if 0
+//        byte = GetByte( &(p_ac3dec->bit_stream) );
+//        write( i, &byte, 1 );
         decode_find_sync( p_ac3dec );
 	parse_syncinfo( p_ac3dec );
 	parse_bsi( p_ac3dec );
@@ -232,7 +231,6 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	    mdate += 5333;
         }
         parse_auxdata( p_ac3dec );
-#endif
     }
     close( i );
 

@@ -441,8 +441,8 @@ static void ba_compute_mask(s16 start, s16 end, u16 fscod,
 			}
 			for (k = 0; k < deltlen[seg]; k++)
 			{
-//				mask[band] += delta;
-				band++;
+                            mask[band] += delta;
+                            band++;
 			}
 		}
 	}
