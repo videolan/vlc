@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.10 2003/12/04 12:33:43 gbazin Exp $
+ * $Id: file.c,v 1.11 2004/01/23 17:56:14 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -61,6 +61,7 @@ static void    Close  ( vlc_object_t * );
 
 static int     Write( sout_access_out_t *, sout_buffer_t * );
 static int     Seek ( sout_access_out_t *, off_t  );
+static int     Read ( sout_access_out_t *, sout_buffer_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -97,7 +98,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "no file name specified" );
         return VLC_EGENERIC;
     }
-    i_flags = O_WRONLY|O_CREAT;
+    i_flags = O_RDWR|O_CREAT;
     if( sout_cfg_find_value( p_access->p_cfg, "append" ) )
     {
         i_flags |= O_APPEND;
@@ -120,8 +121,9 @@ static int Open( vlc_object_t *p_this )
         return( VLC_EGENERIC );
     }
 
-    p_access->pf_write        = Write;
-    p_access->pf_seek         = Seek;
+    p_access->pf_write = Write;
+    p_access->pf_read  = Read;
+    p_access->pf_seek  = Seek;
 
     msg_Info( p_access, "Open: name:`%s'", p_access->psz_name );
     return VLC_SUCCESS;
@@ -132,7 +134,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
+    sout_access_out_t *p_access = (sout_access_out_t*)p_this;
 
     if( strcmp( p_access->psz_name, "-" ) )
     {
@@ -148,6 +150,23 @@ static void Close( vlc_object_t * p_this )
 
 /*****************************************************************************
  * Read: standard read on a file descriptor.
+ *****************************************************************************/
+static int Read( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+{
+    if( strcmp( p_access->psz_name, "-" ) )
+    {
+        return read( p_access->p_sys->i_handle, p_buffer->p_buffer,
+                     p_buffer->i_size );
+    }
+    else
+    {
+        msg_Err( p_access, "cannot seek while using stdout" );
+        return VLC_EGENERIC;
+    }
+}
+
+/*****************************************************************************
+ * Write: standard write on a file descriptor.
  *****************************************************************************/
 static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 {
@@ -173,7 +192,7 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
-    msg_Dbg( p_access, "Seek: pos:"I64Fd, (int64_t)i_pos );
+    //msg_Dbg( p_access, "Seek: pos:"I64Fd, (int64_t)i_pos );
 
     if( strcmp( p_access->psz_name, "-" ) )
     {

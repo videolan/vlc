@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: stream_output.c,v 1.37 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: stream_output.c,v 1.38 2004/01/23 17:56:14 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -238,7 +238,8 @@ int sout_InputDelete( sout_packetizer_input_t *p_input )
 }
 
 
-int sout_InputSendBuffer( sout_packetizer_input_t *p_input, sout_buffer_t *p_buffer )
+int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
+                          sout_buffer_t *p_buffer )
 {
     sout_instance_t     *p_sout = p_input->p_sout;
     int                 i_ret;
@@ -272,7 +273,8 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
         return NULL;
     }
 
-    psz_next = sout_cfg_parser( &p_access->psz_access, &p_access->p_cfg, psz_access );
+    psz_next = sout_cfg_parser( &p_access->psz_access, &p_access->p_cfg,
+                                psz_access );
     if( psz_next )
     {
         free( psz_next );
@@ -281,6 +283,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     p_access->p_sout     = p_sout;
     p_access->p_sys = NULL;
     p_access->pf_seek    = NULL;
+    p_access->pf_read    = NULL;
     p_access->pf_write   = NULL;
 
     p_access->p_module   =
@@ -317,19 +320,27 @@ void sout_AccessOutDelete( sout_access_out_t *p_access )
 /*****************************************************************************
  * sout_AccessSeek:
  *****************************************************************************/
-int  sout_AccessOutSeek( sout_access_out_t *p_access, off_t i_pos )
+int sout_AccessOutSeek( sout_access_out_t *p_access, off_t i_pos )
 {
-    return( p_access->pf_seek( p_access, i_pos ) );
+    return p_access->pf_seek( p_access, i_pos );
+}
+
+/*****************************************************************************
+ * sout_AccessRead:
+ *****************************************************************************/
+int sout_AccessOutRead( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+{
+    return ( p_access->pf_read ?
+             p_access->pf_read( p_access, p_buffer ) : VLC_EGENERIC );
 }
 
 /*****************************************************************************
  * sout_AccessWrite:
  *****************************************************************************/
-int  sout_AccessOutWrite( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+int sout_AccessOutWrite( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 {
-    return( p_access->pf_write( p_access, p_buffer ) );
+    return p_access->pf_write( p_access, p_buffer );
 }
-
 
 /*****************************************************************************
  * MuxNew: allocate a new mux

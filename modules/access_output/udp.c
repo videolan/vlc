@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.16 2003/11/17 14:46:37 massiot Exp $
+ * $Id: udp.c,v 1.17 2004/01/23 17:56:14 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -53,8 +53,6 @@
 #include "network.h"
 
 #define DEFAULT_PORT 1234
-#define LATENCY     100000
-#define MAX_ERROR    500000
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
@@ -130,13 +128,14 @@ static int Open( vlc_object_t *p_this )
     module_t            *p_network;
     network_socket_t    socket_desc;
 
-    char                *val;
+    vlc_value_t         val;
+    char                *psz_val;
 
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
         msg_Err( p_access, "Not enough memory" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
 
@@ -184,7 +183,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->p_thread )
     {
         msg_Err( p_access, "out of memory" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     p_sys->p_thread->p_sout = p_access->p_sout;
@@ -198,34 +197,37 @@ static int Open( vlc_object_t *p_this )
     socket_desc.psz_bind_addr   = "";
     socket_desc.i_bind_port     = 0;
     socket_desc.i_ttl           = 0;
-    if( ( val = sout_cfg_find_value( p_access->p_cfg, "ttl" ) ) )
+    if( ( psz_val = sout_cfg_find_value( p_access->p_cfg, "ttl" ) ) )
     {
-        socket_desc.i_ttl = atoi( val );
+        socket_desc.i_ttl = atoi( psz_val );
     }
     p_sys->p_thread->p_private = (void*)&socket_desc;
-    if( !( p_network = module_Need( p_sys->p_thread,
-                                    "network", "" ) ) )
+    if( !( p_network = module_Need( p_sys->p_thread, "network", "" ) ) )
     {
         msg_Err( p_access, "failed to open a connection (udp)" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
     module_Unneed( p_sys->p_thread, p_network );
 
     p_sys->p_thread->i_handle = socket_desc.i_handle;
-    p_sys->p_thread->i_caching = config_GetInt( p_this, "udp-sout-caching" ) * 1000;
-    if( ( val = sout_cfg_find_value( p_access->p_cfg, "caching" ) ) )
+
+    var_Create( p_this, "udp-sout-caching",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "udp-sout-caching", &val );
+    p_sys->p_thread->i_caching = val.i_int * 1000;
+    if( ( psz_val = sout_cfg_find_value( p_access->p_cfg, "caching" ) ) )
     {
-        p_sys->p_thread->i_caching = atoll( val ) * 1000;
+        p_sys->p_thread->i_caching = atoll( psz_val ) * 1000;
     }
 
-    p_sys->i_mtu     = socket_desc.i_mtu;
+    p_sys->i_mtu = socket_desc.i_mtu;
 
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
                            VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_access->p_sout, "cannot spawn sout access thread" );
         vlc_object_destroy( p_sys->p_thread );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     srand( (uint32_t)mdate());
@@ -235,16 +237,16 @@ static int Open( vlc_object_t *p_this )
 
     if( sout_cfg_find( p_access->p_cfg, "raw" ) )
     {
-        p_access->pf_write       = WriteRaw;
+        p_access->pf_write = WriteRaw;
     }
     else
     {
-        p_access->pf_write       = Write;
+        p_access->pf_write = Write;
     }
-    p_access->pf_seek        = Seek;
 
-    msg_Info( p_access, "Open: addr:`%s' port:`%d'",
-              psz_dst_addr, i_dst_port );
+    p_access->pf_seek = Seek;
+
+    msg_Info( p_access, "Open: addr:`%s' port:`%d'", psz_dst_addr, i_dst_port);
 
     free( psz_dst_addr );
     return VLC_SUCCESS;
@@ -255,14 +257,14 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
-    sout_access_out_sys_t   *p_sys = p_access->p_sys;
-    int                 i;
+    sout_access_out_t     *p_access = (sout_access_out_t*)p_this;
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
+    int i;
 
     p_sys->p_thread->b_die = 1;
     for( i = 0; i < 10; i++ )
     {
-        sout_buffer_t       *p_dummy;
+        sout_buffer_t *p_dummy;
 
         p_dummy = sout_BufferNew( p_access->p_sout, p_sys->i_mtu );
         p_dummy->i_dts = 0;
@@ -296,7 +298,7 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 {
-    sout_access_out_sys_t   *p_sys = p_access->p_sys;
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
     unsigned int i_write;
 
     while( p_buffer )
@@ -356,7 +358,6 @@ static int WriteRaw( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
-
     msg_Err( p_access, "udp sout access cannot seek" );
     return( -1 );
 }

@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.18 2003/12/07 17:09:33 gbazin Exp $
+ * $Id: stream_output.h,v 1.19 2004/01/23 17:56:14 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -121,6 +121,8 @@ struct sout_access_out_t
     sout_access_out_sys_t   *p_sys;
     int                     (* pf_seek  )( sout_access_out_t *,
                                            off_t );
+    int                     (* pf_read  )( sout_access_out_t *,
+                                           sout_buffer_t * );
     int                     (* pf_write )( sout_access_out_t *,
                                            sout_buffer_t * );
 };
@@ -295,6 +297,7 @@ VLC_EXPORT( void,           sout_BufferChain,  ( sout_buffer_t **, sout_buffer_t
 VLC_EXPORT( sout_access_out_t *, sout_AccessOutNew, ( sout_instance_t *, char *psz_access, char *psz_name ) );
 VLC_EXPORT( void,                sout_AccessOutDelete, ( sout_access_out_t * ) );
 VLC_EXPORT( int,                 sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
+VLC_EXPORT( int,                 sout_AccessOutRead,   ( sout_access_out_t *, sout_buffer_t * ) );
 VLC_EXPORT( int,                 sout_AccessOutWrite,  ( sout_access_out_t *, sout_buffer_t * ) );
 
 VLC_EXPORT( sout_mux_t *,       sout_MuxNew,          ( sout_instance_t*, char *, sout_access_out_t * ) );
