@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.11 2003/05/05 13:06:02 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.12 2003/05/07 17:27:30 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -29,9 +29,10 @@
 #define PREFS_WINDOW_WIDTH   600
 #define PREFS_WINDOW_HEIGHT  400
 #define PREFS_ITEM_SELECTED  'pris'
-#define PREFS_OK             'prok'
+#define PREFS_CLOSE          'prcl'
 #define PREFS_REVERT         'prre'
 #define PREFS_APPLY          'prap'
+#define PREFS_SAVE           'prsa'
 #define TEXT_HEIGHT 16
 
 class ConfigView : public BView
@@ -70,6 +71,7 @@ class PreferencesWindow : public BWindow
             void            Update();
             void            UpdateScrollBar();
             void            ApplyChanges( bool doIt );
+            void            SaveChanges();
 
             void            ReallyQuit();
 

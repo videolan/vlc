@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.17 2003/05/07 16:47:10 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.18 2003/05/07 17:27:30 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -82,6 +82,9 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
       fConfigScroll( NULL ),
       p_intf( p_interface )
 {
+    SetSizeLimits( PREFS_WINDOW_WIDTH, PREFS_WINDOW_WIDTH,
+                   200, 2000 );
+
     BRect rect;
 
     /* The "background" view */
@@ -272,15 +275,20 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     rect.InsetBy( 10, 10 );
     rect.left = rect.right - 80;
     rect.top = rect.bottom - 25;
-    button = new BButton( rect, "", _("OK"), new BMessage( PREFS_OK ),
+    button = new BButton( rect, "", _("Close"), new BMessage( PREFS_CLOSE ),
+                          B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
+    button->MakeDefault( true );
+    fPrefsView->AddChild( button );
+    rect.OffsetBy( -90, 0 );
+    button = new BButton( rect, "", _("Apply"), new BMessage( PREFS_APPLY ),
+                          B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
+    fPrefsView->AddChild( button );
+    rect.OffsetBy( -90, 0 );
+    button = new BButton( rect, "", _("Save"), new BMessage( PREFS_SAVE ),
                           B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
     fPrefsView->AddChild( button );
     rect.OffsetBy( -90, 0 );
     button = new BButton( rect, "", _("Revert"), new BMessage( PREFS_REVERT ),
-                          B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
-    fPrefsView->AddChild( button );
-    rect.OffsetBy( -90, 0 );
-    button = new BButton( rect, "", _("Apply"), new BMessage( PREFS_APPLY ),
                           B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
     fPrefsView->AddChild( button );
     
@@ -316,8 +324,7 @@ void PreferencesWindow::MessageReceived( BMessage * message )
             Update();
             break;
         
-        case PREFS_OK:
-            ApplyChanges( true );
+        case PREFS_CLOSE:
             PostMessage( B_QUIT_REQUESTED );
             break;
         
@@ -327,6 +334,10 @@ void PreferencesWindow::MessageReceived( BMessage * message )
         
         case PREFS_APPLY:
             ApplyChanges( true );
+            break;
+        
+        case PREFS_SAVE:
+            SaveChanges();
             break;
 
         default:
@@ -482,6 +493,15 @@ void PreferencesWindow::ApplyChanges( bool doIt )
             }
         }
     }
+}
+
+/*****************************************************************************
+ * PreferencesWindow::SaveChanges
+ *****************************************************************************/
+void PreferencesWindow::SaveChanges()
+{
+    ApplyChanges( true );
+    config_SaveConfigFile( p_intf, NULL );
 }
 
 /*****************************************************************************

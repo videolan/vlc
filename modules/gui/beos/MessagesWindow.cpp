@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.7 2003/02/10 15:23:46 titer Exp $
+ * $Id: MessagesWindow.cpp,v 1.8 2003/05/07 17:27:30 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -45,9 +45,11 @@ MessagesWindow::MessagesWindow( intf_thread_t * p_intf,
                B_NOT_ZOOMABLE )
 {
 	this->p_intf = p_intf;
+
+    SetSizeLimits( 200, 2000, 200, 2000 );
 	
 	BRect rect, textRect;
-	
+
 	rect = Bounds();
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	textRect = rect;
@@ -55,6 +57,7 @@ MessagesWindow::MessagesWindow( intf_thread_t * p_intf,
 	fMessagesView = new BTextView( rect, "messages", textRect,
 	                               B_FOLLOW_ALL, B_WILL_DRAW );
 	fMessagesView->MakeEditable( false );
+	fMessagesView->MakeSelectable( false );
 	fMessagesView->SetStylable( true );
 	fScrollView = new BScrollView( "scrollview", fMessagesView, B_WILL_DRAW,
 	                               B_FOLLOW_ALL, false, true );
@@ -183,6 +186,7 @@ static int UpdateMessages( intf_thread_t * p_intf )
                 }
             
                 /* Scroll at the end */
+                
                 if( scrollBar->LockLooper() )
                 {
                     float min, max;
