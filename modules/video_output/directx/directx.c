@@ -1837,8 +1837,10 @@ static int DirectXLockSurface( vout_thread_t *p_vout, picture_t *p_pic )
             dxresult = IDirectDrawSurface2_Lock( p_pic->p_sys->p_surface, NULL,
                                                  &p_pic->p_sys->ddsd,
                                                  DDLOCK_WAIT, NULL);
+#if 0
             if( dxresult == DDERR_SURFACELOST )
                 msg_Dbg( p_vout, "DirectXLockSurface: DDERR_SURFACELOST" );
+#endif
         }
         if( dxresult != DD_OK )
         {
