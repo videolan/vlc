@@ -86,7 +86,7 @@ static NPPluginFuncs* g_pluginFuncs;
 //  by using the NP_LOADDS macro, when compiling for Win16
 //
 #ifdef __MINGW32__
-extern "C" NPError
+extern "C" __declspec(dllexport) NPError WINAPI
 #else
 NPError WINAPI NP_EXPORT
 #endif
@@ -124,11 +124,11 @@ NP_GetEntryPoints(NPPluginFuncs* pFuncs)
 //	called immediately after the plugin DLL is loaded
 //
 #ifdef __MINGW32__
-extern "C" NPError
+extern "C" __declspec(dllexport) NPError WINAPI
 #else
 NPError WINAPI NP_EXPORT 
 #endif
-NP_Initialize(NPNetscapeFuncs* pFuncs, NPPluginFuncs*)
+NP_Initialize(NPNetscapeFuncs* pFuncs)
 {
     // trap a NULL ptr 
     if(pFuncs == NULL)
@@ -165,7 +165,7 @@ NP_Initialize(NPNetscapeFuncs* pFuncs, NPPluginFuncs*)
 //	unloadable or it needs to stay in memory. 
 //
 #ifdef __MINGW32__
-extern "C" NPError
+extern "C" __declspec(dllexport) NPError WINAPI
 #else
 NPError WINAPI NP_EXPORT 
 #endif

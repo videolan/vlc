@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.131 2003/09/10 11:37:52 fenrir Exp $
+ * $Id: modules.c,v 1.132 2003/09/23 16:07:49 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -574,11 +574,6 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 
     char **         ppsz_path = path;
     char *          psz_fullpath;
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN ) \
-     || ( defined( WIN32 ) && !defined( UNDER_CE ) )
-    int             i_vlclen = strlen( p_this->p_libvlc->psz_vlcpath );
-    vlc_bool_t      b_notinroot;
-#endif
 
 #if defined( UNDER_CE )
     wchar_t         psz_dir[MAX_PATH];
@@ -602,20 +597,16 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     {
 #if defined( SYS_BEOS ) || defined( SYS_DARWIN ) \
      || ( defined( WIN32 ) && !defined( UNDER_CE ) )
-        /* Store strlen(*ppsz_path) for later use. */
-        int i_dirlen = strlen( *ppsz_path );
 
-        b_notinroot = VLC_FALSE;
-        /* Under BeOS, we need to add beos_GetProgramPath() to access
-         * files under the current directory */
+        /* Handle relative as well as absolute paths */
 #ifdef WIN32
-        if( i_dirlen < 3 || (*ppsz_path)[3] != '\\' )
+        if( !(*ppsz_path)[0] || (*ppsz_path)[1] != ':' )
 #else
         if( (*ppsz_path)[0] != '/' )
 #endif
         {
-            i_dirlen += i_vlclen + 2;
-            b_notinroot = VLC_TRUE;
+            int i_dirlen = strlen( *ppsz_path );
+            i_dirlen += strlen( p_this->p_libvlc->psz_vlcpath ) + 2;
 
             psz_fullpath = malloc( i_dirlen );
             if( psz_fullpath == NULL )
@@ -633,7 +624,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         else
 #endif
         {
-            psz_fullpath = *ppsz_path;
+            psz_fullpath = strdup( *ppsz_path );
         }
 
         msg_Dbg( p_this, "recursively browsing `%s'", psz_fullpath );
@@ -646,12 +637,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         AllocatePluginDir( p_this, psz_fullpath, 5 );
 #endif
 
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
-        if( b_notinroot )
-        {
-            free( psz_fullpath );
-        }
-#endif
+        free( psz_fullpath );
     }
 
     /* Free plugin-path */

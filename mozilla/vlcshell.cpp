@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.23 2003/09/20 22:52:27 gbazin Exp $
+ * $Id: vlcshell.cpp,v 1.24 2003/09/23 16:07:48 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -94,8 +94,8 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event );
  * Windows-only declarations
  *****************************************************************************/
 #ifdef XP_WIN
-#   define VOUT_PLUGINS "directx,dummy"
-#   define AOUT_PLUGINS "none" /* "directx,waveout,dummy" */
+#   define VOUT_PLUGINS "directx,wingdi,dummy"
+#   define AOUT_PLUGINS "directx,waveout,dummy"
 
 HINSTANCE g_hDllInstance = NULL;
 
@@ -302,7 +302,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         ppsz_argv[2] = plugin_path;
 
 #elif defined(XP_WIN)
-        char *ppsz_argv[] = { "vlc", "--plugin-path", NULL };
+        char *ppsz_argv[] = { "vlc", "--plugin-path", NULL, "-vv" };
         HKEY h_key;
         DWORD i_type, i_data;
         char p_data[MAX_PATH + 1];
