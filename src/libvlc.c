@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.19 2002/07/31 20:56:52 sam Exp $
+ * $Id: libvlc.c,v 1.20 2002/08/04 20:04:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -186,7 +186,6 @@ vlc_error_t vlc_init( int i_argc, char *ppsz_argv[] )
 vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 {
     char p_capabilities[200];
-    char *psz_module;
     char *p_tmp;
     module_t        *p_help_module;
     playlist_t      *p_playlist;
@@ -453,9 +452,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /*
      * Choose the best memcpy module
      */
-    psz_module = config_GetPsz( p_vlc, "memcpy" );
-    p_vlc->p_memcpy_module = module_Need( p_vlc, "memcpy", psz_module );
-    if( psz_module ) free( psz_module );
+    p_vlc->p_memcpy_module = module_Need( p_vlc, "memcpy", "$memcpy" );
 
     if( p_vlc->p_memcpy_module == NULL )
     {

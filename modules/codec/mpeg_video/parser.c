@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.2 2002/08/04 18:39:41 sam Exp $
+ * $Id: parser.c,v 1.3 2002/08/04 20:04:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -194,15 +194,11 @@ static int RunDecoder ( decoder_fifo_t * p_fifo )
  *****************************************************************************/
 static int InitThread( vpar_thread_t *p_vpar )
 {
-    char *psz_name;
-
     /*
      * Choose the best motion compensation module
      */
-    psz_name = config_GetPsz( p_vpar->p_fifo, "mpeg-motion" );
     p_vpar->p_motion =
-                module_Need( p_vpar->p_fifo, "motion compensation", psz_name );
-    if( psz_name ) free( psz_name );
+         module_Need( p_vpar->p_fifo, "motion compensation", "$mpeg-motion" );
 
     if( p_vpar->p_motion == NULL )
     {
@@ -217,9 +213,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Choose the best IDCT module
      */
-    psz_name = config_GetPsz( p_vpar->p_fifo, "mpeg-idct" );
-    p_vpar->p_idct = module_Need( p_vpar->p_fifo, "idct", psz_name );
-    if( psz_name ) free( psz_name );
+    p_vpar->p_idct = module_Need( p_vpar->p_fifo, "idct", "$mpeg-idct" );
 
     if( p_vpar->p_idct == NULL )
     {

@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.97 2002/07/31 20:56:52 sam Exp $
+ * $Id: interface.c,v 1.98 2002/08/04 20:04:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -58,7 +58,6 @@ static void Manager( intf_thread_t *p_intf );
 intf_thread_t* __intf_Create( vlc_object_t *p_this )
 {
     intf_thread_t * p_intf;
-    char *psz_name;
 
     /* Allocate structure */
     p_intf = vlc_object_create( p_this, VLC_OBJECT_INTF );
@@ -69,10 +68,8 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this )
     }
 
     /* Choose the best module */
-    psz_name = config_GetPsz( p_intf, "intf" );
-    p_intf->p_module = module_Need( p_intf, "interface", psz_name );
+    p_intf->p_module = module_Need( p_intf, "interface", "$intf" );
 
-    if( psz_name ) free( psz_name );
     if( p_intf->p_module == NULL )
     {
         msg_Err( p_intf, "no suitable intf module" );

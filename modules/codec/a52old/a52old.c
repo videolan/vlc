@@ -2,7 +2,7 @@
  * a52old.c: A52 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: a52old.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: a52old.c,v 1.2 2002/08/04 20:04:11 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -225,8 +225,6 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
  *****************************************************************************/
 static int InitThread( a52dec_t * p_a52dec )
 {
-    char *psz_name;
-
     /*
      * Choose the best downmix module
      */
@@ -234,10 +232,8 @@ static int InitThread( a52dec_t * p_a52dec )
                                              sizeof( downmix_t ) );
     p_a52dec->p_downmix->psz_object_name = "downmix";
 
-    psz_name = config_GetPsz( p_a52dec->p_downmix, "a52-downmix" );
     p_a52dec->p_downmix->p_module =
-                    module_Need( p_a52dec->p_downmix, "downmix", psz_name );
-    if( psz_name ) free( psz_name );
+                module_Need( p_a52dec->p_downmix, "downmix", "$a52-downmix" );
 
     if( p_a52dec->p_downmix->p_module == NULL )
     {
@@ -253,10 +249,8 @@ static int InitThread( a52dec_t * p_a52dec )
                                            sizeof( imdct_t ) );
     
 #define IMDCT p_a52dec->p_imdct
-    psz_name = config_GetPsz( p_a52dec->p_fifo, "a52-imdct" );
     p_a52dec->p_imdct->p_module =
-                   module_Need( p_a52dec->p_imdct, "imdct", psz_name );
-    if( psz_name ) free( psz_name );
+                   module_Need( p_a52dec->p_imdct, "imdct", "$a52-imdct" );
 
     if( p_a52dec->p_imdct->p_module == NULL )
     {

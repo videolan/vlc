@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.41 2002/07/31 20:56:52 sam Exp $
+ * $Id: input_dec.c,v 1.42 2002/08/04 20:04:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -45,7 +45,6 @@ static void             DeleteDecoderFifo( decoder_fifo_t * );
 decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
                                    es_descriptor_t * p_es )
 {
-    char * psz_plugin;
     decoder_fifo_t *p_fifo;
 
     /* Create the decoder configuration structure */
@@ -58,9 +57,7 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
     }
 
     /* Get a suitable module */
-    psz_plugin = config_GetPsz( p_fifo, "codec" );
-    p_fifo->p_module = module_Need( p_fifo, "decoder", psz_plugin );
-    if( psz_plugin ) free( psz_plugin );
+    p_fifo->p_module = module_Need( p_fifo, "decoder", "$codec" );
     if( p_fifo->p_module == NULL )
     {
         msg_Err( p_fifo, "no suitable decoder module for fourcc `%4.4s'",

@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.88 2002/08/04 17:23:44 sam Exp $
+ * $Id: audio_output.c,v 1.89 2002/08/04 20:04:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -55,7 +55,6 @@ aout_thread_t *aout_CreateThread( vlc_object_t *p_parent,
                                   int i_channels, int i_rate )
 {
     aout_thread_t * p_aout;                             /* thread descriptor */
-    char *          psz_name;
     int             i_format;
 
     /* Allocate descriptor */
@@ -87,9 +86,7 @@ aout_thread_t *aout_CreateThread( vlc_object_t *p_parent,
     }
 
     /* Choose the best module */
-    psz_name = config_GetPsz( p_aout, "aout" );
-    p_aout->p_module = module_Need( p_aout, "audio output", psz_name );
-    if( psz_name ) free( psz_name );
+    p_aout->p_module = module_Need( p_aout, "audio output", "$aout" );
     if( p_aout->p_module == NULL )
     {
         msg_Err( p_aout, "no suitable aout module" );
