@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.4 2002/06/07 14:30:41 sam Exp $
+ * $Id: cpu.c,v 1.5 2002/08/19 11:13:45 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -43,7 +43,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void IllegalSignalHandler( int i_signal );
+static void SigHandler   ( int );
+static u32  Capabilities ( vlc_object_t * );
 
 /*****************************************************************************
  * Global variables - they're needed for signal handling
@@ -55,11 +56,27 @@ static char   *psz_capability;
 #endif
 
 /*****************************************************************************
- * CPUCapabilities: list the processors MMX support and other capabilities
+ * CPUCapabilities: get the CPU capabilities
+ *****************************************************************************
+ * This function is a wrapper around Capabilities().
+ *****************************************************************************/
+u32 __CPUCapabilities( vlc_object_t *p_this )
+{
+    u32 i_capabilities;
+
+    vlc_mutex_lock( p_this->p_vlc->p_global_lock );
+    i_capabilities = Capabilities( p_this );
+    vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
+    
+    return i_capabilities;
+}
+
+/*****************************************************************************
+ * Capabilities: list the processors MMX support and other capabilities
  *****************************************************************************
  * This function is called to list extensions the CPU may have.
  *****************************************************************************/
-u32 __CPUCapabilities( vlc_object_t *p_this )
+static u32 Capabilities( vlc_object_t *p_this )
 {
     volatile u32 i_capabilities = CPU_CAPABILITY_NONE;
 
@@ -112,11 +129,11 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
                      : "a"  ( a )          \
                      : "cc" );
 
-    i_capabilities |= CPU_CAPABILITY_FPU;
-
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-    signal( SIGILL, IllegalSignalHandler );
+    sighandler_t pf_sigill = signal( SIGILL, SigHandler );
 #   endif
+
+    i_capabilities |= CPU_CAPABILITY_FPU;
 
     /* test for a 486 CPU */
     asm volatile ( "pushl %%ebx\n\t"
@@ -138,7 +155,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
     if( i_eax == i_ebx )
     {
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-        signal( SIGILL, NULL );
+        signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
     }
@@ -151,7 +168,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
     if( !i_eax )
     {
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-        signal( SIGILL, NULL );
+        signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
     }
@@ -169,7 +186,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
     if( ! (i_edx & 0x00800000) )
     {
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-        signal( SIGILL, NULL );
+        signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
     }
@@ -185,13 +202,11 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
         psz_capability = "SSE";
         i_illegal = 0;
 
-        vlc_mutex_lock( p_this->p_vlc->p_global_lock );
         if( setjmp( env ) == 0 )
         {
             /* Test a SSE instruction */
             __asm__ __volatile__ ( "xorps %%xmm0,%%xmm0\n" : : );
         }
-        vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
 
         if( i_illegal == 0 )
         {
@@ -206,7 +221,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
     if( i_eax < 0x80000001 )
     {
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-        signal( SIGILL, NULL );
+        signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
     }
@@ -220,13 +235,11 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
         psz_capability = "3D Now!";
         i_illegal = 0;
 
-        vlc_mutex_lock( p_this->p_vlc->p_global_lock );
         if( setjmp( env ) == 0 )
         {
             /* Test a 3D Now! instruction */
             __asm__ __volatile__ ( "pfadd %%mm0,%%mm0\n" "femms\n" : : );
         }
-        vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
 
         if( i_illegal == 0 )
         {
@@ -241,20 +254,19 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
     }
 
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-    signal( SIGILL, NULL );
+    signal( SIGILL, pf_sigill );
 #   endif
     return i_capabilities;
 
 #elif defined( __powerpc__ )
 
-    i_capabilities |= CPU_CAPABILITY_FPU;
-
 #   ifdef CAN_COMPILE_ALTIVEC
-    signal( SIGILL, IllegalSignalHandler );
+    sighandler_t pf_sigill = signal( SIGILL, SigHandler );
+
+    i_capabilities |= CPU_CAPABILITY_FPU;
 
     i_illegal = 0;
 
-    vlc_mutex_lock( p_this->p_vlc->p_global_lock );
     if( setjmp( env ) == 0 )
     {
         asm volatile ("mtspr 256, %0\n\t"
@@ -262,14 +274,13 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
                       :
                       : "r" (-1));
     }
-    vlc_mutex_unlock( p_this->p_vlc->p_global_lock );
 
     if( i_illegal == 0 )
     {
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
     }
 
-    signal( SIGILL, NULL );
+    signal( SIGILL, pf_sigill );
 #   endif
 
     return i_capabilities;
@@ -287,12 +298,12 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * IllegalSignalHandler: system signal handler
+ * SigHandler: system signal handler
  *****************************************************************************
  * This function is called when an illegal instruction signal is received by
  * the program. We use this function to test OS and CPU capabilities
  *****************************************************************************/
-static void IllegalSignalHandler( int i_signal )
+static void SigHandler( int i_signal )
 {
     /* Acknowledge the signal received */
     i_illegal = 1;

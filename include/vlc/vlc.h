@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.8 2002/08/14 17:06:53 sam Exp $
+ * $Id: vlc.h,v 1.9 2002/08/19 11:13:44 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,6 +114,7 @@ vlc_status_t    vlc_status       ( void );
 vlc_error_t     vlc_create       ( void );
 vlc_error_t     vlc_init         ( int, char *[] );
 vlc_error_t     vlc_run          ( void );
+vlc_error_t     vlc_die          ( void );
 vlc_error_t     vlc_stop         ( void );
 vlc_error_t     vlc_end          ( void );
 vlc_error_t     vlc_destroy      ( void );
@@ -129,6 +130,7 @@ vlc_status_t    vlc_status_r     ( vlc_t * );
 vlc_t *         vlc_create_r     ( void );
 vlc_error_t     vlc_init_r       ( vlc_t *, int, char *[] );
 vlc_error_t     vlc_run_r        ( vlc_t * );
+vlc_error_t     vlc_die_r        ( vlc_t * );
 vlc_error_t     vlc_stop_r       ( vlc_t * );
 vlc_error_t     vlc_end_r        ( vlc_t * );
 vlc_error_t     vlc_destroy_r    ( vlc_t * );

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.27 2002/08/18 13:49:20 sam Exp $
+ * $Id: libvlc.c,v 1.28 2002/08/19 11:13:45 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,7 +37,6 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                                /* free() */
-#include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
 
 #include <vlc/vlc.h>
 
@@ -102,11 +101,6 @@ static void Usage         ( vlc_t *, const char *psz_module_name );
 static void ListModules   ( vlc_t * );
 static void Version       ( void );
 
-#ifndef WIN32
-static void InitSignalHandler   ( void );
-static void FatalSignalHandler  ( int i_signal );
-#endif
-
 #ifdef WIN32
 static void ShowConsole   ( void );
 #endif
@@ -115,12 +109,45 @@ static void ShowConsole   ( void );
  * vlc_create: allocate a vlc_t structure, and initialize libvlc if needed.
  *****************************************************************************
  * This function allocates a vlc_t structure and returns NULL in case of
- * failure. Also, the thread system and the signal handlers are initialized.
+ * failure. Also, the thread system is initialized.
  *****************************************************************************/
 vlc_error_t vlc_create( void )
 {
-    vlc_t * p_vlc = vlc_create_r();
-    return p_vlc ? VLC_SUCCESS : VLC_EGENERIC;
+    vlc_t * p_vlc;
+    vlc_bool_t b_failed = VLC_FALSE;
+
+    /* This gives us a rather good protection against concurrent calls, but
+     * an additional check will be necessary for complete thread safety. */
+    if( i_vlc )
+    {
+        return VLC_EGENERIC;
+    }
+
+    p_vlc = vlc_create_r();
+
+    if( p_vlc == NULL )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* We have created an object, which ensures us that p_global_lock has
+     * been properly initialized. We can now atomically check that we are
+     * the only p_vlc object. */
+    vlc_mutex_lock( p_vlc->p_global_lock );
+    if( i_vlc != 1 )
+    {
+        b_failed = VLC_TRUE;
+    }
+    vlc_mutex_unlock( p_vlc->p_global_lock );
+
+    /* There can be only one */
+    if( b_failed )
+    {
+        vlc_destroy_r( p_vlc );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
 
 vlc_t * vlc_create_r( void )
@@ -149,11 +176,6 @@ vlc_t * vlc_create_r( void )
     vlc_mutex_init( p_vlc, &p_vlc->config_lock );
     vlc_mutex_init( p_vlc, &p_vlc->structure_lock );
 
-    /* Set signal handling policy for all threads */
-#ifndef WIN32
-    InitSignalHandler( );
-#endif
-
     /* Store our newly allocated structure in the global list */
     vlc_mutex_lock( p_vlc->p_global_lock );
     pp_vlc = realloc( pp_vlc, (i_vlc+1) * sizeof( vlc_t * ) );
@@ -180,7 +202,7 @@ vlc_t * vlc_create_r( void )
  *****************************************************************************/
 vlc_error_t vlc_init( int i_argc, char *ppsz_argv[] )
 {
-    return vlc_init_r( ( i_vlc == 1 ) ? *pp_vlc : NULL, i_argc, ppsz_argv );
+    return vlc_init_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL, i_argc, ppsz_argv );
 }
 
 vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
@@ -196,8 +218,6 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         fprintf( stderr, "error: invalid status (!CREATED)\n" );
         return VLC_ESTATUS;
     }
-
-    fprintf( stderr, COPYRIGHT_MESSAGE "\n" );
 
     /* Guess what CPU we have */
     p_vlc->i_cpu = CPUCapabilities( p_vlc );
@@ -511,7 +531,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 vlc_error_t vlc_run( void )
 {
-    return vlc_run_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+    return vlc_run_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
 }
 
 vlc_error_t vlc_run_r( vlc_t *p_vlc )
@@ -539,7 +559,7 @@ vlc_error_t vlc_run_r( vlc_t *p_vlc )
  *****************************************************************************/
 vlc_error_t vlc_add_intf( const char *psz_module, vlc_bool_t b_block )
 {
-    return vlc_add_intf_r( ( i_vlc == 1 ) ? *pp_vlc : NULL,
+    return vlc_add_intf_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL,
                            psz_module, b_block );
 }
 
@@ -602,7 +622,7 @@ vlc_error_t vlc_add_intf_r( vlc_t *p_vlc, const char *psz_module,
  *****************************************************************************/
 vlc_error_t vlc_stop( void )
 {
-    return vlc_stop_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+    return vlc_stop_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
 }
 
 vlc_error_t vlc_stop_r( vlc_t *p_vlc )
@@ -679,7 +699,7 @@ vlc_error_t vlc_stop_r( vlc_t *p_vlc )
  *****************************************************************************/
 vlc_error_t vlc_end( void )
 {
-    return vlc_end_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+    return vlc_end_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
 }
 
 vlc_error_t vlc_end_r( vlc_t *p_vlc )
@@ -737,7 +757,7 @@ vlc_error_t vlc_end_r( vlc_t *p_vlc )
  *****************************************************************************/
 vlc_error_t vlc_destroy( void )
 {
-    return vlc_destroy_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+    return vlc_destroy_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
 }
 
 vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
@@ -802,9 +822,38 @@ vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * vlc_die: ask vlc to die.
+ *****************************************************************************
+ * This function sets p_vlc->b_die to VLC_TRUE, but does not do any other
+ * task. It is your duty to call vlc_end and vlc_destroy afterwards.
+ *****************************************************************************/
+vlc_error_t vlc_die( void )
+{
+    return vlc_die_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+}
+
+vlc_error_t vlc_die_r( vlc_t *p_vlc )
+{
+    if( !p_vlc )
+    {
+        fprintf( stderr, "error: invalid status (!EXIST)\n" );
+        return VLC_ESTATUS;
+    }
+
+    p_vlc->b_die = VLC_TRUE;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * vlc_status: return the current vlc status.
+ *****************************************************************************
+ * This function returns the current value of p_vlc->i_status.
+ *****************************************************************************/
 vlc_status_t vlc_status( void )
 {
-    return vlc_status_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+    return vlc_status_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
 }
 
 vlc_status_t vlc_status_r( vlc_t *p_vlc )
@@ -817,9 +866,15 @@ vlc_status_t vlc_status_r( vlc_t *p_vlc )
     return p_vlc->i_status;
 }
 
+/*****************************************************************************
+ * vlc_add_target: adds a target for playing.
+ *****************************************************************************
+ * This function adds psz_target to the current playlist. If a playlist does
+ * not exist, it will create one.
+ *****************************************************************************/
 vlc_error_t vlc_add_target( const char *psz_target, int i_mode, int i_pos )
 {
-    return vlc_add_target_r( ( i_vlc == 1 ) ? *pp_vlc : NULL,
+    return vlc_add_target_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL,
                              psz_target, i_mode, i_pos );
 }
 
@@ -1174,72 +1229,6 @@ static void ShowConsole( void )
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
     return;
-}
-#endif
-
-#ifndef WIN32
-/*****************************************************************************
- * InitSignalHandler: system signal handler initialization
- *****************************************************************************
- * Set the signal handlers. SIGTERM is not intercepted, because we need at
- * at least a method to kill the program when all other methods failed, and
- * when we don't want to use SIGKILL.
- *****************************************************************************/
-static void InitSignalHandler( void )
-{
-    /* Termination signals */
-    signal( SIGINT,  FatalSignalHandler );
-    signal( SIGHUP,  FatalSignalHandler );
-    signal( SIGQUIT, FatalSignalHandler );
-
-    /* Other signals */
-    signal( SIGALRM, SIG_IGN );
-    signal( SIGPIPE, SIG_IGN );
-}
-
-/*****************************************************************************
- * FatalSignalHandler: system signal handler
- *****************************************************************************
- * This function is called when a fatal signal is received by the program.
- * It tries to end the program in a clean way.
- *****************************************************************************/
-static void FatalSignalHandler( int i_signal )
-{
-    static mtime_t abort_time = 0;
-    static volatile vlc_bool_t b_die = VLC_FALSE;
-    int i_index;
-
-    /* Once a signal has been trapped, the termination sequence will be
-     * armed and following signals will be ignored to avoid sending messages
-     * to an interface having been destroyed */
-
-    if( !b_die )
-    {
-        b_die = VLC_TRUE;
-        abort_time = mdate();
-
-        fprintf( stderr, "signal %d received, terminating libvlc - do it "
-                         "again in case your process gets stuck\n", i_signal );
-
-        /* Try to terminate everything - this is done by requesting the end of
-         * all the p_vlc structures */
-        for( i_index = 0 ; i_index < i_vlc ; i_index++ )
-        {
-            /* Acknowledge the signal received */
-            pp_vlc[ i_index ]->b_die = VLC_TRUE;
-        }
-    }
-    else if( mdate() > abort_time + 1000000 )
-    {
-        /* If user asks again 1 second later, die badly */
-        signal( SIGINT,  SIG_IGN );
-        signal( SIGHUP,  SIG_IGN );
-        signal( SIGQUIT, SIG_IGN );
-
-        fprintf( stderr, "user insisted too much, dying badly\n" );
-
-        exit( 1 );
-    }
 }
 #endif
 
