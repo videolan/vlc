@@ -72,6 +72,27 @@
 #define V_RED_COEF      ((int)(1.596 * (1<<SHIFT) / 1.164))
 #define V_GREEN_COEF    ((int)(-0.813 * (1<<SHIFT) / 1.164))
 
+#define MMX
+#ifdef MMX
+/* hope these constant values are cache line aligned */
+static unsigned long long mmx_80w     = 0x0080008000800080;
+static unsigned long long mmx_10w     = 0x1010101010101010;
+static unsigned long long mmx_00ffw   = 0x00ff00ff00ff00ff;
+static unsigned long long mmx_Y_coeff = 0x253f253f253f253f;
+
+/* hope these constant values are cache line aligned */
+static unsigned long long mmx_U_green = 0xf37df37df37df37d;
+static unsigned long long mmx_U_blue  = 0x4093409340934093;
+static unsigned long long mmx_V_red   = 0x3312331233123312;
+static unsigned long long mmx_V_green = 0xe5fce5fce5fce5fc;
+
+/* hope these constant values are cache line aligned */
+static unsigned long long mmx_redmask = 0xf8f8f8f8f8f8f8f8;
+static unsigned long long mmx_grnmask = 0xfcfcfcfcfcfcfcfc;
+static unsigned long long mmx_grnshift   = 0x03;
+static unsigned long long mmx_blueshift  = 0x03;
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -1319,6 +1340,9 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
+
+#ifndef MMX
+
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
@@ -1332,11 +1356,112 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
         }
-
-        /* Do horizontal and vertical scaling */
         SCALE_WIDTH;
         SCALE_HEIGHT(420, 2);
     }
+    
+#else
+        for ( i_x = i_width / 8; i_x--; )
+        {
+        __asm__ (
+            "movd      (%1), %%mm0       # Load 4 Cb       00 00 00 00 u3 u2 u1 u0\n\t"
+            "movd      (%2), %%mm1       # Load 4 Cr       00 00 00 00 v3 v2 v1 v0\n\t"
+            "pxor      %%mm4, %%mm4      # zero mm4\n\t"
+            "movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0\n\t"
+          //"movl      $0, (%3)          # cache preload for image\n\t"
+             : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer));
+
+        __asm__ (
+            ".align 8 \n\t"
+            /* Do the multiply part of the conversion for even and odd pixels,
+             * register usage:
+             * mm0 -> Cblue, mm1 -> Cred, mm2 -> Cgreen even pixels,
+             * mm3 -> Cblue, mm4 -> Cred, mm5 -> Cgreen odd  pixels,
+             * mm6 -> Y even, mm7 -> Y odd */
+            /* convert the chroma part */
+            "punpcklbw %%mm4, %%mm0      # scatter 4 Cb    00 u3 00 u2 00 u1 00 u0\n\t"
+            "punpcklbw %%mm4, %%mm1      # scatter 4 Cr    00 v3 00 v2 00 v1 00 v0\n\t"
+            "psubsw    mmx_80w, %%mm0    # Cb -= 128\n\t"
+            "psubsw    mmx_80w, %%mm1    # Cr -= 128\n\t"
+            "psllw     $3, %%mm0         # Promote precision\n\t"
+            "psllw     $3, %%mm1         # Promote precision\n\t"
+            "movq      %%mm0, %%mm2      # Copy 4 Cb       00 u3 00 u2 00 u1 00 u0\n\t"
+            "movq      %%mm1, %%mm3      # Copy 4 Cr       00 v3 00 v2 00 v1 00 v0\n\t"
+            "pmulhw    mmx_U_green, %%mm2# Mul Cb with green coeff -> Cb green\n\t"
+            "pmulhw    mmx_V_green, %%mm3# Mul Cr with green coeff -> Cr green\n\t"
+            "pmulhw    mmx_U_blue, %%mm0 # Mul Cb -> Cblue 00 b3 00 b2 00 b1 00 b0\n\t"
+            "pmulhw    mmx_V_red, %%mm1  # Mul Cr -> Cred  00 r3 00 r2 00 r1 00 r0\n\t"
+            "paddsw    %%mm3, %%mm2      # Cb green + Cr green -> Cgreen\n\t"
+            /* convert the luma part */
+            "psubusb   mmx_10w, %%mm6    # Y -= 16\n\t"
+            "movq      %%mm6, %%mm7      # Copy 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0\n\t"
+            "pand      mmx_00ffw, %%mm6  # get Y even      00 Y6 00 Y4 00 Y2 00 Y0\n\t"
+            "psrlw     $8, %%mm7         # get Y odd       00 Y7 00 Y5 00 Y3 00 Y1\n\t"
+            "psllw     $3, %%mm6         # Promote precision\n\t"
+            "psllw     $3, %%mm7         # Promote precision\n\t"
+            "pmulhw    mmx_Y_coeff, %%mm6# Mul 4 Y even    00 y6 00 y4 00 y2 00 y0\n\t"
+            "pmulhw    mmx_Y_coeff, %%mm7# Mul 4 Y odd     00 y7 00 y5 00 y3 00 y1\n\t"
+            /* Do the addition part of the conversion for even and odd pixels,
+             * register usage:
+             * mm0 -> Cblue, mm1 -> Cred, mm2 -> Cgreen even pixels,
+             * mm3 -> Cblue, mm4 -> Cred, mm5 -> Cgreen odd  pixels,
+             * mm6 -> Y even, mm7 -> Y odd */                                                                                                                                        /* Do horizontal and vertical scaling */
+            "movq      %%mm0, %%mm3      # Copy Cblue\n\t"
+            "movq      %%mm1, %%mm4      # Copy Cred\n\t"
+            "movq      %%mm2, %%mm5      # Copy Cgreen\n\t"
+            "paddsw    %%mm6, %%mm0      # Y even + Cblue  00 B6 00 B4 00 B2 00 B0\n\t"
+            "paddsw    %%mm7, %%mm3      # Y odd  + Cblue  00 B7 00 B5 00 B3 00 B1\n\t"
+            "paddsw    %%mm6, %%mm1      # Y even + Cred   00 R6 00 R4 00 R2 00 R0\n\t"
+            "paddsw    %%mm7, %%mm4      # Y odd  + Cred   00 R7 00 R5 00 R3 00 R1\n\t"
+            "paddsw    %%mm6, %%mm2      # Y even + Cgreen 00 G6 00 G4 00 G2 00 G0\n\t"
+            "paddsw    %%mm7, %%mm5      # Y odd  + Cgreen 00 G7 00 G5 00 G3 00 G1\n\t"
+            /* Limit RGB even to 0..255 */
+            "packuswb  %%mm0, %%mm0      # B6 B4 B2 B0 | B6 B4 B2 B0\n\t"
+            "packuswb  %%mm1, %%mm1      # R6 R4 R2 R0 | R6 R4 R2 R0\n\t"
+            "packuswb  %%mm2, %%mm2      # G6 G4 G2 G0 | G6 G4 G2 G0\n\t"
+            /* Limit RGB odd to 0..255 */
+            "packuswb  %%mm3, %%mm3      # B7 B5 B3 B1 | B7 B5 B3 B1\n\t"
+            "packuswb  %%mm4, %%mm4      # R7 R5 R3 R1 | R7 R5 R3 R1\n\t"
+            "packuswb  %%mm5, %%mm5      # G7 G5 G3 G1 | G7 G5 G3 G1\n\t"
+            /* Interleave RGB even and odd */
+            "punpcklbw %%mm3, %%mm0      #                 B7 B6 B5 B4 B3 B2 B1 B0\n\t"
+            "punpcklbw %%mm4, %%mm1      #                 R7 R6 R5 R4 R3 R2 R1 R0\n\t"
+            "punpcklbw %%mm5, %%mm2      #                 G7 G6 G5 G4 G3 G2 G1 G0\n\t"
+            /* mask unneeded bits off */
+            "pand      mmx_redmask, %%mm0# b7b6b5b4 b3_0_0_0 b7b6b5b4 b3_0_0_0\n\t"
+            "pand      mmx_grnmask, %%mm2# g7g6g5g4 g3g2_0_0 g7g6g5g4 g3g2_0_0\n\t"
+            "pand      mmx_redmask, %%mm1# r7r6r5r4 r3_0_0_0 r7r6r5r4 r3_0_0_0\n\t"
+            "psrlw     mmx_blueshift,%%mm0#0_0_0_b7 b6b5b4b3 0_0_0_b7 b6b5b4b3\n\t"
+            "pxor      %%mm4, %%mm4      # zero mm4\n\t"
+            "movq      %%mm0, %%mm5      # Copy B7-B0\n\t"
+            "movq      %%mm2, %%mm7      # Copy G7-G0\n\t"
+            /* convert rgb24 plane to rgb16 pack for pixel 0-3 */
+            "punpcklbw %%mm4, %%mm2      #  0_0_0_0  0_0_0_0 g7g6g5g4 g3g2_0_0\n\t"
+            "punpcklbw %%mm1, %%mm0      # r7r6r5r4 r3_0_0_0 0_0_0_b7 b6b5b4b3\n\t"
+            "psllw     mmx_blueshift,%%mm2#  0_0_0_0 0_g7g6g5 g4g3g2_0  0_0_0_0\n\t"
+            "por       %%mm2, %%mm0      # r7r6r5r4 r3g7g6g5 g4g3g2b7 b6b5b4b3\n\t"
+            "movq      8(%0), %%mm6      # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0\n\t"
+            "movq      %%mm0, (%3)       # store pixel 0-3\n\t"
+            /* convert rgb24 plane to rgb16 pack for pixel 0-3 */
+            "punpckhbw %%mm4, %%mm7      #  0_0_0_0  0_0_0_0 g7g6g5g4 g3g2_0_0\n\t"
+            "punpckhbw %%mm1, %%mm5      # r7r6r5r4 r3_0_0_0 0_0_0_b7 b6b5b4b3\n\t"
+            "psllw     mmx_blueshift,%%mm7#  0_0_0_0 0_g7g6g5 g4g3g2_0  0_0_0_0\n\t"
+            "movd      4(%1), %%mm0      # Load 4 Cb       00 00 00 00 u3 u2 u1 u0\n\t"
+            "por       %%mm7, %%mm5      # r7r6r5r4 r3g7g6g5 g4g3g2b7 b6b5b4b3\n\t"
+            "movd      4(%2), %%mm1      # Load 4 Cr       00 00 00 00 v3 v2 v1 v0\n\t"
+            "movq      %%mm5, 8(%3)      # store pixel 4-7\n\t"
+            : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer));
+        p_y += 8;
+        p_u += 4;
+        p_v += 4;
+        p_buffer += 8;
+        }
+        
+        SCALE_WIDTH;
+        SCALE_HEIGHT(420, 2);
+    }
+    __asm__ ("emms\n\t");
+#endif
 }
 
 /*****************************************************************************
