@@ -569,7 +569,6 @@ static struct
       VIDEO_ES, "Microsoft RLE Video" },
 #endif
 
-#if( !defined( WORDS_BIGENDIAN ) )
     /* Indeo Video Codecs (Quality of this decoder on ppc is not good) */
     { VLC_FOURCC('I','V','3','1'), CODEC_ID_INDEO3,
       VIDEO_ES, "Indeo Video v3" },
@@ -579,7 +578,6 @@ static struct
       VIDEO_ES, "Indeo Video v3" },
     { VLC_FOURCC('i','v','3','2'), CODEC_ID_INDEO3,
       VIDEO_ES, "Indeo Video v3" },
-#endif
 
     /* Huff YUV */
     { VLC_FOURCC('H','F','Y','U'), CODEC_ID_HUFFYUV,
@@ -750,6 +748,12 @@ static struct
     /* Sierra VMD */
     { VLC_FOURCC('v','m','d','a'), CODEC_ID_VMDAUDIO,
       AUDIO_ES, "Sierra VMD Audio" },
+#endif
+
+#if LIBAVCODEC_BUILD >= 4706
+    /* G.726 ADPCM */
+    { VLC_FOURCC('g','7','2','6'), CODEC_ID_ADPCM_G726,
+      AUDIO_ES, "G.726 ADPCM Audio" },
 #endif
 
     /* PCM */

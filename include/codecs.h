@@ -137,6 +137,7 @@ typedef struct
 #define WAVE_FORMAT_IMA_ADPCM           0x0011 /* Intel Corporation */
 #define WAVE_FORMAT_GSM610              0x0031 /* Microsoft Corporation */
 #define WAVE_FORMAT_MSNAUDIO            0x0032 /* Microsoft Corporation */
+#define WAVE_FORMAT_G726                0x0045 /* ITU-T standard  */
 #define WAVE_FORMAT_MPEG                0x0050 /* Microsoft Corporation */
 #define WAVE_FORMAT_MPEGLAYER3          0x0055 /* ISO/MPEG Layer3 Format Tag */
 #define WAVE_FORMAT_DOLBY_AC3_SPDIF     0x0092 /* Sonic Foundry */
@@ -191,6 +192,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_ALAW,     VLC_FOURCC( 'a', 'l', 'a', 'w' ), "A-Law" },
     { WAVE_FORMAT_MULAW,    VLC_FOURCC( 'm', 'l', 'a', 'w' ), "Mu-Law" },
     { WAVE_FORMAT_IMA_ADPCM,VLC_FOURCC( 'm', 's', 0x00,0x11), "Ima-Adpcm" },
+    { WAVE_FORMAT_G726,     VLC_FOURCC( 'g', '7', '2', '6' ), "G.726 Adpcm" },
     { WAVE_FORMAT_MPEGLAYER3,VLC_FOURCC('m', 'p', 'g', 'a' ), "Mpeg Audio" },
     { WAVE_FORMAT_MPEG,     VLC_FOURCC( 'm', 'p', 'g', 'a' ), "Mpeg Audio" },
     { WAVE_FORMAT_A52,      VLC_FOURCC( 'a', '5', '2', ' ' ), "A/52" },
