@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.6 2002/04/03 23:24:42 massiot Exp $
+ * $Id: intf_eject.c,v 1.7 2002/04/04 00:23:36 jlj Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -107,13 +107,17 @@ int intf_Eject( const char *psz_device )
         if( ( p_eject = popen( sz_cmd, "r" ) ) != NULL )
         {
             char psz_result[0x200];
-            i_ret = fread( psz_result, 1, sizeof(psz_result), p_eject );
-            pclose( p_eject );
+            i_ret = fread( psz_result, 1, sizeof(psz_result) - 1, p_eject );
 
             if( i_ret == 0 && ferror( p_eject ) != 0 )
             {
+                pclose( p_eject );
                 return 1;
             }
+
+            pclose( p_eject );
+
+            psz_result[ i_ret ] = 0;
 
             if( strstr( psz_result, "Disk Ejected" ) != NULL )
             {
