@@ -2,7 +2,7 @@
  * ac3_spdif.h: header for ac3 pass-through
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.h,v 1.2 2002/03/12 18:37:46 stef Exp $
+ * $Id: ac3_spdif.h,v 1.3 2002/03/15 01:47:16 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -20,6 +20,31 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  ****************************************************************************/
+
+/****************************************************************************
+ * information about ac3 frame
+ ****************************************************************************/
+typedef struct sync_frame_s
+{
+    struct syncinfo
+    {
+        u8      syncword[2];
+        u8      crc1[2];
+        u8      code;
+    } syncinfo;
+
+    struct bsi
+    {
+        u8      bsidmod;
+        u8      acmod;
+    } bsi;
+} sync_frame_t;
+
+typedef struct frame_size_s
+{
+    u16     i_bit_rate;
+    u16     i_frame_size[3];
+} frame_size_t;                
 
 typedef struct ac3_info_s
 {
@@ -54,7 +79,6 @@ typedef struct ac3_spdif_thread_s
      */
     ac3_info_t          ac3_info;
     u8 *                p_ac3;
-    u8 *                p_iec;
 
     /* current pes date */
     mtime_t             i_pts;

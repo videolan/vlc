@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.20 2002/03/12 18:37:46 stef Exp $
+ * $Id: ac3_spdif.c,v 1.21 2002/03/15 01:47:16 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -43,9 +43,6 @@
 #include "input_ext-dec.h"
 
 #include "ac3_spdif.h"
-#include "ac3_iec958.h"
-
-#define FRAME_NB 8
 
 /****************************************************************************
  * Local Prototypes
@@ -55,6 +52,53 @@ static int  decoder_Run       ( decoder_config_t * );
 static int  InitThread        ( ac3_spdif_thread_t * );
 static void EndThread         ( ac3_spdif_thread_t * );
 static void BitstreamCallback ( bit_stream_t *, boolean_t );
+
+int     ac3_parse_syncinfo   ( struct ac3_spdif_thread_s * );
+
+/****************************************************************************
+ * Local structures and tables
+ ****************************************************************************/
+static const frame_size_t p_frame_size_code[64] =
+{
+        { 32  ,{64   ,69   ,96   } },
+        { 32  ,{64   ,70   ,96   } },
+        { 40  ,{80   ,87   ,120  } },
+        { 40  ,{80   ,88   ,120  } },
+        { 48  ,{96   ,104  ,144  } },
+        { 48  ,{96   ,105  ,144  } },
+        { 56  ,{112  ,121  ,168  } },
+        { 56  ,{112  ,122  ,168  } },
+        { 64  ,{128  ,139  ,192  } },
+        { 64  ,{128  ,140  ,192  } },
+        { 80  ,{160  ,174  ,240  } },
+        { 80  ,{160  ,175  ,240  } },
+        { 96  ,{192  ,208  ,288  } },
+        { 96  ,{192  ,209  ,288  } },
+        { 112 ,{224  ,243  ,336  } },
+        { 112 ,{224  ,244  ,336  } },
+        { 128 ,{256  ,278  ,384  } },
+        { 128 ,{256  ,279  ,384  } },
+        { 160 ,{320  ,348  ,480  } },
+        { 160 ,{320  ,349  ,480  } },
+        { 192 ,{384  ,417  ,576  } },
+        { 192 ,{384  ,418  ,576  } },
+        { 224 ,{448  ,487  ,672  } },
+        { 224 ,{448  ,488  ,672  } },
+        { 256 ,{512  ,557  ,768  } },
+        { 256 ,{512  ,558  ,768  } },
+        { 320 ,{640  ,696  ,960  } },
+        { 320 ,{640  ,697  ,960  } },
+        { 384 ,{768  ,835  ,1152 } },
+        { 384 ,{768  ,836  ,1152 } },
+        { 448 ,{896  ,975  ,1344 } },
+        { 448 ,{896  ,976  ,1344 } },
+        { 512 ,{1024 ,1114 ,1536 } },
+        { 512 ,{1024 ,1115 ,1536 } },
+        { 576 ,{1152 ,1253 ,1728 } },
+        { 576 ,{1152 ,1254 ,1728 } },
+        { 640 ,{1280 ,1393 ,1920 } },
+        { 640 ,{1280 ,1394 ,1920 } }
+};
 
 /*****************************************************************************
  * Capabilities
@@ -110,7 +154,8 @@ static int decoder_Run( decoder_config_t * p_config )
     boolean_t   b_sync;
     /* PTS of the current frame */
     mtime_t     i_current_pts = 0;
-
+    u16         i_length;
+    
     /* Allocate the memory needed to store the thread's structure */
     p_spdif = malloc( sizeof(ac3_spdif_thread_t) );
 
@@ -135,10 +180,14 @@ static int decoder_Run( decoder_config_t * p_config )
     /* Compute the theorical duration of an ac3 frame */
     i_frame_time = 1000000 * AC3_FRAME_SIZE /
                              p_spdif->ac3_info.i_sample_rate;
+    i_length = p_spdif->ac3_info.i_frame_size;
     
     while( !p_spdif->p_fifo->b_die && !p_spdif->p_fifo->b_error )
     {
-        /* Handle the dates */
+        p_spdif->p_ac3[0] = 0x0b;
+        p_spdif->p_ac3[1] = 0x77;
+        
+         /* Handle the dates */
         if( p_spdif->i_real_pts )
         {
             mtime_t     i_delta = p_spdif->i_real_pts - i_current_pts -
@@ -155,25 +204,19 @@ static int decoder_Run( decoder_config_t * p_config )
         {
             i_current_pts += i_frame_time;
         }
+        
+        vlc_mutex_lock (&p_spdif->p_aout_fifo->data_lock);
+        
+        p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->i_end_frame] =
+            i_current_pts;
 
-        /* if we're late here the output won't have to play the frame */
-        if( i_current_pts > mdate() )
-        {
-            p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->i_end_frame] =
-                i_current_pts;
-    
-            /* Write in the first free packet of aout fifo */
-            p_spdif->p_iec = ((u8*)(p_spdif->p_aout_fifo->buffer) + 
-                (p_spdif->p_aout_fifo->i_end_frame * SPDIF_FRAME_SIZE ));
-    
-            /* Build burst to be sent to hardware decoder */
-            ac3_iec958_build_burst( p_spdif );
-    
-            vlc_mutex_lock (&p_spdif->p_aout_fifo->data_lock);
-            p_spdif->p_aout_fifo->i_end_frame = 
-                    (p_spdif->p_aout_fifo->i_end_frame + 1 ) & AOUT_FIFO_SIZE;
-            vlc_mutex_unlock (&p_spdif->p_aout_fifo->data_lock);
-        }
+        p_spdif->p_aout_fifo->i_end_frame = 
+                (p_spdif->p_aout_fifo->i_end_frame + 1 ) & AOUT_FIFO_SIZE;
+        
+        p_spdif->p_ac3 = ((u8*)(p_spdif->p_aout_fifo->buffer)) +
+                     (p_spdif->p_aout_fifo->i_end_frame * i_length );
+        
+        vlc_mutex_unlock (&p_spdif->p_aout_fifo->data_lock);
 
         /* Find syncword again in case of stream discontinuity */
         /* Here we have p_spdif->i_pts == 0
@@ -190,8 +233,7 @@ static int decoder_Run( decoder_config_t * p_config )
         RemoveBits( &p_spdif->bit_stream, 8 );
 
         /* Read data from bitstream */
-        GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + 2,
-                  p_spdif->ac3_info.i_frame_size - 2 );
+        GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + 2, i_length - 2 );
     }
 
     /* If b_error is set, the ac3 spdif thread enters the error loop */
@@ -213,7 +255,7 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
 {
     boolean_t b_sync = 0;
 
-    /* Temporary buffer to store ac3 frames to be transformed */
+    /* Temporary buffer to store first ac3 frame */
     p_spdif->p_ac3 = malloc( SPDIF_FRAME_SIZE );
 
     if( p_spdif->p_ac3 == NULL )
@@ -230,10 +272,6 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     InitBitstream( &p_spdif->bit_stream, p_spdif->p_config->p_decoder_fifo,
                    BitstreamCallback, (void*)p_spdif );
 
-    /* Sync word */
-    p_spdif->p_ac3[0] = 0x0b;
-    p_spdif->p_ac3[1] = 0x77;
-
     /* Find syncword */
     while( !b_sync )
     {
@@ -245,7 +283,7 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     RemoveBits( &p_spdif->bit_stream, 8 );
 
     /* Check stream properties */
-    if( ac3_iec958_parse_syncinfo( p_spdif ) < 0 )
+    if( ac3_parse_syncinfo( p_spdif ) < 0 )
     {
         intf_ErrMsg( "spdif error: stream not valid");
 
@@ -259,12 +297,8 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     {
         intf_ErrMsg( "spdif error: Only 48000 Hz streams tested"
                      "expect weird things !" );
-        //intf_ErrMsg( "spdif error: Only 48000 Hz streams supported");
-
-        //aout_DestroyFifo( p_spdif->p_aout_fifo );
-        //return -1;
     }
-    
+
     /* The audio output need to be ready for an ac3 stream */
     p_spdif->i_previous_format = config_GetIntVariable( "aout_format" );
     config_PutIntVariable( "aout_format", 8 );
@@ -272,7 +306,8 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     /* Creating the audio output fifo */
     p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_SPDIF, 1,
                                             p_spdif->ac3_info.i_sample_rate,
-                                            SPDIF_FRAME_SIZE, NULL );
+                                            p_spdif->ac3_info.i_frame_size,
+                                            NULL );
 
     if( p_spdif->p_aout_fifo == NULL )
     {
@@ -281,6 +316,16 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
 
     intf_WarnMsg( 3, "spdif: aout fifo #%d created",
                      p_spdif->p_aout_fifo->i_fifo );
+
+    /* Put read data into fifo */
+    memcpy( (u8*)(p_spdif->p_aout_fifo->buffer) +
+                 (p_spdif->p_aout_fifo->i_end_frame *
+                   p_spdif->ac3_info.i_frame_size ),
+            p_spdif->p_ac3, sizeof(sync_frame_t) );
+    free( p_spdif->p_ac3 );
+    p_spdif->p_ac3 = ((u8*)(p_spdif->p_aout_fifo->buffer) +
+                           (p_spdif->p_aout_fifo->i_end_frame *
+                            p_spdif->ac3_info.i_frame_size ));
 
     GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + sizeof(sync_frame_t),
         p_spdif->ac3_info.i_frame_size - sizeof(sync_frame_t) );
@@ -309,7 +354,6 @@ static void EndThread( ac3_spdif_thread_t * p_spdif )
     config_PutIntVariable( "aout_format", p_spdif->i_previous_format );
 
     /* Destroy descriptor */
-    free( p_spdif->p_ac3 );
     free( p_spdif );
 }
 
@@ -333,4 +377,44 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
             p_bit_stream->p_decoder_fifo->p_first->i_pts;
         p_bit_stream->p_decoder_fifo->p_first->i_pts = 0;
     }
+}
+
+/****************************************************************************
+ * ac3_parse_syncinfo: parse ac3 sync info
+ ****************************************************************************/
+int ac3_parse_syncinfo( ac3_spdif_thread_t *p_spdif )
+{
+    int             p_sample_rates[4] = { 48000, 44100, 32000, -1 };
+    int             i_frame_rate_code;
+    int             i_frame_size_code;
+    sync_frame_t *  p_sync_frame;
+
+    /* Read sync frame */
+    GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + 2,
+              sizeof(sync_frame_t) - 2 );
+    p_sync_frame = (sync_frame_t*)p_spdif->p_ac3;
+
+    /* Compute frame rate */
+    i_frame_rate_code = (p_sync_frame->syncinfo.code >> 6) & 0x03;
+    p_spdif->ac3_info.i_sample_rate = p_sample_rates[i_frame_rate_code];
+    if( p_spdif->ac3_info.i_sample_rate == -1 )
+    {
+        return -1;
+    }
+
+    /* Compute frame size */
+    i_frame_size_code = p_sync_frame->syncinfo.code & 0x3f;
+    p_spdif->ac3_info.i_frame_size = 2 *
+        p_frame_size_code[i_frame_size_code].i_frame_size[i_frame_rate_code];
+    p_spdif->ac3_info.i_bit_rate =
+        p_frame_size_code[i_frame_size_code].i_bit_rate;
+
+    if( ( ( p_sync_frame->bsi.bsidmod >> 3 ) & 0x1f ) != 0x08 )
+    {
+        return -1;
+    }
+
+    p_spdif->ac3_info.i_bs_mod = p_sync_frame->bsi.bsidmod & 0x7;
+
+    return 0;
 }
