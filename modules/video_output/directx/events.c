@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: events.c,v 1.37 2004/01/02 22:17:57 gbazin Exp $
+ * $Id: events.c,v 1.38 2004/02/26 13:58:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -498,8 +498,9 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
     vout_PlacePicture( p_vout, rect.right, rect.bottom,
                        &i_x, &i_y, &i_width, &i_height );
 
-    SetWindowPos( p_vout->p_sys->hvideownd, HWND_TOP,
-                  i_x, i_y, i_width, i_height, 0 );
+    if( p_vout->p_sys->hvideownd )
+        SetWindowPos( p_vout->p_sys->hvideownd, HWND_TOP,
+                      i_x, i_y, i_width, i_height, 0 );
 
     /* Destination image position and dimensions */
     rect_dest.left = point.x + i_x;

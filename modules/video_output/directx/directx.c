@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: directx.c,v 1.35 2004/02/05 22:56:11 gbazin Exp $
+ * $Id: directx.c,v 1.36 2004/02/26 13:58:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -184,9 +184,10 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->p_display = NULL;
     p_vout->p_sys->p_current_surface = NULL;
     p_vout->p_sys->p_clipper = NULL;
-    p_vout->p_sys->hwnd = NULL;
+    p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
     p_vout->p_sys->hparent = NULL;
     p_vout->p_sys->i_changes = 0;
+    SetRectEmpty( &p_vout->p_sys->rect_display  );
 
     /* Multimonitor stuff */
     p_vout->p_sys->hmonitor = NULL;
@@ -664,16 +665,16 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
     vout_thread_t *p_vout = (vout_thread_t *)p_context;
     vlc_value_t device;
 
-    var_Get( p_vout, "directx-device", &device );
-
     msg_Dbg( p_vout, "DirectXEnumCallback: %s, %s", psz_desc, psz_drivername );
 
     if( hmon )
     {
-        if( ( !device.psz_string || !device.psz_string ) &&
+        var_Get( p_vout, "directx-device", &device );
+
+        if( ( !device.psz_string || !*device.psz_string ) &&
             hmon == p_vout->p_sys->hmonitor )
         {
-            ;
+            if( device.psz_string ) free( device.psz_string );
         }
         else if( strcmp( psz_drivername, device.psz_string ) == 0 )
         {
@@ -699,8 +700,13 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
             }
 
             p_vout->p_sys->hmonitor = hmon;
+            if( device.psz_string ) free( device.psz_string );
         }
-        else return TRUE; /* Keep enumerating */
+        else
+        {
+            if( device.psz_string ) free( device.psz_string );
+            return TRUE; /* Keep enumerating */
+        }
 
         msg_Dbg( p_vout, "selecting %s, %s", psz_desc, psz_drivername );
         p_vout->p_sys->p_display_driver = malloc( sizeof(GUID) );
@@ -751,7 +757,11 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
         vlc_value_t device;
 
         var_Get( p_vout, "directx-device", &device );
-        msg_Dbg( p_vout, "directx-device: %s", device.psz_string );
+        if( device.psz_string )
+        {
+            msg_Dbg( p_vout, "directx-device: %s", device.psz_string );
+            free( device.psz_string );
+        }
 
         p_vout->p_sys->hmonitor =
             p_vout->p_sys->MonitorFromWindow( p_vout->p_sys->hwnd,
