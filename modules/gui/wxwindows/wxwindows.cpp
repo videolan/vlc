@@ -317,7 +317,16 @@ bool Instance::OnInit()
                                            FIND_ANYWHERE );
         if( p_playlist )
         {
-            playlist_Play( p_playlist );
+            vlc_mutex_lock( &p_playlist->object_lock );
+            if( p_playlist->i_size )
+            {
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                playlist_Play( p_playlist );
+            }
+            else
+            {
+                vlc_mutex_unlock( &p_playlist->object_lock );
+            }
             vlc_object_release( p_playlist );
         }
     }
