@@ -220,7 +220,9 @@ static int Demux( demux_t *p_demux )
         break;
 
     case 0x1bc:
-        /* msg_Dbg( p_demux, "received PSM"); */
+        if( p_sys->psm.i_version == 0xFFFF )
+            msg_Dbg( p_demux, "contains a PSM");
+
         ps_psm_fill( &p_sys->psm, p_pkt, p_sys->tk, p_demux->out );
         block_Release( p_pkt );
         break;
@@ -235,6 +237,10 @@ static int Demux( demux_t *p_demux )
                 if( !ps_track_fill( tk, &p_sys->psm, i_id ) )
                 {
                     tk->es = es_out_Add( p_demux->out, &tk->fmt );
+                }
+                else
+                {
+                    msg_Dbg( p_demux, "es id=0x%x format unknown", i_id );
                 }
                 tk->b_seen = VLC_TRUE;
             }
@@ -416,7 +422,7 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
     else
     {
         /* Normal case */
-        return  stream_Block( s, i_size );
+        return stream_Block( s, i_size );
     }
 
     return NULL;

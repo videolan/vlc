@@ -430,7 +430,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
 
     if( !p_psm || p_buffer[3] != 0xbc ) return VLC_EGENERIC;
 
-    i_length = (uint16_t)(p_buffer[4] << 8) + p_buffer[5];
+    i_length = (uint16_t)(p_buffer[4] << 8) + p_buffer[5] + 6;
     if( i_length > i_buffer ) return VLC_EGENERIC;
 
     //i_current_next_indicator = (p_buffer[6] && 0x01);
