@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.13 2004/01/26 18:45:45 gbazin Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -73,7 +73,7 @@ static void Close        ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("visualizer filter") );
-    add_string("effect-list", "dummy", NULL,
+    add_string("effect-list", "spectrum", NULL,
             ELIST_TEXT, ELIST_LONGTEXT, VLC_TRUE );
     add_integer("effect-width",VOUT_WIDTH,NULL,
              WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
