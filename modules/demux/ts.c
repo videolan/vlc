@@ -477,6 +477,8 @@ static int Open( vlc_object_t *p_this )
 
             msg_Dbg( p_demux, "extra pmt specified (pid=%d)", i_pid );
             PIDInit( pmt, VLC_TRUE, NULL );
+            pmt->psi->i_prg = 1;
+            pmt->psi->prg = malloc( sizeof(ts_prg_psi_t) );
             /* FIXME we should also ask for a number */
             pmt->psi->prg[0]->handle =
                 dvbpsi_AttachPMT( 1, (dvbpsi_pmt_callback)PMTCallBack,
