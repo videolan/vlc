@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap.sh,v 1.5 2002/06/08 14:08:46 sam Exp $
+##  $Id: bootstrap.sh,v 1.6 2002/07/11 19:28:13 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -69,7 +69,6 @@ EOF
         | sed 's#_("--")#"--"#' \
         | sed 's#_("/dev/dvd")#"/dev/dvd"#' \
         | sed 's#_(\("./."\))#\1#' \
-        | sed 's/_GLADE_SUX_\([^,]*\), NULL/, "\1"/' \
         >> /tmp/$$.$file.bak
     mv -f /tmp/$$.$file.bak plugins/gtk/$file
 fi

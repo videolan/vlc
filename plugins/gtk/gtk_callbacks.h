@@ -2,7 +2,7 @@
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.h,v 1.20 2002/06/07 14:30:40 sam Exp $
+ * $Id: gtk_callbacks.h,v 1.21 2002/07/11 19:28:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -39,7 +39,7 @@
 /* General glade callbacks */
 
 /*****************************************************************************
- *  main window callbacks: specific prototypes are in headers listed before
+ * main window callbacks: specific prototypes are in headers listed before
  *****************************************************************************/
 
 gboolean GtkExit                ( GtkWidget *, gpointer );
@@ -113,5 +113,35 @@ GtkNetworkOpenChannel                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
 
 void
-GtkNetworkOpenChannel                  (GtkToggleButton *togglebutton,
+GtkOpenOk                              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkOpenCancel                          (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkOpenChanged                         (GtkWidget       *button,
+                                        gpointer         user_data);
+
+void
+GtkOpenNotebookChanged                 (GtkNotebook     *notebook,
+                                        GtkNotebookPage *page,
+                                        gint             page_num,
+                                        gpointer         user_data);
+
+void
+GtkSatOpenToggle                       (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkFileShow                            (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkFileOk                              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkFileCancel                          (GtkButton       *button,
                                         gpointer         user_data);

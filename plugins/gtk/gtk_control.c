@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_control.c,v 1.12 2002/06/07 14:30:41 sam Exp $
+ * $Id: gtk_control.c,v 1.13 2002/07/11 19:28:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -61,7 +61,7 @@ gboolean GtkControlBack( GtkWidget       *widget,
 gboolean GtkControlStop( GtkWidget       *widget,
                          gpointer         user_data )
 {
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -79,7 +79,7 @@ gboolean GtkControlStop( GtkWidget       *widget,
 gboolean GtkControlPlay( GtkWidget       *widget,
                          gpointer         user_data )
 {
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -110,7 +110,7 @@ gboolean GtkControlPlay( GtkWidget       *widget,
 gboolean GtkControlPause( GtkWidget       *widget,
                           gpointer         user_data )
 {
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
 
     if( p_intf->p_sys->p_input == NULL )
     {
@@ -126,7 +126,7 @@ gboolean GtkControlPause( GtkWidget       *widget,
 gboolean GtkControlSlow( GtkWidget       *widget,
                          gpointer         user_data )
 {
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
 
     if( p_intf->p_sys->p_input == NULL )
     {
@@ -142,7 +142,7 @@ gboolean GtkControlSlow( GtkWidget       *widget,
 gboolean GtkControlFast( GtkWidget       *widget,
                          gpointer         user_data )
 {
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
 
     if( p_intf->p_sys->p_input == NULL )
     {

@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_common.h,v 1.10 2002/06/07 14:30:41 sam Exp $
+ * $Id: gtk_common.h,v 1.11 2002/07/11 19:28:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,15 +31,6 @@
 #define MAX_ATEXIT                 10
 
 /*****************************************************************************
- * Useful inline function
- ****************************************************************************/
-static inline intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
-{
-    return( gtk_object_get_data( GTK_OBJECT( lookup_widget(item, psz_parent) ),
-                                                     "p_intf" ) );
-}
-
-/*****************************************************************************
  * intf_sys_t: description and status of Gtk+ interface
  *****************************************************************************/
 struct intf_sys_s
@@ -66,10 +57,7 @@ struct intf_sys_s
     GtkWidget *         p_playwin;                               /* playlist */
     GtkWidget *         p_modules;                         /* module manager */
     GtkWidget *         p_about;                             /* about window */
-    GtkWidget *         p_fileopen;                      /* file open window */
-    GtkWidget *         p_disc;                     /* disc selection window */
-    GtkWidget *         p_sat;                       /* sat selection window */
-    GtkWidget *         p_network;                  /* network stream window */
+    GtkWidget *         p_open;                          /* multiopen window */
     GtkWidget *         p_jump;                               /* jump window */
 
     GtkTooltips *       p_tooltips;                              /* tooltips */
@@ -104,4 +92,10 @@ struct intf_sys_s
  *****************************************************************************/
 gint GtkModeManage   ( intf_thread_t * p_intf );
 void GtkDisplayDate  ( GtkAdjustment *p_adj );
+
+/*****************************************************************************
+ * Useful macro
+ ****************************************************************************/
+#define  GtkGetIntf( widget ) __GtkGetIntf( GTK_WIDGET( widget ) )
+void * __GtkGetIntf( GtkWidget * );
 

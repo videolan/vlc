@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.35 2002/06/07 19:54:37 sam Exp $
+ * $Id: gtk_playlist.c,v 1.36 2002/07/11 19:28:13 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -65,7 +65,7 @@ static GList * GtkReadFiles ( intf_thread_t *, gchar * );
 gboolean GtkPlaylistShow( GtkWidget       *widget,
                           gpointer         user_data )
 {
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -110,7 +110,7 @@ void GtkPlaylistCancel( GtkButton * button, gpointer user_data )
 gboolean GtkPlaylistPrev( GtkWidget       *widget,
                           gpointer         user_data )
 {
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -128,7 +128,7 @@ gboolean GtkPlaylistPrev( GtkWidget       *widget,
 gboolean GtkPlaylistNext( GtkWidget       *widget,
                           gpointer         user_data)
 {
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -163,7 +163,7 @@ void GtkPlaylistDeleteSelected( GtkMenuItem * menuitem, gpointer user_data )
     GList *     p_selection;
     GtkCList *  p_clist;
 
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(menuitem), user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( menuitem);
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -211,7 +211,7 @@ void GtkPlaylistInvert( GtkMenuItem * menuitem, gpointer user_data )
     int         i_dummy;
 
     /* catch the thread back */
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( menuitem );
 
     /* lock the struct */
     vlc_mutex_lock( &p_intf->change_lock );
@@ -257,7 +257,7 @@ gboolean GtkPlaylistEvent( GtkWidget * widget,
                            GdkEvent  * event,
                            gpointer    user_data)
 {
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -297,7 +297,7 @@ void GtkPlaylistDragData( GtkWidget       *widget,
                           guint            time,
                           gpointer         user_data )
 {
-    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t * p_intf = GtkGetIntf( widget );
     GtkCList *      p_clist;
     gint            i_row;
     gint            i_col;
@@ -331,7 +331,7 @@ gboolean GtkPlaylistDragMotion( GtkWidget       *widget,
     int         i_dummy;
     GdkColor    color;
 
-    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GtkGetIntf( widget );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )

@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.33 2002/06/11 09:44:21 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.34 2002/07/11 19:28:13 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -80,7 +80,7 @@ void GtkPreferencesShow( GtkMenuItem * menuitem, gpointer user_data )
 {
     intf_thread_t * p_intf;
 
-    p_intf = GetIntf( GTK_WIDGET(menuitem), (char*)user_data );
+    p_intf = GtkGetIntf( menuitem );
 
     GtkCreateConfigDialog( "main", p_intf );
 }

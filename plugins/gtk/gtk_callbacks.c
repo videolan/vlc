@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.47 2002/07/01 17:39:08 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.48 2002/07/11 19:28:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -47,6 +47,40 @@
 #include "netutils.h"
 
 /*****************************************************************************
+ * Useful function to retrieve p_intf
+ ****************************************************************************/
+void * __GtkGetIntf( GtkWidget * widget )
+{
+    void *p_data;
+
+    if( GTK_IS_MENU_ITEM( widget ) )
+    {
+        /* Look for a GTK_MENU */
+        while( widget->parent && !GTK_IS_MENU( widget ) )
+        {
+            widget = widget->parent;
+        }
+
+        /* Maybe this one has the data */
+        p_data = gtk_object_get_data( GTK_OBJECT( widget ), "p_intf" );
+        if( p_data )
+        {
+            return p_data;
+        }
+
+        /* Otherwise, the parent widget has it */
+        widget = gtk_menu_get_attach_widget( GTK_MENU( widget ) );
+    }
+
+    /* We look for the top widget */
+    widget = gtk_widget_get_toplevel( GTK_WIDGET( widget ) );
+
+    p_data = gtk_object_get_data( GTK_OBJECT( widget ), "p_intf" );
+
+    return p_data;
+}
+
+/*****************************************************************************
  * Callbacks
  *****************************************************************************/
 
@@ -57,7 +91,7 @@
 gboolean GtkExit( GtkWidget       *widget,
                   gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
 
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_vlc->b_die = 1;
@@ -79,12 +113,11 @@ gboolean GtkWindowDelete( GtkWidget       *widget,
 gboolean GtkWindowToggle( GtkWidget       *widget,
                           gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
     
     if( GTK_WIDGET_VISIBLE(p_intf->p_sys->p_window) )
     {
         gtk_widget_hide( p_intf->p_sys->p_window);
-
     } 
     else 
     {
@@ -97,7 +130,7 @@ gboolean GtkWindowToggle( GtkWidget       *widget,
 gboolean GtkFullscreen( GtkWidget       *widget,
                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
     vout_thread_t *p_vout;
 
     p_vout = vlc_object_find( p_intf->p_sys->p_input,
@@ -121,7 +154,7 @@ void GtkWindowDrag( GtkWidget       *widget,
                     guint            time,
                     gpointer         user_data)
 {
-    intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_window" );
+    intf_thread_t * p_intf = GtkGetIntf( widget );
     GtkDropDataReceived( p_intf, data, info, PLAYLIST_END );
 }
 
@@ -134,7 +167,7 @@ gboolean GtkSliderRelease( GtkWidget       *widget,
                            GdkEventButton  *event,
                            gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
 
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->b_slider_free = 1;
@@ -148,7 +181,7 @@ gboolean GtkSliderPress( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
 
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->b_slider_free = 0;
@@ -168,7 +201,7 @@ void GtkTitlePrev( GtkButton * button, gpointer user_data )
     input_area_t *   p_area;
     int              i_id;
 
-    p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    p_intf = GtkGetIntf( button );
 
     i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id - 1;
 
@@ -194,7 +227,7 @@ void GtkTitleNext( GtkButton * button, gpointer user_data )
     input_area_t *  p_area;
     int             i_id;
 
-    p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    p_intf = GtkGetIntf( button );
     i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id + 1;
 
     if( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
@@ -217,7 +250,7 @@ void GtkChapterPrev( GtkButton * button, gpointer user_data )
     intf_thread_t * p_intf;
     input_area_t *  p_area;
 
-    p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    p_intf = GtkGetIntf( button );
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
 
     if( p_area->i_part > 0 )
@@ -240,7 +273,7 @@ void GtkChapterNext( GtkButton * button, gpointer user_data )
     intf_thread_t * p_intf;
     input_area_t *  p_area;
 
-    p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    p_intf = GtkGetIntf( button );
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
 
     if( p_area->i_part < p_area->i_part_nb )
@@ -276,7 +309,7 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
     GtkWidget *     spin;
     int             i_channel;
 
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( button );
 
     window = gtk_widget_get_toplevel( GTK_WIDGET (button) );
     spin = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( window ),
@@ -300,7 +333,7 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
 gboolean GtkAboutShow( GtkWidget       *widget,
                        gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
 
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_about ) )
     {
@@ -316,7 +349,7 @@ gboolean GtkAboutShow( GtkWidget       *widget,
 
 void GtkAboutOk( GtkButton * button, gpointer user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( button );
 
     gtk_widget_hide( p_intf->p_sys->p_about );
 }
@@ -329,7 +362,7 @@ void GtkAboutOk( GtkButton * button, gpointer user_data)
 gboolean GtkJumpShow( GtkWidget       *widget,
                       gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
 
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_jump ) )
     {
@@ -348,7 +381,7 @@ gboolean GtkJumpShow( GtkWidget       *widget,
 void GtkJumpOk( GtkButton       *button,
                 gpointer         user_data)
 {
-    intf_thread_t * p_intf = GetIntf( GTK_WIDGET( button ), (char*)user_data );
+    intf_thread_t * p_intf = GtkGetIntf( button );
     int i_hours, i_minutes, i_seconds;
 
     if( p_intf->p_sys->p_input == NULL )
@@ -387,7 +420,7 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
     char *psz_parser;
     char *psz_current;
 
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -493,7 +526,7 @@ gboolean GtkMessagesShow( GtkWidget       *widget,
 {
     static GdkColor black = { 0, 0x0000, 0x0000, 0x0000 };
     static GdkColormap *colormap;
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
 
     gtk_widget_show( p_intf->p_sys->p_messages );
     colormap = gdk_colormap_get_system ();
@@ -514,7 +547,7 @@ void
 GtkMessagesOk                          (GtkButton       *button,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( button );
     gtk_widget_hide( p_intf->p_sys->p_messages );
 }
 
@@ -524,8 +557,17 @@ GtkMessagesDelete                      (GtkWidget       *widget,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
     gtk_widget_hide( p_intf->p_sys->p_messages );
     return TRUE;
 }
 
+
+void
+GtkOpenNotebookChanged                 (GtkNotebook     *notebook,
+                                        GtkNotebookPage *page,
+                                        gint             page_num,
+                                        gpointer         user_data)
+{
+    GtkOpenChanged( GTK_WIDGET( notebook ), user_data );
+}
