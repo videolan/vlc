@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.43 2003/11/27 12:32:51 fenrir Exp $
+ * $Id: mp4.c,v 1.44 2003/11/29 17:14:39 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -874,8 +874,14 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
                 default:
                     break;
             }
+
+        }
+        else if( p_soun->i_qt_version == 1 && p_soun->i_sample_per_packet <= 0 )
+        {
+            p_soun->i_qt_version = 0;
         }
     }
+
 
     /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )
