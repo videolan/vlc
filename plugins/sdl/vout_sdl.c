@@ -56,6 +56,7 @@ typedef struct vout_sys_s
     SDL_Overlay *   p_overlay;                             /* overlay device */
     boolean_t   b_fullscreen;
     boolean_t   b_reopen_display;
+    boolean_t   b_toggle_fullscreen;
     Uint8   *   p_buffer[2];
                                                      /* Buffers informations */
 }   vout_sys_t;
@@ -63,8 +64,9 @@ typedef struct vout_sys_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int     SDLOpenDisplay   ( vout_thread_t *p_vout );
-static void    SDLCloseDisplay  ( vout_thread_t *p_vout );
+static int     SDLOpenDisplay       ( vout_thread_t *p_vout );
+static void    SDLCloseDisplay      ( vout_thread_t *p_vout );
+static void    SDLToggleFullScreen  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
  * vout_SDLCreate: allocate SDL video thread output method
@@ -113,7 +115,14 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys->i_width = VOUT_WIDTH_DEFAULT;
     p_vout->p_sys->i_height = VOUT_HEIGHT_DEFAULT;
 
-    p_vout->p_sys->b_reopen_display = 1;
+    if( SDLOpenDisplay(p_vout) )
+    {
+      intf_ErrMsg( "error: can't initialize SDL library: %s",
+                   SDL_GetError() );
+      return( 1 );
+    }
+
+    p_vout->p_sys->b_toggle_fullscreen = 0;
 
     return( 0 );
 }
@@ -125,13 +134,6 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
  *****************************************************************************/
 int vout_SDLInit( vout_thread_t *p_vout )
 {
-    if( SDLOpenDisplay(p_vout) )
-    {
-      intf_ErrMsg( "error: can't initialize SDL library: %s",
-                   SDL_GetError() );
-      return( 1 );
-    }
-
     return( 0 );
 }
 
@@ -175,6 +177,13 @@ int vout_SDLManage( vout_thread_t *p_vout )
             return( 1 );
         }
     }
+
+    /* if fullscreen has to be toggled we do so */
+    if( p_vout->p_sys->b_toggle_fullscreen )
+    {
+        SDLToggleFullScreen(p_vout);
+    }
+
     return( 0 );
 }
 
@@ -187,7 +196,7 @@ int vout_SDLManage( vout_thread_t *p_vout )
 void vout_SDLDisplay( vout_thread_t *p_vout )
 {
     SDL_Rect    disp;
-    if(p_vout->p_sys->p_display && !p_vout->p_sys->b_reopen_display)
+    if((p_vout->p_sys->p_display != NULL) && !p_vout->p_sys->b_reopen_display)
     {
         if(p_vout->b_need_render)
         {  
@@ -368,14 +377,31 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
 {
     if( p_vout->p_sys->p_display != NULL )
     {
-        SDL_UnlockSurface ( p_vout->p_sys->p_display );
         if( p_vout->p_sys->p_overlay != NULL )
         {            
             SDL_FreeYUVOverlay(p_vout->p_sys->p_overlay);
             p_vout->p_sys->p_overlay = NULL;
         }
+        SDL_UnlockSurface ( p_vout->p_sys->p_display );
         SDL_FreeSurface( p_vout->p_sys->p_display );
         p_vout->p_sys->p_display = NULL;
     }
+}
+
+/*****************************************************************************
+ * SDLToggleFullScreen: toggle fullscreen
+ *****************************************************************************
+ * This function toggles the fullscreen state of the surface.
+ *****************************************************************************/
+static void SDLToggleFullScreen( vout_thread_t *p_vout )
+{
+    SDL_WM_ToggleFullScreen(p_vout->p_sys->p_display);
+
+    if( p_vout->p_sys->b_fullscreen )
+        SDL_ShowCursor( 0 );
+    else
+        SDL_ShowCursor( 1 );
+
+    p_vout->p_sys->b_toggle_fullscreen = 0;
 }
 

@@ -2,7 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_sdl.c,v 1.20 2001/01/08 01:07:21 bozo Exp $
+ * $Id: intf_sdl.c,v 1.21 2001/01/08 22:42:50 bozo Exp $
  *
  * Authors:
  *
@@ -50,16 +50,6 @@
 
 #include "main.h"
 
-/*****************************************************************************
- * intf_sys_t: description and status of SDL interface
- *****************************************************************************/
-typedef struct intf_sys_s
-{
-    /* SDL system information */
-    SDL_Surface * p_display;
-    boolean_t b_Fullscreen;
-} intf_sys_t;
-
 typedef struct vout_sys_s
 {
     int i_width;
@@ -68,6 +58,7 @@ typedef struct vout_sys_s
     SDL_Overlay *   p_overlay;
     boolean_t   b_fullscreen;
     boolean_t   b_reopen_display;
+    boolean_t   b_toggle_fullscreen;
     Uint8   *   p_buffer[2];
                                                      /* Buffers informations */
 }   vout_sys_t;
@@ -92,14 +83,6 @@ int intf_SDLCreate( intf_thread_t *p_intf )
         return( 1 );
     }
 
-    /* Allocate instance and initialize some members */
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
-    {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
-        return( 1 );
-    }
-
     /* Spawn video output thread */
     p_intf->p_vout = vout_CreateThread( main_GetPszVariable( VOUT_DISPLAY_VAR,
                                                              NULL), 0,
@@ -107,8 +90,7 @@ int intf_SDLCreate( intf_thread_t *p_intf )
                                                          VOUT_WIDTH_DEFAULT ),
                                         main_GetIntVariable( VOUT_HEIGHT_VAR,
                                                         VOUT_HEIGHT_DEFAULT ),
-                                        NULL, 0,
-                                        (void *)&p_intf->p_sys->p_display );
+                                        NULL, 0, NULL );
 
     if( p_intf->p_vout == NULL )                                  /* error */
     {
@@ -136,12 +118,6 @@ void intf_SDLDestroy( intf_thread_t *p_intf )
     {
         vout_DestroyThread( p_intf->p_vout, NULL );
     }
-
-    /* Destroy structure */
-    
-    SDL_FreeSurface( p_intf->p_sys->p_display );     /* destroy the "screen" */
-    SDL_Quit();
-    free( p_intf->p_sys );
 }
 
 
@@ -201,7 +177,6 @@ void intf_SDL_Resize( intf_thread_t * p_intf, int width, int height )
 void intf_SDL_YUVSwitch(intf_thread_t * p_intf)
 {
     vlc_mutex_lock( &p_intf->p_vout->change_lock );
-//    p_intf->p_vout->p_sys->b_must_acquire = 0;
     p_intf->p_vout->b_need_render = 1 - p_intf->p_vout->b_need_render;
     intf_DbgMsg( "need render now : '%d'",p_intf->p_vout->b_need_render); 
     p_intf->p_vout->p_sys->b_reopen_display = 1;
@@ -211,7 +186,7 @@ void intf_SDL_Fullscreen(intf_thread_t * p_intf)
 {
     vlc_mutex_lock( &p_intf->p_vout->change_lock );
     p_intf->p_vout->p_sys->b_fullscreen = 1-p_intf->p_vout->p_sys->b_fullscreen;
-    p_intf->p_vout->p_sys->b_reopen_display = 1;
+    p_intf->p_vout->p_sys->b_toggle_fullscreen = 1;
     vlc_mutex_unlock( &p_intf->p_vout->change_lock );
 } 
     
