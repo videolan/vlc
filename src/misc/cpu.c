@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.5 2002/08/19 11:13:45 sam Exp $
+ * $Id: cpu.c,v 1.6 2002/08/19 11:37:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -130,7 +130,7 @@ static u32 Capabilities( vlc_object_t *p_this )
                      : "cc" );
 
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-    sighandler_t pf_sigill = signal( SIGILL, SigHandler );
+    void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
 #   endif
 
     i_capabilities |= CPU_CAPABILITY_FPU;
@@ -261,7 +261,7 @@ static u32 Capabilities( vlc_object_t *p_this )
 #elif defined( __powerpc__ )
 
 #   ifdef CAN_COMPILE_ALTIVEC
-    sighandler_t pf_sigill = signal( SIGILL, SigHandler );
+    void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
 
     i_capabilities |= CPU_CAPABILITY_FPU;
 
