@@ -412,7 +412,15 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
 
     while( i_data < i_len )
     {
-        if( p_sys->i_packet_used < p_sys->i_packet_length )
+        if( p_sys->i_pos < p_sys->i_header )
+        {
+            i_copy = __MIN( p_sys->i_header - p_sys->i_pos, i_len - i_data );
+            memcpy( &p_buffer[i_data], p_sys->p_header, i_copy );
+
+            i_data += i_copy;
+            p_sys->i_pos += i_copy;
+        }
+        else if( p_sys->i_packet_used < p_sys->i_packet_length )
         {
             i_copy = __MIN( p_sys->i_packet_length - p_sys->i_packet_used,
                             i_len - i_data );
@@ -423,6 +431,7 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
 
             i_data += i_copy;
             p_sys->i_packet_used += i_copy;
+            p_sys->i_pos += i_copy;
         }
         else if( p_sys->i_pos + i_data > p_sys->i_header &&
                  (int)p_sys->i_packet_used < p_sys->asfh.i_min_data_packet_size )
@@ -434,6 +443,7 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
 
             i_data += i_copy;
             p_sys->i_packet_used += i_copy;
+            p_sys->i_pos += i_copy;
         }
         else
         {
@@ -442,10 +452,13 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
             {
                 return -1;
             }
+            if( ck.i_type == 0x4824 )
+            {
+                p_sys->i_packet_used = 0;
+                p_sys->i_packet_length = 0;
+            }
         }
     }
-
-    p_sys->i_pos += i_data;
 
     return( i_data );
 }
@@ -566,6 +579,9 @@ static int Start( input_thread_t *p_input, off_t i_pos )
         msg_Dbg( p_input, "%s", psz );
         free( psz );
     }
+
+    p_sys->i_packet_used   = 0;
+    p_sys->i_packet_length = 0;
 
     return VLC_SUCCESS;
 }
