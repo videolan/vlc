@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.42 2004/01/26 16:45:03 zorglub Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Sam Hocevar <sam@zoy.org>
@@ -503,6 +503,31 @@ static int ManageVideo( vout_thread_t *p_vout )
     XEvent      xevent;                                         /* X11 event */
     vlc_value_t val;
 
+    /* Handle events from the owner window */
+    if( p_vout->p_sys->p_win->owner_window )
+    {
+        while( XCheckWindowEvent( p_vout->p_sys->p_display,
+                                  p_vout->p_sys->p_win->owner_window,
+                                  StructureNotifyMask, &xevent ) == True )
+        {
+            /* ConfigureNotify event: prepare  */
+            if( xevent.type == ConfigureNotify )
+            {
+                if( (unsigned int)xevent.xconfigure.width
+                    != p_vout->p_sys->p_win->i_width ||
+                    (unsigned int)xevent.xconfigure.height
+                    != p_vout->p_sys->p_win->i_height )
+                {
+                    /* Update dimensions */
+                    XResizeWindow( p_vout->p_sys->p_display,
+                                   p_vout->p_sys->p_win->base_window,
+                                   xevent.xconfigure.width,
+                                   xevent.xconfigure.height );
+                }
+            }
+        }
+    }
+
     /* Handle X11 events: ConfigureNotify events are parsed to know if the
      * output window's size changed, MapNotify and UnmapNotify to know if the
      * window is mapped (and if the display is useful), and ClientMessages
@@ -875,7 +900,6 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     vlc_bool_t              b_map_notify = VLC_FALSE;
 
     vlc_value_t             val;
-    long long int           i_drawable;
 
     /* Prepare window manager hints and properties */
     xsize_hints.base_width          = p_win->i_width;
@@ -894,9 +918,9 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     /* Check whether someone provided us with a window ID */
     var_Get( p_vout->p_vlc, "drawable", &val );
-    i_drawable = p_vout->b_fullscreen ? 0 : val.i_int;
+    p_win->owner_window = p_vout->b_fullscreen ? 0 : val.i_int;
 
-    if( !i_drawable )
+    if( !p_win->owner_window )
     {
         /* Create the window and set hints - the window must receive
          * ConfigureNotify events, and until it is displayed, Expose and
@@ -932,10 +956,14 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     }
     else
     {
+        /* Select events we are interested in. */
+        XSelectInput( p_vout->p_sys->p_display, p_win->owner_window,
+                      StructureNotifyMask );
+
         /* Get the parent window's geometry information */
         Window dummy1;
         unsigned int dummy2, dummy3;
-        XGetGeometry( p_vout->p_sys->p_display, i_drawable,
+        XGetGeometry( p_vout->p_sys->p_display, p_win->owner_window,
                       &dummy1, &dummy2, &dummy3,
                       &p_win->i_width,
                       &p_win->i_height,
@@ -948,7 +976,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
          * ButtonPress event, so we need to open a new window anyway. */
         p_win->base_window =
             XCreateWindow( p_vout->p_sys->p_display,
-                           i_drawable,
+                           p_win->owner_window,
                            0, 0,
                            p_win->i_width, p_win->i_height,
                            0,
