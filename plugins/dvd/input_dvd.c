@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.88 2001/10/13 15:34:21 stef Exp $
+ * $Id: input_dvd.c,v 1.89 2001/10/14 03:26:20 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -306,8 +306,6 @@ static void DVDInit( input_thread_t * p_input )
 static void DVDOpen( struct input_thread_s *p_input )
 {
     dvdcss_handle dvdhandle;
-    char *        psz_method;
-    int           i_method;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -322,32 +320,15 @@ static void DVDOpen( struct input_thread_s *p_input )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* XXX: put this shit in an access plugin */
-    psz_method = main_GetPszVariable( INPUT_DVDCSS_VAR,
-                                      INPUT_DVDCSS_DEFAULT );
-    if( !strncmp( psz_method, "key", 3 ) )
-    {
-        i_method = DVDCSS_KEY;
-    }
-    else if( !strncmp( psz_method, "disc", 4 ) )
-    {
-        i_method = DVDCSS_DISC;
-    }
-    else
-    {
-        i_method = DVDCSS_TITLE;
-    }
-    
     if( strlen( p_input->p_source ) > 4
          && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
         dvdhandle = dvdcss_open( p_input->p_source + 4,
-                                 i_method,
                                  DVDCSS_INIT_QUIET );
     }
     else
     {
         dvdhandle = dvdcss_open( p_input->p_source,
-                                 i_method,
                                  DVDCSS_INIT_QUIET );
     }
 

@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.16 2001/10/13 15:34:21 stef Exp $
+ * $Id: libdvdcss.c,v 1.17 2001/10/14 03:26:20 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -80,9 +80,11 @@ static int _win32_dvdcss_aread  ( int i_fd, void *p_data, int i_blocks );
 /*****************************************************************************
  * dvdcss_open: initialize library, open a DVD device, crack CSS key
  *****************************************************************************/
-extern dvdcss_handle dvdcss_open ( char *psz_target, int i_method, int i_flags )
+extern dvdcss_handle dvdcss_open ( char *psz_target, int i_flags )
 {
     int i_ret;
+
+    char    psz_method[16] = "dvdcss_method";
 
     dvdcss_handle dvdcss;
 
@@ -102,8 +104,24 @@ extern dvdcss_handle dvdcss_open ( char *psz_target, int i_method, int i_flags )
     dvdcss->p_titles = NULL;
     dvdcss->b_debug = i_flags & DVDCSS_INIT_DEBUG;
     dvdcss->b_errors = !(i_flags & DVDCSS_INIT_QUIET);
-    dvdcss->i_method = i_method;
     dvdcss->psz_error = "no error";
+
+
+
+    /* find method from DVDCSS_METHOD environment variable */
+    dvdcss->i_method = DVDCSS_TITLE;
+
+    if( getenv( psz_method ) )
+    {
+        if( !strncmp( getenv( psz_method ), "key", 3 ) )
+        {
+            dvdcss->i_method = DVDCSS_KEY;
+        }
+        else if( !strncmp( getenv( psz_method ), "disc", 4 ) )
+        {
+            dvdcss->i_method = DVDCSS_DISC;
+        }
+    }
 
     i_ret = _dvdcss_open( dvdcss, psz_target );
     if( i_ret < 0 )

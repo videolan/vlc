@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.10 2001/10/13 15:34:21 stef Exp $
+ * $Id: css.c,v 1.11 2001/10/14 03:26:20 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Håkan Hjort <d95hjort@dtek.chalmers.se>
@@ -494,7 +494,7 @@ int CSSGetTitleKey( dvdcss_handle dvdcss, int i_pos )
         memcpy( dvdcss->css.p_title_key, p_key, sizeof(dvd_key_t) );
 
         return 0;
-    } // ( dvdcss->i_method == DVDCSS_TITLECRACK ) || ( dvdcss->b_ioctls == 0 )
+    } // ( dvdcss->i_method == DVDCSS_TITLE ) || ( dvdcss->b_ioctls == 0 )
 }
 
 /*****************************************************************************

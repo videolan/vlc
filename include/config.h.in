@@ -220,7 +220,7 @@
 #define INPUT_AUDIO_VAR                 "vlc_input_audio"
 #define INPUT_CHANNEL_VAR               "vlc_input_channel"
 #define INPUT_SUBTITLE_VAR              "vlc_input_subtitle"
-#define INPUT_DVDCSS_VAR                "vlc_input_dvdcss"
+#define INPUT_DVDCSS_VAR                "dvdcss_method"
 #define INPUT_DVDCSS_DEFAULT            "title"
 
 /* VCD defaults */
