@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.117 2003/12/11 01:36:12 yoann Exp $
+ * $Id: libvlc.h,v 1.118 2003/12/11 13:21:11 rocky Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -336,13 +336,25 @@ static char *ppsz_language_text[] =
 #endif
 
 #define VCD_DEV_TEXT N_("VCD device")
+#ifdef HAVE_VCDX
 #define VCD_DEV_LONGTEXT N_( \
-    "This is the default VCD device to use.")
+    "This is the default VCD device to use. " \
+    "If you don't specify anything, we'll scan for a suitable CD-ROM device." )
+#else
+#define VCD_DEV_LONGTEXT N_( \
+    "This is the default VCD device to use." )
+#endif
 
 #define CDAUDIO_DEV_TEXT N_("CD Audio device")
+#ifdef HAVE_CDDAX
 #define CDAUDIO_DEV_LONGTEXT N_( \
-    "This is the default CD Audio device to use.")
-                                                                                                                            
+    "This is the default CD Audio device to use. " \
+    "If you don't specify anything, we'll scan for a suitable CD-ROM device." )
+#else
+#define CDAUDIO_DEV_LONGTEXT N_( \
+    "This is the default CD Audio device to use." )
+#endif
+
 #define IPV6_TEXT N_("Force IPv6")
 #define IPV6_LONGTEXT N_( \
     "If you check this box, IPv6 will be used by default for all UDP and " \
