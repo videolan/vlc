@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.95 2002/08/14 00:23:59 massiot Exp $
+ * $Id: audio_output.c,v 1.96 2002/08/14 13:10:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -97,6 +97,7 @@ aout_buffer_t * aout_BufferNew( aout_instance_t * p_aout,
     p_buffer->i_nb_bytes = duration
                               * aout_FormatToByterate( &p_input->input )
                               / 1000000;
+    p_buffer->i_nb_bytes &= ~0x3;
 
     if ( p_buffer == NULL )
     {

@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.5 2002/08/14 00:43:52 massiot Exp $
+ * $Id: esd.c,v 1.6 2002/08/14 13:10:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -146,9 +146,9 @@ static int SetFormat( aout_instance_t *p_aout )
     /* ESD latency is calculated for 44100 Hz. We don't have any way to get the
      * number of buffered samples, so I assume ESD_BUF_SIZE/2 */
     p_sys->latency =
-        (mtime_t)( esd_get_latency( esd_open_sound(NULL) ) + ESD_BUF_SIZE / 2
-                    * p_aout->output.output.i_rate / ESD_DEFAULT_RATE
-                    * aout_FormatTo( &p_aout->output.output, 1 ) )
+        (mtime_t)( esd_get_latency( esd_open_sound(NULL) ) + ESD_BUF_SIZE/2
+                    * aout_FormatToByterate( &p_aout->output.output )
+                    / ESD_DEFAULT_RATE )
       * (mtime_t)1000000
       / (mtime_t)aout_FormatToByterate( &p_aout->output.output );
 

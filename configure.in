@@ -2128,13 +2128,12 @@ debug mode            : ${DEBUG}
 release               : ${RELEASE}
 profiling             : ${PROFILING}
 need builtin getopt   : ${NEED_GETOPT}
-built-in modules      :${BUILTINS}
-plug-in modules       :${PLUGINS}
+modules               : (see Makefile.config)
 mozilla plugin        : ${MOZILLA}
 vlc aliases           :${ALIASES}
 
-You may now tune Makefile.opts at your convenience, for instance to choose
-which modules get compiled as plugins.
+You may now tune Makefile.config and Makefile.opts at your convenience, for
+instance to choose which modules get compiled as plugins, or tune CFLAGS.
 
 To build vlc and its plugins, type \`${VLC_MAKE}'.
 "
