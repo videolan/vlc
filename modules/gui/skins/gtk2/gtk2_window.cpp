@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.10 2003/04/15 11:46:19 ipkiss Exp $
+ * $Id: gtk2_window.cpp,v 1.11 2003/04/15 16:42:02 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -162,8 +162,6 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
     unsigned int p1  = evt->GetParam1();
     int          p2  = evt->GetParam2();
 
-    fprintf( stderr, "salut %li\n", evt->GetMessage() );
-
     switch( msg )
     {
         case GDK_EXPOSE:
@@ -179,53 +177,57 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
 //            TrackEvent.dwHoverTime = 1;
 //            TrackMouseEvent( &TrackEvent );
             if( LButtonDown )
-                MouseMove( ((GdkEventButton *)p2)->x_root, ((GdkEventButton *)p2)->y_root,
-                           1 );
+                MouseMove( (int)( (GdkEventButton *)p2 )->x,
+                           (int)( (GdkEventButton *)p2 )->y, 1 );
             else if( RButtonDown )
-                MouseMove( ((GdkEventButton *)p2)->x_root, ((GdkEventButton *)p2)->y_root,
-                           2 );
+                MouseMove( (int)( (GdkEventButton *)p2 )->x,
+                           (int)( (GdkEventButton *)p2 )->y, 2 );
             else
-                MouseMove( ((GdkEventButton *)p2)->x_root, ((GdkEventButton *)p2)->y_root,
-                           0 );
-
+                MouseMove( (int)( (GdkEventButton *)p2 )->x,
+                           (int)( (GdkEventButton *)p2 )->y, 0 );
+            gdk_window_get_pointer( gWnd, 0, 0, 0 );
             return true;
 
 
         case GDK_BUTTON_PRESS:
-            switch( ((GdkEventButton *)p2)->button )
+            switch( ( (GdkEventButton *)p2 )->button )
             {
                 case 1:
                     // Left button
                     LButtonDown = true;
-                    MouseDown( ((GdkEventButton *)p2)->x_root,
-                               ((GdkEventButton *)p2)->y_root, 1 );
+                    MouseDown( (int)( (GdkEventButton *)p2 )->x,
+                               (int)( (GdkEventButton *)p2 )->y, 1 );
                     break;
+
                 case 3:
                     // Right button
                     RButtonDown = true;
-                    MouseDown( ((GdkEventButton *)p2)->x_root,
-                               ((GdkEventButton *)p2)->y_root, 2 );
+                    MouseDown( (int)( (GdkEventButton *)p2 )->x,
+                               (int)( (GdkEventButton *)p2 )->y, 2 );
                     break;
+
                 default:
                     break;
             }
             return true;
 
         case GDK_BUTTON_RELEASE:
-            switch( ((GdkEventButton *)p2)->button )
+            switch( ( (GdkEventButton *)p2 )->button )
             {
                 case 1:
                     // Left button
                     LButtonDown = false;
-                    MouseUp( ((GdkEventButton *)p2)->x_root,
-                             ((GdkEventButton *)p2)->y_root, 1 );
+                    MouseUp( (int)( (GdkEventButton *)p2 )->x,
+                             (int)( (GdkEventButton *)p2 )->y, 1 );
                     break;
+
                 case 3:
                     // Right button
                     RButtonDown = false;
-                    MouseUp( ((GdkEventButton *)p2)->x_root,
-                             ((GdkEventButton *)p2)->y_root, 2 );
+                    MouseUp( (int)( (GdkEventButton *)p2 )->x,
+                             (int)( (GdkEventButton *)p2 )->y, 2 );
                     break;
+
                 default:
                     break;
             }
@@ -275,7 +277,6 @@ void GTK2Window::RefreshFromImage( int x, int y, int w, int h )
 
 */
 
- fprintf(stderr, "window %d %d %d %d\n", x, y, w, h);
     gdk_draw_drawable( gWnd, gc, (( GTK2Graphics* )Image )->GetImage(),
             x, y, x, y, w, h );
 }
