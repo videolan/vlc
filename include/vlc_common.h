@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.3 2002/06/01 18:04:48 sam Exp $
+ * $Id: vlc_common.h,v 1.4 2002/06/02 13:38:03 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -181,12 +181,21 @@ VLC_DECLARE_STRUCT(network_socket)
 VLC_DECLARE_STRUCT(iso639_lang)
 
 /*****************************************************************************
+ * Plug-in stuff
+ *****************************************************************************/
+#ifndef __PLUGIN__
+#   define VLC_EXPORT( type, name, args ) type name args;
+#else
+#   define VLC_EXPORT( type, name, args ) ;
+    extern module_symbols_t* p_symbols;
+#endif
+
+/*****************************************************************************
  * OS-specific headers and thread types
  *****************************************************************************/
 #if defined( WIN32 )
 #   define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
-    typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT)( HANDLE, HANDLE, DWORD, BOOL );
 #endif
 
 #include "vlc_threads.h"
@@ -540,12 +549,4 @@ typedef __int64 off_t;
 /*****************************************************************************
  * Plug-in stuff
  *****************************************************************************/
-#ifndef __PLUGIN__
-#   define VLC_EXPORT( type, name, args ) type name args;
-#else
-#   define VLC_EXPORT( type, name, args ) ;
-    extern module_symbols_t* p_symbols;
-#endif
-
 #include "vlc_symbols.h"
-

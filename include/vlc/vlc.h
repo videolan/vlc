@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.1 2002/06/01 12:31:58 sam Exp $
+ * $Id: vlc.h,v 1.2 2002/06/02 13:38:03 gbazin Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,6 @@ VLC_DECLARE_STRUCT(vlc_object)
 #   include "modules.h"
 #   include "main.h"
 #   include "configuration.h"
-#   include "threads_funcs.h"
 #   include "vlc_objects.h"
 #endif
 
