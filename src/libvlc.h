@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.112 2003/12/04 16:49:45 sam Exp $
+ * $Id: libvlc.h,v 1.113 2003/12/07 20:48:21 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -656,7 +656,7 @@ vlc_module_begin();
     add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, VLC_TRUE );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
-    add_integer( "align", -1, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
+    add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );
     add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT, VLC_TRUE );
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
