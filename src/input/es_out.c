@@ -742,7 +742,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     p_block->i_rate = p_input->i_rate;
 
     /* TODO handle mute */
-    if( es->p_dec && ( es->fmt.i_cat != AUDIO_ES || p_input->i_rate == INPUT_RATE_DEFAULT ) )
+    if( es->p_dec && ( es->fmt.i_cat != AUDIO_ES ||
+        p_input->i_rate == INPUT_RATE_DEFAULT ) )
     {
         input_DecoderDecode( es->p_dec, p_block );
     }
@@ -983,6 +984,18 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 p_sys->pgrm[i]->clock.last_pts = 0;
             }
             return VLC_SUCCESS;
+
+        case ES_OUT_GET_TS:
+            if( p_sys->p_pgrm )
+            {
+                int64_t i_ts = (int64_t)va_arg( args, int64_t );
+                int64_t *pi_ts = (int64_t *)va_arg( args, int64_t * );
+                *pi_ts = input_ClockGetTS( p_sys->p_input,
+                                           &p_sys->p_pgrm->clock,
+                                           ( i_ts + 11 ) * 9 / 100 );
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
 
         case ES_OUT_GET_GROUP:
             pi = (int*) va_arg( args, int* );

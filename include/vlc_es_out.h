@@ -64,6 +64,10 @@ enum es_out_query_e
     ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
     ES_OUT_RESET_PCR,           /* no arg */
 
+    /* Timestamp handling, convert an input timestamp to a global clock one.
+     * (shouldn't have to be used by input plugins directly) */
+    ES_OUT_GET_TS,             /* arg1=int64_t i_ts(microsecond!) (using default group 0), arg2=int64_t* converted i_ts */
+
     /* Try not to use this one as it is a bit hacky */
     ES_OUT_SET_FMT      /* arg1= es_out_id_t* arg2=es_format_t* */
 };

@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -147,7 +148,7 @@ static void Run( intf_thread_t *p_intf )
 #define MAX_MSG_LENGTH (2 * sizeof(int64_t))
 
     vlc_bool_t b_master = config_GetInt( p_intf, "netsync-master" );
-    char *psz_master;
+    char *psz_master = NULL;
     char p_data[MAX_MSG_LENGTH];
     int i_socket;
 
@@ -162,13 +163,12 @@ static void Run( intf_thread_t *p_intf )
     }
 
     i_socket = net_OpenUDP( p_intf, NULL,
-                            b_master ? NETSYNC_PORT_MASTER : NETSYNC_PORT_SLAVE,
-                            b_master ? NULL : psz_master,
-                            b_master ? 0 : NETSYNC_PORT_MASTER );
+                   b_master ? NETSYNC_PORT_MASTER : NETSYNC_PORT_SLAVE,
+                   b_master ? NULL : psz_master,
+                   b_master ? 0 : NETSYNC_PORT_MASTER );
 
-    if( !b_master )
-        free( psz_master );
-    
+    if( psz_master ) free( psz_master );
+
     if( i_socket < 0 )
     {
         msg_Err( p_intf, "failed opening UDP socket." );
@@ -180,7 +180,7 @@ static void Run( intf_thread_t *p_intf )
 
     while( !p_intf->b_die )
     {
-        struct timeval  timeout;
+        struct timeval timeout;
         fd_set fds_r;
 
         /* Update the input */
@@ -325,16 +325,15 @@ static void Run( intf_thread_t *p_intf )
 static mtime_t GetClockRef( intf_thread_t *p_intf, mtime_t i_pts )
 {
     input_thread_t *p_input = p_intf->p_sys->p_input;
-    pgrm_descriptor_t *p_pgrm;
+    mtime_t i_ts;
 
-    if( !p_input ) return 0;
+    if( !p_input || !p_input->p_es_out ) return 0;
 
-#if 0
-    p_pgrm = p_input->stream.p_selected_program;
-    if( p_pgrm ) return input_ClockGetTS( p_input, p_pgrm, i_pts );
-#else
-#warning "This code is currently broken. FIXME!!!"
-#endif
+    if( es_out_Control( p_input->p_es_out, ES_OUT_GET_TS, i_pts, &i_ts ) ==
+        VLC_SUCCESS )
+    {
+        return i_ts;
+    }
 
     return 0;
 }
