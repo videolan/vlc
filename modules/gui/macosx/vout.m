@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.22 2003/02/02 23:11:17 massiot Exp $
+ * $Id: vout.m,v 1.23 2003/02/06 13:47:04 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -401,7 +401,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                     p_pic->p_sys->i_size,                    
                     codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
     {
-        msg_Err( p_vout, "DecompressSequenceFrameS failed: %d", err );
+        msg_Warn( p_vout, "DecompressSequenceFrameS failed: %d", err );
     }
     else
     {
