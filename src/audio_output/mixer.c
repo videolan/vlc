@@ -274,8 +274,10 @@ static int MixBuffer( aout_instance_t * p_aout )
                 /* Round to the nearest multiple */
                 i_nb_bytes /= p_aout->mixer.mixer.i_bytes_per_frame;
                 i_nb_bytes *= p_aout->mixer.mixer.i_bytes_per_frame;
-                p_input->p_first_byte_to_mix = p_buffer->p_buffer
-                                                + i_nb_bytes;
+
+                if( i_nb_bytes < 0 ) break; /* FIXME: reset state properly */
+
+                p_input->p_first_byte_to_mix = p_buffer->p_buffer + i_nb_bytes;
             }
         }
     }
