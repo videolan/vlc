@@ -1,4 +1,5 @@
 #!/bin/sh
+ldconfig
 [ -x /opt/QtPalmtop/pics/vlc ] || rm /opt/QtPalmtop/pics/vlc
 exit 0
 
