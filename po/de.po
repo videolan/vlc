@@ -176,7 +176,7 @@ msgid ""
 "In this section you can force the behavior of the subtitle demuxer, for "
 "example by setting the subtitles type or file name."
 msgstr ""
-"In dieser Sektion können Sie das Verhalten der Untertitel-Demxer festlegen, "
+"In dieser Sektion können Sie das Verhalten der Untertitel-Demuxer festlegen, "
 "z.B. durch Einstellen des Untertiteltyps oder Dateinamen."
 
 #: include/vlc_help.h:110
