@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.74 2002/03/12 18:37:46 stef Exp $
+ * $Id: input_programs.c,v 1.75 2002/03/19 23:02:29 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -293,16 +293,104 @@ input_area_t * input_AddArea( input_thread_t * p_input )
 int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
 {
     int i_es_index;
-#define old_prg p_input->stream.p_selected_program
-    for ( i_es_index = 0 ; i_es_index < old_prg->i_es_number ; i_es_index ++ )
+    
+    if ( p_input->stream.p_selected_program )
     {
-        input_UnselectES( p_input , old_prg->pp_es[i_es_index] );
+        for ( i_es_index = 0 ; 
+                i_es_index < p_input->stream.i_selected_es_number; 
+                i_es_index ++ )
+        {
+            intf_WarnMsg( 4, "Unselecting ES %d", 
+                    p_input->stream.pp_selected_es[i_es_index]->i_id );
+            input_UnselectES( p_input , 
+                    p_input->stream.pp_selected_es[i_es_index] );
+        }
     }
-#undef old_prg
+
     for (i_es_index = 0 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
     {
-        input_SelectES( p_input , p_new_prg->pp_es[i_es_index] );
+        int i_required_audio_es;
+        int i_required_spu_es;
+        int i_audio_es = 0;
+        int i_spu_es = 0;
+
+        /* Get the number of the required audio stream */
+        if( p_main->b_audio )
+        {
+            /* Default is the first one */
+            i_required_audio_es = config_GetIntVariable( "input_channel" );
+            if( i_required_audio_es < 0 )
+            {
+                i_required_audio_es = 1;
+            }
+        }
+        else
+        {
+            i_required_audio_es = 0;
+        }
+
+        /* Same thing for subtitles */
+        if( p_main->b_video )
+        {
+            /* for spu, default is none */
+            i_required_spu_es = config_GetIntVariable( "input_subtitle" );
+            if( i_required_spu_es < 0 )
+            {
+                i_required_spu_es = 0;
+            }
+        }
+        else
+        {
+            i_required_spu_es = 0;
+        }
+        switch( p_new_prg->pp_es[i_es_index]->i_cat )
+                    {
+                        case MPEG1_VIDEO_ES:
+                        case MPEG2_VIDEO_ES:
+                            intf_WarnMsg( 4, "Selecting ES %x", 
+                                    p_new_prg->pp_es[i_es_index]->i_id );
+                            input_SelectES( p_input, 
+                                   p_new_prg->pp_es[i_es_index] );
+                            break;
+                        case MPEG1_AUDIO_ES:
+                        case MPEG2_AUDIO_ES:
+                            i_audio_es += 1;
+                            if( i_audio_es == i_required_audio_es )
+                            {
+                                intf_WarnMsg( 4, "Selecting ES %x", 
+                                    p_new_prg->pp_es[i_es_index]->i_id );   
+                                input_SelectES( p_input, 
+                                    p_new_prg->pp_es[i_es_index]);
+                            }
+                            break;
+                        case LPCM_AUDIO_ES :
+                        case AC3_AUDIO_ES :
+                            i_audio_es += 1;
+                            if( i_audio_es == i_required_audio_es )
+                            {
+                                intf_WarnMsg( 4, "Selecting ES %x", 
+                                    p_new_prg->pp_es[i_es_index]->i_id );
+                                input_SelectES( p_input, 
+                                    p_new_prg->pp_es[i_es_index] );
+                            }
+                            break;
+                        /* Not sure this one is fully specification-compliant */
+                        case DVD_SPU_ES :
+                            i_spu_es += 1;
+                            if( i_spu_es == i_required_spu_es )
+                            {
+                                intf_WarnMsg( 4, "Selecting ES %x", 
+                                    p_new_prg->pp_es[i_es_index]->i_id );
+                                input_SelectES( p_input, 
+                                    p_new_prg->pp_es[i_es_index] );
+                            }
+                            break;
+                        default :
+                            break;
+                    }
+
     }
+    
 
     p_input->stream.p_selected_program = p_new_prg;
 

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.85 2002/03/17 17:00:38 sam Exp $
+ * $Id: mpeg_system.c,v 1.86 2002/03/19 23:02:29 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1590,7 +1590,10 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
 #undef p_psi    
 
     /* FIXME This has nothing to do here */
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0] ;
+    if( !p_input->stream.p_selected_program )
+    {
+        input_SetProgram( p_input, p_input->stream.pp_programs[0] );
+    }
 }
 
 /*****************************************************************************
@@ -1708,39 +1711,42 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 
                 /* Tell the interface what kind of stream it is and select 
                  * the required ones */
-                switch( i_stream_type )
+                if ( p_input->stream.p_selected_program == p_new_es->p_pgrm )
                 {
-                    case MPEG1_VIDEO_ES:
-                    case MPEG2_VIDEO_ES:
-                        p_new_es->i_cat = VIDEO_ES;
-                        input_SelectES( p_input, p_new_es );
-                        break;
-                    case MPEG1_AUDIO_ES:
-                    case MPEG2_AUDIO_ES:
-                        p_new_es->i_cat = AUDIO_ES;
-                        i_audio_es += 1;
-                        if( i_audio_es == i_required_audio_es )
+                    switch( i_stream_type )
+                    {
+                        case MPEG1_VIDEO_ES:
+                        case MPEG2_VIDEO_ES:
+                            p_new_es->i_cat = VIDEO_ES;
                             input_SelectES( p_input, p_new_es );
-                        break;
-                    case LPCM_AUDIO_ES :
-                    case AC3_AUDIO_ES :
-                        p_new_es->i_stream_id = 0xBD;
-                        p_new_es->i_cat = AUDIO_ES;
-                        i_audio_es += 1;
-                        if( i_audio_es == i_required_audio_es )
-                            input_SelectES( p_input, p_new_es );
-                        break;
-                    /* Not sure this one is fully specification-compliant */
-                    case DVD_SPU_ES :
-                        p_new_es->i_stream_id = 0xBD;
-                        p_new_es->i_cat = SPU_ES;
-                        i_spu_es += 1;
-                        if( i_spu_es == i_required_spu_es )
-                            input_SelectES( p_input, p_new_es );
-                        break;
-                    default :
-                        p_new_es->i_cat = UNKNOWN_ES;
-                        break;
+                            break;
+                        case MPEG1_AUDIO_ES:
+                        case MPEG2_AUDIO_ES:
+                            p_new_es->i_cat = AUDIO_ES;
+                            i_audio_es += 1;
+                            if( i_audio_es == i_required_audio_es )
+                                input_SelectES( p_input, p_new_es );
+                            break;
+                        case LPCM_AUDIO_ES :
+                        case AC3_AUDIO_ES :
+                            p_new_es->i_stream_id = 0xBD;
+                            p_new_es->i_cat = AUDIO_ES;
+                            i_audio_es += 1;
+                            if( i_audio_es == i_required_audio_es )
+                                input_SelectES( p_input, p_new_es );
+                            break;
+                        /* Not sure this one is fully specification-compliant */
+                        case DVD_SPU_ES :
+                            p_new_es->i_stream_id = 0xBD;
+                            p_new_es->i_cat = SPU_ES;
+                            i_spu_es += 1;
+                            if( i_spu_es == i_required_spu_es )
+                                input_SelectES( p_input, p_new_es );
+                            break;
+                        default :
+                            p_new_es->i_cat = UNKNOWN_ES;
+                            break;
+                    }
                 }
                 
                 p_current_data += 5 + i_es_info_length;
