@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cddax.c,v 1.2 2003/10/05 10:54:55 rocky Exp $
+ * $Id: cddax.c,v 1.3 2003/10/05 14:51:47 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -60,6 +60,7 @@ typedef struct cdda_data_s
     lsn_t       i_sector;                                  /* Current Sector */
     lsn_t *     p_sectors;                                  /* Track sectors */
     vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
+    int         i_debug;                  /* Debugging mask */
 
 } cdda_data_t;
 
@@ -68,6 +69,35 @@ struct demux_sys_t
     es_descriptor_t *p_es;
     mtime_t         i_pts;
 };
+
+/*****************************************************************************
+ * Debugging 
+ *****************************************************************************/
+#define INPUT_DBG_MRL         1 
+#define INPUT_DBG_EXT         2 /* Calls from external routines */
+#define INPUT_DBG_CALL        4 /* all calls */
+#define INPUT_DBG_LSN         8 /* LSN changes */
+#define INPUT_DBG_CDIO       16 /* Debugging from CDIO */
+#define INPUT_DBG_SEEK       32 /* Seeks to set location */
+
+#define DEBUG_TEXT N_("set debug mask for additional debugging.")
+#define DEBUG_LONGTEXT N_( \
+    "This integer when viewed in binary is a debugging mask\n" \
+    "MRL             1\n" \
+    "external call   2\n" \
+    "all calls       4\n" \
+    "LSN             8\n" \
+    "libcdio  (10)  16\n" \
+    "seeks    (20)  32\n" )
+
+#define INPUT_DEBUG 1
+#if INPUT_DEBUG
+#define dbg_print(mask, s, args...) \
+   if (p_cdda->i_debug & mask) \
+     msg_Dbg(p_input, "%s: "s, __func__ , ##args)
+#else
+#define dbg_print(mask, s, args...) 
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -84,6 +114,17 @@ static void CDDACloseDemux   ( vlc_object_t * );
 static int  CDDADemux        ( input_thread_t * p_input );
 
 /*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+
+/* FIXME: This variable is a hack. Would be nice to eliminate. */
+static input_thread_t *p_cdda_input = NULL;
+
+static int debug_callback   ( vlc_object_t *p_this, const char *psz_name,
+			      vlc_value_t oldval, vlc_value_t val, 
+			      void *p_data );
+
+/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
@@ -98,12 +139,66 @@ vlc_module_begin();
     set_callbacks( CDDAOpen, CDDAClose );
     add_shortcut( "cdda" );
 
+    /* Configuration options */
+    add_category_hint( N_("CDX"), NULL, VLC_TRUE );
+    add_integer ( MODULE_STRING "-debug", 0, debug_callback, DEBUG_TEXT, 
+                  DEBUG_LONGTEXT, VLC_TRUE );
+
     add_submodule();
         set_description( _("CD Audio demux") );
         set_capability( "demux", 0 );
         set_callbacks( CDDAOpenDemux, CDDACloseDemux );
         add_shortcut( "cdda" );
 vlc_module_end();
+
+/****************************************************************************
+ * Private functions
+ ****************************************************************************/
+
+static int
+debug_callback   ( vlc_object_t *p_this, const char *psz_name,
+                   vlc_value_t oldval, vlc_value_t val, void *p_data )
+{
+  cdda_data_t *p_cdda;
+
+  if (NULL == p_cdda_input) return VLC_EGENERIC;
+  
+  p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
+
+  if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
+    msg_Dbg( p_cdda_input, "Old debug (x%0x) %d, new debug (x%0x) %d", 
+             p_cdda->i_debug, p_cdda->i_debug, val.i_int, val.i_int);
+  }
+  p_cdda->i_debug = val.i_int;
+  return VLC_SUCCESS;
+}
+
+/* process messages that originate from libcdio. */
+static void
+cdio_log_handler (cdio_log_level_t level, const char message[])
+{
+  cdda_data_t *p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
+  switch (level) {
+  case CDIO_LOG_DEBUG:
+  case CDIO_LOG_INFO:
+    if (p_cdda->i_debug & INPUT_DBG_CDIO) 
+      msg_Dbg( p_cdda_input, message);
+    break;
+  case CDIO_LOG_WARN:
+    msg_Warn( p_cdda_input, message);
+    break;
+  case CDIO_LOG_ERROR:
+  case CDIO_LOG_ASSERT:
+    msg_Err( p_cdda_input, message);
+    break;
+  default:
+    msg_Warn( p_cdda_input, message,
+            _("The above message had unknown vcdimager log level"), 
+            level);
+  }
+  return;
+}
+
 
 /*****************************************************************************
  * CDDAOpen: open cdda
@@ -119,6 +214,9 @@ static int CDDAOpen( vlc_object_t *p_this )
     input_area_t *          p_area;
     int                     i_title = 1;
     cddev_t                 *p_cddev;
+
+    /* Set where to log errors messages from libcdio. */
+    p_cdda_input = (input_thread_t *)p_this;
 
     /* parse the options passed in command line : */
     psz_orig = psz_parser = psz_source = strdup( p_input->psz_name );
@@ -185,8 +283,11 @@ static int CDDAOpen( vlc_object_t *p_this )
         return -1;
     }
 
-    p_cdda->p_cddev = p_cddev;
+    p_cdda->p_cddev        = p_cddev;
+    p_cdda->i_debug        = config_GetInt( p_this, MODULE_STRING "-debug" );
     p_input->p_access_data = (void *)p_cdda;
+
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "%s", psz_source );
 
     p_input->i_mtu = CDDA_DATA_ONCE;
 
@@ -252,7 +353,8 @@ static int CDDAOpen( vlc_object_t *p_this )
     p_input->pf_set_program = CDDASetProgram;
 
     /* Update default_pts to a suitable value for cdda access */
-    p_input->i_pts_delay = config_GetInt( p_input, "cddax-caching" ) * 1000;
+    p_input->i_pts_delay = config_GetInt( p_input, 
+					  MODULE_STRING "-caching" ) * 1000;
 
     return 0;
 }
@@ -265,8 +367,10 @@ static void CDDAClose( vlc_object_t *p_this )
     input_thread_t *   p_input = (input_thread_t *)p_this;
     cdda_data_t *p_cdda = (cdda_data_t *)p_input->p_access_data;
 
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "" );
     ioctl_Close( p_cdda->p_cddev );
     free( p_cdda );
+    p_cdda_input = NULL;
 }
 
 /*****************************************************************************
@@ -306,14 +410,15 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
         {
             input_area_t *p_area;
 
+	    dbg_print( (INPUT_DBG_LSN|INPUT_DBG_CALL), 
+		       "end of track, cur: %u", p_cdda->i_sector );
+
             if ( p_cdda->i_track >= p_cdda->i_nb_tracks - 1 )
                 return 0; /* EOF */
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
             p_area = p_input->stream.pp_areas[
                     p_input->stream.p_selected_area->i_id + 1 ];
-
-            msg_Dbg( p_input, "new title" );
 
             p_area->i_part = 1;
             CDDASetArea( p_input, p_area );
@@ -336,6 +441,8 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
 static int CDDASetProgram( input_thread_t * p_input,
                            pgrm_descriptor_t * p_program)
 {
+    cdda_data_t * p_cdda= (cdda_data_t *) p_input->p_access_data;
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "" );
     return 0;
 }
 
@@ -345,8 +452,10 @@ static int CDDASetProgram( input_thread_t * p_input,
  ****************************************************************************/
 static int CDDASetArea( input_thread_t * p_input, input_area_t * p_area )
 {
-    cdda_data_t *p_cdda = (cdda_data_t*)p_input->p_access_data;
+    cdda_data_t *p_cdda = (cdda_data_t*) p_input->p_access_data;
     vlc_value_t val;
+
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "");
 
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
@@ -394,7 +503,13 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
     p_input->stream.p_selected_area->i_tell =
         (off_t)p_cdda->i_sector * (off_t)CDIO_CD_FRAMESIZE_RAW
          - p_input->stream.p_selected_area->i_start;
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_SEEK),
+    "sector %ud, offset: %lld, i_tell: %lld",  p_cdda->i_sector, i_off, 
+               p_input->stream.p_selected_area->i_tell );
+
 }
 
 /****************************************************************************
