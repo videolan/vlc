@@ -510,8 +510,8 @@ dnl
 AC_ARG_WITH(tuning,
 [  --with-tuning=ARCH      enable special tuning for an architecture
                           (default i686 on IA-32 and 750 on PPC)])
-if test "x$withval" != "x"; then
-    TUNING=$withval
+if test "x$with_tuning" != "x"; then
+    TUNING="$with_tuning"
 else
     if test x${target_cpu} = xi686 -o x${target_cpu} = xi586 -o x${target_cpu} = xi486 -o x${target_cpu} = xi386; then TUNING="pentiumpro"
     else
@@ -533,7 +533,7 @@ dnl  Enable/disable optimizations
 dnl
 AC_ARG_ENABLE(optimizations,
 [  --disable-optimizations disable compiler optimizations (default enabled)],
-[ if test x$enableval = xno; then OPTIMS=0; fi ],
+[ if test x$enable_optimizations = xno; then OPTIMS=0; fi ],
 [ OPTIMS=1 ])
 
 dnl
@@ -541,7 +541,7 @@ dnl  AltiVec acceleration
 dnl
 AC_ARG_ENABLE(altivec,
 [  --disable-altivec       disable altivec optimizations (default enabled on PPC)],
-[ if test x$enableval = xyes; then ARCH="${ARCH} altivec";
+[ if test x$enable_altivec = xyes; then ARCH="${ARCH} altivec";
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ],
 [ if test x${target_cpu} = xpowerpc; then ARCH="${ARCH} altivec";
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ])
@@ -552,7 +552,7 @@ dnl
 DEBUG=0
 AC_ARG_ENABLE(debug,
 [  --enable-debug          debug mode (default disabled)],
-[ if test x$enableval = xyes; then DEBUG=1; fi ])
+[ if test x$enable_debug = xyes; then DEBUG=1; fi ])
 
 dnl
 dnl  Enable release-specific flags
@@ -560,7 +560,7 @@ dnl
 RELEASE=0
 AC_ARG_ENABLE(release,
 [  --enable-release        activate extra optimizations (default disabled)],
-[ if test x$enableval = xyes; then RELEASE=1; fi ],
+[ if test x$enable_release = xyes; then RELEASE=1; fi ],
 [ VERSION="${VERSION}_`date +%Y-%m-%d`" ])
 
 dnl
@@ -574,7 +574,7 @@ dnl  DVD module: optionally check for installed libdvdcss
 dnl
 AC_ARG_ENABLE(dvd,
 [  --enable-dvd            DVD input module (default enabled)])
-if test "x$enableval" != "xno"
+if test "x$enable_dvd" != "xno"
 then
   AC_ARG_WITH(dvdcss, 
   [    --with-dvdcss=PATH    libdvdcss headers and libraries])
@@ -645,13 +645,13 @@ if test "x$enable_dvdread" != "xno"
 then
   AC_ARG_WITH(dvdread, 
   [    --with-dvdread=PATH   libdvdread headers and libraries])
-  if test "x$withval" = x
+  if test "x$with_dvdread" = x
   then
     test_LDFLAGS=""
     test_CFLAGS=""
   else
-    test_LDFLAGS="-L${withval}/lib"
-    test_CFLAGS="-I${withval}/include"
+    test_LDFLAGS="-L${with_dvdread}/lib"
+    test_CFLAGS="-I${with_dvdread}/include"
   fi
   CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
   AC_CHECK_HEADERS(dvdread/dvd_reader.h, [
@@ -669,9 +669,9 @@ then
   ],[
     if test "x$enable_dvdread" != x
     then
-      if test "x$withval" != x
+      if test "x$with_dvdread" != x
       then
-        AC_MSG_ERROR([Cannot find dvdread/dvd_reader.h in ${withval}/include])
+        AC_MSG_ERROR([Cannot find dvdread/dvd_reader.h in ${with_dvdread}/include])
       else
         AC_MSG_ERROR([Cannot find dvdread/dvd_reader.h])
       fi
@@ -685,15 +685,15 @@ dnl  libdvbpsi ts demux
 dnl
 AC_ARG_ENABLE(dvbpsi,
 [  --enable-dvbpsi        dvbpsi ts demux module (default disabled)])
-if test "x$enable_dvdread" != "xno"
+if test "x$enable_dvbpsi" != "xno"
 then
-  if test "x$withval" = x
+  if test "x$with_dvbpsi" = x
   then
     test_LDFLAGS=""
     test_CFLAGS=""
   else
-    test_LDFLAGS="-L${withval}/lib"
-    test_CFLAGS="-I${withval}/include"
+    test_LDFLAGS="-L${with_dvbpsi}/lib"
+    test_CFLAGS="-I${with_dvbpsi}/include"
   fi
   CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
   AC_CHECK_HEADER([dvbpsi/dvbpsi.h],[
@@ -775,10 +775,10 @@ then
   mad_LDFLAGS="${mad_LDFLAGS} -lmad"
   AC_ARG_WITH(mad,
     [    --with-mad=PATH       path to libmad],
-    [ if test "x$with_val" != "xno" -a "x$with_val" != "x"
+    [ if test "x$with_mad" != "xno" -a "x$with_mad" != "x"
       then
-        mad_CFLAGS="${mad_CFLAGS} -I$with_val/include"
-        mad_LDFLAGS="${mad_LDFLAGS} -L$with_val/lib"
+        mad_CFLAGS="${mad_CFLAGS} -I$with_mad/include"
+        mad_LDFLAGS="${mad_LDFLAGS} -L$with_mad/lib"
       fi ])
   save_CFLAGS=$CFLAGS
   save_LDFLAGS=$LDFLAGS
@@ -801,7 +801,7 @@ dnl  ffmpeg decoder plugin
 dnl
 AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default disabled)])
-if test "x$enableval" = "xyes"
+if test "x$enable_ffmpeg" = "xyes"
 then
   AC_ARG_WITH(ffmpeg-tree, 
   [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
@@ -844,7 +844,7 @@ dnl  a52 AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
   [  --enable-a52            AC3 support with liba52 (default enabled)])
-if test "x$enableval" != "xno" -a x$SYS != xmingw32
+if test "x$enable_a52" != "xno" -a x$SYS != xmingw32
   then
     AC_CHECK_HEADERS(a52dec/a52.h, [
       BUILTINS="${BUILTINS} a52"
@@ -857,7 +857,7 @@ dnl  ogg vorbis plugin
 dnl
 AC_ARG_ENABLE(vorbis,
   [  --enable-vorbis         Ogg/Vorbis decoder support (default enabled)])
-if test "x$enableval" != "xno"
+if test "x$enable_vorbis" != "xno"
 then
   AC_CHECK_HEADERS(ogg/ogg.h, [
     dnl disabled for the moment
@@ -938,9 +938,9 @@ then
   SDL_PATH=$PATH
   AC_ARG_WITH(sdl-config-path,
     [    --with-sdl-config-path=PATH sdl-config path (default search in \$PATH)],
-    [ if test "x$withval" != "xno"
+    [ if test "x$with_sdl" != "xno"
       then
-        SDL_PATH=$withval:$PATH
+        SDL_PATH="$with_sdl:$PATH"
       fi ])
   AC_PATH_PROG(SDL12_CONFIG, sdl12-config, no, $SDL_PATH)
   SDL_CONFIG=${SDL12_CONFIG}
@@ -988,7 +988,7 @@ dnl  Windows DirectX module
 dnl
 AC_ARG_ENABLE(directx,
   [  --enable-directx        Win32 DirectX support (default enabled on Win32)])
-if test "x$enableval" != "xno"
+if test "x$enable_directx" != "xno"
 then
   if test x$SYS = xmingw32
   then
@@ -1000,16 +1000,16 @@ then
       [ PLUGINS="${PLUGINS} directx"
         directx_LDFLAGS="${directx_LDFLAGS} -lgdi32" ])
     else
-      AC_MSG_CHECKING(for directX headers in ${withval})
-      if test -f ${withval}/ddraw.h
+      AC_MSG_CHECKING(for directX headers in ${with_directx})
+      if test -f ${with_directx}/ddraw.h
       then
         PLUGINS="${PLUGINS} directx"
-        directx_LDFLAGS="${directx_LDFLAGS} -L${withval}/lib -lgdi32"
-        directx_CFLAGS="${directx_CFLAGS} -I${withval}"
+        directx_LDFLAGS="${directx_LDFLAGS} -L${with_directx}/lib -lgdi32"
+        directx_CFLAGS="${directx_CFLAGS} -I${with_directx}"
         AC_MSG_RESULT(yes)
       else
         AC_MSG_RESULT(no)
-        AC_MSG_ERROR([Cannot find ${withval}/ddraw.h!])
+        AC_MSG_ERROR([Cannot find ${with_directx}/ddraw.h!])
       fi
     fi
   fi
@@ -1048,10 +1048,10 @@ then
   ggi_LDFLAGS="${ggi_LDFLAGS} -lggi"
   AC_ARG_WITH(ggi,
     [    --with-ggi=PATH       path to libggi],
-    [ if test "x$with_val" != "xno" -a "x$with_val" != "x"
+    [ if test "x$with_ggi" != "xno" -a "x$with_ggi" != "x"
       then
-        CFLAGS_GGI="${CFLAGS_GGI} -I$with_val/include"
-        ggi_LDFLAGS="${ggi_LDFLAGS} -L$with_val/lib"
+        CFLAGS_GGI="${CFLAGS_GGI} -I$with_ggi/include"
+        ggi_LDFLAGS="${ggi_LDFLAGS} -L$with_ggi/lib"
       fi ])
 fi
 
@@ -1067,10 +1067,10 @@ then
   glide_CFLAGS="${glide_CFLAGS} -I/usr/include/glide"
   AC_ARG_WITH(glide,
     [    --with-glide=PATH     path to libglide],
-    [ if test "x$with_val" != "xno" -a "x$with_val" != "x"
+    [ if test "x$with_glide" != "xno" -a "x$with_glide" != "x"
       then
-        glide_CFLAGS="${glide_CFLAGS} -I$with_val/include"
-        glide_LDFLAGS="${glide_LDFLAGS} -L$with_val/lib"
+        glide_CFLAGS="${glide_CFLAGS} -I$with_glide/include"
+        glide_LDFLAGS="${glide_LDFLAGS} -L$with_glide/lib"
       fi ])
 fi
 
@@ -1162,7 +1162,7 @@ dnl  win32 waveOut plugin
 dnl
 AC_ARG_ENABLE(waveout,
   [  --enable-waveout        Win32 waveOut module (default enabled on Win32)])
-if test "x$enableval" != "xno" -a x$SYS = xmingw32
+if test "x$enable_waveout" != "xno" -a x$SYS = xmingw32
   then
     PLUGINS="${PLUGINS} waveout"
     waveout_LDFLAGS="-lwinmm"
@@ -1184,9 +1184,9 @@ then
   GTK_PATH=$PATH
   AC_ARG_WITH(gtk-config-path,
     [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
-    [ if test "x$withval" != "xno"
+    [ if test "x$with_gtk" != "xno"
       then
-        GTK_PATH=$withval:$PATH
+        GTK_PATH="$with_gtk:$PATH"
       fi ])
   # look for gtk-config
   AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, $GTK_PATH)
@@ -1318,7 +1318,7 @@ dnl  Windows native interface module, built with Borland C++ Builder
 dnl
 AC_ARG_ENABLE(intfwin,
 [  --enable-intfwin        Win32 interface support (default disabled)],
-[ if test "x$enableval" != "xno"
+[ if test "x$enable_intfwin" != "xno"
   then
     AC_ARG_WITH(bcbuilder, 
     [    --with-bcbuilder=PATH Borland C++ Builder installation path])
@@ -1364,7 +1364,7 @@ dnl  --with-words=big or --with-words=little ; otherwise, try to guess
 dnl
 AC_ARG_WITH(words,
   [  --with-words=endianness set endianness (big or little)])
-  case "x$withval" in
+  case "x$with_words" in
     xbig)
       ac_cv_c_bigendian=yes
       ;;
@@ -1421,12 +1421,12 @@ dnl
 GPROF=0
 AC_ARG_ENABLE(gprof,
 [  --enable-gprof          gprof profiling (default disabled)],
-[ if test x$enableval = xyes; then GPROF=1; fi ])
+[ if test "x$enable_gprof" = "xyes"; then GPROF=1; fi ])
 
 CPROF=0
 AC_ARG_ENABLE(cprof,
 [  --enable-cprof          cprof profiling (default disabled)],
-[ if test x$enableval = xyes;
+[ if test "x$enable_cprof" = "xyes";
   then
     LDFLAGS="${LDFLAGS} -lcprof"
     CPROF=1
@@ -1438,7 +1438,7 @@ dnl  GNU portable threads
 dnl
 AC_ARG_ENABLE(pth,
   [  --enable-pth            GNU Pth support (default disabled)],
-  [ if test x$enableval = xyes; then
+  [ if test "x$enable_pth" = "xyes"; then
     AC_CHECK_LIB(pth,pth_init)
     AC_EGREP_HEADER(pth_init,pth.h,[
       AC_DEFINE(PTH_INIT_IN_PTH_H, 1,
@@ -1452,7 +1452,7 @@ dnl  State Threads
 dnl
 AC_ARG_ENABLE(st,
   [  --enable-st             State Threads (default disabled)],
-  [ if test x$enableval = xyes; then
+  [ if test "x$enable_st" = "xyes"; then
     AC_CHECK_LIB(st,st_init)
     AC_EGREP_HEADER(st_init,st.h,[
       AC_DEFINE(ST_INIT_IN_ST_H, 1,

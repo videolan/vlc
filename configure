@@ -5700,8 +5700,8 @@ if test "${with_tuning+set}" = set; then
   :
 fi
 
-if test "x$withval" != "x"; then
-    TUNING=$withval
+if test "x$with_tuning" != "x"; then
+    TUNING="$with_tuning"
 else
     if test x${target_cpu} = xi686 -o x${target_cpu} = xi586 -o x${target_cpu} = xi486 -o x${target_cpu} = xi386; then TUNING="pentiumpro"
     else
@@ -5718,7 +5718,7 @@ fi
 # Check whether --enable-optimizations or --disable-optimizations was given.
 if test "${enable_optimizations+set}" = set; then
   enableval="$enable_optimizations"
-   if test x$enableval = xno; then OPTIMS=0; fi 
+   if test x$enable_optimizations = xno; then OPTIMS=0; fi 
 else
    OPTIMS=1 
 fi
@@ -5727,7 +5727,7 @@ fi
 # Check whether --enable-altivec or --disable-altivec was given.
 if test "${enable_altivec+set}" = set; then
   enableval="$enable_altivec"
-   if test x$enableval = xyes; then ARCH="${ARCH} altivec";
+   if test x$enable_altivec = xyes; then ARCH="${ARCH} altivec";
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi 
 else
    if test x${target_cpu} = xpowerpc; then ARCH="${ARCH} altivec";
@@ -5739,7 +5739,7 @@ DEBUG=0
 # Check whether --enable-debug or --disable-debug was given.
 if test "${enable_debug+set}" = set; then
   enableval="$enable_debug"
-   if test x$enableval = xyes; then DEBUG=1; fi 
+   if test x$enable_debug = xyes; then DEBUG=1; fi 
 fi
 
 
@@ -5747,7 +5747,7 @@ RELEASE=0
 # Check whether --enable-release or --disable-release was given.
 if test "${enable_release+set}" = set; then
   enableval="$enable_release"
-   if test x$enableval = xyes; then RELEASE=1; fi 
+   if test x$enable_release = xyes; then RELEASE=1; fi 
 else
    VERSION="${VERSION}_`date +%Y-%m-%d`" 
 fi
@@ -5767,7 +5767,7 @@ if test "${enable_dvd+set}" = set; then
   :
 fi
 
-if test "x$enableval" != "xno"
+if test "x$enable_dvd" != "xno"
 then
   # Check whether --with-dvdcss or --without-dvdcss was given.
 if test "${with_dvdcss+set}" = set; then
@@ -5885,13 +5885,13 @@ if test "${with_dvdread+set}" = set; then
   :
 fi
 
-  if test "x$withval" = x
+  if test "x$with_dvdread" = x
   then
     test_LDFLAGS=""
     test_CFLAGS=""
   else
-    test_LDFLAGS="-L${withval}/lib"
-    test_CFLAGS="-I${withval}/include"
+    test_LDFLAGS="-L${with_dvdread}/lib"
+    test_CFLAGS="-I${with_dvdread}/include"
   fi
   CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
   for ac_hdr in dvdread/dvd_reader.h
@@ -5961,9 +5961,9 @@ else
   echo "$ac_t""no" 1>&6
 if test "x$enable_dvdread" != x
     then
-      if test "x$withval" != x
+      if test "x$with_dvdread" != x
       then
-        { echo "configure: error: Cannot find dvdread/dvd_reader.h in ${withval}/include" 1>&2; exit 1; }
+        { echo "configure: error: Cannot find dvdread/dvd_reader.h in ${with_dvdread}/include" 1>&2; exit 1; }
       else
         { echo "configure: error: Cannot find dvdread/dvd_reader.h" 1>&2; exit 1; }
       fi
@@ -5981,15 +5981,15 @@ if test "${enable_dvbpsi+set}" = set; then
   :
 fi
 
-if test "x$enable_dvdread" != "xno"
+if test "x$enable_dvbpsi" != "xno"
 then
-  if test "x$withval" = x
+  if test "x$with_dvbpsi" = x
   then
     test_LDFLAGS=""
     test_CFLAGS=""
   else
-    test_LDFLAGS="-L${withval}/lib"
-    test_CFLAGS="-I${withval}/include"
+    test_LDFLAGS="-L${with_dvbpsi}/lib"
+    test_CFLAGS="-I${with_dvbpsi}/include"
   fi
   CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
   ac_safe=`echo "dvbpsi/dvbpsi.h" | sed 'y%./+-%__p_%'`
@@ -6165,10 +6165,10 @@ then
   # Check whether --with-mad or --without-mad was given.
 if test "${with_mad+set}" = set; then
   withval="$with_mad"
-   if test "x$with_val" != "xno" -a "x$with_val" != "x"
+   if test "x$with_mad" != "xno" -a "x$with_mad" != "x"
       then
-        mad_CFLAGS="${mad_CFLAGS} -I$with_val/include"
-        mad_LDFLAGS="${mad_LDFLAGS} -L$with_val/lib"
+        mad_CFLAGS="${mad_CFLAGS} -I$with_mad/include"
+        mad_LDFLAGS="${mad_LDFLAGS} -L$with_mad/lib"
       fi 
 fi
 
@@ -6279,7 +6279,7 @@ if test "${enable_ffmpeg+set}" = set; then
   :
 fi
 
-if test "x$enableval" = "xyes"
+if test "x$enable_ffmpeg" = "xyes"
 then
   # Check whether --with-ffmpeg-tree or --without-ffmpeg-tree was given.
 if test "${with_ffmpeg_tree+set}" = set; then
@@ -6324,7 +6324,7 @@ if test "${enable_a52+set}" = set; then
   :
 fi
 
-if test "x$enableval" != "xno" -a x$SYS != xmingw32
+if test "x$enable_a52" != "xno" -a x$SYS != xmingw32
   then
     for ac_hdr in a52dec/a52.h
 do
@@ -6377,7 +6377,7 @@ if test "${enable_vorbis+set}" = set; then
   :
 fi
 
-if test "x$enableval" != "xno"
+if test "x$enable_vorbis" != "xno"
 then
   for ac_hdr in ogg/ogg.h
 do
@@ -6616,9 +6616,9 @@ then
   # Check whether --with-sdl-config-path or --without-sdl-config-path was given.
 if test "${with_sdl_config_path+set}" = set; then
   withval="$with_sdl_config_path"
-   if test "x$withval" != "xno"
+   if test "x$with_sdl" != "xno"
       then
-        SDL_PATH=$withval:$PATH
+        SDL_PATH="$with_sdl:$PATH"
       fi 
 fi
 
@@ -6815,7 +6815,7 @@ if test "${enable_directx+set}" = set; then
   :
 fi
 
-if test "x$enableval" != "xno"
+if test "x$enable_directx" != "xno"
 then
   if test x$SYS = xmingw32
   then
@@ -6869,17 +6869,17 @@ fi
 done
 
     else
-      echo $ac_n "checking for directX headers in ${withval}""... $ac_c" 1>&6
-echo "configure:6874: checking for directX headers in ${withval}" >&5
-      if test -f ${withval}/ddraw.h
+      echo $ac_n "checking for directX headers in ${with_directx}""... $ac_c" 1>&6
+echo "configure:6874: checking for directX headers in ${with_directx}" >&5
+      if test -f ${with_directx}/ddraw.h
       then
         PLUGINS="${PLUGINS} directx"
-        directx_LDFLAGS="${directx_LDFLAGS} -L${withval}/lib -lgdi32"
-        directx_CFLAGS="${directx_CFLAGS} -I${withval}"
+        directx_LDFLAGS="${directx_LDFLAGS} -L${with_directx}/lib -lgdi32"
+        directx_CFLAGS="${directx_CFLAGS} -I${with_directx}"
         echo "$ac_t""yes" 1>&6
       else
         echo "$ac_t""no" 1>&6
-        { echo "configure: error: Cannot find ${withval}/ddraw.h!" 1>&2; exit 1; }
+        { echo "configure: error: Cannot find ${with_directx}/ddraw.h!" 1>&2; exit 1; }
       fi
     fi
   fi
@@ -6960,10 +6960,10 @@ then
   # Check whether --with-ggi or --without-ggi was given.
 if test "${with_ggi+set}" = set; then
   withval="$with_ggi"
-   if test "x$with_val" != "xno" -a "x$with_val" != "x"
+   if test "x$with_ggi" != "xno" -a "x$with_ggi" != "x"
       then
-        CFLAGS_GGI="${CFLAGS_GGI} -I$with_val/include"
-        ggi_LDFLAGS="${ggi_LDFLAGS} -L$with_val/lib"
+        CFLAGS_GGI="${CFLAGS_GGI} -I$with_ggi/include"
+        ggi_LDFLAGS="${ggi_LDFLAGS} -L$with_ggi/lib"
       fi 
 fi
 
@@ -6983,10 +6983,10 @@ then
   # Check whether --with-glide or --without-glide was given.
 if test "${with_glide+set}" = set; then
   withval="$with_glide"
-   if test "x$with_val" != "xno" -a "x$with_val" != "x"
+   if test "x$with_glide" != "xno" -a "x$with_glide" != "x"
       then
-        glide_CFLAGS="${glide_CFLAGS} -I$with_val/include"
-        glide_LDFLAGS="${glide_LDFLAGS} -L$with_val/lib"
+        glide_CFLAGS="${glide_CFLAGS} -I$with_glide/include"
+        glide_LDFLAGS="${glide_LDFLAGS} -L$with_glide/lib"
       fi 
 fi
 
@@ -7331,7 +7331,7 @@ if test "${enable_waveout+set}" = set; then
   :
 fi
 
-if test "x$enableval" != "xno" -a x$SYS = xmingw32
+if test "x$enable_waveout" != "xno" -a x$SYS = xmingw32
   then
     PLUGINS="${PLUGINS} waveout"
     waveout_LDFLAGS="-lwinmm"
@@ -7357,9 +7357,9 @@ then
   # Check whether --with-gtk-config-path or --without-gtk-config-path was given.
 if test "${with_gtk_config_path+set}" = set; then
   withval="$with_gtk_config_path"
-   if test "x$withval" != "xno"
+   if test "x$with_gtk" != "xno"
       then
-        GTK_PATH=$withval:$PATH
+        GTK_PATH="$with_gtk:$PATH"
       fi 
 fi
 
@@ -7753,7 +7753,7 @@ done
 # Check whether --enable-intfwin or --disable-intfwin was given.
 if test "${enable_intfwin+set}" = set; then
   enableval="$enable_intfwin"
-   if test "x$enableval" != "xno"
+   if test "x$enable_intfwin" != "xno"
   then
     # Check whether --with-bcbuilder or --without-bcbuilder was given.
 if test "${with_bcbuilder+set}" = set; then
@@ -7882,7 +7882,7 @@ if test "${with_words+set}" = set; then
   :
 fi
 
-  case "x$withval" in
+  case "x$with_words" in
     xbig)
       ac_cv_c_bigendian=yes
       ;;
@@ -7943,7 +7943,7 @@ GPROF=0
 # Check whether --enable-gprof or --disable-gprof was given.
 if test "${enable_gprof+set}" = set; then
   enableval="$enable_gprof"
-   if test x$enableval = xyes; then GPROF=1; fi 
+   if test "x$enable_gprof" = "xyes"; then GPROF=1; fi 
 fi
 
 
@@ -7951,7 +7951,7 @@ CPROF=0
 # Check whether --enable-cprof or --disable-cprof was given.
 if test "${enable_cprof+set}" = set; then
   enableval="$enable_cprof"
-   if test x$enableval = xyes;
+   if test "x$enable_cprof" = "xyes";
   then
     LDFLAGS="${LDFLAGS} -lcprof"
     CPROF=1
@@ -7963,7 +7963,7 @@ fi
 # Check whether --enable-pth or --disable-pth was given.
 if test "${enable_pth+set}" = set; then
   enableval="$enable_pth"
-   if test x$enableval = xyes; then
+   if test "x$enable_pth" = "xyes"; then
     echo $ac_n "checking for pth_init in -lpth""... $ac_c" 1>&6
 echo "configure:7969: checking for pth_init in -lpth" >&5
 ac_lib_var=`echo pth'_'pth_init | sed 'y%./+-%__p_%'`
@@ -8036,7 +8036,7 @@ fi
 # Check whether --enable-st or --disable-st was given.
 if test "${enable_st+set}" = set; then
   enableval="$enable_st"
-   if test x$enableval = xyes; then
+   if test "x$enable_st" = "xyes"; then
     echo $ac_n "checking for st_init in -lst""... $ac_c" 1>&6
 echo "configure:8042: checking for st_init in -lst" >&5
 ac_lib_var=`echo st'_'st_init | sed 'y%./+-%__p_%'`
