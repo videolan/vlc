@@ -1,3 +1,14 @@
+vlc (0.5.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Removed vlc-plugin-dvb, vlc-plugin-xosd, vlc-plugin-aa, vlc-plugin-lirc and
+    vlc-plugin-dv packages because the dependencies are quite small, and merged
+    them into the main vlc package.
+  * Removed the vlc-mad, vlc-arts, vlc-lirc and vlc-aa legacy packages because
+    they were not in woody.
+
+ -- Samuel Hocevar <sam@zoy.org>  Tue, 11 Mar 2003 20:32:36 +0100
+
 vlc (0.5.1-1) unstable; urgency=low
 
   * New upstream release.

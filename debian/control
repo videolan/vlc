@@ -13,6 +13,7 @@ Recommends: vlc-gui
 Suggests: gnome-vlc
 Replaces: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
 Conflicts: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
+Provides: mp3-decoder
 Description: a complete multimedia player
  This is the VideoLAN project's VLC media player. It plays MPEG, MPEG2,
  MPEG4, DivX, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia streams
