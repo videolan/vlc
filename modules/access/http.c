@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.42 2003/08/01 09:45:34 sam Exp $
+ * $Id: http.c,v 1.43 2003/08/02 19:30:35 bigben Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -606,7 +606,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Handle autehtification */
 
-    if ( psz_user == NULL )
+   if ( !psz_user )
     {
         var_Create( p_input, "http-user", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         var_Get( p_input, "http-user", &val );
@@ -617,7 +617,7 @@ static int Open( vlc_object_t *p_this )
         psz_pwd = val.psz_string;
     }
 
-    if (psz_user != NULL)
+    if ( *psz_user )
     {
         char psz_user_pwd[MAX_QUERY_SIZE];
         msg_Dbg( p_input, "authenticating, user=%s, password=%s",
