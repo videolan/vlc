@@ -32,7 +32,9 @@ AC_PROG_CPP
 AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
-AC_PROG_EGREP
+
+dnl AC_PROG_EGREP only exists in autoconf 2.54+
+AC_EGREP_CPP(foo,foo)
 
 dnl AC_PROG_OBJC doesn't seem to exist, this is the KDE workaround
 AC_MSG_CHECKING(for an Objective-C compiler)
