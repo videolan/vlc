@@ -77,6 +77,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_url      = sout_cfg_find_value( p_stream->p_cfg, "url" );
     char *psz_ipv      = sout_cfg_find_value( p_stream->p_cfg, "sap_ipv" );
     char *psz_v6_scope = sout_cfg_find_value( p_stream->p_cfg, "sap_v6scope" );
+    char *psz_sdp      = NULL;
 
     sout_cfg_t *p_sap_cfg = sout_cfg_find( p_stream->p_cfg, "sap" );
 #ifdef HAVE_SLP_H
@@ -255,9 +256,10 @@ static int Open( vlc_object_t *p_this )
         }
         msg_Dbg( p_sout , "Creating SAP with IPv%i", atoi(psz_ipv) );
 
-        p_sap = sout_SAPNew( p_sout , psz_url ,
-            p_sap_cfg->psz_value ? p_sap_cfg->psz_value : psz_url,
-            atoi(psz_ipv), psz_v6_scope );
+        psz_sdp = SDPGenerateUDP(p_sap_cfg->psz_value ? p_sap_cfg->psz_value :
+                    psz_url, psz_url);
+
+        p_sap = sout_SAPNew( p_sout , psz_sdp,atoi(psz_ipv), psz_v6_scope );
 
         if( !p_sap )
             msg_Err( p_sout,"Unable to initialize SAP. SAP disabled");

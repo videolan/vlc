@@ -59,87 +59,96 @@
 #define SAP_IPV6_ADDR_1 "FF0"
 #define SAP_IPV6_ADDR_2 "::2:7FFE"
 
-#define DEFAULT_PORT "1234"
+#define DEFAULT_PORT 1234
 
-/****************************************************************************
- *  Split : split a string into two parts: the one which is before the delim
- *               and the one which is after.
- *               NULL is returned if delim is not found
- ****************************************************************************/
-static char * split( char *psz_in, char *psz_out1, char *psz_out2, char delim)
+
+/*****************************************************************************
+ * SDPGenerateUDP: create a SDP file
+ *****************************************************************************/
+char * SDPGenerateUDP(char * psz_name_arg,char * psz_url_arg)
 {
-    unsigned int i_count = 0; /* pos in input string */
-    unsigned int i_pos1  = 0; /* pos in out2 string */
-    unsigned int i_pos2  = 0;
-    char *psz_cur; /* store the pos of the first delim found */
+    /* Create the SDP content */
+    /* Do not add spaces at beginning of the lines ! */
 
-    /* Skip spaces at the beginning */
-    while( psz_in[i_count] == ' ' )
-    {
-        i_count++;
-    }
+    char                * psz_sdp;
+    vlc_url_t           * p_url; /*where parsed url will be stored*/
 
-    if( psz_in[i_count] == '\0' )
+
+    /*Allocate the URL structure*/
+    p_url = (vlc_url_t *) malloc( sizeof( vlc_url_t) );
+    if ( ! p_url )
     {
         return NULL;
     }
 
-    /* Look for delim */
-    while( psz_in[i_count] && psz_in[i_count] != delim )
-    {
-        psz_out1[i_pos1] = psz_in[i_count];
-        i_count++;
-        i_pos1++;
-    }
-    /* Mark the end of out1 */
-    psz_out1[i_pos1] = '\0';
 
-    if( psz_in[i_count] == '\0' )
+    vlc_UrlParse( p_url, psz_url_arg , 0);
+
+    if (!p_url->psz_host)
     {
         return NULL;
     }
 
-    /* store pos of the first delim */
-    psz_cur = psz_in + i_count;
-
-    /* skip all delim and all spaces */
-    while( psz_in[i_count] == ' ' || psz_in[i_count] == delim )
+    if(p_url->i_port == 0)
     {
-        i_count++;
+        p_url->i_port = DEFAULT_PORT;
     }
 
-    if( psz_in[i_count] == '\0' )
+    psz_sdp = malloc( sizeof("v=0\n"
+                   "o=VideoLAN 3247692199 3247895918 IN IP4 VideoLAN\n"
+                   "s=\n"
+                   "u=VideoLAN\n"
+                   "t=0 0\n"
+                   "m=video  udp 33\n"
+                   "c=IN IP4 /15\n"
+                   "a=type:test\n")
+           + strlen(psz_name_arg)
+           + 20                             /*lengh of a 64 bits int"*/
+           + strlen(p_url->psz_host)+1);
+
+
+    if ( !psz_sdp )
     {
-        return psz_cur;
+        return NULL;
     }
 
-    /* Store the second string */
-    while( psz_in[i_count] )
-    {
-        psz_out2[i_pos2] = psz_in[i_count];
-        i_pos2++;
-        i_count++;
-    }
-    psz_out2[i_pos2] = '\0';
+    sprintf( psz_sdp,"v=0\n"
+                      "o=VideoLAN 3247692199 3247895918 IN IP4 VideoLAN\n"
+                      "s=%s\n"
+                      "u=VideoLAN\n"
+                      "t=0 0\n"
+                      "m=video %i udp 33\n"
+                      "c=IN IP4 %s/15\n"
+                      "a=type:test\n",
+             psz_name_arg, p_url->i_port, p_url->psz_host );
 
-    return psz_cur;
+    vlc_UrlClean( p_url );
+
+    if (p_url)
+    {
+        free(p_url);
+    }
+
+    p_url = NULL;
+
+    return psz_sdp;
 }
+
 
 /*****************************************************************************
  * sout_SAPNew: Creates a SAP Session
  *****************************************************************************/
 sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
-                                     char * psz_url_arg,
-                                     char * psz_name_arg,
+                                     char * psz_sdp_arg,
                                      int ip_version,
                                      char * psz_v6_scope )
 {
     sap_session_t       *p_sap; /* The SAP structure */
-    module_t            *p_network; /* Network module */
-    network_socket_t    socket_desc; /* Socket descriptor */
     char                *sap_ipv6_addr = NULL; /* IPv6 built address */
-    char                *psz_eol; /* Used to parse IPv6 URIs */
-    int                 i_port; /* Port in numerical format */
+    vlc_value_t         val;
+
+    var_Create( p_sout, "ipv6", VLC_VAR_BOOL );
+    var_Create( p_sout, "ipv4", VLC_VAR_BOOL );
 
     /* Allocate the SAP structure */
     p_sap = (sap_session_t *) malloc( sizeof ( sap_session_t ) ) ;
@@ -149,97 +158,29 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
         return NULL;
     }
 
-    /* Fill the information in the structure */
-    if( strstr( psz_url_arg, "[" ) )
-    {
-        /* We have an IPv6 address. Do not use ':' as the port separator */
-        psz_eol = strchr( psz_url_arg, ']' );
-        if( !psz_eol )
-        {
-            msg_Warn( p_sout, "no matching ], unable to parse URI");
-            return NULL;
-        }
+    p_sap->i_socket = 0;
 
-        if( !psz_eol++ )
-        {
-            sprintf( p_sap->psz_url, "%s", psz_url_arg );
-            sprintf( p_sap->psz_port, "%s", DEFAULT_PORT );
-        }
-        else
-        {
-            *psz_eol = '\0';
-            sprintf( p_sap->psz_url, "%s", psz_url_arg );
-            psz_eol++;
-            if( psz_eol )
-            {
-                sprintf( p_sap->psz_port, "%s", psz_eol );
-            }
-        }
-    }
-    else
-    {
-        split( psz_url_arg, p_sap->psz_url, p_sap->psz_port, ':' );
-    }
-
-    /* Check if we have a port */
-    if( !strlen( p_sap->psz_port ) )
-    {
-        sprintf( p_sap->psz_port, "%s", DEFAULT_PORT );
-    }
-
-    /* Make sure our port is valid and atoi it */
-    i_port = atoi( p_sap->psz_port );
-
-    if( !i_port )
-    {
-        sprintf( p_sap->psz_port, "%s", DEFAULT_PORT );
-    }
-    else
-    {
-        sprintf( p_sap->psz_port, "%i", i_port );
-    }
-
-    /* The name that we send */
-    sprintf( p_sap->psz_name, "%s", psz_name_arg );
+    p_sap->psz_sdp=NULL;
 
     p_sap->i_ip_version = ip_version;
 
-    /* Only "6" triggers IPv6. IPv4 is default */
+    p_sap->psz_sdp = psz_sdp_arg;
+
     if( ip_version != 6 )
     {
-        msg_Dbg( p_sout, "creating IPv4 SAP socket" );
-
-        /* Fill the socket descriptor */
-        socket_desc.i_type            = NETWORK_UDP;
-        socket_desc.psz_bind_addr     = "";
-        socket_desc.i_bind_port       = 0;
-        socket_desc.psz_server_addr   = SAP_IPV4_ADDR;
-        socket_desc.i_server_port     = SAP_PORT;
-        socket_desc.i_handle          = 0;
-        socket_desc.i_ttl             = 0;
-
-        /* Call the network module */
-        p_sout->p_private = (void*) &socket_desc;
-        if( !( p_network = module_Need(p_sout, "network", "ipv4", VLC_TRUE) ) )
-        {
-             msg_Warn( p_sout, "failed to open a connection (udp)" );
-             return NULL;
-        }
-        module_Unneed( p_sout, p_network );
-
-        p_sap->i_socket = socket_desc.i_handle;
-        if( p_sap->i_socket < 0 )
-        {
-            msg_Warn( p_sout, "unable to initialize SAP" );
-            return NULL;
-        }
+        val.b_bool = VLC_FALSE;
+        var_Set( p_sout, "ipv6", val);
+        val.b_bool = VLC_TRUE;
+        var_Set( p_sout, "ipv4", val);
+        p_sap->i_socket = net_OpenUDP(p_sout, "", 0, SAP_IPV4_ADDR, SAP_PORT );
     }
     else
     {
-        msg_Dbg( p_sout, "creating IPv6 SAP socket with scope %s",
-                         psz_v6_scope );
+        val.b_bool = VLC_TRUE;
+        var_Set( p_sout, "ipv6", val);
+        val.b_bool = VLC_FALSE;
+        var_Set( p_sout, "ipv4", val);
 
-        /* Initialize and build the IPv6 address to broadcast to */
         sap_ipv6_addr = (char *) malloc( 28 * sizeof(char) );
         if ( !sap_ipv6_addr )
         {
@@ -249,37 +190,21 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
         sprintf( sap_ipv6_addr, "%s%c%s",
                  SAP_IPV6_ADDR_1, psz_v6_scope[0], SAP_IPV6_ADDR_2 );
 
-        /* Fill the socket descriptor */
-        socket_desc.i_type          = NETWORK_UDP;
-        socket_desc.psz_bind_addr   = "";
-        socket_desc.i_bind_port     = 0;
-        socket_desc.psz_server_addr = sap_ipv6_addr;
-        socket_desc.i_server_port   = SAP_PORT;
-        socket_desc.i_handle        = 0;
-        socket_desc.i_ttl           = 0;
+        p_sap->i_socket = net_OpenUDP(p_sout, "", 0, sap_ipv6_addr, SAP_PORT );
 
-        /* Call the network module */
-        p_sout->p_private = (void *) &socket_desc;
-        if( !( p_network = module_Need(p_sout, "network", "ipv6", VLC_TRUE) ) )
-        {
-            msg_Warn( p_sout, "failed to open a connection (udp)" );
-            return NULL;
-        }
-        module_Unneed( p_sout, p_network );
-
-        p_sap->i_socket = socket_desc.i_handle;
-        if( p_sap->i_socket <= 0 )
-        {
-            msg_Warn( p_sout, "unable to initialize SAP" );
-            return NULL;
-        }
-
-        /* Free what we allocated */
         if( sap_ipv6_addr )
         {
             free( sap_ipv6_addr );
         }
     }
+
+    if((int)p_sap->i_socket <= 0)
+    {
+        msg_Warn(p_sout, "invalid SAP socket");
+        return NULL;
+    }
+
+        /* Free what we allocated */
 
     msg_Dbg( p_sout, "SAP initialization complete" );
 
@@ -306,6 +231,12 @@ void sout_SAPDelete( sout_instance_t *p_sout, sap_session_t * p_sap )
         msg_Err( p_sout, "unable to close SAP socket" );
     }
 
+    if (p_sap->psz_sdp)
+    {
+        free(p_sap->psz_sdp);
+        p_sap->psz_sdp = NULL;
+    }
+
     free( p_sap );
 }
 
@@ -314,7 +245,7 @@ void sout_SAPDelete( sout_instance_t *p_sout, sap_session_t * p_sap )
  *****************************************************************************/
 void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_sap )
 {
-    char psz_msg[1000];                     /* SDP content */
+    char *psz_msg;                     /* SDP content */
     char *psz_head;                         /* SAP header */
     char *psz_send;                         /* What we send */
     char *psz_type = "application/sdp";
@@ -352,17 +283,13 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_sap )
     strncpy( psz_head + 8, psz_type, 15 );
     psz_head[ i_header_size-1 ] = '\0';
 
-    /* Create the SDP content */
-    /* Do not add spaces at beginning of the lines ! */
-    sprintf( psz_msg, "v=0\n"
-                      "o=VideoLAN 3247692199 3247895918 IN IP4 VideoLAN\n"
-                      "s=%s\n"
-                      "u=VideoLAN\n"
-                      "t=0 0\n"
-                      "m=video %s udp 33\n"
-                      "c=IN IP4 %s/15\n"
-                      "a=type:test\n",
-             p_sap->psz_name, p_sap->psz_port, p_sap->psz_url );
+    psz_msg = p_sap->psz_sdp;
+
+    if(!psz_msg)
+    {
+        msg_Err( p_sout, "no sdp packet" );
+        return;
+    }
 
     i_msg_size = strlen( psz_msg );
     i_size = i_msg_size + i_header_size;
@@ -380,7 +307,7 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_sap )
 
     if( i_size < 1024 ) /* We mustn't send packets larger than 1024B */
     {
-        i_ret = send( p_sap->i_socket, psz_send, i_size, 0 );
+        i_ret = net_Write(p_sout, p_sap->i_socket, psz_send, i_size );
     }
 
     if( i_ret <= 0 )

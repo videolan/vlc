@@ -2,7 +2,7 @@
  * announce.h : Session announcement
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: announce.h,v 1.1 2003/08/14 20:02:55 zorglub Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -53,9 +53,7 @@
  *****************************************************************************/
 struct sap_session_t
 {
-        char psz_url[256];
-        char psz_name[1024];
-        char psz_port[8];
+        char * psz_sdp;
         module_t p_network;
         unsigned int i_socket;
         unsigned int i_calls;
@@ -77,13 +75,14 @@ typedef struct slp_session_t slp_session_t;
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+
+char * SDPGenerateUDP(char * ,char *);
 sap_session_t *  sout_SAPNew        (sout_instance_t *,
-                                     char *, char* , int, char *);
+                                     char* , int, char *);
 void             sout_SAPDelete     (sout_instance_t *,sap_session_t*);
 void             sout_SAPSend       (sout_instance_t *,sap_session_t *);
 int              sout_SLPReg        (sout_instance_t *,char *,char *);
 int              sout_SLPDereg      (sout_instance_t *,char *,char *);
-
 
 /*
 VLC_EXPORT( sap_session_t *, sout_SAPNew, ( sout_instance_t *,char * , char * , int , char *) );
