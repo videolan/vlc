@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.26 2003/12/08 13:02:40 gbazin Exp $
+ * $Id: ogg.c,v 1.27 2003/12/14 18:44:50 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -355,15 +355,18 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     case VIDEO_ES:
         switch( p_stream->i_fourcc )
         {
-        case VLC_FOURCC( 'm', 'p','g', 'v' ):
-        case VLC_FOURCC( 'm', 'p','4', 'v' ):
-        case VLC_FOURCC( 'D', 'I','V', '3' ):
+        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+        case VLC_FOURCC( 'm', 'p', '4', 'v' ):
+        case VLC_FOURCC( 'D', 'I', 'V', '3' ):
+        case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
+        case VLC_FOURCC( 'W', 'M', 'V', '1' ):
+        case VLC_FOURCC( 'W', 'M', 'V', '2' ):
             memcpy( p_stream->oggds_header.stream_type, "video", 5 );
-            if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p','4', 'v' ) )
+            if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) )
             {
                 memcpy( p_stream->oggds_header.sub_type, "XVID", 4 );
             }
-            else if( p_stream->i_fourcc == VLC_FOURCC( 'D', 'I','V', '3' ) )
+            else if( p_stream->i_fourcc == VLC_FOURCC( 'D', 'I', 'V', '3' ) )
             {
                 memcpy( p_stream->oggds_header.sub_type, "DIV3", 4 );
             }
@@ -383,7 +386,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                      p_input->p_fmt->video.i_width );
             SetDWLE( &p_stream->oggds_header.header.video.i_height,
                      p_input->p_fmt->video.i_height );
-            msg_Dbg( p_mux, "mp4v/div3 stream" );
+            msg_Dbg( p_mux, "%4.4s stream", (char *)&p_stream->i_fourcc );
             break;
 
         case VLC_FOURCC( 't', 'h', 'e', 'o' ):
@@ -399,14 +402,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     case AUDIO_ES:
         switch( p_stream->i_fourcc )
         {
-        case VLC_FOURCC( 'm', 'p','g', 'a' ):
-        case VLC_FOURCC( 'a', '5','2', ' ' ):
+        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+        case VLC_FOURCC( 'a', '5', '2', ' ' ):
             memcpy( p_stream->oggds_header.stream_type, "audio", 5 );
-            if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p','g', 'a' ) )
+            if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p', 'g', 'a' ) )
             {
                 memcpy( p_stream->oggds_header.sub_type, "55  ", 4 );
             }
-            else if( p_stream->i_fourcc == VLC_FOURCC( 'a', '5','2', ' ' ) )
+            else if( p_stream->i_fourcc == VLC_FOURCC( 'a', '5', '2', ' ' ) )
             {
                 memcpy( p_stream->oggds_header.sub_type, "2000", 4 );
             }
