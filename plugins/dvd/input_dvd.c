@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.108 2001/12/19 18:14:23 sam Exp $
+ * $Id: input_dvd.c,v 1.109 2001/12/19 23:19:20 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -955,6 +955,7 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
                 /* MPEG-2 Pack header. */
                 i_packet_size = 8;
             }
+
             if( i_pos != 0 )
             {
                 pp_packets[i_packet] = input_ShareBuffer( 

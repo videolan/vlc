@@ -36,7 +36,6 @@
 /******************************************************************************
 * Prototypes                                                                  *
 ******************************************************************************/
-
-int read_toc ( struct thread_vcd_data_s *);
-int VCD_sector_read ( struct thread_vcd_data_s *, byte_t *) ;
+int VCDReadToc    ( struct thread_vcd_data_s * );
+int VCDReadSector ( struct thread_vcd_data_s *, byte_t * );
 

@@ -70,16 +70,13 @@
 #include "modules.h"
 #include "modules_export.h"
 
-#include "../mpeg_system/input_ps.h"
 #include "input_vcd.h"
 #include "linux_cdrom_tools.h"
 
 /* how many blocks VCDRead will read in each loop */
-#define VCD_BLOCKS_ONCE 64
-#define VCD_DATA_ONCE  (2 * VCD_BLOCKS_ONCE)
+#define VCD_BLOCKS_ONCE 4
+#define VCD_DATA_ONCE   (2 * VCD_BLOCKS_ONCE)
 #define BUFFER_SIZE VCD_DATA_SIZE
-
-
 
 /*****************************************************************************
  * Local prototypes
@@ -88,10 +85,10 @@
 static int  VCDProbe        ( probedata_t *p_data );
 static void VCDInit         ( struct input_thread_s * );
 static int  VCDRead         ( struct input_thread_s *, data_packet_t ** );
-static int  VCDSetArea      ( struct input_thread_s *, struct input_area_s * ); 
-static int  VCDSetProgram   ( struct input_thread_s *, pgrm_descriptor_t * ); 
+static int  VCDSetArea      ( struct input_thread_s *, struct input_area_s * );
+static int  VCDSetProgram   ( struct input_thread_s *, pgrm_descriptor_t * );
 static void VCDOpen         ( struct input_thread_s *);
-static void VCDClose         ( struct input_thread_s *);
+static void VCDClose        ( struct input_thread_s *);
 static void VCDEnd          ( struct input_thread_s *);
 static void VCDSeek         ( struct input_thread_s *, off_t );
 static int  VCDRewind       ( struct input_thread_s * );
@@ -145,7 +142,6 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int VCDProbe( probedata_t *p_data )
 {
-    
     input_thread_t * p_input = (input_thread_t *)p_data;
 
     char * psz_name = p_input->p_source;
@@ -162,6 +158,7 @@ static int VCDProbe( probedata_t *p_data )
         i_score = 100;
         psz_name += 4;
     }
+
     return( i_score );
 }
 
@@ -170,8 +167,6 @@ static int VCDProbe( probedata_t *p_data )
  *****************************************************************************/
 static void VCDOpen( struct input_thread_s *p_input )
 {
-    int vcdhandle;
-
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     /* If we are here we can control the pace... */
@@ -179,30 +174,27 @@ static void VCDOpen( struct input_thread_s *p_input )
 
     p_input->stream.b_seekable = 1;
     p_input->stream.p_selected_area->i_size = 0;
-
     p_input->stream.p_selected_area->i_tell = 0;
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
-    
+
     /* XXX: put this shit in an access plugin */
     if( strlen( p_input->p_source ) > 4
          && !strncasecmp( p_input->p_source, "vcd:", 4 ) )
     {
-        vcdhandle = open( p_input->p_source + 4, O_RDONLY | O_NONBLOCK );
+        p_input->i_handle
+            = open( p_input->p_source + 4, O_RDONLY | O_NONBLOCK );
     }
     else
     {
-        vcdhandle = open( p_input->p_source + 4, O_RDONLY | O_NONBLOCK );
+        p_input->i_handle
+            = open( p_input->p_source + 4, O_RDONLY | O_NONBLOCK );
     }
 
-    if( vcdhandle == -1 )
+    if( p_input->i_handle == -1 )
     {
         p_input->b_error = 1;
-        return;
     }
-
-    p_input->i_handle = (int) vcdhandle;
 }
 
 /*****************************************************************************
@@ -224,9 +216,9 @@ static void VCDInit( input_thread_t * p_input )
     int                  i;
     input_area_t *       p_area;
     es_descriptor_t *    p_es;
-    
+
     p_vcd = malloc( sizeof(thread_vcd_data_t) );
-        
+
     if( p_vcd == NULL )
     {
         intf_ErrMsg( "vcd error: out of memory" );
@@ -242,17 +234,17 @@ static void VCDInit( input_thread_t * p_input )
         return;
     }
 
-    p_vcd->vcdhandle = p_input->i_handle;
+    p_vcd->i_handle = p_input->i_handle;
     p_vcd->b_end_of_track = 0;
 
     /* we read the Table Of Content information */
-    if ( read_toc(p_vcd) == -1 )
+    if ( VCDReadToc( p_vcd ) == -1 )
     {
-        intf_ErrMsg("An error occured when reading vcd's TOC");
+        intf_ErrMsg( "vcd error: could not read TOC" );
     }
-    
+
     p_input->i_read_once = VCD_DATA_ONCE;
-    
+
     /* Set stream and area data */
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -272,8 +264,8 @@ static void VCDInit( input_thread_t * p_input )
         area[i]->i_id = i;
 
         /* Absolute start offset and size */
-        area[i]->i_start = p_vcd->tracks_sector[i];
-        area[i]->i_size = p_vcd->tracks_sector[i+1] - p_vcd->tracks_sector[i];
+        area[i]->i_start = p_vcd->p_sectors[i];
+        area[i]->i_size = p_vcd->p_sectors[i+1] - p_vcd->p_sectors[i];
 
         /* Number of chapters */
         area[i]->i_part_nb = 0;   // will be the entry points
@@ -283,19 +275,19 @@ static void VCDInit( input_thread_t * p_input )
         area[i]->i_angle_nb = 1; // no angle support in VCDs
         area[i]->i_angle = 1;
 
-        area[i]->i_plugin_data = p_vcd->tracks_sector[i];
-    }   
+        area[i]->i_plugin_data = p_vcd->p_sectors[i];
+    }
 #undef area
 
     /* Get requested title - if none try the first title */
     i_title = main_GetIntVariable( INPUT_TITLE_VAR, 1 );
-    if( i_title <= 0)
+    if( i_title <= 0 )
     {
         i_title = 1;
     }
-    
-    // p_vcd->current_track = i_title-1 ;
-    
+
+    // p_vcd->i_track = i_title-1;
+
     /* Get requested chapter - if none defaults to first one */
     i_chapter = main_GetIntVariable( INPUT_CHAPTER_VAR, 1 );
     if( i_chapter <= 0 )
@@ -303,7 +295,6 @@ static void VCDInit( input_thread_t * p_input )
         i_chapter = 1;
     }
 
-    
     p_input->stream.pp_areas[i_title]->i_part = i_chapter;
 
     p_area = p_input->stream.pp_areas[i_title];
@@ -322,30 +313,26 @@ static void VCDInit( input_thread_t * p_input )
     p_es->i_stream_id = 0xe0;
     p_es->i_type = MPEG1_VIDEO_ES;
     p_es->i_cat = VIDEO_ES;
-    
+
     if( p_main->b_video )
     {
         input_SelectES( p_input, p_es );
     }
-    
+
     p_es = input_AddES( p_input,
                 p_input->stream.p_selected_program, 0xc0, 0 );
     p_es->i_stream_id = 0xc0;
     p_es->i_type = MPEG1_AUDIO_ES;
     p_es->b_audio = 1;
     p_es->i_cat = AUDIO_ES;
-     
+
     if( p_main->b_audio )
     {
         input_SelectES( p_input, p_es );
     }
-    
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    
-    return;
 }
-
 
 /*****************************************************************************
  * VCDEnd: frees unused data
@@ -364,8 +351,8 @@ static void VCDEnd( input_thread_t * p_input )
 /*****************************************************************************
  * VCDSetProgram: Does nothing since a VCD is mono_program
  *****************************************************************************/
-static int VCDSetProgram( input_thread_t * p_input, 
-            pgrm_descriptor_t * p_program)
+static int VCDSetProgram( input_thread_t * p_input,
+                          pgrm_descriptor_t * p_program)
 {
     return 0;
 }
@@ -378,34 +365,33 @@ static int VCDSetProgram( input_thread_t * p_input,
 static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
 {
     thread_vcd_data_t *     p_vcd;
-    
+
     p_vcd = (thread_vcd_data_t*)p_input->p_plugin_data;
-    
+
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
-    
-    if ( p_area != p_input->stream.p_selected_area ) 
+
+    if( p_area != p_input->stream.p_selected_area )
     {
-        /* Reset the Chapter position of the old title */
-        p_input->stream.p_selected_area->i_part = 0;
+        /* Reset the Chapter position of the current title */
+        p_input->stream.p_selected_area->i_part = 1;
         p_input->stream.p_selected_area->i_tell = 0;
-        
+
         /* Change the default area */
         p_input->stream.p_selected_area = p_area;
 
         /* Change the current track */
         /* The first track is not a valid one  */
-        p_vcd->current_track = p_area->i_id ;
-        p_vcd->current_sector = p_vcd->tracks_sector[p_vcd->current_track] ;
+        p_vcd->i_track = p_area->i_id;
+        p_vcd->i_sector = p_vcd->p_sectors[p_vcd->i_track];
     }
+
     /* warn interface that something has changed */
     p_input->stream.b_seekable = 1;
     p_input->stream.b_changed = 1;
-    return 0 ;
-    
+
+    return 0;
 }
-
-
 
 /*****************************************************************************
  * VCDRead: reads from the VCD into PES packets.
@@ -413,96 +399,72 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
  * Returns -1 in case of error, 0 if everything went well, and 1 in case of
  * EOF.
  *****************************************************************************/
-static int VCDRead( input_thread_t * p_input,
-                    data_packet_t ** pp_packets )
+static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_packets )
 {
     thread_vcd_data_t *     p_vcd;
     data_packet_t *         p_data;
     int                     i_packet_size;
     int                     i_index;
-    int                     i_packet;   
-    byte_t *                p_buffer;
-    boolean_t                  b_no_packet;
+    int                     i_packet;
+    u32                     i_header;
+    byte_t                  p_buffer[ VCD_DATA_SIZE ];
     /* boolean_t               b_eoc; No chapters yet */
-    
+
     p_vcd = (thread_vcd_data_t *)p_input->p_plugin_data;
-   
 
-    p_buffer = malloc ( VCD_DATA_SIZE );
-
-    if ( p_buffer == NULL )
-    {
-        intf_ErrMsg("Could not malloc the read buffer");
-        return -1;
-    }
-
-    
     i_packet = 0;
-    b_no_packet = 0;
 
-    while( i_packet < VCD_DATA_ONCE ) 
+    while( i_packet < VCD_DATA_ONCE
+            && !p_vcd->b_end_of_track )
     {
-        i_index = 0;
-        
-        if ( VCD_sector_read( p_vcd, p_buffer ) == -1 )
+        if ( VCDReadSector( p_vcd, p_buffer ) == -1 )
         {
-              return -1;
+            return -1;
         }
-        
-        while (i_index < BUFFER_SIZE - 6) 
+
+        i_index = 0;
+
+        while( i_index < BUFFER_SIZE - 6
+                && !p_vcd->b_end_of_track
+                && i_packet < VCD_DATA_ONCE )
         {
-            
-            if( (U32_AT(p_buffer + i_index) & 0xFFFFFF00) != 0x100L )
+            i_header = U32_AT(p_buffer + i_index);
+
+            /* This is not the startcode of a packet. Read the stream
+             * until we find one. */
+            if( !i_header )
             {
-                /* This is not the startcode of a packet. Read the stream
-                 * until we find one. */
-    
-                if( !U32_AT( p_buffer + i_index ) )
-                {
-                    /* It is common for MPEG-1 streams to pad with zeros
-                     * (although it is forbidden by the recommendation), so
-                     * don't bother everybody in this case. */
-                    intf_WarnMsg( 3, "Garbage at input" );
-                }
-    
-                while( ( (U32_AT(p_buffer + i_index) & 0xFFFFFF00) != 0x100L )
-                       && ( i_index < BUFFER_SIZE - 4 ) )
-                {
-                    i_index ++;
-                }
-    
-                if ( i_index == BUFFER_SIZE - 4 )
-                {
-                    b_no_packet = 1;
-                }
-                /* Packet found. */
+                /* It is common for MPEG-1 streams to pad with zeros
+                 * (although it is forbidden by the recommendation), so
+                 * don't bother everybody in this case. */
+                intf_WarnMsg( 3, "vcd warning: garbage at input" );
             }
-            
-            if (b_no_packet)
+
+            while( (i_header & 0xFFFFFF00) != 0x100L
+                     && (++i_index < BUFFER_SIZE - 4) )
             {
-                b_no_packet = 0;
-                intf_WarnMsg(3, "No packet found on sector %d\n", 
-                            p_vcd->current_sector -1 );
+                i_header = U32_AT(p_buffer + i_index);
+            }
+
+            if( (i_header & 0xFFFFFF00) != 0x100L )
+            {
+                intf_WarnMsg( 3, "vcd warning: no packet at sector %d\n",
+                                 p_vcd->i_sector - 1 );
                 break; /* go to the next sector */
             }
-            
 #ifdef DEBUG
-            intf_DbgMsg("packet start code : %X\n", 
-                        U32_AT(p_buffer + i_index));
+            intf_DbgMsg( "packet start code : %X\n", i_header );
 #endif
-            /* 0x1B9 == SYSTEM_END_CODE, it is only 4 bytes long. */
-            if( U32_AT(p_buffer + i_index) != 0x1B9 )
+
+            switch( i_header )
             {
-                /* The packet is at least 6 bytes long. */
-    
-                if( U32_AT(p_buffer + i_index) != 0x1BA )
-                {
-                    /* That's the case for all packets, except pack header. */
-                    i_packet_size = U16_AT((p_buffer + ( i_index + 4 )));
-                }
-                else
-                {
-                    /* Pack header. */
+                /* 0x1b9 == SYSTEM_END_CODE, it is only 4 bytes long. */
+                case 0x1b9:
+                    i_packet_size = -2;
+                    break;
+
+                /* Pack header */
+                case 0x1ba:
                     if( ( *( p_buffer + ( i_index + 4 ) ) & 0xC0) == 0x40 )
                     {
                         /* MPEG-2 */
@@ -518,41 +480,42 @@ static int VCDRead( input_thread_t * p_input,
                         intf_ErrMsg( "Unable to determine stream type" );
                         return( -1 );
                     }
-                }
+                    break;
+
+                /* The packet is at least 6 bytes long. */
+                default:
+                    /* That's the case for all packets, except pack header. */
+                    i_packet_size = U16_AT((p_buffer + ( i_index + 4 )));
+                    break;
             }
-            else
-            {
-                /* System End Code */
-                i_packet_size = -2;
-            }
+
 #ifdef DEBUG
             intf_DbgMsg("i_index : %d\n", i_index);
             intf_DbgMsg("i_packet_size : %d\n", i_packet_size);
 #endif
+
             if ( i_index + i_packet_size > BUFFER_SIZE )
             {
-                intf_ErrMsg( "input error: packet too long (%i)",
+                intf_ErrMsg( "vcd error: packet too long (%i)",
                              i_index + i_packet_size );
                 continue;
             }
-            
+
             /* Fetch a packet of the appropriate size. */
-            
             p_data = p_input->pf_new_packet( p_input->p_method_data,
                                              i_packet_size + 6 );
-            
+
             if( p_data == NULL )
             {
-                intf_ErrMsg( "Out of memory" );
+                intf_ErrMsg( "vcd error: out of memory" );
                 return( -1 );
             }
-    
+
             if( U32_AT(p_buffer) != 0x1B9 )
             {
                 p_main->fast_memcpy( p_data->p_demux_start, p_buffer + i_index,
                                      6 + i_packet_size );
                 i_index += ( 6 + i_packet_size );
-    
             }
             else
             {
@@ -560,24 +523,20 @@ static int VCDRead( input_thread_t * p_input,
                 memcpy( p_data->p_demux_start, p_buffer + i_index, 4 );
                 i_index += 4;
             }
-    
+
             /* Give the packet to the other input stages. */
             pp_packets[i_packet] = p_data;
-            i_packet ++;
+            i_packet++;
         }
-        
-        if ( p_vcd->b_end_of_track )
-            break;
     }
 
+    pp_packets[i_packet] = NULL;
 
-    
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     p_input->stream.p_selected_area->i_tell =
-        p_vcd->current_sector -
-        p_input->stream.p_selected_area->i_start ;
-    
+        p_vcd->i_sector - p_input->stream.p_selected_area->i_start;
+
     /* no chapter for the moment*/
     /*if( b_eoc )
     {
@@ -591,7 +550,7 @@ static int VCDRead( input_thread_t * p_input,
         input_area_t *p_area;
 
         /* EOF ? */
-        if( p_vcd->current_track >= p_vcd->nb_tracks - 1 )
+        if( p_vcd->i_track >= p_vcd->nb_tracks - 1 )
         {
             vlc_mutex_unlock( &p_input->stream.stream_lock );
             return 1;
@@ -607,7 +566,7 @@ static int VCDRead( input_thread_t * p_input,
         p_area->i_part = 1;
         VCDSetArea( p_input, p_area );
     }
-    
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return 0;
@@ -621,7 +580,6 @@ static int VCDRewind( input_thread_t * p_input )
     return( -1 );
 }
 
-
 /****************************************************************************
  * VCDSeek
  ****************************************************************************/
@@ -631,12 +589,9 @@ static void VCDSeek( input_thread_t * p_input, off_t i_off )
 
     p_vcd = (thread_vcd_data_t *) p_input->p_plugin_data;
 
-    p_vcd->current_sector = p_vcd->tracks_sector[p_vcd->current_track]
-                                + i_off;
+    p_vcd->i_sector = p_vcd->p_sectors[p_vcd->i_track] + i_off;
 
-    p_input->stream.p_selected_area->i_tell = p_vcd->current_sector
+    p_input->stream.p_selected_area->i_tell = p_vcd->i_sector
         - p_input->stream.p_selected_area->i_start;
-    
-    return ;
 }
 
