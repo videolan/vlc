@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.41 2003/06/26 12:19:59 sam Exp $
+ * $Id: vout_pictures.c,v 1.42 2003/08/28 21:11:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -422,8 +422,29 @@ void vout_PlacePicture( vout_thread_t *p_vout,
         *pi_width = *pi_height * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
     }
 
-    *pi_x = ( i_width - *pi_width ) / 2;
-    *pi_y = ( i_height - *pi_height ) / 2;
+    switch( p_vout->i_alignment & VOUT_ALIGN_HMASK )
+    {
+    case VOUT_ALIGN_LEFT:
+        *pi_x = 0;
+        break;
+    case VOUT_ALIGN_RIGHT:
+        *pi_x = i_width - *pi_width;
+        break;
+    default:
+        *pi_x = ( i_width - *pi_width ) / 2;
+    }
+
+    switch( p_vout->i_alignment & VOUT_ALIGN_VMASK )
+    {
+    case VOUT_ALIGN_TOP:
+        *pi_y = 0;
+        break;
+    case VOUT_ALIGN_BOTTOM:
+        *pi_y = i_height - *pi_height;
+        break;
+    default:
+        *pi_y = ( i_height - *pi_height ) / 2;
+    }
 }
 
 /*****************************************************************************

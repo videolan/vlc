@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.82 2003/08/19 13:20:27 hartman Exp $
+ * $Id: libvlc.h,v 1.83 2003/08/28 21:11:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -174,6 +174,12 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
 #define HEIGHT_LONGTEXT N_( \
     "You can enforce the video height here. By default (-1) VLC will " \
     "adapt to the video characteristics.")
+
+#define ALIGN_TEXT N_("Video alignment")
+#define ALIGN_LONGTEXT N_( \
+    "You can enforce the video alignement in its window. By default (0) it " \
+    "will be centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
+    "also use combinations of these values).")
 
 #define ZOOM_TEXT N_("Zoom video")
 #define ZOOM_LONGTEXT N_( \
@@ -540,6 +546,7 @@ vlc_module_begin();
     add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, VLC_TRUE );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
+    add_integer( "align", -1, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );
     add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT, VLC_TRUE );
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT, VLC_FALSE );

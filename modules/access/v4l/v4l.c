@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.20 2003/08/17 23:02:51 fenrir Exp $
+ * $Id: v4l.c,v 1.21 2003/08/28 21:11:55 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -109,16 +109,14 @@ struct access_sys_t
     char    *psz_video_device;
     int     fd;
 
-    vlc_fourcc_t    i_codec;   // if i_codec != i_chroma then we need a compressor
-    video_encoder_t *p_encoder;
     picture_t       pic;
 
+    int i_fourcc;
     int i_channel;
     int i_audio;
     int i_norm;
     int i_tuner;
     int i_frequency;
-    int i_chroma;
     int i_width;
     int i_height;
 
@@ -234,7 +232,6 @@ static int AccessOpen( vlc_object_t *p_this )
 
     p_sys->i_frame_pos = 0;
 
-    p_sys->i_codec          = VLC_FOURCC( 0, 0, 0, 0 );
     p_sys->i_video_frame_size_allocated = 0;
     p_sys->psz_adev         = NULL;
     p_sys->fd_audio         = -1;
@@ -359,22 +356,6 @@ static int AccessOpen( vlc_object_t *p_this )
             {
                 p_sys->i_tuner = strtol( psz_parser + strlen( "tuner=" ),
                                          &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "codec=", strlen( "codec=" ) ) )
-            {
-                psz_parser += strlen( "codec=" );
-                if( !strncmp( psz_parser, "mpeg4", strlen( "mpeg4" ) ) )
-                {
-                    p_sys->i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
-                }
-                else if( !strncmp( psz_parser, "mpeg1", strlen( "mpeg1" ) ) )
-                {
-                    p_sys->i_codec = VLC_FOURCC( 'm', 'p', '1', 'v' );
-                }
-                else
-                {
-                    msg_Warn( p_input, "unknow codec" );
-                }
             }
             else if( !strncmp( psz_parser, "adev=", strlen( "adev=" ) ) )
             {
@@ -758,11 +739,7 @@ static int AccessOpen( vlc_object_t *p_this )
 
     p_sys->p_video_frame = NULL;
 
-    if( p_sys->b_mjpeg )
-    {
-        p_sys->i_chroma = VLC_FOURCC( 'I','4','2','0' );
-    }
-    else
+    if( !p_sys->b_mjpeg )
     {
         /* Find out video format used by device */
         if( ioctl( p_sys->fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
@@ -834,7 +811,7 @@ static int AccessOpen( vlc_object_t *p_this )
                 i_chroma = VLC_FOURCC( 'I', '4', '1', '1' );
                 break;
             }
-            p_sys->i_chroma = i_chroma;
+            p_sys->i_fourcc = i_chroma;
         }
         else
         {
@@ -866,8 +843,7 @@ static int AccessOpen( vlc_object_t *p_this )
             goto failed;
         }
 
-        p_sys->i_codec  = VLC_FOURCC( 'm','j','p','g' );
-        p_sys->p_encoder = NULL;
+        p_sys->i_fourcc  = VLC_FOURCC( 'm','j','p','g' );
         p_sys->i_frame_pos = -1;
 
         /* queue up all the frames */
@@ -884,7 +860,7 @@ static int AccessOpen( vlc_object_t *p_this )
     {
         /* Fill in picture_t fields */
         vout_InitPicture( VLC_OBJECT(p_input), &p_sys->pic,
-                          p_sys->i_width, p_sys->i_height, p_sys->i_chroma );
+                          p_sys->i_width, p_sys->i_height, p_sys->i_fourcc );
         if( !p_sys->pic.i_planes )
         {
             msg_Err( p_input, "unsupported chroma" );
@@ -900,7 +876,7 @@ static int AccessOpen( vlc_object_t *p_this )
         msg_Dbg( p_input, "v4l device uses frame size: %i",
                  p_sys->i_video_frame_size );
         msg_Dbg( p_input, "v4l device uses chroma: %4.4s",
-                (char*)&p_sys->i_chroma );
+                (char*)&p_sys->i_fourcc );
 
         /* Allocate mmap buffer */
         if( ioctl( p_sys->fd, VIDIOCGMBUF, &p_sys->vid_mbuf ) < 0 )
@@ -926,63 +902,9 @@ static int AccessOpen( vlc_object_t *p_this )
         p_sys->vid_mmap.format = p_sys->vid_picture.palette;
         if( ioctl( p_sys->fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
         {
-            msg_Warn( p_input, "%4.4s refused", (char*)&p_sys->i_chroma );
+            msg_Warn( p_input, "%4.4s refused", (char*)&p_sys->i_fourcc );
             msg_Err( p_input, "chroma selection failed" );
             goto failed;
-        }
-
-        /* encoder part */
-        if( p_sys->i_codec != VLC_FOURCC( 0, 0, 0, 0 ) )
-        {
-            msg_Dbg( p_input,
-                     "need a rencoder from %4.4s to %4.4s",
-                     (char*)&p_sys->i_chroma,
-                     (char*)&p_sys->i_codec );
-#define p_enc p_sys->p_encoder
-            p_enc = vlc_object_create( p_input, sizeof( video_encoder_t ) );
-            p_enc->i_codec = p_sys->i_codec;
-            p_enc->i_chroma= p_sys->i_chroma;
-            p_enc->i_width = p_sys->i_width;
-            p_enc->i_height= p_sys->i_height;
-            p_enc->i_aspect= 0;
-
-
-            p_enc->p_module = module_Need( p_enc, "video encoder",
-                                           "$video-encoder" );
-            if( !p_enc->p_module )
-            {
-                msg_Warn( p_input, "no suitable encoder to %4.4s",
-                          (char*)&p_enc->i_codec );
-                vlc_object_destroy( p_enc );
-                goto failed;
-            }
-
-            /* *** init the codec *** */
-            if( p_enc->pf_init( p_enc ) )
-            {
-                msg_Err( p_input, "failed to initialize video encoder plugin" );
-                vlc_object_destroy( p_enc );
-                goto failed;
-            }
-
-            /* *** alloacted buffer *** */
-            if( p_enc->i_buffer_size <= 0 )
-            {
-              p_enc->i_buffer_size = 1024 * 1024;// * p_enc->i_width * p_enc->i_height;
-            }
-            p_sys->i_video_frame_size = p_enc->i_buffer_size;
-            p_sys->i_video_frame_size_allocated = p_enc->i_buffer_size;
-            if( !( p_sys->p_video_frame = malloc( p_enc->i_buffer_size ) ) )
-            {
-                msg_Err( p_input, "out of memory" );
-                goto failed;
-            }
-#undef p_enc
-        }
-        else
-        {
-            p_sys->i_codec  = p_sys->i_chroma;
-            p_sys->p_encoder = NULL;
         }
     }
 
@@ -1015,7 +937,7 @@ static int AccessOpen( vlc_object_t *p_this )
     SetDWBE( &p_sys->p_header[4], 1 );
 
     memcpy(  &p_sys->p_header[ 8], "vids", 4 );
-    memcpy(  &p_sys->p_header[12], &p_sys->i_codec, 4 );
+    memcpy(  &p_sys->p_header[12], &p_sys->i_fourcc, 4 );
     SetDWBE( &p_sys->p_header[16], p_sys->i_width );
     SetDWBE( &p_sys->p_header[20], p_sys->i_height );
     SetDWBE( &p_sys->p_header[24], 0 );
@@ -1076,16 +998,6 @@ static void AccessClose( vlc_object_t *p_this )
         close( p_sys->fd_audio );
     }
 
-    if( p_sys->p_encoder )
-    {
-        p_sys->p_encoder->pf_end( p_sys->p_encoder );
-
-        module_Unneed( p_sys->p_encoder,
-                       p_sys->p_encoder->p_module );
-        vlc_object_destroy( p_sys->p_encoder );
-
-        free( p_sys->p_video_frame );
-    }
     free( p_sys );
 }
 
@@ -1257,28 +1169,7 @@ static int GrabVideo( input_thread_t * p_input,
     if( !p_frame )
         return -1;
 
-    if( p_sys->p_encoder )
-    {
-        int i;
-        /* notice we can't get here if we are using mjpeg */
-
-        p_sys->pic.p[0].p_pixels = p_frame;
-
-        for( i = 1; i < p_sys->pic.i_planes; i++ )
-        {
-            p_sys->pic.p[i].p_pixels = p_sys->pic.p[i-1].p_pixels +
-                p_sys->pic.p[i-1].i_pitch * p_sys->pic.p[i-1].i_lines;
-        }
-
-        p_sys->i_video_frame_size = p_sys->i_video_frame_size_allocated;
-        p_sys->p_encoder->pf_encode( p_sys->p_encoder, &p_sys->pic,
-                                     p_sys->p_video_frame,
-                                     &p_sys->i_video_frame_size );
-    }
-    else
-    {
-        p_sys->p_video_frame = p_frame;
-    }
+    p_sys->p_video_frame = p_frame;
 
     *pp_data = p_sys->p_video_frame;
     *pi_data = p_sys->i_video_frame_size;

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.231 2003/07/29 22:20:53 gbazin Exp $
+ * $Id: video_output.c,v 1.232 2003/08/28 21:11:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -268,6 +268,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     p_vout->b_interface  = 0;
     p_vout->b_scale      = 1;
     p_vout->b_fullscreen = 0;
+    p_vout->i_alignment  = 0;
     p_vout->render_time  = 10;
     p_vout->c_fps_samples = 0;
     p_vout->b_filter_change = 0;
@@ -297,6 +298,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     p_vout->b_override_aspect = VLC_FALSE;
 
@@ -1177,6 +1179,9 @@ static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
     uint64_t ll_zoom;
 
 #define FP_FACTOR 1000                             /* our fixed point factor */
+
+    var_Get( p_vout, "align", &val );
+    p_vout->i_alignment = val.i_int;
 
     var_Get( p_vout, "width", &val );
     i_width = val.i_int;

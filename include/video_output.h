@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.97 2003/08/14 18:21:58 sigmunau Exp $
+ * $Id: video_output.h,v 1.98 2003/08/28 21:11:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -82,6 +82,7 @@ struct vout_thread_t
     mtime_t             render_time;           /**< last picture render time */
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */
+    unsigned int        i_alignment;          /**< video alignment in window */
     /**@}*/
     
     /** \name Plugin used and shortcuts to access its capabilities */
@@ -155,6 +156,14 @@ struct vout_thread_t
 #define VOUT_SIZE_CHANGE        0x0200                       /* size changed */
 #define VOUT_DEPTH_CHANGE       0x0400                      /* depth changed */
 #define VOUT_CHROMA_CHANGE      0x0800               /* change chroma tables */
+
+/* Alignment flags */
+#define VOUT_ALIGN_LEFT         0x0001
+#define VOUT_ALIGN_RIGHT        0x0002
+#define VOUT_ALIGN_HMASK        0x0003
+#define VOUT_ALIGN_TOP          0x0004
+#define VOUT_ALIGN_BOTTOM       0x0008
+#define VOUT_ALIGN_VMASK        0x000C
 
 #define MAX_JITTER_SAMPLES      20
 

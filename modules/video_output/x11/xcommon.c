@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.29 2003/08/13 18:39:52 gbazin Exp $
+ * $Id: xcommon.c,v 1.30 2003/08/28 21:11:55 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -882,11 +882,9 @@ static int ManageVideo( vout_thread_t *p_vout )
                            p_vout->p_sys->p_win->i_height,
                            &i_x, &i_y, &i_width, &i_height );
 
-        XResizeWindow( p_vout->p_sys->p_display,
-                       p_vout->p_sys->p_win->video_window, i_width, i_height );
-
-        XMoveWindow( p_vout->p_sys->p_display,
-                     p_vout->p_sys->p_win->video_window, i_x, i_y );
+        XMoveResizeWindow( p_vout->p_sys->p_display,
+                           p_vout->p_sys->p_win->video_window,
+                           i_x, i_y, i_width, i_height );
     }
 
     /* Autohide Cursour */
