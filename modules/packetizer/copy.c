@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.19 2003/11/20 18:27:44 fenrir Exp $
+ * $Id: copy.c,v 1.20 2003/11/22 20:17:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -48,14 +48,10 @@ vlc_module_end();
  *****************************************************************************/
 struct decoder_sys_t
 {
-    int i_spu_size;
-    int i_spu;
-
     block_t *p_block;
 };
 
-static block_t *PacketizeAV ( decoder_t *, block_t ** );
-static block_t *PacketizeSPU( decoder_t *, block_t ** );
+static block_t *Packetize ( decoder_t *, block_t ** );
 
 /*****************************************************************************
  * Open: probe the packetizer and return score
@@ -68,27 +64,15 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_cat == AUDIO_ES || p_dec->fmt_in.i_cat == VIDEO_ES )
-    {
-        p_dec->pf_packetize = PacketizeAV;
-    }
-    else if( p_dec->fmt_in.i_cat == SPU_ES )
-    {
-        if( p_dec->fmt_in.i_codec == VLC_FOURCC( 's', 'p', 'u', ' ' ) ||
-            p_dec->fmt_in.i_codec == VLC_FOURCC( 's', 'p', 'u', 'b' ) )
-        {
-            p_dec->pf_packetize = PacketizeSPU;
-        }
-        else
-        {
-            p_dec->pf_packetize = PacketizeAV;
-        }
-    }
-    else
+    if( p_dec->fmt_in.i_cat != AUDIO_ES &&
+        p_dec->fmt_in.i_cat != VIDEO_ES &&
+        p_dec->fmt_in.i_cat != SPU_ES )
     {
         msg_Err( p_dec, "invalid ES type" );
         return VLC_EGENERIC;
     }
+
+    p_dec->pf_packetize = Packetize;
 
     /* Create the output format */
     memcpy( &p_dec->fmt_out, &p_dec->fmt_in, sizeof( es_format_t ) );
@@ -239,16 +223,9 @@ static int Open( vlc_object_t *p_this )
                     return VLC_EGENERIC;
             }
             break;
-
-        /* subtitles */
-        case VLC_FOURCC( 's', 'p', 'u', 'b' ):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 's', 'p', 'u', ' ' );
-            break;
     }
 
     p_dec->p_sys = p_sys = malloc( sizeof( block_t ) );
-    p_sys->i_spu_size = 0;
-    p_sys->i_spu      = 0;
     p_sys->p_block    = NULL;
 
     return VLC_SUCCESS;
@@ -272,7 +249,7 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * PacketizeStd: packetize an unit (here copy a complete block )
  *****************************************************************************/
-static block_t *PacketizeAV ( decoder_t *p_dec, block_t **pp_block )
+static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
 {
     block_t *p_block;
     block_t *p_ret = p_dec->p_sys->p_block;
@@ -298,66 +275,5 @@ static block_t *PacketizeAV ( decoder_t *p_dec, block_t **pp_block )
     p_dec->p_sys->p_block = p_block;
 
     return p_ret;
-}
-
-/*****************************************************************************
- * PacketizeSPU: packetize an SPU unit (so gather all PES of one subtitle)
- *****************************************************************************/
-static block_t *PacketizeSPU( decoder_t *p_dec, block_t **pp_block )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
-
-    if( pp_block == NULL || *pp_block == NULL )
-    {
-        return NULL;
-    }
-    p_block = *pp_block;
-    *pp_block = NULL;
-
-    if( p_sys->i_spu_size <= 0 &&
-        ( p_block->i_pts <= 0 || p_block->i_buffer < 4 ) )
-    {
-        msg_Dbg( p_dec, "invalid starting packet (size < 4 or pts <=0)" );
-        block_Release( p_block );
-        return NULL;
-    }
-
-    block_ChainAppend( &p_sys->p_block, p_block );
-    p_sys->i_spu += p_block->i_buffer;
-
-    if( p_sys->i_spu_size <= 0 )
-    {
-        int i_rle = ( ( p_block->p_buffer[2] << 8 )| p_block->p_buffer[3] ) - 4;
-
-        p_sys->i_spu_size = ( p_block->p_buffer[0] << 8 )| p_block->p_buffer[1];
-
-        msg_Dbg( p_dec, "i_spu_size=%d i_rle=%d", p_sys->i_spu_size, i_rle );
-
-        if( p_sys->i_spu_size <= 0 || i_rle >= p_sys->i_spu_size )
-        {
-            p_sys->i_spu_size = 0;
-            p_sys->i_spu      = 0;
-            p_sys->p_block    = NULL;
-
-            block_Release( p_block );
-            return NULL;
-        }
-    }
-
-    if( p_sys->i_spu >= p_sys->i_spu_size )
-    {
-        /* We have a complete sub */
-        block_t *p_ret = p_sys->p_block;
-
-        msg_Dbg( p_dec, "SPU packets size=%d should be %d",
-                 p_sys->i_spu, p_sys->i_spu_size );
-
-        p_sys->i_spu_size = 0;
-        p_sys->i_spu      = 0;
-        p_sys->p_block    = NULL;
-        return p_ret;
-    }
-    return NULL;
 }
 
