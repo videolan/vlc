@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.6 2002/07/23 17:19:02 fenrir Exp $
+ * $Id: mp4.c,v 1.7 2002/07/23 22:42:20 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -790,12 +790,6 @@ static void MP4_StartDecoder( input_thread_t *p_input,
         return;
     }
 
-    if( !p_sample->data.p_data )
-    {
-        printf( "\nAhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh %.4s\n",
-                &p_sample->i_type );
-        return;
-    } 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_demux_track->p_es = input_AddES( p_input,
                                        p_input->stream.p_selected_program, 
@@ -811,7 +805,18 @@ static void MP4_StartDecoder( input_thread_t *p_input,
     
     p_demux_track->p_es->i_stream_id = p_demux_track->i_track_ID;
 
-    p_demux_track->p_es->i_fourcc = p_sample->i_type;
+    /* It's a little ugly but .. there are special cases */
+    switch( p_sample->i_type )
+    {
+        case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
+        case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
+            p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
+            break;
+        default:
+            p_demux_track->p_es->i_fourcc = p_sample->i_type;
+            break;
+    }
+    
     p_demux_track->p_es->i_cat = p_demux_track->i_cat;
     
     i_decoder_specific_info_len = 0;

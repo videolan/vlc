@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.5 2002/07/23 17:19:02 fenrir Exp $
+ * $Id: libmp4.c,v 1.6 2002/07/23 22:42:20 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -1312,60 +1312,6 @@ int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-#if 0
-int MP4_ReadBox_sample_mp4v( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
-{
-    int i;    
-
-    MP4_READBOX_ENTER( MP4_Box_data_sample_mp4v_t );
-    
-    for( i = 0; i < 6 ; i++ )
-    {
-        MP4_GET1BYTE( p_box->data.p_sample_mp4v->i_reserved1[i] );
-    }
-
-    MP4_GET2BYTES( p_box->data.p_sample_mp4v->i_data_reference_index );
-
-    MP4_GET2BYTES( p_box->data.p_sample_mp4v->i_predefined1 );
-    MP4_GET2BYTES( p_box->data.p_sample_mp4v->i_reserved2 );
-
-    for( i = 0; i < 3 ; i++ )
-    {
-        MP4_GET4BYTES( p_box->data.p_sample_mp4v->i_predefined2[i] );
-    }
-
-    MP4_GET2BYTES( p_box->data.p_sample_mp4v->i_width );
-    MP4_GET2BYTES( p_box->data.p_sample_mp4v->i_height );
-    
-    MP4_GET4BYTES( p_box->data.p_sample_mp4v->i_horizresolution );
-    MP4_GET4BYTES( p_box->data.p_sample_mp4v->i_vertresolution );
-
-    MP4_GET4BYTES( p_box->data.p_sample_mp4v->i_reserved3 );
-    MP4_GET2BYTES( p_box->data.p_sample_mp4v->i_predefined3 );
-
-    /* This is a pascal string, padded to 32 bytes */
-    memcpy( &p_box->data.p_sample_mp4v->i_compressorname, p_peek+1, 31 );
-    p_box->data.p_sample_mp4v->i_compressorname[*p_peek] = 0;
-    p_peek += 32; i_read -= 32;
-
-    MP4_GET2BYTES( p_box->data.p_sample_mp4v->i_depth );
-    MP4_GET2BYTES( p_box->data.p_sample_mp4v->i_predefined4 );
-
-
-    MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 78);
-    MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
-    
-#ifdef MP4_VERBOSE
-    msg_Dbg( p_stream->p_input, "Read Box: \"mp4v\" in stsd %dx%d depth %d compressor %s",
-                      p_box->data.p_sample_mp4v->i_width,
-                      p_box->data.p_sample_mp4v->i_height,
-                      p_box->data.p_sample_mp4v->i_depth,
-                      p_box->data.p_sample_mp4v->i_compressorname );
-#endif
-    MP4_READBOX_EXIT( 1 );
-}
-#endif 
-
 
 int MP4_ReadBox_stsd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -1996,6 +1942,7 @@ static struct
     /* for codecs */
     { FOURCC_soun,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC__mp3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_ms55,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_mp4a,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
 
     { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
@@ -2005,6 +1952,7 @@ static struct
     { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_3IV1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_3IV2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mjpa,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mjpb,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mjqt,  NULL,                       NULL }, /* found in mjpa/b */

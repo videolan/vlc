@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.8 2002/07/23 17:19:02 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.9 2002/07/23 22:42:20 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -86,6 +86,8 @@ typedef struct bitmapinfoheader_s
 
 /* ?? */
 #define FOURCC_3IV1         VLC_FOURCC('3','I','V','1')
+#define FOURCC_3IV2         VLC_FOURCC('3','I','V','2')
+
 /* H263 and H263i */        
 #define FOURCC_H263         VLC_FOURCC('H','2','6','3')
 #define FOURCC_h263         VLC_FOURCC('h','2','6','3')
@@ -164,6 +166,8 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_DX50:
         case FOURCC_mp4v:
         case FOURCC_4:
+        case FOURCC_3IV2:
+
             i_codec = CODEC_ID_MPEG4;
             psz_name = "MPEG-4";
             break;
