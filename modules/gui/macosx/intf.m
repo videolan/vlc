@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.59 2003/02/18 00:17:06 massiot Exp $
+ * $Id: intf.m,v 1.60 2003/02/19 14:49:25 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -725,7 +725,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         {
             if( f_slider == f_slider_old )
             {
-                float f_updated = ( 100. * p_area->i_tell ) /
+                float f_updated = ( 10000. * p_area->i_tell ) /
                                            p_area->i_size;
 
                 if( f_slider != f_updated )
@@ -735,7 +735,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
             }
             else
             {
-                off_t i_seek = ( f_slider * p_area->i_size ) / 100;
+                off_t i_seek = ( f_slider * p_area->i_size ) / 10000;
 
                 /* release the lock to be able to seek */
                 vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -1409,7 +1409,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
 #define p_area p_playlist->p_input->stream.p_selected_area
         vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-        i_tell = f_updated / 100. * p_area->i_size;
+        i_tell = f_updated / 10000. * p_area->i_size;
         input_OffsetToTime( p_playlist->p_input, psz_time, i_tell );
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
 #undef p_area
