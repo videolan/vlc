@@ -130,6 +130,14 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
+ * Control: control facility for the vout (forwards to child vout)
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
+}
+
+/*****************************************************************************
  * Create: allocates Deinterlace video thread output method
  *****************************************************************************
  * This function allocates and initializes a Deinterlace vout method.
@@ -152,6 +160,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_manage = NULL;
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
+    p_vout->pf_control = Control;
 
     p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
     p_vout->p_sys->b_double_rate = 0;
