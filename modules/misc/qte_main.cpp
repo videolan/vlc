@@ -2,7 +2,7 @@
  * qte_main.c : QT Embedded wrapper for gte_main
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: qte_main.cpp,v 1.2 2003/02/14 13:01:02 jpsaman Exp $
+ * $Id: qte_main.cpp,v 1.3 2003/02/14 13:48:41 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -130,13 +130,11 @@ static void Close( vlc_object_t *p_this )
         var_Destroy( p_this->p_libvlc, "qte" );
         return;
     }
-
     p_qte_main->p_qte_application->quit();
-    vlc_thread_join( p_qte_main );
 
     /* Cleanup allocated classes. */
-    delete p_qte_main->p_qte_application;
     delete p_qte_main->p_qte_widget;
+    delete p_qte_main->p_qte_application;
 
     vlc_object_destroy( p_qte_main );
     p_qte_main = NULL;
@@ -155,29 +153,22 @@ static void QteMain( qte_thread_t *p_this )
 {
     int argc = 0;
 
-    msg_Dbg( p_this, "qte_main: enter" );
     QApplication* pApp = new QApplication(argc, NULL);
     if(pApp)
     {
         p_this->p_qte_application = pApp;
     }
-    msg_Dbg( p_this, "qte_main: qte application created" );
 
     QWidget* pWidget = new QWidget();
     if(pWidget)
     {
         p_this->p_qte_widget = pWidget;
     }
-    msg_Dbg( p_this, "qte_main: qte dummy widget created" );
 
     /* signal the creation of the window */
     p_this->p_qte_application->setMainWidget(p_this->p_qte_widget);
 
     vlc_thread_ready( p_this );
-
-    msg_Dbg( p_this, "qte_main: qte application thread ready" );
     p_this->p_qte_application->exec();
-
-    msg_Dbg( p_this, "qte_main: leaving" );
 }
 

@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.12 2003/02/12 23:13:51 jpsaman Exp $
+ * $Id: qte.cpp,v 1.13 2003/02/14 13:48:41 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -187,7 +187,7 @@ static void Close ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    msg_Err( p_vout, "Close" );
+    msg_Dbg( p_vout, "Close" );
     if( p_vout->p_sys->p_event )
     {
         vlc_object_detach( p_vout->p_sys->p_event );
@@ -199,8 +199,8 @@ static void Close ( vlc_object_t *p_this )
         vlc_thread_join( p_vout->p_sys->p_event );
         vlc_object_destroy( p_vout->p_sys->p_event );
     }
-
 #ifdef NEED_QTE_MAIN
+    msg_Dbg( p_vout, "Releasing qte_main" );
     module_Unneed( p_vout, p_vout->p_sys->p_qte_main );
 #endif
 
