@@ -116,7 +116,7 @@
     }
     vlc_mutex_unlock( &p_item->input.lock );
     
-    psz_temp = vlc_input_item_GetInfo( &p_item->input, _("General"), _("Author") );
+    psz_temp = vlc_input_item_GetInfo( &p_item->input, _("Meta-information"), _("Artist") );
 
     if( psz_temp )
     {
@@ -150,11 +150,11 @@
 
         p_item->input.psz_uri = strdup( [[o_uri_txt stringValue] UTF8String] );
         p_item->input.psz_name = strdup( [[o_title_txt stringValue] UTF8String] );
-        vlc_input_item_AddInfo( &p_item->input, _("General"), _("Author"), [[o_author_txt stringValue] UTF8String]);
         vlc_mutex_unlock( &p_item->input.lock );
+        vlc_input_item_AddInfo( &p_item->input, _("Meta-information"), _("Artist"), [[o_author_txt stringValue] UTF8String]);
         
         val.b_bool = VLC_TRUE;
-        var_Set( p_playlist,"intf-change",val );
+        var_Set( p_playlist, "intf-change", val );
     }
 
     [o_info_window orderOut: self];
