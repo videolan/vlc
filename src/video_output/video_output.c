@@ -396,13 +396,13 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 #endif
 }
 
-/******************************************************************************
+/*******************************************************************************
  * vout_DisplayPicture: display a picture
- ******************************************************************************
+ *******************************************************************************
  * Remove the reservation flag of a picture, which will cause it to be ready for
  * display. The picture won't be displayed until vout_DatePicture has been 
  * called.
- ******************************************************************************/
+ *******************************************************************************/
 void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -422,21 +422,24 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
 #ifdef DEBUG_VIDEO
-    intf_DbgMsg("picture %p\n", p_pic );
+    intf_DbgMsg("picture %p\n", p_pic);
 #endif
-
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-/******************************************************************************
+/*******************************************************************************
  * vout_DatePicture: date a picture
- ******************************************************************************
+ *******************************************************************************
  * Remove the reservation flag of a picture, which will cause it to be ready for
  * display. The picture won't be displayed until vout_DisplayPicture has been 
  * called.
- ******************************************************************************/
+ *******************************************************************************/
 void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
 {
+#ifdef DEBUG_VIDEO
+    char        psz_date[MSTRTIME_MAX_SIZE];                           /* date */
+#endif
+
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->date = date;    
     switch( p_pic->i_status )
@@ -455,9 +458,8 @@ void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
     }
 
 #ifdef DEBUG_VIDEO
-    intf_DbgMsg("picture %p\n", p_pic);
+    intf_DbgMsg("picture %p, display date: %s\n", p_pic, mstrtime( psz_date, p_pic->date) );
 #endif
-
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
@@ -1265,10 +1267,9 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
      */
     if( p_pic != NULL )
     {
-        /* Try horizontal scaling first */
-        i_pic_width = ( p_vout->b_scale || (p_pic->i_width > i_vout_width)) ? 
-            i_vout_width : p_pic->i_width;
-        i_pic_width = i_pic_width;
+        /* Try horizontal scaling first - width must be a mutiple of 16 */
+        i_pic_width = (( p_vout->b_scale || (p_pic->i_width > i_vout_width)) ? 
+                       i_vout_width : p_pic->i_width) & ~0xf;
         switch( p_pic->i_aspect_ratio )
         {
         case AR_3_4_PICTURE:
@@ -1287,7 +1288,8 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
         }
 
         /* If picture dimensions using horizontal scaling are too large, use 
-         * vertical scaling */
+         * vertical scaling. Since width must be a multiple of 16, height is
+         * adjusted again after. */
         if( i_pic_height > i_vout_height )
         {
             i_pic_height = ( p_vout->b_scale || (p_pic->i_height > i_vout_height)) ? 
@@ -1295,20 +1297,23 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
             switch( p_pic->i_aspect_ratio )
             {
             case AR_3_4_PICTURE:
-                i_pic_width = i_pic_height * 4 / 3;
+                i_pic_width = (i_pic_height * 4 / 3) & ~0xf;
+                i_pic_height = i_pic_width * 3 / 4;
                 break;                
             case AR_16_9_PICTURE:
-                i_pic_width = i_pic_height * 16 / 9;
+                i_pic_width = (i_pic_height * 16 / 9) & ~0xf;
+                i_pic_height = i_pic_width * 9 / 16;
                 break;
             case AR_221_1_PICTURE:        
-                i_pic_width = i_pic_height * 221 / 100;
+                i_pic_width = (i_pic_height * 221 / 100) & ~0xf;
+                i_pic_height = i_pic_width * 100 / 221;
                 break;               
             case AR_SQUARE_PICTURE:
             default:
-                i_pic_width = p_pic->i_width * i_pic_height / p_pic->i_height;
+                i_pic_width = (p_pic->i_width * i_pic_height / p_pic->i_height) & ~0xf;
+                i_pic_height = p_pic->i_height * i_pic_width / p_pic->i_width;
                 break;
             }        
-            i_pic_width = i_pic_width;
         }        
 
         /* Set picture position */
@@ -1386,7 +1391,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 #ifdef DEBUG_VIDEO
     /*
-     * In DEBUG_VIDEO_MODE, draw white pixels at the beginning and the end of
+     * In DEBUG_VIDEO mode, draw white pixels at the beginning and the end of
      * the picture area. These pixels should not be erased by rendering functions,
      * otherwise segmentation fault is menacing !
      */
@@ -1423,6 +1428,10 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
  ******************************************************************************/
 static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
+#ifdef DEBUG_VIDEO
+    char                psz_date[MSTRTIME_MAX_SIZE];          /* picture date */    
+    mtime_t             render_time;                /* picture rendering time */
+#endif
     vout_buffer_t *     p_buffer;                         /* rendering buffer */    
     byte_t *            p_pic_data;                 /* convertion destination */
     
@@ -1431,6 +1440,9 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic_data =        p_buffer->p_data + 
         p_buffer->i_pic_x * p_vout->i_bytes_per_pixel +
         p_buffer->i_pic_y * p_vout->i_bytes_per_line;
+#ifdef DEBUG_VIDEO
+    render_time = mdate();    
+#endif
 
     /*
      * Choose appropriate rendering function and render picture 
@@ -1467,6 +1479,12 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
         break;        
 #endif
     }
+
+#ifdef DEBUG_VIDEO
+    /* Print picture date and rendering time */
+    intf_DbgMsg("picture %p rendered (%ld us), display date: %s\n", p_pic,
+                (long) (mdate() - render_time), mstrtime( psz_date, p_pic->date ));
+#endif
 }
 
 /******************************************************************************
