@@ -26,6 +26,7 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <sys/uio.h>                                         /* struct iovec */
 
 #include "config.h"
 #include "common.h"
@@ -51,12 +52,10 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
                        size_t i_buffer_size )
 {
     unsigned int i_loop;
-    netlist_t * p_netlist; /* for a cast */
+    netlist_t * p_netlist;
 
     /* First we allocate and initialise our netlist struct */
     p_input->p_method_data = malloc(sizeof(netlist_t));
-    
-    
     if ( p_input->p_method_data == NULL )
     {
         intf_ErrMsg("Unable to malloc the netlist struct\n");
@@ -65,72 +64,83 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     
     p_netlist = (netlist_t *) p_input->p_method_data;
     
-    //On a besoin de p_buffers pour p_data. Il faut faire l'initialisation
-    //p_data->p_buffer = p_buffers + i * i_buffer_size
-    //p_data->p_payload_start = p_data->p_buffer
-    //p_data->p_payload_end = p_data->p_buffer + i_buffer_size
-    /* For the time being, I only handle pes and data. iovec is to come soon
-     * 
-    p_netlist->p_buffers = malloc(i_buffer_size*i_nb_data)
+    /* allocate the buffers */ 
+    p_netlist->p_buffers = 
+        (byte_t *) malloc(i_buffer_size* i_nb_data );
     if ( p_netlist->p_buffers == NULL )
     {
         intf_ErrMsg ("Unable to malloc in netlist initialization (1)\n");
         return (-1);
     }
-    */
-    //Hum. Remplacer i_buffer_size par sizeof(data_packet_t) et rajouter
-    //un cast en (data_packet_t *) (c'est un buffer de data_packet_t, quand
-    //même.
-    //D'autre part le INPUT_READ_ONCE n'est là quand dans l'initialisation
-    //des iovec => à virer partout ailleurs.
+    
     p_netlist->p_data = 
-        malloc(i_buffer_size*(i_nb_data + INPUT_READ_ONCE));
+        (data_packet_t *) malloc(sizeof(data_packet_t)*(i_nb_data));
     if ( p_netlist->p_data == NULL )
     {
         intf_ErrMsg ("Unable to malloc in netlist initialization (2)\n");
         return (-1);
     }
-    //Pareil.
+    
     p_netlist->p_pes = 
-        malloc(i_buffer_size*(i_nb_pes + INPUT_READ_ONCE));
+        (pes_packet_t *) malloc(sizeof(pes_packet_t)*(i_nb_pes));
     if ( p_netlist->p_pes == NULL )
     {
         intf_ErrMsg ("Unable to malloc in netlist initialization (3)\n");
         return (-1);
     }
-    //Il faut toujours caster la sortie du malloc (ça renvoie void * par
-    //défaut)
+    
+    /* allocate the FIFOs */
     p_netlist->pp_free_data = 
-        malloc (i_nb_data * sizeof(data_packet_t *) );
+        (data_packet_t **) malloc (i_nb_data * sizeof(data_packet_t *) );
     if ( p_netlist->pp_free_data == NULL )
     {
         intf_ErrMsg ("Unable to malloc in netlist initialization (4)\n");
     }
-    //i_nb_pes peut-être ?
     p_netlist->pp_free_pes = 
-        malloc (i_nb_data * sizeof(pes_packet_t *) );
+        (pes_packet_t **) malloc (i_nb_pes * sizeof(pes_packet_t *) );
     if ( p_netlist->pp_free_pes == NULL )
     {
         intf_ErrMsg ("Unable to malloc in netlist initialization (5)\n");
     }
-    //p_free_iovec = malloc( (i_nb_data + INPUT_READ_ONCE) * sizeof(...) )
-
+    
+    p_netlist->p_free_iovec = ( struct iovec * )
+        malloc( (i_nb_data + INPUT_READ_ONCE) * sizeof(struct iovec) );
+    if ( p_netlist->p_free_iovec == NULL )
+    {
+        intf_ErrMsg ("Unable to malloc in netlist initialization (6)\n");
+    }
     
     /* Fill the data FIFO */
     for ( i_loop = 0; i_loop < i_nb_data; i_loop++ )
     {
         p_netlist->pp_free_data[i_loop] = 
             p_netlist->p_data + i_loop;
-        //manque l'initialisation de l'intérieur de p_data (cf. supra)
+
+        p_netlist->pp_free_data[i_loop]->p_buffer = 
+            p_netlist->p_buffers + i_loop * i_buffer_size;
+        
+        p_netlist->pp_free_data[i_loop]->p_payload_start = 
+            p_netlist->pp_free_data[i_loop]->p_buffer;
+
+        p_netlist->pp_free_data[i_loop]->p_payload_end =
+            p_netlist->pp_free_data[i_loop]->p_buffer + i_buffer_size;
     }
     /* Fill the PES FIFO */
-    for ( i_loop = 0; i_loop < i_nb_pes + INPUT_READ_ONCE; i_loop++ )
+    for ( i_loop = 0; i_loop < i_nb_pes ; i_loop++ )
     {
         p_netlist->pp_free_pes[i_loop] = 
             p_netlist->p_pes + i_loop;
     }
-    //p_free_iovec[i_loop].iov_base = p_buffers + i_loop * i_buffer_size
-    //p_free_iovec[i_loop].iov_len = i_buffer_size
+   
+    /* Deal with the iovec */
+    for ( i_loop = 0; i_loop < i_nb_data; i_loop++ )
+    {
+        p_netlist->p_free_iovec[i_loop].iov_base = 
+            p_netlist->p_buffers + i_loop * i_buffer_size;
+   
+        p_netlist->p_free_iovec[i_loop].iov_len = i_buffer_size;
+    }
+    
     /* vlc_mutex_init */
     vlc_mutex_init (&p_netlist->lock);
     
@@ -141,9 +151,8 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     p_netlist->i_pes_start = 0;
     p_netlist->i_pes_end = i_nb_pes + INPUT_READ_ONCE - 1;
 
-    // p_netlist->i_iovec_start = 0;
-    // p_netlist->i_iovec_end = /* ?? */
-    //i_nb_data - 1
+    p_netlist->i_iovec_start = 0;
+    p_netlist->i_iovec_end = i_nb_data - 1;
     
     p_netlist->i_nb_data = i_nb_data;
     p_netlist->i_nb_pes = i_nb_pes;
@@ -155,40 +164,60 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
 /*****************************************************************************
  * input_NetlistGetiovec: returns an iovec pointer for a readv() operation
  *****************************************************************************/
-struct iovec * input_NetlistGetiovec( void * p_netlist )
+struct iovec * input_NetlistGetiovec( void * p_method_data )
 {
-    /* fonction la plus difficile, terminer par celle-la 
-     * je la ferai plus tard :p */
-    //vérifier i_iovec_end - i_iovec_start > INPUT_READ_ONCE
-    //la grosse astuce :
-    //if( i_nb_data - i_iovec_start < INPUT_READ_ONCE )
-    //  memcpy( &p_free_iovec[i_nb_data], p_free_iovec, INPUT_READ_ONCE*... )
-    //return &p_free_iovec[i_iovec_start];
-    return ( NULL ); /* nothing yet */
+    netlist_t * p_netlist;
+
+    /* cast */
+    p_netlist = ( netlist_t * ) p_method_data;
+    
+    /* check */
+    if ( 
+     (p_netlist->i_iovec_end - p_netlist->i_iovec_start)%p_netlist->i_nb_data 
+     < INPUT_READ_ONCE )
+    {
+        intf_ErrMsg("Empty iovec FIFO. Unable to allocate memory\n");
+        return (NULL);
+    }
+
+    /* readv only takes contiguous buffers */
+    if( p_netlist->i_nb_data - p_netlist->i_iovec_start < INPUT_READ_ONCE )
+        memcpy( &p_netlist->p_free_iovec[p_netlist->i_nb_data], 
+                p_netlist->p_free_iovec, 
+                INPUT_READ_ONCE-(p_netlist->i_nb_data-p_netlist->i_iovec_start)
+              );
+
+    p_netlist->i_iovec_start += INPUT_READ_ONCE;
+    p_netlist->i_iovec_start %= p_netlist->i_nb_data;
+    
+    return &p_netlist->p_free_iovec[p_netlist->i_iovec_start];
 }
 
-//je rajoute celle-là
 /*****************************************************************************
  * input_NetlistMviovec: move the iovec pointer after a readv() operation
  *****************************************************************************/
-void input_NetlistMviovec( void * p_netlist, size_t i_nb_iovec )
+void input_NetlistMviovec( void * p_method_data, size_t i_nb_iovec )
 {
-    //i_iovec_start += i_nb_iovec
-    //i_iovec_start %= i_nb_data //oui j'ai bien dit i_nb_data
+    netlist_t * p_netlist;
+
+    /* cast */
+    p_netlist = (netlist_t *) p_method_data;
+    
+    p_netlist->i_iovec_start += i_nb_iovec;
+    p_netlist->i_iovec_start %= p_netlist->i_nb_data;
 }
 
 /*****************************************************************************
  * input_NetlistNewPacket: returns a free data_packet_t
  *****************************************************************************/
-struct data_packet_s * input_NetlistNewPacket( void * p_netlist,
+struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
                                                size_t i_buffer_size )
 {    
-    unsigned int i_return;
-    netlist_t * pt_netlist; /* for a cast */
-    //pas beau, pt_netlist, j'aurais préféré void * p_method_data et
-    //netlist_t * p_netlist
-    pt_netlist = ( netlist_t * ) p_netlist;
-    /* cast p_netlist -> netlist_t */
+    netlist_t * p_netlist; 
+    struct data_packet_s * p_return;
+    
+    /* cast */
+    p_netlist = ( netlist_t * ) p_method_data; 
 
 #ifdef DEBUG
     if( i_buffer_size > p_netlist->i_buffer_size )
@@ -200,127 +229,144 @@ struct data_packet_s * input_NetlistNewPacket( void * p_netlist,
 #endif
 
     /* lock */
-    vlc_mutex_lock ( &pt_netlist->lock );
+    vlc_mutex_lock ( &p_netlist->lock );
         
     /* check */
-    if ( pt_netlist->i_data_start == pt_netlist->i_data_end )
+    if ( p_netlist->i_data_start == p_netlist->i_data_end )
     {
-        //empty peut-être ?
-        intf_ErrMsg("Full Data FIFO in netlist - Unable to allocate memory\n");
+        intf_ErrMsg("Empty Data FIFO in netlist. Unable to allocate memory\n");
         return ( NULL );
     }
     
-    i_return = (pt_netlist->i_data_start)++;
-    pt_netlist->i_data_start %= pt_netlist->i_nb_data;
-    //i_iovec_start++; i_iovec_start %= i_nb_data //oui j'ai bien dit i_nb_data
+    p_return = (p_netlist->pp_free_data[p_netlist->i_data_start]);
+    p_netlist->i_data_start++;
+    p_netlist->i_data_start %= p_netlist->i_nb_data;
+    
+    p_netlist->i_iovec_start++; 
+    p_netlist->i_iovec_start %= p_netlist->i_nb_data;
 
     /* unlock */
-    vlc_mutex_unlock (&pt_netlist->lock);
+    vlc_mutex_unlock (&p_netlist->lock);
 
-    //if (i_buffer_size < p_pes->i_buffer_size) => diminuer p_payload_end
+    if (i_buffer_size < p_netlist->i_buffer_size) 
+    {
+        p_return->p_payload_end = p_return->p_payload_start + i_buffer_size;
+    }
+   
+    /* initialize data */
+    p_return->p_next = NULL;
+    p_return->b_discard_payload = 0;
     
-    //risque de race condition : que se passe-t-il si après avoir rendu
-    //le lock un autre thread rend un paquet et écrase
-    //pp_free_data[i_return] ?
-    return ( pt_netlist->pp_free_data[i_return] );
-    //il faudrait aussi initialiser p_payload_start et p_payload_end
+    return ( p_return );
 }
 
 /*****************************************************************************
  * input_NetlistNewPES: returns a free pes_packet_t
  *****************************************************************************/
-struct pes_packet_s * input_NetlistNewPES( void * p_netlist )
+struct pes_packet_s * input_NetlistNewPES( void * p_method_data )
 {
-    unsigned int i_return;
-    netlist_t * pt_netlist; /* for a cast */
-
-    //tout pareil qu'au-dessus
-    pt_netlist = (netlist_t *)p_netlist;
+    netlist_t * p_netlist;
+    pes_packet_t * p_return;
+    
+    /* cast */ 
+    p_netlist = (netlist_t *) p_method_data;
     
     /* lock */
-    vlc_mutex_lock ( &pt_netlist->lock );
+    vlc_mutex_lock ( &p_netlist->lock );
     
     /* check */
-    if ( pt_netlist->i_pes_start == pt_netlist->i_pes_end )
+    if ( p_netlist->i_pes_start == p_netlist->i_pes_end )
     {
-        intf_ErrMsg("Full PES FIFO in netlist - Unable to allocate memory\n");
+        intf_ErrMsg("Empty PES FIFO in netlist - Unable to allocate memory\n");
         return ( NULL );
     }
 
-    i_return = (pt_netlist->i_pes_start)++;
-    pt_netlist->i_pes_start %= pt_netlist->i_nb_pes; 
+    /* allocate */
+    p_return = p_netlist->pp_free_pes[p_netlist->i_pes_start];
+    p_netlist->i_pes_start++;
+    p_netlist->i_pes_start %= p_netlist->i_nb_pes; 
    
     /* unlock */
-    vlc_mutex_unlock (&pt_netlist->lock);
+    vlc_mutex_unlock (&p_netlist->lock);
     
-    return ( pt_netlist->pp_free_pes[i_return] );
-    //il faudrait initialiser le pes :
-    //b_messed_up = b_data_alignment = b_discontinuity = b_has_pts = 0
-    //i_pes_size = 0
-    //p_first = NULL
+    /* initialize PES */
+    p_return->b_messed_up = 
+        p_return->b_data_alignment = 
+        p_return->b_discontinuity = 
+        p_return->b_has_pts = 0;
+    p_return->i_pes_size = 0;
+    p_return->p_first = NULL;
+   
+    return ( p_return );
 }
 
 /*****************************************************************************
  * input_NetlistDeletePacket: puts a data_packet_t back into the netlist
  *****************************************************************************/
-void input_NetlistDeletePacket( void * p_netlist, data_packet_t * p_data )
+void input_NetlistDeletePacket( void * p_method_data, data_packet_t * p_data )
 {
-    netlist_t * pt_netlist; /* for a cast */
-
-    pt_netlist = (netlist_t *) p_netlist;
+    netlist_t * p_netlist;
+    
+    /* cast */
+    p_netlist = (netlist_t *) p_method_data;
 
     /* lock */
-    vlc_mutex_lock ( &pt_netlist->lock );
+    vlc_mutex_lock ( &p_netlist->lock );
 
-    pt_netlist->i_data_end ++;
-    pt_netlist->i_data_end %= pt_netlist->i_nb_data;
-    //i_iovec_end++; i_iovec_end %= i_nb_data //oui j'ai bien dit i_nb_data
-    //p_free_iovec[i_iovec_end].iov_base = p_data->p_buffer
+    /* Delete data_packet */
+    p_netlist->i_data_end ++;
+    p_netlist->i_data_end %= p_netlist->i_nb_data;
+    p_netlist->pp_free_data[p_netlist->i_data_end] = p_data;
     
-    pt_netlist->pp_free_data[pt_netlist->i_data_end] = p_data;
-
+    /* Delete the corresponding iovec */
+    p_netlist->i_iovec_end++; 
+    p_netlist->i_iovec_end %= p_netlist->i_nb_data;
+    p_netlist->p_free_iovec[p_netlist->i_iovec_end].iov_base = 
+        p_data->p_buffer;
+    
     /* unlock */
-    vlc_mutex_unlock (&pt_netlist->lock);    
+    vlc_mutex_unlock (&p_netlist->lock);    
 }
 
 /*****************************************************************************
  * input_NetlistDeletePES: puts a pes_packet_t back into the netlist
  *****************************************************************************/
-void input_NetlistDeletePES( void * p_netlist, pes_packet_t * p_pes )
+void input_NetlistDeletePES( void * p_method_data, pes_packet_t * p_pes )
 {
-    /* idem, plus detruire tous les data_packet_t dans p_pes->p_first,
-     * p_pes->p_first->p_next, etc. */
-    netlist_t * pt_netlist; /* for a cast */
+    netlist_t * p_netlist; 
     data_packet_t * p_current_packet;
     
-    pt_netlist = (netlist_t *)p_netlist;
+    /* cast */
+    p_netlist = (netlist_t *)p_method_data;
 
-     /* lock */
-    vlc_mutex_lock ( &pt_netlist->lock );
+    /* lock */
+    vlc_mutex_lock ( &p_netlist->lock );
 
-    /* free  p_pes->p_first, p_next ... */
+    /* delete free  p_pes->p_first, p_next ... */
     p_current_packet = p_pes->p_first;
     while ( p_current_packet != NULL )
     {
-        /* copy of NetListDeletePacket 
-         * Duplicate code avoid many locks */
-        pt_netlist->i_data_end ++;
-        pt_netlist->i_data_end %= pt_netlist->i_nb_data;
-        //i_iovec_end++; i_iovec_end %= i_nb_data //oui j'ai bien dit i_nb_data
-        //p_free_iovec[i_iovec_end].iov_base = p_data->p_buffer
-    
-        pt_netlist->pp_free_data[pt_netlist->i_data_end] = p_current_packet;
+        /* copy of NetListDeletePacket, duplicate code avoid many locks */
 
+        p_netlist->i_data_end ++;
+        p_netlist->i_data_end %= p_netlist->i_nb_data;
+        p_netlist->pp_free_data[p_netlist->i_data_end] = p_current_packet;
+        
+        p_netlist->i_iovec_end++; 
+        p_netlist->i_iovec_end %= p_netlist->i_nb_data;
+        p_netlist->p_free_iovec[p_netlist->i_iovec_end].iov_base = 
+            p_netlist->p_data->p_buffer;
+    
         p_current_packet = p_current_packet->p_next;
     }
-    
-    pt_netlist->i_pes_end ++;
-    pt_netlist->i_pes_end %= pt_netlist->i_nb_pes;
-
-    pt_netlist->pp_free_pes[pt_netlist->i_pes_end] = p_pes;
+ 
+    /* delete our current PES packet */
+    p_netlist->i_pes_end ++;
+    p_netlist->i_pes_end %= p_netlist->i_nb_pes;
+    p_netlist->pp_free_pes[p_netlist->i_pes_end] = p_pes;
     
     /* unlock */
-    vlc_mutex_unlock (&pt_netlist->lock);
+    vlc_mutex_unlock (&p_netlist->lock);
 }
 
 /*****************************************************************************
@@ -328,8 +374,9 @@ void input_NetlistDeletePES( void * p_netlist, pes_packet_t * p_pes )
  *****************************************************************************/
 void input_NetlistEnd( input_thread_t * p_input)
 {
-    netlist_t * p_netlist; /* for a cast */
+    netlist_t * p_netlist;
 
+    /* cast */
     p_netlist = ( netlist_t * ) p_input->p_method_data;
     
     /* free the FIFO, the buffer, and the netlist structure */
@@ -338,6 +385,6 @@ void input_NetlistEnd( input_thread_t * p_input)
     free (p_netlist->p_pes);
     free (p_netlist->p_data);
 
+    /* free the netlist */
     free (p_netlist);
 }
-//sinon c'est bien (c)
