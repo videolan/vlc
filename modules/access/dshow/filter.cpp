@@ -219,7 +219,7 @@ int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
     if( media_type.majortype == MEDIATYPE_Video )
     {
         /* currently only support this type of video info format */
-        if( media_type.formattype == FORMAT_VideoInfo )
+        if( 1 /* media_type.formattype == FORMAT_VideoInfo */ )
         {
             /* Packed RGB formats */
             if( media_type.subtype == MEDIASUBTYPE_RGB1 )

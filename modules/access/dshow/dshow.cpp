@@ -1115,7 +1115,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
         AM_MEDIA_TYPE *p_mt;
         while( p_enummt->Next( 1, &p_mt, NULL ) == S_OK )
         {
-            int i_current_fourcc = GetFourCCFromMediaType(*p_mt);
+            int i_current_fourcc = GetFourCCFromMediaType( *p_mt );
             if( i_current_fourcc && p_mt->majortype == MEDIATYPE_Video )
             {
                 int i_current_width = p_mt->pbFormat ?
@@ -1188,6 +1188,10 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
             }
             else if( i_current_fourcc && p_mt->majortype == MEDIATYPE_Stream )
             {
+                msg_Dbg( p_this, "EnumDeviceCaps: input pin "
+                         "accepts stream format: %4.4s",
+                         (char *)&i_current_fourcc );
+
                 if( ( !i_fourcc || i_fourcc == i_current_fourcc ) &&
                     mt_count < mt_max )
                 {
@@ -1199,7 +1203,12 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
             }
             else
             {
-                msg_Dbg( p_this, "EnumDeviceCaps: input pin: unknown format" );
+                char *psz_type = "unknown";
+                if( p_mt->majortype == MEDIATYPE_Video ) psz_type = "video";
+                if( p_mt->majortype == MEDIATYPE_Audio ) psz_type = "audio";
+                if( p_mt->majortype == MEDIATYPE_Stream ) psz_type = "stream";
+                msg_Dbg( p_this, "EnumDeviceCaps: input pin: unknown format "
+                         "(%s %4.4s)", psz_type, (char *)&p_mt->subtype );
                 FreeMediaType( *p_mt );
             }
             CoTaskMemFree( (PVOID)p_mt );
