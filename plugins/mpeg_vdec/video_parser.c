@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.2 2001/11/15 17:39:12 sam Exp $
+ * $Id: video_parser.c,v 1.3 2001/11/21 22:33:03 jlj Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -125,6 +125,7 @@ static int mpeg_vdec_Probe( probedata_t *p_data )
 static int mpeg_vdec_Run ( decoder_config_t * p_config )
 {
     vpar_thread_t *     p_vpar;
+    boolean_t           b_error;
 
     intf_DbgMsg( "vpar debug: video parser thread created. Initializing..." );
 
@@ -173,7 +174,7 @@ static int mpeg_vdec_Run ( decoder_config_t * p_config )
     /*
      * Error loop
      */
-    if( p_vpar->p_fifo->b_error )
+    if( ( b_error = p_vpar->p_fifo->b_error ) )
     {
         mpeg_vdec_ErrorThread( p_vpar );
     }
@@ -181,7 +182,7 @@ static int mpeg_vdec_Run ( decoder_config_t * p_config )
     /* End of thread */
     mpeg_vdec_EndThread( p_vpar );
 
-    if( p_vpar->p_fifo->b_error )
+    if( b_error )
     {
         return( -1 );
     }
