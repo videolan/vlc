@@ -10,12 +10,12 @@
 ################################################################################
 
 # Audio output settings
-AUDIO = dsp
-#AUDIO += esd
+AOUT = dsp
+#AOUT += esd
 # Not yet supported
-#AUDIO += alsa
+#AOUT += alsa
 # Fallback method that should always work
-AUDIO += dummy
+AOUT += dummy
 
 # Video output settings
 VOUT = x11
@@ -68,10 +68,6 @@ DEBUG=0
 ################################################################################
 # Configuration pre-processing
 ################################################################################
-
-# audio and video options
-AUDIO := $(shell echo $(AUDIO) | tr 'A-Z' 'a-z')
-VIDEO := $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
 
 # PROGRAM_OPTIONS is an identification string of the compilation options
 PROGRAM_OPTIONS = $(SYS) $(ARCH)
