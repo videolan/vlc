@@ -408,35 +408,25 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_POSITION )
             {
-                playlist_t *p_playlist =
-                    vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                     FIND_ANYWHERE );
                 char psz_duration[MSTRTIME_MAX_SIZE];
                 char psz_time[MSTRTIME_MAX_SIZE];
                 vlc_value_t time;
                 mtime_t i_seconds;
 
                 var_Get( p_input, "time", &time );
+                i_seconds = time.i_time / 1000000;
+                secstotimestr ( psz_time, i_seconds );
 
-                if( p_playlist )
+                var_Get( p_input, "length", &time );
+                if( time.i_time > 0 )
                 {
-                    mtime_t dur =
-                        p_playlist->pp_items[p_playlist->i_index]->input.i_duration;
-
-                    i_seconds = time.i_time / 1000000;
-                    secstotimestr ( psz_time, i_seconds );
-
-                    if( dur != -1 )
-                    {
-                        secstotimestr( psz_duration, dur / 1000000 );
-                        vout_OSDMessage( p_playlist, "%s / %s",
-                                         psz_time, psz_duration );
-                    }
-                    else if( i_seconds > 0 )
-                    {
-                        vout_OSDMessage( p_playlist, psz_time );
-                    }
-                    vlc_object_release( p_playlist );
+                    secstotimestr( psz_duration, time.i_time / 1000000 );
+                    vout_OSDMessage( p_input, "%s / %s",
+                                     psz_time, psz_duration );
+                }
+                else if( i_seconds > 0 )
+                {
+                    vout_OSDMessage( p_input, psz_time );
                 }
             }
             else if( i_action >= ACTIONID_PLAY_BOOKMARK1 &&
