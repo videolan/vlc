@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.62 2002/04/23 14:16:21 sam Exp $
+ * $Id: netutils.c,v 1.63 2002/05/15 11:06:17 marcari Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -293,7 +293,11 @@ int network_ChannelJoin( int i_channel )
     }
 
     /* Close the socket and return nicely */
+#ifndef WIN32
     close( i_fd );
+#else
+    closesocket( i_fd );
+#endif
 
     return 0;
 }
