@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.31 2003/05/24 17:52:49 gbazin Exp $
+ * $Id: wxwindows.h,v 1.32 2003/05/26 19:06:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -140,6 +140,7 @@ public:
     OpenDialog  *p_open_dialog;
 
     wxMenu      *p_popup_menu;
+    vlc_bool_t  b_popup_change;
 
 private:
     void CreateOurMenuBar();

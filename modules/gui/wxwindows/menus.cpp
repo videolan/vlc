@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.13 2003/05/24 20:54:27 gbazin Exp $
+ * $Id: menus.cpp,v 1.14 2003/05/26 19:06:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -174,6 +174,7 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
 
     _p_main_interface->p_popup_menu = &popupmenu;
     _p_main_interface->PopupMenu( &popupmenu, pos.x, pos.y );
+    _p_main_interface->p_popup_menu = NULL;
 }
 
 wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )

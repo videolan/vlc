@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.18 2003/05/25 20:16:26 gbazin Exp $
+ * $Id: xcommon.c,v 1.19 2003/05/26 19:06:47 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -539,6 +539,16 @@ static int ManageVideo( vout_thread_t *p_vout )
                         p_intf->b_menu_change = 1;
                         vlc_object_release( p_intf );
                     }
+
+                    playlist_t *p_playlist =
+                        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                         FIND_ANYWHERE );
+                    if( p_playlist != NULL )
+                    {
+                        vlc_value_t val;
+                        var_Set( p_playlist, "intf-popupmenu", val );
+                        vlc_object_release( p_playlist );
+                    }
                 }
                 break;
             case XK_Left:
@@ -675,6 +685,16 @@ static int ManageVideo( vout_thread_t *p_vout )
                         {
                             p_intf->b_menu_change = 1;
                             vlc_object_release( p_intf );
+                        }
+
+                        playlist_t *p_playlist =
+                        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                         FIND_ANYWHERE );
+                        if( p_playlist != NULL )
+                        {
+                            vlc_value_t val;
+                            var_Set( p_playlist, "intf-popupmenu", val );
+                            vlc_object_release( p_playlist );
                         }
                     }
                     break;

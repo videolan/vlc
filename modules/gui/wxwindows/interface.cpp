@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.34 2003/05/26 16:06:13 gbazin Exp $
+ * $Id: interface.cpp,v 1.35 2003/05/26 19:06:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -172,6 +172,8 @@ Interface::Interface( intf_thread_t *_p_intf ):
     p_prefs_dialog = NULL;
     i_old_playing_status = PAUSE_S;
     p_open_dialog = NULL;
+    p_popup_menu = NULL;
+    b_popup_change = VLC_FALSE;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );

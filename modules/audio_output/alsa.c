@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.27 2003/05/19 23:36:44 gbazin Exp $
+ * $Id: alsa.c,v 1.28 2003/05/26 19:06:47 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -123,6 +123,7 @@ static void Probe( aout_instance_t * p_aout,
             msg_Warn( p_aout, "unable to retrieve initial hardware parameters"
                               ", disabling linear PCM audio" );
             snd_pcm_close( p_sys->p_snd_pcm );
+            var_Destroy( p_aout, "audio-device" );
             return;
         }
 
@@ -135,6 +136,7 @@ static void Probe( aout_instance_t * p_aout,
             msg_Warn( p_aout, "unable to set stream sample size and word order"
                               ", disabling linear PCM audio" );
             snd_pcm_close( p_sys->p_snd_pcm );
+            var_Destroy( p_aout, "audio-device" );
             return;
         }
 
@@ -206,6 +208,14 @@ static void Probe( aout_instance_t * p_aout,
 
             snd_pcm_close( p_sys->p_snd_pcm );
         }
+    }
+
+    var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    if( val.i_int <= 0 )
+    {
+        /* Probe() has failed. */
+        var_Destroy( p_aout, "audio-device" );
+        return;
     }
 
     /* Add final settings to the variable */

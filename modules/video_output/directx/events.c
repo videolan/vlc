@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.15 2003/05/17 14:36:19 gbazin Exp $
+ * $Id: events.c,v 1.16 2003/05/26 19:06:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -170,13 +170,14 @@ void DirectXEventThread( event_thread_t *p_event )
             val.i_int &= ~4;
             var_Set( p_event->p_vout, "mouse-button-down", val );
             {
-                intf_thread_t *p_intf;
-                p_intf = vlc_object_find( p_event, VLC_OBJECT_INTF,
-                                                   FIND_ANYWHERE );
-                if( p_intf )
+                playlist_t *p_playlist =
+                    vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                     FIND_ANYWHERE );
+                if( p_playlist != NULL )
                 {
-                    p_intf->b_menu_change = 1;
-                    vlc_object_release( p_intf );
+                    vlc_value_t val;
+                    var_Set( p_playlist, "intf-popupmenu", val );
+                    vlc_object_release( p_playlist );
                 }
             }
             break;
@@ -202,13 +203,14 @@ void DirectXEventThread( event_thread_t *p_event )
 
             case VK_MENU:
                 {
-                    intf_thread_t *p_intf;
-                    p_intf = vlc_object_find( p_event->p_vout, VLC_OBJECT_INTF,
-                                              FIND_ANYWHERE );
-                    if( p_intf )
+                    playlist_t *p_playlist =
+                        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                         FIND_ANYWHERE );
+                    if( p_playlist != NULL )
                     {
-                        p_intf->b_menu_change = 1;
-                        vlc_object_release( p_intf );
+                        vlc_value_t val;
+                        var_Set( p_playlist, "intf-popupmenu", val );
+                        vlc_object_release( p_playlist );
                     }
                 }
                 break;

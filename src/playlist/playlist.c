@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.35 2003/05/12 17:33:20 gbazin Exp $
+ * $Id: playlist.c,v 1.36 2003/05/26 19:06:47 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,6 +63,8 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     var_Create( p_playlist, "intf-change", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
+
+    var_Create( p_playlist, "intf-popupmenu", VLC_VAR_VOID );
 
     p_playlist->p_input = NULL;
     p_playlist->i_status = PLAYLIST_STOPPED;

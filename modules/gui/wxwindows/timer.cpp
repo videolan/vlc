@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.18 2003/05/18 19:46:35 gbazin Exp $
+ * $Id: timer.cpp,v 1.19 2003/05/26 19:06:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -49,6 +49,10 @@
 
 void DisplayStreamDate( wxControl *, intf_thread_t *, int );
 
+/* Callback prototype */
+int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
+                 vlc_value_t old_val, vlc_value_t new_val, void *param );
+
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
@@ -58,6 +62,17 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
     p_main_interface = _p_main_interface;
     i_old_playing_status = PAUSE_S;
     i_old_rate = DEFAULT_RATE;
+
+    /* Register callback for the intf-popupmenu variable */
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB,
+			 p_main_interface );
+        vlc_object_release( p_playlist );
+    }
 
     Start( 100 /*milliseconds*/, wxTIMER_CONTINUOUS );
 }
@@ -104,12 +119,21 @@ void Timer::Notify()
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* If the "display popup" flag has changed */
-    if( p_intf->b_menu_change )
+    if( p_main_interface->b_popup_change )
     {
         wxPoint mousepos = wxGetMousePosition();
-        PopupMenu( p_intf, p_main_interface,
-                   p_main_interface->ScreenToClient(mousepos) );
-        p_intf->b_menu_change = 0;
+
+#if defined( __WXMSW__ ) || defined( __WXMAC__ )
+        wxContextMenuEvent event =
+            wxContextMenuEvent( wxEVT_NULL, 0, mousepos );
+#else
+        wxMouseEvent event = wxMouseEvent( wxEVT_RIGHT_UP );
+        event.m_x = p_main_interface->ScreenToClient(mousepos).x;
+        event.m_y = p_main_interface->ScreenToClient(mousepos).y;
+#endif
+        p_main_interface->AddPendingEvent(event);
+
+        p_main_interface->b_popup_change = VLC_FALSE;
     }
 
     /* Update the log window */
@@ -120,7 +144,7 @@ void Timer::Notify()
 
     /* Update the fileinfo windows */
     p_intf->p_sys->p_fileinfo_window->UpdateFileInfo();
-    
+
     /* Update the input */
     if( p_intf->p_sys->p_input == NULL )
     {
@@ -295,4 +319,19 @@ void DisplayStreamDate( wxControl *p_slider_frame, intf_thread_t * p_intf ,
                     psz_time, p_area->i_size * i_pos / SLIDER_MAX_POS )) );
 #undef p_area
      }
+}
+
+/*****************************************************************************
+ * PlaylistChanged: callback triggered by the intf-change playlist variable
+ *  We don't rebuild the playlist directly here because we don't want the
+ *  caller to block for a too long time.
+ *****************************************************************************/
+int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
+                 vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    Interface *p_main_interface = (Interface *)param;
+
+    p_main_interface->b_popup_change = VLC_TRUE;
+
+    return VLC_SUCCESS;
 }
