@@ -62,3 +62,15 @@ begin
   button = FORWARD_UP
   config = FAST
 end
+
+begin
+  prog = vlc
+  button = VOLUME_DOWN_DOWN
+  config = VOL_DOWN
+end
+
+begin
+  prog = vlc
+  button = VOLUME_UP_DOWN
+  config = VOL_UP
+end

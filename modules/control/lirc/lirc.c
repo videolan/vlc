@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.3 2003/01/12 15:38:35 sigmunau Exp $
+ * $Id: lirc.c,v 1.4 2003/02/16 10:25:57 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -32,6 +32,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+#include <vlc/aout.h>
 
 #include <lirc/lirc_client.h>
 
@@ -169,7 +170,14 @@ static void Run( intf_thread_t *p_intf )
                 p_intf->p_vlc->b_die = VLC_TRUE;
                 continue;
             }
-
+            if( !strcmp( c, "VOL_UP" ) )
+            {
+                aout_VolumeUp( p_intf, 1, NULL );
+            }
+            if( !strcmp( c, "VOL_DOWN" ) )
+            {
+                aout_VolumeDown( p_intf, 1, NULL );
+            }
             if( !strcmp( c, "FULLSCREEN" ) )
             {
                 vout_thread_t *p_vout;
