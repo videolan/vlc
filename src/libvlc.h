@@ -315,6 +315,9 @@ static char *ppsz_align_descriptions[] =
 #define STOP_TIME_TEXT N_("Input stop time (seconds)")
 #define STOP_TIME_LONGTEXT N_("Input stop time (seconds)")
 
+#define INPUT_SLAVE_TEXT N_("Input slave (experimental)")
+#define INPUT_SLAVE_LONGTEXT N_("Input slave (experimental)")
+
 #define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
 #define BOOKMARKS_LONGTEXT N_("You can specify a list of bookmarks for a stream in " \
     "the form \"{name=bookmark-name,time=optional-time-offset," \
@@ -862,6 +865,9 @@ vlc_module_begin();
                  START_TIME_TEXT, START_TIME_LONGTEXT, VLC_TRUE );
     add_integer( "stop-time", 0, NULL,
                  STOP_TIME_TEXT, STOP_TIME_LONGTEXT, VLC_TRUE );
+    add_string( "input-slave", NULL, NULL,
+                 INPUT_SLAVE_TEXT, INPUT_SLAVE_LONGTEXT, VLC_TRUE );
+
     add_string( "bookmarks", NULL, NULL,
                  BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_TRUE );
 

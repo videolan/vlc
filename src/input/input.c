@@ -685,6 +685,41 @@ static int Init( input_thread_t * p_input )
     }
     free( psz_subtitle );
 
+    /* Look for slave */
+    psz = var_GetString( p_input, "input-slave" );
+    if( *psz )
+    {
+        char *psz_delim = strchr( psz, '#' );
+
+        for( ;; )
+        {
+            input_source_t *slave;
+
+            if( psz_delim )
+            {
+                *psz_delim++ = '\0';
+            }
+
+            if( *psz == '\0' )
+            {
+                if( psz_delim )
+                    continue;
+                else
+                    break;
+            }
+
+            msg_Dbg( p_input, "adding slave '%s'", psz );
+            slave = InputSourceNew( p_input );
+            if( !InputSourceInit( p_input, slave, psz, NULL ) )
+            {
+                TAB_APPEND( p_input->i_slave, p_input->slave, slave );
+            }
+            if( !psz_delim )
+                break;
+        }
+    }
+    free( psz );
+
     /* Set up es_out */
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
     val.b_bool =  VLC_FALSE;
