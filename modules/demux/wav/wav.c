@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.13 2003/02/27 13:19:43 gbazin Exp $
+ * $Id: wav.c,v 1.14 2003/03/11 06:45:59 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -448,6 +448,18 @@ static int WAVInit( vlc_object_t * p_this )
         case( WAVE_FORMAT_PCM ):
             msg_Dbg( p_input,"found raw pcm audio format" );
             p_demux->i_fourcc = VLC_FOURCC( 'a', 'r', 'a', 'w' );
+            p_demux->GetFrame = PCM_GetFrame;
+            p_demux->psz_demux = strdup( "" );
+            break;
+        case( WAVE_FORMAT_MULAW ):
+            msg_Dbg( p_input,"found mulaw pcm audio format" );
+            p_demux->i_fourcc = VLC_FOURCC( 'u', 'l', 'a', 'w' );
+            p_demux->GetFrame = PCM_GetFrame;
+            p_demux->psz_demux = strdup( "" );
+            break;
+        case( WAVE_FORMAT_ALAW ):
+            msg_Dbg( p_input,"found alaw pcm audio format" );
+            p_demux->i_fourcc = VLC_FOURCC( 'a', 'l', 'a', 'w' );
             p_demux->GetFrame = PCM_GetFrame;
             p_demux->psz_demux = strdup( "" );
             break;
