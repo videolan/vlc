@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.17 2003/02/15 20:02:16 jpsaman Exp $
+$Id: NEWS,v 1.18 2003/02/16 01:29:39 massiot Exp $
 
 Changes between 0.5.0 and 0.5.1:
 --------------------------------
@@ -39,6 +39,7 @@ Mac OS X port:
  * added half, normal and double video window menu items
  * new step forward/step backward commands
  * the dock should no longer be visible in fullscreen mode
+ * the Mac OS X binary is now compiled with Ogg/theora support
  * vlc.app is now VLC.app
 
 Win32 port:

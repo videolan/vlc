@@ -2,7 +2,7 @@
  * linear.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.7 2002/12/13 01:50:31 gbazin Exp $
+ * $Id: linear.c,v 1.8 2003/02/16 01:29:40 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -86,7 +86,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_filter->p_sys->p_prev_sample = malloc(
-        p_filter->input.i_physical_channels * sizeof(int32_t) );
+        aout_FormatNbChannels( &p_filter->input ) * sizeof(int32_t) );
     if( p_filter->p_sys->p_prev_sample == NULL )
     {
         msg_Err( p_filter, "out of memory" );

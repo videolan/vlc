@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.22 2003/02/09 19:28:43 massiot Exp $
+ * $Id: open.m,v 1.23 2003/02/16 01:29:40 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -192,19 +192,14 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_net_udp_port_lbl setStringValue: _NS("Port")];
     [o_net_udpm_addr_lbl setStringValue: _NS("Address")];
     [o_net_udpm_port_lbl setStringValue: _NS("Port")];
-    [o_net_cs_addr_lbl setStringValue: _NS("Address")];
-    [o_net_cs_port_lbl setStringValue: _NS("Port")];
     [o_net_http_url_lbl setStringValue: _NS("URL")];
 
     [[o_net_mode cellAtRow:0 column:0] setTitle: _NS("UDP/RTP")];
     [[o_net_mode cellAtRow:1 column:0] setTitle: _NS("UDP/RTP Multicast")];
-    [[o_net_mode cellAtRow:2 column:0] setTitle: _NS("Channel server")];
-    [[o_net_mode cellAtRow:3 column:0] setTitle: _NS("HTTP/FTP/MMS")];
+    [[o_net_mode cellAtRow:2 column:0] setTitle: _NS("HTTP/FTP/MMS")];
 
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
-    [o_net_cs_port setIntValue: config_GetInt( p_intf, "channel-port" )];
-    [o_net_cs_port_stp setIntValue: config_GetInt( p_intf, "channel-port" )];
 
     [o_sout_cbox setTitle: _NS("Stream output")];
     [o_sout_mrl_lbl setTitle: _NS("Stream output MRL")];
@@ -254,14 +249,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         selector: @selector(openNetInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: o_net_udpm_port];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(openNetInfoChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_net_cs_addr];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(openNetInfoChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_net_cs_port];
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openNetInfoChanged:)
         name: NSControlTextDidChangeNotification
@@ -597,14 +584,12 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     NSString *o_mode;
     BOOL b_udp = FALSE;
     BOOL b_udpm = FALSE;
-    BOOL b_cs = FALSE;
     BOOL b_http = FALSE;
 
     o_mode = [[o_net_mode selectedCell] title];
 
     if( [o_mode isEqualToString: _NS("UDP/RTP")] ) b_udp = TRUE;   
     else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] ) b_udpm = TRUE;
-    else if( [o_mode isEqualToString: _NS("Channel server")] ) b_cs = TRUE;
     else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS")] ) b_http = TRUE;
 
     [o_net_udp_port setEnabled: b_udp];
@@ -612,9 +597,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_net_udpm_addr setEnabled: b_udpm];
     [o_net_udpm_port setEnabled: b_udpm];
     [o_net_udpm_port_stp setEnabled: b_udpm];
-    [o_net_cs_addr setEnabled: b_cs];
-    [o_net_cs_port setEnabled: b_cs]; 
-    [o_net_cs_port_stp setEnabled: b_cs]; 
     [o_net_http_url setEnabled: b_http];
 
     [self openNetInfoChanged: nil];
@@ -632,10 +614,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     {
         [o_net_udpm_port setIntValue: [o_net_udpm_port_stp intValue]];
     }
-    else if( i_tag == 2 )
-    {
-        [o_net_cs_port setIntValue: [o_net_cs_port_stp intValue]];
-    }
 
     [self openNetInfoChanged: nil];
 }
@@ -643,14 +621,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 - (void)openNetInfoChanged:(NSNotification *)o_notification
 {
     NSString *o_mode;
-    vlc_bool_t b_channel;
     NSString *o_mrl_string = [NSString string];
     intf_thread_t * p_intf = [NSApp getIntf];
 
     o_mode = [[o_net_mode selectedCell] title];
-
-    b_channel = (vlc_bool_t)[o_mode isEqualToString: _NS("Channel server")]; 
-    config_PutInt( p_intf, "network-channel", b_channel );
 
     if( [o_mode isEqualToString: _NS("UDP/RTP")] )
     {
@@ -676,25 +650,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             o_mrl_string = 
                 [o_mrl_string stringByAppendingFormat: @":%i", i_port]; 
         } 
-    }
-    else if( [o_mode isEqualToString: _NS("Channel server")] )
-    {
-        NSString *o_addr = [o_net_cs_addr stringValue];
-        int i_port = [o_net_cs_port intValue];
-
-        if( p_intf->p_vlc->p_channel == NULL )
-        {
-            network_ChannelCreate( p_intf );
-        } 
-
-        config_PutPsz( p_intf, "channel-server", [o_addr lossyCString] ); 
-        if( i_port < 65536 )
-        {
-            config_PutInt( p_intf, "channel-port", i_port );
-        }
-
-        /* FIXME: we should use a playlist server instead */
-        o_mrl_string = [NSString stringWithString: @"udp://"];
     }
     else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS")] )
     {

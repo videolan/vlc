@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2003-02-10 22:48+0100\n"
+"POT-Creation-Date: 2003-02-16 02:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,49 +16,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
-#: src/libvlc.c:253
+#: src/libvlc.c:254
 msgid "C"
 msgstr ""
 
 #. Usage
-#: src/libvlc.c:296 src/libvlc.c:1275
+#: src/libvlc.c:297 src/libvlc.c:1306
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr ""
 
-#: src/libvlc.c:1132 src/misc/configuration.c:916
+#: src/libvlc.c:1138 src/misc/configuration.c:916
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:1150 src/misc/configuration.c:901
+#: src/libvlc.c:1155 src/misc/configuration.c:901
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:1153 src/misc/configuration.c:908
+#: src/libvlc.c:1158 src/misc/configuration.c:908
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:1159
+#: src/libvlc.c:1164
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:1160
+#: src/libvlc.c:1165
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:1250 src/libvlc.c:1305 src/libvlc.c:1329
+#: src/libvlc.c:1281 src/libvlc.c:1336 src/libvlc.c:1360
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
 
-#: src/libvlc.c:1278
+#: src/libvlc.c:1309
 msgid "[module]              [description]\n"
 msgstr ""
 
-#: src/libvlc.c:1323
+#: src/libvlc.c:1354
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -781,7 +781,7 @@ msgstr ""
 #. Stream output options
 #: src/libvlc.h:519 modules/gui/gtk/gnome_interface.c:2149
 #: modules/gui/gtk/gtk_interface.c:2468 modules/gui/gtk/gtk_interface.c:3150
-#: modules/gui/macosx/open.m:209 modules/gui/win32/strings.cpp:221
+#: modules/gui/macosx/open.m:204 modules/gui/win32/strings.cpp:221
 msgid "Stream output"
 msgstr ""
 
@@ -852,7 +852,7 @@ msgstr ""
 #: modules/audio_output/alsa.c:333 modules/audio_output/oss.c:208
 #: modules/audio_output/oss.c:317 modules/audio_output/sdl.c:114
 #: modules/audio_output/sdl.c:177 modules/audio_output/sdl.c:188
-#: modules/audio_output/sdl.c:194 modules/audio_output/waveout.c:362
+#: modules/audio_output/sdl.c:194 modules/audio_output/waveout.c:375
 msgid "Stereo"
 msgstr ""
 
@@ -1139,7 +1139,7 @@ msgstr ""
 #. Open the device
 #: modules/audio_output/alsa.c:126 modules/audio_output/alsa.c:314
 #: modules/audio_output/oss.c:152 modules/audio_output/oss.c:298
-#: modules/audio_output/waveout.c:208 modules/audio_output/waveout.c:315
+#: modules/audio_output/waveout.c:207 modules/audio_output/waveout.c:328
 msgid "A/52 over S/PDIF"
 msgstr ""
 
@@ -1147,19 +1147,19 @@ msgstr ""
 #: modules/audio_output/oss.c:227 modules/audio_output/oss.c:323
 #: modules/audio_output/sdl.c:119 modules/audio_output/sdl.c:178
 #: modules/audio_output/sdl.c:190 modules/audio_output/sdl.c:198
-#: modules/audio_output/waveout.c:376
+#: modules/audio_output/waveout.c:389
 msgid "Mono"
 msgstr ""
 
 #: modules/audio_output/alsa.c:318 modules/audio_output/oss.c:187
-#: modules/audio_output/oss.c:302 modules/audio_output/waveout.c:226
-#: modules/audio_output/waveout.c:331
+#: modules/audio_output/oss.c:302 modules/audio_output/waveout.c:234
+#: modules/audio_output/waveout.c:344
 msgid "5.1"
 msgstr ""
 
 #: modules/audio_output/alsa.c:326 modules/audio_output/oss.c:196
-#: modules/audio_output/oss.c:310 modules/audio_output/waveout.c:233
-#: modules/audio_output/waveout.c:348
+#: modules/audio_output/oss.c:310 modules/audio_output/waveout.c:241
+#: modules/audio_output/waveout.c:361
 msgid "2 Front 2 Rear"
 msgstr ""
 
@@ -1552,9 +1552,9 @@ msgstr ""
 msgid "VLC media player"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:90 modules/gui/macosx/open.m:387
-#: modules/gui/macosx/open.m:423 modules/gui/macosx/open.m:584
-#: modules/gui/macosx/open.m:846 modules/gui/macosx/controls.m:580
+#: modules/gui/familiar/interface.c:90 modules/gui/macosx/open.m:374
+#: modules/gui/macosx/open.m:410 modules/gui/macosx/open.m:571
+#: modules/gui/macosx/open.m:801 modules/gui/macosx/controls.m:580
 msgid "Open"
 msgstr ""
 
@@ -1581,8 +1581,8 @@ msgstr ""
 
 #: modules/gui/familiar/interface.c:131 modules/gui/gtk/gnome_interface.c:607
 #: modules/gui/gtk/gnome_interface.c:1061 modules/gui/gtk/gtk_interface.c:714
-#: modules/gui/gtk/gtk_interface.c:1160 modules/gui/macosx/intf.m:810
-#: modules/gui/macosx/intf.m:811 modules/gui/macosx/intf.m:812
+#: modules/gui/gtk/gtk_interface.c:1160 modules/gui/macosx/intf.m:852
+#: modules/gui/macosx/intf.m:853 modules/gui/macosx/intf.m:854
 #: modules/gui/win32/strings.cpp:102
 msgid "Pause"
 msgstr ""
@@ -1595,8 +1595,8 @@ msgstr ""
 #: modules/gui/familiar/interface.c:144 modules/gui/gtk/gnome_interface.c:595
 #: modules/gui/gtk/gnome_interface.c:1054 modules/gui/gtk/gtk_interface.c:703
 #: modules/gui/macosx/intf.m:278 modules/gui/macosx/intf.m:317
-#: modules/gui/macosx/intf.m:363 modules/gui/macosx/intf.m:817
-#: modules/gui/macosx/intf.m:818 modules/gui/macosx/intf.m:819
+#: modules/gui/macosx/intf.m:363 modules/gui/macosx/intf.m:859
+#: modules/gui/macosx/intf.m:860 modules/gui/macosx/intf.m:861
 #: modules/gui/macosx/playlist.m:122 modules/gui/win32/strings.cpp:100
 #: modules/gui/win32/strings.cpp:204
 msgid "Play"
@@ -1666,7 +1666,7 @@ msgid "Media"
 msgstr ""
 
 #: modules/gui/familiar/interface.c:348 modules/gui/gtk/preferences.c:592
-#: modules/gui/gtk/preferences.c:609 modules/gui/macosx/open.m:758
+#: modules/gui/gtk/preferences.c:609 modules/gui/macosx/open.m:713
 #: modules/gui/win32/strings.cpp:213
 msgid "Save"
 msgstr ""
@@ -1944,8 +1944,8 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1932 modules/gui/gtk/gtk_interface.c:2849
 #: modules/gui/gtk/gtk_interface.c:2966 modules/gui/gtk/gtk_interface.c:3218
 #: modules/gui/macosx/intf.m:301 modules/gui/macosx/open.m:172
-#: modules/gui/macosx/open.m:211 modules/gui/macosx/open.m:326
-#: modules/gui/macosx/open.m:777 modules/gui/macosx/open.m:811
+#: modules/gui/macosx/open.m:206 modules/gui/macosx/open.m:313
+#: modules/gui/macosx/open.m:732 modules/gui/macosx/open.m:766
 #: modules/gui/win32/strings.cpp:93 modules/gui/win32/strings.cpp:226
 msgid "File"
 msgstr ""
@@ -1955,7 +1955,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2383 modules/gui/gtk/gtk_interface.c:634
 #: modules/gui/gtk/gtk_interface.c:821 modules/gui/gtk/gtk_interface.c:2053
 #: modules/gui/gtk/gtk_interface.c:2842 modules/gui/macosx/open.m:173
-#: modules/gui/macosx/open.m:330 modules/gui/win32/strings.cpp:43
+#: modules/gui/macosx/open.m:317 modules/gui/win32/strings.cpp:43
 #: modules/gui/win32/strings.cpp:95
 msgid "Disc"
 msgstr ""
@@ -2156,7 +2156,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2105 modules/gui/gtk/gtk_interface.c:1925
 #: modules/gui/gtk/gtk_interface.c:2422 modules/gui/macosx/open.m:176
 #: modules/gui/macosx/open.m:179 modules/gui/macosx/open.m:185
-#: modules/gui/macosx/open.m:215 modules/gui/win32/strings.cpp:229
+#: modules/gui/macosx/open.m:210 modules/gui/win32/strings.cpp:229
 #: modules/gui/win32/strings.cpp:248
 msgid "Browse..."
 msgstr ""
@@ -2167,13 +2167,13 @@ msgid "Disc type"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1653 modules/gui/gtk/gtk_interface.c:1968
-#: modules/gui/macosx/open.m:189 modules/gui/macosx/open.m:545
+#: modules/gui/macosx/open.m:189 modules/gui/macosx/open.m:532
 msgid "DVD"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1661 modules/gui/gtk/gtk_interface.c:1976
-#: modules/gui/macosx/open.m:190 modules/gui/macosx/open.m:454
-#: modules/gui/macosx/open.m:537
+#: modules/gui/macosx/open.m:190 modules/gui/macosx/open.m:441
+#: modules/gui/macosx/open.m:524
 msgid "VCD"
 msgstr ""
 
@@ -2201,27 +2201,25 @@ msgid "Use DVD menus"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1755 modules/gui/gtk/gtk_interface.c:2070
-#: modules/gui/macosx/open.m:199 modules/gui/macosx/open.m:605
-#: modules/gui/macosx/open.m:655 modules/gui/win32/strings.cpp:169
+#: modules/gui/macosx/open.m:197 modules/gui/macosx/open.m:591
+#: modules/gui/macosx/open.m:629 modules/gui/win32/strings.cpp:169
 msgid "UDP/RTP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1765 modules/gui/gtk/gtk_interface.c:2080
-#: modules/gui/macosx/open.m:200 modules/gui/macosx/open.m:606
-#: modules/gui/macosx/open.m:667 modules/gui/win32/strings.cpp:170
+#: modules/gui/macosx/open.m:198 modules/gui/macosx/open.m:592
+#: modules/gui/macosx/open.m:641 modules/gui/win32/strings.cpp:170
 msgid "UDP/RTP Multicast"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1775 modules/gui/gtk/gtk_interface.c:2090
-#: modules/gui/macosx/open.m:201 modules/gui/macosx/open.m:607
-#: modules/gui/macosx/open.m:652 modules/gui/macosx/open.m:680
 #: modules/gui/win32/strings.cpp:171
 msgid "Channel server"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1785 modules/gui/gtk/gtk_interface.c:2100
-#: modules/gui/macosx/open.m:202 modules/gui/macosx/open.m:608
-#: modules/gui/macosx/open.m:699 modules/gui/win32/strings.cpp:172
+#: modules/gui/macosx/open.m:199 modules/gui/macosx/open.m:593
+#: modules/gui/macosx/open.m:654 modules/gui/win32/strings.cpp:172
 msgid "HTTP/FTP/MMS"
 msgstr ""
 
@@ -2231,27 +2229,26 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:3028 modules/gui/gtk/gtk_interface.c:2110
 #: modules/gui/gtk/gtk_interface.c:2185 modules/gui/gtk/gtk_interface.c:2196
 #: modules/gui/gtk/gtk_interface.c:3341 modules/gui/macosx/open.m:192
-#: modules/gui/macosx/open.m:194 modules/gui/macosx/open.m:196
-#: modules/gui/macosx/open.m:217
+#: modules/gui/macosx/open.m:194 modules/gui/macosx/open.m:212
 msgid "Port"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1805
 #: modules/gui/gtk/gnome_interface.c:1817 modules/gui/gtk/gtk_interface.c:2120
 #: modules/gui/gtk/gtk_interface.c:2132 modules/gui/macosx/open.m:193
-#: modules/gui/macosx/open.m:195 modules/gui/macosx/open.m:216
+#: modules/gui/macosx/open.m:211
 msgid "Address"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1827 modules/gui/gtk/gtk_interface.c:2142
-#: modules/gui/macosx/open.m:197
+#: modules/gui/macosx/open.m:195
 msgid "URL"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1937
 #: modules/gui/gtk/gnome_interface.c:2397 modules/gui/gtk/gtk_interface.c:2252
 #: modules/gui/gtk/gtk_interface.c:2856 modules/gui/macosx/open.m:174
-#: modules/gui/macosx/open.m:334
+#: modules/gui/macosx/open.m:321
 msgid "Network"
 msgstr ""
 
@@ -2299,8 +2296,8 @@ msgstr ""
 msgid "Settings..."
 msgstr ""
 
-#: modules/gui/gtk/gnome_interface.c:2295 modules/gui/macosx/open.m:386
-#: modules/gui/macosx/open.m:422 modules/gui/macosx/open.m:845
+#: modules/gui/gtk/gnome_interface.c:2295 modules/gui/macosx/open.m:373
+#: modules/gui/macosx/open.m:409 modules/gui/macosx/open.m:800
 msgid "Open File"
 msgstr ""
 
@@ -2393,13 +2390,13 @@ msgid "Destination Target: "
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2973 modules/gui/gtk/gtk_interface.c:3228
-#: modules/gui/macosx/open.m:212 modules/gui/macosx/open.m:778
-#: modules/gui/macosx/open.m:816 modules/gui/win32/strings.cpp:227
+#: modules/gui/macosx/open.m:207 modules/gui/macosx/open.m:733
+#: modules/gui/macosx/open.m:771 modules/gui/win32/strings.cpp:227
 msgid "UDP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2983 modules/gui/gtk/gtk_interface.c:3238
-#: modules/gui/macosx/open.m:213 modules/gui/macosx/open.m:779
+#: modules/gui/macosx/open.m:208 modules/gui/macosx/open.m:734
 #: modules/gui/win32/strings.cpp:228
 msgid "RTP"
 msgstr ""
@@ -2415,18 +2412,18 @@ msgid "Address:"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:3072 modules/gui/gtk/gtk_interface.c:3317
-#: modules/gui/macosx/open.m:221 modules/gui/win32/strings.cpp:232
+#: modules/gui/macosx/open.m:216 modules/gui/win32/strings.cpp:232
 msgid "TS"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:3080 modules/gui/gtk/gtk_interface.c:3325
-#: modules/gui/macosx/open.m:220 modules/gui/macosx/open.m:749
-#: modules/gui/macosx/open.m:808 modules/gui/win32/strings.cpp:231
+#: modules/gui/macosx/open.m:215 modules/gui/macosx/open.m:704
+#: modules/gui/macosx/open.m:763 modules/gui/win32/strings.cpp:231
 msgid "PS"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:3088 modules/gui/gtk/gtk_interface.c:3333
-#: modules/gui/macosx/open.m:219 modules/gui/macosx/open.m:807
+#: modules/gui/macosx/open.m:214 modules/gui/macosx/open.m:762
 msgid "AVI"
 msgstr ""
 
@@ -2724,7 +2721,7 @@ msgid "Open Recent"
 msgstr ""
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:307 modules/gui/macosx/intf.m:1457
+#: modules/gui/macosx/intf.m:307 modules/gui/macosx/intf.m:1499
 msgid "Clear Menu"
 msgstr ""
 
@@ -2850,20 +2847,20 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1188
+#: modules/gui/macosx/intf.m:1230
 msgid "Load from file.."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1215
+#: modules/gui/macosx/intf.m:1257
 #, c-format
 msgid "Language 0x%x"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1420
+#: modules/gui/macosx/intf.m:1462
 msgid "No CrashLog found"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1420
+#: modules/gui/macosx/intf.m:1462
 msgid ""
 "Either you are running Mac OS X pre 10.2 or you haven't experienced any "
 "heavy crashes yet."
@@ -2889,24 +2886,24 @@ msgstr ""
 msgid "Use DVD menus (EXPERIMENTAL)"
 msgstr ""
 
-#: modules/gui/macosx/open.m:188 modules/gui/macosx/open.m:443
+#: modules/gui/macosx/open.m:188 modules/gui/macosx/open.m:430
 msgid "VIDEO_TS folder"
 msgstr ""
 
-#: modules/gui/macosx/open.m:210
+#: modules/gui/macosx/open.m:205
 msgid "Stream output MRL"
 msgstr ""
 
-#: modules/gui/macosx/open.m:488 modules/gui/macosx/open.m:540
-#: modules/gui/macosx/open.m:548
+#: modules/gui/macosx/open.m:475 modules/gui/macosx/open.m:527
+#: modules/gui/macosx/open.m:535
 msgid "No %@s found"
 msgstr ""
 
-#: modules/gui/macosx/open.m:583
+#: modules/gui/macosx/open.m:570
 msgid "Open VIDEO_TS Directory"
 msgstr ""
 
-#: modules/gui/macosx/open.m:757
+#: modules/gui/macosx/open.m:712
 msgid "Save File"
 msgstr ""
 
@@ -2914,7 +2911,7 @@ msgstr ""
 msgid "Open subtitle file"
 msgstr ""
 
-#: modules/gui/macosx/vout.m:959
+#: modules/gui/macosx/vout.m:1001
 #, c-format
 msgid "Screen %d"
 msgstr ""
@@ -2931,17 +2928,17 @@ msgstr ""
 msgid "Qt interface module"
 msgstr ""
 
-#. ****************************************************************************
-#. * Module descriptor
-#. ****************************************************************************
 #: modules/gui/win32/win32.cpp:302
 msgid "maximum number of lines in the log window"
 msgstr ""
 
 #: modules/gui/win32/win32.cpp:304
 msgid ""
-"You can set the maximum number of lines that the log window will display. "
-"Enter -1 if you want to keep all messages."
+"You can set the maximum number of lines that the log window will display."
+msgstr ""
+
+#: modules/gui/win32/win32.cpp:305
+msgid " Enter -1 if you want to keep all messages."
 msgstr ""
 
 #: modules/gui/win32/win32.cpp:310
@@ -3691,7 +3688,7 @@ msgstr ""
 msgid "QT Embedded module"
 msgstr ""
 
-#: modules/video_output/sdl.c:105
+#: modules/video_output/sdl.c:106
 msgid "Simple DirectMedia Layer video module"
 msgstr ""
 

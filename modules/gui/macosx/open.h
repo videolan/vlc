@@ -2,7 +2,7 @@
  * open.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.h,v 1.10 2003/02/05 02:31:27 hartman Exp $
+ * $Id: open.h,v 1.11 2003/02/16 01:29:40 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -75,11 +75,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_net_udpm_port;
     IBOutlet id o_net_udpm_port_lbl;
     IBOutlet id o_net_udpm_port_stp;
-    IBOutlet id o_net_cs_addr;
-    IBOutlet id o_net_cs_addr_lbl;
-    IBOutlet id o_net_cs_port;
-    IBOutlet id o_net_cs_port_lbl;
-    IBOutlet id o_net_cs_port_stp;
     IBOutlet id o_net_http_url;
     IBOutlet id o_net_http_url_lbl;
 
