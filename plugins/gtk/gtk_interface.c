@@ -1,10 +1,6 @@
-/*
- * NE PAS ÉDITER CE FICHIER - il est généré par Glade.
- */
+/* This file was created automatically by glade and fixed by fixfiles.sh */
 
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
+#include <videolan/vlc.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1596,7 +1592,7 @@ create_intf_disc (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (disc_name);
   gtk_box_pack_start (GTK_BOX (hbox2), disc_name, TRUE, TRUE, 0);
-  gtk_entry_set_text (GTK_ENTRY (disc_name), _("/dev/dvd"));
+  gtk_entry_set_text (GTK_ENTRY (disc_name), config_GetPszVariable( "dvd" ));
 
   dialog_action_area1 = GTK_DIALOG (intf_disc)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_disc), "dialog_action_area1", dialog_action_area1);
@@ -1657,11 +1653,11 @@ create_intf_network (void)
   GtkWidget *network_multicast_address_label;
   GtkWidget *network_channel_address_label;
   GtkWidget *network_http_url_label;
-  GtkWidget *combo1;
+  GtkWidget *network_multicast_address_combo;
   GtkWidget *network_multicast_address;
   GtkObject *network_udp_port_adj;
   GtkWidget *network_udp_port;
-  GtkWidget *combo2;
+  GtkWidget *network_channel_address_combo;
   GtkWidget *network_channel_address;
   GtkWidget *network_multicast_port_label;
   GtkWidget *network_channel_port_label;
@@ -1794,21 +1790,21 @@ create_intf_network (void)
   gtk_widget_set_sensitive (network_http_url_label, FALSE);
   gtk_misc_set_alignment (GTK_MISC (network_http_url_label), 1, 0.5);
 
-  combo1 = gtk_combo_new ();
-  gtk_widget_ref (combo1);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "combo1", combo1,
+  network_multicast_address_combo = gtk_combo_new ();
+  gtk_widget_ref (network_multicast_address_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_multicast_address_combo", network_multicast_address_combo,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (combo1);
-  gtk_table_attach (GTK_TABLE (table4), combo1, 2, 4, 1, 2,
+  gtk_widget_show (network_multicast_address_combo);
+  gtk_table_attach (GTK_TABLE (table4), network_multicast_address_combo, 2, 4, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_sensitive (network_multicast_address_combo, FALSE);
 
-  network_multicast_address = GTK_COMBO (combo1)->entry;
+  network_multicast_address = GTK_COMBO (network_multicast_address_combo)->entry;
   gtk_widget_ref (network_multicast_address);
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_multicast_address", network_multicast_address,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_multicast_address);
-  gtk_widget_set_sensitive (network_multicast_address, FALSE);
 
   network_udp_port_adj = gtk_adjustment_new (1234, 0, 65535, 1, 10, 10);
   network_udp_port = gtk_spin_button_new (GTK_ADJUSTMENT (network_udp_port_adj), 1, 0);
@@ -1821,21 +1817,21 @@ create_intf_network (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_widget_set_usize (network_udp_port, 1, -2);
 
-  combo2 = gtk_combo_new ();
-  gtk_widget_ref (combo2);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "combo2", combo2,
+  network_channel_address_combo = gtk_combo_new ();
+  gtk_widget_ref (network_channel_address_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_address_combo", network_channel_address_combo,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (combo2);
-  gtk_table_attach (GTK_TABLE (table4), combo2, 2, 4, 2, 3,
+  gtk_widget_show (network_channel_address_combo);
+  gtk_table_attach (GTK_TABLE (table4), network_channel_address_combo, 2, 4, 2, 3,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_sensitive (network_channel_address_combo, FALSE);
 
-  network_channel_address = GTK_COMBO (combo2)->entry;
+  network_channel_address = GTK_COMBO (network_channel_address_combo)->entry;
   gtk_widget_ref (network_channel_address);
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_address", network_channel_address,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_channel_address);
-  gtk_widget_set_sensitive (network_channel_address, FALSE);
 
   network_multicast_port_label = gtk_label_new (_("Port"));
   gtk_widget_ref (network_multicast_port_label);

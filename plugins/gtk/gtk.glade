@@ -2223,7 +2223,8 @@ http://www.videolan.org/</label>
 
 	  <widget>
 	    <class>GtkCombo</class>
-	    <name>combo1</name>
+	    <name>network_multicast_address_combo</name>
+	    <sensitive>False</sensitive>
 	    <value_in_list>False</value_in_list>
 	    <ok_if_empty>True</ok_if_empty>
 	    <case_sensitive>False</case_sensitive>
@@ -2249,7 +2250,6 @@ http://www.videolan.org/</label>
 	      <class>GtkEntry</class>
 	      <child_name>GtkCombo:entry</child_name>
 	      <name>network_multicast_address</name>
-	      <sensitive>False</sensitive>
 	      <can_focus>True</can_focus>
 	      <editable>True</editable>
 	      <text_visible>True</text_visible>
@@ -2293,7 +2293,8 @@ http://www.videolan.org/</label>
 
 	  <widget>
 	    <class>GtkCombo</class>
-	    <name>combo2</name>
+	    <name>network_channel_address_combo</name>
+	    <sensitive>False</sensitive>
 	    <value_in_list>False</value_in_list>
 	    <ok_if_empty>True</ok_if_empty>
 	    <case_sensitive>False</case_sensitive>
@@ -2319,7 +2320,6 @@ http://www.videolan.org/</label>
 	      <class>GtkEntry</class>
 	      <child_name>GtkCombo:entry</child_name>
 	      <name>network_channel_address</name>
-	      <sensitive>False</sensitive>
 	      <can_focus>True</can_focus>
 	      <editable>True</editable>
 	      <text_visible>True</text_visible>
