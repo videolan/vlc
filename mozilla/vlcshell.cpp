@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.28 2004/01/25 16:17:03 anil Exp $
+ * $Id: vlcshell.cpp,v 1.29 2004/01/25 17:52:17 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -73,9 +73,9 @@
 #include "vlcplugin.h"
 
 #if USE_LIBVLC
-#   define WINDOW_TEXT _("(no picture)")
+#   define WINDOW_TEXT "(no picture)"
 #else
-#   define WINDOW_TEXT _("(no libvlc)")
+#   define WINDOW_TEXT "(no libvlc)"
 #endif
 
 /*****************************************************************************
@@ -133,7 +133,7 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
 #if USE_LIBVLC
             snprintf( psz_desc, 1000-1, PLUGIN_DESCRIPTION, VLC_Version() );
 #else
-            snprintf( psz_desc, 1000-1, PLUGIN_DESCRIPTION, _("(disabled)") );
+            snprintf( psz_desc, 1000-1, PLUGIN_DESCRIPTION, "(disabled)" );
 #endif
             psz_desc[1000-1] = 0;
             *((char **)value) = psz_desc;
