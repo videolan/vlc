@@ -463,10 +463,10 @@ DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.gz
 
 faac-$(FAAC_VERSION).tar.bz2:
 	$(WGET) $(FAAC_URL)
-	patch -p 0 < Patches/faac.patch
 
 faac: faac-$(FAAC_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+	patch -p 0 < Patches/faac.patch
 
 .faac: faac
 	(cd $<; ./bootstrap && ./configure --prefix=$(PREFIX) && make && make install)
