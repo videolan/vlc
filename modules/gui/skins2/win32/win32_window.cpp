@@ -37,14 +37,26 @@
 
 Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                           HINSTANCE hInst, HWND hParentWindow,
-                          bool dragDrop, bool playOnDrop ):
+                          bool dragDrop, bool playOnDrop,
+                          Win32Window *pParentWindow ):
     OSWindow( pIntf ), m_dragDrop( dragDrop ), m_mm( false )
 {
     // Create the window
-    m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW,
-        "SkinWindowClass", "default name", WS_POPUP, CW_USEDEFAULT,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hParentWindow, 0,
-        hInst, NULL );
+    if( pParentWindow )
+    {
+        // Child window (for vout)
+        HWND hParent = pParentWindow->getHandle();
+        m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, "SkinWindowClass",
+            "default name", WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT,
+            CW_USEDEFAULT, CW_USEDEFAULT, hParent, 0, hInst, NULL );
+    }
+    else
+    {
+        // Normal window
+        m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, "SkinWindowClass",
+            "default name", WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
+            CW_USEDEFAULT, CW_USEDEFAULT, hParentWindow, 0, hInst, NULL );
+    }
 
     if( !m_hWnd )
     {
@@ -68,6 +80,13 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                                                           playOnDrop );
         // Register the window as a drop target
         RegisterDragDrop( m_hWnd, m_pDropTarget );
+    }
+    // XXX: Kludge to tell VLC that this window is the vout
+    if( pParentWindow )
+    {
+        vlc_value_t value;
+        value.i_int = (int) (ptrdiff_t) (void *) m_hWnd;
+        var_Set( getIntf()->p_vlc, "drawable", value );
     }
 }
 

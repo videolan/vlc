@@ -223,7 +223,7 @@ OSWindow *Win32Factory::createOSWindow( GenericWindow &rWindow, bool dragDrop,
                                         bool playOnDrop, OSWindow *pParent )
 {
     return new Win32Window( getIntf(), rWindow, m_hInst, m_hParentWindow,
-                            dragDrop, playOnDrop );
+                            dragDrop, playOnDrop, (Win32Window*)pParent );
 }
 
 

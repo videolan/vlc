@@ -36,7 +36,8 @@ class Win32Window: public OSWindow
     public:
         Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                      HINSTANCE hInst, HWND hParentWindow,
-                     bool dragDrop, bool playOnDrop );
+                     bool dragDrop, bool playOnDrop,
+                     Win32Window *pParentWindow );
         virtual ~Win32Window();
 
         // Show the window
