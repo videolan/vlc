@@ -2,7 +2,7 @@
  * linear.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.11 2003/12/22 14:32:55 sam Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -57,7 +57,7 @@ struct aout_filter_sys_t
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("audio filter for linear interpolation resampling") );
-    set_capability( "audio filter", 2 );
+    set_capability( "audio filter", 5 );
     set_callbacks( Create, Close );
 vlc_module_end();
 
@@ -118,7 +118,7 @@ static void Close( vlc_object_t * p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    float *p_in, *p_out = (float *)p_out_buf->p_buffer;
+    float *p_in_orig, *p_in, *p_out = (float *)p_out_buf->p_buffer;
     float *p_prev_sample = (float *)p_filter->p_sys->p_prev_sample;
 
     int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
@@ -145,7 +145,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #ifdef HAVE_ALLOCA
     p_in = (float *)alloca( p_in_buf->i_nb_bytes );
 #else
-    p_in = (float *)malloc( p_in_buf->i_nb_bytes );
+    p_in_orig = p_in = (float *)malloc( p_in_buf->i_nb_bytes );
 #endif
     if( p_in == NULL )
     {
@@ -225,5 +225,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
         i_nb_channels * sizeof(int32_t);
+
+#ifndef HAVE_ALLOCA
+    free( p_in_orig );
+#endif
 
 }

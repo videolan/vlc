@@ -2,7 +2,7 @@
  * ugly.c : ugly resampler (changes pitch)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ugly.c,v 1.9 2003/03/04 03:27:40 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,7 +44,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("audio filter for ugly resampling") );
-    set_capability( "audio filter", 5 );
+    set_capability( "audio filter", 2 );
     set_callbacks( Create, NULL );
 vlc_module_end();
 
@@ -82,7 +82,7 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    int32_t *p_in, *p_out = (int32_t*)p_out_buf->p_buffer;
+    int32_t *p_in_orig, *p_in, *p_out = (int32_t*)p_out_buf->p_buffer;
 
     unsigned int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
     unsigned int i_in_nb = p_in_buf->i_nb_samples;
@@ -100,7 +100,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #ifdef HAVE_ALLOCA
     p_in = (int32_t *)alloca( p_in_buf->i_nb_bytes );
 #else
-    p_in = (int32_t *)malloc( p_in_buf->i_nb_bytes );
+    p_in_orig = p_in = (int32_t *)malloc( p_in_buf->i_nb_bytes );
 #endif
     if( p_in == NULL )
     {
@@ -131,4 +131,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->start_date = p_in_buf->start_date;
     p_out_buf->end_date = p_out_buf->start_date + p_out_buf->i_nb_samples *
         1000000 / p_filter->output.i_rate;
+
+#ifndef HAVE_ALLOCA
+    free( p_in_orig );
+#endif
+
 }
