@@ -3,7 +3,7 @@
 # change_prefix.sh : allow to transfer a contrib dir
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: change_prefix.sh,v 1.1 2003/11/23 13:06:43 massiot Exp $
+# $Id: change_prefix.sh,v 1.2 2003/11/23 13:23:20 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -44,14 +44,17 @@ fi
 cd $top_dir
 files=`find . -type f`
 for file in $files; do
-  libs=`otool -L $file 2>/dev/null | grep $prefix | cut -d\  -f 1`
-  for i in "" $libs; do
-    if ! test -z $i; then
-      install_name_tool -change $i \
-                        `echo $i | sed -e "s,$prefix,$new_prefix,"` \
-                        $file
-    fi
-  done
-  sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
-  mv -f $file.tmp $file
+  if test ".`file $file | grep Mach-O`" != "." ; then
+    libs=`otool -L $file 2>/dev/null | grep $prefix | cut -d\  -f 1`
+    for i in "" $libs; do
+      if ! test -z $i; then
+        install_name_tool -change $i \
+                          `echo $i | sed -e "s,$prefix,$new_prefix,"` \
+                          $file
+      fi
+    done
+  else
+    sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
+    mv -f $file.tmp $file
+  fi
 done
