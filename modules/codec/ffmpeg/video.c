@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.23 2003/04/26 22:06:12 fenrir Exp $
+ * $Id: video.c,v 1.24 2003/04/27 13:03:28 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -453,7 +453,7 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
             i_pts = p_pes->i_pts;
             input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
 
-        } while( i_pts <= 0 || i_pts < mdate() + DEFAULT_PTS_DELAY );
+        } while( i_pts <= 0 || i_pts < mdate() );
     }
 
     if( !p_vdec->p_context->width || !p_vdec->p_context->height )
