@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.3 2002/08/04 22:13:05 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.4 2002/08/10 20:05:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -88,7 +88,7 @@ static int      b_ffmpeginit = 0;
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL );
 #if LIBAVCODEC_BUILD >= 4611
-    add_integer ( "ffmpeg-error-resilience", 0, NULL, 
+    add_integer ( "ffmpeg-error-resilience", -1, NULL, 
                   "error resilience", ERROR_RESILIENCE_LONGTEXT );
     add_integer ( "ffmpeg-workaround-bugs", 0, NULL, 
                   "workaround bugs", "0-99, seems to be for msmpeg v3\n"  );
@@ -431,16 +431,10 @@ static vout_thread_t *ffmpeg_CreateVout( videodec_thread_t *p_vdec,
     {
         msg_Dbg( p_vdec->p_fifo, "no vout present, spawning one" );
     
-        if( !( p_vout = vout_CreateThread( p_vdec->p_fifo,
-                                         i_width,
-                                         i_height,
-                                         i_chroma,
-                                         i_aspect ) ) )
-        {
-            return( NULL ); /* everythings have failed */
-        }
+        p_vout = vout_CreateThread( p_vdec->p_fifo,
+                                    i_width, i_height,
+                                    i_chroma, i_aspect );
     }
-    /* up to now, all this stuff is used for post-processing */
     
     return( p_vout );
 }
@@ -633,8 +627,6 @@ static int InitThread( videodec_thread_t *p_vdec )
 {
     int i_ffmpeg_codec; 
     int i_tmp;
-    int i_use_pp;
-    
     
     if( p_vdec->p_fifo->p_demux_data )
     {
@@ -696,102 +688,7 @@ static int InitThread( videodec_thread_t *p_vdec )
 #endif
     p_vdec->b_hurry_up = config_GetInt(p_vdec->p_fifo, "ffmpeg-hurry-up");
     
-    /* ***** Load for post processing ***** */
 
-    /* get overridden settings */
-    p_vdec->i_pp_mode = 0;
-    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-yv" ) )
-        p_vdec->i_pp_mode |= PP_DEBLOCK_Y_V;
-    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-yh" ) )
-        p_vdec->i_pp_mode |= PP_DEBLOCK_Y_H;
-    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-cv" ) )
-        p_vdec->i_pp_mode |= PP_DEBLOCK_C_V;
-    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-ch" ) )
-        p_vdec->i_pp_mode |= PP_DEBLOCK_C_H;
-    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr-y" ) )
-        p_vdec->i_pp_mode |= PP_DERING_Y;
-    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr-c" ) )
-        p_vdec->i_pp_mode |= PP_DERING_C;
-    
-    if( ( config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-q" ) > 0 )||
-        ( p_vdec->i_pp_mode != 0 ) )
-    {
-        i_use_pp = 1;
-    }
-    else
-    {
-        i_use_pp = 0;
-    }
-
-    if( i_use_pp )
-    {
-        switch( i_ffmpeg_codec )
-        {
-#if LIBAVCODEC_BUILD > 4608
-            case( CODEC_ID_MSMPEG4V1 ):
-            case( CODEC_ID_MSMPEG4V2 ):
-            case( CODEC_ID_MSMPEG4V3 ):
-#else
-            case( CODEC_ID_MSMPEG4 ):
-#endif
-            case( CODEC_ID_MPEG4 ):
-            case( CODEC_ID_H263 ):
-//            case( CODEC_ID_H263P ): I don't use it up to now
-            case( CODEC_ID_H263I ):
-                /* Ok we can make postprocessing :)) */
-                break;
-            default:
-                p_vdec->i_pp_mode = 0;
-                i_use_pp = 0;
-                msg_Warn( p_vdec->p_fifo, 
-                          "Post processing unsupported for this codec" );
-                break;
-
-        }
-    }
-        
-    if( i_use_pp )
-    {
-#if LIBAVCODEC_BUILD > 4613
-        char *psz_name;
-
-        /* first try to get a postprocess module */
-        p_vdec->p_pp = vlc_object_create( p_vdec->p_fifo,
-                                          sizeof( postprocessing_t ) );
-        p_vdec->p_pp->psz_object_name = "postprocessing";
-
-        psz_name = config_GetPsz( p_vdec->p_pp, "ffmpeg-pp" );
-        p_vdec->p_pp->p_module = 
-            module_Need( p_vdec->p_pp, "postprocessing", psz_name );
-        FREE( psz_name );
-        if( !p_vdec->p_pp->p_module )
-        {
-            msg_Warn( p_vdec->p_fifo, "no suitable postprocessing module" );
-            vlc_object_destroy( p_vdec->p_pp );
-            p_vdec->p_pp = NULL;
-            p_vdec->i_pp_mode = 0;
-        }
-        else
-        {
-            /* get mode upon quality */
-            p_vdec->i_pp_mode |= 
-                p_vdec->p_pp->pf_getmode( config_GetInt( p_vdec->p_fifo, 
-                                                         "ffmpeg-pp-q" ),
-                                          config_GetInt( p_vdec->p_fifo,
-                                                         "ffmpeg-pp-auto" ) );
-                    
-            /* allocate table for postprocess */
-            p_vdec->p_context->quant_store = 
-                malloc( sizeof( int ) * ( MBR + 1 ) * ( MBC + 1 ) );
-            p_vdec->p_context->qstride = MBC + 1;
-        }
-#else
-        msg_Warn( p_vdec->p_fifo, 
-                  "post-processing not supported, upgrade ffmpeg" );
-        p_vdec->i_pp_mode = 0;
-#endif
-    }
-    
     /* ***** Open the codec ***** */ 
     if (avcodec_open(p_vdec->p_context, p_vdec->p_codec) < 0)
     {
@@ -804,7 +701,7 @@ static int InitThread( videodec_thread_t *p_vdec )
         msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) started",
                                  p_vdec->psz_namecodec );
     }
-    
+
     /* ***** init this codec with special data(up to now MPEG4 only) ***** */
     if( p_vdec->format.i_data )
     {
@@ -824,6 +721,88 @@ static int InitThread( videodec_thread_t *p_vdec )
         }
     }
     
+    /* ***** Load post processing ***** */
+
+    /* get overridding settings */
+    p_vdec->i_pp_mode = 0;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-yv" ) )
+        p_vdec->i_pp_mode |= PP_DEBLOCK_Y_V;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-yh" ) )
+        p_vdec->i_pp_mode |= PP_DEBLOCK_Y_H;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-cv" ) )
+        p_vdec->i_pp_mode |= PP_DEBLOCK_C_V;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-ch" ) )
+        p_vdec->i_pp_mode |= PP_DEBLOCK_C_H;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr-y" ) )
+        p_vdec->i_pp_mode |= PP_DERING_Y;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr-c" ) )
+        p_vdec->i_pp_mode |= PP_DERING_C;
+    
+    if( ( config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-q" ) > 0 )||
+        ( config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-auto" )  )||
+        ( p_vdec->i_pp_mode != 0 ) )
+    {
+        /* check if the codec support postproc. */
+        switch( i_ffmpeg_codec )
+        {
+#if LIBAVCODEC_BUILD > 4608
+            case( CODEC_ID_MSMPEG4V1 ):
+            case( CODEC_ID_MSMPEG4V2 ):
+            case( CODEC_ID_MSMPEG4V3 ):
+#else
+            case( CODEC_ID_MSMPEG4 ):
+#endif
+            case( CODEC_ID_MPEG4 ):
+            case( CODEC_ID_H263 ):
+//            case( CODEC_ID_H263P ): I don't use it up to now
+            case( CODEC_ID_H263I ):
+                /* Ok we can make postprocessing :)) */
+               /* first try to get a postprocess module */
+#if LIBAVCODEC_BUILD > 4613
+                p_vdec->p_pp = vlc_object_create( p_vdec->p_fifo,
+                                                  sizeof( postprocessing_t ) );
+                p_vdec->p_pp->psz_object_name = "postprocessing";
+                p_vdec->p_pp->p_module = 
+                   module_Need( p_vdec->p_pp, "postprocessing", "$ffmpeg-pp" );
+
+                if( !p_vdec->p_pp->p_module )
+                {
+                    msg_Warn( p_vdec->p_fifo, 
+                              "no suitable postprocessing module" );
+                    vlc_object_destroy( p_vdec->p_pp );
+                    p_vdec->p_pp = NULL;
+                    p_vdec->i_pp_mode = 0;
+                }
+                else
+                {
+                    /* get mode upon quality */
+                    p_vdec->i_pp_mode |= 
+                        p_vdec->p_pp->pf_getmode( 
+                              config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-q" ),
+                              config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-auto" )
+                                                );
+
+                    /* allocate table for postprocess */
+                    p_vdec->p_context->quant_store = 
+                        malloc( sizeof( int ) * ( MBR + 1 ) * ( MBC + 1 ) );
+                    p_vdec->p_context->qstride = MBC + 1;
+                }
+#else
+                p_vdec->i_pp_mode = 0;
+                msg_Warn( p_vdec->p_fifo, 
+                          "post-processing not supported, upgrade ffmpeg" );
+#endif
+                break;
+            default:
+                p_vdec->i_pp_mode = 0;
+                msg_Warn( p_vdec->p_fifo, 
+                          "Post processing unsupported for this codec" );
+                break;
+        }
+
+    }
+//    memset( &p_vdec->statistic, 0, sizeof( statistic_t ) );
+
     return( 0 );
 }
 

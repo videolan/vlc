@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
 
 /* Define if using alloca.c.  */
 #undef C_ALLOCA
@@ -205,6 +205,9 @@
 /* Define if you have the <dvdread/dvd_reader.h> header file.  */
 #undef HAVE_DVDREAD_DVD_READER_H
 
+/* Define if you have the <faad.h> header file.  */
+#undef HAVE_FAAD_H
+
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
 
@@ -327,6 +330,9 @@
 
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
+
+/* Define if you have the <zlib.h> header file.  */
+#undef HAVE_ZLIB_H
 
 /* Define if you have the pth library (-lpth).  */
 #undef HAVE_LIBPTH

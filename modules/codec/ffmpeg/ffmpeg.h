@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.2 2002/08/04 22:13:05 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.3 2002/08/10 20:05:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -38,8 +38,20 @@ typedef struct bitmapinfoheader_s
 
     int i_data;
     u8  *p_data;
-
 } bitmapinfoheader_t;
+
+
+#if 0
+typedef struct statistic_s
+{
+    mtime_t i_frame_time[3];  /* total time to decode frame */
+    int     i_frame_count[3]; /* number of frame to calculate frame_time */
+    
+    int     i_frame_late[3];  /* number of frame consecutively late */
+    int     i_frame_skip[3];  /* number of frame skip */
+
+} statistic_t;
+#endif
 
 typedef struct videodec_thread_s
 {
@@ -58,6 +70,8 @@ typedef struct videodec_thread_s
     char *psz_namecodec;
 
     /* for frame skipping algo */
+//    statistic_s statistic;
+
     int b_hurry_up;
     int i_frame_error;
     int i_frame_skip;

@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: libmp4.c,v 1.2 2002/08/10 20:05:21 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,10 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include <zlib.h>                                     /* for compressed moov */
+#ifdef HAVE_ZLIB_H
+#   include <zlib.h>                                     /* for compressed moov */
+#endif
+
 #include "libmp4.h"
 
 /*****************************************************************************
@@ -1749,6 +1752,7 @@ void MP4_FreeBox_cmvd( input_thread_t *p_input, MP4_Box_t *p_box )
     FREE( p_box->data.p_cmvd->p_data );
 }
 
+
 int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_Stream_t *p_stream_memory;
@@ -1797,7 +1801,12 @@ int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
                     ( p_dcom->data.p_dcom->i_algorithm >> 24 )&0xff );
         return( 1 );
     }
-    
+
+#ifndef HAVE_ZLIB_H
+    msg_Dbg( p_stream->p_input,
+             "Read Box: \"cmov\" zlib unsupported" );
+    return( 1 );
+#else 
     /* decompress data */
     /* allocate a new buffer */
     if( !( p_data = malloc( p_cmvd->data.p_cmvd->i_uncompressed_size ) ) )
@@ -1875,6 +1884,7 @@ int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
              "Read Box: \"cmov\" compressed movie header completed" );
 #endif
     return( i_result );
+#endif /* HAVE_ZLIB_H */
 }
 
 
