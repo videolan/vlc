@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.4 2003/05/07 15:54:49 gbazin Exp $
+ * $Id: menus.cpp,v 1.5 2003/05/08 12:09:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -180,10 +180,6 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
     /* Initializations */
     memset( pi_objects, 0, 5 * sizeof(int) );
 
-    /* Audio menu */
-    ppsz_varnames[i++] = NULL; /* Separator */
-
-    /* Audio menu */
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
@@ -219,8 +215,6 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
     /* Initializations */
     memset( pi_objects, 0, 4 * sizeof(int) );
 
-    ppsz_varnames[i++] = NULL; /* Separator */
-
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_VOUT,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
@@ -251,8 +245,7 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
  *****************************************************************************/
 Menu::Menu( intf_thread_t *_p_intf, Interface *_p_main_interface,
             int i_count, char **ppsz_varnames, int *pi_objects,
-            int i_start_id ):
-    wxMenu( )
+            int i_start_id ): wxMenu( )
 {
     vlc_object_t *p_object;
     int i;
@@ -284,6 +277,12 @@ Menu::Menu( intf_thread_t *_p_intf, Interface *_p_main_interface,
         vlc_object_release( p_object );
     }
 
+    /* Special case for empty menus */
+    if( GetMenuItemCount() == 0 )
+    {
+        Append( MenuDummy_Event, _("Empty") );
+        Enable( MenuDummy_Event, FALSE );
+    }
 }
 
 Menu::~Menu()
@@ -437,7 +436,7 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
           another_val.psz_string =
               strdup(val_list.p_list->p_values[i].psz_string);
           menuitem =
-              new wxMenuItemExt( this, ++i_item_id,
+              new wxMenuItemExt( menu, ++i_item_id,
                                  text_list.p_list->p_values[i].psz_string ?
                                  text_list.p_list->p_values[i].psz_string :
                                  another_val.psz_string,
@@ -453,7 +452,7 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
 
         case VLC_VAR_INTEGER:
           menuitem =
-              new wxMenuItemExt( this, ++i_item_id,
+              new wxMenuItemExt( menu, ++i_item_id,
                                  text_list.p_list->p_values[i].psz_string ?
                                  text_list.p_list->p_values[i].psz_string :
                                  wxString::Format("%d",
@@ -464,15 +463,13 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
 
           menu->Append( menuitem );
 
-          if( !((i_type & VLC_VAR_FLAGS) & VLC_VAR_ISCOMMAND) &&
-              val_list.p_list->p_values[i].i_int == val.i_int )
+          if( val_list.p_list->p_values[i].i_int == val.i_int )
               menu->Check( i_item_id, TRUE );
           break;
 
         default:
           break;
         }
-
     }
 
     /* clean up everything */
