@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.28 2002/12/30 17:36:01 gbazin Exp $
+ * $Id: messages.c,v 1.29 2003/01/15 13:46:05 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -313,7 +313,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
             p_item = p_bank->msg + p_bank->i_stop;
             p_bank->i_stop = (p_bank->i_stop + 1) % VLC_MSG_QSIZE;
 
-            p_item->i_type =        VLC_MSG_ERR;
+            p_item->i_type =        VLC_MSG_WARN;
             p_item->i_object_id =   p_this->i_object_id;
             p_item->i_object_type = p_this->i_object_type;
             p_item->psz_module =    strdup( "message" );
