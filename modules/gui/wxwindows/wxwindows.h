@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.55 2003/08/20 19:17:29 adn Exp $
+ * $Id: wxwindows.h,v 1.56 2003/08/22 08:06:25 asmax Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -762,8 +762,7 @@ static inline int ConvertHotkey( int i_hotkey )
         case KEY_PAGEDOWN: return WXK_NEXT;
         case KEY_TAB: return WXK_TAB;
         case KEY_BACKSPACE: return WXK_BACK;
-        default:
-            return 0;
         }
     }
+    return 0;
 }

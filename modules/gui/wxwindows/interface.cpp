@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.55 2003/08/14 19:25:56 sigmunau Exp $
+ * $Id: interface.cpp,v 1.56 2003/08/22 08:06:25 asmax Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -363,7 +363,7 @@ void Interface::CreateOurToolBar()
                          * version because we don't include wx.rc */
 
     wxToolBar *toolbar = CreateToolBar(
-        wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
+                                       wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
@@ -453,7 +453,7 @@ void Interface::CreateOurSlider()
 void Interface::UpdateAcceleratorTable()
 {
     /* Set some hotkeys */
-    wxAcceleratorEntry entries[6];
+    wxAcceleratorEntry entries[7];
     int i_key = config_GetInt( p_intf, "quit-key" );
     int i = 0;
     entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
@@ -477,7 +477,7 @@ void Interface::UpdateAcceleratorTable()
     entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
                     SlowStream_Event );
 
-    wxAcceleratorTable accel( 6, entries );
+    wxAcceleratorTable accel( 7, entries );
 
     if( !accel.Ok() )
         msg_Err( p_intf, "invalid accelerator table" );
