@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.2 2002/08/26 09:12:46 sam Exp $
+ * $Id: xvideo.c,v 1.3 2003/02/01 18:54:10 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -65,11 +65,6 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "Force the XVideo renderer to use a specific chroma format instead of " \
     "trying to improve performances by using the most efficient one.")
 
-#define DRAWABLE_TEXT N_("X11 drawable")
-#define DRAWABLE_LONGTEXT N_( \
-    "Specify a X11 drawable to use instead of opening a new window. This " \
-    "option is DANGEROUS, use with care.")
-
 #define SHM_TEXT N_("use shared memory")
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between vlc and the X server.")
@@ -80,7 +75,6 @@ vlc_module_begin();
     add_integer( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT );
     add_bool( "xvideo-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT );
     add_string( "xvideo-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT );
-    add_integer( "xvideo-drawable", -1, NULL, DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
 #ifdef HAVE_SYS_SHM_H
     add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT );
 #endif

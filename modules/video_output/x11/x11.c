@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.2 2002/08/26 09:12:46 sam Exp $
+ * $Id: x11.c,v 1.3 2003/02/01 18:54:10 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -54,11 +54,6 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "Specify the X11 hardware display you want to use. By default vlc will " \
     "use the value of the DISPLAY environment variable.")
 
-#define DRAWABLE_TEXT N_("X11 drawable")
-#define DRAWABLE_LONGTEXT N_( \
-    "Specify a X11 drawable to use instead of opening a new window. This " \
-    "option is DANGEROUS, use with care.")
-
 #define SHM_TEXT N_("use shared memory")
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between vlc and the X server.")
@@ -67,7 +62,6 @@ vlc_module_begin();
     add_category_hint( N_("X11"), NULL );
     add_string( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
     add_bool( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT );
-    add_integer( "x11-drawable", -1, NULL, DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
 #ifdef HAVE_SYS_SHM_H
     add_bool( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT );
 #endif

@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.12 2003/01/28 16:57:28 sam Exp $
+ * $Id: xcommon.c,v 1.13 2003/02/01 18:54:10 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -111,7 +111,8 @@ static void XVideoReleasePort( vout_thread_t *, int );
 #endif
 
 #ifdef MODULE_NAME_IS_x11
-static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
+static void SetPalette     ( vout_thread_t *,
+                             uint16_t *, uint16_t *, uint16_t * );
 #endif
 
 /*****************************************************************************
@@ -822,6 +823,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     vlc_bool_t              b_configure_notify;
     vlc_bool_t              b_map_notify;
 
+    vlc_value_t             val;
     long long int           i_drawable;
 
     /* Prepare window manager hints and properties */
@@ -840,10 +842,10 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
 
     /* Check whether someone provided us with a window ID */
-    i_drawable = p_vout->b_fullscreen ?
-                    -1 : config_GetInt( p_vout, MODULE_STRING "-drawable");
+    var_Get( p_vout->p_vlc, "drawable", &val );
+    i_drawable = p_vout->b_fullscreen ? 0 : val.i_int;
 
-    if( i_drawable == -1 )
+    if( !i_drawable )
     {
         p_win->b_owned = VLC_TRUE;
 
@@ -1424,10 +1426,13 @@ static void EnableXScreenSaver( vout_thread_t *p_vout )
     int dummy;
 #endif
 
-    XSetScreenSaver( p_vout->p_sys->p_display, p_vout->p_sys->i_ss_timeout,
-                     p_vout->p_sys->i_ss_interval,
-                     p_vout->p_sys->i_ss_blanking,
-                     p_vout->p_sys->i_ss_exposure );
+    if( p_vout->p_sys->i_ss_timeout )
+    {
+        XSetScreenSaver( p_vout->p_sys->p_display, p_vout->p_sys->i_ss_timeout,
+                         p_vout->p_sys->i_ss_interval,
+                         p_vout->p_sys->i_ss_blanking,
+                         p_vout->p_sys->i_ss_exposure );
+    }
 
     /* Restore DPMS settings */
 #ifdef DPMSINFO_IN_DPMS_H
@@ -1459,10 +1464,13 @@ static void DisableXScreenSaver( vout_thread_t *p_vout )
                      &p_vout->p_sys->i_ss_exposure );
 
     /* Disable screen saver */
-    XSetScreenSaver( p_vout->p_sys->p_display, 0,
-                     p_vout->p_sys->i_ss_interval,
-                     p_vout->p_sys->i_ss_blanking,
-                     p_vout->p_sys->i_ss_exposure );
+    if( p_vout->p_sys->i_ss_timeout )
+    {
+        XSetScreenSaver( p_vout->p_sys->p_display, 0,
+                         p_vout->p_sys->i_ss_interval,
+                         p_vout->p_sys->i_ss_blanking,
+                         p_vout->p_sys->i_ss_exposure );
+    }
 
     /* Disable DPMS */
 #ifdef DPMSINFO_IN_DPMS_H
@@ -2027,7 +2035,8 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
  * anything, but could later send information on which colors it was unable
  * to set.
  *****************************************************************************/
-static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
+static void SetPalette( vout_thread_t *p_vout,
+                        uint16_t *red, uint16_t *green, uint16_t *blue )
 {
     int i;
     XColor p_colors[255];

@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.10 2003/01/27 01:42:19 ipkiss Exp $
+ * $Id: events.c,v 1.11 2003/02/01 18:54:10 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -280,6 +280,8 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     HMENU      hMenu;
     RECT       rect_window;
 
+    vlc_value_t val;
+
     msg_Dbg( p_vout, "DirectXCreateWindow" );
 
     /* Get this module's instance */
@@ -323,8 +325,9 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     ReleaseDC( NULL, hdc );
 
     /* If an external window was specified, we'll draw in it. */
+    var_Get( p_vout->p_vlc, "drawable", &val );
     p_vout->p_sys->hparent = p_vout->p_sys->hwnd =
-                (void*)(ptrdiff_t)config_GetInt( p_vout, "directx-window" );
+             val.i_int ?  (void*)(ptrdiff_t) val.i_int : NULL;
 
     if( p_vout->p_sys->hparent )
     {

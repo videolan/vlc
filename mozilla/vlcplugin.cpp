@@ -2,7 +2,7 @@
  * vlcplugin.cpp: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.cpp,v 1.2 2002/09/30 11:05:41 sam Exp $
+ * $Id: vlcplugin.cpp,v 1.3 2003/02/01 18:54:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,7 +36,7 @@
  *****************************************************************************/
 VlcPlugin::VlcPlugin( NPP instance )
 {
-    p_instance = instance; 
+    p_instance = instance;
     p_peer = NULL;
 }
 
@@ -71,11 +71,11 @@ VlcIntf* VlcPlugin::GetPeer()
     if( !p_peer )
     {
         p_peer = new VlcPeer( this );
-        if( p_peer == NULL ) 
+        if( p_peer == NULL )
         {
             return NULL;
         }
-        
+
         NS_ADDREF( p_peer );
     }
 
@@ -113,6 +113,6 @@ void VlcPlugin::SetFileName(const char * filename)
     fclose (fh);
     fprintf(stderr, "File loaded\n");
 #endif
-    return; 
+    return;
 }
 

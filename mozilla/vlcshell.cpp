@@ -2,7 +2,7 @@
  * vlcshell.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.8 2003/01/28 16:57:28 sam Exp $
+ * $Id: vlcshell.cpp,v 1.9 2003/02/01 18:54:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -289,7 +289,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         {
             p_plugin->psz_target = argv[i];
         }
-        
+
 #if USE_LIBVLC
         else if( !strcmp( argn[i], "loop" ) )
         {
@@ -359,11 +359,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 
     /* FIXME: this cast sucks */
     value.i_int = (int) (ptrdiff_t) (void *) window->window;
-    VLC_Set( p_plugin->i_vlc, "conf::x11-drawable", value );
-    VLC_Set( p_plugin->i_vlc, "conf::xvideo-drawable", value );
-
-    value.i_int = (int) (ptrdiff_t) (void *) window->window;
-    VLC_Set( p_plugin->i_vlc, "conf::directx-window", value );
+    VLC_Set( p_plugin->i_vlc, "drawable", value );
 #endif
 
     /*
@@ -469,7 +465,7 @@ NPError NPP_NewStream( NPP instance, NPMIMEType type, NPStream *stream,
     VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
 #endif
 
-    fprintf(stderr, "NPP_NewStream - FILE mode !!\n");
+    /* fprintf(stderr, "NPP_NewStream - FILE mode !!\n"); */
 
     /* We want a *filename* ! */
     *stype = NP_ASFILE;
@@ -495,7 +491,7 @@ int32 NPP_WriteReady( NPP instance, NPStream *stream )
 {
     VlcPlugin* p_plugin;
 
-    fprintf(stderr, "NPP_WriteReady\n");
+    /* fprintf(stderr, "NPP_WriteReady\n"); */
 
     if (instance != NULL)
     {
@@ -514,7 +510,7 @@ int32 NPP_WriteReady( NPP instance, NPStream *stream )
 int32 NPP_Write( NPP instance, NPStream *stream, int32 offset,
                  int32 len, void *buffer )
 {
-    fprintf(stderr, "NPP_Write %i\n", (int)len);
+    /* fprintf(stderr, "NPP_Write %i\n", (int)len); */
 
     if( instance != NULL )
     {
@@ -543,13 +539,13 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
         return;
     }
 
-    fprintf(stderr, "NPP_StreamAsFile %s\n", fname);
+    /* fprintf(stderr, "NPP_StreamAsFile %s\n", fname); */
 
 #if USE_LIBVLC
-/*    VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata; */
+    VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
 
-/*    VLC_AddTarget( p_plugin->i_vlc, fname,
-      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );*/
+    VLC_AddTarget( p_plugin->i_vlc, fname,
+                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 #endif
 }
 
