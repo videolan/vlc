@@ -164,7 +164,7 @@ typedef struct
 #define MPEG2_VIDEO_ES          0x02
 #define MPEG1_AUDIO_ES          0x03
 #define MPEG2_AUDIO_ES          0x04
-
+#define AC3_AUDIO_ES            0x81
 
 /******************************************************************************
  * program_descriptor_t

@@ -6,6 +6,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <unistd.h>                                              /* getpid() */
 
 #include <stdio.h>                                           /* "intf_msg.h" */
@@ -28,6 +32,13 @@
 #include "audio_output.h"
 
 #include "ac3_decoder.h"
+#include "ac3_parse.h"
+#include "ac3_exponent.h"
+#include "ac3_bit_allocate.h"
+#include "ac3_mantissa.h"
+#include "ac3_rematrix.h"
+#include "ac3_imdct.h"
+#include "ac3_downmix.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -84,6 +95,8 @@ ac3dec_thread_t * ac3dec_CreateThread( input_thread_t * p_input )
      */
     p_ac3dec->p_aout = p_input->p_aout;
     p_ac3dec->p_aout_fifo = NULL;
+
+    imdct_init();
 
     /* Spawn the ac3 decoder thread */
     if ( vlc_thread_create(&p_ac3dec->thread_id, "ac3 decoder", (vlc_thread_func_t)RunThread, (void *)p_ac3dec) )
@@ -177,6 +190,10 @@ static int InitThread( ac3dec_thread_t * p_ac3dec )
  *****************************************************************************/
 static void RunThread( ac3dec_thread_t * p_ac3dec )
 {
+    int i;
+    mtime_t mdate = 0;
+    byte_t byte;
+
     intf_DbgMsg( "ac3dec debug: running ac3 decoder thread (%p) (pid == %i)\n", p_ac3dec, getpid() );
 
     /* Initializing the ac3 decoder thread */
@@ -185,14 +202,39 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
         p_ac3dec->b_error = 1;
     }
 
+    i = open( "/tmp/taxi.ac3", O_WRONLY|O_CREAT|O_TRUNC );
     /* ac3 decoder thread's main loop */
     while ( (!p_ac3dec->b_die) && (!p_ac3dec->b_error) )
     {
-        if ( decode_find_sync(p_ac3dec) == 0 )
+	    byte = GetByte( &(p_ac3dec->bit_stream) );
+	    write( i, &byte, 1 );
+#if 0
+        decode_find_sync( p_ac3dec );
+	parse_syncinfo( p_ac3dec );
+	parse_bsi( p_ac3dec );
+        for ( i = 0; i < 6; i++ )
         {
-            fprintf( stderr, "ac3dec debug: decode_find_sync() == 0\n" );
+            parse_audblk( p_ac3dec );
+            exponent_unpack( p_ac3dec );
+            bit_allocate( p_ac3dec );
+            mantissa_unpack( p_ac3dec );
+            if ( p_ac3dec->bsi.acmod == 0x2 )
+            {
+                rematrix( p_ac3dec );
+            }
+            imdct( p_ac3dec );
+
+	    vlc_mutex_lock( &p_ac3dec->p_aout_fifo->data_lock );
+	    downmix( p_ac3dec, ((ac3dec_frame_t *)p_ac3dec->p_aout_fifo->buffer)[ p_ac3dec->p_aout_fifo->l_end_frame ] );
+	    p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = mdate;
+	    p_ac3dec->p_aout_fifo->l_end_frame = (p_ac3dec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+	    vlc_mutex_unlock( &p_ac3dec->p_aout_fifo->data_lock );
+	    mdate += 5333;
         }
+        parse_auxdata( p_ac3dec );
+#endif
     }
+    close( i );
 
     /* If b_error is set, the ac3 decoder thread enters the error loop */
     if ( p_ac3dec->b_error )

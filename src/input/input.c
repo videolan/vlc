@@ -349,6 +349,10 @@ static void EndThread( input_thread_t * p_input )
                     adec_DestroyThread( (adec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) );
                     break;
 
+                case AC3_AUDIO_ES:
+                    ac3dec_DestroyThread( (ac3dec_thread_t *)(p_input->pp_selected_es[i_es_loop]->p_dec) );
+                    break;
+
                 default:
                     break;
             }
@@ -979,20 +983,26 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                PES fifo */
             switch( p_es_descriptor->i_type )
             {
-            case MPEG1_VIDEO_ES:
-            case MPEG2_VIDEO_ES:
-                p_fifo = &(((vdec_thread_t*)(p_es_descriptor->p_dec))->fifo);
-                break;
-            case MPEG1_AUDIO_ES:
-            case MPEG2_AUDIO_ES:
-                p_fifo = &(((adec_thread_t*)(p_es_descriptor->p_dec))->fifo);
-                break;
-            default:
-                /* This should never happen. */
-                intf_DbgMsg("Unknown stream type (%d, %d): PES trashed\n",
-                            p_es_descriptor->i_id, p_es_descriptor->i_type);
-                p_fifo = NULL;
-                break;
+                case MPEG1_VIDEO_ES:
+                case MPEG2_VIDEO_ES:
+                    p_fifo = &(((vdec_thread_t*)(p_es_descriptor->p_dec))->fifo);
+                    break;
+
+                case MPEG1_AUDIO_ES:
+                case MPEG2_AUDIO_ES:
+                    p_fifo = &(((adec_thread_t*)(p_es_descriptor->p_dec))->fifo);
+                    break;
+
+                case AC3_AUDIO_ES:
+                    p_fifo = &(((ac3dec_thread_t *)(p_es_descriptor->p_dec))->fifo);
+                    break;
+
+                default:
+                    /* This should never happen */
+                    intf_DbgMsg("Unknown stream type (%d, %d): PES trashed\n",
+                        p_es_descriptor->i_id, p_es_descriptor->i_type);
+                    p_fifo = NULL;
+                    break;
             }
 
             if( p_fifo != NULL )

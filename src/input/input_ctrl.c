@@ -101,6 +101,17 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                 /* Spawn the decoder. */
                 switch( p_input->p_es[i_es_loop].i_type )
                 {
+                    case AC3_AUDIO_ES:
+                        /* Spawn ac3 thread */
+                        if ( ((ac3dec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
+                            ac3dec_CreateThread(p_input)) == NULL )
+                        {
+                            intf_ErrMsg( "Could not start ac3 decoder\n" );
+                            vlc_mutex_unlock( &p_input->es_lock );
+                            return( -1 );
+                        }
+                        break;
+
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
                         /* Spawn audio thread. */
@@ -194,6 +205,10 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
                 /* Cancel the decoder. */
                 switch( p_input->pp_selected_es[i_selected_es_loop]->i_type )
                 {
+                    case AC3_AUDIO_ES:
+                        ac3dec_DestroyThread( (ac3dec_thread_t *)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) );
+                        break;
+
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
                         adec_DestroyThread( (adec_thread_t*)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) );

@@ -176,7 +176,14 @@ video_output_obj = 		video_output/video_output.o \
 						video_output/video_$(video).o \
 						video_output/video_yuv_c.o
 
-ac3_decoder_obj =		ac3_decoder/ac3_decoder.o
+ac3_decoder_obj =		ac3_decoder/ac3_decoder.o \
+						ac3_decoder/ac3_parse.o \
+						ac3_decoder/ac3_exponent.o \
+						ac3_decoder/ac3_bit_allocate.o \
+						ac3_decoder/ac3_mantissa.o \
+						ac3_decoder/ac3_rematrix.o \
+						ac3_decoder/ac3_imdct.o \
+						ac3_decoder/ac3_downmix.o
 
 audio_decoder_obj =		audio_decoder/audio_decoder.o \
 						audio_decoder/audio_math.o

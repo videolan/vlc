@@ -218,6 +218,7 @@ void input_PsiDecode( input_thread_t *p_input, psi_section_t* p_psi_section )
   //intf_DbgMsg( "Section: %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x\n", (u8)p_psi_section->buffer[0], (u8)p_psi_section->buffer[1], (u8)p_psi_section->buffer[2], (u8)p_psi_section->buffer[3], (u8)p_psi_section->buffer[4], (u8)p_psi_section->buffer[5], (u8)p_psi_section->buffer[6], (u8)p_psi_section->buffer[7], (u8)p_psi_section->buffer[8], (u8)p_psi_section->buffer[9], (u8)p_psi_section->buffer[10], (u8)p_psi_section->buffer[11], (u8)p_psi_section->buffer[12], (u8)p_psi_section->buffer[13], (u8)p_psi_section->buffer[14], (u8)p_psi_section->buffer[15], (u8)p_psi_section->buffer[16], (u8)p_psi_section->buffer[17], (u8)p_psi_section->buffer[18], (u8)p_psi_section->buffer[19] );
 
   /* Check the CRC validity if any CRC is carried */
+#if 0
   if( p_psi_section->buffer[1] & 0x80 )
   {
     if( CheckCRC32 (p_psi_section->buffer, p_psi_section->i_length) )
@@ -228,6 +229,7 @@ void input_PsiDecode( input_thread_t *p_input, psi_section_t* p_psi_section )
       return;
     }
   }
+#endif
   
   /* If the section is not immediatly applicable, trash it (DVB drafts disallow
      transmission of such sections, so we didn't implement it) */
@@ -630,25 +632,37 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
               {
                   switch( p_input->p_es[i_es_loop].i_type )
                   {
-                  case MPEG1_VIDEO_ES:
-                  case MPEG2_VIDEO_ES:
-                      if( p_main->b_video )
-                      {
-                           /* Spawn a video thread */
-                           input_AddPgrmElem( p_input,
-                                              p_input->p_es[i_es_loop].i_id );
-                      }
-                      break;
-                  case MPEG1_AUDIO_ES:
-                  case MPEG2_AUDIO_ES:
-                      if( p_main->b_audio )
-                      {
-                          /* Spawn an audio thread */
-                          input_AddPgrmElem( p_input,
-                                             p_input->p_es[i_es_loop].i_id );
-                      }
-                      break;
-                  default:
+                      case MPEG1_VIDEO_ES:
+                      case MPEG2_VIDEO_ES:
+                          if( p_main->b_video )
+                          {
+                              /* Spawn a video thread */
+                              input_AddPgrmElem( p_input,
+                                  p_input->p_es[i_es_loop].i_id );
+                          }
+                          break;
+
+                      case AC3_AUDIO_ES:
+                          if ( p_main->b_audio )
+                          {
+                              /* Spawn an ac3 thread */
+                              input_AddPgrmElem( p_input,
+                                  p_input->p_es[i_es_loop].i_id );
+                              }
+                          break;
+
+                      case MPEG1_AUDIO_ES:
+                      case MPEG2_AUDIO_ES:
+                          if( p_main->b_audio )
+                          {
+                              /* Spawn an audio thread */
+                              input_AddPgrmElem( p_input,
+                                  p_input->p_es[i_es_loop].i_id );
+                          }
+                          break;
+
+                      default:
+                          break;
                   }
               }
 #endif
