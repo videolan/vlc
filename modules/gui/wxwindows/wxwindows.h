@@ -665,6 +665,9 @@ private:
     wxComboBox *audio_bitrate_combo;
     wxComboBox *audio_channels_combo;
     wxComboBox *video_scale_combo;
+    wxComboBox *subtitles_codec_combo;
+    wxCheckBox *subtitles_transc_checkbox;
+    wxCheckBox *subtitles_overlay_checkbox;
 
     /* Misc controls */
     wxCheckBox *sout_all_checkbox;
