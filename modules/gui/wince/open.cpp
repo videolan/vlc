@@ -93,18 +93,13 @@ PURPOSE:
   Processes messages sent to the main window.
   
 ***********************************************************************/
-LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                             PBOOL pbProcessed  )
+LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     SHINITDLGINFO shidi;
     SHMENUBARINFO mbi;
     INITCOMMONCONTROLSEX  iccex;  // INITCOMMONCONTROLSEX structure    
     RECT rcClient;
     TC_ITEM tcItem;
-
-    LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    BOOL bWasProcessed = *pbProcessed;
-    *pbProcessed = TRUE;
 
     switch( msg )
     {
@@ -153,7 +148,6 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
                                   0, hInst, 0 );
 
         // No tooltips for ComboBox
-
         label = CreateWindow( _T("STATIC"),
                               _FROMMB(_("Alternatively, you can build an MRL "
                                        "using one of the following predefined "
@@ -193,48 +187,45 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         NetPanel( hwnd );
 
         OnPageChange();
+        break;
 
-        return lResult;
+    case WM_CLOSE:
+        EndDialog( hwnd, LOWORD( wp ) );
+        break;
 
     case WM_COMMAND:
         if( LOWORD(wp) == IDOK )
         {
             OnOk();
             EndDialog( hwnd, LOWORD( wp ) );
-            return TRUE;
+            break;
         }
         if( HIWORD(wp) == BN_CLICKED )
         {
             if( (HWND)lp == net_radios[0] )
             {
                 OnNetTypeChange( NetRadio1_Event );
-                return TRUE;
             } else if( (HWND)lp == net_radios[1] )
             {
                 OnNetTypeChange( NetRadio2_Event );
-                return TRUE;
             } else if( (HWND)lp == net_radios[2] )
             {
                 OnNetTypeChange( NetRadio3_Event );
-                return TRUE;
             } else if( (HWND)lp == net_radios[3] )
             {
                 OnNetTypeChange( NetRadio4_Event );
-                return TRUE;
             } else if( (HWND)lp == subsfile_checkbox )
             {
                 OnSubsFileEnable();
-                return TRUE;
             } else if( (HWND)lp == subsfile_button )
             {
                 OnSubsFileSettings( hwnd );
-                return TRUE;
             } else if( (HWND)lp == browse_button )
             {
                 SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
                 OnFileBrowse();
-                return TRUE;
             } 
+            break;
         }
         if( HIWORD(wp) == EN_CHANGE )
         {
@@ -262,31 +253,17 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
                 OnFilePanelChange();
             }
         }
-
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
 
     case WM_NOTIFY:
-        if( (((NMHDR *)lp)->code) == TCN_SELCHANGE )
-        {
-            OnPageChange();
-            return TRUE;
-        }
-
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        if( (((NMHDR *)lp)->code) == TCN_SELCHANGE ) OnPageChange();
+        break;
 
     default:
-        // the message was not processed
-        // indicate if the base class handled it
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
     }
 
-    return lResult;
+    return FALSE;
 }
 
 /*****************************************************************************
@@ -826,9 +803,7 @@ void OpenDialog::OnSubsFileSettings( HWND hwnd )
 
     /* Show/hide the open dialog */
     SubsFileDialog *subsfile_dialog = new SubsFileDialog( p_intf, hInst );
-    DialogBoxParam( hInst, (LPCTSTR)IDD_DUMMY, hwnd,
-                    (DLGPROC)subsfile_dialog->BaseWndProc,
-                    (long)subsfile_dialog );
+    CreateDialogBox(  hwnd, subsfile_dialog );
 
     subsfile_mrl.clear();
 

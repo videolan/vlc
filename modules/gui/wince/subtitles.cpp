@@ -62,8 +62,7 @@ PURPOSE:
   Processes messages sent to the main window.
   
 ***********************************************************************/
-LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                                 PBOOL pbProcessed  )
+LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     SHINITDLGINFO shidi;
     SHMENUBARINFO mbi;
@@ -76,10 +75,6 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
     int i_delay;
 
     TCHAR psz_text[256];
-
-    LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    BOOL bWasProcessed = *pbProcessed;
-    *pbProcessed = TRUE;
 
     switch( msg )
     {
@@ -224,7 +219,11 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
             UDS_SETBUDDYINT | UDS_NOTHOUSANDS,
             0, 0, 0, 0, hwnd, 0, hInst, fps_edit, 16000, 0, (int)f_fps );
 
-        return lResult;
+        break;
+
+    case WM_CLOSE:
+        EndDialog( hwnd, LOWORD( wp ) );
+        break;
 
     case WM_COMMAND:
         if ( LOWORD(wp) == IDOK )
@@ -255,7 +254,7 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
             subsfile_mrl.push_back( szFps );
 
             EndDialog( hwnd, LOWORD( wp ) );
-            return TRUE;
+            break;
         }
         if( HIWORD(wp) == BN_CLICKED )
         {
@@ -263,23 +262,15 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
             {
                 SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
                 OnFileBrowse();
-                return TRUE;
             } 
         }
-
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
 
     default:
-        // the message was not processed
-        // indicate if the base class handled it
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
     }
 
-    return lResult;
+    return FALSE;
 }
 
 /*****************************************************************************

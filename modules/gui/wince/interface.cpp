@@ -37,7 +37,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
-#include <commdlg.h> // common dialogs -> fileopen.lib ?
+#include <commdlg.h>
 
 #define NUMIMAGES     9   // Number of buttons in the toolbar           
 #define IMAGEWIDTH    17   // Width of the buttons in the toolbar  
@@ -45,7 +45,6 @@
 #define BUTTONWIDTH   0    // Width of the button images in the toolbar
 #define BUTTONHEIGHT  0    // Height of the button images in the toolbar
 #define ID_TOOLBAR    2000 // Identifier of the main tool bar
-#define dwTBFontStyle TBSTYLE_BUTTON | TBSTYLE_CHECK | TBSTYLE_GROUP // style for toolbar buttons
 
 // Help strings
 #define HELP_SIMPLE _T("Quick file open")
@@ -129,9 +128,14 @@ BOOL Interface::InitInstance( HINSTANCE hInstance, intf_thread_t *_p_intf )
     wc.lpszClassName = _T("VLC WinCE");
     if( !RegisterClass( &wc ) ) return FALSE;
 
+#ifndef WS_OVERLAPPEDWINDOW
+#   define WS_OVERLAPPEDWINDOW 0xcf0000
+#endif
+
     // Create main window
     hwndMain =
-        CreateWindow( _T("VLC WinCE"), _T("VLC media player"), WS_VISIBLE,
+        CreateWindow( _T("VLC WinCE"), _T("VLC media player"),
+                      WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE,
                       0, MENU_HEIGHT, CW_USEDEFAULT, CW_USEDEFAULT,
                       NULL, NULL, hInstance, (void *)this );
 
@@ -437,79 +441,79 @@ HWND CreateStatusBar( HWND hwnd, HINSTANCE hInst )
 }
 
 /***********************************************************************
+FUNCTION:
+  CreateDialogBox
 
+PURPOSE:
+  Creates a Dialog Box.
+***********************************************************************/
+int CBaseWindow::CreateDialogBox( HWND hwnd, CBaseWindow *p_obj )
+{
+    uint8_t p_buffer[sizeof(DLGTEMPLATE) + sizeof(WORD) * 4];
+    DLGTEMPLATE *p_dlg_template = (DLGTEMPLATE *)p_buffer;
+    memset( p_dlg_template, 0, sizeof(DLGTEMPLATE) + sizeof(WORD) * 4 );
+
+    // these values are arbitrary, they won't be used normally anyhow
+    p_dlg_template->x  = 34; p_dlg_template->y  = 22;
+    p_dlg_template->cx = 144; p_dlg_template->cy = 75;
+    p_dlg_template->style =
+        DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|WS_SIZEBOX;
+
+    return DialogBoxIndirectParam( GetModuleHandle(0), p_dlg_template, hwnd,
+				   (DLGPROC)p_obj->BaseWndProc, (LPARAM)p_obj );
+}
+
+/***********************************************************************
 FUNCTION: 
   BaseWndProc
 
 PURPOSE: 
   Processes messages sent to the main window.
-  
 ***********************************************************************/
 LRESULT CALLBACK CBaseWindow::BaseWndProc( HWND hwnd, UINT msg, WPARAM wParam,
                                            LPARAM lParam )
 {
+    CBaseWindow *p_obj;
+
     // check to see if a copy of the 'this' pointer needs to be saved
     if( msg == WM_CREATE )
     {
-        CBaseWindow *pObj = reinterpret_cast<CBaseWindow *>
-            ((long)((LPCREATESTRUCT)lParam)->lpCreateParams);
-        ::SetWindowLong( hwnd, GWL_USERDATA,
-                         (LONG)((LPCREATESTRUCT)lParam)->lpCreateParams );
+        p_obj = (CBaseWindow *)(((LPCREATESTRUCT)lParam)->lpCreateParams);
+        SetWindowLong( hwnd, GWL_USERDATA,
+		       (LONG)((LPCREATESTRUCT)lParam)->lpCreateParams );
 
-        pObj->DlgFlag = FALSE;
-        pObj->hWnd = hwnd; // videowindow
+        p_obj->hWnd = hwnd;
     }
 
     if( msg == WM_INITDIALOG )
     {
-        CBaseWindow *pObj = reinterpret_cast<CBaseWindow *>(lParam);
-        ::SetWindowLong( hwnd, GWL_USERDATA, lParam );
-        pObj->DlgFlag = TRUE;
-        pObj->hWnd = hwnd; //streamout
+        p_obj = (CBaseWindow *)lParam;
+        SetWindowLong( hwnd, GWL_USERDATA, lParam );
+        p_obj->hWnd = hwnd;
     }
 
-    BOOL bProcessed = FALSE;
-    LRESULT lResult;
-
     // Retrieve the pointer
-    CBaseWindow *pObj =
-        reinterpret_cast<CBaseWindow *>(::GetWindowLong( hwnd, GWL_USERDATA ));
+    p_obj = (CBaseWindow *)GetWindowLong( hwnd, GWL_USERDATA );
 
-    if( !pObj ) return DefWindowProc( hwnd, msg, wParam, lParam );
+    if( !p_obj ) return DefWindowProc( hwnd, msg, wParam, lParam );
 
     // Filter message through child classes
-    if( pObj )
-        lResult = pObj->WndProc( hwnd, msg, wParam, lParam, &bProcessed );
-
-    if( pObj->DlgFlag )
-        return bProcessed; // processing a dialog message return TRUE if processed
-    else if( !bProcessed )
-        // If message was unprocessed and not a dialog, send it back to Windows
-        lResult = DefWindowProc( hwnd, msg, wParam, lParam );
-
-    return lResult; // processing a window message return FALSE if processed
+    return p_obj->WndProc( hwnd, msg, wParam, lParam );
 }
 
 /***********************************************************************
-
 FUNCTION: 
   WndProc
 
 PURPOSE: 
   Processes messages sent to the main window.
-  
 ***********************************************************************/
 LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
-                                     LPARAM lp, PBOOL pbProcessed )
+                                     LPARAM lp )
 {
-    // call the base class first
-    LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    *pbProcessed = TRUE;
-
     switch( msg )
     {
     case WM_CREATE:
-        {
         hwndCB = CreateMenuBar( hwnd, hInst );
         hwndTB = CreateToolBar( hwnd, hInst );
         hwndSlider = CreateSliderBar( hwnd, hInst );
@@ -521,62 +525,59 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
 
         /* Video window */
         if( config_GetInt( pIntf, "wince-embed" ) )
-            video = CreateVideoWindow( pIntf, hInst, hwnd );
+            video = CreateVideoWindow( pIntf, hwnd );
 
         ti = new Timer(pIntf, hwnd, this);
 
         // Hide the SIP button (WINCE only)
         SetForegroundWindow( hwnd );
         SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
-        }
-        return lResult;
+        break;
 
     case WM_COMMAND:
         switch( GET_WM_COMMAND_ID(wp,lp) )
         {
         case ID_FILE_QUICKOPEN: 
             OnOpenFileSimple();
-            return lResult;
+	    break;
 
         case ID_FILE_OPENFILE: 
-            open = new OpenDialog( pIntf, hInst, FILE_ACCESS,
-                                   ID_FILE_OPENFILE, OPEN_NORMAL );
-            DialogBoxParam( hInst, (LPCTSTR)IDD_DUMMY, hwnd,
-                            (DLGPROC)open->BaseWndProc, (long)open );
-            delete open;
-            return lResult;
+	    open = new OpenDialog( pIntf, hInst, FILE_ACCESS,
+				   ID_FILE_OPENFILE, OPEN_NORMAL );
+	    CreateDialogBox( hwnd, open );
+	    delete open;
+	    break;
 
         case ID_FILE_OPENNET:
             open = new OpenDialog( pIntf, hInst, NET_ACCESS, ID_FILE_OPENNET,
                                    OPEN_NORMAL );
-            DialogBoxParam( hInst, (LPCTSTR)IDD_DUMMY, hwnd,
-                            (DLGPROC)open->BaseWndProc, (long)open );
+	    CreateDialogBox( hwnd, open );
             delete open;
-            return lResult;
+	    break;
 
         case PlayStream_Event: 
             OnPlayStream();
-            return lResult;
+	    break;
 
         case StopStream_Event: 
             OnStopStream();
-            return lResult;
+	    break;
 
         case PrevStream_Event: 
             OnPrevStream();
-            return lResult;
+	    break;
 
         case NextStream_Event: 
             OnNextStream();
-            return lResult;
+	    break;
 
         case SlowStream_Event: 
             OnSlowStream();
-            return lResult;
+	    break;
 
         case FastStream_Event: 
             OnFastStream();
-            return lResult;
+	    break;
 
         case ID_FILE_ABOUT: 
         {
@@ -588,40 +589,36 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
 
             MessageBox( hwnd, _FROMMB(about.c_str()),
                         _T("About VLC media player"), MB_OK );
-            return lResult;
+	    break;
         }
 
         case ID_FILE_EXIT:
             SendMessage( hwnd, WM_CLOSE, 0, 0 );
-            return lResult;
+	    break;
 
         case ID_VIEW_STREAMINFO:
             fi = new FileInfo( pIntf, hInst );
-            DialogBoxParam( hInst, (LPCTSTR)IDD_DUMMY, hwnd,
-                            (DLGPROC)fi->BaseWndProc, (long)fi );
+	    CreateDialogBox( hwnd, fi );
             delete fi;
-            return lResult;
+	    break;
 
         case ID_VIEW_MESSAGES:
             hmsg = new Messages( pIntf, hInst );
-            DialogBoxParam( hInst, (LPCTSTR)IDD_MESSAGES, hwnd,
-                            (DLGPROC)hmsg->BaseWndProc, (long)hmsg );
+	    CreateDialogBox( hwnd, hmsg );
             delete hmsg;
-            return lResult;
+	    break;
 
         case ID_VIEW_PLAYLIST:
             pl = new Playlist( pIntf, hInst );
-            DialogBoxParam( hInst, (LPCTSTR)IDD_DUMMY, hwnd,
-                            (DLGPROC)pl->BaseWndProc, (long)pl );
+	    CreateDialogBox( hwnd, pl );
             delete pl;
-            return lResult;
+	    break;
 
         case ID_SETTINGS_PREF:
             pref = new PrefsDialog( pIntf, hInst );
-            DialogBoxParam( hInst, (LPCTSTR)IDD_DUMMY, hwnd,
-                            (DLGPROC)pref->BaseWndProc, (long)pref );
+	    CreateDialogBox( hwnd, pref );
             delete pref;
-            return lResult;
+	    break;
                   
         default:
             OnMenuEvent( pIntf, GET_WM_COMMAND_ID(wp,lp) );
@@ -631,7 +628,7 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
   
     case WM_TIMER:
         ti->Notify();
-        return lResult;
+        break;
 
     case WM_CTLCOLORSTATIC: 
         if( ( (HWND)lp == hwndSlider ) || ( (HWND)lp == hwndVol ) )
@@ -646,19 +643,11 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         break;
 
     case WM_HSCROLL:
-        if( (HWND)lp == hwndSlider )
-        {
-            OnSliderUpdate( wp );
-            return lResult;
-        }
+        if( (HWND)lp == hwndSlider ) OnSliderUpdate( wp );
         break;
 
     case WM_VSCROLL:
-        if( (HWND)lp == hwndVol )
-        {
-            OnChange( wp );
-            return lResult;
-        }
+        if( (HWND)lp == hwndVol ) OnChange( wp );
         break;
 
     case WM_INITMENUPOPUP:
@@ -697,19 +686,20 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
                          WM_NOTIFY, wp, lp );
         return lResult;
 #endif
+	break;
 
     case WM_HELP:
         MessageBox (hwnd, _T("Help"), _T("Help"), MB_OK);
-        return lResult;
+	break;
 
     case WM_CLOSE:
         DestroyWindow( hwndCB );
         DestroyWindow( hwnd );
-        return lResult;
+	break;
 
     case WM_DESTROY:
         PostQuitMessage( 0 );
-        return lResult;
+	break;
     }
 
     return DefWindowProc( hwnd, msg, wp, lp );

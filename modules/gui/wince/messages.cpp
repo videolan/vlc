@@ -69,8 +69,7 @@ PURPOSE:
   Processes messages sent to the main window.
 
 ***********************************************************************/
-LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                           PBOOL pbProcessed  )
+LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     SHINITDLGINFO shidi;
 
@@ -79,11 +78,7 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
     int i_dummy;
     HANDLE fichier;
 
-    LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    BOOL bWasProcessed = *pbProcessed;
-    *pbProcessed = TRUE;
-
-    switch (msg)
+    switch( msg )
     {
     case WM_INITDIALOG: 
         shidi.dwMask = SHIDIM_FLAGS;
@@ -116,22 +111,26 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         SetTimer( hwnd, 1, 500 /*milliseconds*/, NULL );
 
         SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
-        return lResult;
+        break;
 
     case WM_TIMER:
         UpdateLog();
-        return lResult;
+        break;
+
+    case WM_CLOSE:
+        EndDialog( hwnd, LOWORD( wp ) );
+        break;
 
     case WM_COMMAND:
         switch( LOWORD(wp) )
         {
         case IDOK:
             EndDialog( hwnd, LOWORD( wp ) );
-            return TRUE;
+            break;
 
         case IDCLEAR:
             ListView_DeleteAllItems( hListView );
-            return TRUE;
+            break;
 
         case IDSAVEAS:  
             memset( &(ofn), 0, sizeof(ofn) );
@@ -170,23 +169,17 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
             }
 
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
-            return TRUE;
+            break;
 
         default:
-            *pbProcessed = bWasProcessed;
-            lResult = FALSE;
-            return lResult;
+            break;
         }
 
     default:
-         // the message was not processed
-         // indicate if the base class handled it
-         *pbProcessed = bWasProcessed;
-         lResult = FALSE;
-         return lResult;
+        break;
     }
 
-    return lResult;
+    return FALSE;
 }
 
 void Messages::UpdateLog()

@@ -147,10 +147,8 @@ static void Run( intf_thread_t *p_intf )
     if( !pInterface->InitInstance( hInstance, p_intf ) ) return;
 
     // Main message loop
-    int status;
-    while( ( status = GetMessage( &msg, NULL, 0, 0 ) ) != 0 )
+    while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
     {
-        if( status == -1 ) return;
         TranslateMessage( &msg );
         DispatchMessage( &msg );
     }

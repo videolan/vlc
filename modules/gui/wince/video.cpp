@@ -52,7 +52,7 @@ class VideoWindow : public CBaseWindow
 {
 public:
     /* Constructor */
-    VideoWindow( intf_thread_t *_p_intf, HINSTANCE _hInst, HWND _p_parent );
+    VideoWindow( intf_thread_t *_p_intf, HWND _p_parent );
     virtual ~VideoWindow();
 
     void *GetWindow( vout_thread_t *, int *, int *, unsigned int *,
@@ -68,24 +68,21 @@ private:
     HWND p_parent;
     vlc_mutex_t lock;
 
-    virtual LRESULT WndProc( HWND hwnd, UINT msg,
-                             WPARAM wParam, LPARAM lParam, PBOOL pbProcessed );
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 };
 
 /*****************************************************************************
  * Public methods.
  *****************************************************************************/
-CBaseWindow *CreateVideoWindow( intf_thread_t *p_intf, HINSTANCE hInst,
-                                HWND p_parent )
+CBaseWindow *CreateVideoWindow( intf_thread_t *p_intf, HWND p_parent )
 {
-    return new VideoWindow( p_intf, hInst, p_parent );
+    return new VideoWindow( p_intf, p_parent );
 }
 
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-VideoWindow::VideoWindow( intf_thread_t *_p_intf, HINSTANCE _hInst,
-                          HWND _p_parent )
+VideoWindow::VideoWindow( intf_thread_t *_p_intf, HWND _p_parent )
 {
     RECT rect;
     WNDCLASS wc;
@@ -111,7 +108,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, HINSTANCE _hInst,
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
     wc.hIcon = NULL;
-    wc.hInstance = _hInst;
+    wc.hInstance = GetModuleHandle(0);
     wc.hCursor = NULL;
     wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     wc.lpszMenuName = NULL;
@@ -122,7 +119,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, HINSTANCE _hInst,
         _T("VIDEOWINDOW"), _T(""), WS_CHILD | WS_VISIBLE | WS_BORDER,
         0, 20, rect.right - rect.left,
         rect.bottom - rect.top - 2*(MENU_HEIGHT-1) - SLIDER_HEIGHT - 20,
-        p_parent, NULL, _hInst, (void *)this );
+        p_parent, NULL, GetModuleHandle(0), (void *)this );
 
     ShowWindow( p_child_window, SW_SHOW );
     UpdateWindow( p_child_window );
@@ -193,24 +190,9 @@ PURPOSE:
   Processes messages sent to the main window.
 
 ***********************************************************************/
-LRESULT VideoWindow::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                              PBOOL pbProcessed  )
+LRESULT VideoWindow::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
-    LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    BOOL bWasProcessed = *pbProcessed;
-    *pbProcessed = TRUE;
-
-    switch( msg )
-    {
-    default:
-        // the message was not processed
-        // indicate if the base class handled it
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
-    }
-
-    return lResult;
+    return DefWindowProc( hwnd, msg, wp, lp );
 }
 
 static int ControlWindow( intf_thread_t *p_intf, void *p_window,

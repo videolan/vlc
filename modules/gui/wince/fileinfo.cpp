@@ -191,14 +191,9 @@ PURPOSE:
   Processes messages sent to the main window.
   
 ***********************************************************************/
-LRESULT FileInfo::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                           PBOOL pbProcessed  )
+LRESULT FileInfo::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     SHINITDLGINFO shidi;
-
-    LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    BOOL bWasProcessed = *pbProcessed;
-    *pbProcessed = TRUE;
 
     switch( msg )
     {
@@ -211,25 +206,22 @@ LRESULT FileInfo::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         CreateTreeView( hwnd );
         UpdateWindow( hwnd );
         SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
-        return lResult;
+        break;
+
+    case WM_CLOSE:
+        EndDialog( hwnd, LOWORD( wp ) );
+        break;
 
     case WM_COMMAND:
         if ( LOWORD(wp) == IDOK )
         {
             EndDialog( hwnd, LOWORD( wp ) );
-            return TRUE;
-         }
-         *pbProcessed = bWasProcessed;
-         lResult = FALSE;
-         return lResult;
+        }
+        break;
 
     default:
-         // the message was not processed
-         // indicate if the base class handled it
-         *pbProcessed = bWasProcessed;
-         lResult = FALSE;
-         return lResult;
+        break;
     }
 
-    return lResult;
+    return FALSE;
 }

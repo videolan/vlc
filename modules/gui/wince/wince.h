@@ -97,10 +97,9 @@ public:
    virtual ~CBaseWindow() {};
 
    HWND hWnd;                // The main window handle
-   BOOL DlgFlag;             // True if object is a dialog window
 
-   static LRESULT CALLBACK BaseWndProc( HWND hwnd, UINT msg,
-                                        WPARAM wParam, LPARAM lParam );
+   static LRESULT CALLBACK BaseWndProc( HWND, UINT, WPARAM, LPARAM );
+   static int CreateDialogBox( HWND, CBaseWindow * );
 
 protected:
 
@@ -108,9 +107,7 @@ protected:
    HWND            hwndCB;              // The command bar handle
 
    HINSTANCE       GetInstance () const { return hInst; }
-   virtual LRESULT WndProc( HWND hwnd, UINT msg,
-                            WPARAM wParam, LPARAM lParam,
-                            PBOOL pbProcessed ){*pbProcessed = FALSE; return 0;}
+   virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM ) = 0;
 };
 
 class FileInfo;
@@ -120,7 +117,7 @@ class Timer;
 class OpenDialog;
 class PrefsDialog;
 
-CBaseWindow *CreateVideoWindow( intf_thread_t *, HINSTANCE, HWND );
+CBaseWindow *CreateVideoWindow( intf_thread_t *, HWND );
 
 /* Main Interface */
 class Interface : public CBaseWindow
@@ -155,8 +152,7 @@ public:
 
 protected:
 
-    virtual LRESULT WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                             PBOOL pbProcessed );
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
     void OnOpenFileSimple( void );
     void OnPlayStream( void );
@@ -193,8 +189,7 @@ protected:
     TCHAR szFileInfoClassName[100];     // Main window class name
     TCHAR szFileInfoTitle[100];         // Main window name
 
-    virtual LRESULT WndProc( HWND hwnd, UINT msg,
-                             WPARAM wParam, LPARAM lParam, PBOOL pbProcessed );
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
     void UpdateFileInfo( HWND );
     BOOL CreateTreeView( HWND );
 };
@@ -211,9 +206,7 @@ protected:
 
     intf_thread_t *p_intf;
 
-    virtual LRESULT WndProc( HWND hwnd, UINT msg,
-                             WPARAM wParam, LPARAM lParam,
-                             PBOOL pbProcessed );
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
     HWND hListView;
     void UpdateLog(void);
@@ -240,9 +233,7 @@ protected:
     void OnOk();
     void UpdateInfo();
 
-    virtual LRESULT WndProc( HWND hwnd, UINT msg,
-                             WPARAM wParam, LPARAM lParam,
-                             PBOOL pbProcessed );
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
     /* Controls for the iteminfo dialog box */
     HWND uri_label;
@@ -274,9 +265,7 @@ protected:
 
     intf_thread_t *p_intf;
 
-    virtual LRESULT WndProc( HWND hwnd, UINT msg,
-                             WPARAM wParam, LPARAM lParam,
-                             PBOOL pbProcessed );
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
     HWND mrl_box;
     HWND mrl_label;
@@ -359,9 +348,7 @@ protected:
     HWND fps_edit;
     HWND fps_spinctrl;
 
-    virtual LRESULT WndProc( HWND hwnd, UINT msg,
-                             WPARAM wParam, LPARAM lParam,
-                             PBOOL pbProcessed );
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnFileBrowse();
@@ -424,9 +411,7 @@ protected:
     void OnPopupEna();
     void OnPopupInfo( HWND hwnd );
 
-    virtual LRESULT WndProc( HWND hwnd, UINT msg,
-                             WPARAM wParam, LPARAM lParam,
-                             PBOOL pbProcessed );
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 };
 
 /* Timer */
@@ -513,9 +498,7 @@ protected:
 
     PrefsTreeCtrl *prefs_tree;
 
-    virtual LRESULT WndProc( HWND hwnd, UINT msg,
-                             WPARAM wParam, LPARAM lParam,
-                             PBOOL pbProcessed );
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 };
 
 /*****************************************************************************

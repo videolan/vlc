@@ -189,27 +189,6 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Dialog
-//
-
-IDD_DUMMY DIALOG DISCARDABLE  0, 0, 186, 90
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Dummy"
-FONT 8, "System"
-BEGIN
-END
-
-IDD_MESSAGES DIALOG DISCARDABLE  0, 0, 138, 90
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Messages"
-FONT 8, "System"
-BEGIN
-    PUSHBUTTON      "Save as...",IDSAVEAS,76,7,50,14
-    PUSHBUTTON      "Clear",IDCLEAR,11,7,50,14
-END
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Menubar
 //
 

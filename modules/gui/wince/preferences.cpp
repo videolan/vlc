@@ -160,16 +160,11 @@ PURPOSE:
   Processes messages sent to the main window.
 
 ***********************************************************************/
-LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                              PBOOL pbProcessed )
+LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     SHINITDLGINFO shidi;
     SHMENUBARINFO mbi;
     RECT rcClient;
-
-    LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    BOOL bWasProcessed = *pbProcessed;
-    *pbProcessed = TRUE;
 
     switch( msg )
     {
@@ -228,32 +223,30 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         prefs_tree = new PrefsTreeCtrl( p_intf, this, hwnd, hInst );
 
         UpdateWindow( hwnd );
-        return lResult;
+        break;
+
+    case WM_CLOSE:
+        EndDialog( hwnd, LOWORD( wp ) );
+        break;
 
     case WM_COMMAND:
         if( LOWORD(wp) == IDOK )
         {
             OnOk();
             EndDialog( hwnd, LOWORD( wp ) );
-            return TRUE;
         }
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
 
     case WM_NOTIFY:
 
-        if ( ( ((LPNMHDR)lp)->hwndFrom == prefs_tree->hwndTV ) &&
-             ( ((LPNMHDR)lp)->code == TVN_SELCHANGED  ) )
+        if( lp && prefs_tree &&
+            ((LPNMHDR)lp)->hwndFrom == prefs_tree->hwndTV &&
+            ((LPNMHDR)lp)->code == TVN_SELCHANGED )
         {
             prefs_tree->OnSelectTreeItem( (NM_TREEVIEW FAR *)(LPNMHDR)lp,
                                           hwnd, hInst );
-            return TRUE;
         }
-
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
 
     case WM_VSCROLL:
     {
@@ -261,7 +254,8 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         tvi.mask = TVIF_PARAM;
         tvi.hItem = TreeView_GetSelection( prefs_tree->hwndTV );
         TreeView_GetItem( prefs_tree->hwndTV, &tvi );
-        ConfigTreeData *config_data = prefs_tree->FindModuleConfig( (ConfigTreeData *)tvi.lParam );
+        ConfigTreeData *config_data =
+            prefs_tree->FindModuleConfig( (ConfigTreeData *)tvi.lParam );
         if ( hwnd == config_data->panel->config_window ) 
         {
             int dy;
@@ -288,20 +282,14 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
 
             config_data->panel->oldvalue = newvalue;                                
         }
+        break;
     }
-    *pbProcessed = bWasProcessed;
-    lResult = FALSE;
-    return lResult;
 
     default:
-        // the message was not processed
-        // indicate if the base class handled it
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
     }
 
-    return lResult;
+    return FALSE;
 }
 
 /*****************************************************************************

@@ -138,31 +138,22 @@ Playlist::Playlist( intf_thread_t *_p_intf, HINSTANCE _hInst )
 }
 
 /***********************************************************************
-
 FUNCTION: 
   WndProc
 
 PURPOSE: 
   Processes messages sent to the main window.
-  
 ***********************************************************************/
-LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                           PBOOL pbProcessed )
+LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     SHINITDLGINFO shidi;
     SHMENUBARINFO mbi;
+    INITCOMMONCONTROLSEX iccex;
+    RECT rect, rectTB;
+    DWORD dwStyle;
 
     int bState;
     playlist_t *p_playlist;
-
-    DWORD dwStyle;
-    RECT rect, rectTB;
-
-    INITCOMMONCONTROLSEX iccex;
-
-    LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    BOOL bWasProcessed = *pbProcessed;
-    *pbProcessed = TRUE;
 
     switch( msg )
     {
@@ -206,12 +197,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
                                   sizeof (tbButton2) / sizeof (TBBUTTON),
                                   BUTTONWIDTH, BUTTONHEIGHT,
                                   IMAGEWIDTH, IMAGEHEIGHT, sizeof(TBBUTTON) );
-        if( !hwndTB )
-        {
-            *pbProcessed = bWasProcessed;
-            lResult = FALSE;
-            return lResult;
-        }
+        if( !hwndTB ) break;
   
         // Add ToolTips to the toolbar.
         SendMessage( hwndTB, TB_SETTOOLTIPS, (WPARAM) NUMIMAGES,
@@ -227,12 +213,8 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         vlc_value_t val; 
         p_playlist = (playlist_t *)
             vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        if( p_playlist == NULL )
-        {
-            *pbProcessed = bWasProcessed;
-            lResult = FALSE;
-            return lResult;
-        }
+        if( !p_playlist ) break;
+
         var_Get( p_playlist , "random", &val );
         bState = val.b_bool ? TBSTATE_CHECKED : 0;
         SendMessage( hwndTB, TB_SETSTATE, Random_Event,
@@ -275,140 +257,141 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         SetTimer( hwnd, 1, 500 /*milliseconds*/, NULL );
 
         SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
-
-        return lResult;
+        break;
 
     case WM_TIMER:
         UpdatePlaylist();
-        return lResult;
+        break;
+
+    case WM_CLOSE:
+        EndDialog( hwnd, LOWORD( wp ) );
+        break;
 
     case WM_COMMAND:    
         switch( LOWORD(wp) )
         {
         case IDOK:
             EndDialog( hwnd, LOWORD( wp ) );
-            return TRUE;
+            break;
 
         case ID_MANAGE_OPENPL:
             OnOpen();
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case ID_MANAGE_SAVEPL:
             SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
             OnSave();
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
-            return TRUE;
+            break;
 
         case ID_MANAGE_SIMPLEADD:
             SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
             OnAddFile();
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case ID_MANAGE_ADDMRL:
             SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
             OnAddMRL();
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case ID_SEL_DELETE:
             OnDeleteSelection();
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case Infos_Event:
             SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
             OnPopupInfo( hwnd );
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case Up_Event:
             OnUp();
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case Down_Event:
             OnDown();
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case Random_Event:
             OnRandom();
-            return TRUE;
+            break;
 
         case Loop_Event:
             OnLoop();
-            return TRUE;
+            break;
 
         case Repeat_Event:
             OnRepeat();
-            return TRUE;
+            break;
 
         case ID_SORT_TITLE:
             OnSort( ID_SORT_TITLE );
-            return TRUE;
+            break;
 
         case ID_SORT_RTITLE:
             OnSort( ID_SORT_RTITLE );
-            return TRUE;
+            break;
 
         case ID_SORT_AUTHOR:
             OnSort( ID_SORT_AUTHOR );
-            return TRUE;
+            break;
 
         case ID_SORT_RAUTHOR:
             OnSort( ID_SORT_RAUTHOR );
-            return TRUE;
+            break;
 
         case ID_SORT_SHUFFLE:
             OnSort( ID_SORT_SHUFFLE );
-            return TRUE;
+            break;
 
         case ID_SEL_ENABLE:
             OnEnableSelection();
-            return TRUE;
+            break;
 
         case ID_SEL_DISABLE:
             OnDisableSelection();
-            return TRUE;
+            break;
 
         case ID_SEL_INVERT:
             OnInvertSelection();
-            return TRUE;
+            break;
 
         case ID_SEL_SELECTALL:
             OnSelectAll();
-            return TRUE;
+            break;
 
         case PopupPlay_Event:
             OnPopupPlay();
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case PopupDel_Event:
             OnPopupDel();
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case PopupEna_Event:
             OnPopupEna();
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         case PopupInfo_Event:
             OnPopupInfo( hwnd );
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             b_need_update = VLC_TRUE;
-            return TRUE;
+            break;
 
         default:
-            *pbProcessed = bWasProcessed;
-            lResult = FALSE;
-            return lResult;
+            break;
         }
 
     case WM_NOTIFY:
@@ -417,40 +400,31 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         {
             SetWindowLong( hwnd, DWL_MSGRESULT,
                            (LONG)ProcessCustomDraw(lp) );
-            return TRUE;
         }
         else if( ( ((LPNMHDR)lp)->hwndFrom == hListView ) &&
                  ( ((LPNMHDR)lp)->code == GN_CONTEXTMENU  ) )
         {                       
             HandlePopupMenu( hwnd, ((PNMRGINFO)lp)->ptAction );
-            return TRUE;
         }
         else if( ( ((LPNMHDR)lp)->hwndFrom == hListView ) &&
                  ( ((LPNMHDR)lp)->code == LVN_COLUMNCLICK  ) )
         {
             OnColSelect( ((LPNMLISTVIEW)lp)->iSubItem );
-            return TRUE;
         }
         else if( ( ((LPNMHDR)lp)->hwndFrom == hListView ) &&
                  ( ((LPNMHDR)lp)->code == LVN_ITEMACTIVATE  ) )
         {
             OnActivateItem( ((LPNMLISTVIEW)lp)->iSubItem );
-            return TRUE;
         }
-
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
 
     default:
          // the message was not processed
          // indicate if the base class handled it
-         *pbProcessed = bWasProcessed;
-         lResult = FALSE;
-         return lResult;
+        break;
     }
 
-    return lResult;
+    return FALSE;
 }
 
 LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
@@ -886,9 +860,7 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
     {
         ItemInfoDialog *iteminfo_dialog =
             new ItemInfoDialog( p_intf, hInst, p_item );
-        DialogBoxParam( hInst, (LPCTSTR)IDD_DUMMY, hwnd,
-                        (DLGPROC)iteminfo_dialog->BaseWndProc,
-                        (long)iteminfo_dialog );                
+        CreateDialogBox( hwnd, iteminfo_dialog );                
         UpdateItem( i_item );
         delete iteminfo_dialog;
     }

@@ -65,17 +65,12 @@ PURPOSE:
   Processes messages sent to the main window.
   
 ***********************************************************************/
-LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                                 PBOOL pbProcessed  )
+LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     SHINITDLGINFO shidi;
     SHMENUBARINFO mbi;
     INITCOMMONCONTROLSEX iccex;
     RECT rcClient;
-
-    LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    BOOL bWasProcessed = *pbProcessed;
-    *pbProcessed = TRUE;
 
     switch( msg )
     {
@@ -155,28 +150,25 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
             hwnd, NULL, hInst, NULL );
 
         UpdateInfo();
-        return lResult;
+        break;
+
+    case WM_CLOSE:
+        EndDialog( hwnd, LOWORD( wp ) );
+        break;
 
     case WM_COMMAND:
         if( LOWORD(wp) == IDOK )
         {
             OnOk();
             EndDialog( hwnd, LOWORD( wp ) );
-            return TRUE;
         }
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
 
     default:
-        // the message was not processed
-        // indicate if the base class handled it
-        *pbProcessed = bWasProcessed;
-        lResult = FALSE;
-        return lResult;
+        break;
     }
 
-    return lResult;
+    return FALSE;
 }
 
 /*****************************************************************************
