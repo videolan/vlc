@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.3 2002/04/08 14:53:05 jobi Exp $
+ * $Id: file.c,v 1.4 2002/04/10 16:26:21 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -49,7 +49,6 @@
  *****************************************************************************/
 static void input_getfunctions( function_list_t * );
 static int  FileOpen       ( struct input_thread_s * );
-static int  FileSetProgram ( struct input_thread_s * , pgrm_descriptor_t * );  
 
 /*****************************************************************************
  * Build configuration tree.
@@ -181,13 +180,3 @@ static int FileOpen( input_thread_t * p_input )
 
     return( 0 );
 }
-
-/*****************************************************************************
- * FileSetProgram: Do nothing
- *****************************************************************************/
-static int FileSetProgram( input_thread_t * p_input,
-                           pgrm_descriptor_t * p_program )
-{
-    return( 0 );
-}
-

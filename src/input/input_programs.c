@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.78 2002/04/08 14:53:05 jobi Exp $
+ * $Id: input_programs.c,v 1.79 2002/04/10 16:26:21 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -347,17 +347,15 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
     {
         switch( p_new_prg->pp_es[i_es_index]->i_cat )
                     {
-                       case MPEG1_VIDEO_ES:
-                       case MPEG2_VIDEO_ES:
+                       case VIDEO_ES:
                            intf_WarnMsg( 4, "Selecting ES %x",
                                     p_new_prg->pp_es[i_es_index]->i_id );
                             input_SelectES( p_input,
                                    p_new_prg->pp_es[i_es_index] );
                             break;
-                        case MPEG1_AUDIO_ES:
-                        case MPEG2_AUDIO_ES:
+                        case AUDIO_ES:
                             i_audio_es += 1;
-                            if( i_audio_es == i_required_audio_es )
+                            if( i_audio_es <= i_required_audio_es )
                             {
                                 intf_WarnMsg( 4, "Selecting ES %x",
                                     p_new_prg->pp_es[i_es_index]->i_id );
@@ -365,21 +363,10 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                                     p_new_prg->pp_es[i_es_index]);
                             }
                             break;
-                        case LPCM_AUDIO_ES :
-                        case AC3_AUDIO_ES :
-                            i_audio_es += 1;
-                            if( i_audio_es == i_required_audio_es )
-                            {
-                                intf_WarnMsg( 4, "Selecting ES %x",
-                                    p_new_prg->pp_es[i_es_index]->i_id );
-                                input_SelectES( p_input,
-                                    p_new_prg->pp_es[i_es_index] );
-                            }
-                            break;
                         /* Not sure this one is fully specification-compliant */
-                        case DVD_SPU_ES :
+                        case SPU_ES :
                             i_spu_es += 1;
-                            if( i_spu_es == i_required_spu_es )
+                            if( i_spu_es <= i_required_spu_es )
                             {
                                 intf_WarnMsg( 4, "Selecting ES %x",
                                     p_new_prg->pp_es[i_es_index]->i_id );
