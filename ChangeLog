@@ -3,7 +3,7 @@
 #===================#
 
 0.4.5
-**
+Fri, 11 Oct 2002 15:37:41 +0200
 
   * src/interface/main.c, src/misc/modules.c: added a quick hack for a
     --plugin-path command line option.
@@ -30,6 +30,7 @@
   * plugins/access/rtp.c: backported RTP access module from HEAD.
   * plugins/access/http.c: fixed a compile issue in the HTTP plug-in.
   * configure.in: fixed bug with $(QTDIR).
+  * plugins/filter/deinterace.c: fixed an issue with the linear method.
 
 0.4.4
 Sun, 11 Aug 2002 01:18:13 +0200
