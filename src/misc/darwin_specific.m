@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.15 2003/10/28 20:15:48 hartman Exp $
+ * $Id: darwin_specific.m,v 1.16 2003/11/10 00:49:48 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -45,6 +45,7 @@ static int FindLanguage( const char * psz_lang )
         "English", "en",
         "Spanish", "es",
         "French", "fr",
+        "Hungarian", "hu",
         "Italian", "it",
         "Japanese", "ja",
         "Dutch", "nl",

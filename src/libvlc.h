@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.102 2003/11/07 19:30:28 massiot Exp $
+ * $Id: libvlc.h,v 1.103 2003/11/10 00:49:48 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -27,12 +27,13 @@
 #include "vlc_keys.h"
 
 static char *ppsz_language[] =
-{ "auto", "en", "en_GB", "es", "de", "fr", "it", "ja",
-  "nl", "no", "pl", "pt_BR", "ru", "sv" };
+{ "auto", "en", "en_GB", "es", "de",
+  "fr", "hu", "it", "ja", "nl", "no",
+  "pl", "pt_BR", "ru", "sv" };
 static char *ppsz_language_text[] =
 { N_("Auto"), N_("English US"), N_("English GB"), N_("Spanish"), N_("German"),
-  N_("French"), N_("Italian"), N_("Japanese"), N_("Dutch"), N_("Norwegian"),
-  N_("Polish"), N_("Portugese BR"), N_("Russian"), N_("Swedish") };
+  N_("French"), N_("Hungarian"), N_("Italian"), N_("Japanese"), N_("Dutch"), N_("Norwegian"),
+  N_("Polish"), N_("Portuguese BR"), N_("Russian"), N_("Swedish") };
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
