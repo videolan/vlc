@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.23 2003/07/28 18:02:06 massiot Exp $
+ * $Id: xcommon.c,v 1.24 2003/07/28 22:46:00 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -491,12 +491,10 @@ static int ManageVideo( vout_thread_t *p_vout )
 
     while( XCheckWindowEvent( p_vout->p_sys->p_display,
                               p_vout->p_sys->p_win->base_window,
-                              StructureNotifyMask, &xevent ) == True
-        || XCheckWindowEvent( p_vout->p_sys->p_display,
-                              p_vout->p_sys->p_win->video_window,
-                              KeyPressMask | PointerMotionMask |
+                              StructureNotifyMask | KeyPressMask |
                               ButtonPressMask | ButtonReleaseMask |
-                              Button1MotionMask, &xevent ) == True )
+                              PointerMotionMask | Button1MotionMask , &xevent )
+           == True )
     {
         /* ConfigureNotify event: prepare  */
         if( xevent.type == ConfigureNotify )
@@ -1047,12 +1045,18 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                       &dummy2, &dummy3 );
     }
 
-    /* We cannot put ButtonPressMask in the list, because according to
-     * the XSelectInput manpage, only one client at a time can select a
-     * ButtonPress event. Programs such as Mozilla may be already selecting
-     * this event. */
-    XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
-                  StructureNotifyMask );
+    /* When we don't own the window we cannot put ButtonPressMask in the list,
+     * because according to the XSelectInput manpage, only one client at a
+     * time can select a ButtonPress event. Programs such as Mozilla may be
+     * already selecting this event. */
+    if( p_win->b_owned )
+        XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
+                      StructureNotifyMask | KeyPressMask |
+                      ButtonPressMask | ButtonReleaseMask |
+                      PointerMotionMask );
+    else
+        XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
+                      StructureNotifyMask );
 
 #ifdef MODULE_NAME_IS_x11
     if( p_win->b_owned &&
@@ -1089,8 +1093,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     XMapWindow( p_vout->p_sys->p_display, p_win->video_window );
     XSelectInput( p_vout->p_sys->p_display, p_win->video_window,
-                  ExposureMask | KeyPressMask | ButtonPressMask |
-                  ButtonReleaseMask | PointerMotionMask );
+                  ExposureMask );
 
     /* make sure the video window will be centered in the next ManageVideo() */
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
