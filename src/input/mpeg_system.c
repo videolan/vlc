@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.69.2.2 2001/12/13 17:35:55 massiot Exp $
+ * $Id: mpeg_system.c,v 1.69.2.3 2001/12/17 16:03:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1296,33 +1296,88 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
  *****************************************************************************/
 static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
 {
-    
     stream_ts_data_t  * p_stream_data;
     es_ts_data_t      * p_demux_data;
+
+    pgrm_descriptor_t * p_pgrm;
+    es_descriptor_t   * p_current_es;
+    byte_t            * p_current_data;           
+
+    int                 i_section_length, i_program_id, i_pmt_pid;
+    int                 i_loop, i_current_section;
+
+    boolean_t           b_changed = 0;
 
     p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
     
 #define p_psi (p_demux_data->p_psi_section)
 
+    /* Not so fast, Mike ! If the PAT version has changed, we first check
+     * that its content has really changed before doing anything */
     if( p_stream_data->i_pat_version != p_psi->i_version_number )
     {
-        /* PAT has changed. We are going to delete all programms and 
+        int i_programs = p_input->stream.i_pgrm_number;
+
+        p_current_data = p_psi->buffer;
+
+        do
+        {
+            i_section_length = ((u32)(p_current_data[1] & 0xF) << 8) |
+                                 p_current_data[2];
+            i_current_section = (u8)p_current_data[6];
+    
+            for( i_loop = 0;
+                 ( i_loop < (i_section_length - 9) / 4 ) && !b_changed;
+                 i_loop++ )
+            {
+                i_program_id = ( (u32)*(p_current_data + i_loop * 4 + 8) << 8 )
+                                 | *(p_current_data + i_loop * 4 + 9);
+                i_pmt_pid = ( ((u32)*(p_current_data + i_loop * 4 + 10) & 0x1F)
+                                    << 8 )
+                               | *(p_current_data + i_loop * 4 + 11);
+
+                if( i_program_id )
+                {
+                    if( (p_pgrm = input_FindProgram( p_input, i_program_id ))
+                        && (p_current_es = input_FindES( p_input, i_pmt_pid ))
+                        && p_current_es->p_pgrm == p_pgrm
+                        && p_current_es->i_id == i_pmt_pid
+                        && ((es_ts_data_t *)p_current_es->p_demux_data)->b_psi
+                        && ((es_ts_data_t *)p_current_es->p_demux_data)
+                            ->i_psi_type == PSI_IS_PMT )
+                    {
+                        i_programs--;
+                    }
+                    else
+                    {
+                        b_changed = 1;
+                    }
+                }
+            }
+            
+            p_current_data += 3 + i_section_length;
+
+        } while( ( i_current_section < p_psi->i_last_section_number )
+                  && !b_changed );
+
+        /* If we didn't find the expected amount of programs, the PAT has
+         * changed. Otherwise, it only changed if b_changed is already != 0 */
+        b_changed = b_changed || i_programs;
+    }
+
+    if( b_changed )
+    {
+        /* PAT has changed. We are going to delete all programs and 
          * create new ones. We chose not to only change what was needed
          * as a PAT change may mean the stream is radically changing and
-         * this is a secure method to avoid krashes */
-        pgrm_descriptor_t * p_pgrm;
-        es_descriptor_t   * p_current_es;
+         * this is a secure method to avoid crashes */
         es_ts_data_t      * p_es_demux;
         pgrm_ts_data_t    * p_pgrm_demux;
-        byte_t            * p_current_data;           
-        
-        int                 i_section_length,i_program_id,i_pmt_pid;
-        int                 i_loop, i_current_section;
         
         p_current_data = p_psi->buffer;
 
-
+        /* Delete all programs */
         for( i_loop = 0; i_loop < p_input->stream.i_pgrm_number; i_loop++ )
         {
             input_DelProgram( p_input, p_input->stream.pp_programs[i_loop] );
@@ -1330,17 +1385,17 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
         
         do
         {
-            i_section_length = (((u32)p_current_data[1] & 0xF) << 8) |
+            i_section_length = ((u32)(p_current_data[1] & 0xF) << 8) |
                                  p_current_data[2];
             i_current_section = (u8)p_current_data[6];
     
             for( i_loop = 0; i_loop < (i_section_length - 9) / 4 ; i_loop++ )
             {
-                i_program_id = ( (u32)*(p_current_data + i_loop * 4 + 8) << 8 ) |
-                                 *(p_current_data + i_loop * 4 + 9);
-                i_pmt_pid = ( ((u32)*( p_current_data + i_loop * 4 + 10) & 0x1F)
-                                    << 8 ) |
-                               *( p_current_data + i_loop * 4 + 11);
+                i_program_id = ( (u32)*(p_current_data + i_loop * 4 + 8) << 8 )
+                                 | *(p_current_data + i_loop * 4 + 9);
+                i_pmt_pid = ( ((u32)*(p_current_data + i_loop * 4 + 10) & 0x1F)
+                                    << 8 )
+                               | *(p_current_data + i_loop * 4 + 11);
     
                 /* If program = 0, we're having info about NIT not PMT */
                 if( i_program_id )
@@ -1367,17 +1422,17 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
             }
             
             p_current_data += 3 + i_section_length;
-            
+
         } while( i_current_section < p_psi->i_last_section_number );
-        
-        /* Go to the beginning of the next section*/
+
+        /* Go to the beginning of the next section */
         p_stream_data->i_pat_version = p_psi->i_version_number;
 
     }
 #undef p_psi    
+
     /* FIXME This has nothing to do here */
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0] ;
-
 }
 
 /*****************************************************************************

@@ -1,13 +1,15 @@
 vlc (0.2.92-1) unstable; urgency=low
 
   * New upstream release.
-  * Added vlc-mad package.
+  * Disabled broken ALSA audio output (Closes: #110869, #119846).
+  * Changed configure.in so that libXv_pic.a is used instead of libXv.a
+    (Closes: #111790).
+  * Added versioned build-dep to libasound2-dev (Closes: #121057).
 
  -- Samuel Hocevar <sam@zoy.org>  Sun,  9 Dec 2001 17:01:44 +0100
 
 vlc (0.2.91-2) unstable; urgency=low
 
-  * Added versioned build-dep to libasound2-dev (Closes: #121057).
   * Added "Video" menu hints (Closes: #121036).
 
  -- Samuel Hocevar <sam@zoy.org>  Sun, 25 Nov 2001 02:25:34 +0100
