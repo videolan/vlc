@@ -9,5 +9,5 @@ SOURCES_motionblur = motionblur.c
 SOURCES_logo = logo.c
 SOURCES_deinterlace = deinterlace.c
 SOURCES_blend = blend.c
-SOURCES_blend = scale.c
+SOURCES_scale = scale.c
 noinst_HEADERS += filter_common.h
