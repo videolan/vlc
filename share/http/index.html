@@ -39,7 +39,7 @@
         <table>
          <tr>
            <td>
-             <form method="get" action="">             
+             <form method="get" action="">
                <input type="submit" name="seek_value" value="-1min"/><input type="hidden" name="control" value="seek"/>
              </form>
            </td>
@@ -63,7 +63,7 @@
       <tr>
         <td>
           <form method="get" action="">
-          Current volume level: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"/><input type="hidden" name="control" value="volume"/><input type="submit" name="Set" value="Set"/>
+          Current volume level: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"/><button name="control" value="volume">Set</button>
           </form>
         </td>
       </tr>
@@ -104,7 +104,7 @@
               <option value="title">title</option>
               <option value="group">group</option>
               <option value="author">author</option>
-	      <option value="shuffle">shuffle</option>
+              <option value="shuffle">shuffle</option>
             </select> with
             <select name="order">
               <option value="0">normal order</option>
