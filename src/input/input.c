@@ -36,7 +36,7 @@
 #include "input_internal.h"
 
 #include "stream_output.h"
-
+#include "vlc_playlist.h"
 #include "vlc_interface.h"
 
 /*****************************************************************************
@@ -1684,11 +1684,17 @@ static int  UpdateMeta( input_thread_t *p_input )
  *****************************************************************************/
 static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
 {
+    playlist_t *p_playlist;
     char psz_buffer[MSTRTIME_MAX_SIZE];
 
     vlc_mutex_lock( &p_input->input.p_item->lock );
     p_input->input.p_item->i_duration = i_length;
     vlc_mutex_unlock( &p_input->input.p_item->lock );
+    p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT);
+    var_SetInteger( p_playlist, "item-change",
+                    p_input->input.p_item->i_id );
+    vlc_object_release( p_playlist );
+    
 
     input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"),
                    msecstotimestr( psz_buffer, i_length / 1000 ) );
