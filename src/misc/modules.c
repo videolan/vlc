@@ -7,6 +7,7 @@
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
  *          Hans-Peter Jansen <hpj@urpla.net>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -133,9 +134,10 @@
  * Local prototypes
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
-static void AllocateAllPlugins   ( vlc_object_t * );
-static void AllocatePluginDir    ( vlc_object_t *, const MYCHAR *, int );
-static int  AllocatePluginFile   ( vlc_object_t *, MYCHAR * );
+static void AllocateAllPlugins  ( vlc_object_t * );
+static void AllocatePluginDir   ( vlc_object_t *, const char *, int );
+static int  AllocatePluginFile  ( vlc_object_t *, char *, int64_t, int64_t );
+static module_t * AllocatePlugin( vlc_object_t *, char * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
 static int  DeleteModule ( module_t * );
@@ -143,8 +145,16 @@ static int  DeleteModule ( module_t * );
 static void   DupModule        ( module_t * );
 static void   UndupModule      ( module_t * );
 static int    CallEntry        ( module_t * );
+static int    LoadModule       ( vlc_object_t *, char *, module_handle_t * );
 static void   CloseModule      ( module_handle_t );
 static void * GetSymbol        ( module_handle_t, const char * );
+static void   CacheLoad        ( vlc_object_t * );
+static void   CacheLoadConfig  ( module_t *, FILE * );
+static void   CacheSave        ( vlc_object_t * );
+static void   CacheSaveConfig  ( module_t *, FILE * );
+static void   CacheMerge       ( vlc_object_t *, module_t *, module_t * );
+static module_cache_t * CacheFind( vlc_object_t *, char *, int64_t, int64_t );
+
 #if defined(HAVE_DL_WINDOWS)
 static char * GetWindowsError  ( void );
 #endif
@@ -162,6 +172,10 @@ void __module_InitBank( vlc_object_t *p_this )
 
     p_bank = vlc_object_create( p_this, sizeof(module_bank_t) );
     p_bank->psz_object_name = "module bank";
+    p_bank->i_cache = p_bank->i_loaded_cache = 0;
+    p_bank->pp_cache = p_bank->pp_loaded_cache = 0;
+    p_bank->b_cache = p_bank->b_cache_dirty =
+        p_bank->b_cache_delete = VLC_FALSE;
 
     /*
      * Store the symbols to be exported
@@ -198,6 +212,10 @@ void __module_ResetBank( vlc_object_t *p_this )
 void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next;
+
+#ifdef HAVE_DYNAMIC_PLUGINS
+    if( p_this->p_libvlc->p_module_bank->b_cache ) CacheSave( p_this );
+#endif
 
     vlc_object_detach( p_this->p_libvlc->p_module_bank );
 
@@ -255,6 +273,13 @@ void __module_LoadPlugins( vlc_object_t * p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     msg_Dbg( p_this, "checking plugin modules" );
+
+    if( config_GetInt( p_this, "plugins-cache" ) )
+        p_this->p_libvlc->p_module_bank->b_cache = VLC_TRUE;
+
+    if( p_this->p_libvlc->p_module_bank->b_cache ||
+        p_this->p_libvlc->p_module_bank->b_cache_delete ) CacheLoad( p_this );
+
     AllocateAllPlugins( p_this );
 #endif
 }
@@ -516,6 +541,23 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     p_tmp = p_first;
     while( p_tmp != NULL )
     {
+#ifdef HAVE_DYNAMIC_PLUGINS
+        /* Make sure the module is loaded in mem */
+        module_t *p_module = p_tmp->p_module->b_submodule ?
+            (module_t *)p_tmp->p_module->p_parent : p_tmp->p_module;
+        if( !p_module->b_builtin && !p_module->b_loaded )
+        {
+            module_t *p_new_module =
+                AllocatePlugin( p_this, p_module->psz_filename );
+            if( p_new_module )
+            {
+                CacheMerge( p_this, p_module, p_new_module );
+                vlc_object_attach( p_new_module, p_module );
+                DeleteModule( p_new_module );
+            }
+        }
+#endif
+
         if( p_tmp->p_module->pf_activate
              && p_tmp->p_module->pf_activate( p_this ) == VLC_SUCCESS )
         {
@@ -614,13 +656,9 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     char **         ppsz_path = path;
     char *          psz_fullpath;
 
-#if defined( UNDER_CE )
-    wchar_t         psz_dir[MAX_PATH];
-#endif
-
     /* If the user provided a plugin path, we add it to the list */
-    path[ sizeof(path)/sizeof(char*) - 2 ] = config_GetPsz( p_this,
-                                                            "plugin-path" );
+    path[ sizeof(path)/sizeof(char*) - 2 ] =
+        config_GetPsz( p_this, "plugin-path" );
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
@@ -659,12 +697,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         msg_Dbg( p_this, "recursively browsing `%s'", psz_fullpath );
 
         /* Don't go deeper than 5 subdirectories */
-#if defined( UNDER_CE )
-        MultiByteToWideChar( CP_ACP, 0, psz_fullpath, -1, psz_dir, MAX_PATH );
-        AllocatePluginDir( p_this, psz_dir, 5 );
-#else
         AllocatePluginDir( p_this, psz_fullpath, 5 );
-#endif
 
         free( psz_fullpath );
     }
@@ -678,12 +711,13 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 /*****************************************************************************
  * AllocatePluginDir: recursively parse a directory to look for plugins
  *****************************************************************************/
-static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
+static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
                                int i_maxdepth )
 {
 #if defined( UNDER_CE ) || defined( _MSC_VER )
 #ifdef UNDER_CE
     MYCHAR psz_path[MAX_PATH + 256];
+    wchar_t psz_wdir[MAX_PATH];
 #else
     char psz_path[MAX_PATH + 256];
 #endif
@@ -693,9 +727,9 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
 #else
     int    i_dirlen;
     DIR *  dir;
-    char * psz_file;
     struct dirent * file;
 #endif
+    char * psz_file;
 
     if( p_this->p_vlc->b_die || i_maxdepth < 0 )
     {
@@ -703,7 +737,9 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
     }
 
 #if defined( UNDER_CE ) || defined( _MSC_VER )
-    rc = GetFileAttributes( psz_dir );
+    MultiByteToWideChar( CP_ACP, 0, psz_dir, -1, psz_wdir, MAX_PATH );
+
+    rc = GetFileAttributes( psz_wdir );
     if( !(rc & FILE_ATTRIBUTE_DIRECTORY) )
     {
         /* Not a directory */
@@ -754,7 +790,16 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
                                    LIBEXT, strlen( LIBEXT ) ) )
 #endif
         {
-            AllocatePluginFile( p_this, psz_path );
+#ifdef UNDER_CE
+            char psz_filename[MAX_PATH];
+            WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, psz_path, -1,
+                                 psz_filename, MAX_PATH, NULL, NULL );
+            psz_file = psz_filename;
+#else
+            psz_file = psz_path;
+#endif
+
+            AllocatePluginFile( p_this, psz_file, 0, 0 );
         }
     }
     while( !p_this->p_vlc->b_die && FindNextFile( handle, &finddata ) );
@@ -776,6 +821,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
     {
         struct stat statbuf;
         unsigned int i_len;
+        int i_stat;
 
         /* Skip ".", ".." and anything starting with "." */
         if( !*file->d_name || *file->d_name == '.' )
@@ -791,7 +837,8 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
         sprintf( psz_file, "%s/%s", psz_dir, file->d_name );
 #endif
 
-        if( !stat( psz_file, &statbuf ) && statbuf.st_mode & S_IFDIR )
+        i_stat = stat( psz_file, &statbuf );
+        if( !i_stat && statbuf.st_mode & S_IFDIR )
         {
             AllocatePluginDir( p_this, psz_file, i_maxdepth - 1 );
         }
@@ -800,7 +847,15 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
                   && !strncasecmp( file->d_name + i_len - strlen( LIBEXT ),
                                    LIBEXT, strlen( LIBEXT ) ) )
         {
-            AllocatePluginFile( p_this, psz_file );
+            int64_t i_time = 0, i_size = 0;
+
+            if( !i_stat )
+            {
+                i_time = statbuf.st_mtime;
+                i_size = statbuf.st_size;
+            }
+
+            AllocatePluginFile( p_this, psz_file, i_time, i_size );
         }
 
         free( psz_file );
@@ -819,143 +874,78 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
  * for its information data. The module can then be handled by module_Need
  * and module_Unneed. It can be removed by DeleteModule.
  *****************************************************************************/
-static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
+static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
+                               int64_t i_file_time, int64_t i_file_size )
+{
+    module_t * p_module;
+    module_cache_t *p_cache_entry = NULL;
+
+    /*
+     * Check our plugins cache first then load plugin if needed
+     */
+    p_cache_entry =
+        CacheFind( p_this, psz_file, i_file_time, i_file_size );
+
+    if( !p_cache_entry )
+    {
+        p_module = AllocatePlugin( p_this, psz_file );
+    }
+    else
+    {
+        /* If junk dll, don't try to load it */
+        if( p_cache_entry->b_junk )
+        {
+            p_module = NULL;
+        }
+        else
+        {
+            p_module = p_cache_entry->p_module;
+            p_module->b_loaded = VLC_FALSE;
+        }
+    }
+
+    if( p_module )
+    {
+        /* Everything worked fine !
+         * The module is ready to be added to the list. */
+        p_module->b_builtin = VLC_FALSE;
+
+        /* msg_Dbg( p_this, "plugin \"%s\", %s",
+                    p_module->psz_object_name, p_module->psz_longname ); */
+
+        vlc_object_attach( p_module, p_this->p_libvlc->p_module_bank );
+    }
+
+    if( !p_this->p_libvlc->p_module_bank->b_cache ) return 0;
+
+    /* Add entry to cache */
+#define p_bank p_this->p_libvlc->p_module_bank
+    p_bank->pp_cache =
+        realloc( p_bank->pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
+    p_bank->pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );
+    p_bank->pp_cache[p_bank->i_cache]->psz_file = strdup( psz_file );
+    p_bank->pp_cache[p_bank->i_cache]->i_time = i_file_time;
+    p_bank->pp_cache[p_bank->i_cache]->i_size = i_file_size;
+    p_bank->pp_cache[p_bank->i_cache]->b_junk = p_module ? 0 : 1;
+    p_bank->pp_cache[p_bank->i_cache]->p_module = p_module;
+    p_bank->i_cache++;
+
+    return p_module ? 0 : -1;
+}
+
+/*****************************************************************************
+ * AllocatePlugin: load a module into memory and initialize it.
+ *****************************************************************************
+ * This function loads a dynamically loadable module and allocates a structure
+ * for its information data. The module can then be handled by module_Need
+ * and module_Unneed. It can be removed by DeleteModule.
+ *****************************************************************************/
+static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
 {
     module_t * p_module;
     module_handle_t handle;
 
-    /*
-     * Try to dynamically load the module. This part is very platform-
-     * specific, and error messages should be as verbose as possible.
-     */
-
-#if defined(HAVE_DL_DYLD)
-    NSObjectFileImage image;
-    NSObjectFileImageReturnCode ret;
-
-    ret = NSCreateObjectFileImageFromFile( psz_file, &image );
-
-    if( ret != NSObjectFileImageSuccess )
-    {
-        msg_Warn( p_this, "cannot create image from `%s'", psz_file );
-        return -1;
-    }
-
-    /* Open the dynamic module */
-    handle = NSLinkModule( image, psz_file,
-                           NSLINKMODULE_OPTION_RETURN_ON_ERROR );
-
-    if( !handle )
-    {
-        NSLinkEditErrors errors;
-        const char *psz_file, *psz_err;
-        int i_errnum;
-        NSLinkEditError( &errors, &i_errnum, &psz_file, &psz_err );
-        msg_Warn( p_this, "cannot link module `%s' (%s)", psz_file, psz_err );
-        NSDestroyObjectFileImage( image );
-        return -1;
-    }
-
-    /* Destroy our image, we won't need it */
-    NSDestroyObjectFileImage( image );
-
-#elif defined(HAVE_DL_BEOS)
-    handle = load_add_on( psz_file );
-    if( handle < 0 )
-    {
-        msg_Warn( p_this, "cannot load module `%s'", psz_file );
-        return -1;
-    }
-
-#elif defined(HAVE_DL_WINDOWS) && defined(UNDER_CE)
-    char psz_filename[MAX_PATH];
-    WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, psz_file, -1,
-                         psz_filename, MAX_PATH, NULL, NULL );
-    handle = LoadLibrary( psz_filename );
-    if( handle == NULL )
-    {
-        char *psz_error = GetWindowsError();
-        msg_Warn( p_this, "cannot load module `%s' (%s)",
-                          psz_filename, psz_error );
-        free( psz_error );
-    }
-
-#elif defined(HAVE_DL_WINDOWS) && defined(WIN32)
-    handle = LoadLibrary( psz_file );
-    if( handle == NULL )
-    {
-        char *psz_error = GetWindowsError();
-        msg_Warn( p_this, "cannot load module `%s' (%s)",
-                          psz_file, psz_error );
-        free( psz_error );
-    }
-
-#elif defined(HAVE_DL_DLOPEN) && defined(RTLD_NOW)
-    /* static is OK, we are called atomically */
-    static vlc_bool_t b_kde = VLC_FALSE;
-
-#   if defined(SYS_LINUX)
-    /* XXX HACK #1 - we should NOT open modules with RTLD_GLOBAL, or we
-     * are going to get namespace collisions when two modules have common
-     * public symbols, but ALSA is being a pest here. */
-    if( strstr( psz_file, "alsa_plugin" ) )
-    {
-        handle = dlopen( psz_file, RTLD_NOW | RTLD_GLOBAL );
-        if( handle == NULL )
-        {
-            msg_Warn( p_this, "cannot load module `%s' (%s)",
-                              psz_file, dlerror() );
-            return -1;
-        }
-    }
-#   endif
-    /* XXX HACK #2 - the ugly KDE workaround. It seems that libkdewhatever
-     * causes dlopen() to segfault if libstdc++ is not loaded in the caller,
-     * so we just load libstdc++. Bwahahaha! ph34r! -- Sam. */
-    /* Update: FYI, this is Debian bug #180505, and seems to be fixed. */
-    if( !b_kde && !strstr( psz_file, "kde" ) )
-    {
-        dlopen( "libstdc++.so.6", RTLD_NOW )
-         || dlopen( "libstdc++.so.5", RTLD_NOW )
-         || dlopen( "libstdc++.so.4", RTLD_NOW )
-         || dlopen( "libstdc++.so.3", RTLD_NOW );
-        b_kde = VLC_TRUE;
-    }
-
-    handle = dlopen( psz_file, RTLD_NOW );
-    if( handle == NULL )
-    {
-        msg_Warn( p_this, "cannot load module `%s' (%s)",
-                          psz_file, dlerror() );
-        return -1;
-    }
-
-#elif defined(HAVE_DL_DLOPEN)
-#   if defined(DL_LAZY)
-    handle = dlopen( psz_file, DL_LAZY );
-#   else
-    handle = dlopen( psz_file, 0 );
-#   endif
-    if( handle == NULL )
-    {
-        msg_Warn( p_this, "cannot load module `%s' (%s)",
-                          psz_file, dlerror() );
-        return -1;
-    }
-
-#elif defined(HAVE_DL_SHL_LOAD)
-    handle = shl_load( psz_file, BIND_IMMEDIATE | BIND_NONFATAL, NULL );
-    if( handle == NULL )
-    {
-        msg_Warn( p_this, "cannot load module `%s' (%s)",
-                          psz_file, strerror(errno) );
-        return -1;
-    }
-
-#else
-#   error "Something is wrong in modules.c"
-
-#endif
+    if( LoadModule( p_this, psz_file, &handle ) ) return NULL;
 
     /* Now that we have successfully loaded the module, we can
      * allocate a structure for it */
@@ -964,25 +954,22 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     {
         msg_Err( p_this, "out of memory" );
         CloseModule( handle );
-        return -1;
+        return NULL;
     }
 
     /* We need to fill these since they may be needed by CallEntry() */
-#ifdef UNDER_CE
-    p_module->psz_filename = psz_filename;
-#else
     p_module->psz_filename = psz_file;
-#endif
     p_module->handle = handle;
     p_module->p_symbols = &p_this->p_libvlc->p_module_bank->symbols;
+    p_module->b_loaded = VLC_TRUE;
 
-    /* Initialize the module: fill p_module->psz_object_name, default config */
+    /* Initialize the module: fill p_module, default config */
     if( CallEntry( p_module ) != 0 )
     {
         /* We couldn't call module_init() */
         vlc_object_destroy( p_module );
         CloseModule( handle );
-        return -1;
+        return NULL;
     }
 
     DupModule( p_module );
@@ -992,12 +979,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     /* Everything worked fine ! The module is ready to be added to the list. */
     p_module->b_builtin = VLC_FALSE;
 
-    /* msg_Dbg( p_this, "plugin \"%s\", %s",
-                p_module->psz_object_name, p_module->psz_longname ); */
-
-    vlc_object_attach( p_module, p_this->p_libvlc->p_module_bank );
-
-    return 0;
+    return p_module;
 }
 
 /*****************************************************************************
@@ -1118,7 +1100,7 @@ static int DeleteModule( module_t * p_module )
 #ifdef HAVE_DYNAMIC_PLUGINS
     if( !p_module->b_builtin )
     {
-        if( p_module->b_unloadable )
+        if( p_module->b_loaded && p_module->b_unloadable )
         {
             CloseModule( p_module->handle );
         }
@@ -1191,6 +1173,135 @@ static int CallEntry( module_t * p_module )
     }
 
     /* Everything worked fine, we can return */
+    return 0;
+}
+
+/*****************************************************************************
+ * LoadModule: loads a dynamic library
+ *****************************************************************************
+ * This function loads a dynamically linked library using a system dependant
+ * method. Will return 0 on success as well as the module handle.
+ *****************************************************************************/
+static int LoadModule( vlc_object_t *p_this, char *psz_file,
+                       module_handle_t *p_handle )
+{
+    module_handle_t handle;
+
+#if defined(HAVE_DL_DYLD)
+    NSObjectFileImage image;
+    NSObjectFileImageReturnCode ret;
+
+    ret = NSCreateObjectFileImageFromFile( psz_file, &image );
+
+    if( ret != NSObjectFileImageSuccess )
+    {
+        msg_Warn( p_this, "cannot create image from `%s'", psz_file );
+        return -1;
+    }
+
+    /* Open the dynamic module */
+    handle = NSLinkModule( image, psz_file,
+                           NSLINKMODULE_OPTION_RETURN_ON_ERROR );
+
+    if( !handle )
+    {
+        NSLinkEditErrors errors;
+        const char *psz_file, *psz_err;
+        int i_errnum;
+        NSLinkEditError( &errors, &i_errnum, &psz_file, &psz_err );
+        msg_Warn( p_this, "cannot link module `%s' (%s)", psz_file, psz_err );
+        NSDestroyObjectFileImage( image );
+        return -1;
+    }
+
+    /* Destroy our image, we won't need it */
+    NSDestroyObjectFileImage( image );
+
+#elif defined(HAVE_DL_BEOS)
+    handle = load_add_on( psz_file );
+    if( handle < 0 )
+    {
+        msg_Warn( p_this, "cannot load module `%s'", psz_file );
+        return -1;
+    }
+
+#elif defined(HAVE_DL_WINDOWS)
+    handle = LoadLibrary( psz_file );
+    if( handle == NULL )
+    {
+        char *psz_err = GetWindowsError();
+        msg_Warn( p_this, "cannot load module `%s' (%s)", psz_file, psz_err );
+        free( psz_err );
+    }
+
+#elif defined(HAVE_DL_DLOPEN) && defined(RTLD_NOW)
+    /* static is OK, we are called atomically */
+    static vlc_bool_t b_kde = VLC_FALSE;
+
+#   if defined(SYS_LINUX)
+    /* XXX HACK #1 - we should NOT open modules with RTLD_GLOBAL, or we
+     * are going to get namespace collisions when two modules have common
+     * public symbols, but ALSA is being a pest here. */
+    if( strstr( psz_file, "alsa_plugin" ) )
+    {
+        handle = dlopen( psz_file, RTLD_NOW | RTLD_GLOBAL );
+        if( handle == NULL )
+        {
+            msg_Warn( p_this, "cannot load module `%s' (%s)",
+                              psz_file, dlerror() );
+            return -1;
+        }
+    }
+#   endif
+    /* XXX HACK #2 - the ugly KDE workaround. It seems that libkdewhatever
+     * causes dlopen() to segfault if libstdc++ is not loaded in the caller,
+     * so we just load libstdc++. Bwahahaha! ph34r! -- Sam. */
+    /* Update: FYI, this is Debian bug #180505, and seems to be fixed. */
+    if( !b_kde && !strstr( psz_file, "kde" ) )
+    {
+        dlopen( "libstdc++.so.6", RTLD_NOW )
+         || dlopen( "libstdc++.so.5", RTLD_NOW )
+         || dlopen( "libstdc++.so.4", RTLD_NOW )
+         || dlopen( "libstdc++.so.3", RTLD_NOW );
+        b_kde = VLC_TRUE;
+    }
+
+    handle = dlopen( psz_file, RTLD_NOW );
+    if( handle == NULL )
+    {
+        msg_Warn( p_this, "cannot load module `%s' (%s)",
+                          psz_file, dlerror() );
+        return -1;
+    }
+
+#elif defined(HAVE_DL_DLOPEN)
+#   if defined(DL_LAZY)
+    handle = dlopen( psz_file, DL_LAZY );
+#   else
+    handle = dlopen( psz_file, 0 );
+#   endif
+    if( handle == NULL )
+    {
+        msg_Warn( p_this, "cannot load module `%s' (%s)",
+                          psz_file, dlerror() );
+        return -1;
+    }
+
+#elif defined(HAVE_DL_SHL_LOAD)
+    handle = shl_load( psz_file, BIND_IMMEDIATE | BIND_NONFATAL, NULL );
+    if( handle == NULL )
+    {
+        msg_Warn( p_this, "cannot load module `%s' (%s)",
+                          psz_file, strerror(errno) );
+        return -1;
+    }
+
+#else
+#   error "Something is wrong in modules.c"
+
+#endif
+
+    *p_handle = handle;
     return 0;
 }
 
@@ -1335,5 +1446,493 @@ static char * GetWindowsError( void )
 #endif
 }
 #endif /* HAVE_DL_WINDOWS */
+
+/*****************************************************************************
+ * LoadPluginsCache: loads the plugins cache file
+ *****************************************************************************
+ * This function will load the plugin cache if present and valid. This cache
+ * will in turn be queried by AllocateAllPlugins() to see if it needs to
+ * actually load the dynamically loadable module.
+ * This allows us to only fully load plugins when they are actually used.
+ *****************************************************************************/
+static void CacheLoad( vlc_object_t *p_this )
+{
+    char *psz_filename, *psz_homedir, *psz_cachefile;
+    FILE *file;
+    int i, j, i_size, i_read;
+    char p_cachestring[sizeof(PLUGINSCACHE_FILE COPYRIGHT_MESSAGE)];
+    int *pi_cache;
+    module_cache_t **pp_cache = 0;
+
+    psz_cachefile = 0; // FIXME
+    if( !psz_cachefile || !psz_cachefile )
+    {
+        psz_homedir = p_this->p_vlc->psz_homedir;
+        if( !psz_homedir )
+        {
+            msg_Err( p_this, "psz_homedir is null" );
+            return;
+        }
+        psz_filename =
+            (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_FILE) +
+                            strlen(psz_homedir) );
+
+        if( psz_filename )
+            sprintf( psz_filename, "%s/" CONFIG_DIR "/" PLUGINSCACHE_FILE,
+                     psz_homedir );
+
+        if( !psz_filename )
+        {
+            msg_Err( p_this, "out of memory" );
+            return;
+        }
+    }
+    else
+    {
+        psz_filename = strdup( psz_cachefile );
+        if( !psz_filename )
+        {
+            msg_Err( p_this, "out of memory" );
+            return;
+        }
+    }
+
+    if( p_this->p_libvlc->p_module_bank->b_cache_delete )
+    {
+        msg_Dbg( p_this, "removing plugins cache file %s", psz_filename );
+        unlink( psz_filename );
+        return;
+    }
+
+    msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
+
+    file = fopen( psz_filename, "r" );
+    if( !file )
+    {
+        msg_Warn( p_this, "could not open plugins cache file %s for reading",
+                  psz_filename );
+        free( psz_filename );
+        return;
+    }
+    free( psz_filename );
+
+    /* Check the file is a plugins cache */
+    i_size = sizeof(PLUGINSCACHE_FILE COPYRIGHT_MESSAGE) - 1;
+    i_read = fread( p_cachestring, sizeof(char), i_size, file );
+    if( i_read != i_size ||
+        memcmp( p_cachestring, PLUGINSCACHE_FILE COPYRIGHT_MESSAGE, i_size ) )
+    {
+        msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
+    }
+
+    pi_cache = &p_this->p_libvlc->p_module_bank->i_loaded_cache;
+    fread( pi_cache, sizeof(char), sizeof(*pi_cache), file );
+    pp_cache = p_this->p_libvlc->p_module_bank->pp_loaded_cache =
+        malloc( *pi_cache * sizeof(void *) );
+
+    for( i = 0; i < *pi_cache; i++ )
+    {
+        int32_t i_size;
+
+#define LOAD_IMMEDIATE(a) \
+        fread( &a, sizeof(char), sizeof(a), file )
+#define LOAD_STRING(a) \
+        { fread( &i_size, sizeof(char), sizeof(int32_t), file ); \
+          if( i_size ) { \
+            a = malloc( i_size ); \
+            fread( a, sizeof(char), i_size, file ); \
+          } else a = 0; \
+        } while(0)
+
+        pp_cache[i] = malloc( sizeof(module_cache_t) );
+
+        /* Save common info */
+        LOAD_STRING( pp_cache[i]->psz_file );
+        LOAD_IMMEDIATE( pp_cache[i]->i_time );
+        LOAD_IMMEDIATE( pp_cache[i]->i_size );
+        LOAD_IMMEDIATE( pp_cache[i]->b_junk );
+
+        if( pp_cache[i]->b_junk ) continue;
+
+        pp_cache[i]->p_module = vlc_object_create( p_this, VLC_OBJECT_MODULE );
+
+        /* Save additional infos */
+        LOAD_STRING( pp_cache[i]->p_module->psz_object_name );
+        LOAD_STRING( pp_cache[i]->p_module->psz_shortname );
+        LOAD_STRING( pp_cache[i]->p_module->psz_longname );
+        LOAD_STRING( pp_cache[i]->p_module->psz_program );
+        for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
+        {
+            LOAD_STRING( pp_cache[i]->p_module->pp_shortcuts[j] ); // FIX
+        }
+        LOAD_STRING( pp_cache[i]->p_module->psz_capability );
+        LOAD_IMMEDIATE( pp_cache[i]->p_module->i_score );
+        LOAD_IMMEDIATE( pp_cache[i]->p_module->i_cpu );
+        LOAD_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
+        LOAD_IMMEDIATE( pp_cache[i]->p_module->b_reentrant );
+        LOAD_IMMEDIATE( pp_cache[i]->p_module->b_submodule );
+
+        /* Config stuff */
+        CacheLoadConfig( pp_cache[i]->p_module, file );
+
+        LOAD_STRING( pp_cache[i]->p_module->psz_filename );
+
+        int i_submodules;
+        LOAD_IMMEDIATE( i_submodules );
+
+        while( i_submodules-- )
+        {
+            module_t *p_module = vlc_object_create( p_this, VLC_OBJECT_MODULE);
+            vlc_object_attach( p_module, pp_cache[i]->p_module );
+            p_module->b_submodule = VLC_TRUE; 
+
+            LOAD_STRING( p_module->psz_object_name );
+            LOAD_STRING( p_module->psz_shortname );
+            LOAD_STRING( p_module->psz_longname );
+            LOAD_STRING( p_module->psz_program );
+            for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
+            {
+                LOAD_STRING( p_module->pp_shortcuts[j] ); // FIX
+            }
+            LOAD_STRING( p_module->psz_capability );
+            LOAD_IMMEDIATE( p_module->i_score );
+            LOAD_IMMEDIATE( p_module->i_cpu );
+            LOAD_IMMEDIATE( p_module->b_unloadable );
+            LOAD_IMMEDIATE( p_module->b_reentrant );
+        }
+    }
+
+    fclose( file );
+
+    return;
+}
+
+void CacheLoadConfig( module_t *p_module, FILE *file )
+{
+    int i, j, i_lines;
+    int32_t i_size;
+
+    /* Calculate the structure length */
+    LOAD_IMMEDIATE( p_module->i_config_items );
+    LOAD_IMMEDIATE( p_module->i_bool_items );
+
+    LOAD_IMMEDIATE( i_lines );
+
+    /* Allocate memory */
+    p_module->p_config =
+        (module_config_t *)malloc( sizeof(module_config_t) * (i_lines + 1));
+    if( p_module->p_config == NULL )
+    {
+        msg_Err( p_module, "config error: can't duplicate p_config" );
+        return;
+    }
+
+    /* Do the duplication job */
+    for( i = 0; i < i_lines ; i++ )
+    {
+        LOAD_IMMEDIATE( p_module->p_config[i] );
+
+        LOAD_STRING( p_module->p_config[i].psz_type );
+        LOAD_STRING( p_module->p_config[i].psz_name );
+        LOAD_STRING( p_module->p_config[i].psz_text );
+        LOAD_STRING( p_module->p_config[i].psz_longtext );
+        LOAD_STRING( p_module->p_config[i].psz_value_orig );
+
+        p_module->p_config[i].psz_value =
+            p_module->p_config[i].psz_value_orig ?
+                strdup( p_module->p_config[i].psz_value_orig ) : 0;
+        p_module->p_config[i].i_value = p_module->p_config[i].i_value_orig;
+        p_module->p_config[i].f_value = p_module->p_config[i].f_value_orig;
+
+        p_module->p_config[i].p_lock = &p_module->object_lock;
+
+        if( p_module->p_config[i].i_list )
+        {
+            if( p_module->p_config[i].ppsz_list )
+            {
+                p_module->p_config[i].ppsz_list =
+                    malloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
+                if( p_module->p_config[i].ppsz_list )
+                {
+                    for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                        LOAD_STRING( p_module->p_config[i].ppsz_list[j] );
+                    p_module->p_config[i].ppsz_list[j] = NULL;
+                }
+            }
+            if( p_module->p_config[i].ppsz_list_text )
+            {
+                p_module->p_config[i].ppsz_list_text =
+                    malloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
+                if( p_module->p_config[i].ppsz_list_text )
+                {
+                  for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                      LOAD_STRING( p_module->p_config[i].ppsz_list_text[j] );
+                  p_module->p_config[i].ppsz_list_text[j] = NULL;
+                }
+            }
+            if( p_module->p_config[i].pi_list )
+            {
+                p_module->p_config[i].pi_list =
+                    malloc( (p_module->p_config[i].i_list + 1) * sizeof(int) );
+                if( p_module->p_config[i].pi_list )
+                {
+                    for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                        LOAD_IMMEDIATE( p_module->p_config[i].pi_list[j] );
+                }
+            }
+        }
+
+        if( p_module->p_config[i].i_action )
+        {
+            p_module->p_config[i].ppf_action =
+                malloc( p_module->p_config[i].i_action * sizeof(void *) );
+            p_module->p_config[i].ppsz_action_text =
+                malloc( p_module->p_config[i].i_action * sizeof(char *) );
+
+            for( j = 0; j < p_module->p_config[i].i_action; j++ )
+            {
+                p_module->p_config[i].ppf_action[j] = 0;
+                LOAD_STRING( p_module->p_config[i].ppsz_action_text[j] );
+            }
+        }
+
+        p_module->p_config[i].pf_callback = 0;
+    }
+
+    p_module->p_config[i].i_type = CONFIG_HINT_END;
+}
+
+/*****************************************************************************
+ * SavePluginsCache: saves the plugins cache to a file
+ *****************************************************************************/
+static void CacheSave( vlc_object_t *p_this )
+{
+    char *psz_filename, *psz_homedir, *psz_cachefile;
+    FILE *file;
+    int i, j, i_cache;
+    module_cache_t **pp_cache;
+
+    psz_cachefile = 0; // FIXME
+    if( !psz_cachefile || !psz_cachefile )
+    {
+        psz_homedir = p_this->p_vlc->psz_homedir;
+        if( !psz_homedir )
+        {
+            msg_Err( p_this, "psz_homedir is null" );
+            return;
+        }
+        psz_filename =
+            (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_FILE) +
+                            strlen(psz_homedir) );
+
+        if( psz_filename )
+            sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
+
+        if( !psz_filename )
+        {
+            msg_Err( p_this, "out of memory" );
+            return;
+        }
+
+        config_CreateDir( p_this, psz_filename );
+
+        strcat( psz_filename, "/" PLUGINSCACHE_FILE );
+    }
+    else
+    {
+        psz_filename = strdup( psz_cachefile );
+        if( !psz_filename )
+        {
+            msg_Err( p_this, "out of memory" );
+            return;
+        }
+    }
+
+    msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
+
+    file = fopen( psz_filename, "w" );
+    if( !file )
+    {
+        msg_Warn( p_this, "could not open plugins cache file %s for writing",
+                  psz_filename );
+        free( psz_filename );
+        return;
+    }
+    free( psz_filename );
+
+    /* Contains version number */
+    fprintf( file, PLUGINSCACHE_FILE COPYRIGHT_MESSAGE );
+
+    i_cache = p_this->p_libvlc->p_module_bank->i_cache;
+    pp_cache = p_this->p_libvlc->p_module_bank->pp_cache;
+
+    fwrite( &i_cache, sizeof(char), sizeof(i_cache), file );
+
+    for( i = 0; i < i_cache; i++ )
+    {
+        int32_t i_size;
+
+#define SAVE_IMMEDIATE(a) \
+        fwrite( &a, sizeof(char), sizeof(a), file )
+#define SAVE_STRING(a) \
+        { i_size = a ? strlen( a ) + 1 : 0; \
+          fwrite( &i_size, sizeof(char), sizeof(int32_t), file ); \
+          if( a ) fwrite( a, sizeof(char), i_size, file ); \
+        } while(0)
+
+        /* Save common info */
+        SAVE_STRING( pp_cache[i]->psz_file );
+        SAVE_IMMEDIATE( pp_cache[i]->i_time );
+        SAVE_IMMEDIATE( pp_cache[i]->i_size );
+        SAVE_IMMEDIATE( pp_cache[i]->b_junk );
+
+        if( pp_cache[i]->b_junk ) continue;
+
+        /* Save additional infos */
+        SAVE_STRING( pp_cache[i]->p_module->psz_object_name );
+        SAVE_STRING( pp_cache[i]->p_module->psz_shortname );
+        SAVE_STRING( pp_cache[i]->p_module->psz_longname );
+        SAVE_STRING( pp_cache[i]->p_module->psz_program );
+        for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
+        {
+            SAVE_STRING( pp_cache[i]->p_module->pp_shortcuts[j] ); // FIX
+        }
+        SAVE_STRING( pp_cache[i]->p_module->psz_capability );
+        SAVE_IMMEDIATE( pp_cache[i]->p_module->i_score );
+        SAVE_IMMEDIATE( pp_cache[i]->p_module->i_cpu );
+        SAVE_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
+        SAVE_IMMEDIATE( pp_cache[i]->p_module->b_reentrant );
+        SAVE_IMMEDIATE( pp_cache[i]->p_module->b_submodule );
+
+        /* Config stuff */
+        CacheSaveConfig( pp_cache[i]->p_module, file );
+
+        SAVE_STRING( pp_cache[i]->p_module->psz_filename );
+
+        int i_submodule;
+        SAVE_IMMEDIATE( pp_cache[i]->p_module->i_children );
+        for( i_submodule = 0; i_submodule < pp_cache[i]->p_module->i_children;
+             i_submodule++ )
+        {
+            module_t *p_module =
+                (module_t *)pp_cache[i]->p_module->pp_children[i_submodule];
+
+            SAVE_STRING( p_module->psz_object_name );
+            SAVE_STRING( p_module->psz_shortname );
+            SAVE_STRING( p_module->psz_longname );
+            SAVE_STRING( p_module->psz_program );
+            for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
+            {
+                SAVE_STRING( p_module->pp_shortcuts[j] ); // FIX
+            }
+            SAVE_STRING( p_module->psz_capability );
+            SAVE_IMMEDIATE( p_module->i_score );
+            SAVE_IMMEDIATE( p_module->i_cpu );
+            SAVE_IMMEDIATE( p_module->b_unloadable );
+            SAVE_IMMEDIATE( p_module->b_reentrant );
+        }
+    }
+
+    fclose( file );
+
+    return;
+}
+
+void CacheSaveConfig( module_t *p_module, FILE *file )
+{
+    int i, j, i_lines = 0;
+    module_config_t *p_item;
+    int32_t i_size;
+
+    SAVE_IMMEDIATE( p_module->i_config_items );
+    SAVE_IMMEDIATE( p_module->i_bool_items );
+
+    for( p_item = p_module->p_config; p_item->i_type != CONFIG_HINT_END;
+         p_item++ ) i_lines++;
+
+    SAVE_IMMEDIATE( i_lines );
+
+    for( i = 0; i < i_lines ; i++ )
+    {
+        SAVE_IMMEDIATE( p_module->p_config[i] );
+
+        SAVE_STRING( p_module->p_config[i].psz_type );
+        SAVE_STRING( p_module->p_config[i].psz_name );
+        SAVE_STRING( p_module->p_config[i].psz_text );
+        SAVE_STRING( p_module->p_config[i].psz_longtext );
+        SAVE_STRING( p_module->p_config[i].psz_value_orig );
+
+        if( p_module->p_config[i].i_list )
+        {
+            if( p_module->p_config[i].ppsz_list )
+            {
+                for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                    SAVE_STRING( p_module->p_config[i].ppsz_list[j] );
+            }
+
+            if( p_module->p_config[i].ppsz_list_text )
+            {
+                for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                    SAVE_STRING( p_module->p_config[i].ppsz_list_text[j] );
+            }
+            if( p_module->p_config[i].pi_list )
+            {
+                for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                    SAVE_IMMEDIATE( p_module->p_config[i].pi_list[j] );
+            }
+        }
+
+        for( j = 0; j < p_module->p_config[i].i_action; j++ )
+            SAVE_STRING( p_module->p_config[i].ppsz_action_text[j] );
+    }
+}
+
+/*****************************************************************************
+ * CacheMerge: Merge a cache module descriptor with a full module descriptor.
+ *****************************************************************************/
+static void CacheMerge( vlc_object_t *p_this, module_t *p_cache,
+                        module_t *p_module )
+{
+    int i_submodule;
+
+    p_cache->pf_activate = p_module->pf_activate;
+    p_cache->pf_deactivate = p_module->pf_deactivate;
+    p_cache->p_symbols = p_module->p_symbols;
+    p_cache->handle = p_module->handle;
+
+    for( i_submodule = 0; i_submodule < p_module->i_children; i_submodule++ )
+    {
+        module_t *p_child = (module_t*)p_module->pp_children[i_submodule];
+        module_t *p_cchild = (module_t*)p_cache->pp_children[i_submodule];
+        p_cchild->pf_activate = p_child->pf_activate;
+        p_cchild->pf_deactivate = p_child->pf_deactivate;
+        p_cchild->p_symbols = p_child->p_symbols;
+    }
+
+    p_cache->b_loaded = VLC_TRUE;
+    p_module->b_loaded = VLC_FALSE;
+}
+
+/*****************************************************************************
+ * FindPluginCache: finds the cache entry corresponding to a file
+ *****************************************************************************/
+static module_cache_t *CacheFind( vlc_object_t *p_this, char *psz_file,
+                                  int64_t i_time, int64_t i_size )
+{
+    module_cache_t **pp_cache;
+    int i_cache, i;
+
+    pp_cache = p_this->p_libvlc->p_module_bank->pp_loaded_cache;
+    i_cache = p_this->p_libvlc->p_module_bank->i_loaded_cache;
+
+    for( i = 0; i < i_cache; i++ )
+    {
+        if( !strcmp( pp_cache[i]->psz_file, psz_file ) &&
+            pp_cache[i]->i_time == i_time &&
+            pp_cache[i]->i_size == i_size ) return pp_cache[i];
+    }
+
+    return NULL;
+}
 
 #endif /* HAVE_DYNAMIC_PLUGINS */

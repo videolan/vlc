@@ -86,16 +86,6 @@ static char *ppsz_language_text[] =
     "show all the available options, including those that most users should " \
     "never touch.")
 
-#define INTF_PATH_TEXT N_("Interface default search path")
-#define INTF_PATH_LONGTEXT N_( \
-    "This option allows you to set the default path that the interface will " \
-    "open when looking for a file.")
-
-#define PLUGIN_PATH_TEXT N_("Modules search path")
-#define PLUGIN_PATH_LONGTEXT N_( \
-    "This option allows you to specify an additional path for VLC to look " \
-    "for its modules.")
-
 #define AOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the audio " \
     "subsystem, and to add audio filters which can be used for " \
@@ -586,9 +576,19 @@ static char *ppsz_align_descriptions[] =
     "priorities. You can use it to tune VLC priority against other " \
     "programs, or against other VLC instances.")
 
-#define MINIMIZE_THREADS_TXT N_("Minimize number of threads")
-#define MINIMIZE_THREADS_LONGTXT N_( \
+#define MINIMIZE_THREADS_TEXT N_("Minimize number of threads")
+#define MINIMIZE_THREADS_LONGTEXT N_( \
      "This option minimizes the number of threads needed to run VLC")
+
+#define PLUGIN_PATH_TEXT N_("Modules search path")
+#define PLUGIN_PATH_LONGTEXT N_( \
+    "This option allows you to specify an additional path for VLC to look " \
+    "for its modules.")
+
+#define PLUGINS_CACHE_TEXT N_("Use a plugins cache")
+#define PLUGINS_CACHE_LONGTEXT N_( \
+    "This option allows you to use a plugins cache which will greatly " \
+    "improve the start time of VLC.")
 
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
 #define ONEINSTANCE_LONGTEXT N_( \
@@ -767,10 +767,6 @@ vlc_module_begin();
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT,
                             ADVANCED_LONGTEXT, VLC_FALSE );
-    add_directory( "search-path", NULL, NULL, INTF_PATH_TEXT,
-                            INTF_PATH_LONGTEXT, VLC_TRUE );
-    add_directory( "plugin-path", NULL, NULL,
-                PLUGIN_PATH_TEXT, PLUGIN_PATH_LONGTEXT, VLC_TRUE );
 
     /* Audio options */
     add_category_hint( N_("Audio"), AOUT_CAT_LONGTEXT , VLC_FALSE );
@@ -956,25 +952,38 @@ vlc_module_begin();
 
     /* Misc options */
     add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, VLC_TRUE );
-    add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT, VLC_TRUE );
-    add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT, VLC_TRUE );
-    add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT, VLC_TRUE );
-
-    add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TXT, MINIMIZE_THREADS_LONGTXT, VLC_TRUE );
+    add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
+                MEMCPY_LONGTEXT, VLC_TRUE );
+    add_module( "access", "access", NULL, NULL, ACCESS_TEXT,
+                ACCESS_LONGTEXT, VLC_TRUE );
+    add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT,
+                DEMUX_LONGTEXT, VLC_TRUE );
+    add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
+              MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
+    add_directory( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT,
+                   PLUGIN_PATH_LONGTEXT, VLC_TRUE );
+    add_bool( "plugins-cache", 0, NULL, PLUGINS_CACHE_TEXT,
+              PLUGINS_CACHE_LONGTEXT, VLC_TRUE );
 
 #if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
-    add_bool( "rt-priority", 0, NULL, RT_PRIORITY_TEXT, RT_PRIORITY_LONGTEXT, VLC_TRUE );
+    add_bool( "rt-priority", 0, NULL, RT_PRIORITY_TEXT,
+              RT_PRIORITY_LONGTEXT, VLC_TRUE );
 #endif
 
 #if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
-    add_integer( "rt-offset", 0, NULL, RT_OFFSET_TEXT, RT_OFFSET_LONGTEXT, VLC_TRUE );
+    add_integer( "rt-offset", 0, NULL, RT_OFFSET_TEXT,
+                 RT_OFFSET_LONGTEXT, VLC_TRUE );
 #endif
 
 #if defined(WIN32)
-    add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT, ONEINSTANCE_LONGTEXT, VLC_TRUE );
-    add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT, HPRIORITY_LONGTEXT, VLC_TRUE );
-    add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT, VLC_TRUE );
-    add_integer( "win9x-cv-method", 1, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT, VLC_TRUE );
+    add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT,
+              ONEINSTANCE_LONGTEXT, VLC_TRUE );
+    add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,
+              HPRIORITY_LONGTEXT, VLC_TRUE );
+    add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT,
+              FAST_MUTEX_LONGTEXT, VLC_TRUE );
+    add_integer( "win9x-cv-method", 1, NULL, WIN9X_CV_TEXT,
+                  WIN9X_CV_LONGTEXT, VLC_TRUE );
 #endif
 
     /* Hotkey options*/
@@ -1108,6 +1117,8 @@ static module_config_t p_help_config[] =
       N_("reset the current config to the default values") },
     { CONFIG_ITEM_STRING, NULL, "config", '\0',
       N_("use alternate config file") },
+    { CONFIG_ITEM_BOOL, NULL, "reset-plugins-cache", '\0',
+      N_("resets the current plugins cache") },
     { CONFIG_ITEM_BOOL, NULL, "version", '\0',
       N_("print version information") },
     { CONFIG_HINT_END, NULL, NULL, '\0', NULL }

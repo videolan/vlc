@@ -340,6 +340,12 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     p_vlc->psz_homedir = config_GetHomeDir();
     p_vlc->psz_configfile = config_GetPsz( p_vlc, "config" );
 
+    /* Check for plugins cache options */
+    if( config_GetInt( p_vlc, "reset-plugins-cache" ) )
+    {
+        libvlc.p_module_bank->b_cache_delete = VLC_TRUE;
+    }
+
     /* Hack: remove the help module here */
     vlc_object_detach( p_help_module );
     /* End hack */
@@ -729,6 +735,11 @@ int VLC_Destroy( int i_object )
         p_vlc->p_memcpy_module = NULL;
     }
 
+    /*
+     * XXX: Free module bank !
+     */
+    module_EndBank( p_vlc );
+
     if( p_vlc->psz_homedir )
     {
         free( p_vlc->psz_homedir );
@@ -746,11 +757,6 @@ int VLC_Destroy( int i_object )
         free( p_vlc->p_hotkeys );
         p_vlc->p_hotkeys = NULL;
     }
-
-    /*
-     * XXX: Free module bank !
-     */
-    /*module_EndBank( p_vlc );*/
 
     /*
      * System specific cleaning code

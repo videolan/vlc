@@ -2,9 +2,9 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: configuration.c,v 1.76 2004/01/29 17:04:01 gbazin Exp $
+ * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -910,6 +910,45 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 }
 
 /*****************************************************************************
+ * config_CreateConfigDir: Create configuration directory if it doesn't exist.
+ *****************************************************************************/
+int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
+{
+    if( !psz_dirname && !*psz_dirname ) return -1;
+
+#if defined( UNDER_CE )
+    {
+        wchar_t psz_new[ MAX_PATH ];
+        MultiByteToWideChar( CP_ACP, 0, psz_dirname, -1, psz_new, MAX_PATH );
+        if( CreateDirectory( psz_new, NULL ) )
+        {
+            msg_Err( p_this, "could not create %s", psz_filename );
+        }
+    }
+
+#elif defined( HAVE_ERRNO_H )
+#   if defined( WIN32 )
+    if( mkdir( psz_dirname ) && errno != EEXIST )
+#   else
+    if( mkdir( psz_dirname, 0755 ) && errno != EEXIST )
+#   endif
+    {
+        msg_Err( p_this, "could not create %s (%s)",
+                 psz_dirname, strerror(errno) );
+    }
+
+#else
+    if( mkdir( psz_dirname ) )
+    {
+        msg_Err( p_this, "could not create %s", psz_dirname );
+    }
+
+#endif
+
+    return 0;
+}
+
+/*****************************************************************************
  * config_SaveConfigFile: Save a module's config options.
  *****************************************************************************
  * This will save the specified module's config options to the config file.
@@ -967,35 +1006,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
             return -1;
         }
 
-#if defined( UNDER_CE )
-        {
-            wchar_t psz_new[ MAX_PATH ];
-            MultiByteToWideChar( CP_ACP, 0, psz_filename, -1, psz_new,
-                                 MAX_PATH );
-            if( CreateDirectory( psz_new, NULL ) )
-            {
-                msg_Err( p_this, "could not create %s", psz_filename );
-            }
-        }
-
-#elif defined( HAVE_ERRNO_H )
-#   if defined( WIN32 )
-        if( mkdir( psz_filename ) && errno != EEXIST )
-#   else
-        if( mkdir( psz_filename, 0755 ) && errno != EEXIST )
-#   endif
-        {
-            msg_Err( p_this, "could not create %s (%s)",
-                             psz_filename, strerror(errno) );
-        }
-
-#else
-        if( mkdir( psz_filename ) )
-        {
-            msg_Err( p_this, "could not create %s", psz_filename );
-        }
-
-#endif
+        config_CreateDir( p_this, psz_filename );
 
         strcat( psz_filename, "/" CONFIG_FILE );
     }
