@@ -41,6 +41,7 @@
 #include "bitmaps/eject.xpm"
 #include "bitmaps/slow.xpm"
 #include "bitmaps/fast.xpm"
+#include "bitmaps/speaker.xpm"
 
 #define TOOLBAR_BMP_WIDTH 16
 #define TOOLBAR_BMP_HEIGHT 16
@@ -75,7 +76,8 @@ class wxVolCtrl: public wxGauge
 {
 public:
     /* Constructor */
-    wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id );
+    wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id,
+               wxPoint = wxDefaultPosition, wxSize = wxSize( 20, -1 ) );
     virtual ~wxVolCtrl() {};
 
     void Change( int i_volume );
@@ -349,7 +351,8 @@ void Interface::CreateOurMenuBar()
                        wxU(_(HELP_PLAYLIST)) );
     view_menu->Append( Logs_Event, wxU(_("&Messages...\tCtrl-M")),
                        wxU(_(HELP_LOGS)) );
-    view_menu->Append( FileInfo_Event, wxU(_("&Stream and Media info...")),
+    view_menu->Append( FileInfo_Event,
+                       wxU(_("Stream and Media &info...\tCtrl-I")),
                        wxU(_(HELP_FILEINFO)) );
 
     /* Create the "Settings" menu */
@@ -370,7 +373,8 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
-    help_menu->Append( About_Event, wxU(_("About VLC media player")), wxU(_(HELP_ABOUT)) );
+    help_menu->Append( About_Event, wxU(_("About VLC media player")),
+                       wxU(_(HELP_ABOUT)) );
 
     /* Append the freshly created menus to the menu bar... */
     wxMenuBar *menubar = new wxMenuBar( wxMB_DOCKABLE );
@@ -392,6 +396,37 @@ void Interface::CreateOurMenuBar()
     /* Associate drop targets with the menubar */
     menubar->SetDropTarget( new DragAndDrop( p_intf ) );
 #endif
+}
+
+class VLCVolCtrl : public wxControl
+{
+public:
+    VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent, wxGauge ** );
+    virtual ~VLCVolCtrl() {};
+
+    virtual void OnPaint( wxPaintEvent &event );
+
+  private:
+    DECLARE_EVENT_TABLE()
+};
+
+BEGIN_EVENT_TABLE(VLCVolCtrl, wxControl)
+   EVT_PAINT(VLCVolCtrl::OnPaint)
+END_EVENT_TABLE()
+
+VLCVolCtrl::VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent,
+                        wxGauge **pp_volctrl )
+  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, 16 ) )
+{
+    *pp_volctrl = new wxVolCtrl( p_intf, this, -1, wxPoint(18,0),
+                                  wxSize(44,16) );
+}
+
+void VLCVolCtrl::OnPaint( wxPaintEvent &evt )
+{
+    wxPaintDC dc( this );
+    wxBitmap mPlayBitmap( speaker_xpm );
+    dc.DrawBitmap( mPlayBitmap, 1, 0, TRUE );
 }
 
 void Interface::CreateOurToolBar()
@@ -435,13 +470,14 @@ void Interface::CreateOurToolBar()
     toolbar->AddTool( Playlist_Event, wxT(""), wxBitmap( eject_xpm ),
                       wxU(_(HELP_PLO)) );
 
-    toolbar->Realize();
+    wxControl *p_dummy_ctrl =
+        new wxControl( toolbar, -1, wxDefaultPosition, wxSize(64, 16 ) );
+    toolbar->AddControl( p_dummy_ctrl );
 
-    /* Place the toolbar in a sizer, so we can calculate the width of the
-     * toolbar and set this as the minimum for the main frame size. */
-    wxBoxSizer *toolbar_sizer = new wxBoxSizer( wxHORIZONTAL );
-    toolbar_sizer->Add( toolbar, 1, 0, 0 );
-    toolbar_sizer->Layout();
+    VLCVolCtrl *sound_control = new VLCVolCtrl( p_intf, toolbar, &volctrl );
+    toolbar->AddControl( sound_control );
+
+    toolbar->Realize();
 
     // '7' is the number of buttons on the toolbar, '3' is arbitrary :)
     frame_sizer->SetMinSize( TOOLBAR_BMP_WIDTH * 7 * 3, -1 );
@@ -473,12 +509,8 @@ void Interface::CreateOurSlider()
                            SLIDER_MAX_POS, wxDefaultPosition, wxDefaultSize );
     slider_sizer->Add( slider, 1, wxEXPAND | wxALL, 5 );
 
-
-    volctrl = new wxVolCtrl( p_intf, slider_frame, -1 );
-
     /* Add everything to the frame */
     frame_sizer->Add( slider_sizer, 1, wxEXPAND | wxBOTTOM, 5 );
-    frame_sizer->Add( volctrl, 0, wxEXPAND | wxALL, 5 );
     slider_frame->SetSizer( frame_sizer );
     frame_sizer->Layout();
     frame_sizer->SetSizeHints(slider_frame);
@@ -1352,9 +1384,9 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 /*****************************************************************************
  * Definition of wxVolCtrl class.
  *****************************************************************************/
-wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id )
-  : wxGauge( parent, id, 200, wxDefaultPosition, wxSize( 20, -1 ),
-             wxGA_VERTICAL | wxGA_SMOOTH )
+wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id,
+                      wxPoint point, wxSize size )
+  : wxGauge( parent, id, 200, point, size, wxGA_HORIZONTAL | wxGA_SMOOTH )
 {
     p_intf = _p_intf;
 }
@@ -1363,8 +1395,7 @@ void wxVolCtrl::OnChange( wxMouseEvent& event )
 {
     if( !event.LeftDown() && !event.LeftIsDown() ) return;
 
-    int i_volume = (GetClientSize().GetHeight() - event.GetY()) * 200 /
-                    GetClientSize().GetHeight();
+    int i_volume = event.GetX() * 200 / GetClientSize().GetWidth();
     Change( i_volume );
 }
 
