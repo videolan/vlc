@@ -70,9 +70,17 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 
+	# Touch stuff
+	touch `find . -name Makefile.in` \
+	&& touch configure.ac.in \
+	&& touch configure.ac \
+	&& touch aclocal.m4 \
+	&& touch configure \
+	&& touch config.h.in
+
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	if test ! -d CVS; then cd extras/ffmpeg && ./configure && make; fi
+	if test ! -d CVS; then cd extras/ffmpeg && ./configure && cd libavcodec && make; fi
 
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
@@ -96,6 +104,9 @@ clean:
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
 	-if test ! -d CVS; then cd extras/faad && make distclean; fi
+
+	# Clean built files
+	rm -f po/*.gmo mozilla/vlcintf.xpt
 
 	-$(MAKE) distclean
 

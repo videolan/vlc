@@ -2,14 +2,15 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt-dev, libasound2-dev (>=0.9.0beta10a), libarts-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0), libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev, libdvdread2-dev, libslp-dev
+Build-Depends: debhelper (>=2.2.0), gettext, xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt3-dev, libasound2-dev (>=0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs4-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0), libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev, libdvdread2-dev, libslp-dev
 Standards-Version: 3.5.6
 
 Package: vlc
 Section: graphics
 Architecture: any
 Depends: ${shlibs:Depends}
-Recommends: vlc-gui, vlc-plugin-mad, vlc-plugin-a52
+Recommends: vlc-gui
+Depends: vlc-plugin-mad, vlc-plugin-a52
 Suggests: gnome-vlc
 Description: a complete multimedia player
  This is the VLC media player. It plays MPEG, MPEG2, MPEG4, DivX, mp3,
@@ -38,7 +39,7 @@ Description: GNOME frontend for VLC
 Package: vlc-gnome
 Architecture: any
 Depends: gnome-vlc
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called gnome-vlc.
 
 Package: gvlc
@@ -54,7 +55,7 @@ Description: Gtk+ frontend for VLC
 Package: vlc-gtk
 Architecture: any
 Depends: gvlc
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called gvlc.
 
 Package: vlc-plugin-esd
@@ -70,7 +71,7 @@ Description: Esound audio output plugin for VLC
 Package: vlc-esd
 Architecture: any
 Depends: vlc-plugin-esd
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called vlc-plugin-esd.
 
 Package: vlc-plugin-alsa
@@ -86,7 +87,7 @@ Description: ALSA audio output plugin for VLC
 Package: vlc-alsa
 Architecture: any
 Depends: vlc-plugin-alsa
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called vlc-plugin-alsa.
 
 Package: vlc-plugin-sdl
@@ -103,7 +104,7 @@ Description: SDL video and audio output plugin for VLC
 Package: vlc-sdl
 Architecture: any
 Depends: vlc-plugin-sdl
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called vlc-plugin-sdl.
 
 Package: vlc-plugin-ggi
@@ -119,7 +120,7 @@ Description: GGI video output plugin for VLC
 Package: vlc-ggi
 Architecture: any
 Depends: vlc-plugin-ggi
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called vlc-plugin-ggi.
 
 Package: vlc-plugin-glide
@@ -135,7 +136,7 @@ Description: Glide video output plugin for VLC
 Package: vlc-glide
 Architecture: any
 Depends: vlc-plugin-glide
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called vlc-plugin-glide.
 
 Package: qvlc
@@ -151,7 +152,7 @@ Description: Qt frontend for VLC
 Package: vlc-qt
 Architecture: any
 Depends: qvlc
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called qvlc.
 
 Package: vlc-plugin-mad
@@ -159,15 +160,15 @@ Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Conflicts: vlc-mad (<< 0.5.0)
 Replaces: vlc-mad (<< 0.5.0)
-Description: MAD audio codec plugin for VLC
+Description: MPEG audio codec plugin for VLC
  This plugin adds support for libmad, the MPEG audio decoder library,
- to the VLC media player. MAD is 100% fixed-point based. The plugin is
- autodetected.
+ to the VLC media player. It is based on libmad, a 100% fixed-point based
+ decoding library. The plugin is autodetected.
 
 Package: vlc-mad
 Architecture: any
 Depends: vlc-plugin-mad
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called vlc-plugin-mad.
 
 Package: vlc-plugin-arts
@@ -183,7 +184,7 @@ Description: aRts audio output plugin for VLC
 Package: vlc-arts
 Architecture: any
 Depends: vlc-plugin-arts
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called vlc-plugin-arts.
 
 Package: vlc-plugin-lirc
@@ -199,7 +200,7 @@ Description: lirc (infrared remote control) interface plugin for VLC
 Package: vlc-lirc
 Architecture: any
 Depends: vlc-plugin-lirc
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called vlc-plugin-lirc.
 
 Package: vlc-plugin-aa
@@ -215,7 +216,7 @@ Description: ASCII art video output plugin for VLC
 Package: vlc-aa
 Architecture: any
 Depends: vlc-plugin-aa
-Description: Legacy package that you should remove.
+Description: legacy package that you should remove
  This package is now called vlc-plugin-aa.
 
 Package: vlc-plugin-xosd
@@ -261,14 +262,14 @@ Description: SVGAlib video output plugin for VLC
 Package: vlc-plugin-dv
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: DV codec plugin for VLC
+Description: DV video codec plugin for VLC
  This plugin adds support for the DV video format to the VLC media player.
  The plugin is autodetected.
 
 Package: vlc-plugin-a52
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: A-52 (AC-3) codec plugin for VLC
+Description: A-52 (AC-3) audio codec plugin for VLC
  This plugin adds support for the ATSC A-52 (aka. AC-3) audio format to
  the VLC media player. The plugin is autodetected.
 
@@ -282,7 +283,7 @@ Description: DVB input plugin for VLC
 Package: vlc-plugin-ogg
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Description: Ogg demuxer and Vorbis codec plugins for VLC
+Description: Ogg demuxer and Vorbis audio codec plugins for VLC
  These plugins add support for the Ogg bitstream format and the Ogg Vorbis
  compressed audio format to the VLC media player. They are autodetected.
 
