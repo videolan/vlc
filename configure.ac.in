@@ -1799,13 +1799,24 @@ dnl
 dnl  Libmpeg2 plugin
 dnl
 AC_ARG_ENABLE(libmpeg2,
-  [  --enable-libmpeg2       libmpeg2 decoder support (default disabled)])
-if test "x${enable_libmpeg2}" = "xyes"
+  [  --enable-libmpeg2       libmpeg2 decoder support (default enabled)])
+if test "x${enable_libmpeg2}" != "xno"
 then
   AC_CHECK_HEADERS(mpeg2dec/mpeg2.h, [
-    PLUGINS="${PLUGINS} libmpeg2"
-    LDFLAGS_libmpeg2="${LDFLAGS_libmpeg2} -lmpeg2"
-   ],[])
+    AC_MSG_CHECKING(for libmpeg2 version >= 0.3.2)
+    AC_EGREP_CPP(yes,
+      [#include <mpeg2dec/mpeg2.h>
+       #ifdef MPEG2_RELEASE
+       #if MPEG2_RELEASE >= MPEG2_VERSION(0,3,2)
+       yes
+       #endif
+       #endif],
+      [AC_MSG_RESULT([yes])
+        PLUGINS="${PLUGINS} libmpeg2"
+        LDFLAGS_libmpeg2="${LDFLAGS_libmpeg2} -lmpeg2"],
+      [AC_MSG_RESULT([no]) ]
+    )
+  ])
 fi
 
 dnl
@@ -1820,7 +1831,7 @@ then
     LDFLAGS_vorbis="${LDFLAGS_vorbis} -lvorbis -logg"
    ],[])
 fi
-         
+
 dnl
 dnl  Tremor plugin
 dnl
