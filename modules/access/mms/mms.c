@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.23 2003/03/11 18:14:27 fenrir Exp $
+ * $Id: mms.c,v 1.24 2003/03/15 02:33:23 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1574,6 +1574,7 @@ static int  mms_ParseCommand( input_thread_t *p_input,
     {
         msg_Warn( p_input, "truncated command (header incomplete)" );
         p_access->i_command = 0;
+        *pi_used = 0;
         return( -1 );
     }
     i_id =  GetDWLE( p_data + 4 );
@@ -1593,6 +1594,7 @@ static int  mms_ParseCommand( input_thread_t *p_input,
                   "truncated command (missing %d bytes)",
                    i_length - i_data  );
         p_access->i_command = 0;
+        *pi_used = 0;
         return( -1 );
     }
     else if( i_length < p_access->i_cmd )
@@ -1638,6 +1640,7 @@ static int  mms_ParsePacket( input_thread_t *p_input,
     if( i_data <= 8 )
     {
         msg_Warn( p_input, "truncated packet (header incomplete)" );
+        *pi_used = 0;
         return( -1 );
     }
 
@@ -1836,32 +1839,39 @@ static int  mms_ReceiveCommand( input_thread_t *p_input )
     {
         int i_used;
         int i_status;
-        NetFillBuffer( p_input );
 
-        i_status = mms_ParseCommand( p_input,
-                              p_access->buffer_tcp,
-                              p_access->i_buffer_tcp,
-                              &i_used );
-        if( i_used < MMS_BUFFER_SIZE )
+        if( NetFillBuffer( p_input ) < 0 )
         {
-            memmove( p_access->buffer_tcp,
-                     p_access->buffer_tcp + i_used,
-                     MMS_BUFFER_SIZE - i_used );
+            msg_Warn( p_input, "cannot fill buffer" );
+            continue;
         }
-        p_access->i_buffer_tcp -= i_used;
+        if( p_access->i_buffer_tcp > 0 )
+        {
+            i_status = mms_ParseCommand( p_input,
+                                  p_access->buffer_tcp,
+                                  p_access->i_buffer_tcp,
+                                  &i_used );
+            if( i_used < MMS_BUFFER_SIZE )
+            {
+                memmove( p_access->buffer_tcp,
+                         p_access->buffer_tcp + i_used,
+                         MMS_BUFFER_SIZE - i_used );
+            }
+            p_access->i_buffer_tcp -= i_used;
 
-        if( i_status < 0 )
-        {
-            return( -1 );
-        }
+            if( i_status < 0 )
+            {
+                return( -1 );
+            }
 
-        if( p_access->i_command == 0x1b )
-        {
-            mms_CommandSend( p_input, 0x1b, 0, 0, NULL, 0 );
-        }
-        else
-        {
-            break;
+            if( p_access->i_command == 0x1b )
+            {
+                mms_CommandSend( p_input, 0x1b, 0, 0, NULL, 0 );
+            }
+            else
+            {
+                break;
+            }
         }
     }
 
