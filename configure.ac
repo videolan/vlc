@@ -2423,14 +2423,6 @@ if test "${enable_x11}" != "no" &&
     AX_ADD_PLUGINS([x11])
     AX_ADD_LDFLAGS([x11],[-L${x_libraries} -lX11 -lXext])
     AX_ADD_CPPFLAGS([x11],[-I${x_includes}])
-    AC_CHECK_HEADERS(X11/extensions/Xinerama.h, [
-      CFLAGS="${CFLAGS_save} -L${x_libraries} -lX11 -lXext"
-      AC_CHECK_LIB(Xinerama, XineramaQueryExtension, [
-        AC_DEFINE(HAVE_XINERAMA,1,[Define this if you have libXinerama installed])
-        AX_ADD_LDFLAGS([x11],[-lXinerama])
-      ])
-      CFLAGS="${CFLAGS_save}"
-    ])
   ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
@@ -2446,30 +2438,56 @@ if test "${enable_xvideo}" != "no" &&
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
     CFLAGS="${CFLAGS_save} -L${x_libraries} -lX11 -lXext"
-    AC_CHECK_LIB(Xv_pic,XvPutImage,
-      # We have Xv_pic, that's good, we can build an xvideo.so plugin !
-      AX_ADD_PLUGINS([xvideo])
-      AX_ADD_LDFLAGS([xvideo],[-L${x_libraries} -lX11 -lXext -lXv_pic])
-      AX_ADD_CPPFLAGS([xvideo],[-I${x_includes}]),
-      AC_CHECK_LIB(Xv,XvPutImage,[
-        # We don't have Xv_pic, but we have Xv, let's make xvideo.a as builtin
+    AC_CHECK_LIB(Xv,XvPutImage,[
+      # If libXv.so is available, xvideo can be a plugin. Otherwise, we
+      # test for libXv_pic.
+      if test -f /usr/X11R6/lib/libXv.so -o -f "${x_libraries}"/libXv.so; then
         AX_ADD_PLUGINS([xvideo])
-        AX_ADD_LDFLAGS([xvideo],[-L${x_libraries} -lX11 -lXext -lXv])
         AX_ADD_CPPFLAGS([xvideo],[-I${x_includes}])
-      ],[
-        # Otherwise... well, do nothing.
-        :
-      ])
-    )
-    AC_CHECK_HEADERS(X11/extensions/Xinerama.h,[
-      AC_CHECK_LIB(Xinerama, XineramaQueryExtension,[
-        AC_DEFINE(HAVE_XINERAMA,1,[Define this if you have libXinerama installed])
-        AX_ADD_LDFLAGS([xvideo],[-lXinerama])
-      ])
+        AX_ADD_LDFLAGS([xvideo],[-L${x_libraries} -lX11 -lXext -lXv])
+      else
+        AC_CHECK_LIB(Xv_pic,XvPutImage,[
+          AX_ADD_PLUGINS([xvideo])
+          AX_ADD_CPPFLAGS([xvideo],[-I${x_includes}])
+          AX_ADD_LDFLAGS([xvideo],[-L${x_libraries} -lX11 -lXext -lXv_pic])
+        ],[
+          AX_ADD_BUILTINS([xvideo])
+          AX_ADD_LDFLAGS([xvideo],[-L${x_libraries} -lX11 -lXext -lXv])
+          AX_ADD_CPPFLAGS([xvideo],[-I${x_includes}])
+        ])
+      fi
     ])
     CFLAGS="${CFLAGS_save}"
   ]
   CPPFLAGS="${CPPFLAGS_save}")
+fi
+
+dnl
+dnl  Check for the Xinerama extension
+dnl
+if test "${enable_xvideo}" != "no" &&
+  (test "${SYS}" != "mingw32" || test "${enable_xvideo}" = "yes"); then
+  ac_cv_have_xinerama="no"
+  CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
+  CFLAGS="${CFLAGS_save} -L${x_libraries} -lX11 -lXext"
+  AC_CHECK_HEADERS(X11/extensions/Xinerama.h,[
+    AC_CHECK_LIB(Xinerama_pic, XineramaQueryExtension,[
+      AX_ADD_LDFLAGS([xvideo],[-lXinerama_pic])
+      AX_ADD_LDFLAGS([x11],[-lXinerama_pic])
+      ac_cv_have_xinerama="yes"
+    ],[
+      AC_CHECK_LIB(Xinerama, XineramaQueryExtension,[
+        AX_ADD_LDFLAGS([xvideo],[-lXinerama])
+        AX_ADD_LDFLAGS([x11],[-lXinerama])
+        ac_cv_have_xinerama="yes"
+      ])
+    ])
+  ])
+  if test "${ac_cv_have_xinerama}" = "yes"; then
+    AC_DEFINE(HAVE_XINERAMA, 1, [Define this if you have libXinerama installed])
+  fi
+  CFLAGS="${CFLAGS_save}"
+  CPPFLAGS="${CPPFLAGS_save}"
 fi
 
 dnl

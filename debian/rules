@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.111 2004/02/10 14:33:17 sam Exp $
+# $Id$
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -49,6 +49,7 @@ CONFIG_FLAGS += \
 	--enable-caca \
 	--enable-livedotcom \
 	--enable-libmpeg2 \
+	--enable-dts \
 	$(NULL)
 
 # These ones are currently shipped with VLC
@@ -88,7 +89,7 @@ configure-stamp:
 	test -d extras/ffmpeg
 	if test ! -d CVS; then \
 	  cd extras/ffmpeg \
-	  && CC=$(CC) ./configure --enable-pp --disable-debug \
+	  && CC=$(CC) ./configure --enable-pp --enable-zlib --disable-debug \
 	  && cd libavcodec \
 	  && $(MAKE); \
 	fi
@@ -296,6 +297,11 @@ endif
 	# Package: mozilla-plugin-vlc
 	ln -s vlc debian/mozilla-plugin-vlc/usr/share/doc/mozilla-plugin-vlc
 	mv debian/vlc/usr/lib/mozilla debian/mozilla-plugin-vlc/usr/lib
+	# links for firefox
+	mkdir -p debian/mozilla-plugin-vlc/usr/lib/mozilla-firefox/plugins/
+	ln -s ../../mozilla/plugins/libvlcplugin.so debian/mozilla-plugin-vlc/usr/lib/mozilla-firefox/plugins/
+	mkdir -p debian/mozilla-plugin-vlc/usr/lib/mozilla-firefox/components/
+	ln -s ../../mozilla/components/vlcintf.xpt debian/mozilla-plugin-vlc/usr/lib/mozilla-firefox/components/
 
 	# Package: kvlc
 	mv debian/vlc/usr/bin/kvlc debian/kvlc/usr/bin/
