@@ -552,6 +552,12 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
                 p_sub->subtitle[p_sub->i_subtitle].i_stop += i_delay;
             }
 
+            if( p_sub->subtitle[p_sub->i_subtitle].i_start < 0 )
+            {
+                p_sub->i_subtitle++;
+                continue;
+            }
+
             p_block->i_pts =
                 input_ClockGetTS( p_sub->p_input,
                                   p_sub->p_input->stream.p_selected_program,
@@ -676,11 +682,8 @@ static void sub_close( subtitle_demux_t *p_sub )
  *****************************************************************************/
 static void  sub_fix( subtitle_demux_t *p_sub )
 {
-    int     i;
-    mtime_t i_delay;
     int     i_index;
     int     i_done;
-    vlc_value_t val;
 
     /* *** fix order (to be sure...) *** */
     /* We suppose that there are near in order and this durty bubble sort
@@ -708,7 +711,8 @@ static void  sub_fix( subtitle_demux_t *p_sub )
             }
         }
     } while( !i_done );
-
+#if 0
+    /* We do not do this here anymore */
     /* *** and at the end add delay *** */
     var_Get( p_sub, "sub-delay", &val );
     i_delay = (mtime_t) val.i_int * 100000;
@@ -724,6 +728,7 @@ static void  sub_fix( subtitle_demux_t *p_sub )
             }
         }
     }
+#endif
 }
 
 
