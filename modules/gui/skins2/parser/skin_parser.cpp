@@ -310,12 +310,15 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "text", "" );
         CheckDefault( "color", "#000000" );
         CheckDefault( "width", "0" );
+        CheckDefault( "lefttop", "lefttop" );
+        CheckDefault( "rightbottom", "lefttop" );
         CheckDefault( "help", "" );
 
         const BuilderData::Text textData( uniqueId( attr["id"] ),
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 attr["visible"], attr["font"],
                 attr["text"], atoi( attr["width"] ),
+                attr["lefttop"], attr["rightbottom"],
                 convertColor( attr["color"] ), attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
         m_curLayer++;

@@ -223,8 +223,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Text
     {
-        Text( const string & id, int xPos, int yPos, const string & visible, const string & fontId, const string & text, int width, uint32_t color, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( fontId ), m_text( text ), m_width( width ), m_color( color ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Text( const string & id, int xPos, int yPos, const string & visible, const string & fontId, const string & text, int width, const string & leftTop, const string & rightBottom, uint32_t color, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( fontId ), m_text( text ), m_width( width ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_color( color ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
         int m_xPos;
@@ -233,6 +233,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( font
         const string m_fontId;
         const string m_text;
         int m_width;
+        const string m_leftTop;
+        const string m_rightBottom;
         uint32_t m_color;
         const string m_help;
         int m_layer;

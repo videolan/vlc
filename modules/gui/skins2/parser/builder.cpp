@@ -453,10 +453,13 @@ void Builder::addText( const BuilderData::Text &rData )
 
     int height = pFont->getSize();
 
-    pLayout->addControl( pText, Position( rData.m_xPos, rData.m_yPos,
-                                          rData.m_xPos + rData.m_width,
-                                          rData.m_yPos + height, *pLayout ),
-                         rData.m_layer );
+    // Compute the position of the control
+    const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
+                                       rData.m_xPos, rData.m_yPos,
+                                       rData.m_width, height,
+                                       *pLayout );
+
+    pLayout->addControl( pText, pos, rData.m_layer );
 
     m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pText );
 }

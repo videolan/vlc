@@ -162,10 +162,12 @@
         visible     CDATA   "true"
         x           CDATA   "0"
         y           CDATA   "0"
+        width       CDATA   "0"
+        lefttop     CDATA   "lefttop"
+        rightbottom CDATA   "lefttop"
         text        CDATA   ""
         font        CDATA   #REQUIRED
         color       CDATA   "#000000"
-        width       CDATA   "0"
         help        CDATA   ""
     >
 <!ELEMENT Playlist (Slider)?>
