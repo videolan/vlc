@@ -1,8 +1,8 @@
 /*****************************************************************************
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.20 2003/11/01 06:56:29 fenrir Exp $
+ * Copyright (C) 2001, 2003 VideoLAN
+ * $Id: araw.c,v 1.21 2003/11/04 01:27:33 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -26,12 +26,12 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <vlc/vlc.h>
+
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
 
 #include <vlc/sout.h>
-#include "aout_internal.h"
 
 #include "codecs.h"
 
@@ -45,7 +45,7 @@ static void EncoderClose ( vlc_object_t *p_this );
 
 vlc_module_begin();
     /* audio decoder module */
-    set_description( _("Pseudo Raw/Log Audio decoder") );
+    set_description( _("Raw/Log Audio decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( DecoderOpen, NULL );
 
@@ -60,13 +60,14 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static int DecoderInit  ( decoder_t * );
+static int DecoderDecode( decoder_t *, block_t * );
+static int DecoderEnd   ( decoder_t * );
 
-typedef struct
+struct decoder_sys_t
 {
     WAVEFORMATEX    *p_wf;
 
-    /* Input properties */
-    decoder_fifo_t *p_fifo;
     int16_t        *p_logtos16;  // used with m/alaw to int16_t
 
     /* Output properties */
@@ -75,18 +76,10 @@ typedef struct
     audio_sample_format_t output_format;
 
     audio_date_t        date;
-    mtime_t             pts;
-
-} adec_thread_t;
+};
 
 
-static int  RunDecoder     ( decoder_fifo_t * );
-static int  InitThread     ( adec_thread_t * );
-static void DecodeThread   ( adec_thread_t * );
-static void EndThread      ( adec_thread_t * );
-
-
-static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf );
+static block_t *EncoderEncode( encoder_t *, aout_buffer_t *p_aout_buf );
 
 /*****************************************************************************
  * DecoderOpen: probe the decoder and return score
@@ -106,7 +99,11 @@ static int DecoderOpen( vlc_object_t *p_this )
 
         case VLC_FOURCC('a','l','a','w'):
         case VLC_FOURCC('u','l','a','w'):
-            p_dec->pf_run = RunDecoder;
+            p_dec->pf_init   = DecoderInit;
+            p_dec->pf_decode = DecoderDecode;
+            p_dec->pf_end    = DecoderEnd;
+
+            p_dec->p_sys     = malloc( sizeof( decoder_sys_t ) );
             return VLC_SUCCESS;
 
         default:
@@ -198,348 +195,242 @@ static int16_t alawtos16[256] =
 };
 
 /*****************************************************************************
- * RunDecoder: this function is called just after the thread is created
+ * DecoderInit: initialize data before entering main loop
  *****************************************************************************/
-static int RunDecoder( decoder_fifo_t *p_fifo )
+static int DecoderInit( decoder_t *p_dec )
 {
-    adec_thread_t *p_adec;
-    int b_error;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( !( p_adec = malloc( sizeof( adec_thread_t ) ) ) )
+    WAVEFORMATEX *p_wf;
+    if( ( p_wf = (WAVEFORMATEX*)p_dec->p_fifo->p_waveformatex ) == NULL )
     {
-        msg_Err( p_fifo, "out of memory" );
-        DecoderError( p_fifo );
-        return( -1 );
-    }
-    memset( p_adec, 0, sizeof( adec_thread_t ) );
-
-    p_adec->p_fifo = p_fifo;
-
-    if( InitThread( p_adec ) != 0 )
-    {
-        DecoderError( p_fifo );
-        return( -1 );
+        msg_Err( p_dec, "unknown raw format" );
+        return VLC_EGENERIC;
     }
 
-    while( ( !p_adec->p_fifo->b_die )&&( !p_adec->p_fifo->b_error ) )
+    if( p_wf->nChannels <= 0 || p_wf->nChannels > 5 )
     {
-        DecodeThread( p_adec );
+        msg_Err( p_dec, "bad channels count(1-5)" );
+        return VLC_EGENERIC;
+    }
+    if( p_wf->nSamplesPerSec <= 0 )
+    {
+        msg_Err( p_dec, "bad samplerate" );
+        return VLC_EGENERIC;
+
     }
 
-
-    if( ( b_error = p_adec->p_fifo->b_error ) )
-    {
-        DecoderError( p_adec->p_fifo );
-    }
-
-    EndThread( p_adec );
-    if( b_error )
-    {
-        return( -1 );
-    }
-
-    return( 0 );
-}
-
-
-#define FREE( p ) if( p ) free( p ); p = NULL
-
-/*****************************************************************************
- * InitThread: initialize data before entering main loop
- *****************************************************************************/
-static int InitThread( adec_thread_t * p_adec )
-{
-    if( ( p_adec->p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_waveformatex )
-        == NULL )
-    {
-        msg_Err( p_adec->p_fifo, "unknown raw format" );
-        return( -1 );
-    }
+    p_sys->p_wf = p_wf;
+    p_sys->p_logtos16 = NULL;
 
     /* fixing some values */
-    if( ( p_adec->p_wf->wFormatTag  == WAVE_FORMAT_PCM ||
-          p_adec->p_wf->wFormatTag  == WAVE_FORMAT_IEEE_FLOAT )&&
-        !p_adec->p_wf->nBlockAlign )
+    if( p_wf->nBlockAlign == 0 &&
+        ( p_wf->wFormatTag == WAVE_FORMAT_PCM ||
+          p_wf->wFormatTag == WAVE_FORMAT_IEEE_FLOAT ) )
     {
-        p_adec->p_wf->nBlockAlign =
-            p_adec->p_wf->nChannels *
-                ( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 );
+        p_wf->nBlockAlign = ( p_wf->wBitsPerSample + 7 ) / 8 * p_wf->nChannels;
     }
 
-    msg_Dbg( p_adec->p_fifo,
-             "raw format: samplerate:%dHz channels:%d bits/sample:%d "
-             "blockalign:%d",
-             p_adec->p_wf->nSamplesPerSec,
-             p_adec->p_wf->nChannels,
-             p_adec->p_wf->wBitsPerSample,
-             p_adec->p_wf->nBlockAlign );
+    msg_Dbg( p_dec,
+             "samplerate:%dHz channels:%d bits/sample:%d blockalign:%d",
+             p_wf->nSamplesPerSec,  p_wf->nChannels,
+             p_wf->wBitsPerSample,  p_wf->nBlockAlign );
 
-    /* Initialize the thread properties */
-    p_adec->p_logtos16 = NULL;
-    if( p_adec->p_wf->wFormatTag  == WAVE_FORMAT_IEEE_FLOAT )
+    if( p_wf->wFormatTag  == WAVE_FORMAT_IEEE_FLOAT )
     {
-        switch( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 )
+        switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
         {
             case( 4 ):
-                p_adec->output_format.i_format = VLC_FOURCC('f','l','3','2');
+                p_sys->output_format.i_format = VLC_FOURCC('f','l','3','2');
                 break;
             case( 8 ):
-                p_adec->output_format.i_format = VLC_FOURCC('f','l','6','4');
+                p_sys->output_format.i_format = VLC_FOURCC('f','l','6','4');
                 break;
             default:
-                msg_Err( p_adec->p_fifo, "bad parameters(bits/sample)" );
-                return( -1 );
+                msg_Err( p_dec, "bad parameters(bits/sample)" );
+                return VLC_EGENERIC;
         }
     }
     else
     {
-        if( p_adec->p_fifo->i_fourcc == VLC_FOURCC( 't', 'w', 'o', 's' ) )
+        if( p_dec->p_fifo->i_fourcc == VLC_FOURCC( 't', 'w', 'o', 's' ) )
         {
-            switch( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 )
+            switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
             {
                 case( 1 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','8',' ',' ');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','8',' ',' ');
                     break;
                 case( 2 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','1','6','b');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','1','6','b');
                     break;
                 case( 3 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','2','4','b');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','2','4','b');
                     break;
                 case( 4 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','3','2','b');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','3','2','b');
                     break;
                 default:
-                    msg_Err( p_adec->p_fifo, "bad parameters(bits/sample)" );
-                    return( -1 );
+                    msg_Err( p_dec, "bad parameters(bits/sample)" );
+                    return VLC_EGENERIC;
             }
         }
-        else if( p_adec->p_fifo->i_fourcc == VLC_FOURCC( 's', 'o', 'w', 't' ) )
+        else if( p_dec->p_fifo->i_fourcc == VLC_FOURCC( 's', 'o', 'w', 't' ) )
         {
-            switch( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 )
+            switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
             {
                 case( 1 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','8',' ',' ');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','8',' ',' ');
                     break;
                 case( 2 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','1','6','l');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','1','6','l');
                     break;
                 case( 3 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','2','4','l');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','2','4','l');
                     break;
                 case( 4 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','3','2','l');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','3','2','l');
                     break;
                 default:
-                    msg_Err( p_adec->p_fifo, "bad parameters(bits/sample)" );
-                    return( -1 );
+                    msg_Err( p_dec, "bad parameters(bits/sample)" );
+                    return VLC_EGENERIC;
             }
         }
-        else if( p_adec->p_fifo->i_fourcc == VLC_FOURCC( 'a', 'r', 'a', 'w' ) )
+        else if( p_dec->p_fifo->i_fourcc == VLC_FOURCC( 'a', 'r', 'a', 'w' ) )
         {
-            switch( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 )
+            switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
             {
                 case( 1 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('u','8',' ',' ');
+                    p_sys->output_format.i_format = VLC_FOURCC('u','8',' ',' ');
                     break;
                 case( 2 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','1','6','l');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','1','6','l');
                     break;
                 case( 3 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','2','4','l');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','2','4','l');
                     break;
                 case( 4 ):
-                    p_adec->output_format.i_format = VLC_FOURCC('s','3','2','l');
+                    p_sys->output_format.i_format = VLC_FOURCC('s','3','2','l');
                     break;
                 default:
-                    msg_Err( p_adec->p_fifo, "bad parameters(bits/sample)" );
-                    return( -1 );
+                    msg_Err( p_dec, "bad parameters(bits/sample)" );
+                    return VLC_EGENERIC;
             }
         }
-        else if( p_adec->p_fifo->i_fourcc == VLC_FOURCC( 'a', 'l', 'a', 'w' ) )
+        else if( p_dec->p_fifo->i_fourcc == VLC_FOURCC( 'a', 'l', 'a', 'w' ) )
         {
-            p_adec->output_format.i_format = AOUT_FMT_S16_NE;
-            p_adec->p_logtos16  = alawtos16;
+            p_sys->output_format.i_format = AOUT_FMT_S16_NE;
+            p_sys->p_logtos16  = alawtos16;
         }
-        else if( p_adec->p_fifo->i_fourcc == VLC_FOURCC( 'u', 'l', 'a', 'w' ) )
+        else if( p_dec->p_fifo->i_fourcc == VLC_FOURCC( 'u', 'l', 'a', 'w' ) )
         {
-            p_adec->output_format.i_format = AOUT_FMT_S16_NE;
-            p_adec->p_logtos16  = ulawtos16;
+            p_sys->output_format.i_format = AOUT_FMT_S16_NE;
+            p_sys->p_logtos16  = ulawtos16;
         }
     }
-    p_adec->output_format.i_rate = p_adec->p_wf->nSamplesPerSec;
+    p_sys->output_format.i_rate = p_wf->nSamplesPerSec;
 
-    if( p_adec->p_wf->nChannels <= 0 || p_adec->p_wf->nChannels > 5 )
+    p_sys->output_format.i_physical_channels =
+    p_sys->output_format.i_original_channels = pi_channels_maps[p_wf->nChannels];
+
+    p_sys->p_aout       = NULL;
+    p_sys->p_aout_input = aout_DecNew( p_dec, &p_sys->p_aout,
+                                       &p_sys->output_format );
+    if( p_sys->p_aout_input == NULL )
     {
-        msg_Err( p_adec->p_fifo, "bad channels count(1-5)" );
-        return( -1 );
+        msg_Err( p_dec, "cannot create aout" );
+        return VLC_EGENERIC;
     }
 
-    p_adec->output_format.i_physical_channels =
-            p_adec->output_format.i_original_channels =
-            pi_channels_maps[p_adec->p_wf->nChannels];
-    p_adec->p_aout = NULL;
-    p_adec->p_aout_input = NULL;
+    aout_DateInit( &p_sys->date, p_sys->output_format.i_rate );
+    aout_DateSet( &p_sys->date, 0 );
 
-    /* **** Create a new audio output **** */
-    aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
-    p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
-                                        &p_adec->p_aout,
-                                        &p_adec->output_format );
-    if( !p_adec->p_aout_input )
-    {
-        msg_Err( p_adec->p_fifo, "cannot create aout" );
-        return( -1 );
-    }
-
-    return( 0 );
-}
-
-static void GetPESData( uint8_t *p_buf, int i_max, pes_packet_t *p_pes )
-{
-    int i_copy;
-    int i_count;
-
-    data_packet_t   *p_data;
-
-    i_count = 0;
-    p_data = p_pes->p_first;
-    while( p_data != NULL && i_count < i_max )
-    {
-
-        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
-                        i_max - i_count );
-
-        if( i_copy > 0 )
-        {
-            memcpy( p_buf,
-                    p_data->p_payload_start,
-                    i_copy );
-        }
-
-        p_data = p_data->p_next;
-        i_count += i_copy;
-        p_buf   += i_copy;
-    }
-
-    if( i_count < i_max )
-    {
-        memset( p_buf, 0, i_max - i_count );
-    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * DecodeThread: decodes a frame
+ * DecoderDecode: decodes a frame
  *****************************************************************************/
-static void DecodeThread( adec_thread_t *p_adec )
+static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 {
-    aout_buffer_t   *p_aout_buffer;
-    int             i_samples; // per channels
-    int             i_size;
-    uint8_t         *p_data, *p;
-    pes_packet_t    *p_pes;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    int            i_size = p_block->i_buffer;
+    uint8_t        *p = p_block->p_buffer;
+    int            i_samples; // per channels
 
-    /* **** get samples count **** */
-    input_ExtractPES( p_adec->p_fifo, &p_pes );
-    if( !p_pes )
+    if( p_sys->p_wf->nBlockAlign > 0 )
     {
-        p_adec->p_fifo->b_error = 1;
-        return;
+        /* Align it (it should already be aligned by demuxer) */
+        i_size -= i_size % p_sys->p_wf->nBlockAlign;
     }
-    i_size = p_pes->i_pes_size;
-
-    if( p_adec->p_wf->nBlockAlign > 0 )
+    if( i_size < p_sys->p_wf->nBlockAlign )
     {
-        i_size -= i_size % p_adec->p_wf->nBlockAlign;
+        return VLC_SUCCESS;
     }
-    if( i_size <= 0 || i_size < p_adec->p_wf->nBlockAlign )
+    i_samples = i_size / ( ( p_sys->p_wf->wBitsPerSample + 7 ) / 8 ) /
+                p_sys->p_wf->nChannels;
+
+    if( p_block->i_pts != 0 && p_block->i_pts != aout_DateGet( &p_sys->date ) )
     {
-        input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
-        return;
+        aout_DateSet( &p_sys->date, p_block->i_pts );
     }
-
-    i_samples = i_size / ( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 ) /
-                p_adec->p_wf->nChannels;
-
-    p_adec->pts = p_pes->i_pts;
-
-    /* **** Now we can output these samples **** */
-
-    if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
+    else if( !aout_DateGet( &p_sys->date ) )
     {
-        aout_DateSet( &p_adec->date, p_adec->pts );
+        return VLC_SUCCESS;
     }
-    else if( !aout_DateGet( &p_adec->date ) )
-    {
-        return;
-    }
-
-    /* gather data */
-    p = p_data = malloc( i_size );
-    GetPESData( p_data, i_size, p_pes );
 
     while( i_samples > 0 )
     {
-        int i_copy;
+        int           i_copy = __MIN( i_samples, 1024 );
+        aout_buffer_t *out;
 
-        i_copy = __MIN( i_samples, 1024 );
-        p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
-                                           p_adec->p_aout_input,
-                                           i_copy );
-        if( !p_aout_buffer )
+        out = aout_DecNewBuffer( p_sys->p_aout, p_sys->p_aout_input, i_copy );
+        if( out == NULL )
         {
-            msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
-            p_adec->p_fifo->b_error = 1;
-
-            free( p_data );
-            return;
+            msg_Err( p_dec, "cannot get aout buffer" );
+            return VLC_EGENERIC;
         }
 
-        p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
-        p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
-                                                      i_copy );
+        out->start_date = aout_DateGet( &p_sys->date );
+        out->end_date   = aout_DateIncrement( &p_sys->date, i_copy );
 
-        if( p_adec->p_logtos16 )
+        if( p_sys->p_logtos16 )
         {
-            int16_t *s = (int16_t*)p_aout_buffer->p_buffer;
+            int16_t      *s = (int16_t*)out->p_buffer;
+            unsigned int i;
 
-            unsigned int     i;
-
-            for( i = 0; i < p_aout_buffer->i_nb_bytes; i++ )
+            for( i = 0; i < out->i_nb_bytes / 2; i++ )
             {
-                *s++ = p_adec->p_logtos16[*p++];
+                *s++ = p_sys->p_logtos16[*p++];
             }
         }
         else
         {
-            memcpy( p_aout_buffer->p_buffer, p,
-                    p_aout_buffer->i_nb_bytes );
+            memcpy( out->p_buffer, p, out->i_nb_bytes );
 
-            p += p_aout_buffer->i_nb_bytes;
+            p += out->i_nb_bytes;
         }
 
-        aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+        aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input, out );
 
         i_samples -= i_copy;
     }
-
-    free( p_data );
-    input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * EndThread : faad decoder thread destruction
+ * DecoderEnd : faad decoder thread destruction
  *****************************************************************************/
-static void EndThread (adec_thread_t *p_adec)
+static int DecoderEnd( decoder_t *p_dec )
 {
-    if( p_adec->p_aout_input )
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_aout_input )
     {
-        aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
+        aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
     }
+    free( p_sys );
 
-    msg_Dbg( p_adec->p_fifo, "raw audio decoder closed" );
-
-    free( p_adec );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
