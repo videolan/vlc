@@ -481,7 +481,7 @@ static int ReadDir( playlist_t *p_playlist,
                                                 p_playlist,
                                                 psz_uri,
                                                 p_dir_content->d_name,
-                                                ITEM_TYPE_FILE );
+                                                ITEM_TYPE_VFILE );
                 playlist_NodeAddItem( p_playlist,p_item,
                                       p_parent->pp_parents[0]->i_view,
                                       p_parent,

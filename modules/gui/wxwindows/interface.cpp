@@ -445,7 +445,7 @@ void Interface::CreateOurToolBar()
                          * version because we don't include wx.rc */
 
     wxToolBar *toolbar =
-        CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
+        CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT  ); //| wxTB_DOCKABLE );
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 

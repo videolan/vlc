@@ -68,12 +68,15 @@ struct input_item_t
 };
 
 #define ITEM_TYPE_UNKNOWN       0
-#define ITEM_TYPE_FILE          1
-#define ITEM_TYPE_DIRECTORY     2
-#define ITEM_TYPE_DISC          3
-#define ITEM_TYPE_CARD          4
-#define ITEM_TYPE_NET           5
-#define ITEM_TYPE_PLAYLIST      6
+#define ITEM_TYPE_AFILE         1
+#define ITEM_TYPE_VFILE         2
+#define ITEM_TYPE_DIRECTORY     3
+#define ITEM_TYPE_DISC          4
+#define ITEM_TYPE_CDDA          5
+#define ITEM_TYPE_CARD          6
+#define ITEM_TYPE_NET           7
+#define ITEM_TYPE_PLAYLIST      8
+#define ITEM_TYPE_NODE          9
 
 static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
 {

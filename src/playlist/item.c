@@ -293,7 +293,7 @@ static void GuessType( input_item_t *p_item)
     {
         { "http", ITEM_TYPE_NET },
         { "dvd", ITEM_TYPE_DISC },
-        { "cdda", ITEM_TYPE_DISC },
+        { "cdda", ITEM_TYPE_CDDA },
         { "mms", ITEM_TYPE_NET },
         { "rtsp", ITEM_TYPE_NET },
         { "udp", ITEM_TYPE_NET },
@@ -308,6 +308,12 @@ static void GuessType( input_item_t *p_item)
         { NULL, 0 }
     };
 
+    static struct { char *psz_search; int i_type; } exts_array[] =
+    {
+        { "mp3", ITEM_TYPE_AFILE },
+        { NULL, 0 }
+    };
+
     for( i = 0; types_array[i].psz_search != NULL; i++ )
     {
         if( !strncmp( p_item->psz_uri, types_array[i].psz_search,
@@ -317,5 +323,5 @@ static void GuessType( input_item_t *p_item)
             return;
         }
     }
-    p_item->i_type = ITEM_TYPE_UNKNOWN;
+    p_item->i_type = ITEM_TYPE_VFILE;
 }

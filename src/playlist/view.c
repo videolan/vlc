@@ -288,6 +288,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
     p_item->input.pp_categories = NULL;
     p_item->input.i_id = ++p_playlist->i_last_id;
 
+    p_item->input.i_type = ITEM_TYPE_NODE;
+
     p_item->pp_parents = NULL;
     p_item->i_parents = 0;
 

@@ -35,11 +35,15 @@
 #include "bitmaps/loop.xpm"
 
 #include "bitmaps/type_unknown.xpm"
+#include "bitmaps/type_afile.xpm"
+#include "bitmaps/type_vfile.xpm"
 #include "bitmaps/type_net.xpm"
 #include "bitmaps/type_card.xpm"
 #include "bitmaps/type_disc.xpm"
+#include "bitmaps/type_cdda.xpm"
 #include "bitmaps/type_directory.xpm"
 #include "bitmaps/type_playlist.xpm"
+#include "bitmaps/type_node.xpm"
 
 #include <wx/dynarray.h>
 #include <wx/imaglist.h>
@@ -332,12 +336,15 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* FIXME: absolutely needs to be in the right order FIXME */
     p_images->Add( wxIcon( type_unknown_xpm ) );
-    p_images->Add( wxIcon( type_unknown_xpm ) );
+    p_images->Add( wxIcon( type_afile_xpm ) );
+    p_images->Add( wxIcon( type_vfile_xpm ) );
     p_images->Add( wxIcon( type_directory_xpm ) );
     p_images->Add( wxIcon( type_disc_xpm ) );
+    p_images->Add( wxIcon( type_cdda_xpm ) );
     p_images->Add( wxIcon( type_card_xpm ) );
     p_images->Add( wxIcon( type_net_xpm ) );
     p_images->Add( wxIcon( type_playlist_xpm ) );
+    p_images->Add( wxIcon( type_node_xpm ) );
     treectrl->AssignImageList( p_images );
 
     treectrl->AddRoot( wxU(_("root" )), -1, -1, NULL );
@@ -520,14 +527,14 @@ void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
 
     if( !strcmp( psz_author, "" ) || p_item->input.b_fixed_name == VLC_TRUE )
     {
-        msg.Printf( wxString( wxL2U( p_item->input.psz_name ) ) + wxU( " ( ") +
-                    wxString(wxL2U(psz_duration ) ) + wxU( ")") );
+        msg.Printf( wxString( wxU( p_item->input.psz_name ) ) + wxU( " ( ") +
+                    wxString(wxU(psz_duration ) ) + wxU( ")") );
     }
     else
     {
         msg.Printf( wxString(wxU( psz_author )) + wxT(" - ") +
-                    wxString(wxL2U(p_item->input.psz_name)) + wxU( " ( ") +
-                    wxString(wxL2U(psz_duration ) ) + wxU( ")") );
+                    wxString(wxU(p_item->input.psz_name)) + wxU( " ( ") +
+                    wxString(wxU(psz_duration ) ) + wxU( ")") );
     }
     treectrl->SetItemText( item , msg );
     treectrl->SetItemImage( item, p_item->input.i_type );
@@ -812,21 +819,13 @@ void Playlist::Rebuild()
     {
         return;
     }
-    int i_count = CountItems( treectrl->GetRootItem()) ;
-
-    if( i_count > p_playlist->i_size && !b_changed_view )
-    {
-        i_current_view = VIEW_CATEGORY;
-        b_changed_view = VLC_TRUE;
-    }
-
     /* ...and rebuild it */
     vlc_mutex_lock( &p_playlist->object_lock );
 
     p_view = playlist_ViewFind( p_playlist, i_current_view ); /* FIXME */
 
     /* HACK we should really get new*/
-    msg_Dbg( p_intf, "rebuilding tree" );
+    msg_Dbg( p_intf, "rebuilding tree for view %i", i_current_view );
     treectrl->DeleteAllItems();
     treectrl->AddRoot( wxU(_("root" )), -1, -1,
                          new PlaylistItem( p_view->p_root) );
@@ -847,15 +846,23 @@ void Playlist::Rebuild()
     {
         item = root;
     }
-    
+
     if( p_playlist->i_size )
     {
         SetCurrentItem( item );
     }
 
+    int i_count = CountItems( treectrl->GetRootItem() );
 
-    i_count = CountItems( treectrl->GetRootItem() );
-    if( i_count != p_playlist->i_size )
+    if( i_count < p_playlist->i_size && !b_changed_view )
+    {
+        i_current_view = VIEW_CATEGORY;
+        b_changed_view = VLC_TRUE;
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        Rebuild();
+        vlc_mutex_lock( &p_playlist->object_lock );
+    }
+    else if( i_count != p_playlist->i_size )
     {
         statusbar->SetStatusText( wxString::Format( wxU(_(
                                   "%i items in playlist (%i not shown)")),
