@@ -63,6 +63,7 @@ begin
   config = FAST
 end
 
+#Audio controls
 begin
   prog = vlc
   button = VOLUME_DOWN_DOWN
@@ -85,4 +86,35 @@ begin
   prog = vlc
   button = MUTE_UP
   config = MUTE
+end
+
+#For dvd navigation
+begin
+  prog = vlc
+  button = 4_UP
+  config = LEFT
+end
+
+begin
+  prog = vlc
+  button = 5_UP
+  config = DOWN
+end
+
+begin
+  prog = vlc
+  button = 2_UP
+  config = UP
+end
+
+begin
+  prog = vlc
+  button = 6_UP
+  config = RIGHT
+end
+
+begin
+  prog = vlc
+  button = MENU_UP
+  config = ACTIVATE
 end
