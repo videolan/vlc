@@ -141,7 +141,9 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
             return NULL;
         }
         
+#ifndef WIN32
         i_status         = inet_pton(AF_INET6,sap_ipv6_addr,net_ipv6_addr);
+#endif
         if(i_status < 0 )
         {
            msg_Warn(p_sout,"Unable to convert address to network format");
