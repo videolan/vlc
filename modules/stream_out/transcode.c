@@ -370,6 +370,13 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_acodec )
     {
+	    if ( ( strncmp( (char *)&p_sys->i_acodec, "mp3", 3) == 0 ) && 
+	           ( p_sys->i_channels > 2 ) )
+	    {
+		   msg_Warn( p_stream, "%d channels invalid for mp3, forcing to 2", 
+                     p_sys->i_channels);
+		   p_sys->i_channels = 2;    
+	    }
         msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
                  (char *)&p_sys->i_acodec, p_sys->i_sample_rate,
                  p_sys->i_channels, p_sys->i_abitrate / 1000 );
