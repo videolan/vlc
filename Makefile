@@ -15,8 +15,9 @@ SHELL=/bin/sh
 
 # Audio output settings
 AUDIO = dsp
-# Not yet supported
 #AUDIO += esd
+# Not yet supported
+#AUDIO += alsa
 # Fallback method that should always work
 AUDIO += dummy
 
@@ -38,12 +39,17 @@ ARCH=X86
 
 # Target operating system
 SYS=LINUX
+#SYS=GNU
 #SYS=BSD
 #SYS=BEOS
 
 # For x86 architecture, choose MMX support
 MMX=YES
 #MMX=NO
+# For x86 architecture, optimize for Pentium Pro
+# (choose NO if you get `Invalid instruction' errors)
+PPRO=YES
+#PPRO=NO
 
 # Decoder choice - ?? old decoder will be removed soon
 #DECODER=old
@@ -124,8 +130,14 @@ CCFLAGS += -fomit-frame-pointer
 # Optimizations for x86 familiy
 ifeq ($(ARCH),X86)
 CCFLAGS += -malign-double
-CCFLAGS += -march=pentiumpro
 #CCFLAGS += -march=pentium
+ifeq ($(PPRO), YES)
+CCFLAGS += -march=pentiumpro
+endif
+# Eventual MMX optimizations for x86
+ifeq ($(MMX), YES)
+CFLAGS += -DHAVE_MMX
+endif
 endif
 
 # Optimizations for PowerPC
@@ -150,17 +162,6 @@ DCFLAGS += -MM
 LCFLAGS += $(LIB)
 LCFLAGS += -Wall
 #LCFLAGS += -s
-
-#
-# C compiler flags: common flags
-#
-
-# Eventual MMX optimizations for x86
-ifeq ($(ARCH),X86)
-ifeq ($(MMX), YES)
-CFLAGS += -DHAVE_MMX
-endif
-endif
 
 #
 # Additionnal debugging flags
@@ -285,9 +286,7 @@ interface_plugin =	$(video:%=interface/intf_%.so)
 audio_plugin =		$(audio:%=audio_output/aout_%.so)
 video_plugin = 		$(video:%=video_output/vout_%.so)
 
-PLUGIN_OBJ = $(interface_plugin) \
-                $(audio_plugin) \
-                $(video_plugin) \
+PLUGIN_OBJ = $(interface_plugin) $(audio_plugin) $(video_plugin)
 
 #
 # Other lists of files
@@ -351,8 +350,7 @@ $(PLUGIN_OBJ): %.so: Makefile.dep
 $(PLUGIN_OBJ): %.so: dep/%.d
 
 # audio plugins
-audio_output/aout_dummy.so \
-	audio_output/aout_dsp.so: %.so: %.c
+audio_output/aout_dummy.so audio_output/aout_dsp.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
 
@@ -361,25 +359,20 @@ audio_output/aout_esd.so: %.so: %.c
 		@$(CC) $(CCFLAGS) $(CFLAGS) -laudiofile -lesd -shared -o $@ $<
 
 # video plugins
-interface/intf_dummy.so \
-	video_output/vout_dummy.so \
-	interface/intf_fb.so \
-	video_output/vout_fb.so: %.so: %.c
+interface/intf_dummy.so video_output/vout_dummy.so \
+	interface/intf_fb.so video_output/vout_fb.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
 
-interface/intf_x11.so \
-	video_output/vout_x11.so: %.so: %.c
+interface/intf_x11.so video_output/vout_x11.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
 
-interface/intf_glide.so \
-	video_output/vout_glide.so: %.so: %.c
+interface/intf_glide.so video_output/vout_glide.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/include/glide -lglide2x -shared -o $@ $<
 
-interface/intf_ggi.so \
-	video_output/vout_ggi.so: %.so: %.c
+interface/intf_ggi.so video_output/vout_ggi.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -lggi -shared -o $@ $<
 

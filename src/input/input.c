@@ -9,15 +9,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
-#include <sys/uio.h>
-#include <string.h>
+#include <errno.h>                                                  /* errno */
+#include <sys/uio.h>                                             /* required */
+#include <string.h>                                            /* strerror() */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <netinet/in.h>
+#include <stdlib.h>                                                /* free() */
+#include <netinet/in.h>                                           /* ntohs() */
 
 #include "common.h"
 #include "config.h"
@@ -34,22 +31,23 @@
 #include "input_file.h"
 #include "input_network.h"
 
-#include "audio_output.h"
-#include "audio_decoder.h"
+#include "audio_output.h"                                   /* aout_thread_t */
+#include "audio_decoder.h"                                  /* adec_thread_t */
 
-#include "video.h"
-#include "video_output.h"
-#include "vdec_idct.h"
-#include "vdec_motion.h"
-#include "video_decoder.h"
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
-#include "video_parser.h"
+#include "video.h"                          /* picture_t (for video_output.h) */
+#include "video_output.h"                                   /* vout_thread_t */
 
-#include "ac3_decoder.h"
-#include "ac3_decoder_thread.h"
-#include "spu_decoder.h"
+#include "vdec_idct.h"                     /* dctelem_t (for video_parser.h) */
+#include "vdec_motion.h"                  /* f_motion_t (for video_parser.h) */
+#include "vpar_blocks.h"                /* macroblock_t (for video_parser.h) */
+#include "vpar_headers.h"                 /* sequence_t (for video_parser.h) */
+#include "vpar_synchro.h"            /* video_synchro_t (for video_parser.h) */
+#include "video_parser.h"                                   /* vpar_thread_t */
+
+#include "ac3_decoder.h"              /* ac3dec_t (for ac3_decoder_thread.h) */
+#include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
+
+#include "spu_decoder.h"                                  /* spudec_thread_t */
 
 #include "main.h"
 

@@ -18,6 +18,9 @@ typedef u8                  byte_t;
 
 /* Boolean type */
 typedef int                 boolean_t;
+#ifdef SYS_GNU
+#define _MACH_I386_BOOLEAN_H_
+#endif
 
 /* Counter for statistics and profiling */
 typedef unsigned long       count_t;

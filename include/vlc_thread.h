@@ -3,9 +3,14 @@
  * (c)1999 VideoLAN
  *****************************************************************************
  * This header is supposed to provide a portable threads implementation.
- * Currently, it is a wrapper to the POSIX pthreads library.
+ * Currently, it is a wrapper to either the POSIX pthreads library, or
+ * the Mach cthreads (for the GNU/Hurd).
  *****************************************************************************/
+#ifdef SYS_GNU
+#include <cthreads.h>
+#else
 #include <pthread.h>
+#endif
 
 /*****************************************************************************
  * Constants
@@ -36,9 +41,34 @@
 /*****************************************************************************
  * Types definition
  *****************************************************************************/
+
+#ifdef SYS_GNU
+
+typedef cthread_t        vlc_thread_t;
+
+/* those structs are the ones defined in /include/cthreads.h but we need
+ *  * to handle *foo where foo is a mutex_t */
+typedef struct s_mutex {
+    spin_lock_t held;
+    spin_lock_t lock;
+    char *name;
+    struct cthread_queue queue;
+} vlc_mutex_t;
+
+typedef struct s_condition {
+    spin_lock_t lock;
+    struct cthread_queue queue;
+    char *name;
+    struct cond_imp *implications;
+} vlc_cond_t;
+
+#else /* SYS_GNU */
+
 typedef pthread_t        vlc_thread_t;
 typedef pthread_mutex_t  vlc_mutex_t;
 typedef pthread_cond_t   vlc_cond_t;
+
+#endif /* SYS_GNU */
 
 typedef void *(*vlc_thread_func_t)(void *p_data);
 
@@ -71,7 +101,12 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
                                          char *psz_name, vlc_thread_func_t func,
                                          void *p_data)
 {
+#ifdef SYS_GNU
+    *p_thread = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
+    return( 0 );
+#else
     return pthread_create( p_thread, NULL, func, p_data );
+#endif
 }
 
 /*****************************************************************************
@@ -79,7 +114,12 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
  *****************************************************************************/
 static __inline__ void vlc_thread_exit( void )
 {
+#ifdef SYS_GNU
+    int result;
+    cthread_exit( &result );
+#else		
     pthread_exit( 0 );
+#endif
 }
 
 /*****************************************************************************
@@ -87,7 +127,11 @@ static __inline__ void vlc_thread_exit( void )
  *****************************************************************************/
 static __inline__ void vlc_thread_join( vlc_thread_t thread )
 {
+#ifdef SYS_GNU
+    cthread_join( thread );
+#else	
     pthread_join( thread, NULL );
+#endif
 }
 
 /*****************************************************************************
@@ -95,7 +139,12 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
  *****************************************************************************/
 static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
+#ifdef SYS_GNU
+    mutex_init( p_mutex );
+    return( 0 );
+#else
     return pthread_mutex_init( p_mutex, NULL );
+#endif
 }
 
 /*****************************************************************************
@@ -103,7 +152,12 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
 {
+#ifdef SYS_GNU
+    mutex_lock( p_mutex );
+    return( 0 );
+#else
     return pthread_mutex_lock( p_mutex );
+#endif
 }
 
 /*****************************************************************************
@@ -111,7 +165,12 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 {
+#ifdef SYS_GNU
+    mutex_unlock( p_mutex );
+    return( 0 );
+#else
     return pthread_mutex_unlock( p_mutex );
+#endif
 }
 
 /*****************************************************************************
@@ -119,7 +178,17 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 {
+#ifdef SYS_GNU
+    /* condition_init() */
+    spin_lock_init( &p_condvar->lock );
+    cthread_queue_init( &p_condvar->queue );
+    p_condvar->name = 0;
+    p_condvar->implications = 0;
+
+    return( 0 );
+#else			    
     return pthread_cond_init( p_condvar, NULL );
+#endif
 }
 
 /*****************************************************************************
@@ -127,7 +196,16 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
  *****************************************************************************/
 static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
 {
+#ifdef SYS_GNU
+    /* condition_signal() */
+    if ( p_condvar->queue.head || p_condvar->implications )
+    {
+        cond_signal( (condition_t)p_condvar );
+    }
+    return( 0 );
+#else		
     return pthread_cond_signal( p_condvar );
+#endif
 }
 
 /*****************************************************************************
@@ -135,5 +213,11 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
  *****************************************************************************/
 static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex )
 {
+#ifdef SYS_GNU
+    condition_wait( (condition_t)p_condvar, (mutex_t)p_mutex );
+    return( 0 );
+#else
     return pthread_cond_wait( p_condvar, p_mutex );
+#endif
 }
+

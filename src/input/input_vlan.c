@@ -6,18 +6,18 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
+#include <errno.h>                                                 /* ENOMEM */
+#include <stdio.h>                                              /* sprintf() */
+#include <unistd.h>                                               /* close() */
+#include <string.h>                                   /* strerror(), bzero() */
+#include <stdlib.h>                                                /* free() */
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
+#include <arpa/inet.h>                           /* inet_ntoa(), inet_aton() */
+#include <sys/ioctl.h>                                            /* ioctl() */
+
+#ifdef SYS_LINUX
+#include <net/if.h>                            /* interface (arch-dependent) */
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -128,6 +128,7 @@ void input_VlanLeave( int i_vlan_id )
 
 static int ZeTrucMucheFunction( int Channel)
 {
+#ifdef SYS_LINUX
     int                         i_socket;
     char   *                    ipaddr;
     struct ifreq                interface;
@@ -207,6 +208,7 @@ static int ZeTrucMucheFunction( int Channel)
 
     /*Close the socket */
     close( i_socket );
+#endif
 
     return 0;
 }

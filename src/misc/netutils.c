@@ -3,25 +3,21 @@
  * (c)1999 VideoLAN
  *****************************************************************************
  * XXX??
- *****************************************************************************
- * Required headers:
- * <netinet/in.h>
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <netdb.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <net/if.h>
+#include <netdb.h>                                        /* gethostbyname() */
+#include <stdlib.h>                             /* free(), realloc(), atoi() */
+#include <errno.h>                                                /* errno() */
+#include <string.h>                                      /* bzero(), bcopy() */
+#include <sys/ioctl.h>                                            /* ioctl() */
+#include <arpa/inet.h>                                   /* htons(), htonl() */
+
+#ifdef SYS_LINUX
+#include <net/if.h>                            /* interface (arch-dependent) */
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -107,8 +103,9 @@ int ServerPort( char *psz_addr )
  *****************************************************************************/
 int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
 {
-    struct ifreq ifr_config;
     int i_rc = 0;
+#ifdef SYS_LINUX
+    struct ifreq ifr_config;
 
     ASSERT(p_ifdescr);
     ASSERT(psz_name);
@@ -188,6 +185,7 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
                     psz_name, strerror(errno));
         return -1;
     }
+#endif /* SYS_LINUX */
 
     return i_rc;
 }
@@ -202,14 +200,17 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
  *****************************************************************************/
 int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 {
+#ifdef SYS_LINUX
     struct ifreq* a_ifr_ifconf = NULL;
     struct ifreq* p_ifr_current_if;
     struct ifconf ifc_netconf;
 
     int i_if_number;
     int i_remaining;
+#endif /* SYS_LINUX */
     int i_rc = 0;
 
+#ifdef SYS_LINUX
     ASSERT(p_net_descr);
 
     /* Start by assuming we have few than 3 interfaces (i_if_number will
@@ -284,6 +285,8 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
 
     /* Don't need the a_ifr_ifconf anymore */
     free( a_ifr_ifconf );
+#endif /* SYS_LINUX */
+
     return i_rc;
 }
 

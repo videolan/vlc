@@ -9,15 +9,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
-#include <pthread.h>
-#include <errno.h>
-#include <stdio.h>
 #include <sys/uio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <netinet/in.h>
-#include <sys/soundcard.h>
+#include <stdlib.h>                                     /* free(), realloc() */
+#include <string.h>                                               /* bzero() */
+#include <netinet/in.h>                                           /* ntohs() */
 
 #include "common.h"
 #include "config.h"
@@ -29,12 +24,6 @@
 #include "input.h"
 #include "input_ctrl.h"
 #include "input_psi.h"
-#include "input_vlan.h"
-
-#include "audio_output.h"
-#include "video.h"
-#include "video_output.h"
-#include "interface.h"
 
 #include "main.h"
 
