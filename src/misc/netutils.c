@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.78 2003/01/15 23:55:22 massiot Exp $
+ * $Id: netutils.c,v 1.79 2003/01/27 21:44:39 ipkiss Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -173,6 +173,12 @@ int __network_ChannelJoin( vlc_object_t *p_this, int i_channel )
     char *psz_vlcs;
     struct timeval delay;
     fd_set fds;
+
+    if( p_this->p_vlc->p_channel == NULL )
+    {
+        msg_Warn( p_this, "channels not initialized" );
+        return 0;
+    }
 
     if( p_this->p_vlc->p_channel->i_channel == i_channel )
     {
