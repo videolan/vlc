@@ -3918,6 +3918,7 @@ fi
 dnl
 dnl  Microsoft ActiveX support
 dnl
+activex=false
 AC_ARG_ENABLE(activex,
   [  --enable-activex        build a vlc-based ActiveX control (default enabled on Win32)])
 if test "${enable_activex}" != "no"
