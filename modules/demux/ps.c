@@ -49,6 +49,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "ps" );
 
+    add_submodule();
     set_description( _("PS demuxer") );
     set_capability( "demux2", 9 );
     set_callbacks( OpenAlt, Close );
