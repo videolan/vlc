@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.78 2003/05/08 23:11:28 hartman Exp $
+ * $Id: intf.m,v 1.79 2003/05/11 18:40:11 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -391,7 +391,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
     [o_info_window setTitle: _NS("Info")];
 
-    [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
 }
 
@@ -501,7 +500,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     {
         vout_thread_t   * p_vout  = NULL;
         aout_instance_t * p_aout  = NULL; 
-        vlc_bool_t b_need_menus = VLC_FALSE;
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -512,16 +510,16 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
             /* New input or stream map change */
             if( p_input->stream.b_changed )
             {
-                p_intf->p_sys->b_playing = 1;
+                p_intf->p_sys->b_playing = TRUE;
                 [self manageMode: p_playlist];
-                b_need_menus = VLC_TRUE;
             }
 
-            if( p_intf->p_sys->i_part !=
-                p_input->stream.p_selected_area->i_part )
+            vlc_value_t val;
+
+            if( var_Get( (vlc_object_t *)p_input, "intf-change", &val )
+                >= 0 && val.b_bool )
             {
-                p_intf->p_sys->b_chapter_update = 1;
-                b_need_menus = VLC_TRUE;
+                p_intf->p_sys->b_input_update = TRUE;
             }
 
             p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
@@ -533,8 +531,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                 if( var_Get( (vlc_object_t *)p_aout, "intf-change", &val )
                     >= 0 && val.b_bool )
                 {
-                    p_intf->p_sys->b_aout_update = 1;
-                    b_need_menus = VLC_TRUE;
+                    p_intf->p_sys->b_aout_update = TRUE;
                 }
 
                 vlc_object_release( (vlc_object_t *)p_aout );
@@ -552,24 +549,18 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                 if( var_Get( (vlc_object_t *)p_vout, "intf-change", &val )
                     >= 0 && val.b_bool )
                 {
-                    p_intf->p_sys->b_vout_update = 1;
-                    b_need_menus = VLC_TRUE;
+                    p_intf->p_sys->b_vout_update = TRUE;
                 }
 
                 vlc_object_release( (vlc_object_t *)p_vout );
-            } 
-
-            if( b_need_menus )
-            {
-                [self setupMenus: p_input];
             }
+            [self setupMenus: p_input];
         }
-
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     else if( p_intf->p_sys->b_playing && !p_intf->b_die )
     {
-        p_intf->p_sys->b_playing = 0;
+        p_intf->p_sys->b_playing = FALSE;
         [self manageMode: p_playlist];
     }
 
@@ -582,16 +573,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
     if( p_playlist->p_input != NULL )
     {
-        /* get ready for menu regeneration */
-        p_intf->p_sys->b_program_update = 1;
-        p_intf->p_sys->b_title_update = 1;
-        p_intf->p_sys->b_chapter_update = 1;
-        p_intf->p_sys->b_audio_update = 1;
-        p_intf->p_sys->b_video_update = 1;
-        p_intf->p_sys->b_spu_update = 1;
         p_intf->p_sys->b_current_title_update = 1;
-        p_intf->p_sys->i_part = 0;
-
         p_playlist->p_input->stream.b_changed = 0;
         
         msg_Dbg( p_intf, "stream has changed, refreshing interface" );
@@ -636,7 +618,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     {
         vlc_value_t val;
 
-        val.b_bool = 0;
+        val.b_bool = FALSE;
         var_Set( (vlc_object_t *)p_playlist, "intf-change", val );
 
         [o_playlist playlistUpdated];
@@ -706,8 +688,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         {
             /* play status */
             p_intf->p_sys->b_play_status = VLC_FALSE;
-
-            [self setSubmenusEnabled: FALSE];
         }
 
         [self playStatusUpdated: p_intf->p_sys->b_play_status];
@@ -731,7 +711,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
     if( p_intf->p_sys->b_playing && p_input != NULL )
     {
-        vlc_bool_t b_field_update = VLC_TRUE;
+        vlc_bool_t b_field_update = TRUE;
 
         if( !p_input->b_die && ( p_intf->p_sys->b_play_status !=
             ( p_input->stream.control.i_status != PAUSE_S ) ) ) 
@@ -902,19 +882,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     }
 }
 
-- (void)setSubmenusEnabled:(BOOL)b_enabled
-{
-    [o_mi_program setEnabled: b_enabled];
-    [o_mi_title setEnabled: b_enabled];
-    [o_mi_chapter setEnabled: b_enabled];
-    [o_mi_audiotrack setEnabled: b_enabled];
-    [o_mi_videotrack setEnabled: b_enabled];
-    [o_mi_subtitle setEnabled: b_enabled];
-    [o_mi_channels setEnabled: b_enabled];
-    [o_mi_device setEnabled: b_enabled];
-    [o_mi_screen setEnabled: b_enabled];
-}
-
 - (void)manageVolumeSlider
 {
     audio_volume_t i_volume;
@@ -923,7 +890,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     aout_VolumeGet( p_intf, &i_volume );
 
     [o_volumeslider setFloatValue: (float)i_volume / AOUT_VOLUME_STEP]; 
-    [o_volumeslider setEnabled: 1];
+    [o_volumeslider setEnabled: TRUE];
 
     p_intf->p_sys->b_mute = ( i_volume == 0 );
 }
@@ -1007,62 +974,32 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 - (void)setupMenus:(input_thread_t *)p_input
 {
     intf_thread_t * p_intf = [NSApp getIntf];
+    vlc_value_t val;
 
-    p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update;
-    p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update |
-                                     p_intf->p_sys->b_program_update;
-    p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update |
-                                   p_intf->p_sys->b_program_update;
-    p_intf->p_sys->b_video_update |= p_intf->p_sys->b_program_update |
-                                     p_intf->p_sys->b_program_update;
-
-    if( p_intf->p_sys->b_program_update )
+    if( p_intf->p_sys->b_input_update )
     {
+        val.b_bool = FALSE;
+
         [self setupVarMenu: o_mi_program target: (vlc_object_t *)p_input
             var: "program" selector: @selector(toggleVar:)];
 
-        p_intf->p_sys->b_program_update = 0;
-    }
-
-    if( p_intf->p_sys->b_title_update )
-    {
         [self setupVarMenu: o_mi_title target: (vlc_object_t *)p_input
             var: "title" selector: @selector(toggleVar:)];
 
-        p_intf->p_sys->b_title_update = 0;
-    }
-
-    if( p_intf->p_sys->b_chapter_update )
-    {
         [self setupVarMenu: o_mi_chapter target: (vlc_object_t *)p_input
-            var: "chapter" selector: @selector(toggleVar:)];\
-        
-        p_intf->p_sys->i_part = p_input->stream.p_selected_area->i_part;
-        p_intf->p_sys->b_chapter_update = 0;
-    }
+            var: "chapter" selector: @selector(toggleVar:)];
 
-    if( p_intf->p_sys->b_audio_update )
-    {
         [self setupVarMenu: o_mi_audiotrack target: (vlc_object_t *)p_input
             var: "audio-es" selector: @selector(toggleVar:)];
 
-        p_intf->p_sys->b_audio_update = 0;
-    }
-
-    if( p_intf->p_sys->b_video_update )
-    {
         [self setupVarMenu: o_mi_videotrack target: (vlc_object_t *)p_input
             var: "video-es" selector: @selector(toggleVar:)];
 
-        p_intf->p_sys->b_video_update = 0;
-    }
-
-    if( p_intf->p_sys->b_spu_update )
-    {
         [self setupVarMenu: o_mi_subtitle target: (vlc_object_t *)p_input
             var: "spu-es" selector: @selector(toggleVar:)];
 
-        p_intf->p_sys->b_spu_update = 0;
+        p_intf->p_sys->b_input_update = FALSE;
+        var_Set( (vlc_object_t *)p_input, "intf-change", val );
     }
 
     if ( p_intf->p_sys->b_aout_update )
@@ -1072,8 +1009,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
         if ( p_aout != NULL )
         {
-            vlc_value_t val;
-            val.b_bool = 0;
+            val.b_bool = FALSE;
             
             [self setupVarMenu: o_mi_channels target: (vlc_object_t *)p_aout
                 var: "audio-channels" selector: @selector(toggleVar:)];
@@ -1084,7 +1020,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
             
             vlc_object_release( (vlc_object_t *)p_aout );
         }
-        p_intf->p_sys->b_aout_update = 0;
+        p_intf->p_sys->b_aout_update = FALSE;
     }
 
     if( p_intf->p_sys->b_vout_update )
@@ -1094,8 +1030,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
         if ( p_vout != NULL )
         {
-            vlc_value_t val;
-            val.b_bool = 0;
+            val.b_bool = FALSE;
 
             [self setupVarMenu: o_mi_screen target: (vlc_object_t *)p_vout
                 var: "video-device" selector: @selector(toggleVar:)];
@@ -1105,7 +1040,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
             [o_mi_close_window setEnabled: TRUE];
         }
         
-        p_intf->p_sys->b_vout_update = 0;
+        p_intf->p_sys->b_vout_update = FALSE;
     }
 }
 

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.220 2003/05/05 11:49:50 sam Exp $
+ * $Id: video_output.c,v 1.221 2003/05/11 18:40:11 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -1146,7 +1146,7 @@ int vout_VarCallback( vlc_object_t * p_this, const char * psz_variable,
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     vlc_value_t val;
-    val.b_bool = 1;
+    val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
     return 0;
 }

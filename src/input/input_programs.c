@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.108 2003/05/10 11:08:07 gbazin Exp $
+ * $Id: input_programs.c,v 1.109 2003/05/11 18:40:11 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,7 +56,7 @@ static int ESCallback( vlc_object_t *, char const *,
  *****************************************************************************/
 int input_InitStream( input_thread_t * p_input, size_t i_data_len )
 {
-    vlc_value_t text;
+    vlc_value_t text,val;
 
     p_input->stream.i_stream_id = 0;
 
@@ -84,6 +84,10 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     {
         p_input->stream.p_demux_data = NULL;
     }
+    
+    var_Create( p_input, "intf-change", VLC_VAR_BOOL );
+    val.b_bool = VLC_TRUE;
+    var_Set( p_input, "intf-change", val );
 
     /* Create a few object variables used for navigation in the interfaces */
     var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
@@ -159,6 +163,7 @@ void input_EndStream( input_thread_t * p_input )
     var_Destroy( p_input, "video-es" );
     var_Destroy( p_input, "audio-es" );
     var_Destroy( p_input, "spu-es" );
+    var_Destroy( p_input, "intf-change" );
 }
 
 /*****************************************************************************
@@ -900,6 +905,7 @@ static int ProgramCallback( vlc_object_t *p_this, char const *psz_cmd,
                   vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
+    vlc_value_t val;
 
     if( oldval.i_int == newval.i_int )
        return VLC_SUCCESS;
@@ -914,6 +920,9 @@ static int ProgramCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_input, "intf-change", val );
+
     return VLC_SUCCESS;
 }
 
@@ -922,6 +931,7 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     input_area_t *p_area;
+    vlc_value_t val;
 
     if( oldval.i_int == newval.i_int )
        return VLC_SUCCESS;
@@ -934,6 +944,9 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_ChangeArea( p_input, p_area );
     input_SetStatus( p_input, INPUT_STATUS_PLAY );
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_input, "intf-change", val );
+
     return VLC_SUCCESS;
 }
 
@@ -942,6 +955,7 @@ static int ChapterCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     input_area_t *p_area;
+    vlc_value_t val;
 
     if( oldval.i_int == newval.i_int )
        return VLC_SUCCESS;
@@ -955,6 +969,9 @@ static int ChapterCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_ChangeArea( p_input, p_area );
     input_SetStatus( p_input, INPUT_STATUS_PLAY );
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_input, "intf-change", val );
+
     return VLC_SUCCESS;
 }
 
@@ -963,6 +980,7 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     uint16_t i_area_id = (int)p_data;
+    vlc_value_t val;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -987,6 +1005,9 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_input, "intf-change", val );
+
     return VLC_SUCCESS;
 }
 
@@ -995,6 +1016,7 @@ static int ESCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     unsigned int i;
+    vlc_value_t val;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -1019,6 +1041,9 @@ static int ESCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_input, "intf-change", val );
 
     return VLC_SUCCESS;
 }

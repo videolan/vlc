@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.36 2003/05/08 17:13:22 massiot Exp $
+ * $Id: intf.h,v 1.37 2003/05/11 18:40:11 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -76,20 +76,12 @@ struct intf_sys_t
     vlc_bool_t b_current_title_update;
     
     /* menus handlers */
-    vlc_bool_t b_chapter_update;
-    vlc_bool_t b_program_update;
-    vlc_bool_t b_title_update;
-    vlc_bool_t b_audio_update;
-    vlc_bool_t b_video_update;
-    vlc_bool_t b_spu_update;
+    vlc_bool_t b_input_update;
     vlc_bool_t b_aout_update;
     vlc_bool_t b_vout_update;
 
     /* The messages window */
     msg_subscription_t * p_sub;
-
-    /* DVD mode */
-    unsigned int i_part;
 };
 
 /*****************************************************************************
@@ -238,7 +230,6 @@ struct intf_sys_t
 
 - (void)updateMessageArray;
 - (void)playStatusUpdated:(BOOL)b_pause;
-- (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)manageVolumeSlider;
 
 - (void)setupMenus:(input_thread_t *)p_input;
