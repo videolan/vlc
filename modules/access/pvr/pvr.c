@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.8 2003/10/23 22:46:16 bigben Exp $
+ * $Id: pvr.c,v 1.9 2003/10/24 09:32:32 bigben Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -175,11 +175,11 @@ static int Open( vlc_object_t * p_this )
                                           &psz_parser, 0 );}
 
             }
-            else if( !strncmp( psz_parser, "input=",
-                               strlen( "input=" ) ) )
+            else if( !strncmp( psz_parser, "channel=",
+                               strlen( "channel=" ) ) )
             {
                 p_sys->i_input =
-                  strtol( psz_parser + strlen( "input=" ),
+                  strtol( psz_parser + strlen( "channel=" ),
                             &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "device=", strlen( "device=" ) ) )
