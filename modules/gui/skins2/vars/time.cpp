@@ -2,7 +2,7 @@
  * time.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: time.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -48,7 +48,7 @@ void Time::set( float percentage, bool updateVLC )
 }
 
 
-string Time::getAsStringPercent() const
+const string Time::getAsStringPercent() const
 {
     int value = (int)(100. * get());
     // 0 <= value <= 100, so we need 4 chars
@@ -61,7 +61,7 @@ string Time::getAsStringPercent() const
 }
 
 
-string Time::getAsStringTime() const
+const string Time::getAsStringCurrTime() const
 {
     if( getIntf()->p_sys->p_input == NULL ||
         !getIntf()->p_sys->p_input->stream.b_seekable )
@@ -70,14 +70,50 @@ string Time::getAsStringTime() const
     }
 
     vlc_value_t time;
-    char *psz_time = new char[MSTRTIME_MAX_SIZE];
     var_Get( getIntf()->p_sys->p_input, "time", &time );
 
-    int i_seconds = time.i_time / 1000000;
+    return formatTime( time.i_time / 1000000 );
+}
+
+
+const string Time::getAsStringTimeLeft() const
+{
+    if( getIntf()->p_sys->p_input == NULL ||
+        !getIntf()->p_sys->p_input->stream.b_seekable )
+    {
+        return "-:--:--";
+    }
+
+    vlc_value_t time, duration;
+    var_Get( getIntf()->p_sys->p_input, "time", &time );
+    var_Get( getIntf()->p_sys->p_input, "length", &duration );
+
+    return formatTime( (duration.i_time - time.i_time) / 1000000 );
+}
+
+
+const string Time::getAsStringDuration() const
+{
+    if( getIntf()->p_sys->p_input == NULL ||
+        !getIntf()->p_sys->p_input->stream.b_seekable )
+    {
+        return "-:--:--";
+    }
+
+    vlc_value_t time;
+    var_Get( getIntf()->p_sys->p_input, "length", &time );
+
+    return formatTime( time.i_time / 1000000 );
+}
+
+
+const string Time::formatTime( int seconds ) const
+{
+    char *psz_time = new char[MSTRTIME_MAX_SIZE];
     snprintf( psz_time, MSTRTIME_MAX_SIZE, "%d:%02d:%02d",
-              (int) (i_seconds / (60 * 60)),
-              (int) (i_seconds / 60 % 60),
-              (int) (i_seconds % 60) );
+              (int) (seconds / (60 * 60)),
+              (int) (seconds / 60 % 60),
+              (int) (seconds % 60) );
 
     string ret = psz_time;
     delete[] psz_time;

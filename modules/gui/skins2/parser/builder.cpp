@@ -133,8 +133,14 @@ void Builder::addFont( const BuilderData::Font &rData )
 {
     GenericFont *pFont = new FT2Font( getIntf(), rData.m_fontName,
                                       rData.m_size );
-    pFont->init();
-    m_pTheme->m_fonts[rData.m_id] = GenericFontPtr( pFont );
+    if( pFont->init() )
+    {
+        m_pTheme->m_fonts[rData.m_id] = GenericFontPtr( pFont );
+    }
+    else
+    {
+        delete pFont;
+    }
 }
 
 

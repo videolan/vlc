@@ -2,7 +2,7 @@
  * var_text.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_text.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -55,7 +55,8 @@ const UString VarText::get() const
     VlcProc *pVlcProc = VlcProc::instance( getIntf() );
 
     // Fill a temporary UString object, and replace the escape characters
-    // ($H for help, $T for time, $V for volume)
+    // ($H for help, $T for current time, $L for time left, $D for duration,
+    // $V for volume)
     UString temp( m_text );
 
     while( (pos = temp.find( "$H" )) != UString::npos )
@@ -67,7 +68,17 @@ const UString VarText::get() const
     while( (pos = temp.find( "$T" )) != UString::npos )
     {
         temp.replace( pos, 2,
-                      pVlcProc->getTimeVar().getAsStringTime().c_str() );
+                      pVlcProc->getTimeVar().getAsStringCurrTime().c_str() );
+    }
+    while( (pos = temp.find( "$L" )) != UString::npos )
+    {
+        temp.replace( pos, 2,
+                      pVlcProc->getTimeVar().getAsStringTimeLeft().c_str() );
+    }
+    while( (pos = temp.find( "$D" )) != UString::npos )
+    {
+        temp.replace( pos, 2,
+                      pVlcProc->getTimeVar().getAsStringDuration().c_str() );
     }
     while( (pos = temp.find( "$V" )) != UString::npos )
     {
@@ -102,6 +113,14 @@ void VarText::set( const UString &rText )
         pVarManager->getHelpText().addObserver( this );
     }
     if( m_text.find( "$T" ) != UString::npos )
+    {
+        pVlcProc->getTimeVar().addObserver( this );
+    }
+    if( m_text.find( "$L" ) != UString::npos )
+    {
+        pVlcProc->getTimeVar().addObserver( this );
+    }
+    if( m_text.find( "$D" ) != UString::npos )
     {
         pVlcProc->getTimeVar().addObserver( this );
     }

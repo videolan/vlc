@@ -2,7 +2,7 @@
  * time.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: time.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -40,9 +40,17 @@ class Time: public VarPercent
         virtual void set( float percentage ) { set( percentage, true ); }
 
         /// Return a string containing a value from 0 to 100
-        virtual string getAsStringPercent() const;
-        /// Return a string formatted as a time display (h:mm:ss)
-        virtual string getAsStringTime() const;
+        virtual const string getAsStringPercent() const;
+        /// Return the current time formatted as a time display (h:mm:ss)
+        virtual const string getAsStringCurrTime() const;
+        /// Return the time left formatted as a time display (h:mm:ss)
+        virtual const string getAsStringTimeLeft() const;
+        /// Return the duration formatted as a time display (h:mm:ss)
+        virtual const string getAsStringDuration() const;
+
+    private:
+        /// Convert a number of seconds into "h:mm:ss" format
+        const string formatTime( int seconds ) const;
 };
 
 #endif
