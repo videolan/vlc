@@ -798,7 +798,6 @@ on_popup_navigation_activate           (GtkMenuItem     *menuitem,
 
     i_title   = (gint)(user_data) / 100 ;
     i_chapter = (gint)(user_data) - ( 100 * i_title );
-fprintf(stderr, "title %d chapter %d\n", i_title, i_chapter );
     p_area    = p_intf->p_input->stream.pp_areas[i_title];
     p_area->i_part = i_chapter;
 

@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.4 2001/03/07 10:31:10 stef Exp $
+ * $Id: intf_gtk.c,v 1.5 2001/03/07 11:56:33 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -442,8 +442,8 @@ static GtkWidget * GtkMenuRadioItem( GtkWidget * p_menu,
     p_item = gtk_menu_item_new_with_label( psz_name );
     gtk_menu_append( GTK_MENU( p_menu ), p_item );
     gtk_widget_show( p_item );
-
 #endif
+
     return p_item;
 }
 
@@ -535,7 +535,7 @@ static gint GtkLanguageMenus( gpointer          p_data,
 }
 
 /*****************************************************************************
- * GtkChapterMenu: generate chapter menu foir current title
+ * GtkChapterMenu: generate chapter menu for current title
  *****************************************************************************/
 static gint GtkChapterMenu( gpointer p_data, GtkWidget * p_chapter,
                         void(*pf_activate )( GtkMenuItem *, gpointer ) )
@@ -585,7 +585,7 @@ static gint GtkChapterMenu( gpointer p_data, GtkWidget * p_chapter,
 
 /*****************************************************************************
  * GtkTitleMenu: sets menus for titles and chapters selection
- * ---
+ *****************************************************************************
  * Generates two type of menus:
  *  -simple list of titles
  *  -cascaded lists of chapters for each title

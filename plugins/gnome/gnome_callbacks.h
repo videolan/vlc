@@ -203,26 +203,6 @@ on_menubar_audio_activate              (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_menubar_subtitles_activate          (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_title_activate                (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_chapter_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_audio_activate                (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_subtitle_activate             (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
 on_menubar_disc_activate               (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
@@ -248,4 +228,32 @@ on_disc_vcd_toggled                    (GtkToggleButton *togglebutton,
 
 void
 on_popup_disc_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_audio_activate                (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_subtitle_activate             (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_audio_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_subtitle_activate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_navigation_activate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_title_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_chapter_activate            (GtkMenuItem     *menuitem,
                                         gpointer         user_data);

@@ -2,7 +2,7 @@
  * gnome_sys.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gnome_sys.h,v 1.6 2001/03/04 03:12:00 sam Exp $
+ * $Id: gnome_sys.h,v 1.7 2001/03/07 11:56:33 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -39,6 +39,7 @@ typedef struct intf_sys_s
     boolean_t           b_window_changed;        /* window display toggled ? */
     boolean_t           b_playlist_changed;    /* playlist display toggled ? */
     boolean_t           b_scale_isfree;       /* user isn't dragging scale ? */
+    boolean_t           b_menus_update;
 
     /* intf_Manage callback timeout */
     int                 i_timeout;
