@@ -30,9 +30,10 @@
 
 #include "interface.h"
 #include "intf_playlist.h"
-#include "win32_common.h"
 
 #include "playlist.h"
+#include "win32_common.h"
+
 //---------------------------------------------------------------------------
 //#pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -74,12 +75,14 @@ void __fastcall TPlaylistDlg::FormShow( TObject *Sender )
 {
     p_intfGlobal->p_sys->p_window->MenuPlaylist->Checked = true;
     p_intfGlobal->p_sys->p_window->PopupPlaylist->Checked = true;
+    p_intfGlobal->p_sys->p_window->ToolButtonPlaylist->Down = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::FormHide( TObject *Sender )
 {
     p_intfGlobal->p_sys->p_window->MenuPlaylist->Checked = false;
     p_intfGlobal->p_sys->p_window->PopupPlaylist->Checked = false;
+    p_intfGlobal->p_sys->p_window->ToolButtonPlaylist->Down = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::BitBtnOkClick( TObject *Sender )

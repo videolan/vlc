@@ -134,6 +134,7 @@ __fastcall TGroupBoxPlugin::TGroupBoxPlugin( TComponent* Owner,
 {
     /* init listview */
     ListView = CreateListView( this, 16, 164, 24, 160, vsReport );
+    ListView->ReadOnly = true;
     ListView->Columns->Add();
     ListView->Columns->Items[0]->Width = 160;
     ListView->Columns->Items[0]->Caption = "Name";//p_config->psz_text;

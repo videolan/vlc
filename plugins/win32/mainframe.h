@@ -39,13 +39,14 @@
 class TMainFrameDlg : public TForm
 {
 __published:	// IDE-managed Components
-    TToolBar *ToolBar1;
+    TToolBar *ToolBar;
     TToolButton *ToolButtonFile;
     TToolButton *ToolButtonDisc;
     TToolButton *ToolButtonNet;
     TToolButton *ToolButtonSep1;
     TToolButton *ToolButtonBack;
     TToolButton *ToolButtonStop;
+    TToolButton *ToolButtonEject;
     TToolButton *ToolButtonPlay;
     TToolButton *ToolButtonPause;
     TToolButton *ToolButtonSlow;
@@ -104,7 +105,6 @@ __published:	// IDE-managed Components
     TMenuItem *PopupPreferences;
     TMenuItem *N7;
     TMenuItem *PopupExit;
-    TToolButton *ToolButtonEject;
     TStatusBar *StatusBar;
     TGroupBox *GroupBoxFile;
     TLabel *LabelFileName;
@@ -159,7 +159,7 @@ __published:	// IDE-managed Components
     void __fastcall ToolButtonFastClick( TObject *Sender );
     void __fastcall ToolButtonPrevClick( TObject *Sender );
     void __fastcall ToolButtonNextClick( TObject *Sender );
-    void __fastcall ToolButtonEjectClick( TObject *Sender );
+    void __fastcall ToolButtonEjecttempClick( TObject *Sender );
     void __fastcall PopupCloseClick( TObject *Sender );
     void __fastcall PopupPlayClick( TObject *Sender );
     void __fastcall PopupPauseClick( TObject *Sender );

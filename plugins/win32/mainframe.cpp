@@ -67,7 +67,7 @@ __fastcall TMainFrameDlg::TMainFrameDlg( TComponent* Owner )
     TrackBar->Max = SLIDER_MAX_VALUE;
 
     /* default height */
-    ClientHeight = 65;
+    ClientHeight = 37 + ToolBar->Height;
 }
 //---------------------------------------------------------------------------
 
@@ -295,7 +295,7 @@ void __fastcall TMainFrameDlg::ToolButtonNextClick( TObject *Sender )
     p_intfGlobal->p_sys->p_playlist->Next();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonEjectClick( TObject *Sender )
+void __fastcall TMainFrameDlg::ToolButtonEjecttempClick( TObject *Sender )
 {
     AnsiString Device = "";
 
@@ -624,8 +624,8 @@ void __fastcall TMainFrameDlg::ModeManage()
                 LabelFileName->Caption = p_input_bank->pp_input[0]->psz_source;
                 break;
         }
-    
-        i_Height = StatusBar->Height + ActiveGB->Height + 72;
+
+        i_Height = StatusBar->Height + ActiveGB->Height + ToolBar->Height + 47;
 
         /* initialize and show slider for seekable streams */
         if( p_input_bank->pp_input[0]->stream.b_seekable )
@@ -648,7 +648,7 @@ void __fastcall TMainFrameDlg::ModeManage()
         p_intf->p_sys->b_audio_update = 1;
         p_intf->p_sys->b_spu_update = 1;
         p_intf->p_sys->i_part = 0;
-    
+
         p_input_bank->pp_input[0]->stream.b_changed = 0;
         intf_WarnMsg( 3, "intf: stream has changed, refreshing interface" );
     }
@@ -662,7 +662,7 @@ void __fastcall TMainFrameDlg::ModeManage()
         else
         {
             /* default mode */
-            ClientHeight = 65;
+            ClientHeight = 37 + ToolBar->Height;
 
             /* unsensitize menus */
             MenuProgram->Enabled = false;
