@@ -247,9 +247,15 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                 pts = S.current_pts + period * S.i_n_b;
             }
 
-            b_decode = ( (1 + S.i_n_p * (S.i_n_b + 1)) * period > 
-                           S.p_tau[I_CODING_TYPE] ) ||
-                       ( (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA) );
+            if( (1 + S.i_n_p * (S.i_n_b + 1)) * period >
+                    S.p_tau[I_CODING_TYPE] )
+            {
+                b_decode = 1;
+            }
+            else
+            {
+                b_decode = (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA);
+            }
             if( !b_decode )
                 intf_WarnMsg( 3, "vpar synchro warning: trashing I\n" );
             break;
@@ -270,20 +276,28 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                 pts = S.current_pts + period * S.i_n_b;
             }
 
-            if( (S.i_n_b + 1) * period > S.p_tau[P_CODING_TYPE] )
+            if( (1 + S.i_n_p * (S.i_n_b + 1)) * period >
+                    S.p_tau[I_CODING_TYPE] )
             {
-                /* Security in case we're _really_ late */
-                b_decode = (pts - now > 0);
+                if( (S.i_n_b + 1) * period > S.p_tau[P_CODING_TYPE] )
+                {
+                    /* Security in case we're _really_ late */
+                    b_decode = (pts - now > 0);
+                }
+                else
+                {
+                    b_decode = (pts - now) > (TAU_PRIME(P_CODING_TYPE) + DELTA);
+                    /* next I */
+                    b_decode &= (pts - now
+                                  + period
+                              * ( (S.i_n_p - S.i_eta_p - 1) * (1 + S.i_n_b) - 1 ))
+                                > (TAU_PRIME(P_CODING_TYPE)
+                                    + TAU_PRIME(I_CODING_TYPE) + DELTA);
+                }
             }
             else
             {
-                b_decode = (pts - now) > (TAU_PRIME(P_CODING_TYPE) + DELTA);
-                /* next I */
-                b_decode &= (pts - now
-                              + period
-                          * ( (S.i_n_p - S.i_eta_p - 1) * (1 + S.i_n_b) - 1 ))
-                            > (TAU_PRIME(P_CODING_TYPE)
-                                + TAU_PRIME(I_CODING_TYPE) + DELTA);
+                b_decode = 0;
             }
             break;
 
