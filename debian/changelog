@@ -1,3 +1,12 @@
+vlc (0.5.2-2) unstable; urgency=low
+
+  * Bumped up standards version to 0.5.9.0.
+  * Added build-dependencies on libidl0 and libglib2.0-0 to work around
+    mozilla-dev's currently broken dependencies.
+  * We now link against libdvdread3 instead of libdvdread2.
+
+ -- Samuel Hocevar <sam@zoy.org>  Tue, 25 Mar 2003 23:21:51 +0100
+
 vlc (0.5.2-1) unstable; urgency=low
 
   * New upstream release.
