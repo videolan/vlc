@@ -154,7 +154,8 @@ case "${target_os}" in
     CFLAGS_save="${CFLAGS_save} -Wno-multichar"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
     LDFLAGS_vlc="${LDFLAGS_vlc} -lbe"
-    LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -ltranslation -ltracker -lgame -lstdc++.r4"
+    CXXFLAGS_beos="${CXXFLAGS_beos}"
+    LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -ltranslation -ltracker -lgame"
     dnl Check if we have BONE (old net_server doesn't have libsocket.so)
     AC_CHECK_LIB( socket, connect,
         LDFLAGS_vlc="${LDFLAGS_vlc} -lsocket -lbind" 
@@ -1437,7 +1438,8 @@ AC_LANG_PUSH(C++)
   dnl matroska headers include ebml headers directly... pouah that stinks
   AC_CHECK_HEADERS(EbmlVersion.h matroska/KaxVersion.h, [
     PLUGINS="${PLUGINS} mkv"
-    LDFLAGS_mkv="${LDFLAGS_mkv} -lmatroska -lebml -lstdc++"
+    CXXFLAGS_mkv="${CXXFLAGS_mkv}"
+    LDFLAGS_mkv="${LDFLAGS_mkv} -lmatroska -lebml"
    ],[])
 AC_LANG_POP(C++)
 fi
@@ -2436,8 +2438,9 @@ if test "${enable_skins}" != "no"; then
 
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
     PLUGINS="${PLUGINS} skins"
-    CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -U_OFF_T_ -U_off_t -fno-rtti -Imodules/gui/skins"
-    LDFLAGS_skins="${LDFLAGS_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
+    CPPFLAGS_skins="${CPPFLAGS_skins} -U_OFF_T_ -U_off_t -Imodules/gui/skins"
+    CXXFLAGS_skins="${CXXFLAGS_skins} -O2 -fno-rtti"
+    LDFLAGS_skins="${LDFLAGS_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
   else
     if test "${enable_skins}" = "yes"; then
       IMLIB2_PATH="${PATH}"
@@ -2447,8 +2450,9 @@ if test "${enable_skins}" != "no"; then
       fi
 
       PLUGINS="${PLUGINS} skins"
-      CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
-      LDFLAGS_skins="${LDFLAGS_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
+      CPPFLAGS_skins="${CPPFLAGS_skins} -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
+      CXXFLAGS_skins="${CXXFLAGS_skins} -O2 -fno-rtti"
+      LDFLAGS_skins="${LDFLAGS_skins} -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
       PLUGINS="${PLUGINS} skins"
     fi
   fi
@@ -2462,8 +2466,9 @@ AC_ARG_ENABLE(basic-skins,
 if test "${enable_basic_skins}" = "yes"; then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
 
-    CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -U_OFF_T_ -U_off_t -fno-rtti -Imodules/gui/skins"
-    LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
+    CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -U_OFF_T_ -U_off_t -Imodules/gui/skins"
+    CXXFLAGS_basic_skins="${CXXFLAGS_basic_skins} -O2 -fno-rtti"
+    LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
 
   else
     IMLIB2_PATH="${PATH}"
@@ -2472,8 +2477,9 @@ if test "${enable_basic_skins}" = "yes"; then
     AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-basic-skins.])
     fi
 
-    CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
-    LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
+    CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
+    CXXFLAGS_basic_skins="${CXXFLAGS_basic_skins} -O2 -fno-rtti"
+    LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
   fi
 
   PLUGINS="${PLUGINS} basic_skins"
