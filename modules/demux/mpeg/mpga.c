@@ -1,3 +1,4 @@
+
 /*****************************************************************************
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
@@ -412,7 +413,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         case DEMUX_GET_META:
             pp_meta = (vlc_meta_t **)va_arg( args, vlc_meta_t** );
-            *pp_meta = vlc_meta_Duplicate( p_sys->meta );
+            if( p_sys->meta )
+            {
+                *pp_meta = vlc_meta_Duplicate( p_sys->meta );
+            }
+            else
+            {
+                *pp_meta = NULL;
+            }
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
