@@ -151,6 +151,70 @@ static int compare_sub_priority( const void *a, const void *b )
 }
 
 /**
+ * Convert a list of paths separated by ',' to a char**
+ */
+static char **paths_to_list( char *psz_dir, char *psz_path )
+{
+    unsigned int i, k, i_nb_subdirs;
+    char **subdirs; /* list of subdirectories to look in */
+    
+    i_nb_subdirs = 1;
+    for( k = 0; k < strlen( psz_path ); k++ )
+    {
+        if( psz_path[k] == ',' )
+        {
+            i_nb_subdirs++;
+        }
+    }
+                                                                                                                            
+    if( i_nb_subdirs > 0 )
+    {
+        char *psz_parser, *psz_temp;
+                                                                                                                            
+        subdirs = (char**)malloc( sizeof(char*) * ( i_nb_subdirs + 1 ) );
+        memset( subdirs, 0, sizeof(char*) * ( i_nb_subdirs + 1 ) );
+        i = 0;
+        psz_parser = psz_path;
+        while( psz_parser && *psz_parser )
+        {
+            char *psz_subdir;
+            psz_subdir = psz_parser;
+            psz_parser = strchr( psz_subdir, ',' );
+            if( psz_parser )
+            {
+                *psz_parser = '\0';
+                psz_parser++;
+                while( *psz_parser == ' ' )
+                {
+                    psz_parser++;
+                }
+            }
+            if( strlen( psz_subdir ) > 0 )
+            {
+                psz_temp = (char *)malloc( strlen(psz_dir)
+                                           + strlen(psz_subdir) + 2 );
+                if( psz_temp )
+                {
+                    sprintf( psz_temp, "%s%s%c", 
+                             psz_subdir[0] == '.' ? psz_dir : "", 
+                             psz_subdir,
+                             psz_subdir[strlen(psz_subdir) - 1] == 
+                              DIRECTORY_SEPARATOR ? '\0' : DIRECTORY_SEPARATOR );
+                    subdirs[i] = psz_temp;
+                    i++;
+                }
+            }
+        }
+        subdirs[i] = NULL;
+    }
+    else
+    {
+        subdirs = NULL;
+    }
+    return subdirs;
+}
+
+/**
  * Detect subtitle files.
  *
  * When called this function will split up the psz_fname string into a
@@ -174,64 +238,17 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     char *tmp_fname_noext, *tmp_fname_trim, *tmp_fname_ext, *tmpresult;
 
     vlc_value_t fuzzy;
-    int len, i, j, i_sub_count, i_nb_subdirs;
-    unsigned int k, i_max_sub_len;
+    int len, i, j, i_sub_count;
     subfn *result; /* unsorted results */
     char **result2; /* sorted results */
-    char **subdirs; /* list of subdirectories to look in */
+    char **tmp_subdirs, **subdirs; /* list of subdirectories to look in */
 
     FILE *f;
     DIR *d;
     struct dirent *de;
 
-    i_nb_subdirs = 1;
-    for( k = 0; k < strlen( psz_path ); k++ )
-    {
-        if( psz_path[k] == ',' ) 
-        {
-            i_nb_subdirs++;
-        }
-    }
-
-    i_max_sub_len = 0;
-    if( i_nb_subdirs > 0 )
-    {
-        char *psz_parser;
-
-        subdirs = (char**)malloc( sizeof(char*) * i_nb_subdirs );
-        i = 0;
-        psz_parser = psz_path;
-        while( psz_parser && *psz_parser )
-        {
-            char *psz_subdir;
-            psz_subdir = psz_parser;
-            psz_parser = strchr( psz_subdir, ',' );
-            if( psz_parser )
-            {
-                *psz_parser = '\0';
-                psz_parser++;
-                while( *psz_parser == ' ' )
-                {
-                    psz_parser++;
-                }
-            }
-            subdirs[i] = strdup( psz_subdir );
-            i++;
-            if( strlen( psz_subdir ) > i_max_sub_len )
-            {
-                i_max_sub_len = strlen( psz_subdir );
-            }
-        }
-    } 
-    else 
-    {
-        i_nb_subdirs = -1;
-        subdirs = NULL;
-    }
-
     i_sub_count = 0;
-    len = ( strlen( psz_fname ) > 256 ? strlen( psz_fname ) : 256 ) +
-        ( i_max_sub_len > 256 ? i_max_sub_len : 256 ) + 2;
+    len = strlen( psz_fname ) > 256 ? strlen( psz_fname ) : 256;
 
     f_dir = (char*)malloc(len);
     f_fname = (char*)malloc(len);
@@ -269,38 +286,18 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     strcpy_trim( f_fname_trim, f_fname_noext );
     var_Get( p_this, "sub-autodetect-fuzzy", &fuzzy );
 
+    tmp_subdirs = paths_to_list( f_dir, psz_path );
+    subdirs = tmp_subdirs;
 
-    for( j = -1; j < i_nb_subdirs; j++)
+    for( j = -1; j == -1 || ( j >= 0 && subdirs != NULL && *subdirs != NULL );
+         j++)
     {
-        if( j >= 0 )
-        {
-            if( subdirs[j] && subdirs[j][0] == '.' )
-            {
-                char* psz_dir;
-                psz_dir = (char *)malloc( len );
-                if( psz_dir ) 
-                {
-                    sprintf( psz_dir, "%s%s", f_dir, subdirs[j] );
-                    d = opendir( psz_dir );
-                    free( psz_dir );
-                }
-                else d = NULL;
-            }
-            else
-            {
-                d = opendir( subdirs[j] );
-            }
-        }
-        else
-        {
-            d = opendir( f_dir );
-        }
-
+        d = opendir( j < 0 ? f_dir : *subdirs );
         if( d )
         {
             int b_found;
             msg_Dbg( p_this, "looking for a subtitle file in %s", 
-                     j < 0 ? f_dir : subdirs[j] );
+                     j < 0 ? f_dir : *subdirs );
             while( ( de = readdir( d ) ) )
             {
                 /* retrieve various parts of the filename */
@@ -355,7 +352,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
                     if( i_prio >= fuzzy.i_int )
                     {
-                        sprintf( tmpresult, "%s%s", j == 0 ? f_dir : psz_path,
+                        sprintf( tmpresult, "%s%s", j == -1 ? f_dir : *subdirs,
                                  de->d_name );
                         msg_Dbg( p_this, "autodetected subtitle: %s with "
                                  "priority %d", de->d_name, i_prio );
@@ -372,9 +369,10 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             }
             closedir( d );
         }
+        free( *subdirs++ );
     }
 
-    if( subdirs ) free( subdirs );
+    if( tmp_subdirs ) free( tmp_subdirs );
 
     free( f_dir );
     free( f_fname );
