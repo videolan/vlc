@@ -918,7 +918,7 @@ static int Mux( sout_mux_t *p_mux )
                     p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length )
                 {
                     /* Need more data */
-                    if( p_input->p_fifo->i_depth <= 50 )
+                    if( p_input->p_fifo->i_depth <= 1 )
                     {
                         if( p_input->p_fmt->i_cat == AUDIO_ES ||
                             p_input->p_fmt->i_cat == VIDEO_ES )
