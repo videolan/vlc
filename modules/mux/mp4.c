@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.13 2004/01/25 18:53:07 gbazin Exp $
+ * $Id: mp4.c,v 1.14 2004/01/26 18:30:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin at videolan dot org>
@@ -740,6 +740,17 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
 
     moov = box_new( "moov" );
 
+    /* Create general info */
+    for( i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++ )
+    {
+        mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
+        i_movie_duration = __MAX( i_movie_duration, p_stream->i_duration );
+    }
+    msg_Dbg( p_mux, "movie duration %ds",
+             (uint32_t)( i_movie_duration / (mtime_t)1000000 ) );
+
+    i_movie_duration = i_movie_duration * i_movie_timescale / 1000000;
+
     /* *** add /moov/mvhd *** */
     if( !p_sys->b_64_ext )
     {
@@ -911,16 +922,11 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         bo_add_32be( hdlr, 0 );         // reserved
         bo_add_32be( hdlr, 0 );         // reserved
 
+        bo_add_8( hdlr, 12 );
         if( p_stream->p_fmt->i_cat == AUDIO_ES )
-        {
-            bo_add_8( hdlr, 13 );
-            bo_add_mem( hdlr, 13, "SoundHandler" );
-        }
+            bo_add_mem( hdlr, 12, "SoundHandler" );
         else
-        {
-            bo_add_8( hdlr, 13 );
-            bo_add_mem( hdlr, 13, "VideoHandler" );
-        }
+            bo_add_mem( hdlr, 12, "VideoHandler" );
 
         box_fix( hdlr );
         box_gather( mdia, hdlr );
@@ -1013,21 +1019,7 @@ static void Close( vlc_object_t * p_this )
     int             i_trak;
     uint64_t        i_moov_pos;
 
-    uint32_t        i_movie_timescale = 90000;
-    int64_t         i_movie_duration  = 0;
-
     msg_Dbg( p_mux, "Close" );
-
-    /* Create general info */
-    for( i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++ )
-    {
-        mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
-        i_movie_duration = __MAX( i_movie_duration, p_stream->i_duration );
-    }
-    msg_Dbg( p_mux, "movie duration %ds",
-             (uint32_t)( i_movie_duration / (mtime_t)1000000 ) );
-
-    i_movie_duration = i_movie_duration * i_movie_timescale / 1000000;
 
     /* Update mdat size */
     bo_init( &bo, 0, NULL, VLC_TRUE );
