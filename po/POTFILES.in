@@ -656,6 +656,8 @@ modules/gui/skins2/events/evt_special.hpp
 modules/gui/skins2/parser/builder.cpp
 modules/gui/skins2/parser/builder.hpp
 modules/gui/skins2/parser/builder_data.hpp
+modules/gui/skins2/parser/expr_evaluator.cpp
+modules/gui/skins2/parser/expr_evaluator.hpp
 modules/gui/skins2/parser/interpreter.cpp
 modules/gui/skins2/parser/interpreter.hpp
 modules/gui/skins2/parser/skin_parser.cpp

@@ -14070,3 +14070,617 @@ Changed paths:
 * modules/demux/avi/libavi.h: added h264 fourccs.
 
 ------------------------------------------------------------------------
+r7513 | gbazin | 2004-04-26 23:34:32 +0200 (Mon, 26 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/po/POTFILES.in
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+
+* ALL: updated for the 0.7.2-test1 release.
+
+------------------------------------------------------------------------
+r7514 | sam | 2004-04-26 23:53:26 +0200 (Mon, 26 Apr 2004) | 3 lines
+Changed paths:
+   M /trunk/src/interface/interface.c
+
+  * src/interface/interface.c:
+    + Only populate the "switch interface" menu with modules that we have.
+
+------------------------------------------------------------------------
+r7515 | gbazin | 2004-04-26 23:56:24 +0200 (Mon, 26 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+
+* configure.ac: fix detection of libfaad2 cvs.
+------------------------------------------------------------------------
+r7516 | sam | 2004-04-27 00:04:21 +0200 (Tue, 27 Apr 2004) | 12 lines
+Changed paths:
+   M /trunk/debian/changelog
+   M /trunk/debian/control
+   M /trunk/debian/rules
+
+  * debian/control:
+    + Removed the libdv2-dev build-dependency.
+    + Set the liblivemedia-dev build-dependency to (>= 2004.04.23-1).
+    + Set the libmatroska-dev build-dependency to (>= 0.7.0).
+    + Build-depend on libfribidi-dev.
+    + Build-depend on libcdio-dev.
+    + Build-depend on libmodplug-dev.
+  * debian/rules:
+    + Activated fribidi support.
+    + Activated CDDA support via libcdio.
+    + Activated MOD support.
+
+------------------------------------------------------------------------
+r7517 | rocky | 2004-04-27 03:04:53 +0200 (Tue, 27 Apr 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/codec/ogt/cvd.c
+   M /trunk/modules/codec/ogt/ogt.c
+
+ogt.c: add object_release for object_find 
+cvd.c: if spu-channel variable not set, don't bother handling subtitle.
+
+
+------------------------------------------------------------------------
+r7518 | sam | 2004-04-27 11:28:25 +0200 (Tue, 27 Apr 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/access/v4l/v4l.c
+
+  * modules/access/v4l/v4l.c:
+    + Fixed possible deadlocks.
+
+------------------------------------------------------------------------
+r7519 | sam | 2004-04-27 11:33:58 +0200 (Tue, 27 Apr 2004) | 4 lines
+Changed paths:
+   M /trunk/README.MacOSX.rtf
+   M /trunk/doc/developer/decoders.xml
+   M /trunk/doc/developer/glossary.xml
+   M /trunk/doc/developer/history.xml
+   M /trunk/doc/developer/manual.xml
+   M /trunk/doc/developer/manual.xml.in
+   M /trunk/doc/vlc-howto.sgml
+   M /trunk/doc/web-streaming.html
+   M /trunk/evc/config.h.in
+   M /trunk/ipkg/control.gpe
+   M /trunk/ipkg/control.h3600
+   M /trunk/ipkg/control.opie
+   M /trunk/ipkg/control.zaurus
+   M /trunk/ipkg/rules.gpe
+   M /trunk/ipkg/rules.h3600
+   M /trunk/ipkg/rules.opie
+   M /trunk/ipkg/rules.zaurus
+   M /trunk/ipkg/vlc.desktop
+   M /trunk/menuconfig
+   M /trunk/modules/gui/qnx/vout.c
+   M /trunk/modules/gui/qt/intf.cpp
+   M /trunk/msvc/config.h.in
+   M /trunk/vlc.spec
+
+  * Removed legacy mentions of "VideoLAN C*****" in favour of "VLC media
+    player". A couple are remaining, but I don't want to break the string
+    freeze yet.
+
+------------------------------------------------------------------------
+r7520 | massiot | 2004-04-27 16:43:44 +0200 (Tue, 27 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access_output/udp.c
+   M /trunk/modules/codec/ffmpeg/ffmpeg.c
+   M /trunk/modules/codec/ffmpeg/ffmpeg.h
+   M /trunk/modules/mux/mpeg/ts.c
+
+Review of sout help strings
+
+------------------------------------------------------------------------
+r7521 | sam | 2004-04-27 16:57:37 +0200 (Tue, 27 Apr 2004) | 3 lines
+Changed paths:
+   M /trunk/include/vlc_meta.h
+   M /trunk/modules/gui/gtk/gnome.glade
+   M /trunk/modules/gui/gtk/gnome_interface.c
+   M /trunk/modules/gui/gtk/gtk.glade
+
+  * Got rid of more "VideoLAN C*****" references.
+  * include/vlc_meta.h: s/Url/URL/.
+
+------------------------------------------------------------------------
+r7522 | sam | 2004-04-27 18:35:15 +0200 (Tue, 27 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_help.h
+   M /trunk/modules/access/directory.c
+   M /trunk/modules/access/dshow/dshow.cpp
+   M /trunk/modules/access/dvb/qpsk.c
+   M /trunk/modules/access/file.c
+   M /trunk/modules/access/ftp.c
+   M /trunk/modules/access/http.c
+   M /trunk/modules/access/mms/mms.c
+   M /trunk/modules/access/tcp.c
+   M /trunk/modules/access/udp.c
+   M /trunk/modules/access/vcdx/vcd.c
+   M /trunk/modules/access_output/dummy.c
+   M /trunk/modules/access_output/file.c
+   M /trunk/modules/access_output/http.c
+   M /trunk/modules/access_output/udp.c
+   M /trunk/modules/audio_filter/converter/a52tofloat32.c
+   M /trunk/modules/audio_filter/resampler/bandlimited.c
+   M /trunk/modules/audio_mixer/spdif.c
+   M /trunk/modules/audio_output/file.c
+   M /trunk/modules/audio_output/oss.c
+   M /trunk/modules/codec/ffmpeg/ffmpeg.h
+   M /trunk/modules/codec/ffmpeg/postprocessing/postprocessing.c
+   M /trunk/modules/codec/ogt/subtitle.h
+   M /trunk/modules/codec/subsdec.c
+   M /trunk/modules/control/joystick.c
+   M /trunk/modules/demux/dvdnav.c
+   M /trunk/modules/demux/livedotcom.cpp
+   M /trunk/modules/demux/rawdv.c
+   M /trunk/modules/demux/util/id3genres.h
+   M /trunk/modules/gui/kde/interface.cpp
+   M /trunk/modules/gui/macosx/intf.m
+   M /trunk/modules/gui/macosx/macosx.m
+   M /trunk/modules/gui/wxwindows/interface.cpp
+   M /trunk/modules/misc/sap.c
+   M /trunk/modules/stream_out/rtp.c
+   M /trunk/modules/stream_out/standard.c
+   M /trunk/modules/video_chroma/i420_yuy2.c
+   M /trunk/modules/video_filter/clone.c
+   M /trunk/modules/video_filter/crop.c
+   M /trunk/modules/video_filter/wall.c
+   M /trunk/modules/video_output/caca.c
+   M /trunk/modules/video_output/directx/directx.c
+   M /trunk/modules/video_output/x11/x11.c
+   M /trunk/modules/video_output/x11/xvideo.c
+   M /trunk/modules/visualization/goom.c
+   M /trunk/src/libvlc.h
+   M /trunk/src/misc/iso-639_def.h
+   M /trunk/src/misc/iso_lang.c
+
+  * Massive spelling corrections.
+
+------------------------------------------------------------------------
+r7523 | massiot | 2004-04-27 19:56:39 +0200 (Tue, 27 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/ts.c
+
+* modules/demux/ts.c: Fixed an infinite loop in PATCallBack.
+
+------------------------------------------------------------------------
+r7524 | zorglub | 2004-04-27 20:22:49 +0200 (Tue, 27 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/vlm.c
+
+Fix VLM item URI assignment
+
+------------------------------------------------------------------------
+r7525 | hartman | 2004-04-27 20:37:43 +0200 (Tue, 27 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/demux2.c
+
+* ahum, missing avi shortcut :D
+
+------------------------------------------------------------------------
+r7526 | gbazin | 2004-04-27 20:45:33 +0200 (Tue, 27 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+
+* po/*: updated with latest string reviews.
+------------------------------------------------------------------------
+r7527 | fkuehne | 2004-04-27 22:47:12 +0200 (Tue, 27 Apr 2004) | 4 lines
+Changed paths:
+   M /trunk/extras/MacOSX/Resources/English.lproj/MainMenu.nib/info.nib
+   M /trunk/extras/MacOSX/Resources/English.lproj/MainMenu.nib/objects.nib
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+   M /trunk/share/http/index.html
+   M /trunk/src/libvlc.h
+
+* extras/MacOSX/Resources/English.lproj/MainMenu.nib/*: minor fixes & added the services-menu again. It isn't yet translatable, since the string-freeze came first. I'll add that after the release.
+* extras/MacOSX/vlc.pbproj/*: Added "m4a" to the file-types and corrected some descriptions
+* share/http/index.html: another minor layout fix
+* src/libvlc.h: changed the default hotkey for "subtitle delay down" from command-h to command-j and for "subtitle delay up" from command-j to command-k due to a conflict with a default OSX-shortcut
+------------------------------------------------------------------------
+r7528 | gbazin | 2004-04-27 23:33:51 +0200 (Tue, 27 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/interface.cpp
+   M /trunk/modules/gui/wxwindows/playlist.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* modules/gui/wxwindows/*: drag&drop is not supported on __WXMOTIF__.
+
+------------------------------------------------------------------------
+r7529 | gbazin | 2004-04-28 00:00:07 +0200 (Wed, 28 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/interface.cpp
+   M /trunk/modules/gui/wxwindows/playlist.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* modules/gui/wxwindows: use wxUSE_DRAG_AND_DROP to check for drag&drop support.
+------------------------------------------------------------------------
+r7530 | gbazin | 2004-04-28 09:05:10 +0200 (Wed, 28 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/ffmpeg.c
+
+* modules/codec/ffmpeg/ffmpeg.c: fixed stupid bug preventing the decoder to be closed properly.
+------------------------------------------------------------------------
+r7531 | murray | 2004-04-28 10:43:28 +0200 (Wed, 28 Apr 2004) | 7 lines
+Changed paths:
+   M /trunk/po/it.po
+
+Updated italian translation for vlc 0.7.2
+
+You will therefore discover that in italian we still call Kalaallisut
+"Kalaallisut", that Ndebele, North is "Ndebele del Nord" and many more
+exciting stuff.
+
+
+------------------------------------------------------------------------
+r7532 | sam | 2004-04-28 13:20:51 +0200 (Wed, 28 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/debian/changelog
+   M /trunk/debian/control
+   M /trunk/debian/rules
+
+  * Control files for the official 0.7.2-test1 Debian packages.
+
+------------------------------------------------------------------------
+r7533 | sam | 2004-04-28 13:44:43 +0200 (Wed, 28 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/po/it.po
+
+  * po/it.po: translated "Bokmaal" and "Volapuk" to iso8859-1.
+
+------------------------------------------------------------------------
+r7534 | murray | 2004-04-28 14:38:55 +0200 (Wed, 28 Apr 2004) | 6 lines
+Changed paths:
+   M /trunk/po/it.po
+
+As a quick google search shows, the letter å does not exist in the
+Italian alphabet. Therefore, we write "Norvegese Bokmal".
+
+We're even, sam :)
+
+
+------------------------------------------------------------------------
+r7535 | gbazin | 2004-04-28 15:01:14 +0200 (Wed, 28 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/configure.ac
+
+* configure.ac, Makefile.am: Use upx for the win32 package if present. Fixed the mozilla plugin build on cygwin.
+------------------------------------------------------------------------
+r7536 | gbazin | 2004-04-28 15:29:31 +0200 (Wed, 28 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+
+* configure.ac: another build fix for the win32 mozilla plugin.
+------------------------------------------------------------------------
+r7537 | sam | 2004-04-28 16:21:43 +0200 (Wed, 28 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/po/en_GB.po
+
+  * po/en_GB.po: Updated the British English translation.
+
+------------------------------------------------------------------------
+r7538 | gbazin | 2004-04-28 16:50:26 +0200 (Wed, 28 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/control/hotkeys.c
+
+* modules/control/hotkeys.c: fixed fullscreen hotkey when video filters are used.
+------------------------------------------------------------------------
+r7539 | sam | 2004-04-28 17:03:19 +0200 (Wed, 28 Apr 2004) | 4 lines
+Changed paths:
+   M /trunk/po/it.po
+
+  * po/it.po: Dude, this has nothing to do with the alphabet but with the
+    charset. "Bokmål" is spelt "Bokmål" whatever the language. It's just that
+    we cannot write "å" in ASCII.
+
+------------------------------------------------------------------------
+r7540 | gbazin | 2004-04-28 19:57:16 +0200 (Wed, 28 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/ogg.c
+
+* modules/demux/ogg.c: theora decoding fix (one of the header fields changed in alpha3).
+------------------------------------------------------------------------
+r7541 | gbazin | 2004-04-28 19:58:26 +0200 (Wed, 28 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/theora.c
+
+* modules/codec/theora.c: better sanity check for aspect ratio.
+------------------------------------------------------------------------
+r7542 | zorglub | 2004-04-28 20:22:31 +0200 (Wed, 28 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/visualization/xosd.c
+
+Improved the Xosd plugin
+
+------------------------------------------------------------------------
+r7543 | gbazin | 2004-04-28 22:02:13 +0200 (Wed, 28 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/theora.c
+   M /trunk/modules/mux/ogg.c
+
+* modules/mux/ogg.c, modules/codec/theora.c: changes for theora alpha 3 support + misc small fixes.
+------------------------------------------------------------------------
+r7544 | gbazin | 2004-04-29 13:04:14 +0200 (Thu, 29 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dshow/filter.cpp
+
+* modules/access/dshow/filter.cpp: removed useless debug messages.
+------------------------------------------------------------------------
+r7545 | gbazin | 2004-04-29 13:14:48 +0200 (Thu, 29 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/video_output.c
+   M /trunk/src/video_output/vout_intf.c
+
+* src/video_output/*: moved fullscreen object var handling in vout_intf.c and disable video-on-top when in fullscreen.
+------------------------------------------------------------------------
+r7546 | gbazin | 2004-04-29 15:53:29 +0200 (Thu, 29 Apr 2004) | 3 lines
+Changed paths:
+   M /trunk/include/vlc_objects.h
+   M /trunk/src/input/demux.c
+   M /trunk/src/input/input.c
+   M /trunk/src/misc/objects.c
+
+* src/input/demux.c, src/misc/objects.c: demux2 has the VLC_OBJECT_DEMUX type.
+* src/input/input.c: input_StopThread() sets b_die on demux2 as well.
+
+------------------------------------------------------------------------
+r7547 | gbazin | 2004-04-29 16:43:12 +0200 (Thu, 29 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/NEWS
+   M /trunk/modules/demux/avi/avi.c
+
+* modules/demux/avi/avi.c: Fixed infinite loop in the AVI demux on broken/incomplete files
+------------------------------------------------------------------------
+r7548 | gbazin | 2004-04-29 16:48:12 +0200 (Thu, 29 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/src/input/input_clock.c
+
+* src/input/input_clock.c: avoid using mwait() for long periods of time without checking p_input->b_die. This will make VLC more resilient to bad streams.
+------------------------------------------------------------------------
+r7549 | hartman | 2004-04-29 16:49:25 +0200 (Thu, 29 Apr 2004) | 4 lines
+Changed paths:
+   M /trunk/src/video_output/vout_intf.c
+
+* Set "fullscreen" var on p_playlist instead of p_input
+  This way we remember the fullscreen setting when we go
+  to the next file in the playlist.
+
+------------------------------------------------------------------------
+r7550 | hartman | 2004-04-29 16:52:05 +0200 (Thu, 29 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/intf.m
+
+* remove "Ja Nu!" Didn't i do that before????
+
+------------------------------------------------------------------------
+r7551 | zorglub | 2004-04-29 17:06:50 +0200 (Thu, 29 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/vlm.c
+
+Fix segfault on "del"
+
+------------------------------------------------------------------------
+r7552 | hartman | 2004-04-29 17:17:51 +0200 (Thu, 29 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/intf.m
+   M /trunk/modules/gui/macosx/vout.m
+
+* Updated the Vout behaviour. Still a bit coupled to p_vout.
+
+------------------------------------------------------------------------
+r7553 | zorglub | 2004-04-29 17:30:00 +0200 (Thu, 29 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/messages.c
+
+Add missing objects descriptions
+
+------------------------------------------------------------------------
+r7554 | gbazin | 2004-04-29 17:45:30 +0200 (Thu, 29 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/avi/avi.c
+
+* modules/demux/avi/avi.c: fixed infinite loop when seeking in broken/incomplete files.
+------------------------------------------------------------------------
+r7555 | zorglub | 2004-04-29 20:27:08 +0200 (Thu, 29 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/dialogs.cpp
+   M /trunk/modules/gui/wxwindows/open.cpp
+   M /trunk/modules/gui/wxwindows/wizard.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* Made the open dialog a wxDialog to be able to call it from the wizard. Please test on win32 and interaction with win32-skins2
+
+------------------------------------------------------------------------
+r7556 | hartman | 2004-04-29 20:32:58 +0200 (Thu, 29 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* Add missing playlistinfo files to OSX target
+
+------------------------------------------------------------------------
+r7557 | hartman | 2004-04-29 20:38:44 +0200 (Thu, 29 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/intf.m
+
+* Fix the fullscreen button.
+
+------------------------------------------------------------------------
+r7558 | hartman | 2004-04-29 21:30:58 +0200 (Thu, 29 Apr 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/control/hotkeys.c
+   M /trunk/modules/gui/macosx/intf.m
+   M /trunk/modules/gui/wxwindows/wxwindows.cpp
+   M /trunk/src/playlist/playlist.c
+
+ * src/playlist/playlist.c: Don't do any playlist actions if there are no items in the playlist.
+ * REST: remove code duplication in some places. there might be more locations.
+
+------------------------------------------------------------------------
+r7559 | gbazin | 2004-04-29 22:30:24 +0200 (Thu, 29 Apr 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/ffmpeg.c
+   M /trunk/modules/codec/ffmpeg/ffmpeg.h
+   M /trunk/modules/codec/ffmpeg/video.c
+
+* modules/codec/ffmpeg/*:
+  + small fix for --ffmpeg-workaround-bugs.
+  + new --ffmpeg-vismv option to visualize motion vectors.
+
+------------------------------------------------------------------------
+r7560 | gbazin | 2004-04-29 23:57:23 +0200 (Thu, 29 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/video.c
+
+* modules/codec/ffmpeg/video.c: direct rendering needs to be disabled for --ffmpeg-vismv.
+------------------------------------------------------------------------
+r7561 | asmax | 2004-04-30 00:09:23 +0200 (Fri, 30 Apr 2004) | 10 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/Modules.am
+   A /trunk/modules/gui/skins2/parser/expr_evaluator.cpp
+   A /trunk/modules/gui/skins2/parser/expr_evaluator.hpp
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+   M /trunk/modules/gui/skins2/src/var_manager.cpp
+   M /trunk/modules/gui/skins2/src/var_manager.hpp
+   M /trunk/modules/gui/skins2/utils/var_bool.cpp
+   M /trunk/modules/gui/skins2/utils/var_bool.hpp
+
+  * parser/expr_evaluator: expression evaluator using Reverse Polish Notation
+    (a bit "C-style-coded" at the moment ;)
+  * utils/var_bool.*: added true and false boolean variables, and the "OR"
+    composite variable
+  * src/var_manager.*: support for anonymous variables
+  * parser/interpreter.cpp: use the RPN evaluator to resolve boolean
+    expressions in the XML. Any well-parenthesized expression using "not",
+    "or", "and", "true", "false" and boolean variables should be understood
+    (not much tested yet).
+
+------------------------------------------------------------------------
+r7562 | gbazin | 2004-04-30 11:14:47 +0200 (Fri, 30 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/open.cpp
+   M /trunk/modules/gui/wxwindows/wizard.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* modules/gui/wxwindows/*: small clean-up.
+------------------------------------------------------------------------
+r7563 | hartman | 2004-04-30 14:51:24 +0200 (Fri, 30 Apr 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.m
+   M /trunk/src/video_output/vout_intf.c
+
+ * src/video_output/vout_intf.c: remember video-on-top via p_playlist
+ * modules/gui/macosx/vout.m: conf->var video-on-top in OS X.
+
+------------------------------------------------------------------------
+r7564 | hartman | 2004-04-30 14:51:53 +0200 (Fri, 30 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   M /trunk/extras/contrib/src/packages.mak
+
+* Update faad even further
+
+------------------------------------------------------------------------
+r7565 | zorglub | 2004-04-30 17:15:16 +0200 (Fri, 30 Apr 2004) | 2 lines
+Changed paths:
+   M /trunk/src/input/control.c
+   M /trunk/src/playlist/playlist.c
+
+Hopefully fix locking issues with wx
+
+------------------------------------------------------------------------
+r7566 | gbazin | 2004-04-30 17:30:43 +0200 (Fri, 30 Apr 2004) | 3 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/modules/gui/skins2/parser/skin_parser.cpp
+   M /trunk/share/Makefile.am
+   A /trunk/share/skins2/skin.catalog
+
+* share/skins2/skin.catalog: added a default catalog as some platforms don't provide one (eg. win32).
+* modules/gui/skins2/parser/skin_parser.cpp: try to load the skins catalog and if it fails, use the system's one.
+
+------------------------------------------------------------------------
+r7567 | gbazin | 2004-04-30 17:35:56 +0200 (Fri, 30 Apr 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/skins2/commands/async_queue.cpp
+   M /trunk/modules/gui/skins2/src/skin_main.cpp
+   M /trunk/modules/gui/skins2/win32/win32_factory.cpp
+
+* modules/gui/skins2/*: a few bug fixes.
+------------------------------------------------------------------------
+r7568 | bigben | 2004-04-30 17:44:06 +0200 (Fri, 30 Apr 2004) | 6 lines
+Changed paths:
+   M /trunk/extras/MacOSX/Resources/English.lproj/MainMenu.nib/classes.nib
+   M /trunk/extras/MacOSX/Resources/English.lproj/MainMenu.nib/info.nib
+   M /trunk/extras/MacOSX/Resources/English.lproj/MainMenu.nib/objects.nib
+   M /trunk/modules/gui/macosx/Modules.am
+   M /trunk/modules/gui/macosx/intf.h
+   M /trunk/modules/gui/macosx/intf.m
+   M /trunk/modules/gui/macosx/playlistinfo.h
+   M /trunk/modules/gui/macosx/playlistinfo.m
+
+* Use the playlist info panel instead of the old one everywhere
+	- old VLCInfo and InfoPanel have been removed from nib file
+	- VLCPlaylistInfo and PlaylistInfoPanel have been renamed
+	- old info.c and info.h are still in repository, but not compiled, should I remove them ?
+
+
+------------------------------------------------------------------------
+r7569 | titer | 2004-04-30 18:44:59 +0200 (Fri, 30 Apr 2004) | 5 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.h
+   M /trunk/modules/gui/macosx/vout.m
+
+ + macosx/vout*: use two pictures and OpenGL textures so a texture
+                 cannot be affected by VLC loading the next picture
+		 (should fix the artifacts when moving or resizing
+		  the window)
+
+------------------------------------------------------------------------
+r7570 | yoann | 2004-05-01 00:53:33 +0200 (Sat, 01 May 2004) | 7 lines
+Changed paths:
+   M /trunk/po/fr.po
+
+ * po/fr.po: updated French translation for vlc 0.7.2
+
+> #, fuzzy
+> msgid "Date metadata"
+> msgstr "Death metal"
+
+
+------------------------------------------------------------------------
+r7571 | gbazin | 2004-05-01 01:21:44 +0200 (Sat, 01 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/interface.cpp
+   M /trunk/modules/gui/wxwindows/menus.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* modules/gui/wxwindows/*: hotkeys support.
+
+------------------------------------------------------------------------
