@@ -52,35 +52,6 @@ void __fastcall TNarrowHintWindow::ActivateHint( const Windows::TRect &Rect,
     THintWindow::ActivateHint( NarrowRect, AHint );
 }
 
-
-/****************************************************************************
- * Just a wrapper to embed an AnsiString into a TObject
- ****************************************************************************/
-__fastcall TObjectString::TObjectString( char * String )
-{
-    FString = AnsiString( String );
-}
-//---------------------------------------------------------------------------
-AnsiString __fastcall TObjectString::String()
-{
-    return FString;
-}
-
-
-/****************************************************************************
- * A TCheckListBox that automatically disposes any TObject
- * associated with the string items
- ****************************************************************************/
-__fastcall TCleanCheckListBox::~TCleanCheckListBox()
-{
-    for( int i = 0 ; i < Items->Count ; i++ )
-    {
-        if( Items->Objects[i] != NULL )
-            delete Items->Objects[i];
-    }
-}
-
-
 /****************************************************************************
  * Functions to help components creation
  ****************************************************************************/
@@ -94,16 +65,16 @@ __fastcall TPanelPref::TPanelPref( TComponent* Owner,
     BorderStyle = bsNone;
 }
 //---------------------------------------------------------------------------
-TCleanCheckListBox * __fastcall TPanelPref::CreateCleanCheckListBox(
+TExtCheckListBox * __fastcall TPanelPref::CreateExtCheckListBox(
     TWinControl *Parent, int Left, int Width, int Top, int Height )
 {
-    TCleanCheckListBox *CleanCheckListBox = new TCleanCheckListBox( Parent );
-    CleanCheckListBox->Parent = Parent;
-    CleanCheckListBox->Left = Left;
-    CleanCheckListBox->Width = Width;
-    CleanCheckListBox->Top = Top;
-    CleanCheckListBox->Height = Height;
-    return CleanCheckListBox;
+    TExtCheckListBox *ExtCheckListBox = new TExtCheckListBox( Parent );
+    ExtCheckListBox->Parent = Parent;
+    ExtCheckListBox->Left = Left;
+    ExtCheckListBox->Width = Width;
+    ExtCheckListBox->Top = Top;
+    ExtCheckListBox->Height = Height;
+    return ExtCheckListBox;
 }
 //---------------------------------------------------------------------------
 TButton * __fastcall TPanelPref::CreateButton( TWinControl *Parent,
@@ -198,9 +169,11 @@ TCSpinEdit * __fastcall TPanelPref::CreateSpinEdit( TWinControl *Parent,
  ****************************************************************************/
 __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
         module_config_t *p_config, intf_thread_t *_p_intf,
-        bool b_multi_plugins ) : TPanelPref( Owner, p_config, _p_intf )
+        TStringList * ModuleNames, bool b_multi_plugins )
+        : TPanelPref( Owner, p_config, _p_intf )
 {
     this->b_multi_plugins = b_multi_plugins;
+    this->ModuleNames = ModuleNames;
 
     /* init configure button */
     ButtonConfig = CreateButton( this,
@@ -229,24 +202,24 @@ __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
         ButtonConfig->Top += ( Label->Height - ButtonConfig->Height ) / 2;
 
     /* init checklistbox */
-    CleanCheckListBox = CreateCleanCheckListBox( this,
+    ExtCheckListBox = CreateExtCheckListBox( this,
             LIBWIN32_PREFSIZE_EDIT_LEFT,
             LIBWIN32_PREFSIZE_EDIT_WIDTH,
             max( Label->Top + Label->Height , ButtonConfig->Top
                  + ButtonConfig->Height ) + LIBWIN32_PREFSIZE_VPAD,
                  LIBWIN32_PREFSIZE_CHECKLISTBOX_HEIGHT );
-    CleanCheckListBox->OnClick = CheckListBoxClick;
-    CleanCheckListBox->OnClickCheck = CheckListBoxClickCheck;
-    CleanCheckListBox->Hint = p_config->psz_longtext;
-    CleanCheckListBox->ShowHint = true;
+    ExtCheckListBox->OnClick = CheckListBoxClick;
+    ExtCheckListBox->OnClickCheck = CheckListBoxClickCheck;
+    ExtCheckListBox->Hint = p_config->psz_longtext;
+    ExtCheckListBox->ShowHint = true;
 
     /* init up and down buttons */
     if ( b_multi_plugins )
     {
         ButtonUp = CreateButton ( this, LIBWIN32_PREFSIZE_LEFT,
-                CleanCheckListBox->Left - LIBWIN32_PREFSIZE_HPAD
+                ExtCheckListBox->Left - LIBWIN32_PREFSIZE_HPAD
                     - LIBWIN32_PREFSIZE_LEFT,
-                CleanCheckListBox->Top + ( CleanCheckListBox->Height
+                ExtCheckListBox->Top + ( ExtCheckListBox->Height
                     - 2*LIBWIN32_PREFSIZE_BUTTON_HEIGHT ) / 3,
                 LIBWIN32_PREFSIZE_BUTTON_HEIGHT,
                 "+" );
@@ -256,9 +229,9 @@ __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
         ButtonUp->ShowHint = true;
 
         ButtonDown = CreateButton ( this, LIBWIN32_PREFSIZE_LEFT,
-                CleanCheckListBox->Left - LIBWIN32_PREFSIZE_HPAD
+                ExtCheckListBox->Left - LIBWIN32_PREFSIZE_HPAD
                     - LIBWIN32_PREFSIZE_LEFT,
-                CleanCheckListBox->Top + ( CleanCheckListBox->Height
+                ExtCheckListBox->Top + ( ExtCheckListBox->Height
                     - 2*LIBWIN32_PREFSIZE_BUTTON_HEIGHT ) * 2 / 3
                     + LIBWIN32_PREFSIZE_BUTTON_HEIGHT,
                 LIBWIN32_PREFSIZE_BUTTON_HEIGHT,
@@ -275,7 +248,7 @@ __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
     }
 
     /* panel height */
-    Height = CleanCheckListBox->Top + CleanCheckListBox->Height
+    Height = ExtCheckListBox->Top + ExtCheckListBox->Height
             + LIBWIN32_PREFSIZE_VPAD;
 };
 //---------------------------------------------------------------------------
@@ -287,25 +260,25 @@ void __fastcall TPanelPlugin::CheckListBoxClick( TObject *Sender )
 
     /* check that the click is valid (we are on an item, and the click
      * started on an item */
-    if( CleanCheckListBox->ItemIndex == -1 )
+    if( ExtCheckListBox->ItemIndex == -1 )
     {
         if ( ButtonUp != NULL ) ButtonUp->Enabled = false;
         if ( ButtonDown != NULL ) ButtonDown->Enabled = false;
         return;
     }
 
-    AnsiString Name = ((TObjectString*)CleanCheckListBox->Items->
-        Objects[CleanCheckListBox->ItemIndex])->String().c_str();
+    AnsiString Name = ModuleNames->Strings
+            [ExtCheckListBox->GetItemData(ExtCheckListBox->ItemIndex)];
     if( Name == "" )
         return;
 
     /* enable up and down buttons */
     if ( b_multi_plugins && ButtonUp != NULL && ButtonDown != NULL )
     {
-        if ( CleanCheckListBox->ItemIndex == 0 )
+        if ( ExtCheckListBox->ItemIndex == 0 )
             ButtonUp->Enabled = false; else ButtonUp->Enabled = true;
-        if ( CleanCheckListBox->ItemIndex
-            == CleanCheckListBox->Items->Count - 1 )
+        if ( ExtCheckListBox->ItemIndex
+            == ExtCheckListBox->Items->Count - 1 )
             ButtonDown->Enabled = false; else ButtonDown->Enabled = true;
     }
 
@@ -333,13 +306,13 @@ void __fastcall TPanelPlugin::CheckListBoxClickCheck( TObject *Sender )
     if ( ! b_multi_plugins )
     {
         /* one item maximum must be checked */
-        if( CleanCheckListBox->Checked[CleanCheckListBox->ItemIndex] )
+        if( ExtCheckListBox->Checked[ExtCheckListBox->ItemIndex] )
         {
-            for( int item = 0; item < CleanCheckListBox->Items->Count; item++ )
+            for( int item = 0; item < ExtCheckListBox->Items->Count; item++ )
             {
-                if( item != CleanCheckListBox->ItemIndex )
+                if( item != ExtCheckListBox->ItemIndex )
                 {
-                    CleanCheckListBox->Checked[item] = false;
+                    ExtCheckListBox->Checked[item] = false;
                 }
             }
         }
@@ -354,23 +327,23 @@ void __fastcall TPanelPlugin::ButtonConfigClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TPanelPlugin::ButtonUpClick( TObject *Sender )
 {
-    if( CleanCheckListBox->ItemIndex != -1 && CleanCheckListBox->ItemIndex > 0 )
+    if( ExtCheckListBox->ItemIndex != -1 && ExtCheckListBox->ItemIndex > 0 )
     {
-        int Pos = CleanCheckListBox->ItemIndex;
-        CleanCheckListBox->Items->Move ( Pos , Pos - 1 );
-        CleanCheckListBox->ItemIndex = Pos - 1;
+        int Pos = ExtCheckListBox->ItemIndex;
+        ExtCheckListBox->Items->Move ( Pos , Pos - 1 );
+        ExtCheckListBox->ItemIndex = Pos - 1;
         CheckListBoxClick ( Sender );
     }
 }
 //---------------------------------------------------------------------------
 void __fastcall TPanelPlugin::ButtonDownClick( TObject *Sender )
 {
-    if( CleanCheckListBox->ItemIndex != -1
-        && CleanCheckListBox->ItemIndex < CleanCheckListBox->Items->Count - 1 )
+    if( ExtCheckListBox->ItemIndex != -1
+        && ExtCheckListBox->ItemIndex < ExtCheckListBox->Items->Count - 1 )
     {
-        int Pos = CleanCheckListBox->ItemIndex;
-        CleanCheckListBox->Items->Move ( Pos , Pos + 1 );
-        CleanCheckListBox->ItemIndex = Pos + 1;
+        int Pos = ExtCheckListBox->ItemIndex;
+        ExtCheckListBox->Items->Move ( Pos , Pos + 1 );
+        ExtCheckListBox->ItemIndex = Pos + 1;
         CheckListBoxClick ( Sender );
     }
 }
@@ -397,13 +370,13 @@ void __fastcall TPanelPlugin::SetValue ( AnsiString Values )
 
         if ( Value.Length() > 0 )
         {
-            for ( int i = TopChecked; i < CleanCheckListBox->Items->Count; i++ )
+            for ( int i = TopChecked; i < ExtCheckListBox->Items->Count; i++ )
             {
-                if ( ((TObjectString*)CleanCheckListBox->Items->Objects[i])
-                        ->String() == Value )
+                if ( ModuleNames->Strings[ExtCheckListBox->GetItemData(i)]
+                        == Value )
                 {
-                    CleanCheckListBox->Checked[i] = true;
-                    CleanCheckListBox->Items->Move ( i , TopChecked );
+                    ExtCheckListBox->Checked[i] = true;
+                    ExtCheckListBox->Items->Move ( i , TopChecked );
                     TopChecked++;
                 }
             }
@@ -416,20 +389,19 @@ void __fastcall TPanelPlugin::UpdateChanges()
     AnsiString Name = "";
 
     /* find the selected plugin (if any) */
-    for( int item = 0; item < CleanCheckListBox->Items->Count; item++ )
+    for( int item = 0; item < ExtCheckListBox->Items->Count; item++ )
     {
-        if( CleanCheckListBox->Checked[item] )
+        if( ExtCheckListBox->Checked[item] )
         {
             if ( Name.Length() == 0 )
             {
-                Name = ((TObjectString*)CleanCheckListBox->Items->Objects[item])
-                       ->String();
+                Name = ModuleNames->Strings
+                        [ExtCheckListBox->GetItemData(item)];
             }
             else
             {
-                Name = Name + ","
-                     + ((TObjectString*)CleanCheckListBox->Items->Objects[item])
-                       ->String();
+                Name = Name + "," + ModuleNames->Strings
+                        [ExtCheckListBox->GetItemData(item)];
             }
         }
     }
@@ -615,9 +587,15 @@ __fastcall TPreferencesDlg::TPreferencesDlg( TComponent* Owner,
     Icon = p_intf->p_sys->p_window->Icon;
     Application->HintHidePause = 0x1000000;
     HintWindowClass = __classid ( TNarrowHintWindow );
+    ModuleNames = new TStringList();
     /* prevent the form from being resized horizontally */
     Constraints->MinWidth = Width;
     Constraints->MaxWidth = Width;
+}
+//---------------------------------------------------------------------------
+__fastcall TPreferencesDlg::~TPreferencesDlg()
+{
+    delete ModuleNames;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPreferencesDlg::FormClose( TObject *Sender,
@@ -711,7 +689,8 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case CONFIG_ITEM_MODULE:
 
             /* add new panel for the config option */
-            PanelPlugin = new TPanelPlugin( this, p_item, p_intf, true );
+            PanelPlugin =
+                new TPanelPlugin( this, p_item, p_intf, ModuleNames, true );
             PanelPlugin->Parent = ScrollBox;
 
             /* Look for valid modules */
@@ -730,9 +709,11 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
                     else
                         ModuleDesc = AnsiString( p_parser->psz_object_name );
 
-                    PanelPlugin->CleanCheckListBox->Items->AddObject(
-                        ModuleDesc.c_str(),
-                        new TObjectString( p_parser->psz_object_name ) );
+                    // add a reference to the module name string
+                    // in the list item object
+                    PanelPlugin->ExtCheckListBox->SetItemData (
+                        PanelPlugin->ExtCheckListBox->Items->Add(ModuleDesc)
+                        , ModuleNames->Add( p_parser->psz_object_name ) );
                 }
             }
 

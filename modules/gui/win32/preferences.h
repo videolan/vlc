@@ -34,14 +34,18 @@
 #include <ExtCtrls.hpp>
 #include "CSPIN.h"
 //---------------------------------------------------------------------------
-/* A TCheckListBox that automatically disposes any TObject
-   associated with the string items */
-class TCleanCheckListBox : public TCheckListBox
+/* A TCheckListBox that can associate an integer to each string item */
+class TExtCheckListBox : public TCheckListBox
 {
 public:
-    __fastcall TCleanCheckListBox( Classes::TComponent* AOwner )
+    DYNAMIC void __fastcall SetItemData(int Index, int AData) {
+        TCheckListBox::SetItemData ( Index , AData );
+    }
+    DYNAMIC int __fastcall GetItemData(int Index) {
+        return TCheckListBox::GetItemData ( Index );
+    }
+    __fastcall TExtCheckListBox( Classes::TComponent* AOwner )
         : TCheckListBox( AOwner ) {};
-    virtual __fastcall ~TCleanCheckListBox();
 };
 //---------------------------------------------------------------------------
 /* A THintWindow with a limited width */
@@ -50,16 +54,6 @@ class TNarrowHintWindow : public THintWindow
 public:
    virtual void __fastcall ActivateHint( const Windows::TRect &Rect,
        const System::AnsiString AHint );
-};
-//---------------------------------------------------------------------------
-/* Just a wrapper to embed an AnsiString into a TObject */
-class TObjectString : public TObject
-{
-private:
-    AnsiString FString;
-public:
-    __fastcall TObjectString( char * String );
-    AnsiString __fastcall String();
 };
 //---------------------------------------------------------------------------
 class TPanelPref : public TPanel
@@ -71,7 +65,7 @@ public:
 protected:
     module_config_t * p_config;
     intf_thread_t * p_intf;
-    TCleanCheckListBox * __fastcall CreateCleanCheckListBox(TWinControl *Parent,
+    TExtCheckListBox * __fastcall CreateExtCheckListBox(TWinControl *Parent,
             int Left, int Width, int Top, int Height );
     TButton * __fastcall CreateButton( TWinControl *Parent,
             int Left, int Width, int Top, int Height, AnsiString Caption );
@@ -89,16 +83,18 @@ protected:
 //---------------------------------------------------------------------------
 class TPanelPlugin : public TPanelPref
 {
+    module_t *ModuleSelected;
 public:
     __fastcall TPanelPlugin( TComponent* Owner, module_config_t *p_config,
-            intf_thread_t *_p_intf, bool b_multi_plugins );
+            intf_thread_t *_p_intf, TStringList * ModuleNames,
+            bool b_multi_plugins );
     bool b_multi_plugins;
-    TCleanCheckListBox *CleanCheckListBox;
+    TExtCheckListBox *ExtCheckListBox;
     TButton *ButtonConfig;
     TButton *ButtonUp;
     TButton *ButtonDown;
     TLabel *Label;
-    module_t *ModuleSelected;
+    TStringList * ModuleNames;
     virtual void __fastcall TPanelPlugin::SetValue ( AnsiString Values );
     virtual void __fastcall UpdateChanges();
     void __fastcall CheckListBoxClick( TObject *Sender );
@@ -162,8 +158,10 @@ __published:	// IDE-managed Components
     void __fastcall FormClose( TObject *Sender, TCloseAction &Action );
 private:	// User declarations
     intf_thread_t *p_intf;
+    TStringList * ModuleNames;
 public:		// User declarations
     __fastcall TPreferencesDlg( TComponent* Owner, intf_thread_t *_p_intf );
+    virtual __fastcall ~TPreferencesDlg();
     void __fastcall CreateConfigDialog( char *psz_module_name );
 };
 //---------------------------------------------------------------------------
