@@ -206,39 +206,16 @@ static int Activate( vlc_object_t *p_this )
     if( ( i_socket == -1) &&
         ( psz_host = config_GetPsz( p_intf, "rc-host" ) ) != NULL )
     {
-        char *psz_addr;
         vlc_url_t url;
-        memset( &url, 0, sizeof(vlc_url_t) );
-          
-        /* If it doesn't include a :, it's a port number rather than an URL */
-        if( strchr( psz_host, ':' ) ) vlc_UrlParse( &url, psz_host, 0 );
-        else url.i_port = atoi( psz_host );
 
-        /* By default, we listen on localhost only for security reasons.
-         * If you need to listen on all IP addresses, specify 0.0.0.0
-         */
-        if( url.psz_host != NULL )
-        {
-            psz_addr = url.psz_host;
-        }
-        else
-        {
-            /* Default to IPv4 for now.
-             * FIXME: should try both IPv4 and IPv6.
-             */
-            vlc_value_t val;
+        vlc_UrlParse( &url, psz_host, 0 );
 
-            var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-            var_Get( p_this, "ipv6", &val );
-            psz_addr = val.b_bool ? "::1" : "127.0.0.1";
-        }
-            
-        msg_Dbg( p_intf, "base %s port %d", psz_addr, url.i_port );
+        msg_Dbg( p_intf, "base %s port %d", url.psz_host, url.i_port );
 
-        if( (i_socket = net_ListenTCP( p_this, psz_addr, url.i_port )) == -1 )
+        if( (i_socket = net_ListenTCP(p_this, url.psz_host, url.i_port)) == -1)
         {
-            msg_Warn( p_intf, "can't listen to %s port %i", psz_addr,
-                      url.i_port );
+            msg_Warn( p_intf, "can't listen to %s port %i",
+                      url.psz_host, url.i_port );
             vlc_UrlClean( &url );
             free( psz_host );
             return VLC_EGENERIC;
