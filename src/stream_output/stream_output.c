@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.31 2003/07/31 19:24:10 fenrir Exp $
+ * $Id: stream_output.c,v 1.32 2003/08/01 18:42:56 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -946,6 +946,11 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
     *ppsz_name = NULL;
     *pp_cfg    = NULL;
 
+    if( p == NULL )
+    {
+        return NULL;
+    }
+
     SKIPSPACE( p );
 
     while( *p && *p != '{' && *p != ':' && *p != ' ' && *p != '\t' )
@@ -1161,8 +1166,6 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout,
 
 void sout_stream_delete( sout_stream_t *p_stream )
 {
-    sout_cfg_t *p_cfg;
-
     msg_Dbg( p_stream, "destroying chain... (name=%s)", p_stream->psz_name );
     if( p_stream->p_module ) module_Unneed( p_stream, p_stream->p_module );
 
