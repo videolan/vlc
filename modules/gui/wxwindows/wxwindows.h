@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.19 2003/05/04 22:42:16 gbazin Exp $
+ * $Id: wxwindows.h,v 1.20 2003/05/07 12:23:06 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -155,7 +155,12 @@ private:
     void OnNextStream( wxCommandEvent& event );
 
     void OnMenuOpen( wxMenuEvent& event );
-    void OnMenuClose( wxMenuEvent& event );
+
+#if defined( __WXMSW__ ) || defined( __WXMAC__ )
+    void OnContextMenu(wxContextMenuEvent& event);
+#else
+    void OnContextMenu(wxMouseEvent& event);
+#endif
 
     DECLARE_EVENT_TABLE();
 
@@ -442,7 +447,8 @@ private:
 #endif
 
 /* Menus */
-void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface );
+void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
+                const wxPoint& pos );
 wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface );
 wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface );
 

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.22 2003/05/04 22:42:16 gbazin Exp $
+ * $Id: interface.cpp,v 1.23 2003/05/07 12:23:06 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -134,8 +134,12 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(Prefs_Event, Interface::OnPreferences)
 
     EVT_MENU_OPEN(Interface::OnMenuOpen)
-    EVT_MENU_CLOSE(Interface::OnMenuClose)
 
+#if defined( __WXMSW__ ) || defined( __WXMAC__ )
+    EVT_CONTEXT_MENU(Interface::OnContextMenu)
+#else
+    EVT_RIGHT_UP(Interface::OnContextMenu)
+#endif
 
     /* Toolbar events */
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
@@ -408,6 +412,7 @@ void Interface::Open( int i_access_method )
  *****************************************************************************/
 void Interface::OnMenuOpen(wxMenuEvent& event)
 {
+#if !defined( __WXMSW__ )
     if( event.GetEventObject() == p_audio_menu )
     {
         if( b_audio_menu )
@@ -434,11 +439,30 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         }
         else b_video_menu = 1;
     }
+
+#else
+    p_audio_menu = AudioMenu( p_intf, this );
+    wxMenu *menu = GetMenuBar()->Replace( 3, p_audio_menu, _("&Audio") );
+    if( menu ) delete menu;
+
+    p_video_menu = VideoMenu( p_intf, this );
+    menu = GetMenuBar()->Replace( 4, p_video_menu, _("&Video") );
+    if( menu ) delete menu;
+
+#endif
 }
 
-void Interface::OnMenuClose(wxMenuEvent& event)
+#if defined( __WXMSW__ ) || defined( __WXMAC__ )
+void Interface::OnContextMenu(wxContextMenuEvent& event)
 {
+    ::PopupMenu( p_intf, this, ScreenToClient(event.GetPosition()) );
 }
+#else
+void Interface::OnContextMenu(wxMouseEvent& event)
+{
+    ::PopupMenu( p_intf, this, event.GetPosition() );
+}
+#endif
 
 void Interface::OnExit( wxCommandEvent& WXUNUSED(event) )
 {

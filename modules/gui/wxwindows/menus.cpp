@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.2 2003/05/05 22:23:40 gbazin Exp $
+ * $Id: menus.cpp,v 1.3 2003/05/07 12:23:06 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -89,7 +89,8 @@ BEGIN_EVENT_TABLE(MenuEvtHandler, wxEvtHandler)
     EVT_MENU(-1, MenuEvtHandler::OnMenuEvent)
 END_EVENT_TABLE()
 
-void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
+void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
+                const wxPoint& pos )
 {
     vlc_object_t *p_object;
     char *ppsz_varnames[19];
@@ -163,11 +164,7 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
                                   ppsz_varnames, pi_objects );
 
     _p_main_interface->p_popup_menu = popupmenu;
-    wxPoint mousepos = wxGetMousePosition();
-    _p_main_interface->PopupMenu( popupmenu,
-                                 _p_main_interface->ScreenToClient(mousepos).x,
-                                 _p_main_interface->ScreenToClient(mousepos).y
-                                 );
+    _p_main_interface->PopupMenu( popupmenu, pos.x, pos.y );
 }
 
 wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )

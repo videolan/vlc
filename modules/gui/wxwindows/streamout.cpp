@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.6 2003/04/21 00:54:26 ipkiss Exp $
+ * $Id: streamout.cpp,v 1.7 2003/05/07 12:23:06 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -155,8 +155,12 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     mrl_combo = new wxComboBox( panel, MRL_Event, mrl,
                                 wxPoint(20,25), wxSize(120, -1),
                                 0, NULL );
-    mrl_sizer->Add( mrl_label, 0, wxEXPAND | wxALL, 5 );
-    mrl_sizer->Add( mrl_combo, 1, wxEXPAND | wxALL, 5 );
+    mrl_combo->SetToolTip( _("You can use this field directly by typing the "
+        "full MRL you want to open.\n""Alternatively, the field will be "
+        "filled automatically when you use the controls below") );
+
+    mrl_sizer->Add( mrl_label, 0, wxALL | wxALIGN_CENTER, 5 );
+    mrl_sizer->Add( mrl_combo, 1, wxALL | wxALIGN_CENTER, 5 );
     mrl_sizer_sizer->Add( mrl_sizer, 1, wxEXPAND | wxALL, 5 );
 
     /* Create the output encapsulation panel */
