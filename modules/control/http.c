@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.48 2004/01/17 16:51:54 gbazin Exp $
+ * $Id: http.c,v 1.49 2004/01/18 07:35:31 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1025,6 +1025,10 @@ static mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
     {
         free( info.info[i].psz_name );
         free( info.info[i].psz_value );
+    }
+    if( info.i_count > 0 )
+    {
+        free( info.info );
     }
 
     return s;
@@ -2286,7 +2290,7 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         p += sprintf( p, "</body>\n" );
         p += sprintf( p, "</html>\n" );
 
-        *pi_data = strlen( *pp_data ) + 1;
+        *pi_data = strlen( *pp_data );
 
         return VLC_SUCCESS;
     }
@@ -2364,11 +2368,12 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         /* we parse executing all  <vlc /> macros */
         Execute( p_args, p_request, i_request, pp_data, pi_data, &dst, &p_buffer[0], &p_buffer[i_buffer] );
 
-        *dst++ = '\0';
+        *dst     = '\0';
         *pi_data = dst - *pp_data;
 
         SSClean( &p_args->stack );
         mvar_Delete( p_args->vars );
+        free( p_buffer );
     }
 
     fclose( f );
