@@ -256,7 +256,7 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
      * Motion Compensation (ISO/IEC 13818-2 section 7.6)
      */
     (*p_mb->pf_motion)( p_mb );
-
+if( !p_mb->b_P_coding_type ) {
     /* luminance */
     for( i_b = 0; i_b < 4; i_b++ )
     {
@@ -288,7 +288,7 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
         (p_mb->pf_addb[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
                               p_mb->p_data[i_b], p_mb->i_addb_c_stride );
     }
-
+}
     /*
      * Decoding is finished, release the macroblock and free
      * unneeded memory.
@@ -320,26 +320,17 @@ void vdec_AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block, yuv_data_t * p_
 void vdec_CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block, yuv_data_t * p_data, int i_incr )
 {
     int i_y;
-//fprintf(stderr, "%d ", i_incr );
 
     for( i_y = 0; i_y < 8; i_y++ )
     {
-#if 0
-        /* dctelem_t and yuv_data_t are the same */
-        memcpy( p_data, p_block, 8*sizeof(yuv_data_t) );
-        p_data += i_incr+8;
-        p_block += 8;
-#else
         int i_x;
 
         for( i_x = 0; i_x < 8; i_x++ )
         {
-            /* ??? Need clip to be MPEG-2 compliant */
             /* ??? Why does the reference decoder add 128 ??? */
             *p_data++ = p_vdec->pi_crop[*p_block++];
         }
         p_data += i_incr;
-#endif
     }
 }
 

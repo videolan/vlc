@@ -590,9 +590,13 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
 
     if( (p_vpar->picture.i_coding_type == P_CODING_TYPE) ||
         (p_vpar->picture.i_coding_type == B_CODING_TYPE) )
-       p_mb->p_forward = p_vpar->sequence.p_forward;
+        p_mb->p_forward = p_vpar->sequence.p_forward;
+    else
+        p_mb->p_forward = NULL;
     if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
         p_mb->p_backward = p_vpar->sequence.p_backward;
+    else
+        p_mb->p_backward = NULL;
 
     p_mb->i_addb_l_stride = (p_mb->i_l_stride = p_vpar->picture.i_l_stride) - 8;
     p_mb->i_addb_c_stride = (p_mb->i_c_stride = p_vpar->picture.i_c_stride) - 8;
@@ -1236,7 +1240,7 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
                                                         : i_level;
                 break;
             case DCT_EOB:
-                if( i_nc <= 1 )
+                if( i_nc <= 0 )
                 {
                     p_mb->pf_idct[i_b] = vdec_SparseIDCT;
                     p_mb->pi_sparse_pos[i_b] = i_coef;

@@ -145,8 +145,19 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
+    static int meuh = 0;
+    static int truc = 0;
 //    return( 1 );
-    return( i_coding_type == I_CODING_TYPE || i_coding_type == P_CODING_TYPE );
+    if( i_coding_type == 1 )
+        meuh = 0;
+    if( i_coding_type == 2 )
+        meuh++;
+    truc++;
+    if( truc == 3 )
+    {
+       // while(1);
+    }
+    return( i_coding_type == I_CODING_TYPE || (i_coding_type == P_CODING_TYPE && meuh == 1) );
     intf_DbgMsg("vpar debug: synchro image %i - modulo is %i\n", i_coding_type, p_vpar->synchro.modulo);
     intf_DbgMsg("vpar debug: synchro predict P %e - predict B %e\n", p_vpar->synchro.p_count_predict, p_vpar->synchro.b_count_predict);
 
@@ -171,7 +182,6 @@ void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
                             int i_structure )
 {
     vpar_SynchroUpdateStructures (p_vpar, i_coding_type);
-
 }
 
 /*****************************************************************************

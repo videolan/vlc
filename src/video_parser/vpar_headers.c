@@ -203,9 +203,8 @@ static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
 {
     if( i_coding_type != B_CODING_TYPE )
     {
-        if( p_vpar->sequence.p_forward != NULL )
-            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
-        p_vpar->sequence.p_forward = p_vpar->sequence.p_backward;
+        if( p_vpar->sequence.p_backward != NULL )
+            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
         p_vpar->sequence.p_backward = p_newref;
         if( p_newref != NULL )
             vout_LinkPicture( p_vpar->p_vout, p_newref );
@@ -525,7 +524,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     p_vpar->picture.pf_macroblock_type = ppf_macroblock_type
                                          [p_vpar->picture.i_coding_type];
     RemoveBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
- 
+
+fprintf( stderr, "coding type: %d\n", p_vpar->picture.i_coding_type );
+    
     if( p_vpar->picture.i_coding_type == P_CODING_TYPE || p_vpar->picture.i_coding_type == B_CODING_TYPE )
     {
         p_vpar->picture.pb_full_pel_vector[0] = GetBits( &p_vpar->bit_stream, 1 );

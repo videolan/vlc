@@ -127,6 +127,8 @@ static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
                                           >> 1;  
                      }
                 }
+                p_dest += i_x_step;
+                p_src += i_x_step;
             }
         }
         break;
@@ -168,6 +170,8 @@ static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
                                                 >> 1;
                      }
                 }
+                p_dest += i_x_step;
+                p_src += i_x_step;
             }
         }
         break;
@@ -475,19 +479,20 @@ void vdec_MotionFrameField( macroblock_t * p_mb )
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
         args.p_source = p_mb->p_forward;
-
+#if 1
         args.b_source_field = p_mb->ppi_field_select[0][0];
         args.b_dest_field = 0;
         args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
         args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
         p_mb->pf_chroma_motion( p_mb, &args );
-
+#endif
+#if 1
         args.b_source_field = p_mb->ppi_field_select[1][0];
         args.b_dest_field = 1;
-        args.i_mv_x = p_mb->pppi_motion_vectors[1][0][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[1][0][1] >> 1;
+        args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
+        args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
         p_mb->pf_chroma_motion( p_mb, &args );
-
+#endif
         args.b_average = 1;
     }
 
@@ -564,7 +569,8 @@ void vdec_MotionFrameDMV( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
 {
-    p_motion->i_mv_x = p_motion->i_mv_y = 0;
+//    p_motion->i_mv_x = p_motion->i_mv_y = 0;
+//fprintf( stderr, " x %d, y %d \n", p_motion->i_mv_x, p_motion->i_mv_y );
     /* Luminance */
     MotionComponent( /* source */
                      p_motion->p_source->p_y
@@ -618,7 +624,6 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
                      (p_motion->b_average << 2)
                        | (((p_motion->i_mv_y/2) & 1) << 1)
                        | ((p_motion->i_mv_x/2) & 1) );
-
 }
 
 /*****************************************************************************

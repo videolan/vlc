@@ -183,7 +183,7 @@ void vpar_DestroyMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
     /* Unlink picture buffer */
     vlc_mutex_lock( &p_mb->p_picture->lock_deccount );
     p_mb->p_picture->i_deccount--;
-    b_finished = (p_mb->p_picture->i_deccount == 1);
+    b_finished = (p_mb->p_picture->i_deccount == 0);
     vlc_mutex_unlock( &p_mb->p_picture->lock_deccount );
 
     /* Test if it was the last block of the picture */
