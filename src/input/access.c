@@ -56,8 +56,7 @@ int access_vaControlDefault( input_thread_t *p_input, int i_query, va_list args 
 /*****************************************************************************
  * access2_New:
  *****************************************************************************/
-access_t *__access2_New( vlc_object_t *p_obj,
-                       char *psz_mrl, stream_t *s, es_out_t *out )
+access_t *__access2_New( vlc_object_t *p_obj, char *psz_mrl )
 {
     msg_Err( p_obj, "access2_New not yet implemented" );
     return NULL;

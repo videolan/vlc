@@ -143,9 +143,9 @@ struct access_t
     access_sys_t *p_sys;
 };
 
-#define access2_New( a, b, c, d ) __acess2_New(VLC_OBJECT(a), b, c, d)
-VLC_EXPORT( demux_t *, __access2_New,  ( vlc_object_t *p_obj, char *psz_mrl, stream_t *s, es_out_t *out ) );
-VLC_EXPORT( void,      access2_Delete, ( demux_t * ) );
+#define access2_New( a, b ) __acess2_New(VLC_OBJECT(a), b )
+VLC_EXPORT( access_t *, __access2_New,  ( vlc_object_t *p_obj, char *psz_mrl ) );
+VLC_EXPORT( void,      access2_Delete, ( access_t * ) );
 
 static inline int access2_vaControl( access_t *p_access, int i_query, va_list args )
 {
