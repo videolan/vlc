@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.2 2002/08/16 16:26:23 sam Exp $
+ * $Id: xcommon.c,v 1.3 2002/08/19 08:19:31 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -992,7 +992,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XSetWindowBackground( p_vout->p_sys->p_display, p_win->video_window,
                           BlackPixel( p_vout->p_sys->p_display,
                                       p_vout->p_sys->i_screen ) );
-    
+
     XMapWindow( p_vout->p_sys->p_display, p_win->video_window );
     XSelectInput( p_vout->p_sys->p_display, p_win->video_window,
                   ExposureMask );
@@ -1291,6 +1291,7 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 static void ToggleFullScreen ( vout_thread_t *p_vout )
 {
     Atom prop;
+    XEvent xevent;
     mwmhints_t mwmhints;
     XSetWindowAttributes attributes;
 
@@ -1299,13 +1300,15 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     if( p_vout->b_fullscreen )
     {
         msg_Dbg( p_vout, "entering fullscreen mode" );
-        p_vout->p_sys->p_win = &p_vout->p_sys->fullscreen_window;
 
-        /* Only check the fullscreen method when we actually go fullscreen,
-         * because to go back to window mode we need to know in which
-         * fullscreen mode we were */
         p_vout->p_sys->b_altfullscreen =
             config_GetInt( p_vout, MODULE_STRING "-altfullscreen" );
+
+        if( p_vout->p_sys->b_createwindow )
+            XUnmapWindow( p_vout->p_sys->p_display,
+                          p_vout->p_sys->p_win->base_window);
+
+        p_vout->p_sys->p_win = &p_vout->p_sys->fullscreen_window;
 
         /* fullscreen window size and position */
         p_vout->p_sys->p_win->i_width =
@@ -1324,7 +1327,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         if( !p_vout->p_sys->b_altfullscreen )
         {
             mwmhints.flags = MWM_HINTS_DECORATIONS;
-            mwmhints.decorations = !p_vout->b_fullscreen;
+            mwmhints.decorations = False;
 
             prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
                                 False );
@@ -1337,17 +1340,25 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         else
         {
             /* brute force way to remove decorations */
-            attributes.override_redirect = p_vout->b_fullscreen;
+            attributes.override_redirect = True;
             XChangeWindowAttributes( p_vout->p_sys->p_display,
                                      p_vout->p_sys->p_win->base_window,
                                      CWOverrideRedirect,
                                      &attributes);
         }
 
+        /* Make sure the change is effective */
         XReparentWindow( p_vout->p_sys->p_display,
                          p_vout->p_sys->p_win->base_window,
                          DefaultRootWindow( p_vout->p_sys->p_display ),
                          0, 0 );
+
+        /* fullscreen window size and position */
+        p_vout->p_sys->p_win->i_width =
+            DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
+        p_vout->p_sys->p_win->i_height =
+            DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
+
         XMoveResizeWindow( p_vout->p_sys->p_display,
                            p_vout->p_sys->p_win->base_window,
                            0, 0,
@@ -1359,17 +1370,31 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         msg_Dbg( p_vout, "leaving fullscreen mode" );
         DestroyWindow( p_vout, &p_vout->p_sys->fullscreen_window );
         p_vout->p_sys->p_win = &p_vout->p_sys->original_window;
+
+        if( p_vout->p_sys->b_createwindow )
+        {
+            XMapWindow( p_vout->p_sys->p_display,
+                        p_vout->p_sys->p_win->base_window);
+        }
     }
 
-    XSync( p_vout->p_sys->p_display, True );
-
-    if( !p_vout->b_fullscreen || p_vout->p_sys->b_altfullscreen )
+    /* Unfortunately, using XSync() here is not enough to ensure the
+     * window has already been mapped because the XMapWindow() request
+     * has not necessarily been sent directly to our window (remember,
+     * the call is first redirected to the window manager) */
+    do
     {
-        XSetInputFocus(p_vout->p_sys->p_display,
-                       p_vout->p_sys->p_win->base_window,
-                       RevertToParent,
-                       CurrentTime);
-    }
+        XWindowEvent( p_vout->p_sys->p_display,
+                      p_vout->p_sys->p_win->base_window,
+                      StructureNotifyMask, &xevent );
+    } while( xevent.type != MapNotify );
+
+    /* Becareful, this can generate a BadMatch error if the window is not
+     * already mapped by the server (see above) */
+    XSetInputFocus(p_vout->p_sys->p_display,
+                   p_vout->p_sys->p_win->base_window,
+                   RevertToParent,
+                   CurrentTime);
 
     /* signal that the size needs to be updated */
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
