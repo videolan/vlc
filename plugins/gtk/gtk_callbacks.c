@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.13 2001/04/08 13:09:32 octplane Exp $
+ * $Id: gtk_callbacks.c,v 1.14 2001/04/11 04:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -545,6 +545,7 @@ on_disc_ok_clicked                     (GtkButton       *button,
     /* Build source name and add it to playlist */
     sprintf( psz_source, "%s:%s", psz_method, psz_device );
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+    free( psz_source );
 
     gtk_widget_hide( p_intf->p_sys->p_disc );
 }

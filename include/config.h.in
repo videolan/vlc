@@ -63,17 +63,10 @@
  * and might cause problems with some very weird streams. */
 //#define MPEG2_COMPLIANT
 
-/* Define for profiling and statistics support - such informations, like FPS
- * or pictures count won't be available if it not set */
-/* #define STATS --moved in Makefile */
-
-/* Define for unthreaded version of the program FIXME: not yet implemented ??*/
-//#define NO_THREAD
-
 /*****************************************************************************
  * Debugging options - define or undefine symbols
  *****************************************************************************/
-#if DEBUG == 1
+#ifdef DEBUG
 /* General debugging support, which depends of the DEBUG define, is determined
  * in the Makefile */
 
@@ -449,7 +442,7 @@
  * when debugging, since it allows messages which would not be printed
  * due to a crash to be printed anyway */
 #ifndef DEBUG
-#define INTF_MSG_QUEUE
+//#define INTF_MSG_QUEUE
 #endif
 
 /* Format of the header for debug messages. The arguments following this header

@@ -2,7 +2,7 @@
  * dvd_ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.h,v 1.5 2001/04/04 02:49:18 sam Exp $
+ * $Id: dvd_ioctl.h,v 1.6 2001/04/11 04:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -22,15 +22,15 @@
  *****************************************************************************/
 
 int ioctl_ReadCopyright     ( int, int, int * );
-int ioctl_ReadKey           ( css_t *, u8 * );
+int ioctl_ReadKey           ( int, int *, u8 * );
 
-int ioctl_LUSendAgid        ( css_t * );
-int ioctl_LUSendChallenge   ( css_t *, u8 * );
-int ioctl_LUSendKey1        ( css_t *, u8 * );
-int ioctl_LUSendASF         ( css_t *, int * );
-int ioctl_InvalidateAgid    ( css_t * );
-int ioctl_HostSendChallenge ( css_t *, u8 * );
-int ioctl_HostSendKey2      ( css_t *, u8 * );
+int ioctl_LUSendAgid        ( int, int * );
+int ioctl_LUSendChallenge   ( int, int *, u8 * );
+int ioctl_LUSendKey1        ( int, int *, u8 * );
+int ioctl_LUSendASF         ( int, int *, int * );
+int ioctl_InvalidateAgid    ( int, int * );
+int ioctl_HostSendChallenge ( int, int *, u8 * );
+int ioctl_HostSendKey2      ( int, int *, u8 * );
 
 #ifdef SYS_BEOS
 

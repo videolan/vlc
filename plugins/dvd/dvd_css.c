@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.23 2001/04/10 17:47:05 stef Exp $
+ * $Id: dvd_css.c,v 1.24 2001/04/11 04:31:59 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -56,7 +56,7 @@
  * Local prototypes
  *****************************************************************************/
 #ifdef HAVE_CSS
-static int  CSSGetASF    ( css_t *p_css );
+static int  CSSGetASF    ( int i_fd );
 static void CSSCryptKey  ( int i_key_type, int i_varient,
                            u8 const * pi_challenge, u8* pi_key );
 static int  CSSCracker   ( int i_start, unsigned char * p_crypted,
@@ -92,18 +92,17 @@ int CSSTest( int i_fd )
  * Since we don't need the disc key to find the title key, we just run the
  * basic unavoidable commands to authenticate device and disc.
  *****************************************************************************/
-int CSSInit( css_t * p_css )
+int CSSInit( int i_fd, css_t * p_css )
 {
 #ifdef HAVE_CSS
     /* structures defined in cdrom.h or dvdio.h */
     char p_buffer[2048 + 4 + 1];
+    int  i_agid = 0;
     int  i_ret = -1;
     int  i;
 
-    p_css->i_agid = 0;
-
     /* Test authentication success */
-    switch( CSSGetASF( p_css ) )
+    switch( CSSGetASF( i_fd ) )
     {
         case -1:
             return -1;
@@ -121,7 +120,7 @@ int CSSInit( css_t * p_css )
     {
         intf_WarnMsg( 3, "css info: requesting AGID %d", i );
 
-        i_ret = ioctl_LUSendAgid( p_css );
+        i_ret = ioctl_LUSendAgid( i_fd, &i_agid );
 
         if( i_ret != -1 )
         {
@@ -131,8 +130,8 @@ int CSSInit( css_t * p_css )
 
         intf_ErrMsg( "css error: ioctl_LUSendAgid failed, invalidating" );
 
-        p_css->i_agid = 0;
-        ioctl_InvalidateAgid( p_css );
+        i_agid = 0;
+        ioctl_InvalidateAgid( i_fd, &i_agid );
     }
 
     /* Unable to authenticate without AGID */
@@ -154,14 +153,14 @@ int CSSInit( css_t * p_css )
     }
 
     /* Send challenge to LU */
-    if( ioctl_HostSendChallenge( p_css, p_buffer ) < 0 )
+    if( ioctl_HostSendChallenge( i_fd, &i_agid, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: ioctl_HostSendChallenge failed" );
         return -1;
     }
 
     /* Get key1 from LU */
-    if( ioctl_LUSendKey1( p_css, p_buffer ) < 0)
+    if( ioctl_LUSendKey1( i_fd, &i_agid, p_buffer ) < 0)
     {
         intf_ErrMsg( "css error: ioctl_LUSendKey1 failed" );
         return -1;
@@ -194,7 +193,7 @@ int CSSInit( css_t * p_css )
     }
 
     /* Get challenge from LU */
-    if( ioctl_LUSendChallenge( p_css, p_buffer ) < 0 )
+    if( ioctl_LUSendChallenge( i_fd, &i_agid, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: ioctl_LUSendKeyChallenge failed" );
         return -1;
@@ -216,7 +215,7 @@ int CSSInit( css_t * p_css )
     }
 
     /* Send key2 to LU */
-    if( ioctl_HostSendKey2( p_css, p_buffer ) < 0 )
+    if( ioctl_HostSendKey2( i_fd, &i_agid, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: ioctl_HostSendKey2 failed" );
         return -1;
@@ -226,18 +225,19 @@ int CSSInit( css_t * p_css )
 
     memcpy( p_css->disc.pi_challenge, p_css->disc.pi_key1, KEY_SIZE );
     memcpy( p_css->disc.pi_challenge+KEY_SIZE, p_css->disc.pi_key2, KEY_SIZE );
+
     CSSCryptKey( 2, p_css->disc.i_varient, p_css->disc.pi_challenge,
-                                               p_css->disc.pi_key_check );
+                                           p_css->disc.pi_key_check );
 
-    intf_WarnMsg( 1, "css info: received Session Key" );
+    intf_WarnMsg( 1, "css info: received session key" );
 
-    if( p_css->i_agid < 0 )
+    if( i_agid < 0 )
     {
         return -1;
     }
 
     /* Test authentication success */
-    switch( CSSGetASF( p_css ) )
+    switch( CSSGetASF( i_fd ) )
     {
         case -1:
             return -1;
@@ -251,7 +251,7 @@ int CSSInit( css_t * p_css )
     }
 
     /* Get encrypted disc key */
-    if( ioctl_ReadKey( p_css, p_buffer ) < 0 )
+    if( ioctl_ReadKey( i_fd, &i_agid, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: ioctl_ReadKey failed" );
         return -1;
@@ -265,7 +265,7 @@ int CSSInit( css_t * p_css )
     memcpy( p_css->disc.pi_key_check, p_buffer, 2048 );
 
     /* Test authentication success */
-    switch( CSSGetASF( p_css ) )
+    switch( CSSGetASF( i_fd ) )
     {
         case -1:
             return -1;
@@ -292,7 +292,7 @@ int CSSInit( css_t * p_css )
  *****************************************************************************
  * The DVD should have been opened and authenticated before.
  *****************************************************************************/
-int CSSGetKey( css_t * p_css )
+int CSSGetKey( int i_fd, css_t * p_css )
 {
 #ifdef HAVE_CSS
     /*
@@ -330,8 +330,8 @@ int CSSGetKey( css_t * p_css )
 //fprintf( stderr, "CSS %d start pos: %lld\n", i_title, i_pos );
 
     do {
-    i_pos = lseek( p_css->i_fd, i_pos, SEEK_SET );
-    i_bytes_read = read( p_css->i_fd, pi_buf, 0x800 );
+    i_pos = lseek( i_fd, i_pos, SEEK_SET );
+    i_bytes_read = read( i_fd, pi_buf, 0x800 );
 
     /* PES_scrambling_control */
     if( pi_buf[0x14] & 0x30 )
@@ -542,25 +542,24 @@ int CSSDescrambleSector( dvd_key_t pi_key, u8* pi_sec )
  *  0 if the device needs to be authenticated,
  *  1 either.
  *****************************************************************************/
-static int CSSGetASF( css_t *p_css )
+static int CSSGetASF( int i_fd )
 {
-    int i_oldagid = p_css->i_agid, i_asf = 0;
+    int i_agid;
+    int i_asf = 0;
 
-    for( p_css->i_agid = 0 ; p_css->i_agid < 4 ; p_css->i_agid++ )
+    for( i_agid = 0 ; i_agid < 4 ; i_agid++ )
     {
-        if( ioctl_LUSendASF( p_css, &i_asf ) == 0 )
+        if( ioctl_LUSendASF( i_fd, &i_agid, &i_asf ) == 0 )
         {
-            intf_WarnMsg( 3, "css info: %sauthenticated", i_asf ? "":"not " );
+            intf_WarnMsg( 3, "css info: GetASF %sauthenticated",
+                          i_asf ? "":"not " );
 
-            p_css->i_agid = i_oldagid;
             return i_asf;
         }
     }
 
     /* The ioctl process has failed */
     intf_ErrMsg( "css error: GetASF fatal error" );
-
-    p_css->i_agid = i_oldagid;
     return -1;
 }
 

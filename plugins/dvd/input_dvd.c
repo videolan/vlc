@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.41 2001/04/10 17:47:05 stef Exp $
+ * $Id: input_dvd.c,v 1.42 2001/04/11 04:31:59 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -528,7 +528,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                     vts.i_pos +
                     vts.manager_inf.i_title_vob_start_sector * DVD_LB_SIZE;
 
-            j = CSSGetKey( p_dvd->p_css );
+            j = CSSGetKey( p_input->i_handle, p_dvd->p_css );
             if( j < 0 )
             {
                 intf_ErrMsg( "dvd error: fatal error in vts css key" );
@@ -865,10 +865,7 @@ static void DVDInit( input_thread_t * p_input )
             return;
         }
 
-        p_dvd->p_css->i_fd = p_input->i_handle;
-        p_dvd->p_css->i_agid = 0;
-
-        if( CSSInit( p_dvd->p_css ) < 0 )
+        if( CSSInit( p_input->i_handle, p_dvd->p_css ) < 0 )
         {
             intf_ErrMsg( "dvd error: fatal failure in CSS" );
             free( p_dvd->p_css );

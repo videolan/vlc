@@ -507,14 +507,14 @@ install:
 ifneq (,$(findstring darwin,$(SYS)))
 # XXX this should only be for MacOS X
 #should the following be "$(DESTDIR)$(bindir)vlc.app/" or "$(DESTDIR)vlc.app/" ?
-    mkdir -p $(DESTDIR)$(bindir)vlc.app/Contents/MacOS
-    mkdir -p $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/lib
-    mkdir -p $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/share
-    $(INSTALL) -m 644 extras/MacOSX_app/Contents/Info.plist $(DESTDIR)$(bindir)vlc.app/Contents/
-    $(INSTALL) -m 644 extras/MacOSX_app/Contents/PkgInfo $(DESTDIR)$(bindir)vlc.app/Contents/
-    $(INSTALL) vlc $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/
-    $(INSTALL) $(PLUGINS:%=lib/%.so) $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/lib
-    $(INSTALL) -m 644 share/*.psf $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/share
+	mkdir -p $(DESTDIR)$(bindir)vlc.app/Contents/MacOS
+	mkdir -p $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/lib
+	mkdir -p $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/share
+	$(INSTALL) -m 644 extras/MacOSX_app/Contents/Info.plist $(DESTDIR)$(bindir)vlc.app/Contents/
+	$(INSTALL) -m 644 extras/MacOSX_app/Contents/PkgInfo $(DESTDIR)$(bindir)vlc.app/Contents/
+	$(INSTALL) vlc $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/
+	$(INSTALL) $(PLUGINS:%=lib/%.so) $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/lib
+	$(INSTALL) -m 644 share/*.psf $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/share
 endif
 
 show:
@@ -683,14 +683,14 @@ endif
 
 vlc.app: all
 ifneq (,$(findstring darwin,$(SYS)))
-    mkdir -p vlc.app/Contents/MacOS
-    mkdir -p vlc.app/Contents/MacOS/lib
-    mkdir -p vlc.app/Contents/MacOS/share
-    $(INSTALL) -m 644 extras/MacOSX_app/Contents/Info.plist vlc.app/Contents/
-    $(INSTALL) -m 644 extras/MacOSX_app/Contents/PkgInfo vlc.app/Contents/
-    $(INSTALL) vlc vlc.app/Contents/MacOS/
-    $(INSTALL) $(PLUGINS:%=lib/%.so) vlc.app/Contents/MacOS/lib
-    $(INSTALL) -m 644 share/*.psf vlc.app/Contents/MacOS/share
+	mkdir -p vlc.app/Contents/MacOS
+	mkdir -p vlc.app/Contents/MacOS/lib
+	mkdir -p vlc.app/Contents/MacOS/share
+	$(INSTALL) -m 644 extras/MacOSX_app/Contents/Info.plist vlc.app/Contents/
+	$(INSTALL) -m 644 extras/MacOSX_app/Contents/PkgInfo vlc.app/Contents/
+	$(INSTALL) vlc vlc.app/Contents/MacOS/
+	$(INSTALL) $(PLUGINS:%=lib/%.so) vlc.app/Contents/MacOS/lib
+	$(INSTALL) -m 644 share/*.psf vlc.app/Contents/MacOS/share
 endif
 
 #
