@@ -5,3 +5,4 @@ SOURCES_m3u = modules/demux/m3u.c
 SOURCES_demuxdump = modules/demux/demuxdump.c
 SOURCES_rawdv = modules/demux/rawdv.c
 SOURCES_au = modules/demux/au.c
+SOURCES_mkv = modules/demux/mkv.cpp

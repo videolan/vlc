@@ -1453,7 +1453,7 @@ then
 fi
 
 dnl
-dnl  ogg plugin
+dnl  ogg demux plugin
 dnl
 AC_ARG_ENABLE(ogg,
   [  --enable-ogg            Ogg demux support (default enabled)])
@@ -1466,6 +1466,22 @@ then
       AC_CHECK_LIB( ogg, oggpackB_read, [
         CPPFLAGS_ogg="${CPPFLAGS_ogg} -DHAVE_OGGPACKB"])])
    ],[])
+fi
+
+dnl
+dnl  matroska demux plugin
+dnl
+AC_ARG_ENABLE(mkv,
+  [  --enable-mkv            Matroska demux support (default disabled)])
+if test "${enable_mkv}" = "yes"
+then
+AC_LANG_PUSH(C++)
+  dnl matroska headers include ebml headers directly... pouah that stinks
+  AC_CHECK_HEADERS(EbmlVersion.h matroska/KaxVersion.h, [
+    PLUGINS="${PLUGINS} mkv"
+    LDFLAGS_mkv="${LDFLAGS_mkv} -lmatroska -lebml -lstdc++"
+   ],[])
+AC_LANG_POP(C++)
 fi
 
 dnl
