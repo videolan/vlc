@@ -2,7 +2,7 @@
  * bezier.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bezier.hpp,v 1.4 2004/02/01 21:13:04 ipkiss Exp $
+ * $Id: bezier.hpp,v 1.5 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -50,6 +50,9 @@ class Bezier: public SkinObject
                 const vector<float> &pOrdinates,
                 Flag_t flag = kCoordsBoth );
         ~Bezier() {}
+
+        /// Get the number of control points used to define the curve
+        int getNbCtrlPoints() const { return m_nbCtrlPt; }
 
         /// Return the percentage (between 0 and 1) of the curve point nearest
         /// from (x, y)

@@ -75,7 +75,7 @@
 
    <Layout id="mainlayout" width="424" height="152">
     <Group x="0" y="0">
-      <Anchor x="7" y="151" priority="100"/>
+      <Anchor x="7" y="151" points="(0,0)" priority="100"/>
       <Image x="0" y="0" image="mainbody" onclick="move"/>
       <Text font="default_font" width="70" x="287" y="79" text="$T" color="#000000"/>
       <Button x="42" y="42" up="preferences" down="preferences_onclick" over="preferences" action="dialogs.prefs()" tooltiptext="Preferences"/>
@@ -96,7 +96,7 @@
   <Window id="playlist_window" x="237" y="401" visible="false">
    <Layout id="playlistLayout" width="410" height="250" minwidth="200" minheight="150" maxwidth="1000" maxheight="800">
     <Group x="0" y="0">
-      <Anchor x="0" y="0" priority="50"/>
+      <Anchor x="0" y="0" points="(0,0)" priority="50"/>
       <Image image="playlist1" x="0" y="0" lefttop="lefttop" rightbottom="lefttop" onclick="move"/>
       <Image image="playlist2" x="17" y="0" lefttop="lefttop" rightbottom="righttop" onclick="move"/>
       <Image image="playlist3" x="350" y="0" lefttop="righttop" rightbottom="righttop" onclick="move"/>

@@ -2,7 +2,7 @@
  * skin_parser.cpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: skin_parser.cpp,v 1.4 2004/03/01 19:36:43 asmax Exp $
+ * $Id: skin_parser.cpp,v 1.5 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -40,7 +40,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
     {
         const BuilderData::Anchor anchor( atoi( attr["x"] ) + m_xOffset,
                 atoi( attr["y"] ) + m_yOffset, atoi( attr["range"] ),
-                atoi( attr["priority"] ), m_curWindowId );
+                atoi( attr["priority"] ), attr["points"], m_curWindowId );
         m_data.m_listAnchor.push_back( anchor );
     }
 

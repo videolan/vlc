@@ -15,7 +15,7 @@ hppfile.write(
  * builder_data.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gen_builder.py,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: gen_builder.py,v 1.2 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -41,12 +41,12 @@ hppfile.write(
 #ifndef BUILDER_DATA_HPP
 #define BUILDER_DATA_HPP
 
-using namespace std;
-
 #include <vlc/vlc.h>
 #include <list>
 #include <map>
 #include <string>
+
+using namespace std;
 
 /// Structure for mapping data from XML file
 struct BuilderData

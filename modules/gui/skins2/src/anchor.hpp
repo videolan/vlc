@@ -2,7 +2,7 @@
  * anchor.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: anchor.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: anchor.hpp,v 1.2 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,6 +27,7 @@
 
 #include "skin_common.hpp"
 #include "generic_window.hpp"
+#include "../utils/bezier.hpp"
 
 
 /// Class for the windows anchors
@@ -34,9 +35,10 @@ class Anchor: public SkinObject
 {
     public:
         Anchor( intf_thread_t *pIntf, int xPos, int yPos, int range,
-                int priority, GenericWindow &rWindow ):
+                int priority, const Bezier &rCurve, GenericWindow &rWindow ):
             SkinObject( pIntf ), m_xPos( xPos ), m_yPos( yPos ),
-            m_range( range ), m_priority( priority ), m_rWindow( rWindow ) {}
+            m_rCurve( rCurve ), m_range( range ), m_priority( priority ),
+            m_rWindow( rWindow ) {}
         virtual ~Anchor() {}
 
         /// Return true if the given anchor is hanged by this one
@@ -56,6 +58,9 @@ class Anchor: public SkinObject
         /// doesn't "jump" in a strange way).
         bool canHang( const Anchor &rOther, int &xOffset, int &yOffset ) const;
 
+        // Indicate whether this anchor is reduced to a single point
+        bool isPoint() const { return m_rCurve.getNbCtrlPoints() == 1; }
+
         // Getters
         int getXPosAbs() const { return (m_xPos + m_rWindow.getLeft()); }
         int getYPosAbs() const { return (m_yPos + m_rWindow.getTop()); }
@@ -63,6 +68,9 @@ class Anchor: public SkinObject
     private:
         /// Coordinates relative to the window
         int m_xPos, m_yPos;
+
+        /// Curve of the anchor
+        const Bezier &m_rCurve;
 
         /// Range of action
         int m_range;

@@ -2,7 +2,7 @@
 -->
 
 
-<!ELEMENT Theme (ThemeInfo,(Bitmap|Font|Window|Event)*)>
+<!ELEMENT Theme (ThemeInfo,(Bitmap|Font|Window)*)>
     <!ATTLIST Theme
         version     CDATA   "1.0"
         magnet      CDATA   "15"
@@ -17,12 +17,6 @@
         id          CDATA   #REQUIRED
         file        CDATA   #REQUIRED
         alphacolor  CDATA   #REQUIRED
-    >
-<!ELEMENT Event EMPTY>
-    <!ATTLIST Event
-        id          CDATA   #REQUIRED
-        event       CDATA   #REQUIRED
-        key         CDATA   "none"
     >
 <!ELEMENT Font EMPTY>
     <!ATTLIST Font
@@ -61,7 +55,7 @@
         maxheight   CDATA   "-1"
     >
 <!ELEMENT Group (Group|Image|Button|Playlist|Slider|RadialSlider|Text|CheckBox|
-                 Rectangle|Anchor)+>
+                 Anchor)+>
     <!ATTLIST Group
         x           CDATA   "0"
         y           CDATA   "0"
@@ -73,6 +67,7 @@
         x           CDATA   "0"
         y           CDATA   "0"
         priority    CDATA   #REQUIRED
+        points      CDATA   "(0,0)"
         range       CDATA   "10"
     >
 
@@ -86,18 +81,6 @@
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
         image       CDATA   #REQUIRED
-        onclick     CDATA   "none"
-        help        CDATA   "\0"
-    >
-<!ELEMENT Rectangle EMPTY>
-    <!ATTLIST Rectangle
-        id          CDATA   "none"
-        visible     CDATA   "true"
-        x           CDATA   "0"
-        y           CDATA   "0"
-        w           CDATA   "50"
-        h           CDATA   "50"
-        color       CDATA   "#C0C0C0"
         onclick     CDATA   "none"
         help        CDATA   "\0"
     >

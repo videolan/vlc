@@ -2,7 +2,7 @@
  * theme.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.3 2004/02/08 11:23:17 gbazin Exp $
+ * $Id: theme.cpp,v 1.4 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -37,6 +37,7 @@ Theme::~Theme()
     m_fonts.clear();
     m_commands.clear();
     m_vars.clear();
+    m_curves.clear();
 }
 
 

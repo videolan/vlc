@@ -2,7 +2,7 @@
  * ctrl_slider.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_slider.hpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
+ * $Id: ctrl_slider.hpp,v 1.4 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -92,7 +92,7 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
         /// Current image
         OSGraphics *m_pImg;
         /// Bezier curve of the slider
-        const Bezier m_curve;
+        const Bezier &m_rCurve;
 
         /// Callback functions
         static void transOverDown( SkinObject *pCtrl );
@@ -133,7 +133,7 @@ class CtrlSliderBg: public CtrlGeneric
         /// Thickness of the curve
         int m_thickness;
         /// Bezier curve of the slider
-        const Bezier m_curve;
+        const Bezier &m_rCurve;
         /// Initial size of the control
         int m_width, m_height;
 

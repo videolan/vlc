@@ -2,7 +2,7 @@
  * bezier.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bezier.cpp,v 1.3 2004/02/01 21:13:04 ipkiss Exp $
+ * $Id: bezier.cpp,v 1.4 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -30,12 +30,12 @@ Bezier::Bezier( intf_thread_t *p_intf, const vector<float> &rAbscissas,
                 const vector<float> &rOrdinates, Flag_t flag )
     : SkinObject( p_intf )
 {
-    // We expect rAbscissas and rOrdinates to have the same size, of course
-    m_nbCtrlPt = rAbscissas.size();
-
     // Copy the control points coordinates
     m_ptx.assign( rAbscissas.begin(), rAbscissas.end() );
     m_pty.assign( rOrdinates.begin(), rOrdinates.end() );
+
+    // We expect m_ptx and m_pty to have the same size, of course
+    m_nbCtrlPt = m_ptx.size();
 
     // Precalculate the factoriels
     m_ft.push_back( 1 );
@@ -44,18 +44,16 @@ Bezier::Bezier( intf_thread_t *p_intf, const vector<float> &rAbscissas,
         m_ft.push_back( i * m_ft[i - 1] );
     }
 
-    // Initialization
-    int cx, cy, oldx, oldy;
-    m_leftVect.reserve( MAX_BEZIER_POINT + 1 );
-    m_topVect.reserve( MAX_BEZIER_POINT + 1 );
-
     // Calculate the first point
+    int oldx, oldy;
     computePoint( 0, oldx, oldy );
-    m_leftVect[0] = oldx;
-    m_topVect[0]  = oldy;
+    m_leftVect.push_back( oldx );
+    m_topVect.push_back( oldy );
+    m_percVect.push_back( 0 );
 
     // Calculate the other points
     float percentage;
+    int cx, cy;
     for( float j = 1; j <= MAX_BEZIER_POINT; j++ )
     {
         percentage = j / MAX_BEZIER_POINT;
@@ -71,9 +69,19 @@ Bezier::Bezier( intf_thread_t *p_intf, const vector<float> &rAbscissas,
             oldy = cy;
         }
     }
-    m_nbPoints = m_percVect.size();
+    m_nbPoints = m_leftVect.size();
 
-    // Small hack to ensure that the percentage of the last point is always 1
+    // If we have only one control point, we duplicate it
+    // This allows to simplify the algorithms used in the class
+    if( m_nbPoints == 1 )
+    {
+        m_leftVect.push_back( m_leftVect[0] );
+        m_topVect.push_back( m_topVect[0] );
+        m_percVect.push_back( 1 );
+        m_nbPoints = 2;
+   }
+
+    // Ensure that the percentage of the last point is always 1
     m_percVect[m_nbPoints - 1] = 1;
 }
 

@@ -2,7 +2,7 @@
  * ctrl_slider.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_slider.cpp,v 1.4 2004/02/29 16:49:55 asmax Exp $
+ * $Id: ctrl_slider.cpp,v 1.5 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -55,7 +55,7 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
     m_cmdUpOver( this, &transUpOver ), m_cmdMove( this, &transMove ),
     m_cmdScroll( this, &transScroll ),
     m_lastPercentage( 0 ), m_xOffset( 0 ), m_yOffset( 0 ),
-    m_pEvt( NULL ), m_curve( rCurve )
+    m_pEvt( NULL ), m_rCurve( rCurve )
 {
     // Build the images of the cursor
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
@@ -120,7 +120,7 @@ bool CtrlSliderCursor::mouseOver( int x, int y ) const
     {
         // Compute the position of the cursor
         int xPos, yPos;
-        m_curve.getPoint( m_rVariable.get(), xPos, yPos );
+        m_rCurve.getPoint( m_rVariable.get(), xPos, yPos );
 
         // Compute the resize factors
         float factorX, factorY;
@@ -144,7 +144,7 @@ void CtrlSliderCursor::draw( OSGraphics &rImage, int xDest, int yDest )
     {
         // Compute the position of the cursor
         int xPos, yPos;
-        m_curve.getPoint( m_rVariable.get(), xPos, yPos );
+        m_rCurve.getPoint( m_rVariable.get(), xPos, yPos );
 
         // Compute the resize factors
         float factorX, factorY;
@@ -181,7 +181,7 @@ void CtrlSliderCursor::transOverDown( SkinObject *pCtrl )
 
     // Compute the offset
     int tempX, tempY;
-    pThis->m_curve.getPoint( pThis->m_rVariable.get(), tempX, tempY );
+    pThis->m_rCurve.getPoint( pThis->m_rVariable.get(), tempX, tempY );
     pThis->m_xOffset = pEvtMouse->getXPos() - pPos->getLeft()
                        - (int)(tempX * factorX);
     pThis->m_yOffset = pEvtMouse->getYPos() - pPos->getTop()
@@ -244,10 +244,10 @@ void CtrlSliderCursor::transMove( SkinObject *pCtrl )
     int relYPond = (int)(relY / factorY);
 
     // Update the position
-    if( pThis->m_curve.getMinDist( relXPond, relYPond ) < RANGE )
+    if( pThis->m_rCurve.getMinDist( relXPond, relYPond ) < RANGE )
     {
-        float percentage = pThis->m_curve.getNearestPercent( relXPond,
-                                                             relYPond );
+        float percentage = pThis->m_rCurve.getNearestPercent( relXPond,
+                                                              relYPond );
         pThis->m_rVariable.set( percentage );
     }
     else
@@ -304,7 +304,7 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
                             int thickness, VarBool *pVisible,
                             const UString &rHelp ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_rCursor( rCursor ),
-    m_rVariable( rVariable ), m_thickness( thickness ), m_curve( rCurve ),
+    m_rVariable( rVariable ), m_thickness( thickness ), m_rCurve( rCurve ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() )
 {
 }
@@ -316,8 +316,8 @@ bool CtrlSliderBg::mouseOver( int x, int y ) const
     float factorX, factorY;
     getResizeFactors( factorX, factorY );
 
-    return (m_curve.getMinDist( (int)(x / factorX),
-                                (int)(y / factorY) ) < m_thickness );
+    return (m_rCurve.getMinDist( (int)(x / factorX),
+                                 (int)(y / factorY) ) < m_thickness );
 }
 
 
@@ -336,7 +336,7 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
         EvtMouse &rEvtMouse = (EvtMouse&)rEvent;
         int x = rEvtMouse.getXPos();
         int y = rEvtMouse.getYPos();
-        m_rVariable.set( m_curve.getNearestPercent(
+        m_rVariable.set( m_rCurve.getNearestPercent(
                             (int)((x - pPos->getLeft()) / factorX),
                             (int)((y - pPos->getTop()) / factorY) ) );
 

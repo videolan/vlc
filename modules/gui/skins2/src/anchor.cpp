@@ -2,7 +2,7 @@
  * anchor.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: anchor.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: anchor.cpp,v 1.2 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,20 +27,47 @@
 
 bool Anchor::isHanging( const Anchor &rOther ) const
 {
-    return (getXPosAbs() == rOther.getXPosAbs() &&
-            getYPosAbs() == rOther.getYPosAbs() &&
-            m_priority > rOther.m_priority );
+    if( m_priority <= rOther.m_priority )
+        return false;
+
+    // Compute delta coordinates between anchors, since the Bezier class
+    // uses coordinates relative to (0;0)
+    int deltaX = getXPosAbs() - rOther.getXPosAbs();
+    int deltaY = getYPosAbs() - rOther.getYPosAbs();
+
+    // One of the anchors (at least) must be a point, else it has no meaning
+    return (isPoint() && rOther.m_rCurve.getMinDist( deltaX, deltaY ) == 0) ||
+           (rOther.isPoint() && m_rCurve.getMinDist( -deltaX, -deltaY ) == 0);
 }
 
 
 bool Anchor::canHang( const Anchor &rOther, int &xOffset, int &yOffset ) const
 {
-    int xDist = getXPosAbs() - (rOther.getXPosAbs() + xOffset);
-    int yDist = getYPosAbs() - (rOther.getYPosAbs() + yOffset);
-    if( m_range > 0 && xDist*xDist + yDist*yDist <= m_range*m_range )
+    int deltaX = getXPosAbs() - (rOther.getXPosAbs() + xOffset);
+    int deltaY = getYPosAbs() - (rOther.getYPosAbs() + yOffset);
+
+    // One of the anchors (at least) must be a point, else it has no meaning
+    if( (isPoint() && rOther.m_rCurve.getMinDist( deltaX, deltaY ) < m_range) )
     {
-        xOffset = getXPosAbs() - rOther.getXPosAbs();
-        yOffset = getYPosAbs() - rOther.getYPosAbs();
+        // Compute the coordinates of the nearest point of the curve
+        int xx, yy;
+        float p = rOther.m_rCurve.getNearestPercent( deltaX, deltaY );
+        rOther.m_rCurve.getPoint( p, xx, yy );
+
+        xOffset = getXPosAbs() - (rOther.getXPosAbs() + xx);
+        yOffset = getYPosAbs() - (rOther.getYPosAbs() + yy);
+        return true;
+    }
+    else if( (rOther.isPoint() &&
+              m_rCurve.getMinDist( -deltaX, -deltaY ) < m_range) )
+    {
+        // Compute the coordinates of the nearest point of the curve
+        int xx, yy;
+        float p = m_rCurve.getNearestPercent( -deltaX, -deltaY );
+        m_rCurve.getPoint( p, xx, yy );
+
+        xOffset = (getXPosAbs() + xx) - rOther.getXPosAbs();
+        yOffset = (getYPosAbs() + yy) - rOther.getYPosAbs();
         return true;
     }
     else

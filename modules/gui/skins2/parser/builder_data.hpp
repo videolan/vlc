@@ -2,7 +2,7 @@
  * builder_data.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder_data.hpp,v 1.5 2004/02/29 16:49:55 asmax Exp $
+ * $Id: builder_data.hpp,v 1.6 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -116,13 +116,14 @@ m_id( id ), m_width( width ), m_height( height ), m_minWidth( minWidth ), m_maxW
     /// Type definition
     struct Anchor
     {
-        Anchor( int xPos, int yPos, int range, int priority, const string & windowId ):
-m_xPos( xPos ), m_yPos( yPos ), m_range( range ), m_priority( priority ), m_windowId( windowId ) {}
+        Anchor( int xPos, int yPos, int range, int priority, const string & points, const string & windowId ):
+m_xPos( xPos ), m_yPos( yPos ), m_range( range ), m_priority( priority ), m_points( points ), m_windowId( windowId ) {}
 
         int m_xPos;
         int m_yPos;
         int m_range;
         int m_priority;
+        const string m_points;
         const string m_windowId;
     };
     /// List

@@ -2,7 +2,7 @@
  * builder.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.cpp,v 1.8 2004/03/01 18:33:31 asmax Exp $
+ * $Id: builder.cpp,v 1.9 2004/03/02 21:45:15 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -182,8 +182,18 @@ void Builder::addAnchor( const BuilderData::Anchor &rData )
         return;
     }
 
+    Bezier *pCurve = getPoints( rData.m_points.c_str() );
+    if( pCurve == NULL )
+    {
+        msg_Err( getIntf(), "Invalid format in tag points=\"%s\"",
+                 rData.m_points.c_str() );
+        return;
+    }
+    m_pTheme->m_curves.push_back( BezierPtr( pCurve ) );
+
     Anchor *pAnc = new Anchor( getIntf(), rData.m_xPos, rData.m_yPos,
-                               rData.m_range, rData.m_priority, *pWin );
+                               rData.m_range, rData.m_priority,
+                               *pCurve, *pWin );
     pWin->addAnchor( pAnc );
 }
 
@@ -615,16 +625,18 @@ Bezier *Builder::getPoints( const char *pTag ) const
     int x, y, n;
     while( 1 )
     {
-        if( sscanf( pTag, "(%d,%d)%n", &x, &y, &n ) < 2 )
+        if( sscanf( pTag, "(%d,%d)%n", &x, &y, &n ) < 1 )
         {
             return NULL;
         }
+#if 0
         if( x < 0 || y < 0 )
         {
             msg_Err( getIntf(),
                      "Slider points cannot have negative coordinates!" );
             return NULL;
         }
+#endif
         xBez.push_back( x );
         yBez.push_back( y );
         pTag += n;
