@@ -74,13 +74,20 @@ typedef struct vout_sys_s
 {
     int i_width;
     int i_height;
+
     SDL_Surface *   p_display;                             /* display device */
     SDL_Overlay *   p_overlay;                             /* overlay device */
+
     boolean_t   b_fullscreen;
     boolean_t   b_overlay;
     boolean_t   b_cursor;
     boolean_t   b_reopen_display;
+
+    boolean_t   b_cursor_autohidden;
+    mtime_t     i_lastmoved;
+
     Uint8   *   p_sdl_buf[2];                          /* Buffer information */
+
 } vout_sys_t;
 
 /*****************************************************************************
@@ -158,6 +165,10 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     p_vout->p_sys->b_cursor = 1; /* TODO should be done with a main_GetInt.. */
+
+    p_vout->p_sys->b_cursor_autohidden = 0;
+    p_vout->p_sys->i_lastmoved = mdate();
+
     p_vout->p_sys->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
                                 VOUT_FULLSCREEN_DEFAULT );
     p_vout->p_sys->b_overlay = main_GetIntVariable( VOUT_OVERLAY_VAR,
@@ -262,7 +273,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
 static int vout_Manage( vout_thread_t *p_vout )
 {
     SDL_Event event;                                            /* SDL event */
-    Uint8   i_key;
+    Uint8     i_key;
 
     /* Process events */
     while( SDL_PollEvent(&event) )
@@ -273,6 +284,22 @@ static int vout_Manage( vout_thread_t *p_vout )
             p_vout->i_width = event.resize.w;
             p_vout->i_height = event.resize.h;
             p_vout->i_changes |= VOUT_SIZE_CHANGE;
+            break;
+
+        case SDL_MOUSEMOTION:
+            if( p_vout->p_sys->b_cursor &&
+                (abs(event.motion.xrel) > 2 || abs(event.motion.yrel) > 2) )
+            {
+                if( p_vout->p_sys->b_cursor_autohidden )
+                {
+                    p_vout->p_sys->b_cursor_autohidden = 0;
+                    SDL_ShowCursor( 1 );
+                }
+		else
+                {
+                    p_vout->p_sys->i_lastmoved = mdate();
+                }
+            }
             break;
 
         case SDL_MOUSEBUTTONUP:
@@ -385,20 +412,11 @@ static int vout_Manage( vout_thread_t *p_vout )
     {
         p_vout->p_sys->b_fullscreen = ! p_vout->p_sys->b_fullscreen;
 
-        if( p_vout->p_sys->b_fullscreen )
-        {
-            p_vout->p_sys->b_fullscreen = 0;
-            p_vout->p_sys->b_cursor = 1;
-            SDL_ShowCursor( 1 );
-        }
-        else
-        {
-            p_vout->p_sys->b_fullscreen = 1;
-            p_vout->p_sys->b_cursor = 0;
-            SDL_ShowCursor( 0 );
-        }
-
         SDL_WM_ToggleFullScreen(p_vout->p_sys->p_display);
+
+        p_vout->p_sys->b_cursor_autohidden = 0;
+        SDL_ShowCursor( p_vout->p_sys->b_cursor &&
+                        ! p_vout->p_sys->b_cursor_autohidden );
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
@@ -406,18 +424,21 @@ static int vout_Manage( vout_thread_t *p_vout )
     /*
      * Pointer change
      */
+    if( ! p_vout->p_sys->b_cursor_autohidden &&
+        ( mdate() - p_vout->p_sys->i_lastmoved > 2000000 ) )
+    {
+        /* Hide the mouse automatically */
+        p_vout->p_sys->b_cursor_autohidden = 1;
+        SDL_ShowCursor( 0 );
+    }
+
     if( p_vout->i_changes & VOUT_CURSOR_CHANGE )
     {
-        if( p_vout->p_sys->b_cursor )
-        {
-            SDL_ShowCursor( 0 );
-            p_vout->p_sys->b_cursor = 0;
-        }
-        else
-        {
-            SDL_ShowCursor( 1 );
-            p_vout->p_sys->b_cursor = 1;
-        }
+        p_vout->p_sys->b_cursor = ! p_vout->p_sys->b_cursor;
+
+        SDL_ShowCursor( p_vout->p_sys->b_cursor &&
+                        ! p_vout->p_sys->b_cursor_autohidden );
+
         p_vout->i_changes &= ~VOUT_CURSOR_CHANGE;
     }
     
@@ -541,20 +562,28 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
     flags = SDL_ANYFORMAT | SDL_HWPALETTE;
 
     if( p_vout->p_sys->b_fullscreen )
+    {
         flags |= SDL_FULLSCREEN;
+    }
     else
+    {
         flags |= SDL_RESIZABLE;
+    }
 
     if( p_vout->b_need_render )
+    {
         flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
+    }
     else
+    {
         flags |= SDL_SWSURFACE; /* save video memory */
+    }
 
     bpp = SDL_VideoModeOK( p_vout->p_sys->i_width,
                            p_vout->p_sys->i_height,
                            p_vout->i_screen_depth, flags );
 
-    if(bpp == 0)
+    if( bpp == 0 )
     {
         intf_ErrMsg( "vout error: no video mode available" );
         return( 1 );
@@ -570,12 +599,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    SDL_LockSurface(p_vout->p_sys->p_display);
-
-    if( p_vout->p_sys->b_fullscreen )
-        SDL_ShowCursor( 0 );
-    else
-        SDL_ShowCursor( 1 );
+    SDL_LockSurface( p_vout->p_sys->p_display );
 
     SDL_WM_SetCaption( VOUT_TITLE " (SDL output)",
                        VOUT_TITLE " (SDL output)" );

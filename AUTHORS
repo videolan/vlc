@@ -48,6 +48,10 @@ N: Jean-Philippe Grimaldi
 E: jeanphi@via.ecp.fr
 D: Bug fixes
 
+N: Shane Harper
+E: shanegh@optusnet.com.au
+D: SDL plugin fixes and enhancements
+
 N: Gaël Hendryckx
 E: jimmy@via.ecp.fr
 D: IDCT and YUV transformations
