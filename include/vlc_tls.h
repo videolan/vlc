@@ -21,6 +21,46 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef _VLC_TLS_H
+# define _VLC_TLS_H
+
+struct tls_t
+{
+    VLC_COMMON_MEMBERS
+
+    /* Module properties */
+    module_t  *p_module;
+    void *p_sys;
+
+    tls_server_t * (*pf_server_create) ( tls_t *, const char *, const char * );
+};
+
+struct tls_server_t
+{
+    tls_t *p_tls;
+    void *p_sys;
+
+    void (*pf_delete) ( tls_server_t * );
+    
+    int (*pf_add_CA) ( tls_server_t *, const char * );
+    int (*pf_add_CRL) ( tls_server_t *, const char * );
+    
+    tls_session_t * (*pf_session_prepare) ( tls_server_t * );
+};
+
+struct tls_session_t
+{
+    tls_t *p_tls;
+    tls_server_t *p_server;
+
+    void *p_sys;
+
+    tls_session_t * (*pf_handshake) ( tls_session_t *, int );
+    void (*pf_close) ( tls_session_t * );
+    int (*pf_send) ( tls_session_t *, const char *, int );
+    int (*pf_recv) ( tls_session_t *, char *, int );
+};
+
 
 /*****************************************************************************
  * tls_ServerCreate:
@@ -28,8 +68,7 @@
  * Allocates a whole server's TLS credentials.
  * Returns NULL on error.
  *****************************************************************************/
-VLC_EXPORT( tls_server_t *, tls_ServerCreate, ( vlc_object_t *, const char *, const char * ) );
-
+# define tls_ServerCreate( a, b, c ) (((tls_t *)a)->pf_server_create (a, b, c))
 
 /*****************************************************************************
  * tls_ServerAddCA:
@@ -37,7 +76,7 @@ VLC_EXPORT( tls_server_t *, tls_ServerCreate, ( vlc_object_t *, const char *, co
  * Adds one or more certificate authorities.
  * Returns -1 on error, 0 on success.
  *****************************************************************************/
-VLC_EXPORT( int, tls_ServerAddCA, ( tls_server_t *, const char * ) );
+# define tls_ServerAddCA( a, b ) (((tls_server_t *)a)->pf_add_CA (a, b))
 
 
 /*****************************************************************************
@@ -46,23 +85,20 @@ VLC_EXPORT( int, tls_ServerAddCA, ( tls_server_t *, const char * ) );
  * Adds a certificates revocation list to be sent to TLS clients.
  * Returns -1 on error, 0 on success.
  *****************************************************************************/
-VLC_EXPORT( int, tls_ServerAddCRL, ( tls_server_t *, const char * ) );
+# define tls_ServerAddCRL( a, b ) (((tls_server_t *)a)->pf_add_CRL (a, b))
 
 
-VLC_EXPORT( void, tls_ServerDelete, ( tls_server_t * ) );
+# define tls_ServerDelete( a ) (((tls_server_t *)a)->pf_delete ( a ))
 
 
-tls_session_t *
-tls_ServerSessionPrepare( const tls_server_t *p_server );
+# define tls_ServerSessionPrepare( a ) (((tls_server_t *)a)->pf_session_prepare (a))
 
-tls_session_t *
-tls_SessionHandshake( tls_session_t *p_session, int fd );
+# define tls_SessionHandshake( a, b ) (((tls_session_t *)a)->pf_handshake (a, b))
 
-void
-tls_SessionClose( tls_session_t *p_session );
+# define tls_SessionClose( a ) (((tls_session_t *)a)->pf_close (a))
 
-int
-tls_Send( tls_session_t *p_session, const char *buf, int i_length );
+# define tls_Send( a, b, c ) (((tls_session_t *)a)->pf_send (a, b, c ))
 
-int
-tls_Recv( tls_session_t *p_session, char *buf, int i_length );
+# define tls_Recv( a, b, c ) (((tls_session_t *)a)->pf_recv (a, b, c ))
+
+#endif
