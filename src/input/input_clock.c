@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.38 2003/07/27 14:10:02 massiot Exp $
+ * $Id: input_clock.c,v 1.39 2003/07/28 13:19:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -98,7 +98,8 @@ static mtime_t ClockToSysdate( input_thread_t * p_input,
         i_sysdate /= 1000;
         i_sysdate += (mtime_t)p_pgrm->sysdate_ref;
 
-        if ( i_sysdate < mdate() - CR_MAX_GAP )
+        if ( i_sysdate < mdate() - CR_MAX_GAP
+               || i_sysdate > mdate() + CR_MAX_GAP )
         {
             msg_Warn( p_input, "Bogus clock encountered, resetting" );
             ClockNewRef( p_pgrm, i_clock, i_sysdate = mdate() );
@@ -277,7 +278,7 @@ void input_ClockManageRef( input_thread_t * p_input,
         {
             /* Wait a while before delivering the packets to the decoder.
              * In case of multiple programs, we arbitrarily follow the
-             * clock of the first program. */
+             * clock of the selected program. */
             mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
 
             /* Now take into account interface changes. */
