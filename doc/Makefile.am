@@ -5,6 +5,7 @@ docdir = $(datadir)/doc/@PACKAGE@
 doc_DATA = \
 	bugreport-howto.txt \
 	fortunes.txt \
+	intf-cdda.txt \
 	intf-vcd.txt \
 	web-streaming.html \
 	vlc-howto.sgml \
