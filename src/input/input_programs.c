@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.19 2001/01/07 03:56:40 henri Exp $
+ * $Id: input_programs.c,v 1.20 2001/01/07 04:31:18 henri Exp $
  *
  * Authors:
  *
@@ -134,7 +134,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
     if( p_input->stream.pp_programs == NULL )
     {
         intf_ErrMsg( "Unable to realloc memory in input_AddProgram" );
-        return NULL;
+        return( NULL );
     }
     
     /* Allocate the structure to store this description */
@@ -143,7 +143,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
     if( p_input->stream.pp_programs[i_pgrm_index] == NULL )
     {
         intf_ErrMsg( "Unable to allocate memory in input_AddProgram" );
-        return NULL;
+        return( NULL );
     }
     
     /* Init this entry */
@@ -174,7 +174,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
         if( p_input->stream.pp_programs[i_pgrm_index]->p_demux_data == NULL )
         {
             intf_ErrMsg( "Unable to allocate memory in input_AddProgram" );
-            return NULL;
+            return( NULL );
         }
         memset( p_input->stream.pp_programs[i_pgrm_index]->p_demux_data, 0,
                 i_data_len );
@@ -272,7 +272,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     if( p_es == NULL )
     {
         intf_ErrMsg( "Unable to allocate memory in input_AddES" );
-        return NULL;
+        return( NULL);
     }
     p_input->stream.i_es_number++;
     p_input->stream.pp_es = realloc( p_input->stream.pp_es,
@@ -281,7 +281,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     if( p_input->stream.pp_es == NULL )
     {
         intf_ErrMsg( "Unable to realloc memory in input_AddES" );
-        return NULL;
+        return( NULL );
     }
     p_input->stream.pp_es[p_input->stream.i_es_number - 1] = p_es;
     p_es->i_id = i_es_id;
@@ -297,7 +297,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         if( p_es->p_demux_data == NULL )
         {
             intf_ErrMsg( "Unable to allocate memory in input_AddES" );
-            return NULL;
+            return( NULL );
         }
         memset( p_es->p_demux_data, 0, i_data_len );
     }
@@ -316,7 +316,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         if( p_pgrm->pp_es == NULL )
         {
             intf_ErrMsg( "Unable to realloc memory in input_AddES" );
-            return NULL;
+            return( NULL );
         }
         p_pgrm->pp_es[p_pgrm->i_es_number - 1] = p_es;
         p_es->p_pgrm = p_pgrm;
@@ -477,16 +477,17 @@ static vdec_config_t * GetVdecConfig( input_thread_t * p_input,
 {
     vdec_config_t *     p_config;
 
-    if( (p_config = (vdec_config_t *)malloc( sizeof(vdec_config_t) )) == NULL)
+    p_config = (vdec_config_t *)malloc( sizeof(vdec_config_t) );
+    if( p_config == NULL )
     {
         intf_ErrMsg( "Unable to allocate memory in GetVdecConfig" );
-        return NULL;
+        return( NULL );
     }
     p_config->p_vout = p_input->p_default_vout;
     if( InitDecConfig( p_input, p_es, &p_config->decoder_config ) == -1 )
     {
         free( p_config );
-        return NULL;
+        return( NULL );
     }
 
     return( p_config );
@@ -500,16 +501,17 @@ static adec_config_t * GetAdecConfig( input_thread_t * p_input,
 {
     adec_config_t *     p_config;
 
-    if ( (p_config = (adec_config_t *)malloc( sizeof(adec_config_t))) ==NULL )
+    p_config = (adec_config_t *)malloc( sizeof(adec_config_t));
+    if( p_config == NULL )
     {
         intf_ErrMsg( "Unable to allocate memory in GetAdecConfig" );
-        return NULL;
+        return( NULL );
     }
     p_config->p_aout = p_input->p_default_aout;
     if( InitDecConfig( p_input, p_es, &p_config->decoder_config ) == -1 )
     {
         free( p_config );
-        return NULL;
+        return( NULL );
     }
 
     return( p_config );

@@ -730,29 +730,29 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
  *****************************************************************************/
 void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-   vlc_mutex_lock( &p_vout->picture_lock );
+    vlc_mutex_lock( &p_vout->picture_lock );
 
 #ifdef DEBUG
-   /* Check if picture status is valid */
-   if( (p_pic->i_status != RESERVED_PICTURE) &&
-       (p_pic->i_status != RESERVED_DATED_PICTURE) &&
-       (p_pic->i_status != RESERVED_DISP_PICTURE) )
-   {
-       intf_DbgMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
-   }
+    /* Check if picture status is valid */
+    if( (p_pic->i_status != RESERVED_PICTURE) &&
+        (p_pic->i_status != RESERVED_DATED_PICTURE) &&
+        (p_pic->i_status != RESERVED_DISP_PICTURE) )
+    {
+        intf_DbgMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
+    }
 #endif
 
-   p_pic->i_status = DESTROYED_PICTURE;
-   p_vout->i_pictures--;
+    p_pic->i_status = DESTROYED_PICTURE;
+    p_vout->i_pictures--;
 
 #ifdef DEBUG_VOUT
-   intf_DbgMsg("picture %p", p_pic);
+    intf_DbgMsg("picture %p", p_pic);
 #endif
 
-   /* destroy the lock that had been initialized in CreatePicture */
-   vlc_mutex_destroy( &(p_pic->lock_deccount) );
+    /* destroy the lock that had been initialized in CreatePicture */
+    vlc_mutex_destroy( &(p_pic->lock_deccount) );
    
-   vlc_mutex_unlock( &p_vout->picture_lock );
+    vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
 /*****************************************************************************

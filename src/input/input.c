@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.66 2001/01/07 03:56:40 henri Exp $
+ * $Id: input.c,v 1.67 2001/01/07 04:31:18 henri Exp $
  *
  * Authors: 
  *
@@ -319,8 +319,8 @@ static void EndThread( input_thread_t * p_input )
     free( p_input->p_plugin );
 
     /* Destroy Mutex locks */
-    vlc_mutex_destroy( &p_input->stream.stream_lock );
     vlc_mutex_destroy( &p_input->stream.control.control_lock );
+    vlc_mutex_destroy( &p_input->stream.stream_lock );
     
     /* Free input structure */
     free( p_input );

@@ -152,7 +152,10 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
                                          char *psz_name, vlc_thread_func_t func,
                                          void *p_data)
 {
-#if defined(HAVE_CTHREADS_H)
+#if defined(HAVE_PTHREAD_H)
+    return pthread_create( p_thread, NULL, func, p_data );
+
+#elif defined(HAVE_CTHREADS_H)
     *p_thread = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
     return 0;
 
@@ -160,9 +163,6 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
     *p_thread = spawn_thread( (thread_func)func, psz_name,
                               B_NORMAL_PRIORITY, p_data );
     return resume_thread( *p_thread );
-
-#elif defined(HAVE_PTHREAD_H)
-    return pthread_create( p_thread, NULL, func, p_data );
 
 #endif
 }
@@ -281,7 +281,7 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 }
 
 /*****************************************************************************
- * vlc_mutex_destroy: destory a mutex
+ * vlc_mutex_destroy: destroy a mutex
  *****************************************************************************/
 static __inline__ int vlc_mutex_destroy( vlc_mutex_t *p_mutex )
 {
@@ -403,7 +403,7 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
 }
 
 /*****************************************************************************
- * vlc_cond_destory: destroy a condition
+ * vlc_cond_destroy: destroy a condition
  *****************************************************************************/
 static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
 {

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.62 2001/01/07 03:56:40 henri Exp $
+ * $Id: video_parser.c,v 1.63 2001/01/07 04:31:18 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -387,9 +387,9 @@ static void EndThread( vpar_thread_t *p_vpar )
 
 #ifdef VDEC_SMP
     /* Destroy lock and cond */
-    vlc_mutex_destroy( &(p_vpar->vfifo.lock) );
     vlc_mutex_destroy( &(p_vpar->vbuffer.lock) );
     vlc_cond_destroy( &(p_vpar->vfifo.wait) );
+    vlc_mutex_destroy( &(p_vpar->vfifo.lock) );
 #endif
     
     vlc_mutex_destroy( &(p_vpar->synchro.fifo_lock) );

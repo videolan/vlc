@@ -355,12 +355,12 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     free( p_aout->s32_buffer );
 
     /* Destroy the condition and mutex locks */
-    vlc_mutex_destroy( &p_aout->fifos_lock );
     for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
     {
         vlc_mutex_destroy( &p_aout->fifo[i_fifo].data_lock );
         vlc_cond_destroy( &p_aout->fifo[i_fifo].data_wait );
     }
+    vlc_mutex_destroy( &p_aout->fifos_lock );
     
     /* Free the structure */
     p_aout->p_sys_close( p_aout );
