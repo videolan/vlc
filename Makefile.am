@@ -237,7 +237,6 @@ EXTRA_DIST += \
 	evc/libvlc.vcp.in \
 	evc/vlc.vcp.in \
 	evc/plugins.vcp.in \
-	evc/vlc.c \
 	evc/errno.h \
 	evc/config.h.in \
 	evc/modules_builtin_evc.h \
