@@ -263,9 +263,9 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
 
     /* Add static entries */
     popupmenu.AppendSeparator();
-    popupmenu.Append( MenuDummy_Event, wxU("Open"),
+    popupmenu.Append( MenuDummy_Event, wxU(_("Open")),
                       OpenStreamMenu( p_intf ), wxT("") );
-    popupmenu.Append( MenuDummy_Event, wxU("Miscellaneous"),
+    popupmenu.Append( MenuDummy_Event, wxU(_("Miscellaneous")),
                       MiscMenu( p_intf ), wxT("") );
 
     p_intf->p_sys->p_popup_menu = &popupmenu;
