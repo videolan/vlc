@@ -80,7 +80,8 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 Win32Factory::Win32Factory( intf_thread_t *pIntf ):
     OSFactory( pIntf ), TransparentBlt( NULL ), AlphaBlend( NULL ),
-    SetLayeredWindowAttributes( NULL ), m_dirSep( "\\" )
+    SetLayeredWindowAttributes( NULL ), m_hParentWindow( NULL ),
+    m_dirSep( "\\" )
 {
     // see init()
 }
@@ -178,8 +179,12 @@ bool Win32Factory::init()
     }
 
     // Initialize the resource path
+    m_resourcePath.push_back( (string)getIntf()->p_vlc->psz_homedir +
+                               "\\" + CONFIG_DIR + "\\skins2" );
     m_resourcePath.push_back( (string)getIntf()->p_libvlc->psz_vlcpath +
                               "\\skins2" );
+    m_resourcePath.push_back( (string)getIntf()->p_libvlc->psz_vlcpath +
+                              "\\share\\skins2" );
 
     // All went well
     return true;
@@ -190,6 +195,8 @@ Win32Factory::~Win32Factory()
 {
     // Uninitialize the OLE library
     OleUninitialize();
+
+    if( m_hParentWindow ) DestroyWindow( m_hParentWindow );
 
     // Unload msimg32.dll and user32.dll
     if( m_hMsimg32 )

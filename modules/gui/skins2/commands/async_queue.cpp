@@ -2,7 +2,7 @@
  * async_queue.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: async_queue.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -40,6 +40,7 @@ AsyncQueue::AsyncQueue( intf_thread_t *pIntf ): SkinObject( pIntf )
 
 AsyncQueue::~AsyncQueue()
 {
+    delete( m_pTimer );
 }
 
 

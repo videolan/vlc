@@ -166,7 +166,7 @@ static void Run( intf_thread_t *p_intf )
     ThemeLoader *pLoader = new ThemeLoader( p_intf );
     char *skin_last = config_GetPsz( p_intf, "skins2-last" );
 
-    if( skin_last == NULL || !pLoader->load( skin_last ) )
+    if( !skin_last || !*skin_last || !pLoader->load( skin_last ) )
     {
         // Get the resource path and try to load the default skin
         OSFactory *pOSFactory = OSFactory::instance( p_intf );
@@ -219,16 +219,7 @@ static void Run( intf_thread_t *p_intf )
                                            FIND_ANYWHERE );
         if( p_playlist )
         {
-            vlc_mutex_lock( &p_playlist->object_lock );
-            if( p_playlist->i_size )
-            {
-                vlc_mutex_unlock( &p_playlist->object_lock );
-                playlist_Play( p_playlist );
-            }
-            else
-            {
-                vlc_mutex_unlock( &p_playlist->object_lock );
-            }
+            playlist_Play( p_playlist );
             vlc_object_release( p_playlist );
         }
     }
