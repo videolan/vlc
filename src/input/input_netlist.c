@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.21 2000/12/22 13:04:45 sam Exp $
+ * $Id: input_netlist.c,v 1.22 2000/12/27 18:35:45 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -313,7 +313,7 @@ struct pes_packet_s * input_NetlistNewPES( void * p_method_data )
     p_return->b_messed_up = 
         p_return->b_data_alignment = 
         p_return->b_discontinuity = 
-        p_return->b_has_pts = 0;
+        p_return->i_pts = p_return->i_dts = 0;
     p_return->i_pes_size = 0;
     p_return->p_first = NULL;
    

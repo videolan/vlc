@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.21 2000/12/22 13:04:44 sam Exp $
+ * $Id: ac3_decoder_thread.c,v 1.22 2000/12/27 18:35:45 massiot Exp $
  *
  * Authors:
  *
@@ -229,10 +229,10 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
             p_ac3dec->sync_ptr = 0;
         }
 
-        if (DECODER_FIFO_START(*p_ac3dec->p_fifo)->b_has_pts)
+        if (DECODER_FIFO_START(*p_ac3dec->p_fifo)->i_pts)
         {
             p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(*p_ac3dec->p_fifo)->i_pts;
-            DECODER_FIFO_START(*p_ac3dec->p_fifo)->b_has_pts = 0;
+            DECODER_FIFO_START(*p_ac3dec->p_fifo)->i_pts = 0;
         }
         else
         {

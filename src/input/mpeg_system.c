@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.19 2000/12/26 19:14:47 massiot Exp $
+ * $Id: mpeg_system.c,v 1.20 2000/12/27 18:35:45 massiot Exp $
  *
  * Authors: 
  *
@@ -186,11 +186,12 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             {
                 /* MPEG-2 : the PES header contains at least 3 more bytes. */
                 size_t      i_max_len;
+                boolean_t   b_has_pts, b_has_dts;
+                byte_t      p_full_header[12];
 
                 p_pes->b_data_alignment = p_header[6] & 0x04;
 
-                /* Re-use p_header buffer now that we don't need it. */
-                i_max_len = MoveChunk( p_header, &p_data, &p_byte, 7 );
+                i_max_len = MoveChunk( p_full_header, &p_data, &p_byte, 12 );
                 if( i_max_len < 2 )
                 {
                     intf_WarnMsg( 3,
@@ -201,11 +202,12 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     return;
                 }
 
-                p_pes->b_has_pts = p_header[0] & 0x80;
-                i_pes_header_size = p_header[1] + 9;
+                b_has_pts = p_full_header[0] & 0x80;
+                b_has_dts = p_full_header[0] & 0x40;
+                i_pes_header_size = p_full_header[1] + 9;
 
                 /* Now parse the optional header extensions */
-                if( p_pes->b_has_pts )
+                if( b_has_pts )
                 {
                     if( i_max_len < 7 )
                     {
@@ -218,15 +220,37 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         return;
                     }
                     p_pes->i_pts =
-                      ( ((mtime_t)(p_header[2] & 0x0E) << 29) |
-                        (((mtime_t)U16_AT(p_header + 3) << 14) - (1 << 14)) |
-                        ((mtime_t)U16_AT(p_header + 5) >> 1) ) * 300;
+                    ( ((mtime_t)(p_full_header[2] & 0x0E) << 29) |
+                      (((mtime_t)U16_AT(p_full_header + 3) << 14) - (1 << 14)) |
+                      ((mtime_t)U16_AT(p_full_header + 5) >> 1) ) * 300;
                     p_pes->i_pts /= 27;
+
+                    if( b_has_dts )
+                    {
+                        if( i_max_len < 12 )
+                        {
+                            intf_WarnMsg( 3,
+                              "PES packet too short to have a MPEG-2 header" );
+                            p_input->p_plugin->pf_delete_pes(
+                                    p_input->p_method_data,
+                                    p_pes );
+                            p_pes = NULL;
+                            return;
+                        }
+                        p_pes->i_dts =
+                        ( ((mtime_t)(p_full_header[7] & 0x0E) << 29) |
+                          (((mtime_t)U16_AT(p_full_header + 10) << 14)
+                                - (1 << 14)) |
+                          ((mtime_t)U16_AT(p_full_header + 12) >> 1) ) * 300;
+                        p_pes->i_dts /= 27;
+                    }
                 }
             }
             else
             {
                 /* Probably MPEG-1 */
+                boolean_t       b_has_pts, b_has_dts;
+
                 i_pes_header_size = 6;
                 p_data = p_pes->p_first;
                 p_byte = p_data->p_payload_start;
@@ -272,18 +296,15 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
 
                 i_pes_header_size++;
 
-                if( *p_byte & 0x10 )
+                b_has_pts = *p_byte & 0x20;
+                b_has_dts = *p_byte & 0x10;
+
+                if( b_has_pts )
                 {
-                    /* DTS */
-                    i_pes_header_size += 5;
-                }
-                if( (p_pes->b_has_pts = (*p_byte & 0x20)) )
-                {
-                    /* PTS */
-                    byte_t      p_pts[5];
+                    byte_t      p_ts[5];
 
                     i_pes_header_size += 4;
-                    if( MoveChunk( p_pts, &p_data, &p_byte, 5 ) != 5 )
+                    if( MoveChunk( p_ts, &p_data, &p_byte, 5 ) != 5 )
                     {
                         intf_WarnMsg( 3,
                             "PES packet too short to have a MPEG-1 header" );
@@ -294,31 +315,54 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     }
 
                     p_pes->i_pts =
-                      ( ((mtime_t)(p_pts[0] & 0x0E) << 29) |
-                        (((mtime_t)U16_AT(p_pts + 1) << 14) - (1 << 14)) |
-                        ((mtime_t)U16_AT(p_pts + 3) >> 1) ) * 300;
+                      ( ((mtime_t)(p_ts[0] & 0x0E) << 29) |
+                        (((mtime_t)U16_AT(p_ts + 1) << 14) - (1 << 14)) |
+                        ((mtime_t)U16_AT(p_ts + 3) >> 1) ) * 300;
                     p_pes->i_pts /= 27;
+
+                    if( b_has_dts )
+                    {
+                        i_pes_header_size += 5;
+                        if( MoveChunk( p_ts, &p_data, &p_byte, 5 ) != 5 )
+                        {
+                            intf_WarnMsg( 3,
+                              "PES packet too short to have a MPEG-1 header" );
+                            p_input->p_plugin->pf_delete_pes(
+                                    p_input->p_method_data, p_pes );
+                            p_pes = NULL;
+                            return;
+                        }
+
+                        p_pes->i_dts =
+                            ( ((mtime_t)(p_ts[0] & 0x0E) << 29) |
+                              (((mtime_t)U16_AT(p_ts + 1) << 14) - (1 << 14)) |
+                              ((mtime_t)U16_AT(p_ts + 3) >> 1) ) * 300;
+                        p_pes->i_dts /= 27;
+                    }
                 }
             }
 
             /* PTS management */
-            if( p_pes->b_has_pts )
+            if( p_pes->i_pts )
             {
                 //intf_Msg("%lld", p_pes->i_pts);
                 switch( p_es->p_pgrm->i_synchro_state )
                 {
                 case SYNCHRO_NOT_STARTED:
                 case SYNCHRO_START:
-                    p_pes->b_has_pts = 0;
+                    p_pes->i_pts = p_pes->i_dts = 0;
                     break;
 
                 case SYNCHRO_REINIT: /* We skip a PES | Why ?? --Meuuh */
-                    p_pes->b_has_pts = 0;
+                    p_pes->i_pts = p_pes->i_dts = 0;
                     p_es->p_pgrm->i_synchro_state = SYNCHRO_START;
                     break;
 
                 case SYNCHRO_OK:
                     p_pes->i_pts += p_es->p_pgrm->delta_cr
+                                         + p_es->p_pgrm->delta_absolute
+                                         + DEFAULT_PTS_DELAY;
+                    p_pes->i_dts += p_es->p_pgrm->delta_cr
                                          + p_es->p_pgrm->delta_absolute
                                          + DEFAULT_PTS_DELAY;
                     break;

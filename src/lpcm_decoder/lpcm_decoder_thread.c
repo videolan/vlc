@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.6 2000/12/22 13:04:45 sam Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.7 2000/12/27 18:35:45 massiot Exp $
  *
  * Authors:
  *
@@ -179,10 +179,10 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
             /* have to find a synchro point */
         }
     
-        if (DECODER_FIFO_START(*p_lpcmdec->p_fifo)->b_has_pts)
+        if (DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts)
         {
 	        p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts;
-	        DECODER_FIFO_START(*p_lpcmdec->p_fifo)->b_has_pts = 0;
+	        DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts = 0;
         }
         else
         {

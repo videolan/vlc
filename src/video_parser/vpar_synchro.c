@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.65 2000/12/27 18:09:02 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.66 2000/12/27 18:35:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -482,7 +482,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
 
     if( i_coding_type == B_CODING_TYPE )
     {
-        if( p_pes->b_has_pts )
+        if( p_pes->i_pts )
         {
             if( p_pes->i_pts < p_vpar->synchro.current_pts )
             {
@@ -490,7 +490,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
                         "vpar synchro warning: pts_date < current_date" );
             }
             p_vpar->synchro.current_pts = p_pes->i_pts;
-            p_pes->b_has_pts = 0;
+            p_pes->i_pts = 0;
         }
         else
         {
@@ -516,11 +516,11 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
             p_vpar->synchro.backward_pts = 0;
         }
 
-        if( p_pes->b_has_pts )
+        if( p_pes->i_pts )
         {
             /* Store the PTS for the next time we have to date an I picture. */
             p_vpar->synchro.backward_pts = p_pes->i_pts;
-            p_pes->b_has_pts = 0;
+            p_pes->i_pts = 0;
         }
     }
 

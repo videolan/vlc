@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.14 2000/12/27 09:54:53 sam Exp $
+ * $Id: input_ps.c,v 1.15 2000/12/27 18:35:45 massiot Exp $
  *
  * Authors: 
  *
@@ -442,7 +442,7 @@ static pes_packet_t * NewPES( void * p_garbage )
     }
 
     p_pes->b_messed_up = p_pes->b_data_alignment = p_pes->b_discontinuity =
-        p_pes->b_has_pts = 0;
+        p_pes->i_pts = p_pes->i_dts = 0;
     p_pes->i_pes_size = 0;
     p_pes->p_first = NULL;
 

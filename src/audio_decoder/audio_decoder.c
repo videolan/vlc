@@ -2,7 +2,7 @@
  * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.c,v 1.42 2000/12/22 13:04:44 sam Exp $
+ * $Id: audio_decoder.c,v 1.43 2000/12/27 18:35:45 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -217,11 +217,11 @@ static void RunThread (adec_thread_t * p_adec)
 
         }
 
-        if( DECODER_FIFO_START( *p_adec->p_fifo)->b_has_pts )
+        if( DECODER_FIFO_START( *p_adec->p_fifo)->i_pts )
         {
             p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
                 DECODER_FIFO_START( *p_adec->p_fifo )->i_pts;
-            DECODER_FIFO_START(*p_adec->p_fifo)->b_has_pts = 0;
+            DECODER_FIFO_START(*p_adec->p_fifo)->i_pts = 0;
         }
         else
         {
