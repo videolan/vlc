@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.20 2004/02/10 20:28:37 jpsaman Exp $
+ * $Id: pda.c,v 1.21 2004/02/13 10:09:46 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -306,6 +306,10 @@ static void Run( intf_thread_t *p_intf )
     /* END OF PLAYLIST GTK_TREE_VIEW */
 
     /* Hide the Preference TAB for now. */
+    GtkWidget *p_preference_tab = NULL;
+    p_preference_tab = gtk_notebook_get_nth_page(p_intf->p_sys->p_notebook,5);
+    if (p_preference_tab != NULL)
+      gtk_widget_hide(p_preference_tab);
 
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );

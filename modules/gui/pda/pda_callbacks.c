@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.27 2004/02/10 20:28:37 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.28 2004/02/13 10:09:46 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -870,7 +870,7 @@ void onDeletePlaylist(GtkButton *button, gpointer user_data)
 #if 0 
             g_list_foreach (p_rows, (GFunc*)gtk_tree_path_free, NULL);
 #endif /* Testing the next line */
-            g_list_foreach (p_rows, (GFunc*)deleteItemFromPlaylist, NULL);
+            g_list_foreach (p_rows, deleteItemFromPlaylist, NULL);
             g_list_free (p_rows);
         }
 
