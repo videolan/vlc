@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.90 2004/02/22 16:08:47 fenrir Exp $
+ * $Id: input_dec.c,v 1.91 2004/02/25 12:38:33 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -96,34 +96,17 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     vlc_value_t    val;
 
     /* If we are in sout mode, search for packetizer module */
-    var_Get( p_input, "sout", &val );
-    if( !p_es->b_force_decoder && val.psz_string && *val.psz_string )
+    if( !p_es->b_force_decoder && p_input->stream.p_sout )
     {
-        free( val.psz_string );
-        val.b_bool = VLC_TRUE;
-
-        if( p_es->i_cat == AUDIO_ES )
+        /* Create the decoder configuration structure */
+        p_dec = CreateDecoder( p_input, p_es, VLC_OBJECT_PACKETIZER );
+        if( p_dec == NULL )
         {
-            var_Get( p_input, "sout-audio", &val );
-        }
-        else if( p_es->i_cat == VIDEO_ES )
-        {
-            var_Get( p_input, "sout-video", &val );
+            msg_Err( p_input, "could not create packetizer" );
+            return NULL;
         }
 
-        if( val.b_bool )
-        {
-            /* Create the decoder configuration structure */
-            p_dec = CreateDecoder( p_input, p_es, VLC_OBJECT_PACKETIZER );
-            if( p_dec == NULL )
-            {
-                msg_Err( p_input, "could not create packetizer" );
-                return NULL;
-            }
-
-            p_dec->p_module =
-                module_Need( p_dec, "packetizer", "$packetizer" );
-        }
+        p_dec->p_module = module_Need( p_dec, "packetizer", "$packetizer" );
     }
     else
     {
@@ -137,11 +120,9 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 
         /* default Get a suitable decoder module */
         p_dec->p_module = module_Need( p_dec, "decoder", "$codec" );
-
-        if( val.psz_string ) free( val.psz_string );
     }
 
-    if( !p_dec || !p_dec->p_module )
+    if( !p_dec->p_module )
     {
         msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
                  "VLC probably does not support this sound or video format.",
