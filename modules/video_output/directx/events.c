@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.6 2002/10/25 18:17:59 sam Exp $
+ * $Id: events.c,v 1.7 2002/11/22 15:24:10 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -324,6 +324,10 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                       GCL_HBRBACKGROUND, (LONG)p_vout->p_sys->hbrush );
         SetClassLong( p_vout->p_sys->hwnd,
                       GCL_HCURSOR, (LONG)LoadCursor(NULL, IDC_ARROW) );
+        /* Store a p_vout pointer into the window local storage (for later
+         * use in DirectXEventProc). */
+        SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)p_vout );
+
         p_vout->p_sys->pf_wndproc =
                (WNDPROC)SetWindowLong( p_vout->p_sys->hwnd,
                                        GWL_WNDPROC, (LONG)DirectXEventProc );
@@ -407,7 +411,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                     NULL,                                /* no parent window */
                     NULL,                          /* no menu in this window */
                     hInstance,            /* handle of this program instance */
-                    NULL);                        /* no additional arguments */
+                    (LPVOID)p_vout );            /* send p_vout to WM_CREATE */
 
         if( !p_vout->p_sys->hwnd )
         {
@@ -415,11 +419,6 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
             return VLC_EGENERIC;
         }
     }
-
-    /* Store a p_vout pointer into the window local storage (for later use
-     * in DirectXEventProc).
-     * We need to use SetWindowLongPtr when it is available in mingw */
-    SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)p_vout );
 
     /* Append a "Always On Top" entry in the system menu */
     hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
@@ -587,13 +586,17 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
 static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
                                          WPARAM wParam, LPARAM lParam )
 {
-    vout_thread_t *p_vout =
-            (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
+    vout_thread_t *p_vout;
 
-    /* Just in case the window wasn't properly initialized yet */
-    if( !p_vout )
+    if( message == WM_CREATE )
     {
-        return DefWindowProc( hwnd, message, wParam, lParam );
+        /* Store p_vout for future use */
+        p_vout = (vout_thread_t *)((CREATESTRUCT *)lParam)->lpCreateParams;
+        SetWindowLong( hWnd, GWL_USERDATA, (LONG)p_vout );
+    }
+    else
+    {
+        p_vout = (vout_thread_t *)GetWindowLong( hWnd, GWL_USERDATA );
     }
 
     switch( message )
