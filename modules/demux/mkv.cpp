@@ -1420,14 +1420,15 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
 #endif
 
+		// TODO implement correct timestamping when B frames are used
         if( tk.fmt.i_cat != VIDEO_ES )
         {
             p_block->i_dts = p_block->i_pts = i_pts;
         }
         else
         {
-            p_block->i_pts = i_pts;
-            p_block->i_dts = 0;
+            p_block->i_dts = i_pts;
+            p_block->i_pts = 0;
         }
 
         if( tk.fmt.i_cat == SPU_ES && strcmp( tk.psz_codec, "S_VOBSUB" ) )
