@@ -198,6 +198,7 @@ static int SatelliteOpen( input_thread_t * p_input )
             break;
         default:
             /* cannot happen */
+            break;
     }
 
 
