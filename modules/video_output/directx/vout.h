@@ -49,6 +49,7 @@ struct vout_sys_t
     HWND                 hwnd;                  /* Handle of the main window */
     HWND                 hvideownd;        /* Handle of the video sub-window */
     HWND                 hparent;             /* Handle of the parent window */
+    HWND                 hfswnd;          /* Handle of the fullscreen window */
     WNDPROC              pf_wndproc;             /* Window handling callback */
 
     /* Multi-monitor support */

@@ -103,7 +103,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->p_current_surface = NULL;
     p_vout->p_sys->p_clipper = NULL;
     p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
-    p_vout->p_sys->hparent = NULL;
+    p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;
     p_vout->p_sys->i_changes = 0;
     p_vout->p_sys->b_wallpaper = 0;
     vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
@@ -307,63 +307,82 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE
         || p_vout->p_sys->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
-        int i_style = 0;
         vlc_value_t val;
+        HWND hwnd = (p_vout->p_sys->hparent && p_vout->p_sys->hfswnd) ?
+            p_vout->p_sys->hfswnd : p_vout->p_sys->hwnd;
 
         p_vout->b_fullscreen = ! p_vout->b_fullscreen;
 
         /* We need to switch between Maximized and Normal sized window */
         window_placement.length = sizeof(WINDOWPLACEMENT);
+        GetWindowPlacement( hwnd, &window_placement );
         if( p_vout->b_fullscreen )
         {
+            /* Change window style, no borders and no title bar */
+            int i_style = WS_CLIPCHILDREN | WS_VISIBLE;
+            SetWindowLong( hwnd, GWL_STYLE, i_style );
+
             if( p_vout->p_sys->hparent )
             {
-                POINT point;
-
-                /* Retrieve the window position */
-                point.x = point.y = 0;
+                /* Retrieve current window position so fullscreen will happen
+                 * on the right screen */
+                POINT point = {0,0};
+                RECT rect;
                 ClientToScreen( p_vout->p_sys->hwnd, &point );
-                SetParent( p_vout->p_sys->hwnd, GetDesktopWindow() );
-                SetWindowPos( p_vout->p_sys->hwnd, 0, point.x, point.y, 0, 0,
-                              SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
-                SetForegroundWindow( p_vout->p_sys->hwnd );
+                GetClientRect( p_vout->p_sys->hwnd, &rect );
+                SetWindowPos( hwnd, 0, point.x, point.y,
+                              rect.right, rect.bottom,
+                              SWP_NOZORDER|SWP_FRAMECHANGED );
+                GetWindowPlacement( hwnd, &window_placement );
             }
 
-            /* Maximized window */
-            GetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
+            /* Maximize window */
             window_placement.showCmd = SW_SHOWMAXIMIZED;
-            /* Change window style, no borders and no title bar */
-            i_style = WS_CLIPCHILDREN | WS_VISIBLE | WS_POPUP;
+            SetWindowPlacement( hwnd, &window_placement );
+            SetWindowPos( hwnd, 0, 0, 0, 0, 0,
+                          SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED);
+
+            if( p_vout->p_sys->hparent )
+            {
+                RECT rect;
+                GetClientRect( hwnd, &rect );
+                SetParent( p_vout->p_sys->hwnd, hwnd );
+                SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
+                              rect.right, rect.bottom,
+                              SWP_NOZORDER|SWP_FRAMECHANGED );
+            }
+
+            SetForegroundWindow( hwnd );
         }
         else
         {
-            if( p_vout->p_sys->hparent )
-            {
-                SetParent( p_vout->p_sys->hwnd, p_vout->p_sys->hparent );
-                SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0, 0, 0,
-                              SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
-                i_style = WS_CLIPCHILDREN | WS_VISIBLE | WS_CHILD;
-                SetForegroundWindow( p_vout->p_sys->hparent );
-            }
-            else
-            {
-                i_style = WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW |
-                          WS_SIZEBOX | WS_VISIBLE;
-            }
+            /* Change window style, no borders and no title bar */
+            int i_style = WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW |
+                WS_SIZEBOX | WS_VISIBLE;
+            SetWindowLong( hwnd, GWL_STYLE, i_style );
 
             /* Normal window */
-            GetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
             window_placement.showCmd = SW_SHOWNORMAL;
+            SetWindowPlacement( hwnd, &window_placement );
+            SetWindowPos( hwnd, 0, 0, 0, 0, 0,
+                          SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED);
+
+            if( p_vout->p_sys->hparent )
+            {
+                RECT rect;
+                GetClientRect( p_vout->p_sys->hparent, &rect );
+                SetParent( p_vout->p_sys->hwnd, p_vout->p_sys->hparent );
+                SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
+                              rect.right, rect.bottom,
+                              SWP_NOZORDER|SWP_FRAMECHANGED );
+
+                ShowWindow( hwnd, SW_HIDE );
+                SetForegroundWindow( p_vout->p_sys->hparent );
+            }
 
             /* Make sure the mouse cursor is displayed */
             PostMessage( p_vout->p_sys->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
         }
-
-        /* Change window style, borders and title bar */
-        SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE, i_style );
-        SetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
-        SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0, 0, 0,
-                      SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
 
         /* Update the object variable and trigger callback */
         val.b_bool = p_vout->b_fullscreen;
