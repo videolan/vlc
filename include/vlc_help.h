@@ -2,7 +2,7 @@
  * vlc_help.h: Help strings
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_help.h,v 1.8 2004/02/06 03:52:09 hartman Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Anil Daoud <anil@videolan.org>
@@ -73,6 +73,9 @@
 #define DEMUX_TITLE N_("Demuxers settings")
 #define DEMUX_HELP N_( "These settings affect demuxer modules.")
 
+#define DEMUX2_TITLE N_("Demuxers settings (new generation)")
+#define DEMUX2_HELP N_("These settings affect new generation demuxer modules.")
+
 #define INTERFACE_TITLE N_("Interface plugins settings")
 #define INTERFACE_HELP  N_( \
     "Interface plugins can be enabled in the Interface section and " \
@@ -133,6 +136,8 @@ static char * GetCapabilityHelp( char *psz_capability, int i_type)
         return i_type == 1 ? DECODER_TITLE : DECODER_HELP;
     if( !strcasecmp(psz_capability,"demux") )
         return i_type == 1 ? DEMUX_TITLE : DEMUX_HELP;
+    if( !strcasecmp(psz_capability,"demux2") )
+        return i_type == 1 ? DEMUX2_TITLE : DEMUX2_HELP;
     if( !strcasecmp(psz_capability,"interface") )
         return i_type == 1 ? INTERFACE_TITLE : INTERFACE_HELP;
     if( !strcasecmp(psz_capability,"sout access") )
