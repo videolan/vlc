@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.132 2001/06/14 01:49:44 sam Exp $
+ * $Id: video_output.c,v 1.133 2001/07/10 06:07:53 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -212,6 +212,10 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     /* Initialize buffer index */
     p_vout->i_buffer_index      = 0;
 
+    /* Initialize fonts */
+    p_vout->p_default_font = NULL;
+    p_vout->p_large_font = NULL;
+
     /* Initialize pictures and subpictures - translation tables and functions
      * will be initialized later in InitThread */
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
@@ -237,16 +241,10 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
                            (void *) RunThread, (void *) p_vout) )
     {
         intf_ErrMsg("vout error: %s", strerror(ENOMEM));
-        vout_UnloadFont( p_vout->p_default_font );
-        vout_UnloadFont( p_vout->p_large_font );
-        p_vout->pf_destroy( p_vout );
+        module_Unneed( p_vout->p_module );
         free( p_vout );
         return( NULL );
     }
-
-    intf_WarnMsg( 1, "vout: video display initialized (%dx%d, %d/%d bpp)",
-              p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-              p_vout->i_bytes_per_pixel * 8 );
 
     /* If status is NULL, wait until the thread is created */
     if( pi_status == NULL )
@@ -880,10 +878,16 @@ static int InitThread( vout_thread_t *p_vout )
      * own error messages */
     if( p_vout->pf_create( p_vout ) )
     {
-        module_Unneed( p_vout->p_module );
-        free( p_vout );
+        /* If pf_create has failed then we have to make sure
+	 * pf_destroy won't be called, because the plugin should have
+	 * cleaned up all its mess */
+        p_vout->pf_destroy = NULL;
         return( 1 );
     }
+
+    intf_WarnMsg( 1, "vout: video display initialized (%dx%d, %d/%d bpp)",
+              p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
+              p_vout->i_bytes_per_pixel * 8 );
 
     intf_WarnMsg( 3, "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
                   "masks: 0x%x/0x%x/0x%x",
@@ -920,9 +924,13 @@ static int InitThread( vout_thread_t *p_vout )
         intf_ErrMsg( "vout error: could not load large font" );
     }
 
-    /* Initialize output method - this function issues its own error messages */
+    /* Initialize output method. This function issues its own error messages */
     if( p_vout->pf_init( p_vout ) )
     {
+        /* If pf_init has failed then we have to make sure
+	 * pf_destroy won't be called, because the plugin should have
+	 * cleaned up all its mess */
+        p_vout->pf_destroy = NULL;
         return( 1 );
     }
 
@@ -930,6 +938,9 @@ static int InitThread( vout_thread_t *p_vout )
     if( vout_InitYUV( p_vout ) )
     {
         intf_ErrMsg("vout error: can't allocate YUV translation tables");
+        p_vout->pf_destroy( p_vout );
+        /* Make sure pf_destroy won't be called again */
+        p_vout->pf_destroy = NULL;
         return( 1 );
     }
 
@@ -965,13 +976,12 @@ static void RunThread( vout_thread_t *p_vout)
     /*
      * Initialize thread
      */
-    p_vout->b_error = InitThread( p_vout );
-    if( p_vout->b_error )
+    if( InitThread( p_vout ) )
     {
+        /* Something bad happened */
         DestroyThread( p_vout, THREAD_ERROR );
         return;
     }
-
     /*
      * Main loop - it is not executed if an error occured during
      * initialization
@@ -1277,7 +1287,7 @@ static void RunThread( vout_thread_t *p_vout)
          */
         if( p_vout->pf_manage( p_vout ) | Manage( p_vout ) )
         {
-            /* A fatal error occured, and the thread must terminate immediately,
+            /* A fatal error occured, and the thread must terminate immediately
              * without displaying anything - setting b_error to 1 cause the
              * immediate end of the main while() loop. */
             p_vout->b_error = 1;
@@ -1379,7 +1389,7 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     /* Destroy thread structures allocated by Create and InitThread */
     vout_UnloadFont( p_vout->p_default_font );
     vout_UnloadFont( p_vout->p_large_font );
-    p_vout->pf_destroy( p_vout );
+    if( p_vout->pf_destroy != NULL ) p_vout->pf_destroy( p_vout );
 
     /* Destroy the locks */
     vlc_mutex_destroy( &p_vout->picture_lock );

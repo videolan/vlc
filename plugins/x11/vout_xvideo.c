@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.21 2001/07/07 17:45:29 sam Exp $
+ * $Id: vout_xvideo.c,v 1.22 2001/07/10 06:07:53 gbazin Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -265,7 +265,12 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     if( (p_vout->p_sys->xv_port = XVideoGetPort( p_vout->p_sys->p_display ))<0 )
+    {
+        XVideoDestroyWindow( p_vout );
+        XCloseDisplay( p_vout->p_sys->p_display );
+        free( p_vout->p_sys );
         return 1;
+    }
     intf_DbgMsg( "Using xv port %d" , p_vout->p_sys->xv_port );
 
 #if 0
