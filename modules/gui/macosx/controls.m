@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.44 2003/07/09 01:30:41 hartman Exp $
+ * $Id: controls.m,v 1.45 2003/07/09 01:31:25 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -203,7 +203,6 @@
 #define p_area p_playlist->p_input->stream.p_selected_area
     if( p_area->i_part < p_area->i_part_nb && p_area->i_part_nb > 1 )
     {
-    NSLog(@"next-chapter: %d, all: %d", p_area->i_part, p_area->i_part_nb);
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         vlc_mutex_unlock( &p_playlist->object_lock );
         var_Get( p_playlist->p_input, "next-chapter", &val );
@@ -211,7 +210,6 @@
     }
     else if( p_area->i_id < p_playlist->p_input->stream.i_area_nb && p_playlist->p_input->stream.i_area_nb > 1 )
     {
-    NSLog(@"next-title: %d, all: %d", p_area->i_id, p_playlist->p_input->stream.i_area_nb );
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         vlc_mutex_unlock( &p_playlist->object_lock );
         var_Get( p_playlist->p_input, "next-title", &val );
@@ -219,7 +217,6 @@
     }
     else
     {
-    NSLog(@"next-item");
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         vlc_mutex_unlock( &p_playlist->object_lock );
         playlist_Next( p_playlist );
