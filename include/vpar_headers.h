@@ -19,9 +19,10 @@
  * Function pointers
  *****************************************************************************/
 struct vpar_thread_s;
+struct macroblock_s;
 
 typedef void    (*f_slice_header_t)( struct vpar_thread_s*, int*, int, u32);
-typedef void    (*f_chroma_pattern_t)( struct vpar_thread_s* );
+typedef int     (*f_chroma_pattern_t)( struct vpar_thread_s* );
 typedef int     (*f_macroblock_type_t)( struct vpar_thread_s* );
 
 /*****************************************************************************
@@ -49,7 +50,7 @@ typedef struct sequence_s
     f_slice_header_t    pf_slice_header;
     quant_matrix_t      intra_quant, nonintra_quant;
     quant_matrix_t      chroma_intra_quant, chroma_nonintra_quant;
-    void                (*pf_decode_mv)( struct vpar_thread_s *, int );
+    void                (*pf_decode_mv)( struct vpar_thread_s *, struct macroblock_s *, int );
     f_chroma_pattern_t  pf_decode_pattern;
 
     /* Chromatic information */
@@ -99,9 +100,6 @@ typedef struct picture_parsing_s
     boolean_t           b_frame_structure;
     f_macroblock_type_t pf_macroblock_type;
 
-    /* Scalability variables */
-    int                 i_spatial_temporal_weight_code_table_index;
-    
     boolean_t           b_error;
 } picture_parsing_t;
 

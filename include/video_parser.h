@@ -88,6 +88,11 @@ typedef struct vpar_thread_s
 #endif
 } vpar_thread_t;
 
+/* Chroma types */
+#define CHROMA_420 1
+#define CHROMA_422 2
+#define CHROMA_444 3
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/

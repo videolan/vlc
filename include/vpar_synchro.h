@@ -26,7 +26,7 @@ typedef struct video_synchro_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void vpar_SynchroChoose( struct vpar_thread_s * p_vpar, int i_coding_type, 
+boolean_t vpar_SynchroChoose( struct vpar_thread_s * p_vpar, int i_coding_type, 
                          int i_structure );
 void vpar_SynchroTrash( struct vpar_thread_s * p_vpar, int i_coding_type,
                         int i_structure );

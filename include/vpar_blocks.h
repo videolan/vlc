@@ -26,9 +26,9 @@ typedef struct macroblock_s
     int                     i_c_x, i_c_y; /* position of macroblock (chroma) */
     int                     i_chroma_nb_blocks;  /* nb of bks for a chr comp */
     int                     i_l_stride;           /* number of data_t to ignore
-					           * when changing lines     */
+					                               * when changing lines     */
     int                     i_c_stride;                  /* idem, for chroma */
-
+    
     /* IDCT information */
     elem_t                  ppi_blocks[12][64];                    /* blocks */
     f_idct_t                pf_idct[12];             /* sparse IDCT or not ? */
@@ -37,10 +37,8 @@ typedef struct macroblock_s
     /* Motion compensation information */
     f_motion_t              pf_motion;    /* function to use for motion comp */
     f_chroma_motion_t       pf_chroma_motion;
-    picture_t *             p_backw_top;
-    picture_t *             p_backw_bot;
-    picture_t *             p_forw_top;
-    picture_t *             p_forw_bot;
+    picture_t *             p_backward;
+    picture_t *             p_forward;
     int                     ppi_field_select[2][2];
     int                     pppi_motion_vectors[2][2][2];
     int                     pi_dm_vector[2];
@@ -105,13 +103,6 @@ typedef struct lookup_s
 /* Scan */
 #define SCAN_ZIGZAG                         0
 #define SCAN_ALT                            1
-
-/*****************************************************************************
- * Constants
- *****************************************************************************/
-extern int *    pi_default_intra_quant;
-extern int *    pi_default_nonintra_quant;
-extern u8       pi_scan[2][64];
 
 /*****************************************************************************
  * Prototypes

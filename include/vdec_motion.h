@@ -23,5 +23,21 @@ typedef void (*f_chroma_motion_t)( struct macroblock_s* );
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void vdec_MotionField( struct macroblock_s* );
-void vdec_MotionFrame( struct macroblock_s* );
+
+/* Empty function for intra macroblocks motion compensation */
+void vdec_DummyRecon    ( struct macroblock_s* );
+
+/* Motion compensation for skipped macroblocks */
+void vdec_MotionField   ( struct macroblock_s* );
+void vdec_MotionFrame   ( struct macroblock_s* );
+
+/* Motion compensation for non skipped macroblocks */
+void vdec_FieldRecon    ( struct macroblock_s* );
+void vdec_16x8Recon     ( struct macroblock_s* );
+void vdec_FrameRecon    ( struct macroblock_s* );
+void vdec_DMVRecon      ( struct macroblock_s* );
+
+/* Motion compensation functions for the 3 chroma formats */
+void vdec_Motion420();
+void vdec_Motion422();
+void vdec_Motion444();
