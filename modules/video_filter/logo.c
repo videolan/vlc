@@ -144,7 +144,7 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
     {
         png_set_tRNS_to_alpha( p_png );
     }
-    else
+    else if( !(i_color_type & PNG_COLOR_MASK_ALPHA) )
     {
         b_alpha = VLC_FALSE;
     }
