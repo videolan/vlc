@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.4 2002/06/02 13:38:03 gbazin Exp $
+ * $Id: vlc_common.h,v 1.5 2002/06/02 15:51:30 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -220,7 +220,6 @@ VLC_DECLARE_STRUCT(iso639_lang)
                                                                             \
     /* Thread properties, if any */                                         \
     vlc_bool_t   b_thread;                                                  \
-    int          i_thread;                                                  \
     vlc_thread_t thread_id;                                                 \
     vlc_mutex_t  thread_lock;                                               \
     vlc_cond_t   thread_wait;                                               \

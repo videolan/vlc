@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.4 2002/06/02 09:03:54 sam Exp $
+ * $Id: objects.c,v 1.5 2002/06/02 15:51:30 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -484,7 +484,7 @@ static void vlc_dumpstructure_inner( vlc_object_t *p_this,
     psz_thread[0] = '\0';
     if( p_this->b_thread )
     {
-        snprintf( psz_thread, 20, " (thread %d)", p_this->i_thread );
+        snprintf( psz_thread, 20, " (thread %d)", (int)p_this->thread_id );
         psz_thread[19] = '\0';
     }
 
