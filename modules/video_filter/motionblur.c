@@ -2,7 +2,7 @@
  * motion_blur.c : motion blur filter for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: motionblur.c,v 1.2 2002/08/27 21:53:54 sigmunau Exp $
+ * $Id: motionblur.c,v 1.3 2002/11/23 02:40:30 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -24,7 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 

@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.2 2002/08/26 09:12:46 sam Exp $
+ * $Id: distort.c,v 1.3 2002/11/23 02:40:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,7 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
@@ -306,10 +305,10 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
         for( i_line = 0 ; i_line < i_num_lines ; i_line++ )
         {
             /* Calculate today's offset, don't go above 1/20th of the screen */
-            i_offset = (double)(p_inpic->p[i_index].i_pitch)
+            i_offset = (int)( (double)(p_inpic->p[i_index].i_pitch)
                          * sin( f_angle + 10.0 * (double)i_line
                                                / (double)i_num_lines )
-                         / 20.0;
+                         / 20.0 );
 
             if( i_offset )
             {
@@ -381,13 +380,13 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
         for( i_line = i_first_line ; i_line < i_num_lines ; i_line++ )
         {
             /* Calculate today's offset, don't go above 1/20th of the screen */
-            i_offset = (double)(p_inpic->p[i_index].i_pitch)
+            i_offset = (int)( (double)(p_inpic->p[i_index].i_pitch)
                          * sin( f_angle + 2.0 * (double)i_line
                                               / (double)( 1 + i_line
                                                             - i_first_line) )
                          * (double)(i_line - i_first_line)
                          / (double)i_num_lines
-                         / 8.0;
+                         / 8.0 );
 
             if( i_offset )
             {

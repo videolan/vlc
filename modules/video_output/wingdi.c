@@ -2,7 +2,7 @@
  * wingdi.c : Win32 / WinCE GDI video output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: wingdi.c,v 1.3 2002/11/22 20:27:19 sam Exp $
+ * $Id: wingdi.c,v 1.4 2002/11/23 02:40:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -67,8 +67,12 @@ struct vout_sys_t
     /* Our offscreen bitmap and its framebuffer */
     HDC        off_dc;
     HBITMAP    off_bitmap;
-    BITMAPINFO bitmapinfo;
     uint8_t *  p_buffer;
+
+    BITMAPINFO bitmapinfo;
+    RGBQUAD    red;
+    RGBQUAD    green;
+    RGBQUAD    blue;
 };
 
 /*****************************************************************************
@@ -255,18 +259,24 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* No need to do anything, the fake direct buffers stay as they are */
     HDC hdc;
-    int y;
+    int i_src_bytes, i_dest_bytes;
 
     hdc = GetDC( p_vout->p_sys->window );
     SelectObject( p_vout->p_sys->off_dc, p_vout->p_sys->off_bitmap );
 
     /* Stupid GDI is upside-down */
-    for( y = p_pic->p->i_lines ; y-- ; )
+    i_src_bytes = p_pic->p->i_lines * p_pic->p->i_pitch;
+    i_dest_bytes = 0;
+
+    while( i_src_bytes )
     {
-        memcpy( p_vout->p_sys->p_buffer
-                         + p_pic->p->i_pitch * (p_pic->p->i_lines-y),
-                p_pic->p->p_pixels + p_pic->p->i_pitch * y,
-                p_pic->p->i_pitch );
+        i_src_bytes -= p_pic->p->i_pitch;
+
+        p_vout->p_vlc->pf_memcpy( p_vout->p_sys->p_buffer + i_dest_bytes,
+                                  p_pic->p->p_pixels + i_src_bytes,
+                                  p_pic->p->i_visible_pitch );
+
+        i_dest_bytes += p_pic->p->i_pitch;
     }
 
     BitBlt( hdc, 0, 0, p_vout->output.i_width, p_vout->output.i_height,
@@ -433,7 +443,8 @@ static long FAR PASCAL WndProc ( HWND hWnd, UINT message,
  *****************************************************************************/
 static void InitBuffers( vout_thread_t *p_vout )
 {
-    BITMAPINFOHEADER *p_header = &p_vout->p_sys->bitmapinfo.bmiHeader;
+    BITMAPINFOHEADER * p_header = &p_vout->p_sys->bitmapinfo.bmiHeader;
+    BITMAPINFO *       p_info = &p_vout->p_sys->bitmapinfo;
     int   i_pixels = p_vout->render.i_height * p_vout->render.i_width;
     HDC   window_dc;
 
@@ -445,23 +456,35 @@ static void InitBuffers( vout_thread_t *p_vout )
     msg_Dbg( p_vout, "GDI depth is %i", p_vout->p_sys->i_depth );
 
     /* Initialize offscreen bitmap */
+    memset( p_info, 0, sizeof( BITMAPINFO ) + 3 * sizeof( RGBQUAD ) );
+
     p_header->biSize = sizeof( BITMAPINFOHEADER );
     p_header->biPlanes = 1;
-    p_header->biCompression = BI_RGB;
     switch( p_vout->p_sys->i_depth )
     {
         case 8:
             p_header->biBitCount = 8;
             p_header->biSizeImage = i_pixels;
+            p_header->biCompression = BI_RGB;
+            /* FIXME: we need a palette here */
             break;
         case 24:
+        case 32:
             p_header->biBitCount = 32;
             p_header->biSizeImage = i_pixels * 4;
+            p_header->biCompression = BI_BITFIELDS;
+            ((DWORD*)p_info->bmiColors)[0] = 0x00ff0000;
+            ((DWORD*)p_info->bmiColors)[1] = 0x0000ff00;
+            ((DWORD*)p_info->bmiColors)[2] = 0x000000ff;
             break;
         case 16:
         default:
             p_header->biBitCount = 16;
             p_header->biSizeImage = i_pixels * 2;
+            p_header->biCompression = BI_BITFIELDS;
+            ((DWORD*)p_info->bmiColors)[0] = 0x00007c00;
+            ((DWORD*)p_info->bmiColors)[1] = 0x000003e0;
+            ((DWORD*)p_info->bmiColors)[2] = 0x0000001f;
             break;
     }
     p_header->biWidth = p_vout->render.i_width;

@@ -63,6 +63,30 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_clone"=.\plugin_clone.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_distort"=.\plugin_distort.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_dummy"=.\plugin_dummy.vcp - Package Owner=<4>
 
 Package=<5>
@@ -171,6 +195,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_invert"=.\plugin_invert.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_ipv4"=.\plugin_ipv4.vcp - Package Owner=<4>
 
 Package=<5>
@@ -219,6 +255,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_motionblur"=.\plugin_motionblur.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_mpeg_audio"=.\plugin_mpeg_audio.vcp - Package Owner=<4>
 
 Package=<5>
@@ -256,6 +304,18 @@ Package=<4>
 ###############################################################################
 
 Project: "plugin_ps"=.\plugin_ps.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_transform"=.\plugin_transform.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -328,6 +388,18 @@ Package=<4>
 ###############################################################################
 
 Project: "plugin_vout_directx"=.\plugin_vout_directx.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_wall"=.\plugin_wall.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
