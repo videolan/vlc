@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.17 2003/01/09 22:30:44 lool Exp $
+$Id: FAQ,v 1.18 2003/01/10 09:25:57 lool Exp $
 
 1. Using VLC
 
@@ -197,6 +197,14 @@ previous one. VLS version 0.4.0 and later now fixes this problem. If, for
 a reason or another, you wish to keep VLS 0.3.3, you can still read those
 streams if you launch VLC (0.4.5 or later) with --vls-backwards-compat.
 
+2.16 NO VIDEO!! or NO AUDIO !!
+---------------------------
+DON'T PANIC! Use the verbose mode of vlc to search the problem, you may
+either set the verbosity option in the interface preferences or use
+the "-v" command line switch to increase the number of report/error
+messages given by vlc. If you are not using a terminal, use the Messages
+window in the View menu.
+
 
 3. Ports and features
 
@@ -235,6 +243,19 @@ This support is currently being developed.
 --------------------------
 Yes. Just use vlc rtp:@<mcast addr>:<local port>.
 
+3.3.4 Does VLC support DVD from all zones?
+-----------------------------------------
+VLC uses libdvdcss to read all DVD, disregarding their zone. All zones
+are supported without any constraint. However, libdvdcss might not be
+legal in your country.
+
+3.3.5 How can I take screenshots?
+--------------------------------
+This is currently unsupported, but will be in a near future. The latest
+developments concern recording the video and the audio to a file.
+However, under XFree, you may use the "x11" video output to take normal
+screen capture of the video displayed by vlc.
+
 4. Legal concerns
 
 4.1 May I use the VideoLAN logo?
@@ -271,4 +292,20 @@ the libdvdcss library. Its use is controversial in a few countries
 such as the United States because of a law called the DMCA. If you are
 unsure about the legality of using and distributing this library in
 your country, please consult your lawyer.
+
+5. Miscellaneous
+
+5.1 How may I help your project?
+-------------------------------
+You might either contribute time, material, or money. We are also always
+needing some translators. You will find all information you need at
+<http://videolan.org/contribute.html>.
+
+5.2 Why are your mailing-lists and your website in english?
+----------------------------------------------------------
+VideoLAN's developers come from all around the world and english is
+the only language they can use to communicate together. Although great
+care is given to the translation of our softwares in various languages,
+maintaining translations of our documentation and website costs too much
+time than we can afford.
 
