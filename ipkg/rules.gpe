@@ -8,6 +8,7 @@
 export CC=arm-linux-gcc
 export LD=arm-linux-ld
 export AR=arm-linux-ar
+export AS=arm-linux-gcc
 export RANLIB=arm-linux-ranlib
 export STRIP=arm-linux-strip
 export CONFIG_FLAGS="--enable-release --prefix=/usr \
@@ -21,7 +22,8 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--enable-sdl \
 	--enable-oss \
 	--disable-alsa \
-	--disable-xvideo \
+	--enable-x11 \
+	--enable-xvideo \
 	--disable-dvd \
 	--disable-dvdread \
 	--disable-vcd \
@@ -80,8 +82,8 @@ install: build
 	cp ipkg/vlc.gpe ${PKGDIR}/usr/lib/menu/vlc
 
 install-plugins: install
-	find ./ -name *.so | xargs cp ${PKGDIR}/usr/lib/vlc
-	$(STRIP) ${PKGDIR}/usr/lib/vlc
+	find ./ -name *.so | xargs cp $1 ${PKGDIR}/usr/lib/vlc/ 
+	$(STRIP) ${PKGDIR}/usr/lib/vlc/*.so
 
 .PHONY: build clean install
 
