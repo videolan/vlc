@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.31 2003/01/29 11:34:11 jlj Exp $
+ * $Id: playlist.c,v 1.32 2003/02/13 00:09:51 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -55,6 +55,7 @@ static void Poubellize ( playlist_t *, input_thread_t * );
 playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist;
+    vlc_value_t     val;
 
     /* Allocate structure */
     p_playlist = vlc_object_create( p_parent, VLC_OBJECT_PLAYLIST );
@@ -63,6 +64,10 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
         msg_Err( p_parent, "out of memory" );
         return NULL;
     }
+
+    var_Create( p_playlist, "intf-change", VLC_VAR_BOOL );
+    val.b_bool = VLC_TRUE;
+    var_Set( p_playlist, "intf-change", val );
 
     p_playlist->p_input = NULL;
     p_playlist->i_status = PLAYLIST_STOPPED;
@@ -94,6 +99,8 @@ void playlist_Destroy( playlist_t * p_playlist )
     p_playlist->b_die = 1;
 
     vlc_thread_join( p_playlist );
+
+    var_Destroy( p_playlist, "intf-change" );
 
     vlc_object_destroy( p_playlist );
 }
@@ -128,6 +135,7 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
 int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
                 int i_mode, int i_pos)
 {
+    vlc_value_t     val;
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
@@ -237,6 +245,9 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_playlist, "intf-change", val );
+
     return 0;
 }
 
@@ -247,6 +258,7 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
  *****************************************************************************/
 int playlist_Delete( playlist_t * p_playlist, int i_pos )
 {
+    vlc_value_t     val;
     vlc_mutex_lock( &p_playlist->object_lock );
 
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
@@ -278,6 +290,9 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_playlist, "intf-change", val );
 
     return 0;
 }

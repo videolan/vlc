@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.54 2003/02/11 15:35:29 hartman Exp $
+ * $Id: intf.m,v 1.55 2003/02/13 00:09:51 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -426,10 +426,19 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
         if( p_playlist != NULL )
         {
+            vlc_value_t val;
+
+            if( var_Get( (vlc_object_t *)p_playlist, "intf-change", &val )
+                >= 0 && val.b_bool )
+            {
+                p_intf->p_sys->b_playlist_update = 1;
+                p_intf->p_sys->b_intf_update = VLC_TRUE;
+            }
+            
             vlc_mutex_lock( &p_playlist->object_lock );
-
+            
             [self manage: p_playlist];
-
+            
             vlc_mutex_unlock( &p_playlist->object_lock );
             vlc_object_release( p_playlist );
         }
@@ -591,6 +600,17 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     }
 
     vlc_mutex_lock( &p_playlist->object_lock );
+    
+    if ( p_intf->p_sys->b_playlist_update )
+    {
+        vlc_value_t val;
+        val.b_bool = 0;
+
+        var_Set( (vlc_object_t *)p_playlist, "intf-change", val );
+
+        [o_playlist playlistUpdated];
+        p_intf->p_sys->b_playlist_update = VLC_FALSE;
+    }
 
 #define p_input p_playlist->p_input
 
