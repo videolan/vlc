@@ -411,7 +411,7 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/alsa.so
 
 %changelog
-* Mon Jun 20 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.2-1mdk
+* Sun Jul 7 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.2-1mdk
 - new upstream release
 
 * Mon Jun 3 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.1-1mdk
