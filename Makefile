@@ -131,6 +131,7 @@ PLUGINS_TARGETS := a52/a52 \
 		mpeg_system/mpeg_es \
 		mpeg_system/mpeg_ps \
 		mpeg_system/mpeg_ts \
+		mpeg_system/mpeg_ts_dvbpsi \
 		mpeg_adec/mpeg_adec \
 		mpeg_vdec/mpeg_vdec \
 		network/ipv4 \

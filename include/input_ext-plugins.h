@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.22 2002/04/24 00:36:24 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.23 2002/04/25 02:10:33 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -49,6 +49,7 @@ int input_SetProgram( struct input_thread_s *, struct pgrm_descriptor_s * );
 struct input_area_s * input_AddArea( struct input_thread_s * );
 void input_DelArea   ( struct input_thread_s *, struct input_area_s * );
 struct es_descriptor_s * input_FindES( struct input_thread_s *, u16 );
+struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
 struct es_descriptor_s * input_AddES ( struct input_thread_s *,
                                        struct pgrm_descriptor_s *, u16,
                                        size_t );
@@ -60,6 +61,7 @@ int  input_UnselectES( struct input_thread_s *, struct es_descriptor_s * );
 #   define input_EndStream p_symbols->input_EndStream
 #   define input_SetProgram p_symbols->input_SetProgram
 #   define input_FindES p_symbols->input_FindES
+#   define input_FindProgram p_symbols->input_FindProgram
 #   define input_AddES p_symbols->input_AddES
 #   define input_DelES p_symbols->input_DelES
 #   define input_SelectES p_symbols->input_SelectES
@@ -203,6 +205,19 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
 #define PSI_IS_PMT          0x01
 #define UNKNOWN_PSI         0xff
 
+/****************************************************************************
+ * psi_callback_t
+ ****************************************************************************
+ * Used by TS demux to handle a PSI, either with the builtin decoder, either
+ * with a library such as libdvbpsi
+ ****************************************************************************/
+typedef void( * psi_callback_t )( 
+        input_thread_t  * p_input,
+        data_packet_t   * p_data,
+        es_descriptor_t * p_es,
+        boolean_t         b_unit_start );
+
+
 /*****************************************************************************
  * psi_section_t
  *****************************************************************************
@@ -256,6 +271,8 @@ typedef struct pgrm_ts_data_s
 {
     u16                     i_pcr_pid;             /* PCR ES, for TS streams */
     int                     i_pmt_version;
+    /* libdvbpsi pmt decoder handle */
+    void *                  p_pmt_handle;
 } pgrm_ts_data_t;
 
 /*****************************************************************************
@@ -264,6 +281,8 @@ typedef struct pgrm_ts_data_s
 typedef struct stream_ts_data_s
 {
     int i_pat_version;          /* Current version of the PAT */
+    /* libdvbpsi pmt decoder handle */
+    void *                  p_pat_handle;
 } stream_ts_data_t;
 
 /*****************************************************************************
@@ -292,9 +311,8 @@ es_descriptor_t * input_ParsePS( struct input_thread_s *,
                                  struct data_packet_s * );
 ssize_t input_ReadTS ( struct input_thread_s *, struct data_packet_s ** );
 void input_DemuxPS   ( struct input_thread_s *, struct data_packet_s * );
-void input_DemuxTS   ( struct input_thread_s *, struct data_packet_s * );
-void input_DemuxPSI  ( struct input_thread_s *, struct data_packet_s *,
-                       struct es_descriptor_s *, boolean_t, boolean_t );
+void input_DemuxTS   ( struct input_thread_s *, struct data_packet_s *, 
+                       psi_callback_t );
 #else
 #   define input_ParsePES p_symbols->input_ParsePES
 #   define input_GatherPES p_symbols->input_GatherPES
@@ -303,7 +321,6 @@ void input_DemuxPSI  ( struct input_thread_s *, struct data_packet_s *,
 #   define input_DemuxPS p_symbols->input_DemuxPS
 #   define input_ReadTS p_symbols->input_ReadTS
 #   define input_DemuxTS p_symbols->input_DemuxTS
-#   define input_DemuxPSI p_symbols->input_DemuxPSI
 #endif
 
 

@@ -46,6 +46,7 @@ E: jobi@via.ecp.fr
 C: jobi
 D: VCD input
 D: Satellite input
+D: libdvbpsi support
 S: France
 
 N: Julien Blache

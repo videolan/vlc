@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.65 2002/04/24 00:36:24 sam Exp $
+ * $Id: input_ext-intf.h,v 1.66 2002/04/25 02:10:33 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -234,8 +234,7 @@ typedef struct stream_descriptor_s
     es_descriptor_t *       p_newly_selected_es;   /* ES selected from
                                                     * the interface */
     es_descriptor_t *       p_removed_es;   /* ES removed from the interface */
-
-
+    
     /* Stream control */
     stream_ctrl_t           control;
 

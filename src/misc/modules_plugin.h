@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.19 2002/04/11 08:55:49 sam Exp $
+ * $Id: modules_plugin.h,v 1.20 2002/04/25 02:10:33 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -224,6 +224,7 @@ module_error( char *psz_buffer )
     (p_symbols)->input_ToggleES = input_ToggleES; \
     (p_symbols)->input_ChangeProgram = input_ChangeProgram; \
     (p_symbols)->input_ChangeArea = input_ChangeArea; \
+    (p_symbols)->input_FindProgram = input_FindProgram; \
     (p_symbols)->input_FindES = input_FindES; \
     (p_symbols)->input_AddES = input_AddES; \
     (p_symbols)->input_DelES = input_DelES; \
@@ -247,7 +248,6 @@ module_error( char *psz_buffer )
     (p_symbols)->input_DemuxPS = input_DemuxPS; \
     (p_symbols)->input_ReadTS = input_ReadTS; \
     (p_symbols)->input_DemuxTS = input_DemuxTS; \
-    (p_symbols)->input_DemuxPSI = input_DemuxPSI; \
     (p_symbols)->input_ClockManageControl = input_ClockManageControl; \
     (p_symbols)->input_FDSeek = input_FDSeek; \
     (p_symbols)->input_FDClose = input_FDClose; \

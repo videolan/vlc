@@ -681,6 +681,35 @@ then
 fi
 
 dnl
+dnl  libdvbpsi ts demux
+dnl
+AC_ARG_ENABLE(dvbpsi,
+[  --enable-dvbpsi        dvbpsi ts demux module (default disabled)])
+if test "x$enable_dvdread" != "xno"
+then
+  if test "x$withval" = x
+  then
+    test_LDFLAGS=""
+    test_CFLAGS=""
+  else
+    test_LDFLAGS="-L${withval}/lib"
+    test_CFLAGS="-I${withval}/include"
+  fi
+  CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
+  AC_CHECK_HEADER([dvbpsi/dvbpsi.h],[
+    PLUGINS="${PLUGINS} mpeg_ts_dvbpsi"
+    mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} ${test_LDFLAGS} -ldvbpsi"
+    mpeg_ts_dvbpsi_CFLAGS="${mpeg_ts_dvbpsi_CFLAGS} ${test_CFLAGS}"
+    ],[
+    if test "x$enable_dvbpsi" != x
+    then
+      AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org])
+    fi
+  ])
+  CPPFLAGS="$save_CPPFLAGS"
+fi
+ 
+dnl
 dnl  VCD module
 dnl
 AC_ARG_ENABLE(vcd,
@@ -1503,6 +1532,7 @@ AC_SUBST(builtins_CFLAGS)
 AC_SUBST(arts_CFLAGS)
 AC_SUBST(dvd_CFLAGS)
 AC_SUBST(dvdread_CFLAGS)
+AC_SUBST(mpeg_ts_dvbpsi_CFLAGS)
 AC_SUBST(directx_CFLAGS)
 AC_SUBST(esd_CFLAGS)
 AC_SUBST(ffmpeg_CFLAGS)
@@ -1534,6 +1564,7 @@ AC_SUBST(directx_LDFLAGS)
 AC_SUBST(dsp_LDFLAGS)
 AC_SUBST(dvd_LDFLAGS)
 AC_SUBST(dvdread_LDFLAGS)
+AC_SUBST(mpeg_ts_dvbpsi_LDFLAGS)
 AC_SUBST(esd_LDFLAGS)
 AC_SUBST(filter_distort_LDFLAGS)
 AC_SUBST(ffmpeg_LDFLAGS)

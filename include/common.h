@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.97 2002/04/24 00:36:24 sam Exp $
+ * $Id: common.h,v 1.98 2002/04/25 02:10:33 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -562,6 +562,8 @@ typedef struct module_symbols_s
     int  ( * input_ChangeProgram )  ( struct input_thread_s *, u16 );
     struct es_descriptor_s * ( * input_FindES ) ( struct input_thread_s *,
                                                   u16 );
+    struct pgrm_descriptor_s * ( * input_FindProgram ) 
+                                    ( struct input_thread_s *, u16 );
     struct es_descriptor_s * ( * input_AddES ) ( struct input_thread_s *,
                                       struct pgrm_descriptor_s *, u16, size_t );
     void ( * input_DelES )          ( struct input_thread_s *,
@@ -607,11 +609,12 @@ typedef struct module_symbols_s
     ssize_t ( * input_ReadTS )      ( struct input_thread_s *,
                                       struct data_packet_s ** );
     void ( * input_DemuxTS )        ( struct input_thread_s *,
-                                      struct data_packet_s * );
-    void ( * input_DemuxPSI )       ( struct input_thread_s *,
                                       struct data_packet_s *,
-                                      struct es_descriptor_s *, 
-                                      boolean_t, boolean_t );
+                                      void(* pf_psi_callback) 
+                                           ( struct input_thread_s *,
+                                             struct data_packet_s  *,
+                                             struct es_descriptor_s *,
+                                             boolean_t ) );
     int ( * input_ClockManageControl )   ( struct input_thread_s *,
                                            struct pgrm_descriptor_s *,
                                            mtime_t );
