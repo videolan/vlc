@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.86 2002/03/20 14:08:55 sam Exp $
+ * $Id: vout_sdl.c,v 1.87 2002/03/21 22:10:33 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -209,32 +209,9 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_cursor_autohidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
 
-    if( p_vout->render.i_height * p_vout->render.i_aspect
-         >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
-    {
-        p_vout->p_sys->i_width = p_vout->render.i_height
-            * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
-        p_vout->p_sys->i_height = p_vout->render.i_height;
-    }
-    else
-    {
-        p_vout->p_sys->i_width = p_vout->render.i_width;
-        p_vout->p_sys->i_height = p_vout->render.i_width
-            * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
-    }
-
-#if 0
-    if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 300 )
-    {
-        p_vout->p_sys->i_width <<= 1;
-        p_vout->p_sys->i_height <<= 1;
-    }
-    else if( p_vout->p_sys->i_width <= 400 && p_vout->p_sys->i_height <= 400 )
-    {
-        p_vout->p_sys->i_width += p_vout->p_sys->i_width >> 1;
-        p_vout->p_sys->i_height += p_vout->p_sys->i_height >> 1;
-    }
-#endif
+    /* Set main window's size */
+    p_vout->p_sys->i_width = p_vout->i_window_width;
+    p_vout->p_sys->i_height = p_vout->i_window_height;
 
     if( OpenDisplay( p_vout ) )
     {

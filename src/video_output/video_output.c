@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.168 2002/03/17 17:00:38 sam Exp $
+ * $Id: video_output.c,v 1.169 2002/03/21 22:10:33 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -53,6 +53,7 @@ static void     DestroyThread     ( vout_thread_t *p_vout, int i_status );
 static int      ReduceHeight      ( int );
 static int      BinaryLog         ( u32 );
 static void     MaskToShift       ( int *, int *, u32 );
+static void     InitWindowSize    ( vout_thread_t *, int *, int * );
 
 /*****************************************************************************
  * vout_InitBank: initialize the video output bank.
@@ -175,6 +176,11 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     /* user requested fullscreen? */
     if( config_GetIntVariable( "fullscreen" ) )
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+
+    /* Initialize the dimensions of the video window */
+    InitWindowSize( p_vout, &p_vout->i_window_width,
+                    &p_vout->i_window_height );
+
 
     p_vout->p_module
         = module_Need( MODULE_CAPABILITY_VOUT, psz_plugin, (void *)p_vout );
@@ -801,3 +807,50 @@ static void MaskToShift( int *pi_left, int *pi_right, u32 i_mask )
     *pi_right = (8 - i_high + i_low);
 }
 
+/*****************************************************************************
+ * InitWindowSize: find the initial dimensions the video window should have.
+ *****************************************************************************
+ * This function will check the "width" and "height" config options and
+ * will calculate the size that the video window should have.
+ *****************************************************************************/
+static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
+                            int *pi_height )
+{
+    int i_width, i_height;
+
+    i_width = config_GetIntVariable( "width" );
+    i_height = config_GetIntVariable( "height" );
+
+    if( (i_width >= 0) && (i_height >= 0))
+    {
+        *pi_width = i_width;
+        *pi_height = i_height;
+        return;
+    }
+    else if( i_width >= 0 )
+    {
+        *pi_width = i_width;
+        *pi_height = i_width * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
+        return;
+    }
+    else if( i_height >= 0 )
+    {
+        *pi_height = i_height;
+        *pi_width = i_height * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
+        return;
+    }
+
+    if( p_vout->render.i_height * p_vout->render.i_aspect
+        >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
+    {
+        *pi_width = p_vout->render.i_height
+          * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
+        *pi_height = p_vout->render.i_height;
+    }
+    else
+    {
+        *pi_width = p_vout->render.i_width;
+        *pi_height = p_vout->render.i_width
+          * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
+    }
+}

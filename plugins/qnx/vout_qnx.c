@@ -146,10 +146,8 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->i_mode = 
         config_GetIntVariable( "nooverlay" ) ?
         MODE_NORMAL_MEM : MODE_VIDEO_OVERLAY;
-    p_vout->p_sys->dim.w =
-        config_GetIntVariable( "width" );
-    p_vout->p_sys->dim.h =
-        config_GetIntVariable( "height" );
+    p_vout->p_sys->dim.w = p_vout->i_window_width;
+    p_vout->p_sys->dim.h = p_vout->i_window_height;
 
     /* init display and create window */
     if( QNXInitDisplay( p_vout ) || QNXCreateWnd( p_vout ) )

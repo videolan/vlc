@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.9 2002/03/17 17:00:38 sam Exp $
+ * $Id: xmga.c,v 1.10 2002/03/21 22:10:33 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -724,33 +724,8 @@ static int CreateWindow( vout_thread_t *p_vout )
     boolean_t               b_map_notify;
 
     /* Set main window's size */
-    if( p_vout->render.i_height * p_vout->render.i_aspect
-        >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
-    {
-        p_vout->p_sys->i_width = p_vout->render.i_height
-          * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
-        p_vout->p_sys->i_height = p_vout->render.i_height;
-    }
-    else
-    {
-        p_vout->p_sys->i_width = p_vout->render.i_width;
-        p_vout->p_sys->i_height = p_vout->render.i_width
-          * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
-    }
-
-#if 0
-    if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 300 )
-    {
-        p_vout->p_sys->i_width <<= 1;
-        p_vout->p_sys->i_height <<= 1;
-    }
-    else if( p_vout->p_sys->i_width <= 400
-             && p_vout->p_sys->i_height <= 400 )
-    {
-        p_vout->p_sys->i_width += p_vout->p_sys->i_width >> 1;
-        p_vout->p_sys->i_height += p_vout->p_sys->i_height >> 1;
-    }
-#endif
+    p_vout->p_sys->i_width = p_vout->i_window_width;
+    p_vout->p_sys->i_height = p_vout->i_window_height;
 
     /* Prepare window manager hints and properties */
     xsize_hints.base_width          = p_vout->p_sys->i_width;

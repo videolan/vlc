@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.26 2002/03/17 17:00:38 sam Exp $
+ * $Id: vout_directx.c,v 1.27 2002/03/21 22:10:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -142,24 +142,8 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->i_lastmoved = mdate();
 
     /* Set main window's size */
-    if( p_vout->render.i_height * p_vout->render.i_aspect
-        >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
-    {
-        p_vout->p_sys->i_window_width = p_vout->render.i_height
-          * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
-        p_vout->p_sys->i_window_height = p_vout->render.i_height;
-    }
-    else
-    {
-        p_vout->p_sys->i_window_width = p_vout->render.i_width;
-        p_vout->p_sys->i_window_height = p_vout->render.i_width
-          * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
-    }
-
-#if 0
-    p_vout->p_sys->i_window_width = config_GetIntVariable( "width" );
-    p_vout->p_sys->i_window_height = config_GetIntVariable( "height" );
-#endif
+    p_vout->p_sys->i_window_width = p_vout->i_window_width;
+    p_vout->p_sys->i_window_height = p_vout->i_window_height;
 
     /* Set locks and condition variables */
     vlc_mutex_init( &p_vout->p_sys->event_thread_lock );

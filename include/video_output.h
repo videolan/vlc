@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.71 2002/01/05 03:49:18 sam Exp $
+ * $Id: video_output.h,v 1.72 2002/03/21 22:10:32 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -110,7 +110,7 @@ typedef struct vout_thread_s
     vlc_mutex_t         change_lock;                   /* thread change lock */
     int *               pi_status;                  /* temporary status flag */
     p_vout_sys_t        p_sys;                       /* system output method */
-                                                                   
+
     /* Current display properties */
     u16                 i_changes;             /* changes made to the thread */
     float               f_gamma;                                    /* gamma */
@@ -120,6 +120,8 @@ typedef struct vout_thread_s
     boolean_t           b_scale;                    /* allow picture scaling */
     boolean_t           b_fullscreen;           /* toogle fullscreen display */
     mtime_t             render_time;             /* last picture render time */
+    int                 i_window_width;                /* video window width */
+    int                 i_window_height;              /* video window height */
 
     /* Plugin used and shortcuts to access its capabilities */
     struct module_s *   p_module;

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.166 2002/03/21 07:11:57 gbazin Exp $
+ * $Id: main.c,v 1.167 2002/03/21 22:10:33 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -305,8 +305,8 @@ ADD_CATEGORY_HINT( "Video", NULL )
 ADD_PLUGIN  ( "vout", MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
 ADD_BOOL    ( "novideo", NULL, NOVIDEO_TEXT, NOVIDEO_LONGTEXT )
 ADD_STRING  ( "display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
-ADD_INTEGER ( "width", 720, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
-ADD_INTEGER ( "height", 576, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT )
+ADD_INTEGER ( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
+ADD_INTEGER ( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT )
 ADD_BOOL    ( "grayscale", NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT )
 ADD_BOOL    ( "fullscreen", NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT )
 ADD_BOOL    ( "nooverlay", NULL, NOOVERLAY_TEXT, NOOVERLAY_LONGTEXT )
