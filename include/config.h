@@ -272,7 +272,7 @@
 #define VOUT_IDLE_DELAY                 5000000
 
 /* Number of pictures required to computes the FPS rate */
-#define VOUT_FPS_SAMPLES                5
+#define VOUT_FPS_SAMPLES                20
 
 /*
  * Framebuffer settings
