@@ -47,7 +47,6 @@ typedef struct spu_s
 } spu_t;
 
 static int NewLine  ( spu_t *p_spu, int *i_id );
-static int PutPixel ( spu_t *p_spu, int len, u8 color );
 
 /* i = get_nibble(); */
 #define GET_NIBBLE( i ) \
@@ -95,6 +94,9 @@ void vout_RenderSPU( byte_t *p_data, int p_offset[2],
     int i_code = 0x00;
     int i_next = 0;
     int i_id = 0;
+    int i_color;
+    static int p_palette[4] = { 0x0000, 0xffff, 0x5555, 0x0000 };
+
     boolean_t b_aligned = 1;
     byte_t *p_from[2];
     spu_t spu;
@@ -108,15 +110,33 @@ void vout_RenderSPU( byte_t *p_data, int p_offset[2],
     spu.height = 576;
     spu.p_data = p_pic + i_x * i_bytes_per_pixel + i_y * i_bytes_per_line;
 
-    while( p_from[0] < p_data + p_offset[1] + 2 )
+    while( p_from[0] < p_data + p_offset[1] )
     {
         GET_NIBBLE( i_code );
 
         if( i_code >= 0x04 )
         {
             found_code:
-            if( PutPixel( &spu, i_code >> 2, i_code & 3 ) < 0 )
+
+            if( ((i_code >> 2) + spu.x + spu.y * spu.width)
+                    > spu.height * spu.width )
+            {
+                intf_DbgMsg ( "video_spu: invalid draw request ! %d %d\n",
+                              i_code >> 2, spu.height * spu.width
+                               - ( (i_code >> 2) + spu.x
+                                   + spu.y * spu.width ) );
                 return;
+            }
+            else
+            {
+                if( (i_color = i_code & 0x3) )
+                {
+                    u8 *p_target = &spu.p_data[ 2 * 
+                                    ( spu.x + spu.y * spu.width ) ];
+                    memset( p_target, p_palette[i_color], 2 * (i_code >> 2) );
+                }
+                spu.x += i_code >> 2;
+            }
 
             if( spu.x >= spu.width )
             {
@@ -164,45 +184,12 @@ void vout_RenderSPU( byte_t *p_data, int p_offset[2],
 
 static int NewLine( spu_t *p_spu, int *i_id )
 {
-    int i_ret = PutPixel( p_spu, p_spu->width - p_spu->x, 0 );
+    *i_id = 1 - *i_id;
 
     p_spu->x = 0;
     p_spu->y++;
-    *i_id = 1 - *i_id;
 
-    return i_ret;
-}
+    return( p_spu->width - p_spu->y );
 
-static int PutPixel ( spu_t *p_spu, int i_len, u8 i_color )
-{
-    //static int p_palette[4] = { 0x0000, 0xfef8, 0x7777, 0xffff };
-    static int p_palette[4] = { 0x0000, 0xffff, 0x5555, 0x0000 };
-
-    if( (i_len + p_spu->x + p_spu->y * p_spu->width)
-            > p_spu->height * p_spu->width )
-    {
-        intf_DbgMsg ( "video_spu: trying to draw beyond memory area! %d %d\n",
-                      i_len, p_spu->height * p_spu->width
-                             - ( i_len + p_spu->x + p_spu->y * p_spu->width) );
-        p_spu->x += i_len;
-        return -1;
-    }
-    else
-    {
-
-        if( i_color > 0x0f )
-            intf_DbgMsg( "video_spu: invalid color\n" );
-
-        if( i_color )
-        {
-            u8 *p_target
-                = &p_spu->p_data[2 * ( p_spu->x + p_spu->y * p_spu->width ) ];
-
-            memset( p_target, p_palette[i_color], 2 * i_len );
-        }
-        p_spu->x += i_len;
-    }
-
-    return 0;
 }
 

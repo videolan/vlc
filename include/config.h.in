@@ -277,6 +277,9 @@
  * (~1 Mbyte) before using huge values */
 #define VOUT_MAX_PICTURES               10
 
+/* Number of simultaneous subpictures */
+#define VOUT_MAX_SUBPICTURES            10
+
 /* Maximum number of active areas in a rendering buffer. Active areas are areas
  * of the picture which need to be cleared before re-using the buffer. If a
  * picture, including its many additions such as subtitles, additionnal user

@@ -119,6 +119,7 @@ typedef struct subpicture_s
     int             i_type;                                          /* type */
     int             i_status;                                       /* flags */
     int             i_size;                                     /* data size */
+    struct subpicture_s *   p_next;              /* next SPU to be displayed */
 
     /* Other properties */
     mtime_t         begin_date;                 /* beginning of display date */

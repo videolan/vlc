@@ -171,6 +171,9 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     {
         p_vout->p_picture[i_index].i_type   =   EMPTY_PICTURE;
         p_vout->p_picture[i_index].i_status =   FREE_PICTURE;
+    }
+    for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
+    {
         p_vout->p_subpicture[i_index].i_type  = EMPTY_SUBPICTURE;
         p_vout->p_subpicture[i_index].i_status= FREE_SUBPICTURE;
     }
@@ -353,7 +356,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     /*
      * Look for an empty place
      */
-    for( i_subpic = 0; i_subpic < VOUT_MAX_PICTURES; i_subpic++ )
+    for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
     {
         if( p_vout->p_subpicture[i_subpic].i_status == DESTROYED_SUBPICTURE )
         {
@@ -981,8 +984,8 @@ last_display_date = display_date;
 #if 1
             if( display_date < current_date && i_trash_count > 4 )
             {
-                /* Picture is late: it will be destroyed and the thread will sleep and
-                 * go to next picture */
+                /* Picture is late: it will be destroyed and the thread
+                 * will sleep and go to next picture */
 
                 vlc_mutex_lock( &p_vout->picture_lock );
                 if( p_pic->i_refcount )
@@ -1026,16 +1029,16 @@ last_display_date = display_date;
         /*
          * Find the subpictures to display - this operation does not need
          * lock, since only READY_SUBPICTURE are handled. If no picture
-         * has been selected, display_date will depend on the subpicture
+         * has been selected, display_date will depend on the subpicture.
+         * We get an easily parsable chained list of subpictures which
+         * ends with NULL since p_subpic was initialized to NULL.
          */
-        /* FIXME: we should find *all* subpictures to display, and
-         * check their displaying date as well */
-        for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
+        for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
         {
             if( p_vout->p_subpicture[i_index].i_status == READY_SUBPICTURE )
             {
+                p_vout->p_subpicture[i_index].p_next = p_subpic;
                 p_subpic = &p_vout->p_subpicture[i_index];
-                break;
             }
         }
 
@@ -1249,6 +1252,9 @@ static void EndThread( vout_thread_t *p_vout )
         {
             free( p_vout->p_picture[i_index].p_data );
         }
+    }
+    for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
+    {
         if( p_vout->p_subpicture[i_index].i_status != FREE_SUBPICTURE )
         {
             free( p_vout->p_subpicture[i_index].p_data );
@@ -1828,43 +1834,67 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     p_vout_font_t       p_font;                                 /* text font */
     int                 i_width, i_height;          /* subpicture dimensions */
 
-    switch( p_subpic->i_type )
+    while( p_subpic != NULL )
     {
-    case DVD_SUBPICTURE:                              /* DVD subpicture unit */
-        vout_RenderSPU( p_subpic->p_data, p_subpic->type.spu.i_offset,
-                        p_subpic->type.spu.i_x1, p_subpic->type.spu.i_y1,
-                        p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
-                        p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
-        break;
-    case TEXT_SUBPICTURE:                                /* single line text */
-        /* Select default font if not specified */
-        p_font = p_subpic->type.text.p_font;
-        if( p_font == NULL )
+        switch( p_subpic->i_type )
         {
-            p_font = p_vout->p_default_font;
-        }
+        case DVD_SUBPICTURE:                          /* DVD subpicture unit */
+            /* test if the picture really has to be displayed */
+            if( mdate() < p_subpic->begin_date )
+            {
+                break;
+            }
+            if( mdate() > p_subpic->end_date )
+            {
+                /* too late, destroying the subpic */
+                vout_DestroySubPicture( p_vout, p_subpic );
+                printf( "destroying subpicture\n" );
+                break;
+            }
+            vout_RenderSPU( p_subpic->p_data, p_subpic->type.spu.i_offset,
+                            p_subpic->type.spu.i_x1, p_subpic->type.spu.i_y1,
+                            p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
+                            p_vout->i_bytes_per_pixel,
+                            p_vout->i_bytes_per_line );
+            break;
+        case TEXT_SUBPICTURE:                            /* single line text */
+            /* Select default font if not specified */
+            p_font = p_subpic->type.text.p_font;
+            if( p_font == NULL )
+            {
+                p_font = p_vout->p_default_font;
+            }
 
-        /* Compute text size (width and height fields are ignored)
-         * and print it */
-        vout_TextSize( p_font, p_subpic->type.text.i_style, p_subpic->p_data, &i_width, &i_height );
-        if( !Align( p_vout, &p_subpic->i_x, &p_subpic->i_y, i_width, i_height,
-                    p_subpic->i_horizontal_align, p_subpic->i_vertical_align ) )
-        {
-            vout_Print( p_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
-                        p_subpic->i_x * p_vout->i_bytes_per_pixel +
-                        p_subpic->i_y * p_vout->i_bytes_per_line,
-                        p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                        p_subpic->type.text.i_char_color, p_subpic->type.text.i_border_color,
-                        p_subpic->type.text.i_bg_color, p_subpic->type.text.i_style,
-                        p_subpic->p_data );
-            SetBufferArea( p_vout, p_subpic->i_x, p_subpic->i_y, i_width, i_height );
-        }
-        break;
+            /* Compute text size (width and height fields are ignored)
+             * and print it */
+            vout_TextSize( p_font, p_subpic->type.text.i_style,
+                           p_subpic->p_data, &i_width, &i_height );
+            if( !Align( p_vout, &p_subpic->i_x, &p_subpic->i_y,
+                        i_width, i_height, p_subpic->i_horizontal_align,
+                        p_subpic->i_vertical_align ) )
+            {
+                vout_Print( p_font,
+                            p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
+                            p_subpic->i_x * p_vout->i_bytes_per_pixel +
+                            p_subpic->i_y * p_vout->i_bytes_per_line,
+                            p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
+                            p_subpic->type.text.i_char_color,
+                            p_subpic->type.text.i_border_color,
+                            p_subpic->type.text.i_bg_color,
+                            p_subpic->type.text.i_style, p_subpic->p_data );
+                SetBufferArea( p_vout, p_subpic->i_x, p_subpic->i_y,
+                               i_width, i_height );
+            }
+            break;
 
 #ifdef DEBUG
-    default:
-        intf_DbgMsg("error: unknown subpicture %p type %d\n", p_subpic, p_subpic->i_type );
+        default:
+            intf_DbgMsg( "error: unknown subpicture %p type %d\n",
+                         p_subpic, p_subpic->i_type );
 #endif
+        }
+
+        p_subpic = p_subpic->p_next;
     }
 }
 

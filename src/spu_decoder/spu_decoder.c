@@ -238,14 +238,15 @@ static void RunThread( spudec_thread_t *p_spudec )
             /* if the values we got aren't too strange, decode the data */
             if( i_rle_size < i_packet_size )
             {
-                /* destroy the previous one */
-                if( p_spu ) vout_DestroySubPicture( p_spudec->p_vout, p_spu );
-
                 /* allocate the subpicture.
                  * FIXME: we should check if the allocation failed */
                 p_spu = vout_CreateSubPicture( p_spudec->p_vout,
                                            DVD_SUBPICTURE, i_rle_size );
                 p_spu_data = p_spu->p_data;
+
+                /* get display time */
+                p_spu->begin_date = p_spu->end_date
+                                = DECODER_FIFO_START(p_spudec->fifo)->i_pts;
 
                 /* getting the RLE part */
                 while( i_index++ < i_rle_size )
@@ -264,9 +265,10 @@ static void RunThread( spudec_thread_t *p_spudec )
                 {
                     unsigned char i_cmd;
                     unsigned int i_word;
+                    unsigned int i_date;
 
                     /* the date */
-                    GetWord( i_word );
+                    GetWord( i_date );
 
                     /* next offset, no next offset if == i_index-5 */
                     GetWord( i_word );
@@ -280,14 +282,16 @@ static void RunThread( spudec_thread_t *p_spudec )
                         switch( i_cmd )
                         {
                             case 0x00:
-                                /* 00 (display now) */
+                                /* 00 (force displaying) */
                                 break;
                             case 0x01:
                                 /* 01 (start displaying) */
-                                break;
+                                p_spu->begin_date += (i_date * 1000000 / 80);
+                                break;    /* FIXME: 80 is absolutely empiric */
                             case 0x02:
                                 /* 02 (stop displaying) */
-                                break;
+                                p_spu->end_date += (i_date * 1000000 / 80);
+                                break;    /* FIXME: 80 is absolutely empiric */
                             case 0x03:
                                 /* 03xxxx (palette) */
                                 GetWord( i_word );
@@ -299,13 +303,21 @@ static void RunThread( spudec_thread_t *p_spudec )
                             case 0x05:
                                 /* 05xxxyyyxxxyyy (coordinates) */
                                 i_word = GetByte( &p_spudec->bit_stream );
-                                p_spu->type.spu.i_x1 = (i_word << 4) | GetBits( &p_spudec->bit_stream, 4 );
+                                p_spu->type.spu.i_x1 = (i_word << 4)
+                                        | GetBits( &p_spudec->bit_stream, 4 );
+
                                 i_word = GetBits( &p_spudec->bit_stream, 4 );
-                                p_spu->type.spu.i_x2 = (i_word << 8) | GetByte( &p_spudec->bit_stream );
+                                p_spu->type.spu.i_x2 = (i_word << 8)
+                                        | GetByte( &p_spudec->bit_stream );
+
                                 i_word = GetByte( &p_spudec->bit_stream );
-                                p_spu->type.spu.i_y1 = (i_word << 4) | GetBits( &p_spudec->bit_stream, 4 );
+                                p_spu->type.spu.i_y1 = (i_word << 4)
+                                        | GetBits( &p_spudec->bit_stream, 4 );
+
                                 i_word = GetBits( &p_spudec->bit_stream, 4 );
-                                p_spu->type.spu.i_y2 = (i_word << 8) | GetByte( &p_spudec->bit_stream );
+                                p_spu->type.spu.i_y2 = (i_word << 8)
+                                        | GetByte( &p_spudec->bit_stream );
+
 				i_index += 6;
                                 break;
                             case 0x06:
