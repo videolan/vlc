@@ -1,7 +1,5 @@
 SOURCES_galaktos = plugin.c \
                    plugin.h \
-                   glx.c \
-                   glx.h \
                    main.c \
                    main.h \
                    preset.c \

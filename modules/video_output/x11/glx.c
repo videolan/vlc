@@ -32,28 +32,59 @@
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 
+/* For the opengl provider interface */
+#include "vlc_opengl.h"
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 
+
+/* Data common to vout and opengl provider structures */
+typedef struct glx_t
+{
+    Display     *p_display;
+    int         b_glx13;
+    int         i_width;
+    int         i_height;
+    int         b_fullscreen;
+    GLXContext  gwctx;
+    Window      wnd;
+    GLXWindow   gwnd;
+    Atom        wm_delete;
+} glx_t;
+
+
+/*****************************************************************************
+ * Vout interface
+ *****************************************************************************/
+static int  CreateVout   ( vlc_object_t * );
+static void DestroyVout  ( vlc_object_t * );
+static int  Init         ( vout_thread_t * );
+static void End          ( vout_thread_t * );
+static int  Manage       ( vout_thread_t * );
+static void Render       ( vout_thread_t *p_vout, picture_t *p_pic );
+static void DisplayVideo ( vout_thread_t *, picture_t * );
+
+/*****************************************************************************
+ * OpenGL providerinterface
+ *****************************************************************************/
+static int  CreateOpenGL ( vlc_object_t * );
+static void DestroyOpenGL( vlc_object_t * );
+static int  InitOpenGL   ( opengl_t *, int, int );
+static void SwapBuffers  ( opengl_t * );
+static int  HandleEvents ( opengl_t * );
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create      ( vlc_object_t * );
-static void Destroy     ( vlc_object_t * );
-
-static int  Init        ( vout_thread_t * );
-static void End         ( vout_thread_t * );
-static int  Manage      ( vout_thread_t * );
-static void Render      ( vout_thread_t *p_vout, picture_t *p_pic );
-static void DisplayVideo( vout_thread_t *, picture_t * );
-
-static int  OpenDisplay ( vout_thread_t * );
-static void CloseDisplay( vout_thread_t * );
-static int  InitGLX12   ( vout_thread_t *p_vout );
-static int  InitGLX13   ( vout_thread_t *p_vout );
-static void CreateWindow( vout_thread_t *p_vout, XVisualInfo *p_vi );
-static void SwitchContext( vout_thread_t *p_vout );
+static int  OpenDisplay ( vlc_object_t *, glx_t * );
+static void CloseDisplay( glx_t * );
+static int  InitGLX12   ( vlc_object_t *, glx_t * );
+static int  InitGLX13   ( vlc_object_t *, glx_t * );
+static void CreateWindow( vlc_object_t *, glx_t *, XVisualInfo *);
+static int  HandleX11Events( vlc_object_t *, glx_t * );
+static void SwitchContext( glx_t * );
 
 static inline int GetAlignedSize( int i_size );
 
@@ -64,8 +95,14 @@ vlc_module_begin();
     set_description( _("X11 OpenGL (GLX) video output") );
     set_capability( "video output", 20 );
     add_shortcut( "glx" );
-    set_callbacks( Create, Destroy );
+    set_callbacks( CreateVout, DestroyVout );
+
+    add_submodule();
+    set_description( _("X11 OpenGL provider") );
+    set_capability( "opengl provider", 50 );
+    set_callbacks( CreateOpenGL, DestroyOpenGL );
 vlc_module_end();
+
 
 /*****************************************************************************
  * vout_sys_t: GLX video output method descriptor
@@ -77,25 +114,19 @@ struct vout_sys_t
 {
     uint8_t     *p_buffer;
     int         i_index;
-
     int         i_tex_width;
     int         i_tex_height;
-
-    int         i_width;
-    int         i_height;
-    int         b_fullscreen;
-
-    Display     *p_display;
-    int         b_glx13;
-    GLXContext  gwctx;
-    Window      wnd;
-    GLXWindow   gwnd;
-    Atom        wm_delete;
-
     GLuint      texture;
-
     int         i_effect; //XXX
+
+    glx_t       glx;
 };
+
+struct opengl_sys_t
+{
+    glx_t       glx;
+};
+
 
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
@@ -110,11 +141,11 @@ typedef struct mwmhints_t
 
 
 /*****************************************************************************
- * Create: allocates GLX video thread output method
+ * CreateVout: allocates GLX video thread output method
  *****************************************************************************
  * This function allocates and initializes a GLX vout method.
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int CreateVout( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
@@ -129,11 +160,11 @@ static int Create( vlc_object_t *p_this )
     //XXX set to 0 to disable the cube effect
     p_vout->p_sys->i_effect = 1;
 
-   /* p_vout->p_sys->i_width = p_vout->i_window_width;
-    p_vout->p_sys->i_height = p_vout->i_window_height; */
-    p_vout->p_sys->i_width = 700;
-    p_vout->p_sys->i_height = 700;
-    p_vout->p_sys->b_fullscreen = 0;
+   /* p_vout->p_sys->glx.i_width = p_vout->i_window_width;
+    p_vout->p_sys->glx.i_height = p_vout->i_window_height; */
+    p_vout->p_sys->glx.i_width = 700;
+    p_vout->p_sys->glx.i_height = 700;
+    p_vout->p_sys->glx.b_fullscreen = 0;
 
     /* A texture must have a size aligned on a power of 2 */
     p_vout->p_sys->i_tex_width  = GetAlignedSize( p_vout->render.i_width );
@@ -143,7 +174,7 @@ static int Create( vlc_object_t *p_this )
              p_vout->p_sys->i_tex_height );
 
     /* Open and initialize device */
-    if( OpenDisplay( p_vout ) )
+    if( OpenDisplay( p_this, &p_vout->p_sys->glx ) )
     {
         msg_Err( p_vout, "cannot open display" );
         free( p_vout->p_sys );
@@ -200,6 +231,13 @@ static int Init( vout_thread_t *p_vout )
      * directly by the decoder */
     p_pic->i_planes = 1;
 
+    p_vout->p_sys->p_buffer =
+        malloc( p_vout->p_sys->i_tex_width * p_vout->p_sys->i_tex_height * 4 );
+    if( !p_vout->p_sys->p_buffer )
+    {
+        msg_Err( p_vout, "Out of memory" );
+        return -1;
+    }
 
     p_pic->p->p_pixels = p_vout->p_sys->p_buffer
         + 2 * p_vout->p_sys->i_tex_width *
@@ -217,7 +255,7 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 1;
 
-    SwitchContext( p_vout );
+    SwitchContext( &p_vout->p_sys->glx );
 
     /* Set the texture parameters */
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -226,7 +264,7 @@ static int Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->i_effect )
     {
         glEnable( GL_CULL_FACE);
-        /*glDisable( GL_DEPTH_TEST );
+/*        glDisable( GL_DEPTH_TEST );
         glEnable( GL_BLEND );
         glBlendFunc( GL_SRC_ALPHA, GL_ONE );*/
 
@@ -253,13 +291,13 @@ static void End( vout_thread_t *p_vout )
 /*****************************************************************************
  * Destroy: destroy GLX video thread output method
  *****************************************************************************
- * Terminate an output method created by Create
+ * Terminate an output method created by CreateVout
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void DestroyVout( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    CloseDisplay( p_vout );
+    CloseDisplay( &p_vout->p_sys->glx );
 
     /* Free the texture buffer*/
     if( p_vout->p_sys->p_buffer )
@@ -270,6 +308,95 @@ static void Destroy( vlc_object_t *p_this )
     free( p_vout->p_sys );
 }
 
+
+/*****************************************************************************
+ * CreateOpenGL: initialize an OpenGL provider
+ *****************************************************************************/
+static int CreateOpenGL( vlc_object_t *p_this )
+{
+    opengl_t *p_opengl = (opengl_t*)p_this;
+
+    /* Allocate the structure */
+    p_opengl->p_sys = malloc(sizeof(opengl_sys_t));
+
+    /* Set the function pointers */
+    p_opengl->pf_init = InitOpenGL;
+    p_opengl->pf_swap = SwapBuffers;
+    p_opengl->pf_handle_events = HandleEvents;
+
+    p_opengl->p_sys->glx.wnd = None;
+
+    return VLC_SUCCESS;
+}
+
+
+/*****************************************************************************
+ * DestroyOpenGL: destroys an OpenGL provider
+ *****************************************************************************/
+static void DestroyOpenGL( vlc_object_t *p_this )
+{
+    opengl_t *p_opengl = (opengl_t*)p_this;
+
+    /* Free the structure */
+    free(p_opengl->p_sys);
+}
+
+/*****************************************************************************
+ * InitOpenGL: creates the OpenGL window
+ *****************************************************************************/
+static int InitOpenGL( opengl_t *p_opengl, int i_width, int i_height )
+{
+    p_opengl->p_sys->glx.i_width = i_width;
+    p_opengl->p_sys->glx.i_height = i_height;
+    p_opengl->p_sys->glx.b_fullscreen = 0;
+
+    if( OpenDisplay( (vlc_object_t*)p_opengl, &p_opengl->p_sys->glx ) )
+    {
+        msg_Err( p_opengl, "Cannot create OpenGL window" );
+        return VLC_EGENERIC;
+    }
+
+    /* Set the OpenGL context _for the current thread_ */
+    SwitchContext( &p_opengl->p_sys->glx );
+
+    return VLC_SUCCESS;
+}
+
+
+/*****************************************************************************
+ * SwapBuffers: swap front/back buffers
+ *****************************************************************************/
+static void SwapBuffers( opengl_t *p_opengl )
+{
+    if( p_opengl->p_sys->glx.b_glx13 )
+    {
+        glXSwapBuffers( p_opengl->p_sys->glx.p_display,
+                        p_opengl->p_sys->glx.gwnd );
+    }
+    else
+    {
+        glXSwapBuffers( p_opengl->p_sys->glx.p_display,
+                        p_opengl->p_sys->glx.wnd );
+    }
+}
+
+
+/*****************************************************************************
+ * HandleEvents: handle window events
+ *****************************************************************************/
+static int HandleEvents( opengl_t *p_opengl )
+{
+    int i_ret =
+        HandleX11Events( (vlc_object_t*)p_opengl, &p_opengl->p_sys->glx );
+    if( i_ret )
+    {
+        /* close the window */
+        CloseDisplay( &p_opengl->p_sys->glx );
+    }
+    return i_ret;
+}
+
+
 /*****************************************************************************
  * Manage: handle X11 events
  *****************************************************************************
@@ -278,9 +405,27 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
+    if( HandleX11Events( (vlc_object_t*)p_vout, &p_vout->p_sys->glx ) )
+    {
+        /* the user wants to close the window */
+        playlist_t * p_playlist =
+            (playlist_t *)vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist != NULL )
+        {
+            playlist_Stop( p_playlist );
+            vlc_object_release( p_playlist );
+        }
+    }
+    return 0;
+}
+
+
+static int HandleX11Events( vlc_object_t *p_thread, glx_t *p_glx )
+{
     Display *p_display;
 
-    p_display = p_vout->p_sys->p_display;
+    p_display = p_glx->p_display;
 
     /* loop on X11 events */
     while( XPending( p_display ) > 0 )
@@ -293,17 +438,10 @@ static int Manage( vout_thread_t *p_vout )
             {
                 /* Delete notification */
                 if( (evt.xclient.format == 32) &&
-                    ((Atom)evt.xclient.data.l[0] == p_vout->p_sys->wm_delete) )
+                    ((Atom)evt.xclient.data.l[0] ==
+                     p_glx->wm_delete) )
                 {
-                    /* the user wants to close the window */
-                    playlist_t * p_playlist =
-                        (playlist_t *)vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-                    if( p_playlist != NULL )
-                    {
-                        playlist_Stop( p_playlist );
-                        vlc_object_release( p_playlist );
-                    }
+                    return -1;
                 }
                 break;
             }
@@ -311,6 +449,7 @@ static int Manage( vout_thread_t *p_vout )
     }
     return 0;
 }
+
 
 /*****************************************************************************
  * Render: render previously calculated output
@@ -421,99 +560,88 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         glEnd();
     }
     glDisable( GL_TEXTURE_2D);
-    
-  
 }
+
 
 /*****************************************************************************
  * DisplayVideo: displays previously rendered output
  *****************************************************************************/
 static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    if( p_vout->p_sys->b_glx13 )
+    if( p_vout->p_sys->glx.b_glx13 )
     {
-        glXSwapBuffers( p_vout->p_sys->p_display, p_vout->p_sys->gwnd );
+        glXSwapBuffers( p_vout->p_sys->glx.p_display,
+                        p_vout->p_sys->glx.gwnd );
     }
     else
     {
-        glXSwapBuffers( p_vout->p_sys->p_display, p_vout->p_sys->wnd );
+        glXSwapBuffers( p_vout->p_sys->glx.p_display,
+                        p_vout->p_sys->glx.wnd );
     }
-
 }
 
-/* following functions are local */
 
 /*****************************************************************************
  * OpenDisplay: open and initialize OpenGL device
  *****************************************************************************/
-
-static int OpenDisplay( vout_thread_t *p_vout )
+static int OpenDisplay( vlc_object_t *p_thread, glx_t *p_glx )
 {
     Display *p_display;
     int i_opcode, i_evt, i_err;
     int i_maj, i_min;
 
     /* Open the display */
-    p_vout->p_sys->p_display = p_display = XOpenDisplay( NULL );
+    p_glx->p_display = p_display = XOpenDisplay( NULL );
     if( !p_display )
     {
-        msg_Err( p_vout, "Cannot open display" );
+        msg_Err( p_thread, "Cannot open display" );
         return -1;
     }
 
     /* Check for GLX extension */
     if( !XQueryExtension( p_display, "GLX", &i_opcode, &i_evt, &i_err ) )
     {
-        msg_Err( p_vout, "GLX extension not supported" );
+        msg_Err( p_thread, "GLX extension not supported" );
         return -1;
     }
     if( !glXQueryExtension( p_display, &i_err, &i_evt ) )
     {
-        msg_Err( p_vout, "glXQueryExtension failed" );
+        msg_Err( p_thread, "glXQueryExtension failed" );
         return -1;
     }
 
     /* Check GLX version */
     if (!glXQueryVersion( p_display, &i_maj, &i_min ) )
     {
-        msg_Err( p_vout, "glXQueryVersion failed" );
+        msg_Err( p_thread, "glXQueryVersion failed" );
         return -1;
     }
     if( i_maj <= 0 || ((i_maj == 1) && (i_min < 3)) )
     {
-        p_vout->p_sys->b_glx13 = 0;
-        msg_Dbg( p_vout, "Using GLX 1.2 API" );
-        if( InitGLX12( p_vout ) == -1 )
+        p_glx->b_glx13 = 0;
+        msg_Dbg( p_thread, "Using GLX 1.2 API" );
+        if( InitGLX12( p_thread, p_glx ) == -1 )
         {
             return -1;
         }
     }
     else
     {
-        p_vout->p_sys->b_glx13 = 1;
-        msg_Dbg( p_vout, "Using GLX 1.3 API" );
-        if( InitGLX13( p_vout ) == -1 )
+        p_glx->b_glx13 = 1;
+        msg_Dbg( p_thread, "Using GLX 1.3 API" );
+        if( InitGLX13( p_thread, p_glx ) == -1 )
         {
             return -1;
         }
     }
 
-    XMapWindow( p_display, p_vout->p_sys->wnd );
-    if( p_vout->p_sys->b_fullscreen )
+    XMapWindow( p_display, p_glx->wnd );
+    if( p_glx->b_fullscreen )
     {
         //XXX
-        XMoveWindow( p_display, p_vout->p_sys->wnd, 0, 0 );
+        XMoveWindow( p_display, p_glx->wnd, 0, 0 );
     }
     XFlush( p_display );
-
-    /* Allocate the texture buffer */
-    p_vout->p_sys->p_buffer =
-        malloc( p_vout->p_sys->i_tex_width * p_vout->p_sys->i_tex_height * 4 );
-    if( !p_vout->p_sys->p_buffer )
-    {
-        msg_Err( p_vout, "Out of memory" );
-        return -1;
-    }
     return 0;
 }
 
@@ -523,25 +651,29 @@ static int OpenDisplay( vout_thread_t *p_vout )
  * Returns all resources allocated by OpenDisplay and restore the original
  * state of the device.
  *****************************************************************************/
-static void CloseDisplay( vout_thread_t *p_vout )
+static void CloseDisplay( glx_t *p_glx )
 {
     Display *p_display;
 
-    glFlush();
-
-    p_display = p_vout->p_sys->p_display;
-    glXDestroyContext( p_display, p_vout->p_sys->gwctx );
-    if( p_vout->p_sys->b_glx13 )
+    if (p_glx->wnd == None )
     {
-        glXDestroyWindow( p_display, p_vout->p_sys->gwnd );
+        // Already closed or not opened...
+        return;
     }
-    XDestroyWindow( p_display, p_vout->p_sys->wnd );
-    XCloseDisplay( p_display );
 
+    glFlush();
+    p_display = p_glx->p_display;
+    glXDestroyContext( p_display, p_glx->gwctx );
+    if( p_glx->b_glx13 )
+    {
+        glXDestroyWindow( p_display, p_glx->gwnd );
+    }
+    XDestroyWindow( p_display, p_glx->wnd );
+    p_glx->wnd = None;
 }
 
 
-int InitGLX12( vout_thread_t *p_vout )
+int InitGLX12( vlc_object_t *p_thread, glx_t *p_glx )
 {
     Display *p_display;
     XVisualInfo *p_vi;
@@ -550,23 +682,23 @@ int InitGLX12( vout_thread_t *p_vout )
                      GLX_BLUE_SIZE, 5, GLX_DOUBLEBUFFER,
                      0 };
 
-    p_display = p_vout->p_sys->p_display;
+    p_display = p_glx->p_display;
 
     p_vi = glXChooseVisual( p_display, DefaultScreen( p_display), p_attr );
     if(! p_vi )
     {
-        msg_Err( p_vout, "Cannot get GLX 1.2 visual" );
+        msg_Err( p_thread, "Cannot get GLX 1.2 visual" );
         return -1;
     }
 
     /* Create the window */
-    CreateWindow( p_vout, p_vi );
+    CreateWindow( p_thread, p_glx, p_vi );
 
      /* Create an OpenGL context */
-    p_vout->p_sys->gwctx = gwctx = glXCreateContext( p_display, p_vi, 0, True );
+    p_glx->gwctx = gwctx = glXCreateContext( p_display, p_vi, 0, True );
     if( !gwctx )
     {
-        msg_Err( p_vout, "Cannot create OpenGL context");
+        msg_Err( p_thread, "Cannot create OpenGL context");
         XFree( p_vi );
         return -1;
     }
@@ -576,7 +708,7 @@ int InitGLX12( vout_thread_t *p_vout )
 }
 
 
-int InitGLX13( vout_thread_t *p_vout )
+int InitGLX13( vlc_object_t *p_thread, glx_t *p_glx )
 {
     Display *p_display;
     int i_nbelem;
@@ -587,13 +719,13 @@ int InitGLX13( vout_thread_t *p_vout )
                      GLX_BLUE_SIZE, 5, GLX_DOUBLEBUFFER, True,
                      GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, 0 };
 
-    p_display = p_vout->p_sys->p_display;
+    p_display = p_glx->p_display;
 
     /* Get the FB configuration */
     p_fbconfs = glXChooseFBConfig( p_display, 0, p_attr, &i_nbelem );
     if( (i_nbelem <= 0) || !p_fbconfs )
     {
-        msg_Err( p_vout, "Cannot get FB configurations");
+        msg_Err( p_thread, "Cannot get FB configurations");
         if( p_fbconfs )
         {
             XFree( p_fbconfs );
@@ -606,30 +738,30 @@ int InitGLX13( vout_thread_t *p_vout )
     p_vi = glXGetVisualFromFBConfig( p_display, fbconf );
     if( !p_vi )
     {
-        msg_Err( p_vout, "Cannot get X11 visual" );
+        msg_Err( p_thread, "Cannot get X11 visual" );
         XFree( p_fbconfs );
         return -1;
     }
 
     /* Create the window */
-    CreateWindow( p_vout, p_vi );
+    CreateWindow( p_thread, p_glx, p_vi );
 
     XFree( p_vi );
 
     /* Create the GLX window */
-    p_vout->p_sys->gwnd = glXCreateWindow( p_display, fbconf, p_vout->p_sys->wnd, NULL );
-    if( p_vout->p_sys->gwnd == None )
+    p_glx->gwnd = glXCreateWindow( p_display, fbconf, p_glx->wnd, NULL );
+    if( p_glx->gwnd == None )
     {
-        msg_Err( p_vout, "Cannot create GLX window" );
+        msg_Err( p_thread, "Cannot create GLX window" );
         return -1;
     }
 
     /* Create an OpenGL context */
-    p_vout->p_sys->gwctx = gwctx = glXCreateNewContext( p_display, fbconf,
+    p_glx->gwctx = gwctx = glXCreateNewContext( p_display, fbconf,
                                                   GLX_RGBA_TYPE, NULL, True );
     if( !gwctx )
     {
-        msg_Err( p_vout, "Cannot create OpenGL context");
+        msg_Err( p_thread, "Cannot create OpenGL context");
         XFree( p_fbconfs );
         return -1;
     }
@@ -639,8 +771,7 @@ int InitGLX13( vout_thread_t *p_vout )
 }
 
 
-
-void CreateWindow( vout_thread_t *p_vout, XVisualInfo *p_vi )
+void CreateWindow( vlc_object_t *p_thread, glx_t *p_glx, XVisualInfo *p_vi )
 {
     Display *p_display;
     XSetWindowAttributes xattr;
@@ -650,7 +781,7 @@ void CreateWindow( vout_thread_t *p_vout, XVisualInfo *p_vi )
     Atom prop;
     mwmhints_t mwmhints;
 
-    p_display = p_vout->p_sys->p_display;
+    p_display = p_glx->p_display;
 
     /* Create a colormap */
     cm = XCreateColormap( p_display, RootWindow( p_display, p_vi->screen ),
@@ -660,16 +791,16 @@ void CreateWindow( vout_thread_t *p_vout, XVisualInfo *p_vi )
     xattr.background_pixel = BlackPixel( p_display, DefaultScreen(p_display) );
     xattr.border_pixel = 0;
     xattr.colormap = cm;
-    p_vout->p_sys->wnd = wnd = XCreateWindow( p_display, DefaultRootWindow(p_display),
-            0, 0, p_vout->p_sys->i_width, p_vout->p_sys->i_height, 0, p_vi->depth,
+    p_glx->wnd = wnd = XCreateWindow( p_display, DefaultRootWindow(p_display),
+            0, 0, p_glx->i_width, p_glx->i_height, 0, p_vi->depth,
             InputOutput, p_vi->visual,
             CWBackPixel | CWBorderPixel | CWColormap, &xattr);
 
     /* Allow the window to be deleted by the window manager */
-    p_vout->p_sys->wm_delete = XInternAtom( p_display, "WM_DELETE_WINDOW", False );
-    XSetWMProtocols( p_display, wnd, &p_vout->p_sys->wm_delete, 1 );
+    p_glx->wm_delete = XInternAtom( p_display, "WM_DELETE_WINDOW", False );
+    XSetWMProtocols( p_display, wnd, &p_glx->wm_delete, 1 );
 
-    if( p_vout->p_sys->b_fullscreen )
+    if( p_glx->b_fullscreen )
     {
         mwmhints.flags = MWM_HINTS_DECORATIONS;
         mwmhints.decorations = False;
@@ -683,10 +814,10 @@ void CreateWindow( vout_thread_t *p_vout, XVisualInfo *p_vi )
         /* Prevent the window from being resized */
         p_size_hints = XAllocSizeHints();
         p_size_hints->flags = PMinSize | PMaxSize;
-        p_size_hints->min_width = p_vout->p_sys->i_width;
-        p_size_hints->min_height = p_vout->p_sys->i_height;
-        p_size_hints->max_width = p_vout->p_sys->i_width;
-        p_size_hints->max_height = p_vout->p_sys->i_height;
+        p_size_hints->min_width = p_glx->i_width;
+        p_size_hints->min_height = p_glx->i_height;
+        p_size_hints->max_width = p_glx->i_width;
+        p_size_hints->max_height = p_glx->i_height;
         XSetWMNormalHints( p_display, wnd, p_size_hints );
         XFree( p_size_hints );
     }
@@ -694,18 +825,18 @@ void CreateWindow( vout_thread_t *p_vout, XVisualInfo *p_vi )
 }
 
 
-void SwitchContext( vout_thread_t *p_vout )
+void SwitchContext( glx_t *p_glx )
 {
     /* Change the current OpenGL context */
-    if( p_vout->p_sys->b_glx13 )
+    if( p_glx->b_glx13 )
     {
-        glXMakeContextCurrent( p_vout->p_sys->p_display, p_vout->p_sys->gwnd,
-                               p_vout->p_sys->gwnd, p_vout->p_sys->gwctx );
+        glXMakeContextCurrent( p_glx->p_display, p_glx->gwnd,
+                               p_glx->gwnd, p_glx->gwctx );
     }
     else
     {
-        glXMakeCurrent( p_vout->p_sys->p_display, p_vout->p_sys->wnd,
-                        p_vout->p_sys->gwctx );
+        glXMakeCurrent( p_glx->p_display, p_glx->wnd,
+                        p_glx->gwctx );
     }
 }
 

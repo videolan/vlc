@@ -1,10 +1,10 @@
 /*****************************************************************************
- * plugin.h:
+ * vlc_opengl.h: OpenGL provider interface
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
  * $Id$
  *
- * Authors: Cyril Deguet <asmax@videolan.org>
+ * Authors: Cyril Deguet  <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,39 +21,28 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef _GALAKTOS_PLUGIN_H_
-#define _GALAKTOS_PLUGIN_H_
+#ifndef _VLC_OPENGL_H
+#define _VLC_OPENGL_H 1
 
-#include <vlc/vlc.h>
-#include <vlc/aout.h>
 
-#define MAX_BLOCKS 10
-
-typedef struct
+struct opengl_t
 {
     VLC_COMMON_MEMBERS
 
-    char          *psz_title;
+    int             i_width;        /* window width */
+    int             i_height;       /* window height */
+    int             b_fullscreen;   /* fullscreen flag */
 
-    /* OpenGL provider */
-    opengl_t      *p_opengl;
-    module_t      *p_module;
+    opengl_sys_t    *p_sys;         /* private data */
 
-    /* Window properties */
-    int           i_width;
-    int           i_height;
-    int           b_fullscreen;
+    /* Create an OpenGL window of the requested size (if possible) */
+    int     ( *pf_init )( opengl_t *, int i_width, int i_height );
 
-    /* Audio properties */
-    int           i_channels;
+    /* Swap front/back buffers */
+    void    ( *pf_swap )( opengl_t * );
 
-    /* Audio buffer */
-    int16_t       p_data[2][512];
-    int           i_cur_sample;
-
-    /* OS specific data */
-    void          *p_os_data;
-
-} galaktos_thread_t;
+    /* Handle window events */
+    int     ( *pf_handle_events )( opengl_t * );
+};
 
 #endif

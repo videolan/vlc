@@ -340,6 +340,10 @@ typedef int (*httpd_file_callback_t)( httpd_file_sys_t*, httpd_file_t *, uint8_t
 typedef struct httpd_redirect_t httpd_redirect_t;
 typedef struct httpd_stream_t httpd_stream_t;
 
+/* opengl */
+typedef struct opengl_t     opengl_t;
+typedef struct opengl_sys_t opengl_sys_t;
+
 /* divers */
 typedef struct vlc_meta_t    vlc_meta_t;
 

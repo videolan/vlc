@@ -29,7 +29,6 @@
  *****************************************************************************/
 
 #include "plugin.h"
-#include "glx.h"
 #include "main.h"
 #include "PCM.h"
 #include "video_init.h"
@@ -38,6 +37,7 @@
 #include <vlc/input.h>
 #include <vlc/vout.h>
 #include "aout_internal.h"
+#include "vlc_opengl.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -78,7 +78,7 @@ static int Open( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
-    galaktos_thread_t     *p_thread;
+    galaktos_thread_t *p_thread;
     vlc_value_t       width, height;
 
     if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' )
@@ -104,6 +104,25 @@ static int Open( vlc_object_t *p_this )
         vlc_object_create( p_filter, sizeof( galaktos_thread_t ) );
     vlc_object_attach( p_thread, p_this );
 
+    /* Get on OpenGL provider */
+    p_thread->p_opengl =
+        (opengl_t *)vlc_object_create( p_this, VLC_OBJECT_OPENGL );
+    if( p_thread->p_opengl == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        return VLC_ENOMEM;
+    }
+
+    p_thread->p_module =
+        module_Need( p_thread->p_opengl, "opengl provider", NULL, 0 );
+    if( p_thread->p_module == NULL )
+    {
+        msg_Err( p_filter, "No OpenGL provider found" );
+        vlc_object_destroy( p_thread->p_opengl );
+        p_thread->p_opengl = NULL;
+        return VLC_ENOOBJ;
+    }
+
 /*
     var_Create( p_thread, "galaktos-width", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Get( p_thread, "galaktos-width", &width );
@@ -116,7 +135,6 @@ static int Open( vlc_object_t *p_this )
     p_thread->i_width = 600;
     p_thread->i_height = 600;
     p_thread->b_fullscreen = 0;
-    galaktos_glx_init( p_thread );
     galaktos_init( p_thread );
 
     p_thread->i_channels = aout_FormatNbChannels( &p_filter->input );
@@ -203,7 +221,10 @@ static void Thread( vlc_object_t *p_this )
     int timestart=0;
     int mspf=0;
 
-    galaktos_glx_activate_window( p_thread );
+    /* Initialize the opengl provider */
+    (p_thread->p_opengl->pf_init)(p_thread->p_opengl, p_thread->i_width,
+                                  p_thread->i_height);
+
     setup_opengl( p_thread->i_width, p_thread->i_height );
     CreateRenderTarget(512, &RenderTargetTextureID, NULL);
 
@@ -235,8 +256,6 @@ static void Thread( vlc_object_t *p_this )
     //     printf("Limiter %d\n",(mdate()/1000-timestart));
         timestart=mdate()/1000;
     }
-
-    galaktos_glx_done( p_thread );
 }
 
 /*****************************************************************************
@@ -253,6 +272,10 @@ static void Close( vlc_object_t *p_this )
     galaktos_done( p_sys->p_thread );
 
     vlc_thread_join( p_sys->p_thread );
+
+    /* Free the openGL provider */
+    module_Unneed( p_sys->p_thread->p_opengl, p_sys->p_thread->p_module );
+    vlc_object_destroy( p_sys->p_thread->p_opengl );
 
     /* Free data */
     vlc_object_detach( p_sys->p_thread );

@@ -48,6 +48,8 @@
 #include "vlc_interface.h"
 #include "vlc_codec.h"
 
+#include "vlc_opengl.h"
+
 #include "vlc_httpd.h"
 #include "vlc_vlm.h"
 /*****************************************************************************
@@ -168,6 +170,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_VLM:
             i_size = sizeof( vlm_t );
             psz_type = "vlm dameon";
+            break;
+        case VLC_OBJECT_OPENGL:
+            i_size = sizeof( opengl_t );
+            psz_type = "opengl provider";
             break;
         case VLC_OBJECT_ANNOUNCE:
             i_size = sizeof( announce_handler_t );

@@ -22,7 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include "glx.h"
+#include "plugin.h"
+#include "vlc_opengl.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <unistd.h>
@@ -269,10 +270,10 @@ int galaktos_update( galaktos_thread_t *p_thread )
     glFinish();
     glFlush();
     //  printf("Flush %d\n",(SDL_GetTicks()-timestart));
-    galaktos_glx_swap( p_thread );
+    (p_thread->p_opengl->pf_swap)( p_thread->p_opengl );
 
-    /* Process X11 events */
-    if( galaktos_glx_handle_events( p_thread ) == 1 )
+    /* Process events */
+    if( (p_thread->p_opengl->pf_handle_events)( p_thread->p_opengl ) )
     {
         return 1;
     }
