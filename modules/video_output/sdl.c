@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.6 2003/01/09 14:05:31 sam Exp $
+ * $Id: sdl.c,v 1.7 2003/01/13 13:28:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -106,6 +106,8 @@ vlc_module_begin();
     set_capability( "video output", 60 );
     add_shortcut( "sdl" );
     set_callbacks( Open, Close );
+    /* XXX: check for conflicts with the SDL audio output */
+    var_Create( p_module->p_libvlc, "sdl", VLC_VAR_MUTEX );
 vlc_module_end();
 
 /*****************************************************************************
@@ -118,14 +120,19 @@ vlc_module_end();
 static int Open ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
+    vlc_value_t lockval;
 
 #ifdef HAVE_SETENV
     char *psz_method;
 #endif
 
+    var_Get( p_this->p_libvlc, "sdl", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+
     if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
     {
-        return( 1 );
+        vlc_mutex_unlock( lockval.p_address );
+        return VLC_EGENERIC;
     }
 
     /* Allocate structure */
@@ -133,7 +140,8 @@ static int Open ( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return( 1 );
+        vlc_mutex_unlock( lockval.p_address );
+        return VLC_ENOMEM;
     }
 
     p_vout->pf_init = Init;
@@ -173,8 +181,11 @@ static int Open ( vlc_object_t *p_this )
     {
         msg_Err( p_vout, "cannot initialize SDL (%s)", SDL_GetError() );
         free( p_vout->p_sys );
-        return( 1 );
+        vlc_mutex_unlock( lockval.p_address );
+        return VLC_EGENERIC;
     }
+
+    vlc_mutex_unlock( lockval.p_address );
 
     p_vout->p_sys->b_cursor = 1;
     p_vout->p_sys->b_cursor_autohidden = 0;
