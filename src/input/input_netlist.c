@@ -102,7 +102,7 @@ int input_NetlistInit( input_thread_t *p_input )
     for( i_packets = 0; i_packets < INPUT_MAX_TS + 1; i_packets++ )
     {
         p_input->netlist.p_ts_free[i_base + i_packets].iov_base
-                              = (p_input->netlist.p_ts_packets + i_packets);
+                          = (void *)(p_input->netlist.p_ts_packets + i_packets);
         /* Initialize TS length. */
         (p_input->netlist.p_ts_packets[i_packets]).i_payload_end = TS_PACKET_SIZE;
     }

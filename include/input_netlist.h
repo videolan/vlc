@@ -63,10 +63,10 @@ static __inline__ void input_NetlistFreePES( input_thread_t *p_input,
 #ifdef INPUT_LIFO_TS_NETLIST
         p_input->netlist.i_ts_index--;
         p_input->netlist.p_ts_free[p_input->netlist.i_ts_index].iov_base
-                             = p_ts_packet;
+                             = (void *)p_ts_packet;
 #else /* FIFO */
         p_input->netlist.p_ts_free[p_input->netlist.i_ts_end].iov_base
-                             = p_ts_packet;
+                             = (void *)p_ts_packet;
         p_input->netlist.i_ts_end++;
         p_input->netlist.i_ts_end &= INPUT_MAX_TS; /* loop */
 #endif
@@ -104,9 +104,11 @@ static __inline__ void input_NetlistFreeTS( input_thread_t *p_input,
     /* Free the TS structure. */
 #ifdef INPUT_LIFO_TS_NETLIST
     p_input->netlist.i_ts_index--;
-    p_input->netlist.p_ts_free[p_input->netlist.i_ts_index].iov_base = p_ts_packet;
+    p_input->netlist.p_ts_free[p_input->netlist.i_ts_index].iov_base
+        = (void *)p_ts_packet;
 #else /* FIFO */
-    p_input->netlist.p_ts_free[p_input->netlist.i_ts_end].iov_base = p_ts_packet;
+    p_input->netlist.p_ts_free[p_input->netlist.i_ts_end].iov_base
+        = (void *)p_ts_packet;
     p_input->netlist.i_ts_end++;
     p_input->netlist.i_ts_end &= INPUT_MAX_TS; /* loop */
 #endif

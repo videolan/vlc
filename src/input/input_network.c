@@ -91,7 +91,7 @@ int input_NetworkOpen( input_thread_t *p_input )
                     &i_socket_option,
                     sizeof( i_socket_option ) ) == (-1) )
     {
-        intf_ErrMsg("error: can't configure socket (%s)\n", strerror(errno));
+        intf_ErrMsg("error: can't configure socket (SO_REUSEADDR: %s)\n", strerror(errno));
         close( p_input->i_handle );
         return( 1 );
     }
@@ -105,7 +105,7 @@ int input_NetworkOpen( input_thread_t *p_input )
                     &i_socket_option,
                     sizeof( i_socket_option ) ) == (-1) )
     {
-        intf_ErrMsg("error: can't configure socket (%s)\n", strerror(errno));
+        intf_ErrMsg("error: can't configure socket (SO_RCVBUF: %s)\n", strerror(errno));
         close( p_input->i_handle );
         return( 1 );
     }

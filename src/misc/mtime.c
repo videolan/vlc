@@ -31,6 +31,7 @@
  * Preamble
  *****************************************************************************/
 #include <stdio.h>                                              /* sprintf() */
+#include <unistd.h>                                              /* select() */
 #include <sys/time.h>
 
 #include "common.h"

@@ -41,10 +41,8 @@
  *****************************************************************************/
 
 /* Program version and copyright message */
-#define COPYRIGHT_MESSAGE               "VideoLAN Client v" PROGRAM_VERSION " - (c)1999-2000 VideoLAN"
-#define VERSION_MESSAGE                 "VideoLAN Client - (c)1999-2000 VideoLAN\n" \
-                                        "version " PROGRAM_VERSION " ( " PROGRAM_BUILD " )\n" \
-                                        "compilation options: " PROGRAM_OPTIONS
+#define COPYRIGHT_MESSAGE   "VideoLAN Client - version " PROGRAM_VERSION \
+                            " " PROGRAM_CODENAME " - (c)1996-2000 VideoLAN"
 
 /*****************************************************************************
  * General compilation options

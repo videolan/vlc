@@ -23,7 +23,6 @@
 
 /*****************************************************************************
  * Required headers:
- * - <sys/soundcard.h>                                       ( audio_buf_info )
  * - "common.h"                                                   ( boolean_t )
  * - "mtime.h"                                                      ( mtime_t )
  * - "threads.h"                                               ( vlc_thread_t )

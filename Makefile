@@ -13,6 +13,8 @@
 CC=egcc
 #CC=gcc295
 SHELL=/bin/sh
+INSTALL=install
+PREFIX=/usr
 
 # Audio output settings
 AUDIO = dsp
@@ -45,12 +47,10 @@ SYS=LINUX
 #SYS=BEOS
 
 # For x86 architecture, choose MMX support
-MMX=YES
-#MMX=NO
+ARCH += MMX
 # For x86 architecture, optimize for Pentium Pro
 # (choose NO if you get `Invalid instruction' errors)
-PPRO=YES
-#PPRO=NO
+ARCH += PPRO
 
 # Decoder choice - ?? old decoder will be removed soon
 #DECODER=old
@@ -65,19 +65,16 @@ DEBUG=0
 # Configuration pre-processing
 ################################################################################
 
-# Program version - may only be changed by the project leader
+# Program version and codename - may only be changed by the project leader
 PROGRAM_VERSION = 0.1.99
+PROGRAM_CODENAME = Onatopp
 
-# audio options
-audio := $(shell echo $(AUDIO) | tr 'A-Z' 'a-z')
-AUDIO := $(shell echo $(AUDIO) | tr 'a-z' 'A-Z')
-
-# video options
-video := $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
-VIDEO := $(shell echo $(VIDEO) | tr 'a-z' 'A-Z')
+# audio and video options
+AUDIO := $(shell echo $(AUDIO) | tr 'A-Z' 'a-z')
+VIDEO := $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
 
 # PROGRAM_OPTIONS is an identification string of the compilation options
-PROGRAM_OPTIONS = $(ARCH) $(SYS)
+PROGRAM_OPTIONS = $(SYS) $(ARCH)
 ifeq ($(DEBUG),1)
 PROGRAM_OPTIONS += DEBUG
 endif
@@ -89,12 +86,12 @@ PROGRAM_BUILD = `date` $(USER)@`hostname`
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including ARCH_xx and SYS_xx. It will be passed to C compiler.
-DEFINE += -DARCH_$(ARCH)
+DEFINE += -DARCH_$(shell echo $(ARCH) | cut -f1 -d' ')
 DEFINE += -DSYS_$(SYS)
-DEFINE += -DAUDIO_OPTIONS="\"$(audio)\""
-DEFINE += -DVIDEO_OPTIONS="\"$(video)\""
+DEFINE += -DPLUGIN_PATH="\"$(PREFIX)/lib/videolan/vlc\""
 DEFINE += -DPROGRAM_VERSION="\"$(PROGRAM_VERSION)\""
-DEFINE += -DPROGRAM_OPTIONS="\"$(PROGRAM_OPTIONS)\""
+DEFINE += -DPROGRAM_CODENAME="\"$(PROGRAM_CODENAME)\""
+DEFINE += -DPROGRAM_OPTIONS="\"$(shell echo $(PROGRAM_OPTIONS) | tr 'A-Z' 'a-z')\""
 DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
 ifeq ($(DEBUG),1)
 DEFINE += -DDEBUG
@@ -113,15 +110,21 @@ INCLUDE += -Iinclude -I/usr/local/include -I/usr/X11R6/include
 #
 # Libraries
 #
-LIB += -L/usr/local/lib
 
 ifeq ($(SYS),GNU)
-LIB += -lthreads
-else
-LIB += -lpthread
+LIB += -lthreads -ldl
 endif
+
+ifeq ($(SYS),BSD)
+LIB += -pthread -lgnugetopt
+LIB += -L/usr/local/lib
+endif
+
+ifeq ($(SYS),LINUX)
+LIB += -lpthread -ldl
+endif
+
 LIB += -lm
-LIB += -ldl
 
 #
 # C compiler flags: compilation
@@ -137,27 +140,28 @@ CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CCFLAGS += -fomit-frame-pointer
 
 # Optimizations for x86 familiy
-ifeq ($(ARCH),X86)
+ifneq (,$(findstring X86,$(ARCH)))
 CCFLAGS += -malign-double
 #CCFLAGS += -march=pentium
-ifeq ($(PPRO), YES)
+# Eventual Pentium Pro optimizations
+ifneq (,$(findstring PPRO,$(ARCH)))
 ifneq ($(SYS), BSD)
 CCFLAGS += -march=pentiumpro
 endif
 endif
 # Eventual MMX optimizations for x86
-ifeq ($(MMX), YES)
+ifneq (,$(findstring MMX,$(ARCH)))
 CFLAGS += -DHAVE_MMX
 endif
 endif
 
 # Optimizations for PowerPC
-ifeq ($(ARCH),PPC)
+ifneq (,$(findstring PPC,$(ARCH)))
 CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
 endif
 
 # Optimizations for Sparc
-ifeq ($(ARCH),SPARC)
+ifneq (,$(findstring SPARC,$(ARCH)))
 CCFLAGS += -mhard-float
 endif
 
@@ -260,6 +264,7 @@ endif
 misc_obj =			misc/mtime.o \
 						misc/rsc_files.o \
 						misc/netutils.o \
+						misc/plugins.o \
 						misc/decoder_fifo.o
 
 C_OBJ = $(interface_obj) \
@@ -278,8 +283,8 @@ C_OBJ = $(interface_obj) \
 #
 # Assembler Objects
 # 
-ifeq ($(ARCH),X86)
-ifeq ($(MMX), YES)
+ifneq (,$(findstring X86,$(ARCH)))
+ifneq (,$(findstring MMX,$(ARCH)))
 ifeq ($(DECODER),new)
 ASM_OBJ = 			video_decoder/vdec_idctmmx.o \
 						video_output/video_yuv_mmx.o
@@ -293,9 +298,9 @@ endif
 #
 # Plugins
 #
-interface_plugin =	$(video:%=interface/intf_%.so)
-audio_plugin =		$(audio:%=audio_output/aout_%.so)
-video_plugin = 		$(video:%=video_output/vout_%.so)
+interface_plugin =	$(VIDEO:%=interface/intf_%.so)
+audio_plugin =		$(AUDIO:%=audio_output/aout_%.so)
+video_plugin = 		$(VIDEO:%=video_output/vout_%.so)
 
 PLUGIN_OBJ = $(interface_plugin) $(audio_plugin) $(video_plugin)
 
@@ -303,7 +308,7 @@ PLUGIN_OBJ = $(interface_plugin) $(audio_plugin) $(video_plugin)
 # Other lists of files
 #
 sources := $(C_OBJ:%.o=%.c) $(PLUGIN_OBJ:%.so=%.c)
-dependancies := $(sources:%.c=dep/%.d)
+dependancies := $(sources:%.c=.dep/%.d)
 
 # All symbols must be exported
 export
@@ -323,7 +328,12 @@ clean:
 distclean: clean
 	rm -f **/*.o **/*.so **/*~ *.log
 	rm -f vlc gmon.out core
-	rm -rf dep
+	rm -rf .dep
+
+install:
+	$(INSTALL) vlc $(PREFIX)/bin
+	mkdir -p $(PREFIX)/lib/videolan/vlc
+	$(INSTALL) $(PLUGIN_OBJ) $(PREFIX)/lib/videolan/vlc
 
 show:
 	@echo "Command line for C objects:"
@@ -347,7 +357,7 @@ $(dependancies): %.d: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
 $(C_OBJ): %.o: Makefile.dep
-$(C_OBJ): %.o: dep/%.d
+$(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
 	@echo "compiling $*.o from $*.c"
 	@$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
@@ -358,7 +368,7 @@ $(ASM_OBJ): %.o: %.S
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
 $(PLUGIN_OBJ): %.so: Makefile.dep
-$(PLUGIN_OBJ): %.so: dep/%.d
+$(PLUGIN_OBJ): %.so: .dep/%.d
 
 # audio plugins
 audio_output/aout_dummy.so audio_output/aout_dsp.so: %.so: %.c
@@ -367,7 +377,11 @@ audio_output/aout_dummy.so audio_output/aout_dsp.so: %.so: %.c
 
 audio_output/aout_esd.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
+ifeq ($(SYS), BSD)
+		@$(CC) $(CCFLAGS) $(CFLAGS) -lesd -shared -o $@ $<
+else
 		@$(CC) $(CCFLAGS) $(CFLAGS) -laudiofile -lesd -shared -o $@ $<
+endif
 
 # video plugins
 interface/intf_dummy.so video_output/vout_dummy.so \
@@ -393,15 +407,15 @@ interface/intf_ggi.so video_output/vout_ggi.so: %.so: %.c
 ################################################################################
 
 # Note on dependancies: each .c file is associated with a .d file, which
-# depends of it. The .o file associated with a .c file depends of the .d, of the 
-# .c itself, and of Makefile. The .d files are stored in a separate dep/ 
+# depends of it. The .o file associated with a .c file depends of the .d, of the
+# .c itself, and of Makefile. The .d files are stored in a separate .dep/
 # directory.
 # The dep directory should be ignored by CVS.
 
-# Note on inclusions: depending of the target, the dependancies files must 
+# Note on inclusions: depending of the target, the dependancies files must
 # or must not be included. The problem is that if we ask make to include a file,
-# and this file does not exist, it is made before it can be included. In a 
-# general way, a .d file should be included if and only if the corresponding .o 
+# and this file does not exist, it is made before it can be included. In a
+# general way, a .d file should be included if and only if the corresponding .o
 # needs to be re-made.
 
 # Two makefiles are used: the main one (this one) has regular generic rules,

@@ -71,8 +71,9 @@
 #define OPT_PORT                172
 
 /* Usage fashion */
-#define SHORT_HELP                0
-#define LONG_HELP                 1
+#define USAGE                     0
+#define SHORT_HELP                1
+#define LONG_HELP                 2
 
 /* Long options */
 static const struct option longopts[] =
@@ -155,14 +156,14 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->p_msg = intf_MsgCreate();
     if( !p_main->p_msg )                         /* start messages interface */
     {
-        fprintf(stderr, "critical error: can't initialize messages interface (%s)\n",
-                strerror(errno));
-        return(errno);
+        fprintf( stderr, "critical error: can't initialize messages interface (%s)\n",
+                strerror(errno) );
+        return( errno );
     }
     if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
     {
         intf_MsgDestroy();
-        return(errno);
+        return( errno );
     }
     intf_MsgImm( COPYRIGHT_MESSAGE "\n" );          /* print welcome message */
 
@@ -172,7 +173,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     if( main_data.b_vlans && input_VlanCreate() )
     {
         /* On error during vlans initialization, switch of vlans */
-        intf_Msg("Virtual LANs initialization failed : vlans management is deactivated\n");
+        intf_Msg( "Virtual LANs initialization failed : vlans management is deactivated\n" );
         main_data.b_vlans = 0;
     }
 
@@ -185,7 +186,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         if( main_data.p_aout == NULL )
         {
             /* On error during audio initialization, switch of audio */
-            intf_Msg("Audio initialization failed : audio is deactivated\n");
+            intf_Msg( "Audio initialization failed : audio is deactivated\n" );
             main_data.b_audio = 0;
         }
     }
@@ -279,14 +280,14 @@ void main_PutPszVariable( char *psz_name, char *psz_value )
     psz_env = malloc( strlen(psz_name) + strlen(psz_value) + 2 );
     if( psz_env == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg( "error: %s\n", strerror(ENOMEM) );
     }
     else
     {
         sprintf( psz_env, "%s=%s", psz_name, psz_value );
         if( putenv( psz_env ) )
         {
-            intf_ErrMsg("error: %s\n", strerror(errno));
+            intf_ErrMsg( "error: %s\n", strerror(errno) );
         }
     }
 }
@@ -302,7 +303,7 @@ void main_PutIntVariable( char *psz_name, int i_value )
 {
     char psz_value[ 256 ];                               /* buffer for value */
 
-    sprintf(psz_value, "%d", i_value );
+    sprintf( psz_value, "%d", i_value );
     main_PutPszVariable( psz_name, psz_value );
 }
 
@@ -417,7 +418,8 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /* Internal error: unknown option */
         case '?':
         default:
-            intf_ErrMsg("intf error: unknown option '%s'\n", ppsz_argv[optind - 1]);
+            intf_ErrMsg( "intf error: unknown option `%s'\n", ppsz_argv[optind - 1] );
+            Usage( USAGE );
             return( EINVAL );
             break;
         }
@@ -438,61 +440,74 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
  *****************************************************************************/
 static void Usage( int i_fashion )
 {
-    intf_Msg(COPYRIGHT_MESSAGE "\n");
-
     /* Usage */
-    intf_Msg("usage: vlc [options...] [parameters]\n" );
+    intf_Msg( "Usage: vlc [options] [parameters]\n" );
+
+    if( i_fashion == USAGE )
+    {
+        intf_Msg( "Try `vlc --help' for more information.\n" );
+        return;
+    }
+
+    intf_MsgImm( COPYRIGHT_MESSAGE "\n" );
 
     /* Options */
-    intf_Msg("Options:\n" \
-             "  -h, --help, -H, --longhelp        \tprint short/long usage\n" \
-             "  -v, --version                     \tprint version information\n"\
-             "  --noaudio, --novideo              \tdisable audio/video\n" \
-             "  --aout {" AUDIO_OPTIONS "}            \taudio output method\n"\
-             "  --stereo, --mono                  \tstereo/mono audio\n" \
-             "  --vout {" VIDEO_OPTIONS "}            \tvideo output method\n"\
-             "  --display <display>               \tdisplay string\n" \
-             "  --width <w>, --height <h>         \tdisplay dimensions\n" \
-             "  -g, --grayscale, --color          \tgrayscale/color video\n" \
-             "  --novlans                         \tdisable vlans\n" \
-             "  --server <host>, --port <port>    \tvideo server adress\n" \
-             );
+    intf_Msg( "\n"
+              "Options:\n"
+              "      --noaudio                  \tdisable audio\n"
+              "      --aout <plugin>            \taudio output method\n"
+              "      --stereo, --mono           \tstereo/mono audio\n"
+              "\n"
+              "      --novideo                  \tdisable audio\n"
+              "      --vout <plugin>            \tvideo output method\n"
+              "      --display <display>        \tdisplay string\n"
+              "      --width <w>, --height <h>  \tdisplay dimensions\n"
+              "  -g, --grayscale                \tgrayscale output\n"
+              "      --color                    \tcolor output\n"
+              "\n"
+              "      --novlans                  \tdisable vlans\n"
+              "      --server <host>            \tvideo server address\n"
+              "      --port <port>              \tvideo server port\n"
+              "\n"
+              "  -h, --help                     \tprint help and exit\n"
+              "  -H, --longhelp                 \tprint long help and exit\n"
+              "  -v, --version                  \toutput version information and exit\n" );
 
     if( i_fashion == SHORT_HELP )
         return;
 
     /* Interface parameters */
-    intf_Msg("Interface parameters:\n" \
-             "  " INTF_INIT_SCRIPT_VAR "=<filename>             \tinitialization script\n" \
-             "  " INTF_CHANNELS_VAR "=<filename>            \tchannels list\n"\
-             );
+    intf_Msg( "\n"
+              "Interface parameters:\n"
+              "  " INTF_INIT_SCRIPT_VAR "=<filename>             \tinitialization script\n"
+              "  " INTF_CHANNELS_VAR "=<filename>            \tchannels list\n" );
 
     /* Audio parameters */
-    intf_Msg("Audio parameters:\n" \
-             "  " AOUT_METHOD_VAR "=<method name>        \taudio method (" AUDIO_OPTIONS ")\n" \
-             "  " AOUT_DSP_VAR "=<filename>              \tdsp device path\n" \
-             "  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output\n" \
-             "  " AOUT_RATE_VAR "=<rate>             \toutput rate\n" \
-             );
+    intf_Msg( "\n"
+              "Audio parameters:\n"
+              "  " AOUT_METHOD_VAR "=<method name>        \taudio method\n"
+              "  " AOUT_DSP_VAR "=<filename>              \tdsp device path\n"
+              "  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output\n"
+              "  " AOUT_RATE_VAR "=<rate>             \toutput rate\n" );
 
     /* Video parameters */
-    intf_Msg("Video parameters:\n" \
-             "  " VOUT_METHOD_VAR "=<method name>        \tdisplay method (" VIDEO_OPTIONS ")\n" \
-             "  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used\n" \
-             "  " VOUT_WIDTH_VAR "=<width>               \tdisplay width\n" \
-             "  " VOUT_HEIGHT_VAR "=<height>             \tdislay height\n" \
-             "  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path\n" \
-             "  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output\n" \
-             );
+    intf_Msg( "\n"
+              "Video parameters:\n"
+              "  " VOUT_METHOD_VAR "=<method name>        \tdisplay method\n"
+              "  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used\n"
+              "  " VOUT_WIDTH_VAR "=<width>               \tdisplay width\n"
+              "  " VOUT_HEIGHT_VAR "=<height>             \tdislay height\n"
+              "  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path\n"
+              "  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output\n" );
 
     /* Input parameters */
-    intf_Msg("Input parameters:\n" \
-             "  " INPUT_SERVER_VAR "=<hostname>          \tvideo server\n" \
-             "  " INPUT_PORT_VAR "=<port>            \tvideo server port\n" \
-             "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n"\
-             "  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server\n" \
-             "  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port\n"\
-             );
+    intf_Msg( "\n"
+              "Input parameters:\n"
+              "  " INPUT_SERVER_VAR "=<hostname>          \tvideo server\n"
+              "  " INPUT_PORT_VAR "=<port>            \tvideo server port\n"
+              "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n"
+              "  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server\n"
+              "  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port\n" );
 }
 
 /*****************************************************************************
@@ -502,14 +517,14 @@ static void Usage( int i_fashion )
  *****************************************************************************/
 static void Version( void )
 {
-    intf_Msg(VERSION_MESSAGE "\n\n");
-    intf_Msg("This is free software; see the documentation or contact <videolan@via.ecp.fr>\n" \
-             "for use and copying conditions.\n" \
-             "\n" \
-             "This software is protected by the international copyright laws, and is\n" \
-             "provided without any warranty, including the implied warranties of\n" \
-             "merchantibility and fitness for a particular purpose.\n" \
-            );
+    intf_Msg( "vlc " PROGRAM_VERSION " " PROGRAM_CODENAME
+              " (" PROGRAM_BUILD ") (" PROGRAM_OPTIONS ")\n"
+              "Copyright 1996-2000 VideoLAN\n"
+              "This program comes with NO WARRANTY, to the extent permitted by law.\n"
+              "You may redistribute it under the terms of the GNU General Public License;\n"
+              "see the file named COPYING for details.\n"
+              "Written by the VideoLAN team at Ecole Centrale, Paris.\n" );
+	    
 }
 
 /*****************************************************************************

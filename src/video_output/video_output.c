@@ -32,12 +32,11 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
-#include <dlfcn.h>                                                /* plugins */
-
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
 #include "threads.h"
+#include "plugins.h"
 #include "video.h"
 #include "video_output.h"
 #include "video_text.h"
@@ -92,7 +91,6 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     int             i_status;                               /* thread status */
     int             i_index;               /* index for array initialization */
     char *          psz_method;
-    char *          psz_plugin;
 
     /* Allocate descriptor */
     intf_DbgMsg("\n");
@@ -103,30 +101,24 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         return( NULL );
     }
 
-    /* Initialize method-dependent functions */
+    /* Request an interface plugin */
     psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
+    p_vout->p_vout_plugin = RequestPlugin( "vout", psz_method );
 
-    psz_plugin = malloc( sizeof("./video_output/vout_.so") + strlen(psz_method) );
-    sprintf( psz_plugin, "./video_output/vout_%s.so", psz_method );
-
-    p_vout->p_vout_plugin = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
-
-    if( p_vout->p_vout_plugin == NULL )
+    if( !p_vout->p_vout_plugin )
     {
-        intf_ErrMsg( "error: could not open video plugin %s\n", psz_plugin );
-        free( psz_plugin );
+        intf_ErrMsg( "error: could not open video plugin vout_%s.so\n", psz_method );
         free( p_vout );
         return( NULL );
     }
-    free( psz_plugin );
 
     /* Get plugins */
-    p_vout->p_sys_create =  dlsym(p_vout->p_vout_plugin, "vout_SysCreate");
-    p_vout->p_sys_init =    dlsym(p_vout->p_vout_plugin, "vout_SysInit");
-    p_vout->p_sys_end =     dlsym(p_vout->p_vout_plugin, "vout_SysEnd");
-    p_vout->p_sys_destroy = dlsym(p_vout->p_vout_plugin, "vout_SysDestroy");
-    p_vout->p_sys_manage =  dlsym(p_vout->p_vout_plugin, "vout_SysManage");
-    p_vout->p_sys_display = dlsym(p_vout->p_vout_plugin, "vout_SysDisplay");
+    p_vout->p_sys_create =  GetPluginFunction( p_vout->p_vout_plugin, "vout_SysCreate" );
+    p_vout->p_sys_init =    GetPluginFunction( p_vout->p_vout_plugin, "vout_SysInit" );
+    p_vout->p_sys_end =     GetPluginFunction( p_vout->p_vout_plugin, "vout_SysEnd" );
+    p_vout->p_sys_destroy = GetPluginFunction( p_vout->p_vout_plugin, "vout_SysDestroy" );
+    p_vout->p_sys_manage =  GetPluginFunction( p_vout->p_vout_plugin, "vout_SysManage" );
+    p_vout->p_sys_display = GetPluginFunction( p_vout->p_vout_plugin, "vout_SysDisplay" );
 
     /* Initialize thread properties - thread id and locks will be initialized
      * later */
@@ -189,7 +181,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
      * own error messages */
     if( p_vout->p_sys_create( p_vout, psz_display, i_root_window ) )
     {
-        dlclose( p_vout->p_vout_plugin );
+        TrashPlugin( p_vout->p_vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -215,7 +207,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     if( p_vout->p_default_font == NULL )
     {
         p_vout->p_sys_destroy( p_vout );
-        dlclose( p_vout->p_vout_plugin );
+        TrashPlugin( p_vout->p_vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -224,7 +216,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     {
         vout_UnloadFont( p_vout->p_default_font );
         p_vout->p_sys_destroy( p_vout );
-        dlclose( p_vout->p_vout_plugin );
+        TrashPlugin( p_vout->p_vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -240,7 +232,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         vout_UnloadFont( p_vout->p_default_font );
         vout_UnloadFont( p_vout->p_large_font );
         p_vout->p_sys_destroy( p_vout );
-        dlclose( p_vout->p_vout_plugin );
+        TrashPlugin( p_vout->p_vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -1262,7 +1254,7 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     p_vout->p_sys_destroy( p_vout );
 
     /* Close plugin */
-    dlclose( p_vout->p_vout_plugin );
+    TrashPlugin( p_vout->p_vout_plugin );
 
     /* Free structure */
     free( p_vout );

@@ -27,18 +27,17 @@
  * Preamble
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
-#include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
+#include <stdio.h>                                                   /* FILE */
 #include <string.h>                                            /* strerror() */
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                          /* for input.h */
-
-#include <dlfcn.h>                                                /* plugins */
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
 #include "threads.h"
+#include "plugins.h"
 #include "input.h"
 
 #include "intf_msg.h"
@@ -89,7 +88,6 @@ intf_thread_t* intf_Create( void )
 {
     intf_thread_t *p_intf;
     char * psz_method;
-    char * psz_plugin;
 
     /* Allocate structure */
     p_intf = malloc( sizeof( intf_thread_t ) );
@@ -99,27 +97,21 @@ intf_thread_t* intf_Create( void )
         return( NULL );
     }
 
-    /* Initialize method-dependent functions */
+    /* Request an interface plugin */
     psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
+    p_intf->p_intf_plugin = RequestPlugin( "intf", psz_method );
 
-    psz_plugin = malloc( sizeof("./interface/intf_.so") + strlen(psz_method) );
-    sprintf( psz_plugin, "./interface/intf_%s.so", psz_method );
-
-    p_intf->p_intf_plugin = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
-
-    if( p_intf->p_intf_plugin == NULL )
+    if( !p_intf->p_intf_plugin )
     {
-        intf_ErrMsg( "error: could not open interface plugin %s\n", psz_plugin );
-        free( psz_plugin );
+        intf_ErrMsg( "error: could not open interface plugin intf_%s.so\n", psz_method );
         free( p_intf );
         return( NULL );
     }
-    free( psz_plugin );
 
     /* Get plugins */
-    p_intf->p_sys_create =  dlsym(p_intf->p_intf_plugin, "intf_SysCreate");
-    p_intf->p_sys_manage =  dlsym(p_intf->p_intf_plugin, "intf_SysManage");
-    p_intf->p_sys_destroy = dlsym(p_intf->p_intf_plugin, "intf_SysDestroy");
+    p_intf->p_sys_create =  GetPluginFunction( p_intf->p_intf_plugin, "intf_SysCreate" );
+    p_intf->p_sys_manage =  GetPluginFunction( p_intf->p_intf_plugin, "intf_SysManage" );
+    p_intf->p_sys_destroy = GetPluginFunction( p_intf->p_intf_plugin, "intf_SysDestroy" );
 
     /* Initialize structure */
     p_intf->b_die =     0;
@@ -136,7 +128,7 @@ intf_thread_t* intf_Create( void )
     if( p_intf->p_console == NULL )
     {
         intf_ErrMsg("error: can't create control console\n");
-        dlclose( p_intf->p_intf_plugin );
+        TrashPlugin( p_intf->p_intf_plugin );
         free( p_intf );
         return( NULL );
     }
@@ -144,7 +136,7 @@ intf_thread_t* intf_Create( void )
     {
         intf_ErrMsg("error: can't create interface\n");
         intf_ConsoleDestroy( p_intf->p_console );
-        dlclose( p_intf->p_intf_plugin );
+        TrashPlugin( p_intf->p_intf_plugin );
         free( p_intf );
         return( NULL );
     }
@@ -210,7 +202,7 @@ void intf_Destroy( intf_thread_t *p_intf )
     UnloadChannels( p_intf );
 
     /* Close plugin */
-    dlclose( p_intf->p_intf_plugin );
+    TrashPlugin( p_intf->p_intf_plugin );
 
     /* Free structure */
     free( p_intf );
