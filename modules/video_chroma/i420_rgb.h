@@ -2,7 +2,7 @@
  * i420_rgb.h : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb.h,v 1.2 2002/11/25 19:29:10 sam Exp $
+ * $Id: i420_rgb.h,v 1.3 2002/11/26 20:04:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -175,7 +175,7 @@ void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
         {                                                                     \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
         }                                                                     \
-        p_pic += i_right_margin;                                              \
+        (u8*)p_pic += i_right_margin;                                         \
     }                                                                         \
     else                                                                      \
     {                                                                         \
@@ -213,7 +213,7 @@ void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
         }                                                                     \
     }                                                                         \
     /* Increment of picture pointer to end of line is still needed */         \
-    p_pic += i_right_margin;                                                  \
+    (u8*)p_pic += i_right_margin;                                             \
                                                                               \
     /* Increment the Y coordinate in the matrix, modulo 4 */                  \
     i_real_y = (i_real_y + 1) & 0x3;                                          \
