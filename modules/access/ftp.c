@@ -34,8 +34,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int     Open     ( vlc_object_t * );
-static void    Close    ( vlc_object_t * );
+static int     Open ( vlc_object_t * );
+static void    Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
@@ -53,7 +53,7 @@ static void    Close    ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("FTP input") );
-    set_capability( "access", 0 );
+    set_capability( "access2", 0 );
     add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
@@ -69,8 +69,9 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static ssize_t Read     ( input_thread_t *, byte_t *,  size_t );
-static void    Seek     ( input_thread_t *, off_t );
+static int Read( access_t *, uint8_t *, int );
+static int Seek( access_t *, int64_t );
+static int Control( access_t *, int, va_list );
 
 struct access_sys_t
 {
@@ -80,34 +81,39 @@ struct access_sys_t
     int       fd_data;
 
     int64_t   i_size;
+
+    int64_t   i_tell;
+
+    vlc_bool_t b_eof;
 };
 
-static int  ftp_SendCommand( input_thread_t *, char *, ... );
-static int  ftp_ReadCommand( input_thread_t *, int *, char ** );
-static int  ftp_StartStream( input_thread_t *, off_t );
-static int  ftp_StopStream ( input_thread_t *);
+static int  ftp_SendCommand( access_t *, char *, ... );
+static int  ftp_ReadCommand( access_t *, int *, char ** );
+static int  ftp_StartStream( access_t *, int64_t );
+static int  ftp_StopStream ( access_t *);
 
 /****************************************************************************
  * Open: connect to ftp server and ask for file
  ****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    input_thread_t  *p_input = (input_thread_t*)p_this;
-    access_sys_t    *p_sys;
-    char            *psz;
-    vlc_value_t     val;
+    access_t     *p_access = (access_t*)p_this;
+    access_sys_t *p_sys;
+    char         *psz;
+    vlc_value_t   val;
 
-    int             i_answer;
-    char            *psz_arg;
+    int          i_answer;
+    char         *psz_arg;
 
     /* *** allocate access_sys_t *** */
-    p_sys = p_input->p_access_data = malloc( sizeof( access_sys_t ) );
+    p_sys = malloc( sizeof( access_sys_t ) );
     memset( p_sys, 0, sizeof( access_sys_t ) );
     p_sys->fd_cmd = -1;
     p_sys->fd_data = -1;
+    p_sys->i_tell = 0;
 
     /* *** Parse URL and get server addr/port and path *** */
-    psz = p_input->psz_name;
+    psz = p_access->psz_path;
     while( *psz == '/' )
     {
         psz++;
@@ -116,7 +122,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
-        msg_Err( p_input, "invalid server name" );
+        msg_Err( p_access, "invalid server name" );
         goto exit_error;
     }
     if( p_sys->url.i_port <= 0 )
@@ -125,35 +131,37 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* *** Open a TCP connection with server *** */
-    msg_Dbg( p_input, "waiting for connection..." );
-    p_sys->fd_cmd = net_OpenTCP( p_input, p_sys->url.psz_host,
+    msg_Dbg( p_access, "waiting for connection..." );
+    p_sys->fd_cmd = net_OpenTCP( p_access, p_sys->url.psz_host,
                                  p_sys->url.i_port );
     if( p_sys->fd_cmd < 0 )
     {
-        msg_Err( p_input, "failed to connect with server" );
+        msg_Err( p_access, "failed to connect with server" );
         goto exit_error;
     }
-    p_input->i_mtu = 0;
+
+    /* set p_access->p_sys */
+    p_access->p_sys = p_sys;
 
     for( ;; )
     {
-        if( ftp_ReadCommand( p_input, &i_answer, NULL ) != 1 )
+        if( ftp_ReadCommand( p_access, &i_answer, NULL ) != 1 )
         {
             break;
         }
     }
     if( i_answer / 100 != 2 )
     {
-        msg_Err( p_input, "connection rejected" );
+        msg_Err( p_access, "connection rejected" );
         goto exit_error;
     }
 
-    msg_Dbg( p_input, "connection accepted (%d)", i_answer );
+    msg_Dbg( p_access, "connection accepted (%d)", i_answer );
 
-    var_Create( p_input, "ftp-user", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_input, "ftp-user", &val );
-    if( ftp_SendCommand( p_input, "USER %s", val.psz_string ) < 0 ||
-        ftp_ReadCommand( p_input, &i_answer, NULL ) < 0 )
+    var_Create( p_access, "ftp-user", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_access, "ftp-user", &val );
+    if( ftp_SendCommand( p_access, "USER %s", val.psz_string ) < 0 ||
+        ftp_ReadCommand( p_access, &i_answer, NULL ) < 0 )
     {
         if( val.psz_string ) free( val.psz_string );
         goto exit_error;
@@ -163,14 +171,14 @@ static int Open( vlc_object_t *p_this )
     switch( i_answer / 100 )
     {
         case 2:
-            msg_Dbg( p_input, "user accepted" );
+            msg_Dbg( p_access, "user accepted" );
             break;
         case 3:
-            msg_Dbg( p_input, "password needed" );
-            var_Create( p_input, "ftp-pwd", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-            var_Get( p_input, "ftp-pwd", &val );
-            if( ftp_SendCommand( p_input, "PASS %s", val.psz_string ) < 0 ||
-                ftp_ReadCommand( p_input, &i_answer, NULL ) < 0 )
+            msg_Dbg( p_access, "password needed" );
+            var_Create( p_access, "ftp-pwd", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+            var_Get( p_access, "ftp-pwd", &val );
+            if( ftp_SendCommand( p_access, "PASS %s", val.psz_string ) < 0 ||
+                ftp_ReadCommand( p_access, &i_answer, NULL ) < 0 )
             {
                 if( val.psz_string ) free( val.psz_string );
                 goto exit_error;
@@ -180,16 +188,16 @@ static int Open( vlc_object_t *p_this )
             switch( i_answer / 100 )
             {
                 case 2:
-                    msg_Dbg( p_input, "password accepted" );
+                    msg_Dbg( p_access, "password accepted" );
                     break;
                 case 3:
-                    msg_Dbg( p_input, "account needed" );
-                    var_Create( p_input, "ftp-account",
+                    msg_Dbg( p_access, "account needed" );
+                    var_Create( p_access, "ftp-account",
                                 VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-                    var_Get( p_input, "ftp-account", &val );
-                    if( ftp_SendCommand( p_input, "ACCT %s",
+                    var_Get( p_access, "ftp-account", &val );
+                    if( ftp_SendCommand( p_access, "ACCT %s",
                                          val.psz_string ) < 0 ||
-                        ftp_ReadCommand( p_input, &i_answer, NULL ) < 0 )
+                        ftp_ReadCommand( p_access, &i_answer, NULL ) < 0 )
                     {
                         if( val.psz_string ) free( val.psz_string );
                         goto exit_error;
@@ -198,69 +206,56 @@ static int Open( vlc_object_t *p_this )
 
                     if( i_answer / 100 != 2 )
                     {
-                        msg_Err( p_input, "account rejected" );
+                        msg_Err( p_access, "account rejected" );
                         goto exit_error;
                     }
-                    msg_Dbg( p_input, "account accepted" );
+                    msg_Dbg( p_access, "account accepted" );
                     break;
 
                 default:
-                    msg_Err( p_input, "password rejected" );
+                    msg_Err( p_access, "password rejected" );
                     goto exit_error;
             }
             break;
         default:
-            msg_Err( p_input, "user rejected" );
+            msg_Err( p_access, "user rejected" );
             goto exit_error;
     }
 
     /* binary mode */
-    if( ftp_SendCommand( p_input, "TYPE I" ) < 0 ||
-        ftp_ReadCommand( p_input, &i_answer, NULL ) != 2 )
+    if( ftp_SendCommand( p_access, "TYPE I" ) < 0 ||
+        ftp_ReadCommand( p_access, &i_answer, NULL ) != 2 )
     {
-        msg_Err( p_input, "cannot set binary transfert mode" );
+        msg_Err( p_access, "cannot set binary transfert mode" );
         goto exit_error;
     }
 
     /* get size */
-    if( ftp_SendCommand( p_input, "SIZE %s", p_sys->url.psz_path ) < 0 ||
-        ftp_ReadCommand( p_input, &i_answer, &psz_arg ) != 2 )
+    if( ftp_SendCommand( p_access, "SIZE %s", p_sys->url.psz_path ) < 0 ||
+        ftp_ReadCommand( p_access, &i_answer, &psz_arg ) != 2 )
     {
-        msg_Err( p_input, "cannot get file size" );
+        msg_Err( p_access, "cannot get file size" );
         goto exit_error;
     }
     p_sys->i_size = atoll( &psz_arg[4] );
     free( psz_arg );
-    msg_Dbg( p_input, "file size: "I64Fd, p_sys->i_size );
+    msg_Dbg( p_access, "file size: "I64Fd, p_sys->i_size );
 
     /* Start the 'stream' */
-    if( ftp_StartStream( p_input, 0 ) < 0 )
+    if( ftp_StartStream( p_access, 0 ) < 0 )
     {
-        msg_Err( p_input, "cannot retrieve file" );
+        msg_Err( p_access, "cannot retrieve file" );
         goto exit_error;
     }
-    /* *** set exported functions *** */
-    p_input->pf_read = Read;
-    p_input->pf_seek = Seek;
-    p_input->pf_set_program = input_SetProgram;
-    p_input->pf_set_area = NULL;
-
-    p_input->p_private = NULL;
-
-    /* *** finished to set some variable *** */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.b_pace_control = VLC_TRUE;
-    p_input->stream.p_selected_area->i_tell = 0;
-    p_input->stream.b_seekable = VLC_TRUE;
-    p_input->stream.p_selected_area->i_size = p_sys->i_size;
-    p_input->stream.i_method = INPUT_METHOD_NETWORK;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* Update default_pts to a suitable value for ftp access */
-    var_Create( p_input, "ftp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_input, "ftp-caching", &val );
-    p_input->i_pts_delay = val.i_int * 1000;
+    var_Create( p_access, "ftp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
+    /* *** set exported functions *** */
+    p_access->pf_read = Read;
+    p_access->pf_block = NULL;
+    p_access->pf_seek = Seek;
+    p_access->pf_control = Control;
     return VLC_SUCCESS;
 
 exit_error:
@@ -278,19 +273,19 @@ exit_error:
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    input_thread_t  *p_input = (input_thread_t *)p_this;
-    access_sys_t    *p_sys = p_input->p_access_data;
+    access_t      *p_access = (access_t*)p_this;
+    access_sys_t  *p_sys = p_access->p_sys;
 
-    msg_Dbg( p_input, "stopping stream" );
-    ftp_StopStream( p_input );
+    msg_Dbg( p_access, "stopping stream" );
+    ftp_StopStream( p_access );
 
-    if( ftp_SendCommand( p_input, "QUIT" ) < 0 )
+    if( ftp_SendCommand( p_access, "QUIT" ) < 0 )
     {
-        msg_Warn( p_input, "cannot quit" );
+        msg_Warn( p_access, "cannot quit" );
     }
     else
     {
-        ftp_ReadCommand( p_input, NULL, NULL );
+        ftp_ReadCommand( p_access, NULL, NULL );
     }
     net_Close( p_sys->fd_cmd );
 
@@ -302,40 +297,121 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Seek: try to go at the right place
  *****************************************************************************/
-static void Seek( input_thread_t * p_input, off_t i_pos )
+static int Seek( access_t *p_access, int64_t i_pos )
 {
+    access_sys_t *p_sys = p_access->p_sys;
     if( i_pos < 0 )
     {
-        return;
+        return VLC_EGENERIC;
     }
-    vlc_mutex_lock( &p_input->stream.stream_lock );
+    msg_Dbg( p_access, "seeking to "I64Fd, i_pos );
 
-    msg_Dbg( p_input, "seeking to "I64Fd, i_pos );
+    ftp_StopStream( p_access );
+    if( ftp_StartStream( p_access, i_pos ) < 0 )
+    {
+        p_sys->b_eof = VLC_TRUE;
+        return VLC_EGENERIC;
+    }
 
-    ftp_StopStream( p_input );
-    ftp_StartStream( p_input, i_pos );
+    p_sys->i_tell = i_pos;
 
-    p_input->stream.p_selected_area->i_tell = i_pos;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * Read:
  *****************************************************************************/
-static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
-                     size_t i_len )
+static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 {
-    access_sys_t *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_access->p_sys;
+    int i_read;
 
-    return net_Read( p_input, p_sys->fd_data, p_buffer, i_len, VLC_FALSE );
+    if( p_sys->b_eof )
+        return 0;
+
+    i_read = net_Read( p_access, p_sys->fd_data, p_buffer, i_len, VLC_FALSE );
+    if( i_read == 0 )
+        p_sys->b_eof = VLC_TRUE;
+    else if( i_read > 0 )
+        p_sys->i_tell += i_read;
+
+    return i_read;
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( access_t *p_access, int i_query, va_list args )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    vlc_bool_t   *pb_bool;
+    int          *pi_int;
+    int64_t      *pi_64;
+    vlc_value_t  val;
+
+    switch( i_query )
+    {
+        /* */
+        case ACCESS_CAN_SEEK:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_TRUE;
+            break;
+        case ACCESS_CAN_FASTSEEK:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_FALSE;
+            break;
+        case ACCESS_CAN_PAUSE:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_TRUE;    /* FIXME */
+            break;
+        case ACCESS_CAN_CONTROL_PACE:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_TRUE;    /* FIXME */
+            break;
+
+        /* */
+        case ACCESS_GET_MTU:
+            pi_int = (int*)va_arg( args, int * );
+            *pi_int = 0;
+            break;
+        case ACCESS_GET_SIZE:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = p_sys->i_size > 0 ? p_sys->i_size : 0;
+            break;
+        case ACCESS_GET_POS:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = p_sys->i_tell;
+            break;
+        case ACCESS_GET_EOF:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = p_sys->b_eof;
+            break;
+
+        case ACCESS_GET_PTS_DELAY:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            var_Get( p_access, "ftp-caching", &val );
+            *pi_64 = val.i_int * 1000;
+            break;
+
+        /* */
+        case ACCESS_SET_PAUSE_STATE:
+            /* Nothing to do */
+            break;
+
+        default:
+            msg_Err( p_access, "unimplemented query in control" );
+            return VLC_EGENERIC;
+
+    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * ftp_*:
  *****************************************************************************/
-static int ftp_SendCommand( input_thread_t *p_input, char *psz_fmt, ... )
+static int ftp_SendCommand( access_t *p_access, char *psz_fmt, ... )
 {
-    access_sys_t *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_access->p_sys;
     va_list      args;
     char         *psz_cmd;
     int          i_ret;
@@ -344,16 +420,16 @@ static int ftp_SendCommand( input_thread_t *p_input, char *psz_fmt, ... )
     vasprintf( &psz_cmd, psz_fmt, args );
     va_end( args );
 
-    msg_Dbg( p_input, "ftp_SendCommand:\"%s\"", psz_cmd);
-    if( ( i_ret = net_Printf( VLC_OBJECT(p_input), p_sys->fd_cmd,
+    msg_Dbg( p_access, "ftp_SendCommand:\"%s\"", psz_cmd);
+    if( ( i_ret = net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd,
                               "%s", psz_cmd ) ) > 0 )
     {
-        i_ret = net_Printf( VLC_OBJECT(p_input), p_sys->fd_cmd, "\n" );
+        i_ret = net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd, "\n" );
     }
 
     if( i_ret < 0 )
     {
-        msg_Err( p_input, "failed to send command" );
+        msg_Err( p_access, "failed to send command" );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -374,18 +450,18 @@ static int ftp_SendCommand( input_thread_t *p_input, char *psz_fmt, ... )
 
  These strings are not part of the requests, except in the case \377\377,
  where the request contains one \377. */
-static int ftp_ReadCommand( input_thread_t *p_input,
+static int ftp_ReadCommand( access_t *p_access,
                             int *pi_answer, char **ppsz_answer )
 {
-    access_sys_t *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_access->p_sys;
     char         *psz_line;
     int          i_answer;
 
-    psz_line = net_Gets( p_input, p_sys->fd_cmd );
-    msg_Dbg( p_input, "answer=%s", psz_line );
+    psz_line = net_Gets( p_access, p_sys->fd_cmd );
+    msg_Dbg( p_access, "answer=%s", psz_line );
     if( psz_line == NULL || strlen( psz_line ) < 3 )
     {
-        msg_Err( p_input, "cannot get answer" );
+        msg_Err( p_access, "cannot get answer" );
         if( psz_line ) free( psz_line );
         if( pi_answer ) *pi_answer    = 500;
         if( ppsz_answer ) *ppsz_answer  = NULL;
@@ -406,9 +482,9 @@ static int ftp_ReadCommand( input_thread_t *p_input,
     return( i_answer / 100 );
 }
 
-static int ftp_StartStream( input_thread_t *p_input, off_t i_start )
+static int ftp_StartStream( access_t *p_access, off_t i_start )
 {
-    access_sys_t *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_access->p_sys;
 
     char psz_ip[1000];
     int  i_answer;
@@ -417,10 +493,10 @@ static int ftp_StartStream( input_thread_t *p_input, off_t i_start )
     int  p1,p2;
     int  i_port;
 
-    if( ftp_SendCommand( p_input, "PASV" ) < 0 ||
-        ftp_ReadCommand( p_input, &i_answer, &psz_arg ) != 2 )
+    if( ftp_SendCommand( p_access, "PASV" ) < 0 ||
+        ftp_ReadCommand( p_access, &i_answer, &psz_arg ) != 2 )
     {
-        msg_Err( p_input, "cannot set passive transfert mode" );
+        msg_Err( p_access, "cannot set passive transfert mode" );
         return VLC_EGENERIC;
     }
 
@@ -430,67 +506,74 @@ static int ftp_StartStream( input_thread_t *p_input, off_t i_start )
                 &a4, &p1, &p2 ) < 6 )
     {
         free( psz_arg );
-        msg_Err( p_input, "cannot get ip/port for passive transfert mode" );
+        msg_Err( p_access, "cannot get ip/port for passive transfert mode" );
         return VLC_EGENERIC;
     }
     free( psz_arg );
 
     sprintf( psz_ip, "%d.%d.%d.%d", a1, a2, a3, a4 );
     i_port = p1 * 256 + p2;
-    msg_Dbg( p_input, "ip:%s port:%d", psz_ip, i_port );
+    msg_Dbg( p_access, "ip:%s port:%d", psz_ip, i_port );
 
-    if( ftp_SendCommand( p_input, "TYPE I" ) < 0 ||
-        ftp_ReadCommand( p_input, &i_answer, NULL ) != 2 )
+    if( ftp_SendCommand( p_access, "TYPE I" ) < 0 ||
+        ftp_ReadCommand( p_access, &i_answer, NULL ) != 2 )
     {
-        msg_Err( p_input, "cannot set binary transfert mode" );
+        msg_Err( p_access, "cannot set binary transfert mode" );
         return VLC_EGENERIC;
     }
 
     if( i_start > 0 )
     {
-        if( ftp_SendCommand( p_input, "REST "I64Fu, i_start ) < 0 ||
-            ftp_ReadCommand( p_input, &i_answer, NULL ) > 3 )
+        if( ftp_SendCommand( p_access, "REST "I64Fu, i_start ) < 0 ||
+            ftp_ReadCommand( p_access, &i_answer, NULL ) > 3 )
         {
-            msg_Err( p_input, "cannot set restart point" );
+            msg_Err( p_access, "cannot set restart point" );
             return VLC_EGENERIC;
         }
     }
 
-    msg_Dbg( p_input, "waiting for data connection..." );
-    p_sys->fd_data = net_OpenTCP( p_input, psz_ip, i_port );
+    msg_Dbg( p_access, "waiting for data connection..." );
+    p_sys->fd_data = net_OpenTCP( p_access, psz_ip, i_port );
     if( p_sys->fd_data < 0 )
     {
-        msg_Err( p_input, "failed to connect with server" );
+        msg_Err( p_access, "failed to connect with server" );
         return VLC_EGENERIC;
     }
-    msg_Dbg( p_input, "connection with \"%s:%d\" successful",
+    msg_Dbg( p_access, "connection with \"%s:%d\" successful",
              psz_ip, i_port );
 
     /* "1xx" message */
-    if( ftp_SendCommand( p_input, "RETR %s", p_sys->url.psz_path ) < 0 ||
-        ftp_ReadCommand( p_input, &i_answer, NULL ) > 2 )
+    if( ftp_SendCommand( p_access, "RETR %s", p_sys->url.psz_path ) < 0 ||
+        ftp_ReadCommand( p_access, &i_answer, NULL ) > 2 )
     {
-        msg_Err( p_input, "cannot retreive file" );
+        msg_Err( p_access, "cannot retreive file" );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
 }
 
-static int ftp_StopStream ( input_thread_t *p_input)
+static int ftp_StopStream ( access_t *p_access )
 {
-    access_sys_t *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_access->p_sys;
 
     int i_answer;
 
-    if( ftp_SendCommand( p_input, "ABOR" ) < 0 )
+    if( ftp_SendCommand( p_access, "ABOR" ) < 0 )
     {
-        msg_Warn( p_input, "cannot abord file" );
-        net_Close( p_sys->fd_data ); p_sys->fd_data = -1;
+        msg_Warn( p_access, "cannot abord file" );
+        if(  p_sys->fd_data > 0 )
+            net_Close( p_sys->fd_data );
+        p_sys->fd_data = -1;
         return VLC_EGENERIC;
     }
-    net_Close( p_sys->fd_data ); p_sys->fd_data = -1;
-    ftp_ReadCommand( p_input, &i_answer, NULL );
-    ftp_ReadCommand( p_input, &i_answer, NULL );
+    if(  p_sys->fd_data > 0 )
+    {
+        net_Close( p_sys->fd_data );
+        p_sys->fd_data = -1;
+        ftp_ReadCommand( p_access, &i_answer, NULL );
+    }
+    ftp_ReadCommand( p_access, &i_answer, NULL );
 
     return VLC_SUCCESS;
 }
+

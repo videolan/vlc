@@ -41,6 +41,7 @@ vlc_module_begin();
     set_callbacks( Access2Open, Access2Close );
     add_shortcut( "access2" );
     add_shortcut( "http" );
+    add_shortcut( "ftp" );
 
     /* Hack */
     //add_shortcut( "file" );
@@ -227,7 +228,7 @@ static void Access2Seek( input_thread_t *p_input, off_t i_pos )
 
     if( p_access->pf_seek != NULL && p_input->stream.b_seekable )
     {
-        if( p_access->pf_seek( p_access, i_pos ) )
+        if( !p_access->pf_seek( p_access, i_pos ) )
         {
             vlc_mutex_lock( &p_input->stream.stream_lock );
             p_input->stream.p_selected_area->i_tell = i_pos;
