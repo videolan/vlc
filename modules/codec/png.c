@@ -45,15 +45,26 @@ static void CloseDecoder  ( vlc_object_t * );
 
 static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
 
+static int  OpenEncoder   ( vlc_object_t * );
+static void CloseEncoder  ( vlc_object_t * );
+static block_t *Encode( encoder_t *p_enc, picture_t *p_pic );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_description( _("PNG video decoder") );
+    set_shortname( _("PNG" ) );
+    set_description( _("PNG image decoder") );
     set_capability( "decoder", 1000 );
     set_callbacks( OpenDecoder, CloseDecoder );
+    add_shortcut( "png" );
+
+    add_submodule();
+    set_description( _( "PNG image encoder" ) );
+    set_capability( "encoder", 100 );
+    set_callbacks( OpenEncoder, CloseEncoder );
     add_shortcut( "png" );
 vlc_module_end();
 
@@ -139,7 +150,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_png = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
     p_info = png_create_info_struct( p_png );
     p_end_info = png_create_info_struct( p_png );
- 
+
     png_set_read_fn( p_png, (void *)p_block, user_read );
     png_set_error_fn( p_png, (void *)p_dec, user_error, user_warning );
 
@@ -219,4 +230,120 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     free( p_sys );
+}
+
+/*****************************************************************************
+ * PNG Encoder
+ *****************************************************************************/
+struct encoder_sys_t
+{
+    block_t *p_chain;
+    mtime_t date;
+    vlc_bool_t b_error;
+};
+
+
+static int OpenEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'p', 'n', 'g', ' ' ) &&
+        !p_enc->b_force )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* Allocate the memory needed to store the encoder structure */
+    if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_enc, "out of memory" );
+        return VLC_EGENERIC;
+    }
+
+    p_enc->p_sys = p_sys;
+    p_enc->p_sys->p_chain = NULL;
+
+    p_enc->pf_encode_video = Encode;
+
+    return VLC_SUCCESS;
+}
+
+static void CloseEncoder( vlc_object_t *p_this )
+{
+}
+
+static void user_write( png_structp p_png, png_bytep data, png_size_t i_length )
+{
+    encoder_t *p_enc = (encoder_t *)png_get_io_ptr( p_png );
+
+    block_t *p_block = block_New( p_enc, i_length );
+
+    memcpy( p_block->p_buffer, data, i_length );
+    p_block->i_dts = p_block->i_pts =  p_enc->p_sys->date;
+    block_ChainAppend( &p_enc->p_sys->p_chain, p_block );
+}
+
+static void user_flush( png_structp p_png )
+{
+}
+
+static void user_write_error( png_structp p_png, png_const_charp error_msg )
+{
+    encoder_t *p_enc = (encoder_t *)png_get_error_ptr( p_png );
+    p_enc->p_sys->b_error = VLC_TRUE;
+    msg_Err( p_enc, error_msg );
+}
+
+static void user_write_warning( png_structp p_png, png_const_charp warning_msg )
+{
+    encoder_t *p_enc = (encoder_t *)png_get_error_ptr( p_png );
+    msg_Warn( p_enc, warning_msg );
+}
+
+
+static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
+{
+    png_structp p_png;
+    png_infop p_info;
+    png_bytep *p_row_pointers = NULL;
+    int i;
+    block_t *p_gather = NULL;
+
+    p_enc->p_sys->date = p_pic->date;
+
+    p_png =  png_create_write_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
+    p_info = png_create_info_struct( p_png );
+
+    png_set_write_fn( p_png, (void *)p_enc, user_write, user_flush );
+    png_set_error_fn( p_png, (void *)p_enc, user_write_error,
+                                            user_write_warning );
+
+    png_set_IHDR( p_png, p_info,
+                  p_pic->format.i_width,
+                  p_pic->format.i_height,
+                  8, PNG_COLOR_TYPE_RGB,
+                  PNG_INTERLACE_NONE,
+                  PNG_COMPRESSION_TYPE_DEFAULT,
+                  PNG_FILTER_TYPE_DEFAULT );
+
+    p_row_pointers = malloc( sizeof(png_bytep) * p_pic->format.i_height );
+    for( i = 0; i < (int)p_pic->format.i_height; i++ )
+        p_row_pointers[i] = p_pic->p->p_pixels + p_pic->p->i_pitch * i;
+
+    png_write_info( p_png, p_info );
+    png_write_image( p_png, p_row_pointers );
+    png_write_end( p_png, p_info );
+
+    png_destroy_write_struct( &p_png, &p_info );
+
+    if( p_enc->p_sys->p_chain )
+    {
+        p_gather = block_ChainGather( p_enc->p_sys->p_chain );
+    }
+    p_enc->p_sys->p_chain = NULL;
+
+    free( p_row_pointers );
+
+    return p_gather;
 }
