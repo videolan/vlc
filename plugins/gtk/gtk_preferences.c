@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.18 2002/03/26 22:30:09 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.19 2002/03/27 21:01:29 lool Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -135,7 +135,10 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     GtkWidget *category_table = NULL;
     GtkWidget *category_vbox = NULL;
 
+#ifndef MODULE_NAME_IS_gnome
     GtkWidget *dialog_action_area;
+#endif
+
     GtkWidget *ok_button;
     GtkWidget *apply_button;
     GtkWidget *save_button;
@@ -184,10 +187,15 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
     /* We found it, now we can start building its configuration interface */
     /* Create the configuration dialog box */
+#ifdef MODULE_NAME_IS_gnome
+    config_dialog = gnome_dialog_new( p_module->psz_longname, NULL );
+    config_dialog_vbox = GNOME_DIALOG(config_dialog)->vbox;
+#else
     config_dialog = gtk_dialog_new();
     gtk_window_set_title( GTK_WINDOW(config_dialog), p_module->psz_longname );
-
     config_dialog_vbox = GTK_DIALOG(config_dialog)->vbox;
+#endif
+
     gtk_container_set_border_width( GTK_CONTAINER(config_dialog_vbox), 0 );
 
     /* Create our config hash table and associate it with the dialog box */
@@ -401,8 +409,8 @@ static void GtkCreateConfigDialog( char *psz_module_name,
         }
     }
 
+#ifndef MODULE_NAME_IS_gnome
     /* Now let's add the action buttons at the bottom of the page */
-
     dialog_action_area = GTK_DIALOG(config_dialog)->action_area;
     gtk_container_set_border_width( GTK_CONTAINER(dialog_action_area), 4 );
 
@@ -413,8 +421,30 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     item_hbox = gtk_hbox_new( FALSE, 0 );
     gtk_box_pack_end( GTK_BOX(dialog_action_area), item_hbox,
                       TRUE, FALSE, 0 );
+#endif
 
     /* Create the OK button */
+#ifdef MODULE_NAME_IS_gnome
+    gnome_dialog_append_button( GNOME_DIALOG(config_dialog),
+                                GNOME_STOCK_BUTTON_OK );
+    ok_button =
+        GTK_WIDGET(g_list_last(GNOME_DIALOG(config_dialog)->buttons)->data);
+
+    gnome_dialog_append_button( GNOME_DIALOG(config_dialog),
+                                GNOME_STOCK_BUTTON_APPLY );
+    apply_button =
+        GTK_WIDGET(g_list_last(GNOME_DIALOG(config_dialog)->buttons)->data);
+
+    gnome_dialog_append_button_with_pixmap(
+        GNOME_DIALOG(config_dialog), _("Save"), GNOME_STOCK_PIXMAP_SAVE );
+    save_button =
+        GTK_WIDGET(g_list_last(GNOME_DIALOG(config_dialog)->buttons)->data);
+
+    gnome_dialog_append_button( GNOME_DIALOG(config_dialog),
+                                GNOME_STOCK_BUTTON_CANCEL );
+    cancel_button =
+        GTK_WIDGET(g_list_last(GNOME_DIALOG(config_dialog)->buttons)->data);
+#else
     ok_button = gtk_button_new_with_label( _("Ok") );
     gtk_box_pack_start( GTK_BOX(dialog_action_area), ok_button,
                         TRUE, TRUE, 0 );
@@ -430,6 +460,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     cancel_button = gtk_button_new_with_label( _("Cancel") );
     gtk_box_pack_start( GTK_BOX(dialog_action_area), cancel_button,
                         TRUE, TRUE, 0 );
+#endif
 
     gtk_signal_connect( GTK_OBJECT(ok_button), "clicked",
                         GTK_SIGNAL_FUNC(GtkConfigOk),
@@ -443,6 +474,8 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     gtk_signal_connect( GTK_OBJECT(cancel_button), "clicked",
                         GTK_SIGNAL_FUNC(GtkConfigCancel),
                         config_dialog );
+
+
 
     /* Ok, job done successfully. Let's keep a reference to the dialog box */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
