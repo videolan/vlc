@@ -2,7 +2,7 @@
  * ogg.c : ogg stream demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.56 2004/02/07 00:33:08 gbazin Exp $
+ * $Id: ogg.c,v 1.57 2004/02/10 02:57:18 hartman Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -482,11 +482,35 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         p_stream->fmt.i_codec != VLC_FOURCC( 't','a','r','k' ) &&
         p_stream->fmt.i_codec != VLC_FOURCC( 't','h','e','o' ) )
     {
-        /* Remove the header from the packet */
+        /* We remove the header from the packet */
         i_header_len = (*p_oggpacket->packet & PACKET_LEN_BITS01) >> 6;
         i_header_len |= (*p_oggpacket->packet & PACKET_LEN_BITS2) << 1;
-        i_header_len++;
+        
+        if( p_stream->fmt.i_codec == VLC_FOURCC( 's','u','b','t' ))
+        {
+            /* But with subtitles we need to retrieve the duration first */
+            int i;
+            long lenbytes = 0;
+        
+            if( ( i_header_len > 0 ) && ( p_oggpacket->bytes >= ( i_header_len + 1 ) ) )
+            {
+                for( i = 0, lenbytes = 0; i < i_header_len; i++ )
+                {
+                    lenbytes = lenbytes << 8;
+                    lenbytes += *((unsigned char *)p_oggpacket->packet + i_header_len - i);
+                }
+            }
+            if (((p_oggpacket->bytes - 1 - i_header_len) > 2) ||
+                ((p_oggpacket->packet[i_header_len + 1] != ' ') &&
+                 (p_oggpacket->packet[i_header_len + 1] != 0) && 
+                 (p_oggpacket->packet[i_header_len + 1] != '\n') &&
+                 (p_oggpacket->packet[i_header_len + 1] != '\r')))
+            {
+                p_block->i_dts = p_block->i_pts + (mtime_t)lenbytes*1000;
+            }
+        }
 
+        i_header_len++;
         p_block->i_buffer -= i_header_len;
     }
 
