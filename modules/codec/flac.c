@@ -1,8 +1,8 @@
 /*****************************************************************************
- * flac.c: flac decoder/packetizer module making use of libflac
+ * flac.c: flac decoder/packetizer/encoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flac.c,v 1.2 2003/11/21 12:18:54 gbazin Exp $
+ * $Id: flac.c,v 1.3 2003/11/21 20:49:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -30,6 +30,7 @@
 #include <vlc/input.h>
 
 #include <FLAC/stream_decoder.h>
+#include <FLAC/stream_encoder.h>
 
 #include "vlc_block_helper.h"
 
@@ -103,6 +104,9 @@ static int  OpenDecoder   ( vlc_object_t * );
 static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
+static int OpenEncoder   ( vlc_object_t * );
+static void CloseEncoder ( vlc_object_t * );
+
 static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
 static block_t *PacketizeBlock( decoder_t *, block_t ** );
 
@@ -149,6 +153,11 @@ vlc_module_begin();
     set_description( _("Flac audio packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
+
+    add_submodule();
+    set_description( _("Flac audio encoder") );
+    set_capability( "encoder", 100 );
+    set_callbacks( OpenEncoder, CloseEncoder );
 
 vlc_module_end();
 
@@ -211,10 +220,9 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Decode STREAMINFO */
     msg_Dbg( p_dec, "decode STREAMINFO" );
-    p_sys->p_block = block_New( p_dec, p_dec->fmt_in.i_extra + 4 );
-    memcpy( p_sys->p_block->p_buffer + 4, p_dec->fmt_in.p_extra,
+    p_sys->p_block = block_New( p_dec, p_dec->fmt_in.i_extra );
+    memcpy( p_sys->p_block->p_buffer, p_dec->fmt_in.p_extra,
             p_dec->fmt_in.i_extra );
-    memcpy( p_sys->p_block->p_buffer, "fLaC", 4 );
     FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
     msg_Dbg( p_dec, "STREAMINFO decoded" );
 
@@ -230,7 +238,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     if( i_ret == VLC_SUCCESS )
     {
         p_dec->p_sys->b_packetizer = VLC_TRUE;
-        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','a','c');
+        es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     }
 
     return i_ret;
@@ -1008,4 +1016,206 @@ static uint8_t flac_crc8( const uint8_t *data, unsigned len )
         crc = flac_crc8_table[crc ^ *data++];
 
     return crc;
+}
+
+/*****************************************************************************
+ * encoder_sys_t : flac encoder descriptor
+ *****************************************************************************/
+struct encoder_sys_t
+{
+    /*
+     * Input properties
+     */
+    int i_headers;
+
+    int i_samples_delay;
+    int i_channels;
+
+    FLAC__int32 *p_buffer;
+    int         i_buffer;
+
+    block_t *p_chain;
+
+    /*
+     * FLAC properties
+     */
+    FLAC__StreamEncoder *p_flac;
+    FLAC__StreamMetadata_StreamInfo stream_info;
+
+    /*
+     * Common properties
+     */
+    mtime_t i_pts;
+};
+
+#define STREAMINFO_SIZE 38
+
+static block_t *Encode( encoder_t *, aout_buffer_t * );
+
+static FLAC__StreamEncoderWriteStatus
+EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
+                      const FLAC__byte buffer[],
+                      unsigned bytes, unsigned samples,
+                      unsigned current_frame, void *client_data );
+
+static void EncoderMetadataCallback( const FLAC__StreamEncoder *encoder,
+                                     const FLAC__StreamMetadata *metadata,
+                                     void *client_data );
+
+/*****************************************************************************
+ * OpenEncoder: probe the encoder and return score
+ *****************************************************************************/
+static int OpenEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys;
+
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC('f','l','a','c') )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_enc, "out of memory" );
+        return VLC_EGENERIC;
+    }
+    p_enc->p_sys = p_sys;
+    p_enc->pf_encode_audio = Encode;
+    p_sys->i_headers = 0;
+    p_sys->p_buffer = 0;
+    p_sys->i_buffer = 0;
+
+    /* Create flac encoder */
+    p_sys->p_flac = FLAC__stream_encoder_new();
+
+    FLAC__stream_encoder_set_streamable_subset( p_sys->p_flac, 1 );
+    FLAC__stream_encoder_set_channels( p_sys->p_flac,
+                                       p_enc->fmt_in.audio.i_channels );
+    FLAC__stream_encoder_set_sample_rate( p_sys->p_flac,
+                                          p_enc->fmt_in.audio.i_rate );
+    FLAC__stream_encoder_set_bits_per_sample( p_sys->p_flac, 16 );
+    p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
+
+    FLAC__stream_encoder_set_write_callback( p_sys->p_flac,
+        EncoderWriteCallback );
+    FLAC__stream_encoder_set_metadata_callback( p_sys->p_flac,
+        EncoderMetadataCallback );
+    FLAC__stream_encoder_set_client_data( p_sys->p_flac, p_enc );
+
+    /* Get and store the STREAMINFO metadata block as a p_extra */
+    p_sys->p_chain = 0;
+    FLAC__stream_encoder_init( p_sys->p_flac );
+
+    return VLC_SUCCESS;
+}
+
+/****************************************************************************
+ * Encode: the whole thing
+ ****************************************************************************
+ * This function spits out ogg packets.
+ ****************************************************************************/
+static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+{
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    block_t *p_chain;
+    int i;
+
+    p_sys->i_pts = p_aout_buf->start_date -
+                (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
+                (mtime_t)p_enc->fmt_in.audio.i_rate;
+
+    p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
+
+    /* Convert samples to FLAC__int32 */
+    if( p_sys->i_buffer < p_aout_buf->i_nb_bytes * 2 )
+    {
+        p_sys->p_buffer =
+            realloc( p_sys->p_buffer, p_aout_buf->i_nb_bytes * 2 );
+        p_sys->i_buffer = p_aout_buf->i_nb_bytes * 2;
+    }
+
+    for( i = 0 ; i < p_aout_buf->i_nb_bytes / 2 ; i++ )
+    {
+        p_sys->p_buffer[i]= ((int16_t *)p_aout_buf->p_buffer)[i];
+    }
+
+    FLAC__stream_encoder_process_interleaved( p_sys->p_flac, p_sys->p_buffer,
+                                              p_aout_buf->i_nb_samples );
+
+    p_chain = p_sys->p_chain;
+    p_sys->p_chain = 0;
+
+    return p_chain;
+}
+
+/*****************************************************************************
+ * CloseEncoder: encoder destruction
+ *****************************************************************************/
+static void CloseEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+
+    FLAC__stream_encoder_delete( p_sys->p_flac );
+
+    if( p_sys->p_buffer ) free( p_sys->p_buffer );
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * EncoderMetadataCallback: called by libflac to output metadata
+ *****************************************************************************/
+static void EncoderMetadataCallback( const FLAC__StreamEncoder *encoder,
+                                     const FLAC__StreamMetadata *metadata,
+                                     void *client_data )
+{
+    encoder_t *p_enc = (encoder_t *)client_data;
+
+    msg_Err( p_enc, "MetadataCallback: %i", metadata->type );
+    return;
+}
+
+/*****************************************************************************
+ * EncoderWriteCallback: called by libflac to output encoded samples
+ *****************************************************************************/
+static FLAC__StreamEncoderWriteStatus
+EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
+                      const FLAC__byte buffer[],
+                      unsigned bytes, unsigned samples,
+                      unsigned current_frame, void *client_data )
+{
+    encoder_t *p_enc = (encoder_t *)client_data;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    block_t *p_block;
+
+    if( samples == 0 && p_sys->i_headers <= 1 )
+    {
+        if( p_sys->i_headers == 1 )
+        {
+            msg_Err( p_enc, "Writing STREAMINFO: %i", bytes );
+
+            /* Backup the STREAMINFO metadata block */
+            p_enc->fmt_out.i_extra = STREAMINFO_SIZE + 4;
+            p_enc->fmt_out.p_extra = malloc( STREAMINFO_SIZE + 4 );
+            memcpy( p_enc->fmt_out.p_extra, "fLaC", 4 );
+            memcpy( ((uint8_t *)p_enc->fmt_out.p_extra) + 4, buffer,
+                    STREAMINFO_SIZE + 4 );
+
+            /* Fake this as the last metadata block */
+            ((uint8_t*)p_enc->fmt_out.p_extra)[4] |= 0x80;
+        }
+        p_sys->i_headers++;
+        return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+    }
+
+    p_block = block_New( p_enc, bytes );
+    memcpy( p_block->p_buffer, buffer, bytes );
+
+    p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
+
+    block_ChainAppend( &p_sys->p_chain, p_block );
+
+    return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }

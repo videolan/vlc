@@ -2,7 +2,7 @@
  * flac.c : FLAC demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: flac.c,v 1.7 2003/11/21 12:18:54 gbazin Exp $
+ * $Id: flac.c,v 1.8 2003/11/21 20:49:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -99,18 +99,15 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
     p_sys->b_start = VLC_TRUE;
 
-    /* Skip stream marker */
-    stream_Read( p_input->s, NULL, 4 );
-
     /* We need to read and store the STREAMINFO metadata */
-    i_peek = stream_Peek( p_input->s, &p_peek, 4 );
-    if( p_peek[0] & 0x7F )
+    i_peek = stream_Peek( p_input->s, &p_peek, 8 );
+    if( p_peek[4] & 0x7F )
     {
         msg_Err( p_input, "This isn't a STREAMINFO metadata block" );
         return VLC_EGENERIC;
     }
 
-    if( ((p_peek[1]<<16)+(p_peek[2]<<8)+p_peek[3]) != (STREAMINFO_SIZE - 4) )
+    if( ((p_peek[5]<<16)+(p_peek[6]<<8)+p_peek[7]) != (STREAMINFO_SIZE - 4) )
     {
         msg_Err( p_input, "Invalid size for a STREAMINFO metadata block" );
         return VLC_EGENERIC;
@@ -132,15 +129,16 @@ static int Open( vlc_object_t * p_this )
                     VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
 
     /* Store STREAMINFO for the decoder and packetizer */
-    p_sys->p_packetizer->fmt_in.i_extra = fmt.i_extra = STREAMINFO_SIZE;
-    p_sys->p_packetizer->fmt_in.p_extra = malloc( STREAMINFO_SIZE );
+    p_sys->p_packetizer->fmt_in.i_extra = fmt.i_extra = STREAMINFO_SIZE + 4;
+    p_sys->p_packetizer->fmt_in.p_extra = malloc( STREAMINFO_SIZE + 4 );
     stream_Read( p_input->s, p_sys->p_packetizer->fmt_in.p_extra,
-                 STREAMINFO_SIZE );
+                 STREAMINFO_SIZE + 4 );
 
     /* Fake this as the last metadata block */
-    ((uint8_t*)p_sys->p_packetizer->fmt_in.p_extra)[0] |= 0x80;
-    fmt.p_extra = malloc( STREAMINFO_SIZE );
-    memcpy( fmt.p_extra, p_sys->p_packetizer->fmt_in.p_extra, STREAMINFO_SIZE);
+    ((uint8_t*)p_sys->p_packetizer->fmt_in.p_extra)[4] |= 0x80;
+    fmt.p_extra = malloc( STREAMINFO_SIZE + 4 );
+    memcpy( fmt.p_extra, p_sys->p_packetizer->fmt_in.p_extra,
+            STREAMINFO_SIZE + 4 );
 
     p_sys->p_packetizer->p_module =
         module_Need( p_sys->p_packetizer, "packetizer", NULL );

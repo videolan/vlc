@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.21 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: ogg.c,v 1.22 2003/11/21 20:49:14 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -426,6 +426,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             msg_Dbg( p_mux, "speex stream" );
             break;
 
+        case VLC_FOURCC( 'f', 'l', 'a', 'c' ):
+            msg_Dbg( p_mux, "flac stream" );
+            break;
+
         default:
             FREE( p_input->p_sys );
             return( VLC_EGENERIC );
@@ -638,6 +642,18 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
                 }
             }
         }
+        else if( p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
+        {
+            /* flac stream marker (yeah, only that in the 1st packet) */
+            op.packet = "fLaC";
+            op.bytes  = 4;
+            op.b_o_s  = 1;
+            op.e_o_s  = 0;
+            op.granulepos = 0;
+            op.packetno = p_stream->i_packet_no++;
+            ogg_stream_packetin( &p_stream->os, &op );
+            p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+        }
         else
         {
             /* ds header */
@@ -689,7 +705,7 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
                 sout_BufferChain( &p_hdr, p_og );
             }
         }
-        else
+        else if( p_stream->i_fourcc != VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
         {
             uint8_t com[128];
             int     i_com;
@@ -708,13 +724,22 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
             sout_BufferChain( &p_hdr, p_og );
         }
 
-        /* Special case for mp4v */
-        if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) &&
+        /* Special case for mp4v and flac */
+        if( ( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) ||
+              p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) ) &&
             p_mux->pp_inputs[i]->p_fmt->i_extra )
         {
-            /* Send a packet with the VOL data */
+            /* Send a packet with the VOL data for mp4v
+             * or STREAMINFO for flac */
+            msg_Dbg( p_mux, "writing extra data" );
             op.bytes  = p_mux->pp_inputs[i]->p_fmt->i_extra;
             op.packet = p_mux->pp_inputs[i]->p_fmt->p_extra;
+            if( p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
+            {
+                /* Skip the flac stream marker */
+                ((uint8_t *)op.bytes) -= 4;
+                ((uint8_t *)op.packet) += 4;
+            }
             op.b_o_s  = 0;
             op.e_o_s  = 0;
             op.granulepos = 0;

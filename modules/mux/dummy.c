@@ -1,8 +1,8 @@
 /*****************************************************************************
- * dummy.c
+ * dummy.c: dummy muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: dummy.c,v 1.8 2003/08/17 18:44:26 fenrir Exp $
+ * $Id: dummy.c,v 1.9 2003/11/21 20:49:14 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -47,7 +47,6 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
-
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
@@ -56,12 +55,20 @@ static int  AddStream( sout_mux_t *, sout_input_t * );
 static int  DelStream( sout_mux_t *, sout_input_t * );
 static int  Mux      ( sout_mux_t * );
 
+struct sout_mux_sys_t
+{
+    /* Some streams have special initialization data, we'll output this
+     * data as an header in the stream. */
+    vlc_bool_t b_header;
+};
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
+    sout_mux_sys_t  *p_sys;
 
     msg_Dbg( p_mux, "Dummy/Raw muxer opened" );
     msg_Info( p_mux, "Open" );
@@ -70,6 +77,9 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
+
+    p_mux->p_sys = p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    p_sys->b_header      = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
@@ -81,8 +91,10 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t * p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
 
     msg_Dbg( p_mux, "Dummy/Raw muxer closed" );
+    free( p_sys );
 }
 
 static int Capability( sout_mux_t *p_mux, int i_query,
@@ -101,23 +113,41 @@ static int Capability( sout_mux_t *p_mux, int i_query,
 static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     msg_Dbg( p_mux, "adding input" );
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
-
     msg_Dbg( p_mux, "removing input" );
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
-static int Mux      ( sout_mux_t *p_mux )
+static int Mux( sout_mux_t *p_mux )
 {
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
     int i;
+
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
         int i_count;
         sout_fifo_t *p_fifo;
+
+        if( p_sys->b_header && p_mux->pp_inputs[i]->p_fmt->i_extra )
+        {
+            /* Write header data */
+            sout_buffer_t *p_data;
+            p_data = sout_BufferNew( p_mux->p_sout,
+                                     p_mux->pp_inputs[i]->p_fmt->i_extra );
+
+            memcpy( p_data->p_buffer, p_mux->pp_inputs[i]->p_fmt->p_extra,
+                    p_mux->pp_inputs[i]->p_fmt->i_extra );
+
+            p_data->i_size = p_mux->pp_inputs[i]->p_fmt->i_extra;
+            p_data->i_dts = p_data->i_pts = p_data->i_length = 0;
+
+            msg_Dbg( p_mux, "writing header data" );
+            sout_AccessOutWrite( p_mux->p_access, p_data );
+        }
 
         p_fifo = p_mux->pp_inputs[i]->p_fifo;
         i_count = p_fifo->i_depth;
@@ -133,6 +163,7 @@ static int Mux      ( sout_mux_t *p_mux )
         }
 
     }
-    return( 0 );
-}
+    p_sys->b_header = VLC_FALSE;
 
+    return VLC_SUCCESS;
+}
