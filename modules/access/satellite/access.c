@@ -48,7 +48,9 @@
 
 #include "dvb.h"
 
-#define SATELLITE_READ_ONCE 80
+/* These are for the Dreambox port. I have no idea whether they're correct
+ * for other DVB adapters. --Meuuh */
+#define SATELLITE_READ_ONCE (64 * 1024)
 #define DMX_BUFFER_SIZE (1024 * 1024)
 
 /*****************************************************************************
@@ -360,7 +362,7 @@ int E_(Open) ( vlc_object_t *p_this )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    p_input->i_mtu = SATELLITE_READ_ONCE * TS_PACKET_SIZE;
+    p_input->i_mtu = SATELLITE_READ_ONCE;
     p_input->stream.i_method = INPUT_METHOD_SATELLITE;
 
     return 0;
