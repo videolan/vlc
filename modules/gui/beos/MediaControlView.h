@@ -54,13 +54,10 @@ class MediaControlView : public BBox
 			void				SetStatus(int status, int rate); 
 			void				SetEnabled(bool enable);
 			void				SetAudioEnabled(bool enable);
-			uint32				GetSeekTo() const;
 			uint32				GetVolume() const;
 			void				SetSkippable(bool backward,
 											 bool forward);
 			void				SetMuted(bool mute);
-
-			sem_id				fScrubSem;
     
  private:
 			void				_LayoutControls(BRect frame) const;
@@ -94,11 +91,10 @@ class MediaControlView : public BBox
 class SeekSlider : public BControl
 {
  public:
-								SeekSlider(BRect frame,
+								SeekSlider(intf_thread_t * p_intf,
+								           BRect frame,
 										   const char* name,
-										   MediaControlView* owner,
-										   int32 minValue,
-										   int32 maxValue);
+										   MediaControlView* owner );
 
 	virtual						~SeekSlider();
 
@@ -121,14 +117,10 @@ private:
 											 rgb_color top,
 											 rgb_color right,
 											 rgb_color bottom);
-			void				_BeginSeek();
-			void				_Seek();
-			void				_EndSeek();
 
+            intf_thread_t     * p_intf;
 			MediaControlView*	fOwner;	
 			bool				fTracking;
-			int32				fMinValue;
-			int32				fMaxValue;
 };
 
 class VolumeSlider : public BControl

@@ -81,7 +81,6 @@ MediaControlView::MediaControlView( intf_thread_t * _p_intf, BRect frame)
 	: BBox(frame, NULL, B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED,
 		   B_PLAIN_BORDER),
       p_intf( _p_intf ),
-      fScrubSem(B_ERROR),
       fCurrentRate(INPUT_RATE_DEFAULT),
       fCurrentStatus(-1),
       fBottomControlHeight(0.0),
@@ -90,8 +89,7 @@ MediaControlView::MediaControlView( intf_thread_t * _p_intf, BRect frame)
 	BRect frame(0.0, 0.0, 10.0, 10.0);
 	
     // Seek Slider
-    fSeekSlider = new SeekSlider( frame, "seek slider", this,
-                                  0, SEEKSLIDER_RANGE );
+    fSeekSlider = new SeekSlider( p_intf, frame, "seek slider", this );
     fSeekSlider->SetValue(0);
     fSeekSlider->ResizeToPreferred();
     AddChild( fSeekSlider );
@@ -370,13 +368,6 @@ MediaControlView::SetAudioEnabled(bool enabled)
 	fVolumeSlider->SetEnabled(enabled);
 }
 
-// GetSeekTo
-uint32
-MediaControlView::GetSeekTo() const
-{
-	return fSeekSlider->Value();
-}
-
 // GetVolume
 uint32
 MediaControlView::GetVolume() const
@@ -531,14 +522,13 @@ MediaControlView::_LayoutControl(BView* view, BRect frame,
 /*****************************************************************************
  * SeekSlider
  *****************************************************************************/
-SeekSlider::SeekSlider(BRect frame, const char* name, MediaControlView *owner,
-					   int32 minValue, int32 maxValue)
+SeekSlider::SeekSlider( intf_thread_t * _p_intf,
+                        BRect frame, const char* name, MediaControlView *owner )
 	: BControl(frame, name, NULL, NULL, B_FOLLOW_NONE,
 			   B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	  p_intf(_p_intf),
 	  fOwner(owner),
-	  fTracking(false),
-	  fMinValue(minValue),
-	  fMaxValue(maxValue)
+	  fTracking(false)
 {
 	BFont font(be_plain_font);
 	font.SetSize(9.0);
@@ -547,7 +537,6 @@ SeekSlider::SeekSlider(BRect frame, const char* name, MediaControlView *owner,
 
 SeekSlider::~SeekSlider()
 {
-	_EndSeek();
 }
 
 /*****************************************************************************
@@ -571,8 +560,8 @@ SeekSlider::Draw(BRect updateRect)
 	float sliderStart = (r.left + knobWidth2);
 	float sliderEnd = (r.right - knobWidth2);
 	float knobPos = sliderStart
-					+ floorf((sliderEnd - sliderStart - 1.0) * (Value() - fMinValue)
-					/ (fMaxValue - fMinValue) + 0.5);
+					+ floorf((sliderEnd - sliderStart - 1.0) * Value()
+					/ SEEKSLIDER_RANGE);
 	// draw both sides (the original from Be doesn't seem
 	// to make a difference for enabled/disabled state)
 //	DrawBitmapAsync(fLeftSideBits, r.LeftTop());
@@ -740,7 +729,6 @@ SeekSlider::MouseDown(BPoint where)
 		SetValue(_ValueFor(where.x));
 		fTracking = true;
 		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-		_BeginSeek();
 	}
 }
 
@@ -753,7 +741,6 @@ SeekSlider::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 	if (fTracking)
 	{
 		SetValue(_ValueFor(where.x));
-		_Seek();
 	}
 }
 
@@ -766,7 +753,16 @@ SeekSlider::MouseUp(BPoint where)
 	if (fTracking)
 	{
 		fTracking = false;
-		_EndSeek();
+		input_thread_t * p_input;
+		p_input = (input_thread_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+
+        if( p_input )
+        {
+		    var_SetFloat( p_input, "position",
+		                  (float) Value() / SEEKSLIDER_RANGE );
+		    vlc_object_release( p_input );
+		}
 	}
 }
 
@@ -788,7 +784,10 @@ SeekSlider::SetPosition(float position)
 {
 	if ( LockLooper() )
 	{
-		SetValue(fMinValue + (int32)floorf((fMaxValue - fMinValue) * position + 0.5));
+	    if( !fTracking )
+	    {
+		    SetValue( SEEKSLIDER_RANGE * position );
+		}
 		UnlockLooper();
 	}
 }
@@ -803,12 +802,12 @@ SeekSlider::_ValueFor(float xPos) const
 	float knobWidth2 = SEEK_SLIDER_KNOB_WIDTH / 2.0;
 	float sliderStart = (r.left + knobWidth2);
 	float sliderEnd = (r.right - knobWidth2);
-	int32 value =  fMinValue + (int32)(((xPos - sliderStart) * (fMaxValue - fMinValue))
+	int32 value =  (int32)(((xPos - sliderStart) * SEEKSLIDER_RANGE)
 				  / (sliderEnd - sliderStart - 1.0));
-	if (value < fMinValue)
-		value = fMinValue;
-	if (value > fMaxValue)
-		value = fMaxValue;
+	if (value < 0)
+		value = 0;
+	if (value > SEEKSLIDER_RANGE)
+		value = SEEKSLIDER_RANGE;
 	return value;
 }
 
@@ -826,42 +825,6 @@ SeekSlider::_StrokeFrame(BRect r, rgb_color left, rgb_color top,
 		AddLine(BPoint(r.right - 1.0, r.bottom), BPoint(r.left + 1.0, r.bottom), bottom);
 	EndLineArray();
 }
-
-/*****************************************************************************
- * SeekSlider::_BeginSeek
- *****************************************************************************/
-void
-SeekSlider::_BeginSeek()
-{
-	fOwner->fScrubSem = create_sem(0, "Vlc::fScrubSem");
-	if (fOwner->fScrubSem >= B_OK)
-		release_sem(fOwner->fScrubSem);
-}
-
-/*****************************************************************************
- * SeekSlider::_Seek
- *****************************************************************************/
-void
-SeekSlider::_Seek()
-{
-	if (fOwner->fScrubSem >= B_OK)
-		delete_sem(fOwner->fScrubSem);
-	fOwner->fScrubSem = create_sem(0, "Vlc::fScrubSem");
-	if (fOwner->fScrubSem >= B_OK)
-		release_sem(fOwner->fScrubSem);
-}
-
-/*****************************************************************************
- * SeekSlider::_EndSeek
- *****************************************************************************/
-void
-SeekSlider::_EndSeek()
-{
-	if (fOwner->fScrubSem >= B_OK)
-		delete_sem(fOwner->fScrubSem);
-	fOwner->fScrubSem = B_ERROR;
-}
-
 
 /*****************************************************************************
  * VolumeSlider

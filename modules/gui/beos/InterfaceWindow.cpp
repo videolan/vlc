@@ -851,7 +851,7 @@ void InterfaceWindow::UpdateInterface()
 #endif
 
         audio_volume_t i_volume;
-        aout_VolumeGet( p_input, &i_volume );
+        aout_VolumeGet( p_intf, &i_volume );
         p_mediaControl->SetAudioEnabled( true );
         p_mediaControl->SetMuted( i_volume );
 
