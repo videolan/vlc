@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.39 2003/12/22 14:32:55 sam Exp $
+ * $Id: libmpeg2.c,v 1.40 2003/12/22 16:40:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -210,7 +210,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( p_block->i_pts )
             {
+#ifdef PIC_FLAG_PTS
                 mpeg2_pts( p_sys->p_mpeg2dec, (uint32_t)p_block->i_pts );
+
+#else /* New interface */
+                mpeg2_tag_picture( p_sys->p_mpeg2dec,
+                                   (uint32_t)p_block->i_pts, 0/*dts*/ );
+#endif
                 p_sys->i_previous_pts = p_sys->i_current_pts;
                 p_sys->i_current_pts = p_block->i_pts;
             }
@@ -337,10 +343,19 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
             p_sys->b_after_sequence_header = 0;
 
+#ifdef PIC_FLAG_PTS
             i_pts = p_sys->p_info->current_picture->flags & PIC_FLAG_PTS ?
                 ( ( p_sys->p_info->current_picture->pts ==
                     (uint32_t)p_sys->i_current_pts ) ?
                   p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
+
+#else /* New interface */
+
+            i_pts = p_sys->p_info->current_picture->flags & PIC_FLAG_TAGS ?
+                ( ( p_sys->p_info->current_picture->tag ==
+                    (uint32_t)p_sys->i_current_pts ) ?
+                  p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
+#endif
 
             /* Hack to handle demuxers which only have DTS timestamps */
             if( !i_pts && !p_block->i_pts && p_block->i_dts > 0 )
