@@ -2,7 +2,7 @@
  * vdec_motion_common.c : common motion compensation routines common
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_common.c,v 1.1 2001/01/18 05:13:22 sam Exp $
+ * $Id: vdec_motion_common.c,v 1.2 2001/02/13 06:31:05 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -201,6 +201,11 @@ static __inline__ void Motion420(
 {
     /* Temporary variables to avoid recalculating things twice */
     int     i_source_offset, i_dest_offset, i_c_height, i_c_select;
+
+    if( p_source == NULL )
+    {
+        return;
+    }
 
     i_source_offset = (p_mb->i_l_x + (i_mv_x >> 1))
                        + (p_mb->i_motion_l_y + i_offset
