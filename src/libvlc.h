@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.104 2003/11/11 23:50:41 hartman Exp $
+ * $Id: libvlc.h,v 1.105 2003/11/14 20:17:29 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -517,7 +517,7 @@ static char *ppsz_language_text[] =
 
 #define FULLSCREEN_KEY_TEXT N_("Fullscreen")
 #define FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state")
-#define PLAY_PAUSE_KEY_TEXT N_("Pause")
+#define PLAY_PAUSE_KEY_TEXT N_("Play/ause")
 #define PLAY_PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to swap paused state")
 #define PAUSE_KEY_TEXT N_("Pause only")
 #define PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to pause")
