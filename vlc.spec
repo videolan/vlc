@@ -1,10 +1,10 @@
 %define name 		vlc
 %define version 	0.5.0
-%define rel		0.1
+%define rel		1
 
 %define	libmajor	0
 
-%define cvs     	1
+%define cvs     	0
 %if %{cvs}
 %define	cvsrel		1
 %define cvsdate 	20030127
@@ -14,7 +14,7 @@
 %define release 	%{rel}mdk
 %endif
 
-%define with_dvdplay 0
+%define with_dvdplay 1
 
 %define with_mozilla 0
 %define with_gtk 1
@@ -34,8 +34,8 @@
 %define with_mad 1
 %define with_ogg 1
 %define with_a52 1
-%define with_dv 0
-%define with_dvb 0
+%define with_dv 1
+%define with_dvb 1
 %define	with_ffmpeg 1
 
 %define with_esd 1
@@ -137,7 +137,7 @@ URL:		http://www.videolan.org/
 Requires:	vlc-gui
 # vlc-mad needed by ffmpeg builtin (i want MPEG4 support out of box)
 Requires:	vlc-plugin-mad
-#DVD working out of box.
+# DVD working out of box.
 Requires:	vlc-plugin-a52
 
 BuildRoot:	%_tmppath/%name-%version-%release-root
@@ -155,12 +155,12 @@ Buildrequires:	gnome-libs-devel
 Buildrequires:	libqt2-devel
 %endif
 %if %with_kde
-Buildrequires:	libkde2-devel
+Buildrequires:	kdelibs-devel
 %endif
 %if %with_ncurses
 Buildrequires:	libncurses5-devel
 %if %with_wx
-Buildrequires:	wxwindows
+Buildrequires:	wxGTK-devel
 %endif
 %endif
 %if %with_lirc
@@ -300,7 +300,6 @@ VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 This plugin adds a KDE interface to vlc, the VideoLAN Client. To
 activate it, use the `--intf kde' flag or run the `kvlc' program.
 
-
 %package plugin-ncurses
 Summary: Ncurses console-based plugin for the VideoLAN client
 Group: Video
@@ -322,6 +321,19 @@ VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin is an infrared lirc interface for vlc, the
 VideoLAN Client. To activate it, use the `--intf lirc' flag.
+
+%package -n wxvlc
+Summary: WxWindow plugin for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+Obsoletes: vlc-lirc
+Provides: vlc-lirc
+%description -n wxvlc
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+This plugin adds a wxWindow interface to vlc, the VideoLAN Client. To
+activate it, use the `--intf wxwin' flag or run the `wxvlc' program.
+
 
 #
 # video plugins
@@ -490,6 +502,7 @@ This plugin adds support for the Advanced Linux Sound Architecture to
 vlc, the VideoLAN Client. To activate it, use the `--aout alsa' flag or
 select the `alsa' aout plugin from the preferences menu.
 
+
 %package plugin-slp
 Summary: Service Location Protocol acces plugin for the VideoLAN client
 Group: Video
@@ -510,9 +523,12 @@ vlc, the VideoLAN Client.
 
 %build
 # yves 0.4.0-1mdk
-# ffmpeg: static linking cause no official ffmpeg release aith a stable ABI
+# ffmpeg: static linking cause no official ffmpeg release with a stable ABI
 # ffmpeg:no plugin posible on ia64 due to the static linking (can not put .a in a .so)
 
+export QTDIR=%{_libdir}/qt3
+# mandrake kernel specific
+export CPPFLAGS="${CPPFLAGS:--I/usr/src/linux/3rdparty/mod_dvb/include}"
 # NO empty line or comments for the configure --switch or it won't work.
 %configure2_5x  --enable-release \
 	--enable-dvd --without-dvdcss \
@@ -587,6 +603,11 @@ vlc, the VideoLAN Client.
 	--disable-vorbis \
 	--disable-ogg \
 %endif
+%if %with_dv
+	--enable-dv \
+%else
+	--disable-dv \
+%endif
 %if %with_dvb
 	--enable-dvb  --enable-dvbpsi --enable-satellite \
 %else
@@ -602,10 +623,6 @@ vlc, the VideoLAN Client.
 	--enable-arts \
 %endif
 
-# debian configure
-# --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-mp4 --enable-dvb --enable-dv --enable-svgalib --enable-satellite --enable-ogg --enable-vorbis
-
-export QTDIR=%{_libdir}/qt3 
 %make
 
 %install
@@ -638,10 +655,12 @@ EOF
 %endif
 %if %with_kde
 cat > %buildroot/%_menudir/kvlc << EOF
-?package(kvlc): command="%_bindir/kvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="kvlc.png" hints="Video"
+?package(kvlc): command="%_bindir/kvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="KDE VideoLAN Client" icon="kvlc.png" hints="Video"
 EOF
 %endif
-
+%if %with_wx
+?package(wxvlc): command="%_bindir/wxvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="wxWindow VideoLAN Client" icon="vlc.png" hints="Video"
+%endif
 
 # icons
 %define pngdir %buildroot/%_datadir/vlc
@@ -683,7 +702,7 @@ rm -fr %buildroot
 
 %files -f %name.lang
 %defattr(-,root,root)
-%doc README COPYING
+%doc NEWS README COPYING AUTHORS MAINTAINERS THANKS
 %_bindir/vlc
 
 %dir %_libdir/vlc
@@ -1023,6 +1042,7 @@ rm -fr %buildroot
 %doc README
 %_libdir/vlc/access/libsatellite_plugin.so
 %_libdir/vlc/demux/libts_dvbpsi_plugin.so
+%_libdir/vlc/mux/libmux_ts_dvbpsi_plugin.so
 %endif
 
 #audio plugins
@@ -1055,6 +1075,9 @@ rm -fr %buildroot
 %endif
 
 %changelog
+* Sat Feb 01 2003 Yves Duret <yves@zarb.org> 0.5.0-1mdk
+- new upstream release.
+
 * Mon Jun 20 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.2-1mdk
 - new upstream release
 
