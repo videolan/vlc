@@ -357,14 +357,6 @@ Status: Todo
 Task
 Difficulty: Easy
 Urgency: Normal
-Platform: any
-Description: SDL vout cleaning
-The SDL vout hasn't been updated for a long while. It needs some cleaning up. New hotkeys support, better resizing, alignment etc. Even though SDL isn't used much, this vout shouldn't disappear, because it is a crossplatform API.
-Status: Todo
-
-Task
-Difficulty: Easy
-Urgency: Normal
 Platform: Win32/Linux
 Description: V4L and dshow tuning support
 We need an API that allows us to control the tuning of V4L and dshow TV cards.
@@ -378,6 +370,7 @@ Description: Electronic Program Guide
 Integrate a EPG system into VLC.
 Status: Todo (CryHavoc)
 
+Task
 Difficulty: Hard
 Urgency: Wishlist
 Platform: any
