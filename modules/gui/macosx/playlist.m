@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.m,v 1.56 2004/02/06 04:51:02 hartman Exp $
+ * $Id: playlist.m,v 1.57 2004/02/08 20:08:28 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -458,13 +458,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             /* All of this is to make sure CD's play when you D&D them on VLC */
             /* Converts mountpoint to a /dev file */
             struct statfs *buf;
-            char *psz_dev, *temp;
+            char *psz_dev;
             buf = (struct statfs *) malloc (sizeof(struct statfs));
             statfs( [o_uri fileSystemRepresentation], buf );
             psz_dev = strdup(buf->f_mntfromname);
-            free( buf );
-            temp = strrchr( psz_dev , 's' );
-            psz_dev[temp - psz_dev] = '\0';
             o_uri = [NSString stringWithCString: psz_dev ];
         }
 
