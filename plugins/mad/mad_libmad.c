@@ -292,7 +292,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     {
     	p_mad_adec->p_aout_fifo = aout_CreateFifo(
                 AOUT_FIFO_PCM,              /* fifo type */
-                p_libmad_pcm->channels,     /* nr. of channels */
+                2, /*p_libmad_pcm->channels,*/     /* nr. of channels */
                 p_libmad_pcm->samplerate,   /* frame rate in Hz ?*/
                 p_libmad_pcm->length*2,     /* length of output buffer *2 channels*/
                 NULL  );                    /* buffer */
@@ -373,9 +373,11 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     }
 
     /* DEBUG */
+    /*
     if (p_libmad_pcm->channels == 1) {
        intf_ErrMsg( "mad debug: libmad_output channels [%d]", p_libmad_pcm->channels);
     }
+    */
 
     vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
     p_mad_adec->p_aout_fifo->i_end_frame = (p_mad_adec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;

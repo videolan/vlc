@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.103 2002/05/03 20:49:30 sam Exp $
+ * $Id: common.h,v 1.104 2002/05/10 02:04:16 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -636,6 +636,9 @@ typedef struct module_symbols_s
     int ( * input_ClockManageControl )   ( struct input_thread_s *,
                                            struct pgrm_descriptor_s *,
                                            mtime_t );
+    mtime_t ( *input_ClockGetTS )       ( struct input_thread_s *,
+                                             struct  pgrm_descriptor_s *, 
+                                             mtime_t );
     void ( * input_FDSeek )         ( struct input_thread_s *, off_t );
     void ( * input_FDClose )        ( struct input_thread_s * );
     ssize_t ( * input_FDRead )          ( struct input_thread_s *, byte_t *,

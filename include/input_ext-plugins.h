@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.24 2002/04/25 21:52:42 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.25 2002/05/10 02:04:16 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -102,6 +102,7 @@ mtime_t input_ClockGetTS( struct input_thread_s *,
 #else
 #   define input_ClockManageRef p_symbols->input_ClockManageRef
 #   define input_ClockManageControl p_symbols->input_ClockManageControl
+#   define input_ClockGetTS p_symbols->input_ClockGetTS
 #endif
 
 /*****************************************************************************

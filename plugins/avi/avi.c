@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.14 2002/05/07 13:53:55 fenrir Exp $
+ * $Id: avi.c,v 1.15 2002/05/10 02:04:17 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -438,7 +438,7 @@ static int AVIInit( input_thread_t *p_input )
     /* we need to seek to be able to readcorrectly */
     if( !p_input->stream.b_seekable ) 
     {
-        intf_ErrMsg( "input error: need the ability to seek in stream" );
+        intf_WarnMsg( 2,"input: RIFF-AVI plug-in discarded (no seekable)" );
         return( -1 );
     }
     p_input->p_demux_data = 
@@ -461,7 +461,7 @@ static int AVIInit( input_thread_t *p_input )
     if( RIFF_TestFileHeader( p_input, &p_riff, FOURCC_AVI ) != 0 )    
     {
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input: RIFF-AVI plug-in discarded (avi_file)" );
+        intf_WarnMsg( 2,"input: RIFF-AVI plug-in discarded (avi_file)" );
         return( -1 );
     }
     p_avi_demux->p_riff = p_riff;
@@ -802,7 +802,6 @@ static int AVIInit( input_thread_t *p_input )
     }
     else
     {
-        /* TODO: if there is more than 1 video stream */
         intf_Msg( "input error: no video stream found !" );
     }
     if( p_avi_demux->p_info_audio != NULL ) 
@@ -883,17 +882,14 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
     p_info->i_idxposc--;
     
     /* create entry on the fly */
-    /* TODO: when parsing for a stream take care of the other to not do 
-       the same things two time */
-    /* search for the less advance stream and parse from it for all streams*/
+    /* search for the more advance stream and parse from it for all streams*/
     p_info_tmp = p_info;
-    /* XXX XXX XXX change to take the stream the more advanced */
     
     for( i = 0; i < p_avi_demux->i_streams; i++ )
     {
 #define p_info_i p_avi_demux->pp_info[i]
         if( p_info_i->p_index[p_info_i->i_idxnb - 1].i_offset + 
-                        p_info_i->i_idxoffset < 
+                        p_info_i->i_idxoffset >
             p_info_tmp->p_index[p_info_tmp->i_idxnb - 1].i_offset +
                         p_info_tmp->i_idxoffset )
         {
@@ -1264,6 +1260,8 @@ static int AVI_ReAlign( input_thread_t *p_input )
         && ( i_pos < p_info->p_index[p_info->i_idxposc].i_offset +
                 p_info->p_index[p_info->i_idxposc].i_length ) )
     {
+        /* FIXME FIXME FIXME if master == audio and samplesize != 0 */
+        /* don't work with big chunk */
         /* don't do anything we are in the current chunk  */
         return( 0 );
     }
@@ -1387,7 +1385,6 @@ static pes_packet_t *AVI_GetFrameInPES( input_thread_t *p_input,
         /* stream is chunk based , easy */
         int i_chunk = __AVI_PTSToChunk( p_info, i_dpts);
         /* at least one frame */
-        /* i_chunk = __MIN( 50, i_chunk ); */ /* but no more than 20 */
         /* read them */
         p_pes_first = NULL;
         for( i = 0; i < i_chunk; i++ )

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.6 2002/05/07 13:55:36 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.7 2002/05/10 02:04:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -120,7 +120,7 @@ static int decoder_Probe( u8 *pi_type )
     switch( *pi_type )
     {
 /*        case( MPEG1_VIDEO_ES ): marche pas pr le moment 
-        case( MPEG2_VIDEO_ES ): */
+        case( MPEG2_VIDEO_ES ):  */
         case( MSMPEG4_VIDEO_ES ):
         case( MPEG4_VIDEO_ES ):
             return( 0 );

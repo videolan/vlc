@@ -128,6 +128,7 @@ PLUGINS_TARGETS := a52/a52 \
 		motion/motionmmxext \
 		motion/motion3dnow \
 		motion/motionaltivec \
+        mpeg_system/mpeg_audio \
 		mpeg_system/mpeg_es \
 		mpeg_system/mpeg_ps \
 		mpeg_system/mpeg_ts \
