@@ -412,7 +412,7 @@ AC_CHECK_LIB(m,pow,[
   VLC_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad equalizer vlc],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
-  VLC_ADD_LDFLAGS([headphone_channel_mixer],[-lm])
+  VLC_ADD_LDFLAGS([headphone_channel_mixer normvol],[-lm])
 ])
 fi # end "${SYS}" != "mingw32"
 
