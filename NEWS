@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.18 2003/02/16 01:29:39 massiot Exp $
+$Id: NEWS,v 1.19 2003/02/16 01:38:36 titer Exp $
 
 Changes between 0.5.0 and 0.5.1:
 --------------------------------
@@ -46,7 +46,8 @@ Win32 port:
  * fixed the "RichEdit line insertion error" bug
 
 BeOS port:
- * lower BeOS priorities to avoid lock-up
+ * smarter BeOS priorities to avoid lock-up
+ * few enhancements in the interface (especially the Settings window)
 
 Opie port:
  * Native video output is working again.
