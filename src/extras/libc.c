@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.11 2004/01/07 23:39:41 fenrir Exp $
+ * $Id: libc.c,v 1.12 2004/01/08 10:27:07 fenrir Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -130,7 +130,7 @@ int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
 /*****************************************************************************
  * vasprintf:
  *****************************************************************************/
-#if !defined( HAVE_VASPRINTF )
+#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
 int vlc_vasprintf(char **strp, const char *fmt, va_list ap)
 {
     /* Guess we need no more than 100 bytes. */
