@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.139 2004/01/03 23:37:08 asmax Exp $
+dnl $Id: configure.ac,v 1.140 2004/01/04 15:24:27 zorglub Exp $
 
 AC_INIT(vlc,0.7.0)
 
@@ -2751,7 +2751,7 @@ if test "${enable_skins2}" != "no"; then
     ALIASES="${ALIASES} svlc"
     AX_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -I${x_includes} -I/usr/include/freetype2 -DX11_SKINS])
     AX_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    AX_ADD_LDFLAGS([skins2],[-L${x_libraries} -lXext -lX11 -lfreetype -lpng -lz ])
+    AX_ADD_LDFLAGS([skins2],[-L${x_libraries} -lXext -lX11 -lfreetype -lpng ])
   fi fi
 fi
 
