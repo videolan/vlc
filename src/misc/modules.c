@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.140 2003/11/19 13:10:48 gbazin Exp $
+ * $Id: modules.c,v 1.141 2003/11/25 12:35:15 sam Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -678,7 +678,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
     struct dirent * file;
 #endif
 
-    if( i_maxdepth < 0 )
+    if( p_this->p_vlc->b_die || i_maxdepth < 0 )
     {
         return;
     }
@@ -738,7 +738,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
             AllocatePluginFile( p_this, psz_path );
         }
     }
-    while( FindNextFile( handle, &finddata ) );
+    while( !p_this->p_vlc->b_die && FindNextFile( handle, &finddata ) );
 
     /* Close the directory */
     FindClose( handle );
@@ -753,7 +753,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
     i_dirlen = strlen( psz_dir );
 
     /* Parse the directory and try to load all files it contains. */
-    while( (file = readdir( dir )) )
+    while( !p_this->p_vlc->b_die && (file = readdir( dir )) )
     {
         struct stat statbuf;
         unsigned int i_len;

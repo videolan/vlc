@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.103 2003/11/25 00:56:34 fenrir Exp $
+ * $Id: libvlc.c,v 1.104 2003/11/25 12:35:15 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -285,8 +285,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     vlc_mutex_lock( lockval.p_address );
     if( libvlc.p_module_bank == NULL )
     {
-        module_InitBank( p_libvlc );
-        module_LoadMain( p_libvlc );
+        module_InitBank( p_vlc );
+        module_LoadMain( p_vlc );
     }
     vlc_mutex_unlock( lockval.p_address );
     var_Destroy( p_libvlc, "libvlc" );
@@ -376,8 +376,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 #endif
 
         module_EndBank( p_vlc );
-        module_InitBank( p_libvlc );
-        module_LoadMain( p_libvlc );
+        module_InitBank( p_vlc );
+        module_LoadMain( p_vlc );
         config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
     }
     if( psz_language ) free( psz_language );
@@ -389,8 +389,13 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * list of configuration options exported by each module and loads their
      * default values.
      */
-    module_LoadBuiltins( p_libvlc );
-    module_LoadPlugins( p_libvlc );
+    module_LoadBuiltins( p_vlc );
+    module_LoadPlugins( p_vlc );
+    if( p_vlc->b_die )
+    {
+        b_exit = VLC_TRUE;
+    }
+
     msg_Dbg( p_vlc, "module bank initialized, found %i modules",
                     libvlc.p_module_bank->i_children );
 
@@ -764,7 +769,7 @@ int VLC_Destroy( int i_object )
  * VLC_Die: ask vlc to die.
  *****************************************************************************
  * This function sets p_vlc->b_die to VLC_TRUE, but does not do any other
- * task. It is your duty to call vlc_end and VLC_Destroy afterwards.
+ * task. It is your duty to call VLC_End and VLC_Destroy afterwards.
  *****************************************************************************/
 int VLC_Die( int i_object )
 {
