@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.18 2002/12/19 17:29:13 massiot Exp $
+ * $Id: http.c,v 1.19 2002/12/23 15:39:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -437,6 +437,14 @@ static int Open( vlc_object_t *p_this )
 
     while( *psz_parser && *psz_parser != ':' && *psz_parser != '/' )
     {
+        if( *psz_parser == '[' )
+        {
+            /* IPv6 address */
+            while( *psz_parser && *psz_parser != ']' )
+            {
+                psz_parser++;
+            }
+        }
         psz_parser++;
     }
 
