@@ -175,6 +175,10 @@
  * (~1 Mbyte) before using huge values */
 #define VOUT_MAX_PICTURES               8
 
+/* Minimum number of direct pictures the video output will accept without
+ * creating additional pictures in system memory */
+#define VOUT_MIN_DIRECT_PICTURES        6
+
 /* Number of simultaneous subpictures */
 #define VOUT_MAX_SUBPICTURES            8
 

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.58 2002/11/11 14:39:11 sam Exp $
+ * $Id: video.h,v 1.59 2002/11/19 20:45:08 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -102,6 +102,8 @@ struct picture_heap_t
 
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];               /* pictures */
+    int             i_last_used_pic;                /* last used pic in heap */
+    vlc_bool_t      b_allow_modify_pics;
 
     /* Stuff used for truecolor RGB planes */
     int i_rmask, i_rrshift, i_lrshift;

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.197 2002/11/13 20:51:05 sam Exp $
+ * $Id: video_output.c,v 1.198 2002/11/19 20:45:08 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -141,6 +141,9 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
     p_vout->render.i_rmask    = 0;
     p_vout->render.i_gmask    = 0;
     p_vout->render.i_bmask    = 0;
+
+    p_vout->render.i_last_used_pic = 0;
+    p_vout->render.b_allow_modify_pics = 1;
 
     /* Zero the output heap */
     I_OUTPUTPICTURES = 0;
@@ -301,15 +304,23 @@ static int InitThread( vout_thread_t *p_vout )
          * for memcpy operations */
         p_vout->b_direct = 1;
 
-        msg_Dbg( p_vout, "direct render, mapping "
-                 "render pictures 0-%i to system pictures 1-%i",
-                 VOUT_MAX_PICTURES - 2, VOUT_MAX_PICTURES - 1 );
-
         for( i = 1; i < VOUT_MAX_PICTURES; i++ )
         {
+            if( p_vout->p_picture[ i ].i_type != DIRECT_PICTURE &&
+                I_RENDERPICTURES >= VOUT_MIN_DIRECT_PICTURES - 1 &&
+                p_vout->p_picture[ i - 1 ].i_type == DIRECT_PICTURE )
+            {
+                /* We have enough direct buffers so there's no need to
+                 * try to use system memory buffers. */
+                break;
+            }
             PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
             I_RENDERPICTURES++;
         }
+
+        msg_Dbg( p_vout, "direct render, mapping "
+                 "render pictures 0-%i to system pictures 1-%i",
+                 VOUT_MAX_PICTURES - 2, VOUT_MAX_PICTURES - 1 );
     }
     else
     {

@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.30 2002/11/10 18:04:24 sam Exp $
+ * $Id: vout_pictures.c,v 1.31 2002/11/19 20:45:09 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -118,22 +118,12 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
     vlc_mutex_lock( &p_vout->picture_lock );
 
     /*
-     * Look for an empty place. We start at 1 because the first
-     * directbuffer is reserved for memcpy()ed pictures.
+     * Look for an empty place in the picture heap.
      */
-    for( i_pic = 0; i_pic < I_RENDERPICTURES && p_freepic == NULL; i_pic++ )
+    for( i_pic = 0; i_pic < I_RENDERPICTURES; i_pic++ )
     {
-        p_pic = PP_RENDERPICTURE[ i_pic ];
-
-        /* If the picture we found is a memory buffer, and we have enough
-         * pictures in the stack, and we might have enough room later for
-         * a direct buffer, skip it. If no other pictures are found, the
-         * video decoder will try again later. */
-        if( p_vout->b_direct && ( p_vout->output.i_pictures > 5 )
-             && ( p_pic->i_type != DIRECT_PICTURE ) )
-        {
-            break;
-        }
+        p_pic = PP_RENDERPICTURE[(p_vout->render.i_last_used_pic + i_pic + 1)
+                                 % I_RENDERPICTURES];
 
         switch( p_pic->i_status )
         {
@@ -150,11 +140,17 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                 p_pic->b_top_field_first    = b_top_field_first;
 
                 p_vout->i_heap_size++;
+                p_vout->render.i_last_used_pic =
+                    ( p_vout->render.i_last_used_pic + i_pic + 1 )
+                    % I_RENDERPICTURES;
                 vlc_mutex_unlock( &p_vout->picture_lock );
                 return( p_pic );
 
             case FREE_PICTURE:
                 /* Picture is empty and ready for allocation */
+                p_vout->render.i_last_used_pic =
+                    ( p_vout->render.i_last_used_pic + i_pic + 1 )
+                    % I_RENDERPICTURES;
                 p_freepic = p_pic;
                 break;
 
@@ -296,7 +292,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
     if( p_pic->i_type == DIRECT_PICTURE )
     {
-        if( p_pic->i_refcount )
+        if( !p_vout->render.b_allow_modify_pics || p_pic->i_refcount )
         {
             /* Picture is in a direct buffer and is still in use,
              * we need to copy it to another direct buffer before
@@ -676,4 +672,3 @@ static void CopyPicture( vout_thread_t * p_vout,
         }
     }
 }
-

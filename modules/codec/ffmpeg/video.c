@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.4 2002/11/10 02:47:27 fenrir Exp $
+ * $Id: video.c,v 1.5 2002/11/19 20:45:09 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -498,7 +498,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 }
 
 /*****************************************************************************
- * DecodeThread: Called for decode one frame
+ * DecodeThread: Called to decode one frame
  *****************************************************************************
  * We have to get a frame stored in a pes, give it to ffmpeg decoder and send
  * the image to the output.
@@ -824,13 +824,12 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *avctx, int width,
 
     avctx->dr_opaque_frame = p_pic;
 
-    /* FIXME: this variable is used to determine if a macro-block to be written
+    /* This variable is used to determine if a macro-block to be written
      * can be skipped. The idea behind this is that if a macro-block hasn't
      * changed and all the frame-buffers already have the value of this
-     * macro-block, then we can skip the writting.
-     * But currently we cannot ensure this is the case, so we decide to write
-     * everything. */
-    avctx->dr_ip_buffer_count = 999;
+     * macro-block, then we don't need to write it again. */
+    avctx->dr_ip_buffer_count = p_vdec->p_vout->render.i_pictures;
+    p_vdec->p_vout->render.b_allow_modify_pics = 0;
 
     return 0;
 #endif
