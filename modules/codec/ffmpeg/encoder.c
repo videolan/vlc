@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.14 2003/11/29 12:03:08 fenrir Exp $
+ * $Id: encoder.c,v 1.15 2003/11/29 13:12:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -98,8 +98,16 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     if( !E_(GetFfmpegCodec)( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
-        return VLC_EGENERIC;
+        if( E_(GetFfmpegChroma)( p_enc->fmt_out.i_codec ) < 0 )
+        {
+            /* handed chroma output */
+            return VLC_EGENERIC;
+        }
+        i_cat      = VIDEO_ES;
+        i_codec_id = CODEC_ID_RAWVIDEO;
+        psz_namecodec = "Raw video";
     }
+
 
     if( p_enc->fmt_out.i_cat == VIDEO_ES && i_cat != VIDEO_ES )
     {
@@ -186,8 +194,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
         p_sys->p_buffer_out = malloc( AVCODEC_MAX_VIDEO_FRAME_SIZE );
 
-        /* Ffmpeg does handle the conversion itself */
-        //p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+        p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
 
         if ( p_enc->b_strict_rc )
         {
@@ -238,6 +245,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
     if( i_codec_id == CODEC_ID_RAWVIDEO )
     {
+        /* XXX: hack: Force same codec (will be handled by transcode) */
+        p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
         p_context->pix_fmt = E_(GetFfmpegChroma)( p_enc->fmt_in.i_codec );
     }
 

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.63 2003/11/28 23:40:09 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.64 2003/11/29 13:12:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -673,7 +673,7 @@ int E_(GetFfmpegChroma)( vlc_fourcc_t i_chroma )
     case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
         return PIX_FMT_YUV422;
     default:
-        return 0;
+        return -1;
     }
 }
 
