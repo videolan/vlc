@@ -65,13 +65,15 @@
  * Module descriptor
  *****************************************************************************/
 #define SAP_ADDR_TEXT N_( "SAP multicast address" )
-#define SAP_ADDR_LONGTEXT N_( "SAP multicast address" )
+#define SAP_ADDR_LONGTEXT N_( "Listen for SAP announces on another address" )
 #define SAP_IPV4_TEXT N_( "IPv4-SAP listening" )
 #define SAP_IPV4_LONGTEXT N_( \
-      "Set this if you want the SAP module to listen to IPv4 announces" )
+      "Set this if you want the SAP module to listen to IPv4 announces " \
+      "on the standard address" )
 #define SAP_IPV6_TEXT N_( "IPv6-SAP listening" )
 #define SAP_IPV6_LONGTEXT N_( \
-      "Set this if you want the SAP module to listen to IPv6 announces" )
+      "Set this if you want the SAP module to listen to IPv6 announces " \
+      "on the standard address" )
 #define SAP_SCOPE_TEXT N_( "IPv6 SAP scope" )
 #define SAP_SCOPE_LONGTEXT N_( \
        "Sets the scope for IPv6 announces (default is 8)" )
@@ -83,6 +85,10 @@
 #define SAP_PARSE_LONGTEXT N_( \
        "When SAP can it will try to parse the SAP. If you don't select " \
        "this, all announces will be parsed by the livedotcom module" )
+#define SAP_STRICT_TEXT N_( "SAP Strict mode" )
+#define SAP_STRICT_LONGTEXT N_( \
+       "When this is set, the SAP parser will discard some non-compliant " \
+       "announces" )
 #define SAP_CACHE_TEXT N_("Use SAP cache")
 #define SAP_CACHE_LONGTEXT N_( \
        "If this option is selected, a SAP caching mechanism will be used." \
@@ -110,6 +116,8 @@ vlc_module_begin();
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE );
     add_bool( "sap-parse", 1 , NULL,
                SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, VLC_TRUE );
+    add_bool( "sap-strict", 0 , NULL,
+               SAP_STRICT_TEXT,SAP_STRICT_LONGTEXT, VLC_TRUE );
     add_bool( "sap-cache", 0 , NULL,
                SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, VLC_TRUE );
 
@@ -246,6 +254,7 @@ static int Open( vlc_object_t *p_this )
 
     playlist_t          *p_playlist;
     playlist_view_t     *p_view;
+    char                *psz_addr;
 
     p_sys->i_timeout = config_GetInt( p_sd,"sap-timeout" );
 
@@ -255,8 +264,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->pi_fd = NULL;
     p_sys->i_fd = 0;
 
-    /* FIXME */
-    p_sys->b_strict = VLC_FALSE;
+    p_sys->b_strict = config_GetInt( p_sd, "sap-strict");
     p_sys->b_parse = config_GetInt( p_sd, "sap-parse" );
 
     if( config_GetInt( p_sd, "sap-cache" ) )
@@ -270,10 +278,29 @@ static int Open( vlc_object_t *p_this )
     }
     if( config_GetInt( p_sd, "sap-ipv6" ) )
     {
-        /* TODO */
+        /* [ + 8x4+7*':' + ] */
+        char psz_address[42];
+        char c_scope;
+        char *psz_scope = config_GetPsz( p_sd, "sap-ipv6-scope" );
+
+        if( psz_scope == NULL || *psz_scope == '\0')
+        {
+            c_scope = '8';
+        }
+        else
+        {
+            c_scope = psz_scope[0];
+        }
+        snprintf( psz_address, 42, "[%s%c%s]", IPV6_ADDR_1, c_scope,
+                                               IPV6_ADDR_2 );
+        InitSocket( p_sd, psz_address, SAP_PORT );
     }
 
-    /* TODO : Handle additionnal adresses */
+    psz_addr = config_GetPsz( p_sd, "sap-addr" );
+    if( psz_addr && *psz_addr )
+    {
+        InitSocket( p_sd, psz_addr, SAP_PORT );
+    }
 
     if( p_sys->i_fd == 0 )
     {
