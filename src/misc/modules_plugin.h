@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.9 2002/02/19 00:50:20 sam Exp $
+ * $Id: modules_plugin.h,v 1.10 2002/02/21 23:56:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -86,7 +86,7 @@ module_unload( module_handle_t handle )
  * similar functions, since we want a non-NULL symbol anyway.
  *****************************************************************************/
 static __inline__ void *
-module_getsymbol( module_handle_t handle, char * psz_function )
+module_getsymbol_inner( module_handle_t handle, char * psz_function )
 {
 #ifdef SYS_BEOS
     void * p_symbol;
@@ -100,19 +100,6 @@ module_getsymbol( module_handle_t handle, char * psz_function )
         return( NULL );
     }
 
-#elif defined( SYS_DARWIN )
-    /* MacOS X dl library expects symbols to begin with "_". That's
-     * really lame, but hey, what can we do ? */
-    char *  psz_call = malloc( strlen( psz_function ) + 2 );
-    void *  p_return;
-    strcpy( psz_call + 1, psz_function );
-    psz_call[ 0 ] = '_';
-
-    p_return = dlsym( handle, psz_call );
-
-    free( psz_call );
-    return( p_return );
-
 #elif defined(WIN32)
     return( (void *)GetProcAddress( handle, psz_function ) );
 
@@ -120,6 +107,27 @@ module_getsymbol( module_handle_t handle, char * psz_function )
     return( dlsym( handle, psz_function ) );
 
 #endif
+}
+
+static __inline__ void *
+module_getsymbol( module_handle_t handle, char * psz_function )
+{
+    void * p_symbol = module_getsymbol_inner( handle, psz_function );
+
+    /* MacOS X dl library expects symbols to begin with "_". So do
+     * some other operating systems. That's really lame, but hey, what
+     * can we do ? */
+    if( p_symbol == NULL )
+    {
+        char *psz_call = malloc( strlen( psz_function ) + 2 );
+
+        strcpy( psz_call + 1, psz_function );
+        psz_call[ 0 ] = '_';
+        p_symbol = module_getsymbol_inner( handle, psz_call );
+        free( psz_call );
+    }
+
+    return p_symbol;
 }
 
 /*****************************************************************************
