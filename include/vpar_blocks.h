@@ -33,7 +33,7 @@ typedef struct macroblock_s
     int                     i_c_stride;                  /* idem, for chroma */
     
     /* IDCT information */
-    elem_t                  ppi_blocks[12][64];                    /* blocks */
+    dctelem_t                  ppi_blocks[12][64];                    /* blocks */
     f_idct_t                pf_idct[12];             /* sparse IDCT or not ? */
     int                     pi_sparse_pos[12];
 
@@ -131,10 +131,17 @@ extern u8       pi_scan[2][64];
  * Prototypes
  *****************************************************************************/
 void vpar_InitCrop( struct vpar_thread_s* p_vpar );
+void vpar_InitMbAddrInc( struct vpar_thread_s * p_vpar );
+void vpar_InitPMBType( struct vpar_thread_s * p_vpar );
+void vpar_InitBMBType( struct vpar_thread_s * p_vpar );
+void vpar_InitCodedPattern( struct vpar_thread_s * p_vpar );
+void vpar_InitDCTTables( struct vpar_thread_s * p_vpar );
+void vpar_ParseMacroblock( struct vpar_thread_s * p_vpar, int * pi_mb_address,
+                           int i_mb_previous, int i_mb_base );
 int vpar_CodedPattern420( struct vpar_thread_s* p_vpar );
 int vpar_CodedPattern422( struct vpar_thread_s* p_vpar );
 int vpar_CodedPattern444( struct vpar_thread_s* p_vpar );
-int  vpar_IMBType( struct vpar_thread_s* p_vpar );
-int  vpar_PMBType( struct vpar_thread_s* p_vpar );
-int  vpar_BMBType( struct vpar_thread_s* p_vpar );
-int  vpar_DMBType( struct vpar_thread_s* p_vpar );
+int vpar_IMBType( struct vpar_thread_s* p_vpar );
+int vpar_PMBType( struct vpar_thread_s* p_vpar );
+int vpar_BMBType( struct vpar_thread_s* p_vpar );
+int vpar_DMBType( struct vpar_thread_s* p_vpar );

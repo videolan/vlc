@@ -84,7 +84,7 @@ macroblock_t * vpar_GetMacroblock( video_fifo_t * p_fifo )
     
     p_mb = VIDEO_FIFO_START( *p_fifo );
     VIDEO_FIFO_INCSTART( *p_fifo );
-    
+
     vlc_mutex_unlock( &p_fifo->lock );
     
     return( p_mb );
@@ -99,12 +99,13 @@ macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
 
 #define P_buffer p_fifo->p_vpar->vbuffer
     vlc_mutex_lock( &P_buffer.lock );
-    if( P_buffer.i_index == -1 )
+    while( P_buffer.i_index == -1 )
     {
         /* No more structures available. This should not happen ! */
-msleep(VPAR_IDLE_SLEEP);
-return vpar_NewMacroblock( p_fifo );
-//        return NULL;
+        intf_DbgMsg("vpar debug: macroblock list is empty, delaying\n");
+        vlc_mutex_unlock( &P_buffer.lock );
+        msleep(VPAR_IDLE_SLEEP);
+        vlc_mutex_lock( &P_buffer.lock );
     }
 
     p_mb = P_buffer.pp_mb_free[ P_buffer.i_index-- ];
@@ -135,12 +136,16 @@ void vpar_DecodeMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
  *****************************************************************************/
 void vpar_ReleaseMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
 {
+    boolean_t      b_finished;
+
     /* Unlink picture buffer */
     vlc_mutex_lock( &p_mb->p_picture->lock_deccount );
     p_mb->p_picture->i_deccount--;
+    b_finished = (p_mb->p_picture->i_deccount == 1);
+    vlc_mutex_unlock( &p_mb->p_picture->lock_deccount );
 //fprintf(stderr, "%d ", p_mb->p_picture->i_deccount);
     /* Test if it was the last block of the picture */
-    if( p_mb->p_picture->i_deccount == 1 )
+    if( b_finished )
     {
 fprintf(stderr, "Image decodee\n");
         /* Mark the picture to be displayed */
@@ -159,7 +164,6 @@ fprintf(stderr, "Image decodee\n");
             vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backward );
         }*/
     }
-    vlc_mutex_unlock( &p_mb->p_picture->lock_deccount );
 
     /* Release the macroblock_t structure */
 #define P_buffer p_fifo->p_vpar->vbuffer
@@ -174,6 +178,35 @@ fprintf(stderr, "Image decodee\n");
  *****************************************************************************/
 void vpar_DestroyMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
 {
+    boolean_t       b_finished;
+
+    /* Unlink picture buffer */
+    vlc_mutex_lock( &p_mb->p_picture->lock_deccount );
+    p_mb->p_picture->i_deccount--;
+    b_finished = (p_mb->p_picture->i_deccount == 1);
+    vlc_mutex_unlock( &p_mb->p_picture->lock_deccount );
+
+    /* Test if it was the last block of the picture */
+    if( b_finished )
+    {
+fprintf(stderr, "Image trashee\n");
+        /* Mark the picture to be displayed */
+        vout_DestroyPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
+
+        /* Warn Synchro for its records. */
+        vpar_SynchroEnd( p_fifo->p_vpar );
+
+        /* Unlink referenced pictures */
+/*        if( p_mb->p_forward != NULL )
+        {
+                vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forward );
+        }
+        if( p_mb->p_backward != NULL )
+        {
+            vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backward );
+        }*/
+    }
+
     /* Release the macroblock_t structure */
 #define P_buffer p_fifo->p_vpar->vbuffer
     vlc_mutex_lock( &P_buffer.lock );

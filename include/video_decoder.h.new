@@ -34,7 +34,7 @@ typedef struct vdec_thread_s
 //    int *pi_status;
     
     /* idct iformations */
-    elem_t              p_pre_idct[64*64];
+    dctelem_t              p_pre_idct[64*64];
     
     /* Input properties */
     struct vpar_thread_s *    p_vpar;                 /* video_parser thread */
@@ -59,7 +59,7 @@ typedef struct vdec_thread_s
 /*****************************************************************************
  * Function pointers
  *****************************************************************************/
-typedef void (*f_addb_t)( vdec_thread_t *, elem_t*, yuv_data_t*, int );
+typedef void (*f_addb_t)( vdec_thread_t *, dctelem_t*, yuv_data_t*, int );
 
 /*****************************************************************************
  * Prototypes
@@ -69,6 +69,6 @@ struct vpar_thread_s;
 /* Thread management functions */
 vdec_thread_t * vdec_CreateThread       ( struct vpar_thread_s *p_vpar /*, int *pi_status */ );
 void vdec_DestroyThread      ( vdec_thread_t *p_vdec /*, int *pi_status */ );
-void vdec_AddBlock( vdec_thread_t *, elem_t*, yuv_data_t*, int );
-void vdec_CopyBlock( vdec_thread_t *, elem_t*, yuv_data_t*, int );
-void vdec_DummyBlock( vdec_thread_t *, elem_t*, yuv_data_t*, int );
+void vdec_AddBlock( vdec_thread_t *, dctelem_t*, yuv_data_t*, int );
+void vdec_CopyBlock( vdec_thread_t *, dctelem_t*, yuv_data_t*, int );
+void vdec_DummyBlock( vdec_thread_t *, dctelem_t*, yuv_data_t*, int );

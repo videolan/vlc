@@ -238,8 +238,6 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_ma
  *****************************************************************************/
 static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
 {
-    int i_dummy;
-    
     if( p_matrix->b_allocated )
     {
         /* Deallocate the piece of memory. */
@@ -280,16 +278,12 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
         switch( GetBits32( &p_vpar->bit_stream ) )
         {
         case SEQUENCE_HEADER_CODE:
-            fprintf( stderr, "begin sequence header\n" );
             SequenceHeader( p_vpar );
-            fprintf( stderr, "end sequence header\n" );
             return 0;
             break;
 
         case GROUP_START_CODE:
-            fprintf( stderr, "begin group\n" );
             GroupHeader( p_vpar );
-            fprintf( stderr, "end group\n" );
             return 0;
             break;
 
@@ -299,7 +293,7 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
             break;
 
         case SEQUENCE_END_CODE:
-            fprintf( stderr, "sequence header end code\n" );
+            intf_DbgMsg("vpar debug: sequence end code received\n");
             return 1;
             break;
 
@@ -517,7 +511,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
     int                 i_structure;
     int                 i_mb_address, i_mb_base, i_mb;
-    elem_t *            p_y, p_u, p_v;
     boolean_t           b_parsable;
     u32                 i_dummy;
     
@@ -659,7 +652,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         return;
     }
-    fprintf(stderr, "begin picture\n");
 
     /* OK, now we are sure we will decode the picture. */
 #define P_picture p_vpar->picture.p_picture
@@ -679,7 +671,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             p_vpar->b_error = 1;
             return;
         }
-bzero( P_picture->p_data, 940032 );
+
         /* Initialize values. */
         P_picture->date = vpar_SynchroDecode( p_vpar,
                                               p_vpar->picture.i_coding_type,
@@ -688,6 +680,9 @@ bzero( P_picture->p_data, 940032 );
                     << ( 1 - p_vpar->picture.b_frame_structure ) );
         p_vpar->picture.i_c_stride = - 8 + ( p_vpar->sequence.i_chroma_width
                     << ( 1 - p_vpar->picture.b_frame_structure ));
+
+        P_picture->i_deccount = p_vpar->sequence.i_mb_size;
+        memset( p_vpar->picture.pp_mb, 0, MAX_MB );
 
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
@@ -723,7 +718,7 @@ bzero( P_picture->p_data, 940032 );
                  < SLICE_START_CODE_MIN) ||
             (i_dummy > SLICE_START_CODE_MAX) )
         {
-            intf_DbgMsg("vpar debug: premature end of picture");
+            intf_DbgMsg("vpar debug: premature end of picture\n");
             p_vpar->picture.b_error = 1;
             break;
         }
@@ -737,13 +732,13 @@ bzero( P_picture->p_data, 940032 );
     {
         /* Trash picture. */
 fprintf(stderr, "Image trashee\n");
-        for( i_mb = 0; p_vpar->picture.pp_mb[i_mb]; i_mb++ )
+        for( i_mb = 1; p_vpar->picture.pp_mb[i_mb]; i_mb++ )
         {
             vpar_DestroyMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
         }
+        vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
 
         ReferenceReplace( p_vpar, p_vpar->picture.i_coding_type, NULL );
-        vout_DestroyPicture( p_vpar->p_vout, P_picture );
 
         /* Prepare context for the next picture. */
         P_picture = NULL;
@@ -754,8 +749,7 @@ fprintf(stderr, "Image trashee\n");
     {
 fprintf(stderr, "Image parsee\n");
         /* Frame completely parsed. */
-        P_picture->i_deccount = p_vpar->sequence.i_mb_size;
-        for( i_mb = 0; i_mb < p_vpar->sequence.i_mb_size; i_mb++ )
+        for( i_mb = 1; p_vpar->picture.pp_mb[i_mb]; i_mb++ )
         {
             vpar_DecodeMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
         }
@@ -773,7 +767,9 @@ fprintf(stderr, "Image parsee\n");
         } 
 #endif
         /* Send signal to the video_decoder. */
+        vlc_mutex_lock( &p_vpar->vfifo.lock );
         vlc_cond_signal( &p_vpar->vfifo.wait );
+        vlc_mutex_unlock( &p_vpar->vfifo.lock );
         
         /* Prepare context for the next picture. */
         P_picture = NULL;

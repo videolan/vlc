@@ -42,11 +42,6 @@
 /*
  * Local prototypes
  */
-static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
-                                       macroblock_t * p_mb );
-static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar );
-static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
-                                        macroblock_t * p_mb );
 typedef void (*f_decode_block_t)( vpar_thread_t *, macroblock_t *, int );
 static void vpar_DecodeMPEG1Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 static void vpar_DecodeMPEG1Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
@@ -57,7 +52,7 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
  * Initialisation tables
  */
     /* Table for coded_block_pattern resolution */
-lookup_t     pl_coded_pattern_init_table[512] = 
+static lookup_t     pl_coded_pattern_init_table[512] = 
     { {MB_ERROR, 0}, {0, 9}, {39, 9}, {27, 9}, {59, 9}, {55, 9}, {47, 9}, {31, 9},
     {58, 8}, {58, 8}, {54, 8}, {54, 8}, {46, 8}, {46, 8}, {30, 8}, {30, 8},
     {57, 8}, {57, 8}, {53, 8}, {53, 8}, {45, 8}, {45, 8}, {29, 8}, {29, 8},
@@ -128,7 +123,7 @@ lookup_t     pl_coded_pattern_init_table[512] =
      */
     
     /* Table B-12, dct_dc_size_luminance, codes 00xxx ... 11110 */
-lookup_t     pl_dct_dc_lum_init_table_1[32] =
+static lookup_t     pl_dct_dc_lum_init_table_1[32] =
     { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
       {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
       {0, 3}, {0, 3}, {0, 3}, {0, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3},
@@ -136,7 +131,7 @@ lookup_t     pl_dct_dc_lum_init_table_1[32] =
     };
 
     /* Table B-12, dct_dc_size_luminance, codes 111110xxx ... 111111111 */
-lookup_t     pl_dct_dc_lum_init_table_2[32] =
+static lookup_t     pl_dct_dc_lum_init_table_2[32] =
     { {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6},
       {8, 7}, {8, 7}, {8, 7}, {8, 7}, {9, 8}, {9, 8}, {10,9}, {11,9},
       {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
@@ -146,7 +141,7 @@ lookup_t     pl_dct_dc_lum_init_table_2[32] =
     };
 
     /* Table B-13, dct_dc_size_chrominance, codes 00xxx ... 11110 */
-lookup_t     pl_dct_dc_chrom_init_table_1[32] =
+static lookup_t     pl_dct_dc_chrom_init_table_1[32] =
     { {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2},
       {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
       {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
@@ -154,7 +149,7 @@ lookup_t     pl_dct_dc_chrom_init_table_1[32] =
     };
 
     /* Table B-13, dct_dc_size_chrominance, codes 111110xxxx ... 1111111111 */
-lookup_t     pl_dct_dc_chrom_init_table_2[32] =
+static lookup_t     pl_dct_dc_chrom_init_table_2[32] =
     { {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
       {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
       {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7},
@@ -172,7 +167,7 @@ lookup_t     pl_dct_dc_chrom_init_table_2[32] =
     /* Table B-14, DCT coefficients table zero,
      * codes 0100 ... 1xxx (used for first (DC) coefficient)
      */
-dct_lookup_t pl_DCT_tab_dc[12] =
+static dct_lookup_t pl_DCT_tab_dc[12] =
     {
         {0,2,4}, {2,1,4}, {1,1,3}, {1,1,3},
         {0,1,1}, {0,1,1}, {0,1,1}, {0,1,1},
@@ -182,7 +177,7 @@ dct_lookup_t pl_DCT_tab_dc[12] =
     /* Table B-14, DCT coefficients table zero,
      * codes 0100 ... 1xxx (used for all other coefficients)
      */
-dct_lookup_t pl_DCT_tab_ac[12] =
+static dct_lookup_t pl_DCT_tab_ac[12] =
     {
         {0,2,4},  {2,1,4},  {1,1,3},  {1,1,3},
         {DCT_EOB,0,2}, {DCT_EOB,0,2}, {DCT_EOB,0,2}, {DCT_EOB,0,2}, /* EOB */
@@ -192,7 +187,7 @@ dct_lookup_t pl_DCT_tab_ac[12] =
     /* Table B-14, DCT coefficients table zero,
      * codes 000001xx ... 00111xxx
      */
-dct_lookup_t pl_DCT_tab0[60] =
+static dct_lookup_t pl_DCT_tab0[60] =
     {
         {DCT_ESCAPE,0,6}, {DCT_ESCAPE,0,6}, {DCT_ESCAPE,0,6}, {DCT_ESCAPE,0,6},
         /* Escape */
@@ -215,7 +210,7 @@ dct_lookup_t pl_DCT_tab0[60] =
     /* Table B-15, DCT coefficients table one,
      * codes 000001xx ... 11111111
      */
-dct_lookup_t pl_DCT_tab0a[252] =
+static dct_lookup_t pl_DCT_tab0a[252] =
     {
         {65,0,6}, {65,0,6}, {65,0,6}, {65,0,6}, /* Escape */
         {7,1,7}, {7,1,7}, {8,1,7}, {8,1,7},
@@ -282,13 +277,10 @@ dct_lookup_t pl_DCT_tab0a[252] =
         {2,3,8}, {4,2,8}, {0,14,8}, {0,15,8}
     };
 
-
-
-
     /* Table B-14, DCT coefficients table zero,
      * codes 0000001000 ... 0000001111
      */
-dct_lookup_t pl_DCT_tab1[8] =
+static dct_lookup_t pl_DCT_tab1[8] =
     {
         {16,1,10}, {5,2,10}, {0,7,10}, {2,3,10},
         {1,4,10}, {15,1,10}, {14,1,10}, {4,2,10}
@@ -297,7 +289,7 @@ dct_lookup_t pl_DCT_tab1[8] =
     /* Table B-15, DCT coefficients table one,
      * codes 000000100x ... 000000111x
      */
-dct_lookup_t pl_DCT_tab1a[8] =
+static dct_lookup_t pl_DCT_tab1a[8] =
     {
         {5,2,9}, {5,2,9}, {14,1,9}, {14,1,9},
         {2,4,10}, {16,1,10}, {15,1,9}, {15,1,9}
@@ -306,7 +298,7 @@ dct_lookup_t pl_DCT_tab1a[8] =
     /* Table B-14/15, DCT coefficients table zero / one,
      * codes 000000010000 ... 000000011111
      */
-dct_lookup_t pl_DCT_tab2[16] =
+static dct_lookup_t pl_DCT_tab2[16] =
     {
         {0,11,12}, {8,2,12}, {4,3,12}, {0,10,12},
         {2,4,12}, {7,2,12}, {21,1,12}, {20,1,12},
@@ -317,7 +309,7 @@ dct_lookup_t pl_DCT_tab2[16] =
     /* Table B-14/15, DCT coefficients table zero / one,
      * codes 0000000010000 ... 0000000011111
      */
-dct_lookup_t pl_DCT_tab3[16] =
+static dct_lookup_t pl_DCT_tab3[16] =
     {
         {10,2,13}, {9,2,13}, {5,3,13}, {3,4,13},
         {2,5,13}, {1,7,13}, {1,6,13}, {0,15,13},
@@ -328,7 +320,7 @@ dct_lookup_t pl_DCT_tab3[16] =
     /* Table B-14/15, DCT coefficients table zero / one,
      * codes 00000000010000 ... 00000000011111
      */
-dct_lookup_t pl_DCT_tab4[16] =
+static dct_lookup_t pl_DCT_tab4[16] =
     {
         {0,31,14}, {0,30,14}, {0,29,14}, {0,28,14},
         {0,27,14}, {0,26,14}, {0,25,14}, {0,24,14},
@@ -339,7 +331,7 @@ dct_lookup_t pl_DCT_tab4[16] =
     /* Table B-14/15, DCT coefficients table zero / one,
      *   codes 000000000010000 ... 000000000011111
      */
-dct_lookup_t pl_DCT_tab5[16] =
+static dct_lookup_t pl_DCT_tab5[16] =
     {
     {0,40,15}, {0,39,15}, {0,38,15}, {0,37,15},
     {0,36,15}, {0,35,15}, {0,34,15}, {0,33,15},
@@ -350,7 +342,7 @@ dct_lookup_t pl_DCT_tab5[16] =
     /* Table B-14/15, DCT coefficients table zero / one,
      * codes 0000000000010000 ... 0000000000011111
      */
-dct_lookup_t pl_DCT_tab6[16] =
+static dct_lookup_t pl_DCT_tab6[16] =
     {
         {1,18,16}, {1,17,16}, {1,16,16}, {1,15,16},
         {6,3,16}, {16,2,16}, {15,2,16}, {14,2,16},
@@ -392,7 +384,7 @@ void vpar_InitCrop( vpar_thread_t * p_vpar )
  *****************************************************************************/
 
 /* Function for filling up the lookup table for mb_addr_inc */
-void __inline__ FillMbAddrIncTable( vpar_thread_t * p_vpar,
+static void __inline__ FillMbAddrIncTable( vpar_thread_t * p_vpar,
                                     int i_start, int i_end, int i_step, 
                                     int * pi_value, int i_length )
 {
@@ -574,268 +566,6 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
  * Macroblock parsing functions
  */
 
-     
-/*****************************************************************************
- * vpar_ParseMacroblock : Parse the next macroblock
- *****************************************************************************/
-void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
-                           int i_mb_previous, int i_mb_base )
-{
-    static f_addb_t ppf_addb_intra[2] = {vdec_AddBlock, vdec_CopyBlock};
-    static f_decode_block_t pppf_decode_block[2][2] =
-                { {vpar_DecodeMPEG1Non, vpar_DecodeMPEG1Intra},
-                  {vpar_DecodeMPEG2Non, vpar_DecodeMPEG2Intra} };
-    static int      pi_x[12] = {0,8,0,8,0,0,0,0,8,8,8,8};
-    static int      pi_y[2][12] = { {0,0,8,8,0,0,8,8,0,0,8,8},
-                                    {0,0,1,1,0,0,1,1,0,0,1,1} };
-
-    int             i_mb, i_b, i_mask;
-    macroblock_t *  p_mb;
-    f_addb_t        pf_addb;
-    yuv_data_t *    p_data1;
-    yuv_data_t *    p_data2;
-
-    /************* DEBUG *************/
-    static int i_count = 0;
-    int i_inc;
-    boolean_t b_stop = 0;
-
-    i_inc = MacroblockAddressIncrement( p_vpar );
-   
-    *pi_mb_address += i_inc;
-
-    //*pi_mb_address += MacroblockAddressIncrement( p_vpar );
-    b_stop = i_inc > 1;
-//    fprintf( stderr, "inc : %d (%d)\n", *pi_mb_address, i_inc );
-if( 0  )//i_count > 8 )
-{
-    exit(0);
-}
-i_count++;
-
-if( 0 )        
-    //i_count == 249)
-    // i_count != *pi_mb_address)
-    //b_stop )
-{
-    fprintf( stderr, "i_count = %d (%d)\n", i_count, i_inc );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     exit(0);
-}
-
-    for( i_mb = i_mb_previous + 1; i_mb < *pi_mb_address; i_mb++ )
-    {
-        /* Skipped macroblock (ISO/IEC 13818-2 7.6.6). */
-        static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
-        static f_motion_t   pf_motion_skipped[4] = {NULL, vdec_MotionField,
-                                vdec_MotionField, vdec_MotionFrame};
-
-fprintf(stderr, "Skipped macroblock !\n");
-        /* Reset DC predictors (7.2.1). */
-        p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
-            = p_vpar->slice.pi_dc_dct_pred[2]
-            = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
-
-        if( p_vpar->picture.i_coding_type == P_CODING_TYPE )
-        {
-            /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
-            bzero( p_vpar->slice.pppi_pmv, 8*sizeof(int) );
-        }
-
-        if( (p_mb = p_vpar->picture.pp_mb[i_mb_base + i_mb] =
-             vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
-        {
-            p_vpar->picture.b_error = 1;
-            intf_ErrMsg("vpar error: macroblock list is empty !\n");
-            return;
-        }
-
-        InitMacroblock( p_vpar, p_mb );
-       
-        /* No IDCT nor AddBlock. */
-        for( i_b = 0; i_b < 12; i_b++ )
-        {
-            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
-            p_mb->pf_addb[i_b] = vdec_DummyBlock;
-        }
-
-        /* Motion type is picture structure. */
-        p_mb->pf_motion = pf_motion_skipped[p_vpar->picture.i_structure];
-
-        /* Set the field we use for motion compensation */
-        p_mb->ppi_field_select[0][0] = p_mb->ppi_field_select[0][1]
-                                     = ( p_vpar->picture.i_current_structure == BOTTOM_FIELD );
-    }
-//fprintf(stderr, "MB1\n");
-    /* Get a macroblock structure. */
-    if( (p_mb = p_vpar->picture.pp_mb[i_mb_base + *pi_mb_address] =
-         vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
-    {
-        p_vpar->picture.b_error = 1;
-        intf_ErrMsg("vpar error: macroblock list is empty !\n");
-        return;
-    }
-
-    InitMacroblock( p_vpar, p_mb );
-
-    /* Parse off macroblock_modes structure. */
-    MacroblockModes( p_vpar, p_mb );
-
-    if( p_vpar->mb.i_mb_type & MB_QUANT )
-    {
-        LoadQuantizerScale( p_vpar );
-    }
-
-    if( p_vpar->mb.i_mb_type & MB_MOTION_FORWARD )
-    {
-fprintf( stderr, "motion !\n" );
-        (*p_vpar->sequence.pf_decode_mv)( p_vpar, p_mb, 0 );
-    }
-
-    if( p_vpar->mb.i_mb_type & MB_MOTION_BACKWARD )
-    {
-fprintf( stderr, "motion2 !\n" );    
-        (*p_vpar->sequence.pf_decode_mv)( p_vpar, p_mb, 1 );
-    }
-
-    if( p_vpar->picture.b_concealment_mv && (p_vpar->mb.i_mb_type & MB_INTRA) )
-    {
-        RemoveBits( &p_vpar->bit_stream, 1 );
-    }
-
-    if( p_vpar->mb.i_mb_type & MB_PATTERN )
-    {
-        (*p_vpar->sequence.pf_decode_pattern)( p_vpar );
-    }
-    else
-    {
-        int     pi_coded_block_pattern[2] = {0,
-                    (1 << (4+p_vpar->sequence.i_chroma_nb_blocks)) - 1};
-        p_vpar->mb.i_coded_block_pattern = pi_coded_block_pattern
-                                    [p_vpar->mb.i_mb_type & MB_INTRA];
-    }
-
-    pf_addb = ppf_addb_intra[p_vpar->mb.i_mb_type & MB_INTRA];
-
-    /*
-     * Effectively decode blocks.
-     */
-//fprintf(stderr, "MB2\n");
-    i_mask = 1 << (3 + p_vpar->sequence.i_chroma_nb_blocks);
-
-    /* luminance */
-    p_data1 = p_mb->p_picture->p_y
-              + p_mb->i_l_x + p_mb->i_l_y*(p_vpar->sequence.i_width);
-
-    for( i_b = 0 ; i_b < 4 ; i_b++, i_mask >>= 1 )
-    {
-        if( p_vpar->mb.i_coded_block_pattern & i_mask )
-        {
-            memset( p_mb->ppi_blocks[i_b], 0, 64*sizeof(elem_t) );
-            (*pppf_decode_block[p_vpar->sequence.b_mpeg2]
-                               [p_vpar->mb.i_mb_type & MB_INTRA])
-                ( p_vpar, p_mb, i_b );
-        
-            /* decode_block has already set pf_idct and pi_sparse_pos. */
-            p_mb->pf_addb[i_b] = pf_addb;
-     
-            /* Calculate block coordinates. */
-            p_mb->p_data[i_b] = p_data1
-                                + pi_y[p_vpar->mb.b_dct_type][i_b]
-                                * p_vpar->sequence.i_width
-                                + pi_x[i_b];
-        }
-        else
-        {
-            /* Block not coded, so no IDCT, nor AddBlock */
-            p_mb->pf_addb[i_b] = vdec_DummyBlock;
-            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
-        }
-    }
-
-    /* chrominance */
-//fprintf(stderr, "%d ", p_mb->i_c_x
-//                      + p_mb->i_c_y
-//                                      * (p_vpar->sequence.i_chroma_width));
-
-    p_data1 = p_mb->p_picture->p_u
-              + p_mb->i_c_x
-              + p_mb->i_c_y
-                * (p_vpar->sequence.i_chroma_width);
-    p_data2 = p_mb->p_picture->p_v
-               + p_mb->i_c_x
-               + p_mb->i_c_y
-                * (p_vpar->sequence.i_chroma_width);
-    
-    for( i_b = 4; i_b < 4 + p_vpar->sequence.i_chroma_nb_blocks;
-         i_b++, i_mask >>= 1 )
-    {
-        yuv_data_t *    pp_data[2] = {p_data1, p_data2};
-
-        if( p_vpar->mb.i_coded_block_pattern & i_mask )
-        {
-            memset( p_mb->ppi_blocks[i_b], 0, 64*sizeof(elem_t) );
-            (*pppf_decode_block[p_vpar->sequence.b_mpeg2]
-                               [p_vpar->mb.i_mb_type & MB_INTRA])
-                ( p_vpar, p_mb, i_b );
-
-            /* decode_block has already set pf_idct and pi_sparse_pos. */
-            p_mb->pf_addb[i_b] = pf_addb;
-
-            /* Calculate block coordinates. */
-            p_mb->p_data[i_b] = pp_data[i_b & 1]
-                                 + pi_y[p_vpar->mb.b_dct_type][i_b]
-                                   * p_vpar->sequence.i_chroma_width
-                                 + pi_x[i_b];
-        }
-        else
-        {
-            /* Block not coded, so no IDCT, nor AddBlock */
-            p_mb->pf_addb[i_b] = vdec_DummyBlock;
-            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
-        }
-    }
-
-    if( !( p_vpar->mb.i_mb_type & MB_INTRA ) )
-    {
-        static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
-
-        /* Reset DC predictors (7.2.1). */
-        p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
-            = p_vpar->slice.pi_dc_dct_pred[2]
-            = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
-    }
-    else if( !p_vpar->picture.b_concealment_mv )
-    {
-        /* Reset MV predictors. */
-        bzero( p_vpar->slice.pppi_pmv, 8*sizeof(int) );
-    }
- if( 0 )        
-    //i_count == 249)
-    // i_count != *pi_mb_address)
-    //b_stop )
-{
-    fprintf( stderr, "i_count = %d (%d)\n", i_count, i_inc );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     exit(0);
-}
-}
-
-
 /*****************************************************************************
  * InitMacroblock : Initialize macroblock values
  *****************************************************************************/
@@ -844,7 +574,7 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
 {
     static f_chroma_motion_t pf_chroma_motion[4] =
     { NULL, vdec_Motion420, vdec_Motion422, vdec_Motion444 };
-    
+
     p_mb->p_picture = p_vpar->picture.p_picture;
     p_mb->i_structure = p_vpar->picture.i_structure;
     p_mb->i_current_structure = p_vpar->picture.i_current_structure;
@@ -858,7 +588,7 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
 
     p_mb->p_forward = p_vpar->sequence.p_forward;
     p_mb->p_backward = p_vpar->sequence.p_backward;
-    
+
     p_mb->i_addb_l_stride = p_mb->i_l_stride = p_vpar->picture.i_l_stride;
     p_mb->i_addb_c_stride = p_mb->i_c_stride = p_vpar->picture.i_c_stride;
 
@@ -883,7 +613,7 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
     int i_addr_inc = 0;
     /* Index in the lookup table mb_addr_inc */
     int    i_index = ShowBits( &p_vpar->bit_stream, 11 );
-
+        
     /* Test the presence of the escape character */
     while( i_index == 8 )
     {
@@ -891,13 +621,13 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
         i_addr_inc += 33;
         i_index = ShowBits( &p_vpar->bit_stream, 11 );
     }
-    
+     
     /* Affect the value from the lookup table */
     i_addr_inc += p_vpar->pl_mb_addr_inc[i_index].i_value;
     
     /* Dump the good number of bits */
     RemoveBits( &p_vpar->bit_stream, p_vpar->pl_mb_addr_inc[i_index].i_length );
-
+    
     return i_addr_inc;
 }
 
@@ -978,16 +708,272 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
             /* The DCT is coded on fields. Jump one line between each
              * sample. */
             p_mb->i_addb_l_stride <<= 1;
-	        p_mb->i_addb_l_stride += 8;
+            p_mb->i_addb_l_stride += 8;
             /* With CHROMA_420, the DCT is necessarily frame-coded. */
             if( p_vpar->sequence.i_chroma_format != CHROMA_420 )
             {
-	            p_mb->i_addb_c_stride <<= 1;
-	            p_mb->i_addb_c_stride += 8;
+                p_mb->i_addb_c_stride <<= 1;
+                p_mb->i_addb_c_stride += 8;
             }
         }
     }
     p_vpar->mb.b_dmv = p_vpar->mb.i_motion_type == MOTION_DMV;
+}
+     
+/*****************************************************************************
+ * vpar_ParseMacroblock : Parse the next macroblock
+ *****************************************************************************/
+void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
+                           int i_mb_previous, int i_mb_base )
+{
+    static f_addb_t ppf_addb_intra[2] = {vdec_AddBlock, vdec_CopyBlock};
+    static f_decode_block_t pppf_decode_block[2][2] =
+                { {vpar_DecodeMPEG1Non, vpar_DecodeMPEG1Intra},
+                  {vpar_DecodeMPEG2Non, vpar_DecodeMPEG2Intra} };
+    static int      pi_x[12] = {0,8,0,8,0,0,0,0,8,8,8,8};
+    static int      pi_y[2][12] = { {0,0,8,8,0,0,8,8,0,0,8,8},
+                                    {0,0,1,1,0,0,1,1,0,0,1,1} };
+
+    int             i_mb, i_b, i_mask;
+    macroblock_t *  p_mb;
+    f_addb_t        pf_addb;
+    yuv_data_t *    p_data1;
+    yuv_data_t *    p_data2;
+
+    /************* DEBUG *************/
+    static int i_count = 0;
+    int i_inc;
+    boolean_t b_stop = 0;
+
+    i_inc = MacroblockAddressIncrement( p_vpar );
+   
+    *pi_mb_address += i_inc;
+
+    //*pi_mb_address += MacroblockAddressIncrement( p_vpar );
+    b_stop = i_inc > 1;
+//    fprintf( stderr, "inc : %d (%d)\n", *pi_mb_address, i_inc );
+if( 0  )//i_count > 8 )
+{
+    exit(0);
+}
+i_count++;
+
+if( 0 )        
+    //i_count == 249)
+    // i_count != *pi_mb_address)
+    //b_stop )
+{
+    fprintf( stderr, "i_count = %d (%d)\n", i_count, i_inc );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
+     exit(0);
+}
+
+    for( i_mb = i_mb_previous + 1; i_mb < *pi_mb_address; i_mb++ )
+    {
+        /* Skipped macroblock (ISO/IEC 13818-2 7.6.6). */
+        static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
+        static f_motion_t   pf_motion_skipped[4] = {NULL, vdec_MotionField,
+                                vdec_MotionField, vdec_MotionFrame};
+
+fprintf(stderr, "Skipped macroblock !\n");
+        /* Reset DC predictors (7.2.1). */
+        p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
+            = p_vpar->slice.pi_dc_dct_pred[2]
+            = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
+
+        if( p_vpar->picture.i_coding_type == P_CODING_TYPE )
+        {
+            /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
+            memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
+        }
+
+        if( (p_mb = p_vpar->picture.pp_mb[i_mb_base + i_mb] =
+             vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
+        {
+            p_vpar->picture.b_error = 1;
+            intf_ErrMsg("vpar error: macroblock list is empty !\n");
+            return;
+        }
+
+        InitMacroblock( p_vpar, p_mb );
+       
+        /* No IDCT nor AddBlock. */
+        for( i_b = 0; i_b < 12; i_b++ )
+        {
+            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
+            p_mb->pf_addb[i_b] = vdec_DummyBlock;
+        }
+
+        /* Motion type is picture structure. */
+        p_mb->pf_motion = pf_motion_skipped[p_vpar->picture.i_structure];
+
+        /* Set the field we use for motion compensation */
+        p_mb->ppi_field_select[0][0] = p_mb->ppi_field_select[0][1]
+                                     = ( p_vpar->picture.i_current_structure == BOTTOM_FIELD );
+    }
+
+    /* Get a macroblock structure. */
+    if( (p_mb = p_vpar->picture.pp_mb[i_mb_base + *pi_mb_address] =
+         vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
+    {
+        p_vpar->picture.b_error = 1;
+        intf_ErrMsg("vpar error: macroblock list is empty !\n");
+        return;
+    }
+
+    InitMacroblock( p_vpar, p_mb );
+
+    /* Parse off macroblock_modes structure. */
+    MacroblockModes( p_vpar, p_mb );
+
+    if( p_vpar->mb.i_mb_type & MB_QUANT )
+    {
+        LoadQuantizerScale( p_vpar );
+    }
+
+    if( p_vpar->mb.i_mb_type & MB_MOTION_FORWARD )
+    {
+fprintf( stderr, "motion !\n" );
+        (*p_vpar->sequence.pf_decode_mv)( p_vpar, p_mb, 0 );
+    }
+
+    if( p_vpar->mb.i_mb_type & MB_MOTION_BACKWARD )
+    {
+fprintf( stderr, "motion2 !\n" );    
+        (*p_vpar->sequence.pf_decode_mv)( p_vpar, p_mb, 1 );
+    }
+
+    if( p_vpar->picture.b_concealment_mv && (p_vpar->mb.i_mb_type & MB_INTRA) )
+    {
+        RemoveBits( &p_vpar->bit_stream, 1 );
+    }
+
+    if( p_vpar->mb.i_mb_type & MB_PATTERN )
+    {
+        (*p_vpar->sequence.pf_decode_pattern)( p_vpar );
+    }
+    else
+    {
+        int     pi_coded_block_pattern[2] = {0,
+                    (1 << (4+p_vpar->sequence.i_chroma_nb_blocks)) - 1};
+        p_vpar->mb.i_coded_block_pattern = pi_coded_block_pattern
+                                    [p_vpar->mb.i_mb_type & MB_INTRA];
+    }
+
+    pf_addb = ppf_addb_intra[p_vpar->mb.i_mb_type & MB_INTRA];
+
+    /*
+     * Effectively decode blocks.
+     */
+
+    i_mask = 1 << (3 + p_vpar->sequence.i_chroma_nb_blocks);
+
+    /* luminance */
+    p_data1 = p_mb->p_picture->p_y
+              + p_mb->i_l_x + p_mb->i_l_y*(p_vpar->sequence.i_width);
+
+    for( i_b = 0 ; i_b < 4 ; i_b++, i_mask >>= 1 )
+    {
+        if( p_vpar->mb.i_coded_block_pattern & i_mask )
+        {
+            memset( p_mb->ppi_blocks[i_b], 0, 64*sizeof(dctelem_t) );
+            (*pppf_decode_block[p_vpar->sequence.b_mpeg2]
+                               [p_vpar->mb.i_mb_type & MB_INTRA])
+                ( p_vpar, p_mb, i_b );
+        
+            /* decode_block has already set pf_idct and pi_sparse_pos. */
+            p_mb->pf_addb[i_b] = pf_addb;
+     
+            /* Calculate block coordinates. */
+            p_mb->p_data[i_b] = p_data1
+                                + pi_y[p_vpar->mb.b_dct_type][i_b]
+                                * p_vpar->sequence.i_width
+                                + pi_x[i_b];
+        }
+        else
+        {
+            /* Block not coded, so no IDCT, nor AddBlock */
+            p_mb->pf_addb[i_b] = vdec_DummyBlock;
+            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
+        }
+    }
+
+    /* chrominance */
+    p_data1 = p_mb->p_picture->p_u
+              + p_mb->i_c_x
+              + p_mb->i_c_y
+                * (p_vpar->sequence.i_chroma_width);
+    p_data2 = p_mb->p_picture->p_v
+               + p_mb->i_c_x
+               + p_mb->i_c_y
+                * (p_vpar->sequence.i_chroma_width);
+    
+    for( i_b = 4; i_b < 4 + p_vpar->sequence.i_chroma_nb_blocks;
+         i_b++, i_mask >>= 1 )
+    {
+        yuv_data_t *    pp_data[2] = {p_data1, p_data2};
+
+        if( p_vpar->mb.i_coded_block_pattern & i_mask )
+        {
+            memset( p_mb->ppi_blocks[i_b], 0, 64*sizeof(dctelem_t) );
+            (*pppf_decode_block[p_vpar->sequence.b_mpeg2]
+                               [p_vpar->mb.i_mb_type & MB_INTRA])
+                ( p_vpar, p_mb, i_b );
+
+            /* decode_block has already set pf_idct and pi_sparse_pos. */
+            p_mb->pf_addb[i_b] = pf_addb;
+
+            /* Calculate block coordinates. */
+            p_mb->p_data[i_b] = pp_data[i_b & 1]
+                                 + pi_y[p_vpar->mb.b_dct_type][i_b]
+                                   * p_vpar->sequence.i_chroma_width
+                                 + pi_x[i_b];
+        }
+        else
+        {
+            /* Block not coded, so no IDCT, nor AddBlock */
+            p_mb->pf_addb[i_b] = vdec_DummyBlock;
+            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
+        }
+    }
+
+    if( !( p_vpar->mb.i_mb_type & MB_INTRA ) )
+    {
+        static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
+
+        /* Reset DC predictors (7.2.1). */
+        p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
+            = p_vpar->slice.pi_dc_dct_pred[2]
+            = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
+    }
+    else if( !p_vpar->picture.b_concealment_mv )
+    {
+        /* Reset MV predictors. */
+        memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
+    }
+ if( 0 )        
+    //i_count == 249)
+    // i_count != *pi_mb_address)
+    //b_stop )
+{
+    fprintf( stderr, "i_count = %d (%d)\n", i_count, i_inc );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x ", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x", GetBits( &p_vpar->bit_stream, 16 ) );
+     fprintf( stderr, "%x\n", GetBits( &p_vpar->bit_stream, 16 ) );
+     exit(0);
+}
 }
 
 /*****************************************************************************

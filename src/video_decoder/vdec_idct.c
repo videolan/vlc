@@ -44,7 +44,7 @@
  * Local prototypes
  */
 
-//extern IDCT_mmx(elem_t*);
+//extern IDCT_mmx(dctelem_t*);
 
 /* Our current implementation is a fast DCT, we might move to a fast DFT or
  * an MMX DCT in the future. */
@@ -52,7 +52,7 @@
 /*****************************************************************************
  * vdec_DummyIDCT : dummy function that does nothing
  *****************************************************************************/
-void vdec_DummyIDCT( vdec_thread_t * p_vdec, elem_t * p_block, 
+void vdec_DummyIDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, 
                      int i_idontcare )
 {
 }
@@ -66,8 +66,8 @@ void vdec_InitIDCT (vdec_thread_t * p_vdec)
 {	  
     int i;
     
-    elem_t * p_pre = p_vdec->p_pre_idct;
-    memset( p_pre, 0, 64*64*sizeof(elem_t) );
+    dctelem_t * p_pre = p_vdec->p_pre_idct;
+    memset( p_pre, 0, 64*64*sizeof(dctelem_t) );
     
     for( i=0 ; i < 64 ; i++ ) 
     {
@@ -76,7 +76,7 @@ void vdec_InitIDCT (vdec_thread_t * p_vdec)
     }
 }
 
-void vdec_SparseIDCT (vdec_thread_t * p_vdec, elem_t * p_block, 
+void vdec_SparseIDCT (vdec_thread_t * p_vdec, dctelem_t * p_block, 
                       int i_sparse_pos)
 {
     short int val;
@@ -135,7 +135,7 @@ void vdec_SparseIDCT (vdec_thread_t * p_vdec, elem_t * p_block,
 /*****************************************************************************
  * vdec_IDCT : IDCT function for normal matrices
  *****************************************************************************/
-void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
+void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
 {
 //IDCT_mmx(p_block);
 #if 1
@@ -143,7 +143,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
     s32 tmp10, tmp11, tmp12, tmp13;
     s32 z1, z2, z3, z4, z5;
     s32 d0, d1, d2, d3, d4, d5, d6, d7;
-    elem_t * dataptr;
+    dctelem_t * dataptr;
     int rowctr;
     
     SHIFT_TEMPS
@@ -174,7 +174,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
             if (d0) 
             {
       /* Compute a 32 bit value to assign. */
-                elem_t dcval = (elem_t) (d0 << PASS1_BITS);
+                dctelem_t dcval = (dctelem_t) (d0 << PASS1_BITS);
                 register int v = (dcval & 0xffff) | (dcval << 16);
   
                 idataptr[0] = v;
@@ -727,14 +727,14 @@ void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
 
     /* Final output stage: inputs are tmp10..tmp13, tmp0..tmp3 */
 
-        dataptr[0] = (elem_t) DESCALE(tmp10 + tmp3, CONST_BITS-PASS1_BITS);
-        dataptr[7] = (elem_t) DESCALE(tmp10 - tmp3, CONST_BITS-PASS1_BITS);
-        dataptr[1] = (elem_t) DESCALE(tmp11 + tmp2, CONST_BITS-PASS1_BITS);
-        dataptr[6] = (elem_t) DESCALE(tmp11 - tmp2, CONST_BITS-PASS1_BITS);
-        dataptr[2] = (elem_t) DESCALE(tmp12 + tmp1, CONST_BITS-PASS1_BITS);
-        dataptr[5] = (elem_t) DESCALE(tmp12 - tmp1, CONST_BITS-PASS1_BITS);
-        dataptr[3] = (elem_t) DESCALE(tmp13 + tmp0, CONST_BITS-PASS1_BITS);
-        dataptr[4] = (elem_t) DESCALE(tmp13 - tmp0, CONST_BITS-PASS1_BITS);
+        dataptr[0] = (dctelem_t) DESCALE(tmp10 + tmp3, CONST_BITS-PASS1_BITS);
+        dataptr[7] = (dctelem_t) DESCALE(tmp10 - tmp3, CONST_BITS-PASS1_BITS);
+        dataptr[1] = (dctelem_t) DESCALE(tmp11 + tmp2, CONST_BITS-PASS1_BITS);
+        dataptr[6] = (dctelem_t) DESCALE(tmp11 - tmp2, CONST_BITS-PASS1_BITS);
+        dataptr[2] = (dctelem_t) DESCALE(tmp12 + tmp1, CONST_BITS-PASS1_BITS);
+        dataptr[5] = (dctelem_t) DESCALE(tmp12 - tmp1, CONST_BITS-PASS1_BITS);
+        dataptr[3] = (dctelem_t) DESCALE(tmp13 + tmp0, CONST_BITS-PASS1_BITS);
+        dataptr[4] = (dctelem_t) DESCALE(tmp13 - tmp0, CONST_BITS-PASS1_BITS);
 
         dataptr += DCTSIZE;		/* advance pointer to next row */
     }
@@ -1294,21 +1294,21 @@ void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
 
     /* Final output stage: inputs are tmp10..tmp13, tmp0..tmp3 */
 
-    dataptr[DCTSIZE*0] = (elem_t) DESCALE(tmp10 + tmp3,
+    dataptr[DCTSIZE*0] = (dctelem_t) DESCALE(tmp10 + tmp3,
                        CONST_BITS+PASS1_BITS+3);
-    dataptr[DCTSIZE*7] = (elem_t) DESCALE(tmp10 - tmp3,
+    dataptr[DCTSIZE*7] = (dctelem_t) DESCALE(tmp10 - tmp3,
                        CONST_BITS+PASS1_BITS+3);
-    dataptr[DCTSIZE*1] = (elem_t) DESCALE(tmp11 + tmp2,
+    dataptr[DCTSIZE*1] = (dctelem_t) DESCALE(tmp11 + tmp2,
                        CONST_BITS+PASS1_BITS+3);
-    dataptr[DCTSIZE*6] = (elem_t) DESCALE(tmp11 - tmp2,
+    dataptr[DCTSIZE*6] = (dctelem_t) DESCALE(tmp11 - tmp2,
                        CONST_BITS+PASS1_BITS+3);
-    dataptr[DCTSIZE*2] = (elem_t) DESCALE(tmp12 + tmp1,
+    dataptr[DCTSIZE*2] = (dctelem_t) DESCALE(tmp12 + tmp1,
                        CONST_BITS+PASS1_BITS+3);
-    dataptr[DCTSIZE*5] = (elem_t) DESCALE(tmp12 - tmp1,
+    dataptr[DCTSIZE*5] = (dctelem_t) DESCALE(tmp12 - tmp1,
                        CONST_BITS+PASS1_BITS+3);
-    dataptr[DCTSIZE*3] = (elem_t) DESCALE(tmp13 + tmp0,
+    dataptr[DCTSIZE*3] = (dctelem_t) DESCALE(tmp13 + tmp0,
                        CONST_BITS+PASS1_BITS+3);
-    dataptr[DCTSIZE*4] = (elem_t) DESCALE(tmp13 - tmp0,
+    dataptr[DCTSIZE*4] = (dctelem_t) DESCALE(tmp13 - tmp0,
                        CONST_BITS+PASS1_BITS+3);
     
     dataptr++;			/* advance pointer to next column */

@@ -175,16 +175,6 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->bit_stream.i_byte = p_vpar->bit_stream.p_ts->i_payload_start;
     vlc_mutex_unlock( &p_vpar->fifo.data_lock );
 
-#if 0
-    /* ?? */
-    /* Create video stream */
-    p_vpar->i_stream =  vout_CreateStream( p_vpar->p_vout );
-    if( p_vpar->i_stream < 0 )                                        /* error */
-    {
-        return( 1 );
-    }
-#endif
-
     /* Initialize parsing data */
     p_vpar->sequence.p_forward = NULL;
     p_vpar->sequence.p_backward = NULL;
@@ -197,6 +187,9 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->sequence.b_original = 0;
     p_vpar->sequence.i_copyright_id = 0;
     p_vpar->sequence.i_copyright_nb = 0;
+
+    p_vpar->picture.p_picture = NULL;
+    p_vpar->picture.i_current_structure = 0;
 
     /* Initialize other properties */
 #ifdef STATS
@@ -214,7 +207,7 @@ static int InitThread( vpar_thread_t *p_vpar )
 
     /* Initialize video FIFO */
     vpar_InitFIFO( p_vpar );
-    
+  
     bzero( p_vpar->p_vdec, NB_VDEC*sizeof(vdec_thread_t *) );
     
     /* Spawn video_decoder threads */

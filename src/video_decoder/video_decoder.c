@@ -111,6 +111,11 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
 
     /* Ask thread to kill itself */
     p_vdec->b_die = 1;
+    /* Make sure the parser thread leaves the GetByte() function */
+    vlc_mutex_lock( &(p_vdec->p_vpar->vfifo.lock) );
+    vlc_cond_signal( &(p_vdec->p_vpar->vfifo.wait) );
+    vlc_mutex_unlock( &(p_vdec->p_vpar->vfifo.lock) );
+
 
     /* Waiting for the decoder thread to exit */
     /* Remove this as soon as the "status" flag is implemented */
@@ -128,9 +133,7 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
  *******************************************************************************/
 static int InitThread( vdec_thread_t *p_vdec )
 {
-//#ifdef MPEG2_COMPLIANT
     int i_dummy;
-//#endif
 
     intf_DbgMsg("vdec debug: initializing video decoder thread %p\n", p_vdec);
 
@@ -144,7 +147,6 @@ static int InitThread( vdec_thread_t *p_vdec )
     p_vdec->c_decoded_b_pictures = 0;
 #endif
 
-//#ifdef MPEG2_COMPLIANT
     /* Init crop table */
     p_vdec->pi_crop = p_vdec->pi_crop_buf + (VDEC_CROPRANGE >> 1);
     for( i_dummy = -(VDEC_CROPRANGE >> 1); i_dummy < 0; i_dummy++ )
@@ -159,7 +161,6 @@ static int InitThread( vdec_thread_t *p_vdec )
     {
         p_vdec->pi_crop[i_dummy] = 255;
     }
-//#endif
 
     /* Mark thread as running and return */
     intf_DbgMsg("vdec debug: InitThread(%p) succeeded\n", p_vdec);    
@@ -194,7 +195,7 @@ static void RunThread( vdec_thread_t *p_vdec )
     while( (!p_vdec->b_die) && (!p_vdec->b_error) )
     {
         macroblock_t *          p_mb;
-        
+
         if( (p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo )) != NULL )
         {
             DecodeMacroblock( p_vdec, p_mb );
@@ -255,9 +256,9 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
      * Motion Compensation (ISO/IEC 13818-2 section 7.6)
      */
     (*p_mb->pf_motion)( p_mb );
-//#if 0
+
     /* luminance */
-    for( i_b = 0; i_b <4; i_b++ )
+    for( i_b = 0; i_b < 4; i_b++ )
     {
         /*
          * Inverse DCT (ISO/IEC 13818-2 section Annex A)
@@ -265,29 +266,13 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
         (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
                               p_mb->pi_sparse_pos[i_b] );
 
-//        if( (i_b & 2) )
-/*        {
-int i, j;
-elem_t meuh[64];
-
-for( i = 0; i < 8; i++ )
-{
-    for( j = 0; j < 8; j++ )
-    {
-        meuh[8*j + (7-i)] = p_mb->ppi_blocks[i_b][j + 8*i];
-    }
-}
-memcpy(p_mb->ppi_blocks[i_b], meuh, 128);
-        }
-        */
         /*
          * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
          */
         (p_mb->pf_addb[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
                               p_mb->p_data[i_b], p_mb->i_addb_l_stride );
     }
-//#endif
-//#if 0
+
     /* chrominance */
     for( i_b = 4; i_b < 4 + p_mb->i_chroma_nb_blocks; i_b++ )
     {
@@ -296,21 +281,6 @@ memcpy(p_mb->ppi_blocks[i_b], meuh, 128);
          */
         (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
                               p_mb->pi_sparse_pos[i_b] );
-/*
-        {
-int i, j;
-elem_t meuh[64];
-
-for( i = 0; i < 8; i++ )
-{
-    for( j = 0; j < 8; j++ )
-    {
-        meuh[8*j + (7-i)] = p_mb->ppi_blocks[i_b][j + 8*i];
-    }
-}
-memcpy(p_mb->ppi_blocks[i_b], meuh, 128);
-        }
-*/ 
         
         /*
          * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
@@ -318,7 +288,7 @@ memcpy(p_mb->ppi_blocks[i_b], meuh, 128);
         (p_mb->pf_addb[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
                               p_mb->p_data[i_b], p_mb->i_addb_c_stride );
     }
-//#endif
+
     /*
      * Decoding is finished, release the macroblock and free
      * unneeded memory.
@@ -329,7 +299,7 @@ memcpy(p_mb->ppi_blocks[i_b], meuh, 128);
 /*******************************************************************************
  * vdec_AddBlock : add a block
  *******************************************************************************/
-void vdec_AddBlock( vdec_thread_t * p_vdec, elem_t * p_block, yuv_data_t * p_data, int i_incr )
+void vdec_AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block, yuv_data_t * p_data, int i_incr )
 {
     int i_x, i_y;
     
@@ -337,12 +307,8 @@ void vdec_AddBlock( vdec_thread_t * p_vdec, elem_t * p_block, yuv_data_t * p_dat
     {
         for( i_x = 0; i_x < 8; i_x++ )
         {
-#ifdef MPEG2_COMPLIANT
             *p_data = p_vdec->pi_crop[*p_data + *p_block++];
             p_data++;
-#else
-            *p_data++ += *p_block++;
-#endif
         }
         p_data += i_incr;
     }
@@ -351,7 +317,7 @@ void vdec_AddBlock( vdec_thread_t * p_vdec, elem_t * p_block, yuv_data_t * p_dat
 /*******************************************************************************
  * vdec_CopyBlock : copy a block
  *******************************************************************************/
-void vdec_CopyBlock( vdec_thread_t * p_vdec, elem_t * p_block, yuv_data_t * p_data, int i_incr )
+void vdec_CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block, yuv_data_t * p_data, int i_incr )
 {
     int i_y;
 //fprintf(stderr, "%d ", i_incr );
@@ -359,7 +325,7 @@ void vdec_CopyBlock( vdec_thread_t * p_vdec, elem_t * p_block, yuv_data_t * p_da
     for( i_y = 0; i_y < 8; i_y++ )
     {
 #if 0
-        /* elem_t and yuv_data_t are the same */
+        /* dctelem_t and yuv_data_t are the same */
         memcpy( p_data, p_block, 8*sizeof(yuv_data_t) );
         p_data += i_incr+8;
         p_block += 8;
@@ -380,6 +346,6 @@ void vdec_CopyBlock( vdec_thread_t * p_vdec, elem_t * p_block, yuv_data_t * p_da
 /*******************************************************************************
  * vdec_DummyBlock : dummy function that does nothing
  *******************************************************************************/
-void vdec_DummyBlock( vdec_thread_t * p_vdec, elem_t * p_block, yuv_data_t * p_data, int i_incr )
+void vdec_DummyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block, yuv_data_t * p_data, int i_incr )
 {
 }
