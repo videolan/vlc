@@ -22,7 +22,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 # ***************************************************************************
 
-GNU=ftp://ftp.leo.org/pub/comp/os/unix/gnu/
+GNU=ftp://ftp.leo.org/pub/comp/os/unix/gnu
 SF=http://heanet.dl.sourceforge.net/sourceforge
 VIDEOLAN=http://download.videolan.org/pub/videolan
 PERL_VERSION=5.8.5
@@ -39,7 +39,7 @@ PKGCFG_URL=http://www.freedesktop.org/software/pkgconfig/releases/pkgconfig-$(PK
 LIBICONV_VERSION=1.9.1
 LIBICONV_URL=$(GNU)/libiconv/libiconv-$(LIBICONV_VERSION).tar.gz
 GETTEXT_VERSION=0.14.1
-GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
+GETTEXT_URL=$(VIDEOLAN)/contrib/gettext-$(GETTEXT_VERSION).tar.gz
 FREETYPE2_VERSION=2.1.9
 FREETYPE2_URL=$(SF)/freetype/freetype-$(FREETYPE2_VERSION).tar.gz
 FRIBIDI_VERSION=0.10.4
