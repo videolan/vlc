@@ -521,21 +521,19 @@ static int64_t GCD( int64_t a, int64_t b )
 }
 
 /* Dynamic array handling: realloc array, move data, increment position */
+#if defined( _MSC_VER )
+#   define VLCCVP (void**) /* Work-around for broken compiler */
+#else
+#   define VLCCVP
+#endif
 #define INSERT_ELEM( p_ar, i_oldsize, i_pos, elem )                           \
     do                                                                        \
     {                                                                         \
-        if( i_oldsize )                                                       \
-        {                                                                     \
-            (p_ar) = (void**)realloc( p_ar, ((i_oldsize) + 1) * sizeof( *(p_ar) ) );  \
-        }                                                                     \
-        else                                                                  \
-        {                                                                     \
-            (p_ar) = (void**)malloc( ((i_oldsize) + 1) * sizeof( *(p_ar) ) ); \
-        }                                                                     \
+        if( !i_oldsize ) (p_ar) = NULL;                                       \
+        (p_ar) = VLCCVP realloc( p_ar, ((i_oldsize) + 1) * sizeof(*(p_ar)) ); \
         if( (i_oldsize) - (i_pos) )                                           \
         {                                                                     \
-            memmove( (p_ar) + (i_pos) + 1,                                    \
-                     (p_ar) + (i_pos),                                        \
+            memmove( (p_ar) + (i_pos) + 1, (p_ar) + (i_pos),                  \
                      ((i_oldsize) - (i_pos)) * sizeof( *(p_ar) ) );           \
         }                                                                     \
         (p_ar)[i_pos] = elem;                                                 \
@@ -958,14 +956,6 @@ typedef __int64 off_t;
 #   endif
 
 #   include <tchar.h>
-#endif
-
-/* lseek (defined in src/extras/libc.c) */
-#ifndef HAVE_LSEEK
-#   define lseek vlc_lseek
-    VLC_EXPORT( off_t, vlc_lseek, ( int fildes, off_t offset, int whence ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_lseek NULL
 #endif
 
 VLC_EXPORT( vlc_bool_t, vlc_reduce, ( int *, int *, int64_t, int64_t, int64_t ) );
