@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.8 2003/01/09 10:12:42 sam Exp $
+ * $Id: parse.c,v 1.9 2003/01/17 13:54:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -271,7 +271,7 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
         if( i_command == SPU_CMD_END )
         {
             /* Get the control sequence date */
-            date = GetBits( &p_spudec->bit_stream, 16 ) * 11000
+            date = (mtime_t)GetBits( &p_spudec->bit_stream, 16 ) * 11000
                     * p_spudec->bit_stream.p_pes->i_rate / DEFAULT_RATE;
 
             /* Next offset */
@@ -415,8 +415,8 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
     if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
     {
         /* This subtitle will live for 5 seconds or until the next subtitle */
-        p_spu->i_stop = p_spu->i_start + 500 * 11000
-                         * p_spudec->bit_stream.p_pes->i_rate / DEFAULT_RATE;;
+        p_spu->i_stop = p_spu->i_start + (mtime_t)500 * 11000
+                         * p_spudec->bit_stream.p_pes->i_rate / DEFAULT_RATE;
         p_spu->b_ephemer = VLC_TRUE;
     }
 
