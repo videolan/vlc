@@ -163,4 +163,5 @@ IV - The configuration file
   will crash (at least).
   The load command converts the medias and schedules configurations into
   command lines, and writes them into a file.
-  Note: commentary system has not been implement yet.
+  Any line where the first non white space character is a '#' is considered
+  as a comment.
