@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.15 2002/06/09 16:52:58 sam Exp $
+ * $Id: deinterlace.c,v 1.16 2002/06/10 00:41:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,9 +34,10 @@
 #include "filter_common.h"
 
 #define DEINTERLACE_DISCARD 1
-#define DEINTERLACE_BLEND   2
-#define DEINTERLACE_BOB     3
-#define DEINTERLACE_LINEAR  4
+#define DEINTERLACE_MEAN    2
+#define DEINTERLACE_BLEND   3
+#define DEINTERLACE_BOB     4
+#define DEINTERLACE_LINEAR  5
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -44,11 +45,11 @@
 static void vout_getfunctions( function_list_t * p_function_list );
 
 static void RenderBob    ( vout_thread_t *, picture_t *, picture_t *, int );
+static void RenderMean   ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderBlend  ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderLinear ( vout_thread_t *, picture_t *, picture_t *, int );
 
-static void MergeLinear ( void *, const void *, const void *, size_t );
-static void MergeBlend  ( void *, void *, const void *, const void *, size_t );
+static void Merge        ( void *, const void *, const void *, size_t );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -56,7 +57,7 @@ static void MergeBlend  ( void *, void *, const void *, const void *, size_t );
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
 ADD_STRING  ( "deinterlace-mode", "discard", NULL, N_("Deinterlace mode"),
-              N_("one of \"discard\", \"blend\", \"bob\" or \"linear\"") )
+      N_("one of \"discard\", \"blend\", \"mean\", \"bob\" or \"linear\"") )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -153,6 +154,10 @@ static int vout_Create( vout_thread_t *p_vout )
         {
             p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
         }
+        else if( !strcmp( psz_method, "mean" ) )
+        {
+            p_vout->p_sys->i_mode = DEINTERLACE_MEAN;
+        }
         else if( !strcmp( psz_method, "blend" )
                   || !strcmp( psz_method, "average" )
                   || !strcmp( psz_method, "combine-fields" ) )
@@ -225,8 +230,9 @@ static int vout_Init( vout_thread_t *p_vout )
     case FOURCC_YV12:
         switch( p_vout->p_sys->i_mode )
         {
-        case DEINTERLACE_DISCARD:
         case DEINTERLACE_BOB:
+        case DEINTERLACE_MEAN:
+        case DEINTERLACE_DISCARD:
             p_vout->p_sys->p_vout =
                 vout_CreateThread( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height / 2,
@@ -383,6 +389,11 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[1] );
             break;
 
+        case DEINTERLACE_MEAN:
+            RenderMean( p_vout, pp_outpic[0], p_pic );
+            vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
+            break;
+
         case DEINTERLACE_BLEND:
             RenderBlend( p_vout, pp_outpic[0], p_pic );
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
@@ -509,9 +520,8 @@ static void RenderLinear( vout_thread_t *p_vout,
 
             p_out += p_pic->p[i_plane].i_pitch;
 
-            MergeLinear( p_out, p_in,
-                         p_in + 2 * p_pic->p[i_plane].i_pitch,
-                         p_pic->p[i_plane].i_pitch );
+            Merge( p_out, p_in, p_in + 2 * p_pic->p[i_plane].i_pitch,
+                   p_pic->p[i_plane].i_pitch );
 
             p_in += 2 * p_pic->p[i_plane].i_pitch;
             p_out += p_pic->p[i_plane].i_pitch;
@@ -525,6 +535,34 @@ static void RenderLinear( vout_thread_t *p_vout,
                                       p_pic->p[i_plane].i_pitch );
         }
 #endif
+    }
+}
+
+static void RenderMean( vout_thread_t *p_vout,
+                        picture_t *p_outpic, picture_t *p_pic )
+{
+    int i_plane;
+
+    /* Copy image and skip lines */
+    for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+    {
+        u8 *p_in, *p_out_end, *p_out;
+
+        p_in = p_pic->p[i_plane].p_pixels;
+
+        p_out = p_outpic->p[i_plane].p_pixels;
+        p_out_end = p_out + p_outpic->p[i_plane].i_pitch
+                             * p_outpic->p[i_plane].i_lines;
+
+        /* All lines: mean value */
+        for( ; p_out < p_out_end ; )
+        {
+            Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
+                   p_pic->p[i_plane].i_pitch );
+
+            p_out += p_pic->p[i_plane].i_pitch;
+            p_in += 2 * p_pic->p[i_plane].i_pitch;
+        }
     }
 }
 
@@ -544,20 +582,25 @@ static void RenderBlend( vout_thread_t *p_vout,
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
                              * p_outpic->p[i_plane].i_lines;
 
+        /* First line: simple copy */
+        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                  p_pic->p[i_plane].i_pitch );
+        p_out += p_pic->p[i_plane].i_pitch;
+
+        /* Remaining lines: mean value */
         for( ; p_out < p_out_end ; )
         {
-            MergeBlend( p_out, p_out + p_outpic->p[i_plane].i_pitch,
-                        p_in, p_in + p_pic->p[i_plane].i_pitch,
-                        p_pic->p[i_plane].i_pitch );
+            Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
+                   p_pic->p[i_plane].i_pitch );
 
-            p_out += 2 * p_pic->p[i_plane].i_pitch;
-            p_in += 2 * p_pic->p[i_plane].i_pitch;
+            p_out += p_pic->p[i_plane].i_pitch;
+            p_in += p_pic->p[i_plane].i_pitch;
         }
     }
 }
 
-static void MergeLinear( void *p_dest, const void *p_s1,
-                         const void *p_s2, size_t i_bytes )
+static void Merge( void *p_dest, const void *p_s1,
+                   const void *p_s2, size_t i_bytes )
 {
     u8* p_end = (u8*)p_dest + i_bytes - 8;
 
@@ -578,41 +621,6 @@ static void MergeLinear( void *p_dest, const void *p_s1,
     while( (u8*)p_dest < p_end )
     {
         *(u8*)p_dest++ = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-    }
-}
-
-static void MergeBlend( void *p_dest1, void *p_dest2,
-                        const void *p_s1, const void *p_s2, size_t i_bytes )
-{
-    u8* p_end1 = (u8*)p_dest1 + i_bytes - 8;
-    u8  i;
-
-    while( (u8*)p_dest1 < p_end1 )
-    {
-        i = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest1++ = *(u8*)p_dest2++ = i;
-        i = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest1++ = *(u8*)p_dest2++ = i;
-        i = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest1++ = *(u8*)p_dest2++ = i;
-        i = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest1++ = *(u8*)p_dest2++ = i;
-        i = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest1++ = *(u8*)p_dest2++ = i;
-        i = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest1++ = *(u8*)p_dest2++ = i;
-        i = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest1++ = *(u8*)p_dest2++ = i;
-        i = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest1++ = *(u8*)p_dest2++ = i;
-    }
-
-    p_end1 += 8;
-
-    while( (u8*)p_dest1 < p_end1 )
-    {
-        i = ( (u16)(*(u8*)p_s1++) + (u16)(*(u8*)p_s2++) ) >> 1;
-        *(u8*)p_dest1++ = *(u8*)p_dest2++ = i;
     }
 }
 

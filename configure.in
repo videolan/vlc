@@ -819,7 +819,11 @@ dnl
 if test x$SYS != xnto && test "x$SYS" != "xmingw32"
 then
   CFLAGS="$save_CFLAGS"
-  AC_CHECK_FUNC(inet_pton,[PLUGINS="${PLUGINS} ipv6"])
+  AC_CHECK_FUNC(inet_pton,[PLUGINS="${PLUGINS} ipv6"],[
+    AC_CHECK_LIB(resolv,inet_pton,
+      [PLUGINS="${PLUGINS} ipv6"
+       ipv6_LDFLAGS="${ipv6_LDFLAGS} -lresolv"])
+  ])
 fi
 if test "x$SYS" = "xmingw32"
 then
