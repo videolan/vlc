@@ -23,7 +23,9 @@ class VlcStreamer:
         self.id = vlc.create()
         if self.id < 0:        
             raise VlcError
-        if vlc.init(self.id, self.file, self.address) < 0:
+        if vlc.init(self.id, self.address) < 0:
+            raise VlcError
+        if vlc.addTarget(self.id, self.file) < 0:
             raise VlcError
             
     def play(self):
