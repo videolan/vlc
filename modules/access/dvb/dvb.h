@@ -33,8 +33,9 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int ioctl_FrontendControl(input_thread_t *p_input, int freq, int pol, int lnb_slof, int diseqc, unsigned int u_adapter, unsigned int u_device );
-int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, int b_polarisation, unsigned int u_adapter, unsigned int u_device );
+int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, int b_polarisation,
+                       unsigned int u_lnb_lof1, unsigned int u_lnb_lof2, unsigned int u_lnb_slof,
+                       unsigned int u_adapter, unsigned int u_device );
 int ioctl_SetDMXFilter(input_thread_t * p_input, int i_pid, int *pi_fd, int i_type, unsigned int u_adapter, unsigned int u_device );
 int ioctl_UnsetDMXFilter(input_thread_t * p_input, int );
 int ioctl_InfoFrontend(input_thread_t * p_input, struct dvb_frontend_info *info, unsigned int u_adapter, unsigned int u_device );

@@ -82,9 +82,9 @@ int E_(Open) ( vlc_object_t *p_this )
     unsigned int        u_device = 0;
     unsigned int        u_freq = 0;
     unsigned int        u_srate = 0;
-    int                 i_lnb_lof1;
-    int                 i_lnb_lof2;
-    int                 i_lnb_slof;
+    unsigned int        u_lnb_lof1;
+    unsigned int        u_lnb_lof2;
+    unsigned int        u_lnb_slof;
     int                 i_bandwidth = 0;
     int                 i_modulation = 0;
     int                 i_guard = 0;
@@ -143,8 +143,8 @@ int E_(Open) ( vlc_object_t *p_this )
         else if (strncmp( p_input->psz_access, "terrestrial",11) ==0)
             frontend_info.type = FE_OFDM;
 
-        frontend_info.frequency_max = 12999;
-        frontend_info.frequency_min = 10000;
+        frontend_info.frequency_max = 12999 * 1000;
+        frontend_info.frequency_min = 9750 * 1000;
         frontend_info.symbol_rate_max = 30000;
         frontend_info.symbol_rate_min = 1000;
     }
@@ -173,6 +173,7 @@ int E_(Open) ( vlc_object_t *p_this )
     }
 
     /* Validating input values */
+    u_freq *= 1000;
     if ( ((u_freq) > frontend_info.frequency_max) ||
          ((u_freq) < frontend_info.frequency_min) )
     {
@@ -223,16 +224,16 @@ int E_(Open) ( vlc_object_t *p_this )
 
     /* Get antenna configuration options */
     b_diseqc = config_GetInt( p_input, "diseqc" );
-    i_lnb_lof1 = config_GetInt( p_input, "lnb-lof1" );
-    i_lnb_lof2 = config_GetInt( p_input, "lnb-lof2" );
-    i_lnb_slof = config_GetInt( p_input, "lnb-slof" );
+    u_lnb_lof1 = config_GetInt( p_input, "lnb-lof1" ) * 1000;
+    u_lnb_lof2 = config_GetInt( p_input, "lnb-lof2" ) * 1000;
+    u_lnb_slof = config_GetInt( p_input, "lnb-slof" ) * 1000;
 
     /* Setting frontend parameters for tuning the hardware */      
     switch( frontend_info.type )
     {
         /* DVB-S: satellite and budget cards (nova) */
         case FE_QPSK:
-            fep.frequency = u_freq * 1000;
+            fep.frequency = u_freq;
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
             fep.u.qpsk.symbol_rate = u_srate * 1000;
             fep.u.qpsk.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
@@ -243,7 +244,7 @@ int E_(Open) ( vlc_object_t *p_this )
         case FE_QAM:
             i_modulation  = config_GetInt(p_input, "modulation");
 
-            fep.frequency = u_freq * 1000;
+            fep.frequency = u_freq;
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
             fep.u.qam.symbol_rate = u_srate * 1000;
             fep.u.qam.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
@@ -261,7 +262,7 @@ int E_(Open) ( vlc_object_t *p_this )
             i_guard = config_GetInt(p_input, "guard");
             i_hierarchy = config_GetInt(p_input, "hierarchy");
             
-            fep.frequency = u_freq * 1000;
+            fep.frequency = u_freq;
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
             fep.u.ofdm.bandwidth = dvb_DecodeBandwidth(p_input, i_bandwidth);
             fep.u.ofdm.code_rate_HP = dvb_DecodeFEC(p_input, i_code_rate_HP); 
@@ -311,7 +312,9 @@ int E_(Open) ( vlc_object_t *p_this )
     }
 
     /* Initialize the Satellite Card */
-    switch (ioctl_SetFrontend (p_input, fep, b_polarisation, u_adapter, u_device ))
+    switch (ioctl_SetFrontend (p_input, fep, b_polarisation,
+                               u_lnb_lof1, u_lnb_lof2, u_lnb_slof,
+                               u_adapter, u_device ))
     {
         case -2:
             msg_Err( p_input, "frontend returned an unexpected event" );

@@ -82,86 +82,6 @@ struct diseqc_cmd_t switch_cmds[] =
 static int ioctl_CheckFrontend(input_thread_t * p_input, int front);
 
 /*****************************************************************************
- * ioctl_FrontendControl : commands the SEC device
- *****************************************************************************/
-int ioctl_FrontendControl(input_thread_t * p_input, int freq, int pol, int lnb_slof,
-                          int diseqc, unsigned int u_adapter, unsigned int u_device)
-{
-    struct dvb_diseqc_master_cmd  cmd;
-    fe_sec_tone_mode_t tone;
-    fe_sec_voltage_t voltage;
-    int frontend;
-    char front[] = FRONTEND;
-    int i_len;
-
-    i_len = sizeof(FRONTEND);
-    if (snprintf(front, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
-    {
-        msg_Err(p_input, "snprintf() truncated string for FRONTEND" );
-        front[sizeof(FRONTEND)] = '\0';
-    }
-
-    msg_Dbg(p_input, "Opening frontend %s",front);	  
-    if((frontend = open(front,O_RDWR)) < 0)
-    {
-#   ifdef HAVE_ERRNO_H
-        msg_Err(p_input, "ioctl_FrontEndControl: Opening frontend failed (%s)",strerror(errno));
-#   else
-        msg_Err(p_input, "ioctl_FrontEndControl: Opening frontend failed");
-#   endif
-        return -1;
-    }
-
-    /* Set the frequency of the transponder, taking into account the
-       local frequencies of the LNB */
-    tone = (freq<lnb_slof) ? SEC_TONE_OFF : SEC_TONE_ON;
-
-    /* Set the polarisation of the transponder by setting the correct
-       voltage on the universal LNB */
-    voltage = (pol) ? SEC_VOLTAGE_18 : SEC_VOLTAGE_13;
-    
-    /* In case we have a DiSEqC, set it to the correct address */
-    cmd.msg[0] = 0x0;  /* framing */
-    cmd.msg[1] = 0x10; /* address */
-    cmd.msg[2] = 0x38; /* command */
-    /* command parameters start at index 3 */
-    cmd.msg[3] = 0xF0 | ((diseqc * 4) & 0x0F);   
-    cmd.msg_len = 4;
-
-    /* Reset everything before sending. */
-#ifdef HAVE_ERRNO_H 
-#   define CHECK_IOCTL(X) if(X<0) \
-    { \
-        msg_Err( p_input, "InfoFrontend: ioctl failed (%s)", strerror(errno)); \
-        close(frontend); \
-        return -1; \
-    }
-#else
-#   define CHECK_IOCTL(X) if(X<0) \
-    { \
-        msg_Err( p_input, "InfoFrontend: ioctl failed"); \
-        close(frontend); \
-        return -1; \
-    }
-#endif
-
-    CHECK_IOCTL(ioctl(frontend, FE_SET_TONE, SEC_TONE_OFF));   
-    CHECK_IOCTL(ioctl(frontend, FE_SET_VOLTAGE, voltage));
-    msleep(15);
-    
-    /* Send the data to the SEC device to prepare the LNB for tuning  */
-    CHECK_IOCTL(ioctl(frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd));
-    msleep(15);
-    CHECK_IOCTL(ioctl(frontend, FE_DISEQC_SEND_BURST, &cmd));
-    msleep(15);
-    CHECK_IOCTL(ioctl(frontend, FE_SET_TONE, tone));
-#undef CHECK_IOCTL
-
-    close(frontend);
-    return 0;
-}
-
-/*****************************************************************************
  * ioctl_InfoFrontend : return information about given frontend
  *****************************************************************************/
 int ioctl_InfoFrontend(input_thread_t * p_input, struct dvb_frontend_info *info,
@@ -367,15 +287,12 @@ int ioctl_SetupSwitch (input_thread_t *p_input, int frontend_fd, int switch_pos,
     return ret;
 }
 
-#define SWITCHFREQ 11700000
-#define LOF_HI     10600000
-#define LOF_LO      9750000
-
 /*****************************************************************************
  * ioctl_SetFrontend : controls the FE device
  *****************************************************************************/
-int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep,
-                       int b_polarisation, unsigned int u_adapter, unsigned int u_device  )
+int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, int b_polarisation, 
+                       unsigned int u_lnb_lof1, unsigned int u_lnb_lof2, unsigned int u_lnb_slof,
+                       unsigned int u_adapter, unsigned int u_device  )
 {
     int front;
     int ret;
@@ -392,7 +309,7 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
     }
     
     /* Open the frontend device */
- 	  msg_Dbg(p_input, "Opening frontend %s", frontend);
+    msg_Dbg(p_input, "Opening frontend %s", frontend);
     if((front = open(frontend,O_RDWR)) < 0)
     {
 #   ifdef HAVE_ERRNO_H
@@ -405,7 +322,8 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
     
     /* Set the frequency of the transponder, taking into account the
        local frequencies of the LNB */
-    hiband = (fep.frequency >= SWITCHFREQ);
+    hiband = (fep.frequency >= u_lnb_slof);
+
     if ((ret=ioctl_SetupSwitch (p_input, front, 0, b_polarisation, hiband))<0)
     {
         msg_Err(p_input, "ioctl_SetupSwitch failed (%d)", ret);
@@ -413,9 +331,9 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
     }
 
     if (hiband)
-        fep.frequency -= LOF_HI;
+        fep.frequency -= u_lnb_lof2;
     else
-        fep.frequency -= LOF_LO;
+        fep.frequency -= u_lnb_lof2;
 
     /* Now send it all to the frontend device */
     if ((ret=ioctl(front, FE_SET_FRONTEND, &fep)) < 0)
