@@ -167,7 +167,7 @@
 #define INPUT_MAX_SOURCE_LENGTH         100
 
 /* Maximum memory the input is allowed to use (20 MB) */
-#define INPUT_MAX_ALLOCATION			20971520
+#define INPUT_MAX_ALLOCATION            20971520
 
 /* Default network protocol */
 #define INPUT_NETWORK_PROTOCOL_VAR      "vlc_network_protocol"

@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.116 2001/12/30 07:09:55 sam Exp $
+ * $Id: input_dvd.c,v 1.117 2001/12/31 01:13:12 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -810,7 +810,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
 
 /*****************************************************************************
- * DVDRead: reads data packets into the netlist.
+ * DVDRead: reads data packets.
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * packets.

@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.13 2001/12/30 22:10:26 stef Exp $
+ * $Id: input_dvdread.c,v 1.14 2001/12/31 01:13:12 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -73,7 +73,6 @@
 
 /* how many blocks DVDRead will read in each loop */
 #define DVD_BLOCK_READ_ONCE 64
-#define DVD_DATA_READ_ONCE  (4 * DVD_BLOCK_READ_ONCE)
 
 /*****************************************************************************
  * Local prototypes
@@ -194,8 +193,7 @@ static void DvdReadInit( input_thread_t * p_input )
         return;
     }
 
-    /* We read DVD_BLOCK_READ_ONCE in each loop, so the input will receive
-     * DVD_DATA_READ_ONCE at most */
+    /* We read DVD_BLOCK_READ_ONCE in each loop */
     p_dvd->i_block_once = DVD_BLOCK_READ_ONCE;
 
     /* Ifo allocation & initialisation */
@@ -781,7 +779,7 @@ static int DvdReadRead( input_thread_t * p_input,
 {
     thread_dvd_data_t *     p_dvd;
     u8                      p_data[DVD_VIDEO_LB_LEN];
-    struct iovec            p_vec[DVD_DATA_READ_ONCE];
+    struct iovec            p_vec[DVD_DATA_BLOCK_ONCE];
     u8 *                    pi_cur;
     int                     i_blocks;
     int                     i_read;
@@ -856,7 +854,7 @@ static int DvdReadRead( input_thread_t * p_input,
 
     /* Get iovecs */
     *pp_data = p_data_p = input_BuffersToIO( p_input->p_method_data, p_vec,
-                                             DVD_DATA_READ_ONCE );
+                                             DVD_BLOCK_READ_ONCE );
 
     if ( p_data_p == NULL )
     {
