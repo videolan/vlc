@@ -31,7 +31,8 @@
  * This function loads a dynamically linked library using a system dependant
  * method, and returns a non-zero value on error, zero otherwise.
  *****************************************************************************/
-static inline int module_load( char * psz_filename, module_handle_t * handle )
+static inline int module_load( const char * psz_filename,
+                               module_handle_t * handle )
 {
 #ifdef SYS_BEOS
     *handle = load_add_on( psz_filename );
@@ -92,7 +93,7 @@ static inline void module_unload( module_handle_t handle )
  * similar functions, since we want a non-NULL symbol anyway.
  *****************************************************************************/
 static inline void * _module_getsymbol( module_handle_t handle,
-                                        char * psz_function )
+                                        const char * psz_function )
 {
 #ifdef SYS_BEOS
     void * p_symbol;
@@ -116,7 +117,7 @@ static inline void * _module_getsymbol( module_handle_t handle,
 }
 
 static inline void * module_getsymbol( module_handle_t handle,
-                                       char * psz_function )
+                                       const char * psz_function )
 {
     void * p_symbol = _module_getsymbol( handle, psz_function );
 
