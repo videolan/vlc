@@ -75,10 +75,12 @@ static void DecodeUrl  ( char * );
  *  - title,title-next,title-prev
  *  - chapter,chapter-next, chapter-prev
  *  - program, audio-es, video-es, spu-es
+ *  - audio-delay, spu-delay
  *  - bookmark
  * * Get only:
  *  - length
  *  - bookmarks
+ *  - seekable (if you can seek, it doesn't say if 'bar display' has be shown or not, for that check position != 0.0)
  * * For intf callback upon changes
  *  - intf-change
  * TODO explain when Callback is called
@@ -280,6 +282,10 @@ void input_DestroyThread( input_thread_t *p_input )
  * Run: main thread loop
  *****************************************************************************
  * Thread in charge of processing the network packets and demultiplexing.
+ *
+ * TODO:
+ *  read subtitle support (XXX take care of spu-delay in the right way).
+ *  multi-input support (XXX may be done with subs)
  *****************************************************************************/
 static int Run( input_thread_t *p_input )
 {
@@ -673,6 +679,11 @@ static int Init( input_thread_t * p_input )
                         &p_input->input.b_can_pace_control );
         demux2_Control( p_input->input.p_demux, DEMUX_CAN_PAUSE,
                         &p_input->input.b_can_pause );
+
+        /* FIXME todo
+        demux2_Control( p_input->input.p_demux, DEMUX_CAN_SEEK,
+                        &val.b_bool );
+        */
     }
     else
     {
@@ -728,6 +739,9 @@ static int Init( input_thread_t * p_input )
                          &p_input->input.b_can_pace_control );
         access2_Control( p_input->input.p_access, ACCESS_CAN_PAUSE,
                          &p_input->input.b_can_pace_control );
+        access2_Control( p_input->input.p_access, ACCESS_CAN_SEEK,
+                         &val.b_bool );
+        var_Set( p_input, "seekable", val );
 
         /* Create the stream_t */
         p_input->input.p_stream = stream_AccessNew( p_input->input.p_access );
@@ -1526,6 +1540,18 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
             /* No need to force update, es_out does it if needed */
             es_out_Control( p_input->p_es_out,
                             ES_OUT_SET_ES, input_EsOutGetFromID( p_input->p_es_out, val.i_int ) );
+            break;
+
+        case INPUT_CONTROL_SET_AUDIO_DELAY:
+            input_EsOutSetDelay( p_input->p_es_out,
+                                 AUDIO_ES, val.i_time );
+            var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
+            break;
+
+        case INPUT_CONTROL_SET_SPU_DELAY:
+            input_EsOutSetDelay( p_input->p_es_out,
+                                 SPU_ES, val.i_time );
+            var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
             break;
 
         case INPUT_CONTROL_SET_TITLE:

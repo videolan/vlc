@@ -291,29 +291,25 @@ static void Run( intf_thread_t *p_intf )
 
         else if( i_action == ACTIONID_SUBDELAY_DOWN )
         {
-            int i_delay;
-            if( input_Control( p_input, INPUT_GET_SUBDELAY, &i_delay ) ==
-                VLC_SUCCESS )
-            {
-                i_delay--;
-                input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
-                ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
-                                 i_delay*100);
-            }
+            int64_t i_delay = var_GetTime( p_input, "spu-delay" );
+
+            i_delay -= 10000;    /* 10 ms */
+
+            var_SetTime( p_input, "spu-delay", i_delay );
+            ClearChannels( p_intf, p_vout );
+            vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
+                                 (int)(i_delay/1000) );
         }
         else if( i_action == ACTIONID_SUBDELAY_UP )
         {
-            int i_delay;
-            if( input_Control( p_input, INPUT_GET_SUBDELAY, &i_delay ) ==
-                VLC_SUCCESS )
-            {
-                i_delay++;
-                input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
-                ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
-                                 i_delay*100);
-            }
+            int64_t i_delay = var_GetTime( p_input, "spu-delay" );
+
+            i_delay += 10000;    /* 10 ms */
+
+            var_SetTime( p_input, "spu-delay", i_delay );
+            ClearChannels( p_intf, p_vout );
+            vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
+                                 (int)(i_delay/1000) );
         }
         else if( i_action == ACTIONID_FULLSCREEN && p_vout )
         {

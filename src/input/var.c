@@ -62,6 +62,9 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
 static int ESCallback      ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
+static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void * );
+
 static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
 
@@ -144,6 +147,17 @@ void input_ControlVarInit ( input_thread_t *p_input )
     text.psz_string = _("Navigation");
     var_Change( p_input, "navigation", VLC_VAR_SETTEXT, &text, NULL );
 
+    /* Delay */
+    var_Create( p_input, "audio-delay", VLC_VAR_TIME );
+    val.i_time = 0;
+    var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
+    var_AddCallback( p_input, "audio-delay", EsDelayCallback, NULL );
+    var_Create( p_input, "spu-delay", VLC_VAR_TIME );
+    val.i_time = 0;
+    var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
+    var_AddCallback( p_input, "spu-delay", EsDelayCallback, NULL );
+
+
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Video Track");
@@ -192,6 +206,9 @@ void input_ControlVarClean( input_thread_t *p_input )
     var_Destroy( p_input, "position-offset" );
     var_Destroy( p_input, "time" );
     var_Destroy( p_input, "time-offset" );
+
+    var_Destroy( p_input, "audio-delay" );
+    var_Destroy( p_input, "spu-delay" );
 
     var_Destroy( p_input, "bookmark" );
 
@@ -384,6 +401,11 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "audio-desync", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "cr-average", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
+    var_Create( p_input, "seekable", VLC_VAR_BOOL );
+    val.b_bool = VLC_TRUE; /* Fixed later*/
+    var_Change( p_input, "seekable", VLC_VAR_SETVALUE, &val, NULL );
+
 }
 
 /*****************************************************************************
@@ -620,6 +642,18 @@ static int ESCallback      ( vlc_object_t *p_this, char const *psz_cmd,
         input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
     }
 
+    return VLC_SUCCESS;
+}
+
+static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p )
+{
+    input_thread_t *p_input = (input_thread_t*)p_this;
+
+    if( !strcmp( psz_cmd, "audio-delay" ) )
+        input_ControlPush( p_input, INPUT_CONTROL_SET_AUDIO_DELAY, &newval );
+    else if( !strcmp( psz_cmd, "spu-delay" ) )
+        input_ControlPush( p_input, INPUT_CONTROL_SET_SPU_DELAY, &newval );
     return VLC_SUCCESS;
 }
 

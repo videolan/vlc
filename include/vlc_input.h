@@ -311,8 +311,19 @@ enum input_query_e
     INPUT_GET_STATE,            /* arg1= int *          res=    */
     INPUT_SET_STATE,            /* arg1= int            res=can fail    */
 
-    /* XXX: all next query aren't working for now */
+    /* input variable "audio-delay" and "spu-delay" */
+    INPUT_GET_AUDIO_DELAY,      /* arg1 = int* res=can fail */
+    INPUT_SET_AUDIO_DELAY,      /* arg1 = int  res=can fail */
+    INPUT_GET_SPU_DELAY,        /* arg1 = int* res=can fail */
+    INPUT_SET_SPU_DELAY,        /* arg1 = int  res=can fail */
 
+    /* Meta datas */
+    INPUT_ADD_INFO,   /* arg1= char * arg2= char * arg3=...  res=can fail    */
+    INPUT_GET_INFO,   /* arg1= char * arg2= char * arg3= char ** res=can fail*/
+
+    INPUT_SET_NAME,   /* arg1= char * res=can fail    */
+
+    /* XXX: all next query aren't working for now */
     /* bookmarks */
     INPUT_GET_BOOKMARKS,   /* arg1= seekpoint_t *** arg2= int * res=can fail */
     INPUT_CLEAR_BOOKMARKS, /* res=can fail */
@@ -320,18 +331,6 @@ enum input_query_e
     INPUT_CHANGE_BOOKMARK, /* arg1= seekpoint_t * arg2= int * res=can fail   */
     INPUT_DEL_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
     INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
-
-    INPUT_ADD_OPTION, /* arg1= char * arg2= char *  res=can fail    */
-
-    /* */
-    INPUT_ADD_INFO,   /* arg1= char * arg2= char * arg3=...  res=can fail    */
-    INPUT_GET_INFO,   /* arg1= char * arg2= char * arg3= char ** res=can fail*/
-
-    INPUT_SET_NAME,   /* arg1= char * res=can fail    */
-
-    /* */
-    INPUT_GET_SUBDELAY,    /* arg1 = int* res=can fail */
-    INPUT_SET_SUBDELAY,    /* arg1 = int  res=can fail */
 };
 
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );

@@ -97,6 +97,10 @@ struct es_out_sys_t
     es_out_id_t *p_es_audio;
     es_out_id_t *p_es_video;
     es_out_id_t *p_es_sub;
+
+    /* delay */
+    int64_t i_audio_delay;
+    int64_t i_spu_delay;
 };
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
@@ -152,6 +156,9 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     p_sys->p_es_audio = NULL;
     p_sys->p_es_video = NULL;
     p_sys->p_es_sub   = NULL;
+
+    p_sys->i_audio_delay= 0;
+    p_sys->i_spu_delay  = 0;
 
     return out;
 }
@@ -223,6 +230,16 @@ void input_EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_audio )
             input_DecoderDiscontinuity( es->p_dec );
         }
     }
+}
+
+void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    if( i_cat == AUDIO_ES )
+        p_sys->i_audio_delay = i_delay;
+    else if( i_cat == SPU_ES )
+        p_sys->i_spu_delay = i_delay;
 }
 
 /*****************************************************************************
@@ -715,17 +732,27 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     es_out_sys_t *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
     es_out_pgrm_t *p_pgrm = es->p_pgrm;
+    int64_t i_delay;
+
+    if( es->fmt.i_cat == AUDIO_ES )
+        i_delay = p_sys->i_audio_delay;
+    else if( es->fmt.i_cat == SPU_ES )
+        i_delay = p_sys->i_spu_delay;
+    else
+        i_delay = 0;
 
     /* +11 -> avoid null value with non null dts/pts */
     if( p_block->i_dts > 0 )
     {
         p_block->i_dts =
-            input_ClockGetTS( p_input, &p_pgrm->clock, ( p_block->i_dts + 11 ) * 9 / 100 );
+            input_ClockGetTS( p_input, &p_pgrm->clock,
+                              ( p_block->i_dts + 11 ) * 9 / 100 ) + i_delay;
     }
     if( p_block->i_pts > 0 )
     {
         p_block->i_pts =
-            input_ClockGetTS( p_input, &p_pgrm->clock, ( p_block->i_pts + 11 )* 9 / 100 );
+            input_ClockGetTS( p_input, &p_pgrm->clock,
+                              ( p_block->i_pts + 11 ) * 9 / 100 ) + i_delay;
     }
 
     p_block->i_rate = p_input->i_rate;

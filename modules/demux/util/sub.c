@@ -76,9 +76,6 @@ vlc_module_begin();
     add_float( "sub-fps", 0.0, NULL,
                N_("Frames per second"),
                SUB_FPS_LONGTEXT, VLC_TRUE );
-    add_integer( "sub-delay", 0, NULL,
-                 N_("Delay subtitles (in 1/10s)"),
-                 SUB_DELAY_LONGTEXT, VLC_TRUE );
     add_string( "sub-type", "auto", NULL, "Subtitles fileformat",
                 SUB_TYPE_LONGTEXT, VLC_TRUE );
         change_string_list( ppsz_sub_type, 0, 0 );
@@ -490,7 +487,6 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
     input_thread_t *p_input = p_sub->p_input;
     vlc_bool_t     b;
     vlc_value_t    val;
-    mtime_t i_delay;
 
     es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE, p_sub->p_es, &b );
     if( b && !p_sub->i_previously_selected )
@@ -507,10 +503,8 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
 
     if( p_sub->i_sub_type != SUB_TYPE_VOBSUB )
     {
-        var_Get( p_sub, "sub-delay", &val );
-        i_delay = (mtime_t) val.i_int * 100000;
         while( p_sub->i_subtitle < p_sub->i_subtitles &&
-               p_sub->subtitle[p_sub->i_subtitle].i_start < i_maxdate - i_delay )
+               p_sub->subtitle[p_sub->i_subtitle].i_start < i_maxdate )
         {
             block_t *p_block;
             int i_len = strlen( p_sub->subtitle[p_sub->i_subtitle].psz_text ) + 1;
@@ -526,13 +520,6 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             {
                 p_sub->i_subtitle++;
                 continue;
-            }
-
-            /* XXX we should convert all demuxers to use es_out_Control to set              * pcr and then remove that */
-            if( i_delay != 0 )
-            {
-                p_sub->subtitle[p_sub->i_subtitle].i_start += i_delay;
-                p_sub->subtitle[p_sub->i_subtitle].i_stop += i_delay;
             }
 
             if( p_sub->subtitle[p_sub->i_subtitle].i_start < 0 )
@@ -686,24 +673,6 @@ static void  sub_fix( subtitle_demux_t *p_sub )
             }
         }
     } while( !i_done );
-#if 0
-    /* We do not do this here anymore */
-    /* *** and at the end add delay *** */
-    var_Get( p_sub, "sub-delay", &val );
-    i_delay = (mtime_t) val.i_int * 100000;
-    if( i_delay != 0 )
-    {
-        for( i = 0; i < p_sub->i_subtitles; i++ )
-        {
-            p_sub->subtitle[i].i_start += i_delay;
-            p_sub->subtitle[i].i_stop += i_delay;
-            if( p_sub->subtitle[i].i_start < 0 )
-            {
-                p_sub->i_subtitle = i + 1;
-            }
-        }
-    }
-#endif
 }
 
 

@@ -56,6 +56,9 @@ enum input_control_e
     INPUT_CONTROL_SET_BOOKMARK,
 
     INPUT_CONTROL_SET_ES,
+
+    INPUT_CONTROL_SET_AUDIO_DELAY,
+    INPUT_CONTROL_SET_SPU_DELAY,
 };
 struct input_thread_sys_t
 {
@@ -119,6 +122,7 @@ es_out_t *input_EsOutNew( input_thread_t * );
 void      input_EsOutDelete( es_out_t * );
 es_out_id_t *input_EsOutGetFromID( es_out_t *, int i_id );
 void      input_EsOutDiscontinuity( es_out_t *, vlc_bool_t b_audio );
+void      input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
 
 /* clock.c */
 enum /* Synchro states */

@@ -81,7 +81,6 @@ typedef struct subtitle_demux_s
  * XXX: - if psz_name is NULL then --sub-file is read
  *      - i_microsecperframe is used only for microdvd file. (overriden
  *        by --sub-fps )
- *      - it's at this point that --sub-delay is applied
  *
  *****************************************************************************/
 static inline subtitle_demux_t *subtitle_New( input_thread_t *p_input,
