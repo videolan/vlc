@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.179 2004/02/10 17:59:10 gbazin Exp $
+dnl $Id: configure.ac,v 1.180 2004/02/10 20:30:09 jpsaman Exp $
 
 AC_INIT(vlc,0.7.1-test1)
 
@@ -3027,20 +3027,20 @@ dnl fi
 dnl
 dnl  PDA Gtk+2 module
 dnl
-#AC_ARG_ENABLE(pda,
-#  [  --enable-pda          PDA interface needs Gtk2 support (default disabled)])
-#if test "x${enable_pda}" = "xyes"
-#then
- # PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
-#  AX_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
-#  AX_ADD_LDFLAGS([gtk2],[${GTK2_LIBS}])
-#  AX_ADD_CFLAGS([pda],[${GTK2_CFLAGS} ${CFLAGS_pda}])
-#  AX_ADD_LDFLAGS([pda],[${GTK2_LIBS} ${LDFLAGS_pda}])
-#  AX_ADD_PLUGINS([pda])
-#  if test "${SYS}" != "mingw32"; then
-#    NEED_GTK2_MAIN=yes
-#  fi
-#fi
+AC_ARG_ENABLE(pda,
+  [  --enable-pda          PDA interface needs Gtk2 support (default disabled)])
+if test "x${enable_pda}" = "xyes"
+then
+  PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
+  AX_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
+  AX_ADD_LDFLAGS([gtk2],[${GTK2_LIBS}])
+  AX_ADD_CFLAGS([pda],[${GTK2_CFLAGS} ${CFLAGS_pda}])
+  AX_ADD_LDFLAGS([pda],[${GTK2_LIBS} ${LDFLAGS_pda}])
+  AX_ADD_PLUGINS([pda])
+  if test "${SYS}" != "mingw32"; then
+    NEED_GTK2_MAIN=yes
+  fi
+fi
 
 dnl
 dnl  Gnome module
