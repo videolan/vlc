@@ -168,7 +168,6 @@ A flash video muxer and demuxer. FFMPEG can already output flash video. a wast n
 Status: Todo
 
 Task
-Task
 Difficulty: Medium
 Urgency: Wishlist
 Platform: any
@@ -498,7 +497,7 @@ Difficulty: Medium
 Platform: any
 Urgency: Normal
 Description: Update matroska demux
- Support default track flag
+ Better Seeking
  General bugfixes
 Status: Todo
 

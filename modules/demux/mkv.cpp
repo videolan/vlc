@@ -651,6 +651,10 @@ static int Open( vlc_object_t * p_this )
             msg_Err( p_demux, "unknow codec id=`%s'", tk.psz_codec );
             tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
         }
+        if( tk.b_default )
+        {
+            tk.fmt.i_priority = 1000;
+        }
 
         tk.p_es = es_out_Add( p_demux->out, &tk.fmt );
 #undef tk
