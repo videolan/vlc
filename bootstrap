@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.25 2002/11/10 18:04:22 sam Exp $
+##  $Id: bootstrap,v 1.26 2002/11/13 15:28:23 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -15,18 +15,18 @@ export LANG
 ###  argument check
 ###
 do_po=no
-do_msvc=no
+do_vc=no
 while test $# -gt 0; do
   case "$1" in
-    --update-msvc)
-      do_msvc=yes
+    --update-vc)
+      do_vc=yes
       ;;
     --update-po)
       do_po=yes
       ;;
     *)
       echo "$0: unknown option $1"
-      echo "recognized flags are --update-msvc and --update-po"
+      echo "recognized flags are --update-vc and --update-po"
       exit 1
       ;;
   esac
@@ -36,9 +36,9 @@ done
 ##
 ##  Update the MSVC project files
 ##
-if test "$do_msvc" = "no"
+if test "$do_vc" = "no"
 then
-  echo "not updating MSVC project file. use --update-msvc to force doing it."
+  echo "not updating MSVC or eVC project file. use --update-vc to force doing it."
 else
   if test ! -f Makefile
   then
@@ -50,12 +50,11 @@ else
   M=''
 
   #  Sources that get built under Win32
-  VLC_SOURCES=`make show-vlc-sources | grep '^X: ' | cut -b3-`
   LIBVLC_SOURCES=`make show-libvlc-sources | grep '^X: ' | cut -b3-`
   LIBVLC_HEADERS=`make show-libvlc-headers | grep '^X: ' | cut -b3-`
   LIBVLC_PKG_HEADERS=`make show-libvlc-pkg-headers | grep '^X: ' | cut -b3-`
 
-  for target in msvc/vlc.vcp msvc/vlc.dsp
+  for target in evc/vlc.vcp msvc/vlc.dsp
   do
     rm -f ${target}
     #  Top of the project file
@@ -65,16 +64,20 @@ else
 # Begin Group "Source Files"${M}
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"${M}
 # Begin Group "vlc"${M}
-EOF
-    for file in ${VLC_SOURCES}
-    do
-      cat >> ${target} << EOF
 # Begin Source File${M}
-SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
-# End Source File${M}
 EOF
-    done
+    if test "${target}" = "evc/vlc.vcp"
+    then
+      cat >> ${target} << EOF
+SOURCE="..\\evc\\vlc.c"${M}
+EOF
+    else
+      cat >> ${target} << EOF
+SOURCE="..\\src\\vlc.c"${M}
+EOF
+    fi
     cat >> ${target} << EOF
+# End Source File${M}
 # End Group${M}
 # Begin Group "libvlc"${M}
 EOF
@@ -94,7 +97,7 @@ EOF
 EOF
       for file in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep "/${subdir}/"`
       do
-      if test "${target}" = "msvc/vlc.vcp"
+      if test "${target}" = "evc/vlc.vcp"
       then
         cat >> ${target} << EOF
 # Begin Source File${M}

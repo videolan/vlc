@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.22 2002/11/11 14:39:12 sam Exp $
+ * $Id: messages.c,v 1.23 2002/11/13 15:28:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -75,6 +75,14 @@ void __msg_Create( vlc_object_t *p_this )
 
     p_this->p_libvlc->msg_bank.i_sub = 0;
     p_this->p_libvlc->msg_bank.pp_sub = NULL;
+
+#ifdef UNDER_CE
+    p_this->p_libvlc->msg_bank.logfile =
+        CreateFile( L"vlc-log.txt", GENERIC_WRITE,
+                    FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
+                    OPEN_ALWAYS, 0, NULL );
+    SetFilePointer( p_this->p_libvlc->msg_bank.logfile, 0, NULL, FILE_END );
+#endif
 }
 
 /*****************************************************************************
@@ -123,6 +131,10 @@ void __msg_Destroy( vlc_object_t *p_this )
     {
         FlushMsg( &p_this->p_libvlc->msg_bank );
     }
+
+#ifdef UNDER_CE
+    CloseHandle( p_this->p_libvlc->msg_bank.logfile );
+#endif
 
     /* Destroy lock */
     vlc_mutex_destroy( &p_this->p_libvlc->msg_bank.lock );
@@ -403,6 +415,9 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 #   define WHITE   COL(37)
 #   define GRAY    "\033[0m"
 
+#ifdef UNDER_CE
+    int i_dummy;
+#endif
     static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
     static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
     char *psz_object = "private";
@@ -439,6 +454,19 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
         case VLC_OBJECT_SOUT: psz_object = "stream output"; break;
     }
 
+#ifdef UNDER_CE
+#   define CE_WRITE(str) WriteFile( p_this->p_libvlc->msg_bank.logfile, \
+                                    str, strlen(str), &i_dummy, NULL );
+    CE_WRITE( p_item->psz_module );
+    CE_WRITE( " " );
+    CE_WRITE( psz_object );
+    CE_WRITE( ppsz_type[i_type] );
+    CE_WRITE( ": " );
+    CE_WRITE( p_item->psz_msg );
+    CE_WRITE( "\n" );
+    FlushFileBuffers( p_this->p_libvlc->msg_bank.logfile );
+
+#else
     /* Send the message to stderr */
     if( p_this->p_libvlc->b_color )
     {
@@ -454,7 +482,8 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
                          p_item->psz_msg );
     }
 
-#if defined(WIN32) || defined(UNDER_CE)
+#   if defined(WIN32)
     fflush( stderr );
+#   endif
 #endif
 }

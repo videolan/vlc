@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.37 2002/11/11 14:39:11 sam Exp $
+ * $Id: vlc_common.h,v 1.38 2002/11/13 15:28:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -528,7 +528,7 @@ static inline uint64_t U64_AT( void * _p )
 #   define I64C(x)         x##i64
 #endif /* defined(WIN32)||defined(UNDER_CE) */
 
-#if defined(WIN32) && !defined(UNDER_CE)
+#if defined(WIN32) || defined(UNDER_CE)
 /* win32, cl and icl support */
 #   if defined( _MSC_VER ) || !defined( __MINGW32__ )
 #       define __attribute__(x)
@@ -580,7 +580,7 @@ typedef __int64 off_t;
 #endif
 
 /* lseek (defined in src/extras/libc.c) */
-#ifndef HAVE_ATOF
+#ifndef HAVE_LSEEK
     off_t lseek( int fildes, off_t offset, int whence );
 #endif
 

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.103 2002/11/11 14:39:12 sam Exp $
+ * $Id: modules.c,v 1.104 2002/11/13 15:28:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -91,10 +91,12 @@
 #   include "modules_plugin.h"
 #endif
 
-#if !defined( _MSC_VER )
-#    include "modules_builtin.h"
-#else
+#if defined( UNDER_CE )
+#    include "modules_builtin_evc.h"
+#elif defined( _MSC_VER )
 #    include "modules_builtin_msvc.h"
+#else
+#    include "modules_builtin.h"
 #endif
 
 /*****************************************************************************

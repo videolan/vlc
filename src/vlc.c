@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.17 2002/11/10 23:41:53 sam Exp $
+ * $Id: vlc.c,v 1.18 2002/11/13 15:28:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -35,12 +35,6 @@
 #   include <time.h>                                               /* time() */
 #endif
 
-#ifdef UNDER_CE
-    /* WinCE needs a WINAPI declaration */
-#   define WIN32_LEAN_AND_MEAN
-#   include <windows.h>
-#endif
-
 #include <vlc/vlc.h>
 
 /*****************************************************************************
@@ -53,18 +47,9 @@ static void SigHandler  ( int i_signal );
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads
  *****************************************************************************/
-#ifdef UNDER_CE
-int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                    LPTSTR lpCmdLine, int nCmdShow )
-#else
 int main( int i_argc, char *ppsz_argv[] )
-#endif
 {
     int i_ret;
-#ifdef UNDER_CE
-    int i_argc = 1;
-    char *ppsz_argv[] = { lpCmdLine, NULL };
-#endif
 
     fprintf( stderr, "VideoLAN Client %s\n", VLC_Version() );
 
@@ -118,7 +103,7 @@ int main( int i_argc, char *ppsz_argv[] )
 
     /* Add a blocking interface and keep the return value */
     i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE );
-
+ 
     /* Finish the threads */
     VLC_Stop( 0 );
 

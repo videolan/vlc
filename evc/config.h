@@ -12,6 +12,7 @@
 
 /* Define if your compiler groks C AltiVec extensions. */
 /* #undef CAN_COMPILE_C_ALTIVEC */
+/*#define HAVE_ATOF 1*/
 
 /* Define if $CC groks SSE inline assembly. */
 #define CAN_COMPILE_SSE 1
@@ -90,7 +91,7 @@
 /* #undef HAVE_FAAD_H */
 
 /* Define to 1 if you have the <fcntl.h> header file. */
-#define HAVE_FCNTL_H 1
+/* #define HAVE_FCNTL_H 1 */
 
 /* Define to 1 if you have the `feof_unlocked' function. */
 /* #undef HAVE_FEOF_UNLOCKED */
@@ -165,7 +166,7 @@
 /* #undef HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H */
 
 /* Define to 1 if you have the `isatty' function. */
-#define HAVE_ISATTY 1
+/* #define HAVE_ISATTY 1 */
 
 /* Define to 1 if you have the <kernel/OS.h> header file. */
 /* #undef HAVE_KERNEL_OS_H */
@@ -201,7 +202,7 @@
 /* #undef HAVE_LINUX_VERSION_H */
 
 /* Define to 1 if you have the <locale.h> header file. */
-#define HAVE_LOCALE_H 1
+/* #define HAVE_LOCALE_H 1 */
 
 /* Define to 1 if you have the <machine/param.h> header file. */
 /* #undef HAVE_MACHINE_PARAM_H */
@@ -258,7 +259,7 @@
 #define HAVE_PTHREAD_H 1
 
 /* Define to 1 if you have the `putenv' function. */
-#define HAVE_PUTENV 1
+/* #define HAVE_PUTENV 1 */
 
 /* Define to 1 if you have the <qt.h> header file. */
 /* #undef HAVE_QT_H */
@@ -279,7 +280,7 @@
 /* #undef HAVE_SOUNDCARD_H */
 
 /* Define to 1 if you have the <stddef.h> header file. */
-#define HAVE_STDDEF_H 1
+/* #define HAVE_STDDEF_H 1 */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 /* #undef HAVE_STDINT_H */
@@ -294,22 +295,22 @@
 /* #define HAVE_STRCASECMP 1 */
 
 /* Define to 1 if you have the `stricmp' function. */
-#define HAVE_STRICMP 1
+/* #define HAVE_STRICMP 1 */
 
 /* Define to 1 if you have the `strncasecmp' function. */
 /* #define HAVE_STRNCASECMP 1 */
 
 /* Define to 1 if you have the `strnicmp' function. */
-#define HAVE_STRNICMP 1
+/* #define HAVE_STRNICMP 1 */
 
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
 
 /* Define to 1 if you have the `strdup' function. */
-#define HAVE_STRDUP 1
+/* #define HAVE_STRDUP 1 */
 
 /* Define to 1 if you have the `strerror' function. */
-#define HAVE_STRERROR 1
+/* #define HAVE_STRERROR 1 */
 
 /* Define to 1 if you have the <strings.h> header file. */
 #define HAVE_STRINGS_H 1
@@ -357,7 +358,7 @@
 #define HAVE_SYS_SOUNDCARD_H 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H 1
+/* #define HAVE_SYS_STAT_H 1 */
 
 /* Define to 1 if you have the <sys/times.h> header file. */
 /* #define HAVE_SYS_TIMES_H 1 */
@@ -366,7 +367,7 @@
 /* #define HAVE_SYS_TIME_H 1 */
 
 /* Define to 1 if you have the <sys/types.h> header file. */
-#define HAVE_SYS_TYPES_H 1
+/* #define HAVE_SYS_TYPES_H 1 */
 
 /* Define to 1 if you have the `tsearch' function. */
 /* #undef HAVE_TSEARCH */
@@ -499,10 +500,3 @@
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
-
-#define HAVE_LSEEK 1
-
-#define HAVE_ERRNO_H 1
-
-#define HAVE_GETENV 1
-

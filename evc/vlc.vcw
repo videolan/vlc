@@ -3,7 +3,7 @@ Microsoft eMbedded Visual Tools Workspace File, Format Version 3.00
 
 ###############################################################################
 
-Project: "vlc"=".\vlc.vcp" - Package Owner=<4>
+Project: "vlc"=.\vlc.vcp - Package Owner=<4>
 
 Package=<5>
 {{{

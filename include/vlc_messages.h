@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_messages.h,v 1.6 2002/08/26 09:12:46 sam Exp $
+ * $Id: vlc_messages.h,v 1.7 2002/11/13 15:28:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -73,6 +73,11 @@ struct msg_bank_t
     /* Subscribers */
     int i_sub;
     msg_subscription_t **pp_sub;
+
+    /* Logfile for WinCE */
+#ifdef UNDER_CE
+    FILE *logfile;
+#endif
 };
 
 /*****************************************************************************

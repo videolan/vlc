@@ -268,7 +268,7 @@ EXTRA_DIST += \
 	$(NULL)
 
 ###############################################################################
-# MS Visual Studio project
+# MS Visual Studio and eMbedded Visual Studio projects
 ###############################################################################
 
 EXTRA_DIST += \
@@ -276,12 +276,14 @@ EXTRA_DIST += \
 	msvc/vlc.dsw \
 	msvc/vlc.dsp.in \
 	msvc/vlc.dsp.out \
-	msvc/vlc.vcp \
-	msvc/vlc.vcw \
-	msvc/vlc.vcp.in \
-	msvc/vlc.vcp.out \
 	msvc/config.h \
 	msvc/modules_builtin_msvc.h \
+	evc/vlc.vcp \
+	evc/vlc.vcw \
+	evc/vlc.vcp.in \
+	evc/vlc.vcp.out \
+	evc/config.h \
+	evc/modules_builtin_msvc.h \
 	$(NULL)
 
 show-vlc-sources: FORCE
