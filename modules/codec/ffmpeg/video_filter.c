@@ -287,6 +287,12 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
             p_dst += i_dst_pitch;
         }
     }
+    else if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','V','A') )
+    {
+        /* Special case for YUVA */
+        memset( p_pic_dst->p[3].p_pixels, 0xFF,
+                p_pic_dst->p[3].i_pitch * p_pic_dst->p[3].i_lines );
+    }
 
     p_pic_dst->date = p_pic->date;
     p_pic_dst->b_force = p_pic->b_force;
