@@ -35,7 +35,6 @@ Caption "VLC '${VERSION}' for Win32 Setup"
 
 CRCCheck on
 
-SetShellVarContext all
 InstallDir "$PROGRAMFILES\VideoLAN\VLC"
 
 ; check if the program has already been installed, if so, take this dir
@@ -68,6 +67,8 @@ Section "Install"
 	File  /r locale
 	File  /r skins
 
+        SetShellVarContext all
+
 	CreateDirectory "$SMPROGRAMS\VideoLAN"
 	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc.lnk" \
                        "$INSTDIR\vlc.exe" "--intf wxwin"
@@ -95,6 +96,7 @@ SectionEnd
 ;;;;;;;;;;;;;;;;;;;;;;
 
 Section "Uninstall"
+        SetShellVarContext all
 	RMDir /r $SMPROGRAMS\VideoLAN
 	RMDir /r $INSTDIR
 	DeleteRegKey HKLM SOFTWARE\VideoLAN
