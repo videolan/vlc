@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.8 2003/01/10 17:30:18 lool Exp $
+ * $Id: open.c,v 1.9 2003/01/21 12:36:11 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -67,6 +67,10 @@ void GtkFileShow( GtkButton * button, gpointer user_data )
     gtk_object_set_data( GTK_OBJECT(p_file), "p_intf",
                          GtkGetIntf( button ) );
 
+    /* entry <- entry_file or entry_subtitle */
+    gtk_object_set_data( GTK_OBJECT(p_file), "entry",
+                         user_data );
+
     gtk_widget_show( p_file );
     gdk_window_raise( p_file->window );
 }
@@ -75,14 +79,16 @@ void GtkFileOk( GtkButton * button, gpointer user_data )
 {
     GtkWidget * p_file = gtk_widget_get_toplevel( GTK_WIDGET (button) );
 
+    char *psz_entry;
     char *psz_filename;
     intf_thread_t * p_intf = GtkGetIntf( button );
 
     /* add the new file to the dialog box */
+    psz_entry = gtk_object_get_data( GTK_OBJECT( p_file ), "entry" );
     psz_filename =
             gtk_file_selection_get_filename( GTK_FILE_SELECTION( p_file ) );
     gtk_entry_set_text( GTK_ENTRY( lookup_widget( p_intf->p_sys->p_open,
-                                                  "entry_file" ) ),
+                                                  psz_entry ) ),
                         psz_filename );
     gtk_widget_destroy( p_file );
 }
@@ -411,6 +417,29 @@ GtkSatOpenToggle                       (GtkToggleButton *togglebutton,
     }
 }
 
+/*****************************************************************************
+ * Open subtitle callbacks
+ *****************************************************************************
+ * The following callbacks are related to the subtitle
+ *****************************************************************************/
+void
+GtkOpenSubtitleShow                    (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf = GtkGetIntf( button );
+
+    if( GTK_TOGGLE_BUTTON( button )->active )
+    {
+        /* show hbox_subtitle */
+        gtk_widget_show_all( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "hbox_subtitle" ) ) );
+    }
+    else
+    {
+        /* hide hbox_subtitle */
+        gtk_widget_hide_all( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "hbox_subtitle" ) ) );
+    }
+}
+
 /******************************
   ******************************/
 
@@ -493,6 +522,10 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
         free( psz_var );
     }
 
+    /* subtitle stuff */
+    /* hide hbox_subtitle */
+    gtk_widget_hide_all( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "hbox_subtitle" ) ) );
+
     /* Set the right page */
 setpage:
     p_notebook = lookup_widget( GTK_WIDGET( p_intf->p_sys->p_open ),
@@ -534,10 +567,33 @@ void GtkOpenOk( GtkButton * button, gpointer user_data )
 
     vlc_object_release( p_playlist );
 
+    /* export subtitle */
+    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                           "show_subtitle" ) )->active )
+    {
+        /* yeah subtitle */
+        char    *psz_subtitle;
+        gfloat  delay;
+        gfloat  fps;
+
+        psz_subtitle = gtk_entry_get_text( GTK_ENTRY( lookup_widget( GTK_WIDGET(button), "entry_subtitle" ) ) );
+        delay = gtk_spin_button_get_value_as_float( GTK_SPIN_BUTTON( lookup_widget( GTK_WIDGET(button), "subtitle_delay" ) ) );
+        fps = gtk_spin_button_get_value_as_float( GTK_SPIN_BUTTON( lookup_widget( GTK_WIDGET(button), "subtitle_fps" ) ) );
+
+        msg_Warn( p_intf, "%s - %f, %f", psz_subtitle, delay, fps);
+        config_PutPsz( p_intf, "sub-file", psz_subtitle );
+        config_PutInt( p_intf, "sub-delay", (int)( delay * 10 ) );
+        config_PutFloat( p_intf, "sub-fps", fps );
+    }
+    else
+    {
+        config_PutPsz( p_intf, "sub-file", "" );
+    }
+
     /* Enable the channel box when network channel is selected */
     if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "network_channel" ) )->active )
-    {  
+    {
         GtkWidget *     p_network_box;
         GtkWidget *     p_channel;
         GtkWidget *     p_label;

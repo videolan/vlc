@@ -1684,6 +1684,18 @@ create_intf_open (void)
   GList *sat_fec_items = NULL;
   GtkWidget *combo_entry1;
   GtkWidget *open_sat;
+  GtkWidget *show_subtitle;
+  GtkWidget *hbox_subtitle;
+  GtkWidget *combo3;
+  GtkWidget *entry_subtitle;
+  GtkWidget *vbox14;
+  GtkWidget *open_browse_subtitle;
+  GtkWidget *label37;
+  GtkObject *subtitle_delay_adj;
+  GtkWidget *subtitle_delay;
+  GtkWidget *label3;
+  GtkObject *subtitle_fps_adj;
+  GtkWidget *subtitle_fps;
   GtkWidget *dialog_action_area6;
   GtkWidget *hbox18;
   GtkWidget *hbox19;
@@ -2245,6 +2257,78 @@ create_intf_open (void)
   gtk_widget_show (open_sat);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (open_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (open_notebook), 3), open_sat);
 
+  show_subtitle = gtk_check_button_new_with_label (_("Subtitle"));
+  gtk_widget_ref (show_subtitle);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "show_subtitle", show_subtitle,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (show_subtitle);
+  gtk_box_pack_start (GTK_BOX (open_vbox), show_subtitle, FALSE, FALSE, 0);
+
+  hbox_subtitle = gtk_hbox_new (FALSE, 5);
+  gtk_widget_ref (hbox_subtitle);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "hbox_subtitle", hbox_subtitle,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox_subtitle);
+  gtk_box_pack_start (GTK_BOX (open_vbox), hbox_subtitle, TRUE, TRUE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox_subtitle), 5);
+
+  combo3 = gtk_combo_new ();
+  gtk_widget_ref (combo3);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "combo3", combo3,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (combo3);
+  gtk_box_pack_start (GTK_BOX (hbox_subtitle), combo3, FALSE, TRUE, 0);
+
+  entry_subtitle = GTK_COMBO (combo3)->entry;
+  gtk_widget_ref (entry_subtitle);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "entry_subtitle", entry_subtitle,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (entry_subtitle);
+
+  vbox14 = gtk_vbox_new (TRUE, 0);
+  gtk_widget_ref (vbox14);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "vbox14", vbox14,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (vbox14);
+  gtk_box_pack_start (GTK_BOX (hbox_subtitle), vbox14, FALSE, FALSE, 0);
+
+  open_browse_subtitle = gtk_button_new_with_label (_("Browse..."));
+  gtk_widget_ref (open_browse_subtitle);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "open_browse_subtitle", open_browse_subtitle,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (open_browse_subtitle);
+  gtk_box_pack_start (GTK_BOX (vbox14), open_browse_subtitle, FALSE, FALSE, 0);
+
+  label37 = gtk_label_new (_("delay"));
+  gtk_widget_ref (label37);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "label37", label37,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label37);
+  gtk_box_pack_start (GTK_BOX (hbox_subtitle), label37, TRUE, TRUE, 0);
+
+  subtitle_delay_adj = gtk_adjustment_new (0, -1000, 1000, 0.1, 10, 10);
+  subtitle_delay = gtk_spin_button_new (GTK_ADJUSTMENT (subtitle_delay_adj), 1, 1);
+  gtk_widget_ref (subtitle_delay);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "subtitle_delay", subtitle_delay,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (subtitle_delay);
+  gtk_box_pack_start (GTK_BOX (hbox_subtitle), subtitle_delay, TRUE, TRUE, 0);
+
+  label3 = gtk_label_new (_("fps"));
+  gtk_widget_ref (label3);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "label3", label3,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label3);
+  gtk_box_pack_start (GTK_BOX (hbox_subtitle), label3, TRUE, TRUE, 0);
+
+  subtitle_fps_adj = gtk_adjustment_new (0, 0, 100, 0.1, 10, 10);
+  subtitle_fps = gtk_spin_button_new (GTK_ADJUSTMENT (subtitle_fps_adj), 1, 1);
+  gtk_widget_ref (subtitle_fps);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "subtitle_fps", subtitle_fps,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (subtitle_fps);
+  gtk_box_pack_start (GTK_BOX (hbox_subtitle), subtitle_fps, TRUE, TRUE, 0);
+
   dialog_action_area6 = GTK_DIALOG (intf_open)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_open), "dialog_action_area6", dialog_action_area6);
   gtk_widget_show (dialog_action_area6);
@@ -2292,7 +2376,7 @@ create_intf_open (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (open_browse), "clicked",
                       GTK_SIGNAL_FUNC (GtkFileShow),
-                      NULL);
+                      "entry_file");
   gtk_signal_connect (GTK_OBJECT (disc_chapter), "changed",
                       GTK_SIGNAL_FUNC (GtkOpenChanged),
                       NULL);
@@ -2351,6 +2435,18 @@ create_intf_open (void)
                       GTK_SIGNAL_FUNC (GtkOpenChanged),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (combo_entry1), "changed",
+                      GTK_SIGNAL_FUNC (GtkOpenChanged),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (show_subtitle), "clicked",
+                      GTK_SIGNAL_FUNC (GtkOpenSubtitleShow),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (entry_subtitle), "changed",
+                      GTK_SIGNAL_FUNC (GtkOpenChanged),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (open_browse_subtitle), "clicked",
+                      GTK_SIGNAL_FUNC (GtkFileShow),
+                      "entry_subtitle");
+  gtk_signal_connect (GTK_OBJECT (subtitle_delay), "changed",
                       GTK_SIGNAL_FUNC (GtkOpenChanged),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (open_ok), "clicked",
