@@ -2,9 +2,9 @@
  * demux.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: demux.c,v 1.5 2003/11/30 17:29:56 fenrir Exp $
+ * $Id: demux.c,v 1.6 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ int demux_vaControlDefault( input_thread_t *p_input, int i_query,
         case DEMUX_SET_POSITION:
             f = (double)va_arg( args, double );
             if( p_input->stream.b_seekable && p_input->pf_seek != NULL &&
-		f >= 0.0 && f <= 1.0 )
+                f >= 0.0 && f <= 1.0 )
             {
                 SeekOffset( p_input, (int64_t)(f *
                             (double)p_input->stream.p_selected_area->i_size) );
@@ -109,7 +109,7 @@ int demux_vaControlDefault( input_thread_t *p_input, int i_query,
             i64 = (int64_t)va_arg( args, int64_t );
             if( p_input->stream.i_mux_rate > 0 &&
                 p_input->stream.b_seekable &&
-		p_input->pf_seek != NULL && i64 >= 0 )
+                p_input->pf_seek != NULL && i64 >= 0 )
             {
                 SeekOffset( p_input, i64 * 50 *
                                      (int64_t)p_input->stream.i_mux_rate /

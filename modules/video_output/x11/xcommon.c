@@ -2,10 +2,10 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.40 2003/12/08 19:50:22 gbazin Exp $
+ * $Id: xcommon.c,v 1.41 2003/12/22 14:32:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
- *          Samuel Hocevar <sam@zoy.org>
+ *          Sam Hocevar <sam@zoy.org>
  *          David Kennedy <dkennedy@tinytoad.com>
  *          Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -282,7 +282,7 @@ int E_(Activate) ( vlc_object_t *p_this )
     TestNetWMSupport( p_vout );
 
     /* Add a variable to indicate if the window should be on top of others */
-    var_Create( p_vout, "video-on-top",	VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     text.psz_string = _("Always on top");
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
@@ -581,7 +581,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int |= 1;
                     var_Set( p_vout, "mouse-button-down", val );
-                    
+
                     /* detect double-clicks */
                     if( ( ((XButtonEvent *)&xevent)->time -
                           p_vout->p_sys->i_time_button_last_pressed ) < 300 )
@@ -597,13 +597,13 @@ static int ManageVideo( vout_thread_t *p_vout )
                     val.i_int |= 2;
                     var_Set( p_vout, "mouse-button-down", val );
                     break;
-                
+
                 case Button3:
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int |= 4;
                     var_Set( p_vout, "mouse-button-down", val );
                     break;
-                
+
                 case Button4:
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int |= 8;
@@ -632,7 +632,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                     val.b_bool = VLC_TRUE;
                     var_Set( p_vout, "mouse-clicked", val );
                     break;
-                    
+
                 case Button2:
                     {
                         playlist_t *p_playlist;
@@ -654,7 +654,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                         }
                     }
                     break;
-                    
+
                 case Button3:
                     {
                         intf_thread_t *p_intf;
@@ -694,7 +694,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                     val.i_int &= ~16;
                     var_Set( p_vout, "mouse-button-down", val );
                     break;
-                    
+
             }
         }
         /* Mouse move */

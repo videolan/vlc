@@ -2,15 +2,15 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.8 2003/08/14 18:12:39 sigmunau Exp $
+ * $Id: lirc.c,v 1.9 2003/12/22 14:32:55 sam Exp $
  *
- * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
+ * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -138,7 +138,7 @@ static void Run( intf_thread_t *p_intf )
     playlist_t *p_playlist;
     input_thread_t *p_input;
     vout_thread_t *p_vout = NULL;
-    
+
     while( !p_intf->b_die )
     {
         /* Sleep a bit */
@@ -182,11 +182,11 @@ static void Run( intf_thread_t *p_intf )
             continue;
         }
 
-        while( !p_intf->b_die 
+        while( !p_intf->b_die
                 && lirc_code2char( p_intf->p_sys->config, code, &c ) == 0
                 && c != NULL )
         {
-            
+
             if( !strcmp( c, "QUIT" ) )
             {
                 p_intf->p_vlc->b_die = VLC_TRUE;
@@ -271,7 +271,7 @@ static void Run( intf_thread_t *p_intf )
                     continue;
                 }
             }
-            
+
             if( !strcmp( c, "PLAY" ) )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -288,7 +288,7 @@ static void Run( intf_thread_t *p_intf )
                 }
                 continue;
             }
-            
+
             if( !strcmp( c, "PLAYPAUSE" ) )
             {
                 if( p_input &&
@@ -312,10 +312,10 @@ static void Run( intf_thread_t *p_intf )
                             vlc_object_release( p_playlist );
                         }
                     }
-                }                    
+                }
                 continue;
             }
-            
+
             else if( p_input )
             {
                 if( !strcmp( c, "PAUSE" ) )
@@ -362,11 +362,11 @@ static void Run( intf_thread_t *p_intf )
                     input_SetStatus( p_input, INPUT_STATUS_SLOWER );
                 }
 /* beginning of modifications by stephane Thu Jun 19 15:29:49 CEST 2003 */
-		else if ( !strcmp(c, "CHAPTER_N" ) ||
+                else if ( !strcmp(c, "CHAPTER_N" ) ||
                           !strcmp( c, "CHAPTER_P" ) )
                 {
                     unsigned int i_chapter = 0;
-                    
+
                     if( !strcmp( c, "CHAPTER_N" ) )
                     {
                         vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -379,7 +379,7 @@ static void Run( intf_thread_t *p_intf )
                         i_chapter = p_input->stream.p_selected_area->i_part - 1;
                         vlc_mutex_unlock( &p_input->stream.stream_lock );
                     }
-                    
+
                     vlc_mutex_lock( &p_input->stream.stream_lock );
                     if( ( i_chapter > 0 ) && ( i_chapter <
                                                p_input->stream.p_selected_area->i_part_nb ) )
@@ -392,7 +392,7 @@ static void Run( intf_thread_t *p_intf )
                         vlc_mutex_lock( &p_input->stream.stream_lock );
                     }
                     vlc_mutex_unlock( &p_input->stream.stream_lock );
-		}
+                }
 /* end of modification by stephane Thu Jun 19 15:29:49 CEST 2003 */
             }
         }
@@ -405,7 +405,7 @@ static void Feedback( intf_thread_t *p_intf, char *psz_string )
 {
     if ( p_intf->p_sys->p_vout )
     {
-	vout_ShowTextRelative( p_intf->p_sys->p_vout, psz_string, NULL, 
-				 OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,400000 );
+        vout_ShowTextRelative( p_intf->p_sys->p_vout, psz_string, NULL,
+                                 OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,400000 );
     }
 }

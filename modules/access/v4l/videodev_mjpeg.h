@@ -2,7 +2,7 @@
  * Copyright (C) lavrec (see http://mjpeg.sourceforge.net)
  * ( XXX This file was get from the driver-zoran package and it is under GPL)
  *
- * $Id: videodev_mjpeg.h,v 1.1 2003/05/31 01:23:29 fenrir Exp $
+ * $Id: videodev_mjpeg.h,v 1.2 2003/12/22 14:32:55 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -93,16 +93,16 @@ struct mjpeg_params
 #define JPEG_MARKER_COM (1<<6)    /* Comment segment */
 #define JPEG_MARKER_APP (1<<7)    /* App segment, driver will allways use APP0 */
 
-   int  VFIFO_FB;                 /* Flag for enabling Video Fifo Feedback.
-                                     If this flag is turned on and JPEG decompressing
-                                     is going to the screen, the decompress process
-                                     is stopped every time the Video Fifo is full.
-                                     This enables a smooth decompress to the screen
-                                     but the video output signal will get scrambled */
+   int  VFIFO_FB;        /* Flag for enabling Video Fifo Feedback.
+                            If this flag is turned on and JPEG decompressing
+                            is going to the screen, the decompress process
+                            is stopped every time the Video Fifo is full.
+                            This enables a smooth decompress to the screen
+                            but the video output signal will get scrambled */
 
    /* Misc */
 
-	char reserved[312];  /* Makes 512 bytes for this structure */
+    char reserved[312];  /* Makes 512 bytes for this structure */
 };
 
 struct mjpeg_requestbuffers

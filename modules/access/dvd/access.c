@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.14 2003/10/25 00:49:13 sam Exp $
+ * $Id: access.c,v 1.15 2003/12/22 14:32:55 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -502,11 +502,11 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         val.i_int = p_area->i_id;
         var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
         var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
-	for( i = 1; i <= p_area->i_part_nb; i++ )
-	{
-	    val.i_int = i;
-	    var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, NULL );
-	}
+        for( i = 1; i <= p_area->i_part_nb; i++ )
+        {
+            val.i_int = i;
+            var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, NULL );
+        }
 
     } /* i_title >= 0 */
     else

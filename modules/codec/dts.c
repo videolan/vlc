@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.8 2003/12/01 23:39:11 gbazin Exp $
+ * $Id: dts.c,v 1.9 2003/12/22 14:32:55 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -263,7 +263,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 msg_Dbg( p_dec, "emulated sync word "
                          "(no sync on following frame) %2.2x%2.2x%2.2x%2.2x",
-			 p_header[0], p_header[1], p_header[2], p_header[3] );
+                         p_header[0], p_header[1], p_header[2], p_header[3] );
                 p_sys->i_state = STATE_NOSYNC;
                 block_SkipByte( &p_sys->bytestream );
                 break;
@@ -546,7 +546,7 @@ static int SyncInfo( const byte_t * p_buf,
             {
                 /* User defined */
                 *pi_channels = 0;
-                *pi_channels_conf = 0; 
+                *pi_channels_conf = 0;
             }
             else
             {

@@ -2,8 +2,9 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.38 2003/12/15 22:55:01 gbazin Exp $
- * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ * $Id: libmp4.c,v 1.39 2003/12/22 14:32:55 sam Exp $
+ *
+ * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -985,7 +986,7 @@ static int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream->p_input, "Found esds MPEG4ESDescr (%dBytes)",
-		 i_len );
+                 i_len );
 #endif
 
         MP4_GET2BYTES( es_descriptor.i_ES_ID );
@@ -1031,7 +1032,7 @@ static int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream->p_input, "Found esds MP4DecConfigDescr (%dBytes)",
-		 i_len );
+                 i_len );
 #endif
 
     es_descriptor.p_decConfigDescr =
@@ -1056,7 +1057,7 @@ static int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream->p_input, "Found esds MP4DecSpecificDescr (%dBytes)",
-		 i_len );
+                 i_len );
 #endif
 
     es_descriptor.p_decConfigDescr->i_decoder_specific_info_len = i_len;

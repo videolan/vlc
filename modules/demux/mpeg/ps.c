@@ -2,15 +2,15 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.12 2003/10/27 18:57:12 rocky Exp $
+ * $Id: ps.c,v 1.13 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -137,16 +137,16 @@ static int Activate( vlc_object_t * p_this )
         return -1;
     }
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
-    
-    p_input->stream.p_selected_program = 
+
+    p_input->stream.p_selected_program =
             p_input->stream.pp_programs[0] ;
-    
+
     if( p_input->stream.b_seekable )
     {
         stream_ps_data_t * p_demux_data =
              (stream_ps_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
 
-	off_t i_tell = p_input->stream.p_selected_area->i_tell;
+        off_t i_tell = p_input->stream.p_selected_area->i_tell;
 
         /* Pre-parse the stream to gather stream_descriptor_t. */
         p_input->pf_seek( p_input, (off_t) 0 );

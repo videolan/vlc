@@ -2,16 +2,16 @@
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
  * Copyright (C) 2002,2003 VideoLAN
- * $Id: intf.c,v 1.11 2003/12/05 05:01:17 rocky Exp $
+ * $Id: intf.c,v 1.12 2003/12/22 14:32:55 sam Exp $
  *
- * Authors: Rocky Bernstein <rocky@panix.com>
+ * Author: Rocky Bernstein <rocky@panix.com>
  *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -96,11 +96,11 @@ static void RunIntf( intf_thread_t *p_intf )
     mtime_t             mlast = 0;
     thread_vcd_data_t * p_vcd;
     input_thread_t    * p_input;
-    
+
     /* What you add to the last input number entry. It accumulates all of
        the 10_ADD keypresses */
-    int number_addend = 0; 
-    
+    int number_addend = 0;
+
     if( InitThread( p_intf ) < 0 )
     {
         msg_Err( p_intf, "can't initialize intf" );
@@ -108,7 +108,7 @@ static void RunIntf( intf_thread_t *p_intf )
     }
 
     p_input = p_intf->p_sys->p_input;
-    p_vcd   = p_intf->p_sys->p_vcd = 
+    p_vcd   = p_intf->p_sys->p_vcd =
       (thread_vcd_data_t *) p_input->p_access_data;
 
     dbg_print( INPUT_DBG_CALL, "intf initialized" );
@@ -119,14 +119,14 @@ static void RunIntf( intf_thread_t *p_intf )
       vlc_mutex_lock( &p_intf->change_lock );
 
         /*
-         * Have we timed-out in showing a still frame? 
+         * Have we timed-out in showing a still frame?
          */
         if( p_intf->p_sys->b_still && !p_intf->p_sys->b_inf_still )
         {
             if( p_intf->p_sys->m_still_time > 0 )
             {
                 /* Update remaining still time */
-	        dbg_print(INPUT_DBG_STILL, "updating still time");
+                dbg_print(INPUT_DBG_STILL, "updating still time");
                 mtime = mdate();
                 if( mlast )
                 {
@@ -138,7 +138,7 @@ static void RunIntf( intf_thread_t *p_intf )
             else
             {
                 /* Still time has elasped; set to continue playing. */
-	        dbg_print(INPUT_DBG_STILL, "wait time done - setting play");
+                dbg_print(INPUT_DBG_STILL, "wait time done - setting play");
                 input_SetStatus( p_intf->p_sys->p_input,
                                  INPUT_STATUS_PLAY );
                 p_intf->p_sys->m_still_time = 0;
@@ -148,146 +148,146 @@ static void RunIntf( intf_thread_t *p_intf )
         }
 
       /*
-       * Do we have a keyboard event? 
+       * Do we have a keyboard event?
        */
       if( p_vout && p_intf->p_sys->b_key_pressed )
         {
-	  vlc_value_t val;
-	  int i, i_action = -1;
-	  struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
+          vlc_value_t val;
+          int i, i_action = -1;
+          struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
 
-	  p_intf->p_sys->b_key_pressed = VLC_FALSE;
-          
-	  /* Find action triggered by hotkey (if any) */
-	  var_Get( p_intf->p_vlc, "key-pressed", &val );
+          p_intf->p_sys->b_key_pressed = VLC_FALSE;
 
-	  dbg_print( INPUT_DBG_EVENT, "Key pressed %d", val.i_int );
+          /* Find action triggered by hotkey (if any) */
+          var_Get( p_intf->p_vlc, "key-pressed", &val );
 
-	  for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+          dbg_print( INPUT_DBG_EVENT, "Key pressed %d", val.i_int );
+
+          for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
             {
-	      if( p_hotkeys[i].i_key == val.i_int )
+              if( p_hotkeys[i].i_key == val.i_int )
                 {
-		  i_action = p_hotkeys[i].i_action;
+                  i_action = p_hotkeys[i].i_action;
                 }
             }
-	  
-	  if( i_action != -1) {
-	    switch (i_action) {
-	      
-	    case ACTIONID_NAV_LEFT: 
-	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_LEFT - prev (%d)", 
-			 number_addend );
-	      do {
-		vcdplayer_play_prev( p_input );
-	      }	while (number_addend-- > 0);
-	      break;
 
-	    case ACTIONID_NAV_RIGHT:
-	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_RIGHT - next (%d)",
-			 number_addend );
-	      do {
-		vcdplayer_play_next( p_input );
-	      } while (number_addend-- > 0);
-	      break;
+          if( i_action != -1) {
+            switch (i_action) {
 
-	    case ACTIONID_NAV_UP:
-	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_UP - return" );
-	      do {
-		vcdplayer_play_return( p_input );
-	      } while (number_addend-- > 0);
-	      break;
+            case ACTIONID_NAV_LEFT:
+              dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_LEFT - prev (%d)",
+                         number_addend );
+              do {
+                vcdplayer_play_prev( p_input );
+              }        while (number_addend-- > 0);
+              break;
 
-	    case ACTIONID_NAV_DOWN:
-	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_DOWN - default"  );
-	      vcdplayer_play_default( p_input );
-	      break;
+            case ACTIONID_NAV_RIGHT:
+              dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_RIGHT - next (%d)",
+                         number_addend );
+              do {
+                vcdplayer_play_next( p_input );
+              } while (number_addend-- > 0);
+              break;
 
-	    case ACTIONID_NAV_ACTIVATE: 
-	      {
-		vcdinfo_itemid_t itemid;
-		itemid.type=p_vcd->play_item.type;
+            case ACTIONID_NAV_UP:
+              dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_UP - return" );
+              do {
+                vcdplayer_play_return( p_input );
+              } while (number_addend-- > 0);
+              break;
 
-		dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_ACTIVATE" );
+            case ACTIONID_NAV_DOWN:
+              dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_DOWN - default"  );
+              vcdplayer_play_default( p_input );
+              break;
 
-		if ( vcdplayer_pbc_is_on( p_vcd ) && number_addend != 0 ) {
-		  lid_t next_num=vcdinfo_selection_get_lid(p_vcd->vcd, 
-							   p_vcd->cur_lid,
-							   number_addend);
-		  if (VCDINFO_INVALID_LID != next_num) {
-		    itemid.num  = next_num;
-		    itemid.type = VCDINFO_ITEM_TYPE_LID;
-		    VCDPlay( p_input, itemid );
-		  }
-		} else {
-		  itemid.num = number_addend;
-		  VCDPlay( p_input, itemid );
-		}
-		break;
-	      }
-	    }
-	    number_addend = 0;
+            case ACTIONID_NAV_ACTIVATE:
+              {
+                vcdinfo_itemid_t itemid;
+                itemid.type=p_vcd->play_item.type;
 
-	    /* Any keypress gets rid of still frame waiting.
-	       FIXME - should handle just the ones that cause an action.
-	    */
-	    if( p_intf->p_sys->b_still )
-	      {
-		dbg_print(INPUT_DBG_STILL, "Playing still after activate");
-		input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
-		p_intf->p_sys->b_still = 0;
-		p_intf->p_sys->b_inf_still = 0;
-		p_intf->p_sys->m_still_time = 0;
-	      }
+                dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_ACTIVATE" );
 
-	  } else {
-	    unsigned int digit_entered=0;
+                if ( vcdplayer_pbc_is_on( p_vcd ) && number_addend != 0 ) {
+                  lid_t next_num=vcdinfo_selection_get_lid(p_vcd->vcd,
+                                                           p_vcd->cur_lid,
+                                                           number_addend);
+                  if (VCDINFO_INVALID_LID != next_num) {
+                    itemid.num  = next_num;
+                    itemid.type = VCDINFO_ITEM_TYPE_LID;
+                    VCDPlay( p_input, itemid );
+                  }
+                } else {
+                  itemid.num = number_addend;
+                  VCDPlay( p_input, itemid );
+                }
+                break;
+              }
+            }
+            number_addend = 0;
 
-	    switch (val.i_int) {
-	    case '9':
-	      digit_entered++;
-	    case '8':
-	      digit_entered++;
-	    case '7':
-	      digit_entered++;
-	    case '6':
-	      digit_entered++;
-	    case '5':
-	      digit_entered++;
-	    case '4':
-	      digit_entered++;
-	    case '3':
-	      digit_entered++;
-	    case '2':
-	      digit_entered++;
-	    case '1':
-	      digit_entered++;
-	    case '0':
-	      {
-		number_addend *= 10;
-		number_addend += digit_entered;
-		dbg_print( INPUT_DBG_EVENT, 
-			   "Added %d. Number is now: %d\n", 
-			   digit_entered, number_addend);
-		break;
-	      }
-	    }
-	  }
+            /* Any keypress gets rid of still frame waiting.
+               FIXME - should handle just the ones that cause an action.
+            */
+            if( p_intf->p_sys->b_still )
+              {
+                dbg_print(INPUT_DBG_STILL, "Playing still after activate");
+                input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+                p_intf->p_sys->b_still = 0;
+                p_intf->p_sys->b_inf_still = 0;
+                p_intf->p_sys->m_still_time = 0;
+              }
+
+          } else {
+            unsigned int digit_entered=0;
+
+            switch (val.i_int) {
+            case '9':
+              digit_entered++;
+            case '8':
+              digit_entered++;
+            case '7':
+              digit_entered++;
+            case '6':
+              digit_entered++;
+            case '5':
+              digit_entered++;
+            case '4':
+              digit_entered++;
+            case '3':
+              digit_entered++;
+            case '2':
+              digit_entered++;
+            case '1':
+              digit_entered++;
+            case '0':
+              {
+                number_addend *= 10;
+                number_addend += digit_entered;
+                dbg_print( INPUT_DBG_EVENT,
+                           "Added %d. Number is now: %d\n",
+                           digit_entered, number_addend);
+                break;
+              }
+            }
+          }
         }
 
-      
+
       vlc_mutex_unlock( &p_intf->change_lock );
-      
+
       if( p_vout == NULL )
         {
-	  p_vout = vlc_object_find( p_intf->p_sys->p_input,
-				    VLC_OBJECT_VOUT, FIND_CHILD );
-	  if( p_vout )
+          p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                                    VLC_OBJECT_VOUT, FIND_CHILD );
+          if( p_vout )
             {
-	      var_AddCallback( p_vout, "key-pressed", KeyEvent, p_intf );
+              var_AddCallback( p_vout, "key-pressed", KeyEvent, p_intf );
             }
         }
-      
-      
+
+
       /* Wait a bit */
       msleep( INTF_IDLE_SLEEP );
     }
@@ -347,7 +347,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_lock( &p_intf->change_lock );
 
     p_intf->p_sys->b_key_pressed = VLC_TRUE;
-    
+
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return VLC_SUCCESS;

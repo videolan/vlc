@@ -2,12 +2,12 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.25 2003/12/07 01:02:08 rocky Exp $
+ * $Id: system.c,v 1.26 2003/12/22 14:32:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
  *          Benoît Steiner <benny@via.ecp.fr>
- *          Samuel Hocevar <sam@zoy.org>
+ *          Sam Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -968,7 +968,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                 else if( (i_id & 0xFFFF) == 0x70BD )
                 {
                     /* SVCD OGT subtitles in stream 0x070 */
-		    i_fourcc = VLC_FOURCC('o','g','t', ' ');
+                    i_fourcc = VLC_FOURCC('o','g','t', ' ');
                     i_cat = SPU_ES;
 #ifdef FINISHED_DEBUGGING
                     if( !p_input->stream.b_seekable )
@@ -979,14 +979,14 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                         b_auto_spawn = VLC_TRUE;
                     }
                 }
-                else if( ((i_id >> 8) & 0xFF) <= 0x03 && 
-			 (i_id & 0x00FF) == 0x00BD )
+                else if( ((i_id >> 8) & 0xFF) <= 0x03 &&
+                         (i_id & 0x00FF) == 0x00BD )
                 {
                     /* CVD subtitles (0x00->0x03) */
-		    i_fourcc = VLC_FOURCC('c','v','d', ' ');
+                    i_fourcc = VLC_FOURCC('c','v','d', ' ');
                     i_cat = SPU_ES;
-		    msg_Warn( p_input,  
-			      "CVD subtitles not implemented yet" );
+                    msg_Warn( p_input,
+                              "CVD subtitles not implemented yet" );
                 }
                 else
                 {

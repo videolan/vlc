@@ -2,15 +2,15 @@
  * memcpyaltivec.c : AltiVec memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpyaltivec.c,v 1.3 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: memcpyaltivec.c,v 1.4 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -150,7 +150,7 @@ static void * fast_memcpy( void * _to, const void * _from, size_t len )
 
 static void * fast_memcpy( void * _to, const void * _from, size_t len )
 {
-    asm ("                                              \n"                     
+    asm ("                                              \n"
 	"	cmplwi		%cr0, %r5,  16		\n"
 	"	mr		%r9,  %r3		\n"
 	"	bc		4,    1,    ._L3	\n"

@@ -2,9 +2,9 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: ncurses.c,v 1.5 2003/12/12 03:06:51 rocky Exp $
+ * $Id: ncurses.c,v 1.6 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Sam Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@
 
 #ifdef HAVE_CDDAX
 #define CDDA_MRL "cddax://"
-#else 
+#else
 #define CDDA_MRL "cdda://"
 #endif
 
@@ -403,7 +403,7 @@ static void Eject ( intf_thread_t *p_intf )
     {
         if( !strncmp(psz_name, "dvd://", 4) )
         {
-	    switch( psz_name[strlen("dvd://")] )
+            switch( psz_name[strlen("dvd://")] )
             {
             case '\0':
             case '@':
@@ -411,13 +411,13 @@ static void Eject ( intf_thread_t *p_intf )
                 break;
             default:
                 /* Omit the first MRL-selector characters */
-	        psz_device = strdup( psz_name + strlen("dvd://" ) );
+                psz_device = strdup( psz_name + strlen("dvd://" ) );
                 break;
             }
         }
         else if( !strncmp(psz_name, VCD_MRL, strlen(VCD_MRL)) )
         {
-	    switch( psz_name[strlen(VCD_MRL)] )
+            switch( psz_name[strlen(VCD_MRL)] )
             {
             case '\0':
             case '@':
@@ -425,13 +425,13 @@ static void Eject ( intf_thread_t *p_intf )
                 break;
             default:
                 /* Omit the beginning MRL-selector characters */
-	        psz_device = strdup( psz_name + strlen(VCD_MRL) );
+                psz_device = strdup( psz_name + strlen(VCD_MRL) );
                 break;
             }
         }
-	else if( !strncmp(psz_name, CDDA_MRL, strlen(CDDA_MRL) ) )
+        else if( !strncmp(psz_name, CDDA_MRL, strlen(CDDA_MRL) ) )
         {
-	    switch( psz_name[strlen(CDDA_MRL)] )
+            switch( psz_name[strlen(CDDA_MRL)] )
             {
             case '\0':
             case '@':
@@ -439,7 +439,7 @@ static void Eject ( intf_thread_t *p_intf )
                 break;
             default:
                 /* Omit the beginning MRL-selector characters */
-	        psz_device = strdup( psz_name + strlen(CDDA_MRL) );
+                psz_device = strdup( psz_name + strlen(CDDA_MRL) );
                 break;
             }
         }

@@ -2,9 +2,9 @@
  * x11_api.cpp: Various x11-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_api.cpp,v 1.9 2003/06/09 22:02:13 asmax Exp $
+ * $Id: x11_api.cpp,v 1.10 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Cyril Deguet  <asmax@videolan.org>
+ * Author: Cyril Deguet <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ void OSAPI_SendMessage( SkinWindow *win, unsigned int message,
 }
 //---------------------------------------------------------------------------
 void OSAPI_PostMessage( SkinWindow *win, unsigned int message,
-			unsigned int param1, long param2 )
+                        unsigned int param1, long param2 )
 {
     XEvent event;
 
@@ -66,7 +66,7 @@ void OSAPI_PostMessage( SkinWindow *win, unsigned int message,
     event.xclient.data.l[0] = message;
     event.xclient.data.l[1] = param1;
     event.xclient.data.l[2] = param2;
-    
+
     if( win == NULL )
     {
         // broadcast message
@@ -77,7 +77,7 @@ void OSAPI_PostMessage( SkinWindow *win, unsigned int message,
         event.xclient.window = (( X11Window *)win)->GetHandle();
     }
     XLOCK;
-    XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, 
+    XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0,
                 &event );
     XUNLOCK;
 }
@@ -122,10 +122,10 @@ void OSAPI_GetMousePos( int &x, int &y )
     int rootx, rooty;
     int winx, winy;
     unsigned int xmask;
-    
+
     Window root = DefaultRootWindow( g_pIntf->p_sys->display );
     XLOCK;
-    XQueryPointer( g_pIntf->p_sys->display, root, &rootReturn, &childReturn, 
+    XQueryPointer( g_pIntf->p_sys->display, root, &rootReturn, &childReturn,
                    &rootx, &rooty, &winx, &winy, &xmask );
     XUNLOCK;
     x = rootx;
@@ -153,8 +153,8 @@ bool OSAPI_RmDir( string path )
 
         /* Skip "." and ".." */
         if( !*file->d_name || *file->d_name == '.' ||
-	    (!*(file->d_name+1) && *file->d_name == '.' &&
-	     *(file->d_name+1) == '.') )
+            (!*(file->d_name+1) && *file->d_name == '.' &&
+             *(file->d_name+1) == '.') )
         {
             continue;
         }

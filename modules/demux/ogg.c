@@ -2,9 +2,9 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.51 2003/12/16 12:38:18 gbazin Exp $
+ * $Id: ogg.c,v 1.52 2003/12/22 14:32:55 sam Exp $
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1235,8 +1235,8 @@ static int Demux( input_thread_t * p_input )
                     else
                     {
                         input_ClockManageRef( p_input,
-				      p_input->stream.p_selected_program,
-				      p_stream->i_pcr );
+                                      p_input->stream.p_selected_program,
+                                      p_stream->i_pcr );
                     }
                     continue;
                 }

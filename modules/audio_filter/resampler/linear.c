@@ -2,7 +2,7 @@
  * linear.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.10 2003/03/04 03:27:40 gbazin Exp $
+ * $Id: linear.c,v 1.11 2003/12/22 14:32:55 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -129,15 +129,15 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
     {
         if( p_filter->b_continuity &&
-	    p_in_buf->i_size >=
-	      p_in_buf->i_nb_bytes + sizeof(float) * i_nb_channels )
-	{
-	    /* output the whole thing with the last sample from last time */
-	    memmove( ((float *)(p_in_buf->p_buffer)) + i_nb_channels,
-		     p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
-	    memcpy( p_in_buf->p_buffer, p_prev_sample,
-		    i_nb_channels * sizeof(float) );
-	}
+            p_in_buf->i_size >=
+              p_in_buf->i_nb_bytes + sizeof(float) * i_nb_channels )
+        {
+            /* output the whole thing with the last sample from last time */
+            memmove( ((float *)(p_in_buf->p_buffer)) + i_nb_channels,
+                     p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+            memcpy( p_in_buf->p_buffer, p_prev_sample,
+                    i_nb_channels * sizeof(float) );
+        }
         p_filter->b_continuity = VLC_FALSE;
         return;
     }
@@ -158,7 +158,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if( !p_filter->b_continuity )
     {
         p_filter->b_continuity = VLC_TRUE;
-	p_filter->p_sys->i_remainder = 0;
+        p_filter->p_sys->i_remainder = 0;
         aout_DateInit( &p_filter->p_sys->end_date, p_filter->output.i_rate );
     }
     else
@@ -169,12 +169,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             {
                 i_chan--;
                 p_out[i_chan] = p_prev_sample[i_chan];
-	        p_out[i_chan] += ( (p_prev_sample[i_chan] - p_in[i_chan])
-				   * p_filter->p_sys->i_remainder
-				   / p_filter->output.i_rate );
+                p_out[i_chan] += ( (p_prev_sample[i_chan] - p_in[i_chan])
+                                   * p_filter->p_sys->i_remainder
+                                   / p_filter->output.i_rate );
             }
             p_out += i_nb_channels;
-  	    i_out++;
+              i_out++;
 
             p_filter->p_sys->i_remainder += p_filter->input.i_rate;
         }
@@ -190,12 +190,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             {
                 i_chan--;
                 p_out[i_chan] = p_in[i_chan];
-	        p_out[i_chan] += ( (p_in[i_chan] -
-	            p_in[i_chan + i_nb_channels])
-		    * p_filter->p_sys->i_remainder / p_filter->output.i_rate );
+                p_out[i_chan] += ( (p_in[i_chan] -
+                    p_in[i_chan + i_nb_channels])
+                    * p_filter->p_sys->i_remainder / p_filter->output.i_rate );
             }
             p_out += i_nb_channels;
-  	    i_out++;
+              i_out++;
 
             p_filter->p_sys->i_remainder += p_filter->input.i_rate;
         }
@@ -215,7 +215,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->start_date = p_in_buf->start_date;
 
     if( p_in_buf->start_date !=
-	aout_DateGet( &p_filter->p_sys->end_date ) )
+        aout_DateGet( &p_filter->p_sys->end_date ) )
     {
         aout_DateSet( &p_filter->p_sys->end_date, p_in_buf->start_date );
     }

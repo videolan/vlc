@@ -2,10 +2,10 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.35 2003/11/11 23:50:41 hartman Exp $
+ * $Id: prefs.m,v 1.36 2003/12/22 14:32:56 sam Exp $
  *
- * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
- *		Derk-Jan Hartman <thedj at users.sf.net>
+ * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Derk-Jan Hartman <thedj at users.sf.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

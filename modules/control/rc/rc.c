@@ -2,15 +2,15 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.39 2003/12/02 13:31:23 gbazin Exp $
+ * $Id: rc.c,v 1.40 2003/12/22 14:32:55 sam Exp $
  *
- * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
+ * Author: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -201,7 +201,7 @@ static void Run( intf_thread_t *p_intf )
     hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
     if( hConsoleIn == INVALID_HANDLE_VALUE )
     {
-        msg_Err( p_intf, "Couldn't open STD_INPUT_HANDLE" ); 
+        msg_Err( p_intf, "Couldn't open STD_INPUT_HANDLE" );
         p_intf->b_die = VLC_TRUE;
     }
 #endif
@@ -823,10 +823,10 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         {
             if ( i_value == val.p_list->p_values[i].i_int )
                 printf( "| %i - %s *\n", val.p_list->p_values[i].i_int,
-			text.p_list->p_values[i].psz_string );
+                        text.p_list->p_values[i].psz_string );
             else
                 printf( "| %i - %s\n", val.p_list->p_values[i].i_int,
-			text.p_list->p_values[i].psz_string );
+                        text.p_list->p_values[i].psz_string );
         }
         var_Change( (vlc_object_t *)p_aout, psz_variable, VLC_VAR_FREELIST,
                     &val, &text );

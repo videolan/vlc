@@ -2,10 +2,10 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.23 2003/10/25 00:49:13 sam Exp $
+ * $Id: sdl.c,v 1.24 2003/12/22 14:32:55 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
- *          Samuel Hocevar <sam@zoy.org>
+ *          Sam Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -177,7 +177,7 @@ static int Open ( vlc_object_t *p_this )
             var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
             val.i_int = (obtained.channels == 2) ? AOUT_VAR_STEREO :
-	                AOUT_VAR_MONO;
+                        AOUT_VAR_MONO;
             text.psz_string = (obtained.channels == 2) ? N_("Stereo") :
                               N_("Mono");
             var_Change( p_aout, "audio-device",

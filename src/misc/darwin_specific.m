@@ -1,17 +1,17 @@
 /*****************************************************************************
- * darwin_specific.m: Darwin specific features 
+ * darwin_specific.m: Darwin specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.16 2003/11/10 00:49:48 hartman Exp $
+ * $Id: darwin_specific.m,v 1.17 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Sam Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -54,7 +54,7 @@ static int FindLanguage( const char * psz_lang )
         "Brazillian Portuguese", "pt_BR",
         "Russian", "ru",
         "Swedish", "sv",
-	NULL
+        NULL
     };
 
     for( ppsz_parser = ppsz_all ; ppsz_parser[0] ; ppsz_parser += 2 )
@@ -97,20 +97,20 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
         NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
         /* Retrieve user's preferences. */
-        NSUserDefaults * o_defs = [NSUserDefaults standardUserDefaults]; 
-        NSArray * o_languages = [o_defs objectForKey:@"AppleLanguages"]; 
-        NSEnumerator * o_enumerator = [o_languages objectEnumerator]; 
+        NSUserDefaults * o_defs = [NSUserDefaults standardUserDefaults];
+        NSArray * o_languages = [o_defs objectForKey:@"AppleLanguages"];
+        NSEnumerator * o_enumerator = [o_languages objectEnumerator];
         NSString * o_lang;
 
         while ( (o_lang = [o_enumerator nextObject]) )
-        { 
+        {
             const char * psz_string = [o_lang lossyCString];
             if ( FindLanguage( psz_string ) )
             {
                 break;
             }
         }
-        
+
         [o_pool release];
     }
 }

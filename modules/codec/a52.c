@@ -2,7 +2,7 @@
  * a52.c: parse A/52 audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.31 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: a52.c,v 1.32 2003/12/22 14:32:55 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -195,7 +195,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
             if( p_sys->i_state != STATE_SYNC )
             {
-	        block_BytestreamFlush( &p_sys->bytestream );
+                block_BytestreamFlush( &p_sys->bytestream );
 
                 /* Need more data */
                 return NULL;

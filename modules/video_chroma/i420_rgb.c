@@ -2,15 +2,15 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.5 2003/12/04 12:33:43 gbazin Exp $
+ * $Id: i420_rgb.c,v 1.6 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Author: Sam Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -123,7 +123,7 @@ static int Activate( vlc_object_t *p_this )
                     break;
 
 #ifndef WIN32 /* Hmmm, is there only X11 using 32bits per pixel for RV24 ? */
-		case VLC_FOURCC('R','V','2','4'):
+                case VLC_FOURCC('R','V','2','4'):
 #endif
                 case VLC_FOURCC('R','V','3','2'):
 #if defined (MODULE_NAME_IS_i420_rgb_mmx)
@@ -146,7 +146,7 @@ static int Activate( vlc_object_t *p_this )
         default:
             return -1;
     }
-    
+
     p_vout->chroma.p_sys = malloc( sizeof( chroma_sys_t ) );
     if( p_vout->chroma.p_sys == NULL )
     {
@@ -220,7 +220,7 @@ static int Activate( vlc_object_t *p_this )
     SetYUV( p_vout );
 #endif
 
-    return 0; 
+    return 0;
 }
 
 /*****************************************************************************

@@ -2,9 +2,9 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.12 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: menu.c,v 1.13 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Sam Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -411,19 +411,19 @@ static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
     if( strcmp( psz_mode, "None" ) )
     {
         vout_thread_t *p_vout;
-	p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-				  FIND_ANYWHERE );
-	if( p_vout )
-	{
-	    vlc_value_t val;
+        p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                  FIND_ANYWHERE );
+        if( p_vout )
+        {
+            vlc_value_t val;
 
-	    val.psz_string = psz_mode;
-	    if( var_Set( p_vout, "deinterlace-mode", val ) != VLC_SUCCESS )
+            val.psz_string = psz_mode;
+            if( var_Set( p_vout, "deinterlace-mode", val ) != VLC_SUCCESS )
                 config_PutPsz( p_intf, "deinterlace-mode", psz_mode );
 
-	    vlc_object_release( p_vout );
-	}
-	else
+            vlc_object_release( p_vout );
+        }
+        else
             config_PutPsz( p_intf, "deinterlace-mode", psz_mode );
 
     }
@@ -1167,7 +1167,7 @@ static gint GtkSetupVarMenu( intf_thread_t * p_intf,
             break;
         default:
             /* FIXME */
-	    return FALSE;
+            return FALSE;
         }
 
         p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );

@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.17 2003/12/06 22:41:40 jpsaman Exp $
+ * $Id: pda.c,v 1.18 2003/12/22 14:32:56 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -188,7 +188,7 @@ static void Run( intf_thread_t *p_intf )
     /* Get the notebook object */
     p_intf->p_sys->p_notebook = GTK_NOTEBOOK( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
-    
+
     /* Get the slider object */
     p_intf->p_sys->p_slider = (GtkHScale*) lookup_widget( p_intf->p_sys->p_window, "timeSlider" );
     p_intf->p_sys->p_slider_label = (GtkLabel*) lookup_widget( p_intf->p_sys->p_window, "timeLabel" );
@@ -264,7 +264,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* BEGIN OF PLAYLIST GTK_TREE_VIEW */
     p_intf->p_sys->p_tvplaylist = NULL;
-    p_intf->p_sys->p_tvplaylist = (GtkTreeView *) lookup_widget( p_intf->p_sys->p_window, "tvPlaylist");   
+    p_intf->p_sys->p_tvplaylist = (GtkTreeView *) lookup_widget( p_intf->p_sys->p_window, "tvPlaylist");
     if (NULL == p_intf->p_sys->p_tvplaylist)
        msg_Err(p_intf, "Error obtaining pointer to Play List");
 
@@ -423,7 +423,7 @@ static int Manage( intf_thread_t *p_intf )
                 p_intf->p_sys->b_playing = 1;
 
                 /* update playlist interface */
-                p_playlist = (playlist_t *) vlc_object_find( 
+                p_playlist = (playlist_t *) vlc_object_find(
                         p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
                 if (p_playlist != NULL)
                 {
@@ -442,7 +442,7 @@ static int Manage( intf_thread_t *p_intf )
 #define p_area p_input->stream.p_selected_area
             if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
             {
-                /* Manage the slider for CPU_CAPABILITY_FPU hardware */	
+                /* Manage the slider for CPU_CAPABILITY_FPU hardware */
                 if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
                 {
                     float newvalue = p_intf->p_sys->p_adj->value;

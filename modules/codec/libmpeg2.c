@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.38 2003/12/10 23:27:34 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.39 2003/12/22 14:32:55 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -220,7 +220,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             mpeg2_buffer( p_sys->p_mpeg2dec, p_block->p_buffer,
                           p_block->p_buffer + p_block->i_buffer );
 
-	    p_block->i_buffer = 0;
+            p_block->i_buffer = 0;
             break;
 
         case STATE_SEQUENCE:
@@ -256,7 +256,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 /* Use the value provided in the MPEG sequence header */
                 p_sys->i_aspect =
-		    ((uint64_t)p_sys->p_info->sequence->display_width) *
+                    ((uint64_t)p_sys->p_info->sequence->display_width) *
                     p_sys->p_info->sequence->pixel_width * VOUT_ASPECT_FACTOR /
                     p_sys->p_info->sequence->display_height /
                     p_sys->p_info->sequence->pixel_height;
@@ -276,10 +276,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             mpeg2_set_buf( p_sys->p_mpeg2dec, buf, NULL );
 
             if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
-	    {
-	        block_Release( p_block );
-	        return NULL;
-	    }
+            {
+                block_Release( p_block );
+                return NULL;
+            }
 
             mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
 
@@ -357,7 +357,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             vout_SynchroNewPicture( p_sys->p_synchro,
                 p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
- 	        p_sys->p_info->current_picture->nb_fields, i_pts,
+                p_sys->p_info->current_picture->nb_fields, i_pts,
                 0, p_sys->i_current_rate );
 
             if ( !(p_sys->b_slice_i
@@ -366,7 +366,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                    && !vout_SynchroChoose( p_sys->p_synchro,
                               p_sys->p_info->current_picture->flags
                                 & PIC_MASK_CODING_TYPE,
-			      /*p_sys->p_vout->render_time*/ 0 /*FIXME*/ ) )
+                              /*p_sys->p_vout->render_time*/ 0 /*FIXME*/ ) )
             {
                 mpeg2_skip( p_sys->p_mpeg2dec, 1 );
                 p_sys->b_skip = 1;
@@ -380,10 +380,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 vout_SynchroDecode( p_sys->p_synchro );
 
                 if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
-		{
-		    block_Release( p_block );
-		    return NULL;
-		}
+                {
+                    block_Release( p_block );
+                    return NULL;
+                }
 
                 mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
             }
@@ -422,7 +422,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                                           p_sys->p_info->discard_fbuf->id );
             }
 
-	    if( p_pic ) return p_pic;
+            if( p_pic ) return p_pic;
 
             break;
 
@@ -434,7 +434,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             msg_Warn( p_dec, "invalid picture encountered" );
             if ( ( p_sys->p_info->current_picture == NULL ) ||
                ( ( p_sys->p_info->current_picture->flags &
-		   PIC_MASK_CODING_TYPE) != B_CODING_TYPE ) )
+                   PIC_MASK_CODING_TYPE) != B_CODING_TYPE ) )
             {
                 if( p_sys->p_synchro ) vout_SynchroReset( p_sys->p_synchro );
             }

@@ -3,9 +3,9 @@
  *            encoding.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: charset.c,v 1.4 2003/10/11 21:08:40 hartman Exp $
+ * $Id: charset.c,v 1.5 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Derk-Jan Hartman <thedj at users.sf.net>
+ * Author: Derk-Jan Hartman <thedj at users.sf.net>
  *
  * vlc_current_charset() an adaption of mp_locale_charset():
  *
@@ -52,12 +52,12 @@ typedef struct VLCCharsetAlias
 
 /*
  * The libcharset load all from external text file, but it's strange and
- * slow solution, we rather use array(s) compiled into source. In the 
+ * slow solution, we rather use array(s) compiled into source. In the
  * "good" libc this is not needful -- for example in linux.
- * 
+ *
  * Please, put to this funtion exotic aliases only. The libc 'iconv' knows
  * a lot of basic aliases (check it first by iconv -l).
- * 
+ *
  */
 
 static const char* vlc_encoding_from_language( const char *l )
@@ -72,8 +72,8 @@ static const char* vlc_encoding_from_language( const char *l )
     if (strstr(l, "ru")) return "KOI8-R";
     if (strstr(l, "uk")) return "KOI8-U";
     if (strstr(l, "pl") || strstr(l, "hr") ||
-	strstr(l, "hu") || strstr(l, "cs") ||
-	strstr(l, "sk") || strstr(l, "sl")) return "ISO-8859-2";
+        strstr(l, "hu") || strstr(l, "cs") ||
+        strstr(l, "sk") || strstr(l, "sl")) return "ISO-8859-2";
     if (strstr(l, "eo") || strstr(l, "mt")) return "ISO-8859-3";
     if (strstr(l, "lt") || strstr(l, "la")) return "ISO-8859-4";
     if (strstr(l, "bg") || strstr(l, "be") ||
@@ -95,82 +95,82 @@ static const char* vlc_encoding_from_language( const char *l )
 
 static const char* vlc_charset_aliases( const char *psz_name )
 {
-    VLCCharsetAlias	*a;
+    VLCCharsetAlias     *a;
 
 #if defined WIN32
-    VLCCharsetAlias aliases[] = 
+    VLCCharsetAlias aliases[] =
     {
-        { "CP936",	"GBK" },
-        { "CP1361",	"JOHAB" },
-        { "CP20127",	"ASCII" },
-        { "CP20866",	"KOI8-R" },
-        { "CP21866",	"KOI8-RU" },
-        { "CP28591",	"ISO-8859-1" },
-        { "CP28592",	"ISO-8859-2" },
-        { "CP28593",	"ISO-8859-3" },
-        { "CP28594",	"ISO-8859-4" },
-        { "CP28595",	"ISO-8859-5" },
-        { "CP28596",	"ISO-8859-6" },
-        { "CP28597",	"ISO-8859-7" },
-        { "CP28598",	"ISO-8859-8" },
-        { "CP28599",	"ISO-8859-9" },
-        { "CP28605",	"ISO-8859-15" },
-        { NULL,		NULL }
+        { "CP936",      "GBK" },
+        { "CP1361",     "JOHAB" },
+        { "CP20127",    "ASCII" },
+        { "CP20866",    "KOI8-R" },
+        { "CP21866",    "KOI8-RU" },
+        { "CP28591",    "ISO-8859-1" },
+        { "CP28592",    "ISO-8859-2" },
+        { "CP28593",    "ISO-8859-3" },
+        { "CP28594",    "ISO-8859-4" },
+        { "CP28595",    "ISO-8859-5" },
+        { "CP28596",    "ISO-8859-6" },
+        { "CP28597",    "ISO-8859-7" },
+        { "CP28598",    "ISO-8859-8" },
+        { "CP28599",    "ISO-8859-9" },
+        { "CP28605",    "ISO-8859-15" },
+        { NULL,         NULL }
     };
 #elif SYS_AIX
     VLCCharsetAlias aliases[] =
     {
-        { "IBM-850",	"CP850" },
-        { "IBM-856",	"CP856" },
-        { "IBM-921",	"ISO-8859-13" },
-        { "IBM-922",	"CP922" },
-        { "IBM-932",	"CP932" },
-        { "IBM-943",	"CP943" },
-        { "IBM-1046",	"CP1046" },
-        { "IBM-1124",	"CP1124" },
-        { "IBM-1129",	"CP1129" },
-        { "IBM-1252",	"CP1252" },
-        { "IBM-EUCCN",	"GB2312" },
-        { "IBM-EUCJP",	"EUC-JP" },
-        { "IBM-EUCKR",	"EUC-KR" },
-        { "IBM-EUCTW",	"EUC-TW" },
-        { NULL,	NULL }
+        { "IBM-850",    "CP850" },
+        { "IBM-856",    "CP856" },
+        { "IBM-921",    "ISO-8859-13" },
+        { "IBM-922",    "CP922" },
+        { "IBM-932",    "CP932" },
+        { "IBM-943",    "CP943" },
+        { "IBM-1046",   "CP1046" },
+        { "IBM-1124",   "CP1124" },
+        { "IBM-1129",   "CP1129" },
+        { "IBM-1252",   "CP1252" },
+        { "IBM-EUCCN",  "GB2312" },
+        { "IBM-EUCJP",  "EUC-JP" },
+        { "IBM-EUCKR",  "EUC-KR" },
+        { "IBM-EUCTW",  "EUC-TW" },
+        { NULL, NULL }
     };
-#elif SYS_HPUX 
+#elif SYS_HPUX
     VLCCharsetAlias aliases[] =
     {
-        { "ROMAN8",	"HP-ROMAN8" },
-        { "ARABIC8",	"HP-ARABIC8" },
-        { "GREEK8",	"HP-GREEK8" },
-        { "HEBREW8",	"HP-HEBREW8" },
-        { "TURKISH8",	"HP-TURKISH8" },
-        { "KANA8",	"HP-KANA8" },
-        { "HP15CN",	"GB2312" },
+        { "ROMAN8",     "HP-ROMAN8" },
+        { "ARABIC8",    "HP-ARABIC8" },
+        { "GREEK8",     "HP-GREEK8" },
+        { "HEBREW8",    "HP-HEBREW8" },
+        { "TURKISH8",   "HP-TURKISH8" },
+        { "KANA8",      "HP-KANA8" },
+        { "HP15CN",     "GB2312" },
         { NULL, NULL }
     };
 #elif SYS_IRIX
     VLCCharsetAlias aliases[] =
     {
-        { "EUCCN",	"GB2312" },
+        { "EUCCN",      "GB2312" },
         { NULL, NULL }
     };
-#elif SYS_OSF 
+#elif SYS_OSF
     VLCCharsetAlias aliases[] =
     {
-        { "KSC5601",	"CP949" },
-        { "SDECKANJI",	"EUC-JP" },
-        { "TACTIS",	"TIS-620" },
+        { "KSC5601",    "CP949" },
+        { "SDECKANJI",  "EUC-JP" },
+        { "TACTIS",     "TIS-620" },
         { NULL, NULL }
     };
 #elif SYS_SOLARIS
     VLCCharsetAlias aliases[] =
     {
-        { "646",	"ASCII" },
-        { "CNS11643",	"EUC-TW" },
-        { "5601",	"EUC-KR" },
-        { "JOHAP92",	"JOHAB" },
-        { "PCK",	"SHIFT_JIS" },
-        { "2533",	"TIS-620" },
+        { "646",        "ASCII" },
+        { "CNS11643",   "EUC-TW" },
+        { "5601",       "EUC-KR" },
+        { "JOHAP92",    "JOHAB" },
+        { "PCK",        "SHIFT_JIS" },
+        { "2533",       "TIS-620" },
         { NULL, NULL }
     };
 #elif SYS_BSD
@@ -190,10 +190,9 @@ static const char* vlc_charset_aliases( const char *psz_name )
             if (strcasecmp (a->psz_alias, psz_name) == 0)
                 return a->psz_name;
     }
-    
+
     /* we return original name beacuse iconv() probably will know
-     * something better about name if we don't know it :-)
-    */
+     * something better about name if we don't know it :-) */
     return psz_name;
 }
 
@@ -208,10 +207,10 @@ static char *vlc_encoding_from_locale( char *psz_locale )
         static char buf[2 + 10 + 1];
 
         psz_dot++;
-        
+
         /* Look for the possible @... trailer and remove it, if any.  */
         psz_modifier = strchr( psz_dot, '@' );
-        
+
         if( psz_modifier == NULL )
             return psz_dot;
         if( 0 < ( psz_modifier - psz_dot ) < sizeof( buf ))
@@ -241,8 +240,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
     /* But most old systems don't have a complete set of locales.  Some
      * (like SunOS 4 or DJGPP) have only the C locale.  Therefore we don't
      * use setlocale here; it would return "C" when it doesn't support the
-     * locale name the user has set. Darwin's setlocale is broken.
-     */
+     * locale name the user has set. Darwin's setlocale is broken. */
 #  if HAVE_SETLOCALE && !SYS_DARWIN
     psz_locale = setlocale( LC_ALL, NULL );
 #  endif
@@ -258,8 +256,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
     }
 
     /* On some old systems, one used to set locale = "iso8859_1". On others,
-     * you set it to "language_COUNTRY.charset". Darwin only has LANG :(
-     */
+     * you set it to "language_COUNTRY.charset". Darwin only has LANG :( */
     psz_codeset = vlc_encoding_from_locale( (char *)psz_locale );
 # endif /* HAVE_LANGINFO_CODESET */
 
@@ -279,8 +276,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
     ULONG cplen;
 
     /* Allow user to override the codeset, as set in the operating system,
-     * with standard language environment variables.
-     */
+     * with standard language environment variables. */
     psz_locale = getenv( "LC_ALL" );
     if( psz_locale == NULL || psz_locale[0] == '\0' )
     {
@@ -292,7 +288,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
         psz_codeset = vlc_encoding_from_locale( psz_locale );
     else
     {
-        /* OS/2 has a function returning the locale's codepage as a number.  */
+        /* OS/2 has a function returning the locale's codepage as a number. */
         if( DosQueryCp( sizeof( cp ), cp, &cplen ) )
             psz_codeset = "";
         else
@@ -303,30 +299,27 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
     }
 #endif
     if( psz_codeset == NULL )
-        /* The canonical name cannot be determined.  */
+        /* The canonical name cannot be determined. */
         psz_codeset = "";
     else
         psz_codeset = vlc_charset_aliases( psz_codeset );
-    
+
     /* Don't return an empty string.  GNU libc and GNU libiconv interpret
      * the empty string as denoting "the locale's character encoding",
-     * thus GNU libiconv would call this function a second time.  
-     */
+     * thus GNU libiconv would call this function a second time. */
     if( psz_codeset[0] == '\0' )
     {
-        /*
-         * Last possibility is 'CHARSET' enviroment variable
-         */
+        /* Last possibility is 'CHARSET' enviroment variable */
         if( !( psz_codeset = getenv( "CHARSET" ) ) )
             psz_codeset = "ISO-8859-1";
     }
-    
+
     if( psz_charset )
         *psz_charset = strdup((char *)psz_codeset);
 
-    if (strcasecmp(psz_codeset, "UTF8")==0 || strcasecmp(psz_codeset, "UTF-8")==0)
+    if( !strcasecmp(psz_codeset, "UTF8") || !strcasecmp(psz_codeset, "UTF-8") )
         return VLC_TRUE;
-    
+
     return VLC_FALSE;
 }
 

@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.52 2003/12/15 19:25:56 bigben Exp $
+ * $Id: intf.h,v 1.53 2003/12/22 14:32:56 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -31,7 +31,7 @@
 #include <Cocoa/Cocoa.h>
 
 /*****************************************************************************
- * VLCApplication interface 
+ * VLCApplication interface
  *****************************************************************************/
 @interface VLCApplication : NSApplication
 {
@@ -87,7 +87,7 @@ struct intf_sys_t
 };
 
 /*****************************************************************************
- * VLCMain interface 
+ * VLCMain interface
  *****************************************************************************/
 @interface VLCMain : NSObject
 {
@@ -98,7 +98,7 @@ struct intf_sys_t
     IBOutlet id o_timefield;    /* time field     */
     IBOutlet id o_timeslider;   /* time slider    */
     float f_slider;             /* slider value   */
-    float f_slider_old;         /* old slider val */ 
+    float f_slider_old;         /* old slider val */
     IBOutlet id o_volumeslider; /* volume slider  */
 
     IBOutlet id o_btn_prev;     /* btn previous   */
@@ -116,13 +116,13 @@ struct intf_sys_t
 
     IBOutlet id o_controls;     /* VLCControls    */
     IBOutlet id o_playlist;     /* VLCPlaylist    */
-    IBOutlet id o_info;		/* VLCInfo        */
+    IBOutlet id o_info;         /* VLCInfo        */
 
     IBOutlet id o_messages;     /* messages tv    */
     IBOutlet id o_msgs_panel;   /* messages panel */
     NSMutableArray * o_msg_arr; /* messages array */
     NSLock * o_msg_lock;        /* messages lock  */
-    IBOutlet id o_msgs_btn_crashlog;	/* messages open crashlog */
+    IBOutlet id o_msgs_btn_crashlog;    /* messages open crashlog */
 
     IBOutlet id o_error;        /* error panel    */
     IBOutlet id o_err_msg;      /* NSTextView     */
@@ -130,8 +130,8 @@ struct intf_sys_t
     IBOutlet id o_err_bug_lbl;
     IBOutlet id o_err_btn_msgs; /* Open Messages  */
     IBOutlet id o_err_btn_dismiss;
-    
-    IBOutlet id o_info_window;	/* Info panel     */
+
+    IBOutlet id o_info_window;  /* Info panel     */
 
     /* main menu */
 
@@ -213,7 +213,7 @@ struct intf_sys_t
     IBOutlet id o_mi_info;
     IBOutlet id o_mi_messages;
     IBOutlet id o_mi_bring_atf;
-    
+
     IBOutlet id o_mu_help;
     IBOutlet id o_mi_readme;
     IBOutlet id o_mi_documentation;

@@ -2,9 +2,9 @@
  * duplicate.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: duplicate.c,v 1.7 2003/12/14 17:58:37 gbazin Exp $
+ * $Id: duplicate.c,v 1.8 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                             p_sys->pp_streams[i_stream], p_fmt );
 
         /* Append failed attempts as well to keep track of which pp_id
-	 * belongs to which duplicated stream */
+         * belongs to which duplicated stream */
         TAB_APPEND( id->i_nb_ids, id->pp_ids, id_new );
         if( id_new ) i_valid_streams++;
     }

@@ -2,10 +2,10 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.60 2003/05/15 22:27:37 massiot Exp $
+ * $Id: oss.c,v 1.61 2003/12/22 14:32:55 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
- *          Samuel Hocevar <sam@zoy.org>
+ *          Sam Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@
 
 /* Patches for ignorant OSS versions */
 #ifndef AFMT_AC3
-#   define AFMT_AC3     0x00000400	/* Dolby Digital AC3 */
+#   define AFMT_AC3     0x00000400        /* Dolby Digital AC3 */
 #endif
 
 #ifndef AFMT_S16_NE
@@ -253,7 +253,7 @@ static void Probe( aout_instance_t * p_aout )
         {
             msg_Warn( p_aout, "s/pdif not supported by card" );
         }
-    }    
+    }
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
                      NULL );

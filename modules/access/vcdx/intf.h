@@ -2,7 +2,7 @@
  * intf.h: send info to intf.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf.h,v 1.3 2003/12/05 05:01:17 rocky Exp $
+ * $Id: intf.h,v 1.4 2003/12/22 14:32:55 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -28,15 +28,15 @@ struct intf_sys_t
 {
   input_thread_t    * p_input;
   thread_vcd_data_t * p_vcd;
-  
+
   vlc_bool_t          b_still;        /* True if we are in a still frame */
   vlc_bool_t          b_inf_still;    /* True if still wait time is infinite */
-  mtime_t             m_still_time;   /* Time in microseconds remaining 
-					 to wait in still frame.
-				       */
+  mtime_t             m_still_time;   /* Time in microseconds remaining
+                                         to wait in still frame.
+                                       */
 #if FINISHED
   vcdplay_ctrl_t      control;
-#else 
+#else
   int                 control;
 #endif
   vlc_bool_t          b_click, b_move, b_key_pressed;

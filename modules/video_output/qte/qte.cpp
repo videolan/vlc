@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2003 VideoLAN
- * $Id: qte.cpp,v 1.19 2003/05/24 12:55:38 jpsaman Exp $
+ * $Id: qte.cpp,v 1.20 2003/12/22 14:32:56 sam Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -290,7 +290,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
                        &x, &y, &w, &h );
 #if 0
     msg_Dbg(p_vout, "+qte::Display( p_vout, i_width=%d, i_height=%d, x=%u, y=%u, w=%u, h=%u",
-	p_vout->output.i_width, p_vout->output.i_height, x, y, w, h );
+        p_vout->output.i_width, p_vout->output.i_height, x, y, w, h );
 #endif
 
     if(p_vout->p_sys->p_VideoWidget)
@@ -607,7 +607,7 @@ static void RunQtThread(event_thread_t *p_event)
         }
         QWidget* pWidget = new QWidget();
         if (pWidget)
-	    {
+            {
             p_event->p_vout->p_sys->p_VideoWidget = pWidget;
         }
     }
@@ -619,31 +619,31 @@ static void RunQtThread(event_thread_t *p_event)
     if (p_event->p_vout->p_sys->p_QApplication)
     {
         /* Set default window width and heigh to exactly preferred size. */
-    	QWidget *desktop = p_event->p_vout->p_sys->p_QApplication->desktop();
-    	p_event->p_vout->p_sys->p_VideoWidget->setMinimumWidth( 10 );
-     	p_event->p_vout->p_sys->p_VideoWidget->setMinimumHeight( 10 );
-    	p_event->p_vout->p_sys->p_VideoWidget->setBaseSize( p_event->p_vout->p_sys->i_width,
-    	p_event->p_vout->p_sys->i_height );
+            QWidget *desktop = p_event->p_vout->p_sys->p_QApplication->desktop();
+            p_event->p_vout->p_sys->p_VideoWidget->setMinimumWidth( 10 );
+             p_event->p_vout->p_sys->p_VideoWidget->setMinimumHeight( 10 );
+            p_event->p_vout->p_sys->p_VideoWidget->setBaseSize( p_event->p_vout->p_sys->i_width,
+            p_event->p_vout->p_sys->i_height );
         p_event->p_vout->p_sys->p_VideoWidget->setMaximumWidth( desktop->width() );
         p_event->p_vout->p_sys->p_VideoWidget->setMaximumHeight( desktop->height() );
         /* Check on fullscreen */
         if (p_event->p_vout->b_fullscreen)
-  	        p_event->p_vout->p_sys->p_VideoWidget->showFullScreen();
+                  p_event->p_vout->p_sys->p_VideoWidget->showFullScreen();
         else
-	        p_event->p_vout->p_sys->p_VideoWidget->showNormal();
+                p_event->p_vout->p_sys->p_VideoWidget->showNormal();
 
         p_event->p_vout->p_sys->p_VideoWidget->show();
         p_event->p_vout->p_sys->bRunning = TRUE;
 
 #ifdef NEED_QTE_MAIN
         while(!p_event->b_die && p_event->p_vout->p_sys->bRunning)
-  	    {
-    	   /* Check if we are asked to exit */
+              {
+               /* Check if we are asked to exit */
            if( p_event->b_die )
                break;
 
-	       msleep(100);
-	    }
+               msleep(100);
+            }
 #else
         // run the main loop of qtapplication until someone says: 'quit'
         p_event->p_vout->p_sys->pcQApplication->exec();

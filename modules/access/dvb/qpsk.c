@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Sam Hocevar <sam@zoy.org>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
  *          Christopher Ross <chris@tebibyte.org>
  *
@@ -71,7 +71,7 @@ void E_(Close)   ( vlc_object_t * );
 #define LNB_SLOF_TEXT N_("antenna lnb_slof (kHz)")
 #define LNB_SLOF_LONGTEXT ""
 
-#define PROBE_TEXT	N_("probe the dvb card for capabilities (default disabled)")
+#define PROBE_TEXT N_("probe the dvb card for capabilities (default disabled)")
 #define PROBE_LONGTEXT N_("some dvb cards do not like to be probed for their capabilities")
 
 /* Cable */

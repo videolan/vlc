@@ -2,12 +2,12 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.21 2003/09/18 17:54:02 zorglub Exp $
+ * $Id: intf_eject.c,v 1.22 2003/12/22 14:32:56 sam Exp $
  *
- * Author: Julien Blache <jb@technologeek.org> for the Linux part
- *               with code taken from the Linux "eject" command
- *         Jon Lech Johansen <jon-vl@nanocrew.net> for Darwin
- *         Gildas Bazin <gbazin@netcourrier.com> for Win32
+ * Authors: Julien Blache <jb@technologeek.org> for the Linux part
+ *                with code taken from the Linux "eject" command
+ *          Jon Lech Johansen <jon-vl@nanocrew.net> for Darwin
+ *          Gildas Bazin <gbazin@netcourrier.com> for Win32
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
      * The only way to cleanly unmount the disc under MacOS X
      * is to use the 'disktool' command line utility. It uses
      * the non-public Disk Arbitration API, which can not be
-     * used by Cocoa or Carbon applications. 
+     * used by Cocoa or Carbon applications.
      */
 
     if( ( psz_disk = (char *)strstr( psz_device, "disk" ) ) != NULL &&
@@ -165,13 +165,13 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
     i_flags = MCI_OPEN_TYPE | MCI_OPEN_TYPE_ID |
               MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE;
 
-    if( !mciSendCommand( 0, MCI_OPEN, i_flags, (unsigned long)&op ) ) 
+    if( !mciSendCommand( 0, MCI_OPEN, i_flags, (unsigned long)&op ) )
     {
         st.dwItem = MCI_STATUS_READY;
-	/* Eject disc */
+        /* Eject disc */
         i_ret = mciSendCommand( op.wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, 0 );
-	/* Release access to the device */
-	mciSendCommand( op.wDeviceID, MCI_CLOSE, MCI_WAIT, 0 );
+        /* Release access to the device */
+        mciSendCommand( op.wDeviceID, MCI_CLOSE, MCI_WAIT, 0 );
     }
     else i_ret = VLC_EGENERIC;
 
@@ -183,7 +183,7 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
     /* This code could be extended to support CD/DVD-ROM chargers */
 
     i_fd = open( psz_device, O_RDONLY | O_NONBLOCK );
-   
+
     if( i_fd == -1 )
     {
         msg_Err( p_this, "could not open device %s", psz_device );
@@ -269,7 +269,7 @@ static int EjectSCSI( int i_fd )
     {
         return VLC_EGENERIC;
     }
-  
+
     scsi_cmd.inlen  = 0;
     scsi_cmd.outlen = 0;
     scsi_cmd.cmd[0] = START_STOP;
@@ -283,10 +283,10 @@ static int EjectSCSI( int i_fd )
     {
         return VLC_EGENERIC;
     }
-  
+
     /* Force kernel to reread partition table when new disc inserted */
     i_status = ioctl( i_fd, BLKRRPART );
-  
+
     return i_status;
 }
 #endif

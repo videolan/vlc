@@ -2,9 +2,9 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.17 2003/11/06 16:54:40 nitrox Exp $
+ * $Id: deinterlace.c,v 1.18 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Author: Sam Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -376,7 +376,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
                 vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
                 return;
             }
-	    msleep( VOUT_OUTMEM_SLEEP );
+            msleep( VOUT_OUTMEM_SLEEP );
         }
 
         /* 20ms is a bit arbitrary, but it's only for the first image we get */
@@ -706,7 +706,7 @@ static void RenderBlend( vout_thread_t *p_vout,
                          picture_t *p_outpic, picture_t *p_pic )
 {
     int i_plane;
-    
+
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {

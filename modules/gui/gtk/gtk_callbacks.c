@@ -2,9 +2,9 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: gtk_callbacks.c,v 1.15 2003/12/12 03:01:12 rocky Exp $
+ * $Id: gtk_callbacks.c,v 1.16 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Sam Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
  *          Julien BLACHE <jb@technologeek.org>
  *
@@ -48,7 +48,7 @@
 
 #ifdef HAVE_CDDAX
 #define CDDA_MRL "cddax://"
-#else 
+#else
 #define CDDA_MRL "cdda://"
 #endif
 
@@ -461,7 +461,7 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
     {
         if( !strncmp(psz_current, "dvd://", 4) )
         {
-	    switch( psz_current[strlen("dvd://")] )
+            switch( psz_current[strlen("dvd://")] )
             {
             case '\0':
             case '@':
@@ -469,13 +469,13 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
                 break;
             default:
                 /* Omit the first MRL-selector characters */
-	        psz_device = strdup( psz_current + strlen("dvd://" ) );
+                psz_device = strdup( psz_current + strlen("dvd://" ) );
                 break;
             }
         }
         else if( !strncmp(psz_current, "vcd:", strlen("vcd:")) )
         {
-	    switch( psz_current[strlen("vcd:")] )
+            switch( psz_current[strlen("vcd:")] )
             {
             case '\0':
             case '@':
@@ -483,13 +483,13 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
                 break;
             default:
                 /* Omit the beginning MRL-selector characters */
-	        psz_device = strdup( psz_current + strlen(VCD_MRL) );
+                psz_device = strdup( psz_current + strlen(VCD_MRL) );
                 break;
             }
         }
-	else if( !strncmp(psz_current, CDDA_MRL, strlen(CDDA_MRL) ) )
+        else if( !strncmp(psz_current, CDDA_MRL, strlen(CDDA_MRL) ) )
         {
-	    switch( psz_current[strlen(CDDA_MRL)] )
+            switch( psz_current[strlen(CDDA_MRL)] )
             {
             case '\0':
             case '@':
@@ -497,7 +497,7 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
                 break;
             default:
                 /* Omit the beginning MRL-selector characters */
-	        psz_device = strdup( psz_current + strlen(CDDA_MRL) );
+                psz_device = strdup( psz_current + strlen(CDDA_MRL) );
                 break;
             }
         }
@@ -636,8 +636,6 @@ GtkMenubarDeinterlace                  ( GtkMenuItem     *menuitem,
 
     if( p_intf )
         msg_Dbg( p_intf, "GtkMenubarDeinterlace" );
-
-    
 }
 
 

@@ -2,9 +2,9 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.17 2003/12/16 22:14:22 gbazin Exp $
+ * $Id: access.c,v 1.18 2003/12/22 14:32:55 sam Exp $
  *
- * Authors: Rocky Bernstein <rocky@panix.com> 
+ * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -68,9 +68,9 @@ static void CDDASeek         ( input_thread_t *, off_t );
 static int  CDDASetArea      ( input_thread_t *, input_area_t * );
 static int  CDDASetProgram   ( input_thread_t *, pgrm_descriptor_t * );
 
-static int  CDDAFixupPlayList( input_thread_t *p_input, 
-			      cdda_data_t *p_cdda, const char *psz_source, 
-			      bool play_single_track);
+static int  CDDAFixupPlayList( input_thread_t *p_input,
+                              cdda_data_t *p_cdda, const char *psz_source,
+                              bool play_single_track);
 
 /****************************************************************************
  * Private functions
@@ -84,7 +84,7 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
   switch (level) {
   case CDIO_LOG_DEBUG:
   case CDIO_LOG_INFO:
-    if (p_cdda->i_debug & INPUT_DBG_CDIO) 
+    if (p_cdda->i_debug & INPUT_DBG_CDIO)
       msg_Dbg( p_cdda_input, message);
     break;
   case CDIO_LOG_WARN:
@@ -96,7 +96,7 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
     break;
   default:
     msg_Warn( p_cdda_input, message,
-            _("The above message had unknown vcdimager log level"), 
+            _("The above message had unknown vcdimager log level"),
             level);
   }
   return;
@@ -104,10 +104,10 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
 
 
 #ifdef HAVE_LIBCDDB
-/*! This routine is called by libcddb routines on error. 
+/*! This routine is called by libcddb routines on error.
    Setup is done by init_input_plugin.
 */
-static void 
+static void
 cddb_log_handler (cddb_log_level_t level, const char message[])
 {
   cdda_data_t *p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
@@ -124,9 +124,9 @@ cddb_log_handler (cddb_log_level_t level, const char message[])
 
 
 /*! This routine is when xine is not fully set up (before full initialization)
-   or is not around (before finalization). 
+   or is not around (before finalization).
 */
-static void 
+static void
 uninit_log_handler (cdio_log_level_t level, const char message[])
 {
   cdda_data_t *p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
@@ -147,11 +147,11 @@ uninit_log_handler (cdio_log_level_t level, const char message[])
     break;
   default:
     fprintf(stderr, "UNKNOWN ERROR: %s\n%s %d\n",
-            message, 
-            _("The above message had unknown cdio log level"), 
+            message,
+            _("The above message had unknown cdio log level"),
             level);
   }
-  
+
   /* gl_default_cdio_log_handler (level, message); */
 }
 
@@ -196,7 +196,7 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
     for ( i_index = 0; i_index < i_blocks; i_index++ )
     {
 
-      if (cdio_read_audio_sector(p_cdda->p_cddev->cdio, p_buffer, 
+      if (cdio_read_audio_sector(p_cdda->p_cddev->cdio, p_buffer,
                                  p_cdda->i_sector) != 0)
         {
           msg_Err( p_input, "could not read sector %d", p_cdda->i_sector );
@@ -208,8 +208,8 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
         {
             input_area_t *p_area;
 
-	    dbg_print( (INPUT_DBG_LSN|INPUT_DBG_CALL), 
-		       "end of track, cur: %u", p_cdda->i_sector );
+            dbg_print( (INPUT_DBG_LSN|INPUT_DBG_CALL),
+                       "end of track, cur: %u", p_cdda->i_sector );
 
             /*???? if ( p_cdda->i_track >= p_cdda->i_nb_tracks - 1 )*/
                 return 0; /* EOF */
@@ -305,15 +305,15 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_SEEK),
-    "sector %ud, offset: %lld, i_tell: %lld",  p_cdda->i_sector, i_off, 
+    "sector %ud, offset: %lld, i_tell: %lld",  p_cdda->i_sector, i_off,
                p_input->stream.p_selected_area->i_tell );
 
 }
 
-#define meta_info_add_str(title, str) \
-  if ( str ) {								\
-    dbg_print( INPUT_DBG_META, "field %s: %s\n", title, str);	\
-    input_AddInfo( p_cat, _(title), "%s", str );			\
+#define meta_info_add_str(title, str)                          \
+  if ( str ) {                                                 \
+    dbg_print( INPUT_DBG_META, "field %s: %s\n", title, str);  \
+    input_AddInfo( p_cat, _(title), "%s", str );               \
   }
 
 
@@ -321,12 +321,12 @@ static void InformationCreate( input_thread_t *p_input  )
 {
   cdda_data_t *p_cdda = (cdda_data_t *) p_input->p_access_data;
   input_info_category_t *p_cat;
-  
+
   p_cat = input_InfoCategory( p_input, "General" );
 
 #ifdef HAVE_LIBCDDB
   if (p_cdda->i_cddb_enabled) {
-    
+
     meta_info_add_str( "Title", p_cdda->cddb.disc->title );
     meta_info_add_str( "Artist", p_cdda->cddb.disc->artist );
     meta_info_add_str( "Genre", p_cdda->cddb.disc->genre );
@@ -334,19 +334,19 @@ static void InformationCreate( input_thread_t *p_input  )
     {
       char year[5];
       if (p_cdda->cddb.disc->year != 0) {
-	snprintf(year, 5, "%d", p_cdda->cddb.disc->year);
-	meta_info_add_str( "Year", year );
+        snprintf(year, 5, "%d", p_cdda->cddb.disc->year);
+        meta_info_add_str( "Year", year );
       }
       if ( p_cdda->cddb.disc->discid ) {
-	input_AddInfo( p_cat, _("CDDB Disc ID"), "%x", 
-		       p_cdda->cddb.disc->discid );
+        input_AddInfo( p_cat, _("CDDB Disc ID"), "%x",
+                       p_cdda->cddb.disc->discid );
       }
-      
+
       if ( p_cdda->cddb.disc->category != CDDB_CAT_INVALID ) {
-	input_AddInfo( p_cat, _("CDDB Disc Category"), "%s", 
-		       CDDB_CATEGORY[p_cdda->cddb.disc->category] );
+        input_AddInfo( p_cat, _("CDDB Disc Category"), "%s",
+                       CDDB_CATEGORY[p_cdda->cddb.disc->category] );
       }
-      
+
     }
   }
 
@@ -355,13 +355,13 @@ static void InformationCreate( input_thread_t *p_input  )
   {
     track_t i_track = p_cdda->i_nb_tracks;
     char psz_buffer[MSTRTIME_MAX_SIZE];
-    mtime_t i_duration = 
-      (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[0]) 
+    mtime_t i_duration =
+      (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[0])
       / CDIO_CD_FRAMES_PER_SEC;
 
     dbg_print( INPUT_DBG_META, "Duration %ld", (long int) i_duration );
-    input_AddInfo( p_cat, _("Duration"), "%s", 
-		   secstotimestr( psz_buffer, i_duration ) );
+    input_AddInfo( p_cat, _("Duration"), "%s",
+                   secstotimestr( psz_buffer, i_duration ) );
   }
 }
 
@@ -369,9 +369,9 @@ static void InformationCreate( input_thread_t *p_input  )
 #ifdef HAVE_LIBCDDB
 
 #define free_and_dup(var, val) \
-  if (var) free(var);	       \
-  if (val) var=strdup(val);	       
-  
+  if (var) free(var);          \
+  if (val) var=strdup(val);
+
 
 static void
 GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
@@ -383,46 +383,46 @@ GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
     int i, i_matches;
     cddb_conn_t  *conn = cddb_new();
     const CdIo *cdio = p_cdda->p_cddev->cdio;
-    
-    
+
+
     cddb_log_set_handler (uninit_log_handler);
 
     if (!conn) {
       msg_Warn( p_input, "unable to initialize libcddb" );
       goto cddb_destroy;
     }
-    
-    cddb_set_email_address( conn, 
-			    config_GetPsz( p_input, 
-					   MODULE_STRING "-cddb-email") );
-    
-    cddb_set_server_name( conn, 
-			  config_GetPsz( p_input, 
-					 MODULE_STRING "-cddb-server") );
 
-    cddb_set_server_port(conn, 
-			  config_GetInt( p_input, 
-					 MODULE_STRING "-cddb-port") );
+    cddb_set_email_address( conn,
+                            config_GetPsz( p_input,
+                                           MODULE_STRING "-cddb-email") );
+
+    cddb_set_server_name( conn,
+                          config_GetPsz( p_input,
+                                         MODULE_STRING "-cddb-server") );
+
+    cddb_set_server_port(conn,
+                          config_GetInt( p_input,
+                                         MODULE_STRING "-cddb-port") );
 
     /* Set the location of the local CDDB cache directory.
        The default location of this directory is */
 
-    if (!config_GetInt( p_input, MODULE_STRING "-cddb-enable-cache" )) 
+    if (!config_GetInt( p_input, MODULE_STRING "-cddb-enable-cache" ))
       cddb_cache_disable(conn);
 
-    cddb_cache_set_dir(conn, 
-		       config_GetPsz( p_input, 
-				      MODULE_STRING "-cddb-cachedir") );
+    cddb_cache_set_dir(conn,
+                       config_GetPsz( p_input,
+                                      MODULE_STRING "-cddb-cachedir") );
 
-    cddb_set_timeout(conn, 
-		     config_GetInt( p_input, MODULE_STRING "-cddb-timeout") );
+    cddb_set_timeout(conn,
+                     config_GetInt( p_input, MODULE_STRING "-cddb-timeout") );
 
 
     if (config_GetInt( p_input, MODULE_STRING "-cddb-httpd" )) {
       cddb_http_enable(conn);
     } else
       cddb_http_disable(conn);
-    
+
     p_cdda->cddb.disc = cddb_disc_new();
     if (!p_cdda->cddb.disc) {
       msg_Err( p_input, "Unable to create CDDB disc structure." );
@@ -430,13 +430,13 @@ GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
     }
 
     for(i = 1; i <= p_cdda->i_nb_tracks; i++) {
-      cddb_track_t *t = cddb_track_new(); 
+      cddb_track_t *t = cddb_track_new();
       t->frame_offset = cdio_get_track_lba(cdio, i);
       cddb_disc_add_track(p_cdda->cddb.disc, t);
     }
-    
-    p_cdda->cddb.disc->length = 
-      cdio_get_track_lba(cdio, CDIO_CDROM_LEADOUT_TRACK) 
+
+    p_cdda->cddb.disc->length =
+      cdio_get_track_lba(cdio, CDIO_CDROM_LEADOUT_TRACK)
       / CDIO_CD_FRAMES_PER_SEC;
 
 
@@ -448,12 +448,12 @@ GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
     i_matches = cddb_query(conn, p_cdda->cddb.disc);
     if (i_matches > 0) {
       if (i_matches > 1)
-	msg_Warn( p_input, "Found %d matches in CDDB. Using first one.", 
-		  i_matches);
+        msg_Warn( p_input, "Found %d matches in CDDB. Using first one.",
+                  i_matches);
       cddb_read(conn, p_cdda->cddb.disc);
 
-      if (p_cdda->i_debug & INPUT_DBG_CDDB) 
-	cddb_disc_print(p_cdda->cddb.disc);
+      if (p_cdda->i_debug & INPUT_DBG_CDDB)
+        cddb_disc_print(p_cdda->cddb.disc);
 
     } else {
       msg_Warn( p_input, "CDDB error: %s", cddb_error_str(errno));
@@ -466,36 +466,36 @@ GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
 }
 #endif /*HAVE_LIBCDDB*/
 
-#define add_format_str_info(val)			\
-  {							\
-    const char *str = val;				\
-    unsigned int len;					\
-    if (val != NULL) {					\
-      len=strlen(str);					\
-      if (len != 0) {					\
-	strncat(tp, str, TEMP_STR_LEN-(tp-temp_str));	\
-	tp += len;					\
-      }							\
-      saw_control_prefix = false;			\
-    }							\
+#define add_format_str_info(val)                         \
+  {                                                      \
+    const char *str = val;                               \
+    unsigned int len;                                    \
+    if (val != NULL) {                                   \
+      len=strlen(str);                                   \
+      if (len != 0) {                                    \
+        strncat(tp, str, TEMP_STR_LEN-(tp-temp_str));    \
+        tp += len;                                       \
+      }                                                  \
+      saw_control_prefix = false;                        \
+    }                                                    \
   }
 
-#define add_format_num_info(val, fmt)			\
-  {							\
-    char num_str[10];					\
-    unsigned int len;                                   \
-    sprintf(num_str, fmt, val);				\
-    len=strlen(num_str);                                \
-    if (len != 0) {					\
-      strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));	\
-      tp += len;					\
-    }							\
-    saw_control_prefix = false;				\
+#define add_format_num_info(val, fmt)                    \
+  {                                                      \
+    char num_str[10];                                    \
+    unsigned int len;                                    \
+    sprintf(num_str, fmt, val);                          \
+    len=strlen(num_str);                                 \
+    if (len != 0) {                                      \
+      strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));  \
+      tp += len;                                         \
+    }                                                    \
+    saw_control_prefix = false;                          \
   }
 
 /*!
    Take a format string and expand escape sequences, that is sequences that
-   begin with %, with information from the current CD. 
+   begin with %, with information from the current CD.
    The expanded string is returned. Here is a list of escape sequences:
 
    %a : The album artist **
@@ -515,7 +515,7 @@ GetCDDBInfo( const input_thread_t *p_input, cdda_data_t *p_cdda )
 */
 static char *
 CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
-	      const char format_str[], const char *mrl, int i_track)
+              const char format_str[], const char *mrl, int i_track)
 {
 #define TEMP_STR_SIZE 256
 #define TEMP_STR_LEN (TEMP_STR_SIZE-1)
@@ -538,11 +538,11 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
     switch(format_str[i]) {
     case '%':
       if (saw_control_prefix) {
-	*tp++ = '%';
+        *tp++ = '%';
       }
       saw_control_prefix = !saw_control_prefix;
       break;
-#ifdef HAVE_LIBCDDB      
+#ifdef HAVE_LIBCDDB
     case 'a':
       if (!p_cdda->i_cddb_enabled) goto not_special;
       add_format_str_info(p_cdda->cddb.disc->artist);
@@ -569,18 +569,18 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
       break;
     case 't':
       if (p_cdda->i_cddb_enabled) {
-	cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, 
-					    i_track-1);
-	if (t != NULL && t->title != NULL) 
-	  add_format_str_info(t->title);
+        cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
+                                            i_track-1);
+        if (t != NULL && t->title != NULL)
+          add_format_str_info(t->title);
       } else goto not_special;
       break;
     case 'p':
       if (p_cdda->i_cddb_enabled) {
-	cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, 
-					    i_track-1);
-	if (t != NULL && t->artist != NULL) 
-	  add_format_str_info(t->artist);
+        cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
+                                            i_track-1);
+        if (t != NULL && t->artist != NULL)
+          add_format_str_info(t->artist);
       } else goto not_special;
       break;
 #endif
@@ -601,22 +601,22 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
 
     case 's':
       if (p_cdda->i_cddb_enabled) {
-	char psz_buffer[MSTRTIME_MAX_SIZE];
-	mtime_t i_duration = 
-	  (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
-	  / CDIO_CD_FRAMES_PER_SEC;
-	add_format_str_info(secstotimestr( psz_buffer, i_duration ) );
+        char psz_buffer[MSTRTIME_MAX_SIZE];
+        mtime_t i_duration =
+          (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1])
+          / CDIO_CD_FRAMES_PER_SEC;
+        add_format_str_info(secstotimestr( psz_buffer, i_duration ) );
       } else goto not_special;
       break;
 
     case 'T':
       add_format_num_info(i_track, "%02d");
       break;
-#ifdef HAVE_LIBCDDB      
+#ifdef HAVE_LIBCDDB
     not_special:
 #endif
     default:
-      *tp++ = '%'; 
+      *tp++ = '%';
       *tp++ = format_str[i];
       saw_control_prefix = false;
     }
@@ -625,14 +625,14 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
 }
 
 static void
-CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda, 
-		       playlist_t *p_playlist, unsigned int i_track, 
-		       char *psz_mrl, int psz_mrl_max, 
-		       const char *psz_source, int playlist_operation, 
-		       int i_pos)
+CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
+                       playlist_t *p_playlist, unsigned int i_track,
+                       char *psz_mrl, int psz_mrl_max,
+                       const char *psz_source, int playlist_operation,
+                       int i_pos)
 {
-  mtime_t i_duration = 
-    (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
+  mtime_t i_duration =
+    (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1])
     / CDIO_CD_FRAMES_PER_SEC;
   char *p_author;
   char *p_title;
@@ -644,23 +644,23 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
   }
 #endif
 
-  snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u", 
-	   CDDA_MRL_PREFIX, psz_source, i_track);
+  snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u",
+           CDDA_MRL_PREFIX, psz_source, i_track);
 
   p_title = CDDAFormatStr(p_input, p_cdda,
-			  config_GetPsz( p_input, config_varname ), 
-			  psz_mrl, i_track);
+                          config_GetPsz( p_input, config_varname ),
+                          psz_mrl, i_track);
 
   dbg_print( INPUT_DBG_META, "mrl: %s, title: %s, duration, %ld, pos %d",
-	     psz_mrl, p_title, (long int) i_duration, i_pos );
+             psz_mrl, p_title, (long int) i_duration, i_pos );
 
-  playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration * 1000000, 
-		   0, 0, playlist_operation, i_pos );
+  playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration * 1000000,
+                   0, 0, playlist_operation, i_pos );
 
-  p_author = 
+  p_author =
     CDDAFormatStr( p_input, p_cdda,
-		   config_GetPsz( p_input, MODULE_STRING "-author-format" ),
-		   psz_mrl, i_track );
+                   config_GetPsz( p_input, MODULE_STRING "-author-format" ),
+                   psz_mrl, i_track );
 
   /* FIXME: This is horrible, but until the playlist interface is fixed up
      something like this has to be done for the "Author" field.
@@ -672,20 +672,20 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
 }
 
 static int
-CDDAFixupPlayList( input_thread_t *p_input, cdda_data_t *p_cdda, 
-		  const char *psz_source, bool play_single_track) 
+CDDAFixupPlayList( input_thread_t *p_input, cdda_data_t *p_cdda,
+                  const char *psz_source, bool play_single_track)
 {
   int i;
   playlist_t * p_playlist;
   char       * psz_mrl;
-  unsigned int psz_mrl_max = strlen(CDDA_MRL_PREFIX) + strlen(psz_source) + 
+  unsigned int psz_mrl_max = strlen(CDDA_MRL_PREFIX) + strlen(psz_source) +
     strlen("@T") + strlen("100") + 1;
 
 #ifdef HAVE_LIBCDDB
-  p_cdda->i_cddb_enabled = 
+  p_cdda->i_cddb_enabled =
     config_GetInt( p_input, MODULE_STRING "-cddb-enabled" );
 #endif
-  
+
   if (play_single_track && !p_cdda->i_cddb_enabled) return 0;
 
   psz_mrl = malloc( psz_mrl_max );
@@ -697,7 +697,7 @@ CDDAFixupPlayList( input_thread_t *p_input, cdda_data_t *p_cdda,
     }
 
   p_playlist = (playlist_t *) vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-					       FIND_ANYWHERE );
+                                               FIND_ANYWHERE );
   if( !p_playlist )
     {
       msg_Warn( p_input, "can't find playlist" );
@@ -708,35 +708,35 @@ CDDAFixupPlayList( input_thread_t *p_input, cdda_data_t *p_cdda,
 #ifdef HAVE_LIBCDDB
   if (p_cdda->i_cddb_enabled)
     GetCDDBInfo(p_input, p_cdda);
-  else 
+  else
     p_cdda->cddb.disc = NULL;
 #endif
 
   InformationCreate(p_input);
-  
+
   if (play_single_track) {
     /* May fill out more information when the playlist user interface becomes
        more mature.
      */
-    CDDACreatePlayListItem(p_input, p_cdda, p_playlist, p_cdda->i_track+1, 
-			   psz_mrl, psz_mrl_max, psz_source, PLAYLIST_REPLACE, 
-			   p_playlist->i_index);
+    CDDACreatePlayListItem(p_input, p_cdda, p_playlist, p_cdda->i_track+1,
+                           psz_mrl, psz_mrl_max, psz_source, PLAYLIST_REPLACE,
+                           p_playlist->i_index);
   } else {
-  
+
     playlist_Delete( p_playlist, p_playlist->i_index);
 
     for( i = 1 ; i <= p_cdda->i_nb_tracks ; i++ )
       {
-	CDDACreatePlayListItem(p_input, p_cdda, p_playlist, i, psz_mrl, 
-			       psz_mrl_max, psz_source, PLAYLIST_APPEND, 
-			       PLAYLIST_END);
+        CDDACreatePlayListItem(p_input, p_cdda, p_playlist, i, psz_mrl,
+                               psz_mrl_max, psz_source, PLAYLIST_APPEND,
+                               PLAYLIST_END);
 
       }
 
     playlist_Command( p_playlist, PLAYLIST_GOTO, 0 );
 
   }
-    
+
   vlc_object_release( p_playlist );
   free(psz_mrl);
   return 0;
@@ -747,16 +747,16 @@ CDDAFixupPlayList( input_thread_t *p_input, cdda_data_t *p_cdda,
  ****************************************************************************/
 int
 E_(DebugCB)   ( vlc_object_t *p_this, const char *psz_name,
-		vlc_value_t oldval, vlc_value_t val, void *p_data )
+                vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
   cdda_data_t *p_cdda;
 
   if (NULL == p_cdda_input) return VLC_EGENERIC;
-  
+
   p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
 
   if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old debug (x%0x) %d, new debug (x%0x) %d", 
+    msg_Dbg( p_cdda_input, "Old debug (x%0x) %d, new debug (x%0x) %d",
              p_cdda->i_debug, p_cdda->i_debug, val.i_int, val.i_int);
   }
   p_cdda->i_debug = val.i_int;
@@ -765,18 +765,18 @@ E_(DebugCB)   ( vlc_object_t *p_this, const char *psz_name,
 
 int
 E_(CDDBEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
-		      vlc_value_t oldval, vlc_value_t val, void *p_data )
+                      vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
   cdda_data_t *p_cdda;
 
   if (NULL == p_cdda_input) return VLC_EGENERIC;
-  
+
   p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
 
   if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old CDDB Enabled (x%0x) %d, new (x%0x) %d", 
-             p_cdda->i_cddb_enabled, p_cdda->i_cddb_enabled, 
-	     val.i_int, val.i_int);
+    msg_Dbg( p_cdda_input, "Old CDDB Enabled (x%0x) %d, new (x%0x) %d",
+             p_cdda->i_cddb_enabled, p_cdda->i_cddb_enabled,
+             val.i_int, val.i_int);
   }
   p_cdda->i_cddb_enabled = val.i_int;
   return VLC_SUCCESS;
@@ -786,16 +786,16 @@ E_(CDDBEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
 #if PLAYLIST_INTERFACE_IS_FIXED
 int
 E_(TitleFormatCB)   ( vlc_object_t *p_this, const char *psz_name,
-		      vlc_value_t oldval, vlc_value_t val, void *p_data )
+                      vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
   cdda_data_t *p_cdda;
 
   if (NULL == p_cdda_input) return VLC_EGENERIC;
-  
+
   p_cdda = (cdda_data_t *)p_cdda_input->p_access_data;
 
   if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old CDDB Enabled (%s), new (%s)", 
+    msg_Dbg( p_cdda_input, "Old CDDB Enabled (%s), new (%s)",
              oldval.psz_string, val.psz_string);
   }
   ????
@@ -806,7 +806,7 @@ E_(TitleFormatCB)   ( vlc_object_t *p_this, const char *psz_name,
 /*****************************************************************************
  * Open: open cdda
  *****************************************************************************/
-int 
+int
 E_(Open)( vlc_object_t *p_this )
 {
     input_thread_t *        p_input = (input_thread_t *)p_this;
@@ -841,12 +841,12 @@ E_(Open)( vlc_object_t *p_this )
         *psz_parser = '\0';
         ++psz_parser;
 
-        if ('T' == *psz_parser || 't' == *psz_parser ) 
+        if ('T' == *psz_parser || 't' == *psz_parser )
             ++psz_parser;
-          
+
         i_track = (int)strtol( psz_parser, NULL, 10 );
         i_track = i_track ? i_track : 1;
-	play_single_track = true;
+        play_single_track = true;
     }
 
     if( !*psz_source ) {
@@ -856,10 +856,10 @@ E_(Open)( vlc_object_t *p_this )
         return -1;
       }
       psz_source = config_GetPsz( p_input, "cd-audio" );
-      
+
       if( !psz_source || 0==strlen(psz_source) ) {
         /* Scan for a CD-ROM drive with a CD-DA in it. */
-        char **cd_drives = 
+        char **cd_drives =
           cdio_get_devices_with_cap(NULL,  CDIO_FS_AUDIO, false);
         if (NULL == cd_drives) return -1;
         if (cd_drives[0] == NULL) {
@@ -912,7 +912,7 @@ E_(Open)( vlc_object_t *p_this )
     {
         ioctl_Close( p_cdda->p_cddev );
         free( p_cdda );
-	free( psz_source );
+        free( psz_source );
         return -1;
     }
 
@@ -963,8 +963,8 @@ E_(Open)( vlc_object_t *p_this )
     p_input->pf_set_program = CDDASetProgram;
 
     /* Update default_pts to a suitable value for cdda access */
-    p_input->i_pts_delay = config_GetInt( p_input, 
-					  MODULE_STRING "-caching" ) * 1000;
+    p_input->i_pts_delay = config_GetInt( p_input,
+                                          MODULE_STRING "-caching" ) * 1000;
 
     free( psz_source );
 
@@ -974,7 +974,7 @@ E_(Open)( vlc_object_t *p_this )
 /*****************************************************************************
  * CDDAClose: closes cdda
  *****************************************************************************/
-void 
+void
 E_(Close)( vlc_object_t *p_this )
 {
     input_thread_t *   p_input = (input_thread_t *)p_this;

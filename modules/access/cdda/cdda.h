@@ -3,9 +3,9 @@
  *          using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cdda.h,v 1.3 2003/11/30 22:26:49 rocky Exp $
+ * $Id: cdda.h,v 1.4 2003/12/22 14:32:55 sam Exp $
  *
- * Authors: Rocky Bernstein <rocky@panix.com> 
+ * Author: Rocky Bernstein <rocky@panix.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #endif
 
 /*****************************************************************************
- * Debugging 
+ * Debugging
  *****************************************************************************/
 #define INPUT_DBG_META        1 /* Meta information */
 #define INPUT_DBG_EVENT       2 /* Trace keyboard events */
@@ -47,7 +47,7 @@
    if (p_cdda->i_debug & mask) \
      msg_Dbg(p_input, "%s: "s, __func__ , ##args)
 #else
-#define dbg_print(mask, s, args...) 
+#define dbg_print(mask, s, args...)
 #endif
 
 /*****************************************************************************
@@ -70,8 +70,8 @@ typedef struct cdda_data_s
   struct  {
     bool             have_info;      /* True if we have any info */
     cddb_disc_t     *disc;           /* libcdio uses this to get disc info */
-    int              disc_length;    /* Length in frames of cd. Used in 
-					CDDB lookups */
+    int              disc_length;    /* Length in frames of cd. Used in
+                                        CDDB lookups */
   } cddb;
 #endif
 

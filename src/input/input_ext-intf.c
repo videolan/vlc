@@ -2,9 +2,9 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001,2003 VideoLAN
- * $Id: input_ext-intf.c,v 1.53 2003/12/03 13:27:51 rocky Exp $
+ * $Id: input_ext-intf.c,v 1.54 2003/12/22 14:32:56 sam Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -308,7 +308,7 @@ char * input_OffsetToTime( input_thread_t * p_input, char * psz_buffer,
     if( p_input->stream.i_mux_rate )
     {
         i_seconds = i_offset / 50 / p_input->stream.i_mux_rate;
-	return secstotimestr( psz_buffer, i_seconds );
+        return secstotimestr( psz_buffer, i_seconds );
     }
     else
     {
