@@ -1,3 +1,5 @@
 #!/bin/sh
-ln -s /usr/share/vlc /opt/QtPalmtop/pics/vlc
+if [ -x /usr/share/vlc ] ; then
+   ln -s /usr/share/vlc /opt/QtPalmtop/pics/vlc
+fi
 exit 0

@@ -1,4 +1,13 @@
 #!/bin/sh
+# patch for gtk-1.2 installation
+#if [ ! -x /usr/lib/libgtk.so ] ; then 
+#   ln -s /usr/lib/libgtk-1.2.so.0.9.1 /usr/lib/libgtk.so 
+#fi
+#if [ ! -x /usr/lib/libgdk.so ] ; then
+#   ln -s /usr/lib/libgdk-1.2.so.0.9.1 /usr/lib/libgdk.so
+#fi
+#ldconfig
+# update menus
 if [ -x /usr/bin/update-menus ] && [ ! /usr/bin/update-menus ] ; then 
    exit $?; 
 fi

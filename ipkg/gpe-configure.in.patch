@@ -1,10 +1,9 @@
 --- configure.in	Fri Oct  4 13:45:02 2002
 +++ configure.gpe.in	Sun Oct  6 22:24:16 2002
-@@ -1508,6 +1508,23 @@
+@@ -1508,5 +1508,23 @@
        PLUGINS="${PLUGINS} familiar"
-       NEED_GTK_MAIN=yes
      fi
-+    GPE_PATH=".."
++    GPE_PATH=""
 +    AC_ARG_WITH(gpe,
 +    [    --with-gpe=PATH gpe path (default search in \$PATH)],
 +    [ if test "x${with_gpe}" != "xno"
