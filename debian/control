@@ -1,7 +1,7 @@
 Source: vlc
 Section: graphics
 Priority: optional
-Maintainer: Samuel Hocevar <sam@zoy.org>
+Maintainer: Sam Hocevar (Debian packages) <sam+deb@zoy.org>
 Build-Depends: debhelper (>=3.0), gettext, fortune-mod, xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt3-mt-dev, libqt3-compat-headers, libasound2-dev (>=0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, libidl0, libglib2.0-0, kdelibs4-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev (>=1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>=1.1.0)
 Build-Conflicts: libmpeg2-dev, libmpeg2-0-dev, libmpeg2-1-dev, libmpeg2-2-dev, libmpeg2-3-dev
 Standards-Version: 3.5.10
@@ -40,13 +40,6 @@ Description: GNOME frontend for VLC
  This plugin adds a GNOME interface to the VLC media player. To activate
  it, use the `--intf gnome' flag or run the `gnome-vlc' program.
 
-Package: vlc-gnome
-Section: gnome
-Architecture: any
-Depends: vlc, gnome-vlc
-Description: legacy package that you should remove
- This package is now called gnome-vlc.
-
 Package: gvlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -56,12 +49,6 @@ Provides: vlc-gui
 Description: GTK+ frontend for VLC
  This plugin adds a GTK+ interface to the VLC media player. To activate
  it, use the `--intf gtk' flag or run the `gvlc' program.
-
-Package: vlc-gtk
-Architecture: any
-Depends: vlc, gvlc
-Description: legacy package that you should remove
- This package is now called gvlc.
 
 Package: vlc-plugin-esd
 Architecture: any
@@ -73,12 +60,6 @@ Description: Esound audio output plugin for VLC
  media player. To activate it, use the `--aout esd' flag or select the
  `esd' audio output plugin from the preferences menu.
 
-Package: vlc-esd
-Architecture: any
-Depends: vlc, vlc-plugin-esd
-Description: legacy package that you should remove
- This package is now called vlc-plugin-esd.
-
 Package: vlc-plugin-alsa
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -88,12 +69,6 @@ Description: ALSA audio output plugin for VLC
  This plugin adds support for the Advanced Linux Sound Architecture to
  the VLC media player. To activate it, use the `--aout alsa' flag or
  select the `alsa' audio output plugin from the preferences menu.
-
-Package: vlc-alsa
-Architecture: any
-Depends: vlc, vlc-plugin-alsa
-Description: legacy package that you should remove
- This package is now called vlc-plugin-alsa.
 
 Package: vlc-plugin-sdl
 Architecture: any
@@ -106,12 +81,6 @@ Description: SDL video and audio output plugin for VLC
  `--aout sdl' flags or select the `sdl' video or audio output plugin
  from the preferences menu.
 
-Package: vlc-sdl
-Architecture: any
-Depends: vlc, vlc-plugin-sdl
-Description: legacy package that you should remove
- This package is now called vlc-plugin-sdl.
-
 Package: vlc-plugin-ggi
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -121,12 +90,6 @@ Description: GGI video output plugin for VLC
  This is a GGI plugin for the VLC media player.  To activate it, use
  the `--vout ggi' flag or select the `ggi' video output plugin from the
  preferences menu.
-
-Package: vlc-ggi
-Architecture: any
-Depends: vlc, vlc-plugin-ggi
-Description: legacy package that you should remove
- This package is now called vlc-plugin-ggi.
 
 Package: vlc-plugin-glide
 Architecture: i386
@@ -138,12 +101,6 @@ Description: Glide video output plugin for VLC
  it, use the `--vout glide' flag or select the `glide' video output
  plugin from the preferences menu.
 
-Package: vlc-glide
-Architecture: i386
-Depends: vlc, vlc-plugin-glide
-Description: legacy package that you should remove
- This package is now called vlc-plugin-glide.
-
 Package: qvlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -153,12 +110,6 @@ Provides: vlc-gui
 Description: Qt frontend for VLC
  This plugin adds a Qt interface to the VLC media player. To activate it,
  use the `--intf qt' flag or run the `qvlc' program.
-
-Package: vlc-qt
-Architecture: any
-Depends: vlc, qvlc
-Description: legacy package that you should remove
- This package is now called qvlc.
 
 Package: vlc-plugin-arts
 Architecture: any
@@ -208,4 +159,53 @@ Provides: vlc-gui
 Description: wxWindows frontend for VLC
  This plugin adds a wxWindow interface to the VLC media player. To
  activate it, use the `--intf wxwin' flag or run the `wxvlc' program.
+
+Package: vlc-alsa
+Architecture: any
+Depends: vlc, vlc-plugin-alsa
+Description: legacy package that you should remove
+ This package is now called vlc-plugin-alsa.
+
+Package: vlc-esd
+Architecture: any
+Depends: vlc, vlc-plugin-esd
+Description: legacy package that you should remove
+ This package is now called vlc-plugin-esd.
+
+Package: vlc-ggi
+Architecture: any
+Depends: vlc, vlc-plugin-ggi
+Description: legacy package that you should remove
+ This package is now called vlc-plugin-ggi.
+
+Package: vlc-glide
+Architecture: i386
+Depends: vlc, vlc-plugin-glide
+Description: legacy package that you should remove
+ This package is now called vlc-plugin-glide.
+
+Package: vlc-gnome
+Section: gnome
+Architecture: any
+Depends: vlc, gnome-vlc
+Description: legacy package that you should remove
+ This package is now called gnome-vlc.
+
+Package: vlc-gtk
+Architecture: any
+Depends: vlc, gvlc
+Description: legacy package that you should remove
+ This package is now called gvlc.
+
+Package: vlc-qt
+Architecture: any
+Depends: vlc, qvlc
+Description: legacy package that you should remove
+ This package is now called qvlc.
+
+Package: vlc-sdl
+Architecture: any
+Depends: vlc, vlc-plugin-sdl
+Description: legacy package that you should remove
+ This package is now called vlc-plugin-sdl.
 

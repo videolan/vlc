@@ -1,13 +1,16 @@
-vlc (0.5.3-4) unstable; urgency=low
+vlc (0.6.0-1) unstable; urgency=low
 
   * debian/rules:
     + Replaced $(DEB_BUILD_ARCH) with `dpkg-architecture -qDEB_BUILD_GNU_CPU`
       so that the rules can be called directly.
+    + Use the -s flag instead of -a so that debhelper properly handles the
+      i386-only plugin packages.
+    + Split the build rule into configure and build.
   * debian/control:
     + Removed leading "a"s from package descriptions.
     + Set policy to 3.5.10.
 
- -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sat,  7 Jun 2003 17:46:36 +0200
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sat, 21 Jun 2003 17:55:07 +0200
 
 vlc (0.5.3-3) unstable; urgency=low
 

@@ -12,8 +12,6 @@ export DH_COMPAT=3
 # Compilation options
 #
 
-ARCH_EXCLUDE =
-
 CONFIG_FLAGS = --enable-release --prefix=/usr
 CONFIG_FLAGS += \
 	--enable-gnome \
@@ -54,9 +52,6 @@ CONFIG_FLAGS += --enable-libmpeg2 --with-libmpeg2-tree=extras/mpeg2dec
 ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 CONFIG_FLAGS += --enable-glide
 CONFIG_FLAGS += --enable-svgalib
-else
-ARCH_EXCLUDE += -Nvlc-plugin-glide -Nvlc-glide
-ARCH_EXCLUDE += -Nvlc-plugin-svgalib
 endif
 
 # Remove --without-dvdcss in non-totalitarian countries
@@ -71,8 +66,8 @@ GNOMEDIR = usr/share/gnome/apps/Multimedia
 # Build rules
 #
 
-build: build-stamp
-build-stamp:
+configure: configure-stamp
+configure-stamp:
 	dh_testdir
 
 	# Touch stuff
@@ -124,6 +119,12 @@ build-stamp:
 	./configure --mandir=$${prefix}/share/man \
 		--infodir=$${prefix}/share/info $(CONFIG_FLAGS)
 
+	touch configure-stamp
+
+build: configure-stamp build-stamp
+build-stamp:
+	dh_testdir
+
 	# Build only VLC, with the non-PIC libs
 	$(MAKE) vlc
 
@@ -161,7 +162,7 @@ endif
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
+	rm -f configure-stamp build-stamp
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
@@ -350,24 +351,24 @@ binary-arch: build install
 #	dh_installdebconf	
 	dh_installdocs -p vlc
 #	dh_installexamples
-	dh_installmenu
-	dh_installmime
+	dh_installmenu -s
+	dh_installmime -s
 	dh_installman doc/vlc.1 -p vlc
 	dh_installman doc/vlc-config.1 -p libvlc0-dev
 #	dh_installchangelogs ChangeLog -p vlc
 	cp ChangeLog debian/vlc/usr/share/doc/vlc/changelog
 	cp debian/changelog debian/vlc/usr/share/doc/vlc/changelog.Debian
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_makeshlibs
-	dh_installdeb
+	dh_link -s
+	dh_strip -s
+	dh_compress -s
+	dh_fixperms -s
+	dh_makeshlibs -s
+	dh_installdeb -s
 #	dh_perl
-	dh_shlibdeps $(ARCH_EXCLUDE)
-	dh_gencontrol $(ARCH_EXCLUDE)
-	dh_md5sums $(ARCH_EXCLUDE)
-	dh_builddeb $(ARCH_EXCLUDE)
+	dh_shlibdeps -s
+	dh_gencontrol -s
+	dh_md5sums -s
+	dh_builddeb -s
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
