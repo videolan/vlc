@@ -68,6 +68,7 @@ struct decoder_sys_t
     block_t    *p_frame;
 
     vlc_bool_t   b_sps;
+    vlc_bool_t   b_pps;
 
     /* avcC data */
     int i_avcC_length_size;
@@ -150,6 +151,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_slice = VLC_FALSE;
     p_sys->p_frame = NULL;
     p_sys->b_sps   = VLC_FALSE;
+    p_sys->b_pps   = VLC_FALSE;
 
     p_sys->i_nal_type = -1;
     p_sys->i_nal_ref_idc = -1;
@@ -528,7 +530,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         bs_t s;
         int i_tmp;
 
-        msg_Dbg( p_dec, "found NAL_SPS" );
+        if( !p_sys->b_sps )
+            msg_Dbg( p_dec, "found NAL_SPS" );
 
         p_sys->b_sps = VLC_TRUE;
 
@@ -644,8 +647,11 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         bs_t s;
         bs_init( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
 
+        if( !p_sys->b_pps )
+            msg_Dbg( p_dec, "found NAL_PPS" );
+        p_sys->b_pps = VLC_TRUE;
+
         /* TODO */
-        msg_Dbg( p_dec, "found NAL_PPS" );
 
         if( p_sys->b_slice )
             OUTPUT;
