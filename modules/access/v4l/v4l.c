@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.17 2003/05/31 01:23:29 fenrir Exp $
+ * $Id: v4l.c,v 1.18 2003/07/24 18:27:07 bigben Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *         Laurent Aimar <fenrir@via.ecp.fr>
@@ -310,6 +310,10 @@ static int AccessOpen( vlc_object_t *p_this )
                 p_sys->i_frequency =
                     strtol( psz_parser + strlen( "frequency=" ),
                             &psz_parser, 0 );
+                if( p_sys->i_frequency < 30000 )
+                {
+                msg_Warn( p_input, "v4l syntax has changed : 'frequency' is now channel frequency in kHz");
+                }
             }
             else if( !strncmp( psz_parser, "audio=", strlen( "audio=" ) ) )
             {
@@ -583,15 +587,21 @@ static int AccessOpen( vlc_object_t *p_this )
             }
         }
 #endif
+
+        // show a warning if frequency is < than 30000. User is certainly usint old syntax.
+        
+
         /* set frequency */
         if( p_sys->i_frequency >= 0 )
         {
-            if( ioctl( p_sys->fd, VIDIOCSFREQ, &p_sys->i_frequency ) < 0 )
+            int driver_frequency = p_sys->i_frequency * 16 /1000;
+            if( ioctl( p_sys->fd, VIDIOCSFREQ, &driver_frequency ) < 0 )
             {
                 msg_Err( p_input, "cannot set frequency" );
                 goto failed;
             }
-            msg_Dbg( p_input, "frequency %d", p_sys->i_frequency );
+            msg_Dbg( p_input, "frequency %d (%d)", p_sys->i_frequency, 
+                                                    driver_frequency );
         }
     }
 
