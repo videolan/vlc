@@ -63,7 +63,15 @@ typedef struct vpar_thread_s
     s16                     pi_crop_buf[65536];
     s16 *                   pi_crop;
 #endif
-    mb_addr_inc_t           mb_addr_inc[2048];
+    lookup_t                pl_mb_addr_inc[2048];    /* for macroblock
+                                                        address increment */
+    /* variable length codes for the structure dct_dc_size */
+    lookup_t                pppl_dct_dc_size[2][2][32];  
+    lookup_t                pppl_dct_dc_size[2][2][32];
+    /* tables for macroblock types 0=P 1=B */
+    lookup_t                pl_mb_type[2][64];
+    /* table for coded_block_pattern */
+    lookup_t                pl_coded_pattern[512];
 
 #ifdef STATS
     /* Statistics */

@@ -115,18 +115,6 @@ typedef struct slice_parsing_s
     int                 pppi_pmv[2][2][2];  /* Motion vect predictors, 7.6.3 */
 } slice_parsing_t;
 
-
-/*****************************************************************************
- * mb_addr_inc_t : entry type for MacroblockAddressIncrement lookup table    *
- *****************************************************************************/
-
-typedef struct mb_addr_inc_s
-{
-    int    i_value;
-    int    i_length;
-} mb_addr_inc_t;
-
-
 /*****************************************************************************
  * Standard codes
  *****************************************************************************/

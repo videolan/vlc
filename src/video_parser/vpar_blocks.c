@@ -168,80 +168,234 @@ void vpar_InitCrop( vpar_thread_t * p_vpar )
  * InitMbAddrInc : Initialize the lookup table for mb_addr_inc               *
  *****************************************************************************/
 
+/* Fonction for filling up the lookup table for mb_addr_inc */
+void __inline__ FillMbAddrIncTable( vpar_thread_t * p_vpar,
+                                    int i_start, int i_end, int i_step, 
+                                    int * pi_value, int i_length )
+{
+    int i_dummy, i_dummy2;
+    for( i_dummy = i_start, i_dummy < i_end, i_dummy += i_step )
+        for( i_dummy2 = 0, i_dummy2 < i_step, i_dummy2 ++ )
+        {
+            p_vpar->pl_mb_addr_inc[i_dummy + i_dummy2].value = * pi_value;
+            p_vpar->pl_mb_addr_inc[i_dummy + i_dummy2].length = i_length;
+        }
+    i_value --;
+}
+    
+/* Fonction that initialize the table using the last one */
 void InitMbAddrInc( vpar_thread_t * p_vpar )
 {
-    bzero( &p_vpar->mb_addr_inc, 4096*sizeof( int ) );
-    p_vpar->mb_addr_inc[8].i_value = MACROBLOCK_ESCAPE;
-    p_vpar->mb_addr_inc[15].i_value = MACROBLOCK_STUFFING;
-    p_vpar->mb_addr_inc[24].i_value = 33;
-    p_vpar->mb_addr_inc[25].i_value = 32;
-    p_vpar->mb_addr_inc[26].i_value = 31;
-    p_vpar->mb_addr_inc[27].i_value = 30;
-    p_vpar->mb_addr_inc[28].i_value = 29;
-    p_vpar->mb_addr_inc[29].i_value = 28;
-    p_vpar->mb_addr_inc[30].i_value = 27;
-    p_vpar->mb_addr_inc[31].i_value = 26;
-    p_vpar->mb_addr_inc[32].i_value = 25;
-    p_vpar->mb_addr_inc[33].i_value = 24;
-    p_vpar->mb_addr_inc[34].i_value = 23;
-    p_vpar->mb_addr_inc[35].i_value = 22;
-    p_vpar->mb_addr_inc[36].i_value = 21;
-    p_vpar->mb_addr_inc[38].i_value = 20;
-    p_vpar->mb_addr_inc[40].i_value = 19;
-    p_vpar->mb_addr_inc[42].i_value = 18;
-    p_vpar->mb_addr_inc[44].i_value = 17;
-    p_vpar->mb_addr_inc[46].i_value = 16;
-    p_vpar->mb_addr_inc[48].i_value = 15;
-    p_vpar->mb_addr_inc[56].i_value = 14;
-    p_vpar->mb_addr_inc[64].i_value = 13;
-    p_vpar->mb_addr_inc[72].i_value = 12;
-    p_vpar->mb_addr_inc[80].i_value = 11;
-    p_vpar->mb_addr_inc[88].i_value = 10;
-    p_vpar->mb_addr_inc[96].i_value = 9;
-    p_vpar->mb_addr_inc[112].i_value = 8;
-    p_vpar->mb_addr_inc[128].i_value = 7;
-    p_vpar->mb_addr_inc[192].i_value = 6;
-    p_vpar->mb_addr_inc[256].i_value = 5;
-    p_vpar->mb_addr_inc[384].i_value = 4;
-    p_vpar->mb_addr_inc[512].i_value = 3;
-    p_vpar->mb_addr_inc[768].i_value = 2;
-    p_vpar->mb_addr_inc[1024].i_value = 1;
-    /* Length of the variable length code */
-    p_vpar->mb_addr_inc[8].i_length = 11;
-    p_vpar->mb_addr_inc[15].i_length = 11;
-    p_vpar->mb_addr_inc[24].i_length = 11;
-    p_vpar->mb_addr_inc[25].i_length = 11;
-    p_vpar->mb_addr_inc[26].i_length = 11;
-    p_vpar->mb_addr_inc[27].i_length = 11;
-    p_vpar->mb_addr_inc[28].i_length = 11;
-    p_vpar->mb_addr_inc[29].i_length = 11;
-    p_vpar->mb_addr_inc[30].i_length = 11;
-    p_vpar->mb_addr_inc[31].i_length = 11;
-    p_vpar->mb_addr_inc[32].i_length = 11;
-    p_vpar->mb_addr_inc[33].i_length = 11;
-    p_vpar->mb_addr_inc[34].i_length = 11;
-    p_vpar->mb_addr_inc[35].i_length = 11;
-    p_vpar->mb_addr_inc[36].i_length = 10;
-    p_vpar->mb_addr_inc[38].i_length = 10;
-    p_vpar->mb_addr_inc[40].i_length = 10;
-    p_vpar->mb_addr_inc[42].i_length = 10;
-    p_vpar->mb_addr_inc[44].i_length = 10;
-    p_vpar->mb_addr_inc[46].i_length = 10;
-    p_vpar->mb_addr_inc[48].i_length = 8;
-    p_vpar->mb_addr_inc[56].i_length = 8;
-    p_vpar->mb_addr_inc[64].i_length = 8;
-    p_vpar->mb_addr_inc[72].i_length = 8;
-    p_vpar->mb_addr_inc[80].i_length = 8;
-    p_vpar->mb_addr_inc[88].i_length = 8;
-    p_vpar->mb_addr_inc[96].i_length = 7;   
-    p_vpar->mb_addr_inc[112].i_length = 7;
-    p_vpar->mb_addr_inc[128].i_length = 5;
-    p_vpar->mb_addr_inc[192].i_length = 5;
-    p_vpar->mb_addr_inc[256].i_length = 4;
-    p_vpar->mb_addr_inc[384].i_length = 4;
-    p_vpar->mb_addr_inc[512].i_length = 3;
-    p_vpar->mb_addr_inc[768].i_length = 3;   
-    p_vpar->mb_addr_inc[1024].i_length = 1;
+    int i_dummy;
+    int *  pi_value;
+    for (i_dummy = 0; i_dummy < 8; i_dummy++)
+    {
+        p_vpar->pl_mb_addr_inc[i_dummy].i_value = MB_ERROR;
+        p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
+    }
+
+    p_vpar->pl_mb_addr_inc[8].i_value = MB_ADDRINC_ESCAPE;
+    p_vpar->pl_mb_addr_inc[8].i_length = 11;
+
+    for (i_dummy = 9; i_dummy < 15; i_dummy ++) 
+    {
+        p_vpar->pl_mb_addr_inc[i_dummy].i_value =  MB_ERROR;
+        p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
+    }
+
+    p_vpar->pl_mb_addr_inc[15].i_value = MB_ADDRINC_STUFFING;
+    p_vpar->pl_mb_addr_inc[15].i_length = 11;
+
+    for (i = 16; i < 24; i++) 
+    {
+        p_vpar->pl_mb_addr_inc[i_dummy].i_value =  MB_ERROR;
+        p_vpar->pl_mb_addr_inc[i_dummy].i_length = 0;
+    }
+    pi_value = (int *) malloc( sizeof( int ) );
+    * pi_value = 33;
+    FillMbAddrIncTable( p_vpar, 1024, 2048, 1024, pi_value, 1 );
+    FillMbAddrIncTable( p_vpar, 512, 1024, 256, pi_value, 3 );
+    FillMbAddrIncTable( p_vpar, 256, 512, 128, pi_value, 4 );
+    FillMbAddrIncTable( p_vpar, 128, 256, 64, pi_value, 5 );
+    FillMbAddrIncTable( p_vpar, 96, 128, 16, pi_value, 7 );
+    FillMbAddrIncTable( p_vpar, 48, 96, 8, pi_value, 8 );
+    FillMbAddrIncTable( p_vpar, 36, 48, 2, pi_value, 10 );
+    FillMbAddrIncTable( p_vpar, 24, 36, 1, pi_value, 11 );
+}
+/*****************************************************************************
+ * InitDCT : Initialize tables giving the length of the dct coefficient
+ *           from the vlc code
+ *****************************************************************************/
+
+void InitDCTTables( vpar_thread_t * p_vpar )
+{
+    /* Tables are cut in two parts to reduce memory occupation */
+    
+    /* Table B-12, dct_dc_size_luminance, codes 00xxx ... 11110 */
+    p_vpar->pppl_dct_dc_size[0][0] =
+    { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
+      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
+      {0, 3}, {0, 3}, {0, 3}, {0, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3},
+      {4, 3}, {4, 3}, {4, 3}, {4, 3}, {5, 4}, {5, 4}, {6, 5}, {MB_ERROR, 0}
+    };
+
+    /* Table B-12, dct_dc_size_luminance, codes 111110xxx ... 111111111 */
+    p_vpar->pppl_dct_dc_lum_size[1][0] =
+    { {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6},
+      {8, 7}, {8, 7}, {8, 7}, {8, 7}, {9, 8}, {9, 8}, {10,9}, {11,9}
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}
+    };
+
+    /* Table B-13, dct_dc_size_chrominance, codes 00xxx ... 11110 */
+    p_vpar->pppl_dct_dc_chrom_size[0][1] =
+    { {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2},
+      {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
+      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
+      {3, 3}, {3, 3}, {3, 3}, {3, 3}, {4, 4}, {4, 4}, {5, 5}, {MB_ERROR, 0}
+    };
+
+    /* Table B-13, dct_dc_size_chrominance, codes 111110xxxx ... 1111111111 */
+    p_vpar->pppl_dct_dc_size[1][1] =
+    { {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
+      {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
+      {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7},
+      {8, 8}, {8, 8}, {8, 8}, {8, 8}, {9, 9}, {9, 9}, {10,10}, {11,10}
+    };
+    
+}
+
+/*****************************************************************************
+ * Init*MBType : Initialize lookup table for the Macroblock type             *
+ * ***************************************************************************/
+
+/* Fonction for filling up the tables */
+static void __inline__ FillMBType( vpar_thread_t * p_vpar,
+                                   int           i_mb_type,
+                                   int           i_start,
+                                   int           i_end,
+                                   int           i_value,
+                                   int           i_length )
+{
+    int i_dummy;
+    for( i_dummy = i_start, i_dummy < i_end, i++ )
+    {
+        p_vpar->pm_mb_type[i_mb_type][i_dummy].i_value = i_value;
+        p_vpar->pm_mb_type[i_mb_type][i_dummy].i_length = i_length;
+    }
+}
+
+/* Fonction that fills the table for P MB_Type */
+void InitPMBType( vpar_thread_t * p_vpar )
+{
+    FillMBType( p_vpar, 0, 32, 64, MB_MOTION_FORWARD|MB_PATTERN, 1 );
+    FillMBType( p_vpar, 0, 16, 32, MB_PATTERN, 2 );
+    FillMBType( p_vpar, 0, 8, 16, MB_MOTION_FORWARD, 3 );
+    FillMBType( p_vpar, 0, 6, 8, MB_INTRA, 5 );
+    FillMBType( p_vpar, 0, 4, 6, MB_QUANT|MB_MOTION_FORWARD|PATTERN, 5 );
+    FillMBType( p_vpar, 0, 2, 4, MB_QUANT|MB_PATTERN, 5 );
+    p_vpar->pm_mb_type[0][1].i_value = MB_QUANT|MB_INTRA;
+    p_vpar->pm_mb_type[0][1].i_length = 6;
+    p_vpar->pm_mb_type[0][0].i_value = MB_ERROR;
+    p_vpar->pm_mb_type[0][0].i_length = 0;
+}
+
+/* Fonction that fills the table for B MB_Type */
+void InitBMBType( vpar_thread_t * p_vpar )
+{
+    FillMBType( p_vpar, 1, 48, 64, MB_MOTION_FORWARD
+                                  |MB_MOTION_BACKWARD|MB_PATTERN, 2 );
+    FillMBType( p_vpar, 1, 32, 48, MB_MOTION_FORWARD|MB_MOTION_BACKWARD, 2 );
+    FillMBType( p_vpar, 1, 24, 32, MB_MOTION_BACKWARD|MB_PATTERN, 3 );
+    FillMBType( p_vpar, 1, 16, 24, MB_MOTION_BACKWARD, 3 );
+    FillMBType( p_vpar, 1, 12, 16, MB_MOTION_FORWARD|MB_PATTERN, 4 );
+    FillMBType( p_vpar, 1, 8, 12, MB_MOTION_FORWARD, 4 );
+    FillMBType( p_vpar, 1, 6, 8, MB_INTRA, 5 );
+    FillMBType( p_vpar, 1, 4, 6, MB_QUANT|MB_MOTION_FORWARD
+                                |MB_MOTION_BACKWARD|MB_PATTERN, 5 );
+    p_vpar->pm_mb_type[1][3].i_value = MB_QUANT|MB_MOTION_FORWARD|MB_PATTERN
+    p_vpar->pm_mb_type[1][3].i_length = 6;
+    p_vpar->pm_mb_type[1][2].i_value = MB_QUANT|MB_MOTION_BACKWARD|MB_PATTERN;
+    p_vpar->pm_mb_type[1][2].i_length = 6;
+    p_vpar->pm_mb_type[1][1].i_value = MB_QUANT|MB_INTRA;
+    p_vpar->pm_mb_type[1][1].i_length = 6;
+    p_vpar->pm_mb_type[1][0].i_value =MB_ERROR;
+    p_vpar->pm_mb_type[1][0].i_length = 0;
+}
+
+/*****************************************************************************
+ * InitCodedPattern : Initialize the lookup table for decoding 
+ *                    coded block pattern
+ *****************************************************************************/
+void InitCodedPattern( vpar_thread_t * p_vpar )
+{
+    p_vpar->pl_coded_pattern = 
+    { {(unsigned int)ERROR, 0}, {(unsigned int)ERROR, 0}, {39, 9}, {27, 9}, {59, 9}, {55, 9}, {47, 9}, {31, 9},
+    {58, 8}, {58, 8}, {54, 8}, {54, 8}, {46, 8}, {46, 8}, {30, 8}, {30, 8},
+    {57, 8}, {57, 8}, {53, 8}, {53, 8}, {45, 8}, {45, 8}, {29, 8}, {29, 8},
+    {38, 8}, {38, 8}, {26, 8}, {26, 8}, {37, 8}, {37, 8}, {25, 8}, {25, 8},
+    {43, 8}, {43, 8}, {23, 8}, {23, 8}, {51, 8}, {51, 8}, {15, 8}, {15, 8},
+    {42, 8}, {42, 8}, {22, 8}, {22, 8}, {50, 8}, {50, 8}, {14, 8}, {14, 8},
+    {41, 8}, {41, 8}, {21, 8}, {21, 8}, {49, 8}, {49, 8}, {13, 8}, {13, 8},
+    {35, 8}, {35, 8}, {19, 8}, {19, 8}, {11, 8}, {11, 8}, {7, 8}, {7, 8},
+    {34, 7}, {34, 7}, {34, 7}, {34, 7}, {18, 7}, {18, 7}, {18, 7}, {18, 7},
+    {10, 7}, {10, 7}, {10, 7}, {10, 7}, {6, 7}, {6, 7}, {6, 7}, {6, 7}, 
+    {33, 7}, {33, 7}, {33, 7}, {33, 7}, {17, 7}, {17, 7}, {17, 7}, {17, 7}, 
+    {9, 7}, {9, 7}, {9, 7}, {9, 7}, {5, 7}, {5, 7}, {5, 7}, {5, 7}, 
+    {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, {63, 6}, 
+    {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, {3, 6}, 
+    {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, {36, 6}, 
+    {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, {24, 6}, 
+    {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5},
+    {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5}, {62, 5},
+    {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, 
+    {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, {2, 5}, 
+    {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, 
+    {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, {61, 5}, 
+    {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, 
+    {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, {1, 5}, 
+    {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, 
+    {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, {56, 5}, 
+    {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, 
+    {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, {52, 5}, 
+    {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, 
+    {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, {44, 5}, 
+    {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, 
+    {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, {28, 5}, 
+    {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, 
+    {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, {40, 5}, 
+    {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, 
+    {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, {20, 5}, 
+    {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, 
+    {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, {48, 5}, 
+    {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, 
+    {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, {12, 5}, 
+    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, 
+    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, 
+    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, 
+    {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, {32, 4}, 
+    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, 
+    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, 
+    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, 
+    {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, {16, 4}, 
+    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, 
+    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, 
+    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, 
+    {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4}, {8, 4},
+    {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
+    {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, 
+    {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, 
+    {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
+    {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3} };
 }
 
 /*
@@ -499,7 +653,7 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 {
     /* Index in the lookup table mb_addr_inc */
     int    i_index = ShowBits( &p_vpar->bit_stream, 11 );
-    p_vpar->mb.i_addr_inc = 0;
+    p_vpar->pl_mb.i_addr_inc = 0;
     /* Test the presence of the escape character */
     while( i_index == 8 )
     {
@@ -508,9 +662,9 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
         i_index = ShowBits( &p_vpar->bit_stream, 11 );
     }
     /* Affect the value from the lookup table */
-    p_vpar->mb.i_addr_inc += p_vpar->mb_addr_inc[i_index].i_value;
+    p_vpar->pl_mb.i_addr_inc += p_vpar->pl_mb_addr_inc[i_index].i_value;
     /* Dump the good number of bits */
-    DumpBits( &p_vpar->bit_stream, p_vpar->mb_addr_inc[i_index].i_length );
+    DumpBits( &p_vpar->bit_stream, p_vpar->pl_mb_addr_inc[i_index].i_length );
 }
 
 /*****************************************************************************
@@ -580,7 +734,16 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
  *****************************************************************************/
 int vpar_IMBType( vpar_thread_t * p_vpar )
 {
-    /* À pomper dans Berkeley */
+    /* Take two bits for testing */
+    int                 i_type = ShowBits( &p_vpar->bit_stream, 2 );
+    /* Lookup table for macroblock_type */
+    static lookup_t     pl_mb_Itype[4] = { {MB_ERROR, 0},
+                                          {MB_QUANT|MB_INTRA, 2},
+                                          {MB_INTRA, 1},
+                                          {MB_INTRA, 2} };
+    /* Dump the good number of bits */
+    DumpBits( &p_vpar->bit_stream, pl_mb_Itype[i_type].i_length );
+    return pl_mb_Itype[i_type];
 }
 
 /*****************************************************************************
@@ -588,7 +751,12 @@ int vpar_IMBType( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_PMBType( vpar_thread_t * p_vpar )
 {
-    /* À pomper dans Berkeley */
+    /* Testing on 6 bits */
+    int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
+    /* Dump the good number of bits */
+    DumpBits( &p_vpar->bit_stream, p_vpar->pm_mb_type[0][i_type].i_length );
+    /* return the value from the lookup table for P type */
+    return p_vpar->pm_mb_type[0][i_type].i_value;
 }
 
 /*****************************************************************************
@@ -596,7 +764,12 @@ int vpar_PMBType( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_BMBType( vpar_thread_t * p_vpar )
 {
-    /* À pomper dans Berkeley */
+     /* Testing on 6 bits */
+    int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
+    /* Dump the good number of bits */
+    DumpBits( &p_vpar->bit_stream, p_vpar->pm_mb_type[1][i_type].i_length );
+    /* return the value from the lookup table for B type */
+    return p_vpar->pm_mb_type[1][i_type].i_value;
 }
 
 /*****************************************************************************
@@ -604,7 +777,11 @@ int vpar_BMBType( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_DMBType( vpar_thread_t * p_vpar )
 {
-    /* À pomper dans Berkeley */
+    /* Taking 1 bit */
+    int               i_type = GetBits( &p_vpar->bit_stream, 1 );
+    /* Lookup table */
+    static int        pi_mb_Dtype[2] = { MB_ERROR, 1 };
+    return pi_mb_Dtype[i_type];
 }
 
 /*****************************************************************************
@@ -612,7 +789,9 @@ int vpar_DMBType( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_CodedPattern420( vpar_thread_t * p_vpar )
 {
-    /* À pomper dans Berkeley */
+    int      i_vlc = ShowBits( p_vpar->bit_stream, 9 );
+    DumpBits( p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
+    return p_vpar->pl_coded_pattern[i_vlc].i_value;
 }
 
 /*****************************************************************************
@@ -679,5 +858,34 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
  *****************************************************************************/
 static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 {
-    /* À pomper dans Berkeley. */
+    /* Lookup Table for the chromatic component */
+    static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
+    int        i_cc = pi_cc_index[i_b];
+    /* Determine whether it is luminance or not (chrominance) */
+    int        i_type = ( i_cc + 1 ) / 2;
+
+    /* Decoding of the DC intra coefficient */
+    /* The nb of bits to parse depends on i_type */
+    int        i_code = ShowBits( &p_vpar->bit_stream, 9 + i_type );
+    /* To reduce memory occupation, there are two lookup tables
+     * See InitDCT above */
+    int        i_code5 = i_code >> 4;
+    /* Shall we lookup in the first or in the second table ? */
+    int        i_select = ( i_code5 - 1 ) / 31;
+    /* Offset value for looking in the second table */
+    int        i_offset = 0x1f0 + ( i_type * 0x1f0 );
+    int        i_pos = i_code5 * ( ! i_select ) +
+                       ( i_code - i_offset ) * i_select;
+    int        i_dct_dc_size;
+    int        i_dct_dc_diff;
+    i_dct_dc_size = p_vpar->pppl_dct_dc_size[i_select][i_type][i_pos].i_value;
+    /* Dump the variable length code */
+    DumpBits( &p_vpar->bit_stream, 
+              pppl_dct_dc_size[i_select][i_type][i_pos].i_length );
+    i_dct_diff = GetBits( &p_vpar->bit_stream, i_dct_dc_size );
+    p_vpar->slice.pi_dct_dc_pred[i_cc] += i_dct_diff;
+    
+    /* Decoding of the AC coefficients */
+    int        i_dummy = 1;
+    
 }

@@ -61,11 +61,23 @@ typedef struct
     boolean_t               b_dmv;
     /* AddressIncrement information */
     int                     i_addr_inc;
+
+    /* Macroblock Type */
     int                     i_coded_block_pattern;
     boolean_t               b_dct_type;
 
     int                     i_l_x, i_l_y, i_c_x, i_c_y;
 } macroblock_parsing_t;
+
+/******************************************************************************
+ * lookup_t : entry type for lookup tables                                    *
+ ******************************************************************************/
+
+typedef struct lookup_s
+{
+    int    i_value;
+    int    i_length;
+} lookup_t;
 
 /*****************************************************************************
  * Standard codes
@@ -84,8 +96,11 @@ typedef struct
 #define MOTION_DMV                      3
 
 /* Macroblock Address Increment types */
-#define MACROBLOCK_ESCAPE               8
-#define MACROBLOCK_STUFFING             15
+#define MB_ADDRINC_ESCAPE               8
+#define MB_ADDRINC_STUFFING             15
+
+/* Error constant for lookup tables */
+#define MB_ERROR                        (-1)
 
 /* Scan */
 #define SCAN_ZIGZAG                         0

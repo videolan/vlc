@@ -226,6 +226,10 @@ static int InitThread( vpar_thread_t *p_vpar )
     vpar_InitCrop( p_vpar );
 #endif
     InitMbAddrInc( p_vpar );
+    InitDCTTables( p_vpar );
+    InitPMBType( p_vpar );
+    InitBMBType( p_vpar );
+    InitCodedPattern( p_vpar );
 
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);
