@@ -917,6 +917,13 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         }
     }
 
+    if( psz_proto && !strncmp( psz_proto, "RTP/AVP", 7 ) )
+    {
+        free( psz_proto );
+        psz_proto = strdup( "rtp" );
+    }
+                    
+
     /* FIXME: HTTP support */
 
     if( i_port == 0 )
@@ -1166,7 +1173,7 @@ static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len )
 #if 0
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
     i_position = p_playlist->i_index;
-    
+
     /* Gather the complete sdp file */
     for( ;; )
     {
