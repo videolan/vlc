@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.11 2004/02/14 01:53:17 gbazin Exp $
+ * $Id: ts.c,v 1.12 2004/02/21 23:15:52 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -60,8 +60,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open    ( vlc_object_t * );
-static void Close  ( vlc_object_t * );
+static int  Open  ( vlc_object_t * );
+static void Close ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("ISO 13818-1 MPEG Transport Stream input - new" ) );
@@ -528,9 +528,9 @@ static void Close( vlc_object_t *p_this )
         csa_Delete( p_sys->csa );
     }
 
+    if( p_sys->i_pmt ) free( p_sys->pmt );
     free( p_sys );
 }
-
 
 /*****************************************************************************
  * Demux:
@@ -1761,13 +1761,15 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 
     msg_Dbg( p_demux, "PATCallBack called" );
 
-    if( pat->psi->i_version != -1 && ( !p_pat->b_current_next || p_pat->i_version == pat->psi->i_version ) )
+    if( pat->psi->i_version != -1 &&
+        ( !p_pat->b_current_next || p_pat->i_version == pat->psi->i_version ) )
     {
         dvbpsi_DeletePAT( p_pat );
         return;
     }
 
-    msg_Dbg( p_demux, "new PAT ts_id=0x%x version=%d current_next=%d", p_pat->i_ts_id, p_pat->i_version, p_pat->b_current_next );
+    msg_Dbg( p_demux, "new PAT ts_id=0x%x version=%d current_next=%d",
+             p_pat->i_ts_id, p_pat->i_version, p_pat->b_current_next );
 
     /* Clean old */
     for( i = 2; i < 8192; i++ )
@@ -1784,7 +1786,8 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                     TAB_REMOVE( p_sys->i_pmt, p_sys->pmt, pid );
                 }
             }
-            else if( pid->p_owner && pid->p_owner->i_number != 0 && pid->es->id )
+            else if( pid->p_owner && pid->p_owner->i_number != 0 &&
+                     pid->es->id )
             {
                 /* We only remove es that aren't defined by extra pmt */
                 PIDClean( p_demux->out, pid );
@@ -1793,15 +1796,19 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
     }
 
     /* now create programs */
-    for( p_program = p_pat->p_first_program; p_program != NULL; p_program = p_program->p_next )
+    for( p_program = p_pat->p_first_program; p_program != NULL;
+         p_program = p_program->p_next )
     {
-        msg_Dbg( p_demux, "  * number=%d pid=0x%x", p_program->i_number, p_program->i_pid );
+        msg_Dbg( p_demux, "  * number=%d pid=0x%x", p_program->i_number,
+                 p_program->i_pid );
         if( p_program->i_number != 0 )
         {
             ts_pid_t *pmt = &p_sys->pid[p_program->i_pid];
 
             PIDInit( pmt, VLC_TRUE, pat->psi );
-            pmt->psi->handle = dvbpsi_AttachPMT( p_program->i_number, (dvbpsi_pmt_callback)PMTCallBack, p_demux );
+            pmt->psi->handle =
+                dvbpsi_AttachPMT( p_program->i_number,
+                                  (dvbpsi_pmt_callback)PMTCallBack, p_demux );
             pmt->psi->i_number = p_program->i_number;
 
             TAB_APPEND( p_sys->i_pmt, p_sys->pmt, pmt );
@@ -1811,4 +1818,3 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 
     dvbpsi_DeletePAT( p_pat );
 }
-

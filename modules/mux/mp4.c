@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.14 2004/01/26 18:30:01 gbazin Exp $
+ * $Id: mp4.c,v 1.15 2004/02/21 23:15:52 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin at videolan dot org>
@@ -1132,6 +1132,7 @@ static void Close( vlc_object_t * p_this )
         free( p_stream->entry );
         free( p_stream );
     }
+    if( p_sys->i_nb_streams ) free( p_sys->pp_streams );
     free( p_sys );
 }
 
@@ -1192,13 +1193,13 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     msg_Dbg( p_mux, "adding input" );
 
     TAB_APPEND( p_sys->i_nb_streams, p_sys->pp_streams, p_stream );
-    return( VLC_SUCCESS );
+    return VLC_SUCCESS;
 }
 
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     msg_Dbg( p_mux, "removing input" );
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /****************************************************************************/

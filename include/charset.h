@@ -2,7 +2,7 @@
  * charset.h: Determine a canonical name for the current locale's character encoding.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: charset.h,v 1.2 2004/01/25 18:17:08 zorglub Exp $
+ * $Id: charset.h,v 1.3 2004/02/21 23:15:52 gbazin Exp $
  *
  * Author: Derk-Jan Hartman <thedj at users.sourceforge.net>
  *
@@ -21,4 +21,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 VLC_EXPORT( vlc_bool_t, vlc_current_charset, ( char ** ) );
+
+# ifdef __cplusplus
+}
+# endif
