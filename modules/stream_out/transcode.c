@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.52 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: transcode.c,v 1.53 2003/11/22 13:49:12 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -885,6 +885,24 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
 
         id->i_dts += ( I64C(1000000) * id->i_buffer_pos / 2 /
             id->f_src.audio.i_channels / id->f_src.audio.i_rate );
+
+        if( id->f_src.audio.i_channels !=
+            id->p_encoder->fmt_in.audio.i_channels )
+        {
+            int i, j;
+
+            /* dumb downmixing */
+            for( i = 0; i < aout_buf.i_nb_samples; i++ )
+            {
+                uint16_t *p_buffer = aout_buf.p_buffer;
+                for( j = 0 ; j < id->p_encoder->fmt_in.audio.i_channels; j++ )
+                {
+                    p_buffer[i*id->p_encoder->fmt_in.audio.i_channels+j] =
+                        p_buffer[i*id->f_src.audio.i_channels+j];
+                }
+            }
+            aout_buf.i_nb_bytes = i*id->p_encoder->fmt_in.audio.i_channels * 2;
+        }
 
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, &aout_buf );
         while( p_block )
