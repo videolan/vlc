@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.32 2001/08/07 02:48:25 sam Exp $
+ * $Id: input_ps.c,v 1.33 2001/08/10 16:38:09 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -470,7 +470,7 @@ static int PSRead( input_thread_t * p_input,
     for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
     {
         /* Read what we believe to be a packet header. */
-        if( (i_error = SafeRead( p_input, p_header, 6 )) )
+        if( (i_error = SafeRead( p_input, p_header, 4 )) )
         {
             return( i_error );
         }
@@ -504,35 +504,46 @@ static int PSRead( input_thread_t * p_input,
             }
             /* Packet found. */
             *(u32 *)p_header = U32_AT(&i_startcode);
+        }
+
+        /* 0x1B9 == SYSTEM_END_CODE, it is only 4 bytes long. */
+        if( U32_AT(p_header) != 0x1B9 )
+        {
+            /* The packet is at least 6 bytes long. */
             if( (i_error = SafeRead( p_input, p_header + 4, 2 )) )
             {
                 return( i_error );
             }
-        }
 
-        if( U32_AT(p_header) != 0x1BA )
-        {
-            /* That's the case for all packets, except pack header. */
-            i_packet_size = U16_AT(&p_header[4]);
-        }
-        else
-        {
-            /* Pack header. */
-            if( (p_header[4] & 0xC0) == 0x40 )
+            if( U32_AT(p_header) != 0x1BA )
             {
-                /* MPEG-2 */
-                i_packet_size = 8;
-            }
-            else if( (p_header[4] & 0xF0) == 0x20 )
-            {
-                /* MPEG-1 */
-                i_packet_size = 6;
+                /* That's the case for all packets, except pack header. */
+                i_packet_size = U16_AT(&p_header[4]);
             }
             else
             {
-                intf_ErrMsg( "Unable to determine stream type" );
-                return( -1 );
+                /* Pack header. */
+                if( (p_header[4] & 0xC0) == 0x40 )
+                {
+                    /* MPEG-2 */
+                    i_packet_size = 8;
+                }
+                else if( (p_header[4] & 0xF0) == 0x20 )
+                {
+                    /* MPEG-1 */
+                    i_packet_size = 6;
+                }
+                else
+                {
+                    intf_ErrMsg( "Unable to determine stream type" );
+                    return( -1 );
+                }
             }
+        }
+        else
+        {
+            /* System End Code */
+            i_packet_size = -2;
         }
 
         /* Fetch a packet of the appropriate size. */
@@ -543,29 +554,37 @@ static int PSRead( input_thread_t * p_input,
             return( -1 );
         }
 
-        /* Copy the header we already read. */
-        memcpy( p_data->p_buffer, p_header, 6 );
-
-        /* Read the remaining of the packet. */
-        if( i_packet_size && (i_error =
-                SafeRead( p_input, p_data->p_buffer + 6, i_packet_size )) )
+        if( U32_AT(p_header) != 0x1B9 )
         {
-            return( i_error );
-        }
+            /* Copy the header we already read. */
+            memcpy( p_data->p_buffer, p_header, 6 );
 
-        /* In MPEG-2 pack headers we still have to read stuffing bytes. */
-        if( U32_AT(p_header) == 0x1BA )
-        {
-            if( i_packet_size == 8 && (p_data->p_buffer[13] & 0x7) != 0 )
+            /* Read the remaining of the packet. */
+            if( i_packet_size && (i_error =
+                    SafeRead( p_input, p_data->p_buffer + 6, i_packet_size )) )
             {
-                /* MPEG-2 stuffing bytes */
-                byte_t      p_garbage[8];
-                if( (i_error = SafeRead( p_input, p_garbage,
-                                         p_data->p_buffer[13] & 0x7)) )
+                return( i_error );
+            }
+
+            /* In MPEG-2 pack headers we still have to read stuffing bytes. */
+            if( U32_AT(p_header) == 0x1BA )
+            {
+                if( i_packet_size == 8 && (p_data->p_buffer[13] & 0x7) != 0 )
                 {
-                    return( i_error );
+                    /* MPEG-2 stuffing bytes */
+                    byte_t      p_garbage[8];
+                    if( (i_error = SafeRead( p_input, p_garbage,
+                                             p_data->p_buffer[13] & 0x7)) )
+                    {
+                        return( i_error );
+                    }
                 }
             }
+        }
+        else
+        {
+            /* Copy the small header. */
+            memcpy( p_data->p_buffer, p_header, 4 );
         }
 
         /* Give the packet to the other input stages. */
