@@ -121,8 +121,7 @@ void DirectXEventThread( event_thread_t *p_event )
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
-    while( !p_event->b_die &&
-           GetMessage( &msg, p_event->p_vout->p_sys->hwnd, 0, 0 ) )
+    while( !p_event->b_die && GetMessage( &msg, 0, 0, 0 ) )
     {
         /* Check if we are asked to exit */
         if( p_event->b_die )
@@ -137,7 +136,7 @@ void DirectXEventThread( event_thread_t *p_event )
                                p_event->p_vout->p_sys->i_window_height,
                                &i_x, &i_y, &i_width, &i_height );
 
-            if( msg.hwnd != p_event->p_vout->p_sys->hwnd )
+            if( msg.hwnd == p_event->p_vout->p_sys->hvideownd )
             {
                 /* Child window */
                 i_x = i_y = 0;
@@ -361,7 +360,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     WNDCLASSEX wc;                            /* window class components */
     HICON      vlc_icon = NULL;
     char       vlc_path[MAX_PATH+1];
-    int        i_style, i_stylex;
+    int        i_style;
 
     msg_Dbg( p_vout, "DirectXCreateWindow" );
 
@@ -441,17 +440,15 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
 
     i_style = WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE|WS_CLIPCHILDREN;
-    i_stylex = 0;
 
     if( p_vout->p_sys->hparent )
     {
         i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
-        i_stylex = WS_EX_TOOLWINDOW;
     }
 
     /* Create the window */
     p_vout->p_sys->hwnd =
-        CreateWindowEx( WS_EX_NOPARENTNOTIFY | i_stylex,
+        CreateWindowEx( WS_EX_NOPARENTNOTIFY,
                     "VLC DirectX",                   /* name of window class */
                     VOUT_TITLE " (DirectX Output)", /* window title bar text */
                     i_style,                                 /* window style */
@@ -483,6 +480,15 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
             /* Hmmm, apparently this is a blocking call... */
             SetWindowLong( p_vout->p_sys->hparent, GWL_STYLE,
                            i_style | WS_CLIPCHILDREN );
+
+        /* Create our fullscreen window */
+        p_vout->p_sys->hfswnd =
+            CreateWindowEx( WS_EX_APPWINDOW, "VLC DirectX",
+                            VOUT_TITLE " (DirectX Output)",
+                            WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN|WS_SIZEBOX,
+                            CW_USEDEFAULT, CW_USEDEFAULT,
+                            CW_USEDEFAULT, CW_USEDEFAULT,
+                            NULL, NULL, hInstance, NULL );
     }
 
     /* Now display the window */
@@ -512,6 +518,7 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
     msg_Dbg( p_vout, "DirectXCloseWindow" );
 
     DestroyWindow( p_vout->p_sys->hwnd );
+    if( p_vout->p_sys->hfswnd ) DestroyWindow( p_vout->p_sys->hfswnd );
 
     if( p_vout->p_sys->hparent )
         vout_ReleaseWindow( p_vout, (void *)p_vout->p_sys->hparent );
