@@ -135,7 +135,7 @@ int E_(Activate) ( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *        psz_display;
-     vlc_value_t  val, text;
+    vlc_value_t   val;
 
 #ifdef MODULE_NAME_IS_xvideo
     char *       psz_chroma;
@@ -157,6 +157,8 @@ int E_(Activate) ( vlc_object_t *p_this )
         msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
     }
+
+    vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
 
     /* Open display, using the "display" config variable or the DISPLAY
      * environment variable */
@@ -327,6 +329,7 @@ void E_(Deactivate) ( vlc_object_t *p_this )
     XCloseDisplay( p_vout->p_sys->p_display );
 
     /* Destroy structure */
+    vlc_mutex_destroy( &p_vout->p_sys->lock );
     free( p_vout->p_sys );
 }
 
@@ -442,6 +445,8 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                        p_vout->p_sys->p_win->i_height,
                        &i_x, &i_y, &i_width, &i_height );
 
+    vlc_mutex_lock( &p_vout->p_sys->lock );
+
 #ifdef HAVE_SYS_SHM_H
     if( p_vout->p_sys->b_shm )
     {
@@ -485,6 +490,8 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Make sure the command is sent now - do NOT use XFlush !*/
     XSync( p_vout->p_sys->p_display, False );
+
+    vlc_mutex_unlock( &p_vout->p_sys->lock );
 }
 
 /*****************************************************************************
@@ -498,6 +505,8 @@ static int ManageVideo( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
     vlc_value_t val;
+
+    vlc_mutex_lock( &p_vout->p_sys->lock );
 
     /* Handle events from the owner window */
     if( p_vout->p_sys->p_win->owner_window )
@@ -857,6 +866,8 @@ static int ManageVideo( vout_thread_t *p_vout )
             ToggleCursor( p_vout );
         }
     }
+
+    vlc_mutex_unlock( &p_vout->p_sys->lock );
 
     return 0;
 }
@@ -2131,21 +2142,26 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
             f_arg = va_arg( args, double );
 
+            vlc_mutex_lock( &p_vout->p_sys->lock );
+
             /* Update dimensions */
             XResizeWindow( p_vout->p_sys->p_display,
                            p_vout->p_sys->p_win->base_window,
                            p_vout->render.i_width * f_arg,
                            p_vout->render.i_height * f_arg );
 
+            vlc_mutex_unlock( &p_vout->p_sys->lock );
             return VLC_SUCCESS;
 
        case VOUT_REPARENT:
+            vlc_mutex_lock( &p_vout->p_sys->lock );
             XReparentWindow( p_vout->p_sys->p_display,
                              p_vout->p_sys->p_win->base_window,
                              DefaultRootWindow( p_vout->p_sys->p_display ),
                              0, 0 );
             XSync( p_vout->p_sys->p_display, False );
             p_vout->p_sys->p_win->owner_window = 0;
+            vlc_mutex_unlock( &p_vout->p_sys->lock );
             return VLC_SUCCESS;
 
         case VOUT_SET_STAY_ON_TOP:
@@ -2154,7 +2170,9 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
                     (void *)p_vout->p_sys->p_win->owner_window, i_query, args);
 
             b_arg = va_arg( args, vlc_bool_t );
+            vlc_mutex_lock( &p_vout->p_sys->lock );
             WindowOnTop( p_vout, b_arg );
+            vlc_mutex_unlock( &p_vout->p_sys->lock );
             return VLC_SUCCESS;
 
        default:

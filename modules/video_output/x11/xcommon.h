@@ -91,6 +91,8 @@ struct vout_sys_t
     Visual *            p_visual;                          /* visual pointer */
     int                 i_screen;                           /* screen number */
 
+    vlc_mutex_t         lock;
+
     /* Our current window */
     x11_window_t *      p_win;
 
