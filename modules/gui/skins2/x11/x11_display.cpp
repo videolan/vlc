@@ -106,6 +106,7 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
             m_pixelSize = 1;
             break;
 
+        case 15:
         case 16:
         case 24:
         case 32:
@@ -135,7 +136,7 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
                 m_pixelSize = 1;
             }
 
-            if( depth == 16 )
+            if( depth == 15 || depth == 16 )
             {
                 if( order == MSBFirst )
                 {
@@ -180,41 +181,44 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
         xgcvalues.graphics_exposures = False;
         m_gc = XCreateGC( m_pDisplay, DefaultRootWindow( m_pDisplay ),
                           GCGraphicsExposures, &xgcvalues );
+
+        // Create a parent window to have a single task in the task bar
+        XSetWindowAttributes attr;
+        m_mainWindow = XCreateWindow( m_pDisplay, DefaultRootWindow( m_pDisplay),
+                                      0, 0, 1, 1, 0, 0, InputOutput,
+                                      CopyFromParent, 0, &attr );
+
+        // Changing decorations
+        struct {
+            unsigned long flags;
+            unsigned long functions;
+            unsigned long decorations;
+            long input_mode;
+            unsigned long status;
+        } motifWmHints;
+        Atom hints_atom = XInternAtom( m_pDisplay, "_MOTIF_WM_HINTS", False );
+        motifWmHints.flags = 2;    // MWM_HINTS_DECORATIONS;
+        motifWmHints.decorations = 0;
+        XChangeProperty( m_pDisplay, m_mainWindow, hints_atom, hints_atom, 32,
+                         PropModeReplace, (unsigned char *)&motifWmHints,
+                         sizeof( motifWmHints ) / sizeof( long ) );
+
+        // Change the window title
+        XStoreName( m_pDisplay, m_mainWindow, "VLC Media Player" );
+
+        // Receive map notify events
+        XSelectInput( m_pDisplay, m_mainWindow, StructureNotifyMask );
+
+        // Set an empty mask for the window
+        Region mask = XCreateRegion();
+        XShapeCombineRegion( m_pDisplay, m_mainWindow, ShapeBounding, 0, 0, mask,
+                             ShapeSet );
+        // Map the window
+        XMapWindow( m_pDisplay, m_mainWindow);
+
+        // Move it outside the screen to avoid seeing it in workspace selector
+        XMoveWindow( m_pDisplay, m_mainWindow, -10, -10 );
     }
-
-    // Create a parent window to have a single task in the task bar
-    XSetWindowAttributes attr;
-    m_mainWindow = XCreateWindow( m_pDisplay, DefaultRootWindow( m_pDisplay),
-                                  0, 0, 1, 1, 0, 0, InputOutput,
-                                  CopyFromParent, 0, &attr );
-
-    // Changing decorations
-    struct {
-        unsigned long flags;
-        unsigned long functions;
-        unsigned long decorations;
-        long input_mode;
-        unsigned long status;
-    } motifWmHints;
-    Atom hints_atom = XInternAtom( m_pDisplay, "_MOTIF_WM_HINTS", False );
-    motifWmHints.flags = 2;    // MWM_HINTS_DECORATIONS;
-    motifWmHints.decorations = 0;
-    XChangeProperty( m_pDisplay, m_mainWindow, hints_atom, hints_atom, 32,
-                     PropModeReplace, (unsigned char *)&motifWmHints,
-                     sizeof( motifWmHints ) / sizeof( long ) );
-
-    // Change the window title
-    XStoreName( m_pDisplay, m_mainWindow, "VLC Media Player" );
-
-    // Receive map notify events
-    XSelectInput( m_pDisplay, m_mainWindow, StructureNotifyMask );
-
-    // Set an empty mask for the window
-    Region mask = XCreateRegion();
-    XShapeCombineRegion( m_pDisplay, m_mainWindow, ShapeBounding, 0, 0, mask,
-                         ShapeSet );
-    // Map the window
-    XMapWindow( m_pDisplay, m_mainWindow);
 }
 
 
