@@ -2,7 +2,7 @@
  * pes.c: PES packetizer used by the MPEG multiplexers
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.10 2003/08/14 23:37:54 fenrir Exp $
+ * $Id: pes.c,v 1.11 2003/08/15 01:58:46 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -51,6 +51,20 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                              vlc_bool_t b_mpeg2 )
 {
     bits_buffer_t bits;
+    int     i_extra = 0;
+
+    /* For PES_PRIVATE_STREAM_1 there is an extra header after the
+       pes header */
+    /* i_private_id != -1 because TS use 0xbd without private_id */
+    if( i_stream_id == PES_PRIVATE_STREAM_1 && i_private_id != -1 )
+    {
+        i_extra = 1;
+        if( ( i_private_id&0xf8 ) == 0x80 )
+        {
+            i_extra += 3;
+        }
+    }
+
 
     bits_initwrite( &bits, 30, p_hdr );
 
@@ -77,19 +91,6 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
             if( b_mpeg2 )
             {
                 int     i_pts_dts;
-                int     i_extra = 0;
-
-                /* For PES_PRIVATE_STREAM_1 there is an extra header after the
-                   pes header */
-                /* i_private_id != -1 because TS use 0xbd without private_id */
-                if( i_stream_id == PES_PRIVATE_STREAM_1 && i_private_id != -1 )
-                {
-                    i_extra = 1;
-                    if( ( i_private_id&0xf8 ) == 0x80 )
-                    {
-                        i_extra += 3;
-                    }
-                }
 
                 if( i_pts >= 0 && i_dts >= 0 )
                 {
@@ -163,17 +164,17 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
 
                 if( i_pts >= 0 && i_dts >= 0 )
                 {
-                    bits_write( &bits, 16, i_es_size + 10 /* + stuffing */ );
+                    bits_write( &bits, 16, i_es_size + i_extra + 10 /* + stuffing */ );
                     i_pts_dts = 0x03;
                 }
                 else if( i_pts >= 0 )
                 {
-                    bits_write( &bits, 16, i_es_size + 5 /* + stuffing */ );
+                    bits_write( &bits, 16, i_es_size + i_extra + 5 /* + stuffing */ );
                     i_pts_dts = 0x02;
                 }
                 else
                 {
-                    bits_write( &bits, 16, i_es_size + 1 /* + stuffing */);
+                    bits_write( &bits, 16, i_es_size + i_extra + 1 /* + stuffing */);
                     i_pts_dts = 0x00;
                 }
 
