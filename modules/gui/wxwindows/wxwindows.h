@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.9 2003/03/22 03:14:34 gbazin Exp $
+ * $Id: wxwindows.h,v 1.10 2003/03/22 11:21:58 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -250,6 +250,7 @@ private:
     void UpdateMRL();
     wxPanel *AccessPanel( wxWindow* parent );
     wxPanel *EncapsulationPanel( wxWindow* parent );
+    void    ParseMRL();
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
@@ -263,7 +264,6 @@ private:
 
     /* Event handlers for the net access output */
     void OnNetChange( wxCommandEvent& event );
-    void OnMulticastChange( wxCommandEvent& event );
 
     /* Event handlers for the encapsulation panel */
     void OnEncapsulationChange( wxCommandEvent& event );
@@ -280,10 +280,8 @@ private:
     /* Controls for the access outputs */
     wxPanel *access_subpanels[4];
     wxRadioButton *access_radios[4];
-    wxCheckBox *multicast_checkbox;
 
     int i_access_type;
-    vlc_bool_t b_multicast;
 
     wxComboBox *file_combo;
     wxSpinCtrl *net_port;
