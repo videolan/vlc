@@ -23,9 +23,7 @@
 
 /*
  * TODO:
- * - libgcrypt thread-safety !!!
  * - fix FIXMEs,
- * - gnutls version check,
  * - client side stuff,
  * - server-side client cert validation,
  * - client-side server cert validation (?).
@@ -170,7 +168,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     int val;
     vlc_value_t bits;
 
-    p_sys = (gnutls_session *)malloc( sizeof(gnutls_session *) );
+    p_sys = (gnutls_session *)malloc( sizeof(gnutls_session) );
     if( p_sys == NULL )
         return NULL;
 
