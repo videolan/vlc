@@ -2,7 +2,7 @@
  * vcd.h: thread structure of the VCD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vcd.h,v 1.3 2002/11/06 15:41:29 jobi Exp $
+ * $Id: vcd.h,v 1.4 2003/02/12 17:13:33 jobi Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -41,7 +41,7 @@
 #define MSF_TO_LBA2(min, sec, frame) ((int)frame + 75 * (sec -2 + 60 * min))
 /* Converts BCD to Binary data */
 #define BCD_TO_BIN(i) \
-    ((uint8_t)(0xf & (uint8_t)i)+((uint8_t)10*((uint8_t)i >> 4)))
+    (uint8_t)((uint8_t)(0xf & (uint8_t)i)+((uint8_t)10*((uint8_t)i >> 4)))
 
 #ifndef VCDDEV_T
 typedef struct vcddev_s vcddev_t;

@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.14 2003/02/12 16:58:11 jobi Exp $
+ * $Id: vcd.c,v 1.15 2003/02/12 17:13:33 jobi Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -522,7 +522,7 @@ static int VCDEntryPoints( input_thread_t * p_input )
 
     p_vcd->i_entries_nb = 0;
 
-#define i_track BCD_TO_BIN( entries.entry[i].i_track )
+#define i_track BCD_TO_BIN(entries.entry[i].i_track)
     for( i = 0 ; i < i_nb ; i++ )
     {
         if( i_track <= p_input->stream.i_area_nb )
