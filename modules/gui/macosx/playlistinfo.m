@@ -120,9 +120,8 @@
     if( psz_temp )
     {
         [o_author_txt setStringValue: [NSString stringWithUTF8String: psz_temp]];
+        free( psz_temp );
     }
-
-    free( psz_temp );
 
     [[VLCInfoTreeItem rootItem] refresh];
     [o_outline_view reloadData];
