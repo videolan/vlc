@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.10 2003/07/23 21:45:13 hartman Exp $
+ * $Id: freetype.c,v 1.11 2003/07/23 23:05:25 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -137,23 +137,14 @@ static int Create( vlc_object_t *p_this )
             (uint8_t)( pow( (double)i / 255.0f, gamma_inv) * 255.0f );
     }
 
-    if( !var_Type( p_vout, "freetype-font" ) )
-    {
-        var_Create( p_vout, "freetype-font", VLC_VAR_STRING );
-        var_Change( p_vout, "freetype-font", VLC_VAR_INHERITVALUE, NULL, NULL );
-    }
-    if( !var_Type( p_vout, "freetype-fontsize" ) )
-    {
-        var_Create( p_vout, "freetype-fontsize", VLC_VAR_INTEGER );
-        var_Change( p_vout, "freetype-fontsize", VLC_VAR_INHERITVALUE, NULL, NULL );
-    }
+    var_Create( p_vout, "freetype-font", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "freetype-fontsize",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* Look what method was requested */
     var_Get( p_vout, "freetype-font", &val );
-    psz_fontfile = (char *)malloc( PATH_MAX + 1 );
-    strcat( psz_fontfile, val.psz_string );
-    free( val.psz_string);
-    
+    psz_fontfile = val.psz_string;
+
     if( !psz_fontfile || !*psz_fontfile )
     {
         if( psz_fontfile ) free( psz_fontfile );
@@ -162,7 +153,7 @@ static int Create( vlc_object_t *p_this )
         GetWindowsDirectory( psz_fontfile, PATH_MAX + 1 );
         strcat( psz_fontfile, "\\fonts\\arial.ttf" );
 #elif SYS_DARWIN
-        strcat( psz_fontfile, DEFAULT_FONT );
+        strcpy( psz_fontfile, DEFAULT_FONT );
 #endif
     }
 

@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.18 2003/07/23 21:45:13 hartman Exp $
+ * $Id: sub.c,v 1.19 2003/07/23 23:05:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -94,26 +94,10 @@ static int Open ( vlc_object_t *p_this )
     p_sub->pf_close = sub_close;
 
     /* Initialize the variables */
-    if( !var_Type( p_this, "sub-file" ) )
-    {
-        var_Create( p_this, "sub-file", VLC_VAR_STRING );
-        var_Change( p_this, "sub-file", VLC_VAR_INHERITVALUE, NULL, NULL );
-    }
-    if( !var_Type( p_this, "sub-fps" ) )
-    {
-        var_Create( p_this, "sub-fps", VLC_VAR_FLOAT );
-        var_Change( p_this, "sub-fps", VLC_VAR_INHERITVALUE, NULL, NULL );
-    }
-    if( !var_Type( p_this, "sub-delay" ) )
-    {
-        var_Create( p_this, "sub-delay", VLC_VAR_INTEGER );
-        var_Change( p_this, "sub-delay", VLC_VAR_INHERITVALUE, NULL, NULL );
-    }
-    if( !var_Type( p_this, "sub-type" ) )
-    {
-        var_Create( p_this, "sub-type", VLC_VAR_STRING );
-        var_Change( p_this, "sub-type", VLC_VAR_INHERITVALUE, NULL, NULL );
-    }
+    var_Create( p_this, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "sub-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "sub-delay", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "sub-type", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     return VLC_SUCCESS;
 }
@@ -269,11 +253,11 @@ static int  sub_open ( subtitle_demux_t *p_sub,
         var_Get( p_sub, "sub-file", &val );
         if( !val.psz_string || !*val.psz_string )
         {
-            if( val.psz_string) free( val.psz_string);
+            if( val.psz_string ) free( val.psz_string );
+        msg_Err( p_sub, "cannot open `%s' subtitle fileeee", val.psz_string );
             return VLC_EGENERIC;
         }
-        psz_name = strdup( val.psz_string );
-        free( val.psz_string );
+        psz_name = val.psz_string;
     }
     else
     {
@@ -401,15 +385,14 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     {
         if( sub_read_subtitle_function[i].i_type == SUB_TYPE_UNKNOWN )
         {
-            msg_Dbg( p_input, "unknown subtitile file" );
+            msg_Dbg( p_input, "unknown subtitle file" );
             text_unload( &txt );
             return VLC_EGENERIC;
         }
 
         if( sub_read_subtitle_function[i].i_type == i_sub_type )
         {
-            msg_Dbg( p_input,
-                    "detected %s format",
+            msg_Dbg( p_input, "detected %s format",
                     sub_read_subtitle_function[i].psz_name );
             pf_read_subtitle = sub_read_subtitle_function[i].pf_read_subtitle;
             break;
