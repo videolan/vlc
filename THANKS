@@ -82,6 +82,7 @@ Rene Gollent <rgollent at u.arizona.edu> - BeOS interface fix
 Roine Gustafsson <roine at popstar.com> - spudec bug fixes
 Rudolf Cornelissen <rag.cornelissen at inter.nl.net> - BeOS fixes
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
+Steve Lhomme <steve dot lhomme at free dot fr> - MSVC fixes and Matroska enhancements
 Steve Brown <sbrown at cortland.com> - fix for optional PES size bug
 Steven M. Schultz <sms at TO.GD-ES.COM> - BSD/OS port
 Tadashi Jokagi <elf2000 at users.sourceforge dot net> - Japanese translation
