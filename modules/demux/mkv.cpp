@@ -234,6 +234,7 @@ class EbmlParser
 
     void Up( void );
     void Down( void );
+    void Reset( void );
     EbmlElement *Get( void );
     void        Keep( void );
 
@@ -502,6 +503,7 @@ public:
     void ParseTracks( EbmlElement *tracks );
     void ParseChapterAtom( int i_level, EbmlMaster *ca, chapter_item_t & chapters );
     void ParseTrackEntry( EbmlMaster *m );
+    void IndexAppendCluster( KaxCluster *cluster );
 };
 
 class matroska_stream_t
@@ -595,7 +597,6 @@ static void Seek   ( demux_t *, mtime_t i_date, double f_percent, const chapter_
 
 #define MKV_IS_ID( el, C ) ( EbmlId( (*el) ) == C::ClassInfos.GlobalId )
 
-static void IndexAppendCluster  ( demux_t *p_demux, KaxCluster *cluster );
 static char *UTF8ToStr          ( const UTFstring &u );
 static void LoadCues            ( demux_t * );
 static void InformationCreate   ( demux_t * );
@@ -612,6 +613,8 @@ static int Open( vlc_object_t * p_this )
     uint8_t            *p_peek;
     std::string        s_path, s_filename;
     size_t             i_track;
+    vlc_stream_io_callback *p_io_callback;
+    EbmlStream         *p_io_stream;
 
     EbmlElement *el = NULL;
 
@@ -627,52 +630,43 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = new demux_sys_t( *p_demux );
 
-    p_stream = new matroska_stream_t( *p_sys );
+    p_io_callback = new vlc_stream_io_callback( p_demux->s );
+    p_io_stream = new EbmlStream( *p_io_callback );
 
-    p_sys->streams.push_back( p_stream );
-    p_sys->i_current_stream = 0;
-
-    p_stream->p_in = new vlc_stream_io_callback( p_demux->s );
-    p_stream->p_es = new EbmlStream( *p_stream->p_in );
-
-    if( p_stream->p_es == NULL )
+    if( p_io_stream == NULL )
     {
         msg_Err( p_demux, "failed to create EbmlStream" );
+        delete p_io_callback;
         delete p_sys;
         return VLC_EGENERIC;
     }
 
-    p_segment = new matroska_segment_t( *p_sys, *p_stream->p_es );
-
-    p_stream->segments.push_back( p_segment );
-    p_stream->i_current_segment = 0;
-
-    /* Find the EbmlHead element */
-    el = p_stream->p_es->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
-    if( el == NULL )
-    {
-        msg_Err( p_demux, "cannot find EbmlHead" );
-        goto error;
-    }
-    msg_Dbg( p_demux, "EbmlHead" );
-    /* skip it */
-    el->SkipData( *p_stream->p_es, el->Generic().Context );
-    delete el;
-
-    /* Find a segment */
-    el = p_stream->p_es->FindNextID( KaxSegment::ClassInfos, 0xFFFFFFFFL);
-    if( el == NULL )
+    p_stream = p_sys->AnalyseAllSegmentsFound( p_io_stream );
+    if( p_stream == NULL )
     {
         msg_Err( p_demux, "cannot find KaxSegment" );
         goto error;
     }
-    MkvTree( *p_demux, 0, "Segment" );
-    p_segment->segment = (KaxSegment*)el;
-    p_segment->cluster = NULL;
+    p_sys->streams.push_back( p_stream );
+    p_sys->i_current_stream = 0;
 
-    p_segment->ep = new EbmlParser( p_stream->p_es, el );
+    p_stream->p_in = p_io_callback;
+    p_stream->p_es = p_io_stream;
 
-    p_segment->Preload( );
+    for (size_t i=0; i<p_stream->segments.size(); i++)
+    {
+        p_stream->segments[i]->Preload();
+    }
+    p_stream->i_current_segment = 0;
+
+    p_segment = p_stream->Segment();
+    if( p_segment->cluster == NULL )
+    {
+        msg_Err( p_demux, "cannot find any cluster, damaged file ?" );
+        goto error;
+    }
+    // reset the stream reading to the first cluster of the segment used
+    p_stream->p_in->setFilePointer( p_segment->cluster->GetElementPosition() );
 
     /* get the files from the same dir from the same family (based on p_demux->psz_path) */
     /* TODO handle multi-segment files */
@@ -739,12 +733,6 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    if( p_segment->cluster == NULL )
-    {
-        msg_Err( p_demux, "cannot find any cluster, damaged file ?" );
-        goto error;
-    }
-
     p_sys->PreloadFamily( );
     p_sys->PreloadLinked( );
 
@@ -764,7 +752,7 @@ static int Open( vlc_object_t * p_this )
     {
         msg_Warn( p_demux, "no cues/empty cues found->seek won't be precise" );
 
-        IndexAppendCluster( p_demux, p_segment->cluster );
+        p_segment->IndexAppendCluster( p_segment->cluster );
 
         p_segment->b_cues = VLC_FALSE;
     }
@@ -1230,7 +1218,7 @@ static int BlockGet( demux_t *p_demux, KaxBlock **pp_block, int64_t *pi_ref1, in
                 if( p_segment->i_index == 0 ||
                     ( p_segment->i_index > 0 && p_segment->index[p_segment->i_index - 1].i_position < (int64_t)p_segment->cluster->GetElementPosition() ) )
                 {
-                    IndexAppendCluster( p_demux, p_segment->cluster );
+                    p_segment->IndexAppendCluster( p_segment->cluster );
                 }
 
                 p_segment->ep->Down();
@@ -1419,9 +1407,6 @@ matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
     {
         return NULL;
     }
-
-    matroska_stream_t *p_stream1 = new matroska_stream_t( *this );
-
     p_l0->SkipData(*p_estream, EbmlHead_Context);
     delete p_l0;
 
@@ -1429,9 +1414,10 @@ matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
     p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
     if (p_l0 == NULL)
     {
-        delete p_stream1;
-        return false;
+        return NULL;
     }
+
+    matroska_stream_t *p_stream1 = new matroska_stream_t( *this );
 
     while (p_l0 != 0)
     {
@@ -1616,7 +1602,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
                         KaxCluster *cluster = (KaxCluster*)el;
 
                         /* add it to the index */
-                        IndexAppendCluster( p_demux, cluster );
+                        p_segment->IndexAppendCluster( cluster );
 
                         if( (int64_t)cluster->GetElementPosition() >= i_pos )
                         {
@@ -1916,6 +1902,13 @@ void EbmlParser::Keep( void )
 int EbmlParser::GetLevel( void )
 {
     return mi_user_level;
+}
+
+void EbmlParser::Reset( void )
+{
+    delete m_el[mi_level];
+    m_el[mi_level] = NULL;
+    m_es->I_O().setFilePointer( m_el[0]->GetElementPosition() + m_el[0]->ElementSize(true) - m_el[0]->GetSize() );
 }
 
 EbmlElement *EbmlParser::Get( void )
@@ -3106,24 +3099,20 @@ static void InformationCreate( demux_t *p_demux )
  * Divers
  *****************************************************************************/
 
-static void IndexAppendCluster( demux_t *p_demux, KaxCluster *cluster )
+void matroska_segment_t::IndexAppendCluster( KaxCluster *cluster )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    matroska_stream_t  *p_stream = p_sys->Stream();
-    matroska_segment_t *p_segment = p_stream->Segment();
-
-#define idx p_segment->index[p_segment->i_index]
+#define idx index[i_index]
     idx.i_track       = -1;
     idx.i_block_number= -1;
     idx.i_position    = cluster->GetElementPosition();
     idx.i_time        = -1;
     idx.b_key         = VLC_TRUE;
 
-    p_segment->i_index++;
-    if( p_segment->i_index >= p_segment->i_index_max )
+    i_index++;
+    if( i_index >= i_index_max )
     {
-        p_segment->i_index_max += 1024;
-        p_segment->index = (mkv_index_t*)realloc( p_segment->index, sizeof( mkv_index_t ) * p_segment->i_index_max );
+        i_index_max += 1024;
+        index = (mkv_index_t*)realloc( index, sizeof( mkv_index_t ) * i_index_max );
     }
 #undef idx
 }
@@ -3358,6 +3347,8 @@ bool matroska_segment_t::Preload( )
         return false;
 
     EbmlElement *el = NULL;
+
+    ep->Reset();
 
     while( ( el = ep->Get() ) != NULL )
     {
