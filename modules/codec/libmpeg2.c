@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.22 2003/06/10 23:01:40 massiot Exp $
+ * $Id: libmpeg2.c,v 1.23 2003/07/13 12:15:23 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -122,7 +122,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     data_packet_t   *p_data = NULL;
     mpeg2_state_t   state;
     picture_t       *p_pic;
-    int             i_aspect, i_chroma;
+    int             i_aspect;
+    int             i_pic;
 
     /* Allocate the memory needed to store the thread's structure */
     if( (p_dec = (dec_thread_t *)malloc (sizeof(dec_thread_t)) )
@@ -279,12 +280,25 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                     p_dec->p_info->sequence->pixel_height;
             }
 
-            i_chroma = VLC_FOURCC('Y','V','1','2');
+            if ( p_dec->p_vout != NULL )
+            { 
+                /* Temporary hack to free the pictures in use by libmpeg2 */
+                for ( i_pic = 0; i_pic < p_dec->p_vout->render.i_pictures; i_pic++ )
+                {
+                    if( p_dec->p_vout->render.pp_picture[i_pic]->i_status ==
+                          RESERVED_PICTURE )
+                        vout_DestroyPicture( p_dec->p_vout,
+                                         p_dec->p_vout->render.pp_picture[i_pic] );
+                    if( p_dec->p_vout->render.pp_picture[i_pic]->i_refcount > 0 )
+                        vout_UnlinkPicture( p_dec->p_vout,
+                                         p_dec->p_vout->render.pp_picture[i_pic] );
+                }
+            }
 
             p_dec->p_vout = vout_Request( p_dec->p_fifo, p_dec->p_vout,
                                           p_dec->p_info->sequence->width,
                                           p_dec->p_info->sequence->height,
-                                          i_chroma, i_aspect );
+                                          VLC_FOURCC('Y','V','1','2'), i_aspect );
 
             msg_Dbg( p_dec->p_fifo, "%dx%d, aspect %d, %u.%03u fps",
                      p_dec->p_info->sequence->width,
