@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.26 2002/08/15 12:11:15 sam Exp $
+ * $Id: libvlc.c,v 1.27 2002/08/18 13:49:20 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -104,7 +104,6 @@ static void Version       ( void );
 
 #ifndef WIN32
 static void InitSignalHandler   ( void );
-static void SimpleSignalHandler ( int i_signal );
 static void FatalSignalHandler  ( int i_signal );
 #endif
 
@@ -1130,6 +1129,8 @@ static void ListModules( vlc_t *p_this )
         psz_spaces[i] = ' ';
     }
 
+    vlc_list_release( p_list );
+
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
         fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
         getchar();
@@ -1192,26 +1193,8 @@ static void InitSignalHandler( void )
     signal( SIGQUIT, FatalSignalHandler );
 
     /* Other signals */
-    signal( SIGALRM, SimpleSignalHandler );
-    signal( SIGPIPE, SimpleSignalHandler );
-}
-
-/*****************************************************************************
- * SimpleSignalHandler: system signal handler
- *****************************************************************************
- * This function is called when a non fatal signal is received by the program.
- *****************************************************************************/
-static void SimpleSignalHandler( int i_signal )
-{
-    int i_index;
-
-    /* Acknowledge the signal received and warn all the p_vlc structures */
-    vlc_mutex_lock( &global_lock );
-    for( i_index = 0 ; i_index < i_vlc ; i_index++ )
-    {
-        msg_Warn( pp_vlc[ i_index ], "ignoring signal %d", i_signal );
-    }
-    vlc_mutex_unlock( &global_lock );
+    signal( SIGALRM, SIG_IGN );
+    signal( SIGPIPE, SIG_IGN );
 }
 
 /*****************************************************************************
