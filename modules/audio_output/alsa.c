@@ -234,6 +234,7 @@ static void Probe( aout_instance_t * p_aout,
     if( val.i_int <= 0 )
     {
         /* Probe() has failed. */
+        msg_Dbg( p_aout, "failed to find a useable alsa configuration" );
         var_Destroy( p_aout, "audio-device" );
         return;
     }
