@@ -1,3 +1,44 @@
+2003-02-03 Monday 01:39  sam
+
+   * ./modules/audio_output/alsa.c: Woody ALSA compilation fix.
+
+2003-02-03 Monday 01:23  sam
+
+   * ./debian/control: missing build dependencies.
+
+2003-02-03 Monday 01:00  massiot
+
+ German translation, croutesy of Felix Kuehne.
+
+2003-02-03 Monday 00:11  massiot
+
+ Worked around a bug with the Screens menu and localization.
+
+2003-02-02 Sunday 21:59  hartman
+
+ * OSX version can open .asx files. so we need to let the os know that ;)
+
+2003-02-02 Sunday 21:21  sam
+
+   * ./include/vlc_config.h: changed "VideoLAN Client" into VLC.
+
+2003-02-02 Sunday 21:07  sam
+
+   * ./debian/vlc.desktop: removed unnecessary file.
+
+2003-02-02 Sunday 21:01  sam
+
+   * ./debian/Makefile.am: added woody-buildpackage, removed *.woody.
+
+2003-02-02 Sunday 21:01  sam
+
+   * ./debian/changelog: updated Debian changelog.
+
+2003-02-02 Sunday 20:45  sam
+
+   * ./ChangeLog: used cvs2cl (./cvs2cl.pl --hide-filenames --no-wrap -w
+     --stdout | sed -e 's/^[^0-9]/ /' -e 's/^  *$//' | uniq).
+
 2003-02-02 Sunday 19:57  sam
 
    * ./debian/woody-buildpackage: finished Woody build script.

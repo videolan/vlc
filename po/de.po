@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.73.3\n"
-"POT-Creation-Date: 2003-02-02 03:07+0100\n"
+"POT-Creation-Date: 2003-02-03 01:40+0100\n"
 "PO-Revision-Date: 2002-04-18 23:38+0100\n"
 "Last-Translator: Felix Kuehne <fk@aenneburghardt.de><fk@aenneburghardt.de>\n"
 "Language-Team: \n"
@@ -473,9 +473,10 @@ msgstr "Netzwerk Schnittstelle"
 msgid ""
 "If you have several interfaces on your Linux machine and use the VLAN "
 "solution, you may indicate here which interface to use."
-msgstr "Wenn Sie mehrere Benutzeroberflächen auf Ihrem Linux-Rechner "
-"haben und die VLAN-Lösung (VLAN solution) benutzen, können Sie hier "
-"angeben, welche Benutzeroberfläche benutzt werden soll."
+msgstr ""
+"Wenn Sie mehrere Benutzeroberflächen auf Ihrem Linux-Rechner haben und die "
+"VLAN-Lösung (VLAN solution) benutzen, können Sie hier angeben, welche "
+"Benutzeroberfläche benutzt werden soll."
 
 #: src/libvlc.h:217
 msgid "network interface address"
@@ -670,8 +671,7 @@ msgstr "mux Modul"
 
 #: src/libvlc.h:312
 msgid "This is a legacy entry to let you configure mux modules"
-msgstr ""
-"Dies ist ein Eintrag mit dem Sie die mux-Module konfigurieren können."
+msgstr "Dies ist ein Eintrag mit dem Sie die mux-Module konfigurieren können."
 
 #: src/libvlc.h:314
 msgid "access output module"
@@ -691,8 +691,7 @@ msgstr "MMX Unterstützung aktivieren"
 msgid ""
 "If your processor supports the MMX instructions set, VLC can take advantage "
 "of them."
-msgstr ""
-"Falls Ihr Prozessor MMX Befehle unterstützt, kann VLC diese benutzen."
+msgstr "Falls Ihr Prozessor MMX Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:324
 msgid "enable CPU 3D Now! support"
@@ -724,8 +723,7 @@ msgstr "SSE Unterstüzung aktivieren"
 msgid ""
 "If your processor supports the SSE instructions set, VLC can take advantage "
 "of them."
-msgstr ""
-"Falls Ihr Prozessor SSE Befehle unterstützt, kann VLC diese benutzen."
+msgstr "Falls Ihr Prozessor SSE Befehle unterstützt, kann VLC diese benutzen."
 
 #: src/libvlc.h:339
 msgid "enable CPU AltiVec support"
@@ -756,7 +754,9 @@ msgstr "Abspielliste beim Starten aufrufen"
 
 #: src/libvlc.h:351
 msgid "If you want VLC to start playing on startup, then enable this option."
-msgstr "Wenn VLC beim Start anfangen soll, die Liste abzuspielen, aktivieren Sie dies."
+msgstr ""
+"Wenn VLC beim Start anfangen soll, die Liste abzuspielen, aktivieren Sie "
+"dies."
 
 #: src/libvlc.h:353
 msgid "enqueue items in playlist"
@@ -1333,8 +1333,8 @@ msgstr "wave header hinzufügen"
 #: modules/audio_output/file.c:87
 msgid "instead of writing a raw file, you can add a wav header to the file"
 msgstr ""
-"Anstatt in eine raw Datei zu schreiben, können Sie einen Header der "
-"Datei hinzufügen"
+"Anstatt in eine raw Datei zu schreiben, können Sie einen Header der Datei "
+"hinzufügen"
 
 #: modules/audio_output/file.c:104
 msgid "path of the output file"
@@ -2312,7 +2312,8 @@ msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
 msgstr ""
-"Sonst können Sie ein Medien-Finder (MRL) mit einer dieser vordefinierten Ziele erzeugen:"
+"Sonst können Sie ein Medien-Finder (MRL) mit einer dieser vordefinierten "
+"Ziele erzeugen:"
 
 #: modules/gui/gtk/gnome_interface.c:1610
 #: modules/gui/gtk/gnome_interface.c:2105 modules/gui/gtk/gtk_interface.c:1925
@@ -3666,8 +3667,8 @@ msgstr "Umwandlungstyp"
 #: modules/video_filter/transform.c:58
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
 msgstr ""
-"Einer von 90, 180, 270, hflip (horizontal umkehren) oder "
-"vflip (vertikal umkehren)"
+"Einer von 90, 180, 270, hflip (horizontal umkehren) oder vflip (vertikal "
+"umkehren)"
 
 #: modules/video_filter/transform.c:66
 msgid "image transformation module"
