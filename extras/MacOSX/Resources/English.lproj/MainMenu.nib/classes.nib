@@ -204,7 +204,6 @@
             OUTLETS = {
                 "o_btn_cancel" = id; 
                 "o_btn_ok" = id; 
-                "o_ckbox_enqueue" = id; 
                 "o_disc_chapter" = id; 
                 "o_disc_chapter_lbl" = id; 
                 "o_disc_chapter_stp" = id; 

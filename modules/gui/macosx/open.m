@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.38 2003/09/19 23:03:27 hartman Exp $
+ * $Id: open.m,v 1.39 2003/10/19 23:12:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -134,7 +134,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
-    [o_ckbox_enqueue setTitle: _NS("Only enqueue in playlist, do not play")];
 
     [o_btn_ok setTitle: _NS("OK")];
     [o_btn_cancel setTitle: _NS("Cancel")];
@@ -233,7 +232,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     {
         NSMutableDictionary *o_dic;
         NSMutableArray *o_options = [NSMutableArray array];
-        BOOL b_enq = [o_ckbox_enqueue state] == NSOnState ? YES : NO;
         o_dic = [NSMutableDictionary dictionaryWithObject: [o_mrl stringValue] forKey: @"ITEM_URL"];
         
         if( [o_file_sub_ckbox state] == NSOnState )
@@ -250,7 +248,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             [o_options addObject: [NSString stringWithFormat: @"sout=%@", [(VLCOutput *)o_sout_options getMRL]]];
         }
         [o_dic setObject: (NSArray *)[o_options copy] forKey: @"ITEM_OPTIONS"];
-        [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:b_enq];
+        [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:NO];
     }
 }
 

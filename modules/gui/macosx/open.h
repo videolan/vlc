@@ -2,7 +2,7 @@
  * open.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.h,v 1.15 2003/07/27 23:05:41 hartman Exp $
+ * $Id: open.h,v 1.16 2003/10/19 23:12:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -40,7 +40,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
     IBOutlet id o_btn_ok;
     IBOutlet id o_btn_cancel;
-    IBOutlet id o_ckbox_enqueue;
 
     IBOutlet id o_file_path;
     IBOutlet id o_file_btn_browse;

@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.33 2003/09/22 03:40:05 hartman Exp $
+ * $Id: playlist.m,v 1.34 2003/10/19 23:12:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -29,6 +29,7 @@
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
 #include <math.h>
+#include <sys/mount.h>
 
 #include "intf.h"
 #include "playlist.h"
@@ -315,24 +316,44 @@ int MacVersion102 = -1;
     {
         /* One item */
         NSDictionary *o_one_item;
-        NSString *o_url;
-        NSString *o_name;
-        NSArray *o_options;
-        int j, i_total_options = 0;
-        char **ppsz_options = NULL;
+        int j;
+        int i_total_options = 0;
         int i_mode = PLAYLIST_INSERT;
-        
+        BOOL b_rem = FALSE, b_dir = FALSE;
+        NSString *o_url, *o_name;
+        NSArray *o_options;
+        char **ppsz_options = NULL;
+    
         /* Get the item */
         o_one_item = [o_array objectAtIndex: i_item];
         o_url = (NSString *)[o_one_item objectForKey: @"ITEM_URL"];
         o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
         o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
         
-        if( !o_name) o_name = o_url;
-        
+        /* If no name, then make a guess */
+        if( !o_name) o_name = [[NSFileManager defaultManager] displayNameAtPath: o_url];
+    
+        if( [[NSFileManager defaultManager] fileExistsAtPath:o_url isDirectory:&b_dir] && b_dir &&
+            [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath: o_url isRemovable: &b_rem
+                    isWritable:NULL isUnmountable:NULL description:NULL type:NULL] && b_rem   )
+        {
+            /* All of this is to make sure CD's play when you D&D them on VLC */
+            /* Converts mountpoint to a /dev file */
+            struct statfs *buf;
+            char *psz_dev, *temp;
+            buf = (struct statfs *) malloc (sizeof(struct statfs));
+            statfs( [o_url fileSystemRepresentation], buf );
+            psz_dev = strdup(buf->f_mntfromname);
+            free( buf );
+            temp = strrchr( psz_dev , 's' );
+            psz_dev[temp - psz_dev] = '\0';
+            o_url = [NSString stringWithCString: psz_dev ];
+            NSLog(@"%@", o_url);
+        }
+    
         if (i_item == 0 && !b_enqueue)
             i_mode |= PLAYLIST_GO;
-
+    
         if( o_options && [o_options count] > 0 )
         {
             /* Count the input options */
@@ -347,16 +368,17 @@ int MacVersion102 = -1;
                 ppsz_options[j] = strdup([[o_options objectAtIndex:j] UTF8String]);
             }
         }
-        
-        playlist_AddExt( p_playlist, [o_name UTF8String], [o_url fileSystemRepresentation], -1, 
+    
+        playlist_AddExt( p_playlist, [o_url fileSystemRepresentation], [o_name UTF8String], -1, 
             (ppsz_options != NULL ) ? (const char **)ppsz_options : 0, i_total_options,
-            i_mode, i_position == -1 ? PLAYLIST_END : i_position + i_item );
-
+            i_mode, i_position == -1 ? PLAYLIST_END : i_position + i_item);
+    
         /* clean up */
         for( j = 0; j < i_total_options; j++ )
             free( ppsz_options[j] );
         if( ppsz_options ) free( ppsz_options );
-
+    
+        /* Recent documents menu */
         NSURL *o_true_url = [NSURL fileURLWithPath: o_url];
         if( o_true_url != nil )
         { 
@@ -386,9 +408,7 @@ int MacVersion102 = -1;
         return;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );    
     i_row = p_playlist->i_index;
-    vlc_mutex_unlock( &p_playlist->object_lock );
     vlc_object_release( p_playlist );
 
     [o_table_view selectRow: i_row byExtendingSelection: NO];
@@ -526,11 +546,9 @@ int MacVersion102 = -1;
                 o_array = [o_array arrayByAddingObject: o_dic];
             }
             [self appendArray: o_array atPos: i_proposed_row enqueue:YES];
-
-            return( YES );
+            return YES;
         }
-        
-        return( NO );
+        return NO;
     }
     [self updateRowSelection];
 }
