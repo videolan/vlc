@@ -841,6 +841,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
             p_child = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                            psz_value, p_sd->p_sys->p_node );
         }
+	free( psz_value );
     }
     else
     {
