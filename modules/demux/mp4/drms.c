@@ -1888,7 +1888,7 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
         if( strstr( psz_ipod, ISCINFO ) == NULL )
         {
             snprintf( p_tmp, sizeof(p_tmp)/sizeof(p_tmp[0]) - 1,
-                      "%s/iPod_Control/iTunes/" ISCINFO, psz_ipod );
+                      "%s/iPod_Control/iTunes/" ISCINFO "2", psz_ipod );
             psz_path = p_tmp;
         }
         else
