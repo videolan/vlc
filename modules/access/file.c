@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.14 2003/03/24 17:15:29 gbazin Exp $
+ * $Id: file.c,v 1.15 2003/03/30 18:14:35 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -72,7 +72,7 @@ static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
     "value should be set in miliseconds units." )
 
 vlc_module_begin();
-    set_description( _("Standard filesystem file reading") );
+    set_description( _("Standard filesystem file input") );
     add_category_hint( N_("file"), NULL, VLC_TRUE );
     add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "access", 50 );

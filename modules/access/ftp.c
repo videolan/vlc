@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.13 2003/03/24 23:04:07 gbazin Exp $
+ * $Id: ftp.c,v 1.14 2003/03/30 18:14:35 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -89,7 +89,7 @@ static int  ftp_StopStream ( input_thread_t *);
     "value should be set in miliseconds units." )
 
 vlc_module_begin();
-    set_description( _("ftp access module") );
+    set_description( _("FTP input") );
     set_capability( "access", 0 );
     add_category_hint( "stream", NULL, VLC_FALSE );
         add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,

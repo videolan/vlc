@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: win32.cpp,v 1.17 2003/03/01 21:32:49 ipkiss Exp $
+ * $Id: win32.cpp,v 1.18 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -314,7 +314,7 @@ vlc_module_begin();
                  MAX_LINES_LONGTEXT, VLC_TRUE );
     add_bool( "intfwin-show-captions", 0, NULL, SHOW_CAPTIONS_TEXT,
               SHOW_CAPTIONS_LONGTEXT, VLC_FALSE );
-    set_description( _("Native Windows interface module") );
+    set_description( _("Native Windows interface") );
     set_capability( "interface", 100 );
     set_callbacks( E_(Open), E_(Close) );
     add_shortcut( "win" );

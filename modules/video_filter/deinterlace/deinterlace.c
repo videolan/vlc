@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.10 2003/03/30 16:26:42 gbazin Exp $
+ * $Id: deinterlace.c,v 1.11 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -81,7 +81,7 @@ vlc_module_begin();
     add_category_hint( N_("Deinterlace"), NULL, VLC_FALSE );
     add_string_from_list( "deinterlace-mode", "discard", mode_list, NULL,
                           MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );
-    set_description( _("deinterlacing module") );
+    set_description( _("video deinterlacing filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "deinterlace" );
     set_callbacks( Create, Destroy );

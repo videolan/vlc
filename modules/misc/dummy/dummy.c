@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.4 2003/02/20 16:07:38 gbazin Exp $
+ * $Id: dummy.c,v 1.5 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,7 +50,7 @@
 #endif
 
 vlc_module_begin();
-    set_description( _("dummy functions module") );
+    set_description( _("dummy functions") );
     add_shortcut( "vlc" );
     add_submodule();
         set_capability( "interface", 0 );

@@ -2,7 +2,7 @@
  * encoder.c :  encoder wrapper plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: encoder.c,v 1.2 2003/01/28 16:57:28 sam Exp $
+ * $Id: encoder.c,v 1.3 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -50,7 +50,7 @@ static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Encoder wrapper module") );
+    set_description( _("Encoder wrapper") );
     set_capability( "video output", 0 );
     set_callbacks( Create, Destroy );
     add_shortcut( "encoder" );

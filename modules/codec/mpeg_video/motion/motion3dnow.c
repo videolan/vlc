@@ -2,7 +2,7 @@
  * motion3dnow.c : 3D Now! motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion3dnow.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: motion3dnow.c,v 1.2 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -41,7 +41,7 @@ static int Open ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("3D Now! motion compensation module") );
+    set_description( _("3D Now! motion compensation") );
     set_capability( "motion compensation", 150 );
     add_requirement( 3DNOW );
     add_shortcut( "3dn" );

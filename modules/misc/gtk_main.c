@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.14 2003/03/19 17:40:43 fenrir Exp $
+ * $Id: gtk_main.c,v 1.15 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -57,7 +57,7 @@ static vlc_object_t * p_gtk_main = NULL;
  *****************************************************************************/
 vlc_module_begin();
     int i_cap;
-    set_description( _("Gtk+ GUI helper module") );
+    set_description( _("Gtk+ GUI helper") );
 #if defined(MODULE_NAME_IS_gtk_main)
     i_cap = 90;
     add_shortcut( "gtk" );

@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.10 2003/03/17 17:11:32 sam Exp $
+ * $Id: sdl.c,v 1.11 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -103,7 +103,7 @@ static void SetPalette      ( vout_thread_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Simple DirectMedia Layer video module") );
+    set_description( _("Simple DirectMedia Layer video output") );
     set_capability( "video output", 60 );
     add_shortcut( "sdl" );
     set_callbacks( Open, Close );

@@ -2,7 +2,7 @@
  * dvdread.c : DvdRead input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dvdread.c,v 1.5 2003/03/29 13:15:33 sigmunau Exp $
+ * $Id: dvdread.c,v 1.6 2003/03/30 18:14:35 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,7 +42,7 @@ void E_(EndDVD)    ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("DVDRead input module") );
+    set_description( _("DVD input (using libdvdread)") );
     add_submodule();
         set_capability( "access", 110 );
         set_callbacks( E_(OpenDVD), E_(CloseDVD) );

@@ -2,7 +2,7 @@
  * demux.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.6 2003/03/14 00:24:07 sigmunau Exp $
+ * $Id: demux.c,v 1.7 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -43,7 +43,7 @@ static void Deactivate  ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("AAC stream demux" ) );
+    set_description( _("AAC stream demuxer" ) );
     set_capability( "demux", 0 );
     set_callbacks( Activate, NULL );
     add_shortcut( "aac" );

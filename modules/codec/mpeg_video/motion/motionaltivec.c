@@ -2,7 +2,7 @@
  * motionaltivec.c : AltiVec motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionaltivec.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: motionaltivec.c,v 1.2 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Paul Mackerras <paulus@linuxcare.com.au>
@@ -44,7 +44,7 @@ static int Open ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("AltiVec motion compensation module") );
+    set_description( _("AltiVec motion compensation") );
     set_capability( "motion compensation", 150 );
     add_requirement( ALTIVEC );
     add_shortcut( "altivec" );

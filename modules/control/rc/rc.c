@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.29 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: rc.c,v 1.30 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -86,7 +86,7 @@ vlc_module_begin();
 #ifdef HAVE_ISATTY
     add_bool( "fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );
 #endif
-    set_description( _("remote control interface module") );
+    set_description( _("remote control interface") );
     set_capability( "interface", 20 );
     set_callbacks( Activate, NULL );
 vlc_module_end();

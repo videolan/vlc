@@ -41,7 +41,7 @@ void E_(CloseVideo)   ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("QNX RTOS module") );
+    set_description( _("QNX RTOS video and audio output") );
     add_submodule();
         set_capability( "video output", 100 );
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );

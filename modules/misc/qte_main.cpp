@@ -2,7 +2,7 @@
  * qte_main.c : QT Embedded wrapper for gte_main
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: qte_main.cpp,v 1.5 2003/03/17 18:02:10 sam Exp $
+ * $Id: qte_main.cpp,v 1.6 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -63,7 +63,7 @@ static qte_thread_t * p_qte_main = NULL;
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Qt Embedded GUI helper module") );
+    set_description( _("Qt Embedded GUI helper") );
     set_capability( "gui-helper", 90 );
     add_shortcut( "qte" );
     set_callbacks( Open, Close );

@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.24 2003/02/20 16:07:38 gbazin Exp $
+ * $Id: alsa.c,v 1.25 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -91,7 +91,7 @@ vlc_module_begin();
     add_category_hint( N_("ALSA"), NULL, VLC_FALSE );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
                 N_("ALSA device name"), NULL, VLC_FALSE );
-    set_description( _("ALSA audio module") );
+    set_description( _("ALSA audio output") );
     set_capability( "audio output", 50 );
     set_callbacks( Open, Close );
 vlc_module_end();

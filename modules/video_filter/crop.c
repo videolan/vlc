@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: crop.c,v 1.9 2003/03/18 23:30:28 gbazin Exp $
+ * $Id: crop.c,v 1.10 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,7 +61,7 @@ vlc_module_begin();
     add_category_hint( N_("Crop"), NULL, VLC_FALSE );
     add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT, GEOMETRY_LONGTEXT, VLC_FALSE );
     add_bool( "autocrop", 0, NULL, AUTOCROP_TEXT, AUTOCROP_LONGTEXT, VLC_FALSE );
-    set_description( _("image crop video module") );
+    set_description( _("crop video filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "crop" );
     set_callbacks( Create, Destroy );

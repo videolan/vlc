@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.15 2003/03/23 12:12:32 gbazin Exp $
+ * $Id: audio.c,v 1.16 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ static int  Demux ( input_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("MPEG I/II audio stream demux" ) );
+    set_description( _("MPEG I/II audio stream demuxer" ) );
     set_capability( "demux", 50 );
     set_callbacks( Activate, NULL );
     add_shortcut( "mpegaudio" );

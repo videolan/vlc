@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.15 2003/03/28 17:02:25 gbazin Exp $
+ * $Id: directx.c,v 1.16 2003/03/30 18:14:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -112,7 +112,7 @@ vlc_module_begin();
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT, VLC_TRUE );
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT, VLC_TRUE );
     add_bool( "directx-3buffering", 1, NULL, TRIPLEBUF_TEXT, TRIPLEBUF_LONGTEXT, VLC_TRUE );
-    set_description( _("DirectX video module") );
+    set_description( _("DirectX video output") );
     set_capability( "video output", 100 );
     add_shortcut( "directx" );
     set_callbacks( OpenVideo, CloseVideo );

@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.3 2002/11/28 21:00:48 gbazin Exp $
+ * $Id: theora.c,v 1.4 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -81,7 +81,7 @@ static void theora_CopyPicture( dec_thread_t *, picture_t *, yuv_buffer * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Theora decoder module") );
+    set_description( _("Theora video decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, NULL );
     add_shortcut( "theora" );

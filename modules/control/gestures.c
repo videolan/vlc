@@ -2,7 +2,7 @@
  * geatures.c: control vlc with mouse gestures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gestures.c,v 1.3 2003/03/08 01:55:28 sigmunau Exp $
+ * $Id: gestures.c,v 1.4 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -90,7 +90,7 @@ vlc_module_begin();
     add_integer( "gestures-threshold", 30, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, VLC_TRUE );
     add_string_from_list( "gestures-button", "right", button_list, NULL,
                           BUTTON_TEXT, BUTTON_LONGTEXT, VLC_FALSE );
-    set_description( _("mouse gestures control module") );
+    set_description( _("mouse gestures control interface") );
 
     set_capability( "interface", 0 );
     set_callbacks( E_(Open), E_(Close) );

@@ -2,7 +2,7 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.2 2002/08/09 16:39:08 sam Exp $
+ * $Id: memcpy.c,v 1.3 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -78,23 +78,23 @@ static int Activate ( vlc_object_t *p_this )
  *****************************************************************************/
 vlc_module_begin();
 #ifdef MODULE_NAME_IS_memcpy
-    set_description( _("libc memcpy module") );
+    set_description( _("libc memcpy") );
     add_shortcut( "c" );
     add_shortcut( "libc" );
 #elif defined( MODULE_NAME_IS_memcpy3dn )
-    set_description( _("3D Now! memcpy module") );
+    set_description( _("3D Now! memcpy") );
     add_requirement( 3DNOW );
     add_shortcut( "3dn" );
     add_shortcut( "3dnow" );
     add_shortcut( "memcpy3dn" );
     add_shortcut( "memcpy3dnow" );
 #elif defined( MODULE_NAME_IS_memcpymmx )
-    set_description( _("MMX memcpy module") );
+    set_description( _("MMX memcpy") );
     add_requirement( MMX );
     add_shortcut( "mmx" );
     add_shortcut( "memcpymmx" );
 #elif defined( MODULE_NAME_IS_memcpymmxext )
-    set_description( _("MMX EXT memcpy module") );
+    set_description( _("MMX EXT memcpy") );
     add_requirement( MMXEXT );
     add_shortcut( "mmxext" );
     add_shortcut( "memcpymmxext" );

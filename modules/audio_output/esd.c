@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.17 2003/01/28 22:52:30 sam Exp $
+ * $Id: esd.c,v 1.18 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,7 +61,7 @@ static void Play         ( aout_instance_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("EsounD audio module") );
+    set_description( _("EsounD audio output") );
     set_capability( "audio output", 50 );
     set_callbacks( Open, Close );
     add_shortcut( "esound" );

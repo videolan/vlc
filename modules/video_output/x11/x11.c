@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.5 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: x11.c,v 1.6 2003/03/30 18:14:39 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,7 +65,7 @@ vlc_module_begin();
 #ifdef HAVE_SYS_SHM_H
     add_bool( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, VLC_TRUE );
 #endif
-    set_description( _("X11 module") );
+    set_description( _("X11 video output") );
     set_capability( "video output", 50 );
     set_callbacks( E_(Activate), E_(Deactivate) );
 vlc_module_end();

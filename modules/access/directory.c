@@ -2,7 +2,7 @@
  * directory.c: expands a directory (directory: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: directory.c,v 1.3 2003/03/24 17:15:29 gbazin Exp $
+ * $Id: directory.c,v 1.4 2003/03/30 18:14:35 gbazin Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -79,7 +79,7 @@ static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
  *****************************************************************************/
 
 vlc_module_begin();
-    set_description( _("Standard filesystem directory reading") );
+    set_description( _("Standard filesystem directory input") );
     set_capability( "access", 55 );
     add_shortcut( "directory" );
     add_shortcut( "dir" );

@@ -2,7 +2,7 @@
  * motionmmxext.c : MMX EXT motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmxext.c,v 1.2 2002/08/08 00:35:11 sam Exp $
+ * $Id: motionmmxext.c,v 1.3 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -41,7 +41,7 @@ static int Open ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("MMX EXT motion compensation module") );
+    set_description( _("MMX EXT motion compensation") );
     set_capability( "motion compensation", 200 );
     add_requirement( MMXEXT );
     add_shortcut( "mmxext" );

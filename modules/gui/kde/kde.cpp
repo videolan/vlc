@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.9 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: kde.cpp,v 1.10 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -53,7 +53,7 @@ vlc_module_begin();
     int i = getenv( "DISPLAY" ) == NULL ? 8 : 85;
     add_category_hint( "kde", NULL, VLC_TRUE );
     add_file( "kdeuirc", DATA_PATH "/ui.rc", NULL, N_( "path to ui.rc file" ), NULL, VLC_TRUE );
-    set_description( _("KDE interface module") );
+    set_description( _("KDE interface") );
     set_capability( "interface", i );
     set_program( "kvlc" );
     set_callbacks( open, close );

@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.21 2003/01/28 16:57:28 sam Exp $
+ * $Id: decoder.c,v 1.22 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -52,7 +52,7 @@ static void EndThread      ( adec_thread_t * );
  *****************************************************************************/
 
 vlc_module_begin();
-    set_description( _("AAC decoder module (libfaad2)") );
+    set_description( _("AAC audio decoder (using libfaad2)") );
     set_capability( "decoder", 60 );
     set_callbacks( OpenDecoder, NULL );
 vlc_module_end();

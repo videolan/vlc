@@ -2,7 +2,7 @@
  * screensaver.c : disable screen savers when VLC is playing
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: screensaver.c,v 1.1 2003/02/06 03:22:08 sam Exp $
+ * $Id: screensaver.c,v 1.2 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -41,7 +41,7 @@ static void Run          ( intf_thread_t *p_intf );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("screensaver disabling module") );
+    set_description( _("screensaver disabling helper") );
     set_capability( "interface", 0 );
     set_callbacks( Activate, NULL );
 vlc_module_end();

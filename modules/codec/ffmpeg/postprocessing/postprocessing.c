@@ -2,7 +2,7 @@
  * postprocessing.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: postprocessing.c,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: postprocessing.c,v 1.3 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -46,16 +46,16 @@ static int pp_postprocess( picture_t *,
  *****************************************************************************/
 vlc_module_begin();
 #ifdef MODULE_NAME_IS_postprocessing_c
-    set_description( _("C Post Processing module") );
+    set_description( _("C Post Processing") );
     set_capability( "postprocessing", 50 );
     add_shortcut( "c" );
 #elif defined( MODULE_NAME_IS_postprocessing_mmx )
-    set_description( _("MMX Post Processing module") );
+    set_description( _("MMX Post Processing") );
     set_capability( "postprocessing", 100 );
     add_requirement( MMX );
     add_shortcut( "mmx" );
 #elif defined( MODULE_NAME_IS_postprocessing_mmxext )
-    set_description( _("MMXEXT Post Processing module") );
+    set_description( _("MMXEXT Post Processing") );
     set_capability( "postprocessing", 150 );
     add_requirement( MMXEXT );
     add_shortcut( "mmxext" );

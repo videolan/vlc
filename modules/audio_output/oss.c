@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.54 2003/03/10 10:41:22 massiot Exp $
+ * $Id: oss.c,v 1.55 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -110,7 +110,7 @@ vlc_module_begin();
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
               N_("OSS dsp device"), NULL, VLC_FALSE );
     add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, VLC_TRUE );
-    set_description( _("Linux OSS /dev/dsp module") );
+    set_description( _("Linux OSS audio output") );
     set_capability( "audio output", 100 );
     add_shortcut( "oss" );
     set_callbacks( Open, Close );

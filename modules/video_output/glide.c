@@ -2,7 +2,7 @@
  * glide.c : 3dfx Glide plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: glide.c,v 1.1 2002/08/13 11:59:36 sam Exp $
+ * $Id: glide.c,v 1.2 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,7 +61,7 @@ static void CloseDisplay   ( vout_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("3dfx Glide module") );
+    set_description( _("3dfx Glide video output") );
     set_capability( "video output", 20 );
     add_shortcut( "3dfx" );
     set_callbacks( Create, Destroy );

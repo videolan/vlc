@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.8 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: xosd.c,v 1.9 2003/03/30 18:14:39 gbazin Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -80,7 +80,7 @@ vlc_module_begin();
                  SHD_OFS_TEXT, SHD_OFS_LONGTEXT, VLC_TRUE );
     add_string( "xosd-font", "-misc-fixed-medium-r-*-*-*-300-*-*-*-*-*-*",
                 NULL, FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
-    set_description( _("xosd interface module") );
+    set_description( _("xosd interface") );
     set_capability( "interface", i );
     set_callbacks( Open, Close );
 vlc_module_end();

@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: ncurses.c,v 1.3 2003/01/17 19:36:53 sam Exp $
+ * $Id: ncurses.c,v 1.4 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,7 +63,7 @@ static void ManageSlider   ( intf_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("ncurses interface module") );
+    set_description( _("ncurses interface") );
     set_capability( "interface", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "curses" );

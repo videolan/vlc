@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.5 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: xvideo.c,v 1.6 2003/03/30 18:14:39 gbazin Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -78,7 +78,7 @@ vlc_module_begin();
 #ifdef HAVE_SYS_SHM_H
     add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, VLC_TRUE );
 #endif
-    set_description( _("XVideo extension module") );
+    set_description( _("XVideo extension video output") );
     set_capability( "video output", 150 );
     set_callbacks( E_(Activate), E_(Deactivate) );
 vlc_module_end();

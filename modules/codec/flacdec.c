@@ -2,7 +2,7 @@
  * flac.c: flac decoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flacdec.c,v 1.1 2003/02/23 16:31:48 sigmunau Exp $
+ * $Id: flacdec.c,v 1.2 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -104,7 +104,7 @@ static void decoder_state_error( dec_thread_t *p_dec, FLAC__StreamDecoderState s
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("flac decoder module") );
+    set_description( _("flac audio decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, NULL );
 vlc_module_end();

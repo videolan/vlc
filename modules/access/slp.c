@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.9 2003/03/24 17:15:29 gbazin Exp $
+ * $Id: slp.c,v 1.10 2003/03/30 18:14:35 gbazin Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -75,7 +75,7 @@ static int  Demux ( input_thread_t * );
                       "default locale; it is used in all SLP queries"
 
 vlc_module_begin();
-    set_description( _("SLP access module") );
+    set_description( _("SLP input") );
     add_category_hint( N_("slp"), NULL, VLC_TRUE );
     add_string( "slp-attrids", "", NULL, ATTRIDS_TEXT, ATTRIDS_LONGTEXT, VLC_TRUE );
     add_string( "slp-scopelist", "", NULL, SCOPELIST_TEXT,

@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmxext.c,v 1.3 2002/08/08 22:28:22 sam Exp $
+ * $Id: idctmmxext.c,v 1.4 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -44,7 +44,7 @@ static int Open( vlc_object_t *p_this );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("MMX EXT IDCT module") );
+    set_description( _("MMX EXT IDCT") );
     set_capability( "idct", 200 );
     add_shortcut( "mmxext" );
     add_requirement( MMXEXT );

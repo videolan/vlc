@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.30 2003/03/24 20:00:51 gbazin Exp $
+ * $Id: mms.c,v 1.31 2003/03/30 18:14:35 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -132,7 +132,7 @@ static void mms_ParseURL( url_t *p_url, char *psz_url );
     "value should be set in miliseconds units." )
 
 vlc_module_begin();
-    set_description( _("MMS access module") );
+    set_description( _("Microsoft Media Server (MMS) input") );
     set_capability( "access", 0 );
     add_category_hint( "stream", NULL, VLC_TRUE );
         add_integer( "mms-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,

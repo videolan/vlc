@@ -2,7 +2,7 @@
  * m4v.c : MPEG-4 video Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: m4v.c,v 1.3 2003/03/14 00:24:08 sigmunau Exp $
+ * $Id: m4v.c,v 1.4 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,7 +40,7 @@ static int  Demux ( input_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("MPEG-4 video elementary stream demux" ) );
+    set_description( _("MPEG-4 video elementary stream demuxer" ) );
     set_capability( "demux", 0 );
     set_callbacks( Activate, NULL );
     add_shortcut( "m4v" );

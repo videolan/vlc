@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctclassic.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: idctclassic.c,v 1.2 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -38,7 +38,7 @@ static int Open( vlc_object_t *p_this );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("classic IDCT module") );
+    set_description( _("classic IDCT") );
     set_capability( "idct", 100 );
     add_shortcut( "classic" );
     set_callbacks( Open, NULL );

@@ -3,7 +3,7 @@
  * using MAD (MPEG Audio Decoder)
  *****************************************************************************
  * Copyright (C) 2001 by Jean-Paul Saman
- * $Id: mpgatofixed32.c,v 1.7 2003/02/21 16:31:37 hartman Exp $
+ * $Id: mpgatofixed32.c,v 1.8 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -58,7 +58,7 @@ struct aout_filter_sys_t
  *****************************************************************************/
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
-    set_description( _("MPEG audio decoder module") );
+    set_description( _("MPEG audio decoder") );
     set_capability( "audio filter", 100 );
     set_callbacks( Create, Destroy );
 vlc_module_end();

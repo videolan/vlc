@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.16 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: spudec.c,v 1.17 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -62,7 +62,7 @@ vlc_module_begin();
     add_file( "spudec-font", "share/" DEFAULT_FONT, NULL,
               FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
 #endif
-    set_description( _("subtitles decoder module") );
+    set_description( _("subtitles decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
 vlc_module_end();

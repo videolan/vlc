@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.3 2003/03/24 17:15:30 gbazin Exp $
+ * $Id: v4l.c,v 1.4 2003/03/30 18:14:36 gbazin Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,7 +42,7 @@ static int  V4lRead  ( input_thread_t *, byte_t *, size_t );
  * Module descriptior
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Video4Linux input module") );
+    set_description( _("Video4Linux input") );
     set_capability( "access", 80 );
     set_callbacks( V4lOpen, V4lClose );
 vlc_module_end();

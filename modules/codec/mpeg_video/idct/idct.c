@@ -2,7 +2,7 @@
  * idct.c : C IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idct.c,v 1.2 2002/11/20 13:37:35 sam Exp $
+ * $Id: idct.c,v 1.3 2003/03/30 18:14:36 gbazin Exp $
  *
  * Author: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -38,7 +38,7 @@ static int Open( vlc_object_t *p_this );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("IDCT module") );
+    set_description( _("IDCT") );
     set_capability( "idct", 50 );
     add_shortcut( "c" );
     set_callbacks( Open, NULL );

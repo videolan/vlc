@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.11 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: parser.c,v 1.12 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -89,7 +89,7 @@ vlc_module_begin();
     add_integer ( "vdec-smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT, VLC_TRUE );
     add_string  ( "vpar-synchro", NULL, NULL, VPAR_SYNCHRO_TEXT,
                   VPAR_SYNCHRO_LONGTEXT, VLC_TRUE );
-    set_description( _("MPEG I/II video decoder module") );
+    set_description( _("MPEG I/II video decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
 vlc_module_end();

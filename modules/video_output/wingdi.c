@@ -2,7 +2,7 @@
  * wingdi.c : Win32 / WinCE GDI video output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: wingdi.c,v 1.5 2003/01/15 13:16:39 sam Exp $
+ * $Id: wingdi.c,v 1.6 2003/03/30 18:14:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -79,7 +79,7 @@ struct vout_sys_t
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Windows GDI video output module") );
+    set_description( _("Windows GDI video output") );
     set_capability( "video output", 10 );
     set_callbacks( OpenVideo, CloseVideo );
 vlc_module_end();

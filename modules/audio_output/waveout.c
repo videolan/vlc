@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.20 2003/03/28 17:02:25 gbazin Exp $
+ * $Id: waveout.c,v 1.21 2003/03/30 18:14:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -127,7 +127,7 @@ static void InterleaveS16( int16_t *, int *, int );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Win32 waveOut extension module") );
+    set_description( _("Win32 waveOut extension output") );
     set_capability( "audio output", 50 );
     set_callbacks( Open, Close );
 vlc_module_end();

@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: BeOS.cpp,v 1.7 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: BeOS.cpp,v 1.8 2003/03/30 18:14:37 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -47,7 +47,7 @@ void E_(CloseVideo)   ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("BeOS standard API module") );
+    set_description( _("BeOS standard API interface") );
     add_submodule();
         set_capability( "interface", 100 );
         set_callbacks( E_(OpenIntf), E_(CloseIntf) );

@@ -78,7 +78,7 @@ vlc_module_begin();
                      LNB_LOF2_TEXT, LNB_LOF2_LONGTEXT, VLC_FALSE );
         add_integer( "lnb-slof", 11700, NULL,
                      LNB_SLOF_TEXT, LNB_SLOF_LONGTEXT, VLC_FALSE );
-    set_description( _("satellite input module") );
+    set_description( _("satellite input") );
     set_capability( "access", 0 );
     add_shortcut( "sat" );
     set_callbacks( E_(Open), E_(Close) );
