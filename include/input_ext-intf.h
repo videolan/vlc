@@ -378,9 +378,4 @@ VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 
-VLC_EXPORT( char *, input_OffsetToTime, ( input_thread_t *, char *, off_t ) );
-VLC_EXPORT( int, input_ToggleES, ( input_thread_t *, es_descriptor_t *, vlc_bool_t ) );
-VLC_EXPORT( int, input_ChangeArea, ( input_thread_t *, input_area_t * ) );
-VLC_EXPORT( int, input_ChangeProgram, ( input_thread_t *, uint16_t ) );
-
 #endif /* "input_ext-intf.h" */
