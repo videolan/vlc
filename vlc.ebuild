@@ -49,7 +49,7 @@ KEYWORDS="~x86 ~ppc ~sparc ~alpha ~mips ~hppa ~amd64 ~ia64 ~ppc64"
 
 RDEPEND="X? ( virtual/x11 )
 	aalib? ( >=media-libs/aalib-1.4_rc4-r2 
-			=media-libs/libcaca-0.9 )
+			>=media-libs/libcaca-0.9 )
 	alsa? ( >=media-libs/alsa-lib-0.9_rc2 )
 	dvb? ( media-libs/libdvb
 		media-tv/linuxtv-dvb )
@@ -66,6 +66,7 @@ RDEPEND="X? ( virtual/x11 )
 	lirc? ( app-misc/lirc )
 	mad? ( media-libs/libmad
 		media-libs/libid3tag )
+	matroska? ( >=media-libs/libmatroska-0.6.3 )
 	mozilla? ( >=net-www/mozilla-1.4 )
 	ncurses? ( sys-libs/ncurses )
 	nls? ( >=sys-devel/gettext-0.12.1 )
