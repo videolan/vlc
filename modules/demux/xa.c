@@ -117,7 +117,7 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->fmt.audio.i_channels = GetWLE ( &p_xa.nChannels );
     p_sys->fmt.audio.i_blockalign = p_sys->fmt.audio.i_bytes_per_frame;
-    p_sys->fmt.audio.i_bitspersample = 4;
+    p_sys->fmt.audio.i_bitspersample = 16;
     p_sys->fmt.i_bitrate = (p_sys->fmt.audio.i_rate
                             * p_sys->fmt.audio.i_bytes_per_frame * 8)
                             / p_sys->fmt.audio.i_frame_length;
@@ -196,10 +196,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
 
-    if( i_query == DEMUX_SET_POSITION )
-        return -1; /* FIXME: progressive encoding - seeking not supported */
-
-    return demux2_vaControlHelper( p_demux->s, 0, -1,
+    return demux2_vaControlHelper( p_demux->s, p_sys->i_data_offset,
+                                   p_sys->i_data_size ? p_sys->i_data_offset
+                                   + p_sys->i_data_size : -1,
                                    p_sys->fmt.i_bitrate,
                                    p_sys->fmt.audio.i_blockalign,
                                    i_query, args );
