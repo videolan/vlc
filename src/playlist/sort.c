@@ -2,7 +2,7 @@
  * sort.c : Playlist sorting functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sort.c,v 1.2 2003/11/26 10:45:21 zorglub Exp $
+ * $Id: sort.c,v 1.3 2003/12/13 17:46:07 asmax Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -41,6 +41,8 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
 {
     int i , i_small , i_position;
     playlist_item_t *p_temp;
+    vlc_value_t val;
+    val.b_bool = VLC_TRUE;
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
@@ -61,6 +63,9 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
             p_playlist->pp_items[i_new] = p_temp;
         }
         vlc_mutex_unlock( &p_playlist->object_lock );
+
+        /* Notify the interfaces (XXX: use a different variable) */
+        var_Set( p_playlist, "intf-change", val );
 
         return 0;
     }
@@ -105,6 +110,9 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
         p_playlist->pp_items[i_small] = p_temp;
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
+
+    /* Notify the interfaces (XXX: use a different variable) */
+    var_Set( p_playlist, "intf-change", val );
 
     return 0;
 }
