@@ -914,7 +914,8 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                 /* The PES header contains at least 3 more bytes: parse them */
                 p_pes->b_data_alignment = p_pes->p_pes_header[6] & 0x04;
                 p_pes->b_has_pts = p_pes->p_pes_header[7] & 0x80;
-                i_pes_header_size = 9 + p_pes->p_pes_header[8];
+                i_pes_header_size = p_pes->p_pes_header[8]
+                        + (p_es_descriptor->i_type == AC3_AUDIO_ES) ? 13 : 9;
 
                 /* Now parse the optional header extensions (in the limit of
                    the 14 bytes */
@@ -979,6 +980,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
             /* This last packet is partly header, partly payload. */
             p_ts->i_payload_start += i_pes_header_size;
 
+	    
             /* Now we can eventually put the PES packet in the decoder's
                PES fifo */
             switch( p_es_descriptor->i_type )
