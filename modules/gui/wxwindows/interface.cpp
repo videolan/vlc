@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.77 2003/12/11 05:12:37 rocky Exp $
+ * $Id: interface.cpp,v 1.78 2003/12/14 15:42:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -226,7 +226,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     wxWindow *p_dummy = new wxWindow( this, 0, wxDefaultPosition,
                                       wxSize(0,0) );
     p_dummy->SetFocus();
-    frame_sizer->Add( p_dummy );
+    frame_sizer->Add( p_dummy, 0, wxEXPAND );
 
     /* Creation of the menu bar */
     CreateOurMenuBar();
@@ -256,7 +256,6 @@ Interface::Interface( intf_thread_t *_p_intf ):
     SetBackgroundColour( slider_frame->GetBackgroundColour() );
 
     /* Layout everything */
-    SetAutoLayout( TRUE );
     frame_sizer->Layout();
     frame_sizer->Fit(this);
 
@@ -396,8 +395,8 @@ void Interface::CreateOurToolBar()
     wxLogNull LogDummy; /* Hack to suppress annoying log message on the win32
                          * version because we don't include wx.rc */
 
-    wxToolBar *toolbar = CreateToolBar(
-                                       wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
+    wxToolBar *toolbar =
+        CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
@@ -405,23 +404,19 @@ void Interface::CreateOurToolBar()
                       wxBitmap( file_xpm ), wxU(_(HELP_SIMPLE)) );
 
     toolbar->AddSeparator();
-
     toolbar->AddTool( OpenFile_Event, wxU(_("File")), wxBitmap( file_xpm ),
                       wxU(_(HELP_FILE)) );
     toolbar->AddTool( OpenDisc_Event, wxU(_("Disc")), wxBitmap( disc_xpm ),
                       wxU(_(HELP_DISC)) );
     toolbar->AddTool( OpenNet_Event, wxU(_("Net")), wxBitmap( net_xpm ),
                       wxU(_(HELP_NET)) );
-#if 0
-    toolbar->AddTool( OpenSat_Event, wxU(_("Sat")), wxBitmap( sat_xpm ),
-                      wxU(_(HELP_SAT)) );
-#endif
     toolbar->AddSeparator();
 
     toolbar->AddTool( StopStream_Event, wxU(_("Stop")), wxBitmap( stop_xpm ),
                       wxU(_(HELP_STOP)) );
     toolbar->AddTool( PlayStream_Event, wxU(_("Play")), wxBitmap( play_xpm ),
                       wxU(_(HELP_PLAY)) );
+
     toolbar->AddSeparator();
     toolbar->AddTool( Playlist_Event, wxU(_("Playlist")),
                       wxBitmap( playlist_xpm ), wxU(_(HELP_PLO)) );
@@ -439,14 +434,15 @@ void Interface::CreateOurToolBar()
     /* Place the toolbar in a sizer, so we can calculate the width of the
      * toolbar and set this as the minimum for the main frame size. */
     wxBoxSizer *toolbar_sizer = new wxBoxSizer( wxHORIZONTAL );
-    toolbar_sizer->Add( toolbar, 0, 0, 0 );
-
+    toolbar_sizer->Add( toolbar, 1, 0, 0 );
     toolbar_sizer->Layout();
 
 #ifndef WIN32
     frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth(), -1 );
 #else
-    frame_sizer->SetMinSize( toolbar->GetToolSize().GetWidth() *
+    frame_sizer->SetMinSize( toolbar->GetToolSize().GetWidth() * 11 +
+                             toolbar->GetToolSeparation() * 3 +
+                             (toolbar->GetMargins().GetWidth() + 2) *
                              toolbar->GetToolsCount(), -1 );
 #endif
 
@@ -1331,7 +1327,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
  * Definition of wxVolCtrl class.
  *****************************************************************************/
 wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id )
-  : wxGauge( parent, id, 200, wxDefaultPosition, wxDefaultSize,
+  : wxGauge( parent, id, 200, wxDefaultPosition, wxSize( 20, -1 ),
              wxGA_VERTICAL | wxGA_SMOOTH )
 {
     p_intf = _p_intf;
