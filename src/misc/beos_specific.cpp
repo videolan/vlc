@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.34 2003/11/09 16:00:54 titer Exp $
+ * $Id: beos_specific.cpp,v 1.35 2003/12/14 16:26:21 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 #include <string.h> /* strdup() */
-#include <malloc.h>   /* free() */
+#include <malloc.h> /* free() */
 
 extern "C"
 {
@@ -56,14 +56,15 @@ public:
 private:
     BWindow*     fInterfaceWindow;
     BMessage*    fRefsMessage;
+    bool         fReadyToQuit;
 };
 
 /*****************************************************************************
  * Static vars
  *****************************************************************************/
 
-//const uint32_t INTERFACE_CREATED = 'ifcr';  /* message sent from interface */
 #include "../../modules/gui/beos/MsgVals.h"
+#define REALLY_QUIT 'requ'
 
 extern "C"
 {
@@ -91,7 +92,6 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
  *****************************************************************************/
 void system_Configure( vlc_t *, int *pi_argc, char *ppsz_argv[] )
 {
-
 }
 
 /*****************************************************************************
@@ -100,7 +100,7 @@ void system_Configure( vlc_t *, int *pi_argc, char *ppsz_argv[] )
 void system_End( vlc_t *p_this )
 {
     /* Tell the BApplication to die */
-    be_app->PostMessage( B_QUIT_REQUESTED );
+    be_app->PostMessage( REALLY_QUIT );
 
     vlc_thread_join( p_this->p_libvlc->p_appthread );
     vlc_object_destroy( p_this->p_libvlc->p_appthread );
@@ -115,7 +115,8 @@ void system_End( vlc_t *p_this )
  *****************************************************************************/
 static void AppThread( vlc_object_t * p_this )
 {
-    VlcApplication *BeApp = new VlcApplication("application/x-vnd.videolan-vlc");
+    VlcApplication * BeApp =
+        new VlcApplication("application/x-vnd.videolan-vlc");
     vlc_object_attach( p_this, p_this->p_vlc );
     BeApp->p_this = p_this;
     BeApp->Run();
@@ -131,7 +132,8 @@ static void AppThread( vlc_object_t * p_this )
 VlcApplication::VlcApplication( char * psz_mimetype )
                :BApplication( psz_mimetype ),
                 fInterfaceWindow( NULL ),
-                fRefsMessage( NULL )
+                fRefsMessage( NULL ),
+                fReadyToQuit( false )
 {
     /* Nothing to do, we use the default constructor */
 }
@@ -182,12 +184,12 @@ void VlcApplication::ReadyToRun( )
  *****************************************************************************/
 void VlcApplication::RefsReceived(BMessage* message)
 {
-	if (fInterfaceWindow)
-		fInterfaceWindow->PostMessage(message);
-	else {
-		delete fRefsMessage;
-		fRefsMessage = new BMessage(*message);
-	}
+    if (fInterfaceWindow)
+        fInterfaceWindow->PostMessage(message);
+    else {
+        delete fRefsMessage;
+        fRefsMessage = new BMessage(*message);
+    }
 }
 
 /*****************************************************************************
@@ -203,31 +205,34 @@ void VlcApplication::RefsReceived(BMessage* message)
  *****************************************************************************/
 void VlcApplication::MessageReceived(BMessage* message)
 {
-	switch (message->what) {
-		case INTERFACE_CREATED: {
-			BWindow* interfaceWindow;
-			if (message->FindPointer("window", (void**)&interfaceWindow) == B_OK) {
-				fInterfaceWindow = interfaceWindow;
-				if (fRefsMessage) {
-					fInterfaceWindow->PostMessage(fRefsMessage);
-					delete fRefsMessage;
-					fRefsMessage = NULL;
-				}
-			}
-			break;
-		}
-		
-		default:
-			BApplication::MessageReceived(message);
-	}
+    switch (message->what) {
+        case INTERFACE_CREATED: {
+            BWindow* interfaceWindow;
+            if (message->FindPointer("window", (void**)&interfaceWindow) == B_OK) {
+                fInterfaceWindow = interfaceWindow;
+                if (fRefsMessage) {
+                    fInterfaceWindow->PostMessage(fRefsMessage);
+                    delete fRefsMessage;
+                    fRefsMessage = NULL;
+                }
+            }
+            break;
+        }
+
+        case REALLY_QUIT:
+            fReadyToQuit = true;
+            PostMessage( B_QUIT_REQUESTED );
+            break;
+        
+        default:
+            BApplication::MessageReceived(message);
+    }
 }
 
 bool VlcApplication::QuitRequested()
 {
-    if( CurrentMessage() && CurrentMessage()->FindBool( "shortcut" ) )
+    if( !fReadyToQuit )
     {
-        /* The user hit Alt+Q, don't let the be_app exit without
-           cleaning */
         p_this->p_vlc->b_die = 1;
         return false;
     }
