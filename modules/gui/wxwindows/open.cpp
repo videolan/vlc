@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.19 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: open.cpp,v 1.20 2003/05/12 21:55:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -165,7 +165,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
                                 0, NULL );
     mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
         "the full MRL you want to open.\n""Alternatively, the field will be "
-        "filled automatically when you use the controls below")) );
+        "filled automatically when you use the controls below.")) );
 
     mrl_sizer->Add( mrl_label, 0, wxALL | wxALIGN_CENTER, 5 );
     mrl_sizer->Add( mrl_combo, 1, wxALL | wxALIGN_CENTER, 5 );
@@ -433,9 +433,10 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
     /* Stuff everything into the main panel */
     for( i=0; i<3; i++ )
     {
-        sizer->Add( net_radios[i], 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
-        sizer->Add( net_subpanels[i], 1,
-                    wxEXPAND | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+        sizer->Add( net_radios[i], 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL |
+                    wxALL, 5 );
+        sizer->Add( net_subpanels[i], 1, wxEXPAND | wxALIGN_LEFT |
+                    wxALIGN_CENTER_VERTICAL | wxALL, 5  );
     }
 
     sizer_row->Add( sizer, 0, wxEXPAND | wxALL, 5 );

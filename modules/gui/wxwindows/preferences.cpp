@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.13 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: preferences.cpp,v 1.14 2003/05/12 21:55:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -76,6 +76,7 @@ public:
     virtual ~PrefsTreeCtrl();
 
     void ApplyChanges();
+    void CleanChanges();
 
 private:
     /* Event handlers (these functions should _not_ be virtual) */
@@ -125,8 +126,7 @@ public:
 
     PrefsPanel() { }
     PrefsPanel( wxWindow *parent, intf_thread_t *_p_intf,
-                PrefsDialog *_p_prefs_dialog,
-                module_t *p_module, char * );
+                PrefsDialog *_p_prefs_dialog, int i_object_id, char * );
     virtual ~PrefsPanel() {}
 
     void ApplyChanges();
@@ -150,11 +150,13 @@ class ConfigTreeData : public wxTreeItemData
 {
 public:
 
-    ConfigTreeData() { panel == NULL; }
+    ConfigTreeData() { panel = NULL; psz_section = NULL; }
     virtual ~ConfigTreeData() { if( panel ) delete panel; }
 
     PrefsPanel *panel;
     wxBoxSizer *sizer;
+    int i_object_id;
+    char *psz_section;
 };
 
 class ConfigEvtHandler : public wxEvtHandler
@@ -289,19 +291,19 @@ PrefsDialog::~PrefsDialog()
 void PrefsDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
     prefs_tree->ApplyChanges();
-
     this->Hide();
+    prefs_tree->CleanChanges();
 }
 
 void PrefsDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
 {
     this->Hide();
+    prefs_tree->CleanChanges();
 }
 
 void PrefsDialog::OnSave( wxCommandEvent& WXUNUSED(event) )
 {
     prefs_tree->ApplyChanges();
-
     config_SaveConfigFile( p_intf, NULL );
 }
 
@@ -316,6 +318,7 @@ void PrefsDialog::OnResetAll( wxCommandEvent& WXUNUSED(event) )
     {
         /* TODO: need to reset all the controls */
         config_ResetAll( p_intf );
+        prefs_tree->CleanChanges();
         config_SaveConfigFile( p_intf, NULL );
     }
 }
@@ -361,7 +364,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     {
         /* We found the main module */
 
-        /* Enumerate config options and add corresponding config boxes */
+        /* Enumerate config categories and store a reference so we can
+         * generate their config panel them when it is asked by the user. */
         p_item = p_module->p_config;
 
         if( p_item ) do
@@ -370,10 +374,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             {
             case CONFIG_HINT_CATEGORY:
                 ConfigTreeData *config_data = new ConfigTreeData;
-                config_data->panel =
-                    new PrefsPanel( p_parent, p_intf, p_prefs_dialog,
-                                    p_module, p_item->psz_text );
-                config_data->panel->Hide();
+                config_data->psz_section = strdup(p_item->psz_text);
+                config_data->i_object_id = p_module->i_object_id;
 
                 /* Add the category to the tree */
                 AppendItem( root_item, wxU(p_item->psz_text),
@@ -436,9 +438,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
         /* Add the plugin to the tree */
         ConfigTreeData *config_data = new ConfigTreeData;
-        config_data->panel =
-            new PrefsPanel( p_parent, p_intf, p_prefs_dialog, p_module, NULL );
-        config_data->panel->Hide();
+        config_data->i_object_id = p_module->i_object_id;
         AppendItem( capability_item, wxU(p_module->psz_object_name), -1, -1,
                     config_data );
     }
@@ -483,7 +483,7 @@ void PrefsTreeCtrl::ApplyChanges()
          i_child_index++ )
     {
         config_data = (ConfigTreeData *)GetItemData( item );
-        if( config_data )
+        if( config_data && config_data->panel )
         {
             config_data->panel->ApplyChanges();
         }
@@ -503,9 +503,84 @@ void PrefsTreeCtrl::ApplyChanges()
              i_child_index++ )
         {
             config_data = (ConfigTreeData *)GetItemData( item2 );
-            if( config_data )
+            if( config_data && config_data->panel )
             {
                 config_data->panel->ApplyChanges();
+            }
+
+            item2 = GetNextChild( item, cookie2 );
+        }
+
+        item = GetNextChild( plugins_item, cookie );
+    }
+}
+
+void PrefsTreeCtrl::CleanChanges()
+{
+    long cookie, cookie2;
+    ConfigTreeData *config_data;
+
+    /* Clean changes for the main module */
+    wxTreeItemId item = GetFirstChild( root_item, cookie );
+    for( size_t i_child_index = 0;
+         i_child_index < GetChildrenCount( root_item, FALSE );
+         i_child_index++ )
+    {
+        config_data = (ConfigTreeData *)GetItemData( item );
+        if( config_data && config_data->panel )
+        {
+            if( item == GetSelection() )
+            {
+                config_data->panel->Hide();
+                p_sizer->Remove( config_data->panel );
+            }
+
+            delete config_data->panel;
+            config_data->panel = NULL;
+
+            if( item == GetSelection() )
+            {
+                wxTreeEvent event;
+                event.SetItem(item);
+
+                OnSelectTreeItem( event );
+            }
+        }
+
+        item = GetNextChild( root_item, cookie );
+    }
+
+    /* Clean changes for the plugins */
+    item = GetFirstChild( plugins_item, cookie );
+    for( size_t i_child_index = 0;
+         i_child_index < GetChildrenCount( plugins_item, FALSE );
+         i_child_index++ )
+    {
+        wxTreeItemId item2 = GetFirstChild( item, cookie2 );
+        for( size_t i_child_index = 0;
+             i_child_index < GetChildrenCount( item, FALSE );
+             i_child_index++ )
+        {
+            config_data = (ConfigTreeData *)GetItemData( item2 );
+
+            if( config_data && config_data->panel )
+            {
+                if( item2 == GetSelection() )
+                {
+                    config_data->panel->Hide();
+                    p_sizer->Remove( config_data->panel );
+                }
+
+                delete config_data->panel;
+                config_data->panel = NULL;
+
+                if( item2 == GetSelection() )
+                {
+                    wxTreeEvent event;
+                    event.SetItem(item2);
+
+                    OnSelectTreeItem( event );
+                }
             }
 
             item2 = GetNextChild( item, cookie2 );
@@ -527,9 +602,21 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
     }
 
     config_data = (ConfigTreeData *)GetItemData( event.GetItem() );
-    if( config_data && config_data->panel )
+    if( config_data )
     {
-        config_data->panel->Show();
+        if( !config_data->panel )
+        {
+            /* The panel hasn't been created yet. Let's do it. */
+            config_data->panel =
+                new PrefsPanel( p_parent, p_intf, p_prefs_dialog,
+                                config_data->i_object_id,
+                                config_data->psz_section );
+        }
+        else
+        {
+            config_data->panel->Show();
+        }
+
         p_sizer->Add( config_data->panel, 2, wxEXPAND | wxALL, 0 );
         p_sizer->Layout();
     }
@@ -540,7 +627,7 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
  *****************************************************************************/
 PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                         PrefsDialog *_p_prefs_dialog,
-                        module_t *p_module, char *psz_section )
+                        int i_object_id, char *psz_section )
   :  wxPanel( parent, -1, wxDefaultPosition, wxDefaultSize )
 {
     module_config_t *p_item;
@@ -563,6 +650,14 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     SetAutoLayout( TRUE );
 
     wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
+
+    /* Get a pointer to the module */
+    module_t *p_module = (module_t *)vlc_object_get( p_intf, i_object_id );
+    if( p_module->i_object_type != VLC_OBJECT_MODULE )
+    {
+        /* 0OOoo something went really bad */
+        return;
+    }
 
     /* Enumerate config options and add corresponding config boxes */
     p_item = p_module->p_config;
@@ -673,7 +768,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                     combo->Append( wxU(p_item->ppsz_list[i_index]) );
                 }
 
-		if( p_item->psz_value )
+                if( p_item->psz_value )
                     combo->SetValue( wxU(p_item->psz_value) );
                 combo->SetToolTip( wxU(p_item->psz_longtext) );
                 config_data->control.combobox = combo;
