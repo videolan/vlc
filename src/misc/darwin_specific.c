@@ -2,7 +2,7 @@
  * darwin_specific.c: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.7 2001/12/30 07:09:56 sam Exp $
+ * $Id: darwin_specific.c,v 1.8 2002/04/26 00:20:00 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -55,6 +55,14 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
     
     return;
+}
+
+/*****************************************************************************
+ * system_Configure: check for system specific configuration options.
+ *****************************************************************************/
+void system_Configure( void )
+{
+
 }
 
 /*****************************************************************************
