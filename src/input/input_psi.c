@@ -434,7 +434,9 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
   u16 i_es_pid;
 
   int i_index = 0;
+#ifdef AUTO_SPAWN
   int i_es_loop;
+#endif
   pgrm_descriptor_t* p_pgrm;
   es_descriptor_t* p_es;
 

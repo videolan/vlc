@@ -35,6 +35,7 @@
 
 #include "audio_constants.h"
 #include "audio_decoder.h"
+#include "audio_math.h"
 
 /******************************************************************************
  * Local prototypes

@@ -123,7 +123,8 @@ video_output_obj = 		video_output/video_output.o \
 						video_output/video_x11.o \
 						video_output/video_graphics.o 
 
-audio_decoder_obj =		audio_decoder/audio_decoder.o
+audio_decoder_obj =		audio_decoder/audio_decoder.o \
+						audio_decoder/audio_math.o
 
 generic_decoder_obj =		generic_decoder/generic_decoder.o
 

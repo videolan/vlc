@@ -11,6 +11,7 @@
  *******************************************************************************/
 #include <pthread.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <sys/soundcard.h>
 #include <sys/uio.h>
