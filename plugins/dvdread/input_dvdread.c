@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.18 2002/01/10 04:11:25 sam Exp $
+ * $Id: input_dvdread.c,v 1.19 2002/01/15 19:01:28 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -285,10 +285,9 @@ static void DvdReadOpen( struct input_thread_s *p_input )
 
     /* If we are here we can control the pace... */
     p_input->stream.b_pace_control = 1;
-
     p_input->stream.b_seekable = 1;
+    
     p_input->stream.p_selected_area->i_size = 0;
-
     p_input->stream.p_selected_area->i_tell = 0;
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );

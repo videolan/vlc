@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.171 2002/01/15 17:55:12 stef Exp $
+ * $Id: input.c,v 1.172 2002/01/15 19:01:28 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -171,6 +171,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     vlc_mutex_init( &p_input->stream.control.control_lock );
 
     /* Initialize stream description */
+    p_input->stream.b_changed = 0;
     p_input->stream.i_es_number = 0;
     p_input->stream.i_selected_es_number = 0;
     p_input->stream.i_pgrm_number = 0;

@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.9 2002/01/09 02:01:14 sam Exp $
+ * $Id: gtk.c,v 1.10 2002/01/15 19:01:28 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -163,7 +163,7 @@ static int intf_Open( intf_thread_t *p_intf )
     }
 
     /* Initialize Gtk+ thread */
-    p_intf->p_sys->b_playing = 1;
+    p_intf->p_sys->b_playing = 0;
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
@@ -343,7 +343,8 @@ static gint GtkManage( gpointer p_data )
             }
 
             /* Manage the slider */
-            if( p_input_bank->pp_input[0]->stream.b_seekable )
+            if( p_input_bank->pp_input[0]->stream.b_seekable &&
+                p_intf->p_sys->b_playing )
             {
                 float newvalue = p_intf->p_sys->p_adj->value;
     

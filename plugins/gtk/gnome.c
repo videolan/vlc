@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.7 2002/01/09 02:01:14 sam Exp $
+ * $Id: gnome.c,v 1.8 2002/01/15 19:01:28 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -162,7 +162,7 @@ static int intf_Open( intf_thread_t *p_intf )
     }
 
     /* Initialize Gnome thread */
-    p_intf->p_sys->b_playing = 1;
+    p_intf->p_sys->b_playing = 0;
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
@@ -340,7 +340,8 @@ static gint GnomeManage( gpointer p_data )
             }
 
             /* Manage the slider */
-            if( p_input_bank->pp_input[0]->stream.b_seekable )
+            if( p_input_bank->pp_input[0]->stream.b_seekable &&
+                p_intf->p_sys->b_playing )
             {
                 float           newvalue;
                 newvalue = p_intf->p_sys->p_adj->value;
