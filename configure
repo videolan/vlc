@@ -5653,7 +5653,7 @@ MMX_MODULES="memcpymmx idctmmx motionmmx chroma_i420_rgb_mmx chroma_i420_yuy2_mm
 MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 SSE_MODULES="imdctsse downmixsse"
-ALTIVEC_MODULES="idctaltivec motionaltivec"
+ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
 
 echo $ac_n "checking if \$CC groks MMX inline assembly""... $ac_c" 1>&6
 echo "configure:5660: checking if \$CC groks MMX inline assembly" >&5
@@ -6880,7 +6880,7 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
 EOF
  
       BUILTINS="${BUILTINS} a52"
-      LIB_A52="${LIB_A52} -la52"
+      LIB_A52="${LIB_A52} -la52 -lm"
      
 else
   echo "$ac_t""no" 1>&6
