@@ -1,3 +1,270 @@
+2003-12-27 Saturday 01:49  rocky
+
+ Scale bitmaps for 4:3 output
+
+2003-12-26 Friday 02:47  rocky
+
+ Keep in synch with rest of source. Should also have no effect on upcoming release
+
+2003-12-26 Friday 01:39  rocky
+
+ Check in a stable copy for reference against future changes. Should
+ not affect or be seen in upcoming release.
+
+2003-12-24 Wednesday 12:38  gbazin
+
+ * src/libvlc.h: on win9x --win9x-cv-method=0 was problematic (eg. vlc could get stuck during video startup) so --win9x-cv-method=1 is now the default.
+
+2003-12-24 Wednesday 10:06  gbazin
+
+ * src/libvlc.c: small fixes to Usage().
+
+2003-12-24 Wednesday 09:46  gbazin
+
+ * include/vlc_block.h: added a temporary i_rate field to block_t.
+ * modules/codec/libmpeg2.c: synchro uses p_block->i_rate again.
+ * src/input/*: do not decode audio when i_rate != DEFAULT_RATE.
+
+2003-12-23 Tuesday 17:10  gbazin
+
+ * modules/video_output/directx/events.c: warning message into debug message.
+
+2003-12-23 Tuesday 15:27  gbazin
+
+ * modules/video_output/directx/events.c: fixed mouse coordinates for dvd navigation which got broken when we switched to using a child window for the video.
+
+2003-12-23 Tuesday 02:11  gbazin
+
+ * modules/video_output/directx/*: fixed strange race condition.
+
+2003-12-23 Tuesday 00:23  hartman
+
+ * Fixed and updated for a 00.7 'Bond' release.
+
+2003-12-22 Monday 23:46  hartman
+
+ * Fix a leak in goom module that caused all the pictures of a vout to be
+   unavailable after several songs.
+
+2003-12-22 Monday 22:37  hartman
+
+ * stream_Size reports the size of a stream, not stream_Tell
+   This fixes the ID3 detection of ID3v1.
+
+2003-12-22 Monday 17:44  gbazin
+
+ * modules/access/dshow/dshow.cpp: fixed previous fix.
+
+2003-12-22 Monday 17:08  bigben
+
+ back to config_PutInt when using the fullscreen button on the interface. This allows to remember the fullscreen setting when changing playlist item
+
+2003-12-22 Monday 16:42  gbazin
+
+ * modules/access/dshow/dshow.cpp: small fix for devices list.
+
+2003-12-22 Monday 16:40  gbazin
+
+ * modules/codec/libmpeg2.c: compiles with the latest libmpeg2 cvs.
+
+2003-12-22 Monday 15:42  gbazin
+
+ * modules/gui/wxwindows/*: use our new wxL2U() macro where needed.
+
+2003-12-22 Monday 14:45  hartman
+
+ * Fix the 'currently playing' field in the OSX intf.
+
+2003-12-22 Monday 14:32  sam
+
+   * Coding style cleanup: removed tabs and trailing spaces.
+
+2003-12-22 Monday 14:31  gbazin
+
+ * modules/gui/wxwindows/*: don't forget to convert the filename/author fields in the playlist to the encoding in use by the wxWindows interface.
+
+2003-12-22 Monday 14:23  sam
+
+   * src/misc/iso-639_def.h modules/demux/util/id3genres.h modules/gui/kde:
+     + Added missing copyright information.
+     + Added GPL header.
+   * src/misc/iso-639_def.h:
+     + Removed useless (and unprotected) macros.
+
+2003-12-22 Monday 11:14  titer
+
+  beos/Video*: fixed cursor hiding (int32_t != int32 bla bla bla)
+
+2003-12-22 Monday 11:08  titer
+
+  beos/*: fixed Alt+X shortcuts (BeOS doesn't let those hit BWindow::KeyDown
+          because it's reserved for system shorcuts - added a workaround)
+
+2003-12-22 Monday 02:24  sam
+
+   * toolbox:
+     + Added pda.glade to the list of Glade2 generated files.
+     + Remove strings such as "http://" or "/dev/video0" from the list of
+       translated strings in the PDA interface.
+   * Fixed grammar, spelling, a few pathetic inconsistencies, removed trailing
+     whitespaces and tabulations here and there.
+
+2003-12-22 Monday 00:26  sam
+
+   * modules/demux/asf/asf.c: Fixed a buffer overflow.
+
+2003-12-22 Monday 00:13  sam
+
+   * modules/access/vcdx/access.c: Fixed an obvious buffer overflow. This
+     code is still unsafe, bounds need to be checked after each sprintf/strcat
+     call.
+
+2003-12-22 Monday 00:06  titer
+
+  + beos/PreferencesWindow.cpp: esthetic change (use triangle thumb style
+    for sliders)
+
+2003-12-21 Sunday 23:32  sam
+
+   * Fixed URLs here and there.
+
+2003-12-21 Sunday 21:30  titer
+
+  beos/PreferencesWindow*:
+   + Cleaned a bit the way the prefs are created
+   + Added missing CONFIG_ITEM_KEY implementation
+
+2003-12-20 Saturday 22:57  babal
+
+ * libvlc.h input.c headphone.c:
+     fix support of audio channel mixers, like the headphone channel mixer
+     for instance, which was broken since the introduction of user audio
+     filters; if specified by the user and compatible with the audio
+     pipeline, we add the channel mixer after the user filters.
+     -> unfortunately, this fix removed two strings and introduced 4 new
+        ones
+     -> TODO: allow the user to choose only amongst channel mixers, not
+        all available audio filters
+
+ * vlc.exe.manifest Makefile.am install-win32 :
+     add a manifest file to allow the win32 gui to use Windows XP visual
+     styles when available.
+
+2003-12-20 Saturday 16:22  gbazin
+
+ * modules/demux/mp4/mp4.c: fixed problem with buggy files that don't set the audio sample rate properly.
+
+2003-12-20 Saturday 16:11  gbazin
+
+ * modules/codec/araw.c: added "mlaw" as a fourcc for ulaw audio.
+
+2003-12-20 Saturday 15:25  rocky
+
+ Remove unused variable. Artifact of old track/entry handling.
+
+2003-12-20 Saturday 11:56  rocky
+
+ Grammar correction.
+
+2003-12-20 Saturday 11:55  rocky
+
+ Spelling correction.
+
+2003-12-18 Thursday 16:29  hartman
+
+ * Fix broken http intf in macosx package.
+
+2003-12-18 Thursday 12:35  rocky
+
+ Go over for spelling and acurracy.
+
+2003-12-17 Wednesday 23:21  hartman
+
+ * Commented out the option 'goom' for the visualizer. It isn't working in
+   this system yet and will not work before release. The visualizer system
+   needs to be cleaned in 0.7.1 with one 'visual' audio filter which loads
+   one or more 'visualization' true modules.
+
+2003-12-17 Wednesday 23:09  hartman
+
+ * second round of dutch translation update for 0.7.0-test2
+
+2003-12-17 Wednesday 21:29  hartman
+
+ * Updated portuguese brazilian update
+
+2003-12-17 Wednesday 11:42  hartman
+
+ * First run of dutch translations.
+
+2003-12-17 Wednesday 08:53  titer
+
+  * Makefile.am: cleaned up package-beos
+  * share/vlc_beos.rsrc: new icon based on Stephane's cone
+
+2003-12-16 Tuesday 23:01  massiot
+
+ Contrib build system :
+ * Jumped to ogg-1.1
+ * Reverted to ffmpeg-0.4.8
+
+2003-12-16 Tuesday 22:14  gbazin
+
+ * modules/access/cdda/access.c: need to include errno.h
+
+2003-12-16 Tuesday 22:10  gbazin
+
+ * modules/video_output/directx/events.c: the coordinates used to blit the video must be relative to the current primary surface (current display).
+
+2003-12-16 Tuesday 21:56  geshp
+
+ Just a release number update in the spec file.  (It won't break anything I promise)
+
+2003-12-16 Tuesday 19:02  gbazin
+
+ * modules/gui/wxwindows/open.cpp: compilation fix.
+
+2003-12-16 Tuesday 18:18  gbazin
+
+ * modules/gui/skins/src/themeloader.cpp: the tar loader now checks the magic value in the tar header.
+
+2003-12-16 Tuesday 16:51  gbazin
+
+ * modules/codec/araw.c: small fix.
+
+2003-12-16 Tuesday 13:35  gbazin
+
+ * modules/gui/wxwindows/open.cpp: compilation fix.
+
+2003-12-16 Tuesday 13:22  gbazin
+
+ * modules/gui/wxwindows/interface.cpp: better heuristic for the interface size on win32.
+
+2003-12-16 Tuesday 12:54  gbazin
+
+ * modules/misc/dummy/input.c: fixed the vlc:quit command.
+
+2003-12-16 Tuesday 12:38  gbazin
+
+ * modules/codec/ffmpeg/ffmpeg.c, modules/demux/ogg.c: theora decoding support via ffmpeg (currently slower than libtheora).
+
+2003-12-16 Tuesday 09:14  courmisch
+
+ Added field for RTSP in Network Stream open tab
+
+2003-12-16 Tuesday 03:21  rocky
+
+ Remember the disc selection type (DVD, VCD, CD-DA) selected in "Open
+ Disc" and use that as the default for next time.
+
+2003-12-16 Tuesday 00:36  gbazin
+
+ * doc/Makefile.am: added intf-cdda.txt to EXTRA_DIST.
+
+2003-12-16 Tuesday 00:01  gbazin
+
+ * ALL: preparing for 0.7.0-test2.
+
 2003-12-15 Monday 23:31  gbazin
 
  * modules/demux/ogg.c: a couple of fixes for flac streaming.
