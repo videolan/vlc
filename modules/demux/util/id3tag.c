@@ -61,48 +61,45 @@ vlc_module_end();
  *****************************************************************************/
 static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
 {
-    struct id3_tag        *p_id3_tag;
-    struct id3_frame      *p_frame;
-    char                  *psz_temp;
-    vlc_value_t val;
-    int i;
+    struct id3_tag   *p_id3_tag;
+    struct id3_frame *p_frame;
     input_thread_t *p_input;
+    vlc_value_t val;
+    int i = 0;
 
-    p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT,
-                                FIND_PARENT );
-    if( !p_input)
-    {
-        return;
-    }
+    p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( !p_input) return;
 
     var_Get( p_input, "demuxed-id3", &val );
     if( val.b_bool )
     {
         msg_Dbg( p_demux, "the ID3 tag was already parsed" );
+        vlc_object_release( p_input );
         return;
     }
 
-    val.b_bool = VLC_FALSE;
+    val.b_bool = VLC_TRUE;
+    var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
 
     p_id3_tag = id3_tag_parse( p_data, i_size );
-    i = 0;
+    if( !p_id3_tag ) return;
 
-    while ( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
+    while( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
-        int i_strings;
+        int i_strings = id3_field_getnstrings( &p_frame->fields[1] );
 
-        i_strings = id3_field_getnstrings( &p_frame->fields[1] );
-
-        while ( i_strings > 0 )
+        while( i_strings > 0 )
         {
-            psz_temp = id3_ucs4_utf8duplicate( id3_field_getstrings( &p_frame->fields[1], --i_strings ) );
-            if ( !strcmp(p_frame->id, ID3_FRAME_GENRE ) )
+            char *psz_temp = id3_ucs4_utf8duplicate(
+                id3_field_getstrings( &p_frame->fields[1], --i_strings ) );
+
+            if( !strcmp( p_frame->id, ID3_FRAME_GENRE ) )
             {
-                int i_genre;
                 char *psz_endptr;
-                i_genre = strtol( psz_temp, &psz_endptr, 10 );
-                if( psz_temp != psz_endptr && i_genre >= 0 &&
-                                              i_genre < NUM_GENRES )
+                int i_genre = strtol( psz_temp, &psz_endptr, 10 );
+
+                if( psz_temp != psz_endptr &&
+                    i_genre >= 0 && i_genre < NUM_GENRES )
                 {
                     vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
                                   VLC_META_GENRE, ppsz_genres[atoi(psz_temp)]);
@@ -111,34 +108,30 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
                 {
                     /* Unknown genre */
                     vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                                   VLC_META_GENRE, psz_temp );
+                                  VLC_META_GENRE, psz_temp );
                 }
             }
-            else if ( !strcmp(p_frame->id, ID3_FRAME_TITLE ) )
+            else if( !strcmp(p_frame->id, ID3_FRAME_TITLE ) )
             {
                 vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                               VLC_META_TITLE, psz_temp );
-//              input_Control( p_demux, INPUT_SET_NAME, psz_temp );
+                              VLC_META_TITLE, psz_temp );
             }
-            else if ( !strcmp(p_frame->id, ID3_FRAME_ARTIST ) )
+            else if( !strcmp(p_frame->id, ID3_FRAME_ARTIST ) )
             {
                 vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                               VLC_META_ARTIST, psz_temp );
+                              VLC_META_ARTIST, psz_temp );
             }
             else
             {
                 /* Unknown meta info */
                 vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                               (char *)p_frame->description, psz_temp );
+                              (char *)p_frame->description, psz_temp );
             }
             free( psz_temp );
         }
         i++;
     }
     id3_tag_delete( p_id3_tag );
-
-    val.b_bool = VLC_TRUE;
-    var_Change( p_demux, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
 
     vlc_object_release( p_input );
 }
@@ -177,7 +170,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
             if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
             {
                 msg_Err( p_demux, "cannot peek()" );
-                return( VLC_EGENERIC );
+                return VLC_EGENERIC;
             }
 
             i_size2 = id3_tag_query( p_peek, 10 );
@@ -187,7 +180,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
                 if ( stream_Peek( p_demux->s, &p_peek, i_size2 ) < i_size2 )
                 {
                     msg_Err( p_demux, "cannot peek()" );
-                    return( VLC_EGENERIC );
+                    return VLC_EGENERIC;
                 }
                 msg_Dbg( p_demux, "found ID3v1 tag" );
                 ParseID3Tag( p_demux, p_peek, i_size2 );
@@ -198,7 +191,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
             if( stream_Peek( p_demux->s, &p_peek, 128 ) < 128 )
             {
                 msg_Err( p_demux, "cannot peek()" );
-                return( VLC_EGENERIC );
+                return VLC_EGENERIC;
             }
             i_size2 = id3_tag_query( p_peek + 118, 10 );
             if ( i_size2 < 0  && i_pos > -i_size2 )
@@ -208,7 +201,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
                 if ( stream_Peek( p_demux->s, &p_peek, i_size2 ) < i_size2 )
                 {
                     msg_Err( p_demux, "cannot peek()" );
-                    return( VLC_EGENERIC );
+                    return VLC_EGENERIC;
                 }
                 msg_Dbg( p_demux, "found ID3v2 tag at end of file" );
                 ParseID3Tag( p_demux, p_peek, i_size2 );
@@ -220,13 +213,13 @@ static int ParseID3Tags( vlc_object_t *p_this )
     if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
     {
         msg_Err( p_demux, "cannot peek()" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     i_size = id3_tag_query( p_peek, 10 );
     if ( i_size <= 0 )
     {
-        return( VLC_SUCCESS );
+        return VLC_SUCCESS;
     }
 
     /* Read the entire tag */
@@ -235,12 +228,12 @@ static int ParseID3Tags( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "cannot read ID3 tag" );
         if( p_peek ) free( p_peek );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
-    ParseID3Tag( p_demux, p_peek, i_size );
     msg_Dbg( p_demux, "found ID3v2 tag" );
+    ParseID3Tag( p_demux, p_peek, i_size );
 
     free( p_peek );
-    return( VLC_SUCCESS );
+    return VLC_SUCCESS;
 }
