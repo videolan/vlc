@@ -254,17 +254,14 @@ void vdec_MotionFieldField( macroblock_t * p_mb )
 
     args.i_height = 16;
     args.b_average = 0;
-    args.b_dest_field = 0;
+    args.b_dest_field = p_mb->b_motion_field;
     args.i_offset = 0;
 
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
-        boolean_t   b_current_field;
-        
-        b_current_field = ( p_mb->i_structure == BOTTOM_FIELD );
         if( p_mb->b_P_coding_type
              && (p_mb->i_current_structure == FRAME_STRUCTURE)
-             && (b_current_field != p_mb->ppi_field_select[0][0]) )
+             && (p_mb->b_motion_field != p_mb->ppi_field_select[0][0]) )
             args.p_source = p_mb->p_picture;
         else
             args.p_source = p_mb->p_forward;
@@ -296,17 +293,14 @@ void vdec_MotionField16x8( macroblock_t * p_mb )
 
     args.i_height = 8;
     args.b_average = 0;
-    args.b_dest_field = 0;
+    args.b_dest_field = p_mb->b_motion_field;
     args.i_offset = 0;
 
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
-        boolean_t   b_current_field;
-
-        b_current_field = ( p_mb->i_structure == BOTTOM_FIELD );
         if( p_mb->b_P_coding_type
              && (p_mb->i_current_structure == FRAME_STRUCTURE)
-             && (b_current_field != p_mb->ppi_field_select[0][0]) )
+             && (p_mb->b_motion_field != p_mb->ppi_field_select[0][0]) )
             args.p_source = p_mb->p_picture;
         else
             args.p_source = p_mb->p_forward;
@@ -317,7 +311,7 @@ void vdec_MotionField16x8( macroblock_t * p_mb )
 
         if( p_mb->b_P_coding_type
              && (p_mb->i_current_structure == FRAME_STRUCTURE)
-             && (b_current_field != p_mb->ppi_field_select[1][0]) )
+             && (p_mb->b_motion_field != p_mb->ppi_field_select[1][0]) )
             args.p_source = p_mb->p_picture;
         else
             args.p_source = p_mb->p_forward;
@@ -406,18 +400,14 @@ void vdec_MotionFrameField( macroblock_t * p_mb )
 
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
-        args.p_source = p_mb->p_forward;
-#
         args.b_source_field = p_mb->ppi_field_select[0][0];
         args.b_dest_field = 0;
         args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
         args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
-//        p_mb->pf_chroma_motion( p_mb, &args );
+        p_mb->pf_chroma_motion( p_mb, &args );
 
-p_mb->i_l_y ++;
-p_mb->i_c_y ++;
-        args.b_source_field = p_mb->ppi_field_select[1][0]-1;
-        //args.b_dest_field = 1;
+        args.b_source_field = p_mb->ppi_field_select[1][0];
+        args.b_dest_field = 1;
         args.i_mv_x = p_mb->pppi_motion_vectors[1][0][0];
         args.i_mv_y = p_mb->pppi_motion_vectors[1][0][1] >> 1;
         p_mb->pf_chroma_motion( p_mb, &args );
@@ -463,14 +453,15 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
     MotionComponent( /* source */
                      p_motion->p_source->p_y
                        + (p_mb->i_l_x + (p_motion->i_mv_x >> 1))
-                       + ((p_mb->i_l_y + p_motion->i_offset
-                          + (p_motion->i_mv_y >> 1))
-                          + (p_motion->b_source_field - p_motion->b_dest_field))
+                       + (p_mb->i_motion_l_y + p_motion->i_offset
+                          + (p_motion->i_mv_y >> 1)
+                          + p_motion->b_source_field)
                          * p_mb->p_picture->i_width,
                      /* destination */
                      p_mb->p_picture->p_y
                        + (p_mb->i_l_x)
-                       + (p_mb->i_l_y) * p_mb->p_picture->i_width,
+                       + (p_mb->i_motion_l_y + p_motion->b_dest_field)
+                         * p_mb->p_picture->i_width,
                      /* prediction width and height */
                      16, p_motion->i_height,
                      /* step */
@@ -483,13 +474,14 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
     /* Chrominance Cr */
     MotionComponent( p_motion->p_source->p_u
                        + (p_mb->i_c_x + ((p_motion->i_mv_x/2) >> 1))
-                       + ((p_mb->i_c_y + (p_motion->i_offset >> 1)
+                       + ((p_mb->i_motion_c_y + (p_motion->i_offset >> 1)
                           + ((p_motion->i_mv_y/2) >> 1))
-                          + (p_motion->b_source_field - p_motion->b_dest_field))
+                          + p_motion->b_source_field)
                          * p_mb->p_picture->i_chroma_width,
                      p_mb->p_picture->p_u
                        + (p_mb->i_c_x)
-                       + (p_mb->i_c_y) * p_mb->p_picture->i_chroma_width,
+                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
+                         * p_mb->p_picture->i_chroma_width,
                      8, p_motion->i_height >> 1, p_mb->i_c_stride,
                      (p_motion->b_average << 2)
                        | (((p_motion->i_mv_y/2) & 1) << 1)
@@ -498,13 +490,14 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
     /* Chrominance Cb */
     MotionComponent( p_motion->p_source->p_v
                        + (p_mb->i_c_x + ((p_motion->i_mv_x/2) >> 1))
-                       + ((p_mb->i_c_y + (p_motion->i_offset >> 1)
-                          +((p_motion->i_mv_y/2) >> 1))
-                          + (p_motion->b_source_field - p_motion->b_dest_field))
+                       + ((p_mb->i_motion_c_y + (p_motion->i_offset >> 1)
+                          + ((p_motion->i_mv_y/2) >> 1))
+                          + p_motion->b_source_field)
                          * p_mb->p_picture->i_chroma_width,
                      p_mb->p_picture->p_v
                        + (p_mb->i_c_x)
-                       + (p_mb->i_c_y) * p_mb->p_picture->i_chroma_width,
+                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
+                         * p_mb->p_picture->i_chroma_width,
                      8, p_motion->i_height >> 1, p_mb->i_c_stride,
                      (p_motion->b_average << 2)
                        | (((p_motion->i_mv_y/2) & 1) << 1)

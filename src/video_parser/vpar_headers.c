@@ -699,7 +699,7 @@ memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
     p_vpar->picture.b_frame_structure = (i_structure == FRAME_STRUCTURE);
 
     /* Initialize picture data for decoding. */
-    if( i_structure == BOTTOM_FIELD )
+    if( p_vpar->picture.b_motion_field = (i_structure == BOTTOM_FIELD) )
     {
         i_mb_base = p_vpar->sequence.i_mb_size >> 1;
         p_vpar->mb.i_l_y = 1;

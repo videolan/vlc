@@ -98,6 +98,7 @@ typedef struct picture_parsing_s
     /* Relative to the current field */
     int                 i_coding_type, i_structure;
     boolean_t           b_frame_structure;
+    boolean_t           b_motion_field;
     f_macroblock_type_t pf_macroblock_type;
 
     boolean_t           b_error;

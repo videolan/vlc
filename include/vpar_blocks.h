@@ -45,6 +45,9 @@ typedef struct macroblock_s
     int                     ppi_field_select[2][2];
     int                     pppi_motion_vectors[2][2][2];
     int                     pi_dm_vector[2];
+    int                     i_motion_l_y;
+    int                     i_motion_c_y;
+    boolean_t               b_motion_field;
   
     /* AddBlock information */
     f_addb_t                pf_addb[12];      /* pointer to the Add function */

@@ -580,9 +580,9 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
     p_mb->i_structure = p_vpar->picture.i_structure;
     p_mb->i_current_structure = p_vpar->picture.i_current_structure;
     p_mb->i_l_x = p_vpar->mb.i_l_x;
-    p_mb->i_l_y = p_vpar->mb.i_l_y;
+    p_mb->i_motion_l_y = p_mb->i_l_y = p_vpar->mb.i_l_y;
     p_mb->i_c_x = p_vpar->mb.i_c_x;
-    p_mb->i_c_y = p_vpar->mb.i_c_y;
+    p_mb->i_motion_c_y = p_mb->i_c_y = p_vpar->mb.i_c_y;
     p_mb->i_chroma_nb_blocks = p_vpar->sequence.i_chroma_nb_blocks;
     p_mb->pf_chroma_motion = pf_chroma_motion[p_vpar->sequence.i_chroma_format];
     p_mb->b_P_coding_type = ( p_vpar->picture.i_coding_type == P_CODING_TYPE );
@@ -607,6 +607,11 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
                         * (2 - p_vpar->picture.b_frame_structure)
                         * p_vpar->sequence.i_chroma_mb_height;
     p_vpar->mb.i_c_x %= p_vpar->sequence.i_chroma_width;
+    if( p_mb->b_motion_field = p_vpar->picture.b_motion_field )
+    {
+        p_mb->i_motion_l_y--;
+        p_mb->i_motion_c_y--;
+    }
 }
 
 /*****************************************************************************
