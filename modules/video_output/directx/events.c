@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.20 2003/07/29 21:14:10 gbazin Exp $
+ * $Id: events.c,v 1.21 2003/07/29 21:46:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -220,29 +220,29 @@ void DirectXEventThread( event_thread_t *p_event )
                 /* input_Seek( p_event->p_vout, -5,
                    INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
                 val.psz_string = "LEFT";
-                var_Set( p_vout, "key-pressed", val );
+                var_Set( p_event->p_vout, "key-pressed", val );
                 break;
             case VK_RIGHT:
                 /* input_Seek( p_event->p_vout, 5,
                    INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
                 val.psz_string = "RIGHT";
-                var_Set( p_vout, "key-pressed", val );
+                var_Set( p_event->p_vout, "key-pressed", val );
                 break;
             case VK_UP:
                 /* input_Seek( p_event->p_vout, 60,
                    INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
                 val.psz_string = "UP";
-                var_Set( p_vout, "key-pressed", val );
+                var_Set( p_event->p_vout, "key-pressed", val );
                 break;
             case VK_DOWN:
                 /* input_Seek( p_event->p_vout, -60,
                    INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
                 val.psz_string = "DOWN";
-                var_Set( p_vout, "key-pressed", val );
+                var_Set( p_event->p_vout, "key-pressed", val );
                 break;
             case VK_RETURN:
                 val.psz_string = "ENTER";
-                var_Set( p_vout, "key-pressed", val );
+                var_Set( p_event->p_vout, "key-pressed", val );
                 break;
             case VK_HOME:
                 input_Seek( p_event->p_vout, 0,
