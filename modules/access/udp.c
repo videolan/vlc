@@ -103,7 +103,6 @@ static int Open( vlc_object_t *p_this )
     char *psz_bind_port = "";
     int  i_bind_port = 0;
     int  i_server_port = 0;
-    vlc_value_t val;
 
 
     /* First set ipv4/ipv6 */
@@ -112,6 +111,7 @@ static int Open( vlc_object_t *p_this )
 
     if( *p_access->psz_access )
     {
+        vlc_value_t val;
         /* Find out which shortcut was used */
         if( !strncmp( p_access->psz_access, "udp4", 6 ) ||
             !strncmp( p_access->psz_access, "rtp4", 6 ))
@@ -201,9 +201,7 @@ static int Open( vlc_object_t *p_this )
     i_server_port = strtol( psz_server_port, NULL, 10 );
     if( ( i_bind_port   = strtol( psz_bind_port,   NULL, 10 ) ) == 0 )
     {
-        var_Create( p_access, "server-port", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-        var_Get( p_access, "server-port", &val  );
-        i_bind_port = val.i_int;
+        i_bind_port = var_CreateGetInteger( p_access, "server-port" );
     }
 
     msg_Dbg( p_access, "opening server=%s:%d local=%s:%d",
@@ -234,13 +232,11 @@ static int Open( vlc_object_t *p_this )
     free( psz_name );
 
     /* FIXME */
-    var_Create( p_access, "mtu", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "mtu", &val);
-    p_sys->i_mtu = val.i_int > 0 ? val.i_int : 1500;    /* avoid problem */
+    p_sys->i_mtu = var_CreateGetInteger( p_access, "mtu" );
+    if( p_sys->i_mtu <= 1 )
+        p_sys->i_mtu  = 1500;   /* Avoid problem */
 
-    var_Create( p_access, "udp-auto-mtu", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "udp-auto-mtu", &val);
-    p_sys->b_auto_mtu = val.b_bool;
+    p_sys->b_auto_mtu = var_CreateGetBool( p_access, "udp-auto-mtu" );;
 
     /* Update default_pts to a suitable value for udp access */
     var_Create( p_access, "udp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -290,7 +286,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             var_Get( p_access, "udp-caching", &val );
-            *pi_64 = val.i_int * 1000;
+            *pi_64 = var_GetInteger( p_access, "udp-caching" ) * 1000;
             break;
 
         /* */

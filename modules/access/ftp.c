@@ -94,7 +94,6 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     char         *psz;
-    vlc_value_t   val;
 
     int          i_answer;
     char         *psz_arg;
@@ -158,15 +157,14 @@ static int Open( vlc_object_t *p_this )
 
     msg_Dbg( p_access, "connection accepted (%d)", i_answer );
 
-    var_Create( p_access, "ftp-user", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "ftp-user", &val );
-    if( ftp_SendCommand( p_access, "USER %s", val.psz_string ) < 0 ||
+    psz = var_CreateGetString( p_access, "ftp-user" );
+    if( ftp_SendCommand( p_access, "USER %s", psz ) < 0 ||
         ftp_ReadCommand( p_access, &i_answer, NULL ) < 0 )
     {
-        if( val.psz_string ) free( val.psz_string );
+        free( psz );
         goto exit_error;
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( psz );
 
     switch( i_answer / 100 )
     {
@@ -175,15 +173,14 @@ static int Open( vlc_object_t *p_this )
             break;
         case 3:
             msg_Dbg( p_access, "password needed" );
-            var_Create( p_access, "ftp-pwd", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-            var_Get( p_access, "ftp-pwd", &val );
-            if( ftp_SendCommand( p_access, "PASS %s", val.psz_string ) < 0 ||
+            psz = var_CreateGetString( p_access, "ftp-pwd" );
+            if( ftp_SendCommand( p_access, "PASS %s", psz ) < 0 ||
                 ftp_ReadCommand( p_access, &i_answer, NULL ) < 0 )
             {
-                if( val.psz_string ) free( val.psz_string );
+                free( psz );
                 goto exit_error;
             }
-            if( val.psz_string ) free( val.psz_string );
+            free( psz );
 
             switch( i_answer / 100 )
             {
@@ -192,17 +189,15 @@ static int Open( vlc_object_t *p_this )
                     break;
                 case 3:
                     msg_Dbg( p_access, "account needed" );
-                    var_Create( p_access, "ftp-account",
-                                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-                    var_Get( p_access, "ftp-account", &val );
+                    psz = var_CreateGetString( p_access, "ftp-account" );
                     if( ftp_SendCommand( p_access, "ACCT %s",
-                                         val.psz_string ) < 0 ||
+                                         psz ) < 0 ||
                         ftp_ReadCommand( p_access, &i_answer, NULL ) < 0 )
                     {
-                        if( val.psz_string ) free( val.psz_string );
+                        free( psz );
                         goto exit_error;
                     }
-                    if( val.psz_string ) free( val.psz_string );
+                    free( psz );
 
                     if( i_answer / 100 != 2 )
                     {
@@ -372,7 +367,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             var_Get( p_access, "ftp-caching", &val );
-            *pi_64 = val.i_int * 1000;
+            *pi_64 = (int64_t)var_GetInteger( p_access, "ftp-caching" ) * I64C(1000);
             break;
 
         /* */

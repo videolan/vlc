@@ -164,8 +164,8 @@ static int ReadNull( access_t *p_access, uint8_t *p_buffer, int i_len)
  *****************************************************************************/
 static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
 {
-    char *psz_name = 0;
-    vlc_value_t val;
+    char *psz_name = NULL;
+    char *psz;
     int  i_mode, i_pos;
 
     playlist_t *p_playlist =
@@ -190,13 +190,12 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     }
 
     /* Initialize structure */
-    var_Create( p_access, "recursive", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "recursive", &val );
-    if( *val.psz_string == '\0' || !strncmp( val.psz_string, "none" , 4 )  )
+    psz = var_CreateGetString( p_access, "recursive" );
+    if( *psz == '\0' || !strncmp( psz, "none" , 4 )  )
     {
         i_mode = MODE_NONE;
     }
-    else if( !strncmp( val.psz_string, "collapse", 8 )  )
+    else if( !strncmp( psz, "collapse", 8 )  )
     {
         i_mode = MODE_COLLAPSE;
     }
@@ -204,7 +203,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     {
         i_mode = MODE_EXPAND;
     }
-    free( val.psz_string );
+    free( psz );
 
     /* Make sure we are deleted when we are done */
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;

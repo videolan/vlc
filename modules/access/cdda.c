@@ -46,12 +46,12 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Audio CD input") );
-
-    add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, VLC_TRUE );
-
     set_capability( "access2", 10 );
     set_callbacks( Open, Close );
+
+    add_usage_hint( N_("[cdda:][device][@[track]]") );
+    add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
+                 CACHING_LONGTEXT, VLC_TRUE );
     add_shortcut( "cdda" );
     add_shortcut( "cddasimple" );
 vlc_module_end();
@@ -98,7 +98,6 @@ static int Open( vlc_object_t *p_this )
     int  i;
     int  i_title = 0;
     vcddev_t *vcddev;
-    vlc_value_t val;
 
     /* Command line: cdda://[dev_path][@title] */
     if( ( psz = strchr( psz_dup, '@' ) ) )
@@ -117,10 +116,7 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
 
 
-        var_Create( p_access, "cd-audio", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-        var_Get( p_access, "cd-audio", &val );
-        psz_dup = val.psz_string;
-
+        psz_dup = var_CreateGetString( p_access, "cd-audio" );
         if( *psz_dup == '\0' )
         {
             free( psz_dup );
@@ -361,7 +357,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     int          *pi_int;
     int64_t      *pi_64;
     input_title_t ***ppp_title;
-    vlc_value_t  val;
     int i;
 
     switch( i_query )
@@ -383,8 +378,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            var_Get( p_access, "cdda-caching", &val );
-            *pi_64 = val.i_int * 1000;
+            *pi_64 = (int64_t)var_GetInteger( p_access, "cdda-caching" ) * I64C(1000);
             break;
 
         /* */

@@ -129,7 +129,7 @@ static int  Open ( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
-    vlc_value_t   val;
+    char         *psz;
 
     /* First set ipv4/ipv6 */
     var_Create( p_access, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -137,6 +137,7 @@ static int  Open ( vlc_object_t *p_this )
 
     if( *p_access->psz_access )
     {
+        vlc_value_t val;
         /* Find out which shortcut was used */
         if( !strncmp( p_access->psz_access, "http4", 6 ) )
         {
@@ -191,27 +192,19 @@ static int  Open ( vlc_object_t *p_this )
     }
     if( !p_sys->psz_user || *p_sys->psz_user == '\0' )
     {
-        var_Create( p_access, "http-user", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-        var_Get( p_access, "http-user", &val );
-        p_sys->psz_user = val.psz_string;
-
-        var_Create( p_access, "http-pwd", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-        var_Get( p_access, "http-pwd", &val );
-        p_sys->psz_passwd = val.psz_string;
+        p_sys->psz_user = var_CreateGetString( p_access, "http-user" );
+        p_sys->psz_passwd = var_CreateGetString( p_access, "http-pwd" );
     }
 
     /* Do user agent */
-    var_Create( p_access, "http-user-agent", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "http-user-agent", &val );
-    p_sys->psz_user_agent = val.psz_string;
+    p_sys->psz_user_agent = var_CreateGetString( p_access, "http-user-agent" );
 
     /* Check proxy */
-    var_Create( p_access, "http-proxy", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "http-proxy", &val );
-    if( val.psz_string && *val.psz_string )
+    psz = var_CreateGetString( p_access, "http-proxy" );
+    if( *psz )
     {
         p_sys->b_proxy = VLC_TRUE;
-        vlc_UrlParse( &p_sys->proxy, val.psz_string, 0 );
+        vlc_UrlParse( &p_sys->proxy, psz, 0 );
     }
     else
     {
@@ -219,17 +212,12 @@ static int  Open ( vlc_object_t *p_this )
         if( psz_proxy && *psz_proxy )
         {
             p_sys->b_proxy = VLC_TRUE;
-            vlc_UrlParse( &p_sys->proxy, val.psz_string, 0 );
+            vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
         }
         if( psz_proxy )
-        {
             free( psz_proxy );
-        }
     }
-    if( val.psz_string )
-    {
-        free( val.psz_string );
-    }
+    free( psz );
 
     if( p_sys->b_proxy )
     {
@@ -497,7 +485,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             var_Get( p_access, "http-caching", &val );
-            *pi_64 = val.i_int * 1000;
+            *pi_64 = (int64_t)var_GetInteger( p_access, "http-caching" ) * 1000;
             break;
 
         /* */

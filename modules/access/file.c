@@ -129,15 +129,14 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
-
-    char *              psz_name = p_access->psz_path;
+    char *psz_name = p_access->psz_path;
+    char *psz;
 
 #ifdef HAVE_SYS_STAT_H
     int                 i_stat;
     struct stat         stat_info;
 #endif
     vlc_bool_t          b_stdin;
-    vlc_value_t         val;
 
     file_entry_t *      p_file;
 
@@ -251,12 +250,10 @@ static int Open( vlc_object_t *p_this )
     p_file->psz_name = strdup( psz_name );
     TAB_APPEND( p_sys->i_file, p_sys->file, p_file );
 
-    var_Create( p_access, "file-cat", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "file-cat", &val );
-
-    if( *val.psz_string )
+    psz = var_CreateGetString( p_access, "file-cat" );
+    if( *psz )
     {
-        char *psz_parser = psz_name = val.psz_string;
+        char *psz_parser = psz_name = psz;
         int64_t i_size;
 
         while( psz_name && *psz_name )
@@ -292,7 +289,7 @@ static int Open( vlc_object_t *p_this )
             if( psz_name ) psz_name++;
         }
     }
-    free( val.psz_string );
+    free( psz );
 
     return VLC_SUCCESS;
 }
@@ -515,7 +512,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
-    vlc_value_t  val;
 
     switch( i_query )
     {
@@ -540,8 +536,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            var_Get( p_access, "file-caching", &val );
-            *pi_64 = val.i_int * 1000;
+            *pi_64 = (int64_t)var_GetInteger( p_access, "file-caching" ) * I64C(1000);
             break;
         /* */
         case ACCESS_SET_PAUSE_STATE:

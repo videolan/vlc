@@ -120,7 +120,6 @@ int  E_(MMSTUOpen)( access_t *p_access )
     access_sys_t   *p_sys;
     int             i_proto;
     int             i_status;
-    vlc_value_t val;
 
     /* Set up p_access */
     p_access->pf_read = Read;
@@ -215,10 +214,6 @@ int  E_(MMSTUOpen)( access_t *p_access )
         vlc_UrlClean( &p_sys->url );
         return VLC_EGENERIC;
     }
-
-    /* Update default_pts to a suitable value for mms access */
-    var_Get( p_access, "mms-caching", &val );
-
     return VLC_SUCCESS;
 }
 
@@ -272,7 +267,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             var_Get( p_access, "mms-caching", &val );
-            *pi_64 = val.i_int * 1000;
+            *pi_64 = (int64_t)var_GetInteger( p_access, "mms-caching" ) * I64C(1000);
             break;
 
         /* */
@@ -748,10 +743,10 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     E_( asf_HeaderParse )( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
     E_( asf_StreamSelect)( &p_sys->asfh,
-                           config_GetInt( p_access, "mms-maxbitrate" ),
-                           config_GetInt( p_access, "mms-all" ),
-                           config_GetInt( p_access, "audio" ),
-                           config_GetInt( p_access, "video" ) );
+                           var_CreateGetInteger( p_access, "mms-maxbitrate" ),
+                           var_CreateGetInteger( p_access, "mms-all" ),
+                           var_CreateGetInteger( p_access, "audio" ),
+                           var_CreateGetInteger( p_access, "video" ) );
 
     /* *** now select stream we want to receive *** */
     /* TODO take care of stream bitrate TODO */

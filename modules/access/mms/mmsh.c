@@ -66,7 +66,6 @@ int E_(MMSHOpen)( access_t *p_access )
 {
     access_sys_t    *p_sys;
     char            *psz_location = NULL;
-    vlc_value_t     val;
 
     /* init p_sys */
 
@@ -145,9 +144,6 @@ int E_(MMSHOpen)( access_t *p_access )
         p_access->info.i_size = p_sys->asfh.i_file_size;
     }
 
-    /* Update default_pts to a suitable value for mms access */
-    var_Get( p_access, "mms-caching", &val );
-
     return VLC_SUCCESS;
 }
 
@@ -171,7 +167,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
-    vlc_value_t  val;
 
     switch( i_query )
     {
@@ -195,8 +190,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            var_Get( p_access, "mms-caching", &val );
-            *pi_64 = val.i_int * 1000;
+            *pi_64 = (int64_t)var_GetInteger( p_access, "mms-caching" ) * I64C(1000);
             break;
 
         /* */
@@ -531,10 +525,10 @@ static int Describe( access_t  *p_access, char **ppsz_location )
              p_sys->asfh.i_min_data_packet_size );
 
     E_( asf_StreamSelect)( &p_sys->asfh,
-                           config_GetInt( p_access, "mms-maxbitrate" ),
-                           config_GetInt( p_access, "mms-all" ),
-                           config_GetInt( p_access, "audio" ),
-                           config_GetInt( p_access, "video" ) );
+                           var_CreateGetInteger( p_access, "mms-maxbitrate" ),
+                           var_CreateGetInteger( p_access, "mms-all" ),
+                           var_CreateGetInteger( p_access, "audio" ),
+                           var_CreateGetInteger( p_access, "video" ) );
 
     return VLC_SUCCESS;
 
