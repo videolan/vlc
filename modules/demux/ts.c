@@ -185,6 +185,8 @@ typedef struct
 {
     es_format_t  fmt;
     es_out_id_t *id;
+    int         i_pes_size;
+    int         i_pes_gathered;
     block_t     *p_pes;
     block_t     **pp_last;
 
@@ -792,6 +794,8 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
         es_format_Init( &pid->es->fmt, UNKNOWN_ES, 0 );
         pid->es->id      = NULL;
         pid->es->p_pes   = NULL;
+        pid->es->i_pes_size= 0;
+        pid->es->i_pes_gathered= 0;
         pid->es->pp_last = &pid->es->p_pes;
         pid->es->p_mpeg4desc = NULL;
         pid->es->b_gather = VLC_FALSE;
@@ -853,14 +857,17 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
 {
     block_t *p_pes = pid->es->p_pes;
     uint8_t header[30];
-    int     i_pes_size;
+    int     i_pes_size = 0;
     int     i_skip = 0;
     mtime_t i_dts = -1;
     mtime_t i_pts = -1;
+    mtime_t i_length = 0;
     int i_max;
 
     /* remove the pes from pid */
     pid->es->p_pes = NULL;
+    pid->es->i_pes_size= 0;
+    pid->es->i_pes_gathered= 0;
     pid->es->pp_last = &pid->es->p_pes;
 
     /* FIXME find real max size */
@@ -875,10 +882,7 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
         return;
     }
 
-    i_pes_size = (header[4] << 8)|header[5];
-
     /* TODO check size */
-
     switch( header[3] )
     {
         case 0xBC:  /* Program stream map */
@@ -974,6 +978,30 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
     {
         i_skip += 1;
     }
+    else if( pid->es->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) && pid->es->p_mpeg4desc )
+    {
+        decoder_config_descriptor_t *dcd = &pid->es->p_mpeg4desc->dec_descr;
+
+        if( dcd->i_decoder_specific_info_len > 2 &&
+            dcd->p_decoder_specific_info[0] == 0x10 &&
+            ( dcd->p_decoder_specific_info[1]&0x10 ) )
+        {
+            /* display length */
+            if( p_pes->i_buffer + 2 <= i_skip )
+            {
+                msg_Warn( p_demux, "length: %lld", i_length );
+                i_length = GetWBE( &p_pes->p_buffer[i_skip] );
+            }
+
+            i_skip += 2;
+        }
+        if( p_pes->i_buffer + 2 <= i_skip )
+        {
+            i_pes_size = GetWBE( &p_pes->p_buffer[i_skip] );
+        }
+        /* */
+        i_skip += 2;
+    }
 
     /* skip header */
     while( p_pes && i_skip > 0 )
@@ -1007,16 +1035,21 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
         {
             p_pes->i_pts = i_pts * 100 / 9;
         }
+        p_pes->i_length = i_length * 100 / 9;
 
-        if( 1 ) //pid->es->b_gather )
+        p_block = block_ChainGather( p_pes );
+        if( pid->es->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) )
         {
-            /* For mpeg4/mscodec we first gather the packet.
-             * This will make ffmpeg a lot happier */
-            p_block = block_ChainGather( p_pes );
-        }
-        else
-        {
-            p_block = p_pes;
+            if( i_pes_size > 0 && p_block->i_buffer > i_pes_size )
+            {
+                p_block->i_buffer = i_pes_size;
+            }
+            /* Append a \0 */
+            p_block = block_Realloc( p_block, 0, p_block->i_buffer + 1 );
+            p_block->p_buffer[p_block->i_buffer -1] = '\0';
+
+            msg_Warn( p_demux, "subs: pts=%lld str='%s'",
+                      p_block->i_pts, p_block->p_buffer );
         }
 
         for( i = 0; i < pid->i_extra_es; i++ )
@@ -1167,6 +1200,21 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             }
 
             block_ChainLastAppend( &pid->es->pp_last, p_bk );
+            if( p_bk->i_buffer > 6 )
+            {
+                pid->es->i_pes_size = GetWBE( &p_bk->p_buffer[4] );
+                if( pid->es->i_pes_size > 0 )
+                {
+                    pid->es->i_pes_size += 6;
+                }
+            }
+            pid->es->i_pes_gathered += p_bk->i_buffer;
+            if( pid->es->i_pes_size > 0 &&
+                pid->es->i_pes_gathered >= pid->es->i_pes_size )
+            {
+                ParsePES( p_demux, pid );
+                i_ret = VLC_TRUE;
+            }
         }
         else
         {
@@ -1177,9 +1225,14 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             }
             else
             {
-                /* TODO check if when have gathered enough packets to form a
-                 * PES (ie read PES size)*/
                 block_ChainLastAppend( &pid->es->pp_last, p_bk );
+                pid->es->i_pes_gathered += p_bk->i_buffer;
+                if( pid->es->i_pes_size > 0 &&
+                    pid->es->i_pes_gathered >= pid->es->i_pes_size )
+                {
+                    ParsePES( p_demux, pid );
+                    i_ret = VLC_TRUE;
+                }
             }
         }
     }
@@ -1249,6 +1302,7 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
             break;
 
         case 0x06:  /* PES_PRIVATE  (fixed later) */
+        case 0x12:  /* MPEG-4 generic (sub/scene/...) (fixed later) */
         default:
             es_format_Init( fmt, UNKNOWN_ES, 0 );
             break;
@@ -1714,7 +1768,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         PIDFillFormat( pid, p_es->i_type );
         pid->i_owner_number = prg->i_number;
 
-        if( p_es->i_type == 0x10 || p_es->i_type == 0x11 )
+        if( p_es->i_type == 0x10 || p_es->i_type == 0x11 || p_es->i_type == 0x12 )
         {
             /* MPEG-4 stream: search SL_DESCRIPTOR */
             dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;;
@@ -1753,6 +1807,11 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     pid->es->fmt.i_cat = VIDEO_ES;
                     switch( dcd->i_objectTypeIndication )
                     {
+                    case 0x0B: /* mpeg4 sub */
+                        pid->es->fmt.i_cat = SPU_ES;
+                        pid->es->fmt.i_codec = VLC_FOURCC('s','u','b','t');
+                        break;
+
                     case 0x20: /* mpeg4 */
                         pid->es->fmt.i_codec = VLC_FOURCC('m','p','4','v');
                         break;
@@ -1866,6 +1925,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         p_es->fmt = pid->es->fmt;
                         p_es->id = NULL;
                         p_es->p_pes = NULL;
+                        p_es->i_pes_size = 0;
+                        p_es->i_pes_gathered = 0;
                         p_es->pp_last = &p_es->p_pes;
                         p_es->p_mpeg4desc = NULL;
 
