@@ -16,7 +16,7 @@ export PIXDIR="usr/share/pixmaps"
 export GNOMEDIR="usr/share/gnome/apps/Multimedia"
 
 # Library options
-version=$(shell grep '^ *LIBDVDCSS_VERSION=[0-9]' configure.in | head -1 | cut -f2 -d=)
+version=$(shell grep '^ *LIBDVDCSS_VERSION=' configure.in | head -1 | sed 's/"//g' | cut -f2 -d=)
 major=$(shell echo "$(version)" | cut -f1 -d.)
 
 build: build-stamp
