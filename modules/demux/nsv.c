@@ -2,7 +2,7 @@
  * nsv.c: NullSoft Video demuxer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: nsv.c,v 1.8 2004/02/02 11:18:39 fenrir Exp $
+ * $Id: nsv.c,v 1.9 2004/02/15 16:59:18 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -60,6 +60,9 @@ struct demux_sys_t
     es_format_t  fmt_video;
     es_out_id_t *p_video;
 
+    es_format_t  fmt_sub;
+    es_out_id_t  *p_sub;
+
     int64_t     i_pcr;
     int64_t     i_time;
     int64_t     i_pcr_inc;
@@ -109,6 +112,9 @@ static int Open( vlc_object_t *p_this )
 
     es_format_Init( &p_sys->fmt_video, VIDEO_ES, 0 );
     p_sys->p_video = NULL;
+
+    es_format_Init( &p_sys->fmt_sub, SPU_ES, 0 );
+    p_sys->p_sub = NULL;
 
     p_sys->i_pcr   = 1;
     p_sys->i_time  = 0;
@@ -198,8 +204,68 @@ static int Demux( demux_t *p_demux )
     i_size = ( header[0] >> 4 ) | ( header[1] << 4 ) | ( header[2] << 12 );
     if( i_size > 0 )
     {
+        /* extra data ? */
+        if( (header[0]&0x0f) != 0x0 )
+        {
+            uint8_t      aux[6];
+            int          i_aux;
+            vlc_fourcc_t fcc;
+            if( stream_Read( p_demux->s, aux, 6 ) < 6 )
+            {
+                msg_Warn( p_demux, "cannot read" );
+                return 0;
+            }
+            i_aux = GetWLE( aux );
+            fcc   = VLC_FOURCC( aux[2], aux[3], aux[4], aux[5] );
+
+            msg_Dbg( p_demux, "Belekas: %d - size=%d fcc=%4.4s",
+                     header[0]&0xf, i_aux, (char*)&fcc );
+
+            if( fcc == VLC_FOURCC( 'S', 'U', 'B', 'T' ) && i_aux > 2 )
+            {
+                if( p_sys->p_sub == NULL )
+                {
+                    p_sys->fmt_sub.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+                    p_sys->p_sub = es_out_Add( p_demux->out, &p_sys->fmt_sub );
+                    es_out_Control( p_demux->out, ES_OUT_SET_ES, p_sys->p_sub );
+                }
+                stream_Read( p_demux->s, NULL, 2 );
+
+                if( ( p_frame = stream_Block( p_demux->s, i_aux - 2 ) ) )
+                {
+                    uint8_t *p = p_frame->p_buffer;
+
+                    while( p < &p_frame->p_buffer[p_frame->i_buffer] && *p != 0 )
+                    {
+                        p++;
+                    }
+                    if( *p == 0 && p + 1 < &p_frame->p_buffer[p_frame->i_buffer] )
+                    {
+                        p_frame->i_buffer -= p + 1 - p_frame->p_buffer;
+                        p_frame->p_buffer = p + 1;
+                    }
+
+                    /* Skip the first part (it is the language name) */
+                    p_frame->i_pts = p_sys->i_pcr;
+                    p_frame->i_dts = p_sys->i_pcr + 4000000;    /* 4s */
+
+                    es_out_Send( p_demux->out, p_sys->p_sub, p_frame );
+                }
+            }
+            else
+            {
+                /* We skip this extra data */
+                if( stream_Read( p_demux->s, NULL, i_aux ) < i_aux )
+                {
+                    msg_Warn( p_demux, "cannot read" );
+                    return 0;
+                }
+            }
+            i_size -= 6 + i_aux;
+        }
+
         /* msg_Dbg( p_demux, "frame video size=%d", i_size ); */
-        if( ( p_frame = stream_Block( p_demux->s, i_size ) ) )
+        if( i_size > 0 && ( p_frame = stream_Block( p_demux->s, i_size ) ) )
         {
             p_frame->i_dts = p_sys->i_pcr;
             es_out_Send( p_demux->out, p_sys->p_video, p_frame );
