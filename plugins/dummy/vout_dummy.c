@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.15 2002/01/04 14:01:34 sam Exp $
+ * $Id: vout_dummy.c,v 1.16 2002/01/05 03:49:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -77,7 +77,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-    p_function_list->functions.vout.pf_setpalette = NULL;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.77 2002/01/05 02:22:03 sam Exp $
+ * $Id: vout_sdl.c,v 1.78 2002/01/05 03:49:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -140,7 +140,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-    p_function_list->functions.vout.pf_setpalette = NULL;
 }
 
 /*****************************************************************************
@@ -596,12 +595,9 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
     SDL_LockSurface( p_vout->p_sys->p_display );
 
+    /* Choose the chroma we will try first. */
     switch( p_vout->render.i_chroma )
     {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-            p_vout->output.i_chroma = SDL_IYUV_OVERLAY;
-            break;
         case FOURCC_YUY2:
         case FOURCC_YUNV:
             p_vout->output.i_chroma = SDL_YUY2_OVERLAY;
@@ -615,6 +611,8 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
             p_vout->output.i_chroma = SDL_YVYU_OVERLAY;
             break;
         case FOURCC_YV12:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
         default:
             p_vout->output.i_chroma = SDL_YV12_OVERLAY;
             break;
@@ -624,6 +622,10 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         SDL_CreateYUVOverlay( 32, 32, p_vout->output.i_chroma,
                               p_vout->p_sys->p_display );
 
+    /* FIXME: if the first overlay we find is software, don't stop,
+     * because we may find a hardware one later ... */
+
+    /* If this best choice failed, fall back to other chromas */
     if( p_vout->p_sys->p_overlay == NULL )
     {
         p_vout->output.i_chroma = SDL_IYUV_OVERLAY;

@@ -1,1 +1,1 @@
-mga_SOURCES = mga.c vout_mga.c
+mga_SOURCES = mga.c

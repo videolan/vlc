@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.153 2002/01/05 02:22:03 sam Exp $
+ * $Id: video_output.c,v 1.154 2002/01/05 03:49:18 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -132,7 +132,6 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     p_vout->pf_manage     = f.pf_manage;
     p_vout->pf_render     = f.pf_render;
     p_vout->pf_display    = f.pf_display;
-    p_vout->pf_setpalette = f.pf_setpalette;
 #undef f
 
     /* Initialize thread properties - thread id and locks will be initialized

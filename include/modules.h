@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.39 2002/01/04 14:01:34 sam Exp $
+ * $Id: modules.h,v 1.40 2002/01/05 03:49:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -260,8 +260,6 @@ typedef struct function_list_s
                                        struct picture_s * );
             void ( * pf_display )    ( struct vout_thread_s *,
                                        struct picture_s * );
-            void ( * pf_setpalette ) ( struct vout_thread_s *,
-                                       u16 *, u16 *, u16 * );
         } vout;
 
         /* Motion compensation plugin */

@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.70 2002/01/04 14:01:34 sam Exp $
+ * $Id: video_output.h,v 1.71 2002/01/05 03:49:18 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -132,8 +132,6 @@ typedef struct vout_thread_s
                                           struct picture_s * );
     void             ( *pf_display )    ( struct vout_thread_s *,
                                           struct picture_s * );
-    void             ( *pf_setpalette ) ( struct vout_thread_s *,
-                                          u16 *, u16 *, u16 * );
 
     /* Statistics - these numbers are not supposed to be accurate, but are a
      * good indication of the thread status */

@@ -292,7 +292,17 @@ if test x"$ac_cv_c_boolean_t_cthreads_h" != x"no"; then
     AC_DEFINE(BOOLEAN_T_IN_CTHREADS_H, 1, Define if <cthreads.h> defines boolean_t.)
 fi
 
-ARCH=${target_cpu}
+dnl
+dnl  Check the CPU
+dnl
+case x"${target_cpu}" in
+  x)
+    ARCH=unknown
+    ;;
+  *)
+    ARCH=${target_cpu}
+    ;;
+esac
 
 dnl
 dnl  default modules
@@ -396,39 +406,43 @@ AC_CACHE_CHECK([if linker needs -framework vecLib],
 if test x"$ac_cv_ld_altivec" != x"no"; then
   LIB_IDCTALTIVEC="${LIB_IDCTALTIVEC} -framework vecLib"
   LIB_MOTIONALTIVEC="${LIB_MOTIONALTIVEC} -framework vecLib"
+  LIB="${LIB} -framework vecLib"
 fi
 
 dnl
 dnl  Check the operating system
 dnl
-case ${target_os} in
-  linux*)
+case x"${target_os}" in
+  x)
+    SYS=unknown
+    ;;
+  xlinux*)
     SYS=linux
     ;;
-  bsdi*)
+  xbsdi*)
     SYS=bsdi
     ;;
-  darwin*)
+  xdarwin*)
     SYS=darwin
     ;;
-  *mingw32*)
+  x*mingw32*)
     SYS=mingw32
     AC_CHECK_TOOL(WINDRES, windres, :)
     LIB_MPEG_TS="-lws2_32"
     LIB_RC="-lws2_32"
     ;;
-  *nto*)
+  x*nto*)
     SYS=nto
     LIB_X11="${LIB_X11} -lsocket"
     LIB_XVIDEO="${LIB_XVIDEO} -lsocket"
     ;;
-  beos)
+  xbeos)
     SYS=beos
     LIB="${LIB} -lbe"
     LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
     PLDFLAGS="${PLDFLAGS} -nostart"
     ;;
-  *)
+  x*)
     SYS=${target_os}
     ;;
 esac
@@ -925,6 +939,16 @@ AC_ARG_ENABLE(fb,
   [ if test x$enable_fb = xyes
     then
       PLUGINS="${PLUGINS} fb"
+    fi ])
+
+dnl
+dnl  Linux MGA module
+dnl
+AC_ARG_ENABLE(mga,
+  [  --enable-mga            Linux kernel Matrox support (default disabled)],
+  [ if test x$enable_mga = xyes
+    then
+      PLUGINS="${PLUGINS} mga"
     fi ])
 
 dnl
