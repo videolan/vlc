@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.42 2002/07/20 18:01:42 sam Exp $
+ * $Id: intf_beos.cpp,v 1.43 2002/07/23 12:42:17 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -35,17 +35,8 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
+#include "intf_vlc_wrapper.h"
 #include "InterfaceWindow.h"
-
-/*****************************************************************************
- * intf_sys_t: description and status of FB interface
- *****************************************************************************/
-struct intf_sys_t
-{
-    InterfaceWindow * p_window;
-    char              i_key;
-};
-
 
 extern "C"
 {
@@ -89,7 +80,9 @@ static int intf_Open( intf_thread_t *p_intf )
         msg_Err( p_intf, "out of memory" );
         return( 1 );
     }
-    p_intf->p_sys->i_key = -1;
+//    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+    p_intf->p_sys->p_input = NULL;
+
 
     /* Create the interface window */
     p_intf->p_sys->p_window =
@@ -110,6 +103,13 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+    }
+
+//    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+
     /* Destroy the interface window */
     p_intf->p_sys->p_window->Lock();
     p_intf->p_sys->p_window->Quit();
@@ -126,16 +126,31 @@ static void intf_Run( intf_thread_t *p_intf )
 {
     while( !p_intf->b_die )
     {
-        /* Manage the slider */
-        if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL
-             && p_intf->p_sys->p_window != NULL)
+        /* Update the input */
+        if( p_intf->p_sys->p_input != NULL )
         {
+            if( p_intf->p_sys->p_input->b_dead )
+            {
+                vlc_object_release( p_intf->p_sys->p_input );
+                p_intf->p_sys->p_input = NULL;
+            }
+        /* Manage the slider */
             p_intf->p_sys->p_window->updateInterface();
         }
+    
+        if( p_intf->p_sys->p_input == NULL )
+        {
+            p_intf->p_sys->p_input = 
+                        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                          FIND_ANYWHERE );
+        }
+
+
 
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
     }
+    
 }
 
 } /* extern "C" */

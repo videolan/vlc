@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.22 2002/07/23 00:39:16 sam Exp $
+ * $Id: VideoWindow.h,v 1.23 2002/07/23 12:42:17 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -45,7 +45,7 @@ colorcombo colspace[]=
 };
 
 #define COLOR_COUNT 5
-#define DEFAULT_COL 3
+#define DEFAULT_COL 4
 
 
 class VLCView : public BView
@@ -74,7 +74,7 @@ public:
     void            drawBuffer(int bufferIndex);
     void            WindowActivated(bool active);
     int             SelectDrawingMode(int width, int height);
-    bool            QuitRequested();
+    void            MessageReceived(BMessage *message);
     
     // this is the hook controling direct screen connection
     int32           i_width;     // incomming bitmap size 
@@ -82,7 +82,6 @@ public:
     BRect           winSize;     // current window size
     bool            is_zoomed, vsync;
     BBitmap	        *bitmap[3];
-    BBitmap         *overlaybitmap;
     VLCView	        *view;
     int             i_buffer;
     bool			teardownwindow;

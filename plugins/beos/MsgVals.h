@@ -2,7 +2,7 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.10 2002/07/22 11:39:56 tcastley Exp $
+ * $Id: MsgVals.h,v 1.11 2002/07/23 12:42:17 tcastley Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *
@@ -36,7 +36,7 @@ const uint32 SLOWER_PLAY    = 'SLPL';
 const uint32 SEEK_PLAYBACK  = 'SEEK';
 const uint32 VOLUME_CHG     = 'VOCH';
 const uint32 VOLUME_MUTE    = 'MUTE';
-const uint32 SELECT_CHANNEL = 'CHAN';
+const uint32 SELECT_AUDIO   = 'AUDI';
 const uint32 SELECT_SUBTITLE = 'SUBT';
 const uint32 PREV_TITLE     = 'PRTI';
 const uint32 NEXT_TITLE     = 'NXTI';

@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.14 2002/07/23 00:39:16 sam Exp $
+ * $Id: InterfaceWindow.h,v 1.15 2002/07/23 12:42:17 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -21,6 +21,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+/*****************************************************************************
+ * intf_sys_t: description and status of FB interface
  *****************************************************************************/
 class MediaControlView;
 class PlayListWindow;
@@ -65,8 +68,10 @@ public:
 private:	
     intf_thread_t  *p_intf;
     bool            b_empty_playlist;
+    bool            b_mute;
 	BFilePanel *file_panel;
 	PlayListWindow* playlist_window;
     BMenuItem      *miOnTop;
+    Intf_VLCWrapper *  p_vlc_wrapper;
 };
 
