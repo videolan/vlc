@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.72 2001/01/15 13:25:09 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.73 2001/01/15 18:02:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -130,7 +130,6 @@ static int  SynchroType( void );
 
 /* Error margins */
 #define DELTA                   (int)(0.040*CLOCK_FREQ)
-#define PTS_THRESHOLD           (int)(0.030*CLOCK_FREQ)
 
 #define DEFAULT_NB_P            5
 #define DEFAULT_NB_B            1
@@ -151,7 +150,7 @@ void vpar_SynchroInit( vpar_thread_t * p_vpar )
     memset( p_vpar->synchro.pi_meaningful, 0, 4 * sizeof(unsigned int) );
     p_vpar->synchro.b_dropped_last = 0;
     p_vpar->synchro.current_pts = mdate() + DEFAULT_PTS_DELAY;
-    p_vpar->synchro.backward_pts = 0;
+    p_vpar->synchro.backward_pts = p_vpar->synchro.next_period = 0;
 #ifdef STATS
     p_vpar->synchro.i_trashed_pic = p_vpar->synchro.i_not_chosen_pic = 
         p_vpar->synchro.i_pic = 0;
@@ -419,7 +418,7 @@ mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
  * vpar_SynchroNewPicture: Update stream structure and PTS
  *****************************************************************************/
 void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
-                             boolean_t b_repeat_field )
+                             int i_repeat_field )
 {
     mtime_t         period = 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
 
@@ -469,18 +468,14 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
         break;
     }
 
-    if( b_repeat_field )
-    {
-        /* MPEG-2 repeat_first_field */
-        /* FIXME : this is not exactly what we should do, repeat_first_field
-         * only regards the next picture */
-        p_vpar->synchro.current_pts += period + (period >> 1);
-    }
-    else
-    {
-        p_vpar->synchro.current_pts += period;
-    }
+    p_vpar->synchro.current_pts += p_vpar->synchro.next_period;
 
+    /* A video frame can be displayed 1, 2 or 3 times, according to
+     * repeat_first_field, top_field_first, progressive_sequence and
+     * progressive_frame. */
+    p_vpar->synchro.next_period = i_repeat_field * (period >> 1);
+
+#define PTS_THRESHOLD   (period >> 2)
     if( i_coding_type == B_CODING_TYPE )
     {
         if( p_vpar->sequence.next_pts )
@@ -551,6 +546,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
             p_vpar->sequence.next_pts = 0;
         }
     }
+#undef PTS_THRESHOLD
 
 #ifdef STATS
     p_vpar->synchro.i_pic++;

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.68 2001/01/13 12:57:21 sam Exp $
+ * $Id: vpar_headers.c,v 1.69 2001/01/15 18:02:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -542,11 +542,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.b_intra_vlc_format = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_alternate_scan = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_repeat_first_field = GetBits( &p_vpar->bit_stream, 1 );
-        /* repeat_first_field (ISO/IEC 13818-2 6.3.10 is necessary to know
-         * the length of the picture_display_extension structure.
-         * chroma_420_type (obsolete) */
+        /* chroma_420_type (obsolete) */
         RemoveBits( &p_vpar->bit_stream, 1 );
-        p_vpar->picture.b_progressive_frame = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.b_progressive = GetBits( &p_vpar->bit_stream, 1 );
 
         /* composite_display_flag */
         if( GetBits( &p_vpar->bit_stream, 1 ) )
@@ -561,13 +559,14 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         /* MPEG-1 compatibility flags */
         p_vpar->picture.i_intra_dc_precision = 0; /* 8 bits */
         i_structure = FRAME_STRUCTURE;
+        p_vpar->picture.b_top_field_first = 0;
         p_vpar->picture.b_frame_pred_frame_dct = 1;
         p_vpar->picture.b_concealment_mv = 0;
         p_vpar->picture.b_q_scale_type = 0;
         p_vpar->picture.b_intra_vlc_format = 0;
         p_vpar->picture.b_alternate_scan = 0; /* zigzag */
-        p_vpar->picture.b_repeat_first_field = 0;
-        p_vpar->picture.b_progressive_frame = 1;
+        p_vpar->picture.b_repeat_first_field = 1;
+        p_vpar->picture.b_progressive = 1;
     }
 
 #ifdef STATS
@@ -619,9 +618,30 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     }
     else
     {
+        int     i_repeat_field;
+
+        /* Compute the number of times the frame will be emitted by the
+         * decoder (number of periods). */
+        if( p_vpar->sequence.b_progressive )
+        {
+            i_repeat_field = 1 + p_vpar->picture.b_repeat_first_field
+                               + p_vpar->picture.b_top_field_first;
+        }
+        else
+        {
+            if( p_vpar->picture.b_progressive )
+            {
+                i_repeat_field = 2 + p_vpar->picture.b_repeat_first_field;
+            }
+            else
+            {
+                i_repeat_field = 2;
+            }
+        }
+
         /* Warn synchro we have a new picture (updates pictures index). */
         vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type,
-                                p_vpar->picture.b_repeat_first_field );
+                                i_repeat_field );
 
         if( b_parsable )
         {
@@ -751,7 +771,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( p_vpar->picture.b_error )
     {
         /* Trash picture. */
-//fprintf(stderr, "Image trashee\n");
 #ifdef VDEC_SMP
         for( i_mb = 1; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
         {
@@ -778,7 +797,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     }
     else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
     {
-//fprintf(stderr, "Image parsee (%d)\n", p_vpar->picture.i_coding_type);
         /* Frame completely parsed. */
 #ifdef VDEC_SMP
         for( i_mb = 1; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )

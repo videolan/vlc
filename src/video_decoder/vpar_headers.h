@@ -2,7 +2,7 @@
  * vpar_headers.h : video parser : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.h,v 1.2 2001/01/15 13:25:09 massiot Exp $
+ * $Id: vpar_headers.h,v 1.3 2001/01/15 18:02:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -110,7 +110,7 @@ typedef struct picture_parsing_s
     int                 i_intra_dc_precision;
     boolean_t           b_frame_pred_frame_dct, b_q_scale_type;
     boolean_t           b_intra_vlc_format;
-    boolean_t           b_alternate_scan, b_progressive_frame;
+    boolean_t           b_alternate_scan, b_progressive;
     boolean_t           b_top_field_first, b_concealment_mv;
     boolean_t           b_repeat_first_field;
     /* Relative to the current field */
