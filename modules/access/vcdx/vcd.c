@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: vcd.c,v 1.14 2004/01/25 14:42:18 rocky Exp $
+ * $Id: vcd.c,v 1.15 2004/01/25 17:31:22 gbazin Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *
@@ -96,8 +96,6 @@ vlc_module_begin();
     add_shortcut( "vcdx" );
 
     /* Configuration options */
-    add_category_hint( N_("VCDX"), NULL, VLC_TRUE );
-
     add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback),
                   N_("If nonzero, this gives additional debug information."),
                   DEBUG_LONGTEXT, VLC_TRUE );

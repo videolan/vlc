@@ -1,8 +1,8 @@
 /*****************************************************************************
- * tcp.c: TCP access plug-in
+ * tcp.c: TCP input module
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: tcp.c,v 1.3 2004/01/05 15:07:16 fenrir Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: tcp.c,v 1.4 2004/01/25 17:31:22 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -34,7 +34,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for udp streams. This " \
     "value should be set in miliseconds units." )
@@ -44,13 +44,14 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("TCP input") );
-    add_category_hint( N_("TCP"), NULL , VLC_TRUE );
-    add_integer( "tcp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+
+    add_integer( "tcp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
+                 CACHING_LONGTEXT, VLC_TRUE );
+
     set_capability( "access", 0 );
     add_shortcut( "tcp" );
     set_callbacks( Open, Close );
 vlc_module_end();
-
 
 /*****************************************************************************
  * Local prototypes
@@ -60,7 +61,7 @@ struct access_sys_t
     int fd;
 };
 
-static ssize_t  Read ( input_thread_t *, byte_t *, size_t );
+static ssize_t Read ( input_thread_t *, byte_t *, size_t );
 
 /*****************************************************************************
  * Open: open the socket
@@ -158,4 +159,3 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
     return net_Read( p_input, p_sys->fd, p_buffer, i_len, VLC_FALSE );
 }
-

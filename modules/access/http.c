@@ -1,8 +1,8 @@
 /*****************************************************************************
- * http.c: HTTP access plug-in
+ * http.c: HTTP input module
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.56 2004/01/15 13:45:27 fenrir Exp $
+ * $Id: http.c,v 1.57 2004/01/25 17:31:22 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -39,9 +39,9 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define PROXY_TEXT N_("Specify an HTTP proxy")
+#define PROXY_TEXT N_("HTTP proxy")
 #define PROXY_LONGTEXT N_( \
-    "Specify an HTTP proxy to use. It must be in the form " \
+    "You can specify an HTTP proxy to use. It must be of the form " \
     "http://myproxy.mydomain:myport/. If none is specified, the HTTP_PROXY " \
     "environment variable will be tried." )
 
@@ -50,15 +50,31 @@ static void Close( vlc_object_t * );
     "Allows you to modify the default caching value for http streams. This " \
     "value should be set in millisecond units." )
 
+#define USER_TEXT N_("HTTP user name")
+#define USER_LONGTEXT N_("Allows you to modify the user name that will " \
+    "be used for the connection (Basic authentification only).")
+
+#define PASS_TEXT N_("HTTP password")
+#define PASS_LONGTEXT N_("Allows you to modify the password that will be " \
+    "used for the connection.")
+
+#define AGENT_TEXT N_("HTTP user agent")
+#define AGENT_LONGTEXT N_("Allows you to modify the user agent that will be " \
+    "used for the connection.")
+
 vlc_module_begin();
     set_description( _("HTTP input") );
     set_capability( "access", 0 );
-    add_category_hint( N_("http"), NULL, VLC_FALSE );
-        add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT, VLC_FALSE );
-        add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-        add_string( "http-user", NULL, NULL, "HTTP user name", "HTTP user name for Basic Authentification", VLC_FALSE );
-        add_string( "http-pwd", NULL , NULL, "HTTP password", "HTTP password for Basic Authentification", VLC_FALSE );
-        add_string( "http-user-agent", COPYRIGHT_MESSAGE , NULL, "HTTP user agent", "HTTP user agent", VLC_FALSE );
+
+    add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
+                VLC_FALSE );
+    add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
+                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_string( "http-user", NULL, NULL, USER_TEXT, USER_LONGTEXT, VLC_FALSE );
+    add_string( "http-pwd", NULL , NULL, PASS_TEXT, PASS_LONGTEXT, VLC_FALSE );
+    add_string( "http-user-agent", COPYRIGHT_MESSAGE , NULL, AGENT_TEXT,
+                AGENT_LONGTEXT, VLC_FALSE );
+
     add_shortcut( "http" );
     add_shortcut( "http4" );
     add_shortcut( "http6" );
@@ -212,24 +228,29 @@ static int  Open ( vlc_object_t *p_this )
         }
     }
 
-    msg_Dbg( p_input, "http: server='%s' port=%d file='%s", p_sys->url.psz_host, p_sys->url.i_port, p_sys->url.psz_path );
+    msg_Dbg( p_input, "http: server='%s' port=%d file='%s",
+             p_sys->url.psz_host, p_sys->url.i_port, p_sys->url.psz_path );
     if( p_sys->b_proxy )
     {
-        msg_Dbg( p_input, "      proxy %s:%d", p_sys->proxy.psz_host, p_sys->proxy.i_port );
+        msg_Dbg( p_input, "      proxy %s:%d", p_sys->proxy.psz_host,
+                 p_sys->proxy.i_port );
     }
     if( p_sys->psz_user && *p_sys->psz_user )
     {
-        msg_Dbg( p_input, "      user='%s', pwd='%s'", p_sys->psz_user, p_sys->psz_passwd );
+        msg_Dbg( p_input, "      user='%s', pwd='%s'",
+                 p_sys->psz_user, p_sys->psz_passwd );
     }
 
     /* Connect */
-    if( Connect( p_input, &p_input->stream.b_seekable, &p_input->stream.p_selected_area->i_size, 0 ) )
+    if( Connect( p_input, &p_input->stream.b_seekable,
+                 &p_input->stream.p_selected_area->i_size, 0 ) )
     {
         /* Retry with http 1.0 */
         p_sys->i_version = 0;
 
         if( p_input->b_die ||
-            Connect( p_input, &p_input->stream.b_seekable, &p_input->stream.p_selected_area->i_size, 0 ) )
+            Connect( p_input, &p_input->stream.b_seekable,
+                     &p_input->stream.p_selected_area->i_size, 0 ) )
         {
             goto error;
         }
@@ -281,7 +302,8 @@ static int  Open ( vlc_object_t *p_this )
         {
             p_input->psz_demux = strdup( "mp3" );
         }
-        msg_Info( p_input, "ICY server found, %s demuxer selected", p_input->psz_demux );
+        msg_Info( p_input, "ICY server found, %s demuxer selected",
+                  p_input->psz_demux );
     }
 
     /* Update default_pts to a suitable value for http access */
@@ -345,7 +367,8 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
 
     net_Close( p_sys->fd ); p_sys->fd = -1;
 
-    if( Connect( p_input, &p_input->stream.b_seekable, &p_input->stream.p_selected_area->i_size, i_pos ) )
+    if( Connect( p_input, &p_input->stream.b_seekable,
+                 &p_input->stream.p_selected_area->i_size, i_pos ) )
     {
         msg_Err( p_input, "seek failed" );
     }
@@ -435,7 +458,8 @@ static void ParseURL( access_sys_t *p_sys, char *psz_url )
 /*****************************************************************************
  * Connect:
  *****************************************************************************/
-static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_size, off_t i_tell )
+static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable,
+                    off_t *pi_size, off_t i_tell )
 {
     access_sys_t   *p_sys   = p_input->p_access_data;
     vlc_url_t      srv = p_sys->b_proxy ? p_sys->proxy : p_sys->url;
@@ -463,8 +487,8 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
     {
         net_Printf( VLC_OBJECT(p_input), p_sys->fd,
                     "GET http://%s:%d/%s HTTP/1.%d\r\n",
-                    p_sys->url.psz_host, p_sys->url.i_port, p_sys->url.psz_path,
-                    p_sys->i_version );
+                    p_sys->url.psz_host, p_sys->url.i_port,
+                    p_sys->url.psz_path, p_sys->i_version );
     }
     else
     {
@@ -474,12 +498,12 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
             psz_path = "/";
         }
         net_Printf( VLC_OBJECT(p_input), p_sys->fd,
-                    "GET %s HTTP/1.%d\r\n"
-                    "Host: %s\r\n",
+                    "GET %s HTTP/1.%d\r\nHost: %s\r\n",
                     psz_path, p_sys->i_version, p_sys->url.psz_host );
     }
     /* User Agent */
-    net_Printf( VLC_OBJECT(p_input), p_sys->fd, "User-Agent: %s\r\n", p_sys->psz_user_agent );
+    net_Printf( VLC_OBJECT(p_input), p_sys->fd, "User-Agent: %s\r\n",
+                p_sys->psz_user_agent );
     /* Offset */
     if( p_sys->i_version == 1 )
     {
@@ -497,14 +521,15 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
 
         b64 = b64_encode( buf );
 
-        net_Printf( VLC_OBJECT(p_input), p_sys->fd, "Authorization: Basic %s", b64 );
+        net_Printf( VLC_OBJECT(p_input), p_sys->fd,
+                    "Authorization: Basic %s", b64 );
         free( b64 );
     }
     net_Printf( VLC_OBJECT(p_input), p_sys->fd, "Connection: Close\r\n" );
 
     if( net_Printf( VLC_OBJECT(p_input), p_sys->fd, "\r\n" ) < 0 )
     {
-        msg_Err( p_input, "Failed to send request\n" );
+        msg_Err( p_input, "failed to send request" );
         net_Close( p_sys->fd ); p_sys->fd = -1;
         return VLC_EGENERIC;
     }
@@ -516,7 +541,7 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
     /* Read Answer */
     if( ( psz = net_Gets( VLC_OBJECT(p_input), p_sys->fd ) ) == NULL )
     {
-        msg_Err( p_input, "Failed to read answer\n" );
+        msg_Err( p_input, "failed to read answer" );
         goto error;
     }
     if( !strncmp( psz, "HTTP/1.", 7 ) )
@@ -535,7 +560,8 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
         free( psz );
         goto error;
     }
-    msg_Dbg( p_input, "Protocol '%s' answer code %d", p_sys->psz_protocol, p_sys->i_code );
+    msg_Dbg( p_input, "protocol '%s' answer code %d",
+             p_sys->psz_protocol, p_sys->i_code );
     if( !strcmp( p_sys->psz_protocol, "ICY" ) )
     {
         *pb_seekable = VLC_FALSE;
@@ -559,7 +585,7 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
 
         if( psz == NULL )
         {
-            msg_Err( p_input, "Failed to read answer\n" );
+            msg_Err( p_input, "failed to read answer" );
             goto error;
         }
 

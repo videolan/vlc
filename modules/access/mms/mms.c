@@ -1,8 +1,8 @@
 /*****************************************************************************
  * mms.c: MMS over tcp, udp and http access plug-in
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.35 2004/01/21 16:56:16 fenrir Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: mms.c,v 1.36 2004/01/25 17:31:22 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -59,19 +59,23 @@ static void Close       ( vlc_object_t * );
     "Allows you to modify the default caching value for mms streams. This " \
     "value should be set in miliseconds units." )
 
+#define ALL_TEXT N_("Force selection of all streams")
+
+#define BITRATE_TEXT N_("Selct maximum bitrate stream")
+#define BITRATE_LONGTEXT N_( \
+    "Always select the stream with the maximum bitrate." )
+
 vlc_module_begin();
     set_description( _("Microsoft Media Server (MMS) input") );
     set_capability( "access", 0 );
-    add_category_hint( "stream", NULL, VLC_TRUE );
-        add_integer( "mms-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
-                     CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
 
-        add_bool( "mms-all", 0, NULL,
-                  "force selection of all streams",
-                  "force selection of all streams", VLC_TRUE );
-        add_integer( "mms-maxbitrate", 0, NULL,
-                     "max bitrate",
-                     "set max bitrate for auto streams selections", VLC_FALSE );
+    add_integer( "mms-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
+                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+
+    add_bool( "mms-all", 0, NULL, ALL_TEXT, "", VLC_TRUE );
+    add_integer( "mms-maxbitrate", 0, NULL, BITRATE_TEXT, BITRATE_LONGTEXT ,
+                 VLC_FALSE );
+
     add_shortcut( "mms" );
     add_shortcut( "mmsu" );
     add_shortcut( "mmst" );
@@ -79,7 +83,9 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
-
+/*****************************************************************************
+ * Open:
+ *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
     input_thread_t  *p_input = (input_thread_t*)p_this;

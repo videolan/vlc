@@ -1,8 +1,8 @@
 /*****************************************************************************
- * ftp.c:
+ * ftp.c: FTP input module
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ftp.c,v 1.24 2004/01/08 00:37:18 fenrir Exp $
+ * $Id: ftp.c,v 1.25 2004/01/25 17:31:22 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -41,16 +41,27 @@ static void    Close    ( vlc_object_t * );
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for ftp streams. This " \
     "value should be set in millisecond units." )
+#define USER_TEXT N_("FTP user name")
+#define USER_LONGTEXT N_("Allows you to modify the user name that will " \
+    "be used for the connection.")
+#define PASS_TEXT N_("FTP password")
+#define PASS_LONGTEXT N_("Allows you to modify the password that will be " \
+    "used for the connection.")
+#define ACCOUNT_TEXT N_("FTP account")
+#define ACCOUNT_LONGTEXT N_("Allows you to modify the account that will be " \
+    "used for the connection.")
 
 vlc_module_begin();
     set_description( _("FTP input") );
     set_capability( "access", 0 );
-    add_category_hint( "stream", NULL, VLC_FALSE );
-        add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
-                     CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-        add_string( "ftp-user", "anonymous", NULL, "ftp user name", "ftp user name", VLC_FALSE );
-        add_string( "ftp-pwd", "anonymous@dummy.org", NULL, "ftp password", "ftp password, be careful with that option...", VLC_FALSE );
-        add_string( "ftp-account", "anonymous", NULL, "ftp account", "ftp account", VLC_FALSE );
+    add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
+                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
+                VLC_FALSE );
+    add_string( "ftp-pwd", "anonymous@dummy.org", NULL, PASS_TEXT,
+                PASS_LONGTEXT, VLC_FALSE );
+    add_string( "ftp-account", "anonymous", NULL, ACCOUNT_TEXT,
+                ACCOUNT_LONGTEXT, VLC_FALSE );
     add_shortcut( "ftp" );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -115,7 +126,8 @@ static int Open( vlc_object_t *p_this )
 
     /* *** Open a TCP connection with server *** */
     msg_Dbg( p_input, "waiting for connection..." );
-    p_sys->fd_cmd = net_OpenTCP( p_input, p_sys->url.psz_host, p_sys->url.i_port );
+    p_sys->fd_cmd = net_OpenTCP( p_input, p_sys->url.psz_host,
+                                 p_sys->url.i_port );
     if( p_sys->fd_cmd < 0 )
     {
         msg_Err( p_input, "failed to connect with server" );
@@ -172,9 +184,11 @@ static int Open( vlc_object_t *p_this )
                     break;
                 case 3:
                     msg_Dbg( p_input, "account needed" );
-                    var_Create( p_input, "ftp-account", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+                    var_Create( p_input, "ftp-account",
+                                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
                     var_Get( p_input, "ftp-account", &val );
-                    if( ftp_SendCommand( p_input, "ACCT %s", val.psz_string ) < 0 ||
+                    if( ftp_SendCommand( p_input, "ACCT %s",
+                                         val.psz_string ) < 0 ||
                         ftp_ReadCommand( p_input, &i_answer, NULL ) < 0 )
                     {
                         if( val.psz_string ) free( val.psz_string );
@@ -308,8 +322,8 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
 /*****************************************************************************
  * Read:
  *****************************************************************************/
-static ssize_t Read     ( input_thread_t * p_input, byte_t * p_buffer,
-                          size_t i_len )
+static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
+                     size_t i_len )
 {
     access_sys_t *p_sys = p_input->p_access_data;
 
@@ -319,7 +333,7 @@ static ssize_t Read     ( input_thread_t * p_input, byte_t * p_buffer,
 /*****************************************************************************
  * ftp_*:
  *****************************************************************************/
-static int  ftp_SendCommand( input_thread_t *p_input, char *psz_fmt, ... )
+static int ftp_SendCommand( input_thread_t *p_input, char *psz_fmt, ... )
 {
     access_sys_t *p_sys = p_input->p_access_data;
     va_list      args;
@@ -331,7 +345,8 @@ static int  ftp_SendCommand( input_thread_t *p_input, char *psz_fmt, ... )
     va_end( args );
 
     msg_Dbg( p_input, "ftp_SendCommand:\"%s\"", psz_cmd);
-    if( ( i_ret = net_Printf( VLC_OBJECT(p_input), p_sys->fd_cmd, "%s", psz_cmd ) ) > 0 )
+    if( ( i_ret = net_Printf( VLC_OBJECT(p_input), p_sys->fd_cmd,
+                              "%s", psz_cmd ) ) > 0 )
     {
         i_ret = net_Printf( VLC_OBJECT(p_input), p_sys->fd_cmd, "\n" );
     }
@@ -359,8 +374,8 @@ static int  ftp_SendCommand( input_thread_t *p_input, char *psz_fmt, ... )
 
  These strings are not part of the requests, except in the case \377\377,
  where the request contains one \377. */
-static int  ftp_ReadCommand( input_thread_t *p_input,
-                             int *pi_answer, char **ppsz_answer )
+static int ftp_ReadCommand( input_thread_t *p_input,
+                            int *pi_answer, char **ppsz_answer )
 {
     access_sys_t *p_sys = p_input->p_access_data;
     char         *psz_line;
@@ -391,7 +406,7 @@ static int  ftp_ReadCommand( input_thread_t *p_input,
     return( i_answer / 100 );
 }
 
-static int  ftp_StartStream( input_thread_t *p_input, off_t i_start )
+static int ftp_StartStream( input_thread_t *p_input, off_t i_start )
 {
     access_sys_t *p_sys = p_input->p_access_data;
 
@@ -410,7 +425,9 @@ static int  ftp_StartStream( input_thread_t *p_input, off_t i_start )
     }
 
     psz_parser = strchr( psz_arg, '(' );
-    if( !psz_parser || sscanf( psz_parser, "(%d,%d,%d,%d,%d,%d", &a1, &a2, &a3, &a4, &p1, &p2 ) < 6 )
+    if( !psz_parser ||
+        sscanf( psz_parser, "(%d,%d,%d,%d,%d,%d", &a1, &a2, &a3,
+                &a4, &p1, &p2 ) < 6 )
     {
         free( psz_arg );
         msg_Err( p_input, "cannot get ip/port for passive transfert mode" );
@@ -459,7 +476,7 @@ static int  ftp_StartStream( input_thread_t *p_input, off_t i_start )
     return VLC_SUCCESS;
 }
 
-static int  ftp_StopStream ( input_thread_t *p_input)
+static int ftp_StopStream ( input_thread_t *p_input)
 {
     access_sys_t *p_sys = p_input->p_access_data;
 
@@ -477,4 +494,3 @@ static int  ftp_StopStream ( input_thread_t *p_input)
 
     return VLC_SUCCESS;
 }
-

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * udp.c: raw UDP & RTP access plug-in
+ * udp.c: raw UDP & RTP input module
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.27 2004/01/21 10:22:31 fenrir Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: udp.c,v 1.28 2004/01/25 17:31:22 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -38,7 +38,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for udp streams. This " \
     "value should be set in miliseconds units." )
@@ -48,8 +48,10 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("UDP/RTP input") );
-    add_category_hint( N_("UDP"), NULL , VLC_TRUE );
-    add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+
+    add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
+                 CACHING_LONGTEXT, VLC_TRUE );
+
     set_capability( "access", 0 );
     add_shortcut( "udp" );
     add_shortcut( "udpstream" );
@@ -100,7 +102,8 @@ static int Open( vlc_object_t *p_this )
     if( *p_input->psz_access )
     {
         /* Find out which shortcut was used */
-        if( !strncmp( p_input->psz_access, "udp4", 6 ) || !strncmp( p_input->psz_access, "rtp4", 6 ))
+        if( !strncmp( p_input->psz_access, "udp4", 6 ) ||
+            !strncmp( p_input->psz_access, "rtp4", 6 ))
         {
             val.b_bool = VLC_TRUE;
             var_Set( p_input, "ipv4", val );
@@ -108,7 +111,8 @@ static int Open( vlc_object_t *p_this )
             val.b_bool = VLC_FALSE;
             var_Set( p_input, "ipv6", val );
         }
-        else if( !strncmp( p_input->psz_access, "udp6", 6 ) || !strncmp( p_input->psz_access, "rtp6", 6 ) )
+        else if( !strncmp( p_input->psz_access, "udp6", 6 ) ||
+                 !strncmp( p_input->psz_access, "rtp6", 6 ) )
         {
             val.b_bool = VLC_TRUE;
             var_Set( p_input, "ipv6", val );
@@ -307,7 +311,8 @@ static ssize_t RTPRead( input_thread_t * p_input, byte_t * p_buffer,
     }
     else if( i_payload_type !=  33 && i_payload_type != 32 )
     {
-        msg_Dbg( p_input, "unsupported RTP payload type (%u)", i_payload_type );
+        msg_Dbg( p_input, "unsupported RTP payload type (%u)",
+                 i_payload_type );
     }
     i_skip += RTP_HEADER_LEN + 4*i_CSRC_count;
 
@@ -425,7 +430,9 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
         i_ret = i_len;
     }
 
-    p_input->p_vlc->pf_memcpy( p_buffer, &p_tmp_buffer[RTP_HEADER_LEN + 4*i_CSRC_count], i_ret );
+    p_input->p_vlc->pf_memcpy( p_buffer,
+                               &p_tmp_buffer[RTP_HEADER_LEN + 4*i_CSRC_count],
+                               i_ret );
 
     return i_ret;
 }

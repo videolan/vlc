@@ -1,8 +1,8 @@
 /*****************************************************************************
  * slp.c: SLP access plugin
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.19 2004/01/17 12:28:56 gbazin Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: slp.c,v 1.20 2004/01/25 17:31:22 gbazin Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -38,7 +38,7 @@
  *****************************************************************************/
 static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
-static ssize_t Read  ( input_thread_t *, byte_t *, size_t );
+static ssize_t Read( input_thread_t *, byte_t *, size_t );
 
 static int  Init  ( vlc_object_t * );
 static void End   ( vlc_object_t * );
@@ -50,42 +50,51 @@ int i_group;
  * Module descriptor
  *****************************************************************************/
 
-#define SRVTYPE_TEXT     "SLP service type"
-#define SRVTYPE_LONGTEXT "The service type string for SLP queries, " \
-                         "including the authority string (if any) for the " \
-                         "request. May not be empty"
-#define ATTRIDS_TEXT     "SLP attribute identifiers"
-#define ATTRIDS_LONGTEXT "This string is a comma separated list of " \
-                         "attribute identifiers to search for a playlist "\
-                         "title or empty to use all attributes"
-#define SCOPELIST_TEXT     "SLP scopes list"
-#define SCOPELIST_LONGTEXT "This string is a comma separated list of scope " \
-                           "names or empty if you want to use the default "  \
-                           "scopes; it is used in all SLP queries"
-#define NAMINGAUTHORITY_TEXT     "SLP naming authority"
-#define NAMINGAUTHORITY_LONGTEXT "This string is a list of naming " \
-                                 "authorities to search. Use \"*\" for all " \
-                                 "and the empty string for the default of " \
-                                 "IANA"
-#define FILTER_TEXT     "SLP LDAP filter"
-#define FILTER_LONGTEXT "This is a query formulated of attribute pattern " \
-                        "matching expressions in the form of an LDAPv3 "   \
-                        "search filter or empty for all answers"
-#define LANG_TEXT     "Language requested in SLP requests"
-#define LANG_LONGTEXT "RFC 1766 Language Tag for the natural language " \
-                      "locale of requests, leave empty to use the "     \
-                      "default locale; it is used in all SLP queries"
+#if 0
+#define SRVTYPE_TEXT /*N_*/("SLP service type")
+#define SRVTYPE_LONGTEXT /*N_*/( \
+    "The service type string for SLP queries, including the authority " \
+    "string (if any) for the request. May not be empty." )
+#endif
+
+#define ATTRIDS_TEXT N_("SLP attribute identifiers")
+#define ATTRIDS_LONGTEXT N_( \
+    "This string is a comma separated list of attribute identifiers to " \
+    "search for a playlist title or empty to use all attributes." )
+
+#define SCOPELIST_TEXT N_("SLP scopes list")
+#define SCOPELIST_LONGTEXT N_( \
+    "This string is a comma separated list of scope names or empty if you " \
+    "want to use the default scopes. It is used in all SLP queries." )
+
+#define NAMINGAUTHORITY_TEXT N_("SLP naming authority")
+#define NAMINGAUTHORITY_LONGTEXT N_( \
+    "This string is a list of naming authorities to search. " \
+    "Use \"*\" for all and the empty string for the default of IANA." )
+
+#define FILTER_TEXT N_("SLP LDAP filter")
+#define FILTER_LONGTEXT N_( \
+    "This is a query formulated of attribute pattern matching expressions " \
+    "in the form of an LDAPv3 search filter or empty for all answers." )
+
+#define LANG_TEXT N_("Language requested in SLP requests")
+#define LANG_LONGTEXT N_( \
+    "RFC 1766 Language tag for the natural language locale of requests, " \
+    "leave empty to use the default locale. It is used in all SLP queries." )
 
 vlc_module_begin();
     set_description( _("SLP input") );
-    add_category_hint( N_("slp"), NULL, VLC_TRUE );
-    add_string( "slp-attrids", "", NULL, ATTRIDS_TEXT, ATTRIDS_LONGTEXT, VLC_TRUE );
+
+    add_string( "slp-attrids", "", NULL, ATTRIDS_TEXT, ATTRIDS_LONGTEXT,
+                VLC_TRUE );
     add_string( "slp-scopelist", "", NULL, SCOPELIST_TEXT,
                 SCOPELIST_LONGTEXT, VLC_TRUE );
     add_string( "slp-namingauthority", "*", NULL, NAMINGAUTHORITY_TEXT,
                 NAMINGAUTHORITY_LONGTEXT, VLC_TRUE );
-    add_string( "slp-filter", "", NULL, FILTER_TEXT, FILTER_LONGTEXT, VLC_TRUE );
+    add_string( "slp-filter", "", NULL, FILTER_TEXT, FILTER_LONGTEXT,
+                VLC_TRUE );
     add_string( "slp-lang", "", NULL, LANG_TEXT, LANG_LONGTEXT, VLC_TRUE );
+
     set_capability( "access", 0 );
     set_callbacks( Open, Close );
 
@@ -155,10 +164,8 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
     /* or there was a problem with getting the data we requested */
     if( (slpe_errcode != SLP_OK) )
     {
-        msg_Err( p_input,
-                 "SrvUrlCallback got an error %i with URL %s",
-                 slpe_errcode,
-                 psz_srvurl );
+        msg_Err( p_input, "SrvUrlCallback got an error %i with URL %s",
+                 slpe_errcode, psz_srvurl );
         return SLP_TRUE;
     }
 
@@ -234,9 +241,8 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
     vlc_object_release( (vlc_object_t *)p_playlist );
 
     msg_Info( (input_thread_t *)p_input,
-             "added « %s » (lifetime %i) to playlist",
-             psz_srvurl,
-             i_lifetime );
+              "added « %s » (lifetime %i) to playlist",
+               psz_srvurl, i_lifetime );
 
     return SLP_TRUE;
 }
@@ -255,22 +261,20 @@ static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
     char *psz_eos;
     char *psz_service;
 
-    msg_Dbg(p_input,"Services: %s",psz_srvurl);
+    msg_Dbg( p_input, "services: %s", psz_srvurl );
     /* our callback was only called to tell us there's nothing more to read */
     if( slpe_errcode == SLP_LAST_CALL )
     {
         return SLP_TRUE;
     }
 
-    msg_Dbg(p_input,"Services: %s",psz_srvurl);
+    msg_Dbg( p_input, "services: %s", psz_srvurl );
 
     /* or there was a problem with getting the data we requested */
     if( slpe_errcode != SLP_OK )
     {
-        msg_Err( p_input,
-                 "SrvTypeCallback got an error %i with URL %s",
-                 slpe_errcode,
-                 psz_srvurl );
+        msg_Err( p_input, "SrvTypeCallback got an error %i with URL %s",
+                 slpe_errcode, psz_srvurl );
         return SLP_TRUE;
     }
 
@@ -298,7 +302,7 @@ static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
 
                 psz_service = strdup( psz_srvurl);
 
-                msg_Dbg(p_input,"Getting details for %s",psz_service);
+                msg_Dbg( p_input, "getting details for %s", psz_service );
 
                 slpe_result = SLPFindSrvs( slph_slp2,
                                    psz_service,
@@ -317,8 +321,7 @@ static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
                 {
                    msg_Err( p_input,
                            "SLPFindSrvs error %i finding servers of type %s",
-                           slpe_result,
-                           psz_service );
+                           slpe_result, psz_service );
                 }
             }
             psz_srvurl++;
@@ -443,4 +446,3 @@ static void End ( vlc_object_t *p_this )
 {
     return;
 }
-

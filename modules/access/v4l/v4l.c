@@ -1,8 +1,8 @@
 /*****************************************************************************
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.38 2004/01/03 18:41:36 rocky Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: v4l.c,v 1.39 2004/01/25 17:31:22 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -91,19 +91,19 @@ static void DemuxClose ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Video4Linux input") );
-    add_category_hint( N_("v4l"), NULL, VLC_TRUE );
+
     add_integer( "v4l-caching", DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    add_shortcut( "v4l" );
-    set_capability( "access", 10 );
-    set_callbacks( AccessOpen, AccessClose );
-
     add_string( "v4l-vdev", "/dev/video", 0, VDEV_TEXT, VDEV_LONGTEXT,
                 VLC_FALSE );
     add_string( "v4l-adev", "/dev/dsp", 0, ADEV_TEXT, ADEV_LONGTEXT,
                 VLC_FALSE );
     add_string( "v4l-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
+
+    add_shortcut( "v4l" );
+    set_capability( "access", 10 );
+    set_callbacks( AccessOpen, AccessClose );
 
     add_submodule();
         set_description( _("Video4Linux demuxer") );

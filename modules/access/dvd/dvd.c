@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.9 2003/11/05 00:39:16 gbazin Exp $
+ * $Id: dvd.c,v 1.10 2004/01/25 17:31:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -62,7 +62,7 @@ static void UnprobeLibDVDCSS( void );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CSSMETHOD_TEXT N_("Method to use by libdvdcss for key decryption")
+#define CSSMETHOD_TEXT N_("Method used by libdvdcss for decryption")
 #define CSSMETHOD_LONGTEXT N_( \
     "Set the method used by libdvdcss for key decryption.\n" \
     "title: decrypted title key is guessed from the encrypted sectors of " \
@@ -98,6 +98,7 @@ vlc_module_begin();
     set_description( _("DVD input (uses libdvdcss)") );
     i = 100;
 #endif
+
     add_shortcut( "dvdold" );
     add_shortcut( "dvdsimple" );
     set_capability( "access", i );

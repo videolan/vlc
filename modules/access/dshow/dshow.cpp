@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: dshow.cpp,v 1.24 2003/12/22 17:44:58 gbazin Exp $
+ * $Id: dshow.cpp,v 1.25 2004/01/25 17:31:22 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -127,7 +127,7 @@ static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
     "(eg. I420 (default), RV24, etc.)")
 #define CONFIG_TEXT N_("Device properties")
 #define CONFIG_LONGTEXT N_( \
-    "Show the properties dialog of the selected device")
+    "Show the properties dialog of the selected device.")
 
 static int  AccessOpen ( vlc_object_t * );
 static void AccessClose( vlc_object_t * );
@@ -137,7 +137,6 @@ static void DemuxClose ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("DirectShow input") );
-    add_category_hint( N_("dshow"), NULL, VLC_TRUE );
     add_integer( "dshow-caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
 
