@@ -58,8 +58,7 @@ struct filter_t
                                                 int, int, int );
 
     subpicture_t *      ( *pf_sub_filter ) ( filter_t *, mtime_t );
-    /* pf_render_string maps to RenderText in freetype.c */
-    subpicture_region_t *( *pf_render_string ) ( filter_t *, subpicture_t *, subpicture_region_t * );
+    int                 ( *pf_render_text ) ( filter_t *, subpicture_region_t *, subpicture_region_t * );
 
     /*
      * Buffers allocation

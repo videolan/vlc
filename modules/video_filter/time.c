@@ -72,9 +72,9 @@ struct filter_sys_t
 #define POSX_LONGTEXT N_("X offset, from the left screen edge" )
 #define POSY_TEXT N_("Y offset, from the top")
 #define POSY_LONGTEXT N_("Y offset, down from the top" )
-#define OPACITY_TEXT N_("Opacity, -1..255")
-#define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of overlay text. " \
-    "-1 = use freetype-opacity, 0 = transparent, 255 = totally opaque. " )
+#define OPACITY_TEXT N_("Opacity, 0..255")
+#define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of " \
+    "overlay text. 0 = transparent, 255 = totally opaque. " )
 #define SIZE_TEXT N_("Font size, pixels")
 #define SIZE_LONGTEXT N_("Specify the font size, in pixels, " \
     "with -1 = use freetype-fontsize" )
@@ -109,7 +109,7 @@ vlc_module_begin();
     add_integer( "time-position", 9, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
     /* 9 sets the default to bottom-left, minimizing jitter */
     change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_integer_with_range( "time-opacity", -1, -1, 255, NULL,
+    add_integer_with_range( "time-opacity", 0, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
     add_integer( "time-color", -1, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
@@ -269,9 +269,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_spu->i_y = p_sys->i_yoff;
         p_spu->b_absolute = VLC_TRUE;
     }
-    p_spu->p_region->i_font_color = p_sys->i_font_color;
-    p_spu->p_region->i_font_opacity = p_sys->i_font_opacity;
-    p_spu->p_region->i_font_size = p_sys->i_font_size;
+    p_spu->p_region->i_text_color = p_sys->i_font_color;
+    p_spu->p_region->i_text_alpha = 255 - p_sys->i_font_opacity;
+    p_spu->p_region->i_text_size = p_sys->i_font_size;
 
     return p_spu;
 }

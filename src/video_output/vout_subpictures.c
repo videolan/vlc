@@ -257,9 +257,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     p_region->p_cache = 0;
     p_region->fmt = *p_fmt;
     p_region->psz_text = 0;
-    p_region->i_font_color = -1; /* default to using freetype-color -opacity */
-    p_region->i_font_opacity = -1;
-    p_region->i_font_size = -1; /* and the freetype fontsize */
+    p_region->i_text_color = 0xFFFFFF;
 
     if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
         p_fmt->p_palette = p_region->fmt.p_palette =
@@ -302,9 +300,7 @@ subpicture_region_t *__spu_MakeRegion( vlc_object_t *p_this,
     p_region->p_cache = 0;
     p_region->fmt = *p_fmt;
     p_region->psz_text = 0;
-    p_region->i_font_color = -1; /* default to using freetype-color -opacity */
-    p_region->i_font_opacity = -1;
-    p_region->i_font_size = -1; /* and the freetype fontsize */
+    p_region->i_text_color = 0xFFFFFF;
 
     if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
         p_fmt->p_palette = p_region->fmt.p_palette =
@@ -582,20 +578,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
             {
                 if( p_spu->p_text && p_spu->p_text->p_module &&
-                    p_spu->p_text->pf_render_string )
+                    p_spu->p_text->pf_render_text )
                 {
-                    /* TODO: do it in a less hacky way
-                     * (modify text renderer API) */
-                    subpicture_region_t *p_tmp_region;
-                    /*  the actual call  to RenderText in freetype.c: */
-                    p_tmp_region = p_spu->p_text->pf_render_string(
-                        p_spu->p_text, p_subpic, p_region ); 
-
-                    if( p_tmp_region )
-                    {
-//                        p_subpic->pf_destroy_region( p_spu, p_region );
-                        p_region = p_tmp_region;
-                    }
+                    p_spu->p_text->pf_render_text( p_spu->p_text,
+                                                   p_region, p_region ); 
                 }
             }
 

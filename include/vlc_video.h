@@ -204,12 +204,14 @@ struct subpicture_region_t
     video_format_t  fmt;                          /**< format of the picture */
     picture_t       picture;             /**< picture comprising this region */
 
-    char            *psz_text;       /**< text string comprising this region */
-
     int             i_x;                             /**< position of region */
     int             i_y;                             /**< position of region */
-    int i_font_color, i_font_opacity;     /**< controls for text subpictures */
-    int i_font_size;
+
+    char            *psz_text;       /**< text string comprising this region */
+    int             i_text_color;     /**< text color (RGB native endianess) */
+    int             i_text_alpha;                     /**< text transparency */
+    int             i_text_size;                              /**< text size */
+
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_t *p_cache;       /**< modified version of this region */
     /**@}*/
