@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.11 2003/01/27 17:41:01 ipkiss Exp $
+ * $Id: preferences.cpp,v 1.12 2003/02/09 12:18:40 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -50,7 +50,7 @@
 KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                            QWidget *parent, const QString &caption) :
     KDialogBase ( Tabbed, caption, Ok| Apply|Cancel|User1, Ok, parent,
-                  "vlc preferences", true, false, "Save")
+                  "vlc preferences", true, false, i18n("&Save") )
 {
     module_t *p_parser = NULL;
     vlc_list_t *p_list;

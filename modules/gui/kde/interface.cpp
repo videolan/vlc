@@ -15,7 +15,7 @@
 #include "preferences.h"
 #include "languagemenu.h"
 
-#include <iostream.h>
+#include <iostream>
 
 #include <kaction.h>
 #include <kfiledialog.h>
