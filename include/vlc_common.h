@@ -206,6 +206,7 @@ typedef struct msg_subscription_t msg_subscription_t;
  */
 typedef enum {
     PLAYLIST_PLAY,      /**< No arg.                            res=can fail*/
+    PLAYLIST_AUTOPLAY,  /**< No arg.                            res=cant fail*/
     PLAYLIST_VIEWPLAY,  /**< arg1= int, arg2= playlist_item_t*,*/
                         /**  arg3 = playlist_item_t*          , res=can fail */
     PLAYLIST_ITEMPLAY,  /** <arg1 = playlist_item_t *         , res=can fail */

@@ -235,7 +235,7 @@ static void Run( intf_thread_t *p_intf )
         if( p_playlist )
         {
             p_playlist->status.i_view = -1;
-            playlist_Play( p_playlist );
+            playlist_Control( p_playlist, PLAYLIST_AUTOPLAY );
             vlc_object_release( p_playlist );
         }
     }

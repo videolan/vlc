@@ -970,6 +970,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 {
     sdp_t *p_sdp;
     vlc_bool_t b_invalid = VLC_FALSE;
+    vlc_bool_t b_end = VLC_FALSE;
 
     if( psz_sdp == NULL )
     {
@@ -978,7 +979,8 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 
     if( psz_sdp[0] != 'v' || psz_sdp[1] != '=' )
     {
-        msg_Warn( p_obj, "bad SDP packet" );
+        msg_Warn( p_obj, "bad SDP packet, begins with 0x%x(%c) 0x%x(%c)",
+                         psz_sdp[0],psz_sdp[0],psz_sdp[1],psz_sdp[1]);
         return NULL;
     }
 
@@ -997,7 +999,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
     p_sdp->i_attributes    = 0;
     p_sdp->pp_attributes   = NULL;
 
-    while( *psz_sdp != '\0'  )
+    while( *psz_sdp != '\0' && b_end == VLC_FALSE  )
     {
         char *psz_eol;
         char *psz_eof;
@@ -1013,6 +1015,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
         if( ( psz_eol = strchr( psz_sdp, '\n' ) ) == NULL )
         {
             psz_eol = psz_sdp + strlen( psz_sdp );
+            b_end = VLC_TRUE;
         }
         if( psz_eol > psz_sdp && *( psz_eol - 1 ) == '\r' )
         {

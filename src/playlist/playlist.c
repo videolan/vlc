@@ -306,6 +306,12 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         p_playlist->request.i_goto = -1;
         break;
 
+    case PLAYLIST_AUTOPLAY:
+        p_playlist->status.i_status = PLAYLIST_RUNNING;
+
+        p_playlist->request.b_request = VLC_FALSE;
+        break;
+
     case PLAYLIST_PAUSE:
         val.i_int = 0;
         if( p_playlist->p_input )
@@ -357,6 +363,7 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
+    fprintf(stderr,"control done, request is %i\n", p_playlist->request.b_request);
     return VLC_SUCCESS;
 }
 
@@ -817,6 +824,10 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             {
                 p_playlist->i_index++;
                 p_new = p_playlist->pp_items[p_playlist->i_index];
+                if( !(p_new->i_flags & PLAYLIST_SKIP_FLAG) )
+                {
+                    return NULL;
+                }
             }
             else
             {
