@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.2 2003/11/07 00:28:58 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.3 2003/11/07 12:27:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -98,6 +98,8 @@ typedef struct
     uint8_t      buffer[65536];
 
     char         waiting;
+
+    mtime_t      i_pts;
 } live_track_t;
 
 struct demux_sys_t
@@ -221,7 +223,7 @@ static void AccessClose( vlc_object_t *p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     access_sys_t   *p_sys = p_input->p_access_data;
 
-    delete p_sys->p_sdp;
+    delete[] p_sys->p_sdp;
     free( p_sys );
 }
 
@@ -417,6 +419,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         tk = (live_track_t*)malloc( sizeof( live_track_t ) );
         tk->p_input = p_input;
         tk->waiting = 0;
+        tk->i_pts   = 0;
 
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
@@ -468,7 +471,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
                     tk->fmt.i_extra = i_extra;
                     tk->fmt.p_extra = malloc( sizeof( i_extra ) );
                     memcpy( tk->fmt.p_extra, p_extra, i_extra );
-                    delete p_extra;
+                    delete[] p_extra;
                 }
             }
             else if( !strcmp( sub->codecName(), "MPEG4-GENERIC" ) )
@@ -484,7 +487,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
                     tk->fmt.i_extra = i_extra;
                     tk->fmt.p_extra = malloc( i_extra );
                     memcpy( tk->fmt.p_extra, p_extra, i_extra );
-                    delete p_extra;
+                    delete[] p_extra;
                 }
             }
         }
@@ -521,7 +524,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
                     tk->fmt.i_extra = i_extra;
                     tk->fmt.p_extra = malloc( i_extra );
                     memcpy( tk->fmt.p_extra, p_extra, i_extra );
-                    delete p_extra;
+                    delete[] p_extra;
                 }
             }
         }
@@ -594,16 +597,10 @@ static void DemuxClose( vlc_object_t *p_this )
         free( p_sys->track );
     }
 
-    if( p_sys->rtsp )
+    if( p_sys->rtsp && p_sys->ms )
     {
         /* TEARDOWN */
-        MediaSubsessionIterator iter(*p_sys->ms);
-        MediaSubsession *sub;
-
-        while( ( sub = iter.next() ) != NULL )
-        {
-            p_sys->rtsp->teardownMediaSubsession(*sub);
-        }
+        p_sys->rtsp->teardownMediaSession( *p_sys->ms );
     }
     Medium::close( p_sys->ms );
     if( p_sys->rtsp )
@@ -680,6 +677,8 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     pes_packet_t   *p_pes;
     data_packet_t  *p_data;
 
+    mtime_t        i_pts = (mtime_t)pts.tv_sec * 1000000LL + (mtime_t)pts.tv_usec;
+
 #if 0
     fprintf( stderr, "StreamRead size=%d pts=%lld\n",
              i_size,
@@ -699,10 +698,25 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     p_pes->p_first = p_pes->p_last = p_data;
     p_pes->i_nb_data = 1;
     p_pes->i_pes_size = i_size;
+    p_pes->i_rate = p_input->stream.control.i_rate;
 
-    /* FIXME */
-    p_pes->i_pts = mdate() + p_input->i_pts_delay;
-    p_pes->i_dts = mdate() + p_input->i_pts_delay;
+    if( i_pts != tk->i_pts )
+    {
+        input_ClockManageRef( p_input,
+                              p_input->stream.p_selected_program,
+                              i_pts * 9 / 100 );
+        p_pes->i_dts =
+        p_pes->i_pts = input_ClockGetTS( p_input,
+                                         p_input->stream.p_selected_program,
+                                         i_pts * 9 / 100 );
+    }
+    else
+    {
+        p_pes->i_dts = 0;
+        p_pes->i_pts = 0;
+    }
+    //fprintf( stderr, "tk -> dpts=%lld\n", i_pts - tk->i_pts );
+
     es_out_Send( p_input->p_es_out, tk->p_es, p_pes );
 
     /* warm that's ok */
@@ -710,6 +724,8 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
 
     /* we have read data */
     tk->waiting = 0;
+
+    tk->i_pts = i_pts;
 }
 
 /*****************************************************************************
