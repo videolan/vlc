@@ -427,6 +427,16 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Change( p_input, "seekable", VLC_VAR_SETVALUE, &val, NULL );
 
     var_Create( p_input, "input-slave", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+
+    /* Meta */
+    var_Create( p_input, "meta-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-author", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-artist", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-genre", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-copyright", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create( p_input, "meta-description", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
+    var_Create( p_input, "meta-date", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-url", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 }
 
 /*****************************************************************************

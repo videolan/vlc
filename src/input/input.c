@@ -69,6 +69,8 @@ static void InputSourceClean( input_thread_t *, input_source_t * );
 static void SlaveDemux( input_thread_t *p_input );
 static void SlaveSeek( input_thread_t *p_input );
 
+static vlc_meta_t *InputMetaUser( input_thread_t *p_input );
+
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
  *****************************************************************************
@@ -470,9 +472,7 @@ static int Run( input_thread_t *p_input )
         /* We have finish to demux data but not to play them */
         while( !p_input->b_die )
         {
-#if 0
             if( input_EsOutDecodersEmpty( p_input->p_es_out ) )
-#endif
                 break;
 
             msg_Dbg( p_input, "waiting decoder fifos to empty" );
@@ -505,6 +505,8 @@ static int Init( input_thread_t * p_input )
     char *psz_subtitle;
     vlc_value_t val;
     double f_fps;
+    vlc_meta_t *p_meta, *p_meta_user;
+    int i;
 
     /* Initialize optional stream output. (before access/demuxer) */
     psz = var_GetString( p_input, "sout" );
@@ -531,19 +533,6 @@ static int Init( input_thread_t * p_input )
         goto error;
     }
 
-#if 0
-    {
-        input_source_t *extra;
-        char *psz_extra = "/home/fenrir/a.avi";
-
-        extra = InputSourceNew( p_input );
-        if( !InputSourceInit( p_input, extra, psz_extra ) )
-        {
-            TAB_APPEND( p_input->i_slave, p_input->slave, extra );
-        }
-    }
-#endif
-
     /* Create global title (from master) */
     p_input->i_title = p_input->input.i_title;
     p_input->title   = p_input->input.title;
@@ -567,10 +556,6 @@ static int Init( input_thread_t * p_input )
     var_Get( p_input, "audio-desync", &val );
     if( val.i_int < 0 )
         p_input->i_pts_delay -= (val.i_int * 1000);
-
-    /* TODO: check meta data from users */
-
-    /* TODO: get meta data from demuxer */
 
     /* Load master infos */
     /* Init length */
@@ -666,7 +651,6 @@ static int Init( input_thread_t * p_input )
         char **subs = subtitles_Detect( p_input, psz_autopath,
                                         p_input->input.p_item->psz_uri );
         input_source_t *sub;
-        int i;
 
         for( i = 0; subs[i] != NULL; i++ )
         {
@@ -730,15 +714,6 @@ static int Init( input_thread_t * p_input )
     es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE,
                     val.b_bool ? ES_OUT_MODE_ALL : ES_OUT_MODE_AUTO );
 
-    /* TODO select forced subs */
-#if 0
-    if( p_sub_toselect )
-    {
-        es_out_Control( p_input->p_es_out, ES_OUT_SET_ES,
-                        p_sub_toselect->p_es, VLC_TRUE );
-    }
-#endif
-
     if( p_input->p_sout )
     {
         if( p_input->p_sout->i_out_pace_nocontrol > 0 )
@@ -751,6 +726,95 @@ static int Init( input_thread_t * p_input )
         }
         msg_Dbg( p_input, "starting in %s mode",
                  p_input->b_out_pace_control ? "asynch" : "synch" );
+    }
+
+    /* Get meta data from users */
+    p_meta_user = InputMetaUser( p_input );
+
+    /* Get meta data from master input */
+    if( demux2_Control( p_input->input.p_demux, DEMUX_GET_META, &p_meta ) )
+        p_meta = NULL;
+
+    /* Merge them */
+    if( p_meta == NULL )
+    {
+        p_meta = p_meta_user;
+    }
+    else if( p_meta_user )
+    {
+        vlc_meta_Merge( p_meta, p_meta_user );
+        vlc_meta_Delete( p_meta_user );
+    }
+
+    /* Get meta data from slave input */
+    for( i = 0; i < p_input->i_slave; i++ )
+    {
+        vlc_meta_t *p_meta_slave;
+
+        if( !demux2_Control( p_input->slave[i]->p_demux, DEMUX_GET_META, &p_meta_slave ) )
+        {
+            if( p_meta == NULL )
+            {
+                p_meta = p_meta_slave;
+            }
+            else if( p_meta_slave )
+            {
+                vlc_meta_Merge( p_meta, p_meta_slave );
+                vlc_meta_Delete( p_meta_slave );
+            }
+        }
+    }
+
+    if( p_meta && p_meta->i_meta > 0 )
+    {
+        msg_Dbg( p_input, "meta informations:" );
+        for( i = 0; i < p_meta->i_meta; i++ )
+        {
+            msg_Dbg( p_input, "  - '%s' = '%s'",
+                    _(p_meta->name[i]), p_meta->value[i] );
+
+            if( !strcmp(p_meta->name[i], VLC_META_TITLE) && p_meta->value[i] )
+                input_Control( p_input, INPUT_SET_NAME, p_meta->value[i] );
+
+            if( !strcmp( p_meta->name[i], VLC_META_AUTHOR ) )
+                input_Control( p_input, INPUT_ADD_INFO, _("General"),
+                               _("Author"), p_meta->value[i] );
+
+            input_Control( p_input, INPUT_ADD_INFO, _("File"),
+                          _(p_meta->name[i]), "%s", p_meta->value[i] );
+        }
+
+        for( i = 0; i < p_meta->i_track; i++ )
+        {
+            vlc_meta_t *tk = p_meta->track[i];
+            int j;
+
+            if( tk->i_meta > 0 )
+            {
+                char *psz_cat = malloc( strlen(_("Stream")) + 10 );
+
+                msg_Dbg( p_input, "  - track[%d]:", i );
+
+                sprintf( psz_cat, "%s %d", _("Stream"), i );
+                for( j = 0; j < tk->i_meta; j++ )
+                {
+                    msg_Dbg( p_input, "     - '%s' = '%s'", _(tk->name[j]),
+                             tk->value[j] );
+
+                    input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                                   _(tk->name[j]), "%s", tk->value[j] );
+                }
+            }
+        }
+
+        if( p_input->p_sout && p_input->p_sout->p_meta == NULL )
+        {
+            p_input->p_sout->p_meta = p_meta;
+        }
+        else
+        {
+            vlc_meta_Delete( p_meta );
+        }
     }
 
     msg_Dbg( p_input, "`%s' sucessfully opened",
@@ -779,234 +843,6 @@ error:
     p_input->p_sout = NULL;
 
     return VLC_EGENERIC;
-
-#if 0
-    vlc_meta_t *p_meta = NULL, *p_meta_user = NULL;
-//    float f_fps;
-    double f_fps;
-    mtime_t i_length;
-
-    FIXME
-    p_input->input.i_cr_average = config_GetInt( p_input, "cr-average" );
-    p_input->stream.control.i_status = INIT_S;
-    p_input->stream.control.i_rate = DEFAULT_RATE;
-
-
-    /* Init input_thread_sys_t */
-    p_input->p_sys = malloc( sizeof( input_thread_sys_t ) );
-    p_input->p_sys->i_sub = 0;
-    p_input->p_sys->sub   = NULL;
-
-    /* Get meta information from user */
-    var_Create( p_input, "meta-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "meta-author", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "meta-artist", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "meta-genre", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "meta-copyright", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-    var_Create( p_input, "meta-description", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
-    var_Create( p_input, "meta-date", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "meta-url", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    if( (p_meta_user = vlc_meta_New()) )
-    {
-        vlc_value_t val;
-
-        var_Get( p_input, "meta-title", &val );
-        if( *val.psz_string )
-            vlc_meta_Add( p_meta_user, VLC_META_TITLE, val.psz_string );
-        free( val.psz_string );
-        var_Get( p_input, "meta-author", &val );
-        if( *val.psz_string )
-            vlc_meta_Add( p_meta_user, VLC_META_AUTHOR, val.psz_string );
-        free( val.psz_string );
-        var_Get( p_input, "meta-artist", &val );
-        if( *val.psz_string )
-            vlc_meta_Add( p_meta_user, VLC_META_ARTIST, val.psz_string );
-        free( val.psz_string );
-        var_Get( p_input, "meta-genre", &val );
-        if( *val.psz_string )
-            vlc_meta_Add( p_meta_user, VLC_META_GENRE, val.psz_string );
-        free( val.psz_string );
-        var_Get( p_input, "meta-copyright", &val );
-        if( *val.psz_string )
-            vlc_meta_Add( p_meta_user, VLC_META_COPYRIGHT, val.psz_string );
-        free( val.psz_string );
-        var_Get( p_input, "meta-description", &val );
-        if( *val.psz_string )
-            vlc_meta_Add( p_meta_user, VLC_META_DESCRIPTION, val.psz_string );
-        free( val.psz_string );
-        var_Get( p_input, "meta-date", &val );
-        if( *val.psz_string )
-            vlc_meta_Add( p_meta_user, VLC_META_DATE, val.psz_string );
-        free( val.psz_string );
-        var_Get( p_input, "meta-url", &val );
-        if( *val.psz_string )
-            vlc_meta_Add( p_meta_user, VLC_META_URL, val.psz_string );
-        free( val.psz_string );
-    }
-
-    /* Get meta informations from demuxer */
-    if( !demux_Control( p_input, DEMUX_GET_META, &p_meta ) ||
-        ( p_meta_user && p_meta_user->i_meta ) )
-    {
-        int i;
-
-        /* Merge demux and user metadata */
-        if( !p_meta ){ p_meta = p_meta_user; p_meta_user = NULL; }
-        else if( p_meta && p_meta_user ) vlc_meta_Merge( p_meta, p_meta_user );
-
-        msg_Dbg( p_input, "meta informations:" );
-        if( p_meta->i_meta > 0 )
-        {
-            for( i = 0; i < p_meta->i_meta; i++ )
-            {
-                msg_Dbg( p_input, "  - '%s' = '%s'", _(p_meta->name[i]),
-                         p_meta->value[i] );
-                if( !strcmp( p_meta->name[i], VLC_META_TITLE ) &&
-                    p_meta->value[i] )
-                    input_Control( p_input, INPUT_SET_NAME, p_meta->value[i] );
-
-                if( !strcmp( p_meta->name[i], VLC_META_AUTHOR ) )
-                    input_Control( p_input, INPUT_ADD_INFO, _("General"),
-                                   _("Author"), p_meta->value[i] );
-
-                input_Control( p_input, INPUT_ADD_INFO, _("File"),
-                              _(p_meta->name[i]), "%s", p_meta->value[i] );
-            }
-        }
-        for( i = 0; i < p_meta->i_track; i++ )
-        {
-            vlc_meta_t *tk = p_meta->track[i];
-            int j;
-
-            msg_Dbg( p_input, "  - track[%d]:", i );
-            if( tk->i_meta > 0 )
-            {
-                char *psz_cat = malloc( strlen(_("Stream")) + 10 );
-                sprintf( psz_cat, "%s %d", _("Stream"), i );
-
-                for( j = 0; j < tk->i_meta; j++ )
-                {
-                    msg_Dbg( p_input, "     - '%s' = '%s'", _(tk->name[j]),
-                             tk->value[j] );
-
-                    input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                                   _(tk->name[j]), "%s", tk->value[j] );
-                }
-            }
-        }
-
-        if( p_input->stream.p_sout && p_input->stream.p_sout->p_meta == NULL )
-        {
-            p_input->stream.p_sout->p_meta = p_meta;
-        }
-        else
-        {
-            vlc_meta_Delete( p_meta );
-        }
-    }
-    if( p_meta_user ) vlc_meta_Delete( p_meta_user );
-
-    /* Get length */
-    if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) &&
-        i_length > 0 )
-    {
-        char psz_buffer[MSTRTIME_MAX_SIZE];
-
-        vlc_mutex_lock( &p_input->p_item->lock );
-        p_input->p_item->i_duration = i_length;
-        vlc_mutex_unlock( &p_input->p_item->lock );
-
-        input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"),
-                       msecstotimestr( psz_buffer, i_length / 1000 ) );
-
-        /* Set start time */
-        var_Get( p_input, "start-time", &val );
-        if(  val.i_int > 0 )
-        {
-            double f_pos = val.i_int * I64C(1000000) / (double)i_length;
-
-            if( f_pos >= 1.0 )
-            {
-                msg_Warn( p_input, "invalid start-time, ignored (start-time "
-                          ">= media length)" );
-            }
-            else
-            {
-                p_input->stream.p_selected_area->i_seek =
-                    (int64_t)( f_pos * (double)p_input->stream.p_selected_area->i_size );
-
-                msg_Dbg( p_input, "start-time %ds (%2.2f)", val.i_int, f_pos );
-            }
-        }
-    }
-
-    /* Get fps */
-    if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
-    {
-        i_microsecondperframe = 0;
-    }
-    else
-    {
-        i_microsecondperframe = (int64_t)( (double)1000000.0 / (double)f_fps );
-    }
-
-    /* Look for and add subtitle files */
-    var_Get( p_input, "sub-file", &val );
-    if( val.psz_string && *val.psz_string )
-    {
-        subtitle_demux_t *p_sub;
-
-        msg_Dbg( p_input, "force subtitle: %s", val.psz_string );
-        if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string),
-                                    i_microsecondperframe ) ) )
-        {
-            p_sub_toselect = p_sub;
-            TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
-        }
-    }
-    psz_sub_file = val.psz_string;
-
-    var_Get( p_input, "sub-autodetect-file", &val );
-    var_Get( p_input, "sub-autodetect-path", &val1 );
-    if( val.b_bool )
-    {
-        subtitle_demux_t *p_sub;
-        int i;
-        char **tmp = subtitles_Detect( p_input, val1.psz_string,
-                                       p_input->psz_name );
-        char **tmp2 = tmp;
-        for( i = 0; *tmp2 != NULL; i++ )
-        {
-            if( psz_sub_file == NULL || strcmp( psz_sub_file, *tmp2 ) )
-            {
-                if( ( p_sub = subtitle_New( p_input, *tmp2,
-                                            i_microsecondperframe ) ) )
-                {
-                    TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub,
-                                p_sub );
-                }
-            }
-            free( *tmp2++ );
-        }
-        free( tmp );
-        free( val1.psz_string );
-    }
-    if( psz_sub_file ) free( psz_sub_file );
-
-    es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
-    val.b_bool =  VLC_FALSE;
-    if( p_input->stream.p_sout )
-    {
-        var_Get( p_input, "sout-all", &val );
-    }
-    es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE,
-                    val.b_bool ? ES_OUT_MODE_ALL : ES_OUT_MODE_AUTO );
-    if( p_sub_toselect )
-    {
-        es_out_Control( p_input->p_es_out, ES_OUT_SET_ES,
-                        p_sub_toselect->p_es, VLC_TRUE );
-    }
-#endif
 }
 
 /*****************************************************************************
@@ -1814,10 +1650,7 @@ static void SlaveDemux( input_thread_t *p_input )
                     i_ret = 0;
                     break;
                 }
-#if 0
-                msg_Dbg( p_input, "slave time="I64Fd" input="I64Fd,
-                         i_stime, i_time );
-#endif
+
                 if( i_stime >= i_time )
                     break;
 
@@ -1860,7 +1693,36 @@ static void SlaveSeek( input_thread_t *p_input )
         }
     }
 }
+/*****************************************************************************
+ * InputMetaUser:
+ *****************************************************************************/
+static vlc_meta_t *InputMetaUser( input_thread_t *p_input )
+{
+    vlc_meta_t *p_meta;
+    vlc_value_t val;
 
+    if( ( p_meta = vlc_meta_New() ) == NULL )
+        return NULL;
+
+    /* Get meta information from user */
+#define GET_META( c, s ) \
+    var_Get( p_input, (s), &val );  \
+    if( *val.psz_string )       \
+        vlc_meta_Add( p_meta, c, val.psz_string ); \
+    free( val.psz_string )
+
+    GET_META( VLC_META_TITLE, "meta-title" );
+    GET_META( VLC_META_AUTHOR, "meta-author" );
+    GET_META( VLC_META_ARTIST, "meta-artist" );
+    GET_META( VLC_META_GENRE, "meta-genre" );
+    GET_META( VLC_META_COPYRIGHT, "meta-copyright" );
+    GET_META( VLC_META_DESCRIPTION, "meta-description" );
+    GET_META( VLC_META_DATE, "meta-date" );
+    GET_META( VLC_META_URL, "meta-url" );
+#undef GET_META
+
+    return p_meta;
+}
 
 /*****************************************************************************
  * DecodeUrl: decode a given encoded url
