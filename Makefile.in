@@ -615,8 +615,10 @@ $(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
 
 $(PLUGIN_KDE): %.o: Makefile.dep
 $(PLUGIN_KDE): %.o: .dep/%.dpp
-$(PLUGIN_KDE): %.o: %.cpp
-	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -fno-rtti -c -o $@ $<
+$(PLUGIN_KDE): %.o: %.moc
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -fno-rtti -c -o $@ $(<:%.moc=%.cpp)
+$(PLUGIN_KDE:%.o=%.moc): %.moc: %.cpp
+	moc -i $< -o $@
 
 $(PLUGIN_BEOS): %.o: Makefile.dep
 $(PLUGIN_BEOS): %.o: .dep/%.dpp
