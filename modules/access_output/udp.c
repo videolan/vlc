@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.19 2004/01/25 20:40:59 gbazin Exp $
+ * $Id: udp.c,v 1.20 2004/02/20 17:13:42 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -439,8 +439,19 @@ static void ThreadWrite( vlc_object_t *p_this )
             }
         }
 
+        i_sent = mdate();
+        if ( i_sent > i_date + 100000 )
+        {
+            msg_Dbg( p_thread, "late packet to send (" I64Fd ") -> drop",
+                     i_sent - i_date );
+            sout_BufferDelete( p_sout, p_pk );
+            i_date_last = i_date;
+            continue;
+        }
+
         mwait( i_date );
         send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_size, 0 );
+
         i_sent = mdate();
         if ( i_sent > i_date + 20000 )
         {
