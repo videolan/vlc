@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.9 2002/08/30 23:27:06 massiot Exp $
+ * $Id: sdl.c,v 1.10 2002/08/31 19:58:04 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -84,7 +84,6 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
 
 #ifndef WIN32
