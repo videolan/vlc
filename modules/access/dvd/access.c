@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.10 2003/02/08 22:20:28 massiot Exp $
+ * $Id: access.c,v 1.11 2003/03/11 23:56:53 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -206,10 +206,8 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
      * is reserved for video_ts.vob */
     for( i = 1 ; i <= title_inf.i_title_nb ; i++ )
     {
-        input_AddArea( p_input );
-
         /* Titles are Program Chains */
-        area[i]->i_id = i;
+        input_AddArea( p_input, i, title_inf.p_attr[i-1].i_chapter_nb );
 
         /* Absolute start offset and size
          * We can only set that with vts ifo, so we do it during the
@@ -217,8 +215,7 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
         area[i]->i_start = 0;
         area[i]->i_size = 0;
 
-        /* Number of chapters */
-        area[i]->i_part_nb = title_inf.p_attr[i-1].i_chapter_nb;
+        /* Default Chapter */
         area[i]->i_part = 1;
 
         /* Offset to vts_i_0.ifo */
@@ -291,6 +288,7 @@ static int DVDSetProgram( input_thread_t    * p_input,
     {
         thread_dvd_data_t *  p_dvd;
         int                  i_angle;
+        vlc_value_t          val;
 
         p_dvd   = (thread_dvd_data_t*)(p_input->p_access_data);
         i_angle = p_program->i_number;
@@ -325,6 +323,10 @@ static int DVDSetProgram( input_thread_t    * p_input,
         }
 #undef title
         msg_Dbg( p_input, "angle %d selected", p_dvd->i_angle );
+
+        /* Update the navigation variables without triggering a callback */
+        val.i_int = p_program->i_number;
+        var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
     }
 
     return 0;
@@ -390,6 +392,7 @@ static int DVDReadAngle( input_thread_t * p_input )
 static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 {
     thread_dvd_data_t *  p_dvd;
+    vlc_value_t          val;
 
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
 
@@ -401,6 +404,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         int     i_vts_title;
         u32     i_first;
         u32     i_last;
+        unsigned int i;
 
         /* Reset the Chapter position of the old title */
         p_input->stream.p_selected_area->i_part = 1;
@@ -495,6 +499,16 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             DVDLaunchDecoders( p_input );
         }
 
+        /* Update the navigation variables without triggering a callback */
+        val.i_int = p_area->i_id;
+        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
+        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL );
+	for( i = 1; i <= p_area->i_part_nb; i++ )
+	{
+	    val.i_int = i;
+	    var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val );
+	}
+
     } /* i_title >= 0 */
     else
     {
@@ -509,6 +523,10 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     /* warn interface that something has changed */
     p_input->stream.b_seekable = 1;
     p_input->stream.b_changed  = 1;
+
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = p_area->i_part;
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
 
     return 0;
 }

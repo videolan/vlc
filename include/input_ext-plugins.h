@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.40 2003/03/04 13:21:19 massiot Exp $
+ * $Id: input_ext-plugins.h,v 1.41 2003/03/11 23:56:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ VLC_EXPORT( pgrm_descriptor_t *, input_FindProgram,( input_thread_t *, uint16_t 
 VLC_EXPORT( pgrm_descriptor_t *, input_AddProgram, ( input_thread_t *, uint16_t, size_t ) );
 VLC_EXPORT( void, input_DelProgram,( input_thread_t *, pgrm_descriptor_t * ) );
 VLC_EXPORT( int, input_SetProgram,( input_thread_t *, pgrm_descriptor_t * ) );
-VLC_EXPORT( input_area_t *, input_AddArea,( input_thread_t * ) );
+VLC_EXPORT( input_area_t *, input_AddArea,( input_thread_t *, uint16_t, uint16_t ) );
 VLC_EXPORT( void, input_DelArea,   ( input_thread_t *, input_area_t * ) );
 VLC_EXPORT( es_descriptor_t *, input_FindES,( input_thread_t *, uint16_t ) );
 VLC_EXPORT( es_descriptor_t *, input_AddES, ( input_thread_t *, pgrm_descriptor_t *, uint16_t, size_t ) );

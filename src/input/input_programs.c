@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.101 2003/01/31 11:23:37 massiot Exp $
+ * $Id: input_programs.c,v 1.102 2003/03/11 23:56:54 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,6 +39,16 @@
  * p_input->stream.lock
  */
 
+/* Navigation callbacks */
+static int ProgramCallback( vlc_object_t *, char const *,
+                            vlc_value_t, vlc_value_t, void * );
+static int TitleCallback( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+static int ChapterCallback( vlc_object_t *, char const *,
+                            vlc_value_t, vlc_value_t, void * );
+static int NavigationCallback( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * input_InitStream: init the stream descriptor of the given input
  *****************************************************************************/
@@ -72,6 +82,15 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
         p_input->stream.p_demux_data = NULL;
     }
 
+    /* Create a few object variables used for navigation in the interfaces */
+    var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_input, "title", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_input, "chapter", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_input, "navigation", VLC_VAR_VARIABLE | VLC_VAR_HASCHOICE );
+    var_AddCallback( p_input, "program", ProgramCallback, NULL );
+    var_AddCallback( p_input, "title", TitleCallback, NULL );
+    var_AddCallback( p_input, "chapter", ChapterCallback, NULL );
+
     return 0;
 }
 
@@ -80,6 +99,11 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
  *****************************************************************************/
 void input_EndStream( input_thread_t * p_input )
 {
+    /* Free navigation variables */
+    var_Destroy( p_input, "program" );
+    var_Destroy( p_input, "title" );
+    var_Destroy( p_input, "chapter" );
+
     /* Free all programs and associated ES, and associated decoders. */
     while( p_input->stream.i_pgrm_number )
     {
@@ -139,6 +163,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
 {
     /* Where to add the pgrm */
     pgrm_descriptor_t * p_pgrm = malloc( sizeof(pgrm_descriptor_t) );
+    vlc_value_t val;
 
     if( p_pgrm == NULL )
     {
@@ -179,6 +204,9 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
                  p_input->stream.i_pgrm_number,
                  p_pgrm );
 
+    val.i_int = i_pgrm_id;
+    var_Change( p_input, "program", VLC_VAR_ADDCHOICE, &val );
+
     return p_pgrm;
 }
 
@@ -190,6 +218,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
 void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 {
     unsigned int i_pgrm_index;
+    vlc_value_t val;
 
     /* Find the program in the programs table */
     for( i_pgrm_index = 0; i_pgrm_index < p_input->stream.i_pgrm_number;
@@ -205,6 +234,9 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
         msg_Err( p_input, "program does not belong to this input" );
         return;
     }
+
+    val.i_int = i_pgrm_index;
+    var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val );
 
     /* Free the structures that describe the es that belongs to that program */
     while( p_pgrm->i_es_number )
@@ -232,10 +264,13 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
  *****************************************************************************
  * This area descriptor will be referenced in the given stream descriptor
  *****************************************************************************/
-input_area_t * input_AddArea( input_thread_t * p_input )
+input_area_t * input_AddArea( input_thread_t * p_input,
+                              uint16_t i_area_id, uint16_t i_part_nb )
 {
     /* Where to add the pgrm */
     input_area_t * p_area = malloc( sizeof(input_area_t) );
+    vlc_value_t val;
+    int i;
 
     if( p_area == NULL )
     {
@@ -244,19 +279,48 @@ input_area_t * input_AddArea( input_thread_t * p_input )
     }
 
     /* Init this entry */
-    p_area->i_id = 0;
+    p_area->i_id = i_area_id;
+    p_area->i_part_nb = i_part_nb;
+    p_area->i_part= 0;
     p_area->i_start = 0;
     p_area->i_size = 0;
     p_area->i_tell = 0;
     p_area->i_seek = NO_SEEK;
-    p_area->i_part_nb = 1;
-    p_area->i_part= 0;
 
     /* Add an entry to the list of program associated with the stream */
     INSERT_ELEM( p_input->stream.pp_areas,
                  p_input->stream.i_area_nb,
                  p_input->stream.i_area_nb,
                  p_area );
+
+    /* Don't add empty areas */
+    if( i_part_nb == 0 )
+        return NULL;
+
+    /* Take care of the navigation variables */
+    val.i_int = i_area_id;
+    var_Change( p_input, "title", VLC_VAR_ADDCHOICE, &val );
+
+    val.psz_string = malloc( sizeof("title ") + 5 );
+    if( val.psz_string )
+    {
+        vlc_value_t val2;
+
+        sprintf( val.psz_string, "title %2i", i_area_id );
+	var_Destroy( p_input, val.psz_string );
+	var_Create( p_input, val.psz_string, VLC_VAR_INTEGER |
+		    VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
+	var_AddCallback( p_input, val.psz_string, NavigationCallback,
+			 (void *)(int)i_area_id );
+
+	var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val );
+
+	for( i = 1; i <= i_part_nb; i++ )
+	{
+	    val2.i_int = i;
+	    var_Change( p_input, val.psz_string, VLC_VAR_ADDCHOICE, &val2 );
+	}
+    }
 
     return p_area;
 }
@@ -271,6 +335,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
     int i_required_spu_es;
     int i_audio_es = 0;
     int i_spu_es = 0;
+    vlc_value_t val;
 
     if ( p_input->stream.p_selected_program )
     {
@@ -356,9 +421,12 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
 
     p_input->stream.p_selected_program = p_new_prg;
 
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = p_new_prg->i_number;
+    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
+
     return( 0 );
 }
-
 
 /*****************************************************************************
  * input_DelArea: destroy a area descriptor
@@ -368,6 +436,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
 void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
 {
     unsigned int i_area_index;
+    vlc_value_t val;
 
     /* Find the area in the areas table */
     for( i_area_index = 0; i_area_index < p_input->stream.i_area_nb;
@@ -382,6 +451,15 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
     {
         msg_Err( p_input, "area does not belong to this input" );
         return;
+    }
+
+    /* Take care of the navigation variables */
+    val.psz_string = malloc( sizeof("title ") + 5 );
+    if( val.psz_string )
+    {
+        sprintf( val.psz_string, "title %i", p_area->i_id );
+	var_Change( p_input, "navigation", VLC_VAR_DELCHOICE, &val );
+	var_Destroy( p_input, val.psz_string );
     }
 
     /* Remove this area from the stream's list of areas */
@@ -657,4 +735,102 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
     }
 
     return 0;
+}
+
+/*****************************************************************************
+ * Navigation callback: a bunch of navigation variables are used as an
+ *  alternative to the navigation API.
+ *****************************************************************************/
+static int ProgramCallback( vlc_object_t *p_this, char const *psz_cmd,
+                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+
+    if( oldval.i_int == newval.i_int )
+       return VLC_SUCCESS;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( ( newval.i_int > 0 ) )
+    {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        input_ChangeProgram( p_input, newval.i_int );
+        input_SetStatus( p_input, INPUT_STATUS_PLAY );
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return VLC_SUCCESS;
+}
+
+static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
+                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    input_area_t *p_area;
+
+    if( oldval.i_int == newval.i_int )
+       return VLC_SUCCESS;
+
+    /* Sanity check should have already be done by var_Set(). */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_area = p_input->stream.pp_areas[newval.i_int];
+    p_area->i_part = 1;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    input_ChangeArea( p_input, p_area );
+    input_SetStatus( p_input, INPUT_STATUS_PLAY );
+
+    return VLC_SUCCESS;
+}
+
+static int ChapterCallback( vlc_object_t *p_this, char const *psz_cmd,
+                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    input_area_t *p_area;
+
+    if( oldval.i_int == newval.i_int )
+       return VLC_SUCCESS;
+
+    /* Sanity check will have already be done by var_Set(). */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_area = p_input->stream.p_selected_area;
+    p_input->stream.p_selected_area->i_part = newval.i_int;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    input_ChangeArea( p_input, p_area );
+    input_SetStatus( p_input, INPUT_STATUS_PLAY );
+
+    return VLC_SUCCESS;
+}
+
+static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
+                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    uint16_t i_area_id = (int)p_data;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    if( p_input->stream.p_selected_area->i_id == i_area_id &&
+        oldval.i_int == newval.i_int )
+    {
+        /* Nothing to do */
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        return VLC_SUCCESS;
+    }
+
+    if( ( i_area_id < p_input->stream.i_area_nb ) && ( newval.i_int > 0 ) &&
+        ( (uint16_t)newval.i_int <=
+          p_input->stream.pp_areas[i_area_id]->i_part_nb ) )
+    {
+        input_area_t *p_area = p_input->stream.pp_areas[i_area_id];
+        p_input->stream.p_selected_area->i_part = newval.i_int;
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        input_ChangeArea( p_input, p_area );
+        input_SetStatus( p_input, INPUT_STATUS_PLAY );
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return VLC_SUCCESS;
 }

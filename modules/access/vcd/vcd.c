@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.15 2003/02/12 17:13:33 jobi Exp $
+ * $Id: vcd.c,v 1.16 2003/03/11 23:56:54 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -224,18 +224,15 @@ static int VCDOpen( vlc_object_t *p_this )
 #define area p_input->stream.pp_areas
     for( i = 1 ; i <= p_vcd->i_nb_tracks - 1 ; i++ )
     {
-        input_AddArea( p_input );
-
         /* Titles are Program Chains */
-        area[i]->i_id = i;
+        input_AddArea( p_input, i, 1 );
 
         /* Absolute start offset and size */
         area[i]->i_start = (off_t)p_vcd->p_sectors[i] * (off_t)VCD_DATA_SIZE;
         area[i]->i_size = (off_t)(p_vcd->p_sectors[i+1] - p_vcd->p_sectors[i])
                            * (off_t)VCD_DATA_SIZE;
 
-        /* Number of chapters */
-        area[i]->i_part_nb = 1;   /* will be the entry points */
+        /* Default Chapter */
         area[i]->i_part = 1;
 
         /* i_plugin_data is used to store which entry point is the first
@@ -388,6 +385,7 @@ static int VCDSetProgram( input_thread_t * p_input,
 static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
 {
     thread_vcd_data_t *     p_vcd;
+    vlc_value_t val;
 
     p_vcd = (thread_vcd_data_t*)p_input->p_access_data;
 
@@ -396,6 +394,8 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
     if( p_area != p_input->stream.p_selected_area )
     {
+        unsigned int i;
+
         /* Reset the Chapter position of the current title */
         p_input->stream.p_selected_area->i_part = 1;
         p_input->stream.p_selected_area->i_tell = 0;
@@ -407,6 +407,16 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
         /* The first track is not a valid one  */
         p_vcd->i_track = p_area->i_id;
         p_vcd->i_sector = p_vcd->p_sectors[p_vcd->i_track];
+
+        /* Update the navigation variables without triggering a callback */
+        val.i_int = p_area->i_id;
+        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
+        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL );
+        for( i = 1; i <= p_area->i_part_nb; i++ )
+        {
+            val.i_int = i;
+            var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val );
+        }
     }
 
     if( p_vcd->b_valid_ep )
@@ -426,6 +436,10 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
     /* warn interface that something has changed */
     p_input->stream.b_seekable = 1;
     p_input->stream.b_changed = 1;
+
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = p_area->i_part;
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
 
     return 0;
 }

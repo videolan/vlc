@@ -2,7 +2,7 @@
  * popup.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: popup.cpp,v 1.3 2003/01/26 10:36:10 gbazin Exp $
+ * $Id: popup.cpp,v 1.4 2003/03/11 23:56:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -118,6 +118,7 @@ PopupMenu::PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface ):
 
     CreateMenuEntry( "title", p_object );
     CreateMenuEntry( "chapter", p_object );
+    CreateMenuEntry( "navigation", p_object );
 
     vlc_object_release( p_object );
 
@@ -207,43 +208,40 @@ wxMenu *PopupMenu::CreateSubMenu( char *psz_var, vlc_object_t *p_object )
 {
     wxMenu *menu = new wxMenu;
     vlc_value_t val;
-    char *psz_value;
+    vlc_value_t val_list;
     int i_type, i;
 
     /* Check the type of the object variable */
     i_type = var_Type( p_object, psz_var );
 
-    switch( i_type )
-    {
-    case VLC_VAR_VOID:
-    case VLC_VAR_STRING:
-        break;
-
-    default:
-        break;
-    }
-
     if( var_Get( p_object, psz_var, &val ) < 0 )
     {
         return NULL;
     }
-    psz_value = val.psz_string;
 
-    if( var_Change( p_object, psz_var, VLC_VAR_GETLIST, &val ) < 0 )
+    if( var_Change( p_object, psz_var, VLC_VAR_GETLIST, &val_list ) < 0 )
     {
         return NULL;
     }
 
-    for( i = 0; i < val.p_list->i_count; i++ )
+    for( i = 0; i < val_list.p_list->i_count; i++ )
     {
         vlc_value_t another_val;
         wxMenuItemExt *menuitem;
 
         switch( i_type & VLC_VAR_TYPE )
         {
+        case VLC_VAR_VARIABLE:
+          menu->Append( MenuDummy_Event,
+                        val_list.p_list->p_values[i].psz_string,
+                        CreateSubMenu( val_list.p_list->p_values[i].psz_string,
+                                       p_object ),
+                        "YEAAAARRRGGGHHH HEEELLPPPPPP" );
+          break;
+
         case VLC_VAR_STRING:
           another_val.psz_string =
-              strdup(val.p_list->p_values[i].psz_string);
+              strdup(val_list.p_list->p_values[i].psz_string);
           menuitem =
               new wxMenuItemExt( this, i_item_id++, another_val.psz_string,
                                  "", wxITEM_RADIO, strdup(psz_var),
@@ -252,7 +250,8 @@ wxMenu *PopupMenu::CreateSubMenu( char *psz_var, vlc_object_t *p_object )
 
           menu->Append( menuitem );
 
-          if( !strcmp( psz_value, val.p_list->p_values[i].psz_string ) )
+          if( !strcmp( val.psz_string,
+                       val_list.p_list->p_values[i].psz_string ) )
               menu->Check( i_item_id - 1, TRUE );
           break;
 
@@ -260,12 +259,16 @@ wxMenu *PopupMenu::CreateSubMenu( char *psz_var, vlc_object_t *p_object )
           menuitem =
               new wxMenuItemExt( this, i_item_id++,
                                  wxString::Format(_("%d"),
-                                 val.p_list->p_values[i].i_int),
+                                 val_list.p_list->p_values[i].i_int),
                                  "", wxITEM_RADIO, strdup(psz_var),
                                  p_object->i_object_id,
-                                 val.p_list->p_values[i] );
+                                 val_list.p_list->p_values[i] );
 
           menu->Append( menuitem );
+
+          if( !((i_type & VLC_VAR_FLAGS) & VLC_VAR_ISCOMMAND) &&
+              val_list.p_list->p_values[i].i_int == val.i_int )
+              menu->Check( i_item_id - 1, TRUE );
           break;
 
         default:
@@ -273,7 +276,7 @@ wxMenu *PopupMenu::CreateSubMenu( char *psz_var, vlc_object_t *p_object )
         }
     }
 
-    var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val );
+    var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list );
 
     return menu;
 }

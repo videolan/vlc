@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: input.c,v 1.16 2003/02/02 00:49:40 massiot Exp $
+ * $Id: input.c,v 1.17 2003/03/11 23:56:53 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -383,10 +383,8 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
      * is reserved for video_ts.vob */
     for( i = 1 ; i <= tt_srpt->nr_of_srpts ; i++ )
     {
-        input_AddArea( p_input );
-
         /* Titles are Program Chains */
-        area[i]->i_id = i;
+        input_AddArea( p_input, i, tt_srpt->title[i-1].nr_of_ptts );
 
         /* Absolute start offset and size
          * We can only set that with vts ifo, so we do it during the
@@ -394,8 +392,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
         area[i]->i_start = 0;
         area[i]->i_size = 0;
 
-        /* Number of chapters */
-        area[i]->i_part_nb = tt_srpt->title[i-1].nr_of_ptts;
+        /* Default Chapter */
         area[i]->i_part = 1;
 
         area[i]->i_plugin_data = tt_srpt->title[i-1].title_set_nr;
@@ -465,6 +462,7 @@ static int DvdReadSetProgram( input_thread_t * p_input,
     if( p_input->stream.p_selected_program != p_program )
     {
         thread_dvd_data_t *  p_dvd;
+        vlc_value_t val;
 
         p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
         p_dvd->i_angle = p_program->i_number;
@@ -475,6 +473,10 @@ static int DvdReadSetProgram( input_thread_t * p_input,
         p_input->stream.p_selected_program = p_program;
 
         msg_Dbg( p_input, "angle %d selected", p_dvd->i_angle );
+
+        /* Update the navigation variables without triggering a callback */
+        val.i_int = p_program->i_number;
+        var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
     }
 
     return VLC_SUCCESS;
@@ -494,6 +496,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
     thread_dvd_data_t *  p_dvd;
     int                  pgc_id = 0;
     int                  pgn = 0;
+    vlc_value_t          val;
 
     p_dvd = (thread_dvd_data_t*)p_input->p_access_data;
 
@@ -794,6 +797,16 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
             DvdReadLauchDecoders( p_input );
         }
 
+        /* Update the navigation variables without triggering a callback */
+        val.i_int = p_area->i_id;
+        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
+        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL );
+        for( i = 1; i <= p_area->i_part_nb; i++ )
+        {
+            val.i_int = i;
+            var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val );
+        }
+
     } /* i_title >= 0 */
     else
     {
@@ -837,6 +850,10 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
     p_area->i_tell = LB2OFF( p_dvd->i_next_vobu ) - p_area->i_start;
     p_input->stream.b_seekable = VLC_TRUE;
     p_input->stream.b_changed = VLC_TRUE;
+
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = p_area->i_part;
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
 
     return VLC_SUCCESS;
 }

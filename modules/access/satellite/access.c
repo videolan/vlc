@@ -382,6 +382,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
                          pgrm_descriptor_t * p_new_prg )
 {
     unsigned int i_es_index;
+    vlc_value_t val;
 
     if ( p_input->stream.p_selected_program )
     {
@@ -433,6 +434,10 @@ int SatelliteSetProgram( input_thread_t    * p_input,
     }
 
     p_input->stream.p_selected_program = p_new_prg;
+
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = p_new_prg->i_number;
+    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
 
     return 0;
 }

@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.11 2002/12/14 19:34:07 gbazin Exp $
+ * $Id: variables.h,v 1.12 2003/03/11 23:56:53 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -75,6 +75,7 @@ struct variable_t
 #define VLC_VAR_MODULE    0x0041
 #define VLC_VAR_FILE      0x0042
 #define VLC_VAR_DIRECTORY 0x0043
+#define VLC_VAR_VARIABLE  0x0044
 #define VLC_VAR_FLOAT     0x0050
 #define VLC_VAR_TIME      0x0060
 #define VLC_VAR_ADDRESS   0x0070
@@ -97,11 +98,14 @@ struct variable_t
 #define VLC_VAR_SETMAX        0x0011
 #define VLC_VAR_SETSTEP       0x0012
 
+#define VLC_VAR_SETVALUE      0x0013
+
 #define VLC_VAR_ADDCHOICE     0x0020
 #define VLC_VAR_DELCHOICE     0x0021
-#define VLC_VAR_SETDEFAULT    0x0022
-#define VLC_VAR_GETLIST       0x0023
-#define VLC_VAR_FREELIST      0x0024
+#define VLC_VAR_CLEARCHOICES  0x0022
+#define VLC_VAR_SETDEFAULT    0x0023
+#define VLC_VAR_GETLIST       0x0024
+#define VLC_VAR_FREELIST      0x0025
 
 /*****************************************************************************
  * Prototypes

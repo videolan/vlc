@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.20 2003/03/09 19:25:08 gbazin Exp $
+ * $Id: variables.c,v 1.21 2003/03/11 23:56:54 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -155,6 +155,8 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         case VLC_VAR_STRING:
         case VLC_VAR_MODULE:
         case VLC_VAR_FILE:
+        case VLC_VAR_DIRECTORY:
+        case VLC_VAR_VARIABLE:
             p_var->pf_cmp = CmpString;
             p_var->pf_dup = DupString;
             p_var->pf_free = FreeString;
@@ -264,6 +266,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
 {
     int i_var, i;
     variable_t *p_var;
+    vlc_value_t oldval;
 
     vlc_mutex_lock( &p_this->var_lock );
 
@@ -364,6 +367,18 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
 
             CheckValue( p_var, &p_var->val );
             break;
+        case VLC_VAR_CLEARCHOICES:
+            for( i = 0 ; i < p_var->choices.i_count ; i++ )
+            {
+                p_var->pf_free( &p_var->choices.p_values[i] );
+            }
+            if( p_var->choices.i_count )
+                free( p_var->choices.p_values );
+
+            p_var->choices.i_count = 0;
+            p_var->choices.p_values = NULL;
+            p_var->i_default = -1;
+            break;
         case VLC_VAR_SETDEFAULT:
             /* FIXME: the list is sorted, dude. Use something cleverer. */
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
@@ -383,7 +398,18 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             p_var->i_default = i;
             CheckValue( p_var, &p_var->val );
             break;
-
+        case VLC_VAR_SETVALUE:
+            /* Duplicate data if needed */
+            p_var->pf_dup( p_val );
+            /* Backup needed stuff */
+            oldval = p_var->val;
+            /* Check boundaries and list */
+            CheckValue( p_var, p_val );
+            /* Set the variable */
+            p_var->val = *p_val;
+            /* Free data if needed */
+            p_var->pf_free( &oldval );
+            break;
         case VLC_VAR_GETLIST:
             p_val->p_list = malloc( sizeof(vlc_list_t) );
             if( p_var->choices.i_count )

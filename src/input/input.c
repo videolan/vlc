@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.223 2003/02/08 22:43:02 massiot Exp $
+ * $Id: input.c,v 1.224 2003/03/11 23:56:54 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -126,7 +126,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->stream.p_newly_selected_es = NULL;
 
     /* By default there is one area in a stream */
-    input_AddArea( p_input );
+    input_AddArea( p_input, 0, 1 );
     p_input->stream.p_selected_area = p_input->stream.pp_areas[0];
 
     /* Initialize stream control properties. */

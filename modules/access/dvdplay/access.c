@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.12 2003/03/09 19:25:09 gbazin Exp $
+ * $Id: access.c,v 1.13 2003/03/11 23:56:53 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -43,10 +43,6 @@
 
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
-#endif
-
-#if defined( WIN32 )
-#   include <io.h>                                                 /* read() */
 #endif
 
 #include "dvd.h"
@@ -147,17 +143,12 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
 
     /* Area 0 for menu */
     area[0]->i_plugin_data = 0;
+    input_DelArea( p_input, p_input->stream.pp_areas[0] );
+    input_AddArea( p_input, 0, 1 );
 
     for( i = 1 ; i <= i_title_nr ; i++ )
     {
-        input_AddArea( p_input );
-
-        /* Titles id */
-        area[i]->i_id = i;
-
-        /* Number of chapters */
-        area[i]->i_part_nb = dvdplay_chapter_nr( p_dvd->vmg, i );
-
+        input_AddArea( p_input, i, dvdplay_chapter_nr( p_dvd->vmg, i ) );
         area[i]->i_plugin_data = 0;
     }
 #undef area
@@ -244,6 +235,7 @@ static int dvdplay_SetProgram( input_thread_t *     p_input,
     {
         dvd_data_t *    p_dvd;
         int             i_angle;
+        vlc_value_t     val;
 
         p_dvd = (dvd_data_t*)(p_input->p_access_data);
         i_angle = p_program->i_number;
@@ -257,6 +249,10 @@ static int dvdplay_SetProgram( input_thread_t *     p_input,
 
             msg_Dbg( p_input, "angle %d selected", i_angle );
         }
+
+        /* Update the navigation variables without triggering a callback */
+        val.i_int = p_program->i_number;
+        var_Change( p_input, "program", VLC_VAR_SETVALUE, &val );
     }
 
     return 0;
@@ -272,6 +268,7 @@ static int dvdplay_SetProgram( input_thread_t *     p_input,
 static int dvdplay_SetArea( input_thread_t * p_input, input_area_t * p_area )
 {
     dvd_data_t *    p_dvd;
+    vlc_value_t     val;
 
     p_dvd = (dvd_data_t*)p_input->p_access_data;
 
@@ -321,6 +318,10 @@ static int dvdplay_SetArea( input_thread_t * p_input, input_area_t * p_area )
     p_area->i_tell =
         LB2OFF( dvdplay_position( p_dvd->vmg ) ) - p_area->i_start;
     p_input->stream.b_changed = 1;
+
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = p_area->i_part;
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
 
     return 0;
 }
@@ -395,7 +396,6 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
     case NEW_VTS:
         break;
     case NEW_FILE:
-
         break;
     case NEW_PGC:
         /* prevent intf to try to seek  by default */
@@ -428,6 +428,10 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
 
         /* warn interface that something has changed */
         p_input->stream.b_changed = 1;
+
+        /* Update the navigation variables without triggering a callback */
+        val.i_int = p_input->stream.p_selected_area->i_part;
+        var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
         break;
     case NEW_CELL:
         p_dvd->b_end_of_cell = 0;
@@ -497,6 +501,7 @@ static int dvdNewArea( input_thread_t * p_input, input_area_t * p_area )
 {
     dvd_data_t *    p_dvd;
     int             i_angle_nb, i_angle;
+    vlc_value_t     val;
     int             i;
 
     p_dvd = (dvd_data_t*)p_input->p_access_data;
@@ -525,6 +530,20 @@ static int dvdNewArea( input_thread_t * p_input, input_area_t * p_area )
 
     /* No PSM to read in DVD mode, we already have all information */
     p_input->stream.p_selected_program->b_is_ok = 1;
+
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = p_area->i_id;
+    var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL );
+    for( i = 1; (unsigned int)i <= p_area->i_part_nb; i++ )
+    {
+        val.i_int = i;
+        var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val );
+    }
+
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = p_area->i_part;
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
 
     return 0;
 }
@@ -568,4 +587,3 @@ static int dvdNewPGC( input_thread_t * p_input )
 
     return 0;
 }
-
