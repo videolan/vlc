@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_ext-intf.c: services to the interface
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.52 2003/11/24 00:39:02 fenrir Exp $
+ * Copyright (C) 1998-2001,2003 VideoLAN
+ * $Id: input_ext-intf.c,v 1.53 2003/12/03 13:27:51 rocky Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -197,8 +197,8 @@ void __input_Seek( vlc_object_t * p_this, off_t i_position, int i_whence )
 {
     input_thread_t *p_input;
 
-    char psz_time1[OFFSETTOTIME_MAX_SIZE];
-    char psz_time2[OFFSETTOTIME_MAX_SIZE];
+    char psz_time1[MSTRTIME_MAX_SIZE];
+    char psz_time2[MSTRTIME_MAX_SIZE];
 
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
 
@@ -308,11 +308,7 @@ char * input_OffsetToTime( input_thread_t * p_input, char * psz_buffer,
     if( p_input->stream.i_mux_rate )
     {
         i_seconds = i_offset / 50 / p_input->stream.i_mux_rate;
-        snprintf( psz_buffer, OFFSETTOTIME_MAX_SIZE, "%d:%02d:%02d",
-                 (int) (i_seconds / (60 * 60)),
-                 (int) (i_seconds / 60 % 60),
-                 (int) (i_seconds % 60) );
-        return( psz_buffer );
+	return secstotimestr( psz_buffer, i_seconds );
     }
     else
     {
@@ -330,8 +326,8 @@ char * input_OffsetToTime( input_thread_t * p_input, char * psz_buffer,
  *****************************************************************************/
 void input_DumpStream( input_thread_t * p_input )
 {
-    char psz_time1[OFFSETTOTIME_MAX_SIZE];
-    char psz_time2[OFFSETTOTIME_MAX_SIZE];
+    char psz_time1[MSTRTIME_MAX_SIZE];
+    char psz_time2[MSTRTIME_MAX_SIZE];
     unsigned int i, j;
 
 #define S   p_input->stream

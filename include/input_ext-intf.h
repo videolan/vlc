@@ -3,8 +3,8 @@
  * This header provides structures to read the stream descriptors and
  * control the pace of reading.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.101 2003/11/29 18:36:13 massiot Exp $
+ * Copyright (C) 1999, 2000, 2003 VideoLAN
+ * $Id: input_ext-intf.h,v 1.102 2003/12/03 13:27:51 rocky Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -37,8 +37,6 @@
 #define REQUESTED_LPCM         3
 #define REQUESTED_DTS          4
 #define REQUESTED_NOAUDIO    255
-
-#define OFFSETTOTIME_MAX_SIZE       10
 
 /*****************************************************************************
  * es_descriptor_t: elementary stream descriptor

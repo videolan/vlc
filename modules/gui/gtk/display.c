@@ -1,8 +1,8 @@
 /*****************************************************************************
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.c,v 1.11 2003/08/03 23:11:21 gbazin Exp $
+ * Copyright (C) 1999, 2000, 2003 VideoLAN
+ * $Id: display.c,v 1.12 2003/12/03 13:27:51 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -63,7 +63,7 @@ void E_(GtkDisplayDate)( GtkAdjustment *p_adj )
     if( p_intf->p_sys->p_input )
     {
 #define p_area p_intf->p_sys->p_input->stream.p_selected_area
-        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+        char psz_time[ MSTRTIME_MAX_SIZE ];
 
         gtk_frame_set_label( GTK_FRAME( p_intf->p_sys->p_slider_frame ),
                         input_OffsetToTime( p_intf->p_sys->p_input, psz_time,

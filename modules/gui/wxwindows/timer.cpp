@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: timer.cpp,v 1.35 2003/11/23 22:29:27 ipkiss Exp $
+ * $Id: timer.cpp,v 1.36 2003/12/03 13:27:51 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -184,7 +184,7 @@ void Timer::Notify()
                 if( p_intf->p_sys->b_slider_free )
                 {
                     vlc_value_t pos;
-                    char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+                    char psz_time[ MSTRTIME_MAX_SIZE ];
                     vlc_value_t time;
                     mtime_t i_seconds;
 
@@ -201,11 +201,7 @@ void Timer::Notify()
                         var_Get( p_intf->p_sys->p_input, "time", &time );
                         i_seconds = time.i_time / 1000000;
 
-                        snprintf( psz_time, OFFSETTOTIME_MAX_SIZE,
-                                  "%d:%02d:%02d",
-                                  (int) (i_seconds / (60 * 60)),
-                                  (int) (i_seconds / 60 % 60),
-                                  (int) (i_seconds % 60) );
+                        secstotimestr ( psz_time, i_seconds );
 
                         p_main_interface->slider_box->SetLabel( wxU(psz_time) );
                     }

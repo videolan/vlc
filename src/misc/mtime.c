@@ -1,9 +1,9 @@
 /*****************************************************************************
- * mtime.c: high rezolution time management functions
+ * mtime.c: high resolution time management functions
  * Functions are prototyped in mtime.h.
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.37 2003/12/02 01:54:30 rocky Exp $
+ * Copyright (C) 1998-2001, 2003 VideoLAN
+ * $Id: mtime.c,v 1.38 2003/12/03 13:27:51 rocky Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -103,11 +103,12 @@ char *mstrtime( char *psz_buffer, mtime_t date )
  * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
  * \return psz_buffer is returned so this can be used as printf parameter.
  */
-char *secstotimestr( char *psz_buffer, int secs )
+char *secstotimestr( char *psz_buffer, int i_seconds )
 {
   snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%d:%2.2d:%2.2d",
-	    (int) (secs / 3600), (int)(( secs % 3600 ) / 60), 
-	    (int)(secs % 60) );
+	    (int) (i_seconds / (60 *60)), 
+	    (int) ((i_seconds / 60) % 60), 
+	    (int) (i_seconds % 60) );
   return( psz_buffer );
 }
 
