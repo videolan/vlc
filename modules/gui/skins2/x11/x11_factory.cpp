@@ -72,6 +72,7 @@ bool X11Factory::init()
     // Initialize the resource path
     m_resourcePath.push_back( (string)getIntf()->p_vlc->psz_homedir +
         m_dirSep + CONFIG_DIR + "/skins2" );
+    m_resourcePath.push_back( (string)"share/skins2" );
     m_resourcePath.push_back( (string)DATA_PATH + "/skins2" );
 
     return true;

@@ -169,7 +169,7 @@ void Dialogs::showChangeSkin()
 
         p_arg->b_blocking = false;
 
-        p_arg->psz_title = strdup( _("Open a skin file.") );
+        p_arg->psz_title = strdup( _("Open a skin file") );
         p_arg->psz_extensions =
             strdup( _("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|") );
 
