@@ -408,7 +408,7 @@ static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select )
             char *psz_arg = strchr( psz, '=' );
             *psz_arg++ = '\0';
 
-            if( !strcmp( psz, "no-es" ) || !strcmp( psz, "es" ) )
+            if( !strcmp( psz, "no-es" ) || !strcmp( psz, "noes" ) )
             {
                 if( i_es != 1 )
                 {
