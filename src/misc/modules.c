@@ -39,10 +39,6 @@
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
-#elif defined( UNDER_CE )
-#   include <windows.h>                               /* GetFileAttributes() */
-#else
-#   include "../extras/dirent.h"
 #endif
 
 #ifdef HAVE_SYS_TYPES_H
@@ -124,7 +120,7 @@
 #endif
 #include "network.h"
 
-#if defined( WIN32) || defined( UNDER_CE )
+#if defined( WIN32 ) || defined( UNDER_CE )
     /* Avoid name collisions */
 #   define LoadModule(a,b,c) _LoadModule(a,b,c)
 #endif
