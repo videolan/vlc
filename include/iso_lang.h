@@ -2,7 +2,7 @@
  * iso_lang.h: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: iso_lang.h,v 1.8 2002/11/11 14:39:11 sam Exp $
+ * $Id: iso_lang.h,v 1.9 2003/10/24 17:41:58 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -31,8 +31,14 @@ struct iso639_lang_t
     char * psz_iso639_2B;       /* ISO-639-2/B (3 characters) native code */
 };
 
+#if defined( __cplusplus )
+extern "C" {
+#endif
 VLC_EXPORT( const iso639_lang_t *, GetLang_1, ( const char * ) );
 VLC_EXPORT( const iso639_lang_t *, GetLang_2T, ( const char * ) );
 VLC_EXPORT( const iso639_lang_t *, GetLang_2B, ( const char * ) );
 VLC_EXPORT( const char *, DecodeLanguage, ( uint16_t ) );
+#if defined( __cplusplus )
+}
+#endif
 
