@@ -73,11 +73,11 @@ vlc_module_end();
  *****************************************************************************/
 struct vout_sys_t
 {
-  snapshot_t **p_list; /* List of available snapshots */
-  int i_index;        /* Index of the next available list member */
-  int i_size;         /* Size of the cache */
-  int i_datasize;     /* Size of an image */
-  input_thread_t *    p_input;             /* The input thread */
+    snapshot_t **p_list;    /* List of available snapshots */
+    int i_index;            /* Index of the next available list member */
+    int i_size;             /* Size of the cache */
+    int i_datasize;         /* Size of an image */
+    input_thread_t *p_input;             /* The input thread */
 };
 
 /*****************************************************************************
@@ -127,25 +127,22 @@ static int Init( vout_thread_t *p_vout )
     i_height = config_GetInt( p_vout, "snapshot-height" );
 
     psz_chroma = config_GetPsz( p_vout, "snapshot-chroma" );
-    if ( psz_chroma )
-      {
-        if ( strlen( psz_chroma ) < 4 )
-          {
-            msg_Err( p_vout,
-                     "snapshot-chroma should be 4 characters long.\n" );
+    if( psz_chroma )
+    {
+        if( strlen( psz_chroma ) < 4 )
+        {
+            msg_Err( p_vout, "snapshot-chroma should be 4 characters long." );
             return VLC_EGENERIC;
-          }
-        i_chroma = VLC_FOURCC( psz_chroma[0],
-                               psz_chroma[1],
-                               psz_chroma[2],
-                               psz_chroma[3] );
+        }
+        i_chroma = VLC_FOURCC( psz_chroma[0], psz_chroma[1],
+                               psz_chroma[2], psz_chroma[3] );
         free( psz_chroma );
-      }
+    }
     else
-      {
-        msg_Err( p_vout, "Cannot find chroma information.\n" );
+    {
+        msg_Err( p_vout, "Cannot find chroma information." );
         return VLC_EGENERIC;
-      }
+    }
 
     I_OUTPUTPICTURES = 0;
 
@@ -160,7 +157,7 @@ static int Init( vout_thread_t *p_vout )
 
     /* Define the bitmasks */
     switch( i_chroma )
-      {
+    {
       case VLC_FOURCC( 'R','V','1','5' ):
         p_vout->output.i_rmask = 0x001f;
         p_vout->output.i_gmask = 0x03e0;
@@ -184,7 +181,7 @@ static int Init( vout_thread_t *p_vout )
         p_vout->output.i_gmask = 0x00ff00;
         p_vout->output.i_bmask = 0x0000ff;
         break;
-      }
+    }
 
     /* Try to initialize 1 direct buffer */
     p_pic = NULL;
@@ -205,7 +202,7 @@ static int Init( vout_thread_t *p_vout )
         return VLC_SUCCESS;
     }
 
-    vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_chroma,
+    vout_AllocatePicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma,
                           p_vout->output.i_width, p_vout->output.i_height,
                           p_vout->output.i_aspect );
 
@@ -230,24 +227,23 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_sys->i_size = config_GetInt( p_vout, "snapshot-cache-size" );
 
     if( p_vout->p_sys->i_size < 2 )
-      {
+    {
         msg_Err( p_vout, "snapshot-cache-size must be at least 1." );
         return VLC_EGENERIC;
-      }
+    }
 
-    p_vout->p_sys->p_list = ( snapshot_t ** )malloc( p_vout->p_sys->i_size * sizeof( snapshot_t * ) );
+    p_vout->p_sys->p_list = malloc( p_vout->p_sys->i_size * sizeof( snapshot_t * ) );
 
     if( p_vout->p_sys->p_list == NULL )
-      return VLC_ENOMEM;
+        return VLC_ENOMEM;
 
     /* Initialize the structures for the circular buffer */
-    for( i_index = 0 ; i_index < p_vout->p_sys->i_size ; i_index++ )
-      {
-        snapshot_t *p_snapshot;
-        p_snapshot = ( snapshot_t * )malloc( sizeof( snapshot_t ) );
+    for( i_index = 0; i_index < p_vout->p_sys->i_size; i_index++ )
+    {
+        snapshot_t *p_snapshot = malloc( sizeof( snapshot_t ) );
 
         if( p_snapshot == NULL )
-          return VLC_ENOMEM;
+            return VLC_ENOMEM;
 
         p_snapshot->i_width = i_width;
         p_snapshot->i_height = i_height;
@@ -255,9 +251,9 @@ static int Init( vout_thread_t *p_vout )
         p_snapshot->date = 0;
         p_snapshot->p_data = ( char* ) malloc( i_datasize );
         if( p_snapshot->p_data == NULL )
-          return VLC_ENOMEM;
-        p_vout->p_sys->p_list[ i_index ] = p_snapshot;
-      }
+            return VLC_ENOMEM;
+        p_vout->p_sys->p_list[i_index] = p_snapshot;
+    }
 
     val.i_int = i_width;
     var_Set( p_vout, "snapshot-width", val );
@@ -276,24 +272,25 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_sys->p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
                                               FIND_PARENT );
 
-    if( ! p_vout->p_sys->p_input )
-      return VLC_ENOOBJ;
+    if( !p_vout->p_sys->p_input )
+        return VLC_ENOOBJ;
 
-    if( var_Create( p_vout->p_sys->p_input, "snapshot-id", VLC_VAR_INTEGER ) != VLC_SUCCESS )
-      {
-        msg_Err( p_vout, "Cannot create snapshot-id variable in p_input (%d).", p_vout->p_sys->p_input->i_object_id );
+    if( var_Create( p_vout->p_sys->p_input, "snapshot-id", VLC_VAR_INTEGER ) )
+    {
+        msg_Err( p_vout, "Cannot create snapshot-id variable in p_input (%d).",
+                 p_vout->p_sys->p_input->i_object_id );
         return VLC_EGENERIC;
-      }
+    }
 
     /* Register the snapshot vout module at the input level */
     val.i_int = p_vout->i_object_id;
 
-    if( var_Set( p_vout->p_sys->p_input, "snapshot-id", val ) != VLC_SUCCESS )
-      {
-        msg_Err( p_vout, "Cannot register snapshot-id in p_input (%d).", 
+    if( var_Set( p_vout->p_sys->p_input, "snapshot-id", val ) )
+    {
+        msg_Err( p_vout, "Cannot register snapshot-id in p_input (%d).",
                  p_vout->p_sys->p_input->i_object_id );
         return VLC_EGENERIC;
-      }
+    }
 
     return VLC_SUCCESS;
 }
@@ -305,59 +302,59 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-  vout_thread_t *p_vout = ( vout_thread_t * )p_this;
-  vlc_object_t *p_vlc;
-  int i_index;
+    vout_thread_t *p_vout = ( vout_thread_t * )p_this;
+    vlc_object_t *p_vlc;
+    int i_index;
 
-  vlc_object_release( p_vout->p_sys->p_input );
-  var_Destroy( p_this, "snapshot-width" );
-  var_Destroy( p_this, "snapshot-height" );
-  var_Destroy( p_this, "snapshot-datasize" );
+    vlc_object_release( p_vout->p_sys->p_input );
+    var_Destroy( p_this, "snapshot-width" );
+    var_Destroy( p_this, "snapshot-height" );
+    var_Destroy( p_this, "snapshot-datasize" );
 
-  p_vlc = vlc_object_find( p_this, VLC_OBJECT_ROOT, FIND_PARENT );
-  if( p_vlc )
+    p_vlc = vlc_object_find( p_this, VLC_OBJECT_ROOT, FIND_PARENT );
+    if( p_vlc )
     {
-      /* UnRegister the snapshot vout module at the root level */
-      /* var_Destroy (p_vlc, "snapshot-id"); */
-      var_Destroy( p_this->p_libvlc, "snapshot-id" );
-      vlc_object_release( p_vlc );
+        /* UnRegister the snapshot vout module at the root level */
+        /* var_Destroy (p_vlc, "snapshot-id"); */
+        var_Destroy( p_this->p_libvlc, "snapshot-id" );
+        vlc_object_release( p_vlc );
     }
 
-  for( i_index = 0 ; i_index < p_vout->p_sys->i_size ; i_index++ )
+    for( i_index = 0 ; i_index < p_vout->p_sys->i_size ; i_index++ )
     {
-      free( p_vout->p_sys->p_list[ i_index ]->p_data );
+        free( p_vout->p_sys->p_list[ i_index ]->p_data );
     }
-  free( p_vout->p_sys->p_list );
-  /* Destroy structure */
-  free( p_vout->p_sys );
+    free( p_vout->p_sys->p_list );
+    /* Destroy structure */
+    free( p_vout->p_sys );
 }
 
 /* Return the position in ms from the start of the movie */
-mtime_t snapshot_GetMovietime( vout_thread_t *p_vout )
+static mtime_t snapshot_GetMovietime( vout_thread_t *p_vout )
 {
-  input_thread_t* p_input;
-  vlc_value_t val;
-  mtime_t result;
+    input_thread_t* p_input;
+    vlc_value_t val;
+    mtime_t i_result;
 
-  p_input = p_vout->p_sys->p_input;
-  if( ! p_input )
-    return 0;
+    p_input = p_vout->p_sys->p_input;
+    if( !p_input )
+        return 0;
 
-  var_Get( p_input, "time", &val );
+    var_Get( p_input, "time", &val );
 
-  result = val.i_time;
+    i_result = val.i_time;
 
-  if (result == 0)
+    if( i_result <= 0 )
     {
-      /* Either we are at the start, or (more probably) the demuxer
-         does not support the DEMUX_GET_TIME call. Try to fallback to
-         another method. */
-      stream_position_t pos;
+        /* Either we are at the start, or (more probably) the demuxer
+           does not support the DEMUX_GET_TIME call. Try to fallback to
+           another method. */
+        stream_position_t pos;
 
-      input_Tell( p_input, &pos );
-      result = pos.i_mux_rate * 50 * pos.i_tell;
+        input_Tell( p_input, &pos );
+        i_result = pos.i_mux_rate * 50 * pos.i_tell;
     }
-  return( result / 1000 );
+    return( i_result / 1000 );
 }
 
 /*****************************************************************************
@@ -367,28 +364,26 @@ mtime_t snapshot_GetMovietime( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-   int i_index;
-   mtime_t date;
+    int i_index;
+    mtime_t i_date;
 
-   i_index = p_vout->p_sys->i_index;
+    i_index = p_vout->p_sys->i_index;
 
-   p_vout->p_vlc->pf_memcpy(
-                            p_vout->p_sys->p_list[i_index]->p_data,
-                            p_pic->p->p_pixels,
-                            p_vout->p_sys->i_datasize );
+    p_vout->p_vlc->pf_memcpy( p_vout->p_sys->p_list[i_index]->p_data,
+                              p_pic->p->p_pixels,
+                              p_vout->p_sys->i_datasize );
 
-   date = snapshot_GetMovietime( p_vout );
+    i_date = snapshot_GetMovietime( p_vout );
 
-   p_vout->p_sys->p_list[ i_index ]->date = date;
+    p_vout->p_sys->p_list[i_index]->date = i_date;
 
-   i_index++;
+    i_index++;
 
-   if( i_index >= p_vout->p_sys->i_size )
-     {
-       i_index = 0;
-     }
+    if( i_index >= p_vout->p_sys->i_size )
+    {
+        i_index = 0;
+    }
 
-   p_vout->p_sys->i_index = i_index;
-
-  return;
+    p_vout->p_sys->i_index = i_index;
 }
+
