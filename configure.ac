@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.154 2004/01/24 13:08:12 asmax Exp $
+dnl $Id: configure.ac,v 1.155 2004/01/24 15:18:29 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -2807,7 +2807,14 @@ if test "${enable_skins2}" != "no"; then
     AX_ADD_LDFLAGS([skins2],[`${FREETYPE_CONFIG} --libs`])
   fi
 
-  AC_PATH_PROG(XML2_CONFIG, xml2-config, no)
+  XML2_PATH="${PATH}"
+  AC_ARG_WITH(xml2-config-path,
+    [    --with-xml2-config-path=PATH xml2-config path (default search in \$PATH)],
+    [ if test "${with_xml2_config_path}" != "no"
+      then
+        XML2_PATH="${with_xml2_config_path}:${PATH}"
+      fi ])
+  AC_PATH_PROG(XML2_CONFIG, xml2-config, no, ${XML2_PATH})
   if test "${XML2_CONFIG}" != "no"
   then
     AX_ADD_CPPFLAGS([skins2],[`${XML2_CONFIG} --cflags`])
