@@ -167,6 +167,7 @@ protected:
     virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
     void OnOpenFileSimple( void );
+    void OnOpenDirectory( void );
     void OnPlayStream( void );
     void OnVideoOnTop( void );
 
@@ -653,7 +654,8 @@ extern "C" {
 #define IDM_NAVIGATION                  40053
 #define ID_FILE_QUICKOPEN               40057
 #define ID_FILE_OPENFILE                40058
-#define ID_FILE_OPENNET                 40059
+#define ID_FILE_OPENDIR                 40059
+#define ID_FILE_OPENNET                 40060
 #define ID_FILE_EXIT                    40061
 #define ID_VIEW_PLAYLIST                40063
 #define ID_VIEW_MESSAGES                40064

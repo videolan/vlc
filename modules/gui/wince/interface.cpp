@@ -38,6 +38,7 @@
 #include <windowsx.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <shlobj.h>
 
 #define NUMIMAGES     9   // Number of buttons in the toolbar           
 #define IMAGEWIDTH    17   // Width of the buttons in the toolbar  
@@ -218,6 +219,8 @@ HWND Interface::CreateMenuBar( HWND hwnd, HINSTANCE hInst )
     AppendMenu( menu_file, MF_SEPARATOR, 0, 0 );
     AppendMenu( menu_file, MF_STRING, ID_FILE_OPENFILE,
                 _T("Open &File...") );
+    AppendMenu( menu_file, MF_STRING, ID_FILE_OPENDIR,
+                _T("Open &Directory...") );
     AppendMenu( menu_file, MF_STRING, ID_FILE_OPENNET,
                 _T("Open &Network Stream...") );
     AppendMenu( menu_file, MF_SEPARATOR, 0, 0 );
@@ -565,6 +568,10 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             delete open;
             break;
 
+        case ID_FILE_OPENDIR:
+            OnOpenDirectory();
+            break;
+
         case ID_FILE_OPENNET:
             open = new OpenDialog( p_intf, hInst, NET_ACCESS, ID_FILE_OPENNET,
                                    OPEN_NORMAL );
@@ -742,7 +749,7 @@ void Interface::OnOpenFileSimple( void )
 
     memset( &ofn, 0, sizeof(OPENFILENAME) );
     ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = NULL;
+    ofn.hwndOwner = hwndMain;
     ofn.hInstance = hInst;
     ofn.lpstrFilter = szFilter;
     ofn.lpstrCustomFilter = NULL;
@@ -772,6 +779,75 @@ void Interface::OnOpenFileSimple( void )
     }
 
     vlc_object_release( p_playlist );
+}
+
+void Interface::OnOpenDirectory( void )
+{
+    TCHAR psz_result[MAX_PATH];
+    LPMALLOC p_malloc = 0;
+    LPITEMIDLIST pidl;
+    BROWSEINFO bi;
+    playlist_t *p_playlist = 0;
+
+#ifdef UNDER_CE
+#   define SHGetMalloc MySHGetMalloc
+#   define SHBrowseForFolder MySHBrowseForFolder
+#   define SHGetPathFromIDList MySHGetPathFromIDList
+
+    HMODULE ceshell_dll = LoadLibrary( _T("ceshell") );
+    if( !ceshell_dll ) return;
+
+    HRESULT WINAPI (*SHGetMalloc)(LPMALLOC *) =
+        (HRESULT WINAPI (*)(LPMALLOC *))
+        GetProcAddress( ceshell_dll, _T("SHGetMalloc") );
+    LPITEMIDLIST WINAPI (*SHBrowseForFolder)(LPBROWSEINFO) =
+        (LPITEMIDLIST WINAPI (*)(LPBROWSEINFO))
+        GetProcAddress( ceshell_dll, _T("SHBrowseForFolder") );
+    BOOL WINAPI (*SHGetPathFromIDList)(LPCITEMIDLIST, LPTSTR) =
+        (BOOL WINAPI (*)(LPCITEMIDLIST, LPTSTR))
+        GetProcAddress( ceshell_dll, _T("SHGetPathFromIDList") );
+
+    if( !SHGetMalloc || !SHBrowseForFolder || !SHGetPathFromIDList )
+    {
+        msg_Err( p_intf, "couldn't load SHBrowseForFolder API" );
+        FreeLibrary( ceshell_dll );
+        return;
+    }
+#endif
+
+    if( !SUCCEEDED( SHGetMalloc(&p_malloc) ) ) goto error;
+
+    p_playlist = (playlist_t *)
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( !p_playlist ) goto error;
+
+    memset( &bi, 0, sizeof(BROWSEINFO) );
+    bi.hwndOwner = hwndMain;
+    bi.pszDisplayName = psz_result;
+    bi.ulFlags = BIF_EDITBOX;
+#ifndef UNDER_CE
+    bi.ulFlags |= BIF_USENEWUI;
+#endif
+
+    if( (pidl = SHBrowseForFolder( &bi ) ) )
+    {
+        if( SHGetPathFromIDList( pidl, psz_result ) )
+        {
+            char *psz_filename = _TOMB(psz_result);
+            playlist_Add( p_playlist, psz_filename, psz_filename,
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+        }
+        p_malloc->Free( pidl );
+    }
+
+ error:
+
+    if( p_malloc) p_malloc->Release();
+    if( p_playlist ) vlc_object_release( p_playlist );
+
+#ifdef UNDER_CE
+    FreeLibrary( ceshell_dll );
+#endif
 }
 
 void Interface::OnPlayStream( void )

@@ -35,6 +35,7 @@
 
 #include "wince.h"
 
+#include <objbase.h>
 #include <commctrl.h>
 #include <commdlg.h>
 
@@ -171,12 +172,17 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     MSG msg;
-    Interface interface;
+    Interface intf;
 
-    p_intf->p_sys->p_main_window = &interface;
+    p_intf->p_sys->p_main_window = &intf;
     if( !hInstance ) hInstance = GetModuleHandle(NULL);
 
-    if( !interface.InitInstance( hInstance, p_intf ) ) return;
+#ifndef UNDER_CE
+    /* Initialize OLE/COM */
+    CoInitialize( 0 );
+#endif
+
+    if( !intf.InitInstance( hInstance, p_intf ) ) return;
 
     // Main message loop
     while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
@@ -184,4 +190,9 @@ static void Run( intf_thread_t *p_intf )
         TranslateMessage( &msg );
         DispatchMessage( &msg );
     }
+
+#ifndef UNDER_CE
+    /* Uninitialize OLE/COM */
+    CoUninitialize();
+#endif
 }
