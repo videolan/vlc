@@ -75,16 +75,18 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
                wxPoint( p_parent->GetParent()->GetRect().GetX(),
                         p_parent->GetParent()->GetRect().GetY() +
                         p_parent->GetParent()->GetRect().GetHeight() + 40 ),
-             !p_parent->GetParent() ? wxDefaultSize :
-               wxSize( p_parent->GetParent()->GetRect().GetWidth(), -1 ),
+             wxSize( 500, -1 ),
              wxDEFAULT_FRAME_STYLE | wxFRAME_FLOAT_ON_PARENT )
 {
     /* Initializations */
     p_intf = _p_intf;
 
+    wxPanel *main_panel = new wxPanel( this, -1 );
+    wxBoxSizer *main_sizer = new wxBoxSizer( wxHORIZONTAL );
+
     wxBoxSizer *sizer = new wxBoxSizer( wxHORIZONTAL );
 
-    wxPanel *panel = new wxPanel( this, -1 );
+    wxPanel *panel = new wxPanel( main_panel, -1 );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     wxButton *button_add =
         new wxButton( panel, ButtonAdd_Event, wxU(_("Add")) );
@@ -97,7 +99,8 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     panel_sizer->Add( button_clear, 0, wxEXPAND );
     panel->SetSizerAndFit( panel_sizer );
 
-    list_ctrl = new wxListView( this, -1, wxDefaultPosition, wxDefaultSize,
+    list_ctrl = new wxListView( main_panel, -1,
+                                wxDefaultPosition, wxDefaultSize,
                                 wxLC_REPORT | wxSUNKEN_BORDER |
                                 wxLC_SINGLE_SEL );
     list_ctrl->InsertColumn( 0, wxU(_("Description")) );
@@ -105,9 +108,12 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     list_ctrl->InsertColumn( 1, wxU(_("Size offset")) );
     list_ctrl->InsertColumn( 2, wxU(_("Time offset")) );
 
-    sizer->Add( panel, 0, wxEXPAND | wxALL, 5 );
-    sizer->Add( list_ctrl, 1, wxEXPAND | wxALL, 5 );
-    SetSizer( sizer );
+    sizer->Add( panel, 0, wxEXPAND | wxALL, 1 );
+    sizer->Add( list_ctrl, 1, wxEXPAND | wxALL, 1 );
+    main_panel->SetSizer( sizer );
+
+    main_sizer->Add( main_panel, 1, wxEXPAND );
+    SetSizer( main_sizer );
 
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -115,7 +121,9 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     if( p_playlist )
     {
        /* Some global changes happened -> Rebuild all */
-       var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, this );
+       var_AddCallback( p_playlist, "playlist-current",
+                        PlaylistChanged, this );
+       vlc_object_release( p_playlist );
     }
 }
 
@@ -128,6 +136,8 @@ BookmarksDialog::~BookmarksDialog()
     {
        /* Some global changes happened -> Rebuild all */
        var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
+
+       vlc_object_release( p_playlist );
     }
 }
 
