@@ -2,7 +2,7 @@
  * hotkeys.h: keycode defines
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_keys.h,v 1.8 2003/11/11 23:50:41 hartman Exp $
+ * $Id: vlc_keys.h,v 1.9 2003/11/16 22:10:16 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -171,7 +171,7 @@ static inline int StringToKey( char *psz_key )
             return vlc_keys[i].i_key_code;
         }
     }
-    return NULL;
+    return 0;
 }
 
 
