@@ -8533,7 +8533,7 @@ if test "${enable_plugins+set}" = set; then
 fi
 
 
-if test x$ac_cv_header_dlfcn_h = xno -a x$ac_cv_header_image_h = xno
+if test x$ac_cv_header_dlfcn_h = xno -a x$ac_cv_header_image_h = xno -a x$SYS != xmingw32
 then
   echo "*** Your system doesn't have plug-in support. All plug-ins will be compiled"
   echo "as built-in"
