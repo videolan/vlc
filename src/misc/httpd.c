@@ -1007,7 +1007,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
                 const struct sockaddr_in6 *p_hsock, *p_sock;
 
                 p_hsock = (const struct sockaddr_in6 *)&httpd->host[i]->sock;
-                p_sock = (const struct sockaddr_in6 *)res->ai_addr;
+                p_sock = (const struct sockaddr_in6 *)ptr->ai_addr;
 
                 if( memcmp( &p_hsock->sin6_addr, &in6addr_any,
                             sizeof( struct in6_addr ) ) &&
@@ -1016,7 +1016,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
                                       sizeof( struct in6_addr ) ) ) )
                     continue; /* does not match */
             }
-            else if( res->ai_family == PF_INET6 )
+            else if( ptr->ai_family == PF_INET6 )
                 continue;
             else
 #endif
@@ -1025,14 +1025,14 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
                 const struct sockaddr_in *p_hsock, *p_sock;
 
                 p_hsock = (const struct sockaddr_in *)&httpd->host[i]->sock;
-                p_sock = (const struct sockaddr_in *)res->ai_addr;
+                p_sock = (const struct sockaddr_in *)ptr->ai_addr;
 
                 if( p_hsock->sin_addr.s_addr != INADDR_ANY &&
                     ( p_sock->sin_family != AF_INET ||
                       p_hsock->sin_addr.s_addr != p_sock->sin_addr.s_addr ) )
                     continue; /* does not match */
             }
-            else if( res->ai_family == PF_INET )
+            else if( ptr->ai_family == PF_INET )
                 continue;
             else
             {
@@ -1053,7 +1053,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         }
 
         /* create the listening socket */
-        fd = socket( res->ai_family, res->ai_socktype, res->ai_protocol );
+        fd = socket( ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol );
         if( fd == -1 )
             continue;
 
@@ -1068,7 +1068,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         }
 
         /* bind it */
-        if( bind( fd, res->ai_addr, res->ai_addrlen ) )
+        if( bind( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
             msg_Err( p_this, "cannot bind socket" );
             goto socket_error;
@@ -1105,17 +1105,19 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
             goto socket_error;
         }
 
-        continue;
+        break; // success
 
 socket_error:
         close( fd );
         fd = -1;
     }
 
-    freeaddrinfo( res );
 
     if( fd == -1 )
+    {
+        freeaddrinfo( res );
         goto error;
+    }
 
     /* create the new host */
     host = vlc_object_create( p_this, sizeof( httpd_host_t ) );
@@ -1124,13 +1126,15 @@ socket_error:
     host->i_ref = 1;
     host->fd = fd;
 
-    memcpy( &host->sock, res->ai_addr, res->ai_addrlen );
-    host->i_sock_size = res->ai_addrlen;
+    memcpy( &host->sock, ptr->ai_addr, ptr->ai_addrlen );
+    host->i_sock_size = ptr->ai_addrlen;
     host->i_url     = 0;
     host->url       = NULL;
     host->i_client  = 0;
     host->client    = NULL;
-    
+
+    freeaddrinfo( res );
+
     /* create the thread */
     if( vlc_thread_create( host, "httpd host thread", httpd_HostThread,
                            VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
@@ -1475,8 +1479,6 @@ char* httpd_ClientIP( httpd_client_t *cl )
         /* FIXME: msg_Err */
         return NULL;
         
-    fprintf( stderr, "ClientIP = %s\n", &sz_ip[1]);
-    
     if( strchr( &sz_ip[1], ':' ) != NULL )
     {
         *sz_ip = '[';
@@ -1484,7 +1486,6 @@ char* httpd_ClientIP( httpd_client_t *cl )
         sz_ip[i++] = ']';
         sz_ip[i] = '\0';
        
-        fprintf( stderr, "ClientIP (with []) = %s\n", sz_ip);
         return strdup( sz_ip );
     }
     
