@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.23 2003/01/11 18:31:17 fenrir Exp $
+ * $Id: avi.c,v 1.24 2003/01/12 18:26:09 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -622,6 +622,7 @@ print_stat:
 static vlc_bool_t AVI_StreamStart ( input_thread_t *, demux_sys_t *, int );
 static int  AVI_StreamSeek   ( input_thread_t *, demux_sys_t *, int, mtime_t );
 static void AVI_StreamStop   ( input_thread_t *, demux_sys_t *, int );
+static int  AVI_StreamStopFinishedStreams( input_thread_t *, demux_sys_t * );
 
 static vlc_bool_t AVI_StreamStart( input_thread_t *p_input,
                                    demux_sys_t *p_avi, int i_stream )
@@ -679,6 +680,28 @@ static void    AVI_StreamStop( input_thread_t *p_input,
 #undef  p_stream
 }
 
+static int AVI_StreamStopFinishedStreams( input_thread_t *p_input,
+                                           demux_sys_t *p_avi )
+{
+    int i_stream;
+    int b_end;
+
+    for( i_stream = 0,b_end = VLC_TRUE;
+            i_stream < p_avi->i_streams; i_stream++ )
+    {
+#define p_stream    p_avi->pp_info[i_stream]
+        if( p_stream->i_idxposc >= p_stream->i_idxnb )
+        {
+            AVI_StreamStop( p_input, p_avi, i_stream );
+        }
+        else
+        {
+            b_end = VLC_FALSE;
+        }
+#undef  p_stream
+    }
+    return( b_end );
+}
 /****************************************************************************
  * AVI_MovieGetLength give max streams length in second
  ****************************************************************************/
@@ -941,7 +964,9 @@ static int AVIInit( vlc_object_t * p_this )
         p_info->i_rate  = p_avi_strh->i_rate;
         p_info->i_scale = p_avi_strh->i_scale;
         p_info->i_samplesize = p_avi_strh->i_samplesize;
-
+        msg_Dbg( p_input, "stream[%d] rate:%d scale:%d samplesize:%d",
+                 i,
+                 p_info->i_rate, p_info->i_scale, p_info->i_samplesize );
         switch( p_avi_strh->i_type )
         {
             case( AVIFOURCC_auds ):
@@ -1661,6 +1686,7 @@ typedef struct avi_stream_toread_s
 
 static int AVIDemux_Seekable( input_thread_t *p_input )
 {
+    unsigned int i_stream_count;
     unsigned int i_stream;
     vlc_bool_t b_stream;
 
@@ -1670,7 +1696,8 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
     demux_sys_t *p_avi = p_input->p_demux_data;
 
     /* detect new selected/unselected streams */
-    for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
+    for( i_stream = 0,i_stream_count= 0;
+            i_stream < p_avi->i_streams; i_stream++ )
     {
 #define p_stream    p_avi->pp_info[i_stream]
         if( p_stream->p_es )
@@ -1687,7 +1714,17 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                 AVI_StreamStop( p_input, p_avi, i_stream );
             }
         }
+        if( p_stream->b_activated )
+        {
+            i_stream_count++;
+        }
 #undef  p_stream
+    }
+
+    if( i_stream_count <= 0 )
+    {
+        msg_Err( p_input, "no track selected, exiting..." );
+        return( 0 );
     }
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
@@ -1819,13 +1856,14 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
         if( i_pos == -1 )
         {
-            /* no valid index, we will parse directly the stream */
+            /* no valid index, we will parse directly the stream
+             * in case we fail we will disable all finished stream */
             if( p_avi->i_movi_lastchunk_pos >= p_avi->i_movi_begin )
             {
                 AVI_SeekAbsolute( p_input, p_avi->i_movi_lastchunk_pos );
                 if( AVI_PacketNext( p_input ) )
                 {
-                    return( 0 );
+                    return( AVI_StreamStopFinishedStreams( p_input, p_avi ) ? 0 : 1 );
                 }
             }
             else
@@ -1839,8 +1877,9 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
                 if( AVI_PacketGetHeader( p_input, &avi_pk ) )
                 {
-                    msg_Err( p_input, "cannot get packet header" );
-                    return( 0 );
+                    msg_Err( p_input,
+                             "cannot get packet header, track disabled" );
+                    return( AVI_StreamStopFinishedStreams( p_input, p_avi ) ? 0 : 1 );
                 }
                 if( avi_pk.i_stream >= p_avi->i_streams ||
                     ( avi_pk.i_cat != AUDIO_ES && avi_pk.i_cat != VIDEO_ES ) )
@@ -1853,8 +1892,9 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                         default:
                             if( AVI_PacketNext( p_input ) )
                             {
-                                msg_Err( p_input, "cannot skip packet" );
-                                return( 0 );
+                                msg_Err( p_input,
+                                         "cannot skip packet, track disabled" );
+                                return( AVI_StreamStopFinishedStreams( p_input, p_avi ) ? 0 : 1 );
                             }
                             break;
                     }
@@ -1884,8 +1924,9 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                     {
                         if( AVI_PacketNext( p_input ) )
                         {
-                            msg_Err( p_input, "cannot skip packet" );
-                            return( 0 );
+                            msg_Err( p_input,
+                                     "cannot skip packet, track disabled" );
+                            return( AVI_StreamStopFinishedStreams( p_input, p_avi ) ? 0 : 1 );
                         }
                     }
                 }
@@ -1994,28 +2035,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                     input_ClockGetTS( p_input,
                                       p_input->stream.p_selected_program,
                                       p_pes->i_pts * 9/100);
-#if 0
-            /* debuuging: split pes in 2 parts */
-            if( p_pes->i_nb_data >= 2 && p_stream->i_cat == AUDIO_ES )
-            {
-                pes_packet_t  *p_pes_;
-                data_packet_t *p_data;
-                int           i_nb_data;
 
-                p_pes_ = PES_split( p_input, p_stream, p_pes );
-                if( p_pes_->i_nb_data >= 2 )
-                {
-                    input_DecodePES( p_stream->p_es->p_decoder_fifo, PES_split( p_input,p_stream,p_pes_ ) );
-                }
-                input_DecodePES( p_stream->p_es->p_decoder_fifo,p_pes_ );
-
-                if( p_pes->i_nb_data >= 2 )
-                {
-                    input_DecodePES( p_stream->p_es->p_decoder_fifo, PES_split( p_input,p_stream,p_pes ) );
-                }
-                //input_DecodePES( p_stream->p_es->p_decoder_fifo,p_pes );
-            }
-#endif
             input_DecodePES( p_stream->p_es->p_decoder_fifo, p_pes );
         }
         else
