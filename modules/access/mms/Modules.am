@@ -1,8 +1,12 @@
 SOURCES_access_mms = \
 	modules/access/mms/mms.c \
 	modules/access/mms/mms.h \
+	modules/access/mms/mmsh.c \
+	modules/access/mms/mmsh.h \
+	modules/access/mms/mmstu.c \
+	modules/access/mms/mmstu.h \
 	modules/access/mms/buffer.c \
 	modules/access/mms/buffer.h \
 	modules/access/mms/asf.h \
+	modules/access/mms/asf.c \
 	$(NULL)
-

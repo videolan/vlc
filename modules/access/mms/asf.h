@@ -2,7 +2,7 @@
  * asf.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: asf.h,v 1.4 2003/03/02 18:17:58 fenrir Exp $
+ * $Id: asf.h,v 1.5 2003/04/20 19:29:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -28,6 +28,30 @@
  *
  ****************************************************************************/
 
+#define ASF_STREAM_VIDEO    0x0001
+#define ASF_STREAM_AUDIO    0x0002
+#define ASF_STREAM_UNKNOWN  0xffff
+
+typedef struct asf_stream_s
+{
+    int i_id;       /* 1 -> 127 */
+    int i_cat;      /* ASF_STREAM_VIDEO, ASF_STREAM_AUDIO */
+    int i_bitrate;  /* -1 if unknown */
+    int i_selected;
+
+} asf_stream_t;
+
+typedef struct
+{
+    int64_t      i_file_size;
+    int64_t      i_data_packets_count;
+    int32_t      i_min_data_packet_size;
+
+    asf_stream_t stream[128];
+
+} asf_header_t;
+
+
 typedef struct guid_s
 {
     uint32_t v1; /* le */
@@ -36,36 +60,13 @@ typedef struct guid_s
     uint8_t  v4[8];
 } guid_t;
 
-static inline int CmpGuid( const guid_t *p_guid1, const guid_t *p_guid2 )
-{
-    return( ( p_guid1->v1 == p_guid2->v1 &&
-              p_guid1->v2 == p_guid2->v2 &&
-              p_guid1->v3 == p_guid2->v3 &&
-              p_guid1->v4[0] == p_guid2->v4[0] &&
-              p_guid1->v4[1] == p_guid2->v4[1] &&
-              p_guid1->v4[2] == p_guid2->v4[2] &&
-              p_guid1->v4[3] == p_guid2->v4[3] &&
-              p_guid1->v4[4] == p_guid2->v4[4] &&
-              p_guid1->v4[5] == p_guid2->v4[5] &&
-              p_guid1->v4[6] == p_guid2->v4[6] &&
-              p_guid1->v4[7] == p_guid2->v4[7] ) ? 1 : 0 );
-}
 
-static void GenerateGuid( guid_t *p_guid )
-{
-    int i;
+void E_( GenerateGuid )     ( guid_t * );
+void E_( asf_HeaderParse )  ( asf_header_t *, uint8_t *, int );
+void E_( asf_StreamSelect ) ( asf_header_t *,
+                              int i_bitrate_max, vlc_bool_t b_all, vlc_bool_t b_audio,
+                              vlc_bool_t b_video );
 
-    srand( mdate() & 0xffffffff );
-
-    /* FIXME should be generated using random data */
-    p_guid->v1 = 0xbabac001;
-    p_guid->v2 = ( (uint64_t)rand() << 16 ) / RAND_MAX;
-    p_guid->v3 = ( (uint64_t)rand() << 16 ) / RAND_MAX;
-    for( i = 0; i < 8; i++ )
-    {
-        p_guid->v4[i] = ( (uint64_t)rand() * 256 ) / RAND_MAX;
-    }
-}
 
 #define GUID_FMT "%8.8x-%4.4x-%4.4x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
 #define GUID_PRINT( guid )  \
