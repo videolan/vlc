@@ -61,7 +61,7 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
 
 vlc_module_begin();
     set_description( _("libtoolame audio encoder") );
-    set_capability( "encoder", 200 );
+    set_capability( "encoder", 50 );
     set_callbacks( OpenEncoder, CloseEncoder );
 
     add_float( ENC_CFG_PREFIX "quality", 0.0, NULL, ENC_QUALITY_TEXT,
@@ -105,10 +105,17 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
     vlc_value_t val;
 
-    if ( (p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','g','a') &&
-          !p_enc->b_force)
-            || p_enc->fmt_in.audio.i_channels > 2 )
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','g','a') &&
+        p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','2','a') &&
+        p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','2',' ') &&
+        !p_enc->b_force )
     {
+        return VLC_EGENERIC;
+    }
+
+    if( p_enc->fmt_in.audio.i_channels > 2 )
+    {
+        msg_Err( p_enc, "doesn't support > 2 channels" );
         return VLC_EGENERIC;
     }
 
