@@ -3,7 +3,7 @@
  *          using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vcd.h,v 1.1 2003/10/04 18:55:13 gbazin Exp $
+ * $Id: vcd.h,v 1.2 2003/11/20 02:17:33 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -45,7 +45,7 @@ typedef struct
 #endif
 
     int                     i_still_time;
-    vlc_bool_t              b_end_of_cell;
+    bool                    b_end_of_cell;
 
 #if FINISHED
     vcdplay_event_t         event;
