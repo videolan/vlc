@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.69 2004/01/19 14:40:25 fenrir Exp $
+ * $Id: transcode.c,v 1.70 2004/01/19 18:15:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -374,6 +374,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         /* create dst format */
         es_format_Init( &id->f_dst, AUDIO_ES, p_sys->i_acodec );
+        id->f_dst.i_id    = id->f_src->i_id;
         id->f_dst.i_group = id->f_src->i_group;
         id->f_dst.audio.i_rate = p_sys->i_sample_rate  > 0 ? p_sys->i_sample_rate : id->f_src.audio.i_rate;
         id->f_dst.audio.i_channels    = p_sys->i_channels > 0 ? p_sys->i_channels : id->f_src.audio.i_channels;
@@ -411,6 +412,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         /* create dst format */
         es_format_Init( &id->f_dst, VIDEO_ES, p_sys->i_vcodec );
+        id->f_dst.i_id    = id->f_src->i_id;
         id->f_dst.i_group = id->f_src->i_group;
         id->f_dst.video.i_width = p_sys->i_width;
         id->f_dst.video.i_height= p_sys->i_height;

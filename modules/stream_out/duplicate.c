@@ -2,7 +2,7 @@
  * duplicate.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: duplicate.c,v 1.10 2004/01/18 03:43:03 fenrir Exp $
+ * $Id: duplicate.c,v 1.11 2004/01/19 18:15:55 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -60,8 +60,6 @@ struct sout_stream_sys_t
 
     int             i_nb_select;
     char            **ppsz_select;
-
-    int             i_es;
 };
 
 struct sout_stream_id_t
@@ -70,7 +68,7 @@ struct sout_stream_id_t
     void                **pp_ids;
 };
 
-static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select, int i_es_number );
+static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select );
 
 /*****************************************************************************
  * Open:
@@ -89,7 +87,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->pp_streams   = NULL;
     p_sys->i_nb_select  = 0;
     p_sys->ppsz_select  = NULL;
-    p_sys->i_es         = 0;
 
     for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
     {
@@ -181,13 +178,13 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     msg_Dbg( p_stream, "duplicated a new stream codec=%4.4s (es=%d group=%d)",
              (char*)&p_fmt->i_codec,
-             p_sys->i_es,
+             p_fmt->i_id,
              p_fmt->i_group );
     for( i_stream = 0; i_stream < p_sys->i_nb_streams; i_stream++ )
     {
         void *id_new = NULL;
 
-        if( ESSelected( p_fmt, p_sys->ppsz_select[i_stream], p_sys->i_es ) )
+        if( ESSelected( p_fmt, p_sys->ppsz_select[i_stream] ) )
         {
             sout_stream_t *out = p_sys->pp_streams[i_stream];
 
@@ -211,8 +208,6 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
          * belongs to which duplicated stream */
         TAB_APPEND( id->i_nb_ids, id->pp_ids, id_new );
     }
-
-    p_sys->i_es++;
 
     if( i_valid_streams <= 0 )
     {
@@ -317,7 +312,7 @@ static vlc_bool_t NumInRange( char *psz_range, int i_num )
     return i_start <= i_num && i_num <= i_stop ? VLC_TRUE : VLC_FALSE;
 }
 
-static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select, int i_es_number )
+static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select )
 {
     char  *psz_dup;
     char  *psz;
@@ -418,14 +413,14 @@ static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select, int i_es_numbe
             {
                 if( i_es != 1 )
                 {
-                    i_es = !NumInRange( psz_arg, i_es_number ) ? 1 : 0;
+                    i_es = !NumInRange( psz_arg, fmt->i_id ) ? 1 : 0;
                 }
             }
             else if( !strcmp( psz, "es" ) )
             {
                 if( i_es != 1 )
                 {
-                    i_es = NumInRange( psz_arg, i_es_number ) ? 1 : 0;
+                    i_es = NumInRange( psz_arg, fmt->i_id) ? 1 : 0;
                 }
             }
             else if( !strcmp( psz, "no-prgm" ) || !strcmp( psz, "noprgm" ) ||
