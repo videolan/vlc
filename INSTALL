@@ -15,13 +15,6 @@ symbols:
 
    make distclean ; ./configure --prefix=/usr --enable-gnome --enable-debug
 
-It is also possible to cross-compile for the Win32 platform using mingw32:
-
-   make distclean ; CC=i586-mingw32msvc-gcc CFLAGS=-I/usr/i586-mingw32msvc \
-   RANLIB=i586-mingw32msvc-ranlib WINDRES=i586-mingw32msvc-windres \
-   ./configure --host=i386-mingw32msvc --with-directx-path=<path> \
-   --with-sdl-config-path=<path> --with-gtk-config-path=<path>
-
 
 Building VideoLAN
 =================

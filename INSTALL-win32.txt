@@ -60,7 +60,8 @@ See `./configure --help' for more information.
 For example if you are cross-compiling from Debian, you can use something
 along those lines:
 
- make distclean ; CC=i586-mingw32msvc-gcc \
+ make distclean ; CC=i586-mingw32msvc-gcc CFLAGS=-I/usr/i586-mingw32msvc \
+   RANLIB=i586-mingw32msvc-ranlib WINDRES=i586-mingw32msvc-windres \
    ./configure --host=i586-mingw32msvc --target=i586-mingw32msvc \
     --build=i386-linux --with-gtk-config-path=/usr/i586-mingw32msvc/bin \
     --with-sdl-config-path=/usr/i586-mingw32msvc/bin
