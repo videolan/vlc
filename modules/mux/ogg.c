@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.19 2003/10/22 17:12:30 gbazin Exp $
+ * $Id: ogg.c,v 1.20 2003/11/21 13:01:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -699,6 +699,22 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
             i_com = snprintf( &com[1], 128, VERSION" stream output" ) + 1;
             op.packet = com;
             op.bytes  = i_com;
+            op.b_o_s  = 0;
+            op.e_o_s  = 0;
+            op.granulepos = 0;
+            op.packetno = p_stream->i_packet_no++;
+            ogg_stream_packetin( &p_stream->os, &op );
+            p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+            sout_BufferChain( &p_hdr, p_og );
+        }
+
+        /* Special case for mp4v */
+        if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) &&
+            p_mux->pp_inputs[i]->p_fmt->i_extra_data )
+        {
+            /* Send a packet with the VOL data */
+            op.bytes  = p_mux->pp_inputs[i]->p_fmt->i_extra_data;
+            op.packet = p_mux->pp_inputs[i]->p_fmt->p_extra_data;
             op.b_o_s  = 0;
             op.e_o_s  = 0;
             op.granulepos = 0;
