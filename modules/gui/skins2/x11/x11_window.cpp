@@ -168,7 +168,7 @@ void X11Window::raise() const
 }
 
 
-void X11Window::setOpacity( uint8_t value )
+void X11Window::setOpacity( uint8_t value ) const
 {
     // Sorry, the opacity cannot be changed :)
 }

@@ -51,7 +51,7 @@ class OSWindow: public SkinObject
         virtual void raise() const = 0;
 
         /// Set the opacity of the window (0 = transparent, 255 = opaque)
-        virtual void setOpacity( uint8_t value ) = 0;
+        virtual void setOpacity( uint8_t value ) const = 0;
 
         /// Toggle the window on top
         virtual void toggleOnTop( bool onTop ) const = 0;

@@ -57,7 +57,7 @@ class X11Window: public OSWindow
         virtual void raise() const;
 
         /// Set the opacity of the window (0 = transparent, 255 = opaque)
-        virtual void setOpacity( uint8_t value );
+        virtual void setOpacity( uint8_t value ) const;
 
         /// Toggle the window on top
         virtual void toggleOnTop( bool onTop ) const;

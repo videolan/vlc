@@ -31,15 +31,17 @@
 
 
 /// Fading API
-#define LWA_COLORKEY  0x00000001
-#define LWA_ALPHA     0x00000002
+#ifndef LWA_COLORKEY
+#   define LWA_COLORKEY  0x00000001
+#   define LWA_ALPHA     0x00000002
+#endif
 
 
 Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                           HINSTANCE hInst, HWND hParentWindow,
                           bool dragDrop, bool playOnDrop,
                           Win32Window *pParentWindow ):
-    OSWindow( pIntf ), m_dragDrop( dragDrop ), m_mm( false )
+    OSWindow( pIntf ), m_dragDrop( dragDrop )
 {
     // Create the window
     if( pParentWindow )
@@ -66,8 +68,8 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 
     // We do it this way otherwise CreateWindowEx will fail if WS_EX_LAYERED
     // is not supported
-//    SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-//                      GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
+    SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
+                      GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
 
     // Store a pointer to the GenericWindow in a map
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
@@ -134,52 +136,37 @@ void Win32Window::raise() const
 }
 
 
-void Win32Window::setOpacity( uint8_t value )
+void Win32Window::setOpacity( uint8_t value ) const
 {
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
-#if 0
+
     if( value == 255 )
     {
         // If the window is opaque, we remove the WS_EX_LAYERED attribute
         // which slows resizing for nothing
-        if( m_mm )
-        {
-            SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-                GetWindowLong( m_hWnd, GWL_EXSTYLE ) & !WS_EX_LAYERED );
-            SetWindowPos( m_hWnd, HWND_TOP, 0, 0, 0, 0,
-                SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED );
-            m_mm = false;
-        }
-//    GenericWindow *pWin = pFactory->m_windowMap[m_hWnd];
-//    pWin->refresh( pWin->getLeft(), pWin->getTop(), pWin->getWidth(), pWin->getHeight() );
-
+        SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
+            GetWindowLong( m_hWnd, GWL_EXSTYLE ) & !WS_EX_LAYERED );
+        SetWindowPos( m_hWnd, HWND_TOP, 0, 0, 0, 0,
+            SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED );
     }
     else
-#endif
     {
         if( pFactory->SetLayeredWindowAttributes )
         {
-#if 0
             // (Re)Add the WS_EX_LAYERED attribute.
             // Resizing will be very slow, now :)
-            if( !m_mm )
-            {
-                SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-                    GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
-                SetWindowPos( m_hWnd, HWND_TOP, 0, 0, 0, 0,
-                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED );
-                m_mm = true;
-            }
-//    GenericWindow *pWin = pFactory->m_windowMap[m_hWnd];
-//    pWin->refresh( pWin->getLeft(), pWin->getTop(), pWin->getWidth(), pWin->getHeight() );
-#endif
+            SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
+                GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
+            SetWindowPos( m_hWnd, HWND_TOP, 0, 0, 0, 0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED );
+
             // Change the opacity
             pFactory->SetLayeredWindowAttributes(
                 m_hWnd, 0, value, LWA_ALPHA|LWA_COLORKEY );
         }
     }
 
-//    UpdateWindow( m_hWnd );
+   UpdateWindow( m_hWnd );
 }
 
 
