@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.83 2003/05/08 14:15:36 titer Exp $
+ * $Id: libvlc.c,v 1.84 2003/05/08 15:58:44 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -336,6 +336,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         /* Reset the default domain */
         SetLanguage( psz_translation );
+
+        /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
+        msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
 
         textdomain( PACKAGE );
 

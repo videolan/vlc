@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.18 2003/04/16 11:47:08 gbazin Exp $
+ * $Id: file.c,v 1.19 2003/05/08 15:58:56 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,6 +46,12 @@
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
+#endif
+
+/* stat() support for large files on win32 */
+#if defined( WIN32 ) && !defined( UNDER_CE )
+#define stat(a,b) _stati64(a,b)
+#define fstat(a,b) _fstati64(a,b)
 #endif
 
 /*****************************************************************************
@@ -97,7 +103,11 @@ static int Open( vlc_object_t *p_this )
     char *              psz_name = p_input->psz_name;
 #ifdef HAVE_SYS_STAT_H
     int                 i_stat;
+#if defined( WIN32 ) && !defined( UNDER_CE )
+    struct _stati64     stat_info;
+#else
     struct stat         stat_info;
+#endif
 #endif
     _input_socket_t *   p_access_data;
     vlc_bool_t          b_stdin, b_kfir = 0;
@@ -365,7 +375,11 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     if ( p_input->stream.p_selected_area->i_size != 0
             && (p_access_data->i_nb_reads % INPUT_FSTAT_NB_READS) == 0 )
     {
+#if defined( WIN32 ) && !defined( UNDER_CE )
+        struct _stati64 stat_info;
+#else
         struct stat stat_info;
+#endif
         if ( fstat( p_access_data->_socket.i_handle, &stat_info ) == -1 )
         {
 #   ifdef HAVE_ERRNO_H

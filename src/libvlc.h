@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.62 2003/05/08 14:15:36 titer Exp $
+ * $Id: libvlc.h,v 1.63 2003/05/08 15:58:44 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,9 +57,10 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define TRANSLATION_TEXT N_("Translation")
 #define TRANSLATION_LONGTEXT N_( \
-    "This option allows you to set the language of the interface " \
-    "(e.g. 'fr', 'de'...). If not specified, the system language is " \
-    "auto-detected." )
+    "This option allows you to set the language of the interface or disable " \
+    "the translation alltogether " \
+    "(e.g. 'C' (for disable), 'fr', 'de', 'en_GB', ...). " \
+    "The system language is auto-detected if nothing is specified here." )
 
 #define COLOR_TEXT N_("Color messages")
 #define COLOR_LONGTEXT N_( \
