@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.87 2002/01/09 02:01:14 sam Exp $
+ * $Id: interface.c,v 1.88 2002/02/15 13:32:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -72,7 +72,7 @@ intf_thread_t* intf_Create( void )
     /* Choose the best module */
     p_intf->p_module = module_Need( MODULE_CAPABILITY_INTF,
                            main_GetPszVariable( INTF_METHOD_VAR, NULL ),
-                           NULL );
+                           (void *)p_intf );
 
     if( p_intf->p_module == NULL )
     {
@@ -95,14 +95,6 @@ intf_thread_t* intf_Create( void )
 
     p_intf->b_menu        = 0;
     p_intf->b_menu_change = 0;
-
-    if( p_intf->pf_open( p_intf ) )
-    {
-        intf_ErrMsg("intf error: cannot create interface");
-        module_Unneed( p_intf->p_module );
-        free( p_intf );
-        return( NULL );
-    }
 
     /* Initialize mutexes */
     vlc_mutex_init( &p_intf->change_lock );

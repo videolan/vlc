@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.2 2002/02/13 21:54:44 gbazin Exp $
+ * $Id: a52.c,v 1.3 2002/02/15 13:32:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -47,7 +47,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe  ( probedata_t * );
+static int  decoder_Probe  ( u8 * );
 static int  decoder_Run    ( decoder_config_t * );
 static int  DecodeFrame    ( a52_adec_thread_t * );
 static int  InitThread     ( a52_adec_thread_t * );
@@ -62,8 +62,8 @@ static __inline__ int16_t convert   ( int32_t );
  *****************************************************************************/
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run = decoder_Run;
+    p_function_list->functions.dec.pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run   = decoder_Run;
 }
 
 /*****************************************************************************
@@ -91,9 +91,9 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able
  * to choose.
  *****************************************************************************/
-static int decoder_Probe( probedata_t *p_data )
+static int decoder_Probe( u8 *pi_type )
 {
-    return ( p_data->i_type == AC3_AUDIO_ES );
+    return ( *pi_type == AC3_AUDIO_ES ? 0 : -1 );
 }
 
 /*****************************************************************************

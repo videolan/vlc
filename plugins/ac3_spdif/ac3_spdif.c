@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.12 2002/01/28 23:08:31 stef Exp $
+ * $Id: ac3_spdif.c,v 1.13 2002/02/15 13:32:52 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -50,7 +50,7 @@
 /****************************************************************************
  * Local Prototypes
  ****************************************************************************/
-static int  decoder_Probe     ( probedata_t * );
+static int  decoder_Probe     ( u8 * );
 static int  decoder_Run       ( decoder_config_t * );
 static int  InitThread        ( ac3_spdif_thread_t * );
 static void EndThread         ( ac3_spdif_thread_t * );
@@ -61,8 +61,8 @@ static void BitstreamCallback ( bit_stream_t *, boolean_t );
  *****************************************************************************/
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run = decoder_Run;
+    p_function_list->functions.dec.pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run   = decoder_Run;
 }
 
 /*****************************************************************************
@@ -89,10 +89,10 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( probedata_t *p_data )
+static int decoder_Probe( u8 *pi_type )
 {
     return( ( main_GetIntVariable( AOUT_SPDIF_VAR, 0 )
-               && p_data->i_type == AC3_AUDIO_ES ) ? 100 : 0 );
+               && *pi_type == AC3_AUDIO_ES ) ? 0 : -1 );
 }
 
 

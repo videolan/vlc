@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.12 2002/01/21 23:57:46 massiot Exp $
+ * $Id: video_parser.c,v 1.13 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -53,7 +53,7 @@
 /*
  * Local prototypes
  */
-static int      decoder_Probe     ( probedata_t * );
+static int      decoder_Probe     ( u8 * );
 static int      decoder_Run       ( decoder_config_t * );
 static int      InitThread        ( vpar_thread_t * );
 static void     EndThread         ( vpar_thread_t * );
@@ -64,8 +64,8 @@ static void     BitstreamCallback ( bit_stream_t *, boolean_t );
  *****************************************************************************/
 void _M( vdec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run = decoder_Run;
+    p_function_list->functions.dec.pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run   = decoder_Run;
 }
 
 /*****************************************************************************
@@ -93,10 +93,10 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( probedata_t *p_data )
+static int decoder_Probe( u8 *pi_type )
 {
-    return( ( p_data->i_type == MPEG1_VIDEO_ES
-               || p_data->i_type == MPEG2_VIDEO_ES ) ? 50 : 0 );
+    return( ( *pi_type == MPEG1_VIDEO_ES
+               || *pi_type == MPEG2_VIDEO_ES ) ? 0 : -1 );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.24 2002/01/28 23:08:31 stef Exp $
+ * $Id: aout_sdl.c,v 1.25 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -61,7 +61,6 @@ typedef struct aout_sys_s
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     aout_Probe       ( probedata_t *p_data );
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
 static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
@@ -77,60 +76,11 @@ static void    aout_SDLCallback ( void *userdata, Uint8 *stream, int len );
  *****************************************************************************/
 void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;
     p_function_list->functions.aout.pf_setformat = aout_SetFormat;
     p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
     p_function_list->functions.aout.pf_play = aout_Play;
     p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Probe: probe the audio device and return a score
- *****************************************************************************
- * This function tries to initialize SDL audio and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int aout_Probe( probedata_t *p_data )
-{
-#if 0
-    SDL_AudioSpec desired, obtained;
-#endif
-
-    if( SDL_WasInit( SDL_INIT_AUDIO ) != 0 )
-    {
-        return( 0 );
-    }
-
-#if 0
-    /* Start AudioSDL */
-    if( SDL_Init(SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE) != 0 )
-    {
-        intf_DbgMsg( "aout: SDL_Init failed (%s)", SDL_GetError() );
-        return( 0 );
-    }
-
-    desired.freq       = 11025;                                 /* frequency */
-    desired.format     = AUDIO_U8;                        /* unsigned 8 bits */
-    desired.channels   = 2;                                          /* mono */
-    desired.callback   = aout_SDLCallback;    /* callback function mandatory */
-    desired.userdata   = NULL;                     /* null parm for callback */
-    desired.samples    = 4096;
-
-    /* If we were unable to open the device, there is no way we can use
-     * the plugin. Return a score of 0. */
-    if( SDL_OpenAudio( &desired, &obtained ) < 0 )
-    {
-        intf_DbgMsg( "aout: SDL_OpenAudio failed (%s)", SDL_GetError() );
-        return( 0 );
-    }
-
-    /* Otherwise, there are good chances we can use this plugin, return 100. */
-    intf_DbgMsg( "aout: SDL_OpenAudio successfully run" );
-    SDL_CloseAudio();
-#endif
-
-    return( 40 );
 }
 
 /*****************************************************************************
@@ -146,7 +96,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     if( SDL_WasInit( SDL_INIT_AUDIO ) != 0 )
     {
-        return( 0 );
+        return( 1 );
     }
 
     /* Allocate structure */

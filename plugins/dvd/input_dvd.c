@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.118 2002/01/10 04:11:25 sam Exp $
+ * $Id: input_dvd.c,v 1.119 2002/02/15 13:32:53 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -85,7 +85,7 @@
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int  DVDProbe        ( probedata_t *p_data );
+static int  DVDProbe        ( struct input_thread_s * );
 static void DVDInit         ( struct input_thread_s * );
 static void DVDEnd          ( struct input_thread_s * );
 static void DVDOpen         ( struct input_thread_s * );
@@ -124,7 +124,7 @@ DECLARE_BUFFERS_SHAREBUFFER( FLAGS );
 void _M( input_getfunctions )( function_list_t * p_function_list )
 {
 #define input p_function_list->functions.input
-    p_function_list->pf_probe = DVDProbe;
+    input.pf_probe            = DVDProbe;
     input.pf_init             = DVDInit;
     input.pf_open             = DVDOpen;
     input.pf_close            = DVDClose;
@@ -150,21 +150,17 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * DVDProbe: verifies that the stream is a PS stream
  *****************************************************************************/
-static int DVDProbe( probedata_t *p_data )
+static int DVDProbe( input_thread_t * p_input )
 {
-    input_thread_t * p_input = (input_thread_t *)p_data;
-
     char * psz_name = p_input->p_source;
-    int i_score = 0;
 
     if( ( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "dvd:", 4 ) )
     {
         /* If the user specified "dvd:" then it's probably a DVD */
-        i_score = 100;
-        psz_name += 4;
+        return 0;
     }
 
-    return( i_score );
+    return -1;
 }
 
 /*****************************************************************************

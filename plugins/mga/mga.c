@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.15 2002/01/07 02:12:29 sam Exp $
+ * $Id: mga.c,v 1.16 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -47,7 +47,6 @@
  *****************************************************************************/
 static void vout_getfunctions( function_list_t * p_function_list );
 
-static int  vout_Probe     ( probedata_t *p_data );
 static int  vout_Create    ( vout_thread_t * );
 static int  vout_Init      ( vout_thread_t * );
 static void vout_End       ( vout_thread_t * );
@@ -146,7 +145,6 @@ typedef struct picture_sys_s
  *****************************************************************************/
 static void vout_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -154,24 +152,6 @@ static void vout_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * intf_Probe: return a score
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    int i_fd;
-
-    i_fd = open( "/dev/mga_vid", O_RDWR );
-    if( i_fd == -1 )
-    {
-        return 0;
-    }
-
-    close( i_fd );
-
-    return 10;
 }
 
 /*****************************************************************************

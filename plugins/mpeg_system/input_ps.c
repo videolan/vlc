@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.11 2001/12/30 07:09:55 sam Exp $
+ * $Id: input_ps.c,v 1.12 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -72,7 +72,7 @@ static __inline__ off_t fseeko( FILE *p_file, off_t i_offset, int i_pos )
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  PSProbe         ( probedata_t * );
+static int  PSProbe         ( struct input_thread_s * );
 static int  PSRead          ( struct input_thread_s *, data_packet_t ** );
 static void PSInit          ( struct input_thread_s * );
 static void PSEnd           ( struct input_thread_s * );
@@ -100,7 +100,7 @@ DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 300 );
 void _M( input_getfunctions )( function_list_t * p_function_list )
 {
 #define input p_function_list->functions.input
-    p_function_list->pf_probe = PSProbe;
+    input.pf_probe            = PSProbe;
     input.pf_init             = PSInit;
     input.pf_open             = NULL;
     input.pf_close            = NULL;
@@ -126,23 +126,20 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * PSProbe: verifies that the stream is a PS stream
  *****************************************************************************/
-static int PSProbe( probedata_t *p_data )
+static int PSProbe( input_thread_t *p_input )
 {
-    input_thread_t * p_input = (input_thread_t *)p_data;
-
     char * psz_name = p_input->p_source;
-    int i_score = 10;
 
     if( ( strlen(psz_name) > 5 ) && (!strncasecmp( psz_name, "file:", 5 )
                                       || !strncasecmp( psz_name, "http:", 5 )) )
     {
         /* If the user specified "file:" or "http:" then it's probably a
          * PS file */
-        i_score = 100;
-        psz_name += 5;
+        return 0;
     }
 
-    return( i_score );
+    /* Oh, we load it anyway */
+    return 0;
 }
 
 /*****************************************************************************

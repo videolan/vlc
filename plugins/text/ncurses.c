@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.10 2002/01/04 14:01:34 sam Exp $
+ * $Id: ncurses.c,v 1.11 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -42,7 +42,6 @@
  * Local prototypes.
  *****************************************************************************/
 static void intf_getfunctions ( function_list_t * p_function_list );
-static int  intf_Probe        ( probedata_t *p_data );
 static int  intf_Open         ( intf_thread_t *p_intf );
 static void intf_Close        ( intf_thread_t *p_intf );
 static void intf_Run          ( intf_thread_t *p_intf );
@@ -85,21 +84,9 @@ typedef struct intf_sys_s
  *****************************************************************************/
 static void intf_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = intf_Probe;
     p_function_list->functions.intf.pf_open  = intf_Open;
     p_function_list->functions.intf.pf_close = intf_Close;
     p_function_list->functions.intf.pf_run   = intf_Run;
-}
-
-/*****************************************************************************
- * intf_Probe: probe the interface and return a score
- *****************************************************************************
- * This function tries to initialize ncurses and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int intf_Probe( probedata_t *p_data )
-{
-    return( 40 );
 }
 
 /*****************************************************************************

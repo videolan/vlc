@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.40 2002/02/13 22:10:40 sam Exp $
+ * $Id: vout_beos.cpp,v 1.41 2002/02/15 13:32:52 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -380,7 +380,6 @@ extern "C"
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Probe      ( probedata_t *p_data );
 static int  vout_Create     ( vout_thread_t * );
 static int  vout_Init       ( vout_thread_t * );
 static void vout_End        ( vout_thread_t * );
@@ -398,7 +397,6 @@ static void BeosCloseDisplay( vout_thread_t *p_vout );
  *****************************************************************************/
 void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -406,17 +404,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_display    = vout_Display;
     p_function_list->functions.vout.pf_render     = vout_Render;
-}
-
-/*****************************************************************************
- * vout_Probe: probe the video driver and return a score
- *****************************************************************************
- * This function tries to initialize SDL and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    return( 100 );
 }
 
 /*****************************************************************************

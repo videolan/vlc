@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.17 2002/01/12 01:25:57 sam Exp $
+ * $Id: vout_dummy.c,v 1.18 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,7 +52,6 @@ typedef struct vout_sys_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Probe     ( probedata_t *p_data );
 static int  vout_Create    ( struct vout_thread_s * );
 static int  vout_Init      ( struct vout_thread_s * );
 static void vout_End       ( struct vout_thread_s * );
@@ -69,7 +68,6 @@ static int  DummyNewPicture( struct vout_thread_s *, struct picture_s * );
  *****************************************************************************/
 void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -77,14 +75,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * intf_Probe: return a score
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    return( 1 );
 }
 
 /*****************************************************************************

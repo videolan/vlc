@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.14 2002/02/13 22:10:40 sam Exp $
+ * $Id: vout_pictures.c,v 1.15 2002/02/15 13:32:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -367,14 +367,14 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
     /* Picture is not in a direct buffer, and needs to be converted to
      * another size/chroma. Then the subtitles need to be rendered as
-     * well. */
-
-    /* This usually means software YUV, or hardware YUV with a
+     * well. This usually means software YUV, or hardware YUV with a
      * different chroma. */
 
-    /* We render subtitles and convert image to the first direct buffer */
-    vout_RenderSubPictures( p_vout, p_pic, p_subpic );
+    /* Convert image to the first direct buffer */
     p_vout->chroma.pf_convert( p_vout, p_pic, &p_vout->p_picture[0] );
+
+    /* Render subpictures on the first direct buffer */
+    vout_RenderSubPictures( p_vout, &p_vout->p_picture[0], p_subpic );
 
     return &p_vout->p_picture[0];
 }

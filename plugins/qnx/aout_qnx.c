@@ -45,7 +45,6 @@ typedef struct aout_sys_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int     aout_Probe       ( probedata_t *p_data );
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
 static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
@@ -59,46 +58,12 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  *****************************************************************************/
 void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;
     p_function_list->functions.aout.pf_setformat = aout_SetFormat;
     p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
     p_function_list->functions.aout.pf_play = aout_Play;
     p_function_list->functions.aout.pf_close = aout_Close;
 }
-
-/*****************************************************************************
- * aout_Probe: probes the audio device and return a score
- *****************************************************************************
- * This function tries to open the dps and returns a score to the plugin
- * manager so that it can make its choice.
- *****************************************************************************/
-static int aout_Probe( probedata_t *p_data )
-{
-    int i_ret;
-    aout_sys_t adev;
-
-    /* open audio device */
-    if( ( i_ret = snd_pcm_open_preferred( &adev.p_pcm_handle,
-                                          &adev.i_card, &adev.i_device,
-                                          SND_PCM_OPEN_PLAYBACK ) ) < 0 )
-    {
-        intf_WarnMsg( 2, "aout error: unable to open audio device (%s)",
-                      snd_strerror( i_ret ) );
-        return( 0 );
-    }
-
-    /* close audio device */
-    if( ( i_ret = snd_pcm_close( adev.p_pcm_handle ) ) < 0 )
-    {
-        intf_WarnMsg( 2, "aout error: unable to close audio device (%s)",
-                      snd_strerror( i_ret ) );
-        return( 0 );
-    }
-
-    /* return score */
-    return( 50 );
-}    
 
 /*****************************************************************************
  * aout_Open : creates a handle and opens an alsa device
@@ -126,6 +91,7 @@ static int aout_Open( aout_thread_t *p_aout )
     {
         intf_ErrMsg( "aout error: unable to open audio device (%s)",
                       snd_strerror( i_ret ) );
+        free( p_aout->p_sys );
         return( 1 );
     }
 
@@ -136,6 +102,7 @@ static int aout_Open( aout_thread_t *p_aout )
         intf_ErrMsg( "aout error: unable to disable mmap (%s)",
                      snd_strerror( i_ret ) );
         aout_Close( p_aout );
+        free( p_aout->p_sys );
         return( 1 );
     }
 

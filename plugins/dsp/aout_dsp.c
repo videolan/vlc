@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.20 2002/01/28 23:08:31 stef Exp $
+ * $Id: aout_dsp.c,v 1.21 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -68,7 +68,6 @@ typedef struct aout_sys_s
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     aout_Probe       ( probedata_t *p_data );
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
 static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
@@ -82,36 +81,11 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  *****************************************************************************/
 void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;
     p_function_list->functions.aout.pf_setformat = aout_SetFormat;
     p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
     p_function_list->functions.aout.pf_play = aout_Play;
     p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Probe: probe the audio device and return a score
- *****************************************************************************
- * This function tries to open the DSP and returns a score to the plugin
- * manager so that it can choose the most appropriate one.
- *****************************************************************************/
-static int aout_Probe( probedata_t *p_data )
-{
-    char * psz_device = main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT );
-    int i_fd = open( psz_device, O_WRONLY|O_NONBLOCK );
-
-    /* If we were unable to open the device, there is no way we can use
-     * the plugin. Return a score of 0. */
-    if( i_fd < 0 )
-    {
-        return( 0 );
-    }
-
-    /* Otherwise, there are good chances we can use this plugin, return 100. */
-    close( i_fd );
-
-    return( 100 );
 }
 
 /*****************************************************************************

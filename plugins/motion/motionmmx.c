@@ -2,7 +2,7 @@
  * motionmmx.c : MMX motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionmmx.c,v 1.14 2001/12/30 07:09:55 sam Exp $
+ * $Id: motionmmx.c,v 1.15 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -57,14 +57,6 @@ MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * motion_Probe: tests probe the CPU and return a score
- *****************************************************************************/
-static int motion_Probe( probedata_t *p_data )
-{
-    return( 150 );
-}
 
 /*****************************************************************************
  * Motion compensation in MMX
@@ -579,8 +571,6 @@ static void motion_getfunctions( function_list_t * p_function_list )
             }
         }
     };
-
-    p_function_list->pf_probe = motion_Probe;
 
 #define list p_function_list->functions.motion
     memcpy( list.ppppf_motion, ppppf_motion, sizeof( void * ) * 16 );

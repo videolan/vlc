@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.18 2002/01/28 23:08:31 stef Exp $
+ * $Id: aout_dummy.c,v 1.19 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,7 +46,6 @@ typedef struct aout_sys_s
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     aout_Probe       ( probedata_t *p_data );
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
 static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
@@ -60,20 +59,11 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  *****************************************************************************/
 void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;
     p_function_list->functions.aout.pf_setformat = aout_SetFormat;
     p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
     p_function_list->functions.aout.pf_play = aout_Play;
     p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Probe: probe the audio device and return a score
- *****************************************************************************/
-static int aout_Probe( probedata_t *p_data )
-{
-    return( 1 );
 }
 
 /*****************************************************************************

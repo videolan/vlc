@@ -2,7 +2,7 @@
  * glide.c : 3dfx Glide plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: glide.c,v 1.11 2002/01/09 02:01:14 sam Exp $
+ * $Id: glide.c,v 1.12 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,7 +51,6 @@
  *****************************************************************************/
 static void vout_getfunctions( function_list_t * p_function_list );
 
-static int  vout_Probe     ( probedata_t *p_data );
 static int  vout_Create    ( vout_thread_t * );
 static int  vout_Init      ( vout_thread_t * );
 static void vout_End       ( vout_thread_t * );
@@ -104,7 +103,6 @@ typedef struct vout_sys_s
  *****************************************************************************/
 void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -112,21 +110,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Probe: probe the video driver and return a score
- *****************************************************************************
- * This function tries to initialize SDL and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    /* We could do a grSstQueryBoards( GrHwConfiguration *hwConfig ) at
-     * this point, but if the user didn't configure his 3dfx card, we
-     * have great chances to segfault here. So we'd better assume
-     * everything is fine and worry only if we really need to use Glide */
-    return( 1 );
 }
 
 /*****************************************************************************

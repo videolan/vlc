@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.58 2002/01/21 23:57:46 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.59 2002/02/15 13:32:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -265,6 +265,7 @@ typedef struct input_thread_s
     struct module_s *       p_input_module;
 
     /* Init/End */
+    int                  (* pf_probe)( struct input_thread_s * );
     void                 (* pf_init)( struct input_thread_s * );
     void                 (* pf_open)( struct input_thread_s * );
     void                 (* pf_close)( struct input_thread_s * );

@@ -2,7 +2,7 @@
  * idct_decl.h : common declarations, must be included at the very end
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct_decl.h,v 1.1 2001/09/05 16:07:49 massiot Exp $
+ * $Id: idct_decl.h,v 1.2 2002/02/15 13:32:53 sam Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,7 +44,6 @@ static void IDCTAdd( dctelem_t * p_block, yuv_data_t * p_dest,
  *****************************************************************************/
 static void idct_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = idct_Probe;
 #define F p_function_list->functions.idct
     F.pf_idct_init = InitIDCT;
     F.pf_norm_scan = NormScan;

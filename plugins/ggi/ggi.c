@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.12 2002/01/12 01:25:57 sam Exp $
+ * $Id: ggi.c,v 1.13 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -44,7 +44,6 @@
  *****************************************************************************/
 static void vout_getfunctions( function_list_t * p_function_list );
 
-static int  vout_Probe     ( probedata_t *p_data );
 static int  vout_Create    ( vout_thread_t * );
 static int  vout_Init      ( vout_thread_t * );
 static void vout_End       ( vout_thread_t * );
@@ -102,7 +101,6 @@ typedef struct vout_sys_s
  *****************************************************************************/
 static void vout_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create  = vout_Create;
     p_function_list->functions.vout.pf_init    = vout_Init;
     p_function_list->functions.vout.pf_end     = vout_End;
@@ -110,17 +108,6 @@ static void vout_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage  = vout_Manage;
     p_function_list->functions.vout.pf_render  = vout_Render;
     p_function_list->functions.vout.pf_display = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Probe: probe the video driver and return a score
- *****************************************************************************
- * This function tries to initialize GGI and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    return( 1 );
 }
 
 /*****************************************************************************

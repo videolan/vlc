@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.12 2002/01/12 01:25:57 sam Exp $
+ * $Id: fb.c,v 1.13 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -49,7 +49,6 @@
  *****************************************************************************/
 static void vout_getfunctions( function_list_t * p_function_list );
 
-static int  vout_Probe     ( probedata_t *p_data );
 static int  vout_Create    ( vout_thread_t * );
 static void vout_Destroy   ( vout_thread_t * );
 static void vout_Render    ( vout_thread_t *, picture_t * );
@@ -125,7 +124,6 @@ typedef struct vout_sys_s
  *****************************************************************************/
 static void vout_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -133,27 +131,6 @@ static void vout_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Probe: probe the video driver and return a score
- *****************************************************************************
- * This function tries to open the framebuffer and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    int i_fd;
-
-    i_fd = open( main_GetPszVariable( VOUT_FB_DEV_VAR,
-                                      VOUT_FB_DEV_DEFAULT ), O_RDWR );
-    if( i_fd == -1 )
-    {
-        return( 0 );
-    }
-    close( i_fd );
-
-    return( 30 );
 }
 
 /*****************************************************************************

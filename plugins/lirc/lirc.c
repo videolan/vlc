@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.1 2002/02/06 02:37:18 sam Exp $
+ * $Id: lirc.c,v 1.2 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -54,7 +54,6 @@ typedef struct intf_sys_s
  *****************************************************************************/
 static void intf_getfunctions( function_list_t * p_function_list );
 
-static int  intf_Probe     ( probedata_t *p_data );
 static int  intf_Open      ( intf_thread_t *p_intf );
 static void intf_Close     ( intf_thread_t *p_intf );
 static void intf_Run       ( intf_thread_t *p_intf );
@@ -86,18 +85,9 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void intf_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = intf_Probe;
     p_function_list->functions.intf.pf_open  = intf_Open;
     p_function_list->functions.intf.pf_close = intf_Close;
     p_function_list->functions.intf.pf_run   = intf_Run;
-}
-
-/*****************************************************************************
- * intf_Probe: probe the interface and return a score
- *****************************************************************************/
-static int intf_Probe( probedata_t *p_data )
-{
-    return( 1 );
 }
 
 /*****************************************************************************

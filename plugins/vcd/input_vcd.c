@@ -70,7 +70,7 @@
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int  VCDProbe        ( probedata_t *p_data );
+static int  VCDProbe        ( struct input_thread_s * );
 static void VCDInit         ( struct input_thread_s * );
 static int  VCDRead         ( struct input_thread_s *, data_packet_t ** );
 static int  VCDSetArea      ( struct input_thread_s *, struct input_area_s * );
@@ -102,7 +102,7 @@ DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 1000 );
 void _M( input_getfunctions )( function_list_t * p_function_list )
 {
 #define input p_function_list->functions.input
-    p_function_list->pf_probe = VCDProbe;
+    input.pf_probe            = VCDProbe;
     input.pf_init             = VCDInit;
     input.pf_open             = VCDOpen;
     input.pf_close            = VCDClose;
@@ -128,21 +128,17 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * VCDProbe: verifies that the stream is a PS stream
  *****************************************************************************/
-static int VCDProbe( probedata_t *p_data )
+static int VCDProbe( input_thread_t * p_input )
 {
-    input_thread_t * p_input = (input_thread_t *)p_data;
-
     char * psz_name = p_input->p_source;
-    int i_score = 0;
 
     if( ( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "vcd:", 4 ) )
     {
         /* If the user specified "vcd:" then it's probably a VCD */
-        i_score = 100;
-        psz_name += 4;
+        return 0;
     }
 
-    return( i_score );
+    return -1;
 }
 
 /*****************************************************************************

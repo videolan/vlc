@@ -35,6 +35,8 @@
 #include "video.h"
 #include "video_output.h"
 
+#define OSX_COM_STRUCT intf_sys_s
+#define OSX_COM_TYPE intf_sys_t
 #include "macosx.h"
 
 #include <QuickTime/QuickTime.h>
@@ -45,41 +47,50 @@
  * This structure is part of the video output thread descriptor.
  * It describes the MacOS X specific properties of an output thread.
  *****************************************************************************/
-typedef unsigned int yuv2_data_t ;
 typedef struct vout_sys_s
 {
-    osx_com_t osx_communication ;
-
+    /* QT sequence information */
     ImageDescriptionHandle h_img_descr ;
     ImageSequence i_seq ;   
     unsigned int c_codec ;
     MatrixRecordPtr p_matrix ;
-    
-    yuv2_data_t *p_yuv2 ;
-    unsigned i_yuv2_size ;
-    PlanarPixmapInfoYUV420 s_ppiy420 ;
+
 } vout_sys_t;
 
+typedef struct picture_sys_s
+{
+    void *p_info;
+    unsigned int i_size;
+
+    /* When using I420 output */
+    PlanarPixmapInfoYUV420 pixmap_i420 ;
+
+} picture_sys_t;
+
+#define MAX_DIRECTBUFFERS 10
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Probe     ( probedata_t *p_data );
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
-static void vout_Display   ( struct vout_thread_s * );
+static int  vout_Create    ( vout_thread_t * );
+static int  vout_Init      ( vout_thread_t * );
+static void vout_End       ( vout_thread_t * );
+static void vout_Destroy   ( vout_thread_t * );
+static int  vout_Manage    ( vout_thread_t * );
+static void vout_Display   ( vout_thread_t *, picture_t * );
+static void vout_Render    ( vout_thread_t *, picture_t * );
 
 /* OS Specific */
-static void fillout_PPIYUV420( picture_t *p_y420, PlanarPixmapInfoYUV420 *p_ppiy420 ) ;
-static void fillout_ImageDescription(ImageDescriptionHandle h_descr, unsigned int i_with, unsigned int i_height, unsigned int c_codec) ;
+static int  CreateQTSequence ( vout_thread_t *p_vout ) ;
+static void DestroyQTSequence( vout_thread_t *p_vout ) ;
+
+static int  NewPicture     ( vout_thread_t *, picture_t * );
+static void FreePicture    ( vout_thread_t *, picture_t * );
+
+static void fillout_ImageDescription(ImageDescriptionHandle h_descr,
+                        unsigned int i_with, unsigned int i_height,
+                        unsigned int c_codec) ;
 static void fillout_ScalingMatrix( vout_thread_t *p_vout ) ;
-static OSErr new_QTSequence(ImageSequence *i_seq, CGrafPtr p_port, ImageDescriptionHandle h_descr, MatrixRecordPtr p_matrix) ;
-static int create_QTSequenceBestCodec( vout_thread_t *p_vout ) ;
-static void dispose_QTSequence( vout_thread_t *p_vout ) ;
-static void convert_Y420_to_YUV2( picture_t *p_y420, yuv2_data_t *p_yuv2 ) ;
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -87,22 +98,13 @@ static void convert_Y420_to_YUV2( picture_t *p_y420, yuv2_data_t *p_yuv2 ) ;
  *****************************************************************************/
 void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
     p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-    p_function_list->functions.vout.pf_setpalette = NULL;
-}
-
-/*****************************************************************************
- * intf_Probe: return a score
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    return( 100 );
 }
 
 /*****************************************************************************
@@ -118,10 +120,10 @@ static int vout_Create( vout_thread_t *p_vout )
         intf_ErrMsg( "error: %s", strerror( ENOMEM ) );
         return( 1 );
     }
+    p_main->p_intf->p_sys->i_changes = 0;
+    p_main->p_intf->p_sys->p_vout = p_vout;
     p_vout->p_sys->h_img_descr = (ImageDescriptionHandle)NewHandleClear( sizeof( ImageDescription ) ) ;
     p_vout->p_sys->p_matrix = (MatrixRecordPtr)malloc( sizeof( MatrixRecord ) ) ;
-    p_vout->p_sys->c_codec = 'NONE' ;
-
     EnterMovies() ;
 
     return( 0 );
@@ -132,11 +134,63 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
-    p_vout->b_need_render = 0 ;
-    p_vout->i_bytes_per_line = p_vout->i_width ;
-    p_vout->p_sys->c_codec = 'NONE' ;
-    p_vout->p_sys->osx_communication.i_changes |= OSX_VOUT_INTF_REQUEST_QDPORT ;
-    
+    int i_index;
+    picture_t *p_pic;
+
+    I_OUTPUTPICTURES = 0;
+
+    /* Since we can arbitrary scale, stick to the coordinates and aspect. */
+    p_vout->output.i_width  = p_vout->render.i_width;
+    p_vout->output.i_height = p_vout->render.i_height;
+    p_vout->output.i_aspect = p_vout->render.i_aspect;
+
+    CreateQTSequence( p_vout ) ;
+
+    switch( p_vout->p_sys->c_codec )
+    {
+        case 'yuv2':
+            p_vout->output.i_chroma = FOURCC_YUY2;
+            break;
+        case 'y420':
+            p_vout->output.i_chroma = FOURCC_I420;
+            break;
+        case 'NONE':
+            intf_ErrMsg( "vout error: no QT codec found" );
+            return 0;
+        default:
+            intf_ErrMsg( "vout error: unknown QT codec" );
+            return 0;
+    }
+
+    /* Try to initialize up to MAX_DIRECTBUFFERS direct buffers */
+    while( I_OUTPUTPICTURES < MAX_DIRECTBUFFERS )
+    {
+        p_pic = NULL;
+
+        /* Find an empty picture slot */
+        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+        {
+            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+            {
+                p_pic = p_vout->p_picture + i_index;
+                break;
+            }
+        }
+
+        /* Allocate the picture */
+        if( p_pic == NULL || NewPicture( p_vout, p_pic ) )
+        {
+            break;
+        }
+
+        p_pic->i_status = DESTROYED_PICTURE;
+        p_pic->i_type   = DIRECT_PICTURE;
+
+        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+
+        I_OUTPUTPICTURES++;
+    }
+
     return 0 ;
 }
 
@@ -145,8 +199,18 @@ static int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_End( vout_thread_t *p_vout )
 {
-    dispose_QTSequence( p_vout ) ;
-    p_vout->p_sys->osx_communication.i_changes |= OSX_VOUT_INTF_RELEASE_QDPORT ;
+    int i_index;
+
+    DestroyQTSequence( p_vout ) ;
+    p_main->p_intf->p_sys->p_vout = NULL;
+    p_main->p_intf->p_sys->i_changes |= OSX_VOUT_INTF_RELEASE_QDPORT ;
+
+    /* Free the direct buffers we allocated */
+    for( i_index = I_OUTPUTPICTURES ; i_index ; )
+    {
+        i_index--;
+        FreePicture( p_vout, PP_OUTPUTPICTURE[ i_index ] );
+    }
 }
 
 /*****************************************************************************
@@ -167,73 +231,138 @@ static void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {    
-      if ( p_vout->p_sys->osx_communication.i_changes & OSX_INTF_VOUT_QDPORT_CHANGE ) {
-          dispose_QTSequence( p_vout ) ;
-          create_QTSequenceBestCodec( p_vout ) ;
-      }
-      else if ( p_vout->p_sys->osx_communication.i_changes & OSX_INTF_VOUT_SIZE_CHANGE ) {
-          if ( p_vout->p_sys->c_codec != 'NONE' ) {
-              fillout_ScalingMatrix( p_vout ) ;
-              SetDSequenceMatrix( p_vout->p_sys->i_seq, p_vout->p_sys->p_matrix ) ;
-          }
-      }
+    if( p_main->p_intf->p_sys->i_changes
+         & OSX_INTF_VOUT_QDPORT_CHANGE )
+    {
+        intf_ErrMsg( "vout error: this change is unhandled yet !" );
+        return 1;
+    }
+    else if( p_main->p_intf->p_sys->i_changes
+              & OSX_INTF_VOUT_SIZE_CHANGE )
+    {
+        if( p_vout->p_sys->c_codec != 'NONE' )
+        {
+            fillout_ScalingMatrix( p_vout ) ;
+            SetDSequenceMatrix( p_vout->p_sys->i_seq,
+                                p_vout->p_sys->p_matrix ) ;
+        }
+    }
 
-      p_vout->p_sys->osx_communication.i_changes &= ~( 
-          OSX_INTF_VOUT_QDPORT_CHANGE |
-          OSX_INTF_VOUT_SIZE_CHANGE
-      ) ;
+    /* Clear flags */
+    p_main->p_intf->p_sys->i_changes &= ~( 
+        OSX_INTF_VOUT_QDPORT_CHANGE |
+        OSX_INTF_VOUT_SIZE_CHANGE
+    ) ;
 
     return 0 ;
 }
 
 
 /*****************************************************************************
- * vout_OSX_Display: displays previously rendered output
+ * vout_Render: renders previously calculated output
+ *****************************************************************************/
+void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    ;
+}
+
+ /*****************************************************************************
+ * vout_Display: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-void vout_Display( vout_thread_t *p_vout )
+void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     CodecFlags out_flags ;
 
     switch (p_vout->p_sys->c_codec)
     {
         case 'yuv2':
-            convert_Y420_to_YUV2(p_vout->p_rendered_pic, p_vout->p_sys->p_yuv2) ;
+        case 'y420':
             DecompressSequenceFrameS(
 		p_vout->p_sys->i_seq,
-		(void *)p_vout->p_sys->p_yuv2,
-		p_vout->p_sys->i_yuv2_size,
+		p_pic->p_sys->p_info,
+		p_pic->p_sys->i_size,
 		codecFlagUseScreenBuffer,
  		&out_flags,
  		nil
             ) ;
             break ;
-        case 'y420':
-            fillout_PPIYUV420(p_vout->p_rendered_pic, &p_vout->p_sys->s_ppiy420) ;
-            DecompressSequenceFrameS(
-		p_vout->p_sys->i_seq,
-		(void *)&p_vout->p_sys->s_ppiy420,
-		sizeof(PlanarPixmapInfoYUV420),
-		codecFlagUseScreenBuffer,
- 		&out_flags,
- 		nil
-            ) ;            
-            break ;
-       default:
-           intf_WarnMsg( 1, "vout_macosx: vout_Display called, but no codec available" ) ;
+        default:
+            intf_WarnMsg( 1, "vout_macosx: vout_Display called, but no codec available" ) ;
+            break;
     }
 }
 
-static void fillout_PPIYUV420( picture_t *p_y420, PlanarPixmapInfoYUV420 *p_ppiy420 )
+static int CreateQTSequence( vout_thread_t *p_vout )
 {
-    p_ppiy420->componentInfoY.offset = (void *)p_y420->p_y - (void *)p_ppiy420 ;
-    p_ppiy420->componentInfoY.rowBytes = p_y420->i_width ;
-    p_ppiy420->componentInfoCb.offset = (void *)p_y420->p_u - (void *)p_ppiy420 ;
-    p_ppiy420->componentInfoCb.rowBytes = p_y420->i_width / 2;
-    p_ppiy420->componentInfoCr.offset = (void *)p_y420->p_v - (void *)p_ppiy420 ;
-    p_ppiy420->componentInfoCr.rowBytes = p_y420->i_width / 2;
+    p_vout->p_sys->c_codec = 'NONE' ;
+    p_main->p_intf->p_sys->i_changes |= OSX_VOUT_INTF_REQUEST_QDPORT ;
+    
+    while ( p_main->p_intf->p_sys->p_qdport == nil
+             && !p_vout->b_die )
+    {
+printf("WAITING for QD port ...\n");
+        if( p_main->p_intf->p_sys->i_changes
+             & OSX_INTF_VOUT_QDPORT_CHANGE )
+        {
+            p_main->p_intf->p_sys->i_changes &= ~( OSX_INTF_VOUT_QDPORT_CHANGE ) ;
+            intf_ErrMsg( "got a QDPORT_CHANGE" );
+            break;
+        }
+        msleep( 300000 );
+    }
+
+    if ( p_main->p_intf->p_sys->p_qdport == nil)
+    {
+printf("BLAAAAAAAAAAH\n");
+        p_vout->p_sys->c_codec = 'NONE' ;
+        return 1 ;
+    }
+
+    SetPort( p_main->p_intf->p_sys->p_qdport ) ;
+    fillout_ScalingMatrix( p_vout ) ;
+
+    fillout_ImageDescription( p_vout->p_sys->h_img_descr,
+                              p_vout->output.i_width, p_vout->output.i_height,
+                              'y420' ) ;
+
+    if( !DecompressSequenceBeginS( &p_vout->p_sys->i_seq,
+            p_vout->p_sys->h_img_descr, NULL, 0,
+            p_main->p_intf->p_sys->p_qdport,
+            NULL, //device to display (is set implicit via the qdPort)
+            NULL, //src-rect
+            p_vout->p_sys->p_matrix, //matrix
+            0, //just do plain copying
+            NULL, //no mask region
+            codecFlagUseScreenBuffer, codecLosslessQuality,
+            (DecompressorComponent) bestSpeedCodec) )
+    {
+printf("OK !!!\n");
+        p_vout->p_sys->c_codec = 'y420' ;
+        return 0 ;
+    }
+
+#if 0
+    /* For yuv2 */
+    {
+        p_vout->p_sys->c_codec = 'yuv2' ;
+    }
+#endif
+   
+printf("FUXK..\n");
+    p_vout->p_sys->c_codec = 'NONE' ;
+    return 1 ;
+}
+
+static void DestroyQTSequence( vout_thread_t *p_vout )
+{
+    if (p_vout->p_sys->c_codec == 'NONE')
+    	return ;
+    	
+    CDSequenceEnd( p_vout->p_sys->i_seq ) ;
+    p_vout->p_sys->c_codec = 'NONE' ;
 }
 
 
@@ -266,7 +395,7 @@ static void fillout_ImageDescription(ImageDescriptionHandle h_descr, unsigned in
             p_descr->depth = 24 ;
             break ;
         case 'y420':
-            p_descr->dataSize=i_width * i_height * 1.5 ;
+            p_descr->dataSize=i_width * i_height * 3 / 2 ;
             p_descr->depth = 12 ;
             break ;
     }
@@ -280,98 +409,115 @@ static void fillout_ScalingMatrix( vout_thread_t *p_vout)
 	Fixed factor_x ;
 	Fixed factor_y ;
         	
-	GetPortBounds( p_vout->p_sys->osx_communication.p_qdport, &s_rect ) ;
+	GetPortBounds( p_main->p_intf->p_sys->p_qdport, &s_rect ) ;
 //	if (((s_rect.right - s_rect.left) / ((float) p_vout->i_width)) < ((s_rect.bottom - s_rect.top) / ((float) p_vout->i_height)))
-		factor_x = FixDiv(Long2Fix(s_rect.right - s_rect.left), Long2Fix(p_vout->i_width)) ;
+		factor_x = FixDiv(Long2Fix(s_rect.right - s_rect.left), Long2Fix(p_vout->output.i_width)) ;
 //	else
-		factor_y = FixDiv(Long2Fix(s_rect.bottom - s_rect.top), Long2Fix(p_vout->i_height)) ;
+		factor_y = FixDiv(Long2Fix(s_rect.bottom - s_rect.top), Long2Fix(p_vout->output.i_height)) ;
 	
 	SetIdentityMatrix(p_vout->p_sys->p_matrix) ;
 	ScaleMatrix( p_vout->p_sys->p_matrix, factor_x, factor_y, Long2Fix(0), Long2Fix(0) ) ;
 }
 
-static OSErr new_QTSequence( ImageSequence *i_seq, CGrafPtr p_qdport, ImageDescriptionHandle h_descr, MatrixRecordPtr p_matrix )
+/*****************************************************************************
+ * NewPicture: allocate a picture
+ *****************************************************************************
+ * Returns 0 on success, -1 otherwise
+ *****************************************************************************/
+static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    return DecompressSequenceBeginS(
-        i_seq, 
-        h_descr,
-        NULL,
-        0,
-        p_qdport,
-        NULL, //device to display (is set implicit via the qdPort)
-        NULL, //src-rect
-        p_matrix, //matrix
-        0, //just do plain copying
-        NULL, //no mask region
-        codecFlagUseScreenBuffer,
-        codecLosslessQuality,
-        (DecompressorComponent) bestSpeedCodec
-    ) ;
-}
+    /* We know the chroma, allocate a buffer which will be used
+     * directly by the decoder */
+    p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
 
-static int create_QTSequenceBestCodec( vout_thread_t *p_vout )
-{
-    if ( p_vout->p_sys->osx_communication.p_qdport == nil)
+    if( p_pic->p_sys == NULL )
     {
-        p_vout->p_sys->c_codec = 'NONE' ;
-        return 1 ;
+        return -1;
     }
 
-    SetPort( p_vout->p_sys->osx_communication.p_qdport ) ;
-    fillout_ScalingMatrix( p_vout ) ;
-    fillout_ImageDescription(
-        p_vout->p_sys->h_img_descr,
-        p_vout->i_width,
-        p_vout->i_height,
-        'y420'
-    ) ;
-    if ( !new_QTSequence(
-            &p_vout->p_sys->i_seq,
-            p_vout->p_sys->osx_communication.p_qdport,
-            p_vout->p_sys->h_img_descr,
-            p_vout->p_sys->p_matrix
-        ) )
+    switch( p_vout->output.i_chroma )
     {
-        p_vout->p_sys->c_codec = 'y420' ;
-        return 0 ;
+        case FOURCC_I420:
+
+            p_pic->p_sys->p_info = (void *)&p_pic->p_sys->pixmap_i420 ;
+            p_pic->p_sys->i_size = sizeof(PlanarPixmapInfoYUV420) ;
+
+            p_pic->Y_PIXELS = memalign( 16, p_vout->output.i_width
+                                           * p_vout->output.i_height * 3 / 2 );
+            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
+            p_pic->p[Y_PLANE].i_pitch = p_vout->output.i_width;
+            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+            p_pic->p[Y_PLANE].b_margin = 0;
+
+            p_pic->U_PIXELS = p_pic->Y_PIXELS + p_vout->output.i_width
+                                                 * p_vout->output.i_height;
+            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[U_PLANE].i_pitch = p_vout->output.i_width / 2;
+            p_pic->p[U_PLANE].i_pixel_bytes = 1;
+            p_pic->p[U_PLANE].b_margin = 0;
+
+            p_pic->V_PIXELS = p_pic->U_PIXELS + p_vout->output.i_width
+                                                 * p_vout->output.i_height / 4;
+            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[V_PLANE].i_pitch = p_vout->output.i_width / 2;
+            p_pic->p[V_PLANE].i_pixel_bytes = 1;
+            p_pic->p[V_PLANE].b_margin = 0;
+
+            p_pic->i_planes = 3;
+
+#define P p_pic->p_sys->pixmap_i420
+            P.componentInfoY.offset = (void *)p_pic->Y_PIXELS
+                                       - p_pic->p_sys->p_info;
+            P.componentInfoCb.offset = (void *)p_pic->U_PIXELS
+                                        - p_pic->p_sys->p_info;
+            P.componentInfoCr.offset = (void *)p_pic->V_PIXELS
+                                        - p_pic->p_sys->p_info;
+
+            P.componentInfoY.rowBytes = p_vout->output.i_width ;
+            P.componentInfoCb.rowBytes = p_vout->output.i_width / 2 ;
+            P.componentInfoCr.rowBytes = p_vout->output.i_width / 2 ;
+#undef P
+
+            break;
+
+        case FOURCC_YUY2:
+
+            /* XXX: TODO */
+            free( p_pic->p_sys );
+            intf_ErrMsg( "vout error: YUV2 not supported yet" );
+            p_pic->i_planes = 0;
+            break;
+
+        default:
+            /* Unknown chroma, tell the guy to get lost */
+            free( p_pic->p_sys );
+            intf_ErrMsg( "vout error: never heard of chroma 0x%.8x (%4.4s)",
+                         p_vout->output.i_chroma,
+                         (char*)&p_vout->output.i_chroma );
+            p_pic->i_planes = 0;
+            return -1;
     }
-   
-    p_vout->p_sys->c_codec = 'NONE' ;
-    return 1 ;
+
+    return 0;
 }
 
-static void dispose_QTSequence( vout_thread_t *p_vout )
+/*****************************************************************************
+ * FreePicture: destroy a picture allocated with NewPicture
+ *****************************************************************************/
+static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    if (p_vout->p_sys->c_codec == 'NONE')
-    	return ;
-    	
-    CDSequenceEnd( p_vout->p_sys->i_seq ) ;
     switch (p_vout->p_sys->c_codec)
     {
         case 'yuv2':
-            free( (void *)p_vout->p_sys->p_yuv2 ) ;
-            p_vout->p_sys->i_yuv2_size = 0 ;
+            free( p_pic->p_sys->p_info ) ;
+            p_pic->p_sys->i_size = 0 ;
+            break ;
+        case 'y420':
             break ;
         default:
 	    break ;            
     }
-    p_vout->p_sys->c_codec = 'NONE' ;
+
+    free( p_pic->p_sys );
 }
 
-static void convert_Y420_to_YUV2( picture_t *p_y420, yuv2_data_t *p_yuv2 )
-{
-    unsigned int width = p_y420->i_width, height = p_y420->i_height ;
-    unsigned int x, y ;
-    
-    for( x=0; x < height; x++ )
-    {
-        for( y=0; y < (width/2); y++ )
-        {
-            p_yuv2[(width/2)*x + y] =
-                (p_y420->p_y[width*x + 2*y]) << 24 |
-                ((p_y420->p_u[(width/2)*(x/2) + y] ^ 0x80) << 16) |
-                (p_y420->p_y[width*x + 2*y + 1] << 8) |
-                (p_y420->p_v[(width/2)*(x/2) + y] ^ 0x80) ;   
-        }
-    }
-}

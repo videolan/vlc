@@ -45,7 +45,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe  ( probedata_t * );
+static int  decoder_Probe  ( u8 * );
 static int  decoder_Run    ( decoder_config_t * );
 static int  InitThread     ( mad_adec_thread_t * p_mad_adec );
 static void EndThread      ( mad_adec_thread_t * p_mad_adec );
@@ -55,8 +55,8 @@ static void EndThread      ( mad_adec_thread_t * p_mad_adec );
  *****************************************************************************/
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run = decoder_Run;
+    p_function_list->functions.dec.pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run   = decoder_Run;
 }
 
 /*****************************************************************************
@@ -84,16 +84,14 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( probedata_t *p_data )
+static int decoder_Probe( u8 *pi_type )
 {
-    if( p_data->i_type == MPEG1_AUDIO_ES || p_data->i_type == MPEG2_AUDIO_ES )
+    if( *pi_type == MPEG1_AUDIO_ES || *pi_type == MPEG2_AUDIO_ES )
     {
-        return( 50 );
+        return 0;
     }
-    else
-    {
-        return( 0 );
-    }
+
+    return -1;
 }
 
 /*****************************************************************************

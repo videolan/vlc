@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.157 2002/01/13 15:07:55 gbazin Exp $
+ * $Id: video_output.c,v 1.158 2002/02/15 13:32:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -95,7 +95,6 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     int             i_status;                               /* thread status */
     int             i_index;                                /* loop variable */
     char          * psz_plugin;
-    probedata_t     data;
 
     /* Allocate descriptor */
     p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
@@ -112,27 +111,6 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     {
         psz_plugin = main_GetPszVariable( VOUT_METHOD_VAR, "" );
     }
-
-    data.vout.i_chroma = i_chroma;
-    p_vout->p_module
-        = module_Need( MODULE_CAPABILITY_VOUT, psz_plugin, &data );
-
-    if( p_vout->p_module == NULL )
-    {
-        intf_ErrMsg( "vout error: no suitable vout module" );
-        free( p_vout );
-        return( NULL );
-    }
-
-#define f p_vout->p_module->p_functions->vout.functions.vout
-    p_vout->pf_create     = f.pf_create;
-    p_vout->pf_init       = f.pf_init;
-    p_vout->pf_end        = f.pf_end;
-    p_vout->pf_destroy    = f.pf_destroy;
-    p_vout->pf_manage     = f.pf_manage;
-    p_vout->pf_render     = f.pf_render;
-    p_vout->pf_display    = f.pf_display;
-#undef f
 
     /* Initialize thread properties - thread id and locks will be initialized
      * later */
@@ -178,6 +156,26 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     /* user requested fullscreen? */
     if( main_GetIntVariable( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT ) )
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+
+    p_vout->p_module
+        = module_Need( MODULE_CAPABILITY_VOUT, psz_plugin, (void *)p_vout );
+
+    if( p_vout->p_module == NULL )
+    {
+        intf_ErrMsg( "vout error: no suitable vout module" );
+        free( p_vout );
+        return( NULL );
+    }
+
+#define f p_vout->p_module->p_functions->vout.functions.vout
+    p_vout->pf_create     = f.pf_create;
+    p_vout->pf_init       = f.pf_init;
+    p_vout->pf_end        = f.pf_end;
+    p_vout->pf_destroy    = f.pf_destroy;
+    p_vout->pf_manage     = f.pf_manage;
+    p_vout->pf_render     = f.pf_render;
+    p_vout->pf_display    = f.pf_display;
+#undef f
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->picture_lock );
@@ -251,7 +249,6 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
 static int InitThread( vout_thread_t *p_vout )
 {
     int i, i_pgcd;
-    probedata_t data;
 
     /* Update status */
     *p_vout->pi_status = THREAD_START;
@@ -328,10 +325,8 @@ static int InitThread( vout_thread_t *p_vout )
         p_vout->b_direct = 0;
 
         /* Choose the best module */
-        data.chroma.p_render = &p_vout->render;
-        data.chroma.p_output = &p_vout->output;
         p_vout->chroma.p_module
-            = module_Need( MODULE_CAPABILITY_CHROMA, NULL, &data );
+            = module_Need( MODULE_CAPABILITY_CHROMA, NULL, (void *)p_vout );
 
         if( p_vout->chroma.p_module == NULL )
         {
@@ -403,14 +398,6 @@ static void RunThread( vout_thread_t *p_vout)
     picture_t *     p_directbuffer;              /* direct buffer to display */
 
     subpicture_t *  p_subpic;                          /* subpicture pointer */
-
-    /* Create and initialize system-dependant method - this function issues its
-     * own error messages */
-    if( p_vout->pf_create( p_vout ) )
-    {
-        DestroyThread( p_vout, THREAD_ERROR );
-        return;
-    }
 
     /*
      * Initialize thread

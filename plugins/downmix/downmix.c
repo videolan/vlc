@@ -2,7 +2,7 @@
  * downmix.c : AC3 downmix module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: downmix.c,v 1.6 2001/12/30 07:09:54 sam Exp $
+ * $Id: downmix.c,v 1.7 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -36,7 +36,6 @@
  * Local and extern prototypes.
  *****************************************************************************/
 static void downmix_getfunctions( function_list_t * p_function_list );
-static int  downmix_Probe       ( probedata_t *p_data );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -66,7 +65,6 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void downmix_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = downmix_Probe;
 #define F p_function_list->functions.downmix
     F.pf_downmix_3f_2r_to_2ch = _M( downmix_3f_2r_to_2ch );
     F.pf_downmix_3f_1r_to_2ch = _M( downmix_3f_1r_to_2ch );
@@ -76,13 +74,5 @@ static void downmix_getfunctions( function_list_t * p_function_list )
     F.pf_stream_sample_2ch_to_s16 = _M( stream_sample_2ch_to_s16 );
     F.pf_stream_sample_1ch_to_s16 = _M( stream_sample_1ch_to_s16 );
 #undef F
-}
-
-/*****************************************************************************
- * downmix_Probe: returns a preference score
- *****************************************************************************/
-static int downmix_Probe( probedata_t *p_data )
-{
-    return( 50 );
 }
 

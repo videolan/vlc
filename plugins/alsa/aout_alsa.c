@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_alsa.c,v 1.25 2002/01/28 23:08:31 stef Exp $
+ * $Id: aout_alsa.c,v 1.26 2002/02/15 13:32:52 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -60,42 +60,6 @@ typedef struct aout_sys_s
     unsigned int  samples_per_frame;
     unsigned int  bytes_per_frame;
 } aout_sys_t;
-
-
-/*****************************************************************************
- * aout_Probe: probes the audio device and return a score
- *****************************************************************************
- * This function tries to open the dps and returns a score to the plugin
- * manager so that it can make its choice.
- *****************************************************************************/
-static int aout_Probe( probedata_t *p_data )
-{
-    int i_open_return, i_close_return;
-    aout_sys_t local_sys;
-
-    /* Open device */
-    i_open_return = snd_pcm_open( &(local_sys.p_alsa_handle), "default",
-                                  SND_PCM_STREAM_PLAYBACK, 0 );
-    if( i_open_return )
-    {
-        intf_WarnMsg( 2, "aout info: could not probe ALSA device (%s)",
-                      snd_strerror( i_open_return ) );
-        return ( 0 );
-    }
-
-    /* Close it */
-    i_close_return = snd_pcm_close( local_sys.p_alsa_handle );
-
-    if( i_close_return )
-    {
-        intf_ErrMsg( "aout error: could not close ALSA device (%s)",
-                     snd_strerror( i_close_return ) );
-        return( 0 );
-    }
-
-    /* And return score */
-    return( 100 );
-}
 
 /*****************************************************************************
  * aout_Open : creates a handle and opens an alsa device
@@ -385,7 +349,6 @@ static void aout_Close( aout_thread_t *p_aout )
  *****************************************************************************/
 void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;
     p_function_list->functions.aout.pf_setformat = aout_SetFormat;
     p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;

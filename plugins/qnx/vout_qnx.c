@@ -89,7 +89,6 @@ typedef struct vout_sys_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Probe     ( probedata_t *p_data );
 static int  vout_Create    ( struct vout_thread_s * );
 static int  vout_Init      ( struct vout_thread_s * );
 static void vout_End       ( struct vout_thread_s * );
@@ -107,7 +106,6 @@ static int  QNXDestroyWnd  ( struct vout_thread_s * );
  *****************************************************************************/
 void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -115,17 +113,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_display    = vout_Display;
     p_function_list->functions.vout.pf_setpalette = NULL;
-}
-
-/*****************************************************************************
- * vout_Probe: probe the video driver and return a score
- *****************************************************************************
- * This function tries to initialize SDL and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    return( 100 );
 }
 
 /*****************************************************************************

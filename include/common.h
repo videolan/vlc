@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.72 2002/02/14 23:29:17 sam Exp $
+ * $Id: common.h,v 1.73 2002/02/15 13:32:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -167,7 +167,6 @@ struct pgrm_descriptor_s;
 struct pes_packet_s;
 struct input_area_s;
 struct bit_stream_s;
-struct probedata_s;
 
 /*****************************************************************************
  * Macros and inline functions
@@ -578,7 +577,7 @@ typedef struct module_symbols_s
 
     char * ( * DecodeLanguage ) ( u16 );
 
-    struct module_s * ( * module_Need ) ( int, char *, struct probedata_s * );
+    struct module_s * ( * module_Need ) ( int, char *, void * );
     void ( * module_Unneed )            ( struct module_s * );
 
 } module_symbols_t;

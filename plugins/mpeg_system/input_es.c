@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.12 2002/01/21 23:57:46 massiot Exp $
+ * $Id: input_es.c,v 1.13 2002/02/15 13:32:53 sam Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -61,7 +61,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  ESProbe     ( probedata_t * );
+static int  ESProbe     ( struct input_thread_s * );
 static int  ESRead      ( struct input_thread_s *, data_packet_t ** );
 static void ESInit          ( struct input_thread_s * );
 static void ESEnd           ( struct input_thread_s * );
@@ -91,7 +91,7 @@ DECLARE_BUFFERS_TOIO( FLAGS, ES_PACKET_SIZE );
 void _M( input_getfunctions )( function_list_t * p_function_list )
 {
 #define input p_function_list->functions.input
-    p_function_list->pf_probe = ESProbe;
+    input.pf_probe            = ESProbe;
     input.pf_init             = ESInit;
     input.pf_open             = NULL;
     input.pf_close            = NULL;
@@ -116,11 +116,9 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * ESProbe: verifies that the stream is a ES stream
  *****************************************************************************/
-static int ESProbe( probedata_t *p_data )
+static int ESProbe( input_thread_t *p_input )
 {
-    int i_score = 5;
-
-    return( i_score );
+    return 0;
 }
 
 /*****************************************************************************

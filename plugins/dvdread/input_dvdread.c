@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.19 2002/01/15 19:01:28 stef Exp $
+ * $Id: input_dvdread.c,v 1.20 2002/02/15 13:32:53 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -78,7 +78,7 @@
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int  DvdReadProbe    ( probedata_t *p_data );
+static int  DvdReadProbe    ( struct input_thread_s * );
 static void DvdReadInit     ( struct input_thread_s * );
 static void DvdReadEnd      ( struct input_thread_s * );
 static void DvdReadOpen     ( struct input_thread_s * );
@@ -115,7 +115,7 @@ DECLARE_BUFFERS_SHAREBUFFER( FLAGS );
 void _M( input_getfunctions )( function_list_t * p_function_list )
 {
 #define input p_function_list->functions.input
-    p_function_list->pf_probe = DvdReadProbe;
+    input.pf_probe            = DvdReadProbe;
     input.pf_init             = DvdReadInit;
     input.pf_open             = DvdReadOpen;
     input.pf_close            = DvdReadClose;
@@ -142,19 +142,17 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * DvdReadProbe: verifies that the stream is a PS stream
  *****************************************************************************/
-static int DvdReadProbe( probedata_t *p_data )
+static int DvdReadProbe( input_thread_t *p_input )
 {
-    input_thread_t * p_input = (input_thread_t *)p_data;
-
     char * psz_name = p_input->p_source;
 
     if((( strlen(psz_name) > 8 ) && !strncasecmp( psz_name, "dvdread:", 8 ))
      ||(( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "dvd:", 4 )))
     {
-        return 1;
+        return 0;
     }
 
-    return 0;
+    return -1;
 }
 
 /*****************************************************************************

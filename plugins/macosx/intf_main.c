@@ -30,25 +30,14 @@
 
 #include <videolan/vlc.h>
 
+#include "macosx.h"
+
 #include "interface.h"
-
-/* OS specific */
-#import <Cocoa/Cocoa.h>
-
-
-/*****************************************************************************
- * intf_sys_t: description and status of the interface
- *****************************************************************************/
-typedef struct intf_sys_s
-{
-    NSAutoreleasePool *o_pool ;
-} intf_sys_t;
-
+#include "intf_main.h"
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  intf_Probe     ( probedata_t *p_data );
 static int  intf_Open      ( intf_thread_t *p_intf );
 static void intf_Close     ( intf_thread_t *p_intf );
 static void intf_Run       ( intf_thread_t *p_intf );
@@ -59,22 +48,9 @@ static void intf_Run       ( intf_thread_t *p_intf );
  *****************************************************************************/
 void _M( intf_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = intf_Probe;
     p_function_list->functions.intf.pf_open  = intf_Open;
     p_function_list->functions.intf.pf_close = intf_Close;
     p_function_list->functions.intf.pf_run   = intf_Run;
-}
-
-/*****************************************************************************
- * intf_Probe: probe the interface and return a score
- *****************************************************************************
- * This function checks the interface can be run and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int intf_Probe( probedata_t *p_data )
-{
-    /* Under MacOS X, this plugin always works */
-    return( 100 );
 }
 
 /*****************************************************************************

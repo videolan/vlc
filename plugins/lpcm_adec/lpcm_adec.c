@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.10 2002/01/21 23:57:46 massiot Exp $
+ * $Id: lpcm_adec.c,v 1.11 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -45,7 +45,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe  ( probedata_t * );
+static int  decoder_Probe  ( u8 * );
 static int  decoder_Run    ( decoder_config_t * );
        void DecodeFrame    ( lpcmdec_thread_t * );
 static int  InitThread     ( lpcmdec_thread_t * );
@@ -57,8 +57,8 @@ static void EndThread      ( lpcmdec_thread_t * );
  *****************************************************************************/
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run = decoder_Run;
+    p_function_list->functions.dec.pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run   = decoder_Run;
 }
 
 /*****************************************************************************
@@ -82,9 +82,9 @@ MODULE_DEACTIVATE_STOP
 /*****************************************************************************
  * decoder_Probe: probe the decoder and return score
  *****************************************************************************/
-static int decoder_Probe( probedata_t *p_data )
+static int decoder_Probe( u8 *pi_type )
 {
-    return ( p_data->i_type == LPCM_AUDIO_ES ) ? 100 : 0;
+    return ( *pi_type == LPCM_AUDIO_ES ) ? 0 : -1;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.51 2002/02/04 09:58:59 sam Exp $
+ * $Id: modules.c,v 1.52 2002/02/15 13:32:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -224,49 +224,12 @@ void module_ManageBank( void )
     return;
 }
 
-int module_NeedMemcpy( memcpy_module_t *p_memcpy )
-{
-    p_memcpy->p_module = module_Need( MODULE_CAPABILITY_MEMCPY, NULL, NULL );
-
-    if( p_memcpy->p_module == NULL )
-    {
-        return -1;
-    }
-
-    p_memcpy->pf_memcpy = p_memcpy->p_module->p_functions->memcpy.functions.memcpy.fast_memcpy;
-
-    return 0;
-}
-
-void module_UnneedMemcpy( memcpy_module_t *p_memcpy )
-{
-    module_Unneed( p_memcpy->p_module );
-}
-
-#if 0
-int module_NeedIntf( intf_module_t *p_intf )
-{
-    p_intf->p_module = module_Need( MODULE_CAPABILITY_INTF, NULL );
-
-    if( p_intf->p_module == NULL )
-    {
-        return -1;
-    }
-
-    p_intf->pf_open = p_intf->p_module->p_functions->intf.functions.intf.pf_open;
-    p_intf->pf_run = p_intf->p_module->p_functions->intf.functions.intf.pf_run;
-    p_intf->pf_close = p_intf->p_module->p_functions->intf.functions.intf.pf_close;
-
-    return 0;
-}
-#endif
-
 /*****************************************************************************
  * module_Need: return the best module function, given a capability list.
  *****************************************************************************
  * This function returns the module that best fits the asked capabilities.
  *****************************************************************************/
-module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
+module_t * module_Need( int i_capability, char *psz_name, void *p_data )
 {
     typedef struct module_list_s
     {
@@ -275,8 +238,7 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
     } module_list_t;
     struct module_list_s *p_list, *p_first;
 
-    int i_score = 0;
-    int i_index = 0;
+    int i_ret, i_index = 0;
 
     module_t *p_module;
     char     *psz_realname = NULL;
@@ -354,6 +316,9 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
         /* Store this new module */
         p_list[ i_index ].p_module = p_module;
 
+        /* Lock it */
+        LockModule( p_module );
+
         if( i_index == 0 )
         {
             p_list[ i_index ].p_next = NULL;
@@ -375,8 +340,7 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
             else
             {
                 while( p_newlist->p_next != NULL
-                        && p_newlist->p_next
-                             ->p_module->pi_score[i_capability]
+                        && p_newlist->p_next->p_module->pi_score[i_capability]
                             >= p_module->pi_score[i_capability] )
                 {
                     p_newlist = p_newlist->p_next;
@@ -390,31 +354,92 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
         i_index++;
     }
 
+    /* We can release the global lock, module refcount were incremented */
+    vlc_mutex_unlock( &p_module_bank->lock );
+
     /* Parse the linked list and use the first successful module */
     while( p_first != NULL )
     {
-        LockModule( p_first->p_module );
-
         /* Test the requested capability */
-        i_score += ((function_list_t *)p_first->p_module->p_functions)
-                                        [i_capability].pf_probe( p_data );
+        switch( i_capability )
+        {
+            case MODULE_CAPABILITY_INPUT:
+                i_ret = p_first->p_module->p_functions->input.functions.
+                              input.pf_probe( (input_thread_t *)p_data );
+                break;
+
+            case MODULE_CAPABILITY_DECODER:
+                i_ret = p_first->p_module->p_functions->dec.functions.
+                              dec.pf_probe( (u8 *)p_data );
+                break;
+
+            case MODULE_CAPABILITY_INTF:
+                i_ret = p_first->p_module->p_functions->intf.functions.
+                              intf.pf_open( (intf_thread_t *)p_data );
+                break;
+
+            case MODULE_CAPABILITY_AOUT:
+                i_ret = p_first->p_module->p_functions->aout.functions.
+                              aout.pf_open( (aout_thread_t *)p_data );
+                break;
+
+            case MODULE_CAPABILITY_VOUT:
+                i_ret = p_first->p_module->p_functions->vout.functions.
+                              vout.pf_create( (vout_thread_t *)p_data );
+                break;
+
+            case MODULE_CAPABILITY_CHROMA:
+                i_ret = p_first->p_module->p_functions->chroma.functions.
+                              chroma.pf_init( (vout_thread_t *)p_data );
+                break;
+
+            case MODULE_CAPABILITY_IDCT:
+            case MODULE_CAPABILITY_IMDCT:
+            case MODULE_CAPABILITY_MOTION:
+            case MODULE_CAPABILITY_DOWNMIX:
+            case MODULE_CAPABILITY_MEMCPY:
+                /* This one always works */
+                i_ret = 0;
+                break;
+
+            default:
+                intf_ErrMsg( "module error: if you can read this, sam fucked up something very bad... fuck him with a chainsaw on vlc-devel" );
+                i_ret = -1;
+                break;
+        }
 
         /* If the high score was broken, we have a new champion */
-        if( i_score )
+        if( i_ret == 0 )
         {
             break;
         }
-
-        UnlockModule( p_first->p_module );
+        else
+        {
+            UnlockModule( p_first->p_module );
+        }
 
         p_first = p_first->p_next;
     }
 
-    p_module = (p_first == NULL) ? NULL : p_first->p_module;
-    free( p_list );
+    /* Store the locked module value */
+    if( p_first != NULL )
+    {
+        p_module = p_first->p_module;
+        p_first = p_first->p_next;
+    }
+    else
+    {
+        p_module = NULL;
+    }
 
-    /* We can release the global lock, module refcount was incremented */
-    vlc_mutex_unlock( &p_module_bank->lock );
+    /* Unlock the remaining modules */
+    while( p_first != NULL )
+    {
+        UnlockModule( p_first->p_module );
+        p_first = p_first->p_next;
+    }
+
+    free( p_list );
 
     if( p_module != NULL )
     {
@@ -433,7 +458,7 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
         free( psz_realname );
     }
 
-    /* Don't forget that the module is still locked if bestmodule != NULL */
+    /* Don't forget that the module is still locked */
     return( p_module );
 }
 

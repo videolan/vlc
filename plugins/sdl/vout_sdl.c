@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.80 2002/01/12 01:25:57 sam Exp $
+ * $Id: vout_sdl.c,v 1.81 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -120,7 +120,6 @@ static __inline__ void vout_Seek( off_t i_seek )
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  vout_Probe      ( probedata_t *p_data );
 static int  vout_Create     ( struct vout_thread_s * );
 static int  vout_Init       ( struct vout_thread_s * );
 static void vout_End        ( struct vout_thread_s * );
@@ -139,7 +138,6 @@ static int  SDLNewPicture       ( vout_thread_t *p_vout, picture_t *p_pic );
  *****************************************************************************/
 void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -147,22 +145,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Probe: probe the video driver and return a score
- *****************************************************************************
- * This function tries to initialize SDL and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
-    {
-        return( 0 );
-    }
-
-    return( 100 );
 }
 
 /*****************************************************************************

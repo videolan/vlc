@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.17 2002/01/23 12:02:12 asmax Exp $
+ * $Id: mpeg_adec.c,v 1.18 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -45,7 +45,7 @@
 /*****************************************************************************
  * Local Prototypes
  *****************************************************************************/
-static int   decoder_Probe ( probedata_t * );
+static int   decoder_Probe ( u8 * );
 static int   decoder_Run   ( decoder_config_t * );
 static void  EndThread     ( adec_thread_t * );
 static void  DecodeThread  ( adec_thread_t * );
@@ -55,8 +55,8 @@ static void  DecodeThread  ( adec_thread_t * );
  *****************************************************************************/
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run = decoder_Run;
+    p_function_list->functions.dec.pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run   = decoder_Run;
 }
 
 /*****************************************************************************
@@ -82,10 +82,10 @@ MODULE_DEACTIVATE_STOP
 /*****************************************************************************
  * decoder_Probe: probe the decoder and return score
  *****************************************************************************/
-static int decoder_Probe( probedata_t *p_data )
+static int decoder_Probe( u8 *pi_type )
 {
-    return( ( p_data->i_type == MPEG1_AUDIO_ES
-               || p_data->i_type == MPEG2_AUDIO_ES ) ? 100 : 0 );
+    return( ( *pi_type == MPEG1_AUDIO_ES
+               || *pi_type == MPEG2_AUDIO_ES ) ? 0 : -1 );
 }
 
 /*****************************************************************************

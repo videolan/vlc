@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dummy.c,v 1.14 2002/01/10 04:11:25 sam Exp $
+ * $Id: input_dummy.c,v 1.15 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,7 +46,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  DummyProbe     ( probedata_t * );
+static int  DummyProbe     ( struct input_thread_s * );
 static void DummyInit      ( struct input_thread_s * );
 static void DummyOpen      ( struct input_thread_s * );
 static void DummyClose     ( struct input_thread_s * );
@@ -78,7 +78,7 @@ typedef struct dummy_data_s
 void _M( input_getfunctions )( function_list_t * p_function_list )
 {
 #define input p_function_list->functions.input
-    p_function_list->pf_probe = DummyProbe;
+    input.pf_probe            = DummyProbe;
     input.pf_init             = DummyInit;
     input.pf_open             = DummyOpen;
     input.pf_close            = DummyClose;
@@ -98,18 +98,17 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * DummyProbe: verifies that the input is a vlc command
  *****************************************************************************/
-static int DummyProbe( probedata_t *p_data )
+static int DummyProbe( input_thread_t *p_input )
 {
-    input_thread_t *p_input = (input_thread_t *)p_data;
     char *psz_name = p_input->p_source;
 
     if( ( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "vlc:", 4 ) )
     {
-        /* If the user specified "vlc:" then it's probably a file */
-        return( 1 );
+        /* If the user specified "vlc:" then it's probably a special command */
+        return 0;
     }
 
-    return( 0 );
+    return -1;
 }
 
 /*****************************************************************************
@@ -221,7 +220,8 @@ static int DummyRead( struct input_thread_s *p_input, data_packet_t **pp_data )
     switch( p_method->i_command )
     {
         case COMMAND_QUIT:
-            p_input->b_die = 1;
+            p_main->p_intf->b_die = 1;
+            p_input->b_eof = 1;
             break;
 
         case COMMAND_LOOP:

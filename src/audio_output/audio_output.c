@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.75 2002/01/28 23:08:31 stef Exp $
+ * $Id: audio_output.c,v 1.76 2002/02/15 13:32:54 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -97,9 +97,8 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
     p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
                                                   i_channels - 1 );
 
-    intf_WarnMsg( 3, "aout_CreateThread: channels == %d, rate == %d",
-                         p_aout->i_channels,
-                         p_aout->l_rate );
+    intf_WarnMsg( 3, "aout info: thread created, channels %d, rate %d",
+                  p_aout->i_channels, p_aout->l_rate );
     
     /* Maybe we should pass this setting in argument */
     p_aout->i_format = AOUT_FORMAT_DEFAULT;
@@ -125,7 +124,7 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
     /* Choose the best module */
     p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT,
                            main_GetPszVariable( AOUT_METHOD_VAR, NULL ), 
-                           NULL );
+                           (void *)p_aout );
 
     if( p_aout->p_module == NULL )
     {
@@ -145,13 +144,6 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
     /*
      * Initialize audio device
      */
-    if ( p_aout->pf_open( p_aout ) )
-    {
-        module_Unneed( p_aout->p_module );
-        free( p_aout );
-        return( NULL );
-    }
-
     if ( p_aout->pf_setformat( p_aout ) )
     {
         p_aout->pf_close( p_aout );

@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.28 2002/02/13 22:10:40 sam Exp $
+ * $Id: main.h,v 1.29 2002/02/15 13:32:52 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -52,7 +52,9 @@ typedef struct main_s
     mtime_t                i_desync;   /* relative desync of the audio ouput */
 
     /* Fast memcpy plugin used */
-    memcpy_module_t        memcpy;
+    module_t *             p_memcpy_module;
+    void* ( *pf_memcpy ) ( void *, const void *, size_t );
+    void* ( *pf_memset ) ( void *, int, size_t );    /* FIXME: unimplemented */
 
     /* Unique threads */
     p_intf_thread_t        p_intf;                  /* main interface thread */
@@ -73,8 +75,8 @@ extern main_t *p_main;
 /*****************************************************************************
  * Fast memory operation module
  *****************************************************************************/
-#define FAST_MEMCPY p_main->memcpy.pf_memcpy
-#define FAST_MEMSET p_main->memcpy.pf_memset
+#define FAST_MEMCPY p_main->pf_memcpy
+#define FAST_MEMSET p_main->pf_memset
 
 /*****************************************************************************
  * Prototypes - these methods are used to get default values for some threads

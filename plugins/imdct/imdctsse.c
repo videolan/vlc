@@ -2,7 +2,7 @@
  * imdctsse.c : accelerated SSE IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdctsse.c,v 1.10 2001/12/30 07:09:55 sam Exp $
+ * $Id: imdctsse.c,v 1.11 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -36,7 +36,6 @@
  * Local and extern prototypes.
  *****************************************************************************/
 static void imdct_getfunctions( function_list_t * p_function_list );
-static int  imdct_Probe       ( probedata_t *p_data );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -67,7 +66,6 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void imdct_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = imdct_Probe;
 #define F p_function_list->functions.imdct
     F.pf_imdct_init    = _M( imdct_init );
     F.pf_imdct_256     = _M( imdct_do_256 );
@@ -75,17 +73,5 @@ static void imdct_getfunctions( function_list_t * p_function_list )
     F.pf_imdct_512     = _M( imdct_do_512 );
     F.pf_imdct_512_nol = _M( imdct_do_512_nol );
 #undef F
-}
-
-/*****************************************************************************
- * imdct_Probe: returns a preference score
- *****************************************************************************/
-static int imdct_Probe( probedata_t *p_data )
-{
-#if defined ( __MINGW32__ )
-    return 0;
-#else
-    return( 200 );
-#endif
 }
 

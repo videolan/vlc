@@ -2,7 +2,7 @@
  * aout_waveout.c: Windows waveOut audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_waveout.c,v 1.2 2002/01/28 23:08:31 stef Exp $
+ * $Id: aout_waveout.c,v 1.3 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -63,7 +63,6 @@ typedef struct aout_sys_s
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     aout_Probe       ( probedata_t *p_data );
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
 static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
@@ -80,45 +79,11 @@ static int     OpenWaveOutDevice( aout_thread_t *p_aout );
  *****************************************************************************/
 void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;
     p_function_list->functions.aout.pf_setformat = aout_SetFormat;
     p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
     p_function_list->functions.aout.pf_play = aout_Play;
     p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Probe: probe the audio device and return a score
- *****************************************************************************
- * This function tries to probe for a waveOut sound  device and returns a
- * score to the plugin manager so it can select the best plugin.
- *****************************************************************************/
-static int aout_Probe( probedata_t *p_data )
-{
-    HWAVEOUT h_waveout;
-    WAVEFORMATEX waveformat;
-    MMRESULT result;
-
-    /* Set a common sound format */
-    waveformat.wFormatTag       = WAVE_FORMAT_PCM;
-    waveformat.nChannels        = 2;
-    waveformat.nSamplesPerSec   = 44100;
-    waveformat.wBitsPerSample   = 16;
-    waveformat.nBlockAlign      = waveformat.wBitsPerSample / 8 * 2;
-    waveformat.nAvgBytesPerSec  = waveformat.nSamplesPerSec *
-                                      waveformat.nBlockAlign;
-
-    /* Open the device */
-    result = waveOutOpen( &h_waveout, WAVE_MAPPER, &waveformat,
-                          0 /*callback*/, 0 /*callback data*/, CALLBACK_NULL );
-    if( result != MMSYSERR_NOERROR )
-    {
-        return( 0 );
-    }
-    waveOutClose( h_waveout );
-
-    return( 150 );
 }
 
 /*****************************************************************************

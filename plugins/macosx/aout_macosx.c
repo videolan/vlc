@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.11 2002/01/28 23:08:31 stef Exp $
+ * $Id: aout_macosx.c,v 1.12 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -43,8 +43,6 @@
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
-#include "modules.h"
-
 #include <Carbon/Carbon.h>
 #include <CoreAudio/AudioHardware.h>
 
@@ -78,7 +76,6 @@ typedef struct aout_sys_s
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     aout_Probe       ( probedata_t *p_data );
 static int     aout_Open        ( aout_thread_t *p_aout );
 static int     aout_SetFormat   ( aout_thread_t *p_aout );
 static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
@@ -105,21 +102,11 @@ static void Convert8BitIntegerTo32Float( Ptr in8BitDataPtr, Ptr p_out32BitDataPt
  *****************************************************************************/
 void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;
     p_function_list->functions.aout.pf_setformat = aout_SetFormat;
     p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
     p_function_list->functions.aout.pf_play = aout_Play;
     p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Probe: probe the audio device and return a score
- *****************************************************************************/
-static int aout_Probe( probedata_t *p_data )
-{
-    /* This plugin always works under OS X */
-    return( 100 );
 }
 
 /*****************************************************************************

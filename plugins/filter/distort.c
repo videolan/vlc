@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.6 2002/01/05 03:49:18 sam Exp $
+ * $Id: distort.c,v 1.7 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -86,7 +86,6 @@ typedef struct vout_sys_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Probe     ( probedata_t *p_data );
 static int  vout_Create    ( struct vout_thread_s * );
 static int  vout_Init      ( struct vout_thread_s * );
 static void vout_End       ( struct vout_thread_s * );
@@ -106,7 +105,6 @@ static void DistortRipple  ( struct vout_thread_s *, struct picture_s *,
  *****************************************************************************/
 static void vout_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -114,14 +112,6 @@ static void vout_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * intf_Probe: return a score
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    return( 0 );
 }
 
 /*****************************************************************************

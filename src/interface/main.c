@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.150 2002/02/14 23:29:17 sam Exp $
+ * $Id: main.c,v 1.151 2002/02/15 13:32:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -405,11 +405,18 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Choose the best memcpy module
      */
-    if( module_NeedMemcpy( &p_main->memcpy ) )
+    p_main->p_memcpy_module = module_Need( MODULE_CAPABILITY_MEMCPY, NULL,
+                                           NULL );
+    if( p_main->p_memcpy_module == NULL )
     {
         intf_ErrMsg( "intf error: no suitable memcpy module, "
                      "using libc default" );
-        p_main->memcpy.pf_memcpy = memcpy;
+        p_main->pf_memcpy = memcpy;
+    }
+    else
+    {
+        p_main->pf_memcpy = p_main->p_memcpy_module->p_functions
+                                  ->memcpy.functions.memcpy.pf_memcpy;
     }
 
     /*
@@ -420,8 +427,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         network_ChannelCreate() )
     {
         /* On error during Channels initialization, switch off channels */
-        intf_Msg( "Channels initialization failed : "
-                  "Channel management is deactivated" );
+        intf_ErrMsg( "intf error: channels initialization failed, " 
+                                 "deactivating channels" );
         main_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, 0 );
     }
 
@@ -475,9 +482,9 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Free memcpy module if it was allocated
      */
-    if( p_main->memcpy.p_module != NULL )
+    if( p_main->p_memcpy_module != NULL )
     {
-        module_UnneedMemcpy( &p_main->memcpy );
+        module_Unneed( p_main->p_memcpy_module );
     }
 
     /*

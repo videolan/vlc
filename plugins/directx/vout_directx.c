@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.20 2002/01/27 22:14:52 gbazin Exp $
+ * $Id: vout_directx.c,v 1.21 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -71,7 +71,6 @@ DEFINE_GUID( IID_IDirectDrawSurface3, 0xDA044E00,0x69B2,0x11D0,0xA1,0xD5,0x00,0x
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  vout_Probe     ( probedata_t *p_data );
 static int  vout_Create    ( vout_thread_t * );
 static void vout_Destroy   ( vout_thread_t * );
 static int  vout_Init      ( vout_thread_t * );
@@ -102,7 +101,6 @@ static int  DirectXGetSurfaceDesc ( picture_t *p_pic );
  *****************************************************************************/
 void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -110,21 +108,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Probe: probe the video driver and return a score
- *****************************************************************************
- * This function tries to initialize Windows DirectX and returns a score to
- * the plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-
-    /* Check that at least DirectX5 is installed on the computer */
-    /* Fixme */
-
-    return( 400 );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c : MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.c,v 1.6 2001/12/30 07:09:55 sam Exp $
+ * $Id: intf_vlc_wrapper.c,v 1.7 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *
@@ -27,12 +27,11 @@
 
 #include <videolan/vlc.h>
 
+#include "macosx.h"
+
 #include "interface.h"
 #include "intf_playlist.h"
-
-#define OSX_COM_STRUCT vout_sys_s
-#define OSX_COM_TYPE vout_sys_t
-#include "macosx.h"
+#include "intf_main.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -41,12 +40,7 @@
 
 #import "intf_vlc_wrapper.h"
 
-#define p_area p_main->p_intf->p_input->stream.p_selected_area
-
-@interface Intf_VlcWrapper(Private) 
-- (struct vout_thread_s*) lockVout ;
-- (void) unlockVout ;
-@end
+#define p_area p_input_bank->pp_input[0]->stream.p_selected_area
 
 @implementation Intf_VlcWrapper
 //Initialization,.....
@@ -77,28 +71,33 @@
         bool b_resize=FALSE, b_request=FALSE, b_release=FALSE;
         bool b_fullscreen=FALSE ;
 
+printf("start managing\n");
         p_main->p_intf->pf_manage( p_main->p_intf ) ;
         
-        if ((p_vout = [self lockVout])) {
-            i_width = p_vout->i_width ;
-            i_height = p_vout->i_height ;
+        if ((p_vout = p_main->p_intf->p_sys->osx_communication.p_vout)) {
+printf("doing stuff with vout\n");
+            i_width = p_vout->output.i_width ;
+            i_height = p_vout->output.i_height ;
             b_fullscreen = !!p_vout->b_fullscreen ;
             
             //Also mange the notifications for the output.
             if (p_vout->i_changes & (VOUT_SIZE_CHANGE | VOUT_FULLSCREEN_CHANGE)) b_resize = TRUE ;
-            if (p_vout->p_sys->i_changes & OSX_VOUT_INTF_REQUEST_QDPORT) b_request = TRUE ;
-            if (p_vout->p_sys->i_changes & OSX_VOUT_INTF_RELEASE_QDPORT) b_release = TRUE ;
-            
             p_vout->i_changes &= ~(VOUT_SIZE_CHANGE | VOUT_FULLSCREEN_CHANGE) ;
-            p_vout->p_sys->i_changes &= ~(OSX_VOUT_INTF_REQUEST_QDPORT | OSX_VOUT_INTF_RELEASE_QDPORT) ;
-
-            [self unlockVout] ;
         }
         
         if (b_resize) [o_delegate resizeQDPortFullscreen:b_fullscreen] ;
+
+printf("   testing...\n");
+        if (p_main->p_intf->p_sys->osx_communication.i_changes & OSX_VOUT_INTF_REQUEST_QDPORT) b_request = TRUE ;
+printf("   tested : %s\n", b_request ? "YES !!!" : "nope..." );
+        if (p_main->p_intf->p_sys->osx_communication.i_changes & OSX_VOUT_INTF_RELEASE_QDPORT) b_release = TRUE ;
+            
+        p_main->p_intf->p_sys->osx_communication.i_changes &= ~(OSX_VOUT_INTF_REQUEST_QDPORT | OSX_VOUT_INTF_RELEASE_QDPORT) ;
+
         if (b_release) [o_delegate releaseQDPort] ;
         if (b_request) [o_delegate requestQDPortFullscreen:b_fullscreen] ;
 
+printf("end managing\n\n");
         return p_main->p_intf->b_die ;
     }
 
@@ -107,22 +106,16 @@
 
 //Function for the GUI. 
     - (void) setQDPort:(CGrafPtr)p_qdport {
-        vout_thread_t *p_vout;
         
-        if ((p_vout = [self lockVout])) {
-            p_vout->p_sys->p_qdport = p_qdport ;
-            p_vout->p_sys->i_changes |= OSX_INTF_VOUT_QDPORT_CHANGE ;
-            [self unlockVout] ;
-        }
+printf("setQDPort !!\n");
+        p_main->p_intf->p_sys->osx_communication.p_qdport = p_qdport ;
+        p_main->p_intf->p_sys->osx_communication.i_changes |= OSX_INTF_VOUT_QDPORT_CHANGE ;
     }
     
     - (void) sizeChangeQDPort {
-        vout_thread_t *p_vout;
         
-        if ((p_vout = [self lockVout])) {
-            p_vout->p_sys->i_changes |= OSX_INTF_VOUT_SIZE_CHANGE ;
-            [self unlockVout] ;
-        }
+printf("sizeChangeQDPort !!\n");
+        p_main->p_intf->p_sys->osx_communication.i_changes |= OSX_INTF_VOUT_SIZE_CHANGE ;
     }    
 
     - (NSSize) videoSize {
@@ -141,22 +134,22 @@
     - (NSString *) getTimeAsString {
         static char psz_currenttime[ OFFSETTOTIME_MAX_SIZE ] ;
         
-        if (!p_main->p_intf->p_input) return [NSString stringWithCString:"00:00:00"] ;
+        if (!p_input_bank->pp_input[0]) return [NSString stringWithCString:"00:00:00"] ;
         
-        input_OffsetToTime( p_main->p_intf->p_input, psz_currenttime, p_area->i_tell ) ;        
+        input_OffsetToTime( p_input_bank->pp_input[0], psz_currenttime, p_area->i_tell ) ;        
         return [NSString stringWithCString:psz_currenttime] ;
     }
     
     - (float) getTimeAsFloat {
-        if (!p_main->p_intf->p_input) return 0.0 ;
+        if (!p_input_bank->pp_input[0]) return 0.0 ;
     
         return (float)p_area->i_tell / (float)p_area->i_size ;
     }
 
     - (void) setTimeAsFloat:(float) f_position {
-        if (!p_main->p_intf->p_input) return ;
+        if (!p_input_bank->pp_input[0]) return ;
     
-        input_Seek(p_main->p_intf->p_input, p_area->i_size * f_position) ;
+        input_Seek(p_input_bank->pp_input[0], p_area->i_size * f_position) ;
     }
     
     
@@ -191,17 +184,17 @@
     }
     
     - (bool) playlistPlayCurrent {
-        if (p_main->p_intf->p_input) {
+        if (p_input_bank->pp_input[0]) {
             switch (e_speed)
             {
                 case SPEED_SLOW:
-                    input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_SLOWER) ;
+                    input_SetStatus(p_input_bank->pp_input[0], INPUT_STATUS_SLOWER) ;
                     break ;
                 case SPEED_NORMAL:
-                    input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_PLAY) ;
+                    input_SetStatus(p_input_bank->pp_input[0], INPUT_STATUS_PLAY) ;
                     break ;
                 case SPEED_FAST:
-                    input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_FASTER) ;
+                    input_SetStatus(p_input_bank->pp_input[0], INPUT_STATUS_FASTER) ;
                     break ;
             }
             p_main->p_playlist->b_stopped = 0 ;
@@ -217,12 +210,12 @@
     }
 
     - (void) playlistPause {
-        if (p_main->p_intf->p_input)
-            input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_PAUSE) ;
+        if (p_input_bank->pp_input[0])
+            input_SetStatus(p_input_bank->pp_input[0], INPUT_STATUS_PAUSE) ;
     }
     
     - (void) playlistStop {
-        if (p_main->p_intf->p_input) p_main->p_intf->p_input->b_eof = 1 ;
+        if (p_input_bank->pp_input[0]) p_input_bank->pp_input[0]->b_eof = 1 ;
         vlc_mutex_lock(&p_main->p_playlist->change_lock) ;
             p_main->p_playlist->i_index-- ;
             p_main->p_playlist->b_stopped = 1 ;
@@ -265,27 +258,5 @@
             for(i=0; i < p_main->p_playlist->i_size; i++)
                 intf_PlaylistDelete(p_main->p_playlist, i) ;
         vlc_mutex_unlock(&p_main->p_playlist->change_lock) ;        
-    }
-    
-
-
-
-// Private Functions. This are just some utilities for other functions
-    - (struct vout_thread_s*) lockVout {
-        vlc_mutex_lock(&p_vout_bank->lock) ;
-        if (p_vout_bank->i_count) {
-            vlc_mutex_lock(&p_vout_bank->pp_vout[0]->change_lock) ;
-            return p_vout_bank->pp_vout[0] ;
-        }
-        else
-        {
-            vlc_mutex_unlock(&p_vout_bank->lock) ;
-            return NULL ;
-        }
-    }
-    
-    - (void) unlockVout {
-        vlc_mutex_unlock(&p_vout_bank->pp_vout[0]->change_lock) ;
-        vlc_mutex_unlock(&p_vout_bank->lock) ;
     }
 @end

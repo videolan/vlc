@@ -2,7 +2,7 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.4 2002/01/04 14:01:34 sam Exp $
+ * $Id: memcpy.c,v 1.5 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,7 +50,6 @@
  * Local and extern prototypes.
  *****************************************************************************/
 static void memcpy_getfunctions( function_list_t * p_function_list );
-static int  memcpy_Probe       ( probedata_t *p_data );
 #ifndef MODULE_NAME_IS_memcpy
 void *      _M( fast_memcpy )  ( void * to, const void * from, size_t len );
 #endif
@@ -106,19 +105,10 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void memcpy_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = memcpy_Probe;
 #ifdef MODULE_NAME_IS_memcpy
-    p_function_list->functions.memcpy.fast_memcpy = memcpy;
+    p_function_list->functions.memcpy.pf_memcpy = memcpy;
 #else
-    p_function_list->functions.memcpy.fast_memcpy = _M( fast_memcpy );
+    p_function_list->functions.memcpy.pf_memcpy = _M( fast_memcpy );
 #endif
-}
-
-/*****************************************************************************
- * memcpy_Probe: returns a preference score
- *****************************************************************************/
-static int memcpy_Probe( probedata_t *p_data )
-{
-    return( 1 );
 }
 

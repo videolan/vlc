@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctclassic.c,v 1.19 2001/12/30 07:09:55 sam Exp $
+ * $Id: idctclassic.c,v 1.20 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -60,14 +60,6 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 /* Following functions are local */
-
-/*****************************************************************************
- * idct_Probe: returns a preference score
- *****************************************************************************/
-static int idct_Probe( probedata_t *p_data )
-{
-    return( 100 );
-}
 
 /*****************************************************************************
  * NormScan : Unused in this IDCT

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.173 2002/01/21 23:57:46 massiot Exp $
+ * $Id: input.c,v 1.174 2002/02/15 13:32:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -453,7 +453,7 @@ static int InitThread( input_thread_t * p_input )
     /* Find appropriate module. */
     p_input->p_input_module = module_Need( MODULE_CAPABILITY_INPUT,
                                  main_GetPszVariable( INPUT_METHOD_VAR, NULL ),
-                                 (probedata_t *)p_input );
+                                 (void *)p_input );
 
     if( p_input->p_input_module == NULL )
     {
@@ -463,6 +463,7 @@ static int InitThread( input_thread_t * p_input )
     }
 
 #define f p_input->p_input_module->p_functions->input.functions.input
+    p_input->pf_probe         = f.pf_probe;
     p_input->pf_init          = f.pf_init;
     p_input->pf_end           = f.pf_end;
     p_input->pf_read          = f.pf_read;

@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.4 2002/02/08 15:57:29 sam Exp $
+ * $Id: i420_rgb.c,v 1.5 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,7 +41,6 @@
  *****************************************************************************/
 static void chroma_getfunctions ( function_list_t * p_function_list );
 
-static int  chroma_Probe        ( probedata_t *p_data );
 static int  chroma_Init         ( vout_thread_t *p_vout );
 static void chroma_End          ( vout_thread_t *p_vout );
 
@@ -75,50 +74,8 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void chroma_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = chroma_Probe;
     p_function_list->functions.chroma.pf_init = chroma_Init;
     p_function_list->functions.chroma.pf_end  = chroma_End;
-}
-
-/*****************************************************************************
- * chroma_Probe: return a score
- *****************************************************************************
- * This function checks that we can handle the required data
- *****************************************************************************/
-static int chroma_Probe( probedata_t *p_data )
-{
-    if( p_data->chroma.p_render->i_width & 1
-         || p_data->chroma.p_render->i_height & 1 )
-    {
-        return 0;
-    }
-
-    switch( p_data->chroma.p_render->i_chroma )
-    {
-        case FOURCC_YV12:
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-            switch( p_data->chroma.p_output->i_chroma )
-            {
-#if defined (MODULE_NAME_IS_chroma_i420_rgb)
-                case FOURCC_BI_RGB:
-                    break;
-#endif
-                case FOURCC_RV15:
-                case FOURCC_RV16:
-                case FOURCC_RV32:
-                    break;
-
-                default:
-                    return 0;
-            }
-            break;
-
-        default:
-            return 0;
-    }
-
-    return 100;
 }
 
 /*****************************************************************************

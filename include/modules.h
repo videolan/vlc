@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.40 2002/01/05 03:49:18 sam Exp $
+ * $Id: modules.h,v 1.41 2002/02/15 13:32:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -156,46 +156,11 @@ typedef struct module_s
 
 } module_t;
 
-/*****************************************
- * FIXME
- * FIXME    Capabilities
- * FIXME
- *******************************************/
-typedef struct memcpy_module_s
-{
-    struct module_s *p_module;
-
-    void* ( *pf_memcpy ) ( void *, const void *, size_t );
-
-} memcpy_module_t;
-
-typedef struct probedata_s
-{
-    u8  i_type;
-
-    struct
-    {
-        char * psz_data;
-    } aout;
-
-    struct
-    {
-        u32 i_chroma;
-    } vout;
-
-    struct
-    {
-        struct picture_heap_s* p_output;
-        struct picture_heap_s* p_render;
-    } chroma;
-
-} probedata_t;
-
-/* FIXME: find a nicer way to do this. */
+/*****************************************************************************
+ * Module functions description structure
+ *****************************************************************************/
 typedef struct function_list_s
 {
-    int ( * pf_probe ) ( probedata_t * p_data );
-
     union
     {
         /* Interface plugin */
@@ -209,6 +174,7 @@ typedef struct function_list_s
         /* Input plugin */
         struct
         {
+            int  ( * pf_probe )( struct input_thread_s * );
             void ( * pf_init ) ( struct input_thread_s * );
             void ( * pf_open ) ( struct input_thread_s * );
             void ( * pf_close )( struct input_thread_s * );
@@ -323,13 +289,15 @@ typedef struct function_list_s
         /* Decoder plugins */
         struct
         {
+            int  ( * pf_probe)( u8 * p_es );
             int  ( * pf_run ) ( struct decoder_config_s * p_config );
         } dec;
 
         /* memcpy plugins */
         struct
         {
-            void* ( * fast_memcpy ) ( void *, const void *, size_t );
+            void* ( * pf_memcpy ) ( void *, const void *, size_t );
+            void* ( * pf_memset ) ( void *, int, size_t );
         } memcpy;
 
     } functions;
@@ -395,11 +363,8 @@ void            module_InitBank     ( void );
 void            module_EndBank      ( void );
 void            module_ResetBank    ( void );
 void            module_ManageBank   ( void );
-module_t *      module_Need         ( int, char *, probedata_t * );
+module_t *      module_Need         ( int, char *, void * );
 void            module_Unneed       ( module_t * p_module );
-
-int module_NeedMemcpy( memcpy_module_t * );
-void module_UnneedMemcpy( memcpy_module_t * );
 
 #else
 #   define module_Need p_symbols->module_Need

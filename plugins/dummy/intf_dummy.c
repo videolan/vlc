@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.14 2002/01/29 20:11:18 gbazin Exp $
+ * $Id: intf_dummy.c,v 1.15 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,7 +44,6 @@ typedef struct intf_sys_s
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  intf_Probe     ( probedata_t *p_data );
 static int  intf_Open      ( intf_thread_t *p_intf );
 static void intf_Close     ( intf_thread_t *p_intf );
 static void intf_Run       ( intf_thread_t *p_intf );
@@ -55,21 +54,9 @@ static void intf_Run       ( intf_thread_t *p_intf );
  *****************************************************************************/
 void _M( intf_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = intf_Probe;
     p_function_list->functions.intf.pf_open  = intf_Open;
     p_function_list->functions.intf.pf_close = intf_Close;
     p_function_list->functions.intf.pf_run   = intf_Run;
-}
-
-/*****************************************************************************
- * intf_Probe: probe the interface and return a score
- *****************************************************************************
- * This function tries to initialize Gnome and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int intf_Probe( probedata_t *p_data )
-{
-    return( 1 );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.1 2002/01/04 14:01:34 sam Exp $
+ * $Id: i420_yuy2.c,v 1.2 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,7 +49,6 @@
  *****************************************************************************/
 static void chroma_getfunctions ( function_list_t * p_function_list );
 
-static int  chroma_Probe        ( probedata_t *p_data );
 static int  chroma_Init         ( vout_thread_t *p_vout );
 static void chroma_End          ( vout_thread_t *p_vout );
 
@@ -92,64 +91,8 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void chroma_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = chroma_Probe;
     p_function_list->functions.chroma.pf_init = chroma_Init;
     p_function_list->functions.chroma.pf_end  = chroma_End;
-}
-
-/*****************************************************************************
- * chroma_Probe: return a score
- *****************************************************************************
- * This function checks that we can handle the required data
- *****************************************************************************/
-static int chroma_Probe( probedata_t *p_data )
-{
-    if( p_data->chroma.p_render->i_width & 1
-         || p_data->chroma.p_render->i_height & 1 )
-    {
-        return 0;
-    }
-
-    switch( p_data->chroma.p_render->i_chroma )
-    {
-        case FOURCC_YV12:
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-            switch( p_data->chroma.p_output->i_chroma )
-            {
-                case FOURCC_YUY2:
-                case FOURCC_YUNV:
-                    break;
-
-                case FOURCC_YVYU:
-                    break;
-
-                case FOURCC_UYVY:
-                case FOURCC_UYNV:
-                case FOURCC_Y422:
-                    break;
-
-                case FOURCC_IUYV:
-                    break;
-
-                case FOURCC_cyuv:
-                    break;
-
-#if defined (MODULE_NAME_IS_chroma_i420_yuy2)
-                case FOURCC_Y211:
-                    break;
-#endif
-
-                default:
-                    return 0;
-            }
-            break;
-
-        default:
-            return 0;
-    }
-
-    return 100;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.15 2002/01/28 16:51:22 sam Exp $
+ * $Id: xcommon.c,v 1.16 2002/02/15 13:32:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -85,7 +85,6 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Probe     ( probedata_t * );
 static int  vout_Create    ( vout_thread_t * );
 static void vout_Destroy   ( vout_thread_t * );
 static void vout_Render    ( vout_thread_t *, picture_t * );
@@ -257,7 +256,6 @@ static __inline__ void vout_Seek( off_t i_seek )
  *****************************************************************************/
 void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
@@ -265,62 +263,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Probe: probe the video driver and return a score
- *****************************************************************************
- * This function tries to initialize SDL and returns a score to the
- * plugin manager so that it can select the best plugin.
- *****************************************************************************/
-static int vout_Probe( probedata_t *p_data )
-{
-    Display *p_display;                                   /* display pointer */
-    char    *psz_display;
-#ifdef MODULE_NAME_IS_xvideo
-    int      i_xvport, i_dummy;
-#endif
-
-    /* Open display, unsing 'vlc_display' or DISPLAY environment variable */
-    psz_display = XDisplayName( main_GetPszVariable(VOUT_DISPLAY_VAR, NULL) );
-    p_display = XOpenDisplay( psz_display );
-    if( p_display == NULL )                                         /* error */
-    {
-        intf_WarnMsg( 3, "vout: cannot open display %s", psz_display );
-        return( 0 );
-    }
-
-#ifdef MODULE_NAME_IS_xvideo
-    /* Check that there is an available XVideo port for this format */
-    i_xvport = XVideoGetPort( p_display, p_data->vout.i_chroma, &i_dummy );
-    if( i_xvport < 0 )
-    {
-        /* It failed, but it's not completely lost ! We try to open an
-         * XVideo port for a YUY2 picture */
-        i_xvport = XVideoGetPort( p_display, FOURCC_YUY2, &i_dummy );
-        if( i_xvport < 0 )
-        {
-            /* It failed, but it's not completely lost ! We try to open an
-             * XVideo port for a simple 16bpp RGB picture */
-            i_xvport = XVideoGetPort( p_display, FOURCC_RV16, &i_dummy );
-            if( i_xvport < 0 )
-            {
-                XCloseDisplay( p_display );
-                return( 0 );
-            }
-        }
-    }
-    XVideoReleasePort( p_display, i_xvport );
-#endif
-
-    /* Clean-up everyting */
-    XCloseDisplay( p_display );
-
-#ifdef MODULE_NAME_IS_xvideo 
-    return( 150 );
-#else
-    return( 50 );
-#endif
 }
 
 /*****************************************************************************

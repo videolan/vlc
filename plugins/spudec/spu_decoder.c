@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.8 2002/01/21 23:57:46 massiot Exp $
+ * $Id: spu_decoder.c,v 1.9 2002/02/15 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,7 +48,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe ( probedata_t * );
+static int  decoder_Probe ( u8 * );
 static int  decoder_Run   ( decoder_config_t * );
 static int  InitThread    ( spudec_thread_t * );
 static void EndThread     ( spudec_thread_t * );
@@ -63,8 +63,8 @@ static int  ParseRLE             ( spudec_thread_t *, subpicture_t *, u8 * );
  *****************************************************************************/
 void _M( spudec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run = decoder_Run;
+    p_function_list->functions.dec.pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run   = decoder_Run;
 }
 
 /*****************************************************************************
@@ -91,9 +91,9 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( probedata_t *p_data )
+static int decoder_Probe( u8 *pi_type )
 {
-    return ( p_data->i_type == DVD_SPU_ES ) ? 50 : 0;
+    return ( *pi_type == DVD_SPU_ES ) ? 0 : -1;
 }
 
 /*****************************************************************************
