@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.18 2003/09/24 23:45:06 gbazin Exp $
+ * $Id: vorbis.c,v 1.19 2003/09/28 16:50:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -293,7 +293,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
         if( p_sys->b_packetizer )
         {
-            i_ret = SendPacket( p_dec, &oggpacket );
+            i_ret = ProcessPacket( p_dec, &oggpacket, p_block->i_pts );
             block_Release( p_block );
             return i_ret;
         }
@@ -319,7 +319,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
         if( p_sys->b_packetizer )
         {
-            i_ret = SendPacket( p_dec, &oggpacket );
+            i_ret = ProcessPacket( p_dec, &oggpacket, p_block->i_pts );
             block_Release( p_block );
             return i_ret;
         }
@@ -352,7 +352,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
         if( p_sys->b_packetizer )
         {
-            i_ret = SendPacket( p_dec, &oggpacket );
+            i_ret = ProcessPacket( p_dec, &oggpacket, p_block->i_pts );
             block_Release( p_block );
             return i_ret;
         }

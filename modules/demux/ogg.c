@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.36 2003/09/27 15:33:02 gbazin Exp $
+ * $Id: ogg.c,v 1.37 2003/09/28 16:50:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -210,10 +210,9 @@ static int Ogg_ElemStreamStart( input_thread_t *p_input,
         int i;
         for( i = 0; i < p_stream->i_packets_backup; i++ )
         {
-            /* Set correct starting date in the last header packet */
-            if( i == p_stream->i_packets_backup -1 )
-                p_stream->p_packets_backup[i].granulepos =
-                    p_stream->i_interpolated_pcr * p_stream->f_rate / 90000;
+            /* Set correct starting date in header packets */
+            p_stream->p_packets_backup[i].granulepos =
+                p_stream->i_interpolated_pcr * p_stream->f_rate / 90000;
 
             Ogg_DecodePacket( p_input, p_stream,
                               &p_stream->p_packets_backup[i] );
@@ -375,8 +374,16 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
             &p_stream->p_packets_backup[p_stream->i_packets_backup - 1];
 
         p_packet_backup->bytes = p_oggpacket->bytes;
-        if( p_stream->b_force_backup ) p_oggpacket->granulepos = -1;
         p_packet_backup->granulepos = p_oggpacket->granulepos;
+
+        if( p_oggpacket->granulepos >= 0 )
+        {
+            /* Because of vorbis granulepos scheme we must set the pcr for the
+             * 1st header packet so it doesn't get discarded in the
+             * packetizer */
+            Ogg_UpdatePCR( p_stream, p_oggpacket );
+        }
+
         p_packet_backup->packet = malloc( p_oggpacket->bytes );
         if( !p_packet_backup->packet ) return;
         memcpy( p_packet_backup->packet, p_oggpacket->packet,
@@ -1524,7 +1531,7 @@ static int Demux( input_thread_t * p_input )
 static int Control( input_thread_t *p_input, int i_query, va_list args )
 {
     demux_sys_t *p_ogg  = (demux_sys_t *)p_input->p_demux_data;
-    int64_t i64, *pi64;
+    int64_t *pi64;
 
     switch( i_query )
     {
