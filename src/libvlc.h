@@ -722,6 +722,11 @@ static char *ppsz_align_descriptions[] =
 #define HISTORY_FORWARD_TEXT N_("Go forward in browsing history")
 #define HISTORY_FORWARD_LONGTEXT N_("Select the key to go forward (to the next media item) in the browsing history.")
 
+#define AUDIO_TRACK_KEY_TEXT N_("Cycle audio track")
+#define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages)")
+#define SUBTITLE_TRACK_KEY_TEXT N_("Cycle subtitle track")
+#define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks")
+
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
     "\n  [dvd://][device][@raw_device][@[title][,[chapter][,angle]]]" \
@@ -1107,6 +1112,8 @@ vlc_module_begin();
     add_key( "key-play-bookmark10", KEY_F10, NULL, PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-history-back", KEY_MODIFIER_CTRL|'[', NULL, HISTORY_BACK_TEXT, HISTORY_BACK_LONGTEXT, VLC_TRUE );
     add_key( "key-history-forward", KEY_MODIFIER_CTRL|']', NULL, HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
+    add_key( "key-audio-track", 'l', NULL, AUDIO_TRACK_KEY_TEXT, AUDIO_TRACK_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-subtitle-track", 's', NULL, SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, VLC_FALSE );
 #endif
 
     /* Usage (mainly useful for cmd line stuff) */
@@ -1197,5 +1204,7 @@ static struct hotkey p_hotkeys[] =
     { "key-play-bookmark10", ACTIONID_PLAY_BOOKMARK10, 0},
     { "key-history-back", ACTIONID_HISTORY_BACK, 0},
     { "key-history-forward", ACTIONID_HISTORY_FORWARD, 0},
+    { "key-audio-track", ACTIONID_AUDIO_TRACK, 0},
+    { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, 0},
     { NULL, 0, 0 }
 };
