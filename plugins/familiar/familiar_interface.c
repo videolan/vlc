@@ -40,7 +40,7 @@ create_familiar (void)
   GtkWidget *listMedia;
   GtkWidget *comboURL;
   GList *comboURL_items = NULL;
-  GtkWidget *combo_entry1;
+  GtkWidget *comboURL_entry;
   GtkWidget *media;
   GtkWidget *fixedPreferences;
   GtkWidget *buttonSave;
@@ -50,7 +50,7 @@ create_familiar (void)
   GtkWidget *fixed3;
   GtkWidget *comboDefaultURL;
   GList *comboDefaultURL_items = NULL;
-  GtkWidget *combo_entry2;
+  GtkWidget *comboPrefs_entry;
   GtkWidget *frameIP;
   GtkWidget *fixed2;
   GSList *fixed2_group = NULL;
@@ -263,13 +263,13 @@ create_familiar (void)
   gtk_combo_set_popdown_strings (GTK_COMBO (comboURL), comboURL_items);
   g_list_free (comboURL_items);
 
-  combo_entry1 = GTK_COMBO (comboURL)->entry;
-  gtk_widget_set_name (combo_entry1, "combo_entry1");
-  gtk_widget_ref (combo_entry1);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "combo_entry1", combo_entry1,
+  comboURL_entry = GTK_COMBO (comboURL)->entry;
+  gtk_widget_set_name (comboURL_entry, "comboURL_entry");
+  gtk_widget_ref (comboURL_entry);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboURL_entry", comboURL_entry,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (combo_entry1);
-  gtk_entry_set_text (GTK_ENTRY (combo_entry1), _("file://"));
+  gtk_widget_show (comboURL_entry);
+  gtk_entry_set_text (GTK_ENTRY (comboURL_entry), _("file://"));
 
   media = gtk_label_new (_("Media"));
   gtk_widget_set_name (media, "media");
@@ -341,8 +341,8 @@ create_familiar (void)
   gtk_object_set_data_full (GTK_OBJECT (familiar), "comboDefaultURL", comboDefaultURL,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (comboDefaultURL);
-  gtk_fixed_put (GTK_FIXED (fixed3), comboDefaultURL, 8, 4);
-  gtk_widget_set_uposition (comboDefaultURL, 8, 4);
+  gtk_fixed_put (GTK_FIXED (fixed3), comboDefaultURL, 8, 8);
+  gtk_widget_set_uposition (comboDefaultURL, 8, 8);
   gtk_widget_set_usize (comboDefaultURL, 200, 24);
   comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("file://"));
   comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("ftp://localhost"));
@@ -351,13 +351,13 @@ create_familiar (void)
   gtk_combo_set_popdown_strings (GTK_COMBO (comboDefaultURL), comboDefaultURL_items);
   g_list_free (comboDefaultURL_items);
 
-  combo_entry2 = GTK_COMBO (comboDefaultURL)->entry;
-  gtk_widget_set_name (combo_entry2, "combo_entry2");
-  gtk_widget_ref (combo_entry2);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "combo_entry2", combo_entry2,
+  comboPrefs_entry = GTK_COMBO (comboDefaultURL)->entry;
+  gtk_widget_set_name (comboPrefs_entry, "comboPrefs_entry");
+  gtk_widget_ref (comboPrefs_entry);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboPrefs_entry", comboPrefs_entry,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (combo_entry2);
-  gtk_entry_set_text (GTK_ENTRY (combo_entry2), _("file://"));
+  gtk_widget_show (comboPrefs_entry);
+  gtk_entry_set_text (GTK_ENTRY (comboPrefs_entry), _("file://"));
 
   frameIP = gtk_frame_new (_("IP version:"));
   gtk_widget_set_name (frameIP, "frameIP");
@@ -507,6 +507,12 @@ create_familiar (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (toolbar_about), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_about_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (comboURL_entry), "changed",
+                      GTK_SIGNAL_FUNC (on_comboURL_entry_changed),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (comboPrefs_entry), "changed",
+                      GTK_SIGNAL_FUNC (on_comboPrefs_entry_changed),
                       NULL);
 
   gtk_object_set_data (GTK_OBJECT (familiar), "tooltips", tooltips);

@@ -2,7 +2,7 @@
  * familiar_callbacks.h : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar_callbacks.h,v 1.5 2002/07/24 20:46:08 jpsaman Exp $
+ * $Id: familiar_callbacks.h,v 1.6 2002/08/06 19:12:07 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -61,3 +61,12 @@ on_toolbar_forward_clicked             (GtkButton       *button,
 void
 on_toolbar_about_clicked               (GtkButton       *button,
                                         gpointer         user_data);
+
+void
+on_comboURL_entry_changed              (GtkEditable     *editable,
+                                        gpointer         user_data);
+
+void
+on_comboPrefs_entry_changed            (GtkEditable     *editable,
+                                        gpointer         user_data);
+
