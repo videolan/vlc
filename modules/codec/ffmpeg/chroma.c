@@ -2,7 +2,7 @@
  * chroma.c: chroma conversion using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: chroma.c,v 1.3 2003/10/27 01:04:38 gbazin Exp $
+ * $Id: chroma.c,v 1.4 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -24,8 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 

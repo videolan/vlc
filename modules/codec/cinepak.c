@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.3 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: cinepak.c,v 1.4 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -24,13 +24,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
-
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
 
 #define CINEPAK_MAXSTRIP 32
 

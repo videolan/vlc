@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.16 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: adpcm.c,v 1.17 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -26,13 +26,8 @@
  *
  * Documentation: http://www.pcisys.net/~melanson/codecs/adpcm.txt
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
-
-#include "codecs.h"
 
 /*****************************************************************************
  * Module descriptor

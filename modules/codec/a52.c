@@ -2,7 +2,7 @@
  * a52.c: parse A/52 audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.30 2003/11/16 22:54:12 gbazin Exp $
+ * $Id: a52.c,v 1.31 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -26,13 +26,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>                                              /* memcpy() */
-
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
 
 #include "vlc_block_helper.h"
 

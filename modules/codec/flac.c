@@ -2,7 +2,7 @@
  * flac.c: flac decoder/packetizer/encoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flac.c,v 1.4 2003/11/22 12:41:32 gbazin Exp $
+ * $Id: flac.c,v 1.5 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,9 +25,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
 
 #include <FLAC/stream_decoder.h>
 #include <FLAC/stream_encoder.h>

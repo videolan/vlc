@@ -2,7 +2,7 @@
  * postprocess.c: video postprocessing using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: postprocess.c,v 1.2 2003/10/28 14:17:51 gbazin Exp $
+ * $Id: postprocess.c,v 1.3 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -21,8 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>

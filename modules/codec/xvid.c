@@ -2,7 +2,7 @@
  * xvid.c: a decoder for libxvidcore, the Xvid video codec
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: xvid.c,v 1.7 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: xvid.c,v 1.8 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,10 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
-#include <vlc/input.h>
 #include <vlc/decoder.h>
-
-#include <stdlib.h>
 
 #include "codecs.h"
 

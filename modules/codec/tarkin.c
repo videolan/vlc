@@ -2,7 +2,7 @@
  * tarkin.c: tarkin decoder module making use of libtarkin.
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: tarkin.c,v 1.8 2003/11/22 15:06:50 gbazin Exp $
+ * $Id: tarkin.c,v 1.9 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 #include <vlc/decoder.h>
 
 #include <ogg/ogg.h>

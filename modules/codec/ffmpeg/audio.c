@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: audio.c,v 1.24 2003/11/19 13:10:48 gbazin Exp $
+ * $Id: audio.c,v 1.25 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -25,15 +25,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
-
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
-
-#include "codecs.h"
-#include "aout_internal.h"
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H

@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.6 2003/11/16 22:54:12 gbazin Exp $
+ * $Id: dts.c,v 1.7 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -25,13 +25,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>                                              /* memcpy() */
-
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
 
 #include "vlc_block_helper.h"
 

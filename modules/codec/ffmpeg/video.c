@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.47 2003/11/19 13:10:48 gbazin Exp $
+ * $Id: video.c,v 1.48 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -25,12 +25,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
-
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H

@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: speex.c,v 1.3 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: speex.c,v 1.4 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,12 +24,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                    /* memcpy(), memset() */
-
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
 
 #include <ogg/ogg.h>
 #include <speex.h>

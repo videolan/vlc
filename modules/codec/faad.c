@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: faad.c,v 1.4 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: faad.c,v 1.5 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -21,25 +21,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include <stdlib.h>
-
+#include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
 
 #include <faad.h>
-#include "codecs.h"
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 static int  Open( vlc_object_t * );
-static void CloseDecoder( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("AAC audio decoder (using libfaad2)") );
     set_capability( "decoder", 60 );
-    set_callbacks( Open, CloseDecoder );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 
@@ -301,9 +298,9 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 }
 
 /*****************************************************************************
- * CloseDecoder:
+ * Close:
  *****************************************************************************/
-static void CloseDecoder( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;

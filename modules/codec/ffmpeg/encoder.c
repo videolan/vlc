@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.7 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: encoder.c,v 1.8 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -25,17 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
-
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
-
-#include "aout_internal.h"
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H

@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.29 2003/11/22 20:15:34 fenrir Exp $
+ * $Id: spudec.c,v 1.30 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -25,12 +25,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
 
 #include "spudec.h"
 

@@ -2,7 +2,7 @@
  * dvbsub.c : DVB subtitles decoder thread
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
- * $Id: dvbsub.c,v 1.3 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: dvbsub.c,v 1.4 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Damien LUCAS <damien.lucas@anevia.com>
  *
@@ -23,13 +23,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                    /* memcpy(), memset() */
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
-#include "codecs.h"
 
+#include "codecs.h"
 
 // Wow, that's ugly but very usefull for a memory leak track
 // so I just keep it

@@ -2,7 +2,7 @@
  * render.c : SPU renderer
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: render.c,v 1.7 2003/11/22 19:55:47 fenrir Exp $
+ * $Id: render.c,v 1.8 2003/11/22 23:39:14 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -26,8 +26,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
