@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.35 2001/02/12 07:52:40 sam Exp $
+ * $Id: mpeg_system.c,v 1.36 2001/02/14 15:58:29 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -448,7 +448,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
             }
             p_pes->i_rate = p_input->stream.control.i_rate;
             p_pes->p_first = p_data;
-
+            
             /* If the PES header fits in the first data packet, we can
              * already set p_gather->i_pes_real_size. */
             if( p_data->p_payload_end - p_data->p_payload_start
@@ -456,11 +456,12 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
             {
                 p_es->i_pes_real_size =
                                 U16_AT(p_data->p_payload_start + 4) + 6;
+                
             }
             else
-            {
+            { 
                 p_es->i_pes_real_size = 0;
-            }
+            } 
         }
         else
         {
@@ -864,7 +865,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     }
 }
 
-
+ 
 /*
  * TS Demultiplexing
  */
@@ -884,7 +885,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     es_ts_data_t *      p_es_demux = NULL;
     pgrm_ts_data_t *    p_pgrm_demux = NULL;
 
-#define p (p_data->p_buffer)
+    #define p (p_data->p_buffer)
 
     //intf_DbgMsg("input debug: TS-demultiplexing packet %p, pid %d",
     //            p_ts_packet, U16_AT(&p[1]) & 0x1fff);
@@ -897,8 +898,22 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
 
     /* Find out the elementary stream. */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_es = input_FindES( p_input, i_pid );
 
+// kludge    
+if ( i_pid == 0x78 )
+{
+    p_es = input_FindES( p_input, 0x78 );
+    p_es->i_type = MPEG2_VIDEO_ES;
+    if( p_es->p_pes == NULL )
+      intf_ErrMsg("Got p_es . p_es->p_pes == null ? %d",p_es->p_pes == NULL);
+}
+else
+{
+    p_es = NULL;
+    b_trash = 1;
+}
+
+    
     vlc_mutex_lock( &p_input->stream.control.control_lock );
     if( p_es == NULL || p_es->p_decoder_fifo == NULL
          || (p_es->b_audio && p_input->stream.control.b_mute) )
@@ -909,6 +924,15 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     vlc_mutex_unlock( &p_input->stream.control.control_lock );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+// kludge
+    if (p_es != NULL )
+    {
+    
+    p_es_demux = (es_ts_data_t *)p_es->p_demux_data;
+    p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data; 
+    
+    p_pgrm_demux->i_pcr_pid = 0x78;
+
     if( (p_es->p_decoder_fifo != NULL) || (p_pgrm_demux->i_pcr_pid == i_pid) )
     {
 #ifdef STATS
@@ -916,6 +940,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
 #endif
 
         /* Extract adaptation field information if any */
+
         if( !b_adaptation )
         {
             /* We don't have any adaptation_field, so payload starts
@@ -973,6 +998,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     
                     /* If this is a PCR_PID, and this TS packet contains a
                      * PCR, we pass it along to the PCR decoder. */
+
                     if( (p_pgrm_demux->i_pcr_pid == i_pid) && (p[5] & 0x10) )
                     {
                         /* There should be a PCR field in the packet, check
@@ -993,13 +1019,12 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                 } /* valid TS adaptation field ? */
             } /* length > 0 */
         } /* has adaptation field */
-    
         /* Check the continuity of the stream. */
         i_dummy = ((p[3] & 0x0f) - p_es_demux->i_continuity_counter) & 0x0f;
         if( i_dummy == 1 )
         {
             /* Everything is ok, just increase our counter */
-            p_es_demux->i_continuity_counter++;
+            (p_es_demux->i_continuity_counter)++;
         }
         else
         {
@@ -1046,10 +1071,13 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
         } /* continuity */
     } /* if selected or PCR */
 
+    }
+    
     /* Trash the packet if it has no payload or if it isn't selected */
     if( b_trash )
     {
-        p_input->pf_delete_packet( p_input, p_data );
+        
+        p_input->pf_delete_packet( p_input->p_method_data, p_data );
 #ifdef STATS
         p_input->c_packets_trashed++;
 #endif
@@ -1058,6 +1086,8 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     {
         if( p_es_demux->b_psi )
         {
+//debug
+//printf("DemuxTS : Was a PSI\n");
             /* The payload contains PSI tables */
 #if 0
             /* FIXME ! write the PSI decoder :p */
@@ -1068,10 +1098,10 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
         else
         {
             /* The payload carries a PES stream */
-            if( b_unit_start )
-            input_GatherPES( p_input, p_data, p_es, b_unit_start, b_lost );
+            input_GatherPES( p_input, p_data, p_es, b_unit_start, b_lost ); 
         }
     }
 
 #undef p
+
 }

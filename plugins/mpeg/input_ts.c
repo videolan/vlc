@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.1 2001/02/08 04:43:27 sam Exp $
+ * $Id: input_ts.c,v 1.2 2001/02/14 15:58:29 henri Exp $
  *
  * Authors: 
  *
@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/uio.h>
+
 
 #include "config.h"
 #include "common.h"
@@ -44,6 +46,7 @@
 #include "input_ext-dec.h"
 
 #include "input.h"
+#include "input_ts.h"
 
 #include "mpeg_system.h"
 #include "input_netlist.h"
@@ -91,7 +94,7 @@ static int TSProbe( probedata_t * p_data )
     }
 
     /* verify that the first byte is 0x47 */
-    return 1;
+    return 0;
 }
 
 /*****************************************************************************
@@ -100,6 +103,58 @@ static int TSProbe( probedata_t * p_data )
 static void TSInit( input_thread_t * p_input )
 {
     /* Initialize netlist and TS structures */
+    thread_ts_data_t    * p_method;
+    pgrm_ts_data_t      * p_pgrm_demux;
+    es_descriptor_t     * kludge1;
+
+    /* Initialise structure */
+    p_method = malloc( sizeof( thread_ts_data_t ) );
+    if( p_method == NULL )
+    {
+        intf_ErrMsg( "Out of memory" );
+        p_input->b_error = 1;
+        return;
+    }
+ 
+    p_input->p_plugin_data = (void *)p_method;
+    p_input->p_method_data = NULL;
+ 
+    
+    /* XXX : For the time being, only file, after, i'll do the network */ 
+    
+    /* Initialize netlist */
+    if( input_NetlistInit( p_input, NB_DATA, NB_PES, TS_PACKET_SIZE, 
+                INPUT_READ_ONCE ) )
+    {
+        intf_ErrMsg( "Could not initialize netlist" );
+        return;
+    }
+   
+    /* Initialize the stream */
+    input_InitStream( p_input, sizeof( stream_ts_data_t ) );
+
+    /* FIXME : PSIDemux and PSIDecode */
+    /* Add audio and video programs */
+    /* p_input->stream.pp_programs[0] = */
+    input_AddProgram( p_input, 0, sizeof( pgrm_ts_data_t ) );
+    p_pgrm_demux = 
+        (pgrm_ts_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
+    p_pgrm_demux->i_pcr_pid = 0x78;
+
+    kludge1 = input_AddES( p_input, p_input->stream.pp_programs[0], 
+                           0x78, sizeof( es_ts_data_t ) );
+
+    // kludge
+    kludge1->i_type = MPEG2_VIDEO_ES;
+
+    input_SelectES( p_input, kludge1 );
+
+    vlc_mutex_lock( &(p_input->stream.stream_lock) );
+    p_input->stream.pp_programs[0]->b_is_ok = 1;
+    vlc_mutex_unlock( &(p_input->stream.stream_lock) );
+
+//debug
+intf_ErrMsg("End of TSINIT");    
 }
 
 /*****************************************************************************
@@ -119,6 +174,34 @@ static void TSEnd( input_thread_t * p_input )
 static int TSRead( input_thread_t * p_input,
                    data_packet_t * pp_packets[INPUT_READ_ONCE] )
 {
-    return -1;
-}
+    unsigned int i_read, i_loop;
+    struct iovec * p_iovec;
+    
+    memset( pp_packets, 0, INPUT_READ_ONCE*sizeof(data_packet_t *) );
+    
+    p_iovec = input_NetlistGetiovec( p_input->p_method_data );
+    
+    if ( p_iovec == NULL )
+    {
+        return( -1 ); /* empty netlist */
+    } 
 
+    i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
+    
+    if( i_read == -1 )
+    {
+        intf_ErrMsg( "Could not readv" );
+        return( -1 );
+    }
+
+    input_NetlistMviovec( p_input->p_method_data, 
+            (int)(i_read/TS_PACKET_SIZE) , pp_packets );
+
+    /* check correct TS header */
+    for( i_loop=0; i_loop < (int)(i_read/TS_PACKET_SIZE); i_loop++ )
+    {
+        if( pp_packets[i_loop]->p_buffer[0] != 0x47 )
+            intf_ErrMsg( "Bad TS Packet (starcode != 0x47)." );
+    }
+    return 0;
+}

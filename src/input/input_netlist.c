@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.30 2001/02/08 17:44:12 massiot Exp $
+ * $Id: input_netlist.c,v 1.31 2001/02/14 15:58:29 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -41,8 +41,8 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 
-#include "input_netlist.h"
 #include "input.h"
+#include "input_netlist.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -66,6 +66,8 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     }
     
     p_netlist = (netlist_t *) p_input->p_method_data;
+    
+    p_netlist->i_read_once = i_read_once;
     
     /* allocate the buffers */ 
     p_netlist->p_buffers = 
@@ -107,7 +109,7 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     }
     
     p_netlist->p_free_iovec = ( struct iovec * )
-        malloc( (i_nb_data + INPUT_READ_ONCE) * sizeof(struct iovec) );
+        malloc( (i_nb_data + p_netlist->i_read_once) * sizeof(struct iovec) );
     if ( p_netlist->p_free_iovec == NULL )
     {
         intf_ErrMsg ("Unable to malloc in netlist initialization (6)");
@@ -121,6 +123,9 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
 
         p_netlist->pp_free_data[i_loop]->p_buffer = 
             p_netlist->p_buffers + i_loop * i_buffer_size;
+      
+        p_netlist->pp_free_data[i_loop]->p_payload_start = 
+            p_netlist->pp_free_data[i_loop]->p_buffer;
         
         p_netlist->pp_free_data[i_loop]->p_payload_end =
             p_netlist->pp_free_data[i_loop]->p_buffer + i_buffer_size;
@@ -140,7 +145,7 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
    
         p_netlist->p_free_iovec[i_loop].iov_len = i_buffer_size;
     }
-    
+   
     /* vlc_mutex_init */
     vlc_mutex_init (&p_netlist->lock);
     
@@ -155,16 +160,17 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     p_netlist->i_nb_pes = i_nb_pes;
     p_netlist->i_buffer_size = i_buffer_size;
 
-    p_netlist->i_read_once = i_read_once;
-
     return (0); /* Everything went all right */
 }
 
 /*****************************************************************************
  * input_NetlistGetiovec: returns an iovec pointer for a readv() operation
+ *****************************************************************************
+ * We return an iovec vector, so that readv can read many packets at a time,
+ * and we set pp_data to direct to the fifo pointer, which will allow us
+ * to get the corresponding data_packet.
  *****************************************************************************/
-struct iovec * input_NetlistGetiovec( void * p_method_data,
-                                      struct data_packet_s ** pp_data )
+struct iovec * input_NetlistGetiovec( void * p_method_data )
 {
     netlist_t * p_netlist;
 
@@ -191,22 +197,11 @@ struct iovec * input_NetlistGetiovec( void * p_method_data,
                 p_netlist->p_free_iovec, 
                 (p_netlist->i_read_once-
                     (p_netlist->i_nb_data-p_netlist->i_data_start))
-                    * sizeof(struct iovec*)
+                    * sizeof(struct iovec)
               );
 
     }
  
-    /* Gives a pointer to the data_packet struct associated with io_vec */
-    *pp_data = p_netlist->pp_free_data[p_netlist->i_data_start];
-
-    /* Initialize payload start and end */
-    p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_start 
-        = p_netlist->pp_free_data[p_netlist->i_data_start]->p_buffer;
- 
-    p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_end 
-        = p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_start
-        + p_netlist->i_buffer_size;
-
     return &p_netlist->p_free_iovec[p_netlist->i_data_start];
 
 }
@@ -214,16 +209,34 @@ struct iovec * input_NetlistGetiovec( void * p_method_data,
 /*****************************************************************************
  * input_NetlistMviovec: move the iovec pointer after a readv() operation
  *****************************************************************************/
-void input_NetlistMviovec( void * p_method_data, size_t i_nb_iovec )
+void input_NetlistMviovec( void * p_method_data, size_t i_nb_iovec,
+                           struct data_packet_s * pp_packets[INPUT_READ_ONCE] )
 {
     netlist_t * p_netlist;
+    unsigned int i_loop = 0;
+    unsigned int i_current;
 
     /* cast */
     p_netlist = (netlist_t *) p_method_data;
     
     /* lock */
     vlc_mutex_lock ( &p_netlist->lock );
-    
+
+    i_current = p_netlist->i_data_start;
+
+
+    /* Fills a table of pointers to packets associated with the io_vec's */
+while (i_loop < i_nb_iovec )
+    {
+        if( i_current >= p_netlist->i_nb_data ) 
+            i_current-=p_netlist->i_nb_data;
+        
+        pp_packets[i_loop] = p_netlist->pp_free_data[i_current];
+
+        i_loop ++;
+        i_current ++;
+    }
+
     p_netlist->i_data_start += i_nb_iovec;
     p_netlist->i_data_start %= p_netlist->i_nb_data;
 
@@ -333,13 +346,18 @@ void input_NetlistDeletePacket( void * p_method_data, data_packet_t * p_data )
     /* lock */
     vlc_mutex_lock ( &p_netlist->lock );
 
-    /* Delete data_packet */
+
+   /* Delete data_packet */
     p_netlist->i_data_end ++;
     p_netlist->i_data_end %= p_netlist->i_nb_data;
+    
     p_netlist->pp_free_data[p_netlist->i_data_end] = p_data;
-    
     p_netlist->p_free_iovec[p_netlist->i_data_end].iov_base = p_data->p_buffer;
-    
+
+    /* re initialize for next time */
+    p_data->p_payload_start = p_data->p_buffer;
+    p_data->p_next = NULL;
+ 
     /* unlock */
     vlc_mutex_unlock (&p_netlist->lock);
 }
@@ -350,7 +368,7 @@ void input_NetlistDeletePacket( void * p_method_data, data_packet_t * p_data )
 void input_NetlistDeletePES( void * p_method_data, pes_packet_t * p_pes )
 {
     netlist_t * p_netlist; 
-    data_packet_t * p_current_packet;
+    data_packet_t * p_current_packet,* p_next_packet;
     
     /* cast */
     p_netlist = (netlist_t *)p_method_data;
@@ -366,12 +384,18 @@ void input_NetlistDeletePES( void * p_method_data, pes_packet_t * p_pes )
 
         p_netlist->i_data_end ++;
         p_netlist->i_data_end %= p_netlist->i_nb_data;
-        p_netlist->pp_free_data[p_netlist->i_data_end] = p_current_packet;
+
+        /* re initialize*/
+        p_current_packet->p_payload_start = p_current_packet->p_buffer;
         
+        p_netlist->pp_free_data[p_netlist->i_data_end] = p_current_packet;
+
         p_netlist->p_free_iovec[p_netlist->i_data_end].iov_base 
             = p_current_packet->p_buffer;
     
-        p_current_packet = p_current_packet->p_next;
+        p_next_packet = p_current_packet->p_next;
+        p_current_packet->p_next = NULL;
+        p_current_packet = p_next_packet;
     }
  
     /* delete our current PES packet */

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.10 2001/02/14 04:11:01 stef Exp $
+ * $Id: input_dvd.c,v 1.11 2001/02/14 15:58:29 henri Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -475,7 +475,7 @@ static int DVDRead( input_thread_t * p_input,
     p_netlist = ( netlist_t * ) p_input->p_method_data;
 
     /* Get an iovec pointer */
-    if( ( p_vec = input_NetlistGetiovec( p_netlist, &p_data ) ) == NULL )
+    if( ( p_vec = input_NetlistGetiovec( p_netlist ) ) == NULL )
     {
         intf_ErrMsg( "DVD: read error" );
         return -1;
@@ -498,7 +498,7 @@ static int DVDRead( input_thread_t * p_input,
 #endif
 
     /* Update netlist indexes */
-    input_NetlistMviovec( p_netlist, p_method->i_read_once );
+    input_NetlistMviovec( p_netlist, p_method->i_read_once, &p_data );
 
     i_packet = 0;
     /* Read headers to compute payload length */

@@ -36,8 +36,9 @@ int                     input_NetlistInit( struct input_thread_s *,
                                            int i_nb_data, int i_nb_pes,
                                            size_t i_buffer_size,
                                            int i_read_once );
-struct iovec *          input_NetlistGetiovec( void *, struct data_packet_s** );
-void                    input_NetlistMviovec( void *, size_t );
+
+struct iovec * input_NetlistGetiovec( void * p_method_data );
+void input_NetlistMviovec( void * , size_t, struct data_packet_s **);
 struct data_packet_s *  input_NetlistNewPacket( void *, size_t );
 struct pes_packet_s *   input_NetlistNewPES( void * );
 void            input_NetlistDeletePacket( void *, struct data_packet_s * );
