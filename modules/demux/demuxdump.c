@@ -1,8 +1,8 @@
 /*****************************************************************************
  * demuxdump.c : Pseudo demux module for vlc (dump raw stream)
  *****************************************************************************
- * Copyright (C) 2001-2003 VideoLAN
- * $Id: demuxdump.c,v 1.12 2004/01/25 20:05:28 hartman Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -31,17 +31,6 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include <sys/types.h>
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Activate ( vlc_object_t * );
-static int  Demux ( input_thread_t * );
-static void Deactivate ( vlc_object_t * );
-
-#define DUMP_BLOCKSIZE  16384
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -49,22 +38,34 @@ static void Deactivate ( vlc_object_t * );
 #define FILE_LONGTEXT N_( \
     "Specify a file name to which the raw stream will be dumped." )
 
+static int  Open( vlc_object_t * );
+static void Close ( vlc_object_t * );
+
 vlc_module_begin();
     set_description( _("Filedump demuxer") );
-    set_capability( "demux", 0 );
-    add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT, 
+    set_capability( "demux2", 0 );
+    add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT,
               FILE_LONGTEXT, VLC_FALSE );
-    set_callbacks( Activate, Deactivate );
+    set_callbacks( Open, Close );
     add_shortcut( "dump" );
 vlc_module_end();
 
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int Demux( demux_t * );
+static int Control( demux_t *, int,va_list );
+
+#define DUMP_BLOCKSIZE  16384
+
 struct demux_sys_t
 {
-    char        *psz_name;
+    char        *psz_file;
     FILE        *p_file;
     uint64_t    i_write;
 
-    void        *p_demux_data_sav;
+    uint8_t     buffer[DUMP_BLOCKSIZE];
 };
 
 /*
@@ -72,121 +73,65 @@ struct demux_sys_t
  */
 
 /*****************************************************************************
- * Activate: initializes dump structures
+ * Open: initializes dump structures
  *****************************************************************************/
-static int Activate( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
-    input_thread_t      *p_input = (input_thread_t *)p_this;
-    demux_sys_t         *p_demux;
-    vlc_value_t         val;
-    char                *psz_name;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
 
-    /* Set the demux function */
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
+    /* Accept only if forced */
+    if( strcasecmp( p_demux->psz_demux, "dump" ) )
+        return VLC_EGENERIC;
 
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->i_write = 0;
+    p_sys->p_file = NULL;
+    p_sys->psz_file = var_CreateGetString( p_demux, "demuxdump-file" );
+    if( *p_sys->psz_file == '\0' )
     {
-        /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
-    }
-    
-    var_Create( p_input, "demuxdump-file", VLC_VAR_FILE|VLC_VAR_DOINHERIT );
-    var_Get( p_input, "demuxdump-file", &val );
-    psz_name = val.psz_string;
-    if( !psz_name || !*psz_name )
-    {
-        msg_Warn( p_input, "no dump file name given" );
+        msg_Warn( p_demux, "no dump file name given" );
         return VLC_EGENERIC;
     }
 
-    p_demux = malloc( sizeof( demux_sys_t ) );
-    memset( p_demux, 0, sizeof( demux_sys_t ) );
-
-    if( !strcmp( psz_name, "-" ) )
+    if( !strcmp( p_sys->psz_file, "-" ) )
     {
-        msg_Info( p_input,
-                  "dumping raw stream to standard output" );
-        p_demux->p_file = stdout;
-        p_demux->psz_name = psz_name;
+        msg_Info( p_demux, "dumping raw stream to standard output" );
+        p_sys->p_file = stdout;
     }
-    else if( !( p_demux->p_file = fopen( psz_name, "wb" ) ) )
+    else if( ( p_sys->p_file = fopen( p_sys->psz_file, "wb" ) ) == NULL )
     {
-        msg_Err( p_input,
-                 "cannot create `%s' for writing", 
-                 psz_name );
-        free( p_demux );
+        msg_Err( p_demux,"cannot create `%s' for writing", p_sys->psz_file );
+
+        free( p_sys );
         return VLC_EGENERIC;
     }
-    else
-    {
-        msg_Info( p_input,
-                  "dumping raw stream to file `%s'", 
-                  psz_name );
-        p_demux->psz_name = psz_name;
-    }
+    msg_Info( p_demux, "dumping raw stream to file `%s'", p_sys->psz_file );
 
-    p_demux->i_write = 0;
-    p_demux->p_demux_data_sav = p_input->p_demux_data;
-
-    if( p_input->stream.p_selected_program != NULL )
-    {
-        /* workaround for dvd access */
-        msg_Warn( p_input, "demux data already initializated (by access?)" );
-    }
-    else
-    {
-
-        if( input_InitStream( p_input, 0 ) == -1 )
-        {
-            if( p_demux->p_file != stdout )
-                fclose( p_demux->p_file );
-            free( p_demux );
-            return VLC_EGENERIC;
-        }
-        input_AddProgram( p_input, 0, 0 );
-        p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.p_selected_area->i_tell = 0;
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-    }
-
-    p_input->p_demux_data = p_demux;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.p_selected_program->b_is_ok = 1;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * Deactivate: initializes dump structures
+ * Close:
  *****************************************************************************/
-static void Deactivate ( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
-    input_thread_t      *p_input = (input_thread_t *)p_this;
-    demux_sys_t         *p_demux = (demux_sys_t*)p_input->p_demux_data;
 
-    msg_Info( p_input,
-              "closing %s ("I64Fd" Kbytes dumped)",
-              p_demux->psz_name,
-              p_demux->i_write / 1024 );
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_demux->p_file )
+    msg_Info( p_demux ,"closing %s ("I64Fd" Kbytes dumped)", p_sys->psz_file,
+              p_sys->i_write / 1024 );
+
+    if( p_sys->p_file != stdout )
     {
-        if( p_demux->p_file != stdout )
-            fclose( p_demux->p_file );
-        p_demux->p_file = NULL;
+        fclose( p_sys->p_file );
     }
-    if( p_demux->psz_name )
-    {
-        free( p_demux->psz_name );
-    }
-    p_input->p_demux_data = p_demux->p_demux_data_sav;
-    free( p_demux );
+    free( p_sys->psz_file );
+
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -194,54 +139,36 @@ static void Deactivate ( vlc_object_t *p_this )
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux( input_thread_t * p_input )
+static int Demux( demux_t *p_demux )
 {
-    demux_sys_t         *p_demux = (demux_sys_t*)p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
-    ssize_t         i_read;
-    data_packet_t * p_data;
-    int             i_write;
+    int i_data;
 
-    p_input->p_demux_data = p_demux->p_demux_data_sav;
-    i_read = input_SplitBuffer( p_input, &p_data, DUMP_BLOCKSIZE );
-    p_input->p_demux_data = p_demux;
-    
-    if ( i_read <= 0 )
+    /* I'm pretty sure that stream_Peek,stream_Read( , NULL ) would be faster*/
+    i_data = stream_Read( p_demux->s, p_sys->buffer, DUMP_BLOCKSIZE );
+    if ( i_data <= 0 )
+        return i_data;
+
+    i_data = fwrite( p_sys->buffer, 1, i_data, p_sys->p_file );
+
+    if( i_data < 0 )
     {
-        return i_read;
+        msg_Err( p_demux, "failed to write data" );
+        return -1;
     }
+    msg_Dbg( p_demux, "dumped %d bytes", i_data );
 
-    i_write = fwrite( p_data->p_payload_start,
-                       1,
-                       i_read,
-                       p_demux->p_file );
-    
-    input_DeletePacket( p_input->p_method_data, p_data );
+    p_sys->i_write += i_data;
 
-    if( i_write < 0 )
-    {
-        msg_Err( p_input, 
-                 "failed to write %d bytes",
-                 i_write );
-        return( -1 );
-    }
-    else
-    {
-        msg_Dbg( p_input,
-                 "dumped %d bytes",
-                 i_write );
-        p_demux->i_write += i_write;
-    }
-
-
-    if( (p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT)
-         | (input_ClockManageControl( p_input, 
-                      p_input->stream.p_selected_program,
-                         (mtime_t)0 ) == PAUSE_S) )
-    {
-        msg_Warn( p_input, "synchro reinit" );
-        p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_OK;
-    }
-
-    return( 1 );
+    return 1;
 }
+
+/*****************************************************************************
+ * Demux: reads and demuxes data packets
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    return demux2_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
+}
+
