@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.12 2004/01/25 18:20:12 bigben Exp $
+ * $Id: subtitle.h,v 1.13 2004/01/25 19:27:09 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -34,6 +34,10 @@
 #define DECODE_DBG_RENDER     32 /* rendering information */
 #define DECODE_DBG_PNG        64 /* Extract subtitles to PNG files. */
 #define DECODE_DBG_INFO      128
+
+#define DEBUG_TEXT N_(					    \
+     "If nonzero, this gives additional debug information." \
+     )
 
 #define DEBUG_LONGTEXT N_( \
     "This integer when viewed in binary is a debugging mask\n" \

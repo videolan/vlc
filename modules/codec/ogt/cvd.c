@@ -2,7 +2,7 @@
  * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: cvd.c,v 1.14 2004/01/25 18:20:12 bigben Exp $
+ * $Id: cvd.c,v 1.15 2004/01/25 19:27:09 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -48,8 +48,7 @@ vlc_module_begin();
     set_callbacks( DecoderOpen, VCDSubClose );
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
-                  N_("Set debug mask for additional debugging."),
-                  N_(DEBUG_LONGTEXT), VLC_TRUE );
+		  DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );
 
     add_integer ( MODULE_STRING "-horizontal-correct", 0, NULL,
                   HORIZONTAL_CORRECT, HORIZONTAL_CORRECT_LONGTEXT, VLC_FALSE );
@@ -61,7 +60,7 @@ vlc_module_begin();
                 SUB_ASPECT_RATIO_TEXT, SUB_ASPECT_RATIO_LONGTEXT, 
 		VLC_TRUE );
 
-    add_integer( MODULE_STRING "-duration-scaling", 9, NULL,
+    add_integer( MODULE_STRING "-duration-scaling", 3, NULL,
 		 DURATION_SCALE_TEXT, DURATION_SCALE_LONGTEXT,
 		 VLC_TRUE );
 

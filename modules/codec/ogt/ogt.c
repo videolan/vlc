@@ -2,7 +2,7 @@
  * ogt.c : Overlay Graphics Text (SVCD subtitles) decoder thread
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: ogt.c,v 1.11 2004/01/16 13:32:37 rocky Exp $
+ * $Id: ogt.c,v 1.12 2004/01/25 19:27:09 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -48,8 +48,7 @@ vlc_module_begin();
     set_callbacks( DecoderOpen, VCDSubClose );
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
-                  N_("set debug mask for additional debugging."),
-                  DEBUG_LONGTEXT, VLC_TRUE );
+		  DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );
 
     add_integer ( MODULE_STRING "-horizontal-correct", 0, NULL,
                   HORIZONTAL_CORRECT, HORIZONTAL_CORRECT_LONGTEXT, VLC_FALSE );
