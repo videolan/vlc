@@ -1339,6 +1339,11 @@ AC_ARG_ENABLE(dvdnav,
   [  --enable-dvdnav         dvdnav input module (default enabled)])
 if test "${enable_dvdnav}" != "no"
 then
+  dnl Same hack than dvdread
+  if test "${SYS}" = "mingw32" || test "${SYS}" = "darwin" || test "${SYS}" = "beos" ; then
+      VLC_ADD_LDFLAGS([dvdnav],[-ldvdcss])
+  fi
+
   DVDNAV_PATH="${PATH}"
   AC_ARG_WITH(dvdnav-config-path,
     [    --with-dvdnav-config-path=PATH dvdnav-config path (default search in \$PATH)],
