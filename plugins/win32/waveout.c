@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.7 2002/04/19 13:56:11 sam Exp $
+ * $Id: waveout.c,v 1.7.2.1 2002/06/03 07:22:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -207,6 +207,11 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
     int current_buffer = p_aout->p_sys->i_current_buffer;
 
     p_aout->p_sys->i_current_buffer = (current_buffer + 1) % NUMBUF;
+
+    /* Unprepare the old buffer */
+    waveOutUnprepareHeader( p_aout->p_sys->h_waveout,
+                            &p_aout->p_sys->waveheader[current_buffer],
+                            sizeof(WAVEHDR) );
 
     /* Prepare the buffer */
     p_aout->p_sys->waveheader[current_buffer].lpData =
