@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.11 2003/06/12 23:03:09 gbazin Exp $
+ * $Id: ipv6.c,v 1.12 2003/06/13 12:08:13 gbazin Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -63,13 +63,13 @@ static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #   define IPPROTO_IPV6 41 
 #endif
 #ifndef IPV6_JOIN_GROUP
-#   define IPV6_JOIN_GROUP 20
+#   define IPV6_JOIN_GROUP 12
 #endif
 #ifndef IPV6_MULTICAST_HOPS
-#   define IPV6_MULTICAST_HOPS 18
+#   define IPV6_MULTICAST_HOPS 10
 #endif
 #ifndef IPV6_UNICAST_HOPS
-#   define IPV6_UNICAST_HOPS 16
+#   define IPV6_UNICAST_HOPS 4
 #endif
 #   define close closesocket
 #endif
@@ -301,7 +301,24 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         close( i_handle );
         return( -1 );
     }
- 
+
+#if defined(WIN32)
+    /* Under Win32 and for multicasting, we bind to IN6ADDR_ANY */
+    if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
+    {
+        struct sockaddr_in6 sockany = sock;
+        sockany.sin6_addr = in6addr_any;
+        sockany.sin6_scope_id = 0;
+
+        /* Bind it */
+        if( bind( i_handle, (struct sockaddr *)&sockany, sizeof( sock ) ) < 0 )
+        {
+            msg_Err( p_this, "cannot bind socket (%s)", strerror(errno) );
+            close( i_handle );
+            return( -1 );
+        }
+    } else
+#endif
     /* Bind it */
     if( bind( i_handle, (struct sockaddr *)&sock, sizeof( sock ) ) < 0 )
     {
@@ -332,7 +349,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         imr.ipv6mr_interface = sock.sin6_scope_id;
         imr.ipv6mr_multiaddr = sock.sin6_addr;
         res = setsockopt(i_handle, IPPROTO_IPV6, IPV6_JOIN_GROUP, (void*) &imr,
+#if defined(WIN32)
+                         sizeof(imr) + 4); /* Doesn't work without this */
+#else
                          sizeof(imr));
+#endif
 
         if( res == -1 )
         {
