@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.43 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.44 2003/09/05 15:55:30 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -114,6 +114,11 @@ bool VlcProc::EventProc( Event *evt )
 
         case VLC_OPEN:
             p_intf->p_sys->p_dialogs->ShowOpen( true );
+            InterfaceRefresh();
+            return true;
+
+        case VLC_NET:
+            p_intf->p_sys->p_dialogs->ShowNet();
             InterfaceRefresh();
             return true;
 

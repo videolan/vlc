@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.20 2003/07/20 20:42:23 ipkiss Exp $
+ * $Id: event.cpp,v 1.21 2003/09/05 15:55:30 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -112,6 +112,8 @@ unsigned int Event::GetMessageType( string Desc )
         return VLC_HIDE;
     else if( Desc == "VLC_OPEN" )
         return VLC_OPEN;
+    else if( Desc == "VLC_NET" )
+        return VLC_NET;
     else if( Desc == "VLC_LOAD_SKIN" )
         return VLC_LOAD_SKIN;
     else if( Desc == "VLC_CHANGE_TRAY" )

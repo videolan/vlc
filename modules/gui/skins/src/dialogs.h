@@ -2,7 +2,7 @@
  * dialogs.h: Dialogs class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.h,v 1.9 2003/08/28 15:59:04 gbazin Exp $
+ * $Id: dialogs.h,v 1.10 2003/09/05 15:55:30 asmax Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -46,6 +46,7 @@ class Dialogs
         virtual ~Dialogs();
 
         void ShowOpen( bool b_play );
+        void ShowNet();
         void ShowOpenSkin( bool b_block );
         void ShowMessages();
         void ShowPrefs();

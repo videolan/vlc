@@ -2,7 +2,7 @@
  * event.h: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.h,v 1.13 2003/07/20 20:42:23 ipkiss Exp $
+ * $Id: event.h,v 1.14 2003/09/05 15:55:30 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -59,6 +59,7 @@ using namespace std;
 #define VLC_OPEN            (VLC_MESSAGE + 5)
 #define VLC_LOAD_SKIN       (VLC_MESSAGE + 6)
 #define VLC_DROP            (VLC_MESSAGE + 7)
+#define VLC_NET             (VLC_MESSAGE + 8)
 
 #define VLC_LOG_SHOW        (VLC_MESSAGE + 20)
 #define VLC_PREFS_SHOW      (VLC_MESSAGE + 23)

@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.13 2003/08/28 15:59:04 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.14 2003/09/05 15:55:30 asmax Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -102,6 +102,13 @@ void Dialogs::ShowOpen( bool b_play )
         p_provider->pf_show_dialog( p_provider, INTF_DIALOG_FILE,
                                     (int)b_play, 0 );
 }
+
+void Dialogs::ShowNet()
+{
+    if( p_provider && p_provider->pf_show_dialog )
+        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_NET, 0, 0 );
+}
+
 
 static void ShowOpenSkinCallback( intf_dialog_args_t *p_arg )
 {
