@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.32 2003/03/17 13:49:14 marcari Exp $
+ * $Id: familiar.c,v 1.33 2003/03/17 18:02:10 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -90,8 +90,8 @@ static int Open( vlc_object_t *p_this )
     }
 
 #ifdef NEED_GTK_MAIN
-    msg_Dbg( p_intf, "Using gtk_main" );
-    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gtk" );
+    msg_Dbg( p_intf, "Using gui-helper" );
+    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gui-helper", "gtk" );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
@@ -124,7 +124,7 @@ static void Close( vlc_object_t *p_this )
     }
 
 #ifdef NEED_GTK_MAIN
-    msg_Dbg( p_intf, "Releasing gtk_main" );
+    msg_Dbg( p_intf, "Releasing gui-helper" );
     module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
 #endif
 
@@ -143,7 +143,7 @@ static void Run( intf_thread_t *p_intf )
 #ifndef NEED_GTK_MAIN
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
-    char  *p_args[] = { "" };
+    char  *p_args[] = { "", NULL };
     char **pp_args  = p_args;
     int    i_args   = 1;
     int    i_dummy;
@@ -156,23 +156,23 @@ static void Run( intf_thread_t *p_intf )
         exit (1);
 #else
     gtk_set_locale ();
- #ifndef NEED_GTK_MAIN
+#   ifndef NEED_GTK_MAIN
     msg_Dbg( p_intf, "Starting familiar GTK+ interface" );
     gtk_init( &i_args, &pp_args );
- #else
+#   else
     /* Initialize Gtk+ */
     msg_Dbg( p_intf, "Starting familiar GTK+ interface thread" );
     gdk_threads_enter();
- #endif
+#   endif
 #endif
 
     /* Create some useful widgets that will certainly be used */
 // FIXME: magic path
     add_pixmap_directory("share");
     add_pixmap_directory("/usr/share/vlc");
+
     /* Path for pixmaps under linupy 1.4 */
     add_pixmap_directory("/usr/local/share/pixmaps/vlc");
-
 
     /* Path for pixmaps under linupy 2.0 */
     add_pixmap_directory("/usr/share/pixmaps/vlc");

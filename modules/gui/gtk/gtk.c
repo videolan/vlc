@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.18 2003/03/10 18:17:19 gbazin Exp $
+ * $Id: gtk.c,v 1.19 2003/03/17 18:02:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -97,7 +97,7 @@ static int Open( vlc_object_t *p_this )
     }
 
 #ifdef NEED_GTK_MAIN
-    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gtk" );
+    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gui-helper", "gtk" );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
@@ -180,7 +180,7 @@ static void Run( intf_thread_t *p_intf )
 #else
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
-    char  *p_args[] = { "" };
+    char  *p_args[] = { "", NULL };
     char **pp_args  = p_args;
     int    i_args   = 1;
     int    i_dummy;

@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.11 2003/01/15 13:16:39 sam Exp $
+ * $Id: gtk_main.c,v 1.12 2003/03/17 18:02:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,7 +30,11 @@
 
 #include <gtk/gtk.h>
 
-#ifdef MODULE_NAME_IS_gnome_main
+#if defined(MODULE_NAME_IS_gtk2_main)
+#   include <glib.h>
+#endif
+
+#if defined(MODULE_NAME_IS_gnome_main) || defined(MODULE_NAME_IS_gnome2_main)
 #   include <gnome.h>
 #endif
 
@@ -52,14 +56,24 @@ static vlc_object_t * p_gtk_main = NULL;
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Gtk+ helper module") );
-#ifdef MODULE_NAME_IS_gtk_main
-    set_capability( "gtk_main", 90 );
-#else
-    set_capability( "gtk_main", 100 );
-    add_shortcut( "gnome" );
-#endif
+    int i_cap;
+    set_description( _("Gtk+ GUI helper module") );
+#if defined(MODULE_NAME_IS_gtk_main)
+    i_cap = 90;
     add_shortcut( "gtk" );
+#elif defined(MODULE_NAME_IS_gnome_main)
+    i_cap = 100;
+    add_shortcut( "gtk" );
+    add_shortcut( "gnome" );
+#elif defined(MODULE_NAME_IS_gtk2_main)
+    i_cap = 95;
+    add_shortcut( "gtk2" );
+#elif defined(MODULE_NAME_IS_gnome2_main)
+    i_cap = 105;
+    add_shortcut( "gtk2" );
+    add_shortcut( "gnome2" );
+#endif
+    set_capability( "gui-helper", i_cap );
     set_callbacks( Open, Close );
     linked_with_a_crap_library_which_uses_atexit();
 vlc_module_end();
@@ -152,8 +166,8 @@ static void GtkMain( vlc_object_t *p_this )
 {
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
-    static char  *p_args[] = { "" };
-#ifdef MODULE_NAME_IS_gtk_main
+    static char  *p_args[] = { "", NULL };
+#if defined(MODULE_NAME_IS_gtk_main) || defined(MODULE_NAME_IS_gtk2_main)
     static char **pp_args  = p_args;
 #endif
     static int    i_args   = 1;
@@ -161,7 +175,7 @@ static void GtkMain( vlc_object_t *p_this )
     /* FIXME: deprecated ? */
     /* gdk_threads_init(); */
 
-#ifdef MODULE_NAME_IS_gnome_main
+#if defined(MODULE_NAME_IS_gnome_main) || defined(MODULE_NAME_IS_gnome2_main)
     gnome_init( p_this->p_vlc->psz_object_name, VERSION, i_args, p_args );
 #else
     gtk_set_locale();

@@ -7,7 +7,8 @@ COMMON_gtk = \
 	modules/gui/gtk/playlist.c \
 	modules/gui/gtk/modules.c \
 	modules/gui/gtk/preferences.c \
-	modules/gui/gtk/gtk_callbacks.c
+	modules/gui/gtk/gtk_callbacks.c \
+	$(NULL)
 
 SOURCES_gtk = \
 	modules/gui/gtk/gtk.c \
@@ -35,9 +36,11 @@ noinst_HEADERS += \
 	modules/gui/gtk/gtk_interface.h \
 	modules/gui/gtk/playlist.h \
 	modules/gui/gtk/preferences.h \
-	modules/gui/gtk/gtk_support.h
+	modules/gui/gtk/gtk_support.h \
+	$(NULL)
 
 EXTRA_DIST += \
 	modules/gui/gtk/gtk.glade \
 	modules/gui/gtk/gnome.glade \
-	modules/gui/gtk/gnome_callbacks.c
+	modules/gui/gtk/gnome_callbacks.c \
+	$(NULL)

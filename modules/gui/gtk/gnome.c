@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.13 2003/03/10 18:17:19 gbazin Exp $
+ * $Id: gnome.c,v 1.14 2003/03/17 18:02:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -98,7 +98,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gnome" );
+    p_intf->p_sys->p_gtk_main = module_Need( p_this, "gui-helper", "gnome" );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );

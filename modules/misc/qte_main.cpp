@@ -2,7 +2,7 @@
  * qte_main.c : QT Embedded wrapper for gte_main
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: qte_main.cpp,v 1.4 2003/03/06 10:11:33 jpsaman Exp $
+ * $Id: qte_main.cpp,v 1.5 2003/03/17 18:02:10 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -41,7 +41,7 @@ typedef struct qte_thread_t
     VLC_COMMON_MEMBERS
 
     QApplication*       p_qte_application;
-    QWidget* 		p_qte_widget;
+    QWidget*            p_qte_widget;
 
 } qte_thread_t;
 
@@ -63,8 +63,8 @@ static qte_thread_t * p_qte_main = NULL;
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Qt Embedded helper module") );
-    set_capability( "qte_main", 90 );
+    set_description( _("Qt Embedded GUI helper module") );
+    set_capability( "gui-helper", 90 );
     add_shortcut( "qte" );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -94,8 +94,8 @@ static int Open( vlc_object_t *p_this )
 
     p_qte_main = (qte_thread_t *) vlc_object_create( p_this, sizeof(qte_thread_t) );
 
-    /* Launch the gtk_main() thread. It will not return until it has
-     * called gdk_threads_enter(), which ensures us thread safety. */
+    /* Launch the QApplication::exec() thread. It will not return until the
+     * application is properly initialized, which ensures us thread safety. */
     if( vlc_thread_create( p_qte_main, "qte_main", QteMain,
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {

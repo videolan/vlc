@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.58 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: vlc_common.h,v 1.59 2003/03/17 18:02:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -502,7 +502,8 @@ static inline uint64_t U64_AT( void * _p )
 
 #ifndef HAVE_STRNDUP
 #   if defined(STRNDUP_IN_GNOME_H) && \
-        (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main))
+        (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main)||\
+         defined(MODULE_NAME_IS_gnome2)||defined(MODULE_NAME_IS_gnome2_main))
         /* Do nothing: gnome.h defines strndup for us */
 #   else
 #       define strndup vlc_strndup
@@ -662,7 +663,8 @@ typedef __int64 off_t;
 VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 
 #if defined( ENABLE_NLS ) && \
-     (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main))
+     (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main)||\
+      defined(MODULE_NAME_IS_gnome2)||defined(MODULE_NAME_IS_gnome2_main))
     /* Declare nothing: gnome.h will do it for us */
 #elif defined( ENABLE_NLS ) && defined( HAVE_INCLUDED_GETTEXT )
 #   include "libintl.h"
