@@ -1164,6 +1164,10 @@ then
   AC_PATH_PROG(GTK_CONFIG, gtk-config, no, $GTK_PATH)
   if test -x ${GTK_CONFIG}
   then
+    if expr 1.2.0 \> `$GTK_CONFIG --version` >/dev/null
+    then
+      AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-gtk.])
+    fi
     CFLAGS_GTK="`${GTK_CONFIG} --cflags gtk`"
     LIB_GTK="`${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`"
   fi

@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: beos.cpp,v 1.15 2001/12/30 07:09:54 sam Exp $
+ * $Id: beos.cpp,v 1.16 2002/01/05 18:25:48 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -48,11 +48,11 @@ ADD_WINDOW( "Configuration for BeOS module" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_AOUT
-                                | MODULE_CAPABILITY_VOUT
-                                | MODULE_CAPABILITY_INTF;
-    p_module->psz_longname = "BeOS standard API module";
+    SET_DESCRIPTION( "BeOS standard API module" )
+    ADD_CAPABILITY( INTF, 100 )
+    ADD_CAPABILITY( VOUT, 100 )
+    ADD_CAPABILITY( AOUT, 100 )
+    ADD_SHORTCUT( "beos" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

@@ -133,7 +133,7 @@ static void S16StereoPlay( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
             }
             p_fifo->l_units -= p_aout->l_units;
         }
-        else
+        else /* p_fifo->l_units <= p_aout->l_units */
         {
             /* p_aout->b_stereo == 1 */
             while ( l_buffer < (p_fifo->l_units << 1) )
@@ -164,7 +164,7 @@ static void S16StereoPlay( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
             }
             p_fifo->l_units -= p_aout->l_units;
         }
-        else
+        else /* p_fifo->l_units <= p_aout->l_units */
         {
             /* p_aout->b_stereo == 1 */
             while ( l_buffer < (p_fifo->l_units << 1) )
@@ -216,10 +216,10 @@ static void S16StereoPlay( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
                 p_fifo->l_units -= l_units;
                 break;
             }
-            else
+            else /* p_fifo->l_units <= l_units */
             {
                 /* p_aout->b_stereo == 1 */
-                l_buffer_limit = l_buffer + (p_fifo->l_units << 1);
+                l_buffer_limit = p_fifo->l_units << 1;
 
                 while ( l_buffer < l_buffer_limit )
                 {
@@ -287,10 +287,10 @@ static void S16StereoPlay( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
                 p_fifo->l_units -= l_units;
                 break;
             }
-            else
+            else /* p_fifo->l_units <= l_units */
             {
                 /* p_aout->b_stereo == 1 */
-                l_buffer_limit = l_buffer + (p_fifo->l_units << 1);
+                l_buffer_limit = p_fifo->l_units << 1;
 
                 while ( l_buffer < l_buffer_limit )
                 {
