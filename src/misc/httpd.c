@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- *          Remi Denis-Courmont <courmisch@via.ecp.fr> 
+ *          Remi Denis-Courmont <courmisch@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <vlc/vlc.h>
 
 #include "vlc_httpd.h"
+#include "network.h"
 
 #include <string.h>
 #include <errno.h>
@@ -39,9 +40,6 @@
 #elif defined( WIN32 )
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
 #else
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
@@ -854,32 +852,112 @@ void httpd_StreamDelete( httpd_stream_t *stream )
  *****************************************************************************/
 #define LISTEN_BACKLOG          100
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-#define SOCKET_CLOSE(a)    closesocket(a)
-#else
-#define SOCKET_CLOSE(a)    close(a)
+#if defined(HAVE_GETNAMEINFO) && !defined(HAVE_GETADDRINFO)
+/* 
+ * For now, VLC's configure script does not check for getaddrinfo(),
+ * but it should be present if getnameinfo() is (the opposite is untrue, with
+ * Debian potato as an example)
+ */
+# define HAVE_GETADDRINFO 1
 #endif
 
 static void httpd_HostThread( httpd_host_t * );
-static int BuildAddr( struct sockaddr_storage * p_socket, int *pi_sock_size,
+static int GetAddrPort( const struct sockaddr_storage *p_ss );
+
+#ifndef HAVE_GETADDRINFO
+struct httpd_addrinfo
+{
+    int ai_family;
+    int ai_socktype;
+    int ai_protocol;
+    /*int ai_flags;*/
+    struct sockaddr *ai_addr;
+    int ai_addrlen;
+    struct httpd_addrinfo *ai_next;
+};
+#   define addrinfo httpd_addrinfo
+
+static int BuildAddr( struct sockaddr_in * p_socket,
                       const char * psz_address, int i_port );
+#endif
 
 
 /* create a new host */
 httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
 {
     httpd_t      *httpd;
-    httpd_host_t *host;
+    httpd_host_t *host = NULL;
     vlc_value_t lockval;
-    struct sockaddr_storage sock;
-    int i, i_sock_size;
+    int fd = -1;
+    struct addrinfo *res, *ptr;
 
     /* resolv */
-    if( BuildAddr( &sock, &i_sock_size, psz_host, i_port ) )
+#ifdef HAVE_GETADDRINFO
+
+    {
+        vlc_value_t val;
+        char psz_port[6];
+        struct addrinfo hints;
+        
+        memset( &hints, 0, sizeof( hints ) );
+#if 0
+        /* Check if we have force ipv4 or ipv6 */
+        var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Get( p_this, "ipv4", &val );
+        if( val.b_bool )
+            hints.ai_family = PF_INET;
+#else
+        /* 
+         * For now, keep IPv4 by default. That said, it should be safe to use
+         * IPv6 by default *on the server side*, as, apart from NetBSD, most
+         * systems accept IPv4 clients on IPv6 listening sockets.
+         *
+         *
+         */
+        hints.ai_family = PF_INET;
+#endif
+
+        var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Get( p_this, "ipv6", &val );
+        if( val.b_bool )
+            hints.ai_family = PF_INET6;
+
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_flags = AI_PASSIVE;
+
+        if (*psz_host == '\0')
+            psz_host = NULL;
+
+        snprintf( psz_port, sizeof( psz_port ), "%d", i_port );
+        psz_port[sizeof( psz_port ) - 1] = '\0';
+        
+        if( getaddrinfo( psz_host, psz_port, &hints, &res ) )
+        {
+            msg_Err( p_this, "cannot resolve %s:%d", psz_host, i_port );
+            return NULL;
+        }
+    }
+#else
+    struct sockaddr_in sock;
+    struct httpd_addrinfo info;
+    
+    info.ai_family = PF_INET;
+    info.ai_socktype = SOCK_STREAM;
+    info.ai_protocol = 0;
+    info.ai_addr = (struct sockaddr *)&sock;
+    info.ai_addrlen = sizeof( sock );
+    info.ai_next = NULL;
+    
+    res = &info;
+
+    if( BuildAddr( &sock, psz_host, i_port ) )
     {
         msg_Err( p_this, "cannot build address for %s:%d", psz_host, i_port );
         return NULL;
     }
+
+#   define freeaddrinfo( r ) (void)0;
+#endif
 
     /* to be sure to avoid multiple creation */
     var_Create( p_this->p_libvlc, "httpd_mutex", VLC_VAR_MUTEX );
@@ -892,6 +970,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         if( ( httpd = vlc_object_create( p_this, VLC_OBJECT_HTTPD ) ) == NULL )
         {
             vlc_mutex_unlock( lockval.p_address );
+            freeaddrinfo( res );
             return NULL;
         }
 
@@ -902,38 +981,65 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         vlc_object_attach( httpd, p_this->p_vlc );
     }
 
-    /* verify if it already exist */
-    for( i = 0; i < httpd->i_host; i++ )
+    for( ptr = res; (ptr != NULL) && (fd == -1); ptr = ptr->ai_next )
     {
-        vlc_bool_t b_match = VLC_FALSE;
+        int i;
 
-        if (sock.ss_family != httpd->host[i]->sock.ss_family ||
-            i_sock_size != httpd->host[i]->i_sock_size)
+        if( ((unsigned)ptr->ai_addrlen) > sizeof( struct sockaddr_storage ) )
+        {
+            msg_Dbg( p_this, "socket address too big" );
             continue;
-        
-        switch (sock.ss_family)
-        {
-            case AF_INET:
-            {
-                const struct sockaddr_in *p_mysock, *p_thatsock;
-                
-                p_mysock = (const struct sockaddr_in *)&sock;
-                p_thatsock = (const struct sockaddr_in *)&httpd->host[i]->sock;
-                
-                b_match = p_mysock->sin_port == p_thatsock->sin_port &&
-                          ( p_mysock->sin_addr.s_addr == INADDR_ANY ||
-                            p_mysock->sin_addr.s_addr ==
-                                              p_thatsock->sin_addr.s_addr ) ?
-                          VLC_TRUE : VLC_FALSE;
-                break;
-            }
-            
-            default:
-                msg_Dbg( p_this, "host with unknown address family" );
         }
-        
-        if (b_match == VLC_TRUE)
+
+        /* verify if it already exist */
+        for( i = 0; i < httpd->i_host; i++ )
         {
+            if (GetAddrPort (&httpd->host[i]->sock) != i_port)
+                continue;
+
+#ifdef AF_INET6
+            if( httpd->host[i]->sock.ss_family == AF_INET6 )
+            {
+                    const struct sockaddr_in6 *p_hsock, *p_sock;
+        
+                    p_hsock = (const struct sockaddr_in6 *)&httpd->host[i]->sock;
+                    p_sock = (const struct sockaddr_in6 *)res->ai_addr;
+
+                    if( memcmp( &p_hsock->sin6_addr, &in6addr_any,
+                                sizeof( struct in6_addr ) ) &&
+                        ( p_sock->sin6_family != AF_INET6 ||
+                          memcmp( &p_hsock->sin6_addr, &p_sock->sin6_addr,
+                                  sizeof( struct in6_addr ) ) ) )
+                        continue; /* does not match */
+            }
+            else
+            if( res->ai_family == PF_INET6 )
+                continue;
+            else
+#endif
+            if( httpd->host[i]->sock.ss_family == AF_INET )
+            {
+                    const struct sockaddr_in *p_hsock, *p_sock;
+        
+                    p_hsock = (const struct sockaddr_in *)&httpd->host[i]->sock;
+                    p_sock = (const struct sockaddr_in *)res->ai_addr;
+
+                    if( p_hsock->sin_addr.s_addr != INADDR_ANY &&
+                        ( p_sock->sin_family != AF_INET ||
+                          p_hsock->sin_addr.s_addr != p_sock->sin_addr.s_addr ) )
+                        continue; /* does not match */
+            }
+            else
+            if( res->ai_family == PF_INET )
+                continue;
+            else
+            {
+                msg_Dbg( p_this, "host with unknown address family" );
+                continue;
+            }
+
+            freeaddrinfo( res );
+
             /* yep found */
             host = httpd->host[i];
             host->i_ref++;
@@ -943,75 +1049,86 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
             msg_Dbg( p_this, "host already registered" );
             return host;
         }
+
+        /* create the listening socket */
+        fd = socket( res->ai_family, res->ai_socktype, res->ai_protocol );
+        if( fd < 0 )
+            continue;
+
+        /* reuse socket */
+        {
+            int dummy = 1;
+            if( setsockopt( fd, SOL_SOCKET, SO_REUSEADDR,
+                            (void *)&dummy, sizeof( dummy ) ) < 0 )
+            {
+                msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR)" );
+            }
+        }
+
+        /* bind it */
+        if( bind( fd, res->ai_addr, res->ai_addrlen ) )
+        {
+            msg_Err( p_this, "cannot bind socket" );
+            continue;
+        }
+        /* set to non-blocking */
+#if defined( WIN32 ) || defined( UNDER_CE )
+        {
+            unsigned long i_dummy = 1;
+            if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
+            {
+                msg_Err( p_this, "cannot set socket to non-blocking mode" );
+                continue;
+            }
+        }
+#else
+        {
+            unsigned int i_flags;
+            if( ( i_flags = fcntl( fd, F_GETFL, 0 ) ) < 0 )
+            {
+                msg_Err( p_this, "cannot F_GETFL socket" );
+                continue;
+            }
+            if( fcntl( fd, F_SETFL, i_flags | O_NONBLOCK ) < 0 )
+            {
+                msg_Err( p_this, "cannot F_SETFL O_NONBLOCK" );
+                continue;
+            }
+        }
+#endif
+        /* listen */
+        if( listen( fd, LISTEN_BACKLOG ) < 0 )
+        {
+            msg_Err( p_this, "cannot listen socket" );
+            continue;
+        }
     }
+
+    freeaddrinfo( res );
+
+    if( fd == -1 )
+        goto error;
+
     /* create the new host */
     host = vlc_object_create( p_this, sizeof( httpd_host_t ) );
     host->httpd = httpd;
     vlc_mutex_init( httpd, &host->lock );
     host->i_ref = 1;
-    memcpy( &host->sock, &sock, sizeof( struct sockaddr_storage ) );
-    host->i_sock_size = i_sock_size;
+    host->fd = fd;
+
+    memcpy( &host->sock, res->ai_addr, res->ai_addrlen );
+    host->i_sock_size = res->ai_addrlen;
     host->i_url     = 0;
     host->url       = NULL;
     host->i_client  = 0;
     host->client    = NULL;
-
-    /* create the listening socket */
-    if( ( host->fd = socket( PF_INET, SOCK_STREAM, 0 ) ) < 0 )
-    {
-        goto socket_error;
-    }
-    /* reuse socket */
-    i = 1;
-    if( setsockopt( host->fd, SOL_SOCKET, SO_REUSEADDR,
-                    (void *) &i, sizeof( i ) ) < 0 )
-    {
-        msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR)" );
-    }
-    /* bind it */
-    if( bind( host->fd, (struct sockaddr *)&host->sock, host->i_sock_size ) )
-    {
-        msg_Err( p_this, "cannot bind socket" );
-        goto socket_error;
-    }
-    /* set to non-blocking */
-#if defined( WIN32 ) || defined( UNDER_CE )
-    {
-        unsigned long i_dummy = 1;
-        if( ioctlsocket( host->fd, FIONBIO, &i_dummy ) != 0 )
-        {
-            msg_Err( p_this, "cannot set socket to non-blocking mode" );
-            goto socket_error;
-        }
-    }
-#else
-    {
-        unsigned int i_flags;
-        if( ( i_flags = fcntl( host->fd, F_GETFL, 0 ) ) < 0 )
-        {
-            msg_Err( p_this, "cannot F_GETFL socket" );
-            goto socket_error;
-        }
-        if( fcntl( host->fd, F_SETFL, i_flags | O_NONBLOCK ) < 0 )
-        {
-            msg_Err( p_this, "cannot F_SETFL O_NONBLOCK" );
-            goto socket_error;
-        }
-    }
-#endif
-    /* listen */
-    if( listen( host->fd, LISTEN_BACKLOG ) < 0 )
-    {
-        msg_Err( p_this, "cannot listen socket" );
-        goto socket_error;
-    }
-
+    
     /* create the thread */
     if( vlc_thread_create( host, "httpd host thread", httpd_HostThread,
                            VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
         msg_Err( p_this, "cannot spawn http host thread" );
-        goto socket_error;
+        goto error;
     }
 
     /* now add it to httpd */
@@ -1020,15 +1137,17 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
 
     return host;
 
-socket_error:
+error:
     vlc_mutex_unlock( lockval.p_address );
 
-    if( host->fd > 0 )
+    if( fd != -1 )
+        net_Close( fd );
+
+    if( host != NULL )
     {
-        SOCKET_CLOSE( host->fd );
+        vlc_mutex_destroy( &host->lock );
+        vlc_object_destroy( host );
     }
-    vlc_mutex_destroy( &host->lock );
-    vlc_object_destroy( host );
 
     /* TODO destroy no more used httpd TODO */
     vlc_object_release( httpd );
@@ -1081,7 +1200,7 @@ void httpd_HostDelete( httpd_host_t *host )
         /* TODO */
     }
 
-    SOCKET_CLOSE( host->fd );
+    net_Close( host->fd );
     vlc_mutex_destroy( &host->lock );
     vlc_object_destroy( host );
 
@@ -1320,15 +1439,59 @@ void httpd_ClientModeBidir( httpd_client_t *cl )
 
 char* httpd_ClientIP( httpd_client_t *cl )
 {
-    /* FIXME not thread safe - should use inet_ntop if available */
+#ifdef HAVE_GETNAMEINFO
+    char sz_ip[INET6_ADDRSTRLEN + 2];
+    int i;
+
+    if( (cl->sock.ss_family == AF_INET6) &&
+        IN6_IS_ADDR_V4MAPPED( &((const struct sockaddr_in6 *)
+                              &cl->sock)->sin6_addr) )
+    {
+        /* If client is using IPv4 but server is using IPv6 */
+        struct sockaddr_in a;
+        
+        memset( &a, 0, sizeof( a ) );
+        a.sin_family = AF_INET;
+        a.sin_port = ((const struct sockaddr_in6 *)&cl->sock)->sin6_port;
+        a.sin_addr.s_addr = ((const uint32_t *)&((const struct sockaddr_in6 *)
+                            &cl->sock)->sin6_addr)[3];
+        i = getnameinfo( (const struct sockaddr *)&a, sizeof( a ),
+                         &sz_ip[1], INET6_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST );
+    }
+    else
+        i = getnameinfo( (const struct sockaddr *)&cl->sock, cl->i_sock_size,
+                         &sz_ip[1], INET6_ADDRSTRLEN, NULL, 0,
+                         NI_NUMERICHOST );
+
+    if( i != 0 )
+        /* FIXME: msg_Err */
+        return NULL;
+        
+    fprintf( stderr, "ClientIP = %s\n", &sz_ip[1]);
+    
+    if( strchr( &sz_ip[1], ':' ) != NULL )
+    {
+        *sz_ip = '[';
+        i = strlen( sz_ip );
+        sz_ip[i++] = ']';
+        sz_ip[i] = '\0';
+       
+        fprintf( stderr, "ClientIP (with []) = %s\n", sz_ip);
+        return strdup( sz_ip );
+    }
+    
+    return strdup( &sz_ip[1] );
+#else        
+    /* FIXME not thread safe */
     return strdup( inet_ntoa( ((const struct sockaddr_in *)&cl->sock)->sin_addr ) );
+#endif
 }
 
 static void httpd_ClientClean( httpd_client_t *cl )
 {
     if( cl->fd > 0 )
     {
-        SOCKET_CLOSE( cl->fd );
+        net_Close( cl->fd );
         cl->fd = -1;
     }
 
@@ -1826,8 +1989,14 @@ static void httpd_HostThread( httpd_host_t *host )
                 ( cl->i_state == HTTPD_CLIENT_DEAD ||
                   cl->i_activity_date + cl->i_activity_timeout < mdate() ) ) )
             {
+                char *ip;
+
+                // FIXME: it sucks to allocate memory on the stack for debug
+                ip = httpd_ClientIP( cl );
                 msg_Dbg( host, "connection closed(%s)",
-                         inet_ntoa(((const struct sockaddr_in *)&cl->sock)->sin_addr) );
+                         (ip != NULL) ? ip : "unknown" );
+                free( ip );
+
                 httpd_ClientClean( cl );
                 TAB_REMOVE( host->i_client, host->client, cl );
                 free( cl );
@@ -2179,14 +2348,19 @@ static void httpd_HostThread( httpd_host_t *host )
             fd = accept( host->fd, (struct sockaddr *)&sock, &i_sock_size );
             if( fd > 0 )
             {
+                char *ip;
+
                 httpd_client_t *cl = httpd_ClientNew( fd, &sock, i_sock_size );
 
                 vlc_mutex_lock( &host->lock );
                 TAB_APPEND( host->i_client, host->client, cl );
                 vlc_mutex_unlock( &host->lock );
 
+                // FIXME: it sucks to allocate heap memory for a debug message
+                ip = httpd_ClientIP( cl );
                 msg_Dbg( host, "new connection (%s)",
-                         inet_ntoa(((const struct sockaddr_in *)&sock)->sin_addr) );
+                         ip != NULL ? ip : "unknown" );
+                free( ip );
             }
         }
         /* now try all others socket */
@@ -2214,17 +2388,17 @@ static void httpd_HostThread( httpd_host_t *host )
     }
 }
 
-static int BuildAddr( struct sockaddr_storage * p_socket, int *pi_sock_size,
+#ifndef HAVE_GETADDRINFO
+static int BuildAddr( struct sockaddr_in * p_socket,
                       const char * psz_address, int i_port )
 {
     /* Reset struct */
-    memset( p_socket, 0, sizeof( struct sockaddr_storage ) );
-    p_socket->ss_family = AF_INET;                                /* family */
-    *pi_sock_size = sizeof( struct sockaddr_in );
-    ((struct sockaddr_in *)p_socket)->sin_port = htons( (uint16_t)i_port );
+    memset( p_socket, 0, sizeof( struct sockaddr_in ) );
+    p_socket->sin_family = AF_INET;                                /* family */
+    p_socket->sin_port = htons( (uint16_t)i_port );
     if( !*psz_address )
     {
-        ((struct sockaddr_in *)p_socket)->sin_addr.s_addr = INADDR_ANY;
+        p_socket->sin_addr.s_addr = INADDR_ANY;
     }
     else
     {
@@ -2233,11 +2407,12 @@ static int BuildAddr( struct sockaddr_storage * p_socket, int *pi_sock_size,
         /* Try to convert address directly from in_addr - this will work if
          * psz_address is dotted decimal. */
 #ifdef HAVE_ARPA_INET_H
-        if( !inet_aton( psz_address, &((struct sockaddr_in *)p_socket)->sin_addr ) )
+        if( !inet_aton( psz_address, &p_socket->sin_addr ) )
 #else
-        ((struct sockaddr_in *)p_socket)->sin_addr.s_addr = inet_addr( psz_address );
-/*        if( ((struct sockaddr_in *)p_socket)->sin_addr.s_addr == INADDR_NONE )*/
-        if( ((struct sockaddr_in *)p_socket)->sin_addr.s_addr == INADDR_BROADCAST )
+        p_socket->sin_addr.s_addr = inet_addr( psz_address );
+
+/*        if( p_socket->sin_addr.s_addr == INADDR_NONE )*/
+        if( p_socket->sin_addr.s_addr == INADDR_BROADCAST )
 #endif
         {
             /* We have a fqdn, try to find its address */
@@ -2252,4 +2427,28 @@ static int BuildAddr( struct sockaddr_storage * p_socket, int *pi_sock_size,
         }
     }
     return( 0 );
+}
+#endif
+
+static int GetAddrPort( const struct sockaddr_storage *p_ss )
+{
+    int i_port = 0;
+
+    switch (p_ss->ss_family)
+    {
+#ifdef AF_INET6
+        case AF_INET6:
+            i_port = ((const struct sockaddr_in6 *)p_ss)->sin6_port;
+            break;
+#endif
+
+        case AF_INET:
+            i_port = ((const struct sockaddr_in *)p_ss)->sin_port;
+            break;
+            
+        default:
+            return -1;
+    }
+    
+    return ntohs( i_port );
 }
