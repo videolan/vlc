@@ -233,7 +233,7 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
     else if( !strncasecmp( psz_bol, "sgiFormatName=", sizeof("sgiFormatName=") - 1 ) )
     {
         psz_bol += sizeof("sgiFormatName=") - 1;
-        if( !strcasestr( psz_bol, "MPEG-4") )
+        if( !strcasestr( psz_bol, "MPEG-4") ) /*not mpeg4 */
             p_sys->b_rtsp_kasenna = VLC_TRUE;
     }
     else if( !strncasecmp( psz_bol, "sgiMulticastAddress=", sizeof("sgiMulticastAddress=") - 1 ) )
@@ -342,7 +342,14 @@ static int Demux ( demux_t *p_demux )
         playlist_ItemAddOption( p_item, psz_option );
         free( psz_option );
     }
-    if( p_sys->b_rtsp_kasenna )
+    if( !p_sys->psz_mcast_ip )
+    {
+        char *psz_option;
+	asprintf( &psz_option, "rtsp-caching=10000" )
+	playlist_ItemAddOption( p_item, psz_option )
+	free( psz_option );
+    }
+    if( !p_sys->psz_mcast_ip && p_sys->b_rtsp_kasenna )
     {
         char *psz_option;
         asprintf( &psz_option, "rtsp-kasenna" );
