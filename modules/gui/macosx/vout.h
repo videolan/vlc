@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.h,v 1.7 2003/02/07 21:30:25 hartman Exp $
+ * $Id: vout.h,v 1.8 2003/02/08 21:43:26 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -22,8 +22,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-#define WINDOW_TITLE_HEIGHT 24
 
 /*****************************************************************************
  * VLCWindow interface

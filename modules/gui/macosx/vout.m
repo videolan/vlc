@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.26 2003/02/08 17:26:00 massiot Exp $
+ * $Id: vout.m,v 1.27 2003/02/08 21:43:26 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -738,7 +738,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         topleftscreen = [self convertBaseToScreen: topleftbase];
         
         newsize.width = (int) ( p_vout->render.i_width * factor );
-        newsize.height = (int) ( ( p_vout->render.i_height + WINDOW_TITLE_HEIGHT ) * factor );
+        newsize.height = (int) ( p_vout->render.i_height * factor );
         [self setContentSize: newsize];
         
         [self setFrameTopLeftPoint: topleftscreen];
