@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: Makefile,v 1.19 2004/03/02 22:55:34 massiot Exp $
+# $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -534,7 +534,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg
-	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-mp3lame --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
+	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
