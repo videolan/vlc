@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.31 2002/05/06 21:05:26 gbazin Exp $
+ * $Id: xcommon.c,v 1.32 2002/05/13 17:58:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -287,7 +287,12 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
-    char *psz_display;
+    char *    psz_display;
+#ifdef MODULE_NAME_IS_xvideo
+    char *    psz_chroma;
+    u32       i_chroma = 0;
+    boolean_t b_chroma = 0;
+#endif
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -316,12 +321,47 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
 #ifdef MODULE_NAME_IS_xvideo
+    psz_chroma = config_GetPszVariable( "xvideo-chroma" );
+    if( psz_chroma )
+    {
+        if( strlen( psz_chroma ) >= 4 )
+        {
+            i_chroma  = (unsigned char)psz_chroma[0] <<  0;
+            i_chroma |= (unsigned char)psz_chroma[1] <<  8;
+            i_chroma |= (unsigned char)psz_chroma[2] << 16;
+            i_chroma |= (unsigned char)psz_chroma[3] << 24;
+
+            b_chroma = 1;
+        }
+
+        free( psz_chroma );
+    }
+
+    if( b_chroma )
+    {
+        intf_WarnMsg( 3, "vout info: forcing chroma 0x%.8x (%4.4s)", 
+                         i_chroma, (char*)&i_chroma );
+    }
+    else
+    {
+        i_chroma = p_vout->render.i_chroma;
+    }
+
     /* Check that we have access to an XVideo port providing this chroma */
     p_vout->p_sys->i_xvport = XVideoGetPort( p_vout->p_sys->p_display,
-                                             p_vout->render.i_chroma,
+                                             i_chroma,
                                              &p_vout->output.i_chroma );
     if( p_vout->p_sys->i_xvport < 0 )
     {
+        /* If a specific chroma format was requested, then we don't try to
+         * be cleverer than the user. He knows pretty well what he wants. */
+        if( b_chroma )
+        {
+            XCloseDisplay( p_vout->p_sys->p_display );
+            free( p_vout->p_sys );
+            return 1;
+        }
+
         /* It failed, but it's not completely lost ! We try to open an
          * XVideo port for an YUY2 picture. We'll need to do an YUV
          * conversion, but at least it has got scaling. */

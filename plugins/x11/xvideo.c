@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.11 2002/04/23 14:16:20 sam Exp $
+ * $Id: xvideo.c,v 1.12 2002/05/13 17:58:08 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -56,11 +56,17 @@
     "Specify the X11 hardware display you want to use.\nBy default vlc will " \
     "use the value of the DISPLAY environment variable.")
 
+#define CHROMA_TEXT N_("XVimage chroma format")
+#define CHROMA_LONGTEXT N_( \
+    "Force the XVideo renderer to use a specific chroma format instead of " \
+    "trying to improve performances by using the most efficient one.")
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
 ADD_STRING  ( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
 ADD_INTEGER ( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT )
 ADD_BOOL    ( "xvideo-altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
+ADD_STRING  ( "xvideo-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
