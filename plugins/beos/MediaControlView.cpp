@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.4 2001/11/28 15:08:05 massiot Exp $
+ * $Id: MediaControlView.cpp,v 1.5 2001/11/30 09:49:04 tcastley Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *
@@ -25,6 +25,8 @@
 /* System headers */
 #include <InterfaceKit.h>
 #include <AppKit.h>
+#include <string.h>
+
 
 /* VLC headers */
 extern "C"

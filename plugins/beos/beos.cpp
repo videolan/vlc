@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: beos.cpp,v 1.12 2001/11/28 15:08:05 massiot Exp $
+ * $Id: beos.cpp,v 1.13 2001/11/30 09:49:48 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,6 +31,7 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 extern "C"
 {

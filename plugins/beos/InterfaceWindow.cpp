@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.7 2001/11/28 15:08:05 massiot Exp $
+ * $Id: InterfaceWindow.cpp,v 1.8 2001/11/30 09:49:48 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,6 +34,8 @@
 #include <scsi.h>
 #include <scsiprobe_driver.h>
 #include <fs_info.h>
+#include <string.h>
+
 
 /* VLC headers */
 extern "C"
