@@ -31,6 +31,8 @@
 
 #include "vlc_video.h"
 #include "video_output.h"
+#include "vlc_image.h"
+#include "vlc_spu.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -170,6 +172,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     vlc_value_t val, text, old_val;
 
     /* Create a few object variables we'll need later on */
+    var_Create( p_vout, "snapshot-path", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -239,6 +242,89 @@ void vout_IntfInit( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
+ * vout_Snapshot: generates a snapshot.
+ *****************************************************************************/
+int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    image_handler_t *p_image = image_HandlerCreate( p_vout );
+    video_format_t fmt_in = {0}, fmt_out = {0};
+    char *psz_filename;
+    subpicture_t *p_subpic;
+    picture_t *p_pif;
+    vlc_value_t val;
+    int i_ret;
+
+    var_Get( p_vout, "snapshot-path", &val );
+    if( val.psz_string && !*val.psz_string )
+    {
+        free( val.psz_string );
+        val.psz_string = 0;
+    }
+    if( !val.psz_string && p_vout->p_vlc->psz_homedir )
+    {
+        asprintf( &val.psz_string, "%s/" CONFIG_DIR,
+                  p_vout->p_vlc->psz_homedir );
+    }
+    if( !val.psz_string )
+    {
+        msg_Err( p_vout, "no directory specified for snapshots" );
+        return VLC_EGENERIC;
+    }
+
+    asprintf( &psz_filename, "%s/vlcsnap-%u.png", val.psz_string,
+              (unsigned int)(p_pic->date / 100000) & 0xFFFFFF );
+    free( val.psz_string );
+
+    /* Save the snapshot */
+    fmt_in.i_chroma = p_vout->render.i_chroma;
+    fmt_in.i_width = p_vout->render.i_width;
+    fmt_in.i_height = p_vout->render.i_height;
+    i_ret = image_WriteUrl( p_image, p_pic, &fmt_in, &fmt_out, psz_filename );
+    if( i_ret != VLC_SUCCESS )
+    {
+        msg_Err( p_vout, "could not create snapshot %s", psz_filename );
+        free( psz_filename );
+        image_HandlerDelete( p_image );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_vout, "snapshot taken (%s)", psz_filename );
+    free( psz_filename );
+
+    /* Inject a subpicture with the snapshot */
+    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt_out.i_width = fmt_out.i_visible_width = p_vout->render.i_width;
+    fmt_out.i_height = fmt_out.i_visible_height = p_vout->render.i_height;
+    fmt_out.i_aspect = VOUT_ASPECT_FACTOR;
+    p_pif = image_Convert( p_image, p_pic, &fmt_in, &fmt_out );
+    image_HandlerDelete( p_image );
+    if( !p_pif ) return VLC_EGENERIC;
+
+    p_subpic = spu_CreateSubpicture( p_vout->p_spu );
+    if( p_subpic == NULL )
+    {
+         p_pif->pf_release( p_pif );
+         return VLC_EGENERIC;
+    }
+
+    p_subpic->i_channel = 0;
+    p_subpic->i_start = mdate();
+    p_subpic->i_stop = mdate() + 4000000;
+    p_subpic->b_ephemer = VLC_TRUE;
+    p_subpic->b_fade = VLC_TRUE;
+    p_subpic->i_original_picture_width = p_vout->render.i_width * 4;
+    p_subpic->i_original_picture_height = p_vout->render.i_height * 4;
+
+    p_subpic->p_region = spu_CreateRegion( p_vout->p_spu, &fmt_out );
+    vout_CopyPicture( p_image->p_parent, &p_subpic->p_region->picture, p_pif );
+    p_pif->pf_release( p_pif );
+
+    spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * vout_ControlDefault: default methods for video output control.
  *****************************************************************************/
 int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
@@ -252,6 +338,11 @@ int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
             vlc_object_release( p_vout->p_parent_intf );
             p_vout->p_parent_intf = NULL;
         }
+        return VLC_SUCCESS;
+        break;
+
+    case VOUT_SNAPSHOT:
+        p_vout->b_snapshot = VLC_TRUE;
         return VLC_SUCCESS;
         break;
 

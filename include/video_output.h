@@ -142,6 +142,9 @@ struct vout_thread_t
     /* Filter chain */
     char *psz_filter_chain;
     vlc_bool_t b_filter_change;
+
+    /* Misc */
+    vlc_bool_t       b_snapshot;     /**< take one snapshot on the next loop */
 };
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures
@@ -243,6 +246,7 @@ enum output_query_e
     VOUT_SET_ZOOM,         /* arg1= double           res=    */
     VOUT_SET_STAY_ON_TOP,  /* arg1= vlc_bool_t       res=    */
     VOUT_REPARENT,
+    VOUT_SNAPSHOT,
     VOUT_CLOSE
 };
 

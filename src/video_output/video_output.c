@@ -65,6 +65,9 @@ static int DeinterlaceCallback( vlc_object_t *, char const *,
 static int FilterCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
+/* From vout_intf.c */
+int vout_Snapshot( vout_thread_t *, picture_t * );
+
 /*****************************************************************************
  * vout_Request: find a video output thread, create one, or destroy one.
  *****************************************************************************
@@ -850,6 +853,12 @@ static void RunThread( vout_thread_t *p_vout)
         if( p_picture == NULL )
         {
             i_idle_loops++;
+        }
+
+        if( p_picture && p_vout->b_snapshot )
+        {
+            p_vout->b_snapshot = VLC_FALSE;
+            vout_Snapshot( p_vout, p_picture );
         }
 
         /*
