@@ -321,10 +321,11 @@ static block_t *BlockUDP( access_t *p_access )
         return NULL;
     }
 
-    if( p_block->i_buffer >= p_sys->i_mtu && p_sys->b_auto_mtu )
+    if( p_block->i_buffer >= p_sys->i_mtu && p_sys->b_auto_mtu &&
+        p_sys->i_mtu < 32767 )
     {
-        /* Increase by 10% */
-        p_sys->i_mtu += ( p_sys->i_mtu + 9 ) / 10;
+        /* Increase by 100% */
+        p_sys->i_mtu *= 2;
         msg_Dbg( p_access, "increasing MTU to %d", p_sys->i_mtu );
     }
 
