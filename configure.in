@@ -2028,9 +2028,9 @@ then
       LDFLAGS="${save_LDFLAGS}"
     fi
     MOZILLA=1
-    mozilla_CFLAGS="${mozilla_CFLAGS} `${MOZILLA_CONFIG} --cflags plugin java --defines | xargs`"
     dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
-    mozilla_LDFLAGS="${mozilla_LDFLAGS} `${MOZILLA_CONFIG} --libs | sed 's#-I\(.*\)/mozilla/\([^ ]*\)#-I\1/\2 -I\1/mozilla/\2#g'`"
+    [mozilla_CFLAGS="${CPPFLAGS_mozilla} `${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`"]
+    mozilla_LDFLAGS="${mozilla_LDFLAGS} `${MOZILLA_CONFIG} --libs plugin xpcom`"
   fi
 fi
 

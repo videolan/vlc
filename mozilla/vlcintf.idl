@@ -1,0 +1,12 @@
+
+#include "nsISupports.idl"
+
+[scriptable, uuid(ea92ef52-afe4-4212-bacb-dfe9fca94cd6)]
+
+interface VlcIntf : nsISupports
+{
+    void play();
+    void pause();
+    void stop();
+};
+

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * videolan.c: a VideoLAN plugin for Mozilla
+ * vlcplugin.h: a VideoLAN plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.h,v 1.2 2002/07/23 20:12:55 sam Exp $
+ * $Id: vlcplugin.h,v 1.3 2002/09/17 08:18:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,8 +24,23 @@
 /*******************************************************************************
  * Instance state information about the plugin.
  ******************************************************************************/
-typedef struct _PluginInstance
+class VlcPlugin
 {
+public:
+             VlcPlugin( NPP ); 
+    virtual ~VlcPlugin();
+
+    void     SetInstance( NPP );
+    NPP      GetInstance();
+
+    void     SetFileName( const char* );
+    void     Play();
+    void     Pause();
+    void     Stop();
+
+    VlcIntf* getScriptable();
+
+    /* Window settings */
     NPWindow* fWindow;
     uint16 fMode;
 
@@ -36,11 +51,14 @@ typedef struct _PluginInstance
     uint32 width, height;
 
     /* vlc data members */
-    vlc_t *p_vlc;
-    int b_stream;
-    char *psz_target;
+    vlc_t *  p_vlc;
+    int      b_stream;
+    char *   psz_target;
 
-} PluginInstance;
+private:
+    NPP      p_instance;
+    VlcPeer* p_peer;
+};
 
 /*******************************************************************************
  * Plugin properties.
@@ -49,7 +67,7 @@ typedef struct _PluginInstance
 #define PLUGIN_DESCRIPTION \
     "VideoLAN Client Multimedia Player Plugin <br>" \
     " <br>" \
-    COPYRIGHT_MESSAGE " <br>" \
+    /*COPYRIGHT_MESSAGE*/ " <br>" \
     "VideoLAN WWW: <a href=\"http://www.videolan.org/\">http://www.videolan.org/</a>"
 
 #define PLUGIN_MIMETYPES \
