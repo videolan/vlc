@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.26 2003/10/08 18:26:58 gbazin Exp $
+ * $Id: sap.c,v 1.27 2003/10/13 05:48:08 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -154,8 +154,8 @@ struct attr_descr_t
 
 #define SAP_ADDR_TEXT N_("SAP multicast address")
 #define SAP_ADDR_LONGTEXT N_("SAP multicast address")
-#define SAP_IPV4_TEXT N_("No IPv4-SAP listening")
-#define SAP_IPV4_LONGTEXT N_("Set this if you do not want SAP to listen for IPv4 announces")
+#define SAP_IPV4_TEXT N_("IPv4-SAP listening")
+#define SAP_IPV4_LONGTEXT N_("Set this if you want SAP to listen for IPv4 announces")
 #define SAP_IPV6_TEXT N_("IPv6-SAP listening")
 #define SAP_IPV6_LONGTEXT N_("Set this if you want SAP to listen for IPv6 announces")
 #define SAP_SCOPE_TEXT N_("IPv6 SAP scope")
@@ -169,7 +169,7 @@ vlc_module_begin();
         add_string( "sap-addr", NULL, NULL,
                      SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
 
-        add_bool( "no-sap-ipv4", 0 , NULL,
+        add_bool( "sap-ipv4", 1 , NULL,
                      SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE);
 
         add_bool( "sap-ipv6", 0 , NULL,
@@ -213,7 +213,7 @@ static void Run( intf_thread_t *p_intf )
     int fd            = - 1;
     int fdv6          = -1;
 
-    int no_sap_ipv4      = config_GetInt( p_intf, "no-sap-ipv4" );
+    int sap_ipv4         = config_GetInt( p_intf, "sap-ipv4" );
     int sap_ipv6         = config_GetInt( p_intf, "sap-ipv6" );
     char *sap_ipv6_scope = config_GetPsz( p_intf, "sap-ipv6-scope" );
 
@@ -222,14 +222,14 @@ static void Run( intf_thread_t *p_intf )
     module_t            *p_network;
     network_socket_t    socket_desc;
 
-    if( no_sap_ipv4 == -1 || sap_ipv6 == -1 || sap_ipv6_scope == NULL )
+    if( sap_ipv4 == -1 || sap_ipv6 == -1 || sap_ipv6_scope == NULL )
     {
         msg_Warn( p_intf, "Unable to parse module configuration" );
         return;
     }
 
     /* Prepare IPv4 Networking */
-    if ( no_sap_ipv4 == 0)
+    if ( sap_ipv4 == 1)
     {
         if( !(psz_addr = config_GetPsz( p_intf, "sap-addr" ) ) )
         {
@@ -322,14 +322,14 @@ static void Run( intf_thread_t *p_intf )
     }
 
     /* Closing socket */
-    if( fd )
+    if( fd > 0)
     {
         if( close( fd ) )
         {
             msg_Warn( p_intf, "Ohoh, unable to close the socket" );
         }
     }
-    if( fdv6 )
+    if( fdv6 > 0)
     {
         if( close( fdv6 ) )
         {

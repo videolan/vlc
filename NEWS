@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.67 2003/10/12 23:28:36 hartman Exp $
+$Id: NEWS,v 1.68 2003/10/13 05:48:08 zorglub Exp $
 
 Changes between 0.6.2 and 0.6.3:
 ---------------------------------
@@ -17,11 +17,17 @@ Input:
  * Fixed seeking support in FLAC files.
  * cddax and vcdx
  * Reworked DVB tuning
+ * Better Icecast support
 
 Codecs:
  * Support for AAC + SBR.
  * MPEG 2.5 support.
  * removed old a52, mpeg_video and mpeg_audio codecs, since we are using others now.
+
+Interface:
+ * Improvements to the wxwindows playlist 
+   (Sort,Search, mode buttons)
+ * Help in the preferences window
 
 Mac OS X port:
  * Mozilla plugin for Mac OS X (experimental).
@@ -45,6 +51,7 @@ Miscellaneous:
  * Audio visual effects filters (spectrum, scope and random).
  * Audio visual effects filter using goom.
  * Spanish and Portugese Brazilian translations.
+ * SAP now supports HTTP streams
 
 Changes between 0.6.1 and 0.6.2:
 ---------------------------------
