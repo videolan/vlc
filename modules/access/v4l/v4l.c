@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.33 2003/11/24 16:45:53 fenrir Exp $
+ * $Id: v4l.c,v 1.34 2003/11/24 19:27:46 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -84,6 +84,10 @@ static void DemuxClose ( vlc_object_t * );
 #define ADEV_LONGTEXT N_( \
     "Specify the name of the audio device that will be used. " \
     "If you don't specify anything, no audio device will be used.")
+#define CHROMA_TEXT N_("Video input chroma format")
+#define CHROMA_LONGTEXT N_( \
+    "Force the v4l video device to use a specific chroma format " \
+    "(eg. I420 (default), RV24, etc...)")
 
 vlc_module_begin();
     set_description( _("Video4Linux input") );
@@ -98,6 +102,8 @@ vlc_module_begin();
                 VLC_FALSE );
     add_string( "v4l-adev", "/dev/dsp", 0, ADEV_TEXT, ADEV_LONGTEXT,
                 VLC_FALSE );
+    add_string( "v4l-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
+                VLC_TRUE );
 
     add_submodule();
         set_description( _("Video4Linux demuxer") );
@@ -130,6 +136,31 @@ struct quicktime_mjpeg_app1
     uint32_t    i_SOF_offset;
     uint32_t    i_SOS_offset;
     uint32_t    i_data_offset;          /* following SOS marker data */
+};
+
+static struct
+{
+    int i_v4l;
+    int i_fourcc;
+
+} v4lchroma_to_fourcc[] =
+{
+    { VIDEO_PALETTE_GREY, VLC_FOURCC( 'G', 'R', 'E', 'Y' ) },
+    { VIDEO_PALETTE_HI240, VLC_FOURCC( 'I', '2', '4', '0' ) },
+    { VIDEO_PALETTE_RGB565, VLC_FOURCC( 'R', 'V', '1', '6' ) },
+    { VIDEO_PALETTE_RGB555, VLC_FOURCC( 'R', 'V', '1', '5' ) },
+    { VIDEO_PALETTE_RGB24, VLC_FOURCC( 'R', 'V', '2', '4' ) },
+    { VIDEO_PALETTE_RGB32, VLC_FOURCC( 'R', 'V', '3', '2' ) },
+    { VIDEO_PALETTE_YUV422, VLC_FOURCC( 'I', '4', '2', '2' ) },
+    { VIDEO_PALETTE_YUYV, VLC_FOURCC( 'Y', 'U', 'Y', 'V' ) },
+    { VIDEO_PALETTE_UYVY, VLC_FOURCC( 'U', 'Y', 'V', 'Y' ) },
+    { VIDEO_PALETTE_YUV420, VLC_FOURCC( 'I', '4', '2', 'N' ) },
+    { VIDEO_PALETTE_YUV411, VLC_FOURCC( 'I', '4', '1', 'N' ) },
+    { VIDEO_PALETTE_RAW, VLC_FOURCC( 'G', 'R', 'A', 'W' ) },
+    { VIDEO_PALETTE_YUV422P, VLC_FOURCC( 'I', '4', '2', '2' ) },
+    { VIDEO_PALETTE_YUV420P, VLC_FOURCC( 'I', '4', '2', '0' ) },
+    { VIDEO_PALETTE_YUV411P, VLC_FOURCC( 'I', '4', '1', '1' ) },
+    { 0, 0 }
 };
 
 struct access_sys_t
@@ -898,74 +929,67 @@ int OpenVideoDev( input_thread_t *p_input, char *psz_device )
         /* Find out video format used by device */
         if( ioctl( i_fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
         {
-            int i_chroma = VLC_FOURCC( ' ', ' ', ' ', ' ' );
             struct video_picture vid_picture = p_sys->vid_picture;
+            vlc_value_t val;
+            int i;
 
-            /* Try to set the format to something easy to encode */
-            vid_picture.palette = VIDEO_PALETTE_YUV420P;
-            if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
+            vid_picture.palette = 0;
+            p_sys->i_fourcc = 0;
+
+            var_Create( p_input, "v4l-chroma",
+                        VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+            var_Get( p_input, "v4l-chroma", &val );
+            if( val.psz_string && strlen( val.psz_string ) >= 4 )
+            {
+                int i_chroma =
+                    VLC_FOURCC( val.psz_string[0], val.psz_string[1],
+                                val.psz_string[2], val.psz_string[3] );
+
+                /* Find out v4l chroma code */
+                for( i = 0; v4lchroma_to_fourcc[i].i_v4l != 0; i++ )
+                {
+                    if( v4lchroma_to_fourcc[i].i_fourcc == i_chroma )
+                    {
+                        vid_picture.palette = v4lchroma_to_fourcc[i].i_v4l;
+                        break;
+                    }
+                }
+            }
+            if( val.psz_string ) free( val.psz_string );
+
+            if( vid_picture.palette &&
+                !ioctl( i_fd, VIDIOCSPICT, &vid_picture ) )
             {
                 p_sys->vid_picture = vid_picture;
             }
             else
             {
-                vid_picture.palette = VIDEO_PALETTE_YUV422P;
+                /* Try to set the format to something easy to encode */
+                vid_picture.palette = VIDEO_PALETTE_YUV420P;
                 if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
                 {
                     p_sys->vid_picture = vid_picture;
                 }
+                else
+                {
+                    vid_picture.palette = VIDEO_PALETTE_YUV422P;
+                    if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
+                    {
+                        p_sys->vid_picture = vid_picture;
+                    }
+                }
             }
 
             /* Find out final format */
-            switch( p_sys->vid_picture.palette )
+            for( i = 0; v4lchroma_to_fourcc[i].i_v4l != 0; i++ )
             {
-            case VIDEO_PALETTE_GREY:
-                i_chroma = VLC_FOURCC( 'G', 'R', 'E', 'Y' );
-                break;
-            case VIDEO_PALETTE_HI240:
-                i_chroma = VLC_FOURCC( 'I', '2', '4', '0' );
-                break;
-            case VIDEO_PALETTE_RGB565:
-                i_chroma = VLC_FOURCC( 'R', 'V', '1', '6' );
-                break;
-            case VIDEO_PALETTE_RGB555:
-                i_chroma = VLC_FOURCC( 'R', 'V', '1', '5' );
-                break;
-            case VIDEO_PALETTE_RGB24:
-                i_chroma = VLC_FOURCC( 'R', 'V', '2', '4' );
-                break;
-            case VIDEO_PALETTE_RGB32:
-                i_chroma = VLC_FOURCC( 'R', 'V', '3', '2' );
-                break;
-            case VIDEO_PALETTE_YUV422:
-                i_chroma = VLC_FOURCC( 'I', '4', '2', '2' );
-                break;
-            case VIDEO_PALETTE_YUYV:
-                i_chroma = VLC_FOURCC( 'Y', 'U', 'Y', 'V' );
-                break;
-            case VIDEO_PALETTE_UYVY:
-                i_chroma = VLC_FOURCC( 'U', 'Y', 'V', 'Y' );
-                break;
-            case VIDEO_PALETTE_YUV420:
-                i_chroma = VLC_FOURCC( 'I', '4', '2', 'N' );
-                break;
-            case VIDEO_PALETTE_YUV411:
-                i_chroma = VLC_FOURCC( 'I', '4', '1', 'N' );
-                break;
-            case VIDEO_PALETTE_RAW:
-                i_chroma = VLC_FOURCC( 'G', 'R', 'A', 'W' );
-                break;
-            case VIDEO_PALETTE_YUV422P:
-                i_chroma = VLC_FOURCC( 'I', '4', '2', '2' );
-                break;
-            case VIDEO_PALETTE_YUV420P:
-                i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
-                break;
-            case VIDEO_PALETTE_YUV411P:
-                i_chroma = VLC_FOURCC( 'I', '4', '1', '1' );
-                break;
+                if( v4lchroma_to_fourcc[i].i_v4l == p_sys->vid_picture.palette)
+                {
+                    p_sys->i_fourcc = v4lchroma_to_fourcc[i].i_fourcc;
+                    break;
+                }
             }
-            p_sys->i_fourcc = i_chroma;
+
         }
         else
         {
@@ -1536,8 +1560,8 @@ static int DemuxOpen( vlc_object_t *p_this )
         }
         else if( !strncmp( p_peek, "vids", 4 ) )
         {
-            es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( p_peek[4], p_peek[5],
-                                                        p_peek[6], p_peek[7] ) );
+            es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( p_peek[4], p_peek[5],
+                            p_peek[6], p_peek[7] ) );
             fmt.video.i_width  = GetDWBE( &p_peek[8] );
             fmt.video.i_height = GetDWBE( &p_peek[12] );
 
@@ -1618,4 +1642,3 @@ static int Demux( input_thread_t *p_input )
 
     return 1;
 }
-
