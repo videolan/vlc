@@ -450,6 +450,29 @@ static int ftp_ReadCommand( access_t *p_access,
         return -1;
     }
 
+    if( psz_line[3] == '-' )    /* Multiple response */
+    {
+        char end[4];
+
+        memcpy( end, psz_line, 3 );
+        end[3] = ' ';
+
+        for( ;; )
+        {
+            char *psz_tmp = net_Gets( p_access, p_sys->fd_cmd );
+
+            if( psz_tmp == NULL )   /* Error */
+                break;
+
+            if( !strncmp( psz_tmp, end, 4 ) )
+            {
+                free( psz_tmp );
+                break;
+            }
+            free( psz_tmp );
+        }
+    }
+
     i_answer = atoi( psz_line );
 
     if( pi_answer ) *pi_answer = i_answer;
