@@ -221,7 +221,7 @@ static int Open( vlc_object_t *p_this )
     if( ftp_SendCommand( p_access, "TYPE I" ) < 0 ||
         ftp_ReadCommand( p_access, &i_answer, NULL ) != 2 )
     {
-        msg_Err( p_access, "cannot set binary transfert mode" );
+        msg_Err( p_access, "cannot set binary transfer mode" );
         goto exit_error;
     }
 
@@ -478,7 +478,7 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
     if( ftp_SendCommand( p_access, "PASV" ) < 0 ||
         ftp_ReadCommand( p_access, &i_answer, &psz_arg ) != 2 )
     {
-        msg_Err( p_access, "cannot set passive transfert mode" );
+        msg_Err( p_access, "cannot set passive transfer mode" );
         return VLC_EGENERIC;
     }
 
@@ -488,7 +488,7 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
                 &a4, &p1, &p2 ) < 6 )
     {
         free( psz_arg );
-        msg_Err( p_access, "cannot get ip/port for passive transfert mode" );
+        msg_Err( p_access, "cannot get ip/port for passive transfer mode" );
         return VLC_EGENERIC;
     }
     free( psz_arg );
@@ -500,7 +500,7 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
     if( ftp_SendCommand( p_access, "TYPE I" ) < 0 ||
         ftp_ReadCommand( p_access, &i_answer, NULL ) != 2 )
     {
-        msg_Err( p_access, "cannot set binary transfert mode" );
+        msg_Err( p_access, "cannot set binary transfer mode" );
         return VLC_EGENERIC;
     }
 
