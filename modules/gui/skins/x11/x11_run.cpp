@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.12 2003/06/01 16:39:49 asmax Exp $
+ * $Id: x11_run.cpp,v 1.13 2003/06/01 22:11:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -276,10 +276,19 @@ void OSRun( intf_thread_t *p_intf )
     while( !close )
     {
         XEvent event;
-        while( !close && XPending( display ) > 0 )
+        int nPending;
+        XLOCK;
+        nPending = XPending( display );
+        XUNLOCK;
+        while( !close && nPending > 0 )
         {
+            XLOCK;
             XNextEvent( display, &event );
+            XUNLOCK;
             close = ProcessEvent( p_intf, proc, &event );
+            XLOCK;
+            nPending = XPending( display );
+            XUNLOCK;
         }
         
         msleep( 1000 );

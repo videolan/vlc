@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.8 2003/06/01 16:39:49 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.9 2003/06/01 22:11:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -90,9 +90,11 @@ void X11Theme::OnLoadTheme()
     CreateSystemMenu();
 */
     Window root = DefaultRootWindow( display );
-    p_intf->p_sys->mainWin = XCreateSimpleWindow( display, root, 0, 0, 1, 1, 
-                                                  0, 0, 0 );
+    XLOCK;
+    p_intf->p_sys->mainWin = XCreateSimpleWindow( display, root, 0, 0, 
+                                                  1, 1, 0, 0, 0 );
     XStoreName( display, p_intf->p_sys->mainWin, "VLC Media Player" );
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Theme::AddSystemMenu( string name, Event *event )
@@ -110,7 +112,9 @@ void X11Theme::AddSystemMenu( string name, Event *event )
 //---------------------------------------------------------------------------
 void X11Theme::ChangeClientWindowName( string name )
 {
+    XLOCK;
     XStoreName( display, p_intf->p_sys->mainWin, name.c_str() );
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Theme::AddWindow( string name, int x, int y, bool visible,
@@ -119,11 +123,14 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     // Create the window
     Window root = DefaultRootWindow( display );
     XSetWindowAttributes attr;
+    XLOCK;
     Window wnd = XCreateWindow( display, root, 0, 0, 1, 1, 0, 0, InputOutput,
                                 CopyFromParent, 0, &attr );
     XSelectInput( display, wnd, ExposureMask|StructureNotifyMask|
-            KeyPressMask|KeyReleaseMask|ButtonPressMask|ButtonReleaseMask|
-            PointerMotionMask|EnterWindowMask|LeaveWindowMask);
+                  KeyPressMask|KeyReleaseMask|ButtonPressMask|
+                  ButtonReleaseMask|PointerMotionMask|EnterWindowMask|
+                  LeaveWindowMask);
+    XUNLOCK;
 
     // Changing decorations
     struct {
@@ -138,6 +145,7 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     
     motifWmHints.flags = 2;    // MWM_HINTS_DECORATIONS;
     motifWmHints.decorations = 0;
+    XLOCK;
     XChangeProperty( display, wnd, hints_atom, hints_atom, 32, 
                      PropModeReplace, (unsigned char *)&motifWmHints, 
                      sizeof( motifWmHints ) / sizeof( long ) );
@@ -153,6 +161,7 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     {
         XNextEvent( display, &evt );
     } while( evt.type != MapNotify );
+    XUNLOCK;
 
     WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, wnd, x, y, 
         visible, fadetime, alpha, movealpha, dragdrop, name ) ) ;

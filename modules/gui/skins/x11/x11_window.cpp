@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.8 2003/06/01 17:13:04 asmax Exp $
+ * $Id: x11_window.cpp,v 1.9 2003/06/01 22:11:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -46,6 +46,7 @@
 #include "../os_graphics.h"
 #include "../src/skin_common.h"
 #include "../src/theme.h"
+#include "../os_theme.h"
 
 
 //---------------------------------------------------------------------------
@@ -112,10 +113,6 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     attr.wclass = GDK_INPUT_OUTPUT;
     gint mask = 0;
     ToolTipWindow = gdk_window_new( gwnd, &attr, mask);*/
-
-    Open();
-    //fprintf(stderr, "kludge in x11_window.cpp\n");
-
 }
 //---------------------------------------------------------------------------
 X11Window::~X11Window()
@@ -149,13 +146,16 @@ void X11Window::OSShow( bool show )
 {
     if( show )
     {
+        XLOCK;
         XMapWindow( display, Wnd );
         XMoveWindow( display, Wnd, Left, Top );
+        XUNLOCK;
     }
     else
     {
-        //XWithdrawWindow( display, Wnd, 0 );
+        XLOCK;
         XUnmapWindow( display, Wnd );
+        XUNLOCK;
     }
 }
 //---------------------------------------------------------------------------
@@ -190,7 +190,9 @@ bool X11Window::ProcessOSEvent( Event *evt )
                     p_intf->p_sys->p_theme->WindowList.begin();
                     win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
+                XLOCK;
                 XRaiseWindow( display, ( (X11Window *)(*win) )->GetHandle() );
+                XUNLOCK;
             }
 
             switch( ( (XButtonEvent *)p2 )->button )
@@ -280,6 +282,7 @@ void X11Window::RefreshFromImage( int x, int y, int w, int h )
 {
     Drawable drawable = (( X11Graphics* )Image )->GetImage();
     
+    XLOCK;
     XCopyArea( display, drawable, Wnd, Gc, x, y, w, h, x, y );
  
     XImage *image = XGetImage( display, drawable, 0, 0, Width, Height, 
@@ -317,6 +320,7 @@ void X11Window::RefreshFromImage( int x, int y, int w, int h )
     XDestroyRegion( region );
 
     XSync( display, 0);
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Window::WindowManualMove()

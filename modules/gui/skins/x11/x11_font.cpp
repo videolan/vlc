@@ -2,7 +2,7 @@
  * x11_font.cpp: X11 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_font.cpp,v 1.4 2003/06/01 16:39:49 asmax Exp $
+ * $Id: x11_font.cpp,v 1.5 2003/06/01 22:11:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -36,9 +36,8 @@
 #include "../os_graphics.h"
 #include "../src/font.h"
 #include "../os_font.h"
-
-// FIXME ...
-extern intf_thread_t *g_pIntf;
+#include "../src/theme.h"
+#include "../os_theme.h"
 
 //---------------------------------------------------------------------------
 // Font object
@@ -50,7 +49,9 @@ X11Font::X11Font( intf_thread_t *_p_intf, string fontname, int size,
     display = g_pIntf->p_sys->display;
 
     // FIXME: just a beginning...
+    XLOCK;
     font = XLoadFont( display, "-misc-fixed-*-*-*-*-*-*-*-*-*-*-*-*" );
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 X11Font::~X11Font()
@@ -66,8 +67,10 @@ void X11Font::GetSize( string text, int &w, int &h )
     int direction, fontAscent, fontDescent;
     XCharStruct overall;
     
-    XQueryTextExtents( display, font, text.c_str(), text.size(), &direction,
-                       &fontAscent, &fontDescent, &overall );
+    XLOCK;
+    XQueryTextExtents( display, font, text.c_str(), text.size(), 
+                        &direction, &fontAscent, &fontDescent, &overall );
+    XUNLOCK;
 
     w = overall.rbearing - overall.lbearing;
     h = overall.ascent + overall.descent;
@@ -83,10 +86,13 @@ void X11Font::GenericPrint( Graphics *dest, string text, int x, int y,
     XGCValues gcVal;
     gcVal.foreground = (color == 0 ? 10 : color);
     gcVal.font = font;
-    XChangeGC( display, gc, GCForeground|GCFont,  &gcVal );
-
+    
     // Render text on buffer
-    XDrawString( display, drawable, gc, x, y+h, text.c_str(), text.size());
+    XLOCK;
+    XChangeGC( display, gc, GCForeground|GCFont,  &gcVal );
+    XDrawString( display, drawable, gc, x, y+h, text.c_str(), 
+                 text.size());
+    XUNLOCK;
 }
 
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.29 2003/06/01 16:39:49 asmax Exp $
+ * $Id: skin_main.cpp,v 1.30 2003/06/01 22:11:24 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -128,6 +128,7 @@ static int Open ( vlc_object_t *p_this )
 #elif defined X11_SKINS
     // Initialize X11
     p_intf->p_sys->display = XOpenDisplay( NULL );
+    vlc_mutex_init( p_intf, &p_intf->p_sys->xlock );
 
 #elif defined WIN32
     // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
@@ -191,6 +192,8 @@ static void Close ( vlc_object_t *p_this )
         FreeLibrary( p_intf->p_sys->h_msimg32_dll );
     if( p_intf->p_sys->h_user32_dll )
         FreeLibrary( p_intf->p_sys->h_user32_dll );
+#elif defined X11_SKINS
+    vlc_mutex_destroy( &p_intf->p_sys->xlock );
 #endif
 
     // Destroy structure

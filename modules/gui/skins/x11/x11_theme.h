@@ -2,7 +2,7 @@
  * x11_theme.h: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.h,v 1.2 2003/06/01 16:39:49 asmax Exp $
+ * $Id: x11_theme.h,v 1.3 2003/06/01 22:11:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -33,12 +33,19 @@ using namespace std;
 //--- X11 -------------------------------------------------------------------
 #include <X11/Xlib.h>
 
+// macros to make X calls thread safe
+extern intf_thread_t *g_pIntf;
+#define XLOCK vlc_mutex_lock( &g_pIntf->p_sys->xlock )
+#define XUNLOCK vlc_mutex_unlock( &g_pIntf->p_sys->xlock )
+
+
 //---------------------------------------------------------------------------
 struct intf_thread_t;
 class SkinWindow;
 class EventBank;
 class BitmapBank;
 class FontBank;
+
 
 //---------------------------------------------------------------------------
 class X11Theme : public Theme

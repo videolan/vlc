@@ -2,7 +2,7 @@
  * x11_bitmap.cpp: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.cpp,v 1.8 2003/06/01 16:39:49 asmax Exp $
+ * $Id: x11_bitmap.cpp,v 1.9 2003/06/01 22:11:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -73,7 +73,8 @@ X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
  
     AlphaColor = (AColor & 0xff) << 16 | (AColor & 0xff00) | 
                  (AColor & 0xff0000) >> 16;
-                 
+     
+    XLOCK;
     imlib_context_set_display( display );
     imlib_context_set_visual( visual );
     imlib_context_set_colormap( DefaultColormap( display, screen ) );
@@ -107,6 +108,7 @@ X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
     imlib_image_set_has_alpha( 1 );
     imlib_image_set_irrelevant_alpha( 0 );
     imlib_image_put_back_data( data );
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, Graphics *from, int x, int y,
@@ -151,8 +153,10 @@ X11Bitmap::~X11Bitmap()
 {
     if( Img )
     {
+        XLOCK;
         imlib_context_set_image( Img );
         imlib_free_image();
+        XUNLOCK;
     }
 }
 //---------------------------------------------------------------------------
@@ -161,10 +165,12 @@ void X11Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
 {
     if( Img )
     {
+        XLOCK;
         Drawable destImg = ( (X11Graphics *)dest )->GetImage();
         imlib_context_set_image( Img );
         imlib_context_set_drawable( destImg );
         imlib_render_image_part_on_drawable_at_size( x, y, w, h, xRef, yRef, w, h );
+        XUNLOCK;
     }
 }
 //---------------------------------------------------------------------------

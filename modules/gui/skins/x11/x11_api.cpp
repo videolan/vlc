@@ -2,7 +2,7 @@
  * x11_api.cpp: Various x11-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_api.cpp,v 1.4 2003/06/01 16:39:49 asmax Exp $
+ * $Id: x11_api.cpp,v 1.5 2003/06/01 22:11:24 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -32,6 +32,7 @@
 #include "../src/skin_common.h"
 #include "../src/theme.h"
 #include "../src/window.h"
+#include "../os_theme.h"
 #include "../os_window.h"
 #include "../os_api.h"
 #include "../src/event.h"       // for MAX_PARAM_SIZE
@@ -74,7 +75,10 @@ void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int para
     {
         event.xclient.window = (( X11Window *)win)->GetHandle();
     }
-    XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, &event );
+    XLOCK;
+    XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, 
+                &event );
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 
@@ -117,8 +121,10 @@ int OSAPI_GetTime()
 //---------------------------------------------------------------------------
 void OSAPI_GetScreenSize( int &w, int &h )
 {
-/*    w = GetSystemMetrics(SM_CXSCREEN);
-    h = GetSystemMetrics(SM_CYSCREEN);*/
+    Display *display = g_pIntf->p_sys->display;
+    int screen = DefaultScreen( display );
+    w = DisplayWidth( display, screen );
+    h = DisplayHeight( display, screen );
 }
 //---------------------------------------------------------------------------
 void OSAPI_GetMousePos( int &x, int &y )
@@ -129,8 +135,10 @@ void OSAPI_GetMousePos( int &x, int &y )
     unsigned int xmask;
     
     Window root = DefaultRootWindow( g_pIntf->p_sys->display );
+    XLOCK;
     XQueryPointer( g_pIntf->p_sys->display, root, &rootReturn, &childReturn, 
                    &rootx, &rooty, &winx, &winy, &xmask );
+    XUNLOCK;
     x = rootx;
     y = rooty;
 }

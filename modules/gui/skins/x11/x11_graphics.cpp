@@ -2,7 +2,7 @@
  * x11_graphics.cpp: X11 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.cpp,v 1.5 2003/06/01 16:39:49 asmax Exp $
+ * $Id: x11_graphics.cpp,v 1.6 2003/06/01 22:11:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -35,6 +35,8 @@
 #include "../src/graphics.h"
 #include "../src/window.h"
 #include "../os_window.h"
+#include "../src/theme.h"
+#include "../os_theme.h"
 #include "x11_graphics.h"
 #include "../src/skin_common.h"
 
@@ -55,36 +57,45 @@ X11Graphics::X11Graphics( intf_thread_t *p_intf, int w, int h,
         Window fromWnd = ( (X11Window *)from )->GetHandle();
 
         XWindowAttributes attr;
+        XLOCK;
         XGetWindowAttributes( display, fromWnd, &attr);
-
         Image = XCreatePixmap( display, fromWnd, w, h, attr.depth );
+        XUNLOCK;
         Gc = DefaultGC( display, screen );
     }
     else
     {
         Window root = DefaultRootWindow( display );
+        XLOCK;
         Image = XCreatePixmap( display, root, w, h,
                                DefaultDepth( display, screen ) );
+        XUNLOCK;
         Gc = DefaultGC( display, screen );
     }
 
     // Set the background color to black
     XGCValues gcVal;
     gcVal.foreground = 0;
+    XLOCK;
     XChangeGC( display, Gc, GCForeground,  &gcVal );
     XFillRectangle( display, Image, Gc, 0, 0, w, h );    
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 X11Graphics::~X11Graphics()
 {
+    XLOCK;
     XFreePixmap( display, Image );
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
                               int sx, int sy, int Flag )
 {
+    XLOCK;
     XCopyArea( display, (( X11Graphics* )Src )->GetImage(), Image, Gc, 
-            sx, sy, dw, dh, dx, dy );
+               sx, sy, dw, dh, dx, dy );
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Graphics::DrawRect( int x, int y, int w, int h, int color )
