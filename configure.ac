@@ -1622,7 +1622,14 @@ dnl
 AC_ARG_ENABLE(screen,
   [  --enable-screen            Screen capture support (default enabled)])
 if test "${enable_screen}" != "no" && test "${SYS}" != "darwin"; then
-  if test "${SYS}" != "mingw32"; then
+  if test "${SYS}" = "mingw32"; then
+    VLC_ADD_PLUGINS([screen])
+    VLC_ADD_LDFLAGS([screen],[-lgdi32])
+  elif test "${SYS}" = "beos"; then
+    VLC_ADD_PLUGINS([screen])
+    VLC_ADD_CXXFLAGS([screen],[])
+    VLC_ADD_LDFLAGS([screen],[-lbe])
+  else
     CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
     AC_CHECK_HEADERS(X11/Xlib.h, [
       VLC_ADD_PLUGINS([screen])
@@ -1630,9 +1637,6 @@ if test "${enable_screen}" != "no" && test "${SYS}" != "darwin"; then
       VLC_ADD_CPPFLAGS([screen],[-I${x_includes}])
     ])
     CPPFLAGS="${CPPFLAGS_save}"
-  else
-    VLC_ADD_PLUGINS([screen])
-    VLC_ADD_LDFLAGS([screen],[-lgdi32])
   fi
 fi
 
@@ -3936,6 +3940,7 @@ AC_CONFIG_FILES([
   modules/access/cdda/Makefile
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile
+  modules/access/screen/Makefile
   modules/access_output/Makefile
   modules/audio_filter/Makefile
   modules/audio_filter/channel_mixer/Makefile
