@@ -1,5 +1,7 @@
 0.1.99j:
 
+  * Added hardware YUV overlay support (SDL). Huge performance
+    increase.
   * Minor changes in the Debian files.
   * Fixed fps display.
   * Fixed MPEG1 video decoding. We don't read MPEG 1 PS files for the

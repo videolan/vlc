@@ -199,7 +199,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         p_es = &p_input->p_es[i_index];
         p_es->i_id = i_es_id;
         intf_DbgMsg("Slot %d in p_es table assigned to ES %d",
-                    i_index, i_es_pid);
+                    i_index, i_es_id);
 
         /* Init its values */
         p_es->b_discontinuity = 0;

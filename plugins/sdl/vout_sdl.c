@@ -51,6 +51,9 @@
 typedef struct vout_sys_s
 {
     SDL_Surface *   p_display;                             /* display device */
+    SDL_Overlay *   p_overlay;                             /* overlay device */
+    boolean_t   b_fullscreen;
+    boolean_t   b_reopen_display;
     Uint8   *   p_buffer[2];
                                                      /* Buffers informations */
     boolean_t   b_must_acquire;           /* must be acquired before writing */
@@ -59,8 +62,7 @@ typedef struct vout_sys_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int     SDLOpenDisplay   ( vout_thread_t *p_vout, 
-                                  char *psz_display, void *p_data );
+static int     SDLOpenDisplay   ( vout_thread_t *p_vout );
 static void    SDLCloseDisplay  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
@@ -73,7 +75,6 @@ static void    SDLCloseDisplay  ( vout_thread_t *p_vout );
 int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
                     int i_root_window, void *p_data )
 {
-    SDL_Overlay * screen;
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -82,28 +83,39 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
         return( 1 );
     }
 
-    /* Open and initialize device */
-    
-    if( SDLOpenDisplay( p_vout, psz_display, p_data ) )
+    p_vout->p_sys->p_display = NULL;
+    p_vout->p_sys->p_overlay = NULL;
+
+    /* Initialize library */
+    if( SDL_Init(SDL_INIT_VIDEO) < 0 )
     {
-        intf_ErrMsg( "error: can't initialize SDL display\n" );
+        intf_ErrMsg( "error: can't initialize SDL library: %s\n",
+                     SDL_GetError() );
         free( p_vout->p_sys );
         return( 1 );
     }
-    
-    
-    screen = SDL_CreateYUVOverlay( 
-                10, 
-                10, 
-                SDL_IYUV_OVERLAY, 
-                p_vout->p_sys->p_display 
-                );
-    intf_ErrMsg("[YUV acceleration] : %d",screen->hw_overlay);
-    if(screen->hw_overlay) 
+
+    if( SDLOpenDisplay(p_vout) )
     {
-        //hw_acceleration !
-        p_vout->b_need_render = 0;
+        intf_ErrMsg( "error: can't initialize SDL library: %s\n",
+                     SDL_GetError() );
+        free( p_vout->p_sys );
+        return( 1 );
     }
+
+    /* Force the software yuv even if it is not used */
+    /* If we don't do this, p_vout is not correctly initialized
+       and it's impossible to switch between soft/hard yuv */
+    p_vout->b_need_render = 1;
+
+    if(psz_display != NULL && strcmp(psz_display,"fullscreen")==0)
+    {
+        p_vout->p_sys->b_fullscreen = 1;
+    } else {
+        p_vout->p_sys->b_fullscreen = 0;
+    }
+    p_vout->p_sys->b_reopen_display = 1;
+
     return( 0 );
 }
 
@@ -117,7 +129,7 @@ int vout_SDLInit( vout_thread_t *p_vout )
     /* Acquire first buffer */
     if( p_vout->p_sys->b_must_acquire )
     {
-		SDL_LockSurface(p_vout->p_sys->p_display);
+        SDL_LockSurface(p_vout->p_sys->p_display);
     }
 
     return( 0 );
@@ -157,7 +169,28 @@ void vout_SDLDestroy( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_SDLManage( vout_thread_t *p_vout )
 {
-    /* FIXME: 8bpp: change palette ?? */
+    /* If the display has to be reopened we do so */
+    if( p_vout->p_sys->b_reopen_display )
+    {
+        p_vout->p_sys->b_must_acquire = 0;
+        if( p_vout->p_sys->p_display )
+        {
+            if( p_vout->p_sys->p_overlay )
+            {
+                SDL_FreeYUVOverlay(p_vout->p_sys->p_overlay);
+                p_vout->p_sys->p_overlay = NULL;
+            }
+            SDL_FreeSurface( p_vout->p_sys->p_display );
+            p_vout->p_sys->p_display = NULL;
+        }
+
+        if( SDLOpenDisplay(p_vout) )
+        {
+          intf_ErrMsg( "error: can't open DISPLAY default display\n" );
+          return( 1 );
+        }
+        p_vout->p_sys->b_reopen_display = 0;
+    }
     return( 0 );
 }
 
@@ -169,7 +202,6 @@ int vout_SDLManage( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_SDLDisplay( vout_thread_t *p_vout )
 {
-    SDL_Overlay * screen;
     SDL_Rect    disp;
     if(p_vout->b_need_render)
     {  
@@ -179,48 +211,59 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
             
             SDL_Flip( p_vout->p_sys->p_display );
             
-            //Swap buffers and change write frame
+            /* Swap buffers and change write frame */
             SDL_LockSurface ( p_vout->p_sys->p_display );
         }
-     } else {
+     }
+     else
+     {
         
         /*
-         * p_vout->yuv.p_buffer contains the YUV buffer to render 
+         * p_vout->p_rendered_pic->p_y/u/v contains the YUV buffers to render 
          */
-        
-        screen = SDL_CreateYUVOverlay( 
-                    p_vout->p_rendered_pic->i_width, 
-                    p_vout->p_rendered_pic->i_height, 
-                    SDL_IYUV_OVERLAY, 
-                    p_vout->p_sys->p_display 
-                    );
-         
-        SDL_LockYUVOverlay(screen);
-        //* screen->pixels = calloc( p_vout->i_width * p_vout->i_height * 3, 1);
-        //*screen->pixels =  p_vout->yuv.p_buffer;
-        /*    *screen->pixels = malloc( p_vout->i_width * p_vout->i_height * 3 );
-        memcpy( *screen->pixels, p_vout->p_rendered_pic->p_y,  p_vout->i_width * p_vout->i_height );
-        memcpy( *screen->pixels +  p_vout->i_width * p_vout->i_height, 
-                p_vout->p_rendered_pic->p_u,  
-                p_vout->i_width * p_vout->i_height );
-        memcpy( *screen->pixels +  p_vout->i_width * p_vout->i_height * 2,
-                p_vout->p_rendered_pic->p_v,
-                p_vout->i_width * p_vout->i_height ); */
-        
+        if( p_vout->p_sys->b_must_acquire )
+        {
+            /* TODO: support for streams other than 4:2:0 */
+            /* create the overlay if necessary */
+            if( !p_vout->p_sys->p_overlay )
+            {
+                p_vout->p_sys->p_overlay = SDL_CreateYUVOverlay( 
+                                             p_vout->p_rendered_pic->i_width, 
+                                             p_vout->p_rendered_pic->i_height, 
+                                             SDL_YV12_OVERLAY, 
+                                             p_vout->p_sys->p_display
+                                           );
+                intf_Msg("[YUV acceleration] : %d\n",
+                            p_vout->p_sys->p_overlay->hw_overlay);
+            }
 
-        //    *screen->pixels =  p_vout->p_rendered_pic->p_y;
-        *screen->pixels =  p_vout->p_rendered_pic->p_data;
+            SDL_LockYUVOverlay(p_vout->p_sys->p_overlay);
+            /* copy the data into video buffers */
+            /* Y first */
+            memcpy(p_vout->p_sys->p_overlay->pixels[0],
+                   p_vout->p_rendered_pic->p_y,
+                   p_vout->p_sys->p_overlay->h *
+                   p_vout->p_sys->p_overlay->pitches[0]);
+            /* then V */
+            memcpy(p_vout->p_sys->p_overlay->pixels[1],
+                   p_vout->p_rendered_pic->p_v,
+                   p_vout->p_sys->p_overlay->h *
+                   p_vout->p_sys->p_overlay->pitches[1] / 2);
+            /* and U */
+            memcpy(p_vout->p_sys->p_overlay->pixels[2],
+                   p_vout->p_rendered_pic->p_u,
+                   p_vout->p_sys->p_overlay->h *
+                   p_vout->p_sys->p_overlay->pitches[2] / 2);
         
-        disp.x = 0;
-        disp.y = 0;
-        disp.w = p_vout->i_width;
-        disp.h = p_vout->i_height;
-        SDL_UnlockYUVOverlay(screen);
+            disp.x = 0;
+            disp.y = 0;
+            disp.w = p_vout->i_width;
+            disp.h = p_vout->i_height;
         
-        SDL_DisplayYUVOverlay( screen , &disp );
-        //    free(* screen -> pixels);
-        SDL_FreeYUVOverlay(screen);
-     }
+            SDL_DisplayYUVOverlay( p_vout->p_sys->p_overlay , &disp );
+            SDL_UnlockYUVOverlay(p_vout->p_sys->p_overlay);
+        }
+    }
 }
 
 /* following functions are local */
@@ -231,22 +274,14 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
  * Open and initialize display according to preferences specified in the vout
  * thread fields.
  *****************************************************************************/
-static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_data )
+static int SDLOpenDisplay( vout_thread_t *p_vout )
 {
     SDL_Rect    clipping_rect;
     
-    /* Initialize library */
-    if( SDL_Init(SDL_INIT_VIDEO) < 0 )
-    {
-        intf_ErrMsg( "error: can't initialize SDL library: %s\n",
-                     SDL_GetError() );
-        return( 1 );
-    }
-
     /* Open display 
      * TODO: Check that we can request for a DOUBLEBUF HWSURFACE display
      */
-    if(psz_display != NULL && strcmp(psz_display,"fullscreen")==0)
+    if( p_vout->p_sys->b_fullscreen )
     {
         p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
             p_vout->i_height, 
@@ -266,6 +301,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
         intf_ErrMsg( "error: can't open DISPLAY default display\n" );
         return( 1 );
     }
+    p_vout->p_sys->p_overlay = NULL;
     SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);	/* ignore keys up */
 
@@ -334,7 +370,18 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
  *****************************************************************************/
 static void SDLCloseDisplay( vout_thread_t *p_vout )
 {
-    SDL_FreeSurface( p_vout->p_sys->p_display );
+    if( p_vout->p_sys->p_display )
+    {
+        p_vout->p_sys->b_must_acquire = 0;
+        if( p_vout->p_sys->p_overlay )
+        {
+            SDL_FreeYUVOverlay(p_vout->p_sys->p_overlay);
+            p_vout->p_sys->p_overlay = NULL;
+        }
+        SDL_FreeSurface( p_vout->p_sys->p_display );
+        p_vout->p_sys->p_display = NULL;
+    }
+
     SDL_Quit();
 }
 

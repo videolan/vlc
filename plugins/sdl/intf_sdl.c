@@ -64,6 +64,9 @@ typedef struct intf_sys_s
 typedef struct vout_sys_s
 {
     SDL_Surface *   p_display;                             /* display device */
+    SDL_Overlay *   p_overlay;
+    boolean_t   b_fullscreen;
+    boolean_t   b_reopen_display;
     Uint8   *   p_buffer[2];
                                                      /* Buffers informations */
     boolean_t   b_must_acquire;           /* must be acquired before writing */
@@ -146,14 +149,14 @@ void intf_SDLDestroy( intf_thread_t *p_intf )
  *****************************************************************************/
 void intf_SDLManage( intf_thread_t *p_intf )
 {
-	SDL_Event event; 										/*	SDL event	 */
+    SDL_Event event;                                            /* SDL event */
     Uint8   i_key;
     
-    while ( SDL_PollEvent(&event) ) 
+    while ( SDL_PollEvent(&event) )
     {
         i_key = event.key.keysym.sym;                          /* forward it */
-        
-        switch (event.type) {           
+
+        switch (event.type) {
             case SDL_KEYDOWN:                         /* if a key is pressed */
                 switch(i_key) {
                                                     /* switch to fullscreen  */
@@ -166,7 +169,7 @@ void intf_SDLManage( intf_thread_t *p_intf )
                   default :
                         if( intf_ProcessKey( p_intf, (char ) i_key ) )
                         {
-                            intf_DbgMsg( "unhandled key '%c' (%i)\n", 
+                            intf_DbgMsg( "unhandled key '%c' (%i)\n",
                                          (char) i_key, i_key );
                         }
                         break;
@@ -190,71 +193,8 @@ void intf_SDL_YUVSwitch(intf_thread_t * p_intf)
 }
 void intf_SDL_Fullscreen(intf_thread_t * p_intf)
 {
-    SDL_Rect    clipping_rect;
-    
-    SDL_FreeSurface( p_intf->p_vout->p_sys->p_display );
-    
-    if(p_intf->p_sys->b_Fullscreen == 0)
-    {
-        p_intf->p_vout->p_sys->p_display = 
-                SDL_SetVideoMode(
-                                 p_intf->p_vout->i_width,
-                                 p_intf->p_vout->i_height,
-                                 0,
-                                 SDL_ANYFORMAT |
-                                 SDL_HWSURFACE |
-                                 SDL_DOUBLEBUF);
-        p_intf->p_sys->b_Fullscreen = 1;
-        SDL_ShowCursor( 1 );
-    }
-    else
-    {
-        p_intf->p_vout->p_sys->p_display = 
-                SDL_SetVideoMode(
-                                 p_intf->p_vout->i_width,
-                                 p_intf->p_vout->i_height,
-                                 0,
-                                 SDL_ANYFORMAT |
-                                 SDL_HWSURFACE |
-                                 SDL_DOUBLEBUF |
-                                 SDL_FULLSCREEN );
-        p_intf->p_sys->b_Fullscreen = 0;                        
-        SDL_ShowCursor( 0 );
-    }
-    SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
-    SDL_EventState(SDL_KEYUP , SDL_IGNORE);
-    p_intf->p_vout->p_sys->p_buffer[ 0 ] = p_intf->p_vout->p_sys->p_display->pixels;
-    
-    SDL_Flip(p_intf->p_vout->p_sys->p_display);
-    p_intf->p_vout->p_sys->p_buffer[ 1 ] = p_intf->p_vout->p_sys->p_display->pixels;
-    
-    SDL_Flip(p_intf->p_vout->p_sys->p_display);
-
-    /* Clipping zone for the text */
-    clipping_rect.x = 0;
-    clipping_rect.y = 0;
-    clipping_rect.w = p_intf->p_vout->p_sys->p_display->w;
-    clipping_rect.h = p_intf->p_vout->p_sys->p_display->h;
-    SDL_SetClipRect(p_intf->p_vout->p_sys->p_display, &clipping_rect);
-    
-    p_intf->p_vout->i_width =           p_intf->p_vout->p_sys->p_display->w;
-    p_intf->p_vout->i_height =          p_intf->p_vout->p_sys->p_display->h;
-
-    p_intf->p_vout->i_bytes_per_line = 
-        p_intf->p_vout->p_sys->p_display->format->BytesPerPixel 
-        * 
-        p_intf->p_vout->p_sys->p_display->w ;
-
-    p_intf->p_vout->i_screen_depth =    
-        p_intf->p_vout->p_sys->p_display->format->BitsPerPixel;
-    p_intf->p_vout->i_bytes_per_pixel = 
-        p_intf->p_vout->p_sys->p_display->format->BytesPerPixel;
-    p_intf->p_vout->i_red_mask =        
-        p_intf->p_vout->p_sys->p_display->format->Rmask;
-    p_intf->p_vout->i_green_mask =      
-        p_intf->p_vout->p_sys->p_display->format->Gmask;
-    p_intf->p_vout->i_blue_mask =       
-        p_intf->p_vout->p_sys->p_display->format->Bmask;
+    p_intf->p_vout->p_sys->b_fullscreen = 1-p_intf->p_vout->p_sys->b_fullscreen;
+    p_intf->p_vout->p_sys->b_reopen_display = 1;
 } 
     
 
