@@ -1,11 +1,11 @@
 /*****************************************************************************
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_beos.cpp,v 1.10 2001/01/13 12:57:19 sam Exp $
+ * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * $Id: aout_beos.cpp,v 1.11 2001/02/17 08:48:56 sam Exp $
  *
- * Authors:
- * Samuel Hocevar <sam@via.ecp.fr>
+ * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

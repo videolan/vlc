@@ -1,11 +1,11 @@
 /*****************************************************************************
  * intf_beos.cpp: beos interface
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_beos.cpp,v 1.6 2001/01/05 18:46:43 massiot Exp $
+ * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * $Id: intf_beos.cpp,v 1.7 2001/02/17 08:48:56 sam Exp $
  *
- * Authors:
- * Jean-Marc Dressler
+ * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,11 +44,8 @@ extern "C"
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
-
-#include "input.h"
-#include "video.h"
-#include "video_output.h"
+#include "tests.h"
+#include "modules.h"
 
 #include "intf_msg.h"
 #include "interface.h"
@@ -124,9 +121,45 @@ extern "C"
 {
 
 /*****************************************************************************
- * intf_BeCreate: initialize dummy interface
+ * Local prototypes.
  *****************************************************************************/
-int intf_BeCreate( intf_thread_t *p_intf )
+static int  intf_Probe     ( probedata_t *p_data );
+static int  intf_Open      ( intf_thread_t *p_intf );
+static void intf_Close     ( intf_thread_t *p_intf );
+static void intf_Run       ( intf_thread_t *p_intf );
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void intf_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = intf_Probe;
+    p_function_list->functions.intf.pf_open  = intf_Open;
+    p_function_list->functions.intf.pf_close = intf_Close;
+    p_function_list->functions.intf.pf_run   = intf_Run;
+}
+
+/*****************************************************************************
+ * intf_Probe: probe the interface and return a score
+ *****************************************************************************
+ * This function tries to initialize Gnome and returns a score to the
+ * plugin manager so that it can select the best plugin.
+ *****************************************************************************/
+static int intf_Probe( probedata_t *p_data )
+{
+    if( TestMethod( INTF_METHOD_VAR, "beos" ) )
+    {
+        return( 999 );
+    }
+
+    return( 1 );
+}
+
+/*****************************************************************************
+ * intf_Create: initialize dummy interface
+ *****************************************************************************/
+static int intf_Create( intf_thread_t *p_intf )
 {
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t*) malloc( sizeof( intf_sys_t ) );
@@ -139,7 +172,8 @@ int intf_BeCreate( intf_thread_t *p_intf )
     
     /* Create the interface window */
     p_intf->p_sys->p_window =
-        new InterfaceWindow( BRect( 100, 100, 200, 200 ), "Interface :)", p_intf );
+        new InterfaceWindow( BRect( 100, 100, 200, 200 ),
+                             "Interface :)", p_intf );
     if( p_intf->p_sys->p_window == 0 )
     {
         free( p_intf->p_sys );
@@ -147,17 +181,6 @@ int intf_BeCreate( intf_thread_t *p_intf )
         return( 1 );
     }
     
-    /* Spawn video output thread */
-    if( p_main->b_video )
-    {
-        p_intf->p_vout = vout_CreateThread( NULL, 0, 0, 0, NULL, 0, NULL );
-        if( p_intf->p_vout == NULL )                                /* error */
-        {
-            intf_ErrMsg("intf error: can't create output thread" );
-            return( 1 );
-        }
-    }
-
     /* Bind normal keys. */
     intf_AssignNormalKeys( p_intf );
 
@@ -165,22 +188,10 @@ int intf_BeCreate( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_BeDestroy: destroy dummy interface
+ * intf_Destroy: destroy dummy interface
  *****************************************************************************/
-void intf_BeDestroy( intf_thread_t *p_intf )
+static void intf_Destroy( intf_thread_t *p_intf )
 {
-    /* Close input thread, if any (blocking) */
-    if( p_intf->p_input )
-    {
-        input_DestroyThread( p_intf->p_input, NULL );
-    }
-
-    /* Close video output thread, if any (blocking) */
-    if( p_intf->p_vout )
-    {
-        vout_DestroyThread( p_intf->p_vout, NULL );
-    }
-
     /* Destroy the interface window */
     p_intf->p_sys->p_window->Lock();
     p_intf->p_sys->p_window->Quit();    
@@ -191,14 +202,24 @@ void intf_BeDestroy( intf_thread_t *p_intf )
 
 
 /*****************************************************************************
- * intf_BeManage: event loop
+ * intf_Run: event loop
  *****************************************************************************/
-void intf_BeManage( intf_thread_t *p_intf )
+static void intf_Run( intf_thread_t *p_intf )
 {
-    if( p_intf->p_sys->i_key != -1 )
+    while( !p_intf->b_die )
     {
-        intf_ProcessKey( p_intf, p_intf->p_sys->i_key );
-        p_intf->p_sys->i_key = -1;
+        /* Manage core vlc functions through the callback */
+        p_intf->pf_manage( p_intf );
+
+        /* Manage keys */
+        if( p_intf->p_sys->i_key != -1 )
+        {
+            intf_ProcessKey( p_intf, p_intf->p_sys->i_key );
+            p_intf->p_sys->i_key = -1;
+        }
+
+        /* Wait a bit */
+        msleep( INTF_IDLE_SLEEP );
     }
 }
 

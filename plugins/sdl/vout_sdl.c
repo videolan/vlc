@@ -175,7 +175,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if( SDLOpenDisplay(p_vout) )
     {
-        intf_ErrMsg( "vout error: can't initialize SDL (%s)", SDL_GetError() );
+        intf_ErrMsg( "vout error: can't set up SDL (%s)", SDL_GetError() );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -262,15 +262,20 @@ static int vout_Manage( vout_thread_t *p_vout )
             p_vout->i_changes |= VOUT_SIZE_CHANGE;
             break;
 
+        case SDL_MOUSEBUTTONUP:
+            switch( event.button.button )
+            {
+            case SDL_BUTTON_RIGHT:
+                p_main->p_intf->b_menu_change = 1;
+                break;
+            }
+            break;
+
         case SDL_MOUSEBUTTONDOWN:
             switch( event.button.button )
             {
             case SDL_BUTTON_MIDDLE:
                 p_vout->i_changes |= VOUT_CURSOR_CHANGE;
-                break;
-
-            case SDL_BUTTON_RIGHT:
-                p_main->p_intf->b_menu_change = 1;
                 break;
             }
             break;
@@ -337,7 +342,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         SDLCloseDisplay( p_vout );
         if( SDLOpenDisplay( p_vout ) )
         {
-          intf_ErrMsg( "error: can't open DISPLAY default display" );
+          intf_ErrMsg( "vout error: can't reopen display after resize" );
           return( 1 );
         }
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
@@ -354,7 +359,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         SDLCloseDisplay( p_vout );
         if( SDLOpenDisplay( p_vout ) )
         {
-          intf_ErrMsg( "error: can't open DISPLAY default display" );
+          intf_ErrMsg( "error: can't reopen display after YUV change" );
           return( 1 );
         }
         p_vout->i_changes &= ~VOUT_YUV_CHANGE;
@@ -533,13 +538,13 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
     else
         flags |= SDL_SWSURFACE; /* save video memory */
 
-    bpp = SDL_VideoModeOK(p_vout->p_sys->i_width,
-                          p_vout->p_sys->i_height,
-                          p_vout->i_screen_depth, flags);
+    bpp = SDL_VideoModeOK( p_vout->p_sys->i_width,
+                           p_vout->p_sys->i_height,
+                           p_vout->i_screen_depth, flags );
 
     if(bpp == 0)
     {
-        intf_ErrMsg( "error: can't open DISPLAY default display" );
+        intf_ErrMsg( "vout error: no video mode available" );
         return( 1 );
     }
 
@@ -549,7 +554,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_display == NULL )
     {
-        intf_ErrMsg( "error: can't open DISPLAY default display" );
+        intf_ErrMsg( "vout error: cannot set video mode" );
         return( 1 );
     }
 
@@ -563,7 +568,6 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
     SDL_WM_SetCaption( VOUT_TITLE " (SDL output)",
                        VOUT_TITLE " (SDL output)" );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);                /* ignore keys up */
-    SDL_EventState(SDL_MOUSEBUTTONUP, SDL_IGNORE);          
 
     if( p_vout->b_need_render )
     {

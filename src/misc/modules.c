@@ -24,6 +24,12 @@
 
 #include "config.h"
 
+/* Some faulty libcs have a broken struct dirent when _FILE_OFFSET_BITS
+ * is set to 64. Don't try to be cleverer. */
+#ifdef _FILE_OFFSET_BITS
+#undef _FILE_OFFSET_BITS
+#endif
+
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */

@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.13 2001/02/16 06:37:09 sam Exp $
+ * $Id: vout_x11.c,v 1.14 2001/02/17 08:48:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -114,8 +114,7 @@ static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Display   ( struct vout_thread_s * );
 static void vout_SetPalette( struct vout_thread_s *, u16*, u16*, u16*, u16* );
 
-static int  X11CreateWindow             ( vout_thread_t *p_vout );
-
+static int  X11CreateWindow     ( vout_thread_t *p_vout );
 static int  X11InitDisplay      ( vout_thread_t *p_vout, char *psz_display );
 
 static int  X11CreateImage      ( vout_thread_t *p_vout, XImage **pp_ximage );
@@ -125,7 +124,6 @@ static int  X11CreateShmImage   ( vout_thread_t *p_vout, XImage **pp_ximage,
 static void X11DestroyShmImage  ( vout_thread_t *p_vout, XImage *p_ximage,
                                   XShmSegmentInfo *p_shm_info );
 
-/* local prototypes */
 static void X11TogglePointer            ( vout_thread_t *p_vout );
 static void X11EnableScreenSaver        ( vout_thread_t *p_vout );
 static void X11DisableScreenSaver       ( vout_thread_t *p_vout );
@@ -354,7 +352,8 @@ static int vout_Manage( vout_thread_t *p_vout )
     b_resized = 0;
     while( XCheckWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
                               StructureNotifyMask | KeyPressMask |
-                              ButtonPressMask, &xevent ) == True )
+                              ButtonPressMask | ButtonReleaseMask, &xevent )
+           == True )
     {
         /* ConfigureNotify event: prepare  */
         if( (xevent.type == ConfigureNotify)
@@ -412,7 +411,13 @@ static int vout_Manage( vout_thread_t *p_vout )
                 case Button2:
                     X11TogglePointer( p_vout );
                     break;
-
+            }
+        }
+        /* Mouse release */
+        else if( xevent.type == ButtonRelease )
+        {
+            switch( ((XButtonEvent *)&xevent)->button )
+            {
                 case Button3:
                     /* FIXME: need locking ! */
                     p_main->p_intf->b_menu_change = 1;
@@ -678,7 +683,8 @@ static int X11CreateWindow( vout_thread_t *p_vout )
     } while( !( b_expose && b_configure_notify && b_map_notify ) );
 
     XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                  StructureNotifyMask | KeyPressMask | ButtonPressMask );
+                  StructureNotifyMask | KeyPressMask |
+                  ButtonPressMask | ButtonReleaseMask );
 
     if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
     {
