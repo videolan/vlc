@@ -39,7 +39,6 @@ Description: fix subtitle regressions
 Multi-line subtitles are not aligned correctly.<br />
 Text subtitles don't work with 32bpp rgb.<br />
 Investigate behaviour of subpictures when pausing.<br />
-Negative delaying broken<br />
 Status: Todo
 
 
@@ -83,7 +82,6 @@ Difficulty: Guru
 Urgency: Normal
 Platform: any
 Description: Multi-input
-* Core support done<br />
 * Many demuxers don't support it<br />
 * Need GUI elements
 Status: Assigned to fenrir
@@ -157,8 +155,8 @@ Task
 Difficulty: Medium
 Urgency: Normal
 Platform: any
-Description: fix current muxers.
-Our avi muxer doesn't produce valid files
+Description: fix current muxers.<br />
+Our avi muxer doesn't produce valid files<br />
 Status: Todo
 
 Task
@@ -166,7 +164,8 @@ Difficulty: Easy
 Urgency: Normal
 Platform: Mac OS X
 Description: LPCM
-The LPCM decoder outputs really small samples which aren't accepted properly by the macosx coreaudio resampler, causing VLC to not output any sound with many DVD's. A test sample that shows this effect on the mac is the Madonna clip.
+The LPCM decoder outputs really small samples which aren't accepted properly by the macosx coreaudio resampler, causing VLC to not output any sound with many DVD's. A test sample that shows this effect on the mac is the Madonna clip.<br />
+This is now fixed, but there is a problem with buffers in the resampler that now sometimes overflows (or rather get changed after they are released). A good method for reproduction seems to be running Finding Nemo for a minute or 8.
 Status: Todo
 
 Task
@@ -216,7 +215,7 @@ Difficulty: Easy
 Platform: Win32, Linux
 Urgency: Normal
 Description: equalizer fixes
-    - Gray out "reset to defaults" for audio equalizer when disabled<br />
+   - Gray out "reset to defaults" for audio equalizer when disabled<br />
    - Once audio equalizer is disabled, it doesn't enable the first
      try when you select from main menu. It only works a 2nd change
      (enable flag not properly set?).
@@ -239,7 +238,7 @@ Difficulty: Guru
 Urgency: Normal
 Platform: Mac OS X
 Description: SVCD support
-libcdio needs to be ported to the Mac to support the cddax and vcdx modules for proper SVCD support
+Support the cddax and vcdx modules for proper SVCD support. libcdio seems to work a tad flacky under OS X. Cause is unknown.
 Status: Todo
 
 Task
@@ -289,10 +288,8 @@ Difficulty: Hard
 Platform: WinCE
 Urgency: Wishlist
 Description: WinCE port finalizing
-The WinCE port is already quite functional but we still miss a GAPI video output (GDI works but is slow).
-Some code already exists for that (http://sourceforge.net/projects/vlcpocketpc/) and would need to be imported into the VLC source tree.
-Downloads should be added to the main vlc download page. We need an icon for this. 
-Status: Assigned to MixerAnderson and gibalou
+The WinCE port needs a little maturing and optimization.
+Status: Assigned to gibalou
 
 Task
 Difficulty: Medium
@@ -301,7 +298,7 @@ Platform: any
 Description: Full blown OSD system 
  In the line of freevo etc.
  (Checkout the correct svn branch)
-Status: 75% done. Assigned to thedj, jpsaman and yoann
+Status: 80% done. Assigned to thedj, jpsaman and yoann
 
 Task
 Difficulty: Easy
@@ -375,7 +372,8 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: More/Better Picture filters
-There are several picture filters (blend, scale), but we can use more (screenshot, crop, move..) We probably need on the fly picture filter insertion as well. (and also not-on-the-fly)
+There are several picture filters (blend, scale), but we can use more (screenshot, crop, move..) We probably need on the fly picture filter insertion as well. (and also not-on-the-fly)<br />
+- ideas for new filters are a greenwall filter, and a goom filter that mixes goom effects into the vout.
 Status: Todo
 
 Task
@@ -390,6 +388,7 @@ Description: Vout redesign
 - OSD at window resolution instead of video res (secondary vout channel)<br />
 - a OSD needs to be bound to a vout stream (no subs on goom vout)<br />
 - Use OS native calls where appropriate, with 'C' fallbacks. (OpenGL, Quartz, DirectX already has many of the funtionalities we seek and sometimes they are a lot faster too).<br />
+- Allow a vout to reuse a window by resizing it (instead of closing and opening).
 - better hotkeys integration
 Status: Todo
 
@@ -399,7 +398,6 @@ Urgency: Wishlist
 Platform: any
 Description: Subtitle work
 - better SSA support with postioning, colors etc.<br />
-- Fix subtitles dialogs (mac done)
 Status: Todo
 
 Task
@@ -415,7 +413,7 @@ Difficulty: Guru
 Urgency: Wishlist
 Platform: Mac OS X
 Description: skins2
-Port VLC skins to Objective C++ and OSX. Also requires the intf to be a dialog provider.<br />
+Port VLC skins to Objective C++ and OSX. Also requires the intf to be a dialog provider. There is already some code in the VLC sourcetree.<br />
 Hints:<br />
  - In a first step, the need for a dialog provider can be easily omitted.<br />
  - In theory, only a small amount of classes (6 or so) must be written for OS X, implementing predefined interfaces.<br />
@@ -466,6 +464,14 @@ Description: export paramaters of an input
  - bitrate<br />
  - resolution<br />
  - codecs, etc.<br />
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Wishlist
+Platform: any
+Description: statistics
+Count packetloss, bandwith usage and fps for statistics.<br />
 Status: Todo
 
 Task
@@ -623,7 +629,7 @@ Platform: any
 Urgency: Wishlist
 Description: More service discovery modules
 - Port UPnP support from http://sourceforge.net/project/showfiles.php?group_id=89768 <br />
-- libhal based discovery (should be able to find cd,dvd,capture cards,etc etc <br />
+- libhal based discovery (should be able to find cd, dvd, capture cards, etc etc <br />
 - Perhaps a generalized webpage parser (use user supplied templates to parse
    streams from popular websites )
 Status: Todo
