@@ -2,7 +2,7 @@
  * motionaltivec.c : Altivec motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionaltivec.c,v 1.4 2001/09/25 11:46:14 massiot Exp $
+ * $Id: motionaltivec.c,v 1.5 2001/09/28 14:17:16 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Paul Mackerras <paulus@linuxcare.com.au>
@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef __ALTIVEC__
+#ifndef __BUILD_ALTIVEC_ASM__
 
 #define MODULE_NAME motionaltivec
 #include "modules_inner.h"
@@ -94,10 +94,12 @@ static int motion_Probe( probedata_t *p_data )
  * Motion compensation in Altivec
  *****************************************************************************/
 
+#ifndef HAVE_C_ALTIVEC
+
 /*
  * The asm code is generated with:
  *
- * gcc-2.95 -fvec -D__ALTIVEC__ -O9 -fomit-frame-pointer -mregnames -S
+ * gcc-2.95 -fvec -D__BUILD_ALTIVEC_ASM__ -O9 -fomit-frame-pointer -mregnames -S
  *      motion_comp_altivec.c
  *
  * sed 's/.L/._L/g' motion_comp_altivec.s |
@@ -1126,7 +1128,10 @@ static void MC_avg_xy_8_altivec (uint8_t * dest, uint8_t * ref,
 	 );
 }
 
-#else	/* __ALTIVEC__ */
+#endif  /* !HAVE_C_ALTIVEC */
+#endif  /* __BUILD_ALTIVEC_ASM__ */
+
+#if defined(HAVE_C_ALTIVEC) || defined(__BUILD_ALTIVEC_ASM__)
 
 #define vector_s16_t vector signed short
 #define vector_u16_t vector unsigned short
@@ -2078,8 +2083,8 @@ void MC_avg_xy_8_altivec (unsigned char * dest, unsigned char * ref,
     vec_ste ((vector_u32_t)tmp, 4, (unsigned int *)dest);
 }
 
-#endif        /* __ALTIVEC__ */
-#ifndef __ALTIVEC__
+#endif        /* HAVE_C_ALTIVEC || __BUILD_ALTIVEC_ASM__ */
+#ifndef __BUILD_ALTIVEC_ASM__
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -2123,4 +2128,4 @@ static void motion_getfunctions( function_list_t * p_function_list )
     return;
 }
 
-#endif        /* __ALTIVEC__ */
+#endif        /* __BUILD_ALTIVEC_ASM__ */

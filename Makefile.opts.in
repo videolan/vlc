@@ -65,6 +65,7 @@ includedir = @includedir@
 # Libraries for special cases
 #
 LIB_ALSA = @LIB_ALSA@
+LIB_ALTIVEC = @LIB_ALTIVEC@
 LIB_BEOS = @LIB_BEOS@
 LIB_DARWIN = @LIB_DARWIN@
 LIB_DVD = @LIB_DVD@
@@ -90,6 +91,7 @@ LIB_YUV = @LIB_YUV@
 #
 # CFLAGS for special cases
 #
+CFLAGS_ALTIVEC = @CFLAGS_ALTIVEC@
 CFLAGS_DVD = @CFLAGS_DVD@
 CFLAGS_LIBDVDCSS = @CFLAGS_LIBDVDCSS@
 CFLAGS_GTK = @CFLAGS_GTK@
@@ -171,6 +173,9 @@ INCLUDE += -Iinclude -Iextras
 #
 # Libraries needed by built-in modules
 #
+# Let's go for a crude hack !
+LIB_MOTIONALTIVEC := $(LIB_ALTIVEC)
+LIB_IDCTALTIVEC := $(LIB_ALTIVEC)
 ifneq (,$(BUILTINS))
 LIB_BUILTINS := $(shell for i in ${BUILTINS} ; do echo $$i | tr '[a-z]' '[A-Z]' | sed -e 's/.*/$$LIB_&/' ; done)
 LIB += $(LIB_BUILTINS)
@@ -236,7 +241,7 @@ endif
 
 # Optimizations for PowerPC
 ifneq (,$(findstring powerpc,$(ARCH)))
-CFLAGS += -mmultiple -mhard-float -mstring -Wa,-m7400
+CFLAGS += -mmultiple -mhard-float -mstring
 endif
 
 # Optimizations for Sparc
@@ -258,7 +263,13 @@ DCFLAGS += -MM
 #
 LCFLAGS += @LCFLAGS@ $(LIB)
 LCFLAGS += -Wall
-#LCFLAGS += -s
+ifneq ($(DEBUG),1)
+ifneq ($(GPROF),1)
+ifneq ($(CPROF),1)
+LCFLAGS += -s
+endif
+endif
+endif
 ifneq (,$(findstring mingw32,$(SYS)))
 LCFLAGS += -mwindows -Xlinker --force-exe-suffix
 endif

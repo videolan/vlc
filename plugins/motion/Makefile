@@ -30,7 +30,7 @@ include ../../Makefile.modules
 
 $(PLUGIN_MOTIONALTIVEC): %.o: .dep/%.d
 $(PLUGIN_MOTIONALTIVEC): %.o: %.c
-	$(CC) $(CFLAGS) -DPLUGIN $(PCFLAGS) -faltivec -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_ALTIVEC) -DPLUGIN $(PCFLAGS) -c -o $@ $<
 
 $(BUILTIN_MOTION): BUILTIN_MOTION_%.o: .dep/%.d
 $(BUILTIN_MOTION): BUILTIN_MOTION_%.o: %.c
@@ -50,7 +50,7 @@ $(BUILTIN_MOTION3DNOW): BUILTIN_MOTION3DNOW_%.o: %.c
 
 $(BUILTIN_MOTIONALTIVEC): BUILTIN_MOTIONALTIVEC_%.o: .dep/%.d
 $(BUILTIN_MOTIONALTIVEC): BUILTIN_MOTIONALTIVEC_%.o: %.c
-	$(CC) $(CFLAGS) -DBUILTIN -DMODULE_NAME=motionaltivec -faltivec -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_ALTIVEC) -DBUILTIN -DMODULE_NAME=motionaltivec -faltivec -c -o $@ $<
 
 #
 # Real targets
@@ -92,7 +92,7 @@ $(BUILTIN_MOTIONALTIVEC): BUILTIN_MOTIONALTIVEC_%.o: %.c
 	$(RANLIB) $@
 
 ../motionaltivec.so: $(PLUGIN_MOTIONALTIVEC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS)
+	$(CC) $(PCFLAGS) -o $@ $^ $(LIB_ALTIVEC) $(PLCFLAGS)
 
 ../motionaltivec.a: $(BUILTIN_MOTIONALTIVEC)
 	ar r $@ $^

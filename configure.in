@@ -112,52 +112,68 @@ dnl Check for threads library
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
 
 dnl Check for ntohl, etc.
-CFLAGS="${save_CFLAGS} -Wall -Werror"
-AC_MSG_CHECKING([for ntohl in sys/param.h])
-AC_TRY_COMPILE([#include <sys/param.h>
-void foo() { int meuh; ntohl(meuh); }],,
- AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
- AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-
-dnl Check for inline function size limit
-CFLAGS="${save_CFLAGS} -finline-limit-30000"
-AC_MSG_CHECKING([if \$CC accepts -finline-limit])
-AC_TRY_COMPILE([],,
- save_CFLAGS="${save_CFLAGS} -finline-limit-30000"; AC_MSG_RESULT(yes),
- AC_MSG_RESULT(no))
-
-dnl Check for Darwin plugin linking flags
-CFLAGS="${save_CFLAGS} -bundle -undefined suppress"
-AC_MSG_CHECKING([if \$CC accepts -bundle -undefined suppress])
-AC_TRY_COMPILE([],,
- PLCFLAGS="${PLCFLAGS} -bundle -undefined suppress"; AC_MSG_RESULT(yes),
- AC_MSG_RESULT(no))
-
-dnl Check for standard plugin linking flags
-CFLAGS="${save_CFLAGS} -shared"
-AC_MSG_CHECKING([if \$CC accepts -shared])
-AC_TRY_COMPILE([],,
- PLCFLAGS="${PLCFLAGS} -shared"; AC_MSG_RESULT(yes),
- AC_MSG_RESULT(no))
-
-dnl Check for standard soname setting
-if test x"${SOFLAGS}" = x; then
-  try_SOFLAGS="-Wl,-soname -Wl,"
-  LDFLAGS="${save_LDFLAGS} ${try_SOFLAGS}foo.so.0"
-  AC_MSG_CHECKING([if linker accepts ${try_SOFLAGS}foo.so.0])
-  AC_TRY_LINK([],,
-   SOFLAGS="${try_SOFLAGS}"; AC_MSG_RESULT(yes),
-   AC_MSG_RESULT(no))
+AC_CACHE_CHECK([for ntohl in sys/param.h],
+    [ac_cv_c_ntohl_sys_param_h],
+    [CFLAGS="${save_CFLAGS} -Wall -Werror"
+     AC_TRY_COMPILE([#include <sys/param.h>],
+        [void foo() { int meuh; ntohl(meuh); }],
+        ac_cv_c_ntohl_sys_param_h=yes, ac_cv_c_ntohl_sys_param_h=no)])
+if test x"$ac_cv_c_ntohl_sys_param_h" != x"no"; then
+    AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
 
-dnl Check for SunOS soname setting
+dnl Check for inline function size limit
+AC_CACHE_CHECK([if \$CC accepts -finline-limit],
+    [ac_cv_c_inline_limit],
+    [CFLAGS="${save_CFLAGS} -finline-limit-30000"
+     AC_TRY_COMPILE([],,ac_cv_c_inline_limit=yes, ac_cv_c_inline_limit=no)])
+if test x"$ac_cv_c_inline_limit" != x"no"; then
+    save_CFLAGS="${save_CFLAGS} -finline-limit-30000"
+fi
+
+dnl Check for Darwin plugin linking flags
+AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error],
+    [ac_cv_ld_darwin],
+    [CFLAGS="${save_CFLAGS} -bundle -undefined error"
+     AC_TRY_COMPILE([],,ac_cv_ld_darwin=yes, ac_cv_ld_darwin=no)])
+if test x"$ac_cv_ld_darwin" != x"no"; then
+    PLCFLAGS="${PLCFLAGS} -bundle -undefined error"
+fi
+
+dnl Check for standard plugin linking flags
+AC_CACHE_CHECK([if \$CC accepts -shared],
+    [ac_cv_ld_plugins],
+    [CFLAGS="${save_CFLAGS} -shared"
+     AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
+if test x"$ac_cv_ld_plugins" != x"no"; then
+    PLCFLAGS="${PLCFLAGS} -shared"
+fi
+        
+dnl Check for soname setting
 if test x"${SOFLAGS}" = x; then
-  try_SOFLAGS="-Wl,-h -Wl,"
-  LDFLAGS="${save_LDFLAGS} ${try_SOFLAGS}foo.so.0"
-  AC_MSG_CHECKING([if linker accepts ${try_SOFLAGS}foo.so.0])
-  AC_TRY_LINK([],,
-   SOFLAGS="${try_SOFLAGS}"; AC_MSG_RESULT(yes),
-   AC_MSG_RESULT(no))
+    AC_CACHE_CHECK([for soname setting],
+        [ac_cv_ld_soname],
+        [
+        # Standard
+        try_SOFLAGS="-Wl,-soname -Wl,"
+        LDFLAGS="${save_LDFLAGS} ${try_SOFLAGS}foo.so.0"
+        AC_TRY_LINK([],,ac_cv_ld_soname="${try_SOFLAGS}", [
+            # SunOS
+            try_SOFLAGS="-Wl,-h -Wl,"
+            LDFLAGS="${save_LDFLAGS} ${try_SOFLAGS}foo.so.0"
+            AC_TRY_LINK([],,ac_cv_ld_soname="${try_SOFLAGS}",
+                ac_cv_ld_soname=none)
+        ])])
+    if test x"$ac_cv_ld_soname" != x"none"; then
+        SOFLAGS=$ac_cv_ld_soname
+    else
+        echo "
+------------
+Your system doesn't seem to have support for dynamic linking. You may
+have problems using libdvdcss.
+------------
+"
+	fi
 fi
 
 dnl End of the bizarre compilation tests
@@ -165,21 +181,29 @@ CFLAGS="${save_CFLAGS}"
 LDFLAGS="${save_LDFLAGS}"
 
 dnl Check for boolean_t
-AC_MSG_CHECKING([for boolean_t in sys/types.h])
-AC_TRY_COMPILE([#include <sys/types.h>
-void quux() { boolean_t foo; }],,
- AC_DEFINE(BOOLEAN_T_IN_SYS_TYPES_H, 1, Define if <sys/types.h> defines boolean_t.)
- AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-AC_MSG_CHECKING([for boolean_t in pthread.h])
-AC_TRY_COMPILE([#include <pthread.h>
-void quux() { boolean_t foo; }],,
- AC_DEFINE(BOOLEAN_T_IN_PTHREAD_H, 1, Define if <pthread.h> defines boolean_t.)
- AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-AC_MSG_CHECKING([for boolean_t in cthreads.h])
-AC_TRY_COMPILE([#include <cthreads.h>
-void quux() { boolean_t foo; }],,
- AC_DEFINE(BOOLEAN_T_IN_CTHREADS_H, 1, Define if <cthreads.h> defines boolean_t.)
- AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_CACHE_CHECK([for boolean_t in sys/types.h],
+    [ac_cv_c_boolean_t_sys_types_h],
+    [AC_TRY_COMPILE([#include <sys/types.h>], [void quux() { boolean_t foo; }],
+     ac_cv_c_boolean_t_sys_types_h=yes, ac_cv_c_boolean_t_sys_types_h=no)])
+if test x"$ac_cv_c_boolean_t_sys_types_h" != x"no"; then
+    AC_DEFINE(BOOLEAN_T_IN_SYS_TYPES_H, 1, Define if <sys/types.h> defines boolean_t.)
+fi
+
+AC_CACHE_CHECK([for boolean_t in pthread.h],
+    [ac_cv_c_boolean_t_pthread_h],
+    [AC_TRY_COMPILE([#include <pthread.h>], [void quux() { boolean_t foo; }],
+     ac_cv_c_boolean_t_pthread_h=yes, ac_cv_c_boolean_t_pthread_h=no)])
+if test x"$ac_cv_c_boolean_t_pthread_h" != x"no"; then
+    AC_DEFINE(BOOLEAN_T_IN_PTHREAD_H, 1, Define if <pthread.h> defines boolean_t.)
+fi
+
+AC_CACHE_CHECK([for boolean_t in cthreads.h],
+    [ac_cv_c_boolean_t_cthreads_h],
+    [AC_TRY_COMPILE([#include <cthreads.h>], [void quux() { boolean_t foo; }],
+     ac_cv_c_boolean_t_cthreads_h=yes, ac_cv_c_boolean_t_cthreads_h=no)])
+if test x"$ac_cv_c_boolean_t_cthreads_h" != x"no"; then
+    AC_DEFINE(BOOLEAN_T_IN_CTHREADS_H, 1, Define if <cthreads.h> defines boolean_t.)
+fi
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -221,7 +245,7 @@ ALTIVEC_MODULES="idctaltivec motionaltivec"
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
-    [AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
+    [AC_TRY_COMPILE(,[void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],
 	ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
 if test x"$ac_cv_mmx_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
@@ -229,7 +253,7 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
     [ac_cv_mmxext_inline],
-    [AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
+    [AC_TRY_COMPILE(,[void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],
 	ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
 if test x"$ac_cv_mmxext_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
@@ -237,7 +261,7 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks 3D Now! inline assembly],
     [ac_cv_3dnow_inline],
-    [AC_TRY_COMPILE([void quux(){void *p;asm("pfadd %%mm1,%%mm2"::"r"(p));}],,
+    [AC_TRY_COMPILE(,[void quux(){void *p;asm("pfadd %%mm1,%%mm2"::"r"(p));}],
 	ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
 if test x"$ac_cv_3dnow_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${THREEDNOW_MODULES}"
@@ -245,7 +269,7 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
     [ac_cv_sse_inline],
-    [AC_TRY_COMPILE([void quux(){void *p;asm("xorps %%xmm1,%%xmm2"::"r"(p));}],,
+    [AC_TRY_COMPILE(,[void quux(){void *p;asm("xorps %%xmm1,%%xmm2"::"r"(p));}],
 	ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
 if test x"$ac_cv_sse_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
@@ -253,20 +277,47 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
     [ac_cv_altivec_inline],
-    [AC_TRY_COMPILE([void quux(){asm("mtspr 256,%0"::"r"(-1));}],,
-	ac_cv_altivec_inline=yes, ac_cv_altivec_inline=no)])
+    [AC_TRY_COMPILE(,[void quux(){asm("mtspr 256,%0"::"r"(-1));}],
+         ac_cv_altivec_inline=yes,
+         [save_CFLAGS=$CFLAGS
+          CFLAGS="$CFLAGS -Wa,-m7400"
+          AC_TRY_COMPILE(,[void quux(){asm("mtspr 256,%0"::"r"(-1));}],
+            [ac_cv_altivec_inline=yes; CFLAGS_ALTIVEC="-Wa,-m7400"],
+	        ac_cv_altivec_inline=no)
+          CFLAGS=$save_CFLAGS
+         ])])
 if test x"$ac_cv_altivec_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
 AC_CACHE_CHECK([if \$CC groks Altivec C extensions],
     [ac_cv_c_altivec],
-    [save_CFLAGS=$CFLAGS; CFLAGS="$CFLAGS -faltivec"
-     AC_TRY_COMPILE([void quux(){vec_mtvscr((vector unsigned int)(0));}],,
-        ac_cv_c_altivec=yes, ac_cv_c_altivec=no)
-     CFLAGS=$save_CFLAGS])
+    [save_CFLAGS=$CFLAGS
+     CFLAGS="$CFLAGS -faltivec"
+     # Darwin test
+     AC_TRY_COMPILE(,[void quux(){vec_mtvscr((vector unsigned int)(0));}],
+        ac_cv_c_altivec=-faltivec, [
+        # Linux/PPC test
+        CFLAGS="$save_CFLAGS $CFLAGS_ALTIVEC -fvec"
+        AC_TRY_COMPILE(,[void quux(){vec_mtvscr((vector unsigned int)(0));}],
+            [ac_cv_c_altivec="-fvec"], ac_cv_c_altivec=no)
+        ])
+     CFLAGS=$save_CFLAGS
+    ])
 if test x"$ac_cv_c_altivec" != x"no"; then
   AC_DEFINE(HAVE_C_ALTIVEC, 1, Define if your compiler groks C altivec extensions.)
+  CFLAGS_ALTIVEC="$CFLAGS_ALTIVEC $ac_cv_c_altivec"
+fi
+
+AC_CACHE_CHECK([if linker needs -framework vecLib],
+    [ac_cv_ld_altivec],
+    [save_LDFLAGS=$LDFLAGS
+     LDFLAGS="$LDFLAGS -framework vecLib"
+     AC_TRY_LINK([],,ac_cv_ld_altivec=yes,ac_cv_ld_altivec=no)
+     LDFLAGS=$save_LDFLAGS
+    ])
+if test x"$ac_cv_ld_altivec" != x"no"; then
+  LIB_ALTIVEC="-framework vecLib"
 fi
 
 dnl
@@ -358,7 +409,7 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
 dnl
 dnl  Check the operating system
 dnl
-case ${_os} in
+case ${target_os} in
   bsdi*)
     SYS=bsdi
     ;;
@@ -959,6 +1010,7 @@ AC_SUBST(SOFLAGS)
 
 AC_SUBST(LIB)
 AC_SUBST(LIB_ALSA)
+AC_SUBST(LIB_ALTIVEC)
 AC_SUBST(LIB_BEOS)
 AC_SUBST(LIB_DARWIN)
 AC_SUBST(LIB_DVD)
@@ -982,6 +1034,7 @@ AC_SUBST(LIB_XVIDEO)
 AC_SUBST(LIB_YUV)
 
 AC_SUBST(CFLAGS_VLC)
+AC_SUBST(CFLAGS_ALTIVEC)
 AC_SUBST(CFLAGS_DVD)
 AC_SUBST(CFLAGS_LIBDVDCSS)
 AC_SUBST(CFLAGS_GTK)

@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctaltivec.c,v 1.16 2001/09/28 09:55:20 massiot Exp $
+ * $Id: idctaltivec.c,v 1.17 2001/09/28 14:17:16 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef __ALTIVEC__
+#ifndef __BUILD_ALTIVEC_ASM__
 
 #define MODULE_NAME idctaltivec
 #include "modules_inner.h"
@@ -129,10 +129,12 @@ static int16_t constants[5][8] ATTR_ALIGN(16) = {
     {19266, 26722, 25172, 22654, 19266, 22654, 25172, 26722}
 };
 
+#ifndef HAVE_C_ALTIVEC
+
 /*
  * The asm code is generated with:
  *
- * gcc-2.95 -fvec -D__ALTIVEC__	-O9 -fomit-frame-pointer -mregnames -S
+ * gcc-2.95 -fvec -D__BUILD_ALTIVEC_ASM__ -O9 -fomit-frame-pointer -mregnames -S
  *	idct_altivec.c
  *
  * awk '{args=""; len=split ($2, arg, ",");
@@ -555,7 +557,11 @@ void idct_block_add_altivec (int16_t * block, uint8_t * dest, int stride)
 	 );
 }
 
-#else	/* __ALTIVEC__ */
+#endif  /* !HAVE_C_ALTIVEC */
+#endif  /* __BUILD_ALTIVEC_ASM__ */
+
+
+#if defined(HAVE_C_ALTIVEC) || defined(__BUILD_ALTIVEC_ASM__)
 
 #define vector_s16_t vector signed short
 #define vector_u16_t vector unsigned short
@@ -733,8 +739,9 @@ void idct_block_add_altivec (vector_s16_t * block, unsigned char * dest,
     ADD (dest, vx7, perm1)
 }
 
-#endif	/* __ALTIVEC__ */
-#ifndef __ALTIVEC__
+#endif	/* __BUILD_ALTIVEC_ASM__ || HAVE_C_ALTIVEC */
+
+#ifndef __BUILD_ALTIVEC_ASM__
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -754,4 +761,4 @@ static void idct_getfunctions( function_list_t * p_function_list )
 #undef F
 }
 
-#endif	/* __ALTIVEC__ */
+#endif	/* __BUILD_ALTIVEC_ASM__ */
