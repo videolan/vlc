@@ -414,6 +414,37 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
     return NPERR_NO_ERROR;
 }
 
+#ifdef XP_WIN
+/* This is really ugly but there is a deadlock when stopping a stream
+ * (in VLC_CleanUp()) because the video output is a child of the drawable but
+ * is in a different thread. */
+static void HackStopVout( VlcPlugin* p_plugin )
+{
+    MSG msg;
+    HWND hwnd;
+    vlc_value_t value;
+
+    VLC_VariableGet( p_plugin->i_vlc, "drawable", &value );
+
+    hwnd = FindWindowEx( (HWND)value.i_int, 0, 0, 0 );
+    if( !hwnd ) return;
+
+    PostMessage( hwnd, WM_CLOSE, 0, 0 );
+
+    do
+    {
+        fprintf( stderr, "FindWindow: %p\n", hwnd );
+        while( PeekMessage( &msg, (HWND)value.i_int, 0, 0, PM_REMOVE ) )
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        if( FindWindowEx( (HWND)value.i_int, 0, 0, 0 ) ) Sleep( 10 );
+    }
+    while( (hwnd = FindWindowEx( (HWND)value.i_int, 0, 0, 0 )) );
+}
+#endif
+
 NPError NPP_Destroy( NPP instance, NPSavedData** save )
 {
     if( instance == NULL )
@@ -428,6 +459,9 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
         if( p_plugin->i_vlc )
         {
 #if USE_LIBVLC
+#   ifdef XP_WIN
+            HackStopVout( p_plugin );
+#   endif
             VLC_CleanUp( p_plugin->i_vlc );
             VLC_Destroy( p_plugin->i_vlc );
 #endif
