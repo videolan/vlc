@@ -2,7 +2,7 @@
  * dts.c: DTS basic parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.2 2003/03/10 08:23:45 jlj Exp $
+ * $Id: dts.c,v 1.3 2003/03/18 00:25:27 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -322,7 +322,8 @@ static int SyncInfo( const byte_t * p_buf, unsigned int * pi_channels,
         2048000, 3072000, 3840000, 4096000, 0, 0
     };
 
-    if( ((uint32_t*)p_buf)[0] != 0x7ffe8001 )
+    if( (p_buf[0] != 0x7f) || (p_buf[1] != 0xfe) ||
+        (p_buf[2] != 0x80) || (p_buf[3] != 0x01) )
     {
         return( 0 );
     }
