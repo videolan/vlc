@@ -338,7 +338,58 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
                                    i_query, args );
 }
 
-static int Filter( struct direct *foo )
+#ifdef SYS_BEOS
+/* BeOS doesn't have scandir/alphasort/versionsort */
+static int alphasort( const struct dirent **a, const struct dirent **b )
+{
+    return strcoll( (*a)->d_name, (*b)->d_name );
+}
+
+static int scandir( const char *name, struct dirent ***namelist,
+                    int (*filter) ( const struct dirent * ),
+                    int (*compar) ( const struct dirent **,
+                                    const struct dirent ** ) )
+{
+    DIR            * p_dir;
+    struct dirent  * p_content;
+    struct dirent ** pp_list;
+    int              ret, size;
+
+    if( !namelist ||
+        !( p_dir = opendir( name ) ) )
+    {
+        return -1;
+    }
+
+    ret     = 0;
+    pp_list = NULL;
+    while( ( p_content = readdir( p_dir ) ) )
+    {
+        if( filter && !filter( p_content ) )
+        {
+            continue;
+        }
+        pp_list = realloc( pp_list, ( ret + 1 ) * sizeof( struct dirent * ) );
+        size = sizeof( struct dirent ) + strlen( p_content->d_name ) + 1;
+        pp_list[ret] = malloc( size );
+        memcpy( pp_list[ret], p_content, size );
+        ret++;
+    }
+
+    closedir( p_dir );
+
+    if( compar )
+    {
+        qsort( pp_list, ret, sizeof( struct dirent * ),
+               (int (*)(const void *, const void *)) compar );
+    }
+
+    *namelist = pp_list;
+    return ret;
+}
+#endif
+
+static int Filter( const struct dirent *foo )
 {
     return VLC_TRUE;
 }
@@ -349,7 +400,6 @@ static int ReadDir( playlist_t *p_playlist,
                     char *psz_name , int i_mode, int *pi_position,
                     playlist_item_t *p_parent )
 {
-    DIR *                       p_current_dir;
     struct dirent *             p_dir_content;
     struct dirent **            pp_dir_content;
     int                         i_dir_content;
@@ -396,7 +446,8 @@ static int ReadDir( playlist_t *p_playlist,
                 if( i_mode == MODE_NONE )
                 {
                     msg_Dbg( p_playlist, "Skipping subdirectory %s", psz_uri );
-                    p_dir_content = readdir( p_current_dir );
+                    i++;
+                    p_dir_content = pp_dir_content[i];
                     continue;
                 }
                 else if(i_mode == MODE_EXPAND )
