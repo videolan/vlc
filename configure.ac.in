@@ -498,7 +498,8 @@ AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
     [CFLAGS="${CFLAGS_save} -mdynamic-no-pic"
      AC_TRY_COMPILE([],,ac_cv_c_dynamic_no_pic=yes, ac_cv_c_dynamic_no_pic=no)])
 if test "x${ac_cv_c_dynamic_no_pic}" != "xno"; then
-    CFLAGS_builtins="${CFLAGS_OPTIM} -mdynamic-no-pic"
+    CFLAGS_builtins="${CFLAGS_builtins} -mdynamic-no-pic"
+    CFLAGS_libvlc="${CFLAGS_libvlc} -mdynamic-no-pic"
 fi
 
 dnl Check for Darwin plugin linking flags
@@ -579,7 +580,7 @@ PLUGINS="${PLUGINS} deinterlace invert yuv wall transform distort clone crop mot
 PLUGINS="${PLUGINS} float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif fixed32tofloat32 fixed32tos16 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofloat32"
 PLUGINS="${PLUGINS} trivial_resampler ugly_resampler linear_resampler"
 PLUGINS="${PLUGINS} trivial_channel_mixer"
-PLUGINS="${PLUGINS} trivial_mixer spdif_mixer"
+PLUGINS="${PLUGINS} trivial_mixer spdif_mixer float32_mixer"
 PLUGINS="${PLUGINS} aout_file"
 #PLUGINS="${PLUGINS} scope"
 PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
