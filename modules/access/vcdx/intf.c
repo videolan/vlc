@@ -2,7 +2,7 @@
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.2 2003/11/09 00:52:32 rocky Exp $
+ * $Id: intf.c,v 1.3 2003/11/09 18:06:11 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
@@ -185,7 +185,9 @@ static void RunIntf( intf_thread_t *p_intf )
 
 	    case ACTIONID_NAV_UP:
 	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_UP - return" );
-	      vcdplayer_play_return( p_input );
+	      do {
+		vcdplayer_play_return( p_input );
+	      } while (number_addend-- > 0);
 	      break;
 
 	    case ACTIONID_NAV_DOWN:
