@@ -55,7 +55,7 @@ vlc_module_begin();
 
     add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, VLC_TRUE );
-    add_bool( "udp-auto-mtu", 0, NULL,
+    add_bool( "udp-auto-mtu", 1, NULL,
               AUTO_MTU_TEXT, AUTO_MTU_LONGTEXT, VLC_TRUE );
 
     set_capability( "access2", 0 );
