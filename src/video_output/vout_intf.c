@@ -27,12 +27,10 @@
 #include <stdlib.h>                                                /* free() */
 
 #include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "vlc_video.h"
 #include "video_output.h"
-#include "vlc_interface.h"
-
-#include <vlc/input.h>                                 /* for input_thread_t */
 
 /*****************************************************************************
  * Local prototypes
@@ -218,20 +216,20 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    input_thread_t *p_input;
+    playlist_t *p_playlist;
     vlc_value_t val;
 
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
-    p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
+    p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
                                                  FIND_PARENT );
-    if( p_input )
+    if( p_playlist )
     {
-        /* Modify input as well because the vout might have to be restarted */
-        var_Create( p_input, "fullscreen", VLC_VAR_BOOL );
-        var_Set( p_input, "fullscreen", newval );
+        /* Modify playlist as well because the vout might have to be restarted */
+        var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL );
+        var_Set( p_playlist, "fullscreen", newval );
 
-        vlc_object_release( p_input );
+        vlc_object_release( p_playlist );
     }
 
     /* Disable "always on top" in fullscreen mode */
