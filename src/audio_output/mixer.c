@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.25 2003/01/26 13:37:09 gbazin Exp $
+ * $Id: mixer.c,v 1.26 2003/01/27 23:48:14 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -204,41 +204,6 @@ static int MixBuffer( aout_instance_t * p_aout )
             break;
         }
 
-        if ( !AOUT_FMT_NON_LINEAR( &p_aout->mixer.mixer ) )
-        {
-            /* Additionally check that p_first_byte_to_mix is well
-             * located. */
-            mtime_t i_nb_bytes = (start_date - p_buffer->start_date)
-                            * p_aout->mixer.mixer.i_bytes_per_frame
-                            * p_aout->mixer.mixer.i_rate
-                            / p_aout->mixer.mixer.i_frame_length
-                            / 1000000;
-            ptrdiff_t mixer_nb_bytes;
-
-            if ( p_input->p_first_byte_to_mix == NULL )
-            {
-                p_input->p_first_byte_to_mix = p_buffer->p_buffer;
-            }
-            mixer_nb_bytes = p_input->p_first_byte_to_mix
-                              - p_buffer->p_buffer;
-
-            if ( !((i_nb_bytes + p_aout->mixer.mixer.i_bytes_per_frame
-                     > mixer_nb_bytes) &&
-                   (i_nb_bytes < p_aout->mixer.mixer.i_bytes_per_frame
-                     + mixer_nb_bytes)) )
-            {
-                msg_Warn( p_aout,
-                          "mixer start isn't output start ("I64Fd,
-                          i_nb_bytes - mixer_nb_bytes );
-
-                /* Round to the nearest multiple */
-                i_nb_bytes /= p_aout->mixer.mixer.i_bytes_per_frame;
-                i_nb_bytes *= p_aout->mixer.mixer.i_bytes_per_frame;
-                p_input->p_first_byte_to_mix = p_buffer->p_buffer
-                                                + i_nb_bytes;
-            }
-        }
-
         /* Check that we have enough samples. */
         for ( ; ; )
         {
@@ -277,6 +242,42 @@ static int MixBuffer( aout_instance_t * p_aout )
             else break;
         }
         if ( p_buffer == NULL ) break;
+
+        p_buffer = p_fifo->p_first;
+        if ( !AOUT_FMT_NON_LINEAR( &p_aout->mixer.mixer ) )
+        {
+            /* Additionally check that p_first_byte_to_mix is well
+             * located. */
+            mtime_t i_nb_bytes = (start_date - p_buffer->start_date)
+                            * p_aout->mixer.mixer.i_bytes_per_frame
+                            * p_aout->mixer.mixer.i_rate
+                            / p_aout->mixer.mixer.i_frame_length
+                            / 1000000;
+            ptrdiff_t mixer_nb_bytes;
+
+            if ( p_input->p_first_byte_to_mix == NULL )
+            {
+                p_input->p_first_byte_to_mix = p_buffer->p_buffer;
+            }
+            mixer_nb_bytes = p_input->p_first_byte_to_mix
+                              - p_buffer->p_buffer;
+
+            if ( !((i_nb_bytes + p_aout->mixer.mixer.i_bytes_per_frame
+                     > mixer_nb_bytes) &&
+                   (i_nb_bytes < p_aout->mixer.mixer.i_bytes_per_frame
+                     + mixer_nb_bytes)) )
+            {
+                msg_Warn( p_aout,
+                          "mixer start isn't output start ("I64Fd,
+                          i_nb_bytes - mixer_nb_bytes );
+
+                /* Round to the nearest multiple */
+                i_nb_bytes /= p_aout->mixer.mixer.i_bytes_per_frame;
+                i_nb_bytes *= p_aout->mixer.mixer.i_bytes_per_frame;
+                p_input->p_first_byte_to_mix = p_buffer->p_buffer
+                                                + i_nb_bytes;
+            }
+        }
     }
 
     if ( i < p_aout->i_nb_inputs || i_first_input == p_aout->i_nb_inputs )
