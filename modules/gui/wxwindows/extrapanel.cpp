@@ -827,6 +827,7 @@ void ExtraPanel::OnAdjustUpdate( wxScrollEvent &event)
     vout_thread_t *p_vout = (vout_thread_t *)vlc_object_find(p_intf,
                                  VLC_OBJECT_VOUT, FIND_ANYWHERE);
     if( p_vout == NULL )
+    {
         switch( event.GetId() )
         {
             case Hue_Event:
@@ -853,6 +854,7 @@ void ExtraPanel::OnAdjustUpdate( wxScrollEvent &event)
                                 (float)event.GetPosition()/10 );
                 break;
         }
+    }
     else
     {
         vlc_value_t val;
@@ -959,6 +961,7 @@ void ExtraPanel::CheckAout()
 static void ChangeVFiltersString( intf_thread_t *p_intf,
                                  char *psz_name, vlc_bool_t b_add )
 {
+    vout_thread_t *p_vout;
     char *psz_parser, *psz_string;
 
     psz_string = config_GetPsz( p_intf, "filter" );
@@ -1003,6 +1006,16 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
     }
     /* Vout is not kept, so put that in the config */
     config_PutPsz( p_intf, "filter", psz_string );
+
+    /* Try to set on the fly */
+    p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+    if( p_vout )
+    {
+        var_SetString( p_vout, "filter", psz_string );
+        vlc_object_release( p_vout );
+    }
+
     free( psz_string );
 }
 
