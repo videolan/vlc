@@ -1,3 +1,580 @@
+2003-12-15 Monday 23:31  gbazin
+
+ * modules/demux/ogg.c: a couple of fixes for flac streaming.
+
+2003-12-15 Monday 22:55  gbazin
+
+ * modules/packetizer/mpeg4audio.c: fixed raw mpeg4 audio packetizer.
+ * modules/demux/mp4/libmp4.c: fixed (again) parsing of wave tag.
+
+2003-12-15 Monday 22:04  gbazin
+
+ * modules/gui/skins/src/skin_main.cpp: bail out if we can't open an X11 display.
+
+2003-12-15 Monday 21:54  gbazin
+
+ * modules/codec/vorbis.c: added 5.1 channel configuration to the decoder.
+
+2003-12-15 Monday 21:35  gbazin
+
+ * modules/audio_output/directx.c: don't set the default audio output to mono even if the windows settings are set to mono.
+   Too many people just don't know how to set the windows speakers configuration setting properly.
+
+2003-12-15 Monday 21:07  jpsaman
+
+ Fixing QT/Embedded header detection.
+
+2003-12-15 Monday 20:21  gbazin
+
+ * modules/video_output/directx/directx.c: debug message.
+
+2003-12-15 Monday 20:20  gbazin
+
+ * modules/gui/wxwindows/open.cpp: compilation fix.
+
+2003-12-15 Monday 19:55  gbazin
+
+ * share/http/admin/dboxfiles.html: html page used by the dbox.
+
+2003-12-15 Monday 19:26  bigben
+
+ Forgot this
+
+2003-12-15 Monday 19:25  bigben
+
+ Fix for the fullscreen button state (it is only enabled if a vout is present)
+
+2003-12-15 Monday 15:38  hartman
+
+ * fix the skip 10 seconds buttons availability.
+
+2003-12-15 Monday 15:06  hartman
+
+ * Fix the problem with OpenDVD crash.
+
+2003-12-15 Monday 14:25  hartman
+
+ * don't search the playlist when there is nothing in it. We will crash.
+
+2003-12-15 Monday 14:05  hartman
+
+ * compile before you commit
+
+2003-12-15 Monday 13:38  hartman
+
+ * added bookmark 9 and 10 but set their combo to KEY_UNSET
+
+2003-12-15 Monday 13:10  zorglub
+
+ Do not add http:// to MRL if the URI given in the HTTP field already contains it (Fixes bug #1510)
+
+2003-12-15 Monday 01:11  yoann
+
+ For OSX:
+ * added hotkeys Fn and COMMAND+Fn, whith 2 <= n <= 8
+ * bookmark9 and 10 are not added since F9 and F10 are reserved keys
+
+2003-12-15 Monday 00:47  gbazin
+
+ * modules/access/dshow/*: fixed a problem when we would sometimes get stuck trying to stop the dshow graph.
+
+2003-12-14 Sunday 23:40  rocky
+
+ signed/unsigned mismatch fix.
+
+2003-12-14 Sunday 23:14  hartman
+
+ * Clarify the error when utf8 is set and the sub is actually not utf8.
+
+2003-12-14 Sunday 22:49  gbazin
+
+ * modules/gui/wxwindows/*: added raw encapsulation to the streamout dialog.
+ * modules/mux/dummy.c: added "raw" shortcut.
+
+2003-12-14 Sunday 21:03  gbazin
+
+ * modules/gui/wxwindows/*: Added the video scale option to the streamout dialog box.
+   Added a nasty hack to reset LC_NUMERIC to "C" because the stream output MRL parsing can't deal with "," in floating point numbers.
+ * modules/codec/ffmpeg/encoder.c: sanity checks.
+ * modules/stream_out/transcode.c: sanity checks.
+
+2003-12-14 Sunday 19:18  gbazin
+
+ * modules/codec/subsdec.c: default encoding is DEFAULT_NAME not UTF8.
+
+2003-12-14 Sunday 18:44  gbazin
+
+ * modules/mux/ogg.c: added support for WMV1/2 and MJPG.
+
+2003-12-14 Sunday 17:58  gbazin
+
+ * modules/stream_out/duplicate.c: removed unused variable.
+
+2003-12-14 Sunday 17:56  gbazin
+
+ * modules/stream_out/duplicate.c: don't forget to loop through the linked list of sout buffers when sending the data.
+
+2003-12-14 Sunday 16:26  titer
+
+  beos_specific.cpp: never let anyone but system_End terminate the
+                     BApplication (fixes crash for people who like scripting
+                     with BMessages)
+
+2003-12-14 Sunday 16:08  titer
+
+  BeOS & gcc 2.9x fixes
+
+2003-12-14 Sunday 15:42  gbazin
+
+ * modules/gui/wxwindows/interface.cpp: volume control has a fixed width of 20 pixels.
+   Fixed sizer problem on win32 with wxWin cvs.
+
+2003-12-13 Saturday 20:13  rocky
+
+ More Open Disc range customizing/narrowing and some code cleanup.
+
+2003-12-13 Saturday 17:46  asmax
+
+ * src/playlist/sort.c: set "intf-change" after sorting the playlist
+
+2003-12-13 Saturday 17:16  gbazin
+
+ * src/playlist/*: when deleting the currently playing item, skip it instead of stopping the playlist.
+ * include/modules_inner.h, include/configuration.h: don't use a static array anymore during the initialization of the plugins, malloc it instead. This fixes regular overflow problems we have when we increase the number of options in the main module.
+
+2003-12-13 Saturday 15:28  rocky
+
+ Updated.
+
+2003-12-13 Saturday 14:01  gbazin
+
+ * modules/video_output/directx/directx.c: compilation fix.
+
+2003-12-13 Saturday 12:56  rocky
+
+ Add customizable playlist "author" field and set in the playlist.
+
+2003-12-13 Saturday 12:56  rocky
+
+ If not in PBC, playlist fills in all entries.
+ Fill in playlist info. Customizable "title" and "author" field.
+ Still need to pick out and duration field.
+ A couple of segfaults fixed.
+
+2003-12-13 Saturday 11:56  gbazin
+
+ * ALL: bumped version number to 0.7.0-test2
+
+2003-12-13 Saturday 11:22  gbazin
+
+ * NEWS: updated.
+
+2003-12-13 Saturday 00:55  rocky
+
+ Range changes for Title/Track. Hopefully gtk_interface.c changes have
+ been properly reflected back in gnome.glade now.
+
+2003-12-13 Saturday 00:53  rocky
+
+ A better fix for missing options when the satellite plugin is not
+ configured.
+
+2003-12-13 Saturday 00:45  rocky
+
+ Add text field variables for changeable text fields.
+
+2003-12-13 Saturday 00:45  rocky
+
+ Disable Disc "Chapter" button when not appropriate - i.e. CD-DA or
+ VCD. Customize "Title" field (e.g. CD-DA "Track" or VCD "Entry").
+
+2003-12-13 Saturday 00:00  rocky
+
+ Some minor code cleanups. Non-existent satellite options #ifdef'd out.
+
+2003-12-12 Friday 23:15  gbazin
+
+ * modules/codec/faad.c: proper channels re-ordering for multi-channels audio.
+
+2003-12-12 Friday 23:03  yoann
+
+ * added hotkeys F1, F2, ..., F10 to switch between predefined medias
+   (using CTRL+Fn)
+ * only F1 and COMMAND+F1 are defined for OSX (I let those developpers
+   chose their keys)
+ * Currently the medias assigned to Fn are not saved in vlcrc if they
+   have been assigned with Ctrl+Fn. But they are, if assigned via the
+   preferences panel.
+
+2003-12-12 Friday 22:46  rocky
+
+ Compilation fix in conditional code.
+
+2003-12-12 Friday 22:41  rocky
+
+ Disable Chapter button for CD-DA.
+
+2003-12-12 Friday 18:54  gbazin
+
+ * modules/gui/gtk/*: fixed gtk/gnome.glade and re-run ./toolbox --update-glade.
+
+2003-12-12 Friday 18:34  gbazin
+
+ * modules/gui/gtk/open.c: compilation fix.
+
+2003-12-12 Friday 15:37  zorglub
+
+ * Fix segfault when we have two announces with the same URI but different names on the network
+
+2003-12-12 Friday 03:06  rocky
+
+ Add CDDA and make MRLs regular.  Routine Eject is same as that in gtk
+ and should be put in a more core location.
+
+2003-12-12 Friday 03:01  rocky
+
+ Make MRL's more regular across GUIs fix plugin names, and add CD-DA to list.
+
+2003-12-11 Thursday 23:12  gbazin
+
+ * modules/video_output/directx/*: first try at multimonitor support (untested).
+ * src/video_output/video_output.c: small change to allow the directx plugin to destroy/recreate picture buffers on the fly.
+
+2003-12-11 Thursday 20:40  zorglub
+
+ free
+
+2003-12-11 Thursday 20:21  bigben
+
+ fix a typo
+
+2003-12-11 Thursday 20:08  zorglub
+
+ * Do not keep adding items when they have already been added. This allows removal of SAP items
+
+2003-12-11 Thursday 19:34  hartman
+
+ * Fix the state of the playlist and fullscreen button.
+
+2003-12-11 Thursday 16:00  hartman
+
+ * New icon for the playlist
+ * Fixed the mute hotkey
+ * Fixed the positioning of some elements and removed the stupid black box
+ * Added speex and flac encoders to sout dialog
+
+2003-12-11 Thursday 14:58  hartman
+
+ * fix new hotkeys for osx.
+
+2003-12-11 Thursday 13:21  rocky
+
+ Let folks know that the no device string means to scan for one if
+ cddax and vcdx.
+
+2003-12-11 Thursday 13:20  rocky
+
+ Long device text no longer used.
+
+2003-12-11 Thursday 12:56  rocky
+
+ Switch over to using "cd-audio" and "vcd" configuration variables.
+
+2003-12-11 Thursday 12:52  rocky
+
+ VCD or CD "title" 0 means adds entire contents (or possibly PBC for VCD).
+
+2003-12-11 Thursday 11:30  zorglub
+
+ * Fix segfault when creating a group twice without checking return value
+
+2003-12-11 Thursday 10:44  gbazin
+
+ * src/misc/mtime.c: actually tested and fixed my latest changes ;)
+
+2003-12-11 Thursday 09:02  sam
+
+   * doc/vlc.1: Fixed a minor typo (Debian bug #223605).
+
+2003-12-11 Thursday 05:49  rocky
+
+ Remove building OGT.
+
+2003-12-11 Thursday 05:31  rocky
+
+ Guard against dereferencing a NULL pointer.
+
+2003-12-11 Thursday 05:30  rocky
+
+ Use cd-audio variable not vcd variable.
+
+2003-12-11 Thursday 05:28  rocky
+
+ Set compilation flags so that code (e.g. frontends) can test presence
+ or absense of vcdx/cddax.
+
+2003-12-11 Thursday 05:27  rocky
+
+ Improve MRL creation.
+
+ 1. MRL's are of the form xxx://
+ 2. Customize depending on vcdx/vcd or cddax/cdd
+ 3. cdda doesn't have any such notion of a "Chapter", so remove
+    the misleading :x.
+
+ For cddax/vcdx, I'm not sure though I think there is more to do.
+
+2003-12-11 Thursday 05:12  rocky
+
+ More general help tab name: "Media" covers DVD, (S)VCD, *or* CD-DA.
+
+2003-12-11 Thursday 02:26  asmax
+
+ * solved race conditions issues when the OpenSkin dialog is
+   opened in blocking mode
+
+2003-12-11 Thursday 01:36  yoann
+
+ added a 'mute' hotkey ('m')
+
+2003-12-10 Wednesday 23:51  gbazin
+
+ * modules/stream_out/display.c: fixed segfault when switching audio/video track.
+
+2003-12-10 Wednesday 23:27  gbazin
+
+ * modules/codec/libmpeg2.c: hack for demuxers which only have DTS timestamps.
+
+2003-12-10 Wednesday 23:16  gbazin
+
+ * modules/mux/mpeg/pes.c: fixed to handle 0 pts/dts correctly.
+
+2003-12-10 Wednesday 21:54  courmisch
+
+ Added "Force IPv6" check box to UDP Unicast in open dialog
+
+2003-12-10 Wednesday 20:56  yoann
+
+ fixed a compilation error
+
+2003-12-10 Wednesday 17:19  yoann
+
+ added a hotkey ('t') which displays the position in the media
+
+2003-12-10 Wednesday 12:57  bigben
+
+ fixes a infinite loop in the search function.
+
+2003-12-10 Wednesday 11:04  courmisch
+
+ Automatically adds [ and ] around IPv6 addresses in Media Resource Locator.
+
+2003-12-09 Tuesday 19:18  gbazin
+
+ * src/misc/mtime.c: fixed an overflow in mdate() on win32.
+   This overflow was only affecting the hardware configurations where we can't use the performance counter and thus have to use GetTickCount().
+   We now also check for the wrapping of the 32 bits value returned by GetTickCount() so mdate() doesn't wrap after 49.7 days.
+ * src/misc/win32_specific.c: call mdate() once in system_Init() so as to avoid thread safety issues while initialising the static variables used in mdate().
+
+2003-12-09 Tuesday 19:15  yoann
+
+ * fixed a compatibility problem with the CVS version of wxwindows
+ * added a lock when changing p_vout->p_last_osd_message
+
+2003-12-09 Tuesday 14:33  sam
+
+   * toolbox: Do not include MOC files in the POTFILES.in generation.
+
+2003-12-09 Tuesday 00:46  yoann
+
+ This fixes bugs 1285 and 1343
+ * added a the default CD Audio device in General Settings -> Input
+ * added OpenDialog::OnDiscPanelChange in wxwindows/open.cpp
+
+2003-12-08 Monday 19:50  gbazin
+
+ * ALL: new main --video-on-top config option (in use by the x11/xvideo/osx/directx video outputs.)
+ * modules/video_output/x11/*: implemented support for "video on top". Will likely only work with KDE for now.
+
+2003-12-08 Monday 18:42  gbazin
+
+ * modules/misc/dummy/*: new --dummy-save-es option to specify if we want the dummy
+ decoder to save the raw codec data to a file. This is disabled by default (while
+ it was always on before).
+ * src/input/es_out.c: bug fix for ES autoselection.
+
+2003-12-08 Monday 17:48  yoann
+
+ improves OSD sytem
+ The last OSD message is now deleted before printing new one.
+
+2003-12-08 Monday 13:04  gbazin
+
+ * modules/control/hotkeys.c: msvc compilation fix.
+
+2003-12-08 Monday 13:02  gbazin
+
+ * modules/stream_out/transcode.c: added a floating point "scale" option for video transcoding. When specified, you don't need to specify the width and height of the output video.
+  Also changed the width and height options so that if only one of them is specified, the other one is calculated automatically so as to keep the aspect ratio of the video.
+ * modules/mux/ogg.c: fixed crash when removing streams.
+ * modules/codec/theora.c: for now the theora encoder requires a width and height which are multiple of 16.
+
+2003-12-08 Monday 11:00  hartman
+
+ * Update Brazilian Portugese
+
+2003-12-08 Monday 06:01  rocky
+
+ Marginally better
+
+2003-12-07 Sunday 22:23  hartman
+
+ * fix livedotcom contrib
+ * add libcaca contrib
+
+2003-12-07 Sunday 22:14  rocky
+
+ Towards Philips OGT (SVCD subtitle) handling.
+
+2003-12-07 Sunday 20:48  hartman
+
+ * Incorrect default value of align
+
+2003-12-07 Sunday 20:47  hartman
+
+ * added livedotcom and goom to contrib system
+   goom sources currently located on my server.
+
+2003-12-07 Sunday 19:09  jpsaman
+
+ All AddText( vout_thread_t *p_vout, char *psz_string, .. ) calls have as second argument char * now, just like the function definition in include/video_output.h. All uses already passed a char * to the AddText() functions.
+
+2003-12-07 Sunday 19:06  jpsaman
+
+ Compilation warning fixes and if-deffed unused functions/variables.
+
+2003-12-07 Sunday 19:01  jpsaman
+
+ Remove unused variable
+
+2003-12-07 Sunday 19:00  jpsaman
+
+ Fix for iPAQ port.
+
+2003-12-07 Sunday 18:58  jpsaman
+
+ PDA Interface:
+ - some cleanup
+ - reinstated automatic lowering of interface when play button was pressed.
+ - double click in playlist window play selected items.
+
+2003-12-07 Sunday 18:55  jpsaman
+
+ if-deffed a unused variable.
+
+2003-12-07 Sunday 18:52  jpsaman
+
+ Updating makefiles and package scripts.
+
+2003-12-07 Sunday 18:15  gbazin
+
+ * modules/codec/theora.c: bug fix with aspect ratio.
+
+2003-12-07 Sunday 17:53  gbazin
+
+ * modules/codec/theora.c: encoder now respects the aspect ratio.
+
+2003-12-07 Sunday 17:17  gbazin
+
+ * src/input/es_out.c: cosmetic changes.
+
+2003-12-07 Sunday 17:09  gbazin
+
+ * include/stream_output.h, src/stream_output/stream_output.c: added a SOUT_MUX_CAP_GET_ADD_STREAM_WAIT muxer capability to specify that a muxer prefers to wait all ES before starting muxing.
+ * modules/mux/ogg.c: use SOUT_MUX_CAP_GET_ADD_STREAM_WAIT.
+ * modules/stream_out/transcode.c: fix for video stream header generation (theora).
+ * modules/codec/theora.c: don't overwrite headers.
+
+2003-12-07 Sunday 12:11  gbazin
+
+ * include/vlc_block_helper.h: small bugfix to block_FindStartcodeFromOffset().
+ * modules/packetizer/mpegvideo.c: get aspect ratio for MPEG2 video streams (still needs to be done for MPEG1).
+ * modules/codec/libmpeg2.c: use p_dec->fmt_in.video.i_aspect if available.
+ * modules/stream_out/transcode.c, modules/codec/ffmpeg/encoder.c: respect aspect ratio during transcoding.
+
+2003-12-07 Sunday 01:02  rocky
+
+ Marginally better.
+
+2003-12-06 Saturday 23:25  gbazin
+
+ * include/vlc_block_helper.h: new block_FindStartcodeFromOffset() function.
+ * modules/packetizer/mpegvideo.c: rewrote the packetizer to use the block helper functions.
+
+2003-12-06 Saturday 22:58  jpsaman
+
+ Removing last files of previous Familiar interface. Porting to Gtk+2 widget set of this interface is now finished. Policing and improving remains.
+
+2003-12-06 Saturday 22:53  jpsaman
+
+ Always use correct datatypes.
+
+2003-12-06 Saturday 22:50  jpsaman
+
+ Fixed compiler waring about signed - unsigned comparision. It is always safer to use the same datatype when comparing values.
+
+2003-12-06 Saturday 22:47  jpsaman
+
+ Updating with info for upcoming Opie interface.
+
+2003-12-06 Saturday 22:45  jpsaman
+
+ Added PDA interface.
+
+2003-12-06 Saturday 22:45  jpsaman
+
+ Make sure Gtk+2 main module gets build with PDA interface.
+
+2003-12-06 Saturday 22:42  jpsaman
+
+ Updating AUTHORS list for me.
+
+2003-12-06 Saturday 22:41  jpsaman
+
+ PDA Interface:
+ - Fixed last segmentation fault.
+ - Slider and time progress updating.
+
+ This makes the new PDA interface almost complete. It misses the following items still:
+ - preference panel
+ - changing postion in stream with slider widget.
+
+ The missing items above will move to the next release of VLC. Now testing and package building for iPAQ will begin. I expect to have a package at the end of the week.
+
+2003-12-06 Saturday 20:00  gbazin
+
+ * msvc/vlc.dsw: updated the list of plugins.
+
+2003-12-06 Saturday 05:15  rocky
+
+ Recognize Philips Overlay Graphics (OGT) and Chaoji VCD (CVD) subtitle
+ streams.  Still need to be able to do something with them though.
+
+2003-12-05 Friday 14:58  gbazin
+
+ * modules/codec/libmpeg2.c: fixed a couple of crashes on bad files.
+
+2003-12-05 Friday 14:48  asmax
+
+ * modules/gui/wxwindows/preferences_widget.cpp: replaced two ( ? : ) by
+   if / else to avoid compilation problems when wxwindows is not built
+   with unicode support
+
+2003-12-05 Friday 09:28  sam
+
+   * Updated current changelog and regenerated previous ones as to include
+     changes to removed directories.
+
 2003-12-05 Friday 05:01  rocky
 
  A little cleanup on wait timing. No bug fixes yet, though.
