@@ -1,6 +1,4 @@
 # Disabled modules
-EXTRA_DIST += dv.c xvid.c
-
 SOURCES_a52 = a52.c
 SOURCES_cinepak = cinepak.c
 SOURCES_dts = dts.c
