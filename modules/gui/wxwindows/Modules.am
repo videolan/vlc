@@ -7,6 +7,7 @@ SOURCES_wxwindows = \
 	open.cpp \
 	streamout.cpp \
 	wizard.cpp \
+	streamdata.h \
 	messages.cpp \
 	playlist.cpp \
 	iteminfo.cpp \
