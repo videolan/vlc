@@ -44,13 +44,16 @@
     "Allows you to specify the session name used for the streaming output." )
 #define SDP_TEXT N_("SDP")
 #define SDP_LONGTEXT N_( \
-    "Allows you to specify the SDP used for the streaming output." )
+    "Allows you to specify the SDP used for the streaming output. " \
+    "You must use an url: http://location to access the SDP via HTTP, " \
+    "rtsp://location for RTSP access, and sap:// for the SDP to be " \
+    "annnounced via SAP" )
 #define MUX_TEXT N_("Muxer")
 #define MUX_LONGTEXT N_( \
     "Allows you to specify the muxer used for the streaming output." )
 #define PORT_TEXT N_("Port")
 #define PORT_LONGTEXT N_( \
-    "Allows you to specify the port used for the streaming output." )
+    "Allows you to specify the base port used for the RTP streaming" )
 #define TTL_TEXT N_("Time to live")
 #define TTL_LONGTEXT N_( \
     "Allows you to specify the time to live for the output stream." )
