@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.13 2003/05/30 17:30:54 titer Exp $
+ * $Id: Interface.cpp,v 1.14 2003/06/13 00:15:40 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -110,8 +110,8 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     /* Destroy the interface window */
-    p_intf->p_sys->p_window->Lock();
-    p_intf->p_sys->p_window->Quit();
+    if( p_intf->p_sys->p_window->Lock() )
+        p_intf->p_sys->p_window->Quit();
 
     /* Destroy structure */
     delete p_intf->p_sys->p_wrapper;
