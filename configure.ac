@@ -4189,6 +4189,7 @@ AC_CONFIG_FILES([
   modules/gui/qt/Makefile
   modules/gui/skins2/Makefile
   modules/gui/wxwindows/Makefile
+  modules/gui/wince/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
   modules/misc/memcpy/Makefile
