@@ -835,8 +835,7 @@ fi
 dnl
 dnl  ipv6 plugin
 dnl
-AC_EGREP_HEADER(in6_addr,netinet/in.h,[
-  PLUGINS="${PLUGINS} ipv6"])
+AC_CHECK_FUNC(inet_pton,[PLUGINS="{PLUGINS} ipv6"])
 
 dnl
 dnl  Codec plugins
