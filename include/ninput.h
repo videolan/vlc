@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.15 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: ninput.h,v 1.16 2003/11/19 00:14:39 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -82,6 +82,7 @@ static inline void es_format_Init( es_format_t *fmt,
     memset( &fmt->video, 0, sizeof(video_format_t) );
     memset( &fmt->subs, 0, sizeof(subs_format_t) );
 
+    fmt->i_bitrate              = 0;
     fmt->i_extra_type           = ES_EXTRA_TYPE_UNKNOWN;
     fmt->i_extra                = 0;
     fmt->p_extra                = NULL;
