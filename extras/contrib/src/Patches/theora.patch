@@ -5,7 +5,7 @@ diff -ru libtheora.old/Makefile.am libtheora/Makefile.am
  
  AUTOMAKE_OPTIONS = foreign dist-zip
  
--SUBDIRS = lib include examples debian
+-SUBDIRS = lib include doc examples debian
 +SUBDIRS = lib include
  
  EXTRA_DIST = COPYING autogen.sh 
@@ -17,7 +17,7 @@ diff -ru libtheora.old/Makefile.in libtheora/Makefile.in
  
  AUTOMAKE_OPTIONS = foreign dist-zip
  
--SUBDIRS = lib include examples debian
+-SUBDIRS = lib include doc examples debian
 +SUBDIRS = lib include
  
  EXTRA_DIST = COPYING autogen.sh 

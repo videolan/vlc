@@ -378,11 +378,11 @@ DISTCLEAN_PKG += libvorbis-$(VORBIS_VERSION).tar.gz
 # theora
 # ***************************************************************************
 
-libtheora-$(THEORA_VERSION).tar.gz:
+libtheora-$(THEORA_VERSION).tar.bz2:
 	$(WGET) $(THEORA_URL)
 
-libtheora: libtheora-$(THEORA_VERSION).tar.gz
-	$(EXTRACT_GZ)
+libtheora: libtheora-$(THEORA_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 	patch -p 0 < Patches/theora.patch
 
 .theora: libtheora
@@ -391,7 +391,7 @@ libtheora: libtheora-$(THEORA_VERSION).tar.gz
 
 CLEAN_FILE += .theora
 CLEAN_PKG += libtheora
-DISTCLEAN_PKG += libtheora-$(THEORA_VERSION).tar.gz
+DISTCLEAN_PKG += libtheora-$(THEORA_VERSION).tar.bz2
 
 # ***************************************************************************
 # flac
