@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.18 2002/04/19 13:56:10 sam Exp $
+ * $Id: dummy.c,v 1.19 2002/05/20 19:02:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,7 +41,14 @@ void _M( intf_getfunctions )  ( function_list_t * p_function_list );
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+#define CHROMA_TEXT N_("dummy image chroma format")
+#define CHROMA_LONGTEXT N_( \
+    "Force the dummy video output to create images using a specific chroma " \
+    "format instead of trying to improve performances by using the most " \
+    "efficient one.")
+
 MODULE_CONFIG_START
+ADD_STRING  ( "dummy-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
 MODULE_CONFIG_STOP
 
 

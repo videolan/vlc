@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.22 2002/04/25 21:52:42 sam Exp $
+ * $Id: vout_dummy.c,v 1.23 2002/05/20 19:02:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,8 +63,6 @@ static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Render    ( struct vout_thread_s *, struct picture_s * );
 static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
 
-static int  DummyNewPicture( struct vout_thread_s *, struct picture_s * );
-
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
@@ -103,32 +101,48 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
-    int i_index;
+    int i_index, i_chroma;
+    char *psz_chroma;
     picture_t *p_pic;
-    
+    boolean_t b_chroma = 0;
+
+    psz_chroma = config_GetPszVariable( "dummy-chroma" );
+    if( psz_chroma )
+    {
+        if( strlen( psz_chroma ) >= 4 )
+        {
+            i_chroma  = (unsigned char)psz_chroma[0] <<  0;
+            i_chroma |= (unsigned char)psz_chroma[1] <<  8;
+            i_chroma |= (unsigned char)psz_chroma[2] << 16;
+            i_chroma |= (unsigned char)psz_chroma[3] << 24;
+
+            b_chroma = 1;
+        }
+
+        free( psz_chroma );
+    }
+
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
-    switch( p_vout->render.i_chroma )
+    if( b_chroma )
     {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
-            p_vout->output.i_chroma = p_vout->render.i_chroma;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
-            break;
-
-        default:
-            p_vout->output.i_chroma = FOURCC_RV16;
-            p_vout->output.i_rmask  = 0xf800;
-            p_vout->output.i_gmask  = 0x07e0;
-            p_vout->output.i_bmask  = 0x001f;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
-            break;
+        intf_WarnMsg( 3, "vout info: forcing chroma 0x%.8x (%4.4s)",
+                         i_chroma, (char*)&i_chroma );
+        p_vout->output.i_chroma = i_chroma;
+        p_vout->output.i_width  = p_vout->render.i_width;
+        p_vout->output.i_height = p_vout->render.i_height;
+        p_vout->output.i_aspect = p_vout->render.i_aspect;
+    }
+    else
+    {
+        p_vout->output.i_chroma = FOURCC_RV16;
+        p_vout->output.i_rmask  = 0xf800;
+        p_vout->output.i_gmask  = 0x07e0;
+        p_vout->output.i_bmask  = 0x001f;
+        p_vout->output.i_width  = p_vout->render.i_width;
+        p_vout->output.i_height = p_vout->render.i_height;
+        p_vout->output.i_aspect = p_vout->render.i_aspect;
     }
 
     /* Try to initialize DUMMY_MAX_DIRECTBUFFERS direct buffers */
@@ -147,7 +161,16 @@ static int vout_Init( vout_thread_t *p_vout )
         }
 
         /* Allocate the picture */
-        if( p_pic == NULL || DummyNewPicture( p_vout, p_pic ) )
+        if( p_pic == NULL )
+        {
+            break;
+        }
+
+        vout_AllocatePicture( p_pic, p_vout->output.i_width,
+                                     p_vout->output.i_height,
+                                     p_vout->output.i_chroma );
+
+        if( p_pic->i_planes == 0 )
         {
             break;
         }
@@ -213,82 +236,5 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* No need to do anything, the fake direct buffers stay as they are */
-}
-
-/*****************************************************************************
- * DummyNewPicture: allocate a picture
- *****************************************************************************
- * Returns 0 on success, -1 otherwise
- *****************************************************************************/
-static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    int i_width  = p_vout->output.i_width;
-    int i_height = p_vout->output.i_height;
-
-    switch( p_vout->output.i_chroma )
-    {
-    /* We know this chroma, allocate a buffer which will be used
-     * directly by the decoder */
-    case FOURCC_I420:
-    case FOURCC_IYUV:
-    case FOURCC_YV12:
-
-        /* Allocate the memory buffer */
-        p_pic->p_data = vlc_memalign( &p_pic->p_data_orig,
-                                      16, i_width * i_height * 3 / 2 );
-
-        /* Y buffer */
-        p_pic->Y_PIXELS = p_pic->p_data;
-        p_pic->p[Y_PLANE].i_lines = i_height;
-        p_pic->p[Y_PLANE].i_pitch = i_width;
-        p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-        p_pic->p[Y_PLANE].b_margin = 0;
-
-        /* U buffer */
-        p_pic->U_PIXELS = p_pic->Y_PIXELS + i_height * i_width;
-        p_pic->p[U_PLANE].i_lines = i_height / 2;
-        p_pic->p[U_PLANE].i_pitch = i_width / 2;
-        p_pic->p[U_PLANE].i_pixel_bytes = 1;
-        p_pic->p[U_PLANE].b_margin = 0;
-
-        /* V buffer */
-        p_pic->V_PIXELS = p_pic->U_PIXELS + i_height * i_width / 4;
-        p_pic->p[V_PLANE].i_lines = i_height / 2;
-        p_pic->p[V_PLANE].i_pitch = i_width / 2;
-        p_pic->p[V_PLANE].i_pixel_bytes = 1;
-        p_pic->p[V_PLANE].b_margin = 0;
-
-        /* We allocated 3 planes */
-        p_pic->i_planes = 3;
-
-        return( 0 );
-        break;
-
-    /* Unknown chroma, allocate an RGB buffer, the video output's job
-     * will be to do the chroma->RGB conversion */
-    case FOURCC_RV16:
-
-        /* Allocate the memory buffer */
-        p_pic->p_data = vlc_memalign( &p_pic->p_data_orig,
-                                      16, i_width * i_height * 2 );
-
-        /* Fill important structures */
-        p_pic->p->p_pixels = p_pic->p_data;
-        p_pic->p->i_lines = i_height;
-        p_pic->p->i_pitch = i_width;
-        p_pic->p->i_pixel_bytes = 2;
-        p_pic->p->b_margin = 0;
-
-        /* We allocated 1 plane */
-        p_pic->i_planes = 1;
-
-        return( 0 );
-        break;
-
-    default:
-        p_pic->i_planes = 0;
-        return( 0 );
-        break;
-    }
 }
 
