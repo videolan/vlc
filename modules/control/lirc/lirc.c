@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: lirc.c,v 1.2 2003/01/12 01:26:36 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -197,6 +197,29 @@ static void Run( intf_thread_t *p_intf )
                     }
                 }
             }
+            if( !strcmp( c, "PLAYPAUSE" ) )
+            {
+                if( p_intf->p_sys->p_input &&
+                    p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S )
+                {
+                    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+                }
+                else
+                {
+                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                  FIND_ANYWHERE );
+                    if( p_playlist )
+                    {
+                        vlc_mutex_lock( &p_playlist->object_lock );
+                        if( p_playlist->i_size )
+                        {
+                            vlc_mutex_unlock( &p_playlist->object_lock );
+                            playlist_Play( p_playlist );
+                            vlc_object_release( p_playlist );
+                        }
+                    }
+                }                    
+            }                
             else if( p_intf->p_sys->p_input )
             {
                 p_input = p_intf->p_sys->p_input;

@@ -1,8 +1,24 @@
+# This is an example .lircrc file that shows the different config strings that
+# vlc understand. button names are from an animax remote, and these may change
+# with different remotes
+
 begin
   prog = vlc
   button = PLAY_UP
   config = PLAY
+end
+
+begin
+  prog = vlc
+  button = PAUSE_UP
   config = PAUSE
+end
+
+#use this target if you have a combined play/pause button
+begin
+  prog = vlc
+  button = PLAY_UP
+  config = PLAYPAUSE
 end
 
 begin
@@ -26,7 +42,7 @@ end
 begin
   prog = vlc
   button = SKIP_BACKWARD
-  config = LAST
+  config = PREV
 end
 
 begin
