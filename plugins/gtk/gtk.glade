@@ -1398,7 +1398,7 @@
       <widget>
 	<class>GtkLabel</class>
 	<name>label18</name>
-	<label>(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team</label>
+	<label>(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team</label>
 	<justify>GTK_JUSTIFY_LEFT</justify>
 	<wrap>False</wrap>
 	<xalign>0.5</xalign>
@@ -1427,24 +1427,8 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <name>label16</name>
-	  <label>Régis Duchesne &lt;regis@via.ecp.fr&gt;
-Michel Lespinasse &lt;walken@zoy.org&gt;
-Olivier Pomel &lt;pomel@via.ecp.fr&gt;
-Pierre Baillet &lt;oct@zoy.org&gt;
-Jean-Philippe Grimaldi &lt;jeanphi@via.ecp.fr&gt;
-Andres Krapf &lt;dae@via.ecp.fr&gt;
-Christophe Massiot &lt;massiot@via.ecp.fr&gt;
-Vincent Seguin &lt;seguin@via.ecp.fr&gt;
-Benoit Steiner &lt;benny@via.ecp.fr&gt;
-Arnaud de Bossoreille de Ribou &lt;bozo@via.ecp.fr&gt;
-Jean-Marc Dressler &lt;polux@via.ecp.fr&gt;
-Gaël Hendryckx &lt;jimmy@via.ecp.fr&gt;
-Samuel Hocevar &lt;sam@zoy.org&gt;
-Brieuc Jeunhomme &lt;bbp@via.ecp.fr&gt;
-Michel Kaempf &lt;maxx@via.ecp.fr&gt;
-Stéphane Borel &lt;stef@via.ecp.fr&gt;
-Renaud Dartus &lt;reno@via.ecp.fr&gt;
-Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
+	  <label>the VideoLAN team &lt;videolan@videolan.org&gt;
+http://www.videolan.org/</label>
 	  <justify>GTK_JUSTIFY_LEFT</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>

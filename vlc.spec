@@ -1,5 +1,5 @@
 %define name 		vlc
-%define vlc_ver 	0.2.92
+%define vlc_ver 	0.3.0
 %define version		%vlc_ver
 
 %define cvs     	0
@@ -298,6 +298,10 @@ rm -fr %buildroot
 %endif
 
 %changelog
+* Thu Apr 04 2002 Samuel Hocevar <sam@zoy.org> 0.3.0
+- version 0.3.0.
+- removed libdvdcss from the whole tarball.
+
 * Thu Jan 17 2002 Yves Duret <yduret@mandrakesoft.com> 0.2.92-2mdk
 - readded libdvdcss rpm in specfile. use %%define css 1 with correct sources
   to build libdvdcss rpm.

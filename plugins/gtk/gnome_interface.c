@@ -1109,30 +1109,14 @@ GtkWidget*
 create_intf_about (void)
 {
   const gchar *authors[] = {
-    "Régis Duchesne <regis@via.ecp.fr>",
-    "Michel Lespinasse <walken@zoy.org>",
-    "Olivier Pomel <pomel@via.ecp.fr>",
-    "Pierre Baillet <oct@zoy.org>",
-    "Jean-Philippe Grimaldi <jeanphi@via.ecp.fr>",
-    "Andres Krapf <dae@via.ecp.fr>",
-    "Christophe Massiot <massiot@via.ecp.fr>",
-    "Vincent Seguin <seguin@via.ecp.fr>",
-    "Benoit Steiner <benny@via.ecp.fr>",
-    "Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>",
-    "Jean-Marc Dressler <polux@via.ecp.fr>",
-    "Gaël Hendryckx <jimmy@via.ecp.fr>",
-    "Samuel Hocevar <sam@zoy.org>",
-    "Brieuc Jeunhomme <bbp@via.ecp.fr>",
-    "Michel Kaempf <maxx@via.ecp.fr>",
-    "Stéphane Borel <stef@via.ecp.fr>",
-    "Renaud Dartus <reno@via.ecp.fr>",
-    "Henri Fallon <henri@via.ecp.fr>",
+    "the VideoLAN team <videolan@videolan.org>",
+    "http://www.videolan.org/",
     NULL
   };
   GtkWidget *intf_about;
 
   intf_about = gnome_about_new ("VideoLAN Client", VERSION,
-                        _("(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team"),
+                        _("(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002  - the VideoLAN Team"),
                         authors,
                         _("This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source."),
                         NULL);

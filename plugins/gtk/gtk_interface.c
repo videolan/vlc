@@ -1343,7 +1343,7 @@ create_intf_about (void)
   gtk_box_pack_start (GTK_BOX (vbox3), label14, TRUE, TRUE, 0);
   gtk_misc_set_padding (GTK_MISC (label14), 0, 10);
 
-  label18 = gtk_label_new (_("(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team"));
+  label18 = gtk_label_new (_("(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"));
   gtk_widget_ref (label18);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label18", label18,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1359,7 +1359,7 @@ create_intf_about (void)
   gtk_widget_show (frame1);
   gtk_box_pack_start (GTK_BOX (vbox3), frame1, FALSE, FALSE, 0);
 
-  label16 = gtk_label_new (_("Régis Duchesne <regis@via.ecp.fr>\nMichel Lespinasse <walken@zoy.org>\nOlivier Pomel <pomel@via.ecp.fr>\nPierre Baillet <oct@zoy.org>\nJean-Philippe Grimaldi <jeanphi@via.ecp.fr>\nAndres Krapf <dae@via.ecp.fr>\nChristophe Massiot <massiot@via.ecp.fr>\nVincent Seguin <seguin@via.ecp.fr>\nBenoit Steiner <benny@via.ecp.fr>\nArnaud de Bossoreille de Ribou <bozo@via.ecp.fr>\nJean-Marc Dressler <polux@via.ecp.fr>\nGaël Hendryckx <jimmy@via.ecp.fr>\nSamuel Hocevar <sam@zoy.org>\nBrieuc Jeunhomme <bbp@via.ecp.fr>\nMichel Kaempf <maxx@via.ecp.fr>\nStéphane Borel <stef@via.ecp.fr>\nRenaud Dartus <reno@via.ecp.fr>\nHenri Fallon <henri@via.ecp.fr>"));
+  label16 = gtk_label_new (_("the VideoLAN team <videolan@videolan.org>\nhttp://www.videolan.org/"));
   gtk_widget_ref (label16);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label16", label16,
                             (GtkDestroyNotify) gtk_widget_unref);

@@ -4,6 +4,14 @@
 
 HEAD
 
+  * ./plugins/gtk/gtk.glade, plugins/gtk/gnome.glade, ./plugins/kde/kde.cpp:
+    replaced the outdated author list with a "VideoLAN Team" entry.
+  * ./debian/rules, ./debian/control: deactivated the vlc-kde package because
+    it does not work, and removed the vlc-a52 package because liba52 is
+    statically linked into vlc.
+  * ./debian/control: added more helpful package descriptions.
+  * ALL: changed version to 0.3.0. Yeah, it's coming.
+  * ./Makefile: fixed make dist.
   * ./src/video_output/video_output.c: fixed a vout4 image starvation bug.
   * ./plugins/dvd/dvd.c: we look for libdvdcss.so.2 as well as -.so.1.
   * ./configure.in: BSD/OS fixes thanks to Steven M. Schultz.

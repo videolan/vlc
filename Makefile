@@ -211,7 +211,7 @@ endif
 #
 # Misc variables
 #
-VLC_QUICKVERSION := $(shell grep '^ *VLC_VERSION=' configure.in | head -1 | sed 's/"//g' | cut -f2 -d=)
+VLC_QUICKVERSION := $(shell grep '^ *VERSION=' configure.in | head -1 | sed 's/"//g' | cut -f2 -d=)
 
 # All symbols must be exported
 export

@@ -757,7 +757,7 @@ test "$host_alias" != "$target_alias" &&
   program_prefix=${target_alias}-
 
 
-VERSION="0.2.92-dev"
+VERSION="0.3.0"
 CODENAME=Ourumov
 
 save_CFLAGS="${CFLAGS}"
