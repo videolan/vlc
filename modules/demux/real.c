@@ -2,7 +2,7 @@
  * real.c: Real demuxer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: real.c,v 1.3 2004/01/25 20:05:28 hartman Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -89,8 +89,6 @@ static int Open( vlc_object_t *p_this )
     demux_sys_t *p_sys;
 
     uint8_t     *p_peek;
-
-    int         i;
 
     if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
     {
@@ -489,11 +487,11 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
+#if 0
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
     int64_t i64, *pi64;
 
-#if 0
     switch( i_query )
     {
         case DEMUX_GET_POSITION:
