@@ -399,12 +399,12 @@ Difficulty: Guru
 Urgency: Wishlist
 Platform: any
 Description: Vout redesign
-- vout needs distinct splitting into vout_core, vout_window, pic_filter, vout_filter
-- needs 'assistence' vout windows (clone filters, goom) etc.
-- 4:3, 16:9, freeform Aspect Ratio
-- cropping and padding (do at OS level, but provide a core call to set it up and configure).
-- OSD at window resolution instead of video res (secondary vout channel)
-- a OSD needs to be bound to a vout stream (no subs on goom vout)
+- vout needs distinct splitting into vout_core, vout_window, pic_filter, vout_filter<br />
+- needs 'assistence' vout windows (clone filters, goom) etc.<br />
+- 4:3, 16:9, freeform Aspect Ratio<br />
+- cropping and padding (do at OS level, but provide a core call to set it up and configure).<br />
+- OSD at window resolution instead of video res (secondary vout channel)<br />
+- a OSD needs to be bound to a vout stream (no subs on goom vout)<br />
 - Use OS native calls where appropriate, with 'C' fallbacks. (OpenGL, Quartz, DirectX already has many of the funtionalities we seek and sometimes they are a lot faster too).
 Status: Todo
 
@@ -413,7 +413,7 @@ Difficulty: Medium
 Urgency: Wishlist
 Platform: any
 Description: Subtitle work
-- better SSA support with postioning, colors etc.
+- better SSA support with postioning, colors etc.<br />
 - Fix subtitles dialogs (mac done)
 Status: Todo
 
@@ -430,7 +430,11 @@ Difficulty: Guru
 Urgency: Wishlist
 Platform: Mac OS X
 Description: skins2
-Port VLC skins to Objective C++ and OSX. Also requires the intf to be a dialog handler.
+Port VLC skins to Objective C++ and OSX. Also requires the intf to be a dialog provider.<br />
+Hints:<br />
+ - In a first step, the need for a dialog provider can be easily omitted.<br />
+ - In theory, only a small amount of classes (6 or so) must be written for OS X, implementing predefined interfaces.<br />
+ - The code of <a href="http://www.fltk.org">FLTK</a> could be really helpful to identify the correct functions and see how to use them.
 Status: Todo
 
 Task
