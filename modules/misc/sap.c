@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.37 2003/11/22 12:17:08 sigmunau Exp $
+ * $Id: sap.c,v 1.38 2003/11/22 12:33:04 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -408,7 +408,7 @@ static void Run( intf_thread_t *p_intf )
         {
 #ifdef HAVE_ZLIB_H
             i_decompressed_size = do_decompress( p_sdp, &p_decompressed_buffer, i_read - ( p_sdp - buffer ) );
-            if( i_decompressed_size > 0 )
+            if( i_decompressed_size > 0 && i_decompressed_size < MAX_SAP_BUFFER )
             {
                 memcpy( p_sdp, p_decompressed_buffer, i_decompressed_size );
                 p_sdp[i_decompressed_size] = '\0';
