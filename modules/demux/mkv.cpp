@@ -385,7 +385,7 @@ public:
         ,es(estream)
         ,i_timescale(MKVD_TIMECODESCALE)
         ,f_duration(-1.0)
-        ,f_start_time(0.0)
+        ,i_start_time(0)
         ,i_cues_position(-1)
         ,i_chapters_position(-1)
         ,i_tags_position(-1)
@@ -462,7 +462,7 @@ public:
 
     /* duration of the segment */
     float                   f_duration;
-    float                   f_start_time;
+    mtime_t                 i_start_time;
 
     /* all tracks */
     std::vector<mkv_track_t*> tracks;
@@ -3077,7 +3077,7 @@ void matroska_segment_t::ParseCluster( )
         }
     }
 
-    f_start_time = cluster->GlobalTimecode() / 1000000.0;
+    i_start_time = cluster->GlobalTimecode() / 1000;
 }
 
 /*****************************************************************************
@@ -3532,7 +3532,7 @@ float virtual_segment_t::Duration() const
         matroska_segment_t *p_last_segment = linked_segments[linked_segments.size()-1];
 //        p_last_segment->ParseCluster( );
 
-        f_duration = p_last_segment->f_start_time + p_last_segment->f_duration;
+        f_duration = p_last_segment->i_start_time / 1000 + p_last_segment->f_duration;
     }
     return f_duration;
 }
@@ -3567,7 +3567,7 @@ void matroska_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
     int64_t     i_block_ref2;
     size_t      i_track;
     int64_t     i_seek_position = i_start_pos;
-    int64_t     i_seek_time = f_start_time * 1000;
+    int64_t     i_seek_time = i_start_time;
 
     if ( i_index > 0 )
     {
@@ -3688,7 +3688,7 @@ void virtual_segment_t::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
     // find the best matching segment
     for ( i=0; i<linked_segments.size(); i++ )
     {
-        if ( i_date < linked_segments[i]->f_start_time * 1000.0 )
+        if ( i_date < linked_segments[i]->i_start_time )
             break;
     }
 
