@@ -266,7 +266,7 @@ static __inline__ signed int audio_linear_dither(unsigned int bits, mad_fixed_t 
 /*****************************************************************************
  * s24_to_s16_pcm: Scale a 24 bit pcm sample to a 16 bit pcm sample.
  *****************************************************************************/
-static __inline__ mad_fixed_t (mad_fixed_t sample)
+static __inline__ mad_fixed_t s24_to_s16_pcm(mad_fixed_t sample)
 {
   /* round */
   sample += (1L << (MAD_F_FRACBITS - 16));
