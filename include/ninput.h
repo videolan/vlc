@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.23 2004/01/07 15:31:31 fenrir Exp $
+ * $Id: ninput.h,v 1.24 2004/01/16 11:12:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -117,6 +117,8 @@ enum stream_query_e
     STREAM_GET_POSITION,        /**< arg1= int64_t *      res=cannot fail*/
 
     STREAM_GET_SIZE,            /**< arg1= int64_t *      res=cannot fail (0 if no sense)*/
+
+    STREAM_GET_MTU,             /**< arg1= int *          res=cannot fail (0 if no sense)*/
 };
 
 /* Stream */
@@ -145,11 +147,16 @@ static int64_t inline stream_Size( stream_t *s )
 
     return i_pos;
 }
+static int inline stream_MTU( stream_t *s )
+{
+    int i_mtu;
+    return stream_Control( s, STREAM_GET_POSITION, &i_mtu );
+}
+
 static int inline stream_Seek( stream_t *s, int64_t i_pos )
 {
     return stream_Control( s, STREAM_SET_POSITION, i_pos );
 }
-
 
 /**
  * @}

@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: stream.c,v 1.10 2004/01/06 21:42:43 sigmunau Exp $
+ * $Id: stream.c,v 1.11 2004/01/16 11:12:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -78,6 +78,7 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
 {
     vlc_bool_t *p_b;
     int64_t    *p_i64, i64;
+    int        *p_int;
 
     switch( i_query )
     {
@@ -172,7 +173,11 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
                     }
                 }
             }
+            return VLC_SUCCESS;
 
+        case STREAM_GET_MTU:
+            p_int = (int*) va_arg( args, int * );
+            *p_int = s->p_input->i_mtu;
             return VLC_SUCCESS;
 
         default:
