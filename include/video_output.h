@@ -144,6 +144,8 @@ typedef struct vout_thread_s
     int                 i_screen_depth;  /* significant bpp: 8, 15, 16 or 24 */
     int                 i_bytes_per_pixel;/* real screen depth: 1, 2, 3 or 4 */
     float               f_gamma;                                    /* gamma */
+    boolean_t           b_need_render;  /* does the output method need a YUV 
+                                         * conversion ?                      */
 
     /* Color masks and shifts in RGB mode - masks are set by system
      * initialization, shifts are calculated. A pixel color value can be
@@ -202,6 +204,7 @@ typedef struct vout_thread_s
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];      /* subpictures */
     int                 i_pictures;                     /* current heap size */
     vout_yuv_t          yuv;                           /* translation tables */
+    picture_t *         p_rendered_pic;  /* picture currently being rendered */
 
     /* Bitmap fonts */
     p_vout_font_t       p_default_font;                      /* default font */

@@ -158,6 +158,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     p_vout->i_screen_depth        = 15;
     p_vout->i_bytes_per_pixel     = 2;
     p_vout->f_gamma               = VOUT_GAMMA;
+    p_vout->b_need_render         = 1;
 
     p_vout->b_grayscale           = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
                                                        VOUT_GRAYSCALE_DEFAULT );
@@ -923,11 +924,14 @@ static int InitThread( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    /* Initialize convertion tables and functions */
-    if( vout_InitYUV( p_vout ) )
+    if( p_vout->b_need_render )
     {
-        intf_ErrMsg("error: can't allocate YUV translation tables\n");
-        return( 1 );
+        /* Initialize convertion tables and functions */
+        if( vout_InitYUV( p_vout ) )
+        {
+            intf_ErrMsg("error: can't allocate YUV translation tables\n");
+            return( 1 );
+        }
     }
 
     /* Mark thread as running and return */
@@ -1025,7 +1029,7 @@ static void RunThread( vout_thread_t *p_vout)
                         "warning: late picture skipped (%p)\n", p_pic );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
-		continue;
+                continue;
             }
             else if( display_date > current_date + VOUT_DISPLAY_DELAY )
             {
@@ -1060,8 +1064,11 @@ static void RunThread( vout_thread_t *p_vout)
         {
             b_display = p_vout->b_active;
             p_vout->last_display_date = display_date;
+            p_vout->p_rendered_pic = p_pic;
 
-            if( b_display )
+            /* FIXME: if b_need_render == 0 we need to do something with
+             * the subpictures one day. */
+            if( p_vout->b_need_render && b_display )
             {
                 /* Set picture dimensions and clear buffer */
                 SetBufferPicture( p_vout, p_pic );
@@ -1080,14 +1087,17 @@ static void RunThread( vout_thread_t *p_vout)
             }
 
             /* Render interface and subpicture */
-            if( b_display && p_vout->b_interface )
+            if( b_display && p_vout->b_interface && p_vout->b_need_render )
             {
                 RenderInterface( p_vout );
             }
 
         }
-        else if( p_vout->b_active && p_vout->init_display_date == 0)        /* idle or interface screen alone */
+        else if( p_vout->b_active && p_vout->b_need_render 
+                  && p_vout->init_display_date == 0)
         {
+            /* Idle or interface screen alone */
+
             if( p_vout->b_interface && 0 /* && XXX?? intf_change */ )
             {
                 /* Interface has changed, so a new rendering is required - force
@@ -1115,10 +1125,10 @@ static void RunThread( vout_thread_t *p_vout)
 
 
         /*
-         * chech for the current time and
+         * Check for the current time and
          * display splash screen if everything is on time
          */
-        if( p_vout->init_display_date > 0) 
+        if( p_vout->init_display_date > 0 && p_vout->b_need_render ) 
         {
             if( p_vout->b_active && 
                     mdate()-p_vout->init_display_date < 5000000)
@@ -1135,15 +1145,13 @@ static void RunThread( vout_thread_t *p_vout)
         }
             
 
-
-        
         /*
          * Sleep, wake up and display rendered picture
          */
 
         if( display_date != 0 )
         {
-            /* Store render time */
+            /* Store render time using Bresenham algorithm */
             p_vout->render_time += mdate() - current_date;
             p_vout->render_time >>= 1;
         }
