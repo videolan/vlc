@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.6 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: dvd_access.c,v 1.7 2002/03/15 00:57:16 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -226,9 +226,9 @@ static int DVDOpen( struct input_thread_s *p_input )
 
     p_area = p_input->stream.pp_areas[p_dvd->i_title];
     
-    p_dvd->i_chapter = p_dvd->i_chapter <= p_area->i_part_nb ?
-                       p_dvd->i_chapter : 1;
-    p_area->i_part = p_dvd->i_chapter;
+    p_area->i_part = p_dvd->i_chapter <= p_area->i_part_nb ?
+                     p_dvd->i_chapter : 1;
+    p_dvd->i_chapter = 1;
     
     p_dvd->b_new_chapter = 0;
     p_dvd->i_audio_nb = 0;
