@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.22 2003/05/12 01:17:10 hartman Exp $
+ * $Id: playlist.m,v 1.23 2003/05/22 13:40:13 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -111,11 +111,17 @@
     }
 }
 
-- (void) highlightSelectionInClipRect:(NSRect)o_rect {
+- (void)highlightSelectionInClipRect:(NSRect)o_rect {
     NSRect o_new_rect;
     float f_height = [self rowHeight] + [self intercellSpacing].height;
     float f_origin_y = NSMaxY( o_rect );
     int i_row = o_rect.origin.y / f_height;
+    
+    if( [NSColor respondsTo:alternateSelectedControlColor] )
+    {
+        [super highlightSelectionInClipRect:o_rect];
+        break;
+    }
     
     if ( i_row % 2 == 0 )
     {
