@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.14 2003/02/20 18:10:16 hartman Exp $
+ * $Id: prefs.m,v 1.15 2003/02/21 02:45:21 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -576,15 +576,15 @@
     s_rc.origin.y = s_panel_rc.origin.y + 14;
     s_rc.size.height = 25; s_rc.size.width = 105;
     s_rc.origin.x = s_panel_rc.size.width - s_rc.size.width - 14;
-    DEF_PANEL_BUTTON( 0, _NS("OK"), clickedCancelOK: );
+    DEF_PANEL_BUTTON( 0, _NS("OK"), clickedApplyCancelOK: );
     [o_panel setDefaultButtonCell: [o_button cell]];
 
     s_rc.origin.x -= s_rc.size.width;
-    DEF_PANEL_BUTTON( 1, _NS("Cancel"), clickedCancelOK: );
+    DEF_PANEL_BUTTON( 1, _NS("Cancel"), clickedApplyCancelOK: );
     [o_button setKeyEquivalent: @"\E"];
 
     s_rc.origin.x -= s_rc.size.width;
-    DEF_PANEL_BUTTON( 2, _NS("Apply"), clickedApply: );
+    DEF_PANEL_BUTTON( 2, _NS("Apply"), clickedApplyCancelOK: );
     [o_button setEnabled: NO];
 
 #undef DEF_PANEL_BUTTON
@@ -724,92 +724,102 @@
     }
 }
 
-- (void)clickedApply:(id)sender
+- (void)clickedApplyCancelOK:(id)sender
 {
     id o_vlc_control;
     NSEnumerator *o_enum;
-
-    NSView *o_config_view = [sender superview];
-    NSWindow *o_config_panel = [o_config_view window];
-    NSButton *o_btn_apply = [o_config_view viewWithTag: 2];
-    NSString *o_module_name = [[o_config_panel toolbar] identifier];
-    NSMutableArray *o_prefs = [o_save_prefs objectForKey: o_module_name];
-
-    o_enum = [o_prefs objectEnumerator];
-    while( ( o_vlc_control = [o_enum nextObject] ) )
-    {
-        int i_type = [o_vlc_control configType];
-        NSString *o_name = [o_vlc_control configName];
-        char *psz_name = (char *)[o_name lossyCString];
-
-        switch( i_type )
-        {
-
-        case CONFIG_ITEM_MODULE:
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_FILE:
-            {
-                char *psz_value;
-                NSString *o_value;
-
-                o_value = [o_vlc_control stringValue];
-                psz_value = (char *)[o_value lossyCString];
-
-                config_PutPsz( p_intf, psz_name,
-                               *psz_value ? psz_value : NULL );
-            }
-            break;
-
-        case CONFIG_ITEM_INTEGER:
-        case CONFIG_ITEM_BOOL:
-            {
-                int i_value = [o_vlc_control intValue];
-
-                config_PutInt( p_intf, psz_name, i_value );
-            }
-            break;
-
-        case CONFIG_ITEM_FLOAT:
-            {
-                float f_value = [o_vlc_control floatValue];
-
-                config_PutFloat( p_intf, psz_name, f_value );
-            }
-            break;
-
-        }
-    }
-
-    [o_btn_apply setEnabled: NO];
-    [o_prefs removeAllObjects];
-
-    config_SaveConfigFile( p_intf, NULL );
-}
-
-- (void)clickedCancelOK:(id)sender
-{
+    BOOL b_advanced_change = FALSE;
+    
     NSWindow *o_pref_panel = [[sender superview] window];
     NSString *o_module_name = [[o_pref_panel toolbar] identifier];
 
-    if( [[sender title] isEqualToString: _NS("OK")] )
+    if ( ![[sender title] isEqualToString: _NS("Cancel")] )
     {
-        [self clickedApply: sender];
+        NSView *o_config_view = [sender superview];
+        NSWindow *o_config_panel = [o_config_view window];
+        NSButton *o_btn_apply = [o_config_view viewWithTag: 2];
+        NSString *o_module_name = [[o_config_panel toolbar] identifier];
+        NSMutableArray *o_prefs = [o_save_prefs objectForKey: o_module_name];
+    
+        o_enum = [o_prefs objectEnumerator];
+        while( ( o_vlc_control = [o_enum nextObject] ) )
+        {
+            int i_type = [o_vlc_control configType];
+            NSString *o_name = [o_vlc_control configName];
+            char *psz_name = (char *)[o_name lossyCString];
+    
+            switch( i_type )
+            {
+    
+            case CONFIG_ITEM_MODULE:
+            case CONFIG_ITEM_STRING:
+            case CONFIG_ITEM_FILE:
+                {
+                    char *psz_value;
+                    NSString *o_value;
+    
+                    o_value = [o_vlc_control stringValue];
+                    psz_value = (char *)[o_value lossyCString];
+    
+                    config_PutPsz( p_intf, psz_name,
+                                *psz_value ? psz_value : NULL );
+                }
+                break;
+    
+            case CONFIG_ITEM_INTEGER:
+            case CONFIG_ITEM_BOOL:
+                {
+                    int i_value = [o_vlc_control intValue];
+                    if ( !strcmp( psz_name, "advanced" ) && ( config_GetInt( p_intf, "advanced" ) != i_value ) )
+                    {
+                        b_advanced_change = TRUE;
+                    }
+                    config_PutInt( p_intf, psz_name, i_value );
+                }
+                break;
+    
+            case CONFIG_ITEM_FLOAT:
+                {
+                    float f_value = [o_vlc_control floatValue];
+    
+                    config_PutFloat( p_intf, psz_name, f_value );
+                }
+                break;
+    
+            }
+        }
+    
+        [o_btn_apply setEnabled: NO];
+        [o_prefs removeAllObjects];
+    
+        config_SaveConfigFile( p_intf, NULL );
     }
-
-    [o_pref_panel close];
-
-    if( [self respondsToSelector: @selector(performSelectorOnMainThread:
-                                            withObject:waitUntilDone:)] )
+    
+    if ( [[sender title] isEqualToString: _NS("Apply")] && !b_advanced_change )
     {
-        [self performSelectorOnMainThread: @selector(destroyPrefPanel:)
-                                           withObject: o_module_name
-                                           waitUntilDone: NO];
+        ;
     }
     else
     {
-        [NSTimer scheduledTimerWithTimeInterval: 0.1
-                 target: self selector: @selector(destroyPrefPanel:)
-                 userInfo: o_module_name repeats: NO];
+        [o_pref_panel close];
+
+        if( [self respondsToSelector: @selector(performSelectorOnMainThread:
+                                                withObject:waitUntilDone:)] )
+        {
+            [self performSelectorOnMainThread: @selector(destroyPrefPanel:)
+                                            withObject: o_module_name
+                                            waitUntilDone: YES];
+            if ( [[sender title] isEqualToString: _NS("Apply")] && b_advanced_change )
+            {
+                [self createPrefPanel:@"main"];
+            }
+        }
+        else
+        {
+            [NSTimer scheduledTimerWithTimeInterval: 0.1
+                    target: self selector: @selector(destroyPrefPanel:)
+                    userInfo: o_module_name repeats: NO];
+        }
     }
 }
 
