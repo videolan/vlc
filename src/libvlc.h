@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.61 2003/05/07 23:13:07 hartman Exp $
+ * $Id: libvlc.h,v 1.62 2003/05/08 14:15:36 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,7 +57,9 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define TRANSLATION_TEXT N_("Translation")
 #define TRANSLATION_LONGTEXT N_( \
-    "This option allows you to enable the translation of the interface.")
+    "This option allows you to set the language of the interface " \
+    "(e.g. 'fr', 'de'...). If not specified, the system language is " \
+    "auto-detected." )
 
 #define COLOR_TEXT N_("Color messages")
 #define COLOR_LONGTEXT N_( \
@@ -443,7 +445,7 @@ vlc_module_begin();
     add_integer_with_short( "verbose", 'v', -1, NULL,
                             VERBOSE_TEXT, VERBOSE_LONGTEXT, VLC_FALSE );
     add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
-    add_bool( "translation", 1, NULL, TRANSLATION_TEXT, TRANSLATION_LONGTEXT, VLC_FALSE );
+    add_string( "translation", NULL, NULL, TRANSLATION_TEXT, TRANSLATION_LONGTEXT, VLC_FALSE );
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT, VLC_FALSE );
     add_string( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT, VLC_TRUE );
