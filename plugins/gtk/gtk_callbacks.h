@@ -1,4 +1,34 @@
+/*****************************************************************************
+ * gtk_callbacks.h : Callbacks for the gtk plugin.
+ *****************************************************************************
+ * Copyright (C) 2000, 2001 VideoLAN
+ * $Id: gtk_callbacks.h,v 1.13 2001/05/23 23:08:20 stef Exp $
+ *
+ * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Stéphane Borel <stef@via.ecp.fr>
+ *      
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
 #include <gtk/gtk.h>
+
+#include "config.h"
+
 #include "gtk_control.h"
 #include "gtk_menu.h"
 #include "gtk_open.h"
@@ -8,7 +38,9 @@
 
 /* General glade callbacks */
 
-/* main window callbacks: specific prototypes are in headers listed before */
+/*****************************************************************************
+ *  main window callbacks: specific prototypes are in headers listed before
+ *****************************************************************************/
 
 gboolean GtkExit                ( GtkWidget *, GdkEventButton *, gpointer );
 gboolean GtkWindowToggle        ( GtkWidget *, GdkEventButton *, gpointer );

@@ -1,11 +1,12 @@
 /*****************************************************************************
- * gnome_playlist.h : Playlist functions for the Gnome plugin.
+ * gtk_dsiplay.h: Gtk+ tools for main interface.
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_playlist.h,v 1.1 2001/05/06 18:41:52 stef Exp $
+ * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: gtk_display.h,v 1.1 2001/05/23 23:08:20 stef Exp $
  *
- * Authors: Pierre Baillet <oct@zoy.org>
- *      
+ * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Stéphane Borel <stef@via.ecp.fr>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -21,15 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-void    GnomeDropDataReceived ( intf_thread_t *, GtkSelectionData *,
-                                guint, int );
-void    GnomeRebuildCList     ( GtkCList *, playlist_t * );
-int     GnomeHasValidExtension( gchar * );
-int     GnomeAppendList       ( playlist_t *, int, GList * );
-void    GnomePlayListManage   ( intf_thread_t * );
-gint    GnomeCompareItems     ( gconstpointer, gconstpointer );
-GList * GnomeReadFiles        ( gchar * );
-void    GnomeDeleteGListItem  ( gpointer, gpointer );
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
 
+gint GtkModeManage   ( intf_thread_t * p_intf );
+void GtkDisplayDate  ( GtkAdjustment *p_adj );
 
 

@@ -2,7 +2,7 @@
  * intf_gtk.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.h,v 1.5 2001/05/19 00:39:30 stef Exp $
+ * $Id: intf_gtk.h,v 1.6 2001/05/23 23:08:20 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -57,7 +57,6 @@ typedef struct intf_sys_s
     boolean_t           b_popup_changed;                   /* display menu ? */
     boolean_t           b_window_changed;        /* window display toggled ? */
     boolean_t           b_playlist_changed;    /* playlist display toggled ? */
-    boolean_t           b_menus_update;              /* menus have changed ? */
     boolean_t           b_slider_free;                      /* slider status */
 
     /* menus handlers */
@@ -98,5 +97,12 @@ typedef struct intf_sys_s
     void             ( *pf_gdk_callback ) ( void );
 
 } intf_sys_t;
+
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+
+gint GtkModeManage   ( intf_thread_t * p_intf );
+void GtkDisplayDate  ( GtkAdjustment *p_adj );
 
 

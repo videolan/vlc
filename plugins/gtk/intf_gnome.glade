@@ -25,14 +25,16 @@
   <class>GnomeApp</class>
   <name>intf_window</name>
   <signal>
-    <name>destroy</name>
-    <handler>on_intf_window_destroy</handler>
-    <last_modification_time>Sun, 11 Feb 2001 17:41:57 GMT</last_modification_time>
+    <name>delete_event</name>
+    <handler>GtkWindowDelete</handler>
+    <data>&quot;intf_window&quot;</data>
+    <last_modification_time>Sat, 19 May 2001 03:20:57 GMT</last_modification_time>
   </signal>
   <signal>
     <name>drag_data_received</name>
-    <handler>on_intf_window_drag_data_received</handler>
-    <last_modification_time>Fri, 16 Feb 2001 01:59:35 GMT</last_modification_time>
+    <handler>GtkWindowDrag</handler>
+    <data>&quot;intf_window&quot;</data>
+    <last_modification_time>Sat, 19 May 2001 02:30:24 GMT</last_modification_time>
   </signal>
   <title>VideoLAN Client</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
@@ -90,8 +92,9 @@
 	      <tooltip>Open a File</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>on_menubar_open_activate</handler>
-		<last_modification_time>Sun, 04 Mar 2001 21:01:45 GMT</last_modification_time>
+		<handler>GnomeMenubarFileOpenActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:27:02 GMT</last_modification_time>
 	      </signal>
 	      <label>_Open File...</label>
 	      <right_justify>False</right_justify>
@@ -104,8 +107,9 @@
 	      <tooltip>Open a DVD or VCD</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>on_menubar_disc_activate</handler>
-		<last_modification_time>Sun, 04 Mar 2001 01:28:32 GMT</last_modification_time>
+		<handler>GnomeMenubarDiscOpenActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:27:10 GMT</last_modification_time>
 	      </signal>
 	      <label>Open _Disc...</label>
 	      <right_justify>False</right_justify>
@@ -118,8 +122,9 @@
 	      <tooltip>Select a Network Stream</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>on_menubar_network_activate</handler>
-		<last_modification_time>Mon, 12 Mar 2001 14:33:42 GMT</last_modification_time>
+		<handler>GnomeMenbarNetworkOpenActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:27:39 GMT</last_modification_time>
 	      </signal>
 	      <label>_Network Stream...</label>
 	      <right_justify>False</right_justify>
@@ -137,8 +142,9 @@
 	      <name>menubar_exit</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_menubar_exit_activate</handler>
-		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+		<handler>GnomeMenubarExitActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:27:52 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_EXIT_ITEM</stock_item>
 	    </widget>
@@ -155,16 +161,29 @@
 	    <name>menubar_view_menu</name>
 
 	    <widget>
-	      <class>GtkCheckMenuItem</class>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_hide_interface</name>
+	      <signal>
+		<name>activate</name>
+		<handler>GnomeMenubarWindowToggleActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:28:06 GMT</last_modification_time>
+	      </signal>
+	      <label>_Hide interface</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
 	      <name>menubar_fullscreen</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_menubar_fullscreen_activate</handler>
-		<last_modification_time>Wed, 02 May 2001 23:35:36 GMT</last_modification_time>
+		<handler>GnomeMenubarFullscreenActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:28:15 GMT</last_modification_time>
 	      </signal>
 	      <label>_Fullscreen</label>
-	      <active>False</active>
-	      <always_show_toggle>True</always_show_toggle>
+	      <right_justify>False</right_justify>
 	    </widget>
 
 	    <widget>
@@ -212,8 +231,9 @@
 	      <tooltip>Open the playlist window</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>on_menubar_playlist_activate</handler>
-		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+		<handler>GnomeMenubarPlaylistActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:28:41 GMT</last_modification_time>
 	      </signal>
 	      <label>_Playlist...</label>
 	      <right_justify>False</right_justify>
@@ -227,8 +247,9 @@
 	      <tooltip>Open the plugin manager</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>on_menubar_modules_activate</handler>
-		<last_modification_time>Tue, 13 Feb 2001 17:19:41 GMT</last_modification_time>
+		<handler>GnomeMenubarModulesActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:28:53 GMT</last_modification_time>
 	      </signal>
 	      <label>_Modules...</label>
 	      <right_justify>False</right_justify>
@@ -257,7 +278,7 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
-	      <name>menubar_subtitle</name>
+	      <name>menubar_subpictures</name>
 	      <sensitive>False</sensitive>
 	      <tooltip>Select subtitle unit</tooltip>
 	      <label>_Subtitles</label>
@@ -275,8 +296,9 @@
 	      <name>menubar_preferences</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_menubar_preferences_activate</handler>
-		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+		<handler>GnomeMenubarPreferencesActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:29:03 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_PREFERENCES_ITEM</stock_item>
 	    </widget>
@@ -297,8 +319,9 @@
 	      <name>menubar_about</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_menubar_about_activate</handler>
-		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+		<handler>GnomeMenubarAboutActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Sat, 19 May 2001 16:29:19 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
 	    </widget>
@@ -338,9 +361,10 @@
 	  <name>toolbar_file</name>
 	  <tooltip>Open a File</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_open_clicked</handler>
-	    <last_modification_time>Sun, 04 Mar 2001 21:01:24 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkFileOpenShow</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:14:43 GMT</last_modification_time>
 	  </signal>
 	  <label>File</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_OPEN</stock_pixmap>
@@ -352,9 +376,10 @@
 	  <name>toolbar_disc</name>
 	  <tooltip>Open a DVD or VCD</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_disc_clicked</handler>
-	    <last_modification_time>Sun, 04 Mar 2001 01:27:51 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkDiscOpenShow</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:14:38 GMT</last_modification_time>
 	  </signal>
 	  <label>Disc</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_CDROM</stock_pixmap>
@@ -366,9 +391,10 @@
 	  <name>toolbar_network</name>
 	  <tooltip>Select a Network Stream</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_network_clicked</handler>
-	    <last_modification_time>Mon, 12 Mar 2001 14:32:18 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkNetworkOpenShow</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:14:33 GMT</last_modification_time>
 	  </signal>
 	  <label>Net</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_REFRESH</stock_pixmap>
@@ -381,9 +407,10 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Go Backwards</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_back_clicked</handler>
-	    <last_modification_time>Sun, 11 Feb 2001 17:06:28 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkControlBack</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:14:27 GMT</last_modification_time>
 	  </signal>
 	  <label>Back</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_BACK</stock_pixmap>
@@ -399,9 +426,10 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Stop Stream</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_stop_clicked</handler>
-	    <last_modification_time>Sun, 11 Feb 2001 17:06:33 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkControlStop</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:14:22 GMT</last_modification_time>
 	  </signal>
 	  <label>Stop</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_STOP</stock_pixmap>
@@ -411,12 +439,12 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_play</name>
-	  <sensitive>False</sensitive>
 	  <tooltip>Play Stream</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_play_clicked</handler>
-	    <last_modification_time>Sun, 11 Feb 2001 17:06:39 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkControlPlay</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:14:17 GMT</last_modification_time>
 	  </signal>
 	  <label>Play</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_FORWARD</stock_pixmap>
@@ -429,9 +457,10 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Pause Stream</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_pause_clicked</handler>
-	    <last_modification_time>Sun, 11 Feb 2001 17:06:43 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkControlPause</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:14:05 GMT</last_modification_time>
 	  </signal>
 	  <label>Pause</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_BOTTOM</stock_pixmap>
@@ -444,9 +473,10 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Play Slower</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_slow_clicked</handler>
-	    <last_modification_time>Mon, 12 Feb 2001 07:20:42 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkControlSlow</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:13:58 GMT</last_modification_time>
 	  </signal>
 	  <label>Slow</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_TIMER_STOP</stock_pixmap>
@@ -459,9 +489,10 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Play Faster</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_fast_clicked</handler>
-	    <last_modification_time>Mon, 12 Feb 2001 07:20:48 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkControlFast</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:13:53 GMT</last_modification_time>
 	  </signal>
 	  <label>Fast</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_TIMER</stock_pixmap>
@@ -473,9 +504,10 @@
 	  <name>toolbar_playlist</name>
 	  <tooltip>Open Playlist</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_playlist_clicked</handler>
-	    <last_modification_time>Sun, 11 Feb 2001 17:06:48 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkPlaylistShow</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:13:48 GMT</last_modification_time>
 	  </signal>
 	  <label>Playlist</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_INDEX</stock_pixmap>
@@ -490,9 +522,10 @@
 	  <name>toolbar_prev</name>
 	  <tooltip>Previous File</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_prev_clicked</handler>
-	    <last_modification_time>Sun, 11 Feb 2001 17:06:52 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkPlaylistPrev</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:13:44 GMT</last_modification_time>
 	  </signal>
 	  <label>Prev</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_FIRST</stock_pixmap>
@@ -504,9 +537,10 @@
 	  <name>toolbar_next</name>
 	  <tooltip>Next File</tooltip>
 	  <signal>
-	    <name>clicked</name>
-	    <handler>on_toolbar_next_clicked</handler>
-	    <last_modification_time>Sun, 11 Feb 2001 17:06:56 GMT</last_modification_time>
+	    <name>button_press_event</name>
+	    <handler>GtkPlaylistNext</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:13:40 GMT</last_modification_time>
 	  </signal>
 	  <label>Next</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_LAST</stock_pixmap>
@@ -522,12 +556,12 @@
       <spacing>0</spacing>
 
       <widget>
-	<class>GtkHandleBox</class>
-	<name>slider_handlebox</name>
+	<class>GtkFrame</class>
+	<name>slider_frame</name>
 	<visible>False</visible>
-	<shadow_type>GTK_SHADOW_OUT</shadow_type>
-	<handle_position>GTK_POS_LEFT</handle_position>
-	<snap_edge>GTK_POS_TOP</snap_edge>
+	<label>-:--:--</label>
+	<label_xalign>0.05</label_xalign>
+	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
 	<child>
 	  <padding>0</padding>
 	  <expand>True</expand>
@@ -535,37 +569,31 @@
 	</child>
 
 	<widget>
-	  <class>GtkFrame</class>
-	  <name>slider_frame</name>
-	  <label>-:--:--</label>
-	  <label_xalign>0.05</label_xalign>
-	  <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
-
-	  <widget>
-	    <class>GtkHScale</class>
-	    <name>slider</name>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>button_press_event</name>
-	      <handler>on_slider_button_press_event</handler>
-	      <last_modification_time>Wed, 14 Mar 2001 13:46:55 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>button_release_event</name>
-	      <handler>on_slider_button_release_event</handler>
-	      <last_modification_time>Wed, 14 Mar 2001 13:46:59 GMT</last_modification_time>
-	    </signal>
-	    <draw_value>False</draw_value>
-	    <value_pos>GTK_POS_TOP</value_pos>
-	    <digits>3</digits>
-	    <policy>GTK_UPDATE_CONTINUOUS</policy>
-	    <value>0</value>
-	    <lower>0</lower>
-	    <upper>100</upper>
-	    <step>1</step>
-	    <page>6.25</page>
-	    <page_size>0</page_size>
-	  </widget>
+	  <class>GtkHScale</class>
+	  <name>slider</name>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>button_press_event</name>
+	    <handler>GtkSliderPress</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:12:57 GMT</last_modification_time>
+	  </signal>
+	  <signal>
+	    <name>button_release_event</name>
+	    <handler>GtkSliderRelease</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sat, 19 May 2001 03:13:00 GMT</last_modification_time>
+	  </signal>
+	  <draw_value>False</draw_value>
+	  <value_pos>GTK_POS_TOP</value_pos>
+	  <digits>3</digits>
+	  <policy>GTK_UPDATE_CONTINUOUS</policy>
+	  <value>0</value>
+	  <lower>0</lower>
+	  <upper>100</upper>
+	  <step>1</step>
+	  <page>6.25</page>
+	  <page_size>0</page_size>
 	</widget>
       </widget>
 
@@ -657,7 +685,7 @@
 
 	  <widget>
 	    <class>GtkLabel</class>
-	    <name>label_title</name>
+	    <name>title_label</name>
 	    <label>--</label>
 	    <justify>GTK_JUSTIFY_CENTER</justify>
 	    <wrap>False</wrap>
@@ -679,11 +707,12 @@
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>clicked</name>
-	      <handler>on_button_title_prev_clicked</handler>
-	      <last_modification_time>Tue, 03 Apr 2001 03:46:25 GMT</last_modification_time>
+	      <handler>GtkTitlePrev</handler>
+	      <data>&quot;intf_window&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:13:28 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_PREV</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -697,11 +726,12 @@
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>clicked</name>
-	      <handler>on_button_title_next_clicked</handler>
-	      <last_modification_time>Tue, 03 Apr 2001 03:47:01 GMT</last_modification_time>
+	      <handler>GtkTitleNext</handler>
+	      <data>&quot;intf_window&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:13:23 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_NEXT</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -750,7 +780,7 @@
 
 	  <widget>
 	    <class>GtkLabel</class>
-	    <name>label_chapter</name>
+	    <name>chapter_label</name>
 	    <label>---</label>
 	    <justify>GTK_JUSTIFY_CENTER</justify>
 	    <wrap>False</wrap>
@@ -772,11 +802,11 @@
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>clicked</name>
-	      <handler>on_button_chapter_prev_clicked</handler>
-	      <last_modification_time>Tue, 03 Apr 2001 00:53:47 GMT</last_modification_time>
+	      <handler>GtkChapterPrev</handler>
+	      <last_modification_time>Sat, 19 May 2001 02:46:07 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_PREV</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -791,11 +821,12 @@
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>clicked</name>
-	      <handler>on_button_chapter_next_clicked</handler>
-	      <last_modification_time>Tue, 03 Apr 2001 00:53:40 GMT</last_modification_time>
+	      <handler>GtkChapterNext</handler>
+	      <data>&quot;intf_window&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:13:08 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_NEXT</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -915,8 +946,9 @@
     <name>popup_play</name>
     <signal>
       <name>activate</name>
-      <handler>on_popup_play_activate</handler>
-      <last_modification_time>Sun, 11 Feb 2001 16:52:11 GMT</last_modification_time>
+      <handler>GnomePopupPlayActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:16:58 GMT</last_modification_time>
     </signal>
     <label>Play</label>
     <right_justify>False</right_justify>
@@ -928,8 +960,9 @@
     <name>popup_pause</name>
     <signal>
       <name>activate</name>
-      <handler>on_popup_pause_activate</handler>
-      <last_modification_time>Sun, 11 Feb 2001 16:52:11 GMT</last_modification_time>
+      <handler>GnomePopupPauseActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:17:31 GMT</last_modification_time>
     </signal>
     <label>Pause</label>
     <right_justify>False</right_justify>
@@ -941,8 +974,9 @@
     <name>popup_stop</name>
     <signal>
       <name>activate</name>
-      <handler>on_popup_stop_activate</handler>
-      <last_modification_time>Tue, 01 May 2001 22:18:09 GMT</last_modification_time>
+      <handler>GnomePopupStopActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:18:10 GMT</last_modification_time>
     </signal>
     <label>Stop</label>
     <right_justify>False</right_justify>
@@ -955,8 +989,9 @@
     <sensitive>False</sensitive>
     <signal>
       <name>activate</name>
-      <handler>on_popup_back_activate</handler>
-      <last_modification_time>Sun, 06 May 2001 15:33:13 GMT</last_modification_time>
+      <handler>GnomePopupBackActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:18:21 GMT</last_modification_time>
     </signal>
     <label>Back</label>
     <right_justify>False</right_justify>
@@ -968,8 +1003,9 @@
     <name>popup_slow</name>
     <signal>
       <name>activate</name>
-      <handler>on_popup_slow_activate</handler>
-      <last_modification_time>Mon, 12 Feb 2001 07:19:57 GMT</last_modification_time>
+      <handler>GnomePopupSlowActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:18:29 GMT</last_modification_time>
     </signal>
     <label>Slow</label>
     <right_justify>False</right_justify>
@@ -981,8 +1017,9 @@
     <name>popup_fast</name>
     <signal>
       <name>activate</name>
-      <handler>on_popup_fast_activate</handler>
-      <last_modification_time>Mon, 12 Feb 2001 07:19:57 GMT</last_modification_time>
+      <handler>GnomePopupFastActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:18:37 GMT</last_modification_time>
     </signal>
     <label>Fast</label>
     <right_justify>False</right_justify>
@@ -996,17 +1033,30 @@
   </widget>
 
   <widget>
-    <class>GtkCheckMenuItem</class>
+    <class>GtkMenuItem</class>
+    <name>popup_interface_toggle</name>
+    <signal>
+      <name>activate</name>
+      <handler>GnomePopupWindowToggleActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:18:51 GMT</last_modification_time>
+    </signal>
+    <label>Toggle _Interface</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
     <name>popup_fullscreen</name>
     <tooltip>Toggle fullscreen mode</tooltip>
     <signal>
       <name>activate</name>
-      <handler>on_popup_fullscreen_activate</handler>
-      <last_modification_time>Wed, 02 May 2001 23:36:07 GMT</last_modification_time>
+      <handler>GnomePopupFullscreenActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:19:07 GMT</last_modification_time>
     </signal>
     <label>_Fullscreen</label>
-    <active>False</active>
-    <always_show_toggle>True</always_show_toggle>
+    <right_justify>False</right_justify>
   </widget>
 
   <widget>
@@ -1016,13 +1066,40 @@
   </widget>
 
   <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_next</name>
+    <signal>
+      <name>activate</name>
+      <handler>GnomePopupNextActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:19:18 GMT</last_modification_time>
+    </signal>
+    <label>Next</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_prev</name>
+    <signal>
+      <name>activate</name>
+      <handler>GnomePopupPrevActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:19:26 GMT</last_modification_time>
+    </signal>
+    <label>Prev</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
     <class>GtkPixmapMenuItem</class>
     <name>popup_jump</name>
     <tooltip>Got directly so specified point</tooltip>
     <signal>
       <name>activate</name>
-      <handler>on_popup_jump_activate</handler>
-      <last_modification_time>Tue, 01 May 2001 22:22:49 GMT</last_modification_time>
+      <handler>GnomePopupJumpActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:34:46 GMT</last_modification_time>
     </signal>
     <label>_Jump...</label>
     <right_justify>False</right_justify>
@@ -1059,7 +1136,7 @@
 
   <widget>
     <class>GtkPixmapMenuItem</class>
-    <name>popup_subtitle</name>
+    <name>popup_subpictures</name>
     <sensitive>False</sensitive>
     <tooltip>Select subtitle channel</tooltip>
     <label>_Subtitles</label>
@@ -1088,8 +1165,9 @@
 	<tooltip>Open a File</tooltip>
 	<signal>
 	  <name>activate</name>
-	  <handler>on_popup_open_activate</handler>
-	  <last_modification_time>Sun, 04 Mar 2001 21:01:58 GMT</last_modification_time>
+	  <handler>GnomePopupFileOpenActivate</handler>
+	  <data>&quot;intf_popup&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 16:20:08 GMT</last_modification_time>
 	</signal>
 	<label>_Open File...</label>
 	<right_justify>False</right_justify>
@@ -1102,8 +1180,9 @@
 	<tooltip>Open a DVD or VCD</tooltip>
 	<signal>
 	  <name>activate</name>
-	  <handler>on_popup_disc_activate</handler>
-	  <last_modification_time>Sun, 04 Mar 2001 02:57:11 GMT</last_modification_time>
+	  <handler>GnomePopupDiscOpenActivate</handler>
+	  <data>&quot;intf_popup&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 16:20:44 GMT</last_modification_time>
 	</signal>
 	<label>Open _Disc...</label>
 	<right_justify>False</right_justify>
@@ -1116,8 +1195,9 @@
 	<tooltip>Select a Network Stream</tooltip>
 	<signal>
 	  <name>activate</name>
-	  <handler>on_popup_network_activate</handler>
-	  <last_modification_time>Mon, 12 Mar 2001 14:57:25 GMT</last_modification_time>
+	  <handler>GnomePopupNetworkOpenActivate</handler>
+	  <data>&quot;intf_popup&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 16:20:54 GMT</last_modification_time>
 	</signal>
 	<label>_Network Stream...</label>
 	<right_justify>False</right_justify>
@@ -1135,8 +1215,9 @@
 	<name>popup_about</name>
 	<signal>
 	  <name>activate</name>
-	  <handler>on_popup_about_activate</handler>
-	  <last_modification_time>Mon, 12 Feb 2001 00:00:08 GMT</last_modification_time>
+	  <handler>GnomePopupAboutActivate</handler>
+	  <data>&quot;intf_popup&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 16:21:02 GMT</last_modification_time>
 	</signal>
 	<stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
       </widget>
@@ -1148,8 +1229,9 @@
     <name>popup_playlist</name>
     <signal>
       <name>activate</name>
-      <handler>on_popup_playlist_activate</handler>
-      <last_modification_time>Wed, 02 May 2001 14:16:23 GMT</last_modification_time>
+      <handler>GnomePopupPlaylistActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:21:14 GMT</last_modification_time>
     </signal>
     <label>Playlist...</label>
     <right_justify>False</right_justify>
@@ -1160,8 +1242,9 @@
     <name>popup_preferences</name>
     <signal>
       <name>activate</name>
-      <handler>on_popup_preferences_activate</handler>
-      <last_modification_time>Tue, 01 May 2001 22:17:08 GMT</last_modification_time>
+      <handler>GnomePopupPreferencesActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:21:25 GMT</last_modification_time>
     </signal>
     <stock_item>GNOMEUIINFO_MENU_PREFERENCES_ITEM</stock_item>
   </widget>
@@ -1177,8 +1260,9 @@
     <name>popup_exit</name>
     <signal>
       <name>activate</name>
-      <handler>on_popup_exit_activate</handler>
-      <last_modification_time>Sun, 11 Feb 2001 16:49:30 GMT</last_modification_time>
+      <handler>GnomePopupExitActivate</handler>
+      <data>&quot;intf_popup&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 16:21:45 GMT</last_modification_time>
     </signal>
     <stock_item>GNOMEUIINFO_MENU_EXIT_ITEM</stock_item>
   </widget>
@@ -1215,11 +1299,6 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
   <class>GtkFileSelection</class>
   <name>intf_fileopen</name>
   <border_width>10</border_width>
-  <signal>
-    <name>destroy</name>
-    <handler>on_intf_fileopen_destroy</handler>
-    <last_modification_time>Sun, 11 Feb 2001 18:36:13 GMT</last_modification_time>
-  </signal>
   <title>Open File</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
@@ -1237,8 +1316,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
     <can_focus>True</can_focus>
     <signal>
       <name>clicked</name>
-      <handler>on_fileopen_ok_clicked</handler>
-      <last_modification_time>Sun, 11 Feb 2001 18:22:44 GMT</last_modification_time>
+      <handler>GtkFileOpenOk</handler>
+      <data>&quot;intf_fileopen&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 03:10:36 GMT</last_modification_time>
     </signal>
     <label>OK</label>
     <relief>GTK_RELIEF_NORMAL</relief>
@@ -1252,8 +1332,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
     <can_focus>True</can_focus>
     <signal>
       <name>clicked</name>
-      <handler>on_fileopen_cancel_clicked</handler>
-      <last_modification_time>Sun, 11 Feb 2001 18:22:50 GMT</last_modification_time>
+      <handler>GtkFileOpenCancel</handler>
+      <data>&quot;intf_fileopen&quot;</data>
+      <last_modification_time>Sat, 19 May 2001 03:10:31 GMT</last_modification_time>
     </signal>
     <label>Cancel</label>
     <relief>GTK_RELIEF_NORMAL</relief>
@@ -1263,11 +1344,6 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 <widget>
   <class>GnomeDialog</class>
   <name>intf_modules</name>
-  <signal>
-    <name>destroy</name>
-    <handler>on_intf_modules_destroy</handler>
-    <last_modification_time>Tue, 13 Feb 2001 09:19:08 GMT</last_modification_time>
-  </signal>
   <title>Modules</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
@@ -1312,11 +1388,6 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<name>modules_ok</name>
 	<can_default>True</can_default>
 	<can_focus>True</can_focus>
-	<signal>
-	  <name>clicked</name>
-	  <handler>on_modules_ok_clicked</handler>
-	  <last_modification_time>Tue, 13 Feb 2001 09:21:29 GMT</last_modification_time>
-	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_OK</stock_button>
       </widget>
 
@@ -1325,11 +1396,6 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<name>modules_apply</name>
 	<can_default>True</can_default>
 	<can_focus>True</can_focus>
-	<signal>
-	  <name>clicked</name>
-	  <handler>on_modules_apply_clicked</handler>
-	  <last_modification_time>Tue, 13 Feb 2001 09:21:25 GMT</last_modification_time>
-	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_APPLY</stock_button>
       </widget>
 
@@ -1338,11 +1404,6 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<name>modules_cancel</name>
 	<can_default>True</can_default>
 	<can_focus>True</can_focus>
-	<signal>
-	  <name>clicked</name>
-	  <handler>on_modules_cancel_clicked</handler>
-	  <last_modification_time>Tue, 13 Feb 2001 09:21:34 GMT</last_modification_time>
-	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_CANCEL</stock_button>
       </widget>
     </widget>
@@ -1415,8 +1476,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_disc_ok_clicked</handler>
-	  <last_modification_time>Sun, 04 Mar 2001 01:33:55 GMT</last_modification_time>
+	  <handler>GtkDiscOpenOk</handler>
+	  <data>&quot;intf_disc&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:10:12 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_OK</stock_button>
       </widget>
@@ -1428,8 +1490,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_disc_cancel_clicked</handler>
-	  <last_modification_time>Sun, 04 Mar 2001 01:33:50 GMT</last_modification_time>
+	  <handler>GtkDiscOpenCancel</handler>
+	  <data>&quot;intf_disc&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:10:07 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_CANCEL</stock_button>
       </widget>
@@ -1470,8 +1533,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>toggled</name>
-	      <handler>on_disc_dvd_toggled</handler>
-	      <last_modification_time>Sun, 04 Mar 2001 02:12:52 GMT</last_modification_time>
+	      <handler>GtkDiscOpenDvd</handler>
+	      <data>&quot;intf_disc&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:18:29 GMT</last_modification_time>
 	    </signal>
 	    <label>DVD</label>
 	    <active>False</active>
@@ -1491,8 +1555,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>toggled</name>
-	      <handler>on_disc_vcd_toggled</handler>
-	      <last_modification_time>Sun, 04 Mar 2001 02:12:58 GMT</last_modification_time>
+	      <handler>GtkDiscOpenVcd</handler>
+	      <data>&quot;intf_disc&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:22:10 GMT</last_modification_time>
 	    </signal>
 	    <label>VCD</label>
 	    <active>False</active>
@@ -1743,8 +1808,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_network_ok_clicked</handler>
-	  <last_modification_time>Mon, 12 Mar 2001 14:56:40 GMT</last_modification_time>
+	  <handler>GtkNetworkOpenOk</handler>
+	  <data>&quot;intf_network&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:09:40 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_OK</stock_button>
       </widget>
@@ -1756,8 +1822,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_network_cancel_clicked</handler>
-	  <last_modification_time>Mon, 12 Mar 2001 14:56:51 GMT</last_modification_time>
+	  <handler>GtkNetworkOpenCancel</handler>
+	  <data>&quot;intf_network&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:09:44 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_CANCEL</stock_button>
       </widget>
@@ -1954,8 +2021,8 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>toggled</name>
-	      <handler>on_broadcast_check_toggled</handler>
-	      <last_modification_time>Wed, 02 May 2001 00:28:21 GMT</last_modification_time>
+	      <handler>GtkNetworkOpenBroadcast</handler>
+	      <last_modification_time>Sat, 19 May 2001 02:57:46 GMT</last_modification_time>
 	    </signal>
 	    <label>Broadcast</label>
 	    <active>False</active>
@@ -2049,8 +2116,15 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
   <name>intf_playlist</name>
   <signal>
     <name>destroy</name>
-    <handler>on_playlist_destroy</handler>
-    <last_modification_time>Tue, 08 May 2001 23:21:39 GMT</last_modification_time>
+    <handler>gtk_widget_hide</handler>
+    <data>&quot;intf_playlist&quot;</data>
+    <last_modification_time>Sat, 19 May 2001 03:09:08 GMT</last_modification_time>
+  </signal>
+  <signal>
+    <name>delete_event</name>
+    <handler>gtk_widget_hide</handler>
+    <data>&quot;intf_playlist&quot;</data>
+    <last_modification_time>Sat, 19 May 2001 03:09:12 GMT</last_modification_time>
   </signal>
   <title>Playlist</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
@@ -2100,8 +2174,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_playlist_ok_clicked</handler>
-	  <last_modification_time>Sun, 06 May 2001 04:14:54 GMT</last_modification_time>
+	  <handler>GtkPlaylistOk</handler>
+	  <data>&quot;intf_playlist&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:09:00 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_OK</stock_button>
       </widget>
@@ -2113,8 +2188,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_playlist_cancel_clicked</handler>
-	  <last_modification_time>Sun, 06 May 2001 03:41:33 GMT</last_modification_time>
+	  <handler>GtkPlaylistCancel</handler>
+	  <data>&quot;intf_playlist&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:08:56 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_CANCEL</stock_button>
       </widget>
@@ -2152,18 +2228,21 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>event</name>
-	      <handler>on_playlist_clist_event</handler>
-	      <last_modification_time>Tue, 01 May 2001 22:13:12 GMT</last_modification_time>
+	      <handler>GtkPlaylistEvent</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:08:43 GMT</last_modification_time>
 	    </signal>
 	    <signal>
 	      <name>drag_data_received</name>
-	      <handler>on_playlist_clist_drag_data_received</handler>
-	      <last_modification_time>Tue, 01 May 2001 22:13:32 GMT</last_modification_time>
+	      <handler>GtkPlaylistDragData</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:08:45 GMT</last_modification_time>
 	    </signal>
 	    <signal>
 	      <name>drag_motion</name>
-	      <handler>on_playlist_clist_drag_motion</handler>
-	      <last_modification_time>Tue, 01 May 2001 22:13:52 GMT</last_modification_time>
+	      <handler>GtkPlaylistDragMotion</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:08:49 GMT</last_modification_time>
 	    </signal>
 	    <columns>2</columns>
 	    <column_widths>287,70</column_widths>
@@ -2226,8 +2305,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <name>playlist_add_disc</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>on_playlist_disc_activate</handler>
-	      <last_modification_time>Tue, 01 May 2001 19:07:11 GMT</last_modification_time>
+	      <handler>GnomePlaylistDiscOpenActivate</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 16:22:26 GMT</last_modification_time>
 	    </signal>
 	    <label>Disc</label>
 	    <right_justify>False</right_justify>
@@ -2238,8 +2318,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <name>playlist_add_file</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>on_playlist_file_activate</handler>
-	      <last_modification_time>Tue, 01 May 2001 19:07:11 GMT</last_modification_time>
+	      <handler>GnomePlaylistFileOpenActivate</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 16:22:37 GMT</last_modification_time>
 	    </signal>
 	    <label>File</label>
 	    <right_justify>False</right_justify>
@@ -2250,8 +2331,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <name>playlist_add_network</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>on_playlist_network_activate</handler>
-	      <last_modification_time>Tue, 01 May 2001 19:07:11 GMT</last_modification_time>
+	      <handler>GnomePlaylistNetworkOpenActivate</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 16:22:52 GMT</last_modification_time>
 	    </signal>
 	    <label>Network</label>
 	    <right_justify>False</right_justify>
@@ -2262,8 +2344,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <name>playlist_add_url</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>on_playlist_url_activate</handler>
-	      <last_modification_time>Tue, 01 May 2001 19:07:11 GMT</last_modification_time>
+	      <handler>GtkPlaylistAddUrl</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 16:24:27 GMT</last_modification_time>
 	    </signal>
 	    <label>Url</label>
 	    <right_justify>False</right_justify>
@@ -2286,8 +2369,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <name>playlist_delete_all</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>on_playlist_delete_all_activate</handler>
-	      <last_modification_time>Sun, 06 May 2001 01:51:40 GMT</last_modification_time>
+	      <handler>GtkPlaylistDeleteAll</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:08:11 GMT</last_modification_time>
 	    </signal>
 	    <label>All</label>
 	    <right_justify>False</right_justify>
@@ -2298,8 +2382,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <name>playmist_delete_item</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>on_playlist_delete_item_activate</handler>
-	      <last_modification_time>Sun, 06 May 2001 01:51:28 GMT</last_modification_time>
+	      <handler>GtkPlaylistDeleteSelected</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:08:05 GMT</last_modification_time>
 	    </signal>
 	    <label>Item</label>
 	    <right_justify>False</right_justify>
@@ -2322,8 +2407,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <name>playlist_selection_crop</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>on_playlist_crop_activate</handler>
-	      <last_modification_time>Tue, 01 May 2001 18:47:42 GMT</last_modification_time>
+	      <handler>GtkPlaylistCrop</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:07:56 GMT</last_modification_time>
 	    </signal>
 	    <label>Crop</label>
 	    <right_justify>False</right_justify>
@@ -2334,8 +2420,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <name>playlist_selection_invert</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>on_playlist_invert_activate</handler>
-	      <last_modification_time>Tue, 01 May 2001 18:47:42 GMT</last_modification_time>
+	      <handler>GtkPlaylistInvert</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:07:51 GMT</last_modification_time>
 	    </signal>
 	    <label>Invert</label>
 	    <right_justify>False</right_justify>
@@ -2346,8 +2433,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <name>playlist_selection_select</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>on_playlist_select_activate</handler>
-	      <last_modification_time>Tue, 01 May 2001 18:47:42 GMT</last_modification_time>
+	      <handler>GtkPlaylistSelect</handler>
+	      <data>&quot;intf_playlist&quot;</data>
+	      <last_modification_time>Sat, 19 May 2001 03:07:45 GMT</last_modification_time>
 	    </signal>
 	    <label>Select</label>
 	    <right_justify>False</right_justify>
@@ -2406,8 +2494,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_jump_ok_clicked</handler>
-	  <last_modification_time>Wed, 02 May 2001 02:20:21 GMT</last_modification_time>
+	  <handler>GtkJumpOk</handler>
+	  <data>&quot;intf_jump&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:07:27 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_OK</stock_button>
       </widget>
@@ -2419,8 +2508,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_jump_cancel_clicked</handler>
-	  <last_modification_time>Wed, 02 May 2001 02:20:54 GMT</last_modification_time>
+	  <handler>GtkJumpCancel</handler>
+	  <data>&quot;intf_jump&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:07:20 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_CANCEL</stock_button>
       </widget>
@@ -2628,8 +2718,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_preferences_ok_clicked</handler>
-	  <last_modification_time>Wed, 02 May 2001 17:04:42 GMT</last_modification_time>
+	  <handler>GtkPreferencesOk</handler>
+	  <data>&quot;intf_preferences&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:06:57 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_OK</stock_button>
       </widget>
@@ -2641,8 +2732,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_preferences_apply_clicked</handler>
-	  <last_modification_time>Wed, 02 May 2001 17:04:50 GMT</last_modification_time>
+	  <handler>GtkPreferencesApply</handler>
+	  <data>&quot;intf_preferences&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:06:53 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_APPLY</stock_button>
       </widget>
@@ -2654,8 +2746,9 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>clicked</name>
-	  <handler>on_preferences_cancel_clicked</handler>
-	  <last_modification_time>Wed, 02 May 2001 17:05:00 GMT</last_modification_time>
+	  <handler>GtkPreferencesCancel</handler>
+	  <data>&quot;intf_preferences&quot;</data>
+	  <last_modification_time>Sat, 19 May 2001 03:07:05 GMT</last_modification_time>
 	</signal>
 	<stock_button>GNOME_STOCK_BUTTON_CANCEL</stock_button>
       </widget>
@@ -2719,7 +2812,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <widget>
 	      <class>GtkEntry</class>
 	      <child_name>GnomeEntry:entry</child_name>
-	      <name>preferences_file_entry</name>
+	      <name>preferences_file_path_entry</name>
 	      <can_focus>True</can_focus>
 	      <editable>True</editable>
 	      <text_visible>True</text_visible>
@@ -4036,7 +4129,7 @@ Stereo
 
 	  <widget>
 	    <class>GtkCheckButton</class>
-	    <name>preferences_playlist_launch_on_startup_checkbutton</name>
+	    <name>preferences_playlist_startup_checkbutton</name>
 	    <can_focus>True</can_focus>
 	    <label>Launch on startup</label>
 	    <active>False</active>
@@ -4082,7 +4175,7 @@ Stereo
 
 	  <widget>
 	    <class>GtkCheckButton</class>
-	    <name>preferences_playlist_enqueue_as_default_checkbutton</name>
+	    <name>preferences_playlist_enqueue_checkbutton</name>
 	    <can_focus>True</can_focus>
 	    <label>Enqueue as default</label>
 	    <active>False</active>

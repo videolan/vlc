@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.3 2001/05/19 00:39:30 stef Exp $
+ * $Id: gtk_menu.c,v 1.4 2001/05/23 23:08:20 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -21,9 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-#define MODULE_NAME gtk
-#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble

@@ -12,7 +12,7 @@
 # All possible plugin directories, needed for make clean
 #
 PLUGINS_DIR :=	alsa beos darwin dsp dummy \
-		dvd esd fb ggi glide gnome gtk \
+		dvd esd fb ggi glide gtk \
 		downmix idct imdct \
 		macosx mga \
 		motion \
@@ -23,7 +23,7 @@ PLUGINS_DIR :=	alsa beos darwin dsp dummy \
 # All possible plugin objects
 #
 PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin dsp/dsp dummy/dummy \
-		dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gnome/gnome gtk/gtk \
+		dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gtk/gnome gtk/gtk \
 		downmix/downmix downmix/downmixsse downmix/downmix3dn \
 		idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext \
 		imdct/imdct imdct/imdct3dn imdct/imdctsse \
@@ -76,8 +76,7 @@ AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
 AC3_SPDIF = src/ac3_spdif/ac3_spdif.o \
 	        src/ac3_spdif/ac3_iec958.o
 
-LPCM_DECODER =	src/lpcm_decoder/lpcm_decoder_thread.o \
-		src/lpcm_decoder/lpcm_decoder.o
+LPCM_DECODER =	src/lpcm_decoder/lpcm_decoder_thread.o
 
 AUDIO_DECODER =	src/audio_decoder/audio_decoder.o \
 		src/audio_decoder/adec_generic.o \

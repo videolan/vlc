@@ -186,7 +186,7 @@
 	    </widget>
 
 	    <widget>
-	      <class>GtkCheckMenuItem</class>
+	      <class>GtkMenuItem</class>
 	      <name>menubar_fullscreen</name>
 	      <signal>
 		<name>activate</name>
@@ -195,8 +195,7 @@
 		<last_modification_time>Mon, 14 May 2001 21:29:21 GMT</last_modification_time>
 	      </signal>
 	      <label>_Fullscreen</label>
-	      <active>False</active>
-	      <always_show_toggle>True</always_show_toggle>
+	      <right_justify>False</right_justify>
 	    </widget>
 
 	    <widget>

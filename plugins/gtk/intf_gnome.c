@@ -1,8 +1,8 @@
 /*****************************************************************************
- * intf_gtk.c: Gtk+ interface
+ * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.21 2001/05/23 23:08:20 stef Exp $
+ * $Id: intf_gnome.c,v 1.1 2001/05/23 23:08:20 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME gtk
+#define MODULE_NAME gnome
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -35,7 +35,7 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <gtk/gtk.h>
+#include <gnome.h>
 
 #include "config.h"
 #include "common.h"
@@ -47,17 +47,16 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
-#include "interface.h"
 #include "intf_msg.h"
+#include "interface.h"
 #include "intf_playlist.h"
 
 #include "video.h"
 #include "video_output.h"
 
-#include "gtk_callbacks.h"
-#include "gtk_interface.h"
-#include "gtk_support.h"
-#include "gtk_menu.h"
+#include "gnome_callbacks.h"
+#include "gnome_interface.h"
+#include "gnome_support.h"
 #include "gtk_display.h"
 #include "intf_gtk.h"
 
@@ -71,13 +70,13 @@ static int  intf_Open       ( intf_thread_t *p_intf );
 static void intf_Close      ( intf_thread_t *p_intf );
 static void intf_Run        ( intf_thread_t *p_intf );
 
-static gint GtkManage       ( gpointer p_data );
+static gint GnomeManage     ( gpointer p_data );
 
 /*****************************************************************************
- * g_atexit: kludge to avoid the Gtk+ thread to segfault at exit
+ * g_atexit: kludge to avoid the Gnome thread to segfault at exit
  *****************************************************************************
  * gtk_init() makes several calls to g_atexit() which calls atexit() to
- * register tidying callbacks to be called at program exit. Since the Gtk+
+ * register tidying callbacks to be called at program exit. Since the Gnome
  * plugin is likely to be unloaded at program exit, we have to export this
  * symbol to intercept the g_atexit() calls. Talk about crude hack.
  *****************************************************************************/
@@ -112,22 +111,22 @@ void _M( intf_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * intf_Probe: probe the interface and return a score
  *****************************************************************************
- * This function tries to initialize Gtk+ and returns a score to the
+ * This function tries to initialize Gnome and returns a score to the
  * plugin manager so that it can select the best plugin.
  *****************************************************************************/
 static int intf_Probe( probedata_t *p_data )
 {
-    if( TestMethod( INTF_METHOD_VAR, "gtk" ) )
+    if( TestMethod( INTF_METHOD_VAR, "gnome" ) )
     {
         return( 999 );
     }
 
-    if( TestProgram( "gvlc" ) )
+    if( TestProgram( "gnome-vlc" ) )
     {
-        return( 190 );
+        return( 200 );
     }
 
-    return( 90 );
+    return( 100 );
 }
 
 /*****************************************************************************
@@ -143,7 +142,7 @@ static int intf_Open( intf_thread_t *p_intf )
         return( 1 );
     }
 
-    /* Initialize Gtk+ thread */
+    /* Initialize Gnome thread */
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
@@ -167,73 +166,70 @@ static void intf_Close( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Run: Gtk+ thread
+ * intf_Run: Gnome thread
  *****************************************************************************
  * this part of the interface is in a separate thread so that we can call
  * gtk_main() from within it without annoying the rest of the program.
  * XXX: the approach may look kludgy, and probably is, but I could not find
- * a better way to dynamically load a Gtk+ interface at runtime.
+ * a better way to dynamically load a Gnome interface at runtime.
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-    /* gtk_init needs to know the command line. We don't care, so we
+    /* gnome_init needs to know the command line. We don't care, so we
      * give it an empty one */
-    char  *p_args[] = { "" };
-    char **pp_args  = p_args;
-    int    i_args   = 1;
+    char *p_args[] = { "" };
+    int   i_args   = 1;
 
     /* The data types we are allowed to receive */
     static GtkTargetEntry target_table[] =
     {
         { "text/uri-list", 0, DROP_ACCEPT_TEXT_URI_LIST },
-        { "text/plain", 0, DROP_ACCEPT_TEXT_PLAIN }
+        { "text/plain",    0, DROP_ACCEPT_TEXT_PLAIN }
     };
 
     /* intf_Manage callback timeout */
     int i_timeout;
 
-    /* Initialize Gtk+ */
-    gtk_init( &i_args, &pp_args );
+    /* Initialize Gnome */
+    gnome_init( p_main->psz_arg0, VERSION, i_args, p_args );
 
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window( );
     p_intf->p_sys->p_popup = create_intf_popup( );
     p_intf->p_sys->p_playlist = create_intf_playlist();
-    
+
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
-                          VOUT_TITLE " (Gtk+ interface)");
+                          VOUT_TITLE " (Gnome interface)");
 
     /* Accept file drops on the main window */
     gtk_drag_dest_set( GTK_WIDGET( p_intf->p_sys->p_window ),
                        GTK_DEST_DEFAULT_ALL, target_table,
                        1, GDK_ACTION_COPY );
-
     /* Accept file drops on the playlist window */
-    gtk_drag_dest_set( GTK_WIDGET( lookup_widget( p_intf->p_sys->p_playlist,
-                                   "playlist_clist") ),
+    gtk_drag_dest_set( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                            p_intf->p_sys->p_playlist ), "playlist_clist") ),
                        GTK_DEST_DEFAULT_ALL, target_table,
                        1, GDK_ACTION_COPY );
 
     /* Get the interface labels */
-    p_intf->p_sys->p_slider_frame = GTK_FRAME( gtk_object_get_data(
-        GTK_OBJECT(p_intf->p_sys->p_window ), "slider_frame" ) ); 
-
-#define P_LABEL( name ) GTK_LABEL( gtk_object_get_data( \
+    p_intf->p_sys->p_slider_frame = gtk_object_get_data(
+                      GTK_OBJECT( p_intf->p_sys->p_window ), "slider_frame" );
+    #define P_LABEL( name ) GTK_LABEL( gtk_object_get_data( \
                          GTK_OBJECT( p_intf->p_sys->p_window ), name ) )
     p_intf->p_sys->p_label_title = P_LABEL( "title_label" );
     p_intf->p_sys->p_label_chapter = P_LABEL( "chapter_label" );
-#undef P_LABEL
+    #undef P_LABEL
 
     /* Connect the date display to the slider */
-#define P_SLIDER GTK_RANGE( gtk_object_get_data( \
+    #define P_SLIDER GTK_RANGE( gtk_object_get_data( \
                          GTK_OBJECT( p_intf->p_sys->p_window ), "slider" ) )
     p_intf->p_sys->p_adj = gtk_range_get_adjustment( P_SLIDER );
 
     gtk_signal_connect ( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
                          GTK_SIGNAL_FUNC( GtkDisplayDate ), NULL );
     p_intf->p_sys->f_adj_oldvalue = 0;
-#undef P_SLIDER
+    #undef P_SLIDER
 
     /* We don't create these ones yet because we perhaps won't need them */
     p_intf->p_sys->p_about = NULL;
@@ -262,40 +258,43 @@ static void intf_Run( intf_thread_t *p_intf )
 
     /* Sleep to avoid using all CPU - since some interfaces needs to access
      * keyboard events, a 100ms delay is a good compromise */
-    i_timeout = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, GtkManage, p_intf );
+    i_timeout = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, GnomeManage, p_intf );
 
-    /* Enter Gtk mode */
+    /* Enter gnome mode */
     gtk_main();
 
     /* Remove the timeout */
     gtk_timeout_remove( i_timeout );
 
-    /* Launch stored callbacks */
+    /* Get rid of stored callbacks so we can unload the plugin */
     if( p_intf->p_sys->pf_gtk_callback != NULL )
     {
-        p_intf->p_sys->pf_gtk_callback();
+        p_intf->p_sys->pf_gtk_callback( );
+        p_intf->p_sys->pf_gtk_callback = NULL;
 
-        if( p_intf->p_sys->pf_gdk_callback != NULL )
-        {
-            p_intf->p_sys->pf_gdk_callback();
-        }
+    }
+
+    if( p_intf->p_sys->pf_gdk_callback != NULL )
+    {
+        p_intf->p_sys->pf_gdk_callback( );
+        p_intf->p_sys->pf_gdk_callback = NULL;
     }
 }
 
 /* following functions are local */
 
 /*****************************************************************************
- * GtkManage: manage main thread messages
+ * GnomeManage: manage main thread messages
  *****************************************************************************
  * In this function, called approx. 10 times a second, we check what the
  * main program wanted to tell us.
  *****************************************************************************/
-static gint GtkManage( gpointer p_data )
+static gint GnomeManage( gpointer p_data )
 {
 #define p_intf ((intf_thread_t *)p_data)
 
     vlc_mutex_lock( &p_intf->change_lock );
-    
+
     /* If the "display popup" flag has changed */
     if( p_intf->b_menu_change )
     {
@@ -305,13 +304,14 @@ static gint GtkManage( gpointer p_data )
             gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_popup ),
                                  "p_popup", p_intf );
         }
-        gtk_menu_popup( GTK_MENU( p_intf->p_sys->p_popup ),
-                        NULL, NULL, NULL, NULL, 0, GDK_CURRENT_TIME );
+
+        gnome_popup_menu_do_popup( p_intf->p_sys->p_popup,
+                                   NULL, NULL, NULL, NULL );
         p_intf->b_menu_change = 0;
     }
 
     /* update the playlist */
-    GtkPlayListManage( p_data );
+    GtkPlayListManage( p_intf ); 
 
     if( p_intf->p_input != NULL && !p_intf->b_die )
     {
@@ -326,7 +326,8 @@ static gint GtkManage( gpointer p_data )
         /* Manage the slider */
         if( p_intf->p_input->stream.b_seekable )
         {
-            float newvalue = p_intf->p_sys->p_adj->value;
+            float           newvalue;
+            newvalue = p_intf->p_sys->p_adj->value;
     
 #define p_area p_intf->p_input->stream.p_selected_area
             /* If the user hasn't touched the slider since the last time,
@@ -345,8 +346,7 @@ static gint GtkManage( gpointer p_data )
             else if( p_intf->p_sys->b_slider_free )
             {
                 off_t i_seek = ( newvalue * p_area->i_size ) / 100;
-
-                /* release the lock to be able to seek */
+    
                 vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
                 input_Seek( p_intf->p_input, i_seek );
                 vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );

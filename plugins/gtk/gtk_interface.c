@@ -244,7 +244,7 @@ create_intf_window (void)
   gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_interface_hide);
   gtk_tooltips_set_tip (tooltips, menubar_interface_hide, _("Hide the main interface window"), NULL);
 
-  menubar_fullscreen = gtk_check_menu_item_new_with_label ("");
+  menubar_fullscreen = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_fullscreen)->child),
                                    _("_Fullscreen"));
   gtk_widget_add_accelerator (menubar_fullscreen, "activate_item", menubar_view_menu_accels,
@@ -254,7 +254,6 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (menubar_fullscreen);
   gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_fullscreen);
-  gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (menubar_fullscreen), TRUE);
 
   separator13 = gtk_menu_item_new ();
   gtk_widget_ref (separator13);
