@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.19 2003/02/01 12:01:11 stippi Exp $
+ * $Id: VlcWrapper.h,v 1.20 2003/02/09 11:51:36 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -62,7 +62,7 @@ public:
     VlcWrapper( intf_thread_t *p_intf );
     ~VlcWrapper();
     
-    bool UpdateInputAndAOut();
+    bool UpdateInput();
     
     /* Input */
     bool         HasInput();
@@ -116,7 +116,6 @@ public:
 	void	PlaylistSetPlaying( int index ) const;
 
     /* Audio */
-    bool           HasAudio();
     unsigned short GetVolume();
     void           SetVolume( int value );
     void           VolumeMute();
@@ -146,5 +145,4 @@ private:
     intf_thread_t *   p_intf;
     input_thread_t *  p_input;
     playlist_t *      p_playlist;
-    aout_instance_t * p_aout;
 };

@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.27 2003/02/03 17:18:48 stippi Exp $
+ * $Id: InterfaceWindow.cpp,v 1.28 2003/02/09 11:51:36 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -870,7 +870,7 @@ void InterfaceWindow::UpdateInterface()
             p_wrapper->GetNavCapabilities( &canSkipPrev, &canSkipNext );
             p_mediaControl->SetSkippable( canSkipPrev, canSkipNext );
 
-            if ( p_wrapper->HasAudio() )
+            if ( p_wrapper->HasInput() )
             {
                 p_mediaControl->SetAudioEnabled( true );
                 p_mediaControl->SetMuted( p_wrapper->IsMuted() );
@@ -904,14 +904,6 @@ void InterfaceWindow::UpdateInterface()
 			}
             Unlock();
         }
-    }
-
-    /* always force the user-specified volume */
-    /* FIXME : I'm quite sure there is a cleaner way to do this */
-    int i_volume = p_mediaControl->GetVolume();
-    if( p_wrapper->GetVolume() != i_volume )
-    {
-        p_wrapper->SetVolume( i_volume );
     }
 
 	// strangly, someone is calling this function even after the object has been destructed!

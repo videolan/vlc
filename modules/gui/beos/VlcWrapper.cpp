@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.24 2003/02/01 12:01:11 stippi Exp $
+ * $Id: VlcWrapper.cpp,v 1.25 2003/02/09 11:51:36 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -45,7 +45,6 @@ VlcWrapper::VlcWrapper( intf_thread_t *p_interface )
 {
     p_intf = p_interface;
     p_input = NULL;
-    p_aout = NULL;
     p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
 }
@@ -61,25 +60,16 @@ VlcWrapper::~VlcWrapper()
     {
         vlc_object_release( p_playlist );
     }
-    if( p_aout )
-    {
-        vlc_object_release( p_aout );
-    }
 }
 
-/* UpdateInputAndAOut: updates p_input and p_aout, returns true if the
-   interface needs to be updated */
-bool VlcWrapper::UpdateInputAndAOut()
+/* UpdateInput: updates p_input, returns true if the interface needs to
+   be updated */
+bool VlcWrapper::UpdateInput()
 {
     if( p_input == NULL )
     {
         p_input = (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                      FIND_ANYWHERE );
-    }
-    if( p_aout == NULL )
-    {
-        p_aout = (aout_instance_t*)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                    FIND_ANYWHERE );
     }
         
     if( p_input != NULL )
@@ -88,12 +78,6 @@ bool VlcWrapper::UpdateInputAndAOut()
         {
             vlc_object_release( p_input );
             p_input = NULL;
-            
-            if( p_aout )
-            {
-                vlc_object_release( p_aout );
-                p_aout = NULL;
-            }
         }
         return true;
     }
@@ -757,51 +741,33 @@ VlcWrapper::PlaylistSetPlaying( int index ) const
  * audio *
  *********/
 
-bool VlcWrapper::HasAudio()
-{
-    return( p_aout != NULL );
-}
-
 unsigned short VlcWrapper::GetVolume()
 {
-    if( p_aout != NULL )
-    {
-        unsigned short i_volume;
-        aout_VolumeGet( p_aout, (audio_volume_t*)&i_volume );
-        return i_volume;
-    }
-    return 0;
+    unsigned short i_volume;
+    aout_VolumeGet( p_intf, (audio_volume_t*)&i_volume );
+    return i_volume;
 }
 
-void VlcWrapper::SetVolume(int value)
+void VlcWrapper::SetVolume( int value )
 {
-    if( p_aout != NULL )
+    if ( p_intf->p_sys->b_mute )
     {
-		if ( p_intf->p_sys->b_mute )
-		{
-			p_intf->p_sys->b_mute = 0;
-		}
-        aout_VolumeSet( p_aout, value );
+        p_intf->p_sys->b_mute = 0;
     }
+    aout_VolumeSet( p_intf, value );
 }
 
 void VlcWrapper::VolumeMute()
 {
-    if( p_aout != NULL )
-   	{
-   	    aout_VolumeGet( p_aout, &p_intf->p_sys->i_saved_volume );
-	    aout_VolumeMute( p_aout, NULL );
-	    p_intf->p_sys->b_mute = 1;
-   	}
+   	aout_VolumeGet( p_intf, &p_intf->p_sys->i_saved_volume );
+    aout_VolumeMute( p_intf, NULL );
+    p_intf->p_sys->b_mute = 1;
 }
 
 void VlcWrapper::VolumeRestore()
 {
-    if( p_aout != NULL )
-   	{
-        aout_VolumeSet( p_aout, p_intf->p_sys->i_saved_volume );
-        p_intf->p_sys->b_mute = 0;
-	}
+    aout_VolumeSet( p_intf, p_intf->p_sys->i_saved_volume );
+    p_intf->p_sys->b_mute = 0;
 }
 
 bool VlcWrapper::IsMuted()
