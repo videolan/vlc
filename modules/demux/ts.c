@@ -47,7 +47,9 @@
 #   include <dvbpsi/pat.h>
 #   include <dvbpsi/pmt.h>
 #   include <dvbpsi/sdt.h>
-#   include <dvbpsi/eit.h>
+#   if TS_USE_DVB_SI
+#       include <dvbpsi/eit.h>
+#   endif
 #   include <dvbpsi/dr.h>
 #   include <dvbpsi/psi.h>
 #else
@@ -57,7 +59,9 @@
 #   include "tables/pat.h"
 #   include "tables/pmt.h"
 #   include "tables/sdt.h"
-#   include "tables/eit.h"
+#   if TS_USE_DVB_SI
+#       include "tables/eit.h"
+#   endif
 #   include "descriptors/dr.h"
 #   include "psi.h"
 #endif
@@ -320,8 +324,10 @@ static int  PIDFillFormat( ts_pid_t *pid, int i_stream_type );
 
 static void PATCallBack( demux_t *, dvbpsi_pat_t * );
 static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt );
+#if TS_USE_DVB_SI
 static void PSINewTableCallBack( demux_t *, dvbpsi_handle,
                                  uint8_t  i_table_id, uint16_t i_extension );
+#endif
 
 
 static inline int PIDGet( block_t *p )
