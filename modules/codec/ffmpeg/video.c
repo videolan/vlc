@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.44 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: video.c,v 1.45 2003/11/16 22:23:47 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -355,7 +355,6 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         p_sys->input_pts = p_block->i_pts;
     }
 
-#if 0
     /* TODO implement it in a better way */
     /* A good idea could be to decode all I pictures and see for the other */
     if( p_sys->b_hurry_up && p_sys->i_late_frames > 4 )
@@ -392,7 +391,6 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_late_frames--;
         return VLC_SUCCESS;
     }
-#endif
 
     if( !p_sys->p_context->width || !p_sys->p_context->height )
     {

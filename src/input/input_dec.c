@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.67 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: input_dec.c,v 1.68 2003/11/16 22:23:47 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -495,12 +495,13 @@ static int DecoderThread( decoder_t * p_dec )
                         p_dec->fmt_out.audio.i_rate;
                     sout_format.i_channels =
                         p_dec->fmt_out.audio.i_channels;
+                    sout_format.i_block_align =
+                        p_dec->fmt_out.audio.i_blockalign;
                     sout_format.i_width  =
                         p_dec->fmt_out.video.i_width;
                     sout_format.i_height =
                         p_dec->fmt_out.video.i_height;
-                    sout_format.i_block_align = 0;
-                    //sout_format.i_bitrate     = p_dec->fmt_out.i_bit_rate;
+                    sout_format.i_bitrate     = p_dec->fmt_out.i_bitrate;
                     sout_format.i_extra_data  = p_dec->fmt_out.i_extra;
                     sout_format.p_extra_data  = p_dec->fmt_out.p_extra;
 
