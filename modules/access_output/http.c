@@ -197,10 +197,12 @@ static int Open( vlc_object_t *p_this )
         psz_file_name = strdup( psz_file_name );
     }
 
-    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_access), psz_bind_addr, i_bind_port );
+    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_access), psz_bind_addr,
+                                         i_bind_port );
     if( p_sys->p_httpd_host == NULL )
     {
-        msg_Err( p_access, "cannot listen on %s:%d", psz_bind_addr, i_bind_port );
+        msg_Err( p_access, "cannot listen on %s:%d",
+                 psz_bind_addr, i_bind_port );
 
         free( psz_name );
         free( psz_file_name );
@@ -213,10 +215,10 @@ static int Open( vlc_object_t *p_this )
         psz_mime = "video/x-ms-asf-stream";
     }
 
-    p_sys->p_httpd_stream = httpd_StreamNew( p_sys->p_httpd_host,
-                                             psz_file_name, psz_mime,
-                                             sout_cfg_find_value( p_access->p_cfg, "user" ),
-                                             sout_cfg_find_value( p_access->p_cfg, "pwd" ) );
+    p_sys->p_httpd_stream =
+        httpd_StreamNew( p_sys->p_httpd_host, psz_file_name, psz_mime,
+                         sout_cfg_find_value( p_access->p_cfg, "user" ),
+                         sout_cfg_find_value( p_access->p_cfg, "pwd" ) );
     if( p_sys->p_httpd_stream == NULL )
     {
         msg_Err( p_access, "cannot add stream %s", psz_file_name );
@@ -272,7 +274,7 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 {
-    sout_access_out_sys_t   *p_sys = p_access->p_sys;
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
     int i_err = 0;
 
     while( p_buffer )
@@ -288,10 +290,13 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
                 p_sys->i_header_size = 0;
                 p_sys->b_header_complete = VLC_FALSE;
             }
-            if( (int)(p_buffer->i_size + p_sys->i_header_size) > p_sys->i_header_allocated )
+            if( (int)(p_buffer->i_size + p_sys->i_header_size) >
+                p_sys->i_header_allocated )
             {
-                p_sys->i_header_allocated = p_buffer->i_size + p_sys->i_header_size + 1024;
-                p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header_allocated );
+                p_sys->i_header_allocated =
+                    p_buffer->i_size + p_sys->i_header_size + 1024;
+                p_sys->p_header =
+                    realloc( p_sys->p_header, p_sys->i_header_allocated );
             }
             memcpy( &p_sys->p_header[p_sys->i_header_size],
                     p_buffer->p_buffer,
@@ -302,11 +307,13 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
         {
             p_sys->b_header_complete = VLC_TRUE;
 
-            httpd_StreamHeader( p_sys->p_httpd_stream, p_sys->p_header, p_sys->i_header_size );
+            httpd_StreamHeader( p_sys->p_httpd_stream, p_sys->p_header,
+                                p_sys->i_header_size );
         }
 
         /* send data */
-        i_err = httpd_StreamSend( p_sys->p_httpd_stream, p_buffer->p_buffer, p_buffer->i_size );
+        i_err = httpd_StreamSend( p_sys->p_httpd_stream, p_buffer->p_buffer,
+                                  p_buffer->i_size );
 
         p_next = p_buffer->p_next;
         sout_BufferDelete( p_access->p_sout, p_buffer );
@@ -340,4 +347,3 @@ static int Seek( sout_access_out_t *p_access, off_t i_pos )
     msg_Warn( p_access, "HTTP sout access cannot seek" );
     return VLC_EGENERIC;
 }
-

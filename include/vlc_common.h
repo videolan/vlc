@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.111 2004/03/03 13:25:00 fenrir Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -506,12 +506,12 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
                          ((void**)(tab) + _i_index_+1),  \
                          ( (count) - _i_index_ - 1 ) * sizeof( void* ) );\
             }                                   \
-            else                                \
+            (count)--;                          \
+            if( (count) == 0 )                  \
             {                                   \
                 free( tab );                    \
                 (tab) = NULL;                   \
             }                                   \
-            (count)--;                          \
         }                                       \
     }
 
