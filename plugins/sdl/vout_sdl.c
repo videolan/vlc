@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.57 2001/07/11 02:01:05 sam Exp $
+ * $Id: vout_sdl.c,v 1.58 2001/07/16 14:33:40 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -169,7 +169,12 @@ static int vout_Create( vout_thread_t *p_vout )
     /* Win32 SDL implementation doesn't support SDL_INIT_EVENTTHREAD yet*/
                 | SDL_INIT_EVENTTHREAD
 #endif
-                | SDL_INIT_NOPARACHUTE ) < 0 )
+#ifdef DEBUG
+    /* In debug mode you may want vlc to dump a core instead of staying
+     * stuck */
+                | SDL_INIT_NOPARACHUTE
+#endif
+                ) < 0 )
     {
         intf_ErrMsg( "vout error: can't initialize SDL (%s)", SDL_GetError() );
         free( p_vout->p_sys );
