@@ -111,6 +111,58 @@ int __net_OpenTCP( vlc_object_t *p_this, char *psz_host, int i_port )
 }
 
 /*****************************************************************************
+ * __net_ListenTCP:
+ *****************************************************************************
+ * Open a TCP listening socket and return it
+ *****************************************************************************/
+int __net_ListenTCP( vlc_object_t *p_this, char *psz_host, int i_port )
+{
+    vlc_value_t      val;
+    void            *private;
+
+    char            *psz_network = "";
+    network_socket_t sock;
+    module_t         *p_network;
+
+    /* Check if we have force ipv4 or ipv6 */
+    var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "ipv4", &val );
+    if( val.b_bool )
+    {
+        psz_network = "ipv4";
+    }
+
+    var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "ipv6", &val );
+    if( val.b_bool )
+    {
+        psz_network = "ipv6";
+    }
+
+    /* Prepare the network_socket_t structure */
+    sock.i_type = NETWORK_TCP_PASSIVE;
+    sock.psz_bind_addr   = "";
+    sock.i_bind_port     = 0;
+    sock.psz_server_addr = psz_host;
+    sock.i_server_port   = i_port;
+    sock.i_ttl           = 0;
+
+    msg_Dbg( p_this, "net: listening to '%s:%d'", psz_host, i_port );
+    private = p_this->p_private;
+    p_this->p_private = (void*)&sock;
+    if( !( p_network = module_Need( p_this, "network", psz_network, 0 ) ) )
+    {
+        msg_Dbg( p_this, "net: listening to '%s:%d' failed",
+                 psz_host, i_port );
+        return -1;
+    }
+    module_Unneed( p_this, p_network );
+    p_this->p_private = private;
+
+    return sock.i_handle;
+}
+
+/*****************************************************************************
  * __net_OpenUDP:
  *****************************************************************************
  * Open a UDP connection and return a handle

@@ -437,43 +437,24 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 }
 
 /*****************************************************************************
- * OpenTCP: open a TCP socket
+ * SocketTCP: create a TCP socket
  *****************************************************************************
- * psz_server_addr, i_server_port : address and port used for the connect()
- *   system call. If i_server_port == 0, 80 is used.
- * Other parameters are ignored.
  * This function returns -1 in case of error.
  *****************************************************************************/
-static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
+static int SocketTCP( vlc_object_t * p_this )
 {
-    char * psz_server_addr = p_socket->psz_server_addr;
-    int i_server_port = p_socket->i_server_port;
-
     int i_handle;
-    struct sockaddr_in sock;
-
-    if( i_server_port == 0 )
-    {
-        i_server_port = 80;
-    }
-
-    /* Open a SOCK_STREAM (TCP) socket, in the AF_INET domain, automatic (0)
+    
+    /* Open a SOCK_STREAM (TCP) socket, in the PF_INET domain, automatic (0)
      * protocol */
-    if( (i_handle = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
+    if( (i_handle = socket( PF_INET, SOCK_STREAM, 0 )) == -1 )
     {
 #ifdef HAVE_ERRNO_H
         msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
 #else
         msg_Warn( p_this, "cannot create socket" );
 #endif
-        goto error;
-    }
-
-    /* Build remote address */
-    if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
-    {
-        msg_Dbg( p_this, "could not build local address" );
-        goto error;
+        return -1;
     }
 
     /* Set to non-blocking */
@@ -495,6 +476,40 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
         }
     }
 #endif
+
+    return i_handle;
+}
+
+/*****************************************************************************
+ * OpenTCP: open a TCP socket
+ *****************************************************************************
+ * psz_server_addr, i_server_port : address and port used for the connect()
+ *   system call. If i_server_port == 0, 80 is used.
+ * Other parameters are ignored.
+ * This function returns -1 in case of error.
+ *****************************************************************************/
+static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
+{
+    char * psz_server_addr = p_socket->psz_server_addr;
+    int i_server_port = p_socket->i_server_port;
+
+    int i_handle;
+    struct sockaddr_in sock;
+
+    if( i_server_port == 0 )
+    {
+        i_server_port = 80;
+    }
+
+    if( (i_handle = SocketTCP( p_this )) == -1 )
+        return VLC_EGENERIC;
+
+    /* Build remote address */
+    if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
+    {
+        msg_Dbg( p_this, "could not build local address" );
+        goto error;
+    }
 
     /* Connect the socket */
     if( connect( i_handle, (struct sockaddr *) &sock, sizeof( sock ) ) == -1 )
@@ -580,15 +595,76 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
     return VLC_SUCCESS;
 
 error:
-    if( i_handle > 0 )
-    {
-        close( i_handle );
-    }
+    close( i_handle );
     return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * NetOpen: wrapper around OpenUDP and OpenTCP
+ * ListenTCP: open a TCP passive socket (server-side)
+ *****************************************************************************
+ * psz_server_addr, i_server_port : address and port used for the bind()
+ *   system call. If i_server_port == 0, 80 is used.
+ * Other parameters are ignored.
+ * This function returns -1 in case of error.
+ *****************************************************************************/
+static int ListenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
+{
+    char * psz_server_addr = p_socket->psz_server_addr;
+    int i_server_port = p_socket->i_server_port;
+
+    int i_handle, i_dummy = 1;
+    struct sockaddr_in sock;
+
+    if( (i_handle = SocketTCP( p_this )) == -1 )
+        return VLC_EGENERIC;
+
+    if ( setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR,
+                (void *)&i_dummy, sizeof( i_dummy ) ) == -1 )
+    {
+        msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR)" );
+    }
+
+    /* Build remote address */
+    if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
+    {
+        msg_Dbg( p_this, "could not build local address" );
+        return VLC_EGENERIC;
+    }
+    
+    /* Bind the socket */
+    if( bind( i_handle, (struct sockaddr *) &sock, sizeof( sock )) == -1 )
+    {
+#ifdef HAVE_ERRNO_H
+        msg_Err( p_this, "cannot bind socket (%s)", strerror(errno) );
+#else
+        msg_Err( p_this, "cannot bind socket" );
+#endif
+        goto error;
+    }
+ 
+    /* Listen */
+    if( listen( i_handle, 100 ) == -1 )
+    {
+#ifdef HAVE_ERRNO_H
+         msg_Err( p_this, "cannot bring the socket in listening mode (%s)",
+                  strerror(errno) );
+#else
+         msg_Err( p_this, "cannot bring the socket in listening mode" );
+#endif
+         goto error;
+    }
+
+    p_socket->i_handle = i_handle;
+    p_socket->i_mtu = 0; /* There is no MTU notion in TCP */
+    return VLC_SUCCESS;
+
+error:
+    close( i_handle );
+    return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * NetOpen: wrapper around OpenUDP, ListenTCP and OpenTCP
  *****************************************************************************/
 static int NetOpen( vlc_object_t * p_this )
 {
@@ -597,6 +673,10 @@ static int NetOpen( vlc_object_t * p_this )
     if( p_socket->i_type == NETWORK_UDP )
     {
         return OpenUDP( p_this, p_socket );
+    }
+    else if( p_socket->i_type == NETWORK_TCP_PASSIVE )
+    {
+        return ListenTCP( p_this, p_socket );
     }
     else
     {

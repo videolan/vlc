@@ -49,17 +49,8 @@
 #   include <winsock.h>
 #elif defined( WIN32 )
 #   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
 #else
-#   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
-#   include <netinet/in.h>
-#   ifdef HAVE_ARPA_INET_H
-#       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
-#   endif
 #endif
 
 #include "network.h"
@@ -71,8 +62,6 @@
 #else
 #define SOCKET_CLOSE(a)    close(a)
 #endif
-
-#define LISTEN_BACKLOG 100
 
 #define READ_MODE_PWD 1
 #define READ_MODE_CMD 2
@@ -127,7 +116,6 @@ typedef struct
 
 static char* MessageToString( vlm_message_t* , int );
 static void Write_message( telnet_client_t * , vlm_message_t* , char * , int );
-static int  SocketListen( intf_thread_t * , int );
 
 struct intf_sys_t
 {
@@ -159,7 +147,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->pf_run = Run;
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( ( p_intf->p_sys->fd = SocketListen( p_intf , i_telnetport ) ) < 0 )
+    if( ( p_intf->p_sys->fd = net_ListenTCP( p_intf , "", i_telnetport ) ) < 0 )
     {
         msg_Err( p_intf, "cannot listen for telnet" );
         free( p_intf->p_sys );
@@ -207,7 +195,6 @@ static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     struct timeval  timeout;
-    int             i_sock_size = sizeof( struct sockaddr_in );
     char           *s_password;
 
     s_password = config_GetPsz( p_intf, "telnet-password" );
@@ -218,13 +205,12 @@ static void Run( intf_thread_t *p_intf )
         fd_set          fds_write;
         int             i_handle_max = 0;
         int             i_ret;
-        struct          sockaddr_in sock2;
         int             i_len;
         int             fd;
         int             i;
 
         /* if a new client wants to communicate */
-        fd = accept( p_sys->fd, (struct sockaddr *)&sock2, &i_sock_size );
+        fd = accept( p_sys->fd, NULL, NULL );
         if( fd > 0 )
         {
             telnet_client_t *cl;
@@ -438,81 +424,6 @@ static void Write_message( telnet_client_t * client, vlm_message_t * message, ch
     client->i_buffer_write = strlen( psz_message );
     client->i_mode = i_mode;
     free( psz_message );
-}
-
-/* Does what we want except select and accept */
-static int SocketListen( intf_thread_t *p_intf , int i_port )
-{
-    struct sockaddr_in sock;
-    int fd;
-    int i_opt;
-    int i_flags;
-
-    /* open socket */
-    fd = socket( AF_INET, SOCK_STREAM, 0 );
-    if( fd < 0 )
-    {
-        msg_Err( p_intf, "cannot open socket" );
-        goto socket_failed;
-    }
-    /* reuse socket */
-    i_opt = 1;
-    if( setsockopt( fd, SOL_SOCKET, SO_REUSEADDR,
-                    (void *) &i_opt, sizeof( i_opt ) ) < 0 )
-    {
-        msg_Warn( p_intf, "cannot configure socket (SO_REUSEADDR)" );
-    }
-
-    /* fill p_socket structure */
-    memset( &sock, 0, sizeof( struct sockaddr_in ) );
-    sock.sin_family = AF_INET;                             /* family */
-    sock.sin_port = htons( (uint16_t)i_port );
-    sock.sin_addr.s_addr = INADDR_ANY;
-
-    /* bind it */
-    if( bind( fd, (struct sockaddr *)&sock, sizeof( struct sockaddr_in ) ) < 0 )
-    {
-        msg_Err( p_intf, "cannot bind socket" );
-        goto socket_failed;
-    }
-
-   /* set to non-blocking */
-#if defined( WIN32 ) || defined( UNDER_CE )
-    {
-        unsigned long i_dummy = 1;
-        if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
-        {
-            msg_Err( p_intf, "cannot set socket to non-blocking mode" );
-            goto socket_failed;
-        }
-    }
-#else
-    if( ( i_flags = fcntl( fd, F_GETFL, 0 ) ) < 0 )
-    {
-        msg_Err( p_intf, "cannot F_GETFL socket" );
-        goto socket_failed;
-    }
-    if( fcntl( fd, F_SETFL, i_flags | O_NONBLOCK ) < 0 )
-    {
-        msg_Err( p_intf, "cannot F_SETFL O_NONBLOCK" );
-        goto socket_failed;
-    }
-#endif
-    /* listen */
-    if( listen( fd, LISTEN_BACKLOG ) < 0 )
-    {
-        msg_Err( p_intf, "cannot listen socket" );
-        goto socket_failed;
-    }
-
-    return fd;
-
-socket_failed:
-    if( fd >= 0 )
-    {
-        SOCKET_CLOSE( fd );
-    }
-    return -1;
 }
 
 /* we need the level of the message to put a beautiful indentation.

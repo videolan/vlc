@@ -46,6 +46,7 @@ struct network_socket_t
 /* Socket types */
 #define NETWORK_UDP 1
 #define NETWORK_TCP 2
+#define NETWORK_TCP_PASSIVE 3
 
 
 typedef struct
@@ -164,6 +165,9 @@ static inline void vlc_UrlClean( vlc_url_t *url )
 
 #define net_OpenTCP(a, b, c) __net_OpenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_OpenTCP, ( vlc_object_t *p_this, char *psz_host, int i_port ) );
+
+#define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
+VLC_EXPORT( int, __net_ListenTCP, ( vlc_object_t *p_this, char *psz_localaddr, int i_port ) );
 
 #define net_OpenUDP(a, b, c, d, e ) __net_OpenUDP(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, char *psz_bind, int i_bind, char *psz_server, int i_server ) );
