@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.21 2003/04/22 08:51:27 fenrir Exp $
+ * $Id: libmp4.c,v 1.22 2003/04/24 20:49:54 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1971,7 +1971,7 @@ int MP4_ReadBox_rdrf( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     if( i_len > 0 )
     {
         uint32_t i;
-        p_box->data.p_rdrf->psz_ref = malloc( i_len );
+        p_box->data.p_rdrf->psz_ref = malloc( i_len  + 1);
         for( i = 0; i < i_len; i++ )
         {
             MP4_GET1BYTE( p_box->data.p_rdrf->psz_ref[i] );
