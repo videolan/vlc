@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.82 2001/06/18 23:42:07 sam Exp $
+ * $Id: vpar_blocks.c,v 1.83 2001/07/06 08:43:31 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -396,6 +396,14 @@ static dct_lookup_t * ppl_dct_tab1[2] = { pl_DCT_tab_ac, pl_DCT_tab0a };
 
 static dct_lookup_t * ppl_dct_tab2[2] = { pl_DCT_tab_ac, pl_DCT_tab_dc };
 
+/* Replacement for memset( p_table, 0, 8*sizeof( int ) ); */
+static __inline__ void bzero8int( void *p_table )
+{
+    ((int*)p_table)[0] = ((int*)p_table)[1] =
+    ((int*)p_table)[2] = ((int*)p_table)[3] = 
+    ((int*)p_table)[4] = ((int*)p_table)[5] =
+    ((int*)p_table)[6] = ((int*)p_table)[7] = 0;
+}
 
 /*
  * Initialization of lookup tables
@@ -1662,7 +1670,7 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
     else
     {
         p_mb->i_mb_type = MB_MOTION_FORWARD;
-        memset( p_mb->pppi_motion_vectors, 0, 8*sizeof(int) );
+        bzero8int( p_mb->pppi_motion_vectors );
     }
 
     /* Set the field we use for motion compensation */
@@ -1811,7 +1819,7 @@ static __inline__ void ParseMacroblock(
         if( i_coding_type == P_CODING_TYPE )
         {
             /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
-            memset( p_vpar->mb.pppi_pmv, 0, 8*sizeof(int) );
+            bzero8int( p_vpar->mb.pppi_pmv );
         }
 
         for( i_mb = i_mb_previous + 1; i_mb < *pi_mb_address; i_mb++ )
@@ -1866,8 +1874,8 @@ static __inline__ void ParseMacroblock(
     {
         /* Special No-MC macroblock in P pictures (7.6.3.5). */
         p_mb->i_mb_type |= MB_MOTION_FORWARD;
-        memset( p_vpar->mb.pppi_pmv, 0, 8*sizeof(int) );
-        memset( p_mb->pppi_motion_vectors, 0, 8*sizeof(int) );
+        bzero8int( p_vpar->mb.pppi_pmv );
+        bzero8int( p_mb->pppi_motion_vectors );
         p_vpar->mb.i_motion_type = 1 + (i_structure == FRAME_STRUCTURE);
         p_mb->ppi_field_select[0][0] = (i_structure == BOTTOM_FIELD);
     }
@@ -1917,7 +1925,7 @@ static __inline__ void ParseMacroblock(
         if( !p_vpar->picture.b_concealment_mv )
         {
             /* Reset MV predictors. */
-            memset( p_vpar->mb.pppi_pmv, 0, 8*sizeof(int) );
+            bzero8int( p_vpar->mb.pppi_pmv );
         }
         else
         {
@@ -2031,7 +2039,7 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
         = 1 << (7 + p_vpar->picture.i_intra_dc_precision);
 
     /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
-    memset( p_vpar->mb.pppi_pmv, 0, 8*sizeof(int) );
+    bzero8int( p_vpar->mb.pppi_pmv );
 
     do
     {

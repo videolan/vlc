@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.55 2001/06/07 22:14:56 sam Exp $
+ * $Id: vout_sdl.c,v 1.56 2001/07/06 08:43:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -246,6 +246,14 @@ static int vout_Init( vout_thread_t *p_vout )
            main_GetIntVariable( VOUT_HEIGHT_VAR,VOUT_HEIGHT_DEFAULT ),
                                       SDL_YV12_OVERLAY, 
                                       p_vout->p_sys->p_display );
+
+    if( p_overlay == NULL )
+    {
+        intf_ErrMsg( "vout error: could not create SDL overlay" );
+        p_vout->b_need_render = 1;
+        return( 0 );
+    }
+
     intf_WarnMsg( 2, "vout: YUV acceleration %s",
               p_overlay->hw_overlay ? "activated" : "unavailable !" ); 
     p_vout->b_need_render = !p_overlay->hw_overlay;
@@ -537,12 +545,7 @@ static void vout_Display( vout_thread_t *p_vout )
     SDL_Rect    disp;
     if((p_vout->p_sys->p_display != NULL) && !p_vout->p_sys->b_reopen_display)
     {
-        if( p_vout->b_need_render )
-        {  
-            /* Change display frame */
-            SDL_Flip( p_vout->p_sys->p_display );
-        }
-        else
+        if( !p_vout->b_need_render )
         {
             /*
              * p_vout->p_rendered_pic->p_y/u/v contains the YUV buffers to
@@ -558,37 +561,55 @@ static void vout_Display( vout_thread_t *p_vout )
                                              SDL_YV12_OVERLAY, 
                                              p_vout->p_sys->p_display
                                            );
-                intf_WarnMsg( 2, "vout: YUV acceleration %s",
-                              p_vout->p_sys->p_overlay->hw_overlay
-                            ? "activated" : "unavailable !" ); 
             }
 
-            SDL_LockYUVOverlay(p_vout->p_sys->p_overlay);
-            /* copy the data into video buffers */
-            /* Y first */
-            memcpy(p_vout->p_sys->p_overlay->pixels[0],
-                   p_vout->p_rendered_pic->p_y,
-                   p_vout->p_sys->p_overlay->h *
-                   p_vout->p_sys->p_overlay->pitches[0]);
-            /* then V */
-            memcpy(p_vout->p_sys->p_overlay->pixels[1],
-                   p_vout->p_rendered_pic->p_v,
-                   p_vout->p_sys->p_overlay->h *
-                   p_vout->p_sys->p_overlay->pitches[1] / 2);
-            /* and U */
-            memcpy(p_vout->p_sys->p_overlay->pixels[2],
-                   p_vout->p_rendered_pic->p_u,
-                   p_vout->p_sys->p_overlay->h *
-                   p_vout->p_sys->p_overlay->pitches[2] / 2);
+            if( p_vout->p_sys->p_overlay == NULL )
+            {
+                /* Overlay allocation failed, switch back to software mode */
+                intf_ErrMsg( "vout error: could not create SDL overlay" );
+                p_vout->b_need_render = 1;
+            }
+            else
+            {
 
-            disp.w = (&p_vout->p_buffer[p_vout->i_buffer_index])->i_pic_width;
-            disp.h = (&p_vout->p_buffer[p_vout->i_buffer_index])->i_pic_height;
-            disp.x = (p_vout->i_width - disp.w)/2;
-            disp.y = (p_vout->i_height - disp.h)/2;
+                intf_WarnMsg( 2, "vout: YUV acceleration %s",
+                              p_vout->p_sys->p_overlay->hw_overlay
+                               ? "activated" : "unavailable !" ); 
+    
+                SDL_LockYUVOverlay(p_vout->p_sys->p_overlay);
+                /* copy the data into video buffers */
+                /* Y first */
+                memcpy(p_vout->p_sys->p_overlay->pixels[0],
+                       p_vout->p_rendered_pic->p_y,
+                       p_vout->p_sys->p_overlay->h *
+                       p_vout->p_sys->p_overlay->pitches[0]);
+                /* then V */
+                memcpy(p_vout->p_sys->p_overlay->pixels[1],
+                       p_vout->p_rendered_pic->p_v,
+                       p_vout->p_sys->p_overlay->h *
+                       p_vout->p_sys->p_overlay->pitches[1] / 2);
+                /* and U */
+                memcpy(p_vout->p_sys->p_overlay->pixels[2],
+                       p_vout->p_rendered_pic->p_u,
+                       p_vout->p_sys->p_overlay->h *
+                       p_vout->p_sys->p_overlay->pitches[2] / 2);
+    
+#define BUFFER (&p_vout->p_buffer[p_vout->i_buffer_index])
+                disp.w = BUFFER->i_pic_width;
+                disp.h = BUFFER->i_pic_height;
+#undef BUFFER
+                disp.x = (p_vout->i_width - disp.w)/2;
+                disp.y = (p_vout->i_height - disp.h)/2;
+    
+                SDL_DisplayYUVOverlay( p_vout->p_sys->p_overlay , &disp );
+                SDL_UnlockYUVOverlay(p_vout->p_sys->p_overlay);
 
-            SDL_DisplayYUVOverlay( p_vout->p_sys->p_overlay , &disp );
-            SDL_UnlockYUVOverlay(p_vout->p_sys->p_overlay);
+                return;
+            }
         }
+    
+        /* Software YUV: change display frame */
+        SDL_Flip( p_vout->p_sys->p_display );
     }
 }
 
