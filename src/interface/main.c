@@ -40,9 +40,14 @@
 #define OPT_MONO                152
 
 #define OPT_NOVIDEO             160
-#define OPT_COLOR               161
+#define OPT_DISPLAY             161
+#define OPT_WIDTH               162
+#define OPT_HEIGHT              163
+#define OPT_COLOR               164
 
 #define OPT_NOVLANS             170
+#define OPT_SERVER              171
+#define OPT_PORT                172
  
 /* Long options */
 static const struct option longopts[] =
@@ -59,11 +64,16 @@ static const struct option longopts[] =
 
     /* Video options */
     {   "novideo",          0,          0,      OPT_NOVIDEO },           
+    {   "display",          1,          0,      OPT_DISPLAY },  
+    {   "width",            1,          0,      OPT_WIDTH },
+    {   "height",           1,          0,      OPT_HEIGHT },                
     {   "grayscale",        0,          0,      'g' },    
     {   "color",            0,          0,      OPT_COLOR },                
 
-    /* VLAN management options */
+    /* Input options */
     {   "novlans",          0,          0,      OPT_NOVLANS },
+    {   "server",           1,          0,      OPT_SERVER },
+    {   "port",             1,          0,      OPT_PORT },
 
     {   0,                  0,          0,      0 }
 };
@@ -276,26 +286,6 @@ static void SetDefaultConfiguration( void )
     p_main->b_audio  = 1;
     p_main->b_video  = 1;
     p_main->b_vlans  = 1;
-
-    /*
-     * Audio output thread configuration 
-     */
-
-    // ?? initialization using structures is no more available, use putenv/getenv
-    // instead.
-
-   
-
-    /*
-     * Video output thread configuration
-     */
-    //    p_data->vout_cfg.i_properties =         0;
-
-    /* VLAN management */
-    /*???    p_data->cfg.b_vlans =                   0;    
-    p_data->cfg.psz_input_vlan_server =     VLAN_DEFAULT_SERVER;
-    p_data->cfg.i_input_vlan_server_port =  VLAN_DEFAULT_SERVER_PORT;    
-    */
 }
 
 /*******************************************************************************
@@ -344,6 +334,16 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_NOVIDEO:                                         /* --novideo */
             p_main->b_video = 0;
             break;       
+        case OPT_DISPLAY:                                         /* --display */
+            main_PutPszVariable( VOUT_DISPLAY_VAR, optarg );
+            break;            
+        case OPT_WIDTH:                                             /* --width */
+            main_PutPszVariable( VOUT_WIDTH_VAR, optarg );
+            break;            
+        case OPT_HEIGHT:                                           /* --height */            
+            main_PutPszVariable( VOUT_HEIGHT_VAR, optarg );            
+            break;            
+            
         case 'g':                                           /* -g, --grayscale */
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 1 );
             break;            
@@ -351,10 +351,16 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
             break;            
 
-        /* VLAN management options */
+        /* Input options */
         case OPT_NOVLANS:                                         /* --novlans */
             p_main->b_vlans = 0;
             break;      
+        case OPT_SERVER:                                           /* --server */
+            main_PutPszVariable( INPUT_SERVER_VAR, optarg );
+            break;            
+        case OPT_PORT:                                               /* --port */
+            main_PutPszVariable( INPUT_PORT_VAR, optarg );
+            break;            
 	    
         /* Internal error: unknown option */
         case '?':                          
@@ -383,58 +389,58 @@ static void Usage( void )
     intf_Msg(COPYRIGHT_MESSAGE "\n");
 
     /* Usage */
-    intf_Msg("usage: vlc [options...] [parameters]\n" \
-	     "  parameters can be passed using environment variables\n" \
-	     "  example: vlan_server=vlan-server.via.ecp.fr:1234\n" \
-	     );
+    intf_Msg("usage: vlc [options...] [parameters]\n" );
 
     /* Options */
     intf_Msg("Options:\n" \
-             "  -h, --help                      print usage\n" \
-             "  -g, --grayscale                 grayscale video\n" \
-             "  --noaudio                       disable audio\n" \
-             "  --stereo                        enable stereo\n" \
-             "  --mono                          disable stereo\n"
-             "  --novideo                       disable video\n" \
-             "  --color                         color video\n" \
-             "  --novlans                       disable vlans\n" \
+             "  -h, --help                        \tprint usage\n" \
+             "  --noaudio                         \tdisable audio\n" \
+             "  --stereo, --mono                  \tstereo/mono audio\n" \
+             "  --novideo                         \tdisable video\n" \
+             "  --display <display>               \tdisplay string\n" \
+             "  --width <w>, --height <h>         \tdisplay dimensions\n" \
+             "  -g, --grayscale, --color          \tgrayscale/color video\n" \
+             "  --novlans                         \tdisable vlans\n" \
+             "  --server <host>, --port <port>    \tvideo server adress\n" \
              );
 
     /* Interface parameters */
     intf_Msg("Interface parameters:\n" \
-	     "  " INTF_INIT_SCRIPT_VAR "=<filename>             initialization script\n" \
+	     "  " INTF_INIT_SCRIPT_VAR "=<filename>             \tinitialization script\n" \
 	     );
 
     /* Audio parameters */
     intf_Msg("Audio parameters:\n" \
-             "  " AOUT_DSP_VAR "=<filename>              dsp device path\n" \
-             "  " AOUT_STEREO_VAR "={1|0}                stereo or mono output\n" \
-             "  " AOUT_RATE_VAR "=<rate>           output rate\n" \
+             "  " AOUT_DSP_VAR "=<filename>              \tdsp device path\n" \
+             "  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output\n" \
+             "  " AOUT_RATE_VAR "=<rate>             \toutput rate\n" \
 	     );
 
     /* Video parameters */
     intf_Msg("Video parameters:\n" \
-             "  " VOUT_DISPLAY_VAR "=<display name>      display used\n"
-             "  " VOUT_WIDTH_VAR "=<width>               display width\n"
-             "  " VOUT_HEIGHT_VAR "=<height>             dislay height\n"
-             "  " VOUT_FB_DEV_VAR "=<filename>           framebuffer device path\n" \
-             "  " VOUT_GRAYSCALE_VAR "={1|0}             grayscale or color output\n" \
+             "  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used\n" \
+             "  " VOUT_WIDTH_VAR "=<width>               \tdisplay width\n" \
+             "  " VOUT_HEIGHT_VAR "=<height>             \tdislay height\n" \
+             "  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path\n" \
+             "  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output\n" \
 	     ); 
 
-    /* Vlan parameters */
-    intf_Msg("VLANs (Virtual Local Aera Networks) parameters:\n" \
-	     "  " INPUT_IFACE_VAR "=<interface>          network interface\n" \
-             "  " INPUT_VLAN_SERVER_VAR "=<hostname>     vlan server\n" \
-             "  " INPUT_VLAN_PORT_VAR "=<port>           vlan server port\n" \
+    /* Input parameters */
+    intf_Msg("Input parameters:\n" \
+             "  " INPUT_SERVER_VAR "=<hostname>          \tvideo server\n" \
+             "  " INPUT_PORT_VAR "=<port>            \tvideo server port\n" \
+	     "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n" \
+             "  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server\n" \
+             "  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port\n" \
 	     );
 
     /* Interfaces keys */
     intf_Msg("Interface keys: most interfaces accept the following commands:\n" \
-             "  [esc], q                        quit\n" \
-             "  +, -, m                         change volume, mute\n" \
-             "  g, G, c                         change gamma, toggle grayscale\n" \
-             "  0 - 9                           select channel\n" \
-             "  [space]                         toggle info printing\n" \
+             "  [esc], q                          \tquit\n" \
+             "  +, -, m                           \tchange volume, mute\n" \
+             "  g, G, c                           \tchange gamma, toggle grayscale\n" \
+             "  0 - 9                             \tselect channel\n" \
+             "  [space]                           \ttoggle info printing\n" \
              );    
 }
 

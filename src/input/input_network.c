@@ -31,6 +31,7 @@
 #include "input_vlan.h"
 
 #include "intf_msg.h"
+#include "main.h"
 
 /******************************************************************************
  * input_NetworkOpen: initialize a network stream
@@ -97,7 +98,7 @@ int input_NetworkOpen( input_thread_t *p_input )
     /* Use default port if not specified */
     if( p_input->i_port == 0 )
     {
-        p_input->i_port = INPUT_DEFAULT_PORT;        
+        p_input->i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );        
     }
 
     /* Find the address. */
@@ -165,7 +166,7 @@ int input_NetworkOpen( input_thread_t *p_input )
     /* Use default host if not specified */
     if( p_input->psz_source == NULL )
     {
-        p_input->psz_source = INPUT_DEFAULT_SERVER;        
+        p_input->psz_source = main_GetPszVariable( INPUT_SERVER_VAR, INPUT_SERVER_DEFAULT );
     }
     
     if( BuildInetAddr( &sa_in, p_input->psz_source, htons(0) ) == (-1) )

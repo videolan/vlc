@@ -182,20 +182,15 @@
 #undef INPUT_LIFO_PES_NETLIST
 
 /* Maximum length of a hostname or source name */
-#define INPUT_MAX_SOURCE_LENGTH       100
-
-
-/* Default input method */
-#define INPUT_DEFAULT_METHOD            INPUT_METHOD_TS_UCAST
+#define INPUT_MAX_SOURCE_LENGTH         100
 
 /* Default remote server */
-#define INPUT_DEFAULT_SERVER            "138.195.143.220"
+#define INPUT_SERVER_VAR                "vlc_server"
+#define INPUT_SERVER_DEFAULT            "138.195.143.220"
 
 /* Default input port */
-#define INPUT_DEFAULT_PORT           1234
-
-/* Default videolan VLAN */
-#define VIDEOLAN_DEFAULT_VLAN           3
+#define INPUT_PORT_VAR                  "vlc_server_port"
+#define INPUT_PORT_DEFAULT              1234
 
 /*
  * Vlan method 
@@ -240,7 +235,7 @@
  */
 
 /* Environment variable used in place of DISPLAY if available */
-#define VOUT_DISPLAY_VAR                "vlc_DISPLAY"
+#define VOUT_DISPLAY_VAR                "vlc_display"
 
 /* Default dimensions for display window - these dimensions are enough for the 
  * standard width and height broadcasted MPEG-2 streams */
@@ -346,7 +341,7 @@
 /* Define to enable messages queues - disabling messages queue can be usefull
  * when debugging, since it allows messages which would not otherwise be printed,
  * due to a crash, to be printed anyway */
-//#define INTF_MSG_QUEUE
+#define INTF_MSG_QUEUE
 
 /* Format of the header for debug messages. The arguments following this header
  * are the file (char *), the function (char *) and the line (int) in which the
@@ -365,18 +360,3 @@
 /* Maximal number of commands which can be saved in history list */
 #define INTF_CONSOLE_MAX_HISTORY        20
 
-/*******************************************************************************
- * Network and VLAN management
- *******************************************************************************/
-/* Default network interface to use */
-#define NET_DFLT_IF			"eth0"
-
-/* Default VLANserver address */
-#define VLAN_DFLT_VLANSRV		"vlanserver"
-
-/* Default VLANserver port */
-#define VLAN_DFLT_VLANPORT		"6010"
-
-/* Client identification */
-#define VLAN_LOGIN			"guest"
-#define VLAN_PASSWD			"none"
