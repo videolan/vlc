@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.6 2003/01/20 02:19:56 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.7 2003/01/22 04:51:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -55,6 +55,7 @@ typedef struct packetizer_s
     int                     i_sequence_header_length;
     int                     i_last_sequence_header;
 
+    int                     i_last_picture_structure;
 } packetizer_t;
 
 static int  Open    ( vlc_object_t * );
@@ -166,6 +167,7 @@ static int InitThread( packetizer_t *p_pack )
         return -1;
     }
 
+    p_pack->i_last_picture_structure = 0x03; /* frame picture */
     return( 0 );
 }
 
@@ -209,8 +211,14 @@ static void PacketizeThread( packetizer_t *p_pack )
 {
     sout_buffer_t *p_sout_buffer = NULL;
     int32_t i_pos;
-    int i_temporal_ref = 0;
     int i_skipped;
+    mtime_t i_duration; /* of the parsed picture */
+
+    /* needed to calculate pts/dts */
+    int i_temporal_ref = 0;
+    int i_picture_structure = 0x03; /* frame picture */
+    int i_top_field_first = 0;
+    int i_repeat_first_field = 0;
 
     if( !p_pack->p_sout_input )
     {
@@ -365,6 +373,30 @@ static void PacketizeThread( packetizer_t *p_pack )
             CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
             break;
         }
+        else if( i_code == 0x1b5 )
+        {
+            /* extention start code                   32 */
+            GetChunk( &p_pack->bit_stream,
+                      p_sout_buffer->p_buffer + i_pos, 4 ); i_pos += 4;
+
+            if( ShowBits( &p_pack->bit_stream, 4 ) == 0x08 )
+            {
+                /* picture coding extention */
+
+                /* extention start code identifier(b1000)  4 */
+                /* f_code[2][2]                           16 */
+                /* intra_dc_precision                      2 */
+                /* picture_structure                       2 */
+                /* top_field_first                         1 */
+                i_picture_structure =
+                    ShowBits( &p_pack->bit_stream, 24 ) & 0x03;
+                i_top_field_first =
+                    ShowBits( &p_pack->bit_stream, 25 ) & 0x01;
+                i_repeat_first_field =
+                    ShowBits( &p_pack->bit_stream, 31 ) & 0x01;
+            }
+            CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
+        }
         else
         {
             if( i_code == 0x1B3 )
@@ -379,26 +411,55 @@ static void PacketizeThread( packetizer_t *p_pack )
                         p_sout_buffer, i_pos );
     p_sout_buffer->i_size = i_pos;
 
+    /* calculate dts/pts */
+    if( p_pack->i_progressive_sequence || i_picture_structure == 0x03)
+    {
+        i_duration = (mtime_t)( 1000000 / p_pack->d_frame_rate );
+    }
+    else
+    {
+        i_duration = (mtime_t)( 1000000 / p_pack->d_frame_rate / 2);
+    }
+
     p_sout_buffer->i_dts = p_pack->i_last_dts;
-    p_sout_buffer->i_pts = p_pack->i_last_ref_pts +
+    p_sout_buffer->i_pts = p_pack->i_last_ref_pts + 
         i_temporal_ref * (mtime_t)( 1000000 / p_pack->d_frame_rate );
-
-
-    p_sout_buffer->i_length = (uint64_t)1000000 / p_pack->d_frame_rate;
+    p_sout_buffer->i_length = i_duration;
     p_sout_buffer->i_bitrate = (int)( 8 * i_pos * p_pack->d_frame_rate );
-
-//    msg_Dbg( p_pack->p_fifo, "frame length %d b", i_pos );
-
     sout_InputSendBuffer( p_pack->p_sout_input, p_sout_buffer );
 
     if( p_pack->i_progressive_sequence )
     {
-        p_pack->i_last_dts += (mtime_t)( 1000000 / p_pack->d_frame_rate );
+        if( i_top_field_first == 0 && i_repeat_first_field == 0 )
+        {
+            p_pack->i_last_dts += i_duration;
+        }
+        else if( i_top_field_first == 0 && i_repeat_first_field == 1 )
+        {
+            p_pack->i_last_dts += 2 * i_duration;
+        }
+        else if( i_top_field_first == 1 && i_repeat_first_field == 1 )
+        {
+            p_pack->i_last_dts += 3 * i_duration;
+        }
     }
     else
     {
-        p_pack->i_last_dts += (mtime_t)( 1000000 / p_pack->d_frame_rate / 2 );
+        if( i_picture_structure == 0x03 )
+        {
+            p_pack->i_last_dts += i_duration;
+        }
+        else if( i_picture_structure == p_pack->i_last_picture_structure )
+        {
+            p_pack->i_last_dts += 2 * i_duration;
+        }
+        else if( ( !i_top_field_first && i_picture_structure == 0x01 ) ||
+                 (  i_top_field_first && i_picture_structure == 0x02 ) )
+        {
+            p_pack->i_last_dts += 2 * i_duration;
+        }
     }
+    p_pack->i_last_picture_structure = i_picture_structure;
 }
 
 
