@@ -555,21 +555,21 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
          * not have more than 1 bit set to one, but some streams don't
          * respect this note. */
 
-        if( i_type & 0x04)
+        if( i_type & 0x04 && i_id < 4 )
         {
             p_clut->c_2b[i_id].Y = y;
             p_clut->c_2b[i_id].Cr = cr;
             p_clut->c_2b[i_id].Cb = cb;
             p_clut->c_2b[i_id].T = t;
         }
-        if( i_type & 0x02)
+        if( i_type & 0x02 && i_id < 16 )
         {
             p_clut->c_4b[i_id].Y = y;
             p_clut->c_4b[i_id].Cr = cr;
             p_clut->c_4b[i_id].Cb = cb;
             p_clut->c_4b[i_id].T = t;
         }
-        if( i_type & 0x01)
+        if( i_type & 0x01 )
         {
             p_clut->c_8b[i_id].Y = y;
             p_clut->c_8b[i_id].Cr = cr;
