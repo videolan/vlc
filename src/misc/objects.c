@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.34 2003/01/27 17:41:01 ipkiss Exp $
+ * $Id: objects.c,v 1.35 2003/02/23 19:07:02 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,6 +44,7 @@
 #include "vlc_playlist.h"
 #include "interface.h"
 
+#include "httpd.h"
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -122,6 +123,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_SOUT:
             i_size = sizeof(sout_instance_t);
             psz_type = "stream output";
+            break;
+        case VLC_OBJECT_HTTPD:
+            i_size = sizeof( httpd_t );
+            psz_type = "http daemon";
             break;
         default:
             i_size = i_type > 0

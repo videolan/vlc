@@ -170,6 +170,7 @@ HEADERS_include = \
 	include/interface.h \
 	include/intf_eject.h \
 	include/iso_lang.h \
+	include/httpd.h \
 	include/main.h \
 	include/mmx.h \
 	include/modules.h \

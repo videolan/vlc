@@ -1,3 +1,4 @@
 SOURCES_access_output_dummy = modules/access_output/dummy.c
 SOURCES_access_output_file = modules/access_output/file.c
 SOURCES_access_output_udp = modules/access_output/udp.c
+SOURCES_access_output_http = modules/access_output/http.c
