@@ -2,7 +2,7 @@
  * rtp.c: rtp stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: rtp.c,v 1.11 2004/02/02 12:50:08 fenrir Exp $
+ * $Id: rtp.c,v 1.12 2004/02/02 14:43:50 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -457,7 +457,7 @@ static int rtp_packetize_mp4a ( sout_stream_t *, sout_stream_id_t *, sout_buffer
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 {
-    static const char hex[16] = "0123456789ABCDEF";
+    static const char hex[16] = "0123456789abcdef";
     int i;
 
     for( i = 0; i < i_data; i++ )
@@ -582,7 +582,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 id->psz_fmtp = malloc( 100 + 2 * p_fmt->i_extra );
                 sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
                 sprintf( id->psz_fmtp,
-                         "profile-level-id=3; config=%s", hexa );
+                         "profile-level-id=3; config=%s;", hexa );
             }
             break;
         }
@@ -910,12 +910,12 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
                 i_temporal_ref = ( p[1] << 2) |((p[2]>>6)&0x03);
                 i_picture_coding_type = (p[2] >> 3)&0x07;
 
-                if( i_rest > 4 && ( i_picture_coding_type == 2 ||
+                if( i_rest >= 4 && ( i_picture_coding_type == 2 ||
                                     i_picture_coding_type == 3 ) )
                 {
                     i_ffv = (p[3] >> 2)&0x01;
                     i_ffc = ((p[3]&0x03) << 1)|((p[4]>>7)&0x01);
-                    if( i_picture_coding_type == 3 )
+                    if( i_rest > 4 && i_picture_coding_type == 3 )
                     {
                         i_fbv = (p[4]>>6)&0x01;
                         i_bfc = (p[4]>>3)&0x07;
@@ -942,7 +942,8 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
                           ( i_fbv << 7 )|( i_bfc << 4 )|( i_ffv << 3 )|i_ffc;
 
         /* rtp common header */
-        rtp_packetize_common( id, out, (i == i_count - 1)?1:0, in->i_pts );
+        rtp_packetize_common( id, out, (i == i_count - 1)?1:0,
+                              in->i_pts > 0 ? in->i_pts : in->i_dts );
 
         /* MBZ:5 T:1 TR:10 AN:1 N:1 S:1 B:1 E:1 P:3 FBV:1 BFC:3 FFV:1 FFC:3 */
         out->p_buffer[12] = ( h >> 24 )&0xff;
