@@ -189,7 +189,7 @@ typedef struct MP4_Stream_s
 {
     int     b_memory;   /* do we uses a memory buffer */
 
-    input_thread_t *p_input;
+    stream_t *s;
 
     off_t   i_start; /* in the buffer position for memory stream */
     off_t   i_stop;
@@ -821,7 +821,7 @@ typedef struct MP4_Box_s
  *  The first box is a virtual box "root" and is the father for all first
  *  level boxes
  *****************************************************************************/
-MP4_Box_t *MP4_BoxGetRoot( input_thread_t *p_input );
+MP4_Box_t *MP4_BoxGetRoot( stream_t * );
 
 /*****************************************************************************
  * MP4_FreeBox : free memory allocated after read with MP4_ReadBox
@@ -829,14 +829,14 @@ MP4_Box_t *MP4_BoxGetRoot( input_thread_t *p_input );
  * XXX : all children have to be allocated by a malloc !! and
  *         p_box is freed
  *****************************************************************************/
-void MP4_BoxFree( input_thread_t *p_input, MP4_Box_t *p_box );
+void MP4_BoxFree( stream_t *, MP4_Box_t *p_box );
 
 /*****************************************************************************
  * MP4_DumpBoxStructure: print the structure of the p_box
  *****************************************************************************
  * Usefull while debugging
  *****************************************************************************/
-void MP4_BoxDumpStructure( input_thread_t *p_input, MP4_Box_t *p_box );
+void MP4_BoxDumpStructure( stream_t *p_input, MP4_Box_t *p_box );
 
 
 /*****************************************************************************
