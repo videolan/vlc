@@ -142,7 +142,6 @@ gnutls_SessionHandshake( tls_session_t *p_session, int fd )
 
     gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)fd);
 
-    msg_Dbg( p_session->p_tls, "shaking hand..." );
     do
         /* TODO: handle fatal error */
         val = gnutls_handshake( p_sys->session );
@@ -157,7 +156,6 @@ gnutls_SessionHandshake( tls_session_t *p_session, int fd )
         free( p_session );
         return NULL;
     }
-    msg_Dbg( p_session->p_tls, "shaked hand." );
 
     return p_session;
 }
