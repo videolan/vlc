@@ -2,7 +2,7 @@
  * libioRIFF.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: libioRIFF.h,v 1.2 2002/09/18 23:34:28 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -19,12 +19,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
+#define MKFOURCC( a, b, c, d ) \
+    ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
 typedef struct riffchunk_s
 {
-    u32 i_id;
+    vlc_fourcc_t i_id;
     u32 i_size;
-    u32 i_type;
+    vlc_fourcc_t i_type;
     u32 i_pos;
     data_packet_t *p_data;
     u64 i_8bytes; /* it's the first 8 bytes after header 

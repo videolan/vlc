@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.3 2002/08/08 22:28:22 sam Exp $
+ * $Id: avi.c,v 1.4 2002/09/18 23:34:28 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -59,24 +59,23 @@ vlc_module_end();
  *****************************************************************************/
 static u16 GetWLE( byte_t *p_buff )
 {
-    u16 i;
-    i = (*p_buff) + ( *(p_buff + 1) <<8 );
-    return ( i );
+    return( p_buff[0] + ( p_buff[1] << 8 ) );
 }
 static u32 GetDWLE( byte_t *p_buff )
 {
-    u32 i;
-    i = (*p_buff) + ( *(p_buff + 1) <<8 ) + 
-            ( *(p_buff + 2) <<16 ) + ( *(p_buff + 3) <<24 );
-    return ( i );
+    return( p_buff[0] + ( p_buff[1] << 8 ) + 
+            ( p_buff[2] << 16 ) + ( p_buff[3] << 24 ) );
 }
 static u32 GetDWBE( byte_t *p_buff )
 {
-    u32 i;
-    i = ((*p_buff)<<24) + ( *(p_buff + 1) <<16 ) + 
-            ( *(p_buff + 2) <<8 ) + ( *(p_buff + 3) );
-    return ( i );
+    return( p_buff[3] + ( p_buff[2] << 8 ) + 
+            ( p_buff[1] << 16 ) + ( p_buff[0] << 24 ) );
 }
+static vlc_fourcc_t GetFOURCC( byte_t *p_buff )
+{
+    return( VLC_FOURCC( p_buff[0], p_buff[1], p_buff[2], p_buff[3] ) );
+}
+
 static inline off_t __EVEN( off_t i )
 {
     return( (i & 1) ? i+1 : i );
@@ -105,8 +104,8 @@ static void AVI_Parse_avih( MainAVIHeader_t *p_avih, byte_t *p_buff )
 }
 static void AVI_Parse_Header( AVIStreamHeader_t *p_strh, byte_t *p_buff )
 {
-    p_strh->i_type      = GetDWLE( p_buff );
-    p_strh->i_handler   = GetDWLE( p_buff + 4 );
+    p_strh->i_type      = GetFOURCC( p_buff );
+    p_strh->i_handler   = GetFOURCC( p_buff + 4 );
     p_strh->i_flags     = GetDWLE( p_buff + 8 );
     p_strh->i_reserved1 = GetDWLE( p_buff + 12);
     p_strh->i_initialframes = GetDWLE( p_buff + 16);
@@ -125,7 +124,7 @@ static void AVI_Parse_BitMapInfoHeader( bitmapinfoheader_t *h, byte_t *p_data )
     h->i_height        = GetDWLE( p_data + 8 );
     h->i_planes        = GetWLE( p_data + 12 );
     h->i_bitcount      = GetWLE( p_data + 14 );
-    h->i_compression   = GetDWLE( p_data + 16 );
+    h->i_compression   = GetFOURCC( p_data + 16 );
     h->i_sizeimage     = GetDWLE( p_data + 20 );
     h->i_xpelspermeter = GetDWLE( p_data + 24 );
     h->i_ypelspermeter = GetDWLE( p_data + 28 );
@@ -147,10 +146,10 @@ static inline int AVI_GetESTypeFromTwoCC( u16 i_type )
 {
     switch( i_type )
     {
-        case( TWOCC_wb ):
+        case( AVITWOCC_wb ):
             return( AUDIO_ES );
-         case( TWOCC_dc ):
-         case( TWOCC_db ):
+         case( AVITWOCC_dc ):
+         case( AVITWOCC_db ):
             return( VIDEO_ES );
          default:
             return( UNKNOWN_ES );
@@ -335,7 +334,7 @@ static void AVI_PESBuffer_Flush( input_buffers_t *p_method_data,
 static void AVI_ParseStreamHeader( u32 i_id, int *i_number, int *i_type )
 {
     int c1,c2;
-
+/* XXX i_id have to be read using MKFOURCC and NOT VLC_FOURCC */
     c1 = ( i_id ) & 0xFF;
     c2 = ( i_id >>  8 ) & 0xFF;
 
@@ -435,7 +434,7 @@ static void __AVI_GetIndex( input_thread_t *p_input )
     if( RIFF_FindAndGotoDataChunk( p_input,
                                    p_avi->p_riff, 
                                    &p_idx1, 
-                                   FOURCC_idx1)!=0 )
+                                   AVIFOURCC_idx1)!=0 )
     {
         msg_Warn( p_input, "cannot find index" );
         RIFF_GoToChunk( p_input, p_avi->p_hdrl );        
@@ -582,7 +581,7 @@ static int AVIInit( vlc_object_t * p_this )
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
 
-    if( RIFF_TestFileHeader( p_input, &p_riff, FOURCC_AVI ) != 0 )    
+    if( RIFF_TestFileHeader( p_input, &p_riff, AVIFOURCC_AVI ) != 0 )    
     {
         AVIEnd( p_input );
         msg_Warn( p_input, "RIFF-AVI module discarded" );
@@ -598,7 +597,7 @@ static int AVIInit( vlc_object_t * p_this )
     }
 
     /* it's a riff-avi file, so search for LIST-hdrl */
-    if( RIFF_FindListChunk(p_input ,&p_hdrl,p_riff, FOURCC_hdrl) != 0 )
+    if( RIFF_FindListChunk(p_input ,&p_hdrl,p_riff, AVIFOURCC_hdrl) != 0 )
     {
         AVIEnd( p_input );
         msg_Err( p_input, "cannot find \"LIST-hdrl\"" );
@@ -614,7 +613,7 @@ static int AVIInit( vlc_object_t * p_this )
     }
     /* in  LIST-hdrl search avih */
     if( RIFF_FindAndLoadChunk( p_input, p_hdrl, 
-                                    &p_avih, FOURCC_avih ) != 0 )
+                                    &p_avih, AVIFOURCC_avih ) != 0 )
     {
         AVIEnd( p_input );
         msg_Err( p_input, "cannot find \"avih\" chunk" );
@@ -667,7 +666,7 @@ static int AVIInit( vlc_object_t * p_this )
         memset( p_info, 0, sizeof( AVIStreamInfo_t ) );        
 
         if( ( RIFF_FindListChunk(p_input,
-                                &p_strl,p_hdrl, FOURCC_strl) != 0 )
+                                &p_strl,p_hdrl, AVIFOURCC_strl) != 0 )
                 ||( RIFF_DescendChunk(p_input) != 0 ))
         {
             AVIEnd( p_input );
@@ -677,7 +676,7 @@ static int AVIInit( vlc_object_t * p_this )
         
         /* in  LIST-strl search strh */
         if( RIFF_FindAndLoadChunk( p_input, p_hdrl, 
-                                &p_strh, FOURCC_strh ) != 0 )
+                                &p_strh, AVIFOURCC_strh ) != 0 )
         {
             RIFF_DeleteChunk( p_input, p_strl );
             AVIEnd( p_input );
@@ -690,7 +689,7 @@ static int AVIInit( vlc_object_t * p_this )
 
         /* in  LIST-strl search strf */
         if( RIFF_FindAndLoadChunk( p_input, p_hdrl, 
-                                &p_strf, FOURCC_strf ) != 0 )
+                                &p_strf, AVIFOURCC_strf ) != 0 )
         {
             RIFF_DeleteChunk( p_input, p_strl );
             AVIEnd( p_input );
@@ -717,7 +716,7 @@ static int AVIInit( vlc_object_t * p_this )
        
         switch( p_info->header.i_type )
         {
-            case( FOURCC_auds ):
+            case( AVIFOURCC_auds ):
                 p_es->i_cat = AUDIO_ES;
                 AVI_Parse_WaveFormatEx( &p_info->audio_format,
                                    p_strf->p_data->p_payload_start ); 
@@ -725,7 +724,7 @@ static int AVIInit( vlc_object_t * p_this )
                                      p_info->audio_format.i_formattag );
                 break;
                 
-            case( FOURCC_vids ):
+            case( AVIFOURCC_vids ):
                 p_es->i_cat = VIDEO_ES;
                 AVI_Parse_BitMapInfoHeader( &p_info->video_format,
                                    p_strf->p_data->p_payload_start ); 
@@ -762,7 +761,7 @@ static int AVIInit( vlc_object_t * p_this )
     }
 
     /* go to movi chunk to get it*/
-    if( RIFF_FindListChunk(p_input ,&p_movi,p_riff, FOURCC_movi) != 0 )
+    if( RIFF_FindListChunk(p_input ,&p_movi,p_riff, AVIFOURCC_movi) != 0 )
     {
         msg_Err( p_input, "cannot find \"LIST-movi\"" );
         AVIEnd( p_input );
@@ -1275,7 +1274,7 @@ static int __AVI_GetChunk( input_thread_t  *p_input,
         }
 /*        msg_Dbg( p_input, "ck: %4.4s len %d", &p_ck->i_id, p_ck->i_size ); */
         /* special case for LIST-rec chunk */
-        if( ( p_ck->i_id == FOURCC_LIST )&&( p_ck->i_type == FOURCC_rec ) )
+        if( ( p_ck->i_id == AVIFOURCC_LIST )&&( p_ck->i_type == AVIFOURCC_rec ) )
         {
             RIFF_DescendChunk( p_input );
             RIFF_DeleteChunk( p_input, p_ck );
@@ -1879,12 +1878,12 @@ static int __AVIDemux_ChunkAction( int i_streams_max,
 
     switch( p_ck->i_id )
     {
-        case( FOURCC_JUNK ):
+        case( AVIFOURCC_JUNK ):
             return( 1 );
-        case( FOURCC_idx1 ):
+        case( AVIFOURCC_idx1 ):
             return( 3 );
-        case( FOURCC_LIST ):
-            if( p_ck->i_type == FOURCC_rec )
+        case( AVIFOURCC_LIST ):
+            if( p_ck->i_type == AVIFOURCC_rec )
             {
                 return( 2 );
             }
@@ -1897,7 +1896,7 @@ static int __AVIDemux_ChunkAction( int i_streams_max,
     } 
     /* test for ix?? */
 
-    if( ( p_ck->i_id & 0xFFFF ) == VLC_TWOCC( 'i','x' ) )
+    if( ( p_ck->i_id & 0xFFFF ) == MKTWOCC( 'i','x' ) )
     {
         return( 1 );
     }
@@ -1921,9 +1920,9 @@ static int AVI_NotSeekableRecover( input_thread_t *p_input )
         i_id = GetDWLE( p_id );
         switch( i_id )
         {
-            case( FOURCC_idx1 ):
-            case( FOURCC_JUNK ):
-            case( FOURCC_LIST ):
+            case( AVIFOURCC_idx1 ):
+            case( AVIFOURCC_JUNK ):
+            case( AVIFOURCC_LIST ):
                 return( 1 );
             default:
                 AVI_ParseStreamHeader( i_id, &i_number, &i_type );
@@ -1931,10 +1930,10 @@ static int AVI_NotSeekableRecover( input_thread_t *p_input )
                 {
                     switch( i_type )
                     {
-                        case( TWOCC_wb ):
-                        case( TWOCC_db ):
-                        case( TWOCC_dc ):
-                        case( TWOCC_pc ):
+                        case( AVITWOCC_wb ):
+                        case( AVITWOCC_db ):
+                        case( AVITWOCC_dc ):
+                        case( AVITWOCC_pc ):
                             return( 1 );
                     }
                 }

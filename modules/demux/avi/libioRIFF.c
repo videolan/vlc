@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: libioRIFF.c,v 1.2 2002/09/18 23:34:28 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,6 @@
 #include "video.h"
 
 #include "libioRIFF.h"
-
 static inline u16 __GetWLE( byte_t *p_buff )
 {
     return( (*p_buff) + ( *(p_buff+1) <<8 ) );
@@ -47,7 +46,7 @@ static inline u32 __EVEN( u32 i )
 {
     return( (i & 1) ? ++i : i );
 }
-        
+
 int __RIFF_TellPos( input_thread_t *p_input, u32 *pos )
 { 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -355,7 +354,7 @@ int   RIFF_TestFileHeader( input_thread_t * p_input, riffchunk_t ** pp_riff, u32
     {
         return( -1 );
     }
-    if( (*pp_riff)->i_id != VLC_FOURCC('R','I','F','F')
+    if( (*pp_riff)->i_id != MKFOURCC('R','I','F','F')
          || (*pp_riff)->i_type != i_type )
     {
         free( *pp_riff );
@@ -416,7 +415,7 @@ int   RIFF_FindListChunk( input_thread_t *p_input, riffchunk_t **pp_riff, riffch
             free( *pp_riff );
         }
         if( RIFF_FindChunk( p_input,
-                            VLC_FOURCC('L','I','S','T'), p_rifffather ) != 0 )
+                            MKFOURCC('L','I','S','T'), p_rifffather ) != 0 )
         {
             return( -1 );
         }

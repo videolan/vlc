@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.h,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: avi.h,v 1.3 2002/09/18 23:34:28 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -40,31 +40,36 @@
                                            the keyframe flag isn't a true flag
                                            but have to be verified */
 
-/* AVI stuff */
-#define FOURCC_RIFF         VLC_FOURCC('R','I','F','F')
-#define FOURCC_LIST         VLC_FOURCC('L','I','S','T')
-#define FOURCC_JUNK         VLC_FOURCC('J','U','N','K')
-#define FOURCC_AVI          VLC_FOURCC('A','V','I',' ')
-#define FOURCC_WAVE         VLC_FOURCC('W','A','V','E')
+#define MKTWOCC( a, b ) \
+    ( (u16)(a) | ( (u16)(b) << 8 ) )
 
-#define FOURCC_avih         VLC_FOURCC('a','v','i','h')
-#define FOURCC_hdrl         VLC_FOURCC('h','d','r','l')
-#define FOURCC_movi         VLC_FOURCC('m','o','v','i')
-#define FOURCC_idx1         VLC_FOURCC('i','d','x','1')
+/* *** avi stuff *** */
 
-#define FOURCC_strl         VLC_FOURCC('s','t','r','l')
-#define FOURCC_strh         VLC_FOURCC('s','t','r','h')
-#define FOURCC_strf         VLC_FOURCC('s','t','r','f')
-#define FOURCC_strd         VLC_FOURCC('s','t','r','d')
+#define AVIFOURCC_RIFF         MKFOURCC('R','I','F','F')
+#define AVIFOURCC_LIST         MKFOURCC('L','I','S','T')
+#define AVIFOURCC_JUNK         MKFOURCC('J','U','N','K')
+#define AVIFOURCC_AVI          MKFOURCC('A','V','I',' ')
+#define AVIFOURCC_WAVE         MKFOURCC('W','A','V','E')
 
-#define FOURCC_rec          VLC_FOURCC('r','e','c',' ')
-#define FOURCC_auds         VLC_FOURCC('a','u','d','s')
-#define FOURCC_vids         VLC_FOURCC('v','i','d','s')
+#define AVIFOURCC_avih         MKFOURCC('a','v','i','h')
+#define AVIFOURCC_hdrl         MKFOURCC('h','d','r','l')
+#define AVIFOURCC_movi         MKFOURCC('m','o','v','i')
+#define AVIFOURCC_idx1         MKFOURCC('i','d','x','1')
 
-#define TWOCC_wb            VLC_TWOCC('w','b')
-#define TWOCC_db            VLC_TWOCC('d','b')
-#define TWOCC_dc            VLC_TWOCC('d','c')
-#define TWOCC_pc            VLC_TWOCC('p','c')
+#define AVIFOURCC_strl         MKFOURCC('s','t','r','l')
+#define AVIFOURCC_strh         MKFOURCC('s','t','r','h')
+#define AVIFOURCC_strf         MKFOURCC('s','t','r','f')
+#define AVIFOURCC_strd         MKFOURCC('s','t','r','d')
+
+#define AVIFOURCC_rec          MKFOURCC('r','e','c',' ')
+#define AVIFOURCC_auds         MKFOURCC('a','u','d','s')
+#define AVIFOURCC_vids         MKFOURCC('v','i','d','s')
+
+#define AVITWOCC_wb            MKTWOCC('w','b')
+#define AVITWOCC_db            MKTWOCC('d','b')
+#define AVITWOCC_dc            MKTWOCC('d','c')
+#define AVITWOCC_pc            MKTWOCC('p','c')
+/* *** codex stuff ***  */
 
 /* MPEG4 video */
 #define FOURCC_DIVX         VLC_FOURCC('D','I','V','X')
@@ -142,12 +147,12 @@ typedef struct bitmapinfoheader_s
 
 typedef struct waveformatex_s
 {
-    u16 i_formattag;
-    u16 i_channels;
-    u32 i_samplespersec;
-    u32 i_avgbytespersec;
-    u16 i_blockalign;
-    u16 i_bitspersample;
+    u16 i_formattag;        // + 0x00
+    u16 i_channels;         // + 0x02
+    u32 i_samplespersec;    // + 0x04
+    u32 i_avgbytespersec;   // + 0x08
+    u16 i_blockalign;       // + 0x0c
+    u16 i_bitspersample;    // + 0x0e
     u16 i_size; /* the extra size in bytes */
 } waveformatex_t;
 
@@ -210,15 +215,12 @@ typedef struct AVIESBuffer_s
 
 typedef struct AVIStreamInfo_s
 {
+    int i_cat;           /* AUDIO_ES, VIDEO_ES */
+    vlc_fourcc_t    i_fourcc;
+    vlc_fourcc_t    i_codec;
 
-    riffchunk_t *p_strl;
-    riffchunk_t *p_strh;
-    riffchunk_t *p_strf;
-    riffchunk_t *p_strd; /* not used */
-    
     AVIStreamHeader_t header;
     
-    u8 i_cat;           /* AUDIO_ES, VIDEO_ES */
     bitmapinfoheader_t  video_format;
     waveformatex_t      audio_format;
     es_descriptor_t     *p_es;   

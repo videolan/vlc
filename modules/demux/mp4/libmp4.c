@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.5 2002/09/17 11:57:38 fenrir Exp $
+ * $Id: libmp4.c,v 1.6 2002/09/18 23:34:28 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -61,7 +61,8 @@
     dst = GetDWBE( p_peek ); p_peek += 4; i_read -= 4
     
 #define MP4_GETFOURCC( dst ) \
-    dst = GetDWLE( p_peek ); p_peek += 4; i_read -= 4
+    dst = VLC_FOURCC( p_peek[0], p_peek[1], p_peek[2], p_peek[3] ); \
+    p_peek += 4; i_read -= 4
 
 #define MP4_GET8BYTES( dst ) \
     dst = GetQWBE( p_peek ); p_peek += 8; i_read -= 8
