@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.67 2001/12/03 17:55:45 massiot Exp $
+ * $Id: mpeg_system.c,v 1.68 2001/12/05 03:31:04 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1378,6 +1378,8 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
 
     }
 #undef p_psi    
+    /* FIXME This has nothing to do here */
+    p_input->stream.p_selected_program = p_input->stream.pp_programs[0] ;
 
 }
 

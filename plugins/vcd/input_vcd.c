@@ -361,12 +361,13 @@ static void VCDInit( input_thread_t * p_input )
 
     /* Set program information. */
 
-    input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) ); 
+    input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
+    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
 
     /* No PSM to read in disc mode, we already have all information */
-    p_input->stream.pp_programs[0]->b_is_ok = 1;
+    p_input->stream.p_selected_program->b_is_ok = 1;
 
-    p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xe0, 0 );
+    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xe0, 0 );
     p_es->i_stream_id = 0xe0;
     p_es->i_type = MPEG1_VIDEO_ES;
     p_es->i_cat = VIDEO_ES;
@@ -377,7 +378,7 @@ static void VCDInit( input_thread_t * p_input )
     }
     
     p_es = input_AddES( p_input,
-                p_input->stream.pp_programs[0], 0xc0, 0 );
+                p_input->stream.p_selected_program, 0xc0, 0 );
     p_es->i_stream_id = 0xc0;
     p_es->i_type = MPEG1_AUDIO_ES;
     p_es->b_audio = 1;

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.102 2001/11/28 15:08:05 massiot Exp $
+ * $Id: input_dvd.c,v 1.103 2001/12/05 03:31:04 jobi Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -543,23 +543,25 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             }
 
             free( p_input->stream.pp_selected_es );
-            input_DelProgram( p_input, p_input->stream.pp_programs[0] );
+            input_DelProgram( p_input, p_input->stream.p_selected_program );
 
             p_input->stream.pp_selected_es = NULL;
             p_input->stream.i_selected_es_number = 0;
         }
 
         input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
+        p_input->stream.p_selected_program = p_input->stream.pp_programs[0]; 
 
         /* No PSM to read in DVD mode, we already have all information */
-        p_input->stream.pp_programs[0]->b_is_ok = 1;
+        p_input->stream.p_selected_program->b_is_ok = 1;
 
         p_es = NULL;
 
         /* ES 0 -> video MPEG2 */
         IfoPrintVideo( p_dvd );
 
-        p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xe0, 0 );
+        p_es = input_AddES( p_input, p_input->stream.p_selected_program, 
+                0xe0, 0 );
         p_es->i_stream_id = 0xe0;
         p_es->i_type = MPEG2_VIDEO_ES;
         p_es->i_cat = VIDEO_ES;
@@ -585,7 +587,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 case 0x00:              /* AC3 */
                     i_id = ( ( 0x80 + audio_status.i_position ) << 8 ) | 0xbd;
                     p_es = input_AddES( p_input,
-                               p_input->stream.pp_programs[0], i_id, 0 );
+                               p_input->stream.p_selected_program, i_id, 0 );
                     p_es->i_stream_id = 0xbd;
                     p_es->i_type = AC3_AUDIO_ES;
                     p_es->b_audio = 1;
@@ -599,7 +601,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 case 0x03:              /* MPEG audio */
                     i_id = 0xc0 + audio_status.i_position;
                     p_es = input_AddES( p_input,
-                                    p_input->stream.pp_programs[0], i_id, 0 );
+                                    p_input->stream.p_selected_program, i_id
+                                    , 0 );
                     p_es->i_stream_id = i_id;
                     p_es->i_type = MPEG2_AUDIO_ES;
                     p_es->b_audio = 1;
@@ -613,7 +616,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     
                     i_id = ( ( 0xa0 + audio_status.i_position ) << 8 ) | 0xbd;
                     p_es = input_AddES( p_input,
-                                    p_input->stream.pp_programs[0], i_id, 0 );
+                                    p_input->stream.p_selected_program,
+                                    i_id, 0 );
                     p_es->i_stream_id = 0xbd;
                     p_es->i_type = LPCM_AUDIO_ES;
                     p_es->b_audio = 1;
@@ -676,7 +680,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                            | 0xbd;
                 }
                 p_es = input_AddES( p_input,
-                                    p_input->stream.pp_programs[0], i_id, 0 );
+                                    p_input->stream.p_selected_program,
+                                    i_id, 0 );
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = DVD_SPU_ES;
                 p_es->i_cat = SPU_ES;

@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.49 2001/11/25 22:52:21 gbazin Exp $
+ * $Id: input_ext-intf.h,v 1.50 2001/12/05 03:31:04 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -207,7 +207,9 @@ typedef struct stream_descriptor_s
     /* Programs descriptions */
     int                     i_pgrm_number;    /* size of the following array */
     pgrm_descriptor_t **    pp_programs;        /* array of pointers to pgrm */
-
+    pgrm_descriptor_t *     p_selected_program;   /* currently 
+                                                 selected program */
+    pgrm_descriptor_t *     p_new_program;        /* Newly selected program */
     /* ES descriptions */
     int                     i_es_number;
     es_descriptor_t **      pp_es;             /* carried elementary streams */

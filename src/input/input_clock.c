@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.24 2001/11/28 15:08:06 massiot Exp $
+ * $Id: input_clock.c,v 1.25 2001/12/05 03:31:04 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -232,7 +232,7 @@ void input_ClockManageRef( input_thread_t * p_input,
         p_pgrm->i_synchro_state = SYNCHRO_OK;
 
         if( p_input->stream.b_pace_control
-             && p_input->stream.pp_programs[0] == p_pgrm )
+             && p_input->stream.p_selected_program == p_pgrm )
         {
             p_pgrm->last_cr = i_clock;
             mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
@@ -263,7 +263,7 @@ void input_ClockManageRef( input_thread_t * p_input,
         p_pgrm->last_cr = i_clock;
 
         if( p_input->stream.b_pace_control
-             && p_input->stream.pp_programs[0] == p_pgrm )
+             && p_input->stream.p_selected_program == p_pgrm )
         {
             /* We remember the last system date to be able to restart
              * the synchro we statistically better continuity, after 

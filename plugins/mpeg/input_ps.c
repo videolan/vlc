@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.41 2001/12/03 17:55:45 massiot Exp $
+ * $Id: input_ps.c,v 1.42 2001/12/05 03:31:04 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -234,7 +234,12 @@ static void PSInit( input_thread_t * p_input )
     /* FIXME : detect if InitStream failed */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
-
+    
+    p_input->stream.p_selected_program = 
+		 p_input->stream.pp_programs[0] ;
+    p_input->stream.p_new_program = 
+		 p_input->stream.pp_programs[0] ;
+    
     if( p_input->stream.b_seekable )
     {
         stream_ps_data_t * p_demux_data =
