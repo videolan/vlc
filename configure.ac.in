@@ -1998,15 +1998,15 @@ then
       then
         FREETYPE_PATH="${with_freetype_config_path}:${PATH}"
       fi ])
-  AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no, ${SDL_PATH})
+  AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no, ${FREETYPE_PATH})
 
-  if test "x${SDL_CONFIG}" != "xno"
+  if test "x${FREETYPE_CONFIG}" != "xno"
   then
     PLUGINS="${PLUGINS} osdtext"
     CFLAGS_osdtext="${CFLAGS_osdtext} `${FREETYPE_CONFIG} --cflags`"
     LDFLAGS_osdtext="${LDFLAGS_osdtext} `${FREETYPE_CONFIG} --libs`"
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_freetype}"
-  elif test "x${enable_sdl}" =  "xyes"
+  elif test "x${enable_freetype}" =  "xyes"
   then
     AC_MSG_ERROR([I couldn't find the freetype package. You can download libfreetype2
 from http://www.freetype.org/, or configure with --disable-freetype. Have a nice day.
