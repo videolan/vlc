@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.5 2002/11/14 16:17:47 fenrir Exp $
+ * $Id: asf.c,v 1.6 2002/11/15 18:10:26 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -292,9 +292,6 @@ static int Activate( vlc_object_t * p_this )
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.p_selected_program->b_is_ok = 1;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_demux->i_data_begin = p_demux->root.p_data->i_object_pos + 50;
     if( p_demux->root.p_data->i_object_size != 0 )
@@ -310,6 +307,46 @@ static int Activate( vlc_object_t * p_this )
 
     // go to first packet
     ASF_SeekAbsolute( p_input, p_demux->i_data_begin );
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    /* try to calculate movie time */
+    if( p_demux->p_fp->i_data_packets_count > 0 )
+    {
+        int64_t i_count;
+        mtime_t i_length;
+
+        /* real number of packets */
+        i_count = ( p_input->stream.p_selected_area->i_size - 
+                       p_demux->i_data_begin ) / 
+                            p_demux->p_fp->i_min_data_packet_size;
+        /* calculate the time duration in s */
+        i_length = (mtime_t)p_demux->p_fp->i_play_duration / 10 * 
+                   (mtime_t)i_count / 
+                   (mtime_t)p_demux->p_fp->i_data_packets_count /
+                   (mtime_t)1000000;
+        if( i_length > 0 )
+        {
+            p_input->stream.i_mux_rate =
+                p_input->stream.p_selected_area->i_size / 50 / i_length;
+        }
+        else
+        {
+            p_input->stream.i_mux_rate = 0;
+        }
+
+    }
+    else
+    {
+        /* cannot known */
+        p_input->stream.i_mux_rate = 0;
+    }
+
+
+
+    p_input->stream.p_selected_program->b_is_ok = 1;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    
     return( 0 );
 }
 

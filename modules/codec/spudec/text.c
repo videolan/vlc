@@ -2,7 +2,7 @@
  * text.c: text subtitles parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: text.c,v 1.1 2002/11/06 21:48:24 gbazin Exp $
+ * $Id: text.c,v 1.2 2002/11/15 18:10:26 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -43,10 +43,11 @@
 void E_(ParseText)( spudec_thread_t *p_spudec, subtitler_font_t *p_font )
 {
     char         * psz_subtitle;
-    mtime_t        i_pts;
+    mtime_t        i_pts, i_dts;
 
     /* We cannot display a subpicture with no date */
     i_pts = p_spudec->bit_stream.p_pes->i_pts;
+    i_dts = p_spudec->bit_stream.p_pes->i_dts;
     if( i_pts == 0 )
     {
         /* Dump the packet */
@@ -75,7 +76,7 @@ void E_(ParseText)( spudec_thread_t *p_spudec, subtitler_font_t *p_font )
         subtitler_PlotSubtitle( p_spudec->p_vout,
                                 psz_subtitle, p_font,
                                 i_pts,
-                                0 );
+                                i_dts );
     }
 
     /* Prepare for next time. No need to check that

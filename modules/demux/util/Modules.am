@@ -1,2 +1,7 @@
 SOURCES_id3 = modules/demux/util/id3.c
 SOURCES_id3tag = modules/demux/util/id3tag.c
+SOURCES_demuxsub = modules/demux/util/sub.c
+
+noinst_HEADERS += \
+	modules/demux/util/sub.h
+

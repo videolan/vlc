@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.11 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: avi.c,v 1.12 2002/11/15 18:10:26 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,12 @@
 #include "video.h"
 
 #include "libavi.h"
+
+#define __AVI_SUBTITLE__ 1
+
+#ifdef __AVI_SUBTITLE__
+#   include "../util/sub.h"
+#endif
 #include "avi.h"
 
 /*****************************************************************************
@@ -744,6 +750,13 @@ static void __AVIEnd ( vlc_object_t * p_this )
         }
          free( p_avi->pp_info );
     }
+#ifdef __AVI_SUBTITLE__
+    if( p_avi->p_sub )
+    {
+        subtitle_Close( p_avi->p_sub );
+        p_avi->p_sub = NULL;
+    }
+#endif
     AVI_ChunkFreeRoot( p_input, &p_avi->ck_root );
 }
 
@@ -764,7 +777,10 @@ static int AVIInit( vlc_object_t * p_this )
     demux_sys_t *p_avi;
     es_descriptor_t *p_es = NULL; /* avoid warning */
     int i;
-
+#ifdef __AVI_SUBTITLE__
+    mtime_t i_microsecperframe = 0; // for some subtitle format
+#endif
+    
     vlc_bool_t b_stream_audio, b_stream_video; 
 
     p_input->pf_demux = AVIDemux_Seekable;
@@ -954,6 +970,14 @@ static int AVIInit( vlc_object_t * p_this )
                          p_avi_strf_vids->p_bih->biBitCount,
                          (float)p_info->i_rate /
                              (float)p_info->i_scale );
+#ifdef __AVI_SUBTITLE__
+                if( i_microsecperframe == 0 )
+                {
+                    i_microsecperframe = (mtime_t)1000000 *
+                                         (mtime_t)p_info->i_scale /
+                                         (mtime_t)p_info->i_rate;
+                }
+#endif
                 break;
             default:
                 msg_Err( p_input, "stream[%d] unknown type", i );
@@ -983,6 +1007,14 @@ static int AVIInit( vlc_object_t * p_this )
         }
 #undef p_info           
     }
+
+#ifdef __AVI_SUBTITLE__
+    if( ( p_avi->p_sub = subtitle_New( p_input, NULL, i_microsecperframe ) ) )
+    {
+        subtitle_Select( p_avi->p_sub );
+    }
+#endif
+
     if( config_GetInt( p_input, "avi-index" ) )
     {
         if( p_avi->b_seekable )
@@ -1593,6 +1625,13 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
 //        input_ClockInit( p_input->stream.p_selected_program );
         AVISeek( p_input, i_date, i_percent);
+
+#ifdef __AVI_SUBTITLE__
+        if( p_avi->p_sub )
+        {
+            subtitle_Seek( p_avi->p_sub, p_avi->i_time );
+        }
+#endif
     }
 
     
@@ -1607,6 +1646,12 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
     p_avi->i_time += 100*1000;  /* read 100ms */
 
+#ifdef __AVI_SUBTITLE__
+    if( p_avi->p_sub )
+    {
+        subtitle_Demux( p_avi->p_sub, p_avi->i_time );
+    }
+#endif
     /* init toread */
     for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
     {

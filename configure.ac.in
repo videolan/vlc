@@ -585,7 +585,7 @@ PLUGINS="${PLUGINS} aout_file"
 #PLUGINS="${PLUGINS} scope"
 PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
 PLUGINS="${PLUGINS} id3 m3u"
-PLUGINS="${PLUGINS} wav araw demuxdump"
+PLUGINS="${PLUGINS} wav araw demuxdump demuxsub"
 
 dnl
 dnl  Network modules
