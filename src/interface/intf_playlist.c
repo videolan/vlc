@@ -2,7 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.c,v 1.2 2001/03/21 13:42:34 sam Exp $
+ * $Id: intf_playlist.c,v 1.3 2001/04/08 07:24:47 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -244,6 +244,10 @@ void intf_PlaylistDestroy( playlist_t * p_playlist )
 
     intf_WarnMsg( 1, "intf: playlist destroyed" );
 }
+
+/*****************************************************************************
+ * intf_PlaylistJumpto
+ *****************************************************************************/
 void intf_PlaylistJumpto( playlist_t * p_playlist , int i_pos)
 {
     vlc_mutex_lock( &p_playlist->change_lock );

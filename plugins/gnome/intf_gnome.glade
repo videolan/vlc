@@ -584,8 +584,7 @@
 
       <widget>
 	<class>GtkHBox</class>
-	<name>dvd_box</name>
-	<visible>False</visible>
+	<name>file_box</name>
 	<homogeneous>False</homogeneous>
 	<spacing>0</spacing>
 	<child>
@@ -596,8 +595,9 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label_title</name>
-	  <label>Title:</label>
+	  <name>label_file</name>
+	  <height>24</height>
+	  <label>Vlc File Mode</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -607,13 +607,27 @@
 	  <child>
 	    <padding>0</padding>
 	    <expand>True</expand>
-	    <fill>False</fill>
+	    <fill>True</fill>
 	  </child>
 	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>dvd_box</name>
+	<height>24</height>
+	<visible>False</visible>
+	<homogeneous>False</homogeneous>
+	<spacing>0</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
 
 	<widget>
 	  <class>GtkHBox</class>
-	  <name>hbox6</name>
+	  <name>title_chapter_box</name>
 	  <homogeneous>False</homogeneous>
 	  <spacing>10</spacing>
 	  <child>
@@ -621,6 +635,123 @@
 	    <expand>True</expand>
 	    <fill>False</fill>
 	  </child>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label19</name>
+	    <label>Title:</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label_title</name>
+	    <label>--</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>button_title_prev</name>
+	    <tooltip>Select previous title</tooltip>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>clicked</name>
+	      <handler>on_button_title_prev_clicked</handler>
+	      <last_modification_time>Tue, 03 Apr 2001 03:46:25 GMT</last_modification_time>
+	    </signal>
+	    <stock_button>GNOME_STOCK_BUTTON_PREV</stock_button>
+	    <relief>GTK_RELIEF_NONE</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>button_title_next</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>clicked</name>
+	      <handler>on_button_title_next_clicked</handler>
+	      <last_modification_time>Tue, 03 Apr 2001 03:47:01 GMT</last_modification_time>
+	    </signal>
+	    <stock_button>GNOME_STOCK_BUTTON_NEXT</stock_button>
+	    <relief>GTK_RELIEF_NONE</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkHBox</class>
+	  <name>dvd_chapter_box</name>
+	  <homogeneous>False</homogeneous>
+	  <spacing>10</spacing>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>False</fill>
+	  </child>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label20</name>
+	    <label>Chapter:</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label_chapter</name>
+	    <label>--</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
 
 	  <widget>
 	    <class>GtkButton</class>
@@ -634,23 +765,6 @@
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_PREV</stock_button>
 	    <relief>GTK_RELIEF_NONE</relief>
-	    <child>
-	      <padding>0</padding>
-	      <expand>False</expand>
-	      <fill>False</fill>
-	    </child>
-	  </widget>
-
-	  <widget>
-	    <class>GtkLabel</class>
-	    <name>label_chapter</name>
-	    <label>Chapter:   </label>
-	    <justify>GTK_JUSTIFY_CENTER</justify>
-	    <wrap>False</wrap>
-	    <xalign>0.5</xalign>
-	    <yalign>0.5</yalign>
-	    <xpad>0</xpad>
-	    <ypad>0</ypad>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -676,6 +790,126 @@
 	      <fill>False</fill>
 	    </child>
 	  </widget>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>network_box</name>
+	<height>24</height>
+	<visible>False</visible>
+	<homogeneous>False</homogeneous>
+	<spacing>0</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label_network</name>
+	  <label>Network Channel:</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>False</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkToggleButton</class>
+	  <name>button_network_channel_1</name>
+	  <can_focus>True</can_focus>
+	  <label>Channel 1</label>
+	  <relief>GTK_RELIEF_HALF</relief>
+	  <active>True</active>
+	  <child>
+	    <padding>2</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkToggleButton</class>
+	  <name>button_network_channel_2</name>
+	  <sensitive>False</sensitive>
+	  <can_focus>True</can_focus>
+	  <label>Channel 2</label>
+	  <relief>GTK_RELIEF_HALF</relief>
+	  <active>False</active>
+	  <child>
+	    <padding>2</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkToggleButton</class>
+	  <name>button_network_channel_3</name>
+	  <sensitive>False</sensitive>
+	  <can_focus>True</can_focus>
+	  <label>Channel 3</label>
+	  <relief>GTK_RELIEF_HALF</relief>
+	  <active>False</active>
+	  <child>
+	    <padding>2</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkToggleButton</class>
+	  <name>button_network_channel_4</name>
+	  <sensitive>False</sensitive>
+	  <can_focus>True</can_focus>
+	  <label>Channel 4</label>
+	  <relief>GTK_RELIEF_HALF</relief>
+	  <active>False</active>
+	  <child>
+	    <padding>2</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkToggleButton</class>
+	  <name>button_network_channel_5</name>
+	  <sensitive>False</sensitive>
+	  <can_focus>True</can_focus>
+	  <label>Channel 5</label>
+	  <relief>GTK_RELIEF_HALF</relief>
+	  <active>False</active>
+	  <child>
+	    <padding>2</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkToggleButton</class>
+	  <name>button_network_channel_6</name>
+	  <sensitive>False</sensitive>
+	  <can_focus>True</can_focus>
+	  <label>Channel 6</label>
+	  <relief>GTK_RELIEF_HALF</relief>
+	  <active>False</active>
+	  <child>
+	    <padding>2</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
 	</widget>
       </widget>
     </widget>

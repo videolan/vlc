@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.47 2001/04/06 09:15:47 sam Exp $
+ * $Id: mpeg_system.c,v 1.48 2001/04/08 07:24:47 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -703,6 +703,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     {
                         /* MPEG video */
                         p_es->i_type = MPEG2_VIDEO_ES;
+                        p_es->i_cat = VIDEO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
                             input_SelectES( p_input, p_es );
@@ -713,6 +714,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         /* MPEG audio */
                         p_es->i_type = MPEG2_AUDIO_ES;
                         p_es->b_audio = 1;
+                        p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
                         if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
@@ -732,6 +734,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         /* AC3 audio (0x80->0x8F) */
                         p_es->i_type = AC3_AUDIO_ES;
                         p_es->b_audio = 1;
+                        p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
                         if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
@@ -750,7 +753,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     {
                         /* Subtitles video (0x20->0x3F) */
                         p_es->i_type = DVD_SPU_ES;
-                        p_es->b_spu = 1;
+                        p_es->i_cat = SPU_ES;
 #ifdef AUTO_SPAWN
                         if( main_GetIntVariable( INPUT_SUBTITLE_VAR, -1 )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
@@ -765,6 +768,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         /* LPCM audio (0xA0->0xAF) */
                         p_es->i_type = LPCM_AUDIO_ES;
                         p_es->b_audio = 1;
+                        p_es->i_cat = AUDIO_ES;
                         /* FIXME : write the decoder */
                     }
                     else

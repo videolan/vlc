@@ -140,12 +140,27 @@ create_intf_window (void)
   GtkWidget *label_status;
   GtkWidget *label_bar;
   GtkWidget *slider;
+  GtkWidget *file_box;
+  GtkWidget *label_file;
   GtkWidget *dvd_box;
+  GtkWidget *title_chapter_box;
+  GtkWidget *label19;
   GtkWidget *label_title;
-  GtkWidget *hbox6;
-  GtkWidget *button_chapter_prev;
+  GtkWidget *button_title_prev;
+  GtkWidget *button_title_next;
+  GtkWidget *dvd_chapter_box;
+  GtkWidget *label20;
   GtkWidget *label_chapter;
+  GtkWidget *button_chapter_prev;
   GtkWidget *button_chapter_next;
+  GtkWidget *network_box;
+  GtkWidget *label_network;
+  GtkWidget *button_network_channel_1;
+  GtkWidget *button_network_channel_2;
+  GtkWidget *button_network_channel_3;
+  GtkWidget *button_network_channel_4;
+  GtkWidget *button_network_channel_5;
+  GtkWidget *button_network_channel_6;
   GtkWidget *appbar;
   GtkTooltips *tooltips;
 
@@ -471,50 +486,172 @@ create_intf_window (void)
   gtk_scale_set_draw_value (GTK_SCALE (slider), FALSE);
   gtk_scale_set_digits (GTK_SCALE (slider), 3);
 
+  file_box = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (file_box);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "file_box", file_box,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (file_box);
+  gtk_box_pack_start (GTK_BOX (vbox2), file_box, TRUE, TRUE, 0);
+
+  label_file = gtk_label_new (_("Vlc File Mode"));
+  gtk_widget_ref (label_file);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_file", label_file,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label_file);
+  gtk_box_pack_start (GTK_BOX (file_box), label_file, TRUE, TRUE, 0);
+  gtk_widget_set_usize (label_file, -2, 24);
+
   dvd_box = gtk_hbox_new (FALSE, 0);
   gtk_widget_ref (dvd_box);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "dvd_box", dvd_box,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_box_pack_start (GTK_BOX (vbox2), dvd_box, TRUE, TRUE, 0);
+  gtk_widget_set_usize (dvd_box, -2, 24);
 
-  label_title = gtk_label_new (_("Title:"));
+  title_chapter_box = gtk_hbox_new (FALSE, 10);
+  gtk_widget_ref (title_chapter_box);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "title_chapter_box", title_chapter_box,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (title_chapter_box);
+  gtk_box_pack_start (GTK_BOX (dvd_box), title_chapter_box, TRUE, FALSE, 0);
+
+  label19 = gtk_label_new (_("Title:"));
+  gtk_widget_ref (label19);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label19", label19,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label19);
+  gtk_box_pack_start (GTK_BOX (title_chapter_box), label19, FALSE, FALSE, 0);
+
+  label_title = gtk_label_new (_("--"));
   gtk_widget_ref (label_title);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_title", label_title,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label_title);
-  gtk_box_pack_start (GTK_BOX (dvd_box), label_title, TRUE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (title_chapter_box), label_title, FALSE, FALSE, 0);
 
-  hbox6 = gtk_hbox_new (FALSE, 10);
-  gtk_widget_ref (hbox6);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "hbox6", hbox6,
+  button_title_prev = gnome_stock_button (GNOME_STOCK_BUTTON_PREV);
+  gtk_widget_ref (button_title_prev);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_title_prev", button_title_prev,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (hbox6);
-  gtk_box_pack_start (GTK_BOX (dvd_box), hbox6, TRUE, FALSE, 0);
+  gtk_widget_show (button_title_prev);
+  gtk_box_pack_start (GTK_BOX (title_chapter_box), button_title_prev, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, button_title_prev, _("Select previous title"), NULL);
+  gtk_button_set_relief (GTK_BUTTON (button_title_prev), GTK_RELIEF_NONE);
+
+  button_title_next = gnome_stock_button (GNOME_STOCK_BUTTON_NEXT);
+  gtk_widget_ref (button_title_next);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_title_next", button_title_next,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button_title_next);
+  gtk_box_pack_start (GTK_BOX (title_chapter_box), button_title_next, FALSE, FALSE, 0);
+  gtk_button_set_relief (GTK_BUTTON (button_title_next), GTK_RELIEF_NONE);
+
+  dvd_chapter_box = gtk_hbox_new (FALSE, 10);
+  gtk_widget_ref (dvd_chapter_box);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "dvd_chapter_box", dvd_chapter_box,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (dvd_chapter_box);
+  gtk_box_pack_start (GTK_BOX (dvd_box), dvd_chapter_box, TRUE, FALSE, 0);
+
+  label20 = gtk_label_new (_("Chapter:"));
+  gtk_widget_ref (label20);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label20", label20,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label20);
+  gtk_box_pack_start (GTK_BOX (dvd_chapter_box), label20, FALSE, FALSE, 0);
+
+  label_chapter = gtk_label_new (_("--"));
+  gtk_widget_ref (label_chapter);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_chapter", label_chapter,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label_chapter);
+  gtk_box_pack_start (GTK_BOX (dvd_chapter_box), label_chapter, FALSE, FALSE, 0);
 
   button_chapter_prev = gnome_stock_button (GNOME_STOCK_BUTTON_PREV);
   gtk_widget_ref (button_chapter_prev);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_chapter_prev", button_chapter_prev,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (button_chapter_prev);
-  gtk_box_pack_start (GTK_BOX (hbox6), button_chapter_prev, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (dvd_chapter_box), button_chapter_prev, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, button_chapter_prev, _("Select previous chapter"), NULL);
   gtk_button_set_relief (GTK_BUTTON (button_chapter_prev), GTK_RELIEF_NONE);
-
-  label_chapter = gtk_label_new (_("Chapter:   "));
-  gtk_widget_ref (label_chapter);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_chapter", label_chapter,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label_chapter);
-  gtk_box_pack_start (GTK_BOX (hbox6), label_chapter, FALSE, FALSE, 0);
 
   button_chapter_next = gnome_stock_button (GNOME_STOCK_BUTTON_NEXT);
   gtk_widget_ref (button_chapter_next);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_chapter_next", button_chapter_next,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (button_chapter_next);
-  gtk_box_pack_start (GTK_BOX (hbox6), button_chapter_next, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (dvd_chapter_box), button_chapter_next, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, button_chapter_next, _("Select next chapter"), NULL);
   gtk_button_set_relief (GTK_BUTTON (button_chapter_next), GTK_RELIEF_NONE);
+
+  network_box = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (network_box);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_box", network_box,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_box_pack_start (GTK_BOX (vbox2), network_box, TRUE, TRUE, 0);
+  gtk_widget_set_usize (network_box, -2, 24);
+
+  label_network = gtk_label_new (_("Network Channel:"));
+  gtk_widget_ref (label_network);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_network", label_network,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label_network);
+  gtk_box_pack_start (GTK_BOX (network_box), label_network, TRUE, FALSE, 0);
+
+  button_network_channel_1 = gtk_toggle_button_new_with_label (_("Channel 1"));
+  gtk_widget_ref (button_network_channel_1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_network_channel_1", button_network_channel_1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button_network_channel_1);
+  gtk_box_pack_start (GTK_BOX (network_box), button_network_channel_1, FALSE, TRUE, 2);
+  gtk_button_set_relief (GTK_BUTTON (button_network_channel_1), GTK_RELIEF_HALF);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (button_network_channel_1), TRUE);
+
+  button_network_channel_2 = gtk_toggle_button_new_with_label (_("Channel 2"));
+  gtk_widget_ref (button_network_channel_2);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_network_channel_2", button_network_channel_2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button_network_channel_2);
+  gtk_box_pack_start (GTK_BOX (network_box), button_network_channel_2, FALSE, TRUE, 2);
+  gtk_widget_set_sensitive (button_network_channel_2, FALSE);
+  gtk_button_set_relief (GTK_BUTTON (button_network_channel_2), GTK_RELIEF_HALF);
+
+  button_network_channel_3 = gtk_toggle_button_new_with_label (_("Channel 3"));
+  gtk_widget_ref (button_network_channel_3);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_network_channel_3", button_network_channel_3,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button_network_channel_3);
+  gtk_box_pack_start (GTK_BOX (network_box), button_network_channel_3, FALSE, TRUE, 2);
+  gtk_widget_set_sensitive (button_network_channel_3, FALSE);
+  gtk_button_set_relief (GTK_BUTTON (button_network_channel_3), GTK_RELIEF_HALF);
+
+  button_network_channel_4 = gtk_toggle_button_new_with_label (_("Channel 4"));
+  gtk_widget_ref (button_network_channel_4);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_network_channel_4", button_network_channel_4,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button_network_channel_4);
+  gtk_box_pack_start (GTK_BOX (network_box), button_network_channel_4, FALSE, TRUE, 2);
+  gtk_widget_set_sensitive (button_network_channel_4, FALSE);
+  gtk_button_set_relief (GTK_BUTTON (button_network_channel_4), GTK_RELIEF_HALF);
+
+  button_network_channel_5 = gtk_toggle_button_new_with_label (_("Channel 5"));
+  gtk_widget_ref (button_network_channel_5);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_network_channel_5", button_network_channel_5,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button_network_channel_5);
+  gtk_box_pack_start (GTK_BOX (network_box), button_network_channel_5, FALSE, TRUE, 2);
+  gtk_widget_set_sensitive (button_network_channel_5, FALSE);
+  gtk_button_set_relief (GTK_BUTTON (button_network_channel_5), GTK_RELIEF_HALF);
+
+  button_network_channel_6 = gtk_toggle_button_new_with_label (_("Channel 6"));
+  gtk_widget_ref (button_network_channel_6);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "button_network_channel_6", button_network_channel_6,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button_network_channel_6);
+  gtk_box_pack_start (GTK_BOX (network_box), button_network_channel_6, FALSE, TRUE, 2);
+  gtk_widget_set_sensitive (button_network_channel_6, FALSE);
+  gtk_button_set_relief (GTK_BUTTON (button_network_channel_6), GTK_RELIEF_HALF);
 
   appbar = gnome_appbar_new (TRUE, TRUE, GNOME_PREFERENCES_NEVER);
   gtk_widget_ref (appbar);
@@ -571,6 +708,12 @@ create_intf_window (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (slider), "button_release_event",
                       GTK_SIGNAL_FUNC (on_slider_button_release_event),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (button_title_prev), "clicked",
+                      GTK_SIGNAL_FUNC (on_button_title_prev_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (button_title_next), "clicked",
+                      GTK_SIGNAL_FUNC (on_button_title_next_clicked),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (button_chapter_prev), "clicked",
                       GTK_SIGNAL_FUNC (on_button_chapter_prev_clicked),

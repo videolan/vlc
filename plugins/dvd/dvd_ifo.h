@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.10 2001/04/04 02:49:18 sam Exp $
+ * $Id: dvd_ifo.h,v 1.11 2001/04/08 07:24:47 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -57,7 +57,7 @@ typedef struct ifo_audio_s
 
     u8      i_quantization        ;// 2;
     u8      i_sample_freq         ;// 2;
-//    u8                            ;// 1;
+    u8      i_test                ;// 1;
     u8      i_num_channels        ;// 3;
     u16     i_lang_code           ;// 16;   // <char> description
     u8      i_foo                 ;// 8;    // 0x00000000 ?

@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.16 2001/04/01 07:31:38 stef Exp $
+ * $Id: dvd_ifo.c,v 1.17 2001/04/08 07:24:47 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -539,11 +539,19 @@ FLUSH(2);
     {
         GETLL( &i_temp );
 //fprintf( stderr, "Audio %d: %llx\n", i, i_temp );
-        i_temp >>= 32;
+        i_temp >>= 8;
+        manager_inf.p_audio_attr[i].i_bar = i_temp & 0xff;
+        i_temp >>= 8;
+        manager_inf.p_audio_attr[i].i_caption = i_temp & 0xff;
+        i_temp >>= 8;
+        manager_inf.p_audio_attr[i].i_foo = i_temp & 0xff;
+        i_temp >>= 8;
         manager_inf.p_audio_attr[i].i_lang_code = i_temp & 0xffff;
         i_temp >>= 16;
         manager_inf.p_audio_attr[i].i_num_channels = i_temp & 0x7;
-        i_temp >>= 4;
+        i_temp >>= 3;
+        manager_inf.p_audio_attr[i].i_test = i_temp & 0x1;
+        i_temp >>= 1;
         manager_inf.p_audio_attr[i].i_sample_freq = i_temp & 0x3;
         i_temp >>= 2;
         manager_inf.p_audio_attr[i].i_quantization = i_temp & 0x3;

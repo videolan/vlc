@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.25 2001/04/03 03:39:41 stef Exp $
+ * $Id: intf_gnome.c,v 1.26 2001/04/08 07:24:47 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -76,6 +76,8 @@ static gint GnomeTitleMenu    ( gpointer, GtkWidget *,
 static gint GnomeSetupMenu    ( intf_thread_t * p_intf );
 static void GnomeDisplayDate  ( GtkAdjustment *p_adj );
 static gint GnomeDVDModeManage( intf_thread_t * p_intf );
+static gint GnomeFileModeManage( intf_thread_t * p_intf );
+static gint GnomeNetworkModeManage( intf_thread_t * p_intf );
 
 /*****************************************************************************
  * g_atexit: kludge to avoid the Gnome thread to segfault at exit
@@ -147,12 +149,13 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
     p_intf->p_sys->b_menus_update = 1;
-    p_intf->p_sys->b_menus_ready = 0;
 
     p_intf->p_sys->b_slider_free = 1;
 
-    p_intf->p_sys->b_mode_changed = 0;
+    p_intf->p_sys->b_mode_changed = 1;
     p_intf->p_sys->i_intf_mode = FILE_MODE;
+
+    p_intf->p_sys->i_part = 0;
 
     p_intf->p_sys->pf_gtk_callback = NULL;
     p_intf->p_sys->pf_gdk_callback = NULL;
@@ -202,16 +205,6 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_popup = create_intf_popup( );
     p_intf->p_sys->p_disc = create_intf_disc( );
     p_intf->p_sys->p_network = create_intf_network( );
-
-    /* Sets the interface mode according to playlist item */
-    if( p_main->p_playlist->p_item != NULL )
-    {
-        if( !strncmp( p_main->p_playlist->p_item->psz_name, "dvd:", 4 ) )
-        {
-            p_intf->p_sys->i_intf_mode = DVD_MODE;
-            p_intf->p_sys->b_mode_changed = 1;
-        }
-    }
 
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -313,13 +306,33 @@ static gint GnomeManage( gpointer p_data )
         p_intf->b_menu_change = 0;
     }
 
-    if( p_intf->p_input != NULL && p_intf->p_sys->p_window != NULL &&
-        p_intf->p_sys->b_mode_changed )
+    if( p_intf->p_sys->b_mode_changed )
     {
+        /* Sets the interface mode according to playlist item */
+        if( p_main->p_playlist->p_item != NULL )
+        {
+            if( !strncmp( p_main->p_playlist->p_item->psz_name, "dvd:", 4 ) )
+            {
+                p_intf->p_sys->i_intf_mode = DVD_MODE;
+            }
+            else if( !strncmp(
+                        p_main->p_playlist->p_item->psz_name, "ts:", 4 ) )
+            {
+                p_intf->p_sys->i_intf_mode = NET_MODE;
+            }
+        }
+
         switch( p_intf->p_sys->i_intf_mode )
         {
             case DVD_MODE:
                 GnomeDVDModeManage( p_intf );
+                break;
+            case NET_MODE:
+                GnomeNetworkModeManage( p_intf );
+                break;
+            case FILE_MODE:
+            default:
+                GnomeFileModeManage( p_intf );
                 break;
         }
 
@@ -327,21 +340,32 @@ static gint GnomeManage( gpointer p_data )
     }
 
 
-    /* Update language/chapter menus after user request */
-    if( p_intf->p_input != NULL && p_intf->p_sys->p_window != NULL &&
-        p_intf->p_sys->b_menus_update )
-    {
-        p_intf->p_sys->b_menus_ready = 0;
-        GnomeSetupMenu( p_intf );
-        p_intf->p_sys->b_menus_ready = 1;
-    }
-
-    /* Manage the slider */
     if( p_intf->p_input != NULL )
     {
-        float newvalue = p_intf->p_sys->p_adj->value;
+        float           newvalue;
+        char            psz_title[3];
+        char            psz_chapter[3];
 
 #define p_area p_intf->p_input->stream.p_selected_area
+        /* Update language/chapter menus after user request */
+        if( ( p_intf->p_sys->b_menus_update ) ||
+            ( p_intf->p_sys->i_part != p_area->i_part ) )
+        {
+            p_intf->p_sys->b_menus_update = 1;
+            GnomeSetupMenu( p_intf );
+            p_intf->p_sys->b_menus_update = 0;
+
+            snprintf( psz_title, 3, "%02d", p_area->i_id );
+            gtk_label_set_text( p_intf->p_sys->p_label_title, psz_title );
+
+            p_intf->p_sys->i_part = p_area->i_part;
+            snprintf( psz_chapter, 3, "%02d", p_area->i_part );
+            gtk_label_set_text( p_intf->p_sys->p_label_chapter, psz_chapter );
+        }
+
+        /* Manage the slider */
+        newvalue = p_intf->p_sys->p_adj->value;
+
         /* If the user hasn't touched the slider since the last time,
          * then the input can safely change it */
         if( newvalue == p_intf->p_sys->f_adj_oldvalue )
@@ -400,7 +424,7 @@ static gint GnomeManage( gpointer p_data )
 static gint GnomeLanguageMenus( gpointer          p_data,
                                 GtkWidget *       p_root,
                                 es_descriptor_t * p_es,
-                                gint              i_type,
+                                gint              i_cat,
                           void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
@@ -410,8 +434,6 @@ static gint GnomeLanguageMenus( gpointer          p_data,
     GtkWidget *         p_item_active;
     GSList *            p_group;
     char *              psz_name;
-    gint                b_audio;
-    gint                b_spu;
     gint                i_item;
     gint                i;
 
@@ -455,11 +477,7 @@ static gint GnomeLanguageMenus( gpointer          p_data,
     /* create a set of language buttons and append them to the container */
     for( i = 0 ; i < p_intf->p_input->stream.i_es_number ; i++ )
     {
-
-        b_audio = ( i_type == 1 ) && p_intf->p_input->stream.pp_es[i]->b_audio;
-        b_spu   = ( i_type == 2 ) && p_intf->p_input->stream.pp_es[i]->b_spu;
-
-        if( b_audio || b_spu )
+        if( p_intf->p_input->stream.pp_es[i]->i_cat == i_cat )
         {
             i_item++;
             psz_name = p_intf->p_input->stream.pp_es[i]->psz_desc;
@@ -747,11 +765,13 @@ static gint GnomeTitleMenu( gpointer       p_data,
                                                 GTK_RADIO_MENU_ITEM( p_item ) );
                 gtk_widget_show( p_item );
 
-                if( p_intf->p_input->stream.pp_areas[i_title]->i_part
-                             == i_chapter + 1 )
+#define p_area p_intf->p_input->stream.pp_areas[i_title]
+                if( ( p_area == p_intf->p_input->stream.p_selected_area ) &&
+                    ( p_area->i_part == i_chapter + 1 ) )
                 {
                     p_item_active = p_item;
                 }
+#undef p_area
 
                 /* setup signal hanling */
                 gtk_signal_connect( GTK_OBJECT( p_item ),
@@ -855,12 +875,12 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
 
     for( i = 0 ; i < p_intf->p_input->stream.i_selected_es_number ; i++ )
     {
-        if( p_intf->p_input->stream.pp_selected_es[i]->b_audio )
+        if( p_intf->p_input->stream.pp_selected_es[i]->i_cat == AUDIO_ES )
         {
             p_audio_es = p_intf->p_input->stream.pp_selected_es[i];
         }
 
-        if( p_intf->p_input->stream.pp_selected_es[i]->b_spu )
+        if( p_intf->p_input->stream.pp_selected_es[i]->i_cat == SPU_ES )
         {
             p_spu_es = p_intf->p_input->stream.pp_selected_es[i];
         }
@@ -875,9 +895,9 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
     p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                  p_intf->p_sys->p_popup ), "popup_audio" ) );
 
-    GnomeLanguageMenus( p_intf, p_menubar_menu, p_audio_es, 1,
+    GnomeLanguageMenus( p_intf, p_menubar_menu, p_audio_es, AUDIO_ES,
                         on_menubar_audio_toggle );
-    GnomeLanguageMenus( p_intf, p_popup_menu, p_audio_es, 1,
+    GnomeLanguageMenus( p_intf, p_popup_menu, p_audio_es, AUDIO_ES,
                         on_popup_audio_toggle );
 
     /* sub picture menus */
@@ -889,13 +909,10 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
     p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                  p_intf->p_sys->p_popup ), "popup_subtitle" ) );
 
-    GnomeLanguageMenus( p_intf, p_menubar_menu, p_spu_es, 2,
+    GnomeLanguageMenus( p_intf, p_menubar_menu, p_spu_es, SPU_ES,
                         on_menubar_subtitle_toggle  );
-    GnomeLanguageMenus( p_intf, p_popup_menu, p_spu_es, 2,
+    GnomeLanguageMenus( p_intf, p_popup_menu, p_spu_es, SPU_ES,
                         on_popup_subtitle_toggle );
-
-    /* everything is ready */
-    p_intf->p_sys->b_menus_update = 0;
 
     return TRUE;
 }
@@ -935,27 +952,77 @@ void GnomeDisplayDate( GtkAdjustment *p_adj )
 static gint GnomeDVDModeManage( intf_thread_t * p_intf )
 {
     GtkWidget *     p_dvd_box;
-    GtkWidget *     p_toolbar_next;
-    GtkWidget *     p_toolbar_prev;
+    GtkWidget *     p_file_box;
+    GtkWidget *     p_network_box;
+
+    p_file_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "file_box" ) );
+    gtk_widget_hide( GTK_WIDGET( p_file_box ) );
+
+    p_network_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "network_box" ) );
+    gtk_widget_hide( GTK_WIDGET( p_network_box ) );
 
     p_dvd_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
                  p_intf->p_sys->p_window ), "dvd_box" ) );
     gtk_widget_show( GTK_WIDGET( p_dvd_box ) );
 
-    p_toolbar_next = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                 p_intf->p_sys->p_window ), "toolbar_next" ) );
-    gtk_signal_disconnect_by_data( GTK_OBJECT( p_toolbar_next ), NULL );
-    gtk_signal_connect( GTK_OBJECT( p_toolbar_next ), "clicked",
-                        GTK_SIGNAL_FUNC( on_toolbar_next_title_clicked ),
-                        NULL);
-
-    p_toolbar_prev = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                 p_intf->p_sys->p_window ), "toolbar_prev" ) );
-    gtk_signal_disconnect_by_data( GTK_OBJECT( p_toolbar_prev ), NULL );
-    gtk_signal_connect( GTK_OBJECT( p_toolbar_prev ), "clicked",
-                        GTK_SIGNAL_FUNC( on_toolbar_prev_title_clicked ),
-                        NULL);
+    gtk_label_set_text( p_intf->p_sys->p_label_status,
+                        "Status: playing DVD" );
 
     return TRUE;
 }
 
+/*****************************************************************************
+ * GnomeFileModeManage
+ *****************************************************************************/
+static gint GnomeFileModeManage( intf_thread_t * p_intf )
+{
+    GtkWidget *     p_dvd_box;
+    GtkWidget *     p_file_box;
+    GtkWidget *     p_network_box;
+
+    p_network_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "network_box" ) );
+    gtk_widget_hide( GTK_WIDGET( p_network_box ) );
+
+    p_dvd_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "dvd_box" ) );
+    gtk_widget_hide( GTK_WIDGET( p_dvd_box ) );
+
+    p_file_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "file_box" ) );
+    gtk_widget_show( GTK_WIDGET( p_file_box ) );
+
+    gtk_label_set_text( p_intf->p_sys->p_label_status,
+                        "Status: foo" );
+
+    return TRUE;
+}
+
+/*****************************************************************************
+ * GnomeNetworkModeManage
+ *****************************************************************************/
+static gint GnomeNetworkModeManage( intf_thread_t * p_intf )
+{
+    GtkWidget *     p_dvd_box;
+    GtkWidget *     p_file_box;
+    GtkWidget *     p_network_box;
+
+    p_dvd_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "dvd_box" ) );
+    gtk_widget_hide( GTK_WIDGET( p_dvd_box ) );
+
+    p_file_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "file_box" ) );
+    gtk_widget_hide( GTK_WIDGET( p_file_box ) );
+
+    p_network_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "network_box" ) );
+    gtk_widget_show( GTK_WIDGET( p_network_box ) );
+
+    gtk_label_set_text( p_intf->p_sys->p_label_status,
+                        "Status: waiting for stream" );
+
+    return TRUE;
+}

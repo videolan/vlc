@@ -2,7 +2,7 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.20 2001/04/03 03:39:41 stef Exp $
+ * $Id: gnome_callbacks.c,v 1.21 2001/04/08 07:24:47 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -161,6 +161,54 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
 
 
 void
+on_button_title_prev_clicked           (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+    int             i_id;
+
+    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    i_id = p_intf->p_input->stream.p_selected_area->i_id - 1;
+
+    if( i_id >= 0 )
+    {
+        p_area = p_intf->p_input->stream.pp_areas[i_id];
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        p_intf->p_sys->b_menus_update = 1;
+
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_menus_update = 1;
+    }
+}
+
+
+void
+on_button_title_next_clicked           (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+    int             i_id;
+
+    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    i_id = p_intf->p_input->stream.p_selected_area->i_id + 1;
+
+    if( i_id < p_intf->p_input->stream.i_area_nb )
+    {
+        p_area = p_intf->p_input->stream.pp_areas[i_id];   
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        p_intf->p_sys->b_menus_update = 1;
+
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_menus_update = 1;
+    }
+}
+
+
+void
 on_button_chapter_prev_clicked         (GtkButton       *button,
                                         gpointer         user_data)
 {
@@ -170,11 +218,14 @@ on_button_chapter_prev_clicked         (GtkButton       *button,
     p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
     p_area = p_intf->p_input->stream.p_selected_area;
 
-    if( p_area->i_part - 1 >= 0 )
+    if( p_area->i_part > 0 )
     {
         p_area->i_part--;
         p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_menus_update = 1;
     }
 }
 
@@ -189,11 +240,14 @@ on_button_chapter_next_clicked         (GtkButton       *button,
     p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
     p_area = p_intf->p_input->stream.p_selected_area;
 
-    if( p_area->i_part + 1 < p_area->i_part_nb )
+    if( p_area->i_part < p_area->i_part_nb )
     {
         p_area->i_part++;
         p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_menus_update = 1;
     }
 }
 
@@ -278,13 +332,13 @@ void
 on_menubar_audio_toggle                (GtkCheckMenuItem     *menuitem,
                                         gpointer              user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    intf_thread_t *         p_intf;
     es_descriptor_t *       p_es;
 
-    p_es = (es_descriptor_t*)user_data;
-
-    if( p_intf->p_sys->b_menus_ready )
+    if( !p_intf->p_sys->b_menus_update )
     {
+        p_es = (es_descriptor_t*)user_data;
+
         input_ToggleES( p_intf->p_input, p_es, menuitem->active );
     }
 }
@@ -294,13 +348,15 @@ void
 on_menubar_subtitle_toggle             (GtkCheckMenuItem     *menuitem,
                                         gpointer              user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    intf_thread_t *         p_intf;
     es_descriptor_t *       p_es;
 
-    p_es = (es_descriptor_t*)user_data;
+    p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
-    if( p_intf->p_sys->b_menus_ready )
+    if( !p_intf->p_sys->b_menus_update )
     {
+        p_es = (es_descriptor_t*)user_data;
+
         input_ToggleES( p_intf->p_input, p_es, menuitem->active );
     }
 }
@@ -310,14 +366,16 @@ void
 on_menubar_title_toggle                (GtkCheckMenuItem     *menuitem,
                                         gpointer              user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
-    if( menuitem->active && p_intf->p_sys->b_menus_ready )
+    if( menuitem->active && !p_intf->p_sys->b_menus_update )
     {
         p_intf->p_input->pf_set_area( p_intf->p_input,
                                      (input_area_t*)user_data );
-        p_intf->p_sys->b_menus_update = 1;
+
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_menus_update = 1;
     }
 }
 
@@ -329,14 +387,21 @@ on_menubar_chapter_toggle              (GtkCheckMenuItem     *menuitem,
     intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
     input_area_t *  p_area    = p_intf->p_input->stream.p_selected_area;
     gint            i_chapter = (gint)user_data;
+    char            psz_chapter[3];
 
-    if( menuitem->active && p_intf->p_sys->b_menus_ready )
+    if( menuitem->active && !p_intf->p_sys->b_menus_update )
     {
         p_area->i_part = i_chapter;
         p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
+        snprintf( psz_chapter, 3, "%02d", p_area->i_part );
+        gtk_label_set_text( p_intf->p_sys->p_label_chapter, psz_chapter );
+
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_menus_update = 1;
     }
 
-    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 }
 
 void
@@ -526,6 +591,8 @@ on_toolbar_prev_clicked                (GtkButton       *button,
         intf_PlaylistPrev( p_main->p_playlist );
         p_intf->p_input->b_eof = 1;
     }
+
+    p_intf->p_sys->b_mode_changed = 1;
 }
 
 
@@ -540,48 +607,8 @@ on_toolbar_next_clicked                (GtkButton       *button,
         /* FIXME: temporary hack */
         p_intf->p_input->b_eof = 1;
     }
-}
 
-
-void
-on_toolbar_prev_title_clicked         (GtkButton       *button,
-                                       gpointer         user_data)
-{
-    intf_thread_t * p_intf;
-    input_area_t *  p_area;
-    int             i_id;
-
-    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-    i_id = p_intf->p_input->stream.p_selected_area->i_id - 1;
-
-    if( i_id >= 0 )
-    {
-        p_area = p_intf->p_input->stream.pp_areas[i_id];
-        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
-        p_intf->p_sys->b_menus_update = 1;
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
-    }
-}
-
-
-void
-on_toolbar_next_title_clicked          (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t * p_intf;
-    input_area_t *  p_area;
-    int             i_id;
-
-    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-    i_id = p_intf->p_input->stream.p_selected_area->i_id + 1;
-
-    if( i_id < p_intf->p_input->stream.i_area_nb )
-    {
-        p_area = p_intf->p_input->stream.pp_areas[i_id];   
-        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
-        p_intf->p_sys->b_menus_update = 1;
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
-    }
+    p_intf->p_sys->b_mode_changed = 1;
 }
 
 
@@ -652,7 +679,7 @@ on_popup_audio_toggle                  (GtkCheckMenuItem     *menuitem,
 
     p_es = (es_descriptor_t*)user_data;
 
-    if( p_intf->p_sys->b_menus_ready )
+    if( !p_intf->p_sys->b_menus_update )
     {
         input_ToggleES( p_intf->p_input, p_es, menuitem->active );
     }
@@ -668,7 +695,7 @@ on_popup_subtitle_toggle            (GtkCheckMenuItem     *menuitem,
 
     p_es = (es_descriptor_t*)user_data;
 
-    if( p_intf->p_sys->b_menus_ready )
+    if( !p_intf->p_sys->b_menus_update )
     {
         input_ToggleES( p_intf->p_input, p_es, menuitem->active );
     }
@@ -681,7 +708,7 @@ on_popup_navigation_toggle             (GtkCheckMenuItem     *menuitem,
 {
     intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
 
-    if( menuitem->active && p_intf->p_sys->b_menus_ready )
+    if( menuitem->active && !p_intf->p_sys->b_menus_update )
     {
         input_area_t *  p_area;
         gint            i_title;
@@ -690,16 +717,14 @@ on_popup_navigation_toggle             (GtkCheckMenuItem     *menuitem,
         i_title   = (gint)(user_data) / 100;
         i_chapter = (gint)(user_data) - ( 100 * i_title );
 
-        if( i_title != p_intf->p_input->stream.p_selected_area->i_id )
-        {
-            p_intf->p_sys->b_menus_update = 1;
-        }
-
         p_area = p_intf->p_input->stream.pp_areas[i_title];
         p_area->i_part = i_chapter;
 
         p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_menus_update = 1;
     }
 }
 
@@ -793,6 +818,8 @@ void
 on_fileopen_ok_clicked                 (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_fileopen" );
+
     GtkWidget *filesel;
     gchar *filename;
 
@@ -801,6 +828,13 @@ on_fileopen_ok_clicked                 (GtkButton       *button,
     filename = gtk_file_selection_get_filename (GTK_FILE_SELECTION (filesel));
 
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)filename );
+
+    /* Select added item and switch to file interface */
+    intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
+    if( p_intf->p_input != NULL )
+        p_intf->p_input->b_eof = 1;
+    p_intf->p_sys->i_intf_mode = FILE_MODE;
+    p_intf->p_sys->b_mode_changed = 1;
 }
 
 
@@ -937,7 +971,6 @@ on_disc_ok_clicked                     (GtkButton       *button,
     {
         psz_method = "dvd";
         p_intf->p_sys->i_intf_mode = DVD_MODE;
-        p_intf->p_sys->b_mode_changed = 1;
     }
     else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "disc_vcd" ) )->active )
@@ -964,6 +997,12 @@ on_disc_ok_clicked                     (GtkButton       *button,
     sprintf( psz_source, "%s:%s", psz_method, psz_device );
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
     free( psz_source );
+
+    /* Select added item and switch to DVD interface */
+    intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
+    if( p_intf->p_input != NULL )
+        p_intf->p_input->b_eof = 1;
+    p_intf->p_sys->b_mode_changed = 1;
 
     gtk_widget_hide( p_intf->p_sys->p_disc );
 }
@@ -1029,6 +1068,13 @@ on_network_ok_clicked                  (GtkButton       *button,
     sprintf( psz_source, "%s://%s:%i", psz_protocol, psz_server, i_port );
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
     free( psz_source );
+
+    /* Select added item and switch to network interface */
+    intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
+    if( p_intf->p_input != NULL )
+        p_intf->p_input->b_eof = 1;
+    p_intf->p_sys->b_mode_changed = 1;
+    p_intf->p_sys->i_intf_mode = NET_MODE;
 
     gtk_widget_hide( p_intf->p_sys->p_network );
 }

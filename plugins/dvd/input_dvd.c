@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.37 2001/04/03 03:39:41 stef Exp $
+ * $Id: input_dvd.c,v 1.38 2001/04/08 07:24:47 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -365,6 +365,7 @@ static int DVDFindCell( thread_dvd_data_t * p_dvd )
 
     if( i_cell == cell.i_cell_nb )
     {
+        intf_ErrMsg( "dvd error: can't find cell" );
         return -1;
     }
     else
@@ -392,6 +393,7 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
 
     if( DVDFindCell( p_dvd ) < 0 )
     {
+        intf_ErrMsg( "dvd error: can't find sector" );
         return -1;
     }
 
@@ -421,6 +423,7 @@ static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
     /* Find cell index in Program chain for current chapter */
     p_dvd->i_prg_cell = title.chapter_map.pi_start_cell[i_chapter-1] - 1;
     p_dvd->i_cell = 0;
+    p_dvd->i_sector = 0;
 
     /* Search for cell_index in cell adress_table and initialize start sector */
     DVDFindSector( p_dvd );
@@ -561,12 +564,17 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 
+        /* No PSM to read in DVD mode, we already have all information */
+        p_input->stream.pp_programs[0]->b_is_ok = 1;
+        p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_START;
+
         p_es = NULL;
 
         /* ES 0 -> video MPEG2 */
         p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xe0, 0 );
         p_es->i_stream_id = 0xe0;
         p_es->i_type = MPEG2_VIDEO_ES;
+        p_es->i_cat = VIDEO_ES;
         input_SelectES( p_input, p_es );
         intf_WarnMsg( 1, "dvd info: video MPEG2 stream" );
 
@@ -579,15 +587,15 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         {
 
 #ifdef DEBUG
-        intf_DbgMsg( "Audio %d: %x %x %x %x %x %x %x %x %x %x %x %x\n", i,
+        intf_WarnMsg( 1, "Audio %d: %x %x %x %x %x %x %x %x %x %x %x %x", i,
             vts.manager_inf.p_audio_attr[i-1].i_num_channels,
             vts.manager_inf.p_audio_attr[i-1].i_coding_mode,
             vts.manager_inf.p_audio_attr[i-1].i_multichannel_extension,
             vts.manager_inf.p_audio_attr[i-1].i_type,
             vts.manager_inf.p_audio_attr[i-1].i_appl_mode,
             vts.manager_inf.p_audio_attr[i-1].i_foo,
+            vts.manager_inf.p_audio_attr[i-1].i_test,
             vts.manager_inf.p_audio_attr[i-1].i_bar,
-            vts.manager_inf.p_audio_attr[i-1].i_appl_mode,
             vts.manager_inf.p_audio_attr[i-1].i_quantization,
             vts.manager_inf.p_audio_attr[i-1].i_sample_freq,
             vts.manager_inf.p_audio_attr[i-1].i_lang_code,
@@ -603,8 +611,10 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = AC3_AUDIO_ES;
                 p_es->b_audio = 1;
+                p_es->i_cat = AUDIO_ES;
                 strcpy( p_es->psz_desc, Language( hton16(
                     vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
+                strcat( p_es->psz_desc, " (ac3)" );
 
                 intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",
                               i, p_es->psz_desc, i_id );
@@ -618,8 +628,10 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 p_es->i_stream_id = i_id;
                 p_es->i_type = MPEG2_AUDIO_ES;
                 p_es->b_audio = 1;
+                p_es->i_cat = AUDIO_ES;
                 strcpy( p_es->psz_desc, Language( hton16(
                     vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
+                strcat( p_es->psz_desc, " (mpeg)" );
 
                 intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",
                               i, p_es->psz_desc, i_id );
@@ -655,7 +667,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                                     p_input->stream.pp_programs[0], i_id, 0 );
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = DVD_SPU_ES;
-                p_es->b_spu = 1;
+                p_es->i_cat = SPU_ES;
                 strcpy( p_es->psz_desc, Language( hton16(
                     vts.manager_inf.p_spu_attr[i-1].i_lang_code ) ) ); 
                 intf_WarnMsg( 1, "dvd info: spu stream %d %s\t(0x%x)",
@@ -674,7 +686,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             main_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
             i_audio = 1;
         }
-        if( i_audio > 0 )
+        if( i_audio > 0 && vts.manager_inf.i_audio_nb > 0 )
         {
             input_SelectES( p_input, p_input->stream.pp_es[i_audio] );
         }
@@ -686,7 +698,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             main_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
             i_spu = 0;
         }
-        if( i_spu > 0 )
+        if( i_spu > 0 && vts.manager_inf.i_spu_nb > 0 )
         {
             i_spu += vts.manager_inf.i_audio_nb;
             input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
@@ -713,10 +725,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         intf_WarnMsg( 2, "dvd info: chapter %d start at: %lld",
                                     p_area->i_part, p_area->i_tell );
     }
-
-    /* No PSM to read in DVD mode, we already have all information */
-    p_input->stream.pp_programs[0]->b_is_ok = 1;
-    p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_START;
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 #undef vts

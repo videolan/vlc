@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.44 2001/04/06 09:15:47 sam Exp $
+ * $Id: input_programs.c,v 1.45 2001/04/08 07:24:47 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -373,7 +373,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     p_es->p_pes = NULL;
     p_es->p_decoder_fifo = NULL;
     p_es->b_audio = 0;
-    p_es->b_spu = 0;
+    p_es->i_cat = UNKNOWN_ES;
 
     if( i_data_len )
     {
@@ -730,7 +730,9 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
         if( p_input->stream.pp_selected_es == NULL )
         {
-            intf_ErrMsg( "No more selected ES in input_UnselectES" );
+#ifdef DEBUG_INPUT
+            intf_DbgMsg( "No more selected ES in input_UnselectES" );
+#endif
             return( 1 );
         }
     }

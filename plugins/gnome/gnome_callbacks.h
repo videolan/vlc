@@ -2,7 +2,7 @@
  * gnome_callbacks.h : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.h,v 1.13 2001/04/03 03:39:41 stef Exp $
+ * $Id: gnome_callbacks.h,v 1.14 2001/04/08 07:24:47 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -84,14 +84,6 @@ on_toolbar_prev_clicked                (GtkButton       *button,
 
 void
 on_toolbar_next_clicked                (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-on_toolbar_prev_title_clicked          (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-on_toolbar_next_title_clicked          (GtkButton       *button,
                                         gpointer         user_data);
 
 void
@@ -288,4 +280,12 @@ on_button_chapter_prev_clicked         (GtkButton       *button,
 
 void
 on_button_chapter_next_clicked         (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_button_title_prev_clicked           (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_button_title_next_clicked           (GtkButton       *button,
                                         gpointer         user_data);

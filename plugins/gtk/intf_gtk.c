@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.10 2001/03/15 01:42:20 sam Exp $
+ * $Id: intf_gtk.c,v 1.11 2001/04/08 07:24:47 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -347,12 +347,12 @@ static gint GtkManage( gpointer p_data )
 
         for( i = 0 ; i < p_intf->p_input->stream.i_selected_es_number ; i++ )
         {
-            if( p_intf->p_input->stream.pp_es[i]->b_audio )
+            if( p_intf->p_input->stream.pp_es[i]->i_cat == AUDIO_ES )
             {
                 p_audio_es = p_intf->p_input->stream.pp_es[i];
             }
     
-            if( p_intf->p_input->stream.pp_es[i]->b_spu )
+            if( p_intf->p_input->stream.pp_es[i]->i_cat == SPU_ES )
             {
                 p_spu_es = p_intf->p_input->stream.pp_es[i];
             }
@@ -367,9 +367,9 @@ static gint GtkManage( gpointer p_data )
         p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                      p_intf->p_sys->p_popup ), "popup_audio" ) );
 
-        GtkLanguageMenus( p_intf, p_menubar_menu, p_audio_es, 1,
+        GtkLanguageMenus( p_intf, p_menubar_menu, p_audio_es, AUDIO_ES,
                           on_menubar_audio_activate );
-        GtkLanguageMenus( p_intf, p_popup_menu, p_audio_es, 1,
+        GtkLanguageMenus( p_intf, p_popup_menu, p_audio_es, AUDIO_ES,
                           on_popup_audio_activate );
 
         /* sub picture menus */
@@ -381,9 +381,9 @@ static gint GtkManage( gpointer p_data )
         p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                      p_intf->p_sys->p_popup ), "popup_subpictures" ) );
 
-        GtkLanguageMenus( p_intf, p_menubar_menu, p_spu_es, 2,
+        GtkLanguageMenus( p_intf, p_menubar_menu, p_spu_es, SPU_ES,
                           on_menubar_subpictures_activate  );
-        GtkLanguageMenus( p_intf, p_popup_menu, p_spu_es, 2,
+        GtkLanguageMenus( p_intf, p_popup_menu, p_spu_es, SPU_ES,
                           on_popup_subpictures_activate );
 
         /* everything is ready */
@@ -510,7 +510,7 @@ static GtkWidget * GtkMenuRadioItem( GtkWidget * p_menu,
 static gint GtkLanguageMenus( gpointer          p_data,
                               GtkWidget *       p_root,
                               es_descriptor_t * p_es,
-                              gint              i_type,
+                              gint              i_cat,
                         void(*pf_activate )( GtkMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
@@ -520,8 +520,6 @@ static gint GtkLanguageMenus( gpointer          p_data,
     GSList *            p_button_group;
     char *              psz_name;
     gint                b_active;
-    gint                b_audio;
-    gint                b_spu;
     gint                i;
 
     
@@ -531,14 +529,13 @@ static gint GtkLanguageMenus( gpointer          p_data,
 
     vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
 
-    b_audio = ( i_type == 1 );
     p_button_group = NULL;
 
     /* menu container for audio */
     p_menu = gtk_menu_new();
 
     /* create a set of language buttons and append them to the container */
-    b_active = ( p_es == NULL ) ? 1 : 0;
+    b_active = ( p_es == NULL );
     psz_name = "Off";
 
     p_item = GtkMenuRadioItem( p_menu, &p_button_group, b_active, psz_name );
@@ -554,11 +551,7 @@ static gint GtkLanguageMenus( gpointer          p_data,
 
     for( i = 0 ; i < p_intf->p_input->stream.i_es_number ; i++ )
     {
-
-        b_audio = ( i_type == 1 ) && p_intf->p_input->stream.pp_es[i]->b_audio;
-        b_spu   = ( i_type == 2 ) && p_intf->p_input->stream.pp_es[i]->b_spu;
-
-        if( b_audio || b_spu )
+        if( p_intf->p_input->stream.pp_es[i]->i_cat == i_cat )
         {
             b_active = ( p_es == p_intf->p_input->stream.pp_es[i] ) ? 1 : 0;
             psz_name = p_intf->p_input->stream.pp_es[i]->psz_desc;

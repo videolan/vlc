@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.29 2001/04/01 07:31:38 stef Exp $
+ * $Id: input_ext-intf.h,v 1.30 2001/04/08 07:24:47 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -52,7 +52,8 @@ typedef struct es_descriptor_s
     boolean_t               b_audio;      /* is the stream an audio stream that
                                            * will need to be discarded with
                                            * fast forward and slow motion ?  */
-    boolean_t               b_spu;
+    u8                      i_cat;        /* stream category: video, audio,
+                                           * spu, other */
 
     char                    psz_desc[20]; /* description of ES: audio language
                                            * for instance ; NULL if not
@@ -96,6 +97,12 @@ typedef struct es_descriptor_s
 #define LPCM_AUDIO_ES       0x83
 #define UNKNOWN_ES          0xFF
 
+/* ES Categories */
+#define VIDEO_ES        0x00
+#define AUDIO_ES        0x01
+#define SPU_ES          0x02
+#define NAV_ES          0x03
+#define UNKNOWN_ES      0xFF
 /*****************************************************************************
  * pgrm_descriptor_t
  *****************************************************************************
@@ -352,7 +359,7 @@ void input_SetRate  ( struct input_thread_s *, int );
 void input_Seek     ( struct input_thread_s *, off_t );
 void input_DumpStream( struct input_thread_s * );
 char * input_OffsetToTime( struct input_thread_s *, char * psz_buffer, off_t );
-int  input_ChangeES ( struct input_thread_s *, struct es_descriptor_s *, int );
+int  input_ChangeES ( struct input_thread_s *, struct es_descriptor_s *, u8 );
 int  input_ToggleES ( struct input_thread_s *,
                       struct es_descriptor_s *,
                       boolean_t );

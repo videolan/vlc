@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-intf.c,v 1.19 2001/04/06 09:15:47 sam Exp $
+ * $Id: input_ext-intf.c,v 1.20 2001/04/08 07:24:47 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -235,23 +235,18 @@ void input_DumpStream( input_thread_t * p_input )
  * Useful since the interface plugins know p_es
  *****************************************************************************/
 int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
-                    int i_type )
+                    u8 i_cat )
 {
-    boolean_t               b_audio;
-    boolean_t               b_spu;
     int                     i_index;
     int                     i;
 
     i_index = -1;
-    b_audio = ( i_type == 1 ) ? 1 : 0;
-    b_spu   = ( i_type == 2 ) ? 1 : 0;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     for( i = 0 ; i < p_input->stream.i_selected_es_number ; i++ )
     {
-        if( ( b_audio && p_input->stream.pp_selected_es[i]->b_audio ) 
-         || ( b_spu   && p_input->stream.pp_selected_es[i]->b_spu ) )
+        if( p_input->stream.pp_selected_es[i]->i_cat == i_cat )
         {
             i_index = i;
             break;
@@ -313,7 +308,7 @@ int input_ToggleES( input_thread_t * p_input, es_descriptor_t * p_es,
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    if( p_es != NULL && ( p_es->b_audio || p_es->b_spu ) )
+    if( p_es != NULL )
     {
         if( b_select )
         {
