@@ -913,6 +913,10 @@ static int InitThread( vout_thread_t *p_vout )
     intf_DbgMsg("\n");
     *p_vout->pi_status = THREAD_START;
 
+#ifdef STATS
+    p_vout->c_loops = 0;
+#endif
+
    /* Initialize output method - this function issues its own error messages */
     if( p_vout->p_sys_init( p_vout ) )
     {
@@ -973,6 +977,14 @@ static void RunThread( vout_thread_t *p_vout)
         p_subpic =      NULL;
         display_date =  0;
         current_date =  mdate();
+#ifdef STATS
+        p_vout->c_loops++;
+        if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
+        {
+            intf_Msg("vout stats: picture heap: %d/%d\n",
+                     p_vout->i_pictures, VOUT_MAX_PICTURES);
+        }
+#endif
 
         /*
          * Find the picture to display - this operation does not need lock,
@@ -1712,7 +1724,7 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
              (long) p_vout->c_fps_samples, (long) p_vout->render_time );
     Print( p_vout, 0, 0, LEFT_RALIGN, TOP_RALIGN, psz_buffer );
 
-#ifdef DEBUG
+#ifdef STATS
     /*
      * Print picture information in lower right corner
      */
