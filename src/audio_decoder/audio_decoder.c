@@ -136,9 +136,14 @@ void adec_DestroyThread( adec_thread_t * p_adec )
 
     /* Ask thread to kill itself */
     p_adec->b_die = 1;
+    /* Make sure the decoder thread leaves the GetByte() function */
+    pthread_mutex_lock( &(p_adec->fifo.data_lock) );
+    pthread_cond_signal( &(p_adec->fifo.data_wait) );
+    pthread_mutex_unlock( &(p_adec->fifo.data_lock) );
 
+    /* Waiting for the decoder thread to exit */
     /* Remove this as soon as the "status" flag is implemented */
-    pthread_join( p_adec->thread_id, NULL );         /* wait until it's done */
+    pthread_join( p_adec->thread_id, NULL );
 }
 
 /* Following functions are local */
@@ -157,14 +162,8 @@ static int FindHeader( adec_thread_t * p_adec )
         NeedBits( &p_adec->bit_stream, 32 );
         if ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_SYNCWORD_MASK) == ADEC_HEADER_SYNCWORD_MASK )
         {
-#ifdef DEBUG
-//            fprintf(stderr, "H");
-#endif
             return( 0 );
         }
-#ifdef DEBUG
-//        fprintf(stderr, "!");
-#endif
         DumpBits( &p_adec->bit_stream, 8 );
     }
 
@@ -971,9 +970,6 @@ static void ErrorThread( adec_thread_t *p_adec )
         {
             input_NetlistFreePES( p_adec->bit_stream.p_input, DECODER_FIFO_START(p_adec->fifo) );
 	    DECODER_FIFO_INCSTART( p_adec->fifo );
-#ifdef DEBUG
-//            fprintf(stderr, "*");
-#endif
         }
 
         /* Waiting for the input thread to put new PES packets in the fifo */

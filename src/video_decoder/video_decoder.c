@@ -108,9 +108,14 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
 
     /* Ask thread to kill itself */
     p_vdec->b_die = 1;
+    /* Make sure the decoder thread leaves the GetByte() function */
+    pthread_mutex_lock( &(p_vdec->fifo.data_lock) );
+    pthread_cond_signal( &(p_vdec->fifo.data_wait) );
+    pthread_mutex_unlock( &(p_vdec->fifo.data_lock) );
 
+    /* Waiting for the decoder thread to exit */
     /* Remove this as soon as the "status" flag is implemented */
-    pthread_join( p_vdec->thread_id, NULL );         /* wait until it's done */
+    pthread_join( p_vdec->thread_id, NULL );
 }
 
 /* following functions are local */
@@ -281,5 +286,3 @@ static void EndThread( vdec_thread_t *p_vdec )
 
     intf_DbgMsg("vdec debug: EndThread(%p)\n", p_vdec);
 }
-
-

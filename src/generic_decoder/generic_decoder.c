@@ -144,6 +144,10 @@ void gdec_DestroyThread( gdec_thread_t *p_gdec, int *pi_status )
      
     /* Request thread destruction */
     p_gdec->b_die = 1;
+    /* Make sure the decoder thread leaves the GetByte() function */
+    pthread_mutex_lock( &(p_gdec->fifo.data_lock) );
+    pthread_cond_signal( &(p_gdec->fifo.data_wait) );
+    pthread_mutex_unlock( &(p_gdec->fifo.data_lock) );
 
     /* If status is NULL, wait until thread has been destroyed */
     if( pi_status )
@@ -154,7 +158,7 @@ void gdec_DestroyThread( gdec_thread_t *p_gdec, int *pi_status )
         }while( (i_status != THREAD_OVER) && (i_status != THREAD_ERROR) 
                 && (i_status != THREAD_FATAL) );   
     }
-    
+
     intf_DbgMsg("%p -> succeeded\n", p_gdec);
 }
 
@@ -437,4 +441,3 @@ static void PrintPES( pes_packet_t *p_pes, int i_stream_id )
 #endif
     intf_Msg("gdec: PES %s\n", psz_pes );
 }
-

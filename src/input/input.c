@@ -339,10 +339,12 @@ static void EndThread( input_thread_t *p_input )
                 case MPEG2_VIDEO_ES:
                     vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
                     break;
+
                 case MPEG1_AUDIO_ES:
                 case MPEG2_AUDIO_ES:
                     adec_DestroyThread( (adec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) );
                     break;
+
                 default:
                     break;
             }

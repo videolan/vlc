@@ -96,6 +96,12 @@ typedef struct bit_stream_s
  *****************************************************************************/
 static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
 {
+    /* Is the input thread dying ? */
+    if ( p_bit_stream->p_input->b_die )
+    {
+        return( 0 );
+    }
+
     /* Are there some bytes left in the current TS packet ? */
     if ( p_bit_stream->i_byte < p_bit_stream->p_ts->i_payload_end )
     {
@@ -123,11 +129,15 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
                 input_NetlistFreePES( p_bit_stream->p_input, DECODER_FIFO_START(*p_bit_stream->p_decoder_fifo) );
                 DECODER_FIFO_INCSTART( *p_bit_stream->p_decoder_fifo );
 
-                /* !! b_die !! */
                 while ( DECODER_FIFO_ISEMPTY(*p_bit_stream->p_decoder_fifo) )
                 {
                     pthread_cond_wait( &p_bit_stream->p_decoder_fifo->data_wait,
                                        &p_bit_stream->p_decoder_fifo->data_lock );
+                    if ( p_bit_stream->p_input->b_die )
+                    {
+                        pthread_mutex_unlock( &(p_bit_stream->p_decoder_fifo->data_lock) );
+                        return( 0 );
+                    }
                 }
 
                 /* The next byte could be found in the next PES packet */
