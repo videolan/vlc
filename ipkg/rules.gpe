@@ -1,0 +1,88 @@
+#!/usr/bin/make -f
+# debian/rules for the VideoLAN Client - uses debhelper.
+# based on Joey Hess's one.
+# Kludged for ipkg
+
+# export PATH="$PATH:/usr/local/arm/2.95.3/bin"
+# Compilation options
+export CC=arm-linux-gcc
+export LD=arm-linux-ld
+export AR=arm-linux-ar
+export RANLIB=arm-linux-ranlib
+export STRIP=arm-linux-strip
+export CONFIG_FLAGS="--enable-release --prefix=/usr \
+	--disable-plugins \
+	--disable-gtk \
+	--disable-gnome \
+	--disable-qt \
+	--disable-kde \
+	--disable-qte \
+	--enable-fb \
+	--enable-sdl \
+	--disable-alsa \
+	--disable-xvideo \
+	--disable-dvd \
+	--disable-dvdread \
+	--disable-vcd \
+	--disable-maxosx \
+	--enable-mad \
+	--enable-ffmpeg \
+	--enable-familiar \
+	--with-tuning=strongarm1100 \
+	--x-includes=/skiff/local/arm-linux/include \
+	--x-libraries=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/lib \
+	--with-mad-tree=/home/jpsaman/iPaq/src/mad-0.14.2b \
+	--with-gtk-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
+	--with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
+	--with-gpe-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
+	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
+	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
+	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg"
+
+export VIDDIR="usr/share/videolan"
+export PIXDIR="usr/share/pixmaps"
+#export DESTDIR=/tmp/vlc
+export DESTDIR=/usr/local/arm/2.95.3/arm-linux
+export PKGDIR=/home/jpsaman/iPaq/packages/vlc-0.5.0
+
+build: build-stamp
+config:
+	./configure --mandir=$${prefix}/share/man \
+		--infodir=$${prefix}/share/info \
+		--host=arm-linux \
+		--target=arm-linux \
+		$(shell echo $(CONFIG_FLAGS))
+build-stamp:
+# This is ugly -- I know
+#	patch -p 0 < ipkg/patch
+
+	$(MAKE)
+
+	touch build-stamp
+
+clean:
+	rm -f build-stamp
+
+	-$(MAKE) distclean
+
+install: build
+	rm -fr ${PKGDIR}/
+	mkdir -p ${PKGDIR}/CONTROL
+	mkdir -p $(PKGDIR)/usr/bin
+	mkdir -p ${PKGDIR}/usr/share/videolan
+	mkdir -p ${PKGDIR}/usr/lib/menu
+	mkdir -p ${PKGDIR}/usr/lib/videolan/vlc
+	$(STRIP) vlc
+	cp ipkg/control.gpe $(PKGDIR)/CONTROL/control
+	cp ipkg/postinst.gpe ${PKGDIR}/CONTROL/postinst
+	cp ipkg/postrm.gpe ${PKGDIR}/CONTROL/postrm
+	cp share/familiar-* ${PKGDIR}/usr/share/videolan
+	cp share/vlc32x32.xpm ${PKGDIR}/usr/share/videolan
+	cp share/vlc16x16.xpm  ${PKGDIR}/usr/share/videolan
+	cp share/vlc48x48.png  ${PKGDIR}/usr/share/videolan
+	cp vlc $(PKGDIR)/usr/bin
+	cp ipkg/vlc.gpe ${PKGDIR}/usr/lib/menu/vlc
+#	cp plugins/*.so ${PKGDIR}/usr/lib/videolan/vlc
+
+.PHONY: build clean install
+

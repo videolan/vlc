@@ -1,5 +1,5 @@
 [Desktop Entry]
 Comment=Multiplatform Multimedia Player
-Exec=vlc
-Icon=vlc/vlc48x48.png
+Exec=opie-vlc
+Icon=videolan/vlc48x48.png
 Name=VideoLAN Client

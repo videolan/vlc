@@ -1,4 +1,5 @@
 #!/bin/sh
-[ -x /opt/QtPalmtop/pics/vlc ] || rm /opt/QtPalmtop/pics/vlc
+ldconfig
+[ -x /opt/QtPalmtop/pics/videolan ] || rm /opt/QtPalmtop/pics/videolan
 exit 0
 

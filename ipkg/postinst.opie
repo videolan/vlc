@@ -1,3 +1,10 @@
 #!/bin/sh
-ln -s /usr/share/vlc /opt/QtPalmtop/pics/vlc
+ldconfig
+if [ -x /usr/share/videolan ] ; then
+   ln -s /usr/share/videolan /opt/QtPalmtop/pics/videolan
+fi
+# Added support for iPaq 3870
+if [ -x /usr/local/qt-embedded/lib/fonts/fontdir ] ; then
+   ln -s /usr/local/qt-embedded/lib/fonts/fontdir  /opt/QtPalmtop/lib/fonts/fontdir
+fi
 exit 0
