@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.8 2003/06/17 14:38:39 hartman Exp $
+ * $Id: output.m,v 1.9 2003/06/22 15:30:22 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -138,7 +138,7 @@
     [[o_mux_selector itemAtIndex: 1] setTitle: _NS("MPEG PS")];
     [[o_mux_selector itemAtIndex: 2] setTitle: _NS("AVI")];
     [[o_mux_selector itemAtIndex: 3] setTitle: _NS("Ogg")];
-    [[o_mux_selector itemAtIndex: 4] setTitle: _NS("mp4")];
+    //[[o_mux_selector itemAtIndex: 4] setTitle: _NS("mp4")];
     
     [o_transcode_lbl setTitle: _NS("Transcode options")];
     [o_transcode_video_chkbox setTitle: _NS("Video")];
@@ -211,7 +211,7 @@
         [[o_mux_selector itemAtIndex: 1] setEnabled: YES];
         [[o_mux_selector itemAtIndex: 2] setEnabled: YES];
         [[o_mux_selector itemAtIndex: 3] setEnabled: YES];
-        [[o_mux_selector itemAtIndex: 4] setEnabled: YES];
+        //[[o_mux_selector itemAtIndex: 4] setEnabled: YES];
     }
     else if( [o_mode isEqualToString: _NS("Stream")] )
     {
@@ -232,7 +232,7 @@
             [[o_mux_selector itemAtIndex: 1] setEnabled: YES];
             [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 3] setEnabled: YES];
-            [[o_mux_selector itemAtIndex: 4] setEnabled: NO];
+            //[[o_mux_selector itemAtIndex: 4] setEnabled: NO];
         }
         else if( [o_mode isEqualToString: _NS("UDP")] )
         {
@@ -242,7 +242,7 @@
             [[o_mux_selector itemAtIndex: 1] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 3] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 4] setEnabled: NO];
+            //[[o_mux_selector itemAtIndex: 4] setEnabled: NO];
         }
         else if( [o_mode isEqualToString: _NS("RTP")] )
         {
@@ -252,7 +252,7 @@
             [[o_mux_selector itemAtIndex: 1] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 3] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 4] setEnabled: NO];
+            //[[o_mux_selector itemAtIndex: 4] setEnabled: NO];
         }
     }
     if( ![[o_mux_selector selectedItem] isEnabled] )
