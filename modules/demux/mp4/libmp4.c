@@ -1367,6 +1367,58 @@ static void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
 }
 
 
+static int MP4_ReadBox_sample_text( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    unsigned int i;
+
+    MP4_READBOX_ENTER( MP4_Box_data_sample_text_t );
+
+    for( i = 0; i < 6 ; i++ )
+    {
+        MP4_GET1BYTE( p_box->data.p_sample_text->i_reserved1[i] );
+    }
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_data_reference_index );
+
+    MP4_GET4BYTES( p_box->data.p_sample_text->i_display_flags );
+    MP4_GET4BYTES( p_box->data.p_sample_text->i_justification );
+
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_background_color[0] );
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_background_color[1] );
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_background_color[2] );
+
+    MP4_GET8BYTES( p_box->data.p_sample_text->i_text_box );
+    MP4_GET8BYTES( p_box->data.p_sample_text->i_reserved2 );
+
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_font_number );
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_font_face );
+
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_reserved3 );
+
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_foreground_color[0] );
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_foreground_color[1] );
+    MP4_GET2BYTES( p_box->data.p_sample_text->i_foreground_color[2] );
+
+    MP4_GET1BYTE( i );
+    p_box->data.p_sample_text->psz_text_name = malloc( i + 1 );
+    memcpy( p_box->data.p_sample_text->psz_text_name, p_peek, i );
+    p_box->data.p_sample_text->psz_text_name[i] = '\0';
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream->s, "read box: \"text\" in stsd text name=%s",
+             p_box->data.p_sample_text->psz_text_name );
+#endif
+    MP4_READBOX_EXIT( 1 );
+}
+
+#if 0
+/* We can't easily call it, and anyway ~ 20 bytes lost isn't a real problem */
+static void MP4_FreeBox_sample_text( MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_sample_text->psz_text_name );
+}
+#endif
+
+
 static int MP4_ReadBox_stsd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
 
@@ -2084,6 +2136,46 @@ static void MP4_FreeBox_0xa9xxx( MP4_Box_t *p_box )
     FREE( p_box->data.p_0xa9xxx->psz_text );
 }
 
+/* For generic */
+static int MP4_ReadBox_default( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    if( !p_box->p_father )
+    {
+        goto unknown;
+    }
+    if( p_box->p_father->i_type == FOURCC_stsd )
+    {
+        MP4_Box_t *p_mdia = MP4_BoxGet( p_box, "../../../.." );
+        MP4_Box_t *p_hdlr;
+
+        if( p_mdia == NULL || p_mdia->i_type != FOURCC_mdia ||
+            (p_hdlr = MP4_BoxGet( p_mdia, "hdlr" )) == NULL )
+        {
+            goto unknown;
+        }
+        switch( p_hdlr->data.p_hdlr->i_handler_type )
+        {
+            case FOURCC_soun:
+                return MP4_ReadBox_sample_soun( p_stream, p_box );
+            case FOURCC_vide:
+                return MP4_ReadBox_sample_vide( p_stream, p_box );
+            case FOURCC_text:
+                return MP4_ReadBox_sample_text( p_stream, p_box );
+            default:
+                msg_Warn( p_stream->s,
+                          "unknown handler type in stsd (uncompletetly loaded)" );
+                return 1;
+        }
+    }
+
+unknown:
+    msg_Warn( p_stream->s,
+              "unknown box type %4.4s (uncompletetly loaded)",
+              (char*)&p_box->i_type );
+
+    return 1;
+}
+
 /**** ------------------------------------------------------------------- ****/
 /****                   "Higher level" Functions                          ****/
 /**** ------------------------------------------------------------------- ****/
@@ -2179,6 +2271,7 @@ static struct
     { FOURCC_SVQ3,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_ZyGo,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_DIVX,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_XVID,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_s263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
@@ -2192,8 +2285,10 @@ static struct
     { FOURCC_3vid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_mjpa,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_mjpb,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
-    { FOURCC_mjqt,  NULL,                       NULL }, /* found in mjpa/b */
-    { FOURCC_mjht,  NULL,                       NULL },
+
+    { FOURCC_mjqt,  MP4_ReadBox_default,        NULL }, /* found in mjpa/b */
+    { FOURCC_mjht,  MP4_ReadBox_default,        NULL },
+
     { FOURCC_dvc,   MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_dvp,   MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_VP31,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
@@ -2203,18 +2298,18 @@ static struct
     { FOURCC_jpeg,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_avc1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
 
-    { FOURCC_mp4s,  NULL,                       MP4_FreeBox_Common },
+    { FOURCC_mp4s,  MP4_ReadBox_default,        MP4_FreeBox_Common },
 
     /* XXX there is 2 box where we could find this entry stbl and tref*/
-    { FOURCC_hint,  NULL,                       MP4_FreeBox_Common },
+    { FOURCC_hint,  MP4_ReadBox_default,        MP4_FreeBox_Common },
 
     /* found in tref box */
-    { FOURCC_dpnd,  NULL,   NULL },
-    { FOURCC_ipir,  NULL,   NULL },
-    { FOURCC_mpod,  NULL,   NULL },
+    { FOURCC_dpnd,  MP4_ReadBox_default,   NULL },
+    { FOURCC_ipir,  MP4_ReadBox_default,   NULL },
+    { FOURCC_mpod,  MP4_ReadBox_default,   NULL },
 
     /* found in hnti */
-    { FOURCC_rtp,   NULL,   NULL },
+    { FOURCC_rtp,   MP4_ReadBox_default,   NULL },
 
     /* found in rmra */
     { FOURCC_rdrf,  MP4_ReadBox_rdrf,           MP4_FreeBox_rdrf   },
@@ -2249,7 +2344,7 @@ static struct
     { FOURCC_0xa9src,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
 
     /* Last entry */
-    { 0,            NULL,                   NULL }
+    { 0,             MP4_ReadBox_default,       NULL }
 };
 
 
@@ -2286,13 +2381,8 @@ static MP4_Box_t *MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_father )
             break;
         }
     }
-    if( MP4_Box_Function[i_index].MP4_ReadBox_function == NULL )
-    {
-        msg_Warn( p_stream->s,
-                  "unknown box type %4.4s (uncompletetly loaded)",
-                  (char*)&p_box->i_type );
-    }
-    else if( !(MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box ) )
+
+    if( !(MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box ) )
     {
         free( p_box );
         return NULL;

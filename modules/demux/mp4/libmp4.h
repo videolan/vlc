@@ -127,6 +127,7 @@
 #define FOURCC_h263 VLC_FOURCC( 'h', '2', '6', '3' )
 #define FOURCC_s263 VLC_FOURCC( 's', '2', '6', '3' )
 #define FOURCC_DIVX VLC_FOURCC( 'D', 'I', 'V', 'X' )
+#define FOURCC_XVID VLC_FOURCC( 'X', 'V', 'I', 'D' )
 #define FOURCC_cvid VLC_FOURCC( 'c', 'v', 'i', 'd' )
 #define FOURCC_mjpa VLC_FOURCC( 'm', 'j', 'p', 'a' )
 #define FOURCC_mjpb VLC_FOURCC( 'm', 'j', 'q', 't' )
@@ -167,6 +168,8 @@
 #define FOURCC_iviv VLC_FOURCC( 'i', 'v', 'i', 'v' )
 #define FOURCC_name VLC_FOURCC( 'n', 'a', 'm', 'e' )
 #define FOURCC_priv VLC_FOURCC( 'p', 'r', 'i', 'v' )
+
+#define FOURCC_text VLC_FOURCC( 't', 'e', 'x', 't' )
 
 #define FOURCC_0xa9nam VLC_FOURCC( 0xa9, 'n', 'a', 'm' )
 #define FOURCC_0xa9aut VLC_FOURCC( 0xa9, 'a', 'u', 't' )
@@ -446,6 +449,25 @@ typedef struct MP4_Box_data_sample_vide_s
     uint8_t *p_qt_image_description;
 
 } MP4_Box_data_sample_vide_t;
+
+typedef struct
+{
+    uint8_t  i_reserved1[6];
+    uint16_t i_data_reference_index;
+
+    uint32_t i_display_flags;
+    uint32_t i_justification;
+    uint16_t i_background_color[3];
+    uint64_t i_text_box;
+    uint64_t i_reserved2;
+    uint16_t i_font_number;
+    uint16_t i_font_face;
+    uint16_t i_reserved3;
+
+    uint16_t i_foreground_color[3];
+
+    char    *psz_text_name;
+} MP4_Box_data_sample_text_t;
 
 typedef struct MP4_Box_data_sample_hint_s
 {
@@ -785,6 +807,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_stsd_t *p_stsd;
         MP4_Box_data_sample_vide_t *p_sample_vide;
         MP4_Box_data_sample_soun_t *p_sample_soun;
+        MP4_Box_data_sample_text_t *p_sample_text;
         MP4_Box_data_sample_hint_t *p_sample_hint;
 
         MP4_Box_data_esds_t *p_esds;

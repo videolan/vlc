@@ -450,6 +450,10 @@ static int Open( vlc_object_t * p_this )
                 case( AUDIO_ES ):
                     psz_cat = "audio";
                     break;
+                case( SPU_ES ):
+                    psz_cat = "subtitle";
+                    break;
+
                 default:
                     psz_cat = "unknown";
                     break;
@@ -579,6 +583,23 @@ static int Demux( demux_t *p_demux )
                     drms_decrypt( tk->p_drms,
                                   (uint32_t*)p_block->p_buffer,
                                   p_block->i_buffer );
+                }
+                else if( tk->fmt.i_cat == SPU_ES && p_block->i_buffer >= 2 )
+                {
+                    uint16_t i_size = GetWBE( p_block->p_buffer );
+
+                    if( i_size + 2 <= p_block->i_buffer )
+                    {
+                        /* remove the length field, and append a '\0' */
+                        memmove( &p_block->p_buffer[0], &p_block->p_buffer[2], i_size );
+                        p_block->p_buffer[i_size] = '\0';
+                        p_block->i_buffer = i_size + 1;
+                    }
+                    else
+                    {
+                        /* Invalid */
+                        p_block->i_buffer = 0;
+                    }
                 }
                 p_block->i_dts = MP4_TrackGetPTS( p_demux, tk ) + 1;
 
@@ -1084,6 +1105,11 @@ static int  TrackCreateES   ( demux_t   *p_demux,
         case( VLC_FOURCC( 's', '2', '6', '3' ) ):
             p_track->fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '3' );
             break;
+
+        case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):
+            p_track->fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+            break;
+
         default:
             p_track->fmt.i_codec = p_sample->i_type;
             break;
@@ -1557,6 +1583,10 @@ static void MP4_TrackCreate( demux_t *p_demux,
                 return;
             }
             p_track->fmt.i_cat = VIDEO_ES;
+            break;
+
+        case( FOURCC_text ):
+            p_track->fmt.i_cat = SPU_ES;
             break;
 
         default:
