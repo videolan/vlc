@@ -50,7 +50,7 @@
 - (IBAction)infoCancel:(id)sender;
 - (IBAction)infoOk:(id)sender;
 - (playlist_item_t *)getItem;
-- (bool)isItemInPlaylist:(playlist_item_t *)p_item;
+- (BOOL)isItemInPlaylist:(playlist_item_t *)p_item;
 
 @end
 
