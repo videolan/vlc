@@ -477,7 +477,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ),
+        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ?
+                        p_module->psz_shortname : p_module->psz_object_name ),
                            i_access_method == CAPTURE_ACCESS );
     }
 
@@ -487,7 +488,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ),
+        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ?
+                        p_module->psz_shortname : p_module->psz_object_name ),
                            i_access_method == CAPTURE_ACCESS );
     }
 
@@ -497,7 +499,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ),
+        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ?
+                        p_module->psz_shortname : p_module->psz_object_name ),
                            i_access_method == CAPTURE_ACCESS );
     }
 
@@ -507,7 +510,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ),
+        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ?
+                        p_module->psz_shortname : p_module->psz_object_name ),
                            i_access_method == CAPTURE_ACCESS );
     }
 

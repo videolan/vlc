@@ -1383,16 +1383,17 @@ wxMenu *Playlist::SDMenu()
         {
             p_sd_menu->AppendCheckItem( FirstSD_Event + i_number ,
                        wxU( p_parser->psz_longname ? p_parser->psz_longname :
-                            p_parser->psz_shortname ) );
+                            ( p_parser->psz_shortname ?
+                            p_parser->psz_shortname :p_parser->psz_object_name)) );
 
             if( playlist_IsServicesDiscoveryLoaded( p_playlist,
-                                    p_parser->psz_shortname ) )
+                                    p_parser->psz_object_name ) )
             {
                 p_sd_menu->Check( FirstSD_Event + i_number, TRUE );
             }
 
             INSERT_ELEM( (void**)pp_sds, i_number, i_number,
-                         (void*)p_parser->psz_shortname );
+                         (void*)p_parser->psz_object_name );
         }
     }
     vlc_list_release( p_list );
@@ -1424,7 +1425,6 @@ void Playlist::OnPopup( wxContextMenuEvent& event )
         else
             Playlist::PopupMenu( node_popup,
                                  ScreenToClient( wxGetMousePosition() ) );
-            
     }
 }
 

@@ -156,13 +156,14 @@ int intf_RunThread( intf_thread_t *p_intf )
         }
     }
 
-    if( p_intf->b_block && strncmp( p_intf->p_module->psz_shortname, "clivlc", 6) )
+    if( p_intf->b_block && strncmp( p_intf->p_module->psz_object_name,
+                                    "clivlc", 6) )
     {
         o_pool = [[NSAutoreleasePool alloc] init];
-	[VLCApplication sharedApplication];
+        [VLCApplication sharedApplication];
     }
 
-    if( p_intf->b_block && ( !strncmp( p_intf->p_module->psz_shortname, "macosx" , 6 ) ||
+    if( p_intf->b_block && ( !strncmp( p_intf->p_module->psz_object_name, "macosx" , 6 ) ||
                              !strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) ) )
     {
         /* VLC in normal primary interface mode */

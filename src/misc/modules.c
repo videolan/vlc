@@ -1165,7 +1165,7 @@ static void UndupModule( module_t *p_module )
 
     free( p_module->psz_object_name );
     free( p_module->psz_capability );
-    free( p_module->psz_shortname );
+    if( p_module->psz_shortname ) free( p_module->psz_shortname );
     free( p_module->psz_longname );
 
     if( p_module->psz_program != NULL )
