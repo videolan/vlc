@@ -13,34 +13,52 @@ export STRIP=arm-linux-strip
 export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-plugins \
 	--disable-gtk \
+	--disable-gtk2 \
 	--disable-gnome \
+	--disable-gnome2 \
 	--disable-qt \
 	--disable-kde \
 	--disable-xosd \
+	--disable-ogg \
+	--disable-tarkin \
+	--disable-tremor \
+	--disable-theorea \
 	--enable-qte \
 	--disable-x11 \
+	--disable-xvideo \
 	--enable-dummy \
+	--enable-v4l \
 	--enable-fb \
 	--enable-sdl \
+	--enable-oss \
 	--disable-alsa \
 	--disable-xvideo \
 	--disable-dvd \
 	--disable-dvdread \
 	--disable-vcd \
 	--disable-maxosx \
-	--disable-xosd \
 	--disable-freetype \
+	--enable-a52 \
+	--enable-faad2 \
 	--enable-flac \
 	--enable-libmpeg2 \
+	--enable-libdvbpsi \
+	--disable-mkv \
 	--enable-mad \
 	--enable-ffmpeg \
 	--disable-familiar \
 	--with-tuning=strongarm1100 \
-	--with-mad-tree=/home/jpsaman/iPaq/src/mad-0.15.0b \
+	--with-libiconv-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
+	--with-mad-tree=/home/jpsaman/iPaq/src/libmad-0.15.0b \
+	--with-a52-tree=/home/jpsaman/iPaq/src/a52dec-0.7.4 \
+	--with-faad2-tree=/home/jpsaman/iPaq/src/faad2-20030612 \
+	--with-flac-tree=/home/jpsaman/iPaq/src/flac-1.1.0 \
+	--with-libmpeg2-tree=/home/jpsaman/iPaq/src/mpeg2dec-20030612 \
+	--with-libdvbpsi-tree=/home/jpsaman/iPaq/src/libdvbpsi-0.1.2 \
 	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/bin \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
 	--with-qte=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
-	--with-ffmpeg-tree=/home/jpsaman/svn/tmp/ffmpeg-20030517"
+	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg-20030622"
 
 export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
@@ -56,9 +74,8 @@ config:
 		--host=arm-linux \
 		--target=arm-linux \
 		$(shell echo $(CONFIG_FLAGS)) \
-		LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/lib" \
-        	CPPFLAGS="-I/usr/local/arm/2.95.3/arm-linux/usr/include -I/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/include"
-
+	LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/lib -L/home/jpsaman/iPaq/src/libid3tag-0.15.0b" \
+	CPPFLAGS="-I/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/include -I/home/jpsaman/iPaq/src/libid3tag-0.15.0b"
 
 build-stamp:
 # This is ugly -- I know
@@ -77,15 +94,15 @@ install: build
 	mkdir -p ${PKGDIR}/usr/lib/menu
 	mkdir -p ${PKGDIR}/usr/lib/vlc
 	mkdir -p ${PKGDIR}/opt/QtPalmtop/sharp/bin
-	mkdir -p ${PKGDIR}/opt/QtPalmtop/sharp/apps/Applications
+	mkdir -p ${PKGDIR}/opt/QtPalmtop/apps/Applications
 	$(STRIP) vlc
 	cp ipkg/control.zaurus $(PKGDIR)/CONTROL/control
 	cp ipkg/postinst.zaurus ${PKGDIR}/CONTROL/postinst
 	cp ipkg/postrm.zaurus ${PKGDIR}/CONTROL/postrm
 	cp share/vlc48x48.png  ${PKGDIR}/usr/share/vlc
 	cp vlc $(PKGDIR)/usr/bin
-	cp ipkg/vlc.zaurus ${PKGDIR}/opt/QtPalmtop/sharp/bin/opie-vlc
 	cp ipkg/vlc.zaurus ${PKGDIR}/opt/QtPalmtop/sharp/bin/zaurus-vlc
+	cp ipkg/vlc.zaurus ${PKGDIR}/opt/QtPalmtop/sharp/bin/opie-vlc
 	cp ipkg/vlc.desktop ${PKGDIR}/opt/QtPalmtop/sharp/apps/Applications
 
 install-plugins: install
