@@ -90,7 +90,7 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
     sock.i_type = NETWORK_TCP;
     sock.psz_bind_addr   = "";
     sock.i_bind_port     = 0;
-    sock.psz_server_addr = psz_host;
+    sock.psz_server_addr = (char *)psz_host;
     sock.i_server_port   = i_port;
     sock.i_ttl           = 0;
 
