@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.56 2003/07/19 00:02:35 hartman Exp $
+$Id: NEWS,v 1.57 2003/07/19 15:25:47 sigmunau Exp $
 
 Changes between 0.6.0 and 0.6.1:
 ---------------------------------
@@ -15,7 +15,7 @@ Win32 port:
  * Fixed 5.1 audio support for the sblive/audigy soundcards.
  * Fixed sound on Windows NT.
 
-UNIX ports:
+Linux ports:
  * Fixed/improved alsa support and enabled multi-channel audio output.
 
 Interfaces:
