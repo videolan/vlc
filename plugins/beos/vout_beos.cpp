@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.49 2002/03/31 08:13:38 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.50 2002/04/01 05:49:00 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -44,13 +44,11 @@ extern "C"
 #include "video_output.h"
 
 #include "interface.h"
+
 }
 
 #include "VideoWindow.h"
 #include "DrawingTidbits.h"
-
-#define BITS_PER_PLANE  16
-#define BYTES_PER_PIXEL 2
 
 /*****************************************************************************
  * vout_sys_t: BeOS video output method descriptor
@@ -112,7 +110,7 @@ int32 Draw(void *data)
             screen-> WaitForRetrace(22000);
             delete screen;
         }
-        if (p_win-> is_overlay)
+        if (p_win-> mode == OVERLAY)
         {
             p_win-> overlaybitmap->LockBits();
 	        memcpy(p_win-> overlaybitmap->Bits(), 
@@ -123,7 +121,8 @@ int32 Draw(void *data)
         }
         else
         {
-            p_win-> view-> DrawBitmap( p_win-> bitmap[p_win-> i_buffer] );
+            p_win-> view-> DrawBitmap( p_win-> bitmap[p_win-> i_buffer], 
+                                       p_win-> view->Bounds() );
         }                                
         p_win-> Unlock();
     }
@@ -166,36 +165,7 @@ VideoWindow::VideoWindow( int v_width, int v_height,
     i_height = frame.IntegerHeight();
     FrameResized(frame.IntegerWidth(), frame.IntegerHeight());
 
-    overlaybitmap = new BBitmap ( BRect( 0, 0, v_width, v_height ), 
-                                  B_BITMAP_WILL_OVERLAY|B_BITMAP_RESERVE_OVERLAY_CHANNEL,
-                                  B_RGB16);
-
-
-    if(overlaybitmap && overlaybitmap->InitCheck() == B_OK) 
-    {
-        is_overlay = true;
-	    bitmap[0] = new BBitmap( BRect( 0, 0, v_width, v_height ), B_RGB16);
-        bitmap[1] = new BBitmap( BRect( 0, 0, v_width, v_height ), B_RGB16);
-        memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
-        memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
-        memset(overlaybitmap->Bits(), 0, overlaybitmap->BitsLength());
-        rgb_color key;
-		view->SetViewOverlay(overlaybitmap, overlaybitmap->Bounds() ,view->Bounds(),
-		                     &key, B_FOLLOW_ALL,
-			                 B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
-		view->SetViewColor(key);
-        SetTitle(VOUT_TITLE " (RGB Overlay)");
-	}
-	else
-	{
-	    bitmap[0] = new BBitmap( BRect( 0, 0, v_width, v_height ), B_RGB32);
-        bitmap[1] = new BBitmap( BRect( 0, 0, v_width, v_height ), B_RGB32);
-        memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
-        memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
-	    is_overlay = false;
-        view->DrawBitmap(bitmap[0], view->Bounds());
-        SetTitle(VOUT_TITLE " (RGB Bitmap)");
-	}
+    mode = SelectDrawingMode(v_width, v_height);
     Show();
 }
 
@@ -204,12 +174,12 @@ VideoWindow::~VideoWindow()
     int32 result;
 
     teardownwindow = true;
-    wait_for_thread(fDrawThreadID, &result);
-    kill_thread(fDrawThreadID);
-//    delete overlaybitmap;
-//    delete bitmap[0];
-//    delete bitmap[1];
     Lock();
+    view->ClearViewOverlay();
+    wait_for_thread(fDrawThreadID, &result);
+    delete overlaybitmap;
+    delete bitmap[0];
+    delete bitmap[1];
     Quit();
 }
 
@@ -307,6 +277,52 @@ void VideoWindow::WindowActivated(bool active)
     view->Invalidate();
 }
 
+int VideoWindow::SelectDrawingMode(int width, int height)
+{
+    int drawingMode = BITMAP;
+
+    for (int i = 0; i < COLOR_COUNT; i++)
+    {
+        overlaybitmap = new BBitmap ( BRect( 0, 0, width, height ), 
+                                  B_BITMAP_WILL_OVERLAY|B_BITMAP_RESERVE_OVERLAY_CHANNEL,
+                                  colspace[i].colspace);
+
+        if(overlaybitmap && overlaybitmap->InitCheck() == B_OK) 
+        {
+            drawingMode = OVERLAY;
+            colspace_index = i;
+            memset(overlaybitmap->Bits(), 0, overlaybitmap->BitsLength());
+            rgb_color key;
+		    view->SetViewOverlay(overlaybitmap, overlaybitmap->Bounds() ,view->Bounds(),
+		                         &key, B_FOLLOW_ALL,
+			                     B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
+		    view->SetViewColor(key);
+            SetTitle(VOUT_TITLE " (Overlay)");
+            intf_Msg("Color index good: %i", colspace_index);
+            break;
+        }
+        else
+        {
+            delete overlaybitmap;
+            intf_Msg("Color index bad: %i", colspace_index);
+        }        
+	}
+
+    if (drawingMode == BITMAP)
+	{
+        // fallback to RGB32
+        colspace_index = DEFAULT_COL;
+        SetTitle(VOUT_TITLE " (Bitmap)");
+    }
+    
+    bitmap[0] = new BBitmap( BRect( 0, 0, width, height ), colspace[colspace_index].colspace);
+    bitmap[1] = new BBitmap( BRect( 0, 0, width, height ), colspace[colspace_index].colspace);
+    memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
+    memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
+    intf_Msg("Color index used: %i", colspace_index);
+    return drawingMode;
+}
+
 /*****************************************************************************
  * VLCView::VLCView
  *****************************************************************************/
@@ -339,7 +355,7 @@ void VLCView::MouseDown(BPoint point)
 void VLCView::Draw(BRect updateRect) 
 {
     VideoWindow *win = (VideoWindow *) Window();
-    if (!win->is_overlay)
+    if (win->mode == BITMAP)
       FillRect(updateRect);
 }
 
@@ -423,14 +439,7 @@ int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->p_sys->i_width
                                * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
 
-    if (p_vout->p_sys->p_window->is_overlay)
-    {
-        p_vout->output.i_chroma = FOURCC_RV16;
-    }
-    else
-    {
-        p_vout->output.i_chroma = FOURCC_RV32;
-    }
+    p_vout->output.i_chroma = colspace[p_vout->p_sys->p_window->colspace_index].chroma;
 
     p_vout->output.i_rmask  = 0x00ff0000;
     p_vout->output.i_gmask  = 0x0000ff00;
@@ -460,7 +469,7 @@ int vout_Init( vout_thread_t *p_vout )
     p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[0]->BytesPerRow();
     p_pic->p->i_pixel_bytes = p_pic->p->i_pitch / p_vout->p_sys->p_window->bitmap[0]->Bounds().IntegerWidth();
 
-    p_pic->i_planes = 1;
+    p_pic->i_planes = colspace[p_vout->p_sys->p_window->colspace_index].planes;
 
     p_pic->i_status = DESTROYED_PICTURE;
     p_pic->i_type   = DIRECT_PICTURE;

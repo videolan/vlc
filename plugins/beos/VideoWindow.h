@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.14 2002/03/31 08:13:38 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.15 2002/04/01 05:49:00 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -23,9 +23,28 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 #define BITMAP  0
-#define DIRECT  1
-#define OVERLAY 2
-#define OPENGL  3
+#define OVERLAY 1
+#define OPENGL  2
+
+typedef struct colorcombo
+{
+	color_space colspace;
+	const char *name;
+	u32 chroma;
+	int planes;
+} colorcombo;
+
+colorcombo colspace[]=
+{
+	{B_YUV422,   "B_YUV422",   FOURCC_Y422, 3},
+	{B_YCbCr422, "B_YCbCr422", FOURCC_UYVY, 3},
+	{B_RGB32,    "B_RGB32",    FOURCC_RV32, 1},
+	{B_RGB16,    "B_RGB16",    FOURCC_RV16, 1}
+};
+
+#define COLOR_COUNT 4
+#define DEFAULT_COL 2
+
 
 class VLCView : public BView
 {
@@ -52,14 +71,13 @@ public:
     void            ScreenChanged(BRect frame, color_space mode);
     void            drawBuffer(int bufferIndex);
     void            WindowActivated(bool active);
+    int             SelectDrawingMode(int width, int height);
     
     // this is the hook controling direct screen connection
     int32           i_width;     // incomming bitmap size 
     int32           i_height;
     BRect           winSize;     // current window size
-//    float           width_scale, height_scale;
-//    float           out_top, out_left, out_height, out_width;
-    bool            is_zoomed, vsync, is_overlay;
+    bool            is_zoomed, vsync;
     BBitmap	        *bitmap[2];
     BBitmap         *overlaybitmap;
     VLCView	        *view;
@@ -67,9 +85,9 @@ public:
     bool			teardownwindow;
     thread_id       fDrawThreadID;
     int             mode;
+    int             colspace_index;
 
 private:
-    // display_mode old_mode;
     struct vout_thread_s   *p_vout;
 
 };
