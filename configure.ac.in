@@ -877,47 +877,65 @@ then
 fi
 
 dnl
-dnl dvdread module: check for libdvdread plugin
+dnl dvdread module: check for libdvdread
 dnl
 AC_ARG_ENABLE(dvdread,
 [  --enable-dvdread        dvdread input module (default disabled)])
 if test "x${enable_dvdread}" != "xno"
 then
   AC_ARG_WITH(dvdread,
-  [    --with-dvdread=PATH   libdvdread headers and libraries])
-  if test "x${with_dvdread}" = "x"
+  [    --with-dvdread=PATH    libdvdread headers and libraries])
+  AC_ARG_WITH(dvdread-tree,
+  [    --with-dvdread-tree=PATH libdvdread tree for static linking])
+  if test "x${with_dvdread}" = x
   then
-    LDFLAGS_test=""
-    CPPFLAGS_test=""
-  else
-    LDFLAGS_test="-L${with_dvdread}/lib"
-    CPPFLAGS_test="-I${with_dvdread}/include"
-  fi
-  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
-  AC_CHECK_HEADERS(dvdread/dvd_reader.h, [
-     AC_TRY_COMPILE([#include <dvdread/dvd_reader.h>],
-        [int foo() { return DVD_VIDEO_LB_LEN; }],[
-          PLUGINS="${PLUGINS} dvdread"
-          LDFLAGS_dvdread="${LDFLAGS_dvdread} ${LDFLAGS_test} -ldvdread ${LDFLAGS_dvdcss}"
-          CPPFLAGS_dvdread="${CPPFLAGS_dvdread} ${CPPFLAGS_test}"
-        ],[
-          if test "x${enable_dvdread}" != "x"
-          then
-            AC_MSG_ERROR([Cannot find DVD_VIDEO_LB_LEN in dvdread/dvd_reader.h, please install libdvdread version 0.9.2 or later])
-          fi
-        ])
-  ],[
-    if test "x${enable_dvdread}" != "x"
+    if test "x${with_dvdread_tree}" = x
     then
-      if test "x${with_dvdread}" != "x"
+      AC_CHECK_HEADERS(dvdread/dvdread.h,
+        [ PLUGINS="${PLUGINS} dvdread"
+          LDFLAGS_dvdread="${LDFLAGS_dvdread} -ldvdread" ],
+        [ if test "x${enable_dvdread}" != "x"
+          then
+            AC_MSG_WARN([Please get libdvdread from http://www.dtek.chalmers.se/groups/dvd/downloads.shtml])
+            AC_MSG_ERROR([cannot find libdvdread headers])
+          fi ])
+    else
+      AC_MSG_CHECKING(for libdvdread.a in ${with_dvdread_tree})
+      real_dvdread_tree="`cd ${with_dvdread_tree} 2>/dev/null && pwd`"
+      if test "x${real_dvdread_tree}" = "x"
       then
-        AC_MSG_ERROR([Cannot find dvdread/dvd_reader.h in ${with_dvdread}/include])
+        dnl  The given directory can't be found
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot cd to ${with_dvdread_tree}])
+      fi
+      if test -f "${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
+      then
+        dnl  Use a custom libdvdread
+        AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
+        BUILTINS="${BUILTINS} dvdread"
+        LDFLAGS_dvdread="${LDFLAGS_dvdread} ${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
+        CPPFLAGS_dvdread="${CPPFLAGS_dvdread} -I${real_dvdread_tree}"
       else
-        AC_MSG_ERROR([Cannot find dvdread/dvd_reader.h])
+        dnl  The given libdvdread wasn't built
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot find ${real_dvdread_tree}/dvdread/.libs/libdvdread.a, make sure you compiled libdvdread in ${with_dvdread_tree}])
       fi
     fi
-  ])
-  CPPFLAGS="${CPPFLAGS_save}"
+  else
+    AC_MSG_CHECKING(for dvdread headers in ${with_dvdread})
+    if test -f ${with_dvdread}/include/dvdread/dvdread.h
+    then
+      dnl  Use ${with_dvdread}/include/dvdread/dvdread.h
+      AC_MSG_RESULT(yes)
+      PLUGINS="${PLUGINS} dvdread"
+      LDFLAGS_dvdread="${LDFLAGS_dvdread} -L${with_dvdread}/lib -ldvdread"
+      CPPFLAGS_dvdread="${CPPFLAGS_dvdread} -I${with_dvdread}/include"
+    else
+      dnl  No libdvdread could be found, sorry
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvdread.h])
+    fi
+  fi
 fi
 
 dnl
@@ -928,34 +946,60 @@ AC_ARG_ENABLE(dvdplay,
 if test "x${enable_dvdplay}" != "xno"
 then
   AC_ARG_WITH(dvdplay,
-  [    --with-dvdplay=PATH   libdvdplay headers and libraries])
+  [    --with-dvdplay=PATH    libdvdplay headers and libraries])
+  AC_ARG_WITH(dvdplay-tree,
+  [    --with-dvdplay-tree=PATH libdvdplay tree for static linking])
   if test "x${with_dvdplay}" = x
   then
-    LDFLAGS_test=""
-    CPPFLAGS_test=""
-  else
-    LDFLAGS_test="-L${with_dvdplay}/lib"
-    CPPFLAGS_test="-I${with_dvdplay}/include"
-  fi
-  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
-  AC_CHECK_HEADERS(dvdplay/dvdplay.h, [
-      PLUGINS="${PLUGINS} dvdplay"
-      LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_test} -ldvdplay -ldvdread ${LDFLAGS_dvdcss}"
-      CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_test}"
-    ],[
-    if test "x${enable_dvdplay}" != x
+    if test "x${with_dvdplay_tree}" = x
     then
-      if test "x${with_dvdplay}" != x
+      AC_CHECK_HEADERS(dvdplay/dvdplay.h,
+        [ PLUGINS="${PLUGINS} dvdplay"
+          LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_dvd} ${LDFLAGS_dvdread} -ldvdplay"
+          CPPFLAGS_dvdplay = "${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread}" ],
+        [ if test "x${enable_dvdplay}" != "x"
+          then
+            AC_MSG_WARN([Please get libdvdplay from http://www.videolan.org/.])
+            AC_MSG_ERROR([cannot find libdvdplay headers])
+          fi ])
+    else
+      AC_MSG_CHECKING(for libdvdplay.a in ${with_dvdplay_tree})
+      real_dvdplay_tree="`cd ${with_dvdplay_tree} 2>/dev/null && pwd`"
+      if test "x${real_dvdplay_tree}" = "x"
       then
-        AC_MSG_ERROR([Cannot find dvdplay/dvdplay.h in ${with_dvdplay}/include])
+        dnl  The given directory can't be found
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot cd to ${with_dvdplay_tree}])
+      fi
+      if test -f "${real_dvdplay_tree}/src/.libs/libdvdplay.a"
+      then
+        dnl  Use a custom libdvdplay
+        AC_MSG_RESULT(${real_dvdplay_tree}/src/.libs/libdvdplay.a)
+        BUILTINS="${BUILTINS} dvdplay"
+        LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_dvd} ${LDFLAGS_dvdread} ${real_dvdplay_tree}/src/.libs/libdvdplay.a"
+        CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread} -I${real_dvdplay_tree}/src"
       else
-        AC_MSG_ERROR([Cannot find dvdplay/dvdplay.h])
+        dnl  The given libdvdplay wasn't built
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot find ${real_dvdplay_tree}/src/.libs/libdvdplay.a, make sure you compiled libdvdplay in ${with_dvdplay_tree}])
       fi
     fi
-  ])
-  CPPFLAGS="${CPPFLAGS_save}"
+  else
+    AC_MSG_CHECKING(for dvdplay headers in ${with_dvdplay})
+    if test -f ${with_dvdplay}/include/dvdplay/dvdplay.h
+    then
+      dnl  Use ${with_dvdplay}/include/dvdplay/dvdplay.h
+      AC_MSG_RESULT(yes)
+      PLUGINS="${PLUGINS} dvdplay"
+      LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_dvd} ${LDFLAGS_dvdread} -L${with_dvdplay}/lib -ldvdplay"
+      CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread} -I${with_dvdplay}/include"
+    else
+      dnl  No libdvdplay could be found, sorry
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${with_dvdplay}/include/dvdplay/dvdplay.h])
+    fi
+  fi
 fi
-
 
 dnl
 dnl  libdvbpsi ts demux
