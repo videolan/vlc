@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.59 2000/12/29 12:49:29 massiot Exp $
+ * $Id: video_parser.c,v 1.60 2001/01/02 14:03:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -345,9 +345,9 @@ static void EndThread( vpar_thread_t *p_vpar )
              p_vpar->pc_malformed_pictures[P_CODING_TYPE],
              p_vpar->pc_malformed_pictures[B_CODING_TYPE]);
 #define S   p_vpar->sequence
-    intf_Msg("vpar info: %s stream (%dx%d), %d pi/s",
+    intf_Msg("vpar info: %s stream (%dx%d), %d.%d pi/s",
              S.b_mpeg2 ? "MPEG-2" : "MPEG-1",
-             S.i_width, S.i_height, S.i_frame_rate/1001);
+             S.i_width, S.i_height, S.i_frame_rate/1001, S.i_frame_rate % 1001);
     intf_Msg("vpar info: %s, %s, matrix_coeff: %d",
              S.b_progressive ? "Progressive" : "Non-progressive",
              S.i_scalable_mode ? "scalable" : "non-scalable",
