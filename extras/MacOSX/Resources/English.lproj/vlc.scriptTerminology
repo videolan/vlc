@@ -1,0 +1,15 @@
+{
+    "Name" = "vlc suite";
+    "Description" = "vlc specific classes.";
+    
+    "Commands" = {
+        "OpenURL" = {
+            Name = "OpenURL"; 
+            Description = "Open a URL";
+        };
+        "GetURL" = {
+            Name = "GetURL";
+            Description = "Get a URL";
+        };
+    };
+}

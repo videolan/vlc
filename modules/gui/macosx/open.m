@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.19 2003/02/05 02:31:27 hartman Exp $
+ * $Id: open.m,v 1.20 2003/02/05 14:58:15 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -876,13 +876,14 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 @implementation VLGetURLScriptCommand
 
 - (id)performDefaultImplementation {
-    NSString *command = [[self commandDescription] commandName];
-    NSString *urlString = [self directParameter];
+    NSString *o_command = [[self commandDescription] commandName];
+    NSString *o_urlString = [self directParameter];
 
-    if ( [command isEqualToString:@"GetURL"] )
+    NSLog(@"test1");
+    if ( [o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"] )
     {
         intf_thread_t * p_intf = [NSApp getIntf];
-
+        NSLog( o_command );
         playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                         FIND_ANYWHERE );
         if( p_playlist == NULL )
@@ -890,9 +891,22 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             return nil;
         }
 
-        [p_playlist appendArray: 
-            [NSArray arrayWithObject: urlString] atPos: -1 enqueue:NO];
-        
+        if ( o_urlString )
+        {
+            NSURL * o_url;
+    
+            int i_mode = PLAYLIST_INSERT | PLAYLIST_GO;
+            
+            playlist_Add( p_playlist, [o_urlString fileSystemRepresentation],
+                                                    i_mode, PLAYLIST_END );
+            NSLog( o_urlString );
+            o_url = [NSURL fileURLWithPath: o_urlString];
+            if( o_url != nil )
+            { 
+                [[NSDocumentController sharedDocumentController]
+                    noteNewRecentDocumentURL: o_url]; 
+            }
+        }
         vlc_object_release( p_playlist );
     }
     return nil;

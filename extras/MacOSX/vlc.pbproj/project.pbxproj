@@ -400,6 +400,8 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>0.5.0</string>
+	<key>NSAppleScriptEnabled</key>
+	<string>YES</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -434,6 +436,8 @@
 				8E68B0BF03E2EA230059A3A7,
 				8ED6C29F03E2F32E0059A3A7,
 				8ED6C2A003E2F32E0059A3A7,
+				8EBF3FA403F13FFB0059A3A7,
+				8EBF3FA803F140A80059A3A7,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -478,6 +482,8 @@
 				8E68B0BE03E2EA230059A3A7,
 				8ED6C29D03E2F32E0059A3A7,
 				8ED6C29E03E2F32E0059A3A7,
+				8EBF3FA303F13FFB0059A3A7,
+				8EBF3FA703F140A80059A3A7,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -598,6 +604,38 @@
 		};
 		8E88833D03DD6E870059A3A7 = {
 			fileRef = 8E88833C03DD6E870059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8EBF3FA303F13FFB0059A3A7 = {
+			isa = PBXFileReference;
+			name = vlc.scriptSuite;
+			path = Resources/vlc.scriptSuite;
+			refType = 2;
+		};
+		8EBF3FA403F13FFB0059A3A7 = {
+			fileRef = 8EBF3FA303F13FFB0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8EBF3FA503F140960059A3A7 = {
+			isa = PBXFileReference;
+			name = vlc.scriptTerminology;
+			path = Resources/English.lproj/vlc.scriptTerminology;
+			refType = 2;
+		};
+		8EBF3FA703F140A80059A3A7 = {
+			children = (
+				8EBF3FA503F140960059A3A7,
+			);
+			isa = PBXVariantGroup;
+			name = vlc.scriptTerminology;
+			refType = 4;
+		};
+		8EBF3FA803F140A80059A3A7 = {
+			fileRef = 8EBF3FA703F140A80059A3A7;
 			isa = PBXBuildFile;
 			settings = {
 			};

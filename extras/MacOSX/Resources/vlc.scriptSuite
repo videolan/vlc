@@ -1,0 +1,17 @@
+{
+    "Name" = "vlc";
+    "AppleEventCode" = "VLC#";
+    
+    "Commands" = {
+        "OpenURL" = {
+            AppleEventClassCode = "WWW!"; 
+            AppleEventCode = "OURL"; 
+            CommandClass = "VLGetURLScriptCommand"; 
+        };
+        "GetURL" = {
+            AppleEventClassCode = "GURL";
+            AppleEventCode = "GURL";
+            CommandClass = "VLGetURLScriptCommand";
+        };
+    };
+}
