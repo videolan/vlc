@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.21 2002/08/30 23:27:06 massiot Exp $
+ * $Id: oss.c,v 1.22 2002/08/31 22:10:25 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -102,6 +102,7 @@ static int Open( vlc_object_t *p_this )
     char * psz_device;
     int i_format;
     int i_rate;
+    int i_frame_size;
     int i_fragments;
     vlc_bool_t b_stereo;
 
@@ -139,9 +140,17 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "cannot reset OSS audio device" );
         return VLC_EGENERIC;
     }
-
-    /* Set the fragment size */
-    i_fragments = FRAME_COUNT << 16 | FRAME_SIZE;
+    
+    /* Set the fragment size
+     * i_fragment = xxxxyyyy where: xxxx        is fragtotal
+     *                              1 << yyyy   is fragsize */
+    i_fragments = 0;
+    i_frame_size = FRAME_SIZE;
+    while( i_frame_size >>= 1 )
+    {
+        ++i_fragments;
+    }
+    i_fragments |= FRAME_COUNT << 16;
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFRAGMENT, &i_fragments ) < 0 )
     {
         msg_Err( p_aout, "cannot set fragment size (%.8x)", i_fragments );
@@ -257,7 +266,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * BufferDuration: buffer status query
  *****************************************************************************
- * This function returns the duration in microseconfs of the current buffer.
+ * This function returns the duration in microseconds of the current buffer.
  *****************************************************************************/
 static mtime_t BufferDuration( aout_instance_t * p_aout )
 {
