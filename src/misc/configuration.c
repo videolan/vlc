@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.54 2003/04/07 11:48:51 gbazin Exp $
+ * $Id: configuration.c,v 1.55 2003/05/09 00:58:25 titer Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -187,7 +187,7 @@ void __config_PutPsz( vlc_object_t *p_this,
     /* free old string */
     if( p_config->psz_value ) free( p_config->psz_value );
 
-    if( psz_value ) p_config->psz_value = strdup( psz_value );
+    if( psz_value && *psz_value ) p_config->psz_value = strdup( psz_value );
     else p_config->psz_value = NULL;
 
     vlc_mutex_unlock( p_config->p_lock );

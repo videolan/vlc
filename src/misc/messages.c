@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.31 2003/05/08 19:06:47 titer Exp $
+ * $Id: messages.c,v 1.32 2003/05/09 00:58:25 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -277,7 +277,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         return;
     }
 
-#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN)
+#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
     vsnprintf( psz_str, i_size, psz_format, args );
     psz_str[ i_size - 1 ] = 0; /* Just in case */
 #endif

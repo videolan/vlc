@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.18 2003/05/09 00:41:11 hartman Exp $
+ * $Id: prefs.m,v 1.19 2003/05/09 00:58:24 titer Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -771,8 +771,7 @@
                     o_value = [o_vlc_control stringValue];
                     psz_value = (char *)[o_value lossyCString];
     
-                    config_PutPsz( p_intf, psz_name,
-                                   *psz_value ? psz_value : NULL );
+                    config_PutPsz( p_intf, psz_name, psz_value );
                 }
                 break;
     
