@@ -1,3 +1,747 @@
+2003-02-17 Monday 07:00  sam
+
+   * ./src/misc/modules.c: hmpf, Wine does not complain about "/"s in paths,
+     but Windoze will certainly do.
+
+2003-02-17 Monday 06:50  sam
+
+   * ./src/misc/win32_specific.c: under Win32 we retrieve the executable's
+     directory whenever possible, to use it for the spudec font or to load
+     plugins.
+
+2003-02-17 Monday 05:21  sam
+
+   * ./configure.ac.in: fixed PLUGIN_PATH and DATA_PATH settings.
+
+2003-02-17 Monday 01:04  asmax
+
+ * added a sample playlist. All fields must be separated with TABs
+
+2003-02-17 Monday 00:57  asmax
+
+ * libvlc binding for python
+ * new VideoLAN RTSP Server, using libvlc.
+   Not yet fully rfc2326-compliant, but it works ;)
+
+2003-02-17 Monday 00:32  hartman
+
+ * Added an info panel to show movie info, etc.
+
+2003-02-16 Sunday 18:35  sam
+
+   * ./debian/changelog: updated for 0.5.1.
+   * ./debian/control: vlc-glide is now Architecture: i386 only.
+   * ./debian/control: vlc-plugin-mad Provides: mp3-decoder.
+   * ./debian/rules: the deprecated vlc-* packages have a proper link to
+     /usr/share/doc/vlc/.
+
+2003-02-16 Sunday 17:58  ipkiss
+
+  * added an entry for the "subtitles don"t work on windows" problem
+
+2003-02-16 Sunday 17:22  jpsaman
+
+ Updated release numbering for all ipk's
+
+2003-02-16 Sunday 17:21  jpsaman
+
+ Qte video output get is screen size from the QT Embedded environment now. This should produce fullscreen video on other QT Embedded configurations with other screen sizes (greater then 240x320).
+
+2003-02-16 Sunday 15:51  fenrir
+
+  * udp: forgot this file...
+
+2003-02-16 Sunday 15:10  fenrir
+
+  * all: split muxer and access into independant part.
+
+2003-02-16 Sunday 15:03  fenrir
+
+  * Less checks on muxer type.
+
+2003-02-16 Sunday 12:18  fenrir
+
+  * adpcm: added dk3 too.
+
+2003-02-16 Sunday 11:25  sigmunau
+
+ Added support for volume up/down buttons.
+
+2003-02-16 Sunday 10:50  fenrir
+
+  * adpcm: added DUCK 4 variant support. (thx M. Melanson who provided me
+ somes samples.)
+
+2003-02-16 Sunday 09:56  fenrir
+
+  * all: fix mpeg2 handling.
+
+2003-02-16 Sunday 02:38  titer
+
+  NEWS: updated BeOS info for 0.5.1
+
+2003-02-16 Sunday 02:29  massiot
+
+ * modules/gui/macosx/open.m: Removed channel server support
+ * po/*: Updated po files just before the 0.5.1 release
+ * modules/audio_filter/resampler/linear.c: fixed an initialization bug
+
+2003-02-15 Saturday 21:02  jpsaman
+
+ Update iPaq packaging description files for:
+ - GPE port
+ - Opie port
+ - Zaurus
+ Updated NEWS file with OPIE port.
+
+2003-02-15 Saturday 14:50  massiot
+
+ * Bumped up revision number to 0.5.1
+ * Updated French translation
+
+2003-02-15 Saturday 13:57  hartman
+
+ * if we are paused in fullscreen, show cursor.
+
+2003-02-15 Saturday 05:43  ipkiss
+
+  - fixed a vicious bug
+
+2003-02-15 Saturday 00:07  hartman
+
+ * Should fix an issue with multiple monitors and the hiding of the mousecursor
+
+2003-02-14 Friday 19:22  sam
+
+   * ./src/libvlc.c: the --help output is now word-wrapped (Closes: #142).
+   * ./src/libvlc.c: removed unnecessary malloc() calls.
+   * ./src/libvlc.c: used {a,b,c} for lists; [a|b|c] is for optional args.
+
+2003-02-14 Friday 18:00  ipkiss
+
+  * exchanged directx' and waveout's capabilities because the latter
+    seems to be more reliable
+
+2003-02-14 Friday 14:48  jpsaman
+
+ Fixed deadlock upon unloading qte_main plugin.
+ Cleanup of debug messages.
+
+2003-02-14 Friday 14:44  jpsaman
+
+ Tuning package dependencies.
+
+2003-02-14 Friday 14:19  jpsaman
+
+ Updated opie control file for packaging.
+
+2003-02-14 Friday 14:01  jpsaman
+
+ Small improvement.
+
+2003-02-14 Friday 10:50  gbazin
+
+ * modules/audio_output/waveout.c: better buffer management and hopefully
+    fixed the S/PDIF output (Still untested though. Anybody here could test
+    this? ).
+
+2003-02-13 Thursday 22:53  massiot
+
+ Updated NEWS file for 0.5.1. PLEASE do your share and add what you think is
+ meaningful.
+
+2003-02-13 Thursday 18:31  sam
+
+   * ./configure.ac.in: we should look for -lxvidcore, not -lxvid.
+
+2003-02-13 Thursday 15:16  hartman
+
+ ALL:
+  - when a new stream is being loaded we select the current title in the
+    playlist.
+  - Cleaned up some of my previous commited code dealing with updating
+    the window title.
+
+2003-02-13 Thursday 03:00  hartman
+
+ *ALL: update the title of the window everytime the stream changes.
+
+2003-02-13 Thursday 02:14  hartman
+
+ * fixed a small bug
+
+2003-02-13 Thursday 01:09  hartman
+
+ * src/playlist/playlist.c:
+   - added an intf-change variable. This is set whenever you add or delete
+     an item in the playlist. You need to unset it yourself.
+ * modules/gui/macosx/intf.?:
+   - listen for external playlist changes. update view when playlist changes.
+   - activate/deactivate previous and next buttons and menuitems,
+     whenever the playlist gets changed.
+
+2003-02-13 Thursday 00:26  jpsaman
+
+ Scripts for building and packaging vlc on Zaurus PDA.
+
+2003-02-13 Thursday 00:26  jpsaman
+
+ Updated control files and buildscript for v0.5.1
+
+2003-02-13 Thursday 00:13  jpsaman
+
+ The Qt Embedded video output plugin is now the preferred plugin when build for Opie or Qte environments.
+
+2003-02-13 Thursday 00:09  jpsaman
+
+ Fixed Qt Embedded video output placing of video stream in window. Also fixed additional spacing between video lines.
+
+2003-02-13 Thursday 00:08  massiot
+
+ * Italien translation, courtesy of Bruno <allevb@tin.it>.
+
+2003-02-12 Wednesday 18:13  jobi
+
+     * modules/access/vcd/vcd.*: fixed a warning
+
+2003-02-12 Wednesday 17:58  jobi
+
+     * modules/access/vcd/vcd.c: in entry points, track number should be read
+       as BCD (it should fix #244). Also fixed chapter indexing, so that it
+       correspond to the dvd one.
+
+2003-02-12 Wednesday 15:22  hartman
+
+ * modules/gui/macosx/controls.m:
+   - fixed the mute and volumeup volumedown when you use them mixed.
+ * src/audio_output/intf.c:
+   - set "saved-volume" on volume up, volume down.
+
+2003-02-12 Wednesday 14:42  massiot
+
+ Patch courtesy of gibalou :
+ * demux/mpeg/ts.c, demux/mpeg/system.c: Proper initialization of
+ i_continuity_counter,
+ * access/udp.c: Fixed win32 behavior when --mtu is set to a too small value,
+ * demux/mpeg/ts.c: Fixed detection of PAT/PMT change.
+
+2003-02-12 Wednesday 03:11  ipkiss
+
+  * compilation fix
+  * all files are stored in dos mode, or Borland won't compile some of
+    them...
+
+2003-02-11 Tuesday 19:05  massiot
+
+ * 0.5.1 German translation, courtesy of Felix Kühne <FK@aenneburghardt.de>.
+
+2003-02-11 Tuesday 18:20  babal
+
+ - Dolby Surround fix
+ - support for 6.1, 7.1, and possibly even 8.1 ! Not so sure though about
+   6.1 since there is a doubt about where should be the Rear Center
+   coefficient in a decoded sample.
+   -> if anybody has an idea or even better a test stream...
+
+2003-02-11 Tuesday 17:19  hartman
+
+ * updated dutch strings
+
+2003-02-11 Tuesday 16:35  hartman
+
+ ALL: - changed vlc.app into VLC.app
+ modules/gui/macosx/vout.m: fixed a potential issue with the hiding of the
+      mousecursor.
+
+2003-02-11 Tuesday 16:24  hartman
+
+ * Updated ReadMe file
+   - some spelling issues
+   - remark about the current troubles with sound
+   - readded deinterlace remark
+   - Added info on multiple screens and sound devices
+   - updated the bugreporting URL
+   - Changed all occurences of vlc into VLC where appropriate
+
+2003-02-11 Tuesday 12:16  massiot
+
+ * modules/codec/lpcm.c: Attempt at supporting all channel configurations,
+ * Support for 7 and 7.1 channel configurations.
+
+2003-02-11 Tuesday 00:50  massiot
+
+ * modules/video_output/sdl.c: Real fix for the aout_Volume* problem.
+
+2003-02-11 Tuesday 00:16  marcari
+
+  * sdl.c : added includes (vlc/aout.h & aout_internal.h)
+     => to make volumeup/down compile
+
+2003-02-11 Tuesday 00:04  hartman
+
+ * the window of the video shows the official document icon, filename and
+   when command-clicked the path if the stream is a local file.
+   this is the expected window behaviour in osx.
+
+2003-02-10 Monday 23:22  massiot
+
+ * I ran --update-po for the last time before the 0.5.1 release (and I
+ mean it !)
+
+2003-02-10 Monday 23:18  hartman
+
+ * The dock should no longer be visible in fullscreen mode.
+
+2003-02-10 Monday 22:56  sam
+
+   * ./debian/rules: added code to avoid timestamp skews in the faad tree.
+
+2003-02-10 Monday 22:54  hartman
+
+ * only show last part of of file/url name in the playlist.
+
+2003-02-10 Monday 22:46  sam
+
+   * ./debian/rules: added missing icon in the vlc and wxvlc packages.
+
+2003-02-10 Monday 22:28  hartman
+
+ * fixed the black bar issue with window half/normal/double window sizes in
+   OSX. i had forgotten the aspectratio.
+
+2003-02-10 Monday 22:11  sam
+
+   * ./debian/rules: removed Debian kludges that do not really belong to the
+     official VLC tree.
+
+2003-02-10 Monday 21:57  sam
+
+   * ./debian/control: added the "VideoLAN" word in the long description so
+     that "apt-cache search videolan" returns vlc.
+
+2003-02-10 Monday 21:11  sam
+
+   * ./src/misc/modules_plugin.h.in: when opening the KDE plugin, we first
+     dlopen(libstdc++) to avoid dlopen(kde_plugin) from crashing. Call me evil.
+
+2003-02-10 Monday 19:12  sam
+
+   * ./configure.ac.in: disabled the i420_yuy2_mmx plugin when profiling with
+     gprof, because gcc is unable to build it without -fomit-frame-pointer
+     (Closes: #260).
+
+2003-02-10 Monday 18:43  massiot
+
+ * modules/audio_output/alsa.c: Fixed mono files output (thanks bozo !),
+ * Minor fixes.
+
+2003-02-10 Monday 17:53  sam
+
+   * ./src/misc/threads.c: fixed compilation of the gprof wrapper trick.
+     (partially fixes #260)
+
+2003-02-10 Monday 16:23  titer
+
+   Move the messages update function to another thread. It prevents it from
+  freezing the main window (cannot seek anymore, etc).
+
+2003-02-10 Monday 01:41  hartman
+
+ * another proof that the copy command in IE for Mac sucks. stupid stray chars.
+
+2003-02-10 Monday 01:16  massiot
+
+ * Enabled the gestures module by default,
+ * Run --update-po.
+
+2003-02-10 Monday 01:16  hartman
+
+ * restored old deinterlace menu. The on the fly code does not work as long
+   as the vout.m issue exists. but this is better then the current 'dummy'
+   code we have.
+
+2003-02-10 Monday 00:42  sigmunau
+
+  *: a new mouse gestures interface, currently supporting back, forward, quit
+ fullscreen and a nice debug message when you draw a clockwise square. Video
+ output modules needs to be modified for this to work, but it should be minor
+ in modules supporting dvd navigation.
+
+ btw: it should be easy to add new gestures, ideas appreciated
+
+2003-02-09 Sunday 20:28  massiot
+
+ * Minor typographic corrections,
+ * Fixed a segfault in the Preferences window.
+
+2003-02-09 Sunday 18:10  stippi
+
+ modules/gui/beos/PreferenceWindow.h/.cpp
+
+ 	- added settings for screenshot path and image format
+
+ 	- removed "Save" button, added "Cancel" and "Revert" buttons
+
+ 	- added revert functionality
+
+ 	- changed class design for cleaner functionality,
+ 		separated ApplyChanges() into more functions
+ 		to have finer control
+
+ 	- added more error checking and fixed memory leaks
+ 		(config_GetPsz() returns char*, not const char*!)
+
+ 	- all settings are now correctly saved and restored
+
+ 	- some more cosmetic changes
+
+ modules/gui/beos/InterfaceWindow.h/.cpp
+
+ 	- updated vlc way of saving settings to be on par with BeOS way
+ 		and made it selectable in the code which way is used.
+ 		However, the VideoSettings are still only savable in
+ 		the BeOS way.
+
+ 	- if dvd menus are used, the navigation menu enables a
+ 		"Goto Menu" item. Unfortunately, I don't see a clean
+ 		way to really detect the usage of dvd/dvdold in the
+ 		currently playing stream. I wouldn't want to see
+ 		if a playlist item has "dvd:" or "dvdold:" prepended
+ 		at each interface update.
+
+2003-02-09 Sunday 14:25  fenrir
+
+  * sub.c : begun clean up
+
+2003-02-09 Sunday 13:23  sam
+
+   * ./configure.ac.in: fiddled with linking flags for the KDE plugin.
+
+2003-02-09 Sunday 13:21  sam
+
+   * ./debian/control: made lintian happier with package descriptions.
+   * ./debian/rules: added extra touch calls to prevent autobuilders from
+     launching autoconf/automake.
+
+2003-02-09 Sunday 13:19  sam
+
+   * ./modules/video_filter/transform.c: fixed a stupid typo preventing
+     initialization of the plugin.
+
+2003-02-09 Sunday 13:18  sam
+
+   * ./modules/gui/kde/preferences.cpp: fixed KDE 3.1 compilation.
+
+2003-02-09 Sunday 12:51  titer
+
+  Simplified volume functions
+
+2003-02-09 Sunday 03:01  ipkiss
+
+  * modules/gui/win32/mainframe.cpp: simplifications using the new
+    aout_Volume* API
+
+2003-02-09 Sunday 02:56  massiot
+
+ Fixed GTK compilation.
+
+2003-02-09 Sunday 02:50  massiot
+
+ * Added Step forward/Step backward feature.
+
+2003-02-09 Sunday 02:13  massiot
+
+ * aout_Volume* functions now do their own vlc_object_find() on the
+   audio output. Consequently, the first argument can be any vlc_object_t.
+ * modules/gui/macosx/*: greatly simplified volume functions ; you can now
+   call aout_Volume* even when there is no audio output, and the volume
+   will be saved for later use.
+
+2003-02-08 Saturday 23:43  massiot
+
+ Fixed previous commit.
+
+2003-02-08 Saturday 23:20  massiot
+
+ * src/extras/libc.c: New vlc_wraptext function,
+ * modules/gui/macosx/prefs.m: Wrap tool tips to 60 characters,
+ * src/input/input.c: Correctly parse MRL of the type
+   /Volumes/toto:titi/coincoin.mpg (closes #238 & #186)
+ * modules/access/*: Changed some msg_Warn into msg_Err
+ * po/fr.po: Updated French translation,
+ * configure.ac.in: Re-enabled Swedish translation,
+ * Makefile.am: Do not recompile everything everytime someone changes a .h
+
+2003-02-08 Saturday 22:43  hartman
+
+ * window half/normal/double Size commands
+   - black bar issue is not fixed. i removed 'myfix'
+
+2003-02-08 Saturday 21:32  massiot
+
+ * modules/codec/mpeg_video/parser.c: Do not stop decoding on SEQUENCE_END_CODE
+ * modules/gui/macosx/intf.m: VLC _m_edia _p_layer.
+
+2003-02-08 Saturday 20:14  asmax
+
+ * fixed the encoding
+   (Meuuh you can re-enable swedish ;)
+
+2003-02-08 Saturday 20:10  massiot
+
+ * Fixed misc typos in strings,
+ * Updated po files,
+ * New --buggy-psi options, to supports streams which don't update the
+ continuity counter in their PSI packets (walkenizes #sam).
+
+2003-02-08 Saturday 18:26  massiot
+
+ * configure.ac.in: Disabled Swedish translation since it doesn't use the
+   right charset,
+ * Implemented localization for audio-channels and video-device variables.
+
+2003-02-08 Saturday 00:36  marcari
+
+ glibc 2.1 port for linupy (linux on a yopy pda)
+
+ * modules/access/*.c : added include <sys/time.h> for struct timeval
+ * ipv6.c : ipv6 is not fully supported under glibc2.1 (especially multicast)
+
+ VLC rulz on Yopy !
+
+2003-02-07 Friday 22:30  hartman
+
+ * Resize window fixes
+   - we should not resize the window in fullscreen
+   - fixed the black bars bug in half and double size
+   - position of top left corner should not change
+   - more efficient code
+
+2003-02-07 Friday 21:49  alexis
+
+ - FAQ : the first question of the "troubleshooting" section now tells the
+ user to delete VLC's configuration file.
+
+2003-02-07 Friday 21:23  hartman
+
+ * added half, normal and full size videowindow menuitems.
+   there seems to be a bug though somewhere. you end up with black bars in
+   half and double size.
+
+2003-02-07 Friday 19:43  ipkiss
+
+  * Fixed the "RichEdit line insertion error" bug (closes #246)
+  * Added a popup menu to copy log messages to the clipboard
+
+2003-02-07 Friday 17:51  massiot
+
+ Fixed a buffer leak with slice-I streams (thanks sam).
+
+2003-02-07 Friday 10:17  yves
+
+ - added missing buildrequires
+ - now autodetect on wich system we are:
+   rpm --rebuild should work out of box on rh and previous mdk systems.
+ - NO buildrequires on rh-like system. rh does not have a devel policy
+ - more redhat stuff: NO menu (i do not know their "propriatory" menu system yet)
+
+2003-02-07 Friday 02:32  hartman
+
+ * grrr changed the project file by accident. revert
+
+2003-02-07 Friday 02:31  hartman
+
+ * When you push backspace or delete in the playlist, it removes the selected item.
+
+2003-02-07 Friday 02:22  fenrir
+
+  * ffmpeg/audio : removed an old error (anyway it was harmless).
+  * mp4 : removed a bad initialisation. Erased all ending spaces.
+  * mpeg/audio : send i_rate to decoder (not yet usefull but ...)
+
+2003-02-07 Friday 02:09  sam
+
+   * ./src/interface/interface.c: interface variable is "intf", not "interface".
+
+2003-02-07 Friday 01:29  sam
+
+   * ./include/interface.h: grmbl, I forgot VLC_EXPORT did not support multiline
+     declarations. Should fix that later.
+
+2003-02-07 Friday 01:26  sam
+
+   * ./modules/access/dvdplay/demux.c: fixed a minor warning.
+
+2003-02-07 Friday 00:59  sam
+
+   * ./modules/access/dvdplay/demux.c: the dvdplay plugin no longer sets the
+     "interface" variable to "dvdplay" (Closes: #178, #210, and probably a
+     bunch of others).
+   * ./src/interface/interface.c: added a safety check to circumvent the bug,
+     allowing a smooth upgrade.
+
+2003-02-07 Friday 00:55  massiot
+
+ Fixed interface freezes in the OS X interface.
+
+2003-02-07 Friday 00:01  sam
+
+   * ./src/misc/darwin_specific.m: completed our list of known languages and
+     made code simpler to read.
+
+2003-02-06 Thursday 22:56  sam
+
+   * ./debian/rules: build the SLP plugin by default.
+
+2003-02-06 Thursday 22:39  titer
+
+  Tuned BeOS priorities for a better playback on low-end computers.
+
+2003-02-06 Thursday 16:14  massiot
+
+ Fixed AFMT_AC3 and AFMT_S16_NE handling.
+
+2003-02-06 Thursday 14:47  hartman
+
+ * Changed a failed DecompressSequenceFrameS error into a warning. We don't
+   want to bug users with this when we resize a video.
+
+2003-02-06 Thursday 04:22  sam
+
+   * ./modules/misc/screensaver.c: screen saver disabling plugin; runs a thread
+     in the background to disable xscreensaver the jwz way (Closes: #58).
+
+     It's an interface plugin, trigger with "--extraintf screensaver".
+
+2003-02-06 Thursday 03:37  sam
+
+   * ./configure.ac.in: libmad and liba52 need to be explicitely disabled,
+     otherwise we fail with an error when they are not found.
+
+2003-02-06 Thursday 01:45  sam
+
+   * ./doc/faq/faq.sgml: updated config file location for OS X.
+
+2003-02-05 Wednesday 23:48  hartman
+
+ * Changed the wrong property in my recent commit. FIXED
+
+2003-02-05 Wednesday 23:11  sam
+
+   * ./modules/gui/gtk/gtk_callbacks.c: fixed a bug that caused crashes when
+     doing fullscreen or volume up from the popup menu.
+
+2003-02-05 Wednesday 17:23  hartman
+
+ * added a "Open CrashLog" button to the messages window in OSX.
+
+2003-02-05 Wednesday 15:58  hartman
+
+ * Added AppleScript support
+ * We can now handle mms:// etc on a systemwide level.
+   - No way to set this other then trough Explorer Prefs at the moment
+
+2003-02-05 Wednesday 03:31  hartman
+
+ * More support for handling URLs. Still need to create the scriptsuite.
+
+2003-02-05 Wednesday 02:36  hartman
+
+ * Added a Next and Previous item to the dockmenu
+ * Prelimanary support for making VLC the handler of ftp http mms and udp
+   URLs (on a systemwide level)
+
+2003-02-04 Tuesday 22:01  jpsaman
+
+ Closes bug #170
+
+2003-02-04 Tuesday 21:45  hartman
+
+ * We released an array that was in a autorelease pool. That's not necesarry
+
+2003-02-04 Tuesday 12:51  massiot
+
+ * modules/codec/mpeg_video/*: Support for Slice-I (aka intra slice refresh)
+   streams.
+
+2003-02-04 Tuesday 12:07  massiot
+
+ * modules/demux/mpeg/*: Fixed an uninitialized variable with TS streams
+   (thanks gibalou !).
+
+2003-02-04 Tuesday 11:07  massiot
+
+ * modules/access/*: Fixed compilation problems with "struct timeval".
+
+2003-02-03 Monday 22:47  sam
+
+   * ./bootstrap: we don't fail if gettext is too old and there is no
+     ABOUT-NLS in the tree.
+
+2003-02-03 Monday 22:38  massiot
+
+ Now developing 0.5.1-cvs.
+
+2003-02-03 Monday 20:45  sam
+
+   * ./debian/woody-buildpackage: enabled build-deps checking.
+
+2003-02-03 Monday 18:18  stippi
+
+ modules/gui/beos/InterfaceWindow.h/.cpp
+
+ 	- improved file loading:
+ 		- contents of sub folders can optionally be loaded too
+ 		- files are loaded in expected order from filepanel
+ 			_and_ drag'n'drop
+ 		- file panel accepts folders to load
+ 	- saving of playlist's display mode
+ 	- added updating of interface when playlist is modified
+ 		while nothing is playing
+ 	- added compatibility for SoundPlay's drag'n'drop message format
+
+ modules/gui/beos/ListViews.h/.cpp
+
+ 	- implemented reversal of playlist
+ 	- list can display full path or file name only
+ 	- drag'n'drop interaction with SoundPlay
+
+ modules/gui/beos/MediaControlView.cpp
+
+ 	- cosmetic fix
+
+ modules/gui/beos/PlayListWindow.h/.cpp
+
+ 	- added reverse sort command to edit menu
+ 	- added view menu, to allow the user to display paths
+ 		or only names in the list
+
+2003-02-03 Monday 17:07  alexis
+
+ Small fix.
+
+2003-02-03 Monday 12:25  alexis
+
+ Article format, instead of book format.
+ Few typos.
+
+2003-02-03 Monday 03:26  sam
+
+   * ./debian/rules: more Debian Woody fixes. Grrrr!
+
+2003-02-03 Monday 02:32  sam
+
+   * ./modules/visualization/xosd/xosd.c: Woody compilation fixed.
+   * ./debian/woody-buildpackage: sed syntax fixed.
+
+2003-02-03 Monday 01:56  sam
+
+   * ./share/Makefile.am: we weren't distributing the font!
+
+2003-02-03 Monday 01:43  sam
+
+   * Updated ChangeLog and pofiles.
+
 2003-02-03 Monday 01:39  sam
 
    * ./modules/audio_output/alsa.c: Woody ALSA compilation fix.

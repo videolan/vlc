@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.20 2003/02/16 23:32:05 hartman Exp $
+$Id: NEWS,v 1.21 2003/02/17 06:15:21 sam Exp $
 
 Changes between 0.5.0 and 0.5.1:
 --------------------------------
@@ -14,8 +14,8 @@ Input access:
  * VCD: fixed track number and chapter indexing
 
 Input demux:
- * fixed a bad initialization in mp4 plug-in
- * new TS --buggy-psi option for streams which don't update the
+ * fixed a bad initialization in the mp4 plug-in
+ * new --buggy-psi option for TS streams which do not update their
    continuity counter
 
 Codecs:
@@ -26,34 +26,38 @@ DVD support:
    without the user consent
 
 UNIX ports:
- * GTK: fixed a crash when doing fullscreen or volume up from the popup menu
+ * GTK: fixed a crash when going fullscreen or changing volume from the
+   popup menu
  * X11: new screen saver disabling plug-in (--extraintf screensaver)
  * KDE: fixed compilation with KDE 3.1
  * ALSA: fixed mono files output
 
 Mac OS X port:
  * fixed a crash on start-up on some localized systems
- * lowered real-time priorities to avoid lock-up on slow machines
+ * lowered real-time priorities to avoid lock-ups on slow machines
  * VLC can now be made the handler of ftp http mms and udp URLs
  * playlist enhancements
  * added half, normal and double video window menu items
  * new step forward/step backward commands
  * the dock should no longer be visible in fullscreen mode
- * the Mac OS X binary is now compiled with Ogg/theora support
+ * the Mac OS X binary is now compiled with Ogg/Theora support
  * vlc.app is now VLC.app
  * added an info panel
 
 Win32 port:
  * fixed the "RichEdit line insertion error" bug
+ * VLC can now be run from outside its installation directory
+ * fixed a bug that prevented to find the default subtitle font
 
 BeOS port:
- * smarter BeOS priorities to avoid lock-up
+ * smarter BeOS priorities to avoid lock-ups
  * few enhancements in the interface (especially the Settings window)
 
 Opie port:
- * Native video output is working again.
- * Only commandline interface support.
- * Support for MPEG4, DivX through ffmpeg package.
+ * native video output is working again
+ * only commandline interface support
+ * support for MPEG4, DivX through ffmpeg package
+
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
