@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.49 2003/07/24 21:50:28 gbazin Exp $
+ * $Id: wxwindows.h,v 1.50 2003/07/26 12:41:52 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -309,7 +309,9 @@ private:
     wxRadioBox *disc_type;
     wxTextCtrl *disc_device;
     wxSpinCtrl *disc_title;
+    int        i_disc_title;
     wxSpinCtrl *disc_chapter;
+    int        i_disc_chapter;
 
     /* Controls for the net panel */
     wxRadioBox *net_type;
@@ -317,6 +319,7 @@ private:
     wxPanel *net_subpanels[4];
     wxRadioButton *net_radios[4];
     wxSpinCtrl *net_ports[4];
+    int        i_net_ports[4];
     wxTextCtrl *net_addrs[4];
 
     /* Controls for the subtitles file */

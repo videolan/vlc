@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.33 2003/07/25 11:33:24 gbazin Exp $
+ * $Id: open.cpp,v 1.34 2003/07/26 12:41:52 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -445,14 +445,14 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
     /* UDP/RTP row */
     wxFlexGridSizer *subpanel_sizer;
     wxStaticText *label;
-    int val = config_GetInt( p_intf, "server-port" );
+    i_net_ports[0] = config_GetInt( p_intf, "server-port" );
     subpanel_sizer = new wxFlexGridSizer( 2, 1, 20 );
     label = new wxStaticText( net_subpanels[0], -1, wxU(_("Port")) );
     net_ports[0] = new wxSpinCtrl( net_subpanels[0], NetPort1_Event,
-                                   wxString::Format(wxT("%d"), val),
+                                   wxString::Format(wxT("%d"), i_net_ports[0]),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, val);
+                                   0, 16000, i_net_ports[0] );
 
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( net_ports[0], 1,
@@ -471,11 +471,12 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
     label = new wxStaticText( net_subpanels[1], -1, wxU(_("Port")) );
+    i_net_ports[1] = i_net_ports[0];
     net_ports[1] = new wxSpinCtrl( net_subpanels[1], NetPort2_Event,
-                                   wxString::Format(wxT("%d"), val),
+                                   wxString::Format(wxT("%d"), i_net_ports[1]),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, val);
+                                   0, 16000, i_net_ports[1] );
 
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( net_ports[1], 1,
@@ -540,19 +541,18 @@ void OpenDialog::UpdateMRL( int i_access_method )
                   + demux + wxT(":")
                   + disc_device->GetLineText(0)
                   + wxString::Format( wxT("@%d:%d"),
-                                      disc_title->GetValue(),
-                                      disc_chapter->GetValue() );
+                                      i_disc_title, i_disc_chapter );
         break;
     case NET_ACCESS:
         switch( i_net_type )
         {
         case 0:
-            if( net_ports[0]->GetValue() !=
+            if( i_net_ports[0] !=
                 config_GetInt( p_intf, "server-port" ) )
             {
                 mrltemp = wxT("udp") + demux +
                           wxString::Format( wxT("://@:%d"),
-                                            net_ports[0]->GetValue() );
+                                            i_net_ports[0] );
             }
             else
             {
@@ -563,11 +563,11 @@ void OpenDialog::UpdateMRL( int i_access_method )
         case 1:
             mrltemp = wxT("udp") + demux + wxT("://@") +
                       net_addrs[1]->GetLineText(0);
-            if( net_ports[1]->GetValue() !=
+            if( i_net_ports[1] !=
                 config_GetInt( p_intf, "server-port" ) )
             {
                 mrltemp = mrltemp + wxString::Format( wxT(":%d"),
-                                              net_ports[1]->GetValue() );
+                                              i_net_ports[1] );
             }
             break;
 
@@ -730,8 +730,13 @@ void OpenDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 /*****************************************************************************
  * Disc panel event methods.
  *****************************************************************************/
-void OpenDialog::OnDiscPanelChange( wxCommandEvent& WXUNUSED(event) )
+void OpenDialog::OnDiscPanelChange( wxCommandEvent& event )
 {
+    if( event.GetId() == DiscTitle_Event )
+        i_disc_title = event.GetInt();
+    else if( event.GetId() == DiscChapter_Event )
+        i_disc_chapter = event.GetInt();
+
     UpdateMRL( DISC_ACCESS );
 }
 
@@ -759,14 +764,17 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
     case 0:
         disc_title->SetRange( 0, 255 );
         disc_title->SetValue( 0 );
+        i_disc_title = 0;
         break;
 
     default:
         disc_title->SetRange( 1, 255 );
         disc_title->SetValue( 1 );
+        i_disc_title = 1;
         break;
     }
 
+    i_disc_chapter = 1;
     disc_chapter->SetRange( 1, 255 );
     disc_chapter->SetValue( 1 );
 
@@ -776,8 +784,13 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
 /*****************************************************************************
  * Net panel event methods.
  *****************************************************************************/
-void OpenDialog::OnNetPanelChange( wxCommandEvent& WXUNUSED(event) )
+void OpenDialog::OnNetPanelChange( wxCommandEvent& event )
 {
+    if( event.GetId() >= NetPort1_Event && event.GetId() <= NetPort3_Event )
+    {
+        i_net_ports[event.GetId() - NetPort1_Event] = event.GetInt();
+    }
+
     UpdateMRL( NET_ACCESS );
 }
 
