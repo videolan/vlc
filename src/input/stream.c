@@ -503,8 +503,9 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_CONTROL_ACCESS:
             i_int = (int) va_arg( args, int );
-            if( i_int != ACCESS_SET_PRIVATE_ID_STATE
-                 && i_int != ACCESS_SET_PRIVATE_ID_CA )
+            if( i_int != ACCESS_SET_PRIVATE_ID_STATE &&
+                i_int != ACCESS_SET_PRIVATE_ID_CA &&
+                i_int != ACCESS_GET_PRIVATE_ID_STATE )
             {
                 msg_Err( s, "Hey, what are you thinking ?"
                             "DON'T USE STREAM_CONTROL_ACCESS !!!" );

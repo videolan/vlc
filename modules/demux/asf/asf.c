@@ -637,6 +637,7 @@ static int DemuxInit( demux_t *p_demux )
     {
         asf_track_t    *tk;
         asf_object_stream_properties_t *p_sp;
+        vlc_bool_t b_access_selected;
 
         p_sp = ASF_FindObject( p_sys->p_root->p_hdr,
                                &asf_object_stream_properties_guid,
@@ -649,6 +650,17 @@ static int DemuxInit( demux_t *p_demux )
         tk->p_sp = p_sp;
         tk->p_es = NULL;
         tk->p_frame = NULL;
+
+        /* Check (in case of mms) if this track is selected (ie will receive data) */
+        if( !stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_GET_PRIVATE_ID_STATE,
+                             p_sp->i_stream_number, &b_access_selected ) &&
+            !b_access_selected )
+        {
+            tk->i_cat = UNKNOWN_ES;
+            msg_Dbg( p_demux, "ignoring not selected stream(ID:%d) (by access)",
+                     p_sp->i_stream_number );
+            continue;
+        }
 
         if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
             p_sp->i_type_specific_data_length >= sizeof( WAVEFORMATEX ) - 2 )

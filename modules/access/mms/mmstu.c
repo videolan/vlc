@@ -249,6 +249,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
+    int           i_int;
     vlc_value_t  val;
 
     switch( i_query )
@@ -277,6 +278,15 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *pi_64 = (int64_t)var_GetInteger( p_access, "mms-caching" ) * I64C(1000);
             break;
 
+        case ACCESS_GET_PRIVATE_ID_STATE:
+            i_int = (int)va_arg( args, int );
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t );
+
+            if( i_int < 0 || i_int > 127 )
+                return VLC_EGENERIC;
+            *pb_bool =  p_sys->asfh.stream[i_int].i_selected ? VLC_TRUE : VLC_FALSE;
+            break;
+
         /* */
         case ACCESS_SET_PAUSE_STATE:
         case ACCESS_GET_TITLE_INFO:
@@ -284,6 +294,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_SET_PRIVATE_ID_STATE:
             return VLC_EGENERIC;
+
 
         default:
             msg_Warn( p_access, "unimplemented query in control" );

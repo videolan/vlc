@@ -167,6 +167,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
+    int          i_int;
 
     switch( i_query )
     {
@@ -191,6 +192,15 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = (int64_t)var_GetInteger( p_access, "mms-caching" ) * I64C(1000);
+            break;
+
+        case ACCESS_GET_PRIVATE_ID_STATE:
+            i_int = (int)va_arg( args, int );
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t );
+
+            if( i_int < 0 || i_int > 127 )
+                return VLC_EGENERIC;
+            *pb_bool =  p_sys->asfh.stream[i_int].i_selected ? VLC_TRUE : VLC_FALSE;
             break;
 
         /* */
