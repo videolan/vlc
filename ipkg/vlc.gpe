@@ -1,6 +1,6 @@
 ?package(vlc): \
  needs=x11 \
- section=Audio \
+ section=Graphics \
  logtitle="VideoLAN Client" \
  title="VideoLAN Client" \
  command="vlc" \
