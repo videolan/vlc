@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.15 2002/03/31 08:13:38 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.16 2002/05/16 11:38:42 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -569,7 +569,7 @@ bool InterfaceWindow::QuitRequested()
 {
     p_intf->b_die = 1;
 
-    return( false );
+    return( true );
 }
 
 /*****************************************************************************
