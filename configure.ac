@@ -1,10 +1,10 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.137 2004/01/01 17:41:25 zorglub Exp $
+dnl $Id: configure.ac,v 1.138 2004/01/02 23:22:37 zorglub Exp $
 
 AC_INIT(vlc,0.7.0)
 
 CONFIGURE_LINE="$0 $*"
-CODENAME="Trevelyan"
+CODENAME="Bond"
 
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(src/libvlc.c)
