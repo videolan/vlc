@@ -136,6 +136,10 @@
 #define FOURCC_vp31 VLC_FOURCC( 'v', 'p', '3', '1' )
 #define FOURCC_h264 VLC_FOURCC( 'h', '2', '6', '4' )
 
+#define FOURCC_avc1 VLC_FOURCC( 'a', 'v', 'c', '1' )
+#define FOURCC_avcC VLC_FOURCC( 'a', 'v', 'c', 'C' )
+#define FOURCC_m4ds VLC_FOURCC( 'm', '4', 'd', 's' )
+
 #define FOURCC_dvc  VLC_FOURCC( 'd', 'v', 'c', ' ' )
 #define FOURCC_dvp  VLC_FOURCC( 'd', 'v', 'p', ' ' )
 #define FOURCC_raw  VLC_FOURCC( 'r', 'a', 'w', ' ' )
@@ -728,6 +732,31 @@ typedef struct
 
 } MP4_Box_data_0xa9xxx_t;
 
+typedef struct
+{
+    uint8_t i_version;
+    uint8_t i_profile;
+    uint8_t i_profile_compatibility;
+    uint8_t i_level;
+
+    uint8_t i_reserved1;     /* 6 bits */
+    uint8_t i_length_size;
+
+    uint8_t i_reserved2;    /* 3 bits */
+    uint8_t  i_sps;
+    uint16_t *i_sps_length;
+    uint8_t  **sps;
+
+    uint8_t  i_pps;
+    uint16_t *i_pps_length;
+    uint8_t  **pps;
+
+    /* XXX: Hack raw avcC atom payload */
+    int     i_avcC;
+    uint8_t *p_avcC;
+
+} MP4_Box_data_avcC_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -759,6 +788,7 @@ typedef union MP4_Box_data_s
         MP4_Box_data_sample_hint_t *p_sample_hint;
 
         MP4_Box_data_esds_t *p_esds;
+        MP4_Box_data_avcC_t *p_avcC;
 
     MP4_Box_data_stsz_t *p_stsz;
     MP4_Box_data_stz2_t *p_stz2;

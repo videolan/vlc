@@ -529,7 +529,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* first wait for the good time to read a packet */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr + 1 );
 
     p_sys->i_pcr = MP4_GetMoviePTS( p_sys );
 
@@ -580,9 +580,9 @@ static int Demux( demux_t *p_demux )
                                   (uint32_t*)p_block->p_buffer,
                                   p_block->i_buffer );
                 }
-                p_block->i_dts = MP4_TrackGetPTS( p_demux, tk );
+                p_block->i_dts = MP4_TrackGetPTS( p_demux, tk ) + 1;
 
-                p_block->i_pts = tk->fmt.i_cat == VIDEO_ES ? 0 : p_block->i_dts;
+                p_block->i_pts = tk->fmt.i_cat == VIDEO_ES ? 0 : p_block->i_dts + 1;
 
                 if( !tk->b_drms || ( tk->b_drms && tk->p_drms ) )
                 {
@@ -1179,6 +1179,28 @@ static int  TrackCreateES   ( demux_t   *p_demux,
                             p_track->fmt.i_extra);
                 }
                 break;
+
+            /* avc1: send avcC (h264 without annexe B) */
+            case VLC_FOURCC( 'a', 'v', 'c', '1' ):
+            {
+                MP4_Box_t *p_avcC = MP4_BoxGet( p_sample, "avcC" );
+
+                if( p_avcC )
+                {
+                    /* Hack: use a packetizer to reecampsulate data in anexe B format */
+                    msg_Dbg( p_demux, "avcC: size=%d", p_avcC->data.p_avcC->i_avcC );
+                    p_track->fmt.i_extra = p_avcC->data.p_avcC->i_avcC;
+                    p_track->fmt.p_extra = malloc( p_avcC->data.p_avcC->i_avcC );
+                    memcpy( p_track->fmt.p_extra, p_avcC->data.p_avcC->p_avcC, p_track->fmt.i_extra );
+                    p_track->fmt.b_packetized = VLC_FALSE;
+                }
+                else
+                {
+                    msg_Err( p_demux, "missing avcC" );
+                }
+                break;
+            }
+
             default:
                 break;
         }
@@ -1693,6 +1715,7 @@ static int  MP4_TrackSelect ( demux_t    *p_demux,
 static void MP4_TrackUnselect(demux_t    *p_demux,
                               mp4_track_t  *p_track )
 {
+    fprintf( stderr, "MP4_TrackUnselect: id=%d\n", p_track->i_track_ID );
     if( !p_track->b_ok )
     {
         return;
