@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.29 2003/05/19 11:38:05 gbazin Exp $
+ * $Id: stream_output.c,v 1.30 2003/07/22 18:06:04 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -409,7 +409,9 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux,
     if( p_mux->pf_addstream( p_mux, p_input ) < 0 )
     {
             msg_Err( p_mux, "cannot add this stream" );
-            sout_MuxDeleteStream( p_mux, p_input );
+            TAB_REMOVE( p_mux->i_nb_inputs, p_mux->pp_inputs, p_input );
+            sout_FifoDestroy( p_mux->p_sout, p_input->p_fifo );
+            free( p_input );
             return( NULL );
     }
 
