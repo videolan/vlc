@@ -74,7 +74,7 @@ Interfaces:
 
 Mac OS X port:
  * OpenGL video output is now the default when available.
- * Added FLAC encoder.
+ * Added FAAC encoder (mp4a).
  * Audio output fix to work with multiple streams on a HAL device.
  * Possible fix for conflict with CodeTek VirtualDesktop (untested).
 
