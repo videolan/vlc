@@ -232,6 +232,14 @@ int config_CreateDir( vlc_object_t *, char * );
     p_config[i_config].pi_list = list; \
     p_config[i_config].ppsz_list_text = list_text;
 
+#define change_integer_range( min, max ) \
+    p_config[i_config].i_min = min; \
+    p_config[i_config].i_max = max;
+
+#define change_float_range( min, max ) \
+    p_config[i_config].f_min = min; \
+    p_config[i_config].f_max = max;
+
 #define change_action_add( pf_action, action_text ) \
     if( !p_config[i_config].i_action ) \
     { p_config[i_config].ppsz_action_text = 0; \
