@@ -5,8 +5,8 @@
  * especially the 2048 bytes logical block size.
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.15 2003/01/28 15:05:52 massiot Exp $
+ * Copyright (C) 2001, 2003 VideoLAN
+ * $Id: input.c,v 1.16 2003/02/02 00:49:40 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -843,10 +843,10 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
 
 
 /*****************************************************************************
- * DvdReadRead: reads data packets into the netlist.
+ * DvdReadRead: reads data packets.
  *****************************************************************************
- * Returns -1 in case of error, 0 if everything went well, and 1 in case of
- * EOF.
+ * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
+ * bytes.
  *****************************************************************************/
 static int DvdReadRead( input_thread_t * p_input,
                         byte_t * p_buffer, size_t i_count )
@@ -897,10 +897,11 @@ static int DvdReadRead( input_thread_t * p_input,
 
             DvdReadHandleDSI( p_dvd, p_buf );
 
-            /* End of File */
+            /* End of title */
             if( p_dvd->i_next_vobu >= p_dvd->i_end_block + 1 )
             {
-                return 1;
+                b_eot = 1;
+                break;
             }
 
             assert( p_dvd->i_pack_len < 1024 );
@@ -959,15 +960,13 @@ static int DvdReadRead( input_thread_t * p_input,
         {
             /* EOF */
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            return 1;
+            return 0;
         }
 
         /* EOT */
         msg_Dbg( p_input, "new title" );
         DvdReadSetArea( p_input, p_input->stream.pp_areas[
                         p_input->stream.p_selected_area->i_id+1] );
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        return 0;
     }
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
