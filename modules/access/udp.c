@@ -429,12 +429,12 @@ static block_t *BlockChoose( access_t *p_access )
 
         case 14:
             msg_Dbg( p_access, "detected MPEG audio over RTP" );
-            p_access->psz_demux = strdup( "mp3" );
+            p_access->psz_demux = strdup( "mpga" );
             break;
 
         case 32:
             msg_Dbg( p_access, "detected MPEG video over RTP" );
-            p_access->psz_demux = strdup( "es" );
+            p_access->psz_demux = strdup( "mpgv" );
             break;
 
         default:
