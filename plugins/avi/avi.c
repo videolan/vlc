@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.10 2002/05/02 10:54:34 fenrir Exp $
+ * $Id: avi.c,v 1.11 2002/05/04 16:51:05 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -112,14 +112,11 @@ static void __AVIFreeDemuxData( input_thread_t *p_input )
         {
             if( p_avi_demux->pp_info[i] != NULL ) 
             {
-#define p_info p_avi_demux->pp_info[i]
-                
-                if( p_info->p_index != NULL )
+                if( p_avi_demux->pp_info[i]->p_index != NULL )
                 {
-                      free( p_info->p_index );
+                      free( p_avi_demux->pp_info[i]->p_index );
                 }
-                free( p_info ); 
-#undef  p_info
+                free( p_avi_demux->pp_info[i] ); 
             }
         }
          free( p_avi_demux->pp_info );
@@ -306,13 +303,14 @@ static void __AVI_GetIndex( input_thread_t *p_input )
             index.i_offset = __GetDoubleWordLittleEndianFromBuff( p_peek+8);
             index.i_length = __GetDoubleWordLittleEndianFromBuff(p_peek+12);
             
-            if( (__AVI_ParseStreamHeader( index.i_id, &i_number, &i_type ) != 0)
-             ||(i_number > p_avi_demux->i_streams)) 
+            if( (__AVI_ParseStreamHeader( index.i_id, &i_number, &i_type ) == 0)
+             &&(i_number <  p_avi_demux->i_streams )
+             &&(p_avi_demux->pp_info[i_number]->i_cat == 
+                     __AVIGetESTypeFromTwoCC( i_type )))
             {
-                continue;
+                __AVI_AddEntryIndex( p_avi_demux->pp_info[i_number],
+                                     &index );
             }
-            __AVI_AddEntryIndex( p_avi_demux->pp_info[i_number],
-                                 &index );
         }
         __RIFF_SkipBytes( p_input, 16 * i_read );
     }
@@ -563,7 +561,7 @@ static int AVIInit( input_thread_t *p_input )
             return( -1 );
         }
         __AVI_Parse_Header( &p_info->header,
-                        p_strh->p_data->p_payload_start);
+                            p_strh->p_data->p_payload_start);
         RIFF_DeleteChunk( p_input, p_strh );      
 
         /* in  LIST-strl search strf */
@@ -684,14 +682,13 @@ static int AVIInit( input_thread_t *p_input )
 #define p_info  p_avi_demux->pp_info[i]
         if( p_info->p_index == NULL )
         {
-            intf_WarnMsg( 3, "input init: add index entry for stream %d", i ); 
             RIFF_GoToChunk( p_input, p_avi_demux->p_movi );
             if( RIFF_DescendChunk(p_input) != 0 ) { continue; }
             p_chunk = NULL;
+            p_info->i_idxoffset = 0;  /* ref: begining of file */
             switch( p_info->i_cat ) 
             {
                 case( AUDIO_ES ):
-                    p_info->i_idxoffset = 0;  /* ref: begining of file */
                     if( RIFF_FindChunk( p_input, 
                                MAKEFOURCC('0'+i/10, '0'+i%10,'w','b' ), 
                                              p_movi ) == 0)
@@ -701,7 +698,6 @@ static int AVIInit( input_thread_t *p_input )
                     break;
                     
                 case( VIDEO_ES ):
-                    p_info->i_idxoffset = 0;
                     if( (RIFF_FindChunk( p_input, 
                                     MAKEFOURCC('0'+i/10, '0'+i%10,'d','c' ),
                                             p_movi ) == 0) )
@@ -728,6 +724,10 @@ static int AVIInit( input_thread_t *p_input )
                 index.i_offset = p_chunk->i_pos;
                 index.i_length = p_chunk->i_size;
                 __AVI_AddEntryIndex( p_info, &index );
+                intf_WarnMsg( 3, "input init: add index entry (%4.4s) (%d)", 
+                                 (char*)&p_chunk->i_id,
+                                 i); 
+               
             }
         }
 #undef p_info
@@ -844,7 +844,7 @@ static mtime_t __AVI_GetPTS( AVIStreamInfo_t *p_info )
     {
         i_pts = (mtime_t)( (double)1000000.0 *
                    ((double)p_info->p_index[p_info->i_idxposc].i_lengthtotal +
-                    (double)p_info->i_idxposb ) *
+                        (double)p_info->i_idxposb ) *
                     (double)p_info->header.i_scale /
                     (double)p_info->header.i_rate /
                     (double)p_info->header.i_samplesize );
@@ -917,14 +917,7 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
         u16 i_type;
         if( (p_chunk = RIFF_ReadChunk( p_input )) == NULL )
         {
-            if( b_inc )
-            {
-                return( 0 );
-            }
-            else
-            {
-                return( -1 );
-            }
+            return( b_inc == 1 ? 0 : -1 );
         }
 
         index.i_id = p_chunk->i_id;
@@ -950,14 +943,7 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
 #undef  p_info_i
         if( RIFF_NextChunk( p_input, p_avi_demux->p_movi ) != 0 )
         {
-            if( b_inc )
-            {
-                return( 0 );
-            }
-            else
-            {
-                return( -1 );
-            }
+            return( b_inc == 1 ? 0 : -1 );
         }
     } 
     return( 0 );
@@ -1267,7 +1253,7 @@ static int __AVI_ReAlign( input_thread_t *p_input )
     }
     
     while( i_pos >= p_info->p_index[p_info->i_idxposc].i_offset +
-               p_info->p_index[p_info->i_idxposc].i_length )
+               p_info->p_index[p_info->i_idxposc].i_length + 8 )
     {
         /* search after i_idxposc */
         if( __AVI_NextIndexEntry( p_input, p_info ) != 0 )
@@ -1297,9 +1283,9 @@ static int __AVI_ReAlign( input_thread_t *p_input )
                 p_info->i_idxposc--;
             }
         }
-        __AVI_GoToStreamChunk( p_input, p_info, p_info->i_idxposc );
     } 
-    
+    __AVI_GoToStreamChunk( p_input, p_info, p_info->i_idxposc );
+   
     return( 0 );
 }
 
@@ -1372,10 +1358,10 @@ static pes_packet_t *__AVI_GetFrameInPES( input_thread_t *p_input,
     { 
         return( NULL ) ; 
     }
-    /* if i_pts is too small use 100 ms */
-    if( i_dpts <= 100000)
+    /* if i_pts is too small use 50 ms */
+    if( i_dpts <= 50000)
     {
-        i_dpts = 100000; /* 100 ms by default */
+        i_dpts = 50000; /* 50 ms by default */
     }
 
     if( !p_info->header.i_samplesize )
@@ -1506,6 +1492,7 @@ static int AVIDemux( input_thread_t *p_input )
             }
         }
     }
+
     /* for now, we need at least one video stream */
     if( !p_avi_demux->p_info_video ) 
     {
@@ -1524,7 +1511,8 @@ static int AVIDemux( input_thread_t *p_input )
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     { 
-        msleep( 200000 ); /* 200ms delay to have empty audio and video buffer*/
+        /* wait until buffer is empty */
+        msleep( 2*DEFAULT_PTS_DELAY );
       /*realign audio and video stream to the good pts*/
         if( __AVI_ReAlign( p_input ) != 0 )
         {
@@ -1535,11 +1523,10 @@ static int AVIDemux( input_thread_t *p_input )
         p_avi_demux->i_rate = DEFAULT_RATE;
     }
 
-    
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( p_input->stream.control.i_rate != p_avi_demux->i_rate )
     {
-        msleep( 200000 );
+        msleep( 2*DEFAULT_PTS_DELAY );
         p_avi_demux->i_rate = p_input->stream.control.i_rate;
         p_avi_demux->i_date = mdate()  + DEFAULT_PTS_DELAY
                         - __AVI_GetPTS( p_avi_demux->p_info_video ) *
@@ -1558,7 +1545,7 @@ static int AVIDemux( input_thread_t *p_input )
         p_avi_demux->p_info_audio = NULL;
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );    
-    
+ 
     /* take care of newly selected audio ES */
     if( (p_avi_demux->p_info_audio != NULL)
                     &&(p_avi_demux->p_info_audio->b_selected ))
@@ -1567,10 +1554,11 @@ static int AVIDemux( input_thread_t *p_input )
         __AVI_SynchroReInit( p_input ); /* resynchro, and make pts audio
                                             and video egual */
     }
+
     /* get audio and video frame */
     if( p_avi_demux->p_info_video != NULL )
     {
-       p_pes_video = __AVI_GetFrameInPES( p_input,
+        p_pes_video = __AVI_GetFrameInPES( p_input,
                                            p_avi_demux->p_info_video,
                                            100000 ); /* 100 ms */
         if( p_avi_demux->p_info_audio != NULL )
@@ -1592,12 +1580,13 @@ static int AVIDemux( input_thread_t *p_input )
                                            p_avi_demux->p_info_audio,
                                            100000 ); /* 100 ms */
     }
+
     /* send them to decoder */
     __AVI_DecodePES( p_avi_demux->p_info_audio, p_pes_audio,
                      p_avi_demux->i_date, p_avi_demux->i_rate );
     __AVI_DecodePES( p_avi_demux->p_info_video, p_pes_video,
                      p_avi_demux->i_date, p_avi_demux->i_rate );
-   
+  
     if( !p_pes_video )  /* no more video */
     {                          /* currently i need a video stream */
        return( 0 );

@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.3 2002/05/02 10:54:34 fenrir Exp $
+ * $Id: libioRIFF.c,v 1.4 2002/05/04 16:51:05 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -25,13 +25,12 @@ typedef struct riffchunk_s
     u32 i_id;
     u32 i_size;
     u32 i_type;
-    u32 i_pos;   /* peut etre a changer */
-    data_packet_t *p_data; /* pas forcement utilise */
+    u32 i_pos;
+    data_packet_t *p_data;
     struct riffchunk_s *p_next;
     struct riffchunk_s *p_subchunk;
 } riffchunk_t;
 
-/* ttes ces fonctions permettent un acces lineaire sans avoir besoin de revenrir en arriere */
 static riffchunk_t  * RIFF_ReadChunk(input_thread_t * p_input);
 static int            RIFF_NextChunk(input_thread_t * p_input,riffchunk_t *p_rifffather);
 static int            RIFF_DescendChunk(input_thread_t * p_input);
@@ -58,7 +57,7 @@ static char         * RIFF_IToStr(u32 i);
  ********************************************/
 
 static int __RIFF_TellPos( input_thread_t *p_input, u32 *pos )
-{ /* pas sur que ca marche */
+{ 
     u32 i;
     
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -99,6 +98,7 @@ static int 	__RIFF_SkipBytes(input_thread_t * p_input,int nb)
             if ( i < 0 ) { return ( -1 ); }
             i_rest-=i;
             input_DeletePacket( p_input->p_method_data, p_pack);
+            if( ( i == 0 )&&( i_rest != 0 )) { return( -1 ); }
         }
     }
 	return ( 0 );
