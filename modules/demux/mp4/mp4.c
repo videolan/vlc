@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.45 2003/12/02 10:55:21 gbazin Exp $
+ * $Id: mp4.c,v 1.46 2003/12/20 16:22:59 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1337,10 +1337,19 @@ static void MP4_TrackCreate( input_thread_t *p_input,
         if( p_sample && p_sample->data.p_sample_soun)
         {
             MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
-            if( p_soun->i_qt_version == 0 && p_track->i_timescale != p_soun->i_sampleratehi )
+            if( p_soun->i_qt_version == 0 &&
+                p_track->i_timescale != p_soun->i_sampleratehi )
             {
-                msg_Warn( p_input, "i_timescale != i_sampleratehi with qt_version == 0\nMaking both equal ? (report any problem)" );
-                p_track->i_timescale = p_soun->i_sampleratehi;
+                msg_Warn( p_input,
+                          "i_timescale ("I64Fu") != i_sampleratehi (%u) with "
+                          "qt_version == 0\n"
+                          "Making both equal. (report any problem)",
+                          p_track->i_timescale, p_soun->i_sampleratehi );
+
+                if( p_soun->i_sampleratehi )
+                    p_track->i_timescale = p_soun->i_sampleratehi;
+                else
+                    p_soun->i_sampleratehi = p_track->i_timescale;
             }
         }
     }
