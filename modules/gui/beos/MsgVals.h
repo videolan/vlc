@@ -2,7 +2,7 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.9 2003/05/30 17:30:54 titer Exp $
+ * $Id: MsgVals.h,v 1.10 2003/12/22 11:08:00 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -76,5 +76,6 @@
 #define MSG_SOUNDPLAY      'move'  // drag'n'drop from soundplay playlist
 #define INTERFACE_CREATED  'ifcr'  /* see VlcApplication::MessageReceived()
                                             * in src/misc/beos_specific.cpp */
+#define SHORTCUT           'shcu'
 
 #endif    // BEOS_MESSAGE_VALUES_H

@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.26 2003/11/09 16:00:54 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.27 2003/12/22 11:08:00 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -108,36 +108,55 @@ beos_GetAppWindow(char *name)
     return window;
 }
 
-static int ConvertKey( int key )
+static const int beos_keys[][2] =
 {
-    switch( key )
+    { B_LEFT_ARROW,  KEY_LEFT },
+    { B_RIGHT_ARROW, KEY_RIGHT },
+    { B_UP_ARROW,    KEY_UP },
+    { B_DOWN_ARROW,  KEY_DOWN },
+    { B_SPACE,       KEY_SPACE },
+    { B_ENTER,       KEY_ENTER },
+    { B_F1_KEY,      KEY_F1 },
+    { B_F2_KEY,      KEY_F2 },
+    { B_F3_KEY,      KEY_F3 },
+    { B_F4_KEY,      KEY_F4 },
+    { B_F5_KEY,      KEY_F5 },
+    { B_F6_KEY,      KEY_F6 },
+    { B_F7_KEY,      KEY_F7 },
+    { B_F8_KEY,      KEY_F8 },
+    { B_F9_KEY,      KEY_F9 },
+    { B_F10_KEY,     KEY_F10 },
+    { B_F11_KEY,     KEY_F11 },
+    { B_F12_KEY,     KEY_F12 },
+    { B_HOME,        KEY_HOME },
+    { B_END,         KEY_END },
+    { B_ESCAPE,      KEY_ESC },
+    { B_PAGE_UP,     KEY_PAGEUP },
+    { B_PAGE_DOWN,   KEY_PAGEDOWN },
+    { B_TAB,         KEY_TAB },
+    { B_BACKSPACE,   KEY_BACKSPACE }
+};
+
+static int ConvertKeyFromVLC( int key )
+{
+    for( unsigned i = 0; i < sizeof( beos_keys ) / sizeof( int ) / 2; i++ )
     {
-        case B_LEFT_ARROW:
-            return KEY_LEFT;
-        case B_RIGHT_ARROW:
-            return KEY_RIGHT;
-        case B_UP_ARROW:
-            return KEY_UP;
-        case B_DOWN_ARROW:
-            return KEY_DOWN;
-        case B_SPACE:
-            return KEY_SPACE;
-        case B_ENTER:
-            return KEY_ENTER;
-        case B_HOME:
-            return KEY_HOME;
-        case B_END:
-            return KEY_END;
-        case B_ESCAPE:
-            return KEY_ESC;
-        case B_PAGE_UP:
-            return KEY_PAGEUP;
-        case B_PAGE_DOWN:
-            return KEY_PAGEDOWN;
-        case B_TAB:
-            return KEY_TAB;
-        case B_BACKSPACE:
-            return KEY_BACKSPACE;
+        if( beos_keys[i][1] == key )
+        {
+            return beos_keys[i][0];
+        }
+    }
+    return key;
+}
+
+static int ConvertKeyToVLC( int key )
+{
+    for( unsigned i = 0; i < sizeof( beos_keys ) / sizeof( int ) / 2; i++ )
+    {
+        if( beos_keys[i][0] == key )
+        {
+            return beos_keys[i][1];
+        }
     }
     return key;
 }
@@ -325,16 +344,43 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
 		fSettings->AddFlags(VideoSettings::FLAG_FULL_SCREEN);
 
     // add a few useful shortcuts
-    AddShortcut( 'f', 0, new BMessage( TOGGLE_FULL_SCREEN ) );
+    // XXX works only with US keymap
     AddShortcut( '1', 0, new BMessage( RESIZE_50 ) );
     AddShortcut( '2', 0, new BMessage( RESIZE_100 ) );
     AddShortcut( '3', 0, new BMessage( RESIZE_200 ) );
 
-    // workaround for french keyboards
-    AddShortcut( '&', 0, new BMessage( RESIZE_50 ) );
-    AddShortcut( 'é', 0, new BMessage( RESIZE_100 ) );
-        // FIXME - this one doesn't work because 'é' is a multi-byte character
-    AddShortcut( '"', 0, new BMessage( RESIZE_200 ) );
+    // workaround to have Alt+X shortcuts working
+    BMessage * message;
+    for( unsigned i = 1; /* skip KEY_UNSET */
+         i < sizeof( vlc_keys ) / sizeof( key_descriptor_t ); i++ )
+    {
+        /* Alt+X */
+        message = new BMessage( SHORTCUT );
+        message->AddInt32( "key", vlc_keys[i].i_key_code | KEY_MODIFIER_ALT );
+        AddShortcut( ConvertKeyFromVLC( vlc_keys[i].i_key_code ),
+                     0, message );
+
+        /* Alt+Shift+X */
+        message = new BMessage( SHORTCUT );
+        message->AddInt32( "key", vlc_keys[i].i_key_code |
+                KEY_MODIFIER_ALT | KEY_MODIFIER_SHIFT );
+        AddShortcut( ConvertKeyFromVLC( vlc_keys[i].i_key_code ),
+                     B_SHIFT_KEY, message );
+
+        /* Alt+Ctrl+X */
+        message = new BMessage( SHORTCUT );
+        message->AddInt32( "key", vlc_keys[i].i_key_code |
+                KEY_MODIFIER_ALT | KEY_MODIFIER_CTRL );
+        AddShortcut( ConvertKeyFromVLC( vlc_keys[i].i_key_code ),
+                     B_CONTROL_KEY, message );
+
+        /* Alt+Shift+Ctrl+X */
+        message = new BMessage( SHORTCUT );
+        message->AddInt32( "key", vlc_keys[i].i_key_code |
+                KEY_MODIFIER_ALT | KEY_MODIFIER_SHIFT | KEY_MODIFIER_CTRL );
+        AddShortcut( ConvertKeyFromVLC( vlc_keys[i].i_key_code ),
+                     B_SHIFT_KEY | B_CONTROL_KEY, message );
+    }
 
     _SetToSettings();
 }
@@ -439,6 +485,13 @@ VideoWindow::MessageReceived( BMessage *p_message )
 				}
 			}
 			break;
+        case SHORTCUT:
+        {
+            vlc_value_t val;
+            p_message->FindInt32( "key", (int32*) &val.i_int );
+            var_Set( p_vout->p_vlc, "key-pressed", val );
+            break;
+        }
 		default:
 			BWindow::MessageReceived( p_message );
 			break;
@@ -1325,7 +1378,7 @@ void VLCView::KeyDown( const char *bytes, int32 numBytes )
     uint32_t mods = modifiers();
     vlc_value_t val;
 
-    val.i_int = ConvertKey( *bytes );
+    val.i_int = ConvertKeyToVLC( *bytes );
     if( mods & B_SHIFT_KEY )
     {
         val.i_int |= KEY_MODIFIER_SHIFT;
@@ -1333,10 +1386,6 @@ void VLCView::KeyDown( const char *bytes, int32 numBytes )
     if( mods & B_CONTROL_KEY )
     {
         val.i_int |= KEY_MODIFIER_CTRL;
-    }
-    if( mods & B_COMMAND_KEY )
-    {
-        val.i_int |= KEY_MODIFIER_ALT;
     }
     var_Set( p_vout->p_vlc, "key-pressed", val );
 }
