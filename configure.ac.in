@@ -2325,7 +2325,7 @@ then
     CXXFLAGS_wxwindows="${CXXFLAGS_wxwindows} `${WX_CONFIG} --cxxflags`"
     LDFLAGS_wxwindows="${LDFLAGS_wxwindows} `${WX_CONFIG} --libs`"
     # now look for the wxprec.h header
-    CPPFLAGS="${save_CPPFLAGS} ${CXXFLAGS_wxwindows}"
+    CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_wxwindows}"
     ac_cv_wx_headers=yes
     AC_CHECK_HEADERS(wx/wxprec.h, , [
       ac_cv_wx_headers=no
@@ -2336,7 +2336,7 @@ then
       PLUGINS="${PLUGINS} wxwindows"
       ALIASES="${ALIASES} wxvlc"
     fi
-    CPPFLAGS="${save_CPPFLAGS}"
+    CPPFLAGS="${CPPFLAGS_save}"
   fi
 fi
 
