@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: theme.cpp,v 1.2 2003/03/19 03:11:14 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -169,7 +169,7 @@ void Theme::SaveConfig()
     config_PutPsz( p_intf, "skin_config",     save );
     config_PutInt( p_intf, "show_in_tray",    (int)ShowInTray );
     config_PutInt( p_intf, "show_in_taskbar", (int)ShowInTaskbar );
-    config_SaveConfigFile( p_intf, "skin" );
+    config_SaveConfigFile( p_intf, "skins" );
 
     // Free memory
     delete[] save;

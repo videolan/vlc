@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: skin_main.cpp,v 1.2 2003/03/19 03:11:14 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -225,8 +225,8 @@ vlc_module_begin();
               SKIN_TASKBAR_LONG, VLC_FALSE );
     set_description( _("Skinnable Interface Module") );
     set_capability( "interface", 30 );
-    set_callbacks( E_(Open), E_(Close) );
-    add_shortcut( "skin" );
+    set_callbacks( Open, Close );
+    add_shortcut( "skins" );
 vlc_module_end();
 
 

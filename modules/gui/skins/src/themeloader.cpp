@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.2 2003/03/18 04:56:58 ipkiss Exp $
+ * $Id: themeloader.cpp,v 1.3 2003/03/19 03:11:14 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -236,7 +236,7 @@ bool ThemeLoader::Load( const string FileName )
     else
     {
         config_PutPsz( p_intf, "skin_last", FileName.c_str() );
-        config_SaveConfigFile( p_intf, "skin" );
+        config_SaveConfigFile( p_intf, "skins" );
     }
 
     return true;
