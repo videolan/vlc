@@ -469,7 +469,7 @@ faac: faac-$(FAAC_VERSION).tar.bz2
 	patch -p 0 < Patches/faac.patch
 
 .faac: faac
-	(cd $<; ./bootstrap && ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./bootstrap && ./configure --prefix=$(PREFIX) --disable-shared && make && make install)
 	touch $@
 
 CLEAN_FILE += .faac
