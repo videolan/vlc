@@ -34,10 +34,11 @@
 #include <stdio.h>
 #include <string.h>                                            /* strerror() */
 #include <kernel/OS.h>
+#include <Message.h>
 #include <View.h>
+#include <Window.h>
+#include <Bitmap.h>
 #include <Application.h>
-#include <DirectWindow.h>
-#include <Locker.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -77,9 +78,10 @@ typedef struct vout_sys_s
 {
     VideoWindow *         p_window;
 
-    byte_t *              pp_buffer[2];
+    BBitmap *             pp_bitmap[2];
     s32                   i_width;
     s32                   i_height;
+    boolean_t             b_overlay_enabled;
 } vout_sys_t;
 
 
@@ -111,193 +113,23 @@ BWindow *beos_GetAppWindow(char *name)
 }
 
 /*****************************************************************************
- * DrawingThread : thread that really does the drawing
- *****************************************************************************/
-
-int32 DrawingThread(void *data)
-{
-    uint32 i, j, y;
-    uint64 *pp, *qq;
-    uint8 *p, *q;
-    uint32 byte_width;
-    uint32 height, bytes_per_line;
-    clipping_rect *clip;
-
-    VideoWindow *w;
-    w = (VideoWindow*) data;
-    
-    while(!w->fConnectionDisabled)
-    {
-        w->locker->Lock();
-        if( w->fConnected )
-        {
-            if( w->fDirty && (!w->fReady || w->i_screen_depth != w->p_vout->i_screen_depth) )
-            {
-                bytes_per_line = w->fRowBytes;
-                for( i=0 ; i < w->fNumClipRects ; i++ )
-                {
-                    clip = &(w->fClipList[i]);
-                    height = clip->bottom - clip->top +1;
-                    byte_width = w->i_bytes_per_pixel * ((clip->right - clip->left)+1);
-                    p = w->fBits + clip->top*w->fRowBytes + clip->left * w->i_bytes_per_pixel;
-                    for( y=0 ; y < height ; )
-                    {
-                        pp = (uint64*) p;
-                        for( j=0 ; j < byte_width/64 ; j++ )
-                        {
-                            *pp++ = 0;
-                            *pp++ = 0; 
-                            *pp++ = 0;
-                            *pp++ = 0; 
-                            *pp++ = 0;
-                            *pp++ = 0; 
-                            *pp++ = 0;
-                            *pp++ = 0; 
-                        }
-                        memset( pp , 0, byte_width & 63 );
-                        y++;
-                        p += bytes_per_line;
-                    }
-                }
-            }
-            else if( w->fDirty )
-            {
-                bytes_per_line = w->fRowBytes;
-                for( i=0 ; i < w->fNumClipRects ; i++ )
-                {
-                    clip = &(w->fClipList[i]);
-                    height = clip->bottom - clip->top +1;
-                    byte_width = w->i_bytes_per_pixel * ((clip->right - clip->left)+1);
-                    p = w->fBits + clip->top * bytes_per_line + clip->left * w->i_bytes_per_pixel;
-                    q = w->p_vout->p_sys->pp_buffer[ !w->p_vout->i_buffer_index ] +
-                        clip->top * w->p_vout->i_bytes_per_line + clip->left *
-                        w->p_vout->i_bytes_per_pixel;
-                    for( y=0 ; y < height ; )
-                    {
-                        pp = (uint64*) p;
-                        qq = (uint64*) q;
-                        for( j=0 ; j < byte_width/64 ; j++ )
-                        {
-                            *pp++ = *qq++;
-                            *pp++ = *qq++; 
-                            *pp++ = *qq++;
-                            *pp++ = *qq++; 
-                            *pp++ = *qq++;
-                            *pp++ = *qq++; 
-                            *pp++ = *qq++;
-                            *pp++ = *qq++; 
-                        }
-                        memcpy( pp , qq, byte_width & 63 );
-                        y++;
-                        p += bytes_per_line;
-                        q += w->p_vout->p_sys->i_width * w->p_vout->i_bytes_per_pixel;
-                    }
-                }
-            }
-            w->fDirty = false;
-        }
-        w->locker->Unlock();
-        snooze( 20000 );
-    }
-    return B_OK;
-}
-
-/*****************************************************************************
  * VideoWindow constructor and destructor
  *****************************************************************************/
 
 VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_output )
-        : BDirectWindow(frame, name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
+        : BWindow(frame, name, B_TITLED_WINDOW, 0)
 {
-    BView * view;
-
-    fReady = false;
-    fConnected = false;
-    fConnectionDisabled = false;
-    locker = new BLocker();
-    fClipList = NULL;
-    fNumClipRects = 0;
     p_vout = p_video_output;
 
-    view = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
-    view->SetViewColor(B_TRANSPARENT_32_BIT);
-    AddChild(view);
-/*
-    if(!SupportsWindowMode())
-    {
-        SetFullScreen(true);
-    }
-*/
-    fDirty = false;
-    fDrawThreadID = spawn_thread(DrawingThread, "drawing_thread",
-                    B_DISPLAY_PRIORITY, (void*) this);
-    resume_thread(fDrawThreadID);
+    p_view = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
+    p_view->SetViewColor(0,0,0); /* set the background to black */
+    AddChild(p_view);
+
     Show();
 }
 
 VideoWindow::~VideoWindow()
 {
-    int32 result;
-
-    fConnectionDisabled = true;
-    Hide();
-    Sync();
-    wait_for_thread(fDrawThreadID, &result);
-    free(fClipList);
-    delete locker;
-}
-
-/*****************************************************************************
- * VideoWindow::DirectConnected
- *****************************************************************************/
-
-void VideoWindow::DirectConnected(direct_buffer_info *info)
-{
-    unsigned int i;
-
-    if(!fConnected && fConnectionDisabled)
-    {
-        return;
-    }
-    locker->Lock();
-
-    switch(info->buffer_state & B_DIRECT_MODE_MASK)
-    {
-    case B_DIRECT_START:
-        fConnected = true;
-    case B_DIRECT_MODIFY:
-        fBits = (uint8*)((char*)info->bits +
-        (info->window_bounds.top) * info->bytes_per_row +
-        (info->window_bounds.left) * (info->bits_per_pixel>>3));;
-        
-        i_bytes_per_pixel = info->bits_per_pixel >> 3;
-        i_screen_depth = info->bits_per_pixel;
-        
-        fRowBytes = info->bytes_per_row;
-        fFormat = info->pixel_format;
-        fBounds = info->window_bounds;
-        fDirty = true;
-
-        if(fClipList)
-        {
-            free(fClipList);
-            fClipList = NULL;
-        }
-        fNumClipRects = info->clip_list_count;
-        fClipList = (clipping_rect*) malloc(fNumClipRects*sizeof(clipping_rect));
-        for( i=0 ; i<info->clip_list_count ; i++ )
-        {
-            fClipList[i].top = info->clip_list[i].top - info->window_bounds.top;
-            fClipList[i].left = info->clip_list[i].left - info->window_bounds.left;
-            fClipList[i].bottom = info->clip_list[i].bottom - info->window_bounds.top;
-            fClipList[i].right = info->clip_list[i].right - info->window_bounds.left;
-        }
-        break;
-    case B_DIRECT_STOP:
-        fConnected = false;
-        break;
-    }
-    locker->Unlock();
 }
 
 /*****************************************************************************
@@ -306,7 +138,7 @@ void VideoWindow::DirectConnected(direct_buffer_info *info)
 
 void VideoWindow::FrameResized( float width, float height )
 {
-    b_resized = 1;
+    //b_resized = 1;
 }
 
 /*****************************************************************************
@@ -434,32 +266,64 @@ int vout_Create( vout_thread_t *p_vout )
 int vout_Init( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
-    u32 i_page_size;
+    BBitmap **const & p_bmp = p_vout->p_sys->pp_bitmap;
 
-    p_win->locker->Lock();
-
-    i_page_size =   p_vout->i_width * p_vout->i_height * p_vout->i_bytes_per_pixel;
+    p_win->Lock();
     
-    p_vout->p_sys->i_width =         p_vout->i_width;
-    p_vout->p_sys->i_height =        p_vout->i_height;    
+    p_vout->p_sys->i_width =            p_vout->i_width;
+    p_vout->p_sys->i_height =           p_vout->i_height;
+    p_vout->p_sys->b_overlay_enabled =  false;
 
-    /* Allocate memory for the 2 display buffers */
-    p_vout->p_sys->pp_buffer[0] = (byte_t*) malloc( i_page_size );
-    p_vout->p_sys->pp_buffer[1] = (byte_t*) malloc( i_page_size );
-    if( p_vout->p_sys->pp_buffer[0] == NULL  || p_vout->p_sys->pp_buffer[0] == NULL )
+    /*
+     * Create the two bitmaps we need for double buffering
+     */
+    BRect bounds = BRect( 0, 0, p_vout->i_width-1, p_vout->i_height-1 );
+
+    /* First we try to create an overlay bitmap */
+    p_bmp[0] = new BBitmap( bounds,
+        B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL,
+        B_YCbCr420 );
+    p_bmp[1] = new BBitmap( bounds,
+        B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL,
+        B_YCbCr420 );
+    
+    if( p_bmp[0]->InitCheck() == B_OK && p_bmp[1]->InitCheck() == B_OK )
     {
-        intf_ErrMsg("vout error: can't allocate video memory (%s)", strerror(errno) );
-        if( p_vout->p_sys->pp_buffer[0] != NULL ) free( p_vout->p_sys->pp_buffer[0] );
-        if( p_vout->p_sys->pp_buffer[1] != NULL ) free( p_vout->p_sys->pp_buffer[1] );
-        p_win->locker->Unlock();
-        return( 1 );
+        p_vout->p_sys->b_overlay_enabled = true;
+    }
+    else
+    {
+        delete p_bmp[0];
+        delete p_bmp[1];
+    }
+    
+    /* We failed to create overlay bitmaps, use standard bmp instead */
+    if( !p_vout->p_sys->b_overlay_enabled )
+    {
+        p_bmp[0] = new BBitmap( bounds, B_RGB32 );
+        p_bmp[1] = new BBitmap( bounds, B_RGB32 );
+        if( p_bmp[0]->InitCheck() != B_OK || p_bmp[1]->InitCheck() != B_OK )
+        {
+            delete p_bmp[0];
+            delete p_bmp[1];
+            intf_ErrMsg( "vout error: failed to create BBitmap" );
+            return( 1 );
+        }
     }
 
-    /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->pp_buffer[0],
-                     p_vout->p_sys->pp_buffer[1] );
+    p_vout->b_need_render = !p_vout->p_sys->b_overlay_enabled;
+    intf_Msg( "vout: YUV acceleration %s",
+        p_vout->p_sys->b_overlay_enabled ? "activated" : "unavailable !" ); 
+ 
+    /* Initialize the bitmap buffers to black (0,0,0) */
+    memset( p_bmp[0]->Bits(), 0, p_bmp[0]->BitsLength() );
+    memset( p_bmp[1]->Bits(), 0, p_bmp[1]->BitsLength() );
 
-    p_win->locker->Unlock();
+     /* Set and initialize buffers */
+    vout_SetBuffers( p_vout, p_bmp[0]->Bits(), p_bmp[1]->Bits() );
+
+    p_win->Unlock();
+
     return( 0 );
 }
 
@@ -472,10 +336,9 @@ void vout_End( vout_thread_t *p_vout )
    
    p_win->Lock();
    
-   free( p_vout->p_sys->pp_buffer[0] );
-   free( p_vout->p_sys->pp_buffer[1] );
+   delete p_vout->p_sys->pp_bitmap[0];
+   delete p_vout->p_sys->pp_bitmap[1];
 
-   p_win->fReady = false;
    p_win->Unlock();   
 }
 
@@ -505,9 +368,10 @@ int vout_Manage( vout_thread_t *p_vout )
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
     }
 
+    /* XXX: I doubt that this code is working correctly (Polux) */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_WarnMsg( 1, "resizing window" );
+       intf_WarnMsg( 1, "resizing window" );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Resize window */
@@ -543,28 +407,39 @@ int vout_Manage( vout_thread_t *p_vout )
 void vout_Display( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
+    BBitmap **const & p_bmp = p_vout->p_sys->pp_bitmap;
+
+    p_win->Lock();
     
-    p_win->locker->Lock();
     p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
-    p_win->fReady = true;
-    p_win->fDirty = true;
-    p_win->locker->Unlock();
+    if( p_vout->p_sys->b_overlay_enabled )
+    {
+        rgb_color key;
+        p_win->p_view->ClearViewOverlay();
+		p_win->p_view->SetViewOverlay( p_bmp[p_vout->i_buffer_index],
+            p_bmp[p_vout->i_buffer_index]->Bounds(),
+            p_win->p_view->Bounds(), &key, B_FOLLOW_ALL,
+			B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL );
+		p_win->p_view->SetViewColor( key );
+    }
+    else
+    {
+        p_win->p_view->DrawBitmap( p_bmp[p_vout->i_buffer_index],
+            p_win->p_view->Bounds() );
+    }
+    
+    p_win->Unlock();
 }
 
 /* following functions are local */
 
 /*****************************************************************************
  * BeosOpenDisplay: open and initialize BeOS device
- *****************************************************************************
- * XXX?? The framebuffer mode is only provided as a fast and efficient way to
- * display video, providing the card is configured and the mode ok. It is
- * not portable, and is not supposed to work with many cards. Use at your
- * own risk !
  *****************************************************************************/
 
 static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
-    /* Create the DirectDraw video window */
+    /* Create the video window */
     p_vout->p_sys->p_window =
         new VideoWindow(  BRect( 50, 150, 50+p_vout->i_width-1, 150+p_vout->i_height-1 ), VOUT_TITLE " (BeOS output) - drop a file here to play it !", p_vout );
     if( p_vout->p_sys->p_window == 0 )
@@ -573,21 +448,17 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
         intf_ErrMsg( "error: cannot allocate memory for VideoWindow" );
         return( 1 );
     }   
-    VideoWindow * p_win = p_vout->p_sys->p_window;
     
-    /* Wait until DirectConnected has been called */
-    while( !p_win->fConnected )
-        snooze( 50000 );
-
-    p_vout->i_screen_depth =         p_win->i_screen_depth;
-    p_vout->i_bytes_per_pixel =      p_win->i_bytes_per_pixel;
-    p_vout->i_bytes_per_line =       p_vout->i_width*p_win->i_bytes_per_pixel;
+    /* XXX: 32 is only chosen for test purposes */
+    p_vout->i_screen_depth =         32;
+    p_vout->i_bytes_per_pixel =      4;
+    p_vout->i_bytes_per_line =       p_vout->i_width*p_vout->i_bytes_per_pixel;
     
     switch( p_vout->i_screen_depth )
     {
     case 8:
         intf_ErrMsg( "vout error: 8 bit mode not fully supported" );
-        break;
+        return( 1 );
     case 15:
         p_vout->i_red_mask =        0x7c00;
         p_vout->i_green_mask =      0x03e0;

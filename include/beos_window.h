@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-class VideoWindow : public BDirectWindow
+class VideoWindow : public BWindow
 {
 public:
     // standard constructor and destructor
@@ -33,29 +33,10 @@ public:
     virtual bool    QuitRequested();
     virtual void    FrameResized(float width, float height);
     virtual void    MessageReceived(BMessage *message);
-
-    // this is the hook controling direct screen connection
-    virtual void    DirectConnected(direct_buffer_info *info);
-
-    int32                   i_bytes_per_pixel;
-    int32                   i_screen_depth;
+ 
     struct vout_thread_s   *p_vout;
+    BView * p_view;
      
-    uint8           *fBits;
-    int32           fRowBytes;
-    color_space     fFormat;
-    clipping_rect   fBounds;
-
-    uint32          fNumClipRects;
-    clipping_rect   *fClipList;
-
-    bool            fDirty;
-    bool            fReady;
-    bool            fConnected;
-    bool            fConnectionDisabled;
-    BLocker         *locker;
-    thread_id       fDrawThreadID;
-
     // additional events
     bool            b_resized;
 };
