@@ -23,6 +23,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -30,13 +34,12 @@
 #include <malloc.h>
 #include <netinet/in.h>
 #include <sys/ioctl.h>
-//#if defined(__NetBSD__) || defined(__OpenBSD__)
-//# include <sys/dvdio.h>
-//#elif defined(__linux__)
-#include <linux/cdrom.h>
-//#else
-//# error "Need the DVD ioctls"
-//#endif
+#ifdef HAVE_SYS_DVDIO_H
+# include <sys/dvdio.h>
+#endif
+#ifdef LINUX_DVD
+# include <linux/cdrom.h>
+#endif
 
 
 #include "common.h"
@@ -1127,3 +1130,4 @@ int CSSDescrambleSector( DVD_key_t* key, u8* pi_sec )
 
     return(0);
 }
+#endif

@@ -2,7 +2,7 @@
  * input_dvd.c: DVD reading
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.5 2001/01/21 09:20:27 stef Exp $
+ * $Id: input_dvd.c,v 1.6 2001/01/22 05:20:44 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -39,13 +39,12 @@
 #include <malloc.h>
 
 #include <sys/ioctl.h>
-//#if defined(__NetBSD__) || defined(__OpenBSD__)
-//# include <sys/dvdio.h>
-//#elif defined(__linux__)
+#ifdef HAVE_SYS_DVDIO_H
+# include <sys/dvdio.h>
+#endif
+#ifdef LINUX_DVD
 #include <linux/cdrom.h>
-//#else
-//# error "Need the DVD ioctls"
-//#endif
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -93,6 +92,7 @@ static void DeletePES   ( void *, struct pes_packet_s * );
  *****************************************************************************/
 static int DVDProbe( input_thread_t * p_input )
 {
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     dvd_struct dvd;
 
     dvd.type = DVD_STRUCT_COPYRIGHT;
@@ -105,6 +105,9 @@ static int DVDProbe( input_thread_t * p_input )
     }
 
     return dvd.copyright.cpst;
+#else
+    return 0;
+#endif
 }
 
 /*****************************************************************************
@@ -114,7 +117,6 @@ static void DVDInit( input_thread_t * p_input )
 {
     thread_dvd_data_t *  p_method;
     off64_t              i_start;
-    int                  i;
 
     if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
     {
@@ -135,9 +137,12 @@ static void DVDInit( input_thread_t * p_input )
     p_method->ifo = IfoInit( p_input->i_handle );
     IfoRead( &(p_method->ifo) );
 
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     /* CSS authentication and keys */
     if( ( p_method->b_encrypted = DVDProbe( p_input ) ) )
     {
+        int   i;
+
 fprintf(stderr, " CSS Init start\n" );
         p_method->css = CSSInit( p_input->i_handle );
 fprintf(stderr, " CSS Init end\n" );
@@ -160,6 +165,7 @@ fprintf(stderr, " CSS Get start\n" );
         CSSGetKeys( &(p_method->css) );
 fprintf(stderr, " CSS Get end\n" );
     }
+#endif
 
     i_start = p_method->ifo.p_vts[0].i_pos +
               p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE;

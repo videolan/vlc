@@ -19,6 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
 #define KEY_SIZE 5
 
 typedef u8 DVD_key_t[KEY_SIZE];
@@ -57,3 +58,4 @@ typedef struct css_s
  *****************************************************************************/
 struct css_s    CSSInit     ( int );
 int             CSSGetKeys  ( struct css_s* );
+#endif

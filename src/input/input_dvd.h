@@ -27,8 +27,10 @@ typedef struct thread_dvd_data_s
 {
     int                     i_fd;
     boolean_t               b_encrypted;
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     /* Scrambling Information */
     struct css_s            css;
+#endif
     /* Structure that contains all information of the DVD */
     struct ifo_s            ifo;
 } thread_dvd_data_t;

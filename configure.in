@@ -107,6 +107,12 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 
+dnl Checks for DVD ioctls
+AC_CHECK_HEADERS(sys/ioctl.h)
+AC_CHECK_HEADERS(sys/dvdio.h)
+AC_CHECK_HEADERS(linux/cdrom.h)
+AC_EGREP_HEADER(dvd,linux/cdrom.h,AC_DEFINE(LINUX_DVD,1,DVD support for linux))
+
 dnl default plugins 
 PLUGINS=${PLUGINS}"yuv idct idctclassic motion ";
 
@@ -190,7 +196,6 @@ if test x$enable_x11 != xno; then PLUGINS=${PLUGINS}"x11 "; fi
 AC_ARG_ENABLE(alsa,
   [  --enable-alsa           Alsa sound drivers support (Only for linux) (default disabled)],
   [if test x$enable_alsa = xyes; then AC_CHECK_HEADER(sys/asoundlib.h, AC_CHECK_LIB(asound, main, have_alsa="true", have_alsa="false"),have_alsa="false") if test $have_alsa = true; then PLUGINS=${PLUGINS}"alsa "; fi; fi])
-
 fi
 
 AC_SUBST(SYS)

@@ -76,6 +76,9 @@
 /* Define if you have the <kernel/scheduler.h> header file.  */
 #undef HAVE_KERNEL_SCHEDULER_H
 
+/* Define if you have the <linux/cdrom.h> header file.  */
+#undef HAVE_LINUX_CDROM_H
+
 /* Define if you have the <machine/param.h> header file.  */
 #undef HAVE_MACHINE_PARAM_H
 
@@ -93,6 +96,9 @@
 
 /* Define if you have the <stddef.h> header file.  */
 #undef HAVE_STDDEF_H
+
+/* Define if you have the <sys/dvdio.h> header file.  */
+#undef HAVE_SYS_DVDIO_H
 
 /* Define if you have the <sys/ioctl.h> header file.  */
 #undef HAVE_SYS_IOCTL_H
@@ -156,4 +162,7 @@
 
 /* Define if <sys/types.h> defines boolean_t. */
 #undef BOOLEAN_T_IN_SYS_TYPES_H
+
+/* DVD support for linux */
+#undef LINUX_DVD
 
