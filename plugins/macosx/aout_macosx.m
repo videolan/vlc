@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.m,v 1.5 2002/06/01 12:32:00 sam Exp $
+ * $Id: aout_macosx.m,v 1.6 2002/06/08 14:08:46 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -157,7 +157,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     /* initialize mutex and cond */
     vlc_mutex_init( p_aout, &p_aout->p_sys->mutex_lock );
-    vlc_cond_init( &p_aout->p_sys->cond_sync );
+    vlc_cond_init( p_aout, &p_aout->p_sys->cond_sync );
 
     /* initialize source stream format */
     memcpy( &p_aout->p_sys->s_src_stream_format,

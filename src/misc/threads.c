@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.6 2002/06/04 00:11:12 sam Exp $
+ * $Id: threads.c,v 1.7 2002/06/08 14:08:46 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -176,13 +176,12 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     {
         /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
         p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
-        p_mutex->SignalObjectAndWait = p_this->p_vlc->SignalObjectAndWait;
         return ( p_mutex->mutex ? 0 : 1 );
     }
     else
     {
-        InitializeCriticalSection( &p_mutex->csection );
         p_mutex->mutex = NULL;
+        InitializeCriticalSection( &p_mutex->csection );
         return 0;
     }
 
@@ -278,7 +277,7 @@ int __vlc_mutex_destroy( char * psz_file, int i_line, vlc_mutex_t *p_mutex )
 /*****************************************************************************
  * vlc_cond_init: initialize a condition
  *****************************************************************************/
-int vlc_cond_init( vlc_cond_t *p_condvar )
+int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_init( p_condvar );
@@ -288,16 +287,32 @@ int vlc_cond_init( vlc_cond_t *p_condvar )
     return ( *p_condvar == NULL ) ? errno : 0;
 
 #elif defined( WIN32 )
-    /* initialise counter */
+    /* Initialize counter */
     p_condvar->i_waiting_threads = 0;
 
-    /* Create an auto-reset event. */
-    p_condvar->signal = CreateEvent( NULL, /* no security */
-                                     FALSE,  /* auto-reset event */
-                                     FALSE,  /* non-signaled initially */
-                                     NULL ); /* unnamed */
+    if( (GetVersion() < 0x80000000) && !p_this->p_vlc->b_fast_pthread )
+    {
+        /* Create an auto-reset event and a semaphore. */
+        p_condvar->signal = CreateEvent( NULL, FALSE, FALSE, NULL );
+        p_condvar->semaphore = CreateSemaphore( NULL, 0, 0x7fffffff, NULL );
 
-    return( !p_condvar->signal );
+        p_condvar->b_broadcast = 0;
+
+        /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
+        p_condvar->SignalObjectAndWait = p_this->p_vlc->SignalObjectAndWait;
+
+        return !p_condvar->signal || !p_condvar->semaphore;
+    }
+    else
+    {
+        p_condvar->signal = NULL;
+
+        /* Create an auto-reset event and a manual-reset event. */
+        p_condvar->p_events[SIGNAL] = CreateEvent( NULL, FALSE, FALSE, NULL );
+        p_condvar->p_events[BROADCAST] = CreateEvent( NULL, TRUE, FALSE, NULL );
+
+        return !p_condvar->p_events[SIGNAL] || !p_condvar->p_events[BROADCAST];
+    }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return pthread_cond_init( p_condvar, NULL );
@@ -341,7 +356,16 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
     return st_cond_destroy( *p_condvar );
 
 #elif defined( WIN32 )
-    return( !CloseHandle( p_condvar->signal ) );
+    if( p_condvar->signal )
+    {
+        return !CloseHandle( p_condvar->signal )
+                 || !CloseHandle( p_condvar->semaphore );
+    }
+    else
+    {
+        return !CloseHandle( p_condvar->p_events[SIGNAL] )
+                 || !CloseHandle( p_condvar->p_events[BROADCAST] );
+    }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     int i_result = pthread_cond_destroy( p_condvar );
@@ -381,7 +405,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
     wrapper.p_data = (void *)p_this;
     getitimer( ITIMER_PROF, &wrapper.itimer );
     vlc_mutex_init( p_this, &wrapper.lock );
-    vlc_cond_init( &wrapper.wait );
+    vlc_cond_init( p_this, &wrapper.wait );
     vlc_mutex_lock( &wrapper.lock );
 
     /* Alter user-passed data so that we call the wrapper instead
@@ -438,16 +462,16 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 
     if( i_ret == 0 )
     {
-        msg_Dbg( p_this, "thread %d (%s) created (%s:%d)",
-                         p_this->thread_id, psz_name, psz_file, i_line );
-
-        p_this->b_thread = 1;
-
         if( b_wait )
         {
             msg_Dbg( p_this, "waiting for thread completion" );
             vlc_cond_wait( &p_this->object_wait, &p_this->object_lock );
         }
+
+        p_this->b_thread = 1;
+
+        msg_Dbg( p_this, "thread %d (%s) created (%s:%d)",
+                         p_this->thread_id, psz_name, psz_file, i_line );
 
         vlc_mutex_unlock( &p_this->object_lock );
     }

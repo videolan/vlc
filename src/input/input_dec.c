@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.38 2002/06/02 09:03:54 sam Exp $
+ * $Id: input_dec.c,v 1.39 2002/06/08 14:08:46 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -229,7 +229,7 @@ static decoder_fifo_t * CreateDecoderFifo( input_thread_t * p_input,
 
     /* Initialize the p_fifo structure */
     vlc_mutex_init( p_input, &p_fifo->data_lock );
-    vlc_cond_init( &p_fifo->data_wait );
+    vlc_cond_init( p_input, &p_fifo->data_wait );
     p_es->p_decoder_fifo = p_fifo;
 
     p_fifo->i_id = p_es->i_id;

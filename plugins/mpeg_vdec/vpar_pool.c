@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.11 2002/06/02 09:03:54 sam Exp $
+ * $Id: vpar_pool.c,v 1.12 2002/06/08 14:08:46 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,8 +57,8 @@ void vpar_InitPool( vpar_thread_t * p_vpar )
 
     /* Initialize mutex and cond. */
     vlc_mutex_init( p_vpar->p_fifo, &p_vpar->pool.lock );
-    vlc_cond_init( &p_vpar->pool.wait_empty );
-    vlc_cond_init( &p_vpar->pool.wait_undecoded );
+    vlc_cond_init( p_vpar->p_fifo, &p_vpar->pool.wait_empty );
+    vlc_cond_init( p_vpar->p_fifo, &p_vpar->pool.wait_undecoded );
 
     /* Spawn optional video decoder threads. */
     p_vpar->pool.i_smp = 0;

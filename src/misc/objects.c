@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.10 2002/06/07 23:53:44 sam Exp $
+ * $Id: objects.c,v 1.11 2002/06/08 14:08:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -147,7 +147,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     p_new->i_children = 0;
 
     vlc_mutex_init( p_new, &p_new->object_lock );
-    vlc_cond_init( &p_new->object_wait );
+    vlc_cond_init( p_new, &p_new->object_wait );
 
     //msg_Dbg( p_new, "created object" );
 

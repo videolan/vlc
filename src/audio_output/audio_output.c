@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.85 2002/06/01 12:32:01 sam Exp $
+ * $Id: audio_output.c,v 1.86 2002/06/08 14:08:46 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -154,7 +154,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
     {
         p_aout->fifo[i_index].i_format = AOUT_FIFO_NONE;
         vlc_mutex_init( p_aout, &p_aout->fifo[i_index].data_lock );
-        vlc_cond_init( &p_aout->fifo[i_index].data_wait );
+        vlc_cond_init( p_aout, &p_aout->fifo[i_index].data_wait );
     }
 
     /* Compute the size (in audio units) of the audio output buffer. Although

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap.sh,v 1.4 2002/06/07 14:30:40 sam Exp $
+##  $Id: bootstrap.sh,v 1.5 2002/06/08 14:08:46 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -35,12 +35,12 @@ echo '' >> $file
 echo 'struct module_symbols_s' >> $file
 echo '{' >> $file
 cat include/*.h | grep '^ *VLC_EXPORT.*;' | \
-       sed 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/    \1 (* \2_inner) \3;/' >> $file
+       sed 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/    \1 (* \2_inner) \3;/' | sort >> $file
 echo '};' >> $file
 echo '' >> $file
 echo '#ifdef __PLUGIN__' >> $file
 cat include/*.h | grep '^ *VLC_EXPORT.*;' | \
-       sed 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/#   define \2 p_symbols->\2_inner/' >> $file
+       sed 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/#   define \2 p_symbols->\2_inner/' | sort >> $file
 echo '#endif /* __PLUGIN__ */' >> $file
 echo '' >> $file
 echo "$file."

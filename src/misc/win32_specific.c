@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.11 2002/06/02 14:26:16 gbazin Exp $
+ * $Id: win32_specific.c,v 1.12 2002/06/08 14:08:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -60,7 +60,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
  *****************************************************************************/
 void system_Configure( vlc_t *p_this )
 {
-    p_this->p_vlc->b_fast_pthread = config_GetInt( p_this, "fast_pthread" );
+    p_this->p_vlc->b_fast_pthread = config_GetInt( p_this, "fast-pthread" );
 }
 
 /*****************************************************************************
