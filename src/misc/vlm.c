@@ -1883,6 +1883,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
         message_child = MessageAdd( "Media Proprieties Syntax:" );
         MessageAddChild( "input (input_name)" );
         MessageAddChild( "inputdel (input_name)|all" );
+        MessageAddChild( "inputdeln input_number" );
         MessageAddChild( "output (output_name)" );
         MessageAddChild( "enabled|disabled" );
         MessageAddChild( "loop|unloop (broadcast only)" );

@@ -83,6 +83,10 @@ Note: an element is a media or a schedule.
     Media Properties Syntax:
         input (input_name)
             Adds (input_name) at the end of the media input list.
+        inputdel (input_name)|all
+            Deletes (input_name) or all items from the media input list.
+        inputdeln (input_number)
+            Deletes the item #(input_number) from the media input list.
         output (output_name)
             Defines the output of the media.
             The syntax is equivalent to the ":sout=..." option , but you
