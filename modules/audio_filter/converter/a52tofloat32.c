@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52tofloat32.c,v 1.10 2002/12/25 02:23:36 massiot Exp $
+ * $Id: a52tofloat32.c,v 1.11 2003/01/22 09:54:28 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -66,6 +66,7 @@ struct aout_filter_sys_t
     a52_state_t * p_liba52; /* liba52 internal structure */
     vlc_bool_t b_dynrng; /* see below */
     int i_flags; /* liba52 flags, see a52dec/doc/liba52.txt */
+    vlc_bool_t b_dontwarn;
     int i_nb_channels; /* number of float32 per sample */
 };
 
@@ -116,6 +117,7 @@ static int Create( vlc_object_t * _p_filter )
     }
 
     p_sys->b_dynrng = config_GetInt( p_filter, "a52-dynrng" );
+    p_sys->b_dontwarn = 0;
 
     /* We'll do our own downmixing, thanks. */
     p_sys->i_nb_channels = aout_FormatNbChannels( &p_filter->output );
@@ -190,7 +192,7 @@ static int Create( vlc_object_t * _p_filter )
         break;
 
     default:
-        msg_Err( p_filter, "unknow sample format !" );
+        msg_Err( p_filter, "unknown sample format !" );
         free( p_sys );
         return -1;
     }
@@ -293,19 +295,15 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     a52_frame( p_sys->p_liba52, p_in_buf->p_buffer,
                &i_flags, &i_sample_level, 0 );
 
-    if ( (i_flags & A52_CHANNEL_MASK) != (p_sys->i_flags & A52_CHANNEL_MASK) )
+    if ( (i_flags & A52_CHANNEL_MASK) != (p_sys->i_flags & A52_CHANNEL_MASK)
+          && !p_sys->b_dontwarn )
     {
-        msg_Err( p_filter,
-                 "liba52 couldn't do the requested downmix 0x%x->0x%x",
-                 p_sys->i_flags  & A52_CHANNEL_MASK,
-                 i_flags & A52_CHANNEL_MASK );
+        msg_Warn( p_filter,
+                  "liba52 couldn't do the requested downmix 0x%x->0x%x",
+                  p_sys->i_flags  & A52_CHANNEL_MASK,
+                  i_flags & A52_CHANNEL_MASK );
 
-        /* We do not know if the output has the same number of channels
-         * than the input, so die quietly... */
-        memset( p_out_buf->p_buffer, 0, i_bytes_per_block * 6 );
-        p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-        p_out_buf->i_nb_bytes = i_bytes_per_block * 6;
-        return;
+        p_sys->b_dontwarn = 1;
     }
 
     if( !p_sys->b_dynrng )

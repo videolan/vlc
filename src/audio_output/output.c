@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.29 2003/01/20 10:59:29 massiot Exp $
+ * $Id: output.c,v 1.30 2003/01/22 09:54:29 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -119,18 +119,19 @@ int aout_OutputNew( aout_instance_t * p_aout,
     {
         /* Stereo - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
-        val.psz_string = N_("Both");
+        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+        {
+            val.psz_string = N_("Dolby Surround");
+        }
+        else
+        {
+            val.psz_string = N_("Both");
+        }
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         val.psz_string = N_("Left");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         val.psz_string = N_("Right");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
-        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
-        {
-            val.psz_string = N_("Dolby Surround");
-            var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
-        }
-        p_aout->output.output.i_original_channels &= ~AOUT_CHAN_DOLBYSTEREO;
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }
