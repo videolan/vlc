@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.15 2002/01/21 23:57:46 massiot Exp $
+ * $Id: ac3_adec.c,v 1.16 2002/01/22 23:14:26 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -215,7 +215,7 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
 static int decoder_Run ( decoder_config_t * p_config )
 {
     ac3dec_thread_t *   p_ac3thread;
-    int sync;
+    boolean_t           b_sync = 0;
 
     intf_DbgMsg( "ac3_adec debug: ac3_adec thread launched, initializing" );
 
@@ -242,39 +242,36 @@ static int decoder_Run ( decoder_config_t * p_config )
         return( -1 );
     }
 
-    sync = 0;
-    p_ac3thread->sync_ptr = 0;
-
     /* ac3 decoder thread's main loop */
     /* FIXME : do we have enough room to store the decoded frames ?? */
     while ((!p_ac3thread->p_fifo->b_die) && (!p_ac3thread->p_fifo->b_error))
     {
         s16 * buffer;
         ac3_sync_info_t sync_info;
-        int ptr;
 
-        if (!sync) {
-            do {
-                GetBits(&p_ac3thread->ac3_decoder->bit_stream,8);
-            } while ((!p_ac3thread->sync_ptr) && (!p_ac3thread->p_fifo->b_die)
-                    && (!p_ac3thread->p_fifo->b_error));
-            
-            ptr = p_ac3thread->sync_ptr;
+        if( !b_sync )
+        {
+             int i_sync_ptr;
+#define p_bit_stream (&p_ac3thread->ac3_decoder->bit_stream)
 
-            while(ptr-- && (!p_ac3thread->p_fifo->b_die)
-                && (!p_ac3thread->p_fifo->b_error))
-            {
-                p_ac3thread->ac3_decoder->bit_stream.p_byte++;
-            }
-                        
-            /* we are in sync now */
-            sync = 1;
-        }
+             /* Go to the next data packet and jump to sync_ptr */
+             BitstreamNextDataPacket( p_bit_stream );
+             i_sync_ptr = *(p_bit_stream->p_byte - 2) << 8
+                            | *(p_bit_stream->p_byte - 1);
+             p_bit_stream->p_byte += i_sync_ptr;
+
+             /* Empty the bit FIFO and realign the bit stream */
+             p_bit_stream->fifo.buffer = 0;
+             p_bit_stream->fifo.i_available = 0;
+             AlignWord( p_bit_stream );
+             b_sync = 1;
+#undef p_bit_stream
+         }
 
         if (ac3_sync_frame (p_ac3thread->ac3_decoder, &sync_info))
         {
-            sync = 0;
-            goto bad_frame;
+            b_sync = 0;
+            continue;
         }
         
         /* Creating the audio output fifo if not created yet */
@@ -331,8 +328,8 @@ static int decoder_Run ( decoder_config_t * p_config )
 
         if (ac3_decode_frame (p_ac3thread->ac3_decoder, buffer))
         {
-            sync = 0;
-            goto bad_frame;
+            b_sync = 0;
+            continue;
         }
         
         vlc_mutex_lock (&p_ac3thread->p_aout_fifo->data_lock);
@@ -341,8 +338,7 @@ static int decoder_Run ( decoder_config_t * p_config )
         vlc_cond_signal (&p_ac3thread->p_aout_fifo->data_wait);
         vlc_mutex_unlock (&p_ac3thread->p_aout_fifo->data_lock);
 
-        bad_frame:
-            RealignBits(&p_ac3thread->ac3_decoder->bit_stream);
+        RealignBits(&p_ac3thread->ac3_decoder->bit_stream);
     }
 
     /* If b_error is set, the ac3 decoder thread enters the error loop */
@@ -420,20 +416,12 @@ static void EndThread (ac3dec_thread_t * p_ac3thread)
  * This function is called by input's NextDataPacket.
  *****************************************************************************/
 static void BitstreamCallback ( bit_stream_t * p_bit_stream,
-                                        boolean_t b_new_pes)
+                                boolean_t b_new_pes )
 {
-
-    ac3dec_thread_t *p_ac3thread=(ac3dec_thread_t *)p_bit_stream->p_callback_arg;
-
     if( b_new_pes )
     {
-        int ptr;
-        
-        ptr = *(p_bit_stream->p_byte + 1);
-        ptr <<= 8;
-        ptr |= *(p_bit_stream->p_byte + 2);
-        p_ac3thread->sync_ptr = ptr;
-        p_bit_stream->p_byte += 3;                                                            
+        /* Drop special AC3 header */
+        p_bit_stream->p_byte += 3;
     }
 }
 
