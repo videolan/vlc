@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: headers.c,v 1.9 2003/01/30 02:16:09 gbazin Exp $
+ * $Id: headers.c,v 1.10 2003/02/04 11:51:21 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -56,6 +56,7 @@ static void CopyrightExtension( vpar_thread_t * p_vpar );
 /*
  * Standard variables
  */
+
 
 /*****************************************************************************
  * pi_default_intra_quant : default quantization matrix
@@ -311,6 +312,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     int i_aspect;
 
+    p_vpar->sequence.b_after_sequence_header = 1;
     p_vpar->sequence.i_width = GetBits( &p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_height = GetBits( &p_vpar->bit_stream, 12 );
     i_aspect = GetBits( &p_vpar->bit_stream, 4 );
@@ -618,7 +620,42 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /* Extension and User data. */
     ExtensionAndUserData( p_vpar );
 
+#define P_picture p_vpar->picture.p_picture
     p_vpar->pc_pictures[p_vpar->picture.i_coding_type]++;
+
+    if ( p_vpar->picture.i_coding_type != I_CODING_TYPE
+          && p_vpar->sequence.b_after_sequence_header
+          && p_vpar->sequence.p_backward == NULL )
+    {
+        /* Intra-slice refresh. */
+        while( ( P_picture = vout_CreatePicture( p_vpar->p_vout,
+                                 1, 0, 0 ) ) == NULL )
+        {
+            if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
+            {
+                return;
+            }
+            msleep( VOUT_OUTMEM_SLEEP );
+        }
+
+        P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
+        memset( P_picture->p[0].p_pixels, 0,
+                p_vpar->sequence.i_height * p_vpar->sequence.i_width );
+
+        memset( P_picture->p[1].p_pixels, 0x80,
+                p_vpar->sequence.i_height * p_vpar->sequence.i_width
+                 >> (p_vpar->sequence.b_chroma_h_subsampled
+                      + p_vpar->sequence.b_chroma_v_subsampled) );
+
+        memset( P_picture->p[2].p_pixels, 0x80,
+                p_vpar->sequence.i_height * p_vpar->sequence.i_width
+                 >> (p_vpar->sequence.b_chroma_h_subsampled
+                      + p_vpar->sequence.b_chroma_v_subsampled) );
+
+        /* Update the reference pointers. */
+        ReferenceUpdate( p_vpar, I_CODING_TYPE, P_picture );
+    }
+    p_vpar->sequence.b_after_sequence_header = 0;
 
     if( p_vpar->picture.i_current_structure )
     {
@@ -766,7 +803,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /* OK, now we are sure we will decode the picture. */
     p_vpar->pc_decoded_pictures[p_vpar->picture.i_coding_type]++;
 
-#define P_picture p_vpar->picture.p_picture
     p_vpar->picture.b_error = 0;
 
     if( !p_vpar->picture.i_current_structure )

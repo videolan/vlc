@@ -2,7 +2,7 @@
  * parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: parser.h,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: parser.h,v 1.3 2003/02/04 11:51:21 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -133,6 +133,8 @@ typedef struct sequence_s
     int                 i_current_rate;
     vlc_bool_t          b_expect_discontinuity; /* reset the frame predictors
                                                  * after the current frame   */
+    vlc_bool_t          b_after_sequence_header; /* is it the next frame after
+                                                  * the sequence header ?    */
 
     /* Copyright extension */
     vlc_bool_t          b_copyright_flag;     /* Whether the following
