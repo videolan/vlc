@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.21 2003/11/27 19:39:53 fenrir Exp $
+ * $Id: copy.c,v 1.22 2004/01/25 17:41:30 murray Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -38,7 +38,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Copy packetizer") );
+    set_description( _("Copy Packetizer") );
     set_capability( "packetizer", 1 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -177,7 +177,7 @@ static int Open( vlc_object_t *p_this )
                     p_dec->fmt_out.i_codec = VLC_FOURCC('s','3','2','l');
                     break;
                 default:
-                    msg_Err( p_dec, "unknown raw audio sample size !!" );
+                    msg_Err( p_dec, "unknown raw audio sample size" );
                     return VLC_EGENERIC;
             }
             break;
@@ -198,7 +198,7 @@ static int Open( vlc_object_t *p_this )
                     p_dec->fmt_out.i_codec = VLC_FOURCC('s','3','2','b');
                     break;
                 default:
-                    msg_Err( p_dec, "unknown raw audio sample size !!" );
+                    msg_Err( p_dec, "unknown raw audio sample size" );
                     return VLC_EGENERIC;
             }
             break;
@@ -219,7 +219,7 @@ static int Open( vlc_object_t *p_this )
                     p_dec->fmt_out.i_codec = VLC_FOURCC('s','3','2','l');
                     break;
                 default:
-                    msg_Err( p_dec, "unknown raw audio sample size !!" );
+                    msg_Err( p_dec, "unknown raw audio sample size" );
                     return VLC_EGENERIC;
             }
             break;

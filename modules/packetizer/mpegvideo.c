@@ -2,7 +2,7 @@
  * mpegvideo.c: parse and packetize an MPEG1/2 video stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.25 2003/12/07 12:11:13 gbazin Exp $
+ * $Id: mpegvideo.c,v 1.26 2004/01/25 17:41:30 murray Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -55,7 +55,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("MPEG-I/II video packetizer") );
+    set_description( _("MPEG-I/II Video Packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( Open, Close );
 vlc_module_end();
