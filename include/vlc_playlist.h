@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: vlc_playlist.h,v 1.23 2004/01/10 14:24:33 hartman Exp $
+ * $Id: vlc_playlist.h,v 1.24 2004/01/11 00:45:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -54,6 +54,15 @@ struct item_info_category_t
     char * psz_name;            /**< Name of this category */
     int i_infos;                /**< Number of infos in the category */
     item_info_t **pp_infos;     /**< Pointer to an array of infos */
+};
+
+/**
+ * playlist export helper structure
+ */
+struct playlist_export_t
+{
+    char *psz_filename;
+    FILE *p_file;
 };
 
 /**
@@ -209,8 +218,8 @@ VLC_EXPORT( int,  playlist_Sort, ( playlist_t *, int, int) );
 VLC_EXPORT( int,  playlist_Move, ( playlist_t *, int, int ) );
 
 /* Load/Save */
-VLC_EXPORT( int,  playlist_LoadFile, ( playlist_t *, const char * ) );
-VLC_EXPORT( int,  playlist_SaveFile, ( playlist_t *, const char * ) );
+VLC_EXPORT( int,  playlist_Import, ( playlist_t *, const char * ) );
+VLC_EXPORT( int,  playlist_Export, ( playlist_t *, const char *, const char * ) );
 
 /**
  *  tell if a playlist is currently playing.

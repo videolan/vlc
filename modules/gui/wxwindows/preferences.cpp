@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.44 2003/12/22 02:24:52 sam Exp $
+ * $Id: preferences.cpp,v 1.45 2004/01/11 00:45:06 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -328,7 +328,7 @@ static char * GetCapabilityHelp( char *psz_capability, int i_type)
     if( !strcasecmp(psz_capability,"video filter") )
         return i_type == 1 ? VIDEO_FILTER_TITLE : VIDEO_FILTER_HELP;
 
-    return "";
+    return " ";
 }
 
 /*****************************************************************************

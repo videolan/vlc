@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.7 2004/01/10 14:24:33 hartman Exp $
+ * $Id: item-ext.c,v 1.8 2004/01/11 00:45:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -387,6 +387,14 @@ int playlist_Clear( playlist_t * p_playlist ) {
     {
         playlist_Delete( p_playlist, 0 );
     }
+
+    p_playlist->i_index = -1;
+    p_playlist->i_size = 0;
+    p_playlist->pp_items = NULL;
+
+    p_playlist->i_groups = 0;
+    p_playlist->pp_groups = NULL;
+
     return 0;
 }
 

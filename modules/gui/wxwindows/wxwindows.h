@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.83 2004/01/05 13:00:39 zorglub Exp $
+ * $Id: wxwindows.h,v 1.84 2004/01/11 00:45:06 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -740,6 +740,7 @@ private:
 /* Playlist */
 class ItemInfoDialog;
 class NewGroup;
+class ExportPlaylist;
 class Playlist: public wxFrame
 {
 public:
@@ -841,6 +842,24 @@ protected:
     char *psz_name;
 };
 
+class ExportPlaylist: public wxDialog
+{
+public:
+    /* Constructor */
+    ExportPlaylist(intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~ExportPlaylist();
+
+private:
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnOk( wxCommandEvent& event );
+    void OnCancel( wxCommandEvent& event );
+    void OnBrowse( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+    intf_thread_t *p_intf;
+    wxTextCtrl *file_text;
+    wxComboBox *type_combo;
+};
 
 /* ItemInfo Dialog */
 class ItemInfoDialog: public wxDialog

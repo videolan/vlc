@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.35 2004/01/10 03:36:03 hartman Exp $
+ * $Id: playlist.cpp,v 1.36 2004/01/11 00:45:06 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -86,7 +86,9 @@ enum
     Search_Event,
 
     /* controls */
-    ListView_Event
+    ListView_Event,
+
+    Browse_Event,  /* For export playlist */
 };
 
 BEGIN_EVENT_TABLE(Playlist, wxFrame)
@@ -152,6 +154,14 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(NewGroup, wxDialog)
     EVT_BUTTON( wxID_OK, NewGroup::OnOk)
     EVT_BUTTON( wxID_CANCEL, NewGroup::OnCancel)
+END_EVENT_TABLE()
+
+
+/* Event Table for the ExportPlaylist class */
+BEGIN_EVENT_TABLE(ExportPlaylist, wxDialog)
+    EVT_BUTTON( wxID_OK, ExportPlaylist::OnOk)
+    EVT_BUTTON( wxID_CANCEL, ExportPlaylist::OnCancel)
+    EVT_BUTTON( Browse_Event, ExportPlaylist::OnBrowse)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -408,17 +418,18 @@ void Playlist::UpdateItem( int i )
     {
         return;
     }
-    if( i < 0 || i > p_playlist->i_size )
+    if( i < 0 || i >= p_playlist->i_size || !p_playlist->pp_items[i] )
     {
         vlc_object_release(p_playlist);
         return;
     }
     listview->SetItem( i, 0, wxL2U(p_playlist->pp_items[i]->psz_name) );
     listview->SetItem( i, 1, wxL2U( playlist_GetInfo( p_playlist, i,
-                                       "General" , "Author" ) ) );
+                                       _("General") , _("Author") ) ) );
+    char *psz_group = playlist_FindGroup(p_playlist,p_playlist->
+                                    pp_items[i]->i_group);
     listview->SetItem( i, 2,
-             wxL2U(playlist_FindGroup(p_playlist,p_playlist->
-                                    pp_items[i]->i_group) ) );
+             wxL2U( psz_group ? psz_group : _("Normal") ) );
 
     if( p_playlist->pp_items[i]->b_enabled == VLC_FALSE )
     {
@@ -577,23 +588,9 @@ void Playlist::OnClose( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
 {
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    wxFileDialog dialog( this, wxU(_("Save playlist")),
-                         wxT(""), wxT(""), wxT("*"), wxSAVE );
-
-    if( dialog.ShowModal() == wxID_OK )
-    {
-        playlist_SaveFile( p_playlist, dialog.GetPath().mb_str() );
-    }
-
-    vlc_object_release( p_playlist );
+    ExportPlaylist *exp_pl = new ExportPlaylist( p_intf, this);
+    exp_pl->ShowModal();
+    delete exp_pl;
 }
 
 void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
@@ -611,7 +608,7 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
 
     if( dialog.ShowModal() == wxID_OK )
     {
-        playlist_LoadFile( p_playlist, dialog.GetPath().mb_str() );
+        playlist_Import( p_playlist, dialog.GetPath().mb_str() );
     }
 
     vlc_object_release( p_playlist );
@@ -1153,7 +1150,7 @@ int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
 
 
 /***************************************************************************
- * NewGroup
+ * NewGroup Class
  ***************************************************************************/
 NewGroup::NewGroup( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     wxDialog( _p_parent, -1, wxU(_("New Group")), wxDefaultPosition,
@@ -1218,13 +1215,148 @@ void NewGroup::OnOk( wxCommandEvent& event )
         {
             psz_name = NULL;
         }
+        vlc_object_release( p_playlist );
     }
 
-    vlc_object_release( p_playlist );
     EndModal( wxID_OK );
 }
 
 void NewGroup::OnCancel( wxCommandEvent& WXUNUSED(event) )
 {
     EndModal( wxID_CANCEL );
+}
+
+
+
+/***************************************************************************
+ * Export playlist class
+ ***************************************************************************/
+ExportPlaylist::ExportPlaylist( intf_thread_t *_p_intf, wxWindow *_p_parent ):
+    wxDialog( _p_parent, -1, wxU(_("Export playlist")), wxDefaultPosition,
+             wxDefaultSize, wxDEFAULT_FRAME_STYLE )
+{
+    vlc_list_t *p_list;
+    module_t *p_module;
+
+    /* Initializations */
+    p_intf = _p_intf;
+    SetIcon( *p_intf->p_sys->p_icon );
+
+    /* Create a panel to put everything in*/
+    wxPanel *panel = new wxPanel( this, -1 );
+    panel->SetAutoLayout( TRUE );
+
+    /* Create the file box */
+    wxStaticBox *file_box = new wxStaticBox( panel, -1,
+                                             wxU(_("File to save to")) );
+    wxStaticBoxSizer *file_sizer = new wxStaticBoxSizer( file_box,
+                                                        wxHORIZONTAL );
+
+    file_text = new wxTextCtrl(panel, -1, wxU(""),wxDefaultPosition,
+                               wxSize(250,-1),wxTE_PROCESS_ENTER);
+
+    file_text->SetToolTip( wxU(_("Enter the name of the file to export "
+                                 "the playlist to.")) );
+
+    wxButton *file_button = new wxButton( panel, Browse_Event,
+                                          wxU(_("Browse")) );
+
+    file_sizer->Add( file_text, 0, wxALL | wxALIGN_CENTER , 5 );
+    file_sizer->Add( file_button, 0, wxALL | wxALIGN_CENTER , 5 );
+
+    /* Create the type box */
+    wxStaticBox *type_box = new wxStaticBox( panel, -1,
+                                             wxU(_("Select export type")) );
+
+    wxStaticBoxSizer *type_sizer = new wxStaticBoxSizer( type_box,
+                                                        wxHORIZONTAL );
+
+    type_combo = new wxComboBox( panel, -1, wxT(""), wxDefaultPosition,
+                                 wxSize(250, -1), 0, NULL );
+
+    type_sizer->Add( type_combo, 0, wxALL | wxALIGN_CENTER, 5 );
+    type_sizer->Layout();
+
+
+
+    wxButton *ok_button = new wxButton(panel, wxID_OK, wxU(_("OK")) );
+    ok_button->SetDefault();
+    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL,
+                                            wxU(_("Cancel")) );
+
+    wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
+
+    button_sizer->Add( ok_button, 0, wxALL, 5 );
+    button_sizer->Add( cancel_button, 0, wxALL, 5 );
+    button_sizer->Layout();
+
+    wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
+    panel_sizer->Add( file_sizer, 0, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( type_sizer, 0, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( button_sizer, 0, wxEXPAND | wxALL, 5 );
+    panel_sizer->Layout();
+
+    panel->SetSizerAndFit( panel_sizer );
+
+    wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
+    main_sizer->Add( panel, 1, wxEXPAND, 0 );
+    main_sizer->Layout();
+    SetSizerAndFit( main_sizer );
+
+    /* build a list of available modules */
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+    {
+        p_module = (module_t *)p_list->p_values[i_index].p_object ;
+        if( !strcmp( p_module->psz_capability, "playlist export" ) )
+        {
+            type_combo->Append( wxU(p_module->psz_longname),
+                                p_module->pp_shortcuts[1] ?
+                                p_module->pp_shortcuts[1] :
+                                p_module->psz_object_name );
+        }
+    }
+    vlc_list_release( p_list );
+}
+
+
+ExportPlaylist::~ExportPlaylist()
+{
+}
+
+void ExportPlaylist::OnOk( wxCommandEvent& WXUNUSED(event) )
+{
+    playlist_t * p_playlist =
+          (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+
+    if( p_playlist )
+    {
+        char *psz_type = (char *)type_combo->GetClientData(
+                                             type_combo->GetSelection() );
+        if( file_text->GetValue().mb_str() && psz_type )
+        {
+            playlist_Export( p_playlist, file_text->GetValue().mb_str(),
+                             psz_type );
+        }
+    }
+
+    vlc_object_release( p_playlist );
+    EndModal( wxID_OK );
+}
+
+void ExportPlaylist::OnCancel( wxCommandEvent& WXUNUSED(event) )
+{
+    EndModal( wxID_CANCEL );
+}
+
+void ExportPlaylist::OnBrowse( wxCommandEvent& WXUNUSED(event) )
+{
+    wxFileDialog dialog( this, wxU(_("Save playlist")),
+                         wxT(""), wxT(""), wxT("*"), wxSAVE );
+
+    if( dialog.ShowModal() == wxID_OK )
+    {
+        file_text->SetValue( dialog.GetPath() );
+    }
 }

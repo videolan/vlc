@@ -2,7 +2,7 @@
  * playlist.c : Playlist groups management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: group.c,v 1.6 2004/01/06 08:50:20 zorglub Exp $
+ * $Id: group.c,v 1.7 2004/01/11 00:45:06 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -119,7 +119,7 @@ int playlist_DeleteGroup( playlist_t *p_playlist, int i_id )
 char *playlist_FindGroup( playlist_t *p_playlist, int i_id )
 {
     int i;
-    for( i=0 ; i<= p_playlist->i_groups; i++ )
+    for( i=0 ; i< p_playlist->i_groups; i++ )
     {
         if( p_playlist->pp_groups[i]->i_id == i_id )
         {
