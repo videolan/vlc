@@ -29,9 +29,13 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
-#include <unistd.h>
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_UNISTD_H
+#    include <unistd.h>
+#endif
+
 #include <vlc/decoder.h>
 #include <vlc/input.h>
 #include <vlc/intf.h>
