@@ -89,7 +89,7 @@ ifeq (,$($(module_name)_CUSTOM))
 
 ../$(module_name).a: $(EXTRA_DEP) $(OBJ_ALL)
 	rm -f $@
-	ar rc $@ $(OBJ_ALL)
+	$(AR) rc $@ $(OBJ_ALL)
 	$(RANLIB) $@
 endif
 

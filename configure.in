@@ -1186,12 +1186,12 @@ then
   # check for cross-compiling
   SDL_PREFIX=
   AC_ARG_WITH(sdl,
-    [    --with-sdl=PATH       path to libsdl (needed for cross-compiling),
+    [    --with-sdl-prefix=PATH path to libsdl (needed for cross-compiling),
                                e.g use as:
-                               --with-sdl=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-  if test "x$with_sdl" != "xno" -a "x$with_sdl" != "x"
+                               --with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
+  if test "x$with_sdl_prefix" != "xno" -a "x$with_sdl_prefix" != "x"
   then
-    SDL_PREFIX="--prefix=$with_sdl"
+    SDL_PREFIX="--prefix=$with_sdl_prefix"
   fi
   if test x${SDL_CONFIG} != xno
   then
@@ -1513,12 +1513,12 @@ then
   # check for cross-compiling
   GTK_PREFIX=
   AC_ARG_WITH(gtk,
-    [    --with-gtk=PATH       path to libgtk (needed for cross-compiling),
+    [    --with-gtk-prefix=PATH path to libgtk (needed for cross-compiling),
                           e.g use as:
-                          --with-gtk=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-  if test "x$with_gtk" != "xno" -a "x$with_gtk" != "x"
+                          --with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
+  if test "x$with_gtk_prefix" != "xno" -a "x$with_gtk_prefix" != "x"
   then
-    GTK_PREFIX="--prefix=$with_gtk"
+    GTK_PREFIX="--prefix=$with_gtk_prefix"
   fi
   if test "x${GTK_CONFIG}" != "xno"
   then
@@ -1538,7 +1538,7 @@ then
 
     # now look for gpe support
     AC_ARG_WITH(gpe-prefix,
-    [    --with-gpe-prefix=PATH       gpe installation path prefix (default search in \$PATH)],[],[])
+    [    --with-gpe-prefix=PATH gpe installation path prefix (default search in \$PATH)],[],[])
     if test "x$with_gpe_prefix" != "xno"  -a "x$with_gpe_prefix" != "x"
     then
       gpe_CFLAGS="-I$with_gpe_prefix/include"
@@ -1562,7 +1562,7 @@ then
       if test "x${ac_cv_gpe_headers}" = "xyes"
       then
         familiar_CFLAGS="${familiar_CFLAGS} ${gpe_CFLAGS}"
-        familiar_LDFLAGS="${familiar_LDFLAGS} ${gpe_LDFLAGS}" # -lgpewidget"
+        familiar_LDFLAGS="${familiar_LDFLAGS} ${gpe_LDFLAGS}" 
       fi
     fi 
     if test "x${ac_cv_gtk_headers}" = "xyes"
