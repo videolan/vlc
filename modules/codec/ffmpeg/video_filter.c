@@ -171,8 +171,24 @@ static int CheckInit( filter_t *p_filter )
           p_filter->fmt_in.video.i_width * p_filter->fmt_in.video.i_height >
           p_filter->fmt_out.video.i_width * p_filter->fmt_out.video.i_height;
 
-        if( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0') )
+        if( p_sys->i_src_ffmpeg_chroma != PIX_FMT_YUV420P &&
+            p_sys->i_src_ffmpeg_chroma != PIX_FMT_YUVJ420P &&
+            p_sys->i_dst_ffmpeg_chroma != PIX_FMT_YUV420P &&
+            p_sys->i_dst_ffmpeg_chroma != PIX_FMT_YUVJ420P )
+        {
+            msg_Err( p_filter, "img_resample_init only deals with I420" );
+            return VLC_EGENERIC;
+        }
+        else if( p_sys->i_src_ffmpeg_chroma != PIX_FMT_YUV420P &&
+                 p_sys->i_src_ffmpeg_chroma != PIX_FMT_YUVJ420P )
+        {
             p_sys->b_resize_first = VLC_FALSE;
+        }
+        else if( p_sys->i_dst_ffmpeg_chroma != PIX_FMT_YUV420P &&
+                 p_sys->i_dst_ffmpeg_chroma != PIX_FMT_YUVJ420P )
+        {
+            p_sys->b_resize_first = VLC_TRUE;
+        }
 
         if( p_sys->b_resize )
         {
