@@ -84,6 +84,11 @@ private:
 
     wxListView *list_ctrl;
 };
+
+/*****************************************************************************
+ * Event Table.
+ *****************************************************************************/
+
 DEFINE_LOCAL_EVENT_TYPE( wxEVT_BOOKMARKS );
 
 BEGIN_EVENT_TABLE(BookmarksDialog, wxFrame)
@@ -237,9 +242,11 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     panel_sizer->Add( button_add, 0, wxEXPAND );
     panel_sizer->Add( button_del, 0, wxEXPAND );
     panel_sizer->Add( button_clear, 0, wxEXPAND );
+
     panel_sizer->Add( button_edit, 0, wxEXPAND );
     panel_sizer->Add( 0, 0, 1 );
     panel_sizer->Add( button_extract, 0, wxEXPAND );
+
     panel->SetSizerAndFit( panel_sizer );
 
     list_ctrl = new wxListView( main_panel, -1,
@@ -345,21 +352,12 @@ void BookmarksDialog::OnAdd( wxCommandEvent& event )
     bookmark.i_byte_offset = 0;
     bookmark.i_time_offset = 0;
 
-
-    /* FIXME --fenrir
-     * - stream_Tell can't be use (not reentrant)
-     * - nobody except src/input/ could touch p_input
-     *   -> create new INPUT_CONTROL ...
-     */
-#if 0
     var_Get( p_input, "position", &pos );
     bookmark.psz_name = NULL;
-    bookmark.i_byte_offset = stream_Tell( p_input->input.p_stream );
-      (int64_t)((double)pos.f_float * p_input->input.p_access->info.i_size);
+    input_Control( p_input, INPUT_GET_BYTE_POSITION, &bookmark.i_byte_offset );
     var_Get( p_input, "time", &pos );
     bookmark.i_time_offset = pos.i_time;
     input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
-#endif
     vlc_object_release( p_input );
 
     Update();

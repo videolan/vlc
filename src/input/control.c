@@ -55,10 +55,10 @@ int input_Control( input_thread_t *p_input, int i_query, ...  )
 
 int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 {
-    /* seekpoint_t *p_bkmk, ***ppp_bkmk;
+    seekpoint_t *p_bkmk, ***ppp_bkmk;
     int i_bkmk = 0;
     int *pi_bkmk;
-    */
+
     int i_int, *pi_int;
     double f, *pf;
     int64_t i_64, *pi_64;
@@ -247,166 +247,245 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
-#if 0
         case INPUT_ADD_BOOKMARK:
             p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
             p_bkmk = vlc_seekpoint_Duplicate( p_bkmk );
+
+            vlc_mutex_lock( &p_input->input.p_item->lock );
             if( !p_bkmk->psz_name )
             {
                  asprintf( &p_bkmk->psz_name, _("Bookmark %i"),
-                           p_input->i_bookmarks );
+                           p_input->i_bookmark );
             }
-            TAB_APPEND( p_input->i_bookmarks, p_input->pp_bookmarks, p_bkmk );
+
+            TAB_APPEND( p_input->i_bookmark, p_input->bookmark, p_bkmk );
 
             /* Reflect the changes on the object var */
             var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
             {
+                vlc_value_t val, text;
                 int i;
-                for( i = 0; i < p_input->i_bookmarks; i++ )
+
+                for( i = 0; i < p_input->i_bookmark; i++ )
                 {
                     val.i_int = i;
-                    text.psz_string = p_input->pp_bookmarks[i]->psz_name;
+                    text.psz_string = p_input->bookmark[i]->psz_name;
                     var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
                                 &val, &text );
                 }
             }
+            vlc_mutex_unlock( &p_input->input.p_item->lock );
 
             UpdateBookmarksOption( p_input );
 
-            i_ret = VLC_SUCCESS;
+            return VLC_SUCCESS;
             break;
 
         case INPUT_CHANGE_BOOKMARK:
-             p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
-             i_bkmk = (int)va_arg( args, int );
+            p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
+            i_bkmk = (int)va_arg( args, int );
 
-             if( i_bkmk < p_input->i_bookmarks )
-             {
-                 p_input->pp_bookmarks[i_bkmk] = p_bkmk;
+            vlc_mutex_lock( &p_input->input.p_item->lock );
+            if( i_bkmk < p_input->i_bookmark )
+            {
+                vlc_value_t val, text;
+                int i;
 
-                 /* Reflect the changes on the object var */
-                 var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
-                 for( i = 0; i < p_input->i_bookmarks; i++ )
-                 {
-                     val.i_int = i;
-                     text.psz_string = p_input->pp_bookmarks[i]->psz_name;
-                     var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
-                                 &val, &text );
-                 }
-             }
-             UpdateBookmarksOption( p_input );
+                p_input->bookmark[i_bkmk] = p_bkmk;
 
-             i_ret = VLC_SUCCESS;
-             break;
+                /* Reflect the changes on the object var */
+                var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
+                for( i = 0; i < p_input->i_bookmark; i++ )
+                {
+                    val.i_int = i;
+                    text.psz_string = p_input->bookmark[i]->psz_name;
+                    var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
+                                &val, &text );
+                }
+            }
+            vlc_mutex_unlock( &p_input->input.p_item->lock );
+
+            UpdateBookmarksOption( p_input );
+
+            return VLC_SUCCESS;
+            break;
 
         case INPUT_DEL_BOOKMARK:
             i_bkmk = (int)va_arg( args, int );
-            if( i_bkmk < p_input->i_bookmarks )
+
+            vlc_mutex_lock( &p_input->input.p_item->lock );
+            if( i_bkmk < p_input->i_bookmark )
             {
+                vlc_value_t val, text;
                 int i;
-                p_bkmk = p_input->pp_bookmarks[i_bkmk];
-                TAB_REMOVE( p_input->i_bookmarks, p_input->pp_bookmarks,
+
+                p_bkmk = p_input->bookmark[i_bkmk];
+                TAB_REMOVE( p_input->i_bookmark, p_input->bookmark,
                             p_bkmk );
                 vlc_seekpoint_Delete( p_bkmk );
 
                 /* Reflect the changes on the object var */
                 var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
-                for( i = 0; i < p_input->i_bookmarks; i++ )
+                for( i = 0; i < p_input->i_bookmark; i++ )
                 {
                     val.i_int = i;
-                    text.psz_string = p_input->pp_bookmarks[i]->psz_name;
+                    text.psz_string = p_input->bookmark[i]->psz_name;
                     var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
                                 &val, &text );
                 }
+                vlc_mutex_unlock( &p_input->input.p_item->lock );
 
                 UpdateBookmarksOption( p_input );
 
-                i_ret = VLC_SUCCESS;
+                return VLC_SUCCESS;
             }
-            else i_ret = VLC_EGENERIC;
+            vlc_mutex_unlock( &p_input->input.p_item->lock );
+
+            return VLC_EGENERIC;
             break;
 
         case INPUT_GET_BOOKMARKS:
             ppp_bkmk = (seekpoint_t ***)va_arg( args, seekpoint_t *** );
             pi_bkmk = (int *)va_arg( args, int * );
-            if( p_input->i_bookmarks )
+
+            vlc_mutex_lock( &p_input->input.p_item->lock );
+            if( p_input->i_bookmark )
             {
                 int i;
 
-                *pi_bkmk = p_input->i_bookmarks;
+                *pi_bkmk = p_input->i_bookmark;
                 *ppp_bkmk = malloc( sizeof(seekpoint_t *) *
-                              p_input->i_bookmarks );
-                for( i = 0; i < p_input->i_bookmarks; i++ )
+                                    p_input->i_bookmark );
+                for( i = 0; i < p_input->i_bookmark; i++ )
                 {
                     (*ppp_bkmk)[i] =
-                        vlc_seekpoint_Duplicate(p_input->pp_bookmarks[i]);
+                        vlc_seekpoint_Duplicate(p_input->bookmark[i]);
                 }
-                i_ret = VLC_SUCCESS;
+
+                vlc_mutex_unlock( &p_input->input.p_item->lock );
+                return VLC_SUCCESS;
             }
             else
             {
                 *ppp_bkmk = NULL;
                 *pi_bkmk = 0;
-                i_ret = VLC_EGENERIC;
+
+                vlc_mutex_unlock( &p_input->input.p_item->lock );
+                return VLC_EGENERIC;
             }
             break;
 
         case INPUT_CLEAR_BOOKMARKS:
-            if( p_input->i_bookmarks )
+
+            vlc_mutex_lock( &p_input->input.p_item->lock );
+            if( p_input->i_bookmark )
             {
                 int i;
 
-                for( i = p_input->i_bookmarks - 1; i >= 0; i-- )
+                for( i = p_input->i_bookmark - 1; i >= 0; i-- )
                 {
-                    p_bkmk = p_input->pp_bookmarks[i];
-                    TAB_REMOVE( p_input->i_bookmarks, p_input->pp_bookmarks,
+                    p_bkmk = p_input->bookmark[i];
+                    TAB_REMOVE( p_input->i_bookmark, p_input->bookmark,
                                 p_bkmk );
                     vlc_seekpoint_Delete( p_bkmk );
                 }
                 var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
             }
+            vlc_mutex_unlock( &p_input->input.p_item->lock );
 
             UpdateBookmarksOption( p_input );
 
-            i_ret = VLC_SUCCESS;
+            return VLC_SUCCESS;
             break;
 
         case INPUT_SET_BOOKMARK:
             i_bkmk = (int)va_arg( args, int );
-            if( i_bkmk >= 0 && i_bkmk < p_input->i_bookmarks )
+
+            vlc_mutex_lock( &p_input->input.p_item->lock );
+            if( i_bkmk >= 0 && i_bkmk < p_input->i_bookmark )
             {
                 vlc_value_t pos;
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
-                if( p_input->pp_bookmarks[i_bkmk]->i_byte_offset ||
-                    ( !p_input->pp_bookmarks[i_bkmk]->i_byte_offset &&
-                      !p_input->pp_bookmarks[i_bkmk]->i_time_offset ) )
+                int i_ret;
+
+                if( p_input->bookmark[i_bkmk]->i_time_offset )
                 {
-                    pos.f_float = p_input->pp_bookmarks[i_bkmk]->i_byte_offset/
-                        (double)p_input->stream.p_selected_area->i_size;
-                    i_ret = var_Set( p_input, "position", pos );
-                }
-                else if( p_input->pp_bookmarks[i_bkmk]->i_time_offset )
-                {
-                    pos.i_time = p_input->pp_bookmarks[i_bkmk]->i_time_offset;
+                    pos.i_time = p_input->bookmark[i_bkmk]->i_time_offset;
                     i_ret = var_Set( p_input, "time", pos );
                 }
-                vlc_mutex_lock( &p_input->stream.stream_lock );
+                else if( p_input->bookmark[i_bkmk]->i_byte_offset )
+                {
+                    pos.f_float = !p_input->input.p_stream ? 0 :
+                        p_input->bookmark[i_bkmk]->i_byte_offset /
+                        stream_Size( p_input->input.p_stream );
+                    i_ret = var_Set( p_input, "position", pos );
+                }
+                else
+                {
+                    pos.f_float = 0;
+                    i_ret = var_Set( p_input, "position", pos );
+                }
+
+                vlc_mutex_unlock( &p_input->input.p_item->lock );
+                return i_ret;
             }
             else
             {
-                i_ret = VLC_EGENERIC;
+                vlc_mutex_unlock( &p_input->input.p_item->lock );
+                return VLC_EGENERIC;
             }
+
             break;
 
-#endif
-        case INPUT_GET_BOOKMARKS:
-        case INPUT_CLEAR_BOOKMARKS:
-        case INPUT_ADD_BOOKMARK:
-        case INPUT_CHANGE_BOOKMARK:
-        case INPUT_DEL_BOOKMARK:
-        case INPUT_SET_BOOKMARK:
-            /* FIXME */
-            msg_Err( p_input, "unimplemented query in input_vaControl" );
+        case INPUT_ADD_OPTION:
+        {
+            char *psz_option = (char *)va_arg( args, char * );
+            char *psz_value = (char *)va_arg( args, char * );
+            int i;
+
+            vlc_mutex_lock( &p_input->input.p_item->lock );
+            /* Check if option already exists */            
+            for( i = 0; i < p_input->input.p_item->i_options; i++ )
+            {
+                if( !strncmp( p_input->input.p_item->ppsz_options[i],
+                              psz_option, strlen( psz_option ) ) &&
+                    p_input->input.p_item->ppsz_options[i][strlen(psz_option)]
+                      == '=' )
+                {
+                    free( p_input->input.p_item->ppsz_options[i] );
+                    break;
+                }
+            }
+            if( i == p_input->input.p_item->i_options )
+            {
+                p_input->input.p_item->i_options++;
+                p_input->input.p_item->ppsz_options =
+                    realloc( p_input->input.p_item->ppsz_options,
+                             p_input->input.p_item->i_options *
+                             sizeof(char **) );
+            }
+
+            asprintf( &p_input->input.p_item->ppsz_options[i],
+                      "%s=%s", psz_option, psz_value ) ;
+            vlc_mutex_unlock( &p_input->input.p_item->lock );
+
+            return VLC_SUCCESS;
+            break;
+        }
+
+        case INPUT_GET_BYTE_POSITION:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = !p_input->input.p_stream ? 0 :
+                stream_Tell( p_input->input.p_stream );
+            return VLC_SUCCESS;
+            break;
+
+        case INPUT_SET_BYTE_SIZE:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = !p_input->input.p_stream ? 0 :
+                stream_Size( p_input->input.p_stream );
+            return VLC_SUCCESS;
+            break;
+
         default:
             msg_Err( p_input, "unknown query in input_vaControl" );
             return VLC_EGENERIC;
@@ -427,39 +506,36 @@ static void NotifyPlaylist( input_thread_t *p_input )
 
 static void UpdateBookmarksOption( input_thread_t *p_input )
 {
-#if 0
     int i, i_len = 0;
     char *psz_value = NULL, *psz_next = NULL;
-    /* FIXME */
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    for( i = 0; i < p_input->i_bookmarks; i++ )
+    vlc_mutex_lock( &p_input->input.p_item->lock );
+    for( i = 0; i < p_input->i_bookmark; i++ )
     {
         asprintf( &psz_value, "{name=%s,bytes="I64Fd",time="I64Fd"}",
-                  p_input->pp_bookmarks[i]->psz_name,
-                  p_input->pp_bookmarks[i]->i_byte_offset,
-                  p_input->pp_bookmarks[i]->i_time_offset/1000000 );
+                  p_input->bookmark[i]->psz_name,
+                  p_input->bookmark[i]->i_byte_offset,
+                  p_input->bookmark[i]->i_time_offset/1000000 );
         i_len += strlen( psz_value );
         free( psz_value );
     }
-    for( i = 0; i < p_input->i_bookmarks; i++ )
+    for( i = 0; i < p_input->i_bookmark; i++ )
     {
-        if( !i ) psz_value = psz_next = malloc( i_len + p_input->i_bookmarks );
+        if( !i ) psz_value = psz_next = malloc( i_len + p_input->i_bookmark );
 
         sprintf( psz_next, "{name=%s,bytes="I64Fd",time="I64Fd"}",
-                 p_input->pp_bookmarks[i]->psz_name,
-                 p_input->pp_bookmarks[i]->i_byte_offset,
-                 p_input->pp_bookmarks[i]->i_time_offset/1000000 );
+                 p_input->bookmark[i]->psz_name,
+                 p_input->bookmark[i]->i_byte_offset,
+                 p_input->bookmark[i]->i_time_offset/1000000 );
 
         psz_next += strlen( psz_next );
-        if( i < p_input->i_bookmarks - 1)
+        if( i < p_input->i_bookmark - 1)
         {
             *psz_next = ','; psz_next++;
         }
     }
+    vlc_mutex_unlock( &p_input->input.p_item->lock );
+
     input_Control( p_input, INPUT_ADD_OPTION, "bookmarks",
                    psz_value ? psz_value : "" );
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-#endif
 }

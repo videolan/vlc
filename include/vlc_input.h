@@ -321,10 +321,15 @@ enum input_query_e
     /* Meta datas */
     INPUT_ADD_INFO,   /* arg1= char * arg2= char * arg3=...  res=can fail    */
     INPUT_GET_INFO,   /* arg1= char * arg2= char * arg3= char ** res=can fail*/
-
     INPUT_SET_NAME,   /* arg1= char * res=can fail    */
 
-    /* XXX: all next query aren't working for now */
+    /* Input config options */
+    INPUT_ADD_OPTION,      /* arg1= char * arg2= char *  res=can fail*/
+
+    /* Input properties */
+    INPUT_GET_BYTE_POSITION,     /* arg1= int64_t *       res=    */
+    INPUT_SET_BYTE_SIZE,         /* arg1= int64_t *       res=    */
+
     /* bookmarks */
     INPUT_GET_BOOKMARKS,   /* arg1= seekpoint_t *** arg2= int * res=can fail */
     INPUT_CLEAR_BOOKMARKS, /* res=can fail */
