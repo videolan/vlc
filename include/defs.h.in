@@ -217,6 +217,9 @@
 /* Define if you have the <image.h> header file.  */
 #undef HAVE_IMAGE_H
 
+/* Define if you have the <inttypes.h> header file.  */
+#undef HAVE_INTTYPES_H
+
 /* Define if you have the <kernel/OS.h> header file.  */
 #undef HAVE_KERNEL_OS_H
 
@@ -268,6 +271,9 @@
 /* Define if you have the <stddef.h> header file.  */
 #undef HAVE_STDDEF_H
 
+/* Define if you have the <stdint.h> header file.  */
+#undef HAVE_STDINT_H
+
 /* Define if you have the <stdlib.h> header file.  */
 #undef HAVE_STDLIB_H
 
@@ -276,6 +282,9 @@
 
 /* Define if you have the <strings.h> header file.  */
 #undef HAVE_STRINGS_H
+
+/* Define if you have the <sys/int_types.h> header file.  */
+#undef HAVE_SYS_INT_TYPES_H
 
 /* Define if you have the <sys/param.h> header file.  */
 #undef HAVE_SYS_PARAM_H

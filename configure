@@ -4451,7 +4451,7 @@ fi
 rm -f conftest*
 
 
-for ac_hdr in getopt.h strings.h
+for ac_hdr in stdint.h getopt.h strings.h inttypes.h sys/int_types.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
