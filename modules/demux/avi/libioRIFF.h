@@ -2,7 +2,7 @@
  * libioRIFF.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.h,v 1.2 2002/09/18 23:34:28 fenrir Exp $
+ * $Id: libioRIFF.h,v 1.3 2002/10/15 00:55:07 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -32,37 +32,9 @@ typedef struct riffchunk_s
                      used for key frame generation */
 } riffchunk_t;
 
-int  __RIFF_TellPos( input_thread_t *p_input, u32 *pos );
-int 	__RIFF_SkipBytes(input_thread_t * p_input,int nb);
-void RIFF_DeleteChunk( input_thread_t *p_input, riffchunk_t *p_chunk );
+int         __RIFF_TellPos( input_thread_t *p_input, u32 *pos );
+int 	    __RIFF_SkipBytes(input_thread_t * p_input,int nb);
+void        RIFF_DeleteChunk( input_thread_t *p_input, riffchunk_t *p_chunk );
 riffchunk_t *RIFF_ReadChunk(input_thread_t * p_input);
-int  RIFF_NextChunk( input_thread_t * p_input,riffchunk_t *p_rifffather);
-int	RIFF_DescendChunk(input_thread_t * p_input);
-int	RIFF_AscendChunk(input_thread_t * p_input ,riffchunk_t *p_riff);
-int	RIFF_FindChunk(input_thread_t * p_input,
-                           u32 i_id,riffchunk_t *p_rifffather);
-int  RIFF_GoToChunkData(input_thread_t * p_input);
-int	RIFF_LoadChunkData(input_thread_t * p_input,
-                               riffchunk_t *p_riff );
-int RIFF_LoadChunkDataInPES(input_thread_t * p_input,
-                            pes_packet_t **pp_pes,
-                            int i_size_index);
-
-int  RIFF_GoToChunk(input_thread_t * p_input, 
-                           riffchunk_t *p_riff);
-int  RIFF_TestFileHeader( input_thread_t * p_input, 
-                                 riffchunk_t ** pp_riff, 
-                                 u32 i_type );
-int  RIFF_FindAndLoadChunk( input_thread_t * p_input, 
-                                   riffchunk_t *p_riff, 
-                                   riffchunk_t **pp_fmt, 
-                                   u32 i_type );
-int  RIFF_FindAndGotoDataChunk( input_thread_t * p_input, 
-                                       riffchunk_t *p_riff, 
-                                       riffchunk_t **pp_data, 
-                                       u32 i_type );
-int  RIFF_FindListChunk( input_thread_t *p_input, 
-                                riffchunk_t **pp_riff, 
-                                riffchunk_t *p_rifffather, 
-                                u32 i_type );
+int         RIFF_NextChunk( input_thread_t * p_input,riffchunk_t *p_rifffather);
 
