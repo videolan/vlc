@@ -4,7 +4,7 @@
  * Copyright (C) 2002-2004 VideoLAN
  * $Id$
  *
- * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
+ * Authors: Derk-Jan Hartman <hartman at videolan dot org>>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,6 +75,12 @@ static char *psz_recursive_list[] = { "none", "collapse", "expand" };
 static char *psz_recursive_list_text[] = { N_("none"), N_("collapse"),
                                            N_("expand") };
 
+#define IGNORE_TEXT N_("Ignore files with these extensions")
+#define IGNORE_LONGTEXT N_( \
+        "Specify a comma seperated list of file extensions. " \
+        "Files with these extensions will not be added to playlist when opening a directory. " \
+        "This is useful if you add directories that contain mp3 albums for instance." )
+
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_shortname( _("Directory" ) );
@@ -86,6 +92,10 @@ vlc_module_begin();
     add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT, VLC_FALSE );
       change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
+#ifdef HAVE_STRSEP
+    add_string( "ignore-filetypes", "m3u,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue", NULL, IGNORE_TEXT,
+                IGNORE_LONGTEXT, VLC_FALSE );
+#endif
     set_callbacks( Open, Close );
 
     add_submodule();
@@ -137,7 +147,7 @@ static int Open( vlc_object_t *p_this )
     psz_path[MAX_PATH-1] = 0;
 #   else
     char *psz_path = p_access->psz_path;
-#   endif
+#   endif /* UNICODE */
 
     i_ret = GetFileAttributes( psz_path );
     if( i_ret == -1 || !(i_ret & FILE_ATTRIBUTE_DIRECTORY) )
@@ -253,6 +263,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
         }
         b_play = VLC_FALSE;
     }
+
     p_item->input.i_type = ITEM_TYPE_DIRECTORY;
     if( ReadDir( p_playlist, psz_name , i_mode, &i_pos,
                  p_item ) != VLC_SUCCESS )
@@ -413,6 +424,30 @@ static int ReadDir( playlist_t *p_playlist,
     struct dirent   **pp_dir_content;
     int             i_dir_content, i = 0;
     playlist_item_t *p_node;
+    char            *psz_ignore;
+    int             i_extensions = 0;
+    char            **ppsz_extensions;
+
+    /* Build array with ignores */
+#ifdef HAVE_STRSEP
+    psz_ignore = var_CreateGetString( p_playlist, "ignore-filetypes" );
+    if( psz_ignore && *psz_ignore )
+    {
+        char *psz_backup;
+        char *psz_parser = psz_backup = strdup( psz_ignore );
+        int a = 0;
+
+        while( strsep( &psz_parser, "," ) )
+        {
+            i_extensions++;
+        }
+        ppsz_extensions = (char **)malloc( sizeof( char * ) * i_extensions );
+        free( psz_backup );
+
+        psz_parser = psz_backup = strdup( psz_ignore );
+        while( a < i_extensions && ( ppsz_extensions[a++] = strsep( &psz_parser, "," ) ) );
+    }
+#endif /* HAVE_STRSEP */
 
     /* Change the item to a node */
     if( p_parent->i_children == -1 )
@@ -439,7 +474,7 @@ static int ReadDir( playlist_t *p_playlist,
     {
         int i_size_entry = strlen( psz_name ) +
                            strlen( p_dir_content->d_name ) + 2;
-        char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
+        char *psz_uri = (char *)malloc( sizeof(char) * i_size_entry);
 
         sprintf( psz_uri, "%s/%s", psz_name, p_dir_content->d_name );
 
@@ -459,11 +494,12 @@ static int ReadDir( playlist_t *p_playlist,
                 if( i_mode == MODE_NONE )
                 {
                     msg_Dbg( p_playlist, "Skipping subdirectory %s", psz_uri );
+                    free( psz_uri );
                     i++;
                     p_dir_content = pp_dir_content[i];
                     continue;
                 }
-                else if(i_mode == MODE_EXPAND )
+                else if( i_mode == MODE_EXPAND )
                 {
                     char *psz_newname;
                     msg_Dbg(p_playlist, "Reading subdirectory %s", psz_uri );
@@ -498,6 +534,29 @@ static int ReadDir( playlist_t *p_playlist,
             }
             else
             {
+#ifdef HAVE_STRSEP
+                if( i_extensions > 0 )
+                {
+                    char *psz_dot = strrchr( p_dir_content->d_name, '.' );
+                    if( ++psz_dot && *psz_dot )
+                    {
+                        int a;
+                        for( a = 0; a < i_extensions; a++ )
+                        {
+                            if( !strcmp( psz_dot, ppsz_extensions[a] ) )
+                                break;
+                        }
+                        if( a < i_extensions )
+                        {
+                            msg_Dbg( p_playlist, "Ignoring file %s", psz_uri );
+                            free( psz_uri );
+                            i++;
+                            p_dir_content = pp_dir_content[i];
+                            continue;
+                        }
+                    }
+                }
+#endif /* HAVE_STRSEP */
                 playlist_item_t *p_item = playlist_ItemNewWithType(
                                                 p_playlist,
                                                 psz_uri,
@@ -515,6 +574,7 @@ static int ReadDir( playlist_t *p_playlist,
         i++;
         p_dir_content = pp_dir_content[i];
     }
+    if( ppsz_extensions ) free( ppsz_extensions );
     free( pp_dir_content );
     return VLC_SUCCESS;
 }
