@@ -1483,6 +1483,35 @@ static int transcode_video_process( sout_stream_t *p_stream,
             i_width = id->p_encoder->fmt_in.video.i_width;
             i_height = id->p_encoder->fmt_in.video.i_height;
 
+            if( p_pic->i_refcount )
+            {
+                /* We can't modify the picture, we need to duplicate it */
+                picture_t *p_tmp =
+                    video_new_buffer( (decoder_t *)p_sys->p_filter_blend );
+                if( p_tmp )
+                {
+                    int i, j;
+                    for( i = 0; i < p_pic->i_planes; i++ )
+                    {
+                        for( j = 0; j < p_pic->p[i].i_visible_lines; j++ )
+                        {
+                            memcpy( p_tmp->p[i].p_pixels + j *
+                                    p_tmp->p[i].i_pitch,
+                                    p_pic->p[i].p_pixels + j *
+                                    p_pic->p[i].i_pitch,
+                                    p_tmp->p[i].i_visible_pitch );
+                        }
+                    }
+                    p_tmp->date = p_pic->date;
+                    p_tmp->b_force = p_pic->b_force;
+                    p_tmp->i_nb_fields = p_pic->i_nb_fields;
+                    p_tmp->b_progressive = p_pic->b_progressive;
+                    p_tmp->b_top_field_first = p_pic->b_top_field_first;
+                    p_pic->pf_release( p_pic );
+                    p_pic = p_tmp;
+                }
+            }
+
             while( p_subpic != NULL )
             {
                 subpicture_region_t *p_region = p_subpic->p_region;
