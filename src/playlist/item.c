@@ -75,46 +75,40 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
  */
 void playlist_ItemDelete( playlist_item_t *p_item )
 {
-#if 0
-    int i,j;
-#endif
-
     vlc_mutex_lock( &p_item->input.lock );
 
     if( p_item->input.psz_name ) free( p_item->input.psz_name );
     if( p_item->input.psz_uri ) free( p_item->input.psz_uri );
 
-#if 0
-    /* Free the info categories. Welcome to the segfault factory */
-    if( p_item->i_categories > 0 )
+    /* Free the info categories */
+    if( p_item->input.i_categories > 0 )
     {
-        for( i = 0; i < p_item->i_categories; i++ )
+        int i, j;
+
+        for( i = 0; i < p_item->input.i_categories; i++ )
         {
-            for( j= 0 ; j < p_item->pp_categories[i]->i_infos; j++)
+            info_category_t *p_category = p_item->input.pp_categories[i];
+
+            for( j = 0; j < p_category->i_infos; j++)
             {
-                if( p_item->pp_categories[i]->pp_infos[j]->psz_name)
+                if( p_category->pp_infos[j]->psz_name )
                 {
-                    free( p_item->pp_categories[i]->
-                                  pp_infos[j]->psz_name);
+                    free( p_category->pp_infos[j]->psz_name);
                 }
-                if( p_item->pp_categories[i]->pp_infos[j]->psz_value)
+                if( p_category->pp_infos[j]->psz_value )
                 {
-                    free( p_item->pp_categories[i]->
-                                  pp_infos[j]->psz_value);
+                    free( p_category->pp_infos[j]->psz_value );
                 }
-                free( p_item->pp_categories[i]->pp_infos[j] );
+                free( p_category->pp_infos[j] );
             }
-            if( p_item->pp_categories[i]->i_infos )
-                free( p_item->pp_categories[i]->pp_infos );
-            if( p_item->pp_categories[i]->psz_name)
-            {
-                free( p_item->pp_categories[i]->psz_name );
-            }
-            free( p_item->pp_categories[i] );
+
+            if( p_category->i_infos ) free( p_category->pp_infos );
+            if( p_category->psz_name ) free( p_category->psz_name );
+            free( p_category );
         }
-        free( p_item->pp_categories );
+
+        free( p_item->input.pp_categories );
     }
-#endif
 
     vlc_mutex_unlock( &p_item->input.lock );
     vlc_mutex_destroy( &p_item->input.lock );
