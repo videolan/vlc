@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.1 2001/04/01 06:21:44 sam Exp $
+ * $Id: vout_xvideo.c,v 1.2 2001/04/01 06:42:05 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -338,11 +338,11 @@ static int vout_Manage( vout_thread_t *p_vout )
                 || (xevent.xconfigure.height != p_vout->p_sys->i_height)) )
         {
             /* Update dimensions */
-#if 0 XXX XXX
+/* XXX XXX
             b_resized = 1;
             p_vout->p_sys->i_width = xevent.xconfigure.width;
             p_vout->p_sys->i_height = xevent.xconfigure.height;
-#endif XXX XXX
+   XXX XXX */
         }
         /* MapNotify event: change window status and disable screen saver */
         else if( xevent.type == MapNotify)
