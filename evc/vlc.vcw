@@ -111,18 +111,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_es"=.\plugin_es.vcp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "plugin_fixed32tofloat32"=.\plugin_fixed32tofloat32.vcp - Package Owner=<4>
 
 Package=<5>
@@ -183,30 +171,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_idct"=.\plugin_idct.vcp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_idctclassic"=.\plugin_idctclassic.vcp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "plugin_invert"=.\plugin_invert.vcp - Package Owner=<4>
 
 Package=<5>
@@ -243,34 +207,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_mad"=.\plugin_mad.vcp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name libmad
-    End Project Dependency
-}}}
-
-###############################################################################
-
 Project: "plugin_memcpy"=.\plugin_memcpy.vcp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_motion"=.\plugin_motion.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -295,30 +232,6 @@ Package=<4>
 ###############################################################################
 
 Project: "plugin_mpeg_audio"=.\plugin_mpeg_audio.vcp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_mpeg_system"=.\plugin_mpeg_system.vcp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_mpeg_video"=.\plugin_mpeg_video.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
