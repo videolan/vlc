@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.1 2002/10/14 21:59:44 fenrir Exp $
+ * $Id: araw.c,v 1.2 2002/10/20 17:44:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -83,6 +83,15 @@ vlc_module_begin();
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
 vlc_module_end();
+
+
+static int i_channels_maps[6] =
+{
+    0,
+    AOUT_CHAN_MONO,     AOUT_CHAN_STEREO,
+    AOUT_CHAN_3F,       AOUT_CHAN_2F2R,
+    AOUT_CHAN_3F2R
+};
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -223,9 +232,11 @@ static int PESGetSize( pes_packet_t *p_pes )
     return( i_size );
 }
 
+
 /*****************************************************************************
  * InitThread: initialize data before entering main loop
  *****************************************************************************/
+
 static int InitThread( adec_thread_t * p_adec )
 {
 
@@ -271,7 +282,15 @@ static int InitThread( adec_thread_t * p_adec )
             return( -1 );
     }
     p_adec->output_format.i_rate = p_adec->format.i_samplespersec;
-    p_adec->output_format.i_channels = p_adec->format.i_channels;
+    if( p_adec->output_format.i_channels <= 0 || 
+            p_adec->output_format.i_channels > 5 )
+    {
+        msg_Err( p_adec->p_fifo, "bad channels count(1-5)" );
+        return( -1 );
+    }
+
+    p_adec->output_format.i_channels = 
+            i_channels_maps[p_adec->format.i_channels];
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
 

@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.5 2002/09/30 21:32:32 massiot Exp $
+ * $Id: decoder.c,v 1.6 2002/10/20 17:44:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -420,7 +420,8 @@ static void DecodeThread( adec_thread_t *p_adec )
         return;
     }
     if( ( faad_frame.channels <= 0 )||
-        ( faad_frame.channels > AAC_MAXCHANNELS) )
+        ( faad_frame.channels > AAC_MAXCHANNELS) ||
+        ( faad_frame.channels > 5 ) )
     {
         msg_Warn( p_adec->p_fifo,
                   "invalid channels count(%d)", faad_frame.channels );
@@ -453,7 +454,8 @@ static void DecodeThread( adec_thread_t *p_adec )
         }
 
         /* **** Create a new audio output **** */
-        p_adec->output_format.i_channels = faad_frame.channels;
+        p_adec->output_format.i_channels = 
+                i_channels_maps[faad_frame.channels];
         aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
         p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
                                             &p_adec->p_aout,

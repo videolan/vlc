@@ -3,7 +3,7 @@
  *
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: decoder.h,v 1.2 2002/08/23 14:05:22 sam Exp $
+ * $Id: decoder.h,v 1.3 2002/10/20 17:44:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -72,5 +72,12 @@ typedef struct adec_thread_s
 } adec_thread_t;
 
 
+static int i_channels_maps[6] = 
+{
+    0,
+    AOUT_CHAN_MONO,     AOUT_CHAN_STEREO,
+    AOUT_CHAN_3F,       AOUT_CHAN_2F2R,
+    AOUT_CHAN_3F2R
+};
 
 
