@@ -51,19 +51,6 @@ AC_CHECK_TOOL(STRIP, strip, :)
 AC_CHECK_TOOL(AR, ar, :)
 AC_CHECK_TOOL(LD, ld, :)
 
-dnl
-dnl Gettext stuff
-dnl
-ALL_LINGUAS="de en_GB fr it ja no ru nl pl se"
-AM_GNU_GETTEXT_VERSION(0.10.40)
-AM_GNU_GETTEXT
-if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
-  AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
-  INCLUDES="${INCLUDES} -I\\\$(top_srcdir)/intl"
-fi
-AM_CONDITIONAL(BUILD_INTL, test "${nls_cv_force_use_gnu_gettext}" = "yes")
-XGETTEXT="${XGETTEXT} --keyword=_NS"
-
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
@@ -100,9 +87,9 @@ case "x${target_os}" in
     ;;
   xdarwin*)
     SYS=darwin
-    CFLAGS_save="${CFLAGS_save} -no-cpp-precomp"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp"; OBJCFLAGS="${OBJCFLAGS_save}"
+    CFLAGS_save="${CFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
     LDFLAGS_vlc="${LDFLAGS_vlc} -all_load"
     LIBEXT=".dylib"
     ;;
@@ -174,6 +161,19 @@ esac
 AM_CONDITIONAL(HAVE_BEOS, test "x${SYS}" = "xbeos")
 AM_CONDITIONAL(HAVE_DARWIN, test "x${SYS}" = "xdarwin")
 AM_CONDITIONAL(HAVE_WIN32, test "x${SYS}" = "xmingw32")
+
+dnl
+dnl Gettext stuff
+dnl
+ALL_LINGUAS="de en_GB fr it ja no ru nl pl se"
+AM_GNU_GETTEXT_VERSION(0.10.40)
+AM_GNU_GETTEXT
+if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
+  AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
+  INCLUDES="${INCLUDES} -I\\\$(top_srcdir)/intl"
+fi
+AM_CONDITIONAL(BUILD_INTL, test "${nls_cv_force_use_gnu_gettext}" = "yes")
+XGETTEXT="${XGETTEXT} --keyword=_NS"
 
 AC_MSG_CHECKING(for suffix of libraries)
 AC_MSG_RESULT(${LIBEXT})

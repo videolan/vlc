@@ -473,6 +473,11 @@ vlc.app: vlc $(PLUGIN_FILES)
 	fi ; done
 	$(INSTALL) -d vlc.app/Contents/MacOS/share
 	$(INSTALL) -m 644 share/*.psf vlc.app/Contents/MacOS/share
+	$(INSTALL) -d vlc.app/Contents/MacOS/locale
+	for i in $(CATALOGS); do
+		mkdir -p vlc.app/Contents/MacOS/locale/${i%.gmo}/LC_MESSAGES
+		cp po/$i vlc.app/Contents/MacOS/locale/${i%.gmo}/LC_MESSAGES/vlc.mo
+	done
 endif
 
 if HAVE_WIN32
@@ -503,7 +508,7 @@ package-win32:
 	cp vlc.exe tmp/ 
 	$(STRIP) tmp/vlc.exe
 	cp INSTALL.win32 tmp/INSTALL.txt ; unix2dos tmp/INSTALL.txt
-	for file in AUTHORS COPYING ChangeLog README FAQ TODO ; \
+	for file in AUTHORS COPYING ChangeLog README FAQ ; \
 			do cp $$file tmp/$${file}.txt ; \
 			unix2dos tmp/$${file}.txt ; done
 	mkdir tmp/plugins
@@ -535,7 +540,7 @@ package-beos:
 	cp vlc tmp/vlc/
 	$(STRIP) tmp/vlc/vlc
 	xres -o tmp/vlc/vlc ./share/vlc_beos.rsrc
-	cp AUTHORS COPYING ChangeLog README FAQ TODO tmp/vlc/
+	cp AUTHORS COPYING ChangeLog README FAQ tmp/vlc/
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/vlc/share/ ; done
 	mkdir tmp/vlc/plugins
@@ -561,11 +566,10 @@ package-macosx:
 
 # Copy relevant files 
 	cp -R vlc.app tmp/
-	$(STRIP) tmp/vlc.app/Contents/MacOS/vlc
-	cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf FAQ TODO tmp/
+	cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf FAQ tmp/
 
 # Create disk image 
-	./macosx-dmg 15 "vlc-${VERSION}" tmp/* 
+	./macosx-dmg 18 "vlc-${VERSION}" tmp/* 
 
 # Clean up
 	rm -Rf tmp

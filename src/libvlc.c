@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.54 2002/12/25 23:39:01 sam Exp $
+ * $Id: libvlc.c,v 1.55 2002/12/27 00:17:48 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -226,12 +226,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     /*
-     * Support for gettext
-     */
-    SetLanguage( "" );
-    msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
-
-    /*
      * System specific initialization code
      */
     system_Init( p_vlc, &i_argc, ppsz_argv );
@@ -250,6 +244,12 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         p_vlc->psz_object_name = "vlc";
     }
+
+    /*
+     * Support for gettext
+     */
+    SetLanguage( "" );
+    msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
 
     /* Hack: insert the help module here */
     p_help_module = vlc_object_create( p_vlc, VLC_OBJECT_MODULE );
@@ -957,6 +957,12 @@ static void SetLanguage ( char const *psz_lang )
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 
+    char *          psz_path;
+#ifdef SYS_DARWIN
+    char *          psz_vlcpath = system_GetProgramPath();
+    char            psz_tmp[1024];
+#endif
+
 #   if defined( HAVE_INCLUDED_GETTEXT ) && !defined( HAVE_LC_MESSAGES )
     if( *psz_lang )
     {
@@ -977,10 +983,17 @@ static void SetLanguage ( char const *psz_lang )
     setlocale( LC_CTYPE, psz_lang );
 
     /* Specify where to find the locales for current domain */
-    if( !bindtextdomain( PACKAGE, LOCALEDIR ) )
+#ifndef SYS_DARWIN
+    psz_path = LOCALEDIR;
+#else
+    snprintf( psz_tmp, sizeof(psz_tmp), "%s/%s", psz_vlcpath,
+              "locale" );
+    psz_path = psz_tmp;
+#endif
+    if( !bindtextdomain( PACKAGE, psz_path ) )
     {
         fprintf( stderr, "warning: no domain %s in directory %s\n",
-                 PACKAGE, LOCALEDIR );
+                 PACKAGE, psz_path );
     }
 
     /* Set the default domain */
