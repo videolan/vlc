@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.16 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: ggi.c,v 1.17 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -173,6 +173,11 @@ int vout_Init( vout_thread_t *p_vout )
             return 0;
     }
 
+    /* Only useful for bits_per_pixel != 8 */
+    p_vout->output.i_rmask = p_b[ 0 ]->buffer.plb.pixelformat->red_mask;
+    p_vout->output.i_gmask = p_b[ 0 ]->buffer.plb.pixelformat->green_mask;
+    p_vout->output.i_bmask = p_b[ 0 ]->buffer.plb.pixelformat->blue_mask;
+
     p_pic = NULL;
 
     /* Find an empty picture slot */
@@ -213,11 +218,6 @@ int vout_Init( vout_thread_t *p_vout )
         p_pic->p->b_margin = 0;
         p_pic->p->i_pitch = p_b[ 0 ]->buffer.plb.stride;
     }
-
-    /* Only useful for bits_per_pixel != 8 */
-    p_pic->p->i_red_mask =   p_b[ 0 ]->buffer.plb.pixelformat->red_mask;
-    p_pic->p->i_green_mask = p_b[ 0 ]->buffer.plb.pixelformat->green_mask;
-    p_pic->p->i_blue_mask =  p_b[ 0 ]->buffer.plb.pixelformat->blue_mask;
 
     p_pic->i_planes = 1;
 

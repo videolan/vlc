@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.4 2002/03/16 01:40:58 gbazin Exp $
+ * $Id: configuration.c,v 1.5 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -20,6 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
 #include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <string.h>                                              /* strdup() */
@@ -34,7 +35,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-static char *config_GetHomeDir(void);
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static char *GetHomeDir( void );
 
 /*****************************************************************************
  * config_GetIntVariable: get the value of an int variable
@@ -52,15 +56,14 @@ int config_GetIntVariable( const char *psz_name )
     /* sanity checks */
     if( !p_config )
     {
-        intf_ErrMsg( "config_GetIntVariable: option %s doesn't exist",
-                     psz_name );
+        intf_ErrMsg( "config error: option %s doesn't exist", psz_name );
         return -1;
     }
     if( (p_config->i_type!=MODULE_CONFIG_ITEM_INTEGER) &&
         (p_config->i_type!=MODULE_CONFIG_ITEM_BOOL) )
     {
-        intf_ErrMsg( "config_GetIntVariable: option %s doesn't refer to an int"
-                     , psz_name );
+        intf_ErrMsg( "config error: option %s doesn't refer to an int",
+                     psz_name );
         return -1;
     }
 
@@ -88,16 +91,15 @@ char * config_GetPszVariable( const char *psz_name )
     /* sanity checks */
     if( !p_config )
     {
-        intf_ErrMsg( "config_GetPszVariable: option %s doesn't exist",
-                     psz_name );
+        intf_ErrMsg( "config error: option %s doesn't exist", psz_name );
         return NULL;
     }
     if( (p_config->i_type!=MODULE_CONFIG_ITEM_STRING) &&
         (p_config->i_type!=MODULE_CONFIG_ITEM_FILE) &&
         (p_config->i_type!=MODULE_CONFIG_ITEM_PLUGIN) )
     {
-        intf_ErrMsg( "config_GetPszVariable: option %s doesn't refer to a "
-                     "string", psz_name );
+        intf_ErrMsg( "config error: option %s doesn't refer to a string",
+                     psz_name );
         return NULL;
     }
 
@@ -125,16 +127,15 @@ void config_PutPszVariable( const char *psz_name, char *psz_value )
     /* sanity checks */
     if( !p_config )
     {
-        intf_ErrMsg( "config_PutPszVariable: option %s doesn't exist",
-                     psz_name );
+        intf_ErrMsg( "config error: option %s doesn't exist", psz_name );
         return;
     }
     if( (p_config->i_type!=MODULE_CONFIG_ITEM_STRING) &&
         (p_config->i_type!=MODULE_CONFIG_ITEM_FILE) &&
         (p_config->i_type!=MODULE_CONFIG_ITEM_PLUGIN) )
     {
-        intf_ErrMsg( "config_PutPszVariable: option %s doesn't refer to a "
-                     "string", psz_name );
+        intf_ErrMsg( "config error: option %s doesn't refer to a string",
+                     psz_name );
         return;
     }
 
@@ -166,15 +167,14 @@ void config_PutIntVariable( const char *psz_name, int i_value )
     /* sanity checks */
     if( !p_config )
     {
-        intf_ErrMsg( "config_PutIntVariable: option %s doesn't exist",
-                     psz_name );
+        intf_ErrMsg( "config error: option %s doesn't exist", psz_name );
         return;
     }
     if( (p_config->i_type!=MODULE_CONFIG_ITEM_INTEGER) &&
         (p_config->i_type!=MODULE_CONFIG_ITEM_BOOL) )
     {
-        intf_ErrMsg( "config_PutIntVariable: option %s doesn't refer to an int"
-                     , psz_name );
+        intf_ErrMsg( "config error: option %s doesn't refer to an int",
+                     psz_name );
         return;
     }
 
@@ -227,7 +227,7 @@ module_config_t *config_Duplicate( module_t *p_module )
                                           * p_module->i_config_lines );
     if( p_config == NULL )
     {
-        intf_ErrMsg( "config_Duplicate error: can't allocate p_config" );
+        intf_ErrMsg( "config error: can't duplicate p_config" );
         return( NULL );
     }
 
@@ -280,33 +280,32 @@ int config_LoadConfigFile( const char *psz_module_name )
     /* Acquire config file lock */
     vlc_mutex_lock( &p_main->config_lock );
 
-    psz_homedir = config_GetHomeDir();
+    psz_homedir = GetHomeDir();
     if( !psz_homedir )
     {
-        intf_ErrMsg( "config_LoadConfigFile: GetHomeDir failed" );
+        intf_ErrMsg( "config error: GetHomeDir failed" );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
     }
-    psz_filename = (char *)malloc( strlen("/.VideoLan/vlc") +
+    psz_filename = (char *)malloc( strlen("/" CONFIG_DIR "/" CONFIG_FILE) +
                                    strlen(psz_homedir) + 1 );
     if( !psz_filename )
     {
-        intf_ErrMsg( "config err: couldn't malloc psz_filename" );
+        intf_ErrMsg( "config error: couldn't malloc psz_filename" );
         free( psz_homedir );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
     }
-    sprintf( psz_filename, "%s/.VideoLan/vlc", psz_homedir );
+    sprintf( psz_filename, "%s/" CONFIG_DIR "/" CONFIG_FILE, psz_homedir );
     free( psz_homedir );
 
-    intf_WarnMsg( 5, "config_SaveConfigFile: opening config file %s",
-                  psz_filename );
+    intf_WarnMsg( 5, "config: opening config file %s", psz_filename );
 
     file = fopen( psz_filename, "r" );
     if( !file )
     {
-        intf_WarnMsg( 1, "config_LoadConfigFile: couldn't open config file %s "
-                      "for reading", psz_filename );
+        intf_WarnMsg( 1, "config: couldn't open config file %s for reading",
+                         psz_filename );
         free( psz_filename );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
@@ -330,8 +329,8 @@ int config_LoadConfigFile( const char *psz_module_name )
                 !memcmp( &line[1], p_module->psz_name,
                          strlen(p_module->psz_name) ) )
             {
-                intf_WarnMsg( 5, "config_LoadConfigFile: loading config for "
-                              "module <%s>", p_module->psz_name );
+                intf_WarnMsg( 5, "config: loading config for module <%s>",
+                                 p_module->psz_name );
 
                 break;
             }
@@ -375,8 +374,7 @@ int config_LoadConfigFile( const char *psz_module_name )
                     case MODULE_CONFIG_ITEM_INTEGER:
                         p_module->p_config[i].i_value =
                             atoi( psz_option_value);
-                        intf_WarnMsg( 7, "config_LoadConfigFile: found <%s> "
-                                      "option %s=%i",
+                        intf_WarnMsg( 7, "config: found <%s> option %s=%i",
                                       p_module->psz_name,
                                       p_module->p_config[i].psz_name,
                                       p_module->p_config[i].i_value );
@@ -394,8 +392,7 @@ int config_LoadConfigFile( const char *psz_module_name )
 
                         vlc_mutex_unlock( p_module->p_config[i].p_lock );
 
-                        intf_WarnMsg( 7, "config_LoadConfigFile: found <%s> "
-                                      "option %s=%s",
+                        intf_WarnMsg( 7, "config: found <%s> option %s=%s",
                                       p_module->psz_name,
                                       p_module->p_config[i].psz_name,
                                       p_module->p_config[i].psz_value );
@@ -447,40 +444,39 @@ int config_SaveConfigFile( const char *psz_module_name )
     /* Acquire config file lock */
     vlc_mutex_lock( &p_main->config_lock );
 
-    psz_homedir = config_GetHomeDir();
+    psz_homedir = GetHomeDir();
     if( !psz_homedir )
     {
-        intf_ErrMsg( "config_SaveConfigFile: GetHomeDir failed" );
+        intf_ErrMsg( "config error: GetHomeDir failed" );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
     }
-    psz_filename = (char *)malloc( strlen("/.VideoLan/vlc") +
+    psz_filename = (char *)malloc( strlen("/" CONFIG_DIR "/" CONFIG_FILE) +
                                    strlen(psz_homedir) + 1 );
     if( !psz_filename )
     {
-        intf_ErrMsg( "config err: couldn't malloc psz_filename" );
+        intf_ErrMsg( "config error: couldn't malloc psz_filename" );
         free( psz_homedir );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
     }
-    sprintf( psz_filename, "%s/.VideoLan", psz_homedir );
+    sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
     free( psz_homedir );
 #ifndef WIN32
     mkdir( psz_filename, 0755 );
 #else
     mkdir( psz_filename );
 #endif
-    strcat( psz_filename, "/vlc" );
+    strcat( psz_filename, "/" CONFIG_FILE );
 
 
-    intf_WarnMsg( 5, "config_SaveConfigFile: opening config file %s",
-                  psz_filename );
+    intf_WarnMsg( 5, "config: opening config file %s", psz_filename );
 
     file = fopen( psz_filename, "r" );
     if( !file )
     {
-        intf_WarnMsg( 1, "config_SaveConfigFile: couldn't open config file %s "
-                      "for reading", psz_filename );
+        intf_WarnMsg( 1, "config: couldn't open config file %s for reading",
+                         psz_filename );
     }
     else
     {
@@ -493,7 +489,7 @@ int config_SaveConfigFile( const char *psz_module_name )
     p_bigbuffer = p_index = malloc( i_sizebuf+1 );
     if( !p_bigbuffer )
     {
-        intf_ErrMsg( "config err: couldn't malloc bigbuffer" );
+        intf_ErrMsg( "config error: couldn't malloc bigbuffer" );
         if( file ) fclose( file );
         free( psz_filename );
         vlc_mutex_unlock( &p_main->config_lock );
@@ -528,8 +524,8 @@ int config_SaveConfigFile( const char *psz_module_name )
                 /* we don't have this section in our list so we need to back
                  * it up */
                 *p_index2 = 0;
-                intf_WarnMsg( 5, "config_SaveConfigFile: backing up config for"
-                              " unknown module <%s>", &p_line[1] );
+                intf_WarnMsg( 5, "config: backing up config for "
+                                 "unknown module <%s>", &p_line[1] );
                 *p_index2 = ']';
 
                 b_backup = 1;
@@ -559,14 +555,14 @@ int config_SaveConfigFile( const char *psz_module_name )
     file = fopen( psz_filename, "w" );
     if( !file )
     {
-        intf_WarnMsg( 1, "config_SaveConfigFile: couldn't open config file %s "
-                      "for writing", psz_filename );
+        intf_WarnMsg( 1, "config: couldn't open config file %s for writing",
+                         psz_filename );
         free( psz_filename );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
     }
 
-    fprintf( file, "#\n# "COPYRIGHT_MESSAGE"\n#\n\n" );
+    fprintf( file, "###\n###  " COPYRIGHT_MESSAGE "\n###\n\n" );
 
     /* Look for the selected module, if NULL then save everything */
     for( p_module = p_module_bank->first ; p_module != NULL ;
@@ -579,12 +575,13 @@ int config_SaveConfigFile( const char *psz_module_name )
         if( !p_module->i_config_items )
             continue;
 
-        intf_WarnMsg( 5, "config_SaveConfigFile: saving config for "
-                      "module <%s>", p_module->psz_name );
+        intf_WarnMsg( 5, "config: saving config for module <%s>",
+                         p_module->psz_name );
+
+        if( p_module->psz_longname )
+            fprintf( file, "###\n###  %s\n###\n", p_module->psz_longname );
 
         fprintf( file, "[%s]\n", p_module->psz_name );
-        if( p_module->psz_longname )
-            fprintf( file, "# %s\n#\n", p_module->psz_longname );
 
         for( i = 0; i < p_module->i_config_lines; i++ )
         {
@@ -631,12 +628,14 @@ int config_SaveConfigFile( const char *psz_module_name )
     return 0;
 }
 
+/* Following functions are local. */
+
 /*****************************************************************************
- * config_GetHomeDir: find the user's home directory.
+ * GetHomeDir: find the user's home directory.
  *****************************************************************************
  * This function will try by different ways to find the user's home path.
  *****************************************************************************/
-static char *config_GetHomeDir(void)
+static char *GetHomeDir( void )
 {
     char *p_tmp, *p_homedir = NULL;
 
@@ -653,22 +652,19 @@ static char *config_GetHomeDir(void)
     p_buffer = (char *)malloc( bufsize );
 
     if( ( ret = getpwuid_r( getuid(), &pwd, p_buffer, bufsize, &p_pw ) ) < 0 )
-    {
-
 #elif defined(HAVE_GETPWUID)
     if( ( p_pw = getpwuid( getuid() ) ) == NULL )
-    {
-
 #endif
+    {
         if( ( p_tmp = getenv( "HOME" ) ) == NULL )
         {
-            intf_ErrMsg( "Unable to get home directory, set it to /tmp" );
+            intf_ErrMsg( "config error: unable to get home directory, "
+                         "using /tmp instead" );
             p_homedir = strdup( "/tmp" );
         }
         else p_homedir = strdup( p_tmp );
-
-#if defined(HAVE_GETPWUID_R) || defined(HAVE_GETPWUID)
     }
+#if defined(HAVE_GETPWUID_R) || defined(HAVE_GETPWUID)
     else
     {
         if( p_pw ) p_homedir = strdup( p_pw->pw_dir );

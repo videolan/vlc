@@ -2,7 +2,7 @@
  * i422_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i422_yuy2.c,v 1.2 2002/02/15 13:32:53 sam Exp $
+ * $Id: i422_yuy2.c,v 1.3 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,9 +38,9 @@
 
 #define SRC_FOURCC  "I422"
 #if defined (MODULE_NAME_IS_chroma_i422_yuy2)
-#    define DEST_FOURCC "YUY2/YUNV/YVYU/UYVY/UYNV/Y422/IUYV/cyuv/Y211"
+#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv,Y211"
 #else
-#    define DEST_FOURCC "YUY2/YUNV/YVYU/UYVY/UYNV/Y422/IUYV/cyuv"
+#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv"
 #endif
 
 /*****************************************************************************

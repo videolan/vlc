@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.44 2002/03/13 08:39:39 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.45 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -485,6 +485,10 @@ int vout_Init( vout_thread_t *p_vout )
                                * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
     p_vout->output.i_chroma = FOURCC_RV32;
 
+    p_vout->output.i_rmask  = 0x00ff0000;
+    p_vout->output.i_gmask  = 0x0000ff00;
+    p_vout->output.i_bmask  = 0x000000ff;
+
     p_pic = NULL;
 
     /* Find an empty picture slot */
@@ -508,10 +512,6 @@ int vout_Init( vout_thread_t *p_vout )
     p_pic->p->i_lines = p_vout->p_sys->i_height;
     p_pic->p->b_margin = 0;
     p_pic->p->i_pitch = 4 * p_vout->p_sys->i_width;
-
-    p_pic->p->i_red_mask   = 0x00ff0000;
-    p_pic->p->i_green_mask = 0x0000ff00;
-    p_pic->p->i_blue_mask  = 0x000000ff;
 
     p_pic->i_planes = 1;
 

@@ -686,23 +686,23 @@ static int QNXInitDisplay( p_vout_thread_t p_vout )
     switch( p_vout->i_screen_depth )
     {
         case 15:
-            p_vout->i_red_mask   = 0x7c00;
-            p_vout->i_green_mask = 0x03e0;
-            p_vout->i_blue_mask  = 0x001f;
+            p_vout->output.i_rmask = 0x7c00;
+            p_vout->output.i_gmask = 0x03e0;
+            p_vout->output.i_bmask = 0x001f;
             break;
 
         case 16:
-            p_vout->i_red_mask   = 0xf800;
-            p_vout->i_green_mask = 0x07e0;
-            p_vout->i_blue_mask  = 0x001f;
+            p_vout->output.i_rmask = 0xf800;
+            p_vout->output.i_gmask = 0x07e0;
+            p_vout->output.i_bmask = 0x001f;
             break;
 
         case 24:
         case 32:
         default:
-            p_vout->i_red_mask   = 0xff0000;
-            p_vout->i_green_mask = 0x00ff00;
-            p_vout->i_blue_mask  = 0x0000ff;
+            p_vout->output.i_rmask = 0xff0000;
+            p_vout->output.i_gmask = 0x00ff00;
+            p_vout->output.i_bmask = 0x0000ff;
             break;
     }
 

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.166 2002/03/15 04:41:54 sam Exp $
+ * $Id: video_output.c,v 1.167 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -49,7 +49,10 @@ static void     RunThread         ( vout_thread_t *p_vout );
 static void     ErrorThread       ( vout_thread_t *p_vout );
 static void     EndThread         ( vout_thread_t *p_vout );
 static void     DestroyThread     ( vout_thread_t *p_vout, int i_status );
+
 static int      ReduceHeight      ( int );
+static int      BinaryLog         ( u32 );
+static void     MaskToShift       ( int *, int *, u32 );
 
 /*****************************************************************************
  * vout_InitBank: initialize the video output bank.
@@ -133,14 +136,30 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
         p_vout->p_subpicture[i_index].i_type   = EMPTY_SUBPICTURE;
     }
 
-    /* Initialize the rendering heap */
+    /* No images in the heap */
     p_vout->i_heap_size = 0;
 
+    /* Initialize the rendering heap */
     I_RENDERPICTURES = 0;
     p_vout->render.i_width    = i_width;
     p_vout->render.i_height   = i_height;
     p_vout->render.i_chroma   = i_chroma;
     p_vout->render.i_aspect   = i_aspect;
+
+    p_vout->render.i_rmask    = 0;
+    p_vout->render.i_gmask    = 0;
+    p_vout->render.i_bmask    = 0;
+
+    /* Zero the output heap */
+    I_OUTPUTPICTURES = 0;
+    p_vout->output.i_width    = 0;
+    p_vout->output.i_height   = 0;
+    p_vout->output.i_chroma   = 0;
+    p_vout->output.i_aspect   = 0;
+
+    p_vout->output.i_rmask    = 0;
+    p_vout->output.i_gmask    = 0;
+    p_vout->output.i_bmask    = 0;
 
     /* Initialize misc stuff */
     p_vout->i_changes    = 0;
@@ -260,7 +279,7 @@ static int InitThread( vout_thread_t *p_vout )
     p_vout->c_loops = 0;
 #endif
 
-    /* Initialize output method, it issues its own error messages */
+    /* Initialize output method, it allocates direct buffers for us */
     if( p_vout->pf_init( p_vout ) )
     {
         vlc_mutex_unlock( &p_vout->change_lock );
@@ -294,6 +313,14 @@ static int InitThread( vout_thread_t *p_vout )
                   p_vout->output.i_aspect / i_pgcd,
                   VOUT_ASPECT_FACTOR / i_pgcd );
 
+    /* Calculate shifts from system-updated masks */
+    MaskToShift( &p_vout->output.i_lrshift, &p_vout->output.i_rrshift,
+                 p_vout->output.i_rmask );
+    MaskToShift( &p_vout->output.i_lgshift, &p_vout->output.i_rgshift,
+                 p_vout->output.i_gmask );
+    MaskToShift( &p_vout->output.i_lbshift, &p_vout->output.i_rbshift,
+                 p_vout->output.i_bmask );
+
     /* Check whether we managed to create direct buffers similar to
      * the render buffers, ie same size, chroma and aspect ratio */
     if( ( p_vout->output.i_width == p_vout->render.i_width )
@@ -316,7 +343,6 @@ static int InitThread( vout_thread_t *p_vout )
             PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
             I_RENDERPICTURES++;
         }
-
     }
     else
     {
@@ -372,6 +398,17 @@ static int InitThread( vout_thread_t *p_vout )
             PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
             I_RENDERPICTURES++;
         }
+    }
+
+    /* Link pictures back to their heap */
+    for( i = 0 ; i < I_RENDERPICTURES ; i++ )
+    {
+        PP_RENDERPICTURE[ i ]->p_heap = &p_vout->render;
+    }
+
+    for( i = 0 ; i < I_OUTPUTPICTURES ; i++ )
+    {
+        PP_OUTPUTPICTURE[ i ]->p_heap = &p_vout->output;
     }
 
     /* Mark thread as running and return */
@@ -685,6 +722,8 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     *pi_status = i_status;
 }
 
+/* following functions are local */
+
 static int ReduceHeight( int i_ratio )
 {
     int i_dummy = VOUT_ASPECT_FACTOR;
@@ -718,5 +757,57 @@ static int ReduceHeight( int i_ratio )
     }
 
     return i_pgcd;
+}
+
+/*****************************************************************************
+ * BinaryLog: computes the base 2 log of a binary value
+ *****************************************************************************
+ * This functions is used by MaskToShift, to get a bit index from a binary
+ * value.
+ *****************************************************************************/
+static int BinaryLog(u32 i)
+{
+    int i_log = 0;
+
+    if(i & 0xffff0000) i_log += 16;
+    if(i & 0xff00ff00) i_log += 8;
+    if(i & 0xf0f0f0f0) i_log += 4;
+    if(i & 0xcccccccc) i_log += 2;
+    if(i & 0xaaaaaaaa) i_log += 1;
+
+    if (i != ((u32)1 << i_log))
+    {
+        intf_ErrMsg( "vout error: binary log overflow for %i", i );
+    }
+
+    return( i_log );
+}
+
+/*****************************************************************************
+ * MaskToShift: transform a color mask into right and left shifts
+ *****************************************************************************
+ * This function is used for obtaining color shifts from masks.
+ *****************************************************************************/
+static void MaskToShift( int *pi_left, int *pi_right, u32 i_mask )
+{
+    u32 i_low, i_high;                 /* lower hand higher bits of the mask */
+
+    if( !i_mask )
+    {
+        *pi_left = *pi_right = 0;
+        return;
+    }
+
+    /* Get bits */
+    i_low =  i_mask & (- i_mask);                   /* lower bit of the mask */
+    i_high = i_mask + i_low;                       /* higher bit of the mask */
+
+    /* Transform bits into an index */
+    i_low =  BinaryLog (i_low);
+    i_high = BinaryLog (i_high);
+
+    /* Update pointers and return */
+    *pi_left =   i_low;
+    *pi_right = (8 - i_high + i_low);
 }
 

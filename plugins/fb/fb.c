@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.14 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: fb.c,v 1.15 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -275,6 +275,14 @@ static int vout_Init( vout_thread_t *p_vout )
             return 0;
     }
 
+    /* Only useful for p_vout->p_sys->var_info.bits_per_pixel != 8 */
+    p_vout->output.i_rmask = ( (1 << p_vout->p_sys->var_info.red.length) - 1 )
+                     << p_vout->p_sys->var_info.red.offset;
+    p_vout->output.i_gmask = ( (1 << p_vout->p_sys->var_info.green.length) - 1 )
+                     << p_vout->p_sys->var_info.green.offset;
+    p_vout->output.i_bmask = ( (1 << p_vout->p_sys->var_info.blue.length) - 1 )
+                     << p_vout->p_sys->var_info.blue.offset;
+
     p_vout->output.i_width = p_vout->p_sys->i_width;
     p_vout->output.i_height = p_vout->p_sys->i_height;
 
@@ -325,14 +333,6 @@ static int vout_Init( vout_thread_t *p_vout )
         p_pic->p->i_pitch = p_vout->p_sys->var_info.xres
                              * p_vout->p_sys->i_bytes_per_pixel;
     }
-
-    /* Only useful for p_vout->p_sys->var_info.bits_per_pixel != 8 */
-    p_pic->p->i_red_mask = ( (1 << p_vout->p_sys->var_info.red.length) - 1 )
-                             << p_vout->p_sys->var_info.red.offset;
-    p_pic->p->i_green_mask = ( (1 << p_vout->p_sys->var_info.green.length) - 1 )
-                               << p_vout->p_sys->var_info.green.offset;
-    p_pic->p->i_blue_mask = ( (1 << p_vout->p_sys->var_info.blue.length) - 1 )
-                              << p_vout->p_sys->var_info.blue.offset;
 
     p_pic->i_planes = 1;
 

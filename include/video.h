@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.45 2002/03/15 04:41:54 sam Exp $
+ * $Id: video.h,v 1.46 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -44,11 +44,6 @@ typedef struct plane_s
     int i_visible_bytes;                 /* How many real pixels are there ? */
     boolean_t b_hidden;           /* Are we allowed to write to the margin ? */
 
-    /* Variables used for RGB planes */
-    int i_red_mask;
-    int i_green_mask;
-    int i_blue_mask;
-
 } plane_t;
 
 /*****************************************************************************
@@ -84,6 +79,9 @@ typedef struct picture_s
     boolean_t       b_repeat_first_field;                         /* RFF bit */
     boolean_t       b_top_field_first;               /* which field is first */
 
+    /* The picture heap we are attached to */
+    struct picture_heap_s* p_heap;
+
     /* Private data - the video output plugin might want to put stuff here to
      * keep track of the picture */
     struct picture_sys_s *p_sys;
@@ -96,19 +94,30 @@ typedef struct picture_s
  *****************************************************************************/
 typedef struct picture_heap_s
 {
-    int             i_pictures;                         /* current heap size */
+    int i_pictures;                                     /* current heap size */
 
     /* Picture static properties - those properties are fixed at initialization
      * and should NOT be modified */
-    int             i_width;                                /* picture width */
-    int             i_height;                              /* picture height */
-    u32             i_chroma;                              /* picture chroma */
-    int             i_aspect;                                /* aspect ratio */
+    int i_width;                                            /* picture width */
+    int i_height;                                          /* picture height */
+    u32 i_chroma;                                          /* picture chroma */
+    int i_aspect;                                            /* aspect ratio */
+
+    /* Variables used for RGB planes */
+    int i_rmask, i_rrshift, i_lrshift;
+    int i_gmask, i_rgshift, i_lgshift;
+    int i_bmask, i_rbshift, i_lbshift;
 
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];               /* pictures */
 
 } picture_heap_t;
+
+/* RGB2PIXEL: assemble RGB components to a pixel value, returns a u32 */
+#define RGB2PIXEL( p_vout, i_r, i_g, i_b )                                    \
+    (((((u32)i_r) >> p_vout->output.i_rrshift) << p_vout->output.i_lrshift) | \
+     ((((u32)i_g) >> p_vout->output.i_rgshift) << p_vout->output.i_lgshift) | \
+     ((((u32)i_b) >> p_vout->output.i_rbshift) << p_vout->output.i_lbshift))
 
 /*****************************************************************************
  * Flags used to describe the status of a picture
@@ -138,6 +147,7 @@ typedef struct picture_heap_s
 #define FOURCC_BI_BITFIELDS  0x00000003            /* RGB, for 16, 24, 32bpp */
 #define FOURCC_RV15          0x35315652    /* RGB 15bpp, 0x1f, 0x7e0, 0xf800 */
 #define FOURCC_RV16          0x36315652    /* RGB 16bpp, 0x1f, 0x3e0, 0x7c00 */
+#define FOURCC_RV24          0x34325652 /* RGB 24bpp, 0xff, 0xff00, 0xff0000 */
 #define FOURCC_RV32          0x32335652 /* RGB 32bpp, 0xff, 0xff00, 0xff0000 */
 
 /* Planar YUV formats */

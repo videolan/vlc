@@ -2,7 +2,7 @@
  * glide.c : 3dfx Glide plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: glide.c,v 1.12 2002/02/15 13:32:53 sam Exp $
+ * $Id: glide.c,v 1.13 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -146,6 +146,11 @@ int vout_Init( vout_thread_t *p_vout )
     int i_index;
     picture_t *p_pic;
 
+    /* FIXME: we don't set i_chroma !! */
+    p_vout->output.i_rmask = 0xf800;
+    p_vout->output.i_gmask = 0x07e0;
+    p_vout->output.i_bmask = 0x001f;
+
     I_OUTPUTPICTURES = 0;
 
     p_pic = NULL;
@@ -178,10 +183,6 @@ int vout_Init( vout_thread_t *p_vout )
     p_pic->p->i_visible_bytes = GLIDE_WIDTH * GLIDE_BYTES_PER_PIXEL;
     p_pic->p->i_pitch = p_vout->p_sys->p_buffer_info.strideInBytes;
                          /*1024 * GLIDE_BYTES_PER_PIXEL*/
-
-    p_pic->p->i_red_mask =   0xf800;
-    p_pic->p->i_green_mask = 0x07e0;
-    p_pic->p->i_blue_mask =  0x001f;
 
     p_pic->i_status = DESTROYED_PICTURE;
     p_pic->i_type   = DIRECT_PICTURE;

@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.5 2002/02/15 13:32:53 sam Exp $
+ * $Id: i420_rgb.c,v 1.6 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,6 +35,9 @@
 #include "video_output.h"
 
 #include "i420_rgb.h"
+#if defined (MODULE_NAME_IS_chroma_i420_rgb)
+#   include "i420_rgb_c.h"
+#endif
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -44,6 +47,11 @@ static void chroma_getfunctions ( function_list_t * p_function_list );
 static int  chroma_Init         ( vout_thread_t *p_vout );
 static void chroma_End          ( vout_thread_t *p_vout );
 
+#if defined (MODULE_NAME_IS_chroma_i420_rgb)
+static void SetGammaTable       ( int *pi_table, double f_gamma );
+static void SetYUV              ( vout_thread_t *p_vout );
+#endif
+
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
@@ -52,10 +60,10 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
-    SET_DESCRIPTION( "I420/IYUV/YV12 to RGB 8/15/16/24/32 conversions" )
+    SET_DESCRIPTION( "I420,IYUV,YV12 to RGB,RV15,RV16,RV24,RV32 conversions" )
     ADD_CAPABILITY( CHROMA, 80 )
 #elif defined (MODULE_NAME_IS_chroma_i420_rgb_mmx)
-    SET_DESCRIPTION( "MMX I420/IYUV/YV12 to RGB 15/16/24/32 conversions" )
+    SET_DESCRIPTION( "MMX I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversions" )
     ADD_CAPABILITY( CHROMA, 100 )
     ADD_REQUIREMENT( MMX )
 #endif
@@ -85,6 +93,10 @@ static void chroma_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int chroma_Init( vout_thread_t *p_vout )
 {
+#if defined (MODULE_NAME_IS_chroma_i420_rgb)
+    size_t i_tables_size;
+#endif
+
     if( p_vout->render.i_width & 1 || p_vout->render.i_height & 1 )
     {
         return -1;
@@ -98,7 +110,7 @@ static int chroma_Init( vout_thread_t *p_vout )
             switch( p_vout->output.i_chroma )
             {
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
-                case FOURCC_BI_RGB:
+                case FOURCC_RGB:
                     p_vout->chroma.pf_convert = _M( I420_RGB8 );
                     break;
 #endif
@@ -132,7 +144,7 @@ static int chroma_Init( vout_thread_t *p_vout )
     switch( p_vout->output.i_chroma )
     {
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
-        case FOURCC_BI_RGB:
+        case FOURCC_RGB:
             p_vout->chroma.p_sys->p_buffer = malloc( VOUT_MAX_WIDTH );
             break;
 #endif
@@ -166,6 +178,33 @@ static int chroma_Init( vout_thread_t *p_vout )
         return -1;
     }
 
+#if defined (MODULE_NAME_IS_chroma_i420_rgb)
+    switch( p_vout->output.i_chroma )
+    {
+    case FOURCC_RGB:
+        i_tables_size = sizeof( u8 ) * PALETTE_TABLE_SIZE;
+        break;
+    case FOURCC_RV15:
+    case FOURCC_RV16:
+        i_tables_size = sizeof( u16 ) * RGB_TABLE_SIZE;
+        break;
+    default: /* RV24, RV32 */
+        i_tables_size = sizeof( u32 ) * RGB_TABLE_SIZE;
+        break;
+    }
+
+    p_vout->chroma.p_sys->p_base = malloc( i_tables_size );
+    if( p_vout->chroma.p_sys->p_base == NULL )
+    {
+        free( p_vout->chroma.p_sys->p_offset );
+        free( p_vout->chroma.p_sys->p_buffer );
+        free( p_vout->chroma.p_sys );
+        return -1;
+    }
+
+    SetYUV( p_vout );
+#endif
+
     return 0; 
 }
 
@@ -176,8 +215,217 @@ static int chroma_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void chroma_End( vout_thread_t *p_vout )
 {
+#if defined (MODULE_NAME_IS_chroma_i420_rgb)
+    free( p_vout->chroma.p_sys->p_base );
+#endif
     free( p_vout->chroma.p_sys->p_offset );
     free( p_vout->chroma.p_sys->p_buffer );
     free( p_vout->chroma.p_sys );
 }
+
+#if defined (MODULE_NAME_IS_chroma_i420_rgb)
+/*****************************************************************************
+ * SetGammaTable: return intensity table transformed by gamma curve.
+ *****************************************************************************
+ * pi_table is a table of 256 entries from 0 to 255.
+ *****************************************************************************/
+static void SetGammaTable( int *pi_table, double f_gamma )
+{
+    int         i_y;                                       /* base intensity */
+
+    /* Use exp(gamma) instead of gamma */
+    f_gamma = exp( f_gamma );
+
+    /* Build gamma table */
+    for( i_y = 0; i_y < 256; i_y++ )
+    {
+        pi_table[ i_y ] = pow( (double)i_y / 256, f_gamma ) * 256;
+    }
+}
+
+/*****************************************************************************
+ * SetYUV: compute tables and set function pointers
+ *****************************************************************************/
+static void SetYUV( vout_thread_t *p_vout )
+{
+    int         pi_gamma[256];                                /* gamma table */
+    int         i_index;                                  /* index in tables */
+
+    /* Build gamma table */
+    SetGammaTable( pi_gamma, p_vout->f_gamma );
+
+    /*
+     * Set pointers and build YUV tables
+     */
+    /* Color: build red, green and blue tables */
+    switch( p_vout->output.i_chroma )
+    {
+    case FOURCC_RGB:
+        {
+            #define RGB_MIN 0
+            #define RGB_MAX 255
+            #define CLIP( x ) ( ((x < 0) ? 0 : (x > 255) ? 255 : x) << 8 )
+
+            int y,u,v;
+            int r,g,b;
+            int uvr, uvg, uvb;
+            int i = 0, j = 0;
+            u16 red[256], green[256], blue[256], transp[256];
+            unsigned char lookup[PALETTE_TABLE_SIZE];
+
+            p_vout->chroma.p_sys->yuv.p_rgb8 = (u8 *)p_vout->chroma.p_sys->p_base;
+
+            /* this loop calculates the intersection of an YUV box
+             * and the RGB cube. */
+            for ( y = 0; y <= 256; y += 16 )
+            {
+                for ( u = 0; u <= 256; u += 32 )
+                for ( v = 0; v <= 256; v += 32 )
+                {
+                    uvr = (V_RED_COEF*(v-128)) >> SHIFT;
+                    uvg = (U_GREEN_COEF*(u-128) + V_GREEN_COEF*(v-128)) >> SHIFT;
+                    uvb = (U_BLUE_COEF*(u-128)) >> SHIFT;
+                    r = y + uvr;
+                    g = y + uvg;
+                    b = y + uvb;
+
+                    if( r >= RGB_MIN && g >= RGB_MIN && b >= RGB_MIN
+                            && r <= RGB_MAX && g <= RGB_MAX && b <= RGB_MAX )
+                    {
+                        /* this one should never happen unless someone fscked up my code */
+                        if(j == 256) { intf_ErrMsg( "vout error: no colors left to build palette" ); break; }
+
+                        /* clip the colors */
+                        red[j] = CLIP( r );
+                        green[j] = CLIP( g );
+                        blue[j] = CLIP( b );
+                        transp[j] = 0;
+
+                        /* allocate color */
+                        lookup[i] = 1;
+                        p_vout->chroma.p_sys->yuv.p_rgb8[i++] = j;
+                        j++;
+                    }
+                    else
+                    {
+                        lookup[i] = 0;
+                        p_vout->chroma.p_sys->yuv.p_rgb8[i++] = 0;
+                    }
+                }
+                i += 128-81;
+            }
+
+            /* the colors have been allocated, we can set the palette */
+            /* there will eventually be a way to know which colors
+             * couldn't be allocated and try to find a replacement */
+#if 0
+            p_vout->pf_setpalette( p_vout, red, green, blue, transp );
+
+            p_vout->i_white_pixel = 0xff;
+            p_vout->i_black_pixel = 0x00;
+            p_vout->i_gray_pixel = 0x44;
+            p_vout->i_blue_pixel = 0x3b;
+#endif
+
+            i = 0;
+            /* this loop allocates colors that got outside
+             * the RGB cube */
+            for ( y = 0; y <= 256; y += 16 )
+            {
+                for ( u = 0; u <= 256; u += 32 )
+                for ( v = 0; v <= 256; v += 32 )
+                {
+                    int u2, v2;
+                    int dist, mindist = 100000000;
+
+                    if( lookup[i] || y==0)
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    /* heavy. yeah. */
+                    for( u2 = 0; u2 <= 256; u2 += 32 )
+                    for( v2 = 0; v2 <= 256; v2 += 32 )
+                    {
+                        j = ((y>>4)<<7) + (u2>>5)*9 + (v2>>5);
+                        dist = (u-u2)*(u-u2) + (v-v2)*(v-v2);
+                        if( lookup[j] )
+                        /* find the nearest color */
+                        if( dist < mindist )
+                        {
+                            p_vout->chroma.p_sys->yuv.p_rgb8[i] = p_vout->chroma.p_sys->yuv.p_rgb8[j];
+                            mindist = dist;
+                        }
+                        j -= 128;
+                        if( lookup[j] )
+                        /* find the nearest color */
+                        if( dist + 128 < mindist )
+                        {
+                            p_vout->chroma.p_sys->yuv.p_rgb8[i] = p_vout->chroma.p_sys->yuv.p_rgb8[j];
+                            mindist = dist + 128;
+                        }
+                    }
+                    i++;
+                }
+                i += 128-81;
+            }
+
+        }
+        break;
+
+    case FOURCC_RV15:
+    case FOURCC_RV16:
+        p_vout->chroma.p_sys->yuv.p_rgb16 = (u16 *)p_vout->chroma.p_sys->p_base;
+        for( i_index = 0; i_index < RED_MARGIN; i_index++ )
+        {
+            p_vout->chroma.p_sys->yuv.p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_vout, pi_gamma[0], 0, 0 );
+            p_vout->chroma.p_sys->yuv.p_rgb16[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_vout, pi_gamma[255], 0, 0 );
+        }
+        for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
+        {
+            p_vout->chroma.p_sys->yuv.p_rgb16[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[0], 0 );
+            p_vout->chroma.p_sys->yuv.p_rgb16[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_vout, 0, pi_gamma[255], 0 );
+        }
+        for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
+        {
+            p_vout->chroma.p_sys->yuv.p_rgb16[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[0] );
+            p_vout->chroma.p_sys->yuv.p_rgb16[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[255] );
+        }
+        for( i_index = 0; i_index < 256; i_index++ )
+        {
+            p_vout->chroma.p_sys->yuv.p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( p_vout, pi_gamma[ i_index ], 0, 0 );
+            p_vout->chroma.p_sys->yuv.p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[ i_index ], 0 );
+            p_vout->chroma.p_sys->yuv.p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] );
+        }
+        break;
+
+    case FOURCC_RV24:
+    case FOURCC_RV32:
+        p_vout->chroma.p_sys->yuv.p_rgb32 = (u32 *)p_vout->chroma.p_sys->p_base;
+        for( i_index = 0; i_index < RED_MARGIN; i_index++ )
+        {
+            p_vout->chroma.p_sys->yuv.p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_vout, pi_gamma[0], 0, 0 );
+            p_vout->chroma.p_sys->yuv.p_rgb32[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_vout, pi_gamma[255], 0, 0 );
+        }
+        for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
+        {
+            p_vout->chroma.p_sys->yuv.p_rgb32[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[0], 0 );
+            p_vout->chroma.p_sys->yuv.p_rgb32[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_vout, 0, pi_gamma[255], 0 );
+        }
+        for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
+        {
+            p_vout->chroma.p_sys->yuv.p_rgb32[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[0] );
+            p_vout->chroma.p_sys->yuv.p_rgb32[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[255] );
+        }
+        for( i_index = 0; i_index < 256; i_index++ )
+        {
+            p_vout->chroma.p_sys->yuv.p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( p_vout, pi_gamma[ i_index ], 0, 0 );
+            p_vout->chroma.p_sys->yuv.p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[ i_index ], 0 );
+            p_vout->chroma.p_sys->yuv.p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] );
+        }
+        break;
+    }
+}
+#endif
 

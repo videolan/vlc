@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.18 2002/02/15 13:32:53 sam Exp $
+ * $Id: vout_dummy.c,v 1.19 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -119,6 +119,9 @@ static int vout_Init( vout_thread_t *p_vout )
 
         default:
             p_vout->output.i_chroma = FOURCC_RV16;
+            p_vout->output.i_rmask  = 0xf800;
+            p_vout->output.i_gmask  = 0x07e0;
+            p_vout->output.i_bmask  = 0x001f;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
             p_vout->output.i_aspect = p_vout->render.i_aspect;
@@ -270,9 +273,6 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_pic->p->i_pitch = i_width;
         p_pic->p->i_pixel_bytes = 2;
         p_pic->p->b_margin = 0;
-        p_pic->p->i_red_mask   = 0xf800;
-        p_pic->p->i_green_mask = 0x07e0;
-        p_pic->p->i_blue_mask  = 0x001f;
 
         /* We allocated 1 plane */
         p_pic->i_planes = 1;

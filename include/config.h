@@ -47,6 +47,10 @@
  * outputting an error message (in second) */
 #define THREAD_COND_TIMEOUT             5
 
+/* The configuration file and directory */
+#define CONFIG_DIR                      ".videolan"
+#define CONFIG_FILE                     "vlcrc"
+
 /*****************************************************************************
  * Interface configuration
  *****************************************************************************/

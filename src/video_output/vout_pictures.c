@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.18 2002/02/27 18:19:21 sam Exp $
+ * $Id: vout_pictures.c,v 1.19 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -465,9 +465,9 @@ void vout_AllocatePicture( picture_t *p_pic,
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 2;
             p_pic->p->i_pixel_bytes = 2;
-            p_pic->p->i_red_mask =   0x001f;
-            p_pic->p->i_green_mask = 0x03e0;
-            p_pic->p->i_blue_mask =  0x7c00;
+            p_pic->p_heap->i_rmask = 0x001f;
+            p_pic->p_heap->i_gmask = 0x03e0;
+            p_pic->p_heap->i_bmask = 0x7c00;
             p_pic->i_planes = 1;
             break;
 
@@ -475,9 +475,9 @@ void vout_AllocatePicture( picture_t *p_pic,
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 2;
             p_pic->p->i_pixel_bytes = 2;
-            p_pic->p->i_red_mask =   0x001f;
-            p_pic->p->i_green_mask = 0x07e0;
-            p_pic->p->i_blue_mask =  0xf800;
+            p_pic->p_heap->i_rmask = 0x001f;
+            p_pic->p_heap->i_gmask = 0x07e0;
+            p_pic->p_heap->i_bmask = 0xf800;
             p_pic->i_planes = 1;
             break;
 
@@ -485,9 +485,9 @@ void vout_AllocatePicture( picture_t *p_pic,
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 4;
             p_pic->p->i_pixel_bytes = 4;
-            p_pic->p->i_red_mask =   0xff0000;
-            p_pic->p->i_green_mask = 0x00ff00;
-            p_pic->p->i_blue_mask =  0x0000ff;
+            p_pic->p_heap->i_rmask = 0xff0000;
+            p_pic->p_heap->i_gmask = 0x00ff00;
+            p_pic->p_heap->i_bmask = 0x0000ff;
             p_pic->i_planes = 1;
             break;
 

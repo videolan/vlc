@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.24 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: vout_directx.c,v 1.25 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1045,6 +1045,9 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     {
         /* FixMe */
         p_vout->output.i_chroma = FOURCC_RV16;
+        p_vout->output.i_rmask  = 0x001f;
+        p_vout->output.i_gmask  = 0x03e0;
+        p_vout->output.i_bmask  = 0x7c00;
 
         for( i = 0; i < i_num_pics; i++ )
         {
@@ -1176,10 +1179,6 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p->i_pixel_bytes = 2;
             p_pic->p->b_margin = 0;
 
-            p_pic->p->i_red_mask   = 0x001f;
-            p_pic->p->i_green_mask = 0x03e0;
-            p_pic->p->i_blue_mask  = 0x7c00;
-
             p_pic->i_planes = 1;
             break;
 
@@ -1190,10 +1189,6 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
             p_pic->p->i_pixel_bytes = 2;
             p_pic->p->b_margin = 0;
-
-            p_pic->p->i_red_mask   = 0x001f;
-            p_pic->p->i_green_mask = 0x07e0;
-            p_pic->p->i_blue_mask  = 0xf800;
 
             p_pic->i_planes = 1;
             break;

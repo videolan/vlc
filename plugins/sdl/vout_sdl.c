@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.82 2002/02/19 00:50:19 sam Exp $
+ * $Id: vout_sdl.c,v 1.83 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -70,9 +70,6 @@ typedef struct vout_sys_s
 
     /* For RGB output */
     int i_surfaces;
-    int i_red_mask;
-    int i_green_mask;
-    int i_blue_mask;
 
     boolean_t   b_cursor;
     boolean_t   b_cursor_autohidden;
@@ -648,7 +645,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         switch( p_vout->p_sys->p_display->format->BitsPerPixel )
         {
             case 8:
-                p_vout->output.i_chroma = FOURCC_BI_RGB;
+                p_vout->output.i_chroma = FOURCC_RGB;
                 break;
             case 15:
                 p_vout->output.i_chroma = FOURCC_RV15;
@@ -657,10 +654,10 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
                 p_vout->output.i_chroma = FOURCC_RV16;
                 break;
             case 24:
-                p_vout->output.i_chroma = FOURCC_BI_BITFIELDS;
+                p_vout->output.i_chroma = FOURCC_RV24;
                 break;
             case 32:
-                p_vout->output.i_chroma = FOURCC_BI_BITFIELDS;
+                p_vout->output.i_chroma = FOURCC_RV32;
                 break;
             default:
                 intf_ErrMsg( "vout error: unknown screen depth" );
@@ -669,9 +666,9 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
                 return( -1 );
         }
 
-        p_vout->p_sys->i_red_mask = p_vout->p_sys->p_display->format->Rmask;
-        p_vout->p_sys->i_green_mask = p_vout->p_sys->p_display->format->Gmask;
-        p_vout->p_sys->i_blue_mask = p_vout->p_sys->p_display->format->Bmask;
+        p_vout->output.i_rmask = p_vout->p_sys->p_display->format->Rmask;
+        p_vout->output.i_gmask = p_vout->p_sys->p_display->format->Gmask;
+        p_vout->output.i_bmask = p_vout->p_sys->p_display->format->Bmask;
 
         SDL_WM_SetCaption( VOUT_TITLE " (software RGB SDL output)",
                            VOUT_TITLE " (software RGB SDL output)" );
@@ -749,10 +746,6 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->b_hidden = 1;
             p_pic->p->i_visible_bytes = 2 * p_vout->p_sys->p_display->w;
         }
-
-        p_pic->p->i_red_mask = p_vout->p_sys->p_display->format->Rmask;
-        p_pic->p->i_green_mask = p_vout->p_sys->p_display->format->Gmask;
-        p_pic->p->i_blue_mask = p_vout->p_sys->p_display->format->Bmask;
 
         p_vout->p_sys->i_surfaces++;
 

@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.21 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: xcommon.c,v 1.22 2002/03/16 23:03:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -155,9 +155,6 @@ typedef struct vout_sys_s
     int                 i_screen_depth;
     int                 i_bytes_per_pixel;
     int                 i_bytes_per_line;
-    int                 i_red_mask;
-    int                 i_green_mask;
-    int                 i_blue_mask;
 #endif
 
     /* X11 generic properties */
@@ -432,21 +429,35 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
+    switch( p_vout->output.i_chroma )
+    {
+        case FOURCC_RV15:
+            p_vout->output.i_rmask = 0x001f;
+            p_vout->output.i_gmask = 0x07e0;
+            p_vout->output.i_bmask = 0xf800;
+            break;
+        case FOURCC_RV16:
+            p_vout->output.i_rmask = 0x001f;
+            p_vout->output.i_gmask = 0x03e0;
+            p_vout->output.i_bmask = 0x7c00;
+            break;
+    }
+
 #else
     /* Initialize the output structure: RGB with square pixels, whatever
      * the input format is, since it's the only format we know */
     switch( p_vout->p_sys->i_screen_depth )
     {
         case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = FOURCC_BI_RGB; break;
+            p_vout->output.i_chroma = FOURCC_RGB; break;
         case 15:
             p_vout->output.i_chroma = FOURCC_RV15; break;
         case 16:
             p_vout->output.i_chroma = FOURCC_RV16; break;
         case 24:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
+            p_vout->output.i_chroma = FOURCC_RV24; break;
         case 32:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
+            p_vout->output.i_chroma = FOURCC_RV24; break;
         default:
             intf_ErrMsg( "vout error: unknown screen depth" );
             return( 0 );
@@ -1276,10 +1287,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->i_pixel_bytes = 2;
             p_pic->p->b_margin = 0;
 
-            p_pic->p->i_red_mask   = 0x001f;
-            p_pic->p->i_green_mask = 0x07e0;
-            p_pic->p->i_blue_mask  = 0xf800;
-
             p_pic->i_planes = 1;
             break;
 
@@ -1291,10 +1298,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
             p_pic->p->i_pixel_bytes = 2;
             p_pic->p->b_margin = 0;
-
-            p_pic->p->i_red_mask   = 0x001f;
-            p_pic->p->i_green_mask = 0x03e0;
-            p_pic->p->i_blue_mask  = 0x7c00;
 
             p_pic->i_planes = 1;
             break;
@@ -1320,10 +1323,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                 p_pic->p->i_visible_bytes = 2 * p_pic->p_sys->p_image->width;
             }
 
-            p_pic->p->i_red_mask   = p_pic->p_sys->p_image->red_mask;
-            p_pic->p->i_green_mask = p_pic->p_sys->p_image->green_mask;
-            p_pic->p->i_blue_mask  = p_pic->p_sys->p_image->blue_mask;
-
             p_pic->i_planes = 1;
 
             break;
@@ -1346,10 +1345,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                 p_pic->p->b_hidden = 1;
                 p_pic->p->i_visible_bytes = 4 * p_pic->p_sys->p_image->width;
             }
-
-            p_pic->p->i_red_mask   = p_pic->p_sys->p_image->red_mask;
-            p_pic->p->i_green_mask = p_pic->p_sys->p_image->green_mask;
-            p_pic->p->i_blue_mask  = p_pic->p_sys->p_image->blue_mask;
 
             p_pic->i_planes = 1;
 
@@ -2074,9 +2069,10 @@ static int InitDisplay( vout_thread_t *p_vout )
             intf_ErrMsg( "vout error: no TrueColor visual available" );
             return( 1 );
         }
-        p_vout->p_sys->i_red_mask =        p_xvisual->red_mask;
-        p_vout->p_sys->i_green_mask =      p_xvisual->green_mask;
-        p_vout->p_sys->i_blue_mask =       p_xvisual->blue_mask;
+
+        p_vout->output.i_rmask = p_xvisual->red_mask;
+        p_vout->output.i_gmask = p_xvisual->green_mask;
+        p_vout->output.i_bmask = p_xvisual->blue_mask;
 
         /* There is no difference yet between 3 and 4 Bpp. The only way
          * to find the actual number of bytes per pixel is to list supported
