@@ -27,10 +27,12 @@
 #include "defs.h"
 
 #include <stdio.h>
+#include <unistd.h>                                               /* close() */
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
 #include <sys/stat.h>                                    /* fstat, off_t ... */
-#include <byteorder.h>                                          /* ntohl ... */
+#include <netinet/in.h>                                           /* ntohl() */
+#include <fcntl.h>                                                 /* open() */
 #include <malloc.h>                                      /* malloc, read ... */
 #include <string.h>
 
