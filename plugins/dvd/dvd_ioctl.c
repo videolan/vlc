@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.16 2001/05/31 03:12:49 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.17 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,7 +53,10 @@
 #   include <scsi.h>
 #endif
 
+#include "config.h"
 #include "common.h"
+#include "threads.h"
+#include "mtime.h"
 
 #include "intf_msg.h"
 
@@ -63,6 +66,9 @@
 
 #include "dvd_css.h"
 #include "dvd_ioctl.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes, BeOS specific

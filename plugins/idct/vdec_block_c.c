@@ -2,7 +2,7 @@
  * vdec_block_c.c: Macroblock copy functions in C
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block_c.c,v 1.2 2001/05/30 17:03:12 sam Exp $
+ * $Id: vdec_block_c.c,v 1.3 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,6 +56,9 @@
 #include "video_fifo.h"
 
 #include "vdec_block.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Static variables
@@ -150,12 +153,6 @@ void _M( vdec_DecodeMacroblockC ) ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
     {
         DECODEBLOCKSC( CopyBlock )
     }
-
-    /*
-     * Decoding is finished, release the macroblock and free
-     * unneeded memory.
-     */
-    vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
 }
 
 void _M( vdec_DecodeMacroblockBW ) ( vdec_thread_t *p_vdec,
@@ -181,11 +178,5 @@ void _M( vdec_DecodeMacroblockBW ) ( vdec_thread_t *p_vdec,
     {
         DECODEBLOCKSBW( CopyBlock )
     }
-
-    /*
-     * Decoding is finished, release the macroblock and free
-     * unneeded memory.
-     */
-    vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
 }
 

@@ -2,7 +2,7 @@
  * video_fifo.h : FIFO for the pool of video_decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_fifo.h,v 1.18 2001/05/06 04:32:02 sam Exp $
+ * $Id: video_fifo.h,v 1.19 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -112,26 +112,6 @@ static __inline__ macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
 }
 
 /*****************************************************************************
- * vpar_DecodeMacroblock : put a macroblock in the video fifo
- *****************************************************************************/
-static __inline__ void vpar_DecodeMacroblock( video_fifo_t * p_fifo,
-                                              macroblock_t * p_mb )
-{
-#ifdef VDEC_SMP
-    /* Place picture in the video FIFO */
-    vlc_mutex_lock( &p_fifo->lock );
-
-    /* By construction, the video FIFO cannot be full */
-    VIDEO_FIFO_END( *p_fifo ) = p_mb;
-    VIDEO_FIFO_INCEND( *p_fifo );
-
-    vlc_mutex_unlock( &p_fifo->lock );
-#else
-    p_fifo->p_vpar->pf_decode_mb_c( p_fifo->p_vpar->pp_vdec[0], p_mb );
-#endif
-}
-
-/*****************************************************************************
  * vpar_ReleaseMacroblock : release a macroblock and put the picture in the
  *                          video output heap, if it is finished
  *****************************************************************************/
@@ -185,6 +165,27 @@ static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
         /* Warn Synchro for its records. */
         vpar_SynchroEnd( p_fifo->p_vpar, 0 );
     }
+#endif
+}
+
+/*****************************************************************************
+ * vpar_DecodeMacroblock : put a macroblock in the video fifo
+ *****************************************************************************/
+static __inline__ void vpar_DecodeMacroblock( video_fifo_t * p_fifo,
+                                              macroblock_t * p_mb )
+{
+#ifdef VDEC_SMP
+    /* Place picture in the video FIFO */
+    vlc_mutex_lock( &p_fifo->lock );
+
+    /* By construction, the video FIFO cannot be full */
+    VIDEO_FIFO_END( *p_fifo ) = p_mb;
+    VIDEO_FIFO_INCEND( *p_fifo );
+
+    vlc_mutex_unlock( &p_fifo->lock );
+#else
+    p_fifo->p_vpar->pf_decode_mb_c( p_fifo->p_vpar->pp_vdec[0], p_mb );
+    vpar_ReleaseMacroblock( &p_fifo->p_vpar->vfifo, p_mb );
 #endif
 }
 

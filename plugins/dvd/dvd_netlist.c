@@ -7,7 +7,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.8 2001/05/31 03:57:54 sam Exp $
+ * $Id: dvd_netlist.c,v 1.9 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -59,6 +59,9 @@
 
 #include "input.h"
 #include "dvd_netlist.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes

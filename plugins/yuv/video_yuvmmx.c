@@ -3,7 +3,7 @@
  * Provides functions to perform the YUV conversion.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuvmmx.c,v 1.9 2001/05/15 16:19:42 sam Exp $
+ * $Id: video_yuvmmx.c,v 1.10 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,14 +42,15 @@
 #include "mtime.h"
 #include "tests.h"
 
-#include "modules.h"
-
 #include "video.h"
 #include "video_output.h"
 
 #include "video_common.h"
 
 #include "intf_msg.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 static int     yuv_Probe      ( probedata_t *p_data );
 static int     yuv_Init       ( vout_thread_t *p_vout );

@@ -170,6 +170,10 @@ ifneq (,$(findstring darwin,$(SYS)))
 CFLAGS += -traditional-cpp
 endif
 
+ifneq (,$(findstring mingw32,$(SYS)))                                                                     
+CFLAGS += -fnative-struct
+endif
+
 # Optimizations : don't compile debug versions with them
 ifeq ($(OPTIMS),1)
 CFLAGS += -O3
@@ -216,6 +220,20 @@ LCFLAGS += -Wall
 ifneq (,$(findstring mingw32,$(SYS)))
 LCFLAGS += -Xlinker --force-exe-suffix
 endif
+
+#
+# C compiler flags: plugin compilation
+#
+ifneq (,$(findstring mingw32,$(SYS)))
+PCFLAGS += -fPIC -fnative-struct
+else
+PCFLAGS += -fPIC
+endif
+
+#
+# C compiler flags: plugin linking
+#
+PLCFLAGS += @PLCFLAGS@
 
 #
 # Debugging and profiling support

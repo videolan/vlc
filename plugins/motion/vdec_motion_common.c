@@ -2,7 +2,7 @@
  * vdec_motion_common.c : common motion compensation routines common
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_common.c,v 1.6 2001/04/15 04:19:57 sam Exp $
+ * $Id: vdec_motion_common.c,v 1.7 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -39,7 +39,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "modules.h"
 
 #include "intf_msg.h"
 
@@ -47,6 +46,9 @@
 
 #include "vdec_motion.h"
 #include "vpar_blocks.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 extern int _M( motion_Probe )( probedata_t *p_data );
 

@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.51 2001/05/31 01:37:08 sam Exp $
+ * $Id: video_decoder.c,v 1.52 2001/06/03 12:47:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -237,6 +237,10 @@ static void RunThread( vdec_thread_t *p_vdec )
         if( (p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo )) != NULL )
         {
             p_vdec->pf_decode_mb_c( p_vdec, p_mb );
+
+            /* Decoding is finished, release the macroblock and free
+             * unneeded memory. */
+            vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
         }
     }
 

@@ -2,7 +2,7 @@
  * null.c : NULL module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: null.c,v 1.7 2001/05/30 17:03:12 sam Exp $
+ * $Id: null.c,v 1.8 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,6 +38,7 @@
 
 #include "modules.h"
 #include "modules_inner.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Build configuration tree.

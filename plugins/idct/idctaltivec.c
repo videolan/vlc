@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctaltivec.c,v 1.7 2001/05/30 17:03:12 sam Exp $
+ * $Id: idctaltivec.c,v 1.8 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -48,6 +48,8 @@
 #include "vdec_idct.h"
 
 #include "idctaltivec.h"
+
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes.

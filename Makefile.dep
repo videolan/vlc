@@ -1,5 +1,5 @@
 ################################################################################
-# vlc (VideoLAN Client) dependancies makefile
+# vlc (VideoLAN Client) dependencies makefile
 # (c)1998 VideoLAN
 ################################################################################
 # This Makefile is dedicated to build of .d files. It should not be called
@@ -7,23 +7,23 @@
 ################################################################################
 
 ###############################################################################
-# Note on generic rules and dependancies
+# Note on generic rules and dependencies
 ###############################################################################
 
-# Note on dependancies: each .c file is associated with a .d file, which
+# Note on dependencies: each .c file is associated with a .d file, which
 # depends of it. The .o file associated with a .c file depends of the .d, of the
 # .c itself, and of Makefile. The .d files are stored in a separate .dep/
 # directory.
 # The dep directory should be ignored by CVS.
 
-# Note on inclusions: depending of the target, the dependancies files must
+# Note on inclusions: depending of the target, the dependencies files must
 # or must not be included. The problem is that if we ask make to include a file,
 # and this file does not exist, it is made before it can be included. In a
 # general way, a .d file should be included if and only if the corresponding .o
 # needs to be re-made.
 
 # The object Makefile knows how to make a .o from a .c, and includes
-# dependancies for the target, but only those required.
+# dependencies for the target, but only those required.
 
 # All settings and options are passed through main Makefile
 
@@ -36,18 +36,18 @@ default:
 	@echo "see notes at end of main Makefile."
 
 ################################################################################
-# Dependancies creation
+# Dependencies creation
 ################################################################################
 
-# A dependancies file needs to be rebuilt if the .c  changed or if one of the 
-# dependancies files have been changed. In other words, it depends from the
+# A dependencies file needs to be rebuilt if the .c  changed or if one of the 
+# dependencies files have been changed. In other words, it depends from the
 # .c and from itself.
 
 -include $(MAKECMDGOALS)
 
 $(C_DEP): .dep/%.d: %.c
 	@test -d .dep/$(dir $*) || mkdir -p .dep/$(dir $*)
-	#@echo "generating dependancies for $*.c"
+	@echo "regenerating dependencies for $*.c"
 	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) 2>/dev/null $< \
 	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
 	.dep\/$(subst /,\/,$*).d : /g'\'' > $@; \
@@ -55,7 +55,7 @@ $(C_DEP): .dep/%.d: %.c
 
 $(CPP_DEP): .dep/%.dpp: %.cpp
 	@test -d .dep/$(dir $*) || mkdir -p .dep/$(dir $*)
-	#@echo "generating dependancies for $*.c"
+	@echo "regenerating dependencies for $*.c"
 	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) 2>/dev/null $< \
 	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
 	.dep\/$(subst /,\/,$*).dpp : /g'\'' > $@; \

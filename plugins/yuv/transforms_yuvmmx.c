@@ -3,7 +3,7 @@
  * Provides functions to perform the YUV conversion.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: transforms_yuvmmx.c,v 1.5 2001/04/15 04:19:58 sam Exp $
+ * $Id: transforms_yuvmmx.c,v 1.6 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,6 +49,9 @@
 #include "transforms_yuvmmx.h"
 
 #include "intf_msg.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * ConvertY4Gray8: grayscale YUV 4:x:x to RGB 8 bpp

@@ -2,7 +2,7 @@
  * es.c : Elementary Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: es.c,v 1.2 2001/05/30 17:03:12 sam Exp $
+ * $Id: es.c,v 1.3 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: 
  *
@@ -38,6 +38,7 @@
 #include "mtime.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.

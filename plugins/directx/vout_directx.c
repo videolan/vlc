@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.1 2001/06/02 01:09:03 sam Exp $
+ * $Id: vout_directx.c,v 1.2 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -864,7 +864,7 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
                                              ddsd.lpSurface );
         /* FIXME: palette in 8bpp ?? */
         /* Set and initialize buffers */
-        vout_SetBuffers( p_vout, p_vout->p_sys->p_windx_buf[ 0 ],
+        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_windx_buf[ 0 ],
                                  p_vout->p_sys->p_windx_buf[ 1 ] );
     }
     else
@@ -902,7 +902,7 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         dxresult = IDirectDrawSurface_Unlock(p_vout->p_sys->p_overlay,
                                              ddsd.lpSurface );
 
-        vout_SetBuffers( p_vout, p_vout->p_sys->p_windx_buf[ 0 ],
+        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_windx_buf[ 0 ],
                                  p_vout->p_sys->p_windx_buf[ 1 ] );
     }
 

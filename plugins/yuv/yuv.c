@@ -2,7 +2,7 @@
  * yuv.c : C YUV module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: yuv.c,v 1.7 2001/05/30 17:03:12 sam Exp $
+ * $Id: yuv.c,v 1.8 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -40,6 +40,7 @@
 #include "video_output.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.

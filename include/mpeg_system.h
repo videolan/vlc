@@ -3,7 +3,7 @@
  * and TS system layers
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_system.h,v 1.3 2001/03/21 13:42:33 sam Exp $
+ * $Id: mpeg_system.h,v 1.4 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -115,12 +115,13 @@ typedef struct stream_ps_data_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void input_ParsePES( struct input_thread_s *, struct es_descriptor_s * );
-void input_GatherPES( struct input_thread_s *, struct data_packet_s *,
-                      struct es_descriptor_s *, boolean_t, boolean_t );
+void input_ParsePES  ( struct input_thread_s *, struct es_descriptor_s * );
+void input_GatherPES ( struct input_thread_s *, struct data_packet_s *,
+                       struct es_descriptor_s *, boolean_t, boolean_t );
 es_descriptor_t * input_ParsePS( struct input_thread_s *,
                                  struct data_packet_s * );
-void input_DemuxPS( struct input_thread_s *, struct data_packet_s * );
-void input_DemuxTS( struct input_thread_s *, struct data_packet_s * );
-void input_DemuxPSI( input_thread_t *, data_packet_t *, es_descriptor_t *, 
-                     boolean_t, boolean_t );
+void input_DemuxPS   ( struct input_thread_s *, struct data_packet_s * );
+void input_DemuxTS   ( struct input_thread_s *, struct data_packet_s * );
+void input_DemuxPSI  ( struct input_thread_s *, struct data_packet_s *,
+                       struct es_descriptor_s *, boolean_t, boolean_t );
+

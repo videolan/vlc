@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.25 2001/06/02 01:09:03 sam Exp $
+ * $Id: input_ts.c,v 1.26 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -67,7 +67,6 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "intf_msg.h"
 
@@ -80,6 +79,9 @@
 
 #include "mpeg_system.h"
 #include "input_netlist.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes

@@ -102,12 +102,26 @@ dnl Check for threads library
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
 
 dnl Check for ntohl, etc.
-CFLAGS="${CFLAGS} -Wall -Werror"
+CFLAGS="${save_CFLAGS} -Wall -Werror"
 AC_MSG_CHECKING([for ntohl in sys/param.h])
 AC_TRY_COMPILE([#include <sys/param.h>
 void foo() { int meuh; ntohl(meuh); }],,
  AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+dnl Check for Darwin plugin linking flags
+CFLAGS="${save_CFLAGS} -bundle -undefined suppress"
+AC_MSG_CHECKING([if \$CC compiles plugins with -bundle -undefined suppress])
+AC_TRY_COMPILE([],,
+ PLCFLAGS="${PLCFLAGS} -bundle -undefined suppress"; AC_MSG_RESULT(yes),
+ AC_MSG_RESULT(no))
+
+dnl Check for standard plugin linking flags
+CFLAGS="${save_CFLAGS} -shared"
+AC_MSG_CHECKING([if \$CC compiles plugins with -shared])
+AC_TRY_COMPILE([],,
+ PLCFLAGS="${PLCFLAGS} -shared"; AC_MSG_RESULT(yes),
+ AC_MSG_RESULT(no))
 
 dnl End of the bizarre compilation tests
 CFLAGS="${save_CFLAGS}"
@@ -292,6 +306,7 @@ dnl special case for BeOS
 if test x$host_os = xbeos; then
     BUILTINS="${BUILTINS} beos"
     LIB_BEOS="-lbe -lgame -lroot -ltracker"
+    PLCFLAGS="${PLCFLAGS} -nostart"
 
 dnl default case
 else
@@ -570,6 +585,7 @@ AC_SUBST(CSS)
 AC_SUBST(MOC)
 
 AC_SUBST(LCFLAGS)
+AC_SUBST(PLCFLAGS)
 AC_SUBST(LIB)
 
 AC_SUBST(LIB_ALSA)

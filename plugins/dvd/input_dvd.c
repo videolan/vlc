@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.66 2001/05/31 16:10:05 stef Exp $
+ * $Id: input_dvd.c,v 1.67 2001/06/03 12:47:21 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -95,6 +95,7 @@
 #include "debug.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /* how many blocks DVDRead will read in each loop */
 #define DVD_BLOCK_READ_ONCE 32

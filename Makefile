@@ -36,13 +36,13 @@ PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx \
 #
 # C Objects
 # 
-INTERFACE =	src/interface/main.o \
+INTERFACE :=	src/interface/main.o \
 		src/interface/interface.o \
 		src/interface/intf_msg.o \
 		src/interface/intf_playlist.o \
 		src/interface/intf_channels.o
 
-INPUT =		src/input/input.o \
+INPUT :=	src/input/input.o \
 		src/input/input_ext-dec.o \
 		src/input/input_ext-intf.o \
 		src/input/input_dec.o \
@@ -51,7 +51,7 @@ INPUT =		src/input/input.o \
 		src/input/input_clock.o \
 		src/input/mpeg_system.o
 
-AUDIO_OUTPUT = 	src/audio_output/audio_output.o \
+AUDIO_OUTPUT :=	src/audio_output/audio_output.o \
 		src/audio_output/aout_ext-dec.o \
 		src/audio_output/aout_u8.o \
 		src/audio_output/aout_s8.o \
@@ -59,12 +59,12 @@ AUDIO_OUTPUT = 	src/audio_output/audio_output.o \
 		src/audio_output/aout_s16.o \
 	        src/audio_output/aout_spdif.o
 
-VIDEO_OUTPUT = 	src/video_output/video_output.o \
+VIDEO_OUTPUT :=	src/video_output/video_output.o \
 		src/video_output/video_text.o \
 		src/video_output/video_spu.o \
 		src/video_output/video_yuv.o
 
-AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
+AC3_DECODER :=	src/ac3_decoder/ac3_decoder_thread.o \
 		src/ac3_decoder/ac3_decoder.o \
 		src/ac3_decoder/ac3_parse.o \
 		src/ac3_decoder/ac3_exponent.o \
@@ -73,36 +73,36 @@ AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
 		src/ac3_decoder/ac3_rematrix.o \
 		src/ac3_decoder/ac3_imdct.o
 
-AC3_SPDIF =	src/ac3_spdif/ac3_spdif.o \
+AC3_SPDIF :=	src/ac3_spdif/ac3_spdif.o \
 		src/ac3_spdif/ac3_iec958.o
 
-LPCM_DECODER =	src/lpcm_decoder/lpcm_decoder_thread.o \
+LPCM_DECODER :=	src/lpcm_decoder/lpcm_decoder_thread.o \
 		src/lpcm_decoder/lpcm_decoder.o
 
-AUDIO_DECODER =	src/audio_decoder/audio_decoder.o \
-		src/audio_decoder/adec_generic.o \
-		src/audio_decoder/adec_layer1.o \
-		src/audio_decoder/adec_layer2.o \
-		src/audio_decoder/adec_math.o
+AUDIO_DECODER :=	src/audio_decoder/audio_decoder.o \
+			src/audio_decoder/adec_generic.o \
+			src/audio_decoder/adec_layer1.o \
+			src/audio_decoder/adec_layer2.o \
+			src/audio_decoder/adec_math.o
 
-SPU_DECODER =	src/spu_decoder/spu_decoder.o
+SPU_DECODER :=	src/spu_decoder/spu_decoder.o
 
-#GEN_DECODER =	src/generic_decoder/generic_decoder.o
+#GEN_DECODER :=	src/generic_decoder/generic_decoder.o
 
-VIDEO_PARSER = 	src/video_parser/video_parser.o \
+VIDEO_PARSER :=	src/video_parser/video_parser.o \
 		src/video_parser/vpar_headers.o \
 		src/video_parser/vpar_blocks.o \
 		src/video_parser/vpar_synchro.o \
 		src/video_parser/video_fifo.o
 
-VIDEO_DECODER =	src/video_decoder/video_decoder.o
+VIDEO_DECODER :=	src/video_decoder/video_decoder.o
 
-MISC =		src/misc/mtime.o \
+MISC :=		src/misc/mtime.o \
 		src/misc/tests.o \
 		src/misc/modules.o \
 		src/misc/netutils.o
 
-C_OBJ =		$(INTERFACE) \
+C_OBJ :=	$(INTERFACE) \
 		$(INPUT) \
 		$(VIDEO_OUTPUT) \
 		$(AUDIO_OUTPUT) \
@@ -124,7 +124,7 @@ C_OBJ += extras/GNUgetopt/getopt.o extras/GNUgetopt/getopt1.o
 endif
 
 ifeq ($(SYS),beos)
-CPP_OBJ =	src/misc/beos_specific.o
+CPP_OBJ :=	src/misc/beos_specific.o
 endif
 
 ifneq (,$(findstring darwin,$(SYS)))
@@ -134,7 +134,7 @@ endif
 #
 # Generated header
 #
-H_OBJ =		src/misc/modules_builtin.h
+H_OBJ :=	src/misc/modules_builtin.h
 
 #
 # Other lists of files
@@ -305,14 +305,14 @@ ifneq (,$(BUILTINS))
 		echo "int module_"$$i"_DeactivateModule( module_t* );" >> $@ ; \
 	done
 endif
+ifneq (,$(BUILTINS))
 	echo "" >> $@ ;
 	printf "#define ALLOCATE_ALL_BUILTINS() do { " >> $@ ;
-ifneq (,$(BUILTINS))
 	for i in $(BUILTINS) ; do \
 		printf "ALLOCATE_BUILTIN("$$i"); " >> $@ ; \
 	done
-endif
 	echo "} while( 0 );" >> $@ ;
+endif
 	echo "" >> $@ ;
 
 $(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile

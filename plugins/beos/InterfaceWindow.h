@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.9 2001/03/25 17:09:14 richards Exp $
+ * $Id: InterfaceWindow.h,v 1.10 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -57,7 +57,8 @@ public:
     // standard window member
     virtual bool    QuitRequested();
     virtual void    MessageReceived(BMessage *message);
-    
+	void 			updateInterface();
+	    
 	SeekSlider * p_seek;
 	sem_id	fScrubSem;
 	bool	fSeeking;

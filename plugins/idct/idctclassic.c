@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctclassic.c,v 1.10 2001/05/30 17:03:12 sam Exp $
+ * $Id: idctclassic.c,v 1.11 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -46,6 +46,8 @@
 
 #include "vdec_block.h"
 #include "vdec_idct.h"
+
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.

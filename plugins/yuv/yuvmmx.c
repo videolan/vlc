@@ -2,7 +2,7 @@
  * yuvmmx.c : Accelerated MMX YUV module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: yuvmmx.c,v 1.5 2001/05/30 17:03:12 sam Exp $
+ * $Id: yuvmmx.c,v 1.6 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,6 +40,7 @@
 #include "video_output.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.

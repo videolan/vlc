@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.2 2001/05/31 01:37:08 sam Exp $
+ * $Id: dvd_summary.c,v 1.3 2001/06/03 12:47:21 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -70,6 +70,7 @@
 #include "debug.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local tables

@@ -5,7 +5,7 @@
  * case by optimized functions.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuv.c,v 1.13 2001/04/15 04:19:58 sam Exp $
+ * $Id: video_yuv.c,v 1.14 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -43,7 +43,6 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -51,6 +50,9 @@
 #include "video_common.h"
 
 #include "intf_msg.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 static int     yuv_Probe      ( probedata_t *p_data );
 static int     yuv_Init       ( vout_thread_t *p_vout );

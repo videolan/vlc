@@ -5,7 +5,7 @@
  * certain cases by optimized functions.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: transforms_yuv.c,v 1.5 2001/04/15 04:19:58 sam Exp $
+ * $Id: transforms_yuv.c,v 1.6 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Vincent Seguin <ptyx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,6 +53,9 @@
 #include "transforms_yuv.h"
 
 #include "intf_msg.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * ConvertY4Gray8: grayscale YUV 4:x:x to RGB 8 bpp

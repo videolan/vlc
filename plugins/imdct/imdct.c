@@ -2,7 +2,7 @@
  * imdct.c : IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct.c,v 1.2 2001/05/30 17:03:12 sam Exp $
+ * $Id: imdct.c,v 1.3 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -41,6 +41,7 @@
 #include "ac3_imdct_common.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.

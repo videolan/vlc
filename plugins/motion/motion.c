@@ -2,7 +2,7 @@
  * motion.c : C motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: motion.c,v 1.5 2001/05/30 17:03:12 sam Exp $
+ * $Id: motion.c,v 1.6 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -40,6 +40,7 @@
 #include "video.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local and extern prototypes.

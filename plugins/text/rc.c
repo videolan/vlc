@@ -37,6 +37,7 @@
 #include "mtime.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.

@@ -43,7 +43,6 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -54,6 +53,9 @@
 
 #include "video.h"
 #include "video_output.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * intf_sys_t: description and status of rc interface

@@ -2,7 +2,7 @@
  * ac3_downmix_3dn.c: accelerated 3D Now! ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_3dn.c,v 1.1 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_downmix_3dn.c,v 1.2 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -45,16 +45,16 @@ void sqrt2_3dn (void)
 void _M( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
-    "pushl %%ecx\n"
-    "movl  $128,  %%ecx\n"            /* loop counter */
+    "pushl %%ebx\n"
+    "movl  $128,  %%ebx\n"            /* loop counter */
 
-    "movd    (%%ebx), %%mm5\n"        /* unit */
+    "movd    (%%ecx), %%mm5\n"        /* unit */
     "punpckldq %%mm5, %%mm5\n"        /* unit | unit */
 
-    "movd    4(%%ebx), %%mm6\n"        /* clev */
+    "movd    4(%%ecx), %%mm6\n"        /* clev */
     "punpckldq %%mm6, %%mm6\n"        /* clev | clev */
 
-    "movd    8(%%ebx), %%mm7\n"        /* slev */
+    "movd    8(%%ecx), %%mm7\n"        /* slev */
     "punpckldq %%mm7, %%mm7\n"        /* slev | slev */
 
 ".loop:\n"
@@ -77,25 +77,25 @@ void _M( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
     "movq    %%mm1, 1024(%%eax)\n"
 
     "addl    $8, %%eax\n"
-    "decl     %%ecx\n"
+    "decl     %%ebx\n"
     "jnz    .loop\n"
     
-    "popl   %%ecx\n"
+    "popl   %%ebx\n"
     "femms\n"
     : "=a" (samples)
-    : "a" (samples), "b" (dm_par));
+    : "a" (samples), "c" (dm_par));
 }
 
 void _M( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
-    "pushl %%ecx\n"
-    "movl  $128, %%ecx\n"       /* loop counter */
+    "pushl %%ebx\n"
+    "movl  $128, %%ebx\n"       /* loop counter */
 
-    "movd  (%%ebx), %%mm5\n"    /* unit */
+    "movd  (%%ecx), %%mm5\n"    /* unit */
     "punpckldq %%mm5, %%mm5\n"  /* unit | unit */
 
-    "movd    8(%%ebx), %%mm7\n"    /* slev */
+    "movd    8(%%ecx), %%mm7\n"    /* slev */
     "punpckldq %%mm7, %%mm7\n"    /* slev | slev */
 
 ".loop3:\n"
@@ -114,29 +114,29 @@ void _M( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t * dm_par)
     "movq    %%mm1, 1024(%%eax)\n"
 
     "addl    $8, %%eax\n"
-    "decl     %%ecx\n"
+    "decl     %%ebx\n"
     "jnz    .loop3\n"
 
-    "popl    %%ecx\n"
+    "popl    %%ebx\n"
     "femms\n"
     : "=a" (samples)
-    : "a" (samples), "b" (dm_par));
+    : "a" (samples), "c" (dm_par));
 }
 
 void _M( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
 
-    "pushl    %%ecx\n"
-    "movl    $128, %%ecx\n"            /* loop counter */
+    "pushl    %%ebx\n"
+    "movl    $128, %%ebx\n"            /* loop counter */
 
-    "movd    (%%ebx), %%mm5\n"        /* unit */
+    "movd    (%%ecx), %%mm5\n"        /* unit */
     "punpckldq %%mm5, %%mm5\n"        /* unit | unit */
 
-    "movd    4(%%ebx), %%mm6\n"        /* clev */
+    "movd    4(%%ecx), %%mm6\n"        /* clev */
     "punpckldq %%mm6, %%mm6\n"        /* clev | clev */
 
-    "movd    8(%%ebx), %%mm7\n"        /* slev */
+    "movd    8(%%ecx), %%mm7\n"        /* slev */
     "punpckldq %%mm7, %%mm7\n"      /* slev | slev */
 
 ".loop4:\n"
@@ -157,25 +157,25 @@ void _M( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
     "movq    %%mm1, 1024(%%eax)\n"
 
     "addl    $8, %%eax\n"
-    "decl     %%ecx\n"
+    "decl     %%ebx\n"
     "jnz    .loop4\n"
 
-    "popl    %%ecx\n"
+    "popl    %%ebx\n"
     "femms\n"
     : "=a" (samples)
-    : "a" (samples), "b" (dm_par));
+    : "a" (samples), "c" (dm_par));
 }
 
 void _M( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
-    "pushl    %%ecx\n"
-    "movl    $128, %%ecx\n"            /* loop counter */
+    "pushl    %%ebx\n"
+    "movl    $128, %%ebx\n"            /* loop counter */
 
-    "movd    (%%ebx), %%mm5\n"        /* unit */
+    "movd    (%%ecx), %%mm5\n"        /* unit */
     "punpckldq %%mm5, %%mm5\n"        /* unit | unit */
 
-    "movd    8(%%ebx), %%mm7\n"        /* slev */
+    "movd    8(%%ecx), %%mm7\n"        /* slev */
     "punpckldq %%mm7, %%mm7\n"      /* slev | slev */
 
 ".loop5:\n"
@@ -192,25 +192,25 @@ void _M( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
     "movq    %%mm1, 1024(%%eax)\n"
 
     "addl    $8, %%eax\n"
-    "decl     %%ecx\n"
+    "decl     %%ebx\n"
     "jnz    .loop5\n"
 
-    "popl    %%ecx\n"
+    "popl    %%ebx\n"
     "femms\n"
     : "=a" (samples)
-    : "a" (samples), "b" (dm_par));
+    : "a" (samples), "c" (dm_par));
 }
 
 void _M( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
-    "pushl    %%ecx\n"
-    "movl    $128, %%ecx\n"            /* loop counter */
+    "pushl    %%ebx\n"
+    "movl    $128, %%ebx\n"            /* loop counter */
 
-    "movd    (%%ebx), %%mm5\n"        /* unit */
+    "movd    (%%ecx), %%mm5\n"        /* unit */
     "punpckldq %%mm5, %%mm5\n"        /* unit | unit */
 
-    "movd    4(%%ebx), %%mm6\n"        /* clev */
+    "movd    4(%%ecx), %%mm6\n"        /* clev */
     "punpckldq %%mm6, %%mm6\n"      /* clev | clev */
 
 ".loop6:\n"
@@ -227,28 +227,28 @@ void _M( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t * dm_par)
     "movq    %%mm1, 1024(%%eax)\n"
 
     "addl    $8, %%eax\n"
-    "decl     %%ecx\n"
+    "decl     %%ebx\n"
     "jnz    .loop6\n"
 
-    "popl    %%ecx\n"
+    "popl    %%ebx\n"
     "femms\n"
     : "=a" (samples)
-    : "a" (samples), "b" (dm_par));
+    : "a" (samples), "c" (dm_par));
 }
 
 void _M( stream_sample_1ch_to_s16 ) (s16 *s16_samples, float *left)
 {
     __asm__ __volatile__ (
-    "pushl %%ecx\n"
+    "pushl %%ebx\n"
     "pushl %%edx\n"
 
     "movl   $sqrt2_3dn, %%edx\n"
     "movd  (%%edx), %%mm7\n"
     "punpckldq %%mm7, %%mm7\n"   /* sqrt2 | sqrt2 */
-    "movl $128, %%ecx\n"
+    "movl $128, %%ebx\n"
 
 ".loop2:\n"
-    "movq (%%ebx), %%mm0\n"        /* c1 | c0 */
+    "movq (%%ecx), %%mm0\n"        /* c1 | c0 */
     "pfmul   %%mm7, %%mm0\n"
 
     "pf2id %%mm0, %%mm0\n"        /* c1 c0 --> mm0, int_32 */
@@ -257,27 +257,27 @@ void _M( stream_sample_1ch_to_s16 ) (s16 *s16_samples, float *left)
 
     "movq %%mm0, (%%eax)\n"
     "addl $8, %%eax\n"
-    "addl $8, %%ebx\n"
+    "addl $8, %%ecx\n"
 
-    "decl %%ecx\n"
+    "decl %%ebx\n"
     "jnz .loop2\n"
 
     "popl %%edx\n"
-    "popl %%ecx\n"
+    "popl %%ebx\n"
     "femms\n"
-    : "=a" (s16_samples), "=b" (left)
-    : "a" (s16_samples), "b" (left));
+    : "=a" (s16_samples), "=c" (left)
+    : "a" (s16_samples), "c" (left));
 }
 
 void _M( stream_sample_2ch_to_s16 ) (s16 *s16_samples, float *left, float *right)
 {
 
     __asm__ __volatile__ (
-    "pushl %%ecx\n"
-    "movl $128, %%ecx\n"
+    "pushl %%ebx\n"
+    "movl $128, %%ebx\n"
 
 ".loop1:\n"
-    "movq  (%%ebx), %%mm0\n"    /* l1 | l0 */
+    "movq  (%%ecx), %%mm0\n"    /* l1 | l0 */
     "movq  (%%edx), %%mm1\n"    /* r1 | r0 */
     "movq   %%mm0,  %%mm2\n"    /* l1 | l0 */
     "punpckldq %%mm1, %%mm0\n"    /* r0 | l0 */
@@ -291,16 +291,16 @@ void _M( stream_sample_2ch_to_s16 ) (s16 *s16_samples, float *left, float *right
     "movq %%mm0, (%%eax)\n"
     "movq %%mm2, 8(%%eax)\n"
     "addl $8, %%eax\n"
-    "addl $8, %%ebx\n"
+    "addl $8, %%ecx\n"
     "addl $8, %%edx\n"
 
-    "decl %%ecx\n"
+    "decl %%ebx\n"
     "jnz .loop1\n"
 
-    "popl %%ecx\n"
+    "popl %%ebx\n"
     "femms\n"
-    : "=a" (s16_samples), "=b" (left), "=d" (right)
-    : "a" (s16_samples), "b" (left), "d" (right));
+    : "=a" (s16_samples), "=c" (left), "=d" (right)
+    : "a" (s16_samples), "c" (left), "d" (right));
     
 }
 

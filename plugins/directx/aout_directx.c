@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_directx.c,v 1.1 2001/06/02 01:09:03 sam Exp $
+ * $Id: aout_directx.c,v 1.2 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -57,6 +57,7 @@
 #include "main.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * aout_sys_t: directx audio output method descriptor

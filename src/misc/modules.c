@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.33 2001/05/31 12:45:39 sam Exp $
+ * $Id: modules.c,v 1.34 2001/06/03 12:47:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -66,17 +66,21 @@
 #include "netutils.h"
 #include "modules.h"
 
+#include "interface.h"
+#include "intf_msg.h"
+#include "intf_playlist.h"
+
 #include "stream_control.h"
 #include "input_ext-intf.h"
+#include "input_ext-dec.h"
+#include "input.h"
+#include "input_netlist.h"
+#include "mpeg_system.h"
 
 #include "video.h"
 #include "video_output.h"
 
 #include "audio_output.h"
-
-#include "interface.h"
-#include "intf_msg.h"
-#include "intf_playlist.h"
 
 #ifdef HAVE_DYNAMIC_PLUGINS
 #   include "modules_core.h"
@@ -92,9 +96,11 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 static int AllocatePluginModule ( char * );
 #endif
+#ifdef ALLOCATE_ALL_BUILTINS
 static int AllocateBuiltinModule( int ( * ) ( module_t * ),
                                   int ( * ) ( module_t * ),
                                   int ( * ) ( module_t * ) );
+#endif
 static int DeleteModule ( module_t * );
 static int LockModule   ( module_t * );
 static int UnlockModule ( module_t * );
@@ -139,9 +145,11 @@ void module_InitBank( void )
     /*
      * Check all the built-in modules
      */
+#ifdef ALLOCATE_ALL_BUILTINS
     intf_WarnMsg( 2, "module: checking built-in modules" );
 
     ALLOCATE_ALL_BUILTINS();
+#endif
 
     /*
      * Check all the plugin modules we can find
@@ -539,6 +547,7 @@ static int AllocatePluginModule( char * psz_filename )
 }
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
+#ifdef ALLOCATE_ALL_BUILTINS
 /*****************************************************************************
  * AllocateBuiltinModule: initialize a built-in module.
  *****************************************************************************
@@ -639,6 +648,7 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
 
     return( 0 );
 }
+#endif /* ALLOCATE_ALL_BUILTINS */
 
 /*****************************************************************************
  * DeleteModule: delete a module and its structure.

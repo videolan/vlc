@@ -2,7 +2,7 @@
  * ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: ts.c,v 1.4 2001/05/30 17:03:12 sam Exp $
+ * $Id: ts.c,v 1.5 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *
@@ -38,6 +38,7 @@
 #include "mtime.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.

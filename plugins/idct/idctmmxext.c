@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmxext.c,v 1.9 2001/05/30 17:03:12 sam Exp $
+ * $Id: idctmmxext.c,v 1.10 2001/06/03 12:47:21 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -53,6 +53,8 @@
 
 #include "attributes.h"
 #include "mmx.h"
+
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes.
