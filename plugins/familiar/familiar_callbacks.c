@@ -2,7 +2,7 @@
  * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.12 2002/10/30 22:42:26 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.13 2002/11/20 21:26:09 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -131,19 +131,17 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
 {
     intf_thread_t *p_intf = GtkGetIntf( clist );
     struct dirent **namelist;
-    int n=-1;
-    int status=-1;
+    int n, status;
 
-    printf( "Read directory: %s\n", psz_dir );
+//    printf( "Read directory: %s\n", psz_dir );
     if (psz_dir)
     {
        status = chdir(psz_dir);
        if (status<0)
           intf_ErrMsg("File is not a directory.");
     }
-    n = scandir(psz_dir, &namelist, 0, NULL);
+    n = scandir(".", &namelist, 0, alphasort);
 
-    printf( "n=%d\n", n);
     if (n<0)
         perror("scandir");
     else
@@ -158,7 +156,7 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
             /* This is a list of strings. */
             ppsz_text[0] = namelist[i]->d_name;
             ppsz_text[1] = get_file_perm(namelist[i]->d_name);
-            printf( "Entry: %s, %s\n", namelist[i]->d_name, ppsz_text[1] );
+//            printf( "Entry: %s(%d), %s\n", namelist[i]->d_name,strlen(namelist[i]->d_name), ppsz_text[1] );
             gtk_clist_insert( p_intf->p_sys->p_clist, i, ppsz_text );
             free(namelist[i]);
         }
@@ -167,6 +165,7 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
     }
 }
 
+#ifdef 0
 void OpenDirectory( GtkCList *clist, char *psz_dir )
 {
     intf_thread_t *p_intf = GtkGetIntf( clist );
@@ -228,6 +227,7 @@ void OpenDirectory( GtkCList *clist, char *psz_dir )
 
     gtk_clist_thaw( p_intf->p_sys->p_clist );
 }
+#endif 
 
 static char* get_file_perm(const char *path)
 {
@@ -333,7 +333,6 @@ on_toolbar_open_clicked                (GtkButton       *button,
     if (p_intf->p_sys->p_clist)
     {
        ReadDirectory(p_intf->p_sys->p_clist, ".");
-//       OpenDirectory(p_intf->p_sys->p_clist, ".");
     }
 }
 
@@ -497,7 +496,6 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
     {
         if (S_ISDIR(st.st_mode))
            ReadDirectory(p_intf->p_sys->p_clist, psz_url);
-//           OpenDirectory(p_intf->p_sys->p_clist, psz_url);
         else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
                  (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
                  (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
@@ -551,7 +549,6 @@ on_clistmedia_select_row               (GtkCList        *clist,
         {
             if (S_ISDIR(st.st_mode))
                ReadDirectory(p_intf->p_sys->p_clist, text[0]);
-//               OpenDirectory(p_intf->p_sys->p_clist, text[0]);
             else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
                      (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
                      (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
