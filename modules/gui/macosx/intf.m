@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.58 2003/02/16 23:32:06 hartman Exp $
+ * $Id: intf.m,v 1.59 2003/02/18 00:17:06 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -179,6 +179,11 @@ static void Run( intf_thread_t *p_intf )
     }
 
     return psz_string;
+}
+
+- (NSStringEncoding)getEncoding
+{
+    return i_encoding;
 }
 
 - (void)setIntf:(intf_thread_t *)_p_intf

@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.28 2003/02/16 23:32:06 hartman Exp $
+ * $Id: intf.h,v 1.29 2003/02/18 00:17:06 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -42,6 +42,7 @@
 - (void)initIntlSupport;
 - (NSString *)localizedString:(char *)psz;
 - (char *)delocalizeString:(NSString *)psz;
+- (NSStringEncoding)getEncoding;
 
 - (void)setIntf:(intf_thread_t *)p_intf;
 - (intf_thread_t *)getIntf;
