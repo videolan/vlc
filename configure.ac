@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.126 2003/12/01 23:39:11 gbazin Exp $
+dnl $Id: configure.ac,v 1.127 2003/12/04 15:54:58 sam Exp $
 
 AC_INIT(vlc,0.7.0-test1)
 
@@ -3487,9 +3487,7 @@ AX_VLC_SUBSTS
 dnl Create vlc-config.in
 AX_OUTPUT_VLC_CONFIG_IN
 
-AC_OUTPUT([
-  vlc-config
-
+AC_CONFIG_FILES([
   Makefile
   autotools/Makefile
   debian/Makefile
@@ -3503,7 +3501,9 @@ AC_OUTPUT([
   po/Makefile.in
   share/Makefile
   src/Makefile
+])
 
+AC_CONFIG_FILES([
   modules/access/Makefile
   modules/access/dshow/Makefile
   modules/access/dvb/Makefile
@@ -3573,11 +3573,12 @@ AC_OUTPUT([
   modules/visualization/scope/Makefile
   modules/visualization/xosd/Makefile
   modules/visualization/visual/Makefile
-],[
-  chmod 0755 vlc-config
 ])
 
-dnl Generate makefiles found by bootstrap
+AC_CONFIG_FILES([vlc-config], [chmod 0755 vlc-config])
+
+dnl Generate makefiles
+AC_OUTPUT
 
 printf "
 vlc configuration
