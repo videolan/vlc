@@ -137,13 +137,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         if( p_image->p_filter )
         if( p_image->p_filter->fmt_in.video.i_chroma !=
             p_image->p_dec->fmt_out.video.i_chroma ||
-            p_image->p_filter->fmt_in.video.i_width !=
-            p_image->p_dec->fmt_out.video.i_width ||
-            p_image->p_filter->fmt_in.video.i_height !=
-            p_image->p_dec->fmt_out.video.i_height ||
-            p_image->p_filter->fmt_out.video.i_chroma != p_fmt_out->i_chroma ||
-            p_image->p_filter->fmt_out.video.i_width != p_fmt_out->i_width ||
-            p_image->p_filter->fmt_out.video.i_height != p_fmt_out->i_height )
+            p_image->p_filter->fmt_out.video.i_chroma != p_fmt_out->i_chroma )
         {
             /* We need to restart a new filter */
             DeleteFilter( p_image->p_filter );
@@ -162,6 +156,14 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
                 p_pic->pf_release( p_pic );
                 return NULL;
             }
+        }
+        else
+        {
+            /* Filters should handle on-the-fly size changes */
+            p_image->p_filter->fmt_in = p_image->p_dec->fmt_out;
+            p_image->p_filter->fmt_out = p_image->p_dec->fmt_out;
+            p_image->p_filter->fmt_out.i_codec = p_fmt_out->i_chroma;
+            p_image->p_filter->fmt_out.video = *p_fmt_out;
         }
 
         p_pic = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
