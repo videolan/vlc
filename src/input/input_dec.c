@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.68 2003/11/16 22:23:47 gbazin Exp $
+ * $Id: input_dec.c,v 1.69 2003/11/18 20:34:23 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -480,7 +480,6 @@ static int DecoderThread( decoder_t * p_dec )
 
         if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
         {
-            sout_buffer_t *p_sout_buffer;
             block_t *p_sout_block;
 
             while( (p_sout_block = p_dec->pf_packetize( p_dec, &p_block )) )
@@ -515,25 +514,33 @@ static int DecoderThread( decoder_t * p_dec )
                     }
                 }
 
-                p_sout_buffer =
-                    sout_BufferNew( p_dec->p_owner->p_sout->p_sout,
-                                    p_sout_block->i_buffer );
-                if( p_sout_buffer == NULL )
+                while( p_sout_block )
                 {
-                    msg_Err( p_dec, "cannot get sout buffer" );
-                    break;
+                    block_t       *p_next = p_sout_block->p_next;
+                    sout_buffer_t *p_sout_buffer;
+
+                    p_sout_buffer =
+                        sout_BufferNew( p_dec->p_owner->p_sout->p_sout,
+                                        p_sout_block->i_buffer );
+                    if( p_sout_buffer == NULL )
+                    {
+                        msg_Err( p_dec, "cannot get sout buffer" );
+                        break;
+                    }
+
+                    memcpy( p_sout_buffer->p_buffer, p_sout_block->p_buffer,
+                            p_sout_block->i_buffer );
+
+                    p_sout_buffer->i_pts = p_sout_block->i_pts;
+                    p_sout_buffer->i_dts = p_sout_block->i_dts;
+                    p_sout_buffer->i_length = p_sout_block->i_length;
+
+                    block_Release( p_sout_block );
+
+                    sout_InputSendBuffer( p_dec->p_owner->p_sout, p_sout_buffer );
+
+                    p_sout_block = p_next;
                 }
-
-                memcpy( p_sout_buffer->p_buffer, p_sout_block->p_buffer,
-                        p_sout_block->i_buffer );
-
-                p_sout_buffer->i_pts = p_sout_block->i_pts;
-                p_sout_buffer->i_dts = p_sout_block->i_dts;
-                p_sout_buffer->i_length = p_sout_block->i_length;
-
-                block_Release( p_sout_block );
-
-                sout_InputSendBuffer( p_dec->p_owner->p_sout, p_sout_buffer );
             }
         }
         else if( p_dec->fmt_in.i_cat == AUDIO_ES )
