@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.22 2003/01/11 18:10:49 fenrir Exp $
+ * $Id: avi.c,v 1.23 2003/01/11 18:31:17 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1900,10 +1900,22 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
         /* read thoses data */
         if( p_stream->i_samplesize )
         {
+            int i_toread;
+
+            if( ( i_toread = toread[i_stream].i_toread ) <= 0 )
+            {
+                if( p_stream->i_samplesize > 1 )
+                {
+                    i_toread = p_stream->i_samplesize;
+                }
+                else
+                {
+                    i_toread = __MAX( AVI_PTSToByte( p_stream, 20 * 1000 ), 100 );
+                }
+            }
             i_size = __MIN( p_stream->p_index[p_stream->i_idxposc].i_length -
                                 p_stream->i_idxposb,
-                            __MAX( toread[i_stream].i_toread,
-                                   p_stream->i_samplesize ) );
+                            i_toread );
         }
         else
         {
