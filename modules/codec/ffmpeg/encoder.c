@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.17 2003/11/29 18:36:13 massiot Exp $
+ * $Id: encoder.c,v 1.18 2003/12/04 23:15:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -465,8 +465,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     /* Backup the remaining raw samples */
     if( i_samples )
     {
-        memcpy( p_sys->p_buffer, p_buffer + i_samples_delay * 2 *
-                p_sys->p_context->channels,
+        memcpy( p_sys->p_buffer + i_samples_delay * 2 *
+                p_sys->p_context->channels, p_buffer,
                 i_samples * 2 * p_sys->p_context->channels );
     }
 

@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: speex.c,v 1.6 2003/12/04 16:49:43 sam Exp $
+ * $Id: speex.c,v 1.7 2003/12/04 23:15:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -730,8 +730,8 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     /* Backup the remaining raw samples */
     if( i_samples )
     {
-        memcpy( p_sys->p_buffer, p_buffer + i_samples_delay * 2 *
-                p_enc->fmt_in.audio.i_channels,
+        memcpy( p_sys->p_buffer + i_samples_delay * 2 *
+                p_enc->fmt_in.audio.i_channels, p_buffer,
                 i_samples * 2 * p_enc->fmt_in.audio.i_channels );
     }
 
