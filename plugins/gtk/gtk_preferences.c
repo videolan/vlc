@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.16 2002/03/25 22:38:28 lool Exp $
+ * $Id: gtk_preferences.c,v 1.17 2002/03/26 17:33:37 lool Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -55,6 +55,7 @@ static void GtkCreateConfigDialog( char *, intf_thread_t * );
 static void GtkConfigOk          ( GtkButton *, gpointer );
 static void GtkConfigApply       ( GtkButton *, gpointer );
 static void GtkConfigCancel      ( GtkButton *, gpointer );
+static void GtkConfigSave        ( GtkButton *, gpointer );
 
 static void GtkConfigDialogDestroyed ( GtkObject *, gpointer );
 
@@ -136,6 +137,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     GtkWidget *dialog_action_area;
     GtkWidget *ok_button;
     GtkWidget *apply_button;
+    GtkWidget *save_button;
     GtkWidget *cancel_button;
 
     GtkWidget *item_align;
@@ -420,6 +422,10 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     gtk_box_pack_start( GTK_BOX(dialog_action_area), apply_button,
                         TRUE, TRUE, 0 );
 
+    save_button = gtk_button_new_with_label( _("Save") );
+    gtk_box_pack_start( GTK_BOX(dialog_action_area), save_button,
+                        TRUE, TRUE, 0 );
+
     cancel_button = gtk_button_new_with_label( _("Cancel") );
     gtk_box_pack_start( GTK_BOX(dialog_action_area), cancel_button,
                         TRUE, TRUE, 0 );
@@ -429,6 +435,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                         config_dialog );
     gtk_signal_connect( GTK_OBJECT(apply_button), "clicked",
                         GTK_SIGNAL_FUNC(GtkConfigApply),
+                        config_dialog );
+    gtk_signal_connect( GTK_OBJECT(save_button), "clicked",
+                        GTK_SIGNAL_FUNC(GtkConfigSave),
                         config_dialog );
     gtk_signal_connect( GTK_OBJECT(cancel_button), "clicked",
                         GTK_SIGNAL_FUNC(GtkConfigCancel),
@@ -476,6 +485,12 @@ void GtkConfigOk( GtkButton * button, gpointer user_data )
 void GtkConfigCancel( GtkButton * button, gpointer user_data )
 {
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
+
+void GtkConfigSave( GtkButton * button, gpointer user_data )
+{
+    GtkConfigApply( button, user_data );
+    config_SaveConfigFile( NULL );
 }
 
 /****************************************************************************
