@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.9 2002/12/31 01:54:35 massiot Exp $
+ * $Id: access.c,v 1.10 2003/01/28 15:05:52 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -109,15 +109,16 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     /* Open libdvdplay */
     p_dvd->vmg = dvdplay_open( psz_source, pf_vmg_callback, (void*)p_input );
 
-    /* free allocated strings */
-    free( psz_source );
-
     if( p_dvd->vmg == NULL )
     {
         msg_Err( p_input, "cannot open %s", psz_source );
+        free( psz_source );
         free( p_dvd );
         return -1;
     }
+
+    /* free allocated strings */
+    free( psz_source );
 
     p_dvd->p_intf = NULL;
 

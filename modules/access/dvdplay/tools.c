@@ -2,7 +2,7 @@
  * tools.c: tools for dvd plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: tools.c,v 1.3 2002/10/28 16:26:44 sam Exp $
+ * $Id: tools.c,v 1.4 2003/01/28 15:05:52 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -52,22 +52,24 @@ char * dvdplay_ParseCL( input_thread_t * p_input,
     
     p_dvd = (dvd_data_t*)(p_input->p_access_data);
 
-    psz_parser = psz_source = strdup( p_input->psz_name );
-    if( !psz_parser )
+    psz_source = strdup( p_input->psz_name );
+    if( psz_source == NULL )
     {
         return NULL;
-    }
-
-    while( *psz_parser && *psz_parser != '@' )
-    {
-        psz_parser++;
     }
 
     *i_title = 0;
     *i_chapter = 1;
     *i_angle = 1;
     
-    if( *psz_parser == '@' )
+    /* Start with the end, because you could have :
+     * dvdplay:/Volumes/my@toto/VIDEO_TS@1,1
+     * (yes, this is kludgy). */
+    for ( psz_parser = psz_source + strlen(psz_source) - 1;
+          psz_parser >= psz_source && *psz_parser != '@';
+          psz_parser-- );
+
+    if( psz_parser >= psz_source && *psz_parser == '@' )
     {
         /* Found options */
         *psz_parser = '\0';
