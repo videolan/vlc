@@ -2,7 +2,7 @@
  * http.c: HTTP input module
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.57 2004/01/25 17:31:22 gbazin Exp $
+ * $Id: http.c,v 1.58 2004/02/02 11:14:32 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -294,7 +294,7 @@ static int  Open ( vlc_object_t *p_this )
     if( !strcmp( p_sys->psz_protocol, "ICY" ) &&
         ( !p_input->psz_demux || !*p_input->psz_demux ) )
     {
-        if( !strcasecmp( p_sys->psz_mime, "video/nsv" ) )
+        if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "video/nsv" ) )
         {
             p_input->psz_demux = strdup( "nsv" );
         }
@@ -604,6 +604,7 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable,
             goto error;
         }
         *p++ = '\0';
+        while( *p == ' ' ) p++;
 
         if( !strcasecmp( psz, "Content-Length" ) )
         {
@@ -619,6 +620,7 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable,
         {
             if( p_sys->psz_mime ) free( p_sys->psz_mime );
             p_sys->psz_mime = strdup( p );
+            msg_Dbg( p_input, "Content-Type: %s", p_sys->psz_mime );
         }
 
         free( psz );
