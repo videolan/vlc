@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.6 2001/02/13 10:08:51 stef Exp $
+ * $Id: dvd_ifo.c,v 1.7 2001/02/14 04:11:01 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -497,23 +497,24 @@ static pgci_ut_t ReadUnitTable( ifo_t* p_ifo )
 static c_adt_t ReadCellInf( ifo_t* p_ifo )
 {
     c_adt_t         c_adt;
-    int             i, i_max;
     off_t           i_start = p_ifo->i_pos;
+    int             i;
 
 //fprintf( stderr, "CELL ADD\n" );
 
     GETS( &c_adt.i_vob_nb );
     FLUSH( 2 );
     GETL( &c_adt.i_ebyte );
-    i_max = ( i_start + c_adt.i_ebyte + 1 - p_ifo->i_pos ) / sizeof(cell_inf_t);
-    c_adt.p_cell_inf = malloc( i_max *sizeof(cell_inf_t) );
+    c_adt.i_cell_nb =
+        ( i_start + c_adt.i_ebyte + 1 - p_ifo->i_pos ) / sizeof(cell_inf_t);
+    c_adt.p_cell_inf = malloc( c_adt.i_cell_nb *sizeof(cell_inf_t) );
     if( c_adt.p_cell_inf == NULL )
     {
         intf_ErrMsg( "Out of memory" );
         p_ifo->b_error = 1;
         return c_adt;
     }
-    for( i=0 ; i<i_max ; i++ )
+    for( i = 0 ; i < c_adt.i_cell_nb ; i++ )
     {
         GETS( &c_adt.p_cell_inf[i].i_vob_id );
         GETC( &c_adt.p_cell_inf[i].i_cell_id );

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.9 2001/02/13 10:08:51 stef Exp $
+ * $Id: input_dvd.c,v 1.10 2001/02/14 04:11:01 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -146,6 +146,8 @@ static void DVDInit( input_thread_t * p_input )
 {
     thread_dvd_data_t *  p_method;
     off_t                i_start;
+    off_t                i_size;
+    int                  i_cell, i_cell_1, i_start_cell, i_end_cell;
 
     if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
     {
@@ -229,12 +231,66 @@ static void DVDInit( input_thread_t * p_input )
 #endif
     }
 
-    /* FIXME: Kludge beginning of vts_01_1.vob */
-    i_start = p_method->ifo.p_vts[0].i_pos +
-              p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
+    /* FIXME: Kludge beginning and end of the stream in vts_01_1.vob */
 
+    /* Determines which vob contains the movie */
+    i_cell = 0;
+    i_cell_1 = 0;
+    i_start_cell = 0;
+    i_end_cell = 0;
+
+    /* Loop on the number of vobs */
+    while( p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_cell].i_vob_id <=
+           p_method->ifo.p_vts[0].c_adt.i_vob_nb )
+    {
+        i_cell_1 = i_cell;
+
+        /* Loop to find the number of cells in the vob */
+        do
+        {
+            i_cell++;
+            if( i_cell >= p_method->ifo.p_vts[0].c_adt.i_cell_nb )
+            {
+                break;
+            }
+        }
+        while( p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_cell-1].i_cell_id <
+               p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_cell].i_cell_id );
+
+
+        if( p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_cell-1].i_cell_id >
+            p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_end_cell].i_cell_id )
+        {
+            i_start_cell = i_cell_1;
+            i_end_cell = i_cell - 1;
+        }
+    }
+
+    /* The preceding does not work with all DVD, so we give the
+     * last cell of the title as end */
+    i_end_cell = p_method->ifo.p_vts[0].c_adt.i_cell_nb - 1;
+
+    intf_WarnMsg( 2, "DVD: Start cell: %d End Cell: %d",
+                                            i_start_cell, i_end_cell );
+
+    p_method->i_start_cell = i_start_cell;
+    p_method->i_end_cell = i_end_cell;
+
+    /* start is : beginning of vts + offset to vobs + offset to vob x */
+    i_start = p_method->ifo.p_vts[0].i_pos + DVD_LB_SIZE *
+            ( p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector +
+              p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_start_cell].i_ssector );
+    p_method->i_start_byte = i_start;
+                                                    
     i_start = lseek( p_input->i_handle, i_start, SEEK_SET );
-    intf_WarnMsg( 3, "DVD: VOB start at : %lld", i_start );
+    intf_WarnMsg( 3, "DVD: VOBstart at: %lld", i_start );
+
+    i_size = (off_t)
+        ( p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_end_cell].i_esector -
+          p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_start_cell].i_ssector + 1 )
+        *DVD_LB_SIZE;
+    intf_WarnMsg( 3, "DVD: stream size: %lld", i_size );
+
 
     /* Initialize ES structures */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
@@ -286,7 +342,11 @@ static void DVDInit( input_thread_t * p_input )
         }
         lseek( p_input->i_handle, i_start, SEEK_SET );
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.i_tell = i_start;
+
+        /* i_tell is an indicator from the beginning of the stream,
+         * not of the DVD */
+        p_input->stream.i_tell = 0;
+
         if( p_demux_data->b_has_PSM )
         {
             /* (The PSM decoder will care about spawning the decoders) */
@@ -359,12 +419,8 @@ static void DVDInit( input_thread_t * p_input )
         input_DumpStream( p_input );
 #endif
 
-        /* FIXME: kludge to implement file size */
-        p_input->stream.i_size = 
-         (off_t)( p_method->ifo.vmg.ptt_srpt.p_tts[1].i_ssector -
-                  p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector ) *DVD_LB_SIZE;
-        intf_WarnMsg( 3, "DVD: stream size: %lld", p_input->stream.i_size );
-
+        /* FIXME : ugly kludge */
+        p_input->stream.i_size = i_size;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -374,11 +430,8 @@ static void DVDInit( input_thread_t * p_input )
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.pp_programs[0]->b_is_ok = 0;
 
-        /* FIXME: kludge to implement file size */
-        p_input->stream.i_size = 
-            ( p_method->ifo.vmg.ptt_srpt.p_tts[1].i_ssector -
-              p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector ) *DVD_LB_SIZE;
-        intf_WarnMsg( 3, "DVD: stream size: %lld", p_input->stream.i_size );
+        /* FIXME : ugly kludge */
+        p_input->stream.i_size = i_size;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -531,15 +584,14 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_method = ( thread_dvd_data_t * )p_input->p_plugin_data;
 
     /* We have to take care of offset of beginning of title */
-    i_pos = i_off - ( p_method->ifo.p_vts[0].i_pos +
-              p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE );
+    i_pos = i_off + p_method->i_start_byte;
 
     /* With DVD, we have to be on a sector boundary */
     i_pos = i_pos & (~0x7ff);
 
     i_pos = lseek( p_input->i_handle, i_pos, SEEK_SET );
 
-    p_input->stream.i_tell = i_pos;
+    p_input->stream.i_tell = i_pos - p_method->i_start_byte;
 
     return;
 }

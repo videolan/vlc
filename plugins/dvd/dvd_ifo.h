@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.4 2001/02/13 10:08:51 stef Exp $
+ * $Id: dvd_ifo.h,v 1.5 2001/02/14 04:11:01 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -185,6 +185,8 @@ typedef struct c_adt_s
     u16             i_vob_nb;                   // 2 bytes
 //    char[2]         ???
     u32             i_ebyte;                    // 4 bytes
+    u16             i_cell_nb;                  // not in ifo; computed
+                                                // with e_byte
     cell_inf_t*     p_cell_inf;
 } c_adt_t;
 

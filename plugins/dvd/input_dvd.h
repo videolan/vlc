@@ -34,12 +34,20 @@ typedef struct thread_dvd_data_s
     boolean_t               b_encrypted;        // CSS encryption
     int                     i_read_once;        // NB of bytes read by DVDRead
     int                     i_title;            // Current Title
+
+    /* FIXME: include these in a struct */
+    int                     i_start_byte;
+    int                     i_start_cell;
+    int                     i_end_cell;
+
     /* Scrambling Information */
 #if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     struct css_s            css;
 #endif
+
     /* Structure that contains all information of the DVD */
     struct ifo_s            ifo;
+
 } thread_dvd_data_t;
 
 /*****************************************************************************

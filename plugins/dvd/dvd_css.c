@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.7 2001/02/13 10:08:51 stef Exp $
+ * $Id: dvd_css.c,v 1.8 2001/02/14 04:11:01 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1000,7 +1000,7 @@ int CSSGetKeys( css_t * p_css )
     int         i_highest;
     int         i,j,k;
 
-    for( i_title = 0 ; i_title < p_css->i_title_nb ; i_title++ )
+    for( i_title = 0 ; i_title < 1/*p_css->i_title_nb*/ ; i_title++ )
     {
         /* Initialization for each title */
         memset( p_title_key, 0, 10 );
@@ -1072,8 +1072,10 @@ int CSSGetKeys( css_t * p_css )
                         (DVD_key_t*)&pi_buf[0x54], &key);
                 }
 
-                /* Stop search if we find two occurances of the key */
-                if( i_registered_keys == 1 && p_title_key[0].i >= 2 )
+                /* Stop search if we find one occurance of the key 
+                 * I have never found a DVD for which it is not enough
+                 * but we should take care of that */
+                if( i_registered_keys == 1 && p_title_key[0].i >= 1 )
                 {
                     b_stop_scanning = 1;
                 }
